@@ -1,0 +1,37 @@
+interface: I1
+fields:
+    a: Int
+methods:
+    func f1()
+
+methods {
+    func mI2() {}
+}
+
+---
+
+interface: I2
+
+fields {
+    b: String
+}
+
+methods {
+    func f2()
+}
+
+---
+
+interface: I3
+
+methods {
+    func f3()
+}
+
+---
+
+interface: I4
+
+fields {
+    c: Float
+}

@@ -1,0 +1,24 @@
+object: MyStruct
+implements: I1, I2, I3, I4
+fields:
+    a: Int
+    b: String
+    c: Float
+
+Self {
+    func f(): Int {
+        return 0
+    }
+}
+
+I1 {
+    func f1() {}
+}
+
+I2 {
+    func f2() {}
+}
+
+I3 {
+    func f3() {}
+}

@@ -1,0 +1,5 @@
+import MyStruct
+let s = MyStruct{1, "Roi", 2.0}
+print(s.f())
+s.f1()
+s.f2()
