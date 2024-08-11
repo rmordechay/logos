@@ -1,24 +1,19 @@
-object: MyStruct
-implements: I1, I2, I3, I4
-fields:
-    a: Int
-    b: String
-    c: Float
+name: MyObject
+implements: Interface
+
+fields {
+    Self var: CustomObject
+    Interface1 a: Int
+    Interface2 b: String
+    Interface3 c: Float
+}
 
 Self {
-    func f(): Int {
+    f(): Int {
         return 0
     }
 }
 
-I1 {
-    func f1() {}
-}
-
-I2 {
-    func f2() {}
-}
-
-I3 {
-    func f3() {}
+Interface {
+    f1() {}
 }

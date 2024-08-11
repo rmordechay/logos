@@ -5,29 +5,23 @@
 extern int yylex();
 extern int yyparse();
 extern FILE* yyin;
-
 void yyerror(const char* s);
+#include "../ast/ast.h"
 %}
+
 
 %union {
     char* val;
+    struct ASTNode *node;
 }
 
-%token <val> OBJECT
-%token <val> FUNC
-%token <val> LET
-%token <val> INTEGER
-%token <val> FLOAT
-%token <val> IDENTIFIER
-%token <val> COLON
-%token <val> LEFT_PAREN
-%token <val> RIGHT_PAREN
-%token <val> LEFT_BRACE
-%token <val> RIGHT_BRACE
-%token <val> LEFT_BRACK
-%token <val> RIGHT_BRACK
+%start program
+%token LET FUNC OBJECT IMPORT LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE LEFT_BRACKET RIGHT_BRACKET DOT COLON EQUAL MINUS PLUS STAR SLASH
+%token <val> INTEGER FLOAT IDENTIFIER
+%type <node> declaration unary_expr
 
 %%
+
 
 program:
       program declaration
@@ -38,9 +32,9 @@ declaration:
 	unary_expr
 
 unary_expr:
-      INTEGER { }
-    | FLOAT { }
-    | IDENTIFIER { }
+      INTEGER {  }
+    | FLOAT {  }
+    | IDENTIFIER {  }
     ;
 %%
 
