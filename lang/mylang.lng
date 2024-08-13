@@ -11,5 +11,5 @@ Self {
 }
 
 Interface {
-    func Void f1() { print("f1") }
+    func Void f1() { }
 }

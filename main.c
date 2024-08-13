@@ -1,31 +1,10 @@
 #include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdarg.h>
 #include "gen/parser.h"
+#include "ast/ast.h"
 
 extern FILE *yyin;
-
 extern int yyparse(void);
-
-extern struct ASTNode *root;
-
-void print_enum_definition(int count, ...) {
-    va_list args;
-    va_start(args, count);
-    printf("typedef enum {\n");
-    for (int i = 0; i < count; i++) {
-        char *str = va_arg(args, char*);
-        char enum_str[100] = "N_";
-        strcat(enum_str, str);
-        for (int j = 0; enum_str[j] != '\0'; j++) {
-            enum_str[j] = (char) toupper(enum_str[j]);
-        }
-        printf("    %s,\n", enum_str);
-    }
-    printf("} NodeType;\n");
-    va_end(args);
-}
+struct ASTNode *root;
 
 int main() {
     const char *filename = "lang/mylang.lng";
@@ -37,6 +16,7 @@ int main() {
     }
     yyin = file;
     yyparse();
+    printf("Root: %s\n", get_node_string(root->nodeType));
     fclose(file);
     return 0;
 }

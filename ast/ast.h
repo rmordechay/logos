@@ -27,10 +27,12 @@ typedef enum {
 typedef struct ASTNode {
     char *value;
     NodeType nodeType;
+    size_t childCount;
     struct ASTNode **children;
 } ASTNode;
 
 ASTNode *new_node(NodeType nodeType, int childCount, ...);
 ASTNode *new_leaf(NodeType nodeType, char *value);
+char *get_node_string(NodeType nodeType);
 
 #endif //MYLANG_C_AST_H
