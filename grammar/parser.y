@@ -1,17 +1,17 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "../ast/ast.h"
 
 extern int yylex();
 extern int yyparse();
 extern int yylineno;
 extern FILE* yyin;
 void yyerror(const char* s);
-#include "../ast/ast.h"
 
 struct ASTNode *root;
-
 %}
+
 
 
 %union {
@@ -26,7 +26,7 @@ struct ASTNode *root;
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER
 
-%type <node> program object_file title primary_title secondary_title methods_block_list methods_block methods_list method param_list param full_variable_declaration fields_block field_list field variable_declaration identifier type
+%type <node> program object_file title primary_title secondary_title method_signature methods_block_list methods_block methods_list method param_list param fields_block field_list field full_variable_declaration identifier type method_header
 
 %%
 
@@ -52,13 +52,27 @@ secondary_title:
 		IMPLEMENTS COLON identifier { $$ = new_node(N_SECONDARY_TITLE, 1, $3) }
 	;
 
+fields_block:
+      	FIELDS LEFT_BRACE field_list RIGHT_BRACE { $$ = new_node(N_FIELDS_BLOCK, 1, $3) }
+    ;
+
+field_list:
+		field_list field { $$ = new_node(N_FIELD_LIST, 1, $2) }
+    | 	field { $$ = new_node(N_FIELD_LIST, 1, $1) }
+    ;
+
+field:
+    	full_variable_declaration  { $$ = new_node(N_FIELD, 2, $1);  }
+    |	full_variable_declaration COLON type  { $$ = new_node(N_FIELD, 2, $1, $3);  }
+    ;
+
 methods_block_list:
 		methods_block { $$ = new_node(N_METHODS_BLOCK_LIST, 1, $1) }
 	|	methods_block_list methods_block { $$ = new_node(N_METHODS_BLOCK_LIST, 1, $2) }
 	;
 
 methods_block:
-		FIELDS LEFT_BRACE methods_list RIGHT_BRACE { $$ = new_node(N_METHODS_BLOCK, 1, $3) }
+		identifier LEFT_BRACE methods_list RIGHT_BRACE { $$ = new_node(N_METHODS_BLOCK, 2, $1, $3) }
 	;
 
 methods_list:
@@ -67,7 +81,16 @@ methods_list:
 	;
 
 method:
-		FUNC identifier LEFT_PAREN param_list RIGHT_PAREN LEFT_BRACE RIGHT_BRACE { $$ = new_node(N_METHOD, 2, $2, $4) }
+		method_signature LEFT_BRACE RIGHT_BRACE { $$ = new_node(N_METHOD, 1, $1) }
+	;
+
+method_signature:
+		method_header LEFT_PAREN param_list RIGHT_PAREN { $$ = new_node(N_METHOD_SIGNATURE, 2, $1, $3) }
+	|	method_header LEFT_PAREN RIGHT_PAREN { $$ = new_node(N_METHOD_SIGNATURE, 1, $1) }
+	;
+
+method_header:
+		FUNC full_variable_declaration { $$ = new_node(N_METHOD_HEADER, 1, $2) }
 	;
 
 param_list:
@@ -76,30 +99,17 @@ param_list:
 	 ;
 
 param:
-		variable_declaration { $$ = new_node(N_PARAM, 1, $1) }
-	|	param COMMA variable_declaration { $$ = new_node(N_PARAM, 2, $1, $3) }
+		full_variable_declaration { $$ = new_node(N_PARAM, 1, $1) }
+	|	param COMMA full_variable_declaration { $$ = new_node(N_PARAM, 2, $1, $3) }
 	;
 
-fields_block:
-      	FIELDS LEFT_BRACE field_list RIGHT_BRACE { $$ = new_node(N_FIELDS_BLOCK, 1, $3) }
-    ;
-
-field_list:
-		field { $$ = new_node(N_FIELD_LIST, 1, $1) }
-    | 	field_list field { $$ = new_node(N_FIELD_LIST, 1, $2) }
-    ;
-
-field:
-    	type full_variable_declaration { $$ = new_node(N_FIELD, 3, $1, $2);  }
-    ;
+//variable_declaration_no_type:
+//		full_variable_declaration { $$ = new_node(N_VARIABLE_DECLARATION, 1, $1) }
+//	|	identifier { $$ = new_node(N_VARIABLE_DECLARATION, 1, $1) }
+//	;
 
 full_variable_declaration:
-		identifier COLON type { $$ = new_node(N_FULL_VARIABLE_DECLARATION, 2, $1, $3) }
-	;
-
-variable_declaration:
-		full_variable_declaration { $$ = new_node(N_VARIABLE_DECLARATION, 1, $1) }
-	|	identifier { $$ = new_node(N_VARIABLE_DECLARATION, 1, $1) }
+		type identifier { $$ = new_node(N_FULL_VARIABLE_DECLARATION, 2, $1, $2) }
 	;
 
 identifier:

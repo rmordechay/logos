@@ -3,7 +3,6 @@
 
 
 typedef enum {
-    N_PROGRAM,
     N_OBJECT_FILE,
     N_TITLE,
     N_PRIMARY_TITLE,
@@ -11,6 +10,8 @@ typedef enum {
     N_METHODS_BLOCK_LIST,
     N_METHODS_BLOCK,
     N_METHODS_LIST,
+    N_METHOD_SIGNATURE,
+    N_METHOD_HEADER,
     N_METHOD,
     N_PARAM_LIST,
     N_PARAM,

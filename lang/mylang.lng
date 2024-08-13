@@ -2,14 +2,14 @@ object: MyObject
 implements: Interface
 
 fields {
-    Self var: CustomObject
-    Interface a: Int
+    Int var
+    Int var: Interface
 }
 
 Self {
-    func f(): Int { return 0 }
+    func Int f() { }
 }
 
 Interface {
-    func f1() { print("f1") }
+    func Void f1() { print("f1") }
 }
