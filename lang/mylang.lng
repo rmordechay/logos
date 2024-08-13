@@ -1,19 +1,15 @@
-name: MyObject
+object: MyObject
 implements: Interface
 
 fields {
     Self var: CustomObject
-    Interface1 a: Int
-    Interface2 b: String
-    Interface3 c: Float
+    Interface a: Int
 }
 
 Self {
-    f(): Int {
-        return 0
-    }
+    func f(): Int { return 0 }
 }
 
 Interface {
-    f1() {}
+    func f1() { print("f1") }
 }

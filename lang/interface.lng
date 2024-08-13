@@ -1,11 +1,11 @@
-interface: I1
+interface: Interface
 
 fields {
     a: Int
     b = 2
 }
 
-methods {
-    f1()
-    f2() {  }
+Self {
+    func f1()
+    func f2() {  }
 }

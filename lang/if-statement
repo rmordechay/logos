@@ -1,0 +1,19 @@
+if (x < 1) {
+    print()
+} or (x > 1) {
+    print()
+} or {
+    print()
+}
+
+if {
+    x > 1: expr
+    x < 1: expr
+    else: expr
+}
+
+if (var) {
+    1: expr
+    x: expr
+    or: expr
+}
