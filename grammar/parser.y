@@ -26,7 +26,7 @@ struct ASTNode *root;
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER
 
-%type <node> program object_file full_title primary_title secondary_title method_signature methods_block_list methods_block methods_list method param_list param fields_block field_list field full_variable_declaration identifier type method_header
+%type <node> program object_file full_title primary_title secondary_title method_signature methods_block_list methods_block methods_list method param_list param fields_block field_list field full_variable_declaration identifier type type_list method_header
 
 %%
 
@@ -49,7 +49,7 @@ primary_title:
 	;
 
 secondary_title:
-		IMPLEMENTS COLON identifier { $$ = new_node(N_SECONDARY_TITLE, 1, $3) }
+		IMPLEMENTS COLON type_list { $$ = new_node(N_SECONDARY_TITLE, 1, $3) }
 	;
 
 fields_block:
@@ -119,6 +119,10 @@ identifier:
 type:
     	IDENTIFIER { $$ = new_leaf(N_TYPE, yylval.val) }
     ;
+
+type_list:
+	  type { $$ = new_node(N_TYPE_LIST, 1, $1) }
+	| type_list COMMA type { $$ = new_node(N_TYPE_LIST, 1, $1) }
 
 %%
 

@@ -1,3 +1,5 @@
+#include <strings.h>
+#include <stdlib.h>
 #include "utils.h"
 
 /**
@@ -83,4 +85,35 @@ void print_json(ASTNode *node) {
     char *jsonString = cJSON_Print(json);
     cJSON_Delete(json);
     printf("%s\n", jsonString);
+}
+
+/**
+ *
+ */
+void init_string_list(StringList *list, int capacity) {
+    list->capacity = capacity;
+    list->len = 0;
+    list->strings = malloc(capacity * sizeof(char *));
+}
+
+/**
+ *
+ */
+void add_to_string(StringList *list, const char *str) {
+    if (list->len >= list->capacity) {
+        list->capacity *= 2;
+        char **new_string = realloc(list->strings, list->capacity * sizeof(char *));
+        list->strings = new_string;
+    }
+    list->strings[list->len] = malloc(strlen(str) + 1);
+    strcpy(list->strings[list->len], str);
+    list->len++;
+}
+
+/**
+ *
+ */
+const char *get_string_element(StringList *list, int i) {
+    if (i < 0 || i > list->len) return NULL;
+    return list->strings[i];
 }

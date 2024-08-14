@@ -16,6 +16,8 @@ set(SOURCES
     compiler/analyser.c
     ast/ast.c
     main.c
+    utils/utils.h
+    utils/utils.c
 )
 
 add_executable(mylang ${SOURCES})

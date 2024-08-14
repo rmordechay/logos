@@ -1,4 +1,7 @@
+#include <stdarg.h>
+#include <stdlib.h>
 #include "ast.h"
+#include "../utils/utils.h"
 
 
 /**

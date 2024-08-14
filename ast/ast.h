@@ -1,9 +1,7 @@
 #ifndef MYLANG_C_AST_H
 #define MYLANG_C_AST_H
 
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdlib.h>
+#include <stddef.h>
 
 typedef enum {
     N_OBJECT_FILE,
@@ -24,7 +22,9 @@ typedef enum {
     N_FIELD,
     N_VARIABLE_DECLARATION,
     N_IDENTIFIER,
+    N_IDENTIFIER_LIST,
     N_TYPE,
+    N_TYPE_LIST,
 } NodeType;
 
 typedef struct ASTNode {
