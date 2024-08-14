@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "gen/parser.h"
 #include "ast/ast.h"
+#include "compiler/compiler.h"
 
 extern FILE *yyin;
 extern int yyparse(void);
@@ -16,7 +17,7 @@ int main() {
     }
     yyin = file;
     yyparse();
-    print_node(root, 0);
+    compile(root);
     fclose(file);
     return 0;
 }

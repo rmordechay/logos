@@ -1,7 +1,10 @@
 #ifndef MYLANG_COMPILER_H
 #define MYLANG_COMPILER_H
 
-struct ASTNode *f(struct ASTNode *r);
-int f1(struct ASTNode *node);
+#include "../ast/ast.h"
+#include "../utils/utils.h"
+
+void compile(ASTNode *root);
+
 
 #endif //MYLANG_COMPILER_H

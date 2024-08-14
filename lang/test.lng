@@ -3,5 +3,5 @@ Self {
 }
 
 Interface {
-    func f1() { print("f1") }
+    func f1() { print("compile") }
 }

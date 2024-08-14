@@ -1,6 +1,4 @@
-#include <string.h>
 #include <stdarg.h>
-#include <printf.h>
 #include <stdlib.h>
 #include "ast.h"
 
@@ -24,6 +22,9 @@ ASTNode *new_node(NodeType nodeType, int childCount, ...) {
     return node;
 }
 
+/**
+ *
+ */
 ASTNode *new_leaf(NodeType nodeType, char *value) {
     ASTNode *node = malloc(sizeof(ASTNode));
     node->value = value;
@@ -31,10 +32,13 @@ ASTNode *new_leaf(NodeType nodeType, char *value) {
     return node;
 }
 
+/**
+ *
+ */
 char *get_node_string(NodeType nodeType) {
     switch (nodeType) {
         case N_OBJECT_FILE: return "OBJECT_FILE";
-        case N_TITLE: return "TITLE";
+        case N_FULL_TITLE: return "TITLE";
         case N_PRIMARY_TITLE: return "PRIMARY_TITLE";
         case N_SECONDARY_TITLE: return "SECONDARY_TITLE";
         case N_METHODS_BLOCK_LIST: return "METHODS_BLOCK_LIST";
@@ -56,29 +60,3 @@ char *get_node_string(NodeType nodeType) {
     }
 }
 
-void print_node(ASTNode *root, int depth) {
-    for (int i = 0; i < depth; i++) {
-        printf("\t");
-    }
-    printf("- Node Type: %s\n", get_node_string(root->nodeType));
-
-    for (int i = 0; i < depth; i++) {
-        printf("\t");
-    }
-    printf("  Child count: %zu\n", root->childCount);
-
-    if (root->childCount != 0) {
-        for (int i = 0; i < depth; i++) {
-            printf("\t");
-        }
-        printf("  Children:\n");
-        for (size_t i = 0; i < root->childCount; i++) {
-            print_node(root->children[i], depth + 1);
-        }
-    } else {
-        for (int i = 0; i < depth; i++) {
-            printf("\t");
-        }
-        printf("  Value: %s\n", root->value);
-    }
-}

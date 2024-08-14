@@ -6,6 +6,6 @@ fields {
 }
 
 Self {
-    func f1()
+    func compile()
     func f2() {  }
 }

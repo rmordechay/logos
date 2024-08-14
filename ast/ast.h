@@ -1,10 +1,12 @@
 #ifndef MYLANG_C_AST_H
 #define MYLANG_C_AST_H
 
+#include "cJSON.h"
+#include <stdio.h>
 
 typedef enum {
     N_OBJECT_FILE,
-    N_TITLE,
+    N_FULL_TITLE,
     N_PRIMARY_TITLE,
     N_SECONDARY_TITLE,
     N_METHODS_BLOCK_LIST,
@@ -33,7 +35,12 @@ typedef struct ASTNode {
 
 ASTNode *new_node(NodeType nodeType, int childCount, ...);
 ASTNode *new_leaf(NodeType nodeType, char *value);
-char *get_node_string(NodeType nodeType);
-void print_node(ASTNode *root, int depth);
+
+
+void visitNode(ASTNode *node);
+void visitObjectFile(ASTNode *object_file);
+void visitFullTitle(ASTNode *full_title);
+void visitPrimaryTitle(ASTNode *primary_title);
+void visitSecondaryTitle(ASTNode *secondary_title);
 
 #endif //MYLANG_C_AST_H

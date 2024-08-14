@@ -26,7 +26,7 @@ struct ASTNode *root;
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER
 
-%type <node> program object_file title primary_title secondary_title method_signature methods_block_list methods_block methods_list method param_list param fields_block field_list field full_variable_declaration identifier type method_header
+%type <node> program object_file full_title primary_title secondary_title method_signature methods_block_list methods_block methods_list method param_list param fields_block field_list field full_variable_declaration identifier type method_header
 
 %%
 
@@ -35,13 +35,13 @@ program:
     ;
 
 object_file:
-      	title fields_block methods_block_list { $$ = new_node(N_OBJECT_FILE, 3, $1, $2, $3) }
-    | 	title fields_block { $$ = new_node(N_OBJECT_FILE, 2, $1, $2) }
+      	full_title fields_block methods_block_list { $$ = new_node(N_OBJECT_FILE, 3, $1, $2, $3) }
+    | 	full_title fields_block { $$ = new_node(N_OBJECT_FILE, 2, $1, $2) }
     ;
 
-title:
-		primary_title secondary_title { $$ = new_node(N_TITLE, 2, $1, $2) }
-	| 	primary_title { $$ = new_node(N_TITLE, 2, $1) }
+full_title:
+		primary_title secondary_title { $$ = new_node(N_FULL_TITLE, 2, $1, $2) }
+	| 	primary_title { $$ = new_node(N_FULL_TITLE, 2, $1) }
 	;
 
 primary_title:
