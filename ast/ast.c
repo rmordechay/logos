@@ -15,9 +15,9 @@ ASTNode *new_node(NodeType nodeType, int childCount, ...) {
     ASTNode *node = malloc(sizeof(ASTNode));
     node->nodeType = nodeType;
     node->childCount = childCount;
-    node->children = malloc(childCount * sizeof(ASTNode*));
+    node->children = malloc(childCount * sizeof(ASTNode *));
     for (int i = 0; i < childCount; i++) {
-        ASTNode* child = va_arg(args, ASTNode*);
+        ASTNode *child = va_arg(args, ASTNode*);
         node->children[i] = child;
     }
     va_end(args);
@@ -32,7 +32,7 @@ ASTNode *new_leaf(NodeType nodeType, char *value) {
 }
 
 char *get_node_string(NodeType nodeType) {
-    switch(nodeType) {
+    switch (nodeType) {
         case N_OBJECT_FILE: return "OBJECT_FILE";
         case N_TITLE: return "TITLE";
         case N_PRIMARY_TITLE: return "PRIMARY_TITLE";
@@ -53,5 +53,32 @@ char *get_node_string(NodeType nodeType) {
         case N_IDENTIFIER: return "IDENTIFIER";
         case N_TYPE: return "TYPE";
         default: return "UNKNOWN_TYPE";
+    }
+}
+
+void print_node(ASTNode *root, int depth) {
+    for (int i = 0; i < depth; i++) {
+        printf("\t");
+    }
+    printf("- Node Type: %s\n", get_node_string(root->nodeType));
+
+    for (int i = 0; i < depth; i++) {
+        printf("\t");
+    }
+    printf("  Child count: %zu\n", root->childCount);
+
+    if (root->childCount != 0) {
+        for (int i = 0; i < depth; i++) {
+            printf("\t");
+        }
+        printf("  Children:\n");
+        for (size_t i = 0; i < root->childCount; i++) {
+            print_node(root->children[i], depth + 1);
+        }
+    } else {
+        for (int i = 0; i < depth; i++) {
+            printf("\t");
+        }
+        printf("  Value: %s\n", root->value);
     }
 }

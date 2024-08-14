@@ -16,7 +16,7 @@ int main() {
     }
     yyin = file;
     yyparse();
-    printf("Root: %s\n", get_node_string(root->nodeType));
+    print_node(root, 0);
     fclose(file);
     return 0;
 }

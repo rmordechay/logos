@@ -34,5 +34,6 @@ typedef struct ASTNode {
 ASTNode *new_node(NodeType nodeType, int childCount, ...);
 ASTNode *new_leaf(NodeType nodeType, char *value);
 char *get_node_string(NodeType nodeType);
+void print_node(ASTNode *root, int depth);
 
 #endif //MYLANG_C_AST_H
