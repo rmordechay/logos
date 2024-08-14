@@ -6,6 +6,6 @@ fields {
 }
 
 Self {
-    func compile()
+    func analyse_ast()
     func f2() {  }
 }

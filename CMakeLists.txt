@@ -14,8 +14,8 @@ add_executable(
     gen/parser.h
     ast/ast.c
     ast/ast.h
-    compiler/compiler.c
-    compiler/compiler.h
+    compiler/analyser.c
+    compiler/analyser.h
     utils/utils.c
     utils/utils.h
     include/cJSON.c

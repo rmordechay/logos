@@ -31,17 +31,17 @@ void print_tree(ASTNode *root, int depth) {
     for (int i = 0; i < depth; i++) {
         printf("\t");
     }
-    printf("- Node Type: %s\n", get_node_string(root->nodeType));
-    if (root->childCount != 0) {
+    printf("- Node Type: %s\n", get_node_string(root->node_type));
+    if (root->child_count != 0) {
         for (int i = 0; i < depth; i++) {
             printf("\t");
         }
-        printf("  Child count: %zu\n", root->childCount);
+        printf("  Child count: %zu\n", root->child_count);
         for (int i = 0; i < depth; i++) {
             printf("\t");
         }
         printf("  Children:\n");
-        for (size_t i = 0; i < root->childCount; i++) {
+        for (size_t i = 0; i < root->child_count; i++) {
             print_tree(root->children[i], depth + 1);
         }
     } else {
@@ -63,9 +63,9 @@ cJSON *node_to_json(ASTNode * node) {
     } else {
         cJSON_AddNullToObject(json, "value");
     }
-    cJSON_AddStringToObject(json, "node_type", get_node_string(node->nodeType));
+    cJSON_AddStringToObject(json, "node_type", get_node_string(node->node_type));
     cJSON *arr = cJSON_CreateArray();
-    for (int i = 0; i < node->childCount; i++) {
+    for (int i = 0; i < node->child_count; i++) {
         cJSON *child = (cJSON *) node_to_json(node->children[i]);
         if (child != NULL) {
             cJSON_AddItemToArray(arr, child);
@@ -73,4 +73,14 @@ cJSON *node_to_json(ASTNode * node) {
     }
     cJSON_AddItemToObject(json, "children", arr);
     return json;
+}
+
+/**
+ *
+ */
+void print_json(ASTNode *node) {
+    cJSON *json = node_to_json(node);
+    char *jsonString = cJSON_Print(json);
+    cJSON_Delete(json);
+    printf("%s\n", jsonString);
 }

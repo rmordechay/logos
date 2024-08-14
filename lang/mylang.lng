@@ -11,5 +11,5 @@ Self {
 }
 
 Interface {
-    func Void compile() { }
+    func Void analyse_ast() { }
 }

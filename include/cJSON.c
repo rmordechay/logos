@@ -180,7 +180,7 @@ static void * CJSON_CDECL internal_realloc(void *pointer, size_t size)
 #define internal_realloc realloc
 #endif
 
-/* strlen of character literals resolved at compile time */
+/* strlen of character literals resolved at analyse_ast time */
 #define static_strlen(string_literal) (sizeof(string_literal) - sizeof(""))
 
 static internal_hooks global_hooks = { internal_malloc, internal_free, internal_realloc };

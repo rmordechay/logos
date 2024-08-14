@@ -3,5 +3,5 @@ Self {
 }
 
 Interface {
-    func f1() { print("compile") }
+    func f1() { print("analyse_ast") }
 }

@@ -6,15 +6,15 @@
 /**
  *
  */
-ASTNode *new_node(NodeType nodeType, int childCount, ...) {
+ASTNode *new_node(NodeType node_type, int child_count, ...) {
     va_list args;
-    va_start(args, childCount);
+    va_start(args, child_count);
 
     ASTNode *node = malloc(sizeof(ASTNode));
-    node->nodeType = nodeType;
-    node->childCount = childCount;
-    node->children = malloc(childCount * sizeof(ASTNode *));
-    for (int i = 0; i < childCount; i++) {
+    node->node_type = node_type;
+    node->child_count = child_count;
+    node->children = malloc(child_count * sizeof(ASTNode *));
+    for (int i = 0; i < child_count; i++) {
         ASTNode *child = va_arg(args, ASTNode*);
         node->children[i] = child;
     }
@@ -25,10 +25,10 @@ ASTNode *new_node(NodeType nodeType, int childCount, ...) {
 /**
  *
  */
-ASTNode *new_leaf(NodeType nodeType, char *value) {
+ASTNode *new_leaf(NodeType node_type, char *value) {
     ASTNode *node = malloc(sizeof(ASTNode));
     node->value = value;
-    node->nodeType = nodeType;
+    node->node_type = node_type;
     return node;
 }
 

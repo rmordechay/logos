@@ -1,5 +1,5 @@
 import MyObject
 let s = MyObject{CustomObject{}, 2}
 print(s.f())
-s.compile()
+s.analyse_ast()
 s.f2()

@@ -7,5 +7,6 @@
 char *get_node_string(NodeType nodeType);
 void print_tree(ASTNode *root, int depth);
 cJSON *node_to_json(ASTNode * node);
+void print_json(ASTNode *node);
 
 #endif //MYLANG_UTILS_H
