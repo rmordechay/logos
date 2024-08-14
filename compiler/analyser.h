@@ -1,8 +1,8 @@
 #ifndef MYLANG_ANALYSER_H
 #define MYLANG_ANALYSER_H
 
-#include "../ast/ast.h"
-#include "../utils/utils.h"
+#include "ast/ast.h"
+#include "utils/utils.h"
 
 typedef struct Object {
     char *name;

@@ -5,8 +5,8 @@ for { }
 for i { }
 
 // Loop in range
-for i in 5..10 {
- }
+for i in 5..10 {  }
+
 // Loop in range with steps
 for i in 5..10 step 2 { }
 

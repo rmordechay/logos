@@ -3,7 +3,7 @@
 
 #include <cJSON.h>
 #include <curl/curl.h>
-#include "../ast/ast.h"
+#include "ast/ast.h"
 
 typedef struct StringList {
     char **strings;
