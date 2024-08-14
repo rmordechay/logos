@@ -1,5 +1,3 @@
-#include <stdarg.h>
-#include <stdlib.h>
 #include "ast.h"
 
 

@@ -1,6 +1,7 @@
 #ifndef MYLANG_UTILS_H
 #define MYLANG_UTILS_H
 
+#include <cJSON.h>
 #include <curl/curl.h>
 #include "../ast/ast.h"
 

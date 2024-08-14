@@ -1,5 +1,7 @@
 #include "analyser.h"
 
+char *object_name;
+
 /**
  *
  */
@@ -45,13 +47,28 @@ void visit_full_title(ASTNode *full_title) {
  *
  */
 void visit_primary_title(ASTNode *primary_title) {
-
+    object_name = primary_title->children[0]->value;
+    printf("%s\n", object_name);
 }
 
 /**
  *
  */
 void visit_secondary_title(ASTNode *secondary_title) {
+
+}
+
+/**
+ *
+ */
+void visit_methods_block_list(ASTNode *methods_block_list) {
+
+}
+
+/**
+ *
+ */
+void visit_fields_block(ASTNode *fields_block) {
 
 }
 

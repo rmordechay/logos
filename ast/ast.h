@@ -1,8 +1,9 @@
 #ifndef MYLANG_C_AST_H
 #define MYLANG_C_AST_H
 
-#include "cJSON.h"
 #include <stdio.h>
+#include <stdarg.h>
+#include <stdlib.h>
 
 typedef enum {
     N_OBJECT_FILE,
