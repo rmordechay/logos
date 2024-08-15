@@ -62,8 +62,12 @@ void visit_secondary_title(ASTNode *secondary_title, Object *obj) {
     ASTNode *type_list = secondary_title->children[0];
     for (int i = 0; i < type_list->child_count; i++) {
         ASTNode *child = type_list->children[i];
-        printf("%s\n", child->value);
-//        add_to_string(&obj->implements, child->value);
+        for (int j = 0; j < child->child_count; j++) {
+            ASTNode *gChild = child->children[j];
+            printf("%s\n", gChild->value);
+            printf("%s\n", get_node_string(gChild->node_type));
+            add_to_string(&obj->implements, gChild->value);
+        }
     }
 }
 

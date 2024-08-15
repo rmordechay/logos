@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ast/ast.h"
+#include "utils/utils.h"
 
 extern int yylex();
 extern int yyparse();
@@ -103,11 +104,6 @@ param:
 	|	param COMMA full_variable_declaration { $$ = new_node(N_PARAM, 2, $1, $3) }
 	;
 
-//variable_declaration_no_type:
-//		full_variable_declaration { $$ = new_node(N_VARIABLE_DECLARATION, 1, $1) }
-//	|	identifier { $$ = new_node(N_VARIABLE_DECLARATION, 1, $1) }
-//	;
-
 full_variable_declaration:
 		type identifier { $$ = new_node(N_FULL_VARIABLE_DECLARATION, 2, $1, $2) }
 	;
@@ -122,7 +118,7 @@ type:
 
 type_list:
 	  type { $$ = new_node(N_TYPE_LIST, 1, $1) }
-	| type_list COMMA type { $$ = new_node(N_TYPE_LIST, 1, $1) }
+	| type_list COMMA type { $$ = flatten_list($1, $3) }
 
 %%
 

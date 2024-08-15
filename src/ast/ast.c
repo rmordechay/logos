@@ -10,7 +10,6 @@
 ASTNode *new_node(NodeType node_type, int child_count, ...) {
     va_list args;
     va_start(args, child_count);
-
     ASTNode *node = malloc(sizeof(ASTNode));
     node->node_type = node_type;
     node->child_count = child_count;
@@ -21,6 +20,14 @@ ASTNode *new_node(NodeType node_type, int child_count, ...) {
     }
     va_end(args);
     return node;
+}
+
+ASTNode *flatten_list(ASTNode *list_node, ASTNode* child) {
+    size_t new_count = list_node->child_count + 1;
+    list_node->children = realloc(list_node->children, new_count * sizeof(ASTNode *));
+    list_node->children[list_node->child_count] = child;
+    list_node->child_count = new_count;
+    return list_node;
 }
 
 /**
@@ -57,7 +64,8 @@ char *get_node_string(NodeType nodeType) {
         case N_VARIABLE_DECLARATION: return "VARIABLE_DECLARATION";
         case N_IDENTIFIER: return "IDENTIFIER";
         case N_TYPE: return "TYPE";
-        default: return "UNKNOWN_TYPE";
+        case N_TYPE_LIST: return "TYPE_LIST";
+        default: return NULL;
     }
 }
 

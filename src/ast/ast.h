@@ -36,5 +36,6 @@ typedef struct ASTNode {
 
 ASTNode *new_node(NodeType node_type, int child_count, ...);
 ASTNode *new_leaf(NodeType node_type, char *value);
+ASTNode *flatten_list(ASTNode *list_node, ASTNode* child);
 
 #endif //MYLANG_C_AST_H
