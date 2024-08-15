@@ -16,7 +16,7 @@ void visit_fields_block(Node *n_fields_block, Object *obj);
 void visit_methods_block_list(Node *n_methods_block_list, Object *obj);
 void visit_field(Node *n_field, Object *obj, Field *field);
 void visit_var_declaration(Node *n_var_declaration, Object *obj, Field *field);
-void visit_variable(Node *n_variable, Object *obj, Variable *p_variable);
-void visit_type(Node *n_type, Object *obj, Type *type);
+void visit_variable(Node *n_variable, Variable *variable);
+void visit_type(Node *n_type, Type *type);
 
 #endif //MYLANG_ANALYSER_H

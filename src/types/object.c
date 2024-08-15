@@ -36,4 +36,7 @@ void print_obj(Object *obj) {
     for (size_t i = 0; i < obj->interfaces_len; i++) {
         printf("Interface %zu: %s\n", i + 1, obj->interfaces[i]->name);
     }
+    for (size_t i = 0; i < obj->fields_len; i++) {
+        printf("Field %zu: %s %s\n", i + 1, obj->fields[i]->variable->name, obj->fields[i]->type->name);
+    }
 }

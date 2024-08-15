@@ -94,6 +94,9 @@ void visit_field(Node *n_field, Object *obj, Field *field) {
     if (n_field->node_type != N_FIELD) return;
     Node *full_var_dec = n_field->children[0];
     visit_var_declaration(full_var_dec, obj, field);
+    if (n_field->child_len == 2) {
+        field->Interface = NULL;
+    }
 }
 
 /**
@@ -103,22 +106,24 @@ void visit_var_declaration(Node *n_var_declaration, Object *obj, Field *field) {
     if (n_var_declaration->node_type != N_VARIABLE_DECLARATION) return;
     field->variable = malloc(sizeof(Variable));
     field->type = malloc(sizeof(Type));
-    visit_variable(n_var_declaration->children[0], obj, field->variable);
-    visit_type(n_var_declaration->children[1], obj, field->type);
+    visit_type(n_var_declaration->children[0], field->type);
+    visit_variable(n_var_declaration->children[1], field->variable);
 }
 
 /**
  *
  */
-void visit_variable(Node *n_variable, Object *obj, Variable *p_variable) {
+void visit_variable(Node *n_variable, Variable *variable) {
     if (n_variable->node_type != N_IDENTIFIER) return;
+    variable->name = n_variable->value;
 }
 
 /**
  *
  */
-void visit_type(Node *n_type, Object *obj, Type *type) {
+void visit_type(Node *n_type, Type *type) {
     if (n_type->node_type != N_TYPE) return;
+    type->name = n_type->value;
 }
 
 /**

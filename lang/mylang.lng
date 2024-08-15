@@ -3,7 +3,7 @@ implements: Interface, Interface2, Interface3
 
 fields {
     Int var
-    Int var: Interface
+    Int var2: Interface
 }
 
 Self {

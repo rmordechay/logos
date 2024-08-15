@@ -63,7 +63,7 @@ field_list:
     ;
 
 field:
-    	variable_declaration  { $$ = new_node(N_FIELD, 2, $1);  }
+    	variable_declaration  { $$ = new_node(N_FIELD, 1, $1);  }
     |	variable_declaration COLON type  { $$ = new_node(N_FIELD, 2, $1, $3);  }
     ;
 
