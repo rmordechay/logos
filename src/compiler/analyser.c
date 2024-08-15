@@ -25,6 +25,7 @@ void visit_object_file(ASTNode *object_file) {
             visit_methods_block_list(child, obj);
         }
     }
+    print_json(object_file);
     free(obj);
 }
 

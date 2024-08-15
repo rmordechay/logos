@@ -58,8 +58,8 @@ fields_block:
     ;
 
 field_list:
-		field_list field { $$ = new_node(N_FIELD_LIST, 1, $2) }
-    | 	field { $$ = new_node(N_FIELD_LIST, 1, $1) }
+		field { $$ = new_node(N_FIELD_LIST, 1, $1) }
+    | 	field_list field { $$ = flatten_list($1, $2) }
     ;
 
 field:
@@ -69,7 +69,7 @@ field:
 
 methods_block_list:
 		methods_block { $$ = new_node(N_METHODS_BLOCK_LIST, 1, $1) }
-	|	methods_block_list methods_block { $$ = new_node(N_METHODS_BLOCK_LIST, 1, $2) }
+	|	methods_block_list methods_block { $$ = flatten_list($1, $2) }
 	;
 
 methods_block:
@@ -78,7 +78,7 @@ methods_block:
 
 methods_list:
 		method { $$ = new_node(N_METHODS_LIST, 1, $1) }
-	|	methods_list method { $$ = new_node(N_METHODS_LIST, 1, $2) }
+	|	methods_list method { $$ = flatten_list($1, $2) }
 	;
 
 method:
@@ -96,12 +96,11 @@ method_header:
 
 param_list:
 	   	param { $$ = new_node(N_PARAM_LIST, 1, $1) }
-	 | 	param_list param { $$ = new_node(N_PARAM_LIST, 1, $2) }
+	 | 	param_list param { $$ = flatten_list($1, $2) }
 	 ;
 
 param:
 		full_variable_declaration { $$ = new_node(N_PARAM, 1, $1) }
-	|	param COMMA full_variable_declaration { $$ = new_node(N_PARAM, 2, $1, $3) }
 	;
 
 full_variable_declaration:
