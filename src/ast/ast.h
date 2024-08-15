@@ -31,11 +31,11 @@ typedef struct ASTNode {
     char *value;
     NodeType node_type;
     size_t child_len;
-    struct ASTNode **children;
-} ASTNode;
+    struct Node **children;
+} Node;
 
-ASTNode *new_node(NodeType node_type, int child_len, ...);
-ASTNode *new_leaf(NodeType node_type, char *value);
-ASTNode *flatten_list(ASTNode *list_node, ASTNode* child);
+Node *new_node(NodeType node_type, int child_len, ...);
+Node *new_leaf(NodeType node_type, char *value);
+Node *flatten_list(Node *list_node, Node* child);
 
 #endif //MYLANG_C_AST_H

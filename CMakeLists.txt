@@ -31,6 +31,11 @@ set(
     ${GEN_DIR_SOURCE}/parser.c
     ${GEN_DIR_SOURCE}/lexer.c
     main.c
+    src/types/object.c
+    src/types/object.h
+    src/config.h
+    src/types/interface.c
+    src/types/interface.h
 )
 
 add_executable(mylang ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})

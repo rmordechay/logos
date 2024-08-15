@@ -32,7 +32,7 @@ struct ASTNode *root;
 %%
 
 program:
-      	object_file { root = $$ }
+      	OBJECT COLON object_file { root = $3 }
     ;
 
 object_file:
@@ -42,11 +42,11 @@ object_file:
 
 full_title:
 		primary_title secondary_title { $$ = new_node(N_FULL_TITLE, 2, $1, $2) }
-	| 	primary_title { $$ = new_node(N_FULL_TITLE, 2, $1) }
+	| 	primary_title { $$ = new_node(N_FULL_TITLE, 1, $1) }
 	;
 
 primary_title:
-		OBJECT COLON identifier { $$ = new_node(N_PRIMARY_TITLE, 1, $3) }
+		identifier { $$ = new_node(N_PRIMARY_TITLE, 1, $1) }
 	;
 
 secondary_title:

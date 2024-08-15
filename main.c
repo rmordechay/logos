@@ -5,7 +5,7 @@
 
 extern FILE *yyin;
 extern int yyparse(void);
-struct ASTNode *root;
+struct Node *root;
 
 int main() {
     const char *filename = "lang/mylang.lng";

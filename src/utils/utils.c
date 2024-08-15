@@ -29,7 +29,7 @@ void make_http_call() {
 /**
  *
  */
-void print_tree(ASTNode *root, int depth) {
+void print_tree(Node *root, int depth) {
     for (int i = 0; i < depth; i++) {
         printf("\t");
     }
@@ -55,7 +55,7 @@ void print_tree(ASTNode *root, int depth) {
 }
 
 
-cJSON *node_to_json(ASTNode * node) {
+cJSON *node_to_json(Node * node) {
     if (node == NULL) {
         return NULL;
     }
@@ -80,7 +80,7 @@ cJSON *node_to_json(ASTNode * node) {
 /**
  *
  */
-void print_json(ASTNode *node) {
+void print_json(Node *node) {
     cJSON *json = node_to_json(node);
     char *jsonString = cJSON_Print(json);
     cJSON_Delete(json);
