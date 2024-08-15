@@ -8,7 +8,7 @@ extern int yyparse(void);
 struct Node *root;
 
 int main() {
-    const char *filename = "lang/mylang.lng";
+    const char *filename = "lang/object.lng";
     FILE *file;
     file = fopen(filename, "r");
     yyin = file;

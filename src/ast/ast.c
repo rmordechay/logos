@@ -74,7 +74,10 @@ char *get_node_string(NodeType nodeType) {
         case N_IDENTIFIER_LIST: return "IDENTIFIER_LIST";
         case N_LOCAL_DECLARATION: return "LOCAL_DECLARATION";
         case N_VAR_DEC_LIST: return "VAR_DEC_LIST";
+        case N_BINARY_EXPR:break;
         default: return NULL;
+
     }
+    return NULL;
 }
 

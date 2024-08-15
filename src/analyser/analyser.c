@@ -177,7 +177,7 @@ void visit_local_declaration(Node *n_local_declaration, LocalDec *local_dec) {
     Node *n_var_dec = n_local_declaration->children[0];
     local_dec->variable_dec = create_variable_declaration();
     visit_variable_declaration(n_var_dec, local_dec->variable_dec);
-    // Expression
+    // Expr
     Node *n_expr = n_local_declaration->children[1];
     local_dec->expr = create_expr();
     visit_expr(n_expr, local_dec->expr);
@@ -188,19 +188,25 @@ void visit_local_declaration(Node *n_local_declaration, LocalDec *local_dec) {
  */
 void visit_expr(Node *n_expr, Expr *expr) {
     check_wrong_token(n_expr, N_EXPR, "EXPR");
-    if (n_expr->node_type == N_UNARY_EXPR) {
+    Node *child = n_expr->children[0];
+    NodeType node_type = child->node_type;
+    if (node_type == N_UNARY_EXPR) {
+        UnaryExpr *unary_expr = create_unary_expr();
+        expr->expr_type = UNARY;
         return;
     }
-    Node *left = n_expr->children[0];
-    Node *right = n_expr->children[1];
-    if (n_expr->node_type == N_ADD_EXPR) {
 
-    } else if (n_expr->node_type == N_SUB_EXPR) {
-
-    } else if (n_expr->node_type == N_MUL_EXPR) {
-
-    } else if (n_expr->node_type == N_DIV_EXPR) {
-
+    Node *left_expr = n_expr->children[0];
+    Node *right_expr = n_expr->children[1];
+    BinaryExpr *binary_expr = create_binary_expr();
+    if (node_type == N_ADD_EXPR) {
+        binary_expr->op = ADD;
+    } else if (node_type == N_SUB_EXPR) {
+        binary_expr->op = SUB;
+    } else if (node_type == N_MUL_EXPR) {
+        binary_expr->op = MUL;
+    } else if (node_type == N_DIV_EXPR) {
+        binary_expr->op = DIV;
     }
 }
 

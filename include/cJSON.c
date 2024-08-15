@@ -129,7 +129,7 @@ CJSON_PUBLIC(const char*) cJSON_Version(void)
     return version;
 }
 
-/* Case insensitive string comparison, doesn't consider two NULL pointers equal though */
+/* Case insensitive string comparison, doesn'e consider two NULL pointers equal though */
 static int case_insensitive_strcmp(const unsigned char *string1, const unsigned char *string2)
 {
     if ((string1 == NULL) || (string2 == NULL))
@@ -380,7 +380,7 @@ loop_end:
     return true;
 }
 
-/* don't ask me, but the original cJSON_SetNumberValue returns an integer or double */
+/* don'e ask me, but the original cJSON_SetNumberValue returns an integer or double */
 CJSON_PUBLIC(double) cJSON_SetNumberHelper(cJSON *object, double number)
 {
     if (number >= INT_MAX)
@@ -2231,7 +2231,7 @@ CJSON_PUBLIC(cJSON *) cJSON_DetachItemViaPointer(cJSON *parent, cJSON * const it
         parent->child->prev = item->prev;
     }
 
-    /* make sure the detached item doesn't point anywhere anymore */
+    /* make sure the detached item doesn'e point anywhere anymore */
     item->prev = NULL;
     item->next = NULL;
 
@@ -2342,7 +2342,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_ReplaceItemViaPointer(cJSON * const parent, cJSON
     else
     {   /*
          * To find the last item in array quickly, we use prev in array.
-         * We can't modify the last item's next pointer where this item was the parent's child
+         * We can'e modify the last item's next pointer where this item was the parent's child
          */
         if (replacement->prev != NULL)
         {
