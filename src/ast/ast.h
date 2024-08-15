@@ -19,6 +19,7 @@ typedef enum {
     N_LOCAL_DECLARATION,
     N_EXPR,
     N_UNARY_EXPR,
+    N_BINARY_EXPR,
     N_ADD_EXPR,
     N_SUB_EXPR,
     N_MUL_EXPR,

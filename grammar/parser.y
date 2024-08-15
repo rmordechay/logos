@@ -27,7 +27,7 @@ struct Node *root;
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER
 
-%type <node> program object_file full_title primary_title secondary_title fields_block field_list field methods_block_list methods_block methods_list method method_signature method_header statement_list statement expr unary_expr add_expr sub_expr mul_expr div_expr local_declaration variable_declaration variable_declaration_list identifier type type_list
+%type <node> program object_file full_title primary_title secondary_title fields_block field_list field methods_block_list methods_block methods_list method method_signature method_header statement_list statement expr unary_expr binary_expr add_expr sub_expr mul_expr div_expr local_declaration variable_declaration variable_declaration_list identifier type type_list
 
 %%
 
@@ -111,12 +111,16 @@ local_declaration:
 
 expr:
 		unary_expr { $$ = new_node(N_EXPR, 1, $1) }
-	|	add_expr { $$ = new_node(N_EXPR, 1, $1) }
-	|	sub_expr { $$ = new_node(N_EXPR, 1, $1) }
-	|	mul_expr { $$ = new_node(N_EXPR, 1, $1) }
-	|	div_expr { $$ = new_node(N_EXPR, 1, $1) }
+	|	binary_expr { $$ = new_node(N_EXPR, 1, $1) }
 	|	LEFT_PAREN expr RIGHT_PAREN { $$ = $2 }
     ;
+
+binary_expr:
+		add_expr { $$ = new_node(N_BINARY_EXPR, 1, $1) }
+	|	sub_expr { $$ = new_node(N_BINARY_EXPR, 1, $1) }
+	|	mul_expr { $$ = new_node(N_BINARY_EXPR, 1, $1) }
+	|	div_expr { $$ = new_node(N_BINARY_EXPR, 1, $1) }
+	;
 
 unary_expr:
 		INTEGER { $$ = new_leaf(N_UNARY_EXPR, yylval.val) }
