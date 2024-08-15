@@ -5,6 +5,7 @@
 #include "utils/utils.h"
 #include "types/object.h"
 #include "types/method.h"
+#include "types/local_declaration.h"
 
 
 void analyse_ast(Node *root);
@@ -17,10 +18,13 @@ void visit_fields_block(Node *n_fields_block, Object *obj);
 void visit_methods_block_list(Node *n_methods_block_list, Object *obj);
 void visit_methods_block(Node *n_methods_block, MethodBlock *method_block);
 void visit_methods_signature(Node *n_method_signature, Method *p_method);
-void visit_param(Node *n_param, VariableDec *param);
+void visit_param_list(Node *n_param_list, Method *p_method);
+void visit_variable_declaration(Node *n_var_dec, VariableDec *param);
 void visit_method(Node *n_method, Method *method);
 void visit_field(Node *n_field, Field *field);
-void visit_statement(Node *n_statement);
-void visit_local_declaration(Node *local_declaration);
+void visit_stmt_list(Node *n_stmt_list, Method *method);
+void visit_statement(Node *n_stmt);
+void visit_local_declaration(Node *n_local_declaration, LocalDec *local_dec);
+void visit_expr(Node *n_expr, Expr *expr);
 
 #endif //MYLANG_ANALYSER_H

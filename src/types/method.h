@@ -3,11 +3,14 @@
 
 #include "type.h"
 #include "variable.h"
+#include "statement.h"
 
 typedef struct Method {
-    VariableDec *variable_declaration;
+    VariableDec *var_dec;
     VariableDec **params;
     size_t params_len;
+    Statement **statements;
+    size_t statements_len;
 } Method;
 
 typedef struct MethodBlock {

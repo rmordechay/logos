@@ -44,10 +44,12 @@ set(
     src/types/field.h
     src/types/method.c
     src/types/method.h
-    src/types/statement.c
-    src/types/statement.h
     src/types/local_declaration.c
     src/types/local_declaration.h
+    src/types/expr.c
+    src/types/expr.h
+    src/types/statement.c
+    src/types/statement.h
 )
 
 add_executable(mylang ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})

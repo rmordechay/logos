@@ -82,7 +82,8 @@ methods_list:
 	;
 
 method:
-		method_signature LEFT_BRACE statement_list RIGHT_BRACE { $$ = new_node(N_METHOD, 1, $1) }
+		method_signature LEFT_BRACE statement_list RIGHT_BRACE { $$ = new_node(N_METHOD, 2, $1, $3) }
+	|	method_signature LEFT_BRACE RIGHT_BRACE { $$ = new_node(N_METHOD, 1, $1) }
 	;
 
 method_signature:
@@ -96,13 +97,12 @@ method_header:
 
 
 statement_list:
-		/* empty */
-	|	statement { $$ = new_node(N_STATEMENT_LIST, 1, $1) }
+		statement { $$ = new_node(N_STATEMENT_LIST, 1, $1) }
 	|	statement_list statement { $$ = flatten_list($1, $2) }
 	;
 
 statement:
-		local_declaration
+		local_declaration { $$ = new_node(N_STATEMENT, 1, $1) }
 	;
 
 local_declaration:
@@ -141,7 +141,7 @@ div_expr:
 	;
 
 variable_declaration_list:
-		variable_declaration { $$ = new_node(N_VARIABLE_DECLARATION, 1, $1) }
+		variable_declaration { $$ = new_node(N_VAR_DEC_LIST, 1, $1) }
 	|	variable_declaration_list COMMA variable_declaration { $$ = flatten_list($1, $3) }
 	;
 

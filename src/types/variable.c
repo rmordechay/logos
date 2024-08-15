@@ -24,7 +24,7 @@ Variable *create_variable_name() {
 /**
  *
  */
-void free_variable(VariableDec *variable) {
+void free_variable_declaration(VariableDec *variable) {
     free_type(variable->type);
     free(variable->variable_name);
     free(variable);
