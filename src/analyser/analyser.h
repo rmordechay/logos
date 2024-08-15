@@ -16,7 +16,8 @@ void visit_secondary_title(Node *n_secondary_title, Object *obj);
 void visit_fields_block(Node *n_fields_block, Object *obj);
 void visit_methods_block_list(Node *n_methods_block_list, Object *obj);
 void visit_methods_block(Node *n_methods_block, MethodBlock *method_block);
-
+void visit_methods_signature(Node *n_method_signature, Method *p_method);
+void visit_param(Node *n_param, VariableDeclaration *param);
 void visit_method(Node *n_method, Method *method);
 void visit_field(Node *n_field, Field *field);
 

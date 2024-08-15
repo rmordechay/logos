@@ -64,6 +64,15 @@ char *get_node_string(NodeType nodeType) {
         case N_IDENTIFIER: return "IDENTIFIER";
         case N_TYPE: return "TYPE";
         case N_TYPE_LIST: return "TYPE_LIST";
+        case N_STATEMENT_LIST: return "STATEMENT_LIST";
+        case N_STATEMENT: return "STATEMENT";
+        case N_EXPR: return "EXPR";
+        case N_UNARY_EXPR: return "UNARY_EXPR";
+        case N_ADD_EXPR: return "ADD_EXPR";
+        case N_SUB_EXPR: return "SUB_EXPR";
+        case N_MUL_EXPR: return "MUL_EXPR";
+        case N_DIV_EXPR: return "DIV_EXPR";
+        case N_IDENTIFIER_LIST: return "IDENTIFIER_LIST";
         default: return NULL;
     }
 }

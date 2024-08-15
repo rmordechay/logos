@@ -7,7 +7,9 @@ fields {
 }
 
 Self {
-    func Int f() { }
+    func Int f(Int v) {
+        let Int a = 2;
+    }
 }
 
 Interface {

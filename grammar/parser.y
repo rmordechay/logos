@@ -10,14 +10,14 @@ extern int yylineno;
 extern FILE* yyin;
 void yyerror(const char* s);
 
-struct ASTNode *root;
+struct Node *root;
 %}
 
 
 
 %union {
     char* val;
-    struct ASTNode *node;
+    struct Node *node;
 }
 
 %start program
@@ -27,7 +27,7 @@ struct ASTNode *root;
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER
 
-%type <node> program object_file full_title primary_title secondary_title fields_block field_list field methods_block_list methods_block methods_list method method_signature method_header param_list param statement_list statement expr unary_expr add_expr sub_expr mul_expr div_expr variable_declaration identifier type type_list
+%type <node> program object_file full_title primary_title secondary_title fields_block field_list field methods_block_list methods_block methods_list method method_signature method_header statement_list statement expr unary_expr add_expr sub_expr mul_expr div_expr variable_declaration variable_declaration_list identifier type type_list
 
 %%
 
@@ -63,8 +63,8 @@ field_list:
     ;
 
 field:
-    	variable_declaration  { $$ = new_node(N_FIELD, 1, $1);  }
-    |	variable_declaration COLON type  { $$ = new_node(N_FIELD, 2, $1, $3);  }
+    	variable_declaration  { $$ = new_node(N_FIELD, 1, $1)  }
+    |	variable_declaration COLON type  { $$ = new_node(N_FIELD, 2, $1, $3)  }
     ;
 
 methods_block_list:
@@ -86,7 +86,7 @@ method:
 	;
 
 method_signature:
-		method_header LEFT_PAREN param_list RIGHT_PAREN { $$ = new_node(N_METHOD_SIGNATURE, 2, $1, $3) }
+		method_header LEFT_PAREN variable_declaration_list RIGHT_PAREN { $$ = new_node(N_METHOD_SIGNATURE, 2, $1, $3) }
 	|	method_header LEFT_PAREN RIGHT_PAREN { $$ = new_node(N_METHOD_SIGNATURE, 1, $1) }
 	;
 
@@ -94,14 +94,6 @@ method_header:
 		FUNC variable_declaration { $$ = new_node(N_METHOD_HEADER, 1, $2) }
 	;
 
-param_list:
-	   	param { $$ = new_node(N_PARAM_LIST, 1, $1) }
-	 | 	param_list param { $$ = flatten_list($1, $2) }
-	 ;
-
-param:
-		variable_declaration { $$ = new_node(N_PARAM, 1, $1) }
-	;
 
 statement_list:
 		/* empty */
@@ -110,7 +102,7 @@ statement_list:
 	;
 
 statement:
-		variable_declaration EQUAL expr
+		LET variable_declaration EQUAL expr
 	;
 
 expr:
@@ -142,6 +134,11 @@ mul_expr:
 
 div_expr:
 		expr SLASH expr { $$ = new_node(N_DIV_EXPR, 2, $1, $3) }
+	;
+
+variable_declaration_list:
+		variable_declaration { $$ = new_node(N_VARIABLE_DECLARATION, 1, $1) }
+	|	variable_declaration_list COMMA variable_declaration { $$ = flatten_list($1, $3) }
 	;
 
 variable_declaration:

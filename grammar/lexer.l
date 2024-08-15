@@ -42,7 +42,7 @@ int line_number = 1;
 
 [ \n\t]+                  { /* Ignore whitespace */ }
 
-.                       { printf("(%d) Unexpected character: %s\n", yylineno, yytext); }
+.                       { fprintf(stderr, "Unexpected character in line %d: %s\n", yylineno, yytext); exit(1); }
 
 %%
 

@@ -5,10 +5,15 @@
 
 typedef struct Variable {
     char *name;
-    Type *type;
 } Variable;
 
-Variable *create_variable();
-void free_variable(Variable *variable);
+typedef struct VariableDeclaration {
+    Variable *variable_name;
+    Type *type;
+} VariableDeclaration;
+
+VariableDeclaration *create_variable_declaration();
+Variable *create_variable_name();
+void free_variable(VariableDeclaration *variable);
 
 #endif //MYLANG_VARIABLE_H

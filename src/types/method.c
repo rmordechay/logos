@@ -7,7 +7,7 @@
  */
 Method *create_method() {
     Method *method = malloc(sizeof(Method));
-    method->identifier = NULL;
+    method->variable_declaration = NULL;
     return method;
 }
 
@@ -26,7 +26,7 @@ MethodBlock *create_method_block() {
  *
  */
 void free_method(Method *method) {
-    free_variable(method->identifier);
+    free_variable(method->variable_declaration);
 }
 
 /**

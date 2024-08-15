@@ -46,7 +46,7 @@ void print_obj(Object *obj) {
     }
     printf("Fields:\n");
     for (size_t i = 0; i < obj->fields_len; i++) {
-        printf("\t%s %s\n", obj->fields[i]->variable->type->name, obj->fields[i]->variable->name);
+        printf("\t%s %s\n", obj->fields[i]->variable_declaration->type->name, obj->fields[i]->variable_declaration->variable_name->name);
     }
     printf("Method Blocks:\n");
     for (size_t i = 0; i < obj->method_blocks_len; i++) {
@@ -54,7 +54,12 @@ void print_obj(Object *obj) {
         printf("\t%s:\n", method_block->name);
         for (size_t j = 0; j < method_block->methods_len; j++) {
             Method *method = method_block->methods[j];
-            printf("\t\t%s\n", method->identifier->name);
+            printf("\t\t%s %s() ", method->variable_declaration->type->name, method->variable_declaration->variable_name->name);
+            for (int k = 0; k < method->params_len; k++) {
+                VariableDeclaration *vd = method->params[k];
+                printf("%s %s ", vd->variable_name->name, vd->type->name);
+            }
+            printf("\n");
         }
     }
 }

@@ -5,8 +5,9 @@
 #include "variable.h"
 
 typedef struct Method {
-    Variable *identifier;
-    Variable **params;
+    VariableDeclaration *variable_declaration;
+    VariableDeclaration **params;
+    size_t params_len;
 } Method;
 
 typedef struct MethodBlock {

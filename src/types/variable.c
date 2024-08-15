@@ -5,18 +5,27 @@
 /**
  *
  */
-Variable *create_variable() {
+VariableDeclaration *create_variable_declaration() {
+    VariableDeclaration *variable_declaration = malloc(sizeof(VariableDeclaration));
+    variable_declaration->variable_name = create_variable_name();
+    variable_declaration->type = create_type();
+    return variable_declaration;
+}
+
+/**
+ *
+ */
+Variable *create_variable_name() {
     Variable *variable = malloc(sizeof(Variable));
     variable->name = NULL;
-    variable->type = create_type();
     return variable;
 }
 
 /**
  *
  */
-void free_variable(Variable *variable) {
+void free_variable(VariableDeclaration *variable) {
     free_type(variable->type);
-    free(variable->name);
+    free(variable->variable_name);
     free(variable);
 }
