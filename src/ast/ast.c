@@ -55,7 +55,6 @@ char *get_node_string(NodeType nodeType) {
         case N_METHOD_SIGNATURE: return "METHOD_SIGNATURE";
         case N_METHOD_HEADER: return "METHOD_HEADER";
         case N_METHOD: return "METHOD";
-        case N_PARAM_LIST: return "PARAM_LIST";
         case N_PARAM: return "PARAM";
         case N_VARIABLE_DECLARATION: return "VARIABLE_DECLARATION";
         case N_FIELDS_BLOCK: return "FIELDS_BLOCK";
@@ -73,6 +72,8 @@ char *get_node_string(NodeType nodeType) {
         case N_MUL_EXPR: return "MUL_EXPR";
         case N_DIV_EXPR: return "DIV_EXPR";
         case N_IDENTIFIER_LIST: return "IDENTIFIER_LIST";
+        case N_LOCAL_DECLARATION: return "LOCAL_DECLARATION";
+        case N_VAR_DEC_LIST: return "VAR_DEC_LIST";
         default: return NULL;
     }
 }

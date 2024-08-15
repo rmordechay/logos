@@ -1,5 +1,18 @@
+#include <stdlib.h>
 #include "statement.h"
 
-typedef struct LocalDeclaration {
 
-} Statement;
+/**
+ *
+ */
+Statement *create_statement() {
+    Statement *stmt = malloc(sizeof(Statement));
+    return stmt;
+}
+
+/**
+ *
+ */
+void free_statement(Statement *stmt) {
+    free(stmt);
+}

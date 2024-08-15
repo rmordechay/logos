@@ -3,6 +3,9 @@
 #include "analyser.h"
 #include "types/object.h"
 #include "types/method.h"
+#include "types/local_declaration.h"
+
+void check_wrong_token(Node *actual, NodeType expected, char *text);
 
 /**
  *
@@ -15,6 +18,7 @@ void analyse_ast(Node *root) {
  *
  */
 void visit_object_file(Node *n_object_file) {
+    check_wrong_token(n_object_file, N_OBJECT_FILE, "OBJECT_FILE");
     Object *obj = create_object();
     for (int i = 0; i < n_object_file->child_len; i++) {
         Node *child = n_object_file->children[i];
@@ -35,6 +39,7 @@ void visit_object_file(Node *n_object_file) {
  *
  */
 void visit_full_title(Node *n_full_title, Object *obj) {
+    check_wrong_token(n_full_title, N_FULL_TITLE, "FULL_TITLE");
     for (int i = 0; i < n_full_title->child_len; i++) {
         Node *child = n_full_title->children[i];
         int nt = child->node_type;
@@ -50,6 +55,7 @@ void visit_full_title(Node *n_full_title, Object *obj) {
  *
  */
 void visit_primary_title(Node *n_primary_title, Object *obj) {
+    check_wrong_token(n_primary_title, N_PRIMARY_TITLE, "PRIMARY_TITLE");
     Node *identifier = n_primary_title->children[0];
     obj->name = strdup(identifier->value);
 }
@@ -58,6 +64,7 @@ void visit_primary_title(Node *n_primary_title, Object *obj) {
  *
  */
 void visit_secondary_title(Node *n_secondary_title, Object *obj) {
+    check_wrong_token(n_secondary_title, N_SECONDARY_TITLE, "SECONDARY_TITLE");
     Node *type_list = n_secondary_title->children[0];
     obj->interfaces_len = type_list->child_len;
     obj->interfaces = malloc(obj->interfaces_len * sizeof(Interface*));
@@ -71,6 +78,7 @@ void visit_secondary_title(Node *n_secondary_title, Object *obj) {
  *
  */
 void visit_fields_block(Node *n_fields_block, Object *obj) {
+    check_wrong_token(n_fields_block, N_FIELDS_BLOCK, "FIELDS_BLOCK");
     Node *field_list = n_fields_block->children[0];
     obj->fields_len = field_list->child_len;
     obj->fields = malloc(obj->fields_len * sizeof(Field*));
@@ -85,15 +93,17 @@ void visit_fields_block(Node *n_fields_block, Object *obj) {
  *
  */
 void visit_field(Node *n_field, Field *field) {
+    check_wrong_token(n_field, N_FIELD, "FIELD");
     Node *full_var_dec = n_field->children[0];
-    field->variable_declaration->variable_name->name = strdup(full_var_dec->children[1]->value);
-    field->variable_declaration->type->name = strdup(full_var_dec->children[0]->value);
+    field->variable_dec->variable_name->name = strdup(full_var_dec->children[1]->value);
+    field->variable_dec->type->name = strdup(full_var_dec->children[0]->value);
 }
 
 /**
  *
  */
 void visit_methods_block_list(Node *n_methods_block_list, Object *obj) {
+    check_wrong_token(n_methods_block_list, N_METHODS_BLOCK_LIST, "METHODS_BLOCK_LIST");
     obj->method_blocks_len = n_methods_block_list->child_len;
     obj->method_blocks = malloc(obj->method_blocks_len * sizeof(MethodBlock*));
     for (int i = 0; i < obj->method_blocks_len; i++) {
@@ -109,6 +119,7 @@ void visit_methods_block_list(Node *n_methods_block_list, Object *obj) {
  *
  */
 void visit_methods_block(Node *n_methods_block, MethodBlock *method_block) {
+    check_wrong_token(n_methods_block, N_METHODS_BLOCK, "METHODS_BLOCK");
     Node *n_methods_list = n_methods_block->children[1];
     method_block->methods_len = n_methods_list->child_len;
     method_block->methods = malloc(method_block->methods_len * sizeof(Method*));
@@ -123,38 +134,94 @@ void visit_methods_block(Node *n_methods_block, MethodBlock *method_block) {
  *
  */
 void visit_method(Node *n_method, Method *method) {
+    check_wrong_token(n_method, N_METHOD, "METHOD");
     visit_methods_signature(n_method->children[0], method);
+    int has_stmts = n_method->child_len == 2;
+    if (!has_stmts) return;
+    Node *n_stmt_list = n_method->children[1];
+    method->statements_len = n_stmt_list->child_len;
+    method->statements = malloc(method->statements_len * sizeof(Statement*));
+    visit_stmt_list(n_stmt_list, method);
 }
 
 /**
  *
  */
-void visit_methods_signature(Node *n_method_signature, Method *method) {
-    Node *var_declaration = n_method_signature->children[0]->children[0];
-    Node *n_type = var_declaration->children[0];
-    Node *n_var = var_declaration->children[1];
-    method->variable_declaration = create_variable_declaration();
-    method->variable_declaration->variable_name->name = strdup(n_var->value);
-    method->variable_declaration->type = create_type();
-    method->variable_declaration->type->name = strdup(n_type->value);
-    int has_params = n_method_signature->child_len == 2;
-    if (!has_params) return;
-    Node *param_list = n_method_signature->children[1];
-    method->params_len = param_list->child_len;
-    method->params = malloc(method->params_len * sizeof(VariableDec*));
-    for (int i = 0; i < param_list->child_len; i++) {
-        Node *n_param = param_list->children[i];
-        method->params[i] = create_variable_declaration();
-        visit_param(n_param, method->params[i]);
+void visit_stmt_list(Node *n_stmt_list, Method *method) {
+    check_wrong_token(n_stmt_list, N_STATEMENT_LIST, "STATEMENT_LIST");
+
+    for (int i = 0; i < n_stmt_list->child_len; i++) {
+        Node *n_stmt = n_stmt_list->children[i];
+        method->statements[i] = create_statement();
+        visit_statement(n_stmt);
     }
 }
 
 /**
  *
  */
-void visit_param(Node *n_param, VariableDec *param) {
-    Node *type = n_param->children[0];
-    Node *name_variable = n_param->children[1];
+void visit_statement(Node *n_stmt) {
+    check_wrong_token(n_stmt, N_STATEMENT, "STATEMENT");
+    Node *n = n_stmt->children[0];
+    if (n->node_type == N_LOCAL_DECLARATION) {
+        LocalDec *local_dec = create_local_declaration();
+        visit_local_declaration(n, local_dec);
+    }
+}
+
+/**
+ *
+ */
+void visit_local_declaration(Node *n_local_declaration, LocalDec *local_dec) {
+    check_wrong_token(n_local_declaration, N_LOCAL_DECLARATION, "LOCAL_DECLARATION");
+    // Variable declaration
+    Node *n_var_dec = n_local_declaration->children[0];
+    local_dec->variable_dec = create_variable_declaration();
+    visit_variable_declaration(n_var_dec, local_dec->variable_dec);
+    // Expression
+    Node *n_expr = n_local_declaration->children[1];
+    local_dec->expr = create_expr();
+    visit_expr(n_expr, local_dec->expr);
+}
+
+/**
+ *
+ */
+void visit_methods_signature(Node *n_method_signature, Method *method) {
+    check_wrong_token(n_method_signature, N_METHOD_SIGNATURE, "METHOD_SIGNATURE");
+    Node *var_declaration = n_method_signature->children[0]->children[0];
+    Node *n_type = var_declaration->children[0];
+    Node *n_var = var_declaration->children[1];
+    method->var_dec = create_variable_declaration();
+    method->var_dec->variable_name->name = strdup(n_var->value);
+    method->var_dec->type = create_type();
+    method->var_dec->type->name = strdup(n_type->value);
+    int has_params = n_method_signature->child_len == 2;
+    if (!has_params) return;
+    visit_param_list(n_method_signature->children[1], method);
+}
+
+/**
+ *
+ */
+void visit_param_list(Node *n_param_list, Method *method) {
+    check_wrong_token(n_param_list, N_VAR_DEC_LIST, "N_VAR_DEC_LIST");
+    method->params_len = n_param_list->child_len;
+    method->params = malloc(method->params_len * sizeof(VariableDec*));
+    for (int i = 0; i < n_param_list->child_len; i++) {
+        Node *n_param = n_param_list->children[i];
+        method->params[i] = create_variable_declaration();
+        visit_variable_declaration(n_param, method->params[i]);
+    }
+}
+
+/**
+ *
+ */
+void visit_variable_declaration(Node *n_var_dec, VariableDec *param) {
+    check_wrong_token(n_var_dec, N_VARIABLE_DECLARATION, "VARIABLE_DECLARATION");
+    Node *type = n_var_dec->children[0];
+    Node *name_variable = n_var_dec->children[1];
     param->variable_name->name = strdup(name_variable->value);
     param->type->name = strdup(type->value);
 }
@@ -162,15 +229,18 @@ void visit_param(Node *n_param, VariableDec *param) {
 /**
  *
  */
-void visit_statement(Node *n_statement) {
-
+void visit_expr(Node *n_expr, Expr *expr) {
+    check_wrong_token(n_expr, N_EXPR, "EXPR");
 }
 
 /**
  *
  */
-void visit_local_declaration(Node *local_declaration) {
-
+void check_wrong_token(Node *actual, NodeType expected, char *text) {
+    if (actual->node_type != expected) {
+        fprintf(stderr, "%s : %s\n", get_node_string(actual->node_type), text);
+        exit(1);
+    }
 }
 
 

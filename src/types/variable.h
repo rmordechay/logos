@@ -14,6 +14,6 @@ typedef struct VariableDeclaration {
 
 VariableDec *create_variable_declaration();
 Variable *create_variable_name();
-void free_variable(VariableDec *variable);
+void free_variable_declaration(VariableDec *variable);
 
 #endif //MYLANG_VARIABLE_H
