@@ -187,18 +187,19 @@ void visit_local_declaration(Node *n_local_declaration, LocalDec *local_dec) {
  */
 void visit_expr(Node *n_expr, Expr *expr) {
     check_wrong_token(n_expr, N_EXPR, "EXPR");
-    Node *child = n_expr->children[0];
-    NodeType node_type = child->node_type;
+    Node *n_left_expr = n_expr->children[0];
+    NodeType node_type = n_left_expr->node_type;
     if (node_type == N_UNARY_EXPR) {
         UnaryExpr *unary_expr = create_unary_expr();
         expr->expr_type = UNARY;
         expr->e.unary_expr = unary_expr;
         return;
     }
-
-    Node *left_expr = n_expr->children[0];
-    Node *right_expr = n_expr->children[1];
+    Node *n_right_expr = n_expr->children[1];
     BinaryExpr *binary_expr = create_binary_expr();
+    expr->expr_type = BINARY;
+    binary_expr->left_expr =
+    expr->e.binary_expr = binary_expr;
     if (node_type == N_ADD_EXPR) {
         binary_expr->op = ADD;
     } else if (node_type == N_SUB_EXPR) {
