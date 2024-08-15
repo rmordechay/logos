@@ -27,7 +27,7 @@ struct ASTNode *root;
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER
 
-%type <node> program object_file full_title primary_title secondary_title method_signature methods_block_list methods_block methods_list method param_list param fields_block field_list field variable_declaration identifier type type_list method_header
+%type <node> program object_file full_title primary_title secondary_title fields_block field_list field methods_block_list methods_block methods_list method method_signature method_header param_list param statement_list statement expr unary_expr add_expr sub_expr mul_expr div_expr variable_declaration identifier type type_list
 
 %%
 
@@ -82,7 +82,7 @@ methods_list:
 	;
 
 method:
-		method_signature LEFT_BRACE RIGHT_BRACE { $$ = new_node(N_METHOD, 1, $1) }
+		method_signature LEFT_BRACE statement_list RIGHT_BRACE { $$ = new_node(N_METHOD, 1, $1) }
 	;
 
 method_signature:
@@ -101,6 +101,47 @@ param_list:
 
 param:
 		variable_declaration { $$ = new_node(N_PARAM, 1, $1) }
+	;
+
+statement_list:
+		/* empty */
+	|	statement { $$ = new_node(N_STATEMENT_LIST, 1, $1) }
+	|	statement_list statement { $$ = flatten_list($1, $2) }
+	;
+
+statement:
+		variable_declaration EQUAL expr
+	;
+
+expr:
+		unary_expr
+	|	add_expr
+	|	sub_expr
+	|	mul_expr
+	|	div_expr
+	|	LEFT_PAREN expr RIGHT_PAREN { $$ = $2 }
+    ;
+
+unary_expr:
+		INTEGER { $$ = new_leaf(N_UNARY_EXPR, yylval.val) }
+	| 	FLOAT { $$ = new_leaf(N_UNARY_EXPR, yylval.val) }
+	| 	identifier { $$ = new_node(N_UNARY_EXPR, 1, $1) }
+	;
+
+add_expr:
+		expr PLUS expr { $$ = new_node(N_ADD_EXPR, 2, $1, $3) }
+	;
+
+sub_expr:
+		expr MINUS expr { $$ = new_node(N_SUB_EXPR, 2, $1, $3) }
+	;
+
+mul_expr:
+		expr STAR expr { $$ = new_node(N_MUL_EXPR, 2, $1, $3) }
+	;
+
+div_expr:
+		expr SLASH expr { $$ = new_node(N_DIV_EXPR, 2, $1, $3) }
 	;
 
 variable_declaration:
