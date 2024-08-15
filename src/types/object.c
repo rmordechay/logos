@@ -56,7 +56,7 @@ void print_obj(Object *obj) {
             Method *method = method_block->methods[j];
             printf("\t\t%s %s() ", method->variable_declaration->type->name, method->variable_declaration->variable_name->name);
             for (int k = 0; k < method->params_len; k++) {
-                VariableDeclaration *vd = method->params[k];
+                VariableDec *vd = method->params[k];
                 printf("%s %s ", vd->variable_name->name, vd->type->name);
             }
             printf("\n");

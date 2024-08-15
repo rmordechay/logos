@@ -16,6 +16,7 @@ typedef enum {
     N_METHOD_HEADER,
     N_STATEMENT_LIST,
     N_STATEMENT,
+    N_LOCAL_DECLARATION,
     N_EXPR,
     N_UNARY_EXPR,
     N_ADD_EXPR,

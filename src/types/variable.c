@@ -5,8 +5,8 @@
 /**
  *
  */
-VariableDeclaration *create_variable_declaration() {
-    VariableDeclaration *variable_declaration = malloc(sizeof(VariableDeclaration));
+VariableDec *create_variable_declaration() {
+    VariableDec *variable_declaration = malloc(sizeof(VariableDec));
     variable_declaration->variable_name = create_variable_name();
     variable_declaration->type = create_type();
     return variable_declaration;
@@ -24,7 +24,7 @@ Variable *create_variable_name() {
 /**
  *
  */
-void free_variable(VariableDeclaration *variable) {
+void free_variable(VariableDec *variable) {
     free_type(variable->type);
     free(variable->variable_name);
     free(variable);

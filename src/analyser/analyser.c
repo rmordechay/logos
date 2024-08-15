@@ -141,7 +141,7 @@ void visit_methods_signature(Node *n_method_signature, Method *method) {
     if (!has_params) return;
     Node *param_list = n_method_signature->children[1];
     method->params_len = param_list->child_len;
-    method->params = malloc(method->params_len * sizeof(VariableDeclaration*));
+    method->params = malloc(method->params_len * sizeof(VariableDec*));
     for (int i = 0; i < param_list->child_len; i++) {
         Node *n_param = param_list->children[i];
         method->params[i] = create_variable_declaration();
@@ -152,11 +152,25 @@ void visit_methods_signature(Node *n_method_signature, Method *method) {
 /**
  *
  */
-void visit_param(Node *n_param, VariableDeclaration *param) {
+void visit_param(Node *n_param, VariableDec *param) {
     Node *type = n_param->children[0];
     Node *name_variable = n_param->children[1];
     param->variable_name->name = strdup(name_variable->value);
     param->type->name = strdup(type->value);
+}
+
+/**
+ *
+ */
+void visit_statement(Node *n_statement) {
+
+}
+
+/**
+ *
+ */
+void visit_local_declaration(Node *local_declaration) {
+
 }
 
 

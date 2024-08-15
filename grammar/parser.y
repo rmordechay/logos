@@ -27,7 +27,7 @@ struct Node *root;
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER
 
-%type <node> program object_file full_title primary_title secondary_title fields_block field_list field methods_block_list methods_block methods_list method method_signature method_header statement_list statement expr unary_expr add_expr sub_expr mul_expr div_expr variable_declaration variable_declaration_list identifier type type_list
+%type <node> program object_file full_title primary_title secondary_title fields_block field_list field methods_block_list methods_block methods_list method method_signature method_header statement_list statement expr unary_expr add_expr sub_expr mul_expr div_expr local_declaration variable_declaration variable_declaration_list identifier type type_list
 
 %%
 
@@ -102,15 +102,19 @@ statement_list:
 	;
 
 statement:
-		LET variable_declaration EQUAL expr
+		local_declaration
+	;
+
+local_declaration:
+		LET variable_declaration EQUAL expr { $$ = new_node(N_LOCAL_DECLARATION, 2, $2, $4) }
 	;
 
 expr:
-		unary_expr
-	|	add_expr
-	|	sub_expr
-	|	mul_expr
-	|	div_expr
+		unary_expr { $$ = new_node(N_EXPR, 1, $1) }
+	|	add_expr { $$ = new_node(N_EXPR, 1, $1) }
+	|	sub_expr { $$ = new_node(N_EXPR, 1, $1) }
+	|	mul_expr { $$ = new_node(N_EXPR, 1, $1) }
+	|	div_expr { $$ = new_node(N_EXPR, 1, $1) }
 	|	LEFT_PAREN expr RIGHT_PAREN { $$ = $2 }
     ;
 

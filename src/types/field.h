@@ -6,7 +6,7 @@
 #include "interface.h"
 
 typedef struct Field {
-    VariableDeclaration *variable_declaration;
+    VariableDec *variable_declaration;
     Interface *interface;
 } Field;
 

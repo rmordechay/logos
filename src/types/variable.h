@@ -10,10 +10,10 @@ typedef struct Variable {
 typedef struct VariableDeclaration {
     Variable *variable_name;
     Type *type;
-} VariableDeclaration;
+} VariableDec;
 
-VariableDeclaration *create_variable_declaration();
+VariableDec *create_variable_declaration();
 Variable *create_variable_name();
-void free_variable(VariableDeclaration *variable);
+void free_variable(VariableDec *variable);
 
 #endif //MYLANG_VARIABLE_H
