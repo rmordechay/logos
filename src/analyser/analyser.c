@@ -1,9 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "analyser.h"
-#include "types/object.h"
-#include "types/method.h"
-#include "types/local_declaration.h"
+#include "types/types.h"
 
 void check_wrong_token(Node *actual, NodeType expected, char *text);
 
@@ -193,6 +191,7 @@ void visit_expr(Node *n_expr, Expr *expr) {
     if (node_type == N_UNARY_EXPR) {
         UnaryExpr *unary_expr = create_unary_expr();
         expr->expr_type = UNARY;
+        expr->e.unary_expr = unary_expr;
         return;
     }
 

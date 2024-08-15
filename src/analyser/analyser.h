@@ -3,9 +3,7 @@
 
 #include "ast/ast.h"
 #include "utils/utils.h"
-#include "types/object.h"
-#include "types/method.h"
-#include "types/local_declaration.h"
+#include "types/types.h"
 
 
 void analyse_ast(Node *root);
