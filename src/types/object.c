@@ -39,11 +39,22 @@ void free_object(Object *obj) {
 *
 */
 void print_obj(Object *obj) {
-    printf("Name: %s\n", obj->name);
+    printf("Name:\n\t%s\n", obj->name);
+    printf("Interfaces:\n");
     for (size_t i = 0; i < obj->interfaces_len; i++) {
-        printf("Interface %zu: %s\n", i + 1, obj->interfaces[i]->name);
+        printf("\t%s\n", obj->interfaces[i]->name);
     }
+    printf("Fields:\n");
     for (size_t i = 0; i < obj->fields_len; i++) {
-        printf("Field %zu: %s %s\n", i + 1, obj->fields[i]->variable->name, obj->fields[i]->variable->type->name);
+        printf("\t%s %s\n", obj->fields[i]->variable->type->name, obj->fields[i]->variable->name);
+    }
+    printf("Method Blocks:\n");
+    for (size_t i = 0; i < obj->method_blocks_len; i++) {
+        MethodBlock *method_block = obj->method_blocks[i];
+        printf("\t%s:\n", method_block->name);
+        for (size_t j = 0; j < method_block->methods_len; j++) {
+            Method *method = method_block->methods[j];
+            printf("\t\t%s\n", method->identifier->name);
+        }
     }
 }

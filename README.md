@@ -1,3 +1,3 @@
 ## Abbreviations
-- var: variable
+- var: identifier
 - node: ASTNode

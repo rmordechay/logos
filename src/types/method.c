@@ -5,17 +5,28 @@
 /**
  *
  */
-Method *create_method(Variable *variable) {
+Method *create_method() {
     Method *method = malloc(sizeof(Method));
-    method->variable = variable;
+    method->identifier = NULL;
     return method;
 }
 
 /**
  *
  */
+MethodBlock *create_method_block() {
+    MethodBlock *method_block = malloc(sizeof(MethodBlock));
+    method_block->name = NULL;
+    method_block->methods = NULL;
+    method_block->methods_len = 0;
+    return method_block;
+}
+
+/**
+ *
+ */
 void free_method(Method *method) {
-    free_variable(method->variable);
+    free_variable(method->identifier);
 }
 
 /**

@@ -5,16 +5,18 @@
 #include "variable.h"
 
 typedef struct Method {
-    char *name;
-    Variable *variable;
+    Variable *identifier;
+    Variable **params;
 } Method;
 
 typedef struct MethodBlock {
+    char *name;
     Method **methods;
     size_t methods_len;
 } MethodBlock;
 
-Method *create_method(Variable *variable);
+Method *create_method();
+MethodBlock *create_method_block();
 void free_method(Method *method);
 void free_method_block(MethodBlock *method_block);
 

@@ -25,7 +25,7 @@ add_flex_bison_dependency(Lexer Parser)
 set(
     SOURCES
     include/cJSON.c
-    src/compiler/analyser.c
+    src/analyser/analyser.c
     src/ast/ast.c
     src/utils/utils.c
     ${GEN_DIR_SOURCE}/parser.c
