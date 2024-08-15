@@ -16,7 +16,6 @@ typedef enum {
     N_METHOD,
     N_PARAM_LIST,
     N_PARAM,
-    N_FULL_VARIABLE_DECLARATION,
     N_FIELDS_BLOCK,
     N_FIELD_LIST,
     N_FIELD,
@@ -27,7 +26,7 @@ typedef enum {
     N_TYPE_LIST,
 } NodeType;
 
-typedef struct ASTNode {
+typedef struct Node {
     char *value;
     NodeType node_type;
     size_t child_len;

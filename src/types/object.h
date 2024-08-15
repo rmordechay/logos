@@ -5,12 +5,15 @@
 #include "utils/utils.h"
 #include "ast/ast.h"
 #include "interface.h"
+#include "field.h"
 
 typedef struct Object {
     char *name;
-    FileType fileType;
+    FileType file_type;
     Interface **interfaces;
     size_t interfaces_len;
+    Field **fields;
+    size_t fields_len;
 } Object;
 
 Object *create_object();

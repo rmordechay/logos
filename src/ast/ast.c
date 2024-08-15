@@ -57,11 +57,10 @@ char *get_node_string(NodeType nodeType) {
         case N_METHOD: return "METHOD";
         case N_PARAM_LIST: return "PARAM_LIST";
         case N_PARAM: return "PARAM";
-        case N_FULL_VARIABLE_DECLARATION: return "FULL_VARIABLE_DECLARATION";
+        case N_VARIABLE_DECLARATION: return "VARIABLE_DECLARATION";
         case N_FIELDS_BLOCK: return "FIELDS_BLOCK";
         case N_FIELD_LIST: return "FIELD_LIST";
         case N_FIELD: return "FIELD";
-        case N_VARIABLE_DECLARATION: return "VARIABLE_DECLARATION";
         case N_IDENTIFIER: return "IDENTIFIER";
         case N_TYPE: return "TYPE";
         case N_TYPE_LIST: return "TYPE_LIST";

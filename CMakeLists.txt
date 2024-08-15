@@ -36,6 +36,12 @@ set(
     src/config.h
     src/types/interface.c
     src/types/interface.h
+    src/types/type.c
+    src/types/type.h
+    src/types/variable.c
+    src/types/variable.h
+    src/types/field.c
+    src/types/field.h
 )
 
 add_executable(mylang ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})

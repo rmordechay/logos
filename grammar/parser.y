@@ -27,7 +27,7 @@ struct ASTNode *root;
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER
 
-%type <node> program object_file full_title primary_title secondary_title method_signature methods_block_list methods_block methods_list method param_list param fields_block field_list field full_variable_declaration identifier type type_list method_header
+%type <node> program object_file full_title primary_title secondary_title method_signature methods_block_list methods_block methods_list method param_list param fields_block field_list field variable_declaration identifier type type_list method_header
 
 %%
 
@@ -63,8 +63,8 @@ field_list:
     ;
 
 field:
-    	full_variable_declaration  { $$ = new_node(N_FIELD, 2, $1);  }
-    |	full_variable_declaration COLON type  { $$ = new_node(N_FIELD, 2, $1, $3);  }
+    	variable_declaration  { $$ = new_node(N_FIELD, 2, $1);  }
+    |	variable_declaration COLON type  { $$ = new_node(N_FIELD, 2, $1, $3);  }
     ;
 
 methods_block_list:
@@ -91,7 +91,7 @@ method_signature:
 	;
 
 method_header:
-		FUNC full_variable_declaration { $$ = new_node(N_METHOD_HEADER, 1, $2) }
+		FUNC variable_declaration { $$ = new_node(N_METHOD_HEADER, 1, $2) }
 	;
 
 param_list:
@@ -100,11 +100,11 @@ param_list:
 	 ;
 
 param:
-		full_variable_declaration { $$ = new_node(N_PARAM, 1, $1) }
+		variable_declaration { $$ = new_node(N_PARAM, 1, $1) }
 	;
 
-full_variable_declaration:
-		type identifier { $$ = new_node(N_FULL_VARIABLE_DECLARATION, 2, $1, $2) }
+variable_declaration:
+		type identifier { $$ = new_node(N_VARIABLE_DECLARATION, 2, $1, $2) }
 	;
 
 identifier:
