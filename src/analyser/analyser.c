@@ -187,6 +187,27 @@ void visit_local_declaration(Node *n_local_declaration, LocalDec *local_dec) {
 /**
  *
  */
+void visit_expr(Node *n_expr, Expr *expr) {
+    check_wrong_token(n_expr, N_EXPR, "EXPR");
+    if (n_expr->node_type == N_UNARY_EXPR) {
+        return;
+    }
+    Node *left = n_expr->children[0];
+    Node *right = n_expr->children[1];
+    if (n_expr->node_type == N_ADD_EXPR) {
+
+    } else if (n_expr->node_type == N_SUB_EXPR) {
+
+    } else if (n_expr->node_type == N_MUL_EXPR) {
+
+    } else if (n_expr->node_type == N_DIV_EXPR) {
+
+    }
+}
+
+/**
+ *
+ */
 void visit_methods_signature(Node *n_method_signature, Method *method) {
     check_wrong_token(n_method_signature, N_METHOD_SIGNATURE, "METHOD_SIGNATURE");
     Node *var_declaration = n_method_signature->children[0]->children[0];
@@ -224,13 +245,6 @@ void visit_variable_declaration(Node *n_var_dec, VariableDec *param) {
     Node *name_variable = n_var_dec->children[1];
     param->variable_name->name = strdup(name_variable->value);
     param->type->name = strdup(type->value);
-}
-
-/**
- *
- */
-void visit_expr(Node *n_expr, Expr *expr) {
-    check_wrong_token(n_expr, N_EXPR, "EXPR");
 }
 
 /**
