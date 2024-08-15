@@ -9,6 +9,6 @@ typedef struct Variable {
 } Variable;
 
 Variable *create_variable();
-void free_variable(Variable *type);
+void free_variable(Variable *variable);
 
 #endif //MYLANG_VARIABLE_H

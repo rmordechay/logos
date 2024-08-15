@@ -6,6 +6,7 @@
 #include "ast/ast.h"
 #include "interface.h"
 #include "field.h"
+#include "method.h"
 
 typedef struct Object {
     char *name;
@@ -14,9 +15,12 @@ typedef struct Object {
     size_t interfaces_len;
     Field **fields;
     size_t fields_len;
+    MethodBlock **method_blocks;
+    size_t method_blocks_len;
 } Object;
 
 Object *create_object();
 void free_object(Object *obj);
+void print_obj(Object *obj);
 
 #endif //MYLANG_OBJECT_H

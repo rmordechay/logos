@@ -67,8 +67,7 @@ void visit_secondary_title(Node *n_secondary_title, Object *obj) {
     obj->interfaces = malloc(obj->interfaces_len * sizeof(Interface*));
     for (int i = 0; i < type_list->child_len; i++) {
         Node *type = type_list->children[i];
-        obj->interfaces[i] = malloc(sizeof(Interface));
-        obj->interfaces[i]->name = strdup(type->value);
+        obj->interfaces[i] = create_interface();
     }
 }
 
@@ -82,48 +81,19 @@ void visit_fields_block(Node *n_fields_block, Object *obj) {
     obj->fields = malloc(obj->fields_len * sizeof(Field*));
     for (int i = 0; i < obj->fields_len; i++) {
         Node *child = field_list->children[i];
-        obj->fields[i] = malloc(sizeof(Field));
-        visit_field(child, obj, obj->fields[i]);
+        obj->fields[i] = create_field();
+        visit_field(child, obj->fields[i]);
     }
 }
 
 /**
  *
  */
-void visit_field(Node *n_field, Object *obj, Field *field) {
+void visit_field(Node *n_field, Field *field) {
     if (n_field->node_type != N_FIELD) return;
     Node *full_var_dec = n_field->children[0];
-    visit_var_declaration(full_var_dec, obj, field);
-    if (n_field->child_len == 2) {
-        field->interface = obj->interfaces[0];
-    }
-}
-
-/**
- *
- */
-void visit_var_declaration(Node *n_var_declaration, Object *obj, Field *field) {
-    if (n_var_declaration->node_type != N_VARIABLE_DECLARATION) return;
-    field->variable = malloc(sizeof(Variable));
-    field->variable->type = malloc(sizeof(Type));
-    visit_type(n_var_declaration->children[0], field->variable->type);
-    visit_variable(n_var_declaration->children[1], field->variable);
-}
-
-/**
- *
- */
-void visit_variable(Node *n_variable, Variable *variable) {
-    if (n_variable->node_type != N_IDENTIFIER) return;
-    variable->name = n_variable->value;
-}
-
-/**
- *
- */
-void visit_type(Node *n_type, Type *type) {
-    if (n_type->node_type != N_TYPE) return;
-    type->name = n_type->value;
+    field->variable->name = full_var_dec->children[1]->value;
+    field->variable->type->name = full_var_dec->children[0]->value;
 }
 
 /**
@@ -146,7 +116,7 @@ void visit_methods_block(Node *n_methods_block, Object *obj) {
     Node *methods_list = n_methods_block->children[1];
     for (int i = 0; i < methods_list->child_len; i++) {
         Node *n_method = methods_list->children[i];
-        Method *method = malloc(sizeof(Method));
+        Method *method = create_method(NULL);
         visit_method(n_method, obj, method);
     }
 }
@@ -154,8 +124,15 @@ void visit_methods_block(Node *n_methods_block, Object *obj) {
 /**
  *
  */
-void visit_method(Node *n_method, Object *obj, Method *p_method) {
+void visit_method(Node *n_method, Object *obj, Method *method) {
     if (n_method->node_type != N_METHOD) return;
+    Node *n_method_signature = n_method->children[0];
+    Node *n_method_header = n_method_signature->children[0];
+    Node *var_declaration = n_method_header->children[0];
+    Node *n_var = var_declaration->children[0];
+    Node *n_type = var_declaration->children[1];
+    printf("%s\n", n_var->value);
+    printf("%s\n", n_type->value);
 }
 
 

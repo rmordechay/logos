@@ -10,6 +10,7 @@ typedef struct Field {
     Interface *interface;
 } Field;
 
+Field *create_field();
 void free_field(Field *field);
 
 #endif //MYLANG_FIELD_H
