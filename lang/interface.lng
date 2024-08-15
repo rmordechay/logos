@@ -1,4 +1,4 @@
-interface: Interface
+interfaces: Interface
 
 fields {
     a: Int

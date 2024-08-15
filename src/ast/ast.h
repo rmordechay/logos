@@ -30,11 +30,11 @@ typedef enum {
 typedef struct ASTNode {
     char *value;
     NodeType node_type;
-    size_t child_count;
+    size_t child_len;
     struct ASTNode **children;
 } ASTNode;
 
-ASTNode *new_node(NodeType node_type, int child_count, ...);
+ASTNode *new_node(NodeType node_type, int child_len, ...);
 ASTNode *new_leaf(NodeType node_type, char *value);
 ASTNode *flatten_list(ASTNode *list_node, ASTNode* child);
 

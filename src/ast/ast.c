@@ -7,14 +7,14 @@
 /**
  *
  */
-ASTNode *new_node(NodeType node_type, int child_count, ...) {
+ASTNode *new_node(NodeType node_type, int child_len, ...) {
     va_list args;
-    va_start(args, child_count);
+    va_start(args, child_len);
     ASTNode *node = malloc(sizeof(ASTNode));
     node->node_type = node_type;
-    node->child_count = child_count;
-    node->children = malloc(child_count * sizeof(ASTNode *));
-    for (int i = 0; i < child_count; i++) {
+    node->child_len = child_len;
+    node->children = malloc(child_len * sizeof(ASTNode *));
+    for (int i = 0; i < child_len; i++) {
         ASTNode *child = va_arg(args, ASTNode*);
         node->children[i] = child;
     }
@@ -23,10 +23,10 @@ ASTNode *new_node(NodeType node_type, int child_count, ...) {
 }
 
 ASTNode *flatten_list(ASTNode *list_node, ASTNode* child) {
-    size_t new_count = list_node->child_count + 1;
-    list_node->children = realloc(list_node->children, new_count * sizeof(ASTNode *));
-    list_node->children[list_node->child_count] = child;
-    list_node->child_count = new_count;
+    size_t new_len = list_node->child_len + 1;
+    list_node->children = realloc(list_node->children, new_len * sizeof(ASTNode *));
+    list_node->children[list_node->child_len] = child;
+    list_node->child_len = new_len;
     return list_node;
 }
 

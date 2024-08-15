@@ -4,13 +4,24 @@
 #include "ast/ast.h"
 #include "utils/utils.h"
 
+typedef enum FileType {
+    OBJECT_FILE,
+    INTERFACE_FILE,
+} FileType;
+
+typedef struct Interface {
+    char *name;
+} Interface;
+
 typedef struct Object {
     char *name;
-    StringList implements;
-    size_t implements_count;
+    FileType fileType;
+    Interface **interfaces;
+    size_t interfaces_len;
 } Object;
 
-Object *create_object();
+Object *create_object(FileType file_type);
+void free_object(Object *obj);
 void analyse_ast(ASTNode *root);
 void visit_object_file(ASTNode *object_file);
 void visit_full_title(ASTNode *full_title, Object *obj);

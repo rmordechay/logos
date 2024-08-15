@@ -34,16 +34,16 @@ void print_tree(ASTNode *root, int depth) {
         printf("\t");
     }
     printf("- Node Type: %s\n", get_node_string(root->node_type));
-    if (root->child_count != 0) {
+    if (root->child_len != 0) {
         for (int i = 0; i < depth; i++) {
             printf("\t");
         }
-        printf("  Child count: %zu\n", root->child_count);
+        printf("  Child len: %zu\n", root->child_len);
         for (int i = 0; i < depth; i++) {
             printf("\t");
         }
         printf("  Children:\n");
-        for (size_t i = 0; i < root->child_count; i++) {
+        for (size_t i = 0; i < root->child_len; i++) {
             print_tree(root->children[i], depth + 1);
         }
     } else {
@@ -67,7 +67,7 @@ cJSON *node_to_json(ASTNode * node) {
     }
     cJSON_AddStringToObject(json, "node_type", get_node_string(node->node_type));
     cJSON *arr = cJSON_CreateArray();
-    for (int i = 0; i < node->child_count; i++) {
+    for (int i = 0; i < node->child_len; i++) {
         cJSON *child = (cJSON *) node_to_json(node->children[i]);
         if (child != NULL) {
             cJSON_AddItemToArray(arr, child);
