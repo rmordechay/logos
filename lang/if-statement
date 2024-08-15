@@ -8,7 +8,7 @@ if (x < 1) {
 
 if {
     x > 1: expr
-    x < 1: expr
+    x < 1: { expr }
     else: expr
 }
 
@@ -16,4 +16,8 @@ if (var) {
     1: expr
     x: expr
     or: expr
+}
+
+if (var) {
+    let a = 2
 }

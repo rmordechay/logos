@@ -40,7 +40,7 @@ int line_number = 1;
 [0-9]+\.[0-9]+          { yylval.val = strdup(yytext); return FLOAT; }
 [a-zA-Z_][a-zA-Z0-9_]*  { yylval.val = strdup(yytext); return IDENTIFIER; }
 
-[ \n\t]+                  { /* Ignore whitespace */ }
+[ \n\e]+                  { /* Ignore whitespace */ }
 
 .                       { fprintf(stderr, "Unexpected character in line %d: %s\n", yylineno, yytext); exit(1); }
 
