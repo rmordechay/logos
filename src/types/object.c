@@ -1,6 +1,5 @@
 #include <stdlib.h>
-#include "object.h"
-#include "method.h"
+#include "types.h"
 
 /**
  *

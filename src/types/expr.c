@@ -1,7 +1,6 @@
 #include <stdlib.h>
-#include "expr.h"
+#include "types.h"
 
-void f();
 
 /**
  *
@@ -67,4 +66,21 @@ void free_binary_expr(BinaryExpr *binary_expr) {
         free_expr(binary_expr->right_expr);
     }
     free(binary_expr);
+}
+
+/**
+ *
+ */
+void evaluate(Expr* expr) {
+    switch (expr->expr_type) {
+        case UNARY: {
+            UnaryExpr* unaryExpr = (UnaryExpr*)expr;
+            break;
+        }
+        case BINARY: {
+            BinaryExpr* binaryExpr = (BinaryExpr*)expr;
+            break;
+        }
+        default: return;
+    }
 }
