@@ -2,7 +2,7 @@
 #include <string.h>
 #include "analyser.h"
 #include "types/object.h"
-#include <stdio.h>
+#include "types/method.h"
 
 /**
  *
@@ -95,7 +95,7 @@ void visit_field(Node *n_field, Object *obj, Field *field) {
     Node *full_var_dec = n_field->children[0];
     visit_var_declaration(full_var_dec, obj, field);
     if (n_field->child_len == 2) {
-        field->Interface = NULL;
+        field->interface = obj->interfaces[0];
     }
 }
 
@@ -105,8 +105,8 @@ void visit_field(Node *n_field, Object *obj, Field *field) {
 void visit_var_declaration(Node *n_var_declaration, Object *obj, Field *field) {
     if (n_var_declaration->node_type != N_VARIABLE_DECLARATION) return;
     field->variable = malloc(sizeof(Variable));
-    field->type = malloc(sizeof(Type));
-    visit_type(n_var_declaration->children[0], field->type);
+    field->variable->type = malloc(sizeof(Type));
+    visit_type(n_var_declaration->children[0], field->variable->type);
     visit_variable(n_var_declaration->children[1], field->variable);
 }
 
@@ -130,7 +130,32 @@ void visit_type(Node *n_type, Type *type) {
  *
  */
 void visit_methods_block_list(Node *n_methods_block_list, Object *obj) {
+    if (n_methods_block_list->node_type != N_METHODS_BLOCK_LIST) return;
+    for (int i = 0; i < n_methods_block_list->child_len; i++) {
+        Node *method_block = n_methods_block_list->children[i];
+        visit_methods_block(method_block, obj);
+    }
+}
 
+/**
+ *
+ */
+void visit_methods_block(Node *n_methods_block, Object *obj) {
+    if (n_methods_block->node_type != N_METHODS_BLOCK) return;
+    Node *block_id = n_methods_block->children[0];
+    Node *methods_list = n_methods_block->children[1];
+    for (int i = 0; i < methods_list->child_len; i++) {
+        Node *n_method = methods_list->children[i];
+        Method *method = malloc(sizeof(Method));
+        visit_method(n_method, obj, method);
+    }
+}
+
+/**
+ *
+ */
+void visit_method(Node *n_method, Object *obj, Method *p_method) {
+    if (n_method->node_type != N_METHOD) return;
 }
 
 

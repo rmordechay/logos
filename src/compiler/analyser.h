@@ -4,7 +4,7 @@
 #include "ast/ast.h"
 #include "utils/utils.h"
 #include "types/object.h"
-
+#include "types/method.h"
 
 
 void analyse_ast(Node *root);
@@ -14,6 +14,8 @@ void visit_primary_title(Node *n_primary_title, Object *obj);
 void visit_secondary_title(Node *n_secondary_title, Object *obj);
 void visit_fields_block(Node *n_fields_block, Object *obj);
 void visit_methods_block_list(Node *n_methods_block_list, Object *obj);
+void visit_methods_block(Node *n_methods_block, Object *obj);
+void visit_method(Node *n_method, Object *obj, Method *p_method);
 void visit_field(Node *n_field, Object *obj, Field *field);
 void visit_var_declaration(Node *n_var_declaration, Object *obj, Field *field);
 void visit_variable(Node *n_variable, Variable *variable);

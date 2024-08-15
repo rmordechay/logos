@@ -1,8 +1,8 @@
 if (x < 1) {
     print()
-} or (x > 1) {
+} else (x > 1) {
     print()
-} or {
+} else {
     print()
 }
 

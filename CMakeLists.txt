@@ -42,6 +42,8 @@ set(
     src/types/variable.h
     src/types/field.c
     src/types/field.h
+    src/types/method.c
+    src/types/method.h
 )
 
 add_executable(mylang ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})

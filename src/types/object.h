@@ -18,6 +18,5 @@ typedef struct Object {
 
 Object *create_object();
 void free_object(Object *obj);
-void print_obj(Object *obj);
 
 #endif //MYLANG_OBJECT_H

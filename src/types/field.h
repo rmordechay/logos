@@ -6,9 +6,10 @@
 #include "interface.h"
 
 typedef struct Field {
-    Type *type;
     Variable *variable;
-    Interface *Interface;
+    Interface *interface;
 } Field;
+
+void free_field(Field *field);
 
 #endif //MYLANG_FIELD_H
