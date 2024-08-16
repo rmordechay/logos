@@ -1,10 +1,11 @@
 #include "project.h"
-#include "types/types.h"
-#include "analyser/analyser.h"
 #include <dirent.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define SRC_DIR "src"
+#define PATH_MAX 1024
 
 typedef struct YY_BUFFER_STATE YY_BUFFER_STATE;
 
