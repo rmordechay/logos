@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "ast/ast.h"
+#include "ast/tree.h"
 #include "utils/utils.h"
 
 extern int yylex();
@@ -18,6 +18,30 @@ struct Node *root;
 %union {
     char* val;
     struct Node *node;
+	struct ObjectFile *object_file;
+	struct FullTitle *full_title;
+	struct PrimaryTitle *primary_title;
+	struct ImplementsBlock *implements_block;
+	struct FieldsBlock *fields_block;
+	struct FieldList *field_list;
+	struct Field *field;
+	struct MethodsBlockList *methods_block_list;
+	struct MethodsBlock *methods_block;
+	struct MethodsList *methods_list;
+	struct Method *method;
+	struct MethodSignature *method_signature;
+	struct MethodHeader *method_header;
+	struct StatementList *statement_list;
+	struct Statement *statement;
+	struct LocalDeclaration *local_declaration;
+	struct Expr *expr;
+	struct BinaryExpr *binary_expr;
+	struct UnaryExpr *unary_expr;
+	struct VariableDeclarationList *variable_declaration_list;
+	struct VariableDeclaration *variable_declaration;
+	struct Identifier *identifier;
+	struct Type *type;
+	struct TypeList *type_list;
 }
 
 %start program
@@ -27,7 +51,35 @@ struct Node *root;
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER
 
-%type <node> program object_file full_title primary_title implements_block fields_block field_list field methods_block_list methods_block methods_list method method_signature method_header statement_list statement expr unary_expr binary_expr add_expr sub_expr mul_expr div_expr local_declaration variable_declaration variable_declaration_list identifier type type_list
+%type <program> program
+%type <object_file> object_file
+%type <full_title> full_title
+%type <primary_title> primary_title
+%type <implements_block> implements_block
+%type <fields_block> fields_block
+%type <field_list> field_list
+%type <field> field
+%type <methods_block_list> methods_block_list
+%type <methods_block> methods_block
+%type <methods_list> methods_list
+%type <method> method
+%type <method_signature> method_signature
+%type <method_header> method_header
+%type <statement_list> statement_list
+%type <statement> statement
+%type <local_declaration> local_declaration
+%type <expr> expr
+%type <binary_expr> binary_expr
+%type <unary_expr> unary_expr
+%type <add_expr> add_expr
+%type <sub_expr> sub_expr
+%type <mul_expr> mul_expr
+%type <div_expr> div_expr
+%type <variable_declaration_list> variable_declaration_list
+%type <variable_declaration> variable_declaration
+%type <identifier> identifier
+%type <type> type
+%type <type_list> type_list
 
 %%
 

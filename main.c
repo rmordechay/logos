@@ -11,6 +11,8 @@ extern void yy_delete_buffer(void *buffer);
 struct Node *root;
 void parse(const char *code);
 
+void analyse_ast(struct Node *root);
+
 int main() {
     init_project();
     return 0;
