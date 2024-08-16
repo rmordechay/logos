@@ -30,6 +30,8 @@ set(
     src/project/app_file.c
     src/ast/tree.c
     main.c
+    src/utils/json_ast.c
+    src/utils/json_ast.h
 )
 
 add_executable(logos ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})

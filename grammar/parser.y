@@ -18,7 +18,6 @@ struct ObjectFile *root;
     char* val;
     struct Node *node;
 	struct ObjectFile *object_file;
-	struct Title *title;
 	struct ImplementsBlock *implements_block;
 	struct FieldsBlock *fields_block;
 	struct FieldList *field_list;
@@ -51,7 +50,6 @@ struct ObjectFile *root;
 
 %type <object_file> program
 %type <object_file> object_file
-%type <title> title
 %type <implements_block> implements_block
 %type <fields_block> fields_block
 %type <field_list> field_list
@@ -85,13 +83,9 @@ program:
     ;
 
 object_file:
-      	title implements_block fields_block methods_block_list { $$ = create_object_file($1, $2, $3, $4) }
-    | 	title fields_block { $$ = create_object_file($1, $2, NULL, NULL) }
+      	OBJECT COLON identifier implements_block fields_block methods_block_list { $$ = create_object_file($3, $4, $5, $6) }
+    | 	OBJECT COLON identifier fields_block { $$ = create_object_file($3, $4, NULL, NULL) }
     ;
-
-title:
-		OBJECT COLON identifier { $$ = create_title($3) }
-	;
 
 implements_block:
 		IMPLEMENTS LEFT_BRACE type_list RIGHT_BRACE { $$ = create_implements_block($3) }

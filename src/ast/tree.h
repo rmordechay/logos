@@ -39,12 +39,6 @@ typedef struct VariableDeclarationList {
     int count;
 } VariableDeclarationList;
 
-/**
- *
- */
-typedef struct Title {
-    Identifier *name;
-} Title;
 
 /**
  *
@@ -181,7 +175,7 @@ typedef struct MethodsBlockList {
  *
  */
 typedef struct ObjectFile {
-    Identifier *name;
+    Identifier *id;
     FieldsBlock *fields_block;
     ImplementsBlock *implements_block;
     MethodsBlockList *methods_block_list;
@@ -191,8 +185,7 @@ typedef struct ObjectFile {
 
 void analyse_ast(ObjectFile *root);
 
-ObjectFile *create_object_file(Identifier *name, ImplementsBlock *implements_block, FieldsBlock *fields_block, MethodsBlockList *methods_block_list);
-Title *create_title(Identifier *name);
+ObjectFile *create_object_file(Identifier *identifier, ImplementsBlock *implements_block, FieldsBlock *fields_block, MethodsBlockList *methods_block_list);
 ImplementsBlock *create_implements_block(TypeList *type_list);
 FieldsBlock *create_fields_block(FieldList *field_list);
 FieldList *create_field_list(int count);
@@ -219,7 +212,6 @@ Type *create_type(const char *name);
 TypeList *create_type_list(int count);
 
 void free_object_file(ObjectFile *obj);
-void free_title(Title *title);
 void free_implements_block(ImplementsBlock *implements_block);
 void free_fields_block(FieldsBlock *fields_block);
 void free_field_list(FieldList *field_list);

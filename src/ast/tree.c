@@ -2,36 +2,29 @@
 #include <string.h>
 #include <stdio.h>
 #include "tree.h"
+#include "utils/json_ast.h"
 
 /**
  *
  */
 void analyse_ast(ObjectFile *root) {
-    printf("%s\n", root->name->name);
+    print_object_file_json(root);
+    printf("%s\n", root->id->name);
 }
 
 /**
  *
  */
-ObjectFile *create_object_file(Identifier *name,
+ObjectFile *create_object_file(Identifier *identifier,
                                ImplementsBlock *implements_block,
                                FieldsBlock *fields_block,
                                MethodsBlockList *methods_block_list) {
     ObjectFile* obj = malloc(sizeof(ObjectFile));
-    obj->name = name;
+    obj->id = identifier;
     obj->fields_block = fields_block;
     obj->implements_block = implements_block;
     obj->methods_block_list = methods_block_list;
     return obj;
-}
-
-/**
- *
- */
-Title *create_title(Identifier *name) {
-    Title *title = malloc(sizeof(Title));
-    title->name = name;
-    return title;
 }
 
 /**
@@ -273,15 +266,8 @@ void free_object_file(ObjectFile* obj) {
     free_fields_block(obj->fields_block);
     free_methods_block_list(obj->methods_block_list);
     free_implements_block(obj->implements_block);
-    free(obj->name);
+    free(obj->id);
     free(obj);
-}
-
-/**
- *
- */
-void free_title(Title *title) {
-    free_identifier(title->name);
 }
 
 /**
