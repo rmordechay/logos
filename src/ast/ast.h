@@ -1,5 +1,5 @@
-#ifndef MYLANG_C_AST_H
-#define MYLANG_C_AST_H
+#ifndef AST_H
+#define AST_H
 
 #include <stddef.h>
 
@@ -47,4 +47,4 @@ Node *new_node(NodeType node_type, int child_len, ...);
 Node *new_leaf(NodeType node_type, char *value);
 Node *flatten_list(Node *list_node, Node* child);
 
-#endif //MYLANG_C_AST_H
+#endif //AST_H

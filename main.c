@@ -18,7 +18,7 @@ int main() {
  *
  */
 void parse() {
-    const char *filename = "lang/src/object.lng";
+    const char *filename = "lang/src/object.lgs";
     FILE *file = fopen(filename, "r");
     if (!file) {
         fprintf(stderr, "Could not open file: %s\n", filename);

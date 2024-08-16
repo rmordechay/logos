@@ -1,5 +1,5 @@
-#ifndef MYLANG_ANALYSER_H
-#define MYLANG_ANALYSER_H
+#ifndef ANALYSER_H
+#define ANALYSER_H
 
 #include "ast/ast.h"
 #include "utils/utils.h"
@@ -24,4 +24,4 @@ void visit_statement(Node *n_stmt);
 void visit_local_declaration(Node *n_local_declaration, LocalDec *local_dec);
 void visit_expr(Node *n_expr, Expr *expr);
 
-#endif //MYLANG_ANALYSER_H
+#endif //ANALYSER_H

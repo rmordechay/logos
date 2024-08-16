@@ -1,9 +1,15 @@
-#ifndef MYLANG_TYPES_H
-#define MYLANG_TYPES_H
+#ifndef TYPES_H
+#define TYPES_H
 
 #include "config.h"
 #include "utils/utils.h"
 #include "ast/ast.h"
+
+#define SRC_DIR "src"
+#define LOGOS_FILE_EXT "lgs"
+#define MAIN_CONFIG_FILE_NAME "Config.lgs"
+#define MAIN_FILE_NAME "Main.lgs"
+
 
 /**
  *
@@ -165,4 +171,4 @@ void free_type(Type *type);
 void free_variable_declaration(VariableDec *variable);
 void print_obj(Object *obj);
 
-#endif //MYLANG_TYPES_H
+#endif //TYPES_H
