@@ -42,6 +42,10 @@ set(
     src/types/local_declaration.c
     src/types/expr.c
     src/types/statement.c
+    src/project/project.c
+    src/project/project.h
+    src/project/application.c
+    src/project/app_file.c
 )
 
 add_executable(mylang ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})

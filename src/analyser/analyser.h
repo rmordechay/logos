@@ -7,7 +7,6 @@
 
 
 void analyse_ast(Node *root);
-void print_error(Node *root);
 void visit_object_file(Node *n_object_file);
 void visit_full_title(Node *n_full_title, Object *obj);
 void visit_primary_title(Node *n_primary_title, Object *obj);

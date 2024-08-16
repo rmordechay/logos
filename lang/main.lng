@@ -1,8 +1,14 @@
 object: Main
 
+func Int f(Object obj) {
+    return 0
+} -> obj
+
 func Void main() {
-    let s = MyObject{CustomObject{}, 2}
-    print(s.f())
-    s.analyse_ast()
+    let obj = MyObject{Object{}, 2}
+    print(obj)
+    Int a = f(obj)
+    obj = a->obj;
+    a->obj.analyse_ast()
     s.f2()
 }

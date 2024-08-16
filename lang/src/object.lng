@@ -1,5 +1,8 @@
 object: MyObject
-implements: Interface, Interface2, Interface3
+
+implements {
+    Interface, Interface2, Interface3
+}
 
 fields {
     Int var
