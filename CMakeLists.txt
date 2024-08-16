@@ -31,21 +31,12 @@ set(
     ${GEN_DIR_SOURCE}/parser.c
     ${GEN_DIR_SOURCE}/lexer.c
     main.c
-    src/types/object.c
-    src/types/types.h
-    src/config.h
-    src/types/interface.c
-    src/types/type.c
-    src/types/variable.c
-    src/types/field.c
-    src/types/method.c
-    src/types/local_declaration.c
-    src/types/expr.c
-    src/types/statement.c
     src/project/project.c
     src/project/project.h
     src/project/application.c
     src/project/app_file.c
+    src/ast/tree.c
+    src/ast/tree.h
 )
 
 add_executable(logos ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})

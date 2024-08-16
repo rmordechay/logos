@@ -4,6 +4,7 @@
 #include "cJSON.h"
 #include <curl/curl.h>
 #include "ast/ast.h"
+#include "ast/tree.h"
 
 typedef struct StringList {
     char **strings;
