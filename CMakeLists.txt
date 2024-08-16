@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(mylang C)
+project(logos C)
 
 set(CMAKE_C_STANDARD 11)
 set(GEN_DIR_BUILD ${CMAKE_BINARY_DIR}/gen)
@@ -48,13 +48,13 @@ set(
     src/project/app_file.c
 )
 
-add_executable(mylang ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})
+add_executable(logos ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/src
 )
 
-set_target_properties(mylang PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+set_target_properties(logos PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
-target_link_libraries(mylang CURL::libcurl)
+target_link_libraries(logos CURL::libcurl)

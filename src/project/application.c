@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <string.h>
 #include "project.h"
+#include "types/types.h"
 
 /**
  *
@@ -34,4 +36,12 @@ AppConfig *create_app_config() {
  */
 void free_app_config(AppConfig *app_config) {
     free(app_config->path);
+}
+
+/**
+ *
+ */
+int is_logos_file(const char *path) {
+    char *dot = strrchr(path, '.');
+    return dot && strcmp(dot + 1, LOGOS_FILE_EXT) == 0;
 }

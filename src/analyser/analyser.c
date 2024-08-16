@@ -198,7 +198,6 @@ void visit_expr(Node *n_expr, Expr *expr) {
     Node *n_right_expr = n_expr->children[1];
     BinaryExpr *binary_expr = create_binary_expr();
     expr->expr_type = BINARY;
-    binary_expr->left_expr =
     expr->e.binary_expr = binary_expr;
     if (node_type == N_ADD_EXPR) {
         binary_expr->op = ADD;

@@ -1,5 +1,5 @@
-#ifndef MYLANG_UTILS_H
-#define MYLANG_UTILS_H
+#ifndef UTILS_H
+#define UTILS_H
 
 #include "cJSON.h"
 #include <curl/curl.h>
@@ -22,4 +22,4 @@ const char *get_string_element(StringList *list, int i);
 
 void print_json(Node *node);
 
-#endif //MYLANG_UTILS_H
+#endif //UTILS_H

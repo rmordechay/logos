@@ -1,5 +1,5 @@
-#ifndef MYLANG_PROJECT_H
-#define MYLANG_PROJECT_H
+#ifndef PROJECT_H
+#define PROJECT_H
 
 #include <stdio.h>
 
@@ -31,6 +31,7 @@ typedef struct AppFile {
 
 
 void init_project();
+int is_logos_file(const char *path);
 
 App *create_application();
 AppConfig *create_app_config();
@@ -40,4 +41,4 @@ void free_application(App *app);
 void free_app_file(AppFile *app_file);
 void free_app_config(AppConfig *app_config);
 
-#endif //MYLANG_PROJECT_H
+#endif //PROJECT_H
