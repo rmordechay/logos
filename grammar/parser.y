@@ -10,17 +10,15 @@ extern int yylineno;
 extern FILE* yyin;
 void yyerror(const char* s);
 
-struct Node *root;
+struct ObjectFile *root;
+
 %}
-
-
 
 %union {
     char* val;
     struct Node *node;
 	struct ObjectFile *object_file;
-	struct FullTitle *full_title;
-	struct PrimaryTitle *primary_title;
+	struct Title *title;
 	struct ImplementsBlock *implements_block;
 	struct FieldsBlock *fields_block;
 	struct FieldList *field_list;
@@ -51,10 +49,9 @@ struct Node *root;
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER
 
-%type <program> program
+%type <object_file> program
 %type <object_file> object_file
-%type <full_title> full_title
-%type <primary_title> primary_title
+%type <title> title
 %type <implements_block> implements_block
 %type <fields_block> fields_block
 %type <field_list> field_list
@@ -69,12 +66,12 @@ struct Node *root;
 %type <statement> statement
 %type <local_declaration> local_declaration
 %type <expr> expr
-%type <binary_expr> binary_expr
 %type <unary_expr> unary_expr
-%type <add_expr> add_expr
-%type <sub_expr> sub_expr
-%type <mul_expr> mul_expr
-%type <div_expr> div_expr
+%type <binary_expr> binary_expr
+%type <binary_expr> add_expr
+%type <binary_expr> sub_expr
+%type <binary_expr> mul_expr
+%type <binary_expr> div_expr
 %type <variable_declaration_list> variable_declaration_list
 %type <variable_declaration> variable_declaration
 %type <identifier> identifier
@@ -84,139 +81,134 @@ struct Node *root;
 %%
 
 program:
-      	OBJECT COLON object_file { root = $3 }
+    	object_file { analyse_ast($1) }
     ;
 
 object_file:
-      	full_title fields_block methods_block_list { $$ = new_node(N_OBJECT_FILE, 3, $1, $2, $3) }
-    | 	full_title fields_block { $$ = new_node(N_OBJECT_FILE, 2, $1, $2) }
+      	title implements_block fields_block methods_block_list { $$ = create_object_file($1, $2, $3, $4) }
+    | 	title fields_block { $$ = create_object_file($1, $2, NULL, NULL) }
     ;
 
-full_title:
-		primary_title implements_block { $$ = new_node(N_FULL_TITLE, 2, $1, $2) }
-	| 	primary_title { $$ = new_node(N_FULL_TITLE, 1, $1) }
-	;
-
-primary_title:
-		identifier { $$ = new_node(N_PRIMARY_TITLE, 1, $1) }
+title:
+		OBJECT COLON identifier { $$ = create_title($3) }
 	;
 
 implements_block:
-		IMPLEMENTS LEFT_BRACE type_list RIGHT_BRACE { $$ = new_node(N_SECONDARY_TITLE, 1, $3) }
+		IMPLEMENTS LEFT_BRACE type_list RIGHT_BRACE { $$ = create_implements_block($3) }
 	;
 
 fields_block:
-      	FIELDS LEFT_BRACE field_list RIGHT_BRACE { $$ = new_node(N_FIELDS_BLOCK, 1, $3) }
+      	FIELDS LEFT_BRACE field_list RIGHT_BRACE { $$ = create_fields_block($3) }
     ;
 
 field_list:
-		field { $$ = new_node(N_FIELD_LIST, 1, $1) }
-    | 	field_list field { $$ = flatten_list($1, $2) }
+		field { $$ = create_field_list(1) }
+    | 	field_list field { $$ = create_field_list($1->count + 1) }
     ;
 
 field:
-    	variable_declaration  { $$ = new_node(N_FIELD, 1, $1)  }
-    |	variable_declaration COLON type  { $$ = new_node(N_FIELD, 2, $1, $3)  }
+    	variable_declaration  { $$ = create_field($1, NULL)  }
+    |	variable_declaration COLON type  { $$ = create_field($1, $3)  }
     ;
 
 methods_block_list:
-		methods_block { $$ = new_node(N_METHODS_BLOCK_LIST, 1, $1) }
-	|	methods_block_list methods_block { $$ = flatten_list($1, $2) }
+		methods_block {  $$ = create_methods_block_list(1);  }
+	|	methods_block_list methods_block {  $$ = create_methods_block_list($1->count + 1);  }
 	;
 
 methods_block:
-		identifier LEFT_BRACE methods_list RIGHT_BRACE { $$ = new_node(N_METHODS_BLOCK, 2, $1, $3) }
+		identifier LEFT_BRACE methods_list RIGHT_BRACE { $$ = create_methods_block($1, $3) }
 	;
 
 methods_list:
-		method { $$ = new_node(N_METHODS_LIST, 1, $1) }
-	|	methods_list method { $$ = flatten_list($1, $2) }
+		method { $$ = create_methods_list(1) }
+	|	methods_list method { $$ = create_methods_list($1->count + 1) }
 	;
 
 method:
-		method_signature LEFT_BRACE statement_list RIGHT_BRACE { $$ = new_node(N_METHOD, 2, $1, $3) }
-	|	method_signature LEFT_BRACE RIGHT_BRACE { $$ = new_node(N_METHOD, 1, $1) }
+		method_signature LEFT_BRACE statement_list RIGHT_BRACE { $$ = create_method($1, $3) }
+	|	method_signature LEFT_BRACE RIGHT_BRACE { $$ = create_method($1, NULL) }
 	;
 
 method_signature:
-		method_header LEFT_PAREN variable_declaration_list RIGHT_PAREN { $$ = new_node(N_METHOD_SIGNATURE, 2, $1, $3) }
-	|	method_header LEFT_PAREN RIGHT_PAREN { $$ = new_node(N_METHOD_SIGNATURE, 1, $1) }
+		method_header LEFT_PAREN variable_declaration_list RIGHT_PAREN { $$ = create_method_signature($1, $3) }
+	|	method_header LEFT_PAREN RIGHT_PAREN { $$ = create_method_signature($1, NULL) }
 	;
 
 method_header:
-		FUNC variable_declaration { $$ = new_node(N_METHOD_HEADER, 1, $2) }
+		FUNC variable_declaration { $$ = create_method_header($2) }
 	;
 
 
 statement_list:
-		statement { $$ = new_node(N_STATEMENT_LIST, 1, $1) }
-	|	statement_list statement { $$ = flatten_list($1, $2) }
+		statement { $$ = create_statement_list(1) }
+	|	statement_list statement { $$ = create_statement_list($1->count + 1) }
 	;
 
 statement:
-		local_declaration { $$ = new_node(N_STATEMENT, 1, $1) }
+		local_declaration { $$ = create_statement($1) }
 	;
 
 local_declaration:
-		LET variable_declaration EQUAL expr { $$ = new_node(N_LOCAL_DECLARATION, 2, $2, $4) }
+		LET variable_declaration EQUAL expr { $$ = create_local_declaration($2, $4) }
 	;
 
 expr:
-		unary_expr { $$ = new_node(N_EXPR, 1, $1) }
-	|	binary_expr { $$ = new_node(N_EXPR, 1, $1) }
+		unary_expr { $$ = create_expr_unary($1) }
+	|	binary_expr { $$ = create_expr_binary($1) }
 	|	LEFT_PAREN expr RIGHT_PAREN { $$ = $2 }
     ;
 
 binary_expr:
-		add_expr { $$ = new_node(N_BINARY_EXPR, 1, $1) }
-	|	sub_expr { $$ = new_node(N_BINARY_EXPR, 1, $1) }
-	|	mul_expr { $$ = new_node(N_BINARY_EXPR, 1, $1) }
-	|	div_expr { $$ = new_node(N_BINARY_EXPR, 1, $1) }
+		add_expr
+	|	sub_expr
+	|	mul_expr
+	|	div_expr
 	;
 
 unary_expr:
-		INTEGER { $$ = new_leaf(N_UNARY_EXPR, yylval.val) }
-	| 	FLOAT { $$ = new_leaf(N_UNARY_EXPR, yylval.val) }
-	| 	identifier { $$ = new_node(N_UNARY_EXPR, 1, $1) }
+		INTEGER { $$ = create_unary_expr_int(yylval.val) }
+	| 	FLOAT { $$ = create_unary_expr_float(yylval.val) }
+	| 	identifier { $$ = create_unary_expr_id($1) }
 	;
 
 add_expr:
-		expr PLUS expr { $$ = new_node(N_ADD_EXPR, 2, $1, $3) }
+		expr PLUS expr { $$ = create_binary_expr($1, $3, '+') }
 	;
 
 sub_expr:
-		expr MINUS expr { $$ = new_node(N_SUB_EXPR, 2, $1, $3) }
+		expr MINUS expr { $$ = create_binary_expr($1, $3, '-') }
 	;
 
 mul_expr:
-		expr STAR expr { $$ = new_node(N_MUL_EXPR, 2, $1, $3) }
+		expr STAR expr { $$ = create_binary_expr($1, $3, '*') }
 	;
 
 div_expr:
-		expr SLASH expr { $$ = new_node(N_DIV_EXPR, 2, $1, $3) }
+		expr SLASH expr { $$ = create_binary_expr($1, $3, '/') }
 	;
 
 variable_declaration_list:
-		variable_declaration { $$ = new_node(N_VAR_DEC_LIST, 1, $1) }
-	|	variable_declaration_list COMMA variable_declaration { $$ = flatten_list($1, $3) }
+		variable_declaration { }
+	|	variable_declaration_list COMMA variable_declaration {  }
 	;
 
 variable_declaration:
-		type identifier { $$ = new_node(N_VARIABLE_DECLARATION, 2, $1, $2) }
+		type identifier { $$ = create_variable_declaration($1, $2) }
 	;
 
 identifier:
-		IDENTIFIER { $$ = new_leaf(N_IDENTIFIER, yylval.val) }
+		IDENTIFIER { $$ = create_identifier(yylval.val) }
 	;
 
 type:
-    	IDENTIFIER { $$ = new_leaf(N_TYPE, yylval.val) }
+    	IDENTIFIER { $$ = create_type(yylval.val) }
     ;
 
 type_list:
-	  type { $$ = new_node(N_TYPE_LIST, 1, $1) }
-	| type_list COMMA type { $$ = flatten_list($1, $3) }
-
+	  	type { $$ = create_type_list(1)  }
+	| 	type_list COMMA type { $$ = create_type_list($1->count + 1)  }
+	;
 %%
 
 void yyerror(const char* s) {

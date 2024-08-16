@@ -29,67 +29,6 @@ void make_http_call() {
 /**
  *
  */
-void print_tree(Node *root, int depth) {
-    for (int i = 0; i < depth; i++) {
-        printf("\t");
-    }
-    printf("- Node Type: %s\n", get_node_string(root->node_type));
-    if (root->child_len != 0) {
-        for (int i = 0; i < depth; i++) {
-            printf("\t");
-        }
-        printf("  Child len: %zu\n", root->child_len);
-        for (int i = 0; i < depth; i++) {
-            printf("\t");
-        }
-        printf("  Children:\n");
-        for (size_t i = 0; i < root->child_len; i++) {
-            print_tree(root->children[i], depth + 1);
-        }
-    } else {
-        for (int i = 0; i < depth; i++) {
-            printf("\t");
-        }
-        printf("  Value: %s\n", root->value);
-    }
-}
-
-
-cJSON *node_to_json(Node * node) {
-    if (node == NULL) {
-        return NULL;
-    }
-    cJSON *json = cJSON_CreateObject();
-    if (node->value != NULL) {
-        cJSON_AddStringToObject(json, "value", node->value);
-    } else {
-        cJSON_AddNullToObject(json, "value");
-    }
-    cJSON_AddStringToObject(json, "node_type", get_node_string(node->node_type));
-    cJSON *arr = cJSON_CreateArray();
-    for (int i = 0; i < node->child_len; i++) {
-        cJSON *child = (cJSON *) node_to_json(node->children[i]);
-        if (child != NULL) {
-            cJSON_AddItemToArray(arr, child);
-        }
-    }
-    cJSON_AddItemToObject(json, "children", arr);
-    return json;
-}
-
-/**
- *
- */
-void print_json(Node *node) {
-    cJSON *json = node_to_json(node);
-    char *jsonString = cJSON_Print(json);
-    cJSON_Delete(json);
-    printf("%s\n", jsonString);
-}
-
-/**
- *
- */
 void init_string_list(StringList *list, int capacity) {
     list->capacity = capacity;
     list->len = 0;

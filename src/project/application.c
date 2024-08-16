@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "project.h"
-#include "types/types.h"
+
+#define LOGOS_FILE_EXT "lgs"
 
 /**
  *
@@ -19,7 +20,6 @@ App *create_application() {
  */
 void free_application(App *app) {
     free(app->name);
-    free(app->root_path);
 //    free_app_config(app->app_config);
     free(app);
 }

@@ -8,10 +8,6 @@ set(GEN_DIR_SOURCE ${CMAKE_SOURCE_DIR}/gen)
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 find_package(CURL REQUIRED)
-
-
-
-
 file(MAKE_DIRECTORY ${GEN_DIR_SOURCE})
 
 BISON_TARGET(
@@ -25,8 +21,6 @@ add_flex_bison_dependency(Lexer Parser)
 set(
     SOURCES
     include/cJSON.c
-    src/analyser/analyser.c
-    src/ast/ast.c
     src/utils/utils.c
     ${GEN_DIR_SOURCE}/parser.c
     ${GEN_DIR_SOURCE}/lexer.c

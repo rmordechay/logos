@@ -1,33 +1,26 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "tree.h"
 
 /**
  *
  */
-void analyse_ast(Node *root) {
-
+void analyse_ast(ObjectFile *root) {
+    printf("%s\n", "");
 }
 
 /**
  *
  */
-Node* create_node(NodeType type, int child_count) {
-    Node* node = malloc(sizeof(Node));
-    node->type = type;
-    node->child_count = child_count;
-    node->children = malloc(sizeof(Node*) * child_count);
-    node->value = NULL;
-    return node;
-}
-
-/**
- *
- */
-ObjectFile* create_object_file(FullTitle* full_title, FieldsBlock* fields_block, MethodsBlockList* methods_block_list) {
+ObjectFile *create_object_file(Identifier *name,
+                               ImplementsBlock *implements_block,
+                               FieldsBlock *fields_block,
+                               MethodsBlockList *methods_block_list) {
     ObjectFile* obj = malloc(sizeof(ObjectFile));
-    obj->full_title = full_title;
+    obj->name = name;
     obj->fields_block = fields_block;
+    obj->implements_block = implements_block;
     obj->methods_block_list = methods_block_list;
     return obj;
 }
@@ -35,20 +28,10 @@ ObjectFile* create_object_file(FullTitle* full_title, FieldsBlock* fields_block,
 /**
  *
  */
-FullTitle* create_full_title(PrimaryTitle* primary_title, ImplementsBlock* implements_block) {
-    FullTitle* ft = malloc(sizeof(FullTitle));
-    ft->primary_title = primary_title;
-    ft->implements_block = implements_block;
-    return ft;
-}
-
-/**
- *
- */
-PrimaryTitle* create_primary_title(Identifier* identifier) {
-    PrimaryTitle* pt = malloc(sizeof(PrimaryTitle));
-    pt->identifier = identifier;
-    return pt;
+Title *create_title(Identifier *name) {
+    Title *title = malloc(sizeof(Title));
+    title->name = name;
+    return title;
 }
 
 /**
@@ -82,7 +65,7 @@ FieldList* create_field_list(int count) {
 /**
  *
  */
-Field* create_field(VariableDec* variable_declaration, Type* type) {
+Field* create_field(VariableDec *variable_declaration, Type* type) {
     Field* f = malloc(sizeof(Field));
     f->variable_declaration = variable_declaration;
     f->type = type;
@@ -282,45 +265,23 @@ TypeList* create_type_list(int count) {
 }
 
 
-// Free functions
-void free_node(Node* node) {
-    if (node == NULL) return;
-    for (int i = 0; i < node->child_count; i++) {
-        free_node(node->children[i]);
-    }
-    free(node->children);
-    free(node->value);
-    free(node);
-}
-
 /**
  *
  */
 void free_object_file(ObjectFile* obj) {
     if (obj == NULL) return;
-    free_full_title(obj->full_title);
     free_fields_block(obj->fields_block);
     free_methods_block_list(obj->methods_block_list);
+    free_implements_block(obj->implements_block);
+    free(obj->name);
     free(obj);
 }
 
 /**
  *
  */
-void free_full_title(FullTitle* ft) {
-    if (ft == NULL) return;
-    free_primary_title(ft->primary_title);
-    free_implements_block(ft->implements_block);
-    free(ft);
-}
-
-/**
- *
- */
-void free_primary_title(PrimaryTitle* pt) {
-    if (pt == NULL) return;
-    free_identifier(pt->identifier);
-    free(pt);
+void free_title(Title *title) {
+    free_identifier(title->name);
 }
 
 /**
@@ -541,4 +502,43 @@ void free_type_list(TypeList* tl) {
     }
     free(tl->types);
     free(tl);
+}
+
+/**
+ *
+ */
+char *get_node_string(NodeType nodeType) {
+    switch (nodeType) {
+        case N_OBJECT_FILE: return "OBJECT_FILE";
+        case N_TITLE: return "TITLE";
+        case N_METHODS_BLOCK_LIST: return "METHODS_BLOCK_LIST";
+        case N_METHODS_BLOCK: return "METHODS_BLOCK";
+        case N_METHODS_LIST: return "METHODS_LIST";
+        case N_METHOD_SIGNATURE: return "METHOD_SIGNATURE";
+        case N_METHOD_HEADER: return "METHOD_HEADER";
+        case N_METHOD: return "METHOD";
+        case N_PARAM: return "PARAM";
+        case N_VARIABLE_DECLARATION: return "VARIABLE_DECLARATION";
+        case N_FIELDS_BLOCK: return "FIELDS_BLOCK";
+        case N_FIELD_LIST: return "FIELD_LIST";
+        case N_FIELD: return "FIELD";
+        case N_IDENTIFIER: return "IDENTIFIER";
+        case N_TYPE: return "TYPE";
+        case N_TYPE_LIST: return "TYPE_LIST";
+        case N_STATEMENT_LIST: return "STATEMENT_LIST";
+        case N_STATEMENT: return "STATEMENT";
+        case N_EXPR: return "EXPR";
+        case N_UNARY_EXPR: return "UNARY_EXPR";
+        case N_ADD_EXPR: return "ADD_EXPR";
+        case N_SUB_EXPR: return "SUB_EXPR";
+        case N_MUL_EXPR: return "MUL_EXPR";
+        case N_DIV_EXPR: return "DIV_EXPR";
+        case N_IDENTIFIER_LIST: return "IDENTIFIER_LIST";
+        case N_LOCAL_DECLARATION: return "LOCAL_DECLARATION";
+        case N_VAR_DEC_LIST: return "VAR_DEC_LIST";
+        case N_BINARY_EXPR:break;
+        default: return NULL;
+
+    }
+    return NULL;
 }
