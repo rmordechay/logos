@@ -23,11 +23,11 @@ struct Node *root;
 %start program
 
 %token LET FUNC IMPLEMENTS FIELDS SELF OBJECT
-%token LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE LEFT_BRACKET RIGHT_BRACKET
+%token LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE LEFT_BRACKET RIGHT_BRACKET LEFT_ANGLE RIGHT_ANGLE
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER
 
-%type <node> program object_file full_title primary_title secondary_title fields_block field_list field methods_block_list methods_block methods_list method method_signature method_header statement_list statement expr unary_expr binary_expr add_expr sub_expr mul_expr div_expr local_declaration variable_declaration variable_declaration_list identifier type type_list
+%type <node> program object_file full_title primary_title implements_block fields_block field_list field methods_block_list methods_block methods_list method method_signature method_header statement_list statement expr unary_expr binary_expr add_expr sub_expr mul_expr div_expr local_declaration variable_declaration variable_declaration_list identifier type type_list
 
 %%
 
@@ -41,7 +41,7 @@ object_file:
     ;
 
 full_title:
-		primary_title secondary_title { $$ = new_node(N_FULL_TITLE, 2, $1, $2) }
+		primary_title implements_block { $$ = new_node(N_FULL_TITLE, 2, $1, $2) }
 	| 	primary_title { $$ = new_node(N_FULL_TITLE, 1, $1) }
 	;
 
@@ -49,8 +49,8 @@ primary_title:
 		identifier { $$ = new_node(N_PRIMARY_TITLE, 1, $1) }
 	;
 
-secondary_title:
-		IMPLEMENTS COLON type_list { $$ = new_node(N_SECONDARY_TITLE, 1, $3) }
+implements_block:
+		IMPLEMENTS LEFT_BRACE type_list RIGHT_BRACE { $$ = new_node(N_SECONDARY_TITLE, 1, $3) }
 	;
 
 fields_block:

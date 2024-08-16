@@ -7,7 +7,6 @@
 Object *create_object() {
     Object *obj = malloc(sizeof(Object));
     obj->name = NULL;
-    obj->file_type = OBJECT_FILE;
     obj->interfaces = NULL;
     obj->interfaces_len = 0;
     obj->fields = NULL;

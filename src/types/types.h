@@ -5,6 +5,9 @@
 #include "utils/utils.h"
 #include "ast/ast.h"
 
+/**
+ *
+ */
 typedef enum Operation {
     ADD = 1,
     SUB,
@@ -12,24 +15,39 @@ typedef enum Operation {
     DIV,
 } Operation;
 
+/**
+ *
+ */
 typedef enum ExprType {
     UNARY = 1,
     BINARY,
 } ExprType;
 
+/**
+ *
+ */
 typedef struct Variable {
     char *name;
 } Variable;
 
+/**
+ *
+ */
 typedef struct Type {
     char *name;
 } Type;
 
+/**
+ *
+ */
 typedef struct VariableDeclaration {
     Variable *variable_name;
     Type *type;
 } VariableDec;
 
+/**
+ *
+ */
 typedef struct Expr {
     char *value;
     ExprType expr_type;
@@ -39,35 +57,56 @@ typedef struct Expr {
     } e;
 } Expr;
 
+/**
+ *
+ */
 typedef struct UnaryExpr {
     Operation op;
     Expr *expr;
 } UnaryExpr;
 
+/**
+ *
+ */
 typedef struct BinaryExpr {
     Operation op;
     Expr *left_expr;
     Expr *right_expr;
 } BinaryExpr;
 
+/**
+ *
+ */
 typedef struct LocalDeclaration {
     VariableDec *variable_dec;
     Expr *expr;
 } LocalDec;
 
+/**
+ *
+ */
 typedef struct Statement {
     LocalDec *local_dec;
 } Statement;
 
+/**
+ *
+ */
 typedef struct Interface {
     char *name;
 } Interface;
 
+/**
+ *
+ */
 typedef struct Field {
     VariableDec *variable_dec;
     Interface *interface;
 } Field;
 
+/**
+ *
+ */
 typedef struct Method {
     VariableDec *var_dec;
     VariableDec **params;
@@ -76,15 +115,20 @@ typedef struct Method {
     size_t statements_len;
 } Method;
 
+/**
+ *
+ */
 typedef struct MethodBlock {
     char *name;
     Method **methods;
     size_t methods_len;
 } MethodBlock;
 
+/**
+ *
+ */
 typedef struct Object {
     char *name;
-    FileType file_type;
     Interface **interfaces;
     size_t interfaces_len;
     Field **fields;

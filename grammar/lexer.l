@@ -21,6 +21,8 @@ int line_number = 1;
 "}"                     { return RIGHT_BRACE; }
 "["                     { return LEFT_BRACKET; }
 "]"                     { return RIGHT_BRACKET; }
+"<"                     { return LEFT_ANGLE; }
+">"                     { return RIGHT_ANGLE; }
 ","                     { return COMMA; }
 "."                     { return DOT; }
 ":"                     { return COLON; }
