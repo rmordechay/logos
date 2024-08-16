@@ -24,13 +24,12 @@ set(
     src/utils/utils.c
     ${GEN_DIR_SOURCE}/parser.c
     ${GEN_DIR_SOURCE}/lexer.c
-    main.c
     src/project/project.c
     src/project/project.h
     src/project/application.c
     src/project/app_file.c
     src/ast/tree.c
-    src/ast/tree.h
+    main.c
 )
 
 add_executable(logos ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})
@@ -38,6 +37,8 @@ add_executable(logos ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/src
+    ${GEN_DIR_SOURCE}
+    ${GEN_DIR_BUILD}
 )
 
 set_target_properties(logos PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})

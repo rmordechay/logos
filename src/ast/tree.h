@@ -1,37 +1,6 @@
 #ifndef TREE_H
 #define TREE_H
 
-typedef enum {
-    N_OBJECT_FILE,
-    N_TITLE,
-    N_METHODS_BLOCK_LIST,
-    N_METHODS_BLOCK,
-    N_METHODS_LIST,
-    N_METHOD,
-    N_METHOD_SIGNATURE,
-    N_METHOD_HEADER,
-    N_STATEMENT_LIST,
-    N_STATEMENT,
-    N_LOCAL_DECLARATION,
-    N_EXPR,
-    N_UNARY_EXPR,
-    N_BINARY_EXPR,
-    N_ADD_EXPR,
-    N_SUB_EXPR,
-    N_MUL_EXPR,
-    N_DIV_EXPR,
-    N_PARAM,
-    N_FIELDS_BLOCK,
-    N_FIELD_LIST,
-    N_FIELD,
-    N_VARIABLE_DECLARATION,
-    N_VAR_DEC_LIST,
-    N_IDENTIFIER,
-    N_IDENTIFIER_LIST,
-    N_TYPE,
-    N_TYPE_LIST,
-} NodeType;
-
 /**
  *
  */
@@ -221,7 +190,6 @@ typedef struct ObjectFile {
 
 
 void analyse_ast(ObjectFile *root);
-char *get_node_string(NodeType nodeType);
 
 ObjectFile *create_object_file(Identifier *name, ImplementsBlock *implements_block, FieldsBlock *fields_block, MethodsBlockList *methods_block_list);
 Title *create_title(Identifier *name);
