@@ -6,12 +6,12 @@ implements {
 
 fields {
     Int var
-    Int var2 of Interface
+    Int var2: Interface
 }
 
 Self {
     func Int f(Int v) {
-        let Int a = 2
+        let Int a = 2 + 2 + 3
     }
 }
 

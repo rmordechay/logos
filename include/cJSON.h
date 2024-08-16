@@ -61,18 +61,18 @@ then using the CJSON_API_VISIBILITY flag to "export" the same symbols the way CJ
 #endif
 
 #if defined(CJSON_HIDE_SYMBOLS)
-#define CJSON_PUBLIC(type)   type CJSON_STDCALL
+#define CJSON_PUBLIC(implements)   implements CJSON_STDCALL
 #elif defined(CJSON_EXPORT_SYMBOLS)
-#define CJSON_PUBLIC(type)   __declspec(dllexport) type CJSON_STDCALL
+#define CJSON_PUBLIC(implements)   __declspec(dllexport) implements CJSON_STDCALL
 #elif defined(CJSON_IMPORT_SYMBOLS)
-#define CJSON_PUBLIC(type)   __declspec(dllimport) type CJSON_STDCALL
+#define CJSON_PUBLIC(implements)   __declspec(dllimport) implements CJSON_STDCALL
 #endif
 #else /* !__WINDOWS__ */
 #define CJSON_CDECL
 #define CJSON_STDCALL
 
 #if (defined(__GNUC__) || defined(__SUNPRO_CC) || defined (__SUNPRO_C)) && defined(CJSON_API_VISIBILITY)
-#define CJSON_PUBLIC(type)   __attribute__((visibility("default"))) type
+#define CJSON_PUBLIC(implements)   __attribute__((visibility("default"))) implements
 #else
 #define CJSON_PUBLIC(type) type
 #endif
@@ -108,14 +108,14 @@ typedef struct cJSON
     /* An array or object item will have a child pointer pointing to a chain of the items in the array/object. */
     struct cJSON *child;
 
-    /* The type of the item, as above. */
+    /* The implements of the item, as above. */
     int type;
 
-    /* The item's string, if type==cJSON_String  and type == cJSON_Raw */
+    /* The item's string, if implements==cJSON_String  and implements == cJSON_Raw */
     char *valuestring;
     /* writing to valueint is DEPRECATED, use cJSON_SetNumberValue instead */
     int valueint;
-    /* The item's number, if type==cJSON_Number */
+    /* The item's number, if implements==cJSON_Number */
     double valuedouble;
 
     /* The item's variable_name string, if this item is the child of, or is in the list of subitems of an object. */
@@ -175,11 +175,11 @@ CJSON_PUBLIC(cJSON_bool) cJSON_HasObjectItem(const cJSON *object, const char *st
 /* For analysing failed parses. This returns a pointer to the parse error. You'll probably need to look a few chars back to make sense of it. Defined when cJSON_Parse() returns 0. 0 when cJSON_Parse() succeeds. */
 CJSON_PUBLIC(const char *) cJSON_GetErrorPtr(void);
 
-/* Check item type and return its value */
+/* Check item implements and return its value */
 CJSON_PUBLIC(char *) cJSON_GetStringValue(const cJSON * const item);
 CJSON_PUBLIC(double) cJSON_GetNumberValue(const cJSON * const item);
 
-/* These functions check the type of an item */
+/* These functions check the implements of an item */
 CJSON_PUBLIC(cJSON_bool) cJSON_IsInvalid(const cJSON * const item);
 CJSON_PUBLIC(cJSON_bool) cJSON_IsFalse(const cJSON * const item);
 CJSON_PUBLIC(cJSON_bool) cJSON_IsTrue(const cJSON * const item);
@@ -191,7 +191,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_IsArray(const cJSON * const item);
 CJSON_PUBLIC(cJSON_bool) cJSON_IsObject(const cJSON * const item);
 CJSON_PUBLIC(cJSON_bool) cJSON_IsRaw(const cJSON * const item);
 
-/* These calls create a cJSON item of the appropriate type. */
+/* These calls create a cJSON item of the appropriate implements. */
 CJSON_PUBLIC(cJSON *) cJSON_CreateNull(void);
 CJSON_PUBLIC(cJSON *) cJSON_CreateTrue(void);
 CJSON_PUBLIC(cJSON *) cJSON_CreateFalse(void);
@@ -222,7 +222,7 @@ CJSON_PUBLIC(cJSON *) cJSON_CreateStringArray(const char *const *strings, int co
 CJSON_PUBLIC(cJSON_bool) cJSON_AddItemToArray(cJSON *array, cJSON *item);
 CJSON_PUBLIC(cJSON_bool) cJSON_AddItemToObject(cJSON *object, const char *string, cJSON *item);
 /* Use this when string is definitely const (i.e. a literal, or as good as), and will definitely survive the cJSON object.
- * WARNING: When this function was used, make sure to always check that (item->type & cJSON_StringIsConst) is zero before
+ * WARNING: When this function was used, make sure to always check that (item->implements & cJSON_StringIsConst) is zero before
  * writing to `item->string` */
 CJSON_PUBLIC(cJSON_bool) cJSON_AddItemToObjectCS(cJSON *object, const char *string, cJSON *item);
 /* Append reference to item to the specified array/object. Use this when you want to add an existing cJSON to a new cJSON, but don'e want to corrupt your existing cJSON. */
@@ -276,10 +276,10 @@ CJSON_PUBLIC(cJSON*) cJSON_AddArrayToObject(cJSON * const object, const char * c
 /* helper for the cJSON_SetNumberValue macro */
 CJSON_PUBLIC(double) cJSON_SetNumberHelper(cJSON *object, double number);
 #define cJSON_SetNumberValue(object, number) ((object != NULL) ? cJSON_SetNumberHelper(object, (double)number) : (number))
-/* Change the valuestring of a cJSON_String object, only takes effect when type of object is cJSON_String */
+/* Change the valuestring of a cJSON_String object, only takes effect when implements of object is cJSON_String */
 CJSON_PUBLIC(char*) cJSON_SetValuestring(cJSON *object, const char *valuestring);
 
-/* If the object is not a boolean type this does nothing and returns cJSON_Invalid else it returns the new type*/
+/* If the object is not a boolean implements this does nothing and returns cJSON_Invalid else it returns the new implements*/
 #define cJSON_SetBoolValue(object, boolValue) ( \
     (object != NULL && ((object)->type & (cJSON_False|cJSON_True))) ? \
     (object)->type=((object)->type &(~(cJSON_False|cJSON_True)))|((boolValue)?cJSON_True:cJSON_False) : \

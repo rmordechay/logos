@@ -101,8 +101,8 @@ field_list:
     ;
 
 field:
-    	variable_declaration  { $$ = create_field($1, NULL)  }
-    |	variable_declaration COLON type  { $$ = create_field($1, $3)  }
+    	variable_declaration COLON type  { $$ = create_field($1, $3)  }
+    |	variable_declaration  { $$ = create_field($1, NULL)  }
     ;
 
 methods_block_list:
