@@ -37,7 +37,7 @@ typedef struct VariableDeclaration {
 typedef struct VariableDeclarationList {
     VariableDec **declarations;
     int count;
-} VariableDeclarationList;
+} VarDecList;
 
 /**
  *
@@ -134,7 +134,7 @@ typedef struct MethodHeader {
  */
 typedef struct MethodSignature {
     MethodHeader *method_header;
-    VariableDeclarationList *variable_declaration_list;  // Optional
+    VarDecList *variable_declaration_list;  // Optional
 } MethodSignature;
 
 /**
@@ -187,18 +187,18 @@ void analyse_ast(ObjectFile *root);
 ObjectFile *create_object_file(Identifier *identifier, ImplementsBlock *implements_block, FieldsBlock *fields_block, MethodsBlockList *methods_block_list);
 ImplementsBlock *create_implements_block(TypeList *type_list);
 FieldsBlock *create_fields_block(FieldList *field_list);
-FieldList *create_field_list(int count);
+FieldList *create_field_list(Field *field);
 FieldList *flatten_field_list(FieldList *field_list, Field *field);
 Field *create_field(VariableDec *variable_declaration, Type *type);
-MethodsBlockList *create_methods_block_list(int count);
+MethodsBlockList *create_methods_block_list(MethodsBlock *methodBlock);
 MethodsBlockList *flatten_methods_block_list(MethodsBlockList *methods_block_list, MethodsBlock *methods_block);
 MethodsBlock *create_methods_block(Identifier *identifier, MethodsList *methods_list);
-MethodsList *create_methods_list(int count);
+MethodsList *create_methods_list(Method *method);
 MethodsList *flatten_methods_list(MethodsList *methods_list, Method *method);
 Method *create_method(MethodSignature *method_signature, StatementList *statement_list);
-MethodSignature *create_method_signature(MethodHeader *method_header, VariableDeclarationList *variable_declaration_list);
+MethodSignature *create_method_signature(MethodHeader *method_header, VarDecList *variable_declaration_list);
 MethodHeader *create_method_header(VariableDec *variable_declaration);
-StatementList *create_statement_list(int count);
+StatementList *create_statement_list(Statement *statement);
 StatementList *flatten_statement_list(StatementList *statement_list, Statement *statement);
 Statement *create_statement(LocalDeclaration *local_declaration);
 LocalDeclaration *create_local_declaration(VariableDec *variable_declaration, Expr *expr);
@@ -208,12 +208,12 @@ BinaryExpr *create_binary_expr(Expr *left, Expr *right, char operator);
 UnaryExpr *create_unary_expr_int(char *integer_value);
 UnaryExpr *create_unary_expr_float(char *float_value);
 UnaryExpr *create_unary_expr_id(Identifier *identifier);
-VariableDeclarationList *create_var_dec_list(int count);
-VariableDeclarationList *flatten_var_dec_list(VariableDeclarationList *var_dec_list, VariableDec *variable_dec);
+VarDecList *create_var_dec_list(VariableDec *variable_dec);
+VarDecList *flatten_var_dec_list(VarDecList *var_dec_list, VariableDec *variable_dec);
 VariableDec *create_variable_declaration(Type *type, Identifier *identifier);
 Identifier *create_identifier(const char *name);
 Type *create_type(const char *name);
-TypeList *create_type_list(int count);
+TypeList *create_type_list(Type *type);
 TypeList *flatten_type_list(TypeList *type_list, Type *type);
 
 void free_object_file(ObjectFile *obj);
@@ -233,7 +233,7 @@ void free_local_declaration(LocalDeclaration *local_declaration);
 void free_expr(Expr *expr);
 void free_binary_expr(BinaryExpr *binary_expr);
 void free_unary_expr(UnaryExpr *unary_expr);
-void free_variable_declaration_list(VariableDeclarationList *variable_declaration_list);
+void free_variable_declaration_list(VarDecList *variable_declaration_list);
 void free_variable_declaration(VariableDec *variable_dec);
 void free_identifier(Identifier *identifier);
 void free_type(Type *type);

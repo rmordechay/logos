@@ -48,10 +48,11 @@ FieldsBlock* create_fields_block(FieldList* field_list) {
 /**
  *
  */
-FieldList* create_field_list(int count) {
+FieldList* create_field_list(Field *field) {
     FieldList* fl = malloc(sizeof(FieldList));
-    fl->fields = malloc(sizeof(Field*) * count);
-    fl->count = count;
+    fl->fields = malloc(sizeof(Field*));
+    fl->count = 1;
+    fl->fields[0] = field;
     return fl;
 }
 
@@ -80,21 +81,12 @@ Field* create_field(VariableDec *variable_declaration, Type* type) {
 /**
  *
  */
-MethodsBlockList* create_methods_block_list(int count) {
+MethodsBlockList *create_methods_block_list(MethodsBlock *methodBlock) {
     MethodsBlockList* mbl = malloc(sizeof(MethodsBlockList));
-    mbl->blocks = malloc(sizeof(MethodsBlock*) * count);
-    mbl->count = count;
+    mbl->blocks = malloc(sizeof(MethodsBlock*));
+    mbl->count = 1;
+    mbl->blocks[0] = methodBlock;
     return mbl;
-}
-
-/**
- *
- */
-MethodsBlock* create_methods_block(Identifier* identifier, MethodsList* methods_list) {
-    MethodsBlock* mb = malloc(sizeof(MethodsBlock));
-    mb->identifier = identifier;
-    mb->methods_list = methods_list;
-    return mb;
 }
 
 /**
@@ -109,14 +101,25 @@ MethodsBlockList *flatten_methods_block_list(MethodsBlockList *methods_block_lis
     return methods_block_list;
 }
 
+/**
+ *
+ */
+MethodsBlock* create_methods_block(Identifier* identifier, MethodsList* methods_list) {
+    MethodsBlock* mb = malloc(sizeof(MethodsBlock));
+    mb->identifier = identifier;
+    mb->methods_list = methods_list;
+    return mb;
+}
+
 
 /**
  *
  */
-MethodsList* create_methods_list(int count) {
+MethodsList *create_methods_list(Method *method) {
     MethodsList* ml = malloc(sizeof(MethodsList));
-    ml->methods = malloc(sizeof(Method*) * count);
-    ml->count = count;
+    ml->methods = malloc(sizeof(Method*));
+    ml->count = 1;
+    ml->methods[0] = method;
     return ml;
 }
 
@@ -125,7 +128,7 @@ MethodsList* create_methods_list(int count) {
  */
 MethodsList *flatten_methods_list(MethodsList *methods_list, Method *method) {
     int i = methods_list->count + 1;
-    MethodsList **new_list = realloc(methods_list->methods, i * sizeof(Method *));
+    Method **new_list = realloc(methods_list->methods, i * sizeof(Method *));
     methods_list->methods = new_list;
     methods_list->methods[i] = method;
     methods_list->count = i;
@@ -145,7 +148,7 @@ Method* create_method(MethodSignature* method_signature, StatementList* statemen
 /**
  *
  */
-MethodSignature* create_method_signature(MethodHeader* method_header, VariableDeclarationList* variable_declaration_list) {
+MethodSignature* create_method_signature(MethodHeader* method_header, VarDecList* variable_declaration_list) {
     MethodSignature* ms = malloc(sizeof(MethodSignature));
     ms->method_header = method_header;
     ms->variable_declaration_list = variable_declaration_list;
@@ -164,10 +167,11 @@ MethodHeader* create_method_header(VariableDec* variable_declaration) {
 /**
  *
  */
-StatementList* create_statement_list(int count) {
+StatementList *create_statement_list(Statement *statement) {
     StatementList* sl = malloc(sizeof(StatementList));
-    sl->statements = malloc(sizeof(Statement*) * count);
-    sl->count = count;
+    sl->statements = malloc(sizeof(Statement*));
+    sl->count = 1;
+    sl->statements[0] = statement;
     return sl;
 }
 
@@ -176,7 +180,7 @@ StatementList* create_statement_list(int count) {
  */
 StatementList *flatten_statement_list(StatementList *statement_list, Statement *statement) {
     int i = statement_list->count + 1;
-    StatementList **new_list = realloc(statement_list->statements, i * sizeof(Statement *));
+    Statement **new_list = realloc(statement_list->statements, i * sizeof(Statement*));
     statement_list->statements = new_list;
     statement_list->statements[i] = statement;
     statement_list->count = i;
@@ -261,11 +265,24 @@ UnaryExpr* create_unary_expr_id(Identifier* identifier) {
 /**
  *
  */
-VariableDeclarationList* create_var_dec_list(int count) {
-    VariableDeclarationList* vdl = malloc(sizeof(VariableDeclarationList));
-    vdl->declarations = malloc(sizeof(VariableDec*) * count);
-    vdl->count = count;
+VarDecList *create_var_dec_list(VariableDec *variable_dec) {
+    VarDecList* vdl = malloc(sizeof(VarDecList));
+    vdl->declarations = malloc(sizeof(VariableDec*));
+    vdl->count = 1;
+    vdl->declarations[0] = variable_dec;
     return vdl;
+}
+
+/**
+ *
+ */
+VarDecList *flatten_var_dec_list(VarDecList *var_dec_list, VariableDec *variable_dec) {
+    int i = var_dec_list->count + 1;
+    VariableDec **new_list = realloc(var_dec_list->declarations, i * sizeof(VariableDec *));
+    var_dec_list->declarations = new_list;
+    var_dec_list->declarations[i] = variable_dec;
+    var_dec_list->count = i;
+    return var_dec_list;
 }
 
 /**
@@ -276,18 +293,6 @@ VariableDec* create_variable_declaration(Type* type, Identifier* identifier) {
     vd->type = type;
     vd->identifier = identifier;
     return vd;
-}
-
-/**
- *
- */
-VariableDeclarationList *flatten_var_dec_list(VariableDeclarationList *var_dec_list, VariableDec *variable_dec) {
-    int i = var_dec_list->count + 1;
-    Type **new_list = realloc(var_dec_list->declarations, i * sizeof(Type *));
-    var_dec_list->declarations = new_list;
-    var_dec_list->declarations[i] = variable_dec;
-    var_dec_list->count = i;
-    return var_dec_list;
 }
 
 /**
@@ -312,10 +317,11 @@ Type* create_type(const char* name) {
 /**
  *
  */
-TypeList* create_type_list(int count) {
+TypeList* create_type_list(Type *type) {
     TypeList* tl = malloc(sizeof(TypeList));
-    tl->types = malloc(sizeof(Type*) * count);
-    tl->count = count;
+    tl->types = malloc(sizeof(Type*));
+    tl->count = 1;
+    tl->types[0] = type;
     return tl;
 }
 
@@ -514,7 +520,7 @@ void free_unary_expr(UnaryExpr* ue) {
 /**
  *
  */
-void free_variable_declaration_list(VariableDeclarationList* vdl) {
+void free_variable_declaration_list(VarDecList* vdl) {
     if (vdl == NULL) return;
     for (int i = 0; i < vdl->count; i++) {
         free_variable_declaration(vdl->declarations[i]);

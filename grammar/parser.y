@@ -96,7 +96,7 @@ fields_block:
     ;
 
 field_list:
-		field { $$ = create_field_list(1) }
+		field { $$ = create_field_list($1) }
     | 	field_list field { $$ = flatten_field_list($1, $2) }
     ;
 
@@ -106,8 +106,8 @@ field:
     ;
 
 methods_block_list:
-		methods_block {  $$ = create_methods_block_list(1);  }
-	|	methods_block_list methods_block {  $$ = create_methods_block_list($1->count + 1);  }
+		methods_block {  $$ = create_methods_block_list($1);  }
+	|	methods_block_list methods_block {  $$ = flatten_methods_block_list($1, $2);  }
 	;
 
 methods_block:
@@ -115,8 +115,8 @@ methods_block:
 	;
 
 methods_list:
-		method { $$ = create_methods_list(1) }
-	|	methods_list method { $$ = create_methods_list($1->count + 1) }
+		method { $$ = create_methods_list($1) }
+	|	methods_list method { $$ = flatten_methods_list($1, $2) }
 	;
 
 method:
@@ -135,8 +135,8 @@ method_header:
 
 
 statement_list:
-		statement { $$ = create_statement_list(1) }
-	|	statement_list statement { $$ = create_statement_list($1->count + 1) }
+		statement { $$ = create_statement_list($1) }
+	|	statement_list statement { $$ = flatten_statement_list($1, $2) }
 	;
 
 statement:
@@ -183,8 +183,8 @@ div_expr:
 	;
 
 variable_declaration_list:
-		variable_declaration { }
-	|	variable_declaration_list COMMA variable_declaration {  }
+		variable_declaration { $$ = create_var_dec_list($1) }
+	|	variable_declaration_list COMMA variable_declaration { $$ = flatten_var_dec_list($1, $3) }
 	;
 
 variable_declaration:
@@ -200,8 +200,8 @@ type:
     ;
 
 type_list:
-	  	type { $$ = create_type_list(1)  }
-	| 	type_list COMMA type { $$ = create_type_list($1->count + 1)  }
+	  	type { $$ = create_type_list($1)  }
+	| 	type_list COMMA type { $$ = flatten_type_list($1, $3)  }
 	;
 %%
 

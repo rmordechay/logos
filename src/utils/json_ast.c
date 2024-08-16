@@ -8,7 +8,7 @@ cJSON *create_identifier_json(Identifier *id);
 cJSON *create_type_json(Type *type);
 cJSON *create_type_list_json(TypeList *type_list);
 cJSON *create_variable_declaration_json(VariableDec *var_dec);
-cJSON *create_variable_declaration_list_json(VariableDeclarationList *var_dec_list);
+cJSON *create_variable_declaration_list_json(VarDecList *var_dec_list);
 cJSON *create_field_json(Field *field);
 cJSON *create_field_list_json(FieldList *field_list);
 cJSON *create_fields_block_json(FieldsBlock *fields_block);
@@ -86,7 +86,7 @@ cJSON *create_variable_declaration_json(VariableDec *var_dec) {
 /**
  *
  */
-cJSON *create_variable_declaration_list_json(VariableDeclarationList *var_dec_list) {
+cJSON *create_variable_declaration_list_json(VarDecList *var_dec_list) {
     cJSON *root = cJSON_CreateArray();
     for (int i = 0; i < var_dec_list->count; i++) {
         cJSON_AddItemToArray(root, create_variable_declaration_json(var_dec_list->declarations[i]));
