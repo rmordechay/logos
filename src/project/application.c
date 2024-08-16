@@ -45,3 +45,12 @@ int is_logos_file(const char *path) {
     char *dot = strrchr(path, '.');
     return dot && strcmp(dot + 1, LOGOS_FILE_EXT) == 0;
 }
+
+/**
+ *
+ */
+AppFile *create_app_file(const char *name) {
+    AppFile *app_file = malloc(sizeof(AppFile));
+    app_file->name = name;
+    return app_file;
+}

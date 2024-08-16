@@ -15,7 +15,7 @@ typedef struct AppConfig {
  */
 typedef struct Application {
     char *name;
-    char *root_path;
+    const char *root_path;
     AppConfig *app_config;
 } App;
 
@@ -23,8 +23,8 @@ typedef struct Application {
  *
  */
 typedef struct AppFile {
-    char *name;
-    char *full_path;
+    const char *name;
+    char *path;
     char *parent_path;
     const char *code;
 } AppFile;
@@ -35,7 +35,7 @@ int is_logos_file(const char *path);
 
 App *create_application();
 AppConfig *create_app_config();
-AppFile *create_app_file();
+AppFile *create_app_file(const char *name);
 
 void free_application(App *app);
 void free_app_file(AppFile *app_file);

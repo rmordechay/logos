@@ -9,6 +9,7 @@
 #define LOGOS_FILE_EXT "lgs"
 #define MAIN_CONFIG_FILE_NAME "Config.lgs"
 #define MAIN_FILE_NAME "Main.lgs"
+#define PATH_MAX 1024
 
 
 /**

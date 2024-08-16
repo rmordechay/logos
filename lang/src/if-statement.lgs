@@ -21,3 +21,5 @@ if (var) {
 if (var) {
     let a = 2
 }
+
+let a = if a then b else c else d
