@@ -7,7 +7,7 @@
  *
  */
 void analyse_ast(ObjectFile *root) {
-    printf("%s\n", "");
+    printf("%s\n", root->name->name);
 }
 
 /**
@@ -502,43 +502,4 @@ void free_type_list(TypeList* tl) {
     }
     free(tl->types);
     free(tl);
-}
-
-/**
- *
- */
-char *get_node_string(NodeType nodeType) {
-    switch (nodeType) {
-        case N_OBJECT_FILE: return "OBJECT_FILE";
-        case N_TITLE: return "TITLE";
-        case N_METHODS_BLOCK_LIST: return "METHODS_BLOCK_LIST";
-        case N_METHODS_BLOCK: return "METHODS_BLOCK";
-        case N_METHODS_LIST: return "METHODS_LIST";
-        case N_METHOD_SIGNATURE: return "METHOD_SIGNATURE";
-        case N_METHOD_HEADER: return "METHOD_HEADER";
-        case N_METHOD: return "METHOD";
-        case N_PARAM: return "PARAM";
-        case N_VARIABLE_DECLARATION: return "VARIABLE_DECLARATION";
-        case N_FIELDS_BLOCK: return "FIELDS_BLOCK";
-        case N_FIELD_LIST: return "FIELD_LIST";
-        case N_FIELD: return "FIELD";
-        case N_IDENTIFIER: return "IDENTIFIER";
-        case N_TYPE: return "TYPE";
-        case N_TYPE_LIST: return "TYPE_LIST";
-        case N_STATEMENT_LIST: return "STATEMENT_LIST";
-        case N_STATEMENT: return "STATEMENT";
-        case N_EXPR: return "EXPR";
-        case N_UNARY_EXPR: return "UNARY_EXPR";
-        case N_ADD_EXPR: return "ADD_EXPR";
-        case N_SUB_EXPR: return "SUB_EXPR";
-        case N_MUL_EXPR: return "MUL_EXPR";
-        case N_DIV_EXPR: return "DIV_EXPR";
-        case N_IDENTIFIER_LIST: return "IDENTIFIER_LIST";
-        case N_LOCAL_DECLARATION: return "LOCAL_DECLARATION";
-        case N_VAR_DEC_LIST: return "VAR_DEC_LIST";
-        case N_BINARY_EXPR:break;
-        default: return NULL;
-
-    }
-    return NULL;
 }
