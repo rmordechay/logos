@@ -6,7 +6,7 @@ implements {
 
 fields {
     Int var
-    Int var2: Interface
+    Int var2 of Interface = 2
 }
 
 Self {

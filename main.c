@@ -6,8 +6,10 @@
 
 extern FILE *yyin;
 extern int yyparse(void);
+extern void yy_scan_string(const char *str);
+extern void yy_delete_buffer(void *buffer);
 struct Node *root;
-void parse();
+void parse(const char *code);
 
 int main() {
     init_project();
@@ -17,17 +19,11 @@ int main() {
 /**
  *
  */
-void parse() {
-    const char *filename = "lang/src/object.lgs";
-    FILE *file = fopen(filename, "r");
-    if (!file) {
-        fprintf(stderr, "Could not open file: %s\n", filename);
-        return;
-    }
-    yyin = file;
+void parse(const char *code) {
+    yy_scan_string(code);
     yyparse();
     analyse_ast(root);
-    fclose(file);
+    yy_delete_buffer(yyin);
 }
 
 
