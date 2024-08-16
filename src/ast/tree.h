@@ -44,7 +44,7 @@ typedef struct VariableDeclarationList {
  */
 typedef struct Field {
     VariableDec *variable_declaration;
-    Type *type;  // Optional
+    Type *implements;  // Optional
 } Field;
 
 /**

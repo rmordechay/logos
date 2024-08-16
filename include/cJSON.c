@@ -58,7 +58,7 @@
 
 #include "cJSON.h"
 
-/* define our own boolean type */
+/* define our own boolean implements */
 #ifdef true
 #undef true
 #endif
@@ -403,7 +403,7 @@ CJSON_PUBLIC(double) cJSON_SetNumberHelper(cJSON *object, double number)
 CJSON_PUBLIC(char*) cJSON_SetValuestring(cJSON *object, const char *valuestring)
 {
     char *copy = NULL;
-    /* if object's type is not cJSON_String or is cJSON_IsReference, it should not set valuestring */
+    /* if object's implements is not cJSON_String or is cJSON_IsReference, it should not set valuestring */
     if ((object == NULL) || !(object->type & cJSON_String) || (object->type & cJSON_IsReference))
     {
         return NULL;
@@ -3013,7 +3013,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_Compare(const cJSON * const a, const cJSON * cons
         return false;
     }
 
-    /* check if type is valid */
+    /* check if implements is valid */
     switch (a->type & 0xFF)
     {
         case cJSON_False:
@@ -3038,7 +3038,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_Compare(const cJSON * const a, const cJSON * cons
 
     switch (a->type & 0xFF)
     {
-        /* in these cases and equal type is enough */
+        /* in these cases and equal implements is enough */
         case cJSON_False:
         case cJSON_True:
         case cJSON_NULL:
