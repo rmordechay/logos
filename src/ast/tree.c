@@ -58,6 +58,18 @@ FieldList* create_field_list(int count) {
 /**
  *
  */
+FieldList *flatten_field_list(FieldList *field_list, Field *field) {
+    int i = field_list->count + 1;
+    Field **new_list = realloc(field_list->fields, i * sizeof(Field*));
+    field_list->fields = new_list;
+    field_list->fields[i] = field;
+    field_list->count++;
+    return field_list;
+}
+
+/**
+ *
+ */
 Field* create_field(VariableDec *variable_declaration, Type* type) {
     Field* f = malloc(sizeof(Field));
     f->variable_declaration = variable_declaration;
@@ -88,11 +100,26 @@ MethodsBlock* create_methods_block(Identifier* identifier, MethodsList* methods_
 /**
  *
  */
+MethodsBlockList *flatten_methods_block_list(int count) {
+    return NULL;
+}
+
+
+/**
+ *
+ */
 MethodsList* create_methods_list(int count) {
     MethodsList* ml = malloc(sizeof(MethodsList));
     ml->methods = malloc(sizeof(Method*) * count);
     ml->count = count;
     return ml;
+}
+
+/**
+ *
+ */
+MethodsList *flatten_methods_list(int count) {
+    return NULL;
 }
 
 /**
@@ -132,6 +159,13 @@ StatementList* create_statement_list(int count) {
     sl->statements = malloc(sizeof(Statement*) * count);
     sl->count = count;
     return sl;
+}
+
+/**
+ *
+ */
+StatementList *flatten_statement_list(int count) {
+    return NULL;
 }
 
 /**
@@ -247,6 +281,7 @@ Type* create_type(const char* name) {
     return t;
 }
 
+
 /**
  *
  */
@@ -257,6 +292,19 @@ TypeList* create_type_list(int count) {
     return tl;
 }
 
+/**
+ *
+ */
+TypeList *flatten_type_list(int count) {
+    return NULL;
+}
+
+/**
+ *
+ */
+VariableDeclarationList *flatten_variable_declaration_list(int count) {
+    return NULL;
+}
 
 /**
  *

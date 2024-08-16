@@ -14,6 +14,13 @@ int line_number = 1;
 "object"                { return OBJECT; }
 "implements"            { return IMPLEMENTS; }
 "fields"                { return FIELDS; }
+"if"                    { return IF; }
+"for"                   { return FOR; }
+"return"                { return RETURN; }
+"import"                { return IMPORT; }
+"and"                   { return AND; }
+"or"                    { return OR; }
+"not"                   { return NOT; }
 
 "("                     { return LEFT_PAREN; }
 ")"                     { return RIGHT_PAREN; }
