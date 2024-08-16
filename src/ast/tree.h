@@ -39,7 +39,6 @@ typedef struct VariableDeclarationList {
     int count;
 } VariableDeclarationList;
 
-
 /**
  *
  */
@@ -189,14 +188,18 @@ ObjectFile *create_object_file(Identifier *identifier, ImplementsBlock *implemen
 ImplementsBlock *create_implements_block(TypeList *type_list);
 FieldsBlock *create_fields_block(FieldList *field_list);
 FieldList *create_field_list(int count);
+FieldList *flatten_field_list(FieldList *field_list, Field *field);
 Field *create_field(VariableDec *variable_declaration, Type *type);
 MethodsBlockList *create_methods_block_list(int count);
+MethodsBlockList *flatten_methods_block_list(int count);
 MethodsBlock *create_methods_block(Identifier *identifier, MethodsList *methods_list);
 MethodsList *create_methods_list(int count);
+MethodsList *flatten_methods_list(int count);
 Method *create_method(MethodSignature *method_signature, StatementList *statement_list);
 MethodSignature *create_method_signature(MethodHeader *method_header, VariableDeclarationList *variable_declaration_list);
 MethodHeader *create_method_header(VariableDec *variable_declaration);
 StatementList *create_statement_list(int count);
+StatementList *flatten_statement_list(int count);
 Statement *create_statement(LocalDeclaration *local_declaration);
 LocalDeclaration *create_local_declaration(VariableDec *variable_declaration, Expr *expr);
 Expr *create_expr_unary(UnaryExpr *unary_expr);
@@ -206,10 +209,12 @@ UnaryExpr *create_unary_expr_int(char *integer_value);
 UnaryExpr *create_unary_expr_float(char *float_value);
 UnaryExpr *create_unary_expr_id(Identifier *identifier);
 VariableDeclarationList *create_variable_declaration_list(int count);
+VariableDeclarationList *flatten_variable_declaration_list(int count);
 VariableDec *create_variable_declaration(Type *type, Identifier *identifier);
 Identifier *create_identifier(const char *name);
 Type *create_type(const char *name);
 TypeList *create_type_list(int count);
+TypeList *flatten_type_list(int count);
 
 void free_object_file(ObjectFile *obj);
 void free_implements_block(ImplementsBlock *implements_block);

@@ -8,7 +8,6 @@
 #define PATH_MAX 1024
 
 typedef struct YY_BUFFER_STATE YY_BUFFER_STATE;
-
 void parse(const char *filename);
 
 char* read_file_content(const char *file_path) {
@@ -36,7 +35,7 @@ char* read_file_content(const char *file_path) {
         fclose(file);
         return NULL;
     }
-    // Null-terminate the string
+    // Null-terminate string
     content[file_size] = '\0';
     fclose(file);
     return content;

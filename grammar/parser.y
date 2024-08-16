@@ -43,7 +43,7 @@ struct ObjectFile *root;
 
 %start program
 
-%token LET FUNC IMPLEMENTS FIELDS SELF OBJECT
+%token LET FUNC IMPLEMENTS FIELDS SELF OBJECT IF FOR RETURN IMPORT AND OR NOT
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE LEFT_BRACKET RIGHT_BRACKET LEFT_ANGLE RIGHT_ANGLE
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER
@@ -84,7 +84,7 @@ program:
 
 object_file:
       	OBJECT COLON identifier implements_block fields_block methods_block_list { $$ = create_object_file($3, $4, $5, $6) }
-    | 	OBJECT COLON identifier fields_block { $$ = create_object_file($3, $4, NULL, NULL) }
+    | 	OBJECT COLON identifier fields_block { $$ = create_object_file($3, NULL, $4, NULL) }
     ;
 
 implements_block:
@@ -97,7 +97,7 @@ fields_block:
 
 field_list:
 		field { $$ = create_field_list(1) }
-    | 	field_list field { $$ = create_field_list($1->count + 1) }
+    | 	field_list field { $$ = flatten_field_list($1, $2) }
     ;
 
 field:
