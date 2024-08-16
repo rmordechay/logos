@@ -100,8 +100,13 @@ MethodsBlock* create_methods_block(Identifier* identifier, MethodsList* methods_
 /**
  *
  */
-MethodsBlockList *flatten_methods_block_list(int count) {
-    return NULL;
+MethodsBlockList *flatten_methods_block_list(MethodsBlockList *methods_block_list, MethodsBlock *methods_block) {
+    int i = methods_block_list->count + 1;
+    MethodsBlock **new_list = realloc(methods_block_list->blocks, i * sizeof(MethodsBlock*));
+    methods_block_list->blocks = new_list;
+    methods_block_list->blocks[i] = methods_block;
+    methods_block_list->count = i;
+    return methods_block_list;
 }
 
 
@@ -118,8 +123,13 @@ MethodsList* create_methods_list(int count) {
 /**
  *
  */
-MethodsList *flatten_methods_list(int count) {
-    return NULL;
+MethodsList *flatten_methods_list(MethodsList *methods_list, Method *method) {
+    int i = methods_list->count + 1;
+    MethodsList **new_list = realloc(methods_list->methods, i * sizeof(Method *));
+    methods_list->methods = new_list;
+    methods_list->methods[i] = method;
+    methods_list->count = i;
+    return methods_list;
 }
 
 /**
@@ -164,8 +174,13 @@ StatementList* create_statement_list(int count) {
 /**
  *
  */
-StatementList *flatten_statement_list(int count) {
-    return NULL;
+StatementList *flatten_statement_list(StatementList *statement_list, Statement *statement) {
+    int i = statement_list->count + 1;
+    StatementList **new_list = realloc(statement_list->statements, i * sizeof(Statement *));
+    statement_list->statements = new_list;
+    statement_list->statements[i] = statement;
+    statement_list->count = i;
+    return statement_list;
 }
 
 /**
@@ -246,7 +261,7 @@ UnaryExpr* create_unary_expr_id(Identifier* identifier) {
 /**
  *
  */
-VariableDeclarationList* create_variable_declaration_list(int count) {
+VariableDeclarationList* create_var_dec_list(int count) {
     VariableDeclarationList* vdl = malloc(sizeof(VariableDeclarationList));
     vdl->declarations = malloc(sizeof(VariableDec*) * count);
     vdl->count = count;
@@ -266,11 +281,24 @@ VariableDec* create_variable_declaration(Type* type, Identifier* identifier) {
 /**
  *
  */
+VariableDeclarationList *flatten_var_dec_list(VariableDeclarationList *var_dec_list, VariableDec *variable_dec) {
+    int i = var_dec_list->count + 1;
+    Type **new_list = realloc(var_dec_list->declarations, i * sizeof(Type *));
+    var_dec_list->declarations = new_list;
+    var_dec_list->declarations[i] = variable_dec;
+    var_dec_list->count = i;
+    return var_dec_list;
+}
+
+/**
+ *
+ */
 Identifier* create_identifier(const char* name) {
     Identifier* id = malloc(sizeof(Identifier));
     id->name = strdup(name);
     return id;
 }
+
 
 /**
  *
@@ -280,7 +308,6 @@ Type* create_type(const char* name) {
     t->name = strdup(name);
     return t;
 }
-
 
 /**
  *
@@ -295,15 +322,13 @@ TypeList* create_type_list(int count) {
 /**
  *
  */
-TypeList *flatten_type_list(int count) {
-    return NULL;
-}
-
-/**
- *
- */
-VariableDeclarationList *flatten_variable_declaration_list(int count) {
-    return NULL;
+TypeList *flatten_type_list(TypeList *type_list, Type *type) {
+    int i = type_list->count + 1;
+    Type **new_list = realloc(type_list->types, i * sizeof(Type *));
+    type_list->types = new_list;
+    type_list->types[i] = type;
+    type_list->count = i;
+    return type_list;
 }
 
 /**
