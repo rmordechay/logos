@@ -1,6 +1,6 @@
-if (x < 1) {
+if x < 1 {
     print()
-} else (x > 1) {
+} else x > 1 {
     print()
 } else {
     print()
@@ -12,13 +12,13 @@ if {
     else: expr
 }
 
-if (var) {
+if var {
     1: expr
     x: expr
     or: expr
 }
 
-if (var) {
+if var {
     let a = 2
 }
 
