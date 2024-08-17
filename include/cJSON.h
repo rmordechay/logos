@@ -222,7 +222,7 @@ CJSON_PUBLIC(cJSON *) cJSON_CreateStringArray(const char *const *strings, int co
 CJSON_PUBLIC(cJSON_bool) cJSON_AddItemToArray(cJSON *array, cJSON *item);
 CJSON_PUBLIC(cJSON_bool) cJSON_AddItemToObject(cJSON *object, const char *string, cJSON *item);
 /* Use this when string is definitely const (i.e. a literal, or as good as), and will definitely survive the cJSON object.
- * WARNING: When this function was used, make sure to always check that (item->implements & cJSON_StringIsConst) is zero before
+ * WARNING: When this function.txt was used, make sure to always check that (item->implements & cJSON_StringIsConst) is zero before
  * writing to `item->string` */
 CJSON_PUBLIC(cJSON_bool) cJSON_AddItemToObjectCS(cJSON *object, const char *string, cJSON *item);
 /* Append reference to item to the specified array/object. Use this when you want to add an existing cJSON to a new cJSON, but don'e want to corrupt your existing cJSON. */

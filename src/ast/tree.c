@@ -214,6 +214,70 @@ LocalDeclaration *create_local_declaration(VariableDec *variable_declaration, Ex
 /**
  *
  */
+IfStatement *create_if_statement(IfBlock *if_block, IfOrBlockList *if_or_block_list, OrBlock *or_block) {
+    IfStatement *if_statement = malloc(sizeof(IfStatement));
+    if_statement->or_block = or_block;
+    if_statement->if_block = if_block;
+    if_statement->if_or_block_list = if_or_block_list;
+    return if_statement;
+}
+
+/**
+ *
+ */
+IfBlock *create_if_block(Expr *expr, StatementList *statement_list) {
+    IfBlock *if_block = malloc(sizeof(IfBlock));
+    if_block->statement_list = statement_list;
+    if_block->expr = expr;
+    return if_block;
+}
+
+/**
+ *
+ */
+IfOrBlockList *create_if_or_block_list(IfOrBlock *if_or_block) {
+    IfOrBlockList *if_or_block_list = malloc(sizeof(IfOrBlockList));
+    if_or_block_list->count = 1;
+    if_or_block_list->if_or_blocks[0] = if_or_block;
+    return if_or_block_list;
+}
+
+
+/**
+ *
+ */
+IfOrBlockList *flatten_if_or_block_list(IfOrBlockList *if_or_block_list, IfOrBlock *if_or_block) {
+    int i = if_or_block_list->count;
+    IfOrBlock **new_list = realloc(if_or_block_list->if_or_blocks, i * sizeof(IfOrBlock *));
+    if_or_block_list->if_or_blocks = new_list;
+    if_or_block_list->if_or_blocks[i] = if_or_block;
+    if_or_block_list->count++;
+    return if_or_block_list;
+}
+
+/**
+ *
+ */
+IfOrBlock *create_if_or_block(Expr *expr, StatementList *statement_list) {
+    IfOrBlock *if_or_block = malloc(sizeof(IfOrBlock));
+    if_or_block->statement_list = statement_list;
+    if_or_block->expr = expr;
+    return if_or_block;
+}
+
+
+/**
+ *
+ */
+OrBlock *create_or_block(StatementList *statement_list) {
+    OrBlock *or_block = malloc(sizeof(OrBlock));
+    or_block->statement_list = statement_list;
+    return or_block;
+}
+
+/**
+ *
+ */
 Expr *create_expr_from_unary(UnaryExpr *unary_expr) {
     Expr *e = malloc(sizeof(Expr));
     e->unary_expr = unary_expr;
@@ -295,6 +359,7 @@ VariableDec *create_variable_declaration(Type *type, Identifier *identifier) {
     return vd;
 }
 
+
 /**
  *
  */
@@ -303,7 +368,6 @@ Identifier *create_identifier(const char *name) {
     id->name = strdup(name);
     return id;
 }
-
 
 /**
  *
@@ -469,7 +533,14 @@ void free_statement_list(StatementList *sl) {
  */
 void free_statement(Statement *s) {
     if (s == NULL) return;
-    free_local_declaration(s->local_declaration);
+    switch (s->type) {
+        case LOCAL_DEC:
+            free_local_declaration(s->local_declaration);
+            break;
+        case IF_STMT:
+            free_if_statement(s->if_statement);
+            break;
+    }
     free(s);
 }
 
@@ -481,6 +552,52 @@ void free_local_declaration(LocalDeclaration *ld) {
     free_variable_declaration(ld->variable_declaration);
     free_expr(ld->expr);
     free(ld);
+}
+
+/**
+ *
+ */
+void free_if_statement(IfStatement *is) {
+    free_if_block(is->if_block);
+    free_or_block(is->or_block);
+    free_if_or_block_list(is->if_or_block_list);
+    free(is);
+}
+
+/**
+ *
+ */
+void free_if_block(IfBlock *ib) {
+    free_expr(ib->expr);
+    free_statement_list(ib->statement_list);
+    free(ib);
+}
+
+/**
+ *
+ */
+void free_if_or_block_list(IfOrBlockList *iobl) {
+    for (int i = 0; i < iobl->count; i++) {
+        free_if_or_block(iobl->if_or_blocks[i]);
+    }
+    free(iobl);
+}
+
+/**
+ *
+ */
+void free_if_or_block(IfOrBlock *iob) {
+    free_expr(iob->expr);
+    free_statement_list(iob->statement_list);
+    free(iob);
+}
+
+/**
+ *
+ */
+void free_or_block(OrBlock *ob) {
+    free_statement_list(ob->statement_list);
+    free(ob);
 }
 
 /**
@@ -542,10 +659,10 @@ void free_variable_declaration(VariableDec *vd) {
 /**
  *
  */
-void free_identifier(Identifier *id) {
-    if (id == NULL) return;
-    free(id->name);
-    free(id);
+void free_identifier(Identifier *i) {
+    if (i == NULL) return;
+    free(i->name);
+    free(i);
 }
 
 /**
