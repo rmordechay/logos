@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ast/tree.h"
-#include "utils/utils.h"
 
 extern int yylex();
 extern int yyparse();
@@ -31,6 +30,11 @@ struct ObjectFile *root;
 	struct StatementList *statement_list;
 	struct Statement *statement;
 	struct LocalDeclaration *local_declaration;
+	struct IfStatement *if_statement;
+    struct IfBlock *if_block;
+    struct IfOrBlockList *if_or_block_list;
+    struct IfOrBlock *if_or_block;
+    struct OrBlock *or_block;
 	struct Expr *expr;
 	struct BinaryExpr *binary_expr;
 	struct UnaryExpr *unary_expr;
@@ -63,6 +67,11 @@ struct ObjectFile *root;
 %type <statement_list> statement_list statements_block
 %type <statement> statement
 %type <local_declaration> local_declaration
+%type <if_statement> if_statement
+%type <if_block> if_block
+%type <if_or_block_list> if_or_block_list
+%type <if_or_block> if_or_block
+%type <or_block> or_block
 %type <expr> expr
 %type <unary_expr> unary_expr
 %type <binary_expr> binary_expr
@@ -143,20 +152,42 @@ statement_list:
 	;
 
 statement:
-		local_declaration { $$ = create_statement($1) }
+		local_declaration { $$ = create_stmt_from_local_dec($1) }
+	|	if_statement { $$ = create_statement_from_if_stmt($1);  }
 	;
 
 local_declaration:
 		LET variable_declaration EQUAL expr { $$ = create_local_declaration($2, $4) }
 	;
 
+
 if_statement:
-		pattern_matching
-	|	IF expr statements_block
+		if_block if_or_block or_block { $$ = create_if_statement($1, $2, $3) }
+	|	if_block if_or_block { $$ = create_if_statement($1, $2, NULL) }
+	|	if_block or_block { $$ = create_if_statement($1, NULL, $2) }
+	|	if_block { $$ = create_if_statement($1, NULL, NULL) }
 	;
 
+if_block:
+      IF expr statements_block { $$ = create_if_block($2, $3) }
+    ;
+
+if_or_block_list:
+		if_or_block { $$ = create_if_or_block_list($1) }
+	|	if_or_block_list if_or_block { $$ = flatten_if_or_block_list($1, $2) }
+	;
+
+if_or_block:
+      OR expr statements_block { $$ = create_if_block($2, $3) }
+    ;
+
+
+or_block:
+      OR statements_block { $$ = create_or_block($2) }
+    ;
+
 pattern_matching:
-		IF expr statements_block
+		IF expr
 	;
 
 expr:
@@ -173,9 +204,9 @@ binary_expr:
 	;
 
 unary_expr:
-		INTEGER { $$ = create_unary_expr_number(INTEGER, yylval.val) }
-	| 	FLOAT { $$ = create_unary_expr_number(FLOAT, yylval.val) }
-	| 	identifier { $$ = create_unary_expr_id($1) }
+		INTEGER { $$ = create_unary_expr_from_number(INTEGER, yylval.val) }
+	| 	FLOAT { $$ = create_unary_expr_from_number(FLOAT, yylval.val) }
+	| 	identifier { $$ = create_unary_expr_from_id($1) }
 	;
 
 add_expr:

@@ -2016,7 +2016,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_AddItemToArray(cJSON *array, cJSON *item)
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #endif
-/* helper function to cast away const */
+/* helper function.txt to cast away const */
 static void* cast_away_const(const void* string)
 {
     return (void*)string;
