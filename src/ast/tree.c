@@ -170,14 +170,15 @@ MethodHeader *create_method_header(VariableDec *variable_declaration) {
  */
 StatementList *create_statement_list(Statement *statement) {
     StatementList *sl = malloc(sizeof(StatementList));
-    if (statement == NULL) {
-        return sl;
-    } else {
+    if (statement != NULL) {
         sl->statements = malloc(sizeof(Statement *));
         sl->count = 1;
         sl->statements[0] = statement;
-        return sl;
+    } else {
+        sl->count = 0;
+        sl->statements = NULL;
     }
+    return sl;
 }
 
 /**
@@ -249,6 +250,7 @@ IfBlock *create_if_block(Expr *expr, StatementList *statement_list) {
  */
 IfOrBlockList *create_if_or_block_list(IfOrBlock *if_or_block) {
     IfOrBlockList *if_or_block_list = malloc(sizeof(IfOrBlockList));
+    if_or_block_list->if_or_blocks = malloc(sizeof(IfOrBlock*));
     if_or_block_list->count = 1;
     if_or_block_list->if_or_blocks[0] = if_or_block;
     return if_or_block_list;

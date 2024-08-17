@@ -162,8 +162,8 @@ local_declaration:
 
 
 if_statement:
-		if_block if_or_block or_block { $$ = create_if_statement($1, $2, $3) }
-	|	if_block if_or_block { $$ = create_if_statement($1, $2, NULL) }
+		if_block if_or_block_list or_block { $$ = create_if_statement($1, $2, $3) }
+	|	if_block if_or_block_list { $$ = create_if_statement($1, $2, NULL) }
 	|	if_block or_block { $$ = create_if_statement($1, NULL, $2) }
 	|	if_block { $$ = create_if_statement($1, NULL, NULL) }
 	;
