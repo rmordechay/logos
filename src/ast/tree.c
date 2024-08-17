@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+#include <printf.h>
 #include "tree.h"
-#include "utils/json_ast.h"
+#include "parser.h"
+
+void print_object_file_json(ObjectFile *object_file);
 
 /**
  *
@@ -208,7 +210,7 @@ LocalDeclaration *create_local_declaration(VariableDec *variable_declaration, Ex
 /**
  *
  */
-Expr *create_expr_unary(UnaryExpr *unary_expr) {
+Expr *create_expr_from_unary(UnaryExpr *unary_expr) {
     Expr *e = malloc(sizeof(Expr));
     e->unary_expr = unary_expr;
     return e;
@@ -217,7 +219,7 @@ Expr *create_expr_unary(UnaryExpr *unary_expr) {
 /**
  *
  */
-Expr *create_expr_binary(BinaryExpr *binary_expr) {
+Expr *create_expr_from_binary(BinaryExpr *binary_expr) {
     Expr *e = malloc(sizeof(Expr));
     e->binary_expr = binary_expr;
     return e;
@@ -237,18 +239,10 @@ BinaryExpr *create_binary_expr(Expr *left, Expr *right, char operator) {
 /**
  *
  */
-UnaryExpr *create_unary_expr_int(char *integer_value) {
+UnaryExpr *create_unary_expr_number(int type, char *integer_value) {
     UnaryExpr *ue = malloc(sizeof(UnaryExpr));
     ue->integer_value = strdup(integer_value);
-    return ue;
-}
-
-/**
- *
- */
-UnaryExpr *create_unary_expr_float(char *float_value) {
-    UnaryExpr *ue = malloc(sizeof(UnaryExpr));
-    ue->float_value = strdup(float_value);
+    ue->type = type;
     return ue;
 }
 
@@ -258,6 +252,7 @@ UnaryExpr *create_unary_expr_float(char *float_value) {
 UnaryExpr *create_unary_expr_id(Identifier *identifier) {
     UnaryExpr *ue = malloc(sizeof(UnaryExpr));
     ue->identifier = identifier;
+    ue->type = IDENTIFIER;
     return ue;
 }
 

@@ -92,6 +92,7 @@ typedef struct BinaryExpr {
  *
  */
 typedef struct UnaryExpr {
+    int type;
     union {
         char *integer_value;
         char *float_value;
@@ -202,11 +203,10 @@ StatementList *create_statement_list(Statement *statement);
 StatementList *flatten_statement_list(StatementList *statement_list, Statement *statement);
 Statement *create_statement(LocalDeclaration *local_declaration);
 LocalDeclaration *create_local_declaration(VariableDec *variable_declaration, Expr *expr);
-Expr *create_expr_unary(UnaryExpr *unary_expr);
-Expr *create_expr_binary(BinaryExpr *binary_expr);
+Expr *create_expr_from_unary(UnaryExpr *unary_expr);
+Expr *create_expr_from_binary(BinaryExpr *binary_expr);
 BinaryExpr *create_binary_expr(Expr *left, Expr *right, char operator);
-UnaryExpr *create_unary_expr_int(char *integer_value);
-UnaryExpr *create_unary_expr_float(char *float_value);
+UnaryExpr *create_unary_expr_number(int type, char *integer_value);
 UnaryExpr *create_unary_expr_id(Identifier *identifier);
 VarDecList *create_var_dec_list(VariableDec *variable_dec);
 VarDecList *flatten_var_dec_list(VarDecList *var_dec_list, VariableDec *variable_dec);

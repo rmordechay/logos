@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include "cJSON.h"
 #include "ast/tree.h"
+#include "parser.h"
 
-// Forward declarations
+void print_object_file_json(ObjectFile *object_file);
 cJSON *create_identifier_json(Identifier *id);
 cJSON *create_type_json(Type *type);
 cJSON *create_type_list_json(TypeList *type_list);
@@ -25,6 +26,18 @@ cJSON *create_method_json(Method *method);
 cJSON *create_methods_list_json(MethodsList *methods_list);
 cJSON *create_methods_block_json(MethodsBlock *methods_block);
 cJSON *create_methods_block_list_json(MethodsBlockList *methods_block_list);
+cJSON *create_object_file_json(ObjectFile *object_file);
+
+/**
+ *
+ */
+void print_object_file_json(ObjectFile *object_file) {
+    cJSON *json = create_object_file_json(object_file);
+    char *json_string = cJSON_Print(json);
+    printf("%s\n", json_string);
+    free(json_string);
+    cJSON_Delete(json);
+}
 
 /**
  *
@@ -146,27 +159,27 @@ cJSON *create_expr_json(Expr *expr) {
 /**
  *
  */
-cJSON *create_binary_expr_json(BinaryExpr *binary_expr) {
+cJSON *create_unary_expr_json(UnaryExpr *unary_expr) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "left", create_expr_json(binary_expr->left));
-    cJSON_AddItemToObject(root, "right", create_expr_json(binary_expr->right));
-    char op_str[2] = {binary_expr->operator, '\0'};
-    cJSON_AddStringToObject(root, "operator", op_str);
+    if (unary_expr->type == INTEGER) {
+        cJSON_AddStringToObject(root, "integer_value", unary_expr->integer_value);
+    } else if (unary_expr->type == FLOAT) {
+        cJSON_AddStringToObject(root, "float_value", unary_expr->float_value);
+    } else if (unary_expr->identifier) {
+        cJSON_AddItemToObject(root, "identifier", create_identifier_json(unary_expr->identifier));
+    }
     return root;
 }
 
 /**
  *
  */
-cJSON *create_unary_expr_json(UnaryExpr *unary_expr) {
+cJSON *create_binary_expr_json(BinaryExpr *binary_expr) {
     cJSON *root = cJSON_CreateObject();
-    if (unary_expr->integer_value) {
-        cJSON_AddStringToObject(root, "integer_value", unary_expr->integer_value);
-    } else if (unary_expr->float_value) {
-        cJSON_AddStringToObject(root, "float_value", unary_expr->float_value);
-    } else if (unary_expr->identifier) {
-        cJSON_AddItemToObject(root, "identifier", create_identifier_json(unary_expr->identifier));
-    }
+    cJSON_AddItemToObject(root, "left", create_expr_json(binary_expr->left));
+    cJSON_AddItemToObject(root, "right", create_expr_json(binary_expr->right));
+    char op_str[2] = {binary_expr->operator, '\0'};
+    cJSON_AddStringToObject(root, "operator", op_str);
     return root;
 }
 
@@ -266,15 +279,4 @@ cJSON *create_methods_block_list_json(MethodsBlockList *methods_block_list) {
         cJSON_AddItemToArray(root, create_methods_block_json(methods_block_list->blocks[i]));
     }
     return root;
-}
-
-/**
- *
- */
-void print_object_file_json(ObjectFile *object_file) {
-    cJSON *json = create_object_file_json(object_file);
-    char *json_string = cJSON_Print(json);
-    printf("%s\n", json_string);
-    free(json_string);
-    cJSON_Delete(json);
 }

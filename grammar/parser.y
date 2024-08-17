@@ -147,9 +147,18 @@ local_declaration:
 		LET variable_declaration EQUAL expr { $$ = create_local_declaration($2, $4) }
 	;
 
+//if_statement:
+//		pattern_matching
+//	|	IF expr LEFT_BRACE statement_list RIGHT_BRACE
+//	;
+//
+//pattern_matching:
+//	IF expr LEFT_BRACE statement_list RIGHT_BRACE
+
+
 expr:
-		unary_expr { $$ = create_expr_unary($1) }
-	|	binary_expr { $$ = create_expr_binary($1) }
+		unary_expr { $$ = create_expr_from_unary($1) }
+	|	binary_expr { $$ = create_expr_from_binary($1) }
 	|	LEFT_PAREN expr RIGHT_PAREN { $$ = $2 }
     ;
 
@@ -161,8 +170,8 @@ binary_expr:
 	;
 
 unary_expr:
-		INTEGER { $$ = create_unary_expr_int(yylval.val) }
-	| 	FLOAT { $$ = create_unary_expr_float(yylval.val) }
+		INTEGER { $$ = create_unary_expr_number(INTEGER, yylval.val) }
+	| 	FLOAT { $$ = create_unary_expr_number(FLOAT, yylval.val) }
 	| 	identifier { $$ = create_unary_expr_id($1) }
 	;
 
