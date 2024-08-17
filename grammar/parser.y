@@ -35,6 +35,10 @@ struct ObjectFile *root;
     struct IfOrBlockList *if_or_block_list;
     struct IfOrBlock *if_or_block;
     struct OrBlock *or_block;
+    struct PatternMatchingExpr *pattern_matching_expr;
+    struct PatternMatching *pattern_matching;
+    struct Pattern *pattern;
+    struct PatternList *pattern_list;
 	struct Expr *expr;
 	struct BinaryExpr *binary_expr;
 	struct UnaryExpr *unary_expr;
@@ -72,6 +76,10 @@ struct ObjectFile *root;
 %type <if_or_block_list> if_or_block_list
 %type <if_or_block> if_or_block
 %type <or_block> or_block
+%type <pattern_matching_expr> pattern_matching_expr
+%type <pattern_matching> pattern_matching
+%type <pattern> pattern
+%type <pattern_list> pattern_list
 %type <expr> expr
 %type <unary_expr> unary_expr
 %type <binary_expr> binary_expr
@@ -153,13 +161,14 @@ statement_list:
 
 statement:
 		local_declaration { $$ = create_stmt_from_local_dec($1) }
-	|	if_statement { $$ = create_statement_from_if_stmt($1);  }
+	|	if_statement { $$ = create_stmt_from_if_stmt($1);  }
+	|	pattern_matching  { $$ = create_stmt_from_pm($1);  }
+	|	pattern_matching_expr  { $$ = create_stmt_from_pme($1);  }
 	;
 
 local_declaration:
 		LET variable_declaration EQUAL expr { $$ = create_local_declaration($2, $4) }
 	;
-
 
 if_statement:
 		if_block if_or_block_list or_block { $$ = create_if_statement($1, $2, $3) }
@@ -187,7 +196,23 @@ or_block:
     ;
 
 pattern_matching:
-		IF expr
+		IF LEFT_BRACE pattern_list RIGHT_BRACE { $$ = create_pattern_matching($3) }
+	;
+
+pattern_matching_expr:
+		IF expr LEFT_BRACE pattern_list RIGHT_BRACE { $$ = create_pattern_matching_expr($2, $4) }
+	;
+
+pattern_list:
+		pattern { $$ = create_pattern_list($1) }
+	|	pattern_list pattern { $$ =  flatten_pattern_list($1, $2) }
+	;
+
+pattern:
+		expr COLON expr { $$ = create_pattern_from_expr($1, $3) }
+	|	expr COLON statements_block { $$ = create_pattern_from_stmt_list($1, $3) }
+	|	OR COLON expr { $$ = create_pattern_from_expr(NULL, $3) }
+	|	OR COLON statements_block { $$ = create_pattern_from_stmt_list(NULL, $3) }
 	;
 
 expr:

@@ -23,6 +23,10 @@ cJSON *create_if_block_json(IfBlock *obj);
 cJSON *create_if_or_block_json(IfOrBlock *obj);
 cJSON *create_if_or_block_list_json(IfOrBlockList *list);
 cJSON *create_or_block_json(OrBlock *obj);
+cJSON *create_pattern_matching_json(PatternMatching *obj);
+cJSON *create_pattern_matching_expr_json(PatternMatchingExpr *obj);
+cJSON *create_pattern_json(Pattern *obj);
+cJSON *create_pattern_list_json(PatternList *list);
 cJSON *create_statement_json(Statement *obj);
 cJSON *create_statement_list_json(StatementList *list);
 cJSON *create_method_header_json(MethodHeader *obj);
@@ -262,6 +266,54 @@ cJSON *create_or_block_json(OrBlock *obj) {
 /**
  *
  */
+cJSON *create_pattern_matching_json(PatternMatching *obj) {
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddItemToObject(root, "pattern_list",create_pattern_list_json(obj->pattern_list));
+    return root;
+}
+
+/**
+ *
+ */
+cJSON *create_pattern_matching_expr_json(PatternMatchingExpr *obj) {
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddItemToObject(root, "expr",create_expr_json(obj->expr));
+    cJSON_AddItemToObject(root, "pattern_list",create_pattern_list_json(obj->pattern_list));
+    return root;
+}
+
+/**
+ *
+ */
+cJSON *create_pattern_json(Pattern *obj) {
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddItemToObject(root, "expr",create_expr_json(obj->condition));
+    switch (obj->type) {
+        case EXPR_BODY:
+            cJSON_AddItemToObject(root, "expr",create_expr_json(obj->condition));
+            break;
+        case STMT_LIST_BODY:
+            cJSON_AddItemToObject(root, "statement_list",create_statement_list_json(obj->statement_list));
+            break;
+    }
+    return root;
+}
+
+/**
+ *
+ */
+cJSON *create_pattern_list_json(PatternList *list) {
+    cJSON *root = cJSON_CreateArray();
+    for (int i = 0; i < list->count; i++) {
+        cJSON_AddItemToArray(root, create_pattern_json(list->patterns[i]));
+    }
+    return root;
+}
+
+
+/**
+ *
+ */
 cJSON *create_statement_json(Statement *obj) {
     cJSON *root = cJSON_CreateObject();
     switch (obj->type) {
@@ -270,6 +322,12 @@ cJSON *create_statement_json(Statement *obj) {
             break;
         case IF_STMT:
             cJSON_AddItemToObject(root, "if_statement", create_if_statement_json(obj->if_statement));
+            break;
+        case PATTERN_MATCHING:
+            cJSON_AddItemToObject(root, "pattern_matching", create_pattern_matching_json(obj->if_statement));
+            break;
+        case PATTERN_MATCHING_EXPR:
+            cJSON_AddItemToObject(root, "pattern_matching_expr", create_pattern_matching_expr_json(obj->if_statement));
             break;
     }
     return root;

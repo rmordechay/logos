@@ -11,11 +11,11 @@ fields {
 
 Self {
     func Int f(Int v) {
-        if a {
-
-        } or a + 2 {
-
-        } or  {
+        if {
+            x: expr
+            x: {
+                let Int a = 2
+            }
         }
     }
 }

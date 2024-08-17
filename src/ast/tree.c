@@ -206,10 +206,30 @@ Statement *create_stmt_from_local_dec(LocalDeclaration *local_declaration) {
 /**
  *
  */
-Statement *create_statement_from_if_stmt(IfStatement *if_statement) {
+Statement *create_stmt_from_if_stmt(IfStatement *if_statement) {
     Statement *s = malloc(sizeof(Statement));
     s->if_statement = if_statement;
     s->type = IF_STMT;
+    return s;
+}
+
+/**
+ *
+ */
+Statement *create_stmt_from_pm(PatternMatching *pattern_matching) {
+    Statement *s = malloc(sizeof(Statement));
+    s->pattern_matching = pattern_matching;
+    s->type = PATTERN_MATCHING;
+    return s;
+}
+
+/**
+ *
+ */
+Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr) {
+    Statement *s = malloc(sizeof(Statement));
+    s->pattern_matching_expr = pattern_matching_expr;
+    s->type = PATTERN_MATCHING_EXPR;
     return s;
 }
 
@@ -234,6 +254,7 @@ IfStatement *create_if_statement(IfBlock *if_block, IfOrBlockList *if_or_block_l
     return if_statement;
 }
 
+
 /**
  *
  */
@@ -244,17 +265,17 @@ IfBlock *create_if_block(Expr *expr, StatementList *statement_list) {
     return if_block;
 }
 
-
 /**
  *
  */
 IfOrBlockList *create_if_or_block_list(IfOrBlock *if_or_block) {
     IfOrBlockList *if_or_block_list = malloc(sizeof(IfOrBlockList));
-    if_or_block_list->if_or_blocks = malloc(sizeof(IfOrBlock*));
+    if_or_block_list->if_or_blocks = malloc(sizeof(IfOrBlock *));
     if_or_block_list->count = 1;
     if_or_block_list->if_or_blocks[0] = if_or_block;
     return if_or_block_list;
 }
+
 
 /**
  *
@@ -267,7 +288,6 @@ IfOrBlockList *flatten_if_or_block_list(IfOrBlockList *if_or_block_list, IfOrBlo
     if_or_block_list->count++;
     return if_or_block_list;
 }
-
 
 /**
  *
@@ -286,6 +306,70 @@ OrBlock *create_or_block(StatementList *statement_list) {
     OrBlock *or_block = malloc(sizeof(OrBlock));
     or_block->statement_list = statement_list;
     return or_block;
+}
+
+/**
+ *
+ */
+PatternMatching *create_pattern_matching(PatternList *pattern_list) {
+    PatternMatching *pattern_matching = malloc(sizeof(PatternMatching));
+    pattern_matching->pattern_list = pattern_list;
+    return pattern_matching;
+}
+
+/**
+ *
+ */
+PatternMatchingExpr *create_pattern_matching_expr(Expr *condition, PatternList *pattern_list) {
+    PatternMatchingExpr *pattern_matching = malloc(sizeof(PatternMatchingExpr *));
+    pattern_matching->expr = condition;
+    pattern_matching->pattern_list = pattern_list;
+    return pattern_matching;
+}
+
+/**
+ *
+ */
+Pattern *create_pattern_from_stmt_list(Expr *condition, StatementList *statement_list) {
+    Pattern *pattern = malloc(sizeof(Pattern *));
+    pattern->condition = condition;
+    pattern->type = STMT_LIST_BODY;
+    pattern->statement_list = statement_list;
+    return pattern;
+}
+
+/**
+ *
+ */
+Pattern *create_pattern_from_expr(Expr *condition, Expr *expr) {
+    Pattern *pattern = malloc(sizeof(Pattern *));
+    pattern->condition = condition;
+    pattern->type = EXPR_BODY;
+    pattern->expr = expr;
+    return pattern;
+}
+
+/**
+ *
+ */
+PatternList *create_pattern_list(Pattern *pattern) {
+    PatternList *pl = malloc(sizeof(PatternList *));
+    pl->patterns = malloc(sizeof(Pattern *));
+    pl->count = 1;
+    pl->patterns[0] = pattern;
+    return pl;
+}
+
+/**
+ *
+ */
+PatternList *flatten_pattern_list(PatternList *pattern_list, Pattern *pattern) {
+    int i = pattern_list->count;
+    Pattern **new_list = realloc(pattern_list->patterns, i * sizeof(Pattern *));
+    pattern_list->patterns = new_list;
+    pattern_list->patterns[i] = pattern;
+    pattern_list->count++;
+    return pattern_list;
 }
 
 /**
@@ -329,6 +413,7 @@ UnaryExpr *create_unary_expr_from_number(int type, char *integer_value) {
     return ue;
 }
 
+
 /**
  *
  */
@@ -361,7 +446,6 @@ VarDecList *flatten_var_dec_list(VarDecList *var_dec_list, VariableDec *variable
     var_dec_list->count++;
     return var_dec_list;
 }
-
 
 /**
  *
@@ -553,6 +637,12 @@ void free_statement(Statement *s) {
         case IF_STMT:
             free_if_statement(s->if_statement);
             break;
+        case PATTERN_MATCHING:
+            free_pattern_matching(s->pattern_matching);
+            break;
+        case PATTERN_MATCHING_EXPR:
+            free_pattern_matching_expr(s->pattern_matching_expr);
+            break;
     }
     free(s);
 }
@@ -611,6 +701,48 @@ void free_if_or_block(IfOrBlock *iob) {
 void free_or_block(OrBlock *ob) {
     free_statement_list(ob->statement_list);
     free(ob);
+}
+
+/**
+ *
+ */
+void free_pattern(Pattern *p) {
+    switch (p->type) {
+        case EXPR_BODY:
+            free_expr(p->expr);
+            break;
+        case STMT_LIST_BODY:
+            free_statement_list(p->statement_list);
+            break;
+    }
+    free(p);
+}
+
+/**
+ *
+ */
+void free_pattern_list(PatternList *pl) {
+    for (int i = 0; i < pl->count; i++) {
+        free_pattern(pl->patterns[i]);
+    }
+    free(pl);
+}
+
+/**
+ *
+ */
+void free_pattern_matching(PatternMatching *pm) {
+    free_pattern_list(pm->pattern_list);
+    free(pm);
+}
+
+/**
+ *
+ */
+void free_pattern_matching_expr(PatternMatchingExpr *pme) {
+    free_expr(pme->expr);
+    free_pattern_list(pme->pattern_list);
+    free(pme);
 }
 
 /**

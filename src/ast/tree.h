@@ -9,7 +9,14 @@ typedef enum ExprType {
 typedef enum StmtType {
     LOCAL_DECLARATION,
     IF_STMT,
+    PATTERN_MATCHING,
+    PATTERN_MATCHING_EXPR,
 } StmtType;
+
+typedef enum PatternBodyType {
+    EXPR_BODY,
+    STMT_LIST_BODY,
+} PatternBodyType;
 
 /**
  *
@@ -160,6 +167,40 @@ typedef struct IfStatement {
     OrBlock *or_block;
 } IfStatement;
 
+/**
+ *
+ */
+typedef struct Pattern {
+    Expr *condition;
+    PatternBodyType type;
+    union {
+        struct StatementList *statement_list;
+        Expr *expr;
+    };
+} Pattern;
+
+/**
+ *
+ */
+typedef struct PatternList {
+    Pattern **patterns;
+    int count;
+} PatternList;
+
+/**
+ *
+ */
+typedef struct PatternMatching {
+    PatternList *pattern_list;
+} PatternMatching;
+
+/**
+ *
+ */
+typedef struct PatternMatchingExpr {
+    Expr *expr;
+    PatternList *pattern_list;
+} PatternMatchingExpr;
 
 /**
  *
@@ -169,6 +210,8 @@ typedef struct Statement {
     union {
         LocalDeclaration *local_declaration;
         IfStatement *if_statement;
+        PatternMatching *pattern_matching;
+        PatternMatchingExpr *pattern_matching_expr;
     };
 } Statement;
 
@@ -239,42 +282,58 @@ typedef struct ObjectFile {
 } ObjectFile;
 
 
-
 void analyse_ast(ObjectFile *root);
 
 ObjectFile *create_object_file(Identifier *identifier, ImplementsBlock *implements_block, FieldsBlock *fields_block, MethodsBlockList *methods_block_list);
 ImplementsBlock *create_implements_block(TypeList *type_list);
+// Field
 FieldsBlock *create_fields_block(FieldList *field_list);
 FieldList *create_field_list(Field *field);
 FieldList *flatten_field_list(FieldList *field_list, Field *field);
 Field *create_field(VariableDec *variable_declaration, Type *type);
+// Method block
 MethodsBlockList *create_methods_block_list(MethodsBlock *methodBlock);
-MethodsBlockList *flatten_methods_block_list(MethodsBlockList *methods_block_list, MethodsBlock *methods_block);
 MethodsBlock *create_methods_block(Identifier *identifier, MethodsList *methods_list);
+MethodsBlockList *flatten_methods_block_list(MethodsBlockList *methods_block_list, MethodsBlock *methods_block);
+// Method
 MethodsList *create_methods_list(Method *method);
 MethodsList *flatten_methods_list(MethodsList *methods_list, Method *method);
 Method *create_method(MethodSignature *method_signature, StatementList *statement_list);
 MethodSignature *create_method_signature(MethodHeader *method_header, VarDecList *variable_declaration_list);
 MethodHeader *create_method_header(VariableDec *variable_declaration);
+// Statement
 StatementList *create_statement_list(Statement *statement);
 StatementList *flatten_statement_list(StatementList *statement_list, Statement *statement);
 Statement *create_stmt_from_local_dec(LocalDeclaration *local_declaration);
-Statement *create_statement_from_if_stmt(IfStatement *if_statement);
+Statement *create_stmt_from_if_stmt(IfStatement *if_statement);
+Statement *create_stmt_from_pm(PatternMatching *pattern_matching);
+Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr);
+// Declaration
 LocalDeclaration *create_local_declaration(VariableDec *variable_declaration, Expr *expr);
+VarDecList *create_var_dec_list(VariableDec *variable_dec);
+VariableDec *create_variable_declaration(Type *type, Identifier *identifier);
+VarDecList *flatten_var_dec_list(VarDecList *var_dec_list, VariableDec *variable_dec);
+// If statement
 IfStatement *create_if_statement(IfBlock *if_block, IfOrBlockList *if_or_block_list, OrBlock *or_block);
 IfBlock *create_if_block(Expr *expr, StatementList *statement_list);
 IfOrBlockList *create_if_or_block_list(IfOrBlock *if_or_block);
 IfOrBlockList *flatten_if_or_block_list(IfOrBlockList *if_or_block_list, IfOrBlock *if_or_block);
 IfOrBlock *create_if_or_block(Expr *expr, StatementList *statement_list);
 OrBlock *create_or_block(StatementList *statement_list);
+// Pattern matching
+PatternMatchingExpr *create_pattern_matching_expr(Expr *condition, PatternList *pattern_list);
+PatternMatching *create_pattern_matching(PatternList *pattern_list);
+Pattern *create_pattern_from_stmt_list(Expr *condition, StatementList *statement_list);
+Pattern *create_pattern_from_expr(Expr *condition, Expr *expr);
+PatternList *create_pattern_list(Pattern *pattern);
+PatternList *flatten_pattern_list(PatternList *pattern_list, Pattern *pattern);
+// Expression
 Expr *create_expr_from_unary(UnaryExpr *unary_expr);
 Expr *create_expr_from_binary(BinaryExpr *binary_expr);
 BinaryExpr *create_binary_expr(Expr *left, Expr *right, char operator);
 UnaryExpr *create_unary_expr_from_number(int type, char *integer_value);
 UnaryExpr *create_unary_expr_from_id(Identifier *identifier);
-VarDecList *create_var_dec_list(VariableDec *variable_dec);
-VarDecList *flatten_var_dec_list(VarDecList *var_dec_list, VariableDec *variable_dec);
-VariableDec *create_variable_declaration(Type *type, Identifier *identifier);
+// Primitives
 Identifier *create_identifier(const char *name);
 Type *create_type(const char *name);
 TypeList *create_type_list(Type *type);
@@ -299,6 +358,10 @@ void free_if_block(IfBlock *ib);
 void free_if_or_block(IfOrBlock *iob);
 void free_if_or_block_list(IfOrBlockList *iobl);
 void free_or_block(OrBlock *ob);
+void free_pattern(Pattern *p);
+void free_pattern_list(PatternList *pl);
+void free_pattern_matching(PatternMatching *pm);
+void free_pattern_matching_expr(PatternMatchingExpr *pme);
 void free_expr(Expr *expr);
 void free_binary_expr(BinaryExpr *be);
 void free_unary_expr(UnaryExpr *ue);
