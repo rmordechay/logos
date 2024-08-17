@@ -1,7 +1,0 @@
-Self {
-    func f(): Int { return 0 }
-}
-
-Interface {
-    func f1() { print("analyse_ast") }
-}
