@@ -1,4 +1,5 @@
 enum: MyEnum
+
 enums {
     ENUM1,
     ENUM2,

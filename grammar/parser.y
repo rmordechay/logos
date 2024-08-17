@@ -60,7 +60,7 @@ struct ObjectFile *root;
 %type <method> method
 %type <method_signature> method_signature
 %type <method_header> method_header
-%type <statement_list> statement_list
+%type <statement_list> statement_list statements_block
 %type <statement> statement
 %type <local_declaration> local_declaration
 %type <expr> expr
@@ -120,8 +120,7 @@ methods_list:
 	;
 
 method:
-		method_signature LEFT_BRACE statement_list RIGHT_BRACE { $$ = create_method($1, $3) }
-	|	method_signature LEFT_BRACE RIGHT_BRACE { $$ = create_method($1, NULL) }
+		method_signature statements_block { $$ = create_method($1, $2) }
 	;
 
 method_signature:
@@ -133,6 +132,10 @@ method_header:
 		FUNC variable_declaration { $$ = create_method_header($2) }
 	;
 
+statements_block:
+		LEFT_BRACE RIGHT_BRACE { $$ = create_statement_list(NULL) }
+	|	LEFT_BRACE statement_list RIGHT_BRACE { $$ = $2 }
+	;
 
 statement_list:
 		statement { $$ = create_statement_list($1) }
@@ -147,14 +150,14 @@ local_declaration:
 		LET variable_declaration EQUAL expr { $$ = create_local_declaration($2, $4) }
 	;
 
-//if_statement:
-//		pattern_matching
-//	|	IF expr LEFT_BRACE statement_list RIGHT_BRACE
-//	;
-//
-//pattern_matching:
-//	IF expr LEFT_BRACE statement_list RIGHT_BRACE
+if_statement:
+		pattern_matching
+	|	IF expr statements_block
+	;
 
+pattern_matching:
+		IF expr statements_block
+	;
 
 expr:
 		unary_expr { $$ = create_expr_from_unary($1) }

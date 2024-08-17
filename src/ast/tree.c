@@ -170,10 +170,14 @@ MethodHeader *create_method_header(VariableDec *variable_declaration) {
  */
 StatementList *create_statement_list(Statement *statement) {
     StatementList *sl = malloc(sizeof(StatementList));
-    sl->statements = malloc(sizeof(Statement *));
-    sl->count = 1;
-    sl->statements[0] = statement;
-    return sl;
+    if (statement == NULL) {
+        return sl;
+    } else {
+        sl->statements = malloc(sizeof(Statement *));
+        sl->count = 1;
+        sl->statements[0] = statement;
+        return sl;
+    }
 }
 
 /**
@@ -213,6 +217,7 @@ LocalDeclaration *create_local_declaration(VariableDec *variable_declaration, Ex
 Expr *create_expr_from_unary(UnaryExpr *unary_expr) {
     Expr *e = malloc(sizeof(Expr));
     e->unary_expr = unary_expr;
+    e->type = UNARY;
     return e;
 }
 
@@ -222,6 +227,7 @@ Expr *create_expr_from_unary(UnaryExpr *unary_expr) {
 Expr *create_expr_from_binary(BinaryExpr *binary_expr) {
     Expr *e = malloc(sizeof(Expr));
     e->binary_expr = binary_expr;
+    e->type = BINARY;
     return e;
 }
 

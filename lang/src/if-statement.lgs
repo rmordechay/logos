@@ -6,19 +6,27 @@ if x < 1 {
     print()
 }
 
+if 0 {
+    print()
+} or if.var {
+    print()
+} or 2 {
+    print()
+}
+
 if {
     x > 1: expr
     x < 1: { expr }
     else: expr
 }
 
-if var {
-    1: expr
-    x: expr
-    or: expr
+if Bool {
+    Bool1: expr
+    Bool2: expr
+    Bool3: expr
 }
 
-if var {
+if Bool {
     let a = 2
 }
 
