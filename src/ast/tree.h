@@ -1,6 +1,11 @@
 #ifndef TREE_H
 #define TREE_H
 
+typedef enum ExprType {
+    UNARY,
+    BINARY,
+} ExprType;
+
 /**
  *
  */
@@ -73,6 +78,7 @@ typedef struct ImplementsBlock {
  *
  */
 typedef struct Expr {
+    int type;
     union {
         struct UnaryExpr *unary_expr;
         struct BinaryExpr *binary_expr;
@@ -82,23 +88,23 @@ typedef struct Expr {
 /**
  *
  */
-typedef struct BinaryExpr {
-    Expr *left;
-    Expr *right;
-    char operator;
-} BinaryExpr;
-
-/**
- *
- */
 typedef struct UnaryExpr {
-    int type;
+    ExprType type;
     union {
         char *integer_value;
         char *float_value;
         Identifier *identifier;
     };
 } UnaryExpr;
+
+/**
+ *
+ */
+typedef struct BinaryExpr {
+    Expr *left;
+    Expr *right;
+    char operator;
+} BinaryExpr;
 
 /**
  *

@@ -148,9 +148,9 @@ cJSON *create_implements_block_json(ImplementsBlock *implements_block) {
  *
  */
 cJSON *create_expr_json(Expr *expr) {
-    if (expr->unary_expr) {
+    if (expr->type == UNARY) {
         return create_unary_expr_json(expr->unary_expr);
-    } else if (expr->binary_expr) {
+    } else if (expr->type == BINARY) {
         return create_binary_expr_json(expr->binary_expr);
     }
     return NULL;
@@ -165,7 +165,7 @@ cJSON *create_unary_expr_json(UnaryExpr *unary_expr) {
         cJSON_AddStringToObject(root, "integer_value", unary_expr->integer_value);
     } else if (unary_expr->type == FLOAT) {
         cJSON_AddStringToObject(root, "float_value", unary_expr->float_value);
-    } else if (unary_expr->identifier) {
+    } else if (unary_expr->type == IDENTIFIER) {
         cJSON_AddItemToObject(root, "identifier", create_identifier_json(unary_expr->identifier));
     }
     return root;
@@ -188,8 +188,7 @@ cJSON *create_binary_expr_json(BinaryExpr *binary_expr) {
  */
 cJSON *create_local_declaration_json(LocalDeclaration *local_dec) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "variable_declaration",
-                          create_variable_declaration_json(local_dec->variable_declaration));
+    cJSON_AddItemToObject(root, "variable_declaration",create_variable_declaration_json(local_dec->variable_declaration));
     cJSON_AddItemToObject(root, "expr", create_expr_json(local_dec->expr));
     return root;
 }
@@ -219,8 +218,8 @@ cJSON *create_statement_list_json(StatementList *statement_list) {
  */
 cJSON *create_method_header_json(MethodHeader *method_header) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "variable_declaration",
-                          create_variable_declaration_json(method_header->variable_declaration));
+    cJSON *var_dec = create_variable_declaration_json(method_header->variable_declaration);
+    cJSON_AddItemToObject(root, "variable_declaration",var_dec);
     return root;
 }
 
@@ -231,8 +230,8 @@ cJSON *create_method_signature_json(MethodSignature *method_signature) {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "method_header", create_method_header_json(method_signature->method_header));
     if (method_signature->variable_declaration_list) {
-        cJSON_AddItemToObject(root, "variable_declaration_list",
-                              create_variable_declaration_list_json(method_signature->variable_declaration_list));
+        cJSON *var_dec_list = create_variable_declaration_list_json(method_signature->variable_declaration_list);
+        cJSON_AddItemToObject(root, "variable_declaration_list", var_dec_list);
     }
     return root;
 }
