@@ -33,7 +33,6 @@ cJSON *create_pattern_json(Pattern *obj);
 cJSON *create_pattern_list_json(PatternList *list);
 cJSON *create_statement_json(Statement *obj);
 cJSON *create_statement_list_json(StatementList *list);
-cJSON *create_method_header_json(MethodHeader *obj);
 cJSON *create_method_signature_json(MethodSignature *obj);
 cJSON *create_method_json(Method *obj);
 cJSON *create_methods_list_json(MethodsList *list);
@@ -115,7 +114,7 @@ cJSON *create_variable_declaration_list_json(VarDecList *list) {
  */
 cJSON *create_field_json(Field *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "variable_declaration", create_variable_declaration_json(obj->variable_declaration));
+    cJSON_AddItemToObject(root, "method_variable", create_variable_declaration_json(obj->variable_declaration));
     if (obj->implements) {
     }
     return root;
@@ -205,7 +204,7 @@ cJSON *create_binary_expr_json(BinaryExpr *obj) {
  */
 cJSON *create_local_declaration_json(LocalDeclaration *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "variable_declaration",create_variable_declaration_json(obj->variable_declaration));
+    cJSON_AddItemToObject(root, "method_variable",create_variable_declaration_json(obj->variable_declaration));
     cJSON_AddItemToObject(root, "expr_list", create_expr_json(obj->expr));
     return root;
 }
@@ -396,25 +395,16 @@ cJSON *create_statement_list_json(StatementList *list) {
     return root;
 }
 
-/**
- *
- */
-cJSON *create_method_header_json(MethodHeader *obj) {
-    cJSON *root = cJSON_CreateObject();
-    cJSON *var_dec = create_variable_declaration_json(obj->variable_declaration);
-    cJSON_AddItemToObject(root, "variable_declaration",var_dec);
-    return root;
-}
 
 /**
  *
  */
 cJSON *create_method_signature_json(MethodSignature *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "method_header", create_method_header_json(obj->method_header));
-    if (obj->variable_declaration_list) {
-        cJSON *var_dec_list = create_variable_declaration_list_json(obj->variable_declaration_list);
-        cJSON_AddItemToObject(root, "variable_declaration_list", var_dec_list);
+    cJSON_AddItemToObject(root, "method_variable", create_variable_declaration_json(obj->method_variable));
+    if (obj->param_list) {
+        cJSON *var_dec_list = create_variable_declaration_list_json(obj->param_list);
+        cJSON_AddItemToObject(root, "param_list", var_dec_list);
     }
     return root;
 }

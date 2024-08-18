@@ -323,6 +323,7 @@ typedef struct Statement {
         PatternMatchingExpr *pattern_matching_expr;
         ForLoop *for_loop;
         ReturnStatement *return_statement;
+        Expr *break_expr;
     };
 } Statement;
 
@@ -334,19 +335,13 @@ typedef struct StatementList {
     int count;
 } StatementList;
 
-/**
- *
- */
-typedef struct MethodHeader {
-    VariableDec *variable_declaration;
-} MethodHeader;
 
 /**
  *
  */
 typedef struct MethodSignature {
-    MethodHeader *method_header;
-    VarDecList *variable_declaration_list;  // Optional
+    VariableDec *method_variable;
+    VarDecList *param_list;  // Optional
 } MethodSignature;
 
 /**
@@ -421,8 +416,7 @@ MethodsBlockList *flatten_methods_block_list(MethodsBlockList *list, MethodsBloc
 MethodsList *create_methods_list(Method *method);
 MethodsList *flatten_methods_list(MethodsList *list, Method *element);
 Method *create_method(MethodSignature *method_signature, StatementList *statement_list);
-MethodSignature *create_method_signature(MethodHeader *method_header, VarDecList *variable_declaration_list);
-MethodHeader *create_method_header(VariableDec *variable_declaration);
+MethodSignature *create_method_signature(VariableDec *variable_dec, VarDecList *variable_declaration_list);
 // Statement
 StatementList *create_statement_list(Statement *statement);
 StatementList *flatten_statement_list(StatementList *list, Statement *element);
@@ -432,6 +426,8 @@ Statement *create_stmt_from_pm(PatternMatching *pattern_matching);
 Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr);
 Statement *create_stmt_from_for_loop(ForLoop *for_loop);
 Statement *create_stmt_from_return_stmt(ReturnStatement *return_statement);
+Statement *create_stmt_from_break(Expr *break_expr);
+Statement *create_stmt_from_continue();
 // Declaration
 LocalDeclaration *create_local_declaration(VariableDec *variable_declaration, Expr *expr);
 VarDecList *create_var_dec_list(VariableDec *variable_dec);
@@ -484,7 +480,6 @@ void free_methods_block(MethodsBlock *mb);
 void free_methods_list(MethodsList *ml);
 void free_method(Method *m);
 void free_method_signature(MethodSignature *ms);
-void free_method_header(MethodHeader *mh);
 void free_statement_list(StatementList *sl);
 void free_statement(Statement *s);
 void free_local_declaration(LocalDeclaration *ld);

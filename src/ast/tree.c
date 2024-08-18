@@ -167,27 +167,18 @@ Method *create_method(MethodSignature *method_signature, StatementList *statemen
     Method *m = malloc(sizeof(Method));
     m->method_signature = method_signature;
     m->statement_list = statement_list;
-    m->name = &m->method_signature->method_header->variable_declaration->identifier->name;
+    m->name = &m->method_signature->method_variable->identifier->name;
     return m;
 }
 
 /**
  *
  */
-MethodSignature *create_method_signature(MethodHeader *method_header, VarDecList *variable_declaration_list) {
+MethodSignature *create_method_signature(VariableDec *variable_dec, VarDecList *variable_declaration_list) {
     MethodSignature *ms = malloc(sizeof(MethodSignature));
-    ms->method_header = method_header;
-    ms->variable_declaration_list = variable_declaration_list;
+    ms->method_variable = variable_dec;
+    ms->param_list = variable_declaration_list;
     return ms;
-}
-
-/**
- *
- */
-MethodHeader *create_method_header(VariableDec *variable_declaration) {
-    MethodHeader *mh = malloc(sizeof(MethodHeader));
-    mh->variable_declaration = variable_declaration;
-    return mh;
 }
 
 /**
@@ -275,6 +266,25 @@ Statement *create_stmt_from_return_stmt(ReturnStatement *return_statement) {
     Statement *s = malloc(sizeof(Statement));
     s->return_statement = return_statement;
     s->type = ST_RETURN_STATEMENT;
+    return s;
+}
+
+/**
+ *
+ */
+Statement *create_stmt_from_break(Expr *break_expr) {
+    Statement *s = malloc(sizeof(Statement));
+    s->break_expr = break_expr;
+    s->type = ST_BREAK;
+    return s;
+}
+
+/**
+ *
+ */
+Statement *create_stmt_from_continue() {
+    Statement *s = malloc(sizeof(Statement));
+    s->type = ST_CONTINUE;
     return s;
 }
 
@@ -427,6 +437,7 @@ ForLoop *create_for_loop_from_for_in(ForInLoop *for_in_loop, StatementList *stat
     for_loop->for_in_loop = for_in_loop;
     return for_loop;
 }
+
 /**
  *
  */
@@ -437,10 +448,11 @@ ForLoop *create_for_loop_from_while(WhileLoop *while_loop, StatementList *statem
     for_loop->while_loop = while_loop;
     return for_loop;
 }
+
 /**
  *
  */
-ForLoop *create_for_loop_from_inf_loop(StatementList* statement_list) {
+ForLoop *create_for_loop_from_inf_loop(StatementList *statement_list) {
     ForLoop *for_loop = malloc(sizeof(ForLoop));
     for_loop->type = FL_INFINITE;
     for_loop->statement_list = statement_list;
@@ -465,6 +477,7 @@ WhileLoop *create_while_loop(ExprList *expr_list) {
     while_loop->expr_list = expr_list;
     return while_loop;
 }
+
 /**
  *
  */
@@ -729,18 +742,13 @@ void free_method(Method *m) {
  *
  */
 void free_method_signature(MethodSignature *ms) {
-    free_method_header(ms->method_header);
-    free_variable_declaration_list(ms->variable_declaration_list);
+    free_variable_declaration(ms->method_variable);
+    if (ms->param_list) {
+        free_variable_declaration_list(ms->param_list);
+    }
     free(ms);
 }
 
-/**
- *
- */
-void free_method_header(MethodHeader *mh) {
-    free_variable_declaration(mh->variable_declaration);
-    free(mh);
-}
 
 /**
  *
@@ -775,6 +783,11 @@ void free_statement(Statement *s) {
             break;
         case ST_RETURN_STATEMENT:
             free_return_statement(s->return_statement);
+            break;
+        case ST_BREAK:
+            free_expr(s->break_expr);
+            break;
+        case ST_CONTINUE:
             break;
     }
     free(s);
@@ -955,9 +968,17 @@ void free_binary_expr(BinaryExpr *be) {
  *
  */
 void free_unary_expr(UnaryExpr *ue) {
-    free(ue->integer_value);
-    free(ue->float_value);
-    free_identifier(ue->identifier);
+    switch (ue->type) {
+        case IDENTIFIER:
+            free_identifier(ue->identifier);
+            break;
+        case INTEGER:
+            free(ue->integer_value);
+            break;
+        case FLOAT:
+            free(ue->float_value);
+            break;
+    }
     free(ue);
 }
 
@@ -993,6 +1014,7 @@ void free_identifier(Identifier *i) {
  *
  */
 void free_type(Type *t) {
+    if (t == NULL) return;
     free(t->name);
     free(t);
 }

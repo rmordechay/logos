@@ -72,7 +72,6 @@ struct Entity *root;
 %type <methods_list> methods_list
 %type <method> method
 %type <method_signature> method_signature
-%type <method_header> method_header
 %type <statement_list> statement_list statements_block
 %type <statement> statement
 %type <local_declaration> local_declaration
@@ -106,7 +105,7 @@ struct Entity *root;
 %%
 
 program:
-    	object_entity { analyse_ast(create_entity(OBJECT_ENTITY, $1)) }
+    	object_entity { analyse_ast(create_entity(E_OBJECT, $1)) }
     ;
 
 object_entity:
@@ -151,12 +150,8 @@ method:
 	;
 
 method_signature:
-		method_header LEFT_PAREN variable_declaration_list RIGHT_PAREN { $$ = create_method_signature($1, $3) }
-	|	method_header LEFT_PAREN RIGHT_PAREN { $$ = create_method_signature($1, NULL) }
-	;
-
-method_header:
-		FUNC variable_declaration { $$ = create_method_header($2) }
+		FUNC variable_declaration LEFT_PAREN variable_declaration_list RIGHT_PAREN { $$ = create_method_signature($2, $4) }
+	|	FUNC variable_declaration LEFT_PAREN RIGHT_PAREN { $$ = create_method_signature($2, NULL) }
 	;
 
 statements_block:
@@ -177,7 +172,6 @@ statement:
 	|	for_loop  { $$ = create_stmt_from_for_loop($1);  }
 	|	return_statement  { $$ = create_stmt_from_return_stmt($1);  }
 	;
-
 
 
 for_loop_statement:
