@@ -21,6 +21,7 @@ int line_number = 1;
 "and"                   { return AND; }
 "or"                    { return OR; }
 "not"                   { return NOT; }
+"in"                    { return IN; }
 
 "("                     { return LEFT_PAREN; }
 ")"                     { return RIGHT_PAREN; }

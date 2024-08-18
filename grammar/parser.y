@@ -40,6 +40,7 @@ struct ObjectFile *root;
     struct Pattern *pattern;
     struct PatternList *pattern_list;
 	struct Expr *expr;
+	struct ExprList *expr_list;
 	struct BinaryExpr *binary_expr;
 	struct UnaryExpr *unary_expr;
 	struct VariableDeclarationList *variable_declaration_list;
@@ -51,7 +52,7 @@ struct ObjectFile *root;
 
 %start program
 
-%token LET FUNC IMPLEMENTS FIELDS SELF OBJECT IF FOR RETURN IMPORT AND OR NOT
+%token LET FUNC IMPLEMENTS FIELDS SELF OBJECT IF FOR RETURN IMPORT AND OR NOT IN
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE LEFT_BRACKET RIGHT_BRACKET LEFT_ANGLE RIGHT_ANGLE
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER
@@ -81,6 +82,7 @@ struct ObjectFile *root;
 %type <pattern> pattern
 %type <pattern_list> pattern_list
 %type <expr> expr
+%type <expr_list> expr_list
 %type <unary_expr> unary_expr
 %type <binary_expr> binary_expr
 %type <binary_expr> add_expr
@@ -214,6 +216,11 @@ pattern:
 	|	OR COLON expr { $$ = create_pattern_from_expr(NULL, $3) }
 	|	OR COLON statements_block { $$ = create_pattern_from_stmt_list(NULL, $3) }
 	;
+
+expr_list:
+		expr { $$ = create_expr_list($1) }
+	|	expr_list expr { $$ =  flatten_expr_list($1, $2) }
+    ;
 
 expr:
 		unary_expr { $$ = create_expr_from_unary($1) }

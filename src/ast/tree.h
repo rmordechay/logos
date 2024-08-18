@@ -100,6 +100,14 @@ typedef struct Expr {
 /**
  *
  */
+typedef struct ExprList {
+    Expr **exprs;
+    int count;
+} ExprList;
+
+/**
+ *
+ */
 typedef struct UnaryExpr {
     int type;
     union {
@@ -330,6 +338,8 @@ PatternList *flatten_pattern_list(PatternList *pattern_list, Pattern *pattern);
 // Expression
 Expr *create_expr_from_unary(UnaryExpr *unary_expr);
 Expr *create_expr_from_binary(BinaryExpr *binary_expr);
+ExprList *create_expr_list(Expr *expr);
+ExprList *flatten_expr_list(ExprList *expr_list, Expr *expr);
 BinaryExpr *create_binary_expr(Expr *left, Expr *right, char operator);
 UnaryExpr *create_unary_expr_from_number(int type, char *integer_value);
 UnaryExpr *create_unary_expr_from_id(Identifier *identifier);
@@ -362,7 +372,8 @@ void free_pattern(Pattern *p);
 void free_pattern_list(PatternList *pl);
 void free_pattern_matching(PatternMatching *pm);
 void free_pattern_matching_expr(PatternMatchingExpr *pme);
-void free_expr(Expr *expr);
+void free_expr(Expr *e);
+void free_expr_list(ExprList *el);
 void free_binary_expr(BinaryExpr *be);
 void free_unary_expr(UnaryExpr *ue);
 void free_variable_declaration_list(VarDecList *vdl);

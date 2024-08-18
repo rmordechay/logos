@@ -395,6 +395,30 @@ Expr *create_expr_from_binary(BinaryExpr *binary_expr) {
 /**
  *
  */
+ExprList *create_expr_list(Expr *expr) {
+    ExprList *expr_list = malloc(sizeof(ExprList *));
+    expr_list->exprs = malloc(sizeof(Expr *));
+    expr_list->count = 1;
+    expr_list->exprs[0] = expr;
+    return expr_list;
+}
+
+/**
+ *
+ */
+ExprList *flatten_expr_list(ExprList *expr_list, Expr *expr) {
+    int i = expr_list->count;
+    Expr **new_list = realloc(expr_list->exprs, i * sizeof(Expr *));
+    expr_list->exprs = new_list;
+    expr_list->exprs[i] = expr;
+    expr_list->count++;
+    return expr_list;
+}
+
+
+/**
+ *
+ */
 BinaryExpr *create_binary_expr(Expr *left, Expr *right, char operator) {
     BinaryExpr *be = malloc(sizeof(BinaryExpr));
     be->left = left;
@@ -756,6 +780,16 @@ void free_expr(Expr *e) {
         free_binary_expr(e->binary_expr);
     }
     free(e);
+}
+
+/**
+ *
+ */
+void free_expr_list(ExprList *el) {
+    for (int i = 0; i < el->count; ++i) {
+        free_expr(el->exprs[i]);
+    }
+    free(el);
 }
 
 /**
