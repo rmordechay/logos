@@ -143,6 +143,7 @@ Method *create_method(MethodSignature *method_signature, StatementList *statemen
     Method *m = malloc(sizeof(Method));
     m->method_signature = method_signature;
     m->statement_list = statement_list;
+    m->name = &m->method_signature->method_header->variable_declaration->identifier->name;
     return m;
 }
 
@@ -185,10 +186,10 @@ StatementList *create_statement_list(Statement *statement) {
  *
  */
 StatementList *flatten_statement_list(StatementList *statement_list, Statement *statement) {
-    int i = statement_list->count;
-    Statement **new_list = realloc(statement_list->statements, i * sizeof(Statement *));
+    int new_size = statement_list->count + 1;
+    Statement **new_list = realloc(statement_list->statements, new_size * sizeof(Statement *));
     statement_list->statements = new_list;
-    statement_list->statements[i] = statement;
+    statement_list->statements[statement_list->count] = statement;
     statement_list->count++;
     return statement_list;
 }
@@ -385,8 +386,29 @@ PatternList *flatten_pattern_list(PatternList *pattern_list, Pattern *pattern) {
 /**
  *
  */
-ForLoop *create_for_loop(StatementList *statement_list) {
+ForLoop *create_for_loop_from_for_in(ForInLoop *for_in_loop, StatementList *statement_list) {
     ForLoop *for_loop = malloc(sizeof(ForLoop));
+    for_loop->type = FOR_IN_LOOP;
+    for_loop->statement_list = statement_list;
+    for_loop->for_in_loop = for_in_loop;
+    return for_loop;
+}
+/**
+ *
+ */
+ForLoop *create_for_loop_from_while(WhileLoop *while_loop, StatementList *statement_list) {
+    ForLoop *for_loop = malloc(sizeof(ForLoop));
+    for_loop->type = WHILE_LOOP;
+    for_loop->statement_list = statement_list;
+    for_loop->while_loop = while_loop;
+    return for_loop;
+}
+/**
+ *
+ */
+ForLoop *create_for_loop_from_inf_loop(StatementList* statement_list) {
+    ForLoop *for_loop = malloc(sizeof(ForLoop));
+    for_loop->type = INFINITE_LOOP;
     for_loop->statement_list = statement_list;
     return for_loop;
 }
@@ -399,6 +421,15 @@ ForInLoop *create_for_in_loop(ExprList *expr_list, Expr *in_expr) {
     for_loop_in->expr_list = expr_list;
     for_loop_in->in_expr = in_expr;
     return for_loop_in;
+}
+
+/**
+ *
+ */
+WhileLoop *create_while_loop(Expr *expr) {
+    WhileLoop *while_loop = malloc(sizeof(WhileLoop));
+    while_loop->condition = expr;
+    return while_loop;
 }
 
 /**
@@ -798,7 +829,7 @@ void free_for_loop(ForLoop *fl) {
         case FOR_IN_LOOP:
             free_for_in_loop(fl->for_in_loop);
             break;
-        case ENDLESS_LOOP:
+        case INFINITE_LOOP:
             break;
     }
     free_statement_list(fl->statement_list);
@@ -818,8 +849,7 @@ void free_for_in_loop(ForInLoop *fli) {
  *
  */
 void free_while_loop(WhileLoop *wl) {
-    free_expr(wl->in_expr);
-    free_expr_list(wl->expr_list);
+    free_expr(wl->condition);
     free(wl);
 }
 

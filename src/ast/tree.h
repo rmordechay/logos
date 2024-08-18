@@ -39,7 +39,7 @@ typedef enum UnaryExprType {
 
 typedef enum ForLoopType {
     WHILE_LOOP,
-    ENDLESS_LOOP,
+    INFINITE_LOOP,
     FOR_IN_LOOP,
 } ForLoopType;
 
@@ -258,8 +258,7 @@ typedef struct PatternMatchingExpr {
  *
  */
 typedef struct WhileLoop {
-    ExprList *expr_list;
-    Expr *in_expr;
+    Expr *condition;
 } WhileLoop;
 
 /**
@@ -324,6 +323,7 @@ typedef struct MethodSignature {
  *
  */
 typedef struct Method {
+    char **name;
     MethodSignature *method_signature;
     StatementList *statement_list;  // Optional
 } Method;
@@ -411,8 +411,11 @@ Pattern *create_pattern_from_expr(Expr *condition, Expr *expr);
 PatternList *create_pattern_list(Pattern *pattern);
 PatternList *flatten_pattern_list(PatternList *pattern_list, Pattern *pattern);
 // For loop
-ForLoop *create_for_loop(StatementList *statement_list);
+ForLoop *create_for_loop_from_for_in(ForInLoop *for_in_loop, StatementList *statement_list);
+ForLoop *create_for_loop_from_while(WhileLoop *while_loop, StatementList *statement_list);
+ForLoop *create_for_loop_from_inf_loop(StatementList* statement_list);
 ForInLoop *create_for_in_loop(ExprList *expr_list, Expr *in_expr);
+WhileLoop *create_while_loop(Expr *expr);
 // Expression
 Expr *create_expr_from_unary(UnaryExpr *unary_expr);
 Expr *create_expr_from_binary(BinaryExpr *binary_expr);

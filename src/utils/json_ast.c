@@ -15,6 +15,7 @@ cJSON *create_field_list_json(FieldList *obj);
 cJSON *create_fields_block_json(FieldsBlock *obj);
 cJSON *create_implements_block_json(ImplementsBlock *obj);
 cJSON *create_expr_json(Expr *obj);
+cJSON *create_expr_list_json(ExprList *list);
 cJSON *create_binary_expr_json(BinaryExpr *obj);
 cJSON *create_unary_expr_json(UnaryExpr *obj);
 cJSON *create_local_declaration_json(LocalDeclaration *obj);
@@ -23,6 +24,9 @@ cJSON *create_if_block_json(IfBlock *obj);
 cJSON *create_if_or_block_json(IfOrBlock *obj);
 cJSON *create_if_or_block_list_json(IfOrBlockList *list);
 cJSON *create_or_block_json(OrBlock *obj);
+cJSON *create_for_loop_json(ForLoop *obj);
+cJSON *create_for_in_loop_json(ForInLoop *obj);
+cJSON *create_while_loop_json(WhileLoop *obj);
 cJSON *create_pattern_matching_json(PatternMatching *obj);
 cJSON *create_pattern_matching_expr_json(PatternMatchingExpr *obj);
 cJSON *create_pattern_json(Pattern *obj);
@@ -168,6 +172,17 @@ cJSON *create_expr_json(Expr *obj) {
 /**
  *
  */
+cJSON *create_expr_list_json(ExprList *list) {
+    cJSON *root = cJSON_CreateArray();
+    for (int i = 0; i < list->count; ++i) {
+        cJSON_AddItemToObject(root, "condition", create_expr_json(list->exprs[i]));
+    }
+    return root;
+}
+
+/**
+ *
+ */
 cJSON *create_unary_expr_json(UnaryExpr *obj) {
     cJSON *root = cJSON_CreateObject();
     if (obj->type == INTEGER) {
@@ -198,7 +213,7 @@ cJSON *create_binary_expr_json(BinaryExpr *obj) {
 cJSON *create_local_declaration_json(LocalDeclaration *obj) {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "variable_declaration",create_variable_declaration_json(obj->variable_declaration));
-    cJSON_AddItemToObject(root, "expr", create_expr_json(obj->expr));
+    cJSON_AddItemToObject(root, "condition", create_expr_json(obj->expr));
     return root;
 }
 
@@ -225,7 +240,7 @@ cJSON *create_if_block_json(IfBlock *obj) {
     if (obj->statement_list) {
         cJSON_AddItemToObject(root, "statement_list", create_statement_list_json(obj->statement_list));
     }
-    cJSON_AddItemToObject(root, "expr", create_expr_json(obj->expr));
+    cJSON_AddItemToObject(root, "condition", create_expr_json(obj->expr));
     return root;
 }
 
@@ -237,7 +252,7 @@ cJSON *create_if_or_block_json(IfOrBlock *obj) {
     if (obj->statement_list) {
         cJSON_AddItemToObject(root, "statement_list", create_statement_list_json(obj->statement_list));
     }
-    cJSON_AddItemToObject(root, "expr", create_expr_json(obj->expr));
+    cJSON_AddItemToObject(root, "condition", create_expr_json(obj->expr));
     return root;
 }
 
@@ -266,6 +281,45 @@ cJSON *create_or_block_json(OrBlock *obj) {
 /**
  *
  */
+cJSON *create_for_loop_json(ForLoop *obj) {
+    cJSON *root = cJSON_CreateObject();
+    switch (obj->type) {
+        case WHILE_LOOP:
+            cJSON_AddItemToObject(root, "while_loop",create_while_loop_json(obj->while_loop));
+            break;
+        case INFINITE_LOOP:
+            cJSON_AddItemToObject(root, "infinite_loop",cJSON_CreateObject());
+            break;
+        case FOR_IN_LOOP:
+            cJSON_AddItemToObject(root, "for_in_loop",create_for_in_loop_json(obj->for_in_loop));
+            break;
+    }
+    return root;
+}
+
+/**
+ *
+ */
+cJSON *create_for_in_loop_json(ForInLoop *obj) {
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddItemToObject(root, "condition",create_expr_json(obj->in_expr));
+    cJSON_AddItemToObject(root, "expr_list",create_expr_list_json(obj->expr_list));
+    return root;
+}
+
+/**
+ *
+ */
+cJSON *create_while_loop_json(WhileLoop *obj) {
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddItemToObject(root, "condition",create_expr_json(obj->condition));
+    return root;
+}
+
+
+/**
+ *
+ */
 cJSON *create_pattern_matching_json(PatternMatching *obj) {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "pattern_list",create_pattern_list_json(obj->pattern_list));
@@ -277,7 +331,7 @@ cJSON *create_pattern_matching_json(PatternMatching *obj) {
  */
 cJSON *create_pattern_matching_expr_json(PatternMatchingExpr *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "expr",create_expr_json(obj->expr));
+    cJSON_AddItemToObject(root, "condition",create_expr_json(obj->expr));
     cJSON_AddItemToObject(root, "pattern_list",create_pattern_list_json(obj->pattern_list));
     return root;
 }
@@ -287,10 +341,10 @@ cJSON *create_pattern_matching_expr_json(PatternMatchingExpr *obj) {
  */
 cJSON *create_pattern_json(Pattern *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "expr",create_expr_json(obj->condition));
+    cJSON_AddItemToObject(root, "condition",create_expr_json(obj->condition));
     switch (obj->type) {
         case EXPR_BODY:
-            cJSON_AddItemToObject(root, "expr",create_expr_json(obj->condition));
+            cJSON_AddItemToObject(root, "condition",create_expr_json(obj->condition));
             break;
         case STMT_LIST_BODY:
             cJSON_AddItemToObject(root, "statement_list",create_statement_list_json(obj->statement_list));
@@ -330,7 +384,7 @@ cJSON *create_statement_json(Statement *obj) {
             cJSON_AddItemToObject(root, "pattern_matching_expr", create_pattern_matching_expr_json(obj->pattern_matching_expr));
             break;
         case FOR_LOOP:
-//            cJSON_AddItemToObject(root, "for_loop", create_for_loop_json(obj->if_statement));
+            cJSON_AddItemToObject(root, "for_loop", create_for_loop_json(obj->for_loop));
             break;
     }
     return root;

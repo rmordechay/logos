@@ -40,6 +40,8 @@ struct ObjectFile *root;
     struct Pattern *pattern;
     struct PatternList *pattern_list;
     struct ForLoop *for_loop;
+    struct ForInLoop *for_in_loop;
+    struct WhileLoop *while_loop;
 	struct Expr *expr;
 	struct ExprList *expr_list;
 	struct BinaryExpr *binary_expr;
@@ -83,6 +85,8 @@ struct ObjectFile *root;
 %type <pattern> pattern
 %type <pattern_list> pattern_list
 %type <for_loop> for_loop
+%type <while_loop> while_loop
+%type <for_in_loop> for_in_loop
 %type <expr> expr
 %type <expr_list> expr_list
 %type <unary_expr> unary_expr
@@ -220,18 +224,17 @@ pattern:
 	;
 
 for_loop:
-		FOR statements_block
-	|	while_loop statements_block
-	|	for_in_loop statements_block
-	;
-
-
-while_loop:
-		FOR expr_list
+		FOR statements_block { $$ = create_for_loop_from_inf_loop($2) }
+	|	while_loop statements_block { $$ = create_for_loop_from_while($1, $2) }
+	|	for_in_loop statements_block { $$ = create_for_loop_from_for_in($1, $2) }
 	;
 
 for_in_loop:
-		FOR expr_list IN expr
+		FOR expr_list IN expr { $$ = create_for_in_loop($2, $4) }
+	;
+
+while_loop:
+		FOR expr_list { $$ = create_while_loop($2) }
 	;
 
 expr_list:
