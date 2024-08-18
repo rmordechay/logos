@@ -252,10 +252,10 @@ Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr) {
 /**
  *
  */
-Statement *create_stmt_from_for_loop(ForLoop *for_loop) {
+Statement *create_stmt_from_iteration(Iteration *iteration) {
     Statement *s = malloc(sizeof(Statement));
-    s->for_loop = for_loop;
-    s->type = ST_FOR_LOOP;
+    s->iteration = iteration;
+    s->type = ST_ITERATION;
     return s;
 }
 
@@ -430,43 +430,43 @@ PatternList *flatten_pattern_list(PatternList *list, Pattern *element) {
 /**
  *
  */
-ForLoop *create_for_loop_from_for_in(ForInLoop *for_in_loop, StatementList *statement_list) {
-    ForLoop *for_loop = malloc(sizeof(ForLoop));
-    for_loop->type = FL_IN;
-    for_loop->statement_list = statement_list;
-    for_loop->for_in_loop = for_in_loop;
-    return for_loop;
+Iteration *create_iteration_from_for_in(ForInLoop *for_in_loop, StatementList *statement_list) {
+    Iteration *iteration = malloc(sizeof(Iteration));
+    iteration->type = FL_IN;
+    iteration->statement_list = statement_list;
+    iteration->for_in_loop = for_in_loop;
+    return iteration;
 }
 
 /**
  *
  */
-ForLoop *create_for_loop_from_while(WhileLoop *while_loop, StatementList *statement_list) {
-    ForLoop *for_loop = malloc(sizeof(ForLoop));
-    for_loop->type = FL_WHILE;
-    for_loop->statement_list = statement_list;
-    for_loop->while_loop = while_loop;
-    return for_loop;
+Iteration *create_iteration_from_while(WhileLoop *while_loop, StatementList *statement_list) {
+    Iteration *iteration = malloc(sizeof(Iteration));
+    iteration->type = FL_WHILE;
+    iteration->statement_list = statement_list;
+    iteration->while_loop = while_loop;
+    return iteration;
 }
 
 /**
  *
  */
-ForLoop *create_for_loop_from_inf_loop(StatementList *statement_list) {
-    ForLoop *for_loop = malloc(sizeof(ForLoop));
-    for_loop->type = FL_INFINITE;
-    for_loop->statement_list = statement_list;
-    return for_loop;
+Iteration *create_iteration_from_inf_loop(StatementList *statement_list) {
+    Iteration *iteration = malloc(sizeof(Iteration));
+    iteration->type = FL_INFINITE;
+    iteration->statement_list = statement_list;
+    return iteration;
 }
 
 /**
  *
  */
 ForInLoop *create_for_in_loop(ExprList *expr_list, Expr *in_expr) {
-    ForInLoop *for_loop_in = malloc(sizeof(ForInLoop));
-    for_loop_in->expr_list = expr_list;
-    for_loop_in->in_expr = in_expr;
-    return for_loop_in;
+    ForInLoop *iteration_in = malloc(sizeof(ForInLoop));
+    iteration_in->expr_list = expr_list;
+    iteration_in->in_expr = in_expr;
+    return iteration_in;
 }
 
 /**
@@ -811,8 +811,8 @@ void free_statement(Statement *s) {
         case ST_PATTERN_MATCHING_EXPR:
             free_pattern_matching_expr(s->pattern_matching_expr);
             break;
-        case ST_FOR_LOOP:
-            free_for_loop(s->for_loop);
+        case ST_ITERATION:
+            free_iteration(s->iteration);
             break;
         case ST_RETURN_STATEMENT:
             free_return_statement(s->return_statement);
@@ -936,7 +936,7 @@ void free_pattern_matching_expr(PatternMatchingExpr *pme) {
 /**
  *
  */
-void free_for_loop(ForLoop *fl) {
+void free_iteration(Iteration *fl) {
     if (fl == NULL) return;
     switch (fl->type) {
         case FL_WHILE:

@@ -39,7 +39,7 @@ struct Entity *root;
     struct PatternMatching *pattern_matching;
     struct Pattern *pattern;
     struct PatternList *pattern_list;
-    struct ForLoop *for_loop;
+    struct ForLoop *iteration;
     struct ForInLoop *for_in_loop;
     struct WhileLoop *while_loop;
     struct ReturnStatement *return_statement;
@@ -74,6 +74,7 @@ struct Entity *root;
 %type <method_signature> method_signature
 %type <statement_list> statement_list statements_block
 %type <statement> statement
+%type <statement> iteration_statement
 %type <local_declaration> local_declaration
 %type <if_statement> if_statement
 %type <if_block> if_block
@@ -84,7 +85,7 @@ struct Entity *root;
 %type <pattern_matching> pattern_matching
 %type <pattern> pattern
 %type <pattern_list> pattern_list
-%type <for_loop> for_loop
+%type <iteration> iteration
 %type <for_in_loop> for_in_loop
 %type <while_loop> while_loop
 %type <return_statement> return_statement
@@ -169,14 +170,15 @@ statement:
 	|	if_statement { $$ = create_stmt_from_if_stmt($1);  }
 	|	pattern_matching  { $$ = create_stmt_from_pm($1);  }
 	|	pattern_matching_expr  { $$ = create_stmt_from_pme($1);  }
-	|	for_loop  { $$ = create_stmt_from_for_loop($1);  }
+	|	iteration  { $$ = create_stmt_from_iteration($1);  }
 	|	return_statement  { $$ = create_stmt_from_return_stmt($1);  }
 	;
 
 
-for_loop_statement:
-		BREAK unary_expr
-	|	CONTINUE
+iteration_statement:
+		BREAK unary_expr { $$ = create_stmt_from_break($2) }
+	|	BREAK  { $$ = create_stmt_from_break(NULL) }
+	|	CONTINUE { $$ = create_stmt_from_continue() }
 	|	statement
 	;
 
@@ -228,10 +230,10 @@ pattern:
 	|	OR COLON statements_block { $$ = create_pattern_from_stmt_list(NULL, $3) }
 	;
 
-for_loop:
-		FOR statements_block { $$ = create_for_loop_from_inf_loop($2) }
-	|	while_loop statements_block { $$ = create_for_loop_from_while($1, $2) }
-	|	for_in_loop statements_block { $$ = create_for_loop_from_for_in($1, $2) }
+iteration:
+		FOR statements_block { $$ = create_iteration_from_inf_loop($2) }
+	|	while_loop statements_block { $$ = create_iteration_from_while($1, $2) }
+	|	for_in_loop statements_block { $$ = create_iteration_from_for_in($1, $2) }
 	;
 
 for_in_loop:

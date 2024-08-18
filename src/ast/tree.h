@@ -53,7 +53,7 @@ typedef enum StatementType {
     ST_IF_STATEMENT,
     ST_PATTERN_MATCHING,
     ST_PATTERN_MATCHING_EXPR,
-    ST_FOR_LOOP,
+    ST_ITERATION,
     ST_RETURN_STATEMENT,
     ST_BREAK,
     ST_CONTINUE,
@@ -71,11 +71,11 @@ typedef enum PatternBodyType {
 /**
  *
  */
-typedef enum ForLoopType {
+typedef enum IterationType {
     FL_WHILE,
     FL_INFINITE,
     FL_IN,
-} ForLoopType;
+} IterationType;
 
 /**
  *
@@ -334,14 +334,14 @@ typedef struct ForInLoop {
 /**
  *
  */
-typedef struct ForLoop {
-    ForLoopType type;
+typedef struct Iteration {
+    IterationType type;
     union {
         ForInLoop *for_in_loop;
         WhileLoop *while_loop;
     };
     struct StatementList *statement_list;
-} ForLoop;
+} Iteration;
 
 /**
  *
@@ -360,7 +360,7 @@ typedef struct Statement {
         IfStatement *if_statement;
         PatternMatching *pattern_matching;
         PatternMatchingExpr *pattern_matching_expr;
-        ForLoop *for_loop;
+        Iteration *iteration;
         ReturnStatement *return_statement;
         Expr *break_expr;
     };
@@ -463,7 +463,7 @@ Statement *create_stmt_from_local_dec(LocalDeclaration *local_declaration);
 Statement *create_stmt_from_if_stmt(IfStatement *if_statement);
 Statement *create_stmt_from_pm(PatternMatching *pattern_matching);
 Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr);
-Statement *create_stmt_from_for_loop(ForLoop *for_loop);
+Statement *create_stmt_from_iteration(Iteration *iteration);
 Statement *create_stmt_from_return_stmt(ReturnStatement *return_statement);
 Statement *create_stmt_from_break(Expr *break_expr);
 Statement *create_stmt_from_continue();
@@ -487,9 +487,9 @@ Pattern *create_pattern_from_expr(Expr *condition, Expr *expr);
 PatternList *create_pattern_list(Pattern *pattern);
 PatternList *flatten_pattern_list(PatternList *list, Pattern *element);
 // For loop
-ForLoop *create_for_loop_from_for_in(ForInLoop *for_in_loop, StatementList *statement_list);
-ForLoop *create_for_loop_from_while(WhileLoop *while_loop, StatementList *statement_list);
-ForLoop *create_for_loop_from_inf_loop(StatementList* statement_list);
+Iteration *create_iteration_from_for_in(ForInLoop *for_in_loop, StatementList *statement_list);
+Iteration *create_iteration_from_while(WhileLoop *while_loop, StatementList *statement_list);
+Iteration *create_iteration_from_inf_loop(StatementList* statement_list);
 ForInLoop *create_for_in_loop(ExprList *expr_list, Expr *in_expr);
 WhileLoop *create_while_loop(ExprList *expr_list);
 // Return statement
@@ -533,7 +533,7 @@ void free_pattern(Pattern *p);
 void free_pattern_list(PatternList *pl);
 void free_pattern_matching(PatternMatching *pm);
 void free_pattern_matching_expr(PatternMatchingExpr *pme);
-void free_for_loop(ForLoop *fl);
+void free_iteration(Iteration *fl);
 void free_for_in_loop(ForInLoop *fli);
 void free_while_loop(WhileLoop *wl);
 void free_return_statement(ReturnStatement *rs);
