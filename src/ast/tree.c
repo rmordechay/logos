@@ -979,14 +979,19 @@ void free_binary_expr(BinaryExpr *be) {
  */
 void free_unary_expr(UnaryExpr *ue) {
     switch (ue->type) {
-        case IDENTIFIER:
+        case UE_IDENTIFIER:
             free_identifier(ue->identifier);
             break;
-        case INTEGER:
+        case UE_INT:
             free(ue->integer_value);
             break;
-        case FLOAT:
+        case UE_FLOAT:
             free(ue->float_value);
+            break;
+        case UE_STRING:
+            free(ue->string);
+            break;
+        case UE_BOOL:
             break;
     }
     free(ue);

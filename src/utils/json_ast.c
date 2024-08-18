@@ -177,12 +177,22 @@ cJSON *create_expr_list_json(ExprList *list) {
  */
 cJSON *create_unary_expr_json(UnaryExpr *obj) {
     cJSON *root = cJSON_CreateObject();
-    if (obj->type == INTEGER) {
-        cJSON_AddStringToObject(root, "integer_value", obj->integer_value);
-    } else if (obj->type == FLOAT) {
-        cJSON_AddStringToObject(root, "float_value", obj->float_value);
-    } else if (obj->type == IDENTIFIER) {
-        cJSON_AddItemToObject(root, "identifier", create_identifier_json(obj->identifier));
+    switch (obj->type) {
+        case UE_INT:
+            cJSON_AddStringToObject(root, "integer_value", obj->integer_value);
+            break;
+        case UE_FLOAT:
+            cJSON_AddStringToObject(root, "float_value", obj->float_value);
+            break;
+        case UE_BOOL:
+            cJSON_AddBoolToObject(root, "bool", obj->boolean);
+            break;
+        case UE_STRING:
+            cJSON_AddStringToObject(root, "string", obj->string);
+            break;
+        case UE_IDENTIFIER:
+            cJSON_AddItemToObject(root, "identifier", create_identifier_json(obj->identifier));
+            break;
     }
     return root;
 }
@@ -379,6 +389,12 @@ cJSON *create_statement_json(Statement *obj) {
             cJSON_AddItemToObject(root, "for_loop", create_for_loop_json(obj->for_loop));
             break;
         case ST_RETURN_STATEMENT:
+            cJSON_AddItemToObject(root, "return_statement_expr_list", create_expr_list_json(obj->return_statement->expr_list));
+            break;
+        case ST_BREAK:
+            cJSON_AddItemToObject(root, "break_expr", create_expr_json(obj->break_expr));
+            break;
+        case ST_CONTINUE:
             break;
     }
     return root;

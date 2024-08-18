@@ -36,6 +36,17 @@ typedef enum ExprType {
 /**
  *
  */
+typedef enum UnaryExprType {
+    UE_INT,
+    UE_FLOAT,
+    UE_BOOL,
+    UE_STRING,
+    UE_IDENTIFIER,
+} UnaryExprType;
+
+/**
+ *
+ */
 typedef enum StatementType {
     ST_LOCAL_DECLARATION,
     ST_IF_STATEMENT,
@@ -172,12 +183,13 @@ typedef struct ExprList {
  *
  */
 typedef struct UnaryExpr {
-    int type;
+    UnaryExprType type;
     union {
         char *integer_value;
         char *float_value;
         Identifier *identifier;
         char *string;
+        int boolean;
     };
 } UnaryExpr;
 
