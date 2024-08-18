@@ -244,6 +244,7 @@ while_loop:
 
 return_statement:
 		RETURN expr_list { $$ = create_return_statement($2) }
+	|	RETURN { $$ = create_return_statement(NULL) }
 	;
 
 expr_list:

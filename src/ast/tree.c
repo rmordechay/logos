@@ -576,6 +576,16 @@ UnaryExpr *create_unary_expr_from_string(char *string) {
 /**
  *
  */
+MethodCall *create_method_call(MethodSignature *method_signature, ExprList *param_exprs) {
+    MethodCall *method_call = malloc(sizeof(MethodCall));
+    method_call->method_signature = method_signature;
+    method_call->param_exprs = param_exprs;
+    return method_call;
+}
+
+/**
+ *
+ */
 VarDecList *create_var_dec_list(VariableDec *variable_dec) {
     VarDecList *vdl = malloc(sizeof(VarDecList));
     vdl->var_declarations = malloc(sizeof(VariableDec *));
@@ -651,6 +661,7 @@ TypeList *flatten_type_list(TypeList *list, Type *element) {
  *
  */
 void free_entity(Entity *obj) {
+    if (obj == NULL) return;
     switch (obj->type) {
         case E_OBJECT:
             free_object_file(obj->object_entity);
@@ -665,6 +676,7 @@ void free_entity(Entity *obj) {
  *
  */
 void free_object_file(ObjectEntity *obj) {
+    if (obj == NULL) return;
     free_fields_block(obj->fields_block);
     free_methods_block_list(obj->methods_block_list);
     free_implements_block(obj->implements_block);
@@ -676,6 +688,7 @@ void free_object_file(ObjectEntity *obj) {
  *
  */
 void free_implements_block(ImplementsBlock *ib) {
+    if (ib == NULL) return;
     free_type_list(ib->type_list);
     free(ib);
 }
@@ -684,6 +697,7 @@ void free_implements_block(ImplementsBlock *ib) {
  *
  */
 void free_fields_block(FieldsBlock *fb) {
+    if (fb == NULL) return;
     free_field_list(fb->field_list);
     free(fb);
 }
@@ -692,6 +706,7 @@ void free_fields_block(FieldsBlock *fb) {
  *
  */
 void free_field_list(FieldList *fl) {
+    if (fl == NULL) return;
     for (int i = 0; i < fl->count; i++) {
         free_field(fl->fields[i]);
     }
@@ -703,6 +718,7 @@ void free_field_list(FieldList *fl) {
  *
  */
 void free_field(Field *f) {
+    if (f == NULL) return;
     free_variable_declaration(f->variable_declaration);
     free_type(f->implements);
     free(f);
@@ -712,6 +728,7 @@ void free_field(Field *f) {
  *
  */
 void free_methods_block_list(MethodsBlockList *mbl) {
+    if (mbl == NULL) return;
     for (int i = 0; i < mbl->count; i++) {
         free_methods_block(mbl->blocks[i]);
     }
@@ -723,6 +740,7 @@ void free_methods_block_list(MethodsBlockList *mbl) {
  *
  */
 void free_methods_block(MethodsBlock *mb) {
+    if (mb == NULL) return;
     free_identifier(mb->identifier);
     free_methods_list(mb->methods_list);
     free(mb);
@@ -732,6 +750,7 @@ void free_methods_block(MethodsBlock *mb) {
  *
  */
 void free_methods_list(MethodsList *ml) {
+    if (ml == NULL) return;
     for (int i = 0; i < ml->count; i++) {
         free_method(ml->methods[i]);
     }
@@ -743,6 +762,7 @@ void free_methods_list(MethodsList *ml) {
  *
  */
 void free_method(Method *m) {
+    if (m == NULL) return;
     free_method_signature(m->method_signature);
     free_statement_list(m->statement_list);
     free(m);
@@ -752,6 +772,7 @@ void free_method(Method *m) {
  *
  */
 void free_method_signature(MethodSignature *ms) {
+    if (ms == NULL) return;
     free_variable_declaration(ms->method_variable);
     if (ms->param_list) {
         free_variable_declaration_list(ms->param_list);
@@ -764,6 +785,7 @@ void free_method_signature(MethodSignature *ms) {
  *
  */
 void free_statement_list(StatementList *sl) {
+    if (sl == NULL) return;
     for (int i = 0; i < sl->count; i++) {
         free_statement(sl->statements[i]);
     }
@@ -775,6 +797,7 @@ void free_statement_list(StatementList *sl) {
  *
  */
 void free_statement(Statement *s) {
+    if (s == NULL) return;
     switch (s->type) {
         case ST_LOCAL_DECLARATION:
             free_local_declaration(s->local_declaration);
@@ -807,6 +830,7 @@ void free_statement(Statement *s) {
  *
  */
 void free_local_declaration(LocalDeclaration *ld) {
+    if (ld == NULL) return;
     free_variable_declaration(ld->variable_declaration);
     free_expr(ld->expr);
     free(ld);
@@ -816,6 +840,7 @@ void free_local_declaration(LocalDeclaration *ld) {
  *
  */
 void free_if_statement(IfStatement *is) {
+    if (is == NULL) return;
     free_if_block(is->if_block);
     free_or_block(is->or_block);
     free_if_or_block_list(is->if_or_block_list);
@@ -826,6 +851,7 @@ void free_if_statement(IfStatement *is) {
  *
  */
 void free_if_block(IfBlock *ib) {
+    if (ib == NULL) return;
     free_expr(ib->expr);
     free_statement_list(ib->statement_list);
     free(ib);
@@ -835,6 +861,7 @@ void free_if_block(IfBlock *ib) {
  *
  */
 void free_if_or_block_list(IfOrBlockList *iobl) {
+    if (iobl == NULL) return;
     for (int i = 0; i < iobl->count; i++) {
         free_if_or_block(iobl->if_or_blocks[i]);
     }
@@ -845,6 +872,7 @@ void free_if_or_block_list(IfOrBlockList *iobl) {
  *
  */
 void free_if_or_block(IfOrBlock *iob) {
+    if (iob == NULL) return;
     free_expr(iob->expr);
     free_statement_list(iob->statement_list);
     free(iob);
@@ -854,6 +882,7 @@ void free_if_or_block(IfOrBlock *iob) {
  *
  */
 void free_or_block(OrBlock *ob) {
+    if (ob == NULL) return;
     free_statement_list(ob->statement_list);
     free(ob);
 }
@@ -862,6 +891,7 @@ void free_or_block(OrBlock *ob) {
  *
  */
 void free_pattern(Pattern *p) {
+    if (p == NULL) return;
     switch (p->type) {
         case PB_EXPR:
             free_expr(p->expr);
@@ -877,6 +907,7 @@ void free_pattern(Pattern *p) {
  *
  */
 void free_pattern_list(PatternList *pl) {
+    if (pl == NULL) return;
     for (int i = 0; i < pl->count; i++) {
         free_pattern(pl->patterns[i]);
     }
@@ -887,6 +918,7 @@ void free_pattern_list(PatternList *pl) {
  *
  */
 void free_pattern_matching(PatternMatching *pm) {
+    if (pm == NULL) return;
     free_pattern_list(pm->pattern_list);
     free(pm);
 }
@@ -895,6 +927,7 @@ void free_pattern_matching(PatternMatching *pm) {
  *
  */
 void free_pattern_matching_expr(PatternMatchingExpr *pme) {
+    if (pme == NULL) return;
     free_expr(pme->expr);
     free_pattern_list(pme->pattern_list);
     free(pme);
@@ -904,6 +937,7 @@ void free_pattern_matching_expr(PatternMatchingExpr *pme) {
  *
  */
 void free_for_loop(ForLoop *fl) {
+    if (fl == NULL) return;
     switch (fl->type) {
         case FL_WHILE:
             free_while_loop(fl->while_loop);
@@ -922,6 +956,7 @@ void free_for_loop(ForLoop *fl) {
  *
  */
 void free_for_in_loop(ForInLoop *fli) {
+    if (fli == NULL) return;
     free_expr_list(fli->expr_list);
     free_expr(fli->in_expr);
     free(fli);
@@ -931,6 +966,7 @@ void free_for_in_loop(ForInLoop *fli) {
  *
  */
 void free_while_loop(WhileLoop *wl) {
+    if (wl == NULL) return;
     free_expr_list(wl->expr_list);
     free(wl);
 }
@@ -939,6 +975,7 @@ void free_while_loop(WhileLoop *wl) {
  *
  */
 void free_return_statement(ReturnStatement *rs) {
+    if (rs == NULL) return;
     free_expr_list(rs->expr_list);
     free(rs);
 }
@@ -947,6 +984,7 @@ void free_return_statement(ReturnStatement *rs) {
  *
  */
 void free_expr(Expr *e) {
+    if (e == NULL) return;
     if (e->unary_expr != NULL) {
         free_unary_expr(e->unary_expr);
     } else if (e->binary_expr != NULL) {
@@ -959,6 +997,7 @@ void free_expr(Expr *e) {
  *
  */
 void free_expr_list(ExprList *el) {
+    if (el == NULL) return;
     for (int i = 0; i < el->count; ++i) {
         free_expr(el->exprs[i]);
     }
@@ -969,6 +1008,7 @@ void free_expr_list(ExprList *el) {
  *
  */
 void free_binary_expr(BinaryExpr *be) {
+    if (be == NULL) return;
     free_expr(be->left);
     free_expr(be->right);
     free(be);
@@ -978,6 +1018,7 @@ void free_binary_expr(BinaryExpr *be) {
  *
  */
 void free_unary_expr(UnaryExpr *ue) {
+    if (ue == NULL) return;
     switch (ue->type) {
         case UE_IDENTIFIER:
             free_identifier(ue->identifier);
@@ -993,6 +1034,9 @@ void free_unary_expr(UnaryExpr *ue) {
             break;
         case UE_BOOL:
             break;
+        case UE_METHOD_CALL:
+            free(ue->method_call);
+            break;
     }
     free(ue);
 }
@@ -1001,6 +1045,7 @@ void free_unary_expr(UnaryExpr *ue) {
  *
  */
 void free_variable_declaration_list(VarDecList *vdl) {
+    if (vdl == NULL) return;
     for (int i = 0; i < vdl->count; i++) {
         free_variable_declaration(vdl->var_declarations[i]);
     }
@@ -1012,6 +1057,7 @@ void free_variable_declaration_list(VarDecList *vdl) {
  *
  */
 void free_variable_declaration(VariableDec *vd) {
+    if (vd == NULL) return;
     free_type(vd->type);
     free_identifier(vd->identifier);
     free(vd);
@@ -1021,6 +1067,7 @@ void free_variable_declaration(VariableDec *vd) {
  *
  */
 void free_identifier(Identifier *i) {
+    if (i == NULL) return;
     free(i->name);
     free(i);
 }
@@ -1038,6 +1085,7 @@ void free_type(Type *t) {
  *
  */
 void free_type_list(TypeList *tl) {
+    if (tl == NULL) return;
     for (int i = 0; i < tl->count; i++) {
         free_type(tl->types[i]);
     }
