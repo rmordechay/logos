@@ -55,9 +55,16 @@ typedef enum StatementType {
     ST_PATTERN_MATCHING_EXPR,
     ST_ITERATION,
     ST_RETURN_STATEMENT,
-    ST_BREAK,
-    ST_CONTINUE,
 } StatementType;
+
+/**
+ *
+ */
+typedef enum IterationStmtType {
+    IS_BREAK,
+    IS_CONTINUE,
+    IS_STATEMENT,
+} IterationStmtType;
 
 /**
  *
@@ -373,6 +380,24 @@ typedef struct StatementList {
     Statement **statements;
     int count;
 } StatementList;
+/**
+ *
+ */
+typedef struct IterationStmt {
+    IterationStmtType type;
+    union {
+        Expr *break_expr;
+        Statement *statement;
+    };
+} IterationStmt;
+
+/**
+ *
+ */
+typedef struct IterationStmtList {
+    IterationStmt **statements;
+    int count;
+} IterationStmtList;
 
 
 /**
@@ -465,8 +490,11 @@ Statement *create_stmt_from_pm(PatternMatching *pattern_matching);
 Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr);
 Statement *create_stmt_from_iteration(Iteration *iteration);
 Statement *create_stmt_from_return_stmt(ReturnStatement *return_statement);
-Statement *create_stmt_from_break(Expr *break_expr);
-Statement *create_stmt_from_continue();
+// Iteration statement
+IterationStmt *create_stmt_from_break(Expr *break_expr);
+IterationStmt *create_stmt_from_continue();
+IterationStmtList *create_iteration_statement_list(IterationStmt *statement);
+IterationStmtList *flatten_iteration_statement_list(IterationStmtList *list, IterationStmt *element);
 // Declaration
 LocalDeclaration *create_local_declaration(VariableDec *variable_declaration, Expr *expr);
 VarDecList *create_var_dec_list(VariableDec *variable_dec);
@@ -523,6 +551,8 @@ void free_method(Method *m);
 void free_method_signature(MethodSignature *ms);
 void free_statement_list(StatementList *sl);
 void free_statement(Statement *s);
+void free_iteration_statement_list(IterationStmtList *isl);
+void free_iteration_statement(IterationStmt *is);
 void free_local_declaration(LocalDeclaration *ld);
 void free_if_statement(IfStatement *is);
 void free_if_block(IfBlock *ib);

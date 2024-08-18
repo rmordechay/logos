@@ -393,11 +393,6 @@ cJSON *create_statement_json(Statement *obj) {
         case ST_RETURN_STATEMENT:
             cJSON_AddItemToObject(root, "return_statement_expr_list", create_expr_list_json(obj->return_statement->expr_list));
             break;
-        case ST_BREAK:
-            cJSON_AddItemToObject(root, "break_expr", create_expr_json(obj->break_expr));
-            break;
-        case ST_CONTINUE:
-            break;
     }
     return root;
 }

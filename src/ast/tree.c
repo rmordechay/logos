@@ -272,19 +272,47 @@ Statement *create_stmt_from_return_stmt(ReturnStatement *return_statement) {
 /**
  *
  */
-Statement *create_stmt_from_break(Expr *break_expr) {
-    Statement *s = malloc(sizeof(Statement));
+IterationStmtList *create_iteration_statement_list(IterationStmt *statement) {
+    IterationStmtList *sl = malloc(sizeof(IterationStmtList));
+    if (statement != NULL) {
+        sl->statements = malloc(sizeof(IterationStmt *));
+        sl->count = 1;
+        sl->statements[0] = statement;
+    } else {
+        sl->count = 0;
+        sl->statements = NULL;
+    }
+    return sl;
+}
+
+/**
+ *
+ */
+IterationStmtList *flatten_iteration_statement_list(IterationStmtList *list, IterationStmt *element) {
+    int new_size = list->count + 1;
+    IterationStmt **new_list = realloc(list->statements, new_size * sizeof(IterationStmt *));
+    list->statements = new_list;
+    list->statements[list->count] = element;
+    list->count++;
+    return list;
+}
+
+/**
+ *
+ */
+IterationStmt *create_stmt_from_break(Expr *break_expr) {
+    IterationStmt *s = malloc(sizeof(IterationStmt));
     s->break_expr = break_expr;
-    s->type = ST_BREAK;
+    s->type = IS_BREAK;
     return s;
 }
 
 /**
  *
  */
-Statement *create_stmt_from_continue() {
-    Statement *s = malloc(sizeof(Statement));
-    s->type = ST_CONTINUE;
+IterationStmt *create_stmt_from_continue() {
+    IterationStmt *s = malloc(sizeof(IterationStmt));
+    s->type = IS_CONTINUE;
     return s;
 }
 
@@ -817,13 +845,37 @@ void free_statement(Statement *s) {
         case ST_RETURN_STATEMENT:
             free_return_statement(s->return_statement);
             break;
-        case ST_BREAK:
-            free_expr(s->break_expr);
-            break;
-        case ST_CONTINUE:
-            break;
     }
     free(s);
+}
+
+/**
+ *
+ */
+void free_iteration_statement_list(IterationStmtList *isl) {
+    if (isl == NULL) return;
+    for (int i = 0; i < isl->count; i++) {
+        free_iteration_statement(isl->statements[i]);
+    }
+    free(isl);
+}
+
+/**
+ *
+ */
+void free_iteration_statement(IterationStmt *is) {
+    if (is == NULL) return;
+    switch (is->type) {
+        case IS_BREAK && is->break_expr != NULL:
+            free(is->break_expr);
+            break;
+        case IS_STATEMENT:
+            free_statement(is->statement);
+            break;
+        case IS_CONTINUE:
+            break;
+    }
+    free(is);
 }
 
 /**

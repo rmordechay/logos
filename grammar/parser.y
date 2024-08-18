@@ -29,6 +29,8 @@ struct Entity *root;
 	struct MethodHeader *method_header;
 	struct StatementList *statement_list;
 	struct Statement *statement;
+	struct IterationStmt *iteration_statement;
+    struct IterationStmtList *iteration_statement_list;
 	struct LocalDeclaration *local_declaration;
 	struct IfStatement *if_statement;
     struct IfBlock *if_block;
@@ -74,7 +76,8 @@ struct Entity *root;
 %type <method_signature> method_signature
 %type <statement_list> statement_list statements_block
 %type <statement> statement
-%type <statement> iteration_statement
+%type <iteration_statement_list> iteration_statement_list iteration_statement_block
+%type <iteration_statement> iteration_statement
 %type <local_declaration> local_declaration
 %type <if_statement> if_statement
 %type <if_block> if_block
@@ -174,6 +177,15 @@ statement:
 	|	return_statement  { $$ = create_stmt_from_return_stmt($1);  }
 	;
 
+iteration_statement_block:
+		LEFT_BRACE iteration_statement_list RIGHT_BRACE { $$ = $2 }
+	|	LEFT_BRACE RIGHT_BRACE { $$ = create_iteration_statement_list(NULL) }
+	;
+
+iteration_statement_list:
+		iteration_statement { $$ = create_iteration_statement_list($1) }
+	|	iteration_statement_list iteration_statement { $$ = flatten_iteration_statement_list($1, $2) }
+	;
 
 iteration_statement:
 		BREAK unary_expr { $$ = create_stmt_from_break($2) }
@@ -231,9 +243,9 @@ pattern:
 	;
 
 iteration:
-		FOR statements_block { $$ = create_iteration_from_inf_loop($2) }
-	|	while_loop statements_block { $$ = create_iteration_from_while($1, $2) }
-	|	for_in_loop statements_block { $$ = create_iteration_from_for_in($1, $2) }
+		FOR iteration_statement_block { $$ = create_iteration_from_inf_loop($2) }
+	|	while_loop iteration_statement_block { $$ = create_iteration_from_while($1, $2) }
+	|	for_in_loop iteration_statement_block { $$ = create_iteration_from_for_in($1, $2) }
 	;
 
 for_in_loop:
