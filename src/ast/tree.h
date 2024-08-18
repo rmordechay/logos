@@ -341,21 +341,21 @@ typedef struct ForInLoop {
 /**
  *
  */
+typedef struct ReturnStatement {
+    ExprList *expr_list;
+} ReturnStatement;
+
+/**
+ *
+ */
 typedef struct Iteration {
     IterationType type;
     union {
         ForInLoop *for_in_loop;
         WhileLoop *while_loop;
     };
-    struct StatementList *statement_list;
+    struct IterationStmtList *statement_list;
 } Iteration;
-
-/**
- *
- */
-typedef struct ReturnStatement {
-    ExprList *expr_list;
-} ReturnStatement;
 
 /**
  *
@@ -380,6 +380,7 @@ typedef struct StatementList {
     Statement **statements;
     int count;
 } StatementList;
+
 /**
  *
  */
@@ -515,9 +516,9 @@ Pattern *create_pattern_from_expr(Expr *condition, Expr *expr);
 PatternList *create_pattern_list(Pattern *pattern);
 PatternList *flatten_pattern_list(PatternList *list, Pattern *element);
 // For loop
-Iteration *create_iteration_from_for_in(ForInLoop *for_in_loop, StatementList *statement_list);
-Iteration *create_iteration_from_while(WhileLoop *while_loop, StatementList *statement_list);
-Iteration *create_iteration_from_inf_loop(StatementList* statement_list);
+Iteration *create_iteration_from_for_in(ForInLoop *for_in_loop, IterationStmtList *statement_list);
+Iteration *create_iteration_from_while(WhileLoop *while_loop, IterationStmtList *statement_list);
+Iteration *create_iteration_from_inf_loop(IterationStmtList *statement_list);
 ForInLoop *create_for_in_loop(ExprList *expr_list, Expr *in_expr);
 WhileLoop *create_while_loop(ExprList *expr_list);
 // Return statement
