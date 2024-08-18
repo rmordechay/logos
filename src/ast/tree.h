@@ -400,25 +400,6 @@ typedef struct IterationStmtList {
     int count;
 } IterationStmtList;
 
-/**
- *
- */
-typedef struct IterationStmt {
-    IterationStmtType type;
-    union {
-        Expr *break_expr;
-        Statement *statement;
-    };
-} IterationStmt;
-
-/**
- *
- */
-typedef struct IterationStmtList {
-    IterationStmt **statements;
-    int count;
-} IterationStmtList;
-
 
 /**
  *
