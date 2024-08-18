@@ -4,7 +4,7 @@
 #include "ast/tree.h"
 #include "parser.h"
 
-void print_object_file_json(ObjectFile *object_file);
+void print_object_file_json(Entity *entity);
 cJSON *create_identifier_json(Identifier *obj);
 cJSON *create_type_json(Type *obj);
 cJSON *create_type_list_json(TypeList *list);
@@ -44,8 +44,17 @@ cJSON *create_object_file_json(ObjectFile *obj);
 /**
  *
  */
-void print_object_file_json(ObjectFile *object_file) {
-    cJSON *json = create_object_file_json(object_file);
+void print_object_file_json(Entity *entity) {
+    cJSON *json = NULL;
+    switch (entity->type) {
+        case OBJECT_ENTITY:
+            json = create_object_file_json(entity->object_file);
+            break;
+        case INTERFACE_ENTITY:
+        case ENUM_ENTITY:
+            break;
+    }
+    if (!json) return;
     char *json_string = cJSON_Print(json);
     printf("%s\n", json_string);
     free(json_string);

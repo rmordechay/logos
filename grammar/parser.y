@@ -9,7 +9,7 @@ extern int yylineno;
 extern FILE* yyin;
 void yyerror(const char* s);
 
-struct ObjectFile *root;
+struct Entity *root;
 
 %}
 
@@ -106,7 +106,7 @@ struct ObjectFile *root;
 %%
 
 program:
-    	object_file { analyse_ast($1) }
+    	object_file { analyse_ast(create_entity(OBJECT_ENTITY, $1)) }
     ;
 
 object_file:

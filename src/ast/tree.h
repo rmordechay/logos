@@ -19,6 +19,15 @@ typedef enum NumberType {
 /**
  *
  */
+typedef enum EntityType {
+    OBJECT_ENTITY,
+    INTERFACE_ENTITY,
+    ENUM_ENTITY,
+} EntityType;
+
+/**
+ *
+ */
 typedef enum ExprType {
     UNARY,
     BINARY,
@@ -390,8 +399,18 @@ typedef struct ObjectFile {
     MethodsBlockList *methods_block_list;
 } ObjectFile;
 
+/**
+ *
+ */
+typedef struct Entity {
+    EntityType type;
+    union {
+        ObjectFile *object_file;
+    };
+} Entity;
 
-void analyse_ast(ObjectFile *root);
+void analyse_ast(Entity *root);
+Entity *create_entity(EntityType entity_type, void *entity_tree);
 
 ObjectFile *create_object_file(Identifier *identifier, ImplementsBlock *implements_block, FieldsBlock *fields_block, MethodsBlockList *methods_block_list);
 ImplementsBlock *create_implements_block(TypeList *type_list);
@@ -460,6 +479,7 @@ Type *create_type(const char *name);
 TypeList *create_type_list(Type *type);
 TypeList *flatten_type_list(TypeList *list, Type *element);
 
+void free_entity(Entity *obj);
 void free_object_file(ObjectFile *obj);
 void free_implements_block(ImplementsBlock *ib);
 void free_fields_block(FieldsBlock *fb);

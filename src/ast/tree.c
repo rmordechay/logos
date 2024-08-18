@@ -4,13 +4,30 @@
 #include "tree.h"
 #include "parser.h"
 
-void print_object_file_json(ObjectFile *object_file);
+void print_object_file_json(Entity *entity);
 
 /**
  *
  */
-void analyse_ast(ObjectFile *root) {
+void analyse_ast(Entity *root) {
     print_object_file_json(root);
+}
+
+/**
+ *
+ */
+Entity *create_entity(EntityType entity_type, void *entity_tree) {
+    Entity *entity = malloc(sizeof(Entity));
+    switch (entity_type) {
+        case OBJECT_ENTITY:
+            entity->type = entity_type;
+            entity->object_file = entity_tree;
+            break;
+        case INTERFACE_ENTITY:
+        case ENUM_ENTITY:
+            break;
+    }
+    return entity;
 }
 
 /**
@@ -598,6 +615,20 @@ TypeList *flatten_type_list(TypeList *list, Type *element) {
     list->types[list->count] = element;
     list->count++;
     return list;
+}
+
+/**
+ *
+ */
+void free_entity(Entity *obj) {
+    switch (obj->type) {
+        case OBJECT_ENTITY:
+            free_object_file(obj->object_file);
+            break;
+        case INTERFACE_ENTITY:
+        case ENUM_ENTITY:
+            break;
+    }
 }
 
 /**
