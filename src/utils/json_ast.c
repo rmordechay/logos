@@ -112,7 +112,7 @@ cJSON *create_variable_declaration_json(VariableDec *obj) {
 cJSON *create_variable_declaration_list_json(VarDecList *list) {
     cJSON *root = cJSON_CreateArray();
     for (int i = 0; i < list->count; i++) {
-        cJSON_AddItemToArray(root, create_variable_declaration_json(list->declarations[i]));
+        cJSON_AddItemToArray(root, create_variable_declaration_json(list->var_declarations[i]));
     }
     return root;
 }

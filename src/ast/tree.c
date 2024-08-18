@@ -60,13 +60,13 @@ FieldList *create_field_list(Field *field) {
 /**
  *
  */
-FieldList *flatten_field_list(FieldList *field_list, Field *field) {
-    int i = field_list->count;
-    Field **new_list = realloc(field_list->fields, i * sizeof(Field *));
-    field_list->fields = new_list;
-    field_list->fields[i] = field;
-    field_list->count++;
-    return field_list;
+FieldList *flatten_field_list(FieldList *list, Field *element) {
+    int new_size = list->count + 1;
+    Field **new_list = realloc(list->fields, new_size * sizeof(Field *));
+    list->fields = new_list;
+    list->fields[list->count] = element;
+    list->count++;
+    return list;
 }
 
 /**
@@ -93,13 +93,13 @@ MethodsBlockList *create_methods_block_list(MethodsBlock *methodBlock) {
 /**
  *
  */
-MethodsBlockList *flatten_methods_block_list(MethodsBlockList *methods_block_list, MethodsBlock *methods_block) {
-    int i = methods_block_list->count;
-    MethodsBlock **new_list = realloc(methods_block_list->blocks, i * sizeof(MethodsBlock *));
-    methods_block_list->blocks = new_list;
-    methods_block_list->blocks[i] = methods_block;
-    methods_block_list->count++;
-    return methods_block_list;
+MethodsBlockList *flatten_methods_block_list(MethodsBlockList *list, MethodsBlock *element) {
+    int new_size = list->count + 1;
+    MethodsBlock **new_list = realloc(list->blocks, new_size * sizeof(MethodsBlock *));
+    list->blocks = new_list;
+    list->blocks[list->count] = element;
+    list->count++;
+    return list;
 }
 
 /**
@@ -127,13 +127,13 @@ MethodsList *create_methods_list(Method *method) {
 /**
  *
  */
-MethodsList *flatten_methods_list(MethodsList *methods_list, Method *method) {
-    int i = methods_list->count;
-    Method **new_list = realloc(methods_list->methods, i * sizeof(Method *));
-    methods_list->methods = new_list;
-    methods_list->methods[i] = method;
-    methods_list->count++;
-    return methods_list;
+MethodsList *flatten_methods_list(MethodsList *list, Method *element) {
+    int new_size = list->count + 1;
+    Method **new_list = realloc(list->methods, new_size * sizeof(Method *));
+    list->methods = new_list;
+    list->methods[list->count] = element;
+    list->count++;
+    return list;
 }
 
 /**
@@ -185,13 +185,13 @@ StatementList *create_statement_list(Statement *statement) {
 /**
  *
  */
-StatementList *flatten_statement_list(StatementList *statement_list, Statement *statement) {
-    int new_size = statement_list->count + 1;
-    Statement **new_list = realloc(statement_list->statements, new_size * sizeof(Statement *));
-    statement_list->statements = new_list;
-    statement_list->statements[statement_list->count] = statement;
-    statement_list->count++;
-    return statement_list;
+StatementList *flatten_statement_list(StatementList *list, Statement *element) {
+    int new_size = list->count + 1;
+    Statement **new_list = realloc(list->statements, new_size * sizeof(Statement *));
+    list->statements = new_list;
+    list->statements[list->count] = element;
+    list->count++;
+    return list;
 }
 
 /**
@@ -291,13 +291,13 @@ IfOrBlockList *create_if_or_block_list(IfOrBlock *if_or_block) {
 /**
  *
  */
-IfOrBlockList *flatten_if_or_block_list(IfOrBlockList *if_or_block_list, IfOrBlock *if_or_block) {
-    int i = if_or_block_list->count;
-    IfOrBlock **new_list = realloc(if_or_block_list->if_or_blocks, i * sizeof(IfOrBlock *));
-    if_or_block_list->if_or_blocks = new_list;
-    if_or_block_list->if_or_blocks[i] = if_or_block;
-    if_or_block_list->count++;
-    return if_or_block_list;
+IfOrBlockList *flatten_if_or_block_list(IfOrBlockList *list, IfOrBlock *element) {
+    int new_size = list->count + 1;
+    IfOrBlock **new_list = realloc(list->if_or_blocks, new_size * sizeof(IfOrBlock *));
+    list->if_or_blocks = new_list;
+    list->if_or_blocks[list->count] = element;
+    list->count++;
+    return list;
 }
 
 /**
@@ -374,13 +374,13 @@ PatternList *create_pattern_list(Pattern *pattern) {
 /**
  *
  */
-PatternList *flatten_pattern_list(PatternList *pattern_list, Pattern *pattern) {
-    int i = pattern_list->count;
-    Pattern **new_list = realloc(pattern_list->patterns, i * sizeof(Pattern *));
-    pattern_list->patterns = new_list;
-    pattern_list->patterns[i] = pattern;
-    pattern_list->count++;
-    return pattern_list;
+PatternList *flatten_pattern_list(PatternList *list, Pattern *element) {
+    int new_size = list->count + 1;
+    Pattern **new_list = realloc(list->patterns, new_size * sizeof(Pattern *));
+    list->patterns = new_list;
+    list->patterns[list->count] = element;
+    list->count++;
+    return list;
 }
 
 /**
@@ -466,13 +466,13 @@ ExprList *create_expr_list(Expr *expr) {
 /**
  *
  */
-ExprList *flatten_expr_list(ExprList *expr_list, Expr *expr) {
-    int i = expr_list->count;
-    Expr **new_list = realloc(expr_list->exprs, i * sizeof(Expr *));
-    expr_list->exprs = new_list;
-    expr_list->exprs[i] = expr;
-    expr_list->count++;
-    return expr_list;
+ExprList *flatten_expr_list(ExprList *list, Expr *element) {
+    int new_size = list->count + 1;
+    Expr **new_list = realloc(list->exprs, new_size * sizeof(Expr *));
+    list->exprs = new_list;
+    list->exprs[list->count] = element;
+    list->count++;
+    return list;
 }
 
 
@@ -513,22 +513,22 @@ UnaryExpr *create_unary_expr_from_id(Identifier *identifier) {
  */
 VarDecList *create_var_dec_list(VariableDec *variable_dec) {
     VarDecList *vdl = malloc(sizeof(VarDecList));
-    vdl->declarations = malloc(sizeof(VariableDec *));
+    vdl->var_declarations = malloc(sizeof(VariableDec *));
     vdl->count = 1;
-    vdl->declarations[0] = variable_dec;
+    vdl->var_declarations[0] = variable_dec;
     return vdl;
 }
 
 /**
  *
  */
-VarDecList *flatten_var_dec_list(VarDecList *var_dec_list, VariableDec *variable_dec) {
-    int i = var_dec_list->count;
-    VariableDec **new_list = realloc(var_dec_list->declarations, i * sizeof(VariableDec *));
-    var_dec_list->declarations = new_list;
-    var_dec_list->declarations[i] = variable_dec;
-    var_dec_list->count++;
-    return var_dec_list;
+VarDecList *flatten_var_dec_list(VarDecList *list, VariableDec *element) {
+    int new_size = list->count + 1;
+    VariableDec **new_list = realloc(list->var_declarations, new_size * sizeof(VariableDec *));
+    list->var_declarations = new_list;
+    list->var_declarations[list->count] = element;
+    list->count++;
+    return list;
 }
 
 /**
@@ -573,13 +573,13 @@ TypeList *create_type_list(Type *type) {
 /**
  *
  */
-TypeList *flatten_type_list(TypeList *type_list, Type *type) {
-    int i = type_list->count;
-    Type **new_list = realloc(type_list->types, i * sizeof(Type *));
-    type_list->types = new_list;
-    type_list->types[i] = type;
-    type_list->count++;
-    return type_list;
+TypeList *flatten_type_list(TypeList *list, Type *element) {
+    int new_size = list->count + 1;
+    Type **new_list = realloc(list->types, new_size * sizeof(Type *));
+    list->types = new_list;
+    list->types[list->count] = element;
+    list->count++;
+    return list;
 }
 
 /**
@@ -899,9 +899,9 @@ void free_unary_expr(UnaryExpr *ue) {
  */
 void free_variable_declaration_list(VarDecList *vdl) {
     for (int i = 0; i < vdl->count; i++) {
-        free_variable_declaration(vdl->declarations[i]);
+        free_variable_declaration(vdl->var_declarations[i]);
     }
-    free(vdl->declarations);
+    free(vdl->var_declarations);
     free(vdl);
 }
 
