@@ -42,6 +42,7 @@ struct ObjectFile *root;
     struct ForLoop *for_loop;
     struct ForInLoop *for_in_loop;
     struct WhileLoop *while_loop;
+    struct ReturnStatement *return_statement;
 	struct Expr *expr;
 	struct ExprList *expr_list;
 	struct BinaryExpr *binary_expr;
@@ -55,7 +56,7 @@ struct ObjectFile *root;
 
 %start program
 
-%token LET FUNC IMPLEMENTS FIELDS SELF OBJECT IF FOR RETURN IMPORT AND OR NOT IN
+%token LET FUNC IMPLEMENTS FIELDS SELF OBJECT IF FOR IMPORT AND OR NOT IN RETURN BREAK CONTINUE
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE LEFT_BRACKET RIGHT_BRACKET LEFT_ANGLE RIGHT_ANGLE
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER BOOL
@@ -85,8 +86,9 @@ struct ObjectFile *root;
 %type <pattern> pattern
 %type <pattern_list> pattern_list
 %type <for_loop> for_loop
-%type <while_loop> while_loop
 %type <for_in_loop> for_in_loop
+%type <while_loop> while_loop
+%type <return_statement> return_statement
 %type <expr> expr
 %type <expr_list> expr_list
 %type <unary_expr> unary_expr
@@ -173,6 +175,7 @@ statement:
 	|	pattern_matching  { $$ = create_stmt_from_pm($1);  }
 	|	pattern_matching_expr  { $$ = create_stmt_from_pme($1);  }
 	|	for_loop  { $$ = create_stmt_from_for_loop($1);  }
+	|	return_statement  { $$ = create_stmt_from_return_stmt($1);  }
 	;
 
 local_declaration:
@@ -235,6 +238,10 @@ for_in_loop:
 
 while_loop:
 		FOR expr_list { $$ = create_while_loop($2) }
+	;
+
+return_statement:
+		RETURN expr_list { $$ = create_return_statement($2) }
 	;
 
 expr_list:

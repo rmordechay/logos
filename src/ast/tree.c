@@ -210,7 +210,7 @@ Statement *create_stmt_from_local_dec(LocalDeclaration *local_declaration) {
 Statement *create_stmt_from_if_stmt(IfStatement *if_statement) {
     Statement *s = malloc(sizeof(Statement));
     s->if_statement = if_statement;
-    s->type = IF_STMT;
+    s->type = IF_STATEMENT;
     return s;
 }
 
@@ -241,6 +241,16 @@ Statement *create_stmt_from_for_loop(ForLoop *for_loop) {
     Statement *s = malloc(sizeof(Statement));
     s->for_loop = for_loop;
     s->type = FOR_LOOP;
+    return s;
+}
+
+/**
+ *
+ */
+Statement *create_stmt_from_return_stmt(ReturnStatement *return_statement) {
+    Statement *s = malloc(sizeof(Statement));
+    s->return_statement = return_statement;
+    s->type = RETURN_STATEMENT;
     return s;
 }
 
@@ -426,10 +436,18 @@ ForInLoop *create_for_in_loop(ExprList *expr_list, Expr *in_expr) {
 /**
  *
  */
-WhileLoop *create_while_loop(Expr *expr) {
+WhileLoop *create_while_loop(ExprList *expr_list) {
     WhileLoop *while_loop = malloc(sizeof(WhileLoop));
-    while_loop->condition = expr;
+    while_loop->expr_list = expr_list;
     return while_loop;
+}
+/**
+ *
+ */
+ReturnStatement *create_return_statement(ExprList *expr_list) {
+    ReturnStatement *return_statement = malloc(sizeof(ReturnStatement));
+    return_statement->expr_list = expr_list;
+    return return_statement;
 }
 
 /**
@@ -705,7 +723,7 @@ void free_statement(Statement *s) {
         case LOCAL_DECLARATION:
             free_local_declaration(s->local_declaration);
             break;
-        case IF_STMT:
+        case IF_STATEMENT:
             free_if_statement(s->if_statement);
             break;
         case PATTERN_MATCHING:
@@ -716,6 +734,9 @@ void free_statement(Statement *s) {
             break;
         case FOR_LOOP:
             free_for_loop(s->for_loop);
+            break;
+        case RETURN_STATEMENT:
+            free_return_statement(s->return_statement);
             break;
     }
     free(s);
@@ -849,8 +870,16 @@ void free_for_in_loop(ForInLoop *fli) {
  *
  */
 void free_while_loop(WhileLoop *wl) {
-    free_expr(wl->condition);
+    free_expr_list(wl->expr_list);
     free(wl);
+}
+
+/**
+ *
+ */
+void free_return_statement(ReturnStatement *rs) {
+    free_expr_list(rs->expr_list);
+    free(rs);
 }
 
 /**

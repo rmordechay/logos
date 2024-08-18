@@ -1,6 +1,9 @@
 #ifndef TREE_H
 #define TREE_H
 
+/**
+ *
+ */
 typedef enum NumberType {
     LG_BOOL_VALUE,
     LG_SHORT_VALUE,
@@ -13,30 +16,46 @@ typedef enum NumberType {
     LG_DOUBLE_VALUE,
 } NumberType;
 
+/**
+ *
+ */
 typedef enum ExprType {
     UNARY,
     BINARY,
 } ExprType;
 
+/**
+ *
+ */
 typedef enum StmtType {
     LOCAL_DECLARATION,
-    IF_STMT,
+    IF_STATEMENT,
     PATTERN_MATCHING,
     PATTERN_MATCHING_EXPR,
     FOR_LOOP,
+    RETURN_STATEMENT,
 } StmtType;
 
+/**
+ *
+ */
 typedef enum PatternBodyType {
     EXPR_BODY,
     STMT_LIST_BODY,
 } PatternBodyType;
 
+/**
+ *
+ */
 typedef enum UnaryExprType {
     UNARY_IDENTIFIER,
     UNARY_NUMBER,
     UNARY_FUNC_CALL,
 } UnaryExprType;
 
+/**
+ *
+ */
 typedef enum ForLoopType {
     WHILE_LOOP,
     INFINITE_LOOP,
@@ -258,7 +277,7 @@ typedef struct PatternMatchingExpr {
  *
  */
 typedef struct WhileLoop {
-    Expr *condition;
+    ExprList *expr_list;
 } WhileLoop;
 
 /**
@@ -285,6 +304,13 @@ typedef struct ForLoop {
 /**
  *
  */
+typedef struct ReturnStatement {
+    ExprList *expr_list;
+} ReturnStatement;
+
+/**
+ *
+ */
 typedef struct Statement {
     StmtType type;
     union {
@@ -293,6 +319,7 @@ typedef struct Statement {
         PatternMatching *pattern_matching;
         PatternMatchingExpr *pattern_matching_expr;
         ForLoop *for_loop;
+        ReturnStatement *return_statement;
     };
 } Statement;
 
@@ -391,6 +418,7 @@ Statement *create_stmt_from_if_stmt(IfStatement *if_statement);
 Statement *create_stmt_from_pm(PatternMatching *pattern_matching);
 Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr);
 Statement *create_stmt_from_for_loop(ForLoop *for_loop);
+Statement *create_stmt_from_return_stmt(ReturnStatement *return_statement);
 // Declaration
 LocalDeclaration *create_local_declaration(VariableDec *variable_declaration, Expr *expr);
 VarDecList *create_var_dec_list(VariableDec *variable_dec);
@@ -415,7 +443,9 @@ ForLoop *create_for_loop_from_for_in(ForInLoop *for_in_loop, StatementList *stat
 ForLoop *create_for_loop_from_while(WhileLoop *while_loop, StatementList *statement_list);
 ForLoop *create_for_loop_from_inf_loop(StatementList* statement_list);
 ForInLoop *create_for_in_loop(ExprList *expr_list, Expr *in_expr);
-WhileLoop *create_while_loop(Expr *expr);
+WhileLoop *create_while_loop(ExprList *expr_list);
+// Return statement
+ReturnStatement *create_return_statement(ExprList *expr_list);
 // Expression
 Expr *create_expr_from_unary(UnaryExpr *unary_expr);
 Expr *create_expr_from_binary(BinaryExpr *binary_expr);
@@ -456,6 +486,7 @@ void free_pattern_matching_expr(PatternMatchingExpr *pme);
 void free_for_loop(ForLoop *fl);
 void free_for_in_loop(ForInLoop *fli);
 void free_while_loop(WhileLoop *wl);
+void free_return_statement(ReturnStatement *rs);
 void free_expr(Expr *e);
 void free_expr_list(ExprList *el);
 void free_binary_expr(BinaryExpr *be);

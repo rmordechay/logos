@@ -19,6 +19,9 @@ int line_number = 1;
 "if"                    { return IF; }
 "for"                   { return FOR; }
 "return"                { return RETURN; }
+"break"                 { return BREAK; }
+"continue"              { return CONTINUE; }
+"return"                { return RETURN; }
 "import"                { return IMPORT; }
 "and"                   { return AND; }
 "or"                    { return OR; }
