@@ -566,6 +566,16 @@ UnaryExpr *create_unary_expr_from_id(Identifier *identifier) {
 /**
  *
  */
+UnaryExpr *create_unary_expr_from_string(char *string) {
+    UnaryExpr *ue = malloc(sizeof(UnaryExpr));
+    ue->string = string;
+    ue->type = STRING;
+    return ue;
+}
+
+/**
+ *
+ */
 VarDecList *create_var_dec_list(VariableDec *variable_dec) {
     VarDecList *vdl = malloc(sizeof(VarDecList));
     vdl->var_declarations = malloc(sizeof(VariableDec *));

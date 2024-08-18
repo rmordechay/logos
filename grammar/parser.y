@@ -59,7 +59,7 @@ struct Entity *root;
 %token LET FUNC IMPLEMENTS FIELDS SELF OBJECT IF FOR IMPORT AND OR NOT IN RETURN BREAK CONTINUE
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE LEFT_BRACKET RIGHT_BRACKET LEFT_ANGLE RIGHT_ANGLE
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
-%token <val> INTEGER FLOAT IDENTIFIER BOOL
+%token <val> INTEGER FLOAT IDENTIFIER BOOL STRING
 
 %type <object_entity> program
 %type <object_entity> object_entity
@@ -269,6 +269,7 @@ unary_expr:
 		INTEGER { $$ = create_unary_expr_from_number(INTEGER, yylval.val) }
 	| 	FLOAT { $$ = create_unary_expr_from_number(FLOAT, yylval.val) }
 	| 	BOOL { $$ = create_unary_expr_from_number(BOOL, yylval.val) }
+	| 	STRING { $$ = create_unary_expr_from_string(yylval.val) }
 	| 	identifier { $$ = create_unary_expr_from_id($1) }
 	;
 

@@ -64,7 +64,7 @@ cJSON *create_object_file_json(ObjectEntity *obj) {
  */
 cJSON *create_identifier_json(Identifier *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddStringToObject(root, "name", obj->name);
+    cJSON_AddStringToObject(root, "enums", obj->name);
     return root;
 }
 
@@ -73,7 +73,7 @@ cJSON *create_identifier_json(Identifier *obj) {
  */
 cJSON *create_type_json(Type *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddStringToObject(root, "name", obj->name);
+    cJSON_AddStringToObject(root, "enums", obj->name);
     return root;
 }
 

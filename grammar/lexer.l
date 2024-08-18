@@ -3,9 +3,15 @@
 #include "parser.h"
 
 int line_number = 1;
+
 %}
 
 %option yylineno
+
+INTEGER   [0-9]+
+FLOAT     [0-9]+\.[0-9]+
+IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
+STRING    \"([^\"\\]|\\.)*\"
 
 %%
 
@@ -51,9 +57,10 @@ int line_number = 1;
 "$"                     { return DOLLAR; }
 "&"                     { return AMPERSAND; }
 
-[0-9]+                  { yylval.val = strdup(yytext); return INTEGER; }
-[0-9]+\.[0-9]+          { yylval.val = strdup(yytext); return FLOAT; }
-[a-zA-Z_][a-zA-Z0-9_]*  { yylval.val = strdup(yytext); return IDENTIFIER; }
+{INTEGER}               { yylval.val = strdup(yytext); return INTEGER; }
+{FLOAT}                 { yylval.val = strdup(yytext); return FLOAT; }
+{IDENTIFIER}            { yylval.val = strdup(yytext); return IDENTIFIER; }
+{STRING}                { yylval.val = strdup(yytext); return STRING; }
 
 [ \n\e]+                  { /* Ignore whitespace */ }
 

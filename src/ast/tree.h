@@ -106,6 +106,22 @@ typedef struct VariableDeclarationList {
 /**
  *
  */
+typedef struct Enum {
+    char *name;
+    char *string;
+} Enum;
+
+/**
+ *
+ */
+typedef struct EnumBlock {
+    Enum **enums;
+    int count;
+} EnumBlock;
+
+/**
+ *
+ */
 typedef struct Field {
     VariableDec *variable_declaration;
     Type *implements;  // Optional
@@ -161,6 +177,7 @@ typedef struct UnaryExpr {
         char *integer_value;
         char *float_value;
         Identifier *identifier;
+        char *string;
     };
 } UnaryExpr;
 
@@ -463,6 +480,7 @@ ExprList *flatten_expr_list(ExprList *list, Expr *element);
 BinaryExpr *create_binary_expr(Expr *left, Expr *right, char operator);
 UnaryExpr *create_unary_expr_from_number(int type, char *integer_value);
 UnaryExpr *create_unary_expr_from_id(Identifier *identifier);
+UnaryExpr *create_unary_expr_from_string(char *string);
 // Primitives
 Identifier *create_identifier(const char *name);
 Type *create_type(const char *name);
