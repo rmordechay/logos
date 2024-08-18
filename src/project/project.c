@@ -62,7 +62,7 @@ void init_project() {
                 char full_path[PATH_MAX];
                 snprintf(full_path, sizeof(full_path), "%s/%s", app->root_path, entry->d_name);
                 app_file->path = full_path;
-                if (strcmp(name, "object.lgs") == 0) {
+                if (strcmp(name, "Object.lgs") == 0) {
                     const char *code = read_file_content(app_file->path);
                     app_file->code = code;
                     parse(app_file->code);

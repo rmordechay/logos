@@ -39,6 +39,7 @@ struct ObjectFile *root;
     struct PatternMatching *pattern_matching;
     struct Pattern *pattern;
     struct PatternList *pattern_list;
+    struct ForLoop *for_loop;
 	struct Expr *expr;
 	struct ExprList *expr_list;
 	struct BinaryExpr *binary_expr;
@@ -52,11 +53,10 @@ struct ObjectFile *root;
 
 %start program
 
-%token BOOL
 %token LET FUNC IMPLEMENTS FIELDS SELF OBJECT IF FOR RETURN IMPORT AND OR NOT IN
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE LEFT_BRACKET RIGHT_BRACKET LEFT_ANGLE RIGHT_ANGLE
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
-%token <val> INTEGER FLOAT IDENTIFIER
+%token <val> INTEGER FLOAT IDENTIFIER BOOL
 
 %type <object_file> program
 %type <object_file> object_file
@@ -82,6 +82,7 @@ struct ObjectFile *root;
 %type <pattern_matching> pattern_matching
 %type <pattern> pattern
 %type <pattern_list> pattern_list
+%type <for_loop> for_loop
 %type <expr> expr
 %type <expr_list> expr_list
 %type <unary_expr> unary_expr
@@ -167,6 +168,7 @@ statement:
 	|	if_statement { $$ = create_stmt_from_if_stmt($1);  }
 	|	pattern_matching  { $$ = create_stmt_from_pm($1);  }
 	|	pattern_matching_expr  { $$ = create_stmt_from_pme($1);  }
+	|	for_loop  { $$ = create_stmt_from_for_loop($1);  }
 	;
 
 local_declaration:
@@ -190,9 +192,8 @@ if_or_block_list:
 	;
 
 if_or_block:
-      OR expr statements_block { $$ = create_if_block($2, $3) }
+      OR expr statements_block { $$ = create_if_or_block($2, $3) }
     ;
-
 
 or_block:
       OR statements_block { $$ = create_or_block($2) }
@@ -218,9 +219,25 @@ pattern:
 	|	OR COLON statements_block { $$ = create_pattern_from_stmt_list(NULL, $3) }
 	;
 
+for_loop:
+		FOR statements_block
+	|	while_loop statements_block
+	|	for_in_loop statements_block
+	;
+
+
+while_loop:
+		FOR expr_list
+	;
+
+for_in_loop:
+		FOR expr_list IN expr
+	;
+
 expr_list:
 		expr { $$ = create_expr_list($1) }
-	|	expr_list expr { $$ =  flatten_expr_list($1, $2) }
+	|	expr_list COMMA expr { $$ =  flatten_expr_list($1, $3) }
+	|	LEFT_PAREN expr_list RIGHT_PAREN { $$ =  $2 }
     ;
 
 expr:

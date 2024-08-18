@@ -23,6 +23,7 @@ typedef enum StmtType {
     IF_STMT,
     PATTERN_MATCHING,
     PATTERN_MATCHING_EXPR,
+    FOR_LOOP,
 } StmtType;
 
 typedef enum PatternBodyType {
@@ -35,6 +36,12 @@ typedef enum UnaryExprType {
     UNARY_NUMBER,
     UNARY_FUNC_CALL,
 } UnaryExprType;
+
+typedef enum ForLoopType {
+    WHILE_LOOP,
+    ENDLESS_LOOP,
+    FOR_IN_LOOP,
+} ForLoopType;
 
 /**
  *
@@ -211,6 +218,7 @@ typedef struct IfStatement {
     OrBlock *or_block;
 } IfStatement;
 
+
 /**
  *
  */
@@ -249,6 +257,35 @@ typedef struct PatternMatchingExpr {
 /**
  *
  */
+typedef struct WhileLoop {
+    ExprList *expr_list;
+    Expr *in_expr;
+} WhileLoop;
+
+/**
+ *
+ */
+typedef struct ForInLoop {
+    ExprList *expr_list;
+    Expr *in_expr;
+} ForInLoop;
+
+
+/**
+ *
+ */
+typedef struct ForLoop {
+    ForLoopType type;
+    union {
+        ForInLoop *for_in_loop;
+        WhileLoop *while_loop;
+    };
+    struct StatementList *statement_list;
+} ForLoop;
+
+/**
+ *
+ */
 typedef struct Statement {
     StmtType type;
     union {
@@ -256,6 +293,7 @@ typedef struct Statement {
         IfStatement *if_statement;
         PatternMatching *pattern_matching;
         PatternMatchingExpr *pattern_matching_expr;
+        ForLoop *for_loop;
     };
 } Statement;
 
@@ -352,6 +390,7 @@ Statement *create_stmt_from_local_dec(LocalDeclaration *local_declaration);
 Statement *create_stmt_from_if_stmt(IfStatement *if_statement);
 Statement *create_stmt_from_pm(PatternMatching *pattern_matching);
 Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr);
+Statement *create_stmt_from_for_loop(ForLoop *for_loop);
 // Declaration
 LocalDeclaration *create_local_declaration(VariableDec *variable_declaration, Expr *expr);
 VarDecList *create_var_dec_list(VariableDec *variable_dec);
@@ -371,6 +410,9 @@ Pattern *create_pattern_from_stmt_list(Expr *condition, StatementList *statement
 Pattern *create_pattern_from_expr(Expr *condition, Expr *expr);
 PatternList *create_pattern_list(Pattern *pattern);
 PatternList *flatten_pattern_list(PatternList *pattern_list, Pattern *pattern);
+// For loop
+ForLoop *create_for_loop(StatementList *statement_list);
+ForInLoop *create_for_in_loop(ExprList *expr_list, Expr *in_expr);
 // Expression
 Expr *create_expr_from_unary(UnaryExpr *unary_expr);
 Expr *create_expr_from_binary(BinaryExpr *binary_expr);
@@ -408,6 +450,9 @@ void free_pattern(Pattern *p);
 void free_pattern_list(PatternList *pl);
 void free_pattern_matching(PatternMatching *pm);
 void free_pattern_matching_expr(PatternMatchingExpr *pme);
+void free_for_loop(ForLoop *fl);
+void free_for_in_loop(ForInLoop *fli);
+void free_while_loop(WhileLoop *wl);
 void free_expr(Expr *e);
 void free_expr_list(ExprList *el);
 void free_binary_expr(BinaryExpr *be);

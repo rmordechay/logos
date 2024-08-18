@@ -324,10 +324,13 @@ cJSON *create_statement_json(Statement *obj) {
             cJSON_AddItemToObject(root, "if_statement", create_if_statement_json(obj->if_statement));
             break;
         case PATTERN_MATCHING:
-            cJSON_AddItemToObject(root, "pattern_matching", create_pattern_matching_json(obj->if_statement));
+            cJSON_AddItemToObject(root, "pattern_matching", create_pattern_matching_json(obj->pattern_matching));
             break;
         case PATTERN_MATCHING_EXPR:
-            cJSON_AddItemToObject(root, "pattern_matching_expr", create_pattern_matching_expr_json(obj->if_statement));
+            cJSON_AddItemToObject(root, "pattern_matching_expr", create_pattern_matching_expr_json(obj->pattern_matching_expr));
+            break;
+        case FOR_LOOP:
+//            cJSON_AddItemToObject(root, "for_loop", create_for_loop_json(obj->if_statement));
             break;
     }
     return root;
