@@ -532,6 +532,7 @@ BinaryExpr *create_binary_expr(Expr *left, Expr *right, char operator);
 UnaryExpr *create_unary_expr_from_number(int type, char *integer_value);
 UnaryExpr *create_unary_expr_from_id(Identifier *identifier);
 UnaryExpr *create_unary_expr_from_string(char *string);
+UnaryExpr *create_unary_expr_from_method_call(MethodCall *method_call);
 MethodCall *create_method_call(MethodSignature *method_signature, ExprList *param_exprs);
 // Primitives
 Identifier *create_identifier(const char *name);

@@ -587,7 +587,7 @@ UnaryExpr *create_unary_expr_from_number(int type, char *integer_value) {
 UnaryExpr *create_unary_expr_from_id(Identifier *identifier) {
     UnaryExpr *ue = malloc(sizeof(UnaryExpr));
     ue->identifier = identifier;
-    ue->type = IDENTIFIER;
+    ue->type = UE_IDENTIFIER;
     return ue;
 }
 
@@ -597,7 +597,17 @@ UnaryExpr *create_unary_expr_from_id(Identifier *identifier) {
 UnaryExpr *create_unary_expr_from_string(char *string) {
     UnaryExpr *ue = malloc(sizeof(UnaryExpr));
     ue->string = string;
-    ue->type = STRING;
+    ue->type = UE_STRING;
+    return ue;
+}
+
+/**
+ *
+ */
+UnaryExpr *create_unary_expr_from_method_call(MethodCall *method_call) {
+    UnaryExpr *ue = malloc(sizeof(UnaryExpr));
+    ue->method_call = method_call;
+    ue->type = UE_METHOD_CALL;
     return ue;
 }
 

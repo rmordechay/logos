@@ -49,6 +49,7 @@ struct Expr *expr;
 struct ExprList *expr_list;
 struct BinaryExpr *binary_expr;
 struct UnaryExpr *unary_expr;
+struct MethodCall *method_call;
 struct VariableDeclarationList *variable_declaration_list;
 struct VariableDeclaration *variable_declaration;
 struct Identifier *identifier;
@@ -94,12 +95,13 @@ struct TypeList *type_list;
 %type <return_statement> return_statement
 %type <expr> expr
 %type <expr_list> expr_list
-%type <unary_expr> unary_expr
 %type <binary_expr> binary_expr
 %type <binary_expr> add_expr
 %type <binary_expr> sub_expr
 %type <binary_expr> mul_expr
 %type <binary_expr> div_expr
+%type <unary_expr> unary_expr
+%type <method_call> method_call
 %type <variable_declaration_list> variable_declaration_list
 %type <variable_declaration> variable_declaration
 %type <identifier> identifier
@@ -285,7 +287,13 @@ unary_expr:
 	| 	FLOAT { $$ = create_unary_expr_from_number(FLOAT, yylval.val) }
 	| 	BOOL { $$ = create_unary_expr_from_number(BOOL, yylval.val) }
 	| 	STRING { $$ = create_unary_expr_from_string(yylval.val) }
+	| 	method_call { $$ = create_unary_expr_from_method_call($1) }
 	| 	identifier { $$ = create_unary_expr_from_id($1) }
+	;
+
+method_call:
+		identifier LEFT_PAREN expr_list RIGHT_PAREN { $$ = create_method_call($1, $3) }
+	|	identifier LEFT_PAREN RIGHT_PAREN { $$ = create_method_call($1, NULL) }
 	;
 
 add_expr:
