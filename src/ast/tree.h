@@ -397,7 +397,7 @@ typedef struct ObjectFile {
     FieldsBlock *fields_block;
     ImplementsBlock *implements_block;
     MethodsBlockList *methods_block_list;
-} ObjectFile;
+} ObjectEntity;
 
 /**
  *
@@ -405,14 +405,14 @@ typedef struct ObjectFile {
 typedef struct Entity {
     EntityType type;
     union {
-        ObjectFile *object_file;
+        ObjectEntity *object_file;
     };
 } Entity;
 
-void analyse_ast(Entity *root);
+void analyse_ast(Entity *entity);
 Entity *create_entity(EntityType entity_type, void *entity_tree);
 
-ObjectFile *create_object_file(Identifier *identifier, ImplementsBlock *implements_block, FieldsBlock *fields_block, MethodsBlockList *methods_block_list);
+ObjectEntity *create_object_entity(Identifier *identifier, ImplementsBlock *implements_block, FieldsBlock *fields_block, MethodsBlockList *methods_block_list);
 ImplementsBlock *create_implements_block(TypeList *type_list);
 // Field
 FieldsBlock *create_fields_block(FieldList *field_list);
@@ -480,7 +480,7 @@ TypeList *create_type_list(Type *type);
 TypeList *flatten_type_list(TypeList *list, Type *element);
 
 void free_entity(Entity *obj);
-void free_object_file(ObjectFile *obj);
+void free_object_file(ObjectEntity *obj);
 void free_implements_block(ImplementsBlock *ib);
 void free_fields_block(FieldsBlock *fb);
 void free_field_list(FieldList *fl);

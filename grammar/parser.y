@@ -16,7 +16,7 @@ struct Entity *root;
 %union {
     char* val;
     struct Node *node;
-	struct ObjectFile *object_file;
+	struct ObjectEntity *object_entity;
 	struct ImplementsBlock *implements_block;
 	struct FieldsBlock *fields_block;
 	struct FieldList *field_list;
@@ -61,8 +61,8 @@ struct Entity *root;
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER BOOL
 
-%type <object_file> program
-%type <object_file> object_file
+%type <object_entity> program
+%type <object_entity> object_entity
 %type <implements_block> implements_block
 %type <fields_block> fields_block
 %type <field_list> field_list
@@ -106,12 +106,12 @@ struct Entity *root;
 %%
 
 program:
-    	object_file { analyse_ast(create_entity(OBJECT_ENTITY, $1)) }
+    	object_entity { analyse_ast(create_entity(OBJECT_ENTITY, $1)) }
     ;
 
-object_file:
-      	OBJECT COLON identifier implements_block fields_block methods_block_list { $$ = create_object_file($3, $4, $5, $6) }
-    | 	OBJECT COLON identifier fields_block { $$ = create_object_file($3, NULL, $4, NULL) }
+object_entity:
+      	OBJECT COLON identifier implements_block fields_block methods_block_list { $$ = create_object_entity($3, $4, $5, $6) }
+    | 	OBJECT COLON identifier fields_block { $$ = create_object_entity($3, NULL, $4, NULL) }
     ;
 
 implements_block:

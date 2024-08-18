@@ -4,7 +4,7 @@
 #include "ast/tree.h"
 #include "parser.h"
 
-void print_object_file_json(Entity *entity);
+void print_entity_json(Entity *entity);
 cJSON *create_identifier_json(Identifier *obj);
 cJSON *create_type_json(Type *obj);
 cJSON *create_type_list_json(TypeList *list);
@@ -39,12 +39,12 @@ cJSON *create_method_json(Method *obj);
 cJSON *create_methods_list_json(MethodsList *list);
 cJSON *create_methods_block_json(MethodsBlock *obj);
 cJSON *create_methods_block_list_json(MethodsBlockList *list);
-cJSON *create_object_file_json(ObjectFile *obj);
+cJSON *create_object_file_json(ObjectEntity *obj);
 
 /**
  *
  */
-void print_object_file_json(Entity *entity) {
+void print_entity_json(Entity *entity) {
     cJSON *json = NULL;
     switch (entity->type) {
         case OBJECT_ENTITY:
@@ -64,9 +64,9 @@ void print_object_file_json(Entity *entity) {
 /**
  *
  */
-cJSON *create_object_file_json(ObjectFile *obj) {
+cJSON *create_object_file_json(ObjectEntity *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddStringToObject(root, "kind", "ObjectFile");
+    cJSON_AddStringToObject(root, "kind", "ObjectEntity");
     cJSON_AddItemToObject(root, "id", create_identifier_json(obj->id));
     cJSON_AddItemToObject(root, "fields_block", create_fields_block_json(obj->fields_block));
     if (obj->implements_block) {

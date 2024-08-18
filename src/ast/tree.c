@@ -4,13 +4,13 @@
 #include "tree.h"
 #include "parser.h"
 
-void print_object_file_json(Entity *entity);
+void print_entity_json(Entity *entity);
 
 /**
  *
  */
-void analyse_ast(Entity *root) {
-    print_object_file_json(root);
+void analyse_ast(Entity *entity) {
+    print_entity_json(entity);
 }
 
 /**
@@ -18,9 +18,9 @@ void analyse_ast(Entity *root) {
  */
 Entity *create_entity(EntityType entity_type, void *entity_tree) {
     Entity *entity = malloc(sizeof(Entity));
+    entity->type = entity_type;
     switch (entity_type) {
         case OBJECT_ENTITY:
-            entity->type = entity_type;
             entity->object_file = entity_tree;
             break;
         case INTERFACE_ENTITY:
@@ -33,11 +33,11 @@ Entity *create_entity(EntityType entity_type, void *entity_tree) {
 /**
  *
  */
-ObjectFile *create_object_file(Identifier *identifier,
-                               ImplementsBlock *implements_block,
-                               FieldsBlock *fields_block,
-                               MethodsBlockList *methods_block_list) {
-    ObjectFile *obj = malloc(sizeof(ObjectFile));
+ObjectEntity *create_object_entity(Identifier *identifier,
+                                   ImplementsBlock *implements_block,
+                                   FieldsBlock *fields_block,
+                                   MethodsBlockList *methods_block_list) {
+    ObjectEntity *obj = malloc(sizeof(ObjectEntity));
     obj->id = identifier;
     obj->fields_block = fields_block;
     obj->implements_block = implements_block;
@@ -634,7 +634,7 @@ void free_entity(Entity *obj) {
 /**
  *
  */
-void free_object_file(ObjectFile *obj) {
+void free_object_file(ObjectEntity *obj) {
     free_fields_block(obj->fields_block);
     free_methods_block_list(obj->methods_block_list);
     free_implements_block(obj->implements_block);
