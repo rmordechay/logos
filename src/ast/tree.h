@@ -1,6 +1,18 @@
 #ifndef TREE_H
 #define TREE_H
 
+typedef enum NumberType {
+    LG_BOOL_VALUE,
+    LG_SHORT_VALUE,
+    LG_USHORT_VALUE,
+    LG_INT_VALUE,
+    LG_UINT_VALUE,
+    LG_LONG_VALUE,
+    LG_ULONG_VALUE,
+    LG_FLOAT_VALUE,
+    LG_DOUBLE_VALUE,
+} NumberType;
+
 typedef enum ExprType {
     UNARY,
     BINARY,
@@ -17,6 +29,12 @@ typedef enum PatternBodyType {
     EXPR_BODY,
     STMT_LIST_BODY,
 } PatternBodyType;
+
+typedef enum UnaryExprType {
+    UNARY_IDENTIFIER,
+    UNARY_NUMBER,
+    UNARY_FUNC_CALL,
+} UnaryExprType;
 
 /**
  *
@@ -116,6 +134,24 @@ typedef struct UnaryExpr {
         Identifier *identifier;
     };
 } UnaryExpr;
+
+/**
+ *
+ */
+typedef struct Number {
+    NumberType type;
+    union {
+        int bool_value;
+        short short_value;
+        unsigned short ushort_value;
+        int int_value;
+        unsigned int uint_value;
+        long long long_value;
+        unsigned long long ulong_value;
+        float float_value;
+        double double_value;
+    };
+} Number;
 
 /**
  *

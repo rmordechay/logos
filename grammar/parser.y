@@ -52,6 +52,7 @@ struct ObjectFile *root;
 
 %start program
 
+%token BOOL
 %token LET FUNC IMPLEMENTS FIELDS SELF OBJECT IF FOR RETURN IMPORT AND OR NOT IN
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE LEFT_BRACKET RIGHT_BRACKET LEFT_ANGLE RIGHT_ANGLE
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
@@ -238,6 +239,7 @@ binary_expr:
 unary_expr:
 		INTEGER { $$ = create_unary_expr_from_number(INTEGER, yylval.val) }
 	| 	FLOAT { $$ = create_unary_expr_from_number(FLOAT, yylval.val) }
+	| 	BOOL { $$ = create_unary_expr_from_number(BOOL, yylval.val) }
 	| 	identifier { $$ = create_unary_expr_from_id($1) }
 	;
 

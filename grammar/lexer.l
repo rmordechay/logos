@@ -14,6 +14,8 @@ int line_number = 1;
 "object"                { return OBJECT; }
 "implements"            { return IMPLEMENTS; }
 "fields"                { return FIELDS; }
+"true"                  { return BOOL; }
+"false"                 { return BOOL; }
 "if"                    { return IF; }
 "for"                   { return FOR; }
 "return"                { return RETURN; }
