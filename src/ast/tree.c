@@ -458,7 +458,7 @@ PatternList *flatten_pattern_list(PatternList *list, Pattern *element) {
 /**
  *
  */
-Iteration *create_iteration_from_for_in(ForInLoop *for_in_loop, StatementList *statement_list) {
+Iteration *create_iteration_from_for_in(ForInLoop *for_in_loop, IterationStmtList *statement_list) {
     Iteration *iteration = malloc(sizeof(Iteration));
     iteration->type = FL_IN;
     iteration->statement_list = statement_list;
@@ -469,7 +469,7 @@ Iteration *create_iteration_from_for_in(ForInLoop *for_in_loop, StatementList *s
 /**
  *
  */
-Iteration *create_iteration_from_while(WhileLoop *while_loop, StatementList *statement_list) {
+Iteration *create_iteration_from_while(WhileLoop *while_loop, IterationStmtList *statement_list) {
     Iteration *iteration = malloc(sizeof(Iteration));
     iteration->type = FL_WHILE;
     iteration->statement_list = statement_list;
@@ -480,7 +480,7 @@ Iteration *create_iteration_from_while(WhileLoop *while_loop, StatementList *sta
 /**
  *
  */
-Iteration *create_iteration_from_inf_loop(StatementList *statement_list) {
+Iteration *create_iteration_from_inf_loop(IterationStmtList *statement_list) {
     Iteration *iteration = malloc(sizeof(Iteration));
     iteration->type = FL_INFINITE;
     iteration->statement_list = statement_list;
@@ -1000,7 +1000,7 @@ void free_iteration(Iteration *fl) {
         case FL_INFINITE:
             break;
     }
-    free_statement_list(fl->statement_list);
+    free_iteration_statement_list(fl->statement_list);
     free(fl);
 }
 
