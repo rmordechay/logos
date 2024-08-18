@@ -127,7 +127,7 @@ fields_block:
 
 field_list:
 		field { $$ = create_field_list($1) }
-    | 	field_list field { $$ = flatten_field_list($1, $2) }
+	| 	field_list field { $$ = flatten_field_list($1, $2) }
     ;
 
 field:
@@ -215,11 +215,11 @@ if_or_block_list:
 	;
 
 if_or_block:
-      OR expr statements_block { $$ = create_if_or_block($2, $3) }
+		OR expr statements_block { $$ = create_if_or_block($2, $3) }
     ;
 
 or_block:
-      OR statements_block { $$ = create_or_block($2) }
+		OR statements_block { $$ = create_or_block($2) }
     ;
 
 pattern_matching:
