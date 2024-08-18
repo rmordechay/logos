@@ -41,25 +41,6 @@ cJSON *create_methods_block_json(MethodsBlock *obj);
 cJSON *create_methods_block_list_json(MethodsBlockList *list);
 cJSON *create_object_file_json(ObjectEntity *obj);
 
-/**
- *
- */
-void print_entity_json(Entity *entity) {
-    cJSON *json = NULL;
-    switch (entity->type) {
-        case OBJECT_ENTITY:
-            json = create_object_file_json(entity->object_file);
-            break;
-        case INTERFACE_ENTITY:
-        case ENUM_ENTITY:
-            break;
-    }
-    if (!json) return;
-    char *json_string = cJSON_Print(json);
-    printf("%s\n", json_string);
-    free(json_string);
-    cJSON_Delete(json);
-}
 
 /**
  *
@@ -73,6 +54,9 @@ cJSON *create_object_file_json(ObjectEntity *obj) {
         cJSON_AddItemToObject(root, "implements_block", create_implements_block_json(obj->implements_block));
     }
     cJSON_AddItemToObject(root, "methods_block_list", create_methods_block_list_json(obj->methods_block_list));
+    char *json_str = cJSON_Print(root);
+    printf("%s\n", json_str);
+    free(json_str);
     return root;
 }
 
@@ -170,9 +154,9 @@ cJSON *create_implements_block_json(ImplementsBlock *obj) {
  *
  */
 cJSON *create_expr_json(Expr *obj) {
-    if (obj->type == UNARY) {
+    if (obj->type == E_UNARY) {
         return create_unary_expr_json(obj->unary_expr);
-    } else if (obj->type == BINARY) {
+    } else if (obj->type == E_BINARY) {
         return create_binary_expr_json(obj->binary_expr);
     }
     return NULL;
@@ -293,13 +277,13 @@ cJSON *create_or_block_json(OrBlock *obj) {
 cJSON *create_for_loop_json(ForLoop *obj) {
     cJSON *root = cJSON_CreateObject();
     switch (obj->type) {
-        case WHILE_LOOP:
+        case FL_WHILE:
             cJSON_AddItemToObject(root, "while_loop",create_while_loop_json(obj->while_loop));
             break;
-        case INFINITE_LOOP:
+        case FL_INFINITE:
             cJSON_AddItemToObject(root, "infinite_loop",cJSON_CreateObject());
             break;
-        case FOR_IN_LOOP:
+        case FL_IN:
             cJSON_AddItemToObject(root, "for_in_loop",create_for_in_loop_json(obj->for_in_loop));
             break;
     }
@@ -352,10 +336,10 @@ cJSON *create_pattern_json(Pattern *obj) {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "expr_list",create_expr_json(obj->condition));
     switch (obj->type) {
-        case EXPR_BODY:
+        case PB_EXPR:
             cJSON_AddItemToObject(root, "expr_list",create_expr_json(obj->condition));
             break;
-        case STMT_LIST_BODY:
+        case PB_STMT_LIST:
             cJSON_AddItemToObject(root, "statement_list",create_statement_list_json(obj->statement_list));
             break;
     }
@@ -380,22 +364,22 @@ cJSON *create_pattern_list_json(PatternList *list) {
 cJSON *create_statement_json(Statement *obj) {
     cJSON *root = cJSON_CreateObject();
     switch (obj->type) {
-        case LOCAL_DECLARATION:
+        case ST_LOCAL_DECLARATION:
             cJSON_AddItemToObject(root, "local_declaration", create_local_declaration_json(obj->local_declaration));
             break;
-        case IF_STATEMENT:
+        case ST_IF_STATEMENT:
             cJSON_AddItemToObject(root, "if_statement", create_if_statement_json(obj->if_statement));
             break;
-        case PATTERN_MATCHING:
+        case ST_PATTERN_MATCHING:
             cJSON_AddItemToObject(root, "pattern_matching", create_pattern_matching_json(obj->pattern_matching));
             break;
-        case PATTERN_MATCHING_EXPR:
+        case ST_PATTERN_MATCHING_EXPR:
             cJSON_AddItemToObject(root, "pattern_matching_expr", create_pattern_matching_expr_json(obj->pattern_matching_expr));
             break;
-        case FOR_LOOP:
+        case ST_FOR_LOOP:
             cJSON_AddItemToObject(root, "for_loop", create_for_loop_json(obj->for_loop));
             break;
-        case RETURN_STATEMENT:
+        case ST_RETURN_STATEMENT:
             break;
     }
     return root;

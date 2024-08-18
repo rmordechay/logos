@@ -178,6 +178,14 @@ statement:
 	|	return_statement  { $$ = create_stmt_from_return_stmt($1);  }
 	;
 
+
+
+for_loop_statement:
+		BREAK unary_expr
+	|	CONTINUE
+	|	statement
+	;
+
 local_declaration:
 		LET variable_declaration EQUAL expr { $$ = create_local_declaration($2, $4) }
 	;
@@ -190,7 +198,7 @@ if_statement:
 	;
 
 if_block:
-      IF expr statements_block { $$ = create_if_block($2, $3) }
+      	IF expr statements_block { $$ = create_if_block($2, $3) }
     ;
 
 if_or_block_list:

@@ -3,14 +3,21 @@
 #include <printf.h>
 #include "tree.h"
 #include "parser.h"
-
-void print_entity_json(Entity *entity);
+#include "analyser/object_analyser.h"
 
 /**
  *
  */
 void analyse_ast(Entity *entity) {
-    print_entity_json(entity);
+    switch (entity->type) {
+        case E_OBJECT:
+            analyse_object(entity->object_entity);
+            break;
+        case E_INTERFACE:
+        case E_ENUM:
+            break;
+    }
+    free_entity(entity);
 }
 
 /**
@@ -20,11 +27,11 @@ Entity *create_entity(EntityType entity_type, void *entity_tree) {
     Entity *entity = malloc(sizeof(Entity));
     entity->type = entity_type;
     switch (entity_type) {
-        case OBJECT_ENTITY:
-            entity->object_file = entity_tree;
+        case E_OBJECT:
+            entity->object_entity = entity_tree;
             break;
-        case INTERFACE_ENTITY:
-        case ENUM_ENTITY:
+        case E_INTERFACE:
+        case E_ENUM:
             break;
     }
     return entity;
@@ -217,7 +224,7 @@ StatementList *flatten_statement_list(StatementList *list, Statement *element) {
 Statement *create_stmt_from_local_dec(LocalDeclaration *local_declaration) {
     Statement *s = malloc(sizeof(Statement));
     s->local_declaration = local_declaration;
-    s->type = LOCAL_DECLARATION;
+    s->type = ST_LOCAL_DECLARATION;
     return s;
 }
 
@@ -227,7 +234,7 @@ Statement *create_stmt_from_local_dec(LocalDeclaration *local_declaration) {
 Statement *create_stmt_from_if_stmt(IfStatement *if_statement) {
     Statement *s = malloc(sizeof(Statement));
     s->if_statement = if_statement;
-    s->type = IF_STATEMENT;
+    s->type = ST_IF_STATEMENT;
     return s;
 }
 
@@ -237,7 +244,7 @@ Statement *create_stmt_from_if_stmt(IfStatement *if_statement) {
 Statement *create_stmt_from_pm(PatternMatching *pattern_matching) {
     Statement *s = malloc(sizeof(Statement));
     s->pattern_matching = pattern_matching;
-    s->type = PATTERN_MATCHING;
+    s->type = ST_PATTERN_MATCHING;
     return s;
 }
 
@@ -247,7 +254,7 @@ Statement *create_stmt_from_pm(PatternMatching *pattern_matching) {
 Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr) {
     Statement *s = malloc(sizeof(Statement));
     s->pattern_matching_expr = pattern_matching_expr;
-    s->type = PATTERN_MATCHING_EXPR;
+    s->type = ST_PATTERN_MATCHING_EXPR;
     return s;
 }
 
@@ -257,7 +264,7 @@ Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr) {
 Statement *create_stmt_from_for_loop(ForLoop *for_loop) {
     Statement *s = malloc(sizeof(Statement));
     s->for_loop = for_loop;
-    s->type = FOR_LOOP;
+    s->type = ST_FOR_LOOP;
     return s;
 }
 
@@ -267,7 +274,7 @@ Statement *create_stmt_from_for_loop(ForLoop *for_loop) {
 Statement *create_stmt_from_return_stmt(ReturnStatement *return_statement) {
     Statement *s = malloc(sizeof(Statement));
     s->return_statement = return_statement;
-    s->type = RETURN_STATEMENT;
+    s->type = ST_RETURN_STATEMENT;
     return s;
 }
 
@@ -371,7 +378,7 @@ PatternMatchingExpr *create_pattern_matching_expr(Expr *condition, PatternList *
 Pattern *create_pattern_from_stmt_list(Expr *condition, StatementList *statement_list) {
     Pattern *pattern = malloc(sizeof(Pattern *));
     pattern->condition = condition;
-    pattern->type = STMT_LIST_BODY;
+    pattern->type = PB_STMT_LIST;
     pattern->statement_list = statement_list;
     return pattern;
 }
@@ -382,7 +389,7 @@ Pattern *create_pattern_from_stmt_list(Expr *condition, StatementList *statement
 Pattern *create_pattern_from_expr(Expr *condition, Expr *expr) {
     Pattern *pattern = malloc(sizeof(Pattern *));
     pattern->condition = condition;
-    pattern->type = EXPR_BODY;
+    pattern->type = PB_EXPR;
     pattern->expr = expr;
     return pattern;
 }
@@ -415,7 +422,7 @@ PatternList *flatten_pattern_list(PatternList *list, Pattern *element) {
  */
 ForLoop *create_for_loop_from_for_in(ForInLoop *for_in_loop, StatementList *statement_list) {
     ForLoop *for_loop = malloc(sizeof(ForLoop));
-    for_loop->type = FOR_IN_LOOP;
+    for_loop->type = FL_IN;
     for_loop->statement_list = statement_list;
     for_loop->for_in_loop = for_in_loop;
     return for_loop;
@@ -425,7 +432,7 @@ ForLoop *create_for_loop_from_for_in(ForInLoop *for_in_loop, StatementList *stat
  */
 ForLoop *create_for_loop_from_while(WhileLoop *while_loop, StatementList *statement_list) {
     ForLoop *for_loop = malloc(sizeof(ForLoop));
-    for_loop->type = WHILE_LOOP;
+    for_loop->type = FL_WHILE;
     for_loop->statement_list = statement_list;
     for_loop->while_loop = while_loop;
     return for_loop;
@@ -435,7 +442,7 @@ ForLoop *create_for_loop_from_while(WhileLoop *while_loop, StatementList *statem
  */
 ForLoop *create_for_loop_from_inf_loop(StatementList* statement_list) {
     ForLoop *for_loop = malloc(sizeof(ForLoop));
-    for_loop->type = INFINITE_LOOP;
+    for_loop->type = FL_INFINITE;
     for_loop->statement_list = statement_list;
     return for_loop;
 }
@@ -473,7 +480,7 @@ ReturnStatement *create_return_statement(ExprList *expr_list) {
 Expr *create_expr_from_unary(UnaryExpr *unary_expr) {
     Expr *e = malloc(sizeof(Expr));
     e->unary_expr = unary_expr;
-    e->type = UNARY;
+    e->type = E_UNARY;
     return e;
 }
 
@@ -483,7 +490,7 @@ Expr *create_expr_from_unary(UnaryExpr *unary_expr) {
 Expr *create_expr_from_binary(BinaryExpr *binary_expr) {
     Expr *e = malloc(sizeof(Expr));
     e->binary_expr = binary_expr;
-    e->type = BINARY;
+    e->type = E_BINARY;
     return e;
 }
 
@@ -622,11 +629,11 @@ TypeList *flatten_type_list(TypeList *list, Type *element) {
  */
 void free_entity(Entity *obj) {
     switch (obj->type) {
-        case OBJECT_ENTITY:
-            free_object_file(obj->object_file);
+        case E_OBJECT:
+            free_object_file(obj->object_entity);
             break;
-        case INTERFACE_ENTITY:
-        case ENUM_ENTITY:
+        case E_INTERFACE:
+        case E_ENUM:
             break;
     }
 }
@@ -751,22 +758,22 @@ void free_statement_list(StatementList *sl) {
  */
 void free_statement(Statement *s) {
     switch (s->type) {
-        case LOCAL_DECLARATION:
+        case ST_LOCAL_DECLARATION:
             free_local_declaration(s->local_declaration);
             break;
-        case IF_STATEMENT:
+        case ST_IF_STATEMENT:
             free_if_statement(s->if_statement);
             break;
-        case PATTERN_MATCHING:
+        case ST_PATTERN_MATCHING:
             free_pattern_matching(s->pattern_matching);
             break;
-        case PATTERN_MATCHING_EXPR:
+        case ST_PATTERN_MATCHING_EXPR:
             free_pattern_matching_expr(s->pattern_matching_expr);
             break;
-        case FOR_LOOP:
+        case ST_FOR_LOOP:
             free_for_loop(s->for_loop);
             break;
-        case RETURN_STATEMENT:
+        case ST_RETURN_STATEMENT:
             free_return_statement(s->return_statement);
             break;
     }
@@ -833,10 +840,10 @@ void free_or_block(OrBlock *ob) {
  */
 void free_pattern(Pattern *p) {
     switch (p->type) {
-        case EXPR_BODY:
+        case PB_EXPR:
             free_expr(p->expr);
             break;
-        case STMT_LIST_BODY:
+        case PB_STMT_LIST:
             free_statement_list(p->statement_list);
             break;
     }
@@ -875,13 +882,13 @@ void free_pattern_matching_expr(PatternMatchingExpr *pme) {
  */
 void free_for_loop(ForLoop *fl) {
     switch (fl->type) {
-        case WHILE_LOOP:
+        case FL_WHILE:
             free_while_loop(fl->while_loop);
             break;
-        case FOR_IN_LOOP:
+        case FL_IN:
             free_for_in_loop(fl->for_in_loop);
             break;
-        case INFINITE_LOOP:
+        case FL_INFINITE:
             break;
     }
     free_statement_list(fl->statement_list);

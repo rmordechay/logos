@@ -5,70 +5,64 @@
  *
  */
 typedef enum NumberType {
-    LG_BOOL_VALUE,
-    LG_SHORT_VALUE,
-    LG_USHORT_VALUE,
-    LG_INT_VALUE,
-    LG_UINT_VALUE,
-    LG_LONG_VALUE,
-    LG_ULONG_VALUE,
-    LG_FLOAT_VALUE,
-    LG_DOUBLE_VALUE,
+    N_BOOL_VALUE,
+    N_SHORT_VALUE,
+    N_USHORT_VALUE,
+    N_INT_VALUE,
+    N_UINT_VALUE,
+    N_LONG_VALUE,
+    N_ULONG_VALUE,
+    N_FLOAT_VALUE,
+    N_DOUBLE_VALUE,
 } NumberType;
 
 /**
  *
  */
 typedef enum EntityType {
-    OBJECT_ENTITY,
-    INTERFACE_ENTITY,
-    ENUM_ENTITY,
+    E_OBJECT,
+    E_INTERFACE,
+    E_ENUM,
 } EntityType;
 
 /**
  *
  */
 typedef enum ExprType {
-    UNARY,
-    BINARY,
+    E_UNARY,
+    E_BINARY,
 } ExprType;
 
 /**
  *
  */
-typedef enum StmtType {
-    LOCAL_DECLARATION,
-    IF_STATEMENT,
-    PATTERN_MATCHING,
-    PATTERN_MATCHING_EXPR,
-    FOR_LOOP,
-    RETURN_STATEMENT,
-} StmtType;
+typedef enum StatementType {
+    ST_LOCAL_DECLARATION,
+    ST_IF_STATEMENT,
+    ST_PATTERN_MATCHING,
+    ST_PATTERN_MATCHING_EXPR,
+    ST_FOR_LOOP,
+    ST_RETURN_STATEMENT,
+    ST_BREAK,
+    ST_CONTINUE,
+} StatementType;
 
 /**
  *
  */
 typedef enum PatternBodyType {
-    EXPR_BODY,
-    STMT_LIST_BODY,
+    PB_EXPR,
+    PB_STMT_LIST,
 } PatternBodyType;
 
-/**
- *
- */
-typedef enum UnaryExprType {
-    UNARY_IDENTIFIER,
-    UNARY_NUMBER,
-    UNARY_FUNC_CALL,
-} UnaryExprType;
 
 /**
  *
  */
 typedef enum ForLoopType {
-    WHILE_LOOP,
-    INFINITE_LOOP,
-    FOR_IN_LOOP,
+    FL_WHILE,
+    FL_INFINITE,
+    FL_IN,
 } ForLoopType;
 
 /**
@@ -321,7 +315,7 @@ typedef struct ReturnStatement {
  *
  */
 typedef struct Statement {
-    StmtType type;
+    StatementType type;
     union {
         LocalDeclaration *local_declaration;
         IfStatement *if_statement;
@@ -405,7 +399,7 @@ typedef struct ObjectFile {
 typedef struct Entity {
     EntityType type;
     union {
-        ObjectEntity *object_file;
+        ObjectEntity *object_entity;
     };
 } Entity;
 
