@@ -77,8 +77,6 @@ struct TypeList *type_list;
 %type <method_signature> method_signature
 %type <statement_list> statement_list statements_block
 %type <statement> statement
-%type <iteration_statement_list> iteration_statement_list iteration_statement_block
-%type <iteration_statement> iteration_statement
 %type <local_declaration> local_declaration
 %type <if_statement> if_statement
 %type <if_block> if_block
@@ -177,27 +175,13 @@ statement:
 	|	pattern_matching_expr  { $$ = create_stmt_from_pme($1);  }
 	|	iteration  { $$ = create_stmt_from_iteration($1);  }
 	|	return_statement  { $$ = create_stmt_from_return_stmt($1);  }
-	;
-
-iteration_statement_block:
-		LEFT_BRACE iteration_statement_list RIGHT_BRACE { $$ = $2 }
-	|	LEFT_BRACE RIGHT_BRACE { $$ = create_iteration_statement_list(NULL) }
-	;
-
-iteration_statement_list:
-		iteration_statement { $$ = create_iteration_statement_list($1) }
-	|	iteration_statement_list iteration_statement { $$ = flatten_iteration_statement_list($1, $2) }
-	;
-
-iteration_statement:
-		BREAK unary_expr { $$ = create_stmt_from_break($2) }
-	|	BREAK  { $$ = create_stmt_from_break(NULL) }
-	|	CONTINUE { $$ = create_stmt_from_continue() }
-	|	statement
+	|	CONTINUE  { $$ = create_stmt_from_continue();  }
+	|	BREAK expr  { $$ = create_stmt_from_break($2);  }
 	;
 
 local_declaration:
 		LET variable_declaration EQUAL expr { $$ = create_local_declaration($2, $4) }
+	|	LET identifier EQUAL expr { $$ = create_local_declaration($2, $4) }
 	;
 
 if_statement:
@@ -245,9 +229,9 @@ pattern:
 	;
 
 iteration:
-		FOR iteration_statement_block { $$ = create_iteration_from_inf_loop($2) }
-	|	while_loop iteration_statement_block { $$ = create_iteration_from_while($1, $2) }
-	|	for_in_loop iteration_statement_block { $$ = create_iteration_from_for_in($1, $2) }
+		FOR statements_block { $$ = create_iteration_from_inf_loop($2) }
+	|	while_loop statements_block { $$ = create_iteration_from_while($1, $2) }
+	|	for_in_loop statements_block { $$ = create_iteration_from_for_in($1, $2) }
 	;
 
 for_in_loop:
