@@ -113,8 +113,8 @@ program:
     ;
 
 object_entity:
-      	OBJECT COLON type implements_block fields_block methods_block_list { $$ = create_object_entity($3, $4, $5, $6) }
-    | 	OBJECT COLON type fields_block { $$ = create_object_entity($3, NULL, $4, NULL) }
+		OBJECT COLON type implements_block fields_block methods_block_list { $$ = create_object_entity($3, $4, $5, $6) }
+	| 	OBJECT COLON type fields_block { $$ = create_object_entity($3, NULL, $4, NULL) }
     ;
 
 implements_block:
@@ -122,7 +122,7 @@ implements_block:
 	;
 
 fields_block:
-      	FIELDS LEFT_BRACE field_list RIGHT_BRACE { $$ = create_fields_block($3) }
+		FIELDS LEFT_BRACE field_list RIGHT_BRACE { $$ = create_fields_block($3) }
     ;
 
 field_list:
@@ -131,8 +131,8 @@ field_list:
     ;
 
 field:
-    	variable_declaration COLON type  { $$ = create_field($1, $3)  }
-    |	variable_declaration  { $$ = create_field($1, NULL)  }
+		variable_declaration COLON type  { $$ = create_field($1, $3)  }
+	|	variable_declaration  { $$ = create_field($1, NULL)  }
     ;
 
 methods_block_list:
@@ -192,7 +192,6 @@ if_statement:
 	;
 
 if_block:
-      	IF expr statements_block { $$ = create_if_block($2, $3) }
     ;
 
 if_or_block_list:
@@ -309,8 +308,20 @@ identifier:
 		IDENTIFIER { $$ = create_identifier(yylval.val) }
 	;
 
+collection:
+		type LEFT_BRACKET expr_list RIGHT_BRACKET  {  }
+	|	type LEFT_BRACKET RIGHT_BRACKET  {  }
+	|	LEFT_BRACKET expr_list RIGHT_BRACKET  {  }
+	;
+
+dict:
+		LEFT_PAREN type COMMA type RIGHT_PAREN LEFT_BRACE expr_list RIGHT_BRACE  {  }
+	|	type LEFT_BRACE RIGHT_BRACE  {  }
+	|	LEFT_BRACKET expr_list RIGHT_BRACKET  {  }
+	;
+
 type:
-    	TYPE { $$ = create_type(yylval.val) }
+		TYPE { $$ = create_type(yylval.val) }
     ;
 
 type_list:
