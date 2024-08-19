@@ -53,6 +53,7 @@ struct MethodCall *method_call;
 struct VariableDeclarationList *variable_declaration_list;
 struct VariableDeclaration *variable_declaration;
 struct Identifier *identifier;
+struct Collection *collection;
 struct Type *type;
 struct TypeList *type_list;
 }
@@ -102,6 +103,7 @@ struct TypeList *type_list;
 %type <method_call> method_call
 %type <variable_declaration_list> variable_declaration_list
 %type <variable_declaration> variable_declaration
+%type <collection> collection
 %type <identifier> identifier
 %type <type> type
 %type <type_list> type_list
@@ -158,8 +160,8 @@ method_signature:
 	;
 
 statements_block:
-		LEFT_BRACE RIGHT_BRACE { $$ = create_statement_list(NULL) }
-	|	LEFT_BRACE statement_list RIGHT_BRACE { $$ = $2 }
+		LEFT_BRACE statement_list RIGHT_BRACE { $$ = $2 }
+	|	LEFT_BRACE RIGHT_BRACE { $$ = create_statement_list(NULL) }
 	;
 
 statement_list:
@@ -271,6 +273,7 @@ unary_expr:
 	| 	STRING { $$ = create_unary_expr_from_string(yylval.val) }
 	| 	method_call { $$ = create_unary_expr_from_method_call($1) }
 	| 	identifier { $$ = create_unary_expr_from_id($1) }
+	| 	collection { $$ = create_unary_expr_from_collection($1) }
 	;
 
 method_call:
@@ -308,9 +311,9 @@ identifier:
 	;
 
 collection:
-		type LEFT_BRACKET expr_list RIGHT_BRACKET  {  }
-	|	type LEFT_BRACKET RIGHT_BRACKET  {  }
-	|	LEFT_BRACKET expr_list RIGHT_BRACKET  {  }
+		type LEFT_BRACKET expr_list RIGHT_BRACKET  { $$ = create_collection($1, $3) }
+	|	type LEFT_BRACKET RIGHT_BRACKET  { $$ = create_collection($1, NULL) }
+	|	LEFT_BRACKET expr_list RIGHT_BRACKET  { $$ = create_collection(NULL, $2) }
 	;
 
 dict:

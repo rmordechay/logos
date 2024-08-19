@@ -5,6 +5,9 @@
 #include "parser.h"
 #include "analyser/object_analyser.h"
 
+void yyerror(const char* s);
+unsigned int iteration_level;
+
 /**
  *
  */
@@ -188,8 +191,9 @@ StatementList *create_statement_list(Statement *statement) {
     StatementList *sl = malloc(sizeof(StatementList));
     if (statement != NULL) {
         sl->statements = malloc(sizeof(Statement *));
-        sl->count = 1;
         sl->statements[0] = statement;
+        sl->count = 1;
+        if (statement->type == ST_ITERATION) iteration_level--;
     } else {
         sl->statements = NULL;
         sl->count = 0;
@@ -206,6 +210,15 @@ StatementList *flatten_statement_list(StatementList *list, Statement *element) {
     list->statements = new_list;
     list->statements[list->count] = element;
     list->count++;
+    if (iteration_level == 0) {
+        if (element->type == ST_CONTINUE_STATEMENT) {
+            yyerror("'continue' outside iteration loop");
+        } else if (element->type == ST_BREAK_STATEMENT) {
+            yyerror("'break' outside iteration loop");
+        }
+    } else if (element->type == ST_ITERATION) {
+        iteration_level--;
+    }
     return list;
 }
 
@@ -253,6 +266,7 @@ Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr) {
  *
  */
 Statement *create_stmt_from_iteration(Iteration *iteration) {
+    iteration_level++;
     Statement *s = malloc(sizeof(Statement));
     s->iteration = iteration;
     s->type = ST_ITERATION;
@@ -582,6 +596,15 @@ UnaryExpr *create_unary_expr_from_method_call(MethodCall *method_call) {
     ue->type = UE_METHOD_CALL;
     return ue;
 }
+/**
+ *
+ */
+UnaryExpr *create_unary_expr_from_collection(Collection *collection) {
+    UnaryExpr *ue = malloc(sizeof(UnaryExpr));
+    ue->collection = collection;
+    ue->type = UE_COLLECTION;
+    return ue;
+}
 
 /**
  *
@@ -624,6 +647,17 @@ VariableDec *create_variable_declaration(Type *type, Identifier *identifier) {
     vd->type = type;
     vd->identifier = identifier;
     return vd;
+}
+
+/**
+ *
+ */
+Collection *create_collection(Type *type, ExprList *expr_list) {
+    Collection *collection = malloc(sizeof(Collection));
+    collection->type = type;
+    collection->size = 0;
+    collection->expr_list = expr_list;
+    return collection;
 }
 
 /**
@@ -1045,6 +1079,9 @@ void free_unary_expr(UnaryExpr *ue) {
         case UE_METHOD_CALL:
             free(ue->method_call);
             break;
+        case UE_COLLECTION:
+            free_collection(ue->collection);
+            break;
     }
     free(ue);
 }
@@ -1069,6 +1106,14 @@ void free_variable_declaration(VariableDec *vd) {
     free_type(vd->type);
     free_identifier(vd->identifier);
     free(vd);
+}
+
+/**
+ *
+ */
+void free_collection(Collection *c) {
+    free_type(c->type);
+    free(c);
 }
 
 /**

@@ -194,6 +194,7 @@ cJSON *create_unary_expr_json(UnaryExpr *obj) {
             cJSON_AddItemToObject(root, "identifier", create_identifier_json(obj->identifier));
             break;
         case UE_METHOD_CALL:
+        case UE_COLLECTION:
             break;
     }
     return root;
@@ -453,7 +454,7 @@ cJSON *create_methods_list_json(MethodsList *list) {
  */
 cJSON *create_methods_block_json(MethodsBlock *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "identifier", create_identifier_json(obj->identifier));
+    cJSON_AddItemToObject(root, "identifier", create_type_json(obj->identifier));
     cJSON_AddItemToObject(root, "methods_list", create_methods_list_json(obj->methods_list));
     return root;
 }

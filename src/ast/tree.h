@@ -43,6 +43,7 @@ typedef enum UnaryExprType {
     UE_STRING,
     UE_IDENTIFIER,
     UE_METHOD_CALL,
+    UE_COLLECTION,
 } UnaryExprType;
 
 /**
@@ -191,6 +192,15 @@ typedef struct MethodCall {
 /**
  *
  */
+typedef struct Collection {
+    Type *type;
+    int size;
+    ExprList *expr_list;
+} Collection;
+
+/**
+ *
+ */
 typedef struct UnaryExpr {
     UnaryExprType type;
     union {
@@ -200,6 +210,7 @@ typedef struct UnaryExpr {
         char *string;
         int boolean;
         MethodCall *method_call;
+        Collection *collection;
     };
 } UnaryExpr;
 
@@ -504,7 +515,10 @@ UnaryExpr *create_unary_expr_from_number(int type, char *integer_value);
 UnaryExpr *create_unary_expr_from_id(Identifier *identifier);
 UnaryExpr *create_unary_expr_from_string(char *string);
 UnaryExpr *create_unary_expr_from_method_call(MethodCall *method_call);
+UnaryExpr *create_unary_expr_from_collection(Collection *collection);
 MethodCall *create_method_call(MethodSignature *method_signature, ExprList *param_exprs);
+// Collection
+Collection *create_collection(Type *type, ExprList *expr_list);
 // Primitives
 Identifier *create_identifier(const char *name);
 Type *create_type(const char *name);
@@ -544,6 +558,7 @@ void free_binary_expr(BinaryExpr *be);
 void free_unary_expr(UnaryExpr *ue);
 void free_variable_declaration_list(VarDecList *vdl);
 void free_variable_declaration(VariableDec *vd);
+void free_collection(Collection *c);
 void free_identifier(Identifier *i);
 void free_type(Type *t);
 void free_type_list(TypeList *tl);
