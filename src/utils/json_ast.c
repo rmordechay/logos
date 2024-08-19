@@ -217,8 +217,9 @@ cJSON *create_binary_expr_json(BinaryExpr *obj) {
  */
 cJSON *create_local_declaration_json(LocalDeclaration *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "method_variable",create_variable_declaration_json(obj->variable_declaration));
-    cJSON_AddItemToObject(root, "expr_list", create_expr_json(obj->expr));
+    cJSON_AddItemToObject(root, "type",create_type_json(obj->type));
+    cJSON_AddItemToObject(root, "identifier",create_identifier_json(obj->identifier));
+    cJSON_AddItemToObject(root, "expr", create_expr_json(obj->expr));
     return root;
 }
 

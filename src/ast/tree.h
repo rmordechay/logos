@@ -245,7 +245,8 @@ typedef struct BinaryExpr {
  *
  */
 typedef struct LocalDeclaration {
-    VariableDec *variable_declaration;
+    Type *type;
+    Identifier *identifier;
     Expr *expr;
 } LocalDeclaration;
 
@@ -479,7 +480,7 @@ Statement *create_stmt_from_return_stmt(ReturnStatement *return_statement);
 Statement *create_stmt_from_break(Expr *break_expr);
 Statement *create_stmt_from_continue();
 // Declaration
-LocalDeclaration *create_local_declaration(VariableDec *variable_declaration, Expr *expr);
+LocalDeclaration *create_local_declaration(Type *type, Identifier *identifier, Expr *expr);
 VarDecList *create_var_dec_list(VariableDec *variable_dec);
 VariableDec *create_variable_declaration(Type *type, Identifier *identifier);
 VarDecList *flatten_var_dec_list(VarDecList *list, VariableDec *element);

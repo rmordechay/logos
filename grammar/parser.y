@@ -181,7 +181,8 @@ statement:
 	;
 
 local_declaration:
-		LET variable_declaration EQUAL expr { $$ = create_local_declaration($2, $4) }
+		LET type identifier EQUAL expr { $$ = create_local_declaration($2, $3, $5) }
+	|	LET identifier EQUAL expr { $$ = create_local_declaration(NULL, $2, $4) }
 	;
 
 if_statement:
@@ -193,7 +194,7 @@ if_statement:
 
 if_block:
 		IF expr statements_block { $$ = create_if_block($2, $3) }
-    ;
+    	;
 
 if_or_block_list:
 		if_or_block { $$ = create_if_or_block_list($1) }
@@ -311,8 +312,8 @@ identifier:
 	;
 
 collection:
-		type LEFT_BRACKET expr_list RIGHT_BRACKET  { $$ = create_collection($1, $3) }
-	|	type LEFT_BRACKET RIGHT_BRACKET  { $$ = create_collection($1, NULL) }
+		TYPE LEFT_BRACKET expr_list RIGHT_BRACKET  { $$ = create_collection(create_type($1), $3) }
+	|	TYPE LEFT_BRACKET RIGHT_BRACKET  { $$ = create_collection(create_type($1), NULL) }
 	|	LEFT_BRACKET expr_list RIGHT_BRACKET  { $$ = create_collection(NULL, $2) }
 	;
 
@@ -324,6 +325,7 @@ dict:
 
 type:
 		TYPE { $$ = create_type(yylval.val) }
+	|	TYPE LEFT_BRACKET RIGHT_BRACKET { $$ = create_type(yylval.val) }
     ;
 
 type_list:

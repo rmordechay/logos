@@ -305,9 +305,10 @@ Statement *create_stmt_from_continue() {
 /**
  *
  */
-LocalDeclaration *create_local_declaration(VariableDec *variable_declaration, Expr *expr) {
+LocalDeclaration *create_local_declaration(Type *type, Identifier *identifier, Expr *expr) {
     LocalDeclaration *ld = malloc(sizeof(LocalDeclaration));
-    ld->variable_declaration = variable_declaration;
+    ld->identifier = identifier;
+    ld->type = type;
     ld->expr = expr;
     return ld;
 }
@@ -873,7 +874,8 @@ void free_statement(Statement *s) {
  */
 void free_local_declaration(LocalDeclaration *ld) {
     if (ld == NULL) return;
-    free_variable_declaration(ld->variable_declaration);
+    free_type(ld->type);
+    free_identifier(ld->identifier);
     free_expr(ld->expr);
     free(ld);
 }
