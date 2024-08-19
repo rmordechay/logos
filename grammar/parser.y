@@ -62,7 +62,7 @@ struct TypeList *type_list;
 %token LET FUNC IMPLEMENTS FIELDS SELF OBJECT IF FOR IMPORT AND OR NOT IN RETURN BREAK CONTINUE
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE LEFT_BRACKET RIGHT_BRACKET LEFT_ANGLE RIGHT_ANGLE
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
-%token <val> INTEGER FLOAT IDENTIFIER BOOL STRING
+%token <val> INTEGER FLOAT IDENTIFIER BOOL STRING TYPE
 
 %type <object_entity> program
 %type <object_entity> object_entity
@@ -113,8 +113,8 @@ program:
     ;
 
 object_entity:
-      	OBJECT COLON identifier implements_block fields_block methods_block_list { $$ = create_object_entity($3, $4, $5, $6) }
-    | 	OBJECT COLON identifier fields_block { $$ = create_object_entity($3, NULL, $4, NULL) }
+      	OBJECT COLON type implements_block fields_block methods_block_list { $$ = create_object_entity($3, $4, $5, $6) }
+    | 	OBJECT COLON type fields_block { $$ = create_object_entity($3, NULL, $4, NULL) }
     ;
 
 implements_block:
@@ -141,7 +141,7 @@ methods_block_list:
 	;
 
 methods_block:
-		identifier LEFT_BRACE methods_list RIGHT_BRACE { $$ = create_methods_block($1, $3) }
+		type LEFT_BRACE methods_list RIGHT_BRACE { $$ = create_methods_block($1, $3) }
 	;
 
 methods_list:
@@ -310,7 +310,7 @@ identifier:
 	;
 
 type:
-    	IDENTIFIER { $$ = create_type(yylval.val) }
+    	TYPE { $$ = create_type(yylval.val) }
     ;
 
 type_list:

@@ -8,10 +8,11 @@ int line_number = 1;
 
 %option yylineno
 
-INTEGER   [0-9]+
-FLOAT     [0-9]+\.[0-9]+
-IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
-STRING    \"([^\"\\]|\\.)*\"
+INTEGER     [0-9]+
+FLOAT       [0-9]+\.[0-9]+
+IDENTIFIER  [a-z_][a-zA-Z0-9_]*
+TYPE        [A-Z_][a-zA-Z0-9_]*
+STRING      \"([^\"\\]|\\.)*\"
 
 %%
 
@@ -20,8 +21,6 @@ STRING    \"([^\"\\]|\\.)*\"
 "object"                { return OBJECT; }
 "implements"            { return IMPLEMENTS; }
 "fields"                { return FIELDS; }
-"true"                  { return BOOL; }
-"false"                 { return BOOL; }
 "if"                    { return IF; }
 "for"                   { return FOR; }
 "return"                { return RETURN; }
@@ -57,9 +56,12 @@ STRING    \"([^\"\\]|\\.)*\"
 "$"                     { return DOLLAR; }
 "&"                     { return AMPERSAND; }
 
+"true"                  { return BOOL; }
+"false"                 { return BOOL; }
 {INTEGER}               { yylval.val = strdup(yytext); return INTEGER; }
 {FLOAT}                 { yylval.val = strdup(yytext); return FLOAT; }
 {IDENTIFIER}            { yylval.val = strdup(yytext); return IDENTIFIER; }
+{TYPE}                  { yylval.val = strdup(yytext); return TYPE; }
 {STRING}                { yylval.val = strdup(yytext); return STRING; }
 
 [ \n\e]+                  { /* Ignore whitespace */ }
