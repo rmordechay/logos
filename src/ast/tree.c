@@ -40,12 +40,12 @@ Entity *create_entity(EntityType entity_type, void *entity_tree) {
 /**
  *
  */
-ObjectEntity *create_object_entity(Identifier *identifier,
+ObjectEntity *create_object_entity(Type *type,
                                    ImplementsBlock *implements_block,
                                    FieldsBlock *fields_block,
                                    MethodsBlockList *methods_block_list) {
     ObjectEntity *obj = malloc(sizeof(ObjectEntity));
-    obj->id = identifier;
+    obj->id = type;
     obj->fields_block = fields_block;
     obj->implements_block = implements_block;
     obj->methods_block_list = methods_block_list;
@@ -129,9 +129,9 @@ MethodsBlockList *flatten_methods_block_list(MethodsBlockList *list, MethodsBloc
 /**
  *
  */
-MethodsBlock *create_methods_block(Identifier *identifier, MethodsList *methods_list) {
+MethodsBlock *create_methods_block(Type *type, MethodsList *methods_list) {
     MethodsBlock *mb = malloc(sizeof(MethodsBlock));
-    mb->identifier = identifier;
+    mb->identifier = type;
     mb->methods_list = methods_list;
     return mb;
 }
@@ -191,8 +191,8 @@ StatementList *create_statement_list(Statement *statement) {
         sl->count = 1;
         sl->statements[0] = statement;
     } else {
-        sl->count = 0;
         sl->statements = NULL;
+        sl->count = 0;
     }
     return sl;
 }
@@ -751,7 +751,7 @@ void free_methods_block_list(MethodsBlockList *mbl) {
  */
 void free_methods_block(MethodsBlock *mb) {
     if (mb == NULL) return;
-    free_identifier(mb->identifier);
+    free_type(mb->identifier);
     free_methods_list(mb->methods_list);
     free(mb);
 }

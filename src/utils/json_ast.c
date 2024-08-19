@@ -47,7 +47,7 @@ cJSON *create_object_file_json(ObjectEntity *obj);
 cJSON *create_object_file_json(ObjectEntity *obj) {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddStringToObject(root, "kind", "ObjectEntity");
-    cJSON_AddItemToObject(root, "id", create_identifier_json(obj->id));
+    cJSON_AddItemToObject(root, "id", create_type_json(obj->id));
     cJSON_AddItemToObject(root, "fields_block", create_fields_block_json(obj->fields_block));
     if (obj->implements_block) {
         cJSON_AddItemToObject(root, "implements_block", create_implements_block_json(obj->implements_block));
@@ -392,6 +392,9 @@ cJSON *create_statement_json(Statement *obj) {
             break;
         case ST_RETURN_STATEMENT:
             cJSON_AddItemToObject(root, "return_statement_expr_list", create_expr_list_json(obj->return_statement->expr_list));
+            break;
+        case ST_BREAK_STATEMENT:
+        case ST_CONTINUE_STATEMENT:
             break;
     }
     return root;

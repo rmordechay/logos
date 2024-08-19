@@ -404,7 +404,7 @@ typedef struct MethodsList {
  *
  */
 typedef struct MethodsBlock {
-    Identifier *identifier;
+    Type *identifier;
     MethodsList *methods_list;
 } MethodsBlock;
 
@@ -420,8 +420,8 @@ typedef struct MethodsBlockList {
 /**
  *
  */
-typedef struct ObjectFile {
-    Identifier *id;
+typedef struct ObjectEntity {
+    Type *id;
     FieldsBlock *fields_block;
     ImplementsBlock *implements_block;
     MethodsBlockList *methods_block_list;
@@ -440,7 +440,7 @@ typedef struct Entity {
 void analyse_ast(Entity *entity);
 Entity *create_entity(EntityType entity_type, void *entity_tree);
 
-ObjectEntity *create_object_entity(Identifier *identifier, ImplementsBlock *implements_block, FieldsBlock *fields_block, MethodsBlockList *methods_block_list);
+ObjectEntity *create_object_entity(Type *type, ImplementsBlock *implements_block, FieldsBlock *fields_block, MethodsBlockList *methods_block_list);
 ImplementsBlock *create_implements_block(TypeList *type_list);
 // Field
 FieldsBlock *create_fields_block(FieldList *field_list);
@@ -449,7 +449,7 @@ FieldList *flatten_field_list(FieldList *list, Field *element);
 Field *create_field(VariableDec *variable_declaration, Type *type);
 // Method block
 MethodsBlockList *create_methods_block_list(MethodsBlock *methodBlock);
-MethodsBlock *create_methods_block(Identifier *identifier, MethodsList *methods_list);
+MethodsBlock *create_methods_block(Type *type, MethodsList *methods_list);
 MethodsBlockList *flatten_methods_block_list(MethodsBlockList *list, MethodsBlock *element);
 // Method
 MethodsList *create_methods_list(Method *method);

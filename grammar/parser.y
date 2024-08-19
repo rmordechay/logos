@@ -41,7 +41,7 @@ struct PatternMatchingExpr *pattern_matching_expr;
 struct PatternMatching *pattern_matching;
 struct Pattern *pattern;
 struct PatternList *pattern_list;
-struct ForLoop *iteration;
+struct Iteration *iteration;
 struct ForInLoop *for_in_loop;
 struct WhileLoop *while_loop;
 struct ReturnStatement *return_statement;
@@ -107,15 +107,14 @@ struct TypeList *type_list;
 %type <type_list> type_list
 
 %%
-
 program:
-    	object_entity { analyse_ast(create_entity(E_OBJECT, $1)) }
-    ;
+		object_entity { analyse_ast(create_entity(E_OBJECT, $1)) }
+	;
 
 object_entity:
 		OBJECT COLON type implements_block fields_block methods_block_list { $$ = create_object_entity($3, $4, $5, $6) }
 	| 	OBJECT COLON type fields_block { $$ = create_object_entity($3, NULL, $4, NULL) }
-    ;
+	;
 
 implements_block:
 		IMPLEMENTS LEFT_BRACE type_list RIGHT_BRACE { $$ = create_implements_block($3) }
@@ -123,17 +122,17 @@ implements_block:
 
 fields_block:
 		FIELDS LEFT_BRACE field_list RIGHT_BRACE { $$ = create_fields_block($3) }
-    ;
+	;
 
 field_list:
 		field { $$ = create_field_list($1) }
 	| 	field_list field { $$ = flatten_field_list($1, $2) }
-    ;
+	;
 
 field:
 		variable_declaration COLON type  { $$ = create_field($1, $3)  }
 	|	variable_declaration  { $$ = create_field($1, NULL)  }
-    ;
+	;
 
 methods_block_list:
 		methods_block {  $$ = create_methods_block_list($1);  }
@@ -173,7 +172,7 @@ statement:
 	|	if_statement { $$ = create_stmt_from_if_stmt($1);  }
 	|	pattern_matching  { $$ = create_stmt_from_pm($1);  }
 	|	pattern_matching_expr  { $$ = create_stmt_from_pme($1);  }
-	|	iteration  { $$ = create_stmt_from_iteration($1);  }
+	|	iteration  { $$ = create_stmt_from_iteration($1); }
 	|	return_statement  { $$ = create_stmt_from_return_stmt($1);  }
 	|	CONTINUE  { $$ = create_stmt_from_continue();  }
 	|	BREAK expr  { $$ = create_stmt_from_break($2);  }
@@ -181,7 +180,6 @@ statement:
 
 local_declaration:
 		LET variable_declaration EQUAL expr { $$ = create_local_declaration($2, $4) }
-	|	LET identifier EQUAL expr { $$ = create_local_declaration($2, $4) }
 	;
 
 if_statement:
@@ -192,6 +190,7 @@ if_statement:
 	;
 
 if_block:
+		IF expr statements_block { $$ = create_if_block($2, $3) }
     ;
 
 if_or_block_list:
@@ -275,8 +274,8 @@ unary_expr:
 	;
 
 method_call:
-		identifier LEFT_PAREN expr_list RIGHT_PAREN { $$ = create_method_call($1, $3) }
-	|	identifier LEFT_PAREN RIGHT_PAREN { $$ = create_method_call($1, NULL) }
+		identifier LEFT_PAREN expr_list RIGHT_PAREN { $$ = create_method_call(NULL, $3) }
+	|	identifier LEFT_PAREN RIGHT_PAREN { $$ = create_method_call(NULL, NULL) }
 	;
 
 add_expr:
