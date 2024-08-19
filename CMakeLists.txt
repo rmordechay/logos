@@ -33,6 +33,8 @@ set(
     src/utils/json_ast.c
     src/analyser/object_analyser.c
     src/analyser/object_analyser.h
+    src/utils/hashmap.c
+    src/utils/hashmap.h
 )
 
 add_executable(logos ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})
