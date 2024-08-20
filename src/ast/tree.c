@@ -583,7 +583,7 @@ UnaryExpr *create_unary_expr_from_id(Identifier *identifier) {
  */
 UnaryExpr *create_unary_expr_from_string(char *string) {
     UnaryExpr *ue = malloc(sizeof(UnaryExpr));
-    ue->string = string;
+    ue->string = strdup(string);
     ue->type = UE_STRING;
     return ue;
 }
@@ -664,7 +664,7 @@ Collection *create_collection(Type *type, ExprList *expr_list) {
 /**
  *
  */
-Identifier *create_identifier(const char *name) {
+Identifier *create_identifier(char *name) {
     Identifier *id = malloc(sizeof(Identifier));
     id->name = strdup(name);
     return id;
@@ -673,7 +673,7 @@ Identifier *create_identifier(const char *name) {
 /**
  *
  */
-Type *create_type(const char *name) {
+Type *create_type(char *name) {
     Type *t = malloc(sizeof(Type));
     t->name = strdup(name);
     return t;

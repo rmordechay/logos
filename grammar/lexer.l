@@ -11,7 +11,7 @@ int line_number = 1;
 INTEGER     [0-9]+
 FLOAT       [0-9]+\.[0-9]+
 IDENTIFIER  [a-z_][a-zA-Z0-9_]*
-TYPE        [A-Z_][a-zA-Z0-9_]*
+TYPE        [A-Z][a-zA-Z0-9_]*
 STRING      \"([^\"\\]|\\.)*\"
 
 %%
@@ -23,7 +23,6 @@ STRING      \"([^\"\\]|\\.)*\"
 "fields"                { return FIELDS; }
 "if"                    { return IF; }
 "for"                   { return FOR; }
-"return"                { return RETURN; }
 "break"                 { return BREAK; }
 "continue"              { return CONTINUE; }
 "return"                { return RETURN; }
@@ -64,7 +63,7 @@ STRING      \"([^\"\\]|\\.)*\"
 {TYPE}                  { yylval.val = strdup(yytext); return TYPE; }
 {STRING}                { yylval.val = strdup(yytext); return STRING; }
 
-[ \n\e]+                  { /* Ignore whitespace */ }
+[ \t\n\r]+              { /* Ignore whitespace */ }
 
 .                       { fprintf(stderr, "Unexpected character in line %d: %s\n", yylineno, yytext); exit(1); }
 

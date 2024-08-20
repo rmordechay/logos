@@ -57,7 +57,7 @@ void init_project() {
         const char *name = entry->d_name;
         if (entry->d_type == DT_DIR) {
             Package *pkg = create_package(entry->d_name);
-            printf("%s\n", pkg->name);
+            free_package(pkg);
         } else if (entry->d_type == DT_REG) {
             int is_correct_file = is_logos_file(name);
             if (!is_correct_file) continue;
@@ -68,6 +68,7 @@ void init_project() {
             if (strcmp(name, "Object.lgs") != 0) continue;
             const char *code = read_file_content(app_file->path);
             app_file->code = code;
+            parse(app_file->code);
         }
     }
     free_application(app);

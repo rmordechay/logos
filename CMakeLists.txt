@@ -11,19 +11,19 @@ find_package(CURL REQUIRED)
 file(MAKE_DIRECTORY ${GEN_DIR_SOURCE})
 
 BISON_TARGET(
-    Parser grammar/parser.y ${GEN_DIR_SOURCE}/parser.c
+    Parser grammar/parser.y ${GEN_DIR_BUILD}/parser.c
     DEFINES_FILE ${GEN_DIR_SOURCE}/parser.h
     COMPILE_FLAGS -v
 )
-FLEX_TARGET(Lexer grammar/lexer.l ${GEN_DIR_SOURCE}/lexer.c)
+FLEX_TARGET(Lexer grammar/lexer.l ${GEN_DIR_BUILD}/lexer.c)
 add_flex_bison_dependency(Lexer Parser)
 
 set(
     SOURCES
     include/cJSON.c
     src/utils/utils.c
-    ${GEN_DIR_SOURCE}/parser.c
-    ${GEN_DIR_SOURCE}/lexer.c
+    gen/parser.c
+    gen/lexer.c
     src/project/project.c
     src/project/project.h
     src/project/application.c
@@ -35,6 +35,8 @@ set(
     src/analyser/object_analyser.h
     src/utils/hashmap.c
     src/utils/hashmap.h
+    src/executor/executor.c
+    src/executor/executor.h
 )
 
 add_executable(logos ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})

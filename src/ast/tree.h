@@ -521,8 +521,8 @@ MethodCall *create_method_call(MethodSignature *method_signature, ExprList *para
 // Collection
 Collection *create_collection(Type *type, ExprList *expr_list);
 // Primitives
-Identifier *create_identifier(const char *name);
-Type *create_type(const char *name);
+Identifier *create_identifier(char *name);
+Type *create_type(char *name);
 TypeList *create_type_list(Type *type);
 TypeList *flatten_type_list(TypeList *list, Type *element);
 

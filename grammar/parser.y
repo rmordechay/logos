@@ -268,13 +268,13 @@ binary_expr:
 	;
 
 unary_expr:
-		INTEGER { $$ = create_unary_expr_from_number(INTEGER, yylval.val) }
+		method_call { $$ = create_unary_expr_from_method_call($1) }
+	| 	identifier { $$ = create_unary_expr_from_id($1) }
+	| 	collection { $$ = create_unary_expr_from_collection($1) }
+	| 	INTEGER { $$ = create_unary_expr_from_number(INTEGER, yylval.val) }
 	| 	FLOAT { $$ = create_unary_expr_from_number(FLOAT, yylval.val) }
 	| 	BOOL { $$ = create_unary_expr_from_number(BOOL, yylval.val) }
 	| 	STRING { $$ = create_unary_expr_from_string(yylval.val) }
-	| 	method_call { $$ = create_unary_expr_from_method_call($1) }
-	| 	identifier { $$ = create_unary_expr_from_id($1) }
-	| 	collection { $$ = create_unary_expr_from_collection($1) }
 	;
 
 method_call:
@@ -298,6 +298,12 @@ div_expr:
 		expr SLASH expr { $$ = create_binary_expr($1, $3, '/') }
 	;
 
+collection:
+		TYPE LEFT_BRACKET expr_list RIGHT_BRACKET  {  }
+	|	type  { $$ = create_collection($1, NULL) }
+	|	LEFT_BRACKET expr_list RIGHT_BRACKET  { $$ = create_collection(NULL, $2) }
+	;
+
 variable_declaration_list:
 		variable_declaration { $$ = create_var_dec_list($1) }
 	|	variable_declaration_list COMMA variable_declaration { $$ = flatten_var_dec_list($1, $3) }
@@ -311,21 +317,8 @@ identifier:
 		IDENTIFIER { $$ = create_identifier(yylval.val) }
 	;
 
-collection:
-		TYPE LEFT_BRACKET expr_list RIGHT_BRACKET  { $$ = create_collection(create_type($1), $3) }
-	|	TYPE LEFT_BRACKET RIGHT_BRACKET  { $$ = create_collection(create_type($1), NULL) }
-	|	LEFT_BRACKET expr_list RIGHT_BRACKET  { $$ = create_collection(NULL, $2) }
-	;
-
-dict:
-		LEFT_PAREN type COMMA type RIGHT_PAREN LEFT_BRACE expr_list RIGHT_BRACE  {  }
-	|	type LEFT_BRACE RIGHT_BRACE  {  }
-	|	LEFT_BRACKET expr_list RIGHT_BRACKET  {  }
-	;
-
 type:
 		TYPE { $$ = create_type(yylval.val) }
-	|	TYPE LEFT_BRACKET RIGHT_BRACKET { $$ = create_type(yylval.val) }
     ;
 
 type_list:

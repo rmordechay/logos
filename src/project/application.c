@@ -54,6 +54,5 @@ Package *create_package(const char *name) {
  *
  */
 void free_package(Package *package) {
-    free((char *)package->name);
     free(package);
 }
