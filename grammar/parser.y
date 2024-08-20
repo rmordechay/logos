@@ -60,7 +60,9 @@ struct TypeList *type_list;
 
 %start program
 
-%token LET FUNC IMPLEMENTS FIELDS SELF OBJECT IF FOR IMPORT AND OR NOT IN RETURN BREAK CONTINUE
+%token AND OR NOT
+%token RETURN BREAK CONTINUE
+%token LET FUNC IMPLEMENTS FIELDS OBJECT IF FOR IMPORT IN ENUM CONST
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE LEFT_BRACKET RIGHT_BRACKET LEFT_ANGLE RIGHT_ANGLE
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER BOOL STRING TYPE
@@ -114,7 +116,8 @@ program:
 	;
 
 object_entity:
-		OBJECT COLON type implements_block fields_block methods_block_list { $$ = create_object_entity($3, $4, $5, $6) }
+		OBJECT COLON type implements_block enum_declartion fields_block methods_block_list { $$ = create_object_entity($3, $4, $6, $7) }
+	| 	OBJECT COLON type implements_block fields_block methods_block_list { $$ = create_object_entity($3, $4, $5, $6) }
 	| 	OBJECT COLON type fields_block { $$ = create_object_entity($3, NULL, $4, NULL) }
 	;
 
@@ -302,6 +305,10 @@ collection:
 		TYPE LEFT_BRACKET expr_list RIGHT_BRACKET  {  }
 	|	type  { $$ = create_collection($1, NULL) }
 	|	LEFT_BRACKET expr_list RIGHT_BRACKET  { $$ = create_collection(NULL, $2) }
+	;
+
+enum_declartion:
+		ENUM type LEFT_BRACE CONST RIGHT_BRACE
 	;
 
 variable_declaration_list:

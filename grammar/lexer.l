@@ -15,6 +15,7 @@ INTEGER         [0-9]+
 FLOAT           [0-9]+\.[0-9]+
 IDENTIFIER      [a-z_][a-zA-Z0-9_]*
 TYPE            [A-Z][a-zA-Z0-9_]*
+CONST           [A-Z0-9_]+
 STRING          \"([^\"\\]|\\.)*\"
 
 %%
@@ -34,6 +35,7 @@ STRING          \"([^\"\\]|\\.)*\"
 "or"                    {  return OR; }
 "not"                   {  return NOT; }
 "in"                    {  return IN; }
+"enum"                  {  return ENUM; }
 
 "("                     {  return LEFT_PAREN; }
 ")"                     {  return RIGHT_PAREN; }
@@ -62,8 +64,9 @@ STRING          \"([^\"\\]|\\.)*\"
 "false"                 {  return BOOL; }
 {INTEGER}               { yylval.val = strdup(yytext);  return INTEGER; }
 {FLOAT}                 { yylval.val = strdup(yytext);  return FLOAT; }
-{IDENTIFIER}            { yylval.val = strdup(yytext);  return IDENTIFIER; }
-{TYPE}                  { yylval.val = strdup(yytext);  return TYPE; }
+{IDENTIFIER}            { yylval.val = strdup(yytext); return IDENTIFIER; }
+{CONST}                 { printf("%s\n", yytext); yylval.val = strdup(yytext); return CONST; }
+{TYPE}                  { yylval.val = strdup(yytext); return TYPE; }
 {STRING}                { yylval.val = strdup(yytext);  return STRING; }
 
 {BLOCK_COMMENT}         { printf("BLOCK_COMMENT\n"); /* Ignore line comment */ }
