@@ -181,6 +181,7 @@ statement_list:
 
 statement:
 		local_declaration { $$ = create_stmt_from_local_dec($1) }
+	|	enum_declartion  { $$ = create_stmt_from_enum($1) }
 	|	if_statement { $$ = create_stmt_from_if_stmt($1);  }
 	|	pattern_matching  { $$ = create_stmt_from_pm($1);  }
 	|	pattern_matching_expr  { $$ = create_stmt_from_pme($1);  }
@@ -188,7 +189,6 @@ statement:
 	|	return_statement  { $$ = create_stmt_from_return_stmt($1);  }
 	|	CONTINUE  { $$ = create_stmt_from_continue();  }
 	|	BREAK expr  { $$ = create_stmt_from_break($2);  }
-	|	enum_declartion  { $$ = create_stmt_from_enum($1) }
 	;
 
 local_declaration:

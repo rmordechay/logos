@@ -37,6 +37,7 @@ set(
     src/utils/hashmap.h
     src/executor/executor.c
     src/executor/executor.h
+    src/analyser/errors.h
 )
 
 add_executable(logos ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})
