@@ -8,11 +8,13 @@ int line_number = 1;
 
 %option yylineno
 
-INTEGER     [0-9]+
-FLOAT       [0-9]+\.[0-9]+
-IDENTIFIER  [a-z_][a-zA-Z0-9_]*
-TYPE        [A-Z][a-zA-Z0-9_]*
-STRING      \"([^\"\\]|\\.)*\"
+
+LINE_COMMENT    "//".*
+INTEGER         [0-9]+
+FLOAT           [0-9]+\.[0-9]+
+IDENTIFIER      [a-z_][a-zA-Z0-9_]*
+TYPE            [A-Z][a-zA-Z0-9_]*
+STRING          \"([^\"\\]|\\.)*\"
 
 %%
 
@@ -63,6 +65,7 @@ STRING      \"([^\"\\]|\\.)*\"
 {TYPE}                  { yylval.val = strdup(yytext); return TYPE; }
 {STRING}                { yylval.val = strdup(yytext); return STRING; }
 
+{LINE_COMMENT}          { /* Ignore line comment */ }
 [ \t\n\r]+              { /* Ignore whitespace */ }
 
 .                       { fprintf(stderr, "Unexpected character in line %d: %s\n", yylineno, yytext); exit(1); }
