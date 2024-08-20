@@ -4,6 +4,7 @@
 #include "tree.h"
 #include "parser.h"
 #include "analyser/object_analyser.h"
+#include "rule_type.h"
 
 void yyerror(const char* s);
 unsigned int iteration_level;
@@ -177,7 +178,7 @@ Method *create_method(MethodSignature *method_signature, StatementList *statemen
 /**
  *
  */
-MethodSignature *create_method_signature(VariableDec *variable_dec, VarDecList *variable_declaration_list) {
+MethodSignature *create_method_signature(VariableDec *variable_dec, VariableDecList *variable_declaration_list) {
     MethodSignature *ms = malloc(sizeof(MethodSignature));
     ms->method_variable = variable_dec;
     ms->param_list = variable_declaration_list;
@@ -299,6 +300,16 @@ Statement *create_stmt_from_break(Expr *break_expr) {
 Statement *create_stmt_from_continue() {
     Statement *s = malloc(sizeof(Statement));
     s->type = ST_CONTINUE_STATEMENT;
+    return s;
+}
+
+/**
+ *
+ */
+Statement *create_stmt_from_enum(EnumDeclaration *enum_declaration) {
+    Statement *s = malloc(sizeof(Statement));
+    s->type = ST_ENUM_STATEMENT;
+    s->enum_declaration = enum_declaration;
     return s;
 }
 
@@ -620,8 +631,8 @@ MethodCall *create_method_call(MethodSignature *method_signature, ExprList *para
 /**
  *
  */
-VarDecList *create_var_dec_list(VariableDec *variable_dec) {
-    VarDecList *vdl = malloc(sizeof(VarDecList));
+VariableDecList *create_var_dec_list(VariableDec *variable_dec) {
+    VariableDecList *vdl = malloc(sizeof(VariableDecList));
     vdl->var_declarations = malloc(sizeof(VariableDec *));
     vdl->count = 1;
     vdl->var_declarations[0] = variable_dec;
@@ -631,7 +642,7 @@ VarDecList *create_var_dec_list(VariableDec *variable_dec) {
 /**
  *
  */
-VarDecList *flatten_var_dec_list(VarDecList *list, VariableDec *element) {
+VariableDecList *flatten_var_dec_list(VariableDecList *list, VariableDec *element) {
     int new_size = list->count + 1;
     VariableDec **new_list = realloc(list->var_declarations, new_size * sizeof(VariableDec *));
     list->var_declarations = new_list;
@@ -656,9 +667,19 @@ VariableDec *create_variable_declaration(Type *type, Identifier *identifier) {
 Collection *create_collection(Type *type, ExprList *expr_list) {
     Collection *collection = malloc(sizeof(Collection));
     collection->type = type;
-    collection->size = 0;
+    collection->size = expr_list->count;
     collection->expr_list = expr_list;
     return collection;
+}
+
+/**
+ *
+ */
+EnumDeclaration *create_enum_declaration(Type *type, ConstantVariableList *const_var_list) {
+    EnumDeclaration *ed = malloc(sizeof(EnumDeclaration));
+    ed->type = type;
+    ed->const_var_list = const_var_list;
+    return ed;
 }
 
 /**
@@ -669,6 +690,39 @@ Identifier *create_identifier(char *name) {
     id->name = strdup(name);
     return id;
 }
+
+/**
+ *
+ */
+ConstantVariable *create_constant_variable(char *name) {
+    ConstantVariable *cv = malloc(sizeof(ConstantVariable));
+    cv->name = name;
+    return cv;
+}
+
+/**
+ *
+ */
+ConstantVariableList *create_const_var_list(ConstantVariable *constant_variable) {
+    ConstantVariableList *vdl = malloc(sizeof(ConstantVariableList));
+    vdl->constant_variables = malloc(sizeof(ConstantVariable *));
+    vdl->count = 1;
+    vdl->constant_variables[0] = constant_variable;
+    return vdl;
+}
+
+/**
+ *
+ */
+ConstantVariableList *flatten_const_var_list(ConstantVariableList *list, ConstantVariable *element) {
+    int new_size = list->count + 1;
+    ConstantVariable **new_list = realloc(list->constant_variables, new_size * sizeof(ConstantVariable *));
+    list->constant_variables = new_list;
+    list->constant_variables[list->count] = element;
+    list->count++;
+    return list;
+}
+
 
 /**
  *
@@ -863,7 +917,11 @@ void free_statement(Statement *s) {
             free_return_statement(s->return_statement);
             break;
         case ST_BREAK_STATEMENT:
+            free_expr(s->break_expr);
         case ST_CONTINUE_STATEMENT:
+            break;
+        case ST_ENUM_STATEMENT:
+            free_enum_declaration(s->enum_declaration);
             break;
     }
     free(s);
@@ -1091,7 +1149,17 @@ void free_unary_expr(UnaryExpr *ue) {
 /**
  *
  */
-void free_variable_declaration_list(VarDecList *vdl) {
+void free_enum_declaration(EnumDeclaration *ed) {
+    if (ed == NULL) return;
+    free_const_variable_list(ed->const_var_list);
+    free_type(ed->type);
+    free(ed);
+}
+
+/**
+ *
+ */
+void free_variable_declaration_list(VariableDecList *vdl) {
     if (vdl == NULL) return;
     for (int i = 0; i < vdl->count; i++) {
         free_variable_declaration(vdl->var_declarations[i]);
@@ -1121,15 +1189,6 @@ void free_collection(Collection *c) {
 /**
  *
  */
-void free_identifier(Identifier *i) {
-    if (i == NULL) return;
-    free(i->name);
-    free(i);
-}
-
-/**
- *
- */
 void free_type(Type *t) {
     if (t == NULL) return;
     free(t->name);
@@ -1146,4 +1205,33 @@ void free_type_list(TypeList *tl) {
     }
     free(tl->types);
     free(tl);
+}
+
+/**
+ *
+ */
+void free_const_variable(ConstantVariable *cv) {
+    if (cv == NULL) return;
+    free(cv->name);
+    free(cv);
+}
+
+/**
+ *
+ */
+void free_const_variable_list(ConstantVariableList *cvl) {
+    if (cvl == NULL) return;
+    for (int i = 0; i < cvl->count; i++) {
+        free_const_variable(cvl->constant_variables[i]);
+    }
+    free(cvl);
+}
+
+/**
+ *
+ */
+void free_identifier(Identifier *i) {
+    if (i == NULL) return;
+    free(i->name);
+    free(i);
 }

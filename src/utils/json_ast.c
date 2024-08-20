@@ -9,7 +9,7 @@ cJSON *create_identifier_json(Identifier *obj);
 cJSON *create_type_json(Type *obj);
 cJSON *create_type_list_json(TypeList *list);
 cJSON *create_variable_declaration_json(VariableDec *obj);
-cJSON *create_variable_declaration_list_json(VarDecList *list);
+cJSON *create_variable_declaration_list_json(VariableDecList *list);
 cJSON *create_field_json(Field *obj);
 cJSON *create_field_list_json(FieldList *obj);
 cJSON *create_fields_block_json(FieldsBlock *obj);
@@ -93,7 +93,7 @@ cJSON *create_type_list_json(TypeList *list) {
  */
 cJSON *create_variable_declaration_json(VariableDec *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "type", create_type_json(obj->type));
+    cJSON_AddItemToObject(root, "const_var_list", create_type_json(obj->type));
     cJSON_AddItemToObject(root, "identifier", create_identifier_json(obj->identifier));
     return root;
 }
@@ -101,7 +101,7 @@ cJSON *create_variable_declaration_json(VariableDec *obj) {
 /**
  *
  */
-cJSON *create_variable_declaration_list_json(VarDecList *list) {
+cJSON *create_variable_declaration_list_json(VariableDecList *list) {
     cJSON *root = cJSON_CreateArray();
     for (int i = 0; i < list->count; i++) {
         cJSON_AddItemToArray(root, create_variable_declaration_json(list->var_declarations[i]));
@@ -217,7 +217,7 @@ cJSON *create_binary_expr_json(BinaryExpr *obj) {
  */
 cJSON *create_local_declaration_json(LocalDeclaration *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "type",create_type_json(obj->type));
+    cJSON_AddItemToObject(root, "const_var_list",create_type_json(obj->type));
     cJSON_AddItemToObject(root, "identifier",create_identifier_json(obj->identifier));
     cJSON_AddItemToObject(root, "expr", create_expr_json(obj->expr));
     return root;

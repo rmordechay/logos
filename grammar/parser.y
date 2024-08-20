@@ -50,12 +50,15 @@ struct ExprList *expr_list;
 struct BinaryExpr *binary_expr;
 struct UnaryExpr *unary_expr;
 struct MethodCall *method_call;
-struct VariableDeclarationList *variable_declaration_list;
-struct VariableDeclaration *variable_declaration;
-struct Identifier *identifier;
+struct VariableDecList *variable_declaration_list;
+struct VariableDec *variable_declaration;
 struct Collection *collection;
+struct EnumDeclaration *enum_declartion;
 struct Type *type;
 struct TypeList *type_list;
+struct ConstantVariable *constant_variable;
+struct ConstantVariableList *constant_variable_list;
+struct Identifier *identifier;
 }
 
 %start program
@@ -106,9 +109,12 @@ struct TypeList *type_list;
 %type <variable_declaration_list> variable_declaration_list
 %type <variable_declaration> variable_declaration
 %type <collection> collection
-%type <identifier> identifier
+%type <enum_declartion> enum_declartion
 %type <type> type
 %type <type_list> type_list
+%type <constant_variable> constant_variable
+%type <constant_variable_list> constant_variable_list
+%type <identifier> identifier
 
 %%
 program:
@@ -146,6 +152,7 @@ methods_block_list:
 
 methods_block:
 		type LEFT_BRACE methods_list RIGHT_BRACE { $$ = create_methods_block($1, $3) }
+	|	type LEFT_BRACE enum_declartion methods_list RIGHT_BRACE { $$ = create_methods_block($1, $4) }
 	;
 
 methods_list:
@@ -181,6 +188,7 @@ statement:
 	|	return_statement  { $$ = create_stmt_from_return_stmt($1);  }
 	|	CONTINUE  { $$ = create_stmt_from_continue();  }
 	|	BREAK expr  { $$ = create_stmt_from_break($2);  }
+	|	enum_declartion  { $$ = create_stmt_from_enum($1) }
 	;
 
 local_declaration:
@@ -308,8 +316,9 @@ collection:
 	;
 
 enum_declartion:
-		ENUM type LEFT_BRACE CONST RIGHT_BRACE
+		ENUM type LEFT_BRACE constant_variable_list RIGHT_BRACE { $$ = create_enum_declaration($2, $4)  }
 	;
+
 
 variable_declaration_list:
 		variable_declaration { $$ = create_var_dec_list($1) }
@@ -320,10 +329,6 @@ variable_declaration:
 		type identifier { $$ = create_variable_declaration($1, $2) }
 	;
 
-identifier:
-		IDENTIFIER { $$ = create_identifier(yylval.val) }
-	;
-
 type:
 		TYPE { $$ = create_type(yylval.val) }
     ;
@@ -332,6 +337,20 @@ type_list:
 	  	type { $$ = create_type_list($1)  }
 	| 	type_list COMMA type { $$ = flatten_type_list($1, $3)  }
 	;
+
+constant_variable:
+		CONST { $$ = create_constant_variable(yylval.val) }
+	;
+
+constant_variable_list:
+		constant_variable { $$ = create_const_var_list($1)  }
+	|	constant_variable_list constant_variable { $$ = flatten_const_var_list($1, $2)  }
+	;
+
+identifier:
+		IDENTIFIER { $$ = create_identifier(yylval.val) }
+	;
+
 %%
 
 void yyerror(const char* s) {

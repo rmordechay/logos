@@ -1,101 +1,41 @@
 #ifndef TREE_H
 #define TREE_H
-
-/**
- *
- */
-typedef enum {
-    N_BOOL_VALUE,
-    N_SHORT_VALUE,
-    N_USHORT_VALUE,
-    N_INT_VALUE,
-    N_UINT_VALUE,
-    N_LONG_VALUE,
-    N_ULONG_VALUE,
-    N_FLOAT_VALUE,
-    N_DOUBLE_VALUE,
-} NumberType;
-
-/**
- *
- */
-typedef enum {
-    E_OBJECT,
-    E_INTERFACE,
-    E_ENUM,
-} EntityType;
-
-/**
- *
- */
-typedef enum {
-    E_UNARY,
-    E_BINARY,
-} ExprType;
-
-/**
- *
- */
-typedef enum {
-    UE_INT,
-    UE_FLOAT,
-    UE_BOOL,
-    UE_STRING,
-    UE_IDENTIFIER,
-    UE_METHOD_CALL,
-    UE_COLLECTION,
-} UnaryExprType;
-
-/**
- *
- */
-typedef enum {
-    ST_LOCAL_DECLARATION,
-    ST_IF_STATEMENT,
-    ST_PATTERN_MATCHING,
-    ST_PATTERN_MATCHING_EXPR,
-    ST_ITERATION,
-    ST_RETURN_STATEMENT,
-    ST_BREAK_STATEMENT,
-    ST_CONTINUE_STATEMENT,
-} StatementType;
-
-/**
- *
- */
-typedef enum {
-    PB_EXPR,
-    PB_STMT_LIST,
-} PatternBodyType;
+#include "rule_type.h"
 
 
 /**
  *
  */
-typedef enum {
-    FL_WHILE,
-    FL_INFINITE,
-    FL_IN,
-} IterationType;
-
-/**
- *
- */
-typedef struct {
+typedef struct Identifier {
     char *name;
 } Identifier;
 
 /**
  *
  */
-typedef struct {
+typedef struct ConstantVariable {
+    char *name;
+} ConstantVariable;
+
+/**
+ *
+ */
+typedef struct ConstantVariableList {
+    ConstantVariable **constant_variables;
+    int count;
+} ConstantVariableList;
+
+/**
+ *
+ */
+typedef struct Type {
     char *name;
 } Type;
 
 /**
  *
  */
-typedef struct {
+typedef struct TypeList {
     Type **types;
     int count;
 } TypeList;
@@ -103,7 +43,15 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct EnumDeclaration {
+    Type *type;
+    ConstantVariableList *const_var_list;
+} EnumDeclaration;
+
+/**
+ *
+ */
+typedef struct VariableDec {
     Type *type;
     Identifier *identifier;
 } VariableDec;
@@ -111,15 +59,15 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct VariableDecList {
     VariableDec **var_declarations;
     int count;
-} VarDecList;
+} VariableDecList;
 
 /**
  *
  */
-typedef struct {
+typedef struct Enum {
     char *name;
     char *string;
 } Enum;
@@ -127,7 +75,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct EnumBlock {
     Enum **enums;
     int count;
 } EnumBlock;
@@ -135,7 +83,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct Field {
     VariableDec *variable_declaration;
     Type *implements;  // Optional
 } Field;
@@ -143,7 +91,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct FieldList {
     Field **fields;
     int count;
 } FieldList;
@@ -151,21 +99,21 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct FieldsBlock {
     FieldList *field_list;
 } FieldsBlock;
 
 /**
  *
  */
-typedef struct {
+typedef struct ImplementsBlock {
     TypeList *type_list;
 } ImplementsBlock;
 
 /**
  *
  */
-typedef struct {
+typedef struct Expr {
     ExprType type;
     union {
         struct UnaryExpr *unary_expr;
@@ -176,7 +124,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct ExprList {
     Expr **exprs;
     int count;
 } ExprList;
@@ -184,7 +132,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct MethodCall {
     struct MethodSignature *method_signature;
     ExprList *param_exprs;
 } MethodCall;
@@ -192,7 +140,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct Collection {
     Type *type;
     int size;
     ExprList *expr_list;
@@ -201,7 +149,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct UnaryExpr {
     UnaryExprType type;
     union {
         char *integer_value;
@@ -217,7 +165,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct Number {
     NumberType type;
     union {
         int bool_value;
@@ -235,7 +183,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct BinaryExpr {
     Expr *left;
     Expr *right;
     char operator;
@@ -244,7 +192,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct LocalDeclaration {
     Type *type;
     Identifier *identifier;
     Expr *expr;
@@ -253,7 +201,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct IfBlock {
     Expr *expr;
     struct StatementList *statement_list;
 } IfBlock;
@@ -261,7 +209,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct IfOrBlock {
     Expr *expr;
     struct StatementList *statement_list;
 } IfOrBlock;
@@ -269,7 +217,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct IfOrBlockList {
     IfOrBlock **if_or_blocks;
     int count;
 } IfOrBlockList;
@@ -277,7 +225,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct OrBlock {
     struct StatementList *statement_list;
 } OrBlock;
 
@@ -285,7 +233,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct IfStatement {
     IfBlock *if_block;
     IfOrBlockList *if_or_block_list;
     OrBlock *or_block;
@@ -295,7 +243,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct Pattern {
     Expr *condition;
     PatternBodyType type;
     union {
@@ -307,7 +255,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct PatternList {
     Pattern **patterns;
     int count;
 } PatternList;
@@ -315,14 +263,14 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct PatternMatching {
     PatternList *pattern_list;
 } PatternMatching;
 
 /**
  *
  */
-typedef struct {
+typedef struct PatternMatchingExpr {
     Expr *expr;
     PatternList *pattern_list;
 } PatternMatchingExpr;
@@ -330,14 +278,14 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct WhileLoop {
     ExprList *expr_list;
 } WhileLoop;
 
 /**
  *
  */
-typedef struct {
+typedef struct ForInLoop {
     ExprList *expr_list;
     Expr *in_expr;
 } ForInLoop;
@@ -346,14 +294,14 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct ReturnStatement {
     ExprList *expr_list;
 } ReturnStatement;
 
 /**
  *
  */
-typedef struct {
+typedef struct Iteration {
     IterationType type;
     union {
         ForInLoop *for_in_loop;
@@ -365,7 +313,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct Statement {
     StatementType type;
     union {
         LocalDeclaration *local_declaration;
@@ -374,6 +322,7 @@ typedef struct {
         PatternMatchingExpr *pattern_matching_expr;
         Iteration *iteration;
         ReturnStatement *return_statement;
+        EnumDeclaration *enum_declaration;
         Expr *break_expr;
     };
 } Statement;
@@ -381,7 +330,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct StatementList {
     Statement **statements;
     int count;
 } StatementList;
@@ -390,15 +339,15 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct MethodSignature {
     VariableDec *method_variable;
-    VarDecList *param_list;  // Optional
+    VariableDecList *param_list;  // Optional
 } MethodSignature;
 
 /**
  *
  */
-typedef struct {
+typedef struct Method {
     char **name;
     MethodSignature *method_signature;
     StatementList *statement_list;  // Optional
@@ -407,7 +356,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct MethodsList {
     Method **methods;
     int count;
 } MethodsList;
@@ -415,7 +364,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct MethodsBlock {
     Type *identifier;
     MethodsList *methods_list;
 } MethodsBlock;
@@ -423,7 +372,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct MethodsBlockList {
     MethodsBlock **blocks;
     int count;
 } MethodsBlockList;
@@ -432,7 +381,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct ObjectEntity {
     Type *id;
     FieldsBlock *fields_block;
     ImplementsBlock *implements_block;
@@ -442,7 +391,7 @@ typedef struct {
 /**
  *
  */
-typedef struct {
+typedef struct Entity {
     EntityType type;
     union {
         ObjectEntity *object_entity;
@@ -467,7 +416,7 @@ MethodsBlockList *flatten_methods_block_list(MethodsBlockList *list, MethodsBloc
 MethodsList *create_methods_list(Method *method);
 MethodsList *flatten_methods_list(MethodsList *list, Method *element);
 Method *create_method(MethodSignature *method_signature, StatementList *statement_list);
-MethodSignature *create_method_signature(VariableDec *variable_dec, VarDecList *variable_declaration_list);
+MethodSignature *create_method_signature(VariableDec *variable_dec, VariableDecList *variable_declaration_list);
 // Statement
 StatementList *create_statement_list(Statement *statement);
 StatementList *flatten_statement_list(StatementList *list, Statement *element);
@@ -479,11 +428,12 @@ Statement *create_stmt_from_iteration(Iteration *iteration);
 Statement *create_stmt_from_return_stmt(ReturnStatement *return_statement);
 Statement *create_stmt_from_break(Expr *break_expr);
 Statement *create_stmt_from_continue();
+Statement *create_stmt_from_enum(EnumDeclaration *enum_declaration);
 // Declaration
 LocalDeclaration *create_local_declaration(Type *type, Identifier *identifier, Expr *expr);
-VarDecList *create_var_dec_list(VariableDec *variable_dec);
+VariableDecList *create_var_dec_list(VariableDec *variable_dec);
 VariableDec *create_variable_declaration(Type *type, Identifier *identifier);
-VarDecList *flatten_var_dec_list(VarDecList *list, VariableDec *element);
+VariableDecList *flatten_var_dec_list(VariableDecList *list, VariableDec *element);
 // If statement
 IfStatement *create_if_statement(IfBlock *if_block, IfOrBlockList *if_or_block_list, OrBlock *or_block);
 IfBlock *create_if_block(Expr *expr, StatementList *statement_list);
@@ -520,8 +470,13 @@ UnaryExpr *create_unary_expr_from_collection(Collection *collection);
 MethodCall *create_method_call(MethodSignature *method_signature, ExprList *param_exprs);
 // Collection
 Collection *create_collection(Type *type, ExprList *expr_list);
+// Enum
+EnumDeclaration *create_enum_declaration(Type *type, ConstantVariableList *const_var_list);
 // Primitives
 Identifier *create_identifier(char *name);
+ConstantVariable *create_constant_variable(char *name);
+ConstantVariableList *create_const_var_list(ConstantVariable *constant_variable);
+ConstantVariableList *flatten_const_var_list(ConstantVariableList *list, ConstantVariable *element);
 Type *create_type(char *name);
 TypeList *create_type_list(Type *type);
 TypeList *flatten_type_list(TypeList *list, Type *element);
@@ -557,11 +512,14 @@ void free_expr(Expr *e);
 void free_expr_list(ExprList *el);
 void free_binary_expr(BinaryExpr *be);
 void free_unary_expr(UnaryExpr *ue);
-void free_variable_declaration_list(VarDecList *vdl);
+void free_variable_declaration_list(VariableDecList *vdl);
 void free_variable_declaration(VariableDec *vd);
 void free_collection(Collection *c);
-void free_identifier(Identifier *i);
+void free_enum_declaration(EnumDeclaration *ed);
 void free_type(Type *t);
 void free_type_list(TypeList *tl);
+void free_const_variable(ConstantVariable *cv);
+void free_const_variable_list(ConstantVariableList *cvl);
+void free_identifier(Identifier *i);
 
 #endif //TREE_H

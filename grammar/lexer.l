@@ -65,7 +65,7 @@ STRING          \"([^\"\\]|\\.)*\"
 {INTEGER}               { yylval.val = strdup(yytext);  return INTEGER; }
 {FLOAT}                 { yylval.val = strdup(yytext);  return FLOAT; }
 {IDENTIFIER}            { yylval.val = strdup(yytext); return IDENTIFIER; }
-{CONST}                 { printf("%s\n", yytext); yylval.val = strdup(yytext); return CONST; }
+{CONST}                 { yylval.val = strdup(yytext); return CONST; }
 {TYPE}                  { yylval.val = strdup(yytext); return TYPE; }
 {STRING}                { yylval.val = strdup(yytext);  return STRING; }
 
