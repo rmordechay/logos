@@ -26,7 +26,7 @@ void analyse_object(ObjectEntity *entity) {
 void check_implementations(ObjectEntity *entity) {
     ObjectFieldList *field_list = entity->field_list;
     TypeList *implements_type = entity->implements_block->type_list;
-    MethodsBlockList *methods_block_list = entity->methods_block_list;
+    ObjectMethodsBlockList *methods_block_list = entity->methods_block_list;
     check_fields_implementation(implements_type, field_list);
     check_methods_block_implementation(implements_type, methods_block_list);
 }
@@ -48,6 +48,6 @@ void check_fields_implementation(TypeList *implements_types, ObjectFieldList *fi
 /**
  *
  */
-void check_methods_block_implementation(TypeList *implements_types, MethodsBlockList *methods_block_list) {
+void check_methods_block_implementation(TypeList *implements_types, ObjectMethodsBlockList *methods_block_list) {
 
 }

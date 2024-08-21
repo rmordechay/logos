@@ -15,6 +15,7 @@ typedef enum NumberType {
     N_FLOAT_VALUE,
     N_DOUBLE_VALUE,
 } NumberType;
+
 /**
  *
  */
@@ -23,6 +24,7 @@ typedef enum EntityType {
     E_INTERFACE,
     E_ENUM,
 } EntityType;
+
 /**
  *
  */

@@ -35,6 +35,8 @@ Entity *create_entity(EntityType entity_type, void *entity_tree) {
             entity->object_entity = entity_tree;
             break;
         case E_INTERFACE:
+            entity->interface_entity = entity_tree;
+            break;
         case E_ENUM:
             break;
     }
@@ -47,12 +49,21 @@ Entity *create_entity(EntityType entity_type, void *entity_tree) {
 ObjectEntity *create_object_entity(Type *type,
                                    ImplementsBlock *implements_block,
                                    ObjectFieldList *fields_list,
-                                   MethodsBlockList *methods_block_list) {
+                                   ObjectMethodsBlockList *methods_block_list) {
     ObjectEntity *obj = malloc(sizeof(ObjectEntity));
     obj->id = type;
     obj->field_list = fields_list;
     obj->implements_block = implements_block;
     obj->methods_block_list = methods_block_list;
+    return obj;
+}
+/**
+ *
+ */
+InterfaceEntity *create_interface_entity(Type *type, InterfaceFieldList *fields_list) {
+    InterfaceEntity *obj = malloc(sizeof(InterfaceEntity));
+    obj->id = type;
+    obj->field_list = fields_list;
     return obj;
 }
 
@@ -68,7 +79,7 @@ ImplementsBlock *create_implements_block(TypeList *type_list) {
 /**
  *
  */
-ObjectFieldList *create_field_list(ObjectField *field) {
+ObjectFieldList *create_object_field_list(ObjectField *field) {
     ObjectFieldList *fl = malloc(sizeof(ObjectFieldList));
     fl->fields = malloc(sizeof(ObjectField *));
     fl->count = 1;
@@ -79,7 +90,7 @@ ObjectFieldList *create_field_list(ObjectField *field) {
 /**
  *
  */
-ObjectFieldList *add_field(ObjectFieldList *list, ObjectField *element) {
+ObjectFieldList *add_object_field(ObjectFieldList *list, ObjectField *element) {
     int new_size = list->count + 1;
     ObjectField **new_list = realloc(list->fields, new_size * sizeof(ObjectField *));
     list->fields = new_list;
@@ -91,7 +102,7 @@ ObjectFieldList *add_field(ObjectFieldList *list, ObjectField *element) {
 /**
  *
  */
-ObjectField *create_field(VariableDec *variable_declaration, Type *type) {
+ObjectField *create_object_field(VariableDec *variable_declaration, Type *type) {
     ObjectField *f = malloc(sizeof(ObjectField));
     f->variable_declaration = variable_declaration;
     f->implements = type;
@@ -101,9 +112,41 @@ ObjectField *create_field(VariableDec *variable_declaration, Type *type) {
 /**
  *
  */
-MethodsBlockList *create_methods_block_list(MethodsBlock *methodBlock) {
-    MethodsBlockList *mbl = malloc(sizeof(MethodsBlockList));
-    mbl->blocks = malloc(sizeof(MethodsBlock *));
+InterfaceFieldList *create_interface_field_list(InterfaceField *field) {
+    InterfaceFieldList *fl = malloc(sizeof(InterfaceFieldList));
+    fl->fields = malloc(sizeof(InterfaceField *));
+    fl->count = 1;
+    fl->fields[0] = field;
+    return fl;
+}
+
+/**
+ *
+ */
+InterfaceFieldList *add_interface_field(InterfaceFieldList *list, InterfaceField *element) {
+    int new_size = list->count + 1;
+    InterfaceField **new_list = realloc(list->fields, new_size * sizeof(InterfaceField *));
+    list->fields = new_list;
+    list->fields[list->count] = element;
+    list->count++;
+    return list;
+}
+
+/**
+ *
+ */
+InterfaceField *create_interface_field(VariableDec *variable_declaration) {
+    InterfaceField *f = malloc(sizeof(InterfaceField *));
+    f->variable_declaration = variable_declaration;
+    return f;
+}
+
+/**
+ *
+ */
+ObjectMethodsBlockList *create_object_methods_block_list(ObjectMethodsBlock *methodBlock) {
+    ObjectMethodsBlockList *mbl = malloc(sizeof(ObjectMethodsBlockList));
+    mbl->blocks = malloc(sizeof(ObjectMethodsBlock *));
     mbl->count = 1;
     mbl->blocks[0] = methodBlock;
     return mbl;
@@ -112,9 +155,9 @@ MethodsBlockList *create_methods_block_list(MethodsBlock *methodBlock) {
 /**
  *
  */
-MethodsBlockList *add_methods_block(MethodsBlockList *list, MethodsBlock *element) {
+ObjectMethodsBlockList *add_object_methods_block(ObjectMethodsBlockList *list, ObjectMethodsBlock *element) {
     int new_size = list->count + 1;
-    MethodsBlock **new_list = realloc(list->blocks, new_size * sizeof(MethodsBlock *));
+    ObjectMethodsBlock **new_list = realloc(list->blocks, new_size * sizeof(ObjectMethodsBlock *));
     list->blocks = new_list;
     list->blocks[list->count] = element;
     list->count++;
@@ -124,8 +167,8 @@ MethodsBlockList *add_methods_block(MethodsBlockList *list, MethodsBlock *elemen
 /**
  *
  */
-MethodsBlock *create_methods_block(Type *type, MethodsList *methods_list) {
-    MethodsBlock *mb = malloc(sizeof(MethodsBlock));
+ObjectMethodsBlock *create_object_methods_block(Type *type, ObjectMethodsList *methods_list) {
+    ObjectMethodsBlock *mb = malloc(sizeof(ObjectMethodsBlock));
     mb->identifier = type;
     mb->methods_list = methods_list;
     return mb;
@@ -135,9 +178,9 @@ MethodsBlock *create_methods_block(Type *type, MethodsList *methods_list) {
 /**
  *
  */
-MethodsList *create_methods_list(Method *method) {
-    MethodsList *ml = malloc(sizeof(MethodsList));
-    ml->methods = malloc(sizeof(Method *));
+ObjectMethodsList *create_object_methods_list(ObjectMethod *method) {
+    ObjectMethodsList *ml = malloc(sizeof(ObjectMethodsList));
+    ml->methods = malloc(sizeof(ObjectMethod *));
     ml->count = 1;
     ml->methods[0] = method;
     return ml;
@@ -146,9 +189,9 @@ MethodsList *create_methods_list(Method *method) {
 /**
  *
  */
-MethodsList *add_methods(MethodsList *list, Method *element) {
+ObjectMethodsList *add_object_method(ObjectMethodsList *list, ObjectMethod *element) {
     int new_size = list->count + 1;
-    Method **new_list = realloc(list->methods, new_size * sizeof(Method *));
+    ObjectMethod **new_list = realloc(list->methods, new_size * sizeof(ObjectMethod *));
     list->methods = new_list;
     list->methods[list->count] = element;
     list->count++;
@@ -158,12 +201,79 @@ MethodsList *add_methods(MethodsList *list, Method *element) {
 /**
  *
  */
-Method *create_method(MethodSignature *method_signature, StatementList *statement_list) {
-    Method *m = malloc(sizeof(Method));
+InterfaceMethodsBlock *create_interface_methods_block(Type *type, InterfaceMethodsList *methods_list) {
+    InterfaceMethodsBlock *mb = malloc(sizeof(InterfaceMethodsBlock));
+    mb->identifier = type;
+    mb->methods_list = methods_list;
+    return mb;
+}
+
+/**
+ *
+ */
+ObjectMethod *create_object_method(MethodSignature *method_signature, StatementList *statement_list) {
+    ObjectMethod *m = malloc(sizeof(ObjectMethod));
     m->method_signature = method_signature;
     m->statement_list = statement_list;
     m->name = &m->method_signature->method_variable->identifier->name;
     return m;
+}
+
+/**
+ *
+ */
+InterfaceMethodsBlockList *create_interface_methods_block_list(InterfaceMethodsBlock *methodBlock) {
+    InterfaceMethodsBlockList *mbl = malloc(sizeof(InterfaceMethodsBlockList));
+    mbl->blocks = malloc(sizeof(InterfaceMethodsBlock *));
+    mbl->count = 1;
+    mbl->blocks[0] = methodBlock;
+    return mbl;
+}
+
+/**
+ *
+ */
+InterfaceMethodsBlockList *add_interface_methods_block(InterfaceMethodsBlockList *list, InterfaceMethodsBlock *element) {
+    int new_size = list->count + 1;
+    InterfaceMethodsBlock **new_list = realloc(list->blocks, new_size * sizeof(InterfaceMethodsBlock *));
+    list->blocks = new_list;
+    list->blocks[list->count] = element;
+    list->count++;
+    return list;
+}
+
+/**
+ *
+ */
+InterfaceMethod *create_interface_method(MethodSignature *method_signature, StatementList *statement_list) {
+    InterfaceMethod *m = malloc(sizeof(InterfaceMethod));
+    m->method_signature = method_signature;
+    m->statement_list = statement_list;
+    m->name = &m->method_signature->method_variable->identifier->name;
+    return m;
+}
+
+/**
+ *
+ */
+InterfaceMethodsList *create_interface_methods_list(InterfaceMethod *method) {
+    InterfaceMethodsList *ml = malloc(sizeof(InterfaceMethodsList));
+    ml->methods = malloc(sizeof(InterfaceMethod *));
+    ml->count = 1;
+    ml->methods[0] = method;
+    return ml;
+}
+
+/**
+ *
+ */
+InterfaceMethodsList *add_interface_method(InterfaceMethodsList *list, InterfaceMethod *element) {
+    int new_size = list->count + 1;
+    InterfaceMethod **new_list = realloc(list->methods, new_size * sizeof(InterfaceMethod *));
+    list->methods = new_list;
+    list->methods[list->count] = element;
+    list->count++;
+    return list;
 }
 
 /**
@@ -808,7 +918,7 @@ void free_object_field(ObjectField *f) {
 /**
  *
  */
-void free_methods_block_list(MethodsBlockList *mbl) {
+void free_methods_block_list(ObjectMethodsBlockList *mbl) {
     if (mbl == NULL) return;
     for (int i = 0; i < mbl->count; i++) {
         free_methods_block(mbl->blocks[i]);
@@ -820,7 +930,7 @@ void free_methods_block_list(MethodsBlockList *mbl) {
 /**
  *
  */
-void free_methods_block(MethodsBlock *mb) {
+void free_methods_block(ObjectMethodsBlock *mb) {
     if (mb == NULL) return;
     free_type(mb->identifier);
     free_methods_list(mb->methods_list);
@@ -830,7 +940,7 @@ void free_methods_block(MethodsBlock *mb) {
 /**
  *
  */
-void free_methods_list(MethodsList *ml) {
+void free_methods_list(ObjectMethodsList *ml) {
     if (ml == NULL) return;
     for (int i = 0; i < ml->count; i++) {
         free_method(ml->methods[i]);
@@ -842,7 +952,7 @@ void free_methods_list(MethodsList *ml) {
 /**
  *
  */
-void free_method(Method *m) {
+void free_method(ObjectMethod *m) {
     if (m == NULL) return;
     free_method_signature(m->method_signature);
     free_statement_list(m->statement_list);

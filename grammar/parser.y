@@ -17,14 +17,20 @@ struct Entity *root;
 char* val;
 struct Node *node;
 struct ObjectEntity *object_entity;
+struct InterfaceEntity *interface_entity;
 struct ImplementsBlock *implements_block;
-struct FieldsBlock *fields_block;
-struct FieldList *field_list;
-struct Field *field;
-struct MethodsBlockList *methods_block_list;
-struct MethodsBlock *methods_block;
-struct MethodsList *methods_list;
-struct Method *method;
+struct ObjectFieldList *object_field_list;
+struct ObjectField *object_field;
+struct InterfaceFieldList *interface_field_list;
+struct InterfaceField *interface_field;
+struct ObjectMethodsBlockList *object_methods_block_list;
+struct ObjectMethodsBlock *object_methods_block;
+struct ObjectMethodsList *object_methods_list;
+struct ObjectMethod *object_method;
+struct InterfaceMethodsBlockList *interface_methods_block_list;
+struct InterfaceMethodsBlock *interface_methods_block;
+struct InterfaceMethodsList *interface_methods_list;
+struct InterfaceMethod *interface_method;
 struct MethodSignature *method_signature;
 struct MethodHeader *method_header;
 struct StatementList *statement_list;
@@ -73,13 +79,20 @@ struct Identifier *identifier;
 
 %type <object_entity> program
 %type <object_entity> object_entity
+%type <interface_entity> interface_entity
 %type <implements_block> implements_block
-%type <field_list> field_list fields_block
-%type <field> field
-%type <methods_block_list> methods_block_list
-%type <methods_block> methods_block
-%type <methods_list> methods_list
-%type <method> method
+%type <object_field_list> object_field_list object_fields_block
+%type <object_field> object_field
+%type <interface_field_list> interface_field_list interface_fields_block
+%type <interface_field> interface_field
+%type <object_methods_block_list> object_methods_block_list
+%type <object_methods_block> object_methods_block
+%type <object_methods_list> object_methods_list
+%type <object_method> object_method
+%type <interface_methods_block_list> interface_methods_block_list
+%type <interface_methods_block> interface_methods_block
+%type <interface_methods_list> interface_methods_list
+%type <interface_method> interface_method
 %type <method_signature> method_signature
 %type <statement_list> statement_list statements_block
 %type <statement> statement
@@ -119,66 +132,87 @@ struct Identifier *identifier;
 %%
 program:
 		object_entity { analyse_ast(create_entity(E_OBJECT, $1)) }
-//	|	interface_entity { analyse_ast(create_entity(E_INTERFACE, $1)) }
+	|	interface_entity { analyse_ast(create_entity(E_INTERFACE, $1)) }
 	;
 
 object_entity:
-		OBJECT COLON type implements_block enum_declartion fields_block methods_block_list { $$ = create_object_entity($3, $4, $6, $7) }
-	| 	OBJECT COLON type implements_block fields_block methods_block_list { $$ = create_object_entity($3, $4, $5, $6) }
-	| 	OBJECT COLON type fields_block { $$ = create_object_entity($3, NULL, $4, NULL) }
+		OBJECT COLON type implements_block enum_declartion object_fields_block object_methods_block_list { $$ = create_object_entity($3, $4, $6, $7) }
+	| 	OBJECT COLON type implements_block object_fields_block object_methods_block_list { $$ = create_object_entity($3, $4, $5, $6) }
+	| 	OBJECT COLON type object_fields_block { $$ = create_object_entity($3, NULL, $4, NULL) }
 	;
 
-//interface_entity:
-//		INTERFACE COLON type fields_block
-//	;
+interface_entity:
+		INTERFACE COLON type interface_fields_block interface_methods_block_list { $$ = create_interface_entity($3, $4)  }
+	;
 
 implements_block:
 		IMPLEMENTS LEFT_BRACE type_list RIGHT_BRACE { $$ = create_implements_block($3) }
 	;
 
-fields_block:
-		FIELDS LEFT_BRACE field_list RIGHT_BRACE { $$ = $3 }
+object_fields_block:
+		FIELDS LEFT_BRACE object_field_list RIGHT_BRACE { $$ = $3 }
 	;
 
-field_list:
-		field { $$ = create_field_list($1) }
-	| 	field_list field { $$ = add_field($1, $2) }
+object_field_list:
+		object_field { $$ = create_object_field_list($1) }
+	| 	object_field_list object_field { $$ = add_object_field($1, $2) }
 	;
 
-field:
-		variable_declaration COLON type  { $$ = create_field($1, $3)  }
-	|	variable_declaration  { $$ = create_field($1, NULL)  }
-
-//interface_fields_block:
-//		FIELDS LEFT_BRACE interface_field_list RIGHT_BRACE { $$ = create_interface_fields_block($3) }
-//	;
-//
-//interface_field_list:
-//		interface_field { $$ = create_interface_field_list($1) }
-//	| 	interface_field_list interface_field { $$ = add_interface_field($1, $2) }
-//	;
-//
-//interface_field:
-//		variable_declaration  { $$ = create_interface_field($1)  }
-//	;
-
-methods_block_list:
-		methods_block {  $$ = create_methods_block_list($1);  }
-	|	methods_block_list methods_block {  $$ = add_methods_block($1, $2);  }
+object_field:
+		variable_declaration COLON type  { $$ = create_object_field($1, $3)  }
+	|	variable_declaration  { $$ = create_object_field($1, NULL)  }
 	;
 
-methods_block:
-		type LEFT_BRACE methods_list RIGHT_BRACE { $$ = create_methods_block($1, $3) }
-	|	type LEFT_BRACE enum_declartion methods_list RIGHT_BRACE { $$ = create_methods_block($1, $4) }
+interface_fields_block:
+		FIELDS LEFT_BRACE interface_field_list RIGHT_BRACE { $$ = $3 }
 	;
 
-methods_list:
-		method { $$ = create_methods_list($1) }
-	|	methods_list method { $$ = add_methods($1, $2) }
+interface_field_list:
+		interface_field { $$ = create_interface_field_list($1) }
+	| 	interface_field_list interface_field { $$ = add_interface_field($1, $2) }
 	;
 
-method:
-		method_signature statements_block { $$ = create_method($1, $2) }
+interface_field:
+		variable_declaration  { $$ = create_interface_field($1)  }
+	;
+
+object_methods_block_list:
+		object_methods_block {  $$ = create_object_methods_block_list($1);  }
+	|	object_methods_block_list object_methods_block {  $$ = add_object_methods_block($1, $2);  }
+	;
+
+object_methods_block:
+		type LEFT_BRACE object_methods_list RIGHT_BRACE { $$ = create_object_methods_block($1, $3) }
+	|	type LEFT_BRACE enum_declartion object_methods_list RIGHT_BRACE { $$ = create_object_methods_block($1, $4) }
+	;
+
+object_methods_list:
+		object_method { $$ = create_object_methods_list($1) }
+	|	object_methods_list object_method { $$ = add_object_method($1, $2) }
+	;
+
+object_method:
+		method_signature statements_block { $$ = create_object_method($1, $2) }
+	;
+
+interface_methods_block_list:
+		interface_methods_block {  $$ = create_interface_methods_block_list($1);  }
+	|	interface_methods_block_list interface_methods_block {  $$ = add_interface_methods_block($1, $2);  }
+	;
+
+interface_methods_block:
+		type LEFT_BRACE interface_methods_list RIGHT_BRACE { $$ = create_interface_methods_block($1, $3) }
+	|	type LEFT_BRACE enum_declartion interface_methods_list RIGHT_BRACE { $$ = create_interface_methods_block($1, $4) }
+	;
+
+interface_methods_list:
+		interface_method { $$ = create_interface_methods_list($1) }
+	|	interface_methods_list interface_method { $$ = add_interface_method($1, $2) }
+	;
+
+interface_method:
+		method_signature statements_block { $$ = create_interface_method($1, $2) }
+	|	method_signature { $$ = create_interface_method($1, NULL) }
 	;
 
 method_signature:

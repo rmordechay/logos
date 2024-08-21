@@ -33,10 +33,10 @@ cJSON *create_pattern_list_json(PatternList *list);
 cJSON *create_statement_json(Statement *obj);
 cJSON *create_statement_list_json(StatementList *list);
 cJSON *create_method_signature_json(MethodSignature *obj);
-cJSON *create_method_json(Method *obj);
-cJSON *create_methods_list_json(MethodsList *list);
-cJSON *create_methods_block_json(MethodsBlock *obj);
-cJSON *create_methods_block_list_json(MethodsBlockList *list);
+cJSON *create_method_json(ObjectMethod *obj);
+cJSON *create_methods_list_json(ObjectMethodsList *list);
+cJSON *create_methods_block_json(ObjectMethodsBlock *obj);
+cJSON *create_methods_block_list_json(ObjectMethodsBlockList *list);
 cJSON *create_object_file_json(ObjectEntity *obj);
 
 
@@ -422,7 +422,7 @@ cJSON *create_method_signature_json(MethodSignature *obj) {
 /**
  *
  */
-cJSON *create_method_json(Method *obj) {
+cJSON *create_method_json(ObjectMethod *obj) {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "method_signature", create_method_signature_json(obj->method_signature));
     if (obj->statement_list) {
@@ -434,7 +434,7 @@ cJSON *create_method_json(Method *obj) {
 /**
  *
  */
-cJSON *create_methods_list_json(MethodsList *list) {
+cJSON *create_methods_list_json(ObjectMethodsList *list) {
     cJSON *root = cJSON_CreateArray();
     for (int i = 0; i < list->count; i++) {
         cJSON_AddItemToArray(root, create_method_json(list->methods[i]));
@@ -445,7 +445,7 @@ cJSON *create_methods_list_json(MethodsList *list) {
 /**
  *
  */
-cJSON *create_methods_block_json(MethodsBlock *obj) {
+cJSON *create_methods_block_json(ObjectMethodsBlock *obj) {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "identifier", create_type_json(obj->identifier));
     cJSON_AddItemToObject(root, "methods_list", create_methods_list_json(obj->methods_list));
@@ -455,7 +455,7 @@ cJSON *create_methods_block_json(MethodsBlock *obj) {
 /**
  *
  */
-cJSON *create_methods_block_list_json(MethodsBlockList *list) {
+cJSON *create_methods_block_list_json(ObjectMethodsBlockList *list) {
     cJSON *root = cJSON_CreateArray();
     for (int i = 0; i < list->count; i++) {
         cJSON_AddItemToArray(root, create_methods_block_json(list->blocks[i]));
