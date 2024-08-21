@@ -406,20 +406,20 @@ ImplementsBlock *create_implements_block(TypeList *type_list);
 // Field
 FieldsBlock *create_fields_block(FieldList *field_list);
 FieldList *create_field_list(Field *field);
-FieldList *flatten_field_list(FieldList *list, Field *element);
+FieldList *add_field(FieldList *list, Field *element);
 Field *create_field(VariableDec *variable_declaration, Type *type);
 // Method block
 MethodsBlockList *create_methods_block_list(MethodsBlock *methodBlock);
 MethodsBlock *create_methods_block(Type *type, MethodsList *methods_list);
-MethodsBlockList *flatten_methods_block_list(MethodsBlockList *list, MethodsBlock *element);
+MethodsBlockList *add_methods_block(MethodsBlockList *list, MethodsBlock *element);
 // Method
 MethodsList *create_methods_list(Method *method);
-MethodsList *flatten_methods_list(MethodsList *list, Method *element);
+MethodsList *add_methods(MethodsList *list, Method *element);
 Method *create_method(MethodSignature *method_signature, StatementList *statement_list);
 MethodSignature *create_method_signature(VariableDec *variable_dec, VariableDecList *variable_declaration_list);
 // Statement
 StatementList *create_statement_list(Statement *statement);
-StatementList *flatten_statement_list(StatementList *list, Statement *element);
+StatementList *add_statement(StatementList *list, Statement *element);
 Statement *create_stmt_from_local_dec(LocalDeclaration *local_declaration);
 Statement *create_stmt_from_if_stmt(IfStatement *if_statement);
 Statement *create_stmt_from_pm(PatternMatching *pattern_matching);
@@ -433,12 +433,12 @@ Statement *create_stmt_from_enum(EnumDeclaration *enum_declaration);
 LocalDeclaration *create_local_declaration(Type *type, Identifier *identifier, Expr *expr);
 VariableDecList *create_var_dec_list(VariableDec *variable_dec);
 VariableDec *create_variable_declaration(Type *type, Identifier *identifier);
-VariableDecList *flatten_var_dec_list(VariableDecList *list, VariableDec *element);
+VariableDecList *add_var_dec(VariableDecList *list, VariableDec *element);
 // If statement
 IfStatement *create_if_statement(IfBlock *if_block, IfOrBlockList *if_or_block_list, OrBlock *or_block);
 IfBlock *create_if_block(Expr *expr, StatementList *statement_list);
 IfOrBlockList *create_if_or_block_list(IfOrBlock *if_or_block);
-IfOrBlockList *flatten_if_or_block_list(IfOrBlockList *list, IfOrBlock *element);
+IfOrBlockList *add_if_or_block(IfOrBlockList *list, IfOrBlock *element);
 IfOrBlock *create_if_or_block(Expr *expr, StatementList *statement_list);
 OrBlock *create_or_block(StatementList *statement_list);
 // Pattern matching
@@ -447,7 +447,7 @@ PatternMatching *create_pattern_matching(PatternList *pattern_list);
 Pattern *create_pattern_from_stmt_list(Expr *condition, StatementList *statement_list);
 Pattern *create_pattern_from_expr(Expr *condition, Expr *expr);
 PatternList *create_pattern_list(Pattern *pattern);
-PatternList *flatten_pattern_list(PatternList *list, Pattern *element);
+PatternList *add_pattern(PatternList *list, Pattern *element);
 // For loop
 Iteration *create_iteration_from_for_in(ForInLoop *for_in_loop, StatementList *statement_list);
 Iteration *create_iteration_from_while(WhileLoop *while_loop, StatementList *statement_list);
@@ -460,7 +460,7 @@ ReturnStatement *create_return_statement(ExprList *expr_list);
 Expr *create_expr_from_unary(UnaryExpr *unary_expr);
 Expr *create_expr_from_binary(BinaryExpr *binary_expr);
 ExprList *create_expr_list(Expr *expr);
-ExprList *flatten_expr_list(ExprList *list, Expr *element);
+ExprList *add_expr(ExprList *list, Expr *element);
 BinaryExpr *create_binary_expr(Expr *left, Expr *right, char operator);
 UnaryExpr *create_unary_expr_from_number(int type, char *integer_value);
 UnaryExpr *create_unary_expr_from_id(Identifier *identifier);
@@ -476,10 +476,10 @@ EnumDeclaration *create_enum_declaration(Type *type, ConstantVariableList *const
 Identifier *create_identifier(char *name);
 ConstantVariable *create_constant_variable(char *name);
 ConstantVariableList *create_const_var_list(ConstantVariable *constant_variable);
-ConstantVariableList *flatten_const_var_list(ConstantVariableList *list, ConstantVariable *element);
+ConstantVariableList *add_const_var(ConstantVariableList *list, ConstantVariable *element);
 Type *create_type(char *name);
 TypeList *create_type_list(Type *type);
-TypeList *flatten_type_list(TypeList *list, Type *element);
+TypeList *add_type(TypeList *list, Type *element);
 
 void free_entity(Entity *obj);
 void free_object_file(ObjectEntity *obj);

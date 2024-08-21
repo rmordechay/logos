@@ -398,6 +398,8 @@ cJSON *create_statement_json(Statement *obj) {
         case ST_BREAK_STATEMENT:
         case ST_CONTINUE_STATEMENT:
             break;
+        case ST_ENUM_STATEMENT:
+            break;
     }
     return root;
 }

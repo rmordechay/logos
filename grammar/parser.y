@@ -65,7 +65,8 @@ struct Identifier *identifier;
 
 %token AND OR NOT
 %token RETURN BREAK CONTINUE
-%token LET FUNC IMPLEMENTS FIELDS OBJECT IF FOR IMPORT IN ENUM CONST
+%token OBJECT INTERFACE IMPLEMENTS FIELDS IMPORT ENUM
+%token LET FUNC IF FOR IN CONST
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE LEFT_BRACKET RIGHT_BRACKET LEFT_ANGLE RIGHT_ANGLE
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
 %token <val> INTEGER FLOAT IDENTIFIER BOOL STRING TYPE
@@ -119,6 +120,7 @@ struct Identifier *identifier;
 %%
 program:
 		object_entity { analyse_ast(create_entity(E_OBJECT, $1)) }
+//	|	interface_entity { analyse_ast(create_entity(E_INTERFACE, $1)) }
 	;
 
 object_entity:
@@ -126,6 +128,10 @@ object_entity:
 	| 	OBJECT COLON type implements_block fields_block methods_block_list { $$ = create_object_entity($3, $4, $5, $6) }
 	| 	OBJECT COLON type fields_block { $$ = create_object_entity($3, NULL, $4, NULL) }
 	;
+
+//interface_entity:
+//		INTERFACE COLON type fields_block
+//	;
 
 implements_block:
 		IMPLEMENTS LEFT_BRACE type_list RIGHT_BRACE { $$ = create_implements_block($3) }
@@ -137,17 +143,29 @@ fields_block:
 
 field_list:
 		field { $$ = create_field_list($1) }
-	| 	field_list field { $$ = flatten_field_list($1, $2) }
+	| 	field_list field { $$ = add_field($1, $2) }
 	;
 
 field:
 		variable_declaration COLON type  { $$ = create_field($1, $3)  }
 	|	variable_declaration  { $$ = create_field($1, NULL)  }
-	;
+
+//interface_fields_block:
+//		FIELDS LEFT_BRACE interface_field_list RIGHT_BRACE { $$ = create_interface_fields_block($3) }
+//	;
+//
+//interface_field_list:
+//		interface_field { $$ = create_interface_field_list($1) }
+//	| 	interface_field_list interface_field { $$ = add_interface_field($1, $2) }
+//	;
+//
+//interface_field:
+//		variable_declaration  { $$ = create_interface_field($1)  }
+//	;
 
 methods_block_list:
 		methods_block {  $$ = create_methods_block_list($1);  }
-	|	methods_block_list methods_block {  $$ = flatten_methods_block_list($1, $2);  }
+	|	methods_block_list methods_block {  $$ = add_methods_block($1, $2);  }
 	;
 
 methods_block:
@@ -157,7 +175,7 @@ methods_block:
 
 methods_list:
 		method { $$ = create_methods_list($1) }
-	|	methods_list method { $$ = flatten_methods_list($1, $2) }
+	|	methods_list method { $$ = add_methods($1, $2) }
 	;
 
 method:
@@ -176,7 +194,7 @@ statements_block:
 
 statement_list:
 		statement { $$ = create_statement_list($1) }
-	|	statement_list statement { $$ = flatten_statement_list($1, $2) }
+	|	statement_list statement { $$ = add_statement($1, $2) }
 	;
 
 statement:
@@ -209,7 +227,7 @@ if_block:
 
 if_or_block_list:
 		if_or_block { $$ = create_if_or_block_list($1) }
-	|	if_or_block_list if_or_block { $$ = flatten_if_or_block_list($1, $2) }
+	|	if_or_block_list if_or_block { $$ = add_if_or_block($1, $2) }
 	;
 
 if_or_block:
@@ -230,7 +248,7 @@ pattern_matching_expr:
 
 pattern_list:
 		pattern { $$ = create_pattern_list($1) }
-	|	pattern_list pattern { $$ =  flatten_pattern_list($1, $2) }
+	|	pattern_list pattern { $$ =  add_pattern($1, $2) }
 	;
 
 pattern:
@@ -261,7 +279,7 @@ return_statement:
 
 expr_list:
 		expr { $$ = create_expr_list($1) }
-	|	expr_list COMMA expr { $$ =  flatten_expr_list($1, $3) }
+	|	expr_list COMMA expr { $$ =  add_expr($1, $3) }
 	|	LEFT_PAREN expr_list RIGHT_PAREN { $$ =  $2 }
     ;
 
@@ -322,7 +340,7 @@ enum_declartion:
 
 variable_declaration_list:
 		variable_declaration { $$ = create_var_dec_list($1) }
-	|	variable_declaration_list COMMA variable_declaration { $$ = flatten_var_dec_list($1, $3) }
+	|	variable_declaration_list COMMA variable_declaration { $$ = add_var_dec($1, $3) }
 	;
 
 variable_declaration:
@@ -335,7 +353,7 @@ type:
 
 type_list:
 	  	type { $$ = create_type_list($1)  }
-	| 	type_list COMMA type { $$ = flatten_type_list($1, $3)  }
+	| 	type_list COMMA type { $$ = add_type($1, $3)  }
 	;
 
 constant_variable:
@@ -344,7 +362,7 @@ constant_variable:
 
 constant_variable_list:
 		constant_variable { $$ = create_const_var_list($1)  }
-	|	constant_variable_list constant_variable { $$ = flatten_const_var_list($1, $2)  }
+	|	constant_variable_list constant_variable { $$ = add_const_var($1, $2)  }
 	;
 
 identifier:

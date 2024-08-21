@@ -40,11 +40,7 @@ void check_fields_implementation(TypeList *implements_types, FieldList *field_li
         for (int j = 0; j < field_list->count; j++) {
             Field *field = field_list->fields[j];
             Type *implement_type = field->implements;
-            if (implement_type == NULL || strcmp(type_name, implement_type->name) == 0) {
-                continue;
-            } else {
-                errors[err_count++] = create_error(ERR_FIELDS_NOT_IMPLEMENTED);
-            }
+            if (implement_type == NULL) continue;
         }
     }
 }

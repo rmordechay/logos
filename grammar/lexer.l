@@ -24,6 +24,7 @@ STRING          \"([^\"\\]|\\.)*\"
 "func"                  {  return FUNC; }
 "object"                {  return OBJECT; }
 "implements"            {  return IMPLEMENTS; }
+"interface"             {  return INTERFACE; }
 "fields"                {  return FIELDS; }
 "if"                    {  return IF; }
 "for"                   {  return FOR; }

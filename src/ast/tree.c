@@ -88,7 +88,7 @@ FieldList *create_field_list(Field *field) {
 /**
  *
  */
-FieldList *flatten_field_list(FieldList *list, Field *element) {
+FieldList *add_field(FieldList *list, Field *element) {
     int new_size = list->count + 1;
     Field **new_list = realloc(list->fields, new_size * sizeof(Field *));
     list->fields = new_list;
@@ -121,7 +121,7 @@ MethodsBlockList *create_methods_block_list(MethodsBlock *methodBlock) {
 /**
  *
  */
-MethodsBlockList *flatten_methods_block_list(MethodsBlockList *list, MethodsBlock *element) {
+MethodsBlockList *add_methods_block(MethodsBlockList *list, MethodsBlock *element) {
     int new_size = list->count + 1;
     MethodsBlock **new_list = realloc(list->blocks, new_size * sizeof(MethodsBlock *));
     list->blocks = new_list;
@@ -155,7 +155,7 @@ MethodsList *create_methods_list(Method *method) {
 /**
  *
  */
-MethodsList *flatten_methods_list(MethodsList *list, Method *element) {
+MethodsList *add_methods(MethodsList *list, Method *element) {
     int new_size = list->count + 1;
     Method **new_list = realloc(list->methods, new_size * sizeof(Method *));
     list->methods = new_list;
@@ -205,7 +205,7 @@ StatementList *create_statement_list(Statement *statement) {
 /**
  *
  */
-StatementList *flatten_statement_list(StatementList *list, Statement *element) {
+StatementList *add_statement(StatementList *list, Statement *element) {
     int new_size = list->count + 1;
     Statement **new_list = realloc(list->statements, new_size * sizeof(Statement *));
     list->statements = new_list;
@@ -361,7 +361,7 @@ IfOrBlockList *create_if_or_block_list(IfOrBlock *if_or_block) {
 /**
  *
  */
-IfOrBlockList *flatten_if_or_block_list(IfOrBlockList *list, IfOrBlock *element) {
+IfOrBlockList *add_if_or_block(IfOrBlockList *list, IfOrBlock *element) {
     int new_size = list->count + 1;
     IfOrBlock **new_list = realloc(list->if_or_blocks, new_size * sizeof(IfOrBlock *));
     list->if_or_blocks = new_list;
@@ -444,7 +444,7 @@ PatternList *create_pattern_list(Pattern *pattern) {
 /**
  *
  */
-PatternList *flatten_pattern_list(PatternList *list, Pattern *element) {
+PatternList *add_pattern(PatternList *list, Pattern *element) {
     int new_size = list->count + 1;
     Pattern **new_list = realloc(list->patterns, new_size * sizeof(Pattern *));
     list->patterns = new_list;
@@ -547,7 +547,7 @@ ExprList *create_expr_list(Expr *expr) {
 /**
  *
  */
-ExprList *flatten_expr_list(ExprList *list, Expr *element) {
+ExprList *add_expr(ExprList *list, Expr *element) {
     int new_size = list->count + 1;
     Expr **new_list = realloc(list->exprs, new_size * sizeof(Expr *));
     list->exprs = new_list;
@@ -642,7 +642,7 @@ VariableDecList *create_var_dec_list(VariableDec *variable_dec) {
 /**
  *
  */
-VariableDecList *flatten_var_dec_list(VariableDecList *list, VariableDec *element) {
+VariableDecList *add_var_dec(VariableDecList *list, VariableDec *element) {
     int new_size = list->count + 1;
     VariableDec **new_list = realloc(list->var_declarations, new_size * sizeof(VariableDec *));
     list->var_declarations = new_list;
@@ -714,7 +714,7 @@ ConstantVariableList *create_const_var_list(ConstantVariable *constant_variable)
 /**
  *
  */
-ConstantVariableList *flatten_const_var_list(ConstantVariableList *list, ConstantVariable *element) {
+ConstantVariableList *add_const_var(ConstantVariableList *list, ConstantVariable *element) {
     int new_size = list->count + 1;
     ConstantVariable **new_list = realloc(list->constant_variables, new_size * sizeof(ConstantVariable *));
     list->constant_variables = new_list;
@@ -747,7 +747,7 @@ TypeList *create_type_list(Type *type) {
 /**
  *
  */
-TypeList *flatten_type_list(TypeList *list, Type *element) {
+TypeList *add_type(TypeList *list, Type *element) {
     int new_size = list->count + 1;
     Type **new_list = realloc(list->types, new_size * sizeof(Type *));
     list->types = new_list;
