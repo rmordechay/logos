@@ -24,7 +24,7 @@ void analyse_object(ObjectEntity *entity) {
  *
  */
 void check_implementations(ObjectEntity *entity) {
-    FieldList *field_list = entity->fields_block->field_list;
+    ObjectFieldList *field_list = entity->field_list;
     TypeList *implements_type = entity->implements_block->type_list;
     MethodsBlockList *methods_block_list = entity->methods_block_list;
     check_fields_implementation(implements_type, field_list);
@@ -34,11 +34,11 @@ void check_implementations(ObjectEntity *entity) {
 /**
  *
  */
-void check_fields_implementation(TypeList *implements_types, FieldList *field_list) {
+void check_fields_implementation(TypeList *implements_types, ObjectFieldList *field_list) {
     for (int i = 0; i < implements_types->count; i++) {
         char *type_name = implements_types->types[i]->name;
         for (int j = 0; j < field_list->count; j++) {
-            Field *field = field_list->fields[j];
+            ObjectField *field = field_list->fields[j];
             Type *implement_type = field->implements;
             if (implement_type == NULL) continue;
         }

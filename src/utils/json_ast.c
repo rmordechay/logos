@@ -10,9 +10,8 @@ cJSON *create_type_json(Type *obj);
 cJSON *create_type_list_json(TypeList *list);
 cJSON *create_variable_declaration_json(VariableDec *obj);
 cJSON *create_variable_declaration_list_json(VariableDecList *list);
-cJSON *create_field_json(Field *obj);
-cJSON *create_field_list_json(FieldList *obj);
-cJSON *create_fields_block_json(FieldsBlock *obj);
+cJSON *create_field_json(ObjectField *obj);
+cJSON *create_field_list_json(ObjectFieldList *obj);
 cJSON *create_implements_block_json(ImplementsBlock *obj);
 cJSON *create_expr_json(Expr *obj);
 cJSON *create_expr_list_json(ExprList *list);
@@ -48,7 +47,7 @@ cJSON *create_object_file_json(ObjectEntity *obj) {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddStringToObject(root, "kind", "ObjectEntity");
     cJSON_AddItemToObject(root, "id", create_type_json(obj->id));
-    cJSON_AddItemToObject(root, "fields_block", create_fields_block_json(obj->fields_block));
+    cJSON_AddItemToObject(root, "field_list", create_field_list_json(obj->field_list));
     if (obj->implements_block) {
         cJSON_AddItemToObject(root, "implements_block", create_implements_block_json(obj->implements_block));
     }
@@ -112,7 +111,7 @@ cJSON *create_variable_declaration_list_json(VariableDecList *list) {
 /**
  *
  */
-cJSON *create_field_json(Field *obj) {
+cJSON *create_field_json(ObjectField *obj) {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "method_variable", create_variable_declaration_json(obj->variable_declaration));
     if (obj->implements) {
@@ -123,20 +122,11 @@ cJSON *create_field_json(Field *obj) {
 /**
  *
  */
-cJSON *create_field_list_json(FieldList *obj) {
+cJSON *create_field_list_json(ObjectFieldList *obj) {
     cJSON *root = cJSON_CreateArray();
     for (int i = 0; i < obj->count; i++) {
         cJSON_AddItemToArray(root, create_field_json(obj->fields[i]));
     }
-    return root;
-}
-
-/**
- *
- */
-cJSON *create_fields_block_json(FieldsBlock *obj) {
-    cJSON *root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "field_list", create_field_list_json(obj->field_list));
     return root;
 }
 

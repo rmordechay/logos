@@ -74,8 +74,7 @@ struct Identifier *identifier;
 %type <object_entity> program
 %type <object_entity> object_entity
 %type <implements_block> implements_block
-%type <fields_block> fields_block
-%type <field_list> field_list
+%type <field_list> field_list fields_block
 %type <field> field
 %type <methods_block_list> methods_block_list
 %type <methods_block> methods_block
@@ -138,7 +137,7 @@ implements_block:
 	;
 
 fields_block:
-		FIELDS LEFT_BRACE field_list RIGHT_BRACE { $$ = create_fields_block($3) }
+		FIELDS LEFT_BRACE field_list RIGHT_BRACE { $$ = $3 }
 	;
 
 field_list:
@@ -204,7 +203,7 @@ statement:
 	|	pattern_matching  { $$ = create_stmt_from_pm($1);  }
 	|	pattern_matching_expr  { $$ = create_stmt_from_pme($1);  }
 	|	iteration  { $$ = create_stmt_from_iteration($1); }
-	|	return_statement  { $$ = create_stmt_from_return_stmt($1);  }
+	|	return_statement  { $$ = create_stmt_from_return($1);  }
 	|	CONTINUE  { $$ = create_stmt_from_continue();  }
 	|	BREAK expr  { $$ = create_stmt_from_break($2);  }
 	;

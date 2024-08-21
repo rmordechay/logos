@@ -86,22 +86,15 @@ typedef struct EnumBlock {
 typedef struct Field {
     VariableDec *variable_declaration;
     Type *implements;  // Optional
-} Field;
+} ObjectField;
 
 /**
  *
  */
 typedef struct FieldList {
-    Field **fields;
+    ObjectField **fields;
     int count;
-} FieldList;
-
-/**
- *
- */
-typedef struct FieldsBlock {
-    FieldList *field_list;
-} FieldsBlock;
+} ObjectFieldList;
 
 /**
  *
@@ -383,7 +376,7 @@ typedef struct MethodsBlockList {
  */
 typedef struct ObjectEntity {
     Type *id;
-    FieldsBlock *fields_block;
+    ObjectFieldList *field_list;
     ImplementsBlock *implements_block;
     MethodsBlockList *methods_block_list;
 } ObjectEntity;
@@ -401,13 +394,12 @@ typedef struct Entity {
 void analyse_ast(Entity *entity);
 Entity *create_entity(EntityType entity_type, void *entity_tree);
 
-ObjectEntity *create_object_entity(Type *type, ImplementsBlock *implements_block, FieldsBlock *fields_block, MethodsBlockList *methods_block_list);
+ObjectEntity *create_object_entity(Type *type, ImplementsBlock *implements_block, ObjectFieldList *fields_list, MethodsBlockList *methods_block_list);
 ImplementsBlock *create_implements_block(TypeList *type_list);
-// Field
-FieldsBlock *create_fields_block(FieldList *field_list);
-FieldList *create_field_list(Field *field);
-FieldList *add_field(FieldList *list, Field *element);
-Field *create_field(VariableDec *variable_declaration, Type *type);
+// ObjectField
+ObjectFieldList *create_field_list(ObjectField *field);
+ObjectFieldList *add_field(ObjectFieldList *list, ObjectField *element);
+ObjectField *create_field(VariableDec *variable_declaration, Type *type);
 // Method block
 MethodsBlockList *create_methods_block_list(MethodsBlock *methodBlock);
 MethodsBlock *create_methods_block(Type *type, MethodsList *methods_list);
@@ -425,7 +417,7 @@ Statement *create_stmt_from_if_stmt(IfStatement *if_statement);
 Statement *create_stmt_from_pm(PatternMatching *pattern_matching);
 Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr);
 Statement *create_stmt_from_iteration(Iteration *iteration);
-Statement *create_stmt_from_return_stmt(ReturnStatement *return_statement);
+Statement *create_stmt_from_return(ReturnStatement *return_statement);
 Statement *create_stmt_from_break(Expr *break_expr);
 Statement *create_stmt_from_continue();
 Statement *create_stmt_from_enum(EnumDeclaration *enum_declaration);
@@ -484,9 +476,8 @@ TypeList *add_type(TypeList *list, Type *element);
 void free_entity(Entity *obj);
 void free_object_file(ObjectEntity *obj);
 void free_implements_block(ImplementsBlock *ib);
-void free_fields_block(FieldsBlock *fb);
-void free_field_list(FieldList *fl);
-void free_field(Field *f);
+void free_object_field_list(ObjectFieldList *fl);
+void free_object_field(ObjectField *f);
 void free_methods_block_list(MethodsBlockList *mbl);
 void free_methods_block(MethodsBlock *mb);
 void free_methods_list(MethodsList *ml);

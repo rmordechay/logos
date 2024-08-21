@@ -46,11 +46,11 @@ Entity *create_entity(EntityType entity_type, void *entity_tree) {
  */
 ObjectEntity *create_object_entity(Type *type,
                                    ImplementsBlock *implements_block,
-                                   FieldsBlock *fields_block,
+                                   ObjectFieldList *fields_list,
                                    MethodsBlockList *methods_block_list) {
     ObjectEntity *obj = malloc(sizeof(ObjectEntity));
     obj->id = type;
-    obj->fields_block = fields_block;
+    obj->field_list = fields_list;
     obj->implements_block = implements_block;
     obj->methods_block_list = methods_block_list;
     return obj;
@@ -68,18 +68,9 @@ ImplementsBlock *create_implements_block(TypeList *type_list) {
 /**
  *
  */
-FieldsBlock *create_fields_block(FieldList *field_list) {
-    FieldsBlock *fb = malloc(sizeof(FieldsBlock));
-    fb->field_list = field_list;
-    return fb;
-}
-
-/**
- *
- */
-FieldList *create_field_list(Field *field) {
-    FieldList *fl = malloc(sizeof(FieldList));
-    fl->fields = malloc(sizeof(Field *));
+ObjectFieldList *create_field_list(ObjectField *field) {
+    ObjectFieldList *fl = malloc(sizeof(ObjectFieldList));
+    fl->fields = malloc(sizeof(ObjectField *));
     fl->count = 1;
     fl->fields[0] = field;
     return fl;
@@ -88,9 +79,9 @@ FieldList *create_field_list(Field *field) {
 /**
  *
  */
-FieldList *add_field(FieldList *list, Field *element) {
+ObjectFieldList *add_field(ObjectFieldList *list, ObjectField *element) {
     int new_size = list->count + 1;
-    Field **new_list = realloc(list->fields, new_size * sizeof(Field *));
+    ObjectField **new_list = realloc(list->fields, new_size * sizeof(ObjectField *));
     list->fields = new_list;
     list->fields[list->count] = element;
     list->count++;
@@ -100,8 +91,8 @@ FieldList *add_field(FieldList *list, Field *element) {
 /**
  *
  */
-Field *create_field(VariableDec *variable_declaration, Type *type) {
-    Field *f = malloc(sizeof(Field));
+ObjectField *create_field(VariableDec *variable_declaration, Type *type) {
+    ObjectField *f = malloc(sizeof(ObjectField));
     f->variable_declaration = variable_declaration;
     f->implements = type;
     return f;
@@ -277,7 +268,7 @@ Statement *create_stmt_from_iteration(Iteration *iteration) {
 /**
  *
  */
-Statement *create_stmt_from_return_stmt(ReturnStatement *return_statement) {
+Statement *create_stmt_from_return(ReturnStatement *return_statement) {
     Statement *s = malloc(sizeof(Statement));
     s->return_statement = return_statement;
     s->type = ST_RETURN_STATEMENT;
@@ -776,7 +767,7 @@ void free_entity(Entity *obj) {
  */
 void free_object_file(ObjectEntity *obj) {
     if (obj == NULL) return;
-    free_fields_block(obj->fields_block);
+    free_object_field_list(obj->field_list);
     free_methods_block_list(obj->methods_block_list);
     free_implements_block(obj->implements_block);
     free(obj->id);
@@ -795,19 +786,10 @@ void free_implements_block(ImplementsBlock *ib) {
 /**
  *
  */
-void free_fields_block(FieldsBlock *fb) {
-    if (fb == NULL) return;
-    free_field_list(fb->field_list);
-    free(fb);
-}
-
-/**
- *
- */
-void free_field_list(FieldList *fl) {
+void free_object_field_list(ObjectFieldList *fl) {
     if (fl == NULL) return;
     for (int i = 0; i < fl->count; i++) {
-        free_field(fl->fields[i]);
+        free_object_field(fl->fields[i]);
     }
     free(fl->fields);
     free(fl);
@@ -816,7 +798,7 @@ void free_field_list(FieldList *fl) {
 /**
  *
  */
-void free_field(Field *f) {
+void free_object_field(ObjectField *f) {
     if (f == NULL) return;
     free_variable_declaration(f->variable_declaration);
     free_type(f->implements);
