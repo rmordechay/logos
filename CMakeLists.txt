@@ -11,11 +11,11 @@ find_package(CURL REQUIRED)
 file(MAKE_DIRECTORY ${GEN_DIR_SOURCE})
 
 BISON_TARGET(
-    Parser grammar/parser.y ${GEN_DIR_BUILD}/parser.c
+    Parser grammar/parser.y ${GEN_DIR_SOURCE}/parser.c
     DEFINES_FILE ${GEN_DIR_SOURCE}/parser.h
     COMPILE_FLAGS -v
 )
-FLEX_TARGET(Lexer grammar/lexer.l ${GEN_DIR_BUILD}/lexer.c)
+FLEX_TARGET(Lexer grammar/lexer.l ${GEN_DIR_SOURCE}/lexer.c)
 add_flex_bison_dependency(Lexer Parser)
 
 set(
@@ -27,7 +27,6 @@ set(
     src/project/project.c
     src/project/project.h
     src/project/application.c
-    src/project/app_file.c
     src/ast/tree.c
     main.c
     src/utils/json_ast.c

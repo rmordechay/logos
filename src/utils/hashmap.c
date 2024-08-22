@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
+#include <printf.h>
 #include "hashmap.h"
+#include "project/project.h"
 
 /**
  *
@@ -27,7 +29,7 @@ HashMap* create_hash_map() {
 /**
  *
  */
-void insert(HashMap* map, const char* key, int value) {
+void insert(HashMap* map, const char* key, void *value) {
     unsigned int index = hash(key);
     KeyValue* newPair = (KeyValue*)malloc(sizeof(KeyValue));
     newPair->key = strdup(key);
@@ -60,7 +62,7 @@ void insert(HashMap* map, const char* key, int value) {
 /**
  *
  */
-int get(HashMap* map, const char* key) {
+void *get(HashMap* map, const char* key) {
     unsigned int index = hash(key);
     KeyValue* current = map->table[index];
     while (current != NULL) {
@@ -69,7 +71,7 @@ int get(HashMap* map, const char* key) {
         }
         current = current->next;
     }
-    return -1;
+    return NULL;
 }
 
 /**
@@ -86,4 +88,15 @@ void free_hash_map(HashMap* map) {
         }
     }
     free(map);
+}
+
+/**
+ *
+ */
+void print_map(HashMap *map) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        if (!map->table[i]) continue;
+        Package *value = map->table[i]->value;
+        printf("%s\n", map->table[i]->key);
+    }
 }

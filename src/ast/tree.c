@@ -4,7 +4,7 @@
 #include "tree.h"
 #include "parser.h"
 #include "analyser/object_analyser.h"
-#include "rule_type.h"
+#include "token_types.h"
 
 void yyerror(const char* s);
 unsigned int iteration_level;

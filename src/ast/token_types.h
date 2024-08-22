@@ -1,5 +1,5 @@
-#ifndef LOGOS_RULE_TYPE_H
-#define LOGOS_RULE_TYPE_H
+#ifndef LOGOS_TOKEN_TYPES_H
+#define LOGOS_TOKEN_TYPES_H
 
 /**
  *
@@ -32,6 +32,7 @@ typedef enum ExprType {
     E_UNARY,
     E_BINARY,
 } ExprType;
+
 /**
  *
  */
@@ -44,6 +45,7 @@ typedef enum UnaryExprType {
     UE_METHOD_CALL,
     UE_COLLECTION,
 } UnaryExprType;
+
 /**
  *
  */
@@ -58,6 +60,7 @@ typedef enum StatementType {
     ST_CONTINUE_STATEMENT,
     ST_ENUM_STATEMENT,
 } StatementType;
+
 /**
  *
  */
@@ -65,6 +68,7 @@ typedef enum PatternBodyType {
     PB_EXPR,
     PB_STMT_LIST,
 } PatternBodyType;
+
 /**
  *
  */
@@ -74,4 +78,4 @@ typedef enum IterationType {
     FL_IN,
 } IterationType;
 
-#endif //LOGOS_RULE_TYPE_H
+#endif //LOGOS_TOKEN_TYPES_H

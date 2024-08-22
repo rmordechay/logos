@@ -1,6 +1,6 @@
 #ifndef TREE_H
 #define TREE_H
-#include "rule_type.h"
+#include "token_types.h"
 
 
 /**

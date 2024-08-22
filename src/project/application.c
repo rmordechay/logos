@@ -56,3 +56,12 @@ Package *create_package(const char *name) {
 void free_package(Package *package) {
     free(package);
 }
+
+/**
+ *
+ */
+void free_file(AppFile *file) {
+    free(file->path);
+    free(file->parent_path);
+    free(file);
+}

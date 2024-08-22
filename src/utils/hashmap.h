@@ -5,7 +5,7 @@
 
 typedef struct KeyValue {
     char* key;
-    int value;
+    void *value;
     struct KeyValue* next;
 } KeyValue;
 
@@ -15,7 +15,9 @@ typedef struct {
 
 unsigned int hash(const char* key);
 HashMap* create_hash_map();
-void insert(HashMap* map, const char* key, int value);
-int get(HashMap* map, const char* key);
+void insert(HashMap* map, const char* key, void *value);
+void *get(HashMap* map, const char* key);
 void free_hash_map(HashMap* map);
+void print_map(HashMap *map);
+
 #endif //LOGOS_HASHMAP_H

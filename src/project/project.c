@@ -11,7 +11,7 @@
 typedef struct YY_BUFFER_STATE YY_BUFFER_STATE;
 void parse(const char *filename);
 
-char* read_file_content(const char *file_path) {
+char *read_file_content(const char *file_path) {
     FILE *file = fopen(file_path, "r");
     if (file == NULL) {
         perror("Failed to open file");
@@ -22,7 +22,7 @@ char* read_file_content(const char *file_path) {
     long file_size = ftell(file);
     rewind(file);
     // Allocate memory for the content + null terminator
-    char *content = (char *)malloc(file_size + 1);
+    char *content = (char *) malloc(file_size + 1);
     if (content == NULL) {
         perror("Failed to allocate memory");
         fclose(file);
@@ -43,33 +43,53 @@ char* read_file_content(const char *file_path) {
 }
 
 /**
- * 
+ *
+ */
+void visit_file(App *app, const char *name) {
+    int is_correct_file = is_logos_file(name);
+    if (!is_correct_file) return;
+    AppFile *app_file = create_app_file(name);
+    char full_path[PATH_MAX];
+    snprintf(full_path, sizeof(full_path), "%s/%s", app->root_path, name);
+    app_file->path = full_path;
+    app_file->code = read_file_content(app_file->path);
+    if (strcmp(app_file->name, "Object.lgs") == 0) {
+        parse(app_file->code);
+    }
+    get(app->packages, "");
+}
+
+/**
+ *
+ */
+void visit_dir(App *app, const char *path) {
+    struct dirent *entry;
+    DIR *root_dir = opendir(path);
+    while ((entry = readdir(root_dir)) != NULL) {
+        int is_dir_valid = strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0;
+        if (is_dir_valid) continue;
+        const char *name = entry->d_name;
+        if (entry->d_type == DT_DIR) {
+            Package *pkg = create_package(name);
+            char full_path[1024];
+            snprintf(full_path, sizeof(full_path), "%s/%s", path, name);
+            insert(app->packages, name, pkg);
+            visit_dir(app, full_path);
+        } else if (entry->d_type == DT_REG) {
+            visit_file(app, name);
+        }
+    }
+}
+
+/**
+ *
  */
 void init_project() {
     const char *root_path = realpath("lang/src", NULL);
-    DIR *root_dir = opendir(root_path);
     App *app = create_application();
     app->packages = create_hash_map();
-    struct dirent *entry;
     app->root_path = root_path;
-    while ((entry = readdir(root_dir)) != NULL) {
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
-        const char *name = entry->d_name;
-        if (entry->d_type == DT_DIR) {
-            Package *pkg = create_package(entry->d_name);
-            free_package(pkg);
-        } else if (entry->d_type == DT_REG) {
-            int is_correct_file = is_logos_file(name);
-            if (!is_correct_file) continue;
-            AppFile *app_file = create_app_file(name);
-            char full_path[PATH_MAX];
-            snprintf(full_path, sizeof(full_path), "%s/%s", app->root_path, entry->d_name);
-            app_file->path = full_path;
-            if (strcmp(name, "Interface.lgs") != 0) continue;
-            const char *code = read_file_content(app_file->path);
-            app_file->code = code;
-            parse(app_file->code);
-        }
-    }
+    visit_dir(app, app->root_path);
+    print_map(app->packages);
     free_application(app);
 }

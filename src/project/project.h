@@ -18,6 +18,7 @@ typedef struct Application {
  */
 typedef struct Package {
     const char *name;
+    HashMap *files;
 } Package;
 
 /**
@@ -39,7 +40,7 @@ AppFile *create_app_file(const char *name);
 Package *create_package(const char *name);
 
 void free_application(App *app);
-void free_app_file(AppFile *app_file);
 void free_package(Package *package);
+void free_file(AppFile *file);
 
 #endif //PROJECT_H
