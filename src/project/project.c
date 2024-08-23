@@ -53,9 +53,7 @@ void visit_file(App *app, const char *name) {
     snprintf(full_path, sizeof(full_path), "%s/%s", app->root_path, name);
     app_file->path = full_path;
     app_file->code = read_file_content(app_file->path);
-    if (strcmp(app_file->name, "Object.lgs") == 0) {
-        parse(app_file->code);
-    }
+    parse(app_file->code);
     get(app->packages, "");
 }
 

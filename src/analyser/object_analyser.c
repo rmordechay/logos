@@ -1,5 +1,4 @@
 #include <printf.h>
-#include <strings.h>
 #include "object_analyser.h"
 #include "ast/tree.h"
 #include "errors.h"

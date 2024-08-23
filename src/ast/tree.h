@@ -6,21 +6,21 @@
 /**
  *
  */
-typedef struct Identifier {
+typedef struct {
     char *name;
 } Identifier;
 
 /**
  *
  */
-typedef struct ConstantVariable {
+typedef struct {
     char *name;
 } ConstantVariable;
 
 /**
  *
  */
-typedef struct ConstantVariableList {
+typedef struct {
     ConstantVariable **constant_variables;
     int count;
 } ConstantVariableList;
@@ -28,14 +28,14 @@ typedef struct ConstantVariableList {
 /**
  *
  */
-typedef struct Type {
+typedef struct {
     char *name;
 } Type;
 
 /**
  *
  */
-typedef struct TypeList {
+typedef struct {
     Type **types;
     int count;
 } TypeList;
@@ -43,7 +43,7 @@ typedef struct TypeList {
 /**
  *
  */
-typedef struct EnumDeclaration {
+typedef struct {
     Type *type;
     ConstantVariableList *const_var_list;
 } EnumDeclaration;
@@ -51,7 +51,7 @@ typedef struct EnumDeclaration {
 /**
  *
  */
-typedef struct VariableDec {
+typedef struct {
     Type *type;
     Identifier *identifier;
 } VariableDec;
@@ -59,7 +59,7 @@ typedef struct VariableDec {
 /**
  *
  */
-typedef struct VariableDecList {
+typedef struct {
     VariableDec **var_declarations;
     int count;
 } VariableDecList;
@@ -67,7 +67,7 @@ typedef struct VariableDecList {
 /**
  *
  */
-typedef struct Enum {
+typedef struct {
     char *name;
     char *string;
 } Enum;
@@ -75,7 +75,7 @@ typedef struct Enum {
 /**
  *
  */
-typedef struct EnumBlock {
+typedef struct {
     Enum **enums;
     int count;
 } EnumBlock;
@@ -83,7 +83,7 @@ typedef struct EnumBlock {
 /**
  *
  */
-typedef struct ObjectField {
+typedef struct {
     VariableDec *variable_declaration;
     Type *implements;  // Optional
 } ObjectField;
@@ -91,7 +91,7 @@ typedef struct ObjectField {
 /**
  *
  */
-typedef struct ObjectFieldList {
+typedef struct {
     ObjectField **fields;
     int count;
 } ObjectFieldList;
@@ -99,14 +99,14 @@ typedef struct ObjectFieldList {
 /**
  *
  */
-typedef struct InterfaceField {
+typedef struct {
     VariableDec *variable_declaration;
 } InterfaceField;
 
 /**
  *
  */
-typedef struct InterfaceFieldList {
+typedef struct {
     InterfaceField **fields;
     int count;
 } InterfaceFieldList;
@@ -114,14 +114,14 @@ typedef struct InterfaceFieldList {
 /**
  *
  */
-typedef struct ImplementsBlock {
+typedef struct {
     TypeList *type_list;
 } ImplementsBlock;
 
 /**
  *
  */
-typedef struct Expr {
+typedef struct {
     ExprType type;
     union {
         struct UnaryExpr *unary_expr;
@@ -132,7 +132,7 @@ typedef struct Expr {
 /**
  *
  */
-typedef struct ExprList {
+typedef struct {
     Expr **exprs;
     int count;
 } ExprList;
@@ -140,7 +140,7 @@ typedef struct ExprList {
 /**
  *
  */
-typedef struct MethodCall {
+typedef struct {
     struct MethodSignature *method_signature;
     ExprList *param_exprs;
 } MethodCall;
@@ -148,7 +148,7 @@ typedef struct MethodCall {
 /**
  *
  */
-typedef struct Collection {
+typedef struct {
     Type *type;
     int size;
     ExprList *expr_list;
@@ -157,7 +157,7 @@ typedef struct Collection {
 /**
  *
  */
-typedef struct UnaryExpr {
+typedef struct {
     UnaryExprType type;
     union {
         char *integer_value;
@@ -173,7 +173,7 @@ typedef struct UnaryExpr {
 /**
  *
  */
-typedef struct Number {
+typedef struct {
     NumberType type;
     union {
         int bool_value;
@@ -191,7 +191,7 @@ typedef struct Number {
 /**
  *
  */
-typedef struct BinaryExpr {
+typedef struct {
     Expr *left;
     Expr *right;
     char operator;
@@ -200,7 +200,7 @@ typedef struct BinaryExpr {
 /**
  *
  */
-typedef struct LocalDeclaration {
+typedef struct {
     Type *type;
     Identifier *identifier;
     Expr *expr;
@@ -209,7 +209,7 @@ typedef struct LocalDeclaration {
 /**
  *
  */
-typedef struct IfBlock {
+typedef struct {
     Expr *expr;
     struct StatementList *statement_list;
 } IfBlock;
@@ -217,7 +217,7 @@ typedef struct IfBlock {
 /**
  *
  */
-typedef struct IfOrBlock {
+typedef struct {
     Expr *expr;
     struct StatementList *statement_list;
 } IfOrBlock;
@@ -225,7 +225,7 @@ typedef struct IfOrBlock {
 /**
  *
  */
-typedef struct IfOrBlockList {
+typedef struct {
     IfOrBlock **if_or_blocks;
     int count;
 } IfOrBlockList;
@@ -233,7 +233,7 @@ typedef struct IfOrBlockList {
 /**
  *
  */
-typedef struct OrBlock {
+typedef struct {
     struct StatementList *statement_list;
 } OrBlock;
 
@@ -241,7 +241,7 @@ typedef struct OrBlock {
 /**
  *
  */
-typedef struct IfStatement {
+typedef struct {
     IfBlock *if_block;
     IfOrBlockList *if_or_block_list;
     OrBlock *or_block;
@@ -251,7 +251,7 @@ typedef struct IfStatement {
 /**
  *
  */
-typedef struct Pattern {
+typedef struct {
     Expr *condition;
     PatternBodyType type;
     union {
@@ -263,7 +263,7 @@ typedef struct Pattern {
 /**
  *
  */
-typedef struct PatternList {
+typedef struct {
     Pattern **patterns;
     int count;
 } PatternList;
@@ -271,14 +271,14 @@ typedef struct PatternList {
 /**
  *
  */
-typedef struct PatternMatching {
+typedef struct {
     PatternList *pattern_list;
 } PatternMatching;
 
 /**
  *
  */
-typedef struct PatternMatchingExpr {
+typedef struct {
     Expr *expr;
     PatternList *pattern_list;
 } PatternMatchingExpr;
@@ -286,14 +286,14 @@ typedef struct PatternMatchingExpr {
 /**
  *
  */
-typedef struct WhileLoop {
+typedef struct {
     ExprList *expr_list;
 } WhileLoop;
 
 /**
  *
  */
-typedef struct ForInLoop {
+typedef struct {
     ExprList *expr_list;
     Expr *in_expr;
 } ForInLoop;
@@ -302,14 +302,14 @@ typedef struct ForInLoop {
 /**
  *
  */
-typedef struct ReturnStatement {
+typedef struct {
     ExprList *expr_list;
 } ReturnStatement;
 
 /**
  *
  */
-typedef struct Iteration {
+typedef struct {
     IterationType type;
     union {
         ForInLoop *for_in_loop;
@@ -321,7 +321,7 @@ typedef struct Iteration {
 /**
  *
  */
-typedef struct Statement {
+typedef struct {
     StatementType type;
     union {
         LocalDeclaration *local_declaration;
@@ -338,7 +338,7 @@ typedef struct Statement {
 /**
  *
  */
-typedef struct StatementList {
+typedef struct {
     Statement **statements;
     int count;
 } StatementList;
@@ -347,7 +347,7 @@ typedef struct StatementList {
 /**
  *
  */
-typedef struct MethodSignature {
+typedef struct {
     VariableDec *method_variable;
     VariableDecList *param_list;  // Optional
 } MethodSignature;
@@ -355,7 +355,7 @@ typedef struct MethodSignature {
 /**
  *
  */
-typedef struct ObjectMethod {
+typedef struct {
     char **name;
     MethodSignature *method_signature;
     StatementList *statement_list;
@@ -364,7 +364,7 @@ typedef struct ObjectMethod {
 /**
  *
  */
-typedef struct ObjectMethodsList {
+typedef struct {
     ObjectMethod **methods;
     int count;
 } ObjectMethodsList;
@@ -372,7 +372,7 @@ typedef struct ObjectMethodsList {
 /**
  *
  */
-typedef struct ObjectMethodsBlock {
+typedef struct {
     Type *identifier;
     ObjectMethodsList *methods_list;
 } ObjectMethodsBlock;
@@ -380,7 +380,7 @@ typedef struct ObjectMethodsBlock {
 /**
  *
  */
-typedef struct ObjectMethodsBlockList {
+typedef struct {
     ObjectMethodsBlock **blocks;
     int count;
 } ObjectMethodsBlockList;
@@ -388,7 +388,7 @@ typedef struct ObjectMethodsBlockList {
 /**
  *
  */
-typedef struct InterfaceMethod {
+typedef struct {
     char **name;
     MethodSignature *method_signature;
     StatementList *statement_list;  // Optional
@@ -397,7 +397,7 @@ typedef struct InterfaceMethod {
 /**
  *
  */
-typedef struct InterfaceMethodsList {
+typedef struct {
     InterfaceMethod **methods;
     int count;
 } InterfaceMethodsList;
@@ -405,7 +405,7 @@ typedef struct InterfaceMethodsList {
 /**
  *
  */
-typedef struct InterfaceMethodsBlock {
+typedef struct {
     Type *identifier;
     InterfaceMethodsList *methods_list;
 } InterfaceMethodsBlock;
@@ -413,7 +413,7 @@ typedef struct InterfaceMethodsBlock {
 /**
  *
  */
-typedef struct InterfaceMethodsBlockList {
+typedef struct {
     InterfaceMethodsBlock **blocks;
     int count;
 } InterfaceMethodsBlockList;
@@ -422,7 +422,7 @@ typedef struct InterfaceMethodsBlockList {
 /**
  *
  */
-typedef struct ObjectEntity {
+typedef struct {
     Type *id;
     ObjectFieldList *field_list;
     ImplementsBlock *implements_block;
@@ -432,7 +432,7 @@ typedef struct ObjectEntity {
 /**
  *
  */
-typedef struct InterfaceEntity {
+typedef struct {
     Type *id;
     InterfaceFieldList *field_list;
 } InterfaceEntity;
@@ -440,7 +440,7 @@ typedef struct InterfaceEntity {
 /**
  *
  */
-typedef struct Entity {
+typedef struct {
     EntityType type;
     union {
         ObjectEntity *object_entity;
