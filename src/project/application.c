@@ -7,10 +7,11 @@
 /**
  *
  */
-App *create_application() {
+App *create_application(const char *root_path) {
     App *app = malloc(sizeof(App));;
     app->name = NULL;
-    app->root_path = NULL;
+    app->root_path = root_path;
+    app->packages = create_hash_map();
     return app;
 }
 
@@ -44,9 +45,12 @@ AppFile *create_app_file(const char *name) {
 /**
  *
  */
-Package *create_package(const char *name) {
+Package *create_package(const char *name, const char *path) {
     Package *pkg = malloc(sizeof(Package));
     pkg->name = name;
+    pkg->path = path;
+    pkg->packages = create_hash_map();
+    pkg->files = create_hash_map();
     return pkg;
 }
 
@@ -61,7 +65,5 @@ void free_package(Package *package) {
  *
  */
 void free_file(AppFile *file) {
-    free(file->path);
-    free(file->parent_path);
     free(file);
 }

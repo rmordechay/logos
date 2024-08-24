@@ -275,7 +275,7 @@ CJSON_PUBLIC(void) cJSON_Delete(cJSON *item)
     }
 }
 
-/* get the decimal point character of the current locale */
+/* get_from_map the decimal point character of the current locale */
 static unsigned char get_decimal_point(void)
 {
 #ifdef ENABLE_LOCALES
@@ -300,7 +300,7 @@ typedef struct
 /* check if the buffer can be accessed at the given index (starting with 0) */
 #define can_access_at_index(buffer, index) ((buffer != NULL) && (((buffer)->offset + index) < (buffer)->length))
 #define cannot_access_at_index(buffer, index) (!can_access_at_index(buffer, index))
-/* get a pointer to the buffer at the position */
+/* get_from_map a pointer to the buffer at the position */
 #define buffer_at_offset(buffer) ((buffer)->content + (buffer)->offset)
 
 /* Parse the input text to generate a number, and populate the result into item. */
@@ -673,7 +673,7 @@ static unsigned char utf16_literal_to_utf8(const unsigned char * const input_poi
         goto fail;
     }
 
-    /* get the first utf16 sequence */
+    /* get_from_map the first utf16 sequence */
     first_code = parse_hex4(first_sequence + 2);
 
     /* check that the code is valid */
@@ -701,7 +701,7 @@ static unsigned char utf16_literal_to_utf8(const unsigned char * const input_poi
             goto fail;
         }
 
-        /* get the second utf16 sequence */
+        /* get_from_map the second utf16 sequence */
         second_code = parse_hex4(second_sequence + 2);
         /* check that the code is valid */
         if ((second_code < 0xDC00) || (second_code > 0xDFFF))

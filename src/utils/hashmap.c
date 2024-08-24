@@ -29,7 +29,7 @@ HashMap* create_hash_map() {
 /**
  *
  */
-void insert(HashMap* map, const char* key, void *value) {
+void put_in_map(HashMap* map, const char* key, void *value) {
     unsigned int index = hash(key);
     KeyValue* newPair = (KeyValue*)malloc(sizeof(KeyValue));
     newPair->key = strdup(key);
@@ -62,7 +62,7 @@ void insert(HashMap* map, const char* key, void *value) {
 /**
  *
  */
-void *get(HashMap* map, const char* key) {
+void *get_from_map(HashMap* map, const char* key) {
     unsigned int index = hash(key);
     KeyValue* current = map->table[index];
     while (current != NULL) {
@@ -88,15 +88,4 @@ void free_hash_map(HashMap* map) {
         }
     }
     free(map);
-}
-
-/**
- *
- */
-void print_map(HashMap *map) {
-    for (int i = 0; i < TABLE_SIZE; i++) {
-        if (!map->table[i]) continue;
-        Package *value = map->table[i]->value;
-        printf("%s\n", map->table[i]->key);
-    }
 }

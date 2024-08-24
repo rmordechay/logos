@@ -1,7 +1,7 @@
 #ifndef LOGOS_HASHMAP_H
 #define LOGOS_HASHMAP_H
 
-#define TABLE_SIZE 100
+#define TABLE_SIZE 20
 
 typedef struct KeyValue {
     char* key;
@@ -15,8 +15,8 @@ typedef struct {
 
 unsigned int hash(const char* key);
 HashMap* create_hash_map();
-void insert(HashMap* map, const char* key, void *value);
-void *get(HashMap* map, const char* key);
+void put_in_map(HashMap* map, const char* key, void *value);
+void *get_from_map(HashMap* map, const char* key);
 void free_hash_map(HashMap* map);
 void print_map(HashMap *map);
 

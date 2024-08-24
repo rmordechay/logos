@@ -18,6 +18,8 @@ typedef struct Application {
  */
 typedef struct Package {
     const char *name;
+    const char *path;
+    HashMap *packages;
     HashMap *files;
 } Package;
 
@@ -26,8 +28,8 @@ typedef struct Package {
  */
 typedef struct AppFile {
     const char *name;
-    char *path;
-    char *parent_path;
+    const char *path;
+    const char *parent_path;
     const char *code;
 } AppFile;
 
@@ -35,9 +37,9 @@ typedef struct AppFile {
 void init_project();
 int is_logos_file(const char *path);
 
-App *create_application();
+App *create_application(const char *root_path);
 AppFile *create_app_file(const char *name);
-Package *create_package(const char *name);
+Package *create_package(const char *name, const char *path);
 
 void free_application(App *app);
 void free_package(Package *package);

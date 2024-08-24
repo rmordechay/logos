@@ -45,36 +45,34 @@ char *read_file_content(const char *file_path) {
 /**
  *
  */
-void visit_file(App *app, const char *name) {
-    int is_correct_file = is_logos_file(name);
+void visit_file(Package *package, const char *file_name, const char *file_path) {
+    int is_correct_file = is_logos_file(file_name);
     if (!is_correct_file) return;
-    AppFile *app_file = create_app_file(name);
-    char full_path[PATH_MAX];
-    snprintf(full_path, sizeof(full_path), "%s/%s", app->root_path, name);
-    app_file->path = full_path;
+    AppFile *app_file = create_app_file(file_path);
+    app_file->path = file_path;
+    app_file->name = file_name;
     app_file->code = read_file_content(app_file->path);
-    parse(app_file->code);
-    get(app->packages, "");
+    put_in_map(package->files, file_name, app_file);
 }
 
 /**
  *
  */
-void visit_dir(App *app, const char *path) {
+void visit_package(Package *package) {
     struct dirent *entry;
-    DIR *root_dir = opendir(path);
-    while ((entry = readdir(root_dir)) != NULL) {
+    DIR *dir = opendir(package->path);
+    while ((entry = readdir(dir)) != NULL) {
         int is_dir_valid = strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0;
         if (is_dir_valid) continue;
-        const char *name = entry->d_name;
+        const char *file_or_dir_name = entry->d_name;
+        char path[PATH_MAX];
+        snprintf(path, sizeof(path), "%s/%s", package->path, file_or_dir_name);
         if (entry->d_type == DT_DIR) {
-            Package *pkg = create_package(name);
-            char full_path[1024];
-            snprintf(full_path, sizeof(full_path), "%s/%s", path, name);
-            insert(app->packages, name, pkg);
-            visit_dir(app, full_path);
+            Package *child_pkg = create_package(file_or_dir_name, path);
+            put_in_map(package->packages, file_or_dir_name, child_pkg);
+            visit_package(child_pkg);
         } else if (entry->d_type == DT_REG) {
-            visit_file(app, name);
+            visit_file(package, file_or_dir_name, path);
         }
     }
 }
@@ -84,10 +82,9 @@ void visit_dir(App *app, const char *path) {
  */
 void init_project() {
     const char *root_path = realpath("lang/src", NULL);
-    App *app = create_application();
-    app->packages = create_hash_map();
-    app->root_path = root_path;
-    visit_dir(app, app->root_path);
-    print_map(app->packages);
+    App *app = create_application(root_path);
+    Package *root_package = create_package(SRC_DIR, root_path);
+    put_in_map(app->packages, SRC_DIR, root_package);
+    visit_package(root_package);
     free_application(app);
 }
