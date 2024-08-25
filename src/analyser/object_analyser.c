@@ -43,8 +43,70 @@ void analyse_tree(App *app) {
 /**
  *
  */
-void analyse_object(ObjectEntity *entity) {
+typedef struct LgsScopeVariable {
+    Type type;
+    Identifier identifier;
+    char *value;
+} LgsScopeVariable;
 
+/**
+ *
+ */
+typedef struct Scope {
+    HashMap identifiers;
+} Scope;
+
+
+/**
+ *
+ */
+Type *infer_type(Expr *expr) {
+    switch (expr->type) {
+        case E_UNARY:
+        case E_BINARY:
+            break;
+    }
+    return NULL;
+}
+
+/**
+ *
+ */
+void visit_scope(Scope scope, StatementList *statement_list) {
+    for (int i = 0; i < statement_list->count; i++) {
+        Statement *statement = statement_list->statements[i];
+        LocalDeclaration *declaration = statement->local_declaration;
+        Identifier *identifier = declaration->identifier;
+        Type *type = declaration->type;
+        LgsScopeVariable var_dec;
+        var_dec.type = *type;
+        var_dec.identifier = *identifier;
+        put_in_map(&scope.identifiers, identifier->name, &var_dec);
+    }
+}
+
+/**
+ *
+ */
+void analyse_object(ObjectEntity *entity) {
+    ObjMethodsBlockList *methods_block_list = entity->methods_block_list;
+    ObjFieldList *field_list = entity->field_list;
+    ImplementsBlock *implements_block = entity->implements_block;
+    ObjectMethod *method = methods_block_list->blocks[0]->methods_list->methods[0];
+    HashMap hash_map;
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        hash_map.table[i] = NULL;
+    }
+    Scope scope;
+    scope.identifiers = hash_map;
+    visit_scope(scope, method->statement_list);
+}
+
+/**
+ * 
+ */
+void analyse_interface(InterfaceEntity *entity) {
+    
 }
 
 /**

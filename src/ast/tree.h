@@ -94,7 +94,7 @@ typedef struct ObjectField {
 typedef struct ObjectFieldList {
     ObjectField **fields;
     int count;
-} ObjectFieldList;
+} ObjFieldList;
 
 /**
  *
@@ -383,7 +383,7 @@ typedef struct ObjectMethodsBlock {
 typedef struct ObjectMethodsBlockList {
     ObjectMethodsBlock **blocks;
     int count;
-} ObjectMethodsBlockList;
+} ObjMethodsBlockList;
 
 /**
  *
@@ -424,9 +424,9 @@ typedef struct InterfaceMethodsBlockList {
  */
 typedef struct ObjectEntity {
     Type *id;
-    ObjectFieldList *field_list;
+    ObjFieldList *field_list;
     ImplementsBlock *implements_block;
-    ObjectMethodsBlockList *methods_block_list;
+    ObjMethodsBlockList *methods_block_list;
 } ObjectEntity;
 
 /**
@@ -451,12 +451,12 @@ typedef struct Entity {
 void analyse_ast(Entity *entity);
 Entity *create_entity(EntityType entity_type, void *entity_tree);
 
-ObjectEntity *create_object_entity(Type *type, ImplementsBlock *implements_block, ObjectFieldList *fields_list, ObjectMethodsBlockList *methods_block_list);
+ObjectEntity *create_object_entity(Type *type, ImplementsBlock *implements_block, ObjFieldList *fields_list, ObjMethodsBlockList *methods_block_list);
 InterfaceEntity *create_interface_entity(Type *type, InterfaceFieldList *fields_list);
 ImplementsBlock *create_implements_block(TypeList *type_list);
 // Object Field
-ObjectFieldList *create_object_field_list(ObjectField *field);
-ObjectFieldList *add_object_field(ObjectFieldList *list, ObjectField *element);
+ObjFieldList *create_object_field_list(ObjectField *field);
+ObjFieldList *add_object_field(ObjFieldList *list, ObjectField *element);
 ObjectField *create_object_field(VariableDec *variable_declaration, Type *type);
 InterfaceFieldList *create_interface_field_list(InterfaceField *field);
 InterfaceFieldList *add_interface_field(InterfaceFieldList *list, InterfaceField *element);
@@ -464,8 +464,8 @@ InterfaceField *create_interface_field(VariableDec *variable_declaration);
 MethodSignature *create_method_signature(VariableDec *variable_dec, VariableDecList *variable_declaration_list);
 // Methods
 ObjectMethodsBlock *create_object_methods_block(Type *type, ObjectMethodsList *methods_list);
-ObjectMethodsBlockList *create_object_methods_block_list(ObjectMethodsBlock *methodBlock);
-ObjectMethodsBlockList *add_object_methods_block(ObjectMethodsBlockList *list, ObjectMethodsBlock *element);
+ObjMethodsBlockList *create_object_methods_block_list(ObjectMethodsBlock *methodBlock);
+ObjMethodsBlockList *add_object_methods_block(ObjMethodsBlockList *list, ObjectMethodsBlock *element);
 ObjectMethodsList *create_object_methods_list(ObjectMethod *method);
 ObjectMethodsList *add_object_method(ObjectMethodsList *list, ObjectMethod *element);
 ObjectMethod *create_object_method(MethodSignature *method_signature, StatementList *statement_list);
@@ -542,9 +542,9 @@ TypeList *add_type(TypeList *list, Type *element);
 void free_entity(Entity *obj);
 void free_object_file(ObjectEntity *obj);
 void free_implements_block(ImplementsBlock *ib);
-void free_object_field_list(ObjectFieldList *fl);
+void free_object_field_list(ObjFieldList *fl);
 void free_object_field(ObjectField *f);
-void free_methods_block_list(ObjectMethodsBlockList *mbl);
+void free_methods_block_list(ObjMethodsBlockList *mbl);
 void free_methods_block(ObjectMethodsBlock *mb);
 void free_methods_list(ObjectMethodsList *ml);
 void free_method(ObjectMethod *m);

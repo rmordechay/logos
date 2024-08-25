@@ -11,7 +11,7 @@ cJSON *create_type_list_json(TypeList *list);
 cJSON *create_variable_declaration_json(VariableDec *obj);
 cJSON *create_variable_declaration_list_json(VariableDecList *list);
 cJSON *create_field_json(ObjectField *obj);
-cJSON *create_field_list_json(ObjectFieldList *obj);
+cJSON *create_field_list_json(ObjFieldList *obj);
 cJSON *create_implements_block_json(ImplementsBlock *obj);
 cJSON *create_expr_json(Expr *obj);
 cJSON *create_expr_list_json(ExprList *list);
@@ -36,7 +36,7 @@ cJSON *create_method_signature_json(MethodSignature *obj);
 cJSON *create_method_json(ObjectMethod *obj);
 cJSON *create_methods_list_json(ObjectMethodsList *list);
 cJSON *create_methods_block_json(ObjectMethodsBlock *obj);
-cJSON *create_methods_block_list_json(ObjectMethodsBlockList *list);
+cJSON *create_methods_block_list_json(ObjMethodsBlockList *list);
 cJSON *create_object_file_json(ObjectEntity *obj);
 
 
@@ -122,7 +122,7 @@ cJSON *create_field_json(ObjectField *obj) {
 /**
  *
  */
-cJSON *create_field_list_json(ObjectFieldList *obj) {
+cJSON *create_field_list_json(ObjFieldList *obj) {
     cJSON *root = cJSON_CreateArray();
     for (int i = 0; i < obj->count; i++) {
         cJSON_AddItemToArray(root, create_field_json(obj->fields[i]));
@@ -455,7 +455,7 @@ cJSON *create_methods_block_json(ObjectMethodsBlock *obj) {
 /**
  *
  */
-cJSON *create_methods_block_list_json(ObjectMethodsBlockList *list) {
+cJSON *create_methods_block_list_json(ObjMethodsBlockList *list) {
     cJSON *root = cJSON_CreateArray();
     for (int i = 0; i < list->count; i++) {
         cJSON_AddItemToArray(root, create_methods_block_json(list->blocks[i]));

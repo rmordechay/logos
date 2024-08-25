@@ -5,6 +5,7 @@
 #include "project/project.h"
 
 void analyse_object(ObjectEntity *entity);
+void analyse_interface(InterfaceEntity *entity);
 void analyse_tree(App *app);
 
 #endif //LOGOS_OBJECT_ANALYSER_H

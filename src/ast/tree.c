@@ -18,6 +18,7 @@ void analyse_ast(Entity *entity) {
             analyse_object(entity->object_entity);
             break;
         case E_INTERFACE:
+            analyse_interface(entity->interface_entity);
         case E_ENUM:
             break;
     }
@@ -48,8 +49,8 @@ Entity *create_entity(EntityType entity_type, void *entity_tree) {
  */
 ObjectEntity *create_object_entity(Type *type,
                                    ImplementsBlock *implements_block,
-                                   ObjectFieldList *fields_list,
-                                   ObjectMethodsBlockList *methods_block_list) {
+                                   ObjFieldList *fields_list,
+                                   ObjMethodsBlockList *methods_block_list) {
     ObjectEntity *obj = malloc(sizeof(ObjectEntity));
     obj->id = type;
     obj->field_list = fields_list;
@@ -79,8 +80,8 @@ ImplementsBlock *create_implements_block(TypeList *type_list) {
 /**
  *
  */
-ObjectFieldList *create_object_field_list(ObjectField *field) {
-    ObjectFieldList *fl = malloc(sizeof(ObjectFieldList));
+ObjFieldList *create_object_field_list(ObjectField *field) {
+    ObjFieldList *fl = malloc(sizeof(ObjFieldList));
     fl->fields = malloc(sizeof(ObjectField *));
     fl->count = 1;
     fl->fields[0] = field;
@@ -90,7 +91,7 @@ ObjectFieldList *create_object_field_list(ObjectField *field) {
 /**
  *
  */
-ObjectFieldList *add_object_field(ObjectFieldList *list, ObjectField *element) {
+ObjFieldList *add_object_field(ObjFieldList *list, ObjectField *element) {
     int new_size = list->count + 1;
     ObjectField **new_list = realloc(list->fields, new_size * sizeof(ObjectField *));
     list->fields = new_list;
@@ -144,8 +145,8 @@ InterfaceField *create_interface_field(VariableDec *variable_declaration) {
 /**
  *
  */
-ObjectMethodsBlockList *create_object_methods_block_list(ObjectMethodsBlock *methodBlock) {
-    ObjectMethodsBlockList *mbl = malloc(sizeof(ObjectMethodsBlockList));
+ObjMethodsBlockList *create_object_methods_block_list(ObjectMethodsBlock *methodBlock) {
+    ObjMethodsBlockList *mbl = malloc(sizeof(ObjMethodsBlockList));
     mbl->blocks = malloc(sizeof(ObjectMethodsBlock *));
     mbl->count = 1;
     mbl->blocks[0] = methodBlock;
@@ -155,7 +156,7 @@ ObjectMethodsBlockList *create_object_methods_block_list(ObjectMethodsBlock *met
 /**
  *
  */
-ObjectMethodsBlockList *add_object_methods_block(ObjectMethodsBlockList *list, ObjectMethodsBlock *element) {
+ObjMethodsBlockList *add_object_methods_block(ObjMethodsBlockList *list, ObjectMethodsBlock *element) {
     int new_size = list->count + 1;
     ObjectMethodsBlock **new_list = realloc(list->blocks, new_size * sizeof(ObjectMethodsBlock *));
     list->blocks = new_list;
@@ -896,7 +897,7 @@ void free_implements_block(ImplementsBlock *ib) {
 /**
  *
  */
-void free_object_field_list(ObjectFieldList *fl) {
+void free_object_field_list(ObjFieldList *fl) {
     if (fl == NULL) return;
     for (int i = 0; i < fl->count; i++) {
         free_object_field(fl->fields[i]);
@@ -918,7 +919,7 @@ void free_object_field(ObjectField *f) {
 /**
  *
  */
-void free_methods_block_list(ObjectMethodsBlockList *mbl) {
+void free_methods_block_list(ObjMethodsBlockList *mbl) {
     if (mbl == NULL) return;
     for (int i = 0; i < mbl->count; i++) {
         free_methods_block(mbl->blocks[i]);
