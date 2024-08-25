@@ -2,6 +2,8 @@
 #include "ast/tree.h"
 #include "errors.h"
 #include "project/project.h"
+#include "object_analyser.h"
+
 
 #define MAX_ERRORS 1000
 
@@ -29,7 +31,20 @@ void parse(const char *code) {
  *
  */
 void analyse_tree(App *app) {
-    printf("%s\n", app->name);
+    Package *src_pkg = get_from_map(app->packages, SRC_DIR)->package;
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        KeyValue *pair = src_pkg->files->table[i];
+        if (pair == NULL) continue;
+        AppFile *app_file = pair->file;
+        parse(app_file->code);
+    }
+}
+
+/**
+ *
+ */
+void analyse_object(ObjectEntity *entity) {
+
 }
 
 /**

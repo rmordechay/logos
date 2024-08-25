@@ -5,18 +5,22 @@
 
 typedef struct KeyValue {
     char* key;
-    void *value;
+    union {
+        void *value;
+        struct Package *package;
+        struct AppFile *file;
+    };
     struct KeyValue* next;
 } KeyValue;
 
-typedef struct {
+typedef struct HashMap {
     KeyValue* table[TABLE_SIZE];
 } HashMap;
 
 unsigned int hash(const char* key);
 HashMap* create_hash_map();
 void put_in_map(HashMap* map, const char* key, void *value);
-void *get_from_map(HashMap* map, const char* key);
+KeyValue *get_from_map(HashMap* map, const char* key);
 void free_hash_map(HashMap* map);
 void print_map(HashMap *map);
 

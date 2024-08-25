@@ -2,7 +2,6 @@
 #include <string.h>
 #include <printf.h>
 #include "hashmap.h"
-#include "project/project.h"
 
 /**
  *
@@ -62,12 +61,11 @@ void put_in_map(HashMap* map, const char* key, void *value) {
 /**
  *
  */
-void *get_from_map(HashMap* map, const char* key) {
-    unsigned int index = hash(key);
-    KeyValue* current = map->table[index];
+KeyValue *get_from_map(HashMap* map, const char* key) {
+    KeyValue* current = map->table[hash(key)];
     while (current != NULL) {
         if (strcmp(current->key, key) == 0) {
-            return current->value;
+            return current;
         }
         current = current->next;
     }

@@ -2,14 +2,12 @@
 #include <string.h>
 #include "project.h"
 
-#define LOGOS_FILE_EXT "lgs"
-
 /**
  *
  */
-App *create_application(const char *root_path) {
-    App *app = malloc(sizeof(App));;
-    app->name = NULL;
+App *create_application(const char *name, const char *root_path) {
+    App *app = malloc(sizeof(App));
+    app->name = name;
     app->root_path = root_path;
     app->packages = create_hash_map();
     return app;
@@ -19,7 +17,6 @@ App *create_application(const char *root_path) {
  *
  */
 void free_application(App *app) {
-    free(app->name);
     free_hash_map(app->packages);
     free(app);
 }

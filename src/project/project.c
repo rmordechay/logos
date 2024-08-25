@@ -5,9 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SRC_DIR "src"
-#define PATH_MAX 1024
-
 typedef struct YY_BUFFER_STATE YY_BUFFER_STATE;
 void parse(const char *filename);
 
@@ -82,7 +79,7 @@ void visit_package(Package *package) {
  */
 App *init_project() {
     const char *root_path = realpath("lang/src", NULL);
-    App *app = create_application(root_path);
+    App *app = create_application("my-project", root_path);
     Package *root_package = create_package(SRC_DIR, root_path);
     put_in_map(app->packages, SRC_DIR, root_package);
     visit_package(root_package);

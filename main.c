@@ -1,7 +1,6 @@
 #include "gen/parser.h"
 #include "project/project.h"
-
-void analyse_tree(App *app);
+#include "analyser/object_analyser.h"
 
 int main() {
     App *app = init_project();

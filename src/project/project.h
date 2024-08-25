@@ -4,11 +4,15 @@
 #include <stdio.h>
 #include "utils/hashmap.h"
 
+#define SRC_DIR "src"
+#define PATH_MAX 1024
+#define LOGOS_FILE_EXT "lgs"
+
 /**
  *
  */
 typedef struct Application {
-    char *name;
+    const char *name;
     const char *root_path;
     HashMap *packages;
 } App;
@@ -29,7 +33,7 @@ typedef struct Package {
 typedef struct AppFile {
     const char *name;
     const char *path;
-    const char *parent_path;
+    Package *parent;
     const char *code;
 } AppFile;
 
@@ -37,7 +41,7 @@ typedef struct AppFile {
 App *init_project();
 int is_logos_file(const char *path);
 
-App *create_application(const char *root_path);
+App *create_application(const char *name, const char *root_path);
 AppFile *create_app_file(const char *name);
 Package *create_package(const char *name, const char *path);
 
