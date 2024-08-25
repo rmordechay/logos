@@ -1,6 +1,7 @@
-#include "gen/parser.h"
 #include "project/project.h"
 #include "analyser/object_analyser.h"
+
+void create_map();
 
 int main() {
     App *app = init_project();

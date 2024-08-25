@@ -72,16 +72,65 @@ Type *infer_type(Expr *expr) {
 /**
  *
  */
-void visit_scope(Scope scope, StatementList *statement_list) {
+Scope get_scope() {
+    HashMap hash_map;
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        hash_map.table[i] = NULL;
+    }
+    Scope scope;
+    scope.identifiers = hash_map;
+    return scope;
+}
+
+/**
+ *
+ */
+void visit_local_dec(Statement *statement, Scope *scope) {
+    LocalDeclaration *declaration = statement->local_declaration;
+    Identifier *identifier = declaration->identifier;
+    Type *type = declaration->type;
+    LgsScopeVariable var_dec;
+    var_dec.type = *type;
+    var_dec.identifier = *identifier;
+    put_in_map(&(*scope).identifiers, identifier->name, &var_dec);
+}
+
+/**
+ *
+ */
+Scope visit_statement(Statement *statement, Scope scope) {
+    switch (statement->type) {
+        case ST_LOCAL_DECLARATION:
+            visit_local_dec(statement, &scope);
+            break;
+        case ST_IF_STATEMENT:
+            break;
+        case ST_PATTERN_MATCHING:
+            break;
+        case ST_PATTERN_MATCHING_EXPR:
+            break;
+        case ST_ITERATION:
+            break;
+        case ST_RETURN_STATEMENT:
+            break;
+        case ST_BREAK_STATEMENT:
+            break;
+        case ST_CONTINUE_STATEMENT:
+            break;
+        case ST_ENUM_STATEMENT:
+            break;
+    }
+    return scope;
+}
+
+/**
+ *
+ */
+void visit_scope(StatementList *statement_list) {
+    Scope scope = get_scope();
     for (int i = 0; i < statement_list->count; i++) {
         Statement *statement = statement_list->statements[i];
-        LocalDeclaration *declaration = statement->local_declaration;
-        Identifier *identifier = declaration->identifier;
-        Type *type = declaration->type;
-        LgsScopeVariable var_dec;
-        var_dec.type = *type;
-        var_dec.identifier = *identifier;
-        put_in_map(&scope.identifiers, identifier->name, &var_dec);
+        scope = visit_statement(statement, scope);
     }
 }
 
@@ -93,20 +142,14 @@ void analyse_object(ObjectEntity *entity) {
     ObjFieldList *field_list = entity->field_list;
     ImplementsBlock *implements_block = entity->implements_block;
     ObjectMethod *method = methods_block_list->blocks[0]->methods_list->methods[0];
-    HashMap hash_map;
-    for (int i = 0; i < TABLE_SIZE; i++) {
-        hash_map.table[i] = NULL;
-    }
-    Scope scope;
-    scope.identifiers = hash_map;
-    visit_scope(scope, method->statement_list);
+    visit_scope(method->statement_list);
 }
 
 /**
  * 
  */
 void analyse_interface(InterfaceEntity *entity) {
-    
+
 }
 
 /**
