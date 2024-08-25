@@ -1,52 +1,43 @@
 #include <printf.h>
-#include "object_analyser.h"
 #include "ast/tree.h"
 #include "errors.h"
+#include "project/project.h"
 
 #define MAX_ERRORS 1000
 
 Error errors[MAX_ERRORS];
 int err_count = 0;
 
+extern FILE *yyin;
+extern int yyparse(void);
+extern void yy_scan_string(const char *str);
+extern void yy_delete_buffer(void *buffer);
+void parse(const char *code);
+void print_errors();
+
 /**
  *
  */
-void analyse_object(ObjectEntity *entity) {
-    check_implementations(entity);
+void parse(const char *code) {
+    yy_scan_string(code);
+    yyparse();
+    yy_delete_buffer(yyin);
+}
+
+
+/**
+ *
+ */
+void analyse_tree(App *app) {
+    printf("%s\n", app->name);
+}
+
+/**
+ *
+ */
+void print_errors() {
     for (int i = 0; i < err_count; i++) {
         Error err = errors[i];
         printf("%s (%i)\n", err.message, err.error_code);
     }
-}
-
-/**
- *
- */
-void check_implementations(ObjectEntity *entity) {
-    ObjectFieldList *field_list = entity->field_list;
-    TypeList *implements_type = entity->implements_block->type_list;
-    ObjectMethodsBlockList *methods_block_list = entity->methods_block_list;
-    check_fields_implementation(implements_type, field_list);
-    check_methods_block_implementation(implements_type, methods_block_list);
-}
-
-/**
- *
- */
-void check_fields_implementation(TypeList *implements_types, ObjectFieldList *field_list) {
-    for (int i = 0; i < implements_types->count; i++) {
-        char *type_name = implements_types->types[i]->name;
-        for (int j = 0; j < field_list->count; j++) {
-            ObjectField *field = field_list->fields[j];
-            Type *implement_type = field->implements;
-            if (implement_type == NULL) continue;
-        }
-    }
-}
-
-/**
- *
- */
-void check_methods_block_implementation(TypeList *implements_types, ObjectMethodsBlockList *methods_block_list) {
-
 }

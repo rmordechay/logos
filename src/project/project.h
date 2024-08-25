@@ -34,7 +34,7 @@ typedef struct AppFile {
 } AppFile;
 
 
-void init_project();
+App *init_project();
 int is_logos_file(const char *path);
 
 App *create_application(const char *root_path);

@@ -80,11 +80,11 @@ void visit_package(Package *package) {
 /**
  *
  */
-void init_project() {
+App *init_project() {
     const char *root_path = realpath("lang/src", NULL);
     App *app = create_application(root_path);
     Package *root_package = create_package(SRC_DIR, root_path);
     put_in_map(app->packages, SRC_DIR, root_package);
     visit_package(root_package);
-    free_application(app);
+    return app;
 }
