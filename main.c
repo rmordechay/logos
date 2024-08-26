@@ -1,8 +1,6 @@
 #include "project/project.h"
 #include "analyser/analysis.h"
 
-void create_map();
-
 int main() {
     App *app = init_project();
     analyse_tree(app);

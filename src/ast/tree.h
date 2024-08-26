@@ -7,6 +7,7 @@
  *
  */
 typedef struct Identifier {
+    int line_number;
     char *name;
 } Identifier;
 
@@ -14,6 +15,7 @@ typedef struct Identifier {
  *
  */
 typedef struct IdentifierList {
+    int line_number;
     Identifier **identifiers;
     int count;
 } IdentifierList;
@@ -22,6 +24,7 @@ typedef struct IdentifierList {
  *
  */
 typedef struct Carrier {
+    int line_number;
     IdentifierList *identifier_list;
 } Carrier;
 
@@ -29,6 +32,7 @@ typedef struct Carrier {
  *
  */
 typedef struct ConstantVariable {
+    int line_number;
     char *name;
 } ConstantVariable;
 
@@ -36,6 +40,7 @@ typedef struct ConstantVariable {
  *
  */
 typedef struct ConstantVariableList {
+    int line_number;
     ConstantVariable **constant_variables;
     int count;
 } ConstantVariableList;
@@ -44,6 +49,7 @@ typedef struct ConstantVariableList {
  *
  */
 typedef struct Type {
+    int line_number;
     char *name;
 } Type;
 
@@ -51,6 +57,7 @@ typedef struct Type {
  *
  */
 typedef struct TypeList {
+    int line_number;
     Type **types;
     int count;
 } TypeList;
@@ -59,6 +66,7 @@ typedef struct TypeList {
  *
  */
 typedef struct EnumDeclaration {
+    int line_number;
     Type *type;
     ConstantVariableList *const_var_list;
 } EnumDeclaration;
@@ -67,6 +75,7 @@ typedef struct EnumDeclaration {
  *
  */
 typedef struct VariableDec {
+    int line_number;
     Type *type;
     Identifier *identifier;
 } VariableDec;
@@ -75,6 +84,7 @@ typedef struct VariableDec {
  *
  */
 typedef struct VariableDecList {
+    int line_number;
     VariableDec **var_declarations;
     int count;
 } VariableDecList;
@@ -83,6 +93,7 @@ typedef struct VariableDecList {
  *
  */
 typedef struct Enum {
+    int line_number;
     char *name;
     char *string;
 } Enum;
@@ -91,6 +102,7 @@ typedef struct Enum {
  *
  */
 typedef struct EnumBlock {
+    int line_number;
     Enum **enums;
     int count;
 } EnumBlock;
@@ -99,6 +111,7 @@ typedef struct EnumBlock {
  *
  */
 typedef struct ObjectField {
+    int line_number;
     VariableDec *variable_declaration;
     Type *implements;  // Optional
 } ObjectField;
@@ -107,6 +120,7 @@ typedef struct ObjectField {
  *
  */
 typedef struct ObjectFieldList {
+    int line_number;
     ObjectField **fields;
     int count;
 } ObjFieldList;
@@ -115,6 +129,7 @@ typedef struct ObjectFieldList {
  *
  */
 typedef struct InterfaceField {
+    int line_number;
     VariableDec *variable_declaration;
 } InterfaceField;
 
@@ -122,6 +137,7 @@ typedef struct InterfaceField {
  *
  */
 typedef struct InterfaceFieldList {
+    int line_number;
     InterfaceField **fields;
     int count;
 } InterfaceFieldList;
@@ -130,6 +146,7 @@ typedef struct InterfaceFieldList {
  *
  */
 typedef struct ImplementsBlock {
+    int line_number;
     TypeList *type_list;
 } ImplementsBlock;
 
@@ -137,6 +154,7 @@ typedef struct ImplementsBlock {
  *
  */
 typedef struct Expr {
+    int line_number;
     ExprType type;
     union {
         struct UnaryExpr *unary_expr;
@@ -148,6 +166,7 @@ typedef struct Expr {
  *
  */
 typedef struct ExprList {
+    int line_number;
     Expr **exprs;
     int count;
 } ExprList;
@@ -156,6 +175,7 @@ typedef struct ExprList {
  *
  */
 typedef struct MethodCall {
+    int line_number;
     struct MethodSignature *method_signature;
     ExprList *param_exprs;
 } MethodCall;
@@ -164,6 +184,7 @@ typedef struct MethodCall {
  *
  */
 typedef struct Collection {
+    int line_number;
     Type *type;
     int size;
     ExprList *expr_list;
@@ -173,6 +194,7 @@ typedef struct Collection {
  *
  */
 typedef struct UnaryExpr {
+    int line_number;
     UnaryExprType type;
     union {
         char *integer_value;
@@ -189,6 +211,7 @@ typedef struct UnaryExpr {
  *
  */
 typedef struct Number {
+    int line_number;
     NumberType type;
     union {
         int bool_value;
@@ -207,6 +230,7 @@ typedef struct Number {
  *
  */
 typedef struct BinaryExpr {
+    int line_number;
     Expr *left;
     Expr *right;
     char operator;
@@ -216,6 +240,7 @@ typedef struct BinaryExpr {
  *
  */
 typedef struct LocalDeclaration {
+    int line_number;
     Type *type;
     Identifier *identifier;
     Expr *expr;
@@ -225,6 +250,7 @@ typedef struct LocalDeclaration {
  *
  */
 typedef struct IfBlock {
+    int line_number;
     Expr *expr;
     struct StatementList *statement_list;
 } IfBlock;
@@ -233,6 +259,7 @@ typedef struct IfBlock {
  *
  */
 typedef struct IfOrBlock {
+    int line_number;
     Expr *expr;
     struct StatementList *statement_list;
 } IfOrBlock;
@@ -241,6 +268,7 @@ typedef struct IfOrBlock {
  *
  */
 typedef struct IfOrBlockList {
+    int line_number;
     IfOrBlock **if_or_blocks;
     int count;
 } IfOrBlockList;
@@ -249,6 +277,7 @@ typedef struct IfOrBlockList {
  *
  */
 typedef struct OrBlock {
+    int line_number;
     struct StatementList *statement_list;
 } OrBlock;
 
@@ -257,6 +286,7 @@ typedef struct OrBlock {
  *
  */
 typedef struct IfStatement {
+    int line_number;
     IfBlock *if_block;
     IfOrBlockList *if_or_block_list;
     OrBlock *or_block;
@@ -267,6 +297,7 @@ typedef struct IfStatement {
  *
  */
 typedef struct Pattern {
+    int line_number;
     Expr *condition;
     PatternBodyType type;
     union {
@@ -279,6 +310,7 @@ typedef struct Pattern {
  *
  */
 typedef struct PatternList {
+    int line_number;
     Pattern **patterns;
     int count;
 } PatternList;
@@ -287,6 +319,7 @@ typedef struct PatternList {
  *
  */
 typedef struct PatternMatching {
+    int line_number;
     PatternList *pattern_list;
 } PatternMatching;
 
@@ -294,6 +327,7 @@ typedef struct PatternMatching {
  *
  */
 typedef struct PatternMatchingExpr {
+    int line_number;
     Expr *expr;
     PatternList *pattern_list;
 } PatternMatchingExpr;
@@ -302,6 +336,7 @@ typedef struct PatternMatchingExpr {
  *
  */
 typedef struct WhileLoop {
+    int line_number;
     ExprList *expr_list;
 } WhileLoop;
 
@@ -309,6 +344,7 @@ typedef struct WhileLoop {
  *
  */
 typedef struct ForInLoop {
+    int line_number;
     ExprList *expr_list;
     Expr *in_expr;
 } ForInLoop;
@@ -318,6 +354,7 @@ typedef struct ForInLoop {
  *
  */
 typedef struct ReturnStatement {
+    int line_number;
     ExprList *expr_list;
 } ReturnStatement;
 
@@ -325,6 +362,7 @@ typedef struct ReturnStatement {
  *
  */
 typedef struct Iteration {
+    int line_number;
     IterationType type;
     union {
         ForInLoop *for_in_loop;
@@ -337,6 +375,7 @@ typedef struct Iteration {
  *
  */
 typedef struct Statement {
+    int line_number;
     StatementType type;
     union {
         LocalDeclaration *local_declaration;
@@ -354,6 +393,7 @@ typedef struct Statement {
  *
  */
 typedef struct StatementList {
+    int line_number;
     Statement **statements;
     int count;
 } StatementList;
@@ -363,6 +403,7 @@ typedef struct StatementList {
  *
  */
 typedef struct MethodSignature {
+    int line_number;
     VariableDec *method_variable;
     VariableDecList *param_list;  // Optional
 } MethodSignature;
@@ -371,6 +412,7 @@ typedef struct MethodSignature {
  *
  */
 typedef struct ObjectMethod {
+    int line_number;
     char **name;
     MethodSignature *method_signature;
     StatementList *statement_list;
@@ -380,6 +422,7 @@ typedef struct ObjectMethod {
  *
  */
 typedef struct ObjectMethodsList {
+    int line_number;
     ObjectMethod **methods;
     int count;
 } ObjectMethodsList;
@@ -388,6 +431,7 @@ typedef struct ObjectMethodsList {
  *
  */
 typedef struct ObjectMethodsBlock {
+    int line_number;
     Type *identifier;
     ObjectMethodsList *methods_list;
 } ObjectMethodsBlock;
@@ -396,6 +440,7 @@ typedef struct ObjectMethodsBlock {
  *
  */
 typedef struct ObjectMethodsBlockList {
+    int line_number;
     ObjectMethodsBlock **blocks;
     int count;
 } ObjMethodsBlockList;
@@ -404,6 +449,7 @@ typedef struct ObjectMethodsBlockList {
  *
  */
 typedef struct InterfaceMethod {
+    int line_number;
     char **name;
     MethodSignature *method_signature;
     StatementList *statement_list;  // Optional
@@ -413,6 +459,7 @@ typedef struct InterfaceMethod {
  *
  */
 typedef struct InterfaceMethodsList {
+    int line_number;
     InterfaceMethod **methods;
     int count;
 } InterfaceMethodsList;
@@ -421,6 +468,7 @@ typedef struct InterfaceMethodsList {
  *
  */
 typedef struct InterfaceMethodsBlock {
+    int line_number;
     Type *identifier;
     InterfaceMethodsList *methods_list;
 } InterfaceMethodsBlock;
@@ -429,6 +477,7 @@ typedef struct InterfaceMethodsBlock {
  *
  */
 typedef struct InterfaceMethodsBlockList {
+    int line_number;
     InterfaceMethodsBlock **blocks;
     int count;
 } InterfaceMethodsBlockList;
@@ -438,6 +487,7 @@ typedef struct InterfaceMethodsBlockList {
  *
  */
 typedef struct ObjectEntity {
+    int line_number;
     Type *id;
     ObjFieldList *field_list;
     ImplementsBlock *implements_block;
@@ -448,6 +498,7 @@ typedef struct ObjectEntity {
  *
  */
 typedef struct InterfaceEntity {
+    int line_number;
     Type *id;
     InterfaceFieldList *field_list;
 } InterfaceEntity;
@@ -456,6 +507,7 @@ typedef struct InterfaceEntity {
  *
  */
 typedef struct Entity {
+    int line_number;
     EntityType type;
     union {
         ObjectEntity *object_entity;
