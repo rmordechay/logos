@@ -1,5 +1,5 @@
 #include "project/project.h"
-#include "analyser/object_analyser.h"
+#include "analyser/analysis.h"
 
 void create_map();
 

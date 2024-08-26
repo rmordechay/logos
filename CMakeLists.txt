@@ -21,7 +21,7 @@ add_flex_bison_dependency(Lexer Parser)
 set(
     SOURCES
     include/cJSON.c
-    src/utils/utils.c
+    src/utils/utils.h
     gen/parser.c
     gen/lexer.c
     src/project/project.c
@@ -30,8 +30,8 @@ set(
     src/ast/tree.c
     main.c
     src/utils/json_ast.c
-    src/analyser/object_analyser.c
-    src/analyser/object_analyser.h
+    src/analyser/analysis.c
+    src/analyser/analysis.h
     src/utils/hashmap.c
     src/utils/hashmap.h
     src/executor/executor.c

@@ -77,7 +77,7 @@ void visit_package(Package *package) {
 /**
  *
  */
-App *init_project() {
+App *init_project(void) {
     const char *root_path = realpath("lang/src", NULL);
     App *app = create_application("my-project", root_path);
     Package *root_package = create_package(SRC_DIR, root_path);

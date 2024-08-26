@@ -3,7 +3,7 @@
 #include <printf.h>
 #include "tree.h"
 #include "parser.h"
-#include "analyser/object_analyser.h"
+#include "analyser/analysis.h"
 #include "token_types.h"
 
 void yyerror(const char* s);

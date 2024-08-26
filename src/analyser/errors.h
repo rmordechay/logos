@@ -3,18 +3,12 @@
 
 #include <stdlib.h>
 
-#define ERR_FIELDS_NOT_IMPLEMENTED 0, "Fields not implemented"
+#define MAX_ERRORS 50
+#define OBJECT_DOES_NOT_IMPLEMENT_INTERFACE 0, "Object does not implement interface %s"
 
 typedef struct Error {
     int error_code;
     char *message;
 } Error;
-
-Error create_error(int error_code, char *message) {
-    struct Error err;
-    err.error_code = error_code;
-    err.message = message;
-    return err;
-}
 
 #endif //LOGOS_ERRORS_H
