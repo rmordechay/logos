@@ -23,6 +23,8 @@ struct ObjectFieldList *object_field_list;
 struct ObjectField *object_field;
 struct InterfaceFieldList *interface_field_list;
 struct InterfaceField *interface_field;
+struct Carrier *carrier;
+struct MethodSignature *method_signature;
 struct ObjectMethodsBlockList *object_methods_block_list;
 struct ObjectMethodsBlock *object_methods_block;
 struct ObjectMethodsList *object_methods_list;
@@ -31,8 +33,6 @@ struct InterfaceMethodsBlockList *interface_methods_block_list;
 struct InterfaceMethodsBlock *interface_methods_block;
 struct InterfaceMethodsList *interface_methods_list;
 struct InterfaceMethod *interface_method;
-struct MethodSignature *method_signature;
-struct MethodHeader *method_header;
 struct StatementList *statement_list;
 struct Statement *statement;
 struct IterationStmt *iteration_statement;
@@ -65,13 +65,14 @@ struct TypeList *type_list;
 struct ConstantVariable *constant_variable;
 struct ConstantVariableList *constant_variable_list;
 struct Identifier *identifier;
+struct IdentifierList *identifier_list;
 }
 
 %start program
 
 %token AND OR NOT
 %token RETURN BREAK CONTINUE
-%token OBJECT INTERFACE IMPLEMENTS FIELDS IMPORT ENUM
+%token OBJECT INTERFACE IMPLEMENTS FIELDS IMPORT ENUM CARRIER
 %token LET FUNC IF FOR IN CONST
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE LEFT_BRACKET RIGHT_BRACKET LEFT_ANGLE RIGHT_ANGLE
 %token COMMA DOT COLON EQUAL MINUS PLUS STAR SLASH HASH QUEST_MARK EXCLA_MARK PERCENT DOLLAR AMPERSAND
@@ -85,6 +86,7 @@ struct Identifier *identifier;
 %type <object_field> object_field
 %type <interface_field_list> interface_field_list interface_fields_block
 %type <interface_field> interface_field
+%type <carrier> carrier
 %type <object_methods_block_list> object_methods_block_list
 %type <object_methods_block> object_methods_block
 %type <object_methods_list> object_methods_list
@@ -128,6 +130,7 @@ struct Identifier *identifier;
 %type <constant_variable> constant_variable
 %type <constant_variable_list> constant_variable_list
 %type <identifier> identifier
+%type <identifier_list> identifier_list
 
 %%
 program:
@@ -192,7 +195,12 @@ object_methods_list:
 	;
 
 object_method:
-		method_signature statements_block { $$ = create_object_method($1, $2) }
+		method_signature statements_block carrier { $$ = create_object_method($1, $2, $3) }
+	|	method_signature statements_block { $$ = create_object_method($1, $2, NULL) }
+	;
+
+carrier:
+		CARRIER identifier_list
 	;
 
 interface_methods_block_list:
@@ -400,6 +408,12 @@ constant_variable_list:
 
 identifier:
 		IDENTIFIER { $$ = create_identifier(yylval.val) }
+	;
+
+identifier_list:
+	  	identifier { $$ = create_identifier_list($1)  }
+	| 	identifier_list COMMA identifier { $$ = add_identifier($1, $3)  }
+	| 	LEFT_PAREN identifier_list RIGHT_PAREN { $$ = $2  }
 	;
 
 %%

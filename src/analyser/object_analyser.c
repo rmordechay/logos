@@ -47,14 +47,14 @@ typedef struct LgsScopeVariable {
     Type type;
     Identifier identifier;
     char *value;
-} LgsScopeVariable;
+} Lgs_ScopeVariable;
 
 /**
  *
  */
 typedef struct Scope {
     HashMap identifiers;
-} Scope;
+} Lgs_Scope;
 
 
 /**
@@ -72,12 +72,12 @@ Type *infer_type(Expr *expr) {
 /**
  *
  */
-Scope get_scope() {
+Lgs_Scope get_scope() {
     HashMap hash_map;
     for (int i = 0; i < TABLE_SIZE; i++) {
         hash_map.table[i] = NULL;
     }
-    Scope scope;
+    Lgs_Scope scope;
     scope.identifiers = hash_map;
     return scope;
 }
@@ -85,11 +85,11 @@ Scope get_scope() {
 /**
  *
  */
-void visit_local_dec(Statement *statement, Scope *scope) {
+void visit_local_dec(Statement *statement, Lgs_Scope *scope) {
     LocalDeclaration *declaration = statement->local_declaration;
     Identifier *identifier = declaration->identifier;
     Type *type = declaration->type;
-    LgsScopeVariable var_dec;
+    Lgs_ScopeVariable var_dec;
     var_dec.type = *type;
     var_dec.identifier = *identifier;
     put_in_map(&(*scope).identifiers, identifier->name, &var_dec);
@@ -98,7 +98,7 @@ void visit_local_dec(Statement *statement, Scope *scope) {
 /**
  *
  */
-Scope visit_statement(Statement *statement, Scope scope) {
+Lgs_Scope visit_statement(Statement *statement, Lgs_Scope scope) {
     switch (statement->type) {
         case ST_LOCAL_DECLARATION:
             visit_local_dec(statement, &scope);
@@ -127,7 +127,7 @@ Scope visit_statement(Statement *statement, Scope scope) {
  *
  */
 void visit_scope(StatementList *statement_list) {
-    Scope scope = get_scope();
+    Lgs_Scope scope = get_scope();
     for (int i = 0; i < statement_list->count; i++) {
         Statement *statement = statement_list->statements[i];
         scope = visit_statement(statement, scope);

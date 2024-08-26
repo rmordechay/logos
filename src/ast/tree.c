@@ -212,7 +212,7 @@ InterfaceMethodsBlock *create_interface_methods_block(Type *type, InterfaceMetho
 /**
  *
  */
-ObjectMethod *create_object_method(MethodSignature *method_signature, StatementList *statement_list) {
+ObjectMethod *create_object_method(MethodSignature *method_signature, StatementList *statement_list, Carrier *carrier) {
     ObjectMethod *m = malloc(sizeof(ObjectMethod));
     m->method_signature = method_signature;
     m->statement_list = statement_list;
@@ -791,6 +791,29 @@ Identifier *create_identifier(char *name) {
     Identifier *id = malloc(sizeof(Identifier));
     id->name = strdup(name);
     return id;
+}
+
+/**
+ *
+ */
+IdentifierList *create_identifier_list(Identifier *identifier) {
+    IdentifierList *tl = malloc(sizeof(IdentifierList));
+    tl->identifiers = malloc(sizeof(Identifier *));
+    tl->count = 1;
+    tl->identifiers[0] = identifier;
+    return tl;
+}
+
+/**
+ *
+ */
+IdentifierList *add_identifier(IdentifierList *list, Identifier *element) {
+    int new_size = list->count + 1;
+    Identifier **new_list = realloc(list->identifiers, new_size * sizeof(Identifier *));
+    list->identifiers = new_list;
+    list->identifiers[list->count] = element;
+    list->count++;
+    return list;
 }
 
 /**

@@ -38,6 +38,7 @@ STRING          \"([^\"\\]|\\.)*\"
 "in"                    {  return IN; }
 "enum"                  {  return ENUM; }
 
+"->"                    {  return CARRIER; }
 "("                     {  return LEFT_PAREN; }
 ")"                     {  return RIGHT_PAREN; }
 "{"                     {  return LEFT_BRACE; }

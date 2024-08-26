@@ -13,6 +13,21 @@ typedef struct Identifier {
 /**
  *
  */
+typedef struct IdentifierList {
+    Identifier **identifiers;
+    int count;
+} IdentifierList;
+
+/**
+ *
+ */
+typedef struct Carrier {
+    IdentifierList *identifier_list;
+} Carrier;
+
+/**
+ *
+ */
 typedef struct ConstantVariable {
     char *name;
 } ConstantVariable;
@@ -461,14 +476,14 @@ ObjectField *create_object_field(VariableDec *variable_declaration, Type *type);
 InterfaceFieldList *create_interface_field_list(InterfaceField *field);
 InterfaceFieldList *add_interface_field(InterfaceFieldList *list, InterfaceField *element);
 InterfaceField *create_interface_field(VariableDec *variable_declaration);
-MethodSignature *create_method_signature(VariableDec *variable_dec, VariableDecList *variable_declaration_list);
 // Methods
+MethodSignature *create_method_signature(VariableDec *variable_dec, VariableDecList *variable_declaration_list);
 ObjectMethodsBlock *create_object_methods_block(Type *type, ObjectMethodsList *methods_list);
 ObjMethodsBlockList *create_object_methods_block_list(ObjectMethodsBlock *methodBlock);
 ObjMethodsBlockList *add_object_methods_block(ObjMethodsBlockList *list, ObjectMethodsBlock *element);
 ObjectMethodsList *create_object_methods_list(ObjectMethod *method);
 ObjectMethodsList *add_object_method(ObjectMethodsList *list, ObjectMethod *element);
-ObjectMethod *create_object_method(MethodSignature *method_signature, StatementList *statement_list);
+ObjectMethod *create_object_method(MethodSignature *method_signature, StatementList *statement_list, Carrier *carrier);
 InterfaceMethodsBlock *create_interface_methods_block(Type *type, InterfaceMethodsList *methods_list);
 InterfaceMethodsBlockList *create_interface_methods_block_list(InterfaceMethodsBlock *methodBlock);
 InterfaceMethodsBlockList *add_interface_methods_block(InterfaceMethodsBlockList *list, InterfaceMethodsBlock *element);
@@ -532,12 +547,14 @@ Collection *create_collection(Type *type, ExprList *expr_list);
 EnumDeclaration *create_enum_declaration(Type *type, ConstantVariableList *const_var_list);
 // Primitives
 Identifier *create_identifier(char *name);
-ConstantVariable *create_constant_variable(char *name);
-ConstantVariableList *create_const_var_list(ConstantVariable *constant_variable);
-ConstantVariableList *add_const_var(ConstantVariableList *list, ConstantVariable *element);
+IdentifierList *create_identifier_list(Identifier *identifier);
+IdentifierList *add_identifier(IdentifierList *list, Identifier *element);
 Type *create_type(char *name);
 TypeList *create_type_list(Type *type);
 TypeList *add_type(TypeList *list, Type *element);
+ConstantVariable *create_constant_variable(char *name);
+ConstantVariableList *create_const_var_list(ConstantVariable *constant_variable);
+ConstantVariableList *add_const_var(ConstantVariableList *list, ConstantVariable *element);
 
 void free_entity(Entity *obj);
 void free_object_file(ObjectEntity *obj);
