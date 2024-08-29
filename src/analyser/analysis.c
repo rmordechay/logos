@@ -45,13 +45,14 @@ void analyse_tree(App *app) {
 /**
  *
  */
-void analyse_object(ObjectEntity *entity) {
+void analyse_object(ObjEntity *entity) {
     char *obj_name = entity->id->name;
     ImplementsBlock *implements_block = entity->implements_block;
     ObjFieldList *field_list = entity->field_list;
     ObjMethodsBlockList *methods_block_list = entity->methods_block_list;
-    check_method_implementations(implements_block->type_list, methods_block_list, obj_name);
     check_field_implementations(implements_block->type_list, field_list, obj_name);
+    check_method_implementations(implements_block->type_list, methods_block_list, obj_name);
+    check_methods_blocks(methods_block_list);
 }
 
 
@@ -109,13 +110,147 @@ bool is_name_in_type_list(const TypeList *type_list, const char *name) {
     }
     return false;
 }
+
+/**
+ *
+ */
+void check_methods_blocks(ObjMethodsBlockList *methods_block_list) {
+    for (int i = 0; i < methods_block_list->count; i++) {
+        ObjMethodsBlock *block = methods_block_list->blocks[i];
+        for (int j = 0; j < block->methods_list->count; j++) {
+            ObjMethod *method = block->methods_list->methods[j];
+            check_method(method);
+        }
+    }
+}
+
+/**
+ *
+ */
+void check_statement(Statement *stmt) {
+    switch (stmt->type) {
+        case ST_LOCAL_DECLARATION:
+            check_local_declaration(stmt->local_declaration);
+            break;
+        case ST_IF_STATEMENT:
+            check_if_statement(stmt->if_statement);
+            break;
+        case ST_PATTERN_MATCHING:
+            check_pattern_matching(stmt->pattern_matching);
+            break;
+        case ST_PATTERN_MATCHING_EXPR:
+            check_pattern_matching_expr(stmt->pattern_matching_expr);
+            break;
+        case ST_ITERATION:
+            check_iteration(stmt->iteration);
+            break;
+        case ST_RETURN_STATEMENT:
+            check_return_statement(stmt->return_statement);
+            break;
+        case ST_BREAK_STATEMENT:
+            check_break_statement(stmt->break_expr);
+            break;
+        case ST_CONTINUE_STATEMENT:
+            check_continue_statement();
+            break;
+        case ST_ENUM_STATEMENT:
+            check_enum_statement(stmt->enum_declaration);
+            break;
+        case ST_EXPR:
+            check_expr(stmt->expr);
+            break;
+    }
+}
+
+/**
+ *
+ */
+void check_local_declaration(LocalDeclaration *local_declaration) {
+
+}
+
+/**
+ *
+ */
+void check_if_statement(IfStatement *if_statement) {
+
+}
+
+/**
+ *
+ */
+void check_pattern_matching(PatternMatching *pattern_matching) {
+
+}
+
+/**
+ *
+ */
+void check_pattern_matching_expr(PatternMatchingExpr *pattern_matching_expr) {
+
+}
+
+/**
+ *
+ */
+void check_iteration(Iteration *iteration) {
+
+}
+
+/**
+ *
+ */
+void check_return_statement(ReturnStatement *return_statement) {
+
+}
+
+/**
+ *
+ */
+void check_break_statement(Expr *break_expr) {
+
+}
+
+/**
+ *
+ */
+void check_continue_statement() {
+
+}
+
+/**
+ *
+ */
+void check_enum_statement(EnumDeclaration *enum_declaration) {
+
+}
+
+/**
+ *
+ */
+void check_expr(Expr *expr) {
+
+}
+
+/**
+ *
+ */
+void check_method(ObjMethod *method) {
+    printf("Check method: %s\n", method->name);
+    StatementList *statement_list = method->statement_list;
+    for (int i = 0; i < statement_list->count; i++) {
+        Statement *statement = statement_list->statements[i];
+        check_statement(statement);
+    }
+}
+
 /**
  *
  */
 void add_error(int error_code, char *message, int line_number) {
     struct Error err;
     err.error_code = error_code;
-    err.message = message;
+    err.message = strdup(message);
     err.line_number = line_number;
     err.error_count = err_count;
     errors[err_count] = err;

@@ -59,6 +59,7 @@ typedef enum StatementType {
     ST_BREAK_STATEMENT,
     ST_CONTINUE_STATEMENT,
     ST_ENUM_STATEMENT,
+    ST_EXPR,
 } StatementType;
 
 /**

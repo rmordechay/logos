@@ -33,19 +33,19 @@ cJSON *create_pattern_list_json(PatternList *list);
 cJSON *create_statement_json(Statement *obj);
 cJSON *create_statement_list_json(StatementList *list);
 cJSON *create_method_signature_json(MethodSignature *obj);
-cJSON *create_method_json(ObjectMethod *obj);
-cJSON *create_methods_list_json(ObjectMethodsList *list);
-cJSON *create_methods_block_json(ObjectMethodsBlock *obj);
+cJSON *create_method_json(ObjMethod *obj);
+cJSON *create_methods_list_json(ObjMethodsList *list);
+cJSON *create_methods_block_json(ObjMethodsBlock *obj);
 cJSON *create_methods_block_list_json(ObjMethodsBlockList *list);
-cJSON *create_object_file_json(ObjectEntity *obj);
+cJSON *create_object_file_json(ObjEntity *obj);
 
 
 /**
  *
  */
-cJSON *create_object_file_json(ObjectEntity *obj) {
+cJSON *create_object_file_json(ObjEntity *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddStringToObject(root, "kind", "ObjectEntity");
+    cJSON_AddStringToObject(root, "kind", "ObjEntity");
     cJSON_AddItemToObject(root, "id", create_type_json(obj->id));
     cJSON_AddItemToObject(root, "field_list", create_field_list_json(obj->field_list));
     if (obj->implements_block) {
@@ -422,7 +422,7 @@ cJSON *create_method_signature_json(MethodSignature *obj) {
 /**
  *
  */
-cJSON *create_method_json(ObjectMethod *obj) {
+cJSON *create_method_json(ObjMethod *obj) {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "method_signature", create_method_signature_json(obj->method_signature));
     if (obj->statement_list) {
@@ -434,7 +434,7 @@ cJSON *create_method_json(ObjectMethod *obj) {
 /**
  *
  */
-cJSON *create_methods_list_json(ObjectMethodsList *list) {
+cJSON *create_methods_list_json(ObjMethodsList *list) {
     cJSON *root = cJSON_CreateArray();
     for (int i = 0; i < list->count; i++) {
         cJSON_AddItemToArray(root, create_method_json(list->methods[i]));
@@ -445,7 +445,7 @@ cJSON *create_methods_list_json(ObjectMethodsList *list) {
 /**
  *
  */
-cJSON *create_methods_block_json(ObjectMethodsBlock *obj) {
+cJSON *create_methods_block_json(ObjMethodsBlock *obj) {
     cJSON *root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "identifier", create_type_json(obj->identifier));
     cJSON_AddItemToObject(root, "methods_list", create_methods_list_json(obj->methods_list));

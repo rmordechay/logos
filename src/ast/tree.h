@@ -197,11 +197,11 @@ typedef struct UnaryExpr {
     int line_number;
     UnaryExprType type;
     union {
+        int boolean;
         char *integer_value;
         char *float_value;
-        Identifier *identifier;
         char *string;
-        int boolean;
+        Identifier *identifier;
         MethodCall *method_call;
         Collection *collection;
     };
@@ -386,6 +386,7 @@ typedef struct Statement {
         ReturnStatement *return_statement;
         EnumDeclaration *enum_declaration;
         Expr *break_expr;
+        Expr *expr;
     };
 } Statement;
 
@@ -413,19 +414,19 @@ typedef struct MethodSignature {
  */
 typedef struct ObjectMethod {
     int line_number;
-    char **name;
+    char *name;
     MethodSignature *method_signature;
     StatementList *statement_list;
-} ObjectMethod;
+} ObjMethod;
 
 /**
  *
  */
 typedef struct ObjectMethodsList {
     int line_number;
-    ObjectMethod **methods;
+    ObjMethod **methods;
     int count;
-} ObjectMethodsList;
+} ObjMethodsList;
 
 /**
  *
@@ -433,15 +434,15 @@ typedef struct ObjectMethodsList {
 typedef struct ObjectMethodsBlock {
     int line_number;
     Type *identifier;
-    ObjectMethodsList *methods_list;
-} ObjectMethodsBlock;
+    ObjMethodsList *methods_list;
+} ObjMethodsBlock;
 
 /**
  *
  */
 typedef struct ObjectMethodsBlockList {
     int line_number;
-    ObjectMethodsBlock **blocks;
+    ObjMethodsBlock **blocks;
     int count;
 } ObjMethodsBlockList;
 
@@ -492,7 +493,7 @@ typedef struct ObjectEntity {
     ObjFieldList *field_list;
     ImplementsBlock *implements_block;
     ObjMethodsBlockList *methods_block_list;
-} ObjectEntity;
+} ObjEntity;
 
 /**
  *
@@ -510,7 +511,7 @@ typedef struct Entity {
     int line_number;
     EntityType type;
     union {
-        ObjectEntity *object_entity;
+        ObjEntity *object_entity;
         InterfaceEntity *interface_entity;
     };
 } Entity;
@@ -518,7 +519,7 @@ typedef struct Entity {
 void analyse_ast(Entity *entity);
 Entity *create_entity(EntityType entity_type, void *entity_tree);
 
-ObjectEntity *create_object_entity(Type *type, ImplementsBlock *implements_block, ObjFieldList *fields_list, ObjMethodsBlockList *methods_block_list);
+ObjEntity *create_object_entity(Type *t, ImplementsBlock *ib, ObjFieldList *fl, ObjMethodsBlockList *mbl);
 InterfaceEntity *create_interface_entity(Type *type, InterfaceFieldList *fields_list);
 ImplementsBlock *create_implements_block(TypeList *type_list);
 // Object Field
@@ -530,12 +531,12 @@ InterfaceFieldList *add_interface_field(InterfaceFieldList *list, InterfaceField
 InterfaceField *create_interface_field(VariableDec *variable_declaration);
 // Methods
 MethodSignature *create_method_signature(VariableDec *variable_dec, VariableDecList *variable_declaration_list);
-ObjectMethodsBlock *create_object_methods_block(Type *type, ObjectMethodsList *methods_list);
-ObjMethodsBlockList *create_object_methods_block_list(ObjectMethodsBlock *methodBlock);
-ObjMethodsBlockList *add_object_methods_block(ObjMethodsBlockList *list, ObjectMethodsBlock *element);
-ObjectMethodsList *create_object_methods_list(ObjectMethod *method);
-ObjectMethodsList *add_object_method(ObjectMethodsList *list, ObjectMethod *element);
-ObjectMethod *create_object_method(MethodSignature *method_signature, StatementList *statement_list, Carrier *carrier);
+ObjMethodsBlock *create_object_methods_block(Type *type, ObjMethodsList *methods_list);
+ObjMethodsBlockList *create_object_methods_block_list(ObjMethodsBlock *methodBlock);
+ObjMethodsBlockList *add_object_methods_block(ObjMethodsBlockList *list, ObjMethodsBlock *element);
+ObjMethodsList *create_object_methods_list(ObjMethod *method);
+ObjMethodsList *add_object_method(ObjMethodsList *list, ObjMethod *element);
+ObjMethod *create_object_method(MethodSignature *method_signature, StatementList *statement_list, Carrier *carrier);
 InterfaceMethodsBlock *create_interface_methods_block(Type *type, InterfaceMethodsList *methods_list);
 InterfaceMethodsBlockList *create_interface_methods_block_list(InterfaceMethodsBlock *methodBlock);
 InterfaceMethodsBlockList *add_interface_methods_block(InterfaceMethodsBlockList *list, InterfaceMethodsBlock *element);
@@ -554,6 +555,7 @@ Statement *create_stmt_from_return(ReturnStatement *return_statement);
 Statement *create_stmt_from_break(Expr *break_expr);
 Statement *create_stmt_from_continue();
 Statement *create_stmt_from_enum(EnumDeclaration *enum_declaration);
+Statement *create_stmt_from_expr(Expr *expr);
 // Declaration
 LocalDeclaration *create_local_declaration(Type *type, Identifier *identifier, Expr *expr);
 VariableDecList *create_var_dec_list(VariableDec *variable_dec);
@@ -609,14 +611,14 @@ ConstantVariableList *create_const_var_list(ConstantVariable *constant_variable)
 ConstantVariableList *add_const_var(ConstantVariableList *list, ConstantVariable *element);
 
 void free_entity(Entity *obj);
-void free_object_file(ObjectEntity *obj);
+void free_object_file(ObjEntity *obj);
 void free_implements_block(ImplementsBlock *ib);
 void free_object_field_list(ObjFieldList *fl);
 void free_object_field(ObjectField *f);
 void free_methods_block_list(ObjMethodsBlockList *mbl);
-void free_methods_block(ObjectMethodsBlock *mb);
-void free_methods_list(ObjectMethodsList *ml);
-void free_method(ObjectMethod *m);
+void free_methods_block(ObjMethodsBlock *mb);
+void free_methods_list(ObjMethodsList *ml);
+void free_method(ObjMethod *m);
 void free_method_signature(MethodSignature *ms);
 void free_statement_list(StatementList *sl);
 void free_statement(Statement *s);

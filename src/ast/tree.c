@@ -6,7 +6,7 @@
 #include "analyser/analysis.h"
 #include "token_types.h"
 
-void yyerror(const char* s);
+void yyerror(const char *s);
 unsigned int iteration_level;
 extern int yylineno;
 
@@ -49,17 +49,15 @@ Entity *create_entity(EntityType entity_type, void *entity_tree) {
 /**
  *
  */
-ObjectEntity *create_object_entity(Type *type,
-                                   ImplementsBlock *implements_block,
-                                   ObjFieldList *fields_list,
-                                   ObjMethodsBlockList *methods_block_list) {
-    ObjectEntity *obj = malloc(sizeof(ObjectEntity));
-    obj->id = type;
-    obj->field_list = fields_list;
-    obj->implements_block = implements_block;
-    obj->methods_block_list = methods_block_list;
+ObjEntity *create_object_entity(Type *t, ImplementsBlock *ib, ObjFieldList *fl, ObjMethodsBlockList *mbl) {
+    ObjEntity *obj = malloc(sizeof(ObjEntity));
+    obj->id = t;
+    obj->field_list = fl;
+    obj->implements_block = ib;
+    obj->methods_block_list = mbl;
     return obj;
 }
+
 /**
  *
  */
@@ -152,10 +150,10 @@ InterfaceField *create_interface_field(VariableDec *variable_declaration) {
 /**
  *
  */
-ObjMethodsBlockList *create_object_methods_block_list(ObjectMethodsBlock *methodBlock) {
+ObjMethodsBlockList *create_object_methods_block_list(ObjMethodsBlock *methodBlock) {
     ObjMethodsBlockList *mbl = malloc(sizeof(ObjMethodsBlockList));
     mbl->line_number = yylineno;
-    mbl->blocks = malloc(sizeof(ObjectMethodsBlock *));
+    mbl->blocks = malloc(sizeof(ObjMethodsBlock *));
     mbl->count = 1;
     mbl->blocks[0] = methodBlock;
     return mbl;
@@ -164,9 +162,9 @@ ObjMethodsBlockList *create_object_methods_block_list(ObjectMethodsBlock *method
 /**
  *
  */
-ObjMethodsBlockList *add_object_methods_block(ObjMethodsBlockList *list, ObjectMethodsBlock *element) {
+ObjMethodsBlockList *add_object_methods_block(ObjMethodsBlockList *list, ObjMethodsBlock *element) {
     int new_size = list->count + 1;
-    ObjectMethodsBlock **new_list = realloc(list->blocks, new_size * sizeof(ObjectMethodsBlock *));
+    ObjMethodsBlock **new_list = realloc(list->blocks, new_size * sizeof(ObjMethodsBlock *));
     list->blocks = new_list;
     list->blocks[list->count] = element;
     list->count++;
@@ -176,8 +174,8 @@ ObjMethodsBlockList *add_object_methods_block(ObjMethodsBlockList *list, ObjectM
 /**
  *
  */
-ObjectMethodsBlock *create_object_methods_block(Type *type, ObjectMethodsList *methods_list) {
-    ObjectMethodsBlock *mb = malloc(sizeof(ObjectMethodsBlock));
+ObjMethodsBlock *create_object_methods_block(Type *type, ObjMethodsList *methods_list) {
+    ObjMethodsBlock *mb = malloc(sizeof(ObjMethodsBlock));
     mb->line_number = yylineno;
     mb->identifier = type;
     mb->methods_list = methods_list;
@@ -188,10 +186,10 @@ ObjectMethodsBlock *create_object_methods_block(Type *type, ObjectMethodsList *m
 /**
  *
  */
-ObjectMethodsList *create_object_methods_list(ObjectMethod *method) {
-    ObjectMethodsList *ml = malloc(sizeof(ObjectMethodsList));
+ObjMethodsList *create_object_methods_list(ObjMethod *method) {
+    ObjMethodsList *ml = malloc(sizeof(ObjMethodsList));
     ml->line_number = yylineno;
-    ml->methods = malloc(sizeof(ObjectMethod *));
+    ml->methods = malloc(sizeof(ObjMethod *));
     ml->count = 1;
     ml->methods[0] = method;
     return ml;
@@ -200,9 +198,9 @@ ObjectMethodsList *create_object_methods_list(ObjectMethod *method) {
 /**
  *
  */
-ObjectMethodsList *add_object_method(ObjectMethodsList *list, ObjectMethod *element) {
+ObjMethodsList *add_object_method(ObjMethodsList *list, ObjMethod *element) {
     int new_size = list->count + 1;
-    ObjectMethod **new_list = realloc(list->methods, new_size * sizeof(ObjectMethod *));
+    ObjMethod **new_list = realloc(list->methods, new_size * sizeof(ObjMethod *));
     list->methods = new_list;
     list->methods[list->count] = element;
     list->count++;
@@ -223,12 +221,12 @@ InterfaceMethodsBlock *create_interface_methods_block(Type *type, InterfaceMetho
 /**
  *
  */
-ObjectMethod *create_object_method(MethodSignature *method_signature, StatementList *statement_list, Carrier *carrier) {
-    ObjectMethod *m = malloc(sizeof(ObjectMethod));
+ObjMethod *create_object_method(MethodSignature *method_signature, StatementList *statement_list, Carrier *carrier) {
+    ObjMethod *m = malloc(sizeof(ObjMethod));
     m->line_number = yylineno;
     m->method_signature = method_signature;
     m->statement_list = statement_list;
-    m->name = &m->method_signature->method_variable->identifier->name;
+    m->name = strdup(m->method_signature->method_variable->identifier->name);
     return m;
 }
 
@@ -247,7 +245,8 @@ InterfaceMethodsBlockList *create_interface_methods_block_list(InterfaceMethodsB
 /**
  *
  */
-InterfaceMethodsBlockList *add_interface_methods_block(InterfaceMethodsBlockList *list, InterfaceMethodsBlock *element) {
+InterfaceMethodsBlockList *
+add_interface_methods_block(InterfaceMethodsBlockList *list, InterfaceMethodsBlock *element) {
     int new_size = list->count + 1;
     InterfaceMethodsBlock **new_list = realloc(list->blocks, new_size * sizeof(InterfaceMethodsBlock *));
     list->blocks = new_list;
@@ -438,6 +437,17 @@ Statement *create_stmt_from_enum(EnumDeclaration *enum_declaration) {
     s->line_number = yylineno;
     s->type = ST_ENUM_STATEMENT;
     s->enum_declaration = enum_declaration;
+    return s;
+}
+
+/**
+ *
+ */
+Statement *create_stmt_from_expr(Expr *expr) {
+    Statement *s = malloc(sizeof(Statement));
+    s->line_number = yylineno;
+    s->type = ST_EXPR;
+    s->expr = expr;
     return s;
 }
 
@@ -761,6 +771,7 @@ UnaryExpr *create_unary_expr_from_method_call(MethodCall *method_call) {
     ue->type = UE_METHOD_CALL;
     return ue;
 }
+
 /**
  *
  */
@@ -961,7 +972,7 @@ void free_entity(Entity *obj) {
 /**
  *
  */
-void free_object_file(ObjectEntity *obj) {
+void free_object_file(ObjEntity *obj) {
     if (obj == NULL) return;
     free_object_field_list(obj->field_list);
     free_methods_block_list(obj->methods_block_list);
@@ -1016,7 +1027,7 @@ void free_methods_block_list(ObjMethodsBlockList *mbl) {
 /**
  *
  */
-void free_methods_block(ObjectMethodsBlock *mb) {
+void free_methods_block(ObjMethodsBlock *mb) {
     if (mb == NULL) return;
     free_type(mb->identifier);
     free_methods_list(mb->methods_list);
@@ -1026,7 +1037,7 @@ void free_methods_block(ObjectMethodsBlock *mb) {
 /**
  *
  */
-void free_methods_list(ObjectMethodsList *ml) {
+void free_methods_list(ObjMethodsList *ml) {
     if (ml == NULL) return;
     for (int i = 0; i < ml->count; i++) {
         free_method(ml->methods[i]);
@@ -1038,10 +1049,11 @@ void free_methods_list(ObjectMethodsList *ml) {
 /**
  *
  */
-void free_method(ObjectMethod *m) {
+void free_method(ObjMethod *m) {
     if (m == NULL) return;
     free_method_signature(m->method_signature);
     free_statement_list(m->statement_list);
+    free(m->name);
     free(m);
 }
 
@@ -1100,6 +1112,9 @@ void free_statement(Statement *s) {
             break;
         case ST_ENUM_STATEMENT:
             free_enum_declaration(s->enum_declaration);
+            break;
+        case ST_EXPR:
+            free_expr(s->expr);
             break;
     }
     free(s);
@@ -1304,10 +1319,7 @@ void free_unary_expr(UnaryExpr *ue) {
             free_identifier(ue->identifier);
             break;
         case UE_INT:
-            free(ue->integer_value);
-            break;
         case UE_FLOAT:
-            free(ue->float_value);
             break;
         case UE_STRING:
             free(ue->string);

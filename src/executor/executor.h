@@ -3,6 +3,6 @@
 
 #include "ast/tree.h"
 
-void execute(ObjectEntity *entity);
+void execute(ObjEntity *entity);
 
 #endif //LOGOS_EXECUTOR_H

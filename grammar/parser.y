@@ -248,6 +248,7 @@ statement:
 	|	return_statement  { $$ = create_stmt_from_return($1);  }
 	|	CONTINUE  { $$ = create_stmt_from_continue();  }
 	|	BREAK expr  { $$ = create_stmt_from_break($2);  }
+	|	expr  { $$ = create_stmt_from_expr($1);  }
 	;
 
 local_declaration:
