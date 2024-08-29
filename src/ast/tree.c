@@ -8,7 +8,7 @@
 
 void yyerror(const char *s);
 unsigned int iteration_level;
-extern int yylineno;
+int yylineno;
 
 /**
  *
@@ -31,7 +31,6 @@ void analyse_ast(Entity *entity) {
  */
 Entity *create_entity(EntityType entity_type, void *entity_tree) {
     Entity *entity = malloc(sizeof(Entity));
-    entity->line_number = yylineno;
     entity->type = entity_type;
     switch (entity_type) {
         case E_OBJECT:
@@ -73,7 +72,6 @@ InterfaceEntity *create_interface_entity(Type *type, InterfaceFieldList *fields_
  */
 ImplementsBlock *create_implements_block(TypeList *type_list) {
     ImplementsBlock *ib = malloc(sizeof(ImplementsBlock));
-    ib->line_number = yylineno;
     ib->type_list = type_list;
     return ib;
 }
@@ -83,7 +81,6 @@ ImplementsBlock *create_implements_block(TypeList *type_list) {
  */
 ObjFieldList *create_object_field_list(ObjectField *field) {
     ObjFieldList *fl = malloc(sizeof(ObjFieldList));
-    fl->line_number = yylineno;
     fl->fields = malloc(sizeof(ObjectField *));
     fl->count = 1;
     fl->fields[0] = field;
@@ -107,7 +104,6 @@ ObjFieldList *add_object_field(ObjFieldList *list, ObjectField *element) {
  */
 ObjectField *create_object_field(VariableDec *variable_declaration, Type *type) {
     ObjectField *f = malloc(sizeof(ObjectField));
-    f->line_number = yylineno;
     f->variable_declaration = variable_declaration;
     f->implements = type;
     return f;
@@ -118,7 +114,6 @@ ObjectField *create_object_field(VariableDec *variable_declaration, Type *type) 
  */
 InterfaceFieldList *create_interface_field_list(InterfaceField *field) {
     InterfaceFieldList *fl = malloc(sizeof(InterfaceFieldList));
-    fl->line_number = yylineno;
     fl->fields = malloc(sizeof(InterfaceField *));
     fl->count = 1;
     fl->fields[0] = field;
@@ -142,7 +137,6 @@ InterfaceFieldList *add_interface_field(InterfaceFieldList *list, InterfaceField
  */
 InterfaceField *create_interface_field(VariableDec *variable_declaration) {
     InterfaceField *f = malloc(sizeof(InterfaceField *));
-    f->line_number = yylineno;
     f->variable_declaration = variable_declaration;
     return f;
 }
@@ -152,7 +146,6 @@ InterfaceField *create_interface_field(VariableDec *variable_declaration) {
  */
 ObjMethodsBlockList *create_object_methods_block_list(ObjMethodsBlock *methodBlock) {
     ObjMethodsBlockList *mbl = malloc(sizeof(ObjMethodsBlockList));
-    mbl->line_number = yylineno;
     mbl->blocks = malloc(sizeof(ObjMethodsBlock *));
     mbl->count = 1;
     mbl->blocks[0] = methodBlock;
@@ -176,7 +169,6 @@ ObjMethodsBlockList *add_object_methods_block(ObjMethodsBlockList *list, ObjMeth
  */
 ObjMethodsBlock *create_object_methods_block(Type *type, ObjMethodsList *methods_list) {
     ObjMethodsBlock *mb = malloc(sizeof(ObjMethodsBlock));
-    mb->line_number = yylineno;
     mb->identifier = type;
     mb->methods_list = methods_list;
     return mb;
@@ -188,7 +180,6 @@ ObjMethodsBlock *create_object_methods_block(Type *type, ObjMethodsList *methods
  */
 ObjMethodsList *create_object_methods_list(ObjMethod *method) {
     ObjMethodsList *ml = malloc(sizeof(ObjMethodsList));
-    ml->line_number = yylineno;
     ml->methods = malloc(sizeof(ObjMethod *));
     ml->count = 1;
     ml->methods[0] = method;
@@ -212,7 +203,6 @@ ObjMethodsList *add_object_method(ObjMethodsList *list, ObjMethod *element) {
  */
 InterfaceMethodsBlock *create_interface_methods_block(Type *type, InterfaceMethodsList *methods_list) {
     InterfaceMethodsBlock *mb = malloc(sizeof(InterfaceMethodsBlock));
-    mb->line_number = yylineno;
     mb->identifier = type;
     mb->methods_list = methods_list;
     return mb;
@@ -223,7 +213,6 @@ InterfaceMethodsBlock *create_interface_methods_block(Type *type, InterfaceMetho
  */
 ObjMethod *create_object_method(MethodSignature *method_signature, StatementList *statement_list, Carrier *carrier) {
     ObjMethod *m = malloc(sizeof(ObjMethod));
-    m->line_number = yylineno;
     m->method_signature = method_signature;
     m->statement_list = statement_list;
     m->name = strdup(m->method_signature->method_variable->identifier->name);
@@ -235,7 +224,6 @@ ObjMethod *create_object_method(MethodSignature *method_signature, StatementList
  */
 InterfaceMethodsBlockList *create_interface_methods_block_list(InterfaceMethodsBlock *methodBlock) {
     InterfaceMethodsBlockList *mbl = malloc(sizeof(InterfaceMethodsBlockList));
-    mbl->line_number = yylineno;
     mbl->blocks = malloc(sizeof(InterfaceMethodsBlock *));
     mbl->count = 1;
     mbl->blocks[0] = methodBlock;
@@ -260,7 +248,6 @@ add_interface_methods_block(InterfaceMethodsBlockList *list, InterfaceMethodsBlo
  */
 InterfaceMethod *create_interface_method(MethodSignature *method_signature, StatementList *statement_list) {
     InterfaceMethod *m = malloc(sizeof(InterfaceMethod));
-    m->line_number = yylineno;
     m->method_signature = method_signature;
     m->statement_list = statement_list;
     m->name = &m->method_signature->method_variable->identifier->name;
@@ -272,7 +259,6 @@ InterfaceMethod *create_interface_method(MethodSignature *method_signature, Stat
  */
 InterfaceMethodsList *create_interface_methods_list(InterfaceMethod *method) {
     InterfaceMethodsList *ml = malloc(sizeof(InterfaceMethodsList));
-    ml->line_number = yylineno;
     ml->methods = malloc(sizeof(InterfaceMethod *));
     ml->count = 1;
     ml->methods[0] = method;
@@ -296,7 +282,6 @@ InterfaceMethodsList *add_interface_method(InterfaceMethodsList *list, Interface
  */
 MethodSignature *create_method_signature(VariableDec *variable_dec, VariableDecList *variable_declaration_list) {
     MethodSignature *ms = malloc(sizeof(MethodSignature));
-    ms->line_number = yylineno;
     ms->method_variable = variable_dec;
     ms->param_list = variable_declaration_list;
     return ms;
@@ -307,7 +292,6 @@ MethodSignature *create_method_signature(VariableDec *variable_dec, VariableDecL
  */
 StatementList *create_statement_list(Statement *statement) {
     StatementList *sl = malloc(sizeof(StatementList));
-    sl->line_number = yylineno;
     if (statement != NULL) {
         sl->statements = malloc(sizeof(Statement *));
         sl->statements[0] = statement;
@@ -346,7 +330,6 @@ StatementList *add_statement(StatementList *list, Statement *element) {
  */
 Statement *create_stmt_from_local_dec(LocalDeclaration *local_declaration) {
     Statement *s = malloc(sizeof(Statement));
-    s->line_number = yylineno;
     s->local_declaration = local_declaration;
     s->type = ST_LOCAL_DECLARATION;
     return s;
@@ -357,7 +340,6 @@ Statement *create_stmt_from_local_dec(LocalDeclaration *local_declaration) {
  */
 Statement *create_stmt_from_if_stmt(IfStatement *if_statement) {
     Statement *s = malloc(sizeof(Statement));
-    s->line_number = yylineno;
     s->if_statement = if_statement;
     s->type = ST_IF_STATEMENT;
     return s;
@@ -368,7 +350,6 @@ Statement *create_stmt_from_if_stmt(IfStatement *if_statement) {
  */
 Statement *create_stmt_from_pm(PatternMatching *pattern_matching) {
     Statement *s = malloc(sizeof(Statement));
-    s->line_number = yylineno;
     s->pattern_matching = pattern_matching;
     s->type = ST_PATTERN_MATCHING;
     return s;
@@ -379,7 +360,6 @@ Statement *create_stmt_from_pm(PatternMatching *pattern_matching) {
  */
 Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr) {
     Statement *s = malloc(sizeof(Statement));
-    s->line_number = yylineno;
     s->pattern_matching_expr = pattern_matching_expr;
     s->type = ST_PATTERN_MATCHING_EXPR;
     return s;
@@ -391,7 +371,6 @@ Statement *create_stmt_from_pme(PatternMatchingExpr *pattern_matching_expr) {
 Statement *create_stmt_from_iteration(Iteration *iteration) {
     iteration_level++;
     Statement *s = malloc(sizeof(Statement));
-    s->line_number = yylineno;
     s->iteration = iteration;
     s->type = ST_ITERATION;
     return s;
@@ -402,7 +381,6 @@ Statement *create_stmt_from_iteration(Iteration *iteration) {
  */
 Statement *create_stmt_from_return(ReturnStatement *return_statement) {
     Statement *s = malloc(sizeof(Statement));
-    s->line_number = yylineno;
     s->return_statement = return_statement;
     s->type = ST_RETURN_STATEMENT;
     return s;
@@ -413,7 +391,6 @@ Statement *create_stmt_from_return(ReturnStatement *return_statement) {
  */
 Statement *create_stmt_from_break(Expr *break_expr) {
     Statement *s = malloc(sizeof(Statement));
-    s->line_number = yylineno;
     s->break_expr = break_expr;
     s->type = ST_BREAK_STATEMENT;
     return s;
@@ -424,7 +401,6 @@ Statement *create_stmt_from_break(Expr *break_expr) {
  */
 Statement *create_stmt_from_continue() {
     Statement *s = malloc(sizeof(Statement));
-    s->line_number = yylineno;
     s->type = ST_CONTINUE_STATEMENT;
     return s;
 }
@@ -434,7 +410,6 @@ Statement *create_stmt_from_continue() {
  */
 Statement *create_stmt_from_enum(EnumDeclaration *enum_declaration) {
     Statement *s = malloc(sizeof(Statement));
-    s->line_number = yylineno;
     s->type = ST_ENUM_STATEMENT;
     s->enum_declaration = enum_declaration;
     return s;
@@ -445,7 +420,6 @@ Statement *create_stmt_from_enum(EnumDeclaration *enum_declaration) {
  */
 Statement *create_stmt_from_expr(Expr *expr) {
     Statement *s = malloc(sizeof(Statement));
-    s->line_number = yylineno;
     s->type = ST_EXPR;
     s->expr = expr;
     return s;
@@ -456,7 +430,6 @@ Statement *create_stmt_from_expr(Expr *expr) {
  */
 LocalDeclaration *create_local_declaration(Type *type, Identifier *identifier, Expr *expr) {
     LocalDeclaration *ld = malloc(sizeof(LocalDeclaration));
-    ld->line_number = yylineno;
     ld->identifier = identifier;
     ld->type = type;
     ld->expr = expr;
@@ -468,7 +441,6 @@ LocalDeclaration *create_local_declaration(Type *type, Identifier *identifier, E
  */
 IfStatement *create_if_statement(IfBlock *if_block, IfOrBlockList *if_or_block_list, OrBlock *or_block) {
     IfStatement *if_statement = malloc(sizeof(IfStatement));
-    if_statement->line_number = yylineno;
     if_statement->or_block = or_block;
     if_statement->if_block = if_block;
     if_statement->if_or_block_list = if_or_block_list;
@@ -481,7 +453,6 @@ IfStatement *create_if_statement(IfBlock *if_block, IfOrBlockList *if_or_block_l
  */
 IfBlock *create_if_block(Expr *expr, StatementList *statement_list) {
     IfBlock *if_block = malloc(sizeof(IfBlock));
-    if_block->line_number = yylineno;
     if_block->statement_list = statement_list;
     if_block->expr = expr;
     return if_block;
@@ -492,7 +463,6 @@ IfBlock *create_if_block(Expr *expr, StatementList *statement_list) {
  */
 IfOrBlockList *create_if_or_block_list(IfOrBlock *if_or_block) {
     IfOrBlockList *if_or_block_list = malloc(sizeof(IfOrBlockList));
-    if_or_block_list->line_number = yylineno;
     if_or_block_list->if_or_blocks = malloc(sizeof(IfOrBlock *));
     if_or_block_list->count = 1;
     if_or_block_list->if_or_blocks[0] = if_or_block;
@@ -517,7 +487,6 @@ IfOrBlockList *add_if_or_block(IfOrBlockList *list, IfOrBlock *element) {
  */
 IfOrBlock *create_if_or_block(Expr *expr, StatementList *statement_list) {
     IfOrBlock *if_or_block = malloc(sizeof(IfOrBlock));
-    if_or_block->line_number = yylineno;
     if_or_block->statement_list = statement_list;
     if_or_block->expr = expr;
     return if_or_block;
@@ -528,7 +497,6 @@ IfOrBlock *create_if_or_block(Expr *expr, StatementList *statement_list) {
  */
 OrBlock *create_or_block(StatementList *statement_list) {
     OrBlock *or_block = malloc(sizeof(OrBlock));
-    or_block->line_number = yylineno;
     or_block->statement_list = statement_list;
     return or_block;
 }
@@ -538,7 +506,6 @@ OrBlock *create_or_block(StatementList *statement_list) {
  */
 PatternMatching *create_pattern_matching(PatternList *pattern_list) {
     PatternMatching *pattern_matching = malloc(sizeof(PatternMatching));
-    pattern_matching->line_number = yylineno;
     pattern_matching->pattern_list = pattern_list;
     return pattern_matching;
 }
@@ -548,7 +515,6 @@ PatternMatching *create_pattern_matching(PatternList *pattern_list) {
  */
 PatternMatchingExpr *create_pattern_matching_expr(Expr *condition, PatternList *pattern_list) {
     PatternMatchingExpr *pattern_matching = malloc(sizeof(PatternMatchingExpr *));
-    pattern_matching->line_number = yylineno;
     pattern_matching->expr = condition;
     pattern_matching->pattern_list = pattern_list;
     return pattern_matching;
@@ -559,7 +525,6 @@ PatternMatchingExpr *create_pattern_matching_expr(Expr *condition, PatternList *
  */
 Pattern *create_pattern_from_stmt_list(Expr *condition, StatementList *statement_list) {
     Pattern *pattern = malloc(sizeof(Pattern *));
-    pattern->line_number = yylineno;
     pattern->condition = condition;
     pattern->type = PB_STMT_LIST;
     pattern->statement_list = statement_list;
@@ -571,7 +536,6 @@ Pattern *create_pattern_from_stmt_list(Expr *condition, StatementList *statement
  */
 Pattern *create_pattern_from_expr(Expr *condition, Expr *expr) {
     Pattern *pattern = malloc(sizeof(Pattern *));
-    pattern->line_number = yylineno;
     pattern->condition = condition;
     pattern->type = PB_EXPR;
     pattern->expr = expr;
@@ -583,7 +547,6 @@ Pattern *create_pattern_from_expr(Expr *condition, Expr *expr) {
  */
 PatternList *create_pattern_list(Pattern *pattern) {
     PatternList *pl = malloc(sizeof(PatternList *));
-    pl->line_number = yylineno;
     pl->patterns = malloc(sizeof(Pattern *));
     pl->count = 1;
     pl->patterns[0] = pattern;
@@ -607,7 +570,6 @@ PatternList *add_pattern(PatternList *list, Pattern *element) {
  */
 Iteration *create_iteration_from_for_in(ForInLoop *for_in_loop, StatementList *statement_list) {
     Iteration *iteration = malloc(sizeof(Iteration));
-    iteration->line_number = yylineno;
     iteration->type = FL_IN;
     iteration->statement_list = statement_list;
     iteration->for_in_loop = for_in_loop;
@@ -619,7 +581,6 @@ Iteration *create_iteration_from_for_in(ForInLoop *for_in_loop, StatementList *s
  */
 Iteration *create_iteration_from_while(WhileLoop *while_loop, StatementList *statement_list) {
     Iteration *iteration = malloc(sizeof(Iteration));
-    iteration->line_number = yylineno;
     iteration->type = FL_WHILE;
     iteration->statement_list = statement_list;
     iteration->while_loop = while_loop;
@@ -631,7 +592,6 @@ Iteration *create_iteration_from_while(WhileLoop *while_loop, StatementList *sta
  */
 Iteration *create_iteration_from_inf_loop(StatementList *statement_list) {
     Iteration *iteration = malloc(sizeof(Iteration));
-    iteration->line_number = yylineno;
     iteration->type = FL_INFINITE;
     iteration->statement_list = statement_list;
     return iteration;
@@ -642,7 +602,6 @@ Iteration *create_iteration_from_inf_loop(StatementList *statement_list) {
  */
 ForInLoop *create_for_in_loop(ExprList *expr_list, Expr *in_expr) {
     ForInLoop *iteration_in = malloc(sizeof(ForInLoop));
-    iteration_in->line_number = yylineno;
     iteration_in->expr_list = expr_list;
     iteration_in->in_expr = in_expr;
     return iteration_in;
@@ -653,7 +612,6 @@ ForInLoop *create_for_in_loop(ExprList *expr_list, Expr *in_expr) {
  */
 WhileLoop *create_while_loop(ExprList *expr_list) {
     WhileLoop *while_loop = malloc(sizeof(WhileLoop));
-    while_loop->line_number = yylineno;
     while_loop->expr_list = expr_list;
     return while_loop;
 }
@@ -663,7 +621,6 @@ WhileLoop *create_while_loop(ExprList *expr_list) {
  */
 ReturnStatement *create_return_statement(ExprList *expr_list) {
     ReturnStatement *return_statement = malloc(sizeof(ReturnStatement));
-    return_statement->line_number = yylineno;
     return_statement->expr_list = expr_list;
     return return_statement;
 }
@@ -673,7 +630,6 @@ ReturnStatement *create_return_statement(ExprList *expr_list) {
  */
 Expr *create_expr_from_unary(UnaryExpr *unary_expr) {
     Expr *e = malloc(sizeof(Expr));
-    e->line_number = yylineno;
     e->unary_expr = unary_expr;
     e->type = E_UNARY;
     return e;
@@ -684,7 +640,6 @@ Expr *create_expr_from_unary(UnaryExpr *unary_expr) {
  */
 Expr *create_expr_from_binary(BinaryExpr *binary_expr) {
     Expr *e = malloc(sizeof(Expr));
-    e->line_number = yylineno;
     e->binary_expr = binary_expr;
     e->type = E_BINARY;
     return e;
@@ -695,7 +650,6 @@ Expr *create_expr_from_binary(BinaryExpr *binary_expr) {
  */
 ExprList *create_expr_list(Expr *expr) {
     ExprList *expr_list = malloc(sizeof(ExprList *));
-    expr_list->line_number = yylineno;
     expr_list->exprs = malloc(sizeof(Expr *));
     expr_list->count = 1;
     expr_list->exprs[0] = expr;
@@ -720,7 +674,6 @@ ExprList *add_expr(ExprList *list, Expr *element) {
  */
 BinaryExpr *create_binary_expr(Expr *left, Expr *right, char operator) {
     BinaryExpr *be = malloc(sizeof(BinaryExpr));
-    be->line_number = yylineno;
     be->left = left;
     be->right = right;
     be->operator = operator;
@@ -732,7 +685,6 @@ BinaryExpr *create_binary_expr(Expr *left, Expr *right, char operator) {
  */
 UnaryExpr *create_unary_expr_from_number(int type, char *integer_value) {
     UnaryExpr *ue = malloc(sizeof(UnaryExpr));
-    ue->line_number = yylineno;
     ue->integer_value = strdup(integer_value);
     ue->type = type;
     return ue;
@@ -744,7 +696,6 @@ UnaryExpr *create_unary_expr_from_number(int type, char *integer_value) {
  */
 UnaryExpr *create_unary_expr_from_id(Identifier *identifier) {
     UnaryExpr *ue = malloc(sizeof(UnaryExpr));
-    ue->line_number = yylineno;
     ue->identifier = identifier;
     ue->type = UE_IDENTIFIER;
     return ue;
@@ -755,7 +706,6 @@ UnaryExpr *create_unary_expr_from_id(Identifier *identifier) {
  */
 UnaryExpr *create_unary_expr_from_string(char *string) {
     UnaryExpr *ue = malloc(sizeof(UnaryExpr));
-    ue->line_number = yylineno;
     ue->string = strdup(string);
     ue->type = UE_STRING;
     return ue;
@@ -766,7 +716,6 @@ UnaryExpr *create_unary_expr_from_string(char *string) {
  */
 UnaryExpr *create_unary_expr_from_method_call(MethodCall *method_call) {
     UnaryExpr *ue = malloc(sizeof(UnaryExpr));
-    ue->line_number = yylineno;
     ue->method_call = method_call;
     ue->type = UE_METHOD_CALL;
     return ue;
@@ -777,7 +726,6 @@ UnaryExpr *create_unary_expr_from_method_call(MethodCall *method_call) {
  */
 UnaryExpr *create_unary_expr_from_collection(Collection *collection) {
     UnaryExpr *ue = malloc(sizeof(UnaryExpr));
-    ue->line_number = yylineno;
     ue->collection = collection;
     ue->type = UE_COLLECTION;
     return ue;
@@ -786,10 +734,9 @@ UnaryExpr *create_unary_expr_from_collection(Collection *collection) {
 /**
  *
  */
-MethodCall *create_method_call(MethodSignature *method_signature, ExprList *param_exprs) {
+MethodCall *create_method_call(char *func_name, ExprList *param_exprs) {
     MethodCall *method_call = malloc(sizeof(MethodCall));
-    method_call->line_number = yylineno;
-    method_call->method_signature = method_signature;
+    method_call->func_name = func_name;
     method_call->param_exprs = param_exprs;
     return method_call;
 }
@@ -799,7 +746,6 @@ MethodCall *create_method_call(MethodSignature *method_signature, ExprList *para
  */
 VariableDecList *create_var_dec_list(VariableDec *variable_dec) {
     VariableDecList *vdl = malloc(sizeof(VariableDecList));
-    vdl->line_number = yylineno;
     vdl->var_declarations = malloc(sizeof(VariableDec *));
     vdl->count = 1;
     vdl->var_declarations[0] = variable_dec;
@@ -823,7 +769,6 @@ VariableDecList *add_var_dec(VariableDecList *list, VariableDec *element) {
  */
 VariableDec *create_variable_declaration(Type *type, Identifier *identifier) {
     VariableDec *vd = malloc(sizeof(VariableDec));
-    vd->line_number = yylineno;
     vd->type = type;
     vd->identifier = identifier;
     return vd;
@@ -834,7 +779,6 @@ VariableDec *create_variable_declaration(Type *type, Identifier *identifier) {
  */
 Collection *create_collection(Type *type, ExprList *expr_list) {
     Collection *collection = malloc(sizeof(Collection));
-    collection->line_number = yylineno;
     collection->type = type;
     collection->size = expr_list->count;
     collection->expr_list = expr_list;
@@ -846,7 +790,6 @@ Collection *create_collection(Type *type, ExprList *expr_list) {
  */
 EnumDeclaration *create_enum_declaration(Type *type, ConstantVariableList *const_var_list) {
     EnumDeclaration *ed = malloc(sizeof(EnumDeclaration));
-    ed->line_number = yylineno;
     ed->type = type;
     ed->const_var_list = const_var_list;
     return ed;
@@ -857,7 +800,6 @@ EnumDeclaration *create_enum_declaration(Type *type, ConstantVariableList *const
  */
 Identifier *create_identifier(char *name) {
     Identifier *id = malloc(sizeof(Identifier));
-    id->line_number = yylineno;
     id->name = strdup(name);
     return id;
 }
@@ -867,7 +809,6 @@ Identifier *create_identifier(char *name) {
  */
 IdentifierList *create_identifier_list(Identifier *identifier) {
     IdentifierList *tl = malloc(sizeof(IdentifierList));
-    tl->line_number = yylineno;
     tl->identifiers = malloc(sizeof(Identifier *));
     tl->count = 1;
     tl->identifiers[0] = identifier;
@@ -891,7 +832,6 @@ IdentifierList *add_identifier(IdentifierList *list, Identifier *element) {
  */
 ConstantVariable *create_constant_variable(char *name) {
     ConstantVariable *cv = malloc(sizeof(ConstantVariable));
-    cv->line_number = yylineno;
     cv->name = name;
     return cv;
 }
@@ -901,7 +841,6 @@ ConstantVariable *create_constant_variable(char *name) {
  */
 ConstantVariableList *create_const_var_list(ConstantVariable *constant_variable) {
     ConstantVariableList *vdl = malloc(sizeof(ConstantVariableList));
-    vdl->line_number = yylineno;
     vdl->constant_variables = malloc(sizeof(ConstantVariable *));
     vdl->count = 1;
     vdl->constant_variables[0] = constant_variable;
@@ -926,7 +865,6 @@ ConstantVariableList *add_const_var(ConstantVariableList *list, ConstantVariable
  */
 Type *create_type(char *name) {
     Type *t = malloc(sizeof(Type));
-    t->line_number = yylineno;
     t->name = strdup(name);
     return t;
 }

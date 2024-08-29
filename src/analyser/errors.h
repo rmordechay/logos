@@ -15,10 +15,9 @@ const char *OBJECT_FIELD_DOES_NOT_IMPLEMENT_INTERFACE_MSG = "Field '%s' of objec
 typedef struct Error {
     int error_code;
     char *message;
-    int line_number;
     int error_count;
 } Error;
 
-void add_error(int error_code, char *message, int line_number);
+void add_error(int error_code, char *message);
 
 #endif //LOGOS_ERRORS_H

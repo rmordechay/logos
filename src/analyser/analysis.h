@@ -25,6 +25,9 @@ void check_break_statement(Expr *break_expr);
 void check_continue_statement();
 void check_enum_statement(EnumDeclaration *enum_declaration);
 void check_expr(Expr *expr);
+void check_unary_expr(UnaryExpr *expr);
+void check_binary_expr(BinaryExpr *expr);
+void check_method_call(MethodCall *method_call);
 
 bool is_name_in_type_list(const TypeList *type_list, const char *name);
 

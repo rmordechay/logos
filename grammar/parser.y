@@ -349,8 +349,8 @@ unary_expr:
 	;
 
 method_call:
-		identifier LEFT_PAREN expr_list RIGHT_PAREN { $$ = create_method_call(NULL, $3) }
-	|	identifier LEFT_PAREN RIGHT_PAREN { $$ = create_method_call(NULL, NULL) }
+		identifier LEFT_PAREN expr_list RIGHT_PAREN { $$ = create_method_call($1, $3) }
+	|	identifier LEFT_PAREN RIGHT_PAREN { $$ = create_method_call($1, NULL) }
 	;
 
 add_expr:

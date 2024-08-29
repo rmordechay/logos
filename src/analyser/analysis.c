@@ -11,10 +11,10 @@
 Error errors[MAX_ERRORS];
 int err_count = 0;
 
-extern FILE *yyin;
-extern int yyparse(void);
-extern void yy_scan_string(const char *str);
-extern void yy_delete_buffer(void *buffer);
+FILE *yyin;
+int yyparse(void);
+void yy_scan_string(const char *str);
+void yy_delete_buffer(void *buffer);
 void parse(const char *code);
 void print_errors();
 
@@ -73,7 +73,7 @@ void check_field_implementations(TypeList *implements_types, ObjFieldList *field
         if (!is_name_in_type_list(implements_types, implements_type->name)) {
             char err_msg[MAX_ERROR_MSG_SIZE];
             snprintf(err_msg, sizeof(err_msg), OBJECT_FIELD_DOES_NOT_IMPLEMENT_INTERFACE_MSG, field_name, obj_name, implements_type->name);
-            add_error(OBJECT_FIELD_DOES_NOT_IMPLEMENT_INTERFACE_CODE, err_msg, implements_type->line_number);
+            add_error(OBJECT_FIELD_DOES_NOT_IMPLEMENT_INTERFACE_CODE, err_msg);
             break;
         }
     }
@@ -90,7 +90,7 @@ void check_method_implementations(TypeList *implements_types, ObjMethodsBlockLis
         if (!is_name_in_type_list(implements_types, block_name)) {
             char err_msg[MAX_ERROR_MSG_SIZE];
             snprintf(err_msg, sizeof(err_msg), OBJECT_DOES_NOT_IMPLEMENT_INTERFACE_MSG, obj_name, block_name);
-            add_error(OBJECT_DOES_NOT_IMPLEMENT_INTERFACE_CODE, err_msg, identifier->line_number);
+            add_error(OBJECT_DOES_NOT_IMPLEMENT_INTERFACE_CODE, err_msg);
             break;
         }
     }
@@ -229,6 +229,51 @@ void check_enum_statement(EnumDeclaration *enum_declaration) {
  *
  */
 void check_expr(Expr *expr) {
+    switch (expr->type) {
+        case E_UNARY:
+            check_unary_expr(expr->unary_expr);
+            break;
+        case E_BINARY:
+            check_binary_expr(expr->binary_expr);
+            break;
+    }
+}
+
+
+/**
+ *
+ */
+void check_unary_expr(UnaryExpr *expr) {
+    switch (expr->type) {
+        case UE_INT:
+            break;
+        case UE_FLOAT:
+            break;
+        case UE_BOOL:
+            break;
+        case UE_STRING:
+            break;
+        case UE_IDENTIFIER:
+            break;
+        case UE_METHOD_CALL:
+            check_method_call(expr->method_call);
+            break;
+        case UE_COLLECTION:
+            break;
+    }
+}
+
+/**
+ *
+ */
+void check_method_call(MethodCall *method_call) {
+
+}
+
+/**
+ *
+ */
+void check_binary_expr(BinaryExpr *expr) {
 
 }
 
@@ -247,11 +292,10 @@ void check_method(ObjMethod *method) {
 /**
  *
  */
-void add_error(int error_code, char *message, int line_number) {
+void add_error(int error_code, char *message) {
     struct Error err;
     err.error_code = error_code;
     err.message = strdup(message);
-    err.line_number = line_number;
     err.error_count = err_count;
     errors[err_count] = err;
     err_count++;
@@ -263,6 +307,6 @@ void add_error(int error_code, char *message, int line_number) {
 void print_errors() {
     for (int i = 0; i < err_count; i++) {
         Error err = errors[i];
-        printf("%i: (%i) %s : line %i\n", err.error_count, err.error_code, err.message, err.line_number);
+        printf("%i: (%i) %s\n", err.error_count, err.error_code, err.message);
     }
 }

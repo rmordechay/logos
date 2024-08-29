@@ -4,12 +4,12 @@ project(logos C)
 set(CMAKE_C_STANDARD 11)
 set(GEN_DIR_BUILD ${CMAKE_BINARY_DIR}/gen)
 set(GEN_DIR_SOURCE ${CMAKE_SOURCE_DIR}/gen)
+set(CMAKE_C_FLAGS_DEBUG "-g -O0")
 
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 find_package(CURL REQUIRED)
 file(MAKE_DIRECTORY ${GEN_DIR_SOURCE})
-
 BISON_TARGET(
     Parser grammar/parser.y ${GEN_DIR_SOURCE}/parser.c
     DEFINES_FILE ${GEN_DIR_SOURCE}/parser.h
