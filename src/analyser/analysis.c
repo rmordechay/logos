@@ -27,17 +27,24 @@ void parse(const char *code) {
     yy_delete_buffer(yyin);
 }
 
+SymbolTable symbol_table;
 
 /**
  *
  */
 void analyse_tree(App *app) {
+    symbol_table.symbols = create_hash_map();
     Package *src_pkg = get_from_map(app->packages, SRC_DIR)->package;
     for (int i = 0; i < TABLE_SIZE; i++) {
         KeyValue *pair = src_pkg->files->table[i];
         if (pair == NULL) continue;
         AppFile *app_file = pair->file;
         parse(app_file->code);
+    }
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        KeyValue *p_value = symbol_table.symbols->table[i];
+        if (p_value == NULL) continue;
+        printf("%s\n", p_value->key);
     }
     print_errors();
 }
@@ -127,6 +134,17 @@ void check_methods_blocks(ObjMethodsBlockList *methods_block_list) {
 /**
  *
  */
+void check_method(ObjMethod *method) {
+    StatementList *statement_list = method->statement_list;
+    for (int i = 0; i < statement_list->count; i++) {
+        Statement *statement = statement_list->statements[i];
+        check_statement(statement);
+    }
+}
+
+/**
+ *
+ */
 void check_statement(Statement *stmt) {
     switch (stmt->type) {
         case ST_LOCAL_DECLARATION:
@@ -166,9 +184,12 @@ void check_statement(Statement *stmt) {
  *
  */
 void check_local_declaration(LocalDeclaration *local_declaration) {
-
+    char *name = local_declaration->identifier->name;
+    Symbol *symbol = malloc(sizeof(Symbol));
+    symbol->name = name;
+    symbol->symbolType = 1;
+    put_in_map(symbol_table.symbols, name, symbol);
 }
-
 /**
  *
  */
@@ -225,6 +246,7 @@ void check_enum_statement(EnumDeclaration *enum_declaration) {
 
 }
 
+
 /**
  *
  */
@@ -238,7 +260,6 @@ void check_expr(Expr *expr) {
             break;
     }
 }
-
 
 /**
  *
@@ -275,18 +296,6 @@ void check_method_call(MethodCall *method_call) {
  */
 void check_binary_expr(BinaryExpr *expr) {
 
-}
-
-/**
- *
- */
-void check_method(ObjMethod *method) {
-    printf("Check method: %s\n", method->name);
-    StatementList *statement_list = method->statement_list;
-    for (int i = 0; i < statement_list->count; i++) {
-        Statement *statement = statement_list->statements[i];
-        check_statement(statement);
-    }
 }
 
 /**

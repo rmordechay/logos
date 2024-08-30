@@ -156,7 +156,7 @@ typedef struct ExprList {
  *
  */
 typedef struct MethodCall {
-    char *func_name;
+    Identifier *identifier;
     ExprList *param_exprs;
 } MethodCall;
 
@@ -542,7 +542,7 @@ UnaryExpr *create_unary_expr_from_id(Identifier *identifier);
 UnaryExpr *create_unary_expr_from_string(char *string);
 UnaryExpr *create_unary_expr_from_method_call(MethodCall *method_call);
 UnaryExpr *create_unary_expr_from_collection(Collection *collection);
-MethodCall *create_method_call(char *func_name, ExprList *param_exprs);
+MethodCall *create_method_call(Identifier* identifier, ExprList *param_exprs);
 // Collection
 Collection *create_collection(Type *type, ExprList *expr_list);
 // Enum
@@ -588,6 +588,7 @@ void free_expr(Expr *e);
 void free_expr_list(ExprList *el);
 void free_binary_expr(BinaryExpr *be);
 void free_unary_expr(UnaryExpr *ue);
+void free_method_call(MethodCall *mc);
 void free_variable_declaration_list(VariableDecList *vdl);
 void free_variable_declaration(VariableDec *vd);
 void free_collection(Collection *c);

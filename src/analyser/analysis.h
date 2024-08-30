@@ -6,6 +6,17 @@
 #include "project/project.h"
 #include <stdbool.h>
 
+#define MAX_SYMBOLS 8192
+
+typedef struct Symbol {
+    char *name;
+    int symbolType;
+} Symbol;
+
+typedef struct SymbolTable {
+    HashMap *symbols;
+} SymbolTable;
+
 void analyse_object(ObjEntity *entity);
 void analyse_interface(InterfaceEntity *entity);
 void analyse_tree(App *app);
@@ -14,7 +25,7 @@ void check_method_implementations(TypeList *implements_types, ObjMethodsBlockLis
 void check_field_implementations(TypeList *implements_types, ObjFieldList *field_list, char *obj_name);
 void check_methods_blocks(ObjMethodsBlockList *methods_block_list);
 void check_method(ObjMethod *method);
-
+void check_statement(Statement *stmt);
 void check_local_declaration(LocalDeclaration *local_declaration);
 void check_if_statement(IfStatement *if_statement);
 void check_pattern_matching(PatternMatching *pattern_matching);

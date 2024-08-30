@@ -734,9 +734,9 @@ UnaryExpr *create_unary_expr_from_collection(Collection *collection) {
 /**
  *
  */
-MethodCall *create_method_call(char *func_name, ExprList *param_exprs) {
+MethodCall *create_method_call(Identifier *identifier, ExprList *param_exprs) {
     MethodCall *method_call = malloc(sizeof(MethodCall));
-    method_call->func_name = func_name;
+    method_call->identifier = identifier;
     method_call->param_exprs = param_exprs;
     return method_call;
 }
@@ -1229,6 +1229,17 @@ void free_expr(Expr *e) {
 /**
  *
  */
+void free_method_call(MethodCall *mc) {
+    if (mc->param_exprs) {
+        free_expr_list(mc->param_exprs);
+    }
+    free_identifier(mc->identifier);
+    free(mc);
+}
+
+/**
+ *
+ */
 void free_expr_list(ExprList *el) {
     if (el == NULL) return;
     for (int i = 0; i < el->count; ++i) {
@@ -1265,7 +1276,7 @@ void free_unary_expr(UnaryExpr *ue) {
         case UE_BOOL:
             break;
         case UE_METHOD_CALL:
-            free(ue->method_call);
+            free_method_call(ue->method_call);
             break;
         case UE_COLLECTION:
             free_collection(ue->collection);
