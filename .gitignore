@@ -1,5 +1,5 @@
 # Local
-lang/
+./lang/
 asm/
 
 *.d

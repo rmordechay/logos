@@ -5,6 +5,7 @@
 #include "analysis.h"
 #include <string.h>
 
+
 #define SELF_CLASS "Self"
 #define SELF_VARIABLE "self"
 
@@ -17,6 +18,8 @@ void yy_scan_string(const char *str);
 void yy_delete_buffer(void *buffer);
 void parse(const char *code);
 void print_errors();
+
+
 
 /**
  *
@@ -44,10 +47,13 @@ void analyse_tree(App *app) {
     for (int i = 0; i < TABLE_SIZE; i++) {
         KeyValue *p_value = symbol_table.symbols->table[i];
         if (p_value == NULL) continue;
-        printf("%s\n", p_value->key);
+        Symbol *value = p_value->symbol;
+        printf("%s\n", value->identifier.name);
+        printf("%s\n", value->type.name);
     }
     print_errors();
 }
+
 
 /**
  *
@@ -61,7 +67,6 @@ void analyse_object(ObjEntity *entity) {
     check_method_implementations(implements_block->type_list, methods_block_list, obj_name);
     check_methods_blocks(methods_block_list);
 }
-
 
 /**
  *
@@ -86,6 +91,7 @@ void check_field_implementations(TypeList *implements_types, ObjFieldList *field
     }
 }
 
+
 /**
 *
 */
@@ -102,7 +108,6 @@ void check_method_implementations(TypeList *implements_types, ObjMethodsBlockLis
         }
     }
 }
-
 
 /**
  *
@@ -184,12 +189,9 @@ void check_statement(Statement *stmt) {
  *
  */
 void check_local_declaration(LocalDeclaration *local_declaration) {
-    char *name = local_declaration->identifier->name;
-    Symbol *symbol = malloc(sizeof(Symbol));
-    symbol->name = name;
-    symbol->symbolType = 1;
-    put_in_map(symbol_table.symbols, name, symbol);
+    add_symbol(local_declaration->identifier->name, local_declaration->type->name, S_VARIABLE);
 }
+
 /**
  *
  */
@@ -296,6 +298,34 @@ void check_method_call(MethodCall *method_call) {
  */
 void check_binary_expr(BinaryExpr *expr) {
 
+}
+
+/**
+ *
+ */
+void add_symbol(char *id_name, char* type_name, SymbolType symbol_type) {
+    Symbol *symbol = malloc(sizeof(Symbol));
+    symbol->identifier = (Identifier){.name = strdup(id_name)};
+    symbol->type = (Type){.name = strdup(type_name)};
+    symbol->symbolType = symbol_type;
+    put_in_map(symbol_table.symbols, strdup(id_name), symbol);
+}
+
+/**
+ *
+ */
+void free_symbol(Symbol *s) {
+    free(s);
+}
+
+/**
+ *
+ */
+void free_symbol_table(SymbolTable *st) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        if(st->symbols->table[i] == NULL) continue;
+
+    }
 }
 
 /**

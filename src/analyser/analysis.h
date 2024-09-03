@@ -8,9 +8,19 @@
 
 #define MAX_SYMBOLS 8192
 
+typedef enum SymbolType {
+    S_VARIABLE,
+    S_FUNCTION,
+    S_NUMBER,
+} SymbolType;
+
 typedef struct Symbol {
-    char *name;
-    int symbolType;
+    Type type;
+    Identifier identifier;
+    SymbolType symbolType;
+    union {
+        struct Lgs_Object *lgs_object;
+    };
 } Symbol;
 
 typedef struct SymbolTable {
@@ -39,6 +49,11 @@ void check_expr(Expr *expr);
 void check_unary_expr(UnaryExpr *expr);
 void check_binary_expr(BinaryExpr *expr);
 void check_method_call(MethodCall *method_call);
+
+void add_symbol(char *id_name, char* type_name, SymbolType symbol_type);
+
+void free_symbol(Symbol *s);
+void free_symbol_table(SymbolTable *st);
 
 bool is_name_in_type_list(const TypeList *type_list, const char *name);
 

@@ -9,6 +9,7 @@ typedef struct KeyValue {
         void *value;
         struct Package *package;
         struct AppFile *file;
+        struct Symbol *symbol;
     };
     struct KeyValue* next;
 } KeyValue;
