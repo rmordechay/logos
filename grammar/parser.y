@@ -274,11 +274,11 @@ if_or_block_list:
 
 if_or_block:
 		OR expr statements_block { $$ = create_if_or_block($2, $3) }
-    ;
+	;
 
 or_block:
 		OR statements_block { $$ = create_or_block($2) }
-    ;
+	;
 
 pattern_matching:
 		IF LEFT_BRACE pattern_list RIGHT_BRACE { $$ = create_pattern_matching($3) }
@@ -323,13 +323,13 @@ expr_list:
 		expr { $$ = create_expr_list($1) }
 	|	expr_list COMMA expr { $$ =  add_expr($1, $3) }
 	|	LEFT_PAREN expr_list RIGHT_PAREN { $$ =  $2 }
-    ;
+	;
 
 expr:
 		unary_expr { $$ = create_expr_from_unary($1) }
 	|	binary_expr { $$ = create_expr_from_binary($1) }
 	|	LEFT_PAREN expr RIGHT_PAREN { $$ = $2 }
-    ;
+	;
 
 binary_expr:
 		add_expr
@@ -391,7 +391,7 @@ variable_declaration:
 
 type:
 		TYPE { $$ = create_type(yylval.val) }
-    ;
+	;
 
 type_list:
 	  	type { $$ = create_type_list($1)  }
