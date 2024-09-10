@@ -37,11 +37,11 @@ set(
     src/analyser/analysis.h
     src/utils/hashmap.c
     src/utils/hashmap.h
-    src/executor/executor.c
-    src/executor/executor.h
     src/analyser/errors.h
     src/lang/object.c
-    src/codegen/code.c
+    src/codegen/code_generator.c
+    src/codegen/code_generator.h
+    test.c
 )
 
 add_executable(logos ${BISON_Parser_OUTPUTS} ${FLEX_Lexer_OUTPUTS} ${SOURCES})

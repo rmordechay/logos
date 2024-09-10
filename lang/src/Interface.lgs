@@ -1,0 +1,10 @@
+interface: Interface
+
+fields {
+    Int a
+    Int b
+}
+
+Self {
+    func Int f2() {}
+}

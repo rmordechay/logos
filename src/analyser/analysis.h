@@ -5,8 +5,7 @@
 #include "project/project.h"
 #include "project/project.h"
 #include <stdbool.h>
-
-#define MAX_SYMBOLS 8192
+#include <llvm-c/Types.h>
 
 typedef enum SymbolType {
     S_VARIABLE,
@@ -15,21 +14,19 @@ typedef enum SymbolType {
 } SymbolType;
 
 typedef struct Symbol {
-    Type type;
-    Identifier identifier;
+    char *name;
+    char* type;
     SymbolType symbolType;
-    union {
-        struct Lgs_Object *lgs_object;
-    };
+    LLVMValueRef ptr;
 } Symbol;
 
 typedef struct SymbolTable {
     HashMap *symbols;
 } SymbolTable;
 
-void analyse_object(ObjEntity *entity);
+void analyse_object(ObjectEntity *entity);
 void analyse_interface(InterfaceEntity *entity);
-void analyse_tree(App *app);
+void analyse_src_code(App *app);
 
 void check_method_implementations(TypeList *implements_types, ObjMethodsBlockList *methods_block_list, char *obj_name);
 void check_field_implementations(TypeList *implements_types, ObjFieldList *field_list, char *obj_name);

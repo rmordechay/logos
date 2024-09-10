@@ -134,8 +134,8 @@ struct IdentifierList *identifier_list;
 
 %%
 program:
-		object_entity { analyse_ast(create_entity(E_OBJECT, $1)) }
-	|	interface_entity { analyse_ast(create_entity(E_INTERFACE, $1)) }
+		object_entity { root = create_entity(E_OBJECT, $1) }
+	|	interface_entity { root = create_entity(E_INTERFACE, $1) }
 	;
 
 object_entity:

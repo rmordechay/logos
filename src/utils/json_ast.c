@@ -37,15 +37,15 @@ cJSON *create_method_json(ObjMethod *obj);
 cJSON *create_methods_list_json(ObjMethodsList *list);
 cJSON *create_methods_block_json(ObjMethodsBlock *obj);
 cJSON *create_methods_block_list_json(ObjMethodsBlockList *list);
-cJSON *create_object_file_json(ObjEntity *obj);
+cJSON *create_object_file_json(ObjectEntity *obj);
 
 
 /**
  *
  */
-cJSON *create_object_file_json(ObjEntity *obj) {
+cJSON *create_object_file_json(ObjectEntity *obj) {
     cJSON *root = cJSON_CreateObject();
-    cJSON_AddStringToObject(root, "kind", "ObjEntity");
+    cJSON_AddStringToObject(root, "kind", "ObjectEntity");
     cJSON_AddItemToObject(root, "id", create_type_json(obj->id));
     cJSON_AddItemToObject(root, "field_list", create_field_list_json(obj->field_list));
     if (obj->implements_block) {

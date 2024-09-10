@@ -15,7 +15,7 @@ typedef struct Identifier {
  */
 typedef struct IdentifierList {
     Identifier **identifiers;
-    int count;
+    size_t count;
 } IdentifierList;
 
 /**
@@ -37,7 +37,7 @@ typedef struct ConstantVariable {
  */
 typedef struct ConstantVariableList {
     ConstantVariable **constant_variables;
-    int count;
+    size_t count;
 } ConstantVariableList;
 
 /**
@@ -52,7 +52,7 @@ typedef struct Type {
  */
 typedef struct TypeList {
     Type **types;
-    int count;
+    size_t count;
 } TypeList;
 
 /**
@@ -76,7 +76,7 @@ typedef struct VariableDec {
  */
 typedef struct VariableDecList {
     VariableDec **var_declarations;
-    int count;
+    size_t count;
 } VariableDecList;
 
 /**
@@ -92,7 +92,7 @@ typedef struct Enum {
  */
 typedef struct EnumBlock {
     Enum **enums;
-    int count;
+    size_t count;
 } EnumBlock;
 
 /**
@@ -108,7 +108,7 @@ typedef struct ObjectField {
  */
 typedef struct ObjectFieldList {
     ObjectField **fields;
-    int count;
+    size_t count;
 } ObjFieldList;
 
 /**
@@ -123,7 +123,7 @@ typedef struct InterfaceField {
  */
 typedef struct InterfaceFieldList {
     InterfaceField **fields;
-    int count;
+    size_t count;
 } InterfaceFieldList;
 
 /**
@@ -149,7 +149,7 @@ typedef struct Expr {
  */
 typedef struct ExprList {
     Expr **exprs;
-    int count;
+    size_t count;
 } ExprList;
 
 /**
@@ -242,7 +242,7 @@ typedef struct IfOrBlock {
  */
 typedef struct IfOrBlockList {
     IfOrBlock **if_or_blocks;
-    int count;
+    size_t count;
 } IfOrBlockList;
 
 /**
@@ -280,7 +280,7 @@ typedef struct Pattern {
  */
 typedef struct PatternList {
     Pattern **patterns;
-    int count;
+    size_t count;
 } PatternList;
 
 /**
@@ -356,7 +356,7 @@ typedef struct Statement {
  */
 typedef struct StatementList {
     Statement **statements;
-    int count;
+    size_t count;
 } StatementList;
 
 
@@ -382,7 +382,7 @@ typedef struct ObjectMethod {
  */
 typedef struct ObjectMethodsList {
     ObjMethod **methods;
-    int count;
+    size_t count;
 } ObjMethodsList;
 
 /**
@@ -398,7 +398,7 @@ typedef struct ObjectMethodsBlock {
  */
 typedef struct ObjectMethodsBlockList {
     ObjMethodsBlock **blocks;
-    int count;
+    size_t count;
 } ObjMethodsBlockList;
 
 /**
@@ -415,7 +415,7 @@ typedef struct InterfaceMethod {
  */
 typedef struct InterfaceMethodsList {
     InterfaceMethod **methods;
-    int count;
+    size_t count;
 } InterfaceMethodsList;
 
 /**
@@ -431,7 +431,7 @@ typedef struct InterfaceMethodsBlock {
  */
 typedef struct InterfaceMethodsBlockList {
     InterfaceMethodsBlock **blocks;
-    int count;
+    size_t count;
 } InterfaceMethodsBlockList;
 
 
@@ -443,7 +443,7 @@ typedef struct ObjectEntity {
     ObjFieldList *field_list;
     ImplementsBlock *implements_block;
     ObjMethodsBlockList *methods_block_list;
-} ObjEntity;
+} ObjectEntity;
 
 /**
  *
@@ -459,15 +459,14 @@ typedef struct InterfaceEntity {
 typedef struct Entity {
     EntityType type;
     union {
-        ObjEntity *object_entity;
+        ObjectEntity *object_entity;
         InterfaceEntity *interface_entity;
     };
 } Entity;
 
-void analyse_ast(Entity *entity);
 Entity *create_entity(EntityType entity_type, void *entity_tree);
 
-ObjEntity *create_object_entity(Type *t, ImplementsBlock *ib, ObjFieldList *fl, ObjMethodsBlockList *mbl);
+ObjectEntity *create_object_entity(Type *t, ImplementsBlock *ib, ObjFieldList *fl, ObjMethodsBlockList *mbl);
 InterfaceEntity *create_interface_entity(Type *type, InterfaceFieldList *fields_list);
 ImplementsBlock *create_implements_block(TypeList *type_list);
 // Object Field
@@ -559,7 +558,7 @@ ConstantVariableList *create_const_var_list(ConstantVariable *constant_variable)
 ConstantVariableList *add_const_var(ConstantVariableList *list, ConstantVariable *element);
 
 void free_entity(Entity *obj);
-void free_object_file(ObjEntity *obj);
+void free_object_file(ObjectEntity *obj);
 void free_implements_block(ImplementsBlock *ib);
 void free_object_field_list(ObjFieldList *fl);
 void free_object_field(ObjectField *f);

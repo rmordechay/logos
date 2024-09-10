@@ -13,22 +13,6 @@ int yylineno;
 /**
  *
  */
-void analyse_ast(Entity *entity) {
-    switch (entity->type) {
-        case E_OBJECT:
-            analyse_object(entity->object_entity);
-            break;
-        case E_INTERFACE:
-            analyse_interface(entity->interface_entity);
-        case E_ENUM:
-            break;
-    }
-    free_entity(entity);
-}
-
-/**
- *
- */
 Entity *create_entity(EntityType entity_type, void *entity_tree) {
     Entity *entity = malloc(sizeof(Entity));
     entity->type = entity_type;
@@ -48,8 +32,8 @@ Entity *create_entity(EntityType entity_type, void *entity_tree) {
 /**
  *
  */
-ObjEntity *create_object_entity(Type *t, ImplementsBlock *ib, ObjFieldList *fl, ObjMethodsBlockList *mbl) {
-    ObjEntity *obj = malloc(sizeof(ObjEntity));
+ObjectEntity *create_object_entity(Type *t, ImplementsBlock *ib, ObjFieldList *fl, ObjMethodsBlockList *mbl) {
+    ObjectEntity *obj = malloc(sizeof(ObjectEntity));
     obj->id = t;
     obj->field_list = fl;
     obj->implements_block = ib;
@@ -910,7 +894,7 @@ void free_entity(Entity *obj) {
 /**
  *
  */
-void free_object_file(ObjEntity *obj) {
+void free_object_file(ObjectEntity *obj) {
     if (obj == NULL) return;
     free_object_field_list(obj->field_list);
     free_methods_block_list(obj->methods_block_list);

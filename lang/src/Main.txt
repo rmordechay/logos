@@ -1,0 +1,19 @@
+object: Main
+
+
+global {
+
+}
+
+func Int f(Object obj) {
+    return 0
+} -> obj
+
+func Void main() {
+    let obj = MyObject{Object{}, 2}
+    print(obj)
+    Int a = visit_package(obj)
+    obj = a->obj;
+    a->obj.analyse_ast()
+    s.f2()
+}

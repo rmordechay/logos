@@ -4,6 +4,7 @@
 #include "project/project.h"
 #include "analysis.h"
 #include <string.h>
+#include "codegen/code_generator.h"
 
 
 #define SELF_CLASS "Self"
@@ -13,6 +14,7 @@ Error errors[MAX_ERRORS];
 int err_count = 0;
 
 FILE *yyin;
+Entity *root;
 int yyparse(void);
 void yy_scan_string(const char *str);
 void yy_delete_buffer(void *buffer);
@@ -20,6 +22,7 @@ void parse(const char *code);
 void print_errors();
 
 
+void print_symbols();
 
 /**
  *
@@ -31,34 +34,56 @@ void parse(const char *code) {
 }
 
 SymbolTable symbol_table;
+Command current_cmd;
 
 /**
  *
  */
-void analyse_tree(App *app) {
+void parse_file(const AppFile *app_file) {
+    parse(app_file->code);
+    switch (root->type) {
+        case E_OBJECT:
+            analyse_object(root->object_entity);
+            long *a = malloc(sizeof(int));
+            long *b = malloc(sizeof(int));
+            *a = 4;
+            *b = 12;
+            char *name_a = "a";
+            char *name_b = "b";
+            Command cmd5 = create_command(ADD, name_a, name_b, NULL);
+            Command cmd4 = create_command(LOAD, name_b, NULL, &cmd5);
+            Command cmd3 = create_command(LOAD, name_b, NULL, &cmd4);
+            Command cmd2 = create_command(STR, name_b, b, &cmd3);
+            Command cmd1 = create_command(STR, name_a, a, &cmd2);
+            generate_code(cmd1, symbol_table);
+            break;
+        case E_INTERFACE:
+            analyse_interface(root->interface_entity);
+            break;
+        case E_ENUM:
+            break;
+    }
+}
+
+/**
+ *
+ */
+void analyse_src_code(App *app) {
     symbol_table.symbols = create_hash_map();
     Package *src_pkg = get_from_map(app->packages, SRC_DIR)->package;
     for (int i = 0; i < TABLE_SIZE; i++) {
         KeyValue *pair = src_pkg->files->table[i];
         if (pair == NULL) continue;
         AppFile *app_file = pair->file;
-        parse(app_file->code);
-    }
-    for (int i = 0; i < TABLE_SIZE; i++) {
-        KeyValue *p_value = symbol_table.symbols->table[i];
-        if (p_value == NULL) continue;
-        Symbol *value = p_value->symbol;
-        printf("%s\n", value->identifier.name);
-        printf("%s\n", value->type.name);
+        parse_file(app_file);
     }
     print_errors();
 }
 
-
 /**
  *
  */
-void analyse_object(ObjEntity *entity) {
+void analyse_object(ObjectEntity *entity) {
     char *obj_name = entity->id->name;
     ImplementsBlock *implements_block = entity->implements_block;
     ObjFieldList *field_list = entity->field_list;
@@ -67,6 +92,7 @@ void analyse_object(ObjEntity *entity) {
     check_method_implementations(implements_block->type_list, methods_block_list, obj_name);
     check_methods_blocks(methods_block_list);
 }
+
 
 /**
  *
@@ -91,7 +117,6 @@ void check_field_implementations(TypeList *implements_types, ObjFieldList *field
     }
 }
 
-
 /**
 *
 */
@@ -109,9 +134,6 @@ void check_method_implementations(TypeList *implements_types, ObjMethodsBlockLis
     }
 }
 
-/**
- *
- */
 
 bool is_name_in_type_list(const TypeList *type_list, const char *name) {
     for (int i = 0; i < type_list->count; i++) {
@@ -188,8 +210,22 @@ void check_statement(Statement *stmt) {
 /**
  *
  */
+Type infer_type(Expr *expr) {
+    Type type = {.name = NULL};
+    return type;
+}
+
+/**
+ *
+ */
 void check_local_declaration(LocalDeclaration *local_declaration) {
-    add_symbol(local_declaration->identifier->name, local_declaration->type->name, S_VARIABLE);
+    char *type;
+    if (local_declaration->type == NULL) {
+        type = infer_type(local_declaration->expr).name;
+    } else {
+        type = local_declaration->type->name;
+    }
+    add_symbol(local_declaration->identifier->name, type, S_VARIABLE);
 }
 
 /**
@@ -248,7 +284,6 @@ void check_enum_statement(EnumDeclaration *enum_declaration) {
 
 }
 
-
 /**
  *
  */
@@ -262,6 +297,7 @@ void check_expr(Expr *expr) {
             break;
     }
 }
+
 
 /**
  *
@@ -305,10 +341,22 @@ void check_binary_expr(BinaryExpr *expr) {
  */
 void add_symbol(char *id_name, char* type_name, SymbolType symbol_type) {
     Symbol *symbol = malloc(sizeof(Symbol));
-    symbol->identifier = (Identifier){.name = strdup(id_name)};
-    symbol->type = (Type){.name = strdup(type_name)};
+    symbol->name = strdup(id_name);
+    symbol->type = strdup(type_name);
     symbol->symbolType = symbol_type;
     put_in_map(symbol_table.symbols, strdup(id_name), symbol);
+}
+
+/**
+ *
+ */
+
+void print_symbols() {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        KeyValue *p_value = symbol_table.symbols->table[i];
+        if (p_value == NULL) continue;
+        Symbol *value = p_value->symbol;
+    }
 }
 
 /**
@@ -324,7 +372,6 @@ void free_symbol(Symbol *s) {
 void free_symbol_table(SymbolTable *st) {
     for (int i = 0; i < TABLE_SIZE; i++) {
         if(st->symbols->table[i] == NULL) continue;
-
     }
 }
 

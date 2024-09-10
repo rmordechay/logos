@@ -1,0 +1,25 @@
+object: MyObject
+
+implements {
+    Interface
+}
+
+fields {
+    Int var
+    Int var2: Interface
+}
+
+Self {
+    func Int f(Int param1) {
+        let Int a = 2
+        let Int b = 2
+        let Int c = a + b
+        print(c)
+    }
+}
+
+Interface {
+    func Int visit_package(Enum e) {
+
+    }
+}

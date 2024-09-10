@@ -1,0 +1,7 @@
+Self {
+    func visit_package(): Int { return 0 }
+}
+
+Interface {
+    func f1() { print("analyse_ast") }
+}

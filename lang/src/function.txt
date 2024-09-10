@@ -1,0 +1,10 @@
+int {
+    params(Context ctx, UUID systemID, Time from, OptDateTime until)
+    func System InsertSystem() {
+        let a = if a else b else c else d
+    }
+
+    func System InsertSystem(Context ctx, UUID systemID, Time from, OptDateTime until) {
+        let a = if a else b else c else d
+    }
+}
