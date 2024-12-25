@@ -1,6 +1,6 @@
 grammar Logos;
 
-entry: objectFile | interfaceFile;
+logosFile: objectFile | interfaceFile;
 
 interfaceFile: interfaceDeclaration objectImplements? explicitVarDec* funcDec+ funcImplementation*;
 

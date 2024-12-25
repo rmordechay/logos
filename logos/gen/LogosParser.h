@@ -24,11 +24,11 @@ public:
   };
 
   enum {
-    RuleEntry = 0, RuleInterfaceFile = 1, RuleObjectFile = 2, RuleObjectDeclaration = 3, 
+    RuleLogosFile = 0, RuleInterfaceFile = 1, RuleObjectFile = 2, RuleObjectDeclaration = 3, 
     RuleInterfaceDeclaration = 4, RuleObjectImplements = 5, RuleExplicitVarDecList = 6, 
     RuleExplicitVarDec = 7, RuleImplicitVarDec = 8, RuleFuncDec = 9, RuleFuncCall = 10, 
     RuleFuncImplementation = 11, RuleFuncBody = 12, RuleStatement = 13, 
-    RuleExpr_list = 14, RuleExpr = 15, RuleUnary_expr = 16, RuleBinary_expr = 17
+    RuleExpr_list = 14, RuleExpr = 15, RuleBinary_expr = 16, RuleUnary_expr = 17
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -48,7 +48,7 @@ public:
   antlr4::atn::SerializedATNView getSerializedATN() const override;
 
 
-  class EntryContext;
+  class LogosFileContext;
   class InterfaceFileContext;
   class ObjectFileContext;
   class ObjectDeclarationContext;
@@ -64,12 +64,12 @@ public:
   class StatementContext;
   class Expr_listContext;
   class ExprContext;
-  class Unary_exprContext;
-  class Binary_exprContext; 
+  class Binary_exprContext;
+  class Unary_exprContext; 
 
-  class  EntryContext : public antlr4::ParserRuleContext {
+  class  LogosFileContext : public antlr4::ParserRuleContext {
   public:
-    EntryContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    LogosFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     ObjectFileContext *objectFile();
     InterfaceFileContext *interfaceFile();
@@ -79,7 +79,7 @@ public:
    
   };
 
-  EntryContext* entry();
+  LogosFileContext* logosFile();
 
   class  InterfaceFileContext : public antlr4::ParserRuleContext {
   public:
@@ -312,8 +312,10 @@ public:
   public:
     ExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    Unary_exprContext *unary_expr();
     Binary_exprContext *binary_expr();
+    Unary_exprContext *unary_expr();
+    antlr4::tree::TerminalNode *LEFT_PAREN();
+    antlr4::tree::TerminalNode *RIGHT_PAREN();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -321,24 +323,6 @@ public:
   };
 
   ExprContext* expr();
-
-  class  Unary_exprContext : public antlr4::ParserRuleContext {
-  public:
-    Unary_exprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *VARIABLE();
-    antlr4::tree::TerminalNode *INTEGER();
-    antlr4::tree::TerminalNode *FLOAT();
-    antlr4::tree::TerminalNode *BOOL();
-    antlr4::tree::TerminalNode *STRING();
-    FuncCallContext *funcCall();
-
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-   
-  };
-
-  Unary_exprContext* unary_expr();
 
   class  Binary_exprContext : public antlr4::ParserRuleContext {
   public:
@@ -357,6 +341,24 @@ public:
   };
 
   Binary_exprContext* binary_expr();
+
+  class  Unary_exprContext : public antlr4::ParserRuleContext {
+  public:
+    Unary_exprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *VARIABLE();
+    antlr4::tree::TerminalNode *INTEGER();
+    antlr4::tree::TerminalNode *FLOAT();
+    antlr4::tree::TerminalNode *BOOL();
+    antlr4::tree::TerminalNode *STRING();
+    FuncCallContext *funcCall();
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+   
+  };
+
+  Unary_exprContext* unary_expr();
 
 
   // By default the static state used to implement the parser is lazily initialized during the first

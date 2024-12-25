@@ -15,6 +15,8 @@ add_executable(logos
     logos/project/Project.h
     logos/project/LogosFile.cpp
     logos/project/LogosFile.h
+        logos/sema/SemanticAnalyser.cpp
+        logos/sema/SemanticAnalyser.h
 )
 
 target_include_directories(logos PRIVATE
