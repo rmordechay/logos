@@ -1,0 +1,10 @@
+interface: MyInterface
+
+Int a
+Int b
+Int c = 3
+
+Int f()
+Int f2() {
+    return 0
+}

@@ -1,0 +1,25 @@
+// Normal if
+if x < 1 {
+    print()
+} or x > 1 {
+    print()
+} or 0 < x < 10 {
+    print()
+} or {
+    print()
+}
+
+// Pattern matching
+if {
+    x > 1: expr_list
+    x < 1: { expr_list }
+    or: expr_list
+}
+
+// Pattern matching with expr_list
+if Bool {
+    Bool1: expr_list
+    Bool2: expr_list
+    Bool3: expr_list
+    or: expr_list
+}

@@ -1,0 +1,6 @@
+object: Main
+
+main(): Void {
+    obj1 = MyObject{"Roi", 2}
+    obj2: MyObject = MyObject{"Roi", 2}
+}

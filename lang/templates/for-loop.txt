@@ -1,0 +1,33 @@
+// Infinite loop
+for { }
+
+// Infinite loop the increments i
+for i { }
+
+// Normal while loop
+for x > y { }
+
+// Normal while loop with index
+for i @tag {
+    for i, x > y {
+        if a break 2 or break @tag
+    }
+}
+
+// Loop in range
+for i in 5..10 {  }
+
+// Loop in range with steps
+for i in 5..10 : 2 { }
+
+// Loop until number
+for i in ..10 { }
+
+// foreach loop list
+for obj in list { }
+
+// foreach loop list  with index
+for i, obj in list { }
+
+// foreach map loop
+for k, v in map { }
