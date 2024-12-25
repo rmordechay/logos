@@ -1,10 +1,11 @@
 interface: MyInterface
 
-Int a
-Int b
-Int c = 3
+a: Int
+b: Int
+c: Int = 3
 
-Int f()
-Int f2() {
-    return 0
+f(): Int
+
+f2(): Int {
+
 }

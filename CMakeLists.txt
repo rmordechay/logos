@@ -6,13 +6,20 @@ set(CMAKE_CXX_STANDARD 20)
 set(ANTLR_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/antlr4-runtime")
 set(ANTLR_LIB "${CMAKE_CURRENT_SOURCE_DIR}/include/libantlr4-runtime.a")
 
-file(GLOB GENERATED_SRC "gen/*.cpp" "gen/*.h")
+file(GLOB GENERATED_SRC "logos/gen/*.cpp" "logos/gen/*.h")
 
-add_executable(logos main.cpp ${GENERATED_SRC})
+add_executable(logos
+    main.cpp
+    ${GENERATED_SRC}
+    logos/project/Project.cpp
+    logos/project/Project.h
+    logos/project/LogosFile.cpp
+    logos/project/LogosFile.h
+)
 
 target_include_directories(logos PRIVATE
+    logos/gen
     ${ANTLR_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/gen
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 

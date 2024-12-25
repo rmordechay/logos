@@ -1,40 +1,58 @@
 grammar Logos;
 
-entry: object_file | interface_file;
+entry: objectFile | interfaceFile;
 
-interface_file: interface_declaration object_implements? explicit_var_dec* func_dec+ func_implementation*;
+interfaceFile: interfaceDeclaration objectImplements? explicitVarDec* funcDec+ funcImplementation*;
 
-object_file: object_declaration object_implements? explicit_var_dec* func_implementation*;
+objectFile: objectDeclaration objectImplements? explicitVarDec* funcImplementation*;
 
-object_declaration: OBJECT COLON TYPE;
+objectDeclaration: OBJECT COLON TYPE;
 
-interface_declaration: INTERFACE COLON TYPE;
+interfaceDeclaration: INTERFACE COLON TYPE;
 
-object_implements: IMPLEMENTS COLON TYPE;
+objectImplements: IMPLEMENTS COLON TYPE;
 
-explicit_var_dec: VARIABLE COLON TYPE (EQUAL expr)?;
+explicitVarDecList: explicitVarDec (COMMA explicitVarDec)*;
 
-implicit_var_dec: VARIABLE (EQUAL expr)?;
+explicitVarDec: VARIABLE COLON TYPE (EQUAL expr)?;
 
-func_dec: VARIABLE LEFT_PAREN explicit_var_dec_list? RIGHT_PAREN COLON TYPE;
+implicitVarDec: VARIABLE (EQUAL expr)?;
 
-func_implementation: func_dec func_body;
+funcDec: VARIABLE LEFT_PAREN explicitVarDecList? RIGHT_PAREN COLON TYPE;
 
-func_body: LEFT_BRACE statement* RIGHT_BRACE;
+funcCall: VARIABLE LEFT_PAREN expr_list+ RIGHT_PAREN;
+
+funcImplementation: funcDec funcBody;
+
+funcBody: LEFT_BRACE statement* RIGHT_BRACE;
 
 statement:
-        explicit_var_dec
-    |   implicit_var_dec
+        explicitVarDec
+    |   implicitVarDec
     |   expr
     ;
 
-explicit_var_dec_list: explicit_var_dec (COMMA explicit_var_dec)*;
+expr_list: expr (COMMA expr)*;
 
 expr:
+        binary_expr
+    |   unary_expr
+    |   LEFT_PAREN binary_expr RIGHT_PAREN
+    |   LEFT_PAREN unary_expr RIGHT_PAREN
+    ;
+
+binary_expr:
+        unary_expr (STAR | SLASH) expr
+    |   unary_expr (PLUS | MINUS) expr
+    ;
+
+unary_expr:
         VARIABLE
     |   INTEGER
     |   FLOAT
     |   BOOL
+    |   STRING
+    |   funcCall
     ;
 
 LEFT_PAREN: '(';
@@ -79,10 +97,6 @@ OR: 'or';
 NOT: 'not';
 IN: 'in';
 
-BLOCK_COMMENT: '///' .*? '///' -> skip;
-LINE_COMMENT: '//' ~[/]* -> skip;
-WS: [ \t\r\n]+ -> skip;
-
 INTEGER: [0-9]+;
 FLOAT: [0-9]+ '.' [0-9]+;
 BOOL: 'true' | 'false';
@@ -90,4 +104,6 @@ VARIABLE: [a-z_] [a-zA-Z0-9_]*;
 TYPE: [A-Z] [a-zA-Z0-9_]*;
 CONST: [A-Z0-9_]+;
 STRING: '"' ( ~["\\] | '\\' . )* '"';
-
+LINE_COMMENT: '//' ~( '\r' | '\n' )* -> skip;
+BLOCK_COMMENT: '///' .*? '///' -> skip;
+WS: [ \t\r\n]+ -> skip;
