@@ -1,6 +1,9 @@
-object: Main
-
 main(): Void {
     v = 3
     v: Int 2
+    b = MyObject(4, 5)
+    b.var
+    b.var()
+    b.c.var()
+    b.c.var(2 + 3).d
 }

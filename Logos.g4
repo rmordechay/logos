@@ -1,10 +1,12 @@
 grammar Logos;
 
-logosFile: objectFile | interfaceFile;
+logosFile: mainFile | objectFile | interfaceFile;
 
-interfaceFile: interfaceDeclaration objectImplements? explicitVarDec* funcDec+ funcImplementation*;
+mainFile: funcImplementation+ EOF;
 
-objectFile: objectDeclaration objectImplements? explicitVarDec* funcImplementation*;
+interfaceFile: interfaceDeclaration objectImplements? explicitVarDec* funcDec+ funcImplementation* EOF;
+
+objectFile: objectDeclaration objectImplements? explicitVarDec* funcImplementation* EOF;
 
 objectDeclaration: OBJECT COLON TYPE;
 
@@ -12,33 +14,37 @@ interfaceDeclaration: INTERFACE COLON TYPE;
 
 objectImplements: IMPLEMENTS COLON TYPE;
 
+funcDec: VARIABLE LEFT_PAREN explicitVarDecList? RIGHT_PAREN COLON TYPE;
+
+funcImplementation: funcDec funcBody;
+
+funcBody: LEFT_BRACE statement* RIGHT_BRACE;
+
+funcCall: VARIABLE LEFT_PAREN paramCallList* RIGHT_PAREN;
+
+constructorCall: TYPE LEFT_PAREN paramCallList* RIGHT_PAREN;
+
 explicitVarDecList: explicitVarDec (COMMA explicitVarDec)*;
 
 explicitVarDec: VARIABLE COLON TYPE (EQUAL expr)?;
 
 implicitVarDec: VARIABLE (EQUAL expr)?;
 
-funcDec: VARIABLE LEFT_PAREN explicitVarDecList? RIGHT_PAREN COLON TYPE;
+paramCall: (VARIABLE EQUAL)? expr;
 
-funcCall: VARIABLE LEFT_PAREN expr_list+ RIGHT_PAREN;
-
-funcImplementation: funcDec funcBody;
-
-funcBody: LEFT_BRACE statement* RIGHT_BRACE;
+paramCallList: paramCall (COMMA paramCall)*;
 
 statement:
         explicitVarDec
     |   implicitVarDec
+    |   if_statement
     |   expr
     ;
-
-expr_list: expr (COMMA expr)*;
 
 expr:
         binary_expr
     |   unary_expr
-    |   LEFT_PAREN binary_expr RIGHT_PAREN
-    |   LEFT_PAREN unary_expr RIGHT_PAREN
+    |   selection
     ;
 
 binary_expr:
@@ -47,12 +53,21 @@ binary_expr:
     ;
 
 unary_expr:
-        VARIABLE
+        funcCall
+    |   constructorCall
     |   INTEGER
     |   FLOAT
     |   BOOL
     |   STRING
-    |   funcCall
+    |   VARIABLE
+    ;
+
+selection:
+        unary_expr (DOT unary_expr)*
+    ;
+
+if_statement:
+    IF expr LEFT_BRACE statement* RIGHT_BRACE
     ;
 
 LEFT_PAREN: '(';

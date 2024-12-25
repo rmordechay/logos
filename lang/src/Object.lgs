@@ -1,16 +1,13 @@
 object: MyObject
-interface: MyInterface
+implements: MyInterface
 
 a: Int
 var2: Int = 2
 var3: Int
 var4: Int = 3
 
-f(Int param1, g(Int): Bool): Int {
+f(param1: String, param2: Float): Int {
     a: Int = 6
     b = 4
     c = a + b
-    f(1, (a: Int): Bool {
-        return true
-    })
 }

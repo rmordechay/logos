@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "../sema/SemanticAnalyser.h"
+#include "../sema/SemAnalyser.h"
 #include "LogosLexer.h"
 #include "LogosParser.h"
 #include "antlr4-runtime/antlr4-runtime.h"
@@ -24,9 +24,9 @@ void Project::parseFile(const std::string& code) {
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    tree::ParseTree* tree = parser.logosFile();
-    SemanticAnalyser analyser;
-    tree::ParseTreeWalker::DEFAULT.walk(&analyser, tree);
+    SemAnalyser analyser;
+    LogosParser::LogosFileContext* tree = parser.logosFile();
+    analyser.checkLogosFile(tree);
 }
 
 void Project::addLogosFile(const fs::directory_entry& entry) {
@@ -54,7 +54,7 @@ void Project::scanPackage(const std::string& packagePath) {
 
 void Project::scanProject() {
     scanPackage(dirPath);
-    for (auto file : files) {
+    for (const auto file : files) {
         parseFile(file->code);
     }
 }
