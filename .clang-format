@@ -14,6 +14,7 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: false
 IndentCaseBlocks: true
 IndentWidth: 4
 InsertNewlineAtEOF: true
+SeparateDefinitionBlocks: Always
 MacroBlockBegin: ''
 MacroBlockEnd: ''
 MaxEmptyLinesToKeep: 2

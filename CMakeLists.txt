@@ -13,23 +13,31 @@ find_package(LLVM REQUIRED CONFIG)
 add_executable(logos
     main.cpp
     ${GENERATED_SRC}
-    logos/project/Project.cpp
-    logos/project/Project.h
+        logos/project/LogosProject.cpp
+        logos/project/LogosProject.h
+    logos/project/LogosPackage.cpp
+    logos/project/LogosPackage.h
     logos/project/LogosFile.cpp
     logos/project/LogosFile.h
     logos/sema/SemAnalyser.cpp
     logos/sema/SemAnalyser.h
-        logos/codegen/CodeGenerator.cpp
-        logos/codegen/CodeGenerator.h
-        logos/sema/Symbol.cpp
-        logos/sema/Symbol.h
+    logos/sema/Symbol.cpp
+    logos/sema/Symbol.h
+    logos/codegen/CodeGenerator.cpp
+    logos/codegen/CodeGenerator.h
+    logos/LogosConfigs.h
 )
 
 target_include_directories(logos PRIVATE
+    logos
+    logos/project
     logos/parser
+    logos/codegen
+    logos/sema
     ${ANTLR_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${LLVM_INCLUDE_DIRS}
 )
+
 llvm_map_components_to_libnames(LLVM_LIBS core)
 target_link_libraries(logos PRIVATE ${ANTLR_LIB} ${LLVM_LIBS})

@@ -7,10 +7,11 @@
 
 class SemAnalyser final {
     public:
-    void checkLogosFile(LogosParser::LogosFileContext* logosFile);
-    void checkObjectFile(const LogosParser::ObjectFileContext* objectFile);
+    void checkLogosFile(LogosParser::LogosFileContext* ctx);
+    void checkObjectFile(LogosParser::ObjectFileContext* ctx);
+    void checkImportStatement(LogosParser::ImportStatementContext* ctx);
+    void checkObjectImplements(LogosParser::ObjectImplementsContext* ctx);
 };
-
 
 
 #endif //SEMANTICANALYSER_H

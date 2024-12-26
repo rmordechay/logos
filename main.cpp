@@ -1,7 +1,7 @@
-#include "logos/project/Project.h"
+#include "logos/project/LogosProject.h"
 
 int main() {
-    Project project("../lang/src");
+    const LogosProject project("../lang/src");
     project.scanProject();
     return 0;
 }
