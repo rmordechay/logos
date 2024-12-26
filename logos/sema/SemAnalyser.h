@@ -14,7 +14,8 @@ public:
 
     explicit SemAnalyser(LogosPackage* rootPackage);
     void analyseProject();
-    void checkLogosFile(LogosParser::LogosFileContext* ctx);
+    void checkMainFile(LogosParser::MainFileContext* ctx);
+    void checkMain(LogosParser::FuncImplementationContext* ctx);
     void checkObjectFile(LogosParser::ObjectFileContext* ctx);
     void checkImportStatement(LogosParser::ImportStatementContext* ctx);
     void checkObjectImplements(LogosParser::ObjectImplementsContext* ctx);

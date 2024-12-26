@@ -1,5 +1,7 @@
 #include "SemAnalyser.h"
 
+#include "LogosConfigs.h"
+
 SemAnalyser::SemAnalyser(LogosPackage* rootPackage) {
     this->rootPackage = rootPackage;
     this->rootScope = new Scope();
@@ -7,16 +9,21 @@ SemAnalyser::SemAnalyser(LogosPackage* rootPackage) {
 }
 
 void SemAnalyser::analyseProject() {
-    const auto mainFile = rootPackage->mainFile->fileCtx;
-    if (mainFile == nullptr) return;
-    checkImportStatement(mainFile->importStatement());
-    checkLogosFile(mainFile);
+    const auto mainFileCtx = rootPackage->mainFile->fileCtx;
+    checkImportStatement(mainFileCtx->importStatement());
+    checkMainFile(mainFileCtx->mainFile());
 }
 
-void SemAnalyser::checkLogosFile(LogosParser::LogosFileContext* ctx) {
-    const auto objectFile = ctx->objectFile();
-    checkImportStatement(ctx->importStatement());
-    checkObjectFile(objectFile);
+void SemAnalyser::checkMain(LogosParser::FuncImplementationContext* ctx) {
+
+}
+
+void SemAnalyser::checkMainFile(LogosParser::MainFileContext* ctx) {
+    for (const auto func : ctx->funcImplementation()) {
+        if (func->funcDec()->VARIABLE()->getText() == LOGOS_MAIN_FUNCTION) {
+            checkMain(func);
+        }
+    }
 }
 
 void SemAnalyser::checkObjectFile(LogosParser::ObjectFileContext* ctx) {
@@ -30,9 +37,7 @@ void SemAnalyser::checkImportStatement(LogosParser::ImportStatementContext* ctx)
     for (const auto importPath : importPaths) {
         for (const auto package : rootPackage->packages) {
             for (const auto file : package->files) {
-                if (file->name == importPath->TYPE()[0]->getText()) {
-                    std::cout << file->name << std::endl;
-                }
+
             }
         }
     }
