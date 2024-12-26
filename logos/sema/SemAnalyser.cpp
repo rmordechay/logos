@@ -1,6 +1,7 @@
 #include "SemAnalyser.h"
 
 #include "LogosConfigs.h"
+#include "LogosValue.h"
 
 SemAnalyser::SemAnalyser(LogosPackage* rootPackage) {
     this->rootPackage = rootPackage;
@@ -56,24 +57,75 @@ void SemAnalyser::checkStatement(LogosParser::StatementContext* ctx) {
     }
 }
 
-void SemAnalyser::inferType(LogosParser::ExprContext* ctx) {
-    if (ctx->unaryExpr()) {
-    }
-}
-
-void SemAnalyser::setExplicitVariableSymbol(LogosParser::ExplicitVarDecContext* const ctx) {
+void SemAnalyser::setExplicitVariableSymbol(LogosParser::ExplicitVarDecContext* const ctx) const {
     const auto varName = ctx->VARIABLE()->getText();
     const auto typeName = ctx->TYPE()->getText();
     const auto symbol = new Symbol(varName, typeName, LOCAL_VARIABLE);
     currentScope->symbolTable[varName] = symbol;
-    inferType(ctx->expr());
 }
 
 void SemAnalyser::setImplicitVariableSymbol(LogosParser::ImplicitVarDecContext* ctx) {
     const auto varName = ctx->VARIABLE()->getText();
-    const auto symbol = new Symbol(varName, nullptr, LOCAL_VARIABLE);
+    const auto symbol = new Symbol(varName, LOCAL_VARIABLE);
+    inferType(ctx->expr(), symbol);
     currentScope->symbolTable[varName] = symbol;
-    inferType(ctx->expr());
+}
+
+void SemAnalyser::inferType(LogosParser::ExprContext* ctx, Symbol* symbol) {
+    if (const auto unary = ctx->unaryExpr()) {
+        setSymbolFromUnary(unary, symbol);
+    } else if (ctx->binaryExpr()) {
+        symbol->typeName = "Bool";
+    }
+}
+
+void SemAnalyser::setSymbolFromUnary(LogosParser::UnaryExprContext* unary, Symbol* symbol) {
+    if (const auto intToken = unary->INTEGER()) {
+        symbol->typeName = "Int";
+        const auto value = std::stoi(intToken->getText());
+        symbol->value = new LogosValue(ValueType::INT, &value);
+        return;
+    }
+
+    if (const auto floatToken = unary->FLOAT()) {
+        symbol->typeName = "Float";
+        const auto value = std::stof(floatToken->getText());
+        symbol->value = new LogosValue(ValueType::FLOAT, &value);
+        return;
+    }
+
+    if (const auto boolToken = unary->BOOL()) {
+        symbol->typeName = "Bool";
+        const auto value = boolToken->getText() == "true";
+        symbol->value = new LogosValue(ValueType::BOOL, &value);
+        return;
+    }
+
+    if (const auto stringToken = unary->STRING()) {
+        symbol->typeName = "String";
+        const auto value = stringToken->getText();
+        symbol->value = new LogosValue(ValueType::STRING, &value);
+        return;
+    }
+
+    if (const auto variable = unary->VARIABLE()) {
+        const auto it = currentScope->symbolTable.find(variable->getText());
+        if (it != currentScope->symbolTable.end()) {
+            symbol->typeName = it->second->typeName;
+            symbol->value = it->second->value;
+        }
+        return;
+    }
+
+
+    if (const auto funcCall = unary->funcCall()) {
+        symbol->typeName = "";
+        return;
+    }
+
+    if (const auto constructor = unary->constructorCall()) {
+        symbol->typeName = constructor->TYPE()->getText();
+    }
 }
 
 SemAnalyser::~SemAnalyser() {

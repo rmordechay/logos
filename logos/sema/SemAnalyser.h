@@ -20,9 +20,10 @@ public:
     void checkObjectFile(LogosParser::ObjectFileContext* ctx);
     void checkObjectImplements(LogosParser::ObjectImplementsContext* ctx);
     void checkStatement(LogosParser::StatementContext* ctx);
-    void inferType(LogosParser::ExprContext* ctx);
-    void setExplicitVariableSymbol(LogosParser::ExplicitVarDecContext* ctx);
+    void setExplicitVariableSymbol(LogosParser::ExplicitVarDecContext* ctx) const;
     void setImplicitVariableSymbol(LogosParser::ImplicitVarDecContext* ctx);
+    void inferType(LogosParser::ExprContext* ctx, Symbol* symbol);
+    void setSymbolFromUnary(LogosParser::UnaryExprContext* unary, Symbol* symbol);
 
     ~SemAnalyser();
 };

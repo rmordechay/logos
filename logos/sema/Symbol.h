@@ -1,5 +1,8 @@
 #ifndef SYMBOL_H
 #define SYMBOL_H
+#include "LogosValue.h"
+
+
 #include <string>
 
 enum SymbolType {
@@ -13,9 +16,10 @@ public:
     std::string varName;
     std::string typeName;
     SymbolType kind;
-    void *value;
+    LogosValue *value;
 
-    explicit Symbol(const std::string& varName, const std::string& typeName, SymbolType kind);
+    Symbol(const std::string& varName, const std::string& typeName, SymbolType kind);
+    Symbol(const std::string& varName, SymbolType kind);
 };
 
 
