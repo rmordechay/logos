@@ -31,10 +31,10 @@ public:
     RuleFuncBody = 10, RuleFuncCall = 11, RuleConstructorCall = 12, RuleExplicitVarDecList = 13, 
     RuleExplicitVarDec = 14, RuleImplicitVarDec = 15, RuleParamCall = 16, 
     RuleParamCallList = 17, RuleStatement = 18, RuleEnumDeclaration = 19, 
-    RuleEnumField = 20, RuleStatemets_block = 21, RuleExprList = 22, RuleExpr = 23, 
+    RuleEnumField = 20, RuleStatementsBlock = 21, RuleExprList = 22, RuleExpr = 23, 
     RuleBinaryExpr = 24, RuleBoolExpr = 25, RuleUnaryExpr = 26, RuleSelection = 27, 
     RuleIfStatement = 28, RuleElseStatement = 29, RulePatterMatching = 30, 
-    RulePattern = 31, RuleLoopStatemet = 32, RuleRange = 33, RuleControlFlowStatement = 34
+    RulePattern = 31, RuleLoopStatement = 32, RuleRange = 33, RuleControlFlowStatement = 34
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -75,7 +75,7 @@ public:
   class StatementContext;
   class EnumDeclarationContext;
   class EnumFieldContext;
-  class Statemets_blockContext;
+  class StatementsBlockContext;
   class ExprListContext;
   class ExprContext;
   class BinaryExprContext;
@@ -86,7 +86,7 @@ public:
   class ElseStatementContext;
   class PatterMatchingContext;
   class PatternContext;
-  class LoopStatemetContext;
+  class LoopStatementContext;
   class RangeContext;
   class ControlFlowStatementContext; 
 
@@ -241,7 +241,7 @@ public:
   public:
     FuncBodyContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    Statemets_blockContext *statemets_block();
+    StatementsBlockContext *statementsBlock();
 
    
   };
@@ -355,7 +355,7 @@ public:
     ExplicitVarDecContext *explicitVarDec();
     ImplicitVarDecContext *implicitVarDec();
     IfStatementContext *ifStatement();
-    LoopStatemetContext *loopStatemet();
+    LoopStatementContext *loopStatement();
     ControlFlowStatementContext *controlFlowStatement();
     EnumDeclarationContext *enumDeclaration();
     ExprContext *expr();
@@ -394,9 +394,9 @@ public:
 
   EnumFieldContext* enumField();
 
-  class  Statemets_blockContext : public antlr4::ParserRuleContext {
+  class  StatementsBlockContext : public antlr4::ParserRuleContext {
   public:
-    Statemets_blockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    StatementsBlockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *LEFT_BRACE();
     antlr4::tree::TerminalNode *RIGHT_BRACE();
@@ -406,7 +406,7 @@ public:
    
   };
 
-  Statemets_blockContext* statemets_block();
+  StatementsBlockContext* statementsBlock();
 
   class  ExprListContext : public antlr4::ParserRuleContext {
   public:
@@ -506,7 +506,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IF();
     ExprContext *expr();
-    Statemets_blockContext *statemets_block();
+    StatementsBlockContext *statementsBlock();
     ElseStatementContext *elseStatement();
     PatterMatchingContext *patterMatching();
 
@@ -523,8 +523,8 @@ public:
     antlr4::tree::TerminalNode* ELSE(size_t i);
     std::vector<ExprContext *> expr();
     ExprContext* expr(size_t i);
-    std::vector<Statemets_blockContext *> statemets_block();
-    Statemets_blockContext* statemets_block(size_t i);
+    std::vector<StatementsBlockContext *> statementsBlock();
+    StatementsBlockContext* statementsBlock(size_t i);
 
    
   };
@@ -543,7 +543,7 @@ public:
     PatternContext* pattern(size_t i);
     antlr4::tree::TerminalNode *ELSE();
     antlr4::tree::TerminalNode *COLON();
-    Statemets_blockContext *statemets_block();
+    StatementsBlockContext *statementsBlock();
 
    
   };
@@ -556,19 +556,19 @@ public:
     virtual size_t getRuleIndex() const override;
     ExprContext *expr();
     antlr4::tree::TerminalNode *COLON();
-    Statemets_blockContext *statemets_block();
+    StatementsBlockContext *statementsBlock();
 
    
   };
 
   PatternContext* pattern();
 
-  class  LoopStatemetContext : public antlr4::ParserRuleContext {
+  class  LoopStatementContext : public antlr4::ParserRuleContext {
   public:
-    LoopStatemetContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    LoopStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *FOR();
-    Statemets_blockContext *statemets_block();
+    StatementsBlockContext *statementsBlock();
     ExprContext *expr();
     ExprListContext *exprList();
     antlr4::tree::TerminalNode *IN();
@@ -577,7 +577,7 @@ public:
    
   };
 
-  LoopStatemetContext* loopStatemet();
+  LoopStatementContext* loopStatement();
 
   class  RangeContext : public antlr4::ParserRuleContext {
   public:

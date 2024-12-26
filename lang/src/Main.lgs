@@ -2,10 +2,6 @@ import (
     myObject
 )
 
-enum MyEnum {
-    ENUM1 = "dsf"
-    ENUM2
-}
 
 main(): Void {
     v = 3

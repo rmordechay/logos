@@ -19,13 +19,14 @@ Project::Project(const std::string& path) {
     dirPath = path;
 }
 
-void Project::parseFile(const std::string& code) {
-    ANTLRInputStream input(code);
+void Project::parseFile(const LogosFile *logosFile) {
+    ANTLRInputStream input(logosFile->code);
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     SemAnalyser analyser;
     LogosParser::LogosFileContext* tree = parser.logosFile();
+    std::cout << logosFile->name << std::endl;
     analyser.checkLogosFile(tree);
 }
 
@@ -55,8 +56,7 @@ void Project::scanPackage(const std::string& packagePath) {
 void Project::scanProject() {
     scanPackage(dirPath);
     for (const auto file : files) {
-        std::cout << file->name << std::endl;
-        parseFile(file->code);
+        parseFile(file);
     }
 }
 

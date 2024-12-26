@@ -13,7 +13,7 @@ public:
     void scanProject();
     void addLogosFile(const fs::directory_entry& entry);
     void scanPackage(const std::string& packagePath);
-    static void parseFile(const std::string& code);
+    static void parseFile(const LogosFile *logosFile);
 
 private:
     std::string dirPath;

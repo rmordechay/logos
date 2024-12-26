@@ -55,9 +55,9 @@ void logosParserInitialize() {
       "objectDeclaration", "interfaceDeclaration", "objectImplements", "funcDec", 
       "funcImplementation", "funcBody", "funcCall", "constructorCall", "explicitVarDecList", 
       "explicitVarDec", "implicitVarDec", "paramCall", "paramCallList", 
-      "statement", "enumDeclaration", "enumField", "statemets_block", "exprList", 
+      "statement", "enumDeclaration", "enumField", "statementsBlock", "exprList", 
       "expr", "binaryExpr", "boolExpr", "unaryExpr", "selection", "ifStatement", 
-      "elseStatement", "patterMatching", "pattern", "loopStatemet", "range", 
+      "elseStatement", "patterMatching", "pattern", "loopStatement", "range", 
       "controlFlowStatement"
     },
     std::vector<std::string>{
@@ -111,7 +111,7 @@ void logosParserInitialize() {
   	32,363,8,32,1,33,3,33,366,8,33,1,33,1,33,1,33,1,34,1,34,1,34,1,34,1,34,
   	1,34,1,34,3,34,378,8,34,1,34,0,0,35,0,2,4,6,8,10,12,14,16,18,20,22,24,
   	26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,0,3,
-  	1,0,19,20,1,0,17,18,2,0,1,3,8,9,400,0,71,1,0,0,0,2,80,1,0,0,0,4,89,1,
+  	1,0,19,20,1,0,17,18,2,0,1,3,8,9,401,0,71,1,0,0,0,2,80,1,0,0,0,4,89,1,
   	0,0,0,6,112,1,0,0,0,8,130,1,0,0,0,10,140,1,0,0,0,12,144,1,0,0,0,14,148,
   	1,0,0,0,16,152,1,0,0,0,18,161,1,0,0,0,20,164,1,0,0,0,22,166,1,0,0,0,24,
   	176,1,0,0,0,26,186,1,0,0,0,28,202,1,0,0,0,30,204,1,0,0,0,32,211,1,0,0,
@@ -121,91 +121,92 @@ void logosParserInitialize() {
   	0,62,341,1,0,0,0,64,362,1,0,0,0,66,365,1,0,0,0,68,377,1,0,0,0,70,72,3,
   	8,4,0,71,70,1,0,0,0,71,72,1,0,0,0,72,76,1,0,0,0,73,77,3,2,1,0,74,77,3,
   	6,3,0,75,77,3,4,2,0,76,73,1,0,0,0,76,74,1,0,0,0,76,75,1,0,0,0,77,1,1,
-  	0,0,0,78,81,3,28,14,0,79,81,3,30,15,0,80,78,1,0,0,0,80,79,1,0,0,0,81,
-  	83,1,0,0,0,82,84,3,18,9,0,83,82,1,0,0,0,84,85,1,0,0,0,85,83,1,0,0,0,85,
-  	86,1,0,0,0,86,87,1,0,0,0,87,88,5,0,0,1,88,3,1,0,0,0,89,91,3,12,6,0,90,
-  	92,3,14,7,0,91,90,1,0,0,0,91,92,1,0,0,0,92,96,1,0,0,0,93,95,3,28,14,0,
-  	94,93,1,0,0,0,95,98,1,0,0,0,96,94,1,0,0,0,96,97,1,0,0,0,97,100,1,0,0,
-  	0,98,96,1,0,0,0,99,101,3,16,8,0,100,99,1,0,0,0,101,102,1,0,0,0,102,100,
-  	1,0,0,0,102,103,1,0,0,0,103,107,1,0,0,0,104,106,3,18,9,0,105,104,1,0,
-  	0,0,106,109,1,0,0,0,107,105,1,0,0,0,107,108,1,0,0,0,108,110,1,0,0,0,109,
-  	107,1,0,0,0,110,111,5,0,0,1,111,5,1,0,0,0,112,114,3,10,5,0,113,115,3,
-  	14,7,0,114,113,1,0,0,0,114,115,1,0,0,0,115,119,1,0,0,0,116,118,3,28,14,
-  	0,117,116,1,0,0,0,118,121,1,0,0,0,119,117,1,0,0,0,119,120,1,0,0,0,120,
-  	125,1,0,0,0,121,119,1,0,0,0,122,124,3,18,9,0,123,122,1,0,0,0,124,127,
-  	1,0,0,0,125,123,1,0,0,0,125,126,1,0,0,0,126,128,1,0,0,0,127,125,1,0,0,
-  	0,128,129,5,0,0,1,129,7,1,0,0,0,130,131,5,31,0,0,131,135,5,4,0,0,132,
-  	134,3,46,23,0,133,132,1,0,0,0,134,137,1,0,0,0,135,133,1,0,0,0,135,136,
-  	1,0,0,0,136,138,1,0,0,0,137,135,1,0,0,0,138,139,5,5,0,0,139,9,1,0,0,0,
-  	140,141,5,27,0,0,141,142,5,15,0,0,142,143,5,46,0,0,143,11,1,0,0,0,144,
-  	145,5,28,0,0,145,146,5,15,0,0,146,147,5,46,0,0,147,13,1,0,0,0,148,149,
-  	5,30,0,0,149,150,5,15,0,0,150,151,5,46,0,0,151,15,1,0,0,0,152,153,5,47,
-  	0,0,153,155,5,4,0,0,154,156,3,26,13,0,155,154,1,0,0,0,155,156,1,0,0,0,
-  	156,157,1,0,0,0,157,158,5,5,0,0,158,159,5,15,0,0,159,160,5,46,0,0,160,
-  	17,1,0,0,0,161,162,3,16,8,0,162,163,3,20,10,0,163,19,1,0,0,0,164,165,
-  	3,42,21,0,165,21,1,0,0,0,166,167,5,47,0,0,167,171,5,4,0,0,168,170,3,34,
-  	17,0,169,168,1,0,0,0,170,173,1,0,0,0,171,169,1,0,0,0,171,172,1,0,0,0,
-  	172,174,1,0,0,0,173,171,1,0,0,0,174,175,5,5,0,0,175,23,1,0,0,0,176,177,
-  	5,46,0,0,177,181,5,4,0,0,178,180,3,34,17,0,179,178,1,0,0,0,180,183,1,
-  	0,0,0,181,179,1,0,0,0,181,182,1,0,0,0,182,184,1,0,0,0,183,181,1,0,0,0,
-  	184,185,5,5,0,0,185,25,1,0,0,0,186,191,3,28,14,0,187,188,5,12,0,0,188,
-  	190,3,28,14,0,189,187,1,0,0,0,190,193,1,0,0,0,191,189,1,0,0,0,191,192,
-  	1,0,0,0,192,27,1,0,0,0,193,191,1,0,0,0,194,195,5,47,0,0,195,196,5,15,
-  	0,0,196,199,5,46,0,0,197,198,5,16,0,0,198,200,3,46,23,0,199,197,1,0,0,
-  	0,199,200,1,0,0,0,200,203,1,0,0,0,201,203,3,38,19,0,202,194,1,0,0,0,202,
-  	201,1,0,0,0,203,29,1,0,0,0,204,207,5,47,0,0,205,206,5,16,0,0,206,208,
-  	3,46,23,0,207,205,1,0,0,0,207,208,1,0,0,0,208,31,1,0,0,0,209,210,5,47,
-  	0,0,210,212,5,16,0,0,211,209,1,0,0,0,211,212,1,0,0,0,212,213,1,0,0,0,
-  	213,214,3,46,23,0,214,33,1,0,0,0,215,220,3,32,16,0,216,217,5,12,0,0,217,
-  	219,3,32,16,0,218,216,1,0,0,0,219,222,1,0,0,0,220,218,1,0,0,0,220,221,
-  	1,0,0,0,221,35,1,0,0,0,222,220,1,0,0,0,223,231,3,28,14,0,224,231,3,30,
-  	15,0,225,231,3,56,28,0,226,231,3,64,32,0,227,231,3,68,34,0,228,231,3,
-  	38,19,0,229,231,3,46,23,0,230,223,1,0,0,0,230,224,1,0,0,0,230,225,1,0,
-  	0,0,230,226,1,0,0,0,230,227,1,0,0,0,230,228,1,0,0,0,230,229,1,0,0,0,231,
-  	37,1,0,0,0,232,233,5,29,0,0,233,234,5,46,0,0,234,238,5,6,0,0,235,237,
-  	3,40,20,0,236,235,1,0,0,0,237,240,1,0,0,0,238,236,1,0,0,0,238,239,1,0,
-  	0,0,239,241,1,0,0,0,240,238,1,0,0,0,241,242,5,7,0,0,242,39,1,0,0,0,243,
-  	246,5,45,0,0,244,245,5,16,0,0,245,247,5,48,0,0,246,244,1,0,0,0,246,247,
-  	1,0,0,0,247,41,1,0,0,0,248,252,5,6,0,0,249,251,3,36,18,0,250,249,1,0,
-  	0,0,251,254,1,0,0,0,252,250,1,0,0,0,252,253,1,0,0,0,253,255,1,0,0,0,254,
-  	252,1,0,0,0,255,256,5,7,0,0,256,43,1,0,0,0,257,262,3,46,23,0,258,259,
-  	5,12,0,0,259,261,3,46,23,0,260,258,1,0,0,0,261,264,1,0,0,0,262,260,1,
-  	0,0,0,262,263,1,0,0,0,263,45,1,0,0,0,264,262,1,0,0,0,265,270,3,48,24,
-  	0,266,270,3,52,26,0,267,270,3,50,25,0,268,270,3,54,27,0,269,265,1,0,0,
-  	0,269,266,1,0,0,0,269,267,1,0,0,0,269,268,1,0,0,0,270,47,1,0,0,0,271,
-  	272,3,52,26,0,272,273,7,0,0,0,273,274,3,46,23,0,274,280,1,0,0,0,275,276,
-  	3,52,26,0,276,277,7,1,0,0,277,278,3,46,23,0,278,280,1,0,0,0,279,271,1,
-  	0,0,0,279,275,1,0,0,0,280,49,1,0,0,0,281,282,3,52,26,0,282,283,7,2,0,
-  	0,283,284,3,46,23,0,284,51,1,0,0,0,285,293,3,22,11,0,286,293,3,24,12,
-  	0,287,293,5,42,0,0,288,293,5,43,0,0,289,293,5,44,0,0,290,293,5,48,0,0,
-  	291,293,5,47,0,0,292,285,1,0,0,0,292,286,1,0,0,0,292,287,1,0,0,0,292,
-  	288,1,0,0,0,292,289,1,0,0,0,292,290,1,0,0,0,292,291,1,0,0,0,293,53,1,
-  	0,0,0,294,299,3,52,26,0,295,296,5,14,0,0,296,298,3,52,26,0,297,295,1,
-  	0,0,0,298,301,1,0,0,0,299,297,1,0,0,0,299,300,1,0,0,0,300,55,1,0,0,0,
-  	301,299,1,0,0,0,302,303,5,32,0,0,303,304,3,46,23,0,304,305,3,42,21,0,
-  	305,306,3,58,29,0,306,309,1,0,0,0,307,309,3,60,30,0,308,302,1,0,0,0,308,
-  	307,1,0,0,0,309,57,1,0,0,0,310,311,5,33,0,0,311,312,3,46,23,0,312,313,
-  	3,42,21,0,313,315,1,0,0,0,314,310,1,0,0,0,315,318,1,0,0,0,316,314,1,0,
-  	0,0,316,317,1,0,0,0,317,321,1,0,0,0,318,316,1,0,0,0,319,320,5,33,0,0,
-  	320,322,3,42,21,0,321,319,1,0,0,0,321,322,1,0,0,0,322,59,1,0,0,0,323,
-  	325,5,32,0,0,324,326,3,46,23,0,325,324,1,0,0,0,325,326,1,0,0,0,326,327,
-  	1,0,0,0,327,331,5,6,0,0,328,330,3,62,31,0,329,328,1,0,0,0,330,333,1,0,
-  	0,0,331,329,1,0,0,0,331,332,1,0,0,0,332,337,1,0,0,0,333,331,1,0,0,0,334,
-  	335,5,33,0,0,335,336,5,15,0,0,336,338,3,42,21,0,337,334,1,0,0,0,337,338,
-  	1,0,0,0,338,339,1,0,0,0,339,340,5,7,0,0,340,61,1,0,0,0,341,342,3,46,23,
-  	0,342,343,5,15,0,0,343,344,3,42,21,0,344,63,1,0,0,0,345,347,5,34,0,0,
-  	346,348,3,46,23,0,347,346,1,0,0,0,347,348,1,0,0,0,348,349,1,0,0,0,349,
-  	363,3,42,21,0,350,351,5,34,0,0,351,352,3,44,22,0,352,353,5,41,0,0,353,
-  	354,3,46,23,0,354,355,3,42,21,0,355,363,1,0,0,0,356,357,5,34,0,0,357,
-  	358,3,44,22,0,358,359,5,41,0,0,359,360,3,66,33,0,360,361,3,42,21,0,361,
-  	363,1,0,0,0,362,345,1,0,0,0,362,350,1,0,0,0,362,356,1,0,0,0,363,65,1,
-  	0,0,0,364,366,3,46,23,0,365,364,1,0,0,0,365,366,1,0,0,0,366,367,1,0,0,
-  	0,367,368,5,13,0,0,368,369,3,46,23,0,369,67,1,0,0,0,370,371,5,35,0,0,
-  	371,378,3,46,23,0,372,373,5,35,0,0,373,378,5,32,0,0,374,378,5,36,0,0,
-  	375,376,5,37,0,0,376,378,3,46,23,0,377,370,1,0,0,0,377,372,1,0,0,0,377,
-  	374,1,0,0,0,377,375,1,0,0,0,378,69,1,0,0,0,40,71,76,80,85,91,96,102,107,
-  	114,119,125,135,155,171,181,191,199,202,207,211,220,230,238,246,252,262,
-  	269,279,292,299,308,316,321,325,331,337,347,362,365,377
+  	0,0,0,78,81,3,28,14,0,79,81,3,30,15,0,80,78,1,0,0,0,80,79,1,0,0,0,80,
+  	81,1,0,0,0,81,83,1,0,0,0,82,84,3,18,9,0,83,82,1,0,0,0,84,85,1,0,0,0,85,
+  	83,1,0,0,0,85,86,1,0,0,0,86,87,1,0,0,0,87,88,5,0,0,1,88,3,1,0,0,0,89,
+  	91,3,12,6,0,90,92,3,14,7,0,91,90,1,0,0,0,91,92,1,0,0,0,92,96,1,0,0,0,
+  	93,95,3,28,14,0,94,93,1,0,0,0,95,98,1,0,0,0,96,94,1,0,0,0,96,97,1,0,0,
+  	0,97,100,1,0,0,0,98,96,1,0,0,0,99,101,3,16,8,0,100,99,1,0,0,0,101,102,
+  	1,0,0,0,102,100,1,0,0,0,102,103,1,0,0,0,103,107,1,0,0,0,104,106,3,18,
+  	9,0,105,104,1,0,0,0,106,109,1,0,0,0,107,105,1,0,0,0,107,108,1,0,0,0,108,
+  	110,1,0,0,0,109,107,1,0,0,0,110,111,5,0,0,1,111,5,1,0,0,0,112,114,3,10,
+  	5,0,113,115,3,14,7,0,114,113,1,0,0,0,114,115,1,0,0,0,115,119,1,0,0,0,
+  	116,118,3,28,14,0,117,116,1,0,0,0,118,121,1,0,0,0,119,117,1,0,0,0,119,
+  	120,1,0,0,0,120,125,1,0,0,0,121,119,1,0,0,0,122,124,3,18,9,0,123,122,
+  	1,0,0,0,124,127,1,0,0,0,125,123,1,0,0,0,125,126,1,0,0,0,126,128,1,0,0,
+  	0,127,125,1,0,0,0,128,129,5,0,0,1,129,7,1,0,0,0,130,131,5,31,0,0,131,
+  	135,5,4,0,0,132,134,3,46,23,0,133,132,1,0,0,0,134,137,1,0,0,0,135,133,
+  	1,0,0,0,135,136,1,0,0,0,136,138,1,0,0,0,137,135,1,0,0,0,138,139,5,5,0,
+  	0,139,9,1,0,0,0,140,141,5,27,0,0,141,142,5,15,0,0,142,143,5,46,0,0,143,
+  	11,1,0,0,0,144,145,5,28,0,0,145,146,5,15,0,0,146,147,5,46,0,0,147,13,
+  	1,0,0,0,148,149,5,30,0,0,149,150,5,15,0,0,150,151,5,46,0,0,151,15,1,0,
+  	0,0,152,153,5,47,0,0,153,155,5,4,0,0,154,156,3,26,13,0,155,154,1,0,0,
+  	0,155,156,1,0,0,0,156,157,1,0,0,0,157,158,5,5,0,0,158,159,5,15,0,0,159,
+  	160,5,46,0,0,160,17,1,0,0,0,161,162,3,16,8,0,162,163,3,20,10,0,163,19,
+  	1,0,0,0,164,165,3,42,21,0,165,21,1,0,0,0,166,167,5,47,0,0,167,171,5,4,
+  	0,0,168,170,3,34,17,0,169,168,1,0,0,0,170,173,1,0,0,0,171,169,1,0,0,0,
+  	171,172,1,0,0,0,172,174,1,0,0,0,173,171,1,0,0,0,174,175,5,5,0,0,175,23,
+  	1,0,0,0,176,177,5,46,0,0,177,181,5,4,0,0,178,180,3,34,17,0,179,178,1,
+  	0,0,0,180,183,1,0,0,0,181,179,1,0,0,0,181,182,1,0,0,0,182,184,1,0,0,0,
+  	183,181,1,0,0,0,184,185,5,5,0,0,185,25,1,0,0,0,186,191,3,28,14,0,187,
+  	188,5,12,0,0,188,190,3,28,14,0,189,187,1,0,0,0,190,193,1,0,0,0,191,189,
+  	1,0,0,0,191,192,1,0,0,0,192,27,1,0,0,0,193,191,1,0,0,0,194,195,5,47,0,
+  	0,195,196,5,15,0,0,196,199,5,46,0,0,197,198,5,16,0,0,198,200,3,46,23,
+  	0,199,197,1,0,0,0,199,200,1,0,0,0,200,203,1,0,0,0,201,203,3,38,19,0,202,
+  	194,1,0,0,0,202,201,1,0,0,0,203,29,1,0,0,0,204,207,5,47,0,0,205,206,5,
+  	16,0,0,206,208,3,46,23,0,207,205,1,0,0,0,207,208,1,0,0,0,208,31,1,0,0,
+  	0,209,210,5,47,0,0,210,212,5,16,0,0,211,209,1,0,0,0,211,212,1,0,0,0,212,
+  	213,1,0,0,0,213,214,3,46,23,0,214,33,1,0,0,0,215,220,3,32,16,0,216,217,
+  	5,12,0,0,217,219,3,32,16,0,218,216,1,0,0,0,219,222,1,0,0,0,220,218,1,
+  	0,0,0,220,221,1,0,0,0,221,35,1,0,0,0,222,220,1,0,0,0,223,231,3,28,14,
+  	0,224,231,3,30,15,0,225,231,3,56,28,0,226,231,3,64,32,0,227,231,3,68,
+  	34,0,228,231,3,38,19,0,229,231,3,46,23,0,230,223,1,0,0,0,230,224,1,0,
+  	0,0,230,225,1,0,0,0,230,226,1,0,0,0,230,227,1,0,0,0,230,228,1,0,0,0,230,
+  	229,1,0,0,0,231,37,1,0,0,0,232,233,5,29,0,0,233,234,5,46,0,0,234,238,
+  	5,6,0,0,235,237,3,40,20,0,236,235,1,0,0,0,237,240,1,0,0,0,238,236,1,0,
+  	0,0,238,239,1,0,0,0,239,241,1,0,0,0,240,238,1,0,0,0,241,242,5,7,0,0,242,
+  	39,1,0,0,0,243,246,5,45,0,0,244,245,5,16,0,0,245,247,5,48,0,0,246,244,
+  	1,0,0,0,246,247,1,0,0,0,247,41,1,0,0,0,248,252,5,6,0,0,249,251,3,36,18,
+  	0,250,249,1,0,0,0,251,254,1,0,0,0,252,250,1,0,0,0,252,253,1,0,0,0,253,
+  	255,1,0,0,0,254,252,1,0,0,0,255,256,5,7,0,0,256,43,1,0,0,0,257,262,3,
+  	46,23,0,258,259,5,12,0,0,259,261,3,46,23,0,260,258,1,0,0,0,261,264,1,
+  	0,0,0,262,260,1,0,0,0,262,263,1,0,0,0,263,45,1,0,0,0,264,262,1,0,0,0,
+  	265,270,3,48,24,0,266,270,3,52,26,0,267,270,3,50,25,0,268,270,3,54,27,
+  	0,269,265,1,0,0,0,269,266,1,0,0,0,269,267,1,0,0,0,269,268,1,0,0,0,270,
+  	47,1,0,0,0,271,272,3,52,26,0,272,273,7,0,0,0,273,274,3,46,23,0,274,280,
+  	1,0,0,0,275,276,3,52,26,0,276,277,7,1,0,0,277,278,3,46,23,0,278,280,1,
+  	0,0,0,279,271,1,0,0,0,279,275,1,0,0,0,280,49,1,0,0,0,281,282,3,52,26,
+  	0,282,283,7,2,0,0,283,284,3,46,23,0,284,51,1,0,0,0,285,293,3,22,11,0,
+  	286,293,3,24,12,0,287,293,5,42,0,0,288,293,5,43,0,0,289,293,5,44,0,0,
+  	290,293,5,48,0,0,291,293,5,47,0,0,292,285,1,0,0,0,292,286,1,0,0,0,292,
+  	287,1,0,0,0,292,288,1,0,0,0,292,289,1,0,0,0,292,290,1,0,0,0,292,291,1,
+  	0,0,0,293,53,1,0,0,0,294,299,3,52,26,0,295,296,5,14,0,0,296,298,3,52,
+  	26,0,297,295,1,0,0,0,298,301,1,0,0,0,299,297,1,0,0,0,299,300,1,0,0,0,
+  	300,55,1,0,0,0,301,299,1,0,0,0,302,303,5,32,0,0,303,304,3,46,23,0,304,
+  	305,3,42,21,0,305,306,3,58,29,0,306,309,1,0,0,0,307,309,3,60,30,0,308,
+  	302,1,0,0,0,308,307,1,0,0,0,309,57,1,0,0,0,310,311,5,33,0,0,311,312,3,
+  	46,23,0,312,313,3,42,21,0,313,315,1,0,0,0,314,310,1,0,0,0,315,318,1,0,
+  	0,0,316,314,1,0,0,0,316,317,1,0,0,0,317,321,1,0,0,0,318,316,1,0,0,0,319,
+  	320,5,33,0,0,320,322,3,42,21,0,321,319,1,0,0,0,321,322,1,0,0,0,322,59,
+  	1,0,0,0,323,325,5,32,0,0,324,326,3,46,23,0,325,324,1,0,0,0,325,326,1,
+  	0,0,0,326,327,1,0,0,0,327,331,5,6,0,0,328,330,3,62,31,0,329,328,1,0,0,
+  	0,330,333,1,0,0,0,331,329,1,0,0,0,331,332,1,0,0,0,332,337,1,0,0,0,333,
+  	331,1,0,0,0,334,335,5,33,0,0,335,336,5,15,0,0,336,338,3,42,21,0,337,334,
+  	1,0,0,0,337,338,1,0,0,0,338,339,1,0,0,0,339,340,5,7,0,0,340,61,1,0,0,
+  	0,341,342,3,46,23,0,342,343,5,15,0,0,343,344,3,42,21,0,344,63,1,0,0,0,
+  	345,347,5,34,0,0,346,348,3,46,23,0,347,346,1,0,0,0,347,348,1,0,0,0,348,
+  	349,1,0,0,0,349,363,3,42,21,0,350,351,5,34,0,0,351,352,3,44,22,0,352,
+  	353,5,41,0,0,353,354,3,46,23,0,354,355,3,42,21,0,355,363,1,0,0,0,356,
+  	357,5,34,0,0,357,358,3,44,22,0,358,359,5,41,0,0,359,360,3,66,33,0,360,
+  	361,3,42,21,0,361,363,1,0,0,0,362,345,1,0,0,0,362,350,1,0,0,0,362,356,
+  	1,0,0,0,363,65,1,0,0,0,364,366,3,46,23,0,365,364,1,0,0,0,365,366,1,0,
+  	0,0,366,367,1,0,0,0,367,368,5,13,0,0,368,369,3,46,23,0,369,67,1,0,0,0,
+  	370,371,5,35,0,0,371,378,3,46,23,0,372,373,5,35,0,0,373,378,5,32,0,0,
+  	374,378,5,36,0,0,375,376,5,37,0,0,376,378,3,46,23,0,377,370,1,0,0,0,377,
+  	372,1,0,0,0,377,374,1,0,0,0,377,375,1,0,0,0,378,69,1,0,0,0,40,71,76,80,
+  	85,91,96,102,107,114,119,125,135,155,171,181,191,199,202,207,211,220,
+  	230,238,246,252,262,269,279,292,299,308,316,321,325,331,337,347,362,365,
+  	377
   };
   staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
@@ -388,6 +389,7 @@ LogosParser::MainFileContext* LogosParser::mainFile() {
     enterOuterAlt(_localctx, 1);
     setState(80);
     _errHandler->sync(this);
+
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 2, _ctx)) {
     case 1: {
       setState(78);
@@ -1024,8 +1026,8 @@ LogosParser::FuncBodyContext::FuncBodyContext(ParserRuleContext *parent, size_t 
   : ParserRuleContext(parent, invokingState) {
 }
 
-LogosParser::Statemets_blockContext* LogosParser::FuncBodyContext::statemets_block() {
-  return getRuleContext<LogosParser::Statemets_blockContext>(0);
+LogosParser::StatementsBlockContext* LogosParser::FuncBodyContext::statementsBlock() {
+  return getRuleContext<LogosParser::StatementsBlockContext>(0);
 }
 
 
@@ -1048,7 +1050,7 @@ LogosParser::FuncBodyContext* LogosParser::funcBody() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(164);
-    statemets_block();
+    statementsBlock();
    
   }
   catch (RecognitionException &e) {
@@ -1580,8 +1582,8 @@ LogosParser::IfStatementContext* LogosParser::StatementContext::ifStatement() {
   return getRuleContext<LogosParser::IfStatementContext>(0);
 }
 
-LogosParser::LoopStatemetContext* LogosParser::StatementContext::loopStatemet() {
-  return getRuleContext<LogosParser::LoopStatemetContext>(0);
+LogosParser::LoopStatementContext* LogosParser::StatementContext::loopStatement() {
+  return getRuleContext<LogosParser::LoopStatementContext>(0);
 }
 
 LogosParser::ControlFlowStatementContext* LogosParser::StatementContext::controlFlowStatement() {
@@ -1641,7 +1643,7 @@ LogosParser::StatementContext* LogosParser::statement() {
     case 4: {
       enterOuterAlt(_localctx, 4);
       setState(226);
-      loopStatemet();
+      loopStatement();
       break;
     }
 
@@ -1820,37 +1822,37 @@ LogosParser::EnumFieldContext* LogosParser::enumField() {
   return _localctx;
 }
 
-//----------------- Statemets_blockContext ------------------------------------------------------------------
+//----------------- StatementsBlockContext ------------------------------------------------------------------
 
-LogosParser::Statemets_blockContext::Statemets_blockContext(ParserRuleContext *parent, size_t invokingState)
+LogosParser::StatementsBlockContext::StatementsBlockContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* LogosParser::Statemets_blockContext::LEFT_BRACE() {
+tree::TerminalNode* LogosParser::StatementsBlockContext::LEFT_BRACE() {
   return getToken(LogosParser::LEFT_BRACE, 0);
 }
 
-tree::TerminalNode* LogosParser::Statemets_blockContext::RIGHT_BRACE() {
+tree::TerminalNode* LogosParser::StatementsBlockContext::RIGHT_BRACE() {
   return getToken(LogosParser::RIGHT_BRACE, 0);
 }
 
-std::vector<LogosParser::StatementContext *> LogosParser::Statemets_blockContext::statement() {
+std::vector<LogosParser::StatementContext *> LogosParser::StatementsBlockContext::statement() {
   return getRuleContexts<LogosParser::StatementContext>();
 }
 
-LogosParser::StatementContext* LogosParser::Statemets_blockContext::statement(size_t i) {
+LogosParser::StatementContext* LogosParser::StatementsBlockContext::statement(size_t i) {
   return getRuleContext<LogosParser::StatementContext>(i);
 }
 
 
-size_t LogosParser::Statemets_blockContext::getRuleIndex() const {
-  return LogosParser::RuleStatemets_block;
+size_t LogosParser::StatementsBlockContext::getRuleIndex() const {
+  return LogosParser::RuleStatementsBlock;
 }
 
 
-LogosParser::Statemets_blockContext* LogosParser::statemets_block() {
-  Statemets_blockContext *_localctx = _tracker.createInstance<Statemets_blockContext>(_ctx, getState());
-  enterRule(_localctx, 42, LogosParser::RuleStatemets_block);
+LogosParser::StatementsBlockContext* LogosParser::statementsBlock() {
+  StatementsBlockContext *_localctx = _tracker.createInstance<StatementsBlockContext>(_ctx, getState());
+  enterRule(_localctx, 42, LogosParser::RuleStatementsBlock);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -2424,8 +2426,8 @@ LogosParser::ExprContext* LogosParser::IfStatementContext::expr() {
   return getRuleContext<LogosParser::ExprContext>(0);
 }
 
-LogosParser::Statemets_blockContext* LogosParser::IfStatementContext::statemets_block() {
-  return getRuleContext<LogosParser::Statemets_blockContext>(0);
+LogosParser::StatementsBlockContext* LogosParser::IfStatementContext::statementsBlock() {
+  return getRuleContext<LogosParser::StatementsBlockContext>(0);
 }
 
 LogosParser::ElseStatementContext* LogosParser::IfStatementContext::elseStatement() {
@@ -2464,7 +2466,7 @@ LogosParser::IfStatementContext* LogosParser::ifStatement() {
       setState(303);
       expr();
       setState(304);
-      statemets_block();
+      statementsBlock();
       setState(305);
       elseStatement();
       break;
@@ -2513,12 +2515,12 @@ LogosParser::ExprContext* LogosParser::ElseStatementContext::expr(size_t i) {
   return getRuleContext<LogosParser::ExprContext>(i);
 }
 
-std::vector<LogosParser::Statemets_blockContext *> LogosParser::ElseStatementContext::statemets_block() {
-  return getRuleContexts<LogosParser::Statemets_blockContext>();
+std::vector<LogosParser::StatementsBlockContext *> LogosParser::ElseStatementContext::statementsBlock() {
+  return getRuleContexts<LogosParser::StatementsBlockContext>();
 }
 
-LogosParser::Statemets_blockContext* LogosParser::ElseStatementContext::statemets_block(size_t i) {
-  return getRuleContext<LogosParser::Statemets_blockContext>(i);
+LogosParser::StatementsBlockContext* LogosParser::ElseStatementContext::statementsBlock(size_t i) {
+  return getRuleContext<LogosParser::StatementsBlockContext>(i);
 }
 
 
@@ -2552,7 +2554,7 @@ LogosParser::ElseStatementContext* LogosParser::elseStatement() {
         setState(311);
         expr();
         setState(312);
-        statemets_block(); 
+        statementsBlock(); 
       }
       setState(318);
       _errHandler->sync(this);
@@ -2566,7 +2568,7 @@ LogosParser::ElseStatementContext* LogosParser::elseStatement() {
       setState(319);
       match(LogosParser::ELSE);
       setState(320);
-      statemets_block();
+      statementsBlock();
     }
    
   }
@@ -2617,8 +2619,8 @@ tree::TerminalNode* LogosParser::PatterMatchingContext::COLON() {
   return getToken(LogosParser::COLON, 0);
 }
 
-LogosParser::Statemets_blockContext* LogosParser::PatterMatchingContext::statemets_block() {
-  return getRuleContext<LogosParser::Statemets_blockContext>(0);
+LogosParser::StatementsBlockContext* LogosParser::PatterMatchingContext::statementsBlock() {
+  return getRuleContext<LogosParser::StatementsBlockContext>(0);
 }
 
 
@@ -2675,7 +2677,7 @@ LogosParser::PatterMatchingContext* LogosParser::patterMatching() {
       setState(335);
       match(LogosParser::COLON);
       setState(336);
-      statemets_block();
+      statementsBlock();
     }
     setState(339);
     match(LogosParser::RIGHT_BRACE);
@@ -2704,8 +2706,8 @@ tree::TerminalNode* LogosParser::PatternContext::COLON() {
   return getToken(LogosParser::COLON, 0);
 }
 
-LogosParser::Statemets_blockContext* LogosParser::PatternContext::statemets_block() {
-  return getRuleContext<LogosParser::Statemets_blockContext>(0);
+LogosParser::StatementsBlockContext* LogosParser::PatternContext::statementsBlock() {
+  return getRuleContext<LogosParser::StatementsBlockContext>(0);
 }
 
 
@@ -2732,7 +2734,7 @@ LogosParser::PatternContext* LogosParser::pattern() {
     setState(342);
     match(LogosParser::COLON);
     setState(343);
-    statemets_block();
+    statementsBlock();
    
   }
   catch (RecognitionException &e) {
@@ -2744,45 +2746,45 @@ LogosParser::PatternContext* LogosParser::pattern() {
   return _localctx;
 }
 
-//----------------- LoopStatemetContext ------------------------------------------------------------------
+//----------------- LoopStatementContext ------------------------------------------------------------------
 
-LogosParser::LoopStatemetContext::LoopStatemetContext(ParserRuleContext *parent, size_t invokingState)
+LogosParser::LoopStatementContext::LoopStatementContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* LogosParser::LoopStatemetContext::FOR() {
+tree::TerminalNode* LogosParser::LoopStatementContext::FOR() {
   return getToken(LogosParser::FOR, 0);
 }
 
-LogosParser::Statemets_blockContext* LogosParser::LoopStatemetContext::statemets_block() {
-  return getRuleContext<LogosParser::Statemets_blockContext>(0);
+LogosParser::StatementsBlockContext* LogosParser::LoopStatementContext::statementsBlock() {
+  return getRuleContext<LogosParser::StatementsBlockContext>(0);
 }
 
-LogosParser::ExprContext* LogosParser::LoopStatemetContext::expr() {
+LogosParser::ExprContext* LogosParser::LoopStatementContext::expr() {
   return getRuleContext<LogosParser::ExprContext>(0);
 }
 
-LogosParser::ExprListContext* LogosParser::LoopStatemetContext::exprList() {
+LogosParser::ExprListContext* LogosParser::LoopStatementContext::exprList() {
   return getRuleContext<LogosParser::ExprListContext>(0);
 }
 
-tree::TerminalNode* LogosParser::LoopStatemetContext::IN() {
+tree::TerminalNode* LogosParser::LoopStatementContext::IN() {
   return getToken(LogosParser::IN, 0);
 }
 
-LogosParser::RangeContext* LogosParser::LoopStatemetContext::range() {
+LogosParser::RangeContext* LogosParser::LoopStatementContext::range() {
   return getRuleContext<LogosParser::RangeContext>(0);
 }
 
 
-size_t LogosParser::LoopStatemetContext::getRuleIndex() const {
-  return LogosParser::RuleLoopStatemet;
+size_t LogosParser::LoopStatementContext::getRuleIndex() const {
+  return LogosParser::RuleLoopStatement;
 }
 
 
-LogosParser::LoopStatemetContext* LogosParser::loopStatemet() {
-  LoopStatemetContext *_localctx = _tracker.createInstance<LoopStatemetContext>(_ctx, getState());
-  enterRule(_localctx, 64, LogosParser::RuleLoopStatemet);
+LogosParser::LoopStatementContext* LogosParser::loopStatement() {
+  LoopStatementContext *_localctx = _tracker.createInstance<LoopStatementContext>(_ctx, getState());
+  enterRule(_localctx, 64, LogosParser::RuleLoopStatement);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -2810,7 +2812,7 @@ LogosParser::LoopStatemetContext* LogosParser::loopStatemet() {
         expr();
       }
       setState(349);
-      statemets_block();
+      statementsBlock();
       break;
     }
 
@@ -2825,7 +2827,7 @@ LogosParser::LoopStatemetContext* LogosParser::loopStatemet() {
       setState(353);
       expr();
       setState(354);
-      statemets_block();
+      statementsBlock();
       break;
     }
 
@@ -2840,7 +2842,7 @@ LogosParser::LoopStatemetContext* LogosParser::loopStatemet() {
       setState(359);
       range();
       setState(360);
-      statemets_block();
+      statementsBlock();
       break;
     }
 

@@ -2,7 +2,7 @@ grammar Logos;
 
 logosFile: importStatement? (mainFile | objectFile | interfaceFile);
 
-mainFile: (explicitVarDec | implicitVarDec) funcImplementation+ EOF;
+mainFile: (explicitVarDec | implicitVarDec)? funcImplementation+ EOF;
 
 interfaceFile: interfaceDeclaration objectImplements? explicitVarDec* funcDec+ funcImplementation* EOF;
 
@@ -20,7 +20,7 @@ funcDec: VARIABLE LEFT_PAREN explicitVarDecList? RIGHT_PAREN COLON TYPE;
 
 funcImplementation: funcDec funcBody;
 
-funcBody: statemets_block;
+funcBody: statementsBlock;
 
 funcCall: VARIABLE LEFT_PAREN paramCallList* RIGHT_PAREN;
 
@@ -43,7 +43,7 @@ statement:
         explicitVarDec
     |   implicitVarDec
     |   ifStatement
-    |   loopStatemet
+    |   loopStatement
     |   controlFlowStatement
     |   enumDeclaration
     |   expr
@@ -53,13 +53,13 @@ enumDeclaration: ENUM TYPE LEFT_BRACE enumField* RIGHT_BRACE;
 
 enumField: CONST (EQUAL STRING)?;
 
-statemets_block:
+statementsBlock:
         LEFT_BRACE statement* RIGHT_BRACE
     ;
 
 exprList:
         expr (COMMA expr)*
-;
+    ;
 
 expr:
         binaryExpr
@@ -92,26 +92,26 @@ selection:
     ;
 
 ifStatement:
-        IF expr statemets_block elseStatement
+        IF expr statementsBlock elseStatement
     |   patterMatching
     ;
 
 elseStatement:
-    (ELSE expr statemets_block)* (ELSE statemets_block)?
+    (ELSE expr statementsBlock)* (ELSE statementsBlock)?
     ;
 
 patterMatching:
-        IF expr? LEFT_BRACE pattern* (ELSE COLON statemets_block)? RIGHT_BRACE
+        IF expr? LEFT_BRACE pattern* (ELSE COLON statementsBlock)? RIGHT_BRACE
     ;
 
 pattern:
-        expr COLON statemets_block
+        expr COLON statementsBlock
     ;
 
-loopStatemet:
-        FOR expr? statemets_block
-    |   FOR exprList IN expr statemets_block
-    |   FOR exprList IN range statemets_block
+loopStatement:
+        FOR expr? statementsBlock
+    |   FOR exprList IN expr statementsBlock
+    |   FOR exprList IN range statementsBlock
     ;
 
 range:
