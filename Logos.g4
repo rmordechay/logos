@@ -1,12 +1,14 @@
 grammar Logos;
 
-logosFile: mainFile | objectFile | interfaceFile;
+logosFile: importStatement? (mainFile | objectFile | interfaceFile);
 
-mainFile: funcImplementation+ EOF;
+mainFile: (explicitVarDec | implicitVarDec) funcImplementation+ EOF;
 
 interfaceFile: interfaceDeclaration objectImplements? explicitVarDec* funcDec+ funcImplementation* EOF;
 
 objectFile: objectDeclaration objectImplements? explicitVarDec* funcImplementation* EOF;
+
+importStatement: IMPORT LEFT_PAREN expr* RIGHT_PAREN;
 
 objectDeclaration: OBJECT COLON TYPE;
 
@@ -26,7 +28,10 @@ constructorCall: TYPE LEFT_PAREN paramCallList* RIGHT_PAREN;
 
 explicitVarDecList: explicitVarDec (COMMA explicitVarDec)*;
 
-explicitVarDec: VARIABLE COLON TYPE (EQUAL expr)?;
+explicitVarDec:
+        VARIABLE COLON TYPE (EQUAL expr)?
+    |   enumDeclaration
+    ;
 
 implicitVarDec: VARIABLE (EQUAL expr)?;
 
@@ -40,26 +45,36 @@ statement:
     |   ifStatement
     |   loopStatemet
     |   controlFlowStatement
+    |   enumDeclaration
     |   expr
     ;
+
+enumDeclaration: ENUM TYPE LEFT_BRACE enumField* RIGHT_BRACE;
+
+enumField: CONST (EQUAL STRING)?;
 
 statemets_block:
         LEFT_BRACE statement* RIGHT_BRACE
     ;
 
-expr_list:
+exprList:
         expr (COMMA expr)*
 ;
 
 expr:
         binaryExpr
     |   unaryExpr
+    |   boolExpr
     |   selection
     ;
 
 binaryExpr:
         unaryExpr (STAR | SLASH) expr
     |   unaryExpr (PLUS | MINUS) expr
+    ;
+
+boolExpr:
+        unaryExpr (DOUBLE_EQUAL | RIGHT_BRACKET | LEFT_BRACKET | GREATER_EQUAL_THAN | LESS_EQUAL_THAN) expr
     ;
 
 unaryExpr:
@@ -95,8 +110,8 @@ pattern:
 
 loopStatemet:
         FOR expr? statemets_block
-    |   FOR expr_list IN expr statemets_block
-    |   FOR expr_list IN range statemets_block
+    |   FOR exprList IN expr statemets_block
+    |   FOR exprList IN range statemets_block
     ;
 
 range:
@@ -109,6 +124,10 @@ controlFlowStatement:
     |   CONTINUE
     |   RETURN expr
     ;
+
+DOUBLE_EQUAL: '==';
+GREATER_EQUAL_THAN: '>=';
+LESS_EQUAL_THAN: '<=';
 
 LEFT_PAREN: '(';
 RIGHT_PAREN: ')';
@@ -157,9 +176,9 @@ IN: 'in';
 INTEGER: [0-9]+;
 FLOAT: [0-9]+ '.' [0-9]+;
 BOOL: 'true' | 'false';
-VARIABLE: [a-z_] [a-zA-Z0-9_]*;
-TYPE: [A-Z] [a-zA-Z0-9_]*;
 CONST: [A-Z0-9_]+;
+TYPE: [A-Z] [a-zA-Z0-9_]*;
+VARIABLE: [a-z_][a-zA-Z0-9_]*;
 STRING: '"' ( ~["\\] | '\\' . )* '"';
 LINE_COMMENT: '//' ~( '\r' | '\n' )* -> skip;
 BLOCK_COMMENT: '///' .*? '///' -> skip;

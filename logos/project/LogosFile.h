@@ -4,8 +4,9 @@
 
 class LogosFile {
 public:
-    explicit LogosFile(const std::string &code);
+    explicit LogosFile(const std::string &code, const std::string &name);
     std::string code;
+    std::string name;
 };
 
 #endif //LOGOSFILE_H

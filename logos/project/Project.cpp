@@ -38,7 +38,7 @@ void Project::addLogosFile(const fs::directory_entry& entry) {
     std::stringstream fileContents;
     fileContents << file.rdbuf();
     std::string content = fileContents.str();
-    files.push_back(new LogosFile(content));
+    files.push_back(new LogosFile(content, entry.path().filename()));
 }
 
 void Project::scanPackage(const std::string& packagePath) {
@@ -55,6 +55,7 @@ void Project::scanPackage(const std::string& packagePath) {
 void Project::scanProject() {
     scanPackage(dirPath);
     for (const auto file : files) {
+        std::cout << file->name << std::endl;
         parseFile(file->code);
     }
 }
