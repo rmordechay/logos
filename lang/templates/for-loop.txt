@@ -1,16 +1,3 @@
-// Infinite loop
-for { }
-
-// Normal while loop
-for x > y { }
-
-// Normal while loop with index
-for i @tag {
-    for i, x > y {
-        if a break 2 or break @tag
-    }
-}
-
 // Loop in range
 for i in 5..10 {  }
 
@@ -29,5 +16,18 @@ for i, obj in list { }
 // foreach map loop
 for k, v in map { }
 
+// Infinite loop
+for { }
+
 // Infinite loop the increments i
 for i { }
+
+// Normal while loop
+for x > y { }
+
+// Normal while loop with index
+for i @tag {
+    for {
+        break @tag
+    }
+}

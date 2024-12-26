@@ -38,12 +38,18 @@ statement:
         explicitVarDec
     |   implicitVarDec
     |   ifStatement
+    |   loopStatemet
+    |   controlFlowStatement
     |   expr
     ;
 
 statemets_block:
         LEFT_BRACE statement* RIGHT_BRACE
     ;
+
+expr_list:
+        expr (COMMA expr)*
+;
 
 expr:
         binaryExpr
@@ -84,8 +90,25 @@ patterMatching:
     ;
 
 pattern:
-    expr COLON statemets_block
-;
+        expr COLON statemets_block
+    ;
+
+loopStatemet:
+        FOR expr? statemets_block
+    |   FOR expr_list IN expr statemets_block
+    |   FOR expr_list IN range statemets_block
+    ;
+
+range:
+        expr? DOUBLE_DOT expr
+    ;
+
+controlFlowStatement:
+        BREAK expr
+    |   BREAK IF
+    |   CONTINUE
+    |   RETURN expr
+    ;
 
 LEFT_PAREN: '(';
 RIGHT_PAREN: ')';
@@ -97,6 +120,7 @@ LEFT_ANGLE: '<';
 RIGHT_ANGLE: '>';
 
 COMMA: ',';
+DOUBLE_DOT: '..';
 DOT: '.';
 COLON: ':';
 EQUAL: '=';
