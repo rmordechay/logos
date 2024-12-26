@@ -24,13 +24,18 @@ void LogosFile::parseFile() {
     addSymbols();
 }
 
-void LogosFile::addSymbols() {
+void LogosFile::addSymbols() const {
     const auto objectFile = fileCtx->objectFile();
     if (objectFile != nullptr) {
         for (const auto explicitVarDec : objectFile->explicitVarDec()) {
             auto varName = explicitVarDec->VARIABLE()->getText();
             auto typeName = explicitVarDec->TYPE()->getText();
-            // symbolTable->symbols[varName] = Symbol(varName, typeName);
+            symbolTable->symbols[varName] = new Symbol(varName, typeName, FIELD);
+        }
+        for (const auto func : objectFile->funcImplementation()) {
+            auto varName = func->funcDec()->VARIABLE()->getText();
+            auto typeName = func->funcDec()->TYPE()->getText();
+            symbolTable->symbols[varName] = new Symbol(varName, typeName, FUNCTION);
         }
     }
 }

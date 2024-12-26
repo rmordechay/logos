@@ -8,7 +8,7 @@
 
 class SymbolTable {
 public:
-    std::map<std::string, Symbol> symbols;
+    std::map<std::string, Symbol*> symbols;
 };
 
 

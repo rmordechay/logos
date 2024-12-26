@@ -24,7 +24,7 @@ public:
     explicit LogosFile(const std::string& code, const std::filesystem::path& filePath);
     void setParser();
     void parseFile();
-    void addSymbols();
+    void addSymbols() const;
     ~LogosFile();
 };
 
