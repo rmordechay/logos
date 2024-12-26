@@ -1,10 +1,14 @@
 #ifndef SCOPE_H
 #define SCOPE_H
-#include "SymbolTable.h"
+#include <map>
+
+
+class Symbol;
 
 class Scope {
 public:
-    SymbolTable* symbolTable;
+    std::map<std::string, Symbol*> symbolTable;
+    explicit Scope();
 };
 
 

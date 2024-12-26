@@ -13,9 +13,12 @@ public:
     std::string varName;
     std::string typeName;
     SymbolType kind;
+    union {
+        int intValue;
+        float floatValue;
+    };
 
-    explicit Symbol(const std::string& name, const std::string& type, const SymbolType kind):
-    varName(name), typeName(type), kind(kind) {}
+    explicit Symbol(const std::string& varName, const std::string& typeName, SymbolType kind);
 };
 
 

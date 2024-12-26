@@ -1,5 +1,6 @@
 #include "LogosFile.h"
 #include "SemAnalyser.h"
+#include "Symbol.h"
 
 #include <ANTLRInputStream.h>
 
@@ -8,7 +9,6 @@ LogosFile::LogosFile(const std::string& code, const std::filesystem::path& fileP
     this->path = absolute(filePath).string();
     this->name = filePath.filename();
     this->fileCtx = nullptr;
-    this->symbolTable = new SymbolTable();
 }
 
 void LogosFile::setParser() {
@@ -24,23 +24,22 @@ void LogosFile::parseFile() {
     addSymbols();
 }
 
-void LogosFile::addSymbols() const {
+void LogosFile::addSymbols() {
     const auto objectFile = fileCtx->objectFile();
     if (objectFile != nullptr) {
         for (const auto explicitVarDec : objectFile->explicitVarDec()) {
             auto varName = explicitVarDec->VARIABLE()->getText();
             auto typeName = explicitVarDec->TYPE()->getText();
-            symbolTable->symbols[varName] = new Symbol(varName, typeName, FIELD);
+            symbolTable[varName] = new Symbol(varName, typeName, FIELD);
         }
         for (const auto func : objectFile->funcImplementation()) {
             auto varName = func->funcDec()->VARIABLE()->getText();
             auto typeName = func->funcDec()->TYPE()->getText();
-            symbolTable->symbols[varName] = new Symbol(varName, typeName, FUNCTION);
+            symbolTable[varName] = new Symbol(varName, typeName, FUNCTION);
         }
     }
 }
 
 LogosFile::~LogosFile() {
     delete fileCtx;
-    delete symbolTable;
 }

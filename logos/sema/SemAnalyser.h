@@ -16,6 +16,7 @@ public:
     void analyseProject();
     void checkMainFile(LogosParser::MainFileContext* ctx);
     void checkMain(LogosParser::FuncImplementationContext* ctx);
+    void checkStatement(LogosParser::StatementContext* ctx);
     void checkObjectFile(LogosParser::ObjectFileContext* ctx);
     void checkImportStatement(LogosParser::ImportStatementContext* ctx);
     void checkObjectImplements(LogosParser::ObjectImplementsContext* ctx);

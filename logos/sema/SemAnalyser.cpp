@@ -14,10 +14,6 @@ void SemAnalyser::analyseProject() {
     checkMainFile(mainFileCtx->mainFile());
 }
 
-void SemAnalyser::checkMain(LogosParser::FuncImplementationContext* ctx) {
-
-}
-
 void SemAnalyser::checkMainFile(LogosParser::MainFileContext* ctx) {
     for (const auto func : ctx->funcImplementation()) {
         if (func->funcDec()->VARIABLE()->getText() == LOGOS_MAIN_FUNCTION) {
@@ -26,9 +22,25 @@ void SemAnalyser::checkMainFile(LogosParser::MainFileContext* ctx) {
     }
 }
 
+void SemAnalyser::checkMain(LogosParser::FuncImplementationContext* ctx) {
+    const auto statements = ctx->funcBody()->statementsBlock()->statement();
+    for (const auto statement : statements) {
+        checkStatement(statement);
+    }
+}
+
+void SemAnalyser::checkStatement(LogosParser::StatementContext* ctx) {
+    const auto explicitVarDec = ctx->explicitVarDec();
+    if (explicitVarDec != nullptr) {
+        const auto varName = explicitVarDec->VARIABLE()->getText();
+        const auto typeName = explicitVarDec->TYPE()->getText();
+        auto symbol = new Symbol(varName, typeName, LOCAL_VARIABLE);
+        currentScope->symbolTable[varName] = symbol;
+    }
+}
+
 void SemAnalyser::checkObjectFile(LogosParser::ObjectFileContext* ctx) {
     if (ctx == nullptr) return;
-    checkObjectImplements(ctx->objectImplements());
 }
 
 void SemAnalyser::checkImportStatement(LogosParser::ImportStatementContext* ctx) {
