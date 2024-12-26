@@ -26,6 +26,10 @@ add_executable(logos
     logos/codegen/CodeGenerator.cpp
     logos/codegen/CodeGenerator.h
     logos/LogosConfigs.h
+        logos/sema/SymbolTable.cpp
+        logos/sema/SymbolTable.h
+        logos/sema/Scope.cpp
+        logos/sema/Scope.h
 )
 
 target_include_directories(logos PRIVATE

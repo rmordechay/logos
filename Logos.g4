@@ -8,7 +8,9 @@ interfaceFile: interfaceDeclaration objectImplements? explicitVarDec* funcDec+ f
 
 objectFile: objectDeclaration objectImplements? explicitVarDec* funcImplementation* EOF;
 
-importStatement: IMPORT LEFT_PAREN expr* RIGHT_PAREN;
+importStatement: IMPORT LEFT_PAREN importPath* RIGHT_PAREN;
+
+importPath: TYPE (DOT TYPE)*;
 
 objectDeclaration: OBJECT COLON TYPE;
 

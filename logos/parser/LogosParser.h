@@ -26,15 +26,15 @@ public:
 
   enum {
     RuleLogosFile = 0, RuleMainFile = 1, RuleInterfaceFile = 2, RuleObjectFile = 3, 
-    RuleImportStatement = 4, RuleObjectDeclaration = 5, RuleInterfaceDeclaration = 6, 
-    RuleObjectImplements = 7, RuleFuncDec = 8, RuleFuncImplementation = 9, 
-    RuleFuncBody = 10, RuleFuncCall = 11, RuleConstructorCall = 12, RuleExplicitVarDecList = 13, 
-    RuleExplicitVarDec = 14, RuleImplicitVarDec = 15, RuleParamCall = 16, 
-    RuleParamCallList = 17, RuleStatement = 18, RuleEnumDeclaration = 19, 
-    RuleEnumField = 20, RuleStatementsBlock = 21, RuleExprList = 22, RuleExpr = 23, 
-    RuleBinaryExpr = 24, RuleBoolExpr = 25, RuleUnaryExpr = 26, RuleSelection = 27, 
-    RuleIfStatement = 28, RuleElseStatement = 29, RulePatterMatching = 30, 
-    RulePattern = 31, RuleLoopStatement = 32, RuleRange = 33, RuleControlFlowStatement = 34
+    RuleImportStatement = 4, RuleImportPath = 5, RuleObjectDeclaration = 6, 
+    RuleInterfaceDeclaration = 7, RuleObjectImplements = 8, RuleFuncDec = 9, 
+    RuleFuncImplementation = 10, RuleFuncBody = 11, RuleFuncCall = 12, RuleConstructorCall = 13, 
+    RuleExplicitVarDecList = 14, RuleExplicitVarDec = 15, RuleImplicitVarDec = 16, 
+    RuleParamCall = 17, RuleParamCallList = 18, RuleStatement = 19, RuleEnumDeclaration = 20, 
+    RuleEnumField = 21, RuleStatementsBlock = 22, RuleExprList = 23, RuleExpr = 24, 
+    RuleBinaryExpr = 25, RuleBoolExpr = 26, RuleUnaryExpr = 27, RuleSelection = 28, 
+    RuleIfStatement = 29, RuleElseStatement = 30, RulePatterMatching = 31, 
+    RulePattern = 32, RuleLoopStatement = 33, RuleRange = 34, RuleControlFlowStatement = 35
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -59,6 +59,7 @@ public:
   class InterfaceFileContext;
   class ObjectFileContext;
   class ImportStatementContext;
+  class ImportPathContext;
   class ObjectDeclarationContext;
   class InterfaceDeclarationContext;
   class ObjectImplementsContext;
@@ -162,13 +163,27 @@ public:
     antlr4::tree::TerminalNode *IMPORT();
     antlr4::tree::TerminalNode *LEFT_PAREN();
     antlr4::tree::TerminalNode *RIGHT_PAREN();
-    std::vector<ExprContext *> expr();
-    ExprContext* expr(size_t i);
+    std::vector<ImportPathContext *> importPath();
+    ImportPathContext* importPath(size_t i);
 
    
   };
 
   ImportStatementContext* importStatement();
+
+  class  ImportPathContext : public antlr4::ParserRuleContext {
+  public:
+    ImportPathContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<antlr4::tree::TerminalNode *> TYPE();
+    antlr4::tree::TerminalNode* TYPE(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> DOT();
+    antlr4::tree::TerminalNode* DOT(size_t i);
+
+   
+  };
+
+  ImportPathContext* importPath();
 
   class  ObjectDeclarationContext : public antlr4::ParserRuleContext {
   public:

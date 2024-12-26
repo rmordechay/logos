@@ -52,13 +52,13 @@ void logosParserInitialize() {
   auto staticData = std::make_unique<LogosParserStaticData>(
     std::vector<std::string>{
       "logosFile", "mainFile", "interfaceFile", "objectFile", "importStatement", 
-      "objectDeclaration", "interfaceDeclaration", "objectImplements", "funcDec", 
-      "funcImplementation", "funcBody", "funcCall", "constructorCall", "explicitVarDecList", 
-      "explicitVarDec", "implicitVarDec", "paramCall", "paramCallList", 
-      "statement", "enumDeclaration", "enumField", "statementsBlock", "exprList", 
-      "expr", "binaryExpr", "boolExpr", "unaryExpr", "selection", "ifStatement", 
-      "elseStatement", "patterMatching", "pattern", "loopStatement", "range", 
-      "controlFlowStatement"
+      "importPath", "objectDeclaration", "interfaceDeclaration", "objectImplements", 
+      "funcDec", "funcImplementation", "funcBody", "funcCall", "constructorCall", 
+      "explicitVarDecList", "explicitVarDec", "implicitVarDec", "paramCall", 
+      "paramCallList", "statement", "enumDeclaration", "enumField", "statementsBlock", 
+      "exprList", "expr", "binaryExpr", "boolExpr", "unaryExpr", "selection", 
+      "ifStatement", "elseStatement", "patterMatching", "pattern", "loopStatement", 
+      "range", "controlFlowStatement"
     },
     std::vector<std::string>{
       "", "'=='", "'>='", "'<='", "'('", "')'", "'{'", "'}'", "'['", "']'", 
@@ -80,133 +80,136 @@ void logosParserInitialize() {
     }
   );
   static const int32_t serializedATNSegment[] = {
-  	4,1,51,380,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
+  	4,1,51,390,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
   	7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,2,14,7,
   	14,2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,7,20,2,21,7,
   	21,2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,26,2,27,7,27,2,28,7,
-  	28,2,29,7,29,2,30,7,30,2,31,7,31,2,32,7,32,2,33,7,33,2,34,7,34,1,0,3,
-  	0,72,8,0,1,0,1,0,1,0,3,0,77,8,0,1,1,1,1,3,1,81,8,1,1,1,4,1,84,8,1,11,
-  	1,12,1,85,1,1,1,1,1,2,1,2,3,2,92,8,2,1,2,5,2,95,8,2,10,2,12,2,98,9,2,
-  	1,2,4,2,101,8,2,11,2,12,2,102,1,2,5,2,106,8,2,10,2,12,2,109,9,2,1,2,1,
-  	2,1,3,1,3,3,3,115,8,3,1,3,5,3,118,8,3,10,3,12,3,121,9,3,1,3,5,3,124,8,
-  	3,10,3,12,3,127,9,3,1,3,1,3,1,4,1,4,1,4,5,4,134,8,4,10,4,12,4,137,9,4,
-  	1,4,1,4,1,5,1,5,1,5,1,5,1,6,1,6,1,6,1,6,1,7,1,7,1,7,1,7,1,8,1,8,1,8,3,
-  	8,156,8,8,1,8,1,8,1,8,1,8,1,9,1,9,1,9,1,10,1,10,1,11,1,11,1,11,5,11,170,
-  	8,11,10,11,12,11,173,9,11,1,11,1,11,1,12,1,12,1,12,5,12,180,8,12,10,12,
-  	12,12,183,9,12,1,12,1,12,1,13,1,13,1,13,5,13,190,8,13,10,13,12,13,193,
-  	9,13,1,14,1,14,1,14,1,14,1,14,3,14,200,8,14,1,14,3,14,203,8,14,1,15,1,
-  	15,1,15,3,15,208,8,15,1,16,1,16,3,16,212,8,16,1,16,1,16,1,17,1,17,1,17,
-  	5,17,219,8,17,10,17,12,17,222,9,17,1,18,1,18,1,18,1,18,1,18,1,18,1,18,
-  	3,18,231,8,18,1,19,1,19,1,19,1,19,5,19,237,8,19,10,19,12,19,240,9,19,
-  	1,19,1,19,1,20,1,20,1,20,3,20,247,8,20,1,21,1,21,5,21,251,8,21,10,21,
-  	12,21,254,9,21,1,21,1,21,1,22,1,22,1,22,5,22,261,8,22,10,22,12,22,264,
-  	9,22,1,23,1,23,1,23,1,23,3,23,270,8,23,1,24,1,24,1,24,1,24,1,24,1,24,
-  	1,24,1,24,3,24,280,8,24,1,25,1,25,1,25,1,25,1,26,1,26,1,26,1,26,1,26,
-  	1,26,1,26,3,26,293,8,26,1,27,1,27,1,27,5,27,298,8,27,10,27,12,27,301,
-  	9,27,1,28,1,28,1,28,1,28,1,28,1,28,3,28,309,8,28,1,29,1,29,1,29,1,29,
-  	5,29,315,8,29,10,29,12,29,318,9,29,1,29,1,29,3,29,322,8,29,1,30,1,30,
-  	3,30,326,8,30,1,30,1,30,5,30,330,8,30,10,30,12,30,333,9,30,1,30,1,30,
-  	1,30,3,30,338,8,30,1,30,1,30,1,31,1,31,1,31,1,31,1,32,1,32,3,32,348,8,
-  	32,1,32,1,32,1,32,1,32,1,32,1,32,1,32,1,32,1,32,1,32,1,32,1,32,1,32,3,
-  	32,363,8,32,1,33,3,33,366,8,33,1,33,1,33,1,33,1,34,1,34,1,34,1,34,1,34,
-  	1,34,1,34,3,34,378,8,34,1,34,0,0,35,0,2,4,6,8,10,12,14,16,18,20,22,24,
-  	26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,0,3,
-  	1,0,19,20,1,0,17,18,2,0,1,3,8,9,401,0,71,1,0,0,0,2,80,1,0,0,0,4,89,1,
-  	0,0,0,6,112,1,0,0,0,8,130,1,0,0,0,10,140,1,0,0,0,12,144,1,0,0,0,14,148,
-  	1,0,0,0,16,152,1,0,0,0,18,161,1,0,0,0,20,164,1,0,0,0,22,166,1,0,0,0,24,
-  	176,1,0,0,0,26,186,1,0,0,0,28,202,1,0,0,0,30,204,1,0,0,0,32,211,1,0,0,
-  	0,34,215,1,0,0,0,36,230,1,0,0,0,38,232,1,0,0,0,40,243,1,0,0,0,42,248,
-  	1,0,0,0,44,257,1,0,0,0,46,269,1,0,0,0,48,279,1,0,0,0,50,281,1,0,0,0,52,
-  	292,1,0,0,0,54,294,1,0,0,0,56,308,1,0,0,0,58,316,1,0,0,0,60,323,1,0,0,
-  	0,62,341,1,0,0,0,64,362,1,0,0,0,66,365,1,0,0,0,68,377,1,0,0,0,70,72,3,
-  	8,4,0,71,70,1,0,0,0,71,72,1,0,0,0,72,76,1,0,0,0,73,77,3,2,1,0,74,77,3,
-  	6,3,0,75,77,3,4,2,0,76,73,1,0,0,0,76,74,1,0,0,0,76,75,1,0,0,0,77,1,1,
-  	0,0,0,78,81,3,28,14,0,79,81,3,30,15,0,80,78,1,0,0,0,80,79,1,0,0,0,80,
-  	81,1,0,0,0,81,83,1,0,0,0,82,84,3,18,9,0,83,82,1,0,0,0,84,85,1,0,0,0,85,
-  	83,1,0,0,0,85,86,1,0,0,0,86,87,1,0,0,0,87,88,5,0,0,1,88,3,1,0,0,0,89,
-  	91,3,12,6,0,90,92,3,14,7,0,91,90,1,0,0,0,91,92,1,0,0,0,92,96,1,0,0,0,
-  	93,95,3,28,14,0,94,93,1,0,0,0,95,98,1,0,0,0,96,94,1,0,0,0,96,97,1,0,0,
-  	0,97,100,1,0,0,0,98,96,1,0,0,0,99,101,3,16,8,0,100,99,1,0,0,0,101,102,
-  	1,0,0,0,102,100,1,0,0,0,102,103,1,0,0,0,103,107,1,0,0,0,104,106,3,18,
-  	9,0,105,104,1,0,0,0,106,109,1,0,0,0,107,105,1,0,0,0,107,108,1,0,0,0,108,
-  	110,1,0,0,0,109,107,1,0,0,0,110,111,5,0,0,1,111,5,1,0,0,0,112,114,3,10,
-  	5,0,113,115,3,14,7,0,114,113,1,0,0,0,114,115,1,0,0,0,115,119,1,0,0,0,
-  	116,118,3,28,14,0,117,116,1,0,0,0,118,121,1,0,0,0,119,117,1,0,0,0,119,
-  	120,1,0,0,0,120,125,1,0,0,0,121,119,1,0,0,0,122,124,3,18,9,0,123,122,
-  	1,0,0,0,124,127,1,0,0,0,125,123,1,0,0,0,125,126,1,0,0,0,126,128,1,0,0,
-  	0,127,125,1,0,0,0,128,129,5,0,0,1,129,7,1,0,0,0,130,131,5,31,0,0,131,
-  	135,5,4,0,0,132,134,3,46,23,0,133,132,1,0,0,0,134,137,1,0,0,0,135,133,
-  	1,0,0,0,135,136,1,0,0,0,136,138,1,0,0,0,137,135,1,0,0,0,138,139,5,5,0,
-  	0,139,9,1,0,0,0,140,141,5,27,0,0,141,142,5,15,0,0,142,143,5,46,0,0,143,
-  	11,1,0,0,0,144,145,5,28,0,0,145,146,5,15,0,0,146,147,5,46,0,0,147,13,
-  	1,0,0,0,148,149,5,30,0,0,149,150,5,15,0,0,150,151,5,46,0,0,151,15,1,0,
-  	0,0,152,153,5,47,0,0,153,155,5,4,0,0,154,156,3,26,13,0,155,154,1,0,0,
-  	0,155,156,1,0,0,0,156,157,1,0,0,0,157,158,5,5,0,0,158,159,5,15,0,0,159,
-  	160,5,46,0,0,160,17,1,0,0,0,161,162,3,16,8,0,162,163,3,20,10,0,163,19,
-  	1,0,0,0,164,165,3,42,21,0,165,21,1,0,0,0,166,167,5,47,0,0,167,171,5,4,
-  	0,0,168,170,3,34,17,0,169,168,1,0,0,0,170,173,1,0,0,0,171,169,1,0,0,0,
-  	171,172,1,0,0,0,172,174,1,0,0,0,173,171,1,0,0,0,174,175,5,5,0,0,175,23,
-  	1,0,0,0,176,177,5,46,0,0,177,181,5,4,0,0,178,180,3,34,17,0,179,178,1,
-  	0,0,0,180,183,1,0,0,0,181,179,1,0,0,0,181,182,1,0,0,0,182,184,1,0,0,0,
-  	183,181,1,0,0,0,184,185,5,5,0,0,185,25,1,0,0,0,186,191,3,28,14,0,187,
-  	188,5,12,0,0,188,190,3,28,14,0,189,187,1,0,0,0,190,193,1,0,0,0,191,189,
-  	1,0,0,0,191,192,1,0,0,0,192,27,1,0,0,0,193,191,1,0,0,0,194,195,5,47,0,
-  	0,195,196,5,15,0,0,196,199,5,46,0,0,197,198,5,16,0,0,198,200,3,46,23,
-  	0,199,197,1,0,0,0,199,200,1,0,0,0,200,203,1,0,0,0,201,203,3,38,19,0,202,
-  	194,1,0,0,0,202,201,1,0,0,0,203,29,1,0,0,0,204,207,5,47,0,0,205,206,5,
-  	16,0,0,206,208,3,46,23,0,207,205,1,0,0,0,207,208,1,0,0,0,208,31,1,0,0,
-  	0,209,210,5,47,0,0,210,212,5,16,0,0,211,209,1,0,0,0,211,212,1,0,0,0,212,
-  	213,1,0,0,0,213,214,3,46,23,0,214,33,1,0,0,0,215,220,3,32,16,0,216,217,
-  	5,12,0,0,217,219,3,32,16,0,218,216,1,0,0,0,219,222,1,0,0,0,220,218,1,
-  	0,0,0,220,221,1,0,0,0,221,35,1,0,0,0,222,220,1,0,0,0,223,231,3,28,14,
-  	0,224,231,3,30,15,0,225,231,3,56,28,0,226,231,3,64,32,0,227,231,3,68,
-  	34,0,228,231,3,38,19,0,229,231,3,46,23,0,230,223,1,0,0,0,230,224,1,0,
-  	0,0,230,225,1,0,0,0,230,226,1,0,0,0,230,227,1,0,0,0,230,228,1,0,0,0,230,
-  	229,1,0,0,0,231,37,1,0,0,0,232,233,5,29,0,0,233,234,5,46,0,0,234,238,
-  	5,6,0,0,235,237,3,40,20,0,236,235,1,0,0,0,237,240,1,0,0,0,238,236,1,0,
-  	0,0,238,239,1,0,0,0,239,241,1,0,0,0,240,238,1,0,0,0,241,242,5,7,0,0,242,
-  	39,1,0,0,0,243,246,5,45,0,0,244,245,5,16,0,0,245,247,5,48,0,0,246,244,
-  	1,0,0,0,246,247,1,0,0,0,247,41,1,0,0,0,248,252,5,6,0,0,249,251,3,36,18,
-  	0,250,249,1,0,0,0,251,254,1,0,0,0,252,250,1,0,0,0,252,253,1,0,0,0,253,
-  	255,1,0,0,0,254,252,1,0,0,0,255,256,5,7,0,0,256,43,1,0,0,0,257,262,3,
-  	46,23,0,258,259,5,12,0,0,259,261,3,46,23,0,260,258,1,0,0,0,261,264,1,
-  	0,0,0,262,260,1,0,0,0,262,263,1,0,0,0,263,45,1,0,0,0,264,262,1,0,0,0,
-  	265,270,3,48,24,0,266,270,3,52,26,0,267,270,3,50,25,0,268,270,3,54,27,
-  	0,269,265,1,0,0,0,269,266,1,0,0,0,269,267,1,0,0,0,269,268,1,0,0,0,270,
-  	47,1,0,0,0,271,272,3,52,26,0,272,273,7,0,0,0,273,274,3,46,23,0,274,280,
-  	1,0,0,0,275,276,3,52,26,0,276,277,7,1,0,0,277,278,3,46,23,0,278,280,1,
-  	0,0,0,279,271,1,0,0,0,279,275,1,0,0,0,280,49,1,0,0,0,281,282,3,52,26,
-  	0,282,283,7,2,0,0,283,284,3,46,23,0,284,51,1,0,0,0,285,293,3,22,11,0,
-  	286,293,3,24,12,0,287,293,5,42,0,0,288,293,5,43,0,0,289,293,5,44,0,0,
-  	290,293,5,48,0,0,291,293,5,47,0,0,292,285,1,0,0,0,292,286,1,0,0,0,292,
-  	287,1,0,0,0,292,288,1,0,0,0,292,289,1,0,0,0,292,290,1,0,0,0,292,291,1,
-  	0,0,0,293,53,1,0,0,0,294,299,3,52,26,0,295,296,5,14,0,0,296,298,3,52,
-  	26,0,297,295,1,0,0,0,298,301,1,0,0,0,299,297,1,0,0,0,299,300,1,0,0,0,
-  	300,55,1,0,0,0,301,299,1,0,0,0,302,303,5,32,0,0,303,304,3,46,23,0,304,
-  	305,3,42,21,0,305,306,3,58,29,0,306,309,1,0,0,0,307,309,3,60,30,0,308,
-  	302,1,0,0,0,308,307,1,0,0,0,309,57,1,0,0,0,310,311,5,33,0,0,311,312,3,
-  	46,23,0,312,313,3,42,21,0,313,315,1,0,0,0,314,310,1,0,0,0,315,318,1,0,
-  	0,0,316,314,1,0,0,0,316,317,1,0,0,0,317,321,1,0,0,0,318,316,1,0,0,0,319,
-  	320,5,33,0,0,320,322,3,42,21,0,321,319,1,0,0,0,321,322,1,0,0,0,322,59,
-  	1,0,0,0,323,325,5,32,0,0,324,326,3,46,23,0,325,324,1,0,0,0,325,326,1,
-  	0,0,0,326,327,1,0,0,0,327,331,5,6,0,0,328,330,3,62,31,0,329,328,1,0,0,
-  	0,330,333,1,0,0,0,331,329,1,0,0,0,331,332,1,0,0,0,332,337,1,0,0,0,333,
-  	331,1,0,0,0,334,335,5,33,0,0,335,336,5,15,0,0,336,338,3,42,21,0,337,334,
-  	1,0,0,0,337,338,1,0,0,0,338,339,1,0,0,0,339,340,5,7,0,0,340,61,1,0,0,
-  	0,341,342,3,46,23,0,342,343,5,15,0,0,343,344,3,42,21,0,344,63,1,0,0,0,
-  	345,347,5,34,0,0,346,348,3,46,23,0,347,346,1,0,0,0,347,348,1,0,0,0,348,
-  	349,1,0,0,0,349,363,3,42,21,0,350,351,5,34,0,0,351,352,3,44,22,0,352,
-  	353,5,41,0,0,353,354,3,46,23,0,354,355,3,42,21,0,355,363,1,0,0,0,356,
-  	357,5,34,0,0,357,358,3,44,22,0,358,359,5,41,0,0,359,360,3,66,33,0,360,
-  	361,3,42,21,0,361,363,1,0,0,0,362,345,1,0,0,0,362,350,1,0,0,0,362,356,
-  	1,0,0,0,363,65,1,0,0,0,364,366,3,46,23,0,365,364,1,0,0,0,365,366,1,0,
-  	0,0,366,367,1,0,0,0,367,368,5,13,0,0,368,369,3,46,23,0,369,67,1,0,0,0,
-  	370,371,5,35,0,0,371,378,3,46,23,0,372,373,5,35,0,0,373,378,5,32,0,0,
-  	374,378,5,36,0,0,375,376,5,37,0,0,376,378,3,46,23,0,377,370,1,0,0,0,377,
-  	372,1,0,0,0,377,374,1,0,0,0,377,375,1,0,0,0,378,69,1,0,0,0,40,71,76,80,
-  	85,91,96,102,107,114,119,125,135,155,171,181,191,199,202,207,211,220,
-  	230,238,246,252,262,269,279,292,299,308,316,321,325,331,337,347,362,365,
-  	377
+  	28,2,29,7,29,2,30,7,30,2,31,7,31,2,32,7,32,2,33,7,33,2,34,7,34,2,35,7,
+  	35,1,0,3,0,74,8,0,1,0,1,0,1,0,3,0,79,8,0,1,1,1,1,3,1,83,8,1,1,1,4,1,86,
+  	8,1,11,1,12,1,87,1,1,1,1,1,2,1,2,3,2,94,8,2,1,2,5,2,97,8,2,10,2,12,2,
+  	100,9,2,1,2,4,2,103,8,2,11,2,12,2,104,1,2,5,2,108,8,2,10,2,12,2,111,9,
+  	2,1,2,1,2,1,3,1,3,3,3,117,8,3,1,3,5,3,120,8,3,10,3,12,3,123,9,3,1,3,5,
+  	3,126,8,3,10,3,12,3,129,9,3,1,3,1,3,1,4,1,4,1,4,5,4,136,8,4,10,4,12,4,
+  	139,9,4,1,4,1,4,1,5,1,5,1,5,5,5,146,8,5,10,5,12,5,149,9,5,1,6,1,6,1,6,
+  	1,6,1,7,1,7,1,7,1,7,1,8,1,8,1,8,1,8,1,9,1,9,1,9,3,9,166,8,9,1,9,1,9,1,
+  	9,1,9,1,10,1,10,1,10,1,11,1,11,1,12,1,12,1,12,5,12,180,8,12,10,12,12,
+  	12,183,9,12,1,12,1,12,1,13,1,13,1,13,5,13,190,8,13,10,13,12,13,193,9,
+  	13,1,13,1,13,1,14,1,14,1,14,5,14,200,8,14,10,14,12,14,203,9,14,1,15,1,
+  	15,1,15,1,15,1,15,3,15,210,8,15,1,15,3,15,213,8,15,1,16,1,16,1,16,3,16,
+  	218,8,16,1,17,1,17,3,17,222,8,17,1,17,1,17,1,18,1,18,1,18,5,18,229,8,
+  	18,10,18,12,18,232,9,18,1,19,1,19,1,19,1,19,1,19,1,19,1,19,3,19,241,8,
+  	19,1,20,1,20,1,20,1,20,5,20,247,8,20,10,20,12,20,250,9,20,1,20,1,20,1,
+  	21,1,21,1,21,3,21,257,8,21,1,22,1,22,5,22,261,8,22,10,22,12,22,264,9,
+  	22,1,22,1,22,1,23,1,23,1,23,5,23,271,8,23,10,23,12,23,274,9,23,1,24,1,
+  	24,1,24,1,24,3,24,280,8,24,1,25,1,25,1,25,1,25,1,25,1,25,1,25,1,25,3,
+  	25,290,8,25,1,26,1,26,1,26,1,26,1,27,1,27,1,27,1,27,1,27,1,27,1,27,3,
+  	27,303,8,27,1,28,1,28,1,28,5,28,308,8,28,10,28,12,28,311,9,28,1,29,1,
+  	29,1,29,1,29,1,29,1,29,3,29,319,8,29,1,30,1,30,1,30,1,30,5,30,325,8,30,
+  	10,30,12,30,328,9,30,1,30,1,30,3,30,332,8,30,1,31,1,31,3,31,336,8,31,
+  	1,31,1,31,5,31,340,8,31,10,31,12,31,343,9,31,1,31,1,31,1,31,3,31,348,
+  	8,31,1,31,1,31,1,32,1,32,1,32,1,32,1,33,1,33,3,33,358,8,33,1,33,1,33,
+  	1,33,1,33,1,33,1,33,1,33,1,33,1,33,1,33,1,33,1,33,1,33,3,33,373,8,33,
+  	1,34,3,34,376,8,34,1,34,1,34,1,34,1,35,1,35,1,35,1,35,1,35,1,35,1,35,
+  	3,35,388,8,35,1,35,0,0,36,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,
+  	32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,0,3,1,0,19,
+  	20,1,0,17,18,2,0,1,3,8,9,411,0,73,1,0,0,0,2,82,1,0,0,0,4,91,1,0,0,0,6,
+  	114,1,0,0,0,8,132,1,0,0,0,10,142,1,0,0,0,12,150,1,0,0,0,14,154,1,0,0,
+  	0,16,158,1,0,0,0,18,162,1,0,0,0,20,171,1,0,0,0,22,174,1,0,0,0,24,176,
+  	1,0,0,0,26,186,1,0,0,0,28,196,1,0,0,0,30,212,1,0,0,0,32,214,1,0,0,0,34,
+  	221,1,0,0,0,36,225,1,0,0,0,38,240,1,0,0,0,40,242,1,0,0,0,42,253,1,0,0,
+  	0,44,258,1,0,0,0,46,267,1,0,0,0,48,279,1,0,0,0,50,289,1,0,0,0,52,291,
+  	1,0,0,0,54,302,1,0,0,0,56,304,1,0,0,0,58,318,1,0,0,0,60,326,1,0,0,0,62,
+  	333,1,0,0,0,64,351,1,0,0,0,66,372,1,0,0,0,68,375,1,0,0,0,70,387,1,0,0,
+  	0,72,74,3,8,4,0,73,72,1,0,0,0,73,74,1,0,0,0,74,78,1,0,0,0,75,79,3,2,1,
+  	0,76,79,3,6,3,0,77,79,3,4,2,0,78,75,1,0,0,0,78,76,1,0,0,0,78,77,1,0,0,
+  	0,79,1,1,0,0,0,80,83,3,30,15,0,81,83,3,32,16,0,82,80,1,0,0,0,82,81,1,
+  	0,0,0,82,83,1,0,0,0,83,85,1,0,0,0,84,86,3,20,10,0,85,84,1,0,0,0,86,87,
+  	1,0,0,0,87,85,1,0,0,0,87,88,1,0,0,0,88,89,1,0,0,0,89,90,5,0,0,1,90,3,
+  	1,0,0,0,91,93,3,14,7,0,92,94,3,16,8,0,93,92,1,0,0,0,93,94,1,0,0,0,94,
+  	98,1,0,0,0,95,97,3,30,15,0,96,95,1,0,0,0,97,100,1,0,0,0,98,96,1,0,0,0,
+  	98,99,1,0,0,0,99,102,1,0,0,0,100,98,1,0,0,0,101,103,3,18,9,0,102,101,
+  	1,0,0,0,103,104,1,0,0,0,104,102,1,0,0,0,104,105,1,0,0,0,105,109,1,0,0,
+  	0,106,108,3,20,10,0,107,106,1,0,0,0,108,111,1,0,0,0,109,107,1,0,0,0,109,
+  	110,1,0,0,0,110,112,1,0,0,0,111,109,1,0,0,0,112,113,5,0,0,1,113,5,1,0,
+  	0,0,114,116,3,12,6,0,115,117,3,16,8,0,116,115,1,0,0,0,116,117,1,0,0,0,
+  	117,121,1,0,0,0,118,120,3,30,15,0,119,118,1,0,0,0,120,123,1,0,0,0,121,
+  	119,1,0,0,0,121,122,1,0,0,0,122,127,1,0,0,0,123,121,1,0,0,0,124,126,3,
+  	20,10,0,125,124,1,0,0,0,126,129,1,0,0,0,127,125,1,0,0,0,127,128,1,0,0,
+  	0,128,130,1,0,0,0,129,127,1,0,0,0,130,131,5,0,0,1,131,7,1,0,0,0,132,133,
+  	5,31,0,0,133,137,5,4,0,0,134,136,3,10,5,0,135,134,1,0,0,0,136,139,1,0,
+  	0,0,137,135,1,0,0,0,137,138,1,0,0,0,138,140,1,0,0,0,139,137,1,0,0,0,140,
+  	141,5,5,0,0,141,9,1,0,0,0,142,147,5,46,0,0,143,144,5,14,0,0,144,146,5,
+  	46,0,0,145,143,1,0,0,0,146,149,1,0,0,0,147,145,1,0,0,0,147,148,1,0,0,
+  	0,148,11,1,0,0,0,149,147,1,0,0,0,150,151,5,27,0,0,151,152,5,15,0,0,152,
+  	153,5,46,0,0,153,13,1,0,0,0,154,155,5,28,0,0,155,156,5,15,0,0,156,157,
+  	5,46,0,0,157,15,1,0,0,0,158,159,5,30,0,0,159,160,5,15,0,0,160,161,5,46,
+  	0,0,161,17,1,0,0,0,162,163,5,47,0,0,163,165,5,4,0,0,164,166,3,28,14,0,
+  	165,164,1,0,0,0,165,166,1,0,0,0,166,167,1,0,0,0,167,168,5,5,0,0,168,169,
+  	5,15,0,0,169,170,5,46,0,0,170,19,1,0,0,0,171,172,3,18,9,0,172,173,3,22,
+  	11,0,173,21,1,0,0,0,174,175,3,44,22,0,175,23,1,0,0,0,176,177,5,47,0,0,
+  	177,181,5,4,0,0,178,180,3,36,18,0,179,178,1,0,0,0,180,183,1,0,0,0,181,
+  	179,1,0,0,0,181,182,1,0,0,0,182,184,1,0,0,0,183,181,1,0,0,0,184,185,5,
+  	5,0,0,185,25,1,0,0,0,186,187,5,46,0,0,187,191,5,4,0,0,188,190,3,36,18,
+  	0,189,188,1,0,0,0,190,193,1,0,0,0,191,189,1,0,0,0,191,192,1,0,0,0,192,
+  	194,1,0,0,0,193,191,1,0,0,0,194,195,5,5,0,0,195,27,1,0,0,0,196,201,3,
+  	30,15,0,197,198,5,12,0,0,198,200,3,30,15,0,199,197,1,0,0,0,200,203,1,
+  	0,0,0,201,199,1,0,0,0,201,202,1,0,0,0,202,29,1,0,0,0,203,201,1,0,0,0,
+  	204,205,5,47,0,0,205,206,5,15,0,0,206,209,5,46,0,0,207,208,5,16,0,0,208,
+  	210,3,48,24,0,209,207,1,0,0,0,209,210,1,0,0,0,210,213,1,0,0,0,211,213,
+  	3,40,20,0,212,204,1,0,0,0,212,211,1,0,0,0,213,31,1,0,0,0,214,217,5,47,
+  	0,0,215,216,5,16,0,0,216,218,3,48,24,0,217,215,1,0,0,0,217,218,1,0,0,
+  	0,218,33,1,0,0,0,219,220,5,47,0,0,220,222,5,16,0,0,221,219,1,0,0,0,221,
+  	222,1,0,0,0,222,223,1,0,0,0,223,224,3,48,24,0,224,35,1,0,0,0,225,230,
+  	3,34,17,0,226,227,5,12,0,0,227,229,3,34,17,0,228,226,1,0,0,0,229,232,
+  	1,0,0,0,230,228,1,0,0,0,230,231,1,0,0,0,231,37,1,0,0,0,232,230,1,0,0,
+  	0,233,241,3,30,15,0,234,241,3,32,16,0,235,241,3,58,29,0,236,241,3,66,
+  	33,0,237,241,3,70,35,0,238,241,3,40,20,0,239,241,3,48,24,0,240,233,1,
+  	0,0,0,240,234,1,0,0,0,240,235,1,0,0,0,240,236,1,0,0,0,240,237,1,0,0,0,
+  	240,238,1,0,0,0,240,239,1,0,0,0,241,39,1,0,0,0,242,243,5,29,0,0,243,244,
+  	5,46,0,0,244,248,5,6,0,0,245,247,3,42,21,0,246,245,1,0,0,0,247,250,1,
+  	0,0,0,248,246,1,0,0,0,248,249,1,0,0,0,249,251,1,0,0,0,250,248,1,0,0,0,
+  	251,252,5,7,0,0,252,41,1,0,0,0,253,256,5,45,0,0,254,255,5,16,0,0,255,
+  	257,5,48,0,0,256,254,1,0,0,0,256,257,1,0,0,0,257,43,1,0,0,0,258,262,5,
+  	6,0,0,259,261,3,38,19,0,260,259,1,0,0,0,261,264,1,0,0,0,262,260,1,0,0,
+  	0,262,263,1,0,0,0,263,265,1,0,0,0,264,262,1,0,0,0,265,266,5,7,0,0,266,
+  	45,1,0,0,0,267,272,3,48,24,0,268,269,5,12,0,0,269,271,3,48,24,0,270,268,
+  	1,0,0,0,271,274,1,0,0,0,272,270,1,0,0,0,272,273,1,0,0,0,273,47,1,0,0,
+  	0,274,272,1,0,0,0,275,280,3,50,25,0,276,280,3,54,27,0,277,280,3,52,26,
+  	0,278,280,3,56,28,0,279,275,1,0,0,0,279,276,1,0,0,0,279,277,1,0,0,0,279,
+  	278,1,0,0,0,280,49,1,0,0,0,281,282,3,54,27,0,282,283,7,0,0,0,283,284,
+  	3,48,24,0,284,290,1,0,0,0,285,286,3,54,27,0,286,287,7,1,0,0,287,288,3,
+  	48,24,0,288,290,1,0,0,0,289,281,1,0,0,0,289,285,1,0,0,0,290,51,1,0,0,
+  	0,291,292,3,54,27,0,292,293,7,2,0,0,293,294,3,48,24,0,294,53,1,0,0,0,
+  	295,303,3,24,12,0,296,303,3,26,13,0,297,303,5,42,0,0,298,303,5,43,0,0,
+  	299,303,5,44,0,0,300,303,5,48,0,0,301,303,5,47,0,0,302,295,1,0,0,0,302,
+  	296,1,0,0,0,302,297,1,0,0,0,302,298,1,0,0,0,302,299,1,0,0,0,302,300,1,
+  	0,0,0,302,301,1,0,0,0,303,55,1,0,0,0,304,309,3,54,27,0,305,306,5,14,0,
+  	0,306,308,3,54,27,0,307,305,1,0,0,0,308,311,1,0,0,0,309,307,1,0,0,0,309,
+  	310,1,0,0,0,310,57,1,0,0,0,311,309,1,0,0,0,312,313,5,32,0,0,313,314,3,
+  	48,24,0,314,315,3,44,22,0,315,316,3,60,30,0,316,319,1,0,0,0,317,319,3,
+  	62,31,0,318,312,1,0,0,0,318,317,1,0,0,0,319,59,1,0,0,0,320,321,5,33,0,
+  	0,321,322,3,48,24,0,322,323,3,44,22,0,323,325,1,0,0,0,324,320,1,0,0,0,
+  	325,328,1,0,0,0,326,324,1,0,0,0,326,327,1,0,0,0,327,331,1,0,0,0,328,326,
+  	1,0,0,0,329,330,5,33,0,0,330,332,3,44,22,0,331,329,1,0,0,0,331,332,1,
+  	0,0,0,332,61,1,0,0,0,333,335,5,32,0,0,334,336,3,48,24,0,335,334,1,0,0,
+  	0,335,336,1,0,0,0,336,337,1,0,0,0,337,341,5,6,0,0,338,340,3,64,32,0,339,
+  	338,1,0,0,0,340,343,1,0,0,0,341,339,1,0,0,0,341,342,1,0,0,0,342,347,1,
+  	0,0,0,343,341,1,0,0,0,344,345,5,33,0,0,345,346,5,15,0,0,346,348,3,44,
+  	22,0,347,344,1,0,0,0,347,348,1,0,0,0,348,349,1,0,0,0,349,350,5,7,0,0,
+  	350,63,1,0,0,0,351,352,3,48,24,0,352,353,5,15,0,0,353,354,3,44,22,0,354,
+  	65,1,0,0,0,355,357,5,34,0,0,356,358,3,48,24,0,357,356,1,0,0,0,357,358,
+  	1,0,0,0,358,359,1,0,0,0,359,373,3,44,22,0,360,361,5,34,0,0,361,362,3,
+  	46,23,0,362,363,5,41,0,0,363,364,3,48,24,0,364,365,3,44,22,0,365,373,
+  	1,0,0,0,366,367,5,34,0,0,367,368,3,46,23,0,368,369,5,41,0,0,369,370,3,
+  	68,34,0,370,371,3,44,22,0,371,373,1,0,0,0,372,355,1,0,0,0,372,360,1,0,
+  	0,0,372,366,1,0,0,0,373,67,1,0,0,0,374,376,3,48,24,0,375,374,1,0,0,0,
+  	375,376,1,0,0,0,376,377,1,0,0,0,377,378,5,13,0,0,378,379,3,48,24,0,379,
+  	69,1,0,0,0,380,381,5,35,0,0,381,388,3,48,24,0,382,383,5,35,0,0,383,388,
+  	5,32,0,0,384,388,5,36,0,0,385,386,5,37,0,0,386,388,3,48,24,0,387,380,
+  	1,0,0,0,387,382,1,0,0,0,387,384,1,0,0,0,387,385,1,0,0,0,388,71,1,0,0,
+  	0,41,73,78,82,87,93,98,104,109,116,121,127,137,147,165,181,191,201,209,
+  	212,217,221,230,240,248,256,262,272,279,289,302,309,318,326,331,335,341,
+  	347,357,372,375,387
   };
   staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
@@ -297,32 +300,32 @@ LogosParser::LogosFileContext* LogosParser::logosFile() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(71);
+    setState(73);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::IMPORT) {
-      setState(70);
+      setState(72);
       importStatement();
     }
-    setState(76);
+    setState(78);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
       case LogosParser::ENUM:
       case LogosParser::VARIABLE: {
-        setState(73);
+        setState(75);
         mainFile();
         break;
       }
 
       case LogosParser::OBJECT: {
-        setState(74);
+        setState(76);
         objectFile();
         break;
       }
 
       case LogosParser::INTERFACE: {
-        setState(75);
+        setState(77);
         interfaceFile();
         break;
       }
@@ -387,18 +390,18 @@ LogosParser::MainFileContext* LogosParser::mainFile() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(80);
+    setState(82);
     _errHandler->sync(this);
 
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 2, _ctx)) {
     case 1: {
-      setState(78);
+      setState(80);
       explicitVarDec();
       break;
     }
 
     case 2: {
-      setState(79);
+      setState(81);
       implicitVarDec();
       break;
     }
@@ -406,17 +409,17 @@ LogosParser::MainFileContext* LogosParser::mainFile() {
     default:
       break;
     }
-    setState(83); 
+    setState(85); 
     _errHandler->sync(this);
     _la = _input->LA(1);
     do {
-      setState(82);
+      setState(84);
       funcImplementation();
-      setState(85); 
+      setState(87); 
       _errHandler->sync(this);
       _la = _input->LA(1);
     } while (_la == LogosParser::VARIABLE);
-    setState(87);
+    setState(89);
     match(LogosParser::EOF);
    
   }
@@ -492,35 +495,35 @@ LogosParser::InterfaceFileContext* LogosParser::interfaceFile() {
   try {
     size_t alt;
     enterOuterAlt(_localctx, 1);
-    setState(89);
-    interfaceDeclaration();
     setState(91);
+    interfaceDeclaration();
+    setState(93);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::IMPLEMENTS) {
-      setState(90);
+      setState(92);
       objectImplements();
     }
-    setState(96);
+    setState(98);
     _errHandler->sync(this);
     alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 5, _ctx);
     while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER) {
       if (alt == 1) {
-        setState(93);
+        setState(95);
         explicitVarDec(); 
       }
-      setState(98);
+      setState(100);
       _errHandler->sync(this);
       alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 5, _ctx);
     }
-    setState(100); 
+    setState(102); 
     _errHandler->sync(this);
     alt = 1;
     do {
       switch (alt) {
         case 1: {
-              setState(99);
+              setState(101);
               funcDec();
               break;
             }
@@ -528,21 +531,21 @@ LogosParser::InterfaceFileContext* LogosParser::interfaceFile() {
       default:
         throw NoViableAltException(this);
       }
-      setState(102); 
+      setState(104); 
       _errHandler->sync(this);
       alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 6, _ctx);
     } while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER);
-    setState(107);
+    setState(109);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while (_la == LogosParser::VARIABLE) {
-      setState(104);
+      setState(106);
       funcImplementation();
-      setState(109);
+      setState(111);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(110);
+    setState(112);
     match(LogosParser::EOF);
    
   }
@@ -610,39 +613,39 @@ LogosParser::ObjectFileContext* LogosParser::objectFile() {
   try {
     size_t alt;
     enterOuterAlt(_localctx, 1);
-    setState(112);
-    objectDeclaration();
     setState(114);
+    objectDeclaration();
+    setState(116);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::IMPLEMENTS) {
-      setState(113);
+      setState(115);
       objectImplements();
     }
-    setState(119);
+    setState(121);
     _errHandler->sync(this);
     alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 9, _ctx);
     while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER) {
       if (alt == 1) {
-        setState(116);
+        setState(118);
         explicitVarDec(); 
       }
-      setState(121);
+      setState(123);
       _errHandler->sync(this);
       alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 9, _ctx);
     }
-    setState(125);
+    setState(127);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while (_la == LogosParser::VARIABLE) {
-      setState(122);
+      setState(124);
       funcImplementation();
-      setState(127);
+      setState(129);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(128);
+    setState(130);
     match(LogosParser::EOF);
    
   }
@@ -673,12 +676,12 @@ tree::TerminalNode* LogosParser::ImportStatementContext::RIGHT_PAREN() {
   return getToken(LogosParser::RIGHT_PAREN, 0);
 }
 
-std::vector<LogosParser::ExprContext *> LogosParser::ImportStatementContext::expr() {
-  return getRuleContexts<LogosParser::ExprContext>();
+std::vector<LogosParser::ImportPathContext *> LogosParser::ImportStatementContext::importPath() {
+  return getRuleContexts<LogosParser::ImportPathContext>();
 }
 
-LogosParser::ExprContext* LogosParser::ImportStatementContext::expr(size_t i) {
-  return getRuleContext<LogosParser::ExprContext>(i);
+LogosParser::ImportPathContext* LogosParser::ImportStatementContext::importPath(size_t i) {
+  return getRuleContext<LogosParser::ImportPathContext>(i);
 }
 
 
@@ -701,23 +704,89 @@ LogosParser::ImportStatementContext* LogosParser::importStatement() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(130);
+    setState(132);
     match(LogosParser::IMPORT);
-    setState(131);
+    setState(133);
     match(LogosParser::LEFT_PAREN);
-    setState(135);
+    setState(137);
     _errHandler->sync(this);
     _la = _input->LA(1);
-    while ((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & 523367534821376) != 0)) {
-      setState(132);
-      expr();
-      setState(137);
+    while (_la == LogosParser::TYPE) {
+      setState(134);
+      importPath();
+      setState(139);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(138);
+    setState(140);
     match(LogosParser::RIGHT_PAREN);
+   
+  }
+  catch (RecognitionException &e) {
+    _errHandler->reportError(this, e);
+    _localctx->exception = std::current_exception();
+    _errHandler->recover(this, _localctx->exception);
+  }
+
+  return _localctx;
+}
+
+//----------------- ImportPathContext ------------------------------------------------------------------
+
+LogosParser::ImportPathContext::ImportPathContext(ParserRuleContext *parent, size_t invokingState)
+  : ParserRuleContext(parent, invokingState) {
+}
+
+std::vector<tree::TerminalNode *> LogosParser::ImportPathContext::TYPE() {
+  return getTokens(LogosParser::TYPE);
+}
+
+tree::TerminalNode* LogosParser::ImportPathContext::TYPE(size_t i) {
+  return getToken(LogosParser::TYPE, i);
+}
+
+std::vector<tree::TerminalNode *> LogosParser::ImportPathContext::DOT() {
+  return getTokens(LogosParser::DOT);
+}
+
+tree::TerminalNode* LogosParser::ImportPathContext::DOT(size_t i) {
+  return getToken(LogosParser::DOT, i);
+}
+
+
+size_t LogosParser::ImportPathContext::getRuleIndex() const {
+  return LogosParser::RuleImportPath;
+}
+
+
+LogosParser::ImportPathContext* LogosParser::importPath() {
+  ImportPathContext *_localctx = _tracker.createInstance<ImportPathContext>(_ctx, getState());
+  enterRule(_localctx, 10, LogosParser::RuleImportPath);
+  size_t _la = 0;
+
+#if __cplusplus > 201703L
+  auto onExit = finally([=, this] {
+#else
+  auto onExit = finally([=] {
+#endif
+    exitRule();
+  });
+  try {
+    enterOuterAlt(_localctx, 1);
+    setState(142);
+    match(LogosParser::TYPE);
+    setState(147);
+    _errHandler->sync(this);
+    _la = _input->LA(1);
+    while (_la == LogosParser::DOT) {
+      setState(143);
+      match(LogosParser::DOT);
+      setState(144);
+      match(LogosParser::TYPE);
+      setState(149);
+      _errHandler->sync(this);
+      _la = _input->LA(1);
+    }
    
   }
   catch (RecognitionException &e) {
@@ -755,7 +824,7 @@ size_t LogosParser::ObjectDeclarationContext::getRuleIndex() const {
 
 LogosParser::ObjectDeclarationContext* LogosParser::objectDeclaration() {
   ObjectDeclarationContext *_localctx = _tracker.createInstance<ObjectDeclarationContext>(_ctx, getState());
-  enterRule(_localctx, 10, LogosParser::RuleObjectDeclaration);
+  enterRule(_localctx, 12, LogosParser::RuleObjectDeclaration);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -766,11 +835,11 @@ LogosParser::ObjectDeclarationContext* LogosParser::objectDeclaration() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(140);
+    setState(150);
     match(LogosParser::OBJECT);
-    setState(141);
+    setState(151);
     match(LogosParser::COLON);
-    setState(142);
+    setState(152);
     match(LogosParser::TYPE);
    
   }
@@ -809,7 +878,7 @@ size_t LogosParser::InterfaceDeclarationContext::getRuleIndex() const {
 
 LogosParser::InterfaceDeclarationContext* LogosParser::interfaceDeclaration() {
   InterfaceDeclarationContext *_localctx = _tracker.createInstance<InterfaceDeclarationContext>(_ctx, getState());
-  enterRule(_localctx, 12, LogosParser::RuleInterfaceDeclaration);
+  enterRule(_localctx, 14, LogosParser::RuleInterfaceDeclaration);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -820,11 +889,11 @@ LogosParser::InterfaceDeclarationContext* LogosParser::interfaceDeclaration() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(144);
+    setState(154);
     match(LogosParser::INTERFACE);
-    setState(145);
+    setState(155);
     match(LogosParser::COLON);
-    setState(146);
+    setState(156);
     match(LogosParser::TYPE);
    
   }
@@ -863,7 +932,7 @@ size_t LogosParser::ObjectImplementsContext::getRuleIndex() const {
 
 LogosParser::ObjectImplementsContext* LogosParser::objectImplements() {
   ObjectImplementsContext *_localctx = _tracker.createInstance<ObjectImplementsContext>(_ctx, getState());
-  enterRule(_localctx, 14, LogosParser::RuleObjectImplements);
+  enterRule(_localctx, 16, LogosParser::RuleObjectImplements);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -874,11 +943,11 @@ LogosParser::ObjectImplementsContext* LogosParser::objectImplements() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(148);
+    setState(158);
     match(LogosParser::IMPLEMENTS);
-    setState(149);
+    setState(159);
     match(LogosParser::COLON);
-    setState(150);
+    setState(160);
     match(LogosParser::TYPE);
    
   }
@@ -929,7 +998,7 @@ size_t LogosParser::FuncDecContext::getRuleIndex() const {
 
 LogosParser::FuncDecContext* LogosParser::funcDec() {
   FuncDecContext *_localctx = _tracker.createInstance<FuncDecContext>(_ctx, getState());
-  enterRule(_localctx, 16, LogosParser::RuleFuncDec);
+  enterRule(_localctx, 18, LogosParser::RuleFuncDec);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -941,25 +1010,25 @@ LogosParser::FuncDecContext* LogosParser::funcDec() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(152);
+    setState(162);
     match(LogosParser::VARIABLE);
-    setState(153);
+    setState(163);
     match(LogosParser::LEFT_PAREN);
-    setState(155);
+    setState(165);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::ENUM
 
     || _la == LogosParser::VARIABLE) {
-      setState(154);
+      setState(164);
       explicitVarDecList();
     }
-    setState(157);
+    setState(167);
     match(LogosParser::RIGHT_PAREN);
-    setState(158);
+    setState(168);
     match(LogosParser::COLON);
-    setState(159);
+    setState(169);
     match(LogosParser::TYPE);
    
   }
@@ -994,7 +1063,7 @@ size_t LogosParser::FuncImplementationContext::getRuleIndex() const {
 
 LogosParser::FuncImplementationContext* LogosParser::funcImplementation() {
   FuncImplementationContext *_localctx = _tracker.createInstance<FuncImplementationContext>(_ctx, getState());
-  enterRule(_localctx, 18, LogosParser::RuleFuncImplementation);
+  enterRule(_localctx, 20, LogosParser::RuleFuncImplementation);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1005,9 +1074,9 @@ LogosParser::FuncImplementationContext* LogosParser::funcImplementation() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(161);
+    setState(171);
     funcDec();
-    setState(162);
+    setState(172);
     funcBody();
    
   }
@@ -1038,7 +1107,7 @@ size_t LogosParser::FuncBodyContext::getRuleIndex() const {
 
 LogosParser::FuncBodyContext* LogosParser::funcBody() {
   FuncBodyContext *_localctx = _tracker.createInstance<FuncBodyContext>(_ctx, getState());
-  enterRule(_localctx, 20, LogosParser::RuleFuncBody);
+  enterRule(_localctx, 22, LogosParser::RuleFuncBody);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1049,7 +1118,7 @@ LogosParser::FuncBodyContext* LogosParser::funcBody() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(164);
+    setState(174);
     statementsBlock();
    
   }
@@ -1096,7 +1165,7 @@ size_t LogosParser::FuncCallContext::getRuleIndex() const {
 
 LogosParser::FuncCallContext* LogosParser::funcCall() {
   FuncCallContext *_localctx = _tracker.createInstance<FuncCallContext>(_ctx, getState());
-  enterRule(_localctx, 22, LogosParser::RuleFuncCall);
+  enterRule(_localctx, 24, LogosParser::RuleFuncCall);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1108,22 +1177,22 @@ LogosParser::FuncCallContext* LogosParser::funcCall() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(166);
+    setState(176);
     match(LogosParser::VARIABLE);
-    setState(167);
+    setState(177);
     match(LogosParser::LEFT_PAREN);
-    setState(171);
+    setState(181);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 523367534821376) != 0)) {
-      setState(168);
+      setState(178);
       paramCallList();
-      setState(173);
+      setState(183);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(174);
+    setState(184);
     match(LogosParser::RIGHT_PAREN);
    
   }
@@ -1170,7 +1239,7 @@ size_t LogosParser::ConstructorCallContext::getRuleIndex() const {
 
 LogosParser::ConstructorCallContext* LogosParser::constructorCall() {
   ConstructorCallContext *_localctx = _tracker.createInstance<ConstructorCallContext>(_ctx, getState());
-  enterRule(_localctx, 24, LogosParser::RuleConstructorCall);
+  enterRule(_localctx, 26, LogosParser::RuleConstructorCall);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1182,22 +1251,22 @@ LogosParser::ConstructorCallContext* LogosParser::constructorCall() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(176);
+    setState(186);
     match(LogosParser::TYPE);
-    setState(177);
+    setState(187);
     match(LogosParser::LEFT_PAREN);
-    setState(181);
+    setState(191);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 523367534821376) != 0)) {
-      setState(178);
+      setState(188);
       paramCallList();
-      setState(183);
+      setState(193);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(184);
+    setState(194);
     match(LogosParser::RIGHT_PAREN);
    
   }
@@ -1240,7 +1309,7 @@ size_t LogosParser::ExplicitVarDecListContext::getRuleIndex() const {
 
 LogosParser::ExplicitVarDecListContext* LogosParser::explicitVarDecList() {
   ExplicitVarDecListContext *_localctx = _tracker.createInstance<ExplicitVarDecListContext>(_ctx, getState());
-  enterRule(_localctx, 26, LogosParser::RuleExplicitVarDecList);
+  enterRule(_localctx, 28, LogosParser::RuleExplicitVarDecList);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1252,17 +1321,17 @@ LogosParser::ExplicitVarDecListContext* LogosParser::explicitVarDecList() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(186);
+    setState(196);
     explicitVarDec();
-    setState(191);
+    setState(201);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while (_la == LogosParser::COMMA) {
-      setState(187);
+      setState(197);
       match(LogosParser::COMMA);
-      setState(188);
+      setState(198);
       explicitVarDec();
-      setState(193);
+      setState(203);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
@@ -1315,7 +1384,7 @@ size_t LogosParser::ExplicitVarDecContext::getRuleIndex() const {
 
 LogosParser::ExplicitVarDecContext* LogosParser::explicitVarDec() {
   ExplicitVarDecContext *_localctx = _tracker.createInstance<ExplicitVarDecContext>(_ctx, getState());
-  enterRule(_localctx, 28, LogosParser::RuleExplicitVarDec);
+  enterRule(_localctx, 30, LogosParser::RuleExplicitVarDec);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1326,25 +1395,25 @@ LogosParser::ExplicitVarDecContext* LogosParser::explicitVarDec() {
     exitRule();
   });
   try {
-    setState(202);
+    setState(212);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
       case LogosParser::VARIABLE: {
         enterOuterAlt(_localctx, 1);
-        setState(194);
+        setState(204);
         match(LogosParser::VARIABLE);
-        setState(195);
+        setState(205);
         match(LogosParser::COLON);
-        setState(196);
+        setState(206);
         match(LogosParser::TYPE);
-        setState(199);
+        setState(209);
         _errHandler->sync(this);
 
         _la = _input->LA(1);
         if (_la == LogosParser::EQUAL) {
-          setState(197);
+          setState(207);
           match(LogosParser::EQUAL);
-          setState(198);
+          setState(208);
           expr();
         }
         break;
@@ -1352,7 +1421,7 @@ LogosParser::ExplicitVarDecContext* LogosParser::explicitVarDec() {
 
       case LogosParser::ENUM: {
         enterOuterAlt(_localctx, 2);
-        setState(201);
+        setState(211);
         enumDeclaration();
         break;
       }
@@ -1397,7 +1466,7 @@ size_t LogosParser::ImplicitVarDecContext::getRuleIndex() const {
 
 LogosParser::ImplicitVarDecContext* LogosParser::implicitVarDec() {
   ImplicitVarDecContext *_localctx = _tracker.createInstance<ImplicitVarDecContext>(_ctx, getState());
-  enterRule(_localctx, 30, LogosParser::RuleImplicitVarDec);
+  enterRule(_localctx, 32, LogosParser::RuleImplicitVarDec);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1409,16 +1478,16 @@ LogosParser::ImplicitVarDecContext* LogosParser::implicitVarDec() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(204);
+    setState(214);
     match(LogosParser::VARIABLE);
-    setState(207);
+    setState(217);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::EQUAL) {
-      setState(205);
+      setState(215);
       match(LogosParser::EQUAL);
-      setState(206);
+      setState(216);
       expr();
     }
    
@@ -1458,7 +1527,7 @@ size_t LogosParser::ParamCallContext::getRuleIndex() const {
 
 LogosParser::ParamCallContext* LogosParser::paramCall() {
   ParamCallContext *_localctx = _tracker.createInstance<ParamCallContext>(_ctx, getState());
-  enterRule(_localctx, 32, LogosParser::RuleParamCall);
+  enterRule(_localctx, 34, LogosParser::RuleParamCall);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1469,14 +1538,14 @@ LogosParser::ParamCallContext* LogosParser::paramCall() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(211);
+    setState(221);
     _errHandler->sync(this);
 
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 19, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 20, _ctx)) {
     case 1: {
-      setState(209);
+      setState(219);
       match(LogosParser::VARIABLE);
-      setState(210);
+      setState(220);
       match(LogosParser::EQUAL);
       break;
     }
@@ -1484,7 +1553,7 @@ LogosParser::ParamCallContext* LogosParser::paramCall() {
     default:
       break;
     }
-    setState(213);
+    setState(223);
     expr();
    
   }
@@ -1527,7 +1596,7 @@ size_t LogosParser::ParamCallListContext::getRuleIndex() const {
 
 LogosParser::ParamCallListContext* LogosParser::paramCallList() {
   ParamCallListContext *_localctx = _tracker.createInstance<ParamCallListContext>(_ctx, getState());
-  enterRule(_localctx, 34, LogosParser::RuleParamCallList);
+  enterRule(_localctx, 36, LogosParser::RuleParamCallList);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1539,17 +1608,17 @@ LogosParser::ParamCallListContext* LogosParser::paramCallList() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(215);
+    setState(225);
     paramCall();
-    setState(220);
+    setState(230);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while (_la == LogosParser::COMMA) {
-      setState(216);
+      setState(226);
       match(LogosParser::COMMA);
-      setState(217);
+      setState(227);
       paramCall();
-      setState(222);
+      setState(232);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
@@ -1606,7 +1675,7 @@ size_t LogosParser::StatementContext::getRuleIndex() const {
 
 LogosParser::StatementContext* LogosParser::statement() {
   StatementContext *_localctx = _tracker.createInstance<StatementContext>(_ctx, getState());
-  enterRule(_localctx, 36, LogosParser::RuleStatement);
+  enterRule(_localctx, 38, LogosParser::RuleStatement);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1616,54 +1685,54 @@ LogosParser::StatementContext* LogosParser::statement() {
     exitRule();
   });
   try {
-    setState(230);
+    setState(240);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 21, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 22, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(223);
+      setState(233);
       explicitVarDec();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(224);
+      setState(234);
       implicitVarDec();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(225);
+      setState(235);
       ifStatement();
       break;
     }
 
     case 4: {
       enterOuterAlt(_localctx, 4);
-      setState(226);
+      setState(236);
       loopStatement();
       break;
     }
 
     case 5: {
       enterOuterAlt(_localctx, 5);
-      setState(227);
+      setState(237);
       controlFlowStatement();
       break;
     }
 
     case 6: {
       enterOuterAlt(_localctx, 6);
-      setState(228);
+      setState(238);
       enumDeclaration();
       break;
     }
 
     case 7: {
       enterOuterAlt(_localctx, 7);
-      setState(229);
+      setState(239);
       expr();
       break;
     }
@@ -1720,7 +1789,7 @@ size_t LogosParser::EnumDeclarationContext::getRuleIndex() const {
 
 LogosParser::EnumDeclarationContext* LogosParser::enumDeclaration() {
   EnumDeclarationContext *_localctx = _tracker.createInstance<EnumDeclarationContext>(_ctx, getState());
-  enterRule(_localctx, 38, LogosParser::RuleEnumDeclaration);
+  enterRule(_localctx, 40, LogosParser::RuleEnumDeclaration);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1732,23 +1801,23 @@ LogosParser::EnumDeclarationContext* LogosParser::enumDeclaration() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(232);
+    setState(242);
     match(LogosParser::ENUM);
-    setState(233);
+    setState(243);
     match(LogosParser::TYPE);
-    setState(234);
+    setState(244);
     match(LogosParser::LEFT_BRACE);
-    setState(238);
+    setState(248);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while (_la == LogosParser::CONST) {
-      setState(235);
+      setState(245);
       enumField();
-      setState(240);
+      setState(250);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(241);
+    setState(251);
     match(LogosParser::RIGHT_BRACE);
    
   }
@@ -1787,7 +1856,7 @@ size_t LogosParser::EnumFieldContext::getRuleIndex() const {
 
 LogosParser::EnumFieldContext* LogosParser::enumField() {
   EnumFieldContext *_localctx = _tracker.createInstance<EnumFieldContext>(_ctx, getState());
-  enterRule(_localctx, 40, LogosParser::RuleEnumField);
+  enterRule(_localctx, 42, LogosParser::RuleEnumField);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1799,16 +1868,16 @@ LogosParser::EnumFieldContext* LogosParser::enumField() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(243);
+    setState(253);
     match(LogosParser::CONST);
-    setState(246);
+    setState(256);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::EQUAL) {
-      setState(244);
+      setState(254);
       match(LogosParser::EQUAL);
-      setState(245);
+      setState(255);
       match(LogosParser::STRING);
     }
    
@@ -1852,7 +1921,7 @@ size_t LogosParser::StatementsBlockContext::getRuleIndex() const {
 
 LogosParser::StatementsBlockContext* LogosParser::statementsBlock() {
   StatementsBlockContext *_localctx = _tracker.createInstance<StatementsBlockContext>(_ctx, getState());
-  enterRule(_localctx, 42, LogosParser::RuleStatementsBlock);
+  enterRule(_localctx, 44, LogosParser::RuleStatementsBlock);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1864,20 +1933,20 @@ LogosParser::StatementsBlockContext* LogosParser::statementsBlock() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(248);
+    setState(258);
     match(LogosParser::LEFT_BRACE);
-    setState(252);
+    setState(262);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 523630064697344) != 0)) {
-      setState(249);
+      setState(259);
       statement();
-      setState(254);
+      setState(264);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(255);
+    setState(265);
     match(LogosParser::RIGHT_BRACE);
    
   }
@@ -1920,7 +1989,7 @@ size_t LogosParser::ExprListContext::getRuleIndex() const {
 
 LogosParser::ExprListContext* LogosParser::exprList() {
   ExprListContext *_localctx = _tracker.createInstance<ExprListContext>(_ctx, getState());
-  enterRule(_localctx, 44, LogosParser::RuleExprList);
+  enterRule(_localctx, 46, LogosParser::RuleExprList);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1932,17 +2001,17 @@ LogosParser::ExprListContext* LogosParser::exprList() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(257);
+    setState(267);
     expr();
-    setState(262);
+    setState(272);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while (_la == LogosParser::COMMA) {
-      setState(258);
+      setState(268);
       match(LogosParser::COMMA);
-      setState(259);
+      setState(269);
       expr();
-      setState(264);
+      setState(274);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
@@ -1987,7 +2056,7 @@ size_t LogosParser::ExprContext::getRuleIndex() const {
 
 LogosParser::ExprContext* LogosParser::expr() {
   ExprContext *_localctx = _tracker.createInstance<ExprContext>(_ctx, getState());
-  enterRule(_localctx, 46, LogosParser::RuleExpr);
+  enterRule(_localctx, 48, LogosParser::RuleExpr);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1997,33 +2066,33 @@ LogosParser::ExprContext* LogosParser::expr() {
     exitRule();
   });
   try {
-    setState(269);
+    setState(279);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 26, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 27, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(265);
+      setState(275);
       binaryExpr();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(266);
+      setState(276);
       unaryExpr();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(267);
+      setState(277);
       boolExpr();
       break;
     }
 
     case 4: {
       enterOuterAlt(_localctx, 4);
-      setState(268);
+      setState(278);
       selection();
       break;
     }
@@ -2080,7 +2149,7 @@ size_t LogosParser::BinaryExprContext::getRuleIndex() const {
 
 LogosParser::BinaryExprContext* LogosParser::binaryExpr() {
   BinaryExprContext *_localctx = _tracker.createInstance<BinaryExprContext>(_ctx, getState());
-  enterRule(_localctx, 48, LogosParser::RuleBinaryExpr);
+  enterRule(_localctx, 50, LogosParser::RuleBinaryExpr);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -2091,14 +2160,14 @@ LogosParser::BinaryExprContext* LogosParser::binaryExpr() {
     exitRule();
   });
   try {
-    setState(279);
+    setState(289);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 27, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 28, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(271);
+      setState(281);
       unaryExpr();
-      setState(272);
+      setState(282);
       _la = _input->LA(1);
       if (!(_la == LogosParser::STAR
 
@@ -2109,16 +2178,16 @@ LogosParser::BinaryExprContext* LogosParser::binaryExpr() {
         _errHandler->reportMatch(this);
         consume();
       }
-      setState(273);
+      setState(283);
       expr();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(275);
+      setState(285);
       unaryExpr();
-      setState(276);
+      setState(286);
       _la = _input->LA(1);
       if (!(_la == LogosParser::MINUS
 
@@ -2129,7 +2198,7 @@ LogosParser::BinaryExprContext* LogosParser::binaryExpr() {
         _errHandler->reportMatch(this);
         consume();
       }
-      setState(277);
+      setState(287);
       expr();
       break;
     }
@@ -2190,7 +2259,7 @@ size_t LogosParser::BoolExprContext::getRuleIndex() const {
 
 LogosParser::BoolExprContext* LogosParser::boolExpr() {
   BoolExprContext *_localctx = _tracker.createInstance<BoolExprContext>(_ctx, getState());
-  enterRule(_localctx, 50, LogosParser::RuleBoolExpr);
+  enterRule(_localctx, 52, LogosParser::RuleBoolExpr);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -2202,9 +2271,9 @@ LogosParser::BoolExprContext* LogosParser::boolExpr() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(281);
+    setState(291);
     unaryExpr();
-    setState(282);
+    setState(292);
     _la = _input->LA(1);
     if (!((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 782) != 0))) {
@@ -2214,7 +2283,7 @@ LogosParser::BoolExprContext* LogosParser::boolExpr() {
       _errHandler->reportMatch(this);
       consume();
     }
-    setState(283);
+    setState(293);
     expr();
    
   }
@@ -2269,7 +2338,7 @@ size_t LogosParser::UnaryExprContext::getRuleIndex() const {
 
 LogosParser::UnaryExprContext* LogosParser::unaryExpr() {
   UnaryExprContext *_localctx = _tracker.createInstance<UnaryExprContext>(_ctx, getState());
-  enterRule(_localctx, 52, LogosParser::RuleUnaryExpr);
+  enterRule(_localctx, 54, LogosParser::RuleUnaryExpr);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -2279,54 +2348,54 @@ LogosParser::UnaryExprContext* LogosParser::unaryExpr() {
     exitRule();
   });
   try {
-    setState(292);
+    setState(302);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 28, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 29, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(285);
+      setState(295);
       funcCall();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(286);
+      setState(296);
       constructorCall();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(287);
+      setState(297);
       match(LogosParser::INTEGER);
       break;
     }
 
     case 4: {
       enterOuterAlt(_localctx, 4);
-      setState(288);
+      setState(298);
       match(LogosParser::FLOAT);
       break;
     }
 
     case 5: {
       enterOuterAlt(_localctx, 5);
-      setState(289);
+      setState(299);
       match(LogosParser::BOOL);
       break;
     }
 
     case 6: {
       enterOuterAlt(_localctx, 6);
-      setState(290);
+      setState(300);
       match(LogosParser::STRING);
       break;
     }
 
     case 7: {
       enterOuterAlt(_localctx, 7);
-      setState(291);
+      setState(301);
       match(LogosParser::VARIABLE);
       break;
     }
@@ -2375,7 +2444,7 @@ size_t LogosParser::SelectionContext::getRuleIndex() const {
 
 LogosParser::SelectionContext* LogosParser::selection() {
   SelectionContext *_localctx = _tracker.createInstance<SelectionContext>(_ctx, getState());
-  enterRule(_localctx, 54, LogosParser::RuleSelection);
+  enterRule(_localctx, 56, LogosParser::RuleSelection);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -2387,17 +2456,17 @@ LogosParser::SelectionContext* LogosParser::selection() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(294);
+    setState(304);
     unaryExpr();
-    setState(299);
+    setState(309);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while (_la == LogosParser::DOT) {
-      setState(295);
+      setState(305);
       match(LogosParser::DOT);
-      setState(296);
+      setState(306);
       unaryExpr();
-      setState(301);
+      setState(311);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
@@ -2446,7 +2515,7 @@ size_t LogosParser::IfStatementContext::getRuleIndex() const {
 
 LogosParser::IfStatementContext* LogosParser::ifStatement() {
   IfStatementContext *_localctx = _tracker.createInstance<IfStatementContext>(_ctx, getState());
-  enterRule(_localctx, 56, LogosParser::RuleIfStatement);
+  enterRule(_localctx, 58, LogosParser::RuleIfStatement);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -2456,25 +2525,25 @@ LogosParser::IfStatementContext* LogosParser::ifStatement() {
     exitRule();
   });
   try {
-    setState(308);
+    setState(318);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 30, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 31, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(302);
+      setState(312);
       match(LogosParser::IF);
-      setState(303);
+      setState(313);
       expr();
-      setState(304);
+      setState(314);
       statementsBlock();
-      setState(305);
+      setState(315);
       elseStatement();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(307);
+      setState(317);
       patterMatching();
       break;
     }
@@ -2531,7 +2600,7 @@ size_t LogosParser::ElseStatementContext::getRuleIndex() const {
 
 LogosParser::ElseStatementContext* LogosParser::elseStatement() {
   ElseStatementContext *_localctx = _tracker.createInstance<ElseStatementContext>(_ctx, getState());
-  enterRule(_localctx, 58, LogosParser::RuleElseStatement);
+  enterRule(_localctx, 60, LogosParser::RuleElseStatement);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -2544,30 +2613,30 @@ LogosParser::ElseStatementContext* LogosParser::elseStatement() {
   try {
     size_t alt;
     enterOuterAlt(_localctx, 1);
-    setState(316);
+    setState(326);
     _errHandler->sync(this);
-    alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 31, _ctx);
+    alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 32, _ctx);
     while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER) {
       if (alt == 1) {
-        setState(310);
+        setState(320);
         match(LogosParser::ELSE);
-        setState(311);
+        setState(321);
         expr();
-        setState(312);
+        setState(322);
         statementsBlock(); 
       }
-      setState(318);
+      setState(328);
       _errHandler->sync(this);
-      alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 31, _ctx);
+      alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 32, _ctx);
     }
-    setState(321);
+    setState(331);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::ELSE) {
-      setState(319);
+      setState(329);
       match(LogosParser::ELSE);
-      setState(320);
+      setState(330);
       statementsBlock();
     }
    
@@ -2631,7 +2700,7 @@ size_t LogosParser::PatterMatchingContext::getRuleIndex() const {
 
 LogosParser::PatterMatchingContext* LogosParser::patterMatching() {
   PatterMatchingContext *_localctx = _tracker.createInstance<PatterMatchingContext>(_ctx, getState());
-  enterRule(_localctx, 60, LogosParser::RulePatterMatching);
+  enterRule(_localctx, 62, LogosParser::RulePatterMatching);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -2643,43 +2712,43 @@ LogosParser::PatterMatchingContext* LogosParser::patterMatching() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(323);
+    setState(333);
     match(LogosParser::IF);
-    setState(325);
+    setState(335);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 523367534821376) != 0)) {
-      setState(324);
+      setState(334);
       expr();
     }
-    setState(327);
+    setState(337);
     match(LogosParser::LEFT_BRACE);
-    setState(331);
+    setState(341);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 523367534821376) != 0)) {
-      setState(328);
+      setState(338);
       pattern();
-      setState(333);
+      setState(343);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(337);
+    setState(347);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::ELSE) {
-      setState(334);
+      setState(344);
       match(LogosParser::ELSE);
-      setState(335);
+      setState(345);
       match(LogosParser::COLON);
-      setState(336);
+      setState(346);
       statementsBlock();
     }
-    setState(339);
+    setState(349);
     match(LogosParser::RIGHT_BRACE);
    
   }
@@ -2718,7 +2787,7 @@ size_t LogosParser::PatternContext::getRuleIndex() const {
 
 LogosParser::PatternContext* LogosParser::pattern() {
   PatternContext *_localctx = _tracker.createInstance<PatternContext>(_ctx, getState());
-  enterRule(_localctx, 62, LogosParser::RulePattern);
+  enterRule(_localctx, 64, LogosParser::RulePattern);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -2729,11 +2798,11 @@ LogosParser::PatternContext* LogosParser::pattern() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(341);
+    setState(351);
     expr();
-    setState(342);
+    setState(352);
     match(LogosParser::COLON);
-    setState(343);
+    setState(353);
     statementsBlock();
    
   }
@@ -2784,7 +2853,7 @@ size_t LogosParser::LoopStatementContext::getRuleIndex() const {
 
 LogosParser::LoopStatementContext* LogosParser::loopStatement() {
   LoopStatementContext *_localctx = _tracker.createInstance<LoopStatementContext>(_ctx, getState());
-  enterRule(_localctx, 64, LogosParser::RuleLoopStatement);
+  enterRule(_localctx, 66, LogosParser::RuleLoopStatement);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -2795,53 +2864,53 @@ LogosParser::LoopStatementContext* LogosParser::loopStatement() {
     exitRule();
   });
   try {
-    setState(362);
+    setState(372);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 37, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 38, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(345);
+      setState(355);
       match(LogosParser::FOR);
-      setState(347);
+      setState(357);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
       if ((((_la & ~ 0x3fULL) == 0) &&
         ((1ULL << _la) & 523367534821376) != 0)) {
-        setState(346);
+        setState(356);
         expr();
       }
-      setState(349);
+      setState(359);
       statementsBlock();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(350);
+      setState(360);
       match(LogosParser::FOR);
-      setState(351);
+      setState(361);
       exprList();
-      setState(352);
+      setState(362);
       match(LogosParser::IN);
-      setState(353);
+      setState(363);
       expr();
-      setState(354);
+      setState(364);
       statementsBlock();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(356);
+      setState(366);
       match(LogosParser::FOR);
-      setState(357);
+      setState(367);
       exprList();
-      setState(358);
+      setState(368);
       match(LogosParser::IN);
-      setState(359);
+      setState(369);
       range();
-      setState(360);
+      setState(370);
       statementsBlock();
       break;
     }
@@ -2886,7 +2955,7 @@ size_t LogosParser::RangeContext::getRuleIndex() const {
 
 LogosParser::RangeContext* LogosParser::range() {
   RangeContext *_localctx = _tracker.createInstance<RangeContext>(_ctx, getState());
-  enterRule(_localctx, 66, LogosParser::RuleRange);
+  enterRule(_localctx, 68, LogosParser::RuleRange);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -2898,18 +2967,18 @@ LogosParser::RangeContext* LogosParser::range() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(365);
+    setState(375);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 523367534821376) != 0)) {
-      setState(364);
+      setState(374);
       expr();
     }
-    setState(367);
+    setState(377);
     match(LogosParser::DOUBLE_DOT);
-    setState(368);
+    setState(378);
     expr();
    
   }
@@ -2956,7 +3025,7 @@ size_t LogosParser::ControlFlowStatementContext::getRuleIndex() const {
 
 LogosParser::ControlFlowStatementContext* LogosParser::controlFlowStatement() {
   ControlFlowStatementContext *_localctx = _tracker.createInstance<ControlFlowStatementContext>(_ctx, getState());
-  enterRule(_localctx, 68, LogosParser::RuleControlFlowStatement);
+  enterRule(_localctx, 70, LogosParser::RuleControlFlowStatement);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -2966,39 +3035,39 @@ LogosParser::ControlFlowStatementContext* LogosParser::controlFlowStatement() {
     exitRule();
   });
   try {
-    setState(377);
+    setState(387);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 39, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 40, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(370);
+      setState(380);
       match(LogosParser::BREAK);
-      setState(371);
+      setState(381);
       expr();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(372);
+      setState(382);
       match(LogosParser::BREAK);
-      setState(373);
+      setState(383);
       match(LogosParser::IF);
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(374);
+      setState(384);
       match(LogosParser::CONTINUE);
       break;
     }
 
     case 4: {
       enterOuterAlt(_localctx, 4);
-      setState(375);
+      setState(385);
       match(LogosParser::RETURN);
-      setState(376);
+      setState(386);
       expr();
       break;
     }

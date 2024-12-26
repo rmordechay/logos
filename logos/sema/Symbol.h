@@ -4,8 +4,10 @@
 
 class Symbol {
 public:
-    explicit Symbol(const std::string &name);
-    std::string name;
+    std::string varName;
+    std::string typeName;
+
+    explicit Symbol(const std::string& name, const std::string& type);
 };
 
 

@@ -2,16 +2,26 @@
 #define SEMANTICANALYSER_H
 
 
+#include "LogosPackage.h"
 #include "LogosParser.h"
-
+#include "Scope.h"
 
 class SemAnalyser final {
-    public:
+public:
+    LogosPackage* rootPackage;
+    Scope* rootScope;
+    Scope* currentScope;
+
+    explicit SemAnalyser(LogosPackage* rootPackage);
+    void analyseProject();
     void checkLogosFile(LogosParser::LogosFileContext* ctx);
     void checkObjectFile(LogosParser::ObjectFileContext* ctx);
     void checkImportStatement(LogosParser::ImportStatementContext* ctx);
     void checkObjectImplements(LogosParser::ObjectImplementsContext* ctx);
+
+    ~SemAnalyser();
 };
+
 
 
 #endif //SEMANTICANALYSER_H

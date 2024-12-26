@@ -18,7 +18,7 @@ void LogosPackage::scanPackage() {
             auto logosFile = readLogosFile(directoryEntry.path());
             logosFile->parseFile();
             files.push_back(logosFile);
-            if (isMainFile(directoryEntry)) {
+            if (logosFile->fileCtx->mainFile() != nullptr) {
                 mainFile = logosFile;
             }
         } else if (is_directory(directoryEntry.status())) {
