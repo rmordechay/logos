@@ -18,7 +18,7 @@ funcDec: VARIABLE LEFT_PAREN explicitVarDecList? RIGHT_PAREN COLON TYPE;
 
 funcImplementation: funcDec funcBody;
 
-funcBody: LEFT_BRACE statement* RIGHT_BRACE;
+funcBody: statemets_block;
 
 funcCall: VARIABLE LEFT_PAREN paramCallList* RIGHT_PAREN;
 
@@ -37,22 +37,26 @@ paramCallList: paramCall (COMMA paramCall)*;
 statement:
         explicitVarDec
     |   implicitVarDec
-    |   if_statement
+    |   ifStatement
     |   expr
     ;
 
+statemets_block:
+        LEFT_BRACE statement* RIGHT_BRACE
+    ;
+
 expr:
-        binary_expr
-    |   unary_expr
+        binaryExpr
+    |   unaryExpr
     |   selection
     ;
 
-binary_expr:
-        unary_expr (STAR | SLASH) expr
-    |   unary_expr (PLUS | MINUS) expr
+binaryExpr:
+        unaryExpr (STAR | SLASH) expr
+    |   unaryExpr (PLUS | MINUS) expr
     ;
 
-unary_expr:
+unaryExpr:
         funcCall
     |   constructorCall
     |   INTEGER
@@ -63,12 +67,25 @@ unary_expr:
     ;
 
 selection:
-        unary_expr (DOT unary_expr)*
+        unaryExpr (DOT unaryExpr)*
     ;
 
-if_statement:
-    IF expr LEFT_BRACE statement* RIGHT_BRACE
+ifStatement:
+        IF expr statemets_block elseStatement
+    |   patterMatching
     ;
+
+elseStatement:
+    (ELSE expr statemets_block)* (ELSE statemets_block)?
+    ;
+
+patterMatching:
+        IF expr? LEFT_BRACE pattern* (ELSE COLON statemets_block)? RIGHT_BRACE
+    ;
+
+pattern:
+    expr COLON statemets_block
+;
 
 LEFT_PAREN: '(';
 RIGHT_PAREN: ')';
@@ -102,6 +119,7 @@ IMPLEMENTS: 'implements';
 IMPORT: 'import';
 
 IF: 'if';
+ELSE: 'else';
 FOR: 'for';
 BREAK: 'break';
 CONTINUE: 'continue';

@@ -1,3 +1,7 @@
+import (
+    MyObject
+)
+
 main(): Void {
     v = 3
     v: Int 2

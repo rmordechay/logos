@@ -1,9 +1,6 @@
 // Infinite loop
 for { }
 
-// Infinite loop the increments i
-for i { }
-
 // Normal while loop
 for x > y { }
 
@@ -31,3 +28,6 @@ for i, obj in list { }
 
 // foreach map loop
 for k, v in map { }
+
+// Infinite loop the increments i
+for i { }

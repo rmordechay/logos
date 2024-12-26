@@ -19,6 +19,8 @@ add_executable(logos
     logos/project/LogosFile.h
     logos/sema/SemAnalyser.cpp
     logos/sema/SemAnalyser.h
+        logos/codegen/CodeGenerator.cpp
+        logos/codegen/CodeGenerator.h
 )
 
 target_include_directories(logos PRIVATE

@@ -10,4 +10,24 @@ f(param1: String, param2: Float): Int {
     a: Int = 6
     b = 4
     c = a + b
+    if a {
+        b = 4
+        c = a + b
+    } else b {
+        c = a + b
+    } else {
+        print()
+    }
+
+    if {
+        x: {}
+        x: {}
+        else: {}
+    }
+
+    if notBool {
+        notBool1: {}
+        notBool2: {}
+        else: {}
+    }
 }

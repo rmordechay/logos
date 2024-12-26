@@ -1,25 +1,24 @@
 // Normal if
 if x < 1 {
     print()
-} or x > 1 {
+} else x > 1 {
     print()
-} or 0 < x < 10 {
+} else 0 < x < 10 {
     print()
-} or {
+} else {
     print()
 }
 
 // Pattern matching
 if {
-    x > 1: expr_list
-    x < 1: { expr_list }
-    or: expr_list
+    x > 1: statementsBlock
+    x < 1: statementsBlock
+    else:  statementsBlock
 }
 
 // Pattern matching with expr_list
-if Bool {
-    Bool1: expr_list
-    Bool2: expr_list
-    Bool3: expr_list
-    or: expr_list
+if notBool {
+    notBool1: statementsBlock
+    notBool2: statementsBlock
+    else: statementsBlock
 }
