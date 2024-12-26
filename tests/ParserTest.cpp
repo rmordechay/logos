@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-TEST(SampleTest, Test1) {
+TEST(ParserTest, Test1) {
     ASSERT_EQ(4, 3);
 }
 

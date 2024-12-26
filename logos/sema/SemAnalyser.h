@@ -14,16 +14,16 @@ public:
 
     explicit SemAnalyser(LogosPackage* rootPackage);
     void analyseProject();
-    void checkImportStatement(LogosParser::ImportStatementContext* ctx);
+    void checkImportStatement(LogosParser::ImportStatementContext* ctx) const;
     void checkMainFile(LogosParser::MainFileContext* ctx);
     void checkMain(LogosParser::FuncImplementationContext* ctx);
     void checkObjectFile(LogosParser::ObjectFileContext* ctx);
     void checkObjectImplements(LogosParser::ObjectImplementsContext* ctx);
-    void checkStatement(LogosParser::StatementContext* ctx);
+    void checkStatement(LogosParser::StatementContext* ctx) const;
     void setExplicitVariableSymbol(LogosParser::ExplicitVarDecContext* ctx) const;
-    void setImplicitVariableSymbol(LogosParser::ImplicitVarDecContext* ctx);
-    void inferType(LogosParser::ExprContext* ctx, Symbol* symbol);
-    void setSymbolFromUnary(LogosParser::UnaryExprContext* unary, Symbol* symbol);
+    void setImplicitVariableSymbol(LogosParser::ImplicitVarDecContext* ctx) const;
+    void setSymbolFromExpr(LogosParser::ExprContext* ctx, Symbol* symbol) const;
+    void setSymbolFromUnaryExpr(LogosParser::UnaryExprContext* unary, Symbol* symbol) const;
 
     ~SemAnalyser();
 };

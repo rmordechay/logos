@@ -13,12 +13,12 @@ enum SymbolType {
 
 class Symbol {
 public:
-    std::string varName;
+    std::string varibaleName;
     std::string typeName;
     SymbolType kind;
     LogosValue *value;
 
-    Symbol(const std::string& varName, const std::string& typeName, SymbolType kind);
+    Symbol(const std::string& variableName, const std::string& typeName, SymbolType kind);
     Symbol(const std::string& varName, SymbolType kind);
 };
 

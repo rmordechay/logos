@@ -15,7 +15,7 @@ void SemAnalyser::analyseProject() {
     checkMainFile(mainFileCtx->mainFile());
 }
 
-void SemAnalyser::checkImportStatement(LogosParser::ImportStatementContext* ctx) {
+void SemAnalyser::checkImportStatement(LogosParser::ImportStatementContext* ctx) const {
     if (ctx == nullptr) return;
     const auto importPaths = ctx->importPath();
     for (const auto importPath : importPaths) {
@@ -49,7 +49,7 @@ void SemAnalyser::checkObjectImplements(LogosParser::ObjectImplementsContext* ct
     if (ctx == nullptr) return;
 }
 
-void SemAnalyser::checkStatement(LogosParser::StatementContext* ctx) {
+void SemAnalyser::checkStatement(LogosParser::StatementContext* ctx) const {
     if (const auto explicitVarDec = ctx->explicitVarDec()) {
         setExplicitVariableSymbol(explicitVarDec);
     } else if (const auto implicitVarDec = ctx->implicitVarDec()) {
@@ -58,28 +58,28 @@ void SemAnalyser::checkStatement(LogosParser::StatementContext* ctx) {
 }
 
 void SemAnalyser::setExplicitVariableSymbol(LogosParser::ExplicitVarDecContext* const ctx) const {
-    const auto varName = ctx->VARIABLE()->getText();
+    const auto variableName = ctx->VARIABLE()->getText();
     const auto typeName = ctx->TYPE()->getText();
-    const auto symbol = new Symbol(varName, typeName, LOCAL_VARIABLE);
-    currentScope->symbolTable[varName] = symbol;
+    const auto symbol = new Symbol(variableName, typeName, LOCAL_VARIABLE);
+    currentScope->symbolTable[variableName] = symbol;
 }
 
-void SemAnalyser::setImplicitVariableSymbol(LogosParser::ImplicitVarDecContext* ctx) {
-    const auto varName = ctx->VARIABLE()->getText();
-    const auto symbol = new Symbol(varName, LOCAL_VARIABLE);
-    inferType(ctx->expr(), symbol);
-    currentScope->symbolTable[varName] = symbol;
+void SemAnalyser::setImplicitVariableSymbol(LogosParser::ImplicitVarDecContext* ctx) const {
+    const auto variableName = ctx->VARIABLE()->getText();
+    const auto symbol = new Symbol(variableName, LOCAL_VARIABLE);
+    setSymbolFromExpr(ctx->expr(), symbol);
+    currentScope->symbolTable[variableName] = symbol;
 }
 
-void SemAnalyser::inferType(LogosParser::ExprContext* ctx, Symbol* symbol) {
+void SemAnalyser::setSymbolFromExpr(LogosParser::ExprContext* ctx, Symbol* symbol) const {
     if (const auto unary = ctx->unaryExpr()) {
-        setSymbolFromUnary(unary, symbol);
-    } else if (ctx->binaryExpr()) {
+        setSymbolFromUnaryExpr(unary, symbol);
+    } else if (ctx->boolExpr()) {
         symbol->typeName = "Bool";
     }
 }
 
-void SemAnalyser::setSymbolFromUnary(LogosParser::UnaryExprContext* unary, Symbol* symbol) {
+void SemAnalyser::setSymbolFromUnaryExpr(LogosParser::UnaryExprContext* unary, Symbol* symbol) const {
     if (const auto intToken = unary->INTEGER()) {
         symbol->typeName = "Int";
         const auto value = std::stoi(intToken->getText());
@@ -117,9 +117,12 @@ void SemAnalyser::setSymbolFromUnary(LogosParser::UnaryExprContext* unary, Symbo
         return;
     }
 
-
     if (const auto funcCall = unary->funcCall()) {
-        symbol->typeName = "";
+        const auto it = currentScope->symbolTable.find(funcCall->VARIABLE()->getText());
+        if (it != currentScope->symbolTable.end()) {
+            symbol->typeName = it->second->typeName;
+            symbol->value = it->second->value;
+        }
         return;
     }
 
