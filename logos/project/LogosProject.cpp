@@ -12,5 +12,5 @@ LogosProject::LogosProject(const std::string& path) {
 void LogosProject::scanProject() const {
     rootPackage->scanPackage();
     semAnalyser->analyseProject();
-    codeGenerator->generateCode(semAnalyser->astNodes);
+    codeGenerator->generateCode(semAnalyser->codeGenNodes);
 }

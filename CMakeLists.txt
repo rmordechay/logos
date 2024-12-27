@@ -24,23 +24,24 @@ add_executable(logos
     logos/project/LogosFile.h
     logos/sema/SemAnalyser.cpp
     logos/sema/SemAnalyser.h
-    logos/sema/LogosSymbol.cpp
-    logos/sema/LogosSymbol.h
+    logos/symbols/LogosSymbol.cpp
+    logos/symbols/LogosSymbol.h
     logos/codegen/CodeGenerator.cpp
     logos/codegen/CodeGenerator.h
     logos/LogosConfigs.h
     logos/sema/Scope.cpp
     logos/sema/Scope.h
-    logos/sema/LogosValue.cpp
-    logos/sema/LogosValue.h
+    logos/symbols/LogosValue.cpp
+    logos/symbols/LogosValue.h
     logos/sema/LogosErrors.h
-    logos/sema/ASTNode.cpp
-    logos/sema/ASTNode.h
+    logos/codegen/CodeNode.cpp
+    logos/codegen/CodeNode.h
 )
 
 target_include_directories(logos PRIVATE
     logos
     logos/project
+    logos/symbols
     logos/parser
     logos/codegen
     logos/sema

@@ -13,7 +13,7 @@ enum SymbolType {
 
 class LogosSymbol {
 public:
-    std::string varibaleName;
+    std::string variableName;
     std::string typeName;
     SymbolType kind;
     LogosValue *value;

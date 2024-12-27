@@ -1,6 +1,6 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
-#include "../sema/ASTNode.h"
+#include "CodeNode.h"
 
 #include <llvm/IR/LLVMContext.h>
 
@@ -11,7 +11,7 @@ public:
     LLVMContext context = LLVMContext();
 
     void generateCodeDemo();
-    void generateCode(const std::vector<ASTNode>& vector);
+    void generateCode(const std::vector<CodeNode>& vector);
     static void writeToFile(const Module* module);
     static void runBinary();
 };

@@ -68,24 +68,25 @@ void SemAnalyser::visitObjectImplements(LogosParser::ObjectImplementsContext* ct
 
 void SemAnalyser::visitStatement(LogosParser::StatementContext* ctx) const {
     if (const auto explicitVarDec = ctx->explicitVarDec()) {
-        setExplicitVariableSymbol(explicitVarDec);
+        visitExplicitVarDec(explicitVarDec);
     } else if (const auto implicitVarDec = ctx->implicitVarDec()) {
-        setImplicitVariableSymbol(implicitVarDec);
+        visitImplicitVarDec(implicitVarDec);
     }
 }
 
-void SemAnalyser::setExplicitVariableSymbol(LogosParser::ExplicitVarDecContext* const ctx) const {
+void SemAnalyser::visitExplicitVarDec(LogosParser::ExplicitVarDecContext* const ctx) const {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto typeName = ctx->TYPE()->getText();
     const auto symbol = new LogosSymbol(variableName, typeName, LOCAL_VARIABLE);
     currentScope->symbolTable[variableName] = symbol;
 }
 
-void SemAnalyser::setImplicitVariableSymbol(LogosParser::ImplicitVarDecContext* ctx) const {
+void SemAnalyser::visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto symbol = new LogosSymbol(variableName, LOCAL_VARIABLE);
     setSymbolFromExpr(ctx->expr(), symbol);
     currentScope->symbolTable[variableName] = symbol;
+    codeGenNodes.push_back(StoreInt(symbol));
 }
 
 void SemAnalyser::setSymbolFromExpr(LogosParser::ExprContext* ctx, LogosSymbol* symbol) const {

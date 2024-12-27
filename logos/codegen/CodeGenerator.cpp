@@ -8,7 +8,10 @@
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Support/FileSystem.h>
 
-void CodeGenerator::generateCode(const std::vector<ASTNode>& vector) {
+void CodeGenerator::generateCode(const std::vector<CodeNode>& codeGenNodes) {
+    for (auto codeGenNode : codeGenNodes) {
+        codeGenNode.generateCode();
+    }
 }
 
 void CodeGenerator::writeToFile(const Module* const module) {
