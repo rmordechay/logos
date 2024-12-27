@@ -33,6 +33,7 @@ add_executable(logos
     logos/sema/Scope.h
     logos/sema/LogosValue.cpp
     logos/sema/LogosValue.h
+    logos/sema/LogosErrors.h
 )
 
 target_include_directories(logos PRIVATE
@@ -46,7 +47,7 @@ target_include_directories(logos PRIVATE
     ${LLVM_INCLUDE_DIRS}
 )
 
-llvm_map_components_to_libnames(LLVM_LIBS core)
+llvm_map_components_to_libnames(LLVM_LIBS core bitreader bitwriter support)
 target_link_libraries(logos PRIVATE ${ANTLR_LIB} ${LLVM_LIBS} ${GTEST_LIB} ${GTEST_LIB_MAIN})
 
 

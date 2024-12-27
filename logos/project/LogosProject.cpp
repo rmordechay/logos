@@ -6,6 +6,7 @@ LogosProject::LogosProject(const std::string& path) {
     rootPath = path;
     rootPackage = new LogosPackage(LOGOS_SOURCE_PACKAGE, rootPath);
     semAnalyser = new SemAnalyser(rootPackage);
+    codeGenerator = new CodeGenerator();
 }
 
 void LogosProject::scanProject() const {

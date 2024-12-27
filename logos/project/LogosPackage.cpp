@@ -22,7 +22,7 @@ void LogosPackage::scanPackage() {
                 mainFile = logosFile;
             }
         } else if (is_directory(directoryEntry.status())) {
-            auto packagePath = directoryEntry.path();
+            const auto& packagePath = directoryEntry.path();
             const auto newPackage = new LogosPackage(packagePath.filename(), packagePath);
             packages.push_back(newPackage);
             newPackage->scanPackage();

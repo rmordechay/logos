@@ -1,18 +1,33 @@
 #include "SemAnalyser.h"
 
 #include "LogosConfigs.h"
+#include "LogosErrors.h"
 #include "LogosValue.h"
 
 SemAnalyser::SemAnalyser(LogosPackage* rootPackage) {
     this->rootPackage = rootPackage;
     this->rootScope = new Scope();
     this->currentScope = this->rootScope;
+    this->mainFile = nullptr;
 }
 
 void SemAnalyser::analyseProject() {
-    const auto mainFileCtx = rootPackage->mainFile->fileCtx;
-    checkImportStatement(mainFileCtx->importStatement());
-    checkMainFile(mainFileCtx->mainFile());
+    mainFile = rootPackage->mainFile;
+    checkMainFile();
+    checkPackage(rootPackage);
+}
+
+void SemAnalyser::checkPackage(const LogosPackage* package) {
+    for (const auto file : package->files) {
+        checkLogosFile(file->fileCtx);
+    }
+    for (const auto childPackage : package->packages) {
+        checkPackage(childPackage);
+    }
+}
+
+void SemAnalyser::checkLogosFile(LogosParser::LogosFileContext* ctx) {
+    checkImportStatement(ctx->importStatement());
 }
 
 void SemAnalyser::checkImportStatement(LogosParser::ImportStatementContext* ctx) const {
@@ -26,8 +41,9 @@ void SemAnalyser::checkImportStatement(LogosParser::ImportStatementContext* ctx)
     }
 }
 
-void SemAnalyser::checkMainFile(LogosParser::MainFileContext* ctx) {
-    for (const auto func : ctx->funcImplementation()) {
+void SemAnalyser::checkMainFile() {
+    checkImportStatement(mainFile->fileCtx->importStatement());
+    for (const auto func : mainFile->fileCtx->mainFile()->funcImplementation()) {
         if (func->funcDec()->VARIABLE()->getText() == LOGOS_MAIN_FUNCTION) {
             checkMain(func);
         }
@@ -134,4 +150,9 @@ void SemAnalyser::setSymbolFromUnaryExpr(LogosParser::UnaryExprContext* unary, S
 SemAnalyser::~SemAnalyser() {
     delete rootPackage;
     delete rootScope;
+}
+
+void SemAnalyser::printError(const int errorCode) {
+    std::cout << "ERROR: " << LOGOS_ERRORS.at(errorCode) << std::endl;
+    std::cout << "  1. " << mainFile->path << LOGOS_EXTENSION << std::endl;
 }
