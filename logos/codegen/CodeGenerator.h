@@ -3,15 +3,13 @@
 #include "CodeNode.h"
 
 #include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/LLVMContext.h>
 
 using namespace llvm;
 
 class CodeGenerator {
 public:
-    void generateCodeDemo();
-    void insertMain(LLVMContext& context, IRBuilder<>& builder, Module* module);
-    void generateCode(const std::vector<CodeNode*>& codeNodes);
+    static void generateCode(const std::vector<CodeNode*>& codeNodes);
+    static void insertMain(LLVMContext& context, IRBuilder<>& builder, Module* module);
     static void writeToFile(const Module* module);
     static void runBinary();
 };

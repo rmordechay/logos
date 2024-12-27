@@ -24,9 +24,9 @@ funcImplementation: funcDec funcBody;
 
 funcBody: statementsBlock;
 
-funcCall: VARIABLE LEFT_PAREN paramCallList* RIGHT_PAREN;
+funcCall: VARIABLE LEFT_PAREN funcArgList? RIGHT_PAREN;
 
-constructorCall: TYPE LEFT_PAREN paramCallList* RIGHT_PAREN;
+constructorCall: TYPE LEFT_PAREN funcArgList? RIGHT_PAREN;
 
 explicitVarDecList: explicitVarDec (COMMA explicitVarDec)*;
 
@@ -37,9 +37,9 @@ explicitVarDec:
 
 implicitVarDec: VARIABLE (EQUAL expr)?;
 
-paramCall: (VARIABLE EQUAL)? expr;
+funcArg: (VARIABLE EQUAL)? expr;
 
-paramCallList: paramCall (COMMA paramCall)*;
+funcArgList: funcArg (COMMA funcArg)*;
 
 statement:
         explicitVarDec

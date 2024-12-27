@@ -30,12 +30,12 @@ void LogosFile::addSymbols() {
         for (const auto explicitVarDec : objectFile->explicitVarDec()) {
             auto varName = explicitVarDec->VARIABLE()->getText();
             auto typeName = explicitVarDec->TYPE()->getText();
-            symbolTable[varName] = new LogosSymbol(varName, typeName, FIELD);
+            symbolTable[varName] = new LogosSymbol(varName, FIELD);
         }
         for (const auto func : objectFile->funcImplementation()) {
             auto varName = func->funcDec()->VARIABLE()->getText();
             auto typeName = func->funcDec()->TYPE()->getText();
-            symbolTable[varName] = new LogosSymbol(varName, typeName, FUNC_DEFINITION);
+            symbolTable[varName] = new LogosSymbol(varName,  FUNC_DEFINITION);
         }
     }
 }

@@ -16,25 +16,31 @@ find_package(LLVM REQUIRED CONFIG)
 add_executable(logos
     main.cpp
     ${GENERATED_SRC}
-    logos/project/LogosProject.cpp
-    logos/project/LogosProject.h
-    logos/project/LogosPackage.cpp
-    logos/project/LogosPackage.h
-    logos/project/LogosFile.cpp
-    logos/project/LogosFile.h
-    logos/sema/SemAnalyser.cpp
-    logos/sema/SemAnalyser.h
-    logos/symbols/LogosSymbol.cpp
-    logos/symbols/LogosSymbol.h
+    logos/LogosConfigs.h
     logos/codegen/CodeGenerator.cpp
     logos/codegen/CodeGenerator.h
-    logos/LogosConfigs.h
-    logos/sema/Scope.cpp
-    logos/sema/Scope.h
-    logos/sema/LogosErrors.h
+    logos/codegen/BuiltinFunc.cpp
+    logos/codegen/BuiltinFunc.h
     logos/codegen/CodeNode.cpp
     logos/codegen/CodeNode.h
-    logos/symbols/LogosType.cpp
+    logos/codegen/nodes/Add.cpp
+    logos/codegen/nodes/Add.h
+    logos/codegen/nodes/StoreInt.cpp
+    logos/codegen/nodes/StoreInt.h
+    logos/codegen/builtin/Print.cpp
+    logos/codegen/builtin/Print.h
+    logos/project/LogosFile.cpp
+    logos/project/LogosFile.h
+    logos/project/LogosPackage.cpp
+    logos/project/LogosPackage.h
+    logos/project/LogosProject.cpp
+    logos/project/LogosProject.h
+    logos/sema/LogosErrors.h
+    logos/sema/Scope.cpp
+    logos/sema/Scope.h
+    logos/sema/SemAnalyser.cpp
+    logos/sema/SemAnalyser.h
+    logos/symbols/LogosSymbol.h
     logos/symbols/LogosType.h
 )
 

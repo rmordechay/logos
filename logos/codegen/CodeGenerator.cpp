@@ -42,21 +42,3 @@ void CodeGenerator::runBinary() {
     std::system("clang ../codegen/output.o -o ../codegen/output");
     std::system("../codegen/output");
 }
-
-void CodeGenerator::generateCodeDemo() {
-    // const auto int32Ty = Type::getInt32Ty(context);
-    // const auto a = builder.CreateAlloca(int32Ty);
-    // const auto b = builder.CreateAlloca(int32Ty);
-    //
-    // builder.CreateStore(ConstantInt::get(int32Ty, 10), a);
-    // builder.CreateStore(ConstantInt::get(int32Ty, 20), b);
-    //
-    // const auto aVal = builder.CreateLoad(int32Ty, a);
-    // const auto bVal = builder.CreateLoad(int32Ty, b);
-    //
-    // const auto sum = builder.CreateAdd(aVal, bVal);
-    // const auto printfType = FunctionType::get(builder.getInt32Ty(), PointerType::getUnqual(builder.getInt8Ty()), true);
-    // const auto printfFunc = Function::Create(printfType, Function::ExternalLinkage, "printf", module);
-    // auto formatStr = builder.CreateGlobalStringPtr("%d\n");
-    // builder.CreateCall(printfFunc, {formatStr, sum});
-}

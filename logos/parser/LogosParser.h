@@ -30,7 +30,7 @@ public:
     RuleInterfaceDeclaration = 7, RuleObjectImplements = 8, RuleFuncDec = 9, 
     RuleFuncImplementation = 10, RuleFuncBody = 11, RuleFuncCall = 12, RuleConstructorCall = 13, 
     RuleExplicitVarDecList = 14, RuleExplicitVarDec = 15, RuleImplicitVarDec = 16, 
-    RuleParamCall = 17, RuleParamCallList = 18, RuleStatement = 19, RuleEnumDeclaration = 20, 
+    RuleFuncArg = 17, RuleFuncArgList = 18, RuleStatement = 19, RuleEnumDeclaration = 20, 
     RuleEnumField = 21, RuleStatementsBlock = 22, RuleExprList = 23, RuleExpr = 24, 
     RuleBinaryExpr = 25, RuleBoolExpr = 26, RuleUnaryExpr = 27, RuleSelection = 28, 
     RuleIfStatement = 29, RuleElseStatement = 30, RulePatterMatching = 31, 
@@ -71,8 +71,8 @@ public:
   class ExplicitVarDecListContext;
   class ExplicitVarDecContext;
   class ImplicitVarDecContext;
-  class ParamCallContext;
-  class ParamCallListContext;
+  class FuncArgContext;
+  class FuncArgListContext;
   class StatementContext;
   class EnumDeclarationContext;
   class EnumFieldContext;
@@ -270,8 +270,7 @@ public:
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *LEFT_PAREN();
     antlr4::tree::TerminalNode *RIGHT_PAREN();
-    std::vector<ParamCallListContext *> paramCallList();
-    ParamCallListContext* paramCallList(size_t i);
+    FuncArgListContext *funcArgList();
 
    
   };
@@ -285,8 +284,7 @@ public:
     antlr4::tree::TerminalNode *TYPE();
     antlr4::tree::TerminalNode *LEFT_PAREN();
     antlr4::tree::TerminalNode *RIGHT_PAREN();
-    std::vector<ParamCallListContext *> paramCallList();
-    ParamCallListContext* paramCallList(size_t i);
+    FuncArgListContext *funcArgList();
 
    
   };
@@ -336,9 +334,9 @@ public:
 
   ImplicitVarDecContext* implicitVarDec();
 
-  class  ParamCallContext : public antlr4::ParserRuleContext {
+  class  FuncArgContext : public antlr4::ParserRuleContext {
   public:
-    ParamCallContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    FuncArgContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     ExprContext *expr();
     antlr4::tree::TerminalNode *VARIABLE();
@@ -347,21 +345,21 @@ public:
    
   };
 
-  ParamCallContext* paramCall();
+  FuncArgContext* funcArg();
 
-  class  ParamCallListContext : public antlr4::ParserRuleContext {
+  class  FuncArgListContext : public antlr4::ParserRuleContext {
   public:
-    ParamCallListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    FuncArgListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<ParamCallContext *> paramCall();
-    ParamCallContext* paramCall(size_t i);
+    std::vector<FuncArgContext *> funcArg();
+    FuncArgContext* funcArg(size_t i);
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
    
   };
 
-  ParamCallListContext* paramCallList();
+  FuncArgListContext* funcArgList();
 
   class  StatementContext : public antlr4::ParserRuleContext {
   public:

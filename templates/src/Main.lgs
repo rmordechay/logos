@@ -5,5 +5,5 @@ import (
 main(): Void {
     a = 3
     longer = a
-    print(longer)
+    print("longer")
 }

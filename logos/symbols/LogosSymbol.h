@@ -15,13 +15,27 @@ enum SymbolKind {
 
 class LogosSymbol {
 public:
-    std::string variableName;
-    std::string typeName;
+    std::string name;
     SymbolKind kind;
-    LogosType *logosValue;
+    LogosType* logosType;
 
-    LogosSymbol(const std::string& variableName, const std::string& typeName, SymbolKind kind);
-    LogosSymbol(const std::string& varName, SymbolKind kind);
+    explicit LogosSymbol(const std::string& name, const SymbolKind kind, LogosType* logosType):
+        name(name),
+        kind(kind),
+        logosType(logosType) {
+    }
+
+    explicit LogosSymbol(const std::string& name, const SymbolKind kind) :
+        LogosSymbol(name, kind, nullptr) {
+    }
+
+    explicit LogosSymbol(const SymbolKind kind, LogosType* logosType):
+        LogosSymbol("", kind, logosType) {
+    }
+
+    explicit LogosSymbol(const SymbolKind kind):
+        LogosSymbol("", kind, nullptr) {
+    }
 };
 
 

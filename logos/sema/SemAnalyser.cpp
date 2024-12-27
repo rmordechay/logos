@@ -2,6 +2,13 @@
 
 #include "LogosConfigs.h"
 #include "LogosErrors.h"
+#include "LogosParser.h"
+#include "builtin/Print.h"
+#include "nodes/StoreInt.h"
+#include "types/LogosBool.h"
+#include "types/LogosFloat.h"
+#include "types/LogosInt.h"
+#include "types/LogosString.h"
 
 SemAnalyser::SemAnalyser(LogosPackage* rootPackage) {
     this->rootPackage = rootPackage;
@@ -78,14 +85,14 @@ void SemAnalyser::visitStatement(LogosParser::StatementContext* ctx) {
 void SemAnalyser::visitExplicitVarDec(LogosParser::ExplicitVarDecContext* const ctx) const {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto typeName = ctx->TYPE()->getText();
-    const auto symbol = new LogosSymbol(variableName, typeName, LOCAL_VARIABLE);
+    const auto symbol = new LogosSymbol(variableName, LOCAL_VARIABLE);
     currentScope->symbolTable[variableName] = symbol;
 }
 
 void SemAnalyser::visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto symbol = new LogosSymbol(variableName, LOCAL_VARIABLE);
-    setSymbolFromExpr(ctx->expr(), symbol);
+    resolveExpr(ctx->expr(), symbol);
     currentScope->symbolTable[variableName] = symbol;
     codeNodes.push_back(new StoreInt(symbol));
 }
@@ -102,60 +109,64 @@ void SemAnalyser::visitExpr(LogosParser::ExprContext* ctx) {
 
 void SemAnalyser::visitUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto funcCall = ctx->funcCall()) {
-        // const auto variableName = funcCall->VARIABLE()->getText();
-        // const auto stringArg = new std::string(funcCall->paramCallList()[0]->paramCall()[0]->expr()->getText());
-        // auto logosType = new LogosType();
-        // const auto logosStringValue = new LogosValue(stringArg);
-        // const auto newSymbol = new LogosSymbol("arg1", "String", PARAM);
-        // newSymbol->logosValue = logosStringValue;
-        // codeNodes.push_back(new FuncCall(newSymbol));
+        visitFuncCall(funcCall);
     }
 }
 
-void SemAnalyser::setSymbolFromExpr(LogosParser::ExprContext* ctx, LogosSymbol* symbol) const {
+void SemAnalyser::visitFuncCall(LogosParser::FuncCallContext* const ctx) {
+    const auto funcName = ctx->VARIABLE()->getText();
+    if (BUILTIN_FUNCS.contains(funcName)) {
+        visitBuiltinFunc(ctx, funcName);
+    }
+}
+
+void SemAnalyser::visitBuiltinFunc(LogosParser::FuncCallContext* const ctx, const std::string& funcName) {
+    const auto builtinFunc = BUILTIN_FUNCS.at(funcName);
+    const auto args = ctx->funcArgList()->funcArg();
+    const auto newSymbol = new LogosSymbol( PARAM);
+    resolveExpr(args[0]->expr(), newSymbol);
+    builtinFunc->left = newSymbol;
+    codeNodes.push_back(builtinFunc);
+}
+
+void SemAnalyser::resolveExpr(LogosParser::ExprContext* ctx, LogosSymbol* symbol) const {
     if (const auto unary = ctx->unaryExpr()) {
-        setSymbolFromUnaryExpr(unary, symbol);
+        resolveUnaryExpr(unary, symbol);
     } else if (const auto binary = ctx->binaryExpr()) {
-        setSymbolFromBinaryExpr(binary, symbol);
+        resolveBinaryExpr(binary, symbol);
     } else if (ctx->boolExpr()) {
-        symbol->typeName = LogosBool::name;
     }
 }
 
-void SemAnalyser::setSymbolFromUnaryExpr(LogosParser::UnaryExprContext* unary, LogosSymbol* symbol) const {
+void SemAnalyser::resolveUnaryExpr(LogosParser::UnaryExprContext* unary, LogosSymbol* symbol) const {
     if (const auto intToken = unary->INTEGER()) {
-        symbol->typeName = LogosInt::name;
         const auto value = std::stoi(intToken->getText());
-        symbol->logosValue = new LogosInt(value);
+        symbol->logosType = new LogosInt(value);
         return;
     }
 
     if (const auto floatToken = unary->FLOAT()) {
-        symbol->typeName = LogosFloat::name;
         const auto value = std::stof(floatToken->getText());
-        symbol->logosValue = new LogosFloat(value);
+        symbol->logosType = new LogosFloat(value);
         return;
     }
 
     if (const auto boolToken = unary->BOOL()) {
-        symbol->typeName = LogosBool::name;
         const auto value = boolToken->getText() == LogosBool::trueLiteral;
-        symbol->logosValue = new LogosBool(value);
+        symbol->logosType = new LogosBool(value);
         return;
     }
 
     if (const auto stringToken = unary->STRING()) {
-        symbol->typeName = LogosString::name;
-        const auto value = stringToken->getText();
-        symbol->logosValue = new LogosString(value);
+        const auto value = new std::string(stringToken->getText());
+        symbol->logosType = new LogosString(*value);
         return;
     }
 
     if (const auto variable = unary->VARIABLE()) {
         const auto resolvedSymbol = currentScope->resolveSymbol(variable->getText());
         if (resolvedSymbol != nullptr) {
-            symbol->typeName = resolvedSymbol->typeName;
-            symbol->logosValue = resolvedSymbol->logosValue;
+            symbol->logosType = resolvedSymbol->logosType;
         }
         return;
     }
@@ -163,18 +174,16 @@ void SemAnalyser::setSymbolFromUnaryExpr(LogosParser::UnaryExprContext* unary, L
     if (const auto funcCall = unary->funcCall()) {
         const auto resolvedSymbol = currentScope->resolveSymbol(funcCall->getText());
         if (resolvedSymbol != nullptr) {
-            symbol->typeName = resolvedSymbol->typeName;
-            symbol->logosValue = resolvedSymbol->logosValue;
+            symbol->logosType = resolvedSymbol->logosType;
         }
         return;
     }
 
     if (const auto constructor = unary->constructorCall()) {
-        symbol->typeName = constructor->TYPE()->getText();
     }
 }
 
-void SemAnalyser::setSymbolFromBinaryExpr(LogosParser::BinaryExprContext* ctx, LogosSymbol* symbol) const {
+void SemAnalyser::resolveBinaryExpr(LogosParser::BinaryExprContext* ctx, LogosSymbol* symbol) const {
 
 }
 

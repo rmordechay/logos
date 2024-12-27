@@ -28,9 +28,12 @@ public:
     void visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     void visitExpr(LogosParser::ExprContext* ctx);
     void visitUnaryExpr(LogosParser::UnaryExprContext* ctx);
-    void setSymbolFromExpr(LogosParser::ExprContext* ctx, LogosSymbol* symbol) const;
-    void setSymbolFromUnaryExpr(LogosParser::UnaryExprContext* unary, LogosSymbol* symbol) const;
-    void setSymbolFromBinaryExpr(LogosParser::BinaryExprContext* ctx, LogosSymbol* symbol) const;
+    void visitBuiltinFunc(LogosParser::FuncCallContext* ctx, const std::string& funcName);
+    void visitFuncCall(LogosParser::FuncCallContext* ctx);
+    void resolveExpr(LogosParser::ExprContext* ctx, LogosSymbol* symbol) const;
+    void resolveUnaryExpr(LogosParser::UnaryExprContext* unary, LogosSymbol* symbol) const;
+    void resolveBinaryExpr(LogosParser::BinaryExprContext* ctx, LogosSymbol* symbol) const;
+    LogosType *resolveExpr(LogosParser::ExprContext* ctx);
     void printError(int errorCode);
     ~SemAnalyser();
 };
