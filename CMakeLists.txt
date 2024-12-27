@@ -9,7 +9,7 @@ set(GTEST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest.1.15.2.dylib")
 set(GTEST_LIB_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest_main.1.15.2.dylib")
 set(CMAKE_PREFIX_PATH "/opt/homebrew/opt/llvm")
 
-file(GLOB GENERATED_SRC "logos/parser/*.cpp" "logos/parser/*.h")
+file(GLOB GENERATED_SRC "${CMAKE_CURRENT_SOURCE_DIR}/logos/parser/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/logos/parser/*.h")
 
 find_package(LLVM REQUIRED CONFIG)
 
@@ -49,7 +49,6 @@ target_include_directories(logos PRIVATE
 
 llvm_map_components_to_libnames(LLVM_LIBS core bitreader bitwriter support)
 target_link_libraries(logos PRIVATE ${ANTLR_LIB} ${LLVM_LIBS} ${GTEST_LIB} ${GTEST_LIB_MAIN})
-
 
 # Tests
 enable_testing()
