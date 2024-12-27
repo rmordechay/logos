@@ -1,6 +1,6 @@
 #include "LogosFile.h"
 #include "SemAnalyser.h"
-#include "Symbol.h"
+#include "LogosSymbol.h"
 
 #include <ANTLRInputStream.h>
 
@@ -30,12 +30,12 @@ void LogosFile::addSymbols() {
         for (const auto explicitVarDec : objectFile->explicitVarDec()) {
             auto varName = explicitVarDec->VARIABLE()->getText();
             auto typeName = explicitVarDec->TYPE()->getText();
-            symbolTable[varName] = new Symbol(varName, typeName, FIELD);
+            symbolTable[varName] = new LogosSymbol(varName, typeName, FIELD);
         }
         for (const auto func : objectFile->funcImplementation()) {
             auto varName = func->funcDec()->VARIABLE()->getText();
             auto typeName = func->funcDec()->TYPE()->getText();
-            symbolTable[varName] = new Symbol(varName, typeName, FUNCTION);
+            symbolTable[varName] = new LogosSymbol(varName, typeName, FUNCTION);
         }
     }
 }

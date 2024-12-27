@@ -3,11 +3,11 @@
 #include <map>
 
 
-class Symbol;
+class LogosSymbol;
 
 class Scope {
 public:
-    std::map<std::string, Symbol*> symbolTable;
+    std::map<std::string, LogosSymbol*> symbolTable;
     explicit Scope();
 };
 

@@ -1,7 +1,6 @@
 #include "CodeGenerator.h"
 
 #include <gtest/internal/gtest-port.h>
-#include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Function.h>
@@ -9,10 +8,22 @@
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Support/FileSystem.h>
 
-using namespace llvm;
+void CodeGenerator::generateCode(const std::vector<ASTNode>& vector) {
+}
 
-void CodeGenerator::generateCode() {
-    LLVMContext context;
+void CodeGenerator::writeToFile(const Module* const module) {
+    std::error_code EC;
+    raw_fd_ostream textFile("../codegen/output.ll", EC, sys::fs::OF_None);
+    module->print(textFile, nullptr);
+}
+
+void CodeGenerator::runBinary() {
+    std::system("llc -filetype=obj -mtriple=arm64-apple-macos ../codegen/output.ll -o ../codegen/output.o");
+    std::system("clang ../codegen/output.o -o ../codegen/output");
+    std::system("../codegen/output");
+}
+
+void CodeGenerator::generateCodeDemo() {
     const auto module = new Module("root", context);
     IRBuilder builder(context);
 
@@ -22,31 +33,24 @@ void CodeGenerator::generateCode() {
     const auto entry = BasicBlock::Create(context, "entry", mainFunction);
     builder.SetInsertPoint(entry);
 
-    const auto a = builder.CreateAlloca(Type::getInt32Ty(context), nullptr, "a");
-    const auto b = builder.CreateAlloca(Type::getInt32Ty(context), nullptr, "b");
+    const auto int32Ty = Type::getInt32Ty(context);
+    const auto a = builder.CreateAlloca(int32Ty);
+    const auto b = builder.CreateAlloca(int32Ty);
 
-    builder.CreateStore(ConstantInt::get(Type::getInt32Ty(context), 10), a);
-    builder.CreateStore(ConstantInt::get(Type::getInt32Ty(context), 20), b);
+    builder.CreateStore(ConstantInt::get(int32Ty, 10), a);
+    builder.CreateStore(ConstantInt::get(int32Ty, 20), b);
 
-    const auto aVal = builder.CreateLoad(Type::getInt32Ty(context), a, "aVal");
-    const auto bVal = builder.CreateLoad(Type::getInt32Ty(context), b, "bval");
+    const auto aVal = builder.CreateLoad(int32Ty, a);
+    const auto bVal = builder.CreateLoad(int32Ty, b);
 
-    const auto sum = builder.CreateAdd(aVal, bVal, "sum");
-    const auto sumVar = builder.CreateAlloca(Type::getInt32Ty(context), nullptr, "sumVar");
-    builder.CreateStore(sum, sumVar);
-
+    const auto sum = builder.CreateAdd(aVal, bVal);
     const auto printfType = FunctionType::get(builder.getInt32Ty(), PointerType::getUnqual(builder.getInt8Ty()), true);
-    const auto printfFunc = llvm::Function::Create(printfType, llvm::Function::ExternalLinkage, "printf", module);
+    const auto printfFunc = Function::Create(printfType, Function::ExternalLinkage, "printf", module);
     auto formatStr = builder.CreateGlobalStringPtr("%d\n");
-    auto intValue = llvm::ConstantInt::get(builder.getInt32Ty(), 42);
-    builder.CreateCall(printfFunc, {formatStr, intValue});
+    builder.CreateCall(printfFunc, {formatStr, sum});
 
     builder.CreateRetVoid();
 
-    module->print(outs(), nullptr);
-    std::error_code EC;
-    raw_fd_ostream textFile("../codegen/output.ll", EC, sys::fs::OF_None);
-    module->print(textFile, nullptr);
-    std::system("llc -filetype=obj -mtriple=arm64-apple-macos ../codegen/output.ll -o ../codegen/output.o");
-    std::system("clang ../codegen/output.o -o ../codegen/output");
+    writeToFile(module);
+    runBinary();
 }

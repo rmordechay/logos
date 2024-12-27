@@ -2,7 +2,7 @@
 #define LOGOSFILE_H
 #include "LogosLexer.h"
 #include "LogosParser.h"
-#include "Symbol.h"
+#include "LogosSymbol.h"
 
 
 #include <filesystem>
@@ -14,7 +14,7 @@ public:
     std::string name;
     std::string path;
     LogosParser::LogosFileContext* fileCtx;
-    std::map<std::string, Symbol*> symbolTable;
+    std::map<std::string, LogosSymbol*> symbolTable;
 
     std::unique_ptr<antlr4::ANTLRInputStream> input;
     std::unique_ptr<LogosLexer> lexer;

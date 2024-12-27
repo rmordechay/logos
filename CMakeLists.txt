@@ -24,8 +24,8 @@ add_executable(logos
     logos/project/LogosFile.h
     logos/sema/SemAnalyser.cpp
     logos/sema/SemAnalyser.h
-    logos/sema/Symbol.cpp
-    logos/sema/Symbol.h
+    logos/sema/LogosSymbol.cpp
+    logos/sema/LogosSymbol.h
     logos/codegen/CodeGenerator.cpp
     logos/codegen/CodeGenerator.h
     logos/LogosConfigs.h
@@ -34,6 +34,8 @@ add_executable(logos
     logos/sema/LogosValue.cpp
     logos/sema/LogosValue.h
     logos/sema/LogosErrors.h
+    logos/sema/ASTNode.cpp
+    logos/sema/ASTNode.h
 )
 
 target_include_directories(logos PRIVATE

@@ -11,15 +11,15 @@ enum SymbolType {
     FUNCTION,
 };
 
-class Symbol {
+class LogosSymbol {
 public:
     std::string varibaleName;
     std::string typeName;
     SymbolType kind;
     LogosValue *value;
 
-    Symbol(const std::string& variableName, const std::string& typeName, SymbolType kind);
-    Symbol(const std::string& varName, SymbolType kind);
+    LogosSymbol(const std::string& variableName, const std::string& typeName, SymbolType kind);
+    LogosSymbol(const std::string& varName, SymbolType kind);
 };
 
 

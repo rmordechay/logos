@@ -1,5 +1,6 @@
 #ifndef PROJECT_H
 #define PROJECT_H
+#include "../sema/ASTNode.h"
 #include "CodeGenerator.h"
 #include "SemAnalyser.h"
 #include <string>

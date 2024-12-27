@@ -13,24 +13,25 @@ SemAnalyser::SemAnalyser(LogosPackage* rootPackage) {
 
 void SemAnalyser::analyseProject() {
     mainFile = rootPackage->mainFile;
-    checkMainFile();
-    checkPackage(rootPackage);
+    visitMainFile();
+    visitPackage(rootPackage);
 }
 
-void SemAnalyser::checkPackage(const LogosPackage* package) {
+void SemAnalyser::visitPackage(const LogosPackage* package) {
     for (const auto file : package->files) {
-        checkLogosFile(file->fileCtx);
+        visitLogosFile(file->fileCtx);
     }
     for (const auto childPackage : package->packages) {
-        checkPackage(childPackage);
+        visitPackage(childPackage);
     }
 }
 
-void SemAnalyser::checkLogosFile(LogosParser::LogosFileContext* ctx) {
-    checkImportStatement(ctx->importStatement());
+void SemAnalyser::visitLogosFile(LogosParser::LogosFileContext* ctx) {
+    visitImportStatement(ctx->importStatement());
+    visitObjectFile(ctx->objectFile());
 }
 
-void SemAnalyser::checkImportStatement(LogosParser::ImportStatementContext* ctx) const {
+void SemAnalyser::visitImportStatement(LogosParser::ImportStatementContext* ctx) const {
     if (ctx == nullptr) return;
     const auto importPaths = ctx->importPath();
     for (const auto importPath : importPaths) {
@@ -41,31 +42,31 @@ void SemAnalyser::checkImportStatement(LogosParser::ImportStatementContext* ctx)
     }
 }
 
-void SemAnalyser::checkMainFile() {
-    checkImportStatement(mainFile->fileCtx->importStatement());
+void SemAnalyser::visitMainFile() {
+    visitImportStatement(mainFile->fileCtx->importStatement());
     for (const auto func : mainFile->fileCtx->mainFile()->funcImplementation()) {
         if (func->funcDec()->VARIABLE()->getText() == LOGOS_MAIN_FUNCTION) {
-            checkMain(func);
+            visitFuncImplementation(func);
         }
     }
 }
 
-void SemAnalyser::checkMain(LogosParser::FuncImplementationContext* ctx) {
+void SemAnalyser::visitFuncImplementation(LogosParser::FuncImplementationContext* ctx) {
     const auto statements = ctx->funcBody()->statementsBlock()->statement();
     for (const auto statement : statements) {
-        checkStatement(statement);
+        visitStatement(statement);
     }
 }
 
-void SemAnalyser::checkObjectFile(LogosParser::ObjectFileContext* ctx) {
+void SemAnalyser::visitObjectFile(LogosParser::ObjectFileContext* ctx) {
     if (ctx == nullptr) return;
 }
 
-void SemAnalyser::checkObjectImplements(LogosParser::ObjectImplementsContext* ctx) {
+void SemAnalyser::visitObjectImplements(LogosParser::ObjectImplementsContext* ctx) {
     if (ctx == nullptr) return;
 }
 
-void SemAnalyser::checkStatement(LogosParser::StatementContext* ctx) const {
+void SemAnalyser::visitStatement(LogosParser::StatementContext* ctx) const {
     if (const auto explicitVarDec = ctx->explicitVarDec()) {
         setExplicitVariableSymbol(explicitVarDec);
     } else if (const auto implicitVarDec = ctx->implicitVarDec()) {
@@ -76,26 +77,28 @@ void SemAnalyser::checkStatement(LogosParser::StatementContext* ctx) const {
 void SemAnalyser::setExplicitVariableSymbol(LogosParser::ExplicitVarDecContext* const ctx) const {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto typeName = ctx->TYPE()->getText();
-    const auto symbol = new Symbol(variableName, typeName, LOCAL_VARIABLE);
+    const auto symbol = new LogosSymbol(variableName, typeName, LOCAL_VARIABLE);
     currentScope->symbolTable[variableName] = symbol;
 }
 
 void SemAnalyser::setImplicitVariableSymbol(LogosParser::ImplicitVarDecContext* ctx) const {
     const auto variableName = ctx->VARIABLE()->getText();
-    const auto symbol = new Symbol(variableName, LOCAL_VARIABLE);
+    const auto symbol = new LogosSymbol(variableName, LOCAL_VARIABLE);
     setSymbolFromExpr(ctx->expr(), symbol);
     currentScope->symbolTable[variableName] = symbol;
 }
 
-void SemAnalyser::setSymbolFromExpr(LogosParser::ExprContext* ctx, Symbol* symbol) const {
+void SemAnalyser::setSymbolFromExpr(LogosParser::ExprContext* ctx, LogosSymbol* symbol) const {
     if (const auto unary = ctx->unaryExpr()) {
         setSymbolFromUnaryExpr(unary, symbol);
+    } else if (const auto binary = ctx->binaryExpr()) {
+        setSymbolFromBinaryExpr(binary, symbol);
     } else if (ctx->boolExpr()) {
         symbol->typeName = "Bool";
     }
 }
 
-void SemAnalyser::setSymbolFromUnaryExpr(LogosParser::UnaryExprContext* unary, Symbol* symbol) const {
+void SemAnalyser::setSymbolFromUnaryExpr(LogosParser::UnaryExprContext* unary, LogosSymbol* symbol) const {
     if (const auto intToken = unary->INTEGER()) {
         symbol->typeName = "Int";
         const auto value = std::stoi(intToken->getText());
@@ -145,6 +148,10 @@ void SemAnalyser::setSymbolFromUnaryExpr(LogosParser::UnaryExprContext* unary, S
     if (const auto constructor = unary->constructorCall()) {
         symbol->typeName = constructor->TYPE()->getText();
     }
+}
+
+void SemAnalyser::setSymbolFromBinaryExpr(LogosParser::BinaryExprContext* ctx, LogosSymbol* symbol) const {
+
 }
 
 SemAnalyser::~SemAnalyser() {
