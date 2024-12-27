@@ -66,11 +66,13 @@ void SemAnalyser::visitObjectImplements(LogosParser::ObjectImplementsContext* ct
     if (ctx == nullptr) return;
 }
 
-void SemAnalyser::visitStatement(LogosParser::StatementContext* ctx){
+void SemAnalyser::visitStatement(LogosParser::StatementContext* ctx) {
     if (const auto explicitVarDec = ctx->explicitVarDec()) {
         visitExplicitVarDec(explicitVarDec);
     } else if (const auto implicitVarDec = ctx->implicitVarDec()) {
         visitImplicitVarDec(implicitVarDec);
+    } else if (const auto expr = ctx->expr()) {
+        visitExpr(expr);
     }
 }
 
@@ -89,6 +91,27 @@ void SemAnalyser::visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     codeNodes.push_back(new StoreInt(symbol));
 }
 
+void SemAnalyser::visitExpr(LogosParser::ExprContext* ctx) {
+    if (const auto unary = ctx->unaryExpr()) {
+        visitUnaryExpr(unary);
+    } else if (const auto binary = ctx->binaryExpr()) {
+
+    } else if (ctx->boolExpr()) {
+
+    }
+}
+
+void SemAnalyser::visitUnaryExpr(LogosParser::UnaryExprContext* ctx) {
+    if (const auto funcCall = ctx->funcCall()) {
+        const auto variableName = funcCall->VARIABLE()->getText();
+        const auto stringArg = new std::string(funcCall->paramCallList()[0]->paramCall()[0]->expr()->getText());
+        const auto logosStringValue = new LogosValue(ValueType::STRING, stringArg);
+        const auto newSymbol = new LogosSymbol("arg1", "String", PARAM);
+        newSymbol->logosValue = logosStringValue;
+        codeNodes.push_back(new FuncCall(newSymbol));
+    }
+}
+
 void SemAnalyser::setSymbolFromExpr(LogosParser::ExprContext* ctx, LogosSymbol* symbol) const {
     if (const auto unary = ctx->unaryExpr()) {
         setSymbolFromUnaryExpr(unary, symbol);
@@ -103,45 +126,45 @@ void SemAnalyser::setSymbolFromUnaryExpr(LogosParser::UnaryExprContext* unary, L
     if (const auto intToken = unary->INTEGER()) {
         symbol->typeName = "Int";
         const auto value = std::stoi(intToken->getText());
-        symbol->value = new LogosValue(ValueType::INT, &value);
+        symbol->logosValue = new LogosValue(ValueType::INT, &value);
         return;
     }
 
     if (const auto floatToken = unary->FLOAT()) {
         symbol->typeName = "Float";
         const auto value = std::stof(floatToken->getText());
-        symbol->value = new LogosValue(ValueType::FLOAT, &value);
+        symbol->logosValue = new LogosValue(ValueType::FLOAT, &value);
         return;
     }
 
     if (const auto boolToken = unary->BOOL()) {
         symbol->typeName = "Bool";
         const auto value = boolToken->getText() == "true";
-        symbol->value = new LogosValue(ValueType::BOOL, &value);
+        symbol->logosValue = new LogosValue(ValueType::BOOL, &value);
         return;
     }
 
     if (const auto stringToken = unary->STRING()) {
         symbol->typeName = "String";
         const auto value = stringToken->getText();
-        symbol->value = new LogosValue(ValueType::STRING, &value);
+        symbol->logosValue = new LogosValue(ValueType::STRING, &value);
         return;
     }
 
     if (const auto variable = unary->VARIABLE()) {
-        const auto it = currentScope->symbolTable.find(variable->getText());
-        if (it != currentScope->symbolTable.end()) {
-            symbol->typeName = it->second->typeName;
-            symbol->value = it->second->value;
+        const auto resolvedSymbol = currentScope->resolveSymbol(variable->getText());
+        if (resolvedSymbol != nullptr) {
+            symbol->typeName = resolvedSymbol->typeName;
+            symbol->logosValue = resolvedSymbol->logosValue;
         }
         return;
     }
 
     if (const auto funcCall = unary->funcCall()) {
-        const auto it = currentScope->symbolTable.find(funcCall->VARIABLE()->getText());
-        if (it != currentScope->symbolTable.end()) {
-            symbol->typeName = it->second->typeName;
-            symbol->value = it->second->value;
+        const auto resolvedSymbol = currentScope->resolveSymbol(funcCall->getText());
+        if (resolvedSymbol != nullptr) {
+            symbol->typeName = resolvedSymbol->typeName;
+            symbol->logosValue = resolvedSymbol->logosValue;
         }
         return;
     }

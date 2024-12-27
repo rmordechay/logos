@@ -5,21 +5,23 @@
 
 #include <string>
 
-enum SymbolType {
+enum SymbolKind {
     FIELD,
     LOCAL_VARIABLE,
-    FUNCTION,
+    FUNC_CALL,
+    FUNC_DEFINITION,
+    PARAM,
 };
 
 class LogosSymbol {
 public:
     std::string variableName;
     std::string typeName;
-    SymbolType kind;
-    LogosValue *value;
+    SymbolKind kind;
+    LogosValue *logosValue;
 
-    LogosSymbol(const std::string& variableName, const std::string& typeName, SymbolType kind);
-    LogosSymbol(const std::string& varName, SymbolType kind);
+    LogosSymbol(const std::string& variableName, const std::string& typeName, SymbolKind kind);
+    LogosSymbol(const std::string& varName, SymbolKind kind);
 };
 
 

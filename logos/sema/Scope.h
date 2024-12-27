@@ -9,6 +9,8 @@ class Scope {
 public:
     std::map<std::string, LogosSymbol*> symbolTable;
     explicit Scope();
+
+    LogosSymbol* resolveSymbol(const std::string& symbolName);
 };
 
 

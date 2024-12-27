@@ -4,7 +4,6 @@ import (
 
 main(): Void {
     a = 3
-    b = a
-    c = 2 + b
-    print(c)
+    longer = a
+    print(longer)
 }

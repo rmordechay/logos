@@ -9,16 +9,21 @@
 #include <llvm/Support/FileSystem.h>
 
 void CodeGenerator::generateCode(const std::vector<CodeNode*>& codeNodes) {
+    LLVMContext context;
     const auto module = new Module("root", context);
     IRBuilder builder(context);
-    insertMain(builder, module);
+    insertMain(context, builder, module);
     for (const auto& codeNode : codeNodes) {
-        codeNode->generateCode();
+        codeNode->generateCode(context, builder, module);
     }
     builder.CreateRetVoid();
+
+    // module->print(outs(), nullptr);
+    writeToFile(module);
+    runBinary();
 }
 
-void CodeGenerator::insertMain(IRBuilder<>& builder, Module* module) {
+void CodeGenerator::insertMain(LLVMContext& context, IRBuilder<>& builder, Module* module) {
     const auto voidType = Type::getVoidTy(context);
     const auto funcType = FunctionType::get(voidType, false);
     const auto mainFunction = Function::Create(funcType, Function::ExternalLinkage, "main", module);

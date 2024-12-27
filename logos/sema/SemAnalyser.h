@@ -26,6 +26,8 @@ public:
     void visitStatement(LogosParser::StatementContext* ctx);
     void visitExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) const;
     void visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
+    void visitExpr(LogosParser::ExprContext* ctx);
+    void visitUnaryExpr(LogosParser::UnaryExprContext* ctx);
     void setSymbolFromExpr(LogosParser::ExprContext* ctx, LogosSymbol* symbol) const;
     void setSymbolFromUnaryExpr(LogosParser::UnaryExprContext* unary, LogosSymbol* symbol) const;
     void setSymbolFromBinaryExpr(LogosParser::BinaryExprContext* ctx, LogosSymbol* symbol) const;

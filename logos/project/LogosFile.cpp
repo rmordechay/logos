@@ -35,7 +35,7 @@ void LogosFile::addSymbols() {
         for (const auto func : objectFile->funcImplementation()) {
             auto varName = func->funcDec()->VARIABLE()->getText();
             auto typeName = func->funcDec()->TYPE()->getText();
-            symbolTable[varName] = new LogosSymbol(varName, typeName, FUNCTION);
+            symbolTable[varName] = new LogosSymbol(varName, typeName, FUNC_DEFINITION);
         }
     }
 }
