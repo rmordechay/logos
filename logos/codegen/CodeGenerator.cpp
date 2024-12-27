@@ -8,10 +8,22 @@
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Support/FileSystem.h>
 
-void CodeGenerator::generateCode(const std::vector<CodeNode>& codeGenNodes) {
-    for (auto codeGenNode : codeGenNodes) {
-        codeGenNode.generateCode();
+void CodeGenerator::generateCode(const std::vector<CodeNode*>& codeNodes) {
+    const auto module = new Module("root", context);
+    IRBuilder builder(context);
+    insertMain(builder, module);
+    for (const auto& codeNode : codeNodes) {
+        codeNode->generateCode();
     }
+    builder.CreateRetVoid();
+}
+
+void CodeGenerator::insertMain(IRBuilder<>& builder, Module* module) {
+    const auto voidType = Type::getVoidTy(context);
+    const auto funcType = FunctionType::get(voidType, false);
+    const auto mainFunction = Function::Create(funcType, Function::ExternalLinkage, "main", module);
+    const auto entry = BasicBlock::Create(context, "entry", mainFunction);
+    builder.SetInsertPoint(entry);
 }
 
 void CodeGenerator::writeToFile(const Module* const module) {
@@ -27,33 +39,19 @@ void CodeGenerator::runBinary() {
 }
 
 void CodeGenerator::generateCodeDemo() {
-    const auto module = new Module("root", context);
-    IRBuilder builder(context);
-
-    const auto voidType = Type::getVoidTy(context);
-    const auto funcType = FunctionType::get(voidType, false);
-    const auto mainFunction = Function::Create(funcType, Function::ExternalLinkage, "main", module);
-    const auto entry = BasicBlock::Create(context, "entry", mainFunction);
-    builder.SetInsertPoint(entry);
-
-    const auto int32Ty = Type::getInt32Ty(context);
-    const auto a = builder.CreateAlloca(int32Ty);
-    const auto b = builder.CreateAlloca(int32Ty);
-
-    builder.CreateStore(ConstantInt::get(int32Ty, 10), a);
-    builder.CreateStore(ConstantInt::get(int32Ty, 20), b);
-
-    const auto aVal = builder.CreateLoad(int32Ty, a);
-    const auto bVal = builder.CreateLoad(int32Ty, b);
-
-    const auto sum = builder.CreateAdd(aVal, bVal);
-    const auto printfType = FunctionType::get(builder.getInt32Ty(), PointerType::getUnqual(builder.getInt8Ty()), true);
-    const auto printfFunc = Function::Create(printfType, Function::ExternalLinkage, "printf", module);
-    auto formatStr = builder.CreateGlobalStringPtr("%d\n");
-    builder.CreateCall(printfFunc, {formatStr, sum});
-
-    builder.CreateRetVoid();
-
-    writeToFile(module);
-    runBinary();
+    // const auto int32Ty = Type::getInt32Ty(context);
+    // const auto a = builder.CreateAlloca(int32Ty);
+    // const auto b = builder.CreateAlloca(int32Ty);
+    //
+    // builder.CreateStore(ConstantInt::get(int32Ty, 10), a);
+    // builder.CreateStore(ConstantInt::get(int32Ty, 20), b);
+    //
+    // const auto aVal = builder.CreateLoad(int32Ty, a);
+    // const auto bVal = builder.CreateLoad(int32Ty, b);
+    //
+    // const auto sum = builder.CreateAdd(aVal, bVal);
+    // const auto printfType = FunctionType::get(builder.getInt32Ty(), PointerType::getUnqual(builder.getInt8Ty()), true);
+    // const auto printfFunc = Function::Create(printfType, Function::ExternalLinkage, "printf", module);
+    // auto formatStr = builder.CreateGlobalStringPtr("%d\n");
+    // builder.CreateCall(printfFunc, {formatStr, sum});
 }

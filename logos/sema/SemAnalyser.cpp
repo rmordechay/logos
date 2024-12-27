@@ -66,7 +66,7 @@ void SemAnalyser::visitObjectImplements(LogosParser::ObjectImplementsContext* ct
     if (ctx == nullptr) return;
 }
 
-void SemAnalyser::visitStatement(LogosParser::StatementContext* ctx) const {
+void SemAnalyser::visitStatement(LogosParser::StatementContext* ctx){
     if (const auto explicitVarDec = ctx->explicitVarDec()) {
         visitExplicitVarDec(explicitVarDec);
     } else if (const auto implicitVarDec = ctx->implicitVarDec()) {
@@ -86,7 +86,7 @@ void SemAnalyser::visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto symbol = new LogosSymbol(variableName, LOCAL_VARIABLE);
     setSymbolFromExpr(ctx->expr(), symbol);
     currentScope->symbolTable[variableName] = symbol;
-    codeGenNodes.push_back(StoreInt(symbol));
+    codeNodes.push_back(new StoreInt(symbol));
 }
 
 void SemAnalyser::setSymbolFromExpr(LogosParser::ExprContext* ctx, LogosSymbol* symbol) const {

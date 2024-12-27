@@ -1,7 +1,7 @@
 #ifndef SEMANTICANALYSER_H
 #define SEMANTICANALYSER_H
 
-#include "CodeGenNode.h"
+#include "CodeNode.h"
 #include "LogosPackage.h"
 #include "LogosParser.h"
 #include "Scope.h"
@@ -12,7 +12,7 @@ public:
     Scope* rootScope;
     Scope* currentScope;
     LogosFile* mainFile;
-    std::vector<CodeNode> codeGenNodes;
+    std::vector<CodeNode*> codeNodes;
 
     explicit SemAnalyser(LogosPackage* rootPackage);
     void analyseProject();
@@ -23,7 +23,7 @@ public:
     void visitFuncImplementation(LogosParser::FuncImplementationContext* ctx);
     void visitObjectFile(LogosParser::ObjectFileContext* ctx);
     void visitObjectImplements(LogosParser::ObjectImplementsContext* ctx);
-    void visitStatement(LogosParser::StatementContext* ctx) const;
+    void visitStatement(LogosParser::StatementContext* ctx);
     void visitExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) const;
     void visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     void setSymbolFromExpr(LogosParser::ExprContext* ctx, LogosSymbol* symbol) const;
