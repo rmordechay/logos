@@ -31,11 +31,11 @@ add_executable(logos
     logos/LogosConfigs.h
     logos/sema/Scope.cpp
     logos/sema/Scope.h
-    logos/symbols/LogosValue.cpp
-    logos/symbols/LogosValue.h
     logos/sema/LogosErrors.h
     logos/codegen/CodeNode.cpp
     logos/codegen/CodeNode.h
+    logos/symbols/LogosType.cpp
+    logos/symbols/LogosType.h
 )
 
 target_include_directories(logos PRIVATE

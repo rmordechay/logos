@@ -2,7 +2,6 @@
 
 #include "LogosConfigs.h"
 #include "LogosErrors.h"
-#include "LogosValue.h"
 
 SemAnalyser::SemAnalyser(LogosPackage* rootPackage) {
     this->rootPackage = rootPackage;
@@ -103,12 +102,13 @@ void SemAnalyser::visitExpr(LogosParser::ExprContext* ctx) {
 
 void SemAnalyser::visitUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto funcCall = ctx->funcCall()) {
-        const auto variableName = funcCall->VARIABLE()->getText();
-        const auto stringArg = new std::string(funcCall->paramCallList()[0]->paramCall()[0]->expr()->getText());
-        const auto logosStringValue = new LogosValue(ValueType::STRING, stringArg);
-        const auto newSymbol = new LogosSymbol("arg1", "String", PARAM);
-        newSymbol->logosValue = logosStringValue;
-        codeNodes.push_back(new FuncCall(newSymbol));
+        // const auto variableName = funcCall->VARIABLE()->getText();
+        // const auto stringArg = new std::string(funcCall->paramCallList()[0]->paramCall()[0]->expr()->getText());
+        // auto logosType = new LogosType();
+        // const auto logosStringValue = new LogosValue(stringArg);
+        // const auto newSymbol = new LogosSymbol("arg1", "String", PARAM);
+        // newSymbol->logosValue = logosStringValue;
+        // codeNodes.push_back(new FuncCall(newSymbol));
     }
 }
 
@@ -118,36 +118,36 @@ void SemAnalyser::setSymbolFromExpr(LogosParser::ExprContext* ctx, LogosSymbol* 
     } else if (const auto binary = ctx->binaryExpr()) {
         setSymbolFromBinaryExpr(binary, symbol);
     } else if (ctx->boolExpr()) {
-        symbol->typeName = "Bool";
+        symbol->typeName = LogosBool::name;
     }
 }
 
 void SemAnalyser::setSymbolFromUnaryExpr(LogosParser::UnaryExprContext* unary, LogosSymbol* symbol) const {
     if (const auto intToken = unary->INTEGER()) {
-        symbol->typeName = "Int";
+        symbol->typeName = LogosInt::name;
         const auto value = std::stoi(intToken->getText());
-        symbol->logosValue = new LogosValue(ValueType::INT, &value);
+        symbol->logosValue = new LogosInt(value);
         return;
     }
 
     if (const auto floatToken = unary->FLOAT()) {
-        symbol->typeName = "Float";
+        symbol->typeName = LogosFloat::name;
         const auto value = std::stof(floatToken->getText());
-        symbol->logosValue = new LogosValue(ValueType::FLOAT, &value);
+        symbol->logosValue = new LogosFloat(value);
         return;
     }
 
     if (const auto boolToken = unary->BOOL()) {
-        symbol->typeName = "Bool";
-        const auto value = boolToken->getText() == "true";
-        symbol->logosValue = new LogosValue(ValueType::BOOL, &value);
+        symbol->typeName = LogosBool::name;
+        const auto value = boolToken->getText() == LogosBool::trueLiteral;
+        symbol->logosValue = new LogosBool(value);
         return;
     }
 
     if (const auto stringToken = unary->STRING()) {
-        symbol->typeName = "String";
+        symbol->typeName = LogosString::name;
         const auto value = stringToken->getText();
-        symbol->logosValue = new LogosValue(ValueType::STRING, &value);
+        symbol->logosValue = new LogosString(value);
         return;
     }
 

@@ -1,6 +1,6 @@
 #ifndef SYMBOL_H
 #define SYMBOL_H
-#include "LogosValue.h"
+#include "LogosType.h"
 
 
 #include <string>
@@ -18,7 +18,7 @@ public:
     std::string variableName;
     std::string typeName;
     SymbolKind kind;
-    LogosValue *logosValue;
+    LogosType *logosValue;
 
     LogosSymbol(const std::string& variableName, const std::string& typeName, SymbolKind kind);
     LogosSymbol(const std::string& varName, SymbolKind kind);
