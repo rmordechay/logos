@@ -127,7 +127,7 @@ void SemAnalyser::visitBuiltinFunc(LogosParser::FuncCallContext* const ctx, cons
     const auto newSymbol = new LogosSymbol( PARAM);
     const auto exprType = resolveExprType(args[0]->expr());
     newSymbol->logosType = exprType;
-    builtinFunc->left = newSymbol;
+    builtinFunc->args.push_back(newSymbol);
     codeNodes.push_back(builtinFunc);
 }
 
@@ -136,7 +136,7 @@ LogosType *SemAnalyser::resolveExprType(LogosParser::ExprContext* ctx) const {
         return resolveUnaryExprType(unary);
     }
     if (const auto binary = ctx->binaryExpr()) {
-        return resolveBinaryExpr(binary);
+        return resolveBinaryExprType(binary);
     }
     if (ctx->boolExpr()) {
         return new LogosBool();
@@ -186,13 +186,13 @@ LogosType *SemAnalyser::resolveUnaryExprType(LogosParser::UnaryExprContext* unar
     return nullptr;
 }
 
-LogosType *SemAnalyser::resolveBinaryExpr(LogosParser::BinaryExprContext* ctx) const {
+LogosType *SemAnalyser::resolveBinaryExprType(LogosParser::BinaryExprContext* ctx) const {
     const auto left = resolveUnaryExprType(ctx->unaryExpr());
     const auto right = resolveExprType(ctx->expr());
     if (right == nullptr) {
         return left;
     }
-    return left->inferBinaryType(right, ctx);
+    return left->inferType(right);
 }
 
 SemAnalyser::~SemAnalyser() {

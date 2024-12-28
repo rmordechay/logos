@@ -1,6 +1,8 @@
 #include "LogosType.h"
 
-LogosType* LogosType::inferBinaryType(LogosType* other, LogosParser::BinaryExprContext* binaryExpr) {
-    if ()
+LogosType* LogosType::inferBinaryType(const LogosType* other, Operator op) {
+    if (getName() == other->getName()) {
+        return this;
+    }
     return nullptr;
 }

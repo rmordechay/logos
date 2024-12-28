@@ -12,6 +12,7 @@ public:
     LogosBool() = default;
     explicit LogosBool(const bool value): value(value) {}
     std::string getName() const override;
+    LogosType* inferType(LogosType* other) override;
 };
 
 #endif //LOGOSBOOL_H

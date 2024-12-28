@@ -9,8 +9,10 @@ class LogosString final : public LogosType {
 public:
     static constexpr auto name = "Str";
     const std::string &value;
+
     explicit LogosString(const std::string &value): value(value) {}
     std::string getName() const override;
+    LogosType* inferType(LogosType* other) override;
 };
 
 

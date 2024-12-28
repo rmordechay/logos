@@ -4,7 +4,7 @@
 
 class StoreInt final : public CodeNode {
 public:
-    explicit StoreInt(LogosSymbol *left): CodeNode(left, nullptr) {}
+    explicit StoreInt(LogosSymbol* args...): CodeNode(args) {}
     void generateCode(LLVMContext& context, IRBuilder<>& builder, Module* module) const override;
 };
 

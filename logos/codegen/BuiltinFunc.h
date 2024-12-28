@@ -5,7 +5,8 @@
 
 class BuiltinFunc : public CodeNode {
 public:
-    BuiltinFunc(LogosSymbol* left, LogosSymbol* right) : CodeNode(left, right) {}
+    explicit BuiltinFunc() {}
+    explicit BuiltinFunc(LogosSymbol* args...): CodeNode(args) {}
     void generateCode(LLVMContext& context, IRBuilder<>& builder, Module* module) const override = 0;
 };
 

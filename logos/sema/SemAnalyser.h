@@ -30,7 +30,7 @@ public:
     void visitUnaryExpr(LogosParser::UnaryExprContext* ctx);
     void visitBuiltinFunc(LogosParser::FuncCallContext* ctx, const std::string& funcName);
     void visitFuncCall(LogosParser::FuncCallContext* ctx);
-    LogosType *resolveBinaryExpr(LogosParser::BinaryExprContext* ctx) const;
+    LogosType *resolveBinaryExprType(LogosParser::BinaryExprContext* ctx) const;
     LogosType *resolveUnaryExprType(LogosParser::UnaryExprContext* unary) const;
     LogosType *resolveExprType(LogosParser::ExprContext* ctx) const;
     void printError(int errorCode);

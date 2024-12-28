@@ -8,6 +8,7 @@ void Print::generateCode(LLVMContext& context, IRBuilder<>& builder, Module* mod
     const auto printfType = FunctionType::get(builder.getInt32Ty(), PointerType::getUnqual(builder.getInt8Ty()), true);
     const auto printfFunc = Function::Create(printfType, Function::ExternalLinkage, "printf", module);
 
+    const auto left = args[0];
     if (const auto logosStr = dynamic_cast<LogosString*>(left->logosType)) {
         auto formatStr = builder.CreateGlobalStringPtr("Printing: %s\n");
         const auto strValue = builder.CreateGlobalStringPtr(logosStr->value);

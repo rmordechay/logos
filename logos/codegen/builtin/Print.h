@@ -9,8 +9,8 @@ public:
     std::string name = "print";
     const std::vector<LogosSymbol*> params = {new LogosSymbol(PARAM)};
 
-    explicit Print(): BuiltinFunc(nullptr, nullptr) {}
-    explicit Print(LogosSymbol *left): BuiltinFunc(left, nullptr) {}
+    explicit Print(): BuiltinFunc() {}
+    explicit Print(LogosSymbol* args...): BuiltinFunc(args) {}
     void generateCode(LLVMContext& context, IRBuilder<>& builder, Module* module) const override;
 };
 

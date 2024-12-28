@@ -5,7 +5,7 @@
 
 class Add final : public CodeNode {
 public:
-    explicit Add(LogosSymbol *left, LogosSymbol *right): CodeNode(left, right){}
+    explicit Add(LogosSymbol* args...): CodeNode(args) {}
     void generateCode(LLVMContext& context, IRBuilder<>& builder, Module* module) const override;
 };
 

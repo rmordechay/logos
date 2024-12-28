@@ -43,6 +43,14 @@ add_executable(logos
     logos/symbols/LogosSymbol.h
     logos/symbols/LogosType.h
     logos/symbols/LogosType.cpp
+    logos/symbols/types/LogosBool.cpp
+    logos/symbols/types/LogosBool.h
+    logos/symbols/types/LogosFloat.cpp
+    logos/symbols/types/LogosFloat.h
+    logos/symbols/types/LogosInt.cpp
+    logos/symbols/types/LogosInt.h
+    logos/symbols/types/LogosString.cpp
+    logos/symbols/types/LogosString.h
 )
 
 target_include_directories(logos PRIVATE
