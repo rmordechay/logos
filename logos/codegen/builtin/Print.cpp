@@ -13,11 +13,12 @@ void Print::generateCode(LLVMContext& context, IRBuilder<>& builder, Module* mod
         auto formatStr = builder.CreateGlobalStringPtr("Printing: %s\n");
         const auto strValue = builder.CreateGlobalStringPtr(logosStr->value);
         builder.CreateCall(printfFunc, {formatStr, strValue});
-    }
-
-    if (const auto logosInt = dynamic_cast<LogosInt*>(left->logosType)) {
+    } else if (const auto logosInt = dynamic_cast<LogosInt*>(left->logosType)) {
         auto formatStr = builder.CreateGlobalStringPtr("Printing: %d\n");
         auto intValue = ConstantInt::get(builder.getInt32Ty(), logosInt->value);
         builder.CreateCall(printfFunc, {formatStr, intValue});
+    } else {
+        auto formatStr = builder.CreateGlobalStringPtr("Did not find any values\n");
+        builder.CreateCall(printfFunc, {formatStr});
     }
 }

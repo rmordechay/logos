@@ -12,6 +12,7 @@ public:
     static void insertMain(LLVMContext& context, IRBuilder<>& builder, Module* module);
     static void writeToFile(const Module* module);
     static void runBinary();
+    static void compileLLVM(const std::string& llvmFilePath, const std::string& outputFilePath);
 };
 
 #endif //CODEGENERATOR_H

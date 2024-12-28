@@ -8,6 +8,8 @@
 #include "exprs/LogosBinaryExpr.h"
 #include "exprs/LogosUnaryExpr.h"
 
+using namespace std;
+
 class SemAnalyser {
 public:
     LogosPackage* rootPackage;
@@ -32,10 +34,11 @@ public:
     void visitUnaryExpr(LogosParser::UnaryExprContext* ctx);
     void visitBuiltinFunc(LogosParser::FuncCallContext* ctx, const std::string& funcName);
     void visitFuncCall(LogosParser::FuncCallContext* ctx);
-    LogosExpr getExpr(LogosParser::ExprContext* ctx) const;
-    LogosUnaryExpr getUnaryExpr(LogosParser::UnaryExprContext* ctx) const;
-    LogosBinaryExpr getBinaryExpr(LogosParser::BinaryExprContext* ctx) const;
-    void printError(int errorCode);
+    shared_ptr<LogosExpr> getExpr(LogosParser::ExprContext* ctx) const;
+    shared_ptr<LogosTypedValue> getUnaryTypedValue(LogosParser::UnaryExprContext* ctx) const;
+    shared_ptr<LogosExpr> getBinaryExpr(LogosParser::BinaryExprContext* ctx) const;
+    shared_ptr<LogosExpr> getBoolExpr(LogosParser::BoolExprContext* ctx) const;
+    void printError(int errorCode) const;
     ~SemAnalyser();
 };
 

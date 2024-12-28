@@ -54,3 +54,4 @@ LogosPackage::~LogosPackage() {
         delete package;
     }
 }
+

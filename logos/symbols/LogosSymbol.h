@@ -1,6 +1,7 @@
 #ifndef SYMBOL_H
 #define SYMBOL_H
 #include "LogosTypedValue.h"
+#include "exprs/LogosExpr.h"
 
 
 #include <string>
@@ -18,6 +19,7 @@ public:
     std::string name;
     SymbolKind kind;
     LogosTypedValue* logosType;
+    LogosExpr* logosExpr = nullptr;
 
     explicit LogosSymbol(const std::string& name, const SymbolKind kind, LogosTypedValue* logosType):
         name(name),
