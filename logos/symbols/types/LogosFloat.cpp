@@ -4,5 +4,5 @@ std::string LogosFloat::getName() const {
     return name;
 }
 
-LogosType* LogosFloat::inferType(LogosType* other) {
+LogosTypedValue* LogosFloat::applyOperation(LogosTypedValue* other) {
 }

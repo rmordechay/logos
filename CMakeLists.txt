@@ -41,8 +41,7 @@ add_executable(logos
     logos/sema/SemAnalyser.cpp
     logos/sema/SemAnalyser.h
     logos/symbols/LogosSymbol.h
-    logos/symbols/LogosType.h
-    logos/symbols/LogosType.cpp
+    logos/symbols/LogosTypedValue.h
     logos/symbols/types/LogosBool.cpp
     logos/symbols/types/LogosBool.h
     logos/symbols/types/LogosFloat.cpp
@@ -51,6 +50,10 @@ add_executable(logos
     logos/symbols/types/LogosInt.h
     logos/symbols/types/LogosString.cpp
     logos/symbols/types/LogosString.h
+    logos/symbols/logosOperator.h
+    logos/symbols/exprs/LogosBinaryExpr.h
+    logos/symbols/exprs/LogosExpr.h
+    logos/symbols/exprs/LogosUnaryExpr.h
 )
 
 target_include_directories(logos PRIVATE

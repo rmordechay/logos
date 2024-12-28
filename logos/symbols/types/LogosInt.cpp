@@ -4,6 +4,6 @@ std::string LogosInt::getName() const {
     return name;
 }
 
-LogosType* LogosInt::inferType(LogosType* other) {
+LogosTypedValue* LogosInt::applyOperation(LogosTypedValue* other) {
     return new LogosInt();
 }

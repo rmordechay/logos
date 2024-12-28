@@ -5,6 +5,8 @@
 #include "LogosPackage.h"
 #include "LogosParser.h"
 #include "Scope.h"
+#include "exprs/LogosBinaryExpr.h"
+#include "exprs/LogosUnaryExpr.h"
 
 class SemAnalyser {
 public:
@@ -30,9 +32,9 @@ public:
     void visitUnaryExpr(LogosParser::UnaryExprContext* ctx);
     void visitBuiltinFunc(LogosParser::FuncCallContext* ctx, const std::string& funcName);
     void visitFuncCall(LogosParser::FuncCallContext* ctx);
-    LogosType *resolveBinaryExprType(LogosParser::BinaryExprContext* ctx) const;
-    LogosType *resolveUnaryExprType(LogosParser::UnaryExprContext* unary) const;
-    LogosType *resolveExprType(LogosParser::ExprContext* ctx) const;
+    LogosExpr getExpr(LogosParser::ExprContext* ctx) const;
+    LogosUnaryExpr getUnaryExpr(LogosParser::UnaryExprContext* ctx) const;
+    LogosBinaryExpr getBinaryExpr(LogosParser::BinaryExprContext* ctx) const;
     void printError(int errorCode);
     ~SemAnalyser();
 };
