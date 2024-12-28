@@ -38,7 +38,7 @@ void CodeGenerator::writeToFile(const Module* const module) {
 }
 
 void CodeGenerator::runBinary() {
-    std::system("llc -filetype=obj -mtriple=arm64-apple-macos ../codegen/output.ll -o ../codegen/output.o");
-    std::system("clang ../codegen/output.o -o ../codegen/output");
+    // std::system("llc -filetype=obj -mtriple=arm64-apple-macos ../codegen/output.ll -o ../codegen/output.o");
+    std::system("clang -o ../codegen/output ../codegen/output.ll");
     std::system("../codegen/output");
 }

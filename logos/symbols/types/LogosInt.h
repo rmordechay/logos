@@ -9,6 +9,7 @@ public:
     int value;
     LogosInt() = default;
     explicit LogosInt(const int value): value(value) {}
+    std::string getName() const override;
 };
 
 

@@ -30,10 +30,9 @@ public:
     void visitUnaryExpr(LogosParser::UnaryExprContext* ctx);
     void visitBuiltinFunc(LogosParser::FuncCallContext* ctx, const std::string& funcName);
     void visitFuncCall(LogosParser::FuncCallContext* ctx);
-    void resolveExpr(LogosParser::ExprContext* ctx, LogosSymbol* symbol) const;
-    void resolveUnaryExpr(LogosParser::UnaryExprContext* unary, LogosSymbol* symbol) const;
-    void resolveBinaryExpr(LogosParser::BinaryExprContext* ctx, LogosSymbol* symbol) const;
-    LogosType *resolveExpr(LogosParser::ExprContext* ctx);
+    LogosType *resolveBinaryExpr(LogosParser::BinaryExprContext* ctx) const;
+    LogosType *resolveUnaryExprType(LogosParser::UnaryExprContext* unary) const;
+    LogosType *resolveExprType(LogosParser::ExprContext* ctx) const;
     void printError(int errorCode);
     ~SemAnalyser();
 };

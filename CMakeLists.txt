@@ -42,6 +42,7 @@ add_executable(logos
     logos/sema/SemAnalyser.h
     logos/symbols/LogosSymbol.h
     logos/symbols/LogosType.h
+    logos/symbols/LogosType.cpp
 )
 
 target_include_directories(logos PRIVATE

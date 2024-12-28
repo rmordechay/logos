@@ -4,6 +4,7 @@ generate_grammar:
 	java -jar external/bin/antlr.jar -no-listener -Dlanguage=Cpp -o logos/parser Logos.g4
 
 generate_code:
-	cd codegen && \
-	/opt/homebrew/opt/llvm/bin/llc output.ll -o output.o && \
-	clang output.o -o output
+	cd codegen && clang -o output output.ll
+
+emit_llvm:
+	clang++ -S -emit-llvm test.cpp

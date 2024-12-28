@@ -9,6 +9,7 @@ public:
     float value;
     LogosFloat() = default;
     explicit LogosFloat(const float value): value(value) {}
+    std::string getName() const override;
 };
 
 
