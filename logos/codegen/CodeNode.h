@@ -9,14 +9,14 @@ using namespace llvm;
 
 class CodeNode {
 public:
-    std::vector<LogosSymbol *> args;
+    std::vector<LogosSymbol *> argsSymbols;
 
     virtual void generateCode(LLVMContext& context, IRBuilder<>& builder, Module* module) const = 0;
 
 protected:
     explicit CodeNode() {}
     template <typename... Args>
-    explicit CodeNode(Args&& ...args) : args({std::forward<Args>(args)...}) {}
+    explicit CodeNode(Args&& ...args) : argsSymbols({std::forward<Args>(args)...}) {}
     virtual ~CodeNode() = default;
 };
 

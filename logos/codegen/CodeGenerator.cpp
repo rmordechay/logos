@@ -23,9 +23,10 @@ void CodeGenerator::generateCode(const std::vector<CodeNode*>& codeNodes) {
     }
     builder.CreateRetVoid();
 
-    // module->print(outs(), nullptr);
-    // writeToFile(module);
-    compileLLVM("../codegen/output.ll", "../codegen/output");
+    module->print(outs(), nullptr);
+    writeToFile(module);
+    runBinary();
+    // compileLLVM("../codegen/output.ll", "../codegen/output");
 }
 
 void CodeGenerator::insertMain(LLVMContext& context, IRBuilder<>& builder, Module* module) {

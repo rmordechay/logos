@@ -18,7 +18,7 @@ class LogosSymbol {
 public:
     std::string name;
     SymbolKind kind;
-    LogosTypedValue* logosType;
+    std::shared_ptr<LogosTypedValue> logosType;
     LogosExpr* logosExpr = nullptr;
 
     explicit LogosSymbol(const std::string& name, const SymbolKind kind, LogosTypedValue* logosType):

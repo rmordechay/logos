@@ -3,10 +3,10 @@
 
 class LogosExpr {
 public:
-    std::shared_ptr<LogosTypedValue> results = nullptr;
+    std::shared_ptr<LogosTypedValue> value = nullptr;
 
     explicit LogosExpr() {}
-    explicit LogosExpr(LogosTypedValue* results) : results(results) {}
+    explicit LogosExpr(const std::shared_ptr<LogosTypedValue>& results) : value(results) {}
     ~LogosExpr() = default;
 };
 

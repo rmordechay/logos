@@ -49,8 +49,9 @@ void SemAnalyser::visitImportStatement(LogosParser::ImportStatementContext* ctx)
 }
 
 void SemAnalyser::visitMainFile() {
-    visitImportStatement(mainFile->fileCtx->importStatement());
-    for (const auto func : mainFile->fileCtx->mainFile()->funcImplementation()) {
+    const auto fileCtx = mainFile->fileCtx;
+    visitImportStatement(fileCtx->importStatement());
+    for (const auto func : fileCtx->mainFile()->funcImplementation()) {
         if (func->funcDec()->VARIABLE()->getText() == LOGOS_MAIN_FUNCTION) {
             visitFuncImplementation(func);
         }
@@ -126,16 +127,15 @@ void SemAnalyser::visitBuiltinFunc(LogosParser::FuncCallContext* const ctx, cons
     const auto args = ctx->funcArgList()->funcArg();
     const auto newSymbol = new LogosSymbol( PARAM);
     if (const auto exprType = getExpr(args[0]->expr())) {
-        newSymbol->logosType = exprType->results.get();
-        builtinFunc->args.push_back(newSymbol);
+        newSymbol->logosType = exprType->value;
+        builtinFunc->argsSymbols.push_back(newSymbol);
         codeNodes.push_back(builtinFunc);
     }
 }
 
 shared_ptr<LogosExpr> SemAnalyser::getExpr(LogosParser::ExprContext* ctx) const {
     if (const auto unary = ctx->unaryExpr()) {
-        auto logosTypedValue = getUnaryTypedValue(unary);
-        auto logosUnaryExpr = make_shared<LogosUnaryExpr>(logosTypedValue);
+        auto logosUnaryExpr = make_shared<LogosUnaryExpr>(getUnaryTypedValue(unary));
         return logosUnaryExpr;
     }
     if (const auto binary = ctx->binaryExpr()) {
@@ -144,7 +144,7 @@ shared_ptr<LogosExpr> SemAnalyser::getExpr(LogosParser::ExprContext* ctx) const 
         if (right == nullptr) {
             return make_shared<LogosUnaryExpr>(leftExpr);
         }
-        return make_shared<LogosBinaryExpr>(*leftExpr, *getExpr(right)->results, mapOperator(binary));
+        return make_shared<LogosBinaryExpr>(*leftExpr, *getExpr(right)->value, mapOperator(binary));
     }
     return nullptr;
 }
@@ -173,7 +173,7 @@ shared_ptr<LogosTypedValue> SemAnalyser::getUnaryTypedValue(LogosParser::UnaryEx
     if (const auto variable = ctx->VARIABLE()) {
         const auto resolvedSymbol = currentScope->resolveSymbol(variable->getText());
         if (resolvedSymbol != nullptr) {
-            if (const auto intType = dynamic_cast<LogosInt*>(resolvedSymbol->logosType)) {
+            if (const auto intType = dynamic_pointer_cast<LogosInt>(resolvedSymbol->logosType)) {
                 return make_shared<LogosInt>(*intType);
             }
         }

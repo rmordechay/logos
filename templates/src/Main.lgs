@@ -1,7 +1,3 @@
-import (
-    MyObject
-)
-
 main(): Void {
     a = 2
     print(2)
