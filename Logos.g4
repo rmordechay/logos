@@ -8,7 +8,7 @@ interfaceFile: interfaceDeclaration objectImplements? explicitVarDec* funcDec+ f
 
 objectFile: objectDeclaration objectImplements? explicitVarDec* funcImplementation* EOF;
 
-importStatement: IMPORT LEFT_PAREN importPath* RIGHT_PAREN;
+importStatement: IMPORT LPAREN importPath* RPAREN;
 
 importPath: TYPE (DOT TYPE)*;
 
@@ -18,17 +18,17 @@ interfaceDeclaration: INTERFACE COLON TYPE;
 
 objectImplements: IMPLEMENTS COLON TYPE;
 
-funcDec: VARIABLE LEFT_PAREN explicitVarDecList? RIGHT_PAREN COLON TYPE;
+funcDec: VARIABLE LPAREN explicitVarDecList? RPAREN COLON TYPE;
 
 funcImplementation: funcDec funcBody;
 
 funcBody: statementsBlock;
 
-funcCall: VARIABLE LEFT_PAREN funcArgList? RIGHT_PAREN;
+funcCall: VARIABLE LPAREN funcArgList? RPAREN;
 
-constructorCall: TYPE LEFT_PAREN funcArgList? RIGHT_PAREN;
+constructorCall: TYPE LPAREN funcArgList? RPAREN;
 
-explicitVarDecList: explicitVarDec (COMMA explicitVarDec)*;
+explicitVarDecList: explicitVarDec (COMMA explicitVarDec)* COMMA?;
 
 explicitVarDec:
         VARIABLE COLON TYPE (EQUAL expr)?
@@ -39,7 +39,7 @@ implicitVarDec: VARIABLE (EQUAL expr)?;
 
 funcArg: (VARIABLE EQUAL)? expr;
 
-funcArgList: funcArg (COMMA funcArg)*;
+funcArgList: funcArg (COMMA funcArg)* COMMA?;
 
 statement:
         explicitVarDec
@@ -48,35 +48,27 @@ statement:
     |   loopStatement
     |   controlFlowStatement
     |   enumDeclaration
-    |   expr
+    |   funcCall
     ;
 
-enumDeclaration: ENUM TYPE LEFT_BRACE enumField* RIGHT_BRACE;
+enumDeclaration: ENUM TYPE LBRACE enumField* RBRACE;
 
 enumField: CONST (EQUAL STRING)?;
 
 statementsBlock:
-        LEFT_BRACE statement* RIGHT_BRACE
+        LBRACE statement* RBRACE
     ;
 
 exprList:
-        expr (COMMA expr)*
+        expr (COMMA expr)* COMMA?
     ;
 
 expr:
-        binaryExpr
+        expr (STAR | SLASH) expr
+    |   expr (PLUS | MINUS) expr
+    |   expr (DOUBLE_EQUAL | RBRACK | LBRACK | GE | LE) expr
     |   unaryExpr
-    |   boolExpr
-    |   selection
-    ;
-
-binaryExpr:
-        unaryExpr (STAR | SLASH) expr
-    |   unaryExpr (PLUS | MINUS) expr
-    ;
-
-boolExpr:
-        unaryExpr (DOUBLE_EQUAL | RIGHT_BRACKET | LEFT_BRACKET | GREATER_EQUAL_THAN | LESS_EQUAL_THAN) expr
+    |   LPAREN expr RPAREN
     ;
 
 unaryExpr:
@@ -107,7 +99,7 @@ elseStatement:
     ;
 
 patterMatching:
-        IF expr? LEFT_BRACE pattern* (ELSE COLON statementsBlock)? RIGHT_BRACE
+        IF expr? LBRACE pattern* (ELSE COLON statementsBlock)? RBRACE
     ;
 
 pattern:
@@ -132,15 +124,15 @@ controlFlowStatement:
     ;
 
 DOUBLE_EQUAL: '==';
-GREATER_EQUAL_THAN: '>=';
-LESS_EQUAL_THAN: '<=';
+GE: '>=';
+LE: '<=';
 
-LEFT_PAREN: '(';
-RIGHT_PAREN: ')';
-LEFT_BRACE: '{';
-RIGHT_BRACE: '}';
-LEFT_BRACKET: '[';
-RIGHT_BRACKET: ']';
+LPAREN: '(';
+RPAREN: ')';
+LBRACE: '{';
+RBRACE: '}';
+LBRACK: '[';
+RBRACK: ']';
 LEFT_ANGLE: '<';
 RIGHT_ANGLE: '>';
 

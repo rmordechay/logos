@@ -14,21 +14,23 @@
 
 using namespace llvm;
 
-void CodeGenerator::generateCode(const std::vector<CodeNode*>& codeNodes) {
+void CodeGenerator::generateCode(const std::vector<std::shared_ptr<LogosCodeNode>>& codeNodes) {
     LLVMContext context;
-    const auto module = new Module("root", context);
     IRBuilder builder(context);
+    const auto module = new Module("root", context);
+
     insertMain(context, builder, module);
-    for (const auto& codeNode : codeNodes) {
+    for (const auto codeNode : codeNodes) {
         codeNode->generateCode(context, builder, module);
     }
-    builder.CreateRetVoid();
 
+    builder.CreateRetVoid();
     module->print(outs(), nullptr);
     writeToFile(module);
     runBinary();
     // compileLLVM("../codegen/output.ll", "../codegen/output");
 }
+
 
 void CodeGenerator::insertMain(LLVMContext& context, IRBuilder<>& builder, Module* module) {
     const auto voidType = Type::getVoidTy(context);

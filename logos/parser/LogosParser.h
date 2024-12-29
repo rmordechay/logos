@@ -12,16 +12,15 @@
 class  LogosParser : public antlr4::Parser {
 public:
   enum {
-    DOUBLE_EQUAL = 1, GREATER_EQUAL_THAN = 2, LESS_EQUAL_THAN = 3, LEFT_PAREN = 4, 
-    RIGHT_PAREN = 5, LEFT_BRACE = 6, RIGHT_BRACE = 7, LEFT_BRACKET = 8, 
-    RIGHT_BRACKET = 9, LEFT_ANGLE = 10, RIGHT_ANGLE = 11, COMMA = 12, DOUBLE_DOT = 13, 
-    DOT = 14, COLON = 15, EQUAL = 16, MINUS = 17, PLUS = 18, STAR = 19, 
-    SLASH = 20, HASH = 21, QUEST_MARK = 22, EXCLA_MARK = 23, PERCENT = 24, 
-    DOLLAR = 25, AMPERSAND = 26, OBJECT = 27, INTERFACE = 28, ENUM = 29, 
-    IMPLEMENTS = 30, IMPORT = 31, IF = 32, ELSE = 33, FOR = 34, BREAK = 35, 
-    CONTINUE = 36, RETURN = 37, AND = 38, OR = 39, NOT = 40, IN = 41, INTEGER = 42, 
-    FLOAT = 43, BOOL = 44, CONST = 45, TYPE = 46, VARIABLE = 47, STRING = 48, 
-    LINE_COMMENT = 49, BLOCK_COMMENT = 50, WS = 51
+    DOUBLE_EQUAL = 1, GE = 2, LE = 3, LPAREN = 4, RPAREN = 5, LBRACE = 6, 
+    RBRACE = 7, LBRACK = 8, RBRACK = 9, LEFT_ANGLE = 10, RIGHT_ANGLE = 11, 
+    COMMA = 12, DOUBLE_DOT = 13, DOT = 14, COLON = 15, EQUAL = 16, MINUS = 17, 
+    PLUS = 18, STAR = 19, SLASH = 20, HASH = 21, QUEST_MARK = 22, EXCLA_MARK = 23, 
+    PERCENT = 24, DOLLAR = 25, AMPERSAND = 26, OBJECT = 27, INTERFACE = 28, 
+    ENUM = 29, IMPLEMENTS = 30, IMPORT = 31, IF = 32, ELSE = 33, FOR = 34, 
+    BREAK = 35, CONTINUE = 36, RETURN = 37, AND = 38, OR = 39, NOT = 40, 
+    IN = 41, INTEGER = 42, FLOAT = 43, BOOL = 44, CONST = 45, TYPE = 46, 
+    VARIABLE = 47, STRING = 48, LINE_COMMENT = 49, BLOCK_COMMENT = 50, WS = 51
   };
 
   enum {
@@ -32,9 +31,9 @@ public:
     RuleExplicitVarDecList = 14, RuleExplicitVarDec = 15, RuleImplicitVarDec = 16, 
     RuleFuncArg = 17, RuleFuncArgList = 18, RuleStatement = 19, RuleEnumDeclaration = 20, 
     RuleEnumField = 21, RuleStatementsBlock = 22, RuleExprList = 23, RuleExpr = 24, 
-    RuleBinaryExpr = 25, RuleBoolExpr = 26, RuleUnaryExpr = 27, RuleConstant = 28, 
-    RuleSelection = 29, RuleIfStatement = 30, RuleElseStatement = 31, RulePatterMatching = 32, 
-    RulePattern = 33, RuleLoopStatement = 34, RuleRange = 35, RuleControlFlowStatement = 36
+    RuleUnaryExpr = 25, RuleConstant = 26, RuleSelection = 27, RuleIfStatement = 28, 
+    RuleElseStatement = 29, RulePatterMatching = 30, RulePattern = 31, RuleLoopStatement = 32, 
+    RuleRange = 33, RuleControlFlowStatement = 34
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -79,8 +78,6 @@ public:
   class StatementsBlockContext;
   class ExprListContext;
   class ExprContext;
-  class BinaryExprContext;
-  class BoolExprContext;
   class UnaryExprContext;
   class ConstantContext;
   class SelectionContext;
@@ -162,8 +159,8 @@ public:
     ImportStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IMPORT();
-    antlr4::tree::TerminalNode *LEFT_PAREN();
-    antlr4::tree::TerminalNode *RIGHT_PAREN();
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
     std::vector<ImportPathContext *> importPath();
     ImportPathContext* importPath(size_t i);
 
@@ -230,8 +227,8 @@ public:
     FuncDecContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
-    antlr4::tree::TerminalNode *LEFT_PAREN();
-    antlr4::tree::TerminalNode *RIGHT_PAREN();
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
     antlr4::tree::TerminalNode *COLON();
     antlr4::tree::TerminalNode *TYPE();
     ExplicitVarDecListContext *explicitVarDecList();
@@ -269,8 +266,8 @@ public:
     FuncCallContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
-    antlr4::tree::TerminalNode *LEFT_PAREN();
-    antlr4::tree::TerminalNode *RIGHT_PAREN();
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
     FuncArgListContext *funcArgList();
 
    
@@ -283,8 +280,8 @@ public:
     ConstructorCallContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *TYPE();
-    antlr4::tree::TerminalNode *LEFT_PAREN();
-    antlr4::tree::TerminalNode *RIGHT_PAREN();
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
     FuncArgListContext *funcArgList();
 
    
@@ -372,7 +369,7 @@ public:
     LoopStatementContext *loopStatement();
     ControlFlowStatementContext *controlFlowStatement();
     EnumDeclarationContext *enumDeclaration();
-    ExprContext *expr();
+    FuncCallContext *funcCall();
 
    
   };
@@ -385,8 +382,8 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *ENUM();
     antlr4::tree::TerminalNode *TYPE();
-    antlr4::tree::TerminalNode *LEFT_BRACE();
-    antlr4::tree::TerminalNode *RIGHT_BRACE();
+    antlr4::tree::TerminalNode *LBRACE();
+    antlr4::tree::TerminalNode *RBRACE();
     std::vector<EnumFieldContext *> enumField();
     EnumFieldContext* enumField(size_t i);
 
@@ -412,8 +409,8 @@ public:
   public:
     StatementsBlockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *LEFT_BRACE();
-    antlr4::tree::TerminalNode *RIGHT_BRACE();
+    antlr4::tree::TerminalNode *LBRACE();
+    antlr4::tree::TerminalNode *RBRACE();
     std::vector<StatementContext *> statement();
     StatementContext* statement(size_t i);
 
@@ -440,49 +437,26 @@ public:
   public:
     ExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    BinaryExprContext *binaryExpr();
     UnaryExprContext *unaryExpr();
-    BoolExprContext *boolExpr();
-    SelectionContext *selection();
+    antlr4::tree::TerminalNode *LPAREN();
+    std::vector<ExprContext *> expr();
+    ExprContext* expr(size_t i);
+    antlr4::tree::TerminalNode *RPAREN();
+    antlr4::tree::TerminalNode *STAR();
+    antlr4::tree::TerminalNode *SLASH();
+    antlr4::tree::TerminalNode *PLUS();
+    antlr4::tree::TerminalNode *MINUS();
+    antlr4::tree::TerminalNode *DOUBLE_EQUAL();
+    antlr4::tree::TerminalNode *RBRACK();
+    antlr4::tree::TerminalNode *LBRACK();
+    antlr4::tree::TerminalNode *GE();
+    antlr4::tree::TerminalNode *LE();
 
    
   };
 
   ExprContext* expr();
-
-  class  BinaryExprContext : public antlr4::ParserRuleContext {
-  public:
-    BinaryExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    UnaryExprContext *unaryExpr();
-    ExprContext *expr();
-    antlr4::tree::TerminalNode *STAR();
-    antlr4::tree::TerminalNode *SLASH();
-    antlr4::tree::TerminalNode *PLUS();
-    antlr4::tree::TerminalNode *MINUS();
-
-   
-  };
-
-  BinaryExprContext* binaryExpr();
-
-  class  BoolExprContext : public antlr4::ParserRuleContext {
-  public:
-    BoolExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    UnaryExprContext *unaryExpr();
-    ExprContext *expr();
-    antlr4::tree::TerminalNode *DOUBLE_EQUAL();
-    antlr4::tree::TerminalNode *RIGHT_BRACKET();
-    antlr4::tree::TerminalNode *LEFT_BRACKET();
-    antlr4::tree::TerminalNode *GREATER_EQUAL_THAN();
-    antlr4::tree::TerminalNode *LESS_EQUAL_THAN();
-
-   
-  };
-
-  BoolExprContext* boolExpr();
-
+  ExprContext* expr(int precedence);
   class  UnaryExprContext : public antlr4::ParserRuleContext {
   public:
     UnaryExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -561,8 +535,8 @@ public:
     PatterMatchingContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IF();
-    antlr4::tree::TerminalNode *LEFT_BRACE();
-    antlr4::tree::TerminalNode *RIGHT_BRACE();
+    antlr4::tree::TerminalNode *LBRACE();
+    antlr4::tree::TerminalNode *RBRACE();
     ExprContext *expr();
     std::vector<PatternContext *> pattern();
     PatternContext* pattern(size_t i);
@@ -632,6 +606,10 @@ public:
 
   ControlFlowStatementContext* controlFlowStatement();
 
+
+  bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
+
+  bool exprSempred(ExprContext *_localctx, size_t predicateIndex);
 
   // By default the static state used to implement the parser is lazily initialized during the first
   // call to the constructor. You can call this function if you wish to initialize the static state

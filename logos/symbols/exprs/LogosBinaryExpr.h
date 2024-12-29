@@ -2,15 +2,15 @@
 #define LOGOSBINARYOP_H
 #include "LogosExpr.h"
 #include "LogosOperator.h"
-#include "LogosSymbol.h"
+#include "LogosUnaryExpr.h"
 
-class LogosBinaryExpr : public LogosExpr {
+class LogosBinaryExpr final : public LogosExpr {
 public:
-    LogosTypedValue& left;
-    LogosTypedValue& right;
+    std::shared_ptr<LogosExpr> left;
+    std::shared_ptr<LogosExpr> right;
     LogosOperator op;
 
-    explicit LogosBinaryExpr(LogosTypedValue& left, LogosTypedValue& right, const LogosOperator op) :
+    explicit LogosBinaryExpr(const std::shared_ptr<LogosExpr>& left, const std::shared_ptr<LogosExpr>& right, const LogosOperator op) :
         left(left), right(right), op(op) {}
 };
 

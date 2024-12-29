@@ -17,16 +17,6 @@ add_executable(logos
     logos/LogosConfigs.h
     logos/codegen/CodeGenerator.cpp
     logos/codegen/CodeGenerator.h
-    logos/codegen/BuiltinFunc.cpp
-    logos/codegen/BuiltinFunc.h
-    logos/codegen/CodeNode.cpp
-    logos/codegen/CodeNode.h
-    logos/codegen/nodes/Add.cpp
-    logos/codegen/nodes/Add.h
-    logos/codegen/nodes/StoreInt.cpp
-    logos/codegen/nodes/StoreInt.h
-    logos/codegen/builtin/Print.cpp
-    logos/codegen/builtin/Print.h
     logos/project/LogosFile.cpp
     logos/project/LogosFile.h
     logos/project/LogosPackage.cpp
@@ -39,7 +29,7 @@ add_executable(logos
     logos/sema/SemAnalyser.cpp
     logos/sema/SemAnalyser.h
     logos/symbols/LogosSymbol.h
-    logos/symbols/LogosTypedValue.h
+    logos/symbols/LogosType.h
     logos/symbols/types/LogosBool.cpp
     logos/symbols/types/LogosBool.h
     logos/symbols/types/LogosFloat.cpp
@@ -52,6 +42,20 @@ add_executable(logos
     logos/symbols/exprs/LogosBinaryExpr.h
     logos/symbols/exprs/LogosExpr.h
     logos/symbols/exprs/LogosUnaryExpr.h
+    logos/symbols/exprs/LogosVariableExpr.h
+    logos/symbols/exprs/LogosConstantExpr.h
+    logos/symbols/exprs/LogosFuncCallExpr.h
+    logos/symbols/funcs/LogosFunc.h
+    logos/symbols/funcs/LogosPrint.h
+    logos/codegen/LogosCodeNode.h
+    logos/codegen/CodeConstant.h
+    logos/codegen/CodeAddInt.h
+    logos/codegen/CodeStoreInt.h
+    logos/codegen/CodeStoreInt.cpp
+    logos/codegen/CodeAddInt.cpp
+    logos/codegen/CodeConstant.cpp
+    logos/codegen/CodeFuncCall.cpp
+    logos/codegen/CodeFuncCall.h
 )
 
 target_include_directories(logos PRIVATE

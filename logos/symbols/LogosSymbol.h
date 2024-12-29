@@ -1,13 +1,12 @@
 #ifndef SYMBOL_H
 #define SYMBOL_H
-#include "LogosTypedValue.h"
-#include "exprs/LogosExpr.h"
-
 
 #include <string>
 
+class LogosExpr;
+
 enum SymbolKind {
-    FIELD,
+    CONSTANT,
     LOCAL_VARIABLE,
     FUNC_CALL,
     FUNC_DEFINITION,
@@ -16,27 +15,14 @@ enum SymbolKind {
 
 class LogosSymbol {
 public:
-    std::string name;
-    SymbolKind kind;
-    std::shared_ptr<LogosTypedValue> logosType;
-    LogosExpr* logosExpr = nullptr;
+    const std::string name;
+    const std::shared_ptr<LogosExpr> expr;
+    const SymbolKind kind;
 
-    explicit LogosSymbol(const std::string& name, const SymbolKind kind, LogosTypedValue* logosType):
+    explicit LogosSymbol(const std::string& name, const std::shared_ptr<LogosExpr>& expr, const SymbolKind kind) :
         name(name),
-        kind(kind),
-        logosType(logosType) {
-    }
-
-    explicit LogosSymbol(const std::string& name, const SymbolKind kind) :
-        LogosSymbol(name, kind, nullptr) {
-    }
-
-    explicit LogosSymbol(const SymbolKind kind, LogosTypedValue* logosType):
-        LogosSymbol("", kind, logosType) {
-    }
-
-    explicit LogosSymbol(const SymbolKind kind):
-        LogosSymbol("", kind, nullptr) {
+        expr(expr),
+        kind(kind) {
     }
 };
 

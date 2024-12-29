@@ -1,4 +1,4 @@
 main(): Void {
-    a = 2
-    print(2)
+    a = 2 + 2
+    print(a)
 }

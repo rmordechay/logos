@@ -1,6 +1,5 @@
 #ifndef PROJECT_H
 #define PROJECT_H
-#include "../codegen/CodeNode.h"
 #include "CodeGenerator.h"
 #include "SemAnalyser.h"
 #include <string>

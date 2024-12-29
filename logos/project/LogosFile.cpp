@@ -21,23 +21,10 @@ void LogosFile::setParser() {
 void LogosFile::parseFile() {
     setParser();
     fileCtx = parser->logosFile();
-    addSymbols();
 }
 
 void LogosFile::addSymbols() {
-    const auto objectFile = fileCtx->objectFile();
-    if (objectFile != nullptr) {
-        for (const auto explicitVarDec : objectFile->explicitVarDec()) {
-            auto varName = explicitVarDec->VARIABLE()->getText();
-            auto typeName = explicitVarDec->TYPE()->getText();
-            symbolTable[varName] = new LogosSymbol(varName, FIELD);
-        }
-        for (const auto func : objectFile->funcImplementation()) {
-            auto varName = func->funcDec()->VARIABLE()->getText();
-            auto typeName = func->funcDec()->TYPE()->getText();
-            symbolTable[varName] = new LogosSymbol(varName,  FUNC_DEFINITION);
-        }
-    }
+
 }
 
 LogosFile::~LogosFile() {

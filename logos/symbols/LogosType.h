@@ -2,11 +2,10 @@
 #define LOGOSTYPE_H
 #include "LogosParser.h"
 
-class LogosTypedValue {
+class LogosType {
 public:
-    virtual LogosTypedValue* applyOperation(LogosTypedValue* other) = 0;
     virtual std::string getName() const = 0;
-    virtual ~LogosTypedValue() = default;
+    virtual ~LogosType() = default;
 };
 
 #endif //LOGOSTYPE_H

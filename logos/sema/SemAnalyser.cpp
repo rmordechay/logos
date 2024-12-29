@@ -1,10 +1,15 @@
 #include "SemAnalyser.h"
 
+#include "CodeAddInt.h"
+#include "CodeFuncCall.h"
+#include "CodeStoreInt.h"
 #include "LogosConfigs.h"
 #include "LogosErrors.h"
 #include "LogosParser.h"
-#include "builtin/Print.h"
-#include "nodes/StoreInt.h"
+#include "exprs/LogosConstantExpr.h"
+#include "exprs/LogosFuncCallExpr.h"
+#include "exprs/LogosVariableExpr.h"
+#include "funcs/LogosPrint.h"
 #include "types/LogosBool.h"
 #include "types/LogosFloat.h"
 #include "types/LogosInt.h"
@@ -20,37 +25,10 @@ SemAnalyser::SemAnalyser(LogosPackage* rootPackage) {
 void SemAnalyser::analyseProject() {
     mainFile = rootPackage->mainFile;
     visitMainFile();
-    visitPackage(rootPackage);
-}
-
-void SemAnalyser::visitPackage(const LogosPackage* package) {
-    for (const auto file : package->files) {
-        visitLogosFile(file->fileCtx);
-    }
-    for (const auto childPackage : package->packages) {
-        visitPackage(childPackage);
-    }
-}
-
-void SemAnalyser::visitLogosFile(LogosParser::LogosFileContext* ctx) {
-    visitImportStatement(ctx->importStatement());
-    visitObjectFile(ctx->objectFile());
-}
-
-void SemAnalyser::visitImportStatement(LogosParser::ImportStatementContext* ctx) const {
-    if (ctx == nullptr) return;
-    const auto importPaths = ctx->importPath();
-    for (const auto importPath : importPaths) {
-        for (const auto package : rootPackage->packages) {
-            for (const auto file : package->files) {
-            }
-        }
-    }
 }
 
 void SemAnalyser::visitMainFile() {
     const auto fileCtx = mainFile->fileCtx;
-    visitImportStatement(fileCtx->importStatement());
     for (const auto func : fileCtx->mainFile()->funcImplementation()) {
         if (func->funcDec()->VARIABLE()->getText() == LOGOS_MAIN_FUNCTION) {
             visitFuncImplementation(func);
@@ -65,179 +43,114 @@ void SemAnalyser::visitFuncImplementation(LogosParser::FuncImplementationContext
     }
 }
 
-void SemAnalyser::visitObjectFile(LogosParser::ObjectFileContext* ctx) {
-    if (ctx == nullptr) return;
-}
-
-void SemAnalyser::visitObjectImplements(LogosParser::ObjectImplementsContext* ctx) {
-    if (ctx == nullptr) return;
-}
-
 void SemAnalyser::visitStatement(LogosParser::StatementContext* ctx) {
     if (const auto explicitVarDec = ctx->explicitVarDec()) {
         visitExplicitVarDec(explicitVarDec);
     } else if (const auto implicitVarDec = ctx->implicitVarDec()) {
         visitImplicitVarDec(implicitVarDec);
-    } else if (const auto expr = ctx->expr()) {
-        visitExpr(expr);
+    } else if (const auto expr = ctx->funcCall()) {
+        int logosExpr = 1;
     }
 }
 
-void SemAnalyser::visitExplicitVarDec(LogosParser::ExplicitVarDecContext* const ctx) const {
+void SemAnalyser::visitExplicitVarDec(LogosParser::ExplicitVarDecContext* const ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
-    const auto typeName = ctx->TYPE()->getText();
-    const auto symbol = new LogosSymbol(variableName, LOCAL_VARIABLE);
-    currentScope->symbolTable[variableName] = symbol;
+    const auto logosExpr = getExpr(ctx->expr());
+    addSymbol(variableName, logosExpr, LOCAL_VARIABLE);
 }
 
 void SemAnalyser::visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
-    const auto symbol = new LogosSymbol(variableName, LOCAL_VARIABLE);
     const auto logosExpr = getExpr(ctx->expr());
-    symbol->logosType = logosExpr->value;
-    currentScope->symbolTable[variableName] = symbol;
-    codeNodes.push_back(new StoreInt(symbol));
+    addSymbol(variableName, logosExpr, LOCAL_VARIABLE);
 }
 
-void SemAnalyser::visitExpr(LogosParser::ExprContext* ctx) {
+shared_ptr<LogosExpr> SemAnalyser::getExpr(LogosParser::ExprContext* ctx) {
     if (const auto unary = ctx->unaryExpr()) {
-        visitUnaryExpr(unary);
-    } else if (const auto binary = ctx->binaryExpr()) {
-        visitBinaryExpr(binary);
-    } else if (ctx->boolExpr()) {
-
+        return getUnaryExpr(unary);
     }
-}
-
-void SemAnalyser::visitUnaryExpr(LogosParser::UnaryExprContext* ctx) {
-    if (const auto funcCall = ctx->funcCall()) {
-        visitFuncCall(funcCall);
-    } else if (const auto scalar = ctx->constant()) {
-
+    const auto exprs = ctx->expr();
+    if (exprs.size() == 1) {
+        return getExpr(exprs[0]);
     }
-}
-
-void SemAnalyser::visitBinaryExpr(LogosParser::BinaryExprContext* binary) {
-    if (binary->PLUS()) {
-        visitAdd(binary);
-    } else if (binary->MINUS()) {
-        visitSub(binary);
-    } else if (binary->STAR()) {
-        visitMul(binary);
-    } else if (binary->SLASH()) {
-        visitDiv(binary);
-    }
-}
-
-void SemAnalyser::visitAdd(LogosParser::BinaryExprContext* ctx) {
-
-}
-
-void SemAnalyser::visitSub(LogosParser::BinaryExprContext* ctx) {
-
-}
-
-void SemAnalyser::visitMul(LogosParser::BinaryExprContext* ctx) {
-
-}
-
-void SemAnalyser::visitDiv(LogosParser::BinaryExprContext* ctx) {
-
-}
-
-
-void SemAnalyser::visitFuncCall(LogosParser::FuncCallContext* const ctx) {
-    const auto funcName = ctx->VARIABLE()->getText();
-    if (BUILTIN_FUNCS.contains(funcName)) {
-        visitBuiltinFunc(ctx, funcName);
-    }
-}
-
-void SemAnalyser::visitBuiltinFunc(LogosParser::FuncCallContext* const ctx, const string& funcName) {
-    const auto builtinFunc = BUILTIN_FUNCS.at(funcName);
-    const auto args = ctx->funcArgList()->funcArg();
-    const auto newSymbol = new LogosSymbol(PARAM);
-    if (const auto exprType = getExpr(args[0]->expr())) {
-        newSymbol->logosType = exprType->value;
-        builtinFunc->argsSymbols.push_back(newSymbol);
-        codeNodes.push_back(builtinFunc);
-    }
-}
-
-shared_ptr<LogosExpr> SemAnalyser::getExpr(LogosParser::ExprContext* ctx) const {
-    if (const auto unary = ctx->unaryExpr()) {
-        return make_shared<LogosUnaryExpr>(getUnaryTypedValue(unary));
-    }
-    if (const auto binary = ctx->binaryExpr()) {
-        const auto leftExpr = getUnaryTypedValue(ctx->unaryExpr());
-        const auto right = binary->expr();
-        if (right == nullptr) {
-            return make_shared<LogosUnaryExpr>(leftExpr);
+    if (exprs.size() == 2) {
+        auto left = getExpr(exprs[0]);
+        auto right = getExpr(exprs[1]);
+        if (ctx->PLUS()) {
+            return make_shared<LogosBinaryExpr>(left, right, PLUS);
         }
-        return make_shared<LogosBinaryExpr>(*leftExpr, *getExpr(right)->value, mapOperator(binary));
+        if (ctx->MINUS()) {
+            return make_shared<LogosBinaryExpr>(left, right, MINUS);
+        }
+        if (ctx->STAR()) {
+            return make_shared<LogosBinaryExpr>(left, right, STAR);
+        }
+        if (ctx->SLASH()) {
+            return make_shared<LogosBinaryExpr>(left, right, SLASH);
+        }
     }
     return nullptr;
 }
 
-shared_ptr<LogosTypedValue> SemAnalyser::getUnaryTypedValue(LogosParser::UnaryExprContext* ctx) const {
-    if (const auto variable = ctx->VARIABLE()) {
-        const auto resolvedSymbol = currentScope->resolveSymbol(variable->getText());
-        if (resolvedSymbol != nullptr) {
-            if (const auto intType = dynamic_pointer_cast<LogosInt>(resolvedSymbol->logosType)) {
-                return make_shared<LogosInt>(*intType);
-            }
-        }
-        return nullptr;
-    }
-
+shared_ptr<LogosUnaryExpr> SemAnalyser::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto constant = ctx->constant()) {
-        return getConstantTypedValue(constant);
+        auto logosConstantExpr = getConstantExpr(constant);
+        return logosConstantExpr;
+    }
+
+    if (const auto variable = ctx->VARIABLE()) {
+        return make_shared<LogosVariableExpr>(variable->getText());
     }
 
     if (const auto funcCall = ctx->funcCall()) {
-        const auto resolvedSymbol = currentScope->resolveSymbol(funcCall->VARIABLE()->getText());
-        if (resolvedSymbol != nullptr) {
-            return resolvedSymbol->logosType;
-        }
-        return nullptr;
+        return getFuncCallExpr(funcCall);
     }
-
-    if (const auto constructor = ctx->constructorCall()) {
-        const auto resolvedSymbol = currentScope->resolveSymbol(constructor->TYPE()->getText());
-        if (resolvedSymbol != nullptr) {
-            return resolvedSymbol->logosType;
-        }
-        return nullptr;
-    }
-
     return nullptr;
 }
 
-shared_ptr<LogosExpr> SemAnalyser::getBinaryExpr(LogosParser::BinaryExprContext* ctx) const {
-    auto leftExpr = getUnaryTypedValue(ctx->unaryExpr());
-}
 
-shared_ptr<LogosTypedValue> SemAnalyser::getConstantTypedValue(LogosParser::ConstantContext* ctx) const {
+shared_ptr<LogosConstantExpr> SemAnalyser::getConstantExpr(LogosParser::ConstantContext* ctx) {
     if (const auto intToken = ctx->INTEGER()) {
         const auto value = stoi(intToken->getText());
-        return make_shared<LogosInt>(LogosInt(value));
+        return make_shared<LogosConstantExpr>(make_shared<LogosInt>(value));
     }
 
     if (const auto floatToken = ctx->FLOAT()) {
         const auto value = stof(floatToken->getText());
-        return make_shared<LogosFloat>(LogosFloat(value));
+        return make_shared<LogosConstantExpr>(make_shared<LogosFloat>(value));
     }
 
     if (const auto boolToken = ctx->BOOL()) {
         const auto value = boolToken->getText() == LogosBool::trueLiteral;
-        return make_shared<LogosBool>(LogosBool(value));
+        return make_shared<LogosConstantExpr>(make_shared<LogosBool>(value));
     }
 
     if (const auto stringToken = ctx->STRING()) {
         const auto value = stringToken->getText();
-        return make_shared<LogosString>(LogosString(value));
+        return make_shared<LogosConstantExpr>(make_shared<LogosString>(value));
     }
     return nullptr;
+}
+
+shared_ptr<LogosFuncCallExpr> SemAnalyser::getFuncCallExpr(LogosParser::FuncCallContext* ctx) {
+    const auto funcName = ctx->VARIABLE()->getText();
+    auto funcCallExpr = make_shared<LogosFuncCallExpr>(funcName, make_shared<LogosPrint>());
+    const auto args = ctx->funcArgList()->funcArg();
+    for (const auto arg : args) {
+        auto logosExpr = getExpr(arg->expr());
+        funcCallExpr->args.push_back(logosExpr);
+    }
+    return funcCallExpr;
+}
+
+void SemAnalyser::addSymbol(const string& name, const shared_ptr<LogosExpr>& expr, const SymbolKind kind) const {
+    const auto symbol = new LogosSymbol(name, expr, kind);
+    currentScope->symbolTable[name] = symbol;
+}
+
+void SemAnalyser::printError(const int errorCode) const {
+    cout << "ERROR: " << LOGOS_ERRORS.at(errorCode) << endl;
+    cout << "  1. " << mainFile->path << LOGOS_EXTENSION << endl;
 }
 
 SemAnalyser::~SemAnalyser() {
@@ -246,9 +159,4 @@ SemAnalyser::~SemAnalyser() {
     }
     delete rootPackage;
     delete rootScope;
-}
-
-void SemAnalyser::printError(const int errorCode) const {
-    cout << "ERROR: " << LOGOS_ERRORS.at(errorCode) << endl;
-    cout << "  1. " << mainFile->path << LOGOS_EXTENSION << endl;
 }

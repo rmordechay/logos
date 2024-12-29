@@ -1,11 +1,13 @@
 #ifndef SEMANTICANALYSER_H
 #define SEMANTICANALYSER_H
 
-#include "CodeNode.h"
+#include "LogosCodeNode.h"
 #include "LogosPackage.h"
 #include "LogosParser.h"
 #include "Scope.h"
 #include "exprs/LogosBinaryExpr.h"
+#include "exprs/LogosConstantExpr.h"
+#include "exprs/LogosFuncCallExpr.h"
 #include "exprs/LogosUnaryExpr.h"
 
 using namespace std;
@@ -16,7 +18,7 @@ public:
     Scope* rootScope;
     Scope* currentScope;
     LogosFile* mainFile;
-    std::vector<CodeNode*> codeNodes;
+    vector<shared_ptr<LogosCodeNode>> codeNodes;
 
     explicit SemAnalyser(LogosPackage* rootPackage);
     void analyseProject();
@@ -28,22 +30,13 @@ public:
     void visitObjectFile(LogosParser::ObjectFileContext* ctx);
     void visitObjectImplements(LogosParser::ObjectImplementsContext* ctx);
     void visitStatement(LogosParser::StatementContext* ctx);
-    void visitExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) const;
+    void visitExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     void visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
-    void visitExpr(LogosParser::ExprContext* ctx);
-    void visitUnaryExpr(LogosParser::UnaryExprContext* ctx);
-    void visitAdd(LogosParser::BinaryExprContext* ctx);
-    void visitSub(LogosParser::BinaryExprContext* ctx);
-    void visitMul(LogosParser::BinaryExprContext* ctx);
-    void visitDiv(LogosParser::BinaryExprContext* ctx);
-    void visitBinaryExpr(LogosParser::BinaryExprContext* binary);
-    void visitBuiltinFunc(LogosParser::FuncCallContext* ctx, const std::string& funcName);
-    void visitFuncCall(LogosParser::FuncCallContext* ctx);
-    shared_ptr<LogosExpr> getExpr(LogosParser::ExprContext* ctx) const;
-    shared_ptr<LogosTypedValue> getUnaryTypedValue(LogosParser::UnaryExprContext* ctx) const;
-    shared_ptr<LogosExpr> getBinaryExpr(LogosParser::BinaryExprContext* ctx) const;
-    shared_ptr<LogosExpr> getBoolExpr(LogosParser::BoolExprContext* ctx) const;
-    shared_ptr<LogosTypedValue> getConstantTypedValue(LogosParser::ConstantContext* ctx) const;
+    shared_ptr<LogosExpr> getExpr(LogosParser::ExprContext* ctx);
+    shared_ptr<LogosUnaryExpr> getUnaryExpr(LogosParser::UnaryExprContext* ctx);
+    shared_ptr<LogosConstantExpr> getConstantExpr(LogosParser::ConstantContext* ctx);
+    shared_ptr<LogosFuncCallExpr> getFuncCallExpr(LogosParser::FuncCallContext* ctx);
+    void addSymbol(const std::string& name, const shared_ptr<LogosExpr>& expr, SymbolKind kind) const;
     void printError(int errorCode) const;
     ~SemAnalyser();
 };
