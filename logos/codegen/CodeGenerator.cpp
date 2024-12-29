@@ -10,6 +10,7 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/CodeGen/CodeGenAction.h>
 #include <llvm/TargetParser/Host.h>
+#include <llvm/MC/TargetRegistry.h>
 
 using namespace llvm;
 
@@ -60,6 +61,18 @@ void CodeGenerator::compileLLVM(const std::string& llvmFilePath, const std::stri
     const auto targetTriple = sys::getDefaultTargetTriple();
     compiler.getTargetOpts().Triple = targetTriple;
     compiler.getLangOpts().CPlusPlus = true;
+
+    std::string error;
+    auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    auto opt = TargetOptions{};
+    auto RM = std::optional(Reloc::PIC_);
+    auto CM = CodeModel::Small;
+
+    auto machine = target->createTargetMachine(targetTriple, "apple-m2", "", opt, RM, CM);
+    if (!machine) {
+        throw std::runtime_error("Could not create target machine");
+    }
+
 
     const clang::FrontendInputFile inputFile(llvmFilePath, clang::InputKind(clang::Language::LLVM_IR));
     compiler.getFrontendOpts().Inputs.push_back(inputFile);

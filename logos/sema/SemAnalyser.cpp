@@ -93,10 +93,10 @@ void SemAnalyser::visitExplicitVarDec(LogosParser::ExplicitVarDecContext* const 
 void SemAnalyser::visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto symbol = new LogosSymbol(variableName, LOCAL_VARIABLE);
-    // const auto logosExpr = getExpr(ctx->expr());
-    // symbol->logosType = logosExpr->results;
-    // currentScope->symbolTable[variableName] = symbol;
-    // codeNodes.push_back(new StoreInt(symbol));
+    const auto logosExpr = getExpr(ctx->expr());
+    symbol->logosType = logosExpr->value;
+    currentScope->symbolTable[variableName] = symbol;
+    codeNodes.push_back(new StoreInt(symbol));
 }
 
 void SemAnalyser::visitExpr(LogosParser::ExprContext* ctx) {
