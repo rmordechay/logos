@@ -32,9 +32,9 @@ public:
     RuleExplicitVarDecList = 14, RuleExplicitVarDec = 15, RuleImplicitVarDec = 16, 
     RuleFuncArg = 17, RuleFuncArgList = 18, RuleStatement = 19, RuleEnumDeclaration = 20, 
     RuleEnumField = 21, RuleStatementsBlock = 22, RuleExprList = 23, RuleExpr = 24, 
-    RuleBinaryExpr = 25, RuleBoolExpr = 26, RuleUnaryExpr = 27, RuleSelection = 28, 
-    RuleIfStatement = 29, RuleElseStatement = 30, RulePatterMatching = 31, 
-    RulePattern = 32, RuleLoopStatement = 33, RuleRange = 34, RuleControlFlowStatement = 35
+    RuleBinaryExpr = 25, RuleBoolExpr = 26, RuleUnaryExpr = 27, RuleConstant = 28, 
+    RuleSelection = 29, RuleIfStatement = 30, RuleElseStatement = 31, RulePatterMatching = 32, 
+    RulePattern = 33, RuleLoopStatement = 34, RuleRange = 35, RuleControlFlowStatement = 36
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -82,6 +82,7 @@ public:
   class BinaryExprContext;
   class BoolExprContext;
   class UnaryExprContext;
+  class ConstantContext;
   class SelectionContext;
   class IfStatementContext;
   class ElseStatementContext;
@@ -488,16 +489,27 @@ public:
     virtual size_t getRuleIndex() const override;
     FuncCallContext *funcCall();
     ConstructorCallContext *constructorCall();
-    antlr4::tree::TerminalNode *INTEGER();
-    antlr4::tree::TerminalNode *FLOAT();
-    antlr4::tree::TerminalNode *BOOL();
-    antlr4::tree::TerminalNode *STRING();
+    ConstantContext *constant();
     antlr4::tree::TerminalNode *VARIABLE();
 
    
   };
 
   UnaryExprContext* unaryExpr();
+
+  class  ConstantContext : public antlr4::ParserRuleContext {
+  public:
+    ConstantContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *INTEGER();
+    antlr4::tree::TerminalNode *FLOAT();
+    antlr4::tree::TerminalNode *BOOL();
+    antlr4::tree::TerminalNode *STRING();
+
+   
+  };
+
+  ConstantContext* constant();
 
   class  SelectionContext : public antlr4::ParserRuleContext {
   public:

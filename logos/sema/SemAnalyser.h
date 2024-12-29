@@ -32,12 +32,18 @@ public:
     void visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     void visitExpr(LogosParser::ExprContext* ctx);
     void visitUnaryExpr(LogosParser::UnaryExprContext* ctx);
+    void visitAdd(LogosParser::BinaryExprContext* ctx);
+    void visitSub(LogosParser::BinaryExprContext* ctx);
+    void visitMul(LogosParser::BinaryExprContext* ctx);
+    void visitDiv(LogosParser::BinaryExprContext* ctx);
+    void visitBinaryExpr(LogosParser::BinaryExprContext* binary);
     void visitBuiltinFunc(LogosParser::FuncCallContext* ctx, const std::string& funcName);
     void visitFuncCall(LogosParser::FuncCallContext* ctx);
     shared_ptr<LogosExpr> getExpr(LogosParser::ExprContext* ctx) const;
     shared_ptr<LogosTypedValue> getUnaryTypedValue(LogosParser::UnaryExprContext* ctx) const;
     shared_ptr<LogosExpr> getBinaryExpr(LogosParser::BinaryExprContext* ctx) const;
     shared_ptr<LogosExpr> getBoolExpr(LogosParser::BoolExprContext* ctx) const;
+    shared_ptr<LogosTypedValue> getConstantTypedValue(LogosParser::ConstantContext* ctx) const;
     void printError(int errorCode) const;
     ~SemAnalyser();
 };

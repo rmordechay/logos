@@ -7,7 +7,6 @@ set(ANTLR_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runti
 set(ANTLR_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime.a")
 set(GTEST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest.1.15.2.dylib")
 set(GTEST_LIB_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest_main.1.15.2.dylib")
-set(CMAKE_PREFIX_PATH "/opt/homebrew/opt/llvm")
 set(LLVM_LIBS "/opt/homebrew/opt/llvm/lib")
 
 file(GLOB GENERATED_SRC "${CMAKE_CURRENT_SOURCE_DIR}/logos/parser/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/logos/parser/*.h")

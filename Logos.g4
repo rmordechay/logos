@@ -82,12 +82,16 @@ boolExpr:
 unaryExpr:
         funcCall
     |   constructorCall
-    |   INTEGER
+    |   constant
+    |   VARIABLE
+    ;
+
+constant:
+        INTEGER
     |   FLOAT
     |   BOOL
     |   STRING
-    |   VARIABLE
-    ;
+;
 
 selection:
         unaryExpr (DOT unaryExpr)*
