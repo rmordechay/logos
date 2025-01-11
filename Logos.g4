@@ -4,7 +4,7 @@ logosFile: importStatement? (mainFile | objectFile | interfaceFile);
 
 mainFile: (explicitVarDec | implicitVarDec)? funcImplementation+ EOF;
 
-interfaceFile: interfaceDeclaration objectImplements? explicitVarDec* funcDec+ funcImplementation* EOF;
+interfaceFile: interfaceDeclaration objectImplements? explicitVarDec* funcSignature+ funcImplementation* EOF;
 
 objectFile: objectDeclaration objectImplements? explicitVarDec* funcImplementation* EOF;
 
@@ -18,9 +18,9 @@ interfaceDeclaration: INTERFACE COLON TYPE;
 
 objectImplements: IMPLEMENTS COLON TYPE;
 
-funcDec: VARIABLE LPAREN explicitVarDecList? RPAREN COLON TYPE;
+funcSignature: VARIABLE LPAREN explicitVarDecList? RPAREN (COLON TYPE)?;
 
-funcImplementation: funcDec funcBody;
+funcImplementation: funcSignature funcBody;
 
 funcBody: statementsBlock;
 
@@ -64,11 +64,11 @@ exprList:
     ;
 
 expr:
-        expr (STAR | SLASH) expr
-    |   expr (PLUS | MINUS) expr
-    |   expr (DOUBLE_EQUAL | RBRACK | LBRACK | GE | LE) expr
+        left=expr op=(STAR | SLASH) right=expr
+    |   left=expr op=(PLUS | MINUS) right=expr
+    |   left=expr op=(DOUBLE_EQUAL | RBRACK | LBRACK | GE | LE) right=expr
     |   unaryExpr
-    |   LPAREN expr RPAREN
+    |   LPAREN left=expr RPAREN
     ;
 
 unaryExpr:

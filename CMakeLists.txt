@@ -42,20 +42,10 @@ add_executable(logos
     logos/symbols/exprs/LogosBinaryExpr.h
     logos/symbols/exprs/LogosExpr.h
     logos/symbols/exprs/LogosUnaryExpr.h
-    logos/symbols/exprs/LogosVariableExpr.h
     logos/symbols/exprs/LogosConstantExpr.h
     logos/symbols/exprs/LogosFuncCallExpr.h
     logos/symbols/funcs/LogosFunc.h
     logos/symbols/funcs/LogosPrint.h
-    logos/codegen/LogosCodeNode.h
-    logos/codegen/CodeConstant.h
-    logos/codegen/CodeAddInt.h
-    logos/codegen/CodeStoreInt.h
-    logos/codegen/CodeStoreInt.cpp
-    logos/codegen/CodeAddInt.cpp
-    logos/codegen/CodeConstant.cpp
-    logos/codegen/CodeFuncCall.cpp
-    logos/codegen/CodeFuncCall.h
 )
 
 target_include_directories(logos PRIVATE

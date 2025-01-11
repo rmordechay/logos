@@ -1,7 +1,6 @@
 #ifndef SEMANTICANALYSER_H
 #define SEMANTICANALYSER_H
 
-#include "LogosCodeNode.h"
 #include "LogosPackage.h"
 #include "LogosParser.h"
 #include "Scope.h"
@@ -18,7 +17,6 @@ public:
     Scope* rootScope;
     Scope* currentScope;
     LogosFile* mainFile;
-    vector<shared_ptr<LogosCodeNode>> codeNodes;
 
     explicit SemAnalyser(LogosPackage* rootPackage);
     void analyseProject();
@@ -32,8 +30,9 @@ public:
     void visitStatement(LogosParser::StatementContext* ctx);
     void visitExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     void visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
+    void visitFuncCall(LogosParser::FuncCallContext* funcCall);
     shared_ptr<LogosExpr> getExpr(LogosParser::ExprContext* ctx);
-    shared_ptr<LogosUnaryExpr> getUnaryExpr(LogosParser::UnaryExprContext* ctx);
+    shared_ptr<LogosExpr> getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     shared_ptr<LogosConstantExpr> getConstantExpr(LogosParser::ConstantContext* ctx);
     shared_ptr<LogosFuncCallExpr> getFuncCallExpr(LogosParser::FuncCallContext* ctx);
     void addSymbol(const std::string& name, const shared_ptr<LogosExpr>& expr, SymbolKind kind) const;

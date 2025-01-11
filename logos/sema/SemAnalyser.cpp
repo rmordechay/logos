@@ -1,14 +1,10 @@
 #include "SemAnalyser.h"
 
-#include "CodeAddInt.h"
-#include "CodeFuncCall.h"
-#include "CodeStoreInt.h"
 #include "LogosConfigs.h"
 #include "LogosErrors.h"
 #include "LogosParser.h"
 #include "exprs/LogosConstantExpr.h"
 #include "exprs/LogosFuncCallExpr.h"
-#include "exprs/LogosVariableExpr.h"
 #include "funcs/LogosPrint.h"
 #include "types/LogosBool.h"
 #include "types/LogosFloat.h"
@@ -30,7 +26,7 @@ void SemAnalyser::analyseProject() {
 void SemAnalyser::visitMainFile() {
     const auto fileCtx = mainFile->fileCtx;
     for (const auto func : fileCtx->mainFile()->funcImplementation()) {
-        if (func->funcDec()->VARIABLE()->getText() == LOGOS_MAIN_FUNCTION) {
+        if (func->funcSignature()->VARIABLE()->getText() == LOGOS_MAIN_FUNCTION) {
             visitFuncImplementation(func);
         }
     }
@@ -48,8 +44,8 @@ void SemAnalyser::visitStatement(LogosParser::StatementContext* ctx) {
         visitExplicitVarDec(explicitVarDec);
     } else if (const auto implicitVarDec = ctx->implicitVarDec()) {
         visitImplicitVarDec(implicitVarDec);
-    } else if (const auto expr = ctx->funcCall()) {
-        int logosExpr = 1;
+    } else if (const auto funcCall = ctx->funcCall()) {
+        visitFuncCall(funcCall);
     }
 }
 
@@ -65,41 +61,33 @@ void SemAnalyser::visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     addSymbol(variableName, logosExpr, LOCAL_VARIABLE);
 }
 
+void SemAnalyser::visitFuncCall(LogosParser::FuncCallContext* funcCall) {
+    auto funcName = funcCall->VARIABLE()->getText();
+}
+
 shared_ptr<LogosExpr> SemAnalyser::getExpr(LogosParser::ExprContext* ctx) {
     if (const auto unary = ctx->unaryExpr()) {
         return getUnaryExpr(unary);
     }
-    const auto exprs = ctx->expr();
-    if (exprs.size() == 1) {
-        return getExpr(exprs[0]);
-    }
-    if (exprs.size() == 2) {
-        auto left = getExpr(exprs[0]);
-        auto right = getExpr(exprs[1]);
-        if (ctx->PLUS()) {
-            return make_shared<LogosBinaryExpr>(left, right, PLUS);
-        }
-        if (ctx->MINUS()) {
-            return make_shared<LogosBinaryExpr>(left, right, MINUS);
-        }
-        if (ctx->STAR()) {
-            return make_shared<LogosBinaryExpr>(left, right, STAR);
-        }
-        if (ctx->SLASH()) {
-            return make_shared<LogosBinaryExpr>(left, right, SLASH);
-        }
+    if (ctx->right != nullptr) {
+        auto l = getExpr(ctx->left);
+        auto r = getExpr(ctx->right);
+        auto op = mapOperator(ctx);
+        return make_shared<LogosBinaryExpr>(l, r, op);
     }
     return nullptr;
 }
 
-shared_ptr<LogosUnaryExpr> SemAnalyser::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
+shared_ptr<LogosExpr> SemAnalyser::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto constant = ctx->constant()) {
-        auto logosConstantExpr = getConstantExpr(constant);
-        return logosConstantExpr;
+        return getConstantExpr(constant);
     }
 
     if (const auto variable = ctx->VARIABLE()) {
-        return make_shared<LogosVariableExpr>(variable->getText());
+        if (const auto resolvedSymbol = currentScope->resolveSymbol(variable->getText())) {
+            return resolvedSymbol->expr;
+        }
+        return nullptr;
     }
 
     if (const auto funcCall = ctx->funcCall()) {

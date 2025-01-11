@@ -26,7 +26,7 @@ public:
   enum {
     RuleLogosFile = 0, RuleMainFile = 1, RuleInterfaceFile = 2, RuleObjectFile = 3, 
     RuleImportStatement = 4, RuleImportPath = 5, RuleObjectDeclaration = 6, 
-    RuleInterfaceDeclaration = 7, RuleObjectImplements = 8, RuleFuncDec = 9, 
+    RuleInterfaceDeclaration = 7, RuleObjectImplements = 8, RuleFuncSignature = 9, 
     RuleFuncImplementation = 10, RuleFuncBody = 11, RuleFuncCall = 12, RuleConstructorCall = 13, 
     RuleExplicitVarDecList = 14, RuleExplicitVarDec = 15, RuleImplicitVarDec = 16, 
     RuleFuncArg = 17, RuleFuncArgList = 18, RuleStatement = 19, RuleEnumDeclaration = 20, 
@@ -62,7 +62,7 @@ public:
   class ObjectDeclarationContext;
   class InterfaceDeclarationContext;
   class ObjectImplementsContext;
-  class FuncDecContext;
+  class FuncSignatureContext;
   class FuncImplementationContext;
   class FuncBodyContext;
   class FuncCallContext;
@@ -127,8 +127,8 @@ public:
     ObjectImplementsContext *objectImplements();
     std::vector<ExplicitVarDecContext *> explicitVarDec();
     ExplicitVarDecContext* explicitVarDec(size_t i);
-    std::vector<FuncDecContext *> funcDec();
-    FuncDecContext* funcDec(size_t i);
+    std::vector<FuncSignatureContext *> funcSignature();
+    FuncSignatureContext* funcSignature(size_t i);
     std::vector<FuncImplementationContext *> funcImplementation();
     FuncImplementationContext* funcImplementation(size_t i);
 
@@ -222,27 +222,27 @@ public:
 
   ObjectImplementsContext* objectImplements();
 
-  class  FuncDecContext : public antlr4::ParserRuleContext {
+  class  FuncSignatureContext : public antlr4::ParserRuleContext {
   public:
-    FuncDecContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    FuncSignatureContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
+    ExplicitVarDecListContext *explicitVarDecList();
     antlr4::tree::TerminalNode *COLON();
     antlr4::tree::TerminalNode *TYPE();
-    ExplicitVarDecListContext *explicitVarDecList();
 
    
   };
 
-  FuncDecContext* funcDec();
+  FuncSignatureContext* funcSignature();
 
   class  FuncImplementationContext : public antlr4::ParserRuleContext {
   public:
     FuncImplementationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    FuncDecContext *funcDec();
+    FuncSignatureContext *funcSignature();
     FuncBodyContext *funcBody();
 
    
@@ -435,13 +435,16 @@ public:
 
   class  ExprContext : public antlr4::ParserRuleContext {
   public:
+    LogosParser::ExprContext *left = nullptr;
+    antlr4::Token *op = nullptr;
+    LogosParser::ExprContext *right = nullptr;
     ExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     UnaryExprContext *unaryExpr();
     antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
     std::vector<ExprContext *> expr();
     ExprContext* expr(size_t i);
-    antlr4::tree::TerminalNode *RPAREN();
     antlr4::tree::TerminalNode *STAR();
     antlr4::tree::TerminalNode *SLASH();
     antlr4::tree::TerminalNode *PLUS();

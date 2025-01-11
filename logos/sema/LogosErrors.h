@@ -4,7 +4,7 @@
 
 
 const std::map<int, std::string> LOGOS_ERRORS = {
-    {100, "One"},
+    {100, "Variable %s is not defined"},
     {101, "Two"},
     {102, "Three"}
 };

@@ -3,14 +3,14 @@
 #include "LogosPackage.h"
 
 LogosProject::LogosProject(const std::string& path) {
-    rootPath = path;
-    rootPackage = new LogosPackage(LOGOS_SOURCE_PACKAGE, rootPath);
-    semAnalyser = new SemAnalyser(rootPackage);
-    codeGenerator = new CodeGenerator();
+    this->rootPath = path;
+    this->rootPackage = new LogosPackage(LOGOS_SOURCE_PACKAGE, rootPath);
+    this->semAnalyser = new SemAnalyser(rootPackage);
+    this->codeGenerator = new CodeGenerator();
 }
 
 void LogosProject::scanProject() const {
     rootPackage->scanPackage();
     semAnalyser->analyseProject();
-    codeGenerator->generateCode(semAnalyser->codeNodes);
+    codeGenerator->run();
 }
