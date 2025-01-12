@@ -1,17 +1,19 @@
 #ifndef LOGOSFLOAT_H
 #define LOGOSFLOAT_H
-#include "LogosType.h"
+#include "LogosValue.h"
 
 
-class LogosFloat final : public LogosType {
+class LogosFloat final : public LogosValue {
 public:
     float value;
     static constexpr auto name = "Float";
 
-    LogosFloat() = default;
     explicit LogosFloat(const float value): value(value) {}
-    std::string getName() const override;
     ~LogosFloat() override = default;
+
+    std::string getTypeName() const override;
+    Type* getLLVMType(IRBuilder<>& builder) const override;
+    Value* getLLVMValue(IRBuilder<>& builder) const override;
 };
 
 

@@ -1,11 +1,11 @@
 #ifndef LOGOSEXPR_H
 #define LOGOSEXPR_H
-#include "LogosType.h"
+#include "LogosValue.h"
 
 class LogosExpr {
 public:
-    const LogosType* exprType;
-    explicit LogosExpr(const LogosType* exprType) : exprType(exprType) {}
+    LogosValue* exprType;
+    explicit LogosExpr(LogosValue* exprType) : exprType(exprType) {}
     explicit LogosExpr() : exprType(nullptr) {}
     virtual ~LogosExpr() = default;
 };

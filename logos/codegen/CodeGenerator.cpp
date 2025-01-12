@@ -1,5 +1,7 @@
 #include "CodeGenerator.h"
 
+#include "StoreExpr.h"
+
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Function.h>
@@ -12,9 +14,13 @@
 #include <llvm/TargetParser/Host.h>
 #include <llvm/MC/TargetRegistry.h>
 
-void CodeGenerator::run() {
+void CodeGenerator::run(const std::vector<CodeNode*>& codeNodes) {
     const auto module = new Module("main", context);
-    insertMain(context, builder, module);
+    declareFunctions(module);
+    insertMain(module);
+    for (const auto node : codeNodes) {
+        node->generateCode(builder, module, functions);
+    }
     builder.CreateRetVoid();
     module->print(outs(), nullptr);
     writeToFile(module);
@@ -22,12 +28,21 @@ void CodeGenerator::run() {
     // compileLLVM("../codegen/output.ll", "../codegen/output");
 }
 
-void CodeGenerator::insertMain(LLVMContext& context, IRBuilder<>& builder, Module* module) {
+void CodeGenerator::declareFunctions(Module* module) {
+    const auto printfType = FunctionType::get(builder.getInt32Ty(), PointerType::get(builder.getInt1Ty(), 0), true);
+    functions["print"] = Function::Create(printfType, Function::ExternalLinkage, "printf", module);
+}
+
+void CodeGenerator::insertMain(Module* module) {
     const auto voidType = Type::getVoidTy(context);
     const auto funcType = FunctionType::get(voidType, false);
     const auto mainFunction = Function::Create(funcType, Function::ExternalLinkage, "main", module);
     const auto entry = BasicBlock::Create(context, "entry", mainFunction);
     builder.SetInsertPoint(entry);
+}
+
+void CodeGenerator::addStoreExpr(const std::string& name, LogosExpr* expr) {
+    codeNodes.push_back(new StoreExpr(name, expr));
 }
 
 void CodeGenerator::writeToFile(const Module* const module) {
@@ -91,3 +106,4 @@ void CodeGenerator::compileLLVM(const std::string& llvmFilePath, const std::stri
     module->print(outputStream, nullptr);
     outs() << "LLVM IR written to " << outputFilePath << "\n";
 }
+

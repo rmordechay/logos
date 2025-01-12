@@ -1,6 +1,5 @@
 #include "LogosFile.h"
 #include "SemAnalyser.h"
-#include "LogosSymbol.h"
 
 #include <ANTLRInputStream.h>
 

@@ -1,18 +1,19 @@
 #ifndef LOGOSINT_H
 #define LOGOSINT_H
-#include "LogosType.h"
+#include "LogosValue.h"
 
 
-class LogosInt final : public LogosType {
+class LogosInt final : public LogosValue {
 public:
     int value;
     static constexpr auto name = "Int";
 
-    LogosInt() = default;
     explicit LogosInt(const int value): value(value) {}
-
-    std::string getName() const override;
     ~LogosInt() override = default;
+
+    std::string getTypeName() const override;
+    Type* getLLVMType(IRBuilder<>& builder) const override;
+    Value* getLLVMValue(IRBuilder<>& builder) const override;
 };
 
 

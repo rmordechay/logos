@@ -1,11 +1,11 @@
 #ifndef LOGOSCONSTANTEXPR_H
 #define LOGOSCONSTANTEXPR_H
-#include "LogosType.h"
+#include "LogosValue.h"
 #include "LogosUnaryExpr.h"
 
 class LogosConstantExpr final : public LogosUnaryExpr {
 public:
-    explicit LogosConstantExpr(const LogosType* logosType): LogosUnaryExpr(logosType) {}
+    explicit LogosConstantExpr(LogosValue* logosType): LogosUnaryExpr(logosType) {}
 };
 
 #endif //LOGOSCONSTANTEXPR_H

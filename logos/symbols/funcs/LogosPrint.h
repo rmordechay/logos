@@ -2,9 +2,10 @@
 #define PRINT_H
 #include "LogosFunc.h"
 
+
 class LogosPrint final : public LogosFunc {
 public:
-    ~LogosPrint() override = default;
+    LogosPrint() = default;
 };
 
 #endif //PRINT_H

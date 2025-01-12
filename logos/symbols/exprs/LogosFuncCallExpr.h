@@ -1,22 +1,29 @@
 #ifndef LOGOSFUNCCALLEXPR_H
 #define LOGOSFUNCCALLEXPR_H
+#include "LogosUnaryExpr.h"
 #include "funcs/LogosFunc.h"
+#include "funcs/LogosPrint.h"
+
+#include <map>
+
+const std::map<std::string, LogosFunc*> builtinFuncs = {
+    {"print", new LogosPrint()}
+};
 
 class LogosFuncCallExpr final : public LogosUnaryExpr {
 public:
-    LogosFuncCallExpr(const LogosType* exprType, const std::string& name, LogosFunc* func,
-        const std::vector<LogosExpr*>& args, const LogosType* logosType) :
-        LogosUnaryExpr(exprType),
-        name(name),
-        func(func),
-        args(args),
-        logosType(logosType) {
-    }
-
     const std::string name;
     const LogosFunc* func;
     std::vector<LogosExpr*> args;
-    const LogosType* logosType;
+
+    LogosFuncCallExpr(const std::string& name, const LogosFunc* func, const std::vector<LogosExpr*>& args) :
+        LogosUnaryExpr(func->funcType),
+        name(name),
+        func(func),
+        args(args) {
+    }
+
+    ~LogosFuncCallExpr() = default;
 };
 
 #endif //LOGOSFUNCCALLEXPR_H
