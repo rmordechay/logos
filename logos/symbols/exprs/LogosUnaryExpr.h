@@ -5,7 +5,7 @@
 
 class LogosUnaryExpr : public LogosExpr {
 public:
-    virtual std::shared_ptr<LogosType> value() const = 0;
+    explicit LogosUnaryExpr(const LogosType* exprType) : LogosExpr(exprType) {}
 };
 
 #endif //LOGOSUNARYEXPR_H

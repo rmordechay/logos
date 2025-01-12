@@ -4,13 +4,19 @@
 
 class LogosFuncCallExpr final : public LogosUnaryExpr {
 public:
-    std::string name;
-    std::shared_ptr<LogosFunc> func;
-    std::vector<std::shared_ptr<LogosExpr>> args;
-    const std::shared_ptr<LogosType> logosType;
+    LogosFuncCallExpr(const LogosType* exprType, const std::string& name, LogosFunc* func,
+        const std::vector<LogosExpr*>& args, const LogosType* logosType) :
+        LogosUnaryExpr(exprType),
+        name(name),
+        func(func),
+        args(args),
+        logosType(logosType) {
+    }
 
-    explicit LogosFuncCallExpr(const std::string& name, const std::shared_ptr<LogosFunc>& func) : LogosUnaryExpr(), name(name), func(func) {}
-    std::shared_ptr<LogosType> value() const override { return logosType; }
+    const std::string name;
+    const LogosFunc* func;
+    std::vector<LogosExpr*> args;
+    const LogosType* logosType;
 };
 
 #endif //LOGOSFUNCCALLEXPR_H

@@ -6,12 +6,15 @@
 
 class LogosBinaryExpr final : public LogosExpr {
 public:
-    std::shared_ptr<LogosExpr> left;
-    std::shared_ptr<LogosExpr> right;
-    LogosOperator op;
+    const LogosExpr* left;
+    const LogosExpr* right;
+    const LogosOperator op;
 
-    explicit LogosBinaryExpr(const std::shared_ptr<LogosExpr>& left, const std::shared_ptr<LogosExpr>& right, const LogosOperator op) :
-        left(left), right(right), op(op) {}
+    explicit LogosBinaryExpr(const LogosExpr* left, const LogosExpr* right, const LogosOperator op) :
+        left(left),
+        right(right),
+        op(op) {
+    }
 };
 
 #endif //LOGOSBINARYOP_H

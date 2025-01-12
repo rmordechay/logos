@@ -16,14 +16,19 @@ enum SymbolKind {
 class LogosSymbol {
 public:
     const std::string name;
-    const std::shared_ptr<LogosExpr> expr;
     const SymbolKind kind;
+    union SymbolValue {
+        LogosExpr *expr;
+        SymbolValue() {}
+        ~SymbolValue() {}
+    } value;
 
-    explicit LogosSymbol(const std::string& name, const std::shared_ptr<LogosExpr>& expr, const SymbolKind kind) :
+    explicit LogosSymbol(const std::string& name, const SymbolKind kind, const SymbolValue& value) :
         name(name),
-        expr(expr),
-        kind(kind) {
+        kind(kind),
+        value(value) {
     }
+    explicit LogosSymbol(const std::string& name, const SymbolKind kind) : name(name), kind(kind) {}
 };
 
 
