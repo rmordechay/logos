@@ -2,13 +2,7 @@
 #define LOGOSFUNCCALLEXPR_H
 #include "LogosUnaryExpr.h"
 #include "funcs/LogosFunc.h"
-#include "funcs/LogosPrint.h"
-
 #include <map>
-
-const std::map<std::string, LogosFunc*> builtinFuncs = {
-    {"print", new LogosPrint()}
-};
 
 class LogosFuncCallExpr final : public LogosUnaryExpr {
 public:

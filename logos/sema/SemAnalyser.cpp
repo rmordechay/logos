@@ -1,10 +1,8 @@
 #include "SemAnalyser.h"
 
-#include "Print.h"
 #include "LogosConfigs.h"
 #include "LogosErrors.h"
 #include "LogosParser.h"
-#include "StoreExpr.h"
 #include "exprs/LogosConstantExpr.h"
 #include "exprs/LogosFuncCallExpr.h"
 #include "exprs/LogosVariableExpr.h"
@@ -15,19 +13,15 @@
 #include "types/LogosString.h"
 
 SemAnalyser::SemAnalyser(const LogosPackage& rootPackage) : rootPackage(rootPackage) {
-    this->rootScope = new Scope();
-    this->currentScope = this->rootScope;
-    currentScope->symbolTable["print"] = new LogosSymbol("print", FUNC_DEFINITION, SymbolValue(new LogosPrint()));
-    this->mainFile = nullptr;
+    currentScope["print"] = new LogosSymbol("print", SymbolValue(new LogosPrint()));
 }
 
 void SemAnalyser::analyseProject() {
-    mainFile = rootPackage.mainFile;
     visitMainFile();
 }
 
 void SemAnalyser::visitMainFile() {
-    const auto fileCtx = mainFile->fileCtx;
+    const auto fileCtx = rootPackage.mainFile->fileCtx;
     for (const auto func : fileCtx->mainFile()->funcImplementation()) {
         if (func->funcSignature()->VARIABLE()->getText() == LOGOS_MAIN_FUNCTION) {
             visitFuncImplementation(func);
@@ -65,8 +59,8 @@ void SemAnalyser::visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
 }
 
 void SemAnalyser::visitFuncCall(LogosParser::FuncCallContext* ctx) {
-    const auto callExpr = getFuncCallExpr(ctx);
-    codeNodes.push_back(new Print(callExpr));
+    // const auto callExpr = getFuncCallExpr(ctx);
+    // delete callExpr;
 }
 
 LogosExpr* SemAnalyser::getExpr(LogosParser::ExprContext* ctx) {
@@ -86,7 +80,7 @@ LogosExpr* SemAnalyser::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
 
     if (const auto variable = ctx->VARIABLE()) {
         const auto symbolName = variable->getText();
-        if (const auto resolvedSymbol = currentScope->resolveSymbol(symbolName)) {
+        if (const auto resolvedSymbol = resolveSymbol(symbolName)) {
             return new LogosVariableExpr(symbolName, *resolvedSymbol);
         }
         return nullptr;
@@ -103,7 +97,6 @@ LogosExpr* SemAnalyser::getBinaryExpr(LogosParser::ExprContext* ctx) {
     const auto right = getExpr(ctx->right);
     const auto binaryExpr = new LogosBinaryExpr(left, right, mapOperator(ctx));
     binaryExpr->exprType = left->exprType;
-    codeNodes.push_back(new StoreExpr("a", binaryExpr));
     return binaryExpr;
 }
 
@@ -133,36 +126,29 @@ LogosConstantExpr* SemAnalyser::getConstantExpr(LogosParser::ConstantContext* ct
 
 LogosFuncCallExpr* SemAnalyser::getFuncCallExpr(LogosParser::FuncCallContext* ctx) {
     const auto funcName = ctx->VARIABLE()->getText();
-    const auto builtinFunc = builtinFuncs.at(funcName);
-    std::vector<LogosExpr*> args;
+    const auto builtinFunc = resolveSymbol(funcName);
+    vector<LogosExpr*> args;
     for (const auto funcArg : ctx->funcArgList()->funcArg()) {
         args.push_back(getExpr(funcArg->expr()));
     }
-    if (builtinFunc) {
-        return new LogosFuncCallExpr(funcName, builtinFunc, args);
-    }
-    return nullptr;
+    return new LogosFuncCallExpr(funcName, builtinFunc->value.func, args);
 }
 
-void SemAnalyser::addSymbol(const std::string& variableName, LogosExpr* const logosExpr) const {
+void SemAnalyser::addSymbol(const string& variableName, LogosExpr* const logosExpr) {
     const SymbolValue symbolValue(logosExpr);
-    currentScope->symbolTable[variableName] = new LogosSymbol(variableName, LOCAL_VARIABLE, symbolValue);
+    currentScope[variableName] = new LogosSymbol(variableName, symbolValue);
 }
 
-void SemAnalyser::printError(const int errorCode) const {
-    cout << "ERROR: " << LOGOS_ERRORS.at(errorCode) << endl;
-    cout << "  1. " << mainFile->path << LOGOS_EXTENSION << endl;
+LogosSymbol* SemAnalyser::resolveSymbol(const string& symbolName) {
+    const auto it = currentScope.find(symbolName);
+    if (it == currentScope.end()) {
+        return nullptr;
+    }
+    return it->second;
 }
 
 SemAnalyser::~SemAnalyser() {
-    for (auto& [name, symbol] : currentScope->symbolTable) {
+    for (auto& [name, symbol] : currentScope) {
         delete symbol;
-    }
-    for (const auto codeNode : codeNodes) {
-        delete codeNode;
-    }
-    delete rootScope;
-    if (mainFile) {
-        delete mainFile;
     }
 }

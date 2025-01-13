@@ -1,7 +1,5 @@
 #include "CodeGenerator.h"
 
-#include "StoreExpr.h"
-
 #include <iostream>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
@@ -19,19 +17,16 @@
 #include <llvm/IR/LegacyPassManager.h>
 #include "llvm/Target/TargetMachine.h"
 
-void CodeGenerator::run(const std::vector<CodeNode*>& codeNodes) {
+void CodeGenerator::run() {
     const auto module = new Module("main", context);
     declareFunctions(module);
     insertMain(module);
     map<string, Value*> symbolTable;
-    for (const auto node : codeNodes) {
-        node->generateCode(builder, module, &functions, &symbolTable);
-    }
     builder.CreateRet(ConstantInt::get(builder.getInt32Ty(), 0));
-    // module->print(outs(), nullptr);
+    module->print(outs(), nullptr);
     writeToFile(module);
-    compileLLVM("../codegen/output.ll", "../codegen/output");
-    // runBinary();
+    // compileLLVM("../codegen/output.ll", "../codegen/output");
+    runBinary();
 }
 
 void CodeGenerator::declareFunctions(Module* module) {
@@ -46,10 +41,6 @@ void CodeGenerator::insertMain(Module* module) {
     builder.SetInsertPoint(mainEntry);
 }
 
-void CodeGenerator::addStoreExpr(const std::string& name, LogosExpr* expr) {
-    codeNodes.push_back(new StoreExpr(name, expr));
-}
-
 void CodeGenerator::writeToFile(const Module* const module) {
     std::error_code EC;
     raw_fd_ostream textFile("../codegen/output.ll", EC, sys::fs::OF_None);
@@ -57,7 +48,6 @@ void CodeGenerator::writeToFile(const Module* const module) {
 }
 
 void CodeGenerator::runBinary() {
-    // std::system("llc -filetype=obj -mtriple=arm64-apple-macos ../codegen/output.ll -o ../codegen/output.o");
     std::system("clang -o ../codegen/output ../codegen/output.ll");
     std::system("../codegen/output");
 }

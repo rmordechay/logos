@@ -25,8 +25,6 @@ add_executable(logos
     logos/project/LogosProject.cpp
     logos/project/LogosProject.h
     logos/sema/LogosErrors.h
-    logos/sema/Scope.cpp
-    logos/sema/Scope.h
     logos/sema/SemAnalyser.cpp
     logos/sema/SemAnalyser.h
     logos/symbols/LogosSymbol.h
@@ -39,7 +37,7 @@ add_executable(logos
     logos/symbols/types/LogosInt.h
     logos/symbols/types/LogosString.cpp
     logos/symbols/types/LogosString.h
-    logos/symbols/logosOperator.h
+    logos/symbols/exprs/LogosOperator.h
     logos/symbols/exprs/LogosBinaryExpr.h
     logos/symbols/exprs/LogosExpr.h
     logos/symbols/exprs/LogosUnaryExpr.h
@@ -47,13 +45,6 @@ add_executable(logos
     logos/symbols/exprs/LogosFuncCallExpr.h
     logos/symbols/funcs/LogosFunc.h
     logos/symbols/funcs/LogosPrint.h
-    logos/codegen/StoreExpr.cpp
-    logos/codegen/StoreExpr.h
-    logos/codegen/CodeNode.h
-    logos/codegen/CodeNode.cpp
-    logos/codegen/Print.cpp
-    logos/codegen/Print.h
-    logos/symbols/exprs/LogosVariableExpr.h
 )
 
 target_include_directories(logos PRIVATE

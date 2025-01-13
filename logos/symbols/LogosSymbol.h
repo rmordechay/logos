@@ -1,19 +1,10 @@
 #ifndef SYMBOL_H
 #define SYMBOL_H
 
+#include "exprs/LogosExpr.h"
 #include "funcs/LogosFunc.h"
 
 #include <string>
-
-class LogosExpr;
-
-enum SymbolKind {
-    CONSTANT,
-    LOCAL_VARIABLE,
-    FUNC_CALL,
-    FUNC_DEFINITION,
-    PARAM,
-};
 
 union SymbolValue {
     LogosExpr *expr;
@@ -28,16 +19,13 @@ union SymbolValue {
 class LogosSymbol {
 public:
     const std::string name;
-    const SymbolKind kind;
     SymbolValue value;
 
-    explicit LogosSymbol(const std::string& name, const SymbolKind kind, const SymbolValue& value) :
+    explicit LogosSymbol(const std::string& name, const SymbolValue& value) :
         name(name),
-        kind(kind),
         value(value) {
     }
 
-    explicit LogosSymbol(const std::string& name, const SymbolKind kind) : name(name), kind(kind) {}
 };
 
 
