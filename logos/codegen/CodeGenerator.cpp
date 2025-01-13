@@ -2,6 +2,7 @@
 
 #include "StoreExpr.h"
 
+#include <iostream>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Function.h>
@@ -13,6 +14,10 @@
 #include <clang/CodeGen/CodeGenAction.h>
 #include <llvm/TargetParser/Host.h>
 #include <llvm/MC/TargetRegistry.h>
+#include <llvm/IRReader/IRReader.h>
+#include <llvm/IR/Verifier.h>
+#include <llvm/IR/LegacyPassManager.h>
+#include "llvm/Target/TargetMachine.h"
 
 void CodeGenerator::run(const std::vector<CodeNode*>& codeNodes) {
     const auto module = new Module("main", context);
@@ -22,11 +27,11 @@ void CodeGenerator::run(const std::vector<CodeNode*>& codeNodes) {
     for (const auto node : codeNodes) {
         node->generateCode(builder, module, &functions, &symbolTable);
     }
-    builder.CreateRetVoid();
-    module->print(outs(), nullptr);
+    builder.CreateRet(ConstantInt::get(builder.getInt32Ty(), 0));
+    // module->print(outs(), nullptr);
     writeToFile(module);
-    runBinary();
-    // compileLLVM("../codegen/output.ll", "../codegen/output");
+    compileLLVM("../codegen/output.ll", "../codegen/output");
+    // runBinary();
 }
 
 void CodeGenerator::declareFunctions(Module* module) {
@@ -35,11 +40,10 @@ void CodeGenerator::declareFunctions(Module* module) {
 }
 
 void CodeGenerator::insertMain(Module* module) {
-    const auto voidType = Type::getVoidTy(context);
-    const auto funcType = FunctionType::get(voidType, false);
-    const auto mainFunction = Function::Create(funcType, Function::ExternalLinkage, "main", module);
-    const auto entry = BasicBlock::Create(context, "entry", mainFunction);
-    builder.SetInsertPoint(entry);
+    const auto mainFuncType = FunctionType::get(builder.getInt32Ty(), false);
+    const auto mainFunc = Function::Create(mainFuncType, Function::ExternalLinkage, "main", module);
+    const auto mainEntry = BasicBlock::Create(context, "entry", mainFunc);
+    builder.SetInsertPoint(mainEntry);
 }
 
 void CodeGenerator::addStoreExpr(const std::string& name, LogosExpr* expr) {
@@ -62,49 +66,48 @@ void CodeGenerator::compileLLVM(const std::string& llvmFilePath, const std::stri
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();
-
-    clang::CompilerInstance compiler;
-    compiler.createDiagnostics();
-
-    const auto targetTriple = sys::getDefaultTargetTriple();
-    compiler.getTargetOpts().Triple = targetTriple;
-    compiler.getLangOpts().CPlusPlus = true;
-
-    std::string error;
-    auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    auto opt = TargetOptions{};
-    auto RM = std::optional(Reloc::PIC_);
-    auto CM = CodeModel::Small;
-
-    auto machine = target->createTargetMachine(targetTriple, "apple-m2", "", opt, RM, CM);
-    if (!machine) {
-        throw std::runtime_error("Could not create target machine");
-    }
+    InitializeAllTargetMCs();
+    InitializeAllTargets();
+    InitializeAllTargetInfos();
 
 
-    const clang::FrontendInputFile inputFile(llvmFilePath, clang::InputKind(clang::Language::LLVM_IR));
-    compiler.getFrontendOpts().Inputs.push_back(inputFile);
+    const auto context = std::make_unique<LLVMContext>();
+    const std::string errorMsg;
+    auto buffer = MemoryBuffer::getFile(llvmFilePath, errorMsg.data());
 
-    const auto codeGenAction = std::make_unique<clang::EmitLLVMAction>();
-    if (!compiler.ExecuteAction(*codeGenAction)) {
-        errs() << "Error generating LLVM IR.\n";
+    SMDiagnostic err;
+    const auto module = parseIR(**buffer, err, *context);
+    std::cout << module->getName().str() << std::endl;
+
+    const auto targetTriple = sys::getProcessTriple();
+    std::string targetError;
+    const auto* target = TargetRegistry::lookupTarget(targetTriple, targetError);
+    std::cout << targetTriple << std::endl;
+
+    const auto options = TargetOptions();
+    auto CPU = "generic";
+    auto features = "";
+    auto targetMachine = target->createTargetMachine(targetTriple, CPU, features, options, Reloc::PIC_);
+
+    std::error_code EC;
+    raw_fd_ostream dest("../codegen/output.o", EC, sys::fs::OF_None);
+    if (EC) {
+        errs() << "Error opening output file: " << EC.message() << "\n";
         return;
     }
 
-    const auto module = codeGenAction->takeModule();
-    if (!module) {
-        errs() << "No module generated.\n";
+    if (verifyModule(*module, &errs())) {
+        errs() << "Module verification failed!\n";
         return;
     }
 
-    std::error_code ec;
-    raw_fd_ostream outputStream(outputFilePath, ec, sys::fs::OF_None);
-    if (ec) {
-        errs() << "Error opening output file: " << ec.message() << "\n";
+    legacy::PassManager pass;
+    auto fileType = CodeGenFileType::ObjectFile;
+    if (targetMachine->addPassesToEmitFile(pass, dest, nullptr, fileType)) {
+        errs() << "Target machine can't emit object file!\n";
         return;
     }
-
-    module->print(outputStream, nullptr);
-    outs() << "LLVM IR written to " << outputFilePath << "\n";
+    pass.run(*module);
+    dest.flush();
 }
 

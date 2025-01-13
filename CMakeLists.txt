@@ -8,6 +8,7 @@ set(ANTLR_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime.a")
 set(GTEST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest.1.15.2.dylib")
 set(GTEST_LIB_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest_main.1.15.2.dylib")
 set(LLVM_LIBS "/opt/homebrew/opt/llvm/lib")
+set(LLVM_INCLUDE_DIR "/opt/homebrew/opt/llvm/include")
 
 file(GLOB GENERATED_SRC "${CMAKE_CURRENT_SOURCE_DIR}/logos/parser/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/logos/parser/*.h")
 
@@ -64,7 +65,7 @@ target_include_directories(logos PRIVATE
     logos/sema
     ${ANTLR_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
-    ${LLVM_INCLUDE}
+    ${LLVM_INCLUDE_DIR}
 )
 
 file(GLOB LLVM

@@ -103,7 +103,7 @@ LogosExpr* SemAnalyser::getBinaryExpr(LogosParser::ExprContext* ctx) {
     const auto right = getExpr(ctx->right);
     const auto binaryExpr = new LogosBinaryExpr(left, right, mapOperator(ctx));
     binaryExpr->exprType = left->exprType;
-    codeNodes.push_back(new StoreExpr("", binaryExpr));
+    codeNodes.push_back(new StoreExpr("a", binaryExpr));
     return binaryExpr;
 }
 

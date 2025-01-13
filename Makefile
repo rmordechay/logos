@@ -7,4 +7,7 @@ generate_code:
 	cd codegen && clang -o output output.ll
 
 emit_llvm:
-	clang -S -emit-llvm test.cpp
+	cd codegen && clang -c output.ll -o output.o
+	cd codegen && clang output.o -o output
+	codegen/output
+	#rm codegen/output codegen/output.o
