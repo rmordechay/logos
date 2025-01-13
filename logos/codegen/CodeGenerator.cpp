@@ -18,8 +18,9 @@ void CodeGenerator::run(const std::vector<CodeNode*>& codeNodes) {
     const auto module = new Module("main", context);
     declareFunctions(module);
     insertMain(module);
+    map<string, Value*> symbolTable;
     for (const auto node : codeNodes) {
-        node->generateCode(builder, module, functions);
+        node->generateCode(builder, module, &functions, &symbolTable);
     }
     builder.CreateRetVoid();
     module->print(outs(), nullptr);

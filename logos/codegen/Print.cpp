@@ -1,8 +1,11 @@
 #include "Print.h"
 
-void Print::generateCode(IRBuilder<>& builder, Module* module, std::map<std::string, Function*> functions) {
-    const auto name = funcCallExpr->name;
-    const auto printfFunc = functions[name];
+void Print::generateCode(IRBuilder<>& builder, Module* module, std::map<std::string, Function*>* functions, map<string, Value*>* symbolTable) {
+    const auto funcName = funcCallExpr->name;
+    const auto printfFunc = (*functions)[funcName];
+
     auto formatStr = builder.CreateGlobalStringPtr("Printing: %d\n");
-    builder.CreateCall(printfFunc, {formatStr, ConstantInt::get(builder.getInt32Ty(), 5)});
+    const auto intAlloc = (*symbolTable)["a"];
+    auto loadInst = builder.CreateLoad(builder.getInt32Ty(), intAlloc);
+    builder.CreateCall(printfFunc, {formatStr, loadInst});
 }

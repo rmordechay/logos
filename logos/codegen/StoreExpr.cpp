@@ -4,7 +4,7 @@
 #include "exprs/LogosUnaryExpr.h"
 
 
-void StoreExpr::generateCode(IRBuilder<>& builder, Module* module, std::map<std::string, Function*> functions) {
+void StoreExpr::generateCode(IRBuilder<>& builder, Module* module, std::map<std::string, Function*>* functions, map<string, Value*>* symbolTable) {
     if (const auto unary = dynamic_cast<LogosUnaryExpr*>(expr)) {
 
     } else if (const auto binary = dynamic_cast<LogosBinaryExpr*>(expr)) {
@@ -14,6 +14,7 @@ void StoreExpr::generateCode(IRBuilder<>& builder, Module* module, std::map<std:
             const auto ptr = builder.CreateAlloca(binary->exprType->getLLVMType(builder), nullptr, name);
             const auto value = builder.CreateAdd(vl, vr);
             builder.CreateStore(value, ptr);
+            (*symbolTable)[name] = ptr;
         }
     }
 }
