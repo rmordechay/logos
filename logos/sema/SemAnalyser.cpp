@@ -62,12 +62,11 @@ void SemAnalyser::visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto logosExpr = getExpr(ctx->expr());
     addSymbol(variableName, logosExpr);
-    codeNodes.push_back(new StoreExpr(variableName, logosExpr));
 }
 
 void SemAnalyser::visitFuncCall(LogosParser::FuncCallContext* ctx) {
-    auto logosFuncCallExpr = getFuncCallExpr(ctx);
-    codeNodes.push_back(new Print(logosFuncCallExpr));
+    const auto callExpr = getFuncCallExpr(ctx);
+    codeNodes.push_back(new Print(callExpr));
 }
 
 LogosExpr* SemAnalyser::getExpr(LogosParser::ExprContext* ctx) {
@@ -104,6 +103,7 @@ LogosExpr* SemAnalyser::getBinaryExpr(LogosParser::ExprContext* ctx) {
     const auto right = getExpr(ctx->right);
     const auto binaryExpr = new LogosBinaryExpr(left, right, mapOperator(ctx));
     binaryExpr->exprType = left->exprType;
+    codeNodes.push_back(new StoreExpr("", binaryExpr));
     return binaryExpr;
 }
 
