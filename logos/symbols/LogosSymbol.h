@@ -6,26 +6,16 @@
 
 #include <string>
 
-union SymbolValue {
-    LogosExpr *expr;
-    LogosFunc *func;
-
-    SymbolValue(): expr(nullptr) {}
-    explicit SymbolValue(LogosExpr *expr): expr(expr) {}
-    explicit SymbolValue(LogosFunc *func): func(func) {}
-    ~SymbolValue() {}
-};
+using namespace std;
 
 class LogosSymbol {
 public:
-    const std::string name;
-    SymbolValue value;
+    const LogosType& type;
+    using Value = variant<LogosExpr, LogosFunc>;
+    Value value;
 
-    explicit LogosSymbol(const std::string& name, const SymbolValue& value) :
-        name(name),
-        value(value) {
-    }
-
+    LogosSymbol(const LogosType& type, const Value& value) : type(type), value(value) {}
+    ~LogosSymbol() = default;
 };
 
 

@@ -1,13 +1,13 @@
 #ifndef LOGOSFUNC_H
 #define LOGOSFUNC_H
-#include "LogosValue.h"
+#include "../types/LogosType.h"
 
 class LogosFunc {
 public:
-    LogosValue* funcType;
+    std::string name;
+    const LogosType& type;
 
-    explicit LogosFunc() : funcType(nullptr) {}
-    explicit LogosFunc(LogosValue* funcType) : funcType(funcType) {}
+    explicit LogosFunc(const std::string& name, const LogosType& funcType) : name(name), type(funcType) {}
     virtual ~LogosFunc() = default;
 };
 

@@ -1,21 +1,21 @@
 #ifndef LOGOSSTRING_H
 #define LOGOSSTRING_H
-#include "LogosValue.h"
+#include "LogosType.h"
 
 #include <string>
 
 
-class LogosString final : public LogosValue {
+class LogosString final : public LogosType {
 public:
-    std::string value;
     static constexpr auto name = "Str";
 
-    explicit LogosString(const std::string &value): value(value) {}
+    LogosString() = default;
     ~LogosString() override = default;
 
-    std::string getTypeName() const override;
-    Type* getLLVMType(IRBuilder<>& builder) const override;
-    Value* getLLVMValue(IRBuilder<>& builder) const override;
+    Type* getLLVMType(IRBuilder<>& builder) const override {
+        return nullptr;
+    }
+
 };
 
 

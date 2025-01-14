@@ -57,7 +57,7 @@ void logosParserInitialize() {
       "explicitVarDecList", "explicitVarDec", "implicitVarDec", "funcArg", 
       "funcArgList", "statement", "enumDeclaration", "enumField", "statementsBlock", 
       "exprList", "expr", "unaryExpr", "constant", "selection", "ifStatement", 
-      "elseStatement", "patterMatching", "pattern", "loopStatement", "range", 
+      "elseStatement", "patternMatching", "pattern", "loopStatement", "range", 
       "controlFlowStatement"
     },
     std::vector<std::string>{
@@ -70,13 +70,12 @@ void logosParserInitialize() {
     },
     std::vector<std::string>{
       "", "DOUBLE_EQUAL", "GE", "LE", "LPAREN", "RPAREN", "LBRACE", "RBRACE", 
-      "LBRACK", "RBRACK", "LEFT_ANGLE", "RIGHT_ANGLE", "COMMA", "DOUBLE_DOT", 
-      "DOT", "COLON", "EQUAL", "MINUS", "PLUS", "STAR", "SLASH", "HASH", 
-      "QUEST_MARK", "EXCLA_MARK", "PERCENT", "DOLLAR", "AMPERSAND", "OBJECT", 
-      "INTERFACE", "ENUM", "IMPLEMENTS", "IMPORT", "IF", "ELSE", "FOR", 
-      "BREAK", "CONTINUE", "RETURN", "AND", "OR", "NOT", "IN", "INTEGER", 
-      "FLOAT", "BOOL", "CONST", "TYPE", "VARIABLE", "STRING", "LINE_COMMENT", 
-      "BLOCK_COMMENT", "WS"
+      "LBRACK", "RBRACK", "LANGLE", "RANGLE", "COMMA", "DOUBLE_DOT", "DOT", 
+      "COLON", "EQUAL", "MINUS", "PLUS", "STAR", "SLASH", "HASH", "QUEST_MARK", 
+      "EXCLA_MARK", "PERCENT", "DOLLAR", "AMPERSAND", "OBJECT", "INTERFACE", 
+      "ENUM", "IMPLEMENTS", "IMPORT", "IF", "ELSE", "FOR", "BREAK", "CONTINUE", 
+      "RETURN", "AND", "OR", "NOT", "IN", "INTEGER", "FLOAT", "BOOL", "CONST", 
+      "TYPE", "VARIABLE", "STRING", "LINE_COMMENT", "BLOCK_COMMENT", "WS"
     }
   );
   static const int32_t serializedATNSegment[] = {
@@ -112,8 +111,8 @@ void logosParserInitialize() {
   	1,32,3,32,376,8,32,1,33,3,33,379,8,33,1,33,1,33,1,33,1,34,1,34,1,34,1,
   	34,1,34,1,34,1,34,3,34,391,8,34,1,34,0,1,48,35,0,2,4,6,8,10,12,14,16,
   	18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,
-  	64,66,68,0,4,1,0,19,20,1,0,17,18,2,0,1,3,8,9,2,0,42,44,48,48,416,0,71,
-  	1,0,0,0,2,80,1,0,0,0,4,89,1,0,0,0,6,112,1,0,0,0,8,130,1,0,0,0,10,140,
+  	64,66,68,0,4,1,0,19,20,1,0,17,18,2,0,1,3,10,11,2,0,42,44,48,48,416,0,
+  	71,1,0,0,0,2,80,1,0,0,0,4,89,1,0,0,0,6,112,1,0,0,0,8,130,1,0,0,0,10,140,
   	1,0,0,0,12,148,1,0,0,0,14,152,1,0,0,0,16,156,1,0,0,0,18,160,1,0,0,0,20,
   	170,1,0,0,0,22,173,1,0,0,0,24,175,1,0,0,0,26,182,1,0,0,0,28,189,1,0,0,
   	0,30,208,1,0,0,0,32,210,1,0,0,0,34,217,1,0,0,0,36,221,1,0,0,0,38,239,
@@ -2101,12 +2100,12 @@ tree::TerminalNode* LogosParser::ExprContext::DOUBLE_EQUAL() {
   return getToken(LogosParser::DOUBLE_EQUAL, 0);
 }
 
-tree::TerminalNode* LogosParser::ExprContext::RBRACK() {
-  return getToken(LogosParser::RBRACK, 0);
+tree::TerminalNode* LogosParser::ExprContext::LANGLE() {
+  return getToken(LogosParser::LANGLE, 0);
 }
 
-tree::TerminalNode* LogosParser::ExprContext::LBRACK() {
-  return getToken(LogosParser::LBRACK, 0);
+tree::TerminalNode* LogosParser::ExprContext::RANGLE() {
+  return getToken(LogosParser::RANGLE, 0);
 }
 
 tree::TerminalNode* LogosParser::ExprContext::GE() {
@@ -2247,7 +2246,7 @@ LogosParser::ExprContext* LogosParser::expr(int precedence) {
           antlrcpp::downCast<ExprContext *>(_localctx)->op = _input->LT(1);
           _la = _input->LA(1);
           if (!((((_la & ~ 0x3fULL) == 0) &&
-            ((1ULL << _la) & 782) != 0))) {
+            ((1ULL << _la) & 3086) != 0))) {
             antlrcpp::downCast<ExprContext *>(_localctx)->op = _errHandler->recoverInline(this);
           }
           else {
@@ -2513,8 +2512,8 @@ LogosParser::ElseStatementContext* LogosParser::IfStatementContext::elseStatemen
   return getRuleContext<LogosParser::ElseStatementContext>(0);
 }
 
-LogosParser::PatterMatchingContext* LogosParser::IfStatementContext::patterMatching() {
-  return getRuleContext<LogosParser::PatterMatchingContext>(0);
+LogosParser::PatternMatchingContext* LogosParser::IfStatementContext::patternMatching() {
+  return getRuleContext<LogosParser::PatternMatchingContext>(0);
 }
 
 
@@ -2554,7 +2553,7 @@ LogosParser::IfStatementContext* LogosParser::ifStatement() {
     case 2: {
       enterOuterAlt(_localctx, 2);
       setState(320);
-      patterMatching();
+      patternMatching();
       break;
     }
 
@@ -2660,57 +2659,57 @@ LogosParser::ElseStatementContext* LogosParser::elseStatement() {
   return _localctx;
 }
 
-//----------------- PatterMatchingContext ------------------------------------------------------------------
+//----------------- PatternMatchingContext ------------------------------------------------------------------
 
-LogosParser::PatterMatchingContext::PatterMatchingContext(ParserRuleContext *parent, size_t invokingState)
+LogosParser::PatternMatchingContext::PatternMatchingContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* LogosParser::PatterMatchingContext::IF() {
+tree::TerminalNode* LogosParser::PatternMatchingContext::IF() {
   return getToken(LogosParser::IF, 0);
 }
 
-tree::TerminalNode* LogosParser::PatterMatchingContext::LBRACE() {
+tree::TerminalNode* LogosParser::PatternMatchingContext::LBRACE() {
   return getToken(LogosParser::LBRACE, 0);
 }
 
-tree::TerminalNode* LogosParser::PatterMatchingContext::RBRACE() {
+tree::TerminalNode* LogosParser::PatternMatchingContext::RBRACE() {
   return getToken(LogosParser::RBRACE, 0);
 }
 
-LogosParser::ExprContext* LogosParser::PatterMatchingContext::expr() {
+LogosParser::ExprContext* LogosParser::PatternMatchingContext::expr() {
   return getRuleContext<LogosParser::ExprContext>(0);
 }
 
-std::vector<LogosParser::PatternContext *> LogosParser::PatterMatchingContext::pattern() {
+std::vector<LogosParser::PatternContext *> LogosParser::PatternMatchingContext::pattern() {
   return getRuleContexts<LogosParser::PatternContext>();
 }
 
-LogosParser::PatternContext* LogosParser::PatterMatchingContext::pattern(size_t i) {
+LogosParser::PatternContext* LogosParser::PatternMatchingContext::pattern(size_t i) {
   return getRuleContext<LogosParser::PatternContext>(i);
 }
 
-tree::TerminalNode* LogosParser::PatterMatchingContext::ELSE() {
+tree::TerminalNode* LogosParser::PatternMatchingContext::ELSE() {
   return getToken(LogosParser::ELSE, 0);
 }
 
-tree::TerminalNode* LogosParser::PatterMatchingContext::COLON() {
+tree::TerminalNode* LogosParser::PatternMatchingContext::COLON() {
   return getToken(LogosParser::COLON, 0);
 }
 
-LogosParser::StatementsBlockContext* LogosParser::PatterMatchingContext::statementsBlock() {
+LogosParser::StatementsBlockContext* LogosParser::PatternMatchingContext::statementsBlock() {
   return getRuleContext<LogosParser::StatementsBlockContext>(0);
 }
 
 
-size_t LogosParser::PatterMatchingContext::getRuleIndex() const {
-  return LogosParser::RulePatterMatching;
+size_t LogosParser::PatternMatchingContext::getRuleIndex() const {
+  return LogosParser::RulePatternMatching;
 }
 
 
-LogosParser::PatterMatchingContext* LogosParser::patterMatching() {
-  PatterMatchingContext *_localctx = _tracker.createInstance<PatterMatchingContext>(_ctx, getState());
-  enterRule(_localctx, 60, LogosParser::RulePatterMatching);
+LogosParser::PatternMatchingContext* LogosParser::patternMatching() {
+  PatternMatchingContext *_localctx = _tracker.createInstance<PatternMatchingContext>(_ctx, getState());
+  enterRule(_localctx, 60, LogosParser::RulePatternMatching);
   size_t _la = 0;
 
 #if __cplusplus > 201703L

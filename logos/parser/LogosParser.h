@@ -13,9 +13,9 @@ class  LogosParser : public antlr4::Parser {
 public:
   enum {
     DOUBLE_EQUAL = 1, GE = 2, LE = 3, LPAREN = 4, RPAREN = 5, LBRACE = 6, 
-    RBRACE = 7, LBRACK = 8, RBRACK = 9, LEFT_ANGLE = 10, RIGHT_ANGLE = 11, 
-    COMMA = 12, DOUBLE_DOT = 13, DOT = 14, COLON = 15, EQUAL = 16, MINUS = 17, 
-    PLUS = 18, STAR = 19, SLASH = 20, HASH = 21, QUEST_MARK = 22, EXCLA_MARK = 23, 
+    RBRACE = 7, LBRACK = 8, RBRACK = 9, LANGLE = 10, RANGLE = 11, COMMA = 12, 
+    DOUBLE_DOT = 13, DOT = 14, COLON = 15, EQUAL = 16, MINUS = 17, PLUS = 18, 
+    STAR = 19, SLASH = 20, HASH = 21, QUEST_MARK = 22, EXCLA_MARK = 23, 
     PERCENT = 24, DOLLAR = 25, AMPERSAND = 26, OBJECT = 27, INTERFACE = 28, 
     ENUM = 29, IMPLEMENTS = 30, IMPORT = 31, IF = 32, ELSE = 33, FOR = 34, 
     BREAK = 35, CONTINUE = 36, RETURN = 37, AND = 38, OR = 39, NOT = 40, 
@@ -32,8 +32,8 @@ public:
     RuleFuncArg = 17, RuleFuncArgList = 18, RuleStatement = 19, RuleEnumDeclaration = 20, 
     RuleEnumField = 21, RuleStatementsBlock = 22, RuleExprList = 23, RuleExpr = 24, 
     RuleUnaryExpr = 25, RuleConstant = 26, RuleSelection = 27, RuleIfStatement = 28, 
-    RuleElseStatement = 29, RulePatterMatching = 30, RulePattern = 31, RuleLoopStatement = 32, 
-    RuleRange = 33, RuleControlFlowStatement = 34
+    RuleElseStatement = 29, RulePatternMatching = 30, RulePattern = 31, 
+    RuleLoopStatement = 32, RuleRange = 33, RuleControlFlowStatement = 34
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -83,7 +83,7 @@ public:
   class SelectionContext;
   class IfStatementContext;
   class ElseStatementContext;
-  class PatterMatchingContext;
+  class PatternMatchingContext;
   class PatternContext;
   class LoopStatementContext;
   class RangeContext;
@@ -450,8 +450,8 @@ public:
     antlr4::tree::TerminalNode *PLUS();
     antlr4::tree::TerminalNode *MINUS();
     antlr4::tree::TerminalNode *DOUBLE_EQUAL();
-    antlr4::tree::TerminalNode *RBRACK();
-    antlr4::tree::TerminalNode *LBRACK();
+    antlr4::tree::TerminalNode *LANGLE();
+    antlr4::tree::TerminalNode *RANGLE();
     antlr4::tree::TerminalNode *GE();
     antlr4::tree::TerminalNode *LE();
 
@@ -510,7 +510,7 @@ public:
     ExprContext *expr();
     StatementsBlockContext *statementsBlock();
     ElseStatementContext *elseStatement();
-    PatterMatchingContext *patterMatching();
+    PatternMatchingContext *patternMatching();
 
    
   };
@@ -533,9 +533,9 @@ public:
 
   ElseStatementContext* elseStatement();
 
-  class  PatterMatchingContext : public antlr4::ParserRuleContext {
+  class  PatternMatchingContext : public antlr4::ParserRuleContext {
   public:
-    PatterMatchingContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    PatternMatchingContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IF();
     antlr4::tree::TerminalNode *LBRACE();
@@ -550,7 +550,7 @@ public:
    
   };
 
-  PatterMatchingContext* patterMatching();
+  PatternMatchingContext* patternMatching();
 
   class  PatternContext : public antlr4::ParserRuleContext {
   public:

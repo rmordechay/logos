@@ -5,12 +5,12 @@
 LogosProject::LogosProject(const std::string& path) {
     this->rootPath = path;
     this->rootPackage = new LogosPackage(LOGOS_SOURCE_PACKAGE, rootPath);
-    this->semAnalyser = new SemAnalyser(*rootPackage);
+    this->semAnalyser = new SemAnalyser();
     this->codeGenerator = new CodeGenerator();
 }
 
 void LogosProject::scanProject() const {
     rootPackage->scanPackage();
-    semAnalyser->analyseProject();
-    codeGenerator->run();
+    semAnalyser->analyseProject(rootPackage->mainFile);
+    codeGenerator->run(semAnalyser->codeNodes);
 }

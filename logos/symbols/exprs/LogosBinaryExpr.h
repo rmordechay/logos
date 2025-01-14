@@ -1,20 +1,22 @@
-#ifndef LOGOSBINARYOP_H
-#define LOGOSBINARYOP_H
-#include "LogosExpr.h"
+#ifndef LOGOSBINARYEXPR_H
+#define LOGOSBINARYEXPR_H
 #include "LogosOperator.h"
-#include "LogosUnaryExpr.h"
+#include "LogosSymbol.h"
 
-class LogosBinaryExpr final : public LogosExpr {
+class LogosBinaryExpr : public LogosExpr {
 public:
-    const LogosExpr* left;
-    const LogosExpr* right;
-    const LogosOperator op;
+    LogosExpr *left;
+    LogosExpr *right;
+    LogosOperator op;
 
-    explicit LogosBinaryExpr(const LogosExpr* left, const LogosExpr* right, const LogosOperator op) :
+    LogosBinaryExpr(const LogosType& type, LogosExpr* left, LogosExpr* right, LogosOperator op) :
+        LogosExpr(type),
         left(left),
         right(right),
         op(op) {
     }
+
+    ~LogosBinaryExpr() = default;
 };
 
-#endif //LOGOSBINARYOP_H
+#endif //LOGOSBINARYEXPR_H

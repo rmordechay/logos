@@ -1,10 +1,12 @@
 #ifndef LOGOSUNARYEXPR_H
 #define LOGOSUNARYEXPR_H
-#include "LogosExpr.h"
+#include "types/LogosType.h"
+#include "exprs/LogosExpr.h"
 
-class LogosUnaryExpr : public LogosExpr {
+class LogosUnaryExpr: public LogosExpr {
 public:
-    explicit LogosUnaryExpr(LogosValue* exprType) : LogosExpr(exprType) {}
+    explicit LogosUnaryExpr(const LogosType& type) : LogosExpr(type) {}
+    ~LogosUnaryExpr() override = default;
 };
 
 #endif //LOGOSUNARYEXPR_H

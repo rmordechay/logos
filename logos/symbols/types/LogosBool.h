@@ -1,20 +1,20 @@
 #ifndef LOGOSBOOL_H
 #define LOGOSBOOL_H
-#include "LogosValue.h"
+#include "LogosType.h"
 
 
-class LogosBool final : public LogosValue {
+class LogosBool final : public LogosType {
 public:
-    bool value;
     static constexpr auto name = "Bool";
     static constexpr auto trueLiteral = "true";
 
-    explicit LogosBool(const bool value): value(value) {}
+    LogosBool() = default;
     ~LogosBool() override = default;
 
-    std::string getTypeName() const override;
-    Type* getLLVMType(IRBuilder<>& builder) const override;
-    Value* getLLVMValue(IRBuilder<>& builder) const override;
+    Type* getLLVMType(IRBuilder<>& builder) const override {
+        return builder.getInt1Ty();
+    }
+
 };
 
 #endif //LOGOSBOOL_H

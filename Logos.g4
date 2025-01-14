@@ -66,7 +66,7 @@ exprList:
 expr:
         left=expr op=(STAR | SLASH) right=expr
     |   left=expr op=(PLUS | MINUS) right=expr
-    |   left=expr op=(DOUBLE_EQUAL | RBRACK | LBRACK | GE | LE) right=expr
+    |   left=expr op=(DOUBLE_EQUAL | LANGLE | RANGLE | GE | LE) right=expr
     |   unaryExpr
     |   LPAREN left=expr RPAREN
     ;
@@ -91,14 +91,14 @@ selection:
 
 ifStatement:
         IF expr statementsBlock elseStatement
-    |   patterMatching
+    |   patternMatching
     ;
 
 elseStatement:
     (ELSE expr statementsBlock)* (ELSE statementsBlock)?
     ;
 
-patterMatching:
+patternMatching:
         IF expr? LBRACE pattern* (ELSE COLON statementsBlock)? RBRACE
     ;
 
@@ -133,8 +133,8 @@ LBRACE: '{';
 RBRACE: '}';
 LBRACK: '[';
 RBRACK: ']';
-LEFT_ANGLE: '<';
-RIGHT_ANGLE: '>';
+LANGLE: '<';
+RANGLE: '>';
 
 COMMA: ',';
 DOUBLE_DOT: '..';

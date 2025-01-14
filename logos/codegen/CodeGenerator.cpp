@@ -1,12 +1,13 @@
 #include "CodeGenerator.h"
 
+#include "RuntimeScope.h"
+
 #include <iostream>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Function.h>
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Support/FileSystem.h>
-#include <llvm/Support/InitLLVM.h>
 #include <llvm/Support/TargetSelect.h>
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/CodeGen/CodeGenAction.h>
@@ -17,37 +18,44 @@
 #include <llvm/IR/LegacyPassManager.h>
 #include "llvm/Target/TargetMachine.h"
 
-void CodeGenerator::run() {
+void CodeGenerator::run(const vector<CodeNode*>& codeNodes) {
     const auto module = new Module("main", context);
-    declareFunctions(module);
-    insertMain(module);
-    map<string, Value*> symbolTable;
+    RuntimeScope scope;
+    declareFunctions(module, &scope);
+    insertFunction(module, "main", builder.getInt32Ty(), &scope);
+
+    for (const auto &codeNode : codeNodes) {
+        codeNode->builder = &builder;
+        codeNode->context = &context;
+        codeNode->module = module;
+        codeNode->generateProlog(&scope);
+        builder.CreateAlloca(builder.getInt32Ty(), builder.getInt32(2));
+        codeNode->generateEpilog(&scope);
+    }
+
     builder.CreateRet(ConstantInt::get(builder.getInt32Ty(), 0));
     module->print(outs(), nullptr);
-    writeToFile(module);
     // compileLLVM("../codegen/output.ll", "../codegen/output");
-    runBinary();
+    runBinary(*module);
 }
 
-void CodeGenerator::declareFunctions(Module* module) {
+void CodeGenerator::declareFunctions(Module* module, RuntimeScope* scope) {
     const auto printfType = FunctionType::get(builder.getInt32Ty(), PointerType::get(builder.getInt1Ty(), 0), true);
-    functions["print"] = Function::Create(printfType, Function::ExternalLinkage, "printf", module);
+    scope->functions["print"] = Function::Create(printfType, Function::ExternalLinkage, "printf", module);
 }
 
-void CodeGenerator::insertMain(Module* module) {
-    const auto mainFuncType = FunctionType::get(builder.getInt32Ty(), false);
-    const auto mainFunc = Function::Create(mainFuncType, Function::ExternalLinkage, "main", module);
+void CodeGenerator::insertFunction(Module* module, const string& name, Type* rt, RuntimeScope* scope) {
+    const auto mainFuncType = FunctionType::get(rt, false);
+    const auto mainFunc = Function::Create(mainFuncType, Function::ExternalLinkage, name, module);
     const auto mainEntry = BasicBlock::Create(context, "entry", mainFunc);
     builder.SetInsertPoint(mainEntry);
+    scope->currentFrame = mainFunc;
 }
 
-void CodeGenerator::writeToFile(const Module* const module) {
+void CodeGenerator::runBinary(const Module& module) {
     std::error_code EC;
     raw_fd_ostream textFile("../codegen/output.ll", EC, sys::fs::OF_None);
-    module->print(textFile, nullptr);
-}
-
-void CodeGenerator::runBinary() {
+    module.print(textFile, nullptr);
     std::system("clang -o ../codegen/output ../codegen/output.ll");
     std::system("../codegen/output");
 }

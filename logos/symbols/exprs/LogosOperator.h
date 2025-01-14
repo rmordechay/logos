@@ -8,8 +8,8 @@ enum LogosOperator {
     STAR,
     SLASH,
     DOUBLE_EQUAL,
-    RBRACK,
-    LBRACK,
+    LANGLE,
+    RANGLE,
     GE,
     LE,
     NOOP,
@@ -21,8 +21,8 @@ inline LogosOperator mapOperator(LogosParser::ExprContext* expr) {
     if (expr->STAR()) return STAR;
     if (expr->SLASH()) return SLASH;
     if (expr->DOUBLE_EQUAL()) return DOUBLE_EQUAL;
-    if (expr->RBRACK()) return RBRACK;
-    if (expr->LBRACK()) return LBRACK;
+    if (expr->RANGLE()) return LANGLE;
+    if (expr->LANGLE()) return RANGLE;
     if (expr->GE()) return GE;
     if (expr->LE()) return LE;
     return NOOP;

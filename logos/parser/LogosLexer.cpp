@@ -58,13 +58,12 @@ void logoslexerLexerInitialize() {
   auto staticData = std::make_unique<LogosLexerStaticData>(
     std::vector<std::string>{
       "DOUBLE_EQUAL", "GE", "LE", "LPAREN", "RPAREN", "LBRACE", "RBRACE", 
-      "LBRACK", "RBRACK", "LEFT_ANGLE", "RIGHT_ANGLE", "COMMA", "DOUBLE_DOT", 
-      "DOT", "COLON", "EQUAL", "MINUS", "PLUS", "STAR", "SLASH", "HASH", 
-      "QUEST_MARK", "EXCLA_MARK", "PERCENT", "DOLLAR", "AMPERSAND", "OBJECT", 
-      "INTERFACE", "ENUM", "IMPLEMENTS", "IMPORT", "IF", "ELSE", "FOR", 
-      "BREAK", "CONTINUE", "RETURN", "AND", "OR", "NOT", "IN", "INTEGER", 
-      "FLOAT", "BOOL", "CONST", "TYPE", "VARIABLE", "STRING", "LINE_COMMENT", 
-      "BLOCK_COMMENT", "WS"
+      "LBRACK", "RBRACK", "LANGLE", "RANGLE", "COMMA", "DOUBLE_DOT", "DOT", 
+      "COLON", "EQUAL", "MINUS", "PLUS", "STAR", "SLASH", "HASH", "QUEST_MARK", 
+      "EXCLA_MARK", "PERCENT", "DOLLAR", "AMPERSAND", "OBJECT", "INTERFACE", 
+      "ENUM", "IMPLEMENTS", "IMPORT", "IF", "ELSE", "FOR", "BREAK", "CONTINUE", 
+      "RETURN", "AND", "OR", "NOT", "IN", "INTEGER", "FLOAT", "BOOL", "CONST", 
+      "TYPE", "VARIABLE", "STRING", "LINE_COMMENT", "BLOCK_COMMENT", "WS"
     },
     std::vector<std::string>{
       "DEFAULT_TOKEN_CHANNEL", "HIDDEN"
@@ -82,13 +81,12 @@ void logoslexerLexerInitialize() {
     },
     std::vector<std::string>{
       "", "DOUBLE_EQUAL", "GE", "LE", "LPAREN", "RPAREN", "LBRACE", "RBRACE", 
-      "LBRACK", "RBRACK", "LEFT_ANGLE", "RIGHT_ANGLE", "COMMA", "DOUBLE_DOT", 
-      "DOT", "COLON", "EQUAL", "MINUS", "PLUS", "STAR", "SLASH", "HASH", 
-      "QUEST_MARK", "EXCLA_MARK", "PERCENT", "DOLLAR", "AMPERSAND", "OBJECT", 
-      "INTERFACE", "ENUM", "IMPLEMENTS", "IMPORT", "IF", "ELSE", "FOR", 
-      "BREAK", "CONTINUE", "RETURN", "AND", "OR", "NOT", "IN", "INTEGER", 
-      "FLOAT", "BOOL", "CONST", "TYPE", "VARIABLE", "STRING", "LINE_COMMENT", 
-      "BLOCK_COMMENT", "WS"
+      "LBRACK", "RBRACK", "LANGLE", "RANGLE", "COMMA", "DOUBLE_DOT", "DOT", 
+      "COLON", "EQUAL", "MINUS", "PLUS", "STAR", "SLASH", "HASH", "QUEST_MARK", 
+      "EXCLA_MARK", "PERCENT", "DOLLAR", "AMPERSAND", "OBJECT", "INTERFACE", 
+      "ENUM", "IMPLEMENTS", "IMPORT", "IF", "ELSE", "FOR", "BREAK", "CONTINUE", 
+      "RETURN", "AND", "OR", "NOT", "IN", "INTEGER", "FLOAT", "BOOL", "CONST", 
+      "TYPE", "VARIABLE", "STRING", "LINE_COMMENT", "BLOCK_COMMENT", "WS"
     }
   );
   static const int32_t serializedATNSegment[] = {

@@ -28,23 +28,28 @@ add_executable(logos
     logos/sema/SemAnalyser.cpp
     logos/sema/SemAnalyser.h
     logos/symbols/LogosSymbol.h
-    logos/symbols/LogosValue.h
-    logos/symbols/types/LogosBool.cpp
+    logos/symbols/types/LogosType.h
     logos/symbols/types/LogosBool.h
-    logos/symbols/types/LogosFloat.cpp
     logos/symbols/types/LogosFloat.h
-    logos/symbols/types/LogosInt.cpp
     logos/symbols/types/LogosInt.h
-    logos/symbols/types/LogosString.cpp
     logos/symbols/types/LogosString.h
     logos/symbols/exprs/LogosOperator.h
-    logos/symbols/exprs/LogosBinaryExpr.h
     logos/symbols/exprs/LogosExpr.h
-    logos/symbols/exprs/LogosUnaryExpr.h
     logos/symbols/exprs/LogosConstantExpr.h
     logos/symbols/exprs/LogosFuncCallExpr.h
     logos/symbols/funcs/LogosFunc.h
     logos/symbols/funcs/LogosPrint.h
+    logos/codegen/RuntimeScope.h
+    logos/codegen/CodeNode.h
+    logos/codegen/StoreExpr.cpp
+    logos/codegen/StoreExpr.h
+    logos/symbols/exprs/LogosUnaryExpr.h
+    logos/symbols/exprs/LogosBinaryExpr.h
+    logos/codegen/FuncCall.cpp
+    logos/codegen/FuncCall.h
+    logos/codegen/Comparison.cpp
+    logos/codegen/Comparison.h
+    logos/symbols/LogosDefinitions.h
 )
 
 target_include_directories(logos PRIVATE

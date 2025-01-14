@@ -5,12 +5,10 @@
 
 using namespace llvm;
 
-class LogosValue {
+class LogosType {
 public:
-    virtual std::string getTypeName() const = 0;
     virtual Type* getLLVMType(IRBuilder<>& builder) const = 0;
-    virtual Value* getLLVMValue(IRBuilder<>& builder) const = 0;
-    virtual ~LogosValue() = default;
+    virtual ~LogosType() = default;
 };
 
 #endif //LOGOSTYPE_H
