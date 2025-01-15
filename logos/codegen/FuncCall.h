@@ -9,8 +9,7 @@ public:
     LogosFuncCallExpr* funcCallExpr;
 
     explicit FuncCall(LogosFuncCallExpr* funcCallExpr) : funcCallExpr(funcCallExpr) {}
-    void generateProlog(RuntimeScope* scope) override;
-    void generateEpilog(RuntimeScope* scope) override;
+    void generateCode(RuntimeStackFrame* runtimeStack) override;
     ~FuncCall() override = default;
 };
 

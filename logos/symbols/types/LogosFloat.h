@@ -13,7 +13,6 @@ public:
     Type* getLLVMType(IRBuilder<>& builder) const override {
         return builder.getFloatTy();
     }
-
 };
 
 

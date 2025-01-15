@@ -1,14 +1,16 @@
 #ifndef LOGOSFUNC_H
 #define LOGOSFUNC_H
-#include "../types/LogosType.h"
+#include "CodeGeneration.h"
+#include "types/LogosType.h"
 
-class LogosFunc {
+class LogosFunc : public CodeGeneration {
 public:
-    std::string name;
+    string name;
     const LogosType& type;
+    vector<const LogosType*> params;
 
-    explicit LogosFunc(const std::string& name, const LogosType& funcType) : name(name), type(funcType) {}
-    virtual ~LogosFunc() = default;
+    LogosFunc(const string& name, const LogosType& funcType) : name(name), type(funcType) {}
+    ~LogosFunc() override = default;
 };
 
 #endif //LOGOSFUNC_H

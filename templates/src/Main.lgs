@@ -1,6 +1,10 @@
+add(a: Int, b: Int): Int {
+    return a + b
+}
+
 main() {
-    a = 2 + 3 + 5 + 1
-    if a > 10 {
-        print(a)
+    a = 2 + 3 + 5
+    if a > 8 {
+        print(add(a, 10))
     }
 }

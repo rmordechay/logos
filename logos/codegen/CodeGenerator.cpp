@@ -1,8 +1,7 @@
 #include "CodeGenerator.h"
 
-#include "RuntimeScope.h"
+#include "IfStmt.h"
 
-#include <iostream>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Function.h>
@@ -17,46 +16,48 @@
 #include <llvm/IR/Verifier.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include "llvm/Target/TargetMachine.h"
+#include "llvm/Passes/PassBuilder.h"
 
 void CodeGenerator::run(const vector<CodeNode*>& codeNodes) {
+    RuntimeStackFrame rootFrame;
     const auto module = new Module("main", context);
-    RuntimeScope scope;
-    declareFunctions(module, &scope);
-    insertFunction(module, "main", builder.getInt32Ty(), &scope);
+    declareFunctions(module, &rootFrame);
+    insertFunction(module, "main", builder.getInt32Ty(), &rootFrame);
 
-    for (const auto &codeNode : codeNodes) {
-        codeNode->builder = &builder;
-        codeNode->context = &context;
-        codeNode->module = module;
-        codeNode->generateProlog(&scope);
-        builder.CreateAlloca(builder.getInt32Ty(), builder.getInt32(2));
-        codeNode->generateEpilog(&scope);
-    }
+    generate(codeNodes, rootFrame, module);
 
     builder.CreateRet(ConstantInt::get(builder.getInt32Ty(), 0));
+    std::error_code EC;
+    const auto llvmFilePath = "../codegen/output.ll";
+    raw_fd_ostream textFile(llvmFilePath, EC, sys::fs::OF_None);
+    module->print(textFile, nullptr);
     module->print(outs(), nullptr);
-    // compileLLVM("../codegen/output.ll", "../codegen/output");
-    runBinary(*module);
+    compileLLVM(llvmFilePath, "../codegen/output");
+    runBinary();
 }
 
-void CodeGenerator::declareFunctions(Module* module, RuntimeScope* scope) {
+void CodeGenerator::generate(const vector<CodeNode*>& codeNodes, RuntimeStackFrame rootFrame, Module* const module) {
+    for (const auto &codeNode : codeNodes) {
+        codeNode->init(&context, &builder, module);
+        codeNode->generateCode(&rootFrame);
+    }
+}
+
+void CodeGenerator::declareFunctions(Module* module, RuntimeStackFrame* rootFrame) {
     const auto printfType = FunctionType::get(builder.getInt32Ty(), PointerType::get(builder.getInt1Ty(), 0), true);
-    scope->functions["print"] = Function::Create(printfType, Function::ExternalLinkage, "printf", module);
+    rootFrame->functions["print"] = Function::Create(printfType, Function::ExternalLinkage, "printf", module);
 }
 
-void CodeGenerator::insertFunction(Module* module, const string& name, Type* rt, RuntimeScope* scope) {
+void CodeGenerator::insertFunction(Module* module, const string& name, IntegerType* rt, RuntimeStackFrame* frame) {
     const auto mainFuncType = FunctionType::get(rt, false);
     const auto mainFunc = Function::Create(mainFuncType, Function::ExternalLinkage, name, module);
     const auto mainEntry = BasicBlock::Create(context, "entry", mainFunc);
     builder.SetInsertPoint(mainEntry);
-    scope->currentFrame = mainFunc;
+    frame->currentFunction = mainFunc;
 }
 
-void CodeGenerator::runBinary(const Module& module) {
-    std::error_code EC;
-    raw_fd_ostream textFile("../codegen/output.ll", EC, sys::fs::OF_None);
-    module.print(textFile, nullptr);
-    std::system("clang -o ../codegen/output ../codegen/output.ll");
+void CodeGenerator::runBinary() {
+    std::system("clang -o ../codegen/output ../codegen/output.o");
     std::system("../codegen/output");
 }
 
@@ -68,27 +69,27 @@ void CodeGenerator::compileLLVM(const std::string& llvmFilePath, const std::stri
     InitializeAllTargets();
     InitializeAllTargetInfos();
 
-
     const auto context = std::make_unique<LLVMContext>();
     const std::string errorMsg;
     auto buffer = MemoryBuffer::getFile(llvmFilePath, errorMsg.data());
 
     SMDiagnostic err;
     const auto module = parseIR(**buffer, err, *context);
-    std::cout << module->getName().str() << std::endl;
-
     const auto targetTriple = sys::getProcessTriple();
     std::string targetError;
     const auto* target = TargetRegistry::lookupTarget(targetTriple, targetError);
-    std::cout << targetTriple << std::endl;
 
     const auto options = TargetOptions();
     auto CPU = "generic";
     auto features = "";
-    auto targetMachine = target->createTargetMachine(targetTriple, CPU, features, options, Reloc::PIC_);
+    auto RM = Reloc::PIC_;
+    auto targetMachine = target->createTargetMachine(targetTriple, CPU, features, options, RM);
+
+    module->setDataLayout(targetMachine->createDataLayout());
+    module->setTargetTriple(targetTriple);
 
     std::error_code EC;
-    raw_fd_ostream dest("../codegen/output.o", EC, sys::fs::OF_None);
+    raw_fd_ostream dest(outputFilePath + ".o", EC, sys::fs::OF_None);
     if (EC) {
         errs() << "Error opening output file: " << EC.message() << "\n";
         return;
@@ -99,13 +100,8 @@ void CodeGenerator::compileLLVM(const std::string& llvmFilePath, const std::stri
         return;
     }
 
-    legacy::PassManager pass;
+    auto emitPass = legacy::PassManager();
     auto fileType = CodeGenFileType::ObjectFile;
-    if (targetMachine->addPassesToEmitFile(pass, dest, nullptr, fileType)) {
-        errs() << "Target machine can't emit object file!\n";
-        return;
-    }
-    pass.run(*module);
-    dest.flush();
+    targetMachine->addPassesToEmitFile(emitPass, dest, nullptr, fileType);
+    emitPass.run(*module);
 }
-

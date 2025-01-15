@@ -1,15 +1,19 @@
-#ifndef PRINT_H
-#define PRINT_H
+#ifndef LOGOSPRINT_H
+#define LOGOSPRINT_H
 #include "LogosFunc.h"
+#include "StackFrame.h"
 #include "types/LogosInt.h"
-
 
 class LogosPrint final : public LogosFunc {
 public:
     static constexpr auto name = "print";
 
-    explicit LogosPrint() : LogosFunc(name, LogosInt()) {}
+    LogosPrint() : LogosFunc(name, LOGOS_INT) {}
+    const LogosType& getType() const override;
+    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame) override;
     ~LogosPrint() override = default;
 };
 
-#endif //PRINT_H
+inline const LogosFunc& LOGOS_PRINT = LogosPrint();
+
+#endif //LOGOSPRINT_H

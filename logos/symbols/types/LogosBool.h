@@ -14,7 +14,6 @@ public:
     Type* getLLVMType(IRBuilder<>& builder) const override {
         return builder.getInt1Ty();
     }
-
 };
 
 #endif //LOGOSBOOL_H

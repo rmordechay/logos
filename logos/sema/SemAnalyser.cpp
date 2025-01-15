@@ -1,6 +1,6 @@
-#include "SemAnalyser.h"
+    #include "SemAnalyser.h"
 
-#include "Comparison.h"
+#include "IfStmt.h"
 #include "FuncCall.h"
 #include "LogosConfigs.h"
 #include "LogosErrors.h"
@@ -11,26 +11,56 @@
 #include "exprs/LogosFuncCallExpr.h"
 #include "exprs/LogosOperator.h"
 #include "exprs/LogosVariableExpr.h"
-#include "types/LogosBool.h"
+#include "funcs/LogosPrint.h"
+#include "funcs/LogosUserFunc.h"
 
-void SemAnalyser::analyseProject(const LogosFile* mainFile) {
+    void SemAnalyser::analyseProject(const LogosFile* mainFile) {
     visitMainFile(mainFile);
 }
 
 void SemAnalyser::visitMainFile(const LogosFile* mainFile) {
     const auto fileCtx = mainFile->fileCtx;
-    for (const auto func : fileCtx->mainFile()->funcImplementation()) {
-        if (func->funcSignature()->VARIABLE()->getText() == LOGOS_MAIN_FUNCTION) {
-            visitFuncImplementation(func);
-        }
+    map<string, LogosSymbol*> rootFrame;
+    rootFrame[LOGOS_PRINT.name] = new LogosSymbol(const_cast<LogosFunc*>(&LOGOS_PRINT));
+    stack.push(rootFrame);
+
+    const auto fileFuncs = fileCtx->mainFile()->funcImplementation();
+    for (const auto func : fileFuncs) {
+        visitFuncImplementation(func);
     }
 }
 
 void SemAnalyser::visitFuncImplementation(LogosParser::FuncImplementationContext* ctx) {
+    const auto funcSignature = ctx->funcSignature();
+    const auto funcName = funcSignature->VARIABLE()->getText();
+    if (funcName == LOGOS_MAIN_FUNCTION) {
+        const auto logosUserFunc = new LogosUserFunc(LOGOS_MAIN_FUNCTION, LOGOS_INT);
+        stack.top()[funcName] = new LogosSymbol(logosUserFunc);
+    } else {
+        const LogosType& rt = getType(funcSignature->TYPE()->getText());
+        const auto logosUserFunc = new LogosUserFunc(funcName, rt);
+        const auto params = funcSignature->explicitVarDecList()->explicitVarDec();
+        for (const auto param : params) {
+            const LogosType& argType = getType(param->TYPE()->getText());
+            logosUserFunc->params.push_back(&argType);
+        }
+        stack.top()[funcName] = new LogosSymbol(logosUserFunc);
+    }
     const auto statements = ctx->funcBody()->statementsBlock()->statement();
     for (const auto statement : statements) {
         visitStatement(statement);
     }
+}
+
+void SemAnalyser::visitStatementList(const std::vector<LogosParser::StatementContext*>& statements) {
+    map<string, LogosSymbol*> frame;
+    auto currentFrame = stack.top();
+    frame.insert(currentFrame.begin(), currentFrame.end());
+    stack.push(frame);
+    for (const auto statement : statements) {
+        visitStatement(statement);
+    }
+    stack.pop();
 }
 
 void SemAnalyser::visitStatement(LogosParser::StatementContext* ctx) {
@@ -64,8 +94,24 @@ void SemAnalyser::visitFuncCall(LogosParser::FuncCallContext* ctx) {
 
 void SemAnalyser::visitIfStatement(LogosParser::IfStatementContext* ctx) {
     const auto expr = getExpr(ctx->expr());
-    auto statementsContext = ctx->statementsBlock()->statement();
-    codeNodes.push_back(new Comparison(expr));
+    const auto ifStmt = new IfStmt(expr);
+    codeNodes.push_back(ifStmt);
+    const auto startIndex = codeNodes.size();
+    const auto statements = ctx->statementsBlock()->statement();
+    visitStatementList(statements);
+    const auto endIndex = codeNodes.size();
+
+    ifStmt->codeNodes.insert(
+        ifStmt->codeNodes.begin(),
+        make_move_iterator(codeNodes.begin() + startIndex),
+        make_move_iterator(codeNodes.begin() + endIndex)
+    );
+    codeNodes.erase(codeNodes.begin() + startIndex, codeNodes.begin() + endIndex);
+}
+
+const LogosType& SemAnalyser::getType(const string& typeText) {
+    if (typeText == LogosInt::name) return LOGOS_INT;
+    return LOGOS_INT;
 }
 
 LogosExpr* SemAnalyser::getExpr(LogosParser::ExprContext* ctx) {
@@ -94,49 +140,48 @@ LogosUnaryExpr* SemAnalyser::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
 
 LogosUnaryExpr* SemAnalyser::getVariableExpr(const string& symbolName) {
     if (const auto resolvedSymbol = resolveSymbol(symbolName)) {
-        return new LogosVariableExpr(resolvedSymbol->type, symbolName);
+        return new LogosVariableExpr(*resolvedSymbol->type, symbolName);
     }
     return nullptr;
 }
 
-
-LogosUnaryExpr* SemAnalyser::getConstantExpr(LogosParser::ConstantContext* ctx) const {
-    if (const auto intToken = ctx->INTEGER()) {
-        const auto value = stoi(intToken->getText());
-        return new LogosConstantExpr(INT_TYPE, value);
-    }
-    return nullptr;
-}
 
 LogosUnaryExpr* SemAnalyser::getFuncCallExpr(LogosParser::FuncCallContext* ctx) {
     const auto funcName = ctx->VARIABLE()->getText();
-    const auto logosFunc = std::get<LogosFunc>(resolveSymbol(funcName)->value);
+    const auto logosFunc = static_cast<LogosFunc*>(resolveSymbol(funcName)->value);
     vector<LogosExpr*> args;
     for (const auto funcArg : ctx->funcArgList()->funcArg()) {
         args.push_back(getExpr(funcArg->expr()));
     }
-    const auto funcCallExpr = new LogosFuncCallExpr(logosFunc, args);
+    const auto funcCallExpr = new LogosFuncCallExpr(*logosFunc, args);
     codeNodes.push_back(new FuncCall(funcCallExpr));
     return funcCallExpr;
 
 }
 
-void SemAnalyser::addSymbol(const string& variableName, LogosExpr* logosExpr) {
-    if (logosExpr) {
-        currentScope[variableName] = new LogosSymbol(logosExpr->type, *logosExpr);
+LogosUnaryExpr* SemAnalyser::getConstantExpr(LogosParser::ConstantContext* ctx) {
+    if (const auto intToken = ctx->INTEGER()) {
+        const auto value = stoi(intToken->getText());
+        return new LogosConstantExpr(LOGOS_INT, value);
     }
+    return nullptr;
+}
+
+void SemAnalyser::addSymbol(const string& variableName, LogosExpr* logosExpr) {
+    stack.top()[variableName] = new LogosSymbol(logosExpr);
 }
 
 LogosSymbol* SemAnalyser::resolveSymbol(const string& symbolName) {
-    const auto it = currentScope.find(symbolName);
-    if (it == currentScope.end()) {
+    auto frame = stack.top();
+    const auto it = frame.find(symbolName);
+    if (it == frame.end()) {
         return nullptr;
     }
     return it->second;
 }
 
 SemAnalyser::~SemAnalyser() {
-    for (auto& [name, symbol] : currentScope) {
+    for (auto& [name, symbol] : stack.top()) {
         delete symbol;
     }
 }

@@ -2,7 +2,6 @@
 #define LOGOSINT_H
 #include "LogosType.h"
 
-
 class LogosInt final : public LogosType {
 public:
     static constexpr auto name = "Int";
@@ -13,7 +12,8 @@ public:
     Type* getLLVMType(IRBuilder<>& builder) const override {
         return builder.getInt32Ty();
     }
-
 };
+
+inline const LogosType& LOGOS_INT = LogosInt();
 
 #endif //LOGOSINT_H
