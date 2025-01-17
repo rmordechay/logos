@@ -9,17 +9,12 @@
 class LogosFuncCallExpr final : public LogosUnaryExpr {
 public:
     const LogosFunc& func;
-    std::vector<LogosExpr*> args;
+    vector<LogosExpr*> args;
 
-    LogosFuncCallExpr(const LogosFunc& func, const std::vector<LogosExpr*>& args) :
-        LogosUnaryExpr(func.type),
-        func(func),
-        args(args) {
-    }
-
+    explicit LogosFuncCallExpr(const LogosFunc& func, const vector<LogosExpr*>& args) : LogosUnaryExpr(func.type), func(func), args(args) {}
     const LogosType& getType() const override;
     Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
-    ~LogosFuncCallExpr() override = default;
+    ~LogosFuncCallExpr() override;
 };
 
 #endif //LOGOSFUNCCALLEXPR_H

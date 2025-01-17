@@ -1,5 +1,8 @@
 #include "LogosFuncCallExpr.h"
 
+#include <iostream>
+#include <ostream>
+
 const LogosType& LogosFuncCallExpr::getType() const {
     return type;
 }
@@ -14,4 +17,10 @@ Value* LogosFuncCallExpr::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* 
         llvmArgs.push_back(arg->getLLVMValue(builder, stackFrame, module));
     }
     return builder->CreateCall(funcSymbol, ArrayRef(llvmArgs));
+}
+
+LogosFuncCallExpr::~LogosFuncCallExpr() {
+    for (const auto arg : args) {
+        delete arg;
+    }
 }

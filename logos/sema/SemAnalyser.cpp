@@ -88,7 +88,7 @@ void SemAnalyser::visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
 }
 
 void SemAnalyser::visitFuncCall(LogosParser::FuncCallContext* ctx) {
-    const auto callExpr = getFuncCallExpr(ctx);
+    codeNodes.push_back(getFuncCallExpr(ctx));
 }
 
 void SemAnalyser::visitIfStatement(LogosParser::IfStatementContext* ctx) {
@@ -153,7 +153,6 @@ LogosUnaryExpr* SemAnalyser::getFuncCallExpr(LogosParser::FuncCallContext* ctx) 
         args.push_back(getExpr(funcArg->expr()));
     }
     return new LogosFuncCallExpr(*logosFunc, args);
-
 }
 
 LogosUnaryExpr* SemAnalyser::getConstantExpr(LogosParser::ConstantContext* ctx) {
@@ -180,5 +179,8 @@ LogosSymbol* SemAnalyser::resolveSymbol(const string& symbolName) {
 SemAnalyser::~SemAnalyser() {
     for (auto& [name, symbol] : stack.top()) {
         delete symbol;
+    }
+    for (const auto codeNode : codeNodes) {
+        delete codeNode;
     }
 }

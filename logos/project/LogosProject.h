@@ -17,6 +17,7 @@ public:
 
     explicit LogosProject(const std::string& path);
     void scanProject() const;
+    ~LogosProject();
 };
 
 #endif // PROJECT_H

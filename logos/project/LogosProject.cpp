@@ -14,3 +14,8 @@ void LogosProject::scanProject() const {
     semAnalyser->analyseProject(rootPackage->mainFile);
     codeGenerator->run(semAnalyser->codeNodes);
 }
+
+LogosProject::~LogosProject() {
+    delete semAnalyser;
+    delete codeGenerator;
+}
