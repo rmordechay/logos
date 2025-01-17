@@ -10,7 +10,7 @@ public:
 
     LogosPrint() : LogosFunc(name, LOGOS_INT) {}
     const LogosType& getType() const override;
-    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame) override;
+    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
     ~LogosPrint() override = default;
 };
 

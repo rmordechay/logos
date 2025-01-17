@@ -1,29 +1,34 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
-#include "CodeNode.h"
 #include "exprs/LogosExpr.h"
 #include <map>
 #include <stack>
 #include <llvm/IR/IRBuilder.h>
+#include <llvm/MC/TargetRegistry.h>
 
 using namespace llvm;
 using namespace std;
 
 class CodeGenerator {
 public:
-    void generate(const vector<CodeNode*>& codeNodes, RuntimeStackFrame rootFrame, Module* module);
-    void run(const vector<CodeNode*>& codeNodes);
+    void generate(const vector<CodeGeneration*>& codeNodes, RuntimeStackFrame rootFrame, Module* module);
+    void run(const vector<CodeGeneration*>& codeNodes);
     void declareFunctions(Module* module, RuntimeStackFrame* rootFrame);
     void insertFunction(Module* module, const string& name, IntegerType* rt, RuntimeStackFrame* frame);
     void runBinary();
-    void compileLLVM(const string& llvmFilePath, const string& outputFilePath);
-    auto linkModules(const std::vector<std::unique_ptr<Module>>& modules, LLVMContext& context) -> Error;
+    static void initLLVM();
+    void initTargetMachine();
+    unique_ptr<Module> compileModule(const string& inputFile);
+    void linkModules();
     ~CodeGenerator() = default;
 
 private:
     LLVMContext context;
     IRBuilder<> builder = IRBuilder(context);
-    vector<CodeNode*> codeNodes;
+    vector<CodeGeneration*> codeNodes;
+    std::string targetTriple;
+    const Target* target = nullptr;
+    TargetMachine* targetMachine = nullptr;
 };
 
 #endif //CODEGENERATOR_H

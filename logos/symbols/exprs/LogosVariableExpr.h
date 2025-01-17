@@ -10,7 +10,7 @@ public:
 
     explicit LogosVariableExpr(const LogosType& variableType, const std::string& name) : LogosUnaryExpr(variableType), name(name) {}
     const LogosType& getType() const override;
-    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame) override;
+    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
     ~LogosVariableExpr() override = default;
 };
 

@@ -9,7 +9,7 @@ public:
 
     explicit LogosExpr(const LogosType& type) : type(type) {}
     const LogosType& getType() const override;
-    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame) override;
+    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
     ~LogosExpr() override = default;
 };
 

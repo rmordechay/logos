@@ -18,7 +18,7 @@ public:
     }
 
     const LogosType& getType() const override;
-    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame) override;
+    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
     ~LogosFuncCallExpr() override = default;
 };
 

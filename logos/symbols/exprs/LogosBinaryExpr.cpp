@@ -4,9 +4,9 @@ const LogosType& LogosBinaryExpr::getType() const {
     return type;
 }
 
-Value* LogosBinaryExpr::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame) {
-    const auto l = left->getLLVMValue(builder, stackFrame);
-    const auto r = right->getLLVMValue(builder, stackFrame);
+Value* LogosBinaryExpr::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) {
+    const auto l = left->getLLVMValue(builder, stackFrame, module);
+    const auto r = right->getLLVMValue(builder, stackFrame, module);
     if (op == PLUS) {
         return builder->CreateAdd(l, r);
     }

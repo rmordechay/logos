@@ -7,7 +7,7 @@ class LogosUserFunc final : public LogosFunc {
 public:
     LogosUserFunc(const std::string& name, const LogosType& funcType) : LogosFunc(name, funcType) {}
     const LogosType& getType() const override;
-    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame) override;
+    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
     ~LogosUserFunc() override = default;
 };
 

@@ -1,7 +1,5 @@
 #include "CodeGenerator.h"
 
-#include "IfStmt.h"
-
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Function.h>
@@ -17,8 +15,15 @@
 #include <llvm/IR/LegacyPassManager.h>
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Passes/PassBuilder.h"
+#include <llvm/Linker/Linker.h>
 
-void CodeGenerator::run(const vector<CodeNode*>& codeNodes) {
+const auto PROGRAM_IR_FILE = "../codegen/output.ll";
+const auto PRINT_IR_FILE = "../codegen/print.ll";
+const auto LINKED_OBJECT_FILE = "../output.o";
+const auto LINKED_IR_FILE = "../output.ll";
+constexpr auto LLVM_OBJECT_FILE = CodeGenFileType::ObjectFile;
+
+void CodeGenerator::run(const vector<CodeGeneration*>& codeNodes) {
     RuntimeStackFrame rootFrame;
     const auto module = new Module("main", context);
     declareFunctions(module, &rootFrame);
@@ -28,24 +33,25 @@ void CodeGenerator::run(const vector<CodeNode*>& codeNodes) {
 
     builder.CreateRet(ConstantInt::get(builder.getInt32Ty(), 0));
     std::error_code EC;
-    const auto llvmFilePath = "../output.ll";
-    raw_fd_ostream textFile(llvmFilePath, EC, sys::fs::OF_None);
+    raw_fd_ostream textFile(PROGRAM_IR_FILE, EC, sys::fs::OF_None);
     module->print(textFile, nullptr);
     module->print(outs(), nullptr);
-    compileLLVM(llvmFilePath, "../output");
+
+    initLLVM();
+    initTargetMachine();
+    linkModules();
     runBinary();
 }
 
-void CodeGenerator::generate(const vector<CodeNode*>& codeNodes, RuntimeStackFrame rootFrame, Module* const module) {
-    for (const auto &codeNode : codeNodes) {
-        codeNode->init(&context, &builder, module);
-        codeNode->generateCode(&rootFrame);
+void CodeGenerator::generate(const vector<CodeGeneration*>& codeNodes, RuntimeStackFrame rootFrame, Module* const module) {
+    for (const auto& codeNode : codeNodes) {
+        codeNode->getLLVMValue(&builder, &rootFrame, module);
     }
 }
 
 void CodeGenerator::declareFunctions(Module* module, RuntimeStackFrame* rootFrame) {
-    const auto printfType = FunctionType::get(builder.getInt32Ty(), PointerType::get(builder.getInt1Ty(), 0), true);
-    rootFrame->functions["print"] = Function::Create(printfType, Function::ExternalLinkage, "printf", module);
+    const auto printfType = FunctionType::get(builder.getVoidTy(), false);
+    rootFrame->functions["print"] = Function::Create(printfType, Function::ExternalLinkage, "printInt", module);
 }
 
 void CodeGenerator::insertFunction(Module* module, const string& name, IntegerType* rt, RuntimeStackFrame* frame) {
@@ -56,52 +62,48 @@ void CodeGenerator::insertFunction(Module* module, const string& name, IntegerTy
     frame->currentFunction = mainFunc;
 }
 
-void CodeGenerator::runBinary() {
-    std::system("clang -o ../output ../output.o");
-    std::system("../output");
+void CodeGenerator::initTargetMachine() {
+    std::string targetError;
+    targetTriple = sys::getProcessTriple();
+    target = TargetRegistry::lookupTarget(targetTriple, targetError);
+    const auto TARGET_OPTIONS = TargetOptions();
+    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), Reloc::PIC_);
 }
 
-void CodeGenerator::compileLLVM(const std::string& llvmFilePath, const std::string& outputFilePath) {
+void CodeGenerator::linkModules() {
+    const auto compositeModule = compileModule(PRINT_IR_FILE);
+    Linker linker(*compositeModule);
+    const auto inputFile = PROGRAM_IR_FILE;
+    auto module = compileModule(inputFile);
+    linker.linkInModule(std::move(module));
+    if (verifyModule(*compositeModule, &errs())) return;
+    std::error_code EC;
+    raw_fd_ostream dest(LINKED_OBJECT_FILE, EC, sys::fs::OF_None);
+    auto emitPass = legacy::PassManager();
+    targetMachine->addPassesToEmitFile(emitPass, dest, nullptr, LLVM_OBJECT_FILE);
+    emitPass.run(*compositeModule);
+}
+
+unique_ptr<Module> CodeGenerator::compileModule(const string& inputFile) {
+    const std::string errorMsg;
+    auto buffer = MemoryBuffer::getFile(inputFile, errorMsg.data());
+    SMDiagnostic err;
+    auto module = parseIR(**buffer, err, context);
+    module->setDataLayout(targetMachine->createDataLayout());
+    module->setTargetTriple(targetTriple);
+    return module;
+}
+
+void CodeGenerator::initLLVM() {
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();
     InitializeAllTargetMCs();
     InitializeAllTargets();
     InitializeAllTargetInfos();
+}
 
-    const auto context = std::make_unique<LLVMContext>();
-    const std::string errorMsg;
-    auto buffer = MemoryBuffer::getFile(llvmFilePath, errorMsg.data());
-
-    SMDiagnostic err;
-    const auto module = parseIR(**buffer, err, *context);
-    const auto targetTriple = sys::getProcessTriple();
-    std::string targetError;
-    const auto* target = TargetRegistry::lookupTarget(targetTriple, targetError);
-
-    const auto options = TargetOptions();
-    auto CPU = "generic";
-    auto features = "";
-    auto RM = Reloc::PIC_;
-    auto targetMachine = target->createTargetMachine(targetTriple, CPU, features, options, RM);
-
-    module->setDataLayout(targetMachine->createDataLayout());
-    module->setTargetTriple(targetTriple);
-
-    std::error_code EC;
-    raw_fd_ostream dest(outputFilePath + ".o", EC, sys::fs::OF_None);
-    if (EC) {
-        errs() << "Error opening output file: " << EC.message() << "\n";
-        return;
-    }
-
-    if (verifyModule(*module, &errs())) {
-        errs() << "Module verification failed!\n";
-        return;
-    }
-
-    auto emitPass = legacy::PassManager();
-    auto fileType = CodeGenFileType::ObjectFile;
-    targetMachine->addPassesToEmitFile(emitPass, dest, nullptr, fileType);
-    emitPass.run(*module);
+void CodeGenerator::runBinary() {
+    std::system("clang ../output.o -o ../output");
+    std::system("../output");
 }

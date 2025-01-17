@@ -38,15 +38,8 @@ add_executable(logos
     logos/symbols/exprs/LogosConstantExpr.h
     logos/symbols/exprs/LogosFuncCallExpr.h
     logos/symbols/funcs/LogosFunc.h
-    logos/codegen/CodeNode.h
-    logos/codegen/StoreExpr.cpp
-    logos/codegen/StoreExpr.h
     logos/symbols/exprs/LogosUnaryExpr.h
     logos/symbols/exprs/LogosBinaryExpr.h
-    logos/codegen/FuncCall.cpp
-    logos/codegen/FuncCall.h
-    logos/codegen/IfStmt.cpp
-    logos/codegen/IfStmt.h
     logos/codegen/StackFrame.h
     logos/symbols/CodeGeneration.h
     logos/symbols/funcs/LogosPrint.cpp
@@ -58,6 +51,10 @@ add_executable(logos
     logos/symbols/exprs/LogosVariableExpr.cpp
     logos/symbols/exprs/LogosBinaryExpr.cpp
     logos/symbols/exprs/LogosExpr.cpp
+    logos/symbols/stmts/LogosVarDefinition.cpp
+    logos/symbols/stmts/LogosVarDefinition.h
+    logos/symbols/stmts/LogosIfStmt.cpp
+    logos/symbols/stmts/LogosIfStmt.h
 )
 
 target_include_directories(logos PRIVATE

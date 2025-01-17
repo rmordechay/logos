@@ -4,7 +4,7 @@ const LogosType& LogosConstantExpr::getType() const {
     return type;
 }
 
-Value* LogosConstantExpr::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame) {
+Value* LogosConstantExpr::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) {
     if (const auto intValue = get_if<int>(&value)) {
         return builder->getInt32(*intValue);
     }

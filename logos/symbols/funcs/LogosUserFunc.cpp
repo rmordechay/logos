@@ -4,6 +4,6 @@ const LogosType& LogosUserFunc::getType() const {
     return type;
 }
 
-Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame) {
+Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) {
     return nullptr;
 }

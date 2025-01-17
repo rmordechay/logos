@@ -1,7 +1,6 @@
 #ifndef SEMANTICANALYSER_H
 #define SEMANTICANALYSER_H
 
-#include "CodeNode.h"
 #include "LogosPackage.h"
 #include "LogosParser.h"
 #include "LogosSymbol.h"
@@ -12,7 +11,7 @@ using namespace std;
 
 class SemAnalyser {
 public:
-    vector<CodeNode*> codeNodes;
+    vector<CodeGeneration*> codeNodes;
     stack<map<string, LogosSymbol*>> stack;
 
     void analyseProject(const LogosFile* mainFile);

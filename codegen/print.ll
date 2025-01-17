@@ -1,10 +1,14 @@
 ; ModuleID = 'print'
 source_filename = "print"
 
-@0 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 declare i32 @printf(ptr, ...)
 
-define void @print() {
-    call i32 (ptr, ...) @printf(ptr @0, i32 %3)
-    ret void
+@.str = private unnamed_addr constant [4 x i8] c"%d\0A\00"
+
+define void @printInt(i32 noundef %arg) {
+  %2 = alloca i32, align 4
+  store i32 %arg, ptr %2, align 4
+  %3 = load i32, ptr %2, align 4
+  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %3)
+  ret void
 }

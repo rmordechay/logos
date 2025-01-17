@@ -1,11 +1,8 @@
     #include "SemAnalyser.h"
 
-#include "IfStmt.h"
-#include "FuncCall.h"
 #include "LogosConfigs.h"
 #include "LogosErrors.h"
 #include "LogosParser.h"
-#include "StoreExpr.h"
 #include "exprs/LogosBinaryExpr.h"
 #include "exprs/LogosConstantExpr.h"
 #include "exprs/LogosFuncCallExpr.h"
@@ -13,6 +10,8 @@
 #include "exprs/LogosVariableExpr.h"
 #include "funcs/LogosPrint.h"
 #include "funcs/LogosUserFunc.h"
+#include "stmts/LogosIfStmt.h"
+#include "stmts/LogosVarDefinition.h"
 
     void SemAnalyser::analyseProject(const LogosFile* mainFile) {
     visitMainFile(mainFile);
@@ -85,7 +84,7 @@ void SemAnalyser::visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto logosExpr = getExpr(ctx->expr());
     addSymbol(variableName, logosExpr);
-    codeNodes.push_back(new StoreExpr(variableName, logosExpr));
+    codeNodes.push_back(new LogosVarDefinition(variableName, logosExpr));
 }
 
 void SemAnalyser::visitFuncCall(LogosParser::FuncCallContext* ctx) {
@@ -94,7 +93,7 @@ void SemAnalyser::visitFuncCall(LogosParser::FuncCallContext* ctx) {
 
 void SemAnalyser::visitIfStatement(LogosParser::IfStatementContext* ctx) {
     const auto expr = getExpr(ctx->expr());
-    const auto ifStmt = new IfStmt(expr);
+    const auto ifStmt = new LogosIfStmt(expr);
     codeNodes.push_back(ifStmt);
     const auto startIndex = codeNodes.size();
     const auto statements = ctx->statementsBlock()->statement();
@@ -153,9 +152,7 @@ LogosUnaryExpr* SemAnalyser::getFuncCallExpr(LogosParser::FuncCallContext* ctx) 
     for (const auto funcArg : ctx->funcArgList()->funcArg()) {
         args.push_back(getExpr(funcArg->expr()));
     }
-    const auto funcCallExpr = new LogosFuncCallExpr(*logosFunc, args);
-    codeNodes.push_back(new FuncCall(funcCallExpr));
-    return funcCallExpr;
+    return new LogosFuncCallExpr(*logosFunc, args);
 
 }
 
