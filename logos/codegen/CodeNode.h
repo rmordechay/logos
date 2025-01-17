@@ -9,7 +9,6 @@
 #include "exprs/LogosConstantExpr.h"
 #include "exprs/LogosExpr.h"
 #include <llvm/IR/IRBuilder.h>
-#include "ExprHelper.h"
 
 using namespace llvm;
 

@@ -28,11 +28,11 @@ void CodeGenerator::run(const vector<CodeNode*>& codeNodes) {
 
     builder.CreateRet(ConstantInt::get(builder.getInt32Ty(), 0));
     std::error_code EC;
-    const auto llvmFilePath = "../codegen/output.ll";
+    const auto llvmFilePath = "../output.ll";
     raw_fd_ostream textFile(llvmFilePath, EC, sys::fs::OF_None);
     module->print(textFile, nullptr);
     module->print(outs(), nullptr);
-    compileLLVM(llvmFilePath, "../codegen/output");
+    compileLLVM(llvmFilePath, "../output");
     runBinary();
 }
 
@@ -57,8 +57,8 @@ void CodeGenerator::insertFunction(Module* module, const string& name, IntegerTy
 }
 
 void CodeGenerator::runBinary() {
-    std::system("clang -o ../codegen/output ../codegen/output.o");
-    std::system("../codegen/output");
+    std::system("clang -o ../output ../output.o");
+    std::system("../output");
 }
 
 void CodeGenerator::compileLLVM(const std::string& llvmFilePath, const std::string& outputFilePath) {
