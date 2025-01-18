@@ -2,6 +2,6 @@
 
 int main() {
     LogosProject project("../templates/src");
-    project.scanProject();
+    project.runLogos();
     return 0;
 }

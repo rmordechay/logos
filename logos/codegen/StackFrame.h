@@ -12,7 +12,7 @@ using namespace llvm;
 class RuntimeStackFrame {
 public:
     Function *currentFunction;
-    map<string, AllocaInst*> symbolTable;
+    map<string, Value*> symbolTable;
     map<string, Function*> functions;
 };
 

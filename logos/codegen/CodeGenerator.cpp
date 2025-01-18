@@ -1,5 +1,7 @@
 #include "CodeGenerator.h"
 
+#include "LogosRootPackage.h"
+
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Function.h>
@@ -25,53 +27,44 @@ const auto LINKED_OBJECT_FILE = "../output.o";
 const auto LINKED_IR_FILE = "../output.ll";
 constexpr auto LLVM_OBJECT_FILE = CodeGenFileType::ObjectFile;
 
-void CodeGenerator::run(const vector<CodeGeneration*>& codeNodes) {
+void CodeGenerator::run(const LogosRootPackage* rootPackage) {
+    initLLVM();
+    const auto logosMainFile = rootPackage->mainFile;
+    const auto mainModule = generateMainModule(logosMainFile);
+    linkModules(unique_ptr<Module>(mainModule));
+    runBinary();
+    // generateTest();
+}
+
+Module* CodeGenerator::generateMainModule(const LogosMainFile* mainFile) {
     RuntimeStackFrame rootFrame;
-    const auto module = new Module("main", context);
+    const auto module = new Module(LOGOS_MAIN_FUNCTION, context);
+    module->setDataLayout(targetMachine->createDataLayout());
+    module->setTargetTriple(targetTriple);
     declareFunctions(module, &rootFrame);
 
-    for (const auto& codeNode : codeNodes) {
-        codeNode->getLLVMValue(&builder, &rootFrame, module);
+    for (const auto func : mainFile->funcs) {
+        func->getLLVMValue(&builder, &rootFrame, module);
     }
+    mainFile->mainFunc->getLLVMValue(&builder, &rootFrame, module);
+    builder.CreateRet(builder.getInt32(1));
 
-    builder.CreateRet(ConstantInt::get(builder.getInt32Ty(), 0));
     std::error_code EC;
     raw_fd_ostream textFile(PROGRAM_IR_FILE, EC, sys::fs::OF_None);
     module->print(textFile, nullptr);
     module->print(outs(), nullptr);
 
-    initLLVM();
-    initTargetMachine();
-    linkModules();
-    runBinary();
+    return module;
 }
 
 void CodeGenerator::declareFunctions(Module* module, RuntimeStackFrame* rootFrame) {
-    const auto printfType = FunctionType::get(builder.getVoidTy(), false);
+    const auto printfType = FunctionType::get(builder.getVoidTy(), builder.getInt32Ty(), false);
     rootFrame->functions["print"] = Function::Create(printfType, Function::ExternalLinkage, "printInt", module);
 }
 
-void CodeGenerator::insertFunction(Module* module, const string& name, IntegerType* rt, RuntimeStackFrame* frame) {
-    const auto mainFuncType = FunctionType::get(rt, false);
-    const auto mainFunc = Function::Create(mainFuncType, Function::ExternalLinkage, name, module);
-    const auto mainEntry = BasicBlock::Create(context, "entry", mainFunc);
-    builder.SetInsertPoint(mainEntry);
-    frame->currentFunction = mainFunc;
-}
-
-void CodeGenerator::initTargetMachine() {
-    std::string targetError;
-    targetTriple = sys::getProcessTriple();
-    target = TargetRegistry::lookupTarget(targetTriple, targetError);
-    const auto TARGET_OPTIONS = TargetOptions();
-    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), Reloc::PIC_);
-}
-
-void CodeGenerator::linkModules() {
-    const auto compositeModule = compileModule(PRINT_IR_FILE);
+void CodeGenerator::linkModules(unique_ptr<Module> module) {
+    const auto compositeModule = compileLLVMFile(PRINT_IR_FILE);
     Linker linker(*compositeModule);
-    const auto inputFile = PROGRAM_IR_FILE;
-    auto module = compileModule(inputFile);
     linker.linkInModule(std::move(module));
     if (verifyModule(*compositeModule, &errs())) return;
     std::error_code EC;
@@ -81,12 +74,11 @@ void CodeGenerator::linkModules() {
     emitPass.run(*compositeModule);
 }
 
-unique_ptr<Module> CodeGenerator::compileModule(const string& inputFile) {
+unique_ptr<Module> CodeGenerator::compileLLVMFile(const string& inputFile) {
     const std::string errorMsg;
     auto buffer = MemoryBuffer::getFile(inputFile, errorMsg.data());
     SMDiagnostic err;
     auto module = parseIR(**buffer, err, context);
-    std::cout << err.getMessage().data() << std::endl;
     module->setDataLayout(targetMachine->createDataLayout());
     module->setTargetTriple(targetTriple);
     return module;
@@ -99,9 +91,30 @@ void CodeGenerator::initLLVM() {
     InitializeAllTargetMCs();
     InitializeAllTargets();
     InitializeAllTargetInfos();
+
+    std::string targetError;
+    targetTriple = sys::getProcessTriple();
+    target = TargetRegistry::lookupTarget(targetTriple, targetError);
+    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), Reloc::PIC_);
 }
 
 void CodeGenerator::runBinary() {
     std::system("clang ../output.o -o ../output");
     std::system("../output");
+}
+
+void CodeGenerator::generateTest() {
+    const auto funcType = FunctionType::get(builder.getInt32Ty(), {builder.getInt32Ty(), builder.getInt32Ty()}, false);
+    const auto module = new Module(LOGOS_MAIN_FUNCTION, context);
+    const auto func = Function::Create(funcType, Function::ExternalLinkage, "name", module);
+
+    auto args = func->arg_begin();
+    args++->setName("arg1");
+    args->setName("args2");
+    const auto funcEntry = BasicBlock::Create(builder.getContext(), "entry", func);
+    builder.SetInsertPoint(funcEntry);
+    builder.CreateAlloca(builder.getInt32Ty(), nullptr);
+    builder.CreateRetVoid();
+    module->print(outs(), nullptr);
+
 }

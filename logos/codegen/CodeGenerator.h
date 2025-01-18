@@ -1,8 +1,10 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
+#include "LogosRootPackage.h"
 #include "exprs/LogosExpr.h"
+#include "files/LogosMainFile.h"
+
 #include <map>
-#include <stack>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/MC/TargetRegistry.h>
 
@@ -11,14 +13,14 @@ using namespace std;
 
 class CodeGenerator {
 public:
-    void run(const vector<CodeGeneration*>& codeNodes);
+    void run(const LogosRootPackage* rootPackage);
+    Module* generateMainModule(const LogosMainFile* mainFile);
     void declareFunctions(Module* module, RuntimeStackFrame* rootFrame);
-    void insertFunction(Module* module, const string& name, IntegerType* rt, RuntimeStackFrame* frame);
     void runBinary();
-    static void initLLVM();
-    void initTargetMachine();
-    unique_ptr<Module> compileModule(const string& inputFile);
-    void linkModules();
+    void initLLVM();
+    unique_ptr<Module> compileLLVMFile(const string& inputFile);
+    void linkModules(unique_ptr<Module> module);
+    void generateTest();
     ~CodeGenerator() = default;
 
 private:

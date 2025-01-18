@@ -1,14 +1,14 @@
 #ifndef LOGOSMAINFILE_H
 #define LOGOSMAINFILE_H
+#include "LogosFile.h"
 #include "funcs/LogosFunc.h"
 
-#include <vector>
-
-class LogosMainFile {
+class LogosMainFile final : public LogosFile {
 public:
-    LogosFunc* mainFunc;
+    LogosFunc* mainFunc = nullptr;
     std::vector<LogosFunc*> funcs;
-    ~LogosMainFile();
+    ~LogosMainFile() override;
 };
+
 
 #endif //LOGOSMAINFILE_H

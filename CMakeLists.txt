@@ -15,18 +15,17 @@ file(GLOB GENERATED_SRC "${CMAKE_CURRENT_SOURCE_DIR}/logos/parser/*.cpp" "${CMAK
 add_executable(logos
     main.cpp
     ${GENERATED_SRC}
-    logos/LogosConfigs.h
+    logos/LogosDefinitions.h
     logos/codegen/CodeGenerator.cpp
     logos/codegen/CodeGenerator.h
-    logos/project/LogosFile.cpp
-    logos/project/LogosFile.h
+    logos/symbols/files/LogosFile.h
     logos/project/LogosPackage.cpp
     logos/project/LogosPackage.h
     logos/project/LogosProject.cpp
     logos/project/LogosProject.h
     logos/sema/LogosErrors.h
-    logos/sema/SemAnalyser.cpp
-    logos/sema/SemAnalyser.h
+    logos/sema/AntlrConverter.cpp
+    logos/sema/AntlrConverter.h
     logos/symbols/LogosSymbol.h
     logos/symbols/types/LogosType.h
     logos/symbols/types/LogosBool.h
@@ -58,8 +57,12 @@ add_executable(logos
     logos/symbols/stmts/LogosStmt.h
     logos/symbols/files/LogosMainFile.cpp
     logos/symbols/files/LogosMainFile.h
-    logos/symbols/files/LogosObjectFile.cpp
-    logos/symbols/files/LogosObjectFile.h
+    logos/project/LogosRootPackage.cpp
+    logos/project/LogosRootPackage.h
+    logos/symbols/files/LogosMainFile.cpp
+    logos/symbols/files/LogosMainFile.h
+    logos/symbols/stmts/LogosReturnStmt.cpp
+    logos/symbols/stmts/LogosReturnStmt.h
 )
 
 target_include_directories(logos PRIVATE

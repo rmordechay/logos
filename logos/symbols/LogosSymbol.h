@@ -7,10 +7,9 @@ using namespace std;
 
 class LogosSymbol {
 public:
-    const LogosType* type;
     CodeGeneration* value;
 
-    explicit LogosSymbol(CodeGeneration* value) : type(&value->getType()), value(value) {}
+    explicit LogosSymbol(CodeGeneration* value) : value(value) {}
 
     ~LogosSymbol() = default;
 };

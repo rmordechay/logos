@@ -33,7 +33,8 @@ public:
     RuleEnumField = 21, RuleStatementsBlock = 22, RuleExprList = 23, RuleExpr = 24, 
     RuleUnaryExpr = 25, RuleConstant = 26, RuleSelection = 27, RuleIfStatement = 28, 
     RuleElseStatement = 29, RulePatternMatching = 30, RulePattern = 31, 
-    RuleLoopStatement = 32, RuleRange = 33, RuleControlFlowStatement = 34
+    RuleLoopStatement = 32, RuleLoopControlStatement = 33, RuleReturnStatement = 34, 
+    RuleRange = 35
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -86,8 +87,9 @@ public:
   class PatternMatchingContext;
   class PatternContext;
   class LoopStatementContext;
-  class RangeContext;
-  class ControlFlowStatementContext; 
+  class LoopControlStatementContext;
+  class ReturnStatementContext;
+  class RangeContext; 
 
   class  LogosFileContext : public antlr4::ParserRuleContext {
   public:
@@ -364,7 +366,8 @@ public:
     ImplicitVarDecContext *implicitVarDec();
     IfStatementContext *ifStatement();
     LoopStatementContext *loopStatement();
-    ControlFlowStatementContext *controlFlowStatement();
+    LoopControlStatementContext *loopControlStatement();
+    ReturnStatementContext *returnStatement();
     EnumDeclarationContext *enumDeclaration();
     FuncCallContext *funcCall();
 
@@ -578,6 +581,32 @@ public:
 
   LoopStatementContext* loopStatement();
 
+  class  LoopControlStatementContext : public antlr4::ParserRuleContext {
+  public:
+    LoopControlStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *BREAK();
+    ExprContext *expr();
+    antlr4::tree::TerminalNode *IF();
+    antlr4::tree::TerminalNode *CONTINUE();
+
+   
+  };
+
+  LoopControlStatementContext* loopControlStatement();
+
+  class  ReturnStatementContext : public antlr4::ParserRuleContext {
+  public:
+    ReturnStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *RETURN();
+    ExprContext *expr();
+
+   
+  };
+
+  ReturnStatementContext* returnStatement();
+
   class  RangeContext : public antlr4::ParserRuleContext {
   public:
     RangeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -590,21 +619,6 @@ public:
   };
 
   RangeContext* range();
-
-  class  ControlFlowStatementContext : public antlr4::ParserRuleContext {
-  public:
-    ControlFlowStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *BREAK();
-    ExprContext *expr();
-    antlr4::tree::TerminalNode *IF();
-    antlr4::tree::TerminalNode *CONTINUE();
-    antlr4::tree::TerminalNode *RETURN();
-
-   
-  };
-
-  ControlFlowStatementContext* controlFlowStatement();
 
 
   bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;

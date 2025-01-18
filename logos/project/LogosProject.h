@@ -1,23 +1,44 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 #include "CodeGenerator.h"
-#include "SemAnalyser.h"
+#include "AntlrConverter.h"
+#include "LogosLexer.h"
 #include <string>
 
-class LogosFile;
-class LogosPackage;
-
+using namespace std;
 
 class LogosProject {
 public:
-    std::string rootPath;
-    LogosPackage* rootPackage;
-    SemAnalyser* semAnalyser;
+    string rootPath;
     CodeGenerator* codeGenerator;
+    AntlerConverter* antlerConverter;
 
-    explicit LogosProject(const std::string& path);
-    void scanProject() const;
+    unique_ptr<antlr4::ANTLRInputStream> input;
+    unique_ptr<LogosLexer> lexer;
+    unique_ptr<antlr4::CommonTokenStream> tokens;
+    unique_ptr<LogosParser> parser;
+
+    explicit LogosProject(const string& rootPath) :
+        rootPath(rootPath),
+        codeGenerator(new CodeGenerator()),
+        antlerConverter(new AntlerConverter()) {
+    }
+
+    void runLogos();
+    LogosRootPackage* getRootPackage();
+    LogosPackage* getPackage(const filesystem::path& path);
+    LogosFile* getFile(const filesystem::path& dirPath);
+    LogosParser::LogosFileContext* parseFile(string codeText);
+    static string getCodeText(const filesystem::path& path);
     ~LogosProject();
+
+    static bool isLogosFile(const std::filesystem::directory_entry& filePath) {
+        return filePath.is_regular_file() && filePath.path().extension().string() == LOGOS_EXTENSION;
+    }
+
+    static bool isMainFile(const std::filesystem::directory_entry& filePath) {
+        return filePath.path().stem().string() == LOGOS_MAIN_FILE;
+    }
 };
 
 #endif // PROJECT_H

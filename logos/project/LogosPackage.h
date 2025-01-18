@@ -1,23 +1,21 @@
 #ifndef LOGOSPACKAGE_H
 #define LOGOSPACKAGE_H
-#include "LogosFile.h"
+#include "files/LogosFile.h"
+#include "LogosDefinitions.h"
 
 #include <string>
 #include <vector>
 
+using namespace std;
+
 class LogosPackage {
 public:
-    std::string name;
-    std::string path;
-    std::vector<LogosFile*> files;
-    std::vector<LogosPackage*> packages;
-    LogosFile* mainFile;
+    string name;
+    string path;
+    vector<LogosFile*> files;
+    vector<LogosPackage*> packages;
 
-    explicit LogosPackage(const std::string& name, const std::string& path);
-    void scanPackage();
-    static LogosFile* readLogosFile(const std::filesystem::path& path);
-    static bool isLogosFile(const std::filesystem::directory_entry& filePath);
-    static bool isMainFile(const std::filesystem::directory_entry& filePath);
+    explicit LogosPackage(const string& name, const string& path);
     ~LogosPackage();
 };
 

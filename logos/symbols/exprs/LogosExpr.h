@@ -5,10 +5,9 @@
 
 class LogosExpr: public CodeGeneration {
 public:
-    const LogosType& type;
+    const LogosType* type = nullptr;
 
-    explicit LogosExpr(const LogosType& type) : type(type) {}
-    const LogosType& getType() const override;
+    explicit LogosExpr(const LogosType* type) : type(type) {}
     Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
     ~LogosExpr() override = default;
 };

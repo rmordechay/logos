@@ -6,13 +6,15 @@
 #include "exprs/LogosUnaryExpr.h"
 #include <map>
 
-class LogosFuncCallExpr final : public LogosUnaryExpr {
+class LogosFuncCallExpr final : public LogosStmt, public LogosUnaryExpr {
 public:
-    const LogosFunc& func;
+    string name;
     vector<LogosExpr*> args;
 
-    explicit LogosFuncCallExpr(const LogosFunc& func, const vector<LogosExpr*>& args) : LogosUnaryExpr(func.type), func(func), args(args) {}
-    const LogosType& getType() const override;
+    explicit LogosFuncCallExpr(const string& name) : name(name) {}
+    explicit LogosFuncCallExpr(const LogosType* type, const vector<LogosExpr*>& args) :
+        LogosUnaryExpr(type), args(args) {}
+
     Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
     ~LogosFuncCallExpr() override;
 };

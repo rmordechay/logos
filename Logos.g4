@@ -81,7 +81,8 @@ statement:
     |   implicitVarDec
     |   ifStatement
     |   loopStatement
-    |   controlFlowStatement
+    |   loopControlStatement
+    |   returnStatement
     |   enumDeclaration
     |   funcCall
     ;
@@ -147,15 +148,18 @@ loopStatement:
     |   FOR exprList IN range statementsBlock
     ;
 
-range:
-        expr? DOUBLE_DOT expr
-    ;
-
-controlFlowStatement:
+loopControlStatement:
         BREAK expr
     |   BREAK IF
     |   CONTINUE
-    |   RETURN expr
+    ;
+
+returnStatement:
+        RETURN expr
+    ;
+
+range:
+        expr? DOUBLE_DOT expr
     ;
 
 DOUBLE_EQUAL: '==';

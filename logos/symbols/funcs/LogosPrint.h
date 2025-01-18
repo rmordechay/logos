@@ -8,8 +8,7 @@ class LogosPrint final : public LogosFunc {
 public:
     static constexpr auto name = "print";
 
-    LogosPrint() : LogosFunc(name, LOGOS_INT) {}
-    const LogosType& getType() const override;
+    LogosPrint() : LogosFunc(name, &LOGOS_INT) {}
     Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
     ~LogosPrint() override = default;
 };

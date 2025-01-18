@@ -5,13 +5,8 @@
 class LogosInt final : public LogosType {
 public:
     static constexpr auto name = "Int";
-
-    LogosInt() = default;
+    Type* getLLVMType(IRBuilder<>* builder) const override { return builder->getInt32Ty(); }
     ~LogosInt() override = default;
-
-    Type* getLLVMType(IRBuilder<>* builder) const override {
-        return builder->getInt32Ty();
-    }
 };
 
 inline const LogosType& LOGOS_INT = LogosInt();

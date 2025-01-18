@@ -7,12 +7,21 @@
 class LogosFunc : public CodeGeneration {
 public:
     string name;
-    const LogosType& type;
-    vector<const LogosVarDec*> params;
-    vector<const LogosStmt*> stmts;
+    const LogosType* type;
+    vector<LogosVarDec*> params;
+    vector<LogosStmt*> stmts;
 
-    LogosFunc(const string& name, const LogosType& funcType) : name(name), type(funcType) {}
-    ~LogosFunc() override = default;
+    LogosFunc(const string& name, const LogosType* funcType) : name(name), type(funcType) {}
+    ~LogosFunc() override;
 };
+
+inline LogosFunc::~LogosFunc() {
+    for (const auto param : params) {
+        delete param;
+    }
+    for (const auto stmt : stmts) {
+        delete stmt;
+    }
+}
 
 #endif //LOGOSFUNC_H
