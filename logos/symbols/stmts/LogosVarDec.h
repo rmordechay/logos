@@ -1,8 +1,9 @@
 #ifndef LOGOSVARDEFINITION_H
 #define LOGOSVARDEFINITION_H
+#include "LogosStmt.h"
 #include "exprs/LogosExpr.h"
 
-class LogosVarDec final : public CodeGeneration {
+class LogosVarDec final : public LogosStmt {
 public:
     string name;
     const LogosType& type;

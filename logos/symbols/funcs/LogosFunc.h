@@ -9,6 +9,7 @@ public:
     string name;
     const LogosType& type;
     vector<const LogosVarDec*> params;
+    vector<const LogosStmt*> stmts;
 
     LogosFunc(const string& name, const LogosType& funcType) : name(name), type(funcType) {}
     ~LogosFunc() override = default;

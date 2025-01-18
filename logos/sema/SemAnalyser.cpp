@@ -23,15 +23,27 @@ void SemAnalyser::visitMainFile(const LogosFile* mainFile) {
     rootFrame[LOGOS_PRINT.name] = new LogosSymbol(const_cast<LogosFunc*>(&LOGOS_PRINT));
     stack.push(rootFrame);
 
-    const auto fileFuncs = fileCtx->mainFile()->funcImplementation();
-    for (const auto func : fileFuncs) {
+    const auto funcImplementations = fileCtx->mainFile()->funcImplementation();
+    vector<LogosParser::FuncImplementationContext*> funcsWithoutMain;
+    LogosParser::FuncImplementationContext* mainFunc = nullptr;
+    for (const auto func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         if (funcName == LOGOS_MAIN_FUNCTION) {
-            const auto logosUserFunc = new LogosUserFunc(LOGOS_MAIN_FUNCTION, LOGOS_INT);
-            stack.top()[funcName] = new LogosSymbol(logosUserFunc);
+            mainFunc = func;
+        } else {
+            funcsWithoutMain.push_back(func);
         }
+    }
+    visitMainFunc(mainFunc);
+    for (const auto func : funcsWithoutMain) {
         visitFuncImplementation(func);
     }
+}
+
+void SemAnalyser::visitMainFunc(LogosParser::FuncImplementationContext* mainFunc) {
+    const auto logosUserFunc = new LogosUserFunc(LOGOS_MAIN_FUNCTION, LOGOS_INT);
+    stack.top()[LOGOS_MAIN_FUNCTION] = new LogosSymbol(logosUserFunc);
+    visitFuncImplementation(mainFunc);
 }
 
 void SemAnalyser::visitFuncImplementation(LogosParser::FuncImplementationContext* ctx) {

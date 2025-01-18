@@ -15,6 +15,8 @@
 #include <llvm/IR/LegacyPassManager.h>
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Passes/PassBuilder.h"
+
+#include <iostream>
 #include <llvm/Linker/Linker.h>
 
 const auto PROGRAM_IR_FILE = "../codegen/output.ll";
@@ -27,9 +29,10 @@ void CodeGenerator::run(const vector<CodeGeneration*>& codeNodes) {
     RuntimeStackFrame rootFrame;
     const auto module = new Module("main", context);
     declareFunctions(module, &rootFrame);
-    insertFunction(module, "main", builder.getInt32Ty(), &rootFrame);
 
-    generate(codeNodes, rootFrame, module);
+    for (const auto& codeNode : codeNodes) {
+        codeNode->getLLVMValue(&builder, &rootFrame, module);
+    }
 
     builder.CreateRet(ConstantInt::get(builder.getInt32Ty(), 0));
     std::error_code EC;
@@ -41,12 +44,6 @@ void CodeGenerator::run(const vector<CodeGeneration*>& codeNodes) {
     initTargetMachine();
     linkModules();
     runBinary();
-}
-
-void CodeGenerator::generate(const vector<CodeGeneration*>& codeNodes, RuntimeStackFrame rootFrame, Module* const module) {
-    for (const auto& codeNode : codeNodes) {
-        codeNode->getLLVMValue(&builder, &rootFrame, module);
-    }
 }
 
 void CodeGenerator::declareFunctions(Module* module, RuntimeStackFrame* rootFrame) {
@@ -89,6 +86,7 @@ unique_ptr<Module> CodeGenerator::compileModule(const string& inputFile) {
     auto buffer = MemoryBuffer::getFile(inputFile, errorMsg.data());
     SMDiagnostic err;
     auto module = parseIR(**buffer, err, context);
+    std::cout << err.getMessage().data() << std::endl;
     module->setDataLayout(targetMachine->createDataLayout());
     module->setTargetTriple(targetTriple);
     return module;

@@ -1,9 +1,8 @@
 #ifndef LOGOSIFSTMT_H
 #define LOGOSIFSTMT_H
-#include "CodeGeneration.h"
-#include "exprs/LogosExpr.h"
+#include "LogosStmt.h"
 
-class LogosIfStmt final : public CodeGeneration {
+class LogosIfStmt final : public LogosStmt {
 public:
     LogosExpr *cond;
     vector<CodeGeneration*> codeNodes;

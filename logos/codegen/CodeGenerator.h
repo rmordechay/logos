@@ -11,7 +11,6 @@ using namespace std;
 
 class CodeGenerator {
 public:
-    void generate(const vector<CodeGeneration*>& codeNodes, RuntimeStackFrame rootFrame, Module* module);
     void run(const vector<CodeGeneration*>& codeNodes);
     void declareFunctions(Module* module, RuntimeStackFrame* rootFrame);
     void insertFunction(Module* module, const string& name, IntegerType* rt, RuntimeStackFrame* frame);

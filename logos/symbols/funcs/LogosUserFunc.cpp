@@ -11,14 +11,16 @@ Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stac
     }
     const auto funcType = FunctionType::get(type.getLLVMType(builder), llvmParams, false);
     const auto func = Function::Create(funcType, Function::ExternalLinkage, name, module);
-    auto args = func->arg_begin();
-    for (const auto param : params) {
-        args++;
+    if (params.size() > 0) {
+        auto args = func->arg_begin();
+        args->setName(params[0]->name);
+        for (int i = 1; i < params.size(); ++i) {
+            args++->setName(params[i]->name);
+        }
     }
-    Value* a = func->getArg(0);
-    Value* b = func->getArg(1);
     const auto addEntry = BasicBlock::Create(builder->getContext(), "entry", func);
     builder->SetInsertPoint(addEntry);
-    Value* sum = builder->CreateAdd(a, b, "sum");
+    builder->CreateAlloca(builder->getInt1Ty());
+    stackFrame->currentFunction = func;
     return builder->CreateRetVoid();
 }
