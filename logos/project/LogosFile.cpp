@@ -5,25 +5,16 @@
 
 LogosFile::LogosFile(const std::string& code, const std::filesystem::path& filePath) {
     this->code = code;
-    this->path = absolute(filePath).string();
     this->name = filePath.filename();
     this->fileCtx = nullptr;
 }
 
-void LogosFile::setParser() {
-    input = std::make_unique<antlr4::ANTLRInputStream>(code);
-    lexer = std::make_unique<LogosLexer>(input.get());
-    tokens = std::make_unique<antlr4::CommonTokenStream>(lexer.get());
-    parser = std::make_unique<LogosParser>(tokens.get());
-}
-
 void LogosFile::parseFile() {
-    setParser();
+    const auto input = std::make_unique<antlr4::ANTLRInputStream>(code);
+    const auto lexer = std::make_unique<LogosLexer>(input.get());
+    const auto tokens = std::make_unique<antlr4::CommonTokenStream>(lexer.get());
+    const auto parser = std::make_unique<LogosParser>(tokens.get());
     fileCtx = parser->logosFile();
-}
-
-void LogosFile::addSymbols() {
-
 }
 
 LogosFile::~LogosFile() {

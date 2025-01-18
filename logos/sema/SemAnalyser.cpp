@@ -8,6 +8,7 @@
 #include "exprs/LogosFuncCallExpr.h"
 #include "exprs/LogosOperator.h"
 #include "exprs/LogosVariableExpr.h"
+#include "files/LogosMainFile.h"
 #include "funcs/LogosPrint.h"
 #include "funcs/LogosUserFunc.h"
 #include "stmts/LogosIfStmt.h"
@@ -34,37 +35,38 @@ void SemAnalyser::visitMainFile(const LogosFile* mainFile) {
             funcsWithoutMain.push_back(func);
         }
     }
+
     visitMainFunc(mainFunc);
     for (const auto func : funcsWithoutMain) {
         visitFuncImplementation(func);
     }
 }
 
-void SemAnalyser::visitMainFunc(LogosParser::FuncImplementationContext* mainFunc) {
-    const auto logosUserFunc = new LogosUserFunc(LOGOS_MAIN_FUNCTION, LOGOS_INT);
-    stack.top()[LOGOS_MAIN_FUNCTION] = new LogosSymbol(logosUserFunc);
-    visitFuncImplementation(mainFunc);
+void SemAnalyser::visitMainFunc(LogosParser::FuncImplementationContext* ctx) {
+    const auto mainFunc = new LogosUserFunc(LOGOS_MAIN_FUNCTION, LOGOS_INT);
+    stack.top()[LOGOS_MAIN_FUNCTION] = new LogosSymbol(mainFunc);
+    visitFuncImplementation(ctx);
 }
 
 void SemAnalyser::visitFuncImplementation(LogosParser::FuncImplementationContext* ctx) {
     const auto funcSignature = ctx->funcSignature();
-    const auto funcName = funcSignature->VARIABLE()->getText();
-    visitUserFuncDef(funcSignature, funcName);
+    visitUserFuncDef(funcSignature);
     const auto statements = ctx->funcBody()->statementsBlock()->statement();
     for (const auto statement : statements) {
         visitStatement(statement);
     }
 }
 
-void SemAnalyser::visitUserFuncDef(LogosParser::FuncSignatureContext* const funcSignature, const std::string& funcName) {
-    const auto type = funcSignature->TYPE();
+void SemAnalyser::visitUserFuncDef(LogosParser::FuncSignatureContext* const ctx) {
+    const auto type = ctx->TYPE();
+    auto funcName = ctx->VARIABLE()->getText();
     LogosUserFunc* logosUserFunc;
     if (type) {
         logosUserFunc = new LogosUserFunc(funcName, getType(type->getText()));
     } else {
         logosUserFunc = new LogosUserFunc(funcName);
     }
-    const auto args = funcSignature->variableDefintionList();
+    const auto args = ctx->variableDefintionList();
     if (args) {
         const auto params = args->explicitVarDec();
         for (const auto param : params) {
@@ -77,12 +79,12 @@ void SemAnalyser::visitUserFuncDef(LogosParser::FuncSignatureContext* const func
     codeNodes.push_back(logosUserFunc);
 }
 
-void SemAnalyser::visitStatementList(const std::vector<LogosParser::StatementContext*>& statements) {
+void SemAnalyser::visitStatementList(const std::vector<LogosParser::StatementContext*>& ctx) {
     map<string, LogosSymbol*> frame;
     auto currentFrame = stack.top();
     frame.insert(currentFrame.begin(), currentFrame.end());
     stack.push(frame);
-    for (const auto statement : statements) {
+    for (const auto statement : ctx) {
         visitStatement(statement);
     }
     stack.pop();

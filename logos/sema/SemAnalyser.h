@@ -6,6 +6,7 @@
 #include "LogosSymbol.h"
 #include "exprs/LogosConstantExpr.h"
 #include "exprs/LogosFuncCallExpr.h"
+#include "files/LogosMainFile.h"
 
 using namespace std;
 
@@ -16,22 +17,22 @@ public:
 
     void analyseProject(const LogosFile* mainFile);
     void visitMainFile(const LogosFile* mainFile);
-    void visitMainFunc(LogosParser::FuncImplementationContext* mainFunc);
+    void visitMainFunc(LogosParser::FuncImplementationContext* ctx);
     void visitFuncImplementation(LogosParser::FuncImplementationContext* ctx);
-    void visitUserFuncDef(LogosParser::FuncSignatureContext* funcSignature, const std::string& funcName);
+    void visitUserFuncDef(LogosParser::FuncSignatureContext* ctx);
     void visitStatement(LogosParser::StatementContext* ctx);
     void visitExplicitVariableDec(LogosParser::ExplicitVarDecContext* ctx);
     void visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     void visitFuncCall(LogosParser::FuncCallContext* ctx);
-    void visitStatementList(const std::vector<LogosParser::StatementContext*>& statements);
+    void visitStatementList(const std::vector<LogosParser::StatementContext*>& ctx);
     void visitIfStatement(LogosParser::IfStatementContext* ctx);
 
     const LogosType& getType(const string& typeText);
     LogosExpr* getExpr(LogosParser::ExprContext* ctx);
     LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
-    LogosUnaryExpr* getVariableExpr(const string& symbolName);
     LogosUnaryExpr* getFuncCallExpr(LogosParser::FuncCallContext* ctx);
     static LogosUnaryExpr* getConstantExpr(LogosParser::ConstantContext* ctx);
+    LogosUnaryExpr* getVariableExpr(const string& symbolName);
 
     void addSymbol(const string& variableName, LogosExpr* logosExpr);
     LogosSymbol* resolveSymbol(const string& symbolName);

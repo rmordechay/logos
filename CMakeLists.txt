@@ -56,6 +56,10 @@ add_executable(logos
     logos/symbols/stmts/LogosIfStmt.cpp
     logos/symbols/stmts/LogosIfStmt.h
     logos/symbols/stmts/LogosStmt.h
+    logos/symbols/files/LogosMainFile.cpp
+    logos/symbols/files/LogosMainFile.h
+    logos/symbols/files/LogosObjectFile.cpp
+    logos/symbols/files/LogosObjectFile.h
 )
 
 target_include_directories(logos PRIVATE
