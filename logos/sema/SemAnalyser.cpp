@@ -25,6 +25,11 @@ void SemAnalyser::visitMainFile(const LogosFile* mainFile) {
 
     const auto fileFuncs = fileCtx->mainFile()->funcImplementation();
     for (const auto func : fileFuncs) {
+        auto funcName = func->funcSignature()->VARIABLE()->getText();
+        if (funcName == LOGOS_MAIN_FUNCTION) {
+            const auto logosUserFunc = new LogosUserFunc(LOGOS_MAIN_FUNCTION, LOGOS_INT);
+            stack.top()[funcName] = new LogosSymbol(logosUserFunc);
+        }
         visitFuncImplementation(func);
     }
 }
@@ -32,25 +37,32 @@ void SemAnalyser::visitMainFile(const LogosFile* mainFile) {
 void SemAnalyser::visitFuncImplementation(LogosParser::FuncImplementationContext* ctx) {
     const auto funcSignature = ctx->funcSignature();
     const auto funcName = funcSignature->VARIABLE()->getText();
-    if (funcName == LOGOS_MAIN_FUNCTION) {
-        const auto logosUserFunc = new LogosUserFunc(LOGOS_MAIN_FUNCTION, LOGOS_INT);
-        stack.top()[funcName] = new LogosSymbol(logosUserFunc);
+    visitUserFuncDef(funcSignature, funcName);
+    const auto statements = ctx->funcBody()->statementsBlock()->statement();
+    for (const auto statement : statements) {
+        visitStatement(statement);
+    }
+}
+
+void SemAnalyser::visitUserFuncDef(LogosParser::FuncSignatureContext* const funcSignature, const std::string& funcName) {
+    const auto type = funcSignature->TYPE();
+    LogosUserFunc* logosUserFunc;
+    if (type) {
+        logosUserFunc = new LogosUserFunc(funcName, getType(type->getText()));
     } else {
-        const LogosType& rt = getType(funcSignature->TYPE()->getText());
-        const auto logosUserFunc = new LogosUserFunc(funcName, rt);
-        const auto params = funcSignature->variableDefintionList()->explicitVarDec();
+        logosUserFunc = new LogosUserFunc(funcName);
+    }
+    const auto args = funcSignature->variableDefintionList();
+    if (args) {
+        const auto params = args->explicitVarDec();
         for (const auto param : params) {
             const LogosType& argType = getType(param->TYPE()->getText());
             const auto logosVarDec = new LogosVarDec(param->VARIABLE()->getText(), argType);
             logosUserFunc->params.push_back(logosVarDec);
         }
-        stack.top()[funcName] = new LogosSymbol(logosUserFunc);
-        codeNodes.push_back(logosUserFunc);
     }
-    const auto statements = ctx->funcBody()->statementsBlock()->statement();
-    for (const auto statement : statements) {
-        visitStatement(statement);
-    }
+    stack.top()[funcName] = new LogosSymbol(logosUserFunc);
+    codeNodes.push_back(logosUserFunc);
 }
 
 void SemAnalyser::visitStatementList(const std::vector<LogosParser::StatementContext*>& statements) {

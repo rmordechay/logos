@@ -17,6 +17,7 @@ public:
     void analyseProject(const LogosFile* mainFile);
     void visitMainFile(const LogosFile* mainFile);
     void visitFuncImplementation(LogosParser::FuncImplementationContext* ctx);
+    void visitUserFuncDef(LogosParser::FuncSignatureContext* funcSignature, const std::string& funcName);
     void visitStatement(LogosParser::StatementContext* ctx);
     void visitExplicitVariableDec(LogosParser::ExplicitVarDecContext* ctx);
     void visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
