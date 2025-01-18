@@ -1,4 +1,4 @@
-    #include "SemAnalyser.h"
+#include "SemAnalyser.h"
 
 #include "LogosConfigs.h"
 #include "LogosErrors.h"
@@ -13,7 +13,7 @@
 #include "stmts/LogosIfStmt.h"
 #include "stmts/LogosVarDec.h"
 
-    void SemAnalyser::analyseProject(const LogosFile* mainFile) {
+void SemAnalyser::analyseProject(const LogosFile* mainFile) {
     visitMainFile(mainFile);
 }
 
@@ -38,10 +38,10 @@ void SemAnalyser::visitFuncImplementation(LogosParser::FuncImplementationContext
     } else {
         const LogosType& rt = getType(funcSignature->TYPE()->getText());
         const auto logosUserFunc = new LogosUserFunc(funcName, rt);
-        const auto params = funcSignature->explicitVarDecList()->explicitVarDec();
+        const auto params = funcSignature->variableDefintionList()->explicitVarDec();
         for (const auto param : params) {
             const LogosType& argType = getType(param->TYPE()->getText());
-            const auto logosVarDec = new LogosVarDec(param->VARIABLE()->getText());
+            const auto logosVarDec = new LogosVarDec(param->VARIABLE()->getText(), argType);
             logosUserFunc->params.push_back(logosVarDec);
         }
         stack.top()[funcName] = new LogosSymbol(logosUserFunc);
@@ -65,10 +65,10 @@ void SemAnalyser::visitStatementList(const std::vector<LogosParser::StatementCon
 }
 
 void SemAnalyser::visitStatement(LogosParser::StatementContext* ctx) {
-    if (const auto explicitVarDec = ctx->explicitVarDec()) {
-        visitExplicitVarDec(explicitVarDec);
-    } else if (const auto implicitVarDec = ctx->implicitVarDec()) {
+    if (const auto implicitVarDec = ctx->implicitVarDec()) {
         visitImplicitVarDec(implicitVarDec);
+    } else if (const auto explicitVarDec = ctx->explicitVarDec()) {
+        visitExplicitVariableDec(explicitVarDec);
     } else if (const auto funcCall = ctx->funcCall()) {
         visitFuncCall(funcCall);
     } else if (const auto ifStmt = ctx->ifStatement()) {
@@ -76,12 +76,16 @@ void SemAnalyser::visitStatement(LogosParser::StatementContext* ctx) {
     }
 }
 
-void SemAnalyser::visitImplicitVarDec(LogosParser::VariableDefintionContext* ctx) {
-    const auto variableName = ctx->VARIABLE()->G;
+void SemAnalyser::visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
+    const auto variableName = ctx->VARIABLE()->getText();
     const auto logosExpr = getExpr(ctx->expr());
     addSymbol(variableName, logosExpr);
     codeNodes.push_back(new LogosVarDec(variableName, logosExpr));
 }
+
+void SemAnalyser::visitExplicitVariableDec(LogosParser::ExplicitVarDecContext* ctx) {
+}
+
 
 void SemAnalyser::visitFuncCall(LogosParser::FuncCallContext* ctx) {
     codeNodes.push_back(getFuncCallExpr(ctx));
@@ -96,11 +100,8 @@ void SemAnalyser::visitIfStatement(LogosParser::IfStatementContext* ctx) {
     visitStatementList(statements);
     const auto endIndex = codeNodes.size();
 
-    ifStmt->codeNodes.insert(
-        ifStmt->codeNodes.begin(),
-        make_move_iterator(codeNodes.begin() + startIndex),
-        make_move_iterator(codeNodes.begin() + endIndex)
-    );
+    ifStmt->codeNodes.insert(ifStmt->codeNodes.begin(), make_move_iterator(codeNodes.begin() + startIndex),
+                             make_move_iterator(codeNodes.begin() + endIndex));
     codeNodes.erase(codeNodes.begin() + startIndex, codeNodes.begin() + endIndex);
 }
 

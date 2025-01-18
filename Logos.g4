@@ -5,15 +5,15 @@ logosFile:
     ;
 
 mainFile:
-        (variableDefintion)? funcImplementation+ EOF
+        funcImplementation+ EOF
     ;
 
 interfaceFile:
-        interfaceDeclaration objectImplements? variableDefintion* funcSignature+ funcImplementation* EOF
+        interfaceDeclaration objectImplements? explicitVarDec* funcSignature+ funcImplementation* EOF
     ;
 
 objectFile:
-        objectDeclaration objectImplements? variableDefintion* funcImplementation* EOF
+        objectDeclaration objectImplements? explicitVarDec* funcImplementation* EOF
     ;
 
 importStatement:
@@ -37,7 +37,7 @@ objectImplements:
     ;
 
 funcSignature:
-        VARIABLE LPAREN explicitVarDecList? RPAREN (COLON TYPE)?
+        VARIABLE LPAREN variableDefintionList? RPAREN (COLON TYPE)?
     ;
 
 funcImplementation:
@@ -56,12 +56,15 @@ constructorCall:
         TYPE LPAREN funcArgList? RPAREN
     ;
 
-explicitVarDecList:
-        variableDefintion (COMMA variableDefintion)* COMMA?
+variableDefintionList:
+        explicitVarDec (COMMA explicitVarDec)* COMMA?
     ;
 
-variableDefintion:
+explicitVarDec:
         VARIABLE COLON TYPE (EQUAL expr)?
+    ;
+
+implicitVarDec:
         VARIABLE (EQUAL expr)?
     ;
 
@@ -74,7 +77,8 @@ funcArgList:
     ;
 
 statement:
-        variableDefintion
+        explicitVarDec
+    |   implicitVarDec
     |   ifStatement
     |   loopStatement
     |   controlFlowStatement
