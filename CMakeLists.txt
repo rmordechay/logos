@@ -51,8 +51,8 @@ add_executable(logos
     logos/symbols/exprs/LogosVariableExpr.cpp
     logos/symbols/exprs/LogosBinaryExpr.cpp
     logos/symbols/exprs/LogosExpr.cpp
-    logos/symbols/stmts/LogosVarDefinition.cpp
-    logos/symbols/stmts/LogosVarDefinition.h
+    logos/symbols/stmts/LogosVarDec.cpp
+    logos/symbols/stmts/LogosVarDec.h
     logos/symbols/stmts/LogosIfStmt.cpp
     logos/symbols/stmts/LogosIfStmt.h
 )

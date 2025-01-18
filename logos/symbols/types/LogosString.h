@@ -12,7 +12,7 @@ public:
     LogosString();
     ~LogosString() override = default;
 
-    Type* getLLVMType(IRBuilder<>& builder) const override {
+    Type* getLLVMType(IRBuilder<>* builder) const override {
         return nullptr;
     }
 };

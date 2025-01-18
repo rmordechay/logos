@@ -9,8 +9,8 @@ public:
     LogosInt() = default;
     ~LogosInt() override = default;
 
-    Type* getLLVMType(IRBuilder<>& builder) const override {
-        return builder.getInt32Ty();
+    Type* getLLVMType(IRBuilder<>* builder) const override {
+        return builder->getInt32Ty();
     }
 };
 

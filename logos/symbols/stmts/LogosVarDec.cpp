@@ -1,10 +1,10 @@
-#include "LogosVarDefinition.h"
+#include "LogosVarDec.h"
 
-const LogosType& LogosVarDefinition::getType() const {
+const LogosType& LogosVarDec::getType() const {
     return expr->type;
 }
 
-Value* LogosVarDefinition::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) {
+Value* LogosVarDec::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) {
     const auto value = expr->getLLVMValue(builder, stackFrame, module);
     const auto allocaInst = builder->CreateAlloca(value->getType());
     builder->CreateStore(value, allocaInst);

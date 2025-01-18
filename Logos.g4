@@ -1,49 +1,80 @@
 grammar Logos;
 
-logosFile: importStatement? (mainFile | objectFile | interfaceFile);
-
-mainFile: (explicitVarDec | implicitVarDec)? funcImplementation+ EOF;
-
-interfaceFile: interfaceDeclaration objectImplements? explicitVarDec* funcSignature+ funcImplementation* EOF;
-
-objectFile: objectDeclaration objectImplements? explicitVarDec* funcImplementation* EOF;
-
-importStatement: IMPORT LPAREN importPath* RPAREN;
-
-importPath: TYPE (DOT TYPE)*;
-
-objectDeclaration: OBJECT COLON TYPE;
-
-interfaceDeclaration: INTERFACE COLON TYPE;
-
-objectImplements: IMPLEMENTS COLON TYPE;
-
-funcSignature: VARIABLE LPAREN explicitVarDecList? RPAREN (COLON TYPE)?;
-
-funcImplementation: funcSignature funcBody;
-
-funcBody: statementsBlock;
-
-funcCall: VARIABLE LPAREN funcArgList? RPAREN;
-
-constructorCall: TYPE LPAREN funcArgList? RPAREN;
-
-explicitVarDecList: explicitVarDec (COMMA explicitVarDec)* COMMA?;
-
-explicitVarDec:
-        VARIABLE COLON TYPE (EQUAL expr)?
-    |   enumDeclaration
+logosFile:
+        importStatement? (mainFile | objectFile | interfaceFile)
     ;
 
-implicitVarDec: VARIABLE (EQUAL expr)?;
+mainFile:
+        (variableDefintion)? funcImplementation+ EOF
+    ;
 
-funcArg: (VARIABLE EQUAL)? expr;
+interfaceFile:
+        interfaceDeclaration objectImplements? variableDefintion* funcSignature+ funcImplementation* EOF
+    ;
 
-funcArgList: funcArg (COMMA funcArg)* COMMA?;
+objectFile:
+        objectDeclaration objectImplements? variableDefintion* funcImplementation* EOF
+    ;
+
+importStatement:
+        IMPORT LPAREN importPath* RPAREN
+    ;
+
+importPath:
+        TYPE (DOT TYPE)*
+    ;
+
+objectDeclaration:
+        OBJECT COLON TYPE
+    ;
+
+interfaceDeclaration:
+        INTERFACE COLON TYPE
+    ;
+
+objectImplements:
+        IMPLEMENTS COLON TYPE
+    ;
+
+funcSignature:
+        VARIABLE LPAREN explicitVarDecList? RPAREN (COLON TYPE)?
+    ;
+
+funcImplementation:
+        funcSignature funcBody
+    ;
+
+funcBody:
+        statementsBlock
+    ;
+
+funcCall:
+        VARIABLE LPAREN funcArgList? RPAREN
+    ;
+
+constructorCall:
+        TYPE LPAREN funcArgList? RPAREN
+    ;
+
+explicitVarDecList:
+        variableDefintion (COMMA variableDefintion)* COMMA?
+    ;
+
+variableDefintion:
+        VARIABLE COLON TYPE (EQUAL expr)?
+        VARIABLE (EQUAL expr)?
+    ;
+
+funcArg:
+        (VARIABLE EQUAL)? expr
+    ;
+
+funcArgList:
+        funcArg (COMMA funcArg)* COMMA?
+    ;
 
 statement:
-        explicitVarDec
-    |   implicitVarDec
+        variableDefintion
     |   ifStatement
     |   loopStatement
     |   controlFlowStatement

@@ -28,12 +28,12 @@ public:
     RuleImportStatement = 4, RuleImportPath = 5, RuleObjectDeclaration = 6, 
     RuleInterfaceDeclaration = 7, RuleObjectImplements = 8, RuleFuncSignature = 9, 
     RuleFuncImplementation = 10, RuleFuncBody = 11, RuleFuncCall = 12, RuleConstructorCall = 13, 
-    RuleExplicitVarDecList = 14, RuleExplicitVarDec = 15, RuleImplicitVarDec = 16, 
-    RuleFuncArg = 17, RuleFuncArgList = 18, RuleStatement = 19, RuleEnumDeclaration = 20, 
-    RuleEnumField = 21, RuleStatementsBlock = 22, RuleExprList = 23, RuleExpr = 24, 
-    RuleUnaryExpr = 25, RuleConstant = 26, RuleSelection = 27, RuleIfStatement = 28, 
-    RuleElseStatement = 29, RulePatternMatching = 30, RulePattern = 31, 
-    RuleLoopStatement = 32, RuleRange = 33, RuleControlFlowStatement = 34
+    RuleExplicitVarDecList = 14, RuleVariableDefintion = 15, RuleFuncArg = 16, 
+    RuleFuncArgList = 17, RuleStatement = 18, RuleEnumDeclaration = 19, 
+    RuleEnumField = 20, RuleStatementsBlock = 21, RuleExprList = 22, RuleExpr = 23, 
+    RuleUnaryExpr = 24, RuleConstant = 25, RuleSelection = 26, RuleIfStatement = 27, 
+    RuleElseStatement = 28, RulePatternMatching = 29, RulePattern = 30, 
+    RuleLoopStatement = 31, RuleRange = 32, RuleControlFlowStatement = 33
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -68,8 +68,7 @@ public:
   class FuncCallContext;
   class ConstructorCallContext;
   class ExplicitVarDecListContext;
-  class ExplicitVarDecContext;
-  class ImplicitVarDecContext;
+  class VariableDefintionContext;
   class FuncArgContext;
   class FuncArgListContext;
   class StatementContext;
@@ -108,8 +107,7 @@ public:
     MainFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *EOF();
-    ExplicitVarDecContext *explicitVarDec();
-    ImplicitVarDecContext *implicitVarDec();
+    VariableDefintionContext *variableDefintion();
     std::vector<FuncImplementationContext *> funcImplementation();
     FuncImplementationContext* funcImplementation(size_t i);
 
@@ -125,8 +123,8 @@ public:
     InterfaceDeclarationContext *interfaceDeclaration();
     antlr4::tree::TerminalNode *EOF();
     ObjectImplementsContext *objectImplements();
-    std::vector<ExplicitVarDecContext *> explicitVarDec();
-    ExplicitVarDecContext* explicitVarDec(size_t i);
+    std::vector<VariableDefintionContext *> variableDefintion();
+    VariableDefintionContext* variableDefintion(size_t i);
     std::vector<FuncSignatureContext *> funcSignature();
     FuncSignatureContext* funcSignature(size_t i);
     std::vector<FuncImplementationContext *> funcImplementation();
@@ -144,8 +142,8 @@ public:
     ObjectDeclarationContext *objectDeclaration();
     antlr4::tree::TerminalNode *EOF();
     ObjectImplementsContext *objectImplements();
-    std::vector<ExplicitVarDecContext *> explicitVarDec();
-    ExplicitVarDecContext* explicitVarDec(size_t i);
+    std::vector<VariableDefintionContext *> variableDefintion();
+    VariableDefintionContext* variableDefintion(size_t i);
     std::vector<FuncImplementationContext *> funcImplementation();
     FuncImplementationContext* funcImplementation(size_t i);
 
@@ -293,8 +291,8 @@ public:
   public:
     ExplicitVarDecListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<ExplicitVarDecContext *> explicitVarDec();
-    ExplicitVarDecContext* explicitVarDec(size_t i);
+    std::vector<VariableDefintionContext *> variableDefintion();
+    VariableDefintionContext* variableDefintion(size_t i);
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
@@ -303,34 +301,23 @@ public:
 
   ExplicitVarDecListContext* explicitVarDecList();
 
-  class  ExplicitVarDecContext : public antlr4::ParserRuleContext {
+  class  VariableDefintionContext : public antlr4::ParserRuleContext {
   public:
-    ExplicitVarDecContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    VariableDefintionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *VARIABLE();
+    std::vector<antlr4::tree::TerminalNode *> VARIABLE();
+    antlr4::tree::TerminalNode* VARIABLE(size_t i);
     antlr4::tree::TerminalNode *COLON();
     antlr4::tree::TerminalNode *TYPE();
-    antlr4::tree::TerminalNode *EQUAL();
-    ExprContext *expr();
-    EnumDeclarationContext *enumDeclaration();
+    std::vector<antlr4::tree::TerminalNode *> EQUAL();
+    antlr4::tree::TerminalNode* EQUAL(size_t i);
+    std::vector<ExprContext *> expr();
+    ExprContext* expr(size_t i);
 
    
   };
 
-  ExplicitVarDecContext* explicitVarDec();
-
-  class  ImplicitVarDecContext : public antlr4::ParserRuleContext {
-  public:
-    ImplicitVarDecContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *VARIABLE();
-    antlr4::tree::TerminalNode *EQUAL();
-    ExprContext *expr();
-
-   
-  };
-
-  ImplicitVarDecContext* implicitVarDec();
+  VariableDefintionContext* variableDefintion();
 
   class  FuncArgContext : public antlr4::ParserRuleContext {
   public:
@@ -363,8 +350,7 @@ public:
   public:
     StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    ExplicitVarDecContext *explicitVarDec();
-    ImplicitVarDecContext *implicitVarDec();
+    VariableDefintionContext *variableDefintion();
     IfStatementContext *ifStatement();
     LoopStatementContext *loopStatement();
     ControlFlowStatementContext *controlFlowStatement();

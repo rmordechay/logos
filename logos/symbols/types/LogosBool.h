@@ -11,8 +11,8 @@ public:
     LogosBool() = default;
     ~LogosBool() override = default;
 
-    Type* getLLVMType(IRBuilder<>& builder) const override {
-        return builder.getInt1Ty();
+    Type* getLLVMType(IRBuilder<>* builder) const override {
+        return builder->getInt1Ty();
     }
 };
 

@@ -18,8 +18,7 @@ public:
     void visitMainFile(const LogosFile* mainFile);
     void visitFuncImplementation(LogosParser::FuncImplementationContext* ctx);
     void visitStatement(LogosParser::StatementContext* ctx);
-    void visitExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
-    void visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
+    void visitImplicitVarDec(LogosParser::VariableDefintionContext* ctx);
     void visitFuncCall(LogosParser::FuncCallContext* ctx);
     void visitStatementList(const std::vector<LogosParser::StatementContext*>& statements);
     void visitIfStatement(LogosParser::IfStatementContext* ctx);

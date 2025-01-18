@@ -11,7 +11,7 @@
 #include "funcs/LogosPrint.h"
 #include "funcs/LogosUserFunc.h"
 #include "stmts/LogosIfStmt.h"
-#include "stmts/LogosVarDefinition.h"
+#include "stmts/LogosVarDec.h"
 
     void SemAnalyser::analyseProject(const LogosFile* mainFile) {
     visitMainFile(mainFile);
@@ -41,9 +41,11 @@ void SemAnalyser::visitFuncImplementation(LogosParser::FuncImplementationContext
         const auto params = funcSignature->explicitVarDecList()->explicitVarDec();
         for (const auto param : params) {
             const LogosType& argType = getType(param->TYPE()->getText());
-            logosUserFunc->params.push_back(&argType);
+            const auto logosVarDec = new LogosVarDec(param->VARIABLE()->getText());
+            logosUserFunc->params.push_back(logosVarDec);
         }
         stack.top()[funcName] = new LogosSymbol(logosUserFunc);
+        codeNodes.push_back(logosUserFunc);
     }
     const auto statements = ctx->funcBody()->statementsBlock()->statement();
     for (const auto statement : statements) {
@@ -74,17 +76,11 @@ void SemAnalyser::visitStatement(LogosParser::StatementContext* ctx) {
     }
 }
 
-void SemAnalyser::visitExplicitVarDec(LogosParser::ExplicitVarDecContext* const ctx) {
-    // const auto variableName = ctx->VARIABLE()->getText();
-    // const auto logosExpr = getExpr(ctx->expr());
-    // addSymbol(variableName, logosExpr);
-}
-
-void SemAnalyser::visitImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
-    const auto variableName = ctx->VARIABLE()->getText();
+void SemAnalyser::visitImplicitVarDec(LogosParser::VariableDefintionContext* ctx) {
+    const auto variableName = ctx->VARIABLE()->G;
     const auto logosExpr = getExpr(ctx->expr());
     addSymbol(variableName, logosExpr);
-    codeNodes.push_back(new LogosVarDefinition(variableName, logosExpr));
+    codeNodes.push_back(new LogosVarDec(variableName, logosExpr));
 }
 
 void SemAnalyser::visitFuncCall(LogosParser::FuncCallContext* ctx) {

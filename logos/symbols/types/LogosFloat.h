@@ -10,8 +10,8 @@ public:
     LogosFloat() = default;
     ~LogosFloat() override = default;
 
-    Type* getLLVMType(IRBuilder<>& builder) const override {
-        return builder.getFloatTy();
+    Type* getLLVMType(IRBuilder<>* builder) const override {
+        return builder->getFloatTy();
     }
 };
 
