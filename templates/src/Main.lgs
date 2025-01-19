@@ -4,5 +4,5 @@ import (
 
 main() {
     a = 2
-    obj = MyObject()
+    // obj = MyObject()
 }

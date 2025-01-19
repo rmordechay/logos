@@ -15,7 +15,7 @@ using namespace std;
 class CodeGenerator {
 public:
     void run(const LogosRootPackage* rootPackage);
-    Module* createEmptyModule(const string& name, const IRBuilder<>* builder);
+    Module* createEmptyModule(const string& name, const IRBuilder<>* builder) const;
     Module* generateMainModule(const LogosMainFile* mainFile);
     Module* generateObjModule(const LogosObjectFile* file);
     void declareFunctions(Module* module, stack<LogosStackFrame>* rootFrame, IRBuilder<>* builder);

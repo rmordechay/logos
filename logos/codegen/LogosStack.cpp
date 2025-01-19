@@ -11,7 +11,7 @@ void LogosStack::exitScope() {
     pop();
 }
 
-Value* LogosStack::getSymbol(const string& name) {
+LogosSymbol* LogosStack::getSymbol(const string& name) {
     return top().symbolTable[name];
 }
 
@@ -19,8 +19,8 @@ Function* LogosStack::getFunc(const string& name) {
     return top().functions[name];
 }
 
-void LogosStack::addSymbol(const string& name, Value* value) {
-    top().symbolTable[name] = value;
+void LogosStack::addSymbol(const string& name, LogosSymbol* symbol) {
+    top().symbolTable[name] = symbol;
 }
 
 void LogosStack::addFunc(const string& name, Function* value) {

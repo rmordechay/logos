@@ -16,7 +16,7 @@ Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame,
     auto arg = func->arg_begin();
     for (const auto param : params) {
         auto argName = param->name;
-        stackFrame->addSymbol(argName,  arg);
+        stackFrame->addSymbol(argName, new LogosSymbol(arg));
         arg++;
     }
 

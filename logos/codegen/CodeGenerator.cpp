@@ -65,27 +65,32 @@ Module* CodeGenerator::generateObjModule(const LogosObjectFile* file) {
     LLVMContext context;
     auto builder = IRBuilder(context);
 
-    LogosStack theStack;
-    theStack.push(LogosStackFrame());
+    LogosStack rootFrame;
+    rootFrame.push(LogosStackFrame());
 
     const auto objName = file->name;
     const auto module = createEmptyModule(objName, &builder);
 
-    vector<Type*> elements;
-    for (const auto variable : file->variables) {
-        elements.push_back(variable->type->getLLVMType(&builder));
+    vector<Type*> elementTypes;
+    for (int i = 0; i < file->fields.size(); ++i) {
+        const auto field = file->fields[i];
+        auto fieldType = field->type->getLLVMType(&builder);
+        elementTypes.push_back(fieldType);
+        rootFrame.addSymbol(field->name, new LogosSymbol(fieldType, i));
     }
 
-    auto a = StructType::create(context, elements);
+    const auto userStruct = StructType::create(context, elementTypes);
+    rootFrame.addSymbol(LOGOS_THIS, new LogosSymbol(userStruct));
+
     for (const auto func : file->funcs) {
-        func->getLLVMValue(&builder, &theStack, module);
+        func->getLLVMValue(&builder, &rootFrame, module);
     }
 
     emitLLVMFile("../codegen/" + objName + ".ll", module);
     return module;
 }
 
-Module* CodeGenerator::createEmptyModule(const string& name, const IRBuilder<>* builder) {
+Module* CodeGenerator::createEmptyModule(const string& name, const IRBuilder<>* builder) const {
     const auto module = new Module(name, builder->getContext());
     module->setDataLayout(targetMachine->createDataLayout());
     module->setTargetTriple(targetTriple);

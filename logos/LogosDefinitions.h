@@ -1,9 +1,10 @@
 #ifndef LOGOSCONFIGS_H
 #define LOGOSCONFIGS_H
 
-#define LOGOS_SOURCE_PACKAGE "root"
-#define LOGOS_MAIN_FILE "Main"
-#define LOGOS_MAIN_FUNCTION "main"
-#define LOGOS_EXTENSION ".lgs"
+const auto LOGOS_SOURCE_PACKAGE = "root";
+const auto LOGOS_MAIN_FILE = "Main";
+const auto LOGOS_MAIN_FUNCTION = "main";
+const auto LOGOS_EXTENSION = ".lgs";
+const auto LOGOS_THIS = "this";
 
 #endif //LOGOSCONFIGS_H

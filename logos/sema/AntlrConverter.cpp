@@ -39,7 +39,7 @@ LogosFile* AntlerConverter::getObjFile(LogosParser::ObjectFileContext* ctx) {
 
     for (const auto varDec : ctx->explicitVarDec()) {
         auto funcName = varDec->VARIABLE()->getText();
-        objFile->variables.push_back(getVarDec(varDec));
+        objFile->fields.push_back(getVarDec(varDec));
     }
 
     for (const auto func : ctx->funcImplementation()) {
