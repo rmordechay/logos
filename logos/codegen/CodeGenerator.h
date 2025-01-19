@@ -3,6 +3,7 @@
 #include "LogosRootPackage.h"
 #include "exprs/LogosExpr.h"
 #include "files/LogosMainFile.h"
+#include "files/LogosObjectFile.h"
 
 #include <map>
 #include <llvm/IR/IRBuilder.h>
@@ -14,18 +15,19 @@ using namespace std;
 class CodeGenerator {
 public:
     void run(const LogosRootPackage* rootPackage);
+    Module* createEmptyModule(const string& name, const IRBuilder<>* builder);
     Module* generateMainModule(const LogosMainFile* mainFile);
-    void declareFunctions(Module* module, stack<LogosStackFrame>* rootFrame);
+    Module* generateObjModule(const LogosObjectFile* file);
+    void declareFunctions(Module* module, stack<LogosStackFrame>* rootFrame, IRBuilder<>* builder);
     void runBinary();
     void initLLVM();
-    unique_ptr<Module> compileLLVMFile(const string& inputFile);
+    unique_ptr<Module> compileLLVMFile(const string& inputFile, LLVMContext* context);
     void linkModules(unique_ptr<Module> module);
-    void generateTest();
+    static void emitLLVMFile(const string& filePath, const Module* module);
+    static void generateTest();
     ~CodeGenerator() = default;
 
 private:
-    LLVMContext context;
-    IRBuilder<> builder = IRBuilder(context);
     vector<CodeGeneration*> codeNodes;
     std::string targetTriple;
     const Target* target = nullptr;

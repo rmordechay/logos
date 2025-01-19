@@ -18,7 +18,8 @@ LogosRootPackage* LogosProject::getRootPackage() {
                 const auto mainFile = getFile(dirEntry.path());
                 rootPackage->mainFile = static_cast<LogosMainFile*>(mainFile);
             } else {
-                rootPackage->package->files.push_back(getFile(dirPath));
+                auto file = getFile(dirPath);
+                rootPackage->package->files.push_back(file);
             }
         } else if (is_directory(dirEntry.status())) {
             rootPackage->package = getPackage(dirPath);
@@ -44,10 +45,7 @@ LogosPackage* LogosProject::getPackage(const filesystem::path& path) {
 LogosFile* LogosProject::getFile(const filesystem::path& dirPath) {
     const auto codeText = getCodeText(dirPath);
     const auto fileCtx = parseFile(codeText);
-    if (const auto mainFileCtx = fileCtx->mainFile()) {
-        return antlerConverter->getMainFile(mainFileCtx);
-    }
-    return nullptr;
+    return antlerConverter->getLogosFile(fileCtx);
 }
 
 LogosParser::LogosFileContext* LogosProject::parseFile(string codeText) {

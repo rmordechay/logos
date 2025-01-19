@@ -5,5 +5,5 @@ Value* LogosVariableExpr::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFr
     if (auto const allocaInst = dyn_cast<AllocaInst>(symbol)) {
         return builder->CreateLoad(allocaInst->getAllocatedType(), allocaInst);
     }
-    return symbol;
+    return nullptr;
 }

@@ -20,12 +20,14 @@
 
 class AntlerConverter {
 public:
+    LogosFile* getLogosFile(LogosParser::LogosFileContext* ctx);
     LogosFile* getMainFile(LogosParser::MainFileContext* ctx);
+    LogosFile* getObjFile(LogosParser::ObjectFileContext* ctx);
     LogosFunc* getFunc(LogosParser::FuncImplementationContext* ctx);
     LogosStmt* getStmt(LogosParser::StatementContext* ctx);
     vector<LogosStmt*> getStmtList(LogosParser::StatementsBlockContext* ctx);
-    LogosVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
-    LogosVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
+    LogosVarDec* getVarDec(LogosParser::ExplicitVarDecContext* ctx);
+    LogosVarDec* getVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LogosIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
 
     LogosExpr* getExpr(LogosParser::ExprContext* ctx);

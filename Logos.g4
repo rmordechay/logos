@@ -8,13 +8,14 @@ mainFile:
         funcImplementation+ EOF
     ;
 
+objectFile:
+        objectDeclaration objectImplements? explicitVarDec* funcImplementation* EOF
+    ;
+
 interfaceFile:
         interfaceDeclaration objectImplements? explicitVarDec* funcSignature+ funcImplementation* EOF
     ;
 
-objectFile:
-        objectDeclaration objectImplements? explicitVarDec* funcImplementation* EOF
-    ;
 
 importStatement:
         IMPORT LPAREN importPath* RPAREN

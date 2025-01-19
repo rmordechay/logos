@@ -8,7 +8,16 @@ class LogosMainFile final : public LogosFile {
 public:
     LogosUserFunc* mainFunc = nullptr;
     std::vector<LogosFunc*> funcs;
-    ~LogosMainFile() override;
+
+    explicit LogosMainFile() : LogosFile(LOGOS_MAIN_FILE) {}
+
+    ~LogosMainFile() override {
+        delete mainFunc;
+        for (const auto func : funcs) {
+            delete func;
+        }
+
+    }
 };
 
 

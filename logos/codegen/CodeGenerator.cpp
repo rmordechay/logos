@@ -1,6 +1,7 @@
 #include "CodeGenerator.h"
 
 #include "LogosRootPackage.h"
+#include "files/LogosObjectFile.h"
 
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
@@ -21,7 +22,6 @@
 #include <iostream>
 #include <llvm/Linker/Linker.h>
 
-const auto PROGRAM_IR_FILE = "../codegen/output.ll";
 const auto PRINT_IR_FILE = "../codegen/print.ll";
 const auto LINKED_OBJECT_FILE = "../output.o";
 const auto LINKED_IR_FILE = "../output.ll";
@@ -29,42 +29,79 @@ constexpr auto LLVM_OBJECT_FILE = CodeGenFileType::ObjectFile;
 
 void CodeGenerator::run(const LogosRootPackage* rootPackage) {
     initLLVM();
+    for (const auto file : rootPackage->package->files) {
+        if (const auto objFile = static_cast<LogosObjectFile*>(file)) {
+            generateObjModule(objFile);
+        }
+    }
+
     const auto logosMainFile = rootPackage->mainFile;
     const auto mainModule = generateMainModule(logosMainFile);
-    linkModules(unique_ptr<Module>(mainModule));
-    runBinary();
+    // linkModules(unique_ptr<Module>(mainModule));
+    // runBinary();
     // generateTest();
 }
 
 Module* CodeGenerator::generateMainModule(const LogosMainFile* mainFile) {
+    LLVMContext context;
+    auto builder = IRBuilder(context);
     LogosStack theStack;
     theStack.push(LogosStackFrame());
-    const auto module = new Module(LOGOS_MAIN_FUNCTION, context);
-    module->setDataLayout(targetMachine->createDataLayout());
-    module->setTargetTriple(targetTriple);
-    declareFunctions(module, &theStack);
+    const auto module = createEmptyModule(LOGOS_MAIN_FILE, &builder);
+    declareFunctions(module, &theStack, &builder);
 
     for (const auto func : mainFile->funcs) {
         func->getLLVMValue(&builder, &theStack, module);
     }
+
     mainFile->mainFunc->getLLVMValue(&builder, &theStack, module);
     builder.CreateRet(builder.getInt32(1));
 
-    std::error_code EC;
-    raw_fd_ostream textFile(PROGRAM_IR_FILE, EC, sys::fs::OF_None);
-    module->print(textFile, nullptr);
-    module->print(outs(), nullptr);
-
+    emitLLVMFile("../codegen/Main.ll", module);
     return module;
 }
 
-void CodeGenerator::declareFunctions(Module* module, stack<LogosStackFrame>* rootFrame) {
-    const auto printfType = FunctionType::get(builder.getVoidTy(), builder.getInt32Ty(), false);
-    rootFrame->top().functions["print"] = Function::Create(printfType, Function::ExternalLinkage, "printInt", module);
+Module* CodeGenerator::generateObjModule(const LogosObjectFile* file) {
+    LLVMContext context;
+    auto builder = IRBuilder(context);
+
+    LogosStack theStack;
+    theStack.push(LogosStackFrame());
+
+    const auto objName = file->name;
+    const auto module = createEmptyModule(objName, &builder);
+
+    vector<Type*> elements;
+    for (const auto variable : file->variables) {
+        elements.push_back(variable->type->getLLVMType(&builder));
+    }
+
+    auto a = StructType::create(context, elements);
+    for (const auto func : file->funcs) {
+        func->getLLVMValue(&builder, &theStack, module);
+    }
+
+    emitLLVMFile("../codegen/" + objName + ".ll", module);
+    return module;
+}
+
+Module* CodeGenerator::createEmptyModule(const string& name, const IRBuilder<>* builder) {
+    const auto module = new Module(name, builder->getContext());
+    module->setDataLayout(targetMachine->createDataLayout());
+    module->setTargetTriple(targetTriple);
+    return module;
+}
+
+void CodeGenerator::emitLLVMFile(const string& filePath, const Module* const module) {
+    std::error_code EC;
+    raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
+    module->print(textFile, nullptr);
+    module->print(outs(), nullptr);
 }
 
 void CodeGenerator::linkModules(unique_ptr<Module> module) {
-    const auto compositeModule = compileLLVMFile(PRINT_IR_FILE);
+    LLVMContext context;
+    const auto compositeModule = compileLLVMFile(PRINT_IR_FILE, &context);
     Linker linker(*compositeModule);
     linker.linkInModule(std::move(module));
     if (verifyModule(*compositeModule, &errs())) return;
@@ -75,11 +112,16 @@ void CodeGenerator::linkModules(unique_ptr<Module> module) {
     emitPass.run(*compositeModule);
 }
 
-unique_ptr<Module> CodeGenerator::compileLLVMFile(const string& inputFile) {
+void CodeGenerator::declareFunctions(Module* module, stack<LogosStackFrame>* rootFrame, IRBuilder<>* builder) {
+    const auto printfType = FunctionType::get(builder->getVoidTy(), builder->getInt32Ty(), false);
+    rootFrame->top().functions["print"] = Function::Create(printfType, Function::ExternalLinkage, "printInt", module);
+}
+
+unique_ptr<Module> CodeGenerator::compileLLVMFile(const string& inputFile, LLVMContext *context) {
     const std::string errorMsg;
     auto buffer = MemoryBuffer::getFile(inputFile, errorMsg.data());
     SMDiagnostic err;
-    auto module = parseIR(**buffer, err, context);
+    auto module = parseIR(**buffer, err, *context);
     module->setDataLayout(targetMachine->createDataLayout());
     module->setTargetTriple(targetTriple);
     return module;
@@ -105,6 +147,8 @@ void CodeGenerator::runBinary() {
 }
 
 void CodeGenerator::generateTest() {
+    LLVMContext context;
+    auto builder = IRBuilder(context);
     const std::vector<Type *> elements = {
         Type::getInt32Ty(context), Type::getFloatTy(context)
     };

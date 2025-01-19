@@ -1,6 +1,18 @@
 #include "AntlrConverter.h"
 
-LogosFile *AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
+#include "files/LogosObjectFile.h"
+
+LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx) {
+    if (const auto mainFileCtx = ctx->mainFile()) {
+    return getMainFile(mainFileCtx);
+    }
+    if (const auto objFileCtx = ctx->objectFile()) {
+        return getObjFile(objFileCtx);
+    }
+    return nullptr;
+}
+
+LogosFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     const auto funcImplementations = ctx->funcImplementation();
     const auto mainFile = new LogosMainFile();
 
@@ -19,6 +31,23 @@ LogosFile *AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     }
 
     return mainFile;
+}
+
+LogosFile* AntlerConverter::getObjFile(LogosParser::ObjectFileContext* ctx) {
+    const auto objName = ctx->objectDeclaration()->TYPE()->getText();
+    const auto objFile = new LogosObjectFile(objName);
+
+    for (const auto varDec : ctx->explicitVarDec()) {
+        auto funcName = varDec->VARIABLE()->getText();
+        objFile->variables.push_back(getVarDec(varDec));
+    }
+
+    for (const auto func : ctx->funcImplementation()) {
+        auto funcName = func->funcSignature()->VARIABLE()->getText();
+        objFile->funcs.push_back(getFunc(func));
+    }
+
+    return objFile;
 }
 
 LogosFunc *AntlerConverter::getFunc(LogosParser::FuncImplementationContext* ctx) {
@@ -50,10 +79,10 @@ vector<LogosStmt*> AntlerConverter::getStmtList(LogosParser::StatementsBlockCont
 
 LogosStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto implicitVarDec = ctx->implicitVarDec()) {
-        return getImplicitVarDec(implicitVarDec);
+        return getVarDec(implicitVarDec);
     }
     if (const auto explicitVarDec = ctx->explicitVarDec()) {
-        return getExplicitVarDec(explicitVarDec);
+        return getVarDec(explicitVarDec);
     }
     if (const auto funcCall = ctx->funcCall()) {
         return getFuncCallExpr(funcCall);
@@ -67,13 +96,13 @@ LogosStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     return nullptr;
 }
 
-LogosVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
+LogosVarDec* AntlerConverter::getVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto logosExpr = getExpr(ctx->expr());
     return new LogosVarDec(variableName, logosExpr);
 }
 
-LogosVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) {
+LogosVarDec* AntlerConverter::getVarDec(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto logosExpr = getExpr(ctx->expr());
     return new LogosVarDec(variableName, logosExpr);

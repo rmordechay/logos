@@ -9,6 +9,8 @@ using namespace std;
 class LogosFile {
 public:
     string name;
+
+    explicit LogosFile(const string& name) : name(name) {}
     virtual ~LogosFile() = default;
 };
 

@@ -3,7 +3,7 @@
 
 Value* LogosVarDec::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
     const auto value = expr->getLLVMValue(builder, stackFrame, module);
-    const auto allocaInst = builder->CreateAlloca(value->getType(), nullptr, name);
+    const auto allocaInst = builder->CreateAlloca(value->getType(), nullptr);
     builder->CreateStore(value, allocaInst);
     stackFrame->addSymbol(name, allocaInst);
     return allocaInst;
