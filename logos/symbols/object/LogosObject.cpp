@@ -1,0 +1,1 @@
+#include "LogosObject.h"

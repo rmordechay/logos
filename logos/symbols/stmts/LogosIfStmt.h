@@ -7,11 +7,11 @@
 class LogosIfStmt final : public LogosStmt {
 public:
     LogosExpr *cond;
-    vector<LogosStmt*> stmt;
+    vector<LogosStmt*> stmts;
 
-    explicit LogosIfStmt(LogosExpr* cond, const vector<LogosStmt*>& stmt) : cond(cond), stmt(stmt) {}
+    explicit LogosIfStmt(LogosExpr* cond, const vector<LogosStmt*>& stmt) : cond(cond), stmts(stmt) {}
     Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) override;
-    ~LogosIfStmt() override = default;
+    ~LogosIfStmt() override;
 };
 
 

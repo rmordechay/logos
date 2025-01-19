@@ -5,12 +5,11 @@
 
 class LogosReturnStmt final : public LogosStmt {
 public:
-
-    LogosExpr *expr;
+    LogosExpr *expr = nullptr;
 
     Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) override;
     explicit LogosReturnStmt(LogosExpr* expr) : expr(expr) {}
-    ~LogosReturnStmt() override = default;
+    ~LogosReturnStmt() override;
 };
 
 

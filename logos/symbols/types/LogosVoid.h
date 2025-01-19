@@ -6,13 +6,11 @@
 class LogosVoid final : public LogosType {
 public:
     static constexpr auto name = "Void";
-
     LogosVoid() = default;
-    ~LogosVoid() override = default;
-
     Type* getLLVMType(IRBuilder<>* builder) const override {
         return builder->getVoidTy();
     }
+    ~LogosVoid() override = default;
 };
 
 inline const LogosType& LOGOS_VOID = LogosVoid();

@@ -8,13 +8,10 @@
 class LogosString final : public LogosType {
 public:
     static constexpr auto name = "Str";
-
-    LogosString();
-    ~LogosString() override = default;
-
     Type* getLLVMType(IRBuilder<>* builder) const override {
         return nullptr;
     }
+    ~LogosString() override = default;
 };
 
 #endif //LOGOSSTRING_H

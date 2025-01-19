@@ -7,13 +7,10 @@ class LogosBool final : public LogosType {
 public:
     static constexpr auto name = "Bool";
     static constexpr auto trueLiteral = "true";
-
-    LogosBool() = default;
-    ~LogosBool() override = default;
-
     Type* getLLVMType(IRBuilder<>* builder) const override {
         return builder->getInt1Ty();
     }
+    ~LogosBool() override = default;
 };
 
 #endif //LOGOSBOOL_H

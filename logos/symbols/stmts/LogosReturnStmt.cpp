@@ -4,3 +4,7 @@ Value* LogosReturnStmt::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFram
     const auto exprLLVM = expr->getLLVMValue(builder, stackFrame, module);
     return builder->CreateRet(exprLLVM);
 }
+
+LogosReturnStmt::~LogosReturnStmt() {
+    delete expr;
+}

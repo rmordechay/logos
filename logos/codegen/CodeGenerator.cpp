@@ -105,17 +105,11 @@ void CodeGenerator::runBinary() {
 }
 
 void CodeGenerator::generateTest() {
-    const auto funcType = FunctionType::get(builder.getInt32Ty(), {builder.getInt32Ty(), builder.getInt32Ty()}, false);
-    const auto module = new Module(LOGOS_MAIN_FUNCTION, context);
-    const auto func = Function::Create(funcType, Function::ExternalLinkage, "name", module);
-
-    auto args = func->arg_begin();
-    args++->setName("arg1");
-    args->setName("args2");
-    const auto funcEntry = BasicBlock::Create(builder.getContext(), "entry", func);
-    builder.SetInsertPoint(funcEntry);
-    builder.CreateAlloca(builder.getInt32Ty(), nullptr);
-    builder.CreateRetVoid();
-    module->print(outs(), nullptr);
+    const std::vector<Type *> elements = {
+        Type::getInt32Ty(context), Type::getFloatTy(context)
+    };
+    StructType *myStructType = StructType::create(context, elements, "MyStruct");
+    AllocaInst *structInstance = builder.CreateAlloca(myStructType, nullptr, "myStructInstance");
+    Value *fieldAPtr = builder.CreateStructGEP(myStructType, structInstance, 0, "a_ptr");
 
 }

@@ -1,33 +1,8 @@
 object: MyObject
-implements: MyInterface
 
-a: Int
-var2: Int = 2
-var3: Int
-var4: Int = 3
+x: Int = 2
+y: Int = 4
 
-f(param1: String, param2: Float): Int {
-    a: Int = 6
-    b = 4
-    c = a + b
-    if a {
-        b = 4
-        c = a + b
-    } else b {
-        c = a + b
-    } else {
-        print()
-    }
-
-    if {
-        x: {}
-        x: {}
-        else: {}
-    }
-
-    if notBool {
-        notBool1: {}
-        notBool2: {}
-        else: {}
-    }
+add(): Int {
+    return x + y
 }

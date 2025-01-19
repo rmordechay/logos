@@ -8,10 +8,17 @@ Value* LogosIfStmt::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, M
 
     builder->CreateCondBr(condLLVM, ifStartBlock, ifEndBlock);
     builder->SetInsertPoint(ifStartBlock);
-    for (const auto& codeNode : stmt) {
+    for (const auto& codeNode : stmts) {
         codeNode->getLLVMValue(builder, stackFrame, module);
     }
     builder->CreateBr(ifEndBlock);
     builder->SetInsertPoint(ifEndBlock);
     return nullptr;
+}
+
+LogosIfStmt::~LogosIfStmt() {
+    delete cond;
+    for (const auto stmt : stmts) {
+        delete stmt;
+    }
 }

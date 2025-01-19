@@ -66,6 +66,11 @@ add_executable(logos
     logos/sema/SemaAnalyser.h
     logos/codegen/LogosStack.cpp
     logos/codegen/LogosStack.h
+    logos/symbols/exprs/LogosConstructorExpr.cpp
+    logos/symbols/exprs/LogosConstructorExpr.h
+    logos/symbols/object/LogosObject.cpp
+    logos/symbols/object/LogosObject.h
+    logos/symbols/types/LogosUserType.h
 )
 
 target_include_directories(logos PRIVATE
