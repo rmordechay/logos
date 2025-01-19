@@ -9,7 +9,7 @@
 using namespace std;
 using namespace llvm;
 
-class RuntimeStackFrame {
+class LogosStackFrame {
 public:
     Function *currentFunction;
     map<string, Value*> symbolTable;

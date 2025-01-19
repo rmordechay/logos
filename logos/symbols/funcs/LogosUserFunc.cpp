@@ -2,7 +2,7 @@
 
 #include "LogosSymbol.h"
 
-Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) {
+Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) {
     std::vector<Type*> llvmParams;
     for (const auto param : params) {
         llvmParams.push_back(param->type->getLLVMType(builder));
@@ -12,11 +12,11 @@ Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stac
     auto arg = func->arg_begin();
     for (const auto param : params) {
         auto argName = param->name;
-        stackFrame->symbolTable[argName] = arg;
+        stackFrame->top().symbolTable[argName] = arg;
         arg++;
     }
-    stackFrame->currentFunction = func;
-    stackFrame->functions[name] = func;
+    stackFrame->top().currentFunction = func;
+    stackFrame->top().functions[name] = func;
 
     const auto funcEntry = BasicBlock::Create(builder->getContext(), "entry", func);
     builder->SetInsertPoint(funcEntry);

@@ -9,7 +9,7 @@ using namespace std;
 
 class CodeGeneration {
 public:
-    virtual Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) = 0;
+    virtual Value* getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stack, Module* module) = 0;
     virtual ~CodeGeneration() = default;
 };
 

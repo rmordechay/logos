@@ -15,7 +15,7 @@ public:
     explicit LogosFuncCallExpr(const LogosType* type, const vector<LogosExpr*>& args) :
         LogosUnaryExpr(type), args(args) {}
 
-    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
+    Value* getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) override;
     ~LogosFuncCallExpr() override;
 };
 

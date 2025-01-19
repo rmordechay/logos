@@ -14,7 +14,7 @@ public:
     explicit LogosBinaryExpr(const LogosType* type, LogosExpr* left, LogosExpr* right, const LogosOperator op)
         : LogosExpr(type), left(left), right(right), op(op) {}
 
-    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
+    Value* getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) override;
     ~LogosBinaryExpr() override = default;
 };
 

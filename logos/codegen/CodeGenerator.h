@@ -15,7 +15,7 @@ class CodeGenerator {
 public:
     void run(const LogosRootPackage* rootPackage);
     Module* generateMainModule(const LogosMainFile* mainFile);
-    void declareFunctions(Module* module, RuntimeStackFrame* rootFrame);
+    void declareFunctions(Module* module, stack<LogosStackFrame>* rootFrame);
     void runBinary();
     void initLLVM();
     unique_ptr<Module> compileLLVMFile(const string& inputFile);

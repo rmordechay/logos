@@ -3,8 +3,8 @@
 #include <iostream>
 #include <ostream>
 
-Value* LogosFuncCallExpr::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) {
-    const auto funcSymbol = stackFrame->functions[name];
+Value* LogosFuncCallExpr::getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) {
+    const auto funcSymbol = stackFrame->top().functions[name];
     std::vector<Value*> llvmArgs;
     for (const auto arg : args) {
         llvmArgs.push_back(arg->getLLVMValue(builder, stackFrame, module));

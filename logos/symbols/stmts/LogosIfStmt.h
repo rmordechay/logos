@@ -9,7 +9,7 @@ public:
     vector<LogosStmt*> stmt;
 
     explicit LogosIfStmt(LogosExpr* cond, const vector<LogosStmt*>& stmt) : cond(cond), stmt(stmt) {}
-    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
+    Value* getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) override;
     ~LogosIfStmt() override = default;
 };
 

@@ -11,7 +11,7 @@ public:
 
     explicit LogosVarDec(const string& name, LogosExpr* expr) : name(name), type(nullptr), expr(expr) {}
     explicit LogosVarDec(const string& name, const LogosType* type) : name(name), type(type), expr(nullptr) {}
-    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
+    Value* getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) override;
     ~LogosVarDec() override;
 };
 

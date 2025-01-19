@@ -37,7 +37,8 @@ void CodeGenerator::run(const LogosRootPackage* rootPackage) {
 }
 
 Module* CodeGenerator::generateMainModule(const LogosMainFile* mainFile) {
-    RuntimeStackFrame rootFrame;
+    stack<LogosStackFrame> rootFrame;
+    rootFrame.push(LogosStackFrame());
     const auto module = new Module(LOGOS_MAIN_FUNCTION, context);
     module->setDataLayout(targetMachine->createDataLayout());
     module->setTargetTriple(targetTriple);
@@ -57,9 +58,9 @@ Module* CodeGenerator::generateMainModule(const LogosMainFile* mainFile) {
     return module;
 }
 
-void CodeGenerator::declareFunctions(Module* module, RuntimeStackFrame* rootFrame) {
+void CodeGenerator::declareFunctions(Module* module, stack<LogosStackFrame>* rootFrame) {
     const auto printfType = FunctionType::get(builder.getVoidTy(), builder.getInt32Ty(), false);
-    rootFrame->functions["print"] = Function::Create(printfType, Function::ExternalLinkage, "printInt", module);
+    rootFrame->top().functions["print"] = Function::Create(printfType, Function::ExternalLinkage, "printInt", module);
 }
 
 void CodeGenerator::linkModules(unique_ptr<Module> module) {

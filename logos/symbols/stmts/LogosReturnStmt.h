@@ -8,7 +8,7 @@ public:
 
     LogosExpr *expr;
 
-    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
+    Value* getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) override;
     explicit LogosReturnStmt(LogosExpr* expr) : expr(expr) {}
     ~LogosReturnStmt() override = default;
 };

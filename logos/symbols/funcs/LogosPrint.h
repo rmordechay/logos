@@ -9,7 +9,7 @@ public:
     static constexpr auto name = "print";
 
     LogosPrint() : LogosFunc(name, &LOGOS_INT) {}
-    Value* getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stackFrame, Module* module) override;
+    Value* getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) override;
     ~LogosPrint() override = default;
 };
 
