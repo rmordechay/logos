@@ -3,7 +3,7 @@
 #include "LogosBinaryExpr.h"
 #include "LogosUnaryExpr.h"
 
-Value* LogosExpr::getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) {
+Value* LogosExpr::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
     if (const auto unary = dynamic_cast<LogosUnaryExpr*>(this)) {
         return unary->getLLVMValue(builder, stackFrame, module);
     }

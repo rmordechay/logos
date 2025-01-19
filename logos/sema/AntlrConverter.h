@@ -4,7 +4,6 @@
 #include "LogosRootPackage.h"
 #include "LogosPackage.h"
 #include "LogosParser.h"
-#include "LogosSymbol.h"
 #include "exprs/LogosConstantExpr.h"
 #include "exprs/LogosFuncCallExpr.h"
 #include "files/LogosMainFile.h"

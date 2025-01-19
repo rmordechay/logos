@@ -1,6 +1,7 @@
 #ifndef LOGOSFUNCCALLEXPR_H
 #define LOGOSFUNCCALLEXPR_H
-#include "StackFrame.h"
+#include "LogosStack.h"
+#include "LogosStackFrame.h"
 #include "funcs/LogosFunc.h"
 #include "exprs/LogosExpr.h"
 #include "exprs/LogosUnaryExpr.h"
@@ -15,7 +16,7 @@ public:
     explicit LogosFuncCallExpr(const LogosType* type, const vector<LogosExpr*>& args) :
         LogosUnaryExpr(type), args(args) {}
 
-    Value* getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) override;
+    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) override;
     ~LogosFuncCallExpr() override;
 };
 

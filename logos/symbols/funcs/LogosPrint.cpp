@@ -1,5 +1,5 @@
 #include "LogosPrint.h"
 
-Value* LogosPrint::getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) {
+Value* LogosPrint::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
     return nullptr;
 }

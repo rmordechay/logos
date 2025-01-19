@@ -1,10 +1,11 @@
 #include "LogosVarDec.h"
+#include "LogosStack.h"
 
-Value* LogosVarDec::getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) {
+Value* LogosVarDec::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
     const auto value = expr->getLLVMValue(builder, stackFrame, module);
     const auto allocaInst = builder->CreateAlloca(value->getType());
     builder->CreateStore(value, allocaInst);
-    stackFrame->top().symbolTable[name] = allocaInst;
+    stackFrame->addSymbol(name, allocaInst);
     return allocaInst;
 }
 

@@ -37,17 +37,17 @@ void CodeGenerator::run(const LogosRootPackage* rootPackage) {
 }
 
 Module* CodeGenerator::generateMainModule(const LogosMainFile* mainFile) {
-    stack<LogosStackFrame> rootFrame;
-    rootFrame.push(LogosStackFrame());
+    LogosStack theStack;
+    theStack.push(LogosStackFrame());
     const auto module = new Module(LOGOS_MAIN_FUNCTION, context);
     module->setDataLayout(targetMachine->createDataLayout());
     module->setTargetTriple(targetTriple);
-    declareFunctions(module, &rootFrame);
+    declareFunctions(module, &theStack);
 
     for (const auto func : mainFile->funcs) {
-        func->getLLVMValue(&builder, &rootFrame, module);
+        func->getLLVMValue(&builder, &theStack, module);
     }
-    mainFile->mainFunc->getLLVMValue(&builder, &rootFrame, module);
+    mainFile->mainFunc->getLLVMValue(&builder, &theStack, module);
     builder.CreateRet(builder.getInt32(1));
 
     std::error_code EC;

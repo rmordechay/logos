@@ -1,6 +1,6 @@
 #include "LogosBinaryExpr.h"
 
-Value* LogosBinaryExpr::getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) {
+Value* LogosBinaryExpr::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
     const auto l = left->getLLVMValue(builder, stackFrame, module);
     const auto r = right->getLLVMValue(builder, stackFrame, module);
     if (op == PLUS) {

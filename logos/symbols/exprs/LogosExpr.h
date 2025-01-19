@@ -1,14 +1,15 @@
 #ifndef LOGOSEXPR_H
 #define LOGOSEXPR_H
 #include "CodeGeneration.h"
-#include "StackFrame.h"
+#include "LogosStack.h"
+#include "LogosStackFrame.h"
 
 class LogosExpr: public CodeGeneration {
 public:
     const LogosType* type = nullptr;
 
     explicit LogosExpr(const LogosType* type) : type(type) {}
-    Value* getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) override;
+    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) override;
     ~LogosExpr() override = default;
 };
 

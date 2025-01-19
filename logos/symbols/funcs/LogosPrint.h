@@ -1,7 +1,7 @@
 #ifndef LOGOSPRINT_H
 #define LOGOSPRINT_H
 #include "LogosFunc.h"
-#include "StackFrame.h"
+#include "LogosStackFrame.h"
 #include "types/LogosInt.h"
 
 class LogosPrint final : public LogosFunc {
@@ -9,7 +9,7 @@ public:
     static constexpr auto name = "print";
 
     LogosPrint() : LogosFunc(name, &LOGOS_INT) {}
-    Value* getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) override;
+    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) override;
     ~LogosPrint() override = default;
 };
 

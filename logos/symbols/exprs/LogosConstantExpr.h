@@ -1,7 +1,8 @@
 #ifndef LOGOSCONSTANTEXPR_H
 #define LOGOSCONSTANTEXPR_H
+#include "LogosStack.h"
 #include "LogosUnaryExpr.h"
-#include "StackFrame.h"
+#include "LogosStackFrame.h"
 #include "types/LogosType.h"
 #include "types/LogosString.h"
 
@@ -17,7 +18,7 @@ public:
         static_assert(is_same_v<T, bool> || is_same_v<T, int> || is_same_v<T, float> || is_same_v<T, string>);
     }
 
-    Value* getLLVMValue(IRBuilder<>* builder, stack<LogosStackFrame>* stackFrame, Module* module) override;
+    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) override;
     ~LogosConstantExpr() override = default;
 };
 

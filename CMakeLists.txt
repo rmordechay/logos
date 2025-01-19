@@ -26,7 +26,6 @@ add_executable(logos
     logos/sema/LogosErrors.h
     logos/sema/AntlrConverter.cpp
     logos/sema/AntlrConverter.h
-    logos/symbols/LogosSymbol.h
     logos/symbols/types/LogosType.h
     logos/symbols/types/LogosBool.h
     logos/symbols/types/LogosFloat.h
@@ -39,7 +38,7 @@ add_executable(logos
     logos/symbols/funcs/LogosFunc.h
     logos/symbols/exprs/LogosUnaryExpr.h
     logos/symbols/exprs/LogosBinaryExpr.h
-    logos/codegen/StackFrame.h
+    logos/codegen/LogosStackFrame.h
     logos/symbols/CodeGeneration.h
     logos/symbols/funcs/LogosPrint.cpp
     logos/symbols/funcs/LogosPrint.h
@@ -65,6 +64,8 @@ add_executable(logos
     logos/symbols/stmts/LogosReturnStmt.h
     logos/sema/SemaAnalyser.cpp
     logos/sema/SemaAnalyser.h
+    logos/codegen/LogosStack.cpp
+    logos/codegen/LogosStack.h
 )
 
 target_include_directories(logos PRIVATE
