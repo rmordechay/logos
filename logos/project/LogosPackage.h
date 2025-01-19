@@ -15,7 +15,7 @@ public:
     vector<LogosFile*> files;
     vector<LogosPackage*> packages;
 
-    explicit LogosPackage(const string& name, const string& path);
+    LogosPackage(const string& name, const string& path) : name(name), path(filesystem::absolute(path).string()) {}
     ~LogosPackage();
 };
 

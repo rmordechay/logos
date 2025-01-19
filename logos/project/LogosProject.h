@@ -3,6 +3,8 @@
 #include "CodeGenerator.h"
 #include "AntlrConverter.h"
 #include "LogosLexer.h"
+#include "SemaAnalyser.h"
+
 #include <string>
 
 using namespace std;
@@ -12,6 +14,7 @@ public:
     string rootPath;
     CodeGenerator* codeGenerator;
     AntlerConverter* antlerConverter;
+    SemaAnalyser* semaAnalyser;
 
     unique_ptr<antlr4::ANTLRInputStream> input;
     unique_ptr<LogosLexer> lexer;
@@ -21,7 +24,8 @@ public:
     explicit LogosProject(const string& rootPath) :
         rootPath(rootPath),
         codeGenerator(new CodeGenerator()),
-        antlerConverter(new AntlerConverter()) {
+        antlerConverter(new AntlerConverter()),
+        semaAnalyser(new SemaAnalyser()) {
     }
 
     void runLogos();

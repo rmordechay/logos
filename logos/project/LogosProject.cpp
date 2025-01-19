@@ -2,6 +2,9 @@
 
 void LogosProject::runLogos() {
     const auto rootPackage = getRootPackage();
+    if (!semaAnalyser->analyseCode(rootPackage)) {
+        return;
+    }
     codeGenerator->run(rootPackage);
     delete rootPackage;
 }
@@ -12,13 +15,13 @@ LogosRootPackage* LogosProject::getRootPackage() {
         auto dirPath = dirEntry.path();
         if (isLogosFile(dirEntry)) {
             if (isMainFile(dirEntry)) {
-                rootPackage->mainFile = static_cast<LogosMainFile*>(getFile(dirEntry.path()));
+                const auto mainFile = getFile(dirEntry.path());
+                rootPackage->mainFile = static_cast<LogosMainFile*>(mainFile);
             } else {
-                rootPackage->files.push_back(getFile(dirPath));
+                rootPackage->package->files.push_back(getFile(dirPath));
             }
         } else if (is_directory(dirEntry.status())) {
-            auto package = getPackage(dirPath);
-            rootPackage->packages.push_back(package);
+            rootPackage->package = getPackage(dirPath);
         }
     }
     return rootPackage;
@@ -65,4 +68,5 @@ string LogosProject::getCodeText(const filesystem::path& path) {
 LogosProject::~LogosProject() {
     delete antlerConverter;
     delete codeGenerator;
+    delete semaAnalyser;
 }

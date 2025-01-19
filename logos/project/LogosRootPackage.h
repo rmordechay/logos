@@ -9,8 +9,7 @@ using namespace std;
 class LogosRootPackage {
 public:
     string path;
-    vector<LogosFile*> files;
-    vector<LogosPackage*> packages;
+    LogosPackage* package = nullptr;
     LogosMainFile* mainFile = nullptr;
 
     explicit LogosRootPackage(const string& path) : path(path) {}

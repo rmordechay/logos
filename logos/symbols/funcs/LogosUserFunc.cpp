@@ -15,14 +15,14 @@ Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, RuntimeStackFrame* stac
         stackFrame->symbolTable[argName] = arg;
         arg++;
     }
+    stackFrame->currentFunction = func;
+    stackFrame->functions[name] = func;
+
     const auto funcEntry = BasicBlock::Create(builder->getContext(), "entry", func);
     builder->SetInsertPoint(funcEntry);
 
     for (const auto stmt : stmts) {
         stmt->getLLVMValue(builder, stackFrame, module);
     }
-
-    stackFrame->currentFunction = func;
-    stackFrame->functions[name] = func;
     return func;
 }

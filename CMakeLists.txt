@@ -63,6 +63,8 @@ add_executable(logos
     logos/symbols/files/LogosMainFile.h
     logos/symbols/stmts/LogosReturnStmt.cpp
     logos/symbols/stmts/LogosReturnStmt.h
+    logos/sema/SemaAnalyser.cpp
+    logos/sema/SemaAnalyser.h
 )
 
 target_include_directories(logos PRIVATE

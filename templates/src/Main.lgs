@@ -4,5 +4,7 @@ add(x: Int, y: Int): Int {
 
 main() {
     a = 5 + 3 + 2 + 1
-    print(add(a, 2))
+    if a > 10 {
+        print(add(a, 2))
+    }
 }
