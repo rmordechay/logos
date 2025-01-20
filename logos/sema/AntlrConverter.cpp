@@ -34,21 +34,24 @@ LogosMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     return mainFile;
 }
 
+LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx, const std::string& objName) {
+    const auto obj = new LogosObject(new LogosUserType(objName));
+    for (const auto varDec : ctx->explicitVarDec()) {
+        auto funcName = varDec->VARIABLE()->getText();
+        obj->fields.push_back(getVarDec(varDec));
+    }
+    for (const auto func : ctx->funcImplementation()) {
+        auto funcName = func->funcSignature()->VARIABLE()->getText();
+        obj->funcs.push_back(getFunc(func));
+    }
+    return obj;
+}
+
 LogosObjectFile* AntlerConverter::getObjFile(LogosParser::ObjectFileContext* ctx) {
     const auto objName = ctx->objectDeclaration()->TYPE()->getText();
     const auto objFile = new LogosObjectFile(objName);
     objFile->imports = getImports(ctx->importStatement());
-    objFile->obj = new LogosObject(new LogosUserType(objName));
-    for (const auto varDec : ctx->explicitVarDec()) {
-        auto funcName = varDec->VARIABLE()->getText();
-        objFile->obj->fields.push_back(getVarDec(varDec));
-    }
-
-    for (const auto func : ctx->funcImplementation()) {
-        auto funcName = func->funcSignature()->VARIABLE()->getText();
-        objFile->obj->funcs.push_back(getFunc(func));
-    }
-
+    objFile->obj = getObject(ctx, objName);
     return objFile;
 }
 

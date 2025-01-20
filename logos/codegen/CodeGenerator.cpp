@@ -1,6 +1,5 @@
 #include "CodeGenerator.h"
 
-#include "LogosRootPackage.h"
 #include "files/LogosObjectFile.h"
 
 #include <llvm/IR/Module.h>
@@ -27,16 +26,16 @@ const auto LINKED_OBJECT_FILE = "../output.o";
 const auto LINKED_IR_FILE = "../output.ll";
 constexpr auto LLVM_OBJECT_FILE = CodeGenFileType::ObjectFile;
 
-void CodeGenerator::run(const LogosRootPackage* rootPackage) {
+void CodeGenerator::run(const LogosPackage* rootPackage) {
     initLLVM();
-    for (const auto file : rootPackage->package->files) {
+    for (const auto file : rootPackage->files) {
         if (const auto objFile = static_cast<LogosObjectFile*>(file)) {
-            generateObjModule(objFile);
+            auto module = generateObjModule(objFile);
         }
     }
 
-    const auto logosMainFile = rootPackage->mainFile;
-    const auto mainModule = generateMainModule(logosMainFile);
+    // const auto logosMainFile = rootPackage->mainFile;
+    // const auto mainModule = generateMainModule(logosMainFile);
     // linkModules(unique_ptr<Module>(mainModule));
     // runBinary();
     // generateTest();

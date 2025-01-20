@@ -1,6 +1,6 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
-#include "LogosRootPackage.h"
+#include "LogosPackage.h"
 #include "exprs/LogosExpr.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
@@ -14,7 +14,7 @@ using namespace std;
 
 class CodeGenerator {
 public:
-    void run(const LogosRootPackage* rootPackage);
+    void run(const LogosPackage* rootPackage);
     Module* createEmptyModule(const string& name, const IRBuilder<>* builder) const;
     Module* generateMainModule(const LogosMainFile* mainFile);
     Module* generateObjModule(const LogosObjectFile* file) const;

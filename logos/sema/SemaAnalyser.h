@@ -1,11 +1,11 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
-#include "LogosRootPackage.h"
+#include "LogosPackage.h"
 
 
 class SemaAnalyser {
 public:
-    bool analyseCode(LogosRootPackage* rootPackage);
+    bool analyseCode(LogosPackage* rootPackage);
     ~SemaAnalyser() = default;
 };
 

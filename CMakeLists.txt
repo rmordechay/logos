@@ -55,8 +55,6 @@ add_executable(logos
     logos/symbols/stmts/LogosIfStmt.h
     logos/symbols/stmts/LogosStmt.h
     logos/symbols/files/LogosMainFile.h
-    logos/project/LogosRootPackage.cpp
-    logos/project/LogosRootPackage.h
     logos/symbols/files/LogosMainFile.h
     logos/symbols/stmts/LogosReturnStmt.cpp
     logos/symbols/stmts/LogosReturnStmt.h
@@ -70,6 +68,10 @@ add_executable(logos
     logos/symbols/object/LogosObject.h
     logos/symbols/types/LogosUserType.h
     logos/symbols/files/LogosObjectFile.h
+    logos/project/ThreadPool.cpp
+    logos/project/ThreadPool.h
+    logos/project/LogosUtils.cpp
+    logos/project/LogosUtils.h
 )
 
 target_include_directories(logos PRIVATE

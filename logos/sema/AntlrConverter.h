@@ -23,6 +23,7 @@ class AntlerConverter {
 public:
     LogosFile* getLogosFile(LogosParser::LogosFileContext* ctx);
     LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx);
+    LogosObject* getObject(LogosParser::ObjectFileContext* ctx, const std::string& objName);
     LogosObjectFile* getObjFile(LogosParser::ObjectFileContext* ctx);
     LogosFunc* getFunc(LogosParser::FuncImplementationContext* ctx);
     LogosStmt* getStmt(LogosParser::StatementContext* ctx);

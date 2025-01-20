@@ -1,5 +1,5 @@
 #include "SemaAnalyser.h"
 
-bool SemaAnalyser::analyseCode(LogosRootPackage* rootPackage) {
+bool SemaAnalyser::analyseCode(LogosPackage* rootPackage) {
     return true;
 }

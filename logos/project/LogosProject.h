@@ -3,9 +3,14 @@
 #include "CodeGenerator.h"
 #include "AntlrConverter.h"
 #include "LogosLexer.h"
+#include "LogosPackage.h"
 #include "SemaAnalyser.h"
 
+#include <queue>
+#include <thread>
 #include <string>
+#include "LogosUtils.h"
+#include <thread>
 
 using namespace std;
 
@@ -24,20 +29,11 @@ public:
     }
 
     void runLogos();
-    LogosRootPackage* getRootPackage();
     LogosPackage* getPackage(const filesystem::path& path);
     LogosFile* getFile(const filesystem::path& dirPath) const;
     static LogosParser* parseFile(const string& codeText);
     static string getCodeText(const filesystem::path& path);
     ~LogosProject();
-
-    static bool isLogosFile(const std::filesystem::directory_entry& filePath) {
-        return filePath.is_regular_file() && filePath.path().extension().string() == LOGOS_EXTENSION;
-    }
-
-    static bool isMainFile(const std::filesystem::directory_entry& filePath) {
-        return filePath.path().stem().string() == LOGOS_MAIN_FILE;
-    }
 };
 
 #endif // PROJECT_H
