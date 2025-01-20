@@ -11,6 +11,7 @@
 #include "exprs/LogosOperator.h"
 #include "exprs/LogosVariableExpr.h"
 #include "files/LogosMainFile.h"
+#include "files/LogosObjectFile.h"
 #include "funcs/LogosPrint.h"
 #include "funcs/LogosUserFunc.h"
 #include "stmts/LogosIfStmt.h"
@@ -21,8 +22,8 @@
 class AntlerConverter {
 public:
     LogosFile* getLogosFile(LogosParser::LogosFileContext* ctx);
-    LogosFile* getMainFile(LogosParser::MainFileContext* ctx);
-    LogosFile* getObjFile(LogosParser::ObjectFileContext* ctx);
+    LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx);
+    LogosObjectFile* getObjFile(LogosParser::ObjectFileContext* ctx);
     LogosFunc* getFunc(LogosParser::FuncImplementationContext* ctx);
     LogosStmt* getStmt(LogosParser::StatementContext* ctx);
     vector<LogosStmt*> getStmtList(LogosParser::StatementsBlockContext* ctx);
@@ -35,7 +36,8 @@ public:
     LogosConstructorExpr* getConstructorCallExpr(LogosParser::ConstructorCallContext* ctx);
     LogosFuncCallExpr* getFuncCallExpr(LogosParser::FuncCallContext* ctx);
     static LogosUnaryExpr* getConstantExpr(LogosParser::ConstantContext* ctx);
-    static const LogosType* getType(const string& typeText);
+    static const LogosType* getType(antlr4::tree::TerminalNode* type);
+    static vector<vector<const LogosType*>> getImports(LogosParser::ImportStatementContext* ctx);
 
     ~AntlerConverter() = default;
 };

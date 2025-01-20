@@ -61,7 +61,7 @@ Module* CodeGenerator::generateMainModule(const LogosMainFile* mainFile) {
     return module;
 }
 
-Module* CodeGenerator::generateObjModule(const LogosObjectFile* file) {
+Module* CodeGenerator::generateObjModule(const LogosObjectFile* file) const {
     LLVMContext context;
     auto builder = IRBuilder(context);
 
@@ -72,8 +72,8 @@ Module* CodeGenerator::generateObjModule(const LogosObjectFile* file) {
     const auto module = createEmptyModule(objName, &builder);
 
     vector<Type*> elementTypes;
-    for (int i = 0; i < file->fields.size(); ++i) {
-        const auto field = file->fields[i];
+    for (int i = 0; i < file->obj->fields.size(); ++i) {
+        const auto field = file->obj->fields[i];
         auto fieldType = field->type->getLLVMType(&builder);
         elementTypes.push_back(fieldType);
         rootFrame.addSymbol(field->name, new LogosSymbol(fieldType, i));
@@ -82,7 +82,7 @@ Module* CodeGenerator::generateObjModule(const LogosObjectFile* file) {
     const auto userStruct = StructType::create(context, elementTypes);
     rootFrame.addSymbol(LOGOS_THIS, new LogosSymbol(userStruct));
 
-    for (const auto func : file->funcs) {
+    for (const auto func : file->obj->funcs) {
         func->getLLVMValue(&builder, &rootFrame, module);
     }
 

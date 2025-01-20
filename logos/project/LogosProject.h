@@ -16,11 +16,6 @@ public:
     AntlerConverter* antlerConverter;
     SemaAnalyser* semaAnalyser;
 
-    unique_ptr<antlr4::ANTLRInputStream> input;
-    unique_ptr<LogosLexer> lexer;
-    unique_ptr<antlr4::CommonTokenStream> tokens;
-    unique_ptr<LogosParser> parser;
-
     explicit LogosProject(const string& rootPath) :
         rootPath(rootPath),
         codeGenerator(new CodeGenerator()),
@@ -31,8 +26,8 @@ public:
     void runLogos();
     LogosRootPackage* getRootPackage();
     LogosPackage* getPackage(const filesystem::path& path);
-    LogosFile* getFile(const filesystem::path& dirPath);
-    LogosParser::LogosFileContext* parseFile(string codeText);
+    LogosFile* getFile(const filesystem::path& dirPath) const;
+    static LogosParser* parseFile(const string& codeText);
     static string getCodeText(const filesystem::path& path);
     ~LogosProject();
 

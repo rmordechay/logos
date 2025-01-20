@@ -17,7 +17,7 @@ public:
     void run(const LogosRootPackage* rootPackage);
     Module* createEmptyModule(const string& name, const IRBuilder<>* builder) const;
     Module* generateMainModule(const LogosMainFile* mainFile);
-    Module* generateObjModule(const LogosObjectFile* file);
+    Module* generateObjModule(const LogosObjectFile* file) const;
     void declareFunctions(Module* module, stack<LogosStackFrame>* rootFrame, IRBuilder<>* builder);
     void runBinary();
     void initLLVM();

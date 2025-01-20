@@ -24,7 +24,7 @@ public:
   };
 
   enum {
-    RuleLogosFile = 0, RuleMainFile = 1, RuleInterfaceFile = 2, RuleObjectFile = 3, 
+    RuleLogosFile = 0, RuleMainFile = 1, RuleObjectFile = 2, RuleInterfaceFile = 3, 
     RuleImportStatement = 4, RuleImportPath = 5, RuleObjectDeclaration = 6, 
     RuleInterfaceDeclaration = 7, RuleObjectImplements = 8, RuleFuncSignature = 9, 
     RuleFuncImplementation = 10, RuleFuncBody = 11, RuleFuncCall = 12, RuleConstructorCall = 13, 
@@ -56,8 +56,8 @@ public:
 
   class LogosFileContext;
   class MainFileContext;
-  class InterfaceFileContext;
   class ObjectFileContext;
+  class InterfaceFileContext;
   class ImportStatementContext;
   class ImportPathContext;
   class ObjectDeclarationContext;
@@ -98,7 +98,6 @@ public:
     MainFileContext *mainFile();
     ObjectFileContext *objectFile();
     InterfaceFileContext *interfaceFile();
-    ImportStatementContext *importStatement();
 
    
   };
@@ -110,6 +109,7 @@ public:
     MainFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *EOF();
+    ImportStatementContext *importStatement();
     std::vector<FuncImplementationContext *> funcImplementation();
     FuncImplementationContext* funcImplementation(size_t i);
 
@@ -118,12 +118,31 @@ public:
 
   MainFileContext* mainFile();
 
+  class  ObjectFileContext : public antlr4::ParserRuleContext {
+  public:
+    ObjectFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    ObjectDeclarationContext *objectDeclaration();
+    antlr4::tree::TerminalNode *EOF();
+    ImportStatementContext *importStatement();
+    ObjectImplementsContext *objectImplements();
+    std::vector<ExplicitVarDecContext *> explicitVarDec();
+    ExplicitVarDecContext* explicitVarDec(size_t i);
+    std::vector<FuncImplementationContext *> funcImplementation();
+    FuncImplementationContext* funcImplementation(size_t i);
+
+   
+  };
+
+  ObjectFileContext* objectFile();
+
   class  InterfaceFileContext : public antlr4::ParserRuleContext {
   public:
     InterfaceFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     InterfaceDeclarationContext *interfaceDeclaration();
     antlr4::tree::TerminalNode *EOF();
+    ImportStatementContext *importStatement();
     ObjectImplementsContext *objectImplements();
     std::vector<ExplicitVarDecContext *> explicitVarDec();
     ExplicitVarDecContext* explicitVarDec(size_t i);
@@ -136,23 +155,6 @@ public:
   };
 
   InterfaceFileContext* interfaceFile();
-
-  class  ObjectFileContext : public antlr4::ParserRuleContext {
-  public:
-    ObjectFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    ObjectDeclarationContext *objectDeclaration();
-    antlr4::tree::TerminalNode *EOF();
-    ObjectImplementsContext *objectImplements();
-    std::vector<ExplicitVarDecContext *> explicitVarDec();
-    ExplicitVarDecContext* explicitVarDec(size_t i);
-    std::vector<FuncImplementationContext *> funcImplementation();
-    FuncImplementationContext* funcImplementation(size_t i);
-
-   
-  };
-
-  ObjectFileContext* objectFile();
 
   class  ImportStatementContext : public antlr4::ParserRuleContext {
   public:

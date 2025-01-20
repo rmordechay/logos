@@ -1,7 +1,7 @@
 #include "logos/project/LogosProject.h"
 
 int main() {
-    LogosProject project("../templates/src");
+    LogosProject project("../docs/src");
     project.runLogos();
     return 0;
 }

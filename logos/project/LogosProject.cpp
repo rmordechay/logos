@@ -42,18 +42,20 @@ LogosPackage* LogosProject::getPackage(const filesystem::path& path) {
     return package;
 }
 
-LogosFile* LogosProject::getFile(const filesystem::path& dirPath) {
+LogosFile* LogosProject::getFile(const filesystem::path& dirPath) const {
     const auto codeText = getCodeText(dirPath);
-    const auto fileCtx = parseFile(codeText);
-    return antlerConverter->getLogosFile(fileCtx);
+    const auto parser = parseFile(codeText);
+    const auto logosFile = antlerConverter->getLogosFile(parser->logosFile());
+    delete parser;
+    return logosFile;
 }
 
-LogosParser::LogosFileContext* LogosProject::parseFile(string codeText) {
-    input = make_unique<antlr4::ANTLRInputStream>(codeText);
-    lexer = make_unique<LogosLexer>(input.get());
-    tokens = make_unique<antlr4::CommonTokenStream>(lexer.get());
-    parser = make_unique<LogosParser>(tokens.get());
-    return parser->logosFile();
+LogosParser* LogosProject::parseFile(const string& codeText) {
+    const auto input = new antlr4::ANTLRInputStream(codeText);
+    const auto lexer = new LogosLexer(input);
+    const auto tokens = new antlr4::CommonTokenStream(lexer);
+    const auto parser = new LogosParser(tokens);
+    return parser;
 }
 
 string LogosProject::getCodeText(const filesystem::path& path) {

@@ -1,19 +1,19 @@
 grammar Logos;
 
 logosFile:
-        importStatement? (mainFile | objectFile | interfaceFile)
+        mainFile | objectFile | interfaceFile
     ;
 
 mainFile:
-        funcImplementation+ EOF
+        importStatement? funcImplementation+ EOF
     ;
 
 objectFile:
-        objectDeclaration objectImplements? explicitVarDec* funcImplementation* EOF
+        importStatement? objectDeclaration objectImplements? explicitVarDec* funcImplementation* EOF
     ;
 
 interfaceFile:
-        interfaceDeclaration objectImplements? explicitVarDec* funcSignature+ funcImplementation* EOF
+        importStatement? interfaceDeclaration objectImplements? explicitVarDec* funcSignature+ funcImplementation* EOF
     ;
 
 

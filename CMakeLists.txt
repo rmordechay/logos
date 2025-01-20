@@ -84,18 +84,11 @@ target_include_directories(logos PRIVATE
     ${LLVM_INCLUDE_DIR}
 )
 
-file(GLOB LLVM
-    ${LLVM_LIBS}/*.dylib
-    ${LLVM_LIBS}/*.a
-)
+file(GLOB LLVM ${LLVM_LIBS}/libLLVM.dylib ${LLVM_LIBS}/*.a)
 target_link_libraries(logos PRIVATE ${ANTLR_LIB} ${LLVM} ${GTEST_LIB} ${GTEST_LIB_MAIN})
 
-# Tests
 enable_testing()
-
-add_executable(logos_tests
-    tests/ParserTest.cpp
-)
+add_executable(logos_tests tests/ParserTest.cpp)
 
 target_include_directories(logos_tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
