@@ -1,7 +1,6 @@
 #ifndef LOGOSFUNC_H
 #define LOGOSFUNC_H
 #include "CodeGeneration.h"
-#include "stmts/LogosIfStmt.h"
 #include "stmts/LogosVarDec.h"
 #include "types/LogosType.h"
 

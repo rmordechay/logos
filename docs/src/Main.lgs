@@ -4,4 +4,5 @@ import (
 
 main() {
     obj = MyObject()
+    print(10)
 }

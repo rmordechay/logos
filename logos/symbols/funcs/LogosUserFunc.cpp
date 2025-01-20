@@ -9,9 +9,7 @@ Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame,
     const auto funcType = FunctionType::get(type->getLLVMType(builder), llvmParams, false);
     const auto func = Function::Create(funcType, Function::ExternalLinkage, name, module);
 
-    stackFrame->addFunc(name, func);
-    stackFrame->setCurrentFunc(func);
-    stackFrame->enterScope();
+    stackFrame->enterScope(func);
 
     auto arg = func->arg_begin();
     for (const auto param : params) {
@@ -26,6 +24,6 @@ Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame,
     for (const auto stmt : stmts) {
         stmt->getLLVMValue(builder, stackFrame, module);
     }
-    // stackFrame->exitScope();
+    stackFrame->exitScope();
     return func;
 }

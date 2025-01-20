@@ -11,7 +11,8 @@ Value* LogosVariableExpr::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFr
     } else if (const auto type = symbol->symbolType) {
         const auto allocaInst = builder->CreateAlloca(type);
         const auto logosSymbol = stackFrame->getSymbol(LOGOS_THIS)->symbolType;
-        return builder->CreateStructGEP(logosSymbol, allocaInst, symbol->pos);
+        const auto structGep = builder->CreateStructGEP(logosSymbol, allocaInst, symbol->pos);
+        return builder->CreateLoad(allocaInst->getAllocatedType(), structGep);
     }
     return nullptr;
 }

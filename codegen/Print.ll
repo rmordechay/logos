@@ -1,5 +1,5 @@
-; ModuleID = 'print'
-source_filename = "print"
+; ModuleID = 'Print'
+source_filename = "Print"
 
 declare i32 @printf(ptr, ...)
 

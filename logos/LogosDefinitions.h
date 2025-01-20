@@ -1,5 +1,6 @@
 #ifndef LOGOSCONFIGS_H
 #define LOGOSCONFIGS_H
+#include <llvm/TargetParser/Host.h>
 
 const auto LOGOS_SOURCE_PACKAGE = "root";
 const auto LOGOS_MAIN_FILE = "Main";

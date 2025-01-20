@@ -7,6 +7,7 @@
 
 #include <map>
 #include <llvm/IR/IRBuilder.h>
+#include <llvm/Linker/Linker.h>
 #include <llvm/MC/TargetRegistry.h>
 
 using namespace llvm;
@@ -15,22 +16,15 @@ using namespace std;
 class CodeGenerator {
 public:
     void run(const LogosPackage* rootPackage);
-    Module* createEmptyModule(const string& name, const IRBuilder<>* builder) const;
-    Module* generateMainModule(const LogosMainFile* mainFile);
-    Module* generateObjModule(const LogosObjectFile* file) const;
-    void declareFunctions(Module* module, stack<LogosStackFrame>* rootFrame, IRBuilder<>* builder);
-    void runBinary();
+    void generatePackage(const LogosPackage* package, vector<Module*>& modules, IRBuilder<>& builder);
+    Linker* linkModules(const vector<Module*>& modules, LLVMContext& context) const;
     void initLLVM();
-    unique_ptr<Module> compileLLVMFile(const string& inputFile, LLVMContext* context);
-    void linkModules(unique_ptr<Module> module);
-    static void emitLLVMFile(const string& filePath, const Module* module);
+    static void runBinary();
     static void generateTest();
     ~CodeGenerator() = default;
 
 private:
     vector<CodeGeneration*> codeNodes;
-    std::string targetTriple;
-    const Target* target = nullptr;
     TargetMachine* targetMachine = nullptr;
 };
 

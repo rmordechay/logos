@@ -72,6 +72,8 @@ add_executable(logos
     logos/project/ThreadPool.h
     logos/project/LogosUtils.cpp
     logos/project/LogosUtils.h
+    logos/symbols/files/LogosMainFile.cpp
+    logos/symbols/files/LogosObjectFile.cpp
 )
 
 target_include_directories(logos PRIVATE

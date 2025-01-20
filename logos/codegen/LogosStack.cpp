@@ -2,9 +2,11 @@
 
 #include <iostream>
 
-void LogosStack::enterScope() {
+void LogosStack::enterScope(Function* func) {
     const LogosStackFrame stackFrame(top());
     push(stackFrame);
+    addFunc(func->getName().str(), func);
+    setCurrentFunc(func);
 }
 
 void LogosStack::exitScope() {

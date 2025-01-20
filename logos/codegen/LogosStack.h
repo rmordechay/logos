@@ -8,7 +8,7 @@ using namespace std;
 
 class LogosStack : public stack<LogosStackFrame> {
 public:
-    void enterScope();
+    void enterScope(Function* func);
     void exitScope();
     LogosSymbol* getSymbol(const string& name);
     Function* getFunc(const string& name);
