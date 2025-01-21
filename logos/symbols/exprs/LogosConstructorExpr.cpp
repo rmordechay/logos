@@ -1,5 +1,6 @@
 #include "LogosConstructorExpr.h"
 
 Value* LogosConstructorExpr::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
-    return builder->CreateAlloca(builder->getInt32Ty());
+    const auto logosSymbol = stackFrame->getSymbol(name);
+    return builder->CreateAlloca(logosSymbol->llvmType);
 }

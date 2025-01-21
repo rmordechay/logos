@@ -1,6 +1,6 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
-#include "LogosPackage.h"
+#include "application/LogosPackage.h"
 #include "exprs/LogosExpr.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
@@ -15,17 +15,24 @@ using namespace std;
 
 class CodeGenerator {
 public:
-    void run(const LogosPackage* rootPackage);
-    void generatePackage(const LogosPackage* package, vector<Module*>& modules, IRBuilder<>& builder);
-    Linker* linkModules(const vector<Module*>& modules, LLVMContext& context) const;
+    LLVMContext context;
+    vector<Module*> modules;
+    vector<CodeGeneration*> codeNodes;
+    IRBuilder<> builder = IRBuilder(context);
+
+    TargetMachine* targetMachine = nullptr;
+
+    explicit CodeGenerator() {
+        initLLVM();
+    }
+
+    void run(const map<string, LogosFile*>& files);
+    Linker* linkModules() const;
     void initLLVM();
     static void runBinary();
     static void generateTest();
-    ~CodeGenerator() = default;
+    ~CodeGenerator();
 
-private:
-    vector<CodeGeneration*> codeNodes;
-    TargetMachine* targetMachine = nullptr;
 };
 
 #endif //CODEGENERATOR_H

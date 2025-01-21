@@ -96,6 +96,7 @@ public:
     LogosFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     MainFileContext *mainFile();
+    ImportStatementContext *importStatement();
     ObjectFileContext *objectFile();
     InterfaceFileContext *interfaceFile();
 
@@ -109,7 +110,6 @@ public:
     MainFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *EOF();
-    ImportStatementContext *importStatement();
     std::vector<FuncImplementationContext *> funcImplementation();
     FuncImplementationContext* funcImplementation(size_t i);
 
@@ -124,7 +124,6 @@ public:
     virtual size_t getRuleIndex() const override;
     ObjectDeclarationContext *objectDeclaration();
     antlr4::tree::TerminalNode *EOF();
-    ImportStatementContext *importStatement();
     ObjectImplementsContext *objectImplements();
     std::vector<ExplicitVarDecContext *> explicitVarDec();
     ExplicitVarDecContext* explicitVarDec(size_t i);
@@ -142,7 +141,6 @@ public:
     virtual size_t getRuleIndex() const override;
     InterfaceDeclarationContext *interfaceDeclaration();
     antlr4::tree::TerminalNode *EOF();
-    ImportStatementContext *importStatement();
     ObjectImplementsContext *objectImplements();
     std::vector<ExplicitVarDecContext *> explicitVarDec();
     ExplicitVarDecContext* explicitVarDec(size_t i);

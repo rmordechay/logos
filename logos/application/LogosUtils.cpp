@@ -17,18 +17,10 @@ bool Utils::isMainFile(const filesystem::directory_entry& filePath) {
     return filePath.path().stem().string() == LOGOS_MAIN_FILE;
 }
 
-Module* Utils::createEmptyLLVMModule(const string& name, LLVMContext& context, const TargetMachine& tm) {
-    const auto module = new Module(name, context);;
-    module->setDataLayout(tm.createDataLayout());
-    module->setTargetTriple(tm.getTargetTriple().str());
-    return module;
-}
-
 Module* Utils::createLLVMModuleFromFile(const string& filePath, LLVMContext& context, const TargetMachine& tm) {
     SMDiagnostic err;
     auto module = parseIRFile(filePath, err, context);
     module->setDataLayout(tm.createDataLayout());
-    module->setTargetTriple(tm.getTargetTriple().str());
     return module.release();
 }
 

@@ -6,8 +6,10 @@
 
 class LogosConstructorExpr final : public LogosUnaryExpr {
 public:
-    LogosObject* object;
-    explicit LogosConstructorExpr(LogosObject* logosObject) : object(logosObject) {}
+    string name;
+    vector<LogosExpr*> args;
+
+    explicit LogosConstructorExpr(const string& name) : name(name) {}
     Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) override;
     ~LogosConstructorExpr() override = default;
 };

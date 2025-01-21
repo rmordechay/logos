@@ -14,14 +14,14 @@
 
 using namespace std;
 
-class LogosProject {
+class Application {
 public:
     string rootPath;
     CodeGenerator* codeGenerator;
     AntlerConverter* antlerConverter;
     SemaAnalyser* semaAnalyser;
 
-    explicit LogosProject(const string& rootPath) :
+    explicit Application(const string& rootPath) :
         rootPath(rootPath),
         codeGenerator(new CodeGenerator()),
         antlerConverter(new AntlerConverter()),
@@ -33,7 +33,7 @@ public:
     LogosFile* getFile(const filesystem::path& dirPath) const;
     static LogosParser* parseFile(const string& codeText);
     static string getCodeText(const filesystem::path& path);
-    ~LogosProject();
+    ~Application();
 };
 
 #endif // PROJECT_H

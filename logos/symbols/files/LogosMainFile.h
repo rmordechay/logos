@@ -8,7 +8,8 @@ public:
     std::vector<LogosFunc*> funcs;
 
     explicit LogosMainFile() : LogosFile(LOGOS_MAIN_FILE) {}
-    Module* generateModule(const TargetMachine& targetMachine, IRBuilder<>& builder) override;
+    Module* generateModule(IRBuilder<>& builder, LogosStack& theStack) override;
+    void initModule(IRBuilder<>& builder, LogosStack& theStack) override;
     ~LogosMainFile() override;
 };
 

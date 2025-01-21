@@ -1,7 +1,7 @@
-#include "logos/project/LogosProject.h"
+#include "logos/application/Application.h"
 
 int main() {
-    LogosProject project("../docs/src");
-    project.runLogos();
-    return 0;
+     Application project("../docs/src");
+     project.runLogos();
+     return 0;
 }

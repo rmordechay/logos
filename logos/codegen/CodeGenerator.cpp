@@ -1,6 +1,7 @@
 #include "CodeGenerator.h"
 
-#include "LogosUtils.h"
+#include "application/LogosPackage.h"
+#include "application/LogosUtils.h"
 #include "files/LogosObjectFile.h"
 
 #include <llvm/IR/Module.h>
@@ -27,37 +28,35 @@ const auto LINKED_OBJECT_FILE = "../output.o";
 const auto LINKED_IR_FILE = "../output.ll";
 constexpr auto LLVM_OBJECT_FILE = CodeGenFileType::ObjectFile;
 
-void CodeGenerator::run(const LogosPackage* rootPackage) {
-    initLLVM();
-    LLVMContext context;
-    vector<Module*> modules;
-    auto builder = IRBuilder(context);
-    generatePackage(rootPackage, modules, builder);
-    auto linker = linkModules(modules, context);
+void CodeGenerator::run(const map<string, LogosFile*>& files) {
+    LogosStack theStack;
+    theStack.push(LogosStackFrame());
+
+    for (auto [name, file] : files) {
+        file->initModule(builder, theStack);
+    }
+
+    for (auto [name, file] : files) {
+        auto module = file->generateModule(builder, theStack);
+        modules.push_back(module);
+    }
+    const auto linker = linkModules();
     runBinary();
+    delete linker;
     // generateTest();
 }
 
-void CodeGenerator::generatePackage(const LogosPackage* package, vector<Module*>& modules, IRBuilder<>& builder) {
-    for (const auto file : package->files) {
-        auto module = file->generateModule(*targetMachine, builder);
-        module->print(outs(), nullptr);
-        std::cout << "\n-----\n" << std::endl;
-        modules.push_back(module);
-    }
-    for (const auto innerPackage : package->packages) {
-        generatePackage(innerPackage, modules, builder);
-    }
-}
-
-Linker* CodeGenerator::linkModules(const vector<Module*>& modules, LLVMContext& context) const {
-    const auto rootModule = Utils::createLLVMModuleFromFile(PRINT_IR_FILE, context, *targetMachine);
+Linker* CodeGenerator::linkModules() const {
+    const auto rootModule = Utils::createLLVMModuleFromFile(PRINT_IR_FILE, builder.getContext(), *targetMachine);
     rootModule->print(outs(), nullptr);
     std::cout << "\n-----\n" << std::endl;
     const auto linker = new Linker(*rootModule);
 
     for (int i = 0; i < modules.size(); ++i) {
-        linker->linkInModule(std::unique_ptr<Module>(modules[i]));
+        const auto module = modules[i];
+        module->print(outs(), nullptr);
+        std::cout << "\n-----\n" << std::endl;
+        linker->linkInModule(std::unique_ptr<Module>(module));
     }
     if (verifyModule(*rootModule, &errs())) {
         return linker;
@@ -79,7 +78,7 @@ void CodeGenerator::initLLVM() {
     InitializeAllTargetInfos();
 
     std::string targetError;
-    auto targetTriple = sys::getProcessTriple();
+    const auto targetTriple = sys::getProcessTriple();
     const auto target = TargetRegistry::lookupTarget(targetTriple, targetError);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), Reloc::PIC_);
 }
@@ -98,5 +97,10 @@ void CodeGenerator::generateTest() {
     StructType *myStructType = StructType::create(context, elements, "MyStruct");
     AllocaInst *structInstance = builder.CreateAlloca(myStructType, nullptr, "myStructInstance");
     Value *fieldAPtr = builder.CreateStructGEP(myStructType, structInstance, 0, "a_ptr");
+
+}
+
+CodeGenerator::~CodeGenerator() {
+    delete targetMachine;
 
 }

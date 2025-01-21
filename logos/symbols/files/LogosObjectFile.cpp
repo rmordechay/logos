@@ -1,28 +1,30 @@
 #include "LogosObjectFile.h"
 
-#include "LogosUtils.h"
+#include "application/LogosUtils.h"
 
-Module* LogosObjectFile::generateModule(const TargetMachine& targetMachine, IRBuilder<>& builder) {
-    LogosStack rootFrame;
-    rootFrame.push(LogosStackFrame());
 
+Module* LogosObjectFile::generateModule(IRBuilder<>& builder, LogosStack& theStack) {
     auto& context = builder.getContext();
-    auto module = Utils::createEmptyLLVMModule(name, context, targetMachine);
+    const auto module = new Module(name, context);
+    for (const auto func : obj->funcs) {
+        func->getLLVMValue(&builder, &theStack, module);
+    }
+    return module;
+}
 
+void LogosObjectFile::initModule(IRBuilder<>& builder, LogosStack& theStack) {
     vector<Type*> elementTypes;
     for (int i = 0; i < obj->fields.size(); ++i) {
         const auto field = obj->fields[i];
         auto fieldType = field->type->getLLVMType(&builder);
         elementTypes.push_back(fieldType);
-        rootFrame.addSymbol(field->name, new LogosSymbol(fieldType, i));
+        theStack.addSymbol(field->name, new LogosSymbol(fieldType, i));
     }
-
-    const auto userStruct = StructType::create(context, elementTypes);
-    rootFrame.addSymbol(LOGOS_THIS, new LogosSymbol(userStruct));
-
-    for (const auto func : obj->funcs) {
-        func->getLLVMValue(&builder, &rootFrame, module);
-    }
-
-    return module;
+    const auto userStruct = StructType::create(builder.getContext(), elementTypes);
+    theStack.addSymbol(LOGOS_THIS, new LogosSymbol(userStruct));
 }
+
+LogosObjectFile::~LogosObjectFile() {
+    delete obj;
+}
+

@@ -1,20 +1,18 @@
-#include "LogosProject.h"
+#include "Application.h"
 
 #include "LogosPackage.h"
 #include "ThreadPool.h"
 
 
 
-void LogosProject::runLogos() {
+void Application::runLogos() {
     const auto rootPackage = getPackage(rootPath);
-    if (!semaAnalyser->analyseCode(rootPackage)) {
-        return;
-    }
-    codeGenerator->run(rootPackage);
+    if (!semaAnalyser->analyseCode(rootPackage)) return;
+    codeGenerator->run(semaAnalyser->files);
     delete rootPackage;
 }
 
-LogosPackage* LogosProject::getPackage(const filesystem::path& path) {
+LogosPackage* Application::getPackage(const filesystem::path& path) {
     const auto package = new LogosPackage(path.filename(), path);
     for (const auto& dirEntry : filesystem::directory_iterator(path)) {
         if (Utils::isLogosFile(dirEntry)) {
@@ -28,7 +26,7 @@ LogosPackage* LogosProject::getPackage(const filesystem::path& path) {
     return package;
 }
 
-LogosFile* LogosProject::getFile(const filesystem::path& dirPath) const {
+LogosFile* Application::getFile(const filesystem::path& dirPath) const {
     const auto codeText = getCodeText(dirPath);
     const auto parser = parseFile(codeText);
     const auto logosFile = antlerConverter->getLogosFile(parser->logosFile());
@@ -36,7 +34,7 @@ LogosFile* LogosProject::getFile(const filesystem::path& dirPath) const {
     return logosFile;
 }
 
-LogosParser* LogosProject::parseFile(const string& codeText) {
+LogosParser* Application::parseFile(const string& codeText) {
     const auto input = new antlr4::ANTLRInputStream(codeText);
     const auto lexer = new LogosLexer(input);
     const auto tokens = new antlr4::CommonTokenStream(lexer);
@@ -44,14 +42,14 @@ LogosParser* LogosProject::parseFile(const string& codeText) {
     return parser;
 }
 
-string LogosProject::getCodeText(const filesystem::path& path) {
+string Application::getCodeText(const filesystem::path& path) {
     ifstream file(path);
     stringstream fileContents;
     fileContents << file.rdbuf();
     return fileContents.str();
 }
 
-LogosProject::~LogosProject() {
+Application::~Application() {
     delete antlerConverter;
     delete codeGenerator;
     delete semaAnalyser;

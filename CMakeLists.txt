@@ -16,64 +16,64 @@ add_executable(logos
     main.cpp
     ${GENERATED_SRC}
     logos/LogosDefinitions.h
+    logos/application/LogosPackage.cpp
+    logos/application/LogosPackage.h
+    logos/application/Application.cpp
+    logos/application/Application.h
+    logos/application/LogosUtils.cpp
+    logos/application/LogosUtils.h
+    logos/application/ThreadPool.cpp
+    logos/application/ThreadPool.h
     logos/codegen/CodeGenerator.cpp
     logos/codegen/CodeGenerator.h
-    logos/symbols/files/LogosFile.h
-    logos/project/LogosPackage.cpp
-    logos/project/LogosPackage.h
-    logos/project/LogosProject.cpp
-    logos/project/LogosProject.h
-    logos/sema/LogosErrors.h
+    logos/codegen/LogosStack.cpp
+    logos/codegen/LogosStack.h
+    logos/codegen/LogosStackFrame.h
     logos/sema/AntlrConverter.cpp
     logos/sema/AntlrConverter.h
-    logos/symbols/types/LogosType.h
+    logos/sema/LogosErrors.h
+    logos/sema/SemaAnalyser.cpp
+    logos/sema/SemaAnalyser.h
+    logos/symbols/CodeGeneration.h
+    logos/symbols/exprs/LogosBinaryExpr.cpp
+    logos/symbols/exprs/LogosBinaryExpr.h
+    logos/symbols/exprs/LogosConstantExpr.cpp
+    logos/symbols/exprs/LogosConstantExpr.h
+    logos/symbols/exprs/LogosConstructorExpr.cpp
+    logos/symbols/exprs/LogosConstructorExpr.h
+    logos/symbols/exprs/LogosExpr.cpp
+    logos/symbols/exprs/LogosExpr.h
+    logos/symbols/exprs/LogosFuncCallExpr.cpp
+    logos/symbols/exprs/LogosFuncCallExpr.h
+    logos/symbols/exprs/LogosOperator.h
+    logos/symbols/exprs/LogosUnaryExpr.h
+    logos/symbols/exprs/LogosVariableExpr.cpp
+    logos/symbols/files/LogosFile.h
+    logos/symbols/files/LogosMainFile.cpp
+    logos/symbols/files/LogosMainFile.h
+    logos/symbols/files/LogosMainFile.h
+    logos/symbols/files/LogosObjectFile.cpp
+    logos/symbols/files/LogosObjectFile.h
+    logos/symbols/funcs/LogosFunc.h
+    logos/symbols/funcs/LogosUserFunc.cpp
+    logos/symbols/funcs/LogosUserFunc.h
+    logos/symbols/object/LogosObject.cpp
+    logos/symbols/object/LogosObject.h
+    logos/symbols/stmts/LogosIfStmt.cpp
+    logos/symbols/stmts/LogosIfStmt.h
+    logos/symbols/stmts/LogosImportStmt.cpp
+    logos/symbols/stmts/LogosImportStmt.h
+    logos/symbols/stmts/LogosReturnStmt.cpp
+    logos/symbols/stmts/LogosReturnStmt.h
+    logos/symbols/stmts/LogosStmt.h
+    logos/symbols/stmts/LogosVarDec.cpp
+    logos/symbols/stmts/LogosVarDec.h
     logos/symbols/types/LogosBool.h
     logos/symbols/types/LogosFloat.h
     logos/symbols/types/LogosInt.h
     logos/symbols/types/LogosString.h
-    logos/symbols/exprs/LogosOperator.h
-    logos/symbols/exprs/LogosExpr.h
-    logos/symbols/exprs/LogosConstantExpr.h
-    logos/symbols/exprs/LogosFuncCallExpr.h
-    logos/symbols/funcs/LogosFunc.h
-    logos/symbols/exprs/LogosUnaryExpr.h
-    logos/symbols/exprs/LogosBinaryExpr.h
-    logos/codegen/LogosStackFrame.h
-    logos/symbols/CodeGeneration.h
-    logos/symbols/funcs/LogosPrint.cpp
-    logos/symbols/funcs/LogosPrint.h
-    logos/symbols/funcs/LogosUserFunc.cpp
-    logos/symbols/funcs/LogosUserFunc.h
-    logos/symbols/exprs/LogosFuncCallExpr.cpp
-    logos/symbols/exprs/LogosConstantExpr.cpp
-    logos/symbols/exprs/LogosVariableExpr.cpp
-    logos/symbols/exprs/LogosBinaryExpr.cpp
-    logos/symbols/exprs/LogosExpr.cpp
-    logos/symbols/stmts/LogosVarDec.cpp
-    logos/symbols/stmts/LogosVarDec.h
-    logos/symbols/stmts/LogosIfStmt.cpp
-    logos/symbols/stmts/LogosIfStmt.h
-    logos/symbols/stmts/LogosStmt.h
-    logos/symbols/files/LogosMainFile.h
-    logos/symbols/files/LogosMainFile.h
-    logos/symbols/stmts/LogosReturnStmt.cpp
-    logos/symbols/stmts/LogosReturnStmt.h
-    logos/sema/SemaAnalyser.cpp
-    logos/sema/SemaAnalyser.h
-    logos/codegen/LogosStack.cpp
-    logos/codegen/LogosStack.h
-    logos/symbols/exprs/LogosConstructorExpr.cpp
-    logos/symbols/exprs/LogosConstructorExpr.h
-    logos/symbols/object/LogosObject.cpp
-    logos/symbols/object/LogosObject.h
-    logos/symbols/types/LogosUserType.h
-    logos/symbols/files/LogosObjectFile.h
-    logos/project/ThreadPool.cpp
-    logos/project/ThreadPool.h
-    logos/project/LogosUtils.cpp
-    logos/project/LogosUtils.h
-    logos/symbols/files/LogosMainFile.cpp
-    logos/symbols/files/LogosObjectFile.cpp
+    logos/symbols/types/LogosType.h
+    logos/codegen/LogosSymbol.h
 )
 
 target_include_directories(logos PRIVATE
