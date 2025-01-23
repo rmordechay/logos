@@ -1,6 +1,6 @@
 #ifndef LOGOSIFSTMT_H
 #define LOGOSIFSTMT_H
-#include "LogosStack.h"
+#include "../LogosStack.h"
 #include "LogosStmt.h"
 #include "exprs/LogosExpr.h"
 

@@ -16,8 +16,6 @@ add_executable(logos
     main.cpp
     ${GENERATED_SRC}
     logos/LogosDefinitions.h
-    logos/application/LogosPackage.cpp
-    logos/application/LogosPackage.h
     logos/application/Application.cpp
     logos/application/Application.h
     logos/application/LogosUtils.cpp
@@ -26,9 +24,7 @@ add_executable(logos
     logos/application/ThreadPool.h
     logos/codegen/CodeGenerator.cpp
     logos/codegen/CodeGenerator.h
-    logos/codegen/LogosStack.cpp
-    logos/codegen/LogosStack.h
-    logos/codegen/LogosStackFrame.h
+    logos/symbols/LogosStack.h
     logos/sema/AntlrConverter.cpp
     logos/sema/AntlrConverter.h
     logos/sema/LogosErrors.h
@@ -37,14 +33,14 @@ add_executable(logos
     logos/symbols/CodeGeneration.h
     logos/symbols/exprs/LogosBinaryExpr.cpp
     logos/symbols/exprs/LogosBinaryExpr.h
-    logos/symbols/exprs/LogosConstantExpr.cpp
-    logos/symbols/exprs/LogosConstantExpr.h
-    logos/symbols/exprs/LogosConstructorExpr.cpp
-    logos/symbols/exprs/LogosConstructorExpr.h
+    logos/symbols/exprs/LogosConstant.cpp
+    logos/symbols/exprs/LogosConstant.h
+    logos/symbols/exprs/LogosConstructor.cpp
+    logos/symbols/exprs/LogosConstructor.h
     logos/symbols/exprs/LogosExpr.cpp
     logos/symbols/exprs/LogosExpr.h
-    logos/symbols/exprs/LogosFuncCallExpr.cpp
-    logos/symbols/exprs/LogosFuncCallExpr.h
+    logos/symbols/exprs/LogosFuncCall.cpp
+    logos/symbols/exprs/LogosFuncCall.h
     logos/symbols/exprs/LogosOperator.h
     logos/symbols/exprs/LogosUnaryExpr.h
     logos/symbols/exprs/LogosVariableExpr.cpp
@@ -61,8 +57,8 @@ add_executable(logos
     logos/symbols/object/LogosObject.h
     logos/symbols/stmts/LogosIfStmt.cpp
     logos/symbols/stmts/LogosIfStmt.h
-    logos/symbols/stmts/LogosImportStmt.cpp
-    logos/symbols/stmts/LogosImportStmt.h
+    logos/symbols/files/LogosImportStmt.cpp
+    logos/symbols/files/LogosImportStmt.h
     logos/symbols/stmts/LogosReturnStmt.cpp
     logos/symbols/stmts/LogosReturnStmt.h
     logos/symbols/stmts/LogosStmt.h
@@ -73,7 +69,7 @@ add_executable(logos
     logos/symbols/types/LogosInt.h
     logos/symbols/types/LogosString.h
     logos/symbols/types/LogosType.h
-    logos/codegen/LogosSymbol.h
+    logos/symbols/LogosSymbol.h
 )
 
 target_include_directories(logos PRIVATE

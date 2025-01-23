@@ -5,12 +5,7 @@
 #include "types/LogosType.h"
 
 #include <llvm/IR/Module.h>
-#include "LogosDefinitions.h"
-#include "funcs/LogosFunc.h"
-#include "funcs/LogosUserFunc.h"
-#include "stmts/LogosImportStmt.h"
-
-#include <llvm/Target/TargetMachine.h>
+#include "LogosImportStmt.h"
 
 #include <string>
 
@@ -19,6 +14,7 @@ using namespace std;
 class LogosFile {
 public:
     string name;
+    string path;
     vector<LogosImportStmt*> imports;
 
     explicit LogosFile(const string& name) : name(name) {}

@@ -1,9 +1,9 @@
-#include "LogosFuncCallExpr.h"
+#include "LogosFuncCall.h"
 
 #include <iostream>
 #include <ostream>
 
-Value* LogosFuncCallExpr::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
+Value* LogosFuncCall::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
     const auto funcSymbol = stackFrame->getFunc(name);
     std::vector<Value*> llvmArgs;
     for (const auto arg : args) {
@@ -12,7 +12,7 @@ Value* LogosFuncCallExpr::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFr
     return builder->CreateCall(funcSymbol, ArrayRef(llvmArgs));
 }
 
-LogosFuncCallExpr::~LogosFuncCallExpr() {
+LogosFuncCall::~LogosFuncCall() {
     for (const auto arg : args) {
         delete arg;
     }

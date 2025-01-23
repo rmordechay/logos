@@ -1,9 +1,5 @@
 #include "LogosMainFile.h"
 
-#include "application/LogosUtils.h"
-
-#include <llvm/IR/Module.h>
-#include <llvm/Target/TargetMachine.h>
 
 Module* LogosMainFile::generateModule(IRBuilder<>& builder, LogosStack& theStack) {
     const auto module = new Module(name, builder.getContext());

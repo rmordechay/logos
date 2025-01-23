@@ -1,5 +1,5 @@
 #include "LogosVarDec.h"
-#include "LogosStack.h"
+#include "../LogosStack.h"
 
 Value* LogosVarDec::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
     const auto value = expr->getLLVMValue(builder, stackFrame, module);

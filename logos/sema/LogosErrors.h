@@ -4,9 +4,7 @@
 
 
 const std::map<int, std::string> LOGOS_ERRORS = {
-    {100, "Variable %s is not defined"},
-    {101, "Two"},
-    {102, "Three"}
+    {100, "Main function is not defined in Main.lgs file."},
 };
 
 #endif //LOGOSERRORS_H

@@ -1,7 +1,6 @@
 #ifndef LOGOSUSERFUNC_H
 #define LOGOSUSERFUNC_H
 #include "LogosFunc.h"
-#include "LogosStackFrame.h"
 #include <types/LogosVoid.h>
 
 class LogosUserFunc final : public LogosFunc {

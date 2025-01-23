@@ -16,7 +16,6 @@ interfaceFile:
         interfaceDeclaration objectImplements? explicitVarDec* funcSignature+ funcImplementation* EOF
     ;
 
-
 importStatement:
         IMPORT LPAREN importPath* RPAREN
     ;

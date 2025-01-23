@@ -4,7 +4,7 @@
 
 #include <llvm/IR/Module.h>
 
-Value* LogosVariableExpr::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
+Value* LogosVariable::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
     const auto symbol = stackFrame->getSymbol(name);
     if (const auto val = symbol->llvmValue) {
         if (auto const allocaInst = dyn_cast<AllocaInst>(val)) {

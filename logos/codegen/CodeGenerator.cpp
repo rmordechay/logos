@@ -1,6 +1,5 @@
 #include "CodeGenerator.h"
 
-#include "application/LogosPackage.h"
 #include "application/LogosUtils.h"
 #include "files/LogosObjectFile.h"
 
@@ -37,8 +36,8 @@ void CodeGenerator::run(const map<string, LogosFile*>& files) {
     }
 
     for (auto [name, file] : files) {
-        auto module = file->generateModule(builder, theStack);
-        modules.push_back(module);
+        // auto module = file->generateModule(builder, theStack);
+        // modules.push_back(module);
     }
     const auto linker = linkModules();
     runBinary();
@@ -92,15 +91,14 @@ void CodeGenerator::generateTest() {
     LLVMContext context;
     auto builder = IRBuilder(context);
     const std::vector<Type *> elements = {
-        Type::getInt32Ty(context), Type::getFloatTy(context)
+        Type::getInt32Ty(context),
+        Type::getFloatTy(context),
     };
     StructType *myStructType = StructType::create(context, elements, "MyStruct");
     AllocaInst *structInstance = builder.CreateAlloca(myStructType, nullptr, "myStructInstance");
     Value *fieldAPtr = builder.CreateStructGEP(myStructType, structInstance, 0, "a_ptr");
-
 }
 
 CodeGenerator::~CodeGenerator() {
     delete targetMachine;
-
 }

@@ -2,7 +2,7 @@ import (
     MyObject
 )
 
-main() {
+main2() {
     obj = MyObject()
     print(10)
 }

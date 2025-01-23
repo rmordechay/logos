@@ -13,6 +13,7 @@ public:
     Type* llvmType = nullptr;
     Value* llvmValue = nullptr;
 
+    explicit LogosSymbol() = default;
     explicit LogosSymbol(Value* symbolValue) : llvmValue(symbolValue) {}
     explicit LogosSymbol(Type* symbolType) : llvmType(symbolType) {}
     explicit LogosSymbol(Type* symbolType, const int position) : pos(position), llvmType(symbolType) {}

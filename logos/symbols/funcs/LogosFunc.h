@@ -11,7 +11,7 @@ public:
     vector<LogosVarDec*> params;
     vector<LogosStmt*> stmts;
 
-    LogosFunc(const string& name, const LogosType* funcType) : name(name), type(funcType) {}
+    explicit LogosFunc(const string& name, const LogosType* funcType) : name(name), type(funcType) {}
     ~LogosFunc() override;
 };
 

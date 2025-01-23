@@ -1,9 +1,8 @@
 #ifndef LOGOSIMPORTSTMT_H
 #define LOGOSIMPORTSTMT_H
-#include "LogosStmt.h"
+#include "CodeGeneration.h"
 
-
-class LogosImportStmt final : public LogosStmt {
+class LogosImportStmt final : public CodeGeneration {
 public:
     const LogosType* primaryImport;
     LogosType* secondaryImport = nullptr;

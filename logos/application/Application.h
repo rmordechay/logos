@@ -3,13 +3,14 @@
 #include "CodeGenerator.h"
 #include "AntlrConverter.h"
 #include "LogosLexer.h"
-#include "LogosPackage.h"
 #include "SemaAnalyser.h"
 
 #include <queue>
 #include <thread>
 #include <string>
 #include "LogosUtils.h"
+
+#include <future>
 #include <thread>
 
 using namespace std;
@@ -29,10 +30,8 @@ public:
     }
 
     void runLogos();
-    LogosPackage* getPackage(const filesystem::path& path);
-    LogosFile* getFile(const filesystem::path& dirPath) const;
-    static LogosParser* parseFile(const string& codeText);
-    static string getCodeText(const filesystem::path& path);
+    void flattenTree(const filesystem::path& path, vector<future<LogosFile*>>& files);
+    future<LogosFile*> getFile(const filesystem::path& path) const;
     ~Application();
 };
 

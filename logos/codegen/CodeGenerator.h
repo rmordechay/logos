@@ -1,6 +1,5 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
-#include "application/LogosPackage.h"
 #include "exprs/LogosExpr.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"

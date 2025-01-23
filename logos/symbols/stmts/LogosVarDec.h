@@ -1,6 +1,6 @@
 #ifndef LOGOSVARDEFINITION_H
 #define LOGOSVARDEFINITION_H
-#include "LogosStack.h"
+#include "../LogosStack.h"
 #include "LogosStmt.h"
 #include "exprs/LogosExpr.h"
 

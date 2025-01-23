@@ -2,7 +2,6 @@
 
 #include "application/LogosUtils.h"
 
-
 Module* LogosObjectFile::generateModule(IRBuilder<>& builder, LogosStack& theStack) {
     auto& context = builder.getContext();
     const auto module = new Module(name, context);
@@ -21,7 +20,7 @@ void LogosObjectFile::initModule(IRBuilder<>& builder, LogosStack& theStack) {
         theStack.addSymbol(field->name, new LogosSymbol(fieldType, i));
     }
     const auto userStruct = StructType::create(builder.getContext(), elementTypes);
-    theStack.addSymbol(LOGOS_THIS, new LogosSymbol(userStruct));
+    theStack.addSymbol(name, new LogosSymbol(userStruct));
 }
 
 LogosObjectFile::~LogosObjectFile() {

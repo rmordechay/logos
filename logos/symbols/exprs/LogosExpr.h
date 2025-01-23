@@ -1,8 +1,7 @@
 #ifndef LOGOSEXPR_H
 #define LOGOSEXPR_H
 #include "CodeGeneration.h"
-#include "LogosStack.h"
-#include "LogosStackFrame.h"
+#include "../LogosStack.h"
 
 class LogosExpr: public CodeGeneration {
 public:

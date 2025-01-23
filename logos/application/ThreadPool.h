@@ -1,5 +1,6 @@
 #ifndef THREADPOOL_H
 #define THREADPOOL_H
+
 #include <queue>
 #include <thread>
 #include <vector>
@@ -10,30 +11,16 @@ class ThreadPool {
 public:
     vector<thread> workers;
     queue<function<void()>> tasks;
-    mutex queueMtx;
-    mutex vectorMtx;
+    mutex mtx;
     condition_variable condition;
-    vector<int> shared_vector;
     const size_t threadsNumber = 10;
-    bool stop;
+    bool stop = false;
 
-    explicit ThreadPool(): stop(false) {}
+    explicit ThreadPool() {}
     void start();
-    template <class F>
-    void addTask(F&& f);
-    void addToVector(const int value);
-    vector<int> getVec();
-    void waitUntilDone();
-    ~ThreadPool();
+    void enqueueTask(function<void()> task);
+    void wait();
+    ~ThreadPool() = default;
 };
-
-template <class F>
-void ThreadPool::addTask(F&& f) {
-    {
-        unique_lock lock(queueMtx);
-        tasks.emplace(std::forward<F>(f));
-    }
-    condition.notify_one();
-}
 
 #endif //THREADPOOL_H
