@@ -1,16 +1,18 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
-#include "exprs/LogosExpr.h"
-#include "files/LogosMainFile.h"
-#include "files/LogosObjectFile.h"
-
 #include <map>
 #include <llvm/IR/IRBuilder.h>
-#include <llvm/Linker/Linker.h>
-#include <llvm/MC/TargetRegistry.h>
+#include <llvm/IR/LLVMContext.h>
 
 using namespace llvm;
 using namespace std;
+
+namespace llvm {
+    class Linker;
+    class TargetMachine;
+}
+class LogosFile;
+class CodeGeneration;
 
 class CodeGenerator {
 public:

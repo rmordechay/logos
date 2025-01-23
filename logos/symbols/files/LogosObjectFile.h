@@ -7,7 +7,7 @@ class LogosObjectFile final : public LogosFile {
 public:
     LogosObject *obj = nullptr;
 
-    explicit LogosObjectFile(const string& name) : LogosFile(name) {}
+    explicit LogosObjectFile(const string& name, const string& path) : LogosFile(name, path) {}
     Module* generateModule(IRBuilder<>& builder, LogosStack& theStack) override;
     void initModule(IRBuilder<>& builder, LogosStack& theStack) override;
     ~LogosObjectFile() override;

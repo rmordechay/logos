@@ -13,7 +13,7 @@ public:
     LogosUserFunc* mainFunc = nullptr;
     vector<LogosFunc*> funcs;
 
-    explicit LogosMainFile() : LogosFile(LOGOS_MAIN_FILE) {}
+    explicit LogosMainFile(const string& path) : LogosFile(LOGOS_MAIN_FILE, path) {}
     Module* generateModule(IRBuilder<>& builder, LogosStack& theStack) override;
     void initModule(IRBuilder<>& builder, LogosStack& theStack) override;
     ~LogosMainFile() override;

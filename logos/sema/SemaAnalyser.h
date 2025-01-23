@@ -13,19 +13,20 @@
 
 class SemaAnalyser {
 public:
-    map<string, LogosFile*> files;
+    map<string, LogosFile*> validFiles;
+    vector<LogosFile*> unprocessedFiles;
     LogosMainFile* mainFile = nullptr;
     bool successful = true;
     mutex mtx;
     ThreadPool pool;
 
-    bool analyse(const vector<LogosFile*>& files);
+    bool analyse();
     void visitLogosFile(LogosFile* file);
     void visitMainFile(const LogosMainFile* mainFile);
-    void visitImportsStmts(const vector<LogosImportStmt*>& importsStmts);
+    void visitImportsStmts(const vector<LogosImport*>& importsStmts);
     void visitObjectFile(const LogosObjectFile* objectFile);
     void visitObject(const LogosObject* object);
-    void visitMainFunc(const LogosUserFunc* mainFunc);
+    void visitMainFunc(const LogosUserFunc* mainFunc, const string& path);
     void visitFunc(const LogosFunc* func);
     void visitStmt(const LogosStmt* stmt);
     void visitStmtList(const vector<LogosStmt*>& stmts);
@@ -38,7 +39,7 @@ public:
     void visitConstant(const LogosUnaryExpr* unaryExpr);
     void setUnsuccessful();
     static void printError(int errCode, Position position);
-    static void printError(int errCode);
+    static void printError(int errCode, const string& path);
     ~SemaAnalyser() = default;
 };
 

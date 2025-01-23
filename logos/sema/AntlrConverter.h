@@ -1,10 +1,10 @@
 #ifndef SEMANTICANALYSER_H
 #define SEMANTICANALYSER_H
-#include "CodeGeneration.h"
 #include "LogosParser.h"
 
 #include <vector>
 
+class LogosType;
 class LogosFuncCall;
 class LogosConstructor;
 class LogosUnaryExpr;
@@ -14,7 +14,7 @@ class LogosVarDec;
 class LogosStmt;
 class LogosFunc;
 class LogosObjectFile;
-class LogosImportStmt;
+class LogosImport;
 class LogosObject;
 class LogosMainFile;
 class LogosFile;
@@ -23,24 +23,25 @@ using namespace std;
 
 class AntlerConverter {
 public:
-    static LogosFile* getLogosFile(LogosParser::LogosFileContext* ctx);
-    static LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx);
-    static LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
-    static vector<LogosImportStmt*> getImportsStmt(LogosParser::ImportStatementContext* ctx);
-    static LogosObjectFile* getObjFile(LogosParser::ObjectFileContext* ctx);
-    static LogosFunc* getFunc(LogosParser::FuncImplementationContext* ctx);
-    static LogosStmt* getStmt(LogosParser::StatementContext* ctx);
-    static vector<LogosStmt*> getStmtList(LogosParser::StatementsBlockContext* ctx);
-    static LogosVarDec* getVarDec(LogosParser::ExplicitVarDecContext* ctx);
-    static LogosVarDec* getVarDec(LogosParser::ImplicitVarDecContext* ctx);
-    static LogosIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
-    static LogosExpr* getExpr(LogosParser::ExprContext* ctx);
-    static LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
-    static LogosConstructor* getConstructorCallExpr(LogosParser::ConstructorCallContext* ctx);
-    static LogosFuncCall* getFuncCallExpr(LogosParser::FuncCallContext* ctx);
-    static Position getPosition(const antlr4::Token* ctx);
-    static LogosUnaryExpr* getConstantExpr(LogosParser::ConstantContext* ctx);
-    static const LogosType& getType(antlr4::tree::TerminalNode* type);
+    const string& filePath;
+    explicit AntlerConverter(const string& filePath) : filePath(filePath) {}
+    LogosFile* getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath);
+    LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx);
+    LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
+    vector<LogosImport*> getImportsStmt(LogosParser::ImportStatementContext* ctx);
+    LogosObjectFile* getObjFile(LogosParser::ObjectFileContext* ctx);
+    LogosFunc* getFunc(LogosParser::FuncImplementationContext* ctx);
+    LogosStmt* getStmt(LogosParser::StatementContext* ctx);
+    vector<LogosStmt*> getStmtList(LogosParser::StatementsBlockContext* ctx);
+    LogosVarDec* getVarDec(LogosParser::ExplicitVarDecContext* ctx);
+    LogosVarDec* getVarDec(LogosParser::ImplicitVarDecContext* ctx);
+    LogosIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
+    LogosExpr* getExpr(LogosParser::ExprContext* ctx);
+    LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
+    LogosConstructor* getConstructorCallExpr(LogosParser::ConstructorCallContext* ctx);
+    LogosFuncCall* getFuncCallExpr(LogosParser::FuncCallContext* ctx);
+    LogosUnaryExpr* getConstantExpr(LogosParser::ConstantContext* ctx);
+    const LogosType& getType(antlr4::tree::TerminalNode* type);
     ~AntlerConverter() = default;
 };
 

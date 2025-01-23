@@ -3,6 +3,13 @@
 #include <iostream>
 #include <ostream>
 
+
+void LogosFuncCall::setPosition(const antlr4::Token* ctx, const string& filePath) {
+    position.lineNumber = ctx->getLine();
+    position.posInLine = ctx->getCharPositionInLine();
+    position.filePath = &filePath;
+}
+
 Value* LogosFuncCall::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
     const auto funcSymbol = stackFrame->getFunc(name);
     std::vector<Value*> llvmArgs;

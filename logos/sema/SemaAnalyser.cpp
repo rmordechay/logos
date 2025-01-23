@@ -3,9 +3,9 @@
 
 #include <__format/format_functions.h>
 
-bool SemaAnalyser::analyse(const vector<LogosFile*>& files) {
+bool SemaAnalyser::analyse() {
     pool.start();
-    for (const auto file : files) {
+    for (const auto file : unprocessedFiles) {
         pool.enqueueTask([this, file] {
             visitLogosFile(file);
         });
@@ -21,12 +21,12 @@ void SemaAnalyser::visitLogosFile(LogosFile* file) {
     if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
         visitObjectFile(objFile);
     }
-    files[file->name] = file;
+    validFiles[file->name] = file;
 }
 
 void SemaAnalyser::visitMainFile(const LogosMainFile* mainFile) {
     visitImportsStmts(mainFile->imports);
-    visitMainFunc(mainFile->mainFunc);
+    visitMainFunc(mainFile->mainFunc, mainFile->path);
     for (const auto func : mainFile->funcs) {
         visitFunc(func);
     }
@@ -36,15 +36,15 @@ void SemaAnalyser::visitObject(const LogosObject* object) {
     if (!object) return;
 }
 
-void SemaAnalyser::visitMainFunc(const LogosUserFunc* mainFunc) {
+void SemaAnalyser::visitMainFunc(const LogosUserFunc* mainFunc, const string& path) {
     if (!mainFunc) {
-        printError(100);
+        printError(100, path);
         setUnsuccessful();
         return;
     }
 }
 
-void SemaAnalyser::visitImportsStmts(const vector<LogosImportStmt*>& importsStmts) {
+void SemaAnalyser::visitImportsStmts(const vector<LogosImport*>& importsStmts) {
     if (importsStmts.empty()) return;
 }
 
@@ -116,10 +116,11 @@ void SemaAnalyser::setUnsuccessful() {
 }
 
 void SemaAnalyser::printError(const int errCode, Position position) {
-    cout <<  std::format("Error at {} {}", position.lineNumber, position.posInLine);
+    cout <<  std::format("Error at {} {} {}: \n", *position.filePath, position.lineNumber, position.posInLine);
     cout << LOGOS_ERRORS.at(errCode) << endl;
 }
 
-void SemaAnalyser::printError(const int errCode) {
-    cout << LOGOS_ERRORS.at(errCode) << endl;
+void SemaAnalyser::printError(int errCode, const string& path) {
+    cout <<  std::format("Error at {}:\n", path);
+    cout << "\t" << LOGOS_ERRORS.at(errCode) << endl;
 }

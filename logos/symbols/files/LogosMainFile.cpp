@@ -15,7 +15,7 @@ void LogosMainFile::initModule(IRBuilder<>& builder, LogosStack& theStack) {
     const auto printFuncType = FunctionType::get(builder.getVoidTy(), builder.getInt32Ty(), false);
     const auto printFunc = Function::Create(printFuncType, Function::ExternalLinkage, "printInt");
     theStack.addFunc("print", printFunc);
-    for (const LogosImportStmt* import : imports) {
+    for (const LogosImport* import : imports) {
         auto llvmType = import->primaryImport->getLLVMType(&builder);
     }
 }

@@ -5,7 +5,7 @@
 #include "types/LogosType.h"
 
 #include <llvm/IR/Module.h>
-#include "LogosImportStmt.h"
+#include "LogosImport.h"
 
 #include <string>
 
@@ -15,12 +15,18 @@ class LogosFile {
 public:
     string name;
     string path;
-    vector<LogosImportStmt*> imports;
+    vector<LogosImport*> imports;
 
-    explicit LogosFile(const string& name) : name(name) {}
+    explicit LogosFile(const string& name, const string& path) : name(name), path(path) {}
     virtual Module* generateModule(IRBuilder<>& builder, LogosStack& theStack) = 0;
     virtual void initModule(IRBuilder<>& builder, LogosStack& theStack) = 0;
-    virtual ~LogosFile() = default;
+    virtual ~LogosFile();
 };
+
+inline LogosFile::~LogosFile() {
+    for (const auto import : imports) {
+        delete import;
+    }
+}
 
 #endif //LOGOSFILE_H
