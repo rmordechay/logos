@@ -1,6 +1,10 @@
 #include "LogosMainFile.h"
 
 
+void LogosMainFile::initModule(IRBuilder<>& builder, LogosStack& theStack) {
+
+}
+
 Module* LogosMainFile::generateModule(IRBuilder<>& builder, LogosStack& theStack) {
     const auto module = new Module(name, builder.getContext());
     for (const auto func : funcs) {
@@ -9,15 +13,6 @@ Module* LogosMainFile::generateModule(IRBuilder<>& builder, LogosStack& theStack
     mainFunc->getLLVMValue(&builder, &theStack, module);
     builder.CreateRet(builder.getInt32(EXIT_SUCCESS));
     return module;
-}
-
-void LogosMainFile::initModule(IRBuilder<>& builder, LogosStack& theStack) {
-    const auto printFuncType = FunctionType::get(builder.getVoidTy(), builder.getInt32Ty(), false);
-    const auto printFunc = Function::Create(printFuncType, Function::ExternalLinkage, "printInt");
-    theStack.addFunc("print", printFunc);
-    for (const LogosImport* import : imports) {
-        auto llvmType = import->primaryImport->getLLVMType(&builder);
-    }
 }
 
 LogosMainFile::~LogosMainFile() {

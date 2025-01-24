@@ -26,3 +26,4 @@ Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame,
     stackFrame->exitScope();
     return func;
 }
+

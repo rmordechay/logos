@@ -8,8 +8,8 @@ public:
     LogosObject *obj = nullptr;
 
     explicit LogosObjectFile(const string& name, const string& path) : LogosFile(name, path) {}
-    Module* generateModule(IRBuilder<>& builder, LogosStack& theStack) override;
     void initModule(IRBuilder<>& builder, LogosStack& theStack) override;
+    Module* generateModule(IRBuilder<>& builder, LogosStack& theStack) override;
     ~LogosObjectFile() override;
 };
 

@@ -13,12 +13,11 @@
 
 class SemaAnalyser {
 public:
+    bool successful = true;
+    LogosMainFile* mainFile = nullptr;
     map<string, LogosFile*> validFiles;
     vector<LogosFile*> unprocessedFiles;
-    LogosMainFile* mainFile = nullptr;
-    bool successful = true;
     mutex mtx;
-    ThreadPool pool;
 
     bool analyse();
     void visitLogosFile(LogosFile* file);
@@ -38,8 +37,8 @@ public:
     void visitFuncCall(const LogosFuncCall* funcCallExpr);
     void visitConstant(const LogosUnaryExpr* unaryExpr);
     void setUnsuccessful();
-    static void printError(int errCode, Position position);
-    static void printError(int errCode, const string& path);
+    void printError(int errCode, Position position);
+    void printError(int errCode, const string& path);
     ~SemaAnalyser() = default;
 };
 

@@ -21,12 +21,12 @@ public:
     string rootPath;
     CodeGenerator codeGenerator;
     SemaAnalyser semaAnalyser;
-    ThreadPool threadPool;
+    mutex mtx;
 
     explicit Application(const string& rootPath) : rootPath(rootPath) {}
     void runLogos();
     vector<LogosFile*> parse();
-    void flattenTree(const string& path, vector<LogosFile*>& files);
+    void flattenTree(const string& path, vector<LogosFile*>& files, ThreadPool& threadPool);
     static LogosFile* getFile(const directory_entry&);
     ~Application() = default;
 };

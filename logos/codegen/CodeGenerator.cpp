@@ -2,6 +2,7 @@
 
 #include "application/LogosUtils.h"
 #include "files/LogosObjectFile.h"
+#include "funcs/LogosPrint.h"
 
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
@@ -22,35 +23,37 @@
 #include <iostream>
 #include <llvm/Linker/Linker.h>
 
-const auto PRINT_IR_FILE = "../codegen/print.ll";
+const auto LOGOS_LIB_IR_FILE = "../codegen/print.ll";
 const auto LINKED_OBJECT_FILE = "../output.o";
 const auto LINKED_IR_FILE = "../output.ll";
 constexpr auto LLVM_OBJECT_FILE = CodeGenFileType::ObjectFile;
 
 void CodeGenerator::run(const map<string, LogosFile*>& files) {
-    LogosStack theStack;
-    theStack.push(LogosStackFrame());
+    initLLVM();
+    const auto rootModule = Utils::createLLVMModuleFromFile(LOGOS_LIB_IR_FILE, builder.getContext(), *targetMachine);
 
+    LogosStack theStack;
+    declareBuiltinFuncs(theStack, rootModule);
     for (auto [name, file] : files) {
         file->initModule(builder, theStack);
     }
 
     for (auto [name, file] : files) {
-        // auto module = file->generateModule(builder, theStack);
-        // modules.push_back(module);
+        LogosStack fileStack;
+        fileStack.globalFuncs = theStack.globalFuncs;
+        fileStack.globalSymbols = theStack.globalSymbols;
+        auto module = file->generateModule(builder, fileStack);
+        modules.push_back(module);
     }
-    const auto linker = linkModules();
+
+    const auto linker = linkModules(rootModule);
     runBinary();
     delete linker;
     // generateTest();
 }
 
-Linker* CodeGenerator::linkModules() const {
-    const auto rootModule = Utils::createLLVMModuleFromFile(PRINT_IR_FILE, builder.getContext(), *targetMachine);
-    rootModule->print(outs(), nullptr);
-    std::cout << "\n-----\n" << std::endl;
+Linker* CodeGenerator::linkModules(Module* const rootModule) const {
     const auto linker = new Linker(*rootModule);
-
     for (int i = 0; i < modules.size(); ++i) {
         const auto module = modules[i];
         module->print(outs(), nullptr);
@@ -66,6 +69,10 @@ Linker* CodeGenerator::linkModules() const {
     targetMachine->addPassesToEmitFile(emitPass, dest, nullptr, LLVM_OBJECT_FILE);
     emitPass.run(*rootModule);
     return linker;
+}
+
+void CodeGenerator::declareBuiltinFuncs(LogosStack& theStack, Module* const rootModule) {
+    theStack.globalFuncs["print"] = logosPrint.getLLVMValue(&builder, &theStack, rootModule);
 }
 
 void CodeGenerator::initLLVM() {

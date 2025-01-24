@@ -10,12 +10,15 @@ using namespace std;
 class LogosStackFrame {
 public:
     Function* currentFunction = nullptr;
-    map<string, LogosSymbol*> symbolTable;
+    map<string, LogosSymbol*> symbols;
     map<string, Function*> functions;
 };
 
 class LogosStack : public stack<LogosStackFrame> {
 public:
+    LogosStack() { push(LogosStackFrame()); }
+    map<string, LogosSymbol*> globalSymbols;
+    map<string, Function*> globalFuncs;
     void enterScope(Function* func);
     void exitScope();
     LogosSymbol* getSymbol(const string& name);
@@ -38,7 +41,7 @@ inline void LogosStack::exitScope() {
 }
 
 inline LogosSymbol* LogosStack::getSymbol(const string& name) {
-    return top().symbolTable[name];
+    return top().symbols[name];
 }
 
 inline Function* LogosStack::getFunc(const string& name) {
@@ -46,7 +49,7 @@ inline Function* LogosStack::getFunc(const string& name) {
 }
 
 inline void LogosStack::addSymbol(const string& name, LogosSymbol* symbol) {
-    top().symbolTable[name] = symbol;
+    top().symbols[name] = symbol;
 }
 
 inline void LogosStack::addFunc(const string& name, Function* value) {

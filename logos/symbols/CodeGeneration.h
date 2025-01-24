@@ -22,7 +22,7 @@ struct Position {
 class CodeGeneration {
 public:
     Position position = Position();
-    virtual Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stack, Module* module) = 0;
+    virtual Value* getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) = 0;
     virtual void setPosition(const antlr4::Token* ctx, const string& filePath);
     virtual ~CodeGeneration() = default;
 };

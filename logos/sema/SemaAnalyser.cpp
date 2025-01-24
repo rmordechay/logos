@@ -4,13 +4,13 @@
 #include <__format/format_functions.h>
 
 bool SemaAnalyser::analyse() {
-    pool.start();
+    ThreadPool threadPool;
     for (const auto file : unprocessedFiles) {
-        pool.enqueueTask([this, file] {
+        threadPool.runTask([this, file] {
             visitLogosFile(file);
         });
     }
-    pool.wait();
+    threadPool.wait();
     return successful;
 }
 
@@ -39,7 +39,6 @@ void SemaAnalyser::visitObject(const LogosObject* object) {
 void SemaAnalyser::visitMainFunc(const LogosUserFunc* mainFunc, const string& path) {
     if (!mainFunc) {
         printError(100, path);
-        setUnsuccessful();
         return;
     }
 }
@@ -116,11 +115,13 @@ void SemaAnalyser::setUnsuccessful() {
 }
 
 void SemaAnalyser::printError(const int errCode, Position position) {
+    setUnsuccessful();
     cout <<  std::format("Error at {} {} {}: \n", *position.filePath, position.lineNumber, position.posInLine);
     cout << LOGOS_ERRORS.at(errCode) << endl;
 }
 
 void SemaAnalyser::printError(int errCode, const string& path) {
+    setUnsuccessful();
     cout <<  std::format("Error at {}:\n", path);
     cout << "\t" << LOGOS_ERRORS.at(errCode) << endl;
 }

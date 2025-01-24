@@ -16,9 +16,8 @@ public:
     const size_t threadsNumber = 10;
     bool stop = false;
 
-    explicit ThreadPool() {}
-    void start();
-    void enqueueTask(function<void()> task);
+    explicit ThreadPool();
+    void runTask(function<void()> task);
     void wait();
     ~ThreadPool() = default;
 };

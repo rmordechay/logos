@@ -7,23 +7,25 @@ void Application::runLogos() {
 }
 
 vector<LogosFile*> Application::parse() {
-    threadPool.start();
+    ThreadPool threadPool;
     auto files = vector<LogosFile*>();
-    flattenTree(rootPath, files);
+    flattenTree(rootPath, files, threadPool);
     threadPool.wait();
     return files;
 }
 
-void Application::flattenTree(const string& path, vector<LogosFile*>& files) {
+void Application::flattenTree(const string& path, vector<LogosFile*>& files, ThreadPool& threadPool) {
     for (const auto& entry : directory_iterator(path)) {
         if (Utils::isLogosFile(entry)) {
-            threadPool.enqueueTask([entry, &files, this] {
+            threadPool.runTask([entry, &files, this] {
                 const auto logosFile = getFile(entry);
-                std::lock_guard lock(threadPool.mtx);
-                files.emplace_back(logosFile);
+                {
+                    lock_guard lock(mtx);
+                    files.emplace_back(logosFile);
+                }
             });
         } else if (is_directory(entry.status())) {
-            flattenTree(entry.path(), files);
+            flattenTree(entry.path(), files, threadPool);
         }
     }
 }

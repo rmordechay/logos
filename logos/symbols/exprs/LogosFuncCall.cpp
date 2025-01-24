@@ -11,7 +11,7 @@ void LogosFuncCall::setPosition(const antlr4::Token* ctx, const string& filePath
 }
 
 Value* LogosFuncCall::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
-    const auto funcSymbol = stackFrame->getFunc(name);
+    const auto funcSymbol = stackFrame->globalFuncs[name];
     std::vector<Value*> llvmArgs;
     for (const auto arg : args) {
         llvmArgs.push_back(arg->getLLVMValue(builder, stackFrame, module));

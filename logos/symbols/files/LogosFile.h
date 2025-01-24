@@ -18,8 +18,8 @@ public:
     vector<LogosImport*> imports;
 
     explicit LogosFile(const string& name, const string& path) : name(name), path(path) {}
-    virtual Module* generateModule(IRBuilder<>& builder, LogosStack& theStack) = 0;
     virtual void initModule(IRBuilder<>& builder, LogosStack& theStack) = 0;
+    virtual Module* generateModule(IRBuilder<>& builder, LogosStack& theStack) = 0;
     virtual ~LogosFile();
 };
 

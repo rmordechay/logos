@@ -70,6 +70,8 @@ add_executable(logos
     logos/symbols/types/LogosString.h
     logos/symbols/types/LogosType.h
     logos/symbols/LogosSymbol.h
+    logos/symbols/funcs/LogosPrint.cpp
+    logos/symbols/funcs/LogosPrint.h
 )
 
 target_include_directories(logos PRIVATE

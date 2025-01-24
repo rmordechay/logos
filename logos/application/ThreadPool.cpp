@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-void ThreadPool::start() {
+ThreadPool::ThreadPool() {
     for(size_t i = 0; i < threadsNumber; ++i) {
         workers.emplace_back([this] {
             while(true) {
@@ -12,7 +12,7 @@ void ThreadPool::start() {
                     condition.wait(lock, [this] {
                         return stop || !tasks.empty();
                     });
-                    if(stop && tasks.empty()) {
+                    if(tasks.empty()) {
                         return;
                     }
                     task = std::move(tasks.front());
@@ -24,7 +24,7 @@ void ThreadPool::start() {
     }
 }
 
-void ThreadPool::enqueueTask(function<void()> task) {
+void ThreadPool::runTask(function<void()> task) {
     {
         lock_guard lock(mtx);
         tasks.push(std::move(task));
@@ -38,7 +38,7 @@ void ThreadPool::wait() {
         stop = true;
     }
     condition.notify_all();
-    for(thread &worker: workers) {
+    for(auto& worker: workers) {
         worker.join();
     }
 }
