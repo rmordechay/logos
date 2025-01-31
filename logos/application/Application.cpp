@@ -1,9 +1,9 @@
 #include "Application.h"
 
 void Application::runLogos() {
-    semaAnalyser.unprocessedFiles = parse();
+    semaAnalyser.files = parse();
     if (!semaAnalyser.analyse()) return;
-    codeGenerator.run(semaAnalyser.validFiles);
+    codeGenerator.run(semaAnalyser.files);
 }
 
 vector<LogosFile*> Application::parse() {

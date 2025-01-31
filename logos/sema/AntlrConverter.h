@@ -1,5 +1,6 @@
 #ifndef SEMANTICANALYSER_H
 #define SEMANTICANALYSER_H
+
 #include "LogosParser.h"
 
 #include <vector>

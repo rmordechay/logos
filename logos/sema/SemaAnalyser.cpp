@@ -1,11 +1,11 @@
 #include "SemaAnalyser.h"
 #include "LogosErrors.h"
 
-#include <__format/format_functions.h>
+#include <format>
 
 bool SemaAnalyser::analyse() {
     ThreadPool threadPool;
-    for (const auto file : unprocessedFiles) {
+    for (const auto file : files) {
         threadPool.runTask([this, file] {
             visitLogosFile(file);
         });
@@ -21,7 +21,6 @@ void SemaAnalyser::visitLogosFile(LogosFile* file) {
     if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
         visitObjectFile(objFile);
     }
-    validFiles[file->name] = file;
 }
 
 void SemaAnalyser::visitMainFile(const LogosMainFile* mainFile) {

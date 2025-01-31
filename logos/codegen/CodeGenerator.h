@@ -1,11 +1,6 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
 #include "LogosStack.h"
-#include "application/ThreadPool.h"
-
-#include <map>
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/LLVMContext.h>
 
 class ThreadPool;
 using namespace llvm;
@@ -28,11 +23,12 @@ public:
 
 
     void declareBuiltinFuncs(LogosStack& theStack, Module* rootModule);
-    void run(const map<string, LogosFile*>& files);
+    void run(const vector<LogosFile*>& files);
     Linker* linkModules(Module* rootModule) const;
     void initLLVM();
     static void runBinary();
     static void generateTest();
+    void emitLLVMFile(const string& filePath, const Module* module);
     ~CodeGenerator();
 
 };

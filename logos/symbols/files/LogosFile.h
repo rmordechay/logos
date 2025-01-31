@@ -8,6 +8,7 @@
 #include "LogosImport.h"
 
 #include <string>
+#include <llvm/Support/FileSystem.h>
 
 using namespace std;
 
@@ -27,6 +28,13 @@ inline LogosFile::~LogosFile() {
     for (const auto import : imports) {
         delete import;
     }
+}
+
+inline void writeIRToFile(const Module* module, const string& name) {
+    std::error_code EC;
+    raw_fd_ostream textFile("../codegen/" + name + ".ll", EC, sys::fs::OF_None);
+    module->print(outs(), nullptr);
+    module->print(textFile, nullptr);
 }
 
 #endif //LOGOSFILE_H

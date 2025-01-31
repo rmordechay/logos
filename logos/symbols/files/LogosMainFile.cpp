@@ -1,9 +1,7 @@
 #include "LogosMainFile.h"
 
 
-void LogosMainFile::initModule(IRBuilder<>& builder, LogosStack& theStack) {
-
-}
+void LogosMainFile::initModule(IRBuilder<>& builder, LogosStack& theStack) {}
 
 Module* LogosMainFile::generateModule(IRBuilder<>& builder, LogosStack& theStack) {
     const auto module = new Module(name, builder.getContext());
@@ -12,6 +10,8 @@ Module* LogosMainFile::generateModule(IRBuilder<>& builder, LogosStack& theStack
     }
     mainFunc->getLLVMValue(&builder, &theStack, module);
     builder.CreateRet(builder.getInt32(EXIT_SUCCESS));
+
+    writeIRToFile(module, name);
     return module;
 }
 

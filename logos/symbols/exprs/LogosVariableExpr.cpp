@@ -6,7 +6,6 @@
 
 Value* LogosVariable::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
     const auto symbol = stackFrame->getSymbol(name);
-    // TODO Symbol 'x' is not found in MyObject
     if (const auto val = symbol->llvmValue) {
         if (auto const allocaInst = dyn_cast<AllocaInst>(val)) {
             return builder->CreateLoad(allocaInst->getAllocatedType(), allocaInst);

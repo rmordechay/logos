@@ -15,8 +15,7 @@ class SemaAnalyser {
 public:
     bool successful = true;
     LogosMainFile* mainFile = nullptr;
-    map<string, LogosFile*> validFiles;
-    vector<LogosFile*> unprocessedFiles;
+    vector<LogosFile*> files;
     mutex mtx;
 
     bool analyse();

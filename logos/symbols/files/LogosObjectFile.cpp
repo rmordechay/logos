@@ -19,6 +19,7 @@ Module* LogosObjectFile::generateModule(IRBuilder<>& builder, LogosStack& theSta
     for (const auto func : obj->funcs) {
         func->getLLVMValue(&builder, &theStack, module);
     }
+    writeIRToFile(module, name);
     return module;
 }
 

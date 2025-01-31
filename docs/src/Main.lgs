@@ -1,7 +1,3 @@
-import (
-    MyObject
-)
-
 main() {
     obj = MyObject()
     print(10)

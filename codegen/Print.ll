@@ -1,14 +1,9 @@
 ; ModuleID = 'Print'
 source_filename = "Print"
 
-declare i32 @printf(ptr, ...)
+declare i64 @write(i32, ptr, i32)
 
-@.str = private unnamed_addr constant [4 x i8] c"%d\0A\00"
-
-define void @printInt(i32 noundef %arg) {
-  %2 = alloca i32, align 4
-  store i32 %arg, ptr %2, align 4
-  %3 = load i32, ptr %2, align 4
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %3)
+define void @printInt(ptr %arg, i32 %n) {
+  call i64 @write(i32 1, ptr %arg, i32 %n)
   ret void
 }

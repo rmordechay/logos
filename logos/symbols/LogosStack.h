@@ -16,9 +16,10 @@ public:
 
 class LogosStack : public stack<LogosStackFrame> {
 public:
-    LogosStack() { push(LogosStackFrame()); }
     map<string, LogosSymbol*> globalSymbols;
     map<string, Function*> globalFuncs;
+
+    LogosStack() { push(LogosStackFrame()); }
     void enterScope(Function* func);
     void exitScope();
     LogosSymbol* getSymbol(const string& name);

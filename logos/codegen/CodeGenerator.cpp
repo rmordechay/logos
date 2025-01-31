@@ -5,7 +5,7 @@
 #include "funcs/LogosPrint.h"
 
 #include <llvm/IR/Module.h>
-#include <llvm/IR/IRBuilder.h>
+
 #include <llvm/IR/Function.h>
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Support/FileSystem.h>
@@ -28,47 +28,23 @@ const auto LINKED_OBJECT_FILE = "../output.o";
 const auto LINKED_IR_FILE = "../output.ll";
 constexpr auto LLVM_OBJECT_FILE = CodeGenFileType::ObjectFile;
 
-void CodeGenerator::run(const map<string, LogosFile*>& files) {
+void CodeGenerator::run(const vector<LogosFile*>& files) {
     initLLVM();
-    const auto rootModule = Utils::createLLVMModuleFromFile(LOGOS_LIB_IR_FILE, builder.getContext(), *targetMachine);
-
     LogosStack theStack;
+    const auto rootModule = Utils::createLLVMModuleFromFile(LOGOS_LIB_IR_FILE, builder.getContext(), *targetMachine);
     declareBuiltinFuncs(theStack, rootModule);
-    for (auto [name, file] : files) {
+    for (const auto file : files) {
         file->initModule(builder, theStack);
     }
 
-    for (auto [name, file] : files) {
-        LogosStack fileStack;
-        fileStack.globalFuncs = theStack.globalFuncs;
-        fileStack.globalSymbols = theStack.globalSymbols;
-        auto module = file->generateModule(builder, fileStack);
+    for (const auto file : files) {
+        auto module = file->generateModule(builder, theStack);
         modules.push_back(module);
     }
 
-    const auto linker = linkModules(rootModule);
-    runBinary();
-    delete linker;
+    // runBinary();
+    // delete linker;
     // generateTest();
-}
-
-Linker* CodeGenerator::linkModules(Module* const rootModule) const {
-    const auto linker = new Linker(*rootModule);
-    for (int i = 0; i < modules.size(); ++i) {
-        const auto module = modules[i];
-        module->print(outs(), nullptr);
-        std::cout << "\n-----\n" << std::endl;
-        linker->linkInModule(std::unique_ptr<Module>(module));
-    }
-    if (verifyModule(*rootModule, &errs())) {
-        return linker;
-    }
-    std::error_code EC;
-    raw_fd_ostream dest(LINKED_OBJECT_FILE, EC, sys::fs::OF_None);
-    auto emitPass = legacy::PassManager();
-    targetMachine->addPassesToEmitFile(emitPass, dest, nullptr, LLVM_OBJECT_FILE);
-    emitPass.run(*rootModule);
-    return linker;
 }
 
 void CodeGenerator::declareBuiltinFuncs(LogosStack& theStack, Module* const rootModule) {
@@ -90,7 +66,7 @@ void CodeGenerator::initLLVM() {
 }
 
 void CodeGenerator::runBinary() {
-    std::system("clang ../output.o -o ../output");
+    std::system("cd ../codegen && clang Main.ll MyObject.ll Print.ll -o ../output");
     std::system("../output");
 }
 
@@ -104,6 +80,13 @@ void CodeGenerator::generateTest() {
     StructType *myStructType = StructType::create(context, elements, "MyStruct");
     AllocaInst *structInstance = builder.CreateAlloca(myStructType, nullptr, "myStructInstance");
     Value *fieldAPtr = builder.CreateStructGEP(myStructType, structInstance, 0, "a_ptr");
+}
+
+void CodeGenerator::emitLLVMFile(const string& filePath, const Module* const module) {
+    std::error_code EC;
+    raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
+    module->print(textFile, nullptr);
+    module->print(outs(), nullptr);
 }
 
 CodeGenerator::~CodeGenerator() {

@@ -2,10 +2,13 @@
 #define LOGOSUTILS_H
 
 #include "LogosDefinitions.h"
-#include <__filesystem/directory_entry.h>
-#include <llvm/IR/IRBuilder.h>
+
 #include <llvm/IR/Module.h>
+#include <llvm/IRReader/IRReader.h>
+#include <llvm/Support/SourceMgr.h>
 #include <llvm/Target/TargetMachine.h>
+#include "llvm/Support/FileSystem.h"
+#include <__filesystem/directory_entry.h>
 
 using namespace std;
 using namespace llvm;

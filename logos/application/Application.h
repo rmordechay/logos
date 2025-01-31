@@ -2,19 +2,23 @@
 #define PROJECT_H
 
 #include <queue>
-#include <thread>
 #include <string>
-#include <future>
 #include <thread>
-#include "CodeGenerator.h"
+
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/LLVMContext.h>
+
 #include "AntlrConverter.h"
-#include "LogosLexer.h"
-#include "SemaAnalyser.h"
-#include "LogosUtils.h"
 
 using namespace filesystem;
 using namespace std;
 using namespace antlr4;
+using namespace llvm;
+
+#include "CodeGenerator.h"
+#include "LogosLexer.h"
+#include "SemaAnalyser.h"
+#include "LogosUtils.h"
 
 class Application {
 public:
