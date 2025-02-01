@@ -11,7 +11,7 @@ class LogosUserFunc;
 class LogosMainFile final : public LogosFile {
 public:
     LogosUserFunc* mainFunc = nullptr;
-    vector<LogosFunc*> funcs;
+    vector<LogosUserFunc*> funcs;
 
     explicit LogosMainFile(const string& path) : LogosFile(LOGOS_MAIN_FILE, path) {}
     void initModule(IRBuilder<>& builder, LogosStack& theStack) override;

@@ -7,11 +7,12 @@
 class LogosVarDec final : public LogosStmt {
 public:
     string name;
-    const LogosType* type;
-    LogosExpr* expr;
+    LogosType* inferredType = nullptr;
+    LogosType* userType = nullptr;
+    LogosExpr* expr = nullptr;
 
-    explicit LogosVarDec(const string& name, LogosExpr* expr) : name(name), type(expr->type), expr(expr) {}
-    explicit LogosVarDec(const string& name, const LogosType* type) : name(name), type(type), expr(nullptr) {}
+    LogosVarDec(const string& name, LogosType* userType, LogosExpr* expr) : name(name), userType(userType), expr(expr) {}
+    LogosVarDec(const string& name, LogosType* inferredType) : name(name), inferredType(inferredType){}
     Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) override;
     ~LogosVarDec() override;
 };

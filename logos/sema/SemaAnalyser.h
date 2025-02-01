@@ -24,20 +24,20 @@ public:
     void visitObjectFile(const LogosObjectFile* objectFile);
     void visitObject(const LogosObject* object);
     void visitMainFunc(const LogosUserFunc* mainFunc, const string& path);
-    void visitFunc(const LogosFunc* func);
-    void visitStmt(const LogosStmt* stmt);
+    void visitUserFunc(const LogosUserFunc* func);
+    void visitStmt(LogosStmt* stmt);
     void visitStmtList(const vector<LogosStmt*>& stmts);
-    void visitVarDec(const LogosVarDec* varDec);
+    void visitVarDec(LogosVarDec* varDec);
     void visitIfStmt(const LogosIfStmt* ifStmt);
     void visitExpr(const LogosExpr* expr);
     void visitUnaryExpr(const LogosUnaryExpr* unaryExpr);
     void visitConstructor(const LogosConstructor* constructorExpr);
     void visitFuncCall(const LogosFuncCall* funcCallExpr);
     void visitConstant(const LogosUnaryExpr* unaryExpr);
-    const LogosType& inferType(LogosExpr* expr);
+    LogosType* inferType(const LogosExpr* expr);
     void setUnsuccessful();
-    void printError(int errCode, Position position);
-    void printError(int errCode, const string& path);
+    template <class ... Args>
+    void printError(int errCode, Position *position, Args&&... args);
     ~SemaAnalyser() = default;
 };
 

@@ -13,7 +13,7 @@ public:
     ConstValue value;
 
     template <typename T>
-    explicit LogosConstant(const LogosType* exprType, T v) : LogosUnaryExpr(exprType), value(v) {
+    explicit LogosConstant(LogosType* exprType, T v) : LogosUnaryExpr(exprType), value(v) {
         static_assert(is_same_v<T, bool> || is_same_v<T, int> || is_same_v<T, float> || is_same_v<T, string>);
     }
 

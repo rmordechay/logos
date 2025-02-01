@@ -7,11 +7,11 @@
 class LogosFunc : public CodeGeneration {
 public:
     string name;
-    const LogosType* type;
+    LogosType* type;
     vector<LogosVarDec*> params;
     vector<LogosStmt*> stmts;
 
-    explicit LogosFunc(const string& name, const LogosType* funcType) : name(name), type(funcType) {}
+    explicit LogosFunc(const string& name, LogosType* funcType) : name(name), type(funcType) {}
     ~LogosFunc() override;
 };
 

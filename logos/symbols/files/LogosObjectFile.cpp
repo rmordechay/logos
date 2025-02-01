@@ -6,7 +6,7 @@ void LogosObjectFile::initModule(IRBuilder<>& builder, LogosStack& theStack) {
     vector<Type*> elementTypes;
     for (int i = 0; i < obj->fields.size(); ++i) {
         const auto field = obj->fields[i];
-        auto fieldType = field->type->getLLVMType(&builder);
+        auto fieldType = field->inferredType->getLLVMType(&builder);
         elementTypes.push_back(fieldType);
         theStack.addSymbol(field->name, new LogosSymbol(fieldType, i));
     }

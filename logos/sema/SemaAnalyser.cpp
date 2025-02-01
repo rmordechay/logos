@@ -26,26 +26,31 @@ void SemaAnalyser::visitLogosFile(LogosFile* file) {
 void SemaAnalyser::visitMainFile(const LogosMainFile* mainFile) {
     visitMainFunc(mainFile->mainFunc, mainFile->path);
     for (const auto func : mainFile->funcs) {
-        visitFunc(func);
-    }
-}
-
-void SemaAnalyser::visitObject(const LogosObject* object) {
-    if (!object) return;
-}
-
-void SemaAnalyser::visitMainFunc(const LogosUserFunc* mainFunc, const string& path) {
-    if (!mainFunc) {
-        printError(100, path);
-        return;
+        visitUserFunc(func);
     }
 }
 
 void SemaAnalyser::visitObjectFile(const LogosObjectFile* objectFile) {
     if (!objectFile) return;
+    visitObject(objectFile->obj);
 }
 
-void SemaAnalyser::visitFunc(const LogosFunc* func) {
+void SemaAnalyser::visitObject(const LogosObject* object) {
+    if (!object) return;
+    for (const auto field : object->fields) {
+        visitVarDec(field);
+    }
+}
+
+void SemaAnalyser::visitMainFunc(const LogosUserFunc* mainFunc, const string& path) {
+    if (!mainFunc) {
+        printError(100, nullptr);
+        return;
+    }
+    visitUserFunc(mainFunc);
+}
+
+void SemaAnalyser::visitUserFunc(const LogosUserFunc* func) {
     for (const auto param : func->params) {
         if (!func) return;
         visitVarDec(param);
@@ -55,9 +60,9 @@ void SemaAnalyser::visitFunc(const LogosFunc* func) {
     }
 }
 
-void SemaAnalyser::visitStmt(const LogosStmt* stmt) {
+void SemaAnalyser::visitStmt(LogosStmt* stmt) {
     if (!stmt) return;
-    if (const auto varDec = dynamic_cast<const LogosVarDec*>(stmt)) {
+    if (const auto varDec = dynamic_cast<LogosVarDec*>(stmt)) {
         visitVarDec(varDec);
     }
     if (const auto ifStmt = dynamic_cast<const LogosIfStmt*>(stmt)) {
@@ -74,16 +79,12 @@ void SemaAnalyser::visitStmt(const LogosStmt* stmt) {
 void SemaAnalyser::visitStmtList(const vector<LogosStmt*>& stmts) {
 }
 
-void SemaAnalyser::visitVarDec(const LogosVarDec* varDec) {
-    const LogosType& inferredType = inferType(varDec->expr);
-    if (varDec->type) {
-        if (varDec->type == inferredType) {
-            auto err = LOGOS_ERRORS.at[101];
-            auto a = std::format(err, varDec->type->name(), inferredType.name());
-            printError(101, varDec->position);
-        }
+void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
+    const auto inferredType = varDec->expr->type;
+    if (varDec->userType && *varDec->userType != inferredType) {
+        printError(101, &varDec->position, *varDec->userType, inferredType->name());
     } else {
-        varDec->type = inferredType;
+        varDec->inferredType = inferredType;
     }
 }
 
@@ -111,7 +112,8 @@ void SemaAnalyser::visitConstant(const LogosUnaryExpr* unaryExpr) {
     if (!unaryExpr) return;
 }
 
-const LogosType& SemaAnalyser::inferType(LogosExpr* expr) {
+LogosType* SemaAnalyser::inferType(const LogosExpr* expr) {
+    return expr->type;
 }
 
 void SemaAnalyser::setUnsuccessful() {
@@ -119,14 +121,14 @@ void SemaAnalyser::setUnsuccessful() {
     successful = false;
 }
 
-void SemaAnalyser::printError(const int errCode, Position position) {
+template <typename... Args>
+void SemaAnalyser::printError(const int errCode, Position *position, Args&&... args) {
     setUnsuccessful();
-    cout <<  std::format("Error at {} {} {}: \n", *position.filePath, position.lineNumber, position.posInLine);
-    cout << LOGOS_ERRORS.at(errCode) << endl;
-}
-
-void SemaAnalyser::printError(int errCode, const string& path) {
-    setUnsuccessful();
-    cout <<  std::format("Error at {}:\n", path);
-    cout << "\t" << LOGOS_ERRORS.at(errCode) << endl;
+    const auto msgPair = LOGOS_ERRORS.find(errCode);
+    // const auto formattedMessage = std::vformat(msgPair->second, std::make_format_args(args...));
+    if (position) {
+        cout <<  std::format("Error at {} {} {}: \n", *position->filePath, position->lineNumber, position->posInLine);
+    } else {
+        // cout << formattedMessage << endl;
+    }
 }

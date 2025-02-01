@@ -3,7 +3,7 @@
 Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
     std::vector<Type*> llvmParams;
     for (const auto param : params) {
-        llvmParams.emplace_back(param->type->getLLVMType(builder));
+        llvmParams.emplace_back(param->inferredType->getLLVMType(builder));
     }
 
     const auto funcType = FunctionType::get(type->getLLVMType(builder), llvmParams, false);

@@ -1,6 +1,7 @@
 #include "LogosSelection.h"
 
 Value* LogosSelection::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
+    auto logosSymbol = stackFrame->getSymbol("obj");
     return LogosExpr::getLLVMValue(builder, stackFrame, module);
 }
 

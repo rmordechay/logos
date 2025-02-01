@@ -6,7 +6,7 @@
 class LogosUnaryExpr: public LogosExpr {
 public:
     explicit LogosUnaryExpr() : LogosExpr(nullptr) {}
-    explicit LogosUnaryExpr(const LogosType* type) : LogosExpr(type) {}
+    explicit LogosUnaryExpr(LogosType* type) : LogosExpr(type) {}
     ~LogosUnaryExpr() override = default;
 };
 

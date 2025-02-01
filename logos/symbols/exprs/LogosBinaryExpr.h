@@ -5,12 +5,16 @@
 
 class LogosBinaryExpr final : public LogosExpr {
 public:
-    LogosExpr *left;
-    LogosExpr *right;
+    LogosExpr* left;
+    LogosExpr* right;
     LogosOperator op;
 
-    explicit LogosBinaryExpr(const LogosType* type, LogosExpr* left, LogosExpr* right, const LogosOperator op)
-        : LogosExpr(type), left(left), right(right), op(op) {}
+    explicit LogosBinaryExpr(LogosType* type, LogosExpr* left, LogosExpr* right, const LogosOperator op) :
+        LogosExpr(type),
+        left(left),
+        right(right),
+        op(op) {
+    }
 
     Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) override;
     ~LogosBinaryExpr() override = default;

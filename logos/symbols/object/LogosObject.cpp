@@ -1,7 +1,15 @@
 #include "LogosObject.h"
 
+const string LogosObject::name() const {
+    return typeName;
+}
+
 Type* LogosObject::getLLVMType(IRBuilder<>* builder) const {
     return nullptr;
+}
+
+bool LogosObject::operator==(LogosType* other) const {
+
 }
 
 LogosObject::~LogosObject() {

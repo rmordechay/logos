@@ -2,27 +2,28 @@
 #define LOGOSINT_H
 #include "LogosType.h"
 
+#define INT_TYPE_NAME "Int"
+
 class LogosInt final : public LogosType {
 public:
-    static constexpr auto typeName = "Int";
-
-    const string& name() const override;
+    const string name() const override;
     Type* getLLVMType(IRBuilder<>* builder) const override;
-    bool operator==(const LogosType* other) const override;
+    bool operator==(LogosType* other) const override;
     ~LogosInt() override = default;
 };
 
-inline const string& LogosInt::name() const {
-    return typeName;
+inline const string LogosInt::name() const {
+    return INT_TYPE_NAME;
 }
 
 inline Type* LogosInt::getLLVMType(IRBuilder<>* builder) const {
     return builder->getInt32Ty();
 }
 
-inline bool LogosInt::operator==(const LogosType* other) const {
+inline bool LogosInt::operator==(LogosType* other) const {
+    return this->name() == other->name();
 }
 
-inline const LogosType& LOGOS_INT = LogosInt();
+inline LogosInt LOGOS_INT;
 
 #endif //LOGOSINT_H
