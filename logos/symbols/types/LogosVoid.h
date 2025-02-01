@@ -5,13 +5,24 @@
 
 class LogosVoid final : public LogosType {
 public:
-    static constexpr auto name = "Void";
-    LogosVoid() = default;
-    Type* getLLVMType(IRBuilder<>* builder) const override {
-        return builder->getVoidTy();
-    }
+    static constexpr auto typeName = "Void";
+
+    const string& name() const override;
+    Type* getLLVMType(IRBuilder<>* builder) const override;
+    bool operator==(const LogosType* other) const override;
     ~LogosVoid() override = default;
 };
+
+inline const string& LogosVoid::name() const {
+    return typeName;
+}
+
+inline Type* LogosVoid::getLLVMType(IRBuilder<>* builder) const {
+    return builder->getVoidTy();
+}
+
+inline bool LogosVoid::operator==(const LogosType* other) const {
+}
 
 inline const LogosType& LOGOS_VOID = LogosVoid();
 

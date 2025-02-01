@@ -34,6 +34,7 @@ public:
     void visitConstructor(const LogosConstructor* constructorExpr);
     void visitFuncCall(const LogosFuncCall* funcCallExpr);
     void visitConstant(const LogosUnaryExpr* unaryExpr);
+    const LogosType& inferType(LogosExpr* expr);
     void setUnsuccessful();
     void printError(int errCode, Position position);
     void printError(int errCode, const string& path);

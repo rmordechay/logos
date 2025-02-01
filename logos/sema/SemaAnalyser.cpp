@@ -72,11 +72,19 @@ void SemaAnalyser::visitStmt(const LogosStmt* stmt) {
 }
 
 void SemaAnalyser::visitStmtList(const vector<LogosStmt*>& stmts) {
-    if (stmts.empty()) return;
 }
 
 void SemaAnalyser::visitVarDec(const LogosVarDec* varDec) {
-    if (!varDec) return;
+    const LogosType& inferredType = inferType(varDec->expr);
+    if (varDec->type) {
+        if (varDec->type == inferredType) {
+            auto err = LOGOS_ERRORS.at[101];
+            auto a = std::format(err, varDec->type->name(), inferredType.name());
+            printError(101, varDec->position);
+        }
+    } else {
+        varDec->type = inferredType;
+    }
 }
 
 void SemaAnalyser::visitIfStmt(const LogosIfStmt* ifStmt) {
@@ -101,6 +109,9 @@ void SemaAnalyser::visitFuncCall(const LogosFuncCall* funcCallExpr) {
 
 void SemaAnalyser::visitConstant(const LogosUnaryExpr* unaryExpr) {
     if (!unaryExpr) return;
+}
+
+const LogosType& SemaAnalyser::inferType(LogosExpr* expr) {
 }
 
 void SemaAnalyser::setUnsuccessful() {

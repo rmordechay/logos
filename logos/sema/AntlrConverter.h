@@ -37,7 +37,7 @@ public:
     LogosVarDec* getVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LogosVarDec* getVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LogosIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
-    LogosSelection* resolveSelection(LogosParser::SelectionContext* selection);
+    LogosSelection* getSelection(LogosParser::SelectionContext* selection);
     LogosExpr* getExpr(LogosParser::ExprContext* ctx);
     LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     LogosConstructor* getConstructorCallExpr(LogosParser::ConstructorCallContext* ctx);

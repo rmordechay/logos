@@ -148,7 +148,7 @@ LogosExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
         return getUnaryExpr(unary);
     }
     if (const auto selection = ctx->selection()) {
-        return resolveSelection(selection);
+        return getSelection(selection);
     }
     const auto l = getExpr(ctx->left);
     const auto r = getExpr(ctx->right);
@@ -158,14 +158,14 @@ LogosExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
 }
 
 LogosUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
-    if (const auto constant = ctx->constant()) {
-        return getConstantExpr(constant);
-    }
-
     if (const auto variable = ctx->VARIABLE()) {
         const auto logosVariable = new LogosVariable(variable->getText());
         logosVariable->setPosition(ctx->start, filePath);
         return logosVariable;
+    }
+
+    if (const auto constant = ctx->constant()) {
+        return getConstantExpr(constant);
     }
 
     if (const auto funcCall = ctx->constructorCall()) {
@@ -179,7 +179,7 @@ LogosUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx
     return nullptr;
 }
 
-LogosSelection* AntlerConverter::resolveSelection(LogosParser::SelectionContext* selection) {
+LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* selection) {
     vector<LogosUnaryExpr*> exprs;
     for (const auto unaryExpr : selection->unaryExpr()) {
         auto logosUnaryExpr = getUnaryExpr(unaryExpr);

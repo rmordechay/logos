@@ -5,12 +5,24 @@
 
 class LogosFloat final : public LogosType {
 public:
-    static constexpr auto name = "Float";
-    Type* getLLVMType(IRBuilder<>* builder) const override {
-        return builder->getFloatTy();
-    }
+    static constexpr auto typeName = "Float";
+
+    const string& name() const override;
+    Type* getLLVMType(IRBuilder<>* builder) const override;
+    bool operator==(const LogosType* other) const override;
     ~LogosFloat() override = default;
 };
+
+inline const string& LogosFloat::name() const {
+    return typeName;
+}
+
+inline Type* LogosFloat::getLLVMType(IRBuilder<>* builder) const {
+    return builder->getFloatTy();
+}
+
+inline bool LogosFloat::operator==(const LogosType* other) const {
+}
 
 
 #endif //LOGOSFLOAT_H
