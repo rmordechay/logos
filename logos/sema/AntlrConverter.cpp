@@ -5,6 +5,7 @@
 #include "exprs/LogosConstant.h"
 #include "exprs/LogosConstructor.h"
 #include "exprs/LogosFuncCall.h"
+#include "exprs/LogosSelection.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
 #include "funcs/LogosUserFunc.h"
@@ -147,7 +148,7 @@ LogosVarDec* AntlerConverter::getVarDec(LogosParser::ExplicitVarDecContext* ctx)
 LogosIfStmt* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
     const auto expr = getExpr(ctx->expr());
     const auto stmts = getStmtList(ctx->statementsBlock());
-    auto ifStmt = new LogosIfStmt(expr, stmts);
+    const auto ifStmt = new LogosIfStmt(expr, stmts);
     ifStmt->setPosition(ctx->start, filePath);
     return ifStmt;
 }
@@ -156,6 +157,9 @@ LogosExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
     if (!ctx) return nullptr;
     if (const auto unary = ctx->unaryExpr()) {
         return getUnaryExpr(unary);
+    }
+    if (const auto selection = ctx->selection()) {
+        return resolveSelection(selection);
     }
     const auto l = getExpr(ctx->left);
     const auto r = getExpr(ctx->right);
@@ -184,6 +188,15 @@ LogosUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx
     }
 
     return nullptr;
+}
+
+LogosSelection* AntlerConverter::resolveSelection(LogosParser::SelectionContext* selection) {
+    vector<LogosUnaryExpr*> exprs;
+    for (const auto unaryExpr : selection->unaryExpr()) {
+        auto logosUnaryExpr = getUnaryExpr(unaryExpr);
+        exprs.emplace_back(logosUnaryExpr);
+    }
+    return new LogosSelection(exprs);
 }
 
 LogosConstructor* AntlerConverter::getConstructorCallExpr(LogosParser::ConstructorCallContext* ctx) {

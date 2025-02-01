@@ -104,6 +104,7 @@ expr:
     |   left=expr op=(PLUS | MINUS) right=expr
     |   left=expr op=(DOUBLE_EQUAL | LANGLE | RANGLE | GE | LE) right=expr
     |   unaryExpr
+    |   selection
     |   LPAREN left=expr RPAREN
     ;
 
@@ -119,7 +120,7 @@ constant:
     |   FLOAT
     |   BOOL
     |   STRING
-;
+    ;
 
 selection:
         unaryExpr (DOT unaryExpr)*
