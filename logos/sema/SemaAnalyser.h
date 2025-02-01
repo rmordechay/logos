@@ -21,7 +21,6 @@ public:
     bool analyse();
     void visitLogosFile(LogosFile* file);
     void visitMainFile(const LogosMainFile* mainFile);
-    void visitImportsStmts(const vector<LogosImport*>& importsStmts);
     void visitObjectFile(const LogosObjectFile* objectFile);
     void visitObject(const LogosObject* object);
     void visitMainFunc(const LogosUserFunc* mainFunc, const string& path);

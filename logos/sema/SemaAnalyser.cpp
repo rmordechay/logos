@@ -24,7 +24,6 @@ void SemaAnalyser::visitLogosFile(LogosFile* file) {
 }
 
 void SemaAnalyser::visitMainFile(const LogosMainFile* mainFile) {
-    visitImportsStmts(mainFile->imports);
     visitMainFunc(mainFile->mainFunc, mainFile->path);
     for (const auto func : mainFile->funcs) {
         visitFunc(func);
@@ -40,10 +39,6 @@ void SemaAnalyser::visitMainFunc(const LogosUserFunc* mainFunc, const string& pa
         printError(100, path);
         return;
     }
-}
-
-void SemaAnalyser::visitImportsStmts(const vector<LogosImport*>& importsStmts) {
-    if (importsStmts.empty()) return;
 }
 
 void SemaAnalyser::visitObjectFile(const LogosObjectFile* objectFile) {

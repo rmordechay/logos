@@ -57,8 +57,6 @@ add_executable(logos
     logos/symbols/object/LogosObject.h
     logos/symbols/stmts/LogosIfStmt.cpp
     logos/symbols/stmts/LogosIfStmt.h
-    logos/symbols/files/LogosImport.cpp
-    logos/symbols/files/LogosImport.h
     logos/symbols/stmts/LogosReturnStmt.cpp
     logos/symbols/stmts/LogosReturnStmt.h
     logos/symbols/stmts/LogosStmt.h

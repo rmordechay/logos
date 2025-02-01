@@ -23,7 +23,6 @@ LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, con
     if (const auto objFileCtx = ctx->objectFile()) {
         logosFile = getObjFile(objFileCtx);
     }
-    logosFile->imports = getImportsStmt(ctx->importStatement());
     logosFile->path = filePath;
     return logosFile;
 }
@@ -90,16 +89,6 @@ LogosFunc *AntlerConverter::getFunc(LogosParser::FuncImplementationContext* ctx)
     }
     logosUserFunc->stmts = getStmtList(ctx->funcBody()->statementsBlock());
     return logosUserFunc;
-}
-
-vector<LogosImport*> AntlerConverter::getImportsStmt(LogosParser::ImportStatementContext* ctx) {
-    vector<LogosImport*> imports;
-    if (ctx) {
-        vector<const LogosType*> qualifiedImport;
-        const auto type = ctx->importPath()[0]->TYPE()[0];
-        new LogosImport(&getType(type));
-    }
-    return imports;
 }
 
 vector<LogosStmt*> AntlerConverter::getStmtList(LogosParser::StatementsBlockContext* ctx) {

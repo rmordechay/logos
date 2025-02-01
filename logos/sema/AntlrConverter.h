@@ -30,7 +30,6 @@ public:
     LogosFile* getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath);
     LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx);
     LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
-    static vector<LogosImport*> getImportsStmt(LogosParser::ImportStatementContext* ctx);
     LogosObjectFile* getObjFile(LogosParser::ObjectFileContext* ctx);
     LogosFunc* getFunc(LogosParser::FuncImplementationContext* ctx);
     LogosStmt* getStmt(LogosParser::StatementContext* ctx);
