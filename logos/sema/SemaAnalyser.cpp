@@ -4,14 +4,24 @@
 #include <format>
 
 bool SemaAnalyser::analyse() {
+    collectGlobals();
     ThreadPool threadPool;
-    for (const auto file : files) {
+    for (const auto [name, file] : files) {
         threadPool.runTask([this, file] {
             visitLogosFile(file);
         });
     }
     threadPool.wait();
     return successful;
+}
+
+void SemaAnalyser::collectGlobals() {
+    for (const auto [name, file] : files) {
+        if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
+            const auto object = objFile->obj;
+            theStack.globalSymbols[object->name()] = LogosSymbol(OBJECT, object);
+        }
+    }
 }
 
 void SemaAnalyser::visitLogosFile(LogosFile* file) {
@@ -81,8 +91,9 @@ void SemaAnalyser::visitStmtList(const vector<LogosStmt*>& stmts) {
 
 void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
     const auto inferredType = varDec->expr->type;
-    if (varDec->userType && *varDec->userType != inferredType) {
-        printError(101, &varDec->position, *varDec->userType, inferredType->name());
+    const auto userType = varDec->userType;
+    if (userType && *userType != inferredType) {
+        printError(101, &varDec->position, *userType, inferredType->name());
     } else {
         varDec->inferredType = inferredType;
     }

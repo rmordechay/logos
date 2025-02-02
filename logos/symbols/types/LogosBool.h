@@ -9,7 +9,7 @@ public:
     static constexpr auto trueLiteral = "true";
 
     const string name() const override;
-    Type* getLLVMType(IRBuilder<>* builder) const override;
+    Type* getLLVMType(IRBuilder<>* builder, LogosStack* theStack) const override;
     bool operator==(LogosType* other) const override;
     ~LogosBool() override = default;
 };
@@ -18,7 +18,7 @@ inline const string LogosBool::name() const {
     return typeName;
 }
 
-inline Type* LogosBool::getLLVMType(IRBuilder<>* builder) const {
+inline Type* LogosBool::getLLVMType(IRBuilder<>* builder, LogosStack* theStack) const {
     return builder->getInt1Ty();
 }
 

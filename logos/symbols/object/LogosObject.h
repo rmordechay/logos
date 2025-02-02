@@ -12,7 +12,7 @@ public:
     LogosObject() = default;
     explicit LogosObject(const string& typeName) : typeName(typeName) {}
     const string name() const override;
-    Type* getLLVMType(IRBuilder<>* builder) const override;
+    Type* getLLVMType(IRBuilder<>* builder, LogosStack* theStack) const override;
     bool operator==(LogosType* other) const override;
     ~LogosObject() override;
 

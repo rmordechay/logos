@@ -1,40 +1,38 @@
 #ifndef LOGOSSTACK_H
 #define LOGOSSTACK_H
 #include "LogosSymbol.h"
+
 #include <stack>
-#include "types/LogosInt.h"
 #include <map>
+#include "types/LogosInt.h"
 
 using namespace std;
 
-class LogosStackFrame {
-public:
+struct LogosStackFrame {
     Function* currentFunction = nullptr;
-    map<string, LogosSymbol*> symbols;
-    map<string, Function*> functions;
+    map<string, LogosSymbol> symbols;
+
+    explicit LogosStackFrame(Function* currentFunction) :
+        currentFunction(currentFunction) {
+    }
 };
 
 class LogosStack : public stack<LogosStackFrame> {
 public:
-    map<string, LogosSymbol*> globalSymbols;
-    map<string, Function*> globalFuncs;
+    map<string, LogosSymbol> globalSymbols;
 
-    LogosStack() { push(LogosStackFrame()); }
     void enterScope(Function* func);
     void exitScope();
     LogosSymbol* getSymbol(const string& name);
     Function* getFunc(const string& name);
-    void addSymbol(const string& name, LogosSymbol* symbol);
+    void addSymbol(const string& name, const LogosSymbol& symbol);
     void addFunc(const string& name, Function* value);
     void setCurrentFunc(Function* value);
     ~LogosStack() = default;
 };
 
 inline void LogosStack::enterScope(Function* func) {
-    const LogosStackFrame stackFrame(top());
-    push(stackFrame);
-    addFunc(func->getName().str(), func);
-    setCurrentFunc(func);
+    push(LogosStackFrame(func));
 }
 
 inline void LogosStack::exitScope() {
@@ -42,25 +40,24 @@ inline void LogosStack::exitScope() {
 }
 
 inline LogosSymbol* LogosStack::getSymbol(const string& name) {
-    return top().symbols[name];
+    auto& symbols = top().symbols;
+
+    if (symbols.contains(name)) {
+        return &symbols[name];
+    }
+    if (globalSymbols.contains(name)) {
+        return &globalSymbols[name];
+    }
+    return nullptr;
 }
 
-inline Function* LogosStack::getFunc(const string& name) {
-    return top().functions[name];
-}
-
-inline void LogosStack::addSymbol(const string& name, LogosSymbol* symbol) {
+inline void LogosStack::addSymbol(const string& name, const LogosSymbol& symbol) {
     top().symbols[name] = symbol;
-}
-
-inline void LogosStack::addFunc(const string& name, Function* value) {
-    top().functions[name] = value;
 }
 
 inline void LogosStack::setCurrentFunc(Function* value) {
     top().currentFunction = value;
 }
-
 
 
 #endif //LOGOSSTACK_H

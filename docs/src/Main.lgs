@@ -1,4 +1,4 @@
 main() {
     obj = MyObject()
-    print(obj.add(1, 2))
+    // obj.add(1, 2)
 }

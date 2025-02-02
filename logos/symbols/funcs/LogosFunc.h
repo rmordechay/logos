@@ -1,6 +1,7 @@
 #ifndef LOGOSFUNC_H
 #define LOGOSFUNC_H
 #include "CodeGeneration.h"
+#include "exprs/LogosFuncCall.h"
 #include "stmts/LogosVarDec.h"
 #include "types/LogosType.h"
 
@@ -12,6 +13,8 @@ public:
     vector<LogosStmt*> stmts;
 
     explicit LogosFunc(const string& name, LogosType* funcType) : name(name), type(funcType) {}
+    virtual FunctionCallee getFuncCallee(IRBuilder<>* builder, LogosStack* theStack, Module* module) = 0;
+    virtual vector<Value*> getArgs(IRBuilder<>* builder, LogosStack* theStack, Module* module, const vector<LogosExpr*>& args) = 0;
     ~LogosFunc() override;
 };
 

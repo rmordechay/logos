@@ -8,7 +8,7 @@ public:
     static constexpr auto typeName = "Float";
 
     const string name() const override;
-    Type* getLLVMType(IRBuilder<>* builder) const override;
+    Type* getLLVMType(IRBuilder<>* builder, LogosStack* theStack) const override;
     bool operator==(LogosType* other) const override;
     ~LogosFloat() override = default;
 };
@@ -17,7 +17,7 @@ inline const string LogosFloat::name() const {
     return typeName;
 }
 
-inline Type* LogosFloat::getLLVMType(IRBuilder<>* builder) const {
+inline Type* LogosFloat::getLLVMType(IRBuilder<>* builder, LogosStack* theStack) const {
     return builder->getFloatTy();
 }
 

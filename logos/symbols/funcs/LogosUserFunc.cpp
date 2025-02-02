@@ -1,18 +1,26 @@
 #include "LogosUserFunc.h"
 
-Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
+FunctionCallee LogosUserFunc::getFuncCallee(IRBuilder<>* builder, LogosStack* theStack, Module* module) {
+    return nullptr;
+}
+
+vector<Value*> LogosUserFunc::getArgs(IRBuilder<>* builder, LogosStack* theStack, Module* module, const vector<LogosExpr*>& args) {
+    return vector<Value*>();
+}
+
+Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) {
     std::vector<Type*> llvmParams;
     for (const auto param : params) {
-        llvmParams.emplace_back(param->inferredType->getLLVMType(builder));
+        llvmParams.emplace_back(param->inferredType->getLLVMType(builder, theStack));
     }
 
-    const auto funcType = FunctionType::get(type->getLLVMType(builder), llvmParams, false);
+    const auto funcType = FunctionType::get(type->getLLVMType(builder, theStack), llvmParams, false);
     const auto func = Function::Create(funcType, Function::ExternalLinkage, name, module);
-    stackFrame->enterScope(func);
+    theStack->enterScope(func);
 
     auto arg = func->arg_begin();
     for (const auto param : params) {
-        stackFrame->addSymbol(param->name, new LogosSymbol(arg));
+        theStack->addSymbol(param->name, LogosSymbol(VAR_DEC, param));
         arg++;
     }
 
@@ -20,10 +28,10 @@ Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame,
     builder->SetInsertPoint(funcEntry);
 
     for (const auto stmt : stmts) {
-        stmt->getLLVMValue(builder, stackFrame, module);
+        stmt->getLLVMValue(builder, theStack, module);
     }
 
-    stackFrame->exitScope();
+    theStack->exitScope();
     return func;
 }
 

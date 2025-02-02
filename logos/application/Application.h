@@ -29,8 +29,8 @@ public:
 
     explicit Application(const string& rootPath) : rootPath(rootPath) {}
     void runLogos();
-    vector<LogosFile*> parse();
-    void flattenTree(const string& path, vector<LogosFile*>& files, ThreadPool& threadPool);
+    map<string, LogosFile*> parse();
+    void flattenTree(const string& path, map<string, LogosFile*>& files, ThreadPool& threadPool);
     static LogosFile* getFile(const directory_entry&);
     ~Application() = default;
 };

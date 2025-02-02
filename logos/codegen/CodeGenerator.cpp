@@ -1,6 +1,7 @@
 #include "CodeGenerator.h"
 
 #include "application/LogosUtils.h"
+#include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
 #include "funcs/LogosPrint.h"
 
@@ -28,27 +29,22 @@ const auto LINKED_OBJECT_FILE = "../output.o";
 const auto LINKED_IR_FILE = "../output.ll";
 constexpr auto LLVM_OBJECT_FILE = CodeGenFileType::ObjectFile;
 
-void CodeGenerator::run(const vector<LogosFile*>& files) {
+void CodeGenerator::run(const map<string, LogosFile*>& files, LogosStack& theStack) {
     initLLVM();
-    LogosStack theStack;
-    const auto rootModule = Utils::createLLVMModuleFromFile(LOGOS_LIB_IR_FILE, builder.getContext(), *targetMachine);
-    declareBuiltinFuncs(theStack, rootModule);
-    for (const auto file : files) {
-        file->initModule(builder, theStack);
-    }
+    const auto logosLib = Utils::createLLVMModuleFromFile(LOGOS_LIB_IR_FILE, builder.getContext(), *targetMachine);
+    theStack.globalSymbols["print"] = LogosSymbol(FUNC, new LogosPrint());
 
-    for (const auto file : files) {
-        auto module = file->generateModule(builder, theStack);
-        modules.push_back(module);
+    const auto mainFile = dynamic_cast<LogosMainFile*>(files.at(LOGOS_MAIN_FILE));
+    const auto module = new Module(LOGOS_MAIN_FILE, builder.getContext());
+    mainFile->mainFunc->getLLVMValue(&builder, &theStack, module);
+    for (const auto func : mainFile->funcs) {
+        func->getLLVMValue(&builder, &theStack, module);
     }
+    builder.CreateRet(builder.getInt32(EXIT_SUCCESS));
+    writeIRToFile(module, LOGOS_MAIN_FILE);
 
-    // runBinary();
-    // delete linker;
+    runBinary();
     // generateTest();
-}
-
-void CodeGenerator::declareBuiltinFuncs(LogosStack& theStack, Module* const rootModule) {
-    theStack.globalFuncs["print"] = logosPrint.getLLVMValue(&builder, &theStack, rootModule);
 }
 
 void CodeGenerator::initLLVM() {

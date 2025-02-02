@@ -13,7 +13,7 @@ public:
 
     LogosVarDec(const string& name, LogosType* userType, LogosExpr* expr) : name(name), userType(userType), expr(expr) {}
     LogosVarDec(const string& name, LogosType* inferredType) : name(name), inferredType(inferredType){}
-    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) override;
+    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) override;
     ~LogosVarDec() override;
 };
 

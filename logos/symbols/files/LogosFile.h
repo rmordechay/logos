@@ -18,8 +18,6 @@ public:
     string path;
 
     explicit LogosFile(const string& name, const string& path) : name(name), path(path) {}
-    virtual void initModule(IRBuilder<>& builder, LogosStack& theStack) = 0;
-    virtual Module* generateModule(IRBuilder<>& builder, LogosStack& theStack) = 0;
     virtual ~LogosFile() = default;
 };
 

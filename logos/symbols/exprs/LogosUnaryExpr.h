@@ -1,7 +1,6 @@
 #ifndef LOGOSUNARYEXPR_H
 #define LOGOSUNARYEXPR_H
-#include "types/LogosType.h"
-#include "exprs/LogosExpr.h"
+#include "LogosExpr.h"
 
 class LogosUnaryExpr: public LogosExpr {
 public:

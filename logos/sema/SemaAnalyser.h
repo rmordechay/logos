@@ -15,10 +15,12 @@ class SemaAnalyser {
 public:
     bool successful = true;
     LogosMainFile* mainFile = nullptr;
-    vector<LogosFile*> files;
+    map<string, LogosFile*> files;
+    LogosStack theStack;
     mutex mtx;
 
     bool analyse();
+    void collectGlobals();
     void visitLogosFile(LogosFile* file);
     void visitMainFile(const LogosMainFile* mainFile);
     void visitObjectFile(const LogosObjectFile* objectFile);

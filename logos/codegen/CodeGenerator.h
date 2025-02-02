@@ -22,8 +22,7 @@ public:
     TargetMachine* targetMachine = nullptr;
 
 
-    void declareBuiltinFuncs(LogosStack& theStack, Module* rootModule);
-    void run(const vector<LogosFile*>& files);
+    void run(const map<string, LogosFile*>& files, LogosStack& theStack);
     Linker* linkModules(Module* rootModule) const;
     void initLLVM();
     static void runBinary();

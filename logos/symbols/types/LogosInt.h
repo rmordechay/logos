@@ -7,7 +7,7 @@
 class LogosInt final : public LogosType {
 public:
     const string name() const override;
-    Type* getLLVMType(IRBuilder<>* builder) const override;
+    Type* getLLVMType(IRBuilder<>* builder, LogosStack* theStack) const override;
     bool operator==(LogosType* other) const override;
     ~LogosInt() override = default;
 };
@@ -16,7 +16,7 @@ inline const string LogosInt::name() const {
     return INT_TYPE_NAME;
 }
 
-inline Type* LogosInt::getLLVMType(IRBuilder<>* builder) const {
+inline Type* LogosInt::getLLVMType(IRBuilder<>* builder, LogosStack* theStack) const {
     return builder->getInt32Ty();
 }
 

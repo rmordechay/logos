@@ -67,11 +67,11 @@ add_executable(logos
     logos/symbols/types/LogosInt.h
     logos/symbols/types/LogosString.h
     logos/symbols/types/LogosType.h
-    logos/symbols/LogosSymbol.h
     logos/symbols/funcs/LogosPrint.cpp
     logos/symbols/funcs/LogosPrint.h
     logos/symbols/exprs/LogosSelection.cpp
     logos/symbols/exprs/LogosSelection.h
+    logos/symbols/LogosSymbol.h
 )
 
 target_include_directories(logos PRIVATE

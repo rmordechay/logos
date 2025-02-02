@@ -3,25 +3,25 @@
 void Application::runLogos() {
     semaAnalyser.files = parse();
     if (!semaAnalyser.analyse()) return;
-    codeGenerator.run(semaAnalyser.files);
+    codeGenerator.run(semaAnalyser.files, semaAnalyser.theStack);
 }
 
-vector<LogosFile*> Application::parse() {
+map<string, LogosFile*> Application::parse() {
     ThreadPool threadPool;
-    auto files = vector<LogosFile*>();
+    map<string, LogosFile*> files;
     flattenTree(rootPath, files, threadPool);
     threadPool.wait();
     return files;
 }
 
-void Application::flattenTree(const string& path, vector<LogosFile*>& files, ThreadPool& threadPool) {
+void Application::flattenTree(const string& path, map<string, LogosFile*>& files, ThreadPool& threadPool) {
     for (const auto& entry : directory_iterator(path)) {
         if (Utils::isLogosFile(entry)) {
             threadPool.runTask([entry, &files, this] {
                 const auto logosFile = getFile(entry);
                 {
                     lock_guard lock(mtx);
-                    files.emplace_back(logosFile);
+                    files[logosFile->name] = logosFile;
                 }
             });
         } else if (is_directory(entry.status())) {

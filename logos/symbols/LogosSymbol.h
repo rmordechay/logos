@@ -1,23 +1,27 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
 
-#include <stack>
-#include <llvm/IR/Value.h>
+class LogosFunc;
+class LogosObject;
+class LogosVarDec;
 
-using namespace std;
-using namespace llvm;
+enum LogosSymbolType {
+    VAR_DEC,
+    OBJECT,
+    FUNC,
+};
 
-class LogosSymbol {
-public:
-    int pos = -1;
-    Type* llvmType = nullptr;
-    Value* llvmValue = nullptr;
-
-    explicit LogosSymbol() = default;
-    explicit LogosSymbol(Value* symbolValue) : llvmValue(symbolValue) {}
-    explicit LogosSymbol(Type* symbolType) : llvmType(symbolType) {}
-    explicit LogosSymbol(Type* symbolType, const int position) : pos(position), llvmType(symbolType) {}
-    ~LogosSymbol() = default;
+struct LogosSymbol {
+    LogosSymbolType type;
+    union {
+        LogosVarDec* varDec;
+        LogosObject* object;
+        LogosFunc* func;
+    };
+    LogosSymbol() : type(static_cast<LogosSymbolType>(0)), object(nullptr) {}
+    LogosSymbol(const LogosSymbolType type, LogosObject* object) : type(type), object(object) {}
+    LogosSymbol(const LogosSymbolType type, LogosFunc* func) : type(type), func(func) {}
+    LogosSymbol(const LogosSymbolType type, LogosVarDec* varDec) : type(type), varDec(varDec) {}
 };
 
 #endif //LOGOSSYMBOL_H

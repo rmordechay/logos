@@ -1,10 +1,8 @@
 #ifndef CODEGENERATION_H
 #define CODEGENERATION_H
 #include "LogosStack.h"
-#include "types/LogosType.h"
-
+#include <llvm/IR/IRBuilder.h>
 #include <Token.h>
-
 
 namespace antlr4 {
     class Token;
@@ -14,15 +12,15 @@ using namespace llvm;
 using namespace std;
 
 struct Position {
-    int lineNumber;
-    int posInLine;
+    size_t lineNumber;
+    size_t posInLine;
     const string* filePath = nullptr;
 };
 
 class CodeGeneration {
 public:
     Position position = Position();
-    virtual Value* getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) = 0;
+    virtual Value *getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) = 0;
     virtual void setPosition(const antlr4::Token* ctx, const string& filePath);
     virtual ~CodeGeneration() = default;
 };

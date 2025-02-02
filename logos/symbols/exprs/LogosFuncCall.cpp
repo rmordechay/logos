@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <ostream>
+#include <llvm/IR/Module.h>
 
 
 void LogosFuncCall::setPosition(const antlr4::Token* ctx, const string& filePath) {
@@ -10,13 +11,11 @@ void LogosFuncCall::setPosition(const antlr4::Token* ctx, const string& filePath
     position.filePath = &filePath;
 }
 
-Value* LogosFuncCall::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
-    const auto funcSymbol = stackFrame->globalFuncs[name];
-    std::vector<Value*> llvmArgs;
-    for (const auto arg : args) {
-        llvmArgs.push_back(arg->getLLVMValue(builder, stackFrame, module));
-    }
-    return builder->CreateCall(funcSymbol, ArrayRef(llvmArgs));
+Value* LogosFuncCall::getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) {
+    const auto callee = theStack->globalSymbols[name].func;
+    const auto llvmArgs = callee->getArgs(builder, theStack, module, args);
+    const auto func = callee->getFuncCallee(builder, theStack, module);
+    return builder->CreateCall(func, llvmArgs);
 }
 
 LogosFuncCall::~LogosFuncCall() {
