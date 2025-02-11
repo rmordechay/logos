@@ -7,6 +7,7 @@
 
 #include <vector>
 
+class LogosField;
 class LogosType;
 class LogosFuncCall;
 class LogosConstructor;
@@ -32,6 +33,7 @@ public:
     LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx);
     LogosObjectFile* getObjFile(LogosParser::ObjectFileContext* ctx);
     LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
+    LogosField *getField(LogosParser::ExplicitVarDecContext* varDec);
     LogosUserFunc* getFunc(LogosParser::FuncImplementationContext* ctx);
     LogosStmt* getStmt(LogosParser::StatementContext* ctx);
     vector<LogosStmt*> getStmtList(LogosParser::StatementsBlockContext* ctx);
@@ -41,9 +43,9 @@ public:
     LogosSelection* getSelection(LogosParser::SelectionContext* selection);
     LogosExpr* getExpr(LogosParser::ExprContext* ctx);
     LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
-    LogosConstructor* getConstructorCallExpr(LogosParser::ConstructorCallContext* ctx);
-    LogosFuncCall* getFuncCallExpr(LogosParser::FuncCallContext* ctx);
-    static LogosUnaryExpr* getConstantExpr(LogosParser::ConstantContext* ctx);
+    LogosConstructor* getConstructor(LogosParser::ConstructorCallContext* ctx);
+    LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
+    static LogosUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
     static LogosType* getType(antlr4::tree::TerminalNode* type);
     ~AntlerConverter() = default;
 };

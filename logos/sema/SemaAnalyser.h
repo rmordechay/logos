@@ -29,6 +29,7 @@ public:
     void visitUserFunc(const LogosUserFunc* func);
     void visitStmt(LogosStmt* stmt);
     void visitStmtList(const vector<LogosStmt*>& stmts);
+    void visitField(LogosField* field);
     void visitVarDec(LogosVarDec* varDec);
     void visitIfStmt(const LogosIfStmt* ifStmt);
     void visitExpr(const LogosExpr* expr);

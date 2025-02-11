@@ -2,11 +2,14 @@
 #define LOGOSOBJECT_H
 #include "funcs/LogosFunc.h"
 #include "stmts/LogosVarDec.h"
+#include "LogosField.h"
+
+class LogosField;
 
 class LogosObject final : public LogosType {
 public:
     string typeName;
-    vector<LogosVarDec*> fields;
+    vector<LogosField*> fields;
     vector<LogosFunc*> funcs;
 
     LogosObject() = default;

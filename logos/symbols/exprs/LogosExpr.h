@@ -8,6 +8,9 @@ public:
 
     explicit LogosExpr(LogosType* type) : type(type) {}
     Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    // LogosConstructor* asConstructor();
+    // LogosUnaryExpr* asUnaryExpr();
+    // LogosConstructor* asConstructor();
     ~LogosExpr() override = default;
 };
 

@@ -1,6 +1,5 @@
 #ifndef LOGOSCONSTRUCTOREXPR_H
 #define LOGOSCONSTRUCTOREXPR_H
-#include "LogosUnaryExpr.h"
 #include "object/LogosObject.h"
 
 

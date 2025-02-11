@@ -5,11 +5,11 @@
 
 class LogosSelection final : public LogosExpr {
 public:
-    const vector<LogosUnaryExpr*> exprs;
+    const vector<string> names;
 
-    explicit LogosSelection(const vector<LogosUnaryExpr*>& exprs) : LogosExpr(nullptr), exprs(exprs) {}
+    explicit LogosSelection(const vector<string>& names) : LogosExpr(nullptr), names(names) {}
     Value* getLLVMValue(CodeGenMetadata* metadata) override;
-    ~LogosSelection() override;
+    ~LogosSelection() override = default;
 };
 
 

@@ -26,6 +26,7 @@ public:
     LogosSymbol* getSymbol(const string& name);
     Function* getFunc(const string& name);
     void addSymbol(const string& name, const LogosSymbol& symbol);
+    void addGlobalSymbol(const string& name, const LogosSymbol& symbol);
     void addFunc(const string& name, Function* value);
     void setCurrentFunc(Function* value);
     ~LogosStack() = default;
@@ -53,6 +54,10 @@ inline LogosSymbol* LogosStack::getSymbol(const string& name) {
 
 inline void LogosStack::addSymbol(const string& name, const LogosSymbol& symbol) {
     top().symbols[name] = symbol;
+}
+
+inline void LogosStack::addGlobalSymbol(const string& name, const LogosSymbol& symbol) {
+    globalSymbols[name] = symbol;
 }
 
 inline void LogosStack::setCurrentFunc(Function* value) {

@@ -72,6 +72,8 @@ add_executable(logos
     logos/symbols/exprs/LogosSelection.cpp
     logos/symbols/exprs/LogosSelection.h
     logos/symbols/LogosSymbol.h
+    logos/symbols/object/LogosField.cpp
+    logos/symbols/object/LogosField.h
 )
 
 target_include_directories(logos PRIVATE

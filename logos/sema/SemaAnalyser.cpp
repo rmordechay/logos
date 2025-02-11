@@ -48,7 +48,7 @@ void SemaAnalyser::visitObjectFile(const LogosObjectFile* objectFile) {
 void SemaAnalyser::visitObject(const LogosObject* object) {
     if (!object) return;
     for (const auto field : object->fields) {
-        visitVarDec(field);
+        visitField(field);
     }
 }
 
@@ -89,6 +89,9 @@ void SemaAnalyser::visitStmt(LogosStmt* stmt) {
 void SemaAnalyser::visitStmtList(const vector<LogosStmt*>& stmts) {
 }
 
+void SemaAnalyser::visitField(LogosField* field) {
+
+}
 void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
     const auto inferredType = varDec->expr->type;
     const auto userType = varDec->userType;
