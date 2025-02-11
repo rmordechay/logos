@@ -30,15 +30,12 @@ const auto LINKED_IR_FILE = "../output.ll";
 constexpr auto LLVM_OBJECT_FILE = CodeGenFileType::ObjectFile;
 
 void CodeGenerator::run(const map<string, LogosFile*>& files, LogosStack& theStack) {
-    initLLVM();
     theStack.globalSymbols["print"] = LogosSymbol(FUNC, new LogosPrint());
 
     const auto module = new Module(LOGOS_MAIN_FILE, builder.getContext());
     const auto metadata = CodeGenMetadata{.builder = &builder, .theStack = &theStack, .module = module};
     const auto mainFile = dynamic_cast<LogosMainFile*>(files.at(LOGOS_MAIN_FILE));
     generateMainModule(mainFile, metadata);
-
-    writeIRToFile(module, LOGOS_MAIN_FILE);
     runBinary();
 }
 
@@ -48,6 +45,25 @@ void CodeGenerator::generateMainModule(const LogosMainFile* mainFile, CodeGenMet
     for (const auto func : mainFile->funcs) {
         func->getLLVMValue(&metadata);
     }
+    writeIRToFile(metadata.module, LOGOS_MAIN_FILE);
+}
+
+void CodeGenerator::generateObjModule(const LogosObject* obj, IRBuilder<>* builder, const LogosStack* theStack) {
+    const auto module = new Module(obj->name(), builder->getContext());
+    auto logosStack = *theStack;
+    while (logosStack.size() > 1) {
+        logosStack.pop();
+    }
+
+    auto newMetadata = CodeGenMetadata{.builder = builder, .theStack = &logosStack, .module = module};
+    for (const auto func : obj->fields) {
+        func->getLLVMValue(&newMetadata);
+    }
+    for (const auto func : obj->funcs) {
+        func->getLLVMValue(&newMetadata);
+    }
+
+    writeIRToFile(newMetadata.module, module->getName().str());
 }
 
 void CodeGenerator::initLLVM() {
@@ -57,11 +73,6 @@ void CodeGenerator::initLLVM() {
     InitializeAllTargetMCs();
     InitializeAllTargets();
     InitializeAllTargetInfos();
-
-    std::string targetError;
-    const auto targetTriple = sys::getProcessTriple();
-    const auto target = TargetRegistry::lookupTarget(targetTriple, targetError);
-    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), Reloc::PIC_);
 }
 
 void CodeGenerator::runBinary() {
@@ -83,8 +94,4 @@ void CodeGenerator::emitLLVMFile(const string& filePath, const Module* const mod
     raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
     module->print(textFile, nullptr);
     module->print(outs(), nullptr);
-}
-
-CodeGenerator::~CodeGenerator() {
-    delete targetMachine;
 }

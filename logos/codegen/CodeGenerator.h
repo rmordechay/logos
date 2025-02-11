@@ -3,6 +3,7 @@
 #include "CodeGeneration.h"
 #include "LogosStack.h"
 #include "files/LogosMainFile.h"
+#include "files/LogosObjectFile.h"
 
 class ThreadPool;
 using namespace llvm;
@@ -21,18 +22,16 @@ public:
     vector<Module*> modules;
     vector<CodeGeneration*> codeNodes;
     IRBuilder<> builder = IRBuilder(context);
-    TargetMachine* targetMachine = nullptr;
 
-
+    CodeGenerator() { initLLVM(); }
     void generateMainModule(const LogosMainFile* mainFile, CodeGenMetadata metadata);
     void run(const map<string, LogosFile*>& files, LogosStack& theStack);
-    Linker* linkModules(Module* rootModule) const;
     void initLLVM();
     static void runBinary();
     static void generateTest();
+    static void generateObjModule(const LogosObject* obj, IRBuilder<>* builder, const LogosStack* theStack);
     void emitLLVMFile(const string& filePath, const Module* module);
-    ~CodeGenerator();
-
+    ~CodeGenerator() = default;
 };
 
 #endif //CODEGENERATOR_H

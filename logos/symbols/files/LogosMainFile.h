@@ -14,7 +14,6 @@ public:
     vector<LogosUserFunc*> funcs;
 
     explicit LogosMainFile(const string& path) : LogosFile(LOGOS_MAIN_FILE, path) {}
-    Module* generateModule(IRBuilder<>& builder, LogosStack& theStack) const;
     ~LogosMainFile() override;
 };
 
