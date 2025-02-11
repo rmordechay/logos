@@ -4,91 +4,90 @@ project(logos)
 set(CMAKE_CXX_STANDARD 20)
 
 set(ANTLR_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime")
+set(LLVM_INCLUDE_DIR "/opt/homebrew/opt/llvm/include")
+set(LLVM_LIBS "/opt/homebrew/opt/llvm/lib")
 set(ANTLR_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime.a")
 set(GTEST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest.1.15.2.dylib")
 set(GTEST_LIB_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest_main.1.15.2.dylib")
-set(LLVM_LIBS "/opt/homebrew/opt/llvm/lib")
-set(LLVM_INCLUDE_DIR "/opt/homebrew/opt/llvm/include")
 
-file(GLOB GENERATED_SRC "${CMAKE_CURRENT_SOURCE_DIR}/logos/parser/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/logos/parser/*.h")
+file(GLOB GENERATED_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/parser/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/parser/*.h")
+file(GLOB LLVM ${LLVM_LIBS}/libLLVM.dylib ${LLVM_LIBS}/*.a)
 
 add_executable(logos
     main.cpp
     ${GENERATED_SRC}
-    logos/LogosDefinitions.h
-    logos/application/Application.cpp
-    logos/application/Application.h
-    logos/application/LogosUtils.cpp
-    logos/application/LogosUtils.h
-    logos/application/ThreadPool.cpp
-    logos/application/ThreadPool.h
-    logos/codegen/CodeGenerator.cpp
-    logos/codegen/CodeGenerator.h
-    logos/symbols/LogosStack.h
-    logos/sema/AntlrConverter.cpp
-    logos/sema/AntlrConverter.h
-    logos/sema/LogosErrors.h
-    logos/sema/SemaAnalyser.cpp
-    logos/sema/SemaAnalyser.h
-    logos/symbols/CodeGeneration.h
-    logos/symbols/exprs/LogosBinaryExpr.cpp
-    logos/symbols/exprs/LogosBinaryExpr.h
-    logos/symbols/exprs/LogosConstant.cpp
-    logos/symbols/exprs/LogosConstant.h
-    logos/symbols/exprs/LogosConstructor.cpp
-    logos/symbols/exprs/LogosConstructor.h
-    logos/symbols/exprs/LogosExpr.cpp
-    logos/symbols/exprs/LogosExpr.h
-    logos/symbols/exprs/LogosFuncCall.cpp
-    logos/symbols/exprs/LogosFuncCall.h
-    logos/symbols/exprs/LogosOperator.h
-    logos/symbols/exprs/LogosUnaryExpr.h
-    logos/symbols/exprs/LogosVariableExpr.cpp
-    logos/symbols/files/LogosFile.h
-    logos/symbols/files/LogosMainFile.cpp
-    logos/symbols/files/LogosMainFile.h
-    logos/symbols/files/LogosMainFile.h
-    logos/symbols/files/LogosObjectFile.cpp
-    logos/symbols/files/LogosObjectFile.h
-    logos/symbols/funcs/LogosFunc.h
-    logos/symbols/funcs/LogosUserFunc.cpp
-    logos/symbols/funcs/LogosUserFunc.h
-    logos/symbols/object/LogosObject.cpp
-    logos/symbols/object/LogosObject.h
-    logos/symbols/stmts/LogosIfStmt.cpp
-    logos/symbols/stmts/LogosIfStmt.h
-    logos/symbols/stmts/LogosReturnStmt.cpp
-    logos/symbols/stmts/LogosReturnStmt.h
-    logos/symbols/stmts/LogosStmt.h
-    logos/symbols/stmts/LogosVarDec.cpp
-    logos/symbols/stmts/LogosVarDec.h
-    logos/symbols/types/LogosBool.h
-    logos/symbols/types/LogosFloat.h
-    logos/symbols/types/LogosInt.h
-    logos/symbols/types/LogosString.h
-    logos/symbols/types/LogosType.h
-    logos/symbols/funcs/LogosPrint.cpp
-    logos/symbols/funcs/LogosPrint.h
-    logos/symbols/exprs/LogosSelection.cpp
-    logos/symbols/exprs/LogosSelection.h
-    logos/symbols/LogosSymbol.h
-    logos/symbols/object/LogosField.cpp
-    logos/symbols/object/LogosField.h
+    include/LogosDefinitions.h
+    src/application/Application.cpp
+    include/application/Application.h
+    src/application/LogosUtils.cpp
+    include/application/LogosUtils.h
+    src/application/ThreadPool.cpp
+    include/application/ThreadPool.h
+    src/codegen/CodeGenerator.cpp
+    include/codegen/CodeGenerator.h
+    include/symbols/LogosStack.h
+    src/sema/AntlrConverter.cpp
+    include/sema/AntlrConverter.h
+    include/sema/LogosErrors.h
+    src/sema/SemaAnalyser.cpp
+    include/sema/SemaAnalyser.h
+    include/symbols/CodeGeneration.h
+    src/symbols/exprs/LogosBinaryExpr.cpp
+    include/symbols/exprs/LogosBinaryExpr.h
+    src/symbols/exprs/LogosConstant.cpp
+    include/symbols/exprs/LogosConstant.h
+    src/symbols/exprs/LogosConstructor.cpp
+    include/symbols/exprs/LogosConstructor.h
+    include/symbols/exprs/LogosExpr.h
+    src/symbols/exprs/LogosFuncCall.cpp
+    include/symbols/exprs/LogosFuncCall.h
+    include/symbols/exprs/LogosOperator.h
+    include/symbols/exprs/LogosUnaryExpr.h
+    src/symbols/exprs/LogosVariableExpr.cpp
+    include/symbols/files/LogosFile.h
+    src/symbols/files/LogosMainFile.cpp
+    include/symbols/files/LogosMainFile.h
+    include/symbols/files/LogosMainFile.h
+    src/symbols/files/LogosObjectFile.cpp
+    include/symbols/files/LogosObjectFile.h
+    include/symbols/funcs/LogosFunc.h
+    src/symbols/funcs/LogosUserFunc.cpp
+    include/symbols/funcs/LogosUserFunc.h
+    src/symbols/object/LogosObject.cpp
+    include/symbols/object/LogosObject.h
+    src/symbols/stmts/LogosIfStmt.cpp
+    include/symbols/stmts/LogosIfStmt.h
+    src/symbols/stmts/LogosReturnStmt.cpp
+    include/symbols/stmts/LogosReturnStmt.h
+    include/symbols/stmts/LogosStmt.h
+    src/symbols/stmts/LogosVarDec.cpp
+    include/symbols/stmts/LogosVarDec.h
+    include/symbols/types/LogosBool.h
+    include/symbols/types/LogosFloat.h
+    include/symbols/types/LogosInt.h
+    include/symbols/types/LogosString.h
+    include/symbols/types/LogosType.h
+    src/symbols/funcs/LogosPrint.cpp
+    include/symbols/funcs/LogosPrint.h
+    src/symbols/exprs/LogosSelection.cpp
+    include/symbols/exprs/LogosSelection.h
+    include/symbols/LogosSymbol.h
+    src/symbols/object/LogosField.cpp
+    include/symbols/object/LogosField.h
 )
 
 target_include_directories(logos PRIVATE
-    logos
-    logos/project
-    logos/symbols
-    logos/parser
-    logos/codegen
-    logos/sema
+    src/parser
     ${ANTLR_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
     ${LLVM_INCLUDE_DIR}
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/application"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/codegen"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/sema"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/symbols"
 )
 
-file(GLOB LLVM ${LLVM_LIBS}/libLLVM.dylib ${LLVM_LIBS}/*.a)
 target_link_libraries(logos PRIVATE ${ANTLR_LIB} ${LLVM} ${GTEST_LIB} ${GTEST_LIB_MAIN})
 
 enable_testing()

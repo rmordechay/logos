@@ -1,4 +1,4 @@
-#include "logos/application/Application.h"
+#include "application/Application.h"
 
 int main() {
      Application project("../docs/src");
