@@ -17,7 +17,7 @@ public:
         static_assert(is_same_v<T, bool> || is_same_v<T, int> || is_same_v<T, float> || is_same_v<T, string>);
     }
 
-    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) override;
+    Value* getLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosConstant() override = default;
 };
 

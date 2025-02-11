@@ -3,12 +3,12 @@
 #include "LogosBinaryExpr.h"
 #include "LogosUnaryExpr.h"
 
-Value* LogosExpr::getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) {
+Value* LogosExpr::getLLVMValue(CodeGenMetadata* metadata) {
     if (const auto unary = dynamic_cast<LogosUnaryExpr*>(this)) {
-        return unary->getLLVMValue(builder, theStack, module);
+        return unary->getLLVMValue(metadata);
     }
     if (const auto binary = dynamic_cast<LogosBinaryExpr*>(this)) {
-        return binary->getLLVMValue(builder, theStack, module);
+        return binary->getLLVMValue(metadata);
     }
     return nullptr;
 }

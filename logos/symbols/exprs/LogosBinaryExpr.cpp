@@ -2,14 +2,14 @@
 
 #include <llvm/IR/Module.h>
 
-Value* LogosBinaryExpr::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
-    const auto l = left->getLLVMValue(builder, stackFrame, module);
-    const auto r = right->getLLVMValue(builder, stackFrame, module);
+Value* LogosBinaryExpr::getLLVMValue(CodeGenMetadata* metadata) {
+    const auto l = left->getLLVMValue(metadata);
+    const auto r = right->getLLVMValue(metadata);
     if (op == PLUS) {
-        return builder->CreateAdd(l, r);
+        return metadata->builder->CreateAdd(l, r);
     }
     if (op == RANGLE) {
-        return builder->CreateICmpSGT(l, r);
+        return metadata->builder->CreateICmpSGT(l, r);
     }
     return nullptr;
 }

@@ -14,9 +14,9 @@ public:
     };
 
     explicit LogosPrint() : LogosFunc("print", &LOGOS_VOID) {}
-    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) override;
-    FunctionCallee getFuncCallee(IRBuilder<>* builder, LogosStack* theStack, Module* module) override;
-    vector<Value*> getArgs(IRBuilder<>* builder, LogosStack* theStack, Module* module, const vector<LogosExpr*>& args) override;
+    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    FunctionCallee getFuncCallee(CodeGenMetadata* metadata) override;
+    vector<Value*> getArgs(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
     ~LogosPrint() override = default;
 };
 

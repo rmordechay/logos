@@ -4,6 +4,13 @@
 #include <llvm/IR/IRBuilder.h>
 #include <Token.h>
 
+
+struct CodeGenMetadata {
+    IRBuilder<>* builder;
+    LogosStack* theStack;
+    Module* module;
+};
+
 namespace antlr4 {
     class Token;
 }
@@ -20,7 +27,7 @@ struct Position {
 class CodeGeneration {
 public:
     Position position = Position();
-    virtual Value *getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) = 0;
+    virtual Value *getLLVMValue(CodeGenMetadata* metadata) = 0;
     virtual void setPosition(const antlr4::Token* ctx, const string& filePath);
     virtual ~CodeGeneration() = default;
 };

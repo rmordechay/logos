@@ -1,8 +1,8 @@
 #include "LogosSelection.h"
 
-Value* LogosSelection::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
-    auto logosSymbol = stackFrame->getSymbol("obj");
-    return LogosExpr::getLLVMValue(builder, stackFrame, module);
+Value* LogosSelection::getLLVMValue(CodeGenMetadata* metadata) {
+    auto logosSymbol = metadata->theStack->getSymbol("obj");
+    return LogosExpr::getLLVMValue(metadata);
 }
 
 LogosSelection::~LogosSelection() {

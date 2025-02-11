@@ -1,7 +1,7 @@
 #include "LogosConstructor.h"
 
-Value* LogosConstructor::getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) {
-    const auto logosSymbol = theStack->getSymbol(name)->object;
-    const auto llvmType = logosSymbol->getLLVMType(builder, theStack);
-    return builder->CreateAlloca(llvmType);
+Value* LogosConstructor::getLLVMValue(CodeGenMetadata* metadata) {
+    const auto logosSymbol = metadata->theStack->getSymbol(name)->object;
+    const auto llvmType = logosSymbol->getLLVMType(metadata->builder, metadata->theStack);
+    return metadata->builder->CreateAlloca(llvmType);
 }

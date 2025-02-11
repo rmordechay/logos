@@ -8,7 +8,7 @@ public:
     const vector<LogosUnaryExpr*> exprs;
 
     explicit LogosSelection(const vector<LogosUnaryExpr*>& exprs) : LogosExpr(nullptr), exprs(exprs) {}
-    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) override;
+    Value* getLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosSelection() override;
 };
 

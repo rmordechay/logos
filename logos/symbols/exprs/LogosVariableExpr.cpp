@@ -6,7 +6,7 @@
 
 #include <llvm/IR/Module.h>
 
-Value* LogosVariable::getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) {
-    const auto expr = theStack->getSymbol(name)->varDec->expr;
-    return expr->getLLVMValue(builder, theStack, module);
+Value* LogosVariable::getLLVMValue(CodeGenMetadata* metadata) {
+    const auto expr = metadata->theStack->getSymbol(name)->varDec->expr;
+    return expr->getLLVMValue(metadata);
 }

@@ -10,7 +10,7 @@ public:
     vector<LogosExpr*> args;
 
     explicit LogosConstructor(const string& name) : name(name) {}
-    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) override;
+    Value* getLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosConstructor() override = default;
 };
 

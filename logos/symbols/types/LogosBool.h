@@ -22,7 +22,7 @@ inline Type* LogosBool::getLLVMType(IRBuilder<>* builder, LogosStack* theStack) 
     return builder->getInt1Ty();
 }
 
-inline bool LogosBool::operator==(LogosType* other) const {
+inline bool LogosBool::operator==(LogosType* other) const { return true;
     return true;
 }
 

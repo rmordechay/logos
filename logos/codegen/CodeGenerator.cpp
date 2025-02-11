@@ -31,20 +31,23 @@ constexpr auto LLVM_OBJECT_FILE = CodeGenFileType::ObjectFile;
 
 void CodeGenerator::run(const map<string, LogosFile*>& files, LogosStack& theStack) {
     initLLVM();
-    const auto logosLib = Utils::createLLVMModuleFromFile(LOGOS_LIB_IR_FILE, builder.getContext(), *targetMachine);
     theStack.globalSymbols["print"] = LogosSymbol(FUNC, new LogosPrint());
 
-    const auto mainFile = dynamic_cast<LogosMainFile*>(files.at(LOGOS_MAIN_FILE));
     const auto module = new Module(LOGOS_MAIN_FILE, builder.getContext());
-    mainFile->mainFunc->getLLVMValue(&builder, &theStack, module);
-    for (const auto func : mainFile->funcs) {
-        func->getLLVMValue(&builder, &theStack, module);
-    }
-    builder.CreateRet(builder.getInt32(EXIT_SUCCESS));
-    writeIRToFile(module, LOGOS_MAIN_FILE);
+    const auto metadata = CodeGenMetadata{.builder = &builder, .theStack = &theStack, .module = module};
+    const auto mainFile = dynamic_cast<LogosMainFile*>(files.at(LOGOS_MAIN_FILE));
+    generateMainModule(mainFile, metadata);
 
+    writeIRToFile(module, LOGOS_MAIN_FILE);
     runBinary();
-    // generateTest();
+}
+
+void CodeGenerator::generateMainModule(const LogosMainFile* mainFile, CodeGenMetadata metadata) {
+    mainFile->mainFunc->getLLVMValue(&metadata);
+    builder.CreateRet(builder.getInt32(EXIT_SUCCESS));
+    for (const auto func : mainFile->funcs) {
+        func->getLLVMValue(&metadata);
+    }
 }
 
 void CodeGenerator::initLLVM() {
@@ -69,13 +72,10 @@ void CodeGenerator::runBinary() {
 void CodeGenerator::generateTest() {
     LLVMContext context;
     auto builder = IRBuilder(context);
-    const std::vector<Type *> elements = {
-        Type::getInt32Ty(context),
-        Type::getFloatTy(context),
-    };
-    StructType *myStructType = StructType::create(context, elements, "MyStruct");
-    AllocaInst *structInstance = builder.CreateAlloca(myStructType, nullptr, "myStructInstance");
-    Value *fieldAPtr = builder.CreateStructGEP(myStructType, structInstance, 0, "a_ptr");
+    const std::vector<Type*> elements = {Type::getInt32Ty(context), Type::getFloatTy(context),};
+    StructType* myStructType = StructType::create(context, elements, "MyStruct");
+    AllocaInst* structInstance = builder.CreateAlloca(myStructType, nullptr, "myStructInstance");
+    Value* fieldAPtr = builder.CreateStructGEP(myStructType, structInstance, 0, "a_ptr");
 }
 
 void CodeGenerator::emitLLVMFile(const string& filePath, const Module* const module) {

@@ -16,7 +16,7 @@ public:
         op(op) {
     }
 
-    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) override;
+    Value* getLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosBinaryExpr() override = default;
 };
 

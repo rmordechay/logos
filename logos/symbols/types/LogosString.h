@@ -23,7 +23,7 @@ inline Type* LogosString::getLLVMType(IRBuilder<>* builder, LogosStack* theStack
     return nullptr;
 }
 
-inline bool LogosString::operator==(LogosType* other) const {
+inline bool LogosString::operator==(LogosType* other) const { return true;
 }
 
 #endif //LOGOSSTRING_H

@@ -20,7 +20,7 @@ inline Type* LogosInt::getLLVMType(IRBuilder<>* builder, LogosStack* theStack) c
     return builder->getInt32Ty();
 }
 
-inline bool LogosInt::operator==(LogosType* other) const {
+inline bool LogosInt::operator==(LogosType* other) const { return true;
     return this->name() == other->name();
 }
 

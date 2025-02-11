@@ -1,6 +1,8 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
+#include "CodeGeneration.h"
 #include "LogosStack.h"
+#include "files/LogosMainFile.h"
 
 class ThreadPool;
 using namespace llvm;
@@ -22,6 +24,7 @@ public:
     TargetMachine* targetMachine = nullptr;
 
 
+    void generateMainModule(const LogosMainFile* mainFile, CodeGenMetadata metadata);
     void run(const map<string, LogosFile*>& files, LogosStack& theStack);
     Linker* linkModules(Module* rootModule) const;
     void initLLVM();

@@ -21,7 +21,7 @@ inline Type* LogosFloat::getLLVMType(IRBuilder<>* builder, LogosStack* theStack)
     return builder->getFloatTy();
 }
 
-inline bool LogosFloat::operator==(LogosType* other) const {
+inline bool LogosFloat::operator==(LogosType* other) const { return true;
 }
 
 

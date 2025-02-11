@@ -13,7 +13,7 @@ public:
     Position position = Position();
 
     explicit LogosFuncCall(const string& name) : name(name) {}
-    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) override;
+    Value* getLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosFuncCall() override;
     void setPosition(const antlr4::Token* ctx, const string& filePath) override;
 };

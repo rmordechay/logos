@@ -13,7 +13,7 @@ Type* LogosObject::getLLVMType(IRBuilder<>* builder, LogosStack* theStack) const
     return StructType::create(builder->getContext(), elementTypes);
 }
 
-bool LogosObject::operator==(LogosType* other) const {
+bool LogosObject::operator==(LogosType* other) const { return true;
     return true;
 }
 

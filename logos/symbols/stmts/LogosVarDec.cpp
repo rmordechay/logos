@@ -5,11 +5,11 @@
 
 #include <llvm/IR/Module.h>
 
-Value* LogosVarDec::getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) {
-    const auto value = expr->getLLVMValue(builder, theStack, module);
-    const auto allocaInst = builder->CreateAlloca(value->getType(), nullptr);
-    builder->CreateStore(value, allocaInst);
-    theStack->addSymbol(name, LogosSymbol(VAR_DEC, this));
+Value* LogosVarDec::getLLVMValue(CodeGenMetadata* metadata) {
+    const auto value = expr->getLLVMValue(metadata);
+    const auto allocaInst = metadata->builder->CreateAlloca(value->getType(), nullptr);
+    metadata->builder->CreateStore(value, allocaInst);
+    metadata->theStack->addSymbol(name, LogosSymbol(VAR_DEC, this));
     return allocaInst;
 }
 

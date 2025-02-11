@@ -7,7 +7,7 @@ public:
     LogosType* type = nullptr;
 
     explicit LogosExpr(LogosType* type) : type(type) {}
-    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) override;
+    Value* getLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosExpr() override = default;
 };
 

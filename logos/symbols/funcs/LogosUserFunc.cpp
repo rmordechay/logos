@@ -1,37 +1,37 @@
 #include "LogosUserFunc.h"
 
-FunctionCallee LogosUserFunc::getFuncCallee(IRBuilder<>* builder, LogosStack* theStack, Module* module) {
+FunctionCallee LogosUserFunc::getFuncCallee(CodeGenMetadata* metadata) {
     return nullptr;
 }
 
-vector<Value*> LogosUserFunc::getArgs(IRBuilder<>* builder, LogosStack* theStack, Module* module, const vector<LogosExpr*>& args) {
+vector<Value*> LogosUserFunc::getArgs(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
     return vector<Value*>();
 }
 
-Value* LogosUserFunc::getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) {
+Value* LogosUserFunc::getLLVMValue(CodeGenMetadata* metadata) {
     std::vector<Type*> llvmParams;
     for (const auto param : params) {
-        llvmParams.emplace_back(param->inferredType->getLLVMType(builder, theStack));
+        llvmParams.emplace_back(param->inferredType->getLLVMType(metadata->builder, metadata->theStack));
     }
 
-    const auto funcType = FunctionType::get(type->getLLVMType(builder, theStack), llvmParams, false);
-    const auto func = Function::Create(funcType, Function::ExternalLinkage, name, module);
-    theStack->enterScope(func);
+    const auto funcType = FunctionType::get(type->getLLVMType(metadata->builder, metadata->theStack), llvmParams, false);
+    const auto func = Function::Create(funcType, Function::ExternalLinkage, name, metadata->module);
+    metadata->theStack->enterScope(func);
 
     auto arg = func->arg_begin();
     for (const auto param : params) {
-        theStack->addSymbol(param->name, LogosSymbol(VAR_DEC, param));
+        metadata->theStack->addSymbol(param->name, LogosSymbol(VAR_DEC, param));
         arg++;
     }
 
-    const auto funcEntry = BasicBlock::Create(builder->getContext(), "entry", func);
-    builder->SetInsertPoint(funcEntry);
+    const auto funcEntry = BasicBlock::Create(metadata->builder->getContext(), "entry", func);
+    metadata->builder->SetInsertPoint(funcEntry);
 
     for (const auto stmt : stmts) {
-        stmt->getLLVMValue(builder, theStack, module);
+        stmt->getLLVMValue(metadata);
     }
 
-    theStack->exitScope();
+    metadata->theStack->exitScope();
     return func;
 }
 

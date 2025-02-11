@@ -11,11 +11,11 @@ void LogosFuncCall::setPosition(const antlr4::Token* ctx, const string& filePath
     position.filePath = &filePath;
 }
 
-Value* LogosFuncCall::getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) {
-    const auto callee = theStack->globalSymbols[name].func;
-    const auto llvmArgs = callee->getArgs(builder, theStack, module, args);
-    const auto func = callee->getFuncCallee(builder, theStack, module);
-    return builder->CreateCall(func, llvmArgs);
+Value* LogosFuncCall::getLLVMValue(CodeGenMetadata* metadata) {
+    const auto callee = metadata->theStack->globalSymbols[name].func;
+    const auto llvmArgs = callee->getArgs(metadata, args);
+    const auto func = callee->getFuncCallee(metadata);
+    return metadata->builder->CreateCall(func, llvmArgs);
 }
 
 LogosFuncCall::~LogosFuncCall() {

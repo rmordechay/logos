@@ -7,9 +7,9 @@ class LogosUserFunc final : public LogosFunc {
 public:
     explicit LogosUserFunc(const std::string& name, LogosType* funcType) : LogosFunc(name, funcType) {}
     explicit LogosUserFunc(const string& name) : LogosUserFunc(name, &LOGOS_VOID) {};
-    FunctionCallee getFuncCallee(IRBuilder<>* builder, LogosStack* theStack, Module* module) override;
-    vector<Value*> getArgs(IRBuilder<>* builder, LogosStack* theStack, Module* module, const vector<LogosExpr*>& args) override;
-    Value* getLLVMValue(IRBuilder<>* builder, LogosStack* theStack, Module* module) override;
+    FunctionCallee getFuncCallee(CodeGenMetadata* metadata) override;
+    vector<Value*> getArgs(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
+    Value* getLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosUserFunc() override = default;
 };
 

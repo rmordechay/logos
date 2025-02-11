@@ -22,6 +22,7 @@ inline Type* LogosVoid::getLLVMType(IRBuilder<>* builder, LogosStack* theStack) 
 }
 
 inline bool LogosVoid::operator==(LogosType* other) const {
+    return true;
 }
 
 inline LogosVoid LOGOS_VOID;

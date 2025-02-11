@@ -1,18 +1,18 @@
 #include "LogosIfStmt.h"
 
-Value* LogosIfStmt::getLLVMValue(IRBuilder<>* builder, LogosStack* stackFrame, Module* module) {
-    const auto currentFunc = stackFrame->top().currentFunction;
-    const auto condLLVM = cond->getLLVMValue(builder, stackFrame, module);
-    const auto ifStartBlock = BasicBlock::Create(builder->getContext(), "if.start", currentFunc);
-    const auto ifEndBlock = BasicBlock::Create(builder->getContext(), "if.end", currentFunc);
+Value* LogosIfStmt::getLLVMValue(CodeGenMetadata* metadata) {
+    const auto currentFunc = metadata->theStack->top().currentFunction;
+    const auto condLLVM = cond->getLLVMValue(metadata);
+    const auto ifStartBlock = BasicBlock::Create(metadata->builder->getContext(), "if.start", currentFunc);
+    const auto ifEndBlock = BasicBlock::Create(metadata->builder->getContext(), "if.end", currentFunc);
 
-    builder->CreateCondBr(condLLVM, ifStartBlock, ifEndBlock);
-    builder->SetInsertPoint(ifStartBlock);
+    metadata->builder->CreateCondBr(condLLVM, ifStartBlock, ifEndBlock);
+    metadata->builder->SetInsertPoint(ifStartBlock);
     for (const auto& codeNode : stmts) {
-        codeNode->getLLVMValue(builder, stackFrame, module);
+        codeNode->getLLVMValue(metadata);
     }
-    builder->CreateBr(ifEndBlock);
-    builder->SetInsertPoint(ifEndBlock);
+    metadata->builder->CreateBr(ifEndBlock);
+    metadata->builder->SetInsertPoint(ifEndBlock);
     return nullptr;
 }
 
