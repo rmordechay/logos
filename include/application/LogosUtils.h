@@ -11,7 +11,7 @@
 #include <llvm/Target/TargetMachine.h>
 #include "llvm/Support/FileSystem.h"
 #include <__filesystem/directory_entry.h>
-#include <exprs/LogosVariableExpr.h>
+#include <exprs/LogosVariable.h>
 
 using namespace std;
 using namespace llvm;
@@ -22,7 +22,6 @@ public:
     static bool isMainFile(const filesystem::directory_entry& filePath);
     static Module* createLLVMModuleFromFile(const string& filePath, LLVMContext& context, const TargetMachine& tm);
     static void emitLLVMFile(const string& filePath, const Module* module);
-    static string getUnaryExprName(LogosUnaryExpr* expr);
 };
 
 

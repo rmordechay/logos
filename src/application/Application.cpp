@@ -9,12 +9,12 @@ void Application::runLogos() {
 map<string, LogosFile*> Application::parse() {
     ThreadPool threadPool;
     map<string, LogosFile*> files;
-    flattenTree(rootPath, files, threadPool);
+    parseTree(rootPath, files, threadPool);
     threadPool.wait();
     return files;
 }
 
-void Application::flattenTree(const string& path, map<string, LogosFile*>& files, ThreadPool& threadPool) {
+void Application::parseTree(const string& path, map<string, LogosFile*>& files, ThreadPool& threadPool) {
     for (const auto& entry : directory_iterator(path)) {
         if (Utils::isLogosFile(entry)) {
             threadPool.runTask([entry, &files, this] {
@@ -25,7 +25,7 @@ void Application::flattenTree(const string& path, map<string, LogosFile*>& files
                 }
             });
         } else if (is_directory(entry.status())) {
-            flattenTree(entry.path(), files, threadPool);
+            parseTree(entry.path(), files, threadPool);
         }
     }
 }
@@ -40,5 +40,6 @@ LogosFile* Application::getFile(const directory_entry& fileEntry) {
     auto tokens = CommonTokenStream(&lexer);
     auto parser = LogosParser(&tokens);
     auto antlerConverter = AntlerConverter(fileEntry.path());
-    return antlerConverter.getLogosFile(parser.logosFile(), absolute(fileEntry).string());
+    auto parsedFile = parser.logosFile();
+    return antlerConverter.getLogosFile(parsedFile, absolute(fileEntry).string());
 }

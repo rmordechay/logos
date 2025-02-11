@@ -1,8 +1,8 @@
 object: MyObject
 
-x: Int = 2
-y: Int = 4
+x: Int
+y: Int
 
 add(): Int {
-    return x + y
+    return 1 + 2
 }

@@ -11,16 +11,16 @@ vector<Value*> LogosUserFunc::getArgs(CodeGenMetadata* metadata, const vector<Lo
 Value* LogosUserFunc::getLLVMValue(CodeGenMetadata* metadata) {
     std::vector<Type*> llvmParams;
     for (const auto param : params) {
-        llvmParams.emplace_back(param->inferredType->getLLVMType(metadata->builder, metadata->theStack));
+        llvmParams.emplace_back(param->inferredType->getLLVMType(metadata));
     }
 
-    const auto funcType = FunctionType::get(type->getLLVMType(metadata->builder, metadata->theStack), llvmParams, false);
+    const auto funcType = FunctionType::get(type->getLLVMType(metadata), llvmParams, false);
     const auto func = Function::Create(funcType, Function::ExternalLinkage, name, metadata->module);
     metadata->theStack->enterScope(func);
 
     auto arg = func->arg_begin();
     for (const auto param : params) {
-        metadata->theStack->addSymbol(param->name, LogosSymbol(VAR_DEC, param));
+        metadata->theStack->addLocalSymbol(param->name, LogosSymbol(VAR_DEC, param));
         arg++;
     }
 

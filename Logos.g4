@@ -37,7 +37,7 @@ objectImplements:
     ;
 
 funcSignature:
-        VARIABLE LPAREN variableDefintionList? RPAREN (COLON TYPE)?
+        VARIABLE LPAREN paramList? RPAREN (COLON TYPE)?
     ;
 
 funcImplementation:
@@ -56,7 +56,7 @@ constructorCall:
         TYPE LPAREN funcArgList? RPAREN
     ;
 
-variableDefintionList:
+paramList:
         explicitVarDec (COMMA explicitVarDec)* COMMA?
     ;
 

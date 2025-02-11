@@ -1,25 +1,49 @@
 #include "exprs/LogosSelection.h"
 
 #include "LogosUtils.h"
+#include "exprs/LogosFuncCall.h"
 
-#include <exprs/LogosVariableExpr.h>
+LogosExpr* f(LogosUnaryExpr* expr);
+
+void resolveSymbol(CodeGenMetadata* metadata, const LogosSymbol* currentSymbol) {
+    switch (currentSymbol->type) {
+    case FIELD: {
+        currentSymbol->field->expr->getLLVMValue(metadata);
+        break;
+    }
+    case VAR_DEC: {
+        currentSymbol->varDec->expr->getLLVMValue(metadata);
+        break;
+    }
+    case OBJECT: {
+        currentSymbol->object->getLLVMType(metadata);
+        break;
+    }
+    case FUNC: {
+        currentSymbol->func->getLLVMValue(metadata);
+        break;
+    }
+    }
+}
 
 Value* LogosSelection::getLLVMValue(CodeGenMetadata* metadata) {
+    // 1. Get next element
+    // 2. Resolve
+    // 3. Find type
+    // 4. Apply (func=call; varDec=execute expr; constructor=instantiate)
+    // 5. If last value, return, if not, continue
+    // 6. If next selection in the returned values, repeat until exhaustion
+
+    // Unary - func, variable, constructor
+    // obj = MyObject()
+    // obj.add()
+
     for (int i = 0; i < exprs.size(); ++i) {
-        const auto currentExpr = exprs[i];
-        const bool isLastIteration = i == exprs.size() - 1;
-        if (isLastIteration) {
-            return currentExpr->getLLVMValue(metadata);
-        }
-
-        const auto nextExpr = exprs[i + 1];
-        const auto n = Utils::getUnaryExprName(nextExpr);
-        if (const auto var = dynamic_cast<LogosVariable*>(currentExpr)) {
-            const auto objSymbol = metadata->theStack->getSymbol(var->name);
-            const auto typeName = objSymbol->varDec->inferredType->name();
-            const auto obj = metadata->theStack->getSymbol(typeName)->object;
-
-        }
+        const auto expr = exprs[i];
+        expr->getLLVMValue(metadata);
+        // if (i == exprs.size() - 1) break;
+        // auto exprRv = f(expr);
+        // exprRv->getLLVMValue(metadata);
     }
     return nullptr;
 }
@@ -29,4 +53,3 @@ LogosSelection::~LogosSelection() {
         delete expr;
     }
 }
-

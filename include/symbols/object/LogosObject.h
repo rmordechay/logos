@@ -9,17 +9,18 @@ class LogosField;
 
 class LogosObject final : public LogosType {
 public:
+
     string typeName;
     map<string, LogosField*> fields;
     map<string, LogosFunc*> funcs;
+    StructType* llvmStruct = nullptr;
 
     LogosObject() = default;
     explicit LogosObject(const string& typeName) : typeName(typeName) {}
     const string name() const override;
-    Type* getLLVMType(IRBuilder<>* builder, LogosStack* theStack) const override;
+    Type* getLLVMType(CodeGenMetadata* metadata) override;
     bool operator==(LogosType* other) const override;
     ~LogosObject() override;
-
 };
 
 #endif //LOGOSOBJECT_H

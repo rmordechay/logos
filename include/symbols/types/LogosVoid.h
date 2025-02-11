@@ -8,7 +8,7 @@ public:
     static constexpr auto typeName = "Void";
 
     const string name() const override;
-    Type* getLLVMType(IRBuilder<>* builder, LogosStack* theStack) const override;
+    Type* getLLVMType(CodeGenMetadata* metadata) override;
     bool operator==(LogosType* other) const override;
     ~LogosVoid() override = default;
 };
@@ -17,8 +17,8 @@ inline const string LogosVoid::name() const {
     return typeName;
 }
 
-inline Type* LogosVoid::getLLVMType(IRBuilder<>* builder, LogosStack* theStack) const {
-    return builder->getVoidTy();
+inline Type* LogosVoid::getLLVMType(CodeGenMetadata* metadata) {
+    return metadata->builder->getVoidTy();
 }
 
 inline bool LogosVoid::operator==(LogosType* other) const {

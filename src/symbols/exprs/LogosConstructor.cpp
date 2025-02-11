@@ -5,6 +5,6 @@
 Value* LogosConstructor::getLLVMValue(CodeGenMetadata* metadata) {
     const auto obj = metadata->theStack->getSymbol(name)->object;
     CodeGenerator::generateObjModule(obj, metadata->theStack);
-    const auto llvmType = obj->getLLVMType(metadata->builder, metadata->theStack);
+    const auto llvmType = obj->getLLVMType(metadata);
     return metadata->builder->CreateAlloca(llvmType);
 }

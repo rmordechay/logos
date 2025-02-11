@@ -1,5 +1,7 @@
 #include "application/LogosUtils.h"
 
+#include "exprs/LogosFuncCall.h"
+
 using namespace std;
 
 bool Utils::isLogosFile(const filesystem::directory_entry& filePath) {
@@ -23,15 +25,4 @@ void Utils::emitLLVMFile(const string& filePath, const Module* const module) {
     module->print(textFile, nullptr);
 }
 
-string Utils::getUnaryExprName(LogosUnaryExpr* expr) {
-    if (const auto func = dynamic_cast<LogosFunc*>(expr)) {
-        return func->name;
-    }
-    if (const auto func = dynamic_cast<LogosVariable*>(expr)) {
-        return func->name;
-    }
-    if (const auto constructor = dynamic_cast<LogosConstructor*>(expr)) {
-        return constructor->name;
-    }
-    return nullptr;
-}
+

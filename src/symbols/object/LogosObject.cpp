@@ -4,13 +4,14 @@ const string LogosObject::name() const {
     return typeName;
 }
 
-Type* LogosObject::getLLVMType(IRBuilder<>* builder, LogosStack* theStack) const {
+Type* LogosObject::getLLVMType(CodeGenMetadata* metadata) {
     vector<Type*> elementTypes;
     for (const auto entry : fields) {
-        auto fieldType = entry.second->inferredType->getLLVMType(builder, theStack);
+        auto fieldType = entry.second->inferredType->getLLVMType(metadata);
         elementTypes.push_back(fieldType);
     }
-    return StructType::create(builder->getContext(), elementTypes);
+    llvmStruct = StructType::create(metadata->builder->getContext(), elementTypes);
+    return llvmStruct;
 }
 
 bool LogosObject::operator==(LogosType* other) const { return true;

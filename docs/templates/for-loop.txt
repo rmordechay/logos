@@ -31,3 +31,9 @@ for i @tag {
         break @tag
     }
 }
+
+// First and last values
+for i {
+    isFirst = for.first
+    isLast = for.last
+}

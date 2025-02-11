@@ -9,12 +9,14 @@ class LogosExpr;
 class LogosField final : public CodeGeneration {
 public:
     string name;
+    string parentName;
     LogosType* inferredType = nullptr;
     LogosType* userType = nullptr;
     LogosExpr* expr = nullptr;
 
-    LogosField(const string& name, LogosType* inferredType, LogosExpr* expr) :
+    LogosField(const string& name, const string& parentName, LogosType* inferredType, LogosExpr* expr) :
         name(name),
+        parentName(parentName),
         inferredType(inferredType),
         expr(expr) {
     }

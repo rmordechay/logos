@@ -43,7 +43,7 @@ add_executable(logos
     include/symbols/exprs/LogosFuncCall.h
     include/symbols/exprs/LogosOperator.h
     include/symbols/exprs/LogosUnaryExpr.h
-    src/symbols/exprs/LogosVariableExpr.cpp
+    src/symbols/exprs/LogosVariable.cpp
     include/symbols/files/LogosFile.h
     src/symbols/files/LogosMainFile.cpp
     include/symbols/files/LogosMainFile.h

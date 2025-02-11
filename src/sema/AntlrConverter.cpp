@@ -46,20 +46,22 @@ LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
     const auto name = ctx->objectDeclaration()->TYPE()->getText();
     const auto obj = new LogosObject(name);
     for (const auto varDec : ctx->explicitVarDec()) {
-        obj->fields[name] = getField(varDec);
+        const auto field = getField(varDec, name);
+        obj->fields[field->name] = field;
     }
     for (const auto func : ctx->funcImplementation()) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
-        obj->funcs[funcName] = getFunc(func);
+        const auto userFunc = getFunc(func);
+        obj->funcs[funcName] = userFunc;
     }
     return obj;
 }
 
-LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec) {
+LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName) {
     const auto name = varDec->VARIABLE()->getText();
     const auto type = getType(varDec->TYPE());
     const auto expr = getExpr(varDec->expr());
-    return new LogosField(name, type, expr);
+    return new LogosField(name, parentName, type, expr);
 }
 
 LogosUserFunc* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* ctx) {
@@ -68,9 +70,9 @@ LogosUserFunc* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* 
     const auto type = getType(funcSignature->TYPE());
     const auto logosUserFunc = new LogosUserFunc(funcName, type);
 
-    const auto args = funcSignature->variableDefintionList();
-    if (args) {
-        for (const auto param : args->explicitVarDec()) {
+    const auto params = funcSignature->variableDefintionList();
+    if (params) {
+        for (const auto param : params->explicitVarDec()) {
             auto varDec = getExplicitVarDec(param);
             logosUserFunc->params.push_back(varDec);
         }
@@ -197,10 +199,13 @@ LogosFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
     const auto name = ctx->VARIABLE()->getText();
     const auto funcCallExpr = new LogosFuncCall(name);
     funcCallExpr->setPosition(ctx->start, filePath);
-    const auto args = ctx->funcArgList()->funcArg();
-    for (const auto arg : args) {
-        auto argExpr = getExpr(arg->expr());
-        funcCallExpr->args.push_back(argExpr);
+    const auto funcArgList = ctx->funcArgList();
+    if (funcArgList) {
+        const auto args = funcArgList->funcArg();
+        for (const auto arg : args) {
+            auto argExpr = getExpr(arg->expr());
+            funcCallExpr->args.push_back(argExpr);
+        }
     }
     return funcCallExpr;
 }

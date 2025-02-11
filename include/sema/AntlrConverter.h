@@ -10,7 +10,7 @@
 #include "LogosDefinitions.h"
 #include "exprs/LogosConstant.h"
 #include "exprs/LogosFuncCall.h"
-#include "exprs/LogosVariableExpr.h"
+#include "exprs/LogosVariable.h"
 #include "exprs/LogosConstructor.h"
 #include "exprs/LogosSelection.h"
 #include "exprs/LogosBinaryExpr.h"
@@ -32,7 +32,7 @@ public:
     LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx);
     LogosObjectFile* getObjFile(LogosParser::ObjectFileContext* ctx);
     LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
-    LogosField *getField(LogosParser::ExplicitVarDecContext* varDec);
+    LogosField *getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName);
     LogosUserFunc* getFunc(LogosParser::FuncImplementationContext* ctx);
     LogosStmt* getStmt(LogosParser::StatementContext* ctx);
     vector<LogosStmt*> getStmtList(LogosParser::StatementsBlockContext* ctx);
