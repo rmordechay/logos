@@ -4,14 +4,12 @@ project(logos)
 set(CMAKE_CXX_STANDARD 20)
 
 set(ANTLR_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime")
-set(LLVM_INCLUDE_DIR "/opt/homebrew/opt/llvm/include")
-set(LLVM_LIBS "/opt/homebrew/opt/llvm/lib")
+set(LLVM_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libLLVM.dylib")
 set(ANTLR_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime.a")
 set(GTEST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest.1.15.2.dylib")
 set(GTEST_LIB_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest_main.1.15.2.dylib")
 
 file(GLOB GENERATED_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/parser/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/parser/*.h")
-file(GLOB LLVM ${LLVM_LIBS}/libLLVM.dylib ${LLVM_LIBS}/*.a)
 
 add_executable(logos
     main.cpp
@@ -80,7 +78,6 @@ target_include_directories(logos PRIVATE
     src/parser
     ${ANTLR_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
-    ${LLVM_INCLUDE_DIR}
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/application"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/codegen"
@@ -88,15 +85,12 @@ target_include_directories(logos PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/include/symbols"
 )
 
-target_link_libraries(logos PRIVATE ${ANTLR_LIB} ${LLVM} ${GTEST_LIB} ${GTEST_LIB_MAIN})
-
-enable_testing()
+target_link_libraries(logos PRIVATE ${ANTLR_LIB} ${LLVM_LIB} ${GTEST_LIB} ${GTEST_LIB_MAIN})
 add_executable(logos_tests tests/ParserTest.cpp)
 
-target_include_directories(logos_tests PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/include
-)
-
+target_include_directories(logos_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/external/include)
 target_link_libraries(logos_tests PRIVATE ${GTEST_LIB} ${GTEST_LIB_MAIN})
-
+enable_testing()
 add_test(NAME LogosTests COMMAND logos_tests)
+
+
