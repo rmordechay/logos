@@ -29,7 +29,7 @@ public:
     RuleInterfaceDeclaration = 7, RuleObjectImplements = 8, RuleFuncSignature = 9, 
     RuleFuncImplementation = 10, RuleFuncBody = 11, RuleFuncCall = 12, RuleConstructorCall = 13, 
     RuleParamList = 14, RuleExplicitVarDec = 15, RuleImplicitVarDec = 16, 
-    RuleFieldDec = 17, RuleFuncArg = 18, RuleFuncArgList = 19, RuleStatement = 20, 
+    RuleFieldAssignment = 17, RuleFuncArg = 18, RuleFuncArgList = 19, RuleStatement = 20, 
     RuleEnumDeclaration = 21, RuleEnumField = 22, RuleStatementsBlock = 23, 
     RuleExprList = 24, RuleExpr = 25, RuleUnaryExpr = 26, RuleConstant = 27, 
     RuleSelection = 28, RuleIfStatement = 29, RuleElseStatement = 30, RulePatternMatching = 31, 
@@ -71,7 +71,7 @@ public:
   class ParamListContext;
   class ExplicitVarDecContext;
   class ImplicitVarDecContext;
-  class FieldDecContext;
+  class FieldAssignmentContext;
   class FuncArgContext;
   class FuncArgListContext;
   class StatementContext;
@@ -332,9 +332,9 @@ public:
 
   ImplicitVarDecContext* implicitVarDec();
 
-  class  FieldDecContext : public antlr4::ParserRuleContext {
+  class  FieldAssignmentContext : public antlr4::ParserRuleContext {
   public:
-    FieldDecContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    FieldAssignmentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<antlr4::tree::TerminalNode *> VARIABLE();
     antlr4::tree::TerminalNode* VARIABLE(size_t i);
@@ -345,7 +345,7 @@ public:
    
   };
 
-  FieldDecContext* fieldDec();
+  FieldAssignmentContext* fieldAssignment();
 
   class  FuncArgContext : public antlr4::ParserRuleContext {
   public:
@@ -378,7 +378,7 @@ public:
   public:
     StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    FieldDecContext *fieldDec();
+    FieldAssignmentContext *fieldAssignment();
     ExplicitVarDecContext *explicitVarDec();
     ImplicitVarDecContext *implicitVarDec();
     IfStatementContext *ifStatement();

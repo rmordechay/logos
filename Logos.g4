@@ -68,7 +68,7 @@ implicitVarDec:
         VARIABLE EQUAL expr
     ;
 
-fieldDec:
+fieldAssignment:
         VARIABLE DOT VARIABLE* EQUAL expr
     ;
 
@@ -81,7 +81,7 @@ funcArgList:
     ;
 
 statement:
-        fieldDec
+        fieldAssignment
     |   explicitVarDec
     |   implicitVarDec
     |   ifStatement
