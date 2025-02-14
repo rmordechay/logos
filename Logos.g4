@@ -65,7 +65,11 @@ explicitVarDec:
     ;
 
 implicitVarDec:
-        VARIABLE (EQUAL expr)?
+        VARIABLE EQUAL expr
+    ;
+
+fieldDec:
+        VARIABLE DOT VARIABLE* EQUAL expr
     ;
 
 funcArg:
@@ -77,7 +81,8 @@ funcArgList:
     ;
 
 statement:
-        explicitVarDec
+        fieldDec
+    |   explicitVarDec
     |   implicitVarDec
     |   ifStatement
     |   loopStatement

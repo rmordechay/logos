@@ -75,7 +75,7 @@ void SemaAnalyser::visitStmt(LogosStmt* stmt) {
     if (const auto varDec = dynamic_cast<LogosVarDec*>(stmt)) {
         visitVarDec(varDec);
     }
-    if (const auto ifStmt = dynamic_cast<const LogosIfStmt*>(stmt)) {
+    if (const auto ifStmt = dynamic_cast<const LogosIf*>(stmt)) {
         visitIfStmt(ifStmt);
     }
     if (const auto ifStmt = dynamic_cast<const LogosConstructor*>(stmt)) {
@@ -102,7 +102,7 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
     }
 }
 
-void SemaAnalyser::visitIfStmt(const LogosIfStmt* ifStmt) {
+void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {
     if (!ifStmt) return;
 }
 

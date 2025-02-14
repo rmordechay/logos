@@ -28,13 +28,13 @@ public:
     RuleImportStatement = 4, RuleImportPath = 5, RuleObjectDeclaration = 6, 
     RuleInterfaceDeclaration = 7, RuleObjectImplements = 8, RuleFuncSignature = 9, 
     RuleFuncImplementation = 10, RuleFuncBody = 11, RuleFuncCall = 12, RuleConstructorCall = 13, 
-    RuleVariableDefintionList = 14, RuleExplicitVarDec = 15, RuleImplicitVarDec = 16, 
-    RuleFuncArg = 17, RuleFuncArgList = 18, RuleStatement = 19, RuleEnumDeclaration = 20, 
-    RuleEnumField = 21, RuleStatementsBlock = 22, RuleExprList = 23, RuleExpr = 24, 
-    RuleUnaryExpr = 25, RuleConstant = 26, RuleSelection = 27, RuleIfStatement = 28, 
-    RuleElseStatement = 29, RulePatternMatching = 30, RulePattern = 31, 
-    RuleLoopStatement = 32, RuleLoopControlStatement = 33, RuleReturnStatement = 34, 
-    RuleRange = 35
+    RuleParamList = 14, RuleExplicitVarDec = 15, RuleImplicitVarDec = 16, 
+    RuleFieldDec = 17, RuleFuncArg = 18, RuleFuncArgList = 19, RuleStatement = 20, 
+    RuleEnumDeclaration = 21, RuleEnumField = 22, RuleStatementsBlock = 23, 
+    RuleExprList = 24, RuleExpr = 25, RuleUnaryExpr = 26, RuleConstant = 27, 
+    RuleSelection = 28, RuleIfStatement = 29, RuleElseStatement = 30, RulePatternMatching = 31, 
+    RulePattern = 32, RuleLoopStatement = 33, RuleLoopControlStatement = 34, 
+    RuleReturnStatement = 35, RuleRange = 36
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -68,9 +68,10 @@ public:
   class FuncBodyContext;
   class FuncCallContext;
   class ConstructorCallContext;
-  class VariableDefintionListContext;
+  class ParamListContext;
   class ExplicitVarDecContext;
   class ImplicitVarDecContext;
+  class FieldDecContext;
   class FuncArgContext;
   class FuncArgListContext;
   class StatementContext;
@@ -229,7 +230,7 @@ public:
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
-    VariableDefintionListContext *variableDefintionList();
+    ParamListContext *paramList();
     antlr4::tree::TerminalNode *COLON();
     antlr4::tree::TerminalNode *TYPE();
 
@@ -289,9 +290,9 @@ public:
 
   ConstructorCallContext* constructorCall();
 
-  class  VariableDefintionListContext : public antlr4::ParserRuleContext {
+  class  ParamListContext : public antlr4::ParserRuleContext {
   public:
-    VariableDefintionListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    ParamListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<ExplicitVarDecContext *> explicitVarDec();
     ExplicitVarDecContext* explicitVarDec(size_t i);
@@ -301,7 +302,7 @@ public:
    
   };
 
-  VariableDefintionListContext* variableDefintionList();
+  ParamListContext* paramList();
 
   class  ExplicitVarDecContext : public antlr4::ParserRuleContext {
   public:
@@ -330,6 +331,21 @@ public:
   };
 
   ImplicitVarDecContext* implicitVarDec();
+
+  class  FieldDecContext : public antlr4::ParserRuleContext {
+  public:
+    FieldDecContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<antlr4::tree::TerminalNode *> VARIABLE();
+    antlr4::tree::TerminalNode* VARIABLE(size_t i);
+    antlr4::tree::TerminalNode *DOT();
+    antlr4::tree::TerminalNode *EQUAL();
+    ExprContext *expr();
+
+   
+  };
+
+  FieldDecContext* fieldDec();
 
   class  FuncArgContext : public antlr4::ParserRuleContext {
   public:
@@ -362,6 +378,7 @@ public:
   public:
     StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    FieldDecContext *fieldDec();
     ExplicitVarDecContext *explicitVarDec();
     ImplicitVarDecContext *implicitVarDec();
     IfStatementContext *ifStatement();

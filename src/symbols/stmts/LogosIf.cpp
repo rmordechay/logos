@@ -1,6 +1,6 @@
-#include "stmts/LogosIfStmt.h"
+#include "stmts/LogosIf.h"
 
-Value* LogosIfStmt::getLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosIf::getLLVMValue(CodeGenMetadata* metadata) {
     const auto currentFunc = metadata->theStack->top().currentFunction;
     const auto condLLVM = cond->getLLVMValue(metadata);
     const auto ifStartBlock = BasicBlock::Create(metadata->builder->getContext(), "if.start", currentFunc);
@@ -16,7 +16,7 @@ Value* LogosIfStmt::getLLVMValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
 
-LogosIfStmt::~LogosIfStmt() {
+LogosIf::~LogosIf() {
     delete cond;
     for (const auto stmt : stmts) {
         delete stmt;

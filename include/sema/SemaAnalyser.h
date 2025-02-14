@@ -9,7 +9,7 @@
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
 #include "object/LogosObject.h"
-#include "stmts/LogosIfStmt.h"
+#include "stmts/LogosIf.h"
 
 
 class SemaAnalyser {
@@ -32,7 +32,7 @@ public:
     void visitStmtList(const vector<LogosStmt*>& stmts);
     void visitField(LogosField* field);
     void visitVarDec(LogosVarDec* varDec);
-    void visitIfStmt(const LogosIfStmt* ifStmt);
+    void visitIfStmt(const LogosIf* ifStmt);
     void visitExpr(const LogosExpr* expr);
     void visitUnaryExpr(const LogosUnaryExpr* unaryExpr);
     void visitConstructor(const LogosConstructor* constructorExpr);

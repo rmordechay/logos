@@ -3,14 +3,14 @@
 #include "LogosStmt.h"
 #include "exprs/LogosExpr.h"
 
-class LogosIfStmt final : public LogosStmt {
+class LogosIf final : public LogosStmt {
 public:
     LogosExpr *cond;
     vector<LogosStmt*> stmts;
 
-    explicit LogosIfStmt(LogosExpr* cond, const vector<LogosStmt*>& stmt) : cond(cond), stmts(stmt) {}
+    explicit LogosIf(LogosExpr* cond, const vector<LogosStmt*>& stmt) : cond(cond), stmts(stmt) {}
     Value* getLLVMValue(CodeGenMetadata* metadata) override;
-    ~LogosIfStmt() override;
+    ~LogosIf() override;
 };
 
 

@@ -18,8 +18,8 @@
 #include "files/LogosObjectFile.h"
 #include "funcs/LogosUserFunc.h"
 #include "object/LogosObject.h"
-#include "stmts/LogosIfStmt.h"
-#include "stmts/LogosReturnStmt.h"
+#include "stmts/LogosIf.h"
+#include "stmts/LogosReturn.h"
 #include "types/LogosInt.h"
 
 using namespace std;
@@ -38,7 +38,7 @@ public:
     vector<LogosStmt*> getStmtList(LogosParser::StatementsBlockContext* ctx);
     LogosVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LogosVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
-    LogosIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
+    LogosIf* getIfStatement(LogosParser::IfStatementContext* ctx);
     LogosSelection* getSelection(LogosParser::SelectionContext* selection);
     LogosExpr* getExpr(LogosParser::ExprContext* ctx);
     LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);

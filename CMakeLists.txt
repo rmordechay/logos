@@ -3,12 +3,6 @@ project(logos)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(ANTLR_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime")
-set(LLVM_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libLLVM.dylib")
-set(ANTLR_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime.a")
-set(GTEST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest.1.15.2.dylib")
-set(GTEST_LIB_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest_main.1.15.2.dylib")
-
 file(GLOB GENERATED_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/parser/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/parser/*.h")
 
 add_executable(logos
@@ -53,10 +47,10 @@ add_executable(logos
     include/symbols/funcs/LogosUserFunc.h
     src/symbols/object/LogosObject.cpp
     include/symbols/object/LogosObject.h
-    src/symbols/stmts/LogosIfStmt.cpp
-    include/symbols/stmts/LogosIfStmt.h
-    src/symbols/stmts/LogosReturnStmt.cpp
-    include/symbols/stmts/LogosReturnStmt.h
+    src/symbols/stmts/LogosIf.cpp
+    include/symbols/stmts/LogosIf.h
+    src/symbols/stmts/LogosReturn.cpp
+    include/symbols/stmts/LogosReturn.h
     include/symbols/stmts/LogosStmt.h
     src/symbols/stmts/LogosVarDec.cpp
     include/symbols/stmts/LogosVarDec.h
@@ -72,8 +66,11 @@ add_executable(logos
     include/symbols/LogosSymbol.h
     src/symbols/object/LogosField.cpp
     include/symbols/object/LogosField.h
+    src/symbols/stmts/LogosFieldDec.cpp
+    include/symbols/stmts/LogosFieldDec.h
 )
 
+set(ANTLR_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime")
 target_include_directories(logos PRIVATE
     src/parser
     ${ANTLR_INCLUDE_DIR}
@@ -84,6 +81,11 @@ target_include_directories(logos PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/include/sema"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/symbols"
 )
+
+set(LLVM_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libLLVM.dylib")
+set(ANTLR_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime.a")
+set(GTEST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest.1.15.2.dylib")
+set(GTEST_LIB_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest_main.1.15.2.dylib")
 
 target_link_libraries(logos PRIVATE ${ANTLR_LIB} ${LLVM_LIB} ${GTEST_LIB} ${GTEST_LIB_MAIN})
 add_executable(logos_tests tests/ParserTest.cpp)
