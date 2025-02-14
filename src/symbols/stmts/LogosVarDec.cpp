@@ -1,11 +1,15 @@
 #include "stmts/LogosVarDec.h"
 
-Value* LogosVarDec::getLLVMValue(CodeGenMetadata* metadata) {
-    const auto value = expr->getLLVMValue(metadata);
-    const auto allocaInst = metadata->builder->CreateAlloca(value->getType());
-    metadata->builder->CreateStore(value, allocaInst);
+Value* LogosVarDec::writeLLVMValue(CodeGenMetadata* metadata) {
+    const auto value = expr->writeLLVMValue(metadata);
+    const auto valueType = value->getType();
+    if (!valueType->isPointerTy()) {
+        const auto allocaInst = metadata->builder->CreateAlloca(valueType);
+        metadata->builder->CreateStore(value, allocaInst);
+    }
     metadata->theStack->addLocalSymbol(name, LogosSymbol(VAR_DEC, this));
-    return allocaInst;
+    llvmValue = value;
+    return value;
 }
 
 LogosVarDec::~LogosVarDec() {

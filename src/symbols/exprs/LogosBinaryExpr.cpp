@@ -1,13 +1,15 @@
 #include "exprs/LogosBinaryExpr.h"
 
-Value* LogosBinaryExpr::getLLVMValue(CodeGenMetadata* metadata) {
-    const auto l = left->getLLVMValue(metadata);
-    const auto r = right->getLLVMValue(metadata);
+Value* LogosBinaryExpr::writeLLVMValue(CodeGenMetadata* metadata) {
+    const auto l = left->writeLLVMValue(metadata);
+    const auto r = right->writeLLVMValue(metadata);
     if (op == PLUS) {
-        return metadata->builder->CreateAdd(l, r);
+        llvmValue = metadata->builder->CreateAdd(l, r);
+        return llvmValue;
     }
     if (op == RANGLE) {
-        return metadata->builder->CreateICmpSGT(l, r);
+        llvmValue = metadata->builder->CreateICmpSGT(l, r);
+        return llvmValue;
     }
     return nullptr;
 }

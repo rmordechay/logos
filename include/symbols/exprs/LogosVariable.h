@@ -9,7 +9,7 @@ public:
 
     explicit LogosVariable(const std::string& name, LogosType* variableType) : LogosUnaryExpr(variableType), name(name) {}
     explicit LogosVariable(const std::string& name) : LogosVariable(name, nullptr) {}
-    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    Value* writeLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosVariable() override = default;
 };
 

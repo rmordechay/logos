@@ -1,6 +1,4 @@
 main() {
     obj = MyObject()
     obj.x = 5
-    obj.y = 3
-    //print(obj.add())
 }

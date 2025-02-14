@@ -9,7 +9,7 @@ public:
     vector<LogosStmt*> stmts;
 
     explicit LogosIf(LogosExpr* cond, const vector<LogosStmt*>& stmt) : cond(cond), stmts(stmt) {}
-    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    Value* writeLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosIf() override;
 };
 

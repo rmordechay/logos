@@ -26,10 +26,13 @@ struct Position {
     const string* filePath = nullptr;
 };
 
+inline LLVMContext context;
+
 class CodeGeneration {
 public:
+    Value* llvmValue = nullptr;
     Position position = Position();
-    virtual Value *getLLVMValue(CodeGenMetadata* metadata) = 0;
+    virtual Value *writeLLVMValue(CodeGenMetadata* metadata) = 0;
     virtual void setPosition(const antlr4::Token* ctx, const string& filePath);
     virtual ~CodeGeneration() = default;
 };

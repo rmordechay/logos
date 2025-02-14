@@ -11,9 +11,8 @@ public:
     Position position = Position();
 
     explicit LogosFuncCall(const string& name) : name(name) {}
-    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    Value* writeLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosFuncCall() override;
-    void setPosition(const antlr4::Token* ctx, const string& filePath) override;
 };
 
 #endif //LOGOSFUNCCALLEXPR_H

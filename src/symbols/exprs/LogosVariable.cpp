@@ -5,26 +5,30 @@
 
 #include <llvm/IR/Module.h>
 
-Value* LogosVariable::getLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosVariable::writeLLVMValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->theStack->getSymbol(name);
     switch (symbol->type) {
     case FIELD: {
         const auto expr = symbol->field->expr;
         if (expr) {
-            return expr->getLLVMValue(metadata);
+            llvmValue = expr->writeLLVMValue(metadata);
+            return llvmValue;
         }
         break;
     }
     case VAR_DEC: {
-        return symbol->varDec->expr->getLLVMValue(metadata);
+        llvmValue = symbol->varDec->expr->writeLLVMValue(metadata);
+        return llvmValue;
     }
     case OBJECT: {
-        symbol->object->getLLVMType(metadata);
+        symbol->object->writeLLVMType(metadata);
         break;
     }
     case FUNC: {
-        return symbol->func->getLLVMValue(metadata);
+        llvmValue = symbol->func->writeLLVMValue(metadata);
+        return llvmValue;
     }
     }
     return nullptr;
 }
+

@@ -8,13 +8,13 @@ vector<Value*> LogosUserFunc::getArgs(CodeGenMetadata* metadata, const vector<Lo
     return vector<Value*>();
 }
 
-Value* LogosUserFunc::getLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosUserFunc::writeLLVMValue(CodeGenMetadata* metadata) {
     std::vector<Type*> llvmParams;
     for (const auto param : params) {
-        llvmParams.emplace_back(param->inferredType->getLLVMType(metadata));
+        llvmParams.emplace_back(param->inferredType->writeLLVMType(metadata));
     }
 
-    const auto funcType = FunctionType::get(type->getLLVMType(metadata), llvmParams, false);
+    const auto funcType = FunctionType::get(type->writeLLVMType(metadata), llvmParams, false);
     const auto func = Function::Create(funcType, Function::ExternalLinkage, name, metadata->module);
     metadata->theStack->enterScope(func);
 
@@ -28,10 +28,11 @@ Value* LogosUserFunc::getLLVMValue(CodeGenMetadata* metadata) {
     metadata->builder->SetInsertPoint(funcEntry);
 
     for (const auto stmt : stmts) {
-        stmt->getLLVMValue(metadata);
+        stmt->writeLLVMValue(metadata);
     }
 
     metadata->theStack->exitScope();
+    llvmValue = func;
     return func;
 }
 

@@ -14,7 +14,7 @@ public:
     };
 
     explicit LogosPrint() : LogosFunc("print", &LOGOS_VOID) {}
-    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    Value* writeLLVMValue(CodeGenMetadata* metadata) override;
     FunctionCallee getFuncCallee(CodeGenMetadata* metadata) override;
     vector<Value*> getArgs(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
     ~LogosPrint() override = default;

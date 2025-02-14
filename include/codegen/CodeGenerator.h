@@ -21,8 +21,6 @@ namespace llvm {
 class LogosFile;
 class CodeGeneration;
 
-inline LLVMContext context;
-
 class CodeGenerator {
 public:
     vector<Module*> modules;

@@ -4,14 +4,15 @@ const string LogosObject::name() const {
     return typeName;
 }
 
-Type* LogosObject::getLLVMType(CodeGenMetadata* metadata) {
+Type* LogosObject::writeLLVMType(CodeGenMetadata* metadata) {
+    if (llvmType) return llvmType;
     vector<Type*> elementTypes;
     for (const auto entry : fields) {
-        auto fieldType = entry.second->inferredType->getLLVMType(metadata);
+        auto fieldType = entry.second->inferredType->writeLLVMType(metadata);
         elementTypes.push_back(fieldType);
     }
-    llvmStruct = StructType::create(metadata->builder->getContext(), elementTypes);
-    return llvmStruct;
+    llvmType = StructType::create(metadata->builder->getContext(), elementTypes);
+    return llvmType;
 }
 
 bool LogosObject::operator==(LogosType* other) const { return true;

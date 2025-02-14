@@ -1,8 +1,9 @@
 #include "exprs/LogosConstant.h"
 
-Value* LogosConstant::getLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosConstant::writeLLVMValue(CodeGenMetadata* metadata) {
     if (const auto intValue = get_if<int>(&value)) {
-        return metadata->builder->getInt32(*intValue);
+        llvmValue = metadata->builder->getInt32(*intValue);
+        return llvmValue;
     }
     return nullptr;
 }

@@ -1,6 +1,6 @@
 #include "sema/AntlrConverter.h"
 
-#include "stmts/LogosFieldAssignment.h"
+#include "stmts/LogosFieldDef.h"
 
 LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath) {
     LogosFile* logosFile = nullptr;
@@ -92,8 +92,8 @@ vector<LogosStmt*> AntlerConverter::getStmtList(LogosParser::StatementsBlockCont
 }
 
 LogosStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
-    if (const auto fieldAssignment = ctx->fieldAssignment()) {
-        return getFieldAssignment(fieldAssignment);
+    if (const auto fieldDef = ctx->fieldDef()) {
+        return getFieldDef(fieldDef);
     }
     if (const auto implicitVarDec = ctx->implicitVarDec()) {
         return getImplicitVarDec(implicitVarDec);
@@ -113,13 +113,13 @@ LogosStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     return nullptr;
 }
 
-LogosFieldAssignment* AntlerConverter::getFieldAssignment(LogosParser::FieldAssignmentContext* ctx) {
+LogosFieldDef* AntlerConverter::getFieldDef(LogosParser::FieldDefContext* ctx) {
     vector<string> fields;
     for (const auto variable : ctx->VARIABLE()) {
         fields.emplace_back(variable->getText());
     }
     const auto expr = getExpr(ctx->expr());
-    const auto fieldAssignment = new LogosFieldAssignment(fields, expr);
+    const auto fieldAssignment = new LogosFieldDef(fields, expr);
     fieldAssignment->setPosition(ctx->start, filePath);
     return fieldAssignment;
 }

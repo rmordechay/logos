@@ -1,8 +1,9 @@
 #include "stmts/LogosReturn.h"
 
-Value* LogosReturn::getLLVMValue(CodeGenMetadata* metadata) {
-    const auto exprLLVM = expr->getLLVMValue(metadata);
-    return metadata->builder->CreateRet(exprLLVM);
+Value* LogosReturn::writeLLVMValue(CodeGenMetadata* metadata) {
+    const auto exprLLVM = expr->writeLLVMValue(metadata);
+    llvmValue = metadata->builder->CreateRet(exprLLVM);
+    return llvmValue;
 }
 
 LogosReturn::~LogosReturn() {

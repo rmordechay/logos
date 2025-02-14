@@ -9,16 +9,15 @@ class LogosField;
 
 class LogosObject final : public LogosType {
 public:
-
     string typeName;
     map<string, LogosField*> fields;
     map<string, LogosFunc*> funcs;
-    StructType* llvmStruct = nullptr;
+    Value* llvmValue = nullptr;
 
     LogosObject() = default;
     explicit LogosObject(const string& typeName) : typeName(typeName) {}
     const string name() const override;
-    Type* getLLVMType(CodeGenMetadata* metadata) override;
+    Type* writeLLVMType(CodeGenMetadata* metadata) override;
     bool operator==(LogosType* other) const override;
     ~LogosObject() override;
 };

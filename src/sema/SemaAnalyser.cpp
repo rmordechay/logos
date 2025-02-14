@@ -1,5 +1,6 @@
 #include "SemaAnalyser.h"
 #include "LogosErrors.h"
+#include "funcs/LogosUserFunc.h"
 
 #include <format>
 
@@ -144,5 +145,12 @@ void SemaAnalyser::printError(const int errCode, Position *position, Args&&... a
         cout <<  std::format("Error at {} {} {}: \n", *position->filePath, position->lineNumber, position->posInLine);
     } else {
         // cout << formattedMessage << endl;
+    }
+}
+
+SemaAnalyser::~SemaAnalyser() {
+    delete mainFile;
+    for (const auto file : files) {
+        delete file.second;
     }
 }

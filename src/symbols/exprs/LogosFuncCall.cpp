@@ -2,17 +2,12 @@
 
 #include "funcs/LogosFunc.h"
 
-void LogosFuncCall::setPosition(const antlr4::Token* ctx, const string& filePath) {
-    position.lineNumber = ctx->getLine();
-    position.posInLine = ctx->getCharPositionInLine();
-    position.filePath = &filePath;
-}
-
-Value* LogosFuncCall::getLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosFuncCall::writeLLVMValue(CodeGenMetadata* metadata) {
     const auto callee = metadata->theStack->getSymbol(name)->func;
     const auto llvmArgs = callee->getArgs(metadata, args);
     const auto func = callee->getFuncCallee(metadata);
-    return metadata->builder->CreateCall(func, llvmArgs);
+    llvmValue = metadata->builder->CreateCall(func, llvmArgs);
+    return llvmValue;
 }
 
 LogosFuncCall::~LogosFuncCall() {

@@ -54,11 +54,11 @@ void logosParserInitialize() {
       "logosFile", "mainFile", "objectFile", "interfaceFile", "importStatement", 
       "importPath", "objectDeclaration", "interfaceDeclaration", "objectImplements", 
       "funcSignature", "funcImplementation", "funcBody", "funcCall", "constructorCall", 
-      "paramList", "explicitVarDec", "implicitVarDec", "fieldAssignment", 
-      "funcArg", "funcArgList", "statement", "enumDeclaration", "enumField", 
-      "statementsBlock", "exprList", "expr", "unaryExpr", "constant", "selection", 
-      "ifStatement", "elseStatement", "patternMatching", "pattern", "loopStatement", 
-      "loopControlStatement", "returnStatement", "range"
+      "paramList", "explicitVarDec", "implicitVarDec", "fieldDef", "funcArg", 
+      "funcArgList", "statement", "enumDeclaration", "enumField", "statementsBlock", 
+      "exprList", "expr", "unaryExpr", "constant", "selection", "ifStatement", 
+      "elseStatement", "patternMatching", "pattern", "loopStatement", "loopControlStatement", 
+      "returnStatement", "range"
     },
     std::vector<std::string>{
       "", "'=='", "'>='", "'<='", "'('", "')'", "'{'", "'}'", "'['", "']'", 
@@ -1455,41 +1455,41 @@ LogosParser::ImplicitVarDecContext* LogosParser::implicitVarDec() {
   return _localctx;
 }
 
-//----------------- FieldAssignmentContext ------------------------------------------------------------------
+//----------------- FieldDefContext ------------------------------------------------------------------
 
-LogosParser::FieldAssignmentContext::FieldAssignmentContext(ParserRuleContext *parent, size_t invokingState)
+LogosParser::FieldDefContext::FieldDefContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-std::vector<tree::TerminalNode *> LogosParser::FieldAssignmentContext::VARIABLE() {
+std::vector<tree::TerminalNode *> LogosParser::FieldDefContext::VARIABLE() {
   return getTokens(LogosParser::VARIABLE);
 }
 
-tree::TerminalNode* LogosParser::FieldAssignmentContext::VARIABLE(size_t i) {
+tree::TerminalNode* LogosParser::FieldDefContext::VARIABLE(size_t i) {
   return getToken(LogosParser::VARIABLE, i);
 }
 
-tree::TerminalNode* LogosParser::FieldAssignmentContext::DOT() {
+tree::TerminalNode* LogosParser::FieldDefContext::DOT() {
   return getToken(LogosParser::DOT, 0);
 }
 
-tree::TerminalNode* LogosParser::FieldAssignmentContext::EQUAL() {
+tree::TerminalNode* LogosParser::FieldDefContext::EQUAL() {
   return getToken(LogosParser::EQUAL, 0);
 }
 
-LogosParser::ExprContext* LogosParser::FieldAssignmentContext::expr() {
+LogosParser::ExprContext* LogosParser::FieldDefContext::expr() {
   return getRuleContext<LogosParser::ExprContext>(0);
 }
 
 
-size_t LogosParser::FieldAssignmentContext::getRuleIndex() const {
-  return LogosParser::RuleFieldAssignment;
+size_t LogosParser::FieldDefContext::getRuleIndex() const {
+  return LogosParser::RuleFieldDef;
 }
 
 
-LogosParser::FieldAssignmentContext* LogosParser::fieldAssignment() {
-  FieldAssignmentContext *_localctx = _tracker.createInstance<FieldAssignmentContext>(_ctx, getState());
-  enterRule(_localctx, 34, LogosParser::RuleFieldAssignment);
+LogosParser::FieldDefContext* LogosParser::fieldDef() {
+  FieldDefContext *_localctx = _tracker.createInstance<FieldDefContext>(_ctx, getState());
+  enterRule(_localctx, 34, LogosParser::RuleFieldDef);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1679,8 +1679,8 @@ LogosParser::StatementContext::StatementContext(ParserRuleContext *parent, size_
   : ParserRuleContext(parent, invokingState) {
 }
 
-LogosParser::FieldAssignmentContext* LogosParser::StatementContext::fieldAssignment() {
-  return getRuleContext<LogosParser::FieldAssignmentContext>(0);
+LogosParser::FieldDefContext* LogosParser::StatementContext::fieldDef() {
+  return getRuleContext<LogosParser::FieldDefContext>(0);
 }
 
 LogosParser::ExplicitVarDecContext* LogosParser::StatementContext::explicitVarDec() {
@@ -1739,7 +1739,7 @@ LogosParser::StatementContext* LogosParser::statement() {
     case 1: {
       enterOuterAlt(_localctx, 1);
       setState(239);
-      fieldAssignment();
+      fieldDef();
       break;
     }
 

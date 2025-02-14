@@ -66,8 +66,8 @@ add_executable(logos
     include/symbols/LogosSymbol.h
     src/symbols/object/LogosField.cpp
     include/symbols/object/LogosField.h
-    src/symbols/stmts/LogosFieldAssignment.cpp
-    include/symbols/stmts/LogosFieldAssignment.h
+    src/symbols/stmts/LogosFieldDef.cpp
+    include/symbols/stmts/LogosFieldDef.h
 )
 
 set(ANTLR_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime")

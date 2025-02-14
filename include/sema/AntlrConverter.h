@@ -18,12 +18,12 @@
 #include "files/LogosObjectFile.h"
 #include "funcs/LogosUserFunc.h"
 #include "object/LogosObject.h"
-#include "stmts/LogosFieldAssignment.h"
+#include "stmts/LogosFieldDef.h"
 #include "stmts/LogosIf.h"
 #include "stmts/LogosReturn.h"
 #include "types/LogosInt.h"
 
-class LogosFieldAssignment;
+class LogosFieldDef;
 using namespace std;
 
 class AntlerConverter {
@@ -37,7 +37,7 @@ public:
     LogosField *getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName);
     LogosUserFunc* getFunc(LogosParser::FuncImplementationContext* ctx);
     LogosStmt* getStmt(LogosParser::StatementContext* ctx);
-    LogosFieldAssignment* getFieldAssignment(LogosParser::FieldAssignmentContext* ctx);
+    LogosFieldDef* getFieldDef(LogosParser::FieldDefContext* ctx);
     vector<LogosStmt*> getStmtList(LogosParser::StatementsBlockContext* ctx);
     LogosVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LogosVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);

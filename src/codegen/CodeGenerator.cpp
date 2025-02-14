@@ -1,6 +1,7 @@
 #include "CodeGenerator.h"
 
 #include "funcs/LogosPrint.h"
+#include "funcs/LogosUserFunc.h"
 
 
 const auto LOGOS_LIB_IR_FILE = "../codegen/print.ll";
@@ -20,10 +21,10 @@ void CodeGenerator::run(const map<string, LogosFile*>& files, LogosStack& theSta
 }
 
 void CodeGenerator::generateMainModule(const LogosMainFile* mainFile, CodeGenMetadata metadata, IRBuilder<>& builder) {
-    mainFile->mainFunc->getLLVMValue(&metadata);
+    mainFile->mainFunc->writeLLVMValue(&metadata);
     builder.CreateRet(builder.getInt32(EXIT_SUCCESS));
     for (const auto func : mainFile->funcs) {
-        func->getLLVMValue(&metadata);
+        func->writeLLVMValue(&metadata);
     }
     writeIRToFile(metadata.module, LOGOS_MAIN_FILE);
 }
@@ -37,13 +38,13 @@ void CodeGenerator::generateObjModule(LogosObject* obj, const LogosStack* theSta
     }
 
     auto metadata = CodeGenMetadata{.builder = &builder, .theStack = &logosStack, .module = module};
-    obj->getLLVMType(&metadata);
+    obj->writeLLVMType(&metadata);
     metadata.theStack->addGlobalSymbol("this", LogosSymbol(OBJECT, obj));
     for (const auto entry : obj->fields) {
-        entry.second->getLLVMValue(&metadata);
+        entry.second->writeLLVMValue(&metadata);
     }
     for (const auto entry : obj->funcs) {
-        entry.second->getLLVMValue(&metadata);
+        entry.second->writeLLVMValue(&metadata);
     }
 
     writeIRToFile(metadata.module, module->getName().str());

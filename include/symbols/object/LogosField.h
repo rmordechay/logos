@@ -21,7 +21,7 @@ public:
         expr(expr) {
     }
 
-    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    Value* writeLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosField() override = default;
 };
 

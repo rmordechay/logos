@@ -2,7 +2,7 @@
 #define LOGOSSTMT_H
 #include "CodeGeneration.h"
 
-class LogosStmt : public CodeGeneration {
+class LogosStmt : virtual public CodeGeneration {
 public:
     ~LogosStmt() override = default;
 };

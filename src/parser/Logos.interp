@@ -124,7 +124,7 @@ constructorCall
 paramList
 explicitVarDec
 implicitVarDec
-fieldAssignment
+fieldDef
 funcArg
 funcArgList
 statement

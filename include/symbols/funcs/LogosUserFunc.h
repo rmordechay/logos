@@ -9,7 +9,7 @@ public:
     explicit LogosUserFunc(const string& name) : LogosUserFunc(name, &LOGOS_VOID) {};
     FunctionCallee getFuncCallee(CodeGenMetadata* metadata) override;
     vector<Value*> getArgs(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
-    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    Value* writeLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosUserFunc() override = default;
 };
 

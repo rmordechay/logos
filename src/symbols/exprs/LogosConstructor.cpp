@@ -2,9 +2,10 @@
 
 #include "CodeGenerator.h"
 
-Value* LogosConstructor::getLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosConstructor::writeLLVMValue(CodeGenMetadata* metadata) {
     const auto obj = metadata->theStack->getSymbol(name)->object;
     CodeGenerator::generateObjModule(obj, metadata->theStack);
-    const auto llvmType = obj->getLLVMType(metadata);
-    return metadata->builder->CreateAlloca(llvmType);
+    const auto llvmType = obj->writeLLVMType(metadata);
+    llvmValue = metadata->builder->CreateAlloca(llvmType);
+    return llvmValue;
 }

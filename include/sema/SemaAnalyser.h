@@ -42,7 +42,7 @@ public:
     void setUnsuccessful();
     template <class ... Args>
     void printError(int errCode, Position *position, Args&&... args);
-    ~SemaAnalyser() = default;
+    ~SemaAnalyser();
 };
 
 

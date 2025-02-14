@@ -7,8 +7,8 @@ class LogosUnaryExpr: public LogosExpr {
 public:
     explicit LogosUnaryExpr() : LogosExpr(nullptr) {}
     explicit LogosUnaryExpr(LogosType* type) : LogosExpr(type) {}
-    ~LogosUnaryExpr() override = default;
     string getName();
+    ~LogosUnaryExpr() override = default;
 };
 
 #endif //LOGOSUNARYEXPR_H
