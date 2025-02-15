@@ -6,6 +6,8 @@
 
 class LogosInt final : public LogosType {
 public:
+    Type* llvmType = Type::getInt32Ty(context);
+
     const string name() const override;
     Type* writeLLVMType(CodeGenMetadata* metadata) override;
     bool operator==(LogosType* other) const override;
@@ -17,8 +19,6 @@ inline const string LogosInt::name() const {
 }
 
 inline Type* LogosInt::writeLLVMType(CodeGenMetadata* metadata) {
-    if (llvmType) return llvmType;
-    llvmType = metadata->builder->getInt32Ty();
     return llvmType;
 }
 

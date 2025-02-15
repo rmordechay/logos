@@ -6,6 +6,7 @@
 
 class LogosFloat final : public LogosType {
 public:
+    Type* llvmType = Type::getFloatTy(context);
     static constexpr auto typeName = "Float";
 
     const string name() const override;
@@ -19,8 +20,6 @@ inline const string LogosFloat::name() const {
 }
 
 inline Type* LogosFloat::writeLLVMType(CodeGenMetadata* metadata) {
-    if (llvmType) return llvmType;
-    llvmType = metadata->builder->getFloatTy();
     return llvmType;
 }
 

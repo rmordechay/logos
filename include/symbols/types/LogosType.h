@@ -10,8 +10,6 @@ using namespace std;
 
 class LogosType {
 public:
-    Type* llvmType = nullptr;
-
     virtual const string name() const = 0;
     virtual Type* writeLLVMType(CodeGenMetadata* metadata) = 0;
     virtual bool operator==(LogosType* other) const = 0;

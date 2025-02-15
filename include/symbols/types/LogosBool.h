@@ -6,6 +6,7 @@
 
 class LogosBool final : public LogosType {
 public:
+    Type* llvmType = Type::getInt1Ty(context);
     static constexpr auto typeName = "Bool";
     static constexpr auto trueLiteral = "true";
 
@@ -20,8 +21,6 @@ inline const string LogosBool::name() const {
 }
 
 inline Type* LogosBool::writeLLVMType(CodeGenMetadata* metadata) {
-    if (llvmType) return llvmType;
-    llvmType = metadata->builder->getInt1Ty();
     return llvmType;
 }
 

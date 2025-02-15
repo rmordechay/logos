@@ -9,10 +9,10 @@ class LogosField;
 
 class LogosObject final : public LogosType {
 public:
+    Type* llvmType = nullptr;
     string typeName;
     map<string, LogosField*> fields;
     map<string, LogosFunc*> funcs;
-    Value* llvmValue = nullptr;
 
     LogosObject() = default;
     explicit LogosObject(const string& typeName) : typeName(typeName) {}

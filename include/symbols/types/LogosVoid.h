@@ -6,7 +6,7 @@
 
 class LogosVoid final : public LogosType {
 public:
-    Type* llvmType = Type::getInt32Ty(context);
+    Type* llvmType = Type::getVoidTy(context);
     static constexpr auto typeName = "Void";
 
     const string name() const override;
@@ -20,9 +20,6 @@ inline const string LogosVoid::name() const {
 }
 
 inline Type* LogosVoid::writeLLVMType(CodeGenMetadata* metadata) {
-    if (llvmType) return llvmType;
-    llvmType = metadata->builder->getVoidTy();
-
     return llvmType;
 }
 

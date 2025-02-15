@@ -1,5 +1,7 @@
 #include "files/LogosMainFile.h"
 
+#include "funcs/LogosUserFunc.h"
+
 
 LogosMainFile::~LogosMainFile() {
     delete mainFunc;
