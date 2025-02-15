@@ -12,6 +12,7 @@ public:
 
     explicit LogosSelection(const vector<LogosUnaryExpr*>& exprs) : LogosExpr(nullptr), exprs(exprs) {}
     Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    LogosSymbolType getSymbolType() override;
     ~LogosSelection() override;
 };
 

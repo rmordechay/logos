@@ -2,6 +2,7 @@
 #define LOGOSCONSTANTEXPR_H
 #include "LogosUnaryExpr.h"
 
+
 using namespace std;
 
 class LogosConstant final : public LogosUnaryExpr {

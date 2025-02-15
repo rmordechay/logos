@@ -80,10 +80,10 @@ void SemaAnalyser::visitStmt(LogosStmt* stmt) {
     if (const auto varDec = dynamic_cast<LogosVarDec*>(stmt)) {
         visitVarDec(varDec);
     }
-    if (const auto ifStmt = dynamic_cast<const LogosIf*>(stmt)) {
+    if (const auto ifStmt = dynamic_cast<LogosIf*>(stmt)) {
         visitIfStmt(ifStmt);
     }
-    if (const auto fieldDef = dynamic_cast<const LogosFieldDef*>(stmt)) {
+    if (const auto fieldDef = dynamic_cast<LogosFieldDef*>(stmt)) {
         visitFieldDef(fieldDef);
     }
 }
@@ -118,22 +118,22 @@ void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {
     if (!ifStmt) return;
 }
 
-void SemaAnalyser::visitExpr(const LogosExpr* expr) {
+void SemaAnalyser::visitExpr(LogosExpr* expr) {
     if (!expr) return;
-    if (const auto unaryExpr = dynamic_cast<const LogosUnaryExpr*>(expr)) {
+    if (const auto unaryExpr = dynamic_cast<LogosUnaryExpr*>(expr)) {
         visitUnaryExpr(unaryExpr);
     }
-    if (const auto binaryExpr = dynamic_cast<const LogosBinaryExpr*>(expr)) {
+    if (const auto binaryExpr = dynamic_cast<LogosBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
     }
 }
 
-void SemaAnalyser::visitUnaryExpr(const LogosUnaryExpr* unaryExpr) {
+void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
     if (!unaryExpr) return;
-    if (const auto constructor = dynamic_cast<const LogosConstructor*>(unaryExpr)) {
+    if (const auto constructor = dynamic_cast<LogosConstructor*>(unaryExpr)) {
         visitConstructor(constructor);
     }
-    if (const auto funcCall = dynamic_cast<const LogosFuncCall*>(unaryExpr)) {
+    if (const auto funcCall = dynamic_cast<LogosFuncCall*>(unaryExpr)) {
         visitFuncCall(funcCall);
     }
 }
@@ -141,11 +141,12 @@ void SemaAnalyser::visitUnaryExpr(const LogosUnaryExpr* unaryExpr) {
 void SemaAnalyser::visitBinaryExpr(const LogosBinaryExpr* binaryExpr) {
 }
 
-void SemaAnalyser::visitConstructor(const LogosConstructor* constructorExpr) {
+void SemaAnalyser::visitConstructor(LogosConstructor* constructorExpr) {
     if (!constructorExpr) return;
     const auto symbol = theStack.getSymbol(constructorExpr->name);
     const auto obj = symbol->object;
     constructorExpr->type = obj;
+    constructorExpr->obj = obj;
 }
 
 void SemaAnalyser::visitFuncCall(const LogosFuncCall* funcCallExpr) {

@@ -3,39 +3,25 @@
 #include "LogosUtils.h"
 #include "exprs/LogosFuncCall.h"
 
-LogosExpr* f(LogosUnaryExpr* expr);
-
-void resolveSymbol(CodeGenMetadata* metadata, const LogosSymbol* currentSymbol) {
-    switch (currentSymbol->type) {
-    case FIELD: {
-        currentSymbol->field->expr->getLLVMValue(metadata);
-        break;
-    }
-    case VAR_DEC: {
-        currentSymbol->varDec->expr->getLLVMValue(metadata);
-        break;
-    }
-    case OBJECT: {
-        currentSymbol->object->getLLVMType();
-        break;
-    }
-    case FUNC: {
-        currentSymbol->func->getLLVMValue(metadata);
-        break;
-    }
-    }
-}
-
-void resolveSelection(const CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
+void resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
     const auto symbol = metadata->theStack->getSymbol(previousExpr->getName());
     switch (symbol->type) {
     case FIELD:
         break;
-    case VAR_DEC:
+    case CONSTRUCTOR: {
+        const auto obj = symbol->constructor->obj;
+        const auto func = obj->funcs[nextExpr->getName()];
+        func->getLLVMValue(metadata);
+        std::cout << "" << std::endl;
+    }
+    break;
+    case FUNC_CALL:
         break;
-    case OBJECT:
+    case VARIABLE:
         break;
-    case FUNC:
+    case CONSTANT:
+        break;
+    default:
         break;
     }
 }
@@ -48,6 +34,10 @@ Value* LogosSelection::getLLVMValue(CodeGenMetadata* metadata) {
         previous = next;
     }
     return nullptr;
+}
+
+LogosSymbolType LogosSelection::getSymbolType() {
+    return SELECTION;
 }
 
 LogosSelection::~LogosSelection() {

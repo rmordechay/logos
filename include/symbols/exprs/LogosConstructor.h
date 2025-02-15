@@ -7,6 +7,7 @@ class LogosConstructor final : public LogosUnaryExpr {
 public:
     string name;
     vector<LogosExpr*> args;
+    LogosObject* obj = nullptr;
 
     explicit LogosConstructor(const string& name) : name(name) {}
     string getName() override;

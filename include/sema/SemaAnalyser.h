@@ -36,10 +36,10 @@ public:
     void visitFieldDef(const LogosFieldDef* fieldDef);
     void visitVarDec(LogosVarDec* varDec);
     void visitIfStmt(const LogosIf* ifStmt);
-    void visitExpr(const LogosExpr* expr);
-    void visitUnaryExpr(const LogosUnaryExpr* unaryExpr);
+    void visitExpr(LogosExpr* expr);
+    void visitUnaryExpr(LogosUnaryExpr* unaryExpr);
     void visitBinaryExpr(const LogosBinaryExpr* binaryExpr);
-    void visitConstructor(const LogosConstructor* constructorExpr);
+    void visitConstructor(LogosConstructor* constructorExpr);
     void visitFuncCall(const LogosFuncCall* funcCallExpr);
     void visitConstant(const LogosUnaryExpr* unaryExpr);
     void setUnsuccessful();

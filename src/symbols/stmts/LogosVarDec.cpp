@@ -9,7 +9,7 @@ Value* LogosVarDec::getLLVMValue(CodeGenMetadata* metadata) {
         metadata->builder->CreateStore(value, allocaInst);
     }
     llvmValue = value;
-    metadata->theStack->addLocalSymbol(name, LogosSymbol(VAR_DEC, this));
+    metadata->theStack->addLocalSymbol(name, expr->getSymbol());
     return value;
 }
 

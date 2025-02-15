@@ -24,10 +24,10 @@ Value* LogosVariable::getLLVMValue(CodeGenMetadata* metadata) {
         }
         break;
     }
-    case VAR_DEC: {
-        llvmValue = symbol->varDec->expr->getLLVMValue(metadata);
-        return llvmValue;
-    }
+    // case VAR_DEC: {
+    //     llvmValue = symbol->varDec->expr->getLLVMValue(metadata);
+    //     return llvmValue;
+    // }
     case FUNC: {
         llvmValue = symbol->func->getLLVMValue(metadata);
         return llvmValue;
