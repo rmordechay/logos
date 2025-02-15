@@ -1,6 +1,7 @@
 #include "SemaAnalyser.h"
 #include "LogosErrors.h"
 #include "exprs/LogosBinaryExpr.h"
+#include "exprs/LogosSelection.h"
 #include "funcs/LogosUserFunc.h"
 #include "stmts/LogosFieldDef.h"
 
@@ -126,6 +127,9 @@ void SemaAnalyser::visitExpr(LogosExpr* expr) {
     if (const auto binaryExpr = dynamic_cast<LogosBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
     }
+    if (const auto selection = dynamic_cast<LogosSelection*>(expr)) {
+        visitSelection(selection);
+    }
 }
 
 void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
@@ -139,6 +143,10 @@ void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
 }
 
 void SemaAnalyser::visitBinaryExpr(const LogosBinaryExpr* binaryExpr) {
+}
+
+void SemaAnalyser::visitSelection(LogosSelection* selection) {
+
 }
 
 void SemaAnalyser::visitConstructor(LogosConstructor* constructorExpr) {

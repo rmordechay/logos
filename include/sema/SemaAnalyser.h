@@ -6,6 +6,7 @@
 #include "exprs/LogosBinaryExpr.h"
 #include "exprs/LogosConstructor.h"
 #include "exprs/LogosFuncCall.h"
+#include "exprs/LogosSelection.h"
 #include "exprs/LogosUnaryExpr.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
@@ -39,6 +40,7 @@ public:
     void visitExpr(LogosExpr* expr);
     void visitUnaryExpr(LogosUnaryExpr* unaryExpr);
     void visitBinaryExpr(const LogosBinaryExpr* binaryExpr);
+    void visitSelection(LogosSelection* selection);
     void visitConstructor(LogosConstructor* constructorExpr);
     void visitFuncCall(const LogosFuncCall* funcCallExpr);
     void visitConstant(const LogosUnaryExpr* unaryExpr);
