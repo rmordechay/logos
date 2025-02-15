@@ -26,21 +26,26 @@ void resolveSymbol(CodeGenMetadata* metadata, const LogosSymbol* currentSymbol) 
     }
 }
 
+void resolveSelection(const CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
+    const auto symbol = metadata->theStack->getSymbol(previousExpr->getName());
+    switch (symbol->type) {
+    case FIELD:
+        break;
+    case VAR_DEC:
+        break;
+    case OBJECT:
+        break;
+    case FUNC:
+        break;
+    }
+}
+
 Value* LogosSelection::getLLVMValue(CodeGenMetadata* metadata) {
-    // 1. Get next element
-    // 2. Resolve
-    // 3. Find type
-    // 4. Apply (func=call; varDec=execute expr; constructor=instantiate)
-    // 5. If last value, return, if not, continue
-    // 6. If next selection in the returned values, repeat until exhaustion
-
-    // Unary - func, variable, constructor
-    // obj = MyObject()
-    // obj.add()
-
-    for (int i = 0; i < exprs.size(); ++i) {
-        const auto expr = exprs[i];
-        expr->getLLVMValue(metadata);
+    auto previous = exprs[0];
+    for (int i = 1; i < exprs.size(); ++i) {
+        const auto next = exprs[i];
+        resolveSelection(metadata, previous, next);
+        previous = next;
     }
     return nullptr;
 }

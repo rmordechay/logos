@@ -4,7 +4,7 @@
 
 class LogosStmt : virtual public CodeGeneration {
 public:
-    ~LogosStmt() override = default;
+    virtual ~LogosStmt() override = default;
 };
 
 #endif //LOGOSSTMT_H

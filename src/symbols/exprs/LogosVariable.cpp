@@ -5,6 +5,14 @@
 
 #include <llvm/IR/Module.h>
 
+string LogosVariable::getName() {
+    return name;
+}
+
+LogosSymbolType LogosVariable::getSymbolType() {
+    return VARIABLE;
+}
+
 Value* LogosVariable::getLLVMValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->theStack->getSymbol(name);
     switch (symbol->type) {
@@ -32,4 +40,3 @@ Value* LogosVariable::getLLVMValue(CodeGenMetadata* metadata) {
 LogosVariable* LogosVariable::asVariable() {
     return this;
 }
-

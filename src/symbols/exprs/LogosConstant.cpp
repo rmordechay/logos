@@ -1,5 +1,13 @@
 #include "exprs/LogosConstant.h"
 
+string LogosConstant::getName() {
+    return "";
+}
+
+LogosSymbolType LogosConstant::getSymbolType() {
+    return CONSTANT;
+}
+
 Value* LogosConstant::getLLVMValue(CodeGenMetadata* metadata) {
     if (llvmValue) return llvmValue;
     if (const auto intValue = get_if<int>(&value)) {

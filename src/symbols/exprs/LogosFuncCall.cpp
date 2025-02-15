@@ -6,6 +6,14 @@ LogosFuncCall* LogosFuncCall::asFuncCall() {
     return this;
 }
 
+LogosSymbolType LogosFuncCall::getSymbolType() {
+    return FUNC_CALL;
+}
+
+string LogosFuncCall::getName() {
+    return name;
+}
+
 Value* LogosFuncCall::getLLVMValue(CodeGenMetadata* metadata) {
     const auto callee = metadata->theStack->getSymbol(name)->func;
     const auto llvmArgs = callee->getArgs(metadata, args);

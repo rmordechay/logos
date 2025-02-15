@@ -13,6 +13,7 @@ public:
     mutable LogosType* type = nullptr;
 
     explicit LogosExpr(LogosType* type) : type(type) {}
+    virtual LogosSymbolType getSymbolType() = 0;
     virtual LogosFuncCall* asFuncCall() { return nullptr; }
     virtual LogosVariable* asVariable() { return nullptr; }
     virtual LogosConstant* asConstant() { return nullptr; }
