@@ -2,7 +2,11 @@
 
 #include "funcs/LogosFunc.h"
 
-Value* LogosFuncCall::writeLLVMValue(CodeGenMetadata* metadata) {
+LogosFuncCall* LogosFuncCall::asFuncCall() {
+    return this;
+}
+
+Value* LogosFuncCall::getLLVMValue(CodeGenMetadata* metadata) {
     const auto callee = metadata->theStack->getSymbol(name)->func;
     const auto llvmArgs = callee->getArgs(metadata, args);
     const auto func = callee->getFuncCallee(metadata);

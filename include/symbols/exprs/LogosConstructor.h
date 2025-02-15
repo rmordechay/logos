@@ -5,11 +5,13 @@
 
 class LogosConstructor final : public LogosUnaryExpr {
 public:
+
     string name;
     vector<LogosExpr*> args;
 
     explicit LogosConstructor(const string& name) : name(name) {}
-    Value* writeLLVMValue(CodeGenMetadata* metadata) override;
+    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    LogosConstructor* asConstructor() override;
     ~LogosConstructor() override = default;
 };
 

@@ -8,11 +8,11 @@ LogosExpr* f(LogosUnaryExpr* expr);
 void resolveSymbol(CodeGenMetadata* metadata, const LogosSymbol* currentSymbol) {
     switch (currentSymbol->type) {
     case FIELD: {
-        currentSymbol->field->expr->writeLLVMValue(metadata);
+        currentSymbol->field->expr->getLLVMValue(metadata);
         break;
     }
     case VAR_DEC: {
-        currentSymbol->varDec->expr->writeLLVMValue(metadata);
+        currentSymbol->varDec->expr->getLLVMValue(metadata);
         break;
     }
     case OBJECT: {
@@ -20,13 +20,13 @@ void resolveSymbol(CodeGenMetadata* metadata, const LogosSymbol* currentSymbol) 
         break;
     }
     case FUNC: {
-        currentSymbol->func->writeLLVMValue(metadata);
+        currentSymbol->func->getLLVMValue(metadata);
         break;
     }
     }
 }
 
-Value* LogosSelection::writeLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosSelection::getLLVMValue(CodeGenMetadata* metadata) {
     // 1. Get next element
     // 2. Resolve
     // 3. Find type
@@ -40,7 +40,7 @@ Value* LogosSelection::writeLLVMValue(CodeGenMetadata* metadata) {
 
     for (int i = 0; i < exprs.size(); ++i) {
         const auto expr = exprs[i];
-        expr->writeLLVMValue(metadata);
+        expr->getLLVMValue(metadata);
     }
     return nullptr;
 }

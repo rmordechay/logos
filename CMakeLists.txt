@@ -14,7 +14,9 @@ file(GLOB_RECURSE LOGOS_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/parser/*.cpp
 )
 
-add_executable(logos main.cpp ${LOGOS_SRC} ${LOGOS_HEADERS})
+add_executable(logos main.cpp ${LOGOS_SRC} ${LOGOS_HEADERS}
+    src/symbols/stmts/LogosStmtBlock.cpp
+    include/symbols/stmts/LogosStmtBlock.h)
 
 set(ANTLR_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime")
 target_include_directories(logos PRIVATE

@@ -16,7 +16,7 @@ public:
         op(op) {
     }
 
-    Value* writeLLVMValue(CodeGenMetadata* metadata) override;
+    Value* getLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosBinaryExpr() override = default;
 };
 

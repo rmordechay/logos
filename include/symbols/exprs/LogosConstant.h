@@ -6,6 +6,7 @@ using namespace std;
 
 class LogosConstant final : public LogosUnaryExpr {
 public:
+
     using ConstValue = variant<bool, int, float, string>;
     ConstValue value;
 
@@ -14,7 +15,8 @@ public:
         static_assert(is_same_v<T, bool> || is_same_v<T, int> || is_same_v<T, float> || is_same_v<T, string>);
     }
 
-    Value* writeLLVMValue(CodeGenMetadata* metadata) override;
+    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    LogosConstant* asConstant() override;
     ~LogosConstant() override = default;
 };
 

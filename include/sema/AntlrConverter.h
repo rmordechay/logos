@@ -34,14 +34,15 @@ public:
     LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx);
     LogosObjectFile* getObjFile(LogosParser::ObjectFileContext* ctx);
     LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
-    LogosField *getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName);
+    LogosField *getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, int position);
     LogosUserFunc* getFunc(LogosParser::FuncImplementationContext* ctx);
     LogosStmt* getStmt(LogosParser::StatementContext* ctx);
     LogosFieldDef* getFieldDef(LogosParser::FieldDefContext* ctx);
-    vector<LogosStmt*> getStmtList(LogosParser::StatementsBlockContext* ctx);
+    LogosStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
     LogosVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LogosVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LogosIf* getIfStatement(LogosParser::IfStatementContext* ctx);
+    LogosExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     LogosSelection* getSelection(LogosParser::SelectionContext* selection);
     LogosExpr* getExpr(LogosParser::ExprContext* ctx);
     LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);

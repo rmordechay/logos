@@ -21,10 +21,10 @@ void CodeGenerator::run(const map<string, LogosFile*>& files, LogosStack& theSta
 }
 
 void CodeGenerator::generateMainModule(const LogosMainFile* mainFile, CodeGenMetadata metadata, IRBuilder<>& builder) {
-    mainFile->mainFunc->writeLLVMValue(&metadata);
+    mainFile->mainFunc->getLLVMValue(&metadata);
     builder.CreateRet(builder.getInt32(EXIT_SUCCESS));
     for (const auto func : mainFile->funcs) {
-        func->writeLLVMValue(&metadata);
+        func->getLLVMValue(&metadata);
     }
     writeIRToFile(metadata.module, LOGOS_MAIN_FILE);
 }
@@ -40,10 +40,10 @@ void CodeGenerator::generateObjModule(LogosObject* obj, const LogosStack* theSta
     auto metadata = CodeGenMetadata{.builder = &builder, .theStack = &logosStack, .module = module};
     metadata.theStack->addGlobalSymbol("this", LogosSymbol(OBJECT, obj));
     for (const auto entry : obj->fields) {
-        entry.second->writeLLVMValue(&metadata);
+        entry.second->getLLVMValue(&metadata);
     }
     for (const auto entry : obj->funcs) {
-        entry.second->writeLLVMValue(&metadata);
+        entry.second->getLLVMValue(&metadata);
     }
 
     writeIRToFile(metadata.module, module->getName().str());

@@ -32,7 +32,7 @@ class CodeGeneration {
 public:
     Value* llvmValue = nullptr;
     Position position = Position();
-    virtual Value *writeLLVMValue(CodeGenMetadata* metadata) = 0;
+    virtual Value *getLLVMValue(CodeGenMetadata* metadata) = 0;
     virtual void setPosition(const antlr4::Token* ctx, const string& filePath);
     virtual ~CodeGeneration() = default;
 };

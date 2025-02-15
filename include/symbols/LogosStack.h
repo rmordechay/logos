@@ -14,17 +14,17 @@ using namespace std;
 using namespace llvm;
 
 struct LogosStackFrame {
-    Function* currentFunction = nullptr;
+    Function* llvmFunc = nullptr;
     map<string, LogosSymbol> symbols;
 
-    explicit LogosStackFrame(Function* currentFunction) :
-        currentFunction(currentFunction) {
-    }
+    LogosStackFrame() = default;
+    explicit LogosStackFrame(Function* llvmFunc) : llvmFunc(llvmFunc) {}
 };
 
 class LogosStack : public stack<LogosStackFrame> {
 public:
     void enterScope(Function* func);
+    void enterScope();
     void exitScope();
     LogosSymbol* getSymbol(const string& name);
     Function* getFunc(const string& name);
@@ -39,6 +39,10 @@ private:
 
 inline void LogosStack::enterScope(Function* func) {
     push(LogosStackFrame(func));
+}
+
+inline void LogosStack::enterScope() {
+    push(LogosStackFrame());
 }
 
 inline void LogosStack::exitScope() {
@@ -66,7 +70,7 @@ inline void LogosStack::addGlobalSymbol(const string& name, const LogosSymbol& s
 }
 
 inline void LogosStack::setCurrentFunc(Function* value) {
-    top().currentFunction = value;
+    top().llvmFunc = value;
 }
 
 

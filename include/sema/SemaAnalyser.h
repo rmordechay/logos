@@ -3,12 +3,14 @@
 
 #include "LogosStack.h"
 #include "application/ThreadPool.h"
+#include "exprs/LogosBinaryExpr.h"
 #include "exprs/LogosConstructor.h"
 #include "exprs/LogosFuncCall.h"
 #include "exprs/LogosUnaryExpr.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
 #include "object/LogosObject.h"
+#include "stmts/LogosFieldDef.h"
 #include "stmts/LogosIf.h"
 
 
@@ -29,17 +31,19 @@ public:
     void visitMainFunc(const LogosUserFunc* mainFunc, const string& path);
     void visitUserFunc(const LogosUserFunc* func);
     void visitStmt(LogosStmt* stmt);
-    void visitStmtList(const vector<LogosStmt*>& stmts);
+    void visitStmtBlock(LogosStmtBlock* stmtBlock);
     void visitField(LogosField* field);
+    void visitFieldDef(const LogosFieldDef* fieldDef);
     void visitVarDec(LogosVarDec* varDec);
     void visitIfStmt(const LogosIf* ifStmt);
     void visitExpr(const LogosExpr* expr);
     void visitUnaryExpr(const LogosUnaryExpr* unaryExpr);
+    void visitBinaryExpr(const LogosBinaryExpr* binaryExpr);
     void visitConstructor(const LogosConstructor* constructorExpr);
     void visitFuncCall(const LogosFuncCall* funcCallExpr);
     void visitConstant(const LogosUnaryExpr* unaryExpr);
-    LogosType* inferType(const LogosExpr* expr);
     void setUnsuccessful();
+    void checkTypes(LogosVarDec* varDec, LogosType* type);
     template <class ... Args>
     void printError(int errCode, Position *position, Args&&... args);
     ~SemaAnalyser();

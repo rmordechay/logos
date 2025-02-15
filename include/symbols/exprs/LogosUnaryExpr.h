@@ -2,6 +2,8 @@
 #define LOGOSUNARYEXPR_H
 #include "LogosExpr.h"
 
+#include <string>
+
 
 class LogosUnaryExpr: public LogosExpr {
 public:

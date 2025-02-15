@@ -1,6 +1,8 @@
 #include "SemaAnalyser.h"
 #include "LogosErrors.h"
+#include "exprs/LogosBinaryExpr.h"
 #include "funcs/LogosUserFunc.h"
+#include "stmts/LogosFieldDef.h"
 
 #include <format>
 
@@ -62,14 +64,16 @@ void SemaAnalyser::visitMainFunc(const LogosUserFunc* mainFunc, const string& pa
 }
 
 void SemaAnalyser::visitUserFunc(const LogosUserFunc* func) {
+    theStack.enterScope();
     for (const auto param : func->params) {
         if (!func) return;
         visitVarDec(param);
     }
-    for (const auto stmt : func->stmts) {
-        visitStmt(stmt);
-    }
+    visitStmtBlock(func->stmtBlock);
+    theStack.exitScope();
 }
+
+
 
 void SemaAnalyser::visitStmt(LogosStmt* stmt) {
     if (!stmt) return;
@@ -79,26 +83,33 @@ void SemaAnalyser::visitStmt(LogosStmt* stmt) {
     if (const auto ifStmt = dynamic_cast<const LogosIf*>(stmt)) {
         visitIfStmt(ifStmt);
     }
-    if (const auto ifStmt = dynamic_cast<const LogosConstructor*>(stmt)) {
-        visitConstructor(ifStmt);
-    }
-    if (const auto funcCall = dynamic_cast<const LogosFuncCall*>(stmt)) {
-        visitFuncCall(funcCall);
+    if (const auto fieldDef = dynamic_cast<const LogosFieldDef*>(stmt)) {
+        visitFieldDef(fieldDef);
     }
 }
 
-void SemaAnalyser::visitStmtList(const vector<LogosStmt*>& stmts) {
+void SemaAnalyser::visitStmtBlock(LogosStmtBlock* stmtBlock) {
+    for (const auto stmt : stmtBlock->stmts) {
+        visitStmt(stmt);
+    }
 }
 
 void SemaAnalyser::visitField(LogosField* field) {
 
 }
+
+void SemaAnalyser::visitFieldDef(const LogosFieldDef* fieldDef) {
+}
+
+
 void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
+    visitExpr(varDec->expr);
     const auto inferredType = varDec->expr->type;
     const auto userType = varDec->userType;
     if (userType && *userType != inferredType) {
         printError(101, &varDec->position, *userType, inferredType->name());
-    } else {
+    }
+    if (inferredType) {
         varDec->inferredType = inferredType;
     }
 }
@@ -109,14 +120,32 @@ void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {
 
 void SemaAnalyser::visitExpr(const LogosExpr* expr) {
     if (!expr) return;
+    if (const auto unaryExpr = dynamic_cast<const LogosUnaryExpr*>(expr)) {
+        visitUnaryExpr(unaryExpr);
+    }
+    if (const auto binaryExpr = dynamic_cast<const LogosBinaryExpr*>(expr)) {
+        visitBinaryExpr(binaryExpr);
+    }
 }
 
 void SemaAnalyser::visitUnaryExpr(const LogosUnaryExpr* unaryExpr) {
     if (!unaryExpr) return;
+    if (const auto constructor = dynamic_cast<const LogosConstructor*>(unaryExpr)) {
+        visitConstructor(constructor);
+    }
+    if (const auto funcCall = dynamic_cast<const LogosFuncCall*>(unaryExpr)) {
+        visitFuncCall(funcCall);
+    }
+}
+
+void SemaAnalyser::visitBinaryExpr(const LogosBinaryExpr* binaryExpr) {
 }
 
 void SemaAnalyser::visitConstructor(const LogosConstructor* constructorExpr) {
     if (!constructorExpr) return;
+    const auto symbol = theStack.getSymbol(constructorExpr->name);
+    const auto obj = symbol->object;
+    constructorExpr->type = obj;
 }
 
 void SemaAnalyser::visitFuncCall(const LogosFuncCall* funcCallExpr) {
@@ -127,13 +156,16 @@ void SemaAnalyser::visitConstant(const LogosUnaryExpr* unaryExpr) {
     if (!unaryExpr) return;
 }
 
-LogosType* SemaAnalyser::inferType(const LogosExpr* expr) {
-    return expr->type;
-}
-
 void SemaAnalyser::setUnsuccessful() {
     unique_lock lock(mtx);
     successful = false;
+}
+
+void SemaAnalyser::checkTypes(LogosVarDec* varDec, LogosType* type) {
+    const auto userType = varDec->userType;
+    if (userType && *userType != type) {
+        printError(101, &varDec->position, *userType, type->name());
+    }
 }
 
 template <typename... Args>

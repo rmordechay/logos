@@ -20,6 +20,10 @@ inline const string LogosBool::name() const {
     return typeName;
 }
 
+inline void LogosBool::setLLVMType(Type* type) {
+
+}
+
 inline Type* LogosBool::getLLVMType() {
     return llvmType;
 }

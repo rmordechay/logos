@@ -7,11 +7,12 @@ class LogosType;
 
 class LogosFieldDef final : public LogosStmt {
 public:
+    int position = -1;
     vector<string> names;
     LogosExpr* expr = nullptr;
 
     LogosFieldDef(const vector<string>& names, LogosExpr* expr) : names(names), expr(expr) {}
-    Value* writeLLVMValue(CodeGenMetadata* metadata) override;
+    Value* getLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosFieldDef() override;
 };
 

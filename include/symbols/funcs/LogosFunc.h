@@ -1,6 +1,7 @@
 #ifndef LOGOSFUNC_H
 #define LOGOSFUNC_H
 #include "CodeGeneration.h"
+#include "stmts/LogosStmtBlock.h"
 #include "stmts/LogosVarDec.h"
 
 class LogosExpr;
@@ -12,7 +13,7 @@ public:
     string name;
     LogosType* type;
     vector<LogosVarDec*> params;
-    vector<LogosStmt*> stmts;
+    LogosStmtBlock* stmtBlock = nullptr;
 
     explicit LogosFunc(const string& name, LogosType* funcType) : name(name), type(funcType) {}
     virtual FunctionCallee getFuncCallee(CodeGenMetadata* metadata) = 0;
@@ -24,9 +25,7 @@ inline LogosFunc::~LogosFunc() {
     for (const auto param : params) {
         delete param;
     }
-    for (const auto stmt : stmts) {
-        delete stmt;
-    }
+    delete stmtBlock;
 }
 
 #endif //LOGOSFUNC_H

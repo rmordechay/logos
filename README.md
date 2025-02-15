@@ -1,1 +1,2 @@
-# Logos
+# Logos Programming Language
+Work in progress...

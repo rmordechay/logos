@@ -11,7 +11,8 @@ public:
     Position position = Position();
 
     explicit LogosFuncCall(const string& name) : name(name) {}
-    Value* writeLLVMValue(CodeGenMetadata* metadata) override;
+    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    LogosFuncCall* asFuncCall() override;
     ~LogosFuncCall() override;
 };
 

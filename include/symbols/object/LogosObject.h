@@ -14,7 +14,6 @@ public:
     map<string, LogosField*> fields;
     map<string, LogosFunc*> funcs;
 
-    LogosObject() = default;
     explicit LogosObject(const string& typeName) : typeName(typeName) {}
     const string name() const override;
     Type* getLLVMType() override;

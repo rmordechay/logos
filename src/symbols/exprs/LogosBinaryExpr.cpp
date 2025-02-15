@@ -1,8 +1,9 @@
 #include "exprs/LogosBinaryExpr.h"
 
-Value* LogosBinaryExpr::writeLLVMValue(CodeGenMetadata* metadata) {
-    const auto l = left->writeLLVMValue(metadata);
-    const auto r = right->writeLLVMValue(metadata);
+Value* LogosBinaryExpr::getLLVMValue(CodeGenMetadata* metadata) {
+    if (llvmValue) return llvmValue;
+    const auto l = left->getLLVMValue(metadata);
+    const auto r = right->getLLVMValue(metadata);
     if (op == PLUS) {
         llvmValue = metadata->builder->CreateAdd(l, r);
         return llvmValue;

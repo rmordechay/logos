@@ -1,16 +1,14 @@
 #include "stmts/LogosIf.h"
 
-Value* LogosIf::writeLLVMValue(CodeGenMetadata* metadata) {
-    const auto currentFunc = metadata->theStack->top().currentFunction;
-    const auto condLLVM = cond->writeLLVMValue(metadata);
+Value* LogosIf::getLLVMValue(CodeGenMetadata* metadata) {
+    const auto currentFunc = metadata->theStack->top().llvmFunc;
+    const auto condLLVM = cond->getLLVMValue(metadata);
     const auto ifStartBlock = BasicBlock::Create(context, "if.start", currentFunc);
     const auto ifEndBlock = BasicBlock::Create(context, "if.end", currentFunc);
 
     metadata->builder->CreateCondBr(condLLVM, ifStartBlock, ifEndBlock);
     metadata->builder->SetInsertPoint(ifStartBlock);
-    for (const auto& codeNode : stmts) {
-        codeNode->writeLLVMValue(metadata);
-    }
+    stmtBlock->getLLVMValue(metadata);
     metadata->builder->CreateBr(ifEndBlock);
     metadata->builder->SetInsertPoint(ifEndBlock);
     return nullptr;
@@ -18,7 +16,5 @@ Value* LogosIf::writeLLVMValue(CodeGenMetadata* metadata) {
 
 LogosIf::~LogosIf() {
     delete cond;
-    for (const auto stmt : stmts) {
-        delete stmt;
-    }
+    delete stmtBlock;
 }
