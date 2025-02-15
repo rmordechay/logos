@@ -113,6 +113,7 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
     if (inferredType) {
         varDec->inferredType = inferredType;
     }
+    theStack.addLocalSymbol(varDec->name, varDec->expr->createSymbol());
 }
 
 void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {
@@ -145,8 +146,9 @@ void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
 void SemaAnalyser::visitBinaryExpr(const LogosBinaryExpr* binaryExpr) {
 }
 
-void SemaAnalyser::visitSelection(LogosSelection* selection) {
-
+void SemaAnalyser::visitSelection(const LogosSelection* selection) {
+    if (!selection) return;
+    selection->type = inferSelectionType(selection);
 }
 
 void SemaAnalyser::visitConstructor(LogosConstructor* constructorExpr) {
@@ -168,6 +170,42 @@ void SemaAnalyser::visitConstant(const LogosUnaryExpr* unaryExpr) {
 void SemaAnalyser::setUnsuccessful() {
     unique_lock lock(mtx);
     successful = false;
+}
+
+LogosType* SemaAnalyser::inferSelectionType(const LogosSelection* selection) {
+    auto previousExpr = selection->exprs[0];
+    LogosUnaryExpr* nextExpr = nullptr;
+    for (int i = 1; i < selection->exprs.size(); ++i) {
+        nextExpr = selection->exprs[i];
+        resolveSelection(previousExpr, nextExpr);
+        previousExpr = nextExpr;
+    }
+    if (nextExpr) { // If true, nextExpr is the last element
+        selection->type = nextExpr->type;
+    }
+    return nullptr;
+}
+
+void SemaAnalyser::resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
+    const auto symbol = theStack.getSymbol(previousExpr->getName());
+    switch (symbol->type) {
+    case FIELD:
+        break;
+    case CONSTRUCTOR: {
+        const auto obj = symbol->constructor->obj;
+        const auto func = obj->funcs[nextExpr->getName()];
+        nextExpr->type = func->type;
+        break;
+    }
+    case FUNC_CALL:
+        break;
+    case VARIABLE:
+        break;
+    case CONSTANT:
+        break;
+    default:
+        break;
+    }
 }
 
 void SemaAnalyser::checkTypes(LogosVarDec* varDec, LogosType* type) {

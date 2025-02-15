@@ -1,8 +1,6 @@
 #ifndef LOGOSOPERATOR_H
 #define LOGOSOPERATOR_H
-#include "../../../src/parser/LogosParser.h"
-
-
+#include "parser/LogosParser.h"
 
 enum LogosOperator {
     PLUS,

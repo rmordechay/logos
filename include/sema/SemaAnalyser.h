@@ -40,11 +40,13 @@ public:
     void visitExpr(LogosExpr* expr);
     void visitUnaryExpr(LogosUnaryExpr* unaryExpr);
     void visitBinaryExpr(const LogosBinaryExpr* binaryExpr);
-    void visitSelection(LogosSelection* selection);
+    void visitSelection(const LogosSelection* selection);
     void visitConstructor(LogosConstructor* constructorExpr);
     void visitFuncCall(const LogosFuncCall* funcCallExpr);
     void visitConstant(const LogosUnaryExpr* unaryExpr);
     void setUnsuccessful();
+    void resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr);
+    LogosType* inferSelectionType(const LogosSelection* selection);
     void checkTypes(LogosVarDec* varDec, LogosType* type);
     template <class ... Args>
     void printError(int errCode, Position *position, Args&&... args);

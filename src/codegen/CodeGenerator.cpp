@@ -38,7 +38,7 @@ void CodeGenerator::generateObjModule(LogosObject* obj, const LogosStack* theSta
     }
 
     auto metadata = CodeGenMetadata{.builder = &builder, .theStack = &logosStack, .module = module};
-    metadata.theStack->addGlobalSymbol("this", LogosSymbol(OBJECT, obj));
+    metadata.theStack->addGlobalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
     for (const auto entry : obj->fields) {
         entry.second->getLLVMValue(&metadata);
     }

@@ -20,7 +20,7 @@ Value* LogosUserFunc::getLLVMValue(CodeGenMetadata* metadata) {
 
     auto arg = func->arg_begin();
     for (const auto param : params) {
-        metadata->theStack->addLocalSymbol(param->name, param->expr->getSymbol());
+        metadata->theStack->addLocalSymbol(param->name, param->expr->createSymbol());
         arg++;
     }
 

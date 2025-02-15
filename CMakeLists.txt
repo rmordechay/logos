@@ -9,12 +9,10 @@ set(ANTLR_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libantlr4-runtime.a")
 file(GLOB_RECURSE LOGOS_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/parser/*.h
 )
 file(GLOB_RECURSE LOGOS_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/parser/*.cpp
 )
 
 add_executable(logos main.cpp ${LOGOS_SRC} ${LOGOS_HEADERS})
@@ -28,6 +26,7 @@ target_include_directories(logos PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/include/codegen"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/sema"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/symbols"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/parser"
 )
 
 target_link_libraries(logos PRIVATE ${LLVM_LIB} ${ANTLR_LIB})

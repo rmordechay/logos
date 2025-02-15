@@ -14,7 +14,7 @@ public:
 
     explicit LogosExpr(LogosType* type) : type(type) {}
     virtual LogosSymbolType getSymbolType() = 0;
-    virtual LogosSymbol getSymbol();
+    virtual LogosSymbol createSymbol();
     virtual LogosFuncCall* asFuncCall() { return nullptr; }
     virtual LogosVariable* asVariable() { return nullptr; }
     virtual LogosConstant* asConstant() { return nullptr; }
@@ -22,7 +22,7 @@ public:
     ~LogosExpr() override = default;
 };
 
-inline LogosSymbol LogosExpr::getSymbol() {
+inline LogosSymbol LogosExpr::createSymbol() {
     const auto type = getSymbolType();
     switch (type) {
     case CONSTRUCTOR:
@@ -32,7 +32,7 @@ inline LogosSymbol LogosExpr::getSymbol() {
     case VARIABLE:
         return LogosSymbol(type, asVariable());
     case CONSTANT:
-        return LogosSymbol(type, asConstructor());
+        return LogosSymbol(type, asConstant());
     default:
         return LogosSymbol();
     }

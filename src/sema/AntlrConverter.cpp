@@ -74,11 +74,20 @@ LogosUserFunc* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* 
     if (params) {
         for (const auto param : params->explicitVarDec()) {
             auto varDec = getExplicitVarDec(param);
-            logosUserFunc->params.push_back(varDec);
+            logosUserFunc->params.emplace_back(varDec);
         }
     }
     logosUserFunc->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     return logosUserFunc;
+}
+
+LogosStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
+    vector<LogosStmt*> stmts;
+    for (const auto statement: ctx->statement()) {
+        auto stmt = getStmt(statement);
+        stmts.emplace_back(stmt);
+    }
+    return new LogosStmtBlock(stmts);
 }
 
 LogosStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
@@ -101,14 +110,6 @@ LogosStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
         return new LogosReturn(getExpr(returnStmt->expr()));
     }
     return nullptr;
-}
-
-LogosStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
-    vector<LogosStmt*> stmts;
-    for (const auto statement: ctx->statement()) {
-        stmts.push_back(getStmt(statement));
-    }
-    return new LogosStmtBlock(stmts);
 }
 
 LogosFieldDef* AntlerConverter::getFieldDef(LogosParser::FieldDefContext* ctx) {
@@ -184,7 +185,7 @@ LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* sel
     vector<LogosUnaryExpr*> exprs;
     for (const auto unaryExpr : selection->unaryExpr()) {
         auto expr = getUnaryExpr(unaryExpr);
-        exprs.push_back(expr);
+        exprs.emplace_back(expr);
     }
     return new LogosSelection(exprs);
 }
@@ -207,7 +208,7 @@ LogosConstructor* AntlerConverter::getConstructor(LogosParser::ConstructorCallCo
     }
     for (const auto arg : args->funcArg()) {
         auto argExpr = getExpr(arg->expr());
-        constructorExpr->args.push_back(argExpr);
+        constructorExpr->args.emplace_back(argExpr);
     }
     return constructorExpr;
 }
@@ -221,7 +222,7 @@ LogosFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
         const auto args = funcArgList->funcArg();
         for (const auto arg : args) {
             auto argExpr = getExpr(arg->expr());
-            funcCallExpr->args.push_back(argExpr);
+            funcCallExpr->args.emplace_back(argExpr);
         }
     }
     return funcCallExpr;
