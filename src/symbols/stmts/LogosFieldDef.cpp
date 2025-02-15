@@ -6,8 +6,12 @@ Value* LogosFieldDef::writeLLVMValue(CodeGenMetadata* metadata) {
     const auto firstName = names[0];
     const auto secondName = names[1];
     const auto varDec = metadata->theStack->getSymbol(firstName)->varDec;
-    const auto exprValue = varDec->expr->llvmValue;
-    return metadata->builder->CreateStructGEP(exprValue->getType(), exprValue, 0);
+    const auto expr = varDec->expr;
+    const auto llvmValue = expr->llvmValue;
+    // const auto llvmType = varDec->expr->type->getLLVMType();
+    // const auto obj = metadata->theStack->getSymbol()->object;
+    auto a = StructType::create(context);
+    return metadata->builder->CreateStructGEP(a, llvmValue, 0);
 }
 
 LogosFieldDef::~LogosFieldDef() {

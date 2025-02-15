@@ -4,14 +4,14 @@ const string LogosObject::name() const {
     return typeName;
 }
 
-Type* LogosObject::writeLLVMType(CodeGenMetadata* metadata) {
+Type* LogosObject::getLLVMType() {
     if (llvmType) return llvmType;
     vector<Type*> elementTypes;
     for (const auto entry : fields) {
-        auto fieldType = entry.second->inferredType->writeLLVMType(metadata);
+        auto fieldType = entry.second->inferredType->getLLVMType();
         elementTypes.push_back(fieldType);
     }
-    llvmType = StructType::create(metadata->builder->getContext(), elementTypes);
+    llvmType = StructType::create(context, elementTypes);
     return llvmType;
 }
 

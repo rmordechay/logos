@@ -20,14 +20,11 @@ Value* LogosVariable::writeLLVMValue(CodeGenMetadata* metadata) {
         llvmValue = symbol->varDec->expr->writeLLVMValue(metadata);
         return llvmValue;
     }
-    case OBJECT: {
-        symbol->object->writeLLVMType(metadata);
-        break;
-    }
     case FUNC: {
         llvmValue = symbol->func->writeLLVMValue(metadata);
         return llvmValue;
     }
+    default: break;
     }
     return nullptr;
 }

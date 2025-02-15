@@ -10,7 +10,7 @@ public:
     static constexpr auto typeName = "Float";
 
     const string name() const override;
-    Type* writeLLVMType(CodeGenMetadata* metadata) override;
+    Type* getLLVMType() override;
     bool operator==(LogosType* other) const override;
     ~LogosFloat() override = default;
 };
@@ -19,7 +19,7 @@ inline const string LogosFloat::name() const {
     return typeName;
 }
 
-inline Type* LogosFloat::writeLLVMType(CodeGenMetadata* metadata) {
+inline Type* LogosFloat::getLLVMType() {
     return llvmType;
 }
 

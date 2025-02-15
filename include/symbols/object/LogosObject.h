@@ -17,7 +17,7 @@ public:
     LogosObject() = default;
     explicit LogosObject(const string& typeName) : typeName(typeName) {}
     const string name() const override;
-    Type* writeLLVMType(CodeGenMetadata* metadata) override;
+    Type* getLLVMType() override;
     bool operator==(LogosType* other) const override;
     ~LogosObject() override;
 };

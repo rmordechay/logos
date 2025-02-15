@@ -9,7 +9,7 @@ public:
     Type* llvmType = Type::getInt32Ty(context);
 
     const string name() const override;
-    Type* writeLLVMType(CodeGenMetadata* metadata) override;
+    Type* getLLVMType() override;
     bool operator==(LogosType* other) const override;
     ~LogosInt() override = default;
 };
@@ -18,7 +18,7 @@ inline const string LogosInt::name() const {
     return INT_TYPE_NAME;
 }
 
-inline Type* LogosInt::writeLLVMType(CodeGenMetadata* metadata) {
+inline Type* LogosInt::getLLVMType() {
     return llvmType;
 }
 

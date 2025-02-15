@@ -11,10 +11,10 @@ vector<Value*> LogosUserFunc::getArgs(CodeGenMetadata* metadata, const vector<Lo
 Value* LogosUserFunc::writeLLVMValue(CodeGenMetadata* metadata) {
     std::vector<Type*> llvmParams;
     for (const auto param : params) {
-        llvmParams.emplace_back(param->inferredType->writeLLVMType(metadata));
+        llvmParams.emplace_back(param->inferredType->getLLVMType());
     }
 
-    const auto funcType = FunctionType::get(type->writeLLVMType(metadata), llvmParams, false);
+    const auto funcType = FunctionType::get(type->getLLVMType(), llvmParams, false);
     const auto func = Function::Create(funcType, Function::ExternalLinkage, name, metadata->module);
     metadata->theStack->enterScope(func);
 
@@ -24,7 +24,7 @@ Value* LogosUserFunc::writeLLVMValue(CodeGenMetadata* metadata) {
         arg++;
     }
 
-    const auto funcEntry = BasicBlock::Create(metadata->builder->getContext(), "entry", func);
+    const auto funcEntry = BasicBlock::Create(context, "entry", func);
     metadata->builder->SetInsertPoint(funcEntry);
 
     for (const auto stmt : stmts) {

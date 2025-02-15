@@ -11,7 +11,7 @@ using namespace std;
 class LogosType {
 public:
     virtual const string name() const = 0;
-    virtual Type* writeLLVMType(CodeGenMetadata* metadata) = 0;
+    virtual Type* getLLVMType() = 0;
     virtual bool operator==(LogosType* other) const = 0;
     virtual ~LogosType() = default;
 };

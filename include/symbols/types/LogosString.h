@@ -12,7 +12,7 @@ public:
     static constexpr auto typeName = "Str";
 
     const string name() const override;
-    Type* writeLLVMType(CodeGenMetadata* metadata) override;
+    Type* getLLVMType() override;
     bool operator==(LogosType* other) const override;
     ~LogosString() override = default;
 };
@@ -21,7 +21,7 @@ inline const string LogosString::name() const {
     return typeName;
 }
 
-inline Type* LogosString::writeLLVMType(CodeGenMetadata* metadata) {
+inline Type* LogosString::getLLVMType() {
     if (llvmType) return llvmType;
     return nullptr;
 }

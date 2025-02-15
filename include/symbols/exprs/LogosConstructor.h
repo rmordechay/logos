@@ -5,7 +5,7 @@
 
 class LogosConstructor final : public LogosUnaryExpr {
 public:
-    std::string name;
+    string name;
     vector<LogosExpr*> args;
 
     explicit LogosConstructor(const string& name) : name(name) {}

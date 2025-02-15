@@ -16,7 +16,7 @@ void resolveSymbol(CodeGenMetadata* metadata, const LogosSymbol* currentSymbol) 
         break;
     }
     case OBJECT: {
-        currentSymbol->object->writeLLVMType(metadata);
+        currentSymbol->object->getLLVMType();
         break;
     }
     case FUNC: {
