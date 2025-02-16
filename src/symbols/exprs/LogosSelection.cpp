@@ -20,22 +20,14 @@ Value* LogosSelection::getLLVMValue(CodeGenMetadata* metadata) {
 Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
     const auto symbol = metadata->theStack->getSymbol(previousExpr->getName());
     switch (symbol->type) {
-    case FIELD:
-        break;
     case CONSTRUCTOR: {
         const auto obj = symbol->constructor->obj;
         const auto func = obj->funcs[nextExpr->getName()];
         return func->callFunc(metadata);
     }
     case FUNC_CALL: {
-        const auto funcCall = symbol->funcCall;
-        funcCall->getLLVMValue(metadata);
-        break;
+        return symbol->funcCall->getLLVMValue(metadata);
     }
-    case VARIABLE:
-        break;
-    case CONSTANT:
-        break;
     default:
         break;
     }
