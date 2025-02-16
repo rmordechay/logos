@@ -48,7 +48,7 @@ LogosSymbolType LogosSelection::getSymbolType() {
 }
 
 LogosSelection::~LogosSelection() {
-    for (const auto expr : exprs) {
+    for (const auto& expr : exprs) {
         delete expr;
     }
 }

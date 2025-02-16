@@ -17,7 +17,7 @@ void CodeGenerator::generate(const map<string, LogosFile*>& files, LogosStack& t
 void CodeGenerator::generateMainModule(const LogosMainFile* mainFile, CodeGenMetadata metadata) {
     mainFile->mainFunc->getLLVMValue(&metadata);
     metadata.builder->CreateRet(metadata.builder->getInt32(EXIT_SUCCESS));
-    for (const auto func : mainFile->funcs) {
+    for (const auto& func : mainFile->funcs) {
         func->getLLVMValue(&metadata);
     }
     writeIRToFile(metadata.module, LOGOS_MAIN_FILE);
@@ -25,7 +25,7 @@ void CodeGenerator::generateMainModule(const LogosMainFile* mainFile, CodeGenMet
 
 void CodeGenerator::generateObjModule(LogosObject* obj, LogosStack* theStack) {
     auto builder = IRBuilder(context);
-    auto objName = obj->name();
+    const auto objName = obj->name();
     const auto module = new Module(objName, context);
     theStack->modules[objName] = module;
     auto logosStack = *theStack;
@@ -35,10 +35,10 @@ void CodeGenerator::generateObjModule(LogosObject* obj, LogosStack* theStack) {
 
     auto metadata = CodeGenMetadata{.builder = &builder, .theStack = &logosStack, .module = module};
     metadata.theStack->addGlobalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
-    for (const auto entry : obj->fields) {
+    for (const auto& entry : obj->fields) {
         entry.second->getLLVMValue(&metadata);
     }
-    for (const auto entry : obj->funcs) {
+    for (const auto& entry : obj->funcs) {
         entry.second->getLLVMValue(&metadata);
     }
 

@@ -18,7 +18,7 @@ LogosMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     const auto funcImplementations = ctx->funcImplementation();
     const auto mainFile = new LogosMainFile(filePath);
 
-    for (const auto func : funcImplementations) {
+    for (const auto& func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         if (funcName == LOGOS_MAIN_FUNCTION) {
             const auto mainFunc = new LogosUserFunc(LOGOS_MAIN_FUNCTION, &LOGOS_INT);
@@ -49,7 +49,7 @@ LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
         const auto field = getField(varDec, objName, i);
         obj->fields[field->name] = field;
     }
-    for (const auto func : ctx->funcImplementation()) {
+    for (const auto& func : ctx->funcImplementation()) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         const auto userFunc = getFunc(func);
         obj->funcs[funcName] = userFunc;
@@ -72,7 +72,7 @@ LogosUserFunc* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* 
 
     const auto params = funcSignature->paramList();
     if (params) {
-        for (const auto param : params->explicitVarDec()) {
+        for (const auto& param : params->explicitVarDec()) {
             auto varDec = getExplicitVarDec(param);
             logosUserFunc->params.emplace_back(varDec);
         }
@@ -83,7 +83,7 @@ LogosUserFunc* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* 
 
 LogosStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
     vector<LogosStmt*> stmts;
-    for (const auto statement: ctx->statement()) {
+    for (const auto& statement: ctx->statement()) {
         auto stmt = getStmt(statement);
         stmts.emplace_back(stmt);
     }
@@ -114,7 +114,7 @@ LogosStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
 
 LogosFieldDef* AntlerConverter::getFieldDef(LogosParser::FieldDefContext* ctx) {
     vector<string> fields;
-    for (const auto variable : ctx->VARIABLE()) {
+    for (const auto& variable : ctx->VARIABLE()) {
         fields.emplace_back(variable->getText());
     }
     const auto expr = getExpr(ctx->expr());
@@ -183,7 +183,7 @@ LogosUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx
 
 LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* selection) {
     vector<LogosUnaryExpr*> exprs;
-    for (const auto unaryExpr : selection->unaryExpr()) {
+    for (const auto& unaryExpr : selection->unaryExpr()) {
         auto expr = getUnaryExpr(unaryExpr);
         exprs.emplace_back(expr);
     }
@@ -206,7 +206,7 @@ LogosConstructor* AntlerConverter::getConstructor(LogosParser::ConstructorCallCo
     if (!args) {
         return constructorExpr;
     }
-    for (const auto arg : args->funcArg()) {
+    for (const auto& arg : args->funcArg()) {
         auto argExpr = getExpr(arg->expr());
         constructorExpr->args.emplace_back(argExpr);
     }
@@ -220,7 +220,7 @@ LogosFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
     const auto funcArgList = ctx->funcArgList();
     if (funcArgList) {
         const auto args = funcArgList->funcArg();
-        for (const auto arg : args) {
+        for (const auto& arg : args) {
             auto argExpr = getExpr(arg->expr());
             funcCallExpr->args.emplace_back(argExpr);
         }

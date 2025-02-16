@@ -10,7 +10,7 @@
 bool SemaAnalyser::analyse() {
     collectGlobals();
     ThreadPool threadPool;
-    for (const auto [name, file] : files) {
+    for (const auto& [name, file] : files) {
         threadPool.runTask([this, file] {
             visitLogosFile(file);
         });
@@ -23,7 +23,7 @@ bool SemaAnalyser::analyse() {
 }
 
 void SemaAnalyser::collectGlobals() {
-    for (const auto [name, file] : files) {
+    for (const auto& [name, file] : files) {
         if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
             const auto object = objFile->obj;
             theStack.addGlobalSymbol(object->name(), LogosSymbol(OBJECT, object));
@@ -42,7 +42,7 @@ void SemaAnalyser::visitLogosFile(LogosFile* file) {
 
 void SemaAnalyser::visitMainFile(const LogosMainFile* mainFile) {
     visitMainFunc(mainFile->mainFunc, mainFile->path);
-    for (const auto func : mainFile->funcs) {
+    for (const auto& func : mainFile->funcs) {
         visitUserFunc(func);
     }
 }
@@ -54,7 +54,7 @@ void SemaAnalyser::visitObjectFile(const LogosObjectFile* objectFile) {
 
 void SemaAnalyser::visitObject(const LogosObject* object) {
     if (!object) return;
-    for (const auto entry : object->fields) {
+    for (const auto& entry : object->fields) {
         visitField(entry.second);
     }
 }
@@ -69,7 +69,7 @@ void SemaAnalyser::visitMainFunc(const LogosUserFunc* mainFunc, const string& pa
 
 void SemaAnalyser::visitUserFunc(const LogosUserFunc* func) {
     theStack.enterScope();
-    for (const auto param : func->params) {
+    for (const auto& param : func->params) {
         if (!func) return;
         visitVarDec(param);
     }
@@ -93,7 +93,7 @@ void SemaAnalyser::visitStmt(LogosStmt* stmt) {
 }
 
 void SemaAnalyser::visitStmtBlock(LogosStmtBlock* stmtBlock) {
-    for (const auto stmt : stmtBlock->stmts) {
+    for (const auto& stmt : stmtBlock->stmts) {
         visitStmt(stmt);
     }
 }
@@ -232,7 +232,7 @@ void SemaAnalyser::printError(const int errCode, Position *position, Args&&... a
 
 SemaAnalyser::~SemaAnalyser() {
     delete mainFile;
-    for (const auto file : files) {
+    for (const auto& file : files) {
         delete file.second;
     }
 }

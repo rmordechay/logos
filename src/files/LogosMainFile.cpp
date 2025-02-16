@@ -5,7 +5,7 @@
 
 LogosMainFile::~LogosMainFile() {
     delete mainFunc;
-    for (const auto func : funcs) {
+    for (const auto& func : funcs) {
         delete func;
     }
 }

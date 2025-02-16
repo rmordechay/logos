@@ -20,7 +20,7 @@ Value* LogosFuncCall::getLLVMValue(CodeGenMetadata* metadata) {
 }
 
 LogosFuncCall::~LogosFuncCall() {
-    for (const auto arg : args) {
+    for (const auto& arg : args) {
         delete arg;
     }
 }

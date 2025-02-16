@@ -2,7 +2,7 @@
 
 Value* LogosUserFunc::getLLVMValue(CodeGenMetadata* metadata) {
     std::vector<Type*> llvmParams;
-    for (const auto param : params) {
+    for (const auto& param : params) {
         llvmParams.emplace_back(param->inferredType->getLLVMType());
     }
 
@@ -11,7 +11,7 @@ Value* LogosUserFunc::getLLVMValue(CodeGenMetadata* metadata) {
     metadata->theStack->enterScope(func);
 
     auto arg = func->arg_begin();
-    for (const auto param : params) {
+    for (const auto& param : params) {
         metadata->theStack->addLocalSymbol(param->name, param->expr->createSymbol());
         arg++;
     }
@@ -25,18 +25,25 @@ Value* LogosUserFunc::getLLVMValue(CodeGenMetadata* metadata) {
     return func;
 }
 
-vector<Value*> LogosUserFunc::getArgs(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
-    return vector<Value*>();
-}
-
-FunctionCallee LogosUserFunc::getFuncCallee(CodeGenMetadata* metadata) {
-    return nullptr;
-}
-
 Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
     if (llvmValue) return llvmValue;
-    const auto llvmArgs = getArgs(metadata, args);
-    const auto func = getFuncCallee(metadata);
+    vector<Value*> llvmArgs;
+
+    for (const auto& arg : args) {
+        const auto argValue = arg->getLLVMValue(metadata);
+        if (const auto constInt = dyn_cast<ConstantInt>(argValue)) {
+            auto name = std::to_string(constInt->getSExtValue());
+            auto llvmStr = metadata->builder->CreateGlobalStringPtr(name);
+            llvmArgs.emplace_back(llvmStr);
+            llvmArgs.emplace_back(metadata->builder->getInt32(name.size()));
+        } else {
+            llvmArgs.emplace_back(argValue);
+        }
+    }
+
+    const vector<Type*> paramTypes = {metadata->builder->getPtrTy(), metadata->builder->getInt32Ty()};
+    const auto funcType = FunctionType::get(metadata->builder->getVoidTy(), paramTypes, false);
+    const auto func = metadata->module->getOrInsertFunction("printInt", funcType);
     llvmValue = metadata->builder->CreateCall(func, llvmArgs);
     return llvmValue;
 }

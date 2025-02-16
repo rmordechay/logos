@@ -1,15 +1,9 @@
 #ifndef LOGOSSTACK_H
 #define LOGOSSTACK_H
 #include "LogosSymbol.h"
-
 #include <stack>
-
 #include <map>
-
-namespace llvm {
-    class Module;
-    class Function;
-}
+#include <llvm/IR/Module.h>
 
 using namespace std;
 using namespace llvm;

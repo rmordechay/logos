@@ -9,7 +9,7 @@ const string LogosObject::name() const {
 Type* LogosObject::getLLVMType() {
     if (llvmType) return llvmType;
     vector<Type*> elementTypes;
-    for (const auto entry : fields) {
+    for (const auto& entry : fields) {
         auto fieldType = entry.second->inferredType->getLLVMType();
         elementTypes.push_back(fieldType);
     }
@@ -22,10 +22,10 @@ bool LogosObject::operator==(LogosType* other) const { return true;
 }
 
 LogosObject::~LogosObject() {
-    for (const auto field : fields) {
+    for (const auto& field : fields) {
         delete field.second;
     }
-    for (const auto func : funcs) {
+    for (const auto& func : funcs) {
         delete func.second;
     }
 }
