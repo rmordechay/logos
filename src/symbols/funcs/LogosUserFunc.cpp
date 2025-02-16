@@ -1,13 +1,5 @@
 #include "funcs/LogosUserFunc.h"
 
-FunctionCallee LogosUserFunc::getFuncCallee(CodeGenMetadata* metadata) {
-    return nullptr;
-}
-
-vector<Value*> LogosUserFunc::getArgs(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
-    return vector<Value*>();
-}
-
 Value* LogosUserFunc::getLLVMValue(CodeGenMetadata* metadata) {
     std::vector<Type*> llvmParams;
     for (const auto param : params) {
@@ -33,3 +25,18 @@ Value* LogosUserFunc::getLLVMValue(CodeGenMetadata* metadata) {
     return func;
 }
 
+vector<Value*> LogosUserFunc::getArgs(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
+    return vector<Value*>();
+}
+
+FunctionCallee LogosUserFunc::getFuncCallee(CodeGenMetadata* metadata) {
+    return nullptr;
+}
+
+Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
+    if (llvmValue) return llvmValue;
+    const auto llvmArgs = getArgs(metadata, args);
+    const auto func = getFuncCallee(metadata);
+    llvmValue = metadata->builder->CreateCall(func, llvmArgs);
+    return llvmValue;
+}

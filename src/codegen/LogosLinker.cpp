@@ -14,10 +14,13 @@
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IRReader/IRReader.h>
 #include <llvm/Support/SourceMgr.h>
-
+#include <llvm/Object/ObjectFile.h>
 
 void LogosLinker::link(const map<string, Module*>& modules) {
     auto mainModule = std::move(modules.find(LOGOS_MAIN_FILE)->second);
+    auto bufferOrError = MemoryBuffer::getFile("../codegen/Print.ll");
+    auto objectOrError = object::ObjectFile::createObjectFile(bufferOrError->get()->getMemBufferRef());
+
     SMDiagnostic EC;
     auto printModule = parseIRFile("../codegen/Print.ll", EC, context);
     Linker::linkModules(*mainModule, unique_ptr(std::move(printModule)));

@@ -8,6 +8,7 @@ public:
     explicit LogosUserFunc(const std::string& name, LogosType* funcType) : LogosFunc(name, funcType) {}
     explicit LogosUserFunc(const string& name) : LogosUserFunc(name, &LOGOS_VOID) {};
     FunctionCallee getFuncCallee(CodeGenMetadata* metadata) override;
+    Value* callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
     vector<Value*> getArgs(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
     Value* getLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosUserFunc() override = default;

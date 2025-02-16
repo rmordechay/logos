@@ -15,11 +15,8 @@ string LogosFuncCall::getName() {
 }
 
 Value* LogosFuncCall::getLLVMValue(CodeGenMetadata* metadata) {
-    const auto callee = metadata->theStack->getSymbol(name)->func;
-    const auto llvmArgs = callee->getArgs(metadata, args);
-    const auto func = callee->getFuncCallee(metadata);
-    llvmValue = metadata->builder->CreateCall(func, llvmArgs);
-    return llvmValue;
+    const auto symbol = metadata->theStack->getSymbol(name);
+    return symbol->func->callFunc(metadata, args);
 }
 
 LogosFuncCall::~LogosFuncCall() {

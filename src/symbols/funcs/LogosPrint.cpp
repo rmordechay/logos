@@ -8,10 +8,18 @@ Value* LogosPrint::getLLVMValue(CodeGenMetadata* metadata) {
     return llvmValue;
 }
 
+Value* LogosPrint::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
+    const auto llvmArgs = getArgs(metadata, args);
+    const auto func = getFuncCallee(metadata);
+    llvmValue = metadata->builder->CreateCall(func, llvmArgs);
+    return llvmValue;
+}
+
 FunctionCallee LogosPrint::getFuncCallee(CodeGenMetadata* metadata) {
     const vector<Type*> paramTypes = {metadata->builder->getPtrTy(), metadata->builder->getInt32Ty()};
     const auto funcType = FunctionType::get(metadata->builder->getVoidTy(), paramTypes, false);
-    return metadata->module->getOrInsertFunction("printInt", funcType);
+    auto func = metadata->module->getOrInsertFunction("printInt", funcType);
+    return func;
 }
 
 vector<Value*> LogosPrint::getArgs(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
