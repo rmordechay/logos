@@ -16,6 +16,7 @@ using namespace llvm;
 #include "CodeGenerator.h"
 #include "LogosLexer.h"
 #include "SemaAnalyser.h"
+#include "LogosLinker.h"
 #include "LogosUtils.h"
 
 class Application {
@@ -23,6 +24,7 @@ public:
     string rootPath;
     CodeGenerator codeGenerator;
     SemaAnalyser semaAnalyser;
+    LogosLinker linker;
     mutex mtx;
 
     explicit Application(const string& rootPath) : rootPath(rootPath) {}

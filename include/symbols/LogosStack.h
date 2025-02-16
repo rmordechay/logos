@@ -7,6 +7,7 @@
 #include <map>
 
 namespace llvm {
+    class Module;
     class Function;
 }
 
@@ -23,6 +24,8 @@ struct LogosStackFrame {
 
 class LogosStack : public stack<LogosStackFrame> {
 public:
+    map<string, Module*> modules;
+
     void enterScope(Function* func);
     void enterScope();
     void exitScope();

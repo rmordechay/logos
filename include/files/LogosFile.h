@@ -23,7 +23,7 @@ public:
 
 inline void writeIRToFile(const Module* module, const string& name) {
     std::error_code EC;
-    raw_fd_ostream textFile("../codegen/" + name + ".ll", EC, sys::fs::OF_None);
+    raw_fd_ostream textFile("../docs/src/build/" + name + ".ll", EC, sys::fs::OF_None);
     module->print(outs(), nullptr);
     module->print(textFile, nullptr);
 }

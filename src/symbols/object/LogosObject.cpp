@@ -1,5 +1,7 @@
 #include "object/LogosObject.h"
 
+#include "funcs/LogosUserFunc.h"
+
 const string LogosObject::name() const {
     return typeName;
 }

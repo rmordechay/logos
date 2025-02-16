@@ -3,7 +3,8 @@
 void Application::runLogos() {
     semaAnalyser.files = parse();
     if (!semaAnalyser.analyse()) return;
-    codeGenerator.run(semaAnalyser.files, semaAnalyser.theStack);
+    codeGenerator.generate(semaAnalyser.files, semaAnalyser.theStack);
+    linker.runBinary();
 }
 
 map<string, LogosFile*> Application::parse() {

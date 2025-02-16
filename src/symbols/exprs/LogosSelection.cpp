@@ -2,16 +2,16 @@
 
 #include "LogosUtils.h"
 #include "exprs/LogosFuncCall.h"
+#include "funcs/LogosUserFunc.h"
 
 Value *resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
     const auto symbol = metadata->theStack->getSymbol(previousExpr->getName());
-    const auto nextSymbol = metadata->theStack->getSymbol(nextExpr->getName());
     switch (symbol->type) {
     case FIELD:
         break;
     case CONSTRUCTOR: {
         const auto obj = symbol->constructor->obj;
-        const auto funcCall = nextSymbol->funcCall;
+        const auto funcCall = obj->funcs[nextExpr->getName()];
         funcCall->getLLVMValue(metadata);
         metadata->theStack->addGlobalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
         break;

@@ -3,29 +3,31 @@
 #include "funcs/LogosPrint.h"
 #include "funcs/LogosUserFunc.h"
 
-void CodeGenerator::run(const map<string, LogosFile*>& files, LogosStack& theStack) {
+void CodeGenerator::generate(const map<string, LogosFile*>& files, LogosStack& theStack) {
     theStack.addGlobalSymbol("print", LogosSymbol(FUNC, new LogosPrint()));
 
     auto builder = IRBuilder(context);
     const auto module = new Module(LOGOS_MAIN_FILE, context);
+    theStack.modules[LOGOS_MAIN_FILE] = module;
     const auto metadata = CodeGenMetadata{.builder = &builder, .theStack = &theStack, .module = module};
     const auto mainFile = dynamic_cast<LogosMainFile*>(files.at(LOGOS_MAIN_FILE));
-    generateMainModule(mainFile, metadata, builder);
-    runBinary();
+    generateMainModule(mainFile, metadata);
 }
 
-void CodeGenerator::generateMainModule(const LogosMainFile* mainFile, CodeGenMetadata metadata, IRBuilder<>& builder) {
+void CodeGenerator::generateMainModule(const LogosMainFile* mainFile, CodeGenMetadata metadata) {
     mainFile->mainFunc->getLLVMValue(&metadata);
-    builder.CreateRet(builder.getInt32(EXIT_SUCCESS));
+    metadata.builder->CreateRet(metadata.builder->getInt32(EXIT_SUCCESS));
     for (const auto func : mainFile->funcs) {
         func->getLLVMValue(&metadata);
     }
     writeIRToFile(metadata.module, LOGOS_MAIN_FILE);
 }
 
-void CodeGenerator::generateObjModule(LogosObject* obj, const LogosStack* theStack) {
+void CodeGenerator::generateObjModule(LogosObject* obj, LogosStack* theStack) {
     auto builder = IRBuilder(context);
-    const auto module = new Module(obj->name(), context);
+    auto objName = obj->name();
+    const auto module = new Module(objName, context);
+    theStack->modules[objName] = module;
     auto logosStack = *theStack;
     while (logosStack.size() > 1) {
         logosStack.pop();
@@ -50,11 +52,6 @@ void CodeGenerator::initLLVM() {
     InitializeAllTargetMCs();
     InitializeAllTargets();
     InitializeAllTargetInfos();
-}
-
-void CodeGenerator::runBinary() {
-    std::system("cd ../codegen && clang Main.ll MyObject.ll Print.ll -o ../output");
-    std::system("../output");
 }
 
 void CodeGenerator::generateTest() {

@@ -16,6 +16,9 @@ bool SemaAnalyser::analyse() {
         });
     }
     threadPool.wait();
+    while (theStack.size() > 0) {
+        theStack.pop();
+    }
     return successful;
 }
 
