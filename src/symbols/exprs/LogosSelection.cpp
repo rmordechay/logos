@@ -5,11 +5,14 @@
 
 Value *resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
     const auto symbol = metadata->theStack->getSymbol(previousExpr->getName());
+    const auto nextSymbol = metadata->theStack->getSymbol(nextExpr->getName());
     switch (symbol->type) {
     case FIELD:
         break;
     case CONSTRUCTOR: {
         const auto obj = symbol->constructor->obj;
+        const auto funcCall = nextSymbol->funcCall;
+        funcCall->getLLVMValue(metadata);
         metadata->theStack->addGlobalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
         break;
     }

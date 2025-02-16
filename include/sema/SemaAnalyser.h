@@ -13,6 +13,7 @@
 #include "object/LogosObject.h"
 #include "stmts/LogosFieldDef.h"
 #include "stmts/LogosIf.h"
+#include "stmts/LogosVarDec.h"
 
 
 class SemaAnalyser {

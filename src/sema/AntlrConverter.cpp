@@ -42,11 +42,11 @@ LogosObjectFile* AntlerConverter::getObjFile(LogosParser::ObjectFileContext* ctx
 }
 
 LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
-    const auto name = ctx->objectDeclaration()->TYPE()->getText();
-    const auto obj = new LogosObject(name);
+    const auto objName = ctx->objectDeclaration()->TYPE()->getText();
+    const auto obj = new LogosObject(objName);
     for (int i = 0; i < ctx->explicitVarDec().size(); ++i) {
         const auto varDec = ctx->explicitVarDec()[i];
-        const auto field = getField(varDec, name, i);
+        const auto field = getField(varDec, objName, i);
         obj->fields[field->name] = field;
     }
     for (const auto func : ctx->funcImplementation()) {

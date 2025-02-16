@@ -1,5 +1,6 @@
 #include "exprs/LogosVariable.h"
 
+#include "funcs/LogosFunc.h"
 #include "object/LogosField.h"
 #include "object/LogosObject.h"
 
