@@ -7,8 +7,8 @@
 class LogosBool final : public LogosType {
 public:
     Type* llvmType = Type::getInt1Ty(context);
-    static constexpr auto typeName = "Bool";
-    static constexpr auto trueLiteral = "true";
+     string typeName = "Bool";
+     auto trueLiteral = "true";
 
     const string name() const override;
     Type* getLLVMType() override;

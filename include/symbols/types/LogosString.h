@@ -9,7 +9,7 @@
 class LogosString final : public LogosType {
 public:
     Type* llvmType = nullptr;
-    static constexpr auto typeName = "Str";
+     string typeName = "Str";
 
     const string name() const override;
     Type* getLLVMType() override;

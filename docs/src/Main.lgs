@@ -2,5 +2,6 @@ main() {
     obj = MyObject()
     obj.x = 5
     obj.y = 7
-    print(2)
+    sum = obj.add()
+    print(sum)
 }

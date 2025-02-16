@@ -1,6 +1,8 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
 
+class LogosSelection;
+class LogosBinaryExpr;
 class LogosConstant;
 class LogosVariable;
 class LogosFuncCall;
@@ -32,6 +34,8 @@ struct LogosSymbol {
         LogosFuncCall* funcCall;
         LogosVariable* variable;
         LogosConstant* constant;
+        LogosBinaryExpr* binaryExpr;
+        LogosSelection* selection;
     };
 
     LogosSymbol() :
@@ -72,6 +76,16 @@ struct LogosSymbol {
     LogosSymbol(const LogosSymbolType type, LogosConstant* constant) :
         type(type),
         constant(constant) {
+    }
+
+    LogosSymbol(LogosSymbolType type, LogosSelection* selection) :
+        type(type),
+        selection(selection) {
+    }
+
+    LogosSymbol(LogosSymbolType type, LogosBinaryExpr* binaryExpr) :
+        type(type),
+        binaryExpr(binaryExpr) {
     }
 };
 

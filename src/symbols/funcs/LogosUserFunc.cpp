@@ -1,18 +1,24 @@
 #include "funcs/LogosUserFunc.h"
 
+#include "LogosUtils.h"
+
 Value* LogosUserFunc::getLLVMValue(CodeGenMetadata* metadata) {
-    std::vector<Type*> llvmParams;
+    vector<Type*> llvmParams;
     for (const auto& param : params) {
         llvmParams.emplace_back(param->inferredType->getLLVMType());
     }
 
     const auto funcType = FunctionType::get(type->getLLVMType(), llvmParams, false);
-    const auto func = Function::Create(funcType, Function::ExternalLinkage, name, metadata->module);
+    string funcName = name;
+    if (parentName != "") {
+        funcName = parentName + "_" + funcName;
+    }
+    const auto func = Function::Create(funcType, Function::ExternalLinkage, funcName, metadata->module);
     metadata->theStack->enterScope(func);
 
     auto arg = func->arg_begin();
     for (const auto& param : params) {
-        metadata->theStack->addLocalSymbol(param->name, param->expr->createSymbol());
+        metadata->theStack->addLocalSymbol(param->name, Utils::createSymbol(param->expr));
         arg++;
     }
 
@@ -32,7 +38,7 @@ Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr
     for (const auto& arg : args) {
         const auto argValue = arg->getLLVMValue(metadata);
         if (const auto constInt = dyn_cast<ConstantInt>(argValue)) {
-            auto name = std::to_string(constInt->getSExtValue());
+            auto name = to_string(constInt->getSExtValue());
             auto llvmStr = metadata->builder->CreateGlobalStringPtr(name);
             llvmArgs.emplace_back(llvmStr);
             llvmArgs.emplace_back(metadata->builder->getInt32(name.size()));
@@ -43,7 +49,24 @@ Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr
 
     const vector<Type*> paramTypes = {metadata->builder->getPtrTy(), metadata->builder->getInt32Ty()};
     const auto funcType = FunctionType::get(metadata->builder->getVoidTy(), paramTypes, false);
-    const auto func = metadata->module->getOrInsertFunction("printInt", funcType);
+    string funcName = name;
+    if (parentName != "") {
+        funcName = parentName + "_" + funcName;
+    }
+    const auto func = metadata->module->getOrInsertFunction(funcName, funcType);
     llvmValue = metadata->builder->CreateCall(func, llvmArgs);
+    return llvmValue;
+}
+
+Value* LogosUserFunc::callFunc(const CodeGenMetadata* metadata) {
+    if (llvmValue) return llvmValue;
+    const vector<Type*> paramTypes = {metadata->builder->getPtrTy(), metadata->builder->getInt32Ty()};
+    const auto funcType = FunctionType::get(metadata->builder->getVoidTy(), paramTypes, false);
+    string funcName = name;
+    if (parentName != "") {
+        funcName = parentName + "_" + funcName;
+    }
+    const auto func = metadata->module->getOrInsertFunction(funcName, funcType);
+    llvmValue = metadata->builder->CreateCall(func);
     return llvmValue;
 }

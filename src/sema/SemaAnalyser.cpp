@@ -1,5 +1,6 @@
 #include "SemaAnalyser.h"
 #include "LogosErrors.h"
+#include "LogosUtils.h"
 #include "exprs/LogosBinaryExpr.h"
 #include "exprs/LogosSelection.h"
 #include "funcs/LogosUserFunc.h"
@@ -116,7 +117,7 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
     if (inferredType) {
         varDec->inferredType = inferredType;
     }
-    theStack.addLocalSymbol(varDec->name, varDec->expr->createSymbol());
+    theStack.addLocalSymbol(varDec->name, Utils::createSymbol(varDec->expr));
 }
 
 void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {
@@ -208,13 +209,6 @@ void SemaAnalyser::resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr
         break;
     default:
         break;
-    }
-}
-
-void SemaAnalyser::checkTypes(LogosVarDec* varDec, LogosType* type) {
-    const auto userType = varDec->userType;
-    if (userType && *userType != type) {
-        printError(101, &varDec->position, *userType, type->name());
     }
 }
 

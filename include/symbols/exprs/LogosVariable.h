@@ -12,7 +12,6 @@ public:
     string getName() override;
     LogosSymbolType getSymbolType() override;
     Value* getLLVMValue(CodeGenMetadata* metadata) override;
-    LogosVariable* asVariable() override;
     ~LogosVariable() override = default;
 };
 

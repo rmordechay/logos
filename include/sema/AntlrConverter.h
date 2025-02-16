@@ -34,7 +34,7 @@ public:
     LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx);
     LogosObjectFile* getObjFile(LogosParser::ObjectFileContext* ctx);
     LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
-    LogosField *getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, int position);
+    LogosField *getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, size_t position);
     LogosUserFunc* getFunc(LogosParser::FuncImplementationContext* ctx);
     LogosStmt* getStmt(LogosParser::StatementContext* ctx);
     LogosFieldDef* getFieldDef(LogosParser::FieldDefContext* ctx);

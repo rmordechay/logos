@@ -2,10 +2,6 @@
 
 #include "funcs/LogosFunc.h"
 
-LogosFuncCall* LogosFuncCall::asFuncCall() {
-    return this;
-}
-
 LogosSymbolType LogosFuncCall::getSymbolType() {
     return FUNC_CALL;
 }

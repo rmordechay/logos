@@ -3,7 +3,7 @@
 #include <llvm/IR/Module.h>
 
 Value* LogosPrint::getLLVMValue(CodeGenMetadata* metadata) {
-    const auto printFuncType = FunctionType::get(metadata->builder->getVoidTy(), metadata->builder->getInt32Ty(), false);
+    const auto printFuncType = FunctionType::get(LOGOS_VOID.llvmType, LOGOS_INT.llvmType, false);
     llvmValue = Function::Create(printFuncType, Function::ExternalLinkage, "printInt");
     return llvmValue;
 }
@@ -24,7 +24,8 @@ Value* LogosPrint::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>&
 
     const vector<Type*> paramTypes = {metadata->builder->getPtrTy(), metadata->builder->getInt32Ty()};
     const auto funcType = FunctionType::get(metadata->builder->getVoidTy(), paramTypes, false);
-    const auto func = metadata->module->getOrInsertFunction(llvmName, funcType);
+    auto func = metadata->module->getOrInsertFunction(llvmName, funcType);
+    func.getCallee()->print(outs());
     llvmValue = metadata->builder->CreateCall(func, llvmArgs);
     return llvmValue;
 }

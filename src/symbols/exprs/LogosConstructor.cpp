@@ -19,7 +19,3 @@ Value* LogosConstructor::getLLVMValue(CodeGenMetadata* metadata) {
     llvmValue = metadata->builder->CreateAlloca(llvmType);
     return llvmValue;
 }
-
-LogosConstructor* LogosConstructor::asConstructor() {
-    return this;
-}

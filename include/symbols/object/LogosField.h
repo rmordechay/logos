@@ -15,7 +15,7 @@ public:
     LogosType* userType = nullptr;
     LogosExpr* expr = nullptr;
 
-    LogosField(const string& name, const string& parentName, LogosType* inferredType, LogosExpr* expr, const int fieldPosition) :
+    LogosField(const string& name, const string& parentName, LogosType* inferredType, LogosExpr* expr, const size_t fieldPosition) :
         name(name),
         parentName(parentName),
         fieldPosition(fieldPosition),

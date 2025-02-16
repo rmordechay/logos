@@ -7,7 +7,7 @@
 class LogosFloat final : public LogosType {
 public:
     Type* llvmType = Type::getFloatTy(context);
-    static constexpr auto typeName = "Float";
+     string typeName = "Float";
 
     const string name() const override;
     Type* getLLVMType() override;

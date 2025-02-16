@@ -1,10 +1,10 @@
 #include "exprs/LogosVariable.h"
 
+#include "exprs/LogosFuncCall.h"
+#include "exprs/LogosSelection.h"
 #include "funcs/LogosFunc.h"
 #include "object/LogosField.h"
 #include "object/LogosObject.h"
-
-#include <llvm/IR/Module.h>
 
 string LogosVariable::getName() {
     return name;
@@ -25,15 +25,14 @@ Value* LogosVariable::getLLVMValue(CodeGenMetadata* metadata) {
         }
         break;
     }
-    case FUNC: {
-        llvmValue = symbol->func->getLLVMValue(metadata);
+    case FUNC_CALL: {
+        llvmValue = symbol->funcCall->getLLVMValue(metadata);
         return llvmValue;
+    }
+    case SELECTION: {
+        return symbol->selection->getLLVMValue(metadata);
     }
     default: break;
     }
     return nullptr;
-}
-
-LogosVariable* LogosVariable::asVariable() {
-    return this;
 }

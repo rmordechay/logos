@@ -1,5 +1,7 @@
 #include "stmts/LogosVarDec.h"
 
+#include "LogosUtils.h"
+
 Value* LogosVarDec::getLLVMValue(CodeGenMetadata* metadata) {
     if (llvmValue) return llvmValue;
     const auto value = expr->getLLVMValue(metadata);
@@ -9,7 +11,8 @@ Value* LogosVarDec::getLLVMValue(CodeGenMetadata* metadata) {
         metadata->builder->CreateStore(value, allocaInst);
     }
     llvmValue = value;
-    metadata->theStack->addLocalSymbol(name, expr->createSymbol());
+    auto symbol = Utils::createSymbol(expr);
+    metadata->theStack->addLocalSymbol(name, symbol);
     return value;
 }
 

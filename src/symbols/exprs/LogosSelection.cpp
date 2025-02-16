@@ -1,20 +1,31 @@
 #include "exprs/LogosSelection.h"
 
 #include "LogosUtils.h"
+#include "exprs/LogosConstant.h"
 #include "exprs/LogosFuncCall.h"
 #include "funcs/LogosUserFunc.h"
 
-Value *resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
+Value* LogosSelection::getLLVMValue(CodeGenMetadata* metadata) {
+    if (llvmValue) return llvmValue;
+    Value* value = nullptr;
+    for (size_t i = 0; i < exprs.size() - 1; ++i) {
+        const auto previousExpr = exprs[i];
+        const auto nextExpr = exprs[i + 1];
+        value = resolveSelection(metadata, previousExpr, nextExpr);
+    }
+    llvmValue = value;
+    return llvmValue;
+}
+
+Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
     const auto symbol = metadata->theStack->getSymbol(previousExpr->getName());
     switch (symbol->type) {
     case FIELD:
         break;
     case CONSTRUCTOR: {
         const auto obj = symbol->constructor->obj;
-        const auto funcCall = obj->funcs[nextExpr->getName()];
-        funcCall->getLLVMValue(metadata);
-        metadata->theStack->addGlobalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
-        break;
+        const auto func = obj->funcs[nextExpr->getName()];
+        return func->callFunc(metadata);
     }
     case FUNC_CALL: {
         const auto funcCall = symbol->funcCall;
@@ -29,18 +40,6 @@ Value *resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr,
         break;
     }
     return nullptr;
-}
-
-Value* LogosSelection::getLLVMValue(CodeGenMetadata* metadata) {
-    if (llvmValue) return llvmValue;
-    Value* v = nullptr;
-    for (size_t i = 0; i < exprs.size() - 1; ++i) {
-        const auto previousExpr = exprs[i];
-        const auto nextExpr = exprs[i + 1];
-        v = resolveSelection(metadata, previousExpr, nextExpr);
-    }
-    llvmValue = v;
-    return llvmValue;
 }
 
 LogosSymbolType LogosSelection::getSymbolType() {

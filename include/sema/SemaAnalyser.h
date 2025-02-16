@@ -48,7 +48,6 @@ public:
     void setUnsuccessful();
     void resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr);
     LogosType* inferSelectionType(const LogosSelection* selection);
-    void checkTypes(LogosVarDec* varDec, LogosType* type);
     template <class ... Args>
     void printError(int errCode, Position *position, Args&&... args);
     ~SemaAnalyser();

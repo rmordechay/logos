@@ -13,7 +13,6 @@ public:
     string getName() override;
     LogosSymbolType getSymbolType() override;
     Value* getLLVMValue(CodeGenMetadata* metadata) override;
-    LogosConstructor* asConstructor() override;
     ~LogosConstructor() override = default;
 };
 

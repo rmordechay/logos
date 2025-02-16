@@ -7,7 +7,7 @@
 class LogosVoid final : public LogosType {
 public:
     Type* llvmType = Type::getVoidTy(context);
-    static constexpr auto typeName = "Void";
+    string typeName = "Void";
 
     const string name() const override;
     Type* getLLVMType() override;

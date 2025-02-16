@@ -52,12 +52,13 @@ LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
     for (const auto& func : ctx->funcImplementation()) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         const auto userFunc = getFunc(func);
+        userFunc->parentName = objName;
         obj->funcs[funcName] = userFunc;
     }
     return obj;
 }
 
-LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, const int position) {
+LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, const size_t position) {
     const auto name = varDec->VARIABLE()->getText();
     const auto type = getType(varDec->TYPE());
     const auto expr = getExpr(varDec->expr());

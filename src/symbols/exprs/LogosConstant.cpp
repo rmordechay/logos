@@ -16,7 +16,3 @@ Value* LogosConstant::getLLVMValue(CodeGenMetadata* metadata) {
     }
     return nullptr;
 }
-
-LogosConstant* LogosConstant::asConstant() {
-    return this;
-}
