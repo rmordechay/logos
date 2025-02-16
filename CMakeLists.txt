@@ -23,6 +23,7 @@ target_include_directories(logos PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/application"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/files"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/codegen"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/sema"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/symbols"
