@@ -16,8 +16,6 @@ public:
     LogosStmtBlock* stmtBlock = nullptr;
 
     explicit LogosFunc(const string& name, LogosType* funcType) : name(name), type(funcType) {}
-    virtual FunctionCallee getFuncCallee(CodeGenMetadata* metadata) = 0;
-    virtual vector<Value*> getArgs(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) = 0;
     virtual Value* callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) = 0;
     ~LogosFunc() override;
 };

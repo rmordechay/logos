@@ -9,31 +9,20 @@ Value* LogosPrint::getLLVMValue(CodeGenMetadata* metadata) {
 }
 
 Value* LogosPrint::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
-    const auto llvmArgs = getArgs(metadata, args);
-    const auto func = getFuncCallee(metadata);
-    llvmValue = metadata->builder->CreateCall(func, llvmArgs);
-    return llvmValue;
-}
-
-FunctionCallee LogosPrint::getFuncCallee(CodeGenMetadata* metadata) {
-    const vector<Type*> paramTypes = {metadata->builder->getPtrTy(), metadata->builder->getInt32Ty()};
-    const auto funcType = FunctionType::get(metadata->builder->getVoidTy(), paramTypes, false);
-    auto func = metadata->module->getOrInsertFunction("printInt", funcType);
-    return func;
-}
-
-vector<Value*> LogosPrint::getArgs(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
-    const auto arg = args[0];
-    const auto llvmValue = arg->getLLVMValue(metadata);
-
+    const auto argValue = args[0]->getLLVMValue(metadata);
     vector<Value*> llvmArgs;
     string str;
     Constant* llvmStr;
-    if (const auto constInt = dyn_cast<ConstantInt>(llvmValue)) {
+    if (const auto constInt = dyn_cast<ConstantInt>(argValue)) {
         str = std::to_string(constInt->getSExtValue());
         llvmStr = metadata->builder->CreateGlobalStringPtr(str);
     }
     llvmArgs.emplace_back(llvmStr);
     llvmArgs.emplace_back(metadata->builder->getInt32(str.size()));
-    return llvmArgs;
+
+    const vector<Type*> paramTypes = {metadata->builder->getPtrTy(), metadata->builder->getInt32Ty()};
+    const auto funcType = FunctionType::get(metadata->builder->getVoidTy(), paramTypes, false);
+    const auto func = metadata->module->getOrInsertFunction("printInt", funcType);
+    llvmValue = metadata->builder->CreateCall(func, llvmArgs);
+    return llvmValue;
 }
