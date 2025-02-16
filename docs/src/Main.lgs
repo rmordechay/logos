@@ -2,5 +2,5 @@ main() {
     obj = MyObject()
     obj.x = 5
     obj.y = 7
-    a = obj.add()
+    //a = obj.add()
 }

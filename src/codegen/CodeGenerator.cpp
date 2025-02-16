@@ -3,12 +3,6 @@
 #include "funcs/LogosPrint.h"
 #include "funcs/LogosUserFunc.h"
 
-
-const auto LOGOS_LIB_IR_FILE = "../codegen/print.ll";
-const auto LINKED_OBJECT_FILE = "../output.o";
-const auto LINKED_IR_FILE = "../output.ll";
-constexpr auto LLVM_OBJECT_FILE = CodeGenFileType::ObjectFile;
-
 void CodeGenerator::run(const map<string, LogosFile*>& files, LogosStack& theStack) {
     theStack.addGlobalSymbol("print", LogosSymbol(FUNC, new LogosPrint()));
 

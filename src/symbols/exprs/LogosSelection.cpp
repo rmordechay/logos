@@ -9,7 +9,8 @@ Value *resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr,
     case FIELD:
         break;
     case CONSTRUCTOR: {
-        const auto obj = symbol->constructor;
+        const auto obj = symbol->constructor->obj;
+        metadata->theStack->addGlobalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
         break;
     }
     case FUNC_CALL: {
