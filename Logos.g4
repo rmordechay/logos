@@ -48,14 +48,6 @@ funcBody:
         statementsBlock
     ;
 
-funcCall:
-        VARIABLE LPAREN funcArgList? RPAREN
-    ;
-
-constructorCall:
-        TYPE LPAREN funcArgList? RPAREN
-    ;
-
 paramList:
         explicitVarDec (COMMA explicitVarDec)* COMMA?
     ;
@@ -104,20 +96,33 @@ exprList:
         expr (COMMA expr)* COMMA?
     ;
 
+array:
+        LBRACK expr (COMMA expr)* RBRACK
+    ;
+
 expr:
         left=expr op=(STAR | SLASH) right=expr
     |   left=expr op=(PLUS | MINUS) right=expr
     |   left=expr op=(DOUBLE_EQUAL | LANGLE | RANGLE | GE | LE) right=expr
     |   unaryExpr
-    |   selection
     |   LPAREN left=expr RPAREN
     ;
 
 unaryExpr:
         funcCall
-    |   constructorCall
+    |   constructor
     |   constant
+    |   arrayIndex
+    |   selection
     |   VARIABLE
+    ;
+
+funcCall:
+        VARIABLE LPAREN funcArgList? RPAREN
+    ;
+
+constructor:
+        TYPE LPAREN funcArgList? RPAREN
     ;
 
 constant:
@@ -127,8 +132,19 @@ constant:
     |   STRING
     ;
 
+arrayIndex:
+        (VARIABLE | funcCall) (LBRACK expr RBRACK)*
+    ;
+
+selectionElement:
+        VARIABLE
+    |   funcCall
+    |   constructor
+    |   arrayIndex
+    ;
+
 selection:
-        unaryExpr (DOT unaryExpr)*
+        selectionElement (DOT selectionElement)*
     ;
 
 ifStatement:

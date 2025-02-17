@@ -39,7 +39,7 @@ public:
     LogosSelection* getSelection(LogosParser::SelectionContext* selection);
     LogosExpr* getExpr(LogosParser::ExprContext* ctx);
     LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
-    LogosInstance* getInstance(LogosParser::ConstructorCallContext* ctx);
+    LogosInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     static LogosUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
     static LogosType* getType(antlr4::tree::TerminalNode* type);
