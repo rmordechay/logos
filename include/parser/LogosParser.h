@@ -32,7 +32,7 @@ public:
     RuleFuncArg = 16, RuleFuncArgList = 17, RuleStatement = 18, RuleEnumDeclaration = 19, 
     RuleEnumField = 20, RuleStatementsBlock = 21, RuleExprList = 22, RuleExpr = 23, 
     RuleUnaryExpr = 24, RuleFuncCall = 25, RuleArray = 26, RuleConstructor = 27, 
-    RuleConstant = 28, RuleArrayIndex = 29, RuleSelectionElement = 30, RuleSelection = 31, 
+    RuleConstant = 28, RuleArrayIndex = 29, RuleSelection = 30, RuleSelectionElement = 31, 
     RuleIfStatement = 32, RuleElseStatement = 33, RulePatternMatching = 34, 
     RulePattern = 35, RuleLoopStatement = 36, RuleControlFlow = 37, RuleReturnStatement = 38, 
     RuleRange = 39
@@ -85,8 +85,8 @@ public:
   class ConstructorContext;
   class ConstantContext;
   class ArrayIndexContext;
-  class SelectionElementContext;
   class SelectionContext;
+  class SelectionElementContext;
   class IfStatementContext;
   class ElseStatementContext;
   class PatternMatchingContext;
@@ -532,8 +532,8 @@ public:
   public:
     ArrayIndexContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *VARIABLE();
     FuncCallContext *funcCall();
+    antlr4::tree::TerminalNode *VARIABLE();
     std::vector<antlr4::tree::TerminalNode *> LBRACK();
     antlr4::tree::TerminalNode* LBRACK(size_t i);
     std::vector<ExprContext *> expr();
@@ -545,20 +545,6 @@ public:
   };
 
   ArrayIndexContext* arrayIndex();
-
-  class  SelectionElementContext : public antlr4::ParserRuleContext {
-  public:
-    SelectionElementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *VARIABLE();
-    FuncCallContext *funcCall();
-    ConstructorContext *constructor();
-    ArrayIndexContext *arrayIndex();
-
-   
-  };
-
-  SelectionElementContext* selectionElement();
 
   class  SelectionContext : public antlr4::ParserRuleContext {
   public:
@@ -573,6 +559,20 @@ public:
   };
 
   SelectionContext* selection();
+
+  class  SelectionElementContext : public antlr4::ParserRuleContext {
+  public:
+    SelectionElementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *VARIABLE();
+    FuncCallContext *funcCall();
+    ConstructorContext *constructor();
+    ArrayIndexContext *arrayIndex();
+
+   
+  };
+
+  SelectionElementContext* selectionElement();
 
   class  IfStatementContext : public antlr4::ParserRuleContext {
   public:

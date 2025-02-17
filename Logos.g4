@@ -134,7 +134,11 @@ constant:
     ;
 
 arrayIndex:
-        (VARIABLE | funcCall) (LBRACK expr RBRACK)+
+        (funcCall | VARIABLE) (LBRACK expr RBRACK)+
+    ;
+
+selection:
+        selectionElement (DOT selectionElement)*
     ;
 
 selectionElement:
@@ -142,10 +146,6 @@ selectionElement:
     |   funcCall
     |   constructor
     |   arrayIndex
-    ;
-
-selection:
-        selectionElement (DOT selectionElement)*
     ;
 
 ifStatement:

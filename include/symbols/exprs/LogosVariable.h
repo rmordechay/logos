@@ -7,8 +7,7 @@ class LogosVariable final :  public LogosUnaryExpr {
 public:
     std::string name;
 
-    explicit LogosVariable(const std::string& name, LogosType* variableType) : LogosUnaryExpr(variableType), name(name) {}
-    explicit LogosVariable(const std::string& name) : LogosVariable(name, nullptr) {}
+    explicit LogosVariable(const std::string& name) : LogosUnaryExpr(nullptr), name(name) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     LogosSymbolType getSymbolType() override;
     string getName() override;

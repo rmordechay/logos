@@ -1,7 +1,7 @@
 #include "exprs/LogosArrayIndex.h"
 
 Value* LogosArrayIndex::computeIRValue(CodeGenMetadata* metadata) {
-
+    return nullptr;
 }
 
 LogosSymbolType LogosArrayIndex::getSymbolType() {
@@ -9,4 +9,5 @@ LogosSymbolType LogosArrayIndex::getSymbolType() {
 }
 
 string LogosArrayIndex::getName() {
+
 }

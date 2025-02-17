@@ -65,7 +65,8 @@ LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
     return obj;
 }
 
-LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, const size_t position) {
+LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName,
+                                      const size_t position) {
     const auto name = varDec->VARIABLE()->getText();
     const auto type = getType(varDec->TYPE());
     const auto expr = getExpr(varDec->expr());
@@ -91,7 +92,7 @@ LogosUserFunc* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* 
 
 LogosStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
     vector<LogosStmt*> stmts;
-    for (const auto& statement: ctx->statement()) {
+    for (const auto& statement : ctx->statement()) {
         auto stmt = getStmt(statement);
         stmts.emplace_back(stmt);
     }
@@ -177,9 +178,7 @@ LogosExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
 
 LogosUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto variable = ctx->VARIABLE()) {
-        const auto logosVariable = new LogosVariable(variable->getText());
-        logosVariable->setPosition(ctx->start, filePath);
-        return logosVariable;
+        return getVariable(variable->getText(), ctx);
     }
 
     if (const auto constant = ctx->constant()) {
@@ -215,17 +214,21 @@ LogosExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
 
 LogosExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
     const auto logosArray = new LogosArray();
-    for (const auto &expr : ctx->expr()) {
+    for (const auto& expr : ctx->expr()) {
         logosArray->exprs.emplace_back(getExpr(expr));
     }
     return logosArray;
 }
 
+LogosVariable* AntlerConverter::getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) const {
+    const auto logosVariable = new LogosVariable(varName);
+    logosVariable->setPosition(ctx->start, filePath);
+    return logosVariable;
+}
+
 LogosUnaryExpr* AntlerConverter::getSelectionElementExpr(LogosParser::SelectionElementContext* ctx) {
     if (const auto variable = ctx->VARIABLE()) {
-        const auto logosVariable = new LogosVariable(variable->getText());
-        logosVariable->setPosition(ctx->start, filePath);
-        return logosVariable;
+        return getVariable(variable->getText(), ctx);
     }
 
     if (const auto constructor = ctx->constructor()) {
@@ -279,9 +282,18 @@ LogosInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx
 }
 
 LogosArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ctx) {
-    const auto arrayIndex = new LogosArrayIndex();
+    LogosUnaryExpr* baseExpr;
+    if (const auto variable = ctx->VARIABLE()) {
+        baseExpr = getVariable(variable->getText(), ctx);
+    } else {
+        baseExpr = getFuncCall(ctx->funcCall());
+    }
+    const auto logosArrayIndex = new LogosArrayIndex(baseExpr);
 
-    return arrayIndex;
+    for (const auto& expr : ctx->expr()) {
+        logosArrayIndex->exprs.emplace_back(getExpr(expr));
+    }
+    return logosArrayIndex;
 }
 
 LogosUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {

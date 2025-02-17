@@ -7,8 +7,10 @@
 
 class LogosArrayIndex final : public LogosUnaryExpr {
 public:
+    LogosUnaryExpr* baseExpr;
+    vector<LogosExpr*> exprs;
 
-
+    explicit LogosArrayIndex(LogosUnaryExpr* baseExpr) : baseExpr(baseExpr) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     LogosSymbolType getSymbolType() override;
     string getName() override;

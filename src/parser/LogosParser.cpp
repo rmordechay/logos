@@ -57,7 +57,7 @@ void logosParserInitialize() {
       "implicitVarDec", "fieldDef", "funcArg", "funcArgList", "statement", 
       "enumDeclaration", "enumField", "statementsBlock", "exprList", "expr", 
       "unaryExpr", "funcCall", "array", "constructor", "constant", "arrayIndex", 
-      "selectionElement", "selection", "ifStatement", "elseStatement", "patternMatching", 
+      "selection", "selectionElement", "ifStatement", "elseStatement", "patternMatching", 
       "pattern", "loopStatement", "controlFlow", "returnStatement", "range"
     },
     std::vector<std::string>{
@@ -106,7 +106,7 @@ void logosParserInitialize() {
   	25,1,25,1,26,1,26,1,26,1,26,5,26,321,8,26,10,26,12,26,324,9,26,1,26,1,
   	26,1,27,1,27,1,27,3,27,331,8,27,1,27,1,27,1,28,1,28,1,29,1,29,3,29,339,
   	8,29,1,29,1,29,1,29,1,29,4,29,345,8,29,11,29,12,29,346,1,30,1,30,1,30,
-  	1,30,3,30,353,8,30,1,31,1,31,1,31,5,31,358,8,31,10,31,12,31,361,9,31,
+  	5,30,352,8,30,10,30,12,30,355,9,30,1,31,1,31,1,31,1,31,3,31,361,8,31,
   	1,32,1,32,1,32,1,32,1,32,1,32,3,32,369,8,32,1,33,1,33,1,33,1,33,5,33,
   	375,8,33,10,33,12,33,378,9,33,1,33,1,33,3,33,382,8,33,1,34,1,34,3,34,
   	386,8,34,1,34,1,34,5,34,390,8,34,10,34,12,34,393,9,34,1,34,1,34,1,34,
@@ -122,7 +122,7 @@ void logosParserInitialize() {
   	199,1,0,0,0,30,203,1,0,0,0,32,216,1,0,0,0,34,220,1,0,0,0,36,240,1,0,0,
   	0,38,242,1,0,0,0,40,253,1,0,0,0,42,258,1,0,0,0,44,267,1,0,0,0,46,285,
   	1,0,0,0,48,307,1,0,0,0,50,309,1,0,0,0,52,316,1,0,0,0,54,327,1,0,0,0,56,
-  	334,1,0,0,0,58,338,1,0,0,0,60,352,1,0,0,0,62,354,1,0,0,0,64,368,1,0,0,
+  	334,1,0,0,0,58,338,1,0,0,0,60,348,1,0,0,0,62,360,1,0,0,0,64,368,1,0,0,
   	0,66,376,1,0,0,0,68,383,1,0,0,0,70,401,1,0,0,0,72,422,1,0,0,0,74,429,
   	1,0,0,0,76,431,1,0,0,0,78,435,1,0,0,0,80,82,3,8,4,0,81,80,1,0,0,0,81,
   	82,1,0,0,0,82,83,1,0,0,0,83,87,3,2,1,0,84,87,3,4,2,0,85,87,3,6,3,0,86,
@@ -186,7 +186,7 @@ void logosParserInitialize() {
   	5,296,287,1,0,0,0,296,290,1,0,0,0,296,293,1,0,0,0,297,300,1,0,0,0,298,
   	296,1,0,0,0,298,299,1,0,0,0,299,47,1,0,0,0,300,298,1,0,0,0,301,308,3,
   	50,25,0,302,308,3,54,27,0,303,308,3,56,28,0,304,308,3,58,29,0,305,308,
-  	3,62,31,0,306,308,5,47,0,0,307,301,1,0,0,0,307,302,1,0,0,0,307,303,1,
+  	3,60,30,0,306,308,5,47,0,0,307,301,1,0,0,0,307,302,1,0,0,0,307,303,1,
   	0,0,0,307,304,1,0,0,0,307,305,1,0,0,0,307,306,1,0,0,0,308,49,1,0,0,0,
   	309,310,5,47,0,0,310,312,5,4,0,0,311,313,3,34,17,0,312,311,1,0,0,0,312,
   	313,1,0,0,0,313,314,1,0,0,0,314,315,5,5,0,0,315,51,1,0,0,0,316,317,5,
@@ -195,14 +195,14 @@ void logosParserInitialize() {
   	324,322,1,0,0,0,325,326,5,9,0,0,326,53,1,0,0,0,327,328,5,46,0,0,328,330,
   	5,4,0,0,329,331,3,34,17,0,330,329,1,0,0,0,330,331,1,0,0,0,331,332,1,0,
   	0,0,332,333,5,5,0,0,333,55,1,0,0,0,334,335,7,3,0,0,335,57,1,0,0,0,336,
-  	339,5,47,0,0,337,339,3,50,25,0,338,336,1,0,0,0,338,337,1,0,0,0,339,344,
+  	339,3,50,25,0,337,339,5,47,0,0,338,336,1,0,0,0,338,337,1,0,0,0,339,344,
   	1,0,0,0,340,341,5,8,0,0,341,342,3,46,23,0,342,343,5,9,0,0,343,345,1,0,
   	0,0,344,340,1,0,0,0,345,346,1,0,0,0,346,344,1,0,0,0,346,347,1,0,0,0,347,
-  	59,1,0,0,0,348,353,5,47,0,0,349,353,3,50,25,0,350,353,3,54,27,0,351,353,
-  	3,58,29,0,352,348,1,0,0,0,352,349,1,0,0,0,352,350,1,0,0,0,352,351,1,0,
-  	0,0,353,61,1,0,0,0,354,359,3,60,30,0,355,356,5,14,0,0,356,358,3,60,30,
-  	0,357,355,1,0,0,0,358,361,1,0,0,0,359,357,1,0,0,0,359,360,1,0,0,0,360,
-  	63,1,0,0,0,361,359,1,0,0,0,362,363,5,32,0,0,363,364,3,46,23,0,364,365,
+  	59,1,0,0,0,348,353,3,62,31,0,349,350,5,14,0,0,350,352,3,62,31,0,351,349,
+  	1,0,0,0,352,355,1,0,0,0,353,351,1,0,0,0,353,354,1,0,0,0,354,61,1,0,0,
+  	0,355,353,1,0,0,0,356,361,5,47,0,0,357,361,3,50,25,0,358,361,3,54,27,
+  	0,359,361,3,58,29,0,360,356,1,0,0,0,360,357,1,0,0,0,360,358,1,0,0,0,360,
+  	359,1,0,0,0,361,63,1,0,0,0,362,363,5,32,0,0,363,364,3,46,23,0,364,365,
   	3,42,21,0,365,366,3,66,33,0,366,369,1,0,0,0,367,369,3,68,34,0,368,362,
   	1,0,0,0,368,367,1,0,0,0,369,65,1,0,0,0,370,371,5,33,0,0,371,372,3,46,
   	23,0,372,373,3,42,21,0,373,375,1,0,0,0,374,370,1,0,0,0,375,378,1,0,0,
@@ -225,7 +225,7 @@ void logosParserInitialize() {
   	77,1,0,0,0,434,436,3,46,23,0,435,434,1,0,0,0,435,436,1,0,0,0,436,437,
   	1,0,0,0,437,438,5,13,0,0,438,439,3,46,23,0,439,79,1,0,0,0,48,81,86,91,
   	97,102,108,115,120,126,131,141,151,169,174,186,190,197,208,216,225,229,
-  	240,248,256,262,272,276,285,296,298,307,312,322,330,338,346,352,359,368,
+  	240,248,256,262,272,276,285,296,298,307,312,322,330,338,346,353,360,368,
   	376,381,385,391,397,407,422,429,435
   };
   staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
@@ -2598,12 +2598,12 @@ LogosParser::ArrayIndexContext::ArrayIndexContext(ParserRuleContext *parent, siz
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* LogosParser::ArrayIndexContext::VARIABLE() {
-  return getToken(LogosParser::VARIABLE, 0);
-}
-
 LogosParser::FuncCallContext* LogosParser::ArrayIndexContext::funcCall() {
   return getRuleContext<LogosParser::FuncCallContext>(0);
+}
+
+tree::TerminalNode* LogosParser::ArrayIndexContext::VARIABLE() {
+  return getToken(LogosParser::VARIABLE, 0);
 }
 
 std::vector<tree::TerminalNode *> LogosParser::ArrayIndexContext::LBRACK() {
@@ -2655,13 +2655,13 @@ LogosParser::ArrayIndexContext* LogosParser::arrayIndex() {
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 34, _ctx)) {
     case 1: {
       setState(336);
-      match(LogosParser::VARIABLE);
+      funcCall();
       break;
     }
 
     case 2: {
       setState(337);
-      funcCall();
+      match(LogosParser::VARIABLE);
       break;
     }
 
@@ -2690,91 +2690,6 @@ LogosParser::ArrayIndexContext* LogosParser::arrayIndex() {
       _errHandler->sync(this);
       alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 35, _ctx);
     } while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER);
-   
-  }
-  catch (RecognitionException &e) {
-    _errHandler->reportError(this, e);
-    _localctx->exception = std::current_exception();
-    _errHandler->recover(this, _localctx->exception);
-  }
-
-  return _localctx;
-}
-
-//----------------- SelectionElementContext ------------------------------------------------------------------
-
-LogosParser::SelectionElementContext::SelectionElementContext(ParserRuleContext *parent, size_t invokingState)
-  : ParserRuleContext(parent, invokingState) {
-}
-
-tree::TerminalNode* LogosParser::SelectionElementContext::VARIABLE() {
-  return getToken(LogosParser::VARIABLE, 0);
-}
-
-LogosParser::FuncCallContext* LogosParser::SelectionElementContext::funcCall() {
-  return getRuleContext<LogosParser::FuncCallContext>(0);
-}
-
-LogosParser::ConstructorContext* LogosParser::SelectionElementContext::constructor() {
-  return getRuleContext<LogosParser::ConstructorContext>(0);
-}
-
-LogosParser::ArrayIndexContext* LogosParser::SelectionElementContext::arrayIndex() {
-  return getRuleContext<LogosParser::ArrayIndexContext>(0);
-}
-
-
-size_t LogosParser::SelectionElementContext::getRuleIndex() const {
-  return LogosParser::RuleSelectionElement;
-}
-
-
-LogosParser::SelectionElementContext* LogosParser::selectionElement() {
-  SelectionElementContext *_localctx = _tracker.createInstance<SelectionElementContext>(_ctx, getState());
-  enterRule(_localctx, 60, LogosParser::RuleSelectionElement);
-
-#if __cplusplus > 201703L
-  auto onExit = finally([=, this] {
-#else
-  auto onExit = finally([=] {
-#endif
-    exitRule();
-  });
-  try {
-    setState(352);
-    _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 36, _ctx)) {
-    case 1: {
-      enterOuterAlt(_localctx, 1);
-      setState(348);
-      match(LogosParser::VARIABLE);
-      break;
-    }
-
-    case 2: {
-      enterOuterAlt(_localctx, 2);
-      setState(349);
-      funcCall();
-      break;
-    }
-
-    case 3: {
-      enterOuterAlt(_localctx, 3);
-      setState(350);
-      constructor();
-      break;
-    }
-
-    case 4: {
-      enterOuterAlt(_localctx, 4);
-      setState(351);
-      arrayIndex();
-      break;
-    }
-
-    default:
-      break;
-    }
    
   }
   catch (RecognitionException &e) {
@@ -2816,7 +2731,7 @@ size_t LogosParser::SelectionContext::getRuleIndex() const {
 
 LogosParser::SelectionContext* LogosParser::selection() {
   SelectionContext *_localctx = _tracker.createInstance<SelectionContext>(_ctx, getState());
-  enterRule(_localctx, 62, LogosParser::RuleSelection);
+  enterRule(_localctx, 60, LogosParser::RuleSelection);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -2828,21 +2743,106 @@ LogosParser::SelectionContext* LogosParser::selection() {
   try {
     size_t alt;
     enterOuterAlt(_localctx, 1);
-    setState(354);
+    setState(348);
     selectionElement();
-    setState(359);
+    setState(353);
     _errHandler->sync(this);
-    alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 37, _ctx);
+    alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 36, _ctx);
     while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER) {
       if (alt == 1) {
-        setState(355);
+        setState(349);
         match(LogosParser::DOT);
-        setState(356);
+        setState(350);
         selectionElement(); 
       }
-      setState(361);
+      setState(355);
       _errHandler->sync(this);
-      alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 37, _ctx);
+      alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 36, _ctx);
+    }
+   
+  }
+  catch (RecognitionException &e) {
+    _errHandler->reportError(this, e);
+    _localctx->exception = std::current_exception();
+    _errHandler->recover(this, _localctx->exception);
+  }
+
+  return _localctx;
+}
+
+//----------------- SelectionElementContext ------------------------------------------------------------------
+
+LogosParser::SelectionElementContext::SelectionElementContext(ParserRuleContext *parent, size_t invokingState)
+  : ParserRuleContext(parent, invokingState) {
+}
+
+tree::TerminalNode* LogosParser::SelectionElementContext::VARIABLE() {
+  return getToken(LogosParser::VARIABLE, 0);
+}
+
+LogosParser::FuncCallContext* LogosParser::SelectionElementContext::funcCall() {
+  return getRuleContext<LogosParser::FuncCallContext>(0);
+}
+
+LogosParser::ConstructorContext* LogosParser::SelectionElementContext::constructor() {
+  return getRuleContext<LogosParser::ConstructorContext>(0);
+}
+
+LogosParser::ArrayIndexContext* LogosParser::SelectionElementContext::arrayIndex() {
+  return getRuleContext<LogosParser::ArrayIndexContext>(0);
+}
+
+
+size_t LogosParser::SelectionElementContext::getRuleIndex() const {
+  return LogosParser::RuleSelectionElement;
+}
+
+
+LogosParser::SelectionElementContext* LogosParser::selectionElement() {
+  SelectionElementContext *_localctx = _tracker.createInstance<SelectionElementContext>(_ctx, getState());
+  enterRule(_localctx, 62, LogosParser::RuleSelectionElement);
+
+#if __cplusplus > 201703L
+  auto onExit = finally([=, this] {
+#else
+  auto onExit = finally([=] {
+#endif
+    exitRule();
+  });
+  try {
+    setState(360);
+    _errHandler->sync(this);
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 37, _ctx)) {
+    case 1: {
+      enterOuterAlt(_localctx, 1);
+      setState(356);
+      match(LogosParser::VARIABLE);
+      break;
+    }
+
+    case 2: {
+      enterOuterAlt(_localctx, 2);
+      setState(357);
+      funcCall();
+      break;
+    }
+
+    case 3: {
+      enterOuterAlt(_localctx, 3);
+      setState(358);
+      constructor();
+      break;
+    }
+
+    case 4: {
+      enterOuterAlt(_localctx, 4);
+      setState(359);
+      arrayIndex();
+      break;
+    }
+
+    default:
+      break;
     }
    
   }

@@ -1,7 +1,7 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
-#include "exprs/LogosArrayIndex.h"
 
+class LogosArrayIndex;
 class LogosArray;
 class LogosSelection;
 class LogosBinaryExpr;
