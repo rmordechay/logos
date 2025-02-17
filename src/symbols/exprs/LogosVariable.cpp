@@ -4,7 +4,6 @@
 #include "exprs/LogosSelection.h"
 #include "funcs/LogosFunc.h"
 #include "object/LogosField.h"
-#include "object/LogosObject.h"
 
 Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->theStack->getSymbol(name);

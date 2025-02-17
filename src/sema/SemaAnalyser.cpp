@@ -7,6 +7,8 @@
 #include "stmts/LogosFieldDef.h"
 
 #include <format>
+#include <exprs/LogosArray.h>
+#include <exprs/LogosConstant.h>
 #include <stmts/LogosLoop.h>
 
 bool SemaAnalyser::analyse() {
@@ -36,8 +38,7 @@ void SemaAnalyser::collectGlobals() {
 void SemaAnalyser::visitLogosFile(LogosFile* file) {
     if (const auto mainFile = dynamic_cast<LogosMainFile*>(file)) {
         visitMainFile(mainFile);
-    }
-    if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
+    } else if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
         visitObjectFile(objFile);
     }
 }
@@ -80,19 +81,15 @@ void SemaAnalyser::visitUserFunc(const LogosUserFunc* func) {
 }
 
 
-
 void SemaAnalyser::visitStmt(LogosStmt* stmt) {
     if (!stmt) return;
     if (const auto varDec = dynamic_cast<LogosVarDec*>(stmt)) {
         visitVarDec(varDec);
-    }
-    if (const auto ifStmt = dynamic_cast<LogosIf*>(stmt)) {
+    } else if (const auto ifStmt = dynamic_cast<LogosIf*>(stmt)) {
         visitIfStmt(ifStmt);
-    }
-    if (const auto loopStmt = dynamic_cast<LogosLoop*>(stmt)) {
+    } else if (const auto loopStmt = dynamic_cast<LogosLoop*>(stmt)) {
         visitLoopStmt(loopStmt);
-    }
-    if (const auto fieldDef = dynamic_cast<LogosFieldDefinition*>(stmt)) {
+    } else if (const auto fieldDef = dynamic_cast<LogosFieldDefinition*>(stmt)) {
         visitFieldDef(fieldDef);
     }
 }
@@ -136,22 +133,31 @@ void SemaAnalyser::visitExpr(LogosExpr* expr) {
     if (!expr) return;
     if (const auto unaryExpr = dynamic_cast<LogosUnaryExpr*>(expr)) {
         visitUnaryExpr(unaryExpr);
-    }
-    if (const auto binaryExpr = dynamic_cast<LogosBinaryExpr*>(expr)) {
+    } else if (const auto binaryExpr = dynamic_cast<LogosBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
+    } else if (const auto array = dynamic_cast<LogosArray*>(expr)) {
+        visitArray(array);
     }
-    if (const auto selection = dynamic_cast<LogosSelection*>(expr)) {
-        visitSelection(selection);
+}
+
+void SemaAnalyser::visitArray(const LogosArray* array) {
+    for (const auto& element : array->elements) {
+        visitExpr(element);
     }
+    // TODO add check for array type
+    array->type = array->elements[0]->type;
 }
 
 void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
     if (!unaryExpr) return;
     if (const auto instance = dynamic_cast<LogosInstance*>(unaryExpr)) {
         visitInstance(instance);
-    }
-    if (const auto funcCall = dynamic_cast<LogosFuncCall*>(unaryExpr)) {
+    } else if (const auto funcCall = dynamic_cast<LogosFuncCall*>(unaryExpr)) {
         visitFuncCall(funcCall);
+    } else if (const auto selection = dynamic_cast<LogosSelection*>(unaryExpr)) {
+        visitSelection(selection);
+    } else if (const auto constant = dynamic_cast<LogosConstant*>(unaryExpr)) {
+        visitConstant(constant);
     }
 }
 
@@ -171,12 +177,16 @@ void SemaAnalyser::visitInstance(LogosInstance* instance) {
     instance->obj = obj;
 }
 
-void SemaAnalyser::visitFuncCall(const LogosFuncCall* funcCallExpr) {
-    if (!funcCallExpr) return;
+void SemaAnalyser::visitArrayIndex(LogosArrayIndex* arrayIndex) {
+
 }
 
-void SemaAnalyser::visitConstant(const LogosUnaryExpr* unaryExpr) {
-    if (!unaryExpr) return;
+void SemaAnalyser::visitFuncCall(const LogosFuncCall* funcCallExpr) {
+
+}
+
+void SemaAnalyser::visitConstant(const LogosConstant* constant) {
+
 }
 
 void SemaAnalyser::setUnsuccessful() {
@@ -192,7 +202,8 @@ LogosType* SemaAnalyser::inferSelectionType(const LogosSelection* selection) {
         resolveSelection(previousExpr, nextExpr);
         previousExpr = nextExpr;
     }
-    if (nextExpr) { // If true, nextExpr is the last element
+    if (nextExpr) {
+        // If true, nextExpr is the last element
         selection->type = nextExpr->type;
     }
     return nullptr;
@@ -215,18 +226,28 @@ void SemaAnalyser::resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr
         break;
     case CONSTANT:
         break;
-    default:
+    case BINARY_EXPR:
+        break;
+    case OBJECT:
+        break;
+    case FUNC:
+        break;
+    case SELECTION:
+        break;
+    case ARRAY:
+        break;
+    case ARRAY_INDEX:
         break;
     }
 }
 
 template <typename... Args>
-void SemaAnalyser::printError(const int errCode, Position *position, Args&&... args) {
+void SemaAnalyser::printError(const int errCode, Position* position, Args&&... args) {
     setUnsuccessful();
     const auto msgPair = LOGOS_ERRORS.find(errCode);
     // const auto formattedMessage = std::vformat(msgPair->second, std::make_format_args(args...));
     if (position) {
-        cout <<  std::format("Error at {} {} {}: \n", *position->filePath, position->lineNumber, position->posInLine);
+        cout << std::format("Error at {} {} {}: \n", *position->filePath, position->lineNumber, position->posInLine);
     } else {
         // cout << formattedMessage << endl;
     }

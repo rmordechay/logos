@@ -2,5 +2,5 @@
 /cmake-build*
 /examples
 /external/lib
-/llvm-examples/
-/project-example/
+/sandbox/
+/project/

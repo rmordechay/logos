@@ -42,12 +42,14 @@ public:
     void visitIfStmt(const LogosIf* ifStmt);
     void visitLoopStmt(const LogosLoop* loopStmt);
     void visitExpr(LogosExpr* expr);
+    void visitArray(const LogosArray* array);
     void visitUnaryExpr(LogosUnaryExpr* unaryExpr);
     void visitBinaryExpr(const LogosBinaryExpr* binaryExpr);
+    void visitFuncCall(const LogosFuncCall* funcCallExpr);
     void visitSelection(const LogosSelection* selection);
     void visitInstance(LogosInstance* instance);
-    void visitFuncCall(const LogosFuncCall* funcCallExpr);
-    void visitConstant(const LogosUnaryExpr* unaryExpr);
+    void visitArrayIndex(LogosArrayIndex* arrayIndex);
+    void visitConstant(const LogosConstant* constant);
     void setUnsuccessful();
     void resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr);
     LogosType* inferSelectionType(const LogosSelection* selection);

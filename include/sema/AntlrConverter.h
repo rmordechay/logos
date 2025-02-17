@@ -37,13 +37,13 @@ public:
     LogosVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LogosIf* getIfStatement(LogosParser::IfStatementContext* ctx);
     LogosLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
-    LogosSelection* getSelection(LogosParser::SelectionContext* selection);
     LogosExpr* getExpr(LogosParser::ExprContext* ctx);
     LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     LogosExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     LogosExpr* getArray(LogosParser::ArrayContext* ctx);
     LogosVariable* getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) const;
     LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
+    LogosSelection* getSelection(LogosParser::SelectionContext* selection);
     LogosUnaryExpr* getSelectionElementExpr(LogosParser::SelectionElementContext* ctx);
     LogosInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LogosArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);

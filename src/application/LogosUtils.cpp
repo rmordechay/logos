@@ -6,6 +6,9 @@
 #include "exprs/LogosSelection.h"
 #include "object/LogosField.h"
 
+#include <exprs/LogosArray.h>
+#include <exprs/LogosArrayIndex.h>
+
 using namespace std;
 
 bool Utils::isLogosFile(const filesystem::directory_entry& filePath) {
@@ -37,6 +40,10 @@ LogosSymbol Utils::createSymbol(LogosExpr* expr) {
         return LogosSymbol(type, dynamic_cast<LogosBinaryExpr*>(expr));
     case SELECTION:
         return LogosSymbol(type, dynamic_cast<LogosSelection*>(expr));
+    case ARRAY:
+        return LogosSymbol(type, dynamic_cast<LogosArray*>(expr));
+    case ARRAY_INDEX:
+        return LogosSymbol(type, dynamic_cast<LogosArrayIndex*>(expr));
     }
     return LogosSymbol();
 }

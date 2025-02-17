@@ -5,7 +5,7 @@
 
 class LogosArray final : public LogosExpr {
 public:
-    vector<LogosExpr*> exprs;
+    vector<LogosExpr*> elements;
 
     explicit LogosArray() : LogosExpr(nullptr) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;

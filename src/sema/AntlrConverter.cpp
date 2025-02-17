@@ -215,7 +215,7 @@ LogosExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
 LogosExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
     const auto logosArray = new LogosArray();
     for (const auto& expr : ctx->expr()) {
-        logosArray->exprs.emplace_back(getExpr(expr));
+        logosArray->elements.emplace_back(getExpr(expr));
     }
     return logosArray;
 }
@@ -224,22 +224,6 @@ LogosVariable* AntlerConverter::getVariable(const string& varName, const antlr4:
     const auto logosVariable = new LogosVariable(varName);
     logosVariable->setPosition(ctx->start, filePath);
     return logosVariable;
-}
-
-LogosUnaryExpr* AntlerConverter::getSelectionElementExpr(LogosParser::SelectionElementContext* ctx) {
-    if (const auto variable = ctx->VARIABLE()) {
-        return getVariable(variable->getText(), ctx);
-    }
-
-    if (const auto constructor = ctx->constructor()) {
-        return getInstance(constructor);
-    }
-
-    if (const auto funcCall = ctx->funcCall()) {
-        return getFuncCall(funcCall);
-    }
-
-    return nullptr;
 }
 
 LogosFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
@@ -264,6 +248,22 @@ LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* sel
         exprs.emplace_back(expr);
     }
     return new LogosSelection(exprs);
+}
+
+LogosUnaryExpr* AntlerConverter::getSelectionElementExpr(LogosParser::SelectionElementContext* ctx) {
+    if (const auto variable = ctx->VARIABLE()) {
+        return getVariable(variable->getText(), ctx);
+    }
+
+    if (const auto constructor = ctx->constructor()) {
+        return getInstance(constructor);
+    }
+
+    if (const auto funcCall = ctx->funcCall()) {
+        return getFuncCall(funcCall);
+    }
+
+    return nullptr;
 }
 
 LogosInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) {
