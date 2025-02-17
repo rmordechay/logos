@@ -1,0 +1,3 @@
+func Int f(Object obj) {
+    return 0
+} -> obj

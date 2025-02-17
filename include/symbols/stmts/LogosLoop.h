@@ -14,7 +14,6 @@ public:
     LogosStmtBlock* stmtBlock = nullptr;
 
     LogosLoop(LogosVariable* loopVar, LogosExpr* iterable, LogosStmtBlock* stmtBlock) : loopVar(loopVar), iterable(iterable), stmtBlock(stmtBlock) {}
-
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     ~LogosLoop() override = default;
 };
