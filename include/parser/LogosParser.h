@@ -27,15 +27,15 @@ public:
     RuleLogosFile = 0, RuleMainFile = 1, RuleObjectFile = 2, RuleInterfaceFile = 3, 
     RuleImportStatement = 4, RuleImportPath = 5, RuleObjectDeclaration = 6, 
     RuleInterfaceDeclaration = 7, RuleObjectImplements = 8, RuleFuncSignature = 9, 
-    RuleFuncImplementation = 10, RuleFuncBody = 11, RuleFuncCall = 12, RuleConstructor = 13, 
-    RuleParamList = 14, RuleExplicitVarDec = 15, RuleImplicitVarDec = 16, 
-    RuleFieldDef = 17, RuleFuncArg = 18, RuleFuncArgList = 19, RuleStatement = 20, 
-    RuleEnumDeclaration = 21, RuleEnumField = 22, RuleStatementsBlock = 23, 
-    RuleExprList = 24, RuleArray = 25, RuleExpr = 26, RuleUnaryExpr = 27, 
-    RuleArrayIndex = 28, RuleConstant = 29, RuleVarOrFunc = 30, RuleSelectionElement = 31, 
-    RuleSelection = 32, RuleIfStatement = 33, RuleElseStatement = 34, RulePatternMatching = 35, 
-    RulePattern = 36, RuleLoopStatement = 37, RuleControlFlow = 38, RuleReturnStatement = 39, 
-    RuleRange = 40
+    RuleFuncImplementation = 10, RuleFuncBody = 11, RuleParamList = 12, 
+    RuleExplicitVarDec = 13, RuleImplicitVarDec = 14, RuleFieldDef = 15, 
+    RuleFuncArg = 16, RuleFuncArgList = 17, RuleStatement = 18, RuleEnumDeclaration = 19, 
+    RuleEnumField = 20, RuleStatementsBlock = 21, RuleExprList = 22, RuleArray = 23, 
+    RuleExpr = 24, RuleUnaryExpr = 25, RuleFuncCall = 26, RuleConstructor = 27, 
+    RuleConstant = 28, RuleArrayIndex = 29, RuleSelectionElement = 30, RuleSelection = 31, 
+    RuleIfStatement = 32, RuleElseStatement = 33, RulePatternMatching = 34, 
+    RulePattern = 35, RuleLoopStatement = 36, RuleControlFlow = 37, RuleReturnStatement = 38, 
+    RuleRange = 39
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -67,8 +67,6 @@ public:
   class FuncSignatureContext;
   class FuncImplementationContext;
   class FuncBodyContext;
-  class FuncCallContext;
-  class ConstructorContext;
   class ParamListContext;
   class ExplicitVarDecContext;
   class ImplicitVarDecContext;
@@ -83,9 +81,10 @@ public:
   class ArrayContext;
   class ExprContext;
   class UnaryExprContext;
-  class ArrayIndexContext;
+  class FuncCallContext;
+  class ConstructorContext;
   class ConstantContext;
-  class VarOrFuncContext;
+  class ArrayIndexContext;
   class SelectionElementContext;
   class SelectionContext;
   class IfStatementContext;
@@ -266,34 +265,6 @@ public:
   };
 
   FuncBodyContext* funcBody();
-
-  class  FuncCallContext : public antlr4::ParserRuleContext {
-  public:
-    FuncCallContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *VARIABLE();
-    antlr4::tree::TerminalNode *LPAREN();
-    antlr4::tree::TerminalNode *RPAREN();
-    FuncArgListContext *funcArgList();
-
-   
-  };
-
-  FuncCallContext* funcCall();
-
-  class  ConstructorContext : public antlr4::ParserRuleContext {
-  public:
-    ConstructorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *TYPE();
-    antlr4::tree::TerminalNode *LPAREN();
-    antlr4::tree::TerminalNode *RPAREN();
-    FuncArgListContext *funcArgList();
-
-   
-  };
-
-  ConstructorContext* constructor();
 
   class  ParamListContext : public antlr4::ParserRuleContext {
   public:
@@ -514,6 +485,48 @@ public:
 
   UnaryExprContext* unaryExpr();
 
+  class  FuncCallContext : public antlr4::ParserRuleContext {
+  public:
+    FuncCallContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *VARIABLE();
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
+    FuncArgListContext *funcArgList();
+
+   
+  };
+
+  FuncCallContext* funcCall();
+
+  class  ConstructorContext : public antlr4::ParserRuleContext {
+  public:
+    ConstructorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *TYPE();
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
+    FuncArgListContext *funcArgList();
+
+   
+  };
+
+  ConstructorContext* constructor();
+
+  class  ConstantContext : public antlr4::ParserRuleContext {
+  public:
+    ConstantContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *INTEGER();
+    antlr4::tree::TerminalNode *FLOAT();
+    antlr4::tree::TerminalNode *BOOL();
+    antlr4::tree::TerminalNode *STRING();
+
+   
+  };
+
+  ConstantContext* constant();
+
   class  ArrayIndexContext : public antlr4::ParserRuleContext {
   public:
     ArrayIndexContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -531,32 +544,6 @@ public:
   };
 
   ArrayIndexContext* arrayIndex();
-
-  class  ConstantContext : public antlr4::ParserRuleContext {
-  public:
-    ConstantContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *INTEGER();
-    antlr4::tree::TerminalNode *FLOAT();
-    antlr4::tree::TerminalNode *BOOL();
-    antlr4::tree::TerminalNode *STRING();
-
-   
-  };
-
-  ConstantContext* constant();
-
-  class  VarOrFuncContext : public antlr4::ParserRuleContext {
-  public:
-    VarOrFuncContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *VARIABLE();
-    FuncCallContext *funcCall();
-
-   
-  };
-
-  VarOrFuncContext* varOrFunc();
 
   class  SelectionElementContext : public antlr4::ParserRuleContext {
   public:

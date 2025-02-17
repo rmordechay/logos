@@ -167,9 +167,6 @@ LogosExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
     if (const auto unary = ctx->unaryExpr()) {
         return getUnaryExpr(unary);
     }
-    if (const auto selection = ctx->selection()) {
-        return getSelection(selection);
-    }
     return getBinaryExpr(ctx);
 }
 
@@ -184,7 +181,29 @@ LogosUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx
         return getConstant(constant);
     }
 
-    if (const auto constructor = ctx->constructorCall()) {
+    if (const auto selection = ctx->selection()) {
+        return getSelection(selection);
+    }
+
+    if (const auto constructor = ctx->constructor()) {
+        return getInstance(constructor);
+    }
+
+    if (const auto funcCall = ctx->funcCall()) {
+        return getFuncCall(funcCall);
+    }
+
+    return nullptr;
+}
+
+LogosUnaryExpr* AntlerConverter::getSelectionElementExpr(LogosParser::SelectionElementContext* ctx) {
+    if (const auto variable = ctx->VARIABLE()) {
+        const auto logosVariable = new LogosVariable(variable->getText());
+        logosVariable->setPosition(ctx->start, filePath);
+        return logosVariable;
+    }
+
+    if (const auto constructor = ctx->constructor()) {
         return getInstance(constructor);
     }
 
@@ -197,8 +216,8 @@ LogosUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx
 
 LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* selection) {
     vector<LogosUnaryExpr*> exprs;
-    for (const auto& unaryExpr : selection->unaryExpr()) {
-        auto expr = getUnaryExpr(unaryExpr);
+    for (const auto& unaryExpr : selection->selectionElement()) {
+        auto expr = getSelectionElementExpr(unaryExpr);
         exprs.emplace_back(expr);
     }
     return new LogosSelection(exprs);
@@ -212,7 +231,7 @@ LogosExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     return logosBinaryExpr;
 }
 
-LogosInstance* AntlerConverter::getInstance(LogosParser::ConstructorCallContext* ctx) {
+LogosInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) {
     const auto name = ctx->TYPE()->getText();
     const auto instance = new LogosInstance(name);
     instance->setPosition(ctx->start, filePath);

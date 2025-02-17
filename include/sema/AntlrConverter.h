@@ -39,6 +39,7 @@ public:
     LogosSelection* getSelection(LogosParser::SelectionContext* selection);
     LogosExpr* getExpr(LogosParser::ExprContext* ctx);
     LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
+    LogosUnaryExpr* getSelectionElementExpr(LogosParser::SelectionElementContext* ctx);
     LogosInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     static LogosUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);

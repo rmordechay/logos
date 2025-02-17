@@ -5,6 +5,10 @@
 #include "exprs/LogosFuncCall.h"
 #include "funcs/LogosUserFunc.h"
 
+string LogosSelection::getName() {
+    return "";
+}
+
 Value* LogosSelection::computeIRValue(CodeGenMetadata* metadata) {
     Value* value = nullptr;
     for (size_t i = 0; i < exprs.size() - 1; ++i) {
