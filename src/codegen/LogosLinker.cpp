@@ -52,7 +52,7 @@ void LogosLinker::writeFile(const unique_ptr<Module> &module, const string &file
 }
 
 void LogosLinker::runBinary() {
-    system("cd ../codegen && clang ../docs/src/build/Main.ll ../docs/src/build/MyObject.ll ../docs/src/build/Print.ll -o ../output");
+    system("cd ../stdlib && clang ../docs/src/build/Main.ll ../docs/src/build/MyObject.ll LogosStdlib.ll -o ../output");
     // system("ld -v -e main ../linked.o -o ../output");
     system("../output");
 }

@@ -38,13 +38,12 @@ Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr
         paramValues.emplace_back(argValue);
         paramTypes.emplace_back(argValue->getType());
     }
-
-    const auto funcType = FunctionType::get(metadata->builder->getVoidTy(), paramTypes, false);
+    const auto funcType = FunctionType::get(type->getLLVMType(), paramTypes, false);
     string funcName;
     if (parentName == "") {
         funcName = name;
     } else {
-        funcName = parentName + "_" + funcName;
+        funcName = parentName + "_" + name;
     }
     const auto func = metadata->module->getOrInsertFunction(funcName, funcType);
     return metadata->builder->CreateCall(func, paramValues);
