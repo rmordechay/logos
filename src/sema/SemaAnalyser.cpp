@@ -64,17 +64,13 @@ void SemaAnalyser::visitObject(const LogosObject* object) {
 }
 
 void SemaAnalyser::visitMainFunc(const LogosUserFunc* mainFunc, const string& path) {
-    if (!mainFunc) {
-        printError(100, nullptr);
-        return;
-    }
+    if (checkErr100(mainFunc)) return;
     visitUserFunc(mainFunc);
 }
 
 void SemaAnalyser::visitUserFunc(const LogosUserFunc* func) {
     theStack.enterScope();
     for (const auto& param : func->params) {
-        if (!func) return;
         visitVarDec(param);
     }
     visitStmtBlock(func->stmtBlock);
@@ -145,7 +141,7 @@ void SemaAnalyser::visitArray(const LogosArray* array) {
     for (const auto& element : array->elements) {
         visitExpr(element);
     }
-    // TODO add check for array type
+    // TODO add proper check for array type
     array->type = array->elements[0]->type;
 }
 
@@ -202,8 +198,6 @@ void SemaAnalyser::visitVariable(const LogosVariable* variable) {
         break;
     case FUNC_CALL:
         break;
-    case VARIABLE:
-        break;
     case CONSTANT:
         break;
     case OBJECT:
@@ -218,8 +212,9 @@ void SemaAnalyser::visitVariable(const LogosVariable* variable) {
     case ARRAY_INDEX:
         variable->type = symbol->arrayIndex->type;
         break;
+    default:
+        return;
     }
-
 }
 
 void SemaAnalyser::visitConstant(const LogosConstant* constant) {
@@ -288,6 +283,14 @@ void SemaAnalyser::printError(const int errCode, Position* position, Args&&... a
     } else {
         // cout << formattedMessage << endl;
     }
+}
+
+bool SemaAnalyser::checkErr100(const LogosUserFunc* mainFunc) {
+    if (!mainFunc) {
+        printError(100, nullptr);
+        return true;
+    }
+    return false;
 }
 
 SemaAnalyser::~SemaAnalyser() {

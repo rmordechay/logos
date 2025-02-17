@@ -52,26 +52,6 @@ paramList:
         explicitVarDec (COMMA explicitVarDec)* COMMA?
     ;
 
-explicitVarDec:
-        VARIABLE COLON TYPE (EQUAL expr)?
-    ;
-
-implicitVarDec:
-        VARIABLE EQUAL expr
-    ;
-
-fieldDef:
-        VARIABLE DOT VARIABLE* EQUAL expr
-    ;
-
-funcArg:
-        (VARIABLE EQUAL)? expr
-    ;
-
-funcArgList:
-        funcArg (COMMA funcArg)* COMMA?
-    ;
-
 statement:
         fieldDef
     |   explicitVarDec
@@ -84,16 +64,61 @@ statement:
     |   funcCall
     ;
 
-enumDeclaration: ENUM TYPE LBRACE enumField* RBRACE;
-
-enumField: CONST (EQUAL STRING)?;
-
 statementsBlock:
         LBRACE statement* RBRACE
     ;
 
-exprList:
-        expr (COMMA expr)* COMMA?
+fieldDef:
+        VARIABLE DOT VARIABLE* EQUAL expr
+    ;
+
+explicitVarDec:
+        VARIABLE COLON TYPE (EQUAL expr)?
+    ;
+
+implicitVarDec:
+        VARIABLE EQUAL expr
+    ;
+
+ifStatement:
+        IF expr statementsBlock elseStatement
+    |   patternMatching
+    ;
+
+elseStatement:
+    (ELSE expr statementsBlock)* (ELSE statementsBlock)?
+    ;
+
+patternMatching:
+        IF expr? LBRACE pattern* (ELSE COLON statementsBlock)? RBRACE
+    ;
+
+pattern:
+        expr COLON statementsBlock
+    ;
+
+loopStatement:
+        FOR VARIABLE? statementsBlock
+    |   FOR exprList IN iterableExpr=expr statementsBlock
+    |   FOR exprList IN iterableRange=range statementsBlock
+    ;
+
+controlFlow:
+        BREAK expr
+    |   BREAK IF
+    |   CONTINUE
+    ;
+
+returnStatement:
+        RETURN expr
+    ;
+
+enumDeclaration:
+        ENUM TYPE LBRACE enumField* RBRACE
+    ;
+
+enumField:
+        CONST (EQUAL STRING)?
     ;
 
 expr:
@@ -105,25 +130,38 @@ expr:
     |   LPAREN left=expr RPAREN
     ;
 
+exprList:
+        expr (COMMA expr)* COMMA?
+    ;
+
 unaryExpr:
-        funcCall
+        VARIABLE
+    |   funcCall
     |   constructor
     |   constant
     |   arrayIndex
-    |   VARIABLE
     |   selection
+    ;
+
+
+array:
+        LBRACK expr (COMMA expr)* RBRACK
     ;
 
 funcCall:
         VARIABLE LPAREN funcArgList? RPAREN
     ;
 
-array:
-        LBRACK expr (COMMA expr)* RBRACK
-    ;
-
 constructor:
         TYPE LPAREN funcArgList? RPAREN
+    ;
+
+funcArg:
+        (VARIABLE EQUAL)? expr
+    ;
+
+funcArgList:
+        funcArg (COMMA funcArg)* COMMA?
     ;
 
 constant:
@@ -146,39 +184,6 @@ selectionElement:
     |   funcCall
     |   constructor
     |   arrayIndex
-    ;
-
-ifStatement:
-        IF expr statementsBlock elseStatement
-    |   patternMatching
-    ;
-
-elseStatement:
-    (ELSE expr statementsBlock)* (ELSE statementsBlock)?
-    ;
-
-patternMatching:
-        IF expr? LBRACE pattern* (ELSE COLON statementsBlock)? RBRACE
-    ;
-
-pattern:
-        expr COLON statementsBlock
-    ;
-
-loopStatement:
-        FOR expr? statementsBlock
-    |   FOR exprList IN expr statementsBlock
-    |   FOR exprList IN range statementsBlock
-    ;
-
-controlFlow:
-        BREAK expr
-    |   BREAK IF
-    |   CONTINUE
-    ;
-
-returnStatement:
-        RETURN expr
     ;
 
 range:

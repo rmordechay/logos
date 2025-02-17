@@ -9,14 +9,15 @@ class LogosExpr;
 
 class LogosLoop final : public LogosStmt {
 public:
-    LogosExpr *cond = nullptr;
+    LogosVariable* loopVar = nullptr;
+    LogosExpr* iterable = nullptr;
     LogosStmtBlock* stmtBlock = nullptr;
 
-    LogosLoop(LogosExpr* cond, LogosStmtBlock* stmtBlock) : cond(cond), stmtBlock(stmtBlock) {}
+    LogosLoop(LogosVariable* loopVar, LogosExpr* iterable, LogosStmtBlock* stmtBlock) : loopVar(loopVar), iterable(iterable), stmtBlock(stmtBlock) {}
+
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     ~LogosLoop() override = default;
 };
-
 
 
 #endif //LOGOSLOOP_H

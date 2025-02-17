@@ -51,6 +51,7 @@ public:
     void visitInstance(LogosInstance* instance);
     void visitArrayIndex(const LogosArrayIndex* arrayIndex);
     void visitConstant(const LogosConstant* constant);
+    bool checkErr100(const LogosUserFunc* mainFunc);
     void setUnsuccessful();
     void resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr);
     LogosType* inferSelectionType(const LogosSelection* selection);
