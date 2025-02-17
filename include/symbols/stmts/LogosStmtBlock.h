@@ -1,14 +1,14 @@
 #ifndef LOGOSSTMTBLOCK_H
 #define LOGOSSTMTBLOCK_H
-#include "CodeGeneration.h"
+#include "LogosValue.h"
 #include "stmts/LogosStmt.h"
 
-class LogosStmtBlock final : public CodeGeneration {
+class LogosStmtBlock final : public LogosValue {
 public:
     vector<LogosStmt*> stmts;
 
     explicit LogosStmtBlock(const vector<LogosStmt*>& stmts) : stmts(stmts) {}
-    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    Value* computeLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosStmtBlock() override = default;
     LogosStmtBlock();
 };

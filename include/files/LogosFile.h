@@ -1,13 +1,12 @@
 #ifndef LOGOSFILE_H
 #define LOGOSFILE_H
+#include <string>
+#include <llvm/IR/Module.h>
+#include <llvm/Support/FileSystem.h>
 
 #include "LogosParser.h"
 #include "types/LogosType.h"
 
-#include <llvm/IR/Module.h>
-
-#include <string>
-#include <llvm/Support/FileSystem.h>
 
 class LogosStack;
 using namespace std;

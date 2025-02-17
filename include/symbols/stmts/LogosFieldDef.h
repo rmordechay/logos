@@ -12,7 +12,7 @@ public:
     LogosExpr* expr = nullptr;
 
     LogosFieldDef(const vector<string>& names, LogosExpr* expr) : names(names), expr(expr) {}
-    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    Value* computeLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosFieldDef() override;
 };
 

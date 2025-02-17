@@ -28,33 +28,25 @@ void checkPossibleTypes(Value* value) {
     }
 }
 
-Value* LogosPrint::getLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosPrint::computeLLVMValue(CodeGenMetadata* metadata) {
     const auto printFuncType = FunctionType::get(LOGOS_VOID.llvmType, LOGOS_INT.llvmType, false);
-    llvmValue = Function::Create(printFuncType, Function::ExternalLinkage, "printInt");
-    return llvmValue;
+    return Function::Create(printFuncType, Function::ExternalLinkage, "printInt");
 }
 
 Value* LogosPrint::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
-    if (llvmValue) return llvmValue;
-    string strValue;
+
     vector<Value*> llvmArgs;
 
     const auto argValue = args[0]->getLLVMValue(metadata);
-    checkPossibleTypes(argValue);
-    if (const auto constInt = dyn_cast<ConstantInt>(argValue)) {
-        strValue = to_string(constInt->getSExtValue());
-        Constant* llvmConstant = metadata->builder->CreateGlobalStringPtr(strValue);
-        llvmArgs.emplace_back(llvmConstant);
-    } else if (const auto function = dyn_cast<Function>(argValue)) {
-        const auto f = metadata->module->getOrInsertFunction(function->getName(), function->getReturnType());
-        auto funcCall = metadata->builder->CreateCall(f);
-        llvmArgs.emplace_back(funcCall);
-    }
-    llvmArgs.emplace_back(metadata->builder->getInt32(strValue.size()));
+    llvmArgs.emplace_back(argValue);
+// if (const auto function = dyn_cast<Function>(argValue)) {
+    //     auto funcType = function->getFunctionType()->getContainedType(0);
+    // } else {
+    //
+    // }
 
-    const vector<Type*> paramTypes = {metadata->builder->getPtrTy(), metadata->builder->getInt32Ty()};
-    const auto funcType = FunctionType::get(metadata->builder->getVoidTy(), paramTypes, false);
+    const auto funcType = FunctionType::get(metadata->builder->getVoidTy(), metadata->builder->getInt32Ty(), false);
     const auto func = metadata->module->getOrInsertFunction(llvmName, funcType);
-    llvmValue = metadata->builder->CreateCall(func, llvmArgs);
-    return llvmValue;
+
+    return metadata->builder->CreateCall(func, llvmArgs);
 }

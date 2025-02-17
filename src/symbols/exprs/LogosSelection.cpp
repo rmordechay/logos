@@ -5,16 +5,14 @@
 #include "exprs/LogosFuncCall.h"
 #include "funcs/LogosUserFunc.h"
 
-Value* LogosSelection::getLLVMValue(CodeGenMetadata* metadata) {
-    if (llvmValue) return llvmValue;
+Value* LogosSelection::computeLLVMValue(CodeGenMetadata* metadata) {
     Value* value = nullptr;
     for (size_t i = 0; i < exprs.size() - 1; ++i) {
         const auto previousExpr = exprs[i];
         const auto nextExpr = exprs[i + 1];
         value = resolveSelection(metadata, previousExpr, nextExpr);
     }
-    llvmValue = value;
-    return llvmValue;
+    return value;
 }
 
 Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {

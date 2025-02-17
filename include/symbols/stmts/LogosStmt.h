@@ -1,10 +1,10 @@
 #ifndef LOGOSSTMT_H
 #define LOGOSSTMT_H
-#include "CodeGeneration.h"
+#include "LogosValue.h"
 
-class LogosStmt : virtual public CodeGeneration {
+class LogosStmt : virtual public LogosValue {
 public:
-    virtual ~LogosStmt() override = default;
+    ~LogosStmt() override = default;
 };
 
 #endif //LOGOSSTMT_H

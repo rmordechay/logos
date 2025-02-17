@@ -4,6 +4,7 @@
 #include "exprs/LogosConstant.h"
 #include "exprs/LogosFuncCall.h"
 #include "exprs/LogosSelection.h"
+#include "object/LogosField.h"
 
 using namespace std;
 

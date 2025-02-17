@@ -2,7 +2,7 @@
 
 #include "LogosUtils.h"
 
-Value* LogosUserFunc::getLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosUserFunc::computeLLVMValue(CodeGenMetadata* metadata) {
     vector<Type*> llvmParams;
     for (const auto& param : params) {
         llvmParams.emplace_back(param->inferredType->getLLVMType());
@@ -25,14 +25,13 @@ Value* LogosUserFunc::getLLVMValue(CodeGenMetadata* metadata) {
     const auto funcEntry = BasicBlock::Create(context, "entry", func);
     metadata->builder->SetInsertPoint(funcEntry);
     stmtBlock->getLLVMValue(metadata);
-    llvmValue = func;
 
     metadata->theStack->exitScope();
     return func;
 }
 
 Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
-    if (llvmValue) return llvmValue;
+
     vector<Value*> llvmArgs;
 
     for (const auto& arg : args) {
@@ -54,12 +53,11 @@ Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr
         funcName = parentName + "_" + funcName;
     }
     const auto func = metadata->module->getOrInsertFunction(funcName, funcType);
-    llvmValue = metadata->builder->CreateCall(func, llvmArgs);
-    return llvmValue;
+    return metadata->builder->CreateCall(func, llvmArgs);
 }
 
 Value* LogosUserFunc::callFunc(const CodeGenMetadata* metadata) {
-    if (llvmValue) return llvmValue;
+
     const vector<Type*> paramTypes = {metadata->builder->getPtrTy(), metadata->builder->getInt32Ty()};
     const auto funcType = FunctionType::get(metadata->builder->getVoidTy(), paramTypes, false);
     string funcName = name;
@@ -67,6 +65,5 @@ Value* LogosUserFunc::callFunc(const CodeGenMetadata* metadata) {
         funcName = parentName + "_" + funcName;
     }
     const auto func = metadata->module->getOrInsertFunction(funcName, funcType);
-    llvmValue = metadata->builder->CreateCall(func);
-    return llvmValue;
+    return metadata->builder->CreateCall(func);
 }

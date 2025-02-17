@@ -1,7 +1,6 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
 #include "LogosStack.h"
-#include "CodeGeneration.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
 
@@ -10,21 +9,27 @@
 #include "llvm/Passes/PassBuilder.h"
 #include <clang/Frontend/CompilerInstance.h>
 
-class ThreadPool;
-using namespace llvm;
-using namespace std;
-
-namespace llvm {
-    class Linker;
-    class TargetMachine;
-}
 class LogosFile;
-class CodeGeneration;
+class LogosValue;
+
+struct CodeGenMetadata {
+    IRBuilder<>* builder;
+    LogosStack* theStack;
+    Module* module;
+};
+
+struct Position {
+    size_t lineNumber;
+    size_t posInLine;
+    const string* filePath = nullptr;
+};
+
+inline LLVMContext context;
 
 class CodeGenerator {
 public:
     vector<Module*> modules;
-    vector<CodeGeneration*> codeNodes;
+    vector<LogosValue*> codeNodes;
 
     CodeGenerator() { initLLVM(); }
     static void generate(const map<string, LogosFile*>& files, LogosStack& theStack);

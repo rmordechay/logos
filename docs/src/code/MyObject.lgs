@@ -4,5 +4,5 @@ x: Int
 y: Int
 
 add(): Int {
-    return 1 + 2
+    return 5 + 2
 }

@@ -1,6 +1,6 @@
 #include "codegen/LogosLinker.h"
 
-#include "CodeGeneration.h"
+#include "LogosValue.h"
 #include "LogosDefinitions.h"
 
 #include <map>
@@ -18,8 +18,8 @@
 
 void LogosLinker::link(const map<string, Module*>& modules) {
     auto mainModule = std::move(modules.find(LOGOS_MAIN_FILE)->second);
-    auto bufferOrError = MemoryBuffer::getFile("../codegen/Print.ll");
-    auto objectOrError = object::ObjectFile::createObjectFile(bufferOrError->get()->getMemBufferRef());
+    auto logosLib = MemoryBuffer::getFile("../codegen/Print.ll");
+    auto objectFile = object::ObjectFile::createObjectFile(logosLib->get()->getMemBufferRef());
 
     SMDiagnostic EC;
     auto printModule = parseIRFile("../codegen/Print.ll", EC, context);

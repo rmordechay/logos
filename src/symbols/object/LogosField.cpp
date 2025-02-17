@@ -4,7 +4,7 @@
 
 #include <llvm/IR/Module.h>
 
-Value* LogosField::getLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosField::computeLLVMValue(CodeGenMetadata* metadata) {
     metadata->theStack->addGlobalSymbol(name, LogosSymbol(FIELD, this));
     return nullptr;
 }

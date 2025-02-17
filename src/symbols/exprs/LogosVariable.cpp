@@ -14,20 +14,18 @@ LogosSymbolType LogosVariable::getSymbolType() {
     return VARIABLE;
 }
 
-Value* LogosVariable::getLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosVariable::computeLLVMValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->theStack->getSymbol(name);
     switch (symbol->type) {
     case FIELD: {
         const auto expr = symbol->field->expr;
         if (expr) {
-            llvmValue = expr->getLLVMValue(metadata);
-            return llvmValue;
+            return expr->getLLVMValue(metadata);
         }
         break;
     }
     case FUNC_CALL: {
-        llvmValue = symbol->funcCall->getLLVMValue(metadata);
-        return llvmValue;
+        return symbol->funcCall->getLLVMValue(metadata);;
     }
     case SELECTION: {
         return symbol->selection->getLLVMValue(metadata);

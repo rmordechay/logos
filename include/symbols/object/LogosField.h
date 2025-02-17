@@ -1,12 +1,11 @@
 #ifndef LOGOSFIELD_H
 #define LOGOSFIELD_H
-#include "CodeGeneration.h"
-
+#include "LogosValue.h"
 
 class LogosType;
 class LogosExpr;
 
-class LogosField final : public CodeGeneration {
+class LogosField final : public LogosValue {
 public:
     string name;
     string parentName;
@@ -23,7 +22,7 @@ public:
         expr(expr) {
     }
 
-    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    Value* computeLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosField() override = default;
 };
 

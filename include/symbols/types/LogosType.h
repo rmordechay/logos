@@ -2,7 +2,6 @@
 #define LOGOSTYPE_H
 
 #include <llvm/IR/IRBuilder.h>
-#include <symbols/CodeGeneration.h>
 
 class LogosStack;
 using namespace llvm;

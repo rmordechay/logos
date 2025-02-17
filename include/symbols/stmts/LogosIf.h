@@ -10,7 +10,7 @@ public:
     LogosStmtBlock* stmtBlock = nullptr;
 
     explicit LogosIf(LogosExpr* cond, LogosStmtBlock* stmtBlock) : cond(cond), stmtBlock(stmtBlock) {}
-    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    Value* computeLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosIf() override;
 };
 

@@ -1,6 +1,6 @@
 #ifndef LOGOSFLOAT_H
 #define LOGOSFLOAT_H
-#include "CodeGeneration.h"
+#include "LogosValue.h"
 #include "LogosType.h"
 
 

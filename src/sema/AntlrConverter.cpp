@@ -1,5 +1,6 @@
 #include "sema/AntlrConverter.h"
 
+#include "object/LogosField.h"
 #include "stmts/LogosFieldDef.h"
 
 LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath) {

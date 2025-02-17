@@ -1,6 +1,6 @@
 #ifndef LOGOSBOOL_H
 #define LOGOSBOOL_H
-#include "CodeGeneration.h"
+#include "LogosValue.h"
 #include "LogosType.h"
 
 

@@ -8,11 +8,9 @@ LogosSymbolType LogosConstant::getSymbolType() {
     return CONSTANT;
 }
 
-Value* LogosConstant::getLLVMValue(CodeGenMetadata* metadata) {
-    if (llvmValue) return llvmValue;
+Value* LogosConstant::computeLLVMValue(CodeGenMetadata* metadata) {
     if (const auto intValue = get_if<int>(&value)) {
-        llvmValue = metadata->builder->getInt32(*intValue);
-        return llvmValue;
+        return metadata->builder->getInt32(*intValue);
     }
     return nullptr;
 }

@@ -11,7 +11,7 @@ public:
 
     Value* callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
     Value* callFunc(const CodeGenMetadata* metadata);
-    Value* getLLVMValue(CodeGenMetadata* metadata) override;
+    Value* computeLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosUserFunc() override = default;
 };
 

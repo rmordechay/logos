@@ -1,6 +1,6 @@
 #ifndef LOGOSFUNC_H
 #define LOGOSFUNC_H
-#include "CodeGeneration.h"
+#include "LogosValue.h"
 #include "stmts/LogosStmtBlock.h"
 #include "stmts/LogosVarDec.h"
 
@@ -8,7 +8,7 @@ class LogosExpr;
 class LogosStmt;
 class LogosType;
 
-class LogosFunc : public CodeGeneration {
+class LogosFunc : public LogosValue {
 public:
     string name;
     LogosType* type;

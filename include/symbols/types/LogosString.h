@@ -1,6 +1,6 @@
 #ifndef LOGOSSTRING_H
 #define LOGOSSTRING_H
-#include "CodeGeneration.h"
+#include "LogosValue.h"
 #include "LogosType.h"
 
 #include <string>

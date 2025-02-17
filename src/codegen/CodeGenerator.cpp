@@ -2,6 +2,7 @@
 
 #include "funcs/LogosPrint.h"
 #include "funcs/LogosUserFunc.h"
+#include "object/LogosField.h"
 
 void CodeGenerator::generate(const map<string, LogosFile*>& files, LogosStack& theStack) {
     theStack.addGlobalSymbol("print", LogosSymbol(FUNC, new LogosPrint()));
@@ -15,10 +16,10 @@ void CodeGenerator::generate(const map<string, LogosFile*>& files, LogosStack& t
 }
 
 void CodeGenerator::generateMainModule(const LogosMainFile* mainFile, CodeGenMetadata metadata) {
-    mainFile->mainFunc->getLLVMValue(&metadata);
+    mainFile->mainFunc->computeLLVMValue(&metadata);
     metadata.builder->CreateRet(metadata.builder->getInt32(EXIT_SUCCESS));
     for (const auto& func : mainFile->funcs) {
-        func->getLLVMValue(&metadata);
+        func->computeLLVMValue(&metadata);
     }
     writeIRToFile(metadata.module, LOGOS_MAIN_FILE);
 }

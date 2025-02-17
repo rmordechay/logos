@@ -1,6 +1,6 @@
 #ifndef LOGOSEXPR_H
 #define LOGOSEXPR_H
-#include "CodeGeneration.h"
+#include "LogosValue.h"
 #include "types/LogosType.h"
 
 class LogosFuncCall;
@@ -8,7 +8,7 @@ class LogosVariable;
 class LogosConstant;
 class LogosConstructor;
 
-class LogosExpr: virtual public CodeGeneration {
+class LogosExpr: virtual public LogosValue {
 public:
     mutable LogosType* type = nullptr;
 
