@@ -4,7 +4,7 @@
 #include "exprs/LogosBinaryExpr.h"
 #include "exprs/LogosSelection.h"
 #include "funcs/LogosUserFunc.h"
-#include "stmts/LogosFieldDefinition.h"
+#include "stmts/LogosFieldDef.h"
 
 #include <format>
 

@@ -5,18 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(LLVM_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libLLVM.dylib")
 set(ANTLR_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libantlr4-runtime.a")
 
-file(GLOB_RECURSE LOGOS_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h
-)
-file(GLOB_RECURSE LOGOS_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp
-)
-
-add_executable(logos main.cpp ${LOGOS_SRC} ${LOGOS_HEADERS})
-
-target_include_directories(logos PRIVATE
+include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -28,13 +17,35 @@ target_include_directories(logos PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
 )
 
-target_link_libraries(logos PRIVATE ${LLVM_LIB} ${ANTLR_LIB})
+add_library(libs STATIC
+    src/application/Application.cpp
+    src/application/LogosUtils.cpp
+    src/application/ThreadPool.cpp
+    src/codegen/CodeGenerator.cpp
+    src/codegen/LogosLinker.cpp
+    src/parser/LogosLexer.cpp
+    src/parser/LogosParser.cpp
+    src/sema/AntlrConverter.cpp
+    src/sema/SemaAnalyser.cpp
+    src/symbols/exprs/LogosBinaryExpr.cpp
+    src/symbols/exprs/LogosConstant.cpp
+    src/symbols/exprs/LogosFuncCall.cpp
+    src/symbols/exprs/LogosInstance.cpp
+    src/symbols/exprs/LogosSelection.cpp
+    src/symbols/exprs/LogosVariable.cpp
+    src/symbols/funcs/LogosPrint.cpp
+    src/symbols/funcs/LogosUserFunc.cpp
+    src/symbols/object/LogosField.cpp
+    src/symbols/object/LogosObject.cpp
+    src/symbols/stmts/LogosFieldDef.cpp
+    src/symbols/stmts/LogosIf.cpp
+    src/symbols/stmts/LogosReturn.cpp
+    src/symbols/stmts/LogosStmtBlock.cpp
+    src/symbols/stmts/LogosVarDec.cpp
+)
 
-#set(GTEST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest.1.15.2.dylib")
-#set(GTEST_LIB_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libgtest_main.1.15.2.dylib")
-#target_include_directories(logos_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/external/include)
-#target_link_libraries(logos_tests PRIVATE ${GTEST_LIB} ${GTEST_LIB_MAIN})
-#enable_testing()
-#add_test(NAME LogosTests COMMAND logos_tests)
+add_executable(logos main.cpp src/LogosStack.cpp)
+
+target_link_libraries(logos PRIVATE libs ${LLVM_LIB} ${ANTLR_LIB})
 
 

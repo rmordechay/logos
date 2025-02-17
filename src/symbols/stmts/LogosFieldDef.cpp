@@ -1,4 +1,4 @@
-#include "stmts/LogosFieldDefinition.h"
+#include "stmts/LogosFieldDef.h"
 
 #include "exprs/LogosInstance.h"
 #include "object/LogosField.h"

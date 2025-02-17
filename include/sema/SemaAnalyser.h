@@ -11,7 +11,7 @@
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
 #include "object/LogosObject.h"
-#include "stmts/LogosFieldDefinition.h"
+#include "stmts/LogosFieldDef.h"
 #include "stmts/LogosIf.h"
 #include "stmts/LogosVarDec.h"
 
