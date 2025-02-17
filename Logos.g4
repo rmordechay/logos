@@ -96,16 +96,13 @@ exprList:
         expr (COMMA expr)* COMMA?
     ;
 
-array:
-        LBRACK expr (COMMA expr)* RBRACK
-    ;
-
 expr:
         left=expr op=(STAR | SLASH) right=expr
     |   left=expr op=(PLUS | MINUS) right=expr
     |   left=expr op=(DOUBLE_EQUAL | LANGLE | RANGLE | GE | LE) right=expr
     |   unaryExpr
     |   LPAREN left=expr RPAREN
+    |   array
     ;
 
 unaryExpr:
@@ -119,6 +116,10 @@ unaryExpr:
 
 funcCall:
         VARIABLE LPAREN funcArgList? RPAREN
+    ;
+
+array:
+        LBRACK expr (COMMA expr)* RBRACK
     ;
 
 constructor:

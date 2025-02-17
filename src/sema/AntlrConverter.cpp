@@ -167,6 +167,9 @@ LogosExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
     if (const auto unary = ctx->unaryExpr()) {
         return getUnaryExpr(unary);
     }
+    if (const auto array = ctx->array()) {
+        return getArray(array);
+    }
     return getBinaryExpr(ctx);
 }
 
@@ -196,6 +199,18 @@ LogosUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx
     return nullptr;
 }
 
+LogosExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
+    const auto l = getExpr(ctx->left);
+    const auto r = getExpr(ctx->right);
+    const auto logosBinaryExpr = new LogosBinaryExpr(l->type, l, r, mapOperator(ctx));
+    logosBinaryExpr->setPosition(ctx->start, filePath);
+    return logosBinaryExpr;
+}
+
+LogosExpr* AntlerConverter::getArray(LogosParser::ArrayContext* array) {
+
+}
+
 LogosUnaryExpr* AntlerConverter::getSelectionElementExpr(LogosParser::SelectionElementContext* ctx) {
     if (const auto variable = ctx->VARIABLE()) {
         const auto logosVariable = new LogosVariable(variable->getText());
@@ -221,14 +236,6 @@ LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* sel
         exprs.emplace_back(expr);
     }
     return new LogosSelection(exprs);
-}
-
-LogosExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
-    const auto l = getExpr(ctx->left);
-    const auto r = getExpr(ctx->right);
-    const auto logosBinaryExpr = new LogosBinaryExpr(l->type, l, r, mapOperator(ctx));
-    logosBinaryExpr->setPosition(ctx->start, filePath);
-    return logosBinaryExpr;
 }
 
 LogosInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) {

@@ -30,8 +30,8 @@ public:
     RuleFuncImplementation = 10, RuleFuncBody = 11, RuleParamList = 12, 
     RuleExplicitVarDec = 13, RuleImplicitVarDec = 14, RuleFieldDef = 15, 
     RuleFuncArg = 16, RuleFuncArgList = 17, RuleStatement = 18, RuleEnumDeclaration = 19, 
-    RuleEnumField = 20, RuleStatementsBlock = 21, RuleExprList = 22, RuleArray = 23, 
-    RuleExpr = 24, RuleUnaryExpr = 25, RuleFuncCall = 26, RuleConstructor = 27, 
+    RuleEnumField = 20, RuleStatementsBlock = 21, RuleExprList = 22, RuleExpr = 23, 
+    RuleUnaryExpr = 24, RuleFuncCall = 25, RuleArray = 26, RuleConstructor = 27, 
     RuleConstant = 28, RuleArrayIndex = 29, RuleSelectionElement = 30, RuleSelection = 31, 
     RuleIfStatement = 32, RuleElseStatement = 33, RulePatternMatching = 34, 
     RulePattern = 35, RuleLoopStatement = 36, RuleControlFlow = 37, RuleReturnStatement = 38, 
@@ -78,10 +78,10 @@ public:
   class EnumFieldContext;
   class StatementsBlockContext;
   class ExprListContext;
-  class ArrayContext;
   class ExprContext;
   class UnaryExprContext;
   class FuncCallContext;
+  class ArrayContext;
   class ConstructorContext;
   class ConstantContext;
   class ArrayIndexContext;
@@ -426,22 +426,6 @@ public:
 
   ExprListContext* exprList();
 
-  class  ArrayContext : public antlr4::ParserRuleContext {
-  public:
-    ArrayContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *LBRACK();
-    std::vector<ExprContext *> expr();
-    ExprContext* expr(size_t i);
-    antlr4::tree::TerminalNode *RBRACK();
-    std::vector<antlr4::tree::TerminalNode *> COMMA();
-    antlr4::tree::TerminalNode* COMMA(size_t i);
-
-   
-  };
-
-  ArrayContext* array();
-
   class  ExprContext : public antlr4::ParserRuleContext {
   public:
     LogosParser::ExprContext *left = nullptr;
@@ -454,6 +438,7 @@ public:
     antlr4::tree::TerminalNode *RPAREN();
     std::vector<ExprContext *> expr();
     ExprContext* expr(size_t i);
+    ArrayContext *array();
     antlr4::tree::TerminalNode *STAR();
     antlr4::tree::TerminalNode *SLASH();
     antlr4::tree::TerminalNode *PLUS();
@@ -498,6 +483,22 @@ public:
   };
 
   FuncCallContext* funcCall();
+
+  class  ArrayContext : public antlr4::ParserRuleContext {
+  public:
+    ArrayContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LBRACK();
+    std::vector<ExprContext *> expr();
+    ExprContext* expr(size_t i);
+    antlr4::tree::TerminalNode *RBRACK();
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+
+   
+  };
+
+  ArrayContext* array();
 
   class  ConstructorContext : public antlr4::ParserRuleContext {
   public:

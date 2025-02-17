@@ -43,6 +43,7 @@ add_library(libs STATIC
     src/symbols/stmts/LogosStmtBlock.cpp
     src/symbols/stmts/LogosVarDec.cpp
     src/symbols/stmts/LogosLoop.cpp
+    src/symbols/arrays/LogosArray.cpp
 )
 
 add_executable(logos main.cpp src/LogosStack.cpp)

@@ -35,10 +35,11 @@ public:
     LogosVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LogosIf* getIfStatement(LogosParser::IfStatementContext* ctx);
     LogosLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
-    LogosExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     LogosSelection* getSelection(LogosParser::SelectionContext* selection);
     LogosExpr* getExpr(LogosParser::ExprContext* ctx);
     LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
+    LogosExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
+    LogosExpr* getArray(LogosParser::ArrayContext* array);
     LogosUnaryExpr* getSelectionElementExpr(LogosParser::SelectionElementContext* ctx);
     LogosInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
