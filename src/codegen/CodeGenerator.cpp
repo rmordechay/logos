@@ -49,6 +49,13 @@ void CodeGenerator::generateObjModule(LogosObject* obj, LogosStack* theStack) {
     writeIRToFile(metadata.module, module->getName().str());
 }
 
+void CodeGenerator::writeIRToFile(const Module* module, const string& name) {
+    std::error_code EC;
+    raw_fd_ostream textFile(LOGOS_BUILD_DIR + name + ".ll", EC, sys::fs::OF_None);
+    module->print(outs(), nullptr);
+    module->print(textFile, nullptr);
+}
+
 void CodeGenerator::initIR() {
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();

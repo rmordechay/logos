@@ -21,6 +21,7 @@ public:
     static void initIR();
     static void generateMainModule(const LogosMainFile* mainFile, CodeGenMetadata metadata);
     static void generateObjModule(LogosObject* obj, LogosStack* theStack);
+    static void writeIRToFile(const Module* module, const string& name);
     static void emitIRFile(const string& filePath, const Module* module);
     ~CodeGenerator() = default;
 };
