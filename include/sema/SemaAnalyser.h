@@ -16,6 +16,8 @@
 #include "stmts/LogosVarDec.h"
 
 
+class LogosLoop;
+
 class SemaAnalyser {
 public:
     bool successful = true;
@@ -38,6 +40,7 @@ public:
     void visitFieldDef(const LogosFieldDefinition* fieldDef);
     void visitVarDec(LogosVarDec* varDec);
     void visitIfStmt(const LogosIf* ifStmt);
+    void visitLoopStmt(const LogosLoop* loopStmt);
     void visitExpr(LogosExpr* expr);
     void visitUnaryExpr(LogosUnaryExpr* unaryExpr);
     void visitBinaryExpr(const LogosBinaryExpr* binaryExpr);

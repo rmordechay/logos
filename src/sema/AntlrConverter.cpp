@@ -154,6 +154,14 @@ LogosIf* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
     return ifStmt;
 }
 
+LogosLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ctx) {
+    const auto expr = getExpr(ctx->expr());
+    const auto stmts = getStmtBlock(ctx->statementsBlock());
+    const auto loopStmt = new LogosLoop(expr, stmts);
+    loopStmt->setPosition(ctx->start, filePath);
+    return loopStmt;
+}
+
 LogosExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
     if (!ctx) return nullptr;
     if (const auto unary = ctx->unaryExpr()) {

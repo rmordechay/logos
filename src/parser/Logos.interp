@@ -141,7 +141,7 @@ elseStatement
 patternMatching
 pattern
 loopStatement
-loopControlStatement
+controlFlow
 returnStatement
 range
 

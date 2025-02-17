@@ -13,6 +13,8 @@
 #include "stmts/LogosIf.h"
 #include "types/LogosInt.h"
 
+#include <stmts/LogosLoop.h>
+
 class LogosFieldDefinition;
 using namespace std;
 
@@ -32,6 +34,7 @@ public:
     LogosVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LogosVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LogosIf* getIfStatement(LogosParser::IfStatementContext* ctx);
+    LogosLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
     LogosExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     LogosSelection* getSelection(LogosParser::SelectionContext* selection);
     LogosExpr* getExpr(LogosParser::ExprContext* ctx);

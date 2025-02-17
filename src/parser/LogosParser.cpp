@@ -57,7 +57,7 @@ void logosParserInitialize() {
       "paramList", "explicitVarDec", "implicitVarDec", "fieldDef", "funcArg", 
       "funcArgList", "statement", "enumDeclaration", "enumField", "statementsBlock", 
       "exprList", "expr", "unaryExpr", "constant", "selection", "ifStatement", 
-      "elseStatement", "patternMatching", "pattern", "loopStatement", "loopControlStatement", 
+      "elseStatement", "patternMatching", "pattern", "loopStatement", "controlFlow", 
       "returnStatement", "range"
     },
     std::vector<std::string>{
@@ -1699,8 +1699,8 @@ LogosParser::LoopStatementContext* LogosParser::StatementContext::loopStatement(
   return getRuleContext<LogosParser::LoopStatementContext>(0);
 }
 
-LogosParser::LoopControlStatementContext* LogosParser::StatementContext::loopControlStatement() {
-  return getRuleContext<LogosParser::LoopControlStatementContext>(0);
+LogosParser::ControlFlowContext* LogosParser::StatementContext::controlFlow() {
+  return getRuleContext<LogosParser::ControlFlowContext>(0);
 }
 
 LogosParser::ReturnStatementContext* LogosParser::StatementContext::returnStatement() {
@@ -1774,7 +1774,7 @@ LogosParser::StatementContext* LogosParser::statement() {
     case 6: {
       enterOuterAlt(_localctx, 6);
       setState(244);
-      loopControlStatement();
+      controlFlow();
       break;
     }
 
@@ -2990,37 +2990,37 @@ LogosParser::LoopStatementContext* LogosParser::loopStatement() {
   return _localctx;
 }
 
-//----------------- LoopControlStatementContext ------------------------------------------------------------------
+//----------------- ControlFlowContext ------------------------------------------------------------------
 
-LogosParser::LoopControlStatementContext::LoopControlStatementContext(ParserRuleContext *parent, size_t invokingState)
+LogosParser::ControlFlowContext::ControlFlowContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* LogosParser::LoopControlStatementContext::BREAK() {
+tree::TerminalNode* LogosParser::ControlFlowContext::BREAK() {
   return getToken(LogosParser::BREAK, 0);
 }
 
-LogosParser::ExprContext* LogosParser::LoopControlStatementContext::expr() {
+LogosParser::ExprContext* LogosParser::ControlFlowContext::expr() {
   return getRuleContext<LogosParser::ExprContext>(0);
 }
 
-tree::TerminalNode* LogosParser::LoopControlStatementContext::IF() {
+tree::TerminalNode* LogosParser::ControlFlowContext::IF() {
   return getToken(LogosParser::IF, 0);
 }
 
-tree::TerminalNode* LogosParser::LoopControlStatementContext::CONTINUE() {
+tree::TerminalNode* LogosParser::ControlFlowContext::CONTINUE() {
   return getToken(LogosParser::CONTINUE, 0);
 }
 
 
-size_t LogosParser::LoopControlStatementContext::getRuleIndex() const {
-  return LogosParser::RuleLoopControlStatement;
+size_t LogosParser::ControlFlowContext::getRuleIndex() const {
+  return LogosParser::RuleControlFlow;
 }
 
 
-LogosParser::LoopControlStatementContext* LogosParser::loopControlStatement() {
-  LoopControlStatementContext *_localctx = _tracker.createInstance<LoopControlStatementContext>(_ctx, getState());
-  enterRule(_localctx, 68, LogosParser::RuleLoopControlStatement);
+LogosParser::ControlFlowContext* LogosParser::controlFlow() {
+  ControlFlowContext *_localctx = _tracker.createInstance<ControlFlowContext>(_ctx, getState());
+  enterRule(_localctx, 68, LogosParser::RuleControlFlow);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {

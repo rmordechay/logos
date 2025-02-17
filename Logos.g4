@@ -86,7 +86,7 @@ statement:
     |   implicitVarDec
     |   ifStatement
     |   loopStatement
-    |   loopControlStatement
+    |   controlFlow
     |   returnStatement
     |   enumDeclaration
     |   funcCall
@@ -154,7 +154,7 @@ loopStatement:
     |   FOR exprList IN range statementsBlock
     ;
 
-loopControlStatement:
+controlFlow:
         BREAK expr
     |   BREAK IF
     |   CONTINUE

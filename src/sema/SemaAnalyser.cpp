@@ -7,6 +7,7 @@
 #include "stmts/LogosFieldDef.h"
 
 #include <format>
+#include <stmts/LogosLoop.h>
 
 bool SemaAnalyser::analyse() {
     collectGlobals();
@@ -88,6 +89,9 @@ void SemaAnalyser::visitStmt(LogosStmt* stmt) {
     if (const auto ifStmt = dynamic_cast<LogosIf*>(stmt)) {
         visitIfStmt(ifStmt);
     }
+    if (const auto loopStmt = dynamic_cast<LogosLoop*>(stmt)) {
+        visitLoopStmt(loopStmt);
+    }
     if (const auto fieldDef = dynamic_cast<LogosFieldDefinition*>(stmt)) {
         visitFieldDef(fieldDef);
     }
@@ -122,6 +126,10 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
 
 void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {
     if (!ifStmt) return;
+}
+
+void SemaAnalyser::visitLoopStmt(const LogosLoop* loopStmt) {
+    if (!loopStmt) return;
 }
 
 void SemaAnalyser::visitExpr(LogosExpr* expr) {
