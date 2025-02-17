@@ -4,6 +4,8 @@
 #include "funcs/LogosUserFunc.h"
 #include "object/LogosField.h"
 
+#include <llvm/Support/TargetSelect.h>
+
 void CodeGenerator::generate(const map<string, LogosFile*>& files, LogosStack& theStack) {
     theStack.addGlobalSymbol("print", LogosSymbol(FUNC, new LogosPrint()));
     auto builder = IRBuilder(context);

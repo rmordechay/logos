@@ -1,8 +1,0 @@
-object: MyObject
-
-x: Int
-y: Int
-
-add(): Int {
-    return 1 + 5
-}

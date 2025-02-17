@@ -1,5 +1,0 @@
-main() {
-    obj = MyObject()
-    obj.x = 3
-    obj.y = 6
-}

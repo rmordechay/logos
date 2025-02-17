@@ -1,4 +1,6 @@
 /.idea
 /cmake-build*
-/docs/examples
+/examples
 /external/lib
+/llvm-examples/
+/project-example/

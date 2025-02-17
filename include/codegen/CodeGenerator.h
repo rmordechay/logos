@@ -5,7 +5,6 @@
 #include "files/LogosObjectFile.h"
 
 #include <llvm/IR/Module.h>
-#include <llvm/Support/TargetSelect.h>
 #include "llvm/Passes/PassBuilder.h"
 #include <clang/Frontend/CompilerInstance.h>
 

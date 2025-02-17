@@ -1,5 +1,6 @@
 #ifndef LOGOSFILE_H
 #define LOGOSFILE_H
+#include <LogosDefinitions.h>
 #include <string>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/FileSystem.h>
@@ -20,7 +21,7 @@ public:
 
 inline void writeIRToFile(const Module* module, const string& name) {
     std::error_code EC;
-    raw_fd_ostream textFile("../docs/src/build/" + name + ".ll", EC, sys::fs::OF_None);
+    raw_fd_ostream textFile(LOGOS_BUILD_DIR + name + ".ll", EC, sys::fs::OF_None);
     module->print(outs(), nullptr);
     module->print(textFile, nullptr);
 }
