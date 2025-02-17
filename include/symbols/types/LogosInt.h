@@ -1,5 +1,6 @@
 #ifndef LOGOSINT_H
 #define LOGOSINT_H
+#include "CodeGenerator.h"
 #include "LogosType.h"
 
 #define INT_TYPE_NAME "Int"

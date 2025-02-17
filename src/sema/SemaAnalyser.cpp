@@ -4,7 +4,7 @@
 #include "exprs/LogosBinaryExpr.h"
 #include "exprs/LogosSelection.h"
 #include "funcs/LogosUserFunc.h"
-#include "stmts/LogosFieldDef.h"
+#include "stmts/LogosFieldDefinition.h"
 
 #include <format>
 
@@ -88,7 +88,7 @@ void SemaAnalyser::visitStmt(LogosStmt* stmt) {
     if (const auto ifStmt = dynamic_cast<LogosIf*>(stmt)) {
         visitIfStmt(ifStmt);
     }
-    if (const auto fieldDef = dynamic_cast<LogosFieldDef*>(stmt)) {
+    if (const auto fieldDef = dynamic_cast<LogosFieldDefinition*>(stmt)) {
         visitFieldDef(fieldDef);
     }
 }
@@ -103,7 +103,7 @@ void SemaAnalyser::visitField(LogosField* field) {
 
 }
 
-void SemaAnalyser::visitFieldDef(const LogosFieldDef* fieldDef) {
+void SemaAnalyser::visitFieldDef(const LogosFieldDefinition* fieldDef) {
 }
 
 

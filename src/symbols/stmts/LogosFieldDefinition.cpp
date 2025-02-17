@@ -1,11 +1,12 @@
-#include "stmts/LogosFieldDef.h"
+#include "stmts/LogosFieldDefinition.h"
 
 #include "exprs/LogosInstance.h"
 #include "object/LogosField.h"
 #include "object/LogosObject.h"
 #include "stmts/LogosVarDec.h"
 
-Value* LogosFieldDef::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosFieldDefinition::computeIRValue(CodeGenMetadata* metadata) {
+    // TODO make dynamic
     const auto firstName = names[0];
     const auto secondName = names[1];
     const auto instance = metadata->theStack->getSymbol(firstName)->instance;
@@ -19,6 +20,6 @@ Value* LogosFieldDef::computeIRValue(CodeGenMetadata* metadata) {
     return gep;
 }
 
-LogosFieldDef::~LogosFieldDef() {
+LogosFieldDefinition::~LogosFieldDefinition() {
     delete expr;
 }

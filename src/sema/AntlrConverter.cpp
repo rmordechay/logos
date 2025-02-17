@@ -1,7 +1,11 @@
 #include "sema/AntlrConverter.h"
 
+#include "exprs/LogosBinaryExpr.h"
+#include "exprs/LogosConstant.h"
+#include "exprs/LogosOperator.h"
+#include "exprs/LogosSelection.h"
 #include "object/LogosField.h"
-#include "stmts/LogosFieldDef.h"
+#include "stmts/LogosReturn.h"
 
 LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath) {
     LogosFile* logosFile = nullptr;
@@ -114,13 +118,13 @@ LogosStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     return nullptr;
 }
 
-LogosFieldDef* AntlerConverter::getFieldDef(LogosParser::FieldDefContext* ctx) {
+LogosFieldDefinition* AntlerConverter::getFieldDef(LogosParser::FieldDefContext* ctx) {
     vector<string> fields;
     for (const auto& variable : ctx->VARIABLE()) {
         fields.emplace_back(variable->getText());
     }
     const auto expr = getExpr(ctx->expr());
-    const auto fieldAssignment = new LogosFieldDef(fields, expr);
+    const auto fieldAssignment = new LogosFieldDefinition(fields, expr);
     fieldAssignment->setPosition(ctx->start, filePath);
     return fieldAssignment;
 }

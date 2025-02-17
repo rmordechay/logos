@@ -6,7 +6,6 @@
 
 void CodeGenerator::generate(const map<string, LogosFile*>& files, LogosStack& theStack) {
     theStack.addGlobalSymbol("print", LogosSymbol(FUNC, new LogosPrint()));
-
     auto builder = IRBuilder(context);
     const auto module = new Module(LOGOS_MAIN_FILE, context);
     theStack.modules[LOGOS_MAIN_FILE] = module;
@@ -36,9 +35,11 @@ void CodeGenerator::generateObjModule(LogosObject* obj, LogosStack* theStack) {
 
     auto metadata = CodeGenMetadata{.builder = &builder, .theStack = &logosStack, .module = module};
     metadata.theStack->addGlobalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
+
     for (const auto& entry : obj->fields) {
-        entry.second->getIRValue(&metadata);
+        const auto a = entry.second->getIRValue(&metadata);
     }
+
     for (const auto& entry : obj->funcs) {
         entry.second->getIRValue(&metadata);
     }
@@ -53,15 +54,6 @@ void CodeGenerator::initIR() {
     InitializeAllTargetMCs();
     InitializeAllTargets();
     InitializeAllTargetInfos();
-}
-
-void CodeGenerator::generateTest() {
-    LLVMContext context;
-    auto builder = IRBuilder(context);
-    const std::vector<Type*> elements = {Type::getInt32Ty(context), Type::getFloatTy(context),};
-    StructType* myStructType = StructType::create(context, elements, "MyStruct");
-    AllocaInst* structInstance = builder.CreateAlloca(myStructType, nullptr, "myStructInstance");
-    Value* fieldAPtr = builder.CreateStructGEP(myStructType, structInstance, 0, "a_ptr");
 }
 
 void CodeGenerator::emitIRFile(const string& filePath, const Module* const module) {

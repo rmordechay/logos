@@ -11,4 +11,8 @@ public:
     ~LogosObjectFile() override;
 };
 
+inline LogosObjectFile::~LogosObjectFile() {
+    delete obj;
+}
+
 #endif //LOGOSOBJFILE_H

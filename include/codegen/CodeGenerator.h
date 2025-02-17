@@ -1,6 +1,6 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
-#include "../LogosStack.h"
+#include "LogosStack.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
 
@@ -12,20 +12,6 @@
 class LogosFile;
 class LogosValue;
 
-struct CodeGenMetadata {
-    IRBuilder<>* builder;
-    LogosStack* theStack;
-    Module* module;
-};
-
-struct Position {
-    size_t lineNumber;
-    size_t posInLine;
-    const string* filePath = nullptr;
-};
-
-inline LLVMContext context;
-
 class CodeGenerator {
 public:
     vector<Module*> modules;
@@ -34,7 +20,6 @@ public:
     CodeGenerator() { initIR(); }
     static void generate(const map<string, LogosFile*>& files, LogosStack& theStack);
     static void initIR();
-    static void generateTest();
     static void generateMainModule(const LogosMainFile* mainFile, CodeGenMetadata metadata);
     static void generateObjModule(LogosObject* obj, LogosStack* theStack);
     static void emitIRFile(const string& filePath, const Module* module);

@@ -1,5 +1,7 @@
 #include "stmts/LogosIf.h"
 
+#include "CodeGenerator.h"
+
 Value* LogosIf::computeIRValue(CodeGenMetadata* metadata) {
     const auto currentFunc = metadata->theStack->top().IRFunc;
     const auto condIR = cond->getIRValue(metadata);

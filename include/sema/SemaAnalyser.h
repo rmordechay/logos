@@ -11,7 +11,7 @@
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
 #include "object/LogosObject.h"
-#include "stmts/LogosFieldDef.h"
+#include "stmts/LogosFieldDefinition.h"
 #include "stmts/LogosIf.h"
 #include "stmts/LogosVarDec.h"
 
@@ -35,7 +35,7 @@ public:
     void visitStmt(LogosStmt* stmt);
     void visitStmtBlock(LogosStmtBlock* stmtBlock);
     void visitField(LogosField* field);
-    void visitFieldDef(const LogosFieldDef* fieldDef);
+    void visitFieldDef(const LogosFieldDefinition* fieldDef);
     void visitVarDec(LogosVarDec* varDec);
     void visitIfStmt(const LogosIf* ifStmt);
     void visitExpr(LogosExpr* expr);

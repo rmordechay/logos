@@ -1,7 +1,6 @@
 #ifndef LOGOSVOID_H
 #define LOGOSVOID_H
 
-#include "CodeGenerator.h"
 #include "LogosType.h"
 
 class LogosVoid final : public LogosType {

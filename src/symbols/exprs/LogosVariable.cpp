@@ -19,13 +19,10 @@ Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
     switch (symbol->type) {
     case FIELD: {
         const auto field = symbol->field;
-        if (field->expr) {
-            return field->getIRValue(metadata);
-        }
         break;
     }
     case FUNC_CALL: {
-        return symbol->funcCall->getIRValue(metadata);;
+        return symbol->funcCall->getIRValue(metadata);
     }
     case SELECTION: {
         return symbol->selection->getIRValue(metadata);

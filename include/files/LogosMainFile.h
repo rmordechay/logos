@@ -2,6 +2,7 @@
 #define LOGOSMAINFILE_H
 #include "LogosDefinitions.h"
 #include "LogosFile.h"
+#include "funcs/LogosUserFunc.h"
 
 class LogosUserFunc;
 
@@ -10,8 +11,16 @@ public:
     LogosUserFunc* mainFunc = nullptr;
     vector<LogosUserFunc*> funcs;
 
-    explicit LogosMainFile(const string& path) : LogosFile(LOGOS_MAIN_FILE, path) {}
-    ~LogosMainFile() override;
+    explicit LogosMainFile(const string& path) :
+        LogosFile(LOGOS_MAIN_FILE, path) {
+    }
+
+    ~LogosMainFile() override {
+        delete mainFunc;
+        for (const auto& func : funcs) {
+            delete func;
+        }
+    }
 };
 
 

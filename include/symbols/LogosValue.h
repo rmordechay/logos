@@ -1,7 +1,7 @@
 #ifndef CODEGENERATION_H
 #define CODEGENERATION_H
 
-#include "CodeGenerator.h"
+#include "codegen/LogosMetadata.h"
 
 #include <llvm/IR/IRBuilder.h>
 #include <Token.h>
@@ -13,6 +13,7 @@ class LogosValue {
 public:
     Position position = Position();
     Value* getIRValue(CodeGenMetadata* metadata);
+    void setIRValue(Value* value);
     virtual void setPosition(const antlr4::Token* ctx, const string& filePath);
     virtual ~LogosValue() = default;
 protected:
@@ -32,6 +33,10 @@ inline Value* LogosValue::getIRValue(CodeGenMetadata* metadata) {
         IRValue = computeIRValue(metadata);
     }
     return IRValue;
+}
+
+inline void LogosValue::setIRValue(Value* value) {
+    IRValue = value;
 }
 
 #endif //CODEGENERATION_H

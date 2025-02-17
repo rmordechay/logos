@@ -24,10 +24,8 @@ public:
     void enterScope();
     void exitScope();
     LogosSymbol* getSymbol(const string& name);
-    Function* getFunc(const string& name);
     void addLocalSymbol(const string& name, const LogosSymbol& symbol);
     void addGlobalSymbol(const string& name, const LogosSymbol& symbol);
-    void addFunc(const string& name, Function* value);
     void setCurrentFunc(Function* value);
     ~LogosStack() = default;
 private:

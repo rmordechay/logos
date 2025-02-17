@@ -41,13 +41,6 @@ LogosSymbol Utils::createSymbol(LogosExpr* expr) {
     return LogosSymbol();
 }
 
-Module* Utils::createIRModuleFromFile(const string& filePath, LLVMContext& context, const TargetMachine& tm) {
-    SMDiagnostic err;
-    auto module = parseIRFile(filePath, err, context);
-    module->setDataLayout(tm.createDataLayout());
-    return module.release();
-}
-
 void Utils::emitIRFile(const string& filePath, const Module* const module) {
     error_code EC;
     raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);

@@ -1,6 +1,5 @@
 #ifndef LOGOSSTMTBLOCK_H
 #define LOGOSSTMTBLOCK_H
-#include "LogosValue.h"
 #include "stmts/LogosStmt.h"
 
 class LogosStmtBlock final : public LogosValue {

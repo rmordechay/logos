@@ -3,8 +3,6 @@
 #include <string>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/FileSystem.h>
-
-#include "LogosParser.h"
 #include "types/LogosType.h"
 
 

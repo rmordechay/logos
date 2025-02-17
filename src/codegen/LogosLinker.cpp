@@ -1,5 +1,6 @@
 #include "codegen/LogosLinker.h"
 
+#include "CodeGenerator.h"
 #include "LogosValue.h"
 #include "LogosDefinitions.h"
 
