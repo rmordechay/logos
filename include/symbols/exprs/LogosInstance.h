@@ -1,21 +1,21 @@
-#ifndef LOGOSCONSTRUCTOREXPR_H
-#define LOGOSCONSTRUCTOREXPR_H
+#ifndef LOGOSINSTANCE_H
+#define LOGOSINSTANCE_H
 #include "LogosUnaryExpr.h"
 #include <llvm/IR/Module.h>
 
-class LogosConstructor final : public LogosUnaryExpr {
+class LogosInstance final : public LogosUnaryExpr {
 public:
     string name;
     vector<LogosExpr*> args;
     LogosObject* obj = nullptr;
 
-    explicit LogosConstructor(const string& name) : name(name) {}
+    explicit LogosInstance(const string& name) : name(name) {}
     string getName() override;
     LogosSymbolType getSymbolType() override;
     Value* computeLLVMValue(CodeGenMetadata* metadata) override;
-    ~LogosConstructor() override = default;
+    ~LogosInstance() override = default;
 };
 
 
 
-#endif //LOGOSCONSTRUCTOREXPR_H
+#endif //LOGOSINSTANCE_H

@@ -31,39 +31,25 @@ Value* LogosUserFunc::computeLLVMValue(CodeGenMetadata* metadata) {
 }
 
 Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
-
-    vector<Value*> llvmArgs;
-
+    vector<Value*> paramValues;
+    vector<Type*> paramTypes;
     for (const auto& arg : args) {
         const auto argValue = arg->getLLVMValue(metadata);
-        if (const auto constInt = dyn_cast<ConstantInt>(argValue)) {
-            auto name = to_string(constInt->getSExtValue());
-            auto llvmStr = metadata->builder->CreateGlobalStringPtr(name);
-            llvmArgs.emplace_back(llvmStr);
-            llvmArgs.emplace_back(metadata->builder->getInt32(name.size()));
-        } else {
-            llvmArgs.emplace_back(argValue);
-        }
+        paramValues.emplace_back(argValue);
+        paramTypes.emplace_back(argValue->getType());
     }
 
-    const vector<Type*> paramTypes = {metadata->builder->getPtrTy(), metadata->builder->getInt32Ty()};
     const auto funcType = FunctionType::get(metadata->builder->getVoidTy(), paramTypes, false);
-    string funcName = name;
-    if (parentName != "") {
+    string funcName;
+    if (parentName == "") {
+        funcName = name;
+    } else {
         funcName = parentName + "_" + funcName;
     }
     const auto func = metadata->module->getOrInsertFunction(funcName, funcType);
-    return metadata->builder->CreateCall(func, llvmArgs);
+    return metadata->builder->CreateCall(func, paramValues);
 }
 
-Value* LogosUserFunc::callFunc(const CodeGenMetadata* metadata) {
-
-    const vector<Type*> paramTypes = {metadata->builder->getPtrTy(), metadata->builder->getInt32Ty()};
-    const auto funcType = FunctionType::get(metadata->builder->getVoidTy(), paramTypes, false);
-    string funcName = name;
-    if (parentName != "") {
-        funcName = parentName + "_" + funcName;
-    }
-    const auto func = metadata->module->getOrInsertFunction(funcName, funcType);
-    return metadata->builder->CreateCall(func);
+Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata) {
+    return callFunc(metadata, vector<LogosExpr*>());
 }

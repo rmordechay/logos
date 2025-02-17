@@ -6,7 +6,7 @@ class LogosBinaryExpr;
 class LogosConstant;
 class LogosVariable;
 class LogosFuncCall;
-class LogosConstructor;
+class LogosInstance;
 class LogosFunc;
 class LogosField;
 class LogosObject;
@@ -14,7 +14,7 @@ class LogosObject;
 enum LogosSymbolType {
     FIELD,
     BINARY_EXPR,
-    CONSTRUCTOR,
+    INSTANCE,
     FUNC_CALL,
     VARIABLE,
     CONSTANT,
@@ -30,7 +30,7 @@ struct LogosSymbol {
         LogosObject* object;
         LogosField* field;
         LogosFunc* func;
-        LogosConstructor* constructor;
+        LogosInstance* instance;
         LogosFuncCall* funcCall;
         LogosVariable* variable;
         LogosConstant* constant;
@@ -58,9 +58,9 @@ struct LogosSymbol {
         func(func) {
     }
 
-    LogosSymbol(const LogosSymbolType type, LogosConstructor* constructor) :
+    LogosSymbol(const LogosSymbolType type, LogosInstance* constructor) :
         type(type),
-        constructor(constructor) {
+        instance(constructor) {
     }
 
     LogosSymbol(const LogosSymbolType type, LogosFuncCall* funcCall) :

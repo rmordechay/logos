@@ -4,7 +4,7 @@
 #include "LogosStack.h"
 #include "application/ThreadPool.h"
 #include "exprs/LogosBinaryExpr.h"
-#include "exprs/LogosConstructor.h"
+#include "exprs/LogosInstance.h"
 #include "exprs/LogosFuncCall.h"
 #include "exprs/LogosSelection.h"
 #include "exprs/LogosUnaryExpr.h"
@@ -42,7 +42,7 @@ public:
     void visitUnaryExpr(LogosUnaryExpr* unaryExpr);
     void visitBinaryExpr(const LogosBinaryExpr* binaryExpr);
     void visitSelection(const LogosSelection* selection);
-    void visitConstructor(LogosConstructor* constructorExpr);
+    void visitInstance(LogosInstance* instance);
     void visitFuncCall(const LogosFuncCall* funcCallExpr);
     void visitConstant(const LogosUnaryExpr* unaryExpr);
     void setUnsuccessful();

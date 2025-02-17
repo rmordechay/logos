@@ -2,7 +2,7 @@
 #define LOGOSUTILS_H
 
 #include "LogosDefinitions.h"
-#include "exprs/LogosConstructor.h"
+#include "exprs/LogosInstance.h"
 #include "funcs/LogosFunc.h"
 
 #include <llvm/IR/Module.h>

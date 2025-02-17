@@ -10,7 +10,7 @@ public:
     explicit LogosUserFunc(const string& name, LogosType* funcType) : LogosFunc(name, funcType) {}
 
     Value* callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
-    Value* callFunc(const CodeGenMetadata* metadata);
+    Value* callFunc(CodeGenMetadata* metadata);
     Value* computeLLVMValue(CodeGenMetadata* metadata) override;
     ~LogosUserFunc() override = default;
 };

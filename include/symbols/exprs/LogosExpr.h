@@ -6,7 +6,7 @@
 class LogosFuncCall;
 class LogosVariable;
 class LogosConstant;
-class LogosConstructor;
+class LogosInstance;
 
 class LogosExpr: virtual public LogosValue {
 public:

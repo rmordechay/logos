@@ -18,8 +18,8 @@ Value* LogosSelection::computeLLVMValue(CodeGenMetadata* metadata) {
 Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
     const auto symbol = metadata->theStack->getSymbol(previousExpr->getName());
     switch (symbol->type) {
-    case CONSTRUCTOR: {
-        const auto obj = symbol->constructor->obj;
+    case INSTANCE: {
+        const auto obj = symbol->instance->obj;
         const auto func = obj->funcs[nextExpr->getName()];
         return func->callFunc(metadata);
     }

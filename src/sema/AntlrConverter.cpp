@@ -173,7 +173,7 @@ LogosUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx
     }
 
     if (const auto constructor = ctx->constructorCall()) {
-        return getConstructor(constructor);
+        return getInstance(constructor);
     }
 
     if (const auto funcCall = ctx->funcCall()) {
@@ -200,19 +200,19 @@ LogosExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     return logosBinaryExpr;
 }
 
-LogosConstructor* AntlerConverter::getConstructor(LogosParser::ConstructorCallContext* ctx) {
+LogosInstance* AntlerConverter::getInstance(LogosParser::ConstructorCallContext* ctx) {
     const auto name = ctx->TYPE()->getText();
-    const auto constructorExpr = new LogosConstructor(name);
-    constructorExpr->setPosition(ctx->start, filePath);
+    const auto instance = new LogosInstance(name);
+    instance->setPosition(ctx->start, filePath);
     const auto args = ctx->funcArgList();
     if (!args) {
-        return constructorExpr;
+        return instance;
     }
     for (const auto& arg : args->funcArg()) {
         auto argExpr = getExpr(arg->expr());
-        constructorExpr->args.emplace_back(argExpr);
+        instance->args.emplace_back(argExpr);
     }
-    return constructorExpr;
+    return instance;
 }
 
 LogosFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {

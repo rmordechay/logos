@@ -19,8 +19,8 @@ bool Utils::isMainFile(const filesystem::directory_entry& filePath) {
 LogosSymbol Utils::createSymbol(LogosExpr* expr) {
     const auto type = expr->getSymbolType();
     switch (type) {
-    case CONSTRUCTOR:
-        return LogosSymbol(type, dynamic_cast<LogosConstructor*>(expr));
+    case INSTANCE:
+        return LogosSymbol(type, dynamic_cast<LogosInstance*>(expr));
     case FUNC_CALL:
         return LogosSymbol(type, dynamic_cast<LogosFuncCall*>(expr));
     case VARIABLE:

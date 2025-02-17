@@ -1,7 +1,7 @@
 #ifndef SELECTION_H
 #define SELECTION_H
 #include "LogosExpr.h"
-#include "exprs/LogosConstructor.h"
+#include "exprs/LogosInstance.h"
 #include "object/LogosObject.h"
 
 class LogosUnaryExpr;

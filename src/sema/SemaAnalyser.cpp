@@ -139,8 +139,8 @@ void SemaAnalyser::visitExpr(LogosExpr* expr) {
 
 void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
     if (!unaryExpr) return;
-    if (const auto constructor = dynamic_cast<LogosConstructor*>(unaryExpr)) {
-        visitConstructor(constructor);
+    if (const auto instance = dynamic_cast<LogosInstance*>(unaryExpr)) {
+        visitInstance(instance);
     }
     if (const auto funcCall = dynamic_cast<LogosFuncCall*>(unaryExpr)) {
         visitFuncCall(funcCall);
@@ -155,12 +155,12 @@ void SemaAnalyser::visitSelection(const LogosSelection* selection) {
     selection->type = inferSelectionType(selection);
 }
 
-void SemaAnalyser::visitConstructor(LogosConstructor* constructorExpr) {
-    if (!constructorExpr) return;
-    const auto symbol = theStack.getSymbol(constructorExpr->name);
+void SemaAnalyser::visitInstance(LogosInstance* instance) {
+    if (!instance) return;
+    const auto symbol = theStack.getSymbol(instance->name);
     const auto obj = symbol->object;
-    constructorExpr->type = obj;
-    constructorExpr->obj = obj;
+    instance->type = obj;
+    instance->obj = obj;
 }
 
 void SemaAnalyser::visitFuncCall(const LogosFuncCall* funcCallExpr) {
@@ -195,8 +195,8 @@ void SemaAnalyser::resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr
     switch (symbol->type) {
     case FIELD:
         break;
-    case CONSTRUCTOR: {
-        const auto obj = symbol->constructor->obj;
+    case INSTANCE: {
+        const auto obj = symbol->instance->obj;
         const auto func = obj->funcs[nextExpr->getName()];
         nextExpr->type = func->type;
         break;

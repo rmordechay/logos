@@ -11,7 +11,7 @@
 #include "exprs/LogosConstant.h"
 #include "exprs/LogosFuncCall.h"
 #include "exprs/LogosVariable.h"
-#include "exprs/LogosConstructor.h"
+#include "exprs/LogosInstance.h"
 #include "exprs/LogosSelection.h"
 #include "exprs/LogosBinaryExpr.h"
 #include "files/LogosMainFile.h"
@@ -46,7 +46,7 @@ public:
     LogosSelection* getSelection(LogosParser::SelectionContext* selection);
     LogosExpr* getExpr(LogosParser::ExprContext* ctx);
     LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
-    LogosConstructor* getConstructor(LogosParser::ConstructorCallContext* ctx);
+    LogosInstance* getInstance(LogosParser::ConstructorCallContext* ctx);
     LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     static LogosUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
     static LogosType* getType(antlr4::tree::TerminalNode* type);
