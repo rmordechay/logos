@@ -12,47 +12,6 @@
 #include <exprs/LogosConstant.h>
 #include <stmts/LogosLoop.h>
 
-
-Value* computeIRValue(CodeGenMetadata* metadata) {
-    auto builder = metadata->builder;
-    std::vector<Constant*> elements = {
-        ConstantInt::get(builder->getContext(), APInt(32, 10)),
-        ConstantInt::get(builder->getContext(), APInt(32, 20)),
-        ConstantInt::get(builder->getContext(), APInt(32, 30)),
-        ConstantInt::get(builder->getContext(), APInt(32, 40)),
-        ConstantInt::get(builder->getContext(), APInt(32, 50))
-    };
-    auto arrayType = ArrayType::get(builder->getInt32Ty(), elements.size());
-    auto constArray = ConstantArray::get(arrayType, elements);
-
-    // Create an index for the loop
-    auto index = builder->CreateAlloca(builder->getInt32Ty(), nullptr, "index");
-    builder->CreateStore(ConstantInt::get(builder->getContext(), APInt(32, 0)), index);  // Initialize index to 0
-
-    // Loop body block and loop end block
-    auto loopBody = BasicBlock::Create(builder->getContext(), "loop_body");
-    auto loopEnd = BasicBlock::Create(builder->getContext(), "loop_end");
-
-    // Create unconditional branch to loopBody
-    builder->CreateBr(loopBody);
-
-    // // Loop body
-    // builder->SetInsertPoint(loopBody);
-    // auto loadIndex = builder->CreateLoad(index, "index");
-    // auto cmp = builder->CreateICmpULT(loadIndex, ConstantInt::get(builder->getContext(), APInt(32, elements.size())), "cmp");
-    // builder->CreateCondBr(cmp, loopBody, loopEnd);  // Continue loop if index < array size
-    //
-    // // Access the array element using the index
-    // auto arrayElement = builder->CreateExtractValue(constArray, {loadIndex}, "arrayElement");
-    //
-    // // Increment the index
-    // auto inc = builder->CreateAdd(loadIndex, ConstantInt::get(builder->getContext(), APInt(32, 1)), "inc");
-    // builder->CreateStore(inc, index);
-    //
-    // // End of loop
-    // builder->SetInsertPoint(loopEnd);
-}
-
 bool SemaAnalyser::analyse() {
     collectGlobals();
     ThreadPool threadPool;
@@ -160,11 +119,11 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
 }
 
 void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {
-    if (!ifStmt) return;
 }
 
 void SemaAnalyser::visitLoopStmt(const LogosLoop* loopStmt) {
-    if (!loopStmt) return;
+    visitExpr(loopStmt->iterable);
+    loopStmt->loopVar->type = loopStmt->iterable->type;
 }
 
 void SemaAnalyser::visitExpr(LogosExpr* expr) {
