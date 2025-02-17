@@ -33,6 +33,7 @@ add_library(libs STATIC
     src/symbols/exprs/LogosInstance.cpp
     src/symbols/exprs/LogosSelection.cpp
     src/symbols/exprs/LogosVariable.cpp
+    src/symbols/exprs/LogosArray.cpp
     src/symbols/funcs/LogosPrint.cpp
     src/symbols/funcs/LogosUserFunc.cpp
     src/symbols/object/LogosField.cpp
@@ -43,7 +44,8 @@ add_library(libs STATIC
     src/symbols/stmts/LogosStmtBlock.cpp
     src/symbols/stmts/LogosVarDec.cpp
     src/symbols/stmts/LogosLoop.cpp
-    src/symbols/arrays/LogosArray.cpp
+    src/symbols/exprs/LogosArrayIndex.cpp
+    include/symbols/exprs/LogosArrayIndex.h
 )
 
 add_executable(logos main.cpp src/LogosStack.cpp)

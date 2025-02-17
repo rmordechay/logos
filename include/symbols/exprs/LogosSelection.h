@@ -10,11 +10,11 @@ class LogosSelection final : public LogosUnaryExpr {
 public:
     const vector<LogosUnaryExpr*> exprs;
 
-    string getName() override;
     explicit LogosSelection(const vector<LogosUnaryExpr*>& exprs) : exprs(exprs) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     static Value* resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr);
     LogosSymbolType getSymbolType() override;
+    string getName() override;
     ~LogosSelection() override;
 };
 

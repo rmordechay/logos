@@ -6,14 +6,6 @@
 #include "object/LogosField.h"
 #include "object/LogosObject.h"
 
-string LogosVariable::getName() {
-    return name;
-}
-
-LogosSymbolType LogosVariable::getSymbolType() {
-    return VARIABLE;
-}
-
 Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->theStack->getSymbol(name);
     switch (symbol->type) {
@@ -30,4 +22,12 @@ Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
     default: break;
     }
     return nullptr;
+}
+
+LogosSymbolType LogosVariable::getSymbolType() {
+    return VARIABLE;
+}
+
+string LogosVariable::getName() {
+    return name;
 }

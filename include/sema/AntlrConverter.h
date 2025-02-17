@@ -15,6 +15,8 @@
 
 #include <stmts/LogosLoop.h>
 
+#include "exprs/LogosArrayIndex.h"
+
 class LogosFieldDefinition;
 using namespace std;
 
@@ -40,9 +42,10 @@ public:
     LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     LogosExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     LogosExpr* getArray(LogosParser::ArrayContext* array);
+    LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     LogosUnaryExpr* getSelectionElementExpr(LogosParser::SelectionElementContext* ctx);
     LogosInstance* getInstance(LogosParser::ConstructorContext* ctx);
-    LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
+    LogosArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
     static LogosUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
     static LogosType* getType(antlr4::tree::TerminalNode* type);
     ~AntlerConverter() = default;

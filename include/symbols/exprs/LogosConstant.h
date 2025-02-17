@@ -16,9 +16,9 @@ public:
         static_assert(is_same_v<T, bool> || is_same_v<T, int> || is_same_v<T, float> || is_same_v<T, string>);
     }
 
+    Value* computeIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
     LogosSymbolType getSymbolType() override;
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
     ~LogosConstant() override = default;
 };
 

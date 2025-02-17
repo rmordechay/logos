@@ -10,9 +10,9 @@ public:
     LogosObject* obj = nullptr;
 
     explicit LogosInstance(const string& name) : name(name) {}
-    string getName() override;
-    LogosSymbolType getSymbolType() override;
     Value* computeIRValue(CodeGenMetadata* metadata) override;
+    LogosSymbolType getSymbolType() override;
+    string getName() override;
     ~LogosInstance() override = default;
 };
 

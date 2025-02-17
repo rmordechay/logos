@@ -11,9 +11,9 @@ public:
     Position position = Position();
 
     explicit LogosFuncCall(const string& name) : name(name) {}
-    string getName() override;
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     LogosSymbolType getSymbolType() override;
+    string getName() override;
     ~LogosFuncCall() override;
 };
 

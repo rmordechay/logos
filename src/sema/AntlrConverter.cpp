@@ -196,6 +196,10 @@ LogosUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx
         return getFuncCall(funcCall);
     }
 
+    if (const auto arrayIndex = ctx->arrayIndex()) {
+        return getArrayIndex(arrayIndex);
+    }
+
     return nullptr;
 }
 
@@ -229,6 +233,21 @@ LogosUnaryExpr* AntlerConverter::getSelectionElementExpr(LogosParser::SelectionE
     return nullptr;
 }
 
+LogosFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
+    const auto name = ctx->VARIABLE()->getText();
+    const auto funcCallExpr = new LogosFuncCall(name);
+    funcCallExpr->setPosition(ctx->start, filePath);
+    const auto funcArgList = ctx->funcArgList();
+    if (funcArgList) {
+        const auto args = funcArgList->funcArg();
+        for (const auto& arg : args) {
+            auto argExpr = getExpr(arg->expr());
+            funcCallExpr->args.emplace_back(argExpr);
+        }
+    }
+    return funcCallExpr;
+}
+
 LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* selection) {
     vector<LogosUnaryExpr*> exprs;
     for (const auto& unaryExpr : selection->selectionElement()) {
@@ -253,19 +272,8 @@ LogosInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx
     return instance;
 }
 
-LogosFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
-    const auto name = ctx->VARIABLE()->getText();
-    const auto funcCallExpr = new LogosFuncCall(name);
-    funcCallExpr->setPosition(ctx->start, filePath);
-    const auto funcArgList = ctx->funcArgList();
-    if (funcArgList) {
-        const auto args = funcArgList->funcArg();
-        for (const auto& arg : args) {
-            auto argExpr = getExpr(arg->expr());
-            funcCallExpr->args.emplace_back(argExpr);
-        }
-    }
-    return funcCallExpr;
+LogosArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ctx) {
+    return nullptr;
 }
 
 LogosUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
