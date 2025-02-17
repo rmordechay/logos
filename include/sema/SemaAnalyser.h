@@ -46,9 +46,10 @@ public:
     void visitUnaryExpr(LogosUnaryExpr* unaryExpr);
     void visitBinaryExpr(const LogosBinaryExpr* binaryExpr);
     void visitFuncCall(const LogosFuncCall* funcCallExpr);
+    void visitVariable(const LogosVariable* variable);
     void visitSelection(const LogosSelection* selection);
     void visitInstance(LogosInstance* instance);
-    void visitArrayIndex(LogosArrayIndex* arrayIndex);
+    void visitArrayIndex(const LogosArrayIndex* arrayIndex);
     void visitConstant(const LogosConstant* constant);
     void setUnsuccessful();
     void resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr);

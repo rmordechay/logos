@@ -8,6 +8,7 @@
 
 #include <format>
 #include <exprs/LogosArray.h>
+#include <exprs/LogosArrayIndex.h>
 #include <exprs/LogosConstant.h>
 #include <stmts/LogosLoop.h>
 
@@ -158,6 +159,10 @@ void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
         visitSelection(selection);
     } else if (const auto constant = dynamic_cast<LogosConstant*>(unaryExpr)) {
         visitConstant(constant);
+    } else if (const auto arrIndex = dynamic_cast<LogosArrayIndex*>(unaryExpr)) {
+        visitArrayIndex(arrIndex);
+    } else if (const auto var = dynamic_cast<LogosVariable*>(unaryExpr)) {
+        visitVariable(var);
     }
 }
 
@@ -177,11 +182,42 @@ void SemaAnalyser::visitInstance(LogosInstance* instance) {
     instance->obj = obj;
 }
 
-void SemaAnalyser::visitArrayIndex(LogosArrayIndex* arrayIndex) {
-
+void SemaAnalyser::visitArrayIndex(const LogosArrayIndex* arrayIndex) {
+    visitExpr(arrayIndex->baseExpr);
+    arrayIndex->type = arrayIndex->baseExpr->type;
 }
 
 void SemaAnalyser::visitFuncCall(const LogosFuncCall* funcCallExpr) {
+
+}
+
+void SemaAnalyser::visitVariable(const LogosVariable* variable) {
+    const auto symbol = theStack.getSymbol(variable->name);
+    switch (symbol->type) {
+    case FIELD:
+        break;
+    case BINARY_EXPR:
+        break;
+    case INSTANCE:
+        break;
+    case FUNC_CALL:
+        break;
+    case VARIABLE:
+        break;
+    case CONSTANT:
+        break;
+    case OBJECT:
+        break;
+    case FUNC:
+        break;
+    case SELECTION:
+        break;
+    case ARRAY:
+        variable->type = symbol->array->type;
+        break;
+    case ARRAY_INDEX:
+        break;
+    }
 
 }
 

@@ -1,12 +1,18 @@
 #include "exprs//LogosArray.h"
 
 Value* LogosArray::computeIRValue(CodeGenMetadata* metadata) {
-    vector<Value*> arrElements;
+    const auto name = "arr";
+    auto *arrayVar = metadata->module->getGlobalVariable(name);
+    if (arrayVar) return arrayVar;
+
+    vector<Constant*> arrValues;
     for (const auto & element : elements) {
-        arrElements.emplace_back(element->getIRValue(metadata));
+        arrValues.emplace_back(static_cast<Constant*>(element->getIRValue(metadata)));
     }
     const auto arrType = ArrayType::get(type->getIRType(), elements.size());
-    return  metadata->module->getOrInsertGlobal("array", arrType);
+    const auto array = ConstantArray::get(arrType, arrValues);
+
+    return new GlobalVariable(*metadata->module, arrType, true, GlobalValue::PrivateLinkage, array, name);
 }
 
 LogosSymbolType LogosArray::getSymbolType() {
