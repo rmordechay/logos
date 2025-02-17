@@ -186,7 +186,7 @@ void logosParserInitialize() {
   	5,296,287,1,0,0,0,296,290,1,0,0,0,296,293,1,0,0,0,297,300,1,0,0,0,298,
   	296,1,0,0,0,298,299,1,0,0,0,299,47,1,0,0,0,300,298,1,0,0,0,301,308,3,
   	50,25,0,302,308,3,54,27,0,303,308,3,56,28,0,304,308,3,58,29,0,305,308,
-  	3,60,30,0,306,308,5,47,0,0,307,301,1,0,0,0,307,302,1,0,0,0,307,303,1,
+  	5,47,0,0,306,308,3,60,30,0,307,301,1,0,0,0,307,302,1,0,0,0,307,303,1,
   	0,0,0,307,304,1,0,0,0,307,305,1,0,0,0,307,306,1,0,0,0,308,49,1,0,0,0,
   	309,310,5,47,0,0,310,312,5,4,0,0,311,313,3,34,17,0,312,311,1,0,0,0,312,
   	313,1,0,0,0,313,314,1,0,0,0,314,315,5,5,0,0,315,51,1,0,0,0,316,317,5,
@@ -2229,12 +2229,12 @@ LogosParser::ArrayIndexContext* LogosParser::UnaryExprContext::arrayIndex() {
   return getRuleContext<LogosParser::ArrayIndexContext>(0);
 }
 
-LogosParser::SelectionContext* LogosParser::UnaryExprContext::selection() {
-  return getRuleContext<LogosParser::SelectionContext>(0);
-}
-
 tree::TerminalNode* LogosParser::UnaryExprContext::VARIABLE() {
   return getToken(LogosParser::VARIABLE, 0);
+}
+
+LogosParser::SelectionContext* LogosParser::UnaryExprContext::selection() {
+  return getRuleContext<LogosParser::SelectionContext>(0);
 }
 
 
@@ -2289,14 +2289,14 @@ LogosParser::UnaryExprContext* LogosParser::unaryExpr() {
     case 5: {
       enterOuterAlt(_localctx, 5);
       setState(305);
-      selection();
+      match(LogosParser::VARIABLE);
       break;
     }
 
     case 6: {
       enterOuterAlt(_localctx, 6);
       setState(306);
-      match(LogosParser::VARIABLE);
+      selection();
       break;
     }
 

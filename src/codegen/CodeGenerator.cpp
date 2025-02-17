@@ -36,7 +36,6 @@ void CodeGenerator::generateObjModule(LogosObject* obj, LogosStack* theStack) {
     }
 
     auto metadata = CodeGenMetadata{.builder = &builder, .theStack = &logosStack, .module = module};
-    metadata.theStack->addGlobalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
 
     obj->getIRType();
     for (const auto& entry : obj->fields) {

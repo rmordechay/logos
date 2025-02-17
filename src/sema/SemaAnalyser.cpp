@@ -216,6 +216,7 @@ void SemaAnalyser::visitVariable(const LogosVariable* variable) {
         variable->type = symbol->array->type;
         break;
     case ARRAY_INDEX:
+        variable->type = symbol->arrayIndex->type;
         break;
     }
 

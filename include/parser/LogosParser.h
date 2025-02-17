@@ -462,8 +462,8 @@ public:
     ConstructorContext *constructor();
     ConstantContext *constant();
     ArrayIndexContext *arrayIndex();
-    SelectionContext *selection();
     antlr4::tree::TerminalNode *VARIABLE();
+    SelectionContext *selection();
 
    
   };

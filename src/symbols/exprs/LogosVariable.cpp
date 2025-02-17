@@ -23,8 +23,6 @@ Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
         return symbol->binaryExpr->getIRValue(metadata);
     case INSTANCE:
         return symbol->instance->getIRValue(metadata);
-    case OBJECT:
-        return symbol->object->getIRValue(metadata);
     case VARIABLE:
         return symbol->variable->getIRValue(metadata);
     case CONSTANT:
@@ -35,8 +33,9 @@ Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
         return symbol->array->getIRValue(metadata);
     case ARRAY_INDEX:
         return symbol->arrayIndex->getIRValue(metadata);
+    default:
+        return nullptr;
     }
-    return nullptr;
 }
 
 LogosSymbolType LogosVariable::getSymbolType() {

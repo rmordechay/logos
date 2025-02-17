@@ -110,8 +110,8 @@ unaryExpr:
     |   constructor
     |   constant
     |   arrayIndex
-    |   selection
     |   VARIABLE
+    |   selection
     ;
 
 funcCall:
