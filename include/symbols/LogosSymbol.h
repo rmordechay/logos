@@ -1,6 +1,8 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
+#include "exprs/LogosArrayIndex.h"
 
+class LogosArray;
 class LogosSelection;
 class LogosBinaryExpr;
 class LogosConstant;
@@ -21,6 +23,8 @@ enum LogosSymbolType {
     OBJECT,
     FUNC,
     SELECTION,
+    ARRAY,
+    ARRAY_INDEX,
 };
 
 struct LogosSymbol {
@@ -36,6 +40,8 @@ struct LogosSymbol {
         LogosConstant* constant;
         LogosBinaryExpr* binaryExpr;
         LogosSelection* selection;
+        LogosArray* array;
+        LogosArrayIndex* arrayIndex;
     };
 
     LogosSymbol() :
@@ -78,14 +84,24 @@ struct LogosSymbol {
         constant(constant) {
     }
 
-    LogosSymbol(LogosSymbolType type, LogosSelection* selection) :
+    LogosSymbol(const LogosSymbolType type, LogosSelection* selection) :
         type(type),
         selection(selection) {
     }
 
-    LogosSymbol(LogosSymbolType type, LogosBinaryExpr* binaryExpr) :
+    LogosSymbol(const LogosSymbolType type, LogosBinaryExpr* binaryExpr) :
         type(type),
         binaryExpr(binaryExpr) {
+    }
+
+    LogosSymbol(const LogosSymbolType type, LogosArray* array) :
+        type(type),
+        array(array) {
+    }
+
+    LogosSymbol(const LogosSymbolType type, LogosArrayIndex* arrayIndex) :
+        type(type),
+        arrayIndex(arrayIndex) {
     }
 };
 

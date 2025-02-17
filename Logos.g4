@@ -101,8 +101,8 @@ expr:
     |   left=expr op=(PLUS | MINUS) right=expr
     |   left=expr op=(DOUBLE_EQUAL | LANGLE | RANGLE | GE | LE) right=expr
     |   unaryExpr
-    |   LPAREN left=expr RPAREN
     |   array
+    |   LPAREN left=expr RPAREN
     ;
 
 unaryExpr:
@@ -134,7 +134,7 @@ constant:
     ;
 
 arrayIndex:
-        (VARIABLE | funcCall) (LBRACK expr RBRACK)*
+        (VARIABLE | funcCall) (LBRACK expr RBRACK)+
     ;
 
 selectionElement:

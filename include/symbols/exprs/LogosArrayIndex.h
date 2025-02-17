@@ -7,6 +7,8 @@
 
 class LogosArrayIndex final : public LogosUnaryExpr {
 public:
+
+
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     LogosSymbolType getSymbolType() override;
     string getName() override;

@@ -1,11 +1,15 @@
 #ifndef LOGOSARRAY_H
 #define LOGOSARRAY_H
 
-#include "LogosValue.h"
+#include "exprs/LogosExpr.h"
 
-class LogosArray final : public LogosValue {
+class LogosArray final : public LogosExpr {
 public:
+    vector<LogosExpr*> exprs;
+
+    explicit LogosArray() : LogosExpr(nullptr) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
+    LogosSymbolType getSymbolType() override;
     ~LogosArray() override = default;
 };
 

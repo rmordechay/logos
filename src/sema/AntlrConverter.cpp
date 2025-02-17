@@ -7,6 +7,8 @@
 #include "object/LogosField.h"
 #include "stmts/LogosReturn.h"
 
+#include <exprs/LogosArray.h>
+
 LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath) {
     LogosFile* logosFile = nullptr;
     if (const auto mainFileCtx = ctx->mainFile()) {
@@ -211,8 +213,12 @@ LogosExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     return logosBinaryExpr;
 }
 
-LogosExpr* AntlerConverter::getArray(LogosParser::ArrayContext* array) {
-
+LogosExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
+    const auto logosArray = new LogosArray();
+    for (const auto &expr : ctx->expr()) {
+        logosArray->exprs.emplace_back(getExpr(expr));
+    }
+    return logosArray;
 }
 
 LogosUnaryExpr* AntlerConverter::getSelectionElementExpr(LogosParser::SelectionElementContext* ctx) {
@@ -273,7 +279,9 @@ LogosInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx
 }
 
 LogosArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ctx) {
-    return nullptr;
+    const auto arrayIndex = new LogosArrayIndex();
+
+    return arrayIndex;
 }
 
 LogosUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
