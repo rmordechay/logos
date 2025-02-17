@@ -16,10 +16,10 @@ void CodeGenerator::generate(const map<string, LogosFile*>& files, LogosStack& t
 }
 
 void CodeGenerator::generateMainModule(const LogosMainFile* mainFile, CodeGenMetadata metadata) {
-    mainFile->mainFunc->computeLLVMValue(&metadata);
+    mainFile->mainFunc->computeIRValue(&metadata);
     metadata.builder->CreateRet(metadata.builder->getInt32(EXIT_SUCCESS));
     for (const auto& func : mainFile->funcs) {
-        func->computeLLVMValue(&metadata);
+        func->computeIRValue(&metadata);
     }
     writeIRToFile(metadata.module, LOGOS_MAIN_FILE);
 }
@@ -37,16 +37,16 @@ void CodeGenerator::generateObjModule(LogosObject* obj, LogosStack* theStack) {
     auto metadata = CodeGenMetadata{.builder = &builder, .theStack = &logosStack, .module = module};
     metadata.theStack->addGlobalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
     for (const auto& entry : obj->fields) {
-        entry.second->getLLVMValue(&metadata);
+        entry.second->getIRValue(&metadata);
     }
     for (const auto& entry : obj->funcs) {
-        entry.second->getLLVMValue(&metadata);
+        entry.second->getIRValue(&metadata);
     }
 
     writeIRToFile(metadata.module, module->getName().str());
 }
 
-void CodeGenerator::initLLVM() {
+void CodeGenerator::initIR() {
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();
@@ -64,7 +64,7 @@ void CodeGenerator::generateTest() {
     Value* fieldAPtr = builder.CreateStructGEP(myStructType, structInstance, 0, "a_ptr");
 }
 
-void CodeGenerator::emitLLVMFile(const string& filePath, const Module* const module) {
+void CodeGenerator::emitIRFile(const string& filePath, const Module* const module) {
     std::error_code EC;
     raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
     module->print(textFile, nullptr);

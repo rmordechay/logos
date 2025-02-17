@@ -22,7 +22,7 @@ public:
         expr(expr) {
     }
 
-    Value* computeLLVMValue(CodeGenMetadata* metadata) override;
+    Value* computeIRValue(CodeGenMetadata* metadata) override;
     ~LogosField() override = default;
 };
 

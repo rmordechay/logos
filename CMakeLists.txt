@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.30)
 project(logos)
 
 set(CMAKE_CXX_STANDARD 20)
-set(ANTLR_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime")
 set(LLVM_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libLLVM.dylib")
 set(ANTLR_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libantlr4-runtime.a")
 
@@ -18,16 +17,15 @@ file(GLOB_RECURSE LOGOS_SRC
 add_executable(logos main.cpp ${LOGOS_SRC} ${LOGOS_HEADERS})
 
 target_include_directories(logos PRIVATE
-    src/parser
-    ${ANTLR_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/application"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/files"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/codegen"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/sema"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/symbols"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/parser"
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/application
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/files
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/codegen
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/sema
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
 )
 
 target_link_libraries(logos PRIVATE ${LLVM_LIB} ${ANTLR_LIB})

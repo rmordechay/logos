@@ -1,15 +1,15 @@
 #include "stmts/LogosIf.h"
 
-Value* LogosIf::computeLLVMValue(CodeGenMetadata* metadata) {
-    const auto currentFunc = metadata->theStack->top().llvmFunc;
-    const auto condLLVM = cond->getLLVMValue(metadata);
+Value* LogosIf::computeIRValue(CodeGenMetadata* metadata) {
+    const auto currentFunc = metadata->theStack->top().IRFunc;
+    const auto condIR = cond->getIRValue(metadata);
     const auto ifStartBlock = BasicBlock::Create(context, "if.start", currentFunc);
     const auto ifEndBlock = BasicBlock::Create(context, "if.end", currentFunc);
 
-    metadata->builder->CreateCondBr(condLLVM, ifStartBlock, ifEndBlock);
+    metadata->builder->CreateCondBr(condIR, ifStartBlock, ifEndBlock);
     metadata->builder->SetInsertPoint(ifStartBlock);
 
-    stmtBlock->getLLVMValue(metadata);
+    stmtBlock->getIRValue(metadata);
 
     metadata->builder->CreateBr(ifEndBlock);
     metadata->builder->SetInsertPoint(ifEndBlock);

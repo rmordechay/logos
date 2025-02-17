@@ -6,11 +6,11 @@
 
 class LogosVoid final : public LogosType {
 public:
-    Type* llvmType = Type::getVoidTy(context);
+    Type* IRType = Type::getVoidTy(context);
     string typeName = "Void";
 
     const string name() const override;
-    Type* getLLVMType() override;
+    Type* getIRType() override;
     bool operator==(LogosType* other) const override;
     ~LogosVoid() override = default;
 };
@@ -19,8 +19,8 @@ inline const string LogosVoid::name() const {
     return typeName;
 }
 
-inline Type* LogosVoid::getLLVMType() {
-    return llvmType;
+inline Type* LogosVoid::getIRType() {
+    return IRType;
 }
 
 inline bool LogosVoid::operator==(LogosType* other) const {

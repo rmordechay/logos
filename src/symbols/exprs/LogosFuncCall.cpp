@@ -10,7 +10,7 @@ string LogosFuncCall::getName() {
     return name;
 }
 
-Value* LogosFuncCall::computeLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosFuncCall::computeIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->theStack->getSymbol(name);
     return symbol->func->callFunc(metadata, args);
 }

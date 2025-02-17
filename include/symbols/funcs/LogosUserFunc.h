@@ -8,10 +8,11 @@ public:
     string parentName;
 
     explicit LogosUserFunc(const string& name, LogosType* funcType) : LogosFunc(name, funcType) {}
-
+    string getFuncName() const;
+    Value* computeIRValue(CodeGenMetadata* metadata) override;
     Value* callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
     Value* callFunc(CodeGenMetadata* metadata);
-    Value* computeLLVMValue(CodeGenMetadata* metadata) override;
+    FunctionType* getIRFunc() const;
     ~LogosUserFunc() override = default;
 };
 

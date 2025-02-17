@@ -12,7 +12,7 @@ public:
     explicit LogosInstance(const string& name) : name(name) {}
     string getName() override;
     LogosSymbolType getSymbolType() override;
-    Value* computeLLVMValue(CodeGenMetadata* metadata) override;
+    Value* computeIRValue(CodeGenMetadata* metadata) override;
     ~LogosInstance() override = default;
 };
 

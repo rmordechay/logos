@@ -21,8 +21,8 @@ public:
     static bool isLogosFile(const filesystem::directory_entry& filePath);
     static bool isMainFile(const filesystem::directory_entry& filePath);
     static LogosSymbol createSymbol(LogosExpr* expr);
-    static Module* createLLVMModuleFromFile(const string& filePath, LLVMContext& context, const TargetMachine& tm);
-    static void emitLLVMFile(const string& filePath, const Module* module);
+    static Module* createIRModuleFromFile(const string& filePath, LLVMContext& context, const TargetMachine& tm);
+    static void emitIRFile(const string& filePath, const Module* module);
 };
 
 

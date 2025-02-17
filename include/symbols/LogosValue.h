@@ -12,13 +12,13 @@ using namespace std;
 class LogosValue {
 public:
     Position position = Position();
-    Value* getLLVMValue(CodeGenMetadata* metadata);
+    Value* getIRValue(CodeGenMetadata* metadata);
     virtual void setPosition(const antlr4::Token* ctx, const string& filePath);
     virtual ~LogosValue() = default;
 protected:
-    virtual Value *computeLLVMValue(CodeGenMetadata* metadata) = 0;
+    virtual Value *computeIRValue(CodeGenMetadata* metadata) = 0;
 private:
-    Value* llvmValue = nullptr;
+    Value* IRValue = nullptr;
 };
 
 inline void LogosValue::setPosition(const antlr4::Token* ctx, const string& filePath) {
@@ -27,11 +27,11 @@ inline void LogosValue::setPosition(const antlr4::Token* ctx, const string& file
     position.filePath = &filePath;
 }
 
-inline Value* LogosValue::getLLVMValue(CodeGenMetadata* metadata) {
-    if (!llvmValue) {
-        llvmValue = computeLLVMValue(metadata);
+inline Value* LogosValue::getIRValue(CodeGenMetadata* metadata) {
+    if (!IRValue) {
+        IRValue = computeIRValue(metadata);
     }
-    return llvmValue;
+    return IRValue;
 }
 
 #endif //CODEGENERATION_H

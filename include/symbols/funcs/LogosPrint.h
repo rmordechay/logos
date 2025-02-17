@@ -8,7 +8,7 @@
 
 class LogosPrint final : public LogosFunc {
 public:
-    const string llvmName = "printInt";
+    const string IRName = "printInt";
     const string logosName = "print";
     const LogosVarDec* params[2] = {
         new LogosVarDec("input", &LOGOS_INT),
@@ -16,7 +16,7 @@ public:
     };
 
     explicit LogosPrint() : LogosFunc(logosName, &LOGOS_VOID) {}
-    Value* computeLLVMValue(CodeGenMetadata* metadata) override;
+    Value* computeIRValue(CodeGenMetadata* metadata) override;
     Value* callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
     ~LogosPrint() override = default;
 };

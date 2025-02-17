@@ -6,12 +6,12 @@
 
 class LogosBool final : public LogosType {
 public:
-    Type* llvmType = Type::getInt1Ty(context);
+    Type* IRType = Type::getInt1Ty(context);
      string typeName = "Bool";
      auto trueLiteral = "true";
 
     const string name() const override;
-    Type* getLLVMType() override;
+    Type* getIRType() override;
     bool operator==(LogosType* other) const override;
     ~LogosBool() override = default;
 };
@@ -20,12 +20,12 @@ inline const string LogosBool::name() const {
     return typeName;
 }
 
-inline void LogosBool::setLLVMType(Type* type) {
+inline void LogosBool::setIRType(Type* type) {
 
 }
 
-inline Type* LogosBool::getLLVMType() {
-    return llvmType;
+inline Type* LogosBool::getIRType() {
+    return IRType;
 }
 
 inline bool LogosBool::operator==(LogosType* other) const { return true;

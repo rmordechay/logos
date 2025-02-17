@@ -9,14 +9,14 @@ class LogosField;
 
 class LogosObject final : public LogosType {
 public:
-    Type* llvmType = nullptr;
+    Type* IRType = nullptr;
     string typeName;
     map<string, LogosField*> fields;
     map<string, LogosUserFunc*> funcs;
 
     explicit LogosObject(const string& typeName) : typeName(typeName) {}
     const string name() const override;
-    Type* getLLVMType() override;
+    Type* getIRType() override;
     bool operator==(LogosType* other) const override;
     ~LogosObject() override;
 };

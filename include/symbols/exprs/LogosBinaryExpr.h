@@ -16,7 +16,7 @@ public:
         op(op) {
     }
 
-    Value* computeLLVMValue(CodeGenMetadata* metadata) override;
+    Value* computeIRValue(CodeGenMetadata* metadata) override;
     ~LogosBinaryExpr() override = default;
     LogosSymbolType getSymbolType() override { return BINARY_EXPR; }
 };

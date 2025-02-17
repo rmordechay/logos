@@ -7,15 +7,15 @@ const string LogosObject::name() const {
     return typeName;
 }
 
-Type* LogosObject::getLLVMType() {
-    if (llvmType) return llvmType;
+Type* LogosObject::getIRType() {
+    if (IRType) return IRType;
     vector<Type*> elementTypes;
     for (const auto& entry : fields) {
-        auto fieldType = entry.second->inferredType->getLLVMType();
+        auto fieldType = entry.second->inferredType->getIRType();
         elementTypes.push_back(fieldType);
     }
-    llvmType = StructType::create(context, elementTypes);
-    return llvmType;
+    IRType = StructType::create(context, elementTypes);
+    return IRType;
 }
 
 bool LogosObject::operator==(LogosType* other) const { return true;

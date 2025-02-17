@@ -2,8 +2,8 @@
 
 #include "LogosUtils.h"
 
-Value* LogosVarDec::computeLLVMValue(CodeGenMetadata* metadata) {
-    const auto value = expr->getLLVMValue(metadata);
+Value* LogosVarDec::computeIRValue(CodeGenMetadata* metadata) {
+    const auto value = expr->getIRValue(metadata);
     const auto valueType = value->getType();
     if (!valueType->isPointerTy()) {
         const auto allocaInst = metadata->builder->CreateAlloca(valueType);

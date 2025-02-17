@@ -5,7 +5,7 @@
 #include "exprs/LogosFuncCall.h"
 #include "funcs/LogosUserFunc.h"
 
-Value* LogosSelection::computeLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosSelection::computeIRValue(CodeGenMetadata* metadata) {
     Value* value = nullptr;
     for (size_t i = 0; i < exprs.size() - 1; ++i) {
         const auto previousExpr = exprs[i];
@@ -24,7 +24,7 @@ Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExp
         return func->callFunc(metadata);
     }
     case FUNC_CALL: {
-        return symbol->funcCall->getLLVMValue(metadata);
+        return symbol->funcCall->getIRValue(metadata);
     }
     default:
         break;

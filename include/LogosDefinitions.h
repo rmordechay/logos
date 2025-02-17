@@ -11,6 +11,6 @@ const auto LOGOS_THIS = "this";
 const auto LOGOS_LIB_IR_FILE = "../codegen/print.ll";
 const auto LINKED_OBJECT_FILE = "../output.o";
 const auto LINKED_IR_FILE = "../output.ll";
-constexpr auto LLVM_OBJECT_FILE = llvm::CodeGenFileType::ObjectFile;
+constexpr auto IR_OBJECT_FILE = llvm::CodeGenFileType::ObjectFile;
 
 #endif //LOGOSCONFIGS_H

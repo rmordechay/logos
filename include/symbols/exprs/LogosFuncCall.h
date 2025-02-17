@@ -12,7 +12,7 @@ public:
 
     explicit LogosFuncCall(const string& name) : name(name) {}
     string getName() override;
-    Value* computeLLVMValue(CodeGenMetadata* metadata) override;
+    Value* computeIRValue(CodeGenMetadata* metadata) override;
     LogosSymbolType getSymbolType() override;
     ~LogosFuncCall() override;
 };

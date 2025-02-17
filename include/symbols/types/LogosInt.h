@@ -6,10 +6,10 @@
 
 class LogosInt final : public LogosType {
 public:
-    Type* llvmType = Type::getInt32Ty(context);
+    Type* IRType = Type::getInt32Ty(context);
 
     const string name() const override;
-    Type* getLLVMType() override;
+    Type* getIRType() override;
     bool operator==(LogosType* other) const override;
     ~LogosInt() override = default;
 };
@@ -18,8 +18,8 @@ inline const string LogosInt::name() const {
     return INT_TYPE_NAME;
 }
 
-inline Type* LogosInt::getLLVMType() {
-    return llvmType;
+inline Type* LogosInt::getIRType() {
+    return IRType;
 }
 
 inline bool LogosInt::operator==(LogosType* other) const { return true;

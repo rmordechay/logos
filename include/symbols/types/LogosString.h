@@ -8,11 +8,11 @@
 
 class LogosString final : public LogosType {
 public:
-    Type* llvmType = nullptr;
+    Type* IRType = nullptr;
      string typeName = "Str";
 
     const string name() const override;
-    Type* getLLVMType() override;
+    Type* getIRType() override;
     bool operator==(LogosType* other) const override;
     ~LogosString() override = default;
 };
@@ -21,8 +21,8 @@ inline const string LogosString::name() const {
     return typeName;
 }
 
-inline Type* LogosString::getLLVMType() {
-    if (llvmType) return llvmType;
+inline Type* LogosString::getIRType() {
+    if (IRType) return IRType;
     return nullptr;
 }
 

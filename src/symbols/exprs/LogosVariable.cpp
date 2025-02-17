@@ -14,21 +14,21 @@ LogosSymbolType LogosVariable::getSymbolType() {
     return VARIABLE;
 }
 
-Value* LogosVariable::computeLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->theStack->getSymbol(name);
     switch (symbol->type) {
     case FIELD: {
-        const auto expr = symbol->field->expr;
-        if (expr) {
-            return expr->getLLVMValue(metadata);
+        const auto field = symbol->field;
+        if (field->expr) {
+            return field->getIRValue(metadata);
         }
         break;
     }
     case FUNC_CALL: {
-        return symbol->funcCall->getLLVMValue(metadata);;
+        return symbol->funcCall->getIRValue(metadata);;
     }
     case SELECTION: {
-        return symbol->selection->getLLVMValue(metadata);
+        return symbol->selection->getIRValue(metadata);
     }
     default: break;
     }

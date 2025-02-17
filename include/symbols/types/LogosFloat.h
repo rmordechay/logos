@@ -6,11 +6,11 @@
 
 class LogosFloat final : public LogosType {
 public:
-    Type* llvmType = Type::getFloatTy(context);
+    Type* IRType = Type::getFloatTy(context);
      string typeName = "Float";
 
     const string name() const override;
-    Type* getLLVMType() override;
+    Type* getIRType() override;
     bool operator==(LogosType* other) const override;
     ~LogosFloat() override = default;
 };
@@ -19,8 +19,8 @@ inline const string LogosFloat::name() const {
     return typeName;
 }
 
-inline Type* LogosFloat::getLLVMType() {
-    return llvmType;
+inline Type* LogosFloat::getIRType() {
+    return IRType;
 }
 
 inline bool LogosFloat::operator==(LogosType* other) const { return true;

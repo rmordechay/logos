@@ -1,8 +1,8 @@
 #include "stmts/LogosStmtBlock.h"
 
-Value* LogosStmtBlock::computeLLVMValue(CodeGenMetadata* metadata) {
+Value* LogosStmtBlock::computeIRValue(CodeGenMetadata* metadata) {
     for (const auto& stmt : stmts) {
-        stmt->getLLVMValue(metadata);
+        stmt->getIRValue(metadata);
     }
     return nullptr;
 }
