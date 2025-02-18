@@ -12,7 +12,7 @@ struct LogosStackFrame {
     map<string, LogosSymbol> symbols;
 };
 
-class LogosStack : public stack<LogosStackFrame> {
+class LogosStack : stack<LogosStackFrame> {
 public:
     Function* currentFunc = nullptr;
     map<string, Module*> modules;

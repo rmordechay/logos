@@ -5,6 +5,7 @@
 
 #include <ThreadPool.h>
 #include <format>
+#include <funcs/LogosPrint.h>
 
 bool SemaAnalyser::analyse() {
     collectGlobals();
@@ -21,6 +22,7 @@ bool SemaAnalyser::analyse() {
 }
 
 void SemaAnalyser::collectGlobals() {
+    mainStack.addGlobalSymbol("print", LogosSymbol(FUNC, new LogosPrint()));
     for (const auto& [name, file] : files) {
         if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
             const auto object = objFile->obj;

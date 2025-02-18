@@ -8,12 +8,13 @@ Value* LogosRangeLoop::computeIRValue(CodeGenMetadata* metadata) {
     const auto currentFunc = metadata->logosStack->currentFunc;
     const auto builder = metadata->builder;
     auto& context = builder->getContext();
+    const auto i32Type = builder->getInt32Ty();
 
     const auto irStartRange = startRange->writeIRValue(metadata);
     const auto irEndRange = endRange->writeIRValue(metadata);
 
     // Init blocks
-    const auto counter = builder->CreateAlloca(builder->getInt32Ty(), nullptr);
+    const auto counter = builder->CreateAlloca(i32Type, nullptr);
     builder->CreateStore(irStartRange, counter);
     const auto loopCondBlock = BasicBlock::Create(context, "loop_cond", currentFunc);
     const auto loopBodyBlock = BasicBlock::Create(context, "loop_body", currentFunc);
@@ -22,7 +23,7 @@ Value* LogosRangeLoop::computeIRValue(CodeGenMetadata* metadata) {
     // Loop condition
     builder->CreateBr(loopCondBlock);
     builder->SetInsertPoint(loopCondBlock);
-    const auto currentVal = builder->CreateLoad(builder->getInt32Ty(), counter);
+    const auto currentVal = builder->CreateLoad(i32Type, counter);
     const auto condition = builder->CreateICmpSLT(currentVal, irEndRange);
     builder->CreateCondBr(condition, loopBodyBlock, afterLoopBlock);
 

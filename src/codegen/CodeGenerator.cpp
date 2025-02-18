@@ -7,7 +7,6 @@
 #include <llvm/Support/TargetSelect.h>
 
 void CodeGenerator::generateCode() const {
-    logosStack.addGlobalSymbol("print", LogosSymbol(FUNC, new LogosPrint()));
     generateMainModule();
 }
 

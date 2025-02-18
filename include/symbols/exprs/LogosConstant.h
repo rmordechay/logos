@@ -7,7 +7,6 @@ using namespace std;
 
 class LogosConstant final : public LogosUnaryExpr {
 public:
-
     using ConstValue = variant<bool, int, float, string>;
     ConstValue value;
 
