@@ -14,8 +14,8 @@ struct LogosStackFrame {
 
 class LogosStack : stack<LogosStackFrame> {
 public:
+    map<string, LogosSymbol> globalSymbols;
     Function* currentFunc = nullptr;
-    map<string, Module*> modules;
 
     void enterScope(Function* func);
     void enterScope();
@@ -23,10 +23,9 @@ public:
     LogosSymbol* getSymbol(const string& name);
     void addLocalSymbol(const string& name, const LogosSymbol& symbol);
     void addGlobalSymbol(const string& name, const LogosSymbol& symbol);
+    void deleteGlobalSymbol(const string& name);
     void reset();
     ~LogosStack() = default;
-private:
-    map<string, LogosSymbol> globalSymbols;
 };
 
 

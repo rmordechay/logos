@@ -4,7 +4,7 @@
 
 Value* LogosArray::computeIRValue(CodeGenMetadata* metadata) {
     const auto name = "arr";
-    auto *arrayVar = metadata->module->getGlobalVariable(name);
+    auto *arrayVar = metadata->currentModule->getGlobalVariable(name);
     if (arrayVar) return arrayVar;
 
     vector<Constant*> arrValues;
@@ -14,7 +14,7 @@ Value* LogosArray::computeIRValue(CodeGenMetadata* metadata) {
     const auto arrType = ArrayType::get(type->getIRType(), elements.size());
     const auto array = ConstantArray::get(arrType, arrValues);
 
-    return new GlobalVariable(*metadata->module, arrType, true, GlobalValue::PrivateLinkage, array, name);
+    return new GlobalVariable(*metadata->currentModule, arrType, true, GlobalValue::PrivateLinkage, array, name);
 }
 
 LogosSymbolType LogosArray::getSymbolType() {

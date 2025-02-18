@@ -6,16 +6,26 @@
 #include <LogosLexer.h>
 #include <LogosParser.h>
 #include <ThreadPool.h>
+#include <funcs/LogosPrint.h>
 
 void Application::runLogos() {
-    semaAnalyser.files = parse();
-    if (!semaAnalyser.analyse()) return;
-    const auto codeGenerator = CodeGenerator(semaAnalyser.mainStack, semaAnalyser.files);
-    codeGenerator.generateCode();
+    const auto files = parseFiles();
+    const auto globalSymbols = collectGlobals(files);
+    ThreadPool threadPool;
+    for (auto& [name, file] : files) {
+        threadPool.runTask([this, file, &globalSymbols] {
+            SemaAnalyser semaAnalyser;
+            semaAnalyser.logosStack.globalSymbols = globalSymbols;
+            semaAnalyser.visitLogosFile(file);
+        });
+    }
+    threadPool.wait();
+    const auto codeGenerator = CodeGenerator(mainFile);
+    codeGenerator.generateCode(globalSymbols);
     linker.runBinary();
 }
 
-map<string, LogosFile*> Application::parse() {
+map<string, LogosFile*> Application::parseFiles() {
     ThreadPool threadPool;
     map<string, LogosFile*> files;
     parseTree(rootPath, files, threadPool);
@@ -28,6 +38,9 @@ void Application::parseTree(const string& path, map<string, LogosFile*>& files, 
         if (Utils::isLogosFile(entry)) {
             threadPool.runTask([entry, &files, this] {
                 const auto logosFile = getFile(entry);
+                if (const auto mainFile = dynamic_cast<LogosMainFile*>(logosFile)) {
+                    this->mainFile = mainFile;
+                }
                 {
                     lock_guard lock(mtx);
                     files[logosFile->name] = logosFile;
@@ -37,6 +50,18 @@ void Application::parseTree(const string& path, map<string, LogosFile*>& files, 
             parseTree(entry.path(), files, threadPool);
         }
     }
+}
+
+map<string, LogosSymbol> Application::collectGlobals(map<string, LogosFile*> files) {
+    map<string, LogosSymbol> globalSymbols;
+    globalSymbols["print"] = LogosSymbol(FUNC, new LogosPrint());
+    for (const auto& [name, file] : files) {
+        if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
+            const auto object = objFile->obj;
+            globalSymbols[object->name()] = LogosSymbol(OBJECT, object);
+        }
+    }
+    return globalSymbols;
 }
 
 LogosFile* Application::getFile(const directory_entry& fileEntry) {

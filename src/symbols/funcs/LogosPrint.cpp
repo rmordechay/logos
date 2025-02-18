@@ -12,9 +12,9 @@ Value* LogosPrint::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>&
     const auto argValue = args[0]->writeIRValue(metadata);
     IRArgs.emplace_back(argValue);
 
-    const auto builder = metadata->builder;
-    const auto funcType = FunctionType::get(builder->getVoidTy(), builder->getInt32Ty(), false);
-    const auto func = metadata->module->getOrInsertFunction(IRName, funcType);
+    auto& builder = metadata->builder;
+    const auto funcType = FunctionType::get(builder.getVoidTy(), builder.getInt32Ty(), false);
+    const auto func = metadata->currentModule->getOrInsertFunction(IRName, funcType);
 
-    return builder->CreateCall(func, IRArgs);
+    return builder.CreateCall(func, IRArgs);
 }

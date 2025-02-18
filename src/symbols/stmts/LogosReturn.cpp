@@ -2,7 +2,7 @@
 
 Value* LogosReturn::computeIRValue(CodeGenMetadata* metadata) {
     const auto exprIR = expr->writeIRValue(metadata);
-    return metadata->builder->CreateRet(exprIR);
+    return metadata->builder.CreateRet(exprIR);
 }
 
 LogosReturn::~LogosReturn() {

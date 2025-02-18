@@ -18,7 +18,7 @@ Value* LogosSelection::computeIRValue(CodeGenMetadata* metadata) {
 }
 
 Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
-    const auto symbol = metadata->logosStack->getSymbol(previousExpr->getName());
+    const auto symbol = metadata->logosStack.getSymbol(previousExpr->getName());
     switch (symbol->type) {
     case INSTANCE: {
         const auto obj = symbol->instance->obj;

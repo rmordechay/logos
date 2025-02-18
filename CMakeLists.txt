@@ -28,7 +28,6 @@ add_library(libs STATIC
     src/parser/LogosParser.cpp
     src/sema/AntlrConverter.cpp
     src/sema/SemaAnalyser.cpp
-    src/sema/SemaFileAnalyser.cpp
     src/symbols/exprs/LogosBinaryExpr.cpp
     src/symbols/exprs/LogosConstant.cpp
     src/symbols/exprs/LogosFuncCall.cpp

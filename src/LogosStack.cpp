@@ -33,6 +33,10 @@ void LogosStack::addGlobalSymbol(const string& name, const LogosSymbol& symbol) 
     globalSymbols[name] = symbol;
 }
 
+void LogosStack::deleteGlobalSymbol(const string& name) {
+    globalSymbols.erase(name);
+}
+
 void LogosStack::reset() {
     while (size() > 0) {
         pop();

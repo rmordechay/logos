@@ -12,7 +12,7 @@
 #include <exprs/LogosConstant.h>
 
 Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
-    const auto symbol = metadata->logosStack->getSymbol(name);
+    const auto symbol = metadata->logosStack.getSymbol(name);
     switch (symbol->type) {
     case FIELD:
         return symbol->field->writeIRValue(metadata);

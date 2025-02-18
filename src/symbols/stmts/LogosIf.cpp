@@ -3,21 +3,21 @@
 #include "CodeGenerator.h"
 
 Value* LogosIf::computeIRValue(CodeGenMetadata* metadata) {
-    const auto currentFunc = metadata->logosStack->currentFunc;
-    metadata->logosStack->enterScope();
+    const auto currentFunc = metadata->logosStack.currentFunc;
+    metadata->logosStack.enterScope();
     const auto condIR = cond->writeIRValue(metadata);
     const auto ifStartBlock = BasicBlock::Create(context, "if.start", currentFunc);
     const auto ifEndBlock = BasicBlock::Create(context, "if.end", currentFunc);
 
-    const auto builder = metadata->builder;
-    builder->CreateCondBr(condIR, ifStartBlock, ifEndBlock);
-    builder->SetInsertPoint(ifStartBlock);
+    auto& builder = metadata->builder;
+    builder.CreateCondBr(condIR, ifStartBlock, ifEndBlock);
+    builder.SetInsertPoint(ifStartBlock);
 
     stmtBlock->writeIRValue(metadata);
 
-    builder->CreateBr(ifEndBlock);
-    builder->SetInsertPoint(ifEndBlock);
-    metadata->logosStack->exitScope();
+    builder.CreateBr(ifEndBlock);
+    builder.SetInsertPoint(ifEndBlock);
+    metadata->logosStack.exitScope();
     return nullptr;
 }
 

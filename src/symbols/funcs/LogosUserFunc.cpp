@@ -5,19 +5,19 @@
 #include <LogosStack.h>
 
 Value* LogosUserFunc::computeIRValue(CodeGenMetadata* metadata) {
-    const auto func = Function::Create(getIRFunc(), Function::ExternalLinkage, getFuncName(), metadata->module);
-    metadata->logosStack->enterScope(func);
+    const auto func = Function::Create(getIRFunc(), Function::ExternalLinkage, getFuncName(), metadata->currentModule);
+    metadata->logosStack.enterScope(func);
 
     auto arg = func->arg_begin();
     for (const auto& param : params) {
-        metadata->logosStack->addLocalSymbol(param->name, LogosSymbol::createSymbol(param->expr));
+        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol::createSymbol(param->expr));
         arg++;
     }
 
     const auto funcEntry = BasicBlock::Create(context, "entry", func);
-    metadata->builder->SetInsertPoint(funcEntry);
+    metadata->builder.SetInsertPoint(funcEntry);
     stmtBlock->writeIRValue(metadata);
-    metadata->logosStack->exitScope();
+    metadata->logosStack.exitScope();
     return func;
 }
 
@@ -30,8 +30,8 @@ Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr
         paramTypes.emplace_back(argValue->getType());
     }
     const auto funcType = FunctionType::get(type->getIRType(), paramTypes, false);
-    const auto func = metadata->module->getOrInsertFunction(getFuncName(), funcType);
-    return metadata->builder->CreateCall(func, paramValues);
+    const auto func = metadata->currentModule->getOrInsertFunction(getFuncName(), funcType);
+    return metadata->builder.CreateCall(func, paramValues);
 }
 
 FunctionType* LogosUserFunc::getIRFunc() const {

@@ -17,14 +17,15 @@ using namespace llvm;
 class Application {
 public:
     string rootPath;
-    SemaAnalyser semaAnalyser;
     LogosLinker linker;
+    LogosMainFile* mainFile = nullptr;
     mutex mtx;
 
     explicit Application(const string& rootPath) : rootPath(rootPath) {}
     void runLogos();
-    map<string, LogosFile*> parse();
+    map<string, LogosFile*> parseFiles();
     void parseTree(const string& path, map<string, LogosFile*>& files, ThreadPool& threadPool);
+    static map<string, LogosSymbol> collectGlobals(map<string, LogosFile*> files);
     static LogosFile* getFile(const directory_entry&);
     ~Application() = default;
 };
