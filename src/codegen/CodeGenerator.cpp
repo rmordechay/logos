@@ -7,15 +7,15 @@
 #include <llvm/Support/TargetSelect.h>
 
 void CodeGenerator::generateCode() const {
-    theStack.addGlobalSymbol("print", LogosSymbol(FUNC, new LogosPrint()));
+    logosStack.addGlobalSymbol("print", LogosSymbol(FUNC, new LogosPrint()));
     generateMainModule();
 }
 
 void CodeGenerator::generateMainModule() const {
     auto builder = IRBuilder(context);
     const auto module = new Module(LOGOS_MAIN_FILE, context);
-    theStack.modules[LOGOS_MAIN_FILE] = module;
-    auto metadata = createMetadata(builder, &theStack, module);
+    logosStack.modules[LOGOS_MAIN_FILE] = module;
+    auto metadata = createMetadata(builder, &logosStack, module);
 
     const auto mainFile = dynamic_cast<LogosMainFile*>(files.at(LOGOS_MAIN_FILE));
     // Main func
@@ -33,13 +33,11 @@ void CodeGenerator::generateObjModule(LogosObject* obj, CodeGenMetadata& metadat
     auto builder = IRBuilder(context);
     const auto objName = obj->name();
     const auto module = new Module(objName, context);
-    metadata.theStack->modules[objName] = module;
-    const auto newStack = metadata.theStack;
-    while (newStack->size() > 0) {
-        newStack->pop();
-    }
+    metadata.logosStack->modules[objName] = module;
+    const auto newStack = metadata.logosStack;
+    newStack->reset();
 
-    metadata.theStack = newStack;
+    metadata.logosStack = newStack;
 
     obj->getIRType();
     for (const auto& entry : obj->fields) {
@@ -61,7 +59,7 @@ void CodeGenerator::writeIRToFile(const Module* module, const string& name) {
 }
 
 CodeGenMetadata CodeGenerator::createMetadata(IRBuilder<>& builder, LogosStack* logosStack, Module* module) {
-    return CodeGenMetadata{.builder = &builder, .theStack = logosStack, .module = module};
+    return CodeGenMetadata{.builder = &builder, .logosStack = logosStack, .module = module};
 }
 
 void CodeGenerator::initIR() {

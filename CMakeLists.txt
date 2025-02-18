@@ -27,6 +27,7 @@ add_library(libs STATIC
     src/parser/LogosParser.cpp
     src/sema/AntlrConverter.cpp
     src/sema/SemaAnalyser.cpp
+    src/sema/SemaFileAnalyser.cpp
     src/symbols/exprs/LogosBinaryExpr.cpp
     src/symbols/exprs/LogosConstant.cpp
     src/symbols/exprs/LogosFuncCall.cpp
@@ -45,6 +46,7 @@ add_library(libs STATIC
     src/symbols/stmts/LogosVarDec.cpp
     src/symbols/stmts/LogosLoop.cpp
     src/symbols/exprs/LogosArrayIndex.cpp
+    src/symbols/LogosSymbol.cpp
 )
 
 add_executable(logos main.cpp src/LogosStack.cpp)

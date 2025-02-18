@@ -1,6 +1,7 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
 
+class LogosExpr;
 class LogosArrayIndex;
 class LogosArray;
 class LogosSelection;
@@ -103,6 +104,9 @@ struct LogosSymbol {
         type(type),
         arrayIndex(arrayIndex) {
     }
+
+    static LogosSymbol createSymbol(LogosExpr* expr) const;
 };
+
 
 #endif //LOGOSSYMBOL_H

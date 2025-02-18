@@ -12,8 +12,8 @@ Value* LogosVarDec::computeIRValue(CodeGenMetadata* metadata) {
         const auto allocaInst = builder->CreateAlloca(valueType);
         builder->CreateStore(value, allocaInst);
     }
-    const auto symbol = Utils::createSymbol(expr);
-    metadata->theStack->addLocalSymbol(name, symbol);
+    const auto symbol = LogosSymbol::createSymbol(expr);
+    metadata->logosStack->addLocalSymbol(name, symbol);
     return value;
 }
 

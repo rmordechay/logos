@@ -11,7 +11,7 @@ Value* LogosFieldDefinition::computeIRValue(CodeGenMetadata* metadata) {
     // TODO make dynamic
     const auto firstName = names[0];
     const auto secondName = names[1];
-    const auto instance = metadata->theStack->getSymbol(firstName)->instance;
+    const auto instance = metadata->logosStack->getSymbol(firstName)->instance;
     const auto obj = instance->obj;
     const auto value = instance->getIRValue(metadata);
     const auto type = instance->type->getIRType();

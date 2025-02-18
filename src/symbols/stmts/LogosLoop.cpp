@@ -1,10 +1,13 @@
 #include "stmts/LogosLoop.h"
 
 #include <LogosStack.h>
+#include <LogosUtils.h>
 #include <exprs/LogosExpr.h>
+#include <exprs/LogosVariable.h>
+#include <stmts/LogosStmtBlock.h>
 
 Value* LogosLoop::computeIRValue(CodeGenMetadata* metadata) {
-    const auto currentFunc = metadata->theStack->top().IRFunc;
+    const auto currentFunc = metadata->logosStack->top().IRFunc;
     const auto builder = metadata->builder;
     auto& context = builder->getContext();
 
@@ -32,13 +35,10 @@ Value* LogosLoop::computeIRValue(CodeGenMetadata* metadata) {
         CurrentIdx
     };
 
-    // // Here you can access the array elements using CurrentIdx
-    // // For example:
-    // const auto ElementPtr = builder->CreateInBoundsGEP(ArrayType, ConstArray, IdxList);
-    // auto CurrentElement = builder->CreateLoad(Type::getInt32Ty(context), ElementPtr);
-    //
-    // // Your code to process CurrentElement goes here
-    //
+    metadata->logosStack->addLocalSymbol(loopVar->name, LogosSymbol::createSymbol(loopVar));
+
+    stmtBlock->getIRValue(metadata);
+
     // Increment counter
     const auto Incremented = builder->CreateAdd(
         CurrentIdx,

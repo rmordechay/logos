@@ -15,10 +15,10 @@ class CodeGenerator {
 public:
     vector<Module*> modules;
     vector<LogosValue*> codeNodes;
-    LogosStack& theStack;
+    LogosStack& logosStack;
     map<string, LogosFile*>& files;
 
-    CodeGenerator(LogosStack& theStack, map<string, LogosFile*>& files) : theStack(theStack), files(files) {
+    CodeGenerator(LogosStack& logosStack, map<string, LogosFile*>& files) : logosStack(logosStack), files(files) {
         initIR();
     }
 

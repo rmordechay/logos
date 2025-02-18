@@ -3,9 +3,9 @@
 #include "CodeGenerator.h"
 
 Value* LogosInstance::computeIRValue(CodeGenMetadata* metadata) {
-    const auto obj = metadata->theStack->getSymbol(name)->object;
+    const auto obj = metadata->logosStack->getSymbol(name)->object;
     // TODO make modules a map to check if they were already generated
-    CodeGenerator::generateObjModule(obj, TODO);
+    CodeGenerator::generateObjModule(obj, *metadata);
     const auto IRType = obj->getIRType();
     return metadata->builder->CreateAlloca(IRType);
 }

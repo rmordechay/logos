@@ -10,7 +10,7 @@
 void Application::runLogos() {
     semaAnalyser.files = parse();
     if (!semaAnalyser.analyse()) return;
-    auto codeGenerator = CodeGenerator(semaAnalyser.theStack, semaAnalyser.files);
+    const auto codeGenerator = CodeGenerator(semaAnalyser.mainStack, semaAnalyser.files);
     codeGenerator.generateCode();
     linker.runBinary();
 }

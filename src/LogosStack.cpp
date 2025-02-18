@@ -1,5 +1,7 @@
 #include "LogosStack.h"
 
+#include <iostream>
+
 void LogosStack::enterScope(Function* func) {
     push(LogosStackFrame(func));
 }
@@ -36,5 +38,8 @@ void LogosStack::setCurrentFunc(Function* value) {
     top().IRFunc = value;
 }
 
-void LogosStack::resetStack() {
+void LogosStack::reset() {
+    while (size() > 0) {
+        pop();
+    }
 }

@@ -9,6 +9,7 @@
 
 #include <exprs/LogosArray.h>
 #include <exprs/LogosArrayIndex.h>
+#include <exprs/LogosFuncCall.h>
 
 LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
     LogosFile* logosFile = nullptr;

@@ -12,7 +12,7 @@
 #include <exprs/LogosConstant.h>
 
 Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
-    const auto symbol = metadata->theStack->getSymbol(name);
+    const auto symbol = metadata->logosStack->getSymbol(name);
     switch (symbol->type) {
     case FIELD:
         return symbol->field->getIRValue(metadata);
@@ -25,6 +25,7 @@ Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
     case INSTANCE:
         return symbol->instance->getIRValue(metadata);
     case VARIABLE:
+        
         return symbol->variable->getIRValue(metadata);
     case CONSTANT:
         return symbol->constant->getIRValue(metadata);

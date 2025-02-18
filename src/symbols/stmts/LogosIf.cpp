@@ -3,7 +3,7 @@
 #include "CodeGenerator.h"
 
 Value* LogosIf::computeIRValue(CodeGenMetadata* metadata) {
-    const auto currentFunc = metadata->theStack->top().IRFunc;
+    const auto currentFunc = metadata->logosStack->top().IRFunc;
     const auto condIR = cond->getIRValue(metadata);
     const auto ifStartBlock = BasicBlock::Create(context, "if.start", currentFunc);
     const auto ifEndBlock = BasicBlock::Create(context, "if.end", currentFunc);

@@ -12,6 +12,6 @@ Value* LogosField::computeIRValue(CodeGenMetadata* metadata) {
         const auto value = expr->getIRValue(metadata);
         return metadata->builder->CreateStructGEP(type, value, fieldPosition);
     }
-    metadata->theStack->addGlobalSymbol(name, LogosSymbol(FIELD, this));
+    metadata->logosStack->addGlobalSymbol(name, LogosSymbol(FIELD, this));
     return nullptr;
 }

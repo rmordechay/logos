@@ -11,7 +11,7 @@ inline LLVMContext context;
 
 struct CodeGenMetadata {
     IRBuilder<>* builder;
-    LogosStack* theStack;
+    LogosStack* logosStack;
     Module* module;
     CodeGenerator* codeGen;
 };
