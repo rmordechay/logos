@@ -10,6 +10,7 @@
 #include <exprs/LogosArrayIndex.h>
 #include <exprs/LogosBinaryExpr.h>
 #include <exprs/LogosConstant.h>
+#include <funcs/LogosFuncImpl.h>
 
 Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->logosStack.getSymbol(name);

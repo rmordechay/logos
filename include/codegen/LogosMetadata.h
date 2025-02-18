@@ -3,7 +3,6 @@
 
 #include <LogosStack.h>
 #include <llvm/IR/IRBuilder.h>
-#include <map>
 
 class CodeGenerator;
 class LogosStack;

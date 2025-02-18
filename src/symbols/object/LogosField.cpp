@@ -11,12 +11,10 @@ Value* LogosField::computeIRValue(CodeGenMetadata* metadata) {
     if (expr) {
         const auto type = inferredType->getIRType();
         const auto value = expr->writeIRValue(metadata);
-        const auto gep = builder.CreateStructGEP(type, value, 0);
-        return gep;
+        return builder.CreateGEP(type, value, nullptr);
     }
-    const auto gep = builder.CreateAlloca(inferredType->getIRType());
-    const auto val = builder.getInt32(0);
-    builder.CreateStore(val, gep);
-    return val;
-}
+    const auto thisSymbol = metadata->logosStack.getSymbol("this");
+    const auto objType = thisSymbol->object->getIRType();
 
+    return builder.CreateStructGEP(objType, objPtr, fieldPosition);
+}

@@ -1,12 +1,10 @@
 #ifndef CODEGENERATION_H
 #define CODEGENERATION_H
 
-#include "codegen/LogosMetadata.h"
 
 #include <Token.h>
-
-using namespace llvm;
-using namespace std;
+#include <llvm/IR/Value.h>
+#include "codegen/LogosMetadata.h"
 
 class LogosValue {
 public:

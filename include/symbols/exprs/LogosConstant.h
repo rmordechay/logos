@@ -1,7 +1,8 @@
 #ifndef LOGOSCONSTANTEXPR_H
 #define LOGOSCONSTANTEXPR_H
+#include <LogosMetadata.h>
+#include <LogosSymbol.h>
 #include "LogosUnaryExpr.h"
-
 
 using namespace std;
 

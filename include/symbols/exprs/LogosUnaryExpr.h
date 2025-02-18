@@ -3,7 +3,7 @@
 #include "LogosExpr.h"
 
 #include <string>
-
+#include <types/LogosType.h>
 
 class LogosUnaryExpr: public LogosExpr {
 public:

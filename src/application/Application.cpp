@@ -54,7 +54,7 @@ void Application::parseTree(const string& path, map<string, LogosFile*>& files, 
 
 map<string, LogosSymbol> Application::collectGlobals(map<string, LogosFile*> files) {
     map<string, LogosSymbol> globalSymbols;
-    globalSymbols["print"] = LogosSymbol(FUNC_IMPL, new LogosPrint());
+    globalSymbols["print"] = LogosSymbol(INTERNAL_FUNC, new LogosPrint());
     for (const auto& [name, file] : files) {
         if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
             const auto object = objFile->obj;

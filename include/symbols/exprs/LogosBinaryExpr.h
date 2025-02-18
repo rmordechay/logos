@@ -3,6 +3,9 @@
 #include "LogosExpr.h"
 #include "LogosOperator.h"
 
+#include <LogosMetadata.h>
+#include <types/LogosType.h>
+
 class LogosBinaryExpr final : public LogosExpr {
 public:
     LogosExpr* left;

@@ -1,8 +1,9 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
-#include <funcs/LogosFuncImpl.h>
-#include <funcs/LogosMethodImpl.h>
 
+
+class LogosMethodImpl;
+class LogosFuncImpl;
 class LogosExpr;
 class LogosArrayIndex;
 class LogosArray;
@@ -24,6 +25,7 @@ enum LogosSymbolType {
     FUNC_CALL,
     VARIABLE,
     CONSTANT,
+    INTERNAL_FUNC,
     FUNC_IMPL,
     METHOD_IMPL,
     SELECTION,
@@ -37,6 +39,7 @@ struct LogosSymbol {
     union {
         LogosObject* object;
         LogosField* field;
+        LogosFunc* internalFunc;
         LogosFuncImpl* funcImpl;
         LogosMethodImpl* methodImpl;
         LogosInstance* instance;
@@ -67,6 +70,16 @@ struct LogosSymbol {
     LogosSymbol(const LogosSymbolType type, LogosInstance* constructor) :
         type(type),
         instance(constructor) {
+    }
+
+    LogosSymbol(const LogosSymbolType type, LogosFuncCall* funcCall) :
+        type(type),
+        funcCall(funcCall) {
+    }
+
+    LogosSymbol(LogosSymbolType type, LogosFunc* func) :
+        type(type),
+        internalFunc(func) {
     }
 
     LogosSymbol(const LogosSymbolType type, LogosFuncImpl* funcImpl) :

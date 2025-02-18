@@ -1,5 +1,11 @@
 #include "exprs/LogosConstant.h"
 
+#include <LogosMetadata.h>
+#include <LogosSymbol.h>
+
+
+struct CodeGenMetadata;
+
 Value* LogosConstant::computeIRValue(CodeGenMetadata* metadata) {
     if (const auto intValue = get_if<int>(&value)) {
         return metadata->builder.getInt32(*intValue);
