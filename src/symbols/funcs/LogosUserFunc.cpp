@@ -7,6 +7,7 @@
 Value* LogosUserFunc::computeIRValue(CodeGenMetadata* metadata) {
     const auto func = Function::Create(getIRFunc(), Function::ExternalLinkage, getFuncName(), metadata->module);
     metadata->logosStack->enterScope(func);
+
     auto arg = func->arg_begin();
     for (const auto& param : params) {
         metadata->logosStack->addLocalSymbol(param->name, LogosSymbol::createSymbol(param->expr));
@@ -15,7 +16,7 @@ Value* LogosUserFunc::computeIRValue(CodeGenMetadata* metadata) {
 
     const auto funcEntry = BasicBlock::Create(context, "entry", func);
     metadata->builder->SetInsertPoint(funcEntry);
-    stmtBlock->getIRValue(metadata);
+    stmtBlock->writeIRValue(metadata);
     metadata->logosStack->exitScope();
     return func;
 }
@@ -24,7 +25,7 @@ Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr
     vector<Value*> paramValues;
     vector<Type*> paramTypes;
     for (const auto& arg : args) {
-        const auto argValue = arg->getIRValue(metadata);
+        const auto argValue = arg->writeIRValue(metadata);
         paramValues.emplace_back(argValue);
         paramTypes.emplace_back(argValue->getType());
     }

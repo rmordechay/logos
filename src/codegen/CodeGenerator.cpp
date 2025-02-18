@@ -41,11 +41,11 @@ void CodeGenerator::generateObjModule(LogosObject* obj, CodeGenMetadata& metadat
 
     obj->getIRType();
     for (const auto& entry : obj->fields) {
-        entry.second->getIRValue(&metadata);
+        entry.second->writeIRValue(&metadata);
     }
 
     for (const auto& entry : obj->funcs) {
-        entry.second->getIRValue(&metadata);
+        entry.second->writeIRValue(&metadata);
     }
 
     writeIRToFile(metadata.module, module->getName().str());

@@ -105,7 +105,7 @@ struct LogosSymbol {
         arrayIndex(arrayIndex) {
     }
 
-    static LogosSymbol createSymbol(LogosExpr* expr) const;
+    static LogosSymbol createSymbol(LogosExpr* expr);
 };
 
 

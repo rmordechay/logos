@@ -5,7 +5,7 @@
 #include <LogosStack.h>
 
 Value* LogosVarDec::computeIRValue(CodeGenMetadata* metadata) {
-    const auto value = expr->getIRValue(metadata);
+    const auto value = expr->writeIRValue(metadata);
     const auto valueType = value->getType();
     if (!valueType->isPointerTy()) {
         const auto builder = metadata->builder;

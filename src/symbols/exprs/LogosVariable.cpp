@@ -15,26 +15,25 @@ Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->logosStack->getSymbol(name);
     switch (symbol->type) {
     case FIELD:
-        return symbol->field->getIRValue(metadata);
+        return symbol->field->writeIRValue(metadata);
     case FUNC_CALL:
-        return symbol->funcCall->getIRValue(metadata);
+        return symbol->funcCall->writeIRValue(metadata);
     case SELECTION:
-        return symbol->selection->getIRValue(metadata);
+        return symbol->selection->writeIRValue(metadata);
     case BINARY_EXPR:
-        return symbol->binaryExpr->getIRValue(metadata);
+        return symbol->binaryExpr->writeIRValue(metadata);
     case INSTANCE:
-        return symbol->instance->getIRValue(metadata);
+        return symbol->instance->writeIRValue(metadata);
     case VARIABLE:
-        
-        return symbol->variable->getIRValue(metadata);
+        return nullptr;
     case CONSTANT:
-        return symbol->constant->getIRValue(metadata);
+        return symbol->constant->writeIRValue(metadata);
     case FUNC:
-        return symbol->func->getIRValue(metadata);
+        return symbol->func->writeIRValue(metadata);
     case ARRAY:
-        return symbol->array->getIRValue(metadata);
+        return symbol->array->writeIRValue(metadata);
     case ARRAY_INDEX:
-        return symbol->arrayIndex->getIRValue(metadata);
+        return symbol->arrayIndex->writeIRValue(metadata);
     default:
         return nullptr;
     }

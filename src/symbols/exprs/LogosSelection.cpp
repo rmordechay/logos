@@ -26,7 +26,7 @@ Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExp
         return func->callFunc(metadata);
     }
     case FUNC_CALL: {
-        return symbol->funcCall->getIRValue(metadata);
+        return symbol->funcCall->writeIRValue(metadata);
     }
     default:
         break;

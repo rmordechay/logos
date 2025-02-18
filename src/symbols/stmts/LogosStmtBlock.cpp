@@ -2,7 +2,7 @@
 
 Value* LogosStmtBlock::computeIRValue(CodeGenMetadata* metadata) {
     for (const auto& stmt : stmts) {
-        stmt->getIRValue(metadata);
+        stmt->writeIRValue(metadata);
     }
     return nullptr;
 }

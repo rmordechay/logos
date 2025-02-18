@@ -1,9 +1,8 @@
 #include "LogosStack.h"
 
-#include <iostream>
-
 void LogosStack::enterScope(Function* func) {
-    push(LogosStackFrame(func));
+    currentFunc = func;
+    push(LogosStackFrame());
 }
 
 void LogosStack::enterScope() {
@@ -32,10 +31,6 @@ void LogosStack::addLocalSymbol(const string& name, const LogosSymbol& symbol) {
 
 void LogosStack::addGlobalSymbol(const string& name, const LogosSymbol& symbol) {
     globalSymbols[name] = symbol;
-}
-
-void LogosStack::setCurrentFunc(Function* value) {
-    top().IRFunc = value;
 }
 
 void LogosStack::reset() {

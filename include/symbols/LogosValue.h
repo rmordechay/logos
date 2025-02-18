@@ -11,7 +11,7 @@ using namespace std;
 class LogosValue {
 public:
     Position position = Position();
-    Value* getIRValue(CodeGenMetadata* metadata);
+    Value* writeIRValue(CodeGenMetadata* metadata);
     void setIRValue(Value* value);
     virtual void setPosition(const antlr4::Token* ctx, const string& filePath);
     virtual ~LogosValue() = default;
@@ -27,7 +27,7 @@ inline void LogosValue::setPosition(const antlr4::Token* ctx, const string& file
     position.filePath = &filePath;
 }
 
-inline Value* LogosValue::getIRValue(CodeGenMetadata* metadata) {
+inline Value* LogosValue::writeIRValue(CodeGenMetadata* metadata) {
     if (!IRValue) {
         IRValue = computeIRValue(metadata);
     }

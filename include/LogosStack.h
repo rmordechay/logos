@@ -9,15 +9,12 @@ using namespace std;
 using namespace llvm;
 
 struct LogosStackFrame {
-    Function* IRFunc = nullptr;
     map<string, LogosSymbol> symbols;
-
-    LogosStackFrame() = default;
-    explicit LogosStackFrame(Function* IRFunc) : IRFunc(IRFunc) {}
 };
 
 class LogosStack : public stack<LogosStackFrame> {
 public:
+    Function* currentFunc = nullptr;
     map<string, Module*> modules;
 
     void enterScope(Function* func);
@@ -26,7 +23,6 @@ public:
     LogosSymbol* getSymbol(const string& name);
     void addLocalSymbol(const string& name, const LogosSymbol& symbol);
     void addGlobalSymbol(const string& name, const LogosSymbol& symbol);
-    void setCurrentFunc(Function* value);
     void reset();
     ~LogosStack() = default;
 private:

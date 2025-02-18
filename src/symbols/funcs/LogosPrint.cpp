@@ -9,7 +9,7 @@ Value* LogosPrint::computeIRValue(CodeGenMetadata* metadata) {
 
 Value* LogosPrint::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
     vector<Value*> IRArgs;
-    const auto argValue = args[0]->getIRValue(metadata);
+    const auto argValue = args[0]->writeIRValue(metadata);
     IRArgs.emplace_back(argValue);
 
     const auto builder = metadata->builder;
