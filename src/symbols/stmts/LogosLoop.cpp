@@ -7,6 +7,11 @@
 #include <types/LogosInt.h>
 
 Value* LogosLoop::computeIRValue(CodeGenMetadata* metadata) {
+    iterationLoop(metadata);
+    return nullptr;
+}
+
+void LogosLoop::iterationLoop(CodeGenMetadata* metadata) const {
     const auto currentFunc = metadata->logosStack->currentFunc;
     const auto builder = metadata->builder;
     auto& context = builder->getContext();
@@ -39,5 +44,4 @@ Value* LogosLoop::computeIRValue(CodeGenMetadata* metadata) {
     builder->CreateBr(loopCondBlock);
     builder->SetInsertPoint(afterLoopBlock);
     metadata->logosStack->exitScope();
-    return nullptr;
 }

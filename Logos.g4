@@ -99,8 +99,8 @@ pattern:
 
 loopStatement:
         FOR VARIABLE? statementsBlock
+    |   FOR VARIABLE IN iterableRange=range statementsBlock
     |   FOR exprList IN iterableExpr=expr statementsBlock
-    |   FOR exprList IN iterableRange=range statementsBlock
     ;
 
 controlFlow:

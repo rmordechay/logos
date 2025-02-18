@@ -180,9 +180,9 @@ void logosParserInitialize() {
   	1,0,0,0,270,271,1,0,0,0,271,272,5,7,0,0,272,41,1,0,0,0,273,274,3,54,27,
   	0,274,275,5,15,0,0,275,276,3,28,14,0,276,43,1,0,0,0,277,279,5,34,0,0,
   	278,280,5,47,0,0,279,278,1,0,0,0,279,280,1,0,0,0,280,281,1,0,0,0,281,
-  	295,3,28,14,0,282,283,5,34,0,0,283,284,3,56,28,0,284,285,5,41,0,0,285,
-  	286,3,54,27,0,286,287,3,28,14,0,287,295,1,0,0,0,288,289,5,34,0,0,289,
-  	290,3,56,28,0,290,291,5,41,0,0,291,292,3,78,39,0,292,293,3,28,14,0,293,
+  	295,3,28,14,0,282,283,5,34,0,0,283,284,5,47,0,0,284,285,5,41,0,0,285,
+  	286,3,78,39,0,286,287,3,28,14,0,287,295,1,0,0,0,288,289,5,34,0,0,289,
+  	290,3,56,28,0,290,291,5,41,0,0,291,292,3,54,27,0,292,293,3,28,14,0,293,
   	295,1,0,0,0,294,277,1,0,0,0,294,282,1,0,0,0,294,288,1,0,0,0,295,45,1,
   	0,0,0,296,297,5,35,0,0,297,302,3,54,27,0,298,299,5,35,0,0,299,302,5,32,
   	0,0,300,302,5,36,0,0,301,296,1,0,0,0,301,298,1,0,0,0,301,300,1,0,0,0,
@@ -1968,20 +1968,20 @@ tree::TerminalNode* LogosParser::LoopStatementContext::VARIABLE() {
   return getToken(LogosParser::VARIABLE, 0);
 }
 
-LogosParser::ExprListContext* LogosParser::LoopStatementContext::exprList() {
-  return getRuleContext<LogosParser::ExprListContext>(0);
-}
-
 tree::TerminalNode* LogosParser::LoopStatementContext::IN() {
   return getToken(LogosParser::IN, 0);
 }
 
-LogosParser::ExprContext* LogosParser::LoopStatementContext::expr() {
-  return getRuleContext<LogosParser::ExprContext>(0);
-}
-
 LogosParser::RangeContext* LogosParser::LoopStatementContext::range() {
   return getRuleContext<LogosParser::RangeContext>(0);
+}
+
+LogosParser::ExprListContext* LogosParser::LoopStatementContext::exprList() {
+  return getRuleContext<LogosParser::ExprListContext>(0);
+}
+
+LogosParser::ExprContext* LogosParser::LoopStatementContext::expr() {
+  return getRuleContext<LogosParser::ExprContext>(0);
 }
 
 
@@ -2028,11 +2028,11 @@ LogosParser::LoopStatementContext* LogosParser::loopStatement() {
       setState(282);
       match(LogosParser::FOR);
       setState(283);
-      exprList();
+      match(LogosParser::VARIABLE);
       setState(284);
       match(LogosParser::IN);
       setState(285);
-      antlrcpp::downCast<LoopStatementContext *>(_localctx)->iterableExpr = expr(0);
+      antlrcpp::downCast<LoopStatementContext *>(_localctx)->iterableRange = range();
       setState(286);
       statementsBlock();
       break;
@@ -2047,7 +2047,7 @@ LogosParser::LoopStatementContext* LogosParser::loopStatement() {
       setState(290);
       match(LogosParser::IN);
       setState(291);
-      antlrcpp::downCast<LoopStatementContext *>(_localctx)->iterableRange = range();
+      antlrcpp::downCast<LoopStatementContext *>(_localctx)->iterableExpr = expr(0);
       setState(292);
       statementsBlock();
       break;

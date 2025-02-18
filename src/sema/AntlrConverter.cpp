@@ -163,11 +163,21 @@ LogosIf* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
 }
 
 LogosLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ctx) {
-    const auto loopVarName = ctx->exprList()->expr()[0]->getText();
-    const auto loopVar = getVariable(loopVarName, ctx);
-    const auto expr = getExpr(ctx->iterableExpr);
+    LogosLoop* loopStmt;
     const auto stmts = getStmtBlock(ctx->statementsBlock());
-    const auto loopStmt = new LogosLoop(loopVar, expr, stmts);
+    if (const auto iterableExpr = ctx->iterableExpr) {
+        const auto loopVarName = ctx->exprList()->expr()[0]->getText();
+        const auto loopVar = getVariable(loopVarName, ctx);
+        const auto expr = getExpr(iterableExpr);
+        loopStmt = new LogosLoop(FOREACH_LOOP, loopVar, expr, stmts);
+    } else if (const auto range = ctx->iterableRange) {
+        const auto loopVarName = ctx->VARIABLE()->getText();
+        const auto loopVar = getVariable(loopVarName, ctx);
+        loopStmt = new LogosLoop(RANGE_LOOP, loopVar, nullptr, stmts);
+    } else {
+        const auto loopVarName = ctx->VARIABLE()->getText();
+        loopStmt = new LogosLoop(INFINITE_LOOP, stmts);
+    }
     loopStmt->setPosition(ctx->start, filePath);
     return loopStmt;
 }

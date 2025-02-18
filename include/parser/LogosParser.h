@@ -421,17 +421,17 @@ public:
 
   class  LoopStatementContext : public antlr4::ParserRuleContext {
   public:
-    LogosParser::ExprContext *iterableExpr = nullptr;
     LogosParser::RangeContext *iterableRange = nullptr;
+    LogosParser::ExprContext *iterableExpr = nullptr;
     LoopStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *FOR();
     StatementsBlockContext *statementsBlock();
     antlr4::tree::TerminalNode *VARIABLE();
-    ExprListContext *exprList();
     antlr4::tree::TerminalNode *IN();
-    ExprContext *expr();
     RangeContext *range();
+    ExprListContext *exprList();
+    ExprContext *expr();
 
    
   };
