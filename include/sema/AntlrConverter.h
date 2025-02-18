@@ -2,7 +2,7 @@
 #define SEMANTICANALYSER_H
 
 #include "LogosParser.h"
-#include "funcs/LogosUserFunc.h"
+#include "funcs/LogosFuncImpl.h"
 #include "exprs/LogosUnaryExpr.h"
 
 #include "exprs/LogosVariable.h"
@@ -11,24 +11,27 @@
 #include "stmts/LogosFieldDef.h"
 #include "stmts/LogosIf.h"
 #include "types/LogosInt.h"
+
+#include <funcs/LogosMethodImpl.h>
 #include <loops/LogosLoop.h>
 
 
-class LogosFieldDefinition;
+class LogosFieldDef;
 using namespace std;
 
 class AntlerConverter {
 public:
     const string& filePath;
     explicit AntlerConverter(const string& filePath) : filePath(filePath) {}
-    LogosFile* getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath);
+    LogosFile* getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath);
     LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx);
     LogosObjectFile* getObjFile(LogosParser::ObjectFileContext* ctx);
     LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
     LogosField *getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, size_t position);
-    LogosUserFunc* getFunc(LogosParser::FuncImplementationContext* ctx);
+    LogosFuncImpl* getFunc(LogosParser::FuncImplementationContext* ctx);
+    LogosMethodImpl* getMethod(LogosParser::FuncImplementationContext* ctx, string objName);
     LogosStmt* getStmt(LogosParser::StatementContext* ctx);
-    LogosFieldDefinition* getFieldDef(LogosParser::FieldDefContext* ctx);
+    LogosFieldDef* getFieldDef(LogosParser::FieldDefContext* ctx);
     LogosStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
     LogosVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LogosVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
@@ -38,14 +41,14 @@ public:
     LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     LogosExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     LogosExpr* getArray(LogosParser::ArrayContext* ctx);
-    LogosVariable* getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) const;
+    LogosVariable* getVariable(const string& varName, const ParserRuleContext* ctx) const;
     LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     LogosSelection* getSelection(LogosParser::SelectionContext* selection);
     LogosUnaryExpr* getSelectionElementExpr(LogosParser::SelectionElementContext* ctx);
     LogosInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LogosArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
     static LogosUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
-    static LogosType* getType(antlr4::tree::TerminalNode* type);
+    static LogosType* getType(tree::TerminalNode* type);
     ~AntlerConverter() = default;
 };
 

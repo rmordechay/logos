@@ -2,14 +2,14 @@
 #define LOGOSMAINFILE_H
 #include "LogosDefinitions.h"
 #include "LogosFile.h"
-#include "funcs/LogosUserFunc.h"
+#include "funcs/LogosFuncImpl.h"
 
-class LogosUserFunc;
+class LogosFuncImpl;
 
 class LogosMainFile final : public LogosFile {
 public:
-    LogosUserFunc* mainFunc = nullptr;
-    vector<LogosUserFunc*> funcs;
+    LogosFuncImpl* mainFunc = nullptr;
+    vector<LogosFuncImpl*> funcs;
 
     explicit LogosMainFile(const string& path) :
         LogosFile(LOGOS_MAIN_FILE, path) {

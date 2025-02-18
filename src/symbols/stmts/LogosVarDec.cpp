@@ -12,7 +12,7 @@ Value* LogosVarDec::computeIRValue(CodeGenMetadata* metadata) {
         const auto allocaInst = builder.CreateAlloca(valueType);
         builder.CreateStore(value, allocaInst);
     }
-    const auto symbol = LogosSymbol::createSymbol(expr);
+    const auto symbol = LogosSymbol::createSymbolFromExpr(expr);
     metadata->logosStack.addLocalSymbol(name, symbol);
     return value;
 }

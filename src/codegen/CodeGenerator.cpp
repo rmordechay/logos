@@ -1,6 +1,6 @@
 #include "CodeGenerator.h"
 
-#include "funcs/LogosUserFunc.h"
+#include "funcs/LogosFuncImpl.h"
 #include "object/LogosField.h"
 
 #include <llvm/Support/TargetSelect.h>
@@ -31,7 +31,6 @@ void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSym
 
 void CodeGenerator::generateObjModule(LogosObject* obj, LogosGlobals globalSymbols) {
     const auto objName = obj->name();
-
     const auto module = new Module(objName, context);
     modules[objName] = module;
     auto metadata = CodeGenMetadata{.currentModule = module};

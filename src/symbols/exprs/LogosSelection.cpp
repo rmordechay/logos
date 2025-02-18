@@ -3,7 +3,7 @@
 #include "LogosUtils.h"
 #include "exprs/LogosConstant.h"
 #include "exprs/LogosFuncCall.h"
-#include "funcs/LogosUserFunc.h"
+#include "funcs/LogosFuncImpl.h"
 
 #include <LogosStack.h>
 

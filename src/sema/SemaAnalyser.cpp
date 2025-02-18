@@ -44,12 +44,12 @@ void SemaAnalyser::visitObject(const LogosObject* object) {
     }
 }
 
-void SemaAnalyser::visitMainFunc(const LogosUserFunc* mainFunc, const std::string& path) {
+void SemaAnalyser::visitMainFunc(const LogosFuncImpl* mainFunc, const std::string& path) {
     if (checkErr100(mainFunc)) return;
     visitUserFunc(mainFunc);
 }
 
-void SemaAnalyser::visitUserFunc(const LogosUserFunc* func) {
+void SemaAnalyser::visitUserFunc(const LogosFuncImpl* func) {
     logosStack.enterScope();
     for (const auto& param : func->params) {
         visitVarDec(param);
@@ -67,7 +67,7 @@ void SemaAnalyser::visitStmt(LogosStmt* stmt) {
         visitIfStmt(ifStmt);
     } else if (const auto loopStmt = dynamic_cast<LogosLoop*>(stmt)) {
         visitLoopStmt(loopStmt);
-    } else if (const auto fieldDef = dynamic_cast<LogosFieldDefinition*>(stmt)) {
+    } else if (const auto fieldDef = dynamic_cast<LogosFieldDef*>(stmt)) {
         visitFieldDef(fieldDef);
     }
 }
@@ -82,7 +82,7 @@ void SemaAnalyser::visitField(LogosField* field) {
 
 }
 
-void SemaAnalyser::visitFieldDef(const LogosFieldDefinition* fieldDef) {
+void SemaAnalyser::visitFieldDef(const LogosFieldDef* fieldDef) {
 }
 
 
@@ -96,7 +96,7 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
     if (inferredType) {
         varDec->inferredType = inferredType;
     }
-    logosStack.addLocalSymbol(varDec->name, LogosSymbol::createSymbol(varDec->expr));
+    logosStack.addLocalSymbol(varDec->name, LogosSymbol::createSymbolFromExpr(varDec->expr));
 }
 
 void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {
@@ -180,7 +180,9 @@ void SemaAnalyser::visitVariable(const LogosVariable* variable) {
         break;
     case OBJECT:
         break;
-    case FUNC:
+    case FUNC_IMPL:
+        break;
+    case METHOD_IMPL:
         break;
     case SELECTION:
         break;
@@ -240,7 +242,9 @@ void SemaAnalyser::resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr
         break;
     case OBJECT:
         break;
-    case FUNC:
+    case FUNC_IMPL:
+        break;
+    case METHOD_IMPL:
         break;
     case SELECTION:
         break;
@@ -263,7 +267,7 @@ void SemaAnalyser::printError(const int errCode, Position* position, Args&&... a
     }
 }
 
-bool SemaAnalyser::checkErr100(const LogosUserFunc* mainFunc) {
+bool SemaAnalyser::checkErr100(const LogosFuncImpl* mainFunc) {
     if (!mainFunc) {
         printError(100, nullptr);
         return true;

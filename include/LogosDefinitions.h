@@ -7,7 +7,6 @@ const auto LOGOS_SOURCE_PACKAGE = "root";
 const auto LOGOS_MAIN_FILE = "Main";
 const auto LOGOS_MAIN_FUNCTION = "main";
 const auto LOGOS_EXTENSION = ".lgs";
-const auto LOGOS_THIS = "this";
 const auto LOGOS_BUILD_DIR = "../project/build/";
 const auto LOGOS_LIB_IR_FILE = "LogosStdlib.ll";
 const auto LINKED_OBJECT_FILE = "../output.o";

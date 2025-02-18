@@ -10,7 +10,7 @@
 
 
 class LogosIf;
-class LogosFieldDefinition;
+class LogosFieldDef;
 class LogosLoop;
 
 class SemaAnalyser {
@@ -24,11 +24,11 @@ public:
     void visitObjectFile(const LogosObjectFile* objectFile);
     void visitObject(const LogosObject* object);
     void visitField(LogosField* field);
-    void visitMainFunc(const LogosUserFunc* mainFunc, const std::string& path);
-    void visitUserFunc(const LogosUserFunc* func);
+    void visitMainFunc(const LogosFuncImpl* mainFunc, const std::string& path);
+    void visitUserFunc(const LogosFuncImpl* func);
     void visitStmt(LogosStmt* stmt);
     void visitStmtBlock(LogosStmtBlock* stmtBlock);
-    void visitFieldDef(const LogosFieldDefinition* fieldDef);
+    void visitFieldDef(const LogosFieldDef* fieldDef);
     void visitVarDec(LogosVarDec* varDec);
     void visitIfStmt(const LogosIf* ifStmt);
     void visitLoopStmt(const LogosLoop* loopStmt);
@@ -42,7 +42,7 @@ public:
     void visitInstance(LogosInstance* instance);
     void visitArrayIndex(const LogosArrayIndex* arrayIndex);
     void visitConstant(const LogosConstant* constant);
-    bool checkErr100(const LogosUserFunc* mainFunc);
+    bool checkErr100(const LogosFuncImpl* mainFunc);
     void setUnsuccessful();
     void resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr);
     LogosType* inferSelectionType(const LogosSelection* selection);

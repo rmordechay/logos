@@ -7,11 +7,16 @@
 #include <llvm/IR/Module.h>
 
 Value* LogosField::computeIRValue(CodeGenMetadata* metadata) {
+    auto& builder = metadata->builder;
     if (expr) {
         const auto type = inferredType->getIRType();
         const auto value = expr->writeIRValue(metadata);
-        return metadata->builder.CreateStructGEP(type, value, fieldPosition);
+        const auto gep = builder.CreateStructGEP(type, value, 0);
+        return gep;
     }
-    metadata->logosStack.addGlobalSymbol(name, LogosSymbol(FIELD, this));
-    return nullptr;
+    const auto gep = builder.CreateAlloca(inferredType->getIRType());
+    const auto val = builder.getInt32(0);
+    builder.CreateStore(val, gep);
+    return val;
 }
+

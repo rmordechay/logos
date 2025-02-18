@@ -1,5 +1,7 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
+#include <funcs/LogosFuncImpl.h>
+#include <funcs/LogosMethodImpl.h>
 
 class LogosExpr;
 class LogosArrayIndex;
@@ -22,7 +24,8 @@ enum LogosSymbolType {
     FUNC_CALL,
     VARIABLE,
     CONSTANT,
-    FUNC,
+    FUNC_IMPL,
+    METHOD_IMPL,
     SELECTION,
     ARRAY,
     ARRAY_INDEX,
@@ -34,7 +37,8 @@ struct LogosSymbol {
     union {
         LogosObject* object;
         LogosField* field;
-        LogosFunc* func;
+        LogosFuncImpl* funcImpl;
+        LogosMethodImpl* methodImpl;
         LogosInstance* instance;
         LogosFuncCall* funcCall;
         LogosVariable* variable;
@@ -60,19 +64,19 @@ struct LogosSymbol {
         field(field) {
     }
 
-    LogosSymbol(LogosSymbolType type, LogosFunc* func) :
-        type(type),
-        func(func) {
-    }
-
     LogosSymbol(const LogosSymbolType type, LogosInstance* constructor) :
         type(type),
         instance(constructor) {
     }
 
-    LogosSymbol(const LogosSymbolType type, LogosFuncCall* funcCall) :
+    LogosSymbol(const LogosSymbolType type, LogosFuncImpl* funcImpl) :
         type(type),
-        funcCall(funcCall) {
+        funcImpl(funcImpl) {
+    }
+
+    LogosSymbol(const LogosSymbolType type, LogosMethodImpl* methodImpl) :
+        type(type),
+        methodImpl(methodImpl) {
     }
 
     LogosSymbol(const LogosSymbolType type, LogosVariable* variable) :
@@ -105,7 +109,7 @@ struct LogosSymbol {
         arrayIndex(arrayIndex) {
     }
 
-    static LogosSymbol createSymbol(LogosExpr* expr);
+    static LogosSymbol createSymbolFromExpr(LogosExpr* expr);
 };
 
 

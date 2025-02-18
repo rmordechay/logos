@@ -12,6 +12,7 @@
 #include <exprs/LogosFuncCall.h>
 #include <loops/LogosForeachLoop.h>
 #include <loops/LogosRangeLoop.h>
+#include <types/LogosVoid.h>
 
 LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
     LogosFile* logosFile = nullptr;
@@ -32,7 +33,7 @@ LogosMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     for (const auto& func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         if (funcName == LOGOS_MAIN_FUNCTION) {
-            const auto mainFunc = new LogosUserFunc(LOGOS_MAIN_FUNCTION, &LOGOS_INT);
+            const auto mainFunc = new LogosFuncImpl(LOGOS_MAIN_FUNCTION, &LOGOS_INT);
             mainFile->mainFunc = mainFunc;
             const auto statementsBlock = func->funcBody()->statementsBlock();
             mainFunc->stmtBlock = getStmtBlock(statementsBlock);
@@ -62,8 +63,7 @@ LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
     }
     for (const auto& func : ctx->funcImplementation()) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
-        const auto userFunc = getFunc(func);
-        userFunc->parentName = objName;
+        const auto userFunc = getMethod(func, objName);
         obj->funcs[funcName] = userFunc;
     }
     return obj;
@@ -77,11 +77,28 @@ LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec
     return new LogosField(name, parentName, type, expr, position);
 }
 
-LogosUserFunc* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* ctx) {
+LogosFuncImpl* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* ctx) {
     const auto funcSignature = ctx->funcSignature();
     const auto funcName = funcSignature->VARIABLE()->getText();
     const auto type = getType(funcSignature->TYPE());
-    const auto logosUserFunc = new LogosUserFunc(funcName, type);
+    const auto logosUserFunc = new LogosFuncImpl(funcName, type);
+
+    const auto params = funcSignature->paramList();
+    if (params) {
+        for (const auto& param : params->explicitVarDec()) {
+            auto varDec = getExplicitVarDec(param);
+            logosUserFunc->params.emplace_back(varDec);
+        }
+    }
+    logosUserFunc->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
+    return logosUserFunc;
+}
+
+LogosMethodImpl* AntlerConverter::getMethod(LogosParser::FuncImplementationContext* ctx, string objName) {
+    const auto funcSignature = ctx->funcSignature();
+    const auto funcName = funcSignature->VARIABLE()->getText();
+    const auto type = getType(funcSignature->TYPE());
+    const auto logosUserFunc = new LogosMethodImpl(funcName, type, objName);
 
     const auto params = funcSignature->paramList();
     if (params) {
@@ -128,13 +145,13 @@ LogosStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     return nullptr;
 }
 
-LogosFieldDefinition* AntlerConverter::getFieldDef(LogosParser::FieldDefContext* ctx) {
+LogosFieldDef* AntlerConverter::getFieldDef(LogosParser::FieldDefContext* ctx) {
     vector<string> fields;
     for (const auto& variable : ctx->VARIABLE()) {
         fields.emplace_back(variable->getText());
     }
     const auto expr = getExpr(ctx->expr());
-    const auto fieldAssignment = new LogosFieldDefinition(fields, expr);
+    const auto fieldAssignment = new LogosFieldDef(fields, expr);
     fieldAssignment->setPosition(ctx->start, filePath);
     return fieldAssignment;
 }

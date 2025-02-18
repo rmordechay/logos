@@ -1,16 +1,17 @@
-#include "funcs/LogosUserFunc.h"
+#include "funcs/LogosFuncImpl.h"
 
 #include "LogosUtils.h"
 
 #include <LogosStack.h>
+#include <types/LogosInt.h>
 
-Value* LogosUserFunc::computeIRValue(CodeGenMetadata* metadata) {
-    const auto func = Function::Create(getIRFunc(), Function::ExternalLinkage, getFuncName(), metadata->currentModule);
+Value* LogosFuncImpl::computeIRValue(CodeGenMetadata* metadata) {
+    const auto func = Function::Create(getIRFunc(), Function::ExternalLinkage, name, metadata->currentModule);
     metadata->logosStack.enterScope(func);
 
     auto arg = func->arg_begin();
     for (const auto& param : params) {
-        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol::createSymbol(param->expr));
+        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol::createSymbolFromExpr(param->expr));
         arg++;
     }
 
@@ -21,7 +22,15 @@ Value* LogosUserFunc::computeIRValue(CodeGenMetadata* metadata) {
     return func;
 }
 
-Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
+FunctionType* LogosFuncImpl::getIRFunc() const {
+    vector<Type*> IRParams;
+    for (const auto& param : params) {
+        IRParams.emplace_back(param->inferredType->getIRType());
+    }
+    return FunctionType::get(type->getIRType(), IRParams, false);
+}
+
+Value* LogosFuncImpl::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
     vector<Value*> paramValues;
     vector<Type*> paramTypes;
     for (const auto& arg : args) {
@@ -30,28 +39,10 @@ Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr
         paramTypes.emplace_back(argValue->getType());
     }
     const auto funcType = FunctionType::get(type->getIRType(), paramTypes, false);
-    const auto func = metadata->currentModule->getOrInsertFunction(getFuncName(), funcType);
+    const auto func = metadata->currentModule->getOrInsertFunction(name, funcType);
     return metadata->builder.CreateCall(func, paramValues);
 }
 
-FunctionType* LogosUserFunc::getIRFunc() const {
-    vector<Type*> IRParams;
-    for (const auto& param : params) {
-        IRParams.emplace_back(param->inferredType->getIRType());
-    }
-    return FunctionType::get(type->getIRType(), IRParams, false);
-}
-
-Value* LogosUserFunc::callFunc(CodeGenMetadata* metadata) {
+Value* LogosFuncImpl::callFunc(CodeGenMetadata* metadata) {
     return callFunc(metadata, vector<LogosExpr*>());
-}
-
-string LogosUserFunc::getFuncName() const {
-    string funcName;
-    if (parentName == "") {
-        funcName = name;
-    } else {
-        funcName = parentName + "_" + name;
-    }
-    return funcName;
 }

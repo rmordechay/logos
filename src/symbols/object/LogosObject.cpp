@@ -1,6 +1,6 @@
 #include "object/LogosObject.h"
 
-#include "funcs/LogosUserFunc.h"
+#include "funcs/LogosFuncImpl.h"
 #include "object/LogosField.h"
 
 const string LogosObject::name() const {

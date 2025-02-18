@@ -24,12 +24,12 @@ Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
         return symbol->binaryExpr->writeIRValue(metadata);
     case INSTANCE:
         return symbol->instance->writeIRValue(metadata);
-    case VARIABLE:
-        return nullptr;
     case CONSTANT:
         return symbol->constant->writeIRValue(metadata);
-    case FUNC:
-        return symbol->func->writeIRValue(metadata);
+    case FUNC_IMPL:
+        return symbol->funcImpl->writeIRValue(metadata);
+    case METHOD_IMPL:
+        return symbol->methodImpl->writeIRValue(metadata);
     case ARRAY:
         return symbol->array->writeIRValue(metadata);
     case ARRAY_INDEX:

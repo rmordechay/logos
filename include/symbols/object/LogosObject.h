@@ -1,10 +1,12 @@
 #ifndef LOGOSOBJECT_H
 #define LOGOSOBJECT_H
-#include <map>
 #include "types/LogosType.h"
+#include <map>
+
+#include <funcs/LogosMethodImpl.h>
 
 
-class LogosUserFunc;
+class LogosFuncImpl;
 class LogosField;
 
 class LogosObject final : public LogosType {
@@ -12,7 +14,7 @@ public:
     Type* IRType = nullptr;
     string typeName;
     map<string, LogosField*> fields;
-    map<string, LogosUserFunc*> funcs;
+    map<string, LogosMethodImpl*> funcs;
 
     explicit LogosObject(const string& typeName) : typeName(typeName) {}
     const string name() const override;

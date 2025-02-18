@@ -4,8 +4,9 @@
 
 Value* LogosInstance::computeIRValue(CodeGenMetadata* metadata) {
     const auto obj = metadata->logosStack.getSymbol(name)->object;
-    // TODO make modules a map to check if they were already generated
-    CodeGenerator::generateObjModule(obj, metadata->logosStack.globalSymbols);
+    if (!modules.contains(obj->name())) {
+        CodeGenerator::generateObjModule(obj, metadata->logosStack.globalSymbols);
+    }
     const auto IRType = obj->getIRType();
     return metadata->builder.CreateAlloca(IRType);
 }
