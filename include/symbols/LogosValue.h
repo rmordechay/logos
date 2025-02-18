@@ -3,7 +3,6 @@
 
 #include "codegen/LogosMetadata.h"
 
-#include <llvm/IR/IRBuilder.h>
 #include <Token.h>
 
 using namespace llvm;

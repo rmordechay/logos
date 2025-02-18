@@ -2,6 +2,8 @@
 
 #include "funcs/LogosFunc.h"
 
+#include <LogosStack.h>
+
 Value* LogosFuncCall::computeIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->theStack->getSymbol(name);
     return symbol->func->callFunc(metadata, args);

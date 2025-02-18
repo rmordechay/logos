@@ -6,10 +6,12 @@
 #include "funcs/LogosUserFunc.h"
 #include "stmts/LogosFieldDef.h"
 
+#include <ThreadPool.h>
 #include <format>
 #include <exprs/LogosArray.h>
 #include <exprs/LogosArrayIndex.h>
 #include <exprs/LogosConstant.h>
+#include <exprs/LogosVariable.h>
 #include <stmts/LogosLoop.h>
 
 bool SemaAnalyser::analyse() {

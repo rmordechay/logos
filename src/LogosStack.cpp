@@ -35,3 +35,6 @@ void LogosStack::addGlobalSymbol(const string& name, const LogosSymbol& symbol) 
 void LogosStack::setCurrentFunc(Function* value) {
     top().IRFunc = value;
 }
+
+void LogosStack::resetStack() {
+}

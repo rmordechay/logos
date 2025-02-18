@@ -1,5 +1,7 @@
 #ifndef LOGOSEXPR_H
 #define LOGOSEXPR_H
+#include <LogosSymbol.h>
+
 #include "LogosValue.h"
 #include "types/LogosType.h"
 

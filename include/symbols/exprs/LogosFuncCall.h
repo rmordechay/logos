@@ -1,8 +1,8 @@
 #ifndef LOGOSFUNCCALLEXPR_H
 #define LOGOSFUNCCALLEXPR_H
-#include "LogosParser.h"
+#include <stmts/LogosStmt.h>
+
 #include "LogosUnaryExpr.h"
-#include "stmts/LogosStmt.h"
 
 class LogosFuncCall final : public LogosStmt, public LogosUnaryExpr {
 public:

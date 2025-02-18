@@ -6,36 +6,40 @@
 
 #include <llvm/Support/TargetSelect.h>
 
-void CodeGenerator::generate(const map<string, LogosFile*>& files, LogosStack& theStack) {
+void CodeGenerator::generateCode() const {
     theStack.addGlobalSymbol("print", LogosSymbol(FUNC, new LogosPrint()));
+    generateMainModule();
+}
+
+void CodeGenerator::generateMainModule() const {
     auto builder = IRBuilder(context);
     const auto module = new Module(LOGOS_MAIN_FILE, context);
     theStack.modules[LOGOS_MAIN_FILE] = module;
-    const auto metadata = CodeGenMetadata{.builder = &builder, .theStack = &theStack, .module = module};
-    const auto mainFile = dynamic_cast<LogosMainFile*>(files.at(LOGOS_MAIN_FILE));
-    generateMainModule(mainFile, metadata);
-}
+    auto metadata = createMetadata(builder, &theStack, module);
 
-void CodeGenerator::generateMainModule(const LogosMainFile* mainFile, CodeGenMetadata metadata) {
+    const auto mainFile = dynamic_cast<LogosMainFile*>(files.at(LOGOS_MAIN_FILE));
+    // Main func
     mainFile->mainFunc->computeIRValue(&metadata);
     metadata.builder->CreateRet(metadata.builder->getInt32(EXIT_SUCCESS));
+    // Funcs
     for (const auto& func : mainFile->funcs) {
         func->computeIRValue(&metadata);
     }
+
     writeIRToFile(metadata.module, LOGOS_MAIN_FILE);
 }
 
-void CodeGenerator::generateObjModule(LogosObject* obj, LogosStack* theStack) {
+void CodeGenerator::generateObjModule(LogosObject* obj, CodeGenMetadata& metadata) {
     auto builder = IRBuilder(context);
     const auto objName = obj->name();
     const auto module = new Module(objName, context);
-    theStack->modules[objName] = module;
-    auto logosStack = *theStack;
-    while (logosStack.size() > 1) {
-        logosStack.pop();
+    metadata.theStack->modules[objName] = module;
+    const auto newStack = metadata.theStack;
+    while (newStack->size() > 0) {
+        newStack->pop();
     }
 
-    auto metadata = CodeGenMetadata{.builder = &builder, .theStack = &logosStack, .module = module};
+    metadata.theStack = newStack;
 
     obj->getIRType();
     for (const auto& entry : obj->fields) {
@@ -54,6 +58,10 @@ void CodeGenerator::writeIRToFile(const Module* module, const string& name) {
     raw_fd_ostream textFile(LOGOS_BUILD_DIR + name + ".ll", EC, sys::fs::OF_None);
     module->print(outs(), nullptr);
     module->print(textFile, nullptr);
+}
+
+CodeGenMetadata CodeGenerator::createMetadata(IRBuilder<>& builder, LogosStack* logosStack, Module* module) {
+    return CodeGenMetadata{.builder = &builder, .theStack = logosStack, .module = module};
 }
 
 void CodeGenerator::initIR() {

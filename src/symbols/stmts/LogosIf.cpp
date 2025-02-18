@@ -8,13 +8,14 @@ Value* LogosIf::computeIRValue(CodeGenMetadata* metadata) {
     const auto ifStartBlock = BasicBlock::Create(context, "if.start", currentFunc);
     const auto ifEndBlock = BasicBlock::Create(context, "if.end", currentFunc);
 
-    metadata->builder->CreateCondBr(condIR, ifStartBlock, ifEndBlock);
-    metadata->builder->SetInsertPoint(ifStartBlock);
+    const auto builder = metadata->builder;
+    builder->CreateCondBr(condIR, ifStartBlock, ifEndBlock);
+    builder->SetInsertPoint(ifStartBlock);
 
     stmtBlock->getIRValue(metadata);
 
-    metadata->builder->CreateBr(ifEndBlock);
-    metadata->builder->SetInsertPoint(ifEndBlock);
+    builder->CreateBr(ifEndBlock);
+    builder->SetInsertPoint(ifEndBlock);
     return nullptr;
 }
 

@@ -3,6 +3,7 @@
 #include "exprs/LogosExpr.h"
 #include "object/LogosObject.h"
 
+#include <LogosStack.h>
 #include <llvm/IR/Module.h>
 
 Value* LogosField::computeIRValue(CodeGenMetadata* metadata) {

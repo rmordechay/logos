@@ -2,6 +2,8 @@
 
 #include "LogosUtils.h"
 
+#include <LogosStack.h>
+
 Value* LogosUserFunc::computeIRValue(CodeGenMetadata* metadata) {
     const auto func = Function::Create(getIRFunc(), Function::ExternalLinkage, getFuncName(), metadata->module);
     metadata->theStack->enterScope(func);

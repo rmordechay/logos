@@ -4,25 +4,19 @@
 #include <string>
 #include <thread>
 
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/LLVMContext.h>
-#include "AntlrConverter.h"
+#include "SemaAnalyser.h"
+#include "LogosLinker.h"
+#include "LogosUtils.h"
 
+class ThreadPool;
 using namespace filesystem;
 using namespace std;
 using namespace antlr4;
 using namespace llvm;
 
-#include "CodeGenerator.h"
-#include "LogosLexer.h"
-#include "SemaAnalyser.h"
-#include "LogosLinker.h"
-#include "LogosUtils.h"
-
 class Application {
 public:
     string rootPath;
-    CodeGenerator codeGenerator;
     SemaAnalyser semaAnalyser;
     LogosLinker linker;
     mutex mtx;

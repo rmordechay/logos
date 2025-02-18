@@ -8,8 +8,9 @@
 #include "stmts/LogosReturn.h"
 
 #include <exprs/LogosArray.h>
+#include <exprs/LogosArrayIndex.h>
 
-LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath) {
+LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
     LogosFile* logosFile = nullptr;
     if (const auto mainFileCtx = ctx->mainFile()) {
         logosFile = getMainFile(mainFileCtx);

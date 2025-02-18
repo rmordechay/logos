@@ -2,9 +2,6 @@
 #define SEMAANALYSER_H
 
 #include "LogosStack.h"
-#include "application/ThreadPool.h"
-#include "exprs/LogosBinaryExpr.h"
-#include "exprs/LogosInstance.h"
 #include "exprs/LogosFuncCall.h"
 #include "exprs/LogosSelection.h"
 #include "exprs/LogosUnaryExpr.h"

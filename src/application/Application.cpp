@@ -1,9 +1,17 @@
 #include "application/Application.h"
 
+#include <ANTLRInputStream.h>
+#include <AntlrConverter.h>
+#include <CodeGenerator.h>
+#include <LogosLexer.h>
+#include <LogosParser.h>
+#include <ThreadPool.h>
+
 void Application::runLogos() {
     semaAnalyser.files = parse();
     if (!semaAnalyser.analyse()) return;
-    codeGenerator.generate(semaAnalyser.files, semaAnalyser.theStack);
+    auto codeGenerator = CodeGenerator(semaAnalyser.theStack, semaAnalyser.files);
+    codeGenerator.generateCode();
     linker.runBinary();
 }
 

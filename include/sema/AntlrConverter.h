@@ -5,7 +5,6 @@
 #include "funcs/LogosUserFunc.h"
 #include "exprs/LogosUnaryExpr.h"
 
-#include "exprs/LogosFuncCall.h"
 #include "exprs/LogosVariable.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
@@ -15,7 +14,6 @@
 
 #include <stmts/LogosLoop.h>
 
-#include "exprs/LogosArrayIndex.h"
 
 class LogosFieldDefinition;
 using namespace std;

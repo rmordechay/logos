@@ -5,6 +5,8 @@
 #include "object/LogosObject.h"
 #include "stmts/LogosVarDec.h"
 
+#include <LogosStack.h>
+
 Value* LogosFieldDefinition::computeIRValue(CodeGenMetadata* metadata) {
     // TODO make dynamic
     const auto firstName = names[0];
@@ -15,8 +17,9 @@ Value* LogosFieldDefinition::computeIRValue(CodeGenMetadata* metadata) {
     const auto type = instance->type->getIRType();
     const auto fieldPos = obj->fields[secondName]->fieldPosition;
     const auto exprValue = expr->getIRValue(metadata);
-    const auto gep = metadata->builder->CreateStructGEP(type, value, fieldPos);
-    metadata->builder->CreateStore(exprValue, gep);
+    const auto builder = metadata->builder;
+    const auto gep = builder->CreateStructGEP(type, value, fieldPos);
+    builder->CreateStore(exprValue, gep);
     return gep;
 }
 

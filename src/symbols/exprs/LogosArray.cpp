@@ -1,5 +1,7 @@
 #include "exprs//LogosArray.h"
 
+#include <llvm/IR/Module.h>
+
 Value* LogosArray::computeIRValue(CodeGenMetadata* metadata) {
     const auto name = "arr";
     auto *arrayVar = metadata->module->getGlobalVariable(name);

@@ -6,8 +6,11 @@
 #include "exprs/LogosSelection.h"
 #include "object/LogosField.h"
 
+#include <LogosDefinitions.h>
 #include <exprs/LogosArray.h>
 #include <exprs/LogosArrayIndex.h>
+#include <exprs/LogosVariable.h>
+#include <llvm/Support/FileSystem.h>
 
 using namespace std;
 
@@ -47,11 +50,3 @@ LogosSymbol Utils::createSymbol(LogosExpr* expr) {
     }
     return LogosSymbol();
 }
-
-void Utils::emitIRFile(const string& filePath, const Module* const module) {
-    error_code EC;
-    raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
-    module->print(textFile, nullptr);
-}
-
-

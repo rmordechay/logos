@@ -4,6 +4,7 @@
 #include "stmts/LogosStmt.h"
 
 
+class LogosVariable;
 class LogosStmtBlock;
 class LogosExpr;
 

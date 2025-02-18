@@ -1,8 +1,7 @@
 #include "stmts/LogosLoop.h"
 
+#include <LogosStack.h>
 #include <exprs/LogosExpr.h>
-#include <exprs/LogosVariable.h>
-#include <stmts/LogosStmtBlock.h>
 
 Value* LogosLoop::computeIRValue(CodeGenMetadata* metadata) {
     const auto currentFunc = metadata->theStack->top().IRFunc;

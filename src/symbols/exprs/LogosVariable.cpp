@@ -5,6 +5,7 @@
 #include "funcs/LogosFunc.h"
 #include "object/LogosField.h"
 
+#include <LogosStack.h>
 #include <exprs/LogosArray.h>
 #include <exprs/LogosArrayIndex.h>
 #include <exprs/LogosBinaryExpr.h>

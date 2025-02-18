@@ -1,5 +1,7 @@
 #include "exprs/LogosArrayIndex.h"
 
+#include <llvm/IR/Module.h>
+
 Value* LogosArrayIndex::computeIRValue(CodeGenMetadata* metadata) {
     const auto builder = metadata->builder;
     const auto irType = type->getIRType();
