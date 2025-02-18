@@ -187,7 +187,7 @@ selectionElement:
     ;
 
 range:
-        expr? DOUBLE_DOT expr
+        start=expr? DOUBLE_DOT end=expr
     ;
 
 DOUBLE_EQUAL: '==';

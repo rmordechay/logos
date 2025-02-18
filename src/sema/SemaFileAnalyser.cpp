@@ -88,10 +88,7 @@ void SemaFileAnalyser::visitVarDec(LogosVarDec* varDec) {
 void SemaFileAnalyser::visitIfStmt(const LogosIf* ifStmt) {
 }
 
-void SemaFileAnalyser::visitLoopStmt(const LogosLoop* loopStmt) {
-    visitExpr(loopStmt->iterable);
-    loopStmt->loopVar->type = loopStmt->iterable->type;
-}
+void SemaFileAnalyser::visitLoopStmt(const LogosLoop* loopStmt) {}
 
 void SemaFileAnalyser::visitExpr(LogosExpr* expr) {
     if (!expr) return;

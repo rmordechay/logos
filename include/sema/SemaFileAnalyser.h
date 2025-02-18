@@ -9,7 +9,7 @@
 #include "stmts/LogosFieldDef.h"
 #include "stmts/LogosIf.h"
 #include "stmts/LogosVarDec.h"
-#include <stmts/LogosLoop.h>
+#include <loops/LogosLoop.h>
 
 class SemaFileAnalyser {
 public:

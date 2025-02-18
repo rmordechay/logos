@@ -11,8 +11,7 @@
 #include "stmts/LogosFieldDef.h"
 #include "stmts/LogosIf.h"
 #include "types/LogosInt.h"
-
-#include <stmts/LogosLoop.h>
+#include <loops/LogosLoop.h>
 
 
 class LogosFieldDefinition;

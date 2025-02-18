@@ -684,6 +684,8 @@ public:
 
   class  RangeContext : public antlr4::ParserRuleContext {
   public:
+    LogosParser::ExprContext *start = nullptr;
+    LogosParser::ExprContext *end = nullptr;
     RangeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *DOUBLE_DOT();

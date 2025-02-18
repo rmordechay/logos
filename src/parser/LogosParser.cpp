@@ -3482,12 +3482,12 @@ LogosParser::RangeContext* LogosParser::range() {
     if ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 523367534821648) != 0)) {
       setState(434);
-      expr(0);
+      antlrcpp::downCast<RangeContext *>(_localctx)->start = expr(0);
     }
     setState(437);
     match(LogosParser::DOUBLE_DOT);
     setState(438);
-    expr(0);
+    antlrcpp::downCast<RangeContext *>(_localctx)->end = expr(0);
    
   }
   catch (RecognitionException &e) {

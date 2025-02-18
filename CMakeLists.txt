@@ -15,6 +15,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include/sema
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
     ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/loops
 )
 
 add_library(libs STATIC
@@ -35,6 +36,7 @@ add_library(libs STATIC
     src/symbols/exprs/LogosSelection.cpp
     src/symbols/exprs/LogosVariable.cpp
     src/symbols/exprs/LogosArray.cpp
+    src/symbols/exprs/LogosArrayIndex.cpp
     src/symbols/funcs/LogosPrint.cpp
     src/symbols/funcs/LogosUserFunc.cpp
     src/symbols/object/LogosField.cpp
@@ -44,8 +46,8 @@ add_library(libs STATIC
     src/symbols/stmts/LogosReturn.cpp
     src/symbols/stmts/LogosStmtBlock.cpp
     src/symbols/stmts/LogosVarDec.cpp
-    src/symbols/stmts/LogosLoop.cpp
-    src/symbols/exprs/LogosArrayIndex.cpp
+    src/symbols/loops/LogosRangeLoop.cpp
+    src/symbols/loops/LogosForeachLoop.cpp
     src/symbols/LogosSymbol.cpp
 )
 

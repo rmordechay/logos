@@ -10,6 +10,8 @@
 #include <exprs/LogosArray.h>
 #include <exprs/LogosArrayIndex.h>
 #include <exprs/LogosFuncCall.h>
+#include <loops/LogosForeachLoop.h>
+#include <loops/LogosRangeLoop.h>
 
 LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
     LogosFile* logosFile = nullptr;
@@ -169,14 +171,13 @@ LogosLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* 
         const auto loopVarName = ctx->exprList()->expr()[0]->getText();
         const auto loopVar = getVariable(loopVarName, ctx);
         const auto expr = getExpr(iterableExpr);
-        loopStmt = new LogosLoop(FOREACH_LOOP, loopVar, expr, stmts);
+        loopStmt = new LogosForeachLoop(loopVar, expr, stmts);
     } else if (const auto range = ctx->iterableRange) {
         const auto loopVarName = ctx->VARIABLE()->getText();
         const auto loopVar = getVariable(loopVarName, ctx);
-        loopStmt = new LogosLoop(RANGE_LOOP, loopVar, nullptr, stmts);
+        loopStmt = new LogosRangeLoop(loopVar, getExpr(range->start), getExpr(range->end), stmts);
     } else {
-        const auto loopVarName = ctx->VARIABLE()->getText();
-        loopStmt = new LogosLoop(INFINITE_LOOP, stmts);
+        assert(false && "No loop statements found");
     }
     loopStmt->setPosition(ctx->start, filePath);
     return loopStmt;
