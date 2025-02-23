@@ -44,6 +44,10 @@ LogosSymbolType LogosVariable::getSymbolType() {
     return VARIABLE;
 }
 
+void LogosVariable::setName(const string name) {
+    this->name = name;
+}
+
 string LogosVariable::getName() {
     return name;
 }

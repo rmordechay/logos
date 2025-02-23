@@ -14,6 +14,10 @@ LogosSymbolType LogosArrayIndex::getSymbolType() {
     return ARRAY_INDEX;
 }
 
+void LogosArrayIndex::setName(const string name) {
+    baseExpr->setName(name);
+}
+
 string LogosArrayIndex::getName() {
     return baseExpr->getName();
 }

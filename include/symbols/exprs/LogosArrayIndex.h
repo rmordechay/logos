@@ -13,6 +13,7 @@ public:
     explicit LogosArrayIndex(LogosUnaryExpr* baseExpr) : baseExpr(baseExpr) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     LogosSymbolType getSymbolType() override;
+    void setName(string name) override;
     string getName() override;
     ~LogosArrayIndex() override = default;
 };

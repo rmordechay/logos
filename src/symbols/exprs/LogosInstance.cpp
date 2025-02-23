@@ -15,6 +15,10 @@ LogosSymbolType LogosInstance::getSymbolType() {
     return INSTANCE;
 }
 
+void LogosInstance::setName(const string name) {
+    this->name = name;
+}
+
 string LogosInstance::getName() {
     return name;
 }

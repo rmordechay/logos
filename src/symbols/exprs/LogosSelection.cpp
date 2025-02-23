@@ -21,11 +21,8 @@ Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExp
     const auto symbol = metadata->logosStack.getSymbol(previousExpr->getName());
     switch (symbol->type) {
     case INSTANCE: {
-        // const auto instance = symbol->instance;
-        // const auto obj = instance->obj;
-        // const auto func = obj->funcs[nextExpr->getName()];
-        // func->callFunc(metadata, {previousExpr});
-        return resolveSelection(metadata, nextExpr, nullptr);
+        const auto func = symbol->instance->obj->funcs[nextExpr->getName()];
+        return func->callFunc(metadata, {previousExpr});
     }
     case FUNC_CALL: {
         return symbol->funcCall->writeIRValue(metadata);
@@ -39,6 +36,8 @@ Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExp
 LogosSymbolType LogosSelection::getSymbolType() {
     return SELECTION;
 }
+
+void LogosSelection::setName(string name) {}
 
 string LogosSelection::getName() {
     return "";

@@ -24,6 +24,10 @@ LogosSymbolType LogosFuncCall::getSymbolType() {
     return FUNC_CALL;
 }
 
+void LogosFuncCall::setName(const string name) {
+    this->name = name;
+}
+
 string LogosFuncCall::getName() {
     return name;
 }

@@ -11,6 +11,7 @@ public:
     explicit LogosInstance(const string& name) : name(name) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     LogosSymbolType getSymbolType() override;
+    void setName(string name) override;
     string getName() override;
     ~LogosInstance() override = default;
 };
