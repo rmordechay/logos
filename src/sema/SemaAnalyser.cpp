@@ -16,6 +16,19 @@
 #include <loops/LogosLoop.h>
 #include <stmts/LogosFieldDef.h>
 #include <stmts/LogosIf.h>
+#include <ranges>
+
+void SemaAnalyser::analyse(const map<string, LogosFile*>& files, const map<string, LogosSymbol>& globalSymbols) {
+    ThreadPool threadPool;
+    for (const auto& file : files | views::values) {
+        threadPool.runTask([file, &globalSymbols] {
+            SemaAnalyser semaAnalyser;
+            semaAnalyser.logosStack.globalSymbols = globalSymbols;
+            semaAnalyser.visitLogosFile(file);
+        });
+    }
+    threadPool.wait();
+}
 
 void SemaAnalyser::visitLogosFile(LogosFile* file) {
     if (const auto mainFile = dynamic_cast<LogosMainFile*>(file)) {

@@ -7,19 +7,13 @@
 #include <LogosParser.h>
 #include <ThreadPool.h>
 #include <funcs/LogosPrint.h>
+#include <ranges>
+
 
 void Application::runLogos() {
     const auto files = parseFiles();
     const auto globalSymbols = collectGlobals(files);
-    ThreadPool threadPool;
-    for (auto& [name, file] : files) {
-        threadPool.runTask([this, file, &globalSymbols] {
-            SemaAnalyser semaAnalyser;
-            semaAnalyser.logosStack.globalSymbols = globalSymbols;
-            semaAnalyser.visitLogosFile(file);
-        });
-    }
-    threadPool.wait();
+    SemaAnalyser::analyse(files, globalSymbols);
     const auto codeGenerator = CodeGenerator(mainFile);
     codeGenerator.generateCode(globalSymbols);
     linker.runBinary();
@@ -52,10 +46,10 @@ void Application::parseTree(const string& path, map<string, LogosFile*>& files, 
     }
 }
 
-map<string, LogosSymbol> Application::collectGlobals(map<string, LogosFile*> files) {
+map<string, LogosSymbol> Application::collectGlobals(const map<string, LogosFile*>& files) {
     map<string, LogosSymbol> globalSymbols;
     globalSymbols["print"] = LogosSymbol(INTERNAL_FUNC, new LogosPrint());
-    for (const auto& [name, file] : files) {
+    for (const auto& file : files | views::values) {
         if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
             const auto object = objFile->obj;
             globalSymbols[object->name()] = LogosSymbol(OBJECT, object);
@@ -65,7 +59,7 @@ map<string, LogosSymbol> Application::collectGlobals(map<string, LogosFile*> fil
 }
 
 LogosFile* Application::getFile(const directory_entry& fileEntry) {
-    ifstream file(fileEntry);
+    ifstream file(fileEntry.path());
     stringstream fileContents;
     fileContents << file.rdbuf();
     auto codeText = fileContents.str();

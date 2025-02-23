@@ -11,6 +11,6 @@ const auto LOGOS_BUILD_DIR = "../project/build/";
 const auto LOGOS_LIB_IR_FILE = "LogosStdlib.ll";
 const auto LINKED_OBJECT_FILE = "../output.o";
 const auto LINKED_IR_FILE = "../output.ll";
-constexpr auto IR_OBJECT_FILE = llvm::CodeGenFileType::ObjectFile;
+constexpr auto IR_OBJECT_FILE = CodeGenFileType::ObjectFile;
 
 #endif //LOGOSCONFIGS_H

@@ -7,7 +7,7 @@
 
 Value* LogosFuncCall::computeIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->logosStack.getSymbol(name);
-    return symbol->funcImpl->callFunc(metadata, args);
+    return symbol->internalFunc->callFunc(metadata, args);
 }
 
 LogosSymbolType LogosFuncCall::getSymbolType() {

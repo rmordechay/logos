@@ -4,6 +4,8 @@ project(logos)
 set(CMAKE_CXX_STANDARD 20)
 set(LLVM_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libLLVM.dylib")
 set(ANTLR_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libantlr4-runtime.a")
+set(CMAKE_C_COMPILER "/opt/homebrew/opt/llvm/bin/clang")
+set(CMAKE_CXX_COMPILER "/opt/homebrew/opt/llvm/bin/clang++")
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include

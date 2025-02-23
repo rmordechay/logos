@@ -19,6 +19,7 @@ public:
     LogosStack logosStack;
     bool successful = true;
 
+    static void analyse(const map<string, LogosFile*>& files, const map<string, LogosSymbol>& globalSymbols);
     void visitLogosFile(LogosFile* file);
     void visitMainFile(const LogosMainFile* mainFile);
     void visitObjectFile(const LogosObjectFile* objectFile);

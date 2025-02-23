@@ -17,6 +17,9 @@ void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSym
     auto metadata = CodeGenMetadata{.currentModule = module};
     metadata.logosStack.globalSymbols = globalSymbols;
 
+    const auto symbol = metadata.logosStack.getSymbol("print");
+    symbol->internalFunc->writeIRValue(&metadata);
+
     // Main func
     mainFile->mainFunc->computeIRValue(&metadata);
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));

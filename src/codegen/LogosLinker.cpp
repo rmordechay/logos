@@ -18,7 +18,7 @@
 #include <llvm/Object/ObjectFile.h>
 
 void LogosLinker::link(const map<string, Module*>& modules) {
-    auto mainModule = std::move(modules.find(LOGOS_MAIN_FILE)->second);
+    auto mainModule = modules.find(LOGOS_MAIN_FILE)->second;
     auto logosLib = MemoryBuffer::getFile("../codegen/Print.ll");
     auto objectFile = object::ObjectFile::createObjectFile(logosLib->get()->getMemBufferRef());
 
@@ -26,9 +26,9 @@ void LogosLinker::link(const map<string, Module*>& modules) {
     auto printModule = parseIRFile("../codegen/Print.ll", EC, context);
     Linker::linkModules(*mainModule, unique_ptr(std::move(printModule)));
 
-    for (auto module : modules) {
-        if (module.first == LOGOS_MAIN_FILE) continue;
-        Linker::linkModules(*mainModule, unique_ptr<Module>(std::move(module.second)));
+    for (const auto& [name, file] : modules) {
+        if (name == LOGOS_MAIN_FILE) continue;
+        Linker::linkModules(*mainModule, unique_ptr<Module>(std::move(file)));
     }
     writeFile(unique_ptr<Module>(std::move(mainModule)), "../linked.o");
 }
@@ -53,6 +53,8 @@ void LogosLinker::writeFile(const unique_ptr<Module> &module, const string &file
 }
 
 void LogosLinker::runBinary() {
-    system("cd ../stdlib && clang ../project/build/Main.ll ../project/build/MyObject.ll LogosStdlib.ll -o ../output");
-    system("../output");
+    system("mkdir -p ../project/build");
+    // system("cd ../stdlib && clang ../project/build/Main.ll ../project/build/MyObject.ll LogosStdlib.ll -o ../output");
+    system("cd ../project/build && clang Main.ll ../../stdlib/LogosStdlib.ll -o output");
+    system("cd ../project/build && ./output");
 }

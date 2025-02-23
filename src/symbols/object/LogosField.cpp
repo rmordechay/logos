@@ -16,5 +16,6 @@ Value* LogosField::computeIRValue(CodeGenMetadata* metadata) {
     const auto thisSymbol = metadata->logosStack.getSymbol("this");
     const auto objType = thisSymbol->object->getIRType();
 
-    return builder.CreateStructGEP(objType, objPtr, fieldPosition);
+    // return builder.CreateStructGEP(objType, objPtr, fieldPosition);
+    return nullptr;
 }

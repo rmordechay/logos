@@ -14,13 +14,12 @@ void LogosStack::exitScope() {
 }
 
 LogosSymbol* LogosStack::getSymbol(const string& name) {
-    auto& symbols = top().symbols;
-
-    if (symbols.contains(name)) {
-        return &symbols[name];
-    }
     if (globalSymbols.contains(name)) {
         return &globalSymbols[name];
+    }
+    auto& symbols = top().symbols;
+    if (symbols.contains(name)) {
+        return &symbols[name];
     }
     return nullptr;
 }
