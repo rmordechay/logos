@@ -9,7 +9,7 @@
 #include <exprs/LogosSelection.h>
 #include <exprs/LogosVariable.h>
 
-LogosSymbol LogosSymbol::createSymbolFromExpr(LogosExpr* expr) {
+LogosSymbol LogosSymbol::createSymbol(LogosExpr* expr) {
     const auto type = expr->getSymbolType();
     switch (type) {
     case INSTANCE:

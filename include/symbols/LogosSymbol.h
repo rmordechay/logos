@@ -122,7 +122,7 @@ struct LogosSymbol {
         arrayIndex(arrayIndex) {
     }
 
-    static LogosSymbol createSymbolFromExpr(LogosExpr* expr);
+    static LogosSymbol createSymbol(LogosExpr* expr);
 };
 
 

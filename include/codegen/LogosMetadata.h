@@ -20,8 +20,8 @@ struct CodeGenMetadata {
 };
 
 struct Position {
-    size_t lineNumber;
-    size_t posInLine;
+    size_t lineNumber{};
+    size_t posInLine{};
     const string* filePath = nullptr;
 };
 

@@ -109,7 +109,7 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
     if (inferredType) {
         varDec->inferredType = inferredType;
     }
-    logosStack.addLocalSymbol(varDec->name, LogosSymbol::createSymbolFromExpr(varDec->expr));
+    logosStack.addLocalSymbol(varDec->name, LogosSymbol::createSymbol(varDec->expr));
 }
 
 void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {

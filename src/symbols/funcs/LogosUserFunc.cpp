@@ -11,7 +11,7 @@ Value* LogosFuncImpl::computeIRValue(CodeGenMetadata* metadata) {
 
     auto arg = func->arg_begin();
     for (const auto& param : params) {
-        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol::createSymbolFromExpr(param->expr));
+        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol::createSymbol(param->expr));
         arg++;
     }
 

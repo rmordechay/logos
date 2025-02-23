@@ -10,7 +10,7 @@ public:
     explicit LogosUnaryExpr() : LogosExpr(nullptr) {}
     explicit LogosUnaryExpr(LogosType* type) : LogosExpr(type) {}
     virtual string getName() = 0;
-    virtual ~LogosUnaryExpr() override = default;
+    ~LogosUnaryExpr() override = default;
     LogosSymbolType getSymbolType() override = 0;
 };
 

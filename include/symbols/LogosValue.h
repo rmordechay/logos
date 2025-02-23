@@ -14,7 +14,7 @@ public:
     virtual void setPosition(const antlr4::Token* ctx, const string& filePath);
     virtual ~LogosValue() = default;
 protected:
-    virtual Value *computeIRValue(CodeGenMetadata* metadata) = 0;
+    virtual Value* computeIRValue(CodeGenMetadata* metadata) = 0;
 private:
     Value* IRValue = nullptr;
 };

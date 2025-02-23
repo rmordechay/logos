@@ -1,5 +1,6 @@
 #include "funcs/LogosMethodImpl.h"
 
+#include <LogosDefinitions.h>
 #include <object/LogosObject.h>
 
 Value* LogosMethodImpl::computeIRValue(CodeGenMetadata* metadata) {
@@ -8,7 +9,7 @@ Value* LogosMethodImpl::computeIRValue(CodeGenMetadata* metadata) {
     const auto objType = objSymbol->object->getIRType();
 
     vector<Type*> IRParams;
-    IRParams.emplace_back(objType);
+    IRParams.emplace_back(PointerType::getUnqual(objType));
     for (const auto& param : params) {
         IRParams.emplace_back(param->inferredType->getIRType());
     }
@@ -19,10 +20,11 @@ Value* LogosMethodImpl::computeIRValue(CodeGenMetadata* metadata) {
     metadata->builder.SetInsertPoint(methodEntry);
     metadata->logosStack.currentFunc = method;
 
-    metadata->logosStack.addLocalSymbol("this", *objSymbol);
+    metadata->logosStack.addLocalSymbol(LOGOS_THIS, *objSymbol);
     auto args = method->arg_begin();
+    args++->setName("this");
     for (const auto& param : params) {
-        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol::createSymbolFromExpr(param->expr));
+        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol::createSymbol(param->expr));
         args++;
     }
 

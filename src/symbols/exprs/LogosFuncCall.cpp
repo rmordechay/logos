@@ -4,10 +4,20 @@
 
 #include <LogosStack.h>
 #include <funcs/LogosFuncImpl.h>
+#include <funcs/LogosMethodImpl.h>
 
 Value* LogosFuncCall::computeIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->logosStack.getSymbol(name);
-    return symbol->internalFunc->callFunc(metadata, args);
+    switch (symbol->type) {
+    case INTERNAL_FUNC:
+        return symbol->internalFunc->callFunc(metadata, args);;
+    case FUNC_IMPL:
+        return symbol->funcImpl->callFunc(metadata, args);;
+    case METHOD_IMPL:
+        return symbol->methodImpl->callFunc(metadata, args);;
+    default:
+        return nullptr;
+    }
 }
 
 LogosSymbolType LogosFuncCall::getSymbolType() {

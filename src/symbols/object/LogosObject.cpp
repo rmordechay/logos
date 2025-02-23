@@ -1,7 +1,7 @@
 #include "object/LogosObject.h"
-
 #include "funcs/LogosFuncImpl.h"
 #include "object/LogosField.h"
+#include <ranges>
 
 const string LogosObject::name() const {
     return typeName;
@@ -10,8 +10,8 @@ const string LogosObject::name() const {
 Type* LogosObject::getIRType() {
     if (IRType) return IRType;
     vector<Type*> elementTypes;
-    for (const auto& entry : fields) {
-        auto fieldType = entry.second->inferredType->getIRType();
+    for (const auto& val : fields | views::values) {
+        auto fieldType = val->inferredType->getIRType();
         elementTypes.push_back(fieldType);
     }
     IRType = StructType::create(context, elementTypes);
