@@ -1,15 +1,14 @@
 #ifndef LOGOSSTRING_H
 #define LOGOSSTRING_H
-#include "LogosValue.h"
 #include "LogosType.h"
+#include "LogosValue.h"
 
 #include <string>
-
 
 class LogosString final : public LogosType {
 public:
     Type* IRType = nullptr;
-     string typeName = "Str";
+    string typeName = "Str";
 
     const string name() const override;
     Type* getIRType() override;
@@ -26,7 +25,10 @@ inline Type* LogosString::getIRType() {
     return nullptr;
 }
 
-inline bool LogosString::operator==(LogosType* other) const { return true;
+inline bool LogosString::operator==(LogosType* other) const {
+    return true;
 }
 
-#endif //LOGOSSTRING_H
+inline LogosString LOGOS_STRING;
+
+#endif // LOGOSSTRING_H

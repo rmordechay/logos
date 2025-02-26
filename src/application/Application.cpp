@@ -11,10 +11,10 @@
 
 
 void Application::runLogos() {
-    const auto files = parseFiles();
-    const auto globalSymbols = collectGlobals(files);
+    const map<string, LogosFile*> files = parseFiles();
+    const map<string, LogosSymbol> globalSymbols = collectGlobals(files);
     SemaAnalyser::analyse(files, globalSymbols);
-    const auto codeGenerator = CodeGenerator(mainFile);
+    const CodeGenerator codeGenerator = CodeGenerator(mainFile);
     codeGenerator.generateCode(globalSymbols);
     linker.runBinary();
 }

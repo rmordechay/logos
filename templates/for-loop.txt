@@ -2,7 +2,7 @@
 for i in 5..10 {  }
 
 // Loop in range with steps
-for i in 5..10 : 2 { }
+for i in 5..10..2 { }
 
 // Loop until number
 for i in ..10 { }
@@ -33,7 +33,7 @@ for i @tag {
 }
 
 // First and last values
-for i {
-    isFirst = for.first
-    isLast = for.last
+for i in 0..10 {
+    isFirst = for.first // for.first == false
+    isLast = for.last // for.last == true
 }

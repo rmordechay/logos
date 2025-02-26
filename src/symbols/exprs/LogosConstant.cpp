@@ -10,6 +10,8 @@ Value* LogosConstant::computeIRValue(CodeGenMetadata* metadata) {
     if (const auto intValue = get_if<int>(&value)) {
         return metadata->builder.getInt32(*intValue);
     }
+    auto helloConst = ConstantDataArray::getString(context, "helloStr", true);
+    // metadata->currentModule->getOrInsertGlobal()
     return nullptr;
 }
 

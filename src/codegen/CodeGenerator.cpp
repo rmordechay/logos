@@ -4,6 +4,7 @@
 #include "object/LogosField.h"
 
 #include <llvm/Support/TargetSelect.h>
+#include <ranges>
 
 using LogosGlobals = const std::map<std::string, LogosSymbol>&;
 
@@ -16,9 +17,6 @@ void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSym
     modules[LOGOS_MAIN_FILE] = module;
     auto metadata = CodeGenMetadata{.currentModule = module};
     metadata.logosStack.globalSymbols = globalSymbols;
-
-    const auto symbol = metadata.logosStack.getSymbol("print");
-    symbol->internalFunc->writeIRValue(&metadata);
 
     // Main func
     mainFile->mainFunc->computeIRValue(&metadata);
@@ -48,8 +46,8 @@ void CodeGenerator::generateObjModule(LogosObject* obj, LogosGlobals globalSymbo
     }
 
     // Funcs
-    for (const auto& entry : obj->funcs) {
-        entry.second->writeIRValue(&metadata);
+    for (const auto& val : obj->funcs | views::values) {
+        val->writeIRValue(&metadata);
     }
 
     writeIRToFile(metadata.currentModule, objName);

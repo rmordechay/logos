@@ -16,6 +16,4 @@ public:
     ~LogosInstance() override = default;
 };
 
-
-
 #endif //LOGOSINSTANCE_H

@@ -1,26 +1,23 @@
 #ifndef LOGOSPRINT_H
 #define LOGOSPRINT_H
 
-#include "LogosFunc.h"
 #include "types/LogosInt.h"
-
 #include <types/LogosVoid.h>
+#include <types/LogosString.h>
+#include "LogosFunc.h"
+
 
 class LogosPrint final : public LogosFunc {
 public:
     const string IRName = "printInt";
     const string logosName = "print";
-    const LogosVarDec* params[2] = {
-        new LogosVarDec("input", &LOGOS_INT),
-        new LogosVarDec("count", &LOGOS_INT)
-    };
+    FunctionType* const funcTypeInt = FunctionType::get(LOGOS_VOID.IRType, LOGOS_INT.IRType, false);
+    FunctionType* const funcTypeString = FunctionType::get(LOGOS_VOID.IRType, LOGOS_STRING.IRType, false);
 
     explicit LogosPrint() : LogosFunc(logosName, &LOGOS_VOID) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     Value* callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
     ~LogosPrint() override = default;
 };
-
-inline LogosPrint logosPrint;
 
 #endif //LOGOSPRINT_H

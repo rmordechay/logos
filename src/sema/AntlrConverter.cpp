@@ -12,6 +12,7 @@
 #include <exprs/LogosFuncCall.h>
 #include <loops/LogosForeachLoop.h>
 #include <loops/LogosRangeLoop.h>
+#include <types/LogosString.h>
 #include <types/LogosVoid.h>
 
 LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
@@ -69,8 +70,7 @@ LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
     return obj;
 }
 
-LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName,
-                                      const size_t position) {
+LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, const size_t position) {
     const auto name = varDec->VARIABLE()->getText();
     const auto type = getType(varDec->TYPE());
     const auto expr = getExpr(varDec->expr());
@@ -193,6 +193,8 @@ LogosLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* 
         const auto loopVarName = ctx->VARIABLE()->getText();
         const auto loopVar = getVariable(loopVarName, ctx);
         loopStmt = new LogosRangeLoop(loopVar, getExpr(range->start), getExpr(range->end), stmts);
+    } else if (ctx->iterableRange) {
+
     } else {
         assert(false && "No loop statements found");
     }
@@ -335,6 +337,10 @@ LogosUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) 
     if (const auto intToken = ctx->INTEGER()) {
         const auto value = stoi(intToken->getText());
         return new LogosConstant(&LOGOS_INT, value);
+    }
+    if (const auto stringToken = ctx->STRING()) {
+        const auto value = stringToken->getText();
+        return new LogosConstant(&LOGOS_STRING, value);
     }
     return nullptr;
 }

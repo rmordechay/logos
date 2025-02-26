@@ -1,7 +1,7 @@
 grammar Logos;
 
 logosFile:
-        importStatement? mainFile | objectFile | interfaceFile
+        (importStatement? mainFile) | objectFile | interfaceFile
     ;
 
 mainFile:
@@ -69,7 +69,7 @@ statementsBlock:
     ;
 
 fieldDef:
-        VARIABLE DOT VARIABLE* EQUAL expr
+        VARIABLE (DOT VARIABLE)* EQUAL expr
     ;
 
 explicitVarDec:
