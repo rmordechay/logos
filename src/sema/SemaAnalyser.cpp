@@ -132,8 +132,7 @@ void SemaAnalyser::visitArray(const LogosArray* array) {
     for (const auto& element : array->elements) {
         visitExpr(element);
     }
-    // TODO add proper check for array type
-    array->type = array->elements[0]->type;
+    array->type = inferArrayType(array);
 }
 
 void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
@@ -232,6 +231,11 @@ LogosType* SemaAnalyser::inferSelectionType(const LogosSelection* selection) {
         selection->type = nextExpr->type;
     }
     return nullptr;
+}
+
+LogosType* SemaAnalyser::inferArrayType(const LogosArray* array) {
+    // TODO add proper check for array type
+    return array->elements[0]->type;
 }
 
 void SemaAnalyser::resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {

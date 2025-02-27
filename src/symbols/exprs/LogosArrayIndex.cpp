@@ -1,13 +1,15 @@
 #include "exprs/LogosArrayIndex.h"
 
+#include <exprs/LogosConstant.h>
 #include <llvm/IR/Module.h>
 
 Value* LogosArrayIndex::computeIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto irType = type->getIRType();
     const auto arr = metadata->currentModule->getOrInsertGlobal("arr", irType);
-    const auto firstElement = builder.CreateGEP(irType, arr, builder.getInt32(1));
-    return builder.CreateLoad(builder.getInt32Ty(), firstElement);
+    const auto lastExprIRValue = exprs[exprs.size() - 1]->writeIRValue(metadata);
+    const auto lastElement = builder.CreateGEP(irType, arr, lastExprIRValue);
+    return builder.CreateLoad(builder.getInt32Ty(), lastElement);
 }
 
 LogosSymbolType LogosArrayIndex::getSymbolType() {
