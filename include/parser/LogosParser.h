@@ -319,9 +319,10 @@ public:
     virtual size_t getRuleIndex() const override;
     std::vector<antlr4::tree::TerminalNode *> VARIABLE();
     antlr4::tree::TerminalNode* VARIABLE(size_t i);
-    antlr4::tree::TerminalNode *DOT();
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
+    std::vector<antlr4::tree::TerminalNode *> DOT();
+    antlr4::tree::TerminalNode* DOT(size_t i);
 
    
   };

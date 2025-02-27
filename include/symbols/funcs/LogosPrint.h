@@ -9,8 +9,9 @@
 
 class LogosPrint final : public LogosFunc {
 public:
-    const string IRName = "printInt";
     const string logosName = "print";
+    const string IRNameInt = "printInt";
+    const string IRNamePrint = "printString";
     FunctionType* const funcTypeInt = FunctionType::get(LOGOS_VOID.IRType, LOGOS_INT.IRType, false);
     FunctionType* const funcTypeString = FunctionType::get(LOGOS_VOID.IRType, LOGOS_STRING.IRType, false);
 

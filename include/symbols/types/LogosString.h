@@ -7,7 +7,7 @@
 
 class LogosString final : public LogosType {
 public:
-    Type* IRType = nullptr;
+    Type* IRType = PointerType::get(Type::getInt8Ty(context), 0);
     string typeName = "Str";
 
     const string name() const override;

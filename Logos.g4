@@ -69,7 +69,7 @@ statementsBlock:
     ;
 
 fieldDef:
-        VARIABLE (DOT VARIABLE)* EQUAL expr
+        VARIABLE (DOT VARIABLE)+ EQUAL expr
     ;
 
 explicitVarDec:
@@ -142,7 +142,6 @@ unaryExpr:
     |   arrayIndex
     |   selection
     ;
-
 
 array:
         LBRACK expr (COMMA expr)* RBRACK
