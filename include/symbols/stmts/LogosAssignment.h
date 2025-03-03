@@ -5,15 +5,15 @@
 class LogosExpr;
 class LogosType;
 
-class LogosFieldDef final : public LogosStmt {
+class LogosAssignment final : public LogosStmt {
 public:
-    int position = -1;
     vector<string> names;
+    LogosField* field = nullptr;
     LogosExpr* expr = nullptr;
 
-    LogosFieldDef(const vector<string>& names, LogosExpr* expr) : names(names), expr(expr) {}
+    explicit LogosAssignment(LogosExpr* expr) : expr(expr) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
-    ~LogosFieldDef() override;
+    ~LogosAssignment() override;
 };
 
 #endif //LOGOSFIELDDEC_H

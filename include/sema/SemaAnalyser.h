@@ -10,7 +10,7 @@
 
 
 class LogosIf;
-class LogosFieldDef;
+class LogosAssignment;
 class LogosLoop;
 
 class SemaAnalyser {
@@ -29,7 +29,7 @@ public:
     void visitUserFunc(const LogosFuncImpl* func);
     void visitStmt(LogosStmt* stmt);
     void visitStmtBlock(LogosStmtBlock* stmtBlock);
-    void visitFieldDef(const LogosFieldDef* fieldDef);
+    void visitFieldDef(const LogosAssignment* fieldDef);
     void visitVarDec(LogosVarDec* varDec);
     void visitIfStmt(const LogosIf* ifStmt);
     void visitLoopStmt(const LogosLoop* loopStmt);

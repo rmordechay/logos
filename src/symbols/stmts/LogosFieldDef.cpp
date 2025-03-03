@@ -1,4 +1,4 @@
-#include "stmts/LogosFieldDef.h"
+#include "stmts/LogosAssignment.h"
 
 #include "exprs/LogosInstance.h"
 #include "object/LogosField.h"
@@ -6,8 +6,9 @@
 #include "stmts/LogosVarDec.h"
 
 #include <LogosStack.h>
+#include <types/LogosInt.h>
 
-Value* LogosFieldDef::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosAssignment::computeIRValue(CodeGenMetadata* metadata) {
     // TODO make dynamic
     auto& builder = metadata->builder;
     const auto firstName = names[0];
@@ -26,6 +27,6 @@ Value* LogosFieldDef::computeIRValue(CodeGenMetadata* metadata) {
     return gep;
 }
 
-LogosFieldDef::~LogosFieldDef() {
+LogosAssignment::~LogosAssignment() {
     delete expr;
 }

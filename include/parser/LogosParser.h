@@ -28,7 +28,7 @@ public:
     RuleImportStatement = 4, RuleImportPath = 5, RuleObjectDeclaration = 6, 
     RuleInterfaceDeclaration = 7, RuleObjectImplements = 8, RuleFuncSignature = 9, 
     RuleFuncImplementation = 10, RuleFuncBody = 11, RuleParamList = 12, 
-    RuleStatement = 13, RuleStatementsBlock = 14, RuleFieldDef = 15, RuleExplicitVarDec = 16, 
+    RuleStatement = 13, RuleStatementsBlock = 14, RuleAssignment = 15, RuleExplicitVarDec = 16, 
     RuleImplicitVarDec = 17, RuleIfStatement = 18, RuleElseStatement = 19, 
     RulePatternMatching = 20, RulePattern = 21, RuleLoopStatement = 22, 
     RuleControlFlow = 23, RuleReturnStatement = 24, RuleEnumDeclaration = 25, 
@@ -70,7 +70,7 @@ public:
   class ParamListContext;
   class StatementContext;
   class StatementsBlockContext;
-  class FieldDefContext;
+  class AssignmentContext;
   class ExplicitVarDecContext;
   class ImplicitVarDecContext;
   class IfStatementContext;
@@ -284,7 +284,7 @@ public:
   public:
     StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    FieldDefContext *fieldDef();
+    AssignmentContext *assignment();
     ExplicitVarDecContext *explicitVarDec();
     ImplicitVarDecContext *implicitVarDec();
     IfStatementContext *ifStatement();
@@ -313,12 +313,12 @@ public:
 
   StatementsBlockContext* statementsBlock();
 
-  class  FieldDefContext : public antlr4::ParserRuleContext {
+  class  AssignmentContext : public antlr4::ParserRuleContext {
   public:
-    FieldDefContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    AssignmentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<antlr4::tree::TerminalNode *> VARIABLE();
-    antlr4::tree::TerminalNode* VARIABLE(size_t i);
+    std::vector<SelectionElementContext *> selectionElement();
+    SelectionElementContext* selectionElement(size_t i);
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
     std::vector<antlr4::tree::TerminalNode *> DOT();
@@ -327,7 +327,7 @@ public:
    
   };
 
-  FieldDefContext* fieldDef();
+  AssignmentContext* assignment();
 
   class  ExplicitVarDecContext : public antlr4::ParserRuleContext {
   public:

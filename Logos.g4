@@ -53,7 +53,7 @@ paramList:
     ;
 
 statement:
-        fieldDef
+        assignment
     |   explicitVarDec
     |   implicitVarDec
     |   ifStatement
@@ -68,8 +68,8 @@ statementsBlock:
         LBRACE statement* RBRACE
     ;
 
-fieldDef:
-        VARIABLE (DOT VARIABLE)+ EQUAL expr
+assignment:
+        selectionElement (DOT selectionElement)+ EQUAL expr
     ;
 
 explicitVarDec:

@@ -2,21 +2,16 @@
 #define SEMANTICANALYSER_H
 
 #include "LogosParser.h"
-#include "funcs/LogosFuncImpl.h"
 #include "exprs/LogosUnaryExpr.h"
-
-#include "exprs/LogosVariable.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
-#include "stmts/LogosFieldDef.h"
+#include "stmts/LogosAssignment.h"
 #include "stmts/LogosIf.h"
 #include "types/LogosInt.h"
-
 #include <funcs/LogosMethodImpl.h>
-#include <loops/LogosLoop.h>
 
 
-class LogosFieldDef;
+class LogosAssignment;
 using namespace std;
 
 class AntlerConverter {
@@ -29,9 +24,9 @@ public:
     LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
     LogosField *getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, size_t position);
     LogosFuncImpl* getFunc(LogosParser::FuncImplementationContext* ctx);
-    LogosMethodImpl* getMethod(LogosParser::FuncImplementationContext* ctx, string objName);
+    LogosMethodImpl* getMethod(LogosParser::FuncImplementationContext* ctx, const string& objName);
     LogosStmt* getStmt(LogosParser::StatementContext* ctx);
-    LogosFieldDef* getFieldDef(LogosParser::FieldDefContext* ctx);
+    LogosAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     LogosStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
     LogosVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LogosVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);

@@ -14,7 +14,7 @@
 #include <format>
 #include <funcs/LogosPrint.h>
 #include <loops/LogosLoop.h>
-#include <stmts/LogosFieldDef.h>
+#include <stmts/LogosAssignment.h>
 #include <stmts/LogosIf.h>
 #include <ranges>
 
@@ -79,7 +79,7 @@ void SemaAnalyser::visitStmt(LogosStmt* stmt) {
         visitIfStmt(ifStmt);
     } else if (const auto loopStmt = dynamic_cast<LogosLoop*>(stmt)) {
         visitLoopStmt(loopStmt);
-    } else if (const auto fieldDef = dynamic_cast<LogosFieldDef*>(stmt)) {
+    } else if (const auto fieldDef = dynamic_cast<LogosAssignment*>(stmt)) {
         visitFieldDef(fieldDef);
     }
 }
@@ -94,7 +94,11 @@ void SemaAnalyser::visitField(LogosField* field) {
 
 }
 
-void SemaAnalyser::visitFieldDef(const LogosFieldDef* fieldDef) {
+void SemaAnalyser::visitFieldDef(const LogosAssignment* fieldDef) {
+    const auto names = fieldDef->names;
+    for (const auto& name : names) {
+
+    }
 }
 
 
@@ -154,8 +158,7 @@ void SemaAnalyser::visitSelection(const LogosSelection* selection) {
 
 void SemaAnalyser::visitInstance(LogosInstance* instance) {
     if (!instance) return;
-    const auto symbol = logosStack.getSymbol(instance->name);
-    const auto obj = symbol->object;
+    const auto obj = logosStack.getSymbol(instance->name)->object;
     instance->type = obj;
     instance->obj = obj;
 }

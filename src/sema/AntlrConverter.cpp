@@ -10,6 +10,7 @@
 #include <exprs/LogosArray.h>
 #include <exprs/LogosArrayIndex.h>
 #include <exprs/LogosFuncCall.h>
+#include <exprs/LogosVariable.h>
 #include <loops/LogosForeachLoop.h>
 #include <loops/LogosRangeLoop.h>
 #include <types/LogosString.h>
@@ -94,7 +95,7 @@ LogosFuncImpl* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* 
     return logosUserFunc;
 }
 
-LogosMethodImpl* AntlerConverter::getMethod(LogosParser::FuncImplementationContext* ctx, string objName) {
+LogosMethodImpl* AntlerConverter::getMethod(LogosParser::FuncImplementationContext* ctx, const string& objName) {
     const auto funcSignature = ctx->funcSignature();
     const auto funcName = funcSignature->VARIABLE()->getText();
     const auto type = getType(funcSignature->TYPE());
@@ -121,8 +122,8 @@ LogosStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContex
 }
 
 LogosStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
-    if (const auto fieldDef = ctx->fieldDef()) {
-        return getFieldDef(fieldDef);
+    if (const auto fieldDef = ctx->assignment()) {
+        return getAssignment(fieldDef);
     }
     if (const auto implicitVarDec = ctx->implicitVarDec()) {
         return getImplicitVarDec(implicitVarDec);
@@ -145,15 +146,18 @@ LogosStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     return nullptr;
 }
 
-LogosFieldDef* AntlerConverter::getFieldDef(LogosParser::FieldDefContext* ctx) {
-    vector<string> fields;
-    for (const auto& variable : ctx->VARIABLE()) {
-        fields.emplace_back(variable->getText());
-    }
+LogosAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ctx) {
     const auto expr = getExpr(ctx->expr());
-    const auto fieldAssignment = new LogosFieldDef(fields, expr);
-    fieldAssignment->setPosition(ctx->start, filePath);
-    return fieldAssignment;
+    const auto fieldDef = new LogosAssignment(expr);
+    for (const auto& selection : ctx->selectionElement()) {
+        if (const auto variable = selection->VARIABLE()) {
+            fieldDef->names.emplace_back(variable->getText());
+        } else if (const auto funcCall = selection->funcCall()) {
+            fieldDef->names.emplace_back(funcCall->VARIABLE()->getText());
+        }
+    }
+    fieldDef->setPosition(ctx->start, filePath);
+    return fieldDef;
 }
 
 LogosVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
@@ -182,7 +186,7 @@ LogosIf* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
 }
 
 LogosLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ctx) {
-    LogosLoop* loopStmt;
+    LogosLoop* loopStmt = nullptr;
     const auto stmts = getStmtBlock(ctx->statementsBlock());
     if (const auto iterableExpr = ctx->iterableExpr) {
         const auto loopVarName = ctx->exprList()->expr()[0]->getText();
@@ -257,7 +261,7 @@ LogosExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
     return logosArray;
 }
 
-LogosVariable* AntlerConverter::getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) const {
+LogosVariable* AntlerConverter::getVariable(const string& varName, const ParserRuleContext* ctx) const {
     const auto logosVariable = new LogosVariable(varName);
     logosVariable->setPosition(ctx->start, filePath);
     return logosVariable;
@@ -345,7 +349,7 @@ LogosUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) 
     return nullptr;
 }
 
-LogosType* AntlerConverter::getType(antlr4::tree::TerminalNode* type) {
+LogosType* AntlerConverter::getType(tree::TerminalNode* type) {
     if (!type) return &LOGOS_VOID;
     if (type->getText() == INT_TYPE_NAME) return &LOGOS_INT;
     return &LOGOS_VOID;

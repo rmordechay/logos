@@ -54,7 +54,7 @@ void logosParserInitialize() {
       "logosFile", "mainFile", "objectFile", "interfaceFile", "importStatement", 
       "importPath", "objectDeclaration", "interfaceDeclaration", "objectImplements", 
       "funcSignature", "funcImplementation", "funcBody", "paramList", "statement", 
-      "statementsBlock", "fieldDef", "explicitVarDec", "implicitVarDec", 
+      "statementsBlock", "assignment", "explicitVarDec", "implicitVarDec", 
       "ifStatement", "elseStatement", "patternMatching", "pattern", "loopStatement", 
       "controlFlow", "returnStatement", "enumDeclaration", "enumField", 
       "expr", "exprList", "unaryExpr", "array", "funcCall", "constructor", 
@@ -161,10 +161,10 @@ void logosParserInitialize() {
   	201,196,1,0,0,0,201,197,1,0,0,0,201,198,1,0,0,0,201,199,1,0,0,0,201,200,
   	1,0,0,0,202,27,1,0,0,0,203,207,5,6,0,0,204,206,3,26,13,0,205,204,1,0,
   	0,0,206,209,1,0,0,0,207,205,1,0,0,0,207,208,1,0,0,0,208,210,1,0,0,0,209,
-  	207,1,0,0,0,210,211,5,7,0,0,211,29,1,0,0,0,212,215,5,47,0,0,213,214,5,
-  	14,0,0,214,216,5,47,0,0,215,213,1,0,0,0,216,217,1,0,0,0,217,215,1,0,0,
-  	0,217,218,1,0,0,0,218,219,1,0,0,0,219,220,5,16,0,0,220,221,3,54,27,0,
-  	221,31,1,0,0,0,222,223,5,47,0,0,223,224,5,15,0,0,224,227,5,46,0,0,225,
+  	207,1,0,0,0,210,211,5,7,0,0,211,29,1,0,0,0,212,215,3,76,38,0,213,214,
+  	5,14,0,0,214,216,3,76,38,0,215,213,1,0,0,0,216,217,1,0,0,0,217,215,1,
+  	0,0,0,217,218,1,0,0,0,218,219,1,0,0,0,219,220,5,16,0,0,220,221,3,54,27,
+  	0,221,31,1,0,0,0,222,223,5,47,0,0,223,224,5,15,0,0,224,227,5,46,0,0,225,
   	226,5,16,0,0,226,228,3,54,27,0,227,225,1,0,0,0,227,228,1,0,0,0,228,33,
   	1,0,0,0,229,230,5,47,0,0,230,231,5,16,0,0,231,232,3,54,27,0,232,35,1,
   	0,0,0,233,234,5,32,0,0,234,235,3,54,27,0,235,236,3,28,14,0,236,237,3,
@@ -1212,8 +1212,8 @@ LogosParser::StatementContext::StatementContext(ParserRuleContext *parent, size_
   : ParserRuleContext(parent, invokingState) {
 }
 
-LogosParser::FieldDefContext* LogosParser::StatementContext::fieldDef() {
-  return getRuleContext<LogosParser::FieldDefContext>(0);
+LogosParser::AssignmentContext* LogosParser::StatementContext::assignment() {
+  return getRuleContext<LogosParser::AssignmentContext>(0);
 }
 
 LogosParser::ExplicitVarDecContext* LogosParser::StatementContext::explicitVarDec() {
@@ -1272,7 +1272,7 @@ LogosParser::StatementContext* LogosParser::statement() {
     case 1: {
       enterOuterAlt(_localctx, 1);
       setState(192);
-      fieldDef();
+      assignment();
       break;
     }
 
@@ -1394,7 +1394,7 @@ LogosParser::StatementsBlockContext* LogosParser::statementsBlock() {
     _errHandler->sync(this);
     _la = _input->LA(1);
     while ((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & 141000018231296) != 0)) {
+      ((1ULL << _la) & 211368762408960) != 0)) {
       setState(204);
       statement();
       setState(209);
@@ -1414,45 +1414,45 @@ LogosParser::StatementsBlockContext* LogosParser::statementsBlock() {
   return _localctx;
 }
 
-//----------------- FieldDefContext ------------------------------------------------------------------
+//----------------- AssignmentContext ------------------------------------------------------------------
 
-LogosParser::FieldDefContext::FieldDefContext(ParserRuleContext *parent, size_t invokingState)
+LogosParser::AssignmentContext::AssignmentContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-std::vector<tree::TerminalNode *> LogosParser::FieldDefContext::VARIABLE() {
-  return getTokens(LogosParser::VARIABLE);
+std::vector<LogosParser::SelectionElementContext *> LogosParser::AssignmentContext::selectionElement() {
+  return getRuleContexts<LogosParser::SelectionElementContext>();
 }
 
-tree::TerminalNode* LogosParser::FieldDefContext::VARIABLE(size_t i) {
-  return getToken(LogosParser::VARIABLE, i);
+LogosParser::SelectionElementContext* LogosParser::AssignmentContext::selectionElement(size_t i) {
+  return getRuleContext<LogosParser::SelectionElementContext>(i);
 }
 
-tree::TerminalNode* LogosParser::FieldDefContext::EQUAL() {
+tree::TerminalNode* LogosParser::AssignmentContext::EQUAL() {
   return getToken(LogosParser::EQUAL, 0);
 }
 
-LogosParser::ExprContext* LogosParser::FieldDefContext::expr() {
+LogosParser::ExprContext* LogosParser::AssignmentContext::expr() {
   return getRuleContext<LogosParser::ExprContext>(0);
 }
 
-std::vector<tree::TerminalNode *> LogosParser::FieldDefContext::DOT() {
+std::vector<tree::TerminalNode *> LogosParser::AssignmentContext::DOT() {
   return getTokens(LogosParser::DOT);
 }
 
-tree::TerminalNode* LogosParser::FieldDefContext::DOT(size_t i) {
+tree::TerminalNode* LogosParser::AssignmentContext::DOT(size_t i) {
   return getToken(LogosParser::DOT, i);
 }
 
 
-size_t LogosParser::FieldDefContext::getRuleIndex() const {
-  return LogosParser::RuleFieldDef;
+size_t LogosParser::AssignmentContext::getRuleIndex() const {
+  return LogosParser::RuleAssignment;
 }
 
 
-LogosParser::FieldDefContext* LogosParser::fieldDef() {
-  FieldDefContext *_localctx = _tracker.createInstance<FieldDefContext>(_ctx, getState());
-  enterRule(_localctx, 30, LogosParser::RuleFieldDef);
+LogosParser::AssignmentContext* LogosParser::assignment() {
+  AssignmentContext *_localctx = _tracker.createInstance<AssignmentContext>(_ctx, getState());
+  enterRule(_localctx, 30, LogosParser::RuleAssignment);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1465,7 +1465,7 @@ LogosParser::FieldDefContext* LogosParser::fieldDef() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(212);
-    match(LogosParser::VARIABLE);
+    selectionElement();
     setState(215); 
     _errHandler->sync(this);
     _la = _input->LA(1);
@@ -1473,7 +1473,7 @@ LogosParser::FieldDefContext* LogosParser::fieldDef() {
       setState(213);
       match(LogosParser::DOT);
       setState(214);
-      match(LogosParser::VARIABLE);
+      selectionElement();
       setState(217); 
       _errHandler->sync(this);
       _la = _input->LA(1);
