@@ -29,8 +29,8 @@ public:
     RuleInterfaceDeclaration = 7, RuleObjectImplements = 8, RuleFuncSignature = 9, 
     RuleFuncImplementation = 10, RuleFuncBody = 11, RuleParamList = 12, 
     RuleStatement = 13, RuleStatementsBlock = 14, RuleAssignment = 15, RuleExplicitVarDec = 16, 
-    RuleImplicitVarDec = 17, RuleIfStatement = 18, RuleElseStatement = 19, 
-    RuleIfElseStatement = 20, RulePatternMatching = 21, RulePattern = 22, 
+    RuleImplicitVarDec = 17, RuleIfStatement = 18, RuleElseIfStatement = 19, 
+    RuleElseStatement = 20, RulePatternMatching = 21, RulePattern = 22, 
     RuleLoopStatement = 23, RuleControlFlow = 24, RuleReturnStatement = 25, 
     RuleEnumDeclaration = 26, RuleEnumField = 27, RuleExpr = 28, RuleExprList = 29, 
     RuleUnaryExpr = 30, RuleArray = 31, RuleFuncCall = 32, RuleConstructor = 33, 
@@ -74,8 +74,8 @@ public:
   class ExplicitVarDecContext;
   class ImplicitVarDecContext;
   class IfStatementContext;
+  class ElseIfStatementContext;
   class ElseStatementContext;
-  class IfElseStatementContext;
   class PatternMatchingContext;
   class PatternContext;
   class LoopStatementContext;
@@ -365,8 +365,8 @@ public:
     antlr4::tree::TerminalNode *IF();
     ExprContext *expr();
     StatementsBlockContext *statementsBlock();
-    std::vector<IfElseStatementContext *> ifElseStatement();
-    IfElseStatementContext* ifElseStatement(size_t i);
+    std::vector<ElseIfStatementContext *> elseIfStatement();
+    ElseIfStatementContext* elseIfStatement(size_t i);
     ElseStatementContext *elseStatement();
     PatternMatchingContext *patternMatching();
 
@@ -374,6 +374,19 @@ public:
   };
 
   IfStatementContext* ifStatement();
+
+  class  ElseIfStatementContext : public antlr4::ParserRuleContext {
+  public:
+    ElseIfStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *ELSE();
+    ExprContext *expr();
+    StatementsBlockContext *statementsBlock();
+
+   
+  };
+
+  ElseIfStatementContext* elseIfStatement();
 
   class  ElseStatementContext : public antlr4::ParserRuleContext {
   public:
@@ -386,19 +399,6 @@ public:
   };
 
   ElseStatementContext* elseStatement();
-
-  class  IfElseStatementContext : public antlr4::ParserRuleContext {
-  public:
-    IfElseStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *ELSE();
-    ExprContext *expr();
-    StatementsBlockContext *statementsBlock();
-
-   
-  };
-
-  IfElseStatementContext* ifElseStatement();
 
   class  PatternMatchingContext : public antlr4::ParserRuleContext {
   public:

@@ -55,7 +55,7 @@ void logosParserInitialize() {
       "importPath", "objectDeclaration", "interfaceDeclaration", "objectImplements", 
       "funcSignature", "funcImplementation", "funcBody", "paramList", "statement", 
       "statementsBlock", "assignment", "explicitVarDec", "implicitVarDec", 
-      "ifStatement", "elseStatement", "ifElseStatement", "patternMatching", 
+      "ifStatement", "elseIfStatement", "elseStatement", "patternMatching", 
       "pattern", "loopStatement", "controlFlow", "returnStatement", "enumDeclaration", 
       "enumField", "expr", "exprList", "unaryExpr", "array", "funcCall", 
       "constructor", "funcArg", "funcArgList", "constant", "arrayIndex", 
@@ -98,7 +98,7 @@ void logosParserInitialize() {
   	5,14,208,8,14,10,14,12,14,211,9,14,1,14,1,14,1,15,1,15,1,15,4,15,218,
   	8,15,11,15,12,15,219,1,15,1,15,1,15,1,16,1,16,1,16,1,16,1,16,3,16,230,
   	8,16,1,17,1,17,1,17,1,17,1,18,1,18,1,18,1,18,5,18,240,8,18,10,18,12,18,
-  	243,9,18,1,18,3,18,246,8,18,1,18,3,18,249,8,18,1,19,1,19,1,19,1,20,1,
+  	243,9,18,1,18,3,18,246,8,18,1,18,3,18,249,8,18,1,19,1,19,1,19,1,19,1,
   	20,1,20,1,20,1,21,1,21,3,21,260,8,21,1,21,1,21,5,21,264,8,21,10,21,12,
   	21,267,9,21,1,21,1,21,1,21,3,21,272,8,21,1,21,1,21,1,22,1,22,1,22,1,22,
   	1,23,1,23,3,23,282,8,23,1,23,1,23,1,23,1,23,1,23,1,23,1,23,1,23,1,23,
@@ -121,7 +121,7 @@ void logosParserInitialize() {
   	8,138,1,0,0,0,10,148,1,0,0,0,12,156,1,0,0,0,14,160,1,0,0,0,16,164,1,0,
   	0,0,18,168,1,0,0,0,20,178,1,0,0,0,22,181,1,0,0,0,24,183,1,0,0,0,26,203,
   	1,0,0,0,28,205,1,0,0,0,30,214,1,0,0,0,32,224,1,0,0,0,34,231,1,0,0,0,36,
-  	248,1,0,0,0,38,250,1,0,0,0,40,253,1,0,0,0,42,257,1,0,0,0,44,275,1,0,0,
+  	248,1,0,0,0,38,250,1,0,0,0,40,254,1,0,0,0,42,257,1,0,0,0,44,275,1,0,0,
   	0,46,296,1,0,0,0,48,303,1,0,0,0,50,305,1,0,0,0,52,308,1,0,0,0,54,319,
   	1,0,0,0,56,331,1,0,0,0,58,347,1,0,0,0,60,364,1,0,0,0,62,366,1,0,0,0,64,
   	377,1,0,0,0,66,384,1,0,0,0,68,393,1,0,0,0,70,397,1,0,0,0,72,408,1,0,0,
@@ -168,11 +168,11 @@ void logosParserInitialize() {
   	5,15,0,0,226,229,5,46,0,0,227,228,5,16,0,0,228,230,3,56,28,0,229,227,
   	1,0,0,0,229,230,1,0,0,0,230,33,1,0,0,0,231,232,5,47,0,0,232,233,5,16,
   	0,0,233,234,3,56,28,0,234,35,1,0,0,0,235,236,5,32,0,0,236,237,3,56,28,
-  	0,237,241,3,28,14,0,238,240,3,40,20,0,239,238,1,0,0,0,240,243,1,0,0,0,
+  	0,237,241,3,28,14,0,238,240,3,38,19,0,239,238,1,0,0,0,240,243,1,0,0,0,
   	241,239,1,0,0,0,241,242,1,0,0,0,242,245,1,0,0,0,243,241,1,0,0,0,244,246,
-  	3,38,19,0,245,244,1,0,0,0,245,246,1,0,0,0,246,249,1,0,0,0,247,249,3,42,
+  	3,40,20,0,245,244,1,0,0,0,245,246,1,0,0,0,246,249,1,0,0,0,247,249,3,42,
   	21,0,248,235,1,0,0,0,248,247,1,0,0,0,249,37,1,0,0,0,250,251,5,33,0,0,
-  	251,252,3,28,14,0,252,39,1,0,0,0,253,254,5,33,0,0,254,255,3,56,28,0,255,
+  	251,252,3,56,28,0,252,253,3,28,14,0,253,39,1,0,0,0,254,255,5,33,0,0,255,
   	256,3,28,14,0,256,41,1,0,0,0,257,259,5,32,0,0,258,260,3,56,28,0,259,258,
   	1,0,0,0,259,260,1,0,0,0,260,261,1,0,0,0,261,265,5,6,0,0,262,264,3,44,
   	22,0,263,262,1,0,0,0,264,267,1,0,0,0,265,263,1,0,0,0,265,266,1,0,0,0,
@@ -1638,12 +1638,12 @@ LogosParser::StatementsBlockContext* LogosParser::IfStatementContext::statements
   return getRuleContext<LogosParser::StatementsBlockContext>(0);
 }
 
-std::vector<LogosParser::IfElseStatementContext *> LogosParser::IfStatementContext::ifElseStatement() {
-  return getRuleContexts<LogosParser::IfElseStatementContext>();
+std::vector<LogosParser::ElseIfStatementContext *> LogosParser::IfStatementContext::elseIfStatement() {
+  return getRuleContexts<LogosParser::ElseIfStatementContext>();
 }
 
-LogosParser::IfElseStatementContext* LogosParser::IfStatementContext::ifElseStatement(size_t i) {
-  return getRuleContext<LogosParser::IfElseStatementContext>(i);
+LogosParser::ElseIfStatementContext* LogosParser::IfStatementContext::elseIfStatement(size_t i) {
+  return getRuleContext<LogosParser::ElseIfStatementContext>(i);
 }
 
 LogosParser::ElseStatementContext* LogosParser::IfStatementContext::elseStatement() {
@@ -1691,7 +1691,7 @@ LogosParser::IfStatementContext* LogosParser::ifStatement() {
       while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER) {
         if (alt == 1) {
           setState(238);
-          ifElseStatement(); 
+          elseIfStatement(); 
         }
         setState(243);
         _errHandler->sync(this);
@@ -1729,6 +1729,60 @@ LogosParser::IfStatementContext* LogosParser::ifStatement() {
   return _localctx;
 }
 
+//----------------- ElseIfStatementContext ------------------------------------------------------------------
+
+LogosParser::ElseIfStatementContext::ElseIfStatementContext(ParserRuleContext *parent, size_t invokingState)
+  : ParserRuleContext(parent, invokingState) {
+}
+
+tree::TerminalNode* LogosParser::ElseIfStatementContext::ELSE() {
+  return getToken(LogosParser::ELSE, 0);
+}
+
+LogosParser::ExprContext* LogosParser::ElseIfStatementContext::expr() {
+  return getRuleContext<LogosParser::ExprContext>(0);
+}
+
+LogosParser::StatementsBlockContext* LogosParser::ElseIfStatementContext::statementsBlock() {
+  return getRuleContext<LogosParser::StatementsBlockContext>(0);
+}
+
+
+size_t LogosParser::ElseIfStatementContext::getRuleIndex() const {
+  return LogosParser::RuleElseIfStatement;
+}
+
+
+LogosParser::ElseIfStatementContext* LogosParser::elseIfStatement() {
+  ElseIfStatementContext *_localctx = _tracker.createInstance<ElseIfStatementContext>(_ctx, getState());
+  enterRule(_localctx, 38, LogosParser::RuleElseIfStatement);
+
+#if __cplusplus > 201703L
+  auto onExit = finally([=, this] {
+#else
+  auto onExit = finally([=] {
+#endif
+    exitRule();
+  });
+  try {
+    enterOuterAlt(_localctx, 1);
+    setState(250);
+    match(LogosParser::ELSE);
+    setState(251);
+    expr(0);
+    setState(252);
+    statementsBlock();
+   
+  }
+  catch (RecognitionException &e) {
+    _errHandler->reportError(this, e);
+    _localctx->exception = std::current_exception();
+    _errHandler->recover(this, _localctx->exception);
+  }
+
+  return _localctx;
+}
+
 //----------------- ElseStatementContext ------------------------------------------------------------------
 
 LogosParser::ElseStatementContext::ElseStatementContext(ParserRuleContext *parent, size_t invokingState)
@@ -1751,7 +1805,7 @@ size_t LogosParser::ElseStatementContext::getRuleIndex() const {
 
 LogosParser::ElseStatementContext* LogosParser::elseStatement() {
   ElseStatementContext *_localctx = _tracker.createInstance<ElseStatementContext>(_ctx, getState());
-  enterRule(_localctx, 38, LogosParser::RuleElseStatement);
+  enterRule(_localctx, 40, LogosParser::RuleElseStatement);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1762,62 +1816,8 @@ LogosParser::ElseStatementContext* LogosParser::elseStatement() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(250);
-    match(LogosParser::ELSE);
-    setState(251);
-    statementsBlock();
-   
-  }
-  catch (RecognitionException &e) {
-    _errHandler->reportError(this, e);
-    _localctx->exception = std::current_exception();
-    _errHandler->recover(this, _localctx->exception);
-  }
-
-  return _localctx;
-}
-
-//----------------- IfElseStatementContext ------------------------------------------------------------------
-
-LogosParser::IfElseStatementContext::IfElseStatementContext(ParserRuleContext *parent, size_t invokingState)
-  : ParserRuleContext(parent, invokingState) {
-}
-
-tree::TerminalNode* LogosParser::IfElseStatementContext::ELSE() {
-  return getToken(LogosParser::ELSE, 0);
-}
-
-LogosParser::ExprContext* LogosParser::IfElseStatementContext::expr() {
-  return getRuleContext<LogosParser::ExprContext>(0);
-}
-
-LogosParser::StatementsBlockContext* LogosParser::IfElseStatementContext::statementsBlock() {
-  return getRuleContext<LogosParser::StatementsBlockContext>(0);
-}
-
-
-size_t LogosParser::IfElseStatementContext::getRuleIndex() const {
-  return LogosParser::RuleIfElseStatement;
-}
-
-
-LogosParser::IfElseStatementContext* LogosParser::ifElseStatement() {
-  IfElseStatementContext *_localctx = _tracker.createInstance<IfElseStatementContext>(_ctx, getState());
-  enterRule(_localctx, 40, LogosParser::RuleIfElseStatement);
-
-#if __cplusplus > 201703L
-  auto onExit = finally([=, this] {
-#else
-  auto onExit = finally([=] {
-#endif
-    exitRule();
-  });
-  try {
-    enterOuterAlt(_localctx, 1);
-    setState(253);
-    match(LogosParser::ELSE);
     setState(254);
-    expr(0);
+    match(LogosParser::ELSE);
     setState(255);
     statementsBlock();
    

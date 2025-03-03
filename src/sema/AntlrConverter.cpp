@@ -181,11 +181,11 @@ LogosIf* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
     const auto expr = getExpr(ctx->expr());
     const auto stmts = getStmtBlock(ctx->statementsBlock());
     const auto ifStmt = new LogosIf(expr, stmts);
-    for (const auto &ifElseStmt : ctx->ifElseStatement()) {
-        auto ifElseExpr = getExpr(ifElseStmt->expr());
-        auto ifElseStmtBlock = getStmtBlock(ifElseStmt->statementsBlock());
-        ifStmt->ifElseConds.emplace_back(ifElseExpr);
-        ifStmt->ifElseStmtBlocks.emplace_back(ifElseStmtBlock);
+    for (const auto &elseIfStmt : ctx->elseIfStatement()) {
+        auto elseIfExpr = getExpr(elseIfStmt->expr());
+        auto elseIfStmtBlock = getStmtBlock(elseIfStmt->statementsBlock());
+        ifStmt->elseIfConds.emplace_back(elseIfExpr);
+        ifStmt->elseIfStmtBlocks.emplace_back(elseIfStmtBlock);
     }
     if (const auto &elseStmt = ctx->elseStatement()) {
         ifStmt->elseStmtBlock = getStmtBlock(elseStmt->statementsBlock());

@@ -8,6 +8,9 @@
 class LogosFile;
 class LogosValue;
 
+const auto targetTriple = sys::getDefaultTargetTriple();
+inline TargetMachine* targetMachine = nullptr;
+
 class CodeGenerator {
 public:
     map<string, LogosSymbol> globalSymbols;

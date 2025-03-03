@@ -3,6 +3,7 @@
 #include "funcs/LogosFuncImpl.h"
 #include "object/LogosField.h"
 
+#include <llvm/MC/TargetRegistry.h>
 #include <llvm/Support/TargetSelect.h>
 #include <ranges>
 
@@ -14,7 +15,10 @@ void CodeGenerator::generateCode(const map<string, LogosSymbol>& globalSymbols) 
 
 void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSymbols) const {
     const auto module = new Module(LOGOS_MAIN_FILE, context);
+    module->setTargetTriple(targetTriple);
+    module->setDataLayout(targetMachine->createDataLayout());
     modules[LOGOS_MAIN_FILE] = module;
+
     auto metadata = CodeGenMetadata{.currentModule = module};
     metadata.logosStack.globalSymbols = globalSymbols;
 
@@ -26,15 +30,16 @@ void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSym
     // Main func
     mainFile->mainFunc->computeIRValue(&metadata);
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
-
-
     writeIRToFile(metadata.currentModule, LOGOS_MAIN_FILE);
 }
 
 void CodeGenerator::generateObjModule(LogosObject* obj, LogosGlobals globalSymbols) {
     const auto objName = obj->name();
     const auto module = new Module(objName, context);
+    module->setTargetTriple(targetTriple);
+    module->setDataLayout(targetMachine->createDataLayout());
     modules[objName] = module;
+
     auto metadata = CodeGenMetadata{.currentModule = module};
     metadata.logosStack.globalSymbols = globalSymbols;
 
@@ -68,6 +73,9 @@ void CodeGenerator::initIR() {
     InitializeAllTargetMCs();
     InitializeAllTargets();
     InitializeAllTargetInfos();
+    string error;
+    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
 void CodeGenerator::emitIRFile(const string& filePath, const Module* const module) {
