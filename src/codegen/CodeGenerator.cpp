@@ -18,14 +18,15 @@ void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSym
     auto metadata = CodeGenMetadata{.currentModule = module};
     metadata.logosStack.globalSymbols = globalSymbols;
 
-    // Main func
-    mainFile->mainFunc->computeIRValue(&metadata);
-    metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
-
     // Funcs
     for (const auto& func : mainFile->funcs) {
         func->computeIRValue(&metadata);
     }
+
+    // Main func
+    mainFile->mainFunc->computeIRValue(&metadata);
+    metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
+
 
     writeIRToFile(metadata.currentModule, LOGOS_MAIN_FILE);
 }

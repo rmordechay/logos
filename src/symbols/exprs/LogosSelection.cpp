@@ -3,9 +3,8 @@
 #include "LogosUtils.h"
 #include "exprs/LogosConstant.h"
 #include "exprs/LogosFuncCall.h"
-#include "funcs/LogosFuncImpl.h"
-
 #include <LogosStack.h>
+#include <object/LogosField.h>
 
 Value* LogosSelection::computeIRValue(CodeGenMetadata* metadata) {
     Value* value = nullptr;
@@ -22,8 +21,16 @@ Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExp
     switch (symbol->type) {
     case INSTANCE: {
         const auto& funcName = nextExpr->getName();
-        const auto func = symbol->instance->obj->funcs[funcName];
-        return func->callFunc(metadata, {previousExpr});
+        const auto obj = symbol->instance->obj;
+        if (obj->funcs.contains(funcName)) {
+            const auto func = obj->funcs[funcName];
+            return func->callFunc(metadata, {previousExpr});
+        }
+        if (obj->fields.contains(funcName)) {
+            const auto field = obj->fields[funcName];
+            return nullptr;
+        }
+        break;
     }
     case FUNC_CALL: {
         return symbol->funcCall->writeIRValue(metadata);

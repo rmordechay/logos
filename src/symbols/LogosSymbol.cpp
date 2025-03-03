@@ -13,21 +13,21 @@ LogosSymbol LogosSymbol::createSymbol(LogosExpr* expr) {
     const auto type = expr->getSymbolType();
     switch (type) {
     case INSTANCE:
-        return LogosSymbol(type, static_cast<LogosInstance*>(expr));
+        return LogosSymbol(type, dynamic_cast<LogosInstance*>(expr));
     case FUNC_CALL:
-        return LogosSymbol(type, static_cast<LogosFuncCall*>(expr));
+        return LogosSymbol(type, dynamic_cast<LogosFuncCall*>(expr));
     case VARIABLE:
-        return LogosSymbol(type, static_cast<LogosVariable*>(expr));
+        return LogosSymbol(type, dynamic_cast<LogosVariable*>(expr));
     case CONSTANT:
-        return LogosSymbol(type, static_cast<LogosConstant*>(expr));
+        return LogosSymbol(type, dynamic_cast<LogosConstant*>(expr));
     case BINARY_EXPR:
-        return LogosSymbol(type, static_cast<LogosBinaryExpr*>(expr));
+        return LogosSymbol(type, dynamic_cast<LogosBinaryExpr*>(expr));
     case SELECTION:
-        return LogosSymbol(type, static_cast<LogosSelection*>(expr));
+        return LogosSymbol(type, dynamic_cast<LogosSelection*>(expr));
     case ARRAY:
-        return LogosSymbol(type, static_cast<LogosArray*>(expr));
+        return LogosSymbol(type, dynamic_cast<LogosArray*>(expr));
     case ARRAY_INDEX:
-        return LogosSymbol(type, static_cast<LogosArrayIndex*>(expr));
+        return LogosSymbol(type, dynamic_cast<LogosArrayIndex*>(expr));
     default:
         break;
     }

@@ -14,7 +14,7 @@ void Application::runLogos() {
     const map<string, LogosFile*> files = parseFiles();
     const map<string, LogosSymbol> globalSymbols = collectGlobals(files);
     SemaAnalyser::analyse(files, globalSymbols);
-    const CodeGenerator codeGenerator = CodeGenerator(mainFile);
+    const auto codeGenerator = CodeGenerator(mainFile);
     codeGenerator.generateCode(globalSymbols);
     linker.runBinary();
 }
@@ -48,7 +48,7 @@ void Application::parseTree(const string& path, map<string, LogosFile*>& files, 
 
 map<string, LogosSymbol> Application::collectGlobals(const map<string, LogosFile*>& files) {
     map<string, LogosSymbol> globalSymbols;
-    globalSymbols["print"] = LogosSymbol(INTERNAL_FUNC, new LogosPrint());
+    globalSymbols["print"] = LogosSymbol(BUILTIN_FUNC, new LogosPrint());
     for (const auto& file : files | views::values) {
         if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
             const auto object = objFile->obj;

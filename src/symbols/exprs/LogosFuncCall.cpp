@@ -3,18 +3,19 @@
 #include "funcs/LogosFunc.h"
 
 #include <LogosStack.h>
+#include <funcs/LogosBuiltinFunc.h>
 #include <funcs/LogosFuncImpl.h>
 #include <funcs/LogosMethodImpl.h>
 
 Value* LogosFuncCall::computeIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->logosStack.getSymbol(name);
     switch (symbol->type) {
-    case INTERNAL_FUNC:
-        return symbol->internalFunc->callFunc(metadata, args);;
+    case BUILTIN_FUNC:
+        return symbol->builtinFunc->callFunc(metadata, args);
     case FUNC_IMPL:
-        return symbol->funcImpl->callFunc(metadata, args);;
+        return symbol->funcImpl->callFunc(metadata, args);
     case METHOD_IMPL:
-        return symbol->methodImpl->callFunc(metadata, args);;
+        return symbol->methodImpl->callFunc(metadata, args);
     default:
         return nullptr;
     }

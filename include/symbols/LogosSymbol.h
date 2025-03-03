@@ -1,7 +1,9 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
+#include <string>
 
 
+class LogosBuiltinFunc;
 class LogosMethodImpl;
 class LogosFuncImpl;
 class LogosExpr;
@@ -25,7 +27,7 @@ enum LogosSymbolType {
     FUNC_CALL,
     VARIABLE,
     CONSTANT,
-    INTERNAL_FUNC,
+    BUILTIN_FUNC,
     FUNC_IMPL,
     METHOD_IMPL,
     SELECTION,
@@ -39,7 +41,7 @@ struct LogosSymbol {
     union {
         LogosObject* object;
         LogosField* field;
-        LogosFunc* internalFunc;
+        LogosBuiltinFunc* builtinFunc;
         LogosFuncImpl* funcImpl;
         LogosMethodImpl* methodImpl;
         LogosInstance* instance;
@@ -57,12 +59,12 @@ struct LogosSymbol {
         object(nullptr) {
     }
 
-    LogosSymbol(LogosSymbolType type, LogosObject* object) :
+    LogosSymbol(const LogosSymbolType type, LogosObject* object) :
         type(type),
         object(object) {
     }
 
-    LogosSymbol(LogosSymbolType type, LogosField* field) :
+    LogosSymbol(const LogosSymbolType type, LogosField* field) :
         type(type),
         field(field) {
     }
@@ -77,9 +79,9 @@ struct LogosSymbol {
         funcCall(funcCall) {
     }
 
-    LogosSymbol(LogosSymbolType type, LogosFunc* func) :
+    LogosSymbol(const LogosSymbolType type, LogosBuiltinFunc* builtinFunc) :
         type(type),
-        internalFunc(func) {
+        builtinFunc(builtinFunc) {
     }
 
     LogosSymbol(const LogosSymbolType type, LogosFuncImpl* funcImpl) :

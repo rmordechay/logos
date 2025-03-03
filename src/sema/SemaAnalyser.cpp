@@ -259,7 +259,7 @@ void SemaAnalyser::resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr
         break;
     case OBJECT:
         break;
-    case INTERNAL_FUNC:
+    case BUILTIN_FUNC:
         break;
     case FUNC_IMPL:
         break;

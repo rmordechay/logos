@@ -10,7 +10,6 @@ Value* LogosVarDec::computeIRValue(CodeGenMetadata* metadata) {
     if (!valueType->isPointerTy()) {
         auto& builder = metadata->builder;
         const auto allocaInst = builder.CreateAlloca(valueType);
-        const auto instruction = "%1 = alloca i32, align 4";
         builder.CreateStore(value, allocaInst);
     }
     const auto symbol = LogosSymbol::createSymbol(expr);
