@@ -58,7 +58,6 @@ void SemaAnalyser::visitObject(const LogosObject* object) {
 }
 
 void SemaAnalyser::visitMainFunc(const LogosFuncImpl* mainFunc, const std::string& path) {
-    if (checkErr100(mainFunc)) return;
     visitUserFunc(mainFunc);
 }
 
@@ -101,14 +100,7 @@ void SemaAnalyser::visitFieldDef(const LogosFieldDef* fieldDef) {
 
 void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
     visitExpr(varDec->expr);
-    const auto inferredType = varDec->expr->type;
-    const auto userType = varDec->userType;
-    if (userType && *userType != inferredType) {
-        printError(101, &varDec->position, *userType, inferredType->name());
-    }
-    if (inferredType) {
-        varDec->inferredType = inferredType;
-    }
+    varDec->inferredType = varDec->expr->type;
     logosStack.addLocalSymbol(varDec->name, LogosSymbol::createSymbol(varDec->expr));
 }
 
@@ -273,24 +265,3 @@ void SemaAnalyser::resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr
         break;
     }
 }
-
-template <typename... Args>
-void SemaAnalyser::printError(const int errCode, Position* position, Args&&... args) {
-    setUnsuccessful();
-    const auto msgPair = LOGOS_ERRORS.find(errCode);
-    // const auto formattedMessage = std::vformat(msgPair->second, std::make_format_args(args...));
-    if (position) {
-        cout << std::format("Error at {} {} {}: \n", *position->filePath, position->lineNumber, position->posInLine);
-    } else {
-        // cout << formattedMessage << endl;
-    }
-}
-
-bool SemaAnalyser::checkErr100(const LogosFuncImpl* mainFunc) {
-    if (!mainFunc) {
-        printError(100, nullptr);
-        return true;
-    }
-    return false;
-}
-

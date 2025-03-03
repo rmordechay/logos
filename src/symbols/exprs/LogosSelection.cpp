@@ -20,15 +20,18 @@ Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExp
     const auto symbol = metadata->logosStack.getSymbol(previousExpr->getName());
     switch (symbol->type) {
     case INSTANCE: {
-        const auto& funcName = nextExpr->getName();
+        const auto& exprName = nextExpr->getName();
         const auto obj = symbol->instance->obj;
-        if (obj->funcs.contains(funcName)) {
-            const auto func = obj->funcs[funcName];
+        const auto objType = symbol->instance->obj->getIRType();
+        if (obj->funcs.contains(exprName)) {
+            const auto func = obj->funcs[exprName];
             return func->callFunc(metadata, {previousExpr});
         }
-        if (obj->fields.contains(funcName)) {
-            const auto field = obj->fields[funcName];
-            return nullptr;
+        if (obj->fields.contains(exprName)) {
+            const auto field = obj->fields[exprName];
+            const auto fieldValue = field->writeIRValue(metadata);
+            const auto gep = metadata->builder.CreateStructGEP(objType, fieldValue, field->fieldPosition);
+            return metadata->builder.CreateLoad(fieldValue->getType(), gep);
         }
         break;
     }
