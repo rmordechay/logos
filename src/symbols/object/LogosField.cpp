@@ -5,7 +5,6 @@
 
 #include <LogosDefinitions.h>
 #include <LogosStack.h>
-#include <llvm/IR/Module.h>
 
 Value* LogosField::computeIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;

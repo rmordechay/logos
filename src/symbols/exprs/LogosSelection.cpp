@@ -21,17 +21,18 @@ Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExp
     switch (symbol->type) {
     case INSTANCE: {
         const auto& exprName = nextExpr->getName();
-        const auto obj = symbol->instance->obj;
-        const auto objType = symbol->instance->obj->getIRType();
+        const auto instance = symbol->instance;
+        const auto obj = instance->obj;
+        const auto objType = instance->obj->getIRType();
         if (obj->funcs.contains(exprName)) {
             const auto func = obj->funcs[exprName];
             return func->callFunc(metadata, {previousExpr});
         }
         if (obj->fields.contains(exprName)) {
             const auto field = obj->fields[exprName];
-            const auto fieldValue = field->writeIRValue(metadata);
-            const auto gep = metadata->builder.CreateStructGEP(objType, fieldValue, field->fieldPosition);
-            return metadata->builder.CreateLoad(fieldValue->getType(), gep);
+            const auto instancePtr = instance->writeIRValue(metadata);
+            const auto gep = metadata->builder.CreateStructGEP(objType, instancePtr, field->fieldPosition);
+            return metadata->builder.CreateLoad(field->inferredType->getIRType(), gep);
         }
         break;
     }

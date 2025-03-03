@@ -4,5 +4,5 @@ generate_grammar:
 	mv src/parser/*.h include/parser/
 
 run_llvm:
-	cd project/build && clang MyObject.ll Main.ll ../../stdlib/logoslib.ll -o output.o
+	cd project/build && clang MyObject.ll Main.ll ../../stdlib/logoslib.ll -o output
 	cd project/build && ./output
