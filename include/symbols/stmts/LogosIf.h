@@ -6,10 +6,13 @@
 
 class LogosIf final : public LogosStmt {
 public:
-    LogosExpr *cond = nullptr;
-    LogosStmtBlock* stmtBlock = nullptr;
+    LogosExpr* ifCond;
+    LogosStmtBlock* ifStmtBlock;
+    vector<LogosExpr*> ifElseConds;
+    vector<LogosStmtBlock*> ifElseStmtBlocks;
+    LogosStmtBlock* elseStmtBlock = nullptr;
 
-    explicit LogosIf(LogosExpr* cond, LogosStmtBlock* stmtBlock) : cond(cond), stmtBlock(stmtBlock) {}
+    LogosIf(LogosExpr* ifCond, LogosStmtBlock* ifStmtBlock) : ifCond(ifCond), ifStmtBlock(ifStmtBlock) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     ~LogosIf() override;
 };

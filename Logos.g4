@@ -81,12 +81,16 @@ implicitVarDec:
     ;
 
 ifStatement:
-        IF expr statementsBlock elseStatement
+        IF expr statementsBlock ifElseStatement* elseStatement?
     |   patternMatching
     ;
 
 elseStatement:
-    (ELSE expr statementsBlock)* (ELSE statementsBlock)?
+        ELSE statementsBlock
+    ;
+
+ifElseStatement:
+        ELSE expr statementsBlock
     ;
 
 patternMatching:

@@ -7,8 +7,17 @@ Value* LogosBinaryExpr::computeIRValue(CodeGenMetadata* metadata) {
     if (op == PLUS) {
         return builder.CreateAdd(l, r);
     }
+    if (op == MINUS) {
+        return builder.CreateSub(l, r);
+    }
+    if (op == STAR) {
+        return builder.CreateMul(l, r);
+    }
     if (op == RANGLE) {
         return builder.CreateICmpSGT(l, r);
+    }
+    if (op == LANGLE) {
+        return builder.CreateICmpSLT(l, r);
     }
     return nullptr;
 }

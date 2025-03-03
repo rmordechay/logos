@@ -11,7 +11,6 @@
 #include <exprs/LogosInstance.h>
 #include <exprs/LogosSelection.h>
 #include <exprs/LogosVariable.h>
-#include <format>
 #include <funcs/LogosPrint.h>
 #include <loops/LogosLoop.h>
 #include <stmts/LogosAssignment.h>

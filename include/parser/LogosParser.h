@@ -30,12 +30,12 @@ public:
     RuleFuncImplementation = 10, RuleFuncBody = 11, RuleParamList = 12, 
     RuleStatement = 13, RuleStatementsBlock = 14, RuleAssignment = 15, RuleExplicitVarDec = 16, 
     RuleImplicitVarDec = 17, RuleIfStatement = 18, RuleElseStatement = 19, 
-    RulePatternMatching = 20, RulePattern = 21, RuleLoopStatement = 22, 
-    RuleControlFlow = 23, RuleReturnStatement = 24, RuleEnumDeclaration = 25, 
-    RuleEnumField = 26, RuleExpr = 27, RuleExprList = 28, RuleUnaryExpr = 29, 
-    RuleArray = 30, RuleFuncCall = 31, RuleConstructor = 32, RuleFuncArg = 33, 
-    RuleFuncArgList = 34, RuleConstant = 35, RuleArrayIndex = 36, RuleSelection = 37, 
-    RuleSelectionElement = 38, RuleRange = 39
+    RuleIfElseStatement = 20, RulePatternMatching = 21, RulePattern = 22, 
+    RuleLoopStatement = 23, RuleControlFlow = 24, RuleReturnStatement = 25, 
+    RuleEnumDeclaration = 26, RuleEnumField = 27, RuleExpr = 28, RuleExprList = 29, 
+    RuleUnaryExpr = 30, RuleArray = 31, RuleFuncCall = 32, RuleConstructor = 33, 
+    RuleFuncArg = 34, RuleFuncArgList = 35, RuleConstant = 36, RuleArrayIndex = 37, 
+    RuleSelection = 38, RuleSelectionElement = 39, RuleRange = 40
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -75,6 +75,7 @@ public:
   class ImplicitVarDecContext;
   class IfStatementContext;
   class ElseStatementContext;
+  class IfElseStatementContext;
   class PatternMatchingContext;
   class PatternContext;
   class LoopStatementContext;
@@ -364,6 +365,8 @@ public:
     antlr4::tree::TerminalNode *IF();
     ExprContext *expr();
     StatementsBlockContext *statementsBlock();
+    std::vector<IfElseStatementContext *> ifElseStatement();
+    IfElseStatementContext* ifElseStatement(size_t i);
     ElseStatementContext *elseStatement();
     PatternMatchingContext *patternMatching();
 
@@ -376,17 +379,26 @@ public:
   public:
     ElseStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<antlr4::tree::TerminalNode *> ELSE();
-    antlr4::tree::TerminalNode* ELSE(size_t i);
-    std::vector<ExprContext *> expr();
-    ExprContext* expr(size_t i);
-    std::vector<StatementsBlockContext *> statementsBlock();
-    StatementsBlockContext* statementsBlock(size_t i);
+    antlr4::tree::TerminalNode *ELSE();
+    StatementsBlockContext *statementsBlock();
 
    
   };
 
   ElseStatementContext* elseStatement();
+
+  class  IfElseStatementContext : public antlr4::ParserRuleContext {
+  public:
+    IfElseStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *ELSE();
+    ExprContext *expr();
+    StatementsBlockContext *statementsBlock();
+
+   
+  };
+
+  IfElseStatementContext* ifElseStatement();
 
   class  PatternMatchingContext : public antlr4::ParserRuleContext {
   public:
