@@ -2,10 +2,8 @@ cmake_minimum_required(VERSION 3.30)
 project(logos)
 
 set(CMAKE_CXX_STANDARD 20)
-set(LLVM_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libLLVM.dylib")
-set(ANTLR_LIB "${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libantlr4-runtime.a")
-set(CMAKE_C_COMPILER "/opt/homebrew/opt/llvm/bin/clang")
-set(CMAKE_CXX_COMPILER "/opt/homebrew/opt/llvm/bin/clang++")
+set(LLVM_LIB ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libLLVM.dylib)
+set(ANTLR_LIB ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libantlr4-runtime.a)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
@@ -41,7 +39,7 @@ add_library(libs STATIC
     src/symbols/funcs/LogosPrint.cpp
     src/symbols/funcs/LogosUserFunc.cpp
     src/symbols/funcs/LogosMethodImpl.cpp
-        src/symbols/object/LogosField.cpp
+    src/symbols/object/LogosField.cpp
     src/symbols/object/LogosObject.cpp
     src/symbols/stmts/LogosFieldDef.cpp
     src/symbols/stmts/LogosIf.cpp
@@ -55,6 +53,29 @@ add_library(libs STATIC
 
 add_executable(logos main.cpp src/LogosStack.cpp)
 
-target_link_libraries(logos PRIVATE libs ${LLVM_LIB} ${ANTLR_LIB})
+target_link_libraries(logos PRIVATE libs
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMAnalysis.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMCodeGen.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMCore.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMSupport.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMTarget.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMLinker.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMTransformUtils.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMTargetParser.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMRemarks.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMBitstreamReader.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMIRReader.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMDemangle.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMBinaryFormat.a
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMObject.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMMCParser.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMIRReader.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMAsmParser.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMMC.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/libLLVMBitReader.a
+
+  ${ANTLR_LIB}
+)
 
 

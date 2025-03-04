@@ -12,7 +12,6 @@
 
 
 void Application::runLogos() {
-    create_directories(LOGOS_BUILD_DIR);
     const map<string, LogosFile*> files = parseFiles();
     const map<string, LogosSymbol> globalSymbols = collectGlobals(files);
     SemaAnalyser::analyse(files, globalSymbols);

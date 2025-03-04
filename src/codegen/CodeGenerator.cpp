@@ -10,6 +10,7 @@
 using LogosGlobals = const std::map<std::string, LogosSymbol>&;
 
 void CodeGenerator::generateCode(const map<string, LogosSymbol>& globalSymbols) const {
+    create_directories(LOGOS_BUILD_DIR);
     generateMainModule(globalSymbols);
 }
 
@@ -67,12 +68,12 @@ void CodeGenerator::writeIRToFile(const Module* module, const string& name) {
 }
 
 void CodeGenerator::initIR() {
-    InitializeNativeTarget();
-    InitializeNativeTargetAsmPrinter();
-    InitializeNativeTargetAsmParser();
-    InitializeAllTargetMCs();
-    InitializeAllTargets();
-    InitializeAllTargetInfos();
+    // InitializeNativeTarget();
+    // InitializeNativeTargetAsmPrinter();
+    // InitializeNativeTargetAsmParser();
+    // InitializeAllTargetMCs();
+    // InitializeAllTargets();
+    // InitializeAllTargetInfos();
     string error;
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
