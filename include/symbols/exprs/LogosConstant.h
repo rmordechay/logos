@@ -23,4 +23,5 @@ public:
     ~LogosConstant() override = default;
 };
 
+
 #endif //LOGOSCONSTANTEXPR_H

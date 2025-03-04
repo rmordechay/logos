@@ -13,7 +13,6 @@ public:
     LogosStmtBlock* elseStmtBlock = nullptr;
 
     LogosIf(LogosExpr* ifCond, LogosStmtBlock* ifStmtBlock) : ifCond(ifCond), ifStmtBlock(ifStmtBlock) {}
-    static void startBlock(CodeGenMetadata* metadata, BasicBlock* block);
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     void computeSimpleIf(CodeGenMetadata* metadata) const;
     void createElseBlock(CodeGenMetadata* metadata, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const;

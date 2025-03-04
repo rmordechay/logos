@@ -13,8 +13,10 @@ public:
     void setIRValue(Value* value);
     virtual void setPosition(const antlr4::Token* ctx, const string& filePath);
     virtual ~LogosValue() = default;
+
 protected:
     virtual Value* computeIRValue(CodeGenMetadata* metadata) = 0;
+    static void startBlock(CodeGenMetadata* metadata, BasicBlock* block);
 private:
     Value* IRValue = nullptr;
 };
@@ -30,6 +32,13 @@ inline Value* LogosValue::writeIRValue(CodeGenMetadata* metadata) {
         IRValue = computeIRValue(metadata);
     }
     return IRValue;
+}
+
+inline void LogosValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) {
+    const auto currentFunc = metadata->logosStack.currentFunc;
+    auto& builder = metadata->builder;
+    block->insertInto(currentFunc);
+    builder.SetInsertPoint(block);
 }
 
 inline void LogosValue::setIRValue(Value* value) {

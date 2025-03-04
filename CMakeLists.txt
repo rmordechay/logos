@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.30)
 project(logos)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_BUILD_TYPE Debug)
+add_compile_options(-g)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
@@ -57,9 +59,3 @@ target_link_libraries(logos PRIVATE libs
     ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/liblldCommon.dylib
     ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/liblldMachO.dylib
 )
-
-find_package(ZLIB REQUIRED)
-target_link_libraries(logos PRIVATE ZLIB::ZLIB)
-
-
-

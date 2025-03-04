@@ -7,14 +7,14 @@ Value* LogosPrint::computeIRValue(CodeGenMetadata* metadata) {
 }
 
 Value* LogosPrint::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
+    const auto argType = args[0]->type->getIRType();
     auto argValue = args[0]->writeIRValue(metadata);
-    const auto valueName = argValue->getName();
     string funcName;
-    if (valueName.find(".str") != std::string::npos) {
-        funcName = IRNamePrint;
+    if (argType == metadata->builder.getPtrTy()) {
+        funcName = IRNameString;
     } else {
         funcName = IRNameInt;
     }
-    const auto func = metadata->currentModule->getOrInsertFunction(funcName, argValue->getType());
+    const auto func = metadata->currentModule->getOrInsertFunction(funcName, argType);
     return metadata->builder.CreateCall(func, {argValue});
 }

@@ -11,7 +11,7 @@ class LogosInstance;
 
 class LogosExpr: virtual public LogosValue {
 public:
-    mutable LogosType* type = nullptr;
+    LogosType* type = nullptr;
 
     explicit LogosExpr(LogosType* type) : type(type) {}
     virtual LogosSymbolType getSymbolType() = 0;

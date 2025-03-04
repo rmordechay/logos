@@ -8,6 +8,9 @@
 #include "files/LogosObjectFile.h"
 #include "object/LogosObject.h"
 
+#include <loops/LogosForeachLoop.h>
+#include <loops/LogosRangeLoop.h>
+
 
 class LogosIf;
 class LogosAssignment;
@@ -28,24 +31,26 @@ public:
     void visitMainFunc(const LogosFuncImpl* mainFunc, const std::string& path);
     void visitUserFunc(const LogosFuncImpl* func);
     void visitStmt(LogosStmt* stmt);
-    void visitStmtBlock(LogosStmtBlock* stmtBlock);
+    void visitStmtBlock(const LogosStmtBlock* stmtBlock);
     void visitFieldDef(const LogosAssignment* fieldDef);
     void visitVarDec(LogosVarDec* varDec);
     void visitIfStmt(const LogosIf* ifStmt);
-    void visitLoopStmt(const LogosLoop* loopStmt);
+    void visitLoopStmt(LogosLoop* loopStmt);
+    void visitRangeLoop(LogosRangeLoop* rangeLoop);
+    void visitForeachLoop(LogosForeachLoop* foreachLoop);
     void visitExpr(LogosExpr* expr);
-    void visitArray(const LogosArray* array);
+    void visitArray(LogosArray* array);
     void visitUnaryExpr(LogosUnaryExpr* unaryExpr);
     void visitBinaryExpr(const LogosBinaryExpr* binaryExpr);
     void visitFuncCall(const LogosFuncCall* funcCallExpr);
-    void visitVariable(const LogosVariable* variable);
-    void visitSelection(const LogosSelection* selection);
+    void visitVariable(LogosVariable* variable);
+    void visitSelection(LogosSelection* selection);
     void visitInstance(LogosInstance* instance);
-    void visitArrayIndex(const LogosArrayIndex* arrayIndex);
+    void visitArrayIndex(LogosArrayIndex* arrayIndex);
     void visitConstant(const LogosConstant* constant);
     void setUnsuccessful();
     void resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr);
-    LogosType* inferSelectionType(const LogosSelection* selection);
+    LogosType* inferSelectionType(LogosSelection* selection);
     LogosType* inferArrayType(const LogosArray* array);
     ~SemaAnalyser() = default;
 };

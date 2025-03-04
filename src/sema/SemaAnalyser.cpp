@@ -12,10 +12,12 @@
 #include <exprs/LogosSelection.h>
 #include <exprs/LogosVariable.h>
 #include <funcs/LogosPrint.h>
+#include <loops/LogosForeachLoop.h>
 #include <loops/LogosLoop.h>
+#include <loops/LogosRangeLoop.h>
+#include <ranges>
 #include <stmts/LogosAssignment.h>
 #include <stmts/LogosIf.h>
-#include <ranges>
 
 void SemaAnalyser::analyse(const map<string, LogosFile*>& files, const map<string, LogosSymbol>& globalSymbols) {
     ThreadPool threadPool;
@@ -80,10 +82,12 @@ void SemaAnalyser::visitStmt(LogosStmt* stmt) {
         visitLoopStmt(loopStmt);
     } else if (const auto fieldDef = dynamic_cast<LogosAssignment*>(stmt)) {
         visitFieldDef(fieldDef);
+    } else if (const auto funcCall = dynamic_cast<LogosFuncCall*>(stmt)) {
+        visitFuncCall(funcCall);
     }
 }
 
-void SemaAnalyser::visitStmtBlock(LogosStmtBlock* stmtBlock) {
+void SemaAnalyser::visitStmtBlock(const LogosStmtBlock* stmtBlock) {
     for (const auto& stmt : stmtBlock->stmts) {
         visitStmt(stmt);
     }
@@ -110,7 +114,29 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
 void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {
 }
 
-void SemaAnalyser::visitLoopStmt(const LogosLoop* loopStmt) {}
+void SemaAnalyser::visitLoopStmt(LogosLoop* loopStmt) {
+    if (const auto rangeLoop = dynamic_cast<LogosRangeLoop*>(loopStmt)) {
+        visitRangeLoop(rangeLoop);
+    } else if (const auto foreachLoop = dynamic_cast<LogosForeachLoop*>(loopStmt)) {
+        visitForeachLoop(foreachLoop);
+    }
+}
+
+void SemaAnalyser::visitRangeLoop(LogosRangeLoop* rangeLoop) {}
+
+void SemaAnalyser::visitForeachLoop(LogosForeachLoop* foreachLoop) {
+    const auto iterableExpr = foreachLoop->iterableExpr;
+    if (const auto variable = dynamic_cast<LogosVariable*>(iterableExpr)) {
+        const auto symbol = logosStack.getSymbol(variable->name);
+        foreachLoop->iterable = symbol->array;
+        foreachLoop->iterable->type = inferArrayType(foreachLoop->iterable);
+        foreachLoop->arrayIndex = new LogosArrayIndex(variable);
+        foreachLoop->arrayIndex->type = foreachLoop->iterable->type;
+        foreachLoop->arrayIndex->exprs.emplace_back(&LOGOS_CONSTANT);
+        logosStack.addLocalSymbol(foreachLoop->loopVar->name, LogosSymbol(ARRAY_INDEX, foreachLoop->arrayIndex));
+    }
+    visitStmtBlock(foreachLoop->stmtBlock);
+}
 
 void SemaAnalyser::visitExpr(LogosExpr* expr) {
     if (!expr) return;
@@ -123,7 +149,7 @@ void SemaAnalyser::visitExpr(LogosExpr* expr) {
     }
 }
 
-void SemaAnalyser::visitArray(const LogosArray* array) {
+void SemaAnalyser::visitArray(LogosArray* array) {
     for (const auto& element : array->elements) {
         visitExpr(element);
     }
@@ -150,7 +176,7 @@ void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
 void SemaAnalyser::visitBinaryExpr(const LogosBinaryExpr* binaryExpr) {
 }
 
-void SemaAnalyser::visitSelection(const LogosSelection* selection) {
+void SemaAnalyser::visitSelection(LogosSelection* selection) {
     if (!selection) return;
     selection->type = inferSelectionType(selection);
 }
@@ -162,36 +188,20 @@ void SemaAnalyser::visitInstance(LogosInstance* instance) {
     instance->obj = obj;
 }
 
-void SemaAnalyser::visitArrayIndex(const LogosArrayIndex* arrayIndex) {
+void SemaAnalyser::visitArrayIndex(LogosArrayIndex* arrayIndex) {
     visitExpr(arrayIndex->baseExpr);
     arrayIndex->type = arrayIndex->baseExpr->type;
 }
 
 void SemaAnalyser::visitFuncCall(const LogosFuncCall* funcCallExpr) {
-
+    for (const auto &arg : funcCallExpr->args) {
+        visitExpr(arg);
+    }
 }
 
-void SemaAnalyser::visitVariable(const LogosVariable* variable) {
+void SemaAnalyser::visitVariable(LogosVariable* variable) {
     const auto symbol = logosStack.getSymbol(variable->name);
     switch (symbol->type) {
-    case FIELD:
-        break;
-    case BINARY_EXPR:
-        break;
-    case INSTANCE:
-        break;
-    case FUNC_CALL:
-        break;
-    case CONSTANT:
-        break;
-    case OBJECT:
-        break;
-    case FUNC_IMPL:
-        break;
-    case METHOD_IMPL:
-        break;
-    case SELECTION:
-        break;
     case ARRAY:
         variable->type = symbol->array->type;
         break;
@@ -199,7 +209,7 @@ void SemaAnalyser::visitVariable(const LogosVariable* variable) {
         variable->type = symbol->arrayIndex->type;
         break;
     default:
-        return;
+        break;
     }
 }
 
@@ -212,7 +222,7 @@ void SemaAnalyser::setUnsuccessful() {
     successful = false;
 }
 
-LogosType* SemaAnalyser::inferSelectionType(const LogosSelection* selection) {
+LogosType* SemaAnalyser::inferSelectionType(LogosSelection* selection) {
     auto previousExpr = selection->exprs[0];
     LogosUnaryExpr* nextExpr = nullptr;
     for (int i = 1; i < selection->exprs.size(); ++i) {
@@ -220,8 +230,7 @@ LogosType* SemaAnalyser::inferSelectionType(const LogosSelection* selection) {
         resolveSelection(previousExpr, nextExpr);
         previousExpr = nextExpr;
     }
-    if (nextExpr) {
-        // If true, nextExpr is the last element
+    if (nextExpr) { // If true, nextExpr is the last element
         selection->type = nextExpr->type;
     }
     return nullptr;
@@ -235,35 +244,13 @@ LogosType* SemaAnalyser::inferArrayType(const LogosArray* array) {
 void SemaAnalyser::resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
     const auto symbol = logosStack.getSymbol(previousExpr->getName());
     switch (symbol->type) {
-    case FIELD:
-        break;
     case INSTANCE: {
         const auto obj = symbol->instance->obj;
         const auto func = obj->funcs[nextExpr->getName()];
         nextExpr->type = func->type;
         break;
     }
-    case FUNC_CALL:
-        break;
-    case VARIABLE:
-        break;
-    case CONSTANT:
-        break;
-    case BINARY_EXPR:
-        break;
-    case OBJECT:
-        break;
-    case BUILTIN_FUNC:
-        break;
-    case FUNC_IMPL:
-        break;
-    case METHOD_IMPL:
-        break;
-    case SELECTION:
-        break;
-    case ARRAY:
-        break;
-    case ARRAY_INDEX:
+    default:
         break;
     }
 }

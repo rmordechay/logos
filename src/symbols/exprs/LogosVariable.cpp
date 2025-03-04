@@ -2,7 +2,6 @@
 
 #include "exprs/LogosFuncCall.h"
 #include "exprs/LogosSelection.h"
-#include "funcs/LogosFunc.h"
 #include "object/LogosField.h"
 
 #include <LogosStack.h>

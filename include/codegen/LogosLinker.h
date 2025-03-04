@@ -13,6 +13,7 @@ public:
     SMDiagnostic EC;
     const std::string targetTriple = sys::getProcessTriple();
 
+    std::unique_ptr<Module> getStdlibModule();
     void link(const std::map<std::string, Module*>& modules);
     void writeFile(const std::unique_ptr<Module>& module, const std::string& filename) const;
     ~LogosLinker() = default;

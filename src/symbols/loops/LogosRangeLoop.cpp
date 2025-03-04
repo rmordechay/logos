@@ -2,44 +2,45 @@
 
 #include <LogosStack.h>
 #include <exprs/LogosConstant.h>
+#include <exprs/LogosVariable.h>
 #include <types/LogosInt.h>
 
 Value* LogosRangeLoop::computeIRValue(CodeGenMetadata* metadata) {
-    const auto currentFunc = metadata->logosStack.currentFunc;
     auto& builder = metadata->builder;
-    auto& context = builder.getContext();
     const auto i32Type = builder.getInt32Ty();
 
-    const auto irStartRange = startRange->writeIRValue(metadata);
-    const auto irEndRange = endRange->writeIRValue(metadata);
+    const auto loopCondition = BasicBlock::Create(context, "loop_condition");
+    const auto loopBody = BasicBlock::Create(context, "loop_body");
+    const auto loopEnd = BasicBlock::Create(context, "loop_end");
 
     // Init blocks
-    const auto counter = builder.CreateAlloca(i32Type, nullptr);
-    builder.CreateStore(irStartRange, counter);
-    const auto loopCondBlock = BasicBlock::Create(context, "loop_cond", currentFunc);
-    const auto loopBodyBlock = BasicBlock::Create(context, "loop_body", currentFunc);
-    const auto afterLoopBlock = BasicBlock::Create(context, "after_loop", currentFunc);
+    const auto irStartRange = startRange->writeIRValue(metadata);
+    const auto irEndRange = endRange->writeIRValue(metadata);
+    const auto i = builder.CreateAlloca(i32Type, nullptr);
+    builder.CreateStore(irStartRange, i);
+    builder.CreateBr(loopCondition);
 
     // Loop condition
-    builder.CreateBr(loopCondBlock);
-    builder.SetInsertPoint(loopCondBlock);
-    const auto currentVal = builder.CreateLoad(i32Type, counter);
+    startBlock(metadata, loopCondition);
+    const auto currentVal = builder.CreateLoad(i32Type, i);
     const auto condition = builder.CreateICmpSLT(currentVal, irEndRange);
-    builder.CreateCondBr(condition, loopBodyBlock, afterLoopBlock);
+    builder.CreateCondBr(condition, loopBody, loopEnd);
 
     // Loop body
+    startBlock(metadata, loopBody);
     metadata->logosStack.enterScope();
-    builder.SetInsertPoint(loopBodyBlock);
     LogosConstant logosConstant(&LOGOS_INT, 0);
     logosConstant.setIRValue(currentVal);
-    metadata->logosStack.addLocalSymbol("i", LogosSymbol(CONSTANT, &logosConstant));
+    metadata->logosStack.addLocalSymbol(loopVar->name, LogosSymbol(CONSTANT, &logosConstant));
     stmtBlock->writeIRValue(metadata);
 
     // Increment loop variable
-    const auto incremented = builder.CreateAdd(currentVal, builder.getInt32(1));
-    builder.CreateStore(incremented, counter);
-    builder.CreateBr(loopCondBlock);
-    builder.SetInsertPoint(afterLoopBlock);
+    const auto inc = builder.CreateAdd(currentVal, builder.getInt32(1));
+    builder.CreateStore(inc, i);
+    builder.CreateBr(loopCondition);
+
+    // Loop end
+    startBlock(metadata, loopEnd);
     metadata->logosStack.exitScope();
 
     return nullptr;

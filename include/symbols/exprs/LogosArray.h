@@ -13,6 +13,4 @@ public:
     ~LogosArray() override = default;
 };
 
-
-
 #endif //LOGOSARRAY_H

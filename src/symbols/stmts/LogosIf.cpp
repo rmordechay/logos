@@ -15,10 +15,9 @@ Value* LogosIf::computeIRValue(CodeGenMetadata* metadata) {
 
 
 void LogosIf::computeSimpleIf(CodeGenMetadata* metadata) const {
-    const auto currentFunc = metadata->logosStack.currentFunc;
     auto& builder = metadata->builder;
-    const auto ifStartBlock = BasicBlock::Create(context, "if.start");
-    const auto ifEndBlock = BasicBlock::Create(context, "if.end");
+    const auto ifStartBlock = BasicBlock::Create(context, "if_start");
+    const auto ifEndBlock = BasicBlock::Create(context, "if_end");
     const auto elseBlock = BasicBlock::Create(context, "else");
 
     const auto ifCondIR = ifCond->writeIRValue(metadata);
@@ -86,13 +85,6 @@ void LogosIf::computeComplexIf(CodeGenMetadata* metadata) const {
     }
 
     startBlock(metadata, ifEndBlock);
-}
-
-void LogosIf::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) {
-    const auto currentFunc = metadata->logosStack.currentFunc;
-    auto& builder = metadata->builder;
-    block->insertInto(currentFunc);
-    builder.SetInsertPoint(block);
 }
 
 LogosIf::~LogosIf() {

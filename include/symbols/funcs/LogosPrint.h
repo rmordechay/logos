@@ -12,7 +12,7 @@ class LogosPrint final : public LogosBuiltinFunc {
 public:
     const string logosName = "print";
     const string IRNameInt = "printInt";
-    const string IRNamePrint = "printString";
+    const string IRNameString = "printString";
     FunctionType* const funcTypeInt = FunctionType::get(LOGOS_VOID.IRType, LOGOS_INT.IRType, false);
     FunctionType* const funcTypeString = FunctionType::get(LOGOS_VOID.IRType, LOGOS_STRING.IRType, false);
 

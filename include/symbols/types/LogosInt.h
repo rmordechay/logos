@@ -2,6 +2,7 @@
 #define LOGOSINT_H
 #include "CodeGenerator.h"
 #include "LogosType.h"
+#include "exprs/LogosConstant.h"
 
 #define INT_TYPE_NAME "Int"
 
@@ -28,5 +29,6 @@ inline bool LogosInt::operator==(LogosType* other) const { return true;
 }
 
 inline LogosInt LOGOS_INT;
+inline LogosConstant LOGOS_CONSTANT(&LOGOS_INT, 0);
 
 #endif //LOGOSINT_H

@@ -20,19 +20,19 @@ class LogosField;
 class LogosObject;
 
 enum LogosSymbolType {
-    FIELD,
     BINARY_EXPR,
     INSTANCE,
-    OBJECT,
     FUNC_CALL,
     VARIABLE,
     CONSTANT,
+    ARRAY,
+    ARRAY_INDEX,
+    FIELD,
+    OBJECT,
     BUILTIN_FUNC,
     FUNC_IMPL,
     METHOD_IMPL,
     SELECTION,
-    ARRAY,
-    ARRAY_INDEX,
 };
 
 struct LogosSymbol {
