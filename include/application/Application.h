@@ -4,9 +4,10 @@
 #include <string>
 #include <thread>
 
-#include "SemaAnalyser.h"
-#include "LogosLinker.h"
 #include "LogosUtils.h"
+#include "SemaAnalyser.h"
+
+#include <LogosLinker.h>
 
 class ThreadPool;
 using namespace filesystem;

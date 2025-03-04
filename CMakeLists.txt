@@ -52,10 +52,10 @@ add_library(libs STATIC
 add_executable(logos main.cpp src/LogosStack.cpp)
 
 target_link_libraries(logos PRIVATE libs
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libLLVM.dylib
     ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libantlr4-runtime.a
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/liblldCommon.dylib
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/llvm/liblldMachO.dylib
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libLLVM.dylib
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/liblldCommon.dylib
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/liblldMachO.dylib
 )
 
 find_package(ZLIB REQUIRED)
