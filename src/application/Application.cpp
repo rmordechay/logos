@@ -18,7 +18,7 @@ void Application::runLogos() {
     const auto codeGenerator = CodeGenerator(mainFile);
     codeGenerator.generateCode(globalSymbols);
     linker.link(modules);
-    runBinary();
+    system(EXECUTABLE_PATH);
 }
 
 map<string, LogosFile*> Application::parseFiles() {
@@ -72,9 +72,4 @@ LogosFile* Application::getFile(const directory_entry& fileEntry) {
     auto antlerConverter = AntlerConverter(fileEntry.path());
     auto parsedFile = parser.logosFile();
     return antlerConverter.getLogosFile(parsedFile, absolute(fileEntry).string());
-}
-
-void Application::runBinary() {
-    system("cd ../project/build && clang output.o -o output");
-    system("cd ../project/build && ./output");
 }

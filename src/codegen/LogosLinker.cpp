@@ -15,6 +15,10 @@
 #include <llvm/IRReader/IRReader.h>
 #include "llvm/Linker/Linker.h"
 
+namespace lld::macho {
+    bool link(ArrayRef<const char *> argsArr, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
+}
+
 void LogosLinker::link(const map<string, Module*>& modules) {
     auto stdlibModule = parseIRFile("../stdlib/logoslib.ll", EC, context);
     stdlibModule->setTargetTriple(targetTriple);
@@ -26,7 +30,20 @@ void LogosLinker::link(const map<string, Module*>& modules) {
         if (name == LOGOS_MAIN_FILE) continue;
         linker.linkInModule(unique_ptr<Module>(std::move(file)));
     }
-    writeFile(unique_ptr<Module>(mainModule), LOGOS_BUILD_DIR + string("output.o"));
+
+    writeFile(unique_ptr<Module>(mainModule), OBJECT_FILE_PATH);
+
+    const auto args = {
+        "ld.lld",
+        OBJECT_FILE_PATH,
+        "-o", EXECUTABLE_PATH,
+        "-lSystem",
+        "-syslibroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-e", "_main",
+        "-platform_version", "macos", "14.0", "14.0",
+        "-arch", "arm64"
+    };
+    lld::macho::link(args, outs(), errs(), false, false);
 }
 
 void LogosLinker::writeFile(const unique_ptr<Module> &module, const string &filename) {

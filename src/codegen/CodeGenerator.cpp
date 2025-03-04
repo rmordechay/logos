@@ -68,12 +68,12 @@ void CodeGenerator::writeIRToFile(const Module* module, const string& name) {
 }
 
 void CodeGenerator::initIR() {
-    // InitializeNativeTarget();
-    // InitializeNativeTargetAsmPrinter();
-    // InitializeNativeTargetAsmParser();
-    // InitializeAllTargetMCs();
-    // InitializeAllTargets();
-    // InitializeAllTargetInfos();
+    InitializeNativeTarget();
+    InitializeNativeTargetAsmPrinter();
+    InitializeNativeTargetAsmParser();
+    InitializeAllTargetMCs();
+    InitializeAllTargets();
+    InitializeAllTargetInfos();
     string error;
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
