@@ -6,7 +6,6 @@
 
 #include <map>
 #include <llvm/Support/FileSystem.h>
-#include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Support/raw_ostream.h>
@@ -14,23 +13,20 @@
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IRReader/IRReader.h>
-#include <llvm/Support/SourceMgr.h>
-#include <llvm/Object/ObjectFile.h>
+#include "llvm/Linker/Linker.h"
 
 void LogosLinker::link(const map<string, Module*>& modules) {
+    auto stdlibModule = parseIRFile("../stdlib/logoslib.ll", EC, context);
+    stdlibModule->setTargetTriple(targetTriple);
+    stdlibModule->setDataLayout(targetMachine->createDataLayout());
     const auto mainModule = modules.find(LOGOS_MAIN_FILE)->second;
-    auto logosLib = MemoryBuffer::getFile("../codegen/Print.ll");
-    auto objectFile = object::ObjectFile::createObjectFile(logosLib->get()->getMemBufferRef());
-
-    SMDiagnostic EC;
-    auto printModule = parseIRFile("../codegen/Print.ll", EC, context);
-    Linker::linkModules(*mainModule, unique_ptr(std::move(printModule)));
-
+    Linker linker(*mainModule);
+    linker.linkInModule(unique_ptr(std::move(stdlibModule)));
     for (const auto& [name, file] : modules) {
         if (name == LOGOS_MAIN_FILE) continue;
-        Linker::linkModules(*mainModule, unique_ptr<Module>(std::move(file)));
+        linker.linkInModule(unique_ptr<Module>(std::move(file)));
     }
-    writeFile(unique_ptr<Module>(mainModule), "../linked.o");
+    writeFile(unique_ptr<Module>(mainModule), LOGOS_BUILD_DIR + string("output.o"));
 }
 
 void LogosLinker::writeFile(const unique_ptr<Module> &module, const string &filename) {
@@ -52,9 +48,3 @@ void LogosLinker::writeFile(const unique_ptr<Module> &module, const string &file
     outputStream.flush();
 }
 
-void LogosLinker::runBinary() {
-    system("mkdir -p ../project/build");
-    // system("cd ../stdlib && clang ../project/build/Main.ll ../project/build/MyObject.ll logoslib.ll -o ../output");
-    system("cd ../project/build && clang Main.ll MyObject.ll ../../stdlib/logoslib.ll -o output");
-    system("cd ../project/build && ./output");
-}

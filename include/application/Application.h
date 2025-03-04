@@ -27,6 +27,7 @@ public:
     void parseTree(const string& path, map<string, LogosFile*>& files, ThreadPool& threadPool);
     static map<string, LogosSymbol> collectGlobals(const map<string, LogosFile*>& files);
     static LogosFile* getFile(const directory_entry&);
+    static void runBinary();
     ~Application() = default;
 };
 

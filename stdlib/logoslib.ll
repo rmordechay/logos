@@ -1,5 +1,4 @@
-; ModuleID = 'Print'
-source_filename = "Print"
+; ModuleID = 'stdlib'
 
 declare i64 @printf(ptr, ...)
 
