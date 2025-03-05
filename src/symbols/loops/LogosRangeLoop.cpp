@@ -29,7 +29,7 @@ Value* LogosRangeLoop::computeIRValue(CodeGenMetadata* metadata) {
     // Loop body
     startBlock(metadata, loopBody);
     metadata->logosStack.enterScope();
-    LogosConstant logosConstant(&LOGOS_INT, 0);
+    LogosConstant logosConstant(&LOGOS_INT_TYPE, 0);
     logosConstant.setIRValue(currentVal);
     metadata->logosStack.addLocalSymbol(loopVar->name, LogosSymbol(CONSTANT, &logosConstant));
     stmtBlock->writeIRValue(metadata);

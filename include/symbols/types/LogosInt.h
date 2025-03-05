@@ -28,7 +28,7 @@ inline bool LogosInt::operator==(LogosType* other) const { return true;
     return this->name() == other->name();
 }
 
-inline LogosInt LOGOS_INT;
-inline LogosConstant LOGOS_CONSTANT(&LOGOS_INT, 0);
+inline LogosInt LOGOS_INT_TYPE;
+inline LogosConstant LOGOS_INT_CONST(&LOGOS_INT_TYPE, 0);
 
 #endif //LOGOSINT_H

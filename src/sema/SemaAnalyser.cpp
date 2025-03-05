@@ -38,10 +38,10 @@ void SemaAnalyser::visitLogosFile(LogosFile* file) {
 }
 
 void SemaAnalyser::visitMainFile(const LogosMainFile* mainFile) {
-    visitMainFunc(mainFile->mainFunc, mainFile->path);
     for (const auto& func : mainFile->funcs) {
         visitUserFunc(func);
     }
+    visitMainFunc(mainFile->mainFunc, mainFile->path);
 }
 
 void SemaAnalyser::visitObjectFile(const LogosObjectFile* objectFile) {
@@ -104,9 +104,16 @@ void SemaAnalyser::visitFieldDef(const LogosAssignment* fieldDef) {
 
 
 void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
-    visitExpr(varDec->expr);
-    varDec->inferredType = varDec->expr->type;
-    logosStack.addLocalSymbol(varDec->name, LogosSymbol::createSymbol(varDec->expr));
+    if (varDec->expr) {
+        visitExpr(varDec->expr);
+        varDec->inferredType = varDec->expr->type;
+        logosStack.addLocalSymbol(varDec->name, LogosSymbol::createSymbol(varDec->expr));
+    } else {
+        varDec->inferredType = varDec->userType;
+        // TODO potential memory leak
+        auto const constant = new LogosConstant(&LOGOS_INT_TYPE, 0);
+        logosStack.addLocalSymbol(varDec->name, LogosSymbol(CONSTANT, constant));
+    }
 }
 
 void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {
@@ -131,7 +138,7 @@ void SemaAnalyser::visitForeachLoop(LogosForeachLoop* foreachLoop) {
         foreachLoop->iterable->type = inferArrayType(foreachLoop->iterable);
         foreachLoop->arrayIndex = new LogosArrayIndex(variable);
         foreachLoop->arrayIndex->type = foreachLoop->iterable->type;
-        foreachLoop->arrayIndex->exprs.emplace_back(&LOGOS_CONSTANT);
+        foreachLoop->arrayIndex->exprs.emplace_back(&LOGOS_INT_CONST);
         logosStack.addLocalSymbol(foreachLoop->loopVar->name, LogosSymbol(ARRAY_INDEX, foreachLoop->arrayIndex));
     }
     visitStmtBlock(foreachLoop->stmtBlock);
@@ -195,6 +202,7 @@ void SemaAnalyser::visitArrayIndex(LogosArrayIndex* arrayIndex) {
 }
 
 void SemaAnalyser::visitFuncCall(const LogosFuncCall* funcCallExpr) {
+    auto logosSymbol = logosStack.getSymbol(funcCallExpr->name);
     for (const auto &arg : funcCallExpr->args) {
         visitExpr(arg);
     }

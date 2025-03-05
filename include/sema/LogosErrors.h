@@ -8,6 +8,7 @@ const std::map<int, std::string> LOGOS_ERRORS = {
     {101, "The left-hand type '{}' is not equal to the right-hand type '{}'."},
     {102, "{} is not iterable"},
     {103, "Number of arguments does not much. Expected: {}, Given: {}"},
+    {104, "Function {} must return {}"},
 };
 
 #endif //LOGOSERRORS_H

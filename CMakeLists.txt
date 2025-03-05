@@ -36,7 +36,7 @@ add_library(lib STATIC
     src/symbols/exprs/LogosArray.cpp
     src/symbols/exprs/LogosArrayIndex.cpp
     src/symbols/funcs/LogosPrint.cpp
-    src/symbols/funcs/LogosUserFunc.cpp
+    src/symbols/funcs/LogosFuncImpl.cpp
     src/symbols/funcs/LogosMethodImpl.cpp
     src/symbols/object/LogosField.cpp
     src/symbols/object/LogosObject.cpp

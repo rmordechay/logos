@@ -54,6 +54,10 @@ map<string, LogosSymbol> Application::collectGlobals(const map<string, LogosFile
         if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
             const auto object = objFile->obj;
             globalSymbols[object->name()] = LogosSymbol(OBJECT, object);
+        } else if (const auto mainFile = dynamic_cast<LogosMainFile*>(file)) {
+            for (const auto &func : mainFile->funcs) {
+                globalSymbols[func->name] = LogosSymbol(FUNC_IMPL, func);
+            }
         }
     }
     return globalSymbols;

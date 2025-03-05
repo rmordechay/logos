@@ -21,11 +21,11 @@ Value* LogosConstant::computeIRValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
 
-void LogosConstant::setName(string name) {}
-
 LogosSymbolType LogosConstant::getSymbolType() {
     return CONSTANT;
 }
+
+void LogosConstant::setName(string name) {}
 
 string LogosConstant::getName() {
     return "";

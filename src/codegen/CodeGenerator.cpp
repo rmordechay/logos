@@ -25,11 +25,11 @@ void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSym
 
     // Funcs
     for (const auto& func : mainFile->funcs) {
-        func->computeIRValue(&metadata);
+        func->writeIRValue(&metadata);
     }
 
     // Main func
-    mainFile->mainFunc->computeIRValue(&metadata);
+    mainFile->mainFunc->writeIRValue(&metadata);
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
     writeIRToFile(metadata.currentModule, LOGOS_MAIN_FILE);
 }

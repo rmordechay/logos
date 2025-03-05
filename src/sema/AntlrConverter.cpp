@@ -35,7 +35,7 @@ LogosMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     for (const auto& func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         if (funcName == LOGOS_MAIN_FUNCTION) {
-            const auto mainFunc = new LogosFuncImpl(LOGOS_MAIN_FUNCTION, &LOGOS_INT);
+            const auto mainFunc = new LogosFuncImpl(LOGOS_MAIN_FUNCTION, &LOGOS_INT_TYPE);
             mainFile->mainFunc = mainFunc;
             const auto statementsBlock = func->funcBody()->statementsBlock();
             mainFunc->stmtBlock = getStmtBlock(statementsBlock);
@@ -349,7 +349,7 @@ LogosArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* 
 LogosUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
     if (const auto intToken = ctx->INTEGER()) {
         const auto value = stoi(intToken->getText());
-        return new LogosConstant(&LOGOS_INT, value);
+        return new LogosConstant(&LOGOS_INT_TYPE, value);
     }
     if (const auto stringToken = ctx->STRING()) {
         const auto value = stringToken->getText();
@@ -360,6 +360,6 @@ LogosUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) 
 
 LogosType* AntlerConverter::getType(tree::TerminalNode* type) {
     if (!type) return &LOGOS_VOID;
-    if (type->getText() == INT_TYPE_NAME) return &LOGOS_INT;
+    if (type->getText() == INT_TYPE_NAME) return &LOGOS_INT_TYPE;
     return &LOGOS_VOID;
 }

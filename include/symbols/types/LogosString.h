@@ -21,8 +21,7 @@ inline const string LogosString::name() const {
 }
 
 inline Type* LogosString::getIRType() {
-    if (IRType) return IRType;
-    return nullptr;
+    return IRType;
 }
 
 inline bool LogosString::operator==(LogosType* other) const {

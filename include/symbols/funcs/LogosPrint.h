@@ -13,7 +13,7 @@ public:
     const string logosName = "print";
     const string IRNameInt = "printInt";
     const string IRNameString = "printString";
-    FunctionType* const funcTypeInt = FunctionType::get(LOGOS_VOID.IRType, LOGOS_INT.IRType, false);
+    FunctionType* const funcTypeInt = FunctionType::get(LOGOS_VOID.IRType, LOGOS_INT_TYPE.IRType, false);
     FunctionType* const funcTypeString = FunctionType::get(LOGOS_VOID.IRType, LOGOS_STRING.IRType, false);
 
     explicit LogosPrint() : LogosBuiltinFunc(logosName, &LOGOS_VOID) {}

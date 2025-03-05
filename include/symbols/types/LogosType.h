@@ -3,7 +3,6 @@
 
 #include <llvm/IR/IRBuilder.h>
 
-class LogosStack;
 using namespace llvm;
 using namespace std;
 
