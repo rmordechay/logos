@@ -2,7 +2,6 @@
 #include "LogosErrors.h"
 #include "exprs/LogosBinaryExpr.h"
 
-#include <LogosUtils.h>
 #include <ThreadPool.h>
 #include <exprs/LogosArray.h>
 #include <exprs/LogosArrayIndex.h>
@@ -15,7 +14,6 @@
 #include <loops/LogosForeachLoop.h>
 #include <loops/LogosLoop.h>
 #include <loops/LogosRangeLoop.h>
-#include <ranges>
 #include <stmts/LogosAssignment.h>
 #include <stmts/LogosIf.h>
 
@@ -112,6 +110,7 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
 }
 
 void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {
+    visitExpr(ifStmt->ifCond);
 }
 
 void SemaAnalyser::visitLoopStmt(LogosLoop* loopStmt) {
@@ -174,6 +173,8 @@ void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
 }
 
 void SemaAnalyser::visitBinaryExpr(const LogosBinaryExpr* binaryExpr) {
+    visitExpr(binaryExpr->left);
+    visitExpr(binaryExpr->right);
 }
 
 void SemaAnalyser::visitSelection(LogosSelection* selection) {

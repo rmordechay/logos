@@ -6,7 +6,11 @@ void LogosStack::enterScope(Function* func) {
 }
 
 void LogosStack::enterScope() {
-    push(LogosStackFrame());
+    if (size() > 0) {
+        push(LogosStackFrame{.symbols = top().symbols});
+    } else {
+        push(LogosStackFrame());
+    }
 }
 
 void LogosStack::exitScope() {
