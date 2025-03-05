@@ -49,6 +49,8 @@ add_library(libs STATIC
     src/symbols/loops/LogosRangeLoop.cpp
     src/symbols/loops/LogosForeachLoop.cpp
     src/symbols/LogosSymbol.cpp
+    src/application/CommandLine.cpp
+    include/application/CommandLine.h
 )
 
 add_executable(logos main.cpp src/LogosStack.cpp)
