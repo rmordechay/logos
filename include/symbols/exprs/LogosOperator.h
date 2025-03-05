@@ -7,6 +7,7 @@ enum LogosOperator {
     MINUS,
     STAR,
     SLASH,
+    NOT_EQUAL,
     DOUBLE_EQUAL,
     LANGLE,
     RANGLE,
@@ -20,6 +21,7 @@ inline LogosOperator mapOperator(LogosParser::ExprContext* expr) {
     if (expr->MINUS()) return MINUS;
     if (expr->STAR()) return STAR;
     if (expr->SLASH()) return SLASH;
+    if (expr->NOT_EQUAL()) return NOT_EQUAL;
     if (expr->DOUBLE_EQUAL()) return DOUBLE_EQUAL;
     if (expr->RANGLE()) return RANGLE;
     if (expr->LANGLE()) return LANGLE;

@@ -12,15 +12,15 @@
 class  LogosParser : public antlr4::Parser {
 public:
   enum {
-    DOUBLE_EQUAL = 1, GE = 2, LE = 3, LPAREN = 4, RPAREN = 5, LBRACE = 6, 
-    RBRACE = 7, LBRACK = 8, RBRACK = 9, LANGLE = 10, RANGLE = 11, COMMA = 12, 
-    DOUBLE_DOT = 13, DOT = 14, COLON = 15, EQUAL = 16, MINUS = 17, PLUS = 18, 
-    STAR = 19, SLASH = 20, HASH = 21, QUEST_MARK = 22, EXCLA_MARK = 23, 
-    PERCENT = 24, DOLLAR = 25, AMPERSAND = 26, OBJECT = 27, INTERFACE = 28, 
-    ENUM = 29, IMPLEMENTS = 30, IMPORT = 31, IF = 32, ELSE = 33, FOR = 34, 
-    BREAK = 35, CONTINUE = 36, RETURN = 37, AND = 38, OR = 39, NOT = 40, 
-    IN = 41, INTEGER = 42, FLOAT = 43, BOOL = 44, CONST = 45, TYPE = 46, 
-    VARIABLE = 47, STRING = 48, LINE_COMMENT = 49, BLOCK_COMMENT = 50, WS = 51
+    DOUBLE_EQUAL = 1, NOT_EQUAL = 2, GE = 3, LE = 4, LPAREN = 5, RPAREN = 6, 
+    LBRACE = 7, RBRACE = 8, LBRACK = 9, RBRACK = 10, LANGLE = 11, RANGLE = 12, 
+    COMMA = 13, DOUBLE_DOT = 14, DOT = 15, COLON = 16, EQUAL = 17, MINUS = 18, 
+    PLUS = 19, STAR = 20, SLASH = 21, HASH = 22, QUEST_MARK = 23, EXCLA_MARK = 24, 
+    PERCENT = 25, DOLLAR = 26, AMPERSAND = 27, OBJECT = 28, INTERFACE = 29, 
+    ENUM = 30, IMPLEMENTS = 31, IMPORT = 32, IF = 33, ELSE = 34, FOR = 35, 
+    BREAK = 36, CONTINUE = 37, RETURN = 38, AND = 39, OR = 40, NOT = 41, 
+    IN = 42, INTEGER = 43, FLOAT = 44, BOOL = 45, CONST = 46, TYPE = 47, 
+    VARIABLE = 48, STRING = 49, LINE_COMMENT = 50, BLOCK_COMMENT = 51, WS = 52
   };
 
   enum {
@@ -524,6 +524,7 @@ public:
     antlr4::tree::TerminalNode *PLUS();
     antlr4::tree::TerminalNode *MINUS();
     antlr4::tree::TerminalNode *DOUBLE_EQUAL();
+    antlr4::tree::TerminalNode *NOT_EQUAL();
     antlr4::tree::TerminalNode *LANGLE();
     antlr4::tree::TerminalNode *RANGLE();
     antlr4::tree::TerminalNode *GE();

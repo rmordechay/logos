@@ -13,11 +13,26 @@ Value* LogosBinaryExpr::computeIRValue(CodeGenMetadata* metadata) {
     if (op == STAR) {
         return builder.CreateMul(l, r);
     }
+    if (op == SLASH) {
+        return builder.CreateSDiv(l, r);
+    }
     if (op == RANGLE) {
         return builder.CreateICmpSGT(l, r);
     }
     if (op == LANGLE) {
         return builder.CreateICmpSLT(l, r);
+    }
+    if (op == DOUBLE_EQUAL) {
+        return builder.CreateICmpEQ(l, r);
+    }
+    if (op == NOT_EQUAL) {
+        return builder.CreateICmpNE(l, r);
+    }
+    if (op == LE) {
+        return builder.CreateICmpSLE(l, r);
+    }
+    if (op == GE) {
+        return builder.CreateICmpSGE(l, r);
     }
     return nullptr;
 }

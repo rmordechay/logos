@@ -129,7 +129,7 @@ enumField:
 expr:
         left=expr op=(STAR | SLASH) right=expr
     |   left=expr op=(PLUS | MINUS) right=expr
-    |   left=expr op=(DOUBLE_EQUAL | LANGLE | RANGLE | GE | LE) right=expr
+    |   left=expr op=(DOUBLE_EQUAL | NOT_EQUAL | LANGLE | RANGLE | GE | LE) right=expr
     |   unaryExpr
     |   array
     |   LPAREN left=expr RPAREN
@@ -195,6 +195,7 @@ range:
     ;
 
 DOUBLE_EQUAL: '==';
+NOT_EQUAL: '!=';
 GE: '>=';
 LE: '<=';
 
