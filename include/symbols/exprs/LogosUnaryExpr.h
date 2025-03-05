@@ -11,8 +11,8 @@ public:
     explicit LogosUnaryExpr(LogosType* type) : LogosExpr(type) {}
     virtual void setName(string name) = 0;
     virtual string getName() = 0;
-    ~LogosUnaryExpr() override = default;
     LogosSymbolType getSymbolType() override = 0;
+    ~LogosUnaryExpr() override = default;
 };
 
 #endif //LOGOSUNARYEXPR_H
