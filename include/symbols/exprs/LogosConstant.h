@@ -8,19 +8,23 @@ using namespace std;
 
 class LogosConstant final : public LogosUnaryExpr {
 public:
-    using ConstValue = variant<bool, int, float, string>;
-    ConstValue value;
+    union {
+        int intVal;
+        string stringVal;
+        float floatVal;
+        bool boolVal;
+    };
 
-    template <typename T>
-    explicit LogosConstant(LogosType* exprType, T v) : LogosUnaryExpr(exprType), value(v) {
-        static_assert(is_same_v<T, bool> || is_same_v<T, int> || is_same_v<T, float> || is_same_v<T, string>);
-    }
+    LogosConstant(LogosType* type, int intVal) : LogosUnaryExpr(type), intVal(intVal) {}
+    LogosConstant(LogosType* type, const string& stringVal) : LogosUnaryExpr(type), stringVal(stringVal) {}
+    LogosConstant(LogosType* type, float floatVal) : LogosUnaryExpr(type), floatVal(floatVal) {}
+    LogosConstant(LogosType* type, bool boolVal) : LogosUnaryExpr(type), boolVal(boolVal) {}
 
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     void setName(string name) override;
     string getName() override;
     LogosSymbolType getSymbolType() override;
-    ~LogosConstant() override = default;
+    ~LogosConstant() override;
 };
 
 
