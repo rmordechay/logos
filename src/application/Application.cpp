@@ -5,11 +5,10 @@
 #include <CodeGenerator.h>
 #include <LogosLexer.h>
 #include <LogosParser.h>
+#include <LogosUtils.h>
 #include <ThreadPool.h>
 #include <funcs/LogosPrint.h>
 #include <ranges>
-
-
 
 void Application::runLogos() {
     const map<string, LogosFile*> files = parseFiles();
@@ -51,7 +50,7 @@ void Application::parseTree(const string& path, map<string, LogosFile*>& files, 
 map<string, LogosSymbol> Application::collectGlobals(const map<string, LogosFile*>& files) {
     map<string, LogosSymbol> globalSymbols;
     globalSymbols["print"] = LogosSymbol(BUILTIN_FUNC, new LogosPrint());
-    for (const auto& file : files | views::values) {
+    for (const auto& [_, file] : files) {
         if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
             const auto object = objFile->obj;
             globalSymbols[object->name()] = LogosSymbol(OBJECT, object);

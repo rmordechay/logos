@@ -21,11 +21,11 @@
 
 void SemaAnalyser::analyse(const map<string, LogosFile*>& files, const map<string, LogosSymbol>& globalSymbols) {
     ThreadPool threadPool;
-    for (const auto& file : files | views::values) {
-        threadPool.runTask([file, &globalSymbols] {
+    for (const auto& pair : files) {
+        threadPool.runTask([=, &globalSymbols] {
             SemaAnalyser semaAnalyser;
             semaAnalyser.logosStack.globalSymbols = globalSymbols;
-            semaAnalyser.visitLogosFile(file);
+            semaAnalyser.visitLogosFile(pair.second);
         });
     }
     threadPool.wait();

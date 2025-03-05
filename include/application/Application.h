@@ -3,10 +3,9 @@
 
 #include <string>
 #include <thread>
-
-#include "LogosUtils.h"
+#include <mutex>
+#include <filesystem>
 #include "SemaAnalyser.h"
-
 #include <LogosLinker.h>
 
 class ThreadPool;
@@ -20,7 +19,7 @@ public:
     string rootPath;
     LogosLinker linker;
     LogosMainFile* mainFile = nullptr;
-    mutex mtx;
+    std::mutex mtx;
 
     explicit Application(const string& rootPath) : rootPath(rootPath) {}
     void runLogos();

@@ -2,10 +2,8 @@
 #define LOGOSUTILS_H
 
 #include "exprs/LogosInstance.h"
-#include "funcs/LogosFunc.h"
-
 #include <llvm/Target/TargetMachine.h>
-#include <__filesystem/directory_entry.h>
+#include <filesystem>
 
 using namespace std;
 using namespace llvm;

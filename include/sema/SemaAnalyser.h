@@ -1,6 +1,6 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
-
+#include <mutex>
 #include "LogosStack.h"
 
 #include "exprs/LogosUnaryExpr.h"
@@ -18,7 +18,7 @@ class LogosLoop;
 
 class SemaAnalyser {
 public:
-    mutex mtx;
+    std::mutex mtx;
     LogosStack logosStack;
     bool successful = true;
 

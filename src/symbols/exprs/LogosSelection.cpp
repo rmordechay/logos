@@ -24,11 +24,11 @@ Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExp
         const auto instance = symbol->instance;
         const auto obj = instance->obj;
         const auto objType = instance->obj->getIRType();
-        if (obj->funcs.contains(exprName)) {
+        if (obj->funcs.find(exprName) != obj->funcs.end()) {
             const auto func = obj->funcs[exprName];
             return func->callFunc(metadata, {previousExpr});
         }
-        if (obj->fields.contains(exprName)) {
+        if (obj->fields.find(exprName) != obj->fields.end()) {
             const auto field = obj->fields[exprName];
             const auto instancePtr = instance->writeIRValue(metadata);
             const auto gep = metadata->builder.CreateStructGEP(objType, instancePtr, field->fieldPosition);

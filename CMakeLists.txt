@@ -1,9 +1,8 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.22)
 project(logos)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_BUILD_TYPE Debug)
-add_compile_options(-g)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
@@ -18,7 +17,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include/loops
 )
 
-add_library(libs STATIC
+add_library(lib STATIC
     src/application/Application.cpp
     src/application/LogosUtils.cpp
     src/application/ThreadPool.cpp
@@ -55,9 +54,9 @@ add_library(libs STATIC
 
 add_executable(logos main.cpp src/LogosStack.cpp)
 
-target_link_libraries(logos PRIVATE libs
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libantlr4-runtime.a
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/libLLVM.dylib
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/liblldCommon.dylib
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/libs/liblldMachO.dylib
+target_link_libraries(logos PRIVATE lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libLLVM.dylib
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/liblldCommon.dylib
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/liblldMachO.dylib
 )

@@ -2,8 +2,9 @@
 #define CODEGENERATOR_H
 #include <Application.h>
 
-#include <llvm/IR/Module.h>
 #include <clang/Frontend/CompilerInstance.h>
+#include <llvm/IR/Module.h>
+#include <llvm/Target/TargetMachine.h>
 
 class LogosFile;
 class LogosValue;

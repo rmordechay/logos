@@ -4,6 +4,8 @@
 #include <queue>
 #include <thread>
 #include <vector>
+#include <condition_variable>
+#include <functional>
 
 using namespace std;
 
@@ -12,7 +14,7 @@ public:
     vector<thread> workers;
     queue<function<void()>> tasks;
     mutex mtx;
-    condition_variable condition;
+    std::condition_variable condition;
     const size_t threadsNumber = 10;
     bool stop = false;
 

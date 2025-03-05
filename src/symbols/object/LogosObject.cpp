@@ -10,7 +10,7 @@ const string LogosObject::name() const {
 Type* LogosObject::getIRType() {
     if (IRType) return IRType;
     vector<Type*> elementTypes;
-    for (const auto& val : fields | views::values) {
+    for (const auto& [_, val] : fields) {
         auto fieldType = val->inferredType->getIRType();
         elementTypes.push_back(fieldType);
     }
