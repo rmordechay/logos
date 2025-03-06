@@ -4,31 +4,35 @@
 #include "LogosType.h"
 #include "exprs/LogosConstant.h"
 
-#define INT_TYPE_NAME "Int"
 
 class LogosInt final : public LogosType {
 public:
     Type* IRType = Type::getInt32Ty(context);
+    string typeName = "Int";
 
     const string name() const override;
     Type* getIRType() override;
+    LogosConstant* getConstant() override;
     bool operator==(LogosType* other) const override;
     ~LogosInt() override = default;
 };
 
 inline const string LogosInt::name() const {
-    return INT_TYPE_NAME;
+    return typeName;
 }
 
 inline Type* LogosInt::getIRType() {
     return IRType;
 }
 
-inline bool LogosInt::operator==(LogosType* other) const { return true;
-    return this->name() == other->name();
+inline LogosConstant* LogosInt::getConstant() {
+    return new LogosConstant(this, 0);
 }
 
-inline LogosInt LOGOS_INT_TYPE;
-inline LogosConstant LOGOS_INT_CONST(&LOGOS_INT_TYPE, 0);
+inline bool LogosInt::operator==(LogosType* other) const {
+    return true;
+}
+
+inline LogosInt LOGOS_INT;
 
 #endif //LOGOSINT_H

@@ -24,8 +24,8 @@ Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExp
         const auto instance = symbol->instance;
         const auto obj = instance->obj;
         const auto objType = instance->obj->getIRType();
-        if (obj->funcs.find(exprName) != obj->funcs.end()) {
-            const auto func = obj->funcs[exprName];
+        if (obj->methods.find(exprName) != obj->methods.end()) {
+            const auto func = obj->methods[exprName];
             return func->callFunc(metadata, {previousExpr});
         }
         if (obj->fields.find(exprName) != obj->fields.end()) {

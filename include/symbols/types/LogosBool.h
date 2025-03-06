@@ -1,17 +1,18 @@
 #ifndef LOGOSBOOL_H
 #define LOGOSBOOL_H
-#include "LogosValue.h"
 #include "LogosType.h"
-
+#include "LogosValue.h"
+#include "exprs/LogosConstant.h"
 
 class LogosBool final : public LogosType {
 public:
     Type* IRType = Type::getInt1Ty(context);
      string typeName = "Bool";
-     auto trueLiteral = "true";
+     string trueLiteral = "true";
 
     const string name() const override;
     Type* getIRType() override;
+    LogosConstant* getConstant() override;
     bool operator==(LogosType* other) const override;
     ~LogosBool() override = default;
 };
@@ -20,16 +21,18 @@ inline const string LogosBool::name() const {
     return typeName;
 }
 
-inline void LogosBool::setIRType(Type* type) {
-
-}
-
 inline Type* LogosBool::getIRType() {
     return IRType;
+}
+
+inline LogosConstant* LogosBool::getConstant() {
+    return new LogosConstant(this, false);
 }
 
 inline bool LogosBool::operator==(LogosType* other) const { return true;
     return true;
 }
+
+inline LogosBool LOGOS_BOOL;
 
 #endif //LOGOSBOOL_H

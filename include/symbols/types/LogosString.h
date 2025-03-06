@@ -12,6 +12,7 @@ public:
 
     const string name() const override;
     Type* getIRType() override;
+    LogosConstant* getConstant() override;
     bool operator==(LogosType* other) const override;
     ~LogosString() override = default;
 };
@@ -22,6 +23,10 @@ inline const string LogosString::name() const {
 
 inline Type* LogosString::getIRType() {
     return IRType;
+}
+
+inline LogosConstant* LogosString::getConstant() {
+    return new LogosConstant(this, "");
 }
 
 inline bool LogosString::operator==(LogosType* other) const {

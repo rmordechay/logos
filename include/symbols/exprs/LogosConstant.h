@@ -9,7 +9,7 @@ using namespace std;
 
 class LogosConstant final : public LogosUnaryExpr {
 public:
-    std::variant<int, string, float, bool> value;
+    variant<int, string, float, bool> value;
 
     LogosConstant(LogosType* type, int intVal) : LogosUnaryExpr(type), value(intVal) {}
     LogosConstant(LogosType* type, const string& stringVal) : LogosUnaryExpr(type), value(stringVal) {}

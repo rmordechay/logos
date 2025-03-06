@@ -14,11 +14,12 @@ public:
     Type* IRType = nullptr;
     string typeName;
     map<string, LogosField*> fields;
-    map<string, LogosMethodImpl*> funcs;
+    map<string, LogosMethodImpl*> methods;
 
     explicit LogosObject(const string& typeName) : typeName(typeName) {}
     const string name() const override;
     Type* getIRType() override;
+    LogosConstant* getConstant() override;
     bool operator==(LogosType* other) const override;
     ~LogosObject() override;
 };

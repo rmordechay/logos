@@ -1,7 +1,5 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
-#include <string>
-
 
 class LogosBuiltinFunc;
 class LogosMethodImpl;

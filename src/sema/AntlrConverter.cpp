@@ -6,6 +6,8 @@
 #include "exprs/LogosSelection.h"
 #include "object/LogosField.h"
 #include "stmts/LogosReturn.h"
+#include "types/LogosBool.h"
+#include "types/LogosFloat.h"
 
 #include <exprs/LogosArray.h>
 #include <exprs/LogosArrayIndex.h>
@@ -35,7 +37,7 @@ LogosMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     for (const auto& func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         if (funcName == LOGOS_MAIN_FUNCTION) {
-            const auto mainFunc = new LogosFuncImpl(LOGOS_MAIN_FUNCTION, &LOGOS_INT_TYPE);
+            const auto mainFunc = new LogosFuncImpl(LOGOS_MAIN_FUNCTION, &LOGOS_INT);
             mainFile->mainFunc = mainFunc;
             const auto statementsBlock = func->funcBody()->statementsBlock();
             mainFunc->stmtBlock = getStmtBlock(statementsBlock);
@@ -66,7 +68,7 @@ LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
     for (const auto& func : ctx->funcImplementation()) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         const auto userFunc = getMethod(func, objName);
-        obj->funcs[funcName] = userFunc;
+        obj->methods[funcName] = userFunc;
     }
     return obj;
 }
@@ -338,8 +340,8 @@ LogosArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* 
     } else {
         baseExpr = getFuncCall(ctx->funcCall());
     }
-    const auto logosArrayIndex = new LogosArrayIndex(baseExpr);
 
+    const auto logosArrayIndex = new LogosArrayIndex(baseExpr);
     for (const auto& expr : ctx->expr()) {
         logosArrayIndex->exprs.emplace_back(getExpr(expr));
     }
@@ -349,7 +351,15 @@ LogosArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* 
 LogosUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
     if (const auto intToken = ctx->INTEGER()) {
         const auto value = stoi(intToken->getText());
-        return new LogosConstant(&LOGOS_INT_TYPE, value);
+        return new LogosConstant(&LOGOS_INT, value);
+    }
+    if (const auto intToken = ctx->FLOAT()) {
+        const auto value = stof(intToken->getText());
+        return new LogosConstant(&LOGOS_FLOAT, value);
+    }
+    if (const auto intToken = ctx->BOOL()) {
+        const auto value = intToken->getText() == "true";
+        return new LogosConstant(&LOGOS_BOOL, value);
     }
     if (const auto stringToken = ctx->STRING()) {
         const auto value = stringToken->getText();
@@ -360,6 +370,9 @@ LogosUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) 
 
 LogosType* AntlerConverter::getType(tree::TerminalNode* type) {
     if (!type) return &LOGOS_VOID;
-    if (type->getText() == INT_TYPE_NAME) return &LOGOS_INT_TYPE;
+    if (type->getText() == LOGOS_INT.name()) return &LOGOS_INT;
+    if (type->getText() == LOGOS_FLOAT.name()) return &LOGOS_FLOAT;
+    if (type->getText() == LOGOS_BOOL.name()) return &LOGOS_BOOL;
+    if (type->getText() == LOGOS_STRING.name()) return &LOGOS_STRING;
     return &LOGOS_VOID;
 }

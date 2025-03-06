@@ -53,7 +53,7 @@ void CodeGenerator::generateObjModule(LogosObject* obj, LogosGlobals globalSymbo
     }
 
     // Funcs
-    for (const auto& [_, val] : obj->funcs) {
+    for (const auto& [_, val] : obj->methods) {
         val->writeIRValue(&metadata);
     }
 

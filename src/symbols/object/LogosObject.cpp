@@ -18,6 +18,11 @@ Type* LogosObject::getIRType() {
     return IRType;
 }
 
+LogosConstant* LogosObject::getConstant() {
+    // TODO return empty constructor
+    return nullptr;
+}
+
 bool LogosObject::operator==(LogosType* other) const { return true;
     return true;
 }
@@ -26,7 +31,7 @@ LogosObject::~LogosObject() {
     for (const auto& field : fields) {
         delete field.second;
     }
-    for (const auto& func : funcs) {
+    for (const auto& func : methods) {
         delete func.second;
     }
 }

@@ -24,7 +24,12 @@ Value* LogosMethodImpl::computeIRValue(CodeGenMetadata* metadata) {
     auto args = method->arg_begin();
     args++->setName("this");
     for (const auto& param : params) {
-        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol::createSymbol(param->expr));
+        if (param->expr) {
+            metadata->logosStack.addLocalSymbol(param->name, LogosSymbol::createSymbol(param->expr));
+        } else {
+            auto symbol = LogosSymbol(CONSTANT, param->inferredType->getConstant());
+            metadata->logosStack.addLocalSymbol(param->name, symbol);
+        }
         args++;
     }
 

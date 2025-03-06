@@ -28,8 +28,9 @@ public:
     void visitObjectFile(const LogosObjectFile* objectFile);
     void visitObject(const LogosObject* object);
     void visitField(LogosField* field);
+    void visitMethodImpl(const LogosMethodImpl* method);
     void visitMainFunc(const LogosFuncImpl* mainFunc, const std::string& path);
-    void visitUserFunc(const LogosFuncImpl* func);
+    void visitFuncImpl(const LogosFuncImpl* func);
     void visitStmt(LogosStmt* stmt);
     void visitStmtBlock(const LogosStmtBlock* stmtBlock);
     void visitFieldDef(const LogosAssignment* fieldDef);

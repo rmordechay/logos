@@ -29,9 +29,9 @@ Value* LogosRangeLoop::computeIRValue(CodeGenMetadata* metadata) {
     // Loop body
     startBlock(metadata, loopBody);
     metadata->logosStack.enterScope();
-    LogosConstant logosConstant(&LOGOS_INT_TYPE, 0);
-    logosConstant.setIRValue(currentVal);
-    metadata->logosStack.addLocalSymbol(loopVar->name, LogosSymbol(CONSTANT, &logosConstant));
+    const auto constant = LOGOS_INT.getConstant();
+    constant->setIRValue(currentVal);
+    metadata->logosStack.addLocalSymbol(loopVar->name, LogosSymbol(CONSTANT, constant));
     stmtBlock->writeIRValue(metadata);
 
     // Increment loop variable
@@ -42,6 +42,5 @@ Value* LogosRangeLoop::computeIRValue(CodeGenMetadata* metadata) {
     // Loop end
     startBlock(metadata, loopEnd);
     metadata->logosStack.exitScope();
-
     return nullptr;
 }

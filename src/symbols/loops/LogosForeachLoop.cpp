@@ -38,9 +38,9 @@ Value* LogosForeachLoop::computeIRValue(CodeGenMetadata* metadata) {
     const auto elementPtr = builder.CreateGEP(iterableType, iterableValue, i);
     const auto element = builder.CreateLoad(elementPtr->getType(), elementPtr);
 
-    LogosConstant logosConstant(&LOGOS_INT_TYPE, 0);
-    logosConstant.setIRValue(element);
-    metadata->logosStack.addLocalSymbol(loopVar->name, LogosSymbol(CONSTANT, &logosConstant));
+    const auto constant = LOGOS_INT.getConstant();
+    constant->setIRValue(element);
+    metadata->logosStack.addLocalSymbol(loopVar->name, LogosSymbol(CONSTANT, constant));
 
     stmtBlock->writeIRValue(metadata);
 

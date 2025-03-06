@@ -5,13 +5,22 @@
 #include <LogosStack.h>
 #include <types/LogosInt.h>
 
+string LogosFuncImpl::getFuncName() const {
+    return name;
+}
+
 Value* LogosFuncImpl::computeIRValue(CodeGenMetadata* metadata) {
     const auto func = Function::Create(getIRFunc(), Function::ExternalLinkage, name, metadata->currentModule);
     metadata->logosStack.enterScope(func);
 
     auto arg = func->arg_begin();
     for (const auto& param : params) {
-        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol::createSymbol(param->expr));
+        if (param->expr) {
+            metadata->logosStack.addLocalSymbol(param->name, LogosSymbol::createSymbol(param->expr));
+        } else {
+            auto symbol = LogosSymbol(CONSTANT, param->inferredType->getConstant());
+            metadata->logosStack.addLocalSymbol(param->name, symbol);
+        }
         arg++;
     }
 

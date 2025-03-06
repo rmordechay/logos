@@ -10,6 +10,7 @@ public:
 
     const string name() const override;
     Type* getIRType() override;
+    LogosConstant* getConstant() override;
     bool operator==(LogosType* other) const override;
     ~LogosVoid() override = default;
 };
@@ -20,6 +21,10 @@ inline const string LogosVoid::name() const {
 
 inline Type* LogosVoid::getIRType() {
     return IRType;
+}
+
+inline LogosConstant* LogosVoid::getConstant() {
+    return nullptr;
 }
 
 inline bool LogosVoid::operator==(LogosType* other) const {
