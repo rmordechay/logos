@@ -1,40 +1,23 @@
 #include "funcs/LogosMethodImpl.h"
 
+#include "exprs/LogosConstant.h"
+
 #include <LogosDefinitions.h>
 #include <object/LogosObject.h>
 
 Value* LogosMethodImpl::computeIRValue(CodeGenMetadata* metadata) {
-    metadata->logosStack.enterScope();
     const auto objSymbol = metadata->logosStack.getSymbol(parentName);
     const auto objType = objSymbol->object->getIRType();
+    const auto method = Function::Create(getMethodType(objType), Function::ExternalLinkage, combinedName, metadata->currentModule);
+    metadata->logosStack.enterScope(method);
 
-    vector<Type*> IRParams;
-    IRParams.emplace_back(PointerType::getUnqual(objType));
-    for (const auto& param : params) {
-        IRParams.emplace_back(param->inferredType->getIRType());
-    }
-    const auto methodType = FunctionType::get(type->getIRType(), IRParams, false);
-
-    const auto method = Function::Create(methodType, Function::ExternalLinkage, combinedName, metadata->currentModule);
-    const auto methodEntry = BasicBlock::Create(context, "entry", method);
-    metadata->builder.SetInsertPoint(methodEntry);
-    metadata->logosStack.currentFunc = method;
-
-    metadata->logosStack.addLocalSymbol(LOGOS_THIS, *objSymbol);
     auto args = method->arg_begin();
-    args++->setName("this");
-    for (const auto& param : params) {
-        if (param->expr) {
-            metadata->logosStack.addLocalSymbol(param->name, LogosSymbol::createSymbol(param->expr));
-        } else {
-            auto symbol = LogosSymbol(CONSTANT, param->inferredType->getConstant());
-            metadata->logosStack.addLocalSymbol(param->name, symbol);
-        }
-        args++;
-    }
+    args++->setName(LOGOS_THIS);
+    metadata->logosStack.addLocalSymbol(LOGOS_THIS, *objSymbol);
+    setIRArgs(metadata, params, args);
 
+    startBlock(metadata, funcEntry);
     stmtBlock->writeIRValue(metadata);
-
     metadata->logosStack.exitScope();
     return method;
 }

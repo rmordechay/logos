@@ -51,6 +51,7 @@ public:
     void visitConstant(const LogosConstant* constant);
     void setUnsuccessful();
     void resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr);
+    void setForeachLoopTypes(LogosForeachLoop* foreachLoop, LogosVariable* variable);
     LogosType* inferSelectionType(LogosSelection* selection);
     LogosType* inferArrayType(const LogosArray* array);
     ~SemaAnalyser() = default;

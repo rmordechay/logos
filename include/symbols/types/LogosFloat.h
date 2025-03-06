@@ -7,11 +7,11 @@
 class LogosFloat final : public LogosType {
 public:
     Type* IRType = Type::getFloatTy(context);
-     string typeName = "Float";
+    string typeName = "Float";
 
     const string name() const override;
     Type* getIRType() override;
-    LogosConstant* getConstant() override;
+    LogosConstant* getZeroValue() override;
     bool operator==(LogosType* other) const override;
     ~LogosFloat() override = default;
 };
@@ -24,12 +24,14 @@ inline Type* LogosFloat::getIRType() {
     return IRType;
 }
 
-inline LogosConstant* LogosFloat::getConstant() {
+inline LogosConstant* LogosFloat::getZeroValue() {
     return new LogosConstant(this, 0.f);
 }
 
-inline bool LogosFloat::operator==(LogosType* other) const { return true;}
+inline bool LogosFloat::operator==(LogosType* other) const {
+    return true;
+}
 
 inline LogosFloat LOGOS_FLOAT;
 
-#endif //LOGOSFLOAT_H
+#endif // LOGOSFLOAT_H

@@ -7,12 +7,12 @@
 class LogosBool final : public LogosType {
 public:
     Type* IRType = Type::getInt1Ty(context);
-     string typeName = "Bool";
-     string trueLiteral = "true";
+    string typeName = "Bool";
+    string trueLiteral = "true";
 
     const string name() const override;
     Type* getIRType() override;
-    LogosConstant* getConstant() override;
+    LogosConstant* getZeroValue() override;
     bool operator==(LogosType* other) const override;
     ~LogosBool() override = default;
 };
@@ -25,14 +25,15 @@ inline Type* LogosBool::getIRType() {
     return IRType;
 }
 
-inline LogosConstant* LogosBool::getConstant() {
+inline LogosConstant* LogosBool::getZeroValue() {
     return new LogosConstant(this, false);
 }
 
-inline bool LogosBool::operator==(LogosType* other) const { return true;
+inline bool LogosBool::operator==(LogosType* other) const {
+    return true;
     return true;
 }
 
 inline LogosBool LOGOS_BOOL;
 
-#endif //LOGOSBOOL_H
+#endif // LOGOSBOOL_H

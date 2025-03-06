@@ -122,8 +122,8 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
         logosStack.addLocalSymbol(varDec->name, LogosSymbol::createSymbol(varDec->expr));
     } else {
         varDec->inferredType = varDec->userType;
-        const auto constant = varDec->inferredType->getConstant();
-        logosStack.addLocalSymbol(varDec->name, LogosSymbol(CONSTANT, constant));
+        // const auto constant = varDec->inferredType->getConstant();
+        // logosStack.addLocalSymbol(varDec->name, LogosSymbol(CONSTANT, constant));
     }
 }
 
@@ -139,19 +139,13 @@ void SemaAnalyser::visitLoopStmt(LogosLoop* loopStmt) {
     }
 }
 
-void SemaAnalyser::visitRangeLoop(LogosRangeLoop* rangeLoop) {}
+void SemaAnalyser::visitRangeLoop(LogosRangeLoop* rangeLoop) {
+}
 
 void SemaAnalyser::visitForeachLoop(LogosForeachLoop* foreachLoop) {
     const auto iterableExpr = foreachLoop->iterableExpr;
     if (const auto variable = dynamic_cast<LogosVariable*>(iterableExpr)) {
-        const auto symbol = logosStack.getSymbol(variable->name);
-        foreachLoop->iterable = symbol->array;
-        foreachLoop->iterable->type = inferArrayType(foreachLoop->iterable);
-        foreachLoop->arrayIndex = new LogosArrayIndex(variable);
-        foreachLoop->arrayIndex->type = foreachLoop->iterable->type;
-        const auto constant = LOGOS_INT.getConstant();
-        foreachLoop->arrayIndex->exprs.emplace_back(constant);
-        logosStack.addLocalSymbol(foreachLoop->loopVar->name, LogosSymbol(ARRAY_INDEX, foreachLoop->arrayIndex));
+        setForeachLoopTypes(foreachLoop, variable);
     }
     visitStmtBlock(foreachLoop->stmtBlock);
 }
@@ -248,6 +242,17 @@ void SemaAnalyser::visitConstant(const LogosConstant* constant) {
 void SemaAnalyser::setUnsuccessful() {
     unique_lock lock(mtx);
     successful = false;
+}
+
+void SemaAnalyser::setForeachLoopTypes(LogosForeachLoop* foreachLoop, LogosVariable* variable) {
+    const auto symbol = logosStack.getSymbol(variable->name);
+    foreachLoop->iterable = symbol->array;
+    foreachLoop->iterable->type = inferArrayType(foreachLoop->iterable);
+    foreachLoop->arrayIndex = new LogosArrayIndex(variable);
+    foreachLoop->arrayIndex->type = foreachLoop->iterable->type;
+    const auto constant = LOGOS_INT.getZeroValue();
+    foreachLoop->arrayIndex->exprs.emplace_back(constant);
+    logosStack.addLocalSymbol(foreachLoop->loopVar->name, LogosSymbol(ARRAY_INDEX, foreachLoop->arrayIndex));
 }
 
 LogosType* SemaAnalyser::inferSelectionType(LogosSelection* selection) {

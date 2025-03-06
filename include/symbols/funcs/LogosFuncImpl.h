@@ -5,7 +5,6 @@
 class LogosFuncImpl final : public LogosFunc {
 public:
     explicit LogosFuncImpl(const string& name, LogosType* funcType) : LogosFunc(name, funcType) {}
-    string getFuncName() const;
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     Value* callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
     Value* callFunc(CodeGenMetadata* metadata);

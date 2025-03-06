@@ -9,10 +9,11 @@ class LogosInt final : public LogosType {
 public:
     Type* IRType = Type::getInt32Ty(context);
     string typeName = "Int";
+    LogosConstant zeroValue = LogosConstant(this, 0);
 
     const string name() const override;
     Type* getIRType() override;
-    LogosConstant* getConstant() override;
+    LogosConstant* getZeroValue() override;
     bool operator==(LogosType* other) const override;
     ~LogosInt() override = default;
 };
@@ -25,7 +26,7 @@ inline Type* LogosInt::getIRType() {
     return IRType;
 }
 
-inline LogosConstant* LogosInt::getConstant() {
+inline LogosConstant* LogosInt::getZeroValue() {
     return new LogosConstant(this, 0);
 }
 

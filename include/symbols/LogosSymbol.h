@@ -22,6 +22,7 @@ enum LogosSymbolType {
     INSTANCE,
     FUNC_CALL,
     VARIABLE,
+    PARAM,
     CONSTANT,
     ARRAY,
     ARRAY_INDEX,

@@ -19,7 +19,7 @@ public:
     explicit LogosObject(const string& typeName) : typeName(typeName) {}
     const string name() const override;
     Type* getIRType() override;
-    LogosConstant* getConstant() override;
+    LogosConstant* getZeroValue() override;
     bool operator==(LogosType* other) const override;
     ~LogosObject() override;
 };

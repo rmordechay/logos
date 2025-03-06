@@ -10,7 +10,7 @@ public:
 
     const string name() const override;
     Type* getIRType() override;
-    LogosConstant* getConstant() override;
+    LogosConstant* getZeroValue() override;
     bool operator==(LogosType* other) const override;
     ~LogosVoid() override = default;
 };
@@ -23,7 +23,7 @@ inline Type* LogosVoid::getIRType() {
     return IRType;
 }
 
-inline LogosConstant* LogosVoid::getConstant() {
+inline LogosConstant* LogosVoid::getZeroValue() {
     return nullptr;
 }
 

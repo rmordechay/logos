@@ -18,7 +18,7 @@ Type* LogosObject::getIRType() {
     return IRType;
 }
 
-LogosConstant* LogosObject::getConstant() {
+LogosConstant* LogosObject::getZeroValue() {
     // TODO return empty constructor
     return nullptr;
 }
