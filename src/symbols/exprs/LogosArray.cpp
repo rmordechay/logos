@@ -11,7 +11,3 @@ Value* LogosArray::computeIRValue(CodeGenMetadata* metadata) {
     const auto array = ConstantArray::get(arrType, arrValues);
     return new GlobalVariable(*metadata->currentModule, arrType, true, GlobalValue::PrivateLinkage, array);
 }
-
-LogosSymbolType LogosArray::getSymbolType() {
-    return ARRAY;
-}

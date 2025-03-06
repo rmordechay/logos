@@ -72,7 +72,6 @@ void SemaAnalyser::visitFuncImpl(const LogosFuncImpl* func) {
     logosStack.exitScope();
 }
 
-
 void SemaAnalyser::visitStmt(LogosStmt* stmt) {
     if (!stmt) return;
     if (const auto varDec = dynamic_cast<LogosVarDec*>(stmt)) {
@@ -114,17 +113,14 @@ void SemaAnalyser::visitAssignment(const LogosAssignment* fieldDef) {
     }
 }
 
-
 void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
     if (varDec->expr) {
         visitExpr(varDec->expr);
-        varDec->inferredType = varDec->expr->type;
-        logosStack.addLocalSymbol(varDec->name, LogosSymbol::createSymbol(varDec->expr));
+        varDec->type = varDec->expr->type;
     } else {
-        varDec->inferredType = varDec->userType;
-        // const auto constant = varDec->inferredType->getConstant();
-        // logosStack.addLocalSymbol(varDec->name, LogosSymbol(CONSTANT, constant));
+        varDec->type = varDec->userType;
     }
+    logosStack.addLocalSymbol(varDec->name, LogosSymbol(VAR_DEC, varDec));
 }
 
 void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {
@@ -139,12 +135,15 @@ void SemaAnalyser::visitLoopStmt(LogosLoop* loopStmt) {
     }
 }
 
-void SemaAnalyser::visitRangeLoop(LogosRangeLoop* rangeLoop) {
+void SemaAnalyser::visitRangeLoop(const LogosRangeLoop* rangeLoop) {
+    const auto name = rangeLoop->loopVar->name;
+    const auto varDec = new LogosVarDec(name, &LOGOS_INT);
+    logosStack.addLocalSymbol(name, LogosSymbol(VAR_DEC, varDec));
+    visitStmtBlock(rangeLoop->stmtBlock);
 }
 
 void SemaAnalyser::visitForeachLoop(LogosForeachLoop* foreachLoop) {
-    const auto iterableExpr = foreachLoop->iterableExpr;
-    if (const auto variable = dynamic_cast<LogosVariable*>(iterableExpr)) {
+    if (const auto variable = dynamic_cast<LogosVariable*>(foreachLoop->iterableExpr)) {
         setForeachLoopTypes(foreachLoop, variable);
     }
     visitStmtBlock(foreachLoop->stmtBlock);
@@ -207,16 +206,16 @@ void SemaAnalyser::visitArrayIndex(LogosArrayIndex* arrayIndex) {
     arrayIndex->type = arrayIndex->baseExpr->type;
 }
 
-void SemaAnalyser::visitFuncCall(LogosFuncCall* funcCallExpr) {
-    const auto symbol = logosStack.getSymbol(funcCallExpr->name);
+void SemaAnalyser::visitFuncCall(LogosFuncCall* funcCall) {
+    const auto symbol = logosStack.getSymbol(funcCall->name);
     if (symbol->type == BUILTIN_FUNC) {
-        funcCallExpr->type = symbol->builtinFunc->type;
+        funcCall->type = symbol->builtinFunc->type;
     } else if (symbol->type == FUNC_IMPL) {
-        funcCallExpr->type = symbol->funcImpl->type;
+        funcCall->type = symbol->funcImpl->type;
     } else if (symbol->type == METHOD_IMPL) {
-        funcCallExpr->type = symbol->methodImpl->type;
+        funcCall->type = symbol->methodImpl->type;
     }
-    for (const auto &arg : funcCallExpr->args) {
+    for (const auto &arg : funcCall->args) {
         visitExpr(arg);
     }
 }
@@ -224,11 +223,8 @@ void SemaAnalyser::visitFuncCall(LogosFuncCall* funcCallExpr) {
 void SemaAnalyser::visitVariable(LogosVariable* variable) {
     const auto symbol = logosStack.getSymbol(variable->name);
     switch (symbol->type) {
-    case ARRAY:
-        variable->type = symbol->array->type;
-        break;
-    case ARRAY_INDEX:
-        variable->type = symbol->arrayIndex->type;
+    case VAR_DEC:
+        variable->type = symbol->varDec->type;
         break;
     default:
         break;
@@ -246,13 +242,23 @@ void SemaAnalyser::setUnsuccessful() {
 
 void SemaAnalyser::setForeachLoopTypes(LogosForeachLoop* foreachLoop, LogosVariable* variable) {
     const auto symbol = logosStack.getSymbol(variable->name);
-    foreachLoop->iterable = symbol->array;
-    foreachLoop->iterable->type = inferArrayType(foreachLoop->iterable);
-    foreachLoop->arrayIndex = new LogosArrayIndex(variable);
-    foreachLoop->arrayIndex->type = foreachLoop->iterable->type;
-    const auto constant = LOGOS_INT.getZeroValue();
-    foreachLoop->arrayIndex->exprs.emplace_back(constant);
-    logosStack.addLocalSymbol(foreachLoop->loopVar->name, LogosSymbol(ARRAY_INDEX, foreachLoop->arrayIndex));
+    switch (symbol->type) {
+    case VAR_DEC: {
+        const auto array = dynamic_cast<LogosArray*>(symbol->varDec->expr);
+        if (!array) break;
+        foreachLoop->iterable = array;
+        foreachLoop->iterable->type = inferArrayType(foreachLoop->iterable);
+        foreachLoop->arrayIndex = new LogosArrayIndex(variable);
+        foreachLoop->arrayIndex->type = foreachLoop->iterable->type;
+        const auto constant = LOGOS_INT.getZeroValue();
+        foreachLoop->arrayIndex->exprs.emplace_back(constant);
+        const auto varDec = new LogosVarDec(variable->name, foreachLoop->arrayIndex->type, foreachLoop->arrayIndex);
+        logosStack.addLocalSymbol(foreachLoop->loopVar->name, LogosSymbol(VAR_DEC, varDec));
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 LogosType* SemaAnalyser::inferSelectionType(LogosSelection* selection) {
@@ -277,10 +283,12 @@ LogosType* SemaAnalyser::inferArrayType(const LogosArray* array) {
 void SemaAnalyser::resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
     const auto symbol = logosStack.getSymbol(previousExpr->getName());
     switch (symbol->type) {
-    case INSTANCE: {
-        const auto obj = symbol->instance->obj;
-        const auto func = obj->methods[nextExpr->getName()];
-        nextExpr->type = func->type;
+    case VAR_DEC: {
+        if (const auto instance = dynamic_cast<LogosInstance*>(symbol->varDec->expr)) {
+            const auto obj = instance->obj;
+            const auto func = obj->methods[nextExpr->getName()];
+            nextExpr->type = func->type;
+        }
         break;
     }
     default:

@@ -6,19 +6,22 @@
 #include <LogosStack.h>
 
 Value* LogosVarDec::computeIRValue(CodeGenMetadata* metadata) {
+    Value* value;
+    Type* valueType;
     if (expr) {
-        const auto value = expr->writeIRValue(metadata);
-        const auto valueType = value->getType();
-        if (!valueType->isPointerTy()) {
-            auto& builder = metadata->builder;
-            const auto allocaInst = builder.CreateAlloca(valueType);
-            builder.CreateStore(value, allocaInst);
-        }
-        const auto symbol = LogosSymbol::createSymbol(expr);
-        metadata->logosStack.addLocalSymbol(name, symbol);
-        return value;
+        value = expr->writeIRValue(metadata);
+        valueType = value->getType();
+    } else {
+        value = type->getZeroValue()->writeIRValue(metadata);
+        valueType = value->getType();
     }
-    return inferredType->getZeroValue()->writeIRValue(metadata);
+    if (!valueType->isPointerTy()) {
+        auto& builder = metadata->builder;
+        const auto allocaInst = builder.CreateAlloca(valueType);
+        builder.CreateStore(value, allocaInst);
+    }
+    metadata->logosStack.addLocalSymbol(name, LogosSymbol(VAR_DEC, this));
+    return value;
 }
 
 LogosVarDec::~LogosVarDec() {

@@ -21,7 +21,6 @@ public:
 
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     ~LogosBinaryExpr() override = default;
-    LogosSymbolType getSymbolType() override { return BINARY_EXPR; }
 };
 
 #endif //LOGOSBINARYEXPR_H

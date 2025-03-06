@@ -9,7 +9,6 @@ public:
 
     explicit LogosArray() : LogosExpr(nullptr) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
-    LogosSymbolType getSymbolType() override;
     ~LogosArray() override = default;
 };
 

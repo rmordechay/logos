@@ -1,7 +1,6 @@
 #ifndef LOGOSEXPR_H
 #define LOGOSEXPR_H
 #include "LogosValue.h"
-#include <LogosSymbol.h>
 #include <types/LogosType.h>
 
 class LogosFuncCall;
@@ -14,7 +13,7 @@ public:
     LogosType* type = nullptr;
 
     explicit LogosExpr(LogosType* type) : type(type) {}
-    virtual LogosSymbolType getSymbolType() = 0;
+
     ~LogosExpr() override = default;
 };
 

@@ -76,7 +76,6 @@ add_library(lib STATIC
     include/symbols/loops/LogosRangeLoop.h
     src/symbols/loops/LogosForeachLoop.cpp
     include/symbols/loops/LogosForeachLoop.h
-    src/symbols/LogosSymbol.cpp
     include/symbols/LogosSymbol.h
     src/application/CommandLine.cpp
     include/symbols/types/LogosBool.h
@@ -85,6 +84,8 @@ add_library(lib STATIC
     include/symbols/types/LogosString.h
     include/symbols/types/LogosType.h
     include/symbols/types/LogosVoid.h
+    src/symbols/loops/LogosLoopVar.cpp
+    include/symbols/loops/LogosLoopVar.h
 )
 
 add_executable(logos main.cpp src/LogosStack.cpp)

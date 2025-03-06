@@ -15,10 +15,6 @@ Value* LogosFuncCall::computeIRValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
 
-LogosSymbolType LogosFuncCall::getSymbolType() {
-    return FUNC_CALL;
-}
-
 void LogosFuncCall::setName(const string name) {
     this->name = name;
 }

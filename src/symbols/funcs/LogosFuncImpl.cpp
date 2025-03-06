@@ -18,7 +18,7 @@ Value* LogosFuncImpl::computeIRValue(CodeGenMetadata* metadata) {
 FunctionType* LogosFuncImpl::getIRFunc() const {
     vector<Type*> IRParams;
     for (const auto& param : params) {
-        IRParams.emplace_back(param->inferredType->getIRType());
+        IRParams.emplace_back(param->type->getIRType());
     }
     return FunctionType::get(type->getIRType(), IRParams, false);
 }

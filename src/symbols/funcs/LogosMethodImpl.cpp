@@ -39,7 +39,7 @@ FunctionType* LogosMethodImpl::getMethodType(Type* structType) const {
     vector<Type*> IRParams;
     IRParams.emplace_back(structType);
     for (const auto& param : params) {
-        IRParams.emplace_back(param->inferredType->getIRType());
+        IRParams.emplace_back(param->type->getIRType());
     }
     return FunctionType::get(type->getIRType(), IRParams, false);
 }

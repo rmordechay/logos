@@ -19,34 +19,30 @@ Value* LogosSelection::computeIRValue(CodeGenMetadata* metadata) {
 Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
     const auto symbol = metadata->logosStack.getSymbol(previousExpr->getName());
     switch (symbol->type) {
-    case INSTANCE: {
-        const auto& exprName = nextExpr->getName();
-        const auto instance = symbol->instance;
-        const auto obj = instance->obj;
-        const auto objType = instance->obj->getIRType();
-        if (obj->methods.find(exprName) != obj->methods.end()) {
-            const auto func = obj->methods[exprName];
-            return func->callFunc(metadata, {previousExpr});
-        }
-        if (obj->fields.find(exprName) != obj->fields.end()) {
-            const auto field = obj->fields[exprName];
-            const auto instancePtr = instance->writeIRValue(metadata);
-            const auto gep = metadata->builder.CreateStructGEP(objType, instancePtr, field->fieldPosition);
-            return metadata->builder.CreateLoad(field->inferredType->getIRType(), gep);
-        }
-        break;
-    }
-    case FUNC_CALL: {
-        return symbol->funcCall->writeIRValue(metadata);
-    }
+    // case INSTANCE: {
+    //     const auto& exprName = nextExpr->getName();
+    //     const auto instance = symbol->instance;
+    //     const auto obj = instance->obj;
+    //     const auto objType = instance->obj->getIRType();
+    //     if (obj->methods.find(exprName) != obj->methods.end()) {
+    //         const auto func = obj->methods[exprName];
+    //         return func->callFunc(metadata, {previousExpr});
+    //     }
+    //     if (obj->fields.find(exprName) != obj->fields.end()) {
+    //         const auto field = obj->fields[exprName];
+    //         const auto instancePtr = instance->writeIRValue(metadata);
+    //         const auto gep = metadata->builder.CreateStructGEP(objType, instancePtr, field->fieldPosition);
+    //         return metadata->builder.CreateLoad(field->inferredType->getIRType(), gep);
+    //     }
+    //     break;
+    // }
+    // case FUNC_CALL: {
+    //     return symbol->funcCall->writeIRValue(metadata);
+    // }
     default:
         break;
     }
     return nullptr;
-}
-
-LogosSymbolType LogosSelection::getSymbolType() {
-    return SELECTION;
 }
 
 void LogosSelection::setName(string name) {}

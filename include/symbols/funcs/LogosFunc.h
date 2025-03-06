@@ -34,11 +34,11 @@ inline void LogosFunc::setIRArgs(CodeGenMetadata* metadata, const vector<LogosVa
     for (const auto& param : params) {
         if (param->expr) {
             param->expr->setIRValue(args);
-            metadata->logosStack.addLocalSymbol(param->name, LogosSymbol::createSymbol(param->expr));
+            metadata->logosStack.addLocalSymbol(param->name, LogosSymbol(VAR_DEC, param));
         } else {
-            const auto constant = param->inferredType->getZeroValue();
+            const auto constant = param->type->getZeroValue();
             constant->setIRValue(args);
-            auto symbol = LogosSymbol(CONSTANT, constant);
+            auto symbol = LogosSymbol(VAR_DEC, param);
             metadata->logosStack.addLocalSymbol(param->name, symbol);
         }
         args++;

@@ -2,6 +2,7 @@
 #define LOGOSSYMBOL_H
 
 class LogosBuiltinFunc;
+class LogosVarDec;
 class LogosMethodImpl;
 class LogosFuncImpl;
 class LogosExpr;
@@ -18,16 +19,9 @@ class LogosField;
 class LogosObject;
 
 enum LogosSymbolType {
-    BINARY_EXPR,
-    INSTANCE,
-    FUNC_CALL,
-    VARIABLE,
-    PARAM,
-    CONSTANT,
-    ARRAY,
-    ARRAY_INDEX,
-    FIELD,
+    VAR_DEC,
     OBJECT,
+    FIELD,
     BUILTIN_FUNC,
     FUNC_IMPL,
     METHOD_IMPL,
@@ -36,21 +30,14 @@ enum LogosSymbolType {
 
 struct LogosSymbol {
     LogosSymbolType type;
-
     union {
+        LogosVarDec* varDec;
         LogosObject* object;
         LogosField* field;
         LogosBuiltinFunc* builtinFunc;
         LogosFuncImpl* funcImpl;
         LogosMethodImpl* methodImpl;
-        LogosInstance* instance;
-        LogosFuncCall* funcCall;
-        LogosVariable* variable;
-        LogosConstant* constant;
-        LogosBinaryExpr* binaryExpr;
         LogosSelection* selection;
-        LogosArray* array;
-        LogosArrayIndex* arrayIndex;
     };
 
     LogosSymbol() :
@@ -68,16 +55,6 @@ struct LogosSymbol {
         field(field) {
     }
 
-    LogosSymbol(const LogosSymbolType type, LogosInstance* constructor) :
-        type(type),
-        instance(constructor) {
-    }
-
-    LogosSymbol(const LogosSymbolType type, LogosFuncCall* funcCall) :
-        type(type),
-        funcCall(funcCall) {
-    }
-
     LogosSymbol(const LogosSymbolType type, LogosBuiltinFunc* builtinFunc) :
         type(type),
         builtinFunc(builtinFunc) {
@@ -93,37 +70,15 @@ struct LogosSymbol {
         methodImpl(methodImpl) {
     }
 
-    LogosSymbol(const LogosSymbolType type, LogosVariable* variable) :
-        type(type),
-        variable(variable) {
-    }
-
-    LogosSymbol(const LogosSymbolType type, LogosConstant* constant) :
-        type(type),
-        constant(constant) {
-    }
-
     LogosSymbol(const LogosSymbolType type, LogosSelection* selection) :
         type(type),
         selection(selection) {
     }
 
-    LogosSymbol(const LogosSymbolType type, LogosBinaryExpr* binaryExpr) :
+    LogosSymbol(const LogosSymbolType type, LogosVarDec* varDec) :
         type(type),
-        binaryExpr(binaryExpr) {
+        varDec(varDec) {
     }
-
-    LogosSymbol(const LogosSymbolType type, LogosArray* array) :
-        type(type),
-        array(array) {
-    }
-
-    LogosSymbol(const LogosSymbolType type, LogosArrayIndex* arrayIndex) :
-        type(type),
-        arrayIndex(arrayIndex) {
-    }
-
-    static LogosSymbol createSymbol(LogosExpr* expr);
 };
 
 

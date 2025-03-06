@@ -11,10 +11,6 @@ Value* LogosInstance::computeIRValue(CodeGenMetadata* metadata) {
     return metadata->builder.CreateAlloca(IRType);
 }
 
-LogosSymbolType LogosInstance::getSymbolType() {
-    return INSTANCE;
-}
-
 void LogosInstance::setName(const string name) {
     this->name = name;
 }

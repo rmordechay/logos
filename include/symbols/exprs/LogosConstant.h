@@ -19,7 +19,6 @@ public:
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     void setName(string name) override;
     string getName() override;
-    LogosSymbolType getSymbolType() override;
     ~LogosConstant() override = default;
 };
 

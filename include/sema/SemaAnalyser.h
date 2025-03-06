@@ -37,13 +37,13 @@ public:
     void visitVarDec(LogosVarDec* varDec);
     void visitIfStmt(const LogosIf* ifStmt);
     void visitLoopStmt(LogosLoop* loopStmt);
-    void visitRangeLoop(LogosRangeLoop* rangeLoop);
+    void visitRangeLoop(const LogosRangeLoop* rangeLoop);
     void visitForeachLoop(LogosForeachLoop* foreachLoop);
     void visitExpr(LogosExpr* expr);
     void visitArray(LogosArray* array);
     void visitUnaryExpr(LogosUnaryExpr* unaryExpr);
     void visitBinaryExpr(const LogosBinaryExpr* binaryExpr);
-    void visitFuncCall(LogosFuncCall* funcCallExpr);
+    void visitFuncCall(LogosFuncCall* funcCall);
     void visitVariable(LogosVariable* variable);
     void visitSelection(LogosSelection* selection);
     void visitInstance(LogosInstance* instance);
