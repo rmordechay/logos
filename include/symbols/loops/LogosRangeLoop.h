@@ -4,12 +4,12 @@
 
 class LogosRangeLoop final : public LogosLoop {
 public:
-  LogosVariable* loopVar;
+  LogosLoopVar* loopVar;
   LogosExpr* startRange;
   LogosExpr* endRange;
   LogosStmtBlock* stmtBlock;
 
-  LogosRangeLoop(LogosVariable* loopVar, LogosExpr* rangeStart, LogosExpr* rangeEnd, LogosStmtBlock* stmtBlock) : loopVar(loopVar), startRange(rangeStart), endRange(rangeEnd), stmtBlock(stmtBlock) {}
+  LogosRangeLoop(LogosLoopVar* loopVar, LogosExpr* rangeStart, LogosExpr* rangeEnd, LogosStmtBlock* stmtBlock) : loopVar(loopVar), startRange(rangeStart), endRange(rangeEnd), stmtBlock(stmtBlock) {}
   Value* computeIRValue(CodeGenMetadata* metadata) override;
 };
 

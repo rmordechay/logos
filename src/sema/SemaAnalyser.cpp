@@ -1,6 +1,7 @@
 #include "SemaAnalyser.h"
 #include "LogosErrors.h"
 #include "exprs/LogosBinaryExpr.h"
+#include "loops/LogosLoopVar.h"
 
 #include <ThreadPool.h>
 #include <exprs/LogosArray.h>
@@ -137,14 +138,31 @@ void SemaAnalyser::visitLoopStmt(LogosLoop* loopStmt) {
 
 void SemaAnalyser::visitRangeLoop(const LogosRangeLoop* rangeLoop) {
     const auto name = rangeLoop->loopVar->name;
-    const auto varDec = new LogosVarDec(name, &LOGOS_INT);
-    logosStack.addLocalSymbol(name, LogosSymbol(VAR_DEC, varDec));
+    logosStack.addLocalSymbol(name, LogosSymbol(LOOP_VAR, rangeLoop->loopVar));
     visitStmtBlock(rangeLoop->stmtBlock);
 }
 
 void SemaAnalyser::visitForeachLoop(LogosForeachLoop* foreachLoop) {
     if (const auto variable = dynamic_cast<LogosVariable*>(foreachLoop->iterableExpr)) {
-        setForeachLoopTypes(foreachLoop, variable);
+        const auto symbol = logosStack.getSymbol(variable->name);
+        switch (symbol->type) {
+        case VAR_DEC: {
+            const auto array = dynamic_cast<LogosArray*>(symbol->varDec->expr);
+            if (!array) break;
+            foreachLoop->iterable = array;
+            foreachLoop->iterable->type = inferArrayType(foreachLoop->iterable);
+            foreachLoop->loopVar->type = foreachLoop->iterable->type;
+            foreachLoop->arrayIndex = new LogosArrayIndex(variable);
+            foreachLoop->arrayIndex->type = foreachLoop->iterable->type;
+            const auto constant = LOGOS_INT.getZeroValue();
+            foreachLoop->arrayIndex->exprs.emplace_back(constant);
+            const auto varDec = new LogosVarDec(variable->name, foreachLoop->arrayIndex->type, foreachLoop->arrayIndex);
+            logosStack.addLocalSymbol(foreachLoop->loopVar->name, LogosSymbol(VAR_DEC, varDec));
+            break;
+        }
+        default:
+            break;
+        }
     }
     visitStmtBlock(foreachLoop->stmtBlock);
 }
@@ -226,6 +244,9 @@ void SemaAnalyser::visitVariable(LogosVariable* variable) {
     case VAR_DEC:
         variable->type = symbol->varDec->type;
         break;
+    case LOOP_VAR:
+        variable->type = symbol->loopVar->type;
+        break;
     default:
         break;
     }
@@ -238,27 +259,6 @@ void SemaAnalyser::visitConstant(const LogosConstant* constant) {
 void SemaAnalyser::setUnsuccessful() {
     unique_lock lock(mtx);
     successful = false;
-}
-
-void SemaAnalyser::setForeachLoopTypes(LogosForeachLoop* foreachLoop, LogosVariable* variable) {
-    const auto symbol = logosStack.getSymbol(variable->name);
-    switch (symbol->type) {
-    case VAR_DEC: {
-        const auto array = dynamic_cast<LogosArray*>(symbol->varDec->expr);
-        if (!array) break;
-        foreachLoop->iterable = array;
-        foreachLoop->iterable->type = inferArrayType(foreachLoop->iterable);
-        foreachLoop->arrayIndex = new LogosArrayIndex(variable);
-        foreachLoop->arrayIndex->type = foreachLoop->iterable->type;
-        const auto constant = LOGOS_INT.getZeroValue();
-        foreachLoop->arrayIndex->exprs.emplace_back(constant);
-        const auto varDec = new LogosVarDec(variable->name, foreachLoop->arrayIndex->type, foreachLoop->arrayIndex);
-        logosStack.addLocalSymbol(foreachLoop->loopVar->name, LogosSymbol(VAR_DEC, varDec));
-        break;
-    }
-    default:
-        break;
-    }
 }
 
 LogosType* SemaAnalyser::inferSelectionType(LogosSelection* selection) {

@@ -1,5 +1,7 @@
 #include "loops/LogosRangeLoop.h"
 
+#include "loops/LogosLoopVar.h"
+
 #include <LogosStack.h>
 #include <exprs/LogosConstant.h>
 #include <exprs/LogosVariable.h>
@@ -28,9 +30,9 @@ Value* LogosRangeLoop::computeIRValue(CodeGenMetadata* metadata) {
 
     // Loop body
     startBlock(metadata, loopBody);
+    loopVar->setIRValue(currentVal);
     metadata->logosStack.enterScope();
-    const auto varDec = new LogosVarDec(loopVar->name, &LOGOS_INT);
-    metadata->logosStack.addLocalSymbol(loopVar->name, LogosSymbol(VAR_DEC, varDec));
+    metadata->logosStack.addLocalSymbol(loopVar->name, LogosSymbol(LOOP_VAR, loopVar));
     stmtBlock->writeIRValue(metadata);
 
     // Increment loop variable

@@ -5,6 +5,7 @@
 class LogosVariable;
 class LogosStmtBlock;
 class LogosExpr;
+class LogosLoopVar;
 
 class LogosLoop : public LogosStmt {
 public:

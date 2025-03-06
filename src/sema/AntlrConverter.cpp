@@ -4,6 +4,7 @@
 #include "exprs/LogosConstant.h"
 #include "exprs/LogosOperator.h"
 #include "exprs/LogosSelection.h"
+#include "loops/LogosLoopVar.h"
 #include "object/LogosField.h"
 #include "stmts/LogosReturn.h"
 #include "types/LogosBool.h"
@@ -201,15 +202,13 @@ LogosLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* 
     const auto stmts = getStmtBlock(ctx->statementsBlock());
     if (const auto iterableExpr = ctx->iterableExpr) {
         const auto loopVarName = ctx->exprList()->expr()[0]->getText();
-        const auto loopVar = getVariable(loopVarName, ctx);
+        const auto loopVar = new LogosLoopVar(loopVarName);
         const auto expr = getExpr(iterableExpr);
         loopStmt = new LogosForeachLoop(loopVar, expr, stmts);
     } else if (const auto range = ctx->iterableRange) {
         const auto loopVarName = ctx->VARIABLE()->getText();
-        const auto loopVar = getVariable(loopVarName, ctx);
+        const auto loopVar = new LogosLoopVar(loopVarName, &LOGOS_INT);
         loopStmt = new LogosRangeLoop(loopVar, getExpr(range->start), getExpr(range->end), stmts);
-    } else if (ctx->iterableRange) {
-
     } else {
         assert(false && "No loop statements found");
     }

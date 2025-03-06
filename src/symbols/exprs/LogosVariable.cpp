@@ -2,6 +2,7 @@
 
 #include "exprs/LogosFuncCall.h"
 #include "exprs/LogosSelection.h"
+#include "loops/LogosLoopVar.h"
 #include "object/LogosField.h"
 
 #include <LogosStack.h>
@@ -19,6 +20,8 @@ Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
         return symbol->field->writeIRValue(metadata);
     case SELECTION:
         return symbol->selection->writeIRValue(metadata);
+    case LOOP_VAR:
+        return symbol->loopVar->writeIRValue(metadata);
     case FUNC_IMPL:
         return symbol->funcImpl->writeIRValue(metadata);
     case METHOD_IMPL:

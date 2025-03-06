@@ -1,6 +1,8 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
 
+
+class LogosLoopVar;
 class LogosBuiltinFunc;
 class LogosVarDec;
 class LogosMethodImpl;
@@ -26,6 +28,7 @@ enum LogosSymbolType {
     FUNC_IMPL,
     METHOD_IMPL,
     SELECTION,
+    LOOP_VAR,
 };
 
 struct LogosSymbol {
@@ -34,6 +37,7 @@ struct LogosSymbol {
         LogosVarDec* varDec;
         LogosObject* object;
         LogosField* field;
+        LogosLoopVar* loopVar;
         LogosBuiltinFunc* builtinFunc;
         LogosFuncImpl* funcImpl;
         LogosMethodImpl* methodImpl;
@@ -68,6 +72,11 @@ struct LogosSymbol {
     LogosSymbol(const LogosSymbolType type, LogosMethodImpl* methodImpl) :
         type(type),
         methodImpl(methodImpl) {
+    }
+
+    LogosSymbol(const LogosSymbolType type, LogosLoopVar* loopVar) :
+        type(type),
+        loopVar(loopVar) {
     }
 
     LogosSymbol(const LogosSymbolType type, LogosSelection* selection) :

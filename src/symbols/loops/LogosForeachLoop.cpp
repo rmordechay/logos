@@ -1,5 +1,7 @@
 #include "loops/LogosForeachLoop.h"
 
+#include "loops/LogosLoopVar.h"
+
 #include <exprs/LogosArray.h>
 #include <exprs/LogosArrayIndex.h>
 #include <exprs/LogosConstant.h>
@@ -38,9 +40,8 @@ Value* LogosForeachLoop::computeIRValue(CodeGenMetadata* metadata) {
     const auto elementPtr = builder.CreateGEP(iterableType, iterableValue, i);
     const auto element = builder.CreateLoad(elementPtr->getType(), elementPtr);
 
-    const auto varDec = new LogosVarDec(loopVar->name, iterable->type);
-    varDec->setIRValue(element);
-    metadata->logosStack.addLocalSymbol(loopVar->name, LogosSymbol(VAR_DEC, varDec));
+    loopVar->setIRValue(element);
+    metadata->logosStack.addLocalSymbol(loopVar->name, LogosSymbol(LOOP_VAR, loopVar));
     stmtBlock->writeIRValue(metadata);
 
     // Increment loop variable
