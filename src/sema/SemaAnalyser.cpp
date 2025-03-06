@@ -82,7 +82,7 @@ void SemaAnalyser::visitStmt(LogosStmt* stmt) {
     } else if (const auto loopStmt = dynamic_cast<LogosLoop*>(stmt)) {
         visitLoopStmt(loopStmt);
     } else if (const auto fieldDef = dynamic_cast<LogosAssignment*>(stmt)) {
-        visitFieldDef(fieldDef);
+        visitAssignment(fieldDef);
     } else if (const auto funcCall = dynamic_cast<LogosFuncCall*>(stmt)) {
         visitFuncCall(funcCall);
     }
@@ -107,7 +107,7 @@ void SemaAnalyser::visitMethodImpl(const LogosMethodImpl* method) {
     logosStack.exitScope();
 }
 
-void SemaAnalyser::visitFieldDef(const LogosAssignment* fieldDef) {
+void SemaAnalyser::visitAssignment(const LogosAssignment* fieldDef) {
     const auto names = fieldDef->names;
     for (const auto& name : names) {
 
@@ -213,7 +213,15 @@ void SemaAnalyser::visitArrayIndex(LogosArrayIndex* arrayIndex) {
     arrayIndex->type = arrayIndex->baseExpr->type;
 }
 
-void SemaAnalyser::visitFuncCall(const LogosFuncCall* funcCallExpr) {
+void SemaAnalyser::visitFuncCall(LogosFuncCall* funcCallExpr) {
+    const auto symbol = logosStack.getSymbol(funcCallExpr->name);
+    if (symbol->type == BUILTIN_FUNC) {
+        funcCallExpr->type = symbol->builtinFunc->type;
+    } else if (symbol->type == FUNC_IMPL) {
+        funcCallExpr->type = symbol->funcImpl->type;
+    } else if (symbol->type == METHOD_IMPL) {
+        funcCallExpr->type = symbol->methodImpl->type;
+    }
     for (const auto &arg : funcCallExpr->args) {
         visitExpr(arg);
     }

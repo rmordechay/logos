@@ -33,7 +33,7 @@ public:
     void visitFuncImpl(const LogosFuncImpl* func);
     void visitStmt(LogosStmt* stmt);
     void visitStmtBlock(const LogosStmtBlock* stmtBlock);
-    void visitFieldDef(const LogosAssignment* fieldDef);
+    void visitAssignment(const LogosAssignment* fieldDef);
     void visitVarDec(LogosVarDec* varDec);
     void visitIfStmt(const LogosIf* ifStmt);
     void visitLoopStmt(LogosLoop* loopStmt);
@@ -43,7 +43,7 @@ public:
     void visitArray(LogosArray* array);
     void visitUnaryExpr(LogosUnaryExpr* unaryExpr);
     void visitBinaryExpr(const LogosBinaryExpr* binaryExpr);
-    void visitFuncCall(const LogosFuncCall* funcCallExpr);
+    void visitFuncCall(LogosFuncCall* funcCallExpr);
     void visitVariable(LogosVariable* variable);
     void visitSelection(LogosSelection* selection);
     void visitInstance(LogosInstance* instance);

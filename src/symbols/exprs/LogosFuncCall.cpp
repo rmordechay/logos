@@ -9,16 +9,10 @@
 
 Value* LogosFuncCall::computeIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->logosStack.getSymbol(name);
-    switch (symbol->type) {
-    case BUILTIN_FUNC:
-        return symbol->builtinFunc->callFunc(metadata, args);
-    case FUNC_IMPL:
-        return symbol->funcImpl->callFunc(metadata, args);
-    case METHOD_IMPL:
-        return symbol->methodImpl->callFunc(metadata, args);
-    default:
-        return nullptr;
-    }
+    if (symbol->type == BUILTIN_FUNC) return symbol->builtinFunc->callFunc(metadata, args);
+    if (symbol->type == FUNC_IMPL) return symbol->funcImpl->callFunc(metadata, args);
+    if (symbol->type == METHOD_IMPL) return symbol->methodImpl->callFunc(metadata, args);
+    return nullptr;
 }
 
 LogosSymbolType LogosFuncCall::getSymbolType() {
