@@ -1,7 +1,7 @@
 #ifndef LOGOSEXPR_H
 #define LOGOSEXPR_H
 #include "LogosValue.h"
-#include <types/LogosType.h>
+#include <LogosType.h>
 
 class LogosFuncCall;
 class LogosVariable;

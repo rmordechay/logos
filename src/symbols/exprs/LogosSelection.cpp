@@ -16,6 +16,10 @@ Value* LogosSelection::computeIRValue(CodeGenMetadata* metadata) {
     return value;
 }
 
+LogosExpr* LogosSelection::getLastExpr() const {
+    return exprs[exprs.size() - 1];
+}
+
 Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
     const auto symbol = metadata->logosStack.getSymbol(previousExpr->getName());
     switch (symbol->type) {

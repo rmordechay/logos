@@ -28,6 +28,52 @@ public:
     ~LogosStack() = default;
 };
 
+inline void LogosStack::enterScope(Function* func) {
+    currentFunc = func;
+    push(LogosStackFrame());
+}
+
+inline void LogosStack::enterScope() {
+    if (size() > 0) {
+        push(LogosStackFrame{.symbols = top().symbols});
+    } else {
+        push(LogosStackFrame());
+    }
+}
+
+inline void LogosStack::exitScope() {
+    pop();
+}
+
+inline LogosSymbol* LogosStack::getSymbol(const string& name) {
+    if (globalSymbols.find(name) != globalSymbols.end()) {
+        return &globalSymbols[name];
+    }
+    auto& symbols = top().symbols;
+    if (symbols.find(name) != symbols.end()) {
+        return &symbols[name];
+    }
+    return nullptr;
+}
+
+inline void LogosStack::addLocalSymbol(const string& name, const LogosSymbol& symbol) {
+    top().symbols[name] = symbol;
+}
+
+inline void LogosStack::addGlobalSymbol(const string& name, const LogosSymbol& symbol) {
+    globalSymbols[name] = symbol;
+}
+
+inline void LogosStack::deleteGlobalSymbol(const string& name) {
+    globalSymbols.erase(name);
+}
+
+inline void LogosStack::reset() {
+    while (size() > 0) {
+        pop();
+    }
+}
+
 
 
 #endif //LOGOSSTACK_H

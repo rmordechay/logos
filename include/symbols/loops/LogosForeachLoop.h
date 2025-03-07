@@ -2,16 +2,20 @@
 #define LOGOSFOREACHLOOP_H
 #include "LogosLoop.h"
 
+class LogosIterable;
+
 class LogosForeachLoop final : public LogosLoop {
 public:
     LogosLoopVar* loopVar = nullptr;
     LogosExpr* iterableExpr = nullptr;
-    LogosArray* iterable = nullptr;
+    LogosIterable* iterable = nullptr;
     LogosStmtBlock* stmtBlock = nullptr;
-    LogosArrayIndex* arrayIndex = nullptr;
 
     LogosForeachLoop(LogosLoopVar* loopVar, LogosExpr* iterableExpr, LogosStmtBlock* stmtBlock) : loopVar(loopVar), iterableExpr(iterableExpr), stmtBlock(stmtBlock) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
+    void setIterable(CodeGenMetadata* metadata);
+    void setIterable(CodeGenMetadata* metadata, LogosFuncCall* variable);
+    void setIterable(CodeGenMetadata* metadata, const LogosVariable* variable);
     ~LogosForeachLoop() override;
 };
 

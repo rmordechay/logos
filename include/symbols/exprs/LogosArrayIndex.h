@@ -17,6 +17,4 @@ public:
     ~LogosArrayIndex() override = default;
 };
 
-
-
 #endif //LOGOSARRAYINDEX_H

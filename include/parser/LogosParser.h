@@ -35,7 +35,7 @@ public:
     RuleEnumDeclaration = 26, RuleEnumField = 27, RuleExpr = 28, RuleExprList = 29, 
     RuleUnaryExpr = 30, RuleArray = 31, RuleFuncCall = 32, RuleConstructor = 33, 
     RuleFuncArg = 34, RuleFuncArgList = 35, RuleConstant = 36, RuleArrayIndex = 37, 
-    RuleSelection = 38, RuleSelectionElement = 39, RuleRange = 40
+    RuleSelection = 38, RuleSelectionElement = 39, RuleRange = 40, RuleType = 41
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -95,7 +95,8 @@ public:
   class ArrayIndexContext;
   class SelectionContext;
   class SelectionElementContext;
-  class RangeContext; 
+  class RangeContext;
+  class TypeContext; 
 
   class  LogosFileContext : public antlr4::ParserRuleContext {
   public:
@@ -179,8 +180,8 @@ public:
   public:
     ImportPathContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<antlr4::tree::TerminalNode *> TYPE();
-    antlr4::tree::TerminalNode* TYPE(size_t i);
+    std::vector<TypeContext *> type();
+    TypeContext* type(size_t i);
     std::vector<antlr4::tree::TerminalNode *> DOT();
     antlr4::tree::TerminalNode* DOT(size_t i);
 
@@ -195,7 +196,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *OBJECT();
     antlr4::tree::TerminalNode *COLON();
-    antlr4::tree::TerminalNode *TYPE();
+    TypeContext *type();
 
    
   };
@@ -208,7 +209,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *INTERFACE();
     antlr4::tree::TerminalNode *COLON();
-    antlr4::tree::TerminalNode *TYPE();
+    TypeContext *type();
 
    
   };
@@ -221,7 +222,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IMPLEMENTS();
     antlr4::tree::TerminalNode *COLON();
-    antlr4::tree::TerminalNode *TYPE();
+    TypeContext *type();
 
    
   };
@@ -237,7 +238,7 @@ public:
     antlr4::tree::TerminalNode *RPAREN();
     ParamListContext *paramList();
     antlr4::tree::TerminalNode *COLON();
-    antlr4::tree::TerminalNode *TYPE();
+    TypeContext *type();
 
    
   };
@@ -336,7 +337,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *COLON();
-    antlr4::tree::TerminalNode *TYPE();
+    TypeContext *type();
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
 
@@ -482,7 +483,7 @@ public:
     EnumDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *ENUM();
-    antlr4::tree::TerminalNode *TYPE();
+    TypeContext *type();
     antlr4::tree::TerminalNode *LBRACE();
     antlr4::tree::TerminalNode *RBRACE();
     std::vector<EnumFieldContext *> enumField();
@@ -514,7 +515,6 @@ public:
     ExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     UnaryExprContext *unaryExpr();
-    ArrayContext *array();
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
     std::vector<ExprContext *> expr();
@@ -557,6 +557,7 @@ public:
     FuncCallContext *funcCall();
     ConstructorContext *constructor();
     ConstantContext *constant();
+    ArrayContext *array();
     ArrayIndexContext *arrayIndex();
     SelectionContext *selection();
 
@@ -599,7 +600,7 @@ public:
   public:
     ConstructorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *TYPE();
+    TypeContext *type();
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
     FuncArgListContext *funcArgList();
@@ -710,6 +711,19 @@ public:
   };
 
   RangeContext* range();
+
+  class  TypeContext : public antlr4::ParserRuleContext {
+  public:
+    TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *TYPE();
+    antlr4::tree::TerminalNode *LBRACE();
+    antlr4::tree::TerminalNode *RBRACE();
+
+   
+  };
+
+  TypeContext* type();
 
 
   bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;

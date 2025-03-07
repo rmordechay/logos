@@ -21,23 +21,23 @@ importStatement:
     ;
 
 importPath:
-        TYPE (DOT TYPE)*
+        type (DOT type)*
     ;
 
 objectDeclaration:
-        OBJECT COLON TYPE
+        OBJECT COLON type
     ;
 
 interfaceDeclaration:
-        INTERFACE COLON TYPE
+        INTERFACE COLON type
     ;
 
 objectImplements:
-        IMPLEMENTS COLON TYPE
+        IMPLEMENTS COLON type
     ;
 
 funcSignature:
-        VARIABLE LPAREN paramList? RPAREN (COLON TYPE)?
+        VARIABLE LPAREN paramList? RPAREN (COLON type)?
     ;
 
 funcImplementation:
@@ -73,7 +73,7 @@ assignment:
     ;
 
 explicitVarDec:
-        VARIABLE COLON TYPE (EQUAL expr)?
+        VARIABLE COLON type (EQUAL expr)?
     ;
 
 implicitVarDec:
@@ -119,7 +119,7 @@ returnStatement:
     ;
 
 enumDeclaration:
-        ENUM TYPE LBRACE enumField* RBRACE
+        ENUM type LBRACE enumField* RBRACE
     ;
 
 enumField:
@@ -131,7 +131,6 @@ expr:
     |   left=expr op=(PLUS | MINUS) right=expr
     |   left=expr op=(DOUBLE_EQUAL | NOT_EQUAL | LANGLE | RANGLE | GE | LE) right=expr
     |   unaryExpr
-    |   array
     |   LPAREN left=expr RPAREN
     ;
 
@@ -144,6 +143,7 @@ unaryExpr:
     |   funcCall
     |   constructor
     |   constant
+    |   array
     |   arrayIndex
     |   selection
     ;
@@ -157,7 +157,7 @@ funcCall:
     ;
 
 constructor:
-        TYPE LPAREN funcArgList? RPAREN
+        type LPAREN funcArgList? RPAREN
     ;
 
 funcArg:
@@ -192,6 +192,10 @@ selectionElement:
 
 range:
         start=expr? DOUBLE_DOT end=expr
+    ;
+
+type:
+        TYPE (LBRACE RBRACE)?
     ;
 
 DOUBLE_EQUAL: '==';
@@ -247,7 +251,7 @@ INTEGER: [0-9]+;
 FLOAT: [0-9]+ '.' [0-9]+;
 BOOL: 'true' | 'false';
 CONST: [A-Z0-9_]+;
-TYPE: [A-Z] [a-zA-Z0-9_]*;
+TYPE: [A-Z][a-zA-Z0-9_]*;
 VARIABLE: [a-z_][a-zA-Z0-9_]*;
 STRING: '"' ( ~["\\] | '\\' . )* '"';
 LINE_COMMENT: '//' ~( '\r' | '\n' )* -> skip;

@@ -1,10 +1,7 @@
 #ifndef LOGOSOBJECT_H
 #define LOGOSOBJECT_H
-#include "types/LogosType.h"
 #include <map>
-
 #include <funcs/LogosMethodImpl.h>
-
 
 class LogosFuncImpl;
 class LogosField;

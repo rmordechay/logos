@@ -142,28 +142,8 @@ void SemaAnalyser::visitRangeLoop(const LogosRangeLoop* rangeLoop) {
     visitStmtBlock(rangeLoop->stmtBlock);
 }
 
-void SemaAnalyser::visitForeachLoop(LogosForeachLoop* foreachLoop) {
-    if (const auto variable = dynamic_cast<LogosVariable*>(foreachLoop->iterableExpr)) {
-        const auto symbol = logosStack.getSymbol(variable->name);
-        switch (symbol->type) {
-        case VAR_DEC: {
-            const auto array = dynamic_cast<LogosArray*>(symbol->varDec->expr);
-            if (!array) break;
-            foreachLoop->iterable = array;
-            foreachLoop->iterable->type = inferArrayType(foreachLoop->iterable);
-            foreachLoop->loopVar->type = foreachLoop->iterable->type;
-            foreachLoop->arrayIndex = new LogosArrayIndex(variable);
-            foreachLoop->arrayIndex->type = foreachLoop->iterable->type;
-            const auto constant = LOGOS_INT.getZeroValue();
-            foreachLoop->arrayIndex->exprs.emplace_back(constant);
-            const auto varDec = new LogosVarDec(variable->name, foreachLoop->arrayIndex->type, foreachLoop->arrayIndex);
-            logosStack.addLocalSymbol(foreachLoop->loopVar->name, LogosSymbol(VAR_DEC, varDec));
-            break;
-        }
-        default:
-            break;
-        }
-    }
+void SemaAnalyser::visitForeachLoop(const LogosForeachLoop* foreachLoop) {
+    logosStack.addLocalSymbol(foreachLoop->loopVar->name, LogosSymbol(LOOP_VAR, foreachLoop->loopVar));
     visitStmtBlock(foreachLoop->stmtBlock);
 }
 
@@ -173,8 +153,6 @@ void SemaAnalyser::visitExpr(LogosExpr* expr) {
         visitUnaryExpr(unaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LogosBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
-    } else if (const auto array = dynamic_cast<LogosArray*>(expr)) {
-        visitArray(array);
     }
 }
 
@@ -182,7 +160,7 @@ void SemaAnalyser::visitArray(LogosArray* array) {
     for (const auto& element : array->elements) {
         visitExpr(element);
     }
-    array->type = inferArrayType(array);
+    setArrayType(array);
 }
 
 void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
@@ -195,6 +173,8 @@ void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
         visitSelection(selection);
     } else if (const auto constant = dynamic_cast<LogosConstant*>(unaryExpr)) {
         visitConstant(constant);
+    } else if (const auto array = dynamic_cast<LogosArray*>(unaryExpr)) {
+        visitArray(array);
     } else if (const auto arrIndex = dynamic_cast<LogosArrayIndex*>(unaryExpr)) {
         visitArrayIndex(arrIndex);
     } else if (const auto var = dynamic_cast<LogosVariable*>(unaryExpr)) {
@@ -233,7 +213,7 @@ void SemaAnalyser::visitFuncCall(LogosFuncCall* funcCall) {
     } else if (symbol->type == METHOD_IMPL) {
         funcCall->type = symbol->methodImpl->type;
     }
-    for (const auto &arg : funcCall->args) {
+    for (const auto& arg : funcCall->args) {
         visitExpr(arg);
     }
 }
@@ -269,15 +249,16 @@ LogosType* SemaAnalyser::inferSelectionType(LogosSelection* selection) {
         resolveSelection(previousExpr, nextExpr);
         previousExpr = nextExpr;
     }
-    if (nextExpr) { // If true, nextExpr is the last element
+    if (nextExpr) {
+        // If true, nextExpr is the last element
         selection->type = nextExpr->type;
     }
     return nullptr;
 }
 
-LogosType* SemaAnalyser::inferArrayType(const LogosArray* array) {
+void SemaAnalyser::setArrayType(LogosArray* array) {
     // TODO add proper check for array type
-    return array->elements[0]->type;
+    array->type = array->elements[0]->type;
 }
 
 void SemaAnalyser::resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {

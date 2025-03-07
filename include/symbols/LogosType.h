@@ -1,8 +1,6 @@
 #ifndef LOGOSTYPE_H
 #define LOGOSTYPE_H
 
-#include <llvm/IR/IRBuilder.h>
-
 using namespace llvm;
 using namespace std;
 class LogosConstant;

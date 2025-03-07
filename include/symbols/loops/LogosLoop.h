@@ -9,6 +9,10 @@ class LogosLoopVar;
 
 class LogosLoop : public LogosStmt {
 public:
+    BasicBlock* const loopCondition = BasicBlock::Create(context, "loop_condition");
+    BasicBlock* const loopBody = BasicBlock::Create(context, "loop_body");
+    BasicBlock* const loopEnd = BasicBlock::Create(context, "loop_end");
+
     void iterationLoop(CodeGenMetadata* metadata) const;
     ~LogosLoop() override = default;
 };

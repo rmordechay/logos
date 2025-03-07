@@ -12,6 +12,7 @@ public:
 
     explicit LogosSelection(const vector<LogosUnaryExpr*>& exprs) : exprs(exprs) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
+    LogosExpr* getLastExpr() const;
     static Value* resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr);
     void setName(string name) override;
     string getName() override;

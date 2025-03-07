@@ -82,13 +82,16 @@ add_library(lib STATIC
     include/symbols/types/LogosFloat.h
     include/symbols/types/LogosInt.h
     include/symbols/types/LogosString.h
-    include/symbols/types/LogosType.h
+    include/symbols/LogosType.h
     include/symbols/types/LogosVoid.h
     src/symbols/loops/LogosLoopVar.cpp
     include/symbols/loops/LogosLoopVar.h
+    include/symbols/exprs/LogosIterable.h
+    include/symbols/exprs/LogosStringConst.h
+    src/symbols/exprs/LogosStringConst.cpp
 )
 
-add_executable(logos main.cpp src/LogosStack.cpp)
+add_executable(logos main.cpp)
 
 target_link_libraries(logos PRIVATE lib
     ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime.a

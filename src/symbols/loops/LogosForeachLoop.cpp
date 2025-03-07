@@ -1,59 +1,76 @@
 #include "loops/LogosForeachLoop.h"
 
+#include "exprs/LogosFuncCall.h"
+#include "exprs/LogosSelection.h"
+#include "exprs/LogosVariable.h"
 #include "loops/LogosLoopVar.h"
+#include "object/LogosField.h"
 
 #include <exprs/LogosArray.h>
-#include <exprs/LogosArrayIndex.h>
 #include <exprs/LogosConstant.h>
-#include <exprs/LogosVariable.h>
+#include <funcs/LogosBuiltinFunc.h>
 #include <types/LogosInt.h>
 
 Value* LogosForeachLoop::computeIRValue(CodeGenMetadata* metadata) {
+    setIterable(metadata);
+    if (!iterable) return nullptr;
     auto& builder = metadata->builder;
     const auto i32Type = builder.getInt32Ty();
 
-    const auto loopCondition = BasicBlock::Create(context, "loop_condition");
-    const auto loopBody = BasicBlock::Create(context, "loop_body");
-    const auto loopEnd = BasicBlock::Create(context, "loop_end");
-
-    // Init blocks
-    const auto iPtr = builder.CreateAlloca(i32Type);
-    const auto untilPtr = builder.CreateAlloca(i32Type);
-    builder.CreateStore(builder.getInt32(0), iPtr);
-    builder.CreateStore(builder.getInt32(3), untilPtr);
+    const auto iterableSize = iterable->size();
+    const auto irStartRange = metadata->builder.getInt32(0);;
+    const auto irEndRange = metadata->builder.getInt32(iterableSize);;
+    const auto i = builder.CreateAlloca(i32Type);
+    builder.CreateStore(irStartRange, i);
     builder.CreateBr(loopCondition);
 
-    // Loop condition
     startBlock(metadata, loopCondition);
-    const auto i = builder.CreateLoad(i32Type, iPtr);
-    const auto until = builder.CreateLoad(i32Type, untilPtr);
-    const auto condition = builder.CreateICmpSLT(i, until);
+    const auto currentVal = builder.CreateLoad(i32Type, i);
+    const auto condition = builder.CreateICmpSLT(currentVal, irEndRange);
+    loopVar->setIRValue(currentVal);
     builder.CreateCondBr(condition, loopBody, loopEnd);
 
-    // Loop body
     startBlock(metadata, loopBody);
     metadata->logosStack.enterScope();
-
-    const auto iterableType = iterable->type->getIRType();
-    const auto iterableValue = iterable->writeIRValue(metadata);
-
-    const auto elementPtr = builder.CreateGEP(iterableType, iterableValue, i);
-    const auto element = builder.CreateLoad(elementPtr->getType(), elementPtr);
-
-    loopVar->setIRValue(element);
     metadata->logosStack.addLocalSymbol(loopVar->name, LogosSymbol(LOOP_VAR, loopVar));
     stmtBlock->writeIRValue(metadata);
 
-    // Increment loop variable
-    const auto inc = builder.CreateAdd(i, builder.getInt32(1));
-    builder.CreateStore(inc, iPtr);
-    builder.CreateBr(loopCondition);
-
-    // Loop end
-    startBlock(metadata, loopEnd);
-    metadata->logosStack.exitScope();
-
     return nullptr;
+}
+
+void LogosForeachLoop::setIterable(CodeGenMetadata* metadata, const LogosVariable* const variable) {
+    const auto symbol = metadata->logosStack.getSymbol(variable->name);
+    switch (symbol->type) {
+    case VAR_DEC: {
+        iterable = dynamic_cast<LogosIterable*>(symbol->varDec->expr);
+        return;
+    }
+    case LOOP_VAR: {
+        iterable = dynamic_cast<LogosIterable*>(symbol->loopVar->expr);
+        return;
+    }
+    case FIELD: {
+        iterable = dynamic_cast<LogosIterable*>(symbol->field->expr);
+        return;
+    }
+    case SELECTION: {
+        iterable = dynamic_cast<LogosIterable*>(symbol->selection->getLastExpr());
+        return;
+    }
+    default:
+        return;
+    }
+}
+
+void LogosForeachLoop::setIterable(CodeGenMetadata* metadata) {
+    if (const auto var = dynamic_cast<LogosVariable*>(iterableExpr)) {
+        setIterable(metadata, var);
+    } else if (const auto funcCall = dynamic_cast<LogosFuncCall*>(iterableExpr)) {
+        setIterable(metadata, funcCall);
+    }
+}
+
+void LogosForeachLoop::setIterable(CodeGenMetadata* metadata, LogosFuncCall* variable) {
 }
 
 LogosForeachLoop::~LogosForeachLoop() {
@@ -63,13 +80,7 @@ LogosForeachLoop::~LogosForeachLoop() {
     if (iterableExpr) {
         delete iterableExpr;
     }
-    if (iterable) {
-        delete iterable;
-    }
     if (stmtBlock) {
         delete stmtBlock;
-    }
-    if (arrayIndex) {
-        delete arrayIndex;
     }
 }

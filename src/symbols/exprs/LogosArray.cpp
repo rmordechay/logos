@@ -1,7 +1,5 @@
 #include "exprs//LogosArray.h"
 
-#include <llvm/IR/Module.h>
-
 Value* LogosArray::computeIRValue(CodeGenMetadata* metadata) {
     vector<Constant*> arrValues;
     for (const auto & element : elements) {
@@ -10,4 +8,8 @@ Value* LogosArray::computeIRValue(CodeGenMetadata* metadata) {
     const auto arrType = ArrayType::get(type->getIRType(), elements.size());
     const auto array = ConstantArray::get(arrType, arrValues);
     return new GlobalVariable(*metadata->currentModule, arrType, true, GlobalValue::PrivateLinkage, array);
+}
+
+size_t LogosArray::size() {
+    return elements.size();
 }

@@ -11,8 +11,8 @@
 #include <ranges>
 
 void Application::runLogos() {
-    const map<string, LogosFile*> files = parseFiles();
-    const map<string, LogosSymbol> globalSymbols = collectGlobals(files);
+    const auto files = parseFiles();
+    const auto globalSymbols = getGlobalsSymbols(files);
     SemaAnalyser::analyse(files, globalSymbols);
     const auto codeGenerator = CodeGenerator(mainFile);
     codeGenerator.generateCode(globalSymbols);
@@ -47,7 +47,7 @@ void Application::parseTree(const string& path, map<string, LogosFile*>& files, 
     }
 }
 
-map<string, LogosSymbol> Application::collectGlobals(const map<string, LogosFile*>& files) {
+map<string, LogosSymbol> Application::getGlobalsSymbols(const map<string, LogosFile*>& files) {
     map<string, LogosSymbol> globalSymbols;
     globalSymbols["print"] = LogosSymbol(BUILTIN_FUNC, new LogosPrint());
     for (const auto& [_, file] : files) {

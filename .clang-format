@@ -6,11 +6,9 @@ AlignConsecutiveDeclarations: false
 AlignOperands: false
 AlignTrailingComments: false
 AlwaysBreakTemplateDeclarations: Yes
+BreakConstructorInitializersBeforeComma: true
 BreakBeforeBraces: Custom
-BreakConstructorInitializers: AfterColon
-BreakConstructorInitializersBeforeComma: false
 ColumnLimit: 120
-ConstructorInitializerAllOnOneLineOrOnePerLine: true
 IndentCaseBlocks: true
 IndentWidth: 4
 InsertNewlineAtEOF: true
@@ -27,4 +25,15 @@ SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
 TabWidth: 4
 AllowShortIfStatementsOnASingleLine: true
-AllowShortFunctionsOnASingleLine: None
+AllowShortFunctionsOnASingleLine: Empty
+BraceWrapping:
+  AfterFunction: false
+  AfterEnum: false
+  AfterCaseLabel: false
+  AfterStruct: false
+  AfterObjCDeclaration: false
+  AfterClass: false
+  AfterControlStatement: false
+  AfterExternBlock: false
+  AfterNamespace: false
+  AfterUnion: false

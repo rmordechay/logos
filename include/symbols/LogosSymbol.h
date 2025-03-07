@@ -22,13 +22,13 @@ class LogosObject;
 
 enum LogosSymbolType {
     VAR_DEC,
+    LOOP_VAR,
     OBJECT,
     FIELD,
     BUILTIN_FUNC,
     FUNC_IMPL,
     METHOD_IMPL,
     SELECTION,
-    LOOP_VAR,
 };
 
 struct LogosSymbol {
