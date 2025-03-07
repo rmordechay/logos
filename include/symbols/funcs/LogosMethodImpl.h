@@ -4,13 +4,12 @@
 
 class LogosMethodImpl final : public LogosFunc {
 public:
-    string objName;
-    string combinedName = objName + "_" + name;
+    LogosObject* obj;
+    string combinedName;
 
-    LogosMethodImpl(const string& name, LogosType* funcType, const string& objName) : LogosFunc(name, funcType), objName(objName) {}
+    LogosMethodImpl(const string& name, LogosType* funcType, LogosObject* obj) : LogosFunc(name, funcType), obj(obj) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
-    Value* callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
-    Value* callFunc(CodeGenMetadata* metadata);
+    Value* call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
     Function* getIRFunc(CodeGenMetadata* metadata);
     ~LogosMethodImpl() override = default;
 };

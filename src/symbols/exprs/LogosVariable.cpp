@@ -34,10 +34,6 @@ Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
     }
 }
 
-void LogosVariable::setName(const string name) {
-    this->name = name;
-}
-
 string LogosVariable::getName() {
     return name;
 }

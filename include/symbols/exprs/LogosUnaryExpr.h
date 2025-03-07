@@ -9,12 +9,10 @@ class LogosUnaryExpr: public LogosExpr {
 public:
     explicit LogosUnaryExpr() : LogosExpr(nullptr) {}
     explicit LogosUnaryExpr(LogosType* type) : LogosExpr(type) {}
-    virtual void setName(string name);
     virtual string getName();
     ~LogosUnaryExpr() override = default;
 };
 
-inline void LogosUnaryExpr::setName(string name) {}
 inline string LogosUnaryExpr::getName() { return ""; }
 
 #endif //LOGOSUNARYEXPR_H

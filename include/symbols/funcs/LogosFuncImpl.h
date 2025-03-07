@@ -8,8 +8,8 @@ public:
 
     Function* getIRFunc(CodeGenMetadata* metadata);
     Value* computeIRValue(CodeGenMetadata* metadata) override;
-    Value* callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
-    Value* callFunc(CodeGenMetadata* metadata);
+    Value* call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
+    Value* call(CodeGenMetadata* metadata);
     ~LogosFuncImpl() override = default;
 };
 

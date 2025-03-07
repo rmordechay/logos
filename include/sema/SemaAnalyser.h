@@ -51,8 +51,7 @@ public:
     void visitArrayIndex(LogosArrayIndex* arrayIndex);
     void visitConstant(const LogosConstant* constant);
     void setUnsuccessful();
-    void resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr);
-    LogosType* inferSelectionType(LogosSelection* selection);
+    void resolveSelection(LogosUnaryExpr* firstExpr, LogosUnaryExpr* secondExpr);
     void setArrayType(LogosArray* array);
     void setIterable(LogosForeachLoop* foreachLoop, const LogosVariable* variable);
     void setIterable(LogosForeachLoop* foreachLoop);

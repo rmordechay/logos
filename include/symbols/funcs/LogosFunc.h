@@ -20,11 +20,11 @@ public:
     vector<Type*> IRParamsTypes;
     Function* IRFunc = nullptr;
     LogosStmtBlock* stmtBlock = nullptr;
-
     BasicBlock* const entryBlock = BasicBlock::Create(context, "entry");
 
     explicit LogosFunc(const string& name, LogosType* funcType) : name(name), type(funcType) {}
-    virtual Value* callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) = 0;
+    virtual Value* call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) = 0;
+    void setArgs(CodeGenMetadata* metadata, Function::arg_iterator& args) const;
     ~LogosFunc() override;
 };
 
@@ -33,6 +33,14 @@ inline LogosFunc::~LogosFunc() {
         delete param;
     }
     delete stmtBlock;
+}
+
+inline void LogosFunc::setArgs(CodeGenMetadata* metadata, Function::arg_iterator& args) const {
+    for (const auto& param : params) {
+        param->setIRValue(args);
+        args++->setName(param->name);
+        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol(PARAM, param));
+    }
 }
 
 #endif //LOGOSFUNC_H

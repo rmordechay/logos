@@ -4,6 +4,7 @@
 #include <object/LogosObject.h>
 
 Value* LogosMethodImpl::computeIRValue(CodeGenMetadata* metadata) {
+    combinedName = obj->name() + "_" + name+ "_" + type->name();
     metadata->logosStack.enterScope();
     IRFunc = getIRFunc(metadata);
     metadata->logosStack.currentFunc = IRFunc;
@@ -11,10 +12,10 @@ Value* LogosMethodImpl::computeIRValue(CodeGenMetadata* metadata) {
     startBlock(metadata, entryBlock);
     stmtBlock->writeIRValue(metadata);
     metadata->logosStack.exitScope();
-    return IRFunc;
+    return nullptr;
 }
 
-Value* LogosMethodImpl::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
+Value* LogosMethodImpl::call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
     vector<Value*> argsValues;
     for (const auto& arg : args) {
         const auto argValue = arg->writeIRValue(metadata);
@@ -23,27 +24,19 @@ Value* LogosMethodImpl::callFunc(CodeGenMetadata* metadata, const vector<LogosEx
     return metadata->builder.CreateCall(IRFunc, argsValues);
 }
 
-Value* LogosMethodImpl::callFunc(CodeGenMetadata* metadata) {
-    return callFunc(metadata, vector<LogosExpr*>());
-}
-
 Function* LogosMethodImpl::getIRFunc(CodeGenMetadata* metadata) {
     for (const auto& param : params) {
         IRParamsTypes.emplace_back(param->type->getIRType());
     }
-    const auto obj = metadata->logosStack.getSymbol(objName)->object;
     IRParamsTypes.emplace_back(obj->getIRType()->getPointerTo());
+    metadata->logosStack.addLocalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
 
     const auto rt = FunctionType::get(type->getIRType(), IRParamsTypes, false);
     const auto method = Function::Create(rt, Function::ExternalLinkage, combinedName, metadata->currentModule);
+    if (params.size() == 1) return method;
 
     auto args = method->arg_begin();
-    metadata->logosStack.addLocalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
-    for (const auto& param : params) {
-        param->setIRValue(args);
-        args++->setName(param->name);
-        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol(PARAM, param));
-    }
+    setArgs(metadata, args);
     args->setName(LOGOS_THIS);
     return method;
 }

@@ -1,18 +1,14 @@
 #include "exprs/LogosSelection.h"
-
 #include "LogosUtils.h"
 #include "exprs/LogosConstant.h"
 #include "exprs/LogosFuncCall.h"
 #include <LogosStack.h>
-#include <object/LogosField.h>
 
 Value* LogosSelection::computeIRValue(CodeGenMetadata* metadata) {
     Value* value = nullptr;
-    for (size_t i = 0; i < exprs.size() - 1; ++i) {
-        const auto previousExpr = exprs[i];
-        const auto nextExpr = exprs[i + 1];
-        value = resolveSelection(metadata, previousExpr, nextExpr);
-    }
+    const auto firstExpr = exprs[0];
+    const auto secondExpr = exprs[1];
+    value = resolveSelection(metadata, firstExpr, secondExpr);
     return value;
 }
 
@@ -20,36 +16,29 @@ LogosExpr* LogosSelection::getLastExpr() const {
     return exprs[exprs.size() - 1];
 }
 
-Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
-    const auto symbol = metadata->logosStack.getSymbol(previousExpr->getName());
+Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* firstExpr, LogosUnaryExpr* secondExpr) {
+    const auto symbol = metadata->logosStack.getSymbol(firstExpr->getName());
     switch (symbol->type) {
-    // case INSTANCE: {
-    //     const auto& exprName = nextExpr->getName();
-    //     const auto instance = symbol->instance;
-    //     const auto obj = instance->obj;
-    //     const auto objType = instance->obj->getIRType();
-    //     if (obj->methods.find(exprName) != obj->methods.end()) {
-    //         const auto func = obj->methods[exprName];
-    //         return func->callFunc(metadata, {previousExpr});
-    //     }
-    //     if (obj->fields.find(exprName) != obj->fields.end()) {
-    //         const auto field = obj->fields[exprName];
-    //         const auto instancePtr = instance->writeIRValue(metadata);
-    //         const auto gep = metadata->builder.CreateStructGEP(objType, instancePtr, field->fieldPosition);
-    //         return metadata->builder.CreateLoad(field->inferredType->getIRType(), gep);
-    //     }
-    //     break;
-    // }
-    // case FUNC_CALL: {
-    //     return symbol->funcCall->writeIRValue(metadata);
-    // }
+    case VAR_DEC: {
+        if (const auto instance = dynamic_cast<LogosInstance*>(symbol->varDec->expr)) {
+            resolveInstance(metadata, instance, secondExpr);
+        }
+        break;
+    }
     default:
         break;
     }
     return nullptr;
 }
 
-void LogosSelection::setName(string name) {}
+void LogosSelection::resolveInstance(CodeGenMetadata* metadata, const LogosInstance* instance, LogosExpr* expr) {
+    auto methods = instance->obj->methods;
+    if (const auto funcCall = dynamic_cast<LogosFuncCall*>(expr)) {
+        const auto funcCallName = funcCall->name;
+        const auto method = methods[funcCallName];
+        method->call(metadata, funcCall->args);
+    }
+}
 
 string LogosSelection::getName() {
     return "";

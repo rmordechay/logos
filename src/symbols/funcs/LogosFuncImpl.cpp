@@ -10,10 +10,10 @@ Value* LogosFuncImpl::computeIRValue(CodeGenMetadata* metadata) {
     startBlock(metadata, entryBlock);
     stmtBlock->writeIRValue(metadata);
     metadata->logosStack.exitScope();
-    return IRFunc;
+    return nullptr;
 }
 
-Value* LogosFuncImpl::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
+Value* LogosFuncImpl::call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
     vector<Value*> paramValues;
     for (const auto& arg : args) {
         const auto argValue = arg->writeIRValue(metadata);
@@ -22,8 +22,8 @@ Value* LogosFuncImpl::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr
     return metadata->builder.CreateCall(IRFunc, paramValues);
 }
 
-Value* LogosFuncImpl::callFunc(CodeGenMetadata* metadata) {
-    return callFunc(metadata, vector<LogosExpr*>());
+Value* LogosFuncImpl::call(CodeGenMetadata* metadata) {
+    return call(metadata, vector<LogosExpr*>());
 }
 
 Function* LogosFuncImpl::getIRFunc(CodeGenMetadata* metadata) {
@@ -36,10 +36,6 @@ Function* LogosFuncImpl::getIRFunc(CodeGenMetadata* metadata) {
     if (params.empty()) return func;
 
     auto args = func->arg_begin();
-    for (const auto& param : params) {
-        param->setIRValue(args);
-        args++->setName(param->name);
-        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol(PARAM, param));
-    }
+    setArgs(metadata, args);
     return func;
 }

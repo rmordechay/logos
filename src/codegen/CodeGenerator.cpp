@@ -29,7 +29,7 @@ void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSym
     writeIRToFile(metadata.currentModule, LOGOS_MAIN_FILE);
 }
 
-void CodeGenerator::generateObjModule(LogosObject* obj, LogosGlobals globalSymbols) {
+void CodeGenerator::generateObjectModule(LogosObject* obj, LogosGlobals globalSymbols) {
     const auto objName = obj->name();
     const auto module = createModule(objName);
     auto metadata = CodeGenMetadata{.currentModule = module};
@@ -39,8 +39,8 @@ void CodeGenerator::generateObjModule(LogosObject* obj, LogosGlobals globalSymbo
     for (const auto& [name, field] : obj->fields) {
         metadata.logosStack.addGlobalSymbol(name, LogosSymbol(FIELD, field));
     }
-    for (const auto& [_, val] : obj->methods) {
-        val->writeIRValue(&metadata);
+    for (const auto& [_, method] : obj->methods) {
+        method->writeIRValue(&metadata);
     }
 
     writeIRToFile(metadata.currentModule, objName);

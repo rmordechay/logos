@@ -12,7 +12,6 @@ public:
 
     explicit LogosFuncCall(const string& name) : name(name) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
-    void setName(string name) override;
     string getName() override;
     ~LogosFuncCall() override;
 };

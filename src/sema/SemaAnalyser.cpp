@@ -197,12 +197,13 @@ void SemaAnalyser::visitBinaryExpr(const LogosBinaryExpr* binaryExpr) {
 }
 
 void SemaAnalyser::visitSelection(LogosSelection* selection) {
-    if (!selection) return;
-    selection->type = inferSelectionType(selection);
+    const auto firstExpr = selection->exprs[0];
+    const auto secondExpr = selection->exprs[1];
+    resolveSelection(firstExpr, secondExpr);;
+    selection->type = secondExpr->type;
 }
 
 void SemaAnalyser::visitInstance(LogosInstance* instance) {
-    if (!instance) return;
     const auto obj = logosStack.getSymbol(instance->name)->object;
     instance->type = obj;
     instance->obj = obj;
@@ -245,24 +246,20 @@ void SemaAnalyser::visitConstant(const LogosConstant* constant) {
 
 }
 
-void SemaAnalyser::setUnsuccessful() {
-    unique_lock lock(mtx);
-    successful = false;
-}
-
-LogosType* SemaAnalyser::inferSelectionType(LogosSelection* selection) {
-    auto previousExpr = selection->exprs[0];
-    LogosUnaryExpr* nextExpr = nullptr;
-    for (int i = 1; i < selection->exprs.size(); ++i) {
-        nextExpr = selection->exprs[i];
-        resolveSelection(previousExpr, nextExpr);
-        previousExpr = nextExpr;
+void SemaAnalyser::resolveSelection(LogosUnaryExpr* firstExpr, LogosUnaryExpr* secondExpr) {
+    const auto symbol = logosStack.getSymbol(firstExpr->getName());
+    switch (symbol->type) {
+    case VAR_DEC: {
+        if (const auto instance = dynamic_cast<LogosInstance*>(symbol->varDec->expr)) {
+            const auto obj = instance->obj;
+            const auto func = obj->methods[secondExpr->getName()];
+            secondExpr->type = func->type;
+        }
+        break;
     }
-    if (nextExpr) {
-        // If true, nextExpr is the last element
-        selection->type = nextExpr->type;
+    default:
+        break;
     }
-    return nullptr;
 }
 
 void SemaAnalyser::setArrayType(LogosArray* array) {
@@ -302,18 +299,7 @@ void SemaAnalyser::setIterable(LogosForeachLoop* foreachLoop, const LogosVariabl
     }
 }
 
-void SemaAnalyser::resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {
-    const auto symbol = logosStack.getSymbol(previousExpr->getName());
-    switch (symbol->type) {
-    case VAR_DEC: {
-        if (const auto instance = dynamic_cast<LogosInstance*>(symbol->varDec->expr)) {
-            const auto obj = instance->obj;
-            const auto func = obj->methods[nextExpr->getName()];
-            nextExpr->type = func->type;
-        }
-        break;
-    }
-    default:
-        break;
-    }
+void SemaAnalyser::setUnsuccessful() {
+    unique_lock lock(mtx);
+    successful = false;
 }

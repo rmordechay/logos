@@ -23,11 +23,6 @@ Value* LogosArrayIndex::computeIRValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
 
-
-void LogosArrayIndex::setName(const string name) {
-    baseExpr->setName(name);
-}
-
 string LogosArrayIndex::getName() {
     return baseExpr->getName();
 }

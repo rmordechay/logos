@@ -2,6 +2,7 @@
 
 #include "exprs/LogosBinaryExpr.h"
 #include "exprs/LogosConstant.h"
+#include "exprs/LogosInstance.h"
 #include "exprs/LogosOperator.h"
 #include "exprs/LogosSelection.h"
 #include "exprs/LogosStringConst.h"
@@ -69,7 +70,7 @@ LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
     }
     for (const auto& func : ctx->funcImplementation()) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
-        const auto method = getMethod(func, objName);
+        const auto method = getMethod(func, obj);
         obj->methods[funcName] = method;
     }
     return obj;
@@ -99,11 +100,11 @@ LogosFuncImpl* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* 
     return funcImpl;
 }
 
-LogosMethodImpl* AntlerConverter::getMethod(LogosParser::FuncImplementationContext* ctx, const string& objName) {
+LogosMethodImpl* AntlerConverter::getMethod(LogosParser::FuncImplementationContext* ctx, LogosObject* obj) {
     const auto funcSignature = ctx->funcSignature();
     const auto funcName = funcSignature->VARIABLE()->getText();
     const auto type = getType(funcSignature->type()->TYPE());
-    const auto method = new LogosMethodImpl(funcName, type, objName);
+    const auto method = new LogosMethodImpl(funcName, type, obj);
 
     const auto params = funcSignature->paramList();
     if (params) {

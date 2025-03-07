@@ -25,7 +25,7 @@ public:
     LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
     LogosField *getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, size_t position);
     LogosFuncImpl* getFunc(LogosParser::FuncImplementationContext* ctx);
-    LogosMethodImpl* getMethod(LogosParser::FuncImplementationContext* ctx, const string& objName);
+    LogosMethodImpl* getMethod(LogosParser::FuncImplementationContext* ctx, LogosObject* obj);
     LogosStmt* getStmt(LogosParser::StatementContext* ctx);
     LogosAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     LogosStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);

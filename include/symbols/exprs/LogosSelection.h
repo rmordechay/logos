@@ -1,7 +1,5 @@
 #ifndef SELECTION_H
 #define SELECTION_H
-#include "LogosExpr.h"
-#include "exprs/LogosInstance.h"
 #include "object/LogosObject.h"
 
 class LogosUnaryExpr;
@@ -13,8 +11,8 @@ public:
     explicit LogosSelection(const vector<LogosUnaryExpr*>& exprs) : exprs(exprs) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     LogosExpr* getLastExpr() const;
-    static Value* resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr);
-    void setName(string name) override;
+    static Value* resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* firstExpr, LogosUnaryExpr* secondExpr);
+    static void resolveInstance(CodeGenMetadata* metadata, const LogosInstance* instance, LogosExpr* expr);
     string getName() override;
     ~LogosSelection() override;
 };
