@@ -16,20 +16,13 @@ void CodeGenerator::generateCode(const map<string, LogosSymbol>& globalSymbols) 
 }
 
 void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSymbols) const {
-    const auto module = new Module(LOGOS_MAIN_FILE, context);
-    module->setTargetTriple(targetTriple);
-    module->setDataLayout(targetMachine->createDataLayout());
-    modules[LOGOS_MAIN_FILE] = module;
-
+    const auto module = createModule(LOGOS_MAIN_FILE);
     auto metadata = CodeGenMetadata{.currentModule = module};
     metadata.logosStack.globalSymbols = globalSymbols;
 
-    // Funcs
     for (const auto& func : mainFile->funcs) {
         func->writeIRValue(&metadata);
     }
-
-    // Main func
     mainFile->mainFunc->writeIRValue(&metadata);
 
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
@@ -38,29 +31,28 @@ void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSym
 
 void CodeGenerator::generateObjModule(LogosObject* obj, LogosGlobals globalSymbols) {
     const auto objName = obj->name();
-    const auto module = new Module(objName, context);
-    module->setTargetTriple(targetTriple);
-    module->setDataLayout(targetMachine->createDataLayout());
-    modules[objName] = module;
-
+    const auto module = createModule(objName);
     auto metadata = CodeGenMetadata{.currentModule = module};
     metadata.logosStack.globalSymbols = globalSymbols;
 
-    // Init object
     obj->getIRType();
-
-    // Fields
     for (const auto& [name, field] : obj->fields) {
         metadata.logosStack.addGlobalSymbol(name, LogosSymbol(FIELD, field));
     }
-
-    // Methods
     for (const auto& [_, val] : obj->methods) {
         val->writeIRValue(&metadata);
     }
 
     writeIRToFile(metadata.currentModule, objName);
     std::cout << "\n-----\n\n";
+}
+
+Module* CodeGenerator::createModule(const string& objName) {
+    const auto module = new Module(objName, context);
+    module->setTargetTriple(targetTriple);
+    module->setDataLayout(targetMachine->createDataLayout());
+    modules[objName] = module;
+    return module;
 }
 
 void CodeGenerator::writeIRToFile(const Module* module, const string& name) {

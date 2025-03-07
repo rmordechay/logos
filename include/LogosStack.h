@@ -68,6 +68,4 @@ inline void LogosStack::reset() {
     }
 }
 
-
-
 #endif //LOGOSSTACK_H

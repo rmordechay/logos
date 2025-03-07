@@ -28,23 +28,22 @@ Value* LogosMethodImpl::callFunc(CodeGenMetadata* metadata) {
 }
 
 Function* LogosMethodImpl::getIRFunc(CodeGenMetadata* metadata) {
-    const auto obj = metadata->logosStack.getSymbol(parentName)->object;
-    IRParamsTypes.emplace_back(obj->getIRType()->getPointerTo());
     for (const auto& param : params) {
         IRParamsTypes.emplace_back(param->type->getIRType());
     }
+    const auto obj = metadata->logosStack.getSymbol(objName)->object;
+    IRParamsTypes.emplace_back(obj->getIRType()->getPointerTo());
 
     const auto rt = FunctionType::get(type->getIRType(), IRParamsTypes, false);
     const auto method = Function::Create(rt, Function::ExternalLinkage, combinedName, metadata->currentModule);
 
     auto args = method->arg_begin();
-    args++->setName(LOGOS_THIS);
     metadata->logosStack.addLocalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
     for (const auto& param : params) {
         param->setIRValue(args);
         args++->setName(param->name);
         metadata->logosStack.addLocalSymbol(param->name, LogosSymbol(PARAM, param));
     }
-
+    args->setName(LOGOS_THIS);
     return method;
 }

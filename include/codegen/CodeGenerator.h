@@ -20,6 +20,7 @@ public:
 
     void generateCode(const map<string, LogosSymbol>& globalSymbols) const;
     void generateMainModule(const map<string, LogosSymbol>& globalSymbols) const;
+    static Module* createModule(const string& objName);
     static void generateObjModule(LogosObject* obj, const map<string, LogosSymbol>& globalSymbols);
     static void writeIRToFile(const Module* module, const string& name);
     static void initIR();

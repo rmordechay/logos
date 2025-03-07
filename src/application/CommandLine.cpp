@@ -42,7 +42,7 @@ void CommandLine::parseLongFlag(const string& arg) {
 }
 
 void CommandLine::runCommand() const {
-    Application project("/Users/r.mordechay/Desktop/Programming/logos/project/src");
+    Application project("../project/src");
     project.runLogos();
 }
 
