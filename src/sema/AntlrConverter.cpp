@@ -202,10 +202,10 @@ LogosLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* 
     LogosLoop* loopStmt = nullptr;
     const auto stmts = getStmtBlock(ctx->statementsBlock());
     if (const auto iterableExpr = ctx->iterableExpr) {
-        const auto loopVarName = ctx->exprList()->expr()[0]->getText();
-        const auto loopVar = new LogosLoopVar(loopVarName);
-        const auto expr = getExpr(iterableExpr);
-        loopStmt = new LogosForeachLoop(loopVar, expr, stmts);
+        const auto variable = new LogosVariable(ctx->exprList()->expr()[0]->getText());
+        const auto loopVar = new LogosLoopVar(variable->name);
+        loopVar->element = new LogosArrayIndex(variable, {LOGOS_INT.getZeroValue()});
+        loopStmt = new LogosForeachLoop(loopVar, getExpr(iterableExpr), stmts);
     } else if (const auto range = ctx->iterableRange) {
         const auto loopVarName = ctx->VARIABLE()->getText();
         const auto loopVar = new LogosLoopVar(loopVarName, &LOGOS_INT);
@@ -342,10 +342,11 @@ LogosArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* 
         baseExpr = getFuncCall(ctx->funcCall());
     }
 
-    const auto logosArrayIndex = new LogosArrayIndex(baseExpr);
+    vector<LogosExpr*> indexExprs;
     for (const auto& expr : ctx->expr()) {
-        logosArrayIndex->exprs.emplace_back(getExpr(expr));
+        indexExprs.emplace_back(getExpr(expr));
     }
+    const auto logosArrayIndex = new LogosArrayIndex(baseExpr, indexExprs);
     return logosArrayIndex;
 }
 

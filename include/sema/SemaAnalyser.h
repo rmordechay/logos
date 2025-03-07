@@ -38,7 +38,7 @@ public:
     void visitIfStmt(const LogosIf* ifStmt);
     void visitLoopStmt(LogosLoop* loopStmt);
     void visitRangeLoop(const LogosRangeLoop* rangeLoop);
-    void visitForeachLoop(const LogosForeachLoop* foreachLoop);
+    void visitForeachLoop(LogosForeachLoop* foreachLoop);
     void visitExpr(LogosExpr* expr);
     void visitArray(LogosArray* array);
     void visitUnaryExpr(LogosUnaryExpr* unaryExpr);
@@ -53,6 +53,8 @@ public:
     void resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr);
     LogosType* inferSelectionType(LogosSelection* selection);
     void setArrayType(LogosArray* array);
+    void setIterable(LogosForeachLoop* foreachLoop, const LogosVariable* variable);
+    void setIterable(LogosForeachLoop* foreachLoop);
     ~SemaAnalyser() = default;
 };
 

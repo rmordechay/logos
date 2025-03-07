@@ -2,6 +2,7 @@
 #include "LogosErrors.h"
 #include "exprs/LogosBinaryExpr.h"
 #include "loops/LogosLoopVar.h"
+#include "object/LogosField.h"
 
 #include <ThreadPool.h>
 #include <exprs/LogosArray.h>
@@ -142,8 +143,14 @@ void SemaAnalyser::visitRangeLoop(const LogosRangeLoop* rangeLoop) {
     visitStmtBlock(rangeLoop->stmtBlock);
 }
 
-void SemaAnalyser::visitForeachLoop(const LogosForeachLoop* foreachLoop) {
+void SemaAnalyser::visitForeachLoop(LogosForeachLoop* foreachLoop) {
+    visitExpr(foreachLoop->iterableExpr);
+    setIterable(foreachLoop);
+
+    foreachLoop->loopVar->type = foreachLoop->iterableExpr->type;
+    foreachLoop->loopVar->element->type = foreachLoop->loopVar->type;
     logosStack.addLocalSymbol(foreachLoop->loopVar->name, LogosSymbol(LOOP_VAR, foreachLoop->loopVar));
+
     visitStmtBlock(foreachLoop->stmtBlock);
 }
 
@@ -259,6 +266,38 @@ LogosType* SemaAnalyser::inferSelectionType(LogosSelection* selection) {
 void SemaAnalyser::setArrayType(LogosArray* array) {
     // TODO add proper check for array type
     array->type = array->elements[0]->type;
+}
+
+void SemaAnalyser::setIterable(LogosForeachLoop* foreachLoop) {
+    if (const auto variable = dynamic_cast<LogosVariable*>(foreachLoop->iterableExpr)) {
+        setIterable(foreachLoop, variable);
+    } else if (const auto array = dynamic_cast<LogosArray*>(foreachLoop->iterableExpr)) {
+        foreachLoop->iterable = array;
+    }
+}
+
+void SemaAnalyser::setIterable(LogosForeachLoop* foreachLoop, const LogosVariable* const variable) {
+    const auto symbol = logosStack.getSymbol(variable->name);
+    switch (symbol->type) {
+    case VAR_DEC: {
+        foreachLoop->iterable = dynamic_cast<LogosIterable*>(symbol->varDec->expr);
+        return;
+    }
+    case LOOP_VAR: {
+        foreachLoop->iterable = dynamic_cast<LogosIterable*>(symbol->loopVar->element);
+        return;
+    }
+    case FIELD: {
+        foreachLoop->iterable = dynamic_cast<LogosIterable*>(symbol->field->expr);
+        return;
+    }
+    case SELECTION: {
+        foreachLoop->iterable = dynamic_cast<LogosIterable*>(symbol->selection->getLastExpr());
+        return;
+    }
+    default:
+        return;
+    }
 }
 
 void SemaAnalyser::resolveSelection(LogosUnaryExpr* previousExpr, LogosUnaryExpr* nextExpr) {

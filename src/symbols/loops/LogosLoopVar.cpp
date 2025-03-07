@@ -1,5 +1,7 @@
 #include "loops/LogosLoopVar.h"
 #include "LogosType.h"
+#include "exprs/LogosArrayIndex.h"
+
 #include <exprs/LogosExpr.h>
 
 Value* LogosLoopVar::computeIRValue(CodeGenMetadata* metadata) {
@@ -8,5 +10,5 @@ Value* LogosLoopVar::computeIRValue(CodeGenMetadata* metadata) {
 
 LogosLoopVar::~LogosLoopVar() {
     delete type;
-    delete expr;
+    delete element;
 }

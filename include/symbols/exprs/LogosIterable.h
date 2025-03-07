@@ -1,6 +1,8 @@
 #ifndef LOGOSITERABLE_H
 #define LOGOSITERABLE_H
 
+#include <cstddef>
+
 class LogosIterable {
 public:
     virtual size_t size() = 0;

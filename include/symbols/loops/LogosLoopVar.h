@@ -8,7 +8,7 @@ class LogosLoopVar final: public LogosValue {
 public:
     string name;
     LogosType* type = nullptr;
-    LogosExpr* expr = nullptr;
+    LogosArrayIndex* element = nullptr;
 
     explicit LogosLoopVar(const string& name) : name(name) {}
     explicit LogosLoopVar(const string& name, LogosType* type) : name(name), type(type) {}

@@ -13,9 +13,6 @@ public:
 
     LogosForeachLoop(LogosLoopVar* loopVar, LogosExpr* iterableExpr, LogosStmtBlock* stmtBlock) : loopVar(loopVar), iterableExpr(iterableExpr), stmtBlock(stmtBlock) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
-    void setIterable(CodeGenMetadata* metadata);
-    void setIterable(CodeGenMetadata* metadata, LogosFuncCall* variable);
-    void setIterable(CodeGenMetadata* metadata, const LogosVariable* variable);
     ~LogosForeachLoop() override;
 };
 

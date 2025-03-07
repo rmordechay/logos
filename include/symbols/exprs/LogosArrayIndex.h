@@ -8,9 +8,9 @@
 class LogosArrayIndex final : public LogosUnaryExpr {
 public:
     LogosUnaryExpr* baseExpr;
-    vector<LogosExpr*> exprs;
+    vector<LogosExpr*> indexExprs;
 
-    explicit LogosArrayIndex(LogosUnaryExpr* baseExpr) : baseExpr(baseExpr) {}
+    explicit LogosArrayIndex(LogosUnaryExpr* baseExpr, const vector<LogosExpr*>& indexExprs) : baseExpr(baseExpr), indexExprs(indexExprs) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     void setName(string name) override;
     string getName() override;
