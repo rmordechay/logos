@@ -15,6 +15,6 @@ Value* LogosPrint::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>&
     } else {
         funcName = IRNameInt;
     }
-    const auto func = metadata->currentModule->getOrInsertFunction(funcName, argType);
+    const auto func = metadata->currentModule->getOrInsertFunction(funcName, metadata->builder.getVoidTy());
     return metadata->builder.CreateCall(func, {argValue});
 }

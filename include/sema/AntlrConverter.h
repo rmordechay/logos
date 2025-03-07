@@ -5,6 +5,7 @@
 #include "exprs/LogosUnaryExpr.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
+#include "funcs/LogosParam.h"
 #include "stmts/LogosAssignment.h"
 #include "stmts/LogosIf.h"
 #include "types/LogosInt.h"
@@ -29,6 +30,7 @@ public:
     LogosAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     LogosStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
     LogosVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
+    LogosParam* getParam(LogosParser::ExplicitVarDecContext* ctx);
     LogosVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LogosIf* getIfStatement(LogosParser::IfStatementContext* ctx);
     LogosLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);

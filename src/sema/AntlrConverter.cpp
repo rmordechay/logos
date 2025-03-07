@@ -5,6 +5,7 @@
 #include "exprs/LogosOperator.h"
 #include "exprs/LogosSelection.h"
 #include "exprs/LogosStringConst.h"
+#include "funcs/LogosParam.h"
 #include "loops/LogosLoopVar.h"
 #include "object/LogosField.h"
 #include "stmts/LogosReturn.h"
@@ -69,8 +70,8 @@ LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
     }
     for (const auto& func : ctx->funcImplementation()) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
-        const auto userFunc = getMethod(func, objName);
-        obj->methods[funcName] = userFunc;
+        const auto method = getMethod(func, objName);
+        obj->methods[funcName] = method;
     }
     return obj;
 }
@@ -86,34 +87,33 @@ LogosFuncImpl* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* 
     const auto funcSignature = ctx->funcSignature();
     const auto funcName = funcSignature->VARIABLE()->getText();
     const auto type = getType(funcSignature->type()->TYPE());
-    const auto logosUserFunc = new LogosFuncImpl(funcName, type);
+    const auto funcImpl = new LogosFuncImpl(funcName, type);
 
     const auto params = funcSignature->paramList();
     if (params) {
         for (const auto& param : params->explicitVarDec()) {
-            auto varDec = getExplicitVarDec(param);
-            logosUserFunc->params.emplace_back(varDec);
+            funcImpl->params.emplace_back(getParam(param));
         }
     }
-    logosUserFunc->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
-    return logosUserFunc;
+    funcImpl->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
+    return funcImpl;
 }
 
 LogosMethodImpl* AntlerConverter::getMethod(LogosParser::FuncImplementationContext* ctx, const string& objName) {
     const auto funcSignature = ctx->funcSignature();
     const auto funcName = funcSignature->VARIABLE()->getText();
     const auto type = getType(funcSignature->type()->TYPE());
-    const auto logosUserFunc = new LogosMethodImpl(funcName, type, objName);
+    const auto method = new LogosMethodImpl(funcName, type, objName);
 
     const auto params = funcSignature->paramList();
     if (params) {
         for (const auto& param : params->explicitVarDec()) {
-            auto varDec = getExplicitVarDec(param);
-            logosUserFunc->params.emplace_back(varDec);
+            method->params.emplace_back(getParam(param));
         }
     }
-    logosUserFunc->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
-    return logosUserFunc;
+
+    method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
+    return method;
 }
 
 LogosStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
@@ -174,11 +174,20 @@ LogosVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecConte
 
 LogosVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
-    const auto logosExpr = getExpr(ctx->expr());
+    const auto expr = getExpr(ctx->expr());
     const auto userType = getType(ctx->type()->TYPE());
-    const auto logosVarDec = new LogosVarDec(variableName, userType, logosExpr);
-    logosVarDec->setPosition(ctx->start, filePath);
-    return logosVarDec;
+    const auto varDec = new LogosVarDec(variableName, userType, expr);
+    varDec->setPosition(ctx->start, filePath);
+    return varDec;
+}
+
+LogosParam* AntlerConverter::getParam(LogosParser::ExplicitVarDecContext* ctx) {
+    const auto variableName = ctx->VARIABLE()->getText();
+    const auto expr = getExpr(ctx->expr());
+    const auto userType = getType(ctx->type()->TYPE());
+    const auto param = new LogosParam(variableName, userType, expr);
+    param->setPosition(ctx->start, filePath);
+    return param;
 }
 
 LogosIf* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {

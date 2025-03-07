@@ -2,6 +2,7 @@
 #define LOGOSSYMBOL_H
 
 
+class LogosParam;
 class LogosLoopVar;
 class LogosBuiltinFunc;
 class LogosVarDec;
@@ -22,6 +23,7 @@ class LogosObject;
 
 enum LogosSymbolType {
     VAR_DEC,
+    PARAM,
     LOOP_VAR,
     OBJECT,
     FIELD,
@@ -35,6 +37,7 @@ struct LogosSymbol {
     LogosSymbolType type;
     union {
         LogosVarDec* varDec;
+        LogosParam* param;
         LogosObject* object;
         LogosField* field;
         LogosLoopVar* loopVar;
@@ -44,19 +47,30 @@ struct LogosSymbol {
         LogosSelection* selection;
     };
 
+    // TODO is it needed?
     LogosSymbol() :
         type(static_cast<LogosSymbolType>(0)),
         object(nullptr) {
     }
 
-    LogosSymbol(const LogosSymbolType type, LogosObject* object) :
+    LogosSymbol(const LogosSymbolType type, LogosParam* param) :
         type(type),
-        object(object) {
+        param(param) {
+    }
+
+    LogosSymbol(const LogosSymbolType type, LogosVarDec* varDec) :
+        type(type),
+        varDec(varDec) {
     }
 
     LogosSymbol(const LogosSymbolType type, LogosField* field) :
         type(type),
         field(field) {
+    }
+
+    LogosSymbol(const LogosSymbolType type, LogosSelection* selection) :
+        type(type),
+        selection(selection) {
     }
 
     LogosSymbol(const LogosSymbolType type, LogosBuiltinFunc* builtinFunc) :
@@ -69,6 +83,11 @@ struct LogosSymbol {
         funcImpl(funcImpl) {
     }
 
+    LogosSymbol(const LogosSymbolType type, LogosObject* object) :
+        type(type),
+        object(object) {
+    }
+
     LogosSymbol(const LogosSymbolType type, LogosMethodImpl* methodImpl) :
         type(type),
         methodImpl(methodImpl) {
@@ -79,15 +98,6 @@ struct LogosSymbol {
         loopVar(loopVar) {
     }
 
-    LogosSymbol(const LogosSymbolType type, LogosSelection* selection) :
-        type(type),
-        selection(selection) {
-    }
-
-    LogosSymbol(const LogosSymbolType type, LogosVarDec* varDec) :
-        type(type),
-        varDec(varDec) {
-    }
 };
 
 

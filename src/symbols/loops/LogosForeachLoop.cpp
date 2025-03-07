@@ -32,7 +32,6 @@ Value* LogosForeachLoop::computeIRValue(CodeGenMetadata* metadata) {
     // Loop body
     startBlock(metadata, loopBody);
     metadata->logosStack.enterScope();
-
     const auto irType = iterableExpr->type->getIRType();
     const auto lastElement = builder.CreateGEP(irType, arrPtr, currentVal);
     const auto element = builder.CreateLoad(irType, lastElement);

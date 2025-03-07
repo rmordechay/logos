@@ -89,6 +89,8 @@ add_library(lib STATIC
     include/symbols/exprs/LogosIterable.h
     include/symbols/exprs/LogosStringConst.h
     src/symbols/exprs/LogosStringConst.cpp
+    src/symbols/funcs/LogosParam.cpp
+    include/symbols/funcs/LogosParam.h
 )
 
 add_executable(logos main.cpp)

@@ -14,7 +14,7 @@ Value* LogosMethodImpl::computeIRValue(CodeGenMetadata* metadata) {
     auto args = method->arg_begin();
     args++->setName(LOGOS_THIS);
     metadata->logosStack.addLocalSymbol(LOGOS_THIS, *objSymbol);
-    setIRArgs(metadata, params, args);
+    setIRParams(metadata, args);
 
     startBlock(metadata, funcEntry);
     stmtBlock->writeIRValue(metadata);

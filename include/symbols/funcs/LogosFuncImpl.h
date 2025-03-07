@@ -1,5 +1,5 @@
-#ifndef LOGOSUSERFUNC_H
-#define LOGOSUSERFUNC_H
+#ifndef LOGOSFUNCIMPL_H
+#define LOGOSFUNCIMPL_H
 #include "LogosFunc.h"
 
 class LogosFuncImpl final : public LogosFunc {
@@ -12,4 +12,4 @@ public:
     ~LogosFuncImpl() override = default;
 };
 
-#endif //LOGOSUSERFUNC_H
+#endif //LOGOSFUNCIMPL_H

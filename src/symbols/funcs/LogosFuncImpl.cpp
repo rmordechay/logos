@@ -7,7 +7,7 @@ Value* LogosFuncImpl::computeIRValue(CodeGenMetadata* metadata) {
     metadata->logosStack.enterScope(func);
 
     const auto args = func->arg_begin();
-    setIRArgs(metadata, params, args);
+    setIRParams(metadata, args);
 
     startBlock(metadata, funcEntry);
     stmtBlock->writeIRValue(metadata);
