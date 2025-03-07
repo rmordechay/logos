@@ -11,17 +11,16 @@ public:
     LogosFuncImpl* mainFunc = nullptr;
     vector<LogosFuncImpl*> funcs;
 
-    explicit LogosMainFile(const string& path) :
-        LogosFile(LOGOS_MAIN_FILE, path) {
-    }
-
-    ~LogosMainFile() override {
-        delete mainFunc;
-        for (const auto& func : funcs) {
-            delete func;
-        }
-    }
+    explicit LogosMainFile(const string& path) : LogosFile(LOGOS_MAIN_FILE, path) {}
+    ~LogosMainFile() override;
 };
+
+inline LogosMainFile::~LogosMainFile() {
+    delete mainFunc;
+    for (const auto& func : funcs) {
+        delete func;
+    }
+}
 
 
 #endif //LOGOSMAINFILE_H

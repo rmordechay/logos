@@ -1,6 +1,5 @@
 #ifndef LOGOSFILE_H
 #define LOGOSFILE_H
-#include <llvm/Support/FileSystem.h>
 #include <string>
 
 class LogosStack;

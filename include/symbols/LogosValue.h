@@ -1,10 +1,11 @@
 #ifndef CODEGENERATION_H
 #define CODEGENERATION_H
 
-
 #include <Token.h>
 #include <llvm/IR/Value.h>
 #include "codegen/LogosMetadata.h"
+
+constexpr auto privateLinkage = GlobalValue::PrivateLinkage;
 
 class LogosValue {
 public:
@@ -17,7 +18,6 @@ public:
 protected:
     virtual Value* computeIRValue(CodeGenMetadata* metadata) = 0;
     static void startBlock(CodeGenMetadata* metadata, BasicBlock* block);
-private:
     Value* IRValue = nullptr;
 };
 

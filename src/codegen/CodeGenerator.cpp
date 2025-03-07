@@ -6,6 +6,7 @@
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Support/TargetSelect.h>
 #include <ranges>
+#include <llvm/Support/FileSystem.h>
 
 using LogosGlobals = const std::map<std::string, LogosSymbol>&;
 
@@ -30,6 +31,7 @@ void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSym
 
     // Main func
     mainFile->mainFunc->writeIRValue(&metadata);
+
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
     writeIRToFile(metadata.currentModule, LOGOS_MAIN_FILE);
 }
@@ -44,7 +46,7 @@ void CodeGenerator::generateObjModule(LogosObject* obj, LogosGlobals globalSymbo
     auto metadata = CodeGenMetadata{.currentModule = module};
     metadata.logosStack.globalSymbols = globalSymbols;
 
-    // Init struct
+    // Init object
     obj->getIRType();
 
     // Fields
@@ -52,12 +54,13 @@ void CodeGenerator::generateObjModule(LogosObject* obj, LogosGlobals globalSymbo
         metadata.logosStack.addGlobalSymbol(name, LogosSymbol(FIELD, field));
     }
 
-    // Funcs
+    // Methods
     for (const auto& [_, val] : obj->methods) {
         val->writeIRValue(&metadata);
     }
 
     writeIRToFile(metadata.currentModule, objName);
+    std::cout << "\n-----\n\n";
 }
 
 void CodeGenerator::writeIRToFile(const Module* module, const string& name) {

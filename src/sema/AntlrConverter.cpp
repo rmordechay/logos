@@ -44,7 +44,6 @@ LogosMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
             mainFile->mainFunc = mainFunc;
             const auto statementsBlock = func->funcBody()->statementsBlock();
             mainFunc->stmtBlock = getStmtBlock(statementsBlock);
-
         } else {
             auto logosFunc = getFunc(func);
             mainFile->funcs.emplace_back(logosFunc);
@@ -91,8 +90,9 @@ LogosFuncImpl* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* 
 
     const auto params = funcSignature->paramList();
     if (params) {
-        for (const auto& param : params->explicitVarDec()) {
-            funcImpl->params.emplace_back(getParam(param));
+        for (const auto& varDec : params->explicitVarDec()) {
+            auto param = getParam(varDec);
+            funcImpl->params.emplace_back(param);
         }
     }
     funcImpl->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
@@ -107,8 +107,9 @@ LogosMethodImpl* AntlerConverter::getMethod(LogosParser::FuncImplementationConte
 
     const auto params = funcSignature->paramList();
     if (params) {
-        for (const auto& param : params->explicitVarDec()) {
-            method->params.emplace_back(getParam(param));
+        for (const auto& varDec : params->explicitVarDec()) {
+            auto param = getParam(varDec);
+            method->params.emplace_back(param);
         }
     }
 

@@ -3,39 +3,43 @@
 #include <types/LogosInt.h>
 
 Value* LogosFuncImpl::computeIRValue(CodeGenMetadata* metadata) {
-    const auto func = Function::Create(getIRFunc(), Function::ExternalLinkage, name, metadata->currentModule);
-    metadata->logosStack.enterScope(func);
+    metadata->logosStack.enterScope();
+    IRFunc = getIRFunc(metadata);
+    metadata->logosStack.currentFunc = IRFunc;
 
-    const auto args = func->arg_begin();
-    setIRParams(metadata, args);
-
-    startBlock(metadata, funcEntry);
+    startBlock(metadata, entryBlock);
     stmtBlock->writeIRValue(metadata);
     metadata->logosStack.exitScope();
-    return func;
-}
-
-FunctionType* LogosFuncImpl::getIRFunc() const {
-    vector<Type*> IRParams;
-    for (const auto& param : params) {
-        IRParams.emplace_back(param->type->getIRType());
-    }
-    return FunctionType::get(type->getIRType(), IRParams, false);
+    return IRFunc;
 }
 
 Value* LogosFuncImpl::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
     vector<Value*> paramValues;
-    vector<Type*> paramTypes;
     for (const auto& arg : args) {
         const auto argValue = arg->writeIRValue(metadata);
         paramValues.emplace_back(argValue);
-        paramTypes.emplace_back(argValue->getType());
     }
-    const auto funcType = FunctionType::get(type->getIRType(), paramTypes, false);
-    const auto func = metadata->currentModule->getOrInsertFunction(name, funcType);
-    return metadata->builder.CreateCall(func, paramValues);
+    return metadata->builder.CreateCall(IRFunc, paramValues);
 }
 
 Value* LogosFuncImpl::callFunc(CodeGenMetadata* metadata) {
     return callFunc(metadata, vector<LogosExpr*>());
+}
+
+Function* LogosFuncImpl::getIRFunc(CodeGenMetadata* metadata) {
+    for (const auto& param : params) {
+        IRParamsTypes.emplace_back(param->type->getIRType());
+    }
+
+    const auto rt = FunctionType::get(type->getIRType(), IRParamsTypes, false);
+    const auto func = Function::Create(rt, Function::ExternalLinkage, name, metadata->currentModule);
+    if (params.empty()) return func;
+
+    auto args = func->arg_begin();
+    for (const auto& param : params) {
+        param->setIRValue(args);
+        args++->setName(param->name);
+        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol(PARAM, param));
+    }
+    return func;
 }

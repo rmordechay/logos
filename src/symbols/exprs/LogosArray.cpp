@@ -7,7 +7,7 @@ Value* LogosArray::computeIRValue(CodeGenMetadata* metadata) {
     }
     const auto arrType = ArrayType::get(type->getIRType(), elements.size());
     const auto array = ConstantArray::get(arrType, arrValues);
-    return new GlobalVariable(*metadata->currentModule, arrType, true, GlobalValue::PrivateLinkage, array);
+    return new GlobalVariable(*metadata->currentModule, arrType, true, privateLinkage, array);
 }
 
 size_t LogosArray::size() {

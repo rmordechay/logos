@@ -8,7 +8,7 @@
 
 #include <LogosMetadata.h>
 #include <llvm/MC/TargetRegistry.h>
-#include <llvm/IR/PassManager.h>
+#include <llvm/Support/FileSystem.h>
 
 namespace lld::macho {
     bool link(ArrayRef<const char *> argsArr, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);

@@ -68,11 +68,13 @@ void SemaAnalyser::visitMainFunc(const LogosFuncImpl* mainFunc, const std::strin
 void SemaAnalyser::visitFuncImpl(const LogosFuncImpl* func) {
     logosStack.enterScope();
     for (const auto& param : func->params) {
-        visitVarDec(param);
+        visitParam(param);
     }
     visitStmtBlock(func->stmtBlock);
     logosStack.exitScope();
 }
+
+void SemaAnalyser::visitParam(LogosParam* param) {}
 
 void SemaAnalyser::visitStmt(LogosStmt* stmt) {
     if (!stmt) return;
@@ -102,7 +104,7 @@ void SemaAnalyser::visitField(LogosField* field) {
 void SemaAnalyser::visitMethodImpl(const LogosMethodImpl* method) {
     logosStack.enterScope();
     for (const auto& param : method->params) {
-        visitVarDec(param);
+        visitParam(param);
     }
     visitStmtBlock(method->stmtBlock);
     logosStack.exitScope();

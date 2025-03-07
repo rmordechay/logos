@@ -1,49 +1,50 @@
 #include "funcs/LogosMethodImpl.h"
-
 #include "exprs/LogosConstant.h"
-
 #include <LogosDefinitions.h>
 #include <object/LogosObject.h>
 
 Value* LogosMethodImpl::computeIRValue(CodeGenMetadata* metadata) {
-    const auto objSymbol = metadata->logosStack.getSymbol(parentName);
-    const auto objType = objSymbol->object->getIRType();
-    const auto method = Function::Create(getMethodType(objType), Function::ExternalLinkage, combinedName, metadata->currentModule);
-    metadata->logosStack.enterScope(method);
+    metadata->logosStack.enterScope();
+    IRFunc = getIRFunc(metadata);
+    metadata->logosStack.currentFunc = IRFunc;
 
-    auto args = method->arg_begin();
-    args++->setName(LOGOS_THIS);
-    metadata->logosStack.addLocalSymbol(LOGOS_THIS, *objSymbol);
-    setIRParams(metadata, args);
-
-    startBlock(metadata, funcEntry);
+    startBlock(metadata, entryBlock);
     stmtBlock->writeIRValue(metadata);
     metadata->logosStack.exitScope();
-    return method;
+    return IRFunc;
 }
 
 Value* LogosMethodImpl::callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
-    vector<Value*> paramValues;
-    vector<Type*> paramTypes;
+    vector<Value*> argsValues;
     for (const auto& arg : args) {
         const auto argValue = arg->writeIRValue(metadata);
-        paramValues.emplace_back(argValue);
-        paramTypes.emplace_back(argValue->getType());
+        argsValues.emplace_back(argValue);
     }
-    const auto methodType = FunctionType::get(type->getIRType(), paramTypes, false);
-    const auto method = metadata->currentModule->getOrInsertFunction(combinedName, methodType);
-    return metadata->builder.CreateCall(method, paramValues);
-}
-
-FunctionType* LogosMethodImpl::getMethodType(Type* structType) const {
-    vector<Type*> IRParams;
-    IRParams.emplace_back(structType);
-    for (const auto& param : params) {
-        IRParams.emplace_back(param->type->getIRType());
-    }
-    return FunctionType::get(type->getIRType(), IRParams, false);
+    return metadata->builder.CreateCall(IRFunc, argsValues);
 }
 
 Value* LogosMethodImpl::callFunc(CodeGenMetadata* metadata) {
     return callFunc(metadata, vector<LogosExpr*>());
+}
+
+Function* LogosMethodImpl::getIRFunc(CodeGenMetadata* metadata) {
+    const auto obj = metadata->logosStack.getSymbol(parentName)->object;
+    IRParamsTypes.emplace_back(obj->getIRType()->getPointerTo());
+    for (const auto& param : params) {
+        IRParamsTypes.emplace_back(param->type->getIRType());
+    }
+
+    const auto rt = FunctionType::get(type->getIRType(), IRParamsTypes, false);
+    const auto method = Function::Create(rt, Function::ExternalLinkage, combinedName, metadata->currentModule);
+
+    auto args = method->arg_begin();
+    args++->setName(LOGOS_THIS);
+    metadata->logosStack.addLocalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
+    for (const auto& param : params) {
+        param->setIRValue(args);
+        args++->setName(param->name);
+        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol(PARAM, param));
+    }
+
+    return method;
 }

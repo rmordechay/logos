@@ -47,7 +47,6 @@ struct LogosSymbol {
         LogosSelection* selection;
     };
 
-    // TODO is it needed?
     LogosSymbol() :
         type(static_cast<LogosSymbolType>(0)),
         object(nullptr) {

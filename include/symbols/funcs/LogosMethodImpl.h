@@ -11,7 +11,7 @@ public:
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     Value* callFunc(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
     Value* callFunc(CodeGenMetadata* metadata);
-    FunctionType* getMethodType(Type* structType) const;
+    Function* getIRFunc(CodeGenMetadata* metadata);
     ~LogosMethodImpl() override = default;
 };
 

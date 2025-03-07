@@ -17,7 +17,6 @@ public:
     map<string, LogosSymbol> globalSymbols;
     Function* currentFunc = nullptr;
 
-    void enterScope(Function* func);
     void enterScope();
     void exitScope();
     LogosSymbol* getSymbol(const string& name);
@@ -27,11 +26,6 @@ public:
     void reset();
     ~LogosStack() = default;
 };
-
-inline void LogosStack::enterScope(Function* func) {
-    currentFunc = func;
-    push(LogosStackFrame());
-}
 
 inline void LogosStack::enterScope() {
     if (size() > 0) {

@@ -6,10 +6,7 @@
 #include "object/LogosField.h"
 
 #include <LogosStack.h>
-#include <exprs/LogosArray.h>
-#include <exprs/LogosArrayIndex.h>
 #include <exprs/LogosBinaryExpr.h>
-#include <exprs/LogosConstant.h>
 #include <funcs/LogosBuiltinFunc.h>
 #include <funcs/LogosFuncImpl.h>
 
@@ -30,6 +27,8 @@ Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
         return symbol->varDec->writeIRValue(metadata);
     case BUILTIN_FUNC:
         return symbol->builtinFunc->writeIRValue(metadata);
+    case PARAM:
+        return symbol->param->writeIRValue(metadata);
     default:
         return nullptr;
     }

@@ -31,6 +31,7 @@ public:
     void visitMethodImpl(const LogosMethodImpl* method);
     void visitMainFunc(const LogosFuncImpl* mainFunc, const std::string& path);
     void visitFuncImpl(const LogosFuncImpl* func);
+    void visitParam(LogosParam* param);
     void visitStmt(LogosStmt* stmt);
     void visitStmtBlock(const LogosStmtBlock* stmtBlock);
     void visitAssignment(const LogosAssignment* fieldDef);
