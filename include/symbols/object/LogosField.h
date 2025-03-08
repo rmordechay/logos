@@ -10,7 +10,7 @@ public:
     string name;
     string parentName;
     size_t fieldPosition;
-    LogosType* inferredType = nullptr;
+    LogosType* type = nullptr;
     LogosType* userType = nullptr;
     LogosExpr* expr = nullptr;
 
@@ -18,7 +18,7 @@ public:
         name(name),
         parentName(parentName),
         fieldPosition(fieldPosition),
-        inferredType(inferredType),
+        type(inferredType),
         expr(expr) {
     }
 

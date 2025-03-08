@@ -4,14 +4,12 @@
 
 Value* LogosVarDec::computeIRValue(CodeGenMetadata* metadata) {
     Value* value;
-    Type* valueType;
     if (expr) {
         value = expr->writeIRValue(metadata);
-        valueType = value->getType();
     } else {
         value = type->getZeroValue()->writeIRValue(metadata);
-        valueType = value->getType();
     }
+    const auto valueType = value->getType();
     if (!valueType->isPointerTy()) {
         auto& builder = metadata->builder;
         const auto allocaInst = builder.CreateAlloca(valueType);

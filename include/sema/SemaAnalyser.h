@@ -50,11 +50,11 @@ public:
     void visitInstance(LogosInstance* instance);
     void visitArrayIndex(LogosArrayIndex* arrayIndex);
     void visitConstant(const LogosConstant* constant);
-    void setUnsuccessful();
-    void resolveSelection(LogosUnaryExpr* firstExpr, LogosUnaryExpr* secondExpr);
+    void resolveSelection(const LogosVariable* variable, LogosUnaryExpr* nextExpr);
     void setArrayType(LogosArray* array);
     void setIterable(LogosForeachLoop* foreachLoop, const LogosVariable* variable);
     void setIterable(LogosForeachLoop* foreachLoop);
+    void setUnsuccessful();
     ~SemaAnalyser() = default;
 };
 

@@ -197,10 +197,31 @@ void SemaAnalyser::visitBinaryExpr(const LogosBinaryExpr* binaryExpr) {
 }
 
 void SemaAnalyser::visitSelection(LogosSelection* selection) {
-    const auto firstExpr = selection->exprs[0];
-    const auto secondExpr = selection->exprs[1];
-    resolveSelection(firstExpr, secondExpr);;
-    selection->type = secondExpr->type;
+    for (int i = 0; i < selection->exprs.size() - 1; ++i) {
+        const auto prevExpr = selection->exprs[i];
+        const auto nextExpr = selection->exprs[i + 1];
+        if (const auto variable = dynamic_cast<LogosVariable*>(prevExpr)) {
+            resolveSelection(variable, nextExpr);
+        }
+    }
+}
+
+void SemaAnalyser::resolveSelection(const LogosVariable* variable, LogosUnaryExpr* nextExpr) {
+    const auto symbol = logosStack.getSymbol(variable->name);
+    switch (symbol->type) {
+    case VAR_DEC:
+        if (const auto instance = dynamic_cast<LogosInstance*>(symbol->varDec->expr)) {
+            if (const auto funcCall = dynamic_cast<LogosFuncCall*>(nextExpr)) {
+                const auto method = instance->obj->methods[funcCall->name];
+            }
+            if (const auto field = dynamic_cast<LogosField*>(nextExpr)) {
+                const auto v = instance->obj->fields[field->name];
+            }
+        }
+        break;
+    default:
+        break;;
+    }
 }
 
 void SemaAnalyser::visitInstance(LogosInstance* instance) {
@@ -244,22 +265,6 @@ void SemaAnalyser::visitVariable(LogosVariable* variable) {
 
 void SemaAnalyser::visitConstant(const LogosConstant* constant) {
 
-}
-
-void SemaAnalyser::resolveSelection(LogosUnaryExpr* firstExpr, LogosUnaryExpr* secondExpr) {
-    const auto symbol = logosStack.getSymbol(firstExpr->getName());
-    switch (symbol->type) {
-    case VAR_DEC: {
-        if (const auto instance = dynamic_cast<LogosInstance*>(symbol->varDec->expr)) {
-            const auto obj = instance->obj;
-            const auto func = obj->methods[secondExpr->getName()];
-            secondExpr->type = func->type;
-        }
-        break;
-    }
-    default:
-        break;
-    }
 }
 
 void SemaAnalyser::setArrayType(LogosArray* array) {

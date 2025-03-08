@@ -1,47 +1,52 @@
 #include "exprs/LogosSelection.h"
 #include "LogosUtils.h"
+#include "exprs/LogosArrayIndex.h"
 #include "exprs/LogosConstant.h"
 #include "exprs/LogosFuncCall.h"
+#include "exprs/LogosVariable.h"
+#include "object/LogosField.h"
+
 #include <LogosStack.h>
 
 Value* LogosSelection::computeIRValue(CodeGenMetadata* metadata) {
     Value* value = nullptr;
-    const auto firstExpr = exprs[0];
-    const auto secondExpr = exprs[1];
-    value = resolveSelection(metadata, firstExpr, secondExpr);
+    for (int i = 0; i < exprs.size() - 1; ++i) {
+        const auto prevExpr = exprs[i];
+        const auto nextExpr = exprs[i + 1];
+        if (const auto variable = dynamic_cast<LogosVariable*>(prevExpr)) {
+            value = resolveSelection(metadata, variable, nextExpr);
+        }
+    }
     return value;
 }
 
-LogosExpr* LogosSelection::getLastExpr() const {
-    return exprs[exprs.size() - 1];
-}
-
-Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosUnaryExpr* firstExpr, LogosUnaryExpr* secondExpr) {
-    const auto symbol = metadata->logosStack.getSymbol(firstExpr->getName());
+Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, const LogosVariable* variable, LogosUnaryExpr* nextExpr) const {
+    const auto symbol = metadata->logosStack.getSymbol(variable->name);
     switch (symbol->type) {
-    case VAR_DEC: {
+    case VAR_DEC:
         if (const auto instance = dynamic_cast<LogosInstance*>(symbol->varDec->expr)) {
-            resolveInstance(metadata, instance, secondExpr);
+            if (const auto funcCall = dynamic_cast<LogosFuncCall*>(nextExpr)) {
+                const auto method = instance->obj->methods[funcCall->name];
+                return method->call(metadata, funcCall->args);
+            }
+            if (const auto field = dynamic_cast<LogosField*>(nextExpr)) {
+                const auto v = instance->obj->fields[field->name];
+                return v->writeIRValue(metadata);
+            }
         }
         break;
-    }
     default:
-        break;
+        break;;
     }
     return nullptr;
 }
 
-void LogosSelection::resolveInstance(CodeGenMetadata* metadata, const LogosInstance* instance, LogosExpr* expr) {
-    auto methods = instance->obj->methods;
-    if (const auto funcCall = dynamic_cast<LogosFuncCall*>(expr)) {
-        const auto funcCallName = funcCall->name;
-        const auto method = methods[funcCallName];
-        method->call(metadata, funcCall->args);
-    }
-}
-
 string LogosSelection::getName() {
     return "";
+}
+
+LogosExpr* LogosSelection::getLastExpr() const {
+    return exprs[exprs.size() - 1];
 }
 
 LogosSelection::~LogosSelection() {

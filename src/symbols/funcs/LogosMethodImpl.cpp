@@ -21,7 +21,8 @@ Value* LogosMethodImpl::call(CodeGenMetadata* metadata, const vector<LogosExpr*>
         const auto argValue = arg->writeIRValue(metadata);
         argsValues.emplace_back(argValue);
     }
-    return metadata->builder.CreateCall(IRFunc, argsValues);
+    const auto func = metadata->currentModule->getOrInsertFunction(combinedName, IRFunc->getFunctionType());
+    return metadata->builder.CreateCall(func, argsValues);
 }
 
 Function* LogosMethodImpl::getIRFunc(CodeGenMetadata* metadata) {

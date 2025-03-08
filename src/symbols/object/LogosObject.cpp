@@ -11,7 +11,7 @@ Type* LogosObject::getIRType() {
     if (IRType) return IRType;
     vector<Type*> elementTypes;
     for (const auto& [_, val] : fields) {
-        auto fieldType = val->inferredType->getIRType();
+        auto fieldType = val->type->getIRType();
         elementTypes.push_back(fieldType);
     }
     IRType = StructType::create(context, elementTypes, name());
