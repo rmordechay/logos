@@ -29,9 +29,9 @@ Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, const LogosVa
                 const auto method = instance->obj->methods[funcCall->name];
                 return method->call(metadata, funcCall->args);
             }
-            if (const auto field = dynamic_cast<LogosField*>(nextExpr)) {
-                const auto v = instance->obj->fields[field->name];
-                return v->writeIRValue(metadata);
+            if (const auto nextVariable = dynamic_cast<LogosVariable*>(nextExpr)) {
+                const auto field = instance->obj->fields[nextVariable->name];
+                return field->writeIRValue(metadata);
             }
         }
         break;
@@ -45,7 +45,7 @@ string LogosSelection::getName() {
     return "";
 }
 
-LogosExpr* LogosSelection::getLastExpr() const {
+LogosExpr* LogosSelection::lastExpr() const {
     return exprs[exprs.size() - 1];
 }
 

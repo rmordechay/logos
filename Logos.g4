@@ -1,7 +1,7 @@
 grammar Logos;
 
 logosFile:
-        (importStatement? mainFile) | objectFile | interfaceFile
+        mainFile | objectFile | interfaceFile
     ;
 
 mainFile:
@@ -14,14 +14,6 @@ objectFile:
 
 interfaceFile:
         interfaceDeclaration objectImplements? explicitVarDec* funcSignature+ funcImplementation* EOF
-    ;
-
-importStatement:
-        IMPORT LPAREN importPath* RPAREN
-    ;
-
-importPath:
-        type (DOT type)*
     ;
 
 objectDeclaration:
@@ -69,7 +61,7 @@ statementsBlock:
     ;
 
 assignment:
-        selectionElement (DOT selectionElement)+ EQUAL expr
+        (VARIABLE | arrayIndex | selection) COLON EQUAL expr
     ;
 
 explicitVarDec:

@@ -152,16 +152,19 @@ LogosStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     return nullptr;
 }
 
+
 LogosAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ctx) {
-    const auto expr = getExpr(ctx->expr());
-    const auto assignment = new LogosAssignment(expr);
-    for (const auto& selection : ctx->selectionElement()) {
-        if (const auto variable = selection->VARIABLE()) {
-            assignment->names.emplace_back(variable->getText());
-        } else if (const auto funcCall = selection->funcCall()) {
-            assignment->names.emplace_back(funcCall->VARIABLE()->getText());
-        }
+    const auto assignment = new LogosAssignment();
+    assignment->rvalue = getExpr(ctx->expr());
+
+    if (const auto variable = ctx->VARIABLE()) {
+        assignment->lvalue = getVariable(variable->getText(), ctx);
+    } else if (const auto arrayIndex = ctx->arrayIndex()) {
+        assignment->lvalue = getArrayIndex(arrayIndex);
+    } else if (const auto selection = ctx->selection()) {
+        assignment->lvalue = getSelection(selection);
     }
+
     assignment->setPosition(ctx->start, filePath);
     return assignment;
 }

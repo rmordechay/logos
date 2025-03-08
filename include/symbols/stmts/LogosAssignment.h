@@ -7,11 +7,9 @@ class LogosType;
 
 class LogosAssignment final : public LogosStmt {
 public:
-    vector<string> names;
-    LogosField* field = nullptr;
-    LogosExpr* expr = nullptr;
+    LogosExpr* lvalue;
+    LogosExpr* rvalue;
 
-    explicit LogosAssignment(LogosExpr* expr) : expr(expr) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     ~LogosAssignment() override;
 };

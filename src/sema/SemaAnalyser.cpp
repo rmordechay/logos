@@ -111,10 +111,7 @@ void SemaAnalyser::visitMethodImpl(const LogosMethodImpl* method) {
 }
 
 void SemaAnalyser::visitAssignment(const LogosAssignment* fieldDef) {
-    const auto names = fieldDef->names;
-    for (const auto& name : names) {
 
-    }
 }
 
 void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
@@ -204,6 +201,7 @@ void SemaAnalyser::visitSelection(LogosSelection* selection) {
             resolveSelection(variable, nextExpr);
         }
     }
+    selection->type = selection->lastExpr()->type;
 }
 
 void SemaAnalyser::resolveSelection(const LogosVariable* variable, LogosUnaryExpr* nextExpr) {
@@ -213,9 +211,11 @@ void SemaAnalyser::resolveSelection(const LogosVariable* variable, LogosUnaryExp
         if (const auto instance = dynamic_cast<LogosInstance*>(symbol->varDec->expr)) {
             if (const auto funcCall = dynamic_cast<LogosFuncCall*>(nextExpr)) {
                 const auto method = instance->obj->methods[funcCall->name];
+                nextExpr->type = method->type;
             }
-            if (const auto field = dynamic_cast<LogosField*>(nextExpr)) {
-                const auto v = instance->obj->fields[field->name];
+            if (const auto nextVariable = dynamic_cast<LogosVariable*>(nextExpr)) {
+                const auto field = instance->obj->fields[nextVariable->name];
+                nextExpr->type = field->type;
             }
         }
         break;
@@ -296,7 +296,7 @@ void SemaAnalyser::setIterable(LogosForeachLoop* foreachLoop, const LogosVariabl
         return;
     }
     case SELECTION: {
-        foreachLoop->iterable = dynamic_cast<LogosIterable*>(symbol->selection->getLastExpr());
+        foreachLoop->iterable = dynamic_cast<LogosIterable*>(symbol->selection->lastExpr());
         return;
     }
     default:

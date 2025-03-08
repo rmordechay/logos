@@ -25,17 +25,16 @@ public:
 
   enum {
     RuleLogosFile = 0, RuleMainFile = 1, RuleObjectFile = 2, RuleInterfaceFile = 3, 
-    RuleImportStatement = 4, RuleImportPath = 5, RuleObjectDeclaration = 6, 
-    RuleInterfaceDeclaration = 7, RuleObjectImplements = 8, RuleFuncSignature = 9, 
-    RuleFuncImplementation = 10, RuleFuncBody = 11, RuleParamList = 12, 
-    RuleStatement = 13, RuleStatementsBlock = 14, RuleAssignment = 15, RuleExplicitVarDec = 16, 
-    RuleImplicitVarDec = 17, RuleIfStatement = 18, RuleElseIfStatement = 19, 
-    RuleElseStatement = 20, RulePatternMatching = 21, RulePattern = 22, 
-    RuleLoopStatement = 23, RuleControlFlow = 24, RuleReturnStatement = 25, 
-    RuleEnumDeclaration = 26, RuleEnumField = 27, RuleExpr = 28, RuleExprList = 29, 
-    RuleUnaryExpr = 30, RuleArray = 31, RuleFuncCall = 32, RuleConstructor = 33, 
-    RuleFuncArg = 34, RuleFuncArgList = 35, RuleConstant = 36, RuleArrayIndex = 37, 
-    RuleSelection = 38, RuleSelectionElement = 39, RuleRange = 40, RuleType = 41
+    RuleObjectDeclaration = 4, RuleInterfaceDeclaration = 5, RuleObjectImplements = 6, 
+    RuleFuncSignature = 7, RuleFuncImplementation = 8, RuleFuncBody = 9, 
+    RuleParamList = 10, RuleStatement = 11, RuleStatementsBlock = 12, RuleAssignment = 13, 
+    RuleExplicitVarDec = 14, RuleImplicitVarDec = 15, RuleIfStatement = 16, 
+    RuleElseIfStatement = 17, RuleElseStatement = 18, RulePatternMatching = 19, 
+    RulePattern = 20, RuleLoopStatement = 21, RuleControlFlow = 22, RuleReturnStatement = 23, 
+    RuleEnumDeclaration = 24, RuleEnumField = 25, RuleExpr = 26, RuleExprList = 27, 
+    RuleUnaryExpr = 28, RuleArray = 29, RuleFuncCall = 30, RuleConstructor = 31, 
+    RuleFuncArg = 32, RuleFuncArgList = 33, RuleConstant = 34, RuleArrayIndex = 35, 
+    RuleSelection = 36, RuleSelectionElement = 37, RuleRange = 38, RuleType = 39
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -59,8 +58,6 @@ public:
   class MainFileContext;
   class ObjectFileContext;
   class InterfaceFileContext;
-  class ImportStatementContext;
-  class ImportPathContext;
   class ObjectDeclarationContext;
   class InterfaceDeclarationContext;
   class ObjectImplementsContext;
@@ -103,7 +100,6 @@ public:
     LogosFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     MainFileContext *mainFile();
-    ImportStatementContext *importStatement();
     ObjectFileContext *objectFile();
     InterfaceFileContext *interfaceFile();
 
@@ -160,35 +156,6 @@ public:
   };
 
   InterfaceFileContext* interfaceFile();
-
-  class  ImportStatementContext : public antlr4::ParserRuleContext {
-  public:
-    ImportStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *IMPORT();
-    antlr4::tree::TerminalNode *LPAREN();
-    antlr4::tree::TerminalNode *RPAREN();
-    std::vector<ImportPathContext *> importPath();
-    ImportPathContext* importPath(size_t i);
-
-   
-  };
-
-  ImportStatementContext* importStatement();
-
-  class  ImportPathContext : public antlr4::ParserRuleContext {
-  public:
-    ImportPathContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    std::vector<TypeContext *> type();
-    TypeContext* type(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> DOT();
-    antlr4::tree::TerminalNode* DOT(size_t i);
-
-   
-  };
-
-  ImportPathContext* importPath();
 
   class  ObjectDeclarationContext : public antlr4::ParserRuleContext {
   public:
@@ -319,12 +286,12 @@ public:
   public:
     AssignmentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<SelectionElementContext *> selectionElement();
-    SelectionElementContext* selectionElement(size_t i);
+    antlr4::tree::TerminalNode *COLON();
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
-    std::vector<antlr4::tree::TerminalNode *> DOT();
-    antlr4::tree::TerminalNode* DOT(size_t i);
+    antlr4::tree::TerminalNode *VARIABLE();
+    ArrayIndexContext *arrayIndex();
+    SelectionContext *selection();
 
    
   };
