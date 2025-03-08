@@ -1,5 +1,5 @@
 #include "SemaAnalyser.h"
-#include "LogosErrors.h"
+#include "LogosError.h"
 #include "exprs/LogosBinaryExpr.h"
 #include "loops/LogosLoopVar.h"
 #include "object/LogosField.h"
@@ -19,18 +19,6 @@
 #include <stmts/LogosAssignment.h>
 #include <stmts/LogosIf.h>
 
-void SemaAnalyser::analyse(const map<string, LogosFile*>& files, const map<string, LogosSymbol>& globalSymbols) {
-    ThreadPool threadPool;
-    for (const auto& pair : files) {
-        threadPool.runTask([=, &globalSymbols] {
-            SemaAnalyser semaAnalyser;
-            semaAnalyser.logosStack.globalSymbols = globalSymbols;
-            semaAnalyser.visitLogosFile(pair.second);
-        });
-    }
-    threadPool.wait();
-}
-
 void SemaAnalyser::visitLogosFile(LogosFile* file) {
     if (const auto mainFile = dynamic_cast<LogosMainFile*>(file)) {
         visitMainFile(mainFile);
@@ -40,10 +28,7 @@ void SemaAnalyser::visitLogosFile(LogosFile* file) {
 }
 
 void SemaAnalyser::visitMainFile(const LogosMainFile* mainFile) {
-    if (!mainFile->mainFunc) {
-        printError(1000);
-        exit(0);
-    }
+    if (!mainFile->mainFunc) printError(1000);
     for (const auto& func : mainFile->funcs) {
         visitFuncImpl(func);
     }
@@ -122,6 +107,10 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
     if (varDec->expr) {
         visitExpr(varDec->expr);
         varDec->type = varDec->expr->type;
+        if (varDec->userType && *varDec->userType != varDec->type) {
+            printError(1001, varDec->userType->name().c_str(), varDec->type->name().c_str());
+            setUnsuccessful();
+        }
     } else {
         varDec->type = varDec->userType;
     }

@@ -18,6 +18,7 @@ include_directories(
 )
 
 add_library(lib STATIC
+    include/LogosError.h
     src/application/Application.cpp
     include/application/Application.h
     src/application/LogosUtils.cpp

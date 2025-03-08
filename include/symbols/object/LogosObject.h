@@ -17,7 +17,7 @@ public:
     const string name() const override;
     Type* getIRType() override;
     LogosConstant* getZeroValue() override;
-    bool operator==(LogosType* other) const override;
+    bool equals(LogosType* other) const override;
     ~LogosObject() override;
 };
 

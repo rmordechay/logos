@@ -1,5 +1,7 @@
 #ifndef LOGOSERRORS_H
 #define LOGOSERRORS_H
+#include <LogosMetadata.h>
+#include <iostream>
 #include <map>
 
 using namespace std;
@@ -23,6 +25,17 @@ inline void printError(const size_t code, ...) {
     va_start(args, code);
     vsnprintf(buffer, sizeof(buffer), error->second.c_str(), args);
     va_end(args);
+    std::cout << string(buffer) << '\n';
+}
+
+inline void printError(const size_t code, const Position& position, ...) {
+    char buffer[256];
+    const auto error = LOGOS_ERRORS.find(code);
+    va_list args;
+    va_start(args, position);
+    vsnprintf(buffer, sizeof(buffer), error->second.c_str(), args);
+    va_end(args);
+    std::cout << "Error at " << '\n';
     std::cout << string(buffer) << '\n';
 }
 

@@ -23,8 +23,8 @@ LogosConstant* LogosObject::getZeroValue() {
     return nullptr;
 }
 
-bool LogosObject::operator==(LogosType* other) const { return true;
-    return true;
+bool LogosObject::equals(LogosType* other) const {
+    return typeName == other->name();
 }
 
 LogosObject::~LogosObject() {

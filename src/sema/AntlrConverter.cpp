@@ -13,6 +13,7 @@
 #include "types/LogosBool.h"
 #include "types/LogosFloat.h"
 
+#include <LogosError.h>
 #include <exprs/LogosArray.h>
 #include <exprs/LogosArrayIndex.h>
 #include <exprs/LogosFuncCall.h>

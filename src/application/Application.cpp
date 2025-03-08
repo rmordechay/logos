@@ -13,7 +13,7 @@
 void Application::runLogos() {
     const auto files = parseFiles();
     const auto globalSymbols = getGlobalsSymbols(files);
-    SemaAnalyser::analyse(files, globalSymbols);
+    if (!analyse(files, globalSymbols)) return;
     const auto codeGenerator = CodeGenerator(mainFile);
     codeGenerator.generateCode(globalSymbols);
     linker.link(modules);
@@ -75,4 +75,22 @@ LogosFile* Application::getFile(const directory_entry& fileEntry) {
     auto antlerConverter = AntlerConverter(fileEntry.path());
     auto parsedFile = parser.logosFile();
     return antlerConverter.getLogosFile(parsedFile, absolute(fileEntry).string());
+}
+
+bool Application::analyse(const map<string, LogosFile*>& files, const map<string, LogosSymbol>& globalSymbols) {
+    ThreadPool threadPool;
+    vector<bool> semaSuccess;
+    for (const auto& pair : files) {
+        threadPool.runTask([=, &semaSuccess, &globalSymbols] {
+            SemaAnalyser semaAnalyser;
+            semaAnalyser.logosStack.globalSymbols = globalSymbols;
+            semaAnalyser.visitLogosFile(pair.second);
+            {
+                lock_guard lock(mtx);
+                semaSuccess.push_back(semaAnalyser.successful);
+            }
+        });
+    }
+    threadPool.wait();
+    return std::find(semaSuccess.begin(), semaSuccess.end(), false) == semaSuccess.end();
 }
