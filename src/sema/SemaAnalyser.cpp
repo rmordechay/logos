@@ -40,6 +40,10 @@ void SemaAnalyser::visitLogosFile(LogosFile* file) {
 }
 
 void SemaAnalyser::visitMainFile(const LogosMainFile* mainFile) {
+    if (!mainFile->mainFunc) {
+        printError(1000);
+        exit(0);
+    }
     for (const auto& func : mainFile->funcs) {
         visitFuncImpl(func);
     }
@@ -110,7 +114,7 @@ void SemaAnalyser::visitMethodImpl(const LogosMethodImpl* method) {
     logosStack.exitScope();
 }
 
-void SemaAnalyser::visitAssignment(const LogosAssignment* fieldDef) {
+void SemaAnalyser::visitAssignment(const LogosAssignment* assignment) {
 
 }
 

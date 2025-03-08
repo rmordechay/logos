@@ -86,7 +86,12 @@ LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec
 LogosFuncImpl* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* ctx) {
     const auto funcSignature = ctx->funcSignature();
     const auto funcName = funcSignature->VARIABLE()->getText();
-    const auto type = getType(funcSignature->type()->TYPE());
+    LogosType* type;
+    if (funcSignature->type()) {
+        type = getType(funcSignature->type()->TYPE());
+    } else {
+        type = &LOGOS_VOID;
+    }
     const auto funcImpl = new LogosFuncImpl(funcName, type);
 
     const auto params = funcSignature->paramList();

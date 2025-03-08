@@ -34,7 +34,7 @@ public:
     void visitParam(LogosParam* param);
     void visitStmt(LogosStmt* stmt);
     void visitStmtBlock(const LogosStmtBlock* stmtBlock);
-    void visitAssignment(const LogosAssignment* fieldDef);
+    void visitAssignment(const LogosAssignment* assignment);
     void visitVarDec(LogosVarDec* varDec);
     void visitIfStmt(const LogosIf* ifStmt);
     void visitLoopStmt(LogosLoop* loopStmt);
