@@ -104,15 +104,13 @@ void SemaAnalyser::visitAssignment(const LogosAssignment* assignment) {
 }
 
 void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
+    const auto userType = varDec->userType;
     if (varDec->expr) {
         visitExpr(varDec->expr);
+        checkTypesMatch(varDec->expr->type, userType, varDec->position);
         varDec->type = varDec->expr->type;
-        if (varDec->userType && *varDec->userType != varDec->type) {
-            printError(1001, varDec->userType->name().c_str(), varDec->type->name().c_str());
-            setUnsuccessful();
-        }
     } else {
-        varDec->type = varDec->userType;
+        varDec->type = userType;
     }
     logosStack.addLocalSymbol(varDec->name, LogosSymbol(VAR_DEC, varDec));
 }
@@ -137,12 +135,8 @@ void SemaAnalyser::visitRangeLoop(const LogosRangeLoop* rangeLoop) {
 
 void SemaAnalyser::visitForeachLoop(LogosForeachLoop* foreachLoop) {
     visitExpr(foreachLoop->iterableExpr);
-    setIterable(foreachLoop);
-
-    foreachLoop->loopVar->type = foreachLoop->iterableExpr->type;
-    foreachLoop->loopVar->element->type = foreachLoop->loopVar->type;
-    logosStack.addLocalSymbol(foreachLoop->loopVar->name, LogosSymbol(LOOP_VAR, foreachLoop->loopVar));
-
+    setForLoopIterable(foreachLoop);
+    setLoopVarType(foreachLoop);
     visitStmtBlock(foreachLoop->stmtBlock);
 }
 
@@ -181,9 +175,10 @@ void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
     }
 }
 
-void SemaAnalyser::visitBinaryExpr(const LogosBinaryExpr* binaryExpr) {
+void SemaAnalyser::visitBinaryExpr(LogosBinaryExpr* binaryExpr) {
     visitExpr(binaryExpr->left);
     visitExpr(binaryExpr->right);
+    setBinaryExprType(binaryExpr);
 }
 
 void SemaAnalyser::visitSelection(LogosSelection* selection) {
@@ -256,8 +251,12 @@ void SemaAnalyser::visitVariable(LogosVariable* variable) {
     }
 }
 
-void SemaAnalyser::visitConstant(const LogosConstant* constant) {
+void SemaAnalyser::visitConstant(const LogosConstant* constant) {}
 
+void SemaAnalyser::setLoopVarType(const LogosForeachLoop* foreachLoop) {
+    foreachLoop->loopVar->type = foreachLoop->iterableExpr->type;
+    foreachLoop->loopVar->element->type = foreachLoop->loopVar->type;
+    logosStack.addLocalSymbol(foreachLoop->loopVar->name, LogosSymbol(LOOP_VAR, foreachLoop->loopVar));
 }
 
 void SemaAnalyser::setArrayType(LogosArray* array) {
@@ -265,15 +264,19 @@ void SemaAnalyser::setArrayType(LogosArray* array) {
     array->type = array->elements[0]->type;
 }
 
-void SemaAnalyser::setIterable(LogosForeachLoop* foreachLoop) {
+void SemaAnalyser::setBinaryExprType(LogosBinaryExpr* binaryExpr) {
+    binaryExpr->type = binaryExpr->left->type;
+}
+
+void SemaAnalyser::setForLoopIterable(LogosForeachLoop* foreachLoop) {
     if (const auto variable = dynamic_cast<LogosVariable*>(foreachLoop->iterableExpr)) {
-        setIterable(foreachLoop, variable);
+        setForLoopIterable(foreachLoop, variable);
     } else if (const auto array = dynamic_cast<LogosArray*>(foreachLoop->iterableExpr)) {
         foreachLoop->iterable = array;
     }
 }
 
-void SemaAnalyser::setIterable(LogosForeachLoop* foreachLoop, const LogosVariable* const variable) {
+void SemaAnalyser::setForLoopIterable(LogosForeachLoop* foreachLoop, const LogosVariable* const variable) {
     const auto symbol = logosStack.getSymbol(variable->name);
     switch (symbol->type) {
     case VAR_DEC: {
@@ -294,6 +297,13 @@ void SemaAnalyser::setIterable(LogosForeachLoop* foreachLoop, const LogosVariabl
     }
     default:
         return;
+    }
+}
+
+void SemaAnalyser::checkTypesMatch(const LogosType* first, const LogosType* second, const Position& position) {
+    if (second && first != second) {
+        printError(1001, position, {second->name(), first->name()});
+        setUnsuccessful();
     }
 }
 

@@ -22,4 +22,6 @@ public:
     ~LogosPrint() override = default;
 };
 
+inline LogosPrint LOGOS_PRINT;
+
 #endif //LOGOSPRINT_H

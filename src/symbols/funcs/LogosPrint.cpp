@@ -1,7 +1,5 @@
 #include "funcs/LogosPrint.h"
 
-#include <llvm/IR/Module.h>
-
 Value* LogosPrint::computeIRValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
@@ -9,12 +7,11 @@ Value* LogosPrint::computeIRValue(CodeGenMetadata* metadata) {
 Value* LogosPrint::call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
     const auto argType = args[0]->type->getIRType();
     auto argValue = args[0]->writeIRValue(metadata);
-    string funcName;
+    FunctionCallee func;
     if (argType == metadata->builder.getPtrTy()) {
-        funcName = IRNameString;
+        func = metadata->currentModule->getOrInsertFunction(IRNameString, funcTypeString);
     } else {
-        funcName = IRNameInt;
+        func = metadata->currentModule->getOrInsertFunction(IRNameInt, funcTypeInt);
     }
-    const auto func = metadata->currentModule->getOrInsertFunction(funcName, metadata->builder.getVoidTy());
     return metadata->builder.CreateCall(func, {argValue});
 }

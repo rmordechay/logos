@@ -24,7 +24,7 @@ protected:
 inline void LogosValue::setPosition(const antlr4::Token* ctx, const string& filePath) {
     position.lineNumber = ctx->getLine();
     position.posInLine = ctx->getCharPositionInLine();
-    position.filePath = &filePath;
+    position.filePath = filePath;
 }
 
 inline Value* LogosValue::writeIRValue(CodeGenMetadata* metadata) {

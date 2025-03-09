@@ -12,7 +12,7 @@
 #include "stmts/LogosReturn.h"
 #include "types/LogosBool.h"
 #include "types/LogosFloat.h"
-
+#include <LogosDefinitions.h>
 #include <LogosError.h>
 #include <exprs/LogosArray.h>
 #include <exprs/LogosArrayIndex.h>
@@ -23,7 +23,7 @@
 #include <types/LogosString.h>
 #include <types/LogosVoid.h>
 
-LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
+LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath) {
     LogosFile* logosFile = nullptr;
     if (const auto mainFileCtx = ctx->mainFile()) {
         logosFile = getMainFile(mainFileCtx);
