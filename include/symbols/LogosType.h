@@ -11,9 +11,9 @@ public:
     virtual Type* getIRType() = 0;
     virtual LogosConstant* getZeroValue() = 0;
     virtual bool equals(LogosType* other) const = 0;
-    virtual ~LogosType() = default;
     bool operator==(LogosType* other) const;
     bool operator!=(LogosType* other) const;
+    virtual ~LogosType() = default;
 };
 
 inline bool LogosType::operator==(LogosType* other) const {

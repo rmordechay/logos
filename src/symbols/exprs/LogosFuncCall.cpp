@@ -1,8 +1,7 @@
 #include "exprs/LogosFuncCall.h"
 
-#include "funcs/LogosFunc.h"
-
 #include <LogosStack.h>
+#include "funcs/LogosFunc.h"
 #include <funcs/LogosBuiltinFunc.h>
 #include <funcs/LogosFuncImpl.h>
 #include <funcs/LogosMethodImpl.h>

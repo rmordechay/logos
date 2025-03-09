@@ -3,7 +3,6 @@
 #include <map>
 #include <funcs/LogosMethodImpl.h>
 
-class LogosFuncImpl;
 class LogosField;
 
 class LogosObject final : public LogosType {

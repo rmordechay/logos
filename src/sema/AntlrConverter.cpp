@@ -12,7 +12,7 @@
 #include "stmts/LogosReturn.h"
 #include "types/LogosBool.h"
 #include "types/LogosFloat.h"
-
+#include <LogosDefinitions.h>
 #include <LogosError.h>
 #include <exprs/LogosArray.h>
 #include <exprs/LogosArrayIndex.h>
@@ -23,7 +23,7 @@
 #include <types/LogosString.h>
 #include <types/LogosVoid.h>
 
-LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
+LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath) {
     LogosFile* logosFile = nullptr;
     if (const auto mainFileCtx = ctx->mainFile()) {
         logosFile = getMainFile(mainFileCtx);
@@ -393,9 +393,12 @@ LogosUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) 
 
 LogosType* AntlerConverter::getType(tree::TerminalNode* type) {
     if (!type) return &LOGOS_VOID;
-    if (type->getText() == LOGOS_INT.name()) return &LOGOS_INT;
-    if (type->getText() == LOGOS_FLOAT.name()) return &LOGOS_FLOAT;
-    if (type->getText() == LOGOS_BOOL.name()) return &LOGOS_BOOL;
-    if (type->getText() == LOGOS_STRING.name()) return &LOGOS_STRING;
-    return &LOGOS_VOID;
+    const auto typeText = type->getText();
+    if (typeText == LOGOS_INT.name()) return &LOGOS_INT;
+    if (typeText == LOGOS_FLOAT.name()) return &LOGOS_FLOAT;
+    if (typeText == LOGOS_BOOL.name()) return &LOGOS_BOOL;
+    if (typeText == LOGOS_STRING.name()) return &LOGOS_STRING;
+    if (typeText == "") return &LOGOS_VOID;
+    // TODO memory leak
+    return new LogosObject(typeText);
 }

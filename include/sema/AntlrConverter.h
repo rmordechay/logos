@@ -5,12 +5,9 @@
 #include "exprs/LogosUnaryExpr.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
-#include "funcs/LogosParam.h"
 #include "stmts/LogosAssignment.h"
 #include "stmts/LogosIf.h"
 #include "types/LogosInt.h"
-#include <funcs/LogosMethodImpl.h>
-
 
 class LogosAssignment;
 using namespace std;
@@ -18,12 +15,13 @@ using namespace std;
 class AntlerConverter {
 public:
     const string& filePath;
+
     explicit AntlerConverter(const string& filePath) : filePath(filePath) {}
     LogosFile* getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath);
     LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx);
     LogosObjectFile* getObjFile(LogosParser::ObjectFileContext* ctx);
     LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
-    LogosField *getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, size_t position);
+    LogosField* getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, size_t position);
     LogosFuncImpl* getFunc(LogosParser::FuncImplementationContext* ctx);
     LogosMethodImpl* getMethod(LogosParser::FuncImplementationContext* ctx, LogosObject* obj);
     LogosStmt* getStmt(LogosParser::StatementContext* ctx);

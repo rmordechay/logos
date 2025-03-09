@@ -22,7 +22,7 @@ struct CodeGenMetadata {
 struct Position {
     size_t lineNumber{};
     size_t posInLine{};
-    const string* filePath = nullptr;
+    string filePath{};
 };
 
 #endif //LOGOSMETADATA_H

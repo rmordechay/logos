@@ -1,42 +1,47 @@
 #ifndef LOGOSERRORS_H
 #define LOGOSERRORS_H
-#include <LogosMetadata.h>
-#include <iostream>
 #include <map>
 
 using namespace std;
 
-const std::map<int, std::string> LOGOS_ERRORS = {
-    {1000, "Main function is not defined in Main.lgs file."},
-    {1001, "The left-hand type '%s' is not equal to the right-hand type '%s'."},
-    {1002, "%s is not iterable"},
-    {1003, "Number of arguments does not much. Expected: %s, Given: %s"},
-    {1004, "Function %s must return %s"},
+const map<int, string> LOGOS_ERRORS = {
+    {1000, "main() function is not defined in Main.lgs file."},
+    {1001, "The left-hand type '{}' is not equal to the right-hand type '{}'."},
+    {1002, "{} is not iterable"},
+    {1003, "Number of arguments does not much. Expected: {}, Given: {}"},
+    {1004, "Function {} must return {}"},
 };
 
-const std::map<int, std::string> LOGOS_WARNINGS = {
-    {5000, "%s is never used"},
+const map<int, string> LOGOS_WARNINGS = {
+    {5000, "{} is never used"},
 };
 
-inline void printError(const size_t code, ...) {
-    char buffer[256];
+inline void printError(const int code, const vector<string>& args = {}) {
     const auto error = LOGOS_ERRORS.find(code);
-    va_list args;
-    va_start(args, code);
-    vsnprintf(buffer, sizeof(buffer), error->second.c_str(), args);
-    va_end(args);
-    std::cout << string(buffer) << '\n';
+    auto pos = 0;
+    auto argIndex = 0;
+    auto result = error->second;
+    while ((pos = result.find("{}", pos)) != string::npos && argIndex < args.size()) {
+        result.replace(pos, 2, args[argIndex]);
+        pos += args[argIndex].length();
+        argIndex++;
+    }
+    std::cout << result << std::endl;
 }
 
-inline void printError(const size_t code, const Position& position, ...) {
-    char buffer[256];
+inline void printError(const int code, const Position& position, const vector<string>& args = {}) {
     const auto error = LOGOS_ERRORS.find(code);
-    va_list args;
-    va_start(args, position);
-    vsnprintf(buffer, sizeof(buffer), error->second.c_str(), args);
-    va_end(args);
-    std::cout << "Error at " << '\n';
-    std::cout << string(buffer) << '\n';
+    auto pos = 0;
+    auto argIndex = 0;
+    auto result = error->second;
+    while ((pos = result.find("{}", pos)) != string::npos && argIndex < args.size()) {
+        auto str = args[argIndex];
+        result.replace(pos, 2, str);
+        pos += str.length();
+        argIndex++;
+    }
+    std::cout << "Error at " << position.filePath << ", line " << position.lineNumber << '\n';
+    std::cout << '\t' << result << '\n';
 }
 
 #endif //LOGOSERRORS_H

@@ -5,7 +5,6 @@
 #include "exprs/LogosFuncCall.h"
 #include "exprs/LogosVariable.h"
 #include "object/LogosField.h"
-
 #include <LogosStack.h>
 
 Value* LogosSelection::computeIRValue(CodeGenMetadata* metadata) {
@@ -15,6 +14,8 @@ Value* LogosSelection::computeIRValue(CodeGenMetadata* metadata) {
         const auto nextExpr = exprs[i + 1];
         if (const auto variable = dynamic_cast<LogosVariable*>(prevExpr)) {
             value = resolveSelection(metadata, variable, nextExpr);
+        } else if (const auto funcCall = dynamic_cast<LogosFuncCall*>(prevExpr)) {
+            value = resolveSelection(metadata, funcCall, nextExpr);
         }
     }
     return value;
@@ -36,7 +37,17 @@ Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, const LogosVa
         }
         break;
     default:
-        break;;
+        break;
+    }
+    return nullptr;
+}
+
+Value* LogosSelection::resolveSelection(CodeGenMetadata* metadata, LogosFuncCall* funcCall, LogosUnaryExpr* nextExpr) const {
+    if (const auto nextFuncCall = dynamic_cast<LogosFuncCall*>(nextExpr)) {
+        return nextFuncCall->writeIRValue(metadata);
+    }
+    if (const auto variable = dynamic_cast<LogosVariable*>(nextExpr)) {
+        return variable->writeIRValue(metadata);
     }
     return nullptr;
 }
