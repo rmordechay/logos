@@ -29,7 +29,7 @@ LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, con
         logosFile = getMainFile(mainFileCtx);
     }
     if (const auto objFileCtx = ctx->objectFile()) {
-        logosFile = getObjFile(objFileCtx);
+        logosFile = getObjectFile(objFileCtx);
     }
     logosFile->path = filePath;
     return logosFile;
@@ -54,7 +54,7 @@ LogosMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     return mainFile;
 }
 
-LogosObjectFile* AntlerConverter::getObjFile(LogosParser::ObjectFileContext* ctx) {
+LogosObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ctx) {
     const auto objName = ctx->objectDeclaration()->type()->TYPE()->getText();
     const auto objFile = new LogosObjectFile(objName, filePath);
     objFile->obj = getObject(ctx);
@@ -314,29 +314,58 @@ LogosFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
     return funcCallExpr;
 }
 
-LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* selection) {
-    vector<LogosUnaryExpr*> exprs;
-    for (const auto& unaryExpr : selection->selectionElement()) {
-        auto expr = getSelectionElementExpr(unaryExpr);
-        exprs.emplace_back(expr);
+LogosMethodCall* AntlerConverter::getMethodCall(LogosParser::FuncCallContext* ctx) {
+    const auto name = ctx->VARIABLE()->getText();
+    const auto funcCallExpr = new LogosMethodCall(name);
+    funcCallExpr->setPosition(ctx->start, filePath);
+    const auto funcArgList = ctx->funcArgList();
+    if (funcArgList) {
+        const auto args = funcArgList->funcArg();
+        for (const auto& arg : args) {
+            auto argExpr = getExpr(arg->expr());
+            funcCallExpr->args.emplace_back(argExpr);
+        }
     }
-    return new LogosSelection(exprs);
+    return funcCallExpr;
 }
 
-LogosUnaryExpr* AntlerConverter::getSelectionElementExpr(LogosParser::SelectionElementContext* ctx) {
-    if (const auto variable = ctx->VARIABLE()) {
+LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) {
+    const auto selectionElements = ctx->selectionElement();
+    const auto firstExpr = getFirstSelection(ctx, selectionElements[0]);
+    const auto innerSelections = getInnerSelections(ctx->selectionElement());
+    return new LogosSelection(firstExpr, innerSelections);
+}
+
+LogosUnaryExpr* AntlerConverter::getFirstSelection(const LogosParser::SelectionContext* ctx, LogosParser::SelectionElementContext* firstExpr) {
+    if (const auto variable = firstExpr->VARIABLE()) {
         return getVariable(variable->getText(), ctx);
     }
-
-    if (const auto constructor = ctx->constructor()) {
-        return getInstance(constructor);
-    }
-
-    if (const auto funcCall = ctx->funcCall()) {
+    if (const auto funcCall = firstExpr->funcCall()) {
         return getFuncCall(funcCall);
     }
-
+    if (const auto arrayIndex = firstExpr->arrayIndex()) {
+        return getArrayIndex(arrayIndex);
+    }
     return nullptr;
+}
+
+vector<LogosUnaryExpr*> AntlerConverter::getInnerSelections(const vector<LogosParser::SelectionElementContext*>& ctx) {
+    vector<LogosUnaryExpr*> exprs;
+    exprs.reserve(ctx.size());
+    for (int i = 1; i < ctx.size(); ++i) {
+        const auto& expr = ctx[i];
+        if (const auto field = expr->VARIABLE()) {
+            const auto logosField = getVariable(field->getText(), expr);
+            exprs.emplace_back(logosField);
+        } else if (const auto methodCall = expr->funcCall()) {
+            const auto logosFuncCall = getMethodCall(methodCall);
+            exprs.emplace_back(logosFuncCall);
+        } else if (const auto arrayIndex = expr->arrayIndex()) {
+            const auto logosArrayIndex = getArrayIndex(arrayIndex);
+            exprs.emplace_back(logosArrayIndex);
+        }
+    }
+    return exprs;
 }
 
 LogosInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) {
@@ -394,10 +423,10 @@ LogosUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) 
 LogosType* AntlerConverter::getType(tree::TerminalNode* type) {
     if (!type) return &LOGOS_VOID;
     const auto typeText = type->getText();
-    if (typeText == LOGOS_INT.name()) return &LOGOS_INT;
-    if (typeText == LOGOS_FLOAT.name()) return &LOGOS_FLOAT;
-    if (typeText == LOGOS_BOOL.name()) return &LOGOS_BOOL;
-    if (typeText == LOGOS_STRING.name()) return &LOGOS_STRING;
+    if (typeText == LOGOS_INT.getName()) return &LOGOS_INT;
+    if (typeText == LOGOS_FLOAT.getName()) return &LOGOS_FLOAT;
+    if (typeText == LOGOS_BOOL.getName()) return &LOGOS_BOOL;
+    if (typeText == LOGOS_STRING.getName()) return &LOGOS_STRING;
     if (typeText == "") return &LOGOS_VOID;
     // TODO memory leak
     return new LogosObject(typeText);

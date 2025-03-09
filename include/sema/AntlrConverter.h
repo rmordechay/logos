@@ -2,6 +2,7 @@
 #define SEMANTICANALYSER_H
 
 #include "LogosParser.h"
+#include "exprs/LogosMethodCall.h"
 #include "exprs/LogosUnaryExpr.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
@@ -19,7 +20,7 @@ public:
     explicit AntlerConverter(const string& filePath) : filePath(filePath) {}
     LogosFile* getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath);
     LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx);
-    LogosObjectFile* getObjFile(LogosParser::ObjectFileContext* ctx);
+    LogosObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx);
     LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
     LogosField* getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, size_t position);
     LogosFuncImpl* getFunc(LogosParser::FuncImplementationContext* ctx);
@@ -38,8 +39,11 @@ public:
     LogosUnaryExpr* getArray(LogosParser::ArrayContext* ctx);
     LogosVariable* getVariable(const string& varName, const ParserRuleContext* ctx) const;
     LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
-    LogosSelection* getSelection(LogosParser::SelectionContext* selection);
-    LogosUnaryExpr* getSelectionElementExpr(LogosParser::SelectionElementContext* ctx);
+    LogosMethodCall *getMethodCall(LogosParser::FuncCallContext* ctx);
+    LogosUnaryExpr* getFirstSelection(const LogosParser::SelectionContext* ctx,
+                                      vector<LogosParser::SelectionElementContext*>::value_type firstExpr);
+    vector<LogosUnaryExpr*> getInnerSelections(const vector<LogosParser::SelectionElementContext*>& ctx);
+    LogosSelection* getSelection(LogosParser::SelectionContext* ctx);
     LogosInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LogosArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
     static LogosUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);

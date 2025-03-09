@@ -10,6 +10,7 @@ const map<int, string> LOGOS_ERRORS = {
     {1002, "{} is not iterable"},
     {1003, "Number of arguments does not much. Expected: {}, Given: {}"},
     {1004, "Function {} must return {}"},
+    {1005, "{} is not a member of {}"},
 };
 
 const map<int, string> LOGOS_WARNINGS = {

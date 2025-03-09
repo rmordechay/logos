@@ -30,7 +30,7 @@ void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSym
 }
 
 void CodeGenerator::generateObjectModule(LogosObject* obj, LogosGlobals globalSymbols) {
-    const auto objName = obj->name();
+    const auto objName = obj->getName();
     const auto module = createModule(objName);
     auto metadata = CodeGenMetadata{.currentModule = module};
     metadata.logosStack.globalSymbols = globalSymbols;

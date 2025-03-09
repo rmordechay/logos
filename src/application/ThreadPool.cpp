@@ -1,6 +1,7 @@
 #include "ThreadPool.h"
 
-ThreadPool::ThreadPool() {
+void ThreadPool::start()
+{
     for(size_t i = 0; i < threadsNumber; ++i) {
         workers.emplace_back([this] {
             while(true) {

@@ -1,7 +1,6 @@
 #ifndef LOGOSFUNCCALLEXPR_H
 #define LOGOSFUNCCALLEXPR_H
 #include <stmts/LogosStmt.h>
-
 #include "LogosUnaryExpr.h"
 
 class LogosFuncCall final : public LogosStmt, public LogosUnaryExpr {

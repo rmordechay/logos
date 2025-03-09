@@ -7,7 +7,7 @@ class LogosConstant;
 
 class LogosType {
 public:
-    virtual const string name() const = 0;
+    virtual const string getName() const = 0;
     virtual Type* getIRType() = 0;
     virtual LogosConstant* getZeroValue() = 0;
     virtual bool equals(LogosType* other) const = 0;

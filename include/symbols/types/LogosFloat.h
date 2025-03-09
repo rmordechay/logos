@@ -9,14 +9,14 @@ public:
     Type* IRType = Type::getFloatTy(context);
     string typeName = "Float";
 
-    const string name() const override;
+    const string getName() const override;
     Type* getIRType() override;
     LogosConstant* getZeroValue() override;
     bool equals(LogosType* other) const override;
     ~LogosFloat() override = default;
 };
 
-inline const string LogosFloat::name() const {
+inline const string LogosFloat::getName() const {
     return typeName;
 }
 
@@ -29,7 +29,7 @@ inline LogosConstant* LogosFloat::getZeroValue() {
 }
 
 inline bool LogosFloat::equals(LogosType* other) const {
-    return typeName == other->name();
+    return typeName == other->getName();
 }
 
 inline LogosFloat LOGOS_FLOAT;
