@@ -10,14 +10,14 @@ public:
     string typeName = "Bool";
     string trueLiteral = "true";
 
-    const string name() const override;
+    const string getName() const override;
     Type* getIRType() override;
     LogosConstant* getZeroValue() override;
     bool equals(LogosType* other) const override;
     ~LogosBool() override = default;
 };
 
-inline const string LogosBool::name() const {
+inline const string LogosBool::getName() const {
     return typeName;
 }
 
@@ -30,7 +30,7 @@ inline LogosConstant* LogosBool::getZeroValue() {
 }
 
 inline bool LogosBool::equals(LogosType* other) const {
-    return typeName == other->name();
+    return typeName == other->getName();
 }
 
 inline LogosBool LOGOS_BOOL;

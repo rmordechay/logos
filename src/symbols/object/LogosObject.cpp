@@ -3,7 +3,7 @@
 #include "object/LogosField.h"
 #include <ranges>
 
-const string LogosObject::name() const {
+const string LogosObject::getName() const {
     return typeName;
 }
 
@@ -14,7 +14,7 @@ Type* LogosObject::getIRType() {
         auto fieldType = val->type->getIRType();
         elementTypes.push_back(fieldType);
     }
-    IRType = StructType::create(context, elementTypes, name());
+    IRType = StructType::create(context, elementTypes, getName());
     return IRType;
 }
 
@@ -24,7 +24,7 @@ LogosConstant* LogosObject::getZeroValue() {
 }
 
 bool LogosObject::equals(LogosType* other) const {
-    return typeName == other->name();
+    return typeName == other->getName();
 }
 
 LogosObject::~LogosObject() {

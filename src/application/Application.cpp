@@ -22,6 +22,7 @@ void Application::runLogos() {
 
 map<string, LogosFile*> Application::parseFiles() {
     ThreadPool threadPool;
+    threadPool.start();
     map<string, LogosFile*> files;
     parseTree(rootPath, files, threadPool);
     threadPool.wait();
@@ -53,7 +54,7 @@ map<string, LogosSymbol> Application::getGlobalsSymbols(const map<string, LogosF
     for (const auto& [_, file] : files) {
         if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
             const auto object = objFile->obj;
-            globalSymbols[object->name()] = LogosSymbol(OBJECT, object);
+            globalSymbols[object->getName()] = LogosSymbol(OBJECT, object);
         } else if (const auto mainFile = dynamic_cast<LogosMainFile*>(file)) {
             for (const auto &func : mainFile->funcs) {
                 globalSymbols[func->name] = LogosSymbol(FUNC_IMPL, func);
@@ -79,6 +80,7 @@ LogosFile* Application::getFile(const directory_entry& fileEntry) {
 
 bool Application::analyse(const map<string, LogosFile*>& files, const map<string, LogosSymbol>& globalSymbols) {
     ThreadPool threadPool;
+    threadPool.start();
     vector<bool> semaSuccess;
     for (const auto& pair : files) {
         threadPool.runTask([=, &pair, &semaSuccess, &globalSymbols] {

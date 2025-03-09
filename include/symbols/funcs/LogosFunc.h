@@ -28,19 +28,19 @@ public:
     ~LogosFunc() override;
 };
 
-inline LogosFunc::~LogosFunc() {
-    for (const auto param : params) {
-        delete param;
-    }
-    delete stmtBlock;
-}
-
 inline void LogosFunc::setArgs(CodeGenMetadata* metadata, Function::arg_iterator& args) const {
     for (const auto& param : params) {
         param->setIRValue(args);
         args++->setName(param->name);
         metadata->logosStack.addLocalSymbol(param->name, LogosSymbol(PARAM, param));
     }
+}
+
+inline LogosFunc::~LogosFunc() {
+    for (const auto param : params) {
+        delete param;
+    }
+    delete stmtBlock;
 }
 
 #endif //LOGOSFUNC_H

@@ -4,7 +4,7 @@
 #include <object/LogosObject.h>
 
 Value* LogosMethodImpl::computeIRValue(CodeGenMetadata* metadata) {
-    combinedName = obj->name() + "_" + name+ "_" + type->name();
+    combinedName = obj->getName() + "_" + name+ "_" + type->getName();
     metadata->logosStack.enterScope();
     IRFunc = getIRFunc(metadata);
     metadata->logosStack.currentFunc = IRFunc;

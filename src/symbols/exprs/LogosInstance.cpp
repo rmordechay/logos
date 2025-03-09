@@ -4,7 +4,7 @@
 
 Value* LogosInstance::computeIRValue(CodeGenMetadata* metadata) {
     const auto obj = metadata->logosStack.getSymbol(name)->object;
-    if (modules.find(obj->name()) == modules.end()) {
+    if (modules.find(obj->getName()) == modules.end()) {
         CodeGenerator::generateObjectModule(obj, metadata->logosStack.globalSymbols);
     }
     const auto IRType = obj->getIRType();

@@ -3,7 +3,6 @@
 #include <map>
 #include <funcs/LogosMethodImpl.h>
 
-class LogosFuncImpl;
 class LogosField;
 
 class LogosObject final : public LogosType {
@@ -14,7 +13,7 @@ public:
     map<string, LogosMethodImpl*> methods;
 
     explicit LogosObject(const string& typeName) : typeName(typeName) {}
-    const string name() const override;
+    const string getName() const override;
     Type* getIRType() override;
     LogosConstant* getZeroValue() override;
     bool equals(LogosType* other) const override;

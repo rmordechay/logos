@@ -11,14 +11,14 @@ public:
     string typeName = "Int";
     LogosConstant zeroValue = LogosConstant(this, 0);
 
-    const string name() const override;
+    const string getName() const override;
     Type* getIRType() override;
     LogosConstant* getZeroValue() override;
     bool equals(LogosType* other) const override;
     ~LogosInt() override = default;
 };
 
-inline const string LogosInt::name() const {
+inline const string LogosInt::getName() const {
     return typeName;
 }
 
@@ -31,7 +31,7 @@ inline LogosConstant* LogosInt::getZeroValue() {
 }
 
 inline bool LogosInt::equals(LogosType* other) const {
-    return typeName == other->name();
+    return typeName == other->getName();
 }
 
 inline LogosInt LOGOS_INT;

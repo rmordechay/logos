@@ -8,14 +8,14 @@ public:
     Type* IRType = Type::getVoidTy(context);
     string typeName = "Void";
 
-    const string name() const override;
+    const string getName() const override;
     Type* getIRType() override;
     LogosConstant* getZeroValue() override;
     bool equals(LogosType* other) const override;
     ~LogosVoid() override = default;
 };
 
-inline const string LogosVoid::name() const {
+inline const string LogosVoid::getName() const {
     return typeName;
 }
 
@@ -28,7 +28,7 @@ inline LogosConstant* LogosVoid::getZeroValue() {
 }
 
 inline bool LogosVoid::equals(LogosType* other) const {
-    return typeName == other->name();
+    return typeName == other->getName();
 }
 
 inline LogosVoid LOGOS_VOID;

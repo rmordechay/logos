@@ -10,14 +10,14 @@ public:
     Type* IRType = PointerType::get(Type::getInt8Ty(context), 0);
     string typeName = "Str";
 
-    const string name() const override;
+    const string getName() const override;
     Type* getIRType() override;
     LogosConstant* getZeroValue() override;
     bool equals(LogosType* other) const override;
     ~LogosString() override = default;
 };
 
-inline const string LogosString::name() const {
+inline const string LogosString::getName() const {
     return typeName;
 }
 
@@ -30,7 +30,7 @@ inline LogosConstant* LogosString::getZeroValue() {
 }
 
 inline bool LogosString::equals(LogosType* other) const {
-    return typeName == other->name();
+    return typeName == other->getName();
 }
 
 inline LogosString LOGOS_STRING;
