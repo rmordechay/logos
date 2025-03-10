@@ -19,11 +19,21 @@ void CommandLine::parse(const int argc, char* argv[]) {
     }
 }
 
+void CommandLine::printVersion() const {
+    std::cout << "Logos version: " + string(LOGOS_VERSION) << std::endl;
+    std::cout << "Architecture: " + string(ARCH_NAME) << std::endl;
+    std::cout << "Operation System: " + string(OS_NAME) << std::endl;
+}
+
 void CommandLine::execute() const {
     if (command == "run") {
         runCommand();
     } else if (command == "build") {
         buildCommand();
+    } else if (command == "help") {
+        buildCommand();
+    } else if (command == "version") {
+        printVersion();
     } else {
         helpCommand();
     }
@@ -52,7 +62,7 @@ void CommandLine::buildCommand() const {
 void CommandLine::helpCommand() {
     std::cout << "Usage: lgs command [options]" << "\n\n";
     std::cout << "Commands:" << '\n';
-    std::cout << "run       execute a logos script" << '\n';
-    std::cout << "version   print logos version" << '\n';
-    std::cout << "help      print logos help" << '\n';
+    std::cout << "run                       execute a logos script" << '\n';
+    std::cout << "help                      print logos help" << '\n';
+    std::cout << "version, -v, --version    print logos version" << '\n';
 }

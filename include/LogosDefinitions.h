@@ -1,6 +1,7 @@
 #ifndef LOGOSCONFIGS_H
 #define LOGOSCONFIGS_H
 
+const auto LOGOS_VERSION = "0.0.1";
 const auto LOGOS_SELF = "self";
 const auto LOGOS_MAIN_FILE = "Main";
 const auto LOGOS_MAIN_FUNCTION = "main";
