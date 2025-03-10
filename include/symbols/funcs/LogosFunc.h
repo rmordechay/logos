@@ -2,9 +2,8 @@
 #define LOGOSFUNC_H
 #include "LogosParam.h"
 #include "LogosValue.h"
-#include "exprs/LogosConstant.h"
+#include "unary/constants/LogosConstant.h"
 #include "stmts/LogosStmtBlock.h"
-#include "stmts/LogosVarDec.h"
 
 class LogosParam;
 class LogosExpr;

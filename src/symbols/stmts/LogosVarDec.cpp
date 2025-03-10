@@ -1,5 +1,5 @@
 #include "stmts/LogosVarDec.h"
-#include "exprs/LogosConstant.h"
+#include "unary/constants/LogosConstant.h"
 #include <LogosStack.h>
 
 Value* LogosVarDec::computeIRValue(CodeGenMetadata* metadata) {

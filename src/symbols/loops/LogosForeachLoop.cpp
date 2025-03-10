@@ -1,15 +1,8 @@
 #include "loops/LogosForeachLoop.h"
-
-#include "exprs/LogosArrayIndex.h"
-#include "exprs/LogosFuncCall.h"
-#include "exprs/LogosSelection.h"
-#include "exprs/LogosVariable.h"
+#include "unary/LogosArrayIndex.h"
 #include "loops/LogosLoopVar.h"
-#include "object/LogosField.h"
-
-#include <exprs/LogosArray.h>
-#include <exprs/LogosConstant.h>
-#include <funcs/LogosBuiltinFunc.h>
+#include <unary/LogosArray.h>
+#include <unary/constants/LogosConstant.h>
 #include <types/LogosInt.h>
 
 Value* LogosForeachLoop::computeIRValue(CodeGenMetadata* metadata) {

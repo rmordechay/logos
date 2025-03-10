@@ -2,9 +2,9 @@
 #define SEMAANALYSER_H
 #include <mutex>
 #include "LogosStack.h"
-#include "exprs/LogosMethodCall.h"
+#include "unary/LogosMethodCall.h"
 
-#include "exprs/LogosUnaryExpr.h"
+#include "unary/LogosUnaryExpr.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
 #include "object/LogosObject.h"

@@ -1,5 +1,5 @@
 #include "funcs/LogosMethodImpl.h"
-#include "exprs/LogosConstant.h"
+#include "unary/constants/LogosConstant.h"
 #include <LogosDefinitions.h>
 #include <object/LogosObject.h>
 

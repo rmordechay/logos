@@ -2,7 +2,7 @@
 #define LOGOSIFSTMT_H
 #include "LogosStmt.h"
 #include "LogosStmtBlock.h"
-#include "exprs/LogosExpr.h"
+#include "LogosExpr.h"
 
 class LogosIf final : public LogosStmt {
 public:

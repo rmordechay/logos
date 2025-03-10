@@ -2,8 +2,8 @@
 #define SEMANTICANALYSER_H
 
 #include "LogosParser.h"
-#include "exprs/LogosMethodCall.h"
-#include "exprs/LogosUnaryExpr.h"
+#include "unary/LogosMethodCall.h"
+#include "unary/LogosUnaryExpr.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
 #include "stmts/LogosAssignment.h"
@@ -40,6 +40,7 @@ public:
     static LogosVariable* getVariable(const string& varName, const ParserRuleContext* ctx);
     static LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     static LogosMethodCall *getMethodCall(LogosParser::FuncCallContext* ctx);
+    static LogosInstance* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
     static LogosUnaryExpr* getFirstSelection(const LogosParser::SelectionContext* ctx, LogosParser::FirstSelectionElementContext* firstExpr);
     static vector<LogosUnaryExpr*> getInnerSelections(const vector<LogosParser::InnerSelectionElementContext*>& ctx);
     static LogosSelection* getSelection(LogosParser::SelectionContext* ctx);

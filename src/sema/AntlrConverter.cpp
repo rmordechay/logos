@@ -1,23 +1,25 @@
 #include "sema/AntlrConverter.h"
 
-#include "exprs/LogosBinaryExpr.h"
-#include "exprs/LogosConstant.h"
-#include "exprs/LogosInstance.h"
-#include "exprs/LogosOperator.h"
-#include "exprs/LogosSelection.h"
-#include "exprs/LogosStringConst.h"
+#include "binary/LogosBinaryExpr.h"
+#include "binary/LogosOperator.h"
+#include "unary/LogosMethodCall.h"
+#include "unary/constants/LogosConstant.h"
+#include "unary/constants/LogosStringConst.h"
+#include "unary//LogosInstance.h"
+#include "unary//LogosSelection.h"
+#include <exprs/unary/LogosArray.h>
+#include <exprs/unary/LogosArrayIndex.h>
+#include <exprs/unary/LogosFuncCall.h>
+#include <exprs/unary/LogosVariable.h>
 #include "funcs/LogosParam.h"
 #include "loops/LogosLoopVar.h"
 #include "object/LogosField.h"
 #include "stmts/LogosReturn.h"
 #include "types/LogosBool.h"
 #include "types/LogosFloat.h"
+
 #include <LogosDefinitions.h>
 #include <LogosError.h>
-#include <exprs/LogosArray.h>
-#include <exprs/LogosArrayIndex.h>
-#include <exprs/LogosFuncCall.h>
-#include <exprs/LogosVariable.h>
 #include <loops/LogosForeachLoop.h>
 #include <loops/LogosRangeLoop.h>
 #include <types/LogosString.h>
@@ -328,6 +330,12 @@ LogosMethodCall* AntlerConverter::getMethodCall(LogosParser::FuncCallContext* ct
     return funcCallExpr;
 }
 
+LogosInstance* AntlerConverter::getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) {
+    const auto instance = new LogosInstance(type->getText());
+    instance->setPosition(ctx->start);
+    return instance;
+}
+
 LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) {
     const auto firstElement = ctx->firstSelectionElement();
     const auto firstExpr = getFirstSelection(ctx, firstElement);
@@ -344,6 +352,9 @@ LogosUnaryExpr* AntlerConverter::getFirstSelection(const LogosParser::SelectionC
     }
     if (const auto arrayIndex = firstExpr->arrayIndex()) {
         return getArrayIndex(arrayIndex);
+    }
+    if (const auto type = firstExpr->TYPE()) {
+        return getTypeConstant(type, ctx);
     }
     return nullptr;
 }

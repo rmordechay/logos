@@ -1,4 +1,4 @@
-#include "exprs/LogosMethodCall.h"
+#include "unary/LogosMethodCall.h"
 #include "funcs/LogosMethodImpl.h"
 
 Value* LogosMethodCall::computeIRValue(CodeGenMetadata* metadata) {

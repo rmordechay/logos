@@ -1,6 +1,6 @@
 #include "stmts/LogosAssignment.h"
 
-#include "exprs/LogosInstance.h"
+#include "unary/LogosInstance.h"
 #include "object/LogosField.h"
 #include "object/LogosObject.h"
 #include "stmts/LogosVarDec.h"

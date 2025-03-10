@@ -1,7 +1,7 @@
 #ifndef LOGOSRETURNSTMT_H
 #define LOGOSRETURNSTMT_H
 #include "LogosStmt.h"
-#include "exprs/LogosExpr.h"
+#include "LogosExpr.h"
 
 class LogosReturn final : public LogosStmt {
 public:

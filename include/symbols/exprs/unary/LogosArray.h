@@ -3,7 +3,7 @@
 
 #include "LogosIterable.h"
 #include "LogosUnaryExpr.h"
-#include "exprs/LogosExpr.h"
+#include "LogosExpr.h"
 
 class LogosArray final : public LogosUnaryExpr, public LogosIterable {
 public:

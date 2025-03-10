@@ -1,5 +1,7 @@
 #ifndef LOGOSOBJECT_H
 #define LOGOSOBJECT_H
+#include "LogosType.h"
+
 #include <map>
 #include <funcs/LogosMethodImpl.h>
 

@@ -1,4 +1,4 @@
-#include "exprs//LogosArray.h"
+#include "unary/LogosArray.h"
 
 Value* LogosArray::computeIRValue(CodeGenMetadata* metadata) {
     vector<Constant*> arrValues;

@@ -1,10 +1,10 @@
-#include "exprs/LogosSelection.h"
-#include "exprs/LogosArrayIndex.h"
-#include "exprs/LogosConstant.h"
-#include "exprs/LogosFuncCall.h"
-#include "exprs/LogosInstance.h"
-#include "exprs/LogosMethodCall.h"
-#include "exprs/LogosVariable.h"
+#include "unary/LogosSelection.h"
+#include "unary/LogosArrayIndex.h"
+#include "unary/constants/LogosConstant.h"
+#include "unary/LogosFuncCall.h"
+#include "unary/LogosInstance.h"
+#include "unary/LogosMethodCall.h"
+#include "unary/LogosVariable.h"
 #include "object/LogosField.h"
 #include <LogosStack.h>
 

@@ -1,6 +1,6 @@
 #ifndef LOGOSSTRINGCONST_H
 #define LOGOSSTRINGCONST_H
-#include "LogosIterable.h"
+#include "unary/LogosIterable.h"
 
 #include <string>
 

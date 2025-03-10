@@ -1,4 +1,4 @@
-#include "exprs/LogosBinaryExpr.h"
+#include "binary/LogosBinaryExpr.h"
 
 Value* LogosBinaryExpr::computeIRValue(CodeGenMetadata* metadata) {
     const auto l = left->writeIRValue(metadata);

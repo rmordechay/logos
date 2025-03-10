@@ -1,12 +1,12 @@
-#include "exprs/LogosVariable.h"
+#include "unary/LogosVariable.h"
 
-#include "exprs/LogosFuncCall.h"
-#include "exprs/LogosSelection.h"
+#include "unary/LogosFuncCall.h"
+#include "unary/LogosSelection.h"
 #include "loops/LogosLoopVar.h"
 #include "object/LogosField.h"
 
 #include <LogosStack.h>
-#include <exprs/LogosBinaryExpr.h>
+#include <binary/LogosBinaryExpr.h>
 #include <funcs/LogosBuiltinFunc.h>
 #include <funcs/LogosFuncImpl.h>
 

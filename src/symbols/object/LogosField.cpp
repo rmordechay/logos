@@ -1,6 +1,6 @@
 #include "object/LogosField.h"
 
-#include "exprs/LogosExpr.h"
+#include "LogosExpr.h"
 #include "object/LogosObject.h"
 
 #include <LogosDefinitions.h>

@@ -1,4 +1,4 @@
-#include "exprs/LogosFuncCall.h"
+#include "unary/LogosFuncCall.h"
 
 #include <LogosStack.h>
 #include "funcs/LogosFunc.h"

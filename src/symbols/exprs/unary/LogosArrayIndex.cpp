@@ -1,7 +1,7 @@
-#include "exprs/LogosArrayIndex.h"
+#include "unary/LogosArrayIndex.h"
 #include "stmts/LogosVarDec.h"
-#include <exprs/LogosArray.h>
-#include <exprs/LogosConstant.h>
+#include <unary/LogosArray.h>
+#include <unary/constants/LogosConstant.h>
 
 Value* LogosArrayIndex::computeIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;

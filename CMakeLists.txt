@@ -13,6 +13,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include/codegen
     ${CMAKE_CURRENT_SOURCE_DIR}/include/sema
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols/exprs
     ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
     ${CMAKE_CURRENT_SOURCE_DIR}/include/loops
 )
@@ -35,22 +36,22 @@ add_library(lib STATIC
     include/sema/AntlrConverter.h
     src/sema/SemaAnalyser.cpp
     include/sema/SemaAnalyser.h
-    src/symbols/exprs/LogosBinaryExpr.cpp
-    include/symbols/exprs/LogosBinaryExpr.h
-    src/symbols/exprs/LogosConstant.cpp
-    include/symbols/exprs/LogosConstant.h
-    src/symbols/exprs/LogosFuncCall.cpp
-    include/symbols/exprs/LogosFuncCall.h
-    src/symbols/exprs/LogosInstance.cpp
-    include/symbols/exprs/LogosInstance.h
-    src/symbols/exprs/LogosSelection.cpp
-    include/symbols/exprs/LogosSelection.h
-    src/symbols/exprs/LogosVariable.cpp
-    include/symbols/exprs/LogosVariable.h
-    src/symbols/exprs/LogosArray.cpp
-    include/symbols/exprs/LogosArray.h
-    src/symbols/exprs/LogosArrayIndex.cpp
-    include/symbols/exprs/LogosArrayIndex.h
+    src/symbols/exprs/binary/LogosBinaryExpr.cpp
+    include/symbols/exprs/binary/LogosBinaryExpr.h
+    src/symbols/exprs/unary/constants/LogosConstant.cpp
+    include/symbols/exprs/unary/constants/LogosConstant.h
+    src/symbols/exprs/unary/LogosFuncCall.cpp
+    include/symbols/exprs/unary/LogosFuncCall.h
+    src/symbols/exprs/unary/LogosInstance.cpp
+    include/symbols/exprs/unary/LogosInstance.h
+    src/symbols/exprs/unary/LogosSelection.cpp
+    include/symbols/exprs/unary/LogosSelection.h
+    src/symbols/exprs/unary/LogosVariable.cpp
+    include/symbols/exprs/unary/LogosVariable.h
+    src/symbols/exprs/unary/LogosArray.cpp
+    include/symbols/exprs/unary/LogosArray.h
+    src/symbols/exprs/unary/LogosArrayIndex.cpp
+    include/symbols/exprs/unary/LogosArrayIndex.h
     src/symbols/funcs/LogosPrint.cpp
     include/symbols/funcs/LogosPrint.h
     src/symbols/funcs/LogosFuncImpl.cpp
@@ -85,13 +86,13 @@ add_library(lib STATIC
     include/symbols/types/LogosVoid.h
     src/symbols/loops/LogosLoopVar.cpp
     include/symbols/loops/LogosLoopVar.h
-    include/symbols/exprs/LogosIterable.h
-    include/symbols/exprs/LogosStringConst.h
-    src/symbols/exprs/LogosStringConst.cpp
+    include/symbols/exprs/unary/LogosIterable.h
+    include/symbols/exprs/unary/constants/LogosStringConst.h
+    src/symbols/exprs/unary/constants/LogosStringConst.cpp
     src/symbols/funcs/LogosParam.cpp
     include/symbols/funcs/LogosParam.h
-    src/symbols/exprs/LogosMethodCall.cpp
-    include/symbols/exprs/LogosMethodCall.h
+    src/symbols/exprs/unary/LogosMethodCall.cpp
+    include/symbols/exprs/unary/LogosMethodCall.h
 )
 
 add_executable(logos main.cpp)

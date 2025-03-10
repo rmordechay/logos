@@ -1,6 +1,6 @@
 #include "loops/LogosLoopVar.h"
 #include "LogosType.h"
-#include "exprs/LogosArrayIndex.h"
+#include "unary/LogosArrayIndex.h"
 
 #include <exprs/LogosExpr.h>
 

@@ -3,7 +3,7 @@
 #include "loops/LogosLoopVar.h"
 
 #include <LogosStack.h>
-#include <exprs/LogosConstant.h>
+#include <unary/constants/LogosConstant.h>
 #include <types/LogosInt.h>
 
 Value* LogosRangeLoop::computeIRValue(CodeGenMetadata* metadata) {

@@ -1,7 +1,7 @@
 #ifndef LOGOSCONSTANTEXPR_H
 #define LOGOSCONSTANTEXPR_H
 #include <LogosMetadata.h>
-#include "LogosUnaryExpr.h"
+#include "unary/LogosUnaryExpr.h"
 #include <variant>
 
 class LogosStringConst;
