@@ -8,16 +8,16 @@ class LogosExpr;
 class LogosField final : public LogosValue {
 public:
     string name;
-    string parentName;
     size_t fieldPosition;
+    LogosObject* parentObj = nullptr;
     LogosType* type = nullptr;
     LogosType* userType = nullptr;
     LogosExpr* expr = nullptr;
 
-    LogosField(const string& name, const string& parentName, LogosType* inferredType, LogosExpr* expr, const size_t fieldPosition) :
+    LogosField(const string& name, LogosObject* parentObj, LogosType* inferredType, LogosExpr* expr, const size_t fieldPosition) :
         name(name),
-        parentName(parentName),
         fieldPosition(fieldPosition),
+        parentObj(parentObj),
         type(inferredType),
         expr(expr) {
     }

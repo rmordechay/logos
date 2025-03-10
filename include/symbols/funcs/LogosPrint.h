@@ -1,18 +1,15 @@
 #ifndef LOGOSPRINT_H
 #define LOGOSPRINT_H
-
 #include "LogosBuiltinFunc.h"
-#include "LogosFunc.h"
 #include "types/LogosInt.h"
 #include <types/LogosString.h>
 #include <types/LogosVoid.h>
 
-
 class LogosPrint final : public LogosBuiltinFunc {
 public:
     const string logosName = "print";
-    const string IRNameInt = "printInt";
-    const string IRNameString = "printString";
+    const string IRNameInt = "print_Void_Int";
+    const string IRNameString = "print_Void_Str";
     FunctionType* const funcTypeInt = FunctionType::get(LOGOS_VOID.IRType, LOGOS_INT.IRType, false);
     FunctionType* const funcTypeString = FunctionType::get(LOGOS_VOID.IRType, LOGOS_STRING.IRType, false);
 

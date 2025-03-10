@@ -6,7 +6,9 @@
 class LogosMethodCall final : public LogosStmt, public LogosUnaryExpr {
 public:
     string name;
+    string combinedName;
     vector<LogosExpr*> args;
+    LogosMethodImpl* methodImpl = nullptr;
     Position position = Position();
 
     explicit LogosMethodCall(const string& name) : name(name) {}

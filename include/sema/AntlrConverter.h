@@ -9,7 +9,7 @@
 #include "stmts/LogosAssignment.h"
 #include "stmts/LogosIf.h"
 #include "types/LogosInt.h"
-#include "unary/constants/LogosTypeConst.h"
+#include "constants/LogosTypeConst.h"
 
 class LogosAssignment;
 using namespace std;
@@ -23,9 +23,9 @@ public:
     LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx);
     LogosObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx);
     static LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
-    static LogosField* getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, size_t position);
-    static LogosFuncImpl* getFunc(LogosParser::FuncImplementationContext* ctx);
-    static LogosMethodImpl* getMethod(LogosParser::FuncImplementationContext* ctx, LogosObject* obj);
+    static LogosField* getField(LogosParser::ExplicitVarDecContext* varDec, size_t position, LogosObject* obj);
+    static LogosFuncImpl* getFuncImpl(LogosParser::FuncImplementationContext* ctx);
+    static LogosMethodImpl* getMethodImpl(LogosParser::FuncImplementationContext* ctx, LogosObject* obj);
     static LogosStmt* getStmt(LogosParser::StatementContext* ctx);
     static LogosAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     static LogosStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
@@ -49,6 +49,7 @@ public:
     static LogosUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
     static LogosTypeConst* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
     static LogosType* getType(tree::TerminalNode* type);
+    static LogosType* getFuncType(LogosParser::FuncImplementationContext* ctx);
     ~AntlerConverter() = default;
 };
 

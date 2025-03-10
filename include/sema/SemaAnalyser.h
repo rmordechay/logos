@@ -1,5 +1,7 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
+#include "LogosError.h"
+
 #include <mutex>
 #include "LogosStack.h"
 #include "unary/LogosMethodCall.h"
@@ -30,20 +32,20 @@ public:
     void visitMainFile(const LogosMainFile* mainFile);
     void visitObjectFile(const LogosObjectFile* objectFile);
     void visitObject(const LogosObject* object);
-    static void visitField(LogosField* field);
+    void visitField(LogosField* field);
     void visitMethodImpl(const LogosMethodImpl* method);
     void visitMainFunc(const LogosFuncImpl* mainFunc);
     void visitFuncImpl(const LogosFuncImpl* func);
-    static void visitParam(LogosParam* param);
+    void visitParam(LogosParam* param);
     void visitStmt(LogosStmt* stmt);
     void visitStmtBlock(const LogosStmtBlock* stmtBlock);
-    static void visitAssignment(const LogosAssignment* assignment);
+    void visitAssignment(const LogosAssignment* assignment);
     void visitVarDec(LogosVarDec* varDec);
     void visitIfStmt(const LogosIf* ifStmt);
     void visitLoopStmt(LogosLoop* loopStmt);
     void visitRangeLoop(const LogosRangeLoop* rangeLoop);
     void visitForeachLoop(LogosForeachLoop* foreachLoop);
-    static void visitReturnStmt(LogosReturn* returnStmt);
+    void visitReturnStmt(const LogosReturn* returnStmt);
     void visitExpr(LogosExpr* expr);
     void visitArray(LogosArray* array);
     void visitUnaryExpr(LogosUnaryExpr* unaryExpr);
@@ -55,28 +57,27 @@ public:
     void visitSelection(LogosSelection* selection);
     void visitInstance(LogosInstance* instance);
     void visitArrayIndex(LogosArrayIndex* arrayIndex);
-    static void visitConstant(const LogosConstant* constant);
+    void visitConstant(const LogosConstant* constant);
 
     void setFuncCallType(LogosFuncCall* funcCall);
-    void setMethodCallType(LogosMethodCall* methodCall);
     void setLoopVarType(const LogosForeachLoop* foreachLoop);
-    static void setArrayType(LogosArray* array);
-    static void setBinaryExprType(LogosBinaryExpr* binaryExpr);
+    void setArrayType(LogosArray* array);
+    void setBinaryExprType(LogosBinaryExpr* binaryExpr);
     void setForLoopIterable(LogosForeachLoop* foreachLoop, const LogosVariable* variable);
     void setForLoopIterable(LogosForeachLoop* foreachLoop);
 
     void resolveFirstSelection(const LogosSelection* selection, LogosVariable* variable);
     void resolveFirstSelection(const LogosSelection* selection, LogosFuncCall* funcCall);
-    void resolveInnerSelection(const LogosSelection* selection, int nextIndex, const LogosInstance* instance);
-    static void resolveInnerSelection(const LogosSelection* selection, int i, const LogosMethodCall* methodCall);
-    static void resolveInnerSelection(const LogosSelection* selection, int i, LogosField* field);
-    static void resolveInnerSelection(const LogosSelection* selection, int i, LogosFuncImpl* funcImpl);
+    void resolveInnerSelection(const LogosSelection* selection, int i, LogosInstance* instance);
+    void resolveInnerSelection(const LogosSelection* selection, int i, LogosMethodCall* methodCall);
+    void resolveInnerSelection(const LogosSelection* selection, int i, LogosField* field);
+    void resolveInnerSelection(const LogosSelection* selection, int i, LogosFuncImpl* funcImpl);
 
-    void checkTypesMatch(const LogosType* first, const LogosType* second, const LogosValue* value);
+    bool matchTypes(const LogosType* first, const LogosType* second, const LogosValue* value);
     void setUnsuccessful();
 
-    void printError(int code, const vector<string>& args = {});
-    void printError(int code, const LogosValue* value, const vector<string>& args = {});
+    void printError(LogosErrorNo code, const vector<string>& args = {});
+    void printError(LogosErrorNo code, const LogosValue* value, const vector<string>& args = {});
     LogosSymbol* getSymbol(const string& name, const LogosValue* value);
     ~SemaAnalyser() = default;
 };

@@ -35,16 +35,11 @@ void CodeGenerator::generateObjectModule(LogosObject* obj, LogosGlobals globalSy
     auto metadata = CodeGenMetadata{.currentModule = module};
     metadata.logosStack.globalSymbols = globalSymbols;
 
-    obj->getIRType();
-    for (const auto& [name, field] : obj->fields) {
-        metadata.logosStack.addGlobalSymbol(name, LogosSymbol(FIELD, field));
-    }
     for (const auto& [_, method] : obj->methods) {
         method->writeIRValue(&metadata);
     }
 
     writeIRToFile(metadata.currentModule, objName);
-    std::cout << "\n-----\n\n";
 }
 
 Module* CodeGenerator::createModule(const string& objName) {
@@ -58,8 +53,9 @@ Module* CodeGenerator::createModule(const string& objName) {
 void CodeGenerator::writeIRToFile(const Module* module, const string& name) {
     std::error_code EC;
     raw_fd_ostream textFile(LOGOS_BUILD_DIR + name + ".ll", EC, sys::fs::OF_None);
-    module->print(outs(), nullptr);
     module->print(textFile, nullptr);
+    module->print(outs(), nullptr);
+    std::cout << "\n-----\n\n";
 }
 
 void CodeGenerator::initIR() {
@@ -72,11 +68,4 @@ void CodeGenerator::initIR() {
     string error;
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
-}
-
-void CodeGenerator::emitIRFile(const string& filePath, const Module* const module) {
-    std::error_code EC;
-    raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
-    module->print(textFile, nullptr);
-    module->print(outs(), nullptr);
 }

@@ -1,43 +1,44 @@
 #include "funcs/LogosMethodImpl.h"
-#include "unary/constants/LogosConstant.h"
-#include <LogosDefinitions.h>
+#include "constants/LogosConstant.h"
 #include <object/LogosObject.h>
 
 Value* LogosMethodImpl::computeIRValue(CodeGenMetadata* metadata) {
-    combinedName = obj->getName() + "_" + name+ "_" + type->getName();
+    setCombinedName();
     metadata->logosStack.enterScope();
-    IRFunc = getIRFunc(metadata);
-    metadata->logosStack.currentFunc = IRFunc;
+    setIRFunc(metadata);
 
+    const auto entryBlock = BasicBlock::Create(context, "entry");
     startBlock(metadata, entryBlock);
     stmtBlock->writeIRValue(metadata);
     metadata->logosStack.exitScope();
     return nullptr;
 }
 
-Value* LogosMethodImpl::call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
-    vector<Value*> argsValues;
-    for (const auto& arg : args) {
-        const auto argValue = arg->writeIRValue(metadata);
-        argsValues.emplace_back(argValue);
+void LogosMethodImpl::setIRFunc(CodeGenMetadata* metadata) {
+    auto selfIRType = params[0]->type->getIRType()->getPointerTo();
+    IRParamsTypes.emplace_back(selfIRType);
+    for (int i = 1; i < params.size(); ++i) {
+        auto paramIRType = params[i]->type->getIRType();
+        IRParamsTypes.emplace_back(paramIRType);
     }
-    const auto func = metadata->currentModule->getOrInsertFunction(combinedName, IRFunc->getFunctionType());
-    return metadata->builder.CreateCall(func, argsValues);
-}
-
-Function* LogosMethodImpl::getIRFunc(CodeGenMetadata* metadata) {
-    for (const auto& param : params) {
-        IRParamsTypes.emplace_back(param->type->getIRType());
-    }
-    IRParamsTypes.emplace_back(obj->getIRType()->getPointerTo());
-    metadata->logosStack.addLocalSymbol(LOGOS_SELF, LogosSymbol(OBJECT, obj));
 
     const auto rt = FunctionType::get(type->getIRType(), IRParamsTypes, false);
-    const auto method = Function::Create(rt, Function::ExternalLinkage, combinedName, metadata->currentModule);
-    if (params.size() == 1) return method;
+    IRFunc = Function::Create(rt, Function::ExternalLinkage, combinedName, metadata->currentModule);
+    metadata->logosStack.currentFunc = IRFunc;
+    if (params.empty()) return;
 
-    auto args = method->arg_begin();
-    setArgs(metadata, args);
-    args->setName(LOGOS_SELF);
-    return method;
+    auto args = IRFunc->arg_begin();
+    for (const auto& param : params) {
+        param->setIRValue(args);
+        args++->setName(param->name);
+        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol(PARAM, param));
+    }
+}
+
+void LogosMethodImpl::setCombinedName() {
+    combinedName = parentObj->getName() + "_" + name;
+    combinedName += "_" + type->getName();
+    for (int i = 1; i < params.size(); ++i) {
+        combinedName += "_" + params[i]->type->getName();
+    }
 }

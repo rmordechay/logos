@@ -65,7 +65,7 @@ void logosParserInitialize() {
       "", "'=='", "'!='", "'>='", "'<='", "'('", "')'", "'{'", "'}'", "'['", 
       "']'", "'<'", "'>'", "','", "'..'", "'.'", "':'", "'='", "'-'", "'+'", 
       "'*'", "'/'", "'#'", "'\\u003F'", "'!'", "'%'", "'$'", "'&'", "'object'", 
-      "'this'", "'interface'", "'enum'", "'implements'", "'import'", "'if'", 
+      "'self'", "'interface'", "'enum'", "'implements'", "'import'", "'if'", 
       "'else'", "'for'", "'break'", "'continue'", "'return'", "'and'", "'or'", 
       "'not'", "'in'"
     },
@@ -74,7 +74,7 @@ void logosParserInitialize() {
       "RBRACE", "LBRACK", "RBRACK", "LANGLE", "RANGLE", "COMMA", "DOUBLE_DOT", 
       "DOT", "COLON", "EQUAL", "MINUS", "PLUS", "STAR", "SLASH", "HASH", 
       "QUEST_MARK", "EXCLA_MARK", "PERCENT", "DOLLAR", "AMPERSAND", "OBJECT", 
-      "THIS", "INTERFACE", "ENUM", "IMPLEMENTS", "IMPORT", "IF", "ELSE", 
+      "SELF", "INTERFACE", "ENUM", "IMPLEMENTS", "IMPORT", "IF", "ELSE", 
       "FOR", "BREAK", "CONTINUE", "RETURN", "AND", "OR", "NOT", "IN", "INTEGER", 
       "FLOAT", "BOOL", "CONST", "TYPE", "VARIABLE", "STRING", "LINE_COMMENT", 
       "BLOCK_COMMENT", "WS"
@@ -2339,7 +2339,7 @@ LogosParser::ExprContext* LogosParser::expr(int precedence) {
     _errHandler->sync(this);
     switch (_input->LA(1)) {
       case LogosParser::LBRACK:
-      case LogosParser::THIS:
+      case LogosParser::SELF:
       case LogosParser::INTEGER:
       case LogosParser::FLOAT:
       case LogosParser::BOOL:
@@ -2552,8 +2552,8 @@ tree::TerminalNode* LogosParser::UnaryExprContext::VARIABLE() {
   return getToken(LogosParser::VARIABLE, 0);
 }
 
-tree::TerminalNode* LogosParser::UnaryExprContext::THIS() {
-  return getToken(LogosParser::THIS, 0);
+tree::TerminalNode* LogosParser::UnaryExprContext::SELF() {
+  return getToken(LogosParser::SELF, 0);
 }
 
 LogosParser::FuncCallContext* LogosParser::UnaryExprContext::funcCall() {
@@ -2611,7 +2611,7 @@ LogosParser::UnaryExprContext* LogosParser::unaryExpr() {
     case 2: {
       enterOuterAlt(_localctx, 2);
       setState(334);
-      match(LogosParser::THIS);
+      match(LogosParser::SELF);
       break;
     }
 
@@ -3294,8 +3294,8 @@ tree::TerminalNode* LogosParser::FirstSelectionElementContext::TYPE() {
   return getToken(LogosParser::TYPE, 0);
 }
 
-tree::TerminalNode* LogosParser::FirstSelectionElementContext::THIS() {
-  return getToken(LogosParser::THIS, 0);
+tree::TerminalNode* LogosParser::FirstSelectionElementContext::SELF() {
+  return getToken(LogosParser::SELF, 0);
 }
 
 LogosParser::FuncCallContext* LogosParser::FirstSelectionElementContext::funcCall() {
@@ -3348,7 +3348,7 @@ LogosParser::FirstSelectionElementContext* LogosParser::firstSelectionElement() 
     case 3: {
       enterOuterAlt(_localctx, 3);
       setState(408);
-      match(LogosParser::THIS);
+      match(LogosParser::SELF);
       break;
     }
 

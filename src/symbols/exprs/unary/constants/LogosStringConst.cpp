@@ -1,4 +1,4 @@
-#include "unary/constants/LogosStringConst.h"
+#include "constants/LogosStringConst.h"
 
 size_t LogosStringConst::size() {
     return value.size();

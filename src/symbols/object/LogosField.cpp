@@ -13,8 +13,9 @@ Value* LogosField::computeIRValue(CodeGenMetadata* metadata) {
         const auto value = expr->writeIRValue(metadata);
         return builder.CreateGEP(IRType, value, nullptr);
     }
-    const auto thisType = metadata->logosStack.getSymbol(LOGOS_SELF)->object->getIRType();
-    const auto thisValue = metadata->logosStack.currentFunc->getArg(0);
-    const auto gep = builder.CreateStructGEP(thisType, thisValue, fieldPosition);
+    const auto symbol = metadata->logosStack.getSymbol(LOGOS_SELF);
+    const auto selfType = symbol->param->type->getIRType();
+    const auto selfValue = metadata->logosStack.currentFunc->getArg(0);
+    const auto gep = builder.CreateStructGEP(selfType, selfValue, fieldPosition);
     return builder.CreateLoad(IRType, gep);
 }

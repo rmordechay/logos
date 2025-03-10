@@ -4,13 +4,12 @@
 
 class LogosMethodImpl final : public LogosFunc {
 public:
-    LogosObject* obj;
-    string combinedName;
+    LogosObject* parentObj;
 
-    LogosMethodImpl(const string& name, LogosType* funcType, LogosObject* obj) : LogosFunc(name, funcType), obj(obj) {}
+    LogosMethodImpl(const string& name, LogosType* funcType, LogosObject* obj) : LogosFunc(name, funcType), parentObj(obj) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
-    Value* call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
-    Function* getIRFunc(CodeGenMetadata* metadata);
+    void setIRFunc(CodeGenMetadata* metadata);
+    void setCombinedName();
     ~LogosMethodImpl() override = default;
 };
 

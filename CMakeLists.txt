@@ -14,6 +14,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include/sema
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols/exprs
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols/exprs/unary
     ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
     ${CMAKE_CURRENT_SOURCE_DIR}/include/loops
 )
@@ -95,6 +96,7 @@ add_library(lib STATIC
     include/symbols/exprs/unary/LogosMethodCall.h
     src/symbols/exprs/unary/constants/LogosTypeConst.cpp
     include/symbols/exprs/unary/constants/LogosTypeConst.h
+    src/symbols/funcs/LogosFunc.cpp
 )
 
 add_executable(logos main.cpp)

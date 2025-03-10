@@ -10,6 +10,7 @@ using namespace llvm;
 
 struct LogosStackFrame {
     map<string, LogosSymbol> symbols;
+    const string& path = "";
 };
 
 class LogosStack : stack<LogosStackFrame> {
@@ -18,11 +19,13 @@ public:
     Function* currentFunc = nullptr;
 
     void enterScope();
+    void enterScope(const string& path);
     void exitScope();
     LogosSymbol* getSymbol(const string& name);
     void addLocalSymbol(const string& name, const LogosSymbol& symbol);
     void addGlobalSymbol(const string& name, const LogosSymbol& symbol);
     void deleteGlobalSymbol(const string& name);
+    string getStackString();
     void reset();
     ~LogosStack() = default;
 };
@@ -31,7 +34,15 @@ inline void LogosStack::enterScope() {
     if (size() > 0) {
         push(LogosStackFrame{.symbols = top().symbols});
     } else {
-        push(LogosStackFrame());
+        push(LogosStackFrame{});
+    }
+}
+
+inline void LogosStack::enterScope(const string& path) {
+    if (size() > 0) {
+        push(LogosStackFrame{.path = path, .symbols = top().symbols});
+    } else {
+        push(LogosStackFrame{.path = path});
     }
 }
 
@@ -60,6 +71,10 @@ inline void LogosStack::addGlobalSymbol(const string& name, const LogosSymbol& s
 
 inline void LogosStack::deleteGlobalSymbol(const string& name) {
     globalSymbols.erase(name);
+}
+
+inline string LogosStack::getStackString() {
+    return "";
 }
 
 inline void LogosStack::reset() {

@@ -1,6 +1,6 @@
 #include "unary/LogosSelection.h"
 #include "unary/LogosArrayIndex.h"
-#include "unary/constants/LogosConstant.h"
+#include "constants/LogosConstant.h"
 #include "unary/LogosFuncCall.h"
 #include "unary/LogosInstance.h"
 #include "unary/LogosMethodCall.h"
@@ -26,8 +26,14 @@ Value* LogosSelection::resolveFirstSelection(CodeGenMetadata* metadata, const Lo
         if (const auto instance = dynamic_cast<LogosInstance*>(varDecExpr)) {
             return resolveInnerSelection(metadata, 0, instance);
         }
+        return nullptr;
     }
-    break;
+    case PARAM: {
+        const auto paramExpr = symbol->param->expr;
+        if (const auto instance = dynamic_cast<LogosInstance*>(paramExpr)) {
+            return resolveInnerSelection(metadata, 0, instance);
+        }
+    }
     default:
         break;
     }
@@ -46,41 +52,35 @@ Value* LogosSelection::resolveFirstSelection(CodeGenMetadata* metadata, const Lo
     return nullptr;
 }
 
-Value* LogosSelection::resolveInnerSelection(CodeGenMetadata* metadata, const int nextIndex, LogosInstance* instance) {
+Value* LogosSelection::resolveInnerSelection(CodeGenMetadata* metadata, const int i, LogosInstance* instance) {
     const auto IRValue = instance->writeIRValue(metadata);
-    if (innerExprs.size() == nextIndex) return IRValue;
-    const auto nextExpr = innerExprs[nextIndex];
-    if (dynamic_cast<LogosVariable*>(nextExpr)) {
-        const auto fields = instance->obj->fields;
-        const auto field = fields.find(nextExpr->getName());
-        if (field != fields.end()) {
-            return resolveInnerSelection(metadata, nextIndex + 1, field->second);
-        }
-    } else if (const auto methodCall = dynamic_cast<LogosMethodCall*>(nextExpr)) {
-        auto methods = instance->obj->methods;
-        const auto method = methods.find(nextExpr->getName());
-        if (method != methods.end()) {
-            const auto callIRValue = method->second->call(metadata, methodCall->args);
-            methodCall->setIRValue(callIRValue);
-            return resolveInnerSelection(metadata, nextIndex + 1, methodCall);
-        }
+    if (innerExprs.size() == i) return IRValue;
+
+    const auto nextExpr = innerExprs[i];
+    if (const auto variable = dynamic_cast<LogosVariable*>(nextExpr)) {
+        const auto field = instance->obj->getField(variable->name);
+        return resolveInnerSelection(metadata, i + 1, field);
+    }
+    if (const auto methodCall = dynamic_cast<LogosMethodCall*>(nextExpr)) {
+        methodCall->writeIRValue(metadata);
+        return resolveInnerSelection(metadata, i + 1, methodCall);
     }
     return nullptr;
 }
 
-Value* LogosSelection::resolveInnerSelection(CodeGenMetadata* metadata, const int nextIndex, LogosMethodCall* methodCall) {
+Value* LogosSelection::resolveInnerSelection(CodeGenMetadata* metadata, const int i, LogosMethodCall* methodCall) {
     const auto IRValue = methodCall->writeIRValue(metadata);
-    if (innerExprs.size() == nextIndex) return IRValue;
+    if (innerExprs.size() == i) return IRValue;
     return nullptr;
 }
 
-Value* LogosSelection::resolveInnerSelection(CodeGenMetadata* metadata, const int nextIndex, LogosField* field) {
+Value* LogosSelection::resolveInnerSelection(CodeGenMetadata* metadata, const int i, LogosField* field) {
     const auto IRValue = field->writeIRValue(metadata);
-    if (innerExprs.size() == nextIndex) return IRValue;
+    if (innerExprs.size() == i) return IRValue;
     return nullptr;
 }
 
-Value* LogosSelection::resolveInnerSelection(CodeGenMetadata* metadata, int nextIndex, LogosFuncImpl* funcImpl) {
+Value* LogosSelection::resolveInnerSelection(CodeGenMetadata* metadata, int i, LogosFuncImpl* funcImpl) {
     return nullptr;
 }
 
@@ -89,6 +89,7 @@ string LogosSelection::getName() {
 }
 
 LogosExpr* LogosSelection::lastExpr() const {
+    if (innerExprs.empty()) return nullptr;
     return innerExprs[innerExprs.size() - 1];
 }
 

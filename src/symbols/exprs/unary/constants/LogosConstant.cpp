@@ -1,5 +1,5 @@
-#include "unary/constants/LogosConstant.h"
-#include "unary/constants/LogosStringConst.h"
+#include "constants/LogosConstant.h"
+#include "constants/LogosStringConst.h"
 #include <LogosMetadata.h>
 #include <types/LogosString.h>
 

@@ -3,8 +3,8 @@
 #include "binary/LogosBinaryExpr.h"
 #include "binary/LogosOperator.h"
 #include "unary/LogosMethodCall.h"
-#include "unary/constants/LogosConstant.h"
-#include "unary/constants/LogosStringConst.h"
+#include "constants/LogosConstant.h"
+#include "constants/LogosStringConst.h"
 #include "unary//LogosInstance.h"
 #include "unary//LogosSelection.h"
 #include <exprs/unary/LogosArray.h>
@@ -17,7 +17,7 @@
 #include "stmts/LogosReturn.h"
 #include "types/LogosBool.h"
 #include "types/LogosFloat.h"
-#include "unary/constants/LogosTypeConst.h"
+#include "constants/LogosTypeConst.h"
 
 #include <LogosDefinitions.h>
 #include <LogosError.h>
@@ -49,7 +49,7 @@ LogosMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
             const auto statementsBlock = func->funcBody()->statementsBlock();
             mainFunc->stmtBlock = getStmtBlock(statementsBlock);
         } else {
-            auto logosFunc = getFunc(func);
+            auto logosFunc = getFuncImpl(func);
             mainFile->funcs.emplace_back(logosFunc);
         }
     }
@@ -68,61 +68,62 @@ LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
     const auto obj = new LogosObject(objName);
     for (int i = 0; i < ctx->explicitVarDec().size(); ++i) {
         const auto varDec = ctx->explicitVarDec()[i];
-        const auto field = getField(varDec, objName, i);
+        const auto field = getField(varDec, i, obj);
         obj->fields[field->name] = field;
     }
     for (const auto& func : ctx->funcImplementation()) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
-        const auto method = getMethod(func, obj);
+        const auto method = getMethodImpl(func, obj);
         obj->methods[funcName] = method;
     }
     return obj;
 }
 
-LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, const size_t position) {
+LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const size_t position, LogosObject* obj) {
     const auto name = varDec->VARIABLE()->getText();
     const auto type = getType(varDec->TYPE());
     const auto expr = getExpr(varDec->expr());
-    return new LogosField(name, parentName, type, expr, position);
+    return new LogosField(name, obj, type, expr, position);
 }
 
-LogosFuncImpl* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* ctx) {
-    const auto funcSignature = ctx->funcSignature();
-    const auto funcName = funcSignature->VARIABLE()->getText();
-    LogosType* type;
-    if (funcSignature) {
-        type = getType(funcSignature->TYPE());
-    } else {
-        type = &LOGOS_VOID;
-    }
-    const auto funcImpl = new LogosFuncImpl(funcName, type);
+LogosFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext* ctx) {
+    const auto rt = getFuncType(ctx);
+    const auto signature = ctx->funcSignature();
+    const auto name = signature->VARIABLE()->getText();
 
-    const auto params = funcSignature->paramList();
-    if (params) {
-        for (const auto& varDec : params->explicitVarDec()) {
-            auto param = getParam(varDec);
-            funcImpl->params.emplace_back(param);
-        }
+    const auto func = new LogosFuncImpl(name, rt);
+    func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
+    func->setPosition(ctx->start);
+
+    const auto params = signature->paramList();
+    if (!params) return func;
+
+    for (const auto& varDec : params->explicitVarDec()) {
+        auto param = getParam(varDec);
+        func->params.emplace_back(param);
     }
-    funcImpl->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
-    return funcImpl;
+    return func;
 }
 
-LogosMethodImpl* AntlerConverter::getMethod(LogosParser::FuncImplementationContext* ctx, LogosObject* obj) {
-    const auto funcSignature = ctx->funcSignature();
-    const auto funcName = funcSignature->VARIABLE()->getText();
-    const auto type = getType(funcSignature->TYPE());
-    const auto method = new LogosMethodImpl(funcName, type, obj);
+LogosMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationContext* ctx, LogosObject* obj) {
+    const auto rt = getFuncType(ctx);
+    const auto signature = ctx->funcSignature();
+    const auto name = signature->VARIABLE()->getText();
 
-    const auto params = funcSignature->paramList();
-    if (params) {
-        for (const auto& varDec : params->explicitVarDec()) {
-            auto param = getParam(varDec);
-            method->params.emplace_back(param);
-        }
-    }
-
+    const auto method = new LogosMethodImpl(name, rt, obj);
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
+    method->setPosition(ctx->start);
+
+    auto self = new LogosParam(LOGOS_SELF, obj, new LogosInstance(obj));
+    method->params.emplace_back(self);
+
+    const auto params = signature->paramList();
+    if (!params) return method;
+
+    for (const auto& varDec : params->explicitVarDec()) {
+        auto param = getParam(varDec);
+        method->params.emplace_back(param);
+    }
     return method;
 }
 
@@ -345,8 +346,8 @@ LogosUnaryExpr* AntlerConverter::getFirstSelection(const LogosParser::SelectionC
     if (const auto variable = firstExpr->VARIABLE()) {
         return getVariable(variable->getText(), ctx);
     }
-    if (const auto thisVar = firstExpr->THIS()) {
-        return getVariable(thisVar->getText(), ctx);
+    if (const auto self = firstExpr->SELF()) {
+        return getVariable(self->getText(), ctx);
     }
     if (const auto funcCall = firstExpr->funcCall()) {
         return getFuncCall(funcCall);
@@ -363,7 +364,7 @@ LogosUnaryExpr* AntlerConverter::getFirstSelection(const LogosParser::SelectionC
 vector<LogosUnaryExpr*> AntlerConverter::getInnerSelections(const vector<LogosParser::InnerSelectionElementContext*>& ctx) {
     vector<LogosUnaryExpr*> exprs;
     exprs.reserve(ctx.size());
-    for (int i = 1; i < ctx.size(); ++i) {
+    for (int i = 0; i < ctx.size(); ++i) {
         const auto& expr = ctx[i];
         if (const auto field = expr->VARIABLE()) {
             const auto logosField = getVariable(field->getText(), expr);
@@ -448,4 +449,13 @@ LogosType* AntlerConverter::getType(tree::TerminalNode* type) {
     if (typeText == "") return &LOGOS_VOID;
     // TODO memory leak
     return new LogosObject(typeText);
+}
+
+LogosType* AntlerConverter::getFuncType(LogosParser::FuncImplementationContext* ctx) {
+    const auto signature = ctx->funcSignature();
+    LogosType* rt;
+    if (signature->TYPE()) {
+        return getType(signature->TYPE());
+    }
+    return &LOGOS_VOID;
 }

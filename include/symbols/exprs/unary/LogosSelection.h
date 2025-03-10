@@ -12,12 +12,12 @@ public:
 
     LogosSelection(LogosUnaryExpr* firstExpr, const vector<LogosUnaryExpr*>& innerExprs) : firstExpr(firstExpr), innerExprs(innerExprs) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
-    Value* resolveInnerSelection(CodeGenMetadata* metadata, int nextIndex, LogosInstance* instance);
-    Value* resolveInnerSelection(CodeGenMetadata* metadata, int nextIndex, LogosMethodCall* methodCall);
-    Value* resolveInnerSelection(CodeGenMetadata* metadata, int nextIndex, LogosField* field);
-    Value* resolveInnerSelection(CodeGenMetadata* metadata, int nextIndex, LogosFuncImpl* funcImpl);
     Value* resolveFirstSelection(CodeGenMetadata* metadata, const LogosVariable* variable);
     Value* resolveFirstSelection(CodeGenMetadata* metadata, const LogosFuncCall* funcCall);
+    Value* resolveInnerSelection(CodeGenMetadata* metadata, int i, LogosInstance* instance);
+    Value* resolveInnerSelection(CodeGenMetadata* metadata, int i, LogosMethodCall* methodCall);
+    Value* resolveInnerSelection(CodeGenMetadata* metadata, int i, LogosField* field);
+    Value* resolveInnerSelection(CodeGenMetadata* metadata, int i, LogosFuncImpl* funcImpl);
     LogosExpr* lastExpr() const;
     string getName() override;
     ~LogosSelection() override;

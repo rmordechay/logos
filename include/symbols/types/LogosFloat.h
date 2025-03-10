@@ -2,7 +2,7 @@
 #define LOGOSFLOAT_H
 #include "LogosType.h"
 #include "LogosValue.h"
-#include "unary/constants/LogosConstant.h"
+#include "constants/LogosConstant.h"
 
 class LogosFloat final : public LogosType {
 public:

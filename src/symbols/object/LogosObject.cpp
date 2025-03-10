@@ -4,7 +4,7 @@
 #include <ranges>
 
 const string LogosObject::getName() const {
-    return typeName;
+    return name;
 }
 
 Type* LogosObject::getIRType() {
@@ -23,8 +23,32 @@ LogosConstant* LogosObject::getZeroValue() {
     return nullptr;
 }
 
+bool LogosObject::containsField(const string& name) const {
+    return fields.find(name) != fields.end();
+}
+
+bool LogosObject::containsMethod(const string& name) const {
+    return methods.find(name) != methods.end();
+}
+
+LogosField* LogosObject::getField(const string& name) const {
+    const auto it = fields.find(name);
+    if (it != fields.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+LogosMethodImpl* LogosObject::getMethod(const string& name) const {
+    const auto it = methods.find(name);
+    if (it != methods.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
 bool LogosObject::equals(LogosType* other) const {
-    return typeName == other->getName();
+    return name == other->getName();
 }
 
 LogosObject::~LogosObject() {

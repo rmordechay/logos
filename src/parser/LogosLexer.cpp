@@ -61,7 +61,7 @@ void logoslexerLexerInitialize() {
       "RBRACE", "LBRACK", "RBRACK", "LANGLE", "RANGLE", "COMMA", "DOUBLE_DOT", 
       "DOT", "COLON", "EQUAL", "MINUS", "PLUS", "STAR", "SLASH", "HASH", 
       "QUEST_MARK", "EXCLA_MARK", "PERCENT", "DOLLAR", "AMPERSAND", "OBJECT", 
-      "THIS", "INTERFACE", "ENUM", "IMPLEMENTS", "IMPORT", "IF", "ELSE", 
+      "SELF", "INTERFACE", "ENUM", "IMPLEMENTS", "IMPORT", "IF", "ELSE", 
       "FOR", "BREAK", "CONTINUE", "RETURN", "AND", "OR", "NOT", "IN", "INTEGER", 
       "FLOAT", "BOOL", "CONST", "TYPE", "VARIABLE", "STRING", "LINE_COMMENT", 
       "BLOCK_COMMENT", "WS"
@@ -76,7 +76,7 @@ void logoslexerLexerInitialize() {
       "", "'=='", "'!='", "'>='", "'<='", "'('", "')'", "'{'", "'}'", "'['", 
       "']'", "'<'", "'>'", "','", "'..'", "'.'", "':'", "'='", "'-'", "'+'", 
       "'*'", "'/'", "'#'", "'\\u003F'", "'!'", "'%'", "'$'", "'&'", "'object'", 
-      "'this'", "'interface'", "'enum'", "'implements'", "'import'", "'if'", 
+      "'self'", "'interface'", "'enum'", "'implements'", "'import'", "'if'", 
       "'else'", "'for'", "'break'", "'continue'", "'return'", "'and'", "'or'", 
       "'not'", "'in'"
     },
@@ -85,7 +85,7 @@ void logoslexerLexerInitialize() {
       "RBRACE", "LBRACK", "RBRACK", "LANGLE", "RANGLE", "COMMA", "DOUBLE_DOT", 
       "DOT", "COLON", "EQUAL", "MINUS", "PLUS", "STAR", "SLASH", "HASH", 
       "QUEST_MARK", "EXCLA_MARK", "PERCENT", "DOLLAR", "AMPERSAND", "OBJECT", 
-      "THIS", "INTERFACE", "ENUM", "IMPLEMENTS", "IMPORT", "IF", "ELSE", 
+      "SELF", "INTERFACE", "ENUM", "IMPLEMENTS", "IMPORT", "IF", "ELSE", 
       "FOR", "BREAK", "CONTINUE", "RETURN", "AND", "OR", "NOT", "IN", "INTEGER", 
       "FLOAT", "BOOL", "CONST", "TYPE", "VARIABLE", "STRING", "LINE_COMMENT", 
       "BLOCK_COMMENT", "WS"
@@ -161,8 +161,8 @@ void logoslexerLexerInitialize() {
   	48,1,0,0,0,160,161,5,37,0,0,161,50,1,0,0,0,162,163,5,36,0,0,163,52,1,
   	0,0,0,164,165,5,38,0,0,165,54,1,0,0,0,166,167,5,111,0,0,167,168,5,98,
   	0,0,168,169,5,106,0,0,169,170,5,101,0,0,170,171,5,99,0,0,171,172,5,116,
-  	0,0,172,56,1,0,0,0,173,174,5,116,0,0,174,175,5,104,0,0,175,176,5,105,
-  	0,0,176,177,5,115,0,0,177,58,1,0,0,0,178,179,5,105,0,0,179,180,5,110,
+  	0,0,172,56,1,0,0,0,173,174,5,115,0,0,174,175,5,101,0,0,175,176,5,108,
+  	0,0,176,177,5,102,0,0,177,58,1,0,0,0,178,179,5,105,0,0,179,180,5,110,
   	0,0,180,181,5,116,0,0,181,182,5,101,0,0,182,183,5,114,0,0,183,184,5,102,
   	0,0,184,185,5,97,0,0,185,186,5,99,0,0,186,187,5,101,0,0,187,60,1,0,0,
   	0,188,189,5,101,0,0,189,190,5,110,0,0,190,191,5,117,0,0,191,192,5,109,

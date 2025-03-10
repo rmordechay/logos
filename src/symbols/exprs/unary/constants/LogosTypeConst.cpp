@@ -1,4 +1,4 @@
-#include "unary/constants/LogosTypeConst.h"
+#include "constants/LogosTypeConst.h"
 
 #include "AntlrConverter.h"
 

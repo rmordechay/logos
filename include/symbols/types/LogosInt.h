@@ -2,7 +2,7 @@
 #define LOGOSINT_H
 #include "CodeGenerator.h"
 #include "LogosType.h"
-#include "unary/constants/LogosConstant.h"
+#include "constants/LogosConstant.h"
 
 
 class LogosInt final : public LogosType {

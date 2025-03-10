@@ -28,7 +28,7 @@ null
 '$'
 '&'
 'object'
-'this'
+'self'
 'interface'
 'enum'
 'implements'
@@ -84,7 +84,7 @@ PERCENT
 DOLLAR
 AMPERSAND
 OBJECT
-THIS
+SELF
 INTERFACE
 ENUM
 IMPLEMENTS

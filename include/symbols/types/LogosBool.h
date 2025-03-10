@@ -2,7 +2,7 @@
 #define LOGOSBOOL_H
 #include "LogosType.h"
 #include "LogosValue.h"
-#include "unary/constants/LogosConstant.h"
+#include "constants/LogosConstant.h"
 
 class LogosBool final : public LogosType {
 public:

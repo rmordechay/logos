@@ -3,39 +3,44 @@
 #include <types/LogosInt.h>
 
 Value* LogosFuncImpl::computeIRValue(CodeGenMetadata* metadata) {
+    setCombinedName();
     metadata->logosStack.enterScope();
-    IRFunc = getIRFunc(metadata);
+    setIRFunc(metadata);
     metadata->logosStack.currentFunc = IRFunc;
 
+    const auto entryBlock = BasicBlock::Create(context, "entry");
     startBlock(metadata, entryBlock);
     stmtBlock->writeIRValue(metadata);
     metadata->logosStack.exitScope();
     return nullptr;
 }
 
-Value* LogosFuncImpl::call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
-    vector<Value*> paramValues;
-    for (const auto& arg : args) {
-        const auto argValue = arg->writeIRValue(metadata);
-        paramValues.emplace_back(argValue);
-    }
-    return metadata->builder.CreateCall(IRFunc, paramValues);
-}
-
-Value* LogosFuncImpl::call(CodeGenMetadata* metadata) {
-    return call(metadata, vector<LogosExpr*>());
-}
-
-Function* LogosFuncImpl::getIRFunc(CodeGenMetadata* metadata) {
-    for (const auto& param : params) {
-        IRParamsTypes.emplace_back(param->type->getIRType());
+void LogosFuncImpl::setIRFunc(CodeGenMetadata* metadata) {
+    for (int i = 0; i < params.size(); ++i) {
+        auto paramIRType = params[i]->type->getIRType();
+        IRParamsTypes.emplace_back(paramIRType);
     }
 
     const auto rt = FunctionType::get(type->getIRType(), IRParamsTypes, false);
-    const auto func = Function::Create(rt, Function::ExternalLinkage, name, metadata->currentModule);
-    if (params.empty()) return func;
+    IRFunc = Function::Create(rt, Function::ExternalLinkage, combinedName, metadata->currentModule);
+    metadata->logosStack.currentFunc = IRFunc;
+    if (params.empty()) return;
 
-    auto args = func->arg_begin();
-    setArgs(metadata, args);
-    return func;
+    auto args = IRFunc->arg_begin();
+    for (const auto& param : params) {
+        param->setIRValue(args);
+        args++->setName(param->name);
+        metadata->logosStack.addLocalSymbol(param->name, LogosSymbol(PARAM, param));
+    }
+}
+
+void LogosFuncImpl::setCombinedName() {
+    if (name == LOGOS_MAIN_FUNCTION) {
+        combinedName = name;
+    } else {
+        combinedName = name + "_" + type->getName();
+        for (int i = 1; i < params.size(); ++i) {
+            combinedName += "_" + params[i]->type->getName();
+        }
+    }
 }

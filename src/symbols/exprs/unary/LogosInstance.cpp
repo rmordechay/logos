@@ -3,15 +3,20 @@
 #include "CodeGenerator.h"
 
 Value* LogosInstance::computeIRValue(CodeGenMetadata* metadata) {
-    const auto obj = metadata->logosStack.getSymbol(name)->object;
-    if (modules.find(obj->getName()) == modules.end()) {
-        CodeGenerator::generateObjectModule(obj, metadata->logosStack.globalSymbols);
+    const auto selfSymbol = metadata->logosStack.getSymbol(LOGOS_SELF);
+    if (selfSymbol) {
+        return selfSymbol->param->writeIRValue(metadata);
     }
-    const auto IRType = obj->getIRType();
+
+    const auto objSymbol = metadata->logosStack.getSymbol(obj->name)->object;
+    if (modules.find(objSymbol->getName()) == modules.end()) {
+        CodeGenerator::generateObjectModule(objSymbol, metadata->logosStack.globalSymbols);
+    }
+    const auto IRType = objSymbol->getIRType();
     return metadata->builder.CreateAlloca(IRType);
 }
 
-
 string LogosInstance::getName() {
-    return name;
+    return obj->name;
 }
+

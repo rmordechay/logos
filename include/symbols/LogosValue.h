@@ -23,7 +23,7 @@ protected:
 
 inline void LogosValue::setPosition(const antlr4::Token* ctx) {
     position.lineNumber = ctx->getLine();
-    position.posInLine = ctx->getCharPositionInLine();
+    position.posInLine = ctx->getCharPositionInLine() + 1;
 }
 
 inline Value* LogosValue::writeIRValue(CodeGenMetadata* metadata) {
