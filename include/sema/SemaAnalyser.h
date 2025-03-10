@@ -21,16 +21,18 @@ class LogosLoop;
 class SemaAnalyser {
 public:
     std::mutex mtx;
+    LogosFile* file;
     LogosStack logosStack;
     bool successful = true;
 
-    void visitLogosFile(LogosFile* file);
+    explicit SemaAnalyser(LogosFile* logosFile) : file(logosFile) {}
+    void visitLogosFile();
     void visitMainFile(const LogosMainFile* mainFile);
     void visitObjectFile(const LogosObjectFile* objectFile);
     void visitObject(const LogosObject* object);
     void visitField(LogosField* field);
     void visitMethodImpl(const LogosMethodImpl* method);
-    void visitMainFunc(const LogosFuncImpl* mainFunc, const std::string& path);
+    void visitMainFunc(const LogosFuncImpl* mainFunc);
     void visitFuncImpl(const LogosFuncImpl* func);
     void visitParam(LogosParam* param);
     void visitStmt(LogosStmt* stmt);
@@ -53,22 +55,29 @@ public:
     void visitSelection(LogosSelection* selection);
     void visitInstance(LogosInstance* instance);
     void visitArrayIndex(LogosArrayIndex* arrayIndex);
+    void visitConstant(const LogosConstant* constant);
+
     void setFuncCallType(LogosFuncCall* funcCall);
     void setMethodCallType(LogosMethodCall* methodCall);
-    void visitConstant(const LogosConstant* constant);
     void setLoopVarType(const LogosForeachLoop* foreachLoop);
     void setArrayType(LogosArray* array);
     void setBinaryExprType(LogosBinaryExpr* binaryExpr);
     void setForLoopIterable(LogosForeachLoop* foreachLoop, const LogosVariable* variable);
     void setForLoopIterable(LogosForeachLoop* foreachLoop);
+
     void resolveFirstSelection(const LogosSelection* selection, LogosVariable* variable);
     void resolveFirstSelection(const LogosSelection* selection, LogosFuncCall* funcCall);
     void resolveInnerSelection(const LogosSelection* selection, int nextIndex, const LogosInstance* instance);
     void resolveInnerSelection(const LogosSelection* selection, int i, const LogosMethodCall* methodCall);
     void resolveInnerSelection(const LogosSelection* selection, int i, LogosField* field);
     void resolveInnerSelection(const LogosSelection* selection, int i, LogosFuncImpl* funcImpl);
-    void checkTypesMatch(const LogosType* first, const LogosType* second, const Position& position);
+
+    void checkTypesMatch(const LogosType* first, const LogosType* second, const LogosValue* value);
     void setUnsuccessful();
+
+    void printError(int code, const vector<string>& args = {});
+    void printError(int code, const LogosValue* value, const vector<string>& args = {});
+    LogosSymbol* getSymbol(const string& name, const LogosValue* value);
     ~SemaAnalyser() = default;
 };
 

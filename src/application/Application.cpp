@@ -5,7 +5,6 @@
 #include <CodeGenerator.h>
 #include <LogosLexer.h>
 #include <LogosParser.h>
-#include <LogosUtils.h>
 #include <ThreadPool.h>
 #include <funcs/LogosPrint.h>
 #include <ranges>
@@ -31,7 +30,7 @@ map<string, LogosFile*> Application::parseFiles() {
 
 void Application::parseTree(const string& path, map<string, LogosFile*>& files, ThreadPool& threadPool) {
     for (const auto& entry : directory_iterator(path)) {
-        if (Utils::isLogosFile(entry)) {
+        if (isLogosFile(entry)) {
             threadPool.runTask([entry, &files, this] {
                 const auto logosFile = getFile(entry);
                 if (const auto mainFile = dynamic_cast<LogosMainFile*>(logosFile)) {
@@ -65,7 +64,8 @@ map<string, LogosSymbol> Application::getGlobalsSymbols(const map<string, LogosF
 }
 
 LogosFile* Application::getFile(const directory_entry& fileEntry) {
-    ifstream file(fileEntry.path());
+    auto absPath = canonical(fileEntry).string();
+    ifstream file(absPath);
     stringstream fileContents;
     fileContents << file.rdbuf();
     auto codeText = fileContents.str();
@@ -73,9 +73,9 @@ LogosFile* Application::getFile(const directory_entry& fileEntry) {
     auto lexer = LogosLexer(&input);
     auto tokens = CommonTokenStream(&lexer);
     auto parser = LogosParser(&tokens);
-    auto antlerConverter = AntlerConverter(fileEntry.path());
+    auto antlerConverter = AntlerConverter(absPath);
     auto parsedFile = parser.logosFile();
-    return antlerConverter.getLogosFile(parsedFile, absolute(fileEntry).string());
+    return antlerConverter.getLogosFile(parsedFile, absPath);
 }
 
 bool Application::analyse(const map<string, LogosFile*>& files, const map<string, LogosSymbol>& globalSymbols) {
@@ -84,9 +84,9 @@ bool Application::analyse(const map<string, LogosFile*>& files, const map<string
     vector<bool> semaSuccess;
     for (const auto& pair : files) {
         threadPool.runTask([=, &pair, &semaSuccess, &globalSymbols] {
-            SemaAnalyser semaAnalyser;
+            SemaAnalyser semaAnalyser(pair.second);
             semaAnalyser.logosStack.globalSymbols = globalSymbols;
-            semaAnalyser.visitLogosFile(pair.second);
+            semaAnalyser.visitLogosFile();
             {
                 lock_guard lock(mtx);
                 semaSuccess.push_back(semaAnalyser.successful);
@@ -95,4 +95,8 @@ bool Application::analyse(const map<string, LogosFile*>& files, const map<string
     }
     threadPool.wait();
     return std::find(semaSuccess.begin(), semaSuccess.end(), false) == semaSuccess.end();
+}
+
+bool Application::isLogosFile(const directory_entry& filePath) {
+    return filePath.is_regular_file() && filePath.path().extension().string() == LOGOS_EXTENSION;
 }

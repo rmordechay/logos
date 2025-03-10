@@ -22,7 +22,7 @@
 #include <stmts/LogosAssignment.h>
 #include <stmts/LogosIf.h>
 
-void SemaAnalyser::visitLogosFile(LogosFile* file) {
+void SemaAnalyser::visitLogosFile() {
     if (const auto mainFile = dynamic_cast<LogosMainFile*>(file)) {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
@@ -35,7 +35,7 @@ void SemaAnalyser::visitMainFile(const LogosMainFile* mainFile) {
     for (const auto& func : mainFile->funcs) {
         visitFuncImpl(func);
     }
-    visitMainFunc(mainFile->mainFunc, mainFile->path);
+    visitMainFunc(mainFile->mainFunc);
 }
 
 void SemaAnalyser::visitObjectFile(const LogosObjectFile* objectFile) {
@@ -53,7 +53,7 @@ void SemaAnalyser::visitObject(const LogosObject* object) {
     }
 }
 
-void SemaAnalyser::visitMainFunc(const LogosFuncImpl* mainFunc, const std::string& path) {
+void SemaAnalyser::visitMainFunc(const LogosFuncImpl* mainFunc) {
     visitFuncImpl(mainFunc);
 }
 
@@ -108,7 +108,7 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
     const auto userType = varDec->userType;
     if (varDec->expr) {
         visitExpr(varDec->expr);
-        checkTypesMatch(varDec->expr->type, userType, varDec->position);
+        checkTypesMatch(varDec->expr->type, userType, varDec);
         varDec->type = varDec->expr->type;
     } else {
         varDec->type = userType;
@@ -200,8 +200,9 @@ void SemaAnalyser::visitSelection(LogosSelection* selection) {
 }
 
 void SemaAnalyser::resolveFirstSelection(const LogosSelection* selection, LogosVariable* variable) {
-    setVariableType(variable);
-    const auto symbol = logosStack.getSymbol(variable->name);
+    visitVariable(variable);
+    const auto symbol = getSymbol(variable->name, variable);
+    if (!symbol) return;
     switch (symbol->type) {
     case VAR_DEC: {
         variable->type = symbol->varDec->type;
@@ -217,8 +218,9 @@ void SemaAnalyser::resolveFirstSelection(const LogosSelection* selection, LogosV
 }
 
 void SemaAnalyser::resolveFirstSelection(const LogosSelection* selection, LogosFuncCall* funcCall) {
-    setFuncCallType(funcCall);
-    const auto symbol = logosStack.getSymbol(funcCall->name);
+    visitFuncCall(funcCall);
+    const auto symbol = getSymbol(funcCall->name, funcCall);
+    if (!symbol) return;
     switch (symbol->type) {
     case FUNC_IMPL: {
         funcCall->type = symbol->funcImpl->type;
@@ -258,9 +260,10 @@ void SemaAnalyser::resolveInnerSelection(const LogosSelection* selection, const 
 void SemaAnalyser::resolveInnerSelection(const LogosSelection* selection, int i, LogosFuncImpl* funcImpl) {}
 
 void SemaAnalyser::visitInstance(LogosInstance* instance) {
-    const auto obj = logosStack.getSymbol(instance->name)->object;
-    instance->type = obj;
-    instance->obj = obj;
+    const auto symbol = getSymbol(instance->name, instance);
+    if (!symbol) return;
+    instance->type = symbol->object;
+    instance->obj = symbol->object;
 }
 
 void SemaAnalyser::visitArrayIndex(LogosArrayIndex* arrayIndex) {
@@ -283,7 +286,8 @@ void SemaAnalyser::visitMethodCall(LogosMethodCall* methodCall) {
 }
 
 void SemaAnalyser::setVariableType(LogosVariable* variable) {
-    const auto symbol = logosStack.getSymbol(variable->name);
+    const auto symbol = getSymbol(variable->name, variable);
+    if (!symbol) return;
     switch (symbol->type) {
     case VAR_DEC:
         variable->type = symbol->varDec->type;
@@ -330,7 +334,8 @@ void SemaAnalyser::setBinaryExprType(LogosBinaryExpr* binaryExpr) {
 }
 
 void SemaAnalyser::setFuncCallType(LogosFuncCall* funcCall) {
-    const auto symbol = logosStack.getSymbol(funcCall->name);
+    const auto symbol = getSymbol(funcCall->name, funcCall);
+    if (!symbol) return;
     if (symbol->type == BUILTIN_FUNC) {
         funcCall->type = symbol->builtinFunc->type;
     } else if (symbol->type == FUNC_IMPL) {
@@ -339,7 +344,8 @@ void SemaAnalyser::setFuncCallType(LogosFuncCall* funcCall) {
 }
 
 void SemaAnalyser::setMethodCallType(LogosMethodCall* methodCall) {
-    const auto symbol = logosStack.getSymbol(methodCall->name);
+    const auto symbol = getSymbol(methodCall->name, methodCall);
+    if (!symbol) return;
     methodCall->type = symbol->methodImpl->type;
 }
 
@@ -352,7 +358,8 @@ void SemaAnalyser::setForLoopIterable(LogosForeachLoop* foreachLoop) {
 }
 
 void SemaAnalyser::setForLoopIterable(LogosForeachLoop* foreachLoop, const LogosVariable* const variable) {
-    const auto symbol = logosStack.getSymbol(variable->name);
+    const auto symbol = getSymbol(variable->name, variable);
+    if (!symbol) return;
     switch (symbol->type) {
     case VAR_DEC: {
         foreachLoop->iterable = dynamic_cast<LogosIterable*>(symbol->varDec->expr);
@@ -375,14 +382,54 @@ void SemaAnalyser::setForLoopIterable(LogosForeachLoop* foreachLoop, const Logos
     }
 }
 
-void SemaAnalyser::checkTypesMatch(const LogosType* first, const LogosType* second, const Position& position) {
+void SemaAnalyser::checkTypesMatch(const LogosType* first, const LogosType* second, const LogosValue* value) {
     if (second && first != second) {
-        printError(1001, position, {second->getName(), first->getName()});
-        setUnsuccessful();
+        printError(1001, value, {first->getName(), second->getName()});
     }
 }
 
 void SemaAnalyser::setUnsuccessful() {
-    unique_lock lock(mtx);
-    successful = false;
+    if (successful) {
+        unique_lock lock(mtx);
+        successful = false;
+    }
+}
+
+void SemaAnalyser::printError(const int code, const vector<string>& args) {
+    setUnsuccessful();
+    const auto error = LOGOS_ERRORS.find(code);
+    auto pos = 0;
+    auto argIndex = 0;
+    auto result = error->second;
+    while ((pos = result.find("{}", pos)) != string::npos && argIndex < args.size()) {
+        result.replace(pos, 2, args[argIndex]);
+        pos += args[argIndex].length();
+        argIndex++;
+    }
+    std::cout << result << std::endl;
+}
+
+void SemaAnalyser::printError(const int code, const LogosValue* value, const vector<string>& args) {
+    setUnsuccessful();
+    const auto error = LOGOS_ERRORS.find(code);
+    auto pos = 0;
+    auto argIndex = 0;
+    auto errorString = error->second;
+    while ((pos = errorString.find("{}", pos)) != string::npos && argIndex < args.size()) {
+        auto str = args[argIndex];
+        errorString.replace(pos, 2, str);
+        pos += str.length();
+        argIndex++;
+    }
+    const auto path = file->path + ":" + std::to_string(value->position.lineNumber) + ":" + std::to_string(value->position.posInLine);
+    std::cout << "Error: " << errorString << '\n';
+    std::cout << "\tat: " << path << "\n\n";
+}
+
+LogosSymbol* SemaAnalyser::getSymbol(const string& name, const LogosValue* value) {
+    const auto symbol = logosStack.getSymbol(name);
+    if (!symbol) {
+        printError(1006, value, {name});
+    }
+    return symbol;
 }

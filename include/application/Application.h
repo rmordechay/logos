@@ -27,6 +27,7 @@ public:
     static map<string, LogosSymbol> getGlobalsSymbols(const map<string, LogosFile*>& files);
     static LogosFile* getFile(const directory_entry&);
     bool analyse(const map<string, LogosFile*>& files, const map<string, LogosSymbol>& globalSymbols);
+    bool isLogosFile(const filesystem::directory_entry& filePath);
     ~Application() = default;
 };
 

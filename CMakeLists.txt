@@ -21,8 +21,6 @@ add_library(lib STATIC
     include/LogosError.h
     src/application/Application.cpp
     include/application/Application.h
-    src/application/LogosUtils.cpp
-    include/application/LogosUtils.h
     src/application/ThreadPool.cpp
     include/application/ThreadPool.h
     src/codegen/CodeGenerator.cpp

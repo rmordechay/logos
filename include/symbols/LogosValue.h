@@ -12,7 +12,7 @@ public:
     Position position = Position();
     Value* writeIRValue(CodeGenMetadata* metadata);
     void setIRValue(Value* value);
-    virtual void setPosition(const antlr4::Token* ctx, const string& filePath);
+    virtual void setPosition(const antlr4::Token* ctx);
     virtual ~LogosValue() = default;
 
 protected:
@@ -21,10 +21,9 @@ protected:
     Value* IRValue = nullptr;
 };
 
-inline void LogosValue::setPosition(const antlr4::Token* ctx, const string& filePath) {
+inline void LogosValue::setPosition(const antlr4::Token* ctx) {
     position.lineNumber = ctx->getLine();
     position.posInLine = ctx->getCharPositionInLine();
-    position.filePath = filePath;
 }
 
 inline Value* LogosValue::writeIRValue(CodeGenMetadata* metadata) {

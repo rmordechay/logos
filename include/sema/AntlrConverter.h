@@ -40,8 +40,7 @@ public:
     LogosVariable* getVariable(const string& varName, const ParserRuleContext* ctx) const;
     LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     LogosMethodCall *getMethodCall(LogosParser::FuncCallContext* ctx);
-    LogosUnaryExpr* getFirstSelection(const LogosParser::SelectionContext* ctx,
-                                      vector<LogosParser::SelectionElementContext*>::value_type firstExpr);
+    LogosUnaryExpr* getFirstSelection(const LogosParser::SelectionContext* ctx, vector<LogosParser::SelectionElementContext*>::value_type firstExpr);
     vector<LogosUnaryExpr*> getInnerSelections(const vector<LogosParser::SelectionElementContext*>& ctx);
     LogosSelection* getSelection(LogosParser::SelectionContext* ctx);
     LogosInstance* getInstance(LogosParser::ConstructorContext* ctx);
