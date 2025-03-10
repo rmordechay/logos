@@ -9,6 +9,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/application
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/cli
     ${CMAKE_CURRENT_SOURCE_DIR}/include/files
     ${CMAKE_CURRENT_SOURCE_DIR}/include/codegen
     ${CMAKE_CURRENT_SOURCE_DIR}/include/sema
@@ -20,83 +21,94 @@ include_directories(
 )
 
 add_library(lib STATIC
-    include/LogosError.h
-    src/application/Application.cpp
+    # headers
     include/application/Application.h
-    src/application/ThreadPool.cpp
     include/application/ThreadPool.h
-    src/codegen/CodeGenerator.cpp
     include/codegen/CodeGenerator.h
-    src/codegen/LogosLinker.cpp
     include/codegen/LogosLinker.h
-    src/parser/LogosLexer.cpp
+    include/LogosError.h
     include/parser/LogosLexer.h
-    src/parser/LogosParser.cpp
     include/parser/LogosParser.h
-    src/sema/AntlrConverter.cpp
     include/sema/AntlrConverter.h
-    src/sema/SemaAnalyser.cpp
     include/sema/SemaAnalyser.h
-    src/symbols/exprs/binary/LogosBinaryExpr.cpp
+    # Symbols headers
     include/symbols/exprs/binary/LogosBinaryExpr.h
-    src/symbols/exprs/unary/constants/LogosConstant.cpp
     include/symbols/exprs/unary/constants/LogosConstant.h
-    src/symbols/exprs/unary/LogosFuncCall.cpp
-    include/symbols/exprs/unary/LogosFuncCall.h
-    src/symbols/exprs/unary/LogosInstance.cpp
-    include/symbols/exprs/unary/LogosInstance.h
-    src/symbols/exprs/unary/LogosSelection.cpp
-    include/symbols/exprs/unary/LogosSelection.h
-    src/symbols/exprs/unary/LogosVariable.cpp
-    include/symbols/exprs/unary/LogosVariable.h
-    src/symbols/exprs/unary/LogosArray.cpp
+    include/symbols/exprs/unary/constants/LogosStringConst.h
+    include/symbols/exprs/unary/constants/LogosTypeConst.h
     include/symbols/exprs/unary/LogosArray.h
-    src/symbols/exprs/unary/LogosArrayIndex.cpp
     include/symbols/exprs/unary/LogosArrayIndex.h
-    src/symbols/funcs/LogosPrint.cpp
-    include/symbols/funcs/LogosPrint.h
-    src/symbols/funcs/LogosFuncImpl.cpp
+    include/symbols/exprs/unary/LogosFuncCall.h
+    include/symbols/exprs/unary/LogosInstance.h
+    include/symbols/exprs/unary/LogosIterable.h
+    include/symbols/exprs/unary/LogosMethodCall.h
+    include/symbols/exprs/unary/LogosSelection.h
+    include/symbols/exprs/unary/LogosVariable.h
+    include/symbols/funcs/LogosFunc.h
     include/symbols/funcs/LogosFuncImpl.h
-    src/symbols/funcs/LogosMethodImpl.cpp
     include/symbols/funcs/LogosMethodImpl.h
-    src/symbols/object/LogosField.cpp
-    include/symbols/object/LogosField.h
-    src/symbols/object/LogosObject.cpp
-    include/symbols/object/LogosObject.h
-    src/symbols/stmts/LogosAssignment.cpp
-    include/symbols/stmts/LogosAssignment.h
-    src/symbols/stmts/LogosIf.cpp
-    include/symbols/stmts/LogosIf.h
-    src/symbols/stmts/LogosReturn.cpp
-    include/symbols/stmts/LogosReturn.h
-    src/symbols/stmts/LogosStmtBlock.cpp
-    include/symbols/stmts/LogosStmtBlock.h
-    src/symbols/stmts/LogosVarDec.cpp
-    include/symbols/stmts/LogosVarDec.h
-    src/symbols/loops/LogosRangeLoop.cpp
-    include/symbols/loops/LogosRangeLoop.h
-    src/symbols/loops/LogosForeachLoop.cpp
-    include/symbols/loops/LogosForeachLoop.h
+    include/symbols/funcs/LogosParam.h
+    include/symbols/funcs/LogosPrint.h
     include/symbols/LogosSymbol.h
-    src/application/CommandLine.cpp
+    include/symbols/LogosType.h
+    include/symbols/loops/LogosForeachLoop.h
+    include/symbols/loops/LogosLoopVar.h
+    include/symbols/loops/LogosRangeLoop.h
+    include/symbols/object/LogosField.h
+    include/symbols/object/LogosObject.h
+    include/symbols/stmts/LogosAssignment.h
+    include/symbols/stmts/LogosIf.h
+    include/symbols/stmts/LogosReturn.h
+    include/symbols/stmts/LogosStmtBlock.h
+    include/symbols/stmts/LogosVarDec.h
     include/symbols/types/LogosBool.h
     include/symbols/types/LogosFloat.h
     include/symbols/types/LogosInt.h
     include/symbols/types/LogosString.h
-    include/symbols/LogosType.h
     include/symbols/types/LogosVoid.h
-    src/symbols/loops/LogosLoopVar.cpp
-    include/symbols/loops/LogosLoopVar.h
-    include/symbols/exprs/unary/LogosIterable.h
-    include/symbols/exprs/unary/constants/LogosStringConst.h
+    include/cli/LogosCli.h
+    include/cli/LogosCliCmd.h
+    include/cli/LogosRunCmd.h
+
+    # src
+    src/application/Application.cpp
+    src/application/ThreadPool.cpp
+    src/cli/LogosCli.cpp
+    src/codegen/CodeGenerator.cpp
+    src/codegen/LogosLinker.cpp
+    src/parser/LogosLexer.cpp
+    src/parser/LogosParser.cpp
+    src/sema/AntlrConverter.cpp
+    src/sema/SemaAnalyser.cpp
+    # Symbols src
+    src/symbols/exprs/binary/LogosBinaryExpr.cpp
+    src/symbols/exprs/unary/constants/LogosConstant.cpp
     src/symbols/exprs/unary/constants/LogosStringConst.cpp
-    src/symbols/funcs/LogosParam.cpp
-    include/symbols/funcs/LogosParam.h
-    src/symbols/exprs/unary/LogosMethodCall.cpp
-    include/symbols/exprs/unary/LogosMethodCall.h
     src/symbols/exprs/unary/constants/LogosTypeConst.cpp
-    include/symbols/exprs/unary/constants/LogosTypeConst.h
+    src/symbols/exprs/unary/LogosArray.cpp
+    src/symbols/exprs/unary/LogosArrayIndex.cpp
+    src/symbols/exprs/unary/LogosFuncCall.cpp
+    src/symbols/exprs/unary/LogosInstance.cpp
+    src/symbols/exprs/unary/LogosMethodCall.cpp
+    src/symbols/exprs/unary/LogosSelection.cpp
+    src/symbols/exprs/unary/LogosVariable.cpp
     src/symbols/funcs/LogosFunc.cpp
+    src/symbols/funcs/LogosFuncImpl.cpp
+    src/symbols/funcs/LogosMethodImpl.cpp
+    src/symbols/funcs/LogosParam.cpp
+    src/symbols/funcs/LogosPrint.cpp
+    src/symbols/loops/LogosForeachLoop.cpp
+    src/symbols/loops/LogosLoopVar.cpp
+    src/symbols/loops/LogosRangeLoop.cpp
+    src/symbols/object/LogosField.cpp
+    src/symbols/object/LogosObject.cpp
+    src/symbols/stmts/LogosAssignment.cpp
+    src/symbols/stmts/LogosIf.cpp
+    src/symbols/stmts/LogosReturn.cpp
+    src/symbols/stmts/LogosStmtBlock.cpp
+    src/symbols/stmts/LogosVarDec.cpp
+    src/cli/LogosCli.cpp
+    src/cli/LogosRunCmd.cpp
 )
 
 add_executable(lgs main.cpp)

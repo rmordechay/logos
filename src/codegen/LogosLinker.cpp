@@ -34,12 +34,12 @@ std::unique_ptr<Module> LogosLinker::getStdlibModule() {
 
 void LogosLinker::link(const std::map<std::string, Module*>& modules) {
     auto stdlibModule = getStdlibModule();
-    const auto mainModule = modules.find(LOGOS_MAIN_FILE)->second;
+    const auto mainModule = modules.find(LOGOS_MAIN_FILE_NAME)->second;
 
     Linker linker(*mainModule);
     linker.linkInModule(unique_ptr(std::move(stdlibModule)));
     for (const auto& [name, file] : modules) {
-        if (name == LOGOS_MAIN_FILE) continue;
+        if (name == LOGOS_MAIN_FILE_NAME) continue;
         linker.linkInModule(unique_ptr<Module>(std::move(file)));
     }
 

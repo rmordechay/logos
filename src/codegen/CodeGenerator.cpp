@@ -16,7 +16,7 @@ void CodeGenerator::generateCode(const map<string, LogosSymbol>& globalSymbols) 
 }
 
 void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSymbols) const {
-    const auto module = createModule(LOGOS_MAIN_FILE);
+    const auto module = createModule(LOGOS_MAIN_FILE_NAME);
     auto metadata = CodeGenMetadata{.currentModule = module};
     metadata.logosStack.globalSymbols = globalSymbols;
 
@@ -26,7 +26,7 @@ void CodeGenerator::generateMainModule(const map<string, LogosSymbol>& globalSym
     mainFile->mainFunc->writeIRValue(&metadata);
 
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
-    writeIRToFile(metadata.currentModule, LOGOS_MAIN_FILE);
+    writeIRToFile(metadata.currentModule, LOGOS_MAIN_FILE_NAME);
 }
 
 void CodeGenerator::generateObjectModule(LogosObject* obj, LogosGlobals globalSymbols) {
@@ -54,8 +54,8 @@ void CodeGenerator::writeIRToFile(const Module* module, const string& name) {
     std::error_code EC;
     raw_fd_ostream textFile(LOGOS_BUILD_DIR + name + ".ll", EC, sys::fs::OF_None);
     module->print(textFile, nullptr);
-    module->print(outs(), nullptr);
-    std::cout << "\n-----\n\n";
+    // module->print(outs(), nullptr);
+    // std::cout << "\n-----\n\n";
 }
 
 void CodeGenerator::initIR() {

@@ -16,11 +16,14 @@ using namespace llvm;
 class Application {
 public:
     string rootPath;
+    string srcPath;
     LogosLinker linker;
     LogosMainFile* mainFile = nullptr;
     std::mutex mtx;
 
-    explicit Application(const string& rootPath) : rootPath(rootPath) {}
+    explicit Application(const string& rootPath) : rootPath(rootPath) {
+        srcPath = rootPath + "/src";
+    }
     void runLogos();
     map<string, LogosFile*> parseFiles();
     void parseTree(const string& path, map<string, LogosFile*>& files, ThreadPool& threadPool);

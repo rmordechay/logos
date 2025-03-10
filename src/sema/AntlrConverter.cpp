@@ -43,8 +43,8 @@ LogosMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     const auto mainFile = new LogosMainFile(filePath);
     for (const auto& func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
-        if (funcName == LOGOS_MAIN_FUNCTION) {
-            const auto mainFunc = new LogosFuncImpl(LOGOS_MAIN_FUNCTION, &LOGOS_INT);
+        if (funcName == LOGOS_MAIN_FUNCT_NAME) {
+            const auto mainFunc = new LogosFuncImpl(LOGOS_MAIN_FUNCT_NAME, &LOGOS_INT);
             mainFile->mainFunc = mainFunc;
             const auto statementsBlock = func->funcBody()->statementsBlock();
             mainFunc->stmtBlock = getStmtBlock(statementsBlock);
