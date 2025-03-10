@@ -93,6 +93,8 @@ add_library(lib STATIC
     include/symbols/funcs/LogosParam.h
     src/symbols/exprs/unary/LogosMethodCall.cpp
     include/symbols/exprs/unary/LogosMethodCall.h
+    src/symbols/exprs/unary/constants/LogosTypeConst.cpp
+    include/symbols/exprs/unary/constants/LogosTypeConst.h
 )
 
 add_executable(logos main.cpp)

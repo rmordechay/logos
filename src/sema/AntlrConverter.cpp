@@ -17,6 +17,7 @@
 #include "stmts/LogosReturn.h"
 #include "types/LogosBool.h"
 #include "types/LogosFloat.h"
+#include "unary/constants/LogosTypeConst.h"
 
 #include <LogosDefinitions.h>
 #include <LogosError.h>
@@ -287,11 +288,12 @@ LogosExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
 }
 
 LogosUnaryExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
-    const auto logosArray = new LogosArray();
+    const auto array = new LogosArray();
     for (const auto& expr : ctx->expr()) {
-        logosArray->elements.emplace_back(getExpr(expr));
+        array->elements.emplace_back(getExpr(expr));
     }
-    return logosArray;
+    array->setPosition(ctx->start);
+    return array;
 }
 
 LogosVariable* AntlerConverter::getVariable(const string& varName, const ParserRuleContext* ctx) {
@@ -303,7 +305,6 @@ LogosVariable* AntlerConverter::getVariable(const string& varName, const ParserR
 LogosFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
     const auto name = ctx->VARIABLE()->getText();
     const auto funcCallExpr = new LogosFuncCall(name);
-    funcCallExpr->setPosition(ctx->start);
     const auto funcArgList = ctx->funcArgList();
     if (funcArgList) {
         const auto args = funcArgList->funcArg();
@@ -312,6 +313,7 @@ LogosFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
             funcCallExpr->args.emplace_back(argExpr);
         }
     }
+    funcCallExpr->setPosition(ctx->start);
     return funcCallExpr;
 }
 
@@ -330,10 +332,10 @@ LogosMethodCall* AntlerConverter::getMethodCall(LogosParser::FuncCallContext* ct
     return funcCallExpr;
 }
 
-LogosInstance* AntlerConverter::getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) {
-    const auto instance = new LogosInstance(type->getText());
-    instance->setPosition(ctx->start);
-    return instance;
+LogosTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) {
+    const auto typeConst = new LogosTypeConst(getType(type));
+    typeConst->setPosition(ctx->start);
+    return typeConst;
 }
 
 LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) {

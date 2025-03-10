@@ -9,6 +9,7 @@
 #include "stmts/LogosAssignment.h"
 #include "stmts/LogosIf.h"
 #include "types/LogosInt.h"
+#include "unary/constants/LogosTypeConst.h"
 
 class LogosAssignment;
 using namespace std;
@@ -40,7 +41,7 @@ public:
     static LogosVariable* getVariable(const string& varName, const ParserRuleContext* ctx);
     static LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     static LogosMethodCall *getMethodCall(LogosParser::FuncCallContext* ctx);
-    static LogosInstance* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
+    static LogosTypeConst* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
     static LogosUnaryExpr* getFirstSelection(const LogosParser::SelectionContext* ctx, LogosParser::FirstSelectionElementContext* firstExpr);
     static vector<LogosUnaryExpr*> getInnerSelections(const vector<LogosParser::InnerSelectionElementContext*>& ctx);
     static LogosSelection* getSelection(LogosParser::SelectionContext* ctx);
