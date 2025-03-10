@@ -2,7 +2,8 @@
 
 void CommandLine::parse(const int argc, char* argv[]) {
     if (argc < 2) {
-        assert(false && "No command provided");
+        helpCommand();
+        exit(0);
     }
     rootPath = current_path();
     command = argv[1];
@@ -23,10 +24,8 @@ void CommandLine::execute() const {
         runCommand();
     } else if (command == "build") {
         buildCommand();
-    } else if (command == "help") {
-        helpCommand();
     } else {
-        throw runtime_error("Unknown command: " + command);
+        helpCommand();
     }
 }
 
@@ -51,5 +50,9 @@ void CommandLine::buildCommand() const {
 }
 
 void CommandLine::helpCommand() {
-
+    std::cout << "Usage: lgs command [options]" << "\n\n";
+    std::cout << "Commands:" << '\n';
+    std::cout << "run       execute a logos script" << '\n';
+    std::cout << "version   print logos version" << '\n';
+    std::cout << "help      print logos help" << '\n';
 }

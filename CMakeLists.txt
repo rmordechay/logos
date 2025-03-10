@@ -99,9 +99,9 @@ add_library(lib STATIC
     src/symbols/funcs/LogosFunc.cpp
 )
 
-add_executable(logos main.cpp)
+add_executable(lgs main.cpp)
 
-target_link_libraries(logos PRIVATE lib
+target_link_libraries(lgs PRIVATE lib
     ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime.a
     ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libLLVM.dylib
     ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/liblldCommon.dylib
