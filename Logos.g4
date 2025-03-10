@@ -17,19 +17,19 @@ interfaceFile:
     ;
 
 objectDeclaration:
-        OBJECT COLON type
+        OBJECT COLON TYPE
     ;
 
 interfaceDeclaration:
-        INTERFACE COLON type
+        INTERFACE COLON TYPE
     ;
 
 objectImplements:
-        IMPLEMENTS COLON type
+        IMPLEMENTS COLON TYPE
     ;
 
 funcSignature:
-        VARIABLE LPAREN paramList? RPAREN (COLON type)?
+        VARIABLE LPAREN paramList? RPAREN (COLON TYPE)?
     ;
 
 funcImplementation:
@@ -65,7 +65,7 @@ assignment:
     ;
 
 explicitVarDec:
-        VARIABLE COLON type (EQUAL expr)?
+        VARIABLE COLON TYPE (EQUAL expr)?
     ;
 
 implicitVarDec:
@@ -111,7 +111,7 @@ returnStatement:
     ;
 
 enumDeclaration:
-        ENUM type LBRACE enumField* RBRACE
+        ENUM TYPE LBRACE enumField* RBRACE
     ;
 
 enumField:
@@ -150,15 +150,15 @@ funcCall:
     ;
 
 constructor:
-        type LPAREN funcArgList? RPAREN
-    ;
-
-funcArg:
-        ((VARIABLE | THIS) EQUAL)? expr
+        TYPE LPAREN funcArgList? RPAREN
     ;
 
 funcArgList:
         funcArg (COMMA funcArg)* COMMA?
+    ;
+
+funcArg:
+        (VARIABLE EQUAL)? expr
     ;
 
 constant:
@@ -193,10 +193,6 @@ innerSelectionElement:
 
 range:
         start=expr? DOUBLE_DOT end=expr
-    ;
-
-type:
-        TYPE (LBRACE RBRACE)?
     ;
 
 DOUBLE_EQUAL: '==';

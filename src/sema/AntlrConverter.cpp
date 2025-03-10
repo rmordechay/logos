@@ -57,14 +57,14 @@ LogosMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
 }
 
 LogosObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ctx) {
-    const auto objName = ctx->objectDeclaration()->type()->TYPE()->getText();
+    const auto objName = ctx->objectDeclaration()->TYPE()->getText();
     const auto objFile = new LogosObjectFile(objName, filePath);
     objFile->obj = getObject(ctx);
     return objFile;
 }
 
 LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
-    const auto objName = ctx->objectDeclaration()->type()->TYPE()->getText();
+    const auto objName = ctx->objectDeclaration()->TYPE()->getText();
     const auto obj = new LogosObject(objName);
     for (int i = 0; i < ctx->explicitVarDec().size(); ++i) {
         const auto varDec = ctx->explicitVarDec()[i];
@@ -81,7 +81,7 @@ LogosObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
 
 LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const string& parentName, const size_t position) {
     const auto name = varDec->VARIABLE()->getText();
-    const auto type = getType(varDec->type()->TYPE());
+    const auto type = getType(varDec->TYPE());
     const auto expr = getExpr(varDec->expr());
     return new LogosField(name, parentName, type, expr, position);
 }
@@ -90,8 +90,8 @@ LogosFuncImpl* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* 
     const auto funcSignature = ctx->funcSignature();
     const auto funcName = funcSignature->VARIABLE()->getText();
     LogosType* type;
-    if (funcSignature->type()) {
-        type = getType(funcSignature->type()->TYPE());
+    if (funcSignature) {
+        type = getType(funcSignature->TYPE());
     } else {
         type = &LOGOS_VOID;
     }
@@ -111,7 +111,7 @@ LogosFuncImpl* AntlerConverter::getFunc(LogosParser::FuncImplementationContext* 
 LogosMethodImpl* AntlerConverter::getMethod(LogosParser::FuncImplementationContext* ctx, LogosObject* obj) {
     const auto funcSignature = ctx->funcSignature();
     const auto funcName = funcSignature->VARIABLE()->getText();
-    const auto type = getType(funcSignature->type()->TYPE());
+    const auto type = getType(funcSignature->TYPE());
     const auto method = new LogosMethodImpl(funcName, type, obj);
 
     const auto params = funcSignature->paramList();
@@ -188,7 +188,7 @@ LogosVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecConte
 LogosVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto expr = getExpr(ctx->expr());
-    const auto userType = getType(ctx->type()->TYPE());
+    const auto userType = getType(ctx->TYPE());
     const auto varDec = new LogosVarDec(variableName, userType, expr);
     varDec->setPosition(ctx->start);
     return varDec;
@@ -197,7 +197,7 @@ LogosVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecConte
 LogosParam* AntlerConverter::getParam(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto expr = getExpr(ctx->expr());
-    const auto userType = getType(ctx->type()->TYPE());
+    const auto userType = getType(ctx->TYPE());
     const auto param = new LogosParam(variableName, userType, expr);
     param->setPosition(ctx->start);
     return param;
@@ -381,7 +381,7 @@ vector<LogosUnaryExpr*> AntlerConverter::getInnerSelections(const vector<LogosPa
 }
 
 LogosInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) {
-    const auto name = ctx->type()->TYPE()->getText();
+    const auto name = ctx->TYPE()->getText();
     const auto instance = new LogosInstance(name);
     instance->setPosition(ctx->start);
     const auto args = ctx->funcArgList();
