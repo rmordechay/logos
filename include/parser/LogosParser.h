@@ -34,7 +34,8 @@ public:
     RuleEnumDeclaration = 24, RuleEnumField = 25, RuleExpr = 26, RuleExprList = 27, 
     RuleUnaryExpr = 28, RuleArray = 29, RuleFuncCall = 30, RuleConstructor = 31, 
     RuleFuncArg = 32, RuleFuncArgList = 33, RuleConstant = 34, RuleArrayIndex = 35, 
-    RuleSelection = 36, RuleSelectionElement = 37, RuleRange = 38, RuleType = 39
+    RuleSelection = 36, RuleFirstSelectionElement = 37, RuleInnerSelectionElement = 38, 
+    RuleRange = 39, RuleType = 40
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -91,7 +92,8 @@ public:
   class ConstantContext;
   class ArrayIndexContext;
   class SelectionContext;
-  class SelectionElementContext;
+  class FirstSelectionElementContext;
+  class InnerSelectionElementContext;
   class RangeContext;
   class TypeContext; 
 
@@ -640,21 +642,23 @@ public:
   public:
     SelectionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<SelectionElementContext *> selectionElement();
-    SelectionElementContext* selectionElement(size_t i);
+    FirstSelectionElementContext *firstSelectionElement();
     std::vector<antlr4::tree::TerminalNode *> DOT();
     antlr4::tree::TerminalNode* DOT(size_t i);
+    std::vector<InnerSelectionElementContext *> innerSelectionElement();
+    InnerSelectionElementContext* innerSelectionElement(size_t i);
 
    
   };
 
   SelectionContext* selection();
 
-  class  SelectionElementContext : public antlr4::ParserRuleContext {
+  class  FirstSelectionElementContext : public antlr4::ParserRuleContext {
   public:
-    SelectionElementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    FirstSelectionElementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
+    antlr4::tree::TerminalNode *TYPE();
     FuncCallContext *funcCall();
     ConstructorContext *constructor();
     ArrayIndexContext *arrayIndex();
@@ -662,7 +666,20 @@ public:
    
   };
 
-  SelectionElementContext* selectionElement();
+  FirstSelectionElementContext* firstSelectionElement();
+
+  class  InnerSelectionElementContext : public antlr4::ParserRuleContext {
+  public:
+    InnerSelectionElementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *VARIABLE();
+    FuncCallContext *funcCall();
+    ArrayIndexContext *arrayIndex();
+
+   
+  };
+
+  InnerSelectionElementContext* innerSelectionElement();
 
   class  RangeContext : public antlr4::ParserRuleContext {
   public:

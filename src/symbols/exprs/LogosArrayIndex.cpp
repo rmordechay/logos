@@ -26,3 +26,10 @@ Value* LogosArrayIndex::computeIRValue(CodeGenMetadata* metadata) {
 string LogosArrayIndex::getName() {
     return baseExpr->getName();
 }
+
+LogosArrayIndex::~LogosArrayIndex() {
+    delete baseExpr;
+    for (const auto &indexExpr : indexExprs) {
+        delete indexExpr;
+    }
+}

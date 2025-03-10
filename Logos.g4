@@ -172,13 +172,20 @@ arrayIndex:
     ;
 
 selection:
-        selectionElement (DOT selectionElement)*
+        firstSelectionElement (DOT innerSelectionElement)+
     ;
 
-selectionElement:
+firstSelectionElement:
         VARIABLE
+    |   TYPE
     |   funcCall
     |   constructor
+    |   arrayIndex
+    ;
+
+innerSelectionElement:
+        VARIABLE
+    |   funcCall
     |   arrayIndex
     ;
 

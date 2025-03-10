@@ -251,9 +251,7 @@ void SemaAnalyser::resolveInnerSelection(const LogosSelection* selection, const 
     }
 }
 
-void SemaAnalyser::resolveInnerSelection(const LogosSelection* selection, const int i, const LogosMethodCall* methodCall) {
-
-}
+void SemaAnalyser::resolveInnerSelection(const LogosSelection* selection, const int i, const LogosMethodCall* methodCall) {}
 
 void SemaAnalyser::resolveInnerSelection(const LogosSelection* selection, const int i, LogosField* field) {}
 
@@ -423,7 +421,7 @@ void SemaAnalyser::printError(const int code, const LogosValue* value, const vec
     }
     const auto path = file->path + ":" + std::to_string(value->position.lineNumber) + ":" + std::to_string(value->position.posInLine);
     std::cout << "Error: " << errorString << '\n';
-    std::cout << "\tat: " << path << "\n\n";
+    std::cout << "\tat " << path << '\n';
 }
 
 LogosSymbol* SemaAnalyser::getSymbol(const string& name, const LogosValue* value) {

@@ -328,14 +328,20 @@ LogosMethodCall* AntlerConverter::getMethodCall(LogosParser::FuncCallContext* ct
     return funcCallExpr;
 }
 
+LogosTypeConstant* AntlerConverter::getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) {
+    const auto typeConstant = new LogosTypeConstant(getType(type));
+    typeConstant->setPosition(ctx->start);
+    return typeConstant;
+}
+
 LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) {
-    const auto selectionElements = ctx->selectionElement();
-    const auto firstExpr = getFirstSelection(ctx, selectionElements[0]);
-    const auto innerSelections = getInnerSelections(ctx->selectionElement());
+    const auto firstElement = ctx->firstSelectionElement();
+    const auto firstExpr = getFirstSelection(ctx, firstElement);
+    const auto innerSelections = getInnerSelections(ctx->innerSelectionElement());
     return new LogosSelection(firstExpr, innerSelections);
 }
 
-LogosUnaryExpr* AntlerConverter::getFirstSelection(const LogosParser::SelectionContext* ctx, LogosParser::SelectionElementContext* firstExpr) {
+LogosUnaryExpr* AntlerConverter::getFirstSelection(const LogosParser::SelectionContext* ctx, LogosParser::FirstSelectionElementContext* firstExpr) {
     if (const auto variable = firstExpr->VARIABLE()) {
         return getVariable(variable->getText(), ctx);
     }
@@ -345,10 +351,13 @@ LogosUnaryExpr* AntlerConverter::getFirstSelection(const LogosParser::SelectionC
     if (const auto arrayIndex = firstExpr->arrayIndex()) {
         return getArrayIndex(arrayIndex);
     }
+    if (const auto type = firstExpr->TYPE()) {
+        return getTypeConstant(type, ctx);
+    }
     return nullptr;
 }
 
-vector<LogosUnaryExpr*> AntlerConverter::getInnerSelections(const vector<LogosParser::SelectionElementContext*>& ctx) {
+vector<LogosUnaryExpr*> AntlerConverter::getInnerSelections(const vector<LogosParser::InnerSelectionElementContext*>& ctx) {
     vector<LogosUnaryExpr*> exprs;
     exprs.reserve(ctx.size());
     for (int i = 1; i < ctx.size(); ++i) {
@@ -395,9 +404,10 @@ LogosArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* 
     for (const auto& expr : ctx->expr()) {
         indexExprs.emplace_back(getExpr(expr));
     }
-    const auto logosArrayIndex = new LogosArrayIndex(baseExpr, indexExprs);
-    return logosArrayIndex;
+
+    return new LogosArrayIndex(baseExpr, indexExprs);
 }
+
 
 LogosUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
     if (const auto intToken = ctx->INTEGER()) {

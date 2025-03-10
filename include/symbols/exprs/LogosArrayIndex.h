@@ -13,7 +13,7 @@ public:
     explicit LogosArrayIndex(LogosUnaryExpr* baseExpr, const vector<LogosExpr*>& indexExprs) : baseExpr(baseExpr), indexExprs(indexExprs) {}
     Value* computeIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
-    ~LogosArrayIndex() override = default;
+    ~LogosArrayIndex() override;
 };
 
 #endif //LOGOSARRAYINDEX_H
