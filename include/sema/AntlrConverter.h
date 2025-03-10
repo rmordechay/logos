@@ -3,7 +3,6 @@
 
 #include "LogosParser.h"
 #include "exprs/LogosMethodCall.h"
-#include "exprs/LogosTypeConstant.h"
 #include "exprs/LogosUnaryExpr.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
@@ -38,10 +37,9 @@ public:
     static LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     static LogosExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     static LogosUnaryExpr* getArray(LogosParser::ArrayContext* ctx);
-    static LogosVariable* getVariable(const string& varName, const ParserRuleContext* ctx) const;
+    static LogosVariable* getVariable(const string& varName, const ParserRuleContext* ctx);
     static LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     static LogosMethodCall *getMethodCall(LogosParser::FuncCallContext* ctx);
-    static LogosTypeConstant* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
     static LogosUnaryExpr* getFirstSelection(const LogosParser::SelectionContext* ctx, LogosParser::FirstSelectionElementContext* firstExpr);
     static vector<LogosUnaryExpr*> getInnerSelections(const vector<LogosParser::InnerSelectionElementContext*>& ctx);
     static LogosSelection* getSelection(LogosParser::SelectionContext* ctx);

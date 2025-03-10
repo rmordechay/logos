@@ -141,9 +141,7 @@ void SemaAnalyser::visitForeachLoop(LogosForeachLoop* foreachLoop) {
     visitStmtBlock(foreachLoop->stmtBlock);
 }
 
-void SemaAnalyser::visitReturnStmt(LogosReturn* returnStmt) {
-
-}
+void SemaAnalyser::visitReturnStmt(LogosReturn* returnStmt) {}
 
 void SemaAnalyser::visitExpr(LogosExpr* expr) {
     if (const auto unaryExpr = dynamic_cast<LogosUnaryExpr*>(expr)) {

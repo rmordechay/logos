@@ -292,7 +292,7 @@ LogosUnaryExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
     return logosArray;
 }
 
-LogosVariable* AntlerConverter::getVariable(const string& varName, const ParserRuleContext* ctx) const {
+LogosVariable* AntlerConverter::getVariable(const string& varName, const ParserRuleContext* ctx) {
     const auto logosVariable = new LogosVariable(varName);
     logosVariable->setPosition(ctx->start);
     return logosVariable;
@@ -328,12 +328,6 @@ LogosMethodCall* AntlerConverter::getMethodCall(LogosParser::FuncCallContext* ct
     return funcCallExpr;
 }
 
-LogosTypeConstant* AntlerConverter::getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) {
-    const auto typeConstant = new LogosTypeConstant(getType(type));
-    typeConstant->setPosition(ctx->start);
-    return typeConstant;
-}
-
 LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) {
     const auto firstElement = ctx->firstSelectionElement();
     const auto firstExpr = getFirstSelection(ctx, firstElement);
@@ -350,9 +344,6 @@ LogosUnaryExpr* AntlerConverter::getFirstSelection(const LogosParser::SelectionC
     }
     if (const auto arrayIndex = firstExpr->arrayIndex()) {
         return getArrayIndex(arrayIndex);
-    }
-    if (const auto type = firstExpr->TYPE()) {
-        return getTypeConstant(type, ctx);
     }
     return nullptr;
 }
