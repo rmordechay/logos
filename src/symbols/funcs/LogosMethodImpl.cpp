@@ -30,7 +30,7 @@ Function* LogosMethodImpl::getIRFunc(CodeGenMetadata* metadata) {
         IRParamsTypes.emplace_back(param->type->getIRType());
     }
     IRParamsTypes.emplace_back(obj->getIRType()->getPointerTo());
-    metadata->logosStack.addLocalSymbol(LOGOS_THIS, LogosSymbol(OBJECT, obj));
+    metadata->logosStack.addLocalSymbol(LOGOS_SELF, LogosSymbol(OBJECT, obj));
 
     const auto rt = FunctionType::get(type->getIRType(), IRParamsTypes, false);
     const auto method = Function::Create(rt, Function::ExternalLinkage, combinedName, metadata->currentModule);
@@ -38,6 +38,6 @@ Function* LogosMethodImpl::getIRFunc(CodeGenMetadata* metadata) {
 
     auto args = method->arg_begin();
     setArgs(metadata, args);
-    args->setName(LOGOS_THIS);
+    args->setName(LOGOS_SELF);
     return method;
 }

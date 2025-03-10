@@ -132,7 +132,7 @@ exprList:
 
 unaryExpr:
         VARIABLE
-    |   THIS
+    |   SELF
     |   funcCall
     |   constructor
     |   constant
@@ -179,7 +179,7 @@ selection:
 firstSelectionElement:
         VARIABLE
     |   TYPE
-    |   THIS
+    |   SELF
     |   funcCall
     |   constructor
     |   arrayIndex
@@ -226,7 +226,7 @@ DOLLAR: '$';
 AMPERSAND: '&';
 
 OBJECT: 'object';
-THIS: 'this';
+SELF: 'self';
 INTERFACE: 'interface';
 ENUM: 'enum';
 

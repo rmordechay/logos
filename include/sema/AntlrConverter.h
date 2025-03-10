@@ -41,13 +41,13 @@ public:
     static LogosVariable* getVariable(const string& varName, const ParserRuleContext* ctx);
     static LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     static LogosMethodCall *getMethodCall(LogosParser::FuncCallContext* ctx);
-    static LogosTypeConst* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
     static LogosUnaryExpr* getFirstSelection(const LogosParser::SelectionContext* ctx, LogosParser::FirstSelectionElementContext* firstExpr);
     static vector<LogosUnaryExpr*> getInnerSelections(const vector<LogosParser::InnerSelectionElementContext*>& ctx);
     static LogosSelection* getSelection(LogosParser::SelectionContext* ctx);
     static LogosInstance* getInstance(LogosParser::ConstructorContext* ctx);
     static LogosArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
     static LogosUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
+    static LogosTypeConst* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
     static LogosType* getType(tree::TerminalNode* type);
     ~AntlerConverter() = default;
 };
