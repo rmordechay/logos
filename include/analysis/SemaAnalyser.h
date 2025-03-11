@@ -1,17 +1,13 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
-#include "LogosError.h"
-
-#include <mutex>
+#include "LogosAnalyser.h"
 #include "LogosStack.h"
 #include "unary/LogosMethodCall.h"
-
 #include "unary/LogosUnaryExpr.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
 #include "object/LogosObject.h"
 #include "stmts/LogosReturn.h"
-
 #include <loops/LogosForeachLoop.h>
 #include <loops/LogosRangeLoop.h>
 
@@ -20,15 +16,13 @@ class LogosIf;
 class LogosAssignment;
 class LogosLoop;
 
-class SemaAnalyser {
+class SemaAnalyser final : public LogosAnalyser {
 public:
-    std::mutex mtx;
-    LogosFile* file;
     LogosStack logosStack;
-    bool successful = true;
+    LogosFile* file = nullptr;
 
     explicit SemaAnalyser(LogosFile* logosFile) : file(logosFile) {}
-    void visitLogosFile();
+    void analyse();
     void visitMainFile(const LogosMainFile* mainFile);
     void visitObjectFile(const LogosObjectFile* objectFile);
     void visitObject(const LogosObject* object);
@@ -74,10 +68,7 @@ public:
     void resolveInnerSelection(const LogosSelection* selection, int i, LogosFuncImpl* funcImpl);
 
     bool matchTypes(const LogosType* first, const LogosType* second, const LogosValue* value);
-    void setUnsuccessful();
-
-    void printError(LogosErrorNo code, const vector<string>& args = {});
-    void printError(LogosErrorNo code, const LogosValue* value, const vector<string>& args = {});
+    void printError(LogosErrCode code, const LogosValue* value, const vector<string>& args = {});
     LogosSymbol* getSymbol(const string& name, const LogosValue* value);
     ~SemaAnalyser() = default;
 };

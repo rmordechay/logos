@@ -12,7 +12,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cli
     ${CMAKE_CURRENT_SOURCE_DIR}/include/files
     ${CMAKE_CURRENT_SOURCE_DIR}/include/codegen
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/sema
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/analysis
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols/exprs
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols/exprs/unary
@@ -22,15 +22,16 @@ include_directories(
 
 add_library(lib STATIC
     # headers
-    include/application/Application.h
+    include/application/Logos.h
     include/application/ThreadPool.h
     include/codegen/CodeGenerator.h
     include/codegen/LogosLinker.h
     include/LogosError.h
     include/parser/LogosLexer.h
     include/parser/LogosParser.h
-    include/sema/AntlrConverter.h
-    include/sema/SemaAnalyser.h
+    include/analysis/AntlrConverter.h
+    include/analysis/SemaAnalyser.h
+    include/analysis/ProjectAnalyser.h
     # Symbols headers
     include/symbols/exprs/binary/LogosBinaryExpr.h
     include/symbols/exprs/unary/constants/LogosConstant.h
@@ -71,15 +72,16 @@ add_library(lib STATIC
     include/cli/LogosRunCmd.h
 
     # src
-    src/application/Application.cpp
+    src/application/Logos.cpp
     src/application/ThreadPool.cpp
     src/cli/LogosCli.cpp
     src/codegen/CodeGenerator.cpp
     src/codegen/LogosLinker.cpp
     src/parser/LogosLexer.cpp
     src/parser/LogosParser.cpp
-    src/sema/AntlrConverter.cpp
-    src/sema/SemaAnalyser.cpp
+    src/analysis/AntlrConverter.cpp
+    src/analysis/SemaAnalyser.cpp
+    src/analysis/ProjectAnalyser.cpp
     # Symbols src
     src/symbols/exprs/binary/LogosBinaryExpr.cpp
     src/symbols/exprs/unary/constants/LogosConstant.cpp
@@ -111,7 +113,8 @@ add_library(lib STATIC
     src/cli/LogosRunCmd.cpp
 )
 
-add_executable(lgs main.cpp)
+add_executable(lgs main.cpp
+    include/analysis/LogosAnalyser.h)
 
 target_link_libraries(lgs PRIVATE lib
     ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime.a

@@ -1,0 +1,36 @@
+#include "analysis/ProjectAnalyser.h"
+#include <LogosMainFile.h>
+#include <iostream>
+
+using namespace std;
+
+bool ProjectAnalyser::analyse() {
+    if (files.empty()) return false;
+    analyseStructure();
+    return successful;
+}
+
+void ProjectAnalyser::analyseStructure() {
+    bool hasMainFile = false;
+    map<string, vector<LogosFile*>> duplicates;
+    for (const auto& file : files) {
+        if (dynamic_cast<LogosMainFile*>(file)) {
+            hasMainFile = true;
+            continue;
+        }
+        duplicates[file->name].emplace_back(file);
+    }
+    if (!hasMainFile) printError(E10008);
+    printDuplicateFiles(duplicates);
+}
+
+void ProjectAnalyser::printDuplicateFiles(const map<string, vector<LogosFile*>>& duplicates) {
+    for (const auto &duplicate : duplicates) {
+        if (duplicate.second.size() <= 1) continue;
+        ostringstream errMsg;
+        for (const auto &file : duplicate.second) {
+            errMsg << "\n\t - " + file->absPath;
+        }
+        printError(E10007, {duplicate.first, errMsg.str()});
+    }
+}

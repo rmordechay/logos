@@ -35,7 +35,7 @@ void LogosFuncImpl::setIRFunc(CodeGenMetadata* metadata) {
 }
 
 void LogosFuncImpl::setCombinedName() {
-    if (name == LOGOS_MAIN_FUNCT_NAME) {
+    if (name == LOGOS_MAIN_FUNC) {
         combinedName = name;
     } else {
         combinedName = name + "_" + type->getName();

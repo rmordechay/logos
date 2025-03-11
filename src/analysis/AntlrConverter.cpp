@@ -1,4 +1,4 @@
-#include "sema/AntlrConverter.h"
+#include "analysis/AntlrConverter.h"
 
 #include "binary/LogosBinaryExpr.h"
 #include "binary/LogosOperator.h"
@@ -20,7 +20,6 @@
 #include "constants/LogosTypeConst.h"
 
 #include <LogosDefinitions.h>
-#include <LogosError.h>
 #include <loops/LogosForeachLoop.h>
 #include <loops/LogosRangeLoop.h>
 #include <types/LogosString.h>
@@ -29,22 +28,22 @@
 LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
     LogosFile* logosFile = nullptr;
     if (const auto mainFileCtx = ctx->mainFile()) {
-        logosFile = getMainFile(mainFileCtx);
+        logosFile = getMainFile(mainFileCtx, filePath);
     }
     if (const auto objFileCtx = ctx->objectFile()) {
-        logosFile = getObjectFile(objFileCtx);
+        logosFile = getObjectFile(objFileCtx, filePath);
     }
-    logosFile->path = filePath;
+    logosFile->absPath = filePath;
     return logosFile;
 }
 
-LogosMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
+LogosMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, const string& filePath) {
     const auto funcImplementations = ctx->funcImplementation();
     const auto mainFile = new LogosMainFile(filePath);
     for (const auto& func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
-        if (funcName == LOGOS_MAIN_FUNCT_NAME) {
-            const auto mainFunc = new LogosFuncImpl(LOGOS_MAIN_FUNCT_NAME, &LOGOS_INT);
+        if (funcName == LOGOS_MAIN_FUNC) {
+            const auto mainFunc = new LogosFuncImpl(LOGOS_MAIN_FUNC, &LOGOS_INT);
             mainFile->mainFunc = mainFunc;
             const auto statementsBlock = func->funcBody()->statementsBlock();
             mainFunc->stmtBlock = getStmtBlock(statementsBlock);
@@ -56,7 +55,7 @@ LogosMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     return mainFile;
 }
 
-LogosObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ctx) {
+LogosObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath) {
     const auto objName = ctx->objectDeclaration()->TYPE()->getText();
     const auto objFile = new LogosObjectFile(objName, filePath);
     objFile->obj = getObject(ctx);

@@ -8,9 +8,10 @@ using namespace std;
 class LogosFile {
 public:
     string name;
-    string path;
+    string absPath;
+    string relPath;
 
-    explicit LogosFile(const string& name, const string& path) : name(name), path(path) {}
+    explicit LogosFile(const string& name, const string& path) : name(name), absPath(path) {}
     virtual ~LogosFile() = default;
 };
 

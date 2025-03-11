@@ -1,6 +1,6 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
-#include <Application.h>
+#include <Logos.h>
 #include <llvm/Target/TargetMachine.h>
 
 class LogosFile;
@@ -11,19 +11,12 @@ inline TargetMachine* targetMachine = nullptr;
 
 class CodeGenerator {
 public:
-    map<string, LogosSymbol> globalSymbols;
-    const LogosMainFile* mainFile;
-
-    explicit CodeGenerator(const LogosMainFile* mainFile) : mainFile(mainFile) {
-        initIR();
-    }
-
-    void generateCode(const map<string, LogosSymbol>& globalSymbols) const;
-    void generateMainModule(const map<string, LogosSymbol>& globalSymbols) const;
-    static Module* createModule(const string& objName);
-    static void generateObjectModule(LogosObject* obj, const map<string, LogosSymbol>& globalSymbols);
-    static void writeIRToFile(const Module* module, const string& name);
     static void initIR();
+    static void generateCode(const LogosMainFile* mainFile, const map<string, LogosSymbol>& globalSymbols);
+    static void generateMainModule(const LogosMainFile* mainFile, const map<string, LogosSymbol>& globalSymbols);
+    static void generateObjectModule(LogosObject* obj, const map<string, LogosSymbol>& globalSymbols);
+    static Module* createModule(const string& objName);
+    static void writeIRToFile(const Module* module, const string& name);
     ~CodeGenerator() = default;
 };
 

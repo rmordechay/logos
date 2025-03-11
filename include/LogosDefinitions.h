@@ -1,14 +1,17 @@
 #ifndef LOGOSCONFIGS_H
 #define LOGOSCONFIGS_H
+#include <llvm/Support/CodeGen.h>
+
+using namespace std;
 
 const auto LOGOS_VERSION = "0.0.1";
 
 // Logos
 const auto LOGOS_EXTENSION = ".lgs";
-const auto LOGOS_SRC_PATH = "src";
+const auto LOGOS_SRC_DIR = "src";
 const auto LOGOS_BUILD_DIR = "build";
-const auto LOGOS_MAIN_FILE_NAME = "Main";
-const auto LOGOS_MAIN_FUNCT_NAME = "main";
+const auto LOGOS_MAIN_FILE = "Main";
+const auto LOGOS_MAIN_FUNC = "main";
 const auto LOGOS_SELF = "self";
 
 // LLVM

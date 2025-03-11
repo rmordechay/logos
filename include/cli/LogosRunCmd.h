@@ -9,7 +9,6 @@ public:
     void init(int argc, char** argv) override;
     void runCmd() override;
     static void printHelp();
-    static void exitWithMessage(const string& errMsg);
     static void exitWithHelp(const string& errMsg);
     ~LogosRunCmd() override = default;
 };

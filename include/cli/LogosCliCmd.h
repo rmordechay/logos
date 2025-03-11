@@ -1,7 +1,5 @@
 #ifndef LOGOSCOMMAND_H
 #define LOGOSCOMMAND_H
-#include <iostream>
-#include <map>
 #include <vector>
 
 using namespace std;
