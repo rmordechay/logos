@@ -5,6 +5,7 @@ Value* LogosPrint::computeIRValue(CodeGenMetadata* metadata) {
 }
 
 Value* LogosPrint::call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
+    assert(args.empty());
     const auto argType = args[0]->type->getIRType();
     auto argValue = args[0]->writeIRValue(metadata);
     FunctionCallee func;

@@ -13,6 +13,7 @@ public:
     Value* writeIRValue(CodeGenMetadata* metadata);
     void setIRValue(Value* value);
     virtual void setPosition(const antlr4::Token* ctx);
+    static BasicBlock* getBasicBlock(const char* name);
     virtual ~LogosValue() = default;
 
 protected:
@@ -38,6 +39,10 @@ inline void LogosValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const 
     auto& builder = metadata->builder;
     block->insertInto(currentFunc);
     builder.SetInsertPoint(block);
+}
+
+inline BasicBlock* LogosValue::getBasicBlock(const char* name) {
+    return BasicBlock::Create(context, name);
 }
 
 inline void LogosValue::setIRValue(Value* value) {

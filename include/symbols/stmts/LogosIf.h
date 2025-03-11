@@ -4,6 +4,12 @@
 #include "LogosStmtBlock.h"
 #include "LogosExpr.h"
 
+inline auto BB_IF_START = "if_start";
+inline auto BB_IF_END = "if_end";
+inline auto BB_ELSE = "else";
+inline auto BB_ELSE_IF_START = "else_if_start";
+inline auto BB_ELSE_IF_CHECK = "else_if_check";
+
 class LogosIf final : public LogosStmt {
 public:
     LogosExpr* ifCond;
