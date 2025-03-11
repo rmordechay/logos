@@ -119,17 +119,15 @@ add_executable(lgs main.cpp)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE lib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libLLVM.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/liblldCommon.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/liblldMachO.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime-macos.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libLLVM.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldCommon.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldMachO.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libantlr4-runtime.a
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(lgs PRIVATE lib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libLLVM.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/liblldCommon.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/liblldMachO.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime-linux.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libantlr4-runtime.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libLLVM.so
     )
 endif()
 
