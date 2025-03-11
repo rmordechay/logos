@@ -13,6 +13,10 @@ enum LogosErrCode {
     E10030, E10031, E10032, E10033, E10034, E10035, E10036, E10037, E10038, E10039,
 };
 
+enum LogosWarningCode {
+    E50000, E50001, E50002, E50003, E50004, E50005, E50006, E50007, E50008, E50009,
+};
+
 const map<LogosErrCode, string> LOGOS_ERRORS = {
     {E10000, "main() function is not defined in Main.lgs file."},
     {E10001, "The left-hand type '%s' is not equal to the right-hand type '%s'."},
@@ -27,8 +31,8 @@ const map<LogosErrCode, string> LOGOS_ERRORS = {
     {E10010, "Current path is not a root path of a logos project"},
 };
 
-const map<int, string> LOGOS_WARNINGS = {
-    {5000, "%s is never used."},
+const map<LogosWarningCode, string> LOGOS_WARNINGS = {
+    {E50000, "variable %s is never used."},
 };
 
 #endif //LOGOSERRORS_H

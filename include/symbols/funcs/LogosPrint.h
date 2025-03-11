@@ -2,7 +2,7 @@
 #define LOGOSPRINT_H
 #include "LogosBuiltinFunc.h"
 #include "types/LogosInt.h"
-#include <types/LogosString.h>
+#include <types/LogosStr.h>
 #include <types/LogosVoid.h>
 
 class LogosPrint final : public LogosBuiltinFunc {
@@ -14,7 +14,7 @@ public:
     FunctionType* const funcTypeString = FunctionType::get(LOGOS_VOID.IRType, LOGOS_STRING.IRType, false);
 
     explicit LogosPrint() : LogosBuiltinFunc(logosName, &LOGOS_VOID) {}
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
     ~LogosPrint() override = default;
 };

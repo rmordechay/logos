@@ -15,8 +15,6 @@ const auto LOGOS_MAIN_FUNC = "main";
 const auto LOGOS_SELF = "self";
 
 // LLVM
-const auto OBJECT_FILE_PATH = "../project/build/output.o";
-const auto EXECUTABLE_PATH = "../project/build/output";
 const auto OBJECT_FILE = "output.o";
 const auto EXECUTABLE_FILE = "output";
 const auto LOGOS_STDLIB = "../stdlib/logoslib.ll";

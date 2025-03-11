@@ -19,7 +19,7 @@ public:
         op(op) {
     }
 
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LogosBinaryExpr() override = default;
 };
 

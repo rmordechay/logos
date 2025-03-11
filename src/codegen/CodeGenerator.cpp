@@ -1,7 +1,7 @@
 #include "CodeGenerator.h"
 
 #include "funcs/LogosFuncImpl.h"
-#include "object/LogosField.h"
+#include "stmts/LogosField.h"
 
 #include <ranges>
 #include <llvm/MC/TargetRegistry.h>
@@ -21,9 +21,9 @@ void CodeGenerator::generateMainModule(const LogosMainFile* mainFile, const map<
     metadata.logosStack.globalSymbols = globalSymbols;
 
     for (const auto& func : mainFile->funcs) {
-        func->writeIRValue(&metadata);
+        func->getIRValue(&metadata);
     }
-    mainFile->mainFunc->writeIRValue(&metadata);
+    mainFile->mainFunc->getIRValue(&metadata);
 
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
     writeIRToFile(metadata.currentModule, LOGOS_MAIN_FILE);
@@ -36,7 +36,7 @@ void CodeGenerator::generateObjectModule(LogosObject* obj, const map<string, Log
     metadata.logosStack.globalSymbols = globalSymbols;
 
     for (const auto& [_, method] : obj->methods) {
-        method->writeIRValue(&metadata);
+        method->getIRValue(&metadata);
     }
 
     writeIRToFile(metadata.currentModule, objName);

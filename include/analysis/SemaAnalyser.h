@@ -6,7 +6,7 @@
 #include "unary/LogosUnaryExpr.h"
 #include "files/LogosMainFile.h"
 #include "files/LogosObjectFile.h"
-#include "object/LogosObject.h"
+#include "types/LogosObject.h"
 #include "stmts/LogosReturn.h"
 #include <loops/LogosForeachLoop.h>
 #include <loops/LogosRangeLoop.h>

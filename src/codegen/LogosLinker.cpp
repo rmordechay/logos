@@ -33,11 +33,11 @@ void LogosLinker::link(const std::map<std::string, Module*>& modules) {
         linker.linkInModule(unique_ptr<Module>(std::move(file)));
     }
 
-    writeFile(unique_ptr<Module>(mainModule), OBJECT_FILE_PATH);
+    writeExecFile(unique_ptr<Module>(mainModule), objectFilePath);
     lld::macho::link(getLinkerOpts(), outs(), errs(), false, false);
 }
 
-void LogosLinker::writeFile(const unique_ptr<Module> &module, const string &filename) {
+void LogosLinker::writeExecFile(const unique_ptr<Module> &module, const string &filename) {
     string error;
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     const auto cpuName = sys::getHostCPUName();
@@ -55,8 +55,8 @@ void LogosLinker::writeFile(const unique_ptr<Module> &module, const string &file
 vector<const char*> LogosLinker::getLinkerOpts() {
     return {
         DEFAULT_LINKER,
-        objectFile,
-        "-o", execFile,
+        objectFilePath,
+        "-o", execFilePath,
         "-lSystem",
         "-syslibroot", LIB_ROOT,
         "-e", ENTRY_POINT,

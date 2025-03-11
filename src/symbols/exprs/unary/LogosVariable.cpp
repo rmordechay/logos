@@ -3,32 +3,32 @@
 #include "unary/LogosFuncCall.h"
 #include "unary/LogosSelection.h"
 #include "loops/LogosLoopVar.h"
-#include "object/LogosField.h"
+#include "stmts/LogosField.h"
 
 #include <LogosStack.h>
 #include <binary/LogosBinaryExpr.h>
 #include <funcs/LogosBuiltinFunc.h>
 #include <funcs/LogosFuncImpl.h>
 
-Value* LogosVariable::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosVariable::createIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->logosStack.getSymbol(name);
     switch (symbol->type) {
     case FIELD:
-        return symbol->field->writeIRValue(metadata);
+        return symbol->field->getIRValue(metadata);
     case SELECTION:
-        return symbol->selection->writeIRValue(metadata);
+        return symbol->selection->getIRValue(metadata);
     case LOOP_VAR:
-        return symbol->loopVar->writeIRValue(metadata);
+        return symbol->loopVar->getIRValue(metadata);
     case FUNC_IMPL:
-        return symbol->funcImpl->writeIRValue(metadata);
+        return symbol->funcImpl->getIRValue(metadata);
     case METHOD_IMPL:
-        return symbol->methodImpl->writeIRValue(metadata);
+        return symbol->methodImpl->getIRValue(metadata);
     case VAR_DEC:
-        return symbol->varDec->writeIRValue(metadata);
+        return symbol->varDec->getIRValue(metadata);
     case BUILTIN_FUNC:
-        return symbol->builtinFunc->writeIRValue(metadata);
+        return symbol->builtinFunc->getIRValue(metadata);
     case PARAM:
-        return symbol->param->writeIRValue(metadata);
+        return symbol->param->getIRValue(metadata);
     default:
         return nullptr;
     }

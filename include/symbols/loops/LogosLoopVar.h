@@ -12,7 +12,7 @@ public:
 
     explicit LogosLoopVar(const string& name) : name(name) {}
     explicit LogosLoopVar(const string& name, LogosType* type) : name(name), type(type) {}
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LogosLoopVar() override;
 };
 

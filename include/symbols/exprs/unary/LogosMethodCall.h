@@ -12,7 +12,7 @@ public:
     Position position = Position();
 
     explicit LogosMethodCall(const string& name) : name(name) {}
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
     ~LogosMethodCall() override;
 };

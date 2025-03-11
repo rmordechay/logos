@@ -5,12 +5,16 @@
 #include <llvm/IR/Type.h>
 
 class LogosConstant;
+class LogosField;
+class LogosMethodImpl;
 
 class LogosType {
 public:
     virtual const std::string getName() const = 0;
     virtual llvm::Type* getIRType() = 0;
     virtual LogosConstant* getZeroValue() = 0;
+    virtual LogosField* getField(const std::string& name) = 0;
+    virtual LogosMethodImpl* getMethod(const std::string& name) = 0;
     virtual bool equals(LogosType* other) const = 0;
     bool operator==(LogosType* other) const;
     bool operator!=(LogosType* other) const;

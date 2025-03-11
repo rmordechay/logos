@@ -1,7 +1,6 @@
-#include "object/LogosObject.h"
+#include "types/LogosObject.h"
 #include "funcs/LogosFuncImpl.h"
-#include "object/LogosField.h"
-#include <ranges>
+#include "stmts/LogosField.h"
 
 const string LogosObject::getName() const {
     return name;
@@ -23,15 +22,7 @@ LogosConstant* LogosObject::getZeroValue() {
     return nullptr;
 }
 
-bool LogosObject::containsField(const string& name) const {
-    return fields.find(name) != fields.end();
-}
-
-bool LogosObject::containsMethod(const string& name) const {
-    return methods.find(name) != methods.end();
-}
-
-LogosField* LogosObject::getField(const string& name) const {
+LogosField* LogosObject::getField(const string& name) {
     const auto it = fields.find(name);
     if (it != fields.end()) {
         return it->second;
@@ -39,7 +30,7 @@ LogosField* LogosObject::getField(const string& name) const {
     return nullptr;
 }
 
-LogosMethodImpl* LogosObject::getMethod(const string& name) const {
+LogosMethodImpl* LogosObject::getMethod(const string& name) {
     const auto it = methods.find(name);
     if (it != methods.end()) {
         return it->second;

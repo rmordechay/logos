@@ -1,8 +1,8 @@
 #include "stmts/LogosStmtBlock.h"
 
-Value* LogosStmtBlock::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosStmtBlock::createIRValue(CodeGenMetadata* metadata) {
     for (const auto& stmt : stmts) {
-        stmt->writeIRValue(metadata);
+        stmt->getIRValue(metadata);
     }
     return nullptr;
 }

@@ -2,12 +2,12 @@
 #include "constants/LogosConstant.h"
 #include <LogosStack.h>
 
-Value* LogosVarDec::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosVarDec::createIRValue(CodeGenMetadata* metadata) {
     Value* value;
     if (expr) {
-        value = expr->writeIRValue(metadata);
+        value = expr->getIRValue(metadata);
     } else {
-        value = type->getZeroValue()->writeIRValue(metadata);
+        value = type->getZeroValue()->getIRValue(metadata);
     }
     const auto valueType = value->getType();
     if (!valueType->isPointerTy()) {

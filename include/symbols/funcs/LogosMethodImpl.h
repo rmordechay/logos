@@ -7,7 +7,7 @@ public:
     LogosObject* parentObj;
 
     LogosMethodImpl(const string& name, LogosType* funcType, LogosObject* obj) : LogosFunc(name, funcType), parentObj(obj) {}
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     void setIRFunc(CodeGenMetadata* metadata);
     void setCombinedName();
     ~LogosMethodImpl() override = default;

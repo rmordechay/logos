@@ -4,7 +4,7 @@
 
 #include <exprs/LogosExpr.h>
 
-Value* LogosLoopVar::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosLoopVar::createIRValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
 

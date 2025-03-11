@@ -2,14 +2,11 @@
 
 #include "LogosInstance.h"
 #include "funcs/LogosMethodImpl.h"
-#include "object/LogosObject.h"
 
-#include <LogosDefinitions.h>
-
-Value* LogosMethodCall::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosMethodCall::createIRValue(CodeGenMetadata* metadata) {
     vector<Value*> paramValues;
     for (const auto& arg : args) {
-        const auto argValue = arg->writeIRValue(metadata);
+        const auto argValue = arg->getIRValue(metadata);
         paramValues.emplace_back(argValue);
     }
     const auto funcType = methodImpl->IRFunc->getFunctionType();

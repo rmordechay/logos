@@ -3,15 +3,15 @@
 #include <unary/LogosArray.h>
 #include <unary/constants/LogosConstant.h>
 
-Value* LogosArrayIndex::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosArrayIndex::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto irType = type->getIRType();
     const auto symbol = metadata->logosStack.getSymbol(baseExpr->getName());
     switch (symbol->type) {
     case VAR_DEC: {
         if (const auto array = dynamic_cast<LogosArray*>(symbol->varDec->expr)) {
-            const auto arrPtr = array->writeIRValue(metadata);
-            const auto lastExprIRValue = indexExprs[indexExprs.size() - 1]->writeIRValue(metadata);
+            const auto arrPtr = array->getIRValue(metadata);
+            const auto lastExprIRValue = indexExprs[indexExprs.size() - 1]->getIRValue(metadata);
             const auto lastElement = builder.CreateGEP(irType, arrPtr, lastExprIRValue);
             return builder.CreateLoad(irType, lastElement);
         }

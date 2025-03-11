@@ -9,20 +9,19 @@ class LogosField final : public LogosValue {
 public:
     string name;
     size_t fieldPosition;
-    LogosObject* parentObj = nullptr;
+    LogosInstance* instance = nullptr;
     LogosType* type = nullptr;
     LogosType* userType = nullptr;
     LogosExpr* expr = nullptr;
 
-    LogosField(const string& name, LogosObject* parentObj, LogosType* inferredType, LogosExpr* expr, const size_t fieldPosition) :
+    LogosField(const string& name, LogosType* inferredType, LogosExpr* expr, const size_t fieldPosition) :
         name(name),
         fieldPosition(fieldPosition),
-        parentObj(parentObj),
         type(inferredType),
         expr(expr) {
     }
 
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LogosField() override = default;
 };
 

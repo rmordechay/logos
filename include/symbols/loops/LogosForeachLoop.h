@@ -12,7 +12,7 @@ public:
     LogosStmtBlock* stmtBlock = nullptr;
 
     LogosForeachLoop(LogosLoopVar* loopVar, LogosExpr* iterableExpr, LogosStmtBlock* stmtBlock) : loopVar(loopVar), iterableExpr(iterableExpr), stmtBlock(stmtBlock) {}
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LogosForeachLoop() override;
 };
 

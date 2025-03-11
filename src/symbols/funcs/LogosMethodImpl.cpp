@@ -1,15 +1,15 @@
 #include "funcs/LogosMethodImpl.h"
 #include "constants/LogosConstant.h"
-#include <object/LogosObject.h>
+#include <../../../include/symbols/types/LogosObject.h>
 
-Value* LogosMethodImpl::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosMethodImpl::createIRValue(CodeGenMetadata* metadata) {
     setCombinedName();
     metadata->logosStack.enterScope();
     setIRFunc(metadata);
 
     const auto entryBlock = BasicBlock::Create(context, "entry");
     startBlock(metadata, entryBlock);
-    stmtBlock->writeIRValue(metadata);
+    stmtBlock->getIRValue(metadata);
     metadata->logosStack.exitScope();
     return nullptr;
 }

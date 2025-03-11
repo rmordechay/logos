@@ -28,8 +28,8 @@ void Logos::run() {
 
     // Linking
     LogosLinker linker;
-    linker.objectFile = objectFile.c_str();
-    linker.execFile = execFile.c_str();
+    linker.objectFilePath = objectFile.c_str();
+    linker.execFilePath = execFile.c_str();
     linker.link(modules);
 
     // Running

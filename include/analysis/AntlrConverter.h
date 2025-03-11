@@ -39,7 +39,7 @@ public:
     static LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     static LogosMethodCall *getMethodCall(LogosParser::FuncCallContext* ctx);
     static LogosUnaryExpr* getFirstSelection(const LogosParser::SelectionContext* ctx, LogosParser::FirstSelectionElementContext* firstExpr);
-    static vector<LogosUnaryExpr*> getInnerSelections(const vector<LogosParser::InnerSelectionElementContext*>& ctx);
+    static vector<LogosUnaryExpr*> getSelectionInnerExprs(const vector<LogosParser::InnerSelectionElementContext*>& ctx);
     static LogosSelection* getSelection(LogosParser::SelectionContext* ctx);
     static LogosInstance* getInstance(LogosParser::ConstructorContext* ctx);
     static LogosArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);

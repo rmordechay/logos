@@ -13,7 +13,7 @@
 #include <exprs/unary/LogosVariable.h>
 #include "funcs/LogosParam.h"
 #include "loops/LogosLoopVar.h"
-#include "object/LogosField.h"
+#include "stmts/LogosField.h"
 #include "stmts/LogosReturn.h"
 #include "types/LogosBool.h"
 #include "types/LogosFloat.h"
@@ -22,7 +22,7 @@
 #include <LogosDefinitions.h>
 #include <loops/LogosForeachLoop.h>
 #include <loops/LogosRangeLoop.h>
-#include <types/LogosString.h>
+#include <types/LogosStr.h>
 #include <types/LogosVoid.h>
 
 LogosFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
@@ -82,7 +82,7 @@ LogosField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec
     const auto name = varDec->VARIABLE()->getText();
     const auto type = getType(varDec->TYPE());
     const auto expr = getExpr(varDec->expr());
-    return new LogosField(name, obj, type, expr, position);
+    return new LogosField(name, type, expr, position);
 }
 
 LogosFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext* ctx) {
@@ -248,34 +248,13 @@ LogosExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
 }
 
 LogosUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
-    if (const auto variable = ctx->VARIABLE()) {
-        return getVariable(variable->getText(), ctx);
-    }
-
-    if (const auto constant = ctx->constant()) {
-        return getConstant(constant);
-    }
-
-    if (const auto selection = ctx->selection()) {
-        return getSelection(selection);
-    }
-
-    if (const auto constructor = ctx->constructor()) {
-        return getInstance(constructor);
-    }
-
-    if (const auto funcCall = ctx->funcCall()) {
-        return getFuncCall(funcCall);
-    }
-
-    if (const auto array = ctx->array()) {
-        return getArray(array);
-    }
-
-    if (const auto arrayIndex = ctx->arrayIndex()) {
-        return getArrayIndex(arrayIndex);
-    }
-
+    if (const auto variable = ctx->VARIABLE()) return getVariable(variable->getText(), ctx);
+    if (const auto constant = ctx->constant()) return getConstant(constant);
+    if (const auto selection = ctx->selection()) return getSelection(selection);
+    if (const auto constructor = ctx->constructor()) return getInstance(constructor);
+    if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
+    if (const auto array = ctx->array()) return getArray(array);
+    if (const auto arrayIndex = ctx->arrayIndex()) return getArrayIndex(arrayIndex);
     return nullptr;
 }
 
@@ -335,8 +314,8 @@ LogosMethodCall* AntlerConverter::getMethodCall(LogosParser::FuncCallContext* ct
 LogosSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) {
     const auto firstElement = ctx->firstSelectionElement();
     const auto firstExpr = getFirstSelection(ctx, firstElement);
-    const auto innerSelections = getInnerSelections(ctx->innerSelectionElement());
-    const auto selection = new LogosSelection(firstExpr, innerSelections);
+    const auto innerExprs = getSelectionInnerExprs(ctx->innerSelectionElement());
+    const auto selection = new LogosSelection(firstExpr, innerExprs);
     selection->setPosition(ctx->start);
     return selection;
 }
@@ -360,7 +339,7 @@ LogosUnaryExpr* AntlerConverter::getFirstSelection(const LogosParser::SelectionC
     return nullptr;
 }
 
-vector<LogosUnaryExpr*> AntlerConverter::getInnerSelections(const vector<LogosParser::InnerSelectionElementContext*>& ctx) {
+vector<LogosUnaryExpr*> AntlerConverter::getSelectionInnerExprs(const vector<LogosParser::InnerSelectionElementContext*>& ctx) {
     vector<LogosUnaryExpr*> exprs;
     exprs.reserve(ctx.size());
     for (int i = 0; i < ctx.size(); ++i) {

@@ -1,13 +1,14 @@
-#ifndef LOGOSBOOL_H
-#define LOGOSBOOL_H
+#ifndef LOGOSSTRING_H
+#define LOGOSSTRING_H
 #include "LogosType.h"
-#include "constants/LogosConstant.h"
+#include "LogosValue.h"
 
-class LogosBool final : public LogosType {
+#include <string>
+
+class LogosStr final : public LogosType {
 public:
-    Type* IRType = Type::getInt1Ty(context);
-    string typeName = "Bool";
-    string trueLiteral = "true";
+    Type* IRType = PointerType::get(Type::getInt8Ty(context), 0);
+    string typeName = "Str";
 
     const string getName() const override;
     Type* getIRType() override;
@@ -15,9 +16,9 @@ public:
     LogosField* getField(const string& name) override;
     LogosMethodImpl* getMethod(const string& name) override;
     bool equals(LogosType* other) const override;
-    ~LogosBool() override = default;
+    ~LogosStr() override = default;
 };
 
-inline LogosBool LOGOS_BOOL;
+inline LogosStr LOGOS_STRING;
 
-#endif // LOGOSBOOL_H
+#endif // LOGOSSTRING_H

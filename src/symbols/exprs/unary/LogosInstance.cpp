@@ -2,10 +2,10 @@
 
 #include "CodeGenerator.h"
 
-Value* LogosInstance::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosInstance::createIRValue(CodeGenMetadata* metadata) {
     const auto selfSymbol = metadata->logosStack.getSymbol(LOGOS_SELF);
     if (selfSymbol) {
-        return selfSymbol->param->writeIRValue(metadata);
+        return selfSymbol->param->getIRValue(metadata);
     }
 
     const auto objSymbol = metadata->logosStack.getSymbol(obj->name)->object;
@@ -18,5 +18,9 @@ Value* LogosInstance::computeIRValue(CodeGenMetadata* metadata) {
 
 string LogosInstance::getName() {
     return obj->name;
+}
+
+LogosInstance::~LogosInstance() {
+    if (obj) delete obj;
 }
 

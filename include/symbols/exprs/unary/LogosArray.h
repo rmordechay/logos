@@ -10,7 +10,7 @@ public:
     vector<LogosExpr*> elements;
 
     explicit LogosArray() : LogosUnaryExpr(nullptr) {}
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     size_t size() override;
     ~LogosArray() override = default;
 };

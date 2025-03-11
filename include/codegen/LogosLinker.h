@@ -10,12 +10,12 @@ using namespace llvm;
 
 class LogosLinker {
 public:
-    const char* objectFile;
-    const char* execFile;
+    const char* objectFilePath;
+    const char* execFilePath;
 
     void link(const std::map<std::string, Module*>& modules);
     vector<const char*> getLinkerOpts();
-    static void writeFile(const std::unique_ptr<Module>& module, const std::string& filename);
+    static void writeExecFile(const std::unique_ptr<Module>& module, const std::string& filename);
     static std::unique_ptr<Module> getStdlibModule();
     ~LogosLinker() = default;
 };

@@ -7,7 +7,7 @@ public:
     vector<LogosStmt*> stmts;
 
     explicit LogosStmtBlock(const vector<LogosStmt*>& stmts) : stmts(stmts) {}
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LogosStmtBlock() override = default;
     LogosStmtBlock();
 };

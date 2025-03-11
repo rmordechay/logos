@@ -55,8 +55,8 @@ add_library(lib STATIC
     include/symbols/loops/LogosForeachLoop.h
     include/symbols/loops/LogosLoopVar.h
     include/symbols/loops/LogosRangeLoop.h
-    include/symbols/object/LogosField.h
-    include/symbols/object/LogosObject.h
+    include/symbols/stmts/LogosField.h
+    include/symbols/types/LogosObject.h
     include/symbols/stmts/LogosAssignment.h
     include/symbols/stmts/LogosIf.h
     include/symbols/stmts/LogosReturn.h
@@ -65,7 +65,7 @@ add_library(lib STATIC
     include/symbols/types/LogosBool.h
     include/symbols/types/LogosFloat.h
     include/symbols/types/LogosInt.h
-    include/symbols/types/LogosString.h
+    include/symbols/types/LogosStr.h
     include/symbols/types/LogosVoid.h
     include/cli/LogosCli.h
     include/cli/LogosRunCmd.h
@@ -103,8 +103,8 @@ add_library(lib STATIC
     src/symbols/loops/LogosForeachLoop.cpp
     src/symbols/loops/LogosLoopVar.cpp
     src/symbols/loops/LogosRangeLoop.cpp
-    src/symbols/object/LogosField.cpp
-    src/symbols/object/LogosObject.cpp
+    src/symbols/stmts/LogosField.cpp
+    src/symbols/types/LogosObject.cpp
     src/symbols/stmts/LogosAssignment.cpp
     src/symbols/stmts/LogosIf.cpp
     src/symbols/stmts/LogosReturn.cpp
@@ -113,6 +113,11 @@ add_library(lib STATIC
     src/cli/LogosCli.cpp
     src/cli/LogosRunCmd.cpp
     src/cli/LogosGenerateCmd.cpp
+    src/symbols/types/LogosBool.cpp
+    src/symbols/types/LogosInt.cpp
+    src/symbols/types/LogosStr.cpp
+    src/symbols/types/LogosVoid.cpp
+    src/symbols/types/LogosFloat.cpp
 )
 
 add_executable(lgs main.cpp)

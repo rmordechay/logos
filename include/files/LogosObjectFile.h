@@ -1,7 +1,7 @@
 #ifndef LOGOSOBJFILE_H
 #define LOGOSOBJFILE_H
 #include "LogosFile.h"
-#include "object/LogosObject.h"
+#include "types/LogosObject.h"
 
 class LogosObjectFile final : public LogosFile {
 public:

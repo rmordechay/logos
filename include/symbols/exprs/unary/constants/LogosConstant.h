@@ -16,7 +16,7 @@ public:
     LogosConstant(LogosType* type, float floatVal) : LogosUnaryExpr(type), value(floatVal) {}
     LogosConstant(LogosType* type, bool boolVal) : LogosUnaryExpr(type), value(boolVal) {}
 
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LogosConstant() override = default;
 };
 

@@ -10,7 +10,7 @@ public:
   LogosStmtBlock* stmtBlock;
 
   LogosRangeLoop(LogosLoopVar* loopVar, LogosExpr* rangeStart, LogosExpr* rangeEnd, LogosStmtBlock* stmtBlock) : loopVar(loopVar), startRange(rangeStart), endRange(rangeEnd), stmtBlock(stmtBlock) {}
-  Value* computeIRValue(CodeGenMetadata* metadata) override;
+  Value* createIRValue(CodeGenMetadata* metadata) override;
 };
 
 #endif //LOGOSRANGELOOP_H

@@ -1,7 +1,6 @@
 #ifndef LOGOSOBJECT_H
 #define LOGOSOBJECT_H
 #include "LogosType.h"
-
 #include <map>
 #include <funcs/LogosMethodImpl.h>
 
@@ -18,10 +17,8 @@ public:
     const string getName() const override;
     Type* getIRType() override;
     LogosConstant* getZeroValue() override;
-    bool containsField(const string& name) const;
-    bool containsMethod(const string& name) const;
-    LogosField* getField(const string& name) const;
-    LogosMethodImpl* getMethod(const string& name) const;
+    LogosField* getField(const string& name) override;
+    LogosMethodImpl* getMethod(const string& name) override;
     bool equals(LogosType* other) const override;
     ~LogosObject() override;
 };

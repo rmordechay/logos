@@ -14,25 +14,11 @@ public:
     const string getName() const override;
     Type* getIRType() override;
     LogosConstant* getZeroValue() override;
+    LogosField* getField(const string& name) override;
+    LogosMethodImpl* getMethod(const string& name) override;
     bool equals(LogosType* other) const override;
     ~LogosInt() override = default;
 };
-
-inline const string LogosInt::getName() const {
-    return typeName;
-}
-
-inline Type* LogosInt::getIRType() {
-    return IRType;
-}
-
-inline LogosConstant* LogosInt::getZeroValue() {
-    return new LogosConstant(this, 0);
-}
-
-inline bool LogosInt::equals(LogosType* other) const {
-    return typeName == other->getName();
-}
 
 inline LogosInt LOGOS_INT;
 

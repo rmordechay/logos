@@ -8,7 +8,7 @@ public:
     LogosExpr *expr = nullptr;
 
     explicit LogosReturn(LogosExpr* expr) : expr(expr) {}
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LogosReturn() override;
 };
 

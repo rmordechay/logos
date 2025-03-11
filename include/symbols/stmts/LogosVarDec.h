@@ -12,7 +12,7 @@ public:
 
     LogosVarDec(const string& name, LogosType* userType, LogosExpr* expr) : name(name), userType(userType), expr(expr) {}
     LogosVarDec(const string& name, LogosType* inferredType) : name(name), type(inferredType){}
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LogosVarDec() override;
 };
 

@@ -7,12 +7,12 @@ class LogosStmtBlock;
 class LogosExpr;
 class LogosLoopVar;
 
+#define BB_LOOP_CONDITION "loop_condition"
+#define BB_LOOP_BODY "loop_body"
+#define BB_LOOP_END "loop_end"
+
 class LogosLoop : public LogosStmt {
 public:
-    BasicBlock* const loopCondition = BasicBlock::Create(context, "loop_condition");
-    BasicBlock* const loopBody = BasicBlock::Create(context, "loop_body");
-    BasicBlock* const loopEnd = BasicBlock::Create(context, "loop_end");
-
     void iterationLoop(CodeGenMetadata* metadata) const;
     ~LogosLoop() override = default;
 };

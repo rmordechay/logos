@@ -1,11 +1,11 @@
 #include "constants/LogosConstant.h"
 #include "constants/LogosStringConst.h"
 #include <LogosMetadata.h>
-#include <types/LogosString.h>
+#include <types/LogosStr.h>
 
 struct CodeGenMetadata;
 
-Value* LogosConstant::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosConstant::createIRValue(CodeGenMetadata* metadata) {
     if (const auto intValue = get_if<int>(&value)) {
         return metadata->builder.getInt32(*intValue);
     }

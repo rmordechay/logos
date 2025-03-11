@@ -10,14 +10,14 @@ constexpr auto privateLinkage = GlobalValue::PrivateLinkage;
 class LogosValue {
 public:
     Position position = Position();
-    Value* writeIRValue(CodeGenMetadata* metadata);
+    Value* getIRValue(CodeGenMetadata* metadata);
     void setIRValue(Value* value);
     virtual void setPosition(const antlr4::Token* ctx);
-    static BasicBlock* getBasicBlock(const char* name);
+    static BasicBlock* createBasicBlock(const char* name);
     virtual ~LogosValue() = default;
 
 protected:
-    virtual Value* computeIRValue(CodeGenMetadata* metadata) = 0;
+    virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
     static void startBlock(CodeGenMetadata* metadata, BasicBlock* block);
     Value* IRValue = nullptr;
 };
@@ -27,9 +27,9 @@ inline void LogosValue::setPosition(const antlr4::Token* ctx) {
     position.posInLine = ctx->getCharPositionInLine() + 1;
 }
 
-inline Value* LogosValue::writeIRValue(CodeGenMetadata* metadata) {
+inline Value* LogosValue::getIRValue(CodeGenMetadata* metadata) {
     if (!IRValue) {
-        IRValue = computeIRValue(metadata);
+        IRValue = createIRValue(metadata);
     }
     return IRValue;
 }
@@ -41,7 +41,7 @@ inline void LogosValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const 
     builder.SetInsertPoint(block);
 }
 
-inline BasicBlock* LogosValue::getBasicBlock(const char* name) {
+inline BasicBlock* LogosValue::createBasicBlock(const char* name) {
     return BasicBlock::Create(context, name);
 }
 

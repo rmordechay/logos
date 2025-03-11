@@ -6,13 +6,17 @@
 #include <unary/constants/LogosConstant.h>
 #include <types/LogosInt.h>
 
-Value* LogosRangeLoop::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosRangeLoop::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto i32Type = builder.getInt32Ty();
 
+    const auto loopCondition = createBasicBlock(BB_LOOP_CONDITION);
+    const auto loopBody = createBasicBlock(BB_LOOP_BODY);
+    const auto loopEnd = createBasicBlock(BB_LOOP_END);
+
     // Init blocks
-    const auto irStartRange = startRange->writeIRValue(metadata);
-    const auto irEndRange = endRange->writeIRValue(metadata);
+    const auto irStartRange = startRange->getIRValue(metadata);
+    const auto irEndRange = endRange->getIRValue(metadata);
     const auto i = builder.CreateAlloca(i32Type);
     builder.CreateStore(irStartRange, i);
     builder.CreateBr(loopCondition);
@@ -28,7 +32,7 @@ Value* LogosRangeLoop::computeIRValue(CodeGenMetadata* metadata) {
     startBlock(metadata, loopBody);
     metadata->logosStack.enterScope();
     metadata->logosStack.addLocalSymbol(loopVar->name, LogosSymbol(LOOP_VAR, loopVar));
-    stmtBlock->writeIRValue(metadata);
+    stmtBlock->getIRValue(metadata);
 
     // Increment loop variable
     const auto inc = builder.CreateAdd(currentVal, builder.getInt32(1));

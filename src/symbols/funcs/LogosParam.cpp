@@ -1,6 +1,6 @@
 #include "funcs/LogosParam.h"
 
 
-Value* LogosParam::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosParam::createIRValue(CodeGenMetadata* metadata) {
     return IRValue;
 }

@@ -3,7 +3,7 @@
 #include "binary/LogosBinaryExpr.h"
 #include "unary/LogosMethodCall.h"
 #include "loops/LogosLoopVar.h"
-#include "object/LogosField.h"
+#include "stmts/LogosField.h"
 #include "stmts/LogosReturn.h"
 #include "types/LogosBool.h"
 
@@ -79,7 +79,6 @@ void SemaAnalyser::visitParam(LogosParam* param) {
 }
 
 void SemaAnalyser::visitStmt(LogosStmt* stmt) {
-    if (!stmt) return;
     if (const auto varDec = dynamic_cast<LogosVarDec*>(stmt)) {
         visitVarDec(varDec);
     } else if (const auto ifStmt = dynamic_cast<LogosIf*>(stmt)) {
@@ -110,7 +109,8 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
     const auto expr = varDec->expr;
     if (expr) {
         visitExpr(expr);
-        if (!matchTypes(expr->type, userType, varDec)) return;
+        if (!matchTypes(expr->type, userType, expr)) return;
+        varDec->type = expr->type;
     } else {
         varDec->type = userType;
     }
@@ -119,6 +119,7 @@ void SemaAnalyser::visitVarDec(LogosVarDec* varDec) {
 
 void SemaAnalyser::visitIfStmt(const LogosIf* ifStmt) {
     visitExpr(ifStmt->ifCond);
+    visitStmtBlock(ifStmt->ifStmtBlock);
 }
 
 void SemaAnalyser::visitLoopStmt(LogosLoop* loopStmt) {
@@ -162,7 +163,6 @@ void SemaAnalyser::visitArray(LogosArray* array) {
 }
 
 void SemaAnalyser::visitUnaryExpr(LogosUnaryExpr* unaryExpr) {
-    if (!unaryExpr) return;
     if (const auto instance = dynamic_cast<LogosInstance*>(unaryExpr)) {
         visitInstance(instance);
     } else if (const auto funcCall = dynamic_cast<LogosFuncCall*>(unaryExpr)) {
@@ -191,14 +191,16 @@ void SemaAnalyser::visitVariable(LogosVariable* variable) {
 }
 
 void SemaAnalyser::visitSelection(LogosSelection* selection) {
-    const auto firstExpr = selection->firstExpr;
-    if (const auto variable = dynamic_cast<LogosVariable*>(firstExpr)) {
-        resolveFirstSelection(selection, variable);
-    } else if (const auto funcCall = dynamic_cast<LogosFuncCall*>(firstExpr)) {
-        resolveFirstSelection(selection, funcCall);
-    }
-    if (const auto lastExpr = selection->lastExpr()) {
-        selection->type = lastExpr->type;
+    const auto exprs = selection->exprs;
+    for (int i = 0; i < exprs.size(); ++i) {
+        if (i == exprs.size() - 1) return;
+        const auto currentExpr = exprs[i];
+        const auto nextExpr = exprs[i + 1];
+        const auto symbol = logosStack.getSymbol(currentExpr->getName());
+        const auto logos = symbol->varDec->type;
+        auto name = nextExpr->getName();
+        auto logosField = logos->getField(name);
+        std::cout << "" << '\n';
     }
 }
 
@@ -268,8 +270,9 @@ void SemaAnalyser::resolveInnerSelection(const LogosSelection* selection, int i,
 void SemaAnalyser::visitInstance(LogosInstance* instance) {
     const auto symbol = getSymbol(instance->name, instance);
     if (!symbol) return;
-    instance->type = symbol->object;
-    instance->obj = symbol->object;
+    const auto logosObject = new LogosObject(*symbol->object);
+    instance->type = logosObject;
+    instance->obj = logosObject;
 }
 
 void SemaAnalyser::visitArrayIndex(LogosArrayIndex* arrayIndex) {

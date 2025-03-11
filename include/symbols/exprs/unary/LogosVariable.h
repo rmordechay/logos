@@ -8,7 +8,7 @@ public:
     std::string name;
 
     explicit LogosVariable(const std::string& name) : LogosUnaryExpr(nullptr), name(name) {}
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
     ~LogosVariable() override = default;
 };

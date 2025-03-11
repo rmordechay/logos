@@ -5,12 +5,16 @@
 #include <unary/constants/LogosConstant.h>
 #include <types/LogosInt.h>
 
-Value* LogosForeachLoop::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosForeachLoop::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto i32Type = builder.getInt32Ty();
 
+    const auto loopCondition = createBasicBlock(BB_LOOP_CONDITION);
+    const auto loopBody = createBasicBlock(BB_LOOP_BODY);
+    const auto loopEnd = createBasicBlock(BB_LOOP_END);
+
     // Init blocks
-    const auto arrPtr = iterableExpr->writeIRValue(metadata);
+    const auto arrPtr = iterableExpr->getIRValue(metadata);
     const auto iterableSize = iterable->size();
     const auto i = builder.CreateAlloca(i32Type);
     builder.CreateStore(builder.getInt32(0), i);
@@ -30,7 +34,7 @@ Value* LogosForeachLoop::computeIRValue(CodeGenMetadata* metadata) {
     const auto element = builder.CreateLoad(irType, lastElement);
     loopVar->setIRValue(element);
     metadata->logosStack.addLocalSymbol(loopVar->name, LogosSymbol(LOOP_VAR, loopVar));
-    stmtBlock->writeIRValue(metadata);
+    stmtBlock->getIRValue(metadata);
 
     // Increment loop variable
     const auto inc = builder.CreateAdd(currentVal, builder.getInt32(1));

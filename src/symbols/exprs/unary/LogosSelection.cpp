@@ -5,10 +5,10 @@
 #include "unary/LogosInstance.h"
 #include "unary/LogosMethodCall.h"
 #include "unary/LogosVariable.h"
-#include "object/LogosField.h"
+#include "stmts/LogosField.h"
 #include <LogosStack.h>
 
-Value* LogosSelection::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosSelection::createIRValue(CodeGenMetadata* metadata) {
     if (const auto variable = dynamic_cast<LogosVariable*>(firstExpr)) {
         return resolveFirstSelection(metadata, variable);
     }
@@ -53,29 +53,30 @@ Value* LogosSelection::resolveFirstSelection(CodeGenMetadata* metadata, const Lo
 }
 
 Value* LogosSelection::resolveInnerSelection(CodeGenMetadata* metadata, const int i, LogosInstance* instance) {
-    const auto IRValue = instance->writeIRValue(metadata);
+    const auto IRValue = instance->getIRValue(metadata);
     if (innerExprs.size() == i) return IRValue;
 
     const auto nextExpr = innerExprs[i];
     if (const auto variable = dynamic_cast<LogosVariable*>(nextExpr)) {
         const auto field = instance->obj->getField(variable->name);
+        field->instance = instance;
         return resolveInnerSelection(metadata, i + 1, field);
     }
     if (const auto methodCall = dynamic_cast<LogosMethodCall*>(nextExpr)) {
-        methodCall->writeIRValue(metadata);
+        methodCall->getIRValue(metadata);
         return resolveInnerSelection(metadata, i + 1, methodCall);
     }
     return nullptr;
 }
 
-Value* LogosSelection::resolveInnerSelection(CodeGenMetadata* metadata, const int i, LogosMethodCall* methodCall) {
-    const auto IRValue = methodCall->writeIRValue(metadata);
+Value* LogosSelection::resolveInnerSelection(CodeGenMetadata* metadata, const int i, LogosField* field) const {
+    const auto IRValue = field->createIRValue(metadata);
     if (innerExprs.size() == i) return IRValue;
     return nullptr;
 }
 
-Value* LogosSelection::resolveInnerSelection(CodeGenMetadata* metadata, const int i, LogosField* field) {
-    const auto IRValue = field->writeIRValue(metadata);
+Value* LogosSelection::resolveInnerSelection(CodeGenMetadata* metadata, const int i, LogosMethodCall* methodCall) {
+    const auto IRValue = methodCall->getIRValue(metadata);
     if (innerExprs.size() == i) return IRValue;
     return nullptr;
 }

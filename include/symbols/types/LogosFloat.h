@@ -1,7 +1,6 @@
 #ifndef LOGOSFLOAT_H
 #define LOGOSFLOAT_H
 #include "LogosType.h"
-#include "LogosValue.h"
 #include "constants/LogosConstant.h"
 
 class LogosFloat final : public LogosType {
@@ -12,25 +11,11 @@ public:
     const string getName() const override;
     Type* getIRType() override;
     LogosConstant* getZeroValue() override;
+    LogosField* getField(const string& name) override;
+    LogosMethodImpl* getMethod(const string& name) override;
     bool equals(LogosType* other) const override;
     ~LogosFloat() override = default;
 };
-
-inline const string LogosFloat::getName() const {
-    return typeName;
-}
-
-inline Type* LogosFloat::getIRType() {
-    return IRType;
-}
-
-inline LogosConstant* LogosFloat::getZeroValue() {
-    return new LogosConstant(this, 0.f);
-}
-
-inline bool LogosFloat::equals(LogosType* other) const {
-    return typeName == other->getName();
-}
 
 inline LogosFloat LOGOS_FLOAT;
 

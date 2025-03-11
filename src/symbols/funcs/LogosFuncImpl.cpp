@@ -2,7 +2,7 @@
 #include <LogosStack.h>
 #include <types/LogosInt.h>
 
-Value* LogosFuncImpl::computeIRValue(CodeGenMetadata* metadata) {
+Value* LogosFuncImpl::createIRValue(CodeGenMetadata* metadata) {
     setCombinedName();
     metadata->logosStack.enterScope();
     setIRFunc(metadata);
@@ -10,7 +10,7 @@ Value* LogosFuncImpl::computeIRValue(CodeGenMetadata* metadata) {
 
     const auto entryBlock = BasicBlock::Create(context, "entry");
     startBlock(metadata, entryBlock);
-    stmtBlock->writeIRValue(metadata);
+    stmtBlock->getIRValue(metadata);
     metadata->logosStack.exitScope();
     return nullptr;
 }

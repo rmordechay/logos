@@ -10,7 +10,7 @@ public:
     LogosExpr* lvalue;
     LogosExpr* rvalue;
 
-    Value* computeIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LogosAssignment() override;
 };
 
