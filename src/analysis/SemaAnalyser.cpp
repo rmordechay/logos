@@ -57,7 +57,7 @@ void SemaAnalyser::visitMainFunc(const LogosFuncImpl* mainFunc) {
 }
 
 void SemaAnalyser::visitFuncImpl(const LogosFuncImpl* func) {
-    logosStack.enterScope(file->absPath);
+    logosStack.enterScope();
     for (const auto& param : func->params) {
         visitParam(param);
     }
@@ -66,7 +66,7 @@ void SemaAnalyser::visitFuncImpl(const LogosFuncImpl* func) {
 }
 
 void SemaAnalyser::visitMethodImpl(const LogosMethodImpl* method) {
-    logosStack.enterScope(file->absPath);
+    logosStack.enterScope();
     for (const auto& param : method->params) {
         visitParam(param);
     }

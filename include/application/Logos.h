@@ -17,13 +17,18 @@ using namespace llvm;
 
 class Logos {
 public:
-    std::mutex mtx;
-    string rootPath;
-    string srcPath;
-    LogosLinker linker;
+    mutex mtx;
+    path rootDir;
+    path srcDir;
+    path buildDir;
+    path objectFile;
+    path execFile;
 
-    explicit Logos(const string& rootPath) : rootPath(rootPath) {
-        srcPath = rootPath + "/src";
+    explicit Logos(const path& rootPath) : rootDir(rootPath) {
+        srcDir = rootPath / LOGOS_SRC_DIR;
+        buildDir = rootPath / LOGOS_BUILD_DIR;
+        objectFile = buildDir / OBJECT_FILE;
+        execFile = buildDir / EXECUTABLE_FILE;
     }
 
     void run();

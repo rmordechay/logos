@@ -5,6 +5,8 @@
 #include <iostream>
 #include <map>
 #include <mutex>
+#include <vector>
+#include <string>
 
 using namespace std;
 

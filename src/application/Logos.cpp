@@ -23,22 +23,24 @@ void Logos::run() {
 
     // Code generation
     const auto mainFile = getMainFile(files);
-    CodeGenerator::initIR();
-    create_directories(rootPath + "/" + LOGOS_BUILD_DIR);
+    create_directories(buildDir);
     CodeGenerator::generateCode(mainFile, globalSymbols);
 
     // Linking
+    LogosLinker linker;
+    linker.objectFile = objectFile.c_str();
+    linker.execFile = execFile.c_str();
     linker.link(modules);
 
     // Running
-    system(EXECUTABLE_PATH);
+    system(execFile.c_str());
 }
 
 vector<LogosFile*> Logos::parseFiles() {
     ThreadPool threadPool;
     threadPool.start();
     vector<LogosFile*> files;
-    parseTree(rootPath, files, threadPool);
+    parseTree(rootDir, files, threadPool);
     threadPool.wait();
     return files;
 }
@@ -89,7 +91,7 @@ LogosFile* Logos::parseFile(const directory_entry& fileEntry) {
     auto parsedFile = parser.logosFile();
 
     auto logosFile = AntlerConverter::getLogosFile(parsedFile, absFilePath);
-    logosFile->relPath = relative(absFilePath, rootPath).lexically_relative(LOGOS_SRC_DIR);
+    logosFile->relPath = relative(absFilePath, rootDir).lexically_relative(LOGOS_SRC_DIR);
     return logosFile;
 }
 
@@ -118,7 +120,7 @@ bool Logos::isLogosFile(const directory_entry& filePath) {
 
 void Logos::validateProject() const {
     string srcDir;
-    for (const auto& entry : directory_iterator(rootPath)) {
+    for (const auto& entry : directory_iterator(rootDir)) {
         auto fileName = entry.path().filename();
         if (entry.is_directory() && fileName == LOGOS_SRC_DIR) {
             srcDir = entry.path().string();

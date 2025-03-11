@@ -10,12 +10,13 @@ using namespace llvm;
 
 class LogosLinker {
 public:
-    SMDiagnostic EC;
-    const std::string targetTriple = sys::getProcessTriple();
+    const char* objectFile;
+    const char* execFile;
 
-    std::unique_ptr<Module> getStdlibModule();
     void link(const std::map<std::string, Module*>& modules);
-    void writeFile(const std::unique_ptr<Module>& module, const std::string& filename) const;
+    vector<const char*> getLinkerOpts();
+    static void writeFile(const std::unique_ptr<Module>& module, const std::string& filename);
+    static std::unique_ptr<Module> getStdlibModule();
     ~LogosLinker() = default;
 };
 

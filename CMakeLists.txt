@@ -5,19 +5,19 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/application
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/cli
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/files
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/codegen
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/analysis
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols/exprs
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols/exprs/unary
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/loops
+    external/include
+    external/include/antlr4-runtime
+    include
+    include/application
+    include/cli
+    include/files
+    include/codegen
+    include/analysis
+    include/symbols
+    include/symbols/exprs
+    include/symbols/exprs/unary
+    include/parser
+    include/loops
 )
 
 add_library(lib STATIC
@@ -68,8 +68,9 @@ add_library(lib STATIC
     include/symbols/types/LogosString.h
     include/symbols/types/LogosVoid.h
     include/cli/LogosCli.h
-    include/cli/LogosCliCmd.h
     include/cli/LogosRunCmd.h
+    include/cli/LogosGenerateCmd.h
+    include/analysis/LogosAnalyser.h
 
     # src
     src/application/Logos.cpp
@@ -111,14 +112,24 @@ add_library(lib STATIC
     src/symbols/stmts/LogosVarDec.cpp
     src/cli/LogosCli.cpp
     src/cli/LogosRunCmd.cpp
+    src/cli/LogosGenerateCmd.cpp
 )
 
-add_executable(lgs main.cpp
-    include/analysis/LogosAnalyser.h)
+add_executable(lgs main.cpp)
 
-target_link_libraries(lgs PRIVATE lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime.a
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libLLVM.dylib
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/liblldCommon.dylib
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/liblldMachO.dylib
-)
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    target_link_libraries(lgs PRIVATE lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libLLVM.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/liblldCommon.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/liblldMachO.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime-macos.a
+    )
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_link_libraries(lgs PRIVATE lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libLLVM.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/liblldCommon.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/liblldMachO.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libantlr4-runtime-linux.a
+    )
+endif()
+

@@ -1,16 +1,15 @@
 #ifndef LOGOSCMDRUN_H
 #define LOGOSCMDRUN_H
-#include "LogosCliCmd.h"
+#include <string>
 
-class LogosRunCmd final : public LogosCliCmd {
+class LogosRunCmd final {
 public:
-    string rootPath;
+    std::string rootPath;
 
-    void init(int argc, char** argv) override;
-    void runCmd() override;
+    void initRootPath(int argc, char** argv);
+    void runCmd(int argc, char** argv);
     static void printHelp();
-    static void exitWithHelp(const string& errMsg);
-    ~LogosRunCmd() override = default;
+    ~LogosRunCmd() = default;
 };
 
 #endif //LOGOSCMDRUN_H

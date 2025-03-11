@@ -14,18 +14,8 @@ namespace lld::macho {
     bool link(ArrayRef<const char *> argsArr, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
 }
 
-const auto args = {
-    "ld.lld",
-    OBJECT_FILE_PATH,
-    "-o", EXECUTABLE_PATH,
-    "-lSystem",
-    "-syslibroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
-    "-e", "_main",
-    "-platform_version", "macos", "14.0", "14.0",
-    "-arch", "arm64",
-};
-
 std::unique_ptr<Module> LogosLinker::getStdlibModule() {
+    SMDiagnostic EC;
     std::unique_ptr<Module> stdlibModule = parseIRFile(LOGOS_STDLIB, EC, context);
     stdlibModule->setTargetTriple(targetTriple);
     stdlibModule->setDataLayout(targetMachine->createDataLayout());
@@ -44,10 +34,10 @@ void LogosLinker::link(const std::map<std::string, Module*>& modules) {
     }
 
     writeFile(unique_ptr<Module>(mainModule), OBJECT_FILE_PATH);
-    lld::macho::link(args, outs(), errs(), false, false);
+    lld::macho::link(getLinkerOpts(), outs(), errs(), false, false);
 }
 
-void LogosLinker::writeFile(const unique_ptr<Module> &module, const string &filename) const {
+void LogosLinker::writeFile(const unique_ptr<Module> &module, const string &filename) {
     string error;
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     const auto cpuName = sys::getHostCPUName();
@@ -60,5 +50,18 @@ void LogosLinker::writeFile(const unique_ptr<Module> &module, const string &file
 
     pass.run(*module);
     outputStream.flush();
+}
+
+vector<const char*> LogosLinker::getLinkerOpts() {
+    return {
+        DEFAULT_LINKER,
+        objectFile,
+        "-o", execFile,
+        "-lSystem",
+        "-syslibroot", LIB_ROOT,
+        "-e", ENTRY_POINT,
+        "-platform_version", OS_NAME, PLATFORM_VERSION, PLATFORM_VERSION,
+        "-arch", ARCH_NAME,
+    };
 }
 

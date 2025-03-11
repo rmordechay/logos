@@ -2,25 +2,22 @@
 #include "Logos.h"
 #include <iostream>
 
-void LogosRunCmd::init(const int argc, char** argv) {
-    if (argc < 3 || std::strcmp(argv[2], ".") == 0) {
-        rootPath = current_path().string();
-    } else {
-        rootPath = argv[2];
-    }
-}
-
-void LogosRunCmd::runCmd() {
+void LogosRunCmd::runCmd(const int argc, char** argv) {
+    initRootPath(argc, argv);
     Logos project(rootPath);
     project.run();
 }
 
-void LogosRunCmd::printHelp() {
-    std::cout << "Usage: lgs run [path] [options]" << "\n\n";
+void LogosRunCmd::initRootPath(const int argc, char** argv) {
+    const auto firstArg = argv[2];
+    const bool isArgDotOrEmpty = std::strcmp(firstArg, ".") == 0 || argc < 3;
+    if (isArgDotOrEmpty) {
+        rootPath = current_path().string();
+    } else {
+        rootPath = firstArg;
+    }
 }
 
-void LogosRunCmd::exitWithHelp(const string& errMsg) {
-    cout << errMsg << "\n\n";
-    printHelp();
-    exit(0);
+void LogosRunCmd::printHelp() {
+    std::cout << "Usage: lgs run [path] [options]" << "\n\n";
 }

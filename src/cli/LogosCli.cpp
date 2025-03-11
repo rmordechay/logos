@@ -1,4 +1,6 @@
 #include "cli/LogosCli.h"
+
+#include "LogosGenerateCmd.h"
 #include "LogosRunCmd.h"
 #include <iostream>
 
@@ -12,8 +14,10 @@ void LogosCli::execute() const {
     const string cmd = argv[1];
     if (cmd == "run") {
         LogosRunCmd command;
-        command.init(argc, argv);
-        command.runCmd();
+        command.runCmd(argc, argv);
+    } else if (cmd == "generate") {
+        LogosGenerateCmd command;
+        command.runCmd(argc, argv);
     } else if (cmd == "version" || cmd == "-v" || cmd == "--version") {
         printVersion();
     }

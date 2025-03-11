@@ -11,6 +11,7 @@
 using LogosGlobals = const std::map<std::string, LogosSymbol>&;
 
 void CodeGenerator::generateCode(const LogosMainFile* mainFile, const map<string, LogosSymbol>& globalSymbols) {
+    initIR();
     generateMainModule(mainFile, globalSymbols);
 }
 
