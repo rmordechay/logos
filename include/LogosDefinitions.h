@@ -1,6 +1,5 @@
 #ifndef LOGOSCONFIGS_H
 #define LOGOSCONFIGS_H
-#include <llvm/Support/CodeGen.h>
 
 using namespace std;
 

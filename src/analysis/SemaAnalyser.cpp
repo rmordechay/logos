@@ -38,17 +38,15 @@ void SemaAnalyser::visitMainFile(const LogosMainFile* mainFile) {
 }
 
 void SemaAnalyser::visitObjectFile(const LogosObjectFile* objectFile) {
-    if (!objectFile) return;
     visitObject(objectFile->obj);
 }
 
-void SemaAnalyser::visitObject(const LogosObject* object) {
-    if (!object) return;
-    for (const auto& entry : object->fields) {
-        visitField(entry.second);
+void SemaAnalyser::visitObject(LogosObject* obj) {
+    for (const auto& [_, field] : obj->fields) {
+        visitField(field);
     }
-    for (const auto& entry : object->methods) {
-        visitMethodImpl(entry.second);
+    for (const auto& [_, method] : obj->methods) {
+        visitMethodImpl(method, obj);
     }
 }
 
@@ -65,8 +63,10 @@ void SemaAnalyser::visitFuncImpl(const LogosFuncImpl* func) {
     logosStack.exitScope();
 }
 
-void SemaAnalyser::visitMethodImpl(const LogosMethodImpl* method) {
+void SemaAnalyser::visitMethodImpl(LogosMethodImpl* method, LogosObject* obj) {
     logosStack.enterScope();
+    const auto self = new LogosParam(LOGOS_SELF, obj, new LogosInstance(obj->name));
+    method->params.insert(method->params.begin(), self);
     for (const auto& param : method->params) {
         visitParam(param);
     }
@@ -192,87 +192,41 @@ void SemaAnalyser::visitVariable(LogosVariable* variable) {
 
 void SemaAnalyser::visitSelection(LogosSelection* selection) {
     const auto exprs = selection->exprs;
-    for (int i = 0; i < exprs.size(); ++i) {
-        if (i == exprs.size() - 1) return;
+    const auto firstExpr = exprs[0];
+    if (const auto variable = dynamic_cast<LogosVariable*>(firstExpr)) {
+        visitVariable(variable);
+    }
+
+    for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto currentExpr = exprs[i];
         const auto nextExpr = exprs[i + 1];
-        const auto symbol = logosStack.getSymbol(currentExpr->getName());
-        const auto logos = symbol->varDec->type;
-        auto name = nextExpr->getName();
-        auto logosField = logos->getField(name);
-        std::cout << "" << '\n';
+        if (const auto field = currentExpr->type->getField(nextExpr->getName())) {
+            nextExpr->type = field->type;
+        } else if (const auto method = currentExpr->type->getMethod(nextExpr->getName())) {
+            nextExpr->type = method->type;
+        }
     }
+    selection->type = selection->lastExpr()->type;
 }
 
-void SemaAnalyser::resolveFirstSelection(const LogosSelection* selection, LogosVariable* variable) {
+void SemaAnalyser::resolveSelectionVariable(LogosVariable* variable) {
     visitVariable(variable);
-    const auto symbol = getSymbol(variable->name, variable);
-    if (!symbol) return;
-
-    switch (symbol->type) {
-    case VAR_DEC: {
-        const auto varDecExpr = symbol->varDec->expr;
-        if (const auto instance = dynamic_cast<LogosInstance*>(varDecExpr)) {
-            resolveInnerSelection(selection, 0, instance);
-        }
-        return;
+    const auto currentSymbol = logosStack.getSymbol(variable->name);
+    if (currentSymbol->type == VAR_DEC) {
+        const auto varDec = currentSymbol->varDec;
+        variable->type = varDec->type;
     }
-    case PARAM: {
-        const auto paramExpr = symbol->param->expr;
-        if (const auto instance = dynamic_cast<LogosInstance*>(paramExpr)) {
-            resolveInnerSelection(selection, 0, instance);
-        }
-        return;
-    }
-    default:
-        break;
+    if (currentSymbol->type == PARAM) {
+        const auto param = currentSymbol->param;
+        variable->type = param->type;
     }
 }
-
-void SemaAnalyser::resolveFirstSelection(const LogosSelection* selection, LogosFuncCall* funcCall) {
-    visitFuncCall(funcCall);
-    const auto symbol = getSymbol(funcCall->name, funcCall);
-    if (!symbol) return;
-    switch (symbol->type) {
-    case FUNC_IMPL: {
-        return resolveInnerSelection(selection, 0, symbol->funcImpl);
-    }
-    default:
-        break;
-    }
-}
-
-void SemaAnalyser::resolveInnerSelection(const LogosSelection* selection, const int i, LogosInstance* instance) {
-    if (selection->innerExprs.size() == i) return;
-    const auto nextExpr = selection->innerExprs[i];
-    if (const auto variable = dynamic_cast<LogosVariable*>(nextExpr)) {
-        const auto field = instance->obj->getField(variable->name);
-        if (!field) return printError(E10005, variable, {variable->name, instance->obj->name});
-        selection->innerExprs[i]->type = field->type;
-        resolveInnerSelection(selection, i + 1, field);
-    } else if (const auto methodCall = dynamic_cast<LogosMethodCall*>(nextExpr)) {
-        methodCall->args.insert(methodCall->args.begin(), instance);
-        visitMethodCall(methodCall);
-        const auto method = instance->obj->getMethod(methodCall->name);
-        methodCall->methodImpl = method;
-        if (!method) return printError(E10005, methodCall, {methodCall->name, instance->name});
-        selection->innerExprs[i]->type = method->type;
-        resolveInnerSelection(selection, i + 1, methodCall);
-    }
-}
-
-void SemaAnalyser::resolveInnerSelection(const LogosSelection* selection, const int i, LogosMethodCall* methodCall) {}
-
-void SemaAnalyser::resolveInnerSelection(const LogosSelection* selection, const int i, LogosField* field) {}
-
-void SemaAnalyser::resolveInnerSelection(const LogosSelection* selection, int i, LogosFuncImpl* funcImpl) {}
 
 void SemaAnalyser::visitInstance(LogosInstance* instance) {
     const auto symbol = getSymbol(instance->name, instance);
     if (!symbol) return;
-    const auto logosObject = new LogosObject(*symbol->object);
-    instance->type = logosObject;
-    instance->obj = logosObject;
+    instance->obj = new LogosObject(*symbol->object);
+    instance->type = instance->obj;
 }
 
 void SemaAnalyser::visitArrayIndex(LogosArrayIndex* arrayIndex) {
@@ -287,12 +241,6 @@ void SemaAnalyser::visitFuncCall(LogosFuncCall* funcCall) {
     }
 }
 
-void SemaAnalyser::visitMethodCall(LogosMethodCall* methodCall) {
-    for (const auto& arg : methodCall->args) {
-        visitExpr(arg);
-    }
-}
-
 void SemaAnalyser::setVariableType(LogosVariable* variable) {
     const auto symbol = getSymbol(variable->name, variable);
     if (!symbol) return;
@@ -303,12 +251,16 @@ void SemaAnalyser::setVariableType(LogosVariable* variable) {
     case LOOP_VAR:
         variable->type = symbol->loopVar->type;
         break;
-    default:
+    case PARAM:
+        variable->type = symbol->param->type;
         break;
+    default:
+        assert(false && "setVariableType not implemented");
     }
 }
 
-void SemaAnalyser::visitConstant(const LogosConstant* constant) {}
+void SemaAnalyser::visitConstant(const LogosConstant* constant) {
+}
 
 void SemaAnalyser::setLoopVarType(const LogosForeachLoop* foreachLoop) {
     foreachLoop->loopVar->type = foreachLoop->iterableExpr->type;

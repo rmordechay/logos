@@ -10,15 +10,15 @@ constexpr auto privateLinkage = GlobalValue::PrivateLinkage;
 class LogosValue {
 public:
     Position position = Position();
-    Value* getIRValue(CodeGenMetadata* metadata);
-    void setIRValue(Value* value);
-    virtual void setPosition(const antlr4::Token* ctx);
-    static BasicBlock* createBasicBlock(const char* name);
-    virtual ~LogosValue() = default;
 
-protected:
+    void setIRValue(Value* value);
+    Value* getIRValue(CodeGenMetadata* metadata);
+    virtual void setPosition(const antlr4::Token* ctx);
     virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
+    static BasicBlock* createBasicBlock(const char* name);
     static void startBlock(CodeGenMetadata* metadata, BasicBlock* block);
+    virtual ~LogosValue() = default;
+private:
     Value* IRValue = nullptr;
 };
 

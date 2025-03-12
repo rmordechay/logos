@@ -13,7 +13,7 @@ public:
     LogosParam(const string& name, LogosType* type, LogosExpr* expr) : name(name), type(type), expr(expr) {}
     LogosParam(const string& name, LogosType* type) : LogosParam(name, type, nullptr) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    ~LogosParam() override = default;
+    ~LogosParam() override;
 };
 
 #endif //LOGOSPARAM_H

@@ -4,9 +4,9 @@
 
 class LogosMethodImpl final : public LogosFunc {
 public:
-    LogosObject* parentObj;
+    string parentName;
 
-    LogosMethodImpl(const string& name, LogosType* funcType, LogosObject* obj) : LogosFunc(name, funcType), parentObj(obj) {}
+    LogosMethodImpl(const string& name, LogosType* funcType, const string& parentName) : LogosFunc(name, funcType), parentName(parentName) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     void setIRFunc(CodeGenMetadata* metadata);
     void setCombinedName();

@@ -1,6 +1,8 @@
 #include "funcs/LogosMethodImpl.h"
+
+#include "LogosInstance.h"
 #include "constants/LogosConstant.h"
-#include <../../../include/symbols/types/LogosObject.h>
+#include <types/LogosObject.h>
 
 Value* LogosMethodImpl::createIRValue(CodeGenMetadata* metadata) {
     setCombinedName();
@@ -15,8 +17,8 @@ Value* LogosMethodImpl::createIRValue(CodeGenMetadata* metadata) {
 }
 
 void LogosMethodImpl::setIRFunc(CodeGenMetadata* metadata) {
-    auto selfIRType = params[0]->type->getIRType()->getPointerTo();
-    IRParamsTypes.emplace_back(selfIRType);
+    const auto selfPtr = params[0]->type->getIRType()->getPointerTo();
+    IRParamsTypes.emplace_back(selfPtr);
     for (int i = 1; i < params.size(); ++i) {
         auto paramIRType = params[i]->type->getIRType();
         IRParamsTypes.emplace_back(paramIRType);
@@ -36,7 +38,7 @@ void LogosMethodImpl::setIRFunc(CodeGenMetadata* metadata) {
 }
 
 void LogosMethodImpl::setCombinedName() {
-    combinedName = parentObj->getName() + "_" + name;
+    combinedName = parentName + "_" + name;
     combinedName += "_" + type->getName();
     for (int i = 1; i < params.size(); ++i) {
         combinedName += "_" + params[i]->type->getName();

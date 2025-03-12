@@ -1,6 +1,13 @@
 #include "funcs/LogosParam.h"
 
+#include <LogosExpr.h>
 
 Value* LogosParam::createIRValue(CodeGenMetadata* metadata) {
-    return IRValue;
+    return nullptr;
+}
+
+LogosParam::~LogosParam() {
+    if (expr) {
+        delete expr;
+    }
 }

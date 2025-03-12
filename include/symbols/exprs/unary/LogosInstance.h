@@ -8,8 +8,8 @@ public:
     vector<LogosExpr*> args;
     LogosObject* obj = nullptr;
 
-    explicit LogosInstance(LogosObject* obj) : obj(obj) {}
-    explicit LogosInstance(const string& name) : name(name) {}
+    LogosInstance(const string& name) : name(name) {}
+    Value* getInstanceIRValue(CodeGenMetadata* metadata) const;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
     ~LogosInstance() override;

@@ -36,7 +36,7 @@ public:
     bool analyse(const vector<LogosFile*>& files, const map<string, LogosSymbol>& globalSymbols);
     void validateProject() const;
     void parseTree(const string& path, vector<LogosFile*>& files, ThreadPool& threadPool);
-    LogosFile* parseFile(const directory_entry&);
+    LogosFile* parseFile(const directory_entry&) const;
     static void exitWithMessage(const string& errMsg);
     static LogosMainFile* getMainFile(const vector<LogosFile*>& files);
     static map<string, LogosSymbol> getGlobalsSymbols(const vector<LogosFile*>& files);

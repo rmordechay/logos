@@ -4,14 +4,14 @@
 #include "funcs/LogosMethodImpl.h"
 
 Value* LogosMethodCall::createIRValue(CodeGenMetadata* metadata) {
-    vector<Value*> paramValues;
+    vector<Value*> argValues;
     for (const auto& arg : args) {
         const auto argValue = arg->getIRValue(metadata);
-        paramValues.emplace_back(argValue);
+        argValues.emplace_back(argValue);
     }
-    const auto funcType = methodImpl->IRFunc->getFunctionType();
-    const auto func = metadata->currentModule->getOrInsertFunction(methodImpl->combinedName, funcType);
-    return metadata->builder.CreateCall(func, paramValues);
+    const auto functionType = methodImpl->IRFunc->getFunctionType();
+    const auto IRFunc = metadata->currentModule->getOrInsertFunction(methodImpl->combinedName, functionType);
+    return metadata->builder.CreateCall(IRFunc, argValues);
 }
 
 string LogosMethodCall::getName() {

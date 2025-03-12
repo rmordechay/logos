@@ -8,20 +8,22 @@ class LogosExpr;
 class LogosField final : public LogosValue {
 public:
     string name;
+    string parentName;
     size_t fieldPosition;
-    LogosInstance* instance = nullptr;
     LogosType* type = nullptr;
-    LogosType* userType = nullptr;
     LogosExpr* expr = nullptr;
+    Value* gep = nullptr;
 
-    LogosField(const string& name, LogosType* inferredType, LogosExpr* expr, const size_t fieldPosition) :
+    LogosField(const string& name, const string& parentName, LogosType* type, const size_t fieldPosition, LogosExpr* expr) :
         name(name),
+        parentName(parentName),
         fieldPosition(fieldPosition),
-        type(inferredType),
+        type(type),
         expr(expr) {
     }
 
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    void setFieldIRValue(CodeGenMetadata* metadata, LogosExpr* lvalueExpr, LogosInstance* instance);
     ~LogosField() override = default;
 };
 

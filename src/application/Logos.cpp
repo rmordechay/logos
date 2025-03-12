@@ -23,13 +23,11 @@ void Logos::run() {
 
     // Code generation
     const auto mainFile = getMainFile(files);
-    create_directories(buildDir);
-    CodeGenerator::generateCode(mainFile, globalSymbols);
+    CodeGenerator codeGenerator(buildDir);
+    codeGenerator.generateCode(mainFile, globalSymbols);
 
     // Linking
-    LogosLinker linker;
-    linker.objectFilePath = objectFile.c_str();
-    linker.execFilePath = execFile.c_str();
+    LogosLinker linker(objectFile.c_str(), execFile.c_str());
     linker.link(modules);
 
     // Running
@@ -77,7 +75,7 @@ map<string, LogosSymbol> Logos::getGlobalsSymbols(const vector<LogosFile*>& file
     return globalSymbols;
 }
 
-LogosFile* Logos::parseFile(const directory_entry& fileEntry) {
+LogosFile* Logos::parseFile(const directory_entry& fileEntry) const {
     auto absFilePath = canonical(fileEntry).string();
     ifstream file(absFilePath);
     stringstream fileContents;

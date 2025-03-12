@@ -2,6 +2,13 @@
 #include "funcs/LogosFuncImpl.h"
 #include "stmts/LogosField.h"
 
+LogosObject::LogosObject(const LogosObject& other) : name(other.name) {
+    for (const auto& [name, field] : other.fields) {
+        fields[name] = new LogosField(*field);
+    }
+    methods = other.methods;
+}
+
 const string LogosObject::getName() const {
     return name;
 }
@@ -13,7 +20,7 @@ Type* LogosObject::getIRType() {
         auto fieldType = val->type->getIRType();
         elementTypes.push_back(fieldType);
     }
-    IRType = StructType::create(context, elementTypes, getName());
+    IRType = StructType::create(elementTypes, getName());
     return IRType;
 }
 

@@ -1,7 +1,9 @@
 #ifndef LOGOSINT_H
 #define LOGOSINT_H
 #include "CodeGenerator.h"
+#include "LogosBool.h"
 #include "LogosType.h"
+#include "LogosVoid.h"
 #include "constants/LogosConstant.h"
 
 
@@ -10,6 +12,7 @@ public:
     Type* IRType = Type::getInt32Ty(context);
     string typeName = "Int";
     LogosConstant zeroValue = LogosConstant(this, 0);
+    // vector<LogosMethodImpl> fields = {LogosField("isOdd", typeName, &LOGOS_BOOL)};
 
     const string getName() const override;
     Type* getIRType() override;
