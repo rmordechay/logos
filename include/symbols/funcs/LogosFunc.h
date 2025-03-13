@@ -22,6 +22,8 @@ public:
     Function* IRFunc = nullptr;
 
     explicit LogosFunc(const string& name, LogosType* funcType) : name(name), type(funcType) {}
+    explicit LogosFunc(const string& name, LogosType* funcType, const vector<LogosParam*>& params) : name(name), type(funcType), params(params) {}
+    virtual Value* call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) = 0;
     ~LogosFunc() override;
 };
 

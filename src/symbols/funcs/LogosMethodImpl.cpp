@@ -5,7 +5,6 @@
 #include <types/LogosObject.h>
 
 Value* LogosMethodImpl::createIRValue(CodeGenMetadata* metadata) {
-    setCombinedName();
     metadata->logosStack.enterScope();
     setIRFunc(metadata);
 
@@ -14,6 +13,18 @@ Value* LogosMethodImpl::createIRValue(CodeGenMetadata* metadata) {
     stmtBlock->getIRValue(metadata);
     metadata->logosStack.exitScope();
     return nullptr;
+}
+
+Value* LogosMethodImpl::call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
+    vector<Value*> argValues;
+    for (const auto& arg : args) {
+        const auto argValue = arg->getIRValue(metadata);
+        argValues.emplace_back(argValue);
+    }
+    if (!IRFunc) setIRFunc(metadata);
+    const auto functionType = IRFunc->getFunctionType();
+    const auto IRFunc = metadata->currentModule->getOrInsertFunction(combinedName, functionType);
+    return metadata->builder.CreateCall(IRFunc, argValues);
 }
 
 void LogosMethodImpl::setIRFunc(CodeGenMetadata* metadata) {

@@ -13,14 +13,6 @@ LogosConstant* LogosStr::getZeroValue() {
     return new LogosConstant(this, 0);
 }
 
-LogosField* LogosStr::getField(const string& name) {
-    return nullptr;
-}
-
-LogosMethodImpl* LogosStr::getMethod(const string& name) {
-    return nullptr;
-}
-
 bool LogosStr::equals(LogosType* other) const {
     return typeName == other->getName();
 }

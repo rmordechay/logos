@@ -15,9 +15,17 @@ define void @print_Void_Str(i32 noundef %x) {
   ret void
 }
 
-define i1 @isOdd(i32 %n) {
+define i1 @Int_isOdd_Bool(i32 %n) {
 entry:
   %rem = and i32 %n, 1
   %result = icmp ne i32 %rem, 0
   ret i1 %result
 }
+
+define i1 @Int_isEven_Bool(i32 %n) {
+entry:
+  %rem = and i32 %n, 1
+  %result = icmp eq i32 %rem, 0
+  ret i1 %result
+}
+

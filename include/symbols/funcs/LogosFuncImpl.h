@@ -7,6 +7,7 @@ public:
 
     explicit LogosFuncImpl(const string& name, LogosType* funcType) : LogosFunc(name, funcType) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    Value* call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
     void setIRFunc(CodeGenMetadata* metadata);
     void setCombinedName();
     ~LogosFuncImpl() override = default;

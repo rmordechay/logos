@@ -12,12 +12,7 @@ Value* LogosFuncCall::createIRValue(CodeGenMetadata* metadata) {
         return symbol->builtinFunc->call(metadata, args);
     }
     if (symbol->type == FUNC_IMPL) {
-        vector<Value*> paramValues;
-        for (const auto& arg : args) {
-            const auto argValue = arg->getIRValue(metadata);
-            paramValues.emplace_back(argValue);
-        }
-        return metadata->builder.CreateCall(symbol->funcImpl->IRFunc, paramValues);
+        return symbol->funcImpl->call(metadata, args);
     }
     return nullptr;
 }

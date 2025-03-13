@@ -3,6 +3,10 @@
 
 #include <string>
 #include <llvm/IR/Type.h>
+#include <map>
+
+using namespace std;
+using namespace llvm;
 
 class LogosConstant;
 class LogosField;
@@ -10,11 +14,14 @@ class LogosMethodImpl;
 
 class LogosType {
 public:
-    virtual const std::string getName() const = 0;
-    virtual llvm::Type* getIRType() = 0;
+    map<string, LogosField*> fields;
+    map<string, LogosMethodImpl*> methods;
+
+    LogosField* getField(const string& name);
+    LogosMethodImpl* getMethod(const string& name);
+    virtual const string getName() const = 0;
+    virtual Type* getIRType() = 0;
     virtual LogosConstant* getZeroValue() = 0;
-    virtual LogosField* getField(const std::string& name) = 0;
-    virtual LogosMethodImpl* getMethod(const std::string& name) = 0;
     virtual bool equals(LogosType* other) const = 0;
     bool operator==(LogosType* other) const;
     bool operator!=(LogosType* other) const;
@@ -27,6 +34,22 @@ inline bool LogosType::operator==(LogosType* other) const {
 
 inline bool LogosType::operator!=(LogosType* other) const {
     return !equals(other);
+}
+
+inline LogosField* LogosType::getField(const string& name) {
+    const auto it = fields.find(name);
+    if (it != fields.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+inline LogosMethodImpl* LogosType::getMethod(const string& name) {
+    const auto it = methods.find(name);
+    if (it != methods.end()) {
+        return it->second;
+    }
+    return nullptr;
 }
 
 #endif //LOGOSTYPE_H

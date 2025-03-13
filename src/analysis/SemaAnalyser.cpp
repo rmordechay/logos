@@ -203,6 +203,8 @@ void SemaAnalyser::visitSelection(LogosSelection* selection) {
         if (const auto field = currentExpr->type->getField(nextExpr->getName())) {
             nextExpr->type = field->type;
         } else if (const auto method = currentExpr->type->getMethod(nextExpr->getName())) {
+            const auto methodCall = dynamic_cast<LogosMethodCall*>(nextExpr);
+            methodCall->args.insert(methodCall->args.begin(), currentExpr);
             nextExpr->type = method->type;
         }
     }

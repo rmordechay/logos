@@ -29,22 +29,6 @@ LogosConstant* LogosObject::getZeroValue() {
     return nullptr;
 }
 
-LogosField* LogosObject::getField(const string& name) {
-    const auto it = fields.find(name);
-    if (it != fields.end()) {
-        return it->second;
-    }
-    return nullptr;
-}
-
-LogosMethodImpl* LogosObject::getMethod(const string& name) {
-    const auto it = methods.find(name);
-    if (it != methods.end()) {
-        return it->second;
-    }
-    return nullptr;
-}
-
 bool LogosObject::equals(LogosType* other) const {
     return name == other->getName();
 }

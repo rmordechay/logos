@@ -15,8 +15,6 @@ public:
     Type* getIRType() override;
     LogosConstant* getZeroValue() override;
     bool equals(LogosType* other) const override;
-    LogosField* getField(const string& name) override;
-    LogosMethodImpl* getMethod(const string& name) override;
     ~LogosVoid() override = default;
 };
 

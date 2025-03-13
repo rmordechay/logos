@@ -7,15 +7,19 @@
 #include <LogosStack.h>
 
 Value* LogosSelection::createIRValue(CodeGenMetadata* metadata) {
-    Value* value = nullptr;
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto currentExpr = exprs[i];
         const auto nextExpr = exprs[i + 1];
-        if (const auto variable = dynamic_cast<LogosVariable*>(currentExpr)) {
-            value = resolveSelectionVariable(metadata, variable, nextExpr);
+        if (const auto field = currentExpr->type->getField(nextExpr->getName())) {
+            const auto value = field->getIRValue(metadata);
+            nextExpr->setIRValue(value);
+        } else if (const auto method = currentExpr->type->getMethod(nextExpr->getName())) {
+            const auto methodCall = dynamic_cast<LogosMethodCall*>(nextExpr);
+            const auto value = method->call(metadata, methodCall->args);
+            nextExpr->setIRValue(value);
         }
     }
-    return value;
+    return lastExpr()->getIRValue(metadata);
 }
 
 Value* LogosSelection::resolveSelectionVariable(CodeGenMetadata* metadata, const LogosVariable* variable, LogosUnaryExpr* nextExpr) const {

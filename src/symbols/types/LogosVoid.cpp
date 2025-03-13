@@ -15,11 +15,3 @@ inline LogosConstant* LogosVoid::getZeroValue() {
 inline bool LogosVoid::equals(LogosType* other) const {
     return typeName == other->getName();
 }
-
-LogosField* LogosVoid::getField(const string& name) {
-    return nullptr;
-}
-
-LogosMethodImpl* LogosVoid::getMethod(const string& name) {
-    return nullptr;
-}

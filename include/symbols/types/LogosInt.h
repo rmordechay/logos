@@ -9,16 +9,21 @@
 
 class LogosInt final : public LogosType {
 public:
-    Type* IRType = Type::getInt32Ty(context);
     string typeName = "Int";
+    Type* IRType = Type::getInt32Ty(context);
     LogosConstant zeroValue = LogosConstant(this, 0);
-    // vector<LogosMethodImpl> fields = {LogosField("isOdd", typeName, &LOGOS_BOOL)};
+
+    LogosMethodImpl isOdd = LogosMethodImpl("isOdd", &LOGOS_BOOL, typeName, {new LogosParam("n", this)});
+    LogosMethodImpl isEven = LogosMethodImpl("isEven", &LOGOS_BOOL, typeName, {new LogosParam("n", this)});
+
+    LogosInt() {
+        methods[isOdd.name] = &isOdd;
+        methods[isEven.name] = &isOdd;
+    }
 
     const string getName() const override;
     Type* getIRType() override;
     LogosConstant* getZeroValue() override;
-    LogosField* getField(const string& name) override;
-    LogosMethodImpl* getMethod(const string& name) override;
     bool equals(LogosType* other) const override;
     ~LogosInt() override = default;
 };

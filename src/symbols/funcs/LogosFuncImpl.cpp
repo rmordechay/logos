@@ -15,6 +15,16 @@ Value* LogosFuncImpl::createIRValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
 
+Value* LogosFuncImpl::call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
+    const auto symbol = metadata->logosStack.getSymbol(name);
+    vector<Value*> paramValues;
+    for (const auto& arg : args) {
+        const auto argValue = arg->getIRValue(metadata);
+        paramValues.emplace_back(argValue);
+    }
+    return metadata->builder.CreateCall(symbol->funcImpl->IRFunc, paramValues);
+}
+
 void LogosFuncImpl::setIRFunc(CodeGenMetadata* metadata) {
     for (int i = 0; i < params.size(); ++i) {
         auto paramIRType = params[i]->type->getIRType();
