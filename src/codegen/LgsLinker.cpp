@@ -40,10 +40,10 @@ void LgsLinker::link(const std::map<std::string, Module*>& modules) {
     lld::macho::link(getLinkerOpts(), outs(), errs(), false, false);
 }
 
-void LgsLinker::writeExecFile(const unique_ptr<Module>& module) const {
+void LgsLinker::writeExecFile(const unique_ptr<Module>& module) {
     error_code EC;
     legacy::PassManager pass;
-    raw_fd_ostream outputStream(objectFilePath, EC, sys::fs::OF_None);
+    raw_fd_ostream outputStream(objectFile.c_str(), EC, sys::fs::OF_None);
     targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
     pass.run(*module);
     outputStream.flush();
@@ -52,8 +52,8 @@ void LgsLinker::writeExecFile(const unique_ptr<Module>& module) const {
 vector<const char*> LgsLinker::getLinkerOpts() {
     return {
         DEFAULT_LINKER,
-        objectFilePath,
-        "-o", execFilePath,
+        objectFile.c_str(),
+        "-o", execFile.c_str(),
         "-lSystem",
         "-syslibroot", LIB_ROOT,
         "-e", ENTRY_POINT,

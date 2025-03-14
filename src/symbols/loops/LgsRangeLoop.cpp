@@ -12,7 +12,7 @@ Value* LgsRangeLoop::createIRValue(CodeGenMetadata* metadata) {
 
     const auto loopCondition = createBasicBlock(BB_LOOP_CONDITION);
     const auto loopBody = createBasicBlock(BB_LOOP_BODY);
-    const auto loopEnd = createBasicBlock(BB_LOOP_END);
+    const auto loopExit = createBasicBlock(BB_LOOP_EXIT);
 
     // Init blocks
     const auto irStartRange = startRange->getIRValue(metadata);
@@ -26,7 +26,7 @@ Value* LgsRangeLoop::createIRValue(CodeGenMetadata* metadata) {
     const auto currentVal = builder.CreateLoad(i32Type, i);
     const auto condition = builder.CreateICmpSLT(currentVal, irEndRange);
     loopVar->setIRValue(currentVal);
-    builder.CreateCondBr(condition, loopBody, loopEnd);
+    builder.CreateCondBr(condition, loopBody, loopExit);
 
     // Loop body
     startBlock(metadata, loopBody);
@@ -40,7 +40,7 @@ Value* LgsRangeLoop::createIRValue(CodeGenMetadata* metadata) {
     builder.CreateBr(loopCondition);
 
     // Loop end
-    startBlock(metadata, loopEnd);
+    startBlock(metadata, loopExit);
     metadata->logosStack.exitScope();
     return nullptr;
 }

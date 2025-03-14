@@ -3,7 +3,6 @@
 
 #include <LgsStack.h>
 #include <llvm/IR/IRBuilder.h>
-#include <filesystem>
 
 class CodeGenerator;
 class LgsStack;
@@ -18,7 +17,6 @@ struct CodeGenMetadata {
     LgsStack logosStack;
     Module* currentModule;
     IRBuilder<> builder = IRBuilder(context);
-    filesystem::path buildDir;
 };
 
 struct Position {

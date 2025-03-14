@@ -15,32 +15,33 @@ using namespace std;
 using namespace antlr4;
 using namespace llvm;
 
+inline path rootDir;
+inline path srcDir;
+inline path buildDir;
+inline path objectFile;
+inline path execFile;
+
 class Logos {
 public:
     mutex mtx;
-    path rootDir;
-    path srcDir;
-    path buildDir;
-    path objectFile;
-    path execFile;
 
-    explicit Logos(const path& rootPath) : rootDir(rootPath) {
-        srcDir = rootPath / LOGOS_SRC_DIR;
-        buildDir = rootPath / LOGOS_BUILD_DIR;
-        objectFile = buildDir / OBJECT_FILE;
-        execFile = buildDir / EXECUTABLE_FILE;
+    explicit Logos(const path& rootPath) {
+        initPaths(rootPath);
     }
 
     void run();
-    vector<LgsFile*> parseFiles();
-    bool analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols);
     void validateProject() const;
-    void parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool);
+    void initPaths(const path& rootPath) const;
+
+    vector<LgsFile*> parseFiles();
     LgsFile* parseFile(const directory_entry&) const;
-    static void exitWithMessage(const string& errMsg);
+    void parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool);
+    bool analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols);
+
     static LgsMainFile* getMainFile(const vector<LgsFile*>& files);
     static map<string, LgsSymbol> getGlobalsSymbols(const vector<LgsFile*>& files);
     static bool isLogosFile(const directory_entry& filePath);
+    static void exitWithMessage(const string& errMsg);
     ~Logos() = default;
 };
 

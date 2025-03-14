@@ -8,6 +8,14 @@
 #include <ThreadPool.h>
 #include <funcs/LgsPrint.h>
 
+void Logos::initPaths(const path& rootPath) const {
+    rootDir = rootPath;
+    srcDir = rootPath / LOGOS_SRC_DIR;
+    buildDir = rootPath / LOGOS_BUILD_DIR;
+    objectFile = buildDir / OBJECT_FILE;
+    execFile = buildDir / EXECUTABLE_FILE;
+}
+
 void Logos::run() {
     // Initial validation
     validateProject();
@@ -23,12 +31,10 @@ void Logos::run() {
 
     // Code generation
     const auto mainFile = getMainFile(files);
-    CodeGenerator codeGenerator(buildDir);
-    codeGenerator.generateCode(mainFile, globalSymbols);
+    CodeGenerator::generateCode(mainFile, globalSymbols);
 
     // Linking
-    LgsLinker linker(objectFile.c_str(), execFile.c_str());
-    linker.link(modules);
+    LgsLinker::link(modules);
 
     // Running
     system(execFile.c_str());

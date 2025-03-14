@@ -10,6 +10,9 @@ Value* LgsArray::createIRValue(CodeGenMetadata* metadata) {
     return new GlobalVariable(*metadata->currentModule, arrType, true, privateLinkage, array);
 }
 
+void LgsArray::iterate() {
+}
+
 size_t LgsArray::size() {
     return elements.size();
 }

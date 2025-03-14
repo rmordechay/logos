@@ -8,14 +8,10 @@ using namespace std;
 
 class LgsLinker {
 public:
-    const char* objectFilePath;
-    const char* execFilePath;
-
-    LgsLinker(const char* objectFilePath, const char* execFilePath) : objectFilePath(objectFilePath), execFilePath(execFilePath) {}
-    void link(const std::map<std::string, Module*>& modules);
-    vector<const char*> getLinkerOpts();
-    void writeExecFile(const std::unique_ptr<Module>& module) const;
-    static std::unique_ptr<Module> getStdlibModule();
+    static void link(const map<string, Module*>& modules);
+    static vector<const char*> getLinkerOpts();
+    static void writeExecFile(const unique_ptr<Module>& module);
+    static unique_ptr<Module> getStdlibModule();
     ~LgsLinker() = default;
 };
 

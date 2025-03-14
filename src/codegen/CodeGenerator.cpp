@@ -14,9 +14,9 @@ void CodeGenerator::generateCode(const LgsMainFile* mainFile, const map<string, 
     generateModule(mainFile, globalSymbols);
 }
 
-void CodeGenerator::generateModule(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols) const {
+void CodeGenerator::generateModule(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols) {
     const auto module = createModule(LOGOS_MAIN_FILE);
-    auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
+    auto metadata = CodeGenMetadata{.currentModule = module};
     metadata.logosStack.globalSymbols = globalSymbols;
 
     for (const auto& func : mainFile->funcs) {
@@ -25,19 +25,19 @@ void CodeGenerator::generateModule(const LgsMainFile* mainFile, const map<string
     mainFile->mainFunc->createIRValue(&metadata);
 
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
-    writeIRToFile(metadata.currentModule, buildDir, LOGOS_MAIN_FILE);
+    writeIRToFile(metadata.currentModule, LOGOS_MAIN_FILE);
 }
 
-void CodeGenerator::generateModule(LgsObject* obj, const map<string, LgsSymbol>& globalSymbols, const path& buildDir) {
+void CodeGenerator::generateModule(LgsObject* obj, const map<string, LgsSymbol>& globalSymbols) {
     const auto objName = obj->getName();
     const auto module = createModule(objName);
-    auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
+    auto metadata = CodeGenMetadata{.currentModule = module};
     metadata.logosStack.globalSymbols = globalSymbols;
 
     for (const auto& [_, method] : obj->methods) {
         method->createIRValue(&metadata);
     }
-    writeIRToFile(metadata.currentModule, buildDir, objName);
+    writeIRToFile(metadata.currentModule, objName);
 }
 
 Module* CodeGenerator::createModule(const string& objName) {
@@ -48,7 +48,7 @@ Module* CodeGenerator::createModule(const string& objName) {
     return module;
 }
 
-void CodeGenerator::writeIRToFile(const Module* module, const path& buildDir, const path& name){
+void CodeGenerator::writeIRToFile(const Module* module, const path& name){
     const auto filePath = (buildDir / name).string() + ".ll";
     std::error_code EC;
     raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);

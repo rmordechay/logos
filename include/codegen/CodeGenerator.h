@@ -12,15 +12,12 @@ inline TargetMachine* targetMachine = nullptr;
 
 class CodeGenerator {
 public:
-    path buildDir;
-
-    explicit CodeGenerator(const path& buildDir) : buildDir(buildDir) {}
-    void init();
-    void generateCode(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols);
-    void generateModule(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols) const;
-    static void generateModule(LgsObject* obj, const map<string, LgsSymbol>& globalSymbols, const path& buildDir);
+    static void init();
+    static void generateCode(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols);
+    static void generateModule(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols);
+    static void generateModule(LgsObject* obj, const map<string, LgsSymbol>& globalSymbols);
     static Module* createModule(const string& objName);
-    static void writeIRToFile(const Module* module, const path& buildDir, const path& name);
+    static void writeIRToFile(const Module* module, const path& name);
     ~CodeGenerator() = default;
 };
 

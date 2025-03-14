@@ -9,7 +9,7 @@ class LgsLoopVar;
 
 #define BB_LOOP_CONDITION "loop_condition"
 #define BB_LOOP_BODY "loop_body"
-#define BB_LOOP_END "loop_end"
+#define BB_LOOP_EXIT "loop_exit"
 
 class LgsLoop : public LgsStmt {
 public:

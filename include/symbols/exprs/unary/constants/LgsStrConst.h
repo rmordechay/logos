@@ -15,15 +15,14 @@ public:
     vector<LgsCharConst> chars;
 
     explicit LgsStrConst(const std::string& value) : LgsConst(&LOGOS_STRING), value(value) {
-        cleanStr(value);
-        for (const char ch : value) {
-            chars.emplace_back(LgsCharConst(ch));
-        }
+        initStr(value);
     }
 
-    void cleanStr(const std::string& value);
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    void iterate() override;
     size_t size() override;
+    void cleanStr(const std::string& value);
+    void initStr(const std::string& value);
     ~LgsStrConst() override = default;
 };
 

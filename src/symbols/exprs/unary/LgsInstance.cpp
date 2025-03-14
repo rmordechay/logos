@@ -4,7 +4,7 @@
 Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
     const auto value = getInstanceIRValue(metadata);
     if (!moduleExists(obj->name)) {
-        CodeGenerator::generateModule(obj, metadata->logosStack.globalSymbols, metadata->buildDir);
+        CodeGenerator::generateModule(obj, metadata->logosStack.globalSymbols);
     }
     return value;
 }
