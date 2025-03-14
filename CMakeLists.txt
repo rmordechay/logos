@@ -35,8 +35,11 @@ add_library(lib STATIC
     # Symbols headers
     include/symbols/exprs/binary/LgsBinaryExpr.h
     include/symbols/exprs/unary/constants/LgsConstant.h
-    include/symbols/exprs/unary/constants/LgsStringConst.h
+    include/symbols/exprs/unary/constants/LgsStrConst.h
     include/symbols/exprs/unary/constants/LgsTypeConst.h
+    include/symbols/exprs/unary/constants/LgsIntConst.h
+    include/symbols/exprs/unary/constants/LgsFloatConst.h
+    include/symbols/exprs/unary/constants/LgsBoolConst.h
     include/symbols/exprs/unary/LgsArray.h
     include/symbols/exprs/unary/LgsArrayIndex.h
     include/symbols/exprs/unary/LgsFuncCall.h
@@ -45,6 +48,7 @@ add_library(lib STATIC
     include/symbols/exprs/unary/LgsMethodCall.h
     include/symbols/exprs/unary/LgsSelection.h
     include/symbols/exprs/unary/LgsVariable.h
+    include/symbols/exprs/LgsExpr.h
     include/symbols/funcs/LgsFunc.h
     include/symbols/funcs/LgsFuncImpl.h
     include/symbols/funcs/LgsMethodImpl.h
@@ -86,8 +90,11 @@ add_library(lib STATIC
     # Symbols src
     src/symbols/exprs/binary/LgsBinaryExpr.cpp
     src/symbols/exprs/unary/constants/LgsConstant.cpp
-    src/symbols/exprs/unary/constants/LgsStringConst.cpp
+    src/symbols/exprs/unary/constants/LgsStrConst.cpp
     src/symbols/exprs/unary/constants/LgsTypeConst.cpp
+    src/symbols/exprs/unary/constants/LgsIntConst.cpp
+    src/symbols/exprs/unary/constants/LgsFloatConst.cpp
+    src/symbols/exprs/unary/constants/LgsBoolConst.cpp
     src/symbols/exprs/unary/LgsArray.cpp
     src/symbols/exprs/unary/LgsArrayIndex.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp

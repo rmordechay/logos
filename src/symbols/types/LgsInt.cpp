@@ -1,5 +1,7 @@
 #include "types/LgsInt.h"
 
+#include "constants/LgsIntConst.h"
+
 const string LgsInt::getName() const {
     return typeName;
 }
@@ -9,7 +11,7 @@ Type* LgsInt::getIRType() {
 }
 
 LgsConstant* LgsInt::getZeroValue() {
-    return new LgsConstant(this, 0);
+    return new LgsIntConst(0);
 }
 
 bool LgsInt::equals(LgsType* other) const {

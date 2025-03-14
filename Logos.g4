@@ -137,12 +137,17 @@ unaryExpr:
     |   constructor
     |   constant
     |   array
+    |   map
     |   arrayIndex
     |   selection
     ;
 
 array:
         LBRACK expr (COMMA expr)* RBRACK
+    ;
+
+map:
+        LBRACE (expr COLON expr COMMA?)* RBRACE
     ;
 
 funcCall:
@@ -196,8 +201,13 @@ range:
     ;
 
 type:
-        TYPE (LBRACK INTEGER? RBRACK)?
+        TYPE (LBRACK INTEGER? RBRACK)*
+   |    LBRACE type COLON type RBRACE
    ;
+
+vector:
+        VEC | VEC2 | VEC3 | VEC4
+    ;
 
 DOUBLE_EQUAL: '==';
 NOT_EQUAL: '!=';
@@ -233,6 +243,11 @@ OBJECT: 'object';
 SELF: 'self';
 INTERFACE: 'interface';
 ENUM: 'enum';
+
+VEC: 'vec';
+VEC2: 'vec2';
+VEC3: 'vec3';
+VEC4: 'vec4';
 
 IMPLEMENTS: 'implements';
 IMPORT: 'import';

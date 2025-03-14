@@ -2,9 +2,12 @@
 
 #include "binary/LgsBinaryExpr.h"
 #include "binary/LgsOperator.h"
+#include "constants/LgsBoolConst.h"
 #include "unary/LgsMethodCall.h"
 #include "constants/LgsConstant.h"
-#include "constants/LgsStringConst.h"
+#include "constants/LgsFloatConst.h"
+#include "constants/LgsIntConst.h"
+#include "constants/LgsStrConst.h"
 #include "unary//LgsInstance.h"
 #include "unary//LgsSelection.h"
 #include <exprs/unary/LgsArray.h>
@@ -392,22 +395,22 @@ LgsArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ct
 }
 
 
-LgsUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
+LgsConstant* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
     if (const auto intToken = ctx->INTEGER()) {
         const auto value = stoi(intToken->getText());
-        return new LgsConstant(&LOGOS_INT, value);
+        return new LgsIntConst(value);
     }
-    if (const auto intToken = ctx->FLOAT()) {
-        const auto value = stof(intToken->getText());
-        return new LgsConstant(&LOGOS_FLOAT, value);
+    if (const auto floatToken = ctx->FLOAT()) {
+        const auto value = stof(floatToken->getText());
+        return new LgsFloatConst(value);
     }
-    if (const auto intToken = ctx->BOOL()) {
-        const auto value = intToken->getText() == "true";
-        return new LgsConstant(&LOGOS_BOOL, value);
+    if (const auto boolToken = ctx->BOOL()) {
+        const auto value = boolToken->getText() == "true";
+        return new LgsBoolConst(value);
     }
     if (const auto stringToken = ctx->STRING()) {
         const auto value = stringToken->getText();
-        return new LgsConstant(&LOGOS_STRING, new LgsStringConst(value));
+        return new LgsStrConst(value);
     }
     return nullptr;
 }

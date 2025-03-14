@@ -9,6 +9,7 @@ public:
 
     explicit LgsExpr(LgsType* type) : type(type) {}
 
+    virtual Value* operator+(LgsExpr* other) = 0;
     ~LgsExpr() override = default;
 };
 

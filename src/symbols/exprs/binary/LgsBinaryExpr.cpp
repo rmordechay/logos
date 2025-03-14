@@ -3,7 +3,7 @@
 #include "LgsError.h"
 #include "LgsAnalyser.h"
 #include "constants/LgsConstant.h"
-#include "constants/LgsStringConst.h"
+#include "constants/LgsStrConst.h"
 
 Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
     const auto l = left->getIRValue(metadata);
@@ -40,5 +40,9 @@ Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
         return builder.CreateICmpSGE(l, r);
     }
     return nullptr;
+}
+
+Value* LgsBinaryExpr::operator+(LgsExpr* other) {
+    assert(false && "binary + operator not implemented");
 }
 

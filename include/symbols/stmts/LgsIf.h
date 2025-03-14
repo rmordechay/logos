@@ -2,7 +2,7 @@
 #define LOGOSIFSTMT_H
 #include "LgsStmt.h"
 #include "LgsStmtBlock.h"
-#include "LogosExpr.h"
+#include "LgsExpr.h"
 
 #define BB_IF_START "if_start"
 #define BB_IF_END "if_end"

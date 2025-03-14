@@ -1,6 +1,6 @@
 #ifndef LOGOSBINARYEXPR_H
 #define LOGOSBINARYEXPR_H
-#include "LogosExpr.h"
+#include "LgsExpr.h"
 #include "LgsOperator.h"
 
 #include <LogosMetadata.h>
@@ -20,6 +20,7 @@ public:
     }
 
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    Value* operator+(LgsExpr* other) override;
     ~LgsBinaryExpr() override = default;
 };
 

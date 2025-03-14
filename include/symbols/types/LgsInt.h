@@ -4,13 +4,11 @@
 #include "LgsBool.h"
 #include "LgsType.h"
 #include "LgsVoid.h"
-#include "constants/LgsConstant.h"
 
 class LgsInt final : public LgsType {
 public:
     string typeName = "Int";
     Type* IRType = Type::getInt32Ty(context);
-    LgsConstant zeroValue = LgsConstant(this, 0);
 
     LgsMethodImpl isOdd = LgsMethodImpl("isOdd", &LOGOS_BOOL, typeName, {new LgsParam("n", this)});
     LgsMethodImpl isEven = LgsMethodImpl("isEven", &LOGOS_BOOL, typeName, {new LgsParam("n", this)});

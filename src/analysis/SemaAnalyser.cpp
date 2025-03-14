@@ -1,7 +1,7 @@
 #include "SemaAnalyser.h"
 #include "LgsError.h"
 #include "binary/LgsBinaryExpr.h"
-#include "constants/LgsStringConst.h"
+#include "constants/LgsStrConst.h"
 #include "unary/LgsMethodCall.h"
 #include "loops/LgsLoopVar.h"
 #include "stmts/LgsField.h"
@@ -311,7 +311,7 @@ void SemaAnalyser::setForLoopIterable(LgsForeachLoop* foreachLoop) {
         setForLoopIterable(foreachLoop, variable);
     } else if (const auto array = dynamic_cast<LgsArray*>(foreachLoop->iterableExpr)) {
         foreachLoop->iterable = array;
-    } else if (const auto str = dynamic_cast<LgsStringConst*>(foreachLoop->iterableExpr)) {
+    } else if (const auto str = dynamic_cast<LgsStrConst*>(foreachLoop->iterableExpr)) {
         foreachLoop->iterable = str;
     }
 }
@@ -321,9 +321,7 @@ void SemaAnalyser::setForLoopIterable(LgsForeachLoop* foreachLoop, const LgsVari
     if (!symbol) return;
     switch (symbol->type) {
     case VAR_DEC: {
-        const auto a = dynamic_cast<LgsConstant*>(symbol->varDec->expr);
-        const auto lgsStringConst = get_if<LgsStringConst*>(&a->value);
-        foreachLoop->iterable = *lgsStringConst;
+        foreachLoop->iterable = dynamic_cast<LgsStrConst*>(symbol->varDec->expr);
         return;
     }
     case LOOP_VAR: {

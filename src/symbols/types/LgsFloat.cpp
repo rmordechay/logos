@@ -1,5 +1,7 @@
 #include "types/LgsFloat.h"
 
+#include "constants/LgsFloatConst.h"
+
 const string LgsFloat::getName() const {
     return typeName;
 }
@@ -9,7 +11,7 @@ Type* LgsFloat::getIRType() {
 }
 
 LgsConstant* LgsFloat::getZeroValue() {
-    return new LgsConstant(this, 0.f);
+    return new LgsFloatConst(0.0);
 }
 
 bool LgsFloat::equals(LgsType* other) const {

@@ -1,6 +1,6 @@
 #include "funcs/LgsParam.h"
 
-#include <LogosExpr.h>
+#include "LgsExpr.h"
 
 Value* LgsParam::createIRValue(CodeGenMetadata* metadata) {
     return nullptr;

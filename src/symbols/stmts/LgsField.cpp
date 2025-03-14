@@ -1,7 +1,7 @@
 #include "stmts/LgsField.h"
 
 #include "LgsInstance.h"
-#include "exprs/LogosExpr.h"
+#include "exprs/LgsExpr.h"
 #include "types/LgsObject.h"
 
 Value* LgsField::createIRValue(CodeGenMetadata* metadata) {

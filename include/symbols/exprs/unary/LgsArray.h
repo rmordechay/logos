@@ -3,7 +3,7 @@
 
 #include "LgsIterable.h"
 #include "LogosUnaryExpr.h"
-#include "LogosExpr.h"
+#include "LgsExpr.h"
 
 class LgsArray final : public LgsUnaryExpr, public LgsIterable {
 public:

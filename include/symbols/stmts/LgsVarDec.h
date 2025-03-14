@@ -1,7 +1,7 @@
 #ifndef LOGOSVARDEFINITION_H
 #define LOGOSVARDEFINITION_H
 #include "LgsStmt.h"
-#include "LogosExpr.h"
+#include "LgsExpr.h"
 
 class LgsVarDec final : public LgsStmt {
 public:

@@ -2,7 +2,7 @@
 #include "LgsType.h"
 #include "unary/LgsArrayIndex.h"
 
-#include <exprs/LogosExpr.h>
+#include <exprs/LgsExpr.h>
 
 Value* LgsLoopVar::createIRValue(CodeGenMetadata* metadata) {
     return nullptr;
