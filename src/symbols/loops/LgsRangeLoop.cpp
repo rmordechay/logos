@@ -3,7 +3,7 @@
 #include "loops/LgsLoopVar.h"
 
 #include <LgsStack.h>
-#include <unary/constants/LgsConstant.h>
+#include <unary/constants/LgsConst.h>
 #include <types/LgsInt.h>
 
 Value* LgsRangeLoop::createIRValue(CodeGenMetadata* metadata) {

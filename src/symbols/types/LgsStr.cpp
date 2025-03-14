@@ -1,20 +1,24 @@
 #include "types/LgsStr.h"
 
-#include "constants/LgsConstant.h"
+#include "constants/LgsConst.h"
 #include "constants/LgsStrConst.h"
 
 const string LgsStr::getName() const {
-    return typeName;
+    return name;
 }
 
 Type* LgsStr::getIRType() {
     return IRType;
 }
 
-LgsConstant* LgsStr::getZeroValue() {
+LgsConst* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
+LgsType* LgsStr::inferBinaryType(LgsType* other) const {
+    return other;
+}
+
 bool LgsStr::equals(LgsType* other) const {
-    return typeName == other->getName();
+    return name == other->getName();
 }

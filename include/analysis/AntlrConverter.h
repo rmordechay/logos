@@ -43,7 +43,7 @@ public:
     static LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
     static LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
     static LgsArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
-    static LgsConstant* getConstant(LogosParser::ConstantContext* ctx);
+    static LgsConst* getConstant(LogosParser::ConstantContext* ctx);
     static LgsTypeConst* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
     static LgsType* getType(tree::TerminalNode* type);
     static LgsType* getFuncType(LogosParser::FuncImplementationContext* ctx);

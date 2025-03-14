@@ -11,7 +11,7 @@
 #include <ThreadPool.h>
 #include <unary/LgsArray.h>
 #include <unary/LgsArrayIndex.h>
-#include <unary/constants/LgsConstant.h>
+#include <unary/constants/LgsConst.h>
 #include <unary/LgsFuncCall.h>
 #include <unary/LgsInstance.h>
 #include <unary/LgsSelection.h>
@@ -101,16 +101,20 @@ void SemaAnalyser::visitStmtBlock(const LgsStmtBlock* stmtBlock) {
     }
 }
 
-void SemaAnalyser::visitField(LgsField* field) {}
+void SemaAnalyser::visitField(const LgsField* field) {
+    if (!checkExprType(field->expr, field->userType)) return;
+}
 
-void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {}
+void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
+    if (!checkExprType(assignment->rvalue, assignment->lvalue->type)) return;
+}
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     const auto userType = varDec->userType;
     const auto expr = varDec->expr;
     if (expr) {
         visitExpr(expr);
-        if (!matchTypes(expr->type, userType, expr)) return;
+        if (!checkExprType(expr, userType)) return;
         varDec->type = expr->type;
     } else {
         varDec->type = userType;
@@ -170,7 +174,7 @@ void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
         visitFuncCall(funcCall);
     } else if (const auto selection = dynamic_cast<LgsSelection*>(unaryExpr)) {
         visitSelection(selection);
-    } else if (const auto constant = dynamic_cast<LgsConstant*>(unaryExpr)) {
+    } else if (const auto constant = dynamic_cast<LgsConst*>(unaryExpr)) {
         visitConstant(constant);
     } else if (const auto array = dynamic_cast<LgsArray*>(unaryExpr)) {
         visitArray(array);
@@ -262,7 +266,7 @@ void SemaAnalyser::setVariableType(LgsVariable* variable) {
     }
 }
 
-void SemaAnalyser::visitConstant(const LgsConstant* constant) {
+void SemaAnalyser::visitConstant(const LgsConst* constant) {
 }
 
 void SemaAnalyser::setLoopVarType(const LgsForeachLoop* foreachLoop) {
@@ -282,7 +286,7 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     case MINUS:
     case STAR:
     case SLASH:
-        binaryExpr->type = binaryExpr->left->type;
+        binaryExpr->type = binaryExpr->left->type->inferBinaryType(binaryExpr->right->type);
         break;
     case NOT_EQUAL:
     case DOUBLE_EQUAL:
@@ -353,15 +357,13 @@ void SemaAnalyser::printError(const LgsErrCode code, const LgsValue* value, cons
 
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
     const auto symbol = logosStack.getSymbol(name);
-    if (!symbol) {
-        printError(E10006, value, {name});
-    }
+    if (!symbol) printError(E10006, value, {name});
     return symbol;
 }
 
-bool SemaAnalyser::matchTypes(const LgsType* first, const LgsType* second, const LgsValue* value) {
-    if (second && first != second) {
-        printError(E10001, value, {first->getName(), second->getName()});
+bool SemaAnalyser::checkExprType(const LgsExpr* expr, const LgsType* otherType) {
+    if (expr && otherType && otherType->equals(expr->type)) {
+        printError(E10001, expr, {otherType->getName(), expr->type->getName()});
         return false;
     }
     return true;

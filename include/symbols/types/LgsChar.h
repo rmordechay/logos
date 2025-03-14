@@ -7,9 +7,9 @@
 
 class LgsChar final : public LgsType {
 public:
-    string typeName = "Char";
+    string name = "Char";
     Type* IRType = Type::getInt8Ty(context);
-    LgsMethodImpl isAscii = LgsMethodImpl("isAscii", &LOGOS_BOOL, typeName, {new LgsParam("char", this)});
+    LgsMethodImpl isAscii = LgsMethodImpl("isAscii", &LOGOS_BOOL, name, {new LgsParam("char", this)});
 
     LgsChar() {
         methods[isAscii.name] = &isAscii;
@@ -17,10 +17,12 @@ public:
 
     const string getName() const override;
     Type* getIRType() override;
-    LgsConstant* getZeroValue() override;
+    LgsConst* getZeroValue() override;
+    LgsType* inferBinaryType(LgsType* other) const override;
     bool equals(LgsType* other) const override;
+    ~LgsChar() override = default;
 };
 
-
+inline LgsChar LOGOS_CHAR;
 
 #endif //LGSCHAR_H

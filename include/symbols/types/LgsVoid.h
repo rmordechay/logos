@@ -8,12 +8,13 @@ using namespace std;
 
 class LgsVoid final : public LgsType {
 public:
+    string name = "Void";
     Type* IRType = Type::getVoidTy(context);
-    string typeName = "Void";
 
     const string getName() const override;
     Type* getIRType() override;
-    LgsConstant* getZeroValue() override;
+    LgsConst* getZeroValue() override;
+    LgsType* inferBinaryType(LgsType* other) const override;
     bool equals(LgsType* other) const override;
     ~LgsVoid() override = default;
 };

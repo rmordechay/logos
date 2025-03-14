@@ -2,7 +2,7 @@
 #define LOGOSFUNC_H
 #include "LgsParam.h"
 #include "LgsValue.h"
-#include "constants/LgsConstant.h"
+#include "constants/LgsConst.h"
 #include "stmts/LgsStmtBlock.h"
 
 class LgsParam;

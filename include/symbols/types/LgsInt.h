@@ -7,11 +7,12 @@
 
 class LgsInt final : public LgsType {
 public:
-    string typeName = "Int";
+
+    string name = "Int";
     Type* IRType = Type::getInt32Ty(context);
 
-    LgsMethodImpl isOdd = LgsMethodImpl("isOdd", &LOGOS_BOOL, typeName, {new LgsParam("n", this)});
-    LgsMethodImpl isEven = LgsMethodImpl("isEven", &LOGOS_BOOL, typeName, {new LgsParam("n", this)});
+    LgsMethodImpl isOdd = LgsMethodImpl("isOdd", &LOGOS_BOOL, name, {new LgsParam("n", this)});
+    LgsMethodImpl isEven = LgsMethodImpl("isEven", &LOGOS_BOOL, name, {new LgsParam("n", this)});
 
     LgsInt() {
         methods[isOdd.name] = &isOdd;
@@ -20,7 +21,8 @@ public:
 
     const string getName() const override;
     Type* getIRType() override;
-    LgsConstant* getZeroValue() override;
+    LgsConst* getZeroValue() override;
+    LgsType* inferBinaryType(LgsType* other) const override;
     bool equals(LgsType* other) const override;
     ~LgsInt() override = default;
 };

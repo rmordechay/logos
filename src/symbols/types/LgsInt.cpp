@@ -3,17 +3,21 @@
 #include "constants/LgsIntConst.h"
 
 const string LgsInt::getName() const {
-    return typeName;
+    return name;
 }
 
 Type* LgsInt::getIRType() {
     return IRType;
 }
 
-LgsConstant* LgsInt::getZeroValue() {
+LgsConst* LgsInt::getZeroValue() {
     return new LgsIntConst(0);
 }
 
+LgsType* LgsInt::inferBinaryType(LgsType* other) const {
+    return other;
+}
+
 bool LgsInt::equals(LgsType* other) const {
-    return typeName == other->getName();
+    return name == other->getName();
 }

@@ -7,12 +7,13 @@
 
 class LgsStr final : public LgsType {
 public:
-    string typeName = "Str";
+    string name = "Str";
     Type* IRType = PointerType::get(Type::getInt8Ty(context), 0);
 
     const string getName() const override;
     Type* getIRType() override;
-    LgsConstant* getZeroValue() override;
+    LgsConst* getZeroValue() override;
+    LgsType* inferBinaryType(LgsType* other) const override;
     bool equals(LgsType* other) const override;
     ~LgsStr() override = default;
 };

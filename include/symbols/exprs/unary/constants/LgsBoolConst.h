@@ -1,13 +1,13 @@
 #ifndef LGSBOOL_H
 #define LGSBOOL_H
-#include "LgsConstant.h"
+#include "LgsConst.h"
 #include "types/LgsBool.h"
 
-class LgsBoolConst final : public LgsConstant {
+class LgsBoolConst final : public LgsConst {
 public:
     bool value;
 
-    explicit LgsBoolConst(const bool value) : LgsConstant(&LOGOS_BOOL), value(value) {}
+    explicit LgsBoolConst(const bool value) : LgsConst(&LOGOS_BOOL), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsBoolConst() override = default;
 };

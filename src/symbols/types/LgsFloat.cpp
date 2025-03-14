@@ -3,17 +3,21 @@
 #include "constants/LgsFloatConst.h"
 
 const string LgsFloat::getName() const {
-    return typeName;
+    return name;
 }
 
 Type* LgsFloat::getIRType() {
     return IRType;
 }
 
-LgsConstant* LgsFloat::getZeroValue() {
+LgsConst* LgsFloat::getZeroValue() {
     return new LgsFloatConst(0.0);
 }
 
 bool LgsFloat::equals(LgsType* other) const {
-    return typeName == other->getName();
+    return name == other->getName();
+}
+
+LgsType* LgsFloat::inferBinaryType(LgsType* other) const {
+    return other;
 }

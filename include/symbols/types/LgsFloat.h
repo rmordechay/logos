@@ -1,18 +1,19 @@
 #ifndef LOGOSFLOAT_H
 #define LOGOSFLOAT_H
 #include "LgsType.h"
-#include "constants/LgsConstant.h"
+#include "constants/LgsConst.h"
 #include "funcs/LgsMethodImpl.h"
 
 class LgsFloat final : public LgsType {
 public:
+    string name = "Float";
     Type* IRType = Type::getFloatTy(context);
-    string typeName = "Float";
 
     const string getName() const override;
     Type* getIRType() override;
-    LgsConstant* getZeroValue() override;
+    LgsConst* getZeroValue() override;
     bool equals(LgsType* other) const override;
+    LgsType* inferBinaryType(LgsType* other) const override;
     ~LgsFloat() override = default;
 };
 

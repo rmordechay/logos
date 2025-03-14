@@ -4,7 +4,7 @@
 #include "binary/LgsOperator.h"
 #include "constants/LgsBoolConst.h"
 #include "unary/LgsMethodCall.h"
-#include "constants/LgsConstant.h"
+#include "constants/LgsConst.h"
 #include "constants/LgsFloatConst.h"
 #include "constants/LgsIntConst.h"
 #include "constants/LgsStrConst.h"
@@ -394,25 +394,27 @@ LgsArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ct
     return new LgsArrayIndex(baseExpr, indexExprs);
 }
 
-
-LgsConstant* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
+LgsConst* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
+    LgsConst* constant = nullptr;
     if (const auto intToken = ctx->INTEGER()) {
         const auto value = stoi(intToken->getText());
-        return new LgsIntConst(value);
+        constant = new LgsIntConst(value);
     }
     if (const auto floatToken = ctx->FLOAT()) {
         const auto value = stof(floatToken->getText());
-        return new LgsFloatConst(value);
+        constant = new LgsFloatConst(value);
     }
     if (const auto boolToken = ctx->BOOL()) {
         const auto value = boolToken->getText() == "true";
-        return new LgsBoolConst(value);
+        constant = new LgsBoolConst(value);
     }
     if (const auto stringToken = ctx->STRING()) {
         const auto value = stringToken->getText();
-        return new LgsStrConst(value);
+        if (value.size() == 1) constant = new LgsCharConst(value[0]);
+        else constant = new LgsStrConst(value);
     }
-    return nullptr;
+    constant->setPosition(ctx->start);
+    return constant;
 }
 
 LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) {

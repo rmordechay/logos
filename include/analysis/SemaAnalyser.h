@@ -33,7 +33,7 @@ public:
     void visitMainFile(const LgsMainFile* mainFile);
     void visitObjectFile(const LgsObjectFile* objectFile);
     void visitObject(LgsObject* obj);
-    void visitField(LgsField* field);
+    void visitField(const LgsField* field);
     void visitMethodImpl(LgsMethodImpl* method, LgsObject* obj);
     void visitMainFunc(const LgsFuncImpl* mainFunc);
     void visitFuncImpl(const LgsFuncImpl* func);
@@ -58,7 +58,7 @@ public:
     void visitSelection(LgsSelection* selection);
     void visitInstance(LgsInstance* instance);
     void visitArrayIndex(LgsArrayIndex* arrayIndex);
-    void visitConstant(const LgsConstant* constant);
+    void visitConstant(const LgsConst* constant);
 
     void setFuncCallType(LgsFuncCall* funcCall);
     void setLoopVarType(const LgsForeachLoop* foreachLoop);
@@ -67,7 +67,7 @@ public:
     void setForLoopIterable(LgsForeachLoop* foreachLoop, const LgsVariable* variable);
     void setForLoopIterable(LgsForeachLoop* foreachLoop);
 
-    bool matchTypes(const LgsType* first, const LgsType* second, const LgsValue* value);
+    bool checkExprType(const LgsExpr* expr, const LgsType* otherType);
     void printError(LgsErrCode code, const LgsValue* value, const vector<string>& args = {});
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     ~SemaAnalyser() = default;

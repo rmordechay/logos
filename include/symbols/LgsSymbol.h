@@ -13,7 +13,7 @@ class LgsArrayIndex;
 class LgsArray;
 class LgsSelection;
 class LgsBinaryExpr;
-class LgsConstant;
+class LgsConst;
 class LgsVariable;
 class LgsFuncCall;
 class LgsInstance;

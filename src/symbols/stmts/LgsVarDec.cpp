@@ -1,5 +1,5 @@
 #include "stmts/LgsVarDec.h"
-#include "constants/LgsConstant.h"
+#include "constants/LgsConst.h"
 #include <LgsStack.h>
 
 Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {

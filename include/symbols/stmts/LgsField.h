@@ -11,6 +11,7 @@ public:
     string parentName;
     size_t fieldPosition;
     LgsType* type = nullptr;
+    LgsType* userType = nullptr;
     LgsExpr* expr = nullptr;
     Value* gep = nullptr;
 

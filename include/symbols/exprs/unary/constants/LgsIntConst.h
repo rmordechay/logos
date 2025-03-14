@@ -1,13 +1,13 @@
 #ifndef LGSINTCONST_H
 #define LGSINTCONST_H
-#include "LgsConstant.h"
+#include "LgsConst.h"
 #include "types/LgsInt.h"
 
-class LgsIntConst final : public LgsConstant {
+class LgsIntConst final : public LgsConst {
 public:
     int value;
 
-    explicit LgsIntConst(const int value) : LgsConstant(&LOGOS_INT), value(value) {}
+    explicit LgsIntConst(const int value) : LgsConst(&LOGOS_INT), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* add(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* sub(CodeGenMetadata* metadata, LgsExpr* other) override;

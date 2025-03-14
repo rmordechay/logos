@@ -1,17 +1,21 @@
 #include "types/LgsVoid.h"
 
 inline const std::string LgsVoid::getName() const {
-    return typeName;
+    return name;
 }
 
-inline llvm::Type* LgsVoid::getIRType() {
+inline Type* LgsVoid::getIRType() {
     return IRType;
 }
 
-inline LgsConstant* LgsVoid::getZeroValue() {
+inline LgsConst* LgsVoid::getZeroValue() {
     return nullptr;
 }
 
+LgsType* LgsVoid::inferBinaryType(LgsType* other) const {
+    return other;
+}
+
 inline bool LgsVoid::equals(LgsType* other) const {
-    return typeName == other->getName();
+    return name == other->getName();
 }

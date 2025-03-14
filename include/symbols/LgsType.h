@@ -8,7 +8,7 @@
 using namespace std;
 using namespace llvm;
 
-class LgsConstant;
+class LgsConst;
 class LgsField;
 class LgsMethodImpl;
 
@@ -21,20 +21,11 @@ public:
     LgsMethodImpl* getMethod(const string& name);
     virtual const string getName() const = 0;
     virtual Type* getIRType() = 0;
-    virtual LgsConstant* getZeroValue() = 0;
+    virtual LgsConst* getZeroValue() = 0;
     virtual bool equals(LgsType* other) const = 0;
-    bool operator==(LgsType* other) const;
-    bool operator!=(LgsType* other) const;
+    virtual LgsType* inferBinaryType(LgsType* other) const = 0;
     virtual ~LgsType() = default;
 };
-
-inline bool LgsType::operator==(LgsType* other) const {
-    return equals(other);
-}
-
-inline bool LgsType::operator!=(LgsType* other) const {
-    return !equals(other);
-}
 
 inline LgsField* LgsType::getField(const string& name) {
     const auto it = fields.find(name);

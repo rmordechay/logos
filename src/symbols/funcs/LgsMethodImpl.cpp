@@ -1,7 +1,7 @@
 #include "funcs/LgsMethodImpl.h"
 
 #include "LgsInstance.h"
-#include "constants/LgsConstant.h"
+#include "constants/LgsConst.h"
 #include <types/LgsObject.h>
 
 Value* LgsMethodImpl::createIRValue(CodeGenMetadata* metadata) {

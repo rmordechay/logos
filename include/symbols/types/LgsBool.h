@@ -1,17 +1,18 @@
 #ifndef LOGOSBOOL_H
 #define LOGOSBOOL_H
 #include "LgsType.h"
-#include "constants/LgsConstant.h"
+#include "constants/LgsConst.h"
 
 class LgsBool final : public LgsType {
 public:
-    Type* IRType = Type::getInt1Ty(context);
-    string typeName = "Bool";
+    string name = "Bool";
     string trueLiteral = "true";
+    Type* IRType = Type::getInt1Ty(context);
 
     const string getName() const override;
     Type* getIRType() override;
-    LgsConstant* getZeroValue() override;
+    LgsConst* getZeroValue() override;
+    LgsType* inferBinaryType(LgsType* other) const override;
     bool equals(LgsType* other) const override;
     ~LgsBool() override = default;
 };

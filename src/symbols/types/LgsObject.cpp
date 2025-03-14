@@ -24,9 +24,13 @@ Type* LgsObject::getIRType() {
     return IRType;
 }
 
-LgsConstant* LgsObject::getZeroValue() {
+LgsConst* LgsObject::getZeroValue() {
     // TODO return empty constructor
     return nullptr;
+}
+
+LgsType* LgsObject::inferBinaryType(LgsType* other) const {
+    return other;
 }
 
 bool LgsObject::equals(LgsType* other) const {

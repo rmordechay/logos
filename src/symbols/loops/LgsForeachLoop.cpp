@@ -2,7 +2,7 @@
 #include "unary/LgsArrayIndex.h"
 #include "loops/LgsLoopVar.h"
 #include <unary/LgsArray.h>
-#include <unary/constants/LgsConstant.h>
+#include <unary/constants/LgsConst.h>
 #include <types/LgsInt.h>
 
 Value* LgsForeachLoop::createIRValue(CodeGenMetadata* metadata) {
