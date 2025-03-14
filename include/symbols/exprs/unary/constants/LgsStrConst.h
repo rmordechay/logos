@@ -1,7 +1,7 @@
 #ifndef LOGOSSTRINGCONST_H
 #define LOGOSSTRINGCONST_H
 #include "LgsConstant.h"
-#include "types/LgsString.h"
+#include "types/LgsStr.h"
 #include "unary/LgsIterable.h"
 
 #include <string>

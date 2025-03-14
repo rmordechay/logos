@@ -25,7 +25,7 @@
 #include <LgsDefinitions.h>
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
-#include <types/LgsString.h>
+#include <types/LgsStr.h>
 #include <types/LgsVoid.h>
 
 LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {

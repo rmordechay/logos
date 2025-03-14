@@ -1,19 +1,20 @@
-#include "types/LgsString.h"
+#include "types/LgsStr.h"
+
 #include "constants/LgsConstant.h"
 #include "constants/LgsStrConst.h"
 
-const string LgsString::getName() const {
+const string LgsStr::getName() const {
     return typeName;
 }
 
-Type* LgsString::getIRType() {
+Type* LgsStr::getIRType() {
     return IRType;
 }
 
-LgsConstant* LgsString::getZeroValue() {
+LgsConstant* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-bool LgsString::equals(LgsType* other) const {
+bool LgsStr::equals(LgsType* other) const {
     return typeName == other->getName();
 }

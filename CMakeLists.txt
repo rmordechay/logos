@@ -69,8 +69,9 @@ add_library(lib STATIC
     include/symbols/types/LgsBool.h
     include/symbols/types/LgsFloat.h
     include/symbols/types/LgsInt.h
-    include/symbols/types/LgsString.h
+    include/symbols/types/LgsStr.h
     include/symbols/types/LgsVoid.h
+    include/symbols/types/LgsChar.h
     include/cli/LgsCli.h
     include/cli/LgsRunCmd.h
     include/cli/LgsGenerateCmd.h
@@ -122,9 +123,10 @@ add_library(lib STATIC
     src/cli/LgsGenerateCmd.cpp
     src/symbols/types/LgsBool.cpp
     src/symbols/types/LgsInt.cpp
-    src/symbols/types/LgsString.cpp
+    src/symbols/types/LgsStr.cpp
     src/symbols/types/LgsVoid.cpp
     src/symbols/types/LgsFloat.cpp
+    src/symbols/types/LgsChar.cpp
 )
 
 add_executable(lgs main.cpp)

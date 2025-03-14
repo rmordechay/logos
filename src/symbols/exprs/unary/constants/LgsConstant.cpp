@@ -1,7 +1,7 @@
 #include "constants/LgsConstant.h"
 #include "constants/LgsStrConst.h"
 #include <LogosMetadata.h>
-#include <types/LgsString.h>
+#include <types/LgsStr.h>
 
 struct CodeGenMetadata;
 
