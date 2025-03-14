@@ -3,12 +3,11 @@
 #include "stmts/LgsStmt.h"
 #include "LogosUnaryExpr.h"
 
-class LgsMethodCall final : public LgsStmt, public LgsUnaryExpr {
+class LgsMethodCall final : public LgsUnaryExpr {
 public:
     string name;
     vector<LgsExpr*> args;
     LgsMethodImpl* methodImpl = nullptr;
-    Location position = Location();
 
     explicit LgsMethodCall(const string& name) : name(name) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;

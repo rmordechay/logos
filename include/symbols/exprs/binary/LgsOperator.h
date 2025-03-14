@@ -3,28 +3,28 @@
 #include "parser/LogosParser.h"
 
 enum LgsOperator {
-    PLUS,
-    MINUS,
-    STAR,
-    SLASH,
-    NOT_EQUAL,
-    DOUBLE_EQUAL,
-    LANGLE,
-    RANGLE,
+    ADD,
+    SUB,
+    MUL,
+    DIV,
+    NE,
+    EQ,
+    LT,
+    GT,
     GE,
     LE,
     NOOP,
 };
 
 inline LgsOperator mapOperator(LogosParser::ExprContext* expr) {
-    if (expr->PLUS()) return PLUS;
-    if (expr->MINUS()) return MINUS;
-    if (expr->STAR()) return STAR;
-    if (expr->SLASH()) return SLASH;
-    if (expr->NOT_EQUAL()) return NOT_EQUAL;
-    if (expr->DOUBLE_EQUAL()) return DOUBLE_EQUAL;
-    if (expr->RANGLE()) return RANGLE;
-    if (expr->LANGLE()) return LANGLE;
+    if (expr->PLUS()) return ADD;
+    if (expr->MINUS()) return SUB;
+    if (expr->STAR()) return MUL;
+    if (expr->SLASH()) return DIV;
+    if (expr->NOT_EQUAL()) return NE;
+    if (expr->DOUBLE_EQUAL()) return EQ;
+    if (expr->RANGLE()) return GT;
+    if (expr->LANGLE()) return LT;
     if (expr->GE()) return GE;
     if (expr->LE()) return LE;
     return NOOP;

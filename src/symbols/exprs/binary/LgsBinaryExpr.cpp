@@ -2,17 +2,32 @@
 #include "constants/LgsConst.h"
 
 Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
+    const auto l = left->getIRValue(metadata);
+    const auto r = right->getIRValue(metadata);
+    auto& builder = metadata->builder;
     switch (op) {
-    case PLUS:         return left->add(metadata, right);
-    case MINUS:        return left->sub(metadata, right);
-    case STAR:         return left->mul(metadata, right);
-    case SLASH:        return left->div(metadata, right);
-    case RANGLE:       return left->gt(metadata, right);
-    case LANGLE:       return left->lt(metadata, right);
-    case DOUBLE_EQUAL: return left->eq(metadata, right);
-    case NOT_EQUAL:    return left->ne(metadata, right);
-    case LE:           return left->le(metadata, right);
-    case GE:           return left->ge(metadata, right);
-    default:           return nullptr;
+    case ADD:
+        return builder.CreateAdd(l, r);;
+    case SUB:
+        return builder.CreateSub(l, r);;
+    case MUL:
+        return builder.CreateMul(l, r);;
+    case DIV:
+        return builder.CreateSDiv(l, r);;
+    case NE:
+        return builder.CreateICmpNE(l, r);;
+    case EQ:
+        return builder.CreateICmpEQ(l, r);;
+    case LT:
+        return builder.CreateICmpSLT(l, r);;
+    case GT:
+        return builder.CreateICmpSGT(l, r);;
+    case GE:
+        return builder.CreateICmpSGE(l, r);;
+    case LE:
+        return builder.CreateICmpSLE(l, r);;
+    case NOOP:
+        break;
     }
+    return nullptr;
 }

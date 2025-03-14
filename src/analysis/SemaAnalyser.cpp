@@ -282,16 +282,16 @@ void SemaAnalyser::setArrayType(LgsArray* array) const {
 
 void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) const {
     switch (binaryExpr->op) {
-    case PLUS:
-    case MINUS:
-    case STAR:
-    case SLASH:
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
         binaryExpr->type = binaryExpr->left->type->inferBinaryType(binaryExpr->right->type);
         break;
-    case NOT_EQUAL:
-    case DOUBLE_EQUAL:
-    case LANGLE:
-    case RANGLE:
+    case NE:
+    case EQ:
+    case LT:
+    case GT:
     case GE:
     case LE:
         binaryExpr->type = &LOGOS_BOOL;
