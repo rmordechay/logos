@@ -20,9 +20,9 @@ void CodeGenerator::generateModule(const LgsMainFile* mainFile, const map<string
     metadata.logosStack.globalSymbols = globalSymbols;
 
     for (const auto& func : mainFile->funcs) {
-        func->createIRValue(&metadata);
+        func->getIRValue(&metadata);
     }
-    mainFile->mainFunc->createIRValue(&metadata);
+    mainFile->mainFunc->getIRValue(&metadata);
 
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
     writeIRToFile(metadata.currentModule, LOGOS_MAIN_FILE);
@@ -35,7 +35,7 @@ void CodeGenerator::generateModule(LgsObject* obj, const map<string, LgsSymbol>&
     metadata.logosStack.globalSymbols = globalSymbols;
 
     for (const auto& [_, method] : obj->methods) {
-        method->createIRValue(&metadata);
+        method->getIRValue(&metadata);
     }
     writeIRToFile(metadata.currentModule, objName);
 }

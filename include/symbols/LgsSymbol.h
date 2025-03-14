@@ -1,7 +1,6 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
 
-
 class LgsParam;
 class LgsBuiltinFunc;
 class LgsVarDec;
@@ -24,10 +23,8 @@ enum LgsSymbolType {
     VAR_DEC,
     PARAM,
     OBJECT,
-    FIELD,
     BUILTIN_FUNC,
     FUNC_IMPL,
-    METHOD_IMPL,
     SELECTION,
 };
 
@@ -37,10 +34,8 @@ struct LgsSymbol {
         LgsVarDec* varDec;
         LgsParam* param;
         LgsObject* object;
-        LgsField* field;
         LgsBuiltinFunc* builtinFunc;
         LgsFuncImpl* funcImpl;
-        LgsMethodImpl* methodImpl;
         LgsSelection* selection;
     };
 
@@ -57,11 +52,6 @@ struct LgsSymbol {
     LgsSymbol(const LgsSymbolType type, LgsVarDec* varDec) :
         type(type),
         varDec(varDec) {
-    }
-
-    LgsSymbol(const LgsSymbolType type, LgsField* field) :
-        type(type),
-        field(field) {
     }
 
     LgsSymbol(const LgsSymbolType type, LgsSelection* selection) :
@@ -83,12 +73,6 @@ struct LgsSymbol {
         type(type),
         object(object) {
     }
-
-    LgsSymbol(const LgsSymbolType type, LgsMethodImpl* methodImpl) :
-        type(type),
-        methodImpl(methodImpl) {
-    }
 };
-
 
 #endif //LOGOSSYMBOL_H

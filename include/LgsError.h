@@ -29,6 +29,7 @@ const map<LgsErrCode, string> LOGOS_ERRORS = {
     {E10008, "'Main.lgs' could not be found in 'src' directory"},
     {E10009, "Duplicate Main files were found in the project. Locations:%s"},
     {E10010, "Current path is not a root path of a logos project"},
+    {E10011, "'{}' is already declared at {}"},
 };
 
 const map<LgsWarningCode, string> LOGOS_WARNINGS = {

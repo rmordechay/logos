@@ -12,14 +12,10 @@
 Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->logosStack.getSymbol(name);
     switch (symbol->type) {
-    case FIELD:
-        return symbol->field->getIRValue(metadata);
     case SELECTION:
         return symbol->selection->getIRValue(metadata);
     case FUNC_IMPL:
         return symbol->funcImpl->getIRValue(metadata);
-    case METHOD_IMPL:
-        return symbol->methodImpl->getIRValue(metadata);
     case VAR_DEC:
         return symbol->varDec->getIRValue(metadata);
     case BUILTIN_FUNC:

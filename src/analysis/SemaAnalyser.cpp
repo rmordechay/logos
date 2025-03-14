@@ -327,10 +327,6 @@ void SemaAnalyser::setForLoopIterable(LgsForeachLoop* foreachLoop, const LgsVari
         foreachLoop->iterable = dynamic_cast<LgsStrConst*>(symbol->varDec->expr);
         return;
     }
-    case FIELD: {
-        foreachLoop->iterable = dynamic_cast<LgsIterable*>(symbol->field->expr);
-        return;
-    }
     case SELECTION: {
         if (const auto lastExpr = symbol->selection->lastExpr()) {
             foreachLoop->iterable = dynamic_cast<LgsIterable*>(lastExpr);
@@ -357,8 +353,8 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
 }
 
 void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
-    if (logosStack.hasSymbol(name)) {
-        // TODO finish logic
+    if (const auto s = logosStack.getSymbol(name)) {
+        printError(E10011, symbol.varDec, {name});
     }
     logosStack.addLocalSymbol(name, symbol);
 }
