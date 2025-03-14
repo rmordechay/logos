@@ -1,48 +1,18 @@
 #include "binary/LgsBinaryExpr.h"
-
-#include "LgsError.h"
-#include "LgsAnalyser.h"
 #include "constants/LgsConstant.h"
-#include "constants/LgsStrConst.h"
 
 Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
-    const auto l = left->getIRValue(metadata);
-    const auto r = right->getIRValue(metadata);
-    auto& builder = metadata->builder;
-    if (op == PLUS) {
-        return builder.CreateAdd(l, r);
+    switch (op) {
+    case PLUS:         return left->add(metadata, right);
+    case MINUS:        return left->sub(metadata, right);
+    case STAR:         return left->mul(metadata, right);
+    case SLASH:        return left->div(metadata, right);
+    case RANGLE:       return left->gt(metadata, right);
+    case LANGLE:       return left->lt(metadata, right);
+    case DOUBLE_EQUAL: return left->eq(metadata, right);
+    case NOT_EQUAL:    return left->ne(metadata, right);
+    case LE:           return left->le(metadata, right);
+    case GE:           return left->ge(metadata, right);
+    default:           return nullptr;
     }
-    if (op == MINUS) {
-        return builder.CreateSub(l, r);
-    }
-    if (op == STAR) {
-        return builder.CreateMul(l, r);
-    }
-    if (op == SLASH) {
-        return builder.CreateSDiv(l, r);
-    }
-    if (op == RANGLE) {
-        return builder.CreateICmpSGT(l, r);
-    }
-    if (op == LANGLE) {
-        return builder.CreateICmpSLT(l, r);
-    }
-    if (op == DOUBLE_EQUAL) {
-        return builder.CreateICmpEQ(l, r);
-    }
-    if (op == NOT_EQUAL) {
-        return builder.CreateICmpNE(l, r);
-    }
-    if (op == LE) {
-        return builder.CreateICmpSLE(l, r);
-    }
-    if (op == GE) {
-        return builder.CreateICmpSGE(l, r);
-    }
-    return nullptr;
 }
-
-Value* LgsBinaryExpr::operator+(LgsExpr* other) {
-    assert(false && "binary + operator not implemented");
-}
-

@@ -4,10 +4,6 @@ Value* LgsStrConst::createIRValue(CodeGenMetadata* metadata) {
     return ConstantDataArray::getString(context, value, true);
 }
 
-Value* LgsStrConst::operator+(LgsExpr* other) {
-    return LgsConstant::operator+(other);
-}
-
 void LgsStrConst::cleanStr(const std::string& value) {
     this->value.erase(0, 1);
     this->value.erase(value.size() - 1);

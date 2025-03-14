@@ -9,7 +9,10 @@ public:
 
     explicit LgsIntConst(const int value) : LgsConstant(&LOGOS_INT), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* operator+(LgsExpr* other) override;
+    Value* add(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* sub(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* mul(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* div(CodeGenMetadata* metadata, LgsExpr* other) override;
     ~LgsIntConst() override = default;
 };
 

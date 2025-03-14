@@ -13,7 +13,6 @@ public:
     explicit LgsStrConst(const std::string& value) : LgsConstant(&LOGOS_STRING), value(value) { cleanStr(value); }
     void cleanStr(const std::string& value);
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* operator+(LgsExpr* other) override;
     size_t size() override;
     ~LgsStrConst() override = default;
 };

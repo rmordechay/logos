@@ -9,7 +9,6 @@ public:
 
     explicit LgsFloatConst(const float value) : LgsConstant(&LOGOS_FLOAT), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* operator+(LgsExpr* other) override;
     ~LgsFloatConst() override = default;
 };
 
