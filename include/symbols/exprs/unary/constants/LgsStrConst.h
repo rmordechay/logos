@@ -19,7 +19,7 @@ public:
     }
 
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    void iterate() override;
+    void iterate(CodeGenMetadata* metadata) override;
     size_t size() override;
     void cleanStr(const std::string& value);
     void initStr(const std::string& value);

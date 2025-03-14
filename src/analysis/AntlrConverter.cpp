@@ -15,7 +15,6 @@
 #include <exprs/unary/LgsFuncCall.h>
 #include <exprs/unary/LgsVariable.h>
 #include "funcs/LgsParam.h"
-#include "loops/LgsLoopVar.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
 #include "types/LgsBool.h"
@@ -225,12 +224,11 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
     const auto stmts = getStmtBlock(ctx->statementsBlock());
     if (const auto iterableExpr = ctx->iterableExpr) {
         const auto variable = new LgsVariable(ctx->exprList()->expr()[0]->getText());
-        const auto loopVar = new LgsLoopVar(variable->name);
-        loopVar->element = new LgsArrayIndex(variable, {LOGOS_INT.getZeroValue()});
+        const auto loopVar = new LgsVariable(variable->name);
         loopStmt = new LgsForeachLoop(loopVar, getExpr(iterableExpr), stmts);
     } else if (const auto range = ctx->iterableRange) {
         const auto loopVarName = ctx->VARIABLE()->getText();
-        const auto loopVar = new LgsLoopVar(loopVarName, &LOGOS_INT);
+        const auto loopVar = new LgsVariable(loopVarName);
         loopStmt = new LgsRangeLoop(loopVar, getExpr(range->start), getExpr(range->end), stmts);
     } else {
         assert(false && "No loop statements found");

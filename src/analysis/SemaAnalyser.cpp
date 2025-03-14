@@ -3,7 +3,6 @@
 #include "binary/LgsBinaryExpr.h"
 #include "constants/LgsStrConst.h"
 #include "unary/LgsMethodCall.h"
-#include "loops/LgsLoopVar.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
 #include "types/LgsBool.h"
@@ -76,7 +75,7 @@ void SemaAnalyser::visitMethodImpl(LgsMethodImpl* method, LgsObject* obj) {
 }
 
 void SemaAnalyser::visitParam(LgsParam* param) {
-    logosStack.addLocalSymbol(param->name, LgsSymbol(PARAM, param));
+    addLocalSymbol(param->name, LgsSymbol(PARAM, param));
 }
 
 void SemaAnalyser::visitStmt(LgsStmt* stmt) {
@@ -119,8 +118,8 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     } else {
         varDec->type = userType;
     }
-    logosStack.addLocalSymbol(varDec->name, LgsSymbol(VAR_DEC, varDec));
 }
+
 
 void SemaAnalyser::visitIfStmt(const LgsIf* ifStmt) {
     visitExpr(ifStmt->ifCond);
@@ -137,14 +136,16 @@ void SemaAnalyser::visitLoopStmt(LgsLoop* loopStmt) {
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
     const auto name = rangeLoop->loopVar->name;
-    logosStack.addLocalSymbol(name, LgsSymbol(LOOP_VAR, rangeLoop->loopVar));
+    // TODO free memory
+    const auto varDec = new LgsVarDec(rangeLoop->loopVar->name, &LOGOS_INT);
+    addLocalSymbol(name, LgsSymbol(VAR_DEC, varDec));
     visitStmtBlock(rangeLoop->stmtBlock);
 }
 
 void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     visitExpr(foreachLoop->iterableExpr);
     setForLoopIterable(foreachLoop);
-    setLoopVarType(foreachLoop);
+    setLoopVar(foreachLoop);
     visitStmtBlock(foreachLoop->stmtBlock);
 }
 
@@ -255,9 +256,6 @@ void SemaAnalyser::setVariableType(LgsVariable* variable) {
     case VAR_DEC:
         variable->type = symbol->varDec->type;
         break;
-    case LOOP_VAR:
-        variable->type = symbol->loopVar->type;
-        break;
     case PARAM:
         variable->type = symbol->param->type;
         break;
@@ -269,10 +267,11 @@ void SemaAnalyser::setVariableType(LgsVariable* variable) {
 void SemaAnalyser::visitConstant(const LgsConst* constant) {
 }
 
-void SemaAnalyser::setLoopVarType(const LgsForeachLoop* foreachLoop) {
+void SemaAnalyser::setLoopVar(const LgsForeachLoop* foreachLoop) {
     foreachLoop->loopVar->type = foreachLoop->iterableExpr->type;
-    foreachLoop->loopVar->element->type = foreachLoop->loopVar->type;
-    logosStack.addLocalSymbol(foreachLoop->loopVar->name, LgsSymbol(LOOP_VAR, foreachLoop->loopVar));
+    // TODO free memory
+    const auto varDec = new LgsVarDec(foreachLoop->loopVar->name, &LOGOS_INT);
+    addLocalSymbol(foreachLoop->loopVar->name, LgsSymbol(VAR_DEC, varDec));
 }
 
 void SemaAnalyser::setArrayType(LgsArray* array) {
@@ -328,10 +327,6 @@ void SemaAnalyser::setForLoopIterable(LgsForeachLoop* foreachLoop, const LgsVari
         foreachLoop->iterable = dynamic_cast<LgsStrConst*>(symbol->varDec->expr);
         return;
     }
-    case LOOP_VAR: {
-        foreachLoop->iterable = dynamic_cast<LgsIterable*>(symbol->loopVar->element);
-        return;
-    }
     case FIELD: {
         foreachLoop->iterable = dynamic_cast<LgsIterable*>(symbol->field->expr);
         return;
@@ -359,6 +354,13 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
     const auto symbol = logosStack.getSymbol(name);
     if (!symbol) printError(E10006, value, {name});
     return symbol;
+}
+
+void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
+    if (logosStack.hasSymbol(name)) {
+        // TODO finish logic
+    }
+    logosStack.addLocalSymbol(name, symbol);
 }
 
 bool SemaAnalyser::checkExprType(const LgsExpr* expr, const LgsType* otherType) {

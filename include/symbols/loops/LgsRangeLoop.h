@@ -4,12 +4,10 @@
 
 class LgsRangeLoop final : public LgsLoop {
 public:
-  LgsLoopVar* loopVar;
-  LgsExpr* startRange;
-  LgsExpr* endRange;
-  LgsStmtBlock* stmtBlock;
+  LgsExpr* rangeStart = nullptr;
+  LgsExpr* rangeEnd = nullptr;
 
-  LgsRangeLoop(LgsLoopVar* loopVar, LgsExpr* rangeStart, LgsExpr* rangeEnd, LgsStmtBlock* stmtBlock) : loopVar(loopVar), startRange(rangeStart), endRange(rangeEnd), stmtBlock(stmtBlock) {}
+  LgsRangeLoop(LgsVariable* loopVar, LgsExpr* rangeStart, LgsExpr* rangeEnd, LgsStmtBlock* stmtBlock) : LgsLoop(loopVar, stmtBlock), rangeStart(rangeStart), rangeEnd(rangeEnd) {}
   Value* createIRValue(CodeGenMetadata* metadata) override;
 };
 

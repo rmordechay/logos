@@ -6,12 +6,10 @@ class LgsIterable;
 
 class LgsForeachLoop final : public LgsLoop {
 public:
-    LgsLoopVar* loopVar = nullptr;
     LgsExpr* iterableExpr = nullptr;
     LgsIterable* iterable = nullptr;
-    LgsStmtBlock* stmtBlock = nullptr;
 
-    LgsForeachLoop(LgsLoopVar* loopVar, LgsExpr* iterableExpr, LgsStmtBlock* stmtBlock) : loopVar(loopVar), iterableExpr(iterableExpr), stmtBlock(stmtBlock) {}
+    LgsForeachLoop(LgsVariable* loopVar, LgsExpr* iterableExpr, LgsStmtBlock* stmtBlock) : LgsLoop(loopVar, stmtBlock), iterableExpr(iterableExpr) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsForeachLoop() override;
 };

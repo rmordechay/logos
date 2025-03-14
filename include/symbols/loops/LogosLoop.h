@@ -5,7 +5,6 @@
 class LgsVariable;
 class LgsStmtBlock;
 class LgsExpr;
-class LgsLoopVar;
 
 #define BB_LOOP_CONDITION "loop_condition"
 #define BB_LOOP_BODY "loop_body"
@@ -13,6 +12,10 @@ class LgsLoopVar;
 
 class LgsLoop : public LgsStmt {
 public:
+    LgsVariable* loopVar = nullptr;
+    LgsStmtBlock* stmtBlock = nullptr;
+
+    LgsLoop(LgsVariable* loopVar, LgsStmtBlock* stmtBlock) : loopVar(loopVar), stmtBlock(stmtBlock) {}
     void iterationLoop(CodeGenMetadata* metadata) const;
     ~LgsLoop() override = default;
 };

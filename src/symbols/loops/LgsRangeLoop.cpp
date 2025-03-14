@@ -1,9 +1,5 @@
 #include "loops/LgsRangeLoop.h"
-
-#include "loops/LgsLoopVar.h"
-
 #include <LgsStack.h>
-#include <unary/constants/LgsConst.h>
 #include <types/LgsInt.h>
 
 Value* LgsRangeLoop::createIRValue(CodeGenMetadata* metadata) {
@@ -15,8 +11,8 @@ Value* LgsRangeLoop::createIRValue(CodeGenMetadata* metadata) {
     const auto loopExit = createBasicBlock(BB_LOOP_EXIT);
 
     // Init blocks
-    const auto irStartRange = startRange->getIRValue(metadata);
-    const auto irEndRange = endRange->getIRValue(metadata);
+    const auto irStartRange = rangeStart->getIRValue(metadata);
+    const auto irEndRange = rangeEnd->getIRValue(metadata);
     const auto i = builder.CreateAlloca(i32Type);
     builder.CreateStore(irStartRange, i);
     builder.CreateBr(loopCondition);
@@ -25,13 +21,13 @@ Value* LgsRangeLoop::createIRValue(CodeGenMetadata* metadata) {
     startBlock(metadata, loopCondition);
     const auto currentVal = builder.CreateLoad(i32Type, i);
     const auto condition = builder.CreateICmpSLT(currentVal, irEndRange);
-    loopVar->setIRValue(currentVal);
+    // loopVar->setIRValue(currentVal);
     builder.CreateCondBr(condition, loopBody, loopExit);
 
     // Loop body
     startBlock(metadata, loopBody);
     metadata->logosStack.enterScope();
-    metadata->logosStack.addLocalSymbol(loopVar->name, LgsSymbol(LOOP_VAR, loopVar));
+    // metadata->logosStack.addLocalSymbol(loopVar->name, LgsSymbol(LOOP_VAR, loopVar));
     stmtBlock->getIRValue(metadata);
 
     // Increment loop variable

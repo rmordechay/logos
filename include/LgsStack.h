@@ -20,6 +20,7 @@ public:
     void enterScope();
     void exitScope();
     LgsSymbol* getSymbol(const string& name);
+    bool hasSymbol(const string& name);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     void addGlobalSymbol(const string& name, const LgsSymbol& symbol);
     void deleteGlobalSymbol(const string& name);
@@ -50,6 +51,13 @@ inline LgsSymbol* LgsStack::getSymbol(const string& name) {
     }
     return nullptr;
 }
+
+inline bool LgsStack::hasSymbol(const string& name) {
+    if (globalSymbols.find(name) != globalSymbols.end()) return true;
+    auto& symbols = this->top().symbols;
+    return symbols.find(name) != symbols.end();
+}
+
 
 inline void LgsStack::addLocalSymbol(const string& name, const LgsSymbol& symbol) {
     top().symbols[name] = symbol;

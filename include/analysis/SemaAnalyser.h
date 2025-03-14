@@ -61,7 +61,7 @@ public:
     void visitConstant(const LgsConst* constant);
 
     void setFuncCallType(LgsFuncCall* funcCall);
-    void setLoopVarType(const LgsForeachLoop* foreachLoop);
+    void setLoopVar(const LgsForeachLoop* foreachLoop);
     void setArrayType(LgsArray* array);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     void setForLoopIterable(LgsForeachLoop* foreachLoop, const LgsVariable* variable);
@@ -70,6 +70,7 @@ public:
     bool checkExprType(const LgsExpr* expr, const LgsType* otherType);
     void printError(LgsErrCode code, const LgsValue* value, const vector<string>& args = {});
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
+    void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     ~SemaAnalyser() = default;
 };
 

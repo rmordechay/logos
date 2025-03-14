@@ -17,10 +17,11 @@ public:
     COMMA = 13, DOUBLE_DOT = 14, DOT = 15, COLON = 16, EQUAL = 17, MINUS = 18, 
     PLUS = 19, STAR = 20, SLASH = 21, HASH = 22, QUEST_MARK = 23, EXCLA_MARK = 24, 
     PERCENT = 25, DOLLAR = 26, AMPERSAND = 27, OBJECT = 28, SELF = 29, INTERFACE = 30, 
-    ENUM = 31, IMPLEMENTS = 32, IMPORT = 33, IF = 34, ELSE = 35, FOR = 36, 
-    BREAK = 37, CONTINUE = 38, RETURN = 39, AND = 40, OR = 41, NOT = 42, 
-    IN = 43, INTEGER = 44, FLOAT = 45, BOOL = 46, CONST = 47, TYPE = 48, 
-    VARIABLE = 49, STRING = 50, LINE_COMMENT = 51, BLOCK_COMMENT = 52, WS = 53
+    ENUM = 31, VEC = 32, VEC2 = 33, VEC3 = 34, VEC4 = 35, IMPLEMENTS = 36, 
+    IMPORT = 37, IF = 38, ELSE = 39, FOR = 40, BREAK = 41, CONTINUE = 42, 
+    RETURN = 43, AND = 44, OR = 45, NOT = 46, IN = 47, INTEGER = 48, FLOAT = 49, 
+    BOOL = 50, CONST = 51, TYPE = 52, VARIABLE = 53, STRING = 54, LINE_COMMENT = 55, 
+    BLOCK_COMMENT = 56, WS = 57
   };
 
   enum {
@@ -35,7 +36,7 @@ public:
     RuleUnaryExpr = 28, RuleArray = 29, RuleMap = 30, RuleFuncCall = 31, 
     RuleConstructor = 32, RuleFuncArgList = 33, RuleFuncArg = 34, RuleConstant = 35, 
     RuleArrayIndex = 36, RuleSelection = 37, RuleFirstSelectionElement = 38, 
-    RuleInnerSelectionElement = 39, RuleRange = 40, RuleType = 41
+    RuleInnerSelectionElement = 39, RuleRange = 40, RuleType = 41, RuleVector = 42
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -96,7 +97,8 @@ public:
   class FirstSelectionElementContext;
   class InnerSelectionElementContext;
   class RangeContext;
-  class TypeContext; 
+  class TypeContext;
+  class VectorContext; 
 
   class  LogosFileContext : public antlr4::ParserRuleContext {
   public:
@@ -739,6 +741,20 @@ public:
   };
 
   TypeContext* type();
+
+  class  VectorContext : public antlr4::ParserRuleContext {
+  public:
+    VectorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *VEC();
+    antlr4::tree::TerminalNode *VEC2();
+    antlr4::tree::TerminalNode *VEC3();
+    antlr4::tree::TerminalNode *VEC4();
+
+   
+  };
+
+  VectorContext* vector();
 
 
   bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;

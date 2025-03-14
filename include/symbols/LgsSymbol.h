@@ -3,7 +3,6 @@
 
 
 class LgsParam;
-class LgsLoopVar;
 class LgsBuiltinFunc;
 class LgsVarDec;
 class LgsMethodImpl;
@@ -24,7 +23,6 @@ class LgsObject;
 enum LgsSymbolType {
     VAR_DEC,
     PARAM,
-    LOOP_VAR,
     OBJECT,
     FIELD,
     BUILTIN_FUNC,
@@ -40,7 +38,6 @@ struct LgsSymbol {
         LgsParam* param;
         LgsObject* object;
         LgsField* field;
-        LgsLoopVar* loopVar;
         LgsBuiltinFunc* builtinFunc;
         LgsFuncImpl* funcImpl;
         LgsMethodImpl* methodImpl;
@@ -91,12 +88,6 @@ struct LgsSymbol {
         type(type),
         methodImpl(methodImpl) {
     }
-
-    LgsSymbol(const LgsSymbolType type, LgsLoopVar* loopVar) :
-        type(type),
-        loopVar(loopVar) {
-    }
-
 };
 
 

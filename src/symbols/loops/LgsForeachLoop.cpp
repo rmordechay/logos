@@ -1,8 +1,6 @@
 #include "loops/LgsForeachLoop.h"
 #include "unary/LgsArrayIndex.h"
-#include "loops/LgsLoopVar.h"
 #include <unary/LgsArray.h>
-#include <unary/constants/LgsConst.h>
 #include <types/LgsInt.h>
 
 Value* LgsForeachLoop::createIRValue(CodeGenMetadata* metadata) {
@@ -26,20 +24,14 @@ Value* LgsForeachLoop::createIRValue(CodeGenMetadata* metadata) {
     const auto condition = builder.CreateICmpSLT(i, builder.getInt32(iterableSize));
     builder.CreateCondBr(condition, loopBody, loopExit);
 
-    const auto strPtr = builder.CreateAlloca(builder.getInt1Ty(), nullptr);
-    const auto charPtr = builder.CreateGEP(builder.getInt1Ty(), strPtr, i);
-    const auto currentChar = builder.CreateLoad(builder.getInt1Ty(), charPtr);
-    const auto isNullTerminate = builder.CreateICmpEQ(currentChar, builder.getInt8(0));
-    builder.CreateCondBr(isNullTerminate, loopExit, loopBody);
-
     // Loop body
     startBlock(metadata, loopBody);
     metadata->logosStack.enterScope();
     const auto irType = iterableExpr->type->getIRType();
     const auto lastElement = builder.CreateGEP(irType, arrPtr, i);
     const auto element = builder.CreateLoad(irType, lastElement);
-    loopVar->setIRValue(element);
-    metadata->logosStack.addLocalSymbol(loopVar->name, LgsSymbol(LOOP_VAR, loopVar));
+    // loopVar->setIRValue(element);
+    // metadata->logosStack.addLocalSymbol(loopVar->name, LgsSymbol(LOOP_VAR, loopVar));
     stmtBlock->getIRValue(metadata);
 
     // Increment loop variable
@@ -55,9 +47,6 @@ Value* LgsForeachLoop::createIRValue(CodeGenMetadata* metadata) {
 }
 
 LgsForeachLoop::~LgsForeachLoop() {
-    if (loopVar) {
-        delete loopVar;
-    }
     if (iterableExpr) {
         delete iterableExpr;
     }

@@ -58,7 +58,6 @@ add_library(lib STATIC
     include/symbols/LgsSymbol.h
     include/symbols/LgsType.h
     include/symbols/loops/LgsForeachLoop.h
-    include/symbols/loops/LgsLoopVar.h
     include/symbols/loops/LgsRangeLoop.h
     include/symbols/stmts/LgsField.h
     include/symbols/types/LgsObject.h
@@ -110,7 +109,6 @@ add_library(lib STATIC
     src/symbols/funcs/LgsParam.cpp
     src/symbols/funcs/LgsPrint.cpp
     src/symbols/loops/LgsForeachLoop.cpp
-    src/symbols/loops/LgsLoopVar.cpp
     src/symbols/loops/LgsRangeLoop.cpp
     src/symbols/stmts/LgsField.cpp
     src/symbols/types/LgsObject.cpp

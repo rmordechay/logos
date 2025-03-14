@@ -2,7 +2,6 @@
 
 #include "unary/LgsFuncCall.h"
 #include "unary/LgsSelection.h"
-#include "loops/LgsLoopVar.h"
 #include "stmts/LgsField.h"
 
 #include <LgsStack.h>
@@ -17,8 +16,6 @@ Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
         return symbol->field->getIRValue(metadata);
     case SELECTION:
         return symbol->selection->getIRValue(metadata);
-    case LOOP_VAR:
-        return symbol->loopVar->getIRValue(metadata);
     case FUNC_IMPL:
         return symbol->funcImpl->getIRValue(metadata);
     case METHOD_IMPL:
