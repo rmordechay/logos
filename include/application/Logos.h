@@ -7,7 +7,7 @@
 #include <thread>
 #include <filesystem>
 #include "SemaAnalyser.h"
-#include <LogosLinker.h>
+#include <LgsLinker.h>
 
 class ThreadPool;
 using namespace filesystem;
@@ -32,14 +32,14 @@ public:
     }
 
     void run();
-    vector<LogosFile*> parseFiles();
-    bool analyse(const vector<LogosFile*>& files, const map<string, LogosSymbol>& globalSymbols);
+    vector<LgsFile*> parseFiles();
+    bool analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols);
     void validateProject() const;
-    void parseTree(const string& path, vector<LogosFile*>& files, ThreadPool& threadPool);
-    LogosFile* parseFile(const directory_entry&) const;
+    void parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool);
+    LgsFile* parseFile(const directory_entry&) const;
     static void exitWithMessage(const string& errMsg);
-    static LogosMainFile* getMainFile(const vector<LogosFile*>& files);
-    static map<string, LogosSymbol> getGlobalsSymbols(const vector<LogosFile*>& files);
+    static LgsMainFile* getMainFile(const vector<LgsFile*>& files);
+    static map<string, LgsSymbol> getGlobalsSymbols(const vector<LgsFile*>& files);
     static bool isLogosFile(const directory_entry& filePath);
     ~Logos() = default;
 };

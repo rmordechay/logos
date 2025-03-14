@@ -6,7 +6,7 @@
 #include <LogosLexer.h>
 #include <LogosParser.h>
 #include <ThreadPool.h>
-#include <funcs/LogosPrint.h>
+#include <funcs/LgsPrint.h>
 
 void Logos::run() {
     // Initial validation
@@ -27,23 +27,23 @@ void Logos::run() {
     codeGenerator.generateCode(mainFile, globalSymbols);
 
     // Linking
-    LogosLinker linker(objectFile.c_str(), execFile.c_str());
+    LgsLinker linker(objectFile.c_str(), execFile.c_str());
     linker.link(modules);
 
     // Running
     system(execFile.c_str());
 }
 
-vector<LogosFile*> Logos::parseFiles() {
+vector<LgsFile*> Logos::parseFiles() {
     ThreadPool threadPool;
     threadPool.start();
-    vector<LogosFile*> files;
+    vector<LgsFile*> files;
     parseTree(rootDir, files, threadPool);
     threadPool.wait();
     return files;
 }
 
-void Logos::parseTree(const string& path, vector<LogosFile*>& files, ThreadPool& threadPool) {
+void Logos::parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool) {
     for (const auto& entry : directory_iterator(path)) {
         if (isLogosFile(entry)) {
             threadPool.runTask([entry, &files, this] {
@@ -59,23 +59,23 @@ void Logos::parseTree(const string& path, vector<LogosFile*>& files, ThreadPool&
     }
 }
 
-map<string, LogosSymbol> Logos::getGlobalsSymbols(const vector<LogosFile*>& files) {
-    map<string, LogosSymbol> globalSymbols;
-    globalSymbols[LOGOS_PRINT.logosName] = LogosSymbol(BUILTIN_FUNC, &LOGOS_PRINT);
+map<string, LgsSymbol> Logos::getGlobalsSymbols(const vector<LgsFile*>& files) {
+    map<string, LgsSymbol> globalSymbols;
+    globalSymbols[LOGOS_PRINT.logosName] = LgsSymbol(BUILTIN_FUNC, &LOGOS_PRINT);
     for (const auto& file : files) {
-        if (const auto objFile = dynamic_cast<LogosObjectFile*>(file)) {
+        if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             const auto object = objFile->obj;
-            globalSymbols[object->getName()] = LogosSymbol(OBJECT, object);
-        } else if (const auto mainFile = dynamic_cast<LogosMainFile*>(file)) {
+            globalSymbols[object->getName()] = LgsSymbol(OBJECT, object);
+        } else if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
             for (const auto &func : mainFile->funcs) {
-                globalSymbols[func->name] = LogosSymbol(FUNC_IMPL, func);
+                globalSymbols[func->name] = LgsSymbol(FUNC_IMPL, func);
             }
         }
     }
     return globalSymbols;
 }
 
-LogosFile* Logos::parseFile(const directory_entry& fileEntry) const {
+LgsFile* Logos::parseFile(const directory_entry& fileEntry) const {
     auto absFilePath = canonical(fileEntry).string();
     ifstream file(absFilePath);
     stringstream fileContents;
@@ -93,7 +93,7 @@ LogosFile* Logos::parseFile(const directory_entry& fileEntry) const {
     return logosFile;
 }
 
-bool Logos::analyse(const vector<LogosFile*>& files, const map<string, LogosSymbol>& globalSymbols) {
+bool Logos::analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols) {
     ThreadPool threadPool;
     threadPool.start();
     vector<bool> semaSuccess;
@@ -134,11 +134,11 @@ void Logos::exitWithMessage(const string& errMsg) {
     exit(0);
 }
 
-LogosMainFile* Logos::getMainFile(const vector<LogosFile*>& files) {
-    unordered_map<string, LogosFile*> filesMap;
+LgsMainFile* Logos::getMainFile(const vector<LgsFile*>& files) {
+    unordered_map<string, LgsFile*> filesMap;
     for (const auto& file : files) {
         if (file->name == LOGOS_MAIN_FILE) {
-            return dynamic_cast<LogosMainFile*>(file);
+            return dynamic_cast<LgsMainFile*>(file);
         }
     }
     return nullptr;

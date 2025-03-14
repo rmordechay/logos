@@ -1,7 +1,7 @@
-#include "cli/LogosCli.h"
+#include "cli/LgsCli.h"
 
 int main(const int argc, char* argv[]) {
-    const LogosCli cli(argc, argv);
+    const LgsCli cli(argc, argv);
     cli.execute();
     return 0;
 }

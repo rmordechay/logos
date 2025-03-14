@@ -25,99 +25,99 @@ add_library(lib STATIC
     include/application/Logos.h
     include/application/ThreadPool.h
     include/codegen/CodeGenerator.h
-    include/codegen/LogosLinker.h
-    include/LogosError.h
+    include/codegen/LgsLinker.h
+    include/LgsError.h
     include/parser/LogosLexer.h
     include/parser/LogosParser.h
     include/analysis/AntlrConverter.h
     include/analysis/SemaAnalyser.h
     include/analysis/ProjectAnalyser.h
     # Symbols headers
-    include/symbols/exprs/binary/LogosBinaryExpr.h
-    include/symbols/exprs/unary/constants/LogosConstant.h
-    include/symbols/exprs/unary/constants/LogosStringConst.h
-    include/symbols/exprs/unary/constants/LogosTypeConst.h
-    include/symbols/exprs/unary/LogosArray.h
-    include/symbols/exprs/unary/LogosArrayIndex.h
-    include/symbols/exprs/unary/LogosFuncCall.h
-    include/symbols/exprs/unary/LogosInstance.h
-    include/symbols/exprs/unary/LogosIterable.h
-    include/symbols/exprs/unary/LogosMethodCall.h
-    include/symbols/exprs/unary/LogosSelection.h
-    include/symbols/exprs/unary/LogosVariable.h
-    include/symbols/funcs/LogosFunc.h
-    include/symbols/funcs/LogosFuncImpl.h
-    include/symbols/funcs/LogosMethodImpl.h
-    include/symbols/funcs/LogosParam.h
-    include/symbols/funcs/LogosPrint.h
-    include/symbols/LogosSymbol.h
-    include/symbols/LogosType.h
-    include/symbols/loops/LogosForeachLoop.h
-    include/symbols/loops/LogosLoopVar.h
-    include/symbols/loops/LogosRangeLoop.h
-    include/symbols/stmts/LogosField.h
-    include/symbols/types/LogosObject.h
-    include/symbols/stmts/LogosAssignment.h
-    include/symbols/stmts/LogosIf.h
-    include/symbols/stmts/LogosReturn.h
-    include/symbols/stmts/LogosStmtBlock.h
-    include/symbols/stmts/LogosVarDec.h
-    include/symbols/types/LogosBool.h
-    include/symbols/types/LogosFloat.h
-    include/symbols/types/LogosInt.h
-    include/symbols/types/LogosStr.h
-    include/symbols/types/LogosVoid.h
-    include/cli/LogosCli.h
-    include/cli/LogosRunCmd.h
-    include/cli/LogosGenerateCmd.h
+    include/symbols/exprs/binary/LgsBinaryExpr.h
+    include/symbols/exprs/unary/constants/LgsConstant.h
+    include/symbols/exprs/unary/constants/LgsStringConst.h
+    include/symbols/exprs/unary/constants/LgsTypeConst.h
+    include/symbols/exprs/unary/LgsArray.h
+    include/symbols/exprs/unary/LgsArrayIndex.h
+    include/symbols/exprs/unary/LgsFuncCall.h
+    include/symbols/exprs/unary/LgsInstance.h
+    include/symbols/exprs/unary/LgsIterable.h
+    include/symbols/exprs/unary/LgsMethodCall.h
+    include/symbols/exprs/unary/LgsSelection.h
+    include/symbols/exprs/unary/LgsVariable.h
+    include/symbols/funcs/LgsFunc.h
+    include/symbols/funcs/LgsFuncImpl.h
+    include/symbols/funcs/LgsMethodImpl.h
+    include/symbols/funcs/LgsParam.h
+    include/symbols/funcs/LgsPrint.h
+    include/symbols/LgsSymbol.h
+    include/symbols/LgsType.h
+    include/symbols/loops/LgsForeachLoop.h
+    include/symbols/loops/LgsLoopVar.h
+    include/symbols/loops/LgsRangeLoop.h
+    include/symbols/stmts/LgsField.h
+    include/symbols/types/LgsObject.h
+    include/symbols/stmts/LgsAssignment.h
+    include/symbols/stmts/LgsIf.h
+    include/symbols/stmts/LgsReturn.h
+    include/symbols/stmts/LgsStmtBlock.h
+    include/symbols/stmts/LgsVarDec.h
+    include/symbols/types/LgsBool.h
+    include/symbols/types/LgsFloat.h
+    include/symbols/types/LgsInt.h
+    include/symbols/types/LgsString.h
+    include/symbols/types/LgsVoid.h
+    include/cli/LgsCli.h
+    include/cli/LgsRunCmd.h
+    include/cli/LgsGenerateCmd.h
     include/analysis/LogosAnalyser.h
 
     # src
     src/application/Logos.cpp
     src/application/ThreadPool.cpp
-    src/cli/LogosCli.cpp
+    src/cli/LgsCli.cpp
     src/codegen/CodeGenerator.cpp
-    src/codegen/LogosLinker.cpp
+    src/codegen/LgsLinker.cpp
     src/parser/LogosLexer.cpp
     src/parser/LogosParser.cpp
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
     src/analysis/ProjectAnalyser.cpp
     # Symbols src
-    src/symbols/exprs/binary/LogosBinaryExpr.cpp
-    src/symbols/exprs/unary/constants/LogosConstant.cpp
-    src/symbols/exprs/unary/constants/LogosStringConst.cpp
-    src/symbols/exprs/unary/constants/LogosTypeConst.cpp
-    src/symbols/exprs/unary/LogosArray.cpp
-    src/symbols/exprs/unary/LogosArrayIndex.cpp
-    src/symbols/exprs/unary/LogosFuncCall.cpp
-    src/symbols/exprs/unary/LogosInstance.cpp
-    src/symbols/exprs/unary/LogosMethodCall.cpp
-    src/symbols/exprs/unary/LogosSelection.cpp
-    src/symbols/exprs/unary/LogosVariable.cpp
-    src/symbols/funcs/LogosFunc.cpp
-    src/symbols/funcs/LogosFuncImpl.cpp
-    src/symbols/funcs/LogosMethodImpl.cpp
-    src/symbols/funcs/LogosParam.cpp
-    src/symbols/funcs/LogosPrint.cpp
-    src/symbols/loops/LogosForeachLoop.cpp
-    src/symbols/loops/LogosLoopVar.cpp
-    src/symbols/loops/LogosRangeLoop.cpp
-    src/symbols/stmts/LogosField.cpp
-    src/symbols/types/LogosObject.cpp
-    src/symbols/stmts/LogosAssignment.cpp
-    src/symbols/stmts/LogosIf.cpp
-    src/symbols/stmts/LogosReturn.cpp
-    src/symbols/stmts/LogosStmtBlock.cpp
-    src/symbols/stmts/LogosVarDec.cpp
-    src/cli/LogosCli.cpp
-    src/cli/LogosRunCmd.cpp
-    src/cli/LogosGenerateCmd.cpp
-    src/symbols/types/LogosBool.cpp
-    src/symbols/types/LogosInt.cpp
-    src/symbols/types/LogosStr.cpp
-    src/symbols/types/LogosVoid.cpp
-    src/symbols/types/LogosFloat.cpp
+    src/symbols/exprs/binary/LgsBinaryExpr.cpp
+    src/symbols/exprs/unary/constants/LgsConstant.cpp
+    src/symbols/exprs/unary/constants/LgsStringConst.cpp
+    src/symbols/exprs/unary/constants/LgsTypeConst.cpp
+    src/symbols/exprs/unary/LgsArray.cpp
+    src/symbols/exprs/unary/LgsArrayIndex.cpp
+    src/symbols/exprs/unary/LgsFuncCall.cpp
+    src/symbols/exprs/unary/LgsInstance.cpp
+    src/symbols/exprs/unary/LgsMethodCall.cpp
+    src/symbols/exprs/unary/LgsSelection.cpp
+    src/symbols/exprs/unary/LgsVariable.cpp
+    src/symbols/funcs/LgsFunc.cpp
+    src/symbols/funcs/LgsFuncImpl.cpp
+    src/symbols/funcs/LgsMethodImpl.cpp
+    src/symbols/funcs/LgsParam.cpp
+    src/symbols/funcs/LgsPrint.cpp
+    src/symbols/loops/LgsForeachLoop.cpp
+    src/symbols/loops/LgsLoopVar.cpp
+    src/symbols/loops/LgsRangeLoop.cpp
+    src/symbols/stmts/LgsField.cpp
+    src/symbols/types/LgsObject.cpp
+    src/symbols/stmts/LgsAssignment.cpp
+    src/symbols/stmts/LgsIf.cpp
+    src/symbols/stmts/LgsReturn.cpp
+    src/symbols/stmts/LgsStmtBlock.cpp
+    src/symbols/stmts/LgsVarDec.cpp
+    src/cli/LgsCli.cpp
+    src/cli/LgsRunCmd.cpp
+    src/cli/LgsGenerateCmd.cpp
+    src/symbols/types/LgsBool.cpp
+    src/symbols/types/LgsInt.cpp
+    src/symbols/types/LgsString.cpp
+    src/symbols/types/LgsVoid.cpp
+    src/symbols/types/LgsFloat.cpp
 )
 
 add_executable(lgs main.cpp)

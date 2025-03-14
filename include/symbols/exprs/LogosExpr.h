@@ -1,18 +1,18 @@
 #ifndef LOGOSEXPR_H
 #define LOGOSEXPR_H
-#include "LogosValue.h"
-#include <LogosType.h>
+#include "LgsValue.h"
+#include <LgsType.h>
 
 class LogosFuncCall;
 class LogosVariable;
-class LogosConstant;
+class LgsConstant;
 class LogosInstance;
 
-class LogosExpr: virtual public LogosValue {
+class LogosExpr: virtual public LgsValue {
 public:
-    LogosType* type = nullptr;
+    LgsType* type = nullptr;
 
-    explicit LogosExpr(LogosType* type) : type(type) {}
+    explicit LogosExpr(LgsType* type) : type(type) {}
 
     ~LogosExpr() override = default;
 };

@@ -1,68 +1,75 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
 #include "LogosAnalyser.h"
-#include "LogosStack.h"
-#include "unary/LogosMethodCall.h"
+#include "LgsStack.h"
 #include "unary/LogosUnaryExpr.h"
-#include "files/LogosMainFile.h"
-#include "files/LogosObjectFile.h"
-#include "types/LogosObject.h"
-#include "stmts/LogosReturn.h"
-#include <loops/LogosForeachLoop.h>
-#include <loops/LogosRangeLoop.h>
+#include "files/LgsMainFile.h"
+#include "files/LgsObjectFile.h"
+#include "types/LgsObject.h"
+#include "stmts/LgsReturn.h"
+#include <loops/LgsForeachLoop.h>
+#include <loops/LgsRangeLoop.h>
 
 
-class LogosIf;
-class LogosAssignment;
-class LogosLoop;
+class LgsVarDec;
+struct LgsSymbol;
+class LgsInstance;
+class LgsArrayIndex;
+class LgsSelection;
+class LgsFuncCall;
+class LgsBinaryExpr;
+class LgsArray;
+class LgsIf;
+class LgsAssignment;
+class LgsLoop;
 
 class SemaAnalyser final : public LogosAnalyser {
 public:
-    LogosStack logosStack;
-    LogosFile* file = nullptr;
+    LgsStack logosStack;
+    LgsFile* file = nullptr;
 
-    explicit SemaAnalyser(LogosFile* logosFile) : file(logosFile) {}
+    explicit SemaAnalyser(LgsFile* logosFile) : file(logosFile) {}
     void analyse();
-    void visitMainFile(const LogosMainFile* mainFile);
-    void visitObjectFile(const LogosObjectFile* objectFile);
-    void visitObject(LogosObject* obj);
-    void visitField(LogosField* field);
-    void visitMethodImpl(LogosMethodImpl* method, LogosObject* obj);
-    void visitMainFunc(const LogosFuncImpl* mainFunc);
-    void visitFuncImpl(const LogosFuncImpl* func);
-    void visitParam(LogosParam* param);
-    void visitStmt(LogosStmt* stmt);
-    void visitStmtBlock(const LogosStmtBlock* stmtBlock);
-    void visitAssignment(const LogosAssignment* assignment);
-    void visitVarDec(LogosVarDec* varDec);
-    void visitIfStmt(const LogosIf* ifStmt);
-    void visitLoopStmt(LogosLoop* loopStmt);
-    void visitRangeLoop(const LogosRangeLoop* rangeLoop);
-    void visitForeachLoop(LogosForeachLoop* foreachLoop);
-    void visitReturnStmt(const LogosReturn* returnStmt);
+    void visitMainFile(const LgsMainFile* mainFile);
+    void visitObjectFile(const LgsObjectFile* objectFile);
+    void visitObject(LgsObject* obj);
+    void visitField(LgsField* field);
+    void visitMethodImpl(LgsMethodImpl* method, LgsObject* obj);
+    void visitMainFunc(const LgsFuncImpl* mainFunc);
+    void visitFuncImpl(const LgsFuncImpl* func);
+    void visitParam(LgsParam* param);
+    void visitStmt(LgsStmt* stmt);
+    void visitStmtBlock(const LgsStmtBlock* stmtBlock);
+    void visitAssignment(const LgsAssignment* assignment);
+    void visitVarDec(LgsVarDec* varDec);
+    void visitIfStmt(const LgsIf* ifStmt);
+    void visitLoopStmt(LgsLoop* loopStmt);
+    void visitRangeLoop(const LgsRangeLoop* rangeLoop);
+    void visitForeachLoop(LgsForeachLoop* foreachLoop);
+    void visitReturnStmt(const LgsReturn* returnStmt);
     void visitExpr(LogosExpr* expr);
-    void visitArray(LogosArray* array);
-    void visitUnaryExpr(LogosUnaryExpr* unaryExpr);
-    void visitBinaryExpr(LogosBinaryExpr* binaryExpr);
-    void visitVariable(LogosVariable* variable);
-    void resolveSelectionVariable(LogosVariable* variable);
-    void visitFuncCall(LogosFuncCall* funcCall);
-    void setVariableType(LogosVariable* variable);
-    void visitSelection(LogosSelection* selection);
-    void visitInstance(LogosInstance* instance);
-    void visitArrayIndex(LogosArrayIndex* arrayIndex);
-    void visitConstant(const LogosConstant* constant);
+    void visitArray(LgsArray* array);
+    void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
+    void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
+    void visitVariable(LgsVariable* variable);
+    void resolveSelectionVariable(LgsVariable* variable);
+    void visitFuncCall(LgsFuncCall* funcCall);
+    void setVariableType(LgsVariable* variable);
+    void visitSelection(LgsSelection* selection);
+    void visitInstance(LgsInstance* instance);
+    void visitArrayIndex(LgsArrayIndex* arrayIndex);
+    void visitConstant(const LgsConstant* constant);
 
-    void setFuncCallType(LogosFuncCall* funcCall);
-    void setLoopVarType(const LogosForeachLoop* foreachLoop);
-    void setArrayType(LogosArray* array);
-    void setBinaryExprType(LogosBinaryExpr* binaryExpr);
-    void setForLoopIterable(LogosForeachLoop* foreachLoop, const LogosVariable* variable);
-    void setForLoopIterable(LogosForeachLoop* foreachLoop);
+    void setFuncCallType(LgsFuncCall* funcCall);
+    void setLoopVarType(const LgsForeachLoop* foreachLoop);
+    void setArrayType(LgsArray* array);
+    void setBinaryExprType(LgsBinaryExpr* binaryExpr);
+    void setForLoopIterable(LgsForeachLoop* foreachLoop, const LgsVariable* variable);
+    void setForLoopIterable(LgsForeachLoop* foreachLoop);
 
-    bool matchTypes(const LogosType* first, const LogosType* second, const LogosValue* value);
-    void printError(LogosErrCode code, const LogosValue* value, const vector<string>& args = {});
-    LogosSymbol* getSymbol(const string& name, const LogosValue* value);
+    bool matchTypes(const LgsType* first, const LgsType* second, const LgsValue* value);
+    void printError(LogosErrCode code, const LgsValue* value, const vector<string>& args = {});
+    LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     ~SemaAnalyser() = default;
 };
 

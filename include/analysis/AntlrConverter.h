@@ -2,51 +2,51 @@
 #define SEMANTICANALYSER_H
 
 #include "LogosParser.h"
-#include "unary/LogosMethodCall.h"
+#include "unary/LgsMethodCall.h"
 #include "unary/LogosUnaryExpr.h"
-#include "files/LogosMainFile.h"
-#include "files/LogosObjectFile.h"
-#include "stmts/LogosAssignment.h"
-#include "stmts/LogosIf.h"
-#include "types/LogosInt.h"
-#include "constants/LogosTypeConst.h"
+#include "files/LgsMainFile.h"
+#include "files/LgsObjectFile.h"
+#include "stmts/LgsAssignment.h"
+#include "stmts/LgsIf.h"
+#include "types/LgsInt.h"
+#include "constants/LgsTypeConst.h"
 
-class LogosAssignment;
+class LgsAssignment;
 using namespace std;
 
 class AntlerConverter {
 public:
-    static LogosFile* getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath);
-    static LogosMainFile* getMainFile(LogosParser::MainFileContext* ctx, const string& filePath);
-    static LogosObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath);
-    static LogosObject* getObject(LogosParser::ObjectFileContext* ctx);
-    static LogosField* getField(LogosParser::ExplicitVarDecContext* varDec, size_t position, const string& parentName);
-    static LogosFuncImpl* getFuncImpl(LogosParser::FuncImplementationContext* ctx);
-    static LogosMethodImpl* getMethodImpl(LogosParser::FuncImplementationContext* ctx, LogosObject* obj);
-    static LogosStmt* getStmt(LogosParser::StatementContext* ctx);
-    static LogosAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
-    static LogosStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
-    static LogosVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
-    static LogosParam* getParam(LogosParser::ExplicitVarDecContext* ctx);
-    static LogosVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
-    static LogosIf* getIfStatement(LogosParser::IfStatementContext* ctx);
-    static LogosLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
+    static LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath);
+    static LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const string& filePath);
+    static LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath);
+    static LgsObject* getObject(LogosParser::ObjectFileContext* ctx);
+    static LgsField* getField(LogosParser::ExplicitVarDecContext* varDec, size_t position, const string& parentName);
+    static LgsFuncImpl* getFuncImpl(LogosParser::FuncImplementationContext* ctx);
+    static LgsMethodImpl* getMethodImpl(LogosParser::FuncImplementationContext* ctx, LgsObject* obj);
+    static LgsStmt* getStmt(LogosParser::StatementContext* ctx);
+    static LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
+    static LgsStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
+    static LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
+    static LgsParam* getParam(LogosParser::ExplicitVarDecContext* ctx);
+    static LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
+    static LgsIf* getIfStatement(LogosParser::IfStatementContext* ctx);
+    static LgsLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
     static LogosExpr* getExpr(LogosParser::ExprContext* ctx);
-    static LogosUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
+    static LgsUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     static LogosExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
-    static LogosUnaryExpr* getArray(LogosParser::ArrayContext* ctx);
-    static LogosVariable* getVariable(const string& varName, const ParserRuleContext* ctx);
-    static LogosFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
-    static LogosMethodCall *getMethodCall(LogosParser::FuncCallContext* ctx);
-    static LogosUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
-    static vector<LogosUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
-    static LogosSelection* getSelection(LogosParser::SelectionContext* ctx);
-    static LogosInstance* getInstance(LogosParser::ConstructorContext* ctx);
-    static LogosArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
-    static LogosUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
-    static LogosTypeConst* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
-    static LogosType* getType(tree::TerminalNode* type);
-    static LogosType* getFuncType(LogosParser::FuncImplementationContext* ctx);
+    static LgsUnaryExpr* getArray(LogosParser::ArrayContext* ctx);
+    static LgsVariable* getVariable(const string& varName, const ParserRuleContext* ctx);
+    static LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
+    static LgsMethodCall *getMethodCall(LogosParser::FuncCallContext* ctx);
+    static LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
+    static vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
+    static LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
+    static LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
+    static LgsArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
+    static LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
+    static LgsTypeConst* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
+    static LgsType* getType(tree::TerminalNode* type);
+    static LgsType* getFuncType(LogosParser::FuncImplementationContext* ctx);
     ~AntlerConverter() = default;
 };
 

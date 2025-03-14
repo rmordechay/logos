@@ -1,20 +1,20 @@
 #include "CodeGenerator.h"
 
-#include "funcs/LogosFuncImpl.h"
+#include "funcs/LgsFuncImpl.h"
 
 #include <ranges>
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/FileSystem.h>
 
-using LogosGlobals = const std::map<std::string, LogosSymbol>&;
+using LogosGlobals = const std::map<std::string, LgsSymbol>&;
 
-void CodeGenerator::generateCode(const LogosMainFile* mainFile, const map<string, LogosSymbol>& globalSymbols) {
+void CodeGenerator::generateCode(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols) {
     init();
     generateModule(mainFile, globalSymbols);
 }
 
-void CodeGenerator::generateModule(const LogosMainFile* mainFile, const map<string, LogosSymbol>& globalSymbols) const {
+void CodeGenerator::generateModule(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols) const {
     const auto module = createModule(LOGOS_MAIN_FILE);
     auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
     metadata.logosStack.globalSymbols = globalSymbols;
@@ -28,7 +28,7 @@ void CodeGenerator::generateModule(const LogosMainFile* mainFile, const map<stri
     writeIRToFile(metadata.currentModule, buildDir, LOGOS_MAIN_FILE);
 }
 
-void CodeGenerator::generateModule(LogosObject* obj, const map<string, LogosSymbol>& globalSymbols, const path& buildDir) {
+void CodeGenerator::generateModule(LgsObject* obj, const map<string, LgsSymbol>& globalSymbols, const path& buildDir) {
     const auto objName = obj->getName();
     const auto module = createModule(objName);
     auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};

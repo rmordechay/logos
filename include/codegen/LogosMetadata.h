@@ -1,12 +1,12 @@
 #ifndef LOGOSMETADATA_H
 #define LOGOSMETADATA_H
 
-#include <LogosStack.h>
+#include <LgsStack.h>
 #include <llvm/IR/IRBuilder.h>
 #include <filesystem>
 
 class CodeGenerator;
-class LogosStack;
+class LgsStack;
 
 using namespace llvm;
 using namespace std;
@@ -15,7 +15,7 @@ inline LLVMContext context;
 inline map<string, Module*> modules;
 
 struct CodeGenMetadata {
-    LogosStack logosStack;
+    LgsStack logosStack;
     Module* currentModule;
     IRBuilder<> builder = IRBuilder(context);
     filesystem::path buildDir;

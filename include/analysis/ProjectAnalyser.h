@@ -1,21 +1,21 @@
 #ifndef PROJECTANALYSER_H
 #define PROJECTANALYSER_H
 #include "LogosAnalyser.h"
-#include "LogosError.h"
+#include "LgsError.h"
 
-#include <LogosFile.h>
+#include <LgsFile.h>
 #include <mutex>
 #include <vector>
 
 class ProjectAnalyser final : public LogosAnalyser {
 public:
     std::mutex mtx;
-    const vector<LogosFile*>& files;
+    const vector<LgsFile*>& files;
 
-    explicit ProjectAnalyser(const vector<LogosFile*>& files) : files(files) {}
+    explicit ProjectAnalyser(const vector<LgsFile*>& files) : files(files) {}
     bool analyse();
     void analyseStructure();
-    void printDuplicateFiles(const map<string, vector<LogosFile*>>& duplicates);
+    void printDuplicateFiles(const map<string, vector<LgsFile*>>& duplicates);
 };
 
 #endif //PROJECTANALYSER_H

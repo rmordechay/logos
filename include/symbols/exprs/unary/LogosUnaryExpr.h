@@ -3,16 +3,16 @@
 #include "LogosExpr.h"
 
 #include <string>
-#include <LogosType.h>
+#include <LgsType.h>
 
-class LogosUnaryExpr: public LogosExpr {
+class LgsUnaryExpr: public LogosExpr {
 public:
-    explicit LogosUnaryExpr() : LogosExpr(nullptr) {}
-    explicit LogosUnaryExpr(LogosType* type) : LogosExpr(type) {}
+    explicit LgsUnaryExpr() : LogosExpr(nullptr) {}
+    explicit LgsUnaryExpr(LgsType* type) : LogosExpr(type) {}
     virtual string getName();
-    ~LogosUnaryExpr() override = default;
+    ~LgsUnaryExpr() override = default;
 };
 
-inline string LogosUnaryExpr::getName() { return ""; }
+inline string LgsUnaryExpr::getName() { return ""; }
 
 #endif //LOGOSUNARYEXPR_H

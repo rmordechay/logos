@@ -1,5 +1,5 @@
 #include "analysis/ProjectAnalyser.h"
-#include <LogosMainFile.h>
+#include <LgsMainFile.h>
 #include <iostream>
 
 using namespace std;
@@ -12,9 +12,9 @@ bool ProjectAnalyser::analyse() {
 
 void ProjectAnalyser::analyseStructure() {
     bool hasMainFile = false;
-    map<string, vector<LogosFile*>> duplicates;
+    map<string, vector<LgsFile*>> duplicates;
     for (const auto& file : files) {
-        if (dynamic_cast<LogosMainFile*>(file)) {
+        if (dynamic_cast<LgsMainFile*>(file)) {
             hasMainFile = true;
             continue;
         }
@@ -24,7 +24,7 @@ void ProjectAnalyser::analyseStructure() {
     printDuplicateFiles(duplicates);
 }
 
-void ProjectAnalyser::printDuplicateFiles(const map<string, vector<LogosFile*>>& duplicates) {
+void ProjectAnalyser::printDuplicateFiles(const map<string, vector<LgsFile*>>& duplicates) {
     for (const auto &duplicate : duplicates) {
         if (duplicate.second.size() <= 1) continue;
         ostringstream errMsg;
