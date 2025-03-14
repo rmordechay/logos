@@ -15,7 +15,7 @@ public:
 
     explicit LgsPrint() : LgsBuiltinFunc(logosName, &LOGOS_VOID) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
+    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override;
     ~LgsPrint() override = default;
 };
 

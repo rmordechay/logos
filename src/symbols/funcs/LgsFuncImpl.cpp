@@ -15,7 +15,7 @@ Value* LgsFuncImpl::createIRValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
 
-Value* LgsFuncImpl::call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
+Value* LgsFuncImpl::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     const auto symbol = metadata->logosStack.getSymbol(name);
     vector<Value*> paramValues;
     for (const auto& arg : args) {

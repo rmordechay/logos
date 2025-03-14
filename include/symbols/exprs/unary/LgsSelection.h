@@ -13,7 +13,7 @@ public:
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* resolveType(CodeGenMetadata* metadata, LgsUnaryExpr* nextExpr, LgsType* logosType) const;
     Value* resolveSelectionVariable(CodeGenMetadata* metadata, const LgsVariable* variable, LgsUnaryExpr* nextExpr) const;
-    LogosExpr* lastExpr() const;
+    LgsExpr* lastExpr() const;
     string getName() override;
     ~LgsSelection() override;
 };

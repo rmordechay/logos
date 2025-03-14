@@ -1,6 +1,7 @@
 #include "SemaAnalyser.h"
 #include "LgsError.h"
 #include "binary/LgsBinaryExpr.h"
+#include "constants/LgsStringConst.h"
 #include "unary/LgsMethodCall.h"
 #include "loops/LgsLoopVar.h"
 #include "stmts/LgsField.h"
@@ -147,7 +148,7 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
     visitExpr(returnStmt->expr);
 }
 
-void SemaAnalyser::visitExpr(LogosExpr* expr) {
+void SemaAnalyser::visitExpr(LgsExpr* expr) {
     if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(expr)) {
         visitUnaryExpr(unaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
@@ -310,6 +311,8 @@ void SemaAnalyser::setForLoopIterable(LgsForeachLoop* foreachLoop) {
         setForLoopIterable(foreachLoop, variable);
     } else if (const auto array = dynamic_cast<LgsArray*>(foreachLoop->iterableExpr)) {
         foreachLoop->iterable = array;
+    } else if (const auto str = dynamic_cast<LgsStringConst*>(foreachLoop->iterableExpr)) {
+        foreachLoop->iterable = str;
     }
 }
 
@@ -318,7 +321,9 @@ void SemaAnalyser::setForLoopIterable(LgsForeachLoop* foreachLoop, const LgsVari
     if (!symbol) return;
     switch (symbol->type) {
     case VAR_DEC: {
-        foreachLoop->iterable = dynamic_cast<LgsIterable*>(symbol->varDec->expr);
+        const auto a = dynamic_cast<LgsConstant*>(symbol->varDec->expr);
+        const auto lgsStringConst = get_if<LgsStringConst*>(&a->value);
+        foreachLoop->iterable = *lgsStringConst;
         return;
     }
     case LOOP_VAR: {
@@ -340,8 +345,8 @@ void SemaAnalyser::setForLoopIterable(LgsForeachLoop* foreachLoop, const LgsVari
     }
 }
 
-void SemaAnalyser::printError(const LogosErrCode code, const LgsValue* value, const vector<string>& args) {
-    LogosAnalyser::printError(code, args);
+void SemaAnalyser::printError(const LgsErrCode code, const LgsValue* value, const vector<string>& args) {
+    LgsAnalyser::printError(code, args);
     const auto lineNumber = to_string(value->position.lineNumber);
     const auto pos = to_string(value->position.posInLine);
     const auto path = file->absPath + ":" + lineNumber + ":" + pos;

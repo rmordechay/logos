@@ -15,7 +15,7 @@ Value* LgsMethodImpl::createIRValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
 
-Value* LgsMethodImpl::call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
+Value* LgsMethodImpl::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     vector<Value*> argValues;
     for (const auto& arg : args) {
         const auto argValue = arg->getIRValue(metadata);

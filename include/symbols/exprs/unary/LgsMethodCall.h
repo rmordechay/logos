@@ -6,7 +6,7 @@
 class LgsMethodCall final : public LgsStmt, public LgsUnaryExpr {
 public:
     string name;
-    vector<LogosExpr*> args;
+    vector<LgsExpr*> args;
     LgsMethodImpl* methodImpl = nullptr;
     Position position = Position();
 

@@ -2,13 +2,13 @@
 #define LOGOSFIELDDEC_H
 #include "LgsStmt.h"
 
-class LogosExpr;
+class LgsExpr;
 class LgsType;
 
 class LgsAssignment final : public LgsStmt {
 public:
-    LogosExpr* lvalue;
-    LogosExpr* rvalue;
+    LgsExpr* lvalue;
+    LgsExpr* rvalue;
 
     Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsAssignment() override;

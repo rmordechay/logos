@@ -1,6 +1,6 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
-#include "LogosAnalyser.h"
+#include "LgsAnalyser.h"
 #include "LgsStack.h"
 #include "unary/LogosUnaryExpr.h"
 #include "files/LgsMainFile.h"
@@ -23,7 +23,7 @@ class LgsIf;
 class LgsAssignment;
 class LgsLoop;
 
-class SemaAnalyser final : public LogosAnalyser {
+class SemaAnalyser final : public LgsAnalyser {
 public:
     LgsStack logosStack;
     LgsFile* file = nullptr;
@@ -47,7 +47,7 @@ public:
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);
     void visitForeachLoop(LgsForeachLoop* foreachLoop);
     void visitReturnStmt(const LgsReturn* returnStmt);
-    void visitExpr(LogosExpr* expr);
+    void visitExpr(LgsExpr* expr);
     void visitArray(LgsArray* array);
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
@@ -68,7 +68,7 @@ public:
     void setForLoopIterable(LgsForeachLoop* foreachLoop);
 
     bool matchTypes(const LgsType* first, const LgsType* second, const LgsValue* value);
-    void printError(LogosErrCode code, const LgsValue* value, const vector<string>& args = {});
+    void printError(LgsErrCode code, const LgsValue* value, const vector<string>& args = {});
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     ~SemaAnalyser() = default;
 };

@@ -13,7 +13,7 @@ public:
         setCombinedName();
     }
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
+    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override;
     void setIRFunc(CodeGenMetadata* metadata);
     void setCombinedName();
     ~LgsMethodImpl() override = default;

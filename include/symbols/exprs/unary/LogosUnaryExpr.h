@@ -5,10 +5,10 @@
 #include <string>
 #include <LgsType.h>
 
-class LgsUnaryExpr: public LogosExpr {
+class LgsUnaryExpr: public LgsExpr {
 public:
-    explicit LgsUnaryExpr() : LogosExpr(nullptr) {}
-    explicit LgsUnaryExpr(LgsType* type) : LogosExpr(type) {}
+    explicit LgsUnaryExpr() : LgsExpr(nullptr) {}
+    explicit LgsUnaryExpr(LgsType* type) : LgsExpr(type) {}
     virtual string getName();
     ~LgsUnaryExpr() override = default;
 };

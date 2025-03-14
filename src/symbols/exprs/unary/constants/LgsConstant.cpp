@@ -10,12 +10,10 @@ Value* LgsConstant::createIRValue(CodeGenMetadata* metadata) {
         return metadata->builder.getInt32(*intValue);
     }
     if (const auto stringValue = get_if<LgsStringConst*>(&value)) {
-        auto value = (*stringValue)->value;
-        value.erase(0, 1);
-        value.erase(value.size() - 1);
-        const auto irString = ConstantDataArray::getString(context, value, true);
-        // TODO check if already exists
-        return new GlobalVariable(*metadata->currentModule, irString->getType(), true, GlobalValue::PrivateLinkage, irString, ".str");
+        auto str = (*stringValue)->value;
+        str.erase(0, 1);
+        str.erase(str.size() - 1);
+        return ConstantDataArray::getString(context, str, true);
     }
     return nullptr;
 }

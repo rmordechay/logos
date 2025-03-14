@@ -57,7 +57,7 @@ string LgsSelection::getName() {
     return "";
 }
 
-LogosExpr* LgsSelection::lastExpr() const {
+LgsExpr* LgsSelection::lastExpr() const {
     if (exprs.empty()) return nullptr;
     return exprs[exprs.size() - 1];
 }

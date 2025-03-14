@@ -3,7 +3,7 @@
 #include "LgsValue.h"
 
 class LgsType;
-class LogosExpr;
+class LgsExpr;
 
 class LgsField final : public LgsValue {
 public:
@@ -11,10 +11,10 @@ public:
     string parentName;
     size_t fieldPosition;
     LgsType* type = nullptr;
-    LogosExpr* expr = nullptr;
+    LgsExpr* expr = nullptr;
     Value* gep = nullptr;
 
-    LgsField(const string& name, const string& parentName, LgsType* type, const size_t fieldPosition, LogosExpr* expr) :
+    LgsField(const string& name, const string& parentName, LgsType* type, const size_t fieldPosition, LgsExpr* expr) :
         name(name),
         parentName(parentName),
         fieldPosition(fieldPosition),
@@ -23,7 +23,7 @@ public:
     }
 
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    void setFieldIRValue(CodeGenMetadata* metadata, LogosExpr* lvalueExpr, LgsInstance* instance);
+    void setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* lvalueExpr, LgsInstance* instance);
     ~LgsField() override = default;
 };
 

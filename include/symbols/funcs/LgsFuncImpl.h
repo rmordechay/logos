@@ -7,7 +7,7 @@ public:
 
     explicit LgsFuncImpl(const string& name, LgsType* funcType) : LgsFunc(name, funcType) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) override;
+    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override;
     void setIRFunc(CodeGenMetadata* metadata);
     void setCombinedName();
     ~LgsFuncImpl() override = default;

@@ -5,9 +5,9 @@
 
 class LgsReturn final : public LgsStmt {
 public:
-    LogosExpr *expr = nullptr;
+    LgsExpr *expr = nullptr;
 
-    explicit LgsReturn(LogosExpr* expr) : expr(expr) {}
+    explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsReturn() override;
 };

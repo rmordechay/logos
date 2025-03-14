@@ -6,14 +6,14 @@
 #include <LogosMetadata.h>
 #include <LgsType.h>
 
-class LgsBinaryExpr final : public LogosExpr {
+class LgsBinaryExpr final : public LgsExpr {
 public:
-    LogosExpr* left;
-    LogosExpr* right;
+    LgsExpr* left;
+    LgsExpr* right;
     LgsOperator op;
 
-    explicit LgsBinaryExpr(LgsType* type, LogosExpr* left, LogosExpr* right, const LgsOperator op) :
-        LogosExpr(type),
+    explicit LgsBinaryExpr(LgsType* type, LgsExpr* left, LgsExpr* right, const LgsOperator op) :
+        LgsExpr(type),
         left(left),
         right(right),
         op(op) {

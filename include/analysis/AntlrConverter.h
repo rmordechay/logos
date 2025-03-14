@@ -31,9 +31,9 @@ public:
     static LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     static LgsIf* getIfStatement(LogosParser::IfStatementContext* ctx);
     static LgsLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
-    static LogosExpr* getExpr(LogosParser::ExprContext* ctx);
+    static LgsExpr* getExpr(LogosParser::ExprContext* ctx);
     static LgsUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
-    static LogosExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
+    static LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     static LgsUnaryExpr* getArray(LogosParser::ArrayContext* ctx);
     static LgsVariable* getVariable(const string& varName, const ParserRuleContext* ctx);
     static LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);

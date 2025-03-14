@@ -7,7 +7,7 @@
 
 class LgsArray final : public LgsUnaryExpr, public LgsIterable {
 public:
-    vector<LogosExpr*> elements;
+    vector<LgsExpr*> elements;
 
     explicit LgsArray() : LgsUnaryExpr(nullptr) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;

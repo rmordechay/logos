@@ -14,7 +14,7 @@ Value* LgsField::createIRValue(CodeGenMetadata* metadata) {
     return metadata->builder.CreateLoad(ty, gep);
 }
 
-void LgsField::setFieldIRValue(CodeGenMetadata* metadata, LogosExpr* lvalueExpr, LgsInstance* instance) {
+void LgsField::setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* lvalueExpr, LgsInstance* instance) {
     const auto ty = instance->obj->getIRType();
     const auto v = instance->getIRValue(metadata);
     gep = metadata->builder.CreateStructGEP(ty, v, fieldPosition);

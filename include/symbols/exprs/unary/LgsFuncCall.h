@@ -6,7 +6,7 @@
 class LgsFuncCall final : public LgsStmt, public LgsUnaryExpr {
 public:
     string name;
-    vector<LogosExpr*> args;
+    vector<LgsExpr*> args;
     Position position = Position();
 
     explicit LgsFuncCall(const string& name) : name(name) {}

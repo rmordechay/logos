@@ -8,7 +8,7 @@ class LgsBuiltinFunc;
 class LgsVarDec;
 class LgsMethodImpl;
 class LgsFuncImpl;
-class LogosExpr;
+class LgsExpr;
 class LgsArrayIndex;
 class LgsArray;
 class LgsSelection;

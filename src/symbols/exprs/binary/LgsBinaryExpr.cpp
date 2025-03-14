@@ -1,5 +1,10 @@
 #include "binary/LgsBinaryExpr.h"
 
+#include "LgsError.h"
+#include "LgsAnalyser.h"
+#include "constants/LgsConstant.h"
+#include "constants/LgsStringConst.h"
+
 Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
     const auto l = left->getIRValue(metadata);
     const auto r = right->getIRValue(metadata);

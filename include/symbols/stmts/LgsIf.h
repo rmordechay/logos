@@ -12,13 +12,13 @@
 
 class LgsIf final : public LgsStmt {
 public:
-    LogosExpr* ifCond;
+    LgsExpr* ifCond;
     LgsStmtBlock* ifStmtBlock;
-    vector<LogosExpr*> elseIfConds;
+    vector<LgsExpr*> elseIfConds;
     vector<LgsStmtBlock*> elseIfStmtBlocks;
     LgsStmtBlock* elseStmtBlock = nullptr;
 
-    LgsIf(LogosExpr* ifCond, LgsStmtBlock* ifStmtBlock) : ifCond(ifCond), ifStmtBlock(ifStmtBlock) {}
+    LgsIf(LgsExpr* ifCond, LgsStmtBlock* ifStmtBlock) : ifCond(ifCond), ifStmtBlock(ifStmtBlock) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     void computeSimpleIf(CodeGenMetadata* metadata) const;
     void createElseBlock(CodeGenMetadata* metadata, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const;

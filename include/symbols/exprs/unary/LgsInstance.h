@@ -5,7 +5,7 @@
 class LgsInstance final : public LgsUnaryExpr {
 public:
     string name;
-    vector<LogosExpr*> args;
+    vector<LgsExpr*> args;
     LgsObject* obj = nullptr;
 
     LgsInstance(const string& name) : name(name) {}

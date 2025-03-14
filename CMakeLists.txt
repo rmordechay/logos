@@ -70,7 +70,7 @@ add_library(lib STATIC
     include/cli/LgsCli.h
     include/cli/LgsRunCmd.h
     include/cli/LgsGenerateCmd.h
-    include/analysis/LogosAnalyser.h
+    include/analysis/LgsAnalyser.h
 
     # src
     src/application/Logos.cpp

@@ -1,13 +1,13 @@
 #ifndef PROJECTANALYSER_H
 #define PROJECTANALYSER_H
-#include "LogosAnalyser.h"
+#include "LgsAnalyser.h"
 #include "LgsError.h"
 
 #include <LgsFile.h>
 #include <mutex>
 #include <vector>
 
-class ProjectAnalyser final : public LogosAnalyser {
+class ProjectAnalyser final : public LgsAnalyser {
 public:
     std::mutex mtx;
     const vector<LgsFile*>& files;

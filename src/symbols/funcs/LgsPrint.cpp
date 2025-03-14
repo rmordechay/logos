@@ -4,7 +4,7 @@ Value* LgsPrint::createIRValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
 
-Value* LgsPrint::call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) {
+Value* LgsPrint::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     const auto argType = args[0]->type->getIRType();
     auto argValue = args[0]->getIRValue(metadata);
     FunctionCallee func;

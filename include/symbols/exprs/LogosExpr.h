@@ -3,18 +3,13 @@
 #include "LgsValue.h"
 #include <LgsType.h>
 
-class LogosFuncCall;
-class LogosVariable;
-class LgsConstant;
-class LogosInstance;
-
-class LogosExpr: virtual public LgsValue {
+class LgsExpr: virtual public LgsValue {
 public:
     LgsType* type = nullptr;
 
-    explicit LogosExpr(LgsType* type) : type(type) {}
+    explicit LgsExpr(LgsType* type) : type(type) {}
 
-    ~LogosExpr() override = default;
+    ~LgsExpr() override = default;
 };
 
 #endif //LOGOSEXPR_H

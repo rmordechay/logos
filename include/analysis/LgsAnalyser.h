@@ -10,17 +10,17 @@
 
 using namespace std;
 
-class LogosAnalyser {
+class LgsAnalyser {
 public:
     std::mutex mtx;
     bool successful = true;
 
     void setUnsuccessful();
-    void printError(LogosErrCode code, const vector<string>& args = {});
+    void printError(LgsErrCode code, const vector<string>& args = {});
 };
 
 
-inline void LogosAnalyser::printError(const LogosErrCode code, const vector<string>& args) {
+inline void LgsAnalyser::printError(const LgsErrCode code, const vector<string>& args) {
     setUnsuccessful();
     const auto error = LOGOS_ERRORS.find(code);
     auto pos = 0;
@@ -34,7 +34,7 @@ inline void LogosAnalyser::printError(const LogosErrCode code, const vector<stri
     std::cout << "Error: " << result << '\n';
 }
 
-inline void LogosAnalyser::setUnsuccessful() {
+inline void LgsAnalyser::setUnsuccessful() {
     if (successful) {
         std::unique_lock lock(mtx);
         successful = false;

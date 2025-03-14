@@ -4,7 +4,7 @@
 
 class LgsVariable;
 class LgsStmtBlock;
-class LogosExpr;
+class LgsExpr;
 class LgsLoopVar;
 
 #define BB_LOOP_CONDITION "loop_condition"

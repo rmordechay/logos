@@ -29,7 +29,7 @@ objectImplements:
     ;
 
 funcSignature:
-        VARIABLE LPAREN paramList? RPAREN (COLON TYPE)?
+        VARIABLE LPAREN paramList? RPAREN (COLON type)?
     ;
 
 funcImplementation:
@@ -65,7 +65,7 @@ assignment:
     ;
 
 explicitVarDec:
-        VARIABLE COLON TYPE (EQUAL expr)?
+        VARIABLE COLON type (EQUAL expr)?
     ;
 
 implicitVarDec:
@@ -194,6 +194,10 @@ innerSelectionElement:
 range:
         start=expr? DOUBLE_DOT end=expr
     ;
+
+type:
+        TYPE (LBRACK INTEGER? RBRACK)?
+   ;
 
 DOUBLE_EQUAL: '==';
 NOT_EQUAL: '!=';

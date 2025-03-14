@@ -80,7 +80,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
 
 LgsField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const size_t position, const string& parentName) {
     const auto name = varDec->VARIABLE()->getText();
-    const auto type = getType(varDec->TYPE());
+    const auto type = getType(varDec->type()->TYPE());
     const auto expr = getExpr(varDec->expr());
     return new LgsField(name, parentName, type, position, expr);
 }
@@ -185,7 +185,7 @@ LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext
 LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto expr = getExpr(ctx->expr());
-    const auto userType = getType(ctx->TYPE());
+    const auto userType = getType(ctx->type()->TYPE());
     const auto varDec = new LgsVarDec(variableName, userType, expr);
     varDec->setPosition(ctx->start);
     return varDec;
@@ -194,7 +194,7 @@ LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext
 LgsParam* AntlerConverter::getParam(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto expr = getExpr(ctx->expr());
-    const auto userType = getType(ctx->TYPE());
+    const auto userType = getType(ctx->type()->TYPE());
     const auto param = new LgsParam(variableName, userType, expr);
     param->setPosition(ctx->start);
     return param;
@@ -236,7 +236,7 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
     return loopStmt;
 }
 
-LogosExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
+LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
     if (!ctx) return nullptr;
     if (const auto unary = ctx->unaryExpr()) {
         return getUnaryExpr(unary);
@@ -255,7 +255,7 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     return nullptr;
 }
 
-LogosExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
+LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     const auto l = getExpr(ctx->left);
     const auto r = getExpr(ctx->right);
     const auto logosBinaryExpr = new LgsBinaryExpr(l->type, l, r, mapOperator(ctx));
@@ -383,7 +383,7 @@ LgsArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ct
         baseExpr = getFuncCall(ctx->funcCall());
     }
 
-    vector<LogosExpr*> indexExprs;
+    vector<LgsExpr*> indexExprs;
     for (const auto& expr : ctx->expr()) {
         indexExprs.emplace_back(getExpr(expr));
     }
@@ -432,6 +432,6 @@ LgsType* AntlerConverter::getType(tree::TerminalNode* type) {
 
 LgsType* AntlerConverter::getFuncType(LogosParser::FuncImplementationContext* ctx) {
     const auto signature = ctx->funcSignature();
-    if (signature->TYPE()) return getType(signature->TYPE());
+    if (signature->type()->TYPE()) return getType(signature->type()->TYPE());
     return &LOGOS_VOID;
 }

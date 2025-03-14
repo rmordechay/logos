@@ -8,9 +8,9 @@
 class LgsArrayIndex final : public LgsUnaryExpr {
 public:
     LgsUnaryExpr* baseExpr;
-    vector<LogosExpr*> indexExprs;
+    vector<LgsExpr*> indexExprs;
 
-    explicit LgsArrayIndex(LgsUnaryExpr* baseExpr, const vector<LogosExpr*>& indexExprs) : baseExpr(baseExpr), indexExprs(indexExprs) {}
+    explicit LgsArrayIndex(LgsUnaryExpr* baseExpr, const vector<LgsExpr*>& indexExprs) : baseExpr(baseExpr), indexExprs(indexExprs) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
     ~LgsArrayIndex() override;

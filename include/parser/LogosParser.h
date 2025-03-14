@@ -35,7 +35,7 @@ public:
     RuleUnaryExpr = 28, RuleArray = 29, RuleFuncCall = 30, RuleConstructor = 31, 
     RuleFuncArgList = 32, RuleFuncArg = 33, RuleConstant = 34, RuleArrayIndex = 35, 
     RuleSelection = 36, RuleFirstSelectionElement = 37, RuleInnerSelectionElement = 38, 
-    RuleRange = 39
+    RuleRange = 39, RuleType = 40
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -94,7 +94,8 @@ public:
   class SelectionContext;
   class FirstSelectionElementContext;
   class InnerSelectionElementContext;
-  class RangeContext; 
+  class RangeContext;
+  class TypeContext; 
 
   class  LogosFileContext : public antlr4::ParserRuleContext {
   public:
@@ -206,7 +207,7 @@ public:
     antlr4::tree::TerminalNode *RPAREN();
     ParamListContext *paramList();
     antlr4::tree::TerminalNode *COLON();
-    antlr4::tree::TerminalNode *TYPE();
+    TypeContext *type();
 
    
   };
@@ -305,7 +306,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *COLON();
-    antlr4::tree::TerminalNode *TYPE();
+    TypeContext *type();
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
 
@@ -696,6 +697,20 @@ public:
   };
 
   RangeContext* range();
+
+  class  TypeContext : public antlr4::ParserRuleContext {
+  public:
+    TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *TYPE();
+    antlr4::tree::TerminalNode *LBRACK();
+    antlr4::tree::TerminalNode *RBRACK();
+    antlr4::tree::TerminalNode *INTEGER();
+
+   
+  };
+
+  TypeContext* type();
 
 
   bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;

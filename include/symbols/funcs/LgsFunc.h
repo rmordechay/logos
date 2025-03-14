@@ -6,7 +6,7 @@
 #include "stmts/LgsStmtBlock.h"
 
 class LgsParam;
-class LogosExpr;
+class LgsExpr;
 class LgsStmt;
 class LgsType;
 
@@ -23,7 +23,7 @@ public:
 
     explicit LgsFunc(const string& name, LgsType* funcType) : name(name), type(funcType) {}
     explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam*>& params) : name(name), type(funcType), params(params) {}
-    virtual Value* call(CodeGenMetadata* metadata, const vector<LogosExpr*>& args) = 0;
+    virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) = 0;
     ~LgsFunc() override;
 };
 
