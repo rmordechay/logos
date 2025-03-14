@@ -15,7 +15,7 @@ Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
         const auto allocaInst = builder.CreateAlloca(valueType);
         builder.CreateStore(value, allocaInst);
     }
-    metadata->logosStack.addLocalSymbol(name, LgsSymbol(VAR_DEC, this));
+    metadata->logosStack.addLocalSymbol(name, this);
     return value;
 }
 

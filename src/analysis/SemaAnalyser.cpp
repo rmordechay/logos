@@ -118,7 +118,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     } else {
         varDec->type = userType;
     }
-    addLocalSymbol(varDec->name, LgsSymbol(VAR_DEC, ))
+    addLocalSymbol(varDec->name, LgsSymbol(VAR_DEC, varDec));
 }
 
 
@@ -344,9 +344,7 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
 void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
     if (const auto s = logosStack.getSymbol(name)) {
         const auto symbolPosition = getSymbolPosition(s);
-        const auto lineNumber = to_string(symbolPosition->lineNumber);
-        const auto posInLine = to_string(symbolPosition->posInLine);
-        printError(E10011, &symbol.varDec->location, {name, lineNumber, posInLine});
+        printError(E10011, &symbol.varDec->location, {name, to_string(symbolPosition->lineNumber)});
         return;
     }
     logosStack.addLocalSymbol(name, symbol);
@@ -360,10 +358,10 @@ bool SemaAnalyser::checkExprType(const LgsExpr* expr, const LgsType* otherType) 
     return true;
 }
 
-void SemaAnalyser::printError(const LgsErrCode code, const Location* position, const vector<string>& args) {
+void SemaAnalyser::printError(const LgsErrCode code, const Location* location, const vector<string>& args) {
     LgsAnalyser::printError(code, args);
-    const auto lineNumber = to_string(position->lineNumber);
-    const auto pos = to_string(position->posInLine);
+    const auto lineNumber = to_string(location->lineNumber);
+    const auto pos = to_string(location->posInLine);
     const auto path = file->absPath + ":" + lineNumber + ":" + pos;
     cout << "\tat " << path << '\n';
 }

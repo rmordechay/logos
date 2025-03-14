@@ -14,11 +14,11 @@ public:
     void setIRValue(Value* value);
     Value* getIRValue(CodeGenMetadata* metadata);
     virtual void setPosition(const antlr4::Token* ctx);
-    virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
     static BasicBlock* createBasicBlock(const char* name);
     static void startBlock(CodeGenMetadata* metadata, BasicBlock* block);
     virtual ~LgsValue() = default;
 private:
+    virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
     Value* IRValue = nullptr;
 };
 

@@ -27,7 +27,9 @@ public:
 inline string LgsUnaryExpr::getName() { return ""; }
 
 inline Value* LgsUnaryExpr::add(CodeGenMetadata* metadata, LgsExpr* other) {
-     assert(false && "unary add operator not implemented");
+     const auto l = this->getIRValue(metadata);
+     const auto r = other->getIRValue(metadata);
+     return metadata->builder.CreateAdd(l, r);
 }
 
 inline Value* LgsUnaryExpr::sub(CodeGenMetadata* metadata, LgsExpr* other) {
@@ -35,7 +37,9 @@ inline Value* LgsUnaryExpr::sub(CodeGenMetadata* metadata, LgsExpr* other) {
 }
 
 inline Value* LgsUnaryExpr::mul(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false && "unary mul operator not implemented");
+    const auto l = this->getIRValue(metadata);
+    const auto r = other->getIRValue(metadata);
+    return metadata->builder.CreateMul(l, r);
 }
 
 inline Value* LgsUnaryExpr::div(CodeGenMetadata* metadata, LgsExpr* other) {

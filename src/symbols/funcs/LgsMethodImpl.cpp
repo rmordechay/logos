@@ -44,7 +44,7 @@ void LgsMethodImpl::setIRFunc(CodeGenMetadata* metadata) {
     for (const auto& param : params) {
         param->setIRValue(args);
         args++->setName(param->name);
-        metadata->logosStack.addLocalSymbol(param->name, LgsSymbol(PARAM, param));
+        metadata->logosStack.addLocalSymbol(param->name, param);
     }
 }
 
