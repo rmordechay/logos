@@ -7,7 +7,6 @@ class LgsField;
 
 class LgsObject final : public LgsType {
 public:
-
     string name;
     Type* IRType = nullptr;
 

@@ -118,6 +118,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     } else {
         varDec->type = userType;
     }
+    addLocalSymbol(varDec->name, LgsSymbol(VAR_DEC, ))
 }
 
 
@@ -264,7 +265,7 @@ void SemaAnalyser::setVariableType(LgsVariable* variable) {
     }
 }
 
-void SemaAnalyser::visitConstant(const LgsConst* constant) {
+void SemaAnalyser::visitConstant(const LgsConst* constant) const {
 }
 
 void SemaAnalyser::setLoopVar(const LgsForeachLoop* foreachLoop) {
@@ -274,12 +275,12 @@ void SemaAnalyser::setLoopVar(const LgsForeachLoop* foreachLoop) {
     addLocalSymbol(foreachLoop->loopVar->name, LgsSymbol(VAR_DEC, varDec));
 }
 
-void SemaAnalyser::setArrayType(LgsArray* array) {
+void SemaAnalyser::setArrayType(LgsArray* array) const {
     // TODO add proper check for array type
     array->type = array->elements[0]->type;
 }
 
-void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
+void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) const {
     switch (binaryExpr->op) {
     case PLUS:
     case MINUS:
@@ -324,13 +325,9 @@ void SemaAnalyser::setForLoopIterable(LgsForeachLoop* foreachLoop, const LgsVari
     if (!symbol) return;
     switch (symbol->type) {
     case VAR_DEC: {
-        foreachLoop->iterable = dynamic_cast<LgsStrConst*>(symbol->varDec->expr);
         return;
     }
-    case SELECTION: {
-        if (const auto lastExpr = symbol->selection->lastExpr()) {
-            foreachLoop->iterable = dynamic_cast<LgsIterable*>(lastExpr);
-        }
+    case PARAM: {
         return;
     }
     default:
@@ -338,31 +335,50 @@ void SemaAnalyser::setForLoopIterable(LgsForeachLoop* foreachLoop, const LgsVari
     }
 }
 
-void SemaAnalyser::printError(const LgsErrCode code, const LgsValue* value, const vector<string>& args) {
-    LgsAnalyser::printError(code, args);
-    const auto lineNumber = to_string(value->position.lineNumber);
-    const auto pos = to_string(value->position.posInLine);
-    const auto path = file->absPath + ":" + lineNumber + ":" + pos;
-    cout << "\tat " << path << '\n';
-}
-
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
     const auto symbol = logosStack.getSymbol(name);
-    if (!symbol) printError(E10006, value, {name});
+    if (!symbol) printError(E10006, &value->location, {name});
     return symbol;
 }
 
 void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
     if (const auto s = logosStack.getSymbol(name)) {
-        printError(E10011, symbol.varDec, {name});
+        const auto symbolPosition = getSymbolPosition(s);
+        const auto lineNumber = to_string(symbolPosition->lineNumber);
+        const auto posInLine = to_string(symbolPosition->posInLine);
+        printError(E10011, &symbol.varDec->location, {name, lineNumber, posInLine});
+        return;
     }
     logosStack.addLocalSymbol(name, symbol);
 }
 
 bool SemaAnalyser::checkExprType(const LgsExpr* expr, const LgsType* otherType) {
     if (expr && otherType && otherType->equals(expr->type)) {
-        printError(E10001, expr, {otherType->getName(), expr->type->getName()});
+        printError(E10001, &expr->location, {otherType->getName(), expr->type->getName()});
         return false;
     }
     return true;
+}
+
+void SemaAnalyser::printError(const LgsErrCode code, const Location* position, const vector<string>& args) {
+    LgsAnalyser::printError(code, args);
+    const auto lineNumber = to_string(position->lineNumber);
+    const auto pos = to_string(position->posInLine);
+    const auto path = file->absPath + ":" + lineNumber + ":" + pos;
+    cout << "\tat " << path << '\n';
+}
+
+Location* SemaAnalyser::getSymbolPosition(const LgsSymbol* s) const {
+    switch (s->type) {
+    case VAR_DEC:
+        return &s->varDec->location;
+    case PARAM:
+        return &s->param->location;
+    case BUILTIN_FUNC:
+        return &s->builtinFunc->location;
+    case FUNC_IMPL:
+        return &s->funcImpl->location;
+    default:
+        return nullptr;
+    }
 }

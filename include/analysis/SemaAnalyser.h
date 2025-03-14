@@ -58,17 +58,18 @@ public:
     void visitSelection(LgsSelection* selection);
     void visitInstance(LgsInstance* instance);
     void visitArrayIndex(LgsArrayIndex* arrayIndex);
-    void visitConstant(const LgsConst* constant);
+    void visitConstant(const LgsConst* constant) const;
 
     void setFuncCallType(LgsFuncCall* funcCall);
     void setLoopVar(const LgsForeachLoop* foreachLoop);
-    void setArrayType(LgsArray* array);
-    void setBinaryExprType(LgsBinaryExpr* binaryExpr);
+    void setArrayType(LgsArray* array) const;
+    void setBinaryExprType(LgsBinaryExpr* binaryExpr) const;
     void setForLoopIterable(LgsForeachLoop* foreachLoop, const LgsVariable* variable);
     void setForLoopIterable(LgsForeachLoop* foreachLoop);
 
     bool checkExprType(const LgsExpr* expr, const LgsType* otherType);
-    void printError(LgsErrCode code, const LgsValue* value, const vector<string>& args = {});
+    Location* getSymbolPosition(const LgsSymbol* s) const;
+    void printError(LgsErrCode code, const Location* position, const vector<string>& args);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     ~SemaAnalyser() = default;

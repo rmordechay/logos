@@ -25,18 +25,16 @@ enum LgsSymbolType {
     OBJECT,
     BUILTIN_FUNC,
     FUNC_IMPL,
-    SELECTION,
 };
 
 struct LgsSymbol {
     LgsSymbolType type;
     union {
+        LgsObject* object;
         LgsVarDec* varDec;
         LgsParam* param;
-        LgsObject* object;
         LgsBuiltinFunc* builtinFunc;
         LgsFuncImpl* funcImpl;
-        LgsSelection* selection;
     };
 
     LgsSymbol() :
@@ -52,11 +50,6 @@ struct LgsSymbol {
     LgsSymbol(const LgsSymbolType type, LgsVarDec* varDec) :
         type(type),
         varDec(varDec) {
-    }
-
-    LgsSymbol(const LgsSymbolType type, LgsSelection* selection) :
-        type(type),
-        selection(selection) {
     }
 
     LgsSymbol(const LgsSymbolType type, LgsBuiltinFunc* builtinFunc) :

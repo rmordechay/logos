@@ -22,9 +22,13 @@ public:
     LgsSymbol* getSymbol(const string& name);
     bool hasSymbol(const string& name);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
-    void addGlobalSymbol(const string& name, const LgsSymbol& symbol);
-    void deleteGlobalSymbol(const string& name);
-    string getStackString();
+    void addLocalSymbol(const string& name, LgsObject& symbol);
+    void addLocalSymbol(const string& name, LgsVarDec& symbol);
+    void addLocalSymbol(const string& name, LgsParam& symbol);
+    void addLocalSymbol(const string& name, LgsBuiltinFunc& symbol);
+    void addLocalSymbol(const string& name, LgsFuncImpl& symbol);
+    void addGlobalSymbol(const string& name, LgsSymbol& symbol);
+    string getStackString() const;
     void reset();
     ~LgsStack() = default;
 };
@@ -58,20 +62,35 @@ inline bool LgsStack::hasSymbol(const string& name) {
     return symbols.find(name) != symbols.end();
 }
 
-
 inline void LgsStack::addLocalSymbol(const string& name, const LgsSymbol& symbol) {
     top().symbols[name] = symbol;
 }
 
-inline void LgsStack::addGlobalSymbol(const string& name, const LgsSymbol& symbol) {
+inline void LgsStack::addLocalSymbol(const string& name, LgsObject& symbol) {
+    addLocalSymbol(name, LgsSymbol(VAR_DEC, &symbol));
+}
+
+inline void LgsStack::addLocalSymbol(const string& name, LgsVarDec& symbol) {
+    addLocalSymbol(name, LgsSymbol(VAR_DEC, &symbol));
+}
+
+inline void LgsStack::addLocalSymbol(const string& name, LgsParam& symbol) {
+    addLocalSymbol(name, LgsSymbol(VAR_DEC, &symbol));
+}
+
+inline void LgsStack::addLocalSymbol(const string& name, LgsBuiltinFunc& symbol) {
+    addLocalSymbol(name, LgsSymbol(VAR_DEC, &symbol));
+}
+
+inline void LgsStack::addLocalSymbol(const string& name, LgsFuncImpl& symbol) {
+    addLocalSymbol(name, LgsSymbol(VAR_DEC, &symbol));
+}
+
+inline void LgsStack::addGlobalSymbol(const string& name, LgsSymbol& symbol) {
     globalSymbols[name] = symbol;
 }
 
-inline void LgsStack::deleteGlobalSymbol(const string& name) {
-    globalSymbols.erase(name);
-}
-
-inline string LgsStack::getStackString() {
+inline string LgsStack::getStackString() const {
     return "";
 }
 

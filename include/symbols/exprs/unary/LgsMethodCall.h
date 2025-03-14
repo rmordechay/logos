@@ -8,7 +8,7 @@ public:
     string name;
     vector<LgsExpr*> args;
     LgsMethodImpl* methodImpl = nullptr;
-    Position position = Position();
+    Location position = Location();
 
     explicit LgsMethodCall(const string& name) : name(name) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;

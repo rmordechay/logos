@@ -14,7 +14,7 @@ enum LgsErrCode {
 };
 
 enum LgsWarningCode {
-    E50000, E50001, E50002, E50003, E50004, E50005, E50006, E50007, E50008, E50009,
+    W10000, W10001, W10002, W10003, W10004, W10005, W10006, W10007, W10008, W10009,
 };
 
 const map<LgsErrCode, string> LOGOS_ERRORS = {
@@ -26,14 +26,14 @@ const map<LgsErrCode, string> LOGOS_ERRORS = {
     {E10005, "'%s' is not a member of '%s'."},
     {E10006, "'%s' is not defined."},
     {E10007, "File name '%s.lgs' is duplicate. All files in a project must be unique. Locations:%s"},
-    {E10008, "'Main.lgs' could not be found in 'src' directory"},
+    {E10008, "'Main.lgs' could not be found in 'src' directory."},
     {E10009, "Duplicate Main files were found in the project. Locations:%s"},
-    {E10010, "Current path is not a root path of a logos project"},
-    {E10011, "'{}' is already declared at {}"},
+    {E10010, "Current path is not a root path of a logos project."},
+    {E10011, "'{}' is already declared at {}:{}."},
 };
 
 const map<LgsWarningCode, string> LOGOS_WARNINGS = {
-    {E50000, "variable %s is never used."},
+    {W10000, "variable %s is never used."},
 };
 
 #endif //LOGOSERRORS_H

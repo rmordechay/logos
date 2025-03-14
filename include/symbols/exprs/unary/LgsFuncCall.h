@@ -7,7 +7,7 @@ class LgsFuncCall final : public LgsStmt, public LgsUnaryExpr {
 public:
     string name;
     vector<LgsExpr*> args;
-    Position position = Position();
+    Location position = Location();
 
     explicit LgsFuncCall(const string& name) : name(name) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;

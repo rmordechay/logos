@@ -9,7 +9,7 @@ constexpr auto privateLinkage = GlobalValue::PrivateLinkage;
 
 class LgsValue {
 public:
-    Position position = Position();
+    Location location;
 
     void setIRValue(Value* value);
     Value* getIRValue(CodeGenMetadata* metadata);
@@ -23,8 +23,8 @@ private:
 };
 
 inline void LgsValue::setPosition(const antlr4::Token* ctx) {
-    position.lineNumber = ctx->getLine();
-    position.posInLine = ctx->getCharPositionInLine() + 1;
+    location.lineNumber = ctx->getLine();
+    location.posInLine = ctx->getCharPositionInLine() + 1;
 }
 
 inline Value* LgsValue::getIRValue(CodeGenMetadata* metadata) {

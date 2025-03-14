@@ -19,7 +19,7 @@ struct CodeGenMetadata {
     IRBuilder<> builder = IRBuilder(context);
 };
 
-struct Position {
+struct Location {
     size_t lineNumber{};
     size_t posInLine{};
 };
