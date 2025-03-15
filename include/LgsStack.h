@@ -26,8 +26,7 @@ public:
     void addLocalSymbol(const string& name, LgsObject* symbol);
     void addLocalSymbol(const string& name, LgsVarDec* symbol);
     void addLocalSymbol(const string& name, LgsParam* symbol);
-    void addLocalSymbol(const string& name, LgsBuiltinFunc* symbol);
-    void addLocalSymbol(const string& name, LgsFuncImpl* symbol);
+    void addLocalSymbol(const string& name, LgsFunc* symbol);
     string getStackString() const;
     void reset();
     ~LgsStack() = default;
@@ -82,11 +81,7 @@ inline void LgsStack::addLocalSymbol(const string& name, LgsParam* symbol) {
     addLocalSymbol(name, LgsSymbol(PARAM, symbol));
 }
 
-inline void LgsStack::addLocalSymbol(const string& name, LgsBuiltinFunc* symbol) {
-    addLocalSymbol(name, LgsSymbol(BUILTIN_FUNC, symbol));
-}
-
-inline void LgsStack::addLocalSymbol(const string& name, LgsFuncImpl* symbol) {
+inline void LgsStack::addLocalSymbol(const string& name, LgsFunc* symbol) {
     addLocalSymbol(name, LgsSymbol(FUNC_IMPL, symbol));
 }
 

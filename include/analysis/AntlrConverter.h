@@ -22,7 +22,7 @@ public:
     static LgsObject* getObject(LogosParser::ObjectFileContext* ctx);
     static LgsField* getField(LogosParser::ExplicitVarDecContext* varDec, size_t position, const string& parentName);
     static LgsFuncImpl* getFuncImpl(LogosParser::FuncImplementationContext* ctx);
-    static LgsMethodImpl* getMethodImpl(LogosParser::FuncImplementationContext* ctx, LgsObject* obj);
+    static LgsMethodImpl* getMethodImpl(LogosParser::FuncImplementationContext* ctx, const LgsObject* obj);
     static LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     static LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     static LgsStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);

@@ -3,7 +3,7 @@
 #include <types/LgsInt.h>
 
 Value* LgsFuncImpl::createIRValue(CodeGenMetadata* metadata) {
-    setIRNames();
+    setIRName();
     metadata->logosStack.enterScope();
     setIRFunc(metadata);
     metadata->logosStack.currentFunc = IRFunc;
@@ -22,7 +22,7 @@ Value* LgsFuncImpl::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args
         const auto argValue = arg->getIRValue(metadata);
         paramValues.emplace_back(argValue);
     }
-    return metadata->builder.CreateCall(symbol->funcImpl->IRFunc, paramValues);
+    return metadata->builder.CreateCall(symbol->func->IRFunc, paramValues);
 }
 
 void LgsFuncImpl::setIRFunc(CodeGenMetadata* metadata) {
@@ -32,7 +32,7 @@ void LgsFuncImpl::setIRFunc(CodeGenMetadata* metadata) {
     }
 
     const auto rt = FunctionType::get(type->getIRType(), IRParamsTypes, false);
-    IRFunc = Function::Create(rt, Function::ExternalLinkage, IRName, metadata->currentModule);
+    IRFunc = Function::Create(rt, Function::ExternalLinkage, composedName, metadata->currentModule);
     metadata->logosStack.currentFunc = IRFunc;
     if (params.empty()) return;
 
@@ -44,13 +44,13 @@ void LgsFuncImpl::setIRFunc(CodeGenMetadata* metadata) {
     }
 }
 
-void LgsFuncImpl::setIRNames() {
+void LgsFuncImpl::setIRName() {
     if (name == LOGOS_MAIN_FUNC) {
-        IRName = name;
+        composedName = name;
     } else {
-        IRName = name + "_" + type->getName();
+        composedName = name + "_" + type->getName();
         for (int i = 1; i < params.size(); ++i) {
-            IRName += "_" + params[i]->type->getName();
+            composedName += "_" + params[i]->type->getName();
         }
     }
 }

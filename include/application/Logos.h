@@ -36,7 +36,7 @@ public:
     void parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool);
     bool analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols);
     static LgsMainFile* getMainFile(const vector<LgsFile*>& files);
-    static map<string, LgsSymbol> getGlobalsSymbols(const vector<LgsFile*>& files);
+    static void setGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymbol>& globalSymbols);
     static bool isLogosFile(const directory_entry& filePath);
     static void exitWithMessage(const string& errMsg);
     ~Logos() = default;

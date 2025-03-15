@@ -2,7 +2,6 @@
 #define LOGOSSYMBOL_H
 
 class LgsParam;
-class LgsBuiltinFunc;
 class LgsVarDec;
 class LgsMethodImpl;
 class LgsFuncImpl;
@@ -23,7 +22,6 @@ enum LgsSymbolType {
     VAR_DEC,
     PARAM,
     OBJECT,
-    BUILTIN_FUNC,
     FUNC_IMPL,
 };
 
@@ -33,8 +31,7 @@ struct LgsSymbol {
         LgsObject* object;
         LgsVarDec* varDec;
         LgsParam* param;
-        LgsBuiltinFunc* builtinFunc;
-        LgsFuncImpl* funcImpl;
+        LgsFunc* func;
     };
 
     LgsSymbol() :
@@ -52,14 +49,9 @@ struct LgsSymbol {
         varDec(varDec) {
     }
 
-    LgsSymbol(const LgsSymbolType type, LgsBuiltinFunc* builtinFunc) :
+    LgsSymbol(const LgsSymbolType type, LgsFunc* funcImpl) :
         type(type),
-        builtinFunc(builtinFunc) {
-    }
-
-    LgsSymbol(const LgsSymbolType type, LgsFuncImpl* funcImpl) :
-        type(type),
-        funcImpl(funcImpl) {
+        func(funcImpl) {
     }
 
     LgsSymbol(const LgsSymbolType type, LgsObject* object) :

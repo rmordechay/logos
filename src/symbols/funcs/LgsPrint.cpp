@@ -16,14 +16,14 @@ Value* LgsPrint::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     return metadata->builder.CreateCall(func, {argValue});
 }
 
-void LgsPrint::setIRNames() {
-
-}
-
 string LgsPrint::buildFuncName() const {
     auto IRName = name + "_" + type->getName();
     for (int i = 1; i < params.size(); ++i) {
         IRName += "_" + params[i]->type->getName();
     }
     return IRName;
+}
+
+Value* LgsPrint::createIRValue(CodeGenMetadata* metadata) {
+    return nullptr;
 }

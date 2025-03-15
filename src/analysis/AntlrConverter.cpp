@@ -91,22 +91,20 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext
     const auto rt = getFuncType(ctx);
     const auto signature = ctx->funcSignature();
     const auto name = signature->VARIABLE()->getText();
-
-    const auto func = new LgsFuncImpl(name, rt);
+    vector<LgsParam*> params;
+    if (signature->paramList()) {
+        for (const auto& varDec : signature->paramList()->explicitVarDec()) {
+            auto param = getParam(varDec);
+            params.emplace_back(param);
+        }
+    }
+    const auto func = new LgsFuncImpl(name, rt, params);
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     func->setPosition(ctx->start);
-
-    const auto params = signature->paramList();
-    if (!params) return func;
-
-    for (const auto& varDec : params->explicitVarDec()) {
-        auto param = getParam(varDec);
-        func->params.emplace_back(param);
-    }
     return func;
 }
 
-LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationContext* ctx, LgsObject* obj) {
+LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationContext* ctx, const LgsObject* obj) {
     const auto rt = getFuncType(ctx);
     const auto signature = ctx->funcSignature();
     const auto name = signature->VARIABLE()->getText();
@@ -281,39 +279,35 @@ LgsVariable* AntlerConverter::getVariable(const string& varName, const ParserRul
 
 LgsFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
     const auto name = ctx->VARIABLE()->getText();
-    const auto funcCallExpr = new LgsFuncCall(name);
-    const auto funcArgList = ctx->funcArgList();
-    if (funcArgList) {
-        const auto args = funcArgList->funcArg();
-        for (const auto& arg : args) {
+    vector<LgsExpr*> args;
+    if (ctx->funcArgList()) {
+        for (const auto& arg : ctx->funcArgList()->funcArg()) {
             auto argExpr = getExpr(arg->expr());
-            funcCallExpr->args.emplace_back(argExpr);
+            args.emplace_back(argExpr);
         }
     }
-    funcCallExpr->setPosition(ctx->start);
-    return funcCallExpr;
+    const auto funcCall = new LgsFuncCall(name, args);
+    funcCall->setPosition(ctx->start);
+    return funcCall;
 }
 
 LgsMethodCall* AntlerConverter::getMethodCall(LogosParser::FuncCallContext* ctx) {
     const auto name = ctx->VARIABLE()->getText();
-    const auto funcCallExpr = new LgsMethodCall(name);
-    const auto funcArgList = ctx->funcArgList();
-    if (funcArgList) {
-        const auto args = funcArgList->funcArg();
-        for (const auto& arg : args) {
+    vector<LgsExpr*> args;
+    if (ctx->funcArgList()) {
+        for (const auto& arg : ctx->funcArgList()->funcArg()) {
             auto argExpr = getExpr(arg->expr());
-            funcCallExpr->args.emplace_back(argExpr);
+            args.emplace_back(argExpr);
         }
     }
-    funcCallExpr->setPosition(ctx->start);
-    return funcCallExpr;
+    const auto methodCall = new LgsMethodCall(name, args);
+    methodCall->setPosition(ctx->start);
+    return methodCall;
 }
 
 LgsSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) {
-    const auto firstExpr = getFirstSelection(ctx);
     const auto innerExprs = getSelectionInnerExprs(ctx);
-    vector<LgsUnaryExpr*> exprs;
-    exprs.emplace_back(firstExpr);
+    vector exprs = {getFirstSelection(ctx)};
     exprs.insert(exprs.end(), innerExprs.begin(), innerExprs.end());
     const auto selection = new LgsSelection(exprs);
     selection->setPosition(ctx->start);

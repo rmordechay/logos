@@ -18,7 +18,8 @@ void Logos::run() {
     // Analysis
     ProjectAnalyser projectAnalyser(files);
     if (!projectAnalyser.analyse()) return;
-    const auto globalSymbols = getGlobalsSymbols(files);
+    map<string, LgsSymbol> globalSymbols;
+    setGlobalsSymbols(files, globalSymbols);
     if (!analyse(files, globalSymbols)) return;
 
     // Code generation
@@ -57,20 +58,25 @@ void Logos::parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& t
     }
 }
 
-map<string, LgsSymbol> Logos::getGlobalsSymbols(const vector<LgsFile*>& files) {
-    map<string, LgsSymbol> globalSymbols;
-    globalSymbols[LOGOS_PRINT.logosName] = LgsSymbol(BUILTIN_FUNC, &LOGOS_PRINT);
+void Logos::setGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymbol>& globalSymbols) {
+    const auto printIntFunc = new LgsPrint({new LgsParam("input", &LOGOS_INT)});
+    const auto printFloatFunc = new LgsPrint({new LgsParam("input", &LOGOS_FLOAT)});
+    const auto printStrFunc = new LgsPrint({new LgsParam("input", &LOGOS_STR)});
+    const auto printCharFunc = new LgsPrint({new LgsParam("input", &LOGOS_CHAR)});
+    globalSymbols[printIntFunc->composedName] = LgsSymbol(FUNC_IMPL, printIntFunc);
+    globalSymbols[printFloatFunc->composedName] = LgsSymbol(FUNC_IMPL, printFloatFunc);
+    globalSymbols[printStrFunc->composedName] = LgsSymbol(FUNC_IMPL, printStrFunc);
+    globalSymbols[printCharFunc->composedName] = LgsSymbol(FUNC_IMPL, printCharFunc);
     for (const auto& file : files) {
         if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             const auto object = objFile->obj;
             globalSymbols[object->getName()] = LgsSymbol(OBJECT, object);
         } else if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
             for (const auto &func : mainFile->funcs) {
-                globalSymbols[func->name] = LgsSymbol(FUNC_IMPL, func);
+                globalSymbols[func->composedName] = LgsSymbol(FUNC_IMPL, func);
             }
         }
     }
-    return globalSymbols;
 }
 
 LgsFile* Logos::parseFile(const directory_entry& fileEntry) const {

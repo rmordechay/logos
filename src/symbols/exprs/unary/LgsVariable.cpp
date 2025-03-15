@@ -5,7 +5,6 @@
 
 #include <LgsStack.h>
 #include <binary/LgsBinaryExpr.h>
-#include <funcs/LgsBuiltinFunc.h>
 #include <funcs/LgsFuncImpl.h>
 
 string LgsVariable::getName() {
@@ -18,7 +17,7 @@ Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
     case VAR_DEC:
         return symbol->varDec->getIRValue(metadata);
     case FUNC_IMPL:
-        return symbol->funcImpl->getIRValue(metadata);
+        return symbol->func->getIRValue(metadata);
     case PARAM:
         return symbol->param->getIRValue(metadata);
     default:

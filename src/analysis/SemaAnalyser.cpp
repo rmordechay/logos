@@ -244,10 +244,10 @@ void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
 }
 
 void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
-    setFuncCallType(funcCall);
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
     }
+    setFuncCallType(funcCall);
 }
 
 void SemaAnalyser::setVariableType(LgsVariable* variable) {
@@ -301,13 +301,10 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) const {
 }
 
 void SemaAnalyser::setFuncCallType(LgsFuncCall* funcCall) {
-    const auto symbol = getSymbol(funcCall->name, funcCall);
-    if (!symbol) return;
-    if (symbol->type == BUILTIN_FUNC) {
-        funcCall->type = symbol->builtinFunc->type;
-    } else if (symbol->type == FUNC_IMPL) {
-        funcCall->type = symbol->funcImpl->type;
-    }
+    funcCall->setComposedName();
+    const auto symbol = getSymbol(funcCall->composedName, funcCall);
+    if (!symbol || symbol->type != FUNC_IMPL) return;
+    funcCall->type = symbol->func->type;
 }
 
 void SemaAnalyser::setForLoopIterable(LgsForeachLoop* foreachLoop) {
@@ -372,10 +369,8 @@ Location* SemaAnalyser::getSymbolPosition(const LgsSymbol* s) const {
         return &s->varDec->location;
     case PARAM:
         return &s->param->location;
-    case BUILTIN_FUNC:
-        return &s->builtinFunc->location;
     case FUNC_IMPL:
-        return &s->funcImpl->location;
+        return &s->func->location;
     default:
         return nullptr;
     }
