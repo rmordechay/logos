@@ -3,17 +3,6 @@
 #include "LgsInstance.h"
 #include <types/LgsObject.h>
 
-Value* LgsMethodImpl::createIRValue(CodeGenMetadata* metadata) {
-    metadata->logosStack.enterScope();
-    setIRFunc(metadata);
-
-    const auto entryBlock = BasicBlock::Create(context, "entry");
-    startBlock(metadata, entryBlock);
-    stmtBlock->getIRValue(metadata);
-    metadata->logosStack.exitScope();
-    return IRFunc;
-}
-
 Value* LgsMethodImpl::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     vector<Value*> argValues;
     for (const auto& arg : args) {

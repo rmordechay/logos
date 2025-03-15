@@ -2,21 +2,8 @@
 #include <LgsStack.h>
 #include <types/LgsInt.h>
 
-Value* LgsFuncImpl::createIRValue(CodeGenMetadata* metadata) {
-    setIRName();
-    metadata->logosStack.enterScope();
-    setIRFunc(metadata);
-    metadata->logosStack.currentFunc = IRFunc;
-
-    const auto entryBlock = BasicBlock::Create(context, "entry");
-    startBlock(metadata, entryBlock);
-    stmtBlock->getIRValue(metadata);
-    metadata->logosStack.exitScope();
-    return IRFunc;
-}
-
 Value* LgsFuncImpl::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
-    const auto symbol = metadata->logosStack.getSymbol(name);
+    const auto symbol = metadata->logosStack.getSymbol(composedName);
     vector<Value*> paramValues;
     for (const auto& arg : args) {
         const auto argValue = arg->getIRValue(metadata);
@@ -41,16 +28,5 @@ void LgsFuncImpl::setIRFunc(CodeGenMetadata* metadata) {
         param->setIRValue(args);
         args++->setName(param->name);
         metadata->logosStack.addLocalSymbol(param->name, param);
-    }
-}
-
-void LgsFuncImpl::setIRName() {
-    if (name == LOGOS_MAIN_FUNC) {
-        composedName = name;
-    } else {
-        composedName = name + "_" + type->getName();
-        for (int i = 1; i < params.size(); ++i) {
-            composedName += "_" + params[i]->type->getName();
-        }
     }
 }

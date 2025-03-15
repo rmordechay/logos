@@ -5,10 +5,8 @@
 class LgsFuncImpl final : public LgsFunc {
 public:
     explicit LgsFuncImpl(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {}) : LgsFunc(name, funcType, params) {}
-    Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override;
-    void setIRFunc(CodeGenMetadata* metadata);
-    void setIRName();
+    void setIRFunc(CodeGenMetadata* metadata) override;
     ~LgsFuncImpl() override = default;
 };
 

@@ -21,7 +21,7 @@ public:
     void exitScope();
     LgsSymbol* getSymbol(const string& name);
     bool hasSymbol(const string& name);
-    void addGlobalSymbol(const string& name, LgsSymbol& symbol);
+    void addGlobalSymbol(const string& name, const LgsSymbol& symbol);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     void addLocalSymbol(const string& name, LgsObject* symbol);
     void addLocalSymbol(const string& name, LgsVarDec* symbol);
@@ -61,11 +61,12 @@ inline bool LgsStack::hasSymbol(const string& name) {
     return symbols.find(name) != symbols.end();
 }
 
-inline void LgsStack::addGlobalSymbol(const string& name, LgsSymbol& symbol) {
+inline void LgsStack::addGlobalSymbol(const string& name, const LgsSymbol& symbol) {
     globalSymbols[name] = symbol;
 }
 
 inline void LgsStack::addLocalSymbol(const string& name, const LgsSymbol& symbol) {
+    assert(size() > 0 && "stack has no frames");
     top().symbols[name] = symbol;
 }
 
