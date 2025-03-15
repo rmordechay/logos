@@ -3,11 +3,12 @@
 #include "stmts/LgsStmt.h"
 #include "LogosUnaryExpr.h"
 
-class LgsFuncCall : public LgsStmt, public LgsUnaryExpr {
+class LgsFuncCall final : public LgsStmt, public LgsUnaryExpr {
 public:
     string name;
     string composedName;
     vector<LgsExpr*> args;
+    LgsFunc* func = nullptr;
     Location position = Location();
 
     explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}

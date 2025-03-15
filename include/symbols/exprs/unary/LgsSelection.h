@@ -3,7 +3,6 @@
 #include "types/LgsObject.h"
 
 class LgsUnaryExpr;
-class LgsMethodCall;
 
 class LgsSelection final : public LgsUnaryExpr {
 public:

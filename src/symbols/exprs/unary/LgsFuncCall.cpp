@@ -1,6 +1,4 @@
 #include "unary/LgsFuncCall.h"
-
-#include <LgsStack.h>
 #include "funcs/LgsFunc.h"
 
 string LgsFuncCall::getName() {
@@ -8,9 +6,7 @@ string LgsFuncCall::getName() {
 }
 
 Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
-    const auto symbol = metadata->logosStack.getSymbol(composedName);
-    if (symbol->type != FUNC_IMPL) return nullptr;
-    return symbol->func->call(metadata, args);
+    return func->call(metadata, args);
 }
 
 LgsFuncCall::~LgsFuncCall() {

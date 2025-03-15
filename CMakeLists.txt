@@ -46,7 +46,6 @@ add_library(lib STATIC
     include/symbols/exprs/unary/LgsFuncCall.h
     include/symbols/exprs/unary/LgsInstance.h
     include/symbols/exprs/unary/LgsIterable.h
-    include/symbols/exprs/unary/LgsMethodCall.h
     include/symbols/exprs/unary/LgsSelection.h
     include/symbols/exprs/unary/LgsVariable.h
     include/symbols/exprs/LgsExpr.h
@@ -100,7 +99,6 @@ add_library(lib STATIC
     src/symbols/exprs/unary/LgsArrayIndex.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
     src/symbols/exprs/unary/LgsInstance.cpp
-    src/symbols/exprs/unary/LgsMethodCall.cpp
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
     src/symbols/funcs/LgsFunc.cpp

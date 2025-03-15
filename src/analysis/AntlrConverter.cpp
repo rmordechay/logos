@@ -3,7 +3,6 @@
 #include "binary/LgsBinaryExpr.h"
 #include "binary/LgsOperator.h"
 #include "constants/LgsBoolConst.h"
-#include "unary/LgsMethodCall.h"
 #include "constants/LgsConst.h"
 #include "constants/LgsFloatConst.h"
 #include "constants/LgsIntConst.h"
@@ -291,20 +290,6 @@ LgsFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
     return funcCall;
 }
 
-LgsMethodCall* AntlerConverter::getMethodCall(LogosParser::FuncCallContext* ctx) {
-    const auto name = ctx->VARIABLE()->getText();
-    vector<LgsExpr*> args;
-    if (ctx->funcArgList()) {
-        for (const auto& arg : ctx->funcArgList()->funcArg()) {
-            auto argExpr = getExpr(arg->expr());
-            args.emplace_back(argExpr);
-        }
-    }
-    const auto methodCall = new LgsMethodCall(name, args);
-    methodCall->setPosition(ctx->start);
-    return methodCall;
-}
-
 LgsSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) {
     const auto innerExprs = getSelectionInnerExprs(ctx);
     vector exprs = {getFirstSelection(ctx)};
@@ -343,8 +328,8 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
         if (const auto field = expr->VARIABLE()) {
             const auto logosField = getVariable(field->getText(), expr);
             exprs.emplace_back(logosField);
-        } else if (const auto methodCall = expr->funcCall()) {
-            const auto logosFuncCall = getMethodCall(methodCall);
+        } else if (const auto funcCall = expr->funcCall()) {
+            const auto logosFuncCall = getFuncCall(funcCall);
             exprs.emplace_back(logosFuncCall);
         } else if (const auto arrayIndex = expr->arrayIndex()) {
             const auto logosArrayIndex = getArrayIndex(arrayIndex);

@@ -59,14 +59,7 @@ void Logos::parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& t
 }
 
 void Logos::setGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymbol>& globalSymbols) {
-    const auto printIntFunc = new LgsPrint({new LgsParam("input", &LOGOS_INT)});
-    const auto printFloatFunc = new LgsPrint({new LgsParam("input", &LOGOS_FLOAT)});
-    const auto printStrFunc = new LgsPrint({new LgsParam("input", &LOGOS_STR)});
-    const auto printCharFunc = new LgsPrint({new LgsParam("input", &LOGOS_CHAR)});
-    globalSymbols[printIntFunc->composedName] = LgsSymbol(FUNC_IMPL, printIntFunc);
-    globalSymbols[printFloatFunc->composedName] = LgsSymbol(FUNC_IMPL, printFloatFunc);
-    globalSymbols[printStrFunc->composedName] = LgsSymbol(FUNC_IMPL, printStrFunc);
-    globalSymbols[printCharFunc->composedName] = LgsSymbol(FUNC_IMPL, printCharFunc);
+    addBuiltinFuncs(globalSymbols);
     for (const auto& file : files) {
         if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             const auto object = objFile->obj;
@@ -77,6 +70,17 @@ void Logos::setGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymb
             }
         }
     }
+}
+
+void Logos::addBuiltinFuncs(map<string, LgsSymbol>& globalSymbols) {
+    const auto printIntFunc = new LgsPrint({new LgsParam("input", &LOGOS_INT)});
+    const auto printFloatFunc = new LgsPrint({new LgsParam("input", &LOGOS_FLOAT)});
+    const auto printStrFunc = new LgsPrint({new LgsParam("input", &LOGOS_STR)});
+    const auto printCharFunc = new LgsPrint({new LgsParam("input", &LOGOS_CHAR)});
+    globalSymbols[printIntFunc->composedName] = LgsSymbol(FUNC_IMPL, printIntFunc);
+    globalSymbols[printFloatFunc->composedName] = LgsSymbol(FUNC_IMPL, printFloatFunc);
+    globalSymbols[printStrFunc->composedName] = LgsSymbol(FUNC_IMPL, printStrFunc);
+    globalSymbols[printCharFunc->composedName] = LgsSymbol(FUNC_IMPL, printCharFunc);
 }
 
 LgsFile* Logos::parseFile(const directory_entry& fileEntry) const {

@@ -2,7 +2,6 @@
 #include "LgsError.h"
 #include "binary/LgsBinaryExpr.h"
 #include "constants/LgsStrConst.h"
-#include "unary/LgsMethodCall.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
 #include "types/LgsBool.h"
@@ -210,7 +209,8 @@ void SemaAnalyser::visitSelection(LgsSelection* selection) {
         if (const auto field = currentExpr->type->getField(nextExpr->getName())) {
             nextExpr->type = field->type;
         } else if (const auto method = currentExpr->type->getMethod(nextExpr->getName())) {
-            const auto methodCall = dynamic_cast<LgsMethodCall*>(nextExpr);
+            const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr);
+            methodCall->func = method;
             methodCall->args.insert(methodCall->args.begin(), currentExpr);
             nextExpr->type = method->type;
         }
@@ -304,6 +304,7 @@ void SemaAnalyser::setFuncCallType(LgsFuncCall* funcCall) {
     funcCall->setComposedName();
     const auto symbol = getSymbol(funcCall->composedName, funcCall);
     if (!symbol || symbol->type != FUNC_IMPL) return;
+    funcCall->func = symbol->func;
     funcCall->type = symbol->func->type;
 }
 

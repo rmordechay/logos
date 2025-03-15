@@ -1,6 +1,7 @@
 #include "unary/LgsSelection.h"
+
+#include "LgsFuncCall.h"
 #include "unary/LgsArrayIndex.h"
-#include "unary/LgsMethodCall.h"
 #include "unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 
@@ -21,7 +22,7 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
             const auto value = field->getIRValue(metadata);
             nextExpr->setIRValue(value);
         } else if (const auto method = currentExpr->type->getMethod(nextExpr->getName())) {
-            const auto methodCall = dynamic_cast<LgsMethodCall*>(nextExpr);
+            const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr);
             const auto value = method->call(metadata, methodCall->args);
             nextExpr->setIRValue(value);
         }

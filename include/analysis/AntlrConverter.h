@@ -2,7 +2,6 @@
 #define SEMANTICANALYSER_H
 
 #include "LogosParser.h"
-#include "unary/LgsMethodCall.h"
 #include "unary/LogosUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
@@ -37,7 +36,6 @@ public:
     static LgsUnaryExpr* getArray(LogosParser::ArrayContext* ctx);
     static LgsVariable* getVariable(const string& varName, const ParserRuleContext* ctx);
     static LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
-    static LgsMethodCall *getMethodCall(LogosParser::FuncCallContext* ctx);
     static LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
     static vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
     static LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
