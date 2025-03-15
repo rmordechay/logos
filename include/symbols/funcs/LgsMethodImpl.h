@@ -6,16 +6,13 @@ class LgsMethodImpl final : public LgsFunc {
 public:
     string parentName;
 
-    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName) : LgsFunc(name, funcType), parentName(parentName) {
-        setCombinedName();
-    }
-    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam*>& params) : LgsFunc(name, funcType, params), parentName(parentName) {
-        setCombinedName();
+    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam*>& params = {}) : LgsFunc(name, funcType, params), parentName(parentName) {
+        setIRNames();
     }
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override;
+    void setIRNames() override;
     void setIRFunc(CodeGenMetadata* metadata);
-    void setCombinedName();
     ~LgsMethodImpl() override = default;
 };
 

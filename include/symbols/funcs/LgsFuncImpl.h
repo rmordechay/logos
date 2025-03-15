@@ -9,7 +9,7 @@ public:
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override;
     void setIRFunc(CodeGenMetadata* metadata);
-    void setCombinedName();
+    void setIRNames();
     ~LgsFuncImpl() override = default;
 };
 

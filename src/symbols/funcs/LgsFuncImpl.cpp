@@ -3,7 +3,7 @@
 #include <types/LgsInt.h>
 
 Value* LgsFuncImpl::createIRValue(CodeGenMetadata* metadata) {
-    setCombinedName();
+    setIRNames();
     metadata->logosStack.enterScope();
     setIRFunc(metadata);
     metadata->logosStack.currentFunc = IRFunc;
@@ -32,7 +32,7 @@ void LgsFuncImpl::setIRFunc(CodeGenMetadata* metadata) {
     }
 
     const auto rt = FunctionType::get(type->getIRType(), IRParamsTypes, false);
-    IRFunc = Function::Create(rt, Function::ExternalLinkage, combinedName, metadata->currentModule);
+    IRFunc = Function::Create(rt, Function::ExternalLinkage, IRName, metadata->currentModule);
     metadata->logosStack.currentFunc = IRFunc;
     if (params.empty()) return;
 
@@ -44,13 +44,13 @@ void LgsFuncImpl::setIRFunc(CodeGenMetadata* metadata) {
     }
 }
 
-void LgsFuncImpl::setCombinedName() {
+void LgsFuncImpl::setIRNames() {
     if (name == LOGOS_MAIN_FUNC) {
-        combinedName = name;
+        IRName = name;
     } else {
-        combinedName = name + "_" + type->getName();
+        IRName = name + "_" + type->getName();
         for (int i = 1; i < params.size(); ++i) {
-            combinedName += "_" + params[i]->type->getName();
+            IRName += "_" + params[i]->type->getName();
         }
     }
 }

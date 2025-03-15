@@ -24,20 +24,17 @@ inline path execFile;
 class Logos {
 public:
     mutex mtx;
+    path rootPath;
 
-    explicit Logos(const path& rootPath) {
-        initPaths(rootPath);
-    }
-
+    explicit Logos(const path& rootPath) : rootPath(rootPath) {}
     void run();
+    void initProject() const;
+    void initPaths() const;
     void validateProject() const;
-    void initPaths(const path& rootPath) const;
-
     vector<LgsFile*> parseFiles();
     LgsFile* parseFile(const directory_entry&) const;
     void parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool);
     bool analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols);
-
     static LgsMainFile* getMainFile(const vector<LgsFile*>& files);
     static map<string, LgsSymbol> getGlobalsSymbols(const vector<LgsFile*>& files);
     static bool isLogosFile(const directory_entry& filePath);

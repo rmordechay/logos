@@ -14,7 +14,7 @@ public:
     std::string value;
     vector<LgsCharConst> chars;
 
-    explicit LgsStrConst(const std::string& value) : LgsConst(&LOGOS_STRING), value(value) {
+    explicit LgsStrConst(const std::string& value) : LgsConst(&LOGOS_STR), value(value) {
         initStr(value);
     }
 

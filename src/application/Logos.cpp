@@ -8,17 +8,9 @@
 #include <ThreadPool.h>
 #include <funcs/LgsPrint.h>
 
-void Logos::initPaths(const path& rootPath) const {
-    rootDir = rootPath;
-    srcDir = rootPath / LOGOS_SRC_DIR;
-    buildDir = rootPath / LOGOS_BUILD_DIR;
-    objectFile = buildDir / OBJECT_FILE;
-    execFile = buildDir / EXECUTABLE_FILE;
-}
-
 void Logos::run() {
-    // Initial validation
-    validateProject();
+    // Initial
+    initProject();
 
     // Parsing
     const auto files = parseFiles();
@@ -118,10 +110,6 @@ bool Logos::analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>&
     return std::find(semaSuccess.begin(), semaSuccess.end(), false) == semaSuccess.end();
 }
 
-bool Logos::isLogosFile(const directory_entry& filePath) {
-    return filePath.is_regular_file() && filePath.path().extension().string() == LOGOS_EXTENSION;
-}
-
 void Logos::validateProject() const {
     string srcDir;
     for (const auto& entry : directory_iterator(rootDir)) {
@@ -133,6 +121,23 @@ void Logos::validateProject() const {
     if (srcDir.empty()) {
         exitWithMessage(LOGOS_ERRORS.at(E10010));
     }
+}
+
+void Logos::initProject() const {
+    initPaths();
+    validateProject();
+}
+
+void Logos::initPaths() const {
+    rootDir = rootPath;
+    srcDir = rootPath / LOGOS_SRC_DIR;
+    buildDir = rootPath / LOGOS_BUILD_DIR;
+    objectFile = buildDir / OBJECT_FILE;
+    execFile = buildDir / EXECUTABLE_FILE;
+}
+
+bool Logos::isLogosFile(const directory_entry& filePath) {
+    return filePath.is_regular_file() && filePath.path().extension().string() == LOGOS_EXTENSION;
 }
 
 void Logos::exitWithMessage(const string& errMsg) {

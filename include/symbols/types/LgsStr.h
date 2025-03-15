@@ -18,6 +18,6 @@ public:
     ~LgsStr() override = default;
 };
 
-inline LgsStr LOGOS_STRING;
+inline LgsStr LOGOS_STR;
 
 #endif // LOGOSSTRING_H

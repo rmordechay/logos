@@ -427,7 +427,7 @@ LgsType* AntlerConverter::getType(tree::TerminalNode* type) {
     if (typeText == LOGOS_INT.getName()) return &LOGOS_INT;
     if (typeText == LOGOS_FLOAT.getName()) return &LOGOS_FLOAT;
     if (typeText == LOGOS_BOOL.getName()) return &LOGOS_BOOL;
-    if (typeText == LOGOS_STRING.getName()) return &LOGOS_STRING;
+    if (typeText == LOGOS_STR.getName()) return &LOGOS_STR;
     if (typeText == "") return &LOGOS_VOID;
     // TODO memory leak
     return new LgsObject(typeText);

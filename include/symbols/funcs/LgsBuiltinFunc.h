@@ -5,7 +5,7 @@
 class LgsBuiltinFunc : public LgsFunc {
 public:
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    LgsBuiltinFunc(const string& name, LgsType* funcType) : LgsFunc(name, funcType) {}
+    LgsBuiltinFunc(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {}) : LgsFunc(name, funcType, params) {}
     ~LgsBuiltinFunc() override = default;
 };
 

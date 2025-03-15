@@ -1,7 +1,6 @@
 #include "funcs/LgsMethodImpl.h"
 
 #include "LgsInstance.h"
-#include "constants/LgsConst.h"
 #include <types/LgsObject.h>
 
 Value* LgsMethodImpl::createIRValue(CodeGenMetadata* metadata) {
@@ -23,8 +22,16 @@ Value* LgsMethodImpl::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& ar
     }
     if (!IRFunc) setIRFunc(metadata);
     const auto functionType = IRFunc->getFunctionType();
-    const auto IRFunc = metadata->currentModule->getOrInsertFunction(combinedName, functionType);
+    const auto IRFunc = metadata->currentModule->getOrInsertFunction(IRName, functionType);
     return metadata->builder.CreateCall(IRFunc, argValues);
+}
+
+void LgsMethodImpl::setIRNames() {
+    IRName = parentName + "_" + name;
+    IRName += "_" + type->getName();
+    for (int i = 1; i < params.size(); ++i) {
+        IRName += "_" + params[i]->type->getName();
+    }
 }
 
 void LgsMethodImpl::setIRFunc(CodeGenMetadata* metadata) {
@@ -36,7 +43,7 @@ void LgsMethodImpl::setIRFunc(CodeGenMetadata* metadata) {
     }
 
     const auto rt = FunctionType::get(type->getIRType(), IRParamsTypes, false);
-    IRFunc = Function::Create(rt, Function::ExternalLinkage, combinedName, metadata->currentModule);
+    IRFunc = Function::Create(rt, Function::ExternalLinkage, IRName, metadata->currentModule);
     metadata->logosStack.currentFunc = IRFunc;
     if (params.empty()) return;
 
@@ -45,13 +52,5 @@ void LgsMethodImpl::setIRFunc(CodeGenMetadata* metadata) {
         param->setIRValue(args);
         args++->setName(param->name);
         metadata->logosStack.addLocalSymbol(param->name, param);
-    }
-}
-
-void LgsMethodImpl::setCombinedName() {
-    combinedName = parentName + "_" + name;
-    combinedName += "_" + type->getName();
-    for (int i = 1; i < params.size(); ++i) {
-        combinedName += "_" + params[i]->type->getName();
     }
 }
