@@ -3,11 +3,17 @@
 declare i64 @printf(ptr, ...)
 
 @formatInt = private constant [4 x i8] c"%d\0A\00"
+@formatFloat = private constant [4 x i8] c"%f\0A\00"
 @formatString = private constant [4 x i8] c"%s\0A\00"
 @formatChar = private constant [4 x i8] c"%c\0A\00"
 
 define void @print_Void_Int(i32 noundef %x) {
   call i32 (ptr, ...) @printf(ptr noundef @formatInt, i32 noundef %x)
+  ret void
+}
+
+define void @print_Void_Float(float noundef %x) {
+  call i32 (ptr, ...) @printf(ptr noundef @formatFloat, float noundef %x)
   ret void
 }
 

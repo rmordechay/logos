@@ -1,17 +1,15 @@
 #include "funcs/LgsPrint.h"
 
-Value* LgsPrint::createIRValue(CodeGenMetadata* metadata) {
-    return nullptr;
-}
-
 Value* LgsPrint::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
-    const auto argType = args[0]->type->getIRType();
-    auto argValue = args[0]->getIRValue(metadata);
+    const auto type = args[0]->type;
     FunctionCallee func;
-    if (argType == metadata->builder.getPtrTy()) {
+    if (dynamic_cast<LgsInt*>(type)) {
         func = metadata->currentModule->getOrInsertFunction(IRNameString, funcTypeString);
+    } else if (dynamic_cast<LgsFloat*>(type)) {
+        func = metadata->currentModule->getOrInsertFunction(IRNameFloat, funcTypeFloat);
     } else {
         func = metadata->currentModule->getOrInsertFunction(IRNameInt, funcTypeInt);
     }
+    auto argValue = args[0]->getIRValue(metadata);
     return metadata->builder.CreateCall(func, {argValue});
 }
