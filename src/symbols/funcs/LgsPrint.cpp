@@ -3,6 +3,10 @@
 Value* LgsPrint::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     if (!IRFunc) setIRFunc(metadata);
     auto argValue = args[0]->getIRValue(metadata);
+    argValue->print(outs());
+    outs() << "\n";
+    argValue->getType()->print(outs());
+    outs() << "\n";
     return metadata->builder.CreateCall(IRFunc, {argValue});
 }
 

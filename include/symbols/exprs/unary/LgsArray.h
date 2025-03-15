@@ -12,7 +12,6 @@ public:
 
     explicit LgsArray() : LgsUnaryExpr(nullptr) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    void iterate(CodeGenMetadata* metadata) override;
     size_t size() override;
     ~LgsArray() override = default;
 };

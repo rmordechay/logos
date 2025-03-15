@@ -11,9 +11,6 @@ Value* LgsArray::createIRValue(CodeGenMetadata* metadata) {
     return ConstantArray::get(arrType, arrValues);
 }
 
-void LgsArray::iterate(CodeGenMetadata* metadata) {
-
-}
 
 size_t LgsArray::size() {
     return elements.size();
