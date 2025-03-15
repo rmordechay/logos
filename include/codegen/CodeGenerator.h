@@ -7,12 +7,10 @@
 class LgsFile;
 class LgsValue;
 
-const auto targetTriple = sys::getDefaultTargetTriple();
-inline TargetMachine* targetMachine = nullptr;
+using LogosGlobals = const std::map<std::string, LgsSymbol>&;
 
 class CodeGenerator {
 public:
-    static void init();
     static void generateCode(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols);
     static void generateModule(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols);
     static void generateModule(LgsObject* obj, const map<string, LgsSymbol>& globalSymbols);

@@ -1,16 +1,11 @@
 #include "CodeGenerator.h"
-
 #include "funcs/LgsFuncImpl.h"
-
 #include <ranges>
-#include <llvm/MC/TargetRegistry.h>
-#include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/FileSystem.h>
 
-using LogosGlobals = const std::map<std::string, LgsSymbol>&;
-
 void CodeGenerator::generateCode(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols) {
-    init();
+    create_directories(buildDir);
+    initLLVM();
     generateModule(mainFile, globalSymbols);
 }
 
@@ -42,6 +37,7 @@ void CodeGenerator::generateModule(LgsObject* obj, const map<string, LgsSymbol>&
 
 Module* CodeGenerator::createModule(const string& objName) {
     const auto module = new Module(objName, context);
+    const auto targetTriple = sys::getDefaultTargetTriple();
     module->setTargetTriple(targetTriple);
     module->setDataLayout(targetMachine->createDataLayout());
     modules[objName] = module;
@@ -55,17 +51,4 @@ void CodeGenerator::writeIRToFile(const Module* module, const path& name){
     module->print(textFile, nullptr);
     module->print(outs(), nullptr);
     std::cout << "\n-----\n\n";
-}
-
-void CodeGenerator::init() {
-    create_directories(buildDir);
-    InitializeNativeTarget();
-    InitializeNativeTargetAsmPrinter();
-    InitializeNativeTargetAsmParser();
-    InitializeAllTargetMCs();
-    InitializeAllTargets();
-    InitializeAllTargetInfos();
-    string error;
-    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }

@@ -20,6 +20,7 @@ namespace lld::macho {
 std::unique_ptr<Module> LgsLinker::getStdlibModule() {
     SMDiagnostic EC;
     std::unique_ptr<Module> stdlibModule = parseIRFile(LOGOS_STDLIB, EC, context);
+    const auto targetTriple = sys::getDefaultTargetTriple();
     stdlibModule->setTargetTriple(targetTriple);
     stdlibModule->setDataLayout(targetMachine->createDataLayout());
     return stdlibModule;

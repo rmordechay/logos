@@ -34,6 +34,7 @@ void Logos::run() {
 }
 
 vector<LgsFile*> Logos::parseFiles() {
+    assert(rootDir != "" && "rootDir is empty");
     ThreadPool threadPool;
     threadPool.start();
     vector<LgsFile*> files;
