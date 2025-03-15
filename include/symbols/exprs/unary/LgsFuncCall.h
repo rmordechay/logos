@@ -10,8 +10,8 @@ public:
     Location position = Location();
 
     explicit LgsFuncCall(const string& name) : name(name) {}
-    Value* createIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsFuncCall() override;
 };
 

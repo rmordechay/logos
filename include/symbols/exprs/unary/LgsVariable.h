@@ -8,8 +8,8 @@ public:
     std::string name;
 
     explicit LgsVariable(const std::string& name) : LgsUnaryExpr(nullptr), name(name) {}
-    Value* createIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsVariable() override = default;
 };
 

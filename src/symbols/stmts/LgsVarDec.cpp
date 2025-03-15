@@ -3,20 +3,20 @@
 #include <LgsStack.h>
 
 Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
-    Value* value;
+    Value* exprValue;
     if (expr) {
-        value = expr->getIRValue(metadata);
+        exprValue = expr->getIRValue(metadata);
     } else {
-        value = type->getZeroValue()->getIRValue(metadata);
+        exprValue = type->getZeroValue()->getIRValue(metadata);
     }
-    const auto valueType = value->getType();
+    const auto valueType = exprValue->getType();
     if (!valueType->isPointerTy()) {
         auto& builder = metadata->builder;
         const auto allocaInst = builder.CreateAlloca(valueType);
-        builder.CreateStore(value, allocaInst);
+        builder.CreateStore(exprValue, allocaInst);
     }
     metadata->logosStack.addLocalSymbol(name, this);
-    return value;
+    return exprValue;
 }
 
 LgsVarDec::~LgsVarDec() {

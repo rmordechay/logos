@@ -8,22 +8,20 @@
 #include <funcs/LgsBuiltinFunc.h>
 #include <funcs/LgsFuncImpl.h>
 
+string LgsVariable::getName() {
+    return name;
+}
+
 Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->logosStack.getSymbol(name);
     switch (symbol->type) {
-    case FUNC_IMPL:
-        return symbol->funcImpl->getIRValue(metadata);
     case VAR_DEC:
         return symbol->varDec->getIRValue(metadata);
-    case BUILTIN_FUNC:
-        return symbol->builtinFunc->getIRValue(metadata);
+    case FUNC_IMPL:
+        return symbol->funcImpl->getIRValue(metadata);
     case PARAM:
         return symbol->param->getIRValue(metadata);
     default:
         return nullptr;
     }
-}
-
-string LgsVariable::getName() {
-    return name;
 }

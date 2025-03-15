@@ -10,11 +10,10 @@ public:
     vector<LgsUnaryExpr*> exprs;
 
     explicit LgsSelection(const vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
-    Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* resolveType(CodeGenMetadata* metadata, LgsUnaryExpr* nextExpr, LgsType* logosType) const;
-    Value* resolveSelectionVariable(CodeGenMetadata* metadata, const LgsVariable* variable, LgsUnaryExpr* nextExpr) const;
-    LgsExpr* lastExpr() const;
     string getName() override;
+    LgsExpr* lastExpr() const;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
+    LgsExpr* resolveSelection(CodeGenMetadata* metadata) const;
     ~LgsSelection() override;
 };
 

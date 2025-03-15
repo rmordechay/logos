@@ -12,7 +12,7 @@ Value* LgsFuncImpl::createIRValue(CodeGenMetadata* metadata) {
     startBlock(metadata, entryBlock);
     stmtBlock->getIRValue(metadata);
     metadata->logosStack.exitScope();
-    return nullptr;
+    return IRFunc;
 }
 
 Value* LgsFuncImpl::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {

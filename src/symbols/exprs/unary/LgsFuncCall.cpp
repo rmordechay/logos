@@ -6,6 +6,10 @@
 
 #include <funcs/LgsBuiltinFunc.h>
 
+string LgsFuncCall::getName() {
+    return name;
+}
+
 Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->logosStack.getSymbol(name);
     if (symbol->type == BUILTIN_FUNC) {
@@ -15,10 +19,6 @@ Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
         return symbol->funcImpl->call(metadata, args);
     }
     return nullptr;
-}
-
-string LgsFuncCall::getName() {
-    return name;
 }
 
 LgsFuncCall::~LgsFuncCall() {

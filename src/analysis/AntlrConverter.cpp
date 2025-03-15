@@ -435,6 +435,6 @@ LgsType* AntlerConverter::getType(tree::TerminalNode* type) {
 
 LgsType* AntlerConverter::getFuncType(LogosParser::FuncImplementationContext* ctx) {
     const auto signature = ctx->funcSignature();
-    if (signature->type()->TYPE()) return getType(signature->type()->TYPE());
+    if (signature->type()) return getType(signature->type()->TYPE());
     return &LOGOS_VOID;
 }

@@ -1,31 +1,36 @@
 #include "binary/LgsBinaryExpr.h"
-#include "constants/LgsConst.h"
+
+#include "types/LgsInt.h"
+#include "types/LgsStr.h"
 
 Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
+    if (op == ADD) {
+        return left->add(metadata, right);
+    }
     const auto l = left->getIRValue(metadata);
     const auto r = right->getIRValue(metadata);
     auto& builder = metadata->builder;
     switch (op) {
     case ADD:
-        return builder.CreateAdd(l, r);;
+        return builder.CreateAdd(l, r);
     case SUB:
-        return builder.CreateSub(l, r);;
+        return builder.CreateSub(l, r);
     case MUL:
-        return builder.CreateMul(l, r);;
+        return builder.CreateMul(l, r);
     case DIV:
-        return builder.CreateSDiv(l, r);;
+        return builder.CreateSDiv(l, r);
     case NE:
-        return builder.CreateICmpNE(l, r);;
+        return builder.CreateICmpNE(l, r);
     case EQ:
-        return builder.CreateICmpEQ(l, r);;
+        return builder.CreateICmpEQ(l, r);
     case LT:
-        return builder.CreateICmpSLT(l, r);;
+        return builder.CreateICmpSLT(l, r);
     case GT:
-        return builder.CreateICmpSGT(l, r);;
+        return builder.CreateICmpSGT(l, r);
     case GE:
-        return builder.CreateICmpSGE(l, r);;
+        return builder.CreateICmpSGE(l, r);
     case LE:
-        return builder.CreateICmpSLE(l, r);;
+        return builder.CreateICmpSLE(l, r);
     case NOOP:
         break;
     }
