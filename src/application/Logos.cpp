@@ -1,5 +1,7 @@
 #include "application/Logos.h"
 
+#include "LgsLinker.h"
+
 #include <ANTLRInputStream.h>
 #include <AntlrConverter.h>
 #include <CodeGenerator.h>
@@ -18,6 +20,7 @@ void Logos::run() {
     // Project analysis
     ProjectAnalyser projectAnalyser(files);
     if (!projectAnalyser.analyse()) return;
+
     // Semantic analysis
     map<string, LgsSymbol> globalSymbols;
     setGlobalsSymbols(files, globalSymbols);
@@ -27,7 +30,7 @@ void Logos::run() {
     generateCode(getMainFile(files), globalSymbols);
 
     // Linking
-    LgsLinker linker(objFilePath, execFilePath);
+    const LgsLinker linker(objFilePath, execFilePath);
     linker.link(modules);
 
     // Running
@@ -120,6 +123,24 @@ bool Logos::analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>&
     }
     threadPool.wait();
     return std::find(semaSuccess.begin(), semaSuccess.end(), false) == semaSuccess.end();
+}
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Target/TargetOptions.h>
+#include <llvm/TargetParser/Host.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/MC/TargetRegistry.h>
+
+inline void initLLVM() {
+    InitializeNativeTarget();
+    InitializeNativeTargetAsmPrinter();
+    InitializeNativeTargetAsmParser();
+    InitializeAllTargetMCs();
+    InitializeAllTargets();
+    InitializeAllTargetInfos();
+    string error;
+    const auto targetTriple = sys::getDefaultTargetTriple();
+    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
 void Logos::generateCode(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols) const {

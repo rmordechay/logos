@@ -14,3 +14,11 @@ TEST(ParserTest, TestParseFile) {
     EXPECT_NE(mainFile->mainFunc, nullptr);
     EXPECT_EQ(mainFile->funcs.size(), 2);
 }
+
+TEST(ParserTest, TestParseFile2) {
+    const Logos logos("../tests/parser/data");
+    const directory_entry fileEntry(logos.rootDir / "Main.lgs");
+    const auto file = logos.parseFile(fileEntry);
+    const auto mainFile = dynamic_cast<LgsMainFile*>(file);
+    mainFile->printTree();
+}

@@ -16,7 +16,7 @@ public:
     virtual void setPosition(const antlr4::Token* ctx);
     static BasicBlock* createBasicBlock(const char* name);
     static void startBlock(CodeGenMetadata* metadata, BasicBlock* block);
-    virtual void print();
+    virtual json asJson();
     virtual ~LgsValue() = default;
 private:
     virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
@@ -42,12 +42,12 @@ inline void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const bl
     builder.SetInsertPoint(block);
 }
 
-inline void LgsValue::print() {
-
-}
-
 inline BasicBlock* LgsValue::createBasicBlock(const char* name) {
     return BasicBlock::Create(context, name);
+}
+
+inline json LgsValue::asJson() {
+    return "";
 }
 
 inline void LgsValue::setIRValue(Value* value) {

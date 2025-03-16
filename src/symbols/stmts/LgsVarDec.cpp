@@ -1,6 +1,7 @@
 #include "stmts/LgsVarDec.h"
 #include "constants/LgsConst.h"
 #include <LgsStack.h>
+#include <json/json.hpp>
 
 Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
     Value* exprValue;
@@ -19,6 +20,14 @@ Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
     return exprValue;
 }
 
+json LgsVarDec::asJson() {
+    stringstream str;
+    str << string(typeid(this).name()) << name;
+    str << "Expr: " << expr->asJson();
+    return str.str();
+}
+
 LgsVarDec::~LgsVarDec() {
     delete expr;
 }
+

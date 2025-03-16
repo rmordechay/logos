@@ -4,11 +4,10 @@
 #include <LgsStack.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/MC/TargetRegistry.h>
-#include <llvm/Support/TargetSelect.h>
-#include <llvm/Target/TargetOptions.h>
-#include <llvm/TargetParser/Host.h>
 #include <llvm/Target/TargetMachine.h>
 #include <filesystem>
+#include "json/json.hpp"
+using json = nlohmann::json;
 
 class CodeGenerator;
 class LgsStack;
@@ -32,21 +31,5 @@ struct Location {
     size_t posInLine{};
 };
 
-inline bool moduleExists(const string& name) {
-    return modules.find(name) != modules.end();
-}
-
-inline void initLLVM() {
-    InitializeNativeTarget();
-    InitializeNativeTargetAsmPrinter();
-    InitializeNativeTargetAsmParser();
-    InitializeAllTargetMCs();
-    InitializeAllTargets();
-    InitializeAllTargetInfos();
-    string error;
-    const auto targetTriple = sys::getDefaultTargetTriple();
-    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
-}
 
 #endif //LOGOSMETADATA_H

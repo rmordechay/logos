@@ -13,6 +13,7 @@ public:
     LgsVarDec(const string& name, LgsType* userType, LgsExpr* expr) : name(name), userType(userType), expr(expr) {}
     LgsVarDec(const string& name, LgsType* inferredType) : name(name), type(inferredType){}
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    json asJson() override;
     ~LgsVarDec() override;
 };
 

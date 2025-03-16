@@ -1,13 +1,12 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
-#include "ProjectAnalyser.h"
-
 #include <string>
 #include <thread>
 #include <filesystem>
+
 #include "SemaAnalyser.h"
-#include <LgsLinker.h>
+#include "ProjectAnalyser.h"
 
 class ThreadPool;
 using namespace filesystem;

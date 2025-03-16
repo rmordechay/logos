@@ -30,3 +30,15 @@ void LgsFuncImpl::setIRFunc(CodeGenMetadata* metadata) {
         metadata->logosStack.addLocalSymbol(param->name, param);
     }
 }
+
+json LgsFuncImpl::asJson() {
+    stringstream str;
+    json tree;
+    tree["name"] = name;
+    tree["returnType"] = type->getName();
+    tree["params"] = {};
+    for (const auto& param : params) {
+        tree["params"].emplace_back(param->asJson());
+    }
+    return str.str();
+}

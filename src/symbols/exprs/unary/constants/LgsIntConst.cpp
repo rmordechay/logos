@@ -20,6 +20,6 @@ LgsExpr* LgsIntConst::add(LgsExpr* other) {
     return nullptr;
 }
 
-void LgsIntConst::print() {
-    std::cout << typeid(this).name() << value << '\n';
+json LgsIntConst::asJson() {
+    return string(typeid(this).name()) + ": " + to_string(value);
 }
