@@ -12,16 +12,16 @@ class LgsCharConst;
 class LgsStrConst final : public LgsIterable, public LgsConst {
 public:
     string value;
-    vector<LgsCharConst> chars;
 
     explicit LgsStrConst(const string& value) : LgsConst(&LOGOS_STR), value(value) {
-        initStr(value);
+        cleanStr();
     }
 
     Value* createIRValue(CodeGenMetadata* metadata) override;
     size_t size() override;
-    void cleanStr(const std::string& value);
-    void initStr(const string& value);
+    void cleanStr();
+    inline Value* add(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* createGlobalStr(Module* module, const std::string& value) const;
     ~LgsStrConst() override = default;
 };
 
