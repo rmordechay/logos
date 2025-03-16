@@ -19,3 +19,7 @@ LgsExpr* LgsIntConst::add(LgsExpr* other) {
     }
     return nullptr;
 }
+
+void LgsIntConst::print() {
+    std::cout << typeid(this).name() << value << '\n';
+}

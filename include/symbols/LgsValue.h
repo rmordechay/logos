@@ -16,6 +16,7 @@ public:
     virtual void setPosition(const antlr4::Token* ctx);
     static BasicBlock* createBasicBlock(const char* name);
     static void startBlock(CodeGenMetadata* metadata, BasicBlock* block);
+    virtual void print();
     virtual ~LgsValue() = default;
 private:
     virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
@@ -39,6 +40,10 @@ inline void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const bl
     auto& builder = metadata->builder;
     block->insertInto(currentFunc);
     builder.SetInsertPoint(block);
+}
+
+inline void LgsValue::print() {
+
 }
 
 inline BasicBlock* LgsValue::createBasicBlock(const char* name) {
