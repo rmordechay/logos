@@ -61,14 +61,15 @@ public:
     void visitConstant(const LgsConst* constant) const;
 
     void setFuncCallType(LgsFuncCall* funcCall);
+    void setType(LgsExpr* expr, LgsType* type);
     void setLoopVar(const LgsForeachLoop* foreachLoop);
-    void setArrayType(LgsArray* array) const;
-    void setBinaryExprType(LgsBinaryExpr* binaryExpr) const;
+    void setArrayType(LgsArray* array);
+    void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     void setForLoopIterable(LgsForeachLoop* foreachLoop, const LgsVariable* variable);
     void setForLoopIterable(LgsForeachLoop* foreachLoop);
 
     bool checkExprType(const LgsExpr* expr, const LgsType* otherType);
-    Location* getSymbolPosition(const LgsSymbol* s) const;
+    Location* getSymbolLocation(const LgsSymbol* s) const;
     void printError(LgsErrCode code, const Location* location, const vector<string>& args);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);

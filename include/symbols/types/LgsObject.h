@@ -18,9 +18,6 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) const override;
     ~LgsObject() override;
-
 };
-
-
 
 #endif //LOGOSOBJECT_H

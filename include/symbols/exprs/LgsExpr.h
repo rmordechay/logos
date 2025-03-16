@@ -13,7 +13,7 @@ public:
     virtual Value* sub(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* mul(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* div(CodeGenMetadata* metadata, LgsExpr* other);
-    ~LgsExpr() override = default;
+    ~LgsExpr() override;
 };
 
 inline Value* LgsExpr::sub(CodeGenMetadata* metadata, LgsExpr* other) {
@@ -32,6 +32,10 @@ inline Value* LgsExpr::div(CodeGenMetadata* metadata, LgsExpr* other) {
     const auto l = this->getIRValue(metadata);
     const auto r = other->getIRValue(metadata);
     return metadata->builder.CreateSDiv(l, r);
+}
+
+inline LgsExpr::~LgsExpr() {
+    if (type) delete type;
 }
 
 #endif //LOGOSEXPR_H

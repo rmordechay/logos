@@ -4,8 +4,7 @@
 #include <Token.h>
 #include <llvm/IR/Value.h>
 #include "LgsGlobals.h"
-
-constexpr auto privateLinkage = GlobalValue::PrivateLinkage;
+#include "LgsType.h"
 
 class LgsValue {
 public:

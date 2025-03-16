@@ -214,15 +214,15 @@ void SemaAnalyser::visitSelection(LgsSelection* selection) {
         const auto currentExpr = exprs[i];
         const auto nextExpr = exprs[i + 1];
         if (const auto field = currentExpr->type->getField(nextExpr->getName())) {
-            nextExpr->type = field->type;
+            setType(nextExpr, field->type);
         } else if (const auto method = currentExpr->type->getMethod(nextExpr->getName())) {
             const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr);
             methodCall->func = method;
             methodCall->args.insert(methodCall->args.begin(), currentExpr);
-            nextExpr->type = method->type;
+            setType(nextExpr, method->type);
         }
     }
-    selection->type = selection->lastExpr()->type;
+    setType(selection, selection->lastExpr()->type);
 }
 
 void SemaAnalyser::resolveSelectionVariable(LgsVariable* variable) {
@@ -230,11 +230,11 @@ void SemaAnalyser::resolveSelectionVariable(LgsVariable* variable) {
     const auto currentSymbol = logosStack.getSymbol(variable->name);
     if (currentSymbol->type == VAR_DEC) {
         const auto varDec = currentSymbol->varDec;
-        variable->type = varDec->type;
+        setType(variable, varDec->type);
     }
     if (currentSymbol->type == PARAM) {
         const auto param = currentSymbol->param;
-        variable->type = param->type;
+        setType(variable, param->type);
     }
 }
 
@@ -242,18 +242,19 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     const auto symbol = getSymbol(instance->name, instance);
     if (!symbol) return;
     instance->obj = new LgsObject(*symbol->object);
-    instance->type = instance->obj;
+    setType(instance, instance->obj);
 }
 
 void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
     visitExpr(arrayIndex->baseExpr);
-    arrayIndex->type = arrayIndex->baseExpr->type;
+    setType(arrayIndex, arrayIndex->baseExpr->type);
 }
 
 void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
     }
+    funcCall->setComposedName();
     setFuncCallType(funcCall);
 }
 
@@ -262,10 +263,10 @@ void SemaAnalyser::setVariableType(LgsVariable* variable) {
     if (!symbol) return;
     switch (symbol->type) {
     case VAR_DEC:
-        variable->type = symbol->varDec->type;
+        setType(variable, symbol->varDec->type);
         break;
     case PARAM:
-        variable->type = symbol->param->type;
+        setType(variable, symbol->param->type);
         break;
     default:
         assert(false && "setVariableType not implemented");
@@ -276,26 +277,26 @@ void SemaAnalyser::visitConstant(const LgsConst* constant) const {
 }
 
 void SemaAnalyser::setLoopVar(const LgsForeachLoop* foreachLoop) {
-    foreachLoop->loopVar->type = foreachLoop->iterableExpr->type;
+    setType(foreachLoop->loopVar, foreachLoop->iterableExpr->type);
     // TODO free memory
     const auto varDec = new LgsVarDec(foreachLoop->loopVar->name, &LOGOS_INT);
     addLocalSymbol(foreachLoop->loopVar->name, LgsSymbol(VAR_DEC, varDec));
 }
 
-void SemaAnalyser::setArrayType(LgsArray* array) const {
+void SemaAnalyser::setArrayType(LgsArray* array) {
     // TODO add proper check for array type
-    array->type = array->elements[0]->type;
+    setType(array, array->elements[0]->type);
 }
 
-void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) const {
+void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     switch (binaryExpr->op) {
     case ADD:
     case SUB:
     case MUL:
     case DIV: {
-        const auto lty = binaryExpr->left->type;
-        const auto rty = binaryExpr->right->type;
-        binaryExpr->type = lty->inferBinaryType(rty);
+        const auto lType = binaryExpr->left->type;
+        const auto rType = binaryExpr->right->type;
+        setType(binaryExpr, lType->inferBinaryType(rType));
     }
     break;
     case NE:
@@ -304,18 +305,32 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) const {
     case GT:
     case GE:
     case LE:
-        binaryExpr->type = &LOGOS_BOOL;
+        setType(binaryExpr, &LOGOS_BOOL);
     case NOOP:
         break;
     }
 }
 
 void SemaAnalyser::setFuncCallType(LgsFuncCall* funcCall) {
-    funcCall->setComposedName();
     const auto symbol = getSymbol(funcCall->composedName, funcCall);
     if (!symbol || symbol->type != FUNC_IMPL) return;
     funcCall->func = symbol->func;
-    funcCall->type = symbol->func->type;
+    setType(funcCall, symbol->func->type);
+}
+
+void SemaAnalyser::setType(LgsExpr* expr, LgsType* type) {
+    // There should be only one reference for each object. Thus check if
+    // the type is Object and replaces it. Otherwise, set to the type.
+    if (const auto obj = dynamic_cast<LgsObject*>(type)) {
+        delete obj;
+        const auto symbol = getSymbol(type->getName(), expr);
+        if (!symbol) return;
+        if (symbol->type == OBJECT) {
+            expr->type = symbol->object;
+        }
+        return;
+    }
+    expr->type = type;
 }
 
 void SemaAnalyser::setForLoopIterable(LgsForeachLoop* foreachLoop) {
@@ -351,7 +366,7 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
 
 void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
     if (const auto s = logosStack.getSymbol(name)) {
-        const auto symbolPosition = getSymbolPosition(s);
+        const auto symbolPosition = getSymbolLocation(s);
         printError(E10011, &symbol.varDec->location, {name, to_string(symbolPosition->lineNumber)});
         return;
     }
@@ -374,7 +389,7 @@ void SemaAnalyser::printError(const LgsErrCode code, const Location* location, c
     cout << "\tat " << path << '\n';
 }
 
-Location* SemaAnalyser::getSymbolPosition(const LgsSymbol* s) const {
+Location* SemaAnalyser::getSymbolLocation(const LgsSymbol* s) const {
     switch (s->type) {
     case VAR_DEC:
         return &s->varDec->location;

@@ -415,11 +415,13 @@ LgsType* AntlerConverter::getType(tree::TerminalNode* type) {
     if (typeText == LOGOS_BOOL.getName()) return &LOGOS_BOOL;
     if (typeText == LOGOS_STR.getName()) return &LOGOS_STR;
     if (typeText == "") return &LOGOS_VOID;
-    return nullptr;
+    return new LgsObject(type->getText());
 }
 
 LgsType* AntlerConverter::getFuncType(LogosParser::FuncImplementationContext* ctx) {
     const auto signature = ctx->funcSignature();
-    if (signature->type()) return getType(signature->type()->TYPE());
+    if (signature->type()) {
+        return getType(signature->type()->TYPE());
+    }
     return &LOGOS_VOID;
 }

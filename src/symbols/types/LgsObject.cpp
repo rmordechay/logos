@@ -20,7 +20,7 @@ Type* LgsObject::getIRType() {
         auto fieldType = val->type->getIRType();
         elementTypes.push_back(fieldType);
     }
-    IRType = StructType::create(elementTypes, getName());
+    IRType = StructType::create(elementTypes, name);
     return IRType;
 }
 
