@@ -7,10 +7,8 @@
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IRReader/IRReader.h>
 #include <llvm/TargetParser/Host.h>
-#include <llvm/MC/TargetRegistry.h>
 #include <llvm/Support/SourceMgr.h>
 #include <llvm/Support/FileSystem.h>
-#include <llvm/IR/Verifier.h>
 
 
 namespace lld::macho {
