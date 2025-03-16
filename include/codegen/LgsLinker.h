@@ -11,6 +11,7 @@ public:
     static void link(const map<string, Module*>& modules);
     static vector<const char*> getLinkerOpts();
     static void writeExecFile(const unique_ptr<Module>& module);
+    static unique_ptr<Module> getStdlibModule();
     ~LgsLinker() = default;
 };
 
