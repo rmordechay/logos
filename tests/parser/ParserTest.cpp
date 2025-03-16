@@ -1,6 +1,7 @@
 #include "Logos.h"
 #include <gtest/gtest.h>
 #include <LogosParser.h>
+#include <filesystem>
 
 const string dataDir = "../tests/parser/data/";
 

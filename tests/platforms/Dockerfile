@@ -6,7 +6,6 @@ RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 17 all &&
 RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang-17 100
 RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-17 100
 
-WORKDIR /app/
-WORKDIR build/
+WORKDIR /app/build
 RUN cmake ..
-RUN make -j 5
+#RUN make -j 5
