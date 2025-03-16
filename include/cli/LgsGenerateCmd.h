@@ -1,10 +1,15 @@
 #ifndef LOGOSGENERATECMD_H
 #define LOGOSGENERATECMD_H
+#include "LgsCmd.h"
 
-class LgsGenerateCmd final {
+class LgsGenerateCmd final : public LgsCmd {
 public:
-    static void runCmd(int argc, char** argv);
-    ~LgsGenerateCmd() = default;
+
+    LgsGenerateCmd(const int argc, char** argv) : LgsCmd(argc, argv) {}
+    void runCmd() override;
+    void validate() override;
+    void printHelp() override;
+    ~LgsGenerateCmd() override = default;
 };
 
 

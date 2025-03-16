@@ -1,15 +1,18 @@
 #ifndef LOGOSCMDRUN_H
 #define LOGOSCMDRUN_H
+#include "LgsCmd.h"
+
 #include <string>
 
-class LgsRunCmd final {
+class LgsRunCmd final : public LgsCmd {
 public:
     std::string rootPath;
 
-    void initRootPath(int argc, char** argv);
-    void runCmd(int argc, char** argv);
-    static void printHelp();
-    ~LgsRunCmd() = default;
+    LgsRunCmd(const int argc, char** argv) : LgsCmd(argc, argv) {}
+    void runCmd() override;
+    void validate() override;
+    void printHelp() override;
+    ~LgsRunCmd() override = default;
 };
 
 #endif //LOGOSCMDRUN_H

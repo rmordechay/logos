@@ -3,7 +3,7 @@
 
 #include <Token.h>
 #include <llvm/IR/Value.h>
-#include "codegen/LogosMetadata.h"
+#include "LgsGlobals.h"
 
 constexpr auto privateLinkage = GlobalValue::PrivateLinkage;
 

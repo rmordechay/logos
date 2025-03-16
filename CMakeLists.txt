@@ -126,7 +126,8 @@ add_library(lib STATIC
     src/symbols/types/LgsChar.cpp
 )
 
-add_executable(lgs main.cpp)
+add_executable(lgs main.cpp
+    include/cli/LgsCmd.h)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE

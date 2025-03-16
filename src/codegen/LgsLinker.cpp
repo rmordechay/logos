@@ -1,7 +1,7 @@
 #include "codegen/LgsLinker.h"
 #include <CodeGenerator.h>
 #include "LgsDefinitions.h"
-#include <LogosMetadata.h>
+#include <LgsGlobals.h>
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/IR/LegacyPassManager.h>

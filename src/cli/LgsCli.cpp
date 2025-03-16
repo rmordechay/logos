@@ -13,11 +13,11 @@ void LgsCli::execute() const {
 
     const string cmd = argv[1];
     if (cmd == "run") {
-        LgsRunCmd command;
-        command.runCmd(argc, argv);
+        LgsRunCmd command(argc, argv);
+        command.runCmd();
     } else if (cmd == "generate") {
-        LgsGenerateCmd command;
-        command.runCmd(argc, argv);
+        LgsGenerateCmd command(argc, argv);
+        command.runCmd();
     } else if (cmd == "version" || cmd == "-v" || cmd == "--version") {
         printVersion();
     }

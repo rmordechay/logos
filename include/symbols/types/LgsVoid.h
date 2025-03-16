@@ -2,7 +2,7 @@
 #define LOGOSVOID_H
 
 #include "LgsType.h"
-#include <LogosMetadata.h>
+#include "LgsGlobals.h"
 
 using namespace std;
 

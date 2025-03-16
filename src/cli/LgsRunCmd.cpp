@@ -2,13 +2,13 @@
 #include "Logos.h"
 #include <iostream>
 
-void LgsRunCmd::runCmd(const int argc, char** argv) {
-    initRootPath(argc, argv);
+void LgsRunCmd::runCmd() {
+    validate();
     Logos project(rootPath);
     project.run();
 }
 
-void LgsRunCmd::initRootPath(const int argc, char** argv) {
+void LgsRunCmd::validate() {
     const auto firstArg = argv[2];
     const bool isArgDotOrEmpty = std::strcmp(firstArg, ".") == 0 || argc < 3;
     if (isArgDotOrEmpty) {
@@ -19,5 +19,5 @@ void LgsRunCmd::initRootPath(const int argc, char** argv) {
 }
 
 void LgsRunCmd::printHelp() {
-    std::cout << "Usage: lgs run [path] [options]" << "\n\n";
+    std::cout << "Usage: lgs run <path> <options>" << "\n\n";
 }

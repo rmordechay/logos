@@ -3,7 +3,7 @@
 #include "LgsExpr.h"
 #include "LgsOperator.h"
 
-#include <LogosMetadata.h>
+#include "LgsGlobals.h"
 #include <LgsType.h>
 
 class LgsBinaryExpr final : public LgsExpr {
