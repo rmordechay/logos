@@ -132,7 +132,7 @@ exprList:
 
 unaryExpr:
         VARIABLE
-    |   SELF
+    |   SELF_INSTANCE
     |   funcCall
     |   constructor
     |   constant
@@ -184,7 +184,8 @@ selection:
 firstSelectionElement:
         VARIABLE
     |   TYPE
-    |   SELF
+    |   SELF_CLASS
+    |   SELF_INSTANCE
     |   funcCall
     |   constructor
     |   arrayIndex
@@ -240,7 +241,8 @@ DOLLAR: '$';
 AMPERSAND: '&';
 
 OBJECT: 'object';
-SELF: 'self';
+SELF_INSTANCE: 'self';
+SELF_CLASS: 'Self';
 INTERFACE: 'interface';
 ENUM: 'enum';
 

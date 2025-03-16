@@ -9,28 +9,29 @@
 #include <funcs/LgsPrint.h>
 
 void Logos::run() {
-    // Initial
-    initProject();
+    // Initial validation
+    validateProject();
 
     // Parsing
     const auto files = parseFiles();
 
-    // Analysis
+    // Project analysis
     ProjectAnalyser projectAnalyser(files);
     if (!projectAnalyser.analyse()) return;
+    // Semantic analysis
     map<string, LgsSymbol> globalSymbols;
     setGlobalsSymbols(files, globalSymbols);
     if (!analyse(files, globalSymbols)) return;
 
     // Code generation
-    const auto mainFile = getMainFile(files);
-    CodeGenerator::generateCode(mainFile, globalSymbols);
+    generateCode(getMainFile(files), globalSymbols);
 
     // Linking
-    LgsLinker::link(modules);
+    LgsLinker linker(objFilePath, execFilePath);
+    linker.link(modules);
 
     // Running
-    system((buildDir / EXECUTABLE_FILE).c_str());
+    system(execFilePath.c_str());
 }
 
 vector<LgsFile*> Logos::parseFiles() {
@@ -59,6 +60,24 @@ void Logos::parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& t
     }
 }
 
+LgsFile* Logos::parseFile(const directory_entry& fileEntry) const {
+    auto absFilePath = canonical(fileEntry).string();
+    ifstream file(absFilePath);
+    stringstream fileContents;
+    fileContents << file.rdbuf();
+    auto codeText = fileContents.str();
+
+    auto input = ANTLRInputStream(codeText);
+    auto lexer = LogosLexer(&input);
+    auto tokens = CommonTokenStream(&lexer);
+    auto parser = LogosParser(&tokens);
+    auto parsedFile = parser.logosFile();
+
+    auto logosFile = AntlerConverter::getLogosFile(parsedFile, absFilePath);
+    logosFile->relPath = relative(absFilePath, rootDir).lexically_relative(LOGOS_SRC_DIR);
+    return logosFile;
+}
+
 void Logos::setGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymbol>& globalSymbols) {
     addBuiltinFuncs(globalSymbols);
     for (const auto& file : files) {
@@ -84,24 +103,6 @@ void Logos::addBuiltinFuncs(map<string, LgsSymbol>& globalSymbols) {
     globalSymbols[printCharFunc->composedName] = LgsSymbol(FUNC_IMPL, printCharFunc);
 }
 
-LgsFile* Logos::parseFile(const directory_entry& fileEntry) const {
-    auto absFilePath = canonical(fileEntry).string();
-    ifstream file(absFilePath);
-    stringstream fileContents;
-    fileContents << file.rdbuf();
-    auto codeText = fileContents.str();
-
-    auto input = ANTLRInputStream(codeText);
-    auto lexer = LogosLexer(&input);
-    auto tokens = CommonTokenStream(&lexer);
-    auto parser = LogosParser(&tokens);
-    auto parsedFile = parser.logosFile();
-
-    auto logosFile = AntlerConverter::getLogosFile(parsedFile, absFilePath);
-    logosFile->relPath = relative(absFilePath, rootDir).lexically_relative(LOGOS_SRC_DIR);
-    return logosFile;
-}
-
 bool Logos::analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols) {
     ThreadPool threadPool;
     threadPool.start();
@@ -121,28 +122,23 @@ bool Logos::analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>&
     return std::find(semaSuccess.begin(), semaSuccess.end(), false) == semaSuccess.end();
 }
 
+void Logos::generateCode(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols) const {
+    create_directories(buildDir);
+    initLLVM();
+    CodeGenerator::generateModule(buildDir, mainFile, globalSymbols);
+}
+
 void Logos::validateProject() const {
-    string srcDir;
+    string srcDirPath;
     for (const auto& entry : directory_iterator(rootDir)) {
         auto fileName = entry.path().filename();
         if (entry.is_directory() && fileName == LOGOS_SRC_DIR) {
-            srcDir = entry.path().string();
+            srcDirPath = entry.path().string();
         }
     }
-    if (srcDir.empty()) {
+    if (srcDirPath.empty()) {
         exitWithMessage(LOGOS_ERRORS.at(E10010));
     }
-}
-
-void Logos::initProject() const {
-    initPaths();
-    validateProject();
-}
-
-void Logos::initPaths() const {
-    rootDir = rootPath;
-    srcDir = rootDir / LOGOS_SRC_DIR;
-    buildDir = rootDir / LOGOS_BUILD_DIR;
 }
 
 bool Logos::isLogosFile(const directory_entry& filePath) {

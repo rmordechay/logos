@@ -16,7 +16,7 @@ const auto LOGOS_SELF = "self";
 // LLVM
 const auto OBJECT_FILE = "output.o";
 const auto EXECUTABLE_FILE = "output";
-const auto LOGOS_STDLIB = "../stdlib/lgslib.a";
+const auto LOGOS_STDLIB = "../stdlib/lgslib.ll";
 
 #if defined(_WIN32)
     #define OS_NAME "Windows"

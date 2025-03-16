@@ -16,12 +16,12 @@ public:
     LBRACE = 7, RBRACE = 8, LBRACK = 9, RBRACK = 10, LANGLE = 11, RANGLE = 12, 
     COMMA = 13, DOUBLE_DOT = 14, DOT = 15, COLON = 16, EQUAL = 17, MINUS = 18, 
     PLUS = 19, STAR = 20, SLASH = 21, HASH = 22, QUEST_MARK = 23, EXCLA_MARK = 24, 
-    PERCENT = 25, DOLLAR = 26, AMPERSAND = 27, OBJECT = 28, SELF = 29, INTERFACE = 30, 
-    ENUM = 31, VEC = 32, VEC2 = 33, VEC3 = 34, VEC4 = 35, IMPLEMENTS = 36, 
-    IMPORT = 37, IF = 38, ELSE = 39, FOR = 40, BREAK = 41, CONTINUE = 42, 
-    RETURN = 43, AND = 44, OR = 45, NOT = 46, IN = 47, INTEGER = 48, FLOAT = 49, 
-    BOOL = 50, CONST = 51, TYPE = 52, VARIABLE = 53, STRING = 54, LINE_COMMENT = 55, 
-    BLOCK_COMMENT = 56, WS = 57
+    PERCENT = 25, DOLLAR = 26, AMPERSAND = 27, OBJECT = 28, SELF_INSTANCE = 29, 
+    SELF_CLASS = 30, INTERFACE = 31, ENUM = 32, VEC = 33, VEC2 = 34, VEC3 = 35, 
+    VEC4 = 36, IMPLEMENTS = 37, IMPORT = 38, IF = 39, ELSE = 40, FOR = 41, 
+    BREAK = 42, CONTINUE = 43, RETURN = 44, AND = 45, OR = 46, NOT = 47, 
+    IN = 48, INTEGER = 49, FLOAT = 50, BOOL = 51, CONST = 52, TYPE = 53, 
+    VARIABLE = 54, STRING = 55, LINE_COMMENT = 56, BLOCK_COMMENT = 57, WS = 58
   };
 
   enum {
@@ -526,7 +526,7 @@ public:
     UnaryExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
-    antlr4::tree::TerminalNode *SELF();
+    antlr4::tree::TerminalNode *SELF_INSTANCE();
     FuncCallContext *funcCall();
     ConstructorContext *constructor();
     ConstantContext *constant();
@@ -682,7 +682,8 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *TYPE();
-    antlr4::tree::TerminalNode *SELF();
+    antlr4::tree::TerminalNode *SELF_CLASS();
+    antlr4::tree::TerminalNode *SELF_INSTANCE();
     FuncCallContext *funcCall();
     ConstructorContext *constructor();
     ArrayIndexContext *arrayIndex();

@@ -1,17 +1,28 @@
 #ifndef LOGOSLINKER_H
 #define LOGOSLINKER_H
 #include <map>
+#include <__filesystem/filesystem_error.h>
 #include <llvm/IR/Module.h>
 
 using namespace llvm;
 using namespace std;
 
+namespace lld::macho {
+    bool link(ArrayRef<const char *> argsArr, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
+}
+
 class LgsLinker {
 public:
-    static void link(const map<string, Module*>& modules);
-    static vector<const char*> getLinkerOpts();
-    static void writeExecFile(const unique_ptr<Module>& module);
-    static unique_ptr<Module> getStdlibModule();
+    filesystem::path objFilePath;
+    filesystem::path execFilePath;
+
+    LgsLinker(const filesystem::path& objFilePath, const filesystem::path& execFilePath)
+        : objFilePath(objFilePath), execFilePath(execFilePath) {
+    }
+
+    void link(const map<string, Module*>& modules) const;
+    vector<const char*> getLinkerOpts() const;
+    unique_ptr<Module> getStdlibModule() const;
     ~LgsLinker() = default;
 };
 

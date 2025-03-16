@@ -304,8 +304,8 @@ LgsUnaryExpr* AntlerConverter::getFirstSelection(LogosParser::SelectionContext* 
     if (const auto variable = firstExpr->VARIABLE()) {
         return getVariable(variable->getText(), ctx);
     }
-    if (const auto self = firstExpr->SELF()) {
-        return getVariable(self->getText(), ctx);
+    if (const auto selfInstance = firstExpr->SELF_INSTANCE()) {
+        return getVariable(selfInstance->getText(), ctx);
     }
     if (const auto funcCall = firstExpr->funcCall()) {
         return getFuncCall(funcCall);
@@ -315,6 +315,9 @@ LgsUnaryExpr* AntlerConverter::getFirstSelection(LogosParser::SelectionContext* 
     }
     if (const auto type = firstExpr->TYPE()) {
         return getTypeConstant(type, ctx);
+    }
+    if (const auto selfClass = firstExpr->SELF_CLASS()) {
+        return getTypeConstant(selfClass, ctx);
     }
     return nullptr;
 }

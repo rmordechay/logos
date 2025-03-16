@@ -10,12 +10,27 @@
 #include <llvm/Support/SourceMgr.h>
 #include <llvm/Support/FileSystem.h>
 
+void LgsLinker::link(const std::map<std::string, Module*>& modules) const {
+    auto stdlibModule = getStdlibModule();
+    const auto mainModule = modules.find(LOGOS_MAIN_FILE)->second;
+    Linker linker(*mainModule);
+    linker.linkInModule(unique_ptr(std::move(stdlibModule)));
+    for (const auto& [name, file] : modules) {
+        if (name == LOGOS_MAIN_FILE) continue;
+        linker.linkInModule(unique_ptr<Module>(std::move(file)));
+    }
 
-namespace lld::macho {
-    bool link(ArrayRef<const char *> argsArr, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
+    error_code EC;
+    legacy::PassManager pass;
+    raw_fd_ostream outputStream(objFilePath.c_str(), EC, sys::fs::OF_None);
+    targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
+    pass.run(*mainModule);
+    outputStream.flush();
+
+    lld::macho::link(getLinkerOpts(), outs(), errs(), false, false);
 }
 
-std::unique_ptr<Module> LgsLinker::getStdlibModule() {
+std::unique_ptr<Module> LgsLinker::getStdlibModule() const {
     SMDiagnostic EC;
     std::unique_ptr<Module> stdlibModule = parseIRFile(LOGOS_STDLIB, EC, context);
     const auto targetTriple = sys::getDefaultTargetTriple();
@@ -24,35 +39,11 @@ std::unique_ptr<Module> LgsLinker::getStdlibModule() {
     return stdlibModule;
 }
 
-void LgsLinker::link(const std::map<std::string, Module*>& modules) {
-    auto stdlibModule = getStdlibModule();
-    const auto mainModule = modules.find(LOGOS_MAIN_FILE)->second;
-
-    Linker linker(*mainModule);
-    linker.linkInModule(unique_ptr(std::move(stdlibModule)));
-    for (const auto& [name, file] : modules) {
-        if (name == LOGOS_MAIN_FILE) continue;
-        linker.linkInModule(unique_ptr<Module>(std::move(file)));
-    }
-
-    writeExecFile(unique_ptr<Module>(mainModule));
-    lld::macho::link(getLinkerOpts(), outs(), errs(), false, false);
-}
-
-void LgsLinker::writeExecFile(const unique_ptr<Module>& module) {
-    error_code EC;
-    legacy::PassManager pass;
-    raw_fd_ostream outputStream((buildDir / OBJECT_FILE).c_str(), EC, sys::fs::OF_None);
-    targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
-    pass.run(*module);
-    outputStream.flush();
-}
-
-vector<const char*> LgsLinker::getLinkerOpts() {
+vector<const char*> LgsLinker::getLinkerOpts() const {
     return {
         DEFAULT_LINKER,
-        (buildDir / OBJECT_FILE).c_str(),
-        "-o", (buildDir / EXECUTABLE_FILE).c_str(),
+        objFilePath.c_str(),
+        "-o", execFilePath.c_str(),
         "-lSystem",
         "-syslibroot", LIB_ROOT,
         "-e", ENTRY_POINT,
@@ -60,3 +51,4 @@ vector<const char*> LgsLinker::getLinkerOpts() {
         "-arch", ARCH_NAME,
     };
 }
+

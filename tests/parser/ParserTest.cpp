@@ -4,10 +4,9 @@
 
 
 TEST(ParserTest, TestParseFile) {
-    const Logos project("../tests/parser/data");
-    project.initPaths();
-    const directory_entry fileEntry(rootDir / "Main.lgs");
-    const auto file = project.parseFile(fileEntry);
+    const Logos logos("../tests/parser/data");
+    const directory_entry fileEntry(logos.rootDir / "Main.lgs");
+    const auto file = logos.parseFile(fileEntry);
     const auto mainFile = dynamic_cast<LgsMainFile*>(file);
     EXPECT_NE(mainFile, nullptr);
     ASSERT_EQ(mainFile->name, "Main");

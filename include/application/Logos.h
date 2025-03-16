@@ -15,19 +15,21 @@ using namespace std;
 using namespace antlr4;
 using namespace llvm;
 
-inline path rootDir;
-inline path srcDir;
-inline path buildDir;
-
 class Logos {
 public:
     mutex mtx;
-    path rootPath;
+    path rootDir;
+    path buildDir;
+    path objFilePath;
+    path execFilePath;
 
-    explicit Logos(const path& rootPath) : rootPath(rootPath) {}
+    explicit Logos(const path& rootDirPath) : rootDir(rootDirPath) {
+        buildDir = rootDir / LOGOS_BUILD_DIR;
+        objFilePath = buildDir / LOGOS_BUILD_DIR;
+        execFilePath = buildDir / LOGOS_BUILD_DIR;
+    }
     void run();
-    void initProject() const;
-    void initPaths() const;
+    void generateCode(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols) const;
     void validateProject() const;
     vector<LgsFile*> parseFiles();
     LgsFile* parseFile(const directory_entry&) const;

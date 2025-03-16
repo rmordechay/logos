@@ -8,6 +8,7 @@
 #include <llvm/Target/TargetOptions.h>
 #include <llvm/TargetParser/Host.h>
 #include <llvm/Target/TargetMachine.h>
+#include <filesystem>
 
 class CodeGenerator;
 class LgsStack;
@@ -22,6 +23,7 @@ inline TargetMachine* targetMachine = nullptr;
 struct CodeGenMetadata {
     LgsStack logosStack;
     Module* currentModule;
+    filesystem::path buildDir;
     IRBuilder<> builder = IRBuilder(context);
 };
 
