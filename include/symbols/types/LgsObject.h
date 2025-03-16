@@ -17,7 +17,7 @@ public:
     LgsConst* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) const override;
-    ~LgsObject() override;
+    ~LgsObject() override = default;
 };
 
 #endif //LOGOSOBJECT_H

@@ -1,6 +1,6 @@
 #ifndef SELECTION_H
 #define SELECTION_H
-#include "types/LgsObject.h"
+#include <LogosUnaryExpr.h>
 
 class LgsUnaryExpr;
 

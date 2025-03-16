@@ -4,7 +4,6 @@
 #include <Token.h>
 #include <llvm/IR/Value.h>
 #include "LgsGlobals.h"
-#include "LgsType.h"
 
 class LgsValue {
 public:

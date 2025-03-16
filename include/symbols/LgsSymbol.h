@@ -22,7 +22,7 @@ enum LgsSymbolType {
     VAR_DEC,
     PARAM,
     OBJECT,
-    FUNC_IMPL,
+    FUNC,
 };
 
 struct LgsSymbol {

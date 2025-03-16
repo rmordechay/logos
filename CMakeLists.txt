@@ -26,12 +26,17 @@ add_library(lib STATIC
     include/application/ThreadPool.h
     include/codegen/CodeGenerator.h
     include/codegen/LgsLinker.h
-    include/LgsError.h
     include/parser/LogosLexer.h
     include/parser/LogosParser.h
     include/analysis/AntlrConverter.h
+    include/analysis/LgsAnalyser.h
     include/analysis/SemaAnalyser.h
     include/analysis/ProjectAnalyser.h
+    include/cli/LgsCli.h
+    include/cli/LgsCmd.h
+    include/cli/LgsRunCmd.h
+    include/cli/LgsGenerateCmd.h
+    include/LgsError.h
     # Symbols headers
     include/symbols/exprs/binary/LgsBinaryExpr.h
     include/symbols/exprs/unary/constants/LgsConst.h
@@ -55,7 +60,7 @@ add_library(lib STATIC
     include/symbols/funcs/LgsParam.h
     include/symbols/funcs/LgsPrint.h
     include/symbols/LgsSymbol.h
-    include/symbols/LgsType.h
+    include/symbols/types/LgsType.h
     include/symbols/loops/LgsForeachLoop.h
     include/symbols/loops/LgsRangeLoop.h
     include/symbols/stmts/LgsField.h
@@ -65,17 +70,14 @@ add_library(lib STATIC
     include/symbols/stmts/LgsReturn.h
     include/symbols/stmts/LgsStmtBlock.h
     include/symbols/stmts/LgsVarDec.h
+    include/symbols/types/LgsType.h
     include/symbols/types/LgsBool.h
     include/symbols/types/LgsFloat.h
     include/symbols/types/LgsInt.h
     include/symbols/types/LgsStr.h
     include/symbols/types/LgsVoid.h
     include/symbols/types/LgsChar.h
-    include/cli/LgsCli.h
-    include/cli/LgsRunCmd.h
-    include/cli/LgsGenerateCmd.h
-    include/analysis/LgsAnalyser.h
-
+    include/symbols/types/LgsChar.h
     # src
     src/application/Logos.cpp
     src/application/ThreadPool.cpp
@@ -124,10 +126,10 @@ add_library(lib STATIC
     src/symbols/types/LgsVoid.cpp
     src/symbols/types/LgsFloat.cpp
     src/symbols/types/LgsChar.cpp
+    src/symbols/types/LgsType.cpp
 )
 
-add_executable(lgs main.cpp
-    include/cli/LgsCmd.h)
+add_executable(lgs main.cpp)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE

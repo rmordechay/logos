@@ -4,7 +4,7 @@
 #include "LgsOperator.h"
 
 #include "LgsGlobals.h"
-#include <LgsType.h>
+#include <../../types/LgsType.h>
 
 class LgsBinaryExpr final : public LgsExpr {
 public:

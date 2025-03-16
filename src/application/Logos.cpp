@@ -9,6 +9,11 @@
 #include <LogosParser.h>
 #include <ThreadPool.h>
 #include <funcs/LgsPrint.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Target/TargetOptions.h>
+#include <llvm/TargetParser/Host.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/MC/TargetRegistry.h>
 
 void Logos::run() {
     // Initial validation
@@ -23,7 +28,7 @@ void Logos::run() {
 
     // Semantic analysis
     map<string, LgsSymbol> globalSymbols;
-    setGlobalsSymbols(files, globalSymbols);
+    addGlobalsSymbols(files, globalSymbols);
     if (!analyse(files, globalSymbols)) return;
 
     // Code generation
@@ -35,6 +40,8 @@ void Logos::run() {
 
     // Running
     system(execFilePath.c_str());
+
+    cleanup(globalSymbols);
 }
 
 vector<LgsFile*> Logos::parseFiles() {
@@ -81,7 +88,7 @@ LgsFile* Logos::parseFile(const directory_entry& fileEntry) const {
     return logosFile;
 }
 
-void Logos::setGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymbol>& globalSymbols) {
+void Logos::addGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymbol>& globalSymbols) {
     addBuiltinFuncs(globalSymbols);
     for (const auto& file : files) {
         if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
@@ -89,7 +96,7 @@ void Logos::setGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymb
             globalSymbols[object->getName()] = LgsSymbol(OBJECT, object);
         } else if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
             for (const auto &func : mainFile->funcs) {
-                globalSymbols[func->composedName] = LgsSymbol(FUNC_IMPL, func);
+                globalSymbols[func->composedName] = LgsSymbol(FUNC, func);
             }
         }
     }
@@ -100,10 +107,10 @@ void Logos::addBuiltinFuncs(map<string, LgsSymbol>& globalSymbols) {
     const auto printFloatFunc = new LgsPrint({new LgsParam("input", &LOGOS_FLOAT)});
     const auto printStrFunc = new LgsPrint({new LgsParam("input", &LOGOS_STR)});
     const auto printCharFunc = new LgsPrint({new LgsParam("input", &LOGOS_CHAR)});
-    globalSymbols[printIntFunc->composedName] = LgsSymbol(FUNC_IMPL, printIntFunc);
-    globalSymbols[printFloatFunc->composedName] = LgsSymbol(FUNC_IMPL, printFloatFunc);
-    globalSymbols[printStrFunc->composedName] = LgsSymbol(FUNC_IMPL, printStrFunc);
-    globalSymbols[printCharFunc->composedName] = LgsSymbol(FUNC_IMPL, printCharFunc);
+    globalSymbols[printIntFunc->composedName] = LgsSymbol(FUNC, printIntFunc);
+    globalSymbols[printFloatFunc->composedName] = LgsSymbol(FUNC, printFloatFunc);
+    globalSymbols[printStrFunc->composedName] = LgsSymbol(FUNC, printStrFunc);
+    globalSymbols[printCharFunc->composedName] = LgsSymbol(FUNC, printCharFunc);
 }
 
 bool Logos::analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols) {
@@ -124,11 +131,6 @@ bool Logos::analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>&
     threadPool.wait();
     return std::find(semaSuccess.begin(), semaSuccess.end(), false) == semaSuccess.end();
 }
-#include <llvm/Support/TargetSelect.h>
-#include <llvm/Target/TargetOptions.h>
-#include <llvm/TargetParser/Host.h>
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/MC/TargetRegistry.h>
 
 inline void initLLVM() {
     InitializeNativeTarget();
@@ -158,17 +160,13 @@ void Logos::validateProject() const {
         }
     }
     if (srcDirPath.empty()) {
-        exitWithMessage(LOGOS_ERRORS.at(E10010));
+        cout << LOGOS_ERRORS.at(E10010) << '\n';
+        exit(0);
     }
 }
 
 bool Logos::isLogosFile(const directory_entry& filePath) {
     return filePath.is_regular_file() && filePath.path().extension().string() == LOGOS_EXTENSION;
-}
-
-void Logos::exitWithMessage(const string& errMsg) {
-    cout << errMsg << '\n';
-    exit(0);
 }
 
 LgsMainFile* Logos::getMainFile(const vector<LgsFile*>& files) {
@@ -179,4 +177,19 @@ LgsMainFile* Logos::getMainFile(const vector<LgsFile*>& files) {
         }
     }
     return nullptr;
+}
+
+void Logos::cleanup(map<string, LgsSymbol> globalSymbols) const {
+    for (const auto& [_, globalSymbol] : globalSymbols) {
+        switch (globalSymbol.type) {
+        case OBJECT:
+            if (globalSymbol.object) delete globalSymbol.object;
+            break;
+        case FUNC:
+            if (globalSymbol.func) delete globalSymbol.func;
+            break;
+        default:
+            break;
+        }
+    }
 }

@@ -1,6 +1,7 @@
 #include "unary/LgsSelection.h"
 
 #include "LgsFuncCall.h"
+#include "funcs/LgsMethodImpl.h"
 #include "unary/LgsArrayIndex.h"
 #include "unary/LgsVariable.h"
 #include "stmts/LgsField.h"

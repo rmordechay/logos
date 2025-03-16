@@ -313,23 +313,12 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
 
 void SemaAnalyser::setFuncCallType(LgsFuncCall* funcCall) {
     const auto symbol = getSymbol(funcCall->composedName, funcCall);
-    if (!symbol || symbol->type != FUNC_IMPL) return;
+    if (!symbol || symbol->type != FUNC) return;
     funcCall->func = symbol->func;
     setType(funcCall, symbol->func->type);
 }
 
-void SemaAnalyser::setType(LgsExpr* expr, LgsType* type) {
-    // There should be only one reference for each object. Thus check if
-    // the type is Object and replaces it. Otherwise, set to the type.
-    if (const auto obj = dynamic_cast<LgsObject*>(type)) {
-        delete obj;
-        const auto symbol = getSymbol(type->getName(), expr);
-        if (!symbol) return;
-        if (symbol->type == OBJECT) {
-            expr->type = symbol->object;
-        }
-        return;
-    }
+void SemaAnalyser::setType(LgsExpr* expr, LgsType* type) const {
     expr->type = type;
 }
 
@@ -395,7 +384,7 @@ Location* SemaAnalyser::getSymbolLocation(const LgsSymbol* s) const {
         return &s->varDec->location;
     case PARAM:
         return &s->param->location;
-    case FUNC_IMPL:
+    case FUNC:
         return &s->func->location;
     default:
         return nullptr;

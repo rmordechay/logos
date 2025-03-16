@@ -83,7 +83,7 @@ inline void LgsStack::addLocalSymbol(const string& name, LgsParam* symbol) {
 }
 
 inline void LgsStack::addLocalSymbol(const string& name, LgsFunc* symbol) {
-    addLocalSymbol(name, LgsSymbol(FUNC_IMPL, symbol));
+    addLocalSymbol(name, LgsSymbol(FUNC, symbol));
 }
 
 inline string LgsStack::getStackString() const {

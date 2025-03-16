@@ -27,6 +27,7 @@ public:
         objFilePath = buildDir / LOGOS_BUILD_DIR;
         execFilePath = buildDir / LOGOS_BUILD_DIR;
     }
+
     void run();
     void generateCode(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols) const;
     void validateProject() const;
@@ -36,9 +37,9 @@ public:
     static void addBuiltinFuncs(map<string, LgsSymbol>& globalSymbols);
     bool analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols);
     static LgsMainFile* getMainFile(const vector<LgsFile*>& files);
-    static void setGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymbol>& globalSymbols);
+    static void addGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymbol>& globalSymbols);
     static bool isLogosFile(const directory_entry& filePath);
-    static void exitWithMessage(const string& errMsg);
+    void cleanup(map<string, LgsSymbol> globalSymbols) const;
     ~Logos() = default;
 };
 

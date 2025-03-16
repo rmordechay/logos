@@ -61,7 +61,7 @@ public:
     void visitConstant(const LgsConst* constant) const;
 
     void setFuncCallType(LgsFuncCall* funcCall);
-    void setType(LgsExpr* expr, LgsType* type);
+    void setType(LgsExpr* expr, LgsType* type) const;
     void setLoopVar(const LgsForeachLoop* foreachLoop);
     void setArrayType(LgsArray* array);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);

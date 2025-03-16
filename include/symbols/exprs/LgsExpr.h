@@ -1,7 +1,7 @@
 #ifndef LOGOSEXPR_H
 #define LOGOSEXPR_H
 #include "LgsValue.h"
-#include <LgsType.h>
+#include <../types/LgsType.h>
 
 
 class LgsExpr: virtual public LgsValue {
@@ -13,7 +13,7 @@ public:
     virtual Value* sub(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* mul(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* div(CodeGenMetadata* metadata, LgsExpr* other);
-    ~LgsExpr() override;
+    ~LgsExpr() override = default;
 };
 
 inline Value* LgsExpr::sub(CodeGenMetadata* metadata, LgsExpr* other) {
@@ -34,9 +34,4 @@ inline Value* LgsExpr::div(CodeGenMetadata* metadata, LgsExpr* other) {
     return metadata->builder.CreateSDiv(l, r);
 }
 
-inline LgsExpr::~LgsExpr() {
-    if (type) delete type;
-}
-
 #endif //LOGOSEXPR_H
-

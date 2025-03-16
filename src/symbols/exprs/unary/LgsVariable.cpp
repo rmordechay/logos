@@ -16,7 +16,7 @@ Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
     switch (symbol->type) {
     case VAR_DEC:
         return symbol->varDec->getIRValue(metadata);
-    case FUNC_IMPL:
+    case FUNC:
         return symbol->func->getIRValue(metadata);
     case PARAM:
         return symbol->param->getIRValue(metadata);

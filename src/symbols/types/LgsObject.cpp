@@ -36,12 +36,3 @@ LgsType* LgsObject::inferBinaryType(LgsType* other) {
 bool LgsObject::equals(LgsType* other) const {
     return name == other->getName();
 }
-
-LgsObject::~LgsObject() {
-    for (const auto& field : fields) {
-        delete field.second;
-    }
-    for (const auto& func : methods) {
-        delete func.second;
-    }
-}

@@ -1,11 +1,9 @@
 #ifndef LOGOSFUNC_H
 #define LOGOSFUNC_H
 #include "LgsParam.h"
+#include "../types/LgsType.h"
 #include "LgsValue.h"
-#include "constants/LgsConst.h"
 #include "stmts/LgsStmtBlock.h"
-
-#include <LgsConfig.h>
 
 class LgsParam;
 class LgsExpr;

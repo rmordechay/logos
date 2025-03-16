@@ -3,7 +3,7 @@
 #include "LgsExpr.h"
 
 #include <string>
-#include <LgsType.h>
+#include <../../types/LgsType.h>
 
 class LgsUnaryExpr: public LgsExpr {
 public:

@@ -2,8 +2,11 @@
 #define LOGOSTYPE_H
 
 #include <string>
-#include <llvm/IR/Type.h>
 #include <map>
+
+namespace llvm {
+    class Type;
+}
 
 using namespace std;
 using namespace llvm;
@@ -26,21 +29,5 @@ public:
     virtual LgsType* inferBinaryType(LgsType* other) = 0;
     virtual ~LgsType() = default;
 };
-
-inline LgsField* LgsType::getField(const string& name) {
-    const auto it = fields.find(name);
-    if (it != fields.end()) {
-        return it->second;
-    }
-    return nullptr;
-}
-
-inline LgsMethodImpl* LgsType::getMethod(const string& name) {
-    const auto it = methods.find(name);
-    if (it != methods.end()) {
-        return it->second;
-    }
-    return nullptr;
-}
 
 #endif //LOGOSTYPE_H
