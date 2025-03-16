@@ -19,8 +19,6 @@
 #include "types/LgsBool.h"
 #include "types/LgsFloat.h"
 #include "constants/LgsTypeConst.h"
-
-#include <LgsDefinitions.h>
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
 #include <types/LgsStr.h>
@@ -63,29 +61,6 @@ LgsObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ct
     return objFile;
 }
 
-LgsObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
-    const auto objName = ctx->objectDeclaration()->TYPE()->getText();
-    const auto obj = new LgsObject(objName);
-    for (int i = 0; i < ctx->explicitVarDec().size(); ++i) {
-        const auto varDec = ctx->explicitVarDec()[i];
-        const auto field = getField(varDec, i, obj->name);
-        obj->fields[field->name] = field;
-    }
-    for (const auto& func : ctx->funcImplementation()) {
-        auto funcName = func->funcSignature()->VARIABLE()->getText();
-        const auto method = getMethodImpl(func, obj);
-        obj->methods[funcName] = method;
-    }
-    return obj;
-}
-
-LgsField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const size_t position, const string& parentName) {
-    const auto name = varDec->VARIABLE()->getText();
-    const auto type = getType(varDec->type()->TYPE());
-    const auto expr = getExpr(varDec->expr());
-    return new LgsField(name, parentName, type, position, expr);
-}
-
 LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext* ctx) {
     const auto rt = getFuncType(ctx);
     const auto signature = ctx->funcSignature();
@@ -101,6 +76,22 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     func->setPosition(ctx->start);
     return func;
+}
+
+LgsObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
+    const auto objName = ctx->objectDeclaration()->TYPE()->getText();
+    const auto obj = new LgsObject(objName);
+    for (int i = 0; i < ctx->explicitVarDec().size(); ++i) {
+        const auto varDec = ctx->explicitVarDec()[i];
+        const auto field = getField(varDec, i, obj->name);
+        obj->fields[field->name] = field;
+    }
+    for (const auto& func : ctx->funcImplementation()) {
+        auto funcName = func->funcSignature()->VARIABLE()->getText();
+        const auto method = getMethodImpl(func, obj);
+        obj->methods[funcName] = method;
+    }
+    return obj;
 }
 
 LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationContext* ctx, const LgsObject* obj) {
@@ -120,6 +111,13 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationCon
         method->params.emplace_back(param);
     }
     return method;
+}
+
+LgsField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const size_t position, const string& parentName) {
+    const auto name = varDec->VARIABLE()->getText();
+    const auto type = getType(varDec->type()->TYPE());
+    const auto expr = getExpr(varDec->expr());
+    return new LgsField(name, parentName, type, position, expr);
 }
 
 LgsStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {

@@ -5,7 +5,7 @@
 #include "constants/LgsConst.h"
 #include "stmts/LgsStmtBlock.h"
 
-#include <LgsDefinitions.h>
+#include <LgsConfig.h>
 
 class LgsParam;
 class LgsExpr;

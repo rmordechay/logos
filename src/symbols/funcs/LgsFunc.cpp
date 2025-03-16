@@ -1,6 +1,6 @@
 #include "funcs/LgsFunc.h"
 
-#include <LgsDefinitions.h>
+#include <LgsConfig.h>
 
 LgsFunc::~LgsFunc() {
     for (const auto param : params) {

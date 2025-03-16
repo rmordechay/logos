@@ -145,16 +145,17 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    enable_testing()
-    add_executable(lgs_tests
-        tests/main.cpp
-        tests/parser/ParserTest.cpp
-    )
+enable_testing()
+add_executable(lgs_tests
+    tests/main.cpp
+    tests/parser/ParserTest.cpp
+)
 
-    target_include_directories(lgs_tests PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/include
-    )
+target_include_directories(lgs_tests PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/include
+)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs_tests PRIVATE
         lib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libgtest.a
