@@ -387,8 +387,14 @@ LgsConst* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
     }
     if (const auto stringToken = ctx->STRING()) {
         const auto value = stringToken->getText();
-        if (value.size() == 1) constant = new LgsCharConst(value[0]);
-        else constant = new LgsStrConst(value);
+        if (value.size() == 1) {
+            constant = new LgsCharConst(value[0]);
+        }
+        else {
+            const auto strConst = new LgsStrConst(value);
+            strConst->cleanStr();
+            constant = strConst;
+        }
     }
     constant->setPosition(ctx->start);
     return constant;

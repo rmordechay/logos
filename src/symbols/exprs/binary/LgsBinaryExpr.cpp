@@ -1,7 +1,6 @@
 #include "binary/LgsBinaryExpr.h"
-
+#include "constants/LgsStrConst.h"
 #include "types/LgsInt.h"
-#include "types/LgsStr.h"
 
 Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
     switch (op) {
@@ -38,4 +37,23 @@ Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
         break;
     }
     return nullptr;
+}
+
+Value* LgsBinaryExpr::add(CodeGenMetadata* metadata, LgsExpr* other) {
+    return compute(metadata)->add(metadata, other);
+}
+
+LgsExpr* LgsBinaryExpr::compute(CodeGenMetadata* metadata) {
+    if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(left)) {
+        results = unaryExpr->add(right);
+        return results;
+    }
+    if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(left)) {
+        return binaryExpr->compute(metadata);
+    }
+    return nullptr;
+}
+
+LgsBinaryExpr::~LgsBinaryExpr() {
+    if (results) delete results;
 }
