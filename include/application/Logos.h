@@ -18,8 +18,6 @@ using namespace llvm;
 inline path rootDir;
 inline path srcDir;
 inline path buildDir;
-inline path objectFile;
-inline path execFile;
 
 class Logos {
 public:

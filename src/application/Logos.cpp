@@ -30,7 +30,7 @@ void Logos::run() {
     LgsLinker::link(modules);
 
     // Running
-    system(execFile.c_str());
+    system((buildDir / EXECUTABLE_FILE).c_str());
 }
 
 vector<LgsFile*> Logos::parseFiles() {
@@ -141,10 +141,8 @@ void Logos::initProject() const {
 
 void Logos::initPaths() const {
     rootDir = rootPath;
-    srcDir = rootPath / LOGOS_SRC_DIR;
-    buildDir = rootPath / LOGOS_BUILD_DIR;
-    objectFile = buildDir / OBJECT_FILE;
-    execFile = buildDir / EXECUTABLE_FILE;
+    srcDir = rootDir / LOGOS_SRC_DIR;
+    buildDir = rootDir / LOGOS_BUILD_DIR;
 }
 
 bool Logos::isLogosFile(const directory_entry& filePath) {
