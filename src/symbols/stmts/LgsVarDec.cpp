@@ -21,10 +21,11 @@ Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
 }
 
 json LgsVarDec::asJson() {
-    stringstream str;
-    str << string(typeid(this).name()) << name;
-    str << "Expr: " << expr->asJson();
-    return str.str();
+    json tree;
+    tree["name"] = name;
+    tree["type"] = type->getName();
+    tree["expr"] = expr->asJson();
+    return tree;
 }
 
 LgsVarDec::~LgsVarDec() {

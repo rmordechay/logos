@@ -32,7 +32,6 @@ void LgsFuncImpl::setIRFunc(CodeGenMetadata* metadata) {
 }
 
 json LgsFuncImpl::asJson() {
-    stringstream str;
     json tree;
     tree["name"] = name;
     tree["returnType"] = type->getName();
@@ -40,5 +39,5 @@ json LgsFuncImpl::asJson() {
     for (const auto& param : params) {
         tree["params"].emplace_back(param->asJson());
     }
-    return str.str();
+    return tree;
 }

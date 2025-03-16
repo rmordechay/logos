@@ -21,5 +21,8 @@ LgsExpr* LgsIntConst::add(LgsExpr* other) {
 }
 
 json LgsIntConst::asJson() {
-    return string(typeid(this).name()) + ": " + to_string(value);
+    json tree;
+    tree["name"] = type->getName();
+    tree["value"] = value;
+    return tree;
 }

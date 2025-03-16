@@ -47,7 +47,7 @@ inline BasicBlock* LgsValue::createBasicBlock(const char* name) {
 }
 
 inline json LgsValue::asJson() {
-    return "";
+    return json();
 }
 
 inline void LgsValue::setIRValue(Value* value) {

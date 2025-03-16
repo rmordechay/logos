@@ -22,6 +22,7 @@ inline void LgsMainFile::printTree() const {
     // for (const auto& func : funcs) {
     //     fileTree["funcs"].emplace_back(func->print());
     // }
+    std::cout << fileTree.dump(4) << '\n';
 }
 
 inline LgsMainFile::~LgsMainFile() {
