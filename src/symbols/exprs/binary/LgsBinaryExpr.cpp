@@ -4,21 +4,22 @@
 #include "types/LgsStr.h"
 
 Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
-    if (op == ADD) {
+    switch (op) {
+    case ADD:
         return left->add(metadata, right);
+    case SUB:
+        return left->sub(metadata, right);
+    case MUL:
+        return left->mul(metadata, right);
+    case DIV:
+        return left->div(metadata, right);
+    default:
+        break;
     }
     const auto l = left->getIRValue(metadata);
     const auto r = right->getIRValue(metadata);
     auto& builder = metadata->builder;
     switch (op) {
-    case ADD:
-        return builder.CreateAdd(l, r);
-    case SUB:
-        return builder.CreateSub(l, r);
-    case MUL:
-        return builder.CreateMul(l, r);
-    case DIV:
-        return builder.CreateSDiv(l, r);
     case NE:
         return builder.CreateICmpNE(l, r);
     case EQ:
@@ -32,6 +33,8 @@ Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
     case LE:
         return builder.CreateICmpSLE(l, r);
     case NOOP:
+        break;
+    default:
         break;
     }
     return nullptr;

@@ -14,8 +14,8 @@ LgsConst* LgsBool::getZeroValue() {
     return new LgsBoolConst(false);
 }
 
-LgsType* LgsBool::inferBinaryType(LgsType* other) const {
-    return other;
+LgsType* LgsBool::inferBinaryType(LgsType* other) {
+    return this;
 }
 
 bool LgsBool::equals(LgsType* other) const {

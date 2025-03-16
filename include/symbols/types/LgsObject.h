@@ -15,7 +15,7 @@ public:
     const string getName() const override;
     Type* getIRType() override;
     LgsConst* getZeroValue() override;
-    LgsType* inferBinaryType(LgsType* other) const override;
+    LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) const override;
     ~LgsObject() override;
 

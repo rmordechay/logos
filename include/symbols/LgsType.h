@@ -23,7 +23,7 @@ public:
     virtual Type* getIRType() = 0;
     virtual LgsConst* getZeroValue() = 0;
     virtual bool equals(LgsType* other) const = 0;
-    virtual LgsType* inferBinaryType(LgsType* other) const = 0;
+    virtual LgsType* inferBinaryType(LgsType* other) = 0;
     virtual ~LgsType() = default;
 };
 

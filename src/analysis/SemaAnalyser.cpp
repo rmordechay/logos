@@ -104,6 +104,10 @@ void SemaAnalyser::visitField(const LgsField* field) {
 }
 
 void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
+    if (const auto selection = dynamic_cast<LgsSelection*>(assignment->lvalue)) {
+        visitSelection(selection);
+    }
+    visitExpr(assignment->rvalue);
     if (!checkExprType(assignment->rvalue, assignment->lvalue->type)) return;
 }
 
@@ -201,7 +205,10 @@ void SemaAnalyser::visitSelection(LgsSelection* selection) {
     const auto firstExpr = exprs[0];
     if (const auto variable = dynamic_cast<LgsVariable*>(firstExpr)) {
         visitVariable(variable);
+    } else if (const auto funcCall = dynamic_cast<LgsFuncCall*>(firstExpr)) {
+        visitFuncCall(funcCall);
     }
+    if (!successful) return;
 
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto currentExpr = exprs[i];
@@ -285,9 +292,12 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) const {
     case ADD:
     case SUB:
     case MUL:
-    case DIV:
-        binaryExpr->type = binaryExpr->left->type->inferBinaryType(binaryExpr->right->type);
-        break;
+    case DIV: {
+        const auto lty = binaryExpr->left->type;
+        const auto rty = binaryExpr->right->type;
+        binaryExpr->type = lty->inferBinaryType(rty);
+    }
+    break;
     case NE:
     case EQ:
     case LT:
@@ -349,7 +359,7 @@ void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
 }
 
 bool SemaAnalyser::checkExprType(const LgsExpr* expr, const LgsType* otherType) {
-    if (expr && otherType && otherType->equals(expr->type)) {
+    if (expr && otherType && !otherType->equals(expr->type)) {
         printError(E10001, &expr->location, {otherType->getName(), expr->type->getName()});
         return false;
     }

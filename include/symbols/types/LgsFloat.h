@@ -13,7 +13,7 @@ public:
     Type* getIRType() override;
     LgsConst* getZeroValue() override;
     bool equals(LgsType* other) const override;
-    LgsType* inferBinaryType(LgsType* other) const override;
+    LgsType* inferBinaryType(LgsType* other) override;
     ~LgsFloat() override = default;
 };
 

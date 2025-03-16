@@ -18,6 +18,6 @@ bool LgsFloat::equals(LgsType* other) const {
     return name == other->getName();
 }
 
-LgsType* LgsFloat::inferBinaryType(LgsType* other) const {
-    return other;
+LgsType* LgsFloat::inferBinaryType(LgsType* other) {
+    return this;
 }

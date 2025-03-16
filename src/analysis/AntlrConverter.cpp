@@ -291,8 +291,8 @@ LgsFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
 }
 
 LgsSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) {
-    const auto innerExprs = getSelectionInnerExprs(ctx);
     vector exprs = {getFirstSelection(ctx)};
+    const auto innerExprs = getSelectionInnerExprs(ctx);
     exprs.insert(exprs.end(), innerExprs.begin(), innerExprs.end());
     const auto selection = new LgsSelection(exprs);
     selection->setPosition(ctx->start);
@@ -408,8 +408,7 @@ LgsType* AntlerConverter::getType(tree::TerminalNode* type) {
     if (typeText == LOGOS_BOOL.getName()) return &LOGOS_BOOL;
     if (typeText == LOGOS_STR.getName()) return &LOGOS_STR;
     if (typeText == "") return &LOGOS_VOID;
-    // TODO memory leak
-    return new LgsObject(typeText);
+    return nullptr;
 }
 
 LgsType* AntlerConverter::getFuncType(LogosParser::FuncImplementationContext* ctx) {

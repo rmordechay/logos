@@ -29,8 +29,8 @@ LgsConst* LgsObject::getZeroValue() {
     return nullptr;
 }
 
-LgsType* LgsObject::inferBinaryType(LgsType* other) const {
-    return other;
+LgsType* LgsObject::inferBinaryType(LgsType* other) {
+    return this;
 }
 
 bool LgsObject::equals(LgsType* other) const {

@@ -12,8 +12,8 @@ inline LgsConst* LgsVoid::getZeroValue() {
     return nullptr;
 }
 
-LgsType* LgsVoid::inferBinaryType(LgsType* other) const {
-    return other;
+LgsType* LgsVoid::inferBinaryType(LgsType* other) {
+    return this;
 }
 
 inline bool LgsVoid::equals(LgsType* other) const {

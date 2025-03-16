@@ -14,8 +14,8 @@ LgsConst* LgsInt::getZeroValue() {
     return new LgsIntConst(0);
 }
 
-LgsType* LgsInt::inferBinaryType(LgsType* other) const {
-    return other;
+LgsType* LgsInt::inferBinaryType(LgsType* other) {
+    return this;
 }
 
 bool LgsInt::equals(LgsType* other) const {
