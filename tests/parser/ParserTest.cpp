@@ -2,23 +2,17 @@
 #include <gtest/gtest.h>
 #include <LogosParser.h>
 
+const string dataDir = "../tests/parser/data/";
 
 TEST(ParserTest, TestParseFile) {
-    const Logos logos("../tests/parser/data");
+    const Logos logos(dataDir);
     const directory_entry fileEntry(logos.rootDir / "Main.lgs");
     const auto file = logos.parseFile(fileEntry);
     const auto mainFile = dynamic_cast<LgsMainFile*>(file);
-    EXPECT_NE(mainFile, nullptr);
-    ASSERT_EQ(mainFile->name, "Main");
-    EXPECT_NE(mainFile->relPath, "");
-    EXPECT_NE(mainFile->mainFunc, nullptr);
-    EXPECT_EQ(mainFile->funcs.size(), 2);
-}
 
-TEST(ParserTest, TestParseFile2) {
-    const Logos logos("../tests/parser/data");
-    const directory_entry fileEntry(logos.rootDir / "Main.lgs");
-    const auto file = logos.parseFile(fileEntry);
-    const auto mainFile = dynamic_cast<LgsMainFile*>(file);
-    mainFile->printTree();
+    std::ifstream input_file(dataDir + "expected.json");
+    json expectedJson;
+    input_file >> expectedJson;
+
+    ASSERT_EQ(mainFile->asJson().dump(2), expectedJson.dump(2));
 }

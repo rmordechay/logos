@@ -10,19 +10,19 @@ public:
     vector<LgsFuncImpl*> funcs;
 
     explicit LgsMainFile(const string& path) : LgsFile(LOGOS_MAIN_FILE, path) {}
-    void printTree() const;
+    json asJson() const;
     ~LgsMainFile() override;
 };
 
-inline void LgsMainFile::printTree() const {
+inline json LgsMainFile::asJson() const {
     json fileTree;
     fileTree["file"] = name;
     fileTree["mainFunc"] = mainFunc->asJson();
     fileTree["funcs"] = {};
-    // for (const auto& func : funcs) {
-    //     fileTree["funcs"].emplace_back(func->print());
-    // }
-    std::cout << fileTree.dump(4) << '\n';
+    for (const auto& func : funcs) {
+        fileTree["funcs"].emplace_back(func->asJson());
+    }
+    return fileTree;
 }
 
 inline LgsMainFile::~LgsMainFile() {

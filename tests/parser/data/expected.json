@@ -1,0 +1,26 @@
+{
+  "file": "Main",
+  "funcs": [
+    {
+      "name": "sub",
+      "params": [
+        {},
+        {}
+      ],
+      "returnType": "Int"
+    },
+    {
+      "name": "mul",
+      "params": [
+        {},
+        {}
+      ],
+      "returnType": "Int"
+    }
+  ],
+  "mainFunc": {
+    "name": "main",
+    "params": null,
+    "returnType": "Int"
+  }
+}
