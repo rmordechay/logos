@@ -203,7 +203,8 @@ range:
     ;
 
 type:
-        TYPE (LBRACK INTEGER? RBRACK)*
+        TYPE
+   |    TYPE (LBRACK INTEGER? RBRACK)+
    |    LBRACE type COLON type RBRACE
    ;
 

@@ -3,12 +3,13 @@
 #include "binary/LgsBinaryExpr.h"
 #include "binary/LgsOperator.h"
 #include "constants/LgsBoolConst.h"
+#include "constants/LgsCharConst.h"
 #include "constants/LgsConst.h"
 #include "constants/LgsFloatConst.h"
 #include "constants/LgsIntConst.h"
 #include "constants/LgsStrConst.h"
-#include "unary//LgsInstance.h"
-#include "unary//LgsSelection.h"
+#include "unary/LgsInstance.h"
+#include "unary/LgsSelection.h"
 #include <exprs/unary/LgsArray.h>
 #include <exprs/unary/LgsArrayIndex.h>
 #include <exprs/unary/LgsFuncCall.h>
@@ -23,6 +24,7 @@
 #include <loops/LgsRangeLoop.h>
 #include <types/LgsStr.h>
 #include <types/LgsVoid.h>
+#include <types/LgsArrayType.h>
 
 LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
     LgsFile* logosFile = nullptr;
@@ -115,7 +117,7 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationCon
 
 LgsField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const size_t position, const string& parentName) {
     const auto name = varDec->VARIABLE()->getText();
-    const auto type = getType(varDec->type()->TYPE());
+    const auto type = getType(varDec->type());
     const auto expr = getExpr(varDec->expr());
     return new LgsField(name, parentName, type, position, expr);
 }
@@ -182,7 +184,7 @@ LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext
 LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto expr = getExpr(ctx->expr());
-    const auto userType = getType(ctx->type()->TYPE());
+    const auto userType = getType(ctx->type());
     const auto varDec = new LgsVarDec(variableName, userType, expr);
     varDec->setLocation(ctx->start);
     return varDec;
@@ -191,7 +193,7 @@ LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext
 LgsParam* AntlerConverter::getParam(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto expr = getExpr(ctx->expr());
-    const auto userType = getType(ctx->type()->TYPE());
+    const auto userType = getType(ctx->type());
     const auto param = new LgsParam(variableName, userType, expr);
     param->setLocation(ctx->start);
     return param;
@@ -401,26 +403,27 @@ LgsConst* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
 }
 
 LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) {
-    const auto typeConst = new LgsTypeConst(getType(type));
+    const auto typeConst = new LgsTypeConst(new LgsObject(type->getText()));
     typeConst->setLocation(ctx->start);
     return typeConst;
 }
 
-LgsType* AntlerConverter::getType(tree::TerminalNode* type) {
-    if (!type) return &LOGOS_VOID;
+
+LgsType* AntlerConverter::getType(LogosParser::TypeContext* type) {
+    if (!type) return nullptr;
     const auto typeText = type->getText();
     if (typeText == LOGOS_INT.getName()) return &LOGOS_INT;
     if (typeText == LOGOS_FLOAT.getName()) return &LOGOS_FLOAT;
     if (typeText == LOGOS_BOOL.getName()) return &LOGOS_BOOL;
     if (typeText == LOGOS_STR.getName()) return &LOGOS_STR;
-    if (typeText == "") return &LOGOS_VOID;
+    if (type->LBRACE()) return new LgsArrayType();
     return new LgsObject(type->getText());
 }
 
 LgsType* AntlerConverter::getFuncType(LogosParser::FuncImplementationContext* ctx) {
     const auto signature = ctx->funcSignature();
     if (signature->type()) {
-        return getType(signature->type()->TYPE());
+        return getType(signature->type());
     }
     return &LOGOS_VOID;
 }

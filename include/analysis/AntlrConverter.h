@@ -43,7 +43,7 @@ public:
     static LgsArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
     static LgsConst* getConstant(LogosParser::ConstantContext* ctx);
     static LgsTypeConst* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
-    static LgsType* getType(tree::TerminalNode* type);
+    static LgsType* getType(LogosParser::TypeContext* type);
     static LgsType* getFuncType(LogosParser::FuncImplementationContext* ctx);
     ~AntlerConverter() = default;
 };

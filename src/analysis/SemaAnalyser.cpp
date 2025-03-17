@@ -148,13 +148,14 @@ void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
 }
 
 void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
-    visitExpr(foreachLoop->iterable);
-    if (foreachLoop->getExprAsIterable() == nullptr) {
-        printError(E10002, &foreachLoop->iterable->location, {foreachLoop->iterable->getName()});
-        return;
-    }
+    visitUnaryExpr(foreachLoop->iterable);
+    // if (foreachLoop->getExprAsIterable() == nullptr) {
+    //     printError(E10002, &foreachLoop->iterable->location, {foreachLoop->iterable->getName()});
+    //     return;
+    // }
     // TODO check all loop vars
     const auto loopVar = foreachLoop->loopVars[0];
+    loopVar->type = foreachLoop->iterable->type;
     addLocalSymbol(loopVar->name, LgsSymbol(VAR_DEC, loopVar));
     visitStmtBlock(foreachLoop->stmtBlock);
 }

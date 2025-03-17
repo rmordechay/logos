@@ -51,7 +51,7 @@ add_library(lib STATIC
     include/symbols/exprs/unary/LgsArrayIndex.h
     include/symbols/exprs/unary/LgsFuncCall.h
     include/symbols/exprs/unary/LgsInstance.h
-    include/symbols/exprs/unary/LgsIterable.h
+    include/symbols/types/LgsArrayType.h
     include/symbols/exprs/unary/LgsSelection.h
     include/symbols/exprs/unary/LgsVariable.h
     include/symbols/exprs/LgsExpr.h

@@ -4,12 +4,8 @@
 #include <json/json.hpp>
 
 Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
-    Value* exprValue;
-    if (expr) {
-        exprValue = expr->getIRValue(metadata);
-    } else {
-        exprValue = type->getZeroValue()->getIRValue(metadata);
-    }
+    if (!expr) return nullptr;
+    Value* exprValue = expr->getIRValue(metadata);
     const auto valueType = exprValue->getType();
     if (!valueType->isPointerTy()) {
         auto& builder = metadata->builder;
