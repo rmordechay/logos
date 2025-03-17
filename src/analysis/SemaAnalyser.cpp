@@ -242,8 +242,9 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     const auto symbol = getSymbol(instance->name, instance);
     if (!symbol) return;
 
-    instance->obj, instance->type = symbol->object;
-    for (const auto& [name, field] : instance->obj) {
+    instance->obj = symbol->object;
+    instance->type = instance->obj;
+    for (const auto& [name, field] : instance->obj->fields) {
         instance->fields[name] = new LgsField(*field);
     }
 }

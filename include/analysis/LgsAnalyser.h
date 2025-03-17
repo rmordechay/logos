@@ -1,6 +1,6 @@
 #ifndef LOGOSANALYSER_H
 #define LOGOSANALYSER_H
-#include "LgsErrors.h"
+#include "../logos/LgsErrors.h"
 
 #include <iostream>
 #include <map>

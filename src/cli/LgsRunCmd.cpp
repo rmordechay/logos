@@ -9,6 +9,7 @@ void LgsRunCmd::runCmd() {
 }
 
 void LgsRunCmd::validate() {
+    if (argc < 3) printInfoAndExit();
     const auto firstArg = argv[2];
     const bool isArgDotOrEmpty = std::strcmp(firstArg, ".") == 0 || argc < 3;
     if (isArgDotOrEmpty) {

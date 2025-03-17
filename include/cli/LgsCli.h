@@ -1,6 +1,6 @@
 #ifndef COMMANDLINE_H
 #define COMMANDLINE_H
-#include "application/Logos.h"
+#include "logos/Logos.h"
 
 using namespace std;
 

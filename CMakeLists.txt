@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 3.22)
-project(logos)
+project(logos VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
 include_directories(
     external/include
     external/include/antlr4-runtime
     include
-    include/application
+    include/logos
     include/cli
     include/files
     include/codegen
@@ -22,8 +23,8 @@ include_directories(
 
 add_library(lib STATIC
     # headers
-    include/application/Logos.h
-    include/application/ThreadPool.h
+    include/logos/Logos.h
+    include/logos/ThreadPool.h
     include/codegen/CodeGenerator.h
     include/codegen/LgsLinker.h
     include/parser/LogosLexer.h
@@ -36,7 +37,7 @@ add_library(lib STATIC
     include/cli/LgsCmd.h
     include/cli/LgsRunCmd.h
     include/cli/LgsGenerateCmd.h
-    include/LgsErrors.h
+    include/logos/LgsErrors.h
     # Symbols headers
     include/symbols/exprs/binary/LgsBinaryExpr.h
     include/symbols/exprs/unary/constants/LgsConst.h
@@ -78,9 +79,10 @@ add_library(lib STATIC
     include/symbols/types/LgsVoid.h
     include/symbols/types/LgsChar.h
     include/symbols/types/LgsChar.h
+
     # src
-    src/application/Logos.cpp
-    src/application/ThreadPool.cpp
+    src/logos/Logos.cpp
+    src/logos/ThreadPool.cpp
     src/cli/LgsCli.cpp
     src/codegen/CodeGenerator.cpp
     src/codegen/LgsLinker.cpp
@@ -103,7 +105,6 @@ add_library(lib STATIC
     src/symbols/exprs/unary/LgsInstance.cpp
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
-    src/symbols/funcs/LgsFunc.cpp
     src/symbols/funcs/LgsFuncImpl.cpp
     src/symbols/funcs/LgsMethodImpl.cpp
     src/symbols/funcs/LgsParam.cpp

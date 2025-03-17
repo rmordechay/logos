@@ -34,7 +34,7 @@ void LgsCli::printVersion() {
 
 void LgsCli::printHelp() {
     ostringstream txt;
-    txt << "Usage: lgs command [options]" << "\n\n";
+    txt << "Usage: lgs <command> <options>" << "\n\n";
 
     txt << "Commands:" << '\n';
     txt << "run                       execute a logos script or run application" << '\n';

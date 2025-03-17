@@ -1,7 +1,7 @@
 #ifndef PROJECTANALYSER_H
 #define PROJECTANALYSER_H
 #include "LgsAnalyser.h"
-#include "LgsErrors.h"
+#include "../logos/LgsErrors.h"
 
 #include <LgsFile.h>
 #include <mutex>

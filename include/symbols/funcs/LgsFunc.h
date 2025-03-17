@@ -54,4 +54,11 @@ inline Value* LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     return IRFunc;
 }
 
+inline LgsFunc::~LgsFunc() {
+    for (const auto param : params) {
+        delete param;
+    }
+    delete stmtBlock;
+}
+
 #endif //LOGOSFUNC_H
