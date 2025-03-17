@@ -19,6 +19,7 @@ public:
     vector<Type*> IRParamsTypes;
     Function* IRFunc = nullptr;
     LgsStmtBlock* stmtBlock = nullptr;
+    BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
 
     explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {})
         : name(name), type(funcType), params(params) {
@@ -47,7 +48,6 @@ inline Value* LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     metadata->logosStack.enterScope();
     if (!IRFunc) setIRFunc(metadata);
     metadata->logosStack.currentFunc = IRFunc;
-    const auto entryBlock = BasicBlock::Create(context, "entry");
     startBlock(metadata, entryBlock);
     stmtBlock->getIRValue(metadata);
     metadata->logosStack.exitScope();

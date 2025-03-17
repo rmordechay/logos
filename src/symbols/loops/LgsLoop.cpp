@@ -1,9 +1,14 @@
 #include "loops/LgsLoop.h"
 
+#include "stmts/LgsStmtBlock.h"
+
 Value* LgsLoop::createIRValue(CodeGenMetadata* metadata) {
     initIRLoop(metadata);
     setIRCondition(metadata);
+    startBlock(metadata, loopBody);
+    metadata->logosStack.enterScope();
     setIRBody(metadata);
+    stmtBlock->getIRValue(metadata);
     exitIRLoop(metadata);
     return nullptr;
 }

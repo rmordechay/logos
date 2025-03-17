@@ -15,7 +15,7 @@ public:
     virtual void setLocation(const antlr4::Token* ctx);
     virtual json asJson();
     static BasicBlock* createBasicBlock(const char* name);
-    static void startBlock(CodeGenMetadata* metadata, BasicBlock* block);
+    static void startBlock(CodeGenMetadata* metadata, BasicBlock* block, bool enterScope = false);
     virtual ~LgsValue() = default;
 private:
     virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
@@ -34,7 +34,8 @@ inline Value* LgsValue::getIRValue(CodeGenMetadata* metadata) {
     return IRValue;
 }
 
-inline void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) {
+inline void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block, const bool enterScope) {
+    if (enterScope) metadata->logosStack.enterScope();
     const auto currentFunc = metadata->logosStack.currentFunc;
     auto& builder = metadata->builder;
     block->insertInto(currentFunc);

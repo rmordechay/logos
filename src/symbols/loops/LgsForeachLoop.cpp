@@ -20,7 +20,6 @@ void LgsForeachLoop::setIRBody(CodeGenMetadata* metadata) {
     const auto loopVar = loopVars[0];
     loopVar->setIRValue(element);
     metadata->logosStack.addLocalSymbol(loopVar->name, LgsSymbol(VAR_DEC, loopVar));
-    stmtBlock->getIRValue(metadata);
 }
 
 LgsIterable* LgsForeachLoop::getExprAsIterable() const {
