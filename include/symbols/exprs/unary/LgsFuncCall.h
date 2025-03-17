@@ -1,7 +1,7 @@
 #ifndef LOGOSFUNCCALLEXPR_H
 #define LOGOSFUNCCALLEXPR_H
 #include "stmts/LgsStmt.h"
-#include "LogosUnaryExpr.h"
+#include "LgsUnaryExpr.h"
 
 class LgsFuncCall final : public LgsStmt, public LgsUnaryExpr {
 public:

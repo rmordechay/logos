@@ -1,6 +1,6 @@
 #ifndef LOGOSARRAYINDEX_H
 #define LOGOSARRAYINDEX_H
-#include "LogosUnaryExpr.h"
+#include "LgsUnaryExpr.h"
 
 #include <LgsValue.h>
 

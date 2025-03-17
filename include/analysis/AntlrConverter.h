@@ -2,13 +2,13 @@
 #define SEMANTICANALYSER_H
 
 #include "LogosParser.h"
-#include "unary/LogosUnaryExpr.h"
+#include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIf.h"
 #include "types/LgsInt.h"
-#include "constants/LgsTypeConst.h"
+#include "exprs/unary/constants/LgsTypeConst.h"
 
 class LgsAssignment;
 using namespace std;

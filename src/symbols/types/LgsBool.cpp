@@ -1,6 +1,6 @@
 #include "types/LgsBool.h"
 
-#include "constants/LgsBoolConst.h"
+#include "exprs/unary/constants/LgsBoolConst.h"
 
 const string LgsBool::getName() const {
     return name;

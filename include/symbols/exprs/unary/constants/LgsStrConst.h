@@ -2,7 +2,7 @@
 #define LOGOSSTRINGCONST_H
 #include "LgsConst.h"
 #include "types/LgsStr.h"
-#include "unary/LgsIterable.h"
+#include "exprs/unary/LgsIterable.h"
 
 #include <string>
 

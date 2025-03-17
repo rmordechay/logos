@@ -1,7 +1,6 @@
-#include "unary/LgsArrayIndex.h"
+#include "exprs/unary/LgsArrayIndex.h"
 #include "stmts/LgsVarDec.h"
-#include <unary/LgsArray.h>
-#include <unary/constants/LgsConst.h>
+#include <exprs/unary/LgsArray.h>
 
 Value* LgsArrayIndex::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;

@@ -2,7 +2,7 @@
 #define LOGOSTYPECONST_H
 #include "LgsConst.h"
 
-#include <unary/LogosUnaryExpr.h>
+#include <exprs/unary/LgsUnaryExpr.h>
 
 class LgsTypeConst final : public LgsConst {
 public:

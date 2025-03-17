@@ -1,9 +1,8 @@
-#include "unary/LgsSelection.h"
-
-#include "LgsFuncCall.h"
+#include "exprs/unary/LgsSelection.h"
+#include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsMethodImpl.h"
-#include "unary/LgsArrayIndex.h"
-#include "unary/LgsVariable.h"
+#include "exprs/unary/LgsArrayIndex.h"
+#include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 
 string LgsSelection::getName() {

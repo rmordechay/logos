@@ -1,6 +1,6 @@
 #ifndef LOGOSCONSTANTEXPR_H
 #define LOGOSCONSTANTEXPR_H
-#include "unary/LogosUnaryExpr.h"
+#include "exprs/unary/LgsUnaryExpr.h"
 
 class LgsFloatConst;
 class LgsBool;

@@ -1,6 +1,6 @@
 #ifndef LOGOSINSTANCE_H
 #define LOGOSINSTANCE_H
-#include "LogosUnaryExpr.h"
+#include "LgsUnaryExpr.h"
 
 class LgsInstance final : public LgsUnaryExpr {
 public:

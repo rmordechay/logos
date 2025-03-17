@@ -3,7 +3,7 @@
 #include "LgsBool.h"
 #include "funcs/LgsMethodImpl.h"
 #include "funcs/LgsParam.h"
-#include <LogosUnaryExpr.h>
+#include "exprs/unary/LgsUnaryExpr.h"
 
 class LgsChar final : public LgsType {
 public:

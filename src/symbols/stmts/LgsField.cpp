@@ -1,6 +1,6 @@
 #include "stmts/LgsField.h"
 
-#include "LgsInstance.h"
+#include "exprs/unary/LgsInstance.h"
 #include "exprs/LgsExpr.h"
 #include "types/LgsObject.h"
 

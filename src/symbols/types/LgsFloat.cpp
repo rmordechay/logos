@@ -1,6 +1,6 @@
 #include "types/LgsFloat.h"
 
-#include "constants/LgsFloatConst.h"
+#include "exprs/unary/constants/LgsFloatConst.h"
 
 const string LgsFloat::getName() const {
     return name;

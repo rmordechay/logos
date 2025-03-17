@@ -1,4 +1,4 @@
-#include "unary/LgsFuncCall.h"
+#include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
 
 string LgsFuncCall::getName() {

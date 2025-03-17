@@ -1,7 +1,6 @@
-#include "constants/LgsIntConst.h"
-
-#include "constants/LgsFloatConst.h"
-#include "constants/LgsStrConst.h"
+#include "exprs/unary/constants/LgsIntConst.h"
+#include "exprs/unary/constants/LgsFloatConst.h"
+#include "exprs/unary/constants/LgsStrConst.h"
 
 Value* LgsIntConst::createIRValue(CodeGenMetadata* metadata) {
     return metadata->builder.getInt32(value);

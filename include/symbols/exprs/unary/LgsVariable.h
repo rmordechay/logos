@@ -1,6 +1,6 @@
 #ifndef LOGOSVARIABLEEXPR_H
 #define LOGOSVARIABLEEXPR_H
-#include "LogosUnaryExpr.h"
+#include "LgsUnaryExpr.h"
 #include "stmts/LgsVarDec.h"
 
 class LgsVariable final :  public LgsUnaryExpr {

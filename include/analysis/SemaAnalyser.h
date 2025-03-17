@@ -2,7 +2,7 @@
 #define SEMAANALYSER_H
 #include "LgsAnalyser.h"
 #include "LgsStack.h"
-#include "unary/LogosUnaryExpr.h"
+#include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "types/LgsObject.h"

@@ -2,8 +2,8 @@
 #define LOGOSARRAY_H
 
 #include "LgsIterable.h"
-#include "LogosUnaryExpr.h"
-#include "LgsExpr.h"
+#include "LgsUnaryExpr.h"
+#include "exprs/LgsExpr.h"
 
 class LgsArray final : public LgsUnaryExpr, public LgsIterable {
 public:

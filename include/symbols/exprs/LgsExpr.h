@@ -1,7 +1,7 @@
 #ifndef LOGOSEXPR_H
 #define LOGOSEXPR_H
 #include "LgsValue.h"
-#include <../types/LgsType.h>
+#include <types/LgsType.h>
 
 
 class LgsExpr: virtual public LgsValue {

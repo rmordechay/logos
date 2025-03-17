@@ -1,7 +1,7 @@
 #include "types/LgsStr.h"
 
-#include "constants/LgsConst.h"
-#include "constants/LgsStrConst.h"
+#include "exprs/unary/constants/LgsConst.h"
+#include "exprs/unary/constants/LgsStrConst.h"
 
 const string LgsStr::getName() const {
     return name;

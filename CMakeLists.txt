@@ -15,10 +15,7 @@ include_directories(
     include/codegen
     include/analysis
     include/symbols
-    include/symbols/exprs
-    include/symbols/exprs/unary
     include/parser
-    include/loops
 )
 
 add_library(lib STATIC
@@ -84,6 +81,9 @@ add_library(lib STATIC
     src/logos/Logos.cpp
     src/logos/ThreadPool.cpp
     src/cli/LgsCli.cpp
+    src/cli/LgsCli.cpp
+    src/cli/LgsRunCmd.cpp
+    src/cli/LgsGenerateCmd.cpp
     src/codegen/CodeGenerator.cpp
     src/codegen/LgsLinker.cpp
     src/parser/LogosLexer.cpp
@@ -109,6 +109,7 @@ add_library(lib STATIC
     src/symbols/funcs/LgsMethodImpl.cpp
     src/symbols/funcs/LgsParam.cpp
     src/symbols/funcs/LgsPrint.cpp
+    src/symbols/loops/LgsLoop.cpp
     src/symbols/loops/LgsForeachLoop.cpp
     src/symbols/loops/LgsRangeLoop.cpp
     src/symbols/stmts/LgsField.cpp
@@ -118,9 +119,6 @@ add_library(lib STATIC
     src/symbols/stmts/LgsReturn.cpp
     src/symbols/stmts/LgsStmtBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
-    src/cli/LgsCli.cpp
-    src/cli/LgsRunCmd.cpp
-    src/cli/LgsGenerateCmd.cpp
     src/symbols/types/LgsBool.cpp
     src/symbols/types/LgsInt.cpp
     src/symbols/types/LgsStr.cpp

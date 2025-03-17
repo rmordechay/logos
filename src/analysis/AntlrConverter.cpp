@@ -1,15 +1,15 @@
 #include "analysis/AntlrConverter.h"
 
-#include "binary/LgsBinaryExpr.h"
-#include "binary/LgsOperator.h"
-#include "constants/LgsBoolConst.h"
-#include "constants/LgsCharConst.h"
-#include "constants/LgsConst.h"
-#include "constants/LgsFloatConst.h"
-#include "constants/LgsIntConst.h"
-#include "constants/LgsStrConst.h"
-#include "unary/LgsInstance.h"
-#include "unary/LgsSelection.h"
+#include "exprs/binary/LgsBinaryExpr.h"
+#include "exprs/binary/LgsOperator.h"
+#include "exprs/unary/constants/LgsBoolConst.h"
+#include "exprs/unary/constants/LgsCharConst.h"
+#include "exprs/unary/constants/LgsConst.h"
+#include "exprs/unary/constants/LgsFloatConst.h"
+#include "exprs/unary/constants/LgsIntConst.h"
+#include "exprs/unary/constants/LgsStrConst.h"
+#include "exprs/unary/LgsInstance.h"
+#include "exprs/unary/LgsSelection.h"
 #include <exprs/unary/LgsArray.h>
 #include <exprs/unary/LgsArrayIndex.h>
 #include <exprs/unary/LgsFuncCall.h>
@@ -19,7 +19,7 @@
 #include "stmts/LgsReturn.h"
 #include "types/LgsBool.h"
 #include "types/LgsFloat.h"
-#include "constants/LgsTypeConst.h"
+#include "exprs/unary/constants/LgsTypeConst.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
 #include <types/LgsStr.h>

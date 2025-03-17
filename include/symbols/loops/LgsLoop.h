@@ -14,11 +14,21 @@ class LgsLoop : public LgsStmt {
 public:
     vector<LgsVarDec*> loopVars;
     LgsStmtBlock* stmtBlock = nullptr;
+    Type* i32Type = Type::getInt32Ty(context);
+    BasicBlock* loopCondition = nullptr;
+    BasicBlock* loopBody = nullptr;
+    BasicBlock* loopExit = nullptr;
+    Value* iPtr = nullptr;
+    Value* iValue = nullptr;
 
     LgsLoop(const vector<LgsVarDec*>& loopVars, LgsStmtBlock* stmtBlock) : loopVars(loopVars), stmtBlock(stmtBlock) {}
+    Value* createIRValue(CodeGenMetadata* metadata) override;
+    void initIRLoop(CodeGenMetadata* metadata);
+    void setIRCondition(CodeGenMetadata* metadata);
+    void exitIRLoop(CodeGenMetadata* metadata) const;
     virtual int loopSize() = 0;
+    virtual void setIRBody(CodeGenMetadata* metadata) = 0;
     ~LgsLoop() override = default;
 };
-
 
 #endif // LOGOSLOOP_H

@@ -1,6 +1,6 @@
 #include "funcs/LgsMethodImpl.h"
 
-#include "LgsInstance.h"
+#include "exprs/unary/LgsInstance.h"
 #include <types/LgsObject.h>
 
 Value* LgsMethodImpl::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {

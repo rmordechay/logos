@@ -1,6 +1,6 @@
 #include "types/LgsInt.h"
 
-#include "constants/LgsIntConst.h"
+#include "exprs/unary/constants/LgsIntConst.h"
 
 const string LgsInt::getName() const {
     return name;

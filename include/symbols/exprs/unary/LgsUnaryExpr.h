@@ -1,9 +1,9 @@
 #ifndef LOGOSUNARYEXPR_H
 #define LOGOSUNARYEXPR_H
-#include "LgsExpr.h"
+#include "exprs/LgsExpr.h"
 
 #include <string>
-#include <../../types/LgsType.h>
+#include <types/LgsType.h>
 
 class LgsUnaryExpr: public LgsExpr {
 public:

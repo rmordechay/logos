@@ -1,6 +1,6 @@
 #include "types/LgsChar.h"
 
-#include "constants/LgsCharConst.h"
+#include "exprs/unary/constants/LgsCharConst.h"
 
 const string LgsChar::getName() const {
     return name;

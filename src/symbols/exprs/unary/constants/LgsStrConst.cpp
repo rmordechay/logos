@@ -1,6 +1,6 @@
-#include "constants/LgsStrConst.h"
-#include "constants/LgsFloatConst.h"
-#include "constants/LgsIntConst.h"
+#include "exprs/unary/constants/LgsStrConst.h"
+#include "exprs/unary/constants/LgsFloatConst.h"
+#include "exprs/unary/constants/LgsIntConst.h"
 
 Value* LgsStrConst::createIRValue(CodeGenMetadata* metadata) {
     return createGlobalStr(metadata->currentModule, value);

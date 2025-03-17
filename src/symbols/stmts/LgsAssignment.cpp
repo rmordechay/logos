@@ -1,8 +1,8 @@
 #include "stmts/LgsAssignment.h"
 
-#include "LgsInstance.h"
-#include "LgsSelection.h"
-#include "LgsVariable.h"
+#include "exprs/unary/LgsInstance.h"
+#include "exprs/unary/LgsSelection.h"
+#include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 
 #include <LgsStack.h>

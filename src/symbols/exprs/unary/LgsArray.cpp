@@ -1,6 +1,6 @@
-#include "unary/LgsArray.h"
+#include "exprs/unary/LgsArray.h"
 
-#include <loops/LogosLoop.h>
+#include <loops/LgsLoop.h>
 
 Value* LgsArray::createIRValue(CodeGenMetadata* metadata) {
     vector<Constant*> arrValues;
