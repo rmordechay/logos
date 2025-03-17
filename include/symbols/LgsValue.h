@@ -11,7 +11,7 @@ public:
 
     void setIRValue(Value* value);
     Value* getIRValue(CodeGenMetadata* metadata);
-    virtual void setPosition(const antlr4::Token* ctx);
+    virtual void setLocation(const antlr4::Token* ctx);
     static BasicBlock* createBasicBlock(const char* name);
     static void startBlock(CodeGenMetadata* metadata, BasicBlock* block);
     virtual json asJson();
@@ -21,7 +21,7 @@ private:
     Value* IRValue = nullptr;
 };
 
-inline void LgsValue::setPosition(const antlr4::Token* ctx) {
+inline void LgsValue::setLocation(const antlr4::Token* ctx) {
     location.lineNumber = ctx->getLine();
     location.posInLine = ctx->getCharPositionInLine() + 1;
 }

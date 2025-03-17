@@ -74,7 +74,7 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext
     }
     const auto func = new LgsFuncImpl(name, rt, params);
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
-    func->setPosition(ctx->start);
+    func->setLocation(ctx->start);
     return func;
 }
 
@@ -101,7 +101,7 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationCon
 
     const auto method = new LgsMethodImpl(name, rt, obj->name);
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
-    method->setPosition(ctx->start);
+    method->setLocation(ctx->start);
 
     const auto params = signature->paramList();
     if (!params) return method;
@@ -167,7 +167,7 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
         assignment->lvalue = getSelection(selection);
     }
 
-    assignment->setPosition(ctx->start);
+    assignment->setLocation(ctx->start);
     return assignment;
 }
 
@@ -175,7 +175,7 @@ LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext
     const auto variableName = ctx->VARIABLE()->getText();
     const auto logosExpr = getExpr(ctx->expr());
     const auto logosVarDec = new LgsVarDec(variableName, nullptr, logosExpr);
-    logosVarDec->setPosition(ctx->start);
+    logosVarDec->setLocation(ctx->start);
     return logosVarDec;
 }
 
@@ -184,7 +184,7 @@ LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext
     const auto expr = getExpr(ctx->expr());
     const auto userType = getType(ctx->type()->TYPE());
     const auto varDec = new LgsVarDec(variableName, userType, expr);
-    varDec->setPosition(ctx->start);
+    varDec->setLocation(ctx->start);
     return varDec;
 }
 
@@ -193,7 +193,7 @@ LgsParam* AntlerConverter::getParam(LogosParser::ExplicitVarDecContext* ctx) {
     const auto expr = getExpr(ctx->expr());
     const auto userType = getType(ctx->type()->TYPE());
     const auto param = new LgsParam(variableName, userType, expr);
-    param->setPosition(ctx->start);
+    param->setLocation(ctx->start);
     return param;
 }
 
@@ -210,7 +210,7 @@ LgsIf* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
     if (const auto &elseStmt = ctx->elseStatement()) {
         ifStmt->elseStmtBlock = getStmtBlock(elseStmt->statementsBlock());
     }
-    ifStmt->setPosition(ctx->start);
+    ifStmt->setLocation(ctx->start);
     return ifStmt;
 }
 
@@ -228,7 +228,7 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
     } else {
         assert(false && "No loop statements found");
     }
-    loopStmt->setPosition(ctx->start);
+    loopStmt->setLocation(ctx->start);
     return loopStmt;
 }
 
@@ -255,7 +255,7 @@ LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     const auto l = getExpr(ctx->left);
     const auto r = getExpr(ctx->right);
     const auto logosBinaryExpr = new LgsBinaryExpr(l->type, l, r, mapOperator(ctx));
-    logosBinaryExpr->setPosition(ctx->start);
+    logosBinaryExpr->setLocation(ctx->start);
     return logosBinaryExpr;
 }
 
@@ -264,13 +264,13 @@ LgsUnaryExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
     for (const auto& expr : ctx->expr()) {
         array->elements.emplace_back(getExpr(expr));
     }
-    array->setPosition(ctx->start);
+    array->setLocation(ctx->start);
     return array;
 }
 
 LgsVariable* AntlerConverter::getVariable(const string& varName, const ParserRuleContext* ctx) {
     const auto variable = new LgsVariable(varName);
-    variable->setPosition(ctx->start);
+    variable->setLocation(ctx->start);
     return variable;
 }
 
@@ -284,7 +284,7 @@ LgsFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
         }
     }
     const auto funcCall = new LgsFuncCall(name, args);
-    funcCall->setPosition(ctx->start);
+    funcCall->setLocation(ctx->start);
     return funcCall;
 }
 
@@ -293,7 +293,7 @@ LgsSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) 
     const auto innerExprs = getSelectionInnerExprs(ctx);
     exprs.insert(exprs.end(), innerExprs.begin(), innerExprs.end());
     const auto selection = new LgsSelection(exprs);
-    selection->setPosition(ctx->start);
+    selection->setLocation(ctx->start);
     return selection;
 }
 
@@ -343,7 +343,7 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
 LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) {
     const auto name = ctx->TYPE()->getText();
     const auto instance = new LgsInstance(name);
-    instance->setPosition(ctx->start);
+    instance->setLocation(ctx->start);
     const auto args = ctx->funcArgList();
     if (!args) {
         return instance;
@@ -397,13 +397,13 @@ LgsConst* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
             constant = strConst;
         }
     }
-    constant->setPosition(ctx->start);
+    constant->setLocation(ctx->start);
     return constant;
 }
 
 LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) {
     const auto typeConst = new LgsTypeConst(getType(type));
-    typeConst->setPosition(ctx->start);
+    typeConst->setLocation(ctx->start);
     return typeConst;
 }
 

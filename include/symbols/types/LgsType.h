@@ -3,10 +3,7 @@
 
 #include <string>
 #include <map>
-
-namespace llvm {
-    class Type;
-}
+#include <llvm/IR/Type.h>
 
 using namespace std;
 using namespace llvm;
@@ -17,6 +14,7 @@ class LgsMethodImpl;
 
 class LgsType {
 public:
+    // TODO make values const
     map<string, LgsField*> fields;
     map<string, LgsMethodImpl*> methods;
 

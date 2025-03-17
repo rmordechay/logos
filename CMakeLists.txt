@@ -36,7 +36,7 @@ add_library(lib STATIC
     include/cli/LgsCmd.h
     include/cli/LgsRunCmd.h
     include/cli/LgsGenerateCmd.h
-    include/LgsError.h
+    include/LgsErrors.h
     # Symbols headers
     include/symbols/exprs/binary/LgsBinaryExpr.h
     include/symbols/exprs/unary/constants/LgsConst.h

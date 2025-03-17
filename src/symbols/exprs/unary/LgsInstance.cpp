@@ -1,5 +1,10 @@
 #include "unary/LgsInstance.h"
 #include "CodeGenerator.h"
+#include "stmts/LgsField.h"
+
+string LgsInstance::getName() {
+    return name;
+}
 
 Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
     const auto value = getInstanceIRValue(metadata);
@@ -7,10 +12,6 @@ Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
         CodeGenerator::generateModule(metadata->buildDir, obj, metadata->logosStack.globalSymbols);
     }
     return value;
-}
-
-string LgsInstance::getName() {
-    return obj->name;
 }
 
 Value* LgsInstance::getInstanceIRValue(CodeGenMetadata* metadata) const {
@@ -24,6 +25,7 @@ Value* LgsInstance::getInstanceIRValue(CodeGenMetadata* metadata) const {
 }
 
 LgsInstance::~LgsInstance() {
-    if (obj) delete obj;
+    for (const auto &field : fields) {
+        delete field.second;
+    }
 }
-

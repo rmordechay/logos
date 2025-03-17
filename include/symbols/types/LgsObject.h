@@ -11,7 +11,6 @@ public:
     Type* IRType = nullptr;
 
     explicit LgsObject(const string& typeName) : name(typeName) {}
-    LgsObject(const LgsObject& other);
     const string getName() const override;
     Type* getIRType() override;
     LgsConst* getZeroValue() override;

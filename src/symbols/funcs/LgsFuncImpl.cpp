@@ -18,8 +18,7 @@ void LgsFuncImpl::setIRFunc(CodeGenMetadata* metadata) {
         IRParamsTypes.emplace_back(paramIRType);
     }
 
-    auto result = type->getIRType();
-    const auto rt = FunctionType::get(result, IRParamsTypes, false);
+    const auto rt = FunctionType::get(type->getIRType(), IRParamsTypes, false);
     IRFunc = Function::Create(rt, Function::ExternalLinkage, composedName, metadata->currentModule);
     metadata->logosStack.currentFunc = IRFunc;
     if (params.empty()) return;

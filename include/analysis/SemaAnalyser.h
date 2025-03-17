@@ -35,8 +35,8 @@ public:
     void visitObject(LgsObject* obj);
     void visitField(const LgsField* field);
     void visitMethodImpl(LgsMethodImpl* method, LgsObject* obj);
-    void visitMainFunc(const LgsFuncImpl* mainFunc);
-    void visitFuncImpl(const LgsFuncImpl* func);
+    void visitMainFunc(LgsFuncImpl* mainFunc);
+    void visitFuncImpl(LgsFuncImpl* func);
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
     void visitStmtBlock(const LgsStmtBlock* stmtBlock);
@@ -59,20 +59,16 @@ public:
     void visitInstance(LgsInstance* instance);
     void visitArrayIndex(LgsArrayIndex* arrayIndex);
     void visitConstant(const LgsConst* constant) const;
+    void setFuncType(LgsFunc* func);
 
-    void setFuncCallType(LgsFuncCall* funcCall);
-    void setType(LgsExpr* expr, LgsType* type) const;
-    void setLoopVar(const LgsForeachLoop* foreachLoop);
-    void setArrayType(LgsArray* array);
+    void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
-    void setForLoopIterable(LgsForeachLoop* foreachLoop, const LgsVariable* variable);
-    void setForLoopIterable(LgsForeachLoop* foreachLoop);
 
     bool checkExprType(const LgsExpr* expr, const LgsType* otherType);
-    Location* getSymbolLocation(const LgsSymbol* s) const;
     void printError(LgsErrCode code, const Location* location, const vector<string>& args);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
+    Location* getSymbolLocation(const LgsSymbol* s) const;
     ~SemaAnalyser() = default;
 };
 

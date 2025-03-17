@@ -7,8 +7,9 @@ public:
     string name;
     vector<LgsExpr*> args;
     LgsObject* obj = nullptr;
+    map<string, LgsField*> fields;
 
-    LgsInstance(const string& name) : name(name) {}
+    explicit LgsInstance(const string& name) : name(name) {}
     Value* getInstanceIRValue(CodeGenMetadata* metadata) const;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     string getName() override;

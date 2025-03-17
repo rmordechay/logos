@@ -2,13 +2,6 @@
 #include "funcs/LgsFuncImpl.h"
 #include "stmts/LgsField.h"
 
-LgsObject::LgsObject(const LgsObject& other) : name(other.name) {
-    for (const auto& [name, field] : other.fields) {
-        fields[name] = new LgsField(*field);
-    }
-    methods = other.methods;
-}
-
 const string LgsObject::getName() const {
     return name;
 }
@@ -20,7 +13,7 @@ Type* LgsObject::getIRType() {
         auto fieldType = val->type->getIRType();
         elementTypes.push_back(fieldType);
     }
-    IRType = StructType::create(elementTypes, name);
+    IRType = StructType::create(context, elementTypes, name);
     return IRType;
 }
 
