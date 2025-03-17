@@ -141,15 +141,13 @@ void SemaAnalyser::visitLoopStmt(LgsLoop* loopStmt) {
 }
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
-    const auto name = rangeLoop->loopVar->name;
-    // TODO free memory
-    const auto varDec = new LgsVarDec(rangeLoop->loopVar->name, &LOGOS_INT);
-    addLocalSymbol(name, LgsSymbol(VAR_DEC, varDec));
+    const auto loopVar = rangeLoop->loopVar;
+    addLocalSymbol(loopVar->name, LgsSymbol(VAR_DEC, loopVar));
     visitStmtBlock(rangeLoop->stmtBlock);
 }
 
-void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
-    visitExpr(foreachLoop->iterableExpr);
+void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
+    visitExpr(foreachLoop->iterable);
     visitStmtBlock(foreachLoop->stmtBlock);
 }
 

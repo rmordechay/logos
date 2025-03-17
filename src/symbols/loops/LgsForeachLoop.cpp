@@ -12,8 +12,8 @@ Value* LgsForeachLoop::createIRValue(CodeGenMetadata* metadata) {
     const auto loopExit = createBasicBlock(BB_LOOP_EXIT);
 
     // Init blocks
-    const auto arrPtr = iterableExpr->getIRValue(metadata);
-    const auto iterableSize = iterable->size();
+    const auto arrPtr = iterable->getIRValue(metadata);
+    const auto iterableSize = asIterable()->size();
     const auto iPtr = builder.CreateAlloca(i32Type);
     builder.CreateStore(builder.getInt32(0), iPtr);
     builder.CreateBr(loopCondition);
@@ -27,7 +27,7 @@ Value* LgsForeachLoop::createIRValue(CodeGenMetadata* metadata) {
     // Loop body
     startBlock(metadata, loopBody);
     metadata->logosStack.enterScope();
-    const auto irType = iterableExpr->type->getIRType();
+    const auto irType = iterable->type->getIRType();
     const auto lastElement = builder.CreateGEP(irType, arrPtr, i);
     const auto element = builder.CreateLoad(irType, lastElement);
     // loopVar->setIRValue(element);
@@ -46,9 +46,13 @@ Value* LgsForeachLoop::createIRValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
 
+LgsIterable* LgsForeachLoop::asIterable() const {
+    return dynamic_cast<LgsIterable*>(iterable);
+}
+
 LgsForeachLoop::~LgsForeachLoop() {
-    if (iterableExpr) {
-        delete iterableExpr;
+    if (iterable) {
+        delete iterable;
     }
     if (stmtBlock) {
         delete stmtBlock;

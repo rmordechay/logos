@@ -45,7 +45,7 @@ public:
     void visitIfStmt(const LgsIf* ifStmt);
     void visitLoopStmt(LgsLoop* loopStmt);
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);
-    void visitForeachLoop(LgsForeachLoop* foreachLoop);
+    void visitForeachLoop(const LgsForeachLoop* foreachLoop);
     void visitReturnStmt(const LgsReturn* returnStmt);
     void visitExpr(LgsExpr* expr);
     void visitArray(LgsArray* array);

@@ -7,7 +7,7 @@ public:
   LgsExpr* rangeStart = nullptr;
   LgsExpr* rangeEnd = nullptr;
 
-  LgsRangeLoop(LgsVariable* loopVar, LgsExpr* rangeStart, LgsExpr* rangeEnd, LgsStmtBlock* stmtBlock) : LgsLoop(loopVar, stmtBlock), rangeStart(rangeStart), rangeEnd(rangeEnd) {}
+  LgsRangeLoop(LgsVarDec* loopVar, LgsExpr* rangeStart, LgsExpr* rangeEnd, LgsStmtBlock* stmtBlock) : LgsLoop(loopVar, stmtBlock), rangeStart(rangeStart), rangeEnd(rangeEnd) {}
   Value* createIRValue(CodeGenMetadata* metadata) override;
 };
 

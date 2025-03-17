@@ -37,11 +37,10 @@ void Logos::run() {
     // Linking
     const LgsLinker linker(objFilePath, execFilePath);
     linker.link(modules);
+    cleanup(globalSymbols);
 
     // Running
     system(execFilePath.c_str());
-
-    cleanup(globalSymbols);
 }
 
 vector<LgsFile*> Logos::parseFiles() {
