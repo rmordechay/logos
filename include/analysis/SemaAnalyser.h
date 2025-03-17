@@ -48,7 +48,7 @@ public:
     void visitForeachLoop(const LgsForeachLoop* foreachLoop);
     void visitReturnStmt(const LgsReturn* returnStmt);
     void visitExpr(LgsExpr* expr);
-    void visitArray(LgsArray* array);
+    void visitArray(const LgsArray* array);
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
@@ -58,7 +58,6 @@ public:
     void visitSelection(LgsSelection* selection);
     void visitInstance(LgsInstance* instance);
     void visitArrayIndex(LgsArrayIndex* arrayIndex);
-    void visitConstant(const LgsConst* constant) const;
     void setFuncType(LgsFunc* func);
 
     void setExprType(LgsExpr* expr, LgsType* type);

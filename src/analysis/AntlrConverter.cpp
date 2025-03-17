@@ -217,13 +217,15 @@ LgsIf* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
 }
 
 LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ctx) {
-    const auto loopVar = new LgsVarDec(ctx->VARIABLE()[0]->getText());
     const auto stmts = getStmtBlock(ctx->statementsBlock());
 
     LgsLoop* loopStmt = nullptr;
+    const auto loopVarName = ctx->VARIABLE()[0]->getText();
     if (const auto iterable = ctx->iterableExpr) {
+        const auto loopVar = new LgsVarDec(loopVarName);
         loopStmt = new LgsForeachLoop({loopVar}, getUnaryExpr(iterable), stmts);
     } else if (const auto range = ctx->iterableRange) {
+        const auto loopVar = new LgsVarDec(loopVarName, &LOGOS_INT);
         loopStmt = new LgsRangeLoop({loopVar}, getExpr(range->start), getExpr(range->end), stmts);
     } else {
         assert(false && "No loop statements found");
@@ -265,6 +267,7 @@ LgsUnaryExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
     for (const auto& expr : ctx->expr()) {
         array->elements.emplace_back(getExpr(expr));
     }
+    array->type = new LgsArrayType();
     array->setLocation(ctx->start);
     return array;
 }
@@ -391,8 +394,7 @@ LgsConst* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
         const auto value = stringToken->getText();
         if (value.size() == 1) {
             constant = new LgsCharConst(value[0]);
-        }
-        else {
+        } else {
             const auto strConst = new LgsStrConst(value);
             strConst->cleanStr();
             constant = strConst;

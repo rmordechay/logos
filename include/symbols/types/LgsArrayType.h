@@ -6,8 +6,10 @@ struct CodeGenMetadata;
 
 class LgsArrayType final : public LgsType {
 public:
+    LgsType* underlyingType = nullptr;
+
     const string getName() const override;
-    Type* getIRType() override;
+    Type* getIRType(int size) override;
     LgsConst* getZeroValue() override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;
@@ -15,11 +17,11 @@ public:
 };
 
 inline const string LgsArrayType::getName() const {
-    return "";
+    return underlyingType->getName() + "[]";
 }
 
-inline Type* LgsArrayType::getIRType() {
-    assert(false && "not implemented");
+inline Type* LgsArrayType::getIRType(const int size) {
+    return ArrayType::get(underlyingType->getIRType(), size);
 }
 
 inline LgsConst* LgsArrayType::getZeroValue() {

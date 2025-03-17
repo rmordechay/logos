@@ -25,7 +25,7 @@ Value* LgsStrConst::add(CodeGenMetadata* metadata, LgsExpr* other) {
 
 Value* LgsStrConst::createGlobalStr(Module* module, const std::string& value) const {
     const auto strConstant = ConstantDataArray::getString(context, value, true);
-    return new GlobalVariable(*module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
+    return createIRGlobal(module, strConstant);
 }
 
 LgsExpr* LgsStrConst::add(LgsExpr* other) {

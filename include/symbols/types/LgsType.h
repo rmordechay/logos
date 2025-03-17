@@ -21,7 +21,8 @@ public:
     LgsField* getField(const string& name);
     LgsMethodImpl* getMethod(const string& name);
     virtual const string getName() const = 0;
-    virtual Type* getIRType() = 0;
+    virtual Type* getIRType();
+    virtual Type* getIRType(int size);
     virtual LgsConst* getZeroValue() = 0;
     virtual bool equals(LgsType* other) const = 0;
     virtual LgsType* inferBinaryType(LgsType* other) = 0;

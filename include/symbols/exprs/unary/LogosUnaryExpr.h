@@ -15,7 +15,9 @@ public:
     ~LgsUnaryExpr() override = default;
 };
 
-inline string LgsUnaryExpr::getName() { return ""; }
+inline string LgsUnaryExpr::getName() {
+    return "";
+}
 
 inline Value* LgsUnaryExpr::add(CodeGenMetadata* metadata, LgsExpr* other) {
     const auto l = this->getIRValue(metadata);

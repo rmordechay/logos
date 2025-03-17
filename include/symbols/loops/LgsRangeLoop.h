@@ -7,9 +7,9 @@ public:
   LgsExpr* rangeStart = nullptr;
   LgsExpr* rangeEnd = nullptr;
 
-  LgsRangeLoop(const vector<LgsVarDec*>& loopVars, LgsExpr* rangeStart, LgsExpr* rangeEnd, LgsStmtBlock* stmtBlock)
-    : LgsLoop(loopVars, stmtBlock), rangeStart(rangeStart), rangeEnd(rangeEnd) {}
+  LgsRangeLoop(const vector<LgsVarDec*>& loopVars, LgsExpr* rangeStart, LgsExpr* rangeEnd, LgsStmtBlock* stmtBlock) : LgsLoop(loopVars, stmtBlock), rangeStart(rangeStart), rangeEnd(rangeEnd) {}
   Value* createIRValue(CodeGenMetadata* metadata) override;
+  int loopSize() override;
 };
 
 #endif //LOGOSRANGELOOP_H

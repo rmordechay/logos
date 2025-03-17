@@ -18,3 +18,11 @@ LgsMethodImpl* LgsType::getMethod(const string& name) {
     }
     return nullptr;
 }
+
+Type* LgsType::getIRType() {
+    assert(false && "iterable type has no size");
+}
+
+Type* LgsType::getIRType(int size) {
+    assert(false && "primitive type has no size");
+}

@@ -4,6 +4,7 @@
 #include "constants/LgsStrConst.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
+#include "types/LgsArrayType.h"
 #include "types/LgsBool.h"
 
 #include <ThreadPool.h>
@@ -148,14 +149,15 @@ void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
 }
 
 void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
-    visitUnaryExpr(foreachLoop->iterable);
-    // if (foreachLoop->getExprAsIterable() == nullptr) {
-    //     printError(E10002, &foreachLoop->iterable->location, {foreachLoop->iterable->getName()});
-    //     return;
-    // }
+    const auto iterableExpr = foreachLoop->iterableExpr;
+    visitUnaryExpr(iterableExpr);
+    if (!foreachLoop->getExprAsIterable()) {
+        printError(E10002, &iterableExpr->location, {iterableExpr->getName()});
+        return;
+    }
     // TODO check all loop vars
     const auto loopVar = foreachLoop->loopVars[0];
-    loopVar->type = foreachLoop->iterable->type;
+    loopVar->type = dynamic_cast<LgsArrayType*>(iterableExpr->type)->underlyingType;
     addLocalSymbol(loopVar->name, LgsSymbol(VAR_DEC, loopVar));
     visitStmtBlock(foreachLoop->stmtBlock);
 }
@@ -172,11 +174,13 @@ void SemaAnalyser::visitExpr(LgsExpr* expr) {
     }
 }
 
-void SemaAnalyser::visitArray(LgsArray* array) {
+void SemaAnalyser::visitArray(const LgsArray* array) {
     for (const auto& element : array->elements) {
         visitExpr(element);
     }
-    setExprType(array, array->elements[0]->type);
+    if (const auto arrayType = dynamic_cast<LgsArrayType*>(array->type)) {
+        arrayType->underlyingType = array->elements[0]->type;
+    }
 }
 
 void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
@@ -186,8 +190,6 @@ void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
         visitFuncCall(funcCall);
     } else if (const auto selection = dynamic_cast<LgsSelection*>(unaryExpr)) {
         visitSelection(selection);
-    } else if (const auto constant = dynamic_cast<LgsConst*>(unaryExpr)) {
-        visitConstant(constant);
     } else if (const auto array = dynamic_cast<LgsArray*>(unaryExpr)) {
         visitArray(array);
     } else if (const auto arrIndex = dynamic_cast<LgsArrayIndex*>(unaryExpr)) {
@@ -286,8 +288,6 @@ void SemaAnalyser::setVariableType(LgsVariable* variable) {
         assert(false && "setVariableType not implemented");
     }
 }
-
-void SemaAnalyser::visitConstant(const LgsConst* constant) const {}
 
 void SemaAnalyser::setFuncType(LgsFunc* func) {
     const auto symbol = logosStack.getSymbol(func->type->getName());

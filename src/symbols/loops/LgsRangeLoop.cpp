@@ -1,6 +1,16 @@
 #include "loops/LgsRangeLoop.h"
+
+#include "constants/LgsIntConst.h"
+#include "stmts/LgsVarDec.h"
+
 #include <LgsStack.h>
 #include <types/LgsInt.h>
+
+int LgsRangeLoop::loopSize() {
+    const int rangeStartValue = dynamic_cast<LgsIntConst*>(rangeStart)->value;
+    const int rangeEndValue = dynamic_cast<LgsIntConst*>(rangeEnd)->value;
+    return rangeEndValue - rangeStartValue;
+}
 
 Value* LgsRangeLoop::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
@@ -11,32 +21,34 @@ Value* LgsRangeLoop::createIRValue(CodeGenMetadata* metadata) {
     const auto loopExit = createBasicBlock(BB_LOOP_EXIT);
 
     // Init blocks
-    const auto irStartRange = rangeStart->getIRValue(metadata);
-    const auto irEndRange = rangeEnd->getIRValue(metadata);
-    const auto i = builder.CreateAlloca(i32Type);
-    builder.CreateStore(irStartRange, i);
+    const auto iPtr = builder.CreateAlloca(i32Type);
+    builder.CreateStore(builder.getInt32(0), iPtr);
     builder.CreateBr(loopCondition);
 
     // Loop condition
     startBlock(metadata, loopCondition);
-    const auto currentVal = builder.CreateLoad(i32Type, i);
-    const auto condition = builder.CreateICmpSLT(currentVal, irEndRange);
-    // loopVar->setIRValue(currentVal);
+    const auto size = loopSize();
+    const auto iValue = builder.CreateLoad(i32Type, iPtr);
+    const auto condition = builder.CreateICmpSLT(iValue, builder.getInt32(size));
     builder.CreateCondBr(condition, loopBody, loopExit);
 
     // Loop body
     startBlock(metadata, loopBody);
     metadata->logosStack.enterScope();
-    // metadata->logosStack.addLocalSymbol(loopVar->name, LgsSymbol(LOOP_VAR, loopVar));
+
+    const auto loopVar = loopVars[0];
+    loopVar->setIRValue(iValue);
+    metadata->logosStack.addLocalSymbol(loopVar->name, LgsSymbol(VAR_DEC, loopVar));
     stmtBlock->getIRValue(metadata);
 
     // Increment loop variable
-    const auto inc = builder.CreateAdd(currentVal, builder.getInt32(1));
-    builder.CreateStore(inc, i);
+    const auto inc = builder.CreateAdd(iValue, builder.getInt32(1));
+    builder.CreateStore(inc, iPtr);
     builder.CreateBr(loopCondition);
 
     // Loop end
     startBlock(metadata, loopExit);
     metadata->logosStack.exitScope();
+
     return nullptr;
 }

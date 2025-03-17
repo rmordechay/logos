@@ -7,8 +7,9 @@ Value* LgsArray::createIRValue(CodeGenMetadata* metadata) {
     for (const auto & element : elements) {
         arrValues.emplace_back(static_cast<Constant*>(element->getIRValue(metadata)));
     }
-    const auto arrType = ArrayType::get(type->getIRType(), elements.size());
-    return ConstantArray::get(arrType, arrValues);
+    const auto arrayType = type->getIRType(elements.size());
+    const auto arrType = ArrayType::get(arrayType, elements.size());
+    return createIRGlobal(metadata->currentModule, ConstantArray::get(arrType, arrValues));
 }
 
 

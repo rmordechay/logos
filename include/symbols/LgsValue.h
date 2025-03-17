@@ -11,10 +11,11 @@ public:
 
     void setIRValue(Value* value);
     Value* getIRValue(CodeGenMetadata* metadata);
+    GlobalVariable* createIRGlobal(Module* module, Constant* strConstant) const;
     virtual void setLocation(const antlr4::Token* ctx);
+    virtual json asJson();
     static BasicBlock* createBasicBlock(const char* name);
     static void startBlock(CodeGenMetadata* metadata, BasicBlock* block);
-    virtual json asJson();
     virtual ~LgsValue() = default;
 private:
     virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
@@ -50,6 +51,10 @@ inline json LgsValue::asJson() {
 
 inline void LgsValue::setIRValue(Value* value) {
     IRValue = value;
+}
+
+inline GlobalVariable* LgsValue::createIRGlobal(Module* module, Constant* strConstant) const {
+    return new GlobalVariable(*module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
 }
 
 #endif //CODEGENERATION_H

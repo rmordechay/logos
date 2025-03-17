@@ -16,7 +16,7 @@ public:
     LgsStmtBlock* stmtBlock = nullptr;
 
     LgsLoop(const vector<LgsVarDec*>& loopVars, LgsStmtBlock* stmtBlock) : loopVars(loopVars), stmtBlock(stmtBlock) {}
-    void iterationLoop(CodeGenMetadata* metadata) const;
+    virtual int loopSize() = 0;
     ~LgsLoop() override = default;
 };
 
