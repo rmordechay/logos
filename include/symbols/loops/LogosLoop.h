@@ -12,10 +12,10 @@ class LgsExpr;
 
 class LgsLoop : public LgsStmt {
 public:
-    LgsVarDec* loopVar = nullptr;
+    vector<LgsVarDec*> loopVars;
     LgsStmtBlock* stmtBlock = nullptr;
 
-    LgsLoop(LgsVarDec* loopVar, LgsStmtBlock* stmtBlock) : loopVar(loopVar), stmtBlock(stmtBlock) {}
+    LgsLoop(const vector<LgsVarDec*>& loopVars, LgsStmtBlock* stmtBlock) : loopVars(loopVars), stmtBlock(stmtBlock) {}
     void iterationLoop(CodeGenMetadata* metadata) const;
     ~LgsLoop() override = default;
 };

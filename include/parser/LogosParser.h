@@ -408,16 +408,18 @@ public:
   class  LoopStatementContext : public antlr4::ParserRuleContext {
   public:
     LogosParser::RangeContext *iterableRange = nullptr;
-    LogosParser::ExprContext *iterableExpr = nullptr;
+    LogosParser::UnaryExprContext *iterableExpr = nullptr;
     LoopStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *FOR();
-    StatementsBlockContext *statementsBlock();
-    antlr4::tree::TerminalNode *VARIABLE();
+    std::vector<antlr4::tree::TerminalNode *> VARIABLE();
+    antlr4::tree::TerminalNode* VARIABLE(size_t i);
     antlr4::tree::TerminalNode *IN();
+    StatementsBlockContext *statementsBlock();
     RangeContext *range();
-    ExprListContext *exprList();
-    ExprContext *expr();
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+    UnaryExprContext *unaryExpr();
 
    
   };
@@ -527,6 +529,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *SELF_INSTANCE();
+    antlr4::tree::TerminalNode *SELF_CLASS();
     FuncCallContext *funcCall();
     ConstructorContext *constructor();
     ConstantContext *constant();

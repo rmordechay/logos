@@ -16,11 +16,12 @@ public:
     bool successful = true;
 
     void setUnsuccessful();
+    string formatErrorMsg(LgsErrCode code, const vector<string>& args = {});
     void printError(LgsErrCode code, const vector<string>& args = {});
 };
 
 
-inline void LgsAnalyser::printError(const LgsErrCode code, const vector<string>& args) {
+inline string LgsAnalyser::formatErrorMsg(const LgsErrCode code, const vector<string>& args) {
     setUnsuccessful();
     const auto error = LOGOS_ERRORS.find(code);
     auto pos = 0;
@@ -31,14 +32,16 @@ inline void LgsAnalyser::printError(const LgsErrCode code, const vector<string>&
         pos += args[argIndex].length();
         argIndex++;
     }
-    std::cout << "Error: " << result << '\n';
+    return "Error: " + result + '\n';
+}
+
+inline void LgsAnalyser::printError(const LgsErrCode code, const vector<string>& args) {
+    cout << "Error: " << formatErrorMsg(code, args) << endl;
 }
 
 inline void LgsAnalyser::setUnsuccessful() {
-    if (successful) {
-        std::unique_lock lock(mtx);
-        successful = false;
-    }
+    if (!successful) return;
+    successful = false;
 }
 
 #endif //LOGOSANALYSER_H

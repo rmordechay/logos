@@ -215,14 +215,14 @@ LgsIf* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
 }
 
 LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ctx) {
-    const auto loopVar = new LgsVarDec(ctx->VARIABLE()->getText());
+    const auto loopVar = new LgsVarDec(ctx->VARIABLE()[0]->getText());
     const auto stmts = getStmtBlock(ctx->statementsBlock());
 
     LgsLoop* loopStmt = nullptr;
-    if (const auto iterableExpr = ctx->iterableExpr) {
-        loopStmt = new LgsForeachLoop(loopVar, getExpr(iterableExpr), stmts);
+    if (const auto iterable = ctx->iterableExpr) {
+        loopStmt = new LgsForeachLoop({loopVar}, getUnaryExpr(iterable), stmts);
     } else if (const auto range = ctx->iterableRange) {
-        loopStmt = new LgsRangeLoop(loopVar, getExpr(range->start), getExpr(range->end), stmts);
+        loopStmt = new LgsRangeLoop({loopVar}, getExpr(range->start), getExpr(range->end), stmts);
     } else {
         assert(false && "No loop statements found");
     }

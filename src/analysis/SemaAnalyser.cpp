@@ -141,13 +141,21 @@ void SemaAnalyser::visitLoopStmt(LgsLoop* loopStmt) {
 }
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
-    const auto loopVar = rangeLoop->loopVar;
+    // TODO check all loop vars
+    const auto loopVar = rangeLoop->loopVars[0];
     addLocalSymbol(loopVar->name, LgsSymbol(VAR_DEC, loopVar));
     visitStmtBlock(rangeLoop->stmtBlock);
 }
 
 void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
     visitExpr(foreachLoop->iterable);
+    if (foreachLoop->getExprAsIterable() == nullptr) {
+        printError(E10002, &foreachLoop->iterable->location, {foreachLoop->iterable->getName()});
+        return;
+    }
+    // TODO check all loop vars
+    const auto loopVar = foreachLoop->loopVars[0];
+    addLocalSymbol(loopVar->name, LgsSymbol(VAR_DEC, loopVar));
     visitStmtBlock(foreachLoop->stmtBlock);
 }
 
@@ -332,11 +340,12 @@ bool SemaAnalyser::checkExprType(const LgsExpr* expr, const LgsType* otherType) 
 }
 
 void SemaAnalyser::printError(const LgsErrCode code, const Location* location, const vector<string>& args) {
-    LgsAnalyser::printError(code, args);
+    auto errMsg = formatErrorMsg(code, args);
     const auto lineNumber = to_string(location->lineNumber);
     const auto pos = to_string(location->posInLine);
     const auto path = file->absPath + ":" + lineNumber + ":" + pos;
-    cout << "\tat " << path << '\n';
+    errMsg += "\tat " + path + '\n';
+    cout << errMsg << endl;
 }
 
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {

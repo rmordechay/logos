@@ -95,9 +95,9 @@ pattern:
     ;
 
 loopStatement:
-        FOR VARIABLE? statementsBlock
-    |   FOR VARIABLE IN iterableRange=range statementsBlock
-    |   FOR exprList IN iterableExpr=expr statementsBlock
+        FOR VARIABLE (COMMA VARIABLE)* IN iterableRange=range statementsBlock
+    |   FOR VARIABLE (COMMA VARIABLE)* IN iterableExpr=unaryExpr statementsBlock
+    |   FOR VARIABLE? statementsBlock
     ;
 
 controlFlow:
@@ -133,6 +133,7 @@ exprList:
 unaryExpr:
         VARIABLE
     |   SELF_INSTANCE
+    |   SELF_CLASS
     |   funcCall
     |   constructor
     |   constant

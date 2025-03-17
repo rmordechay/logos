@@ -13,7 +13,7 @@ Value* LgsForeachLoop::createIRValue(CodeGenMetadata* metadata) {
 
     // Init blocks
     const auto arrPtr = iterable->getIRValue(metadata);
-    const auto iterableSize = asIterable()->size();
+    const auto iterableSize = getExprAsIterable()->size();
     const auto iPtr = builder.CreateAlloca(i32Type);
     builder.CreateStore(builder.getInt32(0), iPtr);
     builder.CreateBr(loopCondition);
@@ -46,7 +46,7 @@ Value* LgsForeachLoop::createIRValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
 
-LgsIterable* LgsForeachLoop::asIterable() const {
+LgsIterable* LgsForeachLoop::getExprAsIterable() const {
     return dynamic_cast<LgsIterable*>(iterable);
 }
 
