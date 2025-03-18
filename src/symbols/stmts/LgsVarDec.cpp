@@ -5,8 +5,9 @@
 
 Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
     if (!expr) return nullptr;
-    Value* exprValue = expr->getIRValue(metadata);
+    const auto exprValue = expr->getIRValue(metadata);
     const auto valueType = exprValue->getType();
+    // Pointers don't need to be stored
     if (!valueType->isPointerTy()) {
         auto& builder = metadata->builder;
         const auto allocaInst = builder.CreateAlloca(valueType);

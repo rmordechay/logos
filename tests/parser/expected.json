@@ -4,23 +4,38 @@
     {
       "name": "sub",
       "params": [
-        {},
-        {}
+        {
+          "expr": null,
+          "name": "a",
+          "type": "Int"
+        },
+        {
+          "expr": null,
+          "name": "b",
+          "type": "Int"
+        }
       ],
       "returnType": "Int"
     },
     {
       "name": "mul",
       "params": [
-        {},
-        {}
+        {
+          "expr": null,
+          "name": "a",
+          "type": "Int"
+        },
+        {
+          "expr": null,
+          "name": "b",
+          "type": "Int"
+        }
       ],
       "returnType": "Int"
     }
   ],
   "mainFunc": {
     "name": "main",
-    "params": null,
     "returnType": "Int"
   }
 }

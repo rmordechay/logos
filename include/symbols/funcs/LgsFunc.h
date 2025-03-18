@@ -30,6 +30,7 @@ public:
     virtual void setIRFunc(CodeGenMetadata* metadata) = 0;
     vector<string> getParamTypeNames() const;
     static string getComposedName(const string& name, const vector<string>& paramTypeNames);
+    json asJson() override;
     ~LgsFunc() override;
 };
 

@@ -29,6 +29,16 @@ Value* LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     return IRFunc;
 }
 
+json LgsFunc::asJson() {
+    json tree;
+    tree["name"] = name;
+    tree["returnType"] = type->getName();
+    for (const auto& param : params) {
+        tree["params"].emplace_back(param->asJson());
+    }
+    return tree;
+}
+
 LgsFunc::~LgsFunc() {
     for (const auto param : params) {
         delete param;

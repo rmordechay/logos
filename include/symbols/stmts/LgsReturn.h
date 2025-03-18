@@ -9,6 +9,7 @@ public:
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    json asJson() override;
     ~LgsReturn() override;
 };
 

@@ -1,9 +1,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/LgsFuncCall.h"
-#include "stmts/LgsField.h"
-
 #include <LgsStack.h>
-#include <exprs/binary/LgsBinaryExpr.h>
+#include "stmts/LgsField.h"
 #include <funcs/LgsFuncImpl.h>
 
 string LgsVariable::getName() {

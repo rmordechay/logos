@@ -17,7 +17,6 @@ inline json LgsMainFile::asJson() const {
     json fileTree;
     fileTree["file"] = name;
     fileTree["mainFunc"] = mainFunc->asJson();
-    fileTree["funcs"] = {};
     for (const auto& func : funcs) {
         fileTree["funcs"].emplace_back(func->asJson());
     }

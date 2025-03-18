@@ -1,5 +1,4 @@
 #include "loops/LgsLoop.h"
-
 #include "stmts/LgsStmtBlock.h"
 
 Value* LgsLoop::createIRValue(CodeGenMetadata* metadata) {
@@ -10,6 +9,7 @@ Value* LgsLoop::createIRValue(CodeGenMetadata* metadata) {
     setIRBody(metadata);
     stmtBlock->getIRValue(metadata);
     exitIRLoop(metadata);
+    metadata->logosStack.exitScope();
     return nullptr;
 }
 
@@ -38,8 +38,6 @@ void LgsLoop::exitIRLoop(CodeGenMetadata* metadata) const {
     const auto inc = builder.CreateAdd(iValue, builder.getInt32(1));
     builder.CreateStore(inc, iPtr);
     builder.CreateBr(loopCondition);
-
-    // Loop end
+    // Loop exit
     startBlock(metadata, loopExit);
-    metadata->logosStack.exitScope();
 }
