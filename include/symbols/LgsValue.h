@@ -3,7 +3,16 @@
 
 #include <Token.h>
 #include <llvm/IR/Value.h>
+
+#include "CodeGenMetadata.h"
 #include "LgsGlobals.h"
+
+struct CodeGenMetadata;
+
+struct Location {
+    size_t lineNumber{};
+    size_t posInLine{};
+};
 
 class LgsValue {
 public:

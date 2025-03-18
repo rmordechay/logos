@@ -136,6 +136,13 @@ void Logos::addBuiltinFuncs(map<string, LgsSymbol>& globalSymbols) {
     globalSymbols[printCharFunc->composedName] = LgsSymbol(FUNC, printCharFunc);
 }
 
+inline TargetMachine* getTargetMachine() {
+    string error;
+    const auto targetTriple = sys::getDefaultTargetTriple();
+    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    return target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
+}
+
 inline void initLLVM() {
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();

@@ -1,4 +1,5 @@
 #include "funcs/LgsPrint.h"
+#include "CodeGenMetadata.h"
 
 Value* LgsPrint::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     if (!IRFunc) setIRFunc(metadata);
