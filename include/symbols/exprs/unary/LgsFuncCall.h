@@ -14,16 +14,9 @@ public:
     explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
     string getName() override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    vector<string> getArgTypeNames() const;
     void setComposedName();
     ~LgsFuncCall() override;
 };
-
-inline void LgsFuncCall::setComposedName() {
-    auto tempName = name;
-    for (int i = 0; i < args.size(); ++i) {
-        tempName += "_" + args[i]->type->getName();
-    }
-    composedName = tempName;
-}
 
 #endif //LOGOSFUNCCALLEXPR_H

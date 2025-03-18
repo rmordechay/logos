@@ -35,6 +35,7 @@ public:
     LgsFile* parseFile(const directory_entry&) const;
     void parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool);
     static void addBuiltinFuncs(map<string, LgsSymbol>& globalSymbols);
+    bool analyseFile(LgsFile* file, const map<string, LgsSymbol>& globalSymbols) const;
     bool analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols);
     static LgsMainFile* getMainFile(const vector<LgsFile*>& files);
     static void addGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymbol>& globalSymbols);

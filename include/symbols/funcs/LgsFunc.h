@@ -21,44 +21,16 @@ public:
     LgsStmtBlock* stmtBlock = nullptr;
     BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
 
-    explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {})
-        : name(name), type(funcType), params(params) {
-        setComposedName();
+    explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {}) : name(name), type(funcType), params(params) {
+        composedName = getComposedName(name, getParamTypeNames());
     }
-    virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) = 0;
-    void setComposedName();
+
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) = 0;
     virtual void setIRFunc(CodeGenMetadata* metadata) = 0;
+    vector<string> getParamTypeNames() const;
+    static string getComposedName(const string& name, const vector<string>& paramTypeNames);
     ~LgsFunc() override;
 };
-
-inline void LgsFunc::setComposedName() {
-    if (name == LOGOS_MAIN_FUNC) {
-        composedName = name;
-        return;
-    }
-    auto tempName = name;
-    for (int i = 0; i < params.size(); ++i) {
-        tempName += "_" + params[i]->type->getName();
-    }
-    composedName = tempName;
-}
-
-inline Value* LgsFunc::createIRValue(CodeGenMetadata* metadata) {
-    metadata->logosStack.enterScope();
-    if (!IRFunc) setIRFunc(metadata);
-    metadata->logosStack.currentFunc = IRFunc;
-    startBlock(metadata, entryBlock);
-    stmtBlock->getIRValue(metadata);
-    metadata->logosStack.exitScope();
-    return IRFunc;
-}
-
-inline LgsFunc::~LgsFunc() {
-    for (const auto param : params) {
-        delete param;
-    }
-    delete stmtBlock;
-}
 
 #endif //LOGOSFUNC_H

@@ -105,6 +105,7 @@ add_library(lib STATIC
     src/symbols/exprs/unary/LgsInstance.cpp
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
+    src/symbols/funcs/LgsFunc.cpp
     src/symbols/funcs/LgsFuncImpl.cpp
     src/symbols/funcs/LgsMethodImpl.cpp
     src/symbols/funcs/LgsParam.cpp
@@ -150,6 +151,7 @@ enable_testing()
 add_executable(lgs_tests
     tests/main.cpp
     tests/parser/ParserTest.cpp
+    tests/analysis/sema/LoopTest.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE
@@ -160,6 +162,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs_tests PRIVATE
         lib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libgtest.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libgmock.a
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libgtest_main.a
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libLLVM.dylib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldCommon.dylib

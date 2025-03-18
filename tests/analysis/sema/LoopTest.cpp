@@ -1,19 +1,24 @@
 #include "Logos.h"
-#include <gtest/gtest.h>
 #include <LogosParser.h>
 #include <filesystem>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
+using testing::StartsWith;
 
 const string dataDir = "../tests/analysis/sema/data/";
 
-TEST(ParserTest, TestParseFile) {
-    const Logos logos(dataDir);
-    const directory_entry fileEntry(logos.rootDir / "Main.lgs");
-    const auto file = logos.parseFile(fileEntry);
-    const auto mainFile = dynamic_cast<LgsMainFile*>(file);
+TEST(SemaTest, TestNotIterable) {
+    Logos logos(dataDir);
+    const auto files = logos.parseFiles();
+    map<string, LgsSymbol> globalSymbols;
+    logos.addGlobalsSymbols(files, globalSymbols);
 
-    std::ifstream input_file(dataDir + "expected.json");
-    json expectedJson;
-    input_file >> expectedJson;
+    ostringstream outputBuffer;
+    auto buffer = cout.rdbuf(outputBuffer.rdbuf());
+    logos.analyse(files, globalSymbols);
+    cout.rdbuf(buffer);
+    auto output = outputBuffer.str();
 
-    ASSERT_EQ(mainFile->asJson().dump(2), expectedJson.dump(2));
+    EXPECT_THAT(output, StartsWith("Error: 'arr' is not iterable"));
 }

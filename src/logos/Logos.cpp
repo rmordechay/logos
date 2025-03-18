@@ -87,6 +87,30 @@ LgsFile* Logos::parseFile(const directory_entry& fileEntry) const {
     return logosFile;
 }
 
+bool Logos::analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols) {
+    ThreadPool threadPool;
+    threadPool.start();
+    vector<bool> semaSuccess;
+    for (const auto& file : files) {
+        threadPool.runTask([=, &file, &semaSuccess, &globalSymbols] {
+            const bool successful = analyseFile(file, globalSymbols);
+            {
+                lock_guard lock(mtx);
+                semaSuccess.push_back(successful);
+            }
+        });
+    }
+    threadPool.wait();
+    return std::find(semaSuccess.begin(), semaSuccess.end(), false) == semaSuccess.end();
+}
+
+bool Logos::analyseFile(LgsFile* file, const map<string, LgsSymbol>& globalSymbols) const {
+    SemaAnalyser semaAnalyser(file);
+    semaAnalyser.logosStack.globalSymbols = globalSymbols;
+    semaAnalyser.analyse();
+    return semaAnalyser.successful;
+}
+
 void Logos::addGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymbol>& globalSymbols) {
     addBuiltinFuncs(globalSymbols);
     for (const auto& file : files) {
@@ -110,25 +134,6 @@ void Logos::addBuiltinFuncs(map<string, LgsSymbol>& globalSymbols) {
     globalSymbols[printFloatFunc->composedName] = LgsSymbol(FUNC, printFloatFunc);
     globalSymbols[printStrFunc->composedName] = LgsSymbol(FUNC, printStrFunc);
     globalSymbols[printCharFunc->composedName] = LgsSymbol(FUNC, printCharFunc);
-}
-
-bool Logos::analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols) {
-    ThreadPool threadPool;
-    threadPool.start();
-    vector<bool> semaSuccess;
-    for (const auto& file : files) {
-        threadPool.runTask([=, &file, &semaSuccess, &globalSymbols] {
-            SemaAnalyser semaAnalyser(file);
-            semaAnalyser.logosStack.globalSymbols = globalSymbols;
-            semaAnalyser.analyse();
-            {
-                lock_guard lock(mtx);
-                semaSuccess.push_back(semaAnalyser.successful);
-            }
-        });
-    }
-    threadPool.wait();
-    return std::find(semaSuccess.begin(), semaSuccess.end(), false) == semaSuccess.end();
 }
 
 inline void initLLVM() {
