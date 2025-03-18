@@ -152,6 +152,7 @@ endif()
 enable_testing()
 add_executable(lgs_tests
     tests/main.cpp
+    tests/e2e/e2eTest.cpp
     tests/parser/ParserTest.cpp
     tests/analysis/sema/LoopTest.cpp
 )

@@ -23,6 +23,7 @@ public:
     path execFilePath;
     map<string, LgsSymbol> globalSymbols;
 
+    Logos() = default;
     explicit Logos(const path& rootDirPath) : rootDir(rootDirPath) {
         buildDir = rootDir / LOGOS_BUILD_DIR;
         objFilePath = buildDir / LOGOS_BUILD_DIR;
@@ -34,12 +35,13 @@ public:
     void validateProject() const;
     vector<LgsFile*> parseFiles();
     LgsFile* parseFile(const directory_entry&) const;
+    LgsFile* parseFile(const string& codeText, path absFilePath) const;
     void parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool);
     void addBuiltinFuncs();
     bool analyseFile(LgsFile* file) const;
     bool analyse(const vector<LgsFile*>& files);
     LgsMainFile* getMainFile(const vector<LgsFile*>& files);
-    void addGlobalsSymbols(const vector<LgsFile*>& files);
+    void loadGlobals(const vector<LgsFile*>& files = {});
     bool isLogosFile(const directory_entry& filePath);
     void cleanup() const;
     ~Logos() = default;

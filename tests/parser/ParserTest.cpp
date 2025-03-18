@@ -3,7 +3,7 @@
 #include <LogosParser.h>
 #include <filesystem>
 
-const string dataDir = "../tests/parser/data/";
+const string dataDir = "../tests/parser/";
 
 TEST(ParserTest, TestParseFile) {
     const Logos logos(dataDir);

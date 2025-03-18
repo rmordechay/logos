@@ -27,7 +27,7 @@ void Logos::run() {
     if (!projectAnalyser.analyse()) return;
 
     // Semantic analysis
-    addGlobalsSymbols(files);
+    loadGlobals(files);
     if (!analyse(files)) return;
 
     // Code generation
@@ -69,20 +69,23 @@ void Logos::parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& t
 }
 
 LgsFile* Logos::parseFile(const directory_entry& fileEntry) const {
-    auto absFilePath = canonical(fileEntry).string();
+    auto absFilePath = canonical(fileEntry);
     ifstream file(absFilePath);
     stringstream fileContents;
     fileContents << file.rdbuf();
     auto codeText = fileContents.str();
+    auto lgsFile = parseFile(codeText, absFilePath);
+    lgsFile->relPath = relative(absFilePath, rootDir).lexically_relative(LOGOS_SRC_DIR);
+    return lgsFile;
+}
 
+LgsFile* Logos::parseFile(const string& codeText, path absFilePath) const {
     auto input = ANTLRInputStream(codeText);
     auto lexer = LogosLexer(&input);
     auto tokens = CommonTokenStream(&lexer);
     auto parser = LogosParser(&tokens);
     auto parsedFile = parser.logosFile();
-
     auto logosFile = AntlerConverter::getLogosFile(parsedFile, absFilePath);
-    logosFile->relPath = relative(absFilePath, rootDir).lexically_relative(LOGOS_SRC_DIR);
     return logosFile;
 }
 
@@ -110,7 +113,7 @@ bool Logos::analyseFile(LgsFile* file) const {
     return semaAnalyser.successful;
 }
 
-void Logos::addGlobalsSymbols(const vector<LgsFile*>& files) {
+void Logos::loadGlobals(const vector<LgsFile*>& files) {
     addBuiltinFuncs();
     for (const auto& file : files) {
         if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
@@ -156,8 +159,8 @@ inline void initLLVM() {
 }
 
 void Logos::generateCode(const LgsMainFile* mainFile) const {
-    create_directories(buildDir);
     initLLVM();
+    create_directories(buildDir);
     CodeGenerator::generateModule(buildDir, mainFile, globalSymbols);
 }
 
