@@ -36,7 +36,6 @@ void Logos::run() {
     // Linking
     const LgsLinker linker(objFilePath, execFilePath);
     linker.link(modules);
-    cleanup();
 
     // Running
     system(execFilePath.c_str());
@@ -106,9 +105,9 @@ bool Logos::analyse(const vector<LgsFile*>& files) {
     return std::find(semaSuccess.begin(), semaSuccess.end(), false) == semaSuccess.end();
 }
 
-bool Logos::analyseFile(LgsFile* file) const {
+bool Logos::analyseFile(LgsFile* file) {
     SemaAnalyser semaAnalyser(file);
-    semaAnalyser.logosStack.globalSymbols = globalSymbols;
+    semaAnalyser.logosStack.globals = &globals;
     semaAnalyser.analyse();
     return semaAnalyser.successful;
 }
@@ -118,24 +117,22 @@ void Logos::loadGlobals(const vector<LgsFile*>& files) {
     for (const auto& file : files) {
         if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             const auto object = objFile->obj;
-            globalSymbols[object->getName()] = LgsSymbol(OBJECT, object);
+            globals.symbols[object->getName()] = LgsSymbol(OBJECT, object);
         } else if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
             for (const auto &func : mainFile->funcs) {
-                globalSymbols[func->composedName] = LgsSymbol(FUNC, func);
+                globals.symbols[func->composedName] = LgsSymbol(FUNC, func);
             }
         }
     }
 }
 
 void Logos::addBuiltinFuncs() {
-    const auto printIntFunc = new LgsPrint({new LgsParam("input", &LOGOS_INT)});
-    const auto printFloatFunc = new LgsPrint({new LgsParam("input", &LOGOS_FLOAT)});
-    const auto printStrFunc = new LgsPrint({new LgsParam("input", &LOGOS_STR)});
-    const auto printCharFunc = new LgsPrint({new LgsParam("input", &LOGOS_CHAR)});
-    globalSymbols[printIntFunc->composedName] = LgsSymbol(FUNC, printIntFunc);
-    globalSymbols[printFloatFunc->composedName] = LgsSymbol(FUNC, printFloatFunc);
-    globalSymbols[printStrFunc->composedName] = LgsSymbol(FUNC, printStrFunc);
-    globalSymbols[printCharFunc->composedName] = LgsSymbol(FUNC, printCharFunc);
+    globals.funcs[LgsPrint::name] = {
+        new LgsPrint({new LgsParam("input", &LOGOS_INT)}),
+        new LgsPrint({new LgsParam("input", &LOGOS_FLOAT)}),
+        new LgsPrint({new LgsParam("input", &LOGOS_STR)}),
+        new LgsPrint({new LgsParam("input", &LOGOS_CHAR)}),
+    };
 }
 
 inline TargetMachine* getTargetMachine() {
@@ -158,10 +155,10 @@ inline void initLLVM() {
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
-void Logos::generateCode(const LgsMainFile* mainFile) const {
+void Logos::generateCode(const LgsMainFile* mainFile) {
     initLLVM();
     create_directories(buildDir);
-    CodeGenerator::generateModule(buildDir, mainFile, globalSymbols);
+    CodeGenerator::generateModule(buildDir, mainFile, &globals);
 }
 
 void Logos::validateProject() const {
@@ -178,11 +175,11 @@ void Logos::validateProject() const {
     }
 }
 
-bool Logos::isLogosFile(const directory_entry& filePath) {
+bool Logos::isLogosFile(const directory_entry& filePath) const {
     return filePath.is_regular_file() && filePath.path().extension().string() == LOGOS_EXTENSION;
 }
 
-LgsMainFile* Logos::getMainFile(const vector<LgsFile*>& files) {
+LgsMainFile* Logos::getMainFile(const vector<LgsFile*>& files) const {
     unordered_map<string, LgsFile*> filesMap;
     for (const auto& file : files) {
         if (file->name == LOGOS_MAIN_FILE) {
@@ -190,19 +187,4 @@ LgsMainFile* Logos::getMainFile(const vector<LgsFile*>& files) {
         }
     }
     return nullptr;
-}
-
-void Logos::cleanup() const {
-    for (const auto& [_, globalSymbol] : globalSymbols) {
-        switch (globalSymbol.type) {
-        case OBJECT:
-            if (globalSymbol.object) delete globalSymbol.object;
-            break;
-        case FUNC:
-            if (globalSymbol.func) delete globalSymbol.func;
-            break;
-        default:
-            break;
-        }
-    }
 }

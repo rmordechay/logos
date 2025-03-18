@@ -1,5 +1,8 @@
 #include "LgsStack.h"
 
+#include "exprs/unary/LgsFuncCall.h"
+#include "funcs/LgsFunc.h"
+
 void LgsStack::enterScope() {
     if (size() > 0) {
         push(LgsStackFrame{.symbols = top().symbols});
@@ -13,24 +16,32 @@ void LgsStack::exitScope() {
 }
 
 LgsSymbol* LgsStack::getSymbol(const string& name) {
-    if (globalSymbols.find(name) != globalSymbols.end()) {
-        return &globalSymbols[name];
-    }
+    // Locals
     auto& symbols = top().symbols;
     if (symbols.find(name) != symbols.end()) {
         return &symbols[name];
     }
+    // Globals
+    if (globals->symbols.find(name) != globals->symbols.end()) {
+        return &globals->symbols[name];
+    }
     return nullptr;
 }
 
-bool LgsStack::hasSymbol(const string& name) {
-    if (globalSymbols.find(name) != globalSymbols.end()) return true;
-    auto& symbols = this->top().symbols;
-    return symbols.find(name) != symbols.end();
+LgsFunc* LgsStack::getFunc(const LgsFuncCall* funcCall) const {
+    const auto func = globals->funcs.find(funcCall->name);
+    if (func != globals->funcs.end()) {
+        for (const auto& overload : func->second) {
+            if (overload->composedName == funcCall->composedName) {
+                return overload;
+            }
+        }
+    }
+    return nullptr;
 }
 
 void LgsStack::addGlobalSymbol(const string& name, const LgsSymbol& symbol) {
-    globalSymbols[name] = symbol;
+
 }
 
 void LgsStack::addLocalSymbol(const string& name, const LgsSymbol& symbol) {

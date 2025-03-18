@@ -273,10 +273,10 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
         visitExpr(arg);
     }
     funcCall->setComposedName();
-    const auto symbol = getSymbol(funcCall->composedName, funcCall);
-    if (!symbol || symbol->type != FUNC) return;
-    funcCall->func = symbol->func;
-    setExprType(funcCall, symbol->func->type);
+    const auto func = logosStack.getFunc(funcCall);
+    if (!func) return;
+    funcCall->func = func;
+    setExprType(funcCall, func->type);
 }
 
 void SemaAnalyser::setVariableType(LgsVariable* variable) {
@@ -356,7 +356,9 @@ void SemaAnalyser::printError(const LgsErrCode code, const Location* location, c
 
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
     const auto symbol = logosStack.getSymbol(name);
-    if (!symbol) printError(E10006, &value->location, {name});
+    if (!symbol) {
+        printError(E10006, &value->location, {name});
+    }
     return symbol;
 }
 

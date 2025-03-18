@@ -14,13 +14,13 @@ struct LgsStackFrame {
 
 class LgsStack : stack<LgsStackFrame> {
 public:
-    map<string, LgsSymbol> globalSymbols;
+    LgsGlobals* globals = nullptr;
     Function* currentFunc = nullptr;
 
     void enterScope();
     void exitScope();
     LgsSymbol* getSymbol(const string& name);
-    bool hasSymbol(const string& name);
+    LgsFunc* getFunc(const LgsFuncCall* funcCall) const;
     void addGlobalSymbol(const string& name, const LgsSymbol& symbol);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     void addLocalSymbol(const string& name, LgsObject* symbol);

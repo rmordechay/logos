@@ -1,6 +1,11 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
 
+#include <string>
+#include <map>
+
+using namespace std;
+
 class LgsParam;
 class LgsVarDec;
 class LgsMethodImpl;
@@ -58,6 +63,11 @@ struct LgsSymbol {
         type(type),
         object(object) {
     }
+};
+
+struct LgsGlobals {
+    map<string, LgsSymbol> symbols;
+    map<string, vector<LgsFunc*>> funcs;
 };
 
 #endif //LOGOSSYMBOL_H

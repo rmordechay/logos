@@ -58,8 +58,8 @@ public:
     void visitSelection(LgsSelection* selection);
     void visitInstance(LgsInstance* instance);
     void visitArrayIndex(LgsArrayIndex* arrayIndex);
-    void setFuncType(LgsFunc* func);
 
+    void setFuncType(LgsFunc* func);
     void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
 

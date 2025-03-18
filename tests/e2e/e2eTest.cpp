@@ -21,7 +21,6 @@ protected:
     }
 
     void TearDown() override {
-        logos.cleanup();
         remove_all(logos.buildDir);
     }
 };

@@ -3,10 +3,10 @@
 #include <ranges>
 #include <llvm/Support/FileSystem.h>
 
-void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols) {
+void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* mainFile, LgsGlobals* globals) {
     const auto module = createModule(LOGOS_MAIN_FILE);
     auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
-    metadata.logosStack.globalSymbols = globalSymbols;
+    metadata.logosStack.globals = globals;
 
     for (const auto& func : mainFile->funcs) {
         func->getIRValue(&metadata);
@@ -17,11 +17,11 @@ void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* main
     writeIRToFile(metadata.currentModule, buildDir, LOGOS_MAIN_FILE);
 }
 
-void CodeGenerator::generateModule(const path& buildDir, LgsObject* obj, const map<string, LgsSymbol>& globalSymbols) {
+void CodeGenerator::generateModule(const path& buildDir, LgsObject* obj, LgsGlobals* globalSymbols) {
     const auto objName = obj->getName();
     const auto module = createModule(objName);
     auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
-    metadata.logosStack.globalSymbols = globalSymbols;
+    metadata.logosStack.globals = globalSymbols;
 
     for (const auto& [_, method] : obj->methods) {
         method->getIRValue(&metadata);
