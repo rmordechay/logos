@@ -8,7 +8,6 @@
 #include <ThreadPool.h>
 #include "exprs/unary/LgsArray.h"
 #include "exprs/unary/LgsArrayIndex.h"
-#include "exprs/unary/constants/LgsConst.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsInstance.h"
 #include "exprs/unary/LgsSelection.h"
@@ -97,6 +96,7 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
 }
 
 void SemaAnalyser::visitStmtBlock(const LgsStmtBlock* stmtBlock) {
+    if (!stmtBlock) return;
     for (const auto& stmt : stmtBlock->stmts) {
         visitStmt(stmt);
     }
@@ -131,14 +131,20 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
 void SemaAnalyser::visitIfStmt(const LgsIf* ifStmt) {
     visitExpr(ifStmt->ifCond);
     visitStmtBlock(ifStmt->ifStmtBlock);
+    for (const auto& elseIfStmtBlock : ifStmt->elseIfStmtBlocks) {
+        visitStmtBlock(elseIfStmtBlock);
+    }
+    visitStmtBlock(ifStmt->elseStmtBlock);
 }
 
 void SemaAnalyser::visitLoopStmt(LgsLoop* loopStmt) {
+    logosStack.enterScope();
     if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {
         visitRangeLoop(rangeLoop);
     } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loopStmt)) {
         visitForeachLoop(foreachLoop);
     }
+    logosStack.exitScope();
 }
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
@@ -250,7 +256,6 @@ void SemaAnalyser::resolveSelectionVariable(LgsVariable* variable) {
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
     const auto symbol = getSymbol(instance->name, instance);
     if (!symbol) return;
-
     instance->obj = symbol->object;
     instance->type = instance->obj;
     for (const auto& [name, field] : instance->obj->fields) {

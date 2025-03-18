@@ -12,8 +12,7 @@ void LgsPrint::setIRFunc(CodeGenMetadata* metadata) {
         paramTypes.emplace_back(param->type->getIRType());
     }
     const auto IRFuncType = FunctionType::get(LOGOS_VOID.IRType, paramTypes, false);
-    auto func = metadata->currentModule->getOrInsertFunction(composedName, IRFuncType);
-    IRFunc = cast<Function>(func.getCallee());
+    IRFunc = Function::Create(IRFuncType, GlobalValue::ExternalLinkage, composedName, metadata->currentModule);
 }
 
 Value* LgsPrint::createIRValue(CodeGenMetadata* metadata) {
