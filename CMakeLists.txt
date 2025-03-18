@@ -23,6 +23,7 @@ add_library(lib STATIC
     include/logos/Logos.h
     include/logos/ThreadPool.h
     include/codegen/CodeGenerator.h
+    include/codegen/CodeGenMetadata.h
     include/codegen/LgsLinker.h
     include/parser/LogosLexer.h
     include/parser/LogosParser.h

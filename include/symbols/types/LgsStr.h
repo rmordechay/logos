@@ -7,7 +7,7 @@
 
 class LgsStr final : public LgsType {
 public:
-    string name = "Str";
+    static constexpr auto name = "Str";
     Type* IRType = PointerType::get(Type::getInt8Ty(context), 0);
 
     const string getName() const override;

@@ -7,8 +7,7 @@
 
 class LgsInt final : public LgsType {
 public:
-
-    string name = "Int";
+    static constexpr auto name = "Int";
     Type* IRType = Type::getInt32Ty(context);
 
     LgsMethodImpl isOdd = LgsMethodImpl("isOdd", &LOGOS_BOOL, name, {new LgsParam("n", this)});

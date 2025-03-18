@@ -8,7 +8,7 @@ using namespace std;
 
 class LgsVoid final : public LgsType {
 public:
-    string name = "Void";
+    static constexpr auto name = "Void";
     Type* IRType = Type::getVoidTy(context);
 
     const string getName() const override;

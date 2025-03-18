@@ -5,7 +5,7 @@
 
 class LgsBool final : public LgsType {
 public:
-    string name = "Bool";
+    static constexpr auto name = "Bool";
     string trueLiteral = "true";
     Type* IRType = Type::getInt1Ty(context);
 

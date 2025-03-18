@@ -7,7 +7,7 @@
 
 class LgsChar final : public LgsType {
 public:
-    string name = "Char";
+    static constexpr auto name = "Char";
     Type* IRType = Type::getInt8Ty(context);
     LgsMethodImpl isAscii = LgsMethodImpl("isAscii", &LOGOS_BOOL, name, {new LgsParam("char", this)});
 
