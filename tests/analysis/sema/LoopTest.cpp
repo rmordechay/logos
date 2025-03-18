@@ -1,24 +1,45 @@
 #include "LgsLinker.h"
 #include "Logos.h"
+#include "TestUtils.h"
+
 #include <LogosParser.h>
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <filesystem>
 
 using testing::StartsWith;
 
-const path dataDir = "../tests/analysis/sema";
 
-TEST(SemaTest, TestNotIterable) {
-    Logos logos(dataDir);
-    const auto files = logos.parseFiles();
-    map<string, LgsSymbol> globalSymbols;
-    logos.loadGlobals(files);
+class LoopTests : public testing::Test {
+protected:
+    path dataDir = "../tests/analysis/sema";
+    Logos logos = Logos(dataDir);
+
+    void SetUp() override {
+
+    }
+
+    void TearDown() override {
+        logos.cleanup();
+        remove_all(logos.buildDir);
+    }
+};
+
+TEST_F(LoopTests, TestNotIterable) {
+    const auto code = R"(
+    main() {
+        arr = 4
+        for i in arr {
+            print(i)
+        }
+    }
+    )";
+    const auto file = logos.parseFile(code);
+    logos.loadGlobals();
 
     const ostringstream outputBuffer;
     const auto buffer = cout.rdbuf(outputBuffer.rdbuf());
-    logos.analyse(files);
+    logos.analyse({file});
     cout.rdbuf(buffer);
     const auto output = outputBuffer.str();
 

@@ -5,7 +5,7 @@
 #include <llvm/IR/Value.h>
 
 #include "CodeGenMetadata.h"
-#include "LgsGlobals.h"
+#include "LgsData.h"
 
 struct CodeGenMetadata;
 

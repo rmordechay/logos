@@ -4,7 +4,7 @@
 #include "../logos/LgsErrors.h"
 
 #include <LgsFile.h>
-#include <LgsGlobals.h>
+#include <LgsData.h>
 #include <mutex>
 #include <vector>
 

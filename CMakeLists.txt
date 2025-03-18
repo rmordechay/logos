@@ -22,6 +22,9 @@ add_library(lib STATIC
     # headers
     include/logos/Logos.h
     include/logos/ThreadPool.h
+    include/logos/LgsData.h
+    include/logos/LgsStack.h
+    include/logos/LgsErrors.h
     include/codegen/CodeGenerator.h
     include/codegen/CodeGenMetadata.h
     include/codegen/LgsLinker.h
@@ -35,7 +38,7 @@ add_library(lib STATIC
     include/cli/LgsCmd.h
     include/cli/LgsRunCmd.h
     include/cli/LgsGenerateCmd.h
-    include/logos/LgsErrors.h
+
     # Symbols headers
     include/symbols/exprs/binary/LgsBinaryExpr.h
     include/symbols/exprs/unary/constants/LgsConst.h
@@ -93,6 +96,7 @@ add_library(lib STATIC
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
     src/analysis/ProjectAnalyser.cpp
+
     # Symbols src
     src/symbols/exprs/binary/LgsBinaryExpr.cpp
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
@@ -155,10 +159,13 @@ add_executable(lgs_tests
     tests/e2e/e2eTest.cpp
     tests/parser/ParserTest.cpp
     tests/analysis/sema/LoopTest.cpp
+    tests/TestUtils.h
+    tests/LgsTest.h
 )
 
 target_include_directories(lgs_tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")

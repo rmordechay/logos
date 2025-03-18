@@ -1,6 +1,0 @@
-main() {
-    arr = 4
-    for i in arr {
-        print(i)
-    }
-}
