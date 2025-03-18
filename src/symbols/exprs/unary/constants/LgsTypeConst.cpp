@@ -9,3 +9,10 @@ string LgsTypeConst::getName() {
 Value* LgsTypeConst::createIRValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
+
+json LgsTypeConst::asJson() {
+    json tree;
+    tree["name"] = type->getName();
+    tree["value"] = type->getName();
+    return tree;
+}

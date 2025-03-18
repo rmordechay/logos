@@ -9,6 +9,7 @@ public:
 
     explicit LgsBoolConst(const bool value) : LgsConst(&LOGOS_BOOL), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    json asJson() override;
     ~LgsBoolConst() override = default;
 };
 

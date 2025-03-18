@@ -44,3 +44,10 @@ void LgsStrConst::cleanStr() {
     this->value.erase(0, 1);
     this->value.pop_back();
 }
+
+json LgsStrConst::asJson() {
+    json tree;
+    tree["name"] = type->getName();
+    tree["value"] = value;
+    return tree;
+}

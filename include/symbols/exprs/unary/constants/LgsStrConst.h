@@ -15,6 +15,7 @@ public:
     explicit LgsStrConst(const string& value) : LgsConst(&LOGOS_STR), value(value) {}
     Value* createGlobalStr(Module* module, const std::string& value) const;
     void cleanStr();
+    json asJson() override;
     size_t size() override;
     LgsExpr* add(LgsExpr* other) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
