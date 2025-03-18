@@ -9,15 +9,15 @@ class LgsStack;
 using namespace nlohmann;
 using namespace std;
 
-const auto LOGOS_EXTENSION = ".lgs";
-const auto LOGOS_SRC_DIR = "src";
-const auto LOGOS_BUILD_DIR = "build";
-const auto LOGOS_MAIN_FILE = "Main";
-const auto LOGOS_MAIN_FUNC = "main";
-const auto LOGOS_SELF = "self";
-const auto OBJECT_FILE = "output.o";
-const auto EXECUTABLE_FILE = "output";
-const auto LOGOS_STDLIB = "../stdlib/lgslib.ll";
+#define LOGOS_EXTENSION ".lgs"
+#define LOGOS_SRC_DIR "src"
+#define LOGOS_BUILD_DIR "build"
+#define LOGOS_MAIN_FILE "Main"
+#define LOGOS_MAIN_FUNC "main"
+#define LOGOS_SELF "self"
+#define OBJECT_FILE "output.o"
+#define EXECUTABLE_FILE "output"
+#define LOGOS_STDLIB "../stdlib/lgslib.ll"
 
 #if defined(_WIN32)
     #define OS_NAME "Windows"

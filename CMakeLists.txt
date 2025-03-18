@@ -80,6 +80,7 @@ add_library(lib STATIC
 
     # src
     src/logos/Logos.cpp
+    src/logos/LgsStack.cpp
     src/logos/ThreadPool.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsCli.cpp

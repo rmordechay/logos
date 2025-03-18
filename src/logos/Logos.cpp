@@ -27,17 +27,16 @@ void Logos::run() {
     if (!projectAnalyser.analyse()) return;
 
     // Semantic analysis
-    map<string, LgsSymbol> globalSymbols;
-    addGlobalsSymbols(files, globalSymbols);
-    if (!analyse(files, globalSymbols)) return;
+    addGlobalsSymbols(files);
+    if (!analyse(files)) return;
 
     // Code generation
-    generateCode(getMainFile(files), globalSymbols);
+    generateCode(getMainFile(files));
 
     // Linking
     const LgsLinker linker(objFilePath, execFilePath);
     linker.link(modules);
-    cleanup(globalSymbols);
+    cleanup();
 
     // Running
     system(execFilePath.c_str());
@@ -87,13 +86,13 @@ LgsFile* Logos::parseFile(const directory_entry& fileEntry) const {
     return logosFile;
 }
 
-bool Logos::analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols) {
+bool Logos::analyse(const vector<LgsFile*>& files) {
     ThreadPool threadPool;
     threadPool.start();
     vector<bool> semaSuccess;
     for (const auto& file : files) {
-        threadPool.runTask([=, &file, &semaSuccess, &globalSymbols] {
-            const bool successful = analyseFile(file, globalSymbols);
+        threadPool.runTask([=, &file, &semaSuccess] {
+            const bool successful = analyseFile(file);
             {
                 lock_guard lock(mtx);
                 semaSuccess.push_back(successful);
@@ -104,15 +103,15 @@ bool Logos::analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>&
     return std::find(semaSuccess.begin(), semaSuccess.end(), false) == semaSuccess.end();
 }
 
-bool Logos::analyseFile(LgsFile* file, const map<string, LgsSymbol>& globalSymbols) const {
+bool Logos::analyseFile(LgsFile* file) const {
     SemaAnalyser semaAnalyser(file);
     semaAnalyser.logosStack.globalSymbols = globalSymbols;
     semaAnalyser.analyse();
     return semaAnalyser.successful;
 }
 
-void Logos::addGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymbol>& globalSymbols) {
-    addBuiltinFuncs(globalSymbols);
+void Logos::addGlobalsSymbols(const vector<LgsFile*>& files) {
+    addBuiltinFuncs();
     for (const auto& file : files) {
         if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             const auto object = objFile->obj;
@@ -125,7 +124,7 @@ void Logos::addGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymb
     }
 }
 
-void Logos::addBuiltinFuncs(map<string, LgsSymbol>& globalSymbols) {
+void Logos::addBuiltinFuncs() {
     const auto printIntFunc = new LgsPrint({new LgsParam("input", &LOGOS_INT)});
     const auto printFloatFunc = new LgsPrint({new LgsParam("input", &LOGOS_FLOAT)});
     const auto printStrFunc = new LgsPrint({new LgsParam("input", &LOGOS_STR)});
@@ -156,7 +155,7 @@ inline void initLLVM() {
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
-void Logos::generateCode(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols) const {
+void Logos::generateCode(const LgsMainFile* mainFile) const {
     create_directories(buildDir);
     initLLVM();
     CodeGenerator::generateModule(buildDir, mainFile, globalSymbols);
@@ -190,7 +189,7 @@ LgsMainFile* Logos::getMainFile(const vector<LgsFile*>& files) {
     return nullptr;
 }
 
-void Logos::cleanup(map<string, LgsSymbol> globalSymbols) const {
+void Logos::cleanup() const {
     for (const auto& [_, globalSymbol] : globalSymbols) {
         switch (globalSymbol.type) {
         case OBJECT:

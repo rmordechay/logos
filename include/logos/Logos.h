@@ -21,6 +21,7 @@ public:
     path buildDir;
     path objFilePath;
     path execFilePath;
+    map<string, LgsSymbol> globalSymbols;
 
     explicit Logos(const path& rootDirPath) : rootDir(rootDirPath) {
         buildDir = rootDir / LOGOS_BUILD_DIR;
@@ -29,18 +30,18 @@ public:
     }
 
     void run();
-    void generateCode(const LgsMainFile* mainFile, const map<string, LgsSymbol>& globalSymbols) const;
+    void generateCode(const LgsMainFile* mainFile) const;
     void validateProject() const;
     vector<LgsFile*> parseFiles();
     LgsFile* parseFile(const directory_entry&) const;
     void parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool);
-    static void addBuiltinFuncs(map<string, LgsSymbol>& globalSymbols);
-    bool analyseFile(LgsFile* file, const map<string, LgsSymbol>& globalSymbols) const;
-    bool analyse(const vector<LgsFile*>& files, const map<string, LgsSymbol>& globalSymbols);
-    static LgsMainFile* getMainFile(const vector<LgsFile*>& files);
-    static void addGlobalsSymbols(const vector<LgsFile*>& files, map<string, LgsSymbol>& globalSymbols);
-    static bool isLogosFile(const directory_entry& filePath);
-    void cleanup(map<string, LgsSymbol> globalSymbols) const;
+    void addBuiltinFuncs();
+    bool analyseFile(LgsFile* file) const;
+    bool analyse(const vector<LgsFile*>& files);
+    LgsMainFile* getMainFile(const vector<LgsFile*>& files);
+    void addGlobalsSymbols(const vector<LgsFile*>& files);
+    bool isLogosFile(const directory_entry& filePath);
+    void cleanup() const;
     ~Logos() = default;
 };
 
