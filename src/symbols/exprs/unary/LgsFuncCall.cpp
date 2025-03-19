@@ -6,7 +6,7 @@ string LgsFuncCall::getName() {
 }
 
 Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
-    assert(composedName != "");
+    assert(func && composedName != "");
     return func->call(metadata, args);
 }
 

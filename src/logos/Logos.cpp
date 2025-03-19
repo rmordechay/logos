@@ -91,25 +91,19 @@ LgsFile* Logos::parseFile(const string& codeText, path absFilePath) const {
 bool Logos::analyse(const vector<LgsFile*>& files) {
     ThreadPool threadPool;
     threadPool.start();
-    vector<bool> semaSuccess;
     for (const auto& file : files) {
-        threadPool.runTask([=, &file, &semaSuccess] {
-            const bool successful = analyseFile(file);
+        threadPool.runTask([=, &file] {
+            SemaAnalyser semaAnalyser(file);
+            semaAnalyser.logosStack.globals = &globals;
+            semaAnalyser.analyse();
             {
                 lock_guard lock(mtx);
-                semaSuccess.push_back(successful);
+                errors.insert(errors.end(), semaAnalyser.errors.begin(), semaAnalyser.errors.end());
             }
         });
     }
     threadPool.wait();
-    return std::find(semaSuccess.begin(), semaSuccess.end(), false) == semaSuccess.end();
-}
-
-bool Logos::analyseFile(LgsFile* file) {
-    SemaAnalyser semaAnalyser(file);
-    semaAnalyser.logosStack.globals = &globals;
-    semaAnalyser.analyse();
-    return semaAnalyser.successful;
+    return errors.empty();
 }
 
 void Logos::loadGlobals(const vector<LgsFile*>& files) {
@@ -120,7 +114,7 @@ void Logos::loadGlobals(const vector<LgsFile*>& files) {
             globals.symbols[object->getName()] = LgsSymbol(OBJECT, object);
         } else if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
             for (const auto &func : mainFile->funcs) {
-                globals.symbols[func->composedName] = LgsSymbol(FUNC, func);
+                globals.funcs[func->composedName].emplace_back(func);
             }
         }
     }
@@ -170,7 +164,7 @@ void Logos::validateProject() const {
         }
     }
     if (srcDirPath.empty()) {
-        cout << LOGOS_ERRORS.at(E10010) << '\n';
+        cout << E10010 << '\n';
         exit(0);
     }
 }

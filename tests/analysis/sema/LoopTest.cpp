@@ -15,10 +15,6 @@ protected:
     path dataDir = "../tests/analysis/sema";
     Logos logos = Logos(dataDir);
 
-    void SetUp() override {
-
-    }
-
     void TearDown() override {
         remove_all(logos.buildDir);
     }
@@ -35,12 +31,8 @@ TEST_F(LoopTests, TestNotIterable) {
     )";
     const auto file = logos.parseFile(code);
     logos.loadGlobals();
-
-    const ostringstream outputBuffer;
-    const auto buffer = cout.rdbuf(outputBuffer.rdbuf());
     logos.analyse({file});
-    cout.rdbuf(buffer);
-    const auto output = outputBuffer.str();
 
-    ASSERT_THAT(output, StartsWith("Error: 'arr' is not iterable"));
+    ASSERT_THAT(logos.errors.size(), 1);
+    ASSERT_THAT(logos.errors[0].msg, StartsWith("Error: 'arr' is not iterable."));
 }

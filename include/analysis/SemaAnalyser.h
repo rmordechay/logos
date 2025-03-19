@@ -23,10 +23,15 @@ class LgsIf;
 class LgsAssignment;
 class LgsLoop;
 
+struct LgsError {
+    string msg;
+};
+
 class SemaAnalyser final : public LgsAnalyser {
 public:
     LgsStack logosStack;
     LgsFile* file = nullptr;
+    vector<LgsError> errors;
 
     explicit SemaAnalyser(LgsFile* logosFile) : file(logosFile) {}
     void analyse();
@@ -64,8 +69,9 @@ public:
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
 
     bool checkExprType(const LgsExpr* expr, const LgsType* otherType);
-    void printError(LgsErrCode code, const Location* location, const vector<string>& args);
+    void handleError(const string& code, const Location* location, const vector<string>& args);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
+    LgsFunc* getFunc(const LgsFuncCall* funcCall);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     Location* getSymbolLocation(const LgsSymbol* s) const;
     ~SemaAnalyser() = default;

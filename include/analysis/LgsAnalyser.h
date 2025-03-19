@@ -16,27 +16,26 @@ public:
     bool successful = true;
 
     void setUnsuccessful();
-    string formatErrorMsg(LgsErrCode code, const vector<string>& args = {});
-    void printError(LgsErrCode code, const vector<string>& args = {});
+    string formatErrorMsg(const string& errMsg, const vector<string>& args = {});
+    void printError(const string& errMsg, const vector<string>& args = {});
 };
 
 
-inline string LgsAnalyser::formatErrorMsg(const LgsErrCode code, const vector<string>& args) {
+inline string LgsAnalyser::formatErrorMsg(const string& errMsg, const vector<string>& args) {
     setUnsuccessful();
-    const auto error = LOGOS_ERRORS.find(code);
     auto pos = 0;
     auto argIndex = 0;
-    auto result = error->second;
+    auto result = errMsg;
     while ((pos = result.find(ERROR_PLACE_HOLDER, pos)) != string::npos && argIndex < args.size()) {
         result.replace(pos, ERROR_PLACE_HOLDER.size(), args[argIndex]);
         pos += args[argIndex].length();
         argIndex++;
     }
-    return "Error: " + result + '\n';
+    return "Error: " + result;
 }
 
-inline void LgsAnalyser::printError(const LgsErrCode code, const vector<string>& args) {
-    cout << "Error: " << formatErrorMsg(code, args) << endl;
+inline void LgsAnalyser::printError(const string& errMsg, const vector<string>& args) {
+    cout << "Error: " << formatErrorMsg(errMsg, args) << endl;
 }
 
 inline void LgsAnalyser::setUnsuccessful() {
