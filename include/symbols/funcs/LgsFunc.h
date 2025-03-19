@@ -25,7 +25,7 @@ public:
         composedName = getComposedName(name, getParamTypeNames());
     }
 
-    Value* createIRValue(CodeGenMetadata* metadata) override;
+    virtual Value* createIRValue(CodeGenMetadata* metadata);
     virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) = 0;
     virtual void setIRFunc(CodeGenMetadata* metadata) = 0;
     vector<string> getParamTypeNames() const;

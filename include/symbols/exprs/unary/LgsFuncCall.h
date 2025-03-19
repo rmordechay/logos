@@ -9,7 +9,6 @@ public:
     string composedName;
     vector<LgsExpr*> args;
     LgsFunc* func = nullptr;
-    Location position = Location();
 
     explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
     string getName() override;

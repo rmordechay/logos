@@ -2,8 +2,6 @@
 #define LOGOSBINARYEXPR_H
 #include "exprs/LgsExpr.h"
 #include "LgsOperator.h"
-
-#include "LgsData.h"
 #include <types/LgsType.h>
 
 class LgsBinaryExpr final : public LgsExpr {

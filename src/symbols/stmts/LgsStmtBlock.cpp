@@ -1,8 +1,8 @@
 #include "stmts/LgsStmtBlock.h"
 
-Value* LgsStmtBlock::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsStmtBlock::createIRValue(CodeGenMetadata* metadata) const {
     for (const auto& stmt : stmts) {
-        stmt->getIRValue(metadata);
+        stmt->createIRValue(metadata);
     }
     return nullptr;
 }

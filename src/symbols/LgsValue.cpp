@@ -5,14 +5,7 @@ void LgsValue::setLocation(const antlr4::Token* ctx) {
     location.posInLine = ctx->getCharPositionInLine() + 1;
 }
 
-Value* LgsValue::getIRValue(CodeGenMetadata* metadata) {
-    if (!IRValue) {
-        IRValue = createIRValue(metadata);
-    }
-    return IRValue;
-}
-
-void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block, const bool enterScope) {
+void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block, const bool enterScope) const {
     if (enterScope) metadata->logosStack.enterScope();
     const auto currentFunc = metadata->logosStack.currentFunc;
     auto& builder = metadata->builder;
@@ -20,7 +13,7 @@ void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block, co
     builder.SetInsertPoint(block);
 }
 
-BasicBlock* LgsValue::createBasicBlock(const char* name) {
+BasicBlock* LgsValue::createBasicBlock(const char* name) const {
     return BasicBlock::Create(context, name);
 }
 

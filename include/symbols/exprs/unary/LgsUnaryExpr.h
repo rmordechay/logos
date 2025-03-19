@@ -5,7 +5,7 @@
 #include <string>
 #include <types/LgsType.h>
 
-class LgsUnaryExpr: public LgsExpr {
+class LgsUnaryExpr : public LgsExpr {
 public:
     explicit LgsUnaryExpr() : LgsExpr(nullptr) {}
     explicit LgsUnaryExpr(LgsType* type) : LgsExpr(type) {}

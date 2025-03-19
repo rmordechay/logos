@@ -4,6 +4,11 @@
 #include "exprs/LgsExpr.h"
 #include "types/LgsObject.h"
 
+Value* LgsField::getIRValue(CodeGenMetadata* metadata) {
+    if (IRValue) return IRValue;
+    return createIRValue(metadata);
+}
+
 Value* LgsField::createIRValue(CodeGenMetadata* metadata) {
     if (!gep) {
         const auto parentTy = StructType::getTypeByName(context, parentName);

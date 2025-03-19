@@ -24,7 +24,7 @@ Value* LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     if (!IRFunc) setIRFunc(metadata);
     metadata->logosStack.currentFunc = IRFunc;
     startBlock(metadata, entryBlock);
-    stmtBlock->getIRValue(metadata);
+    stmtBlock->createIRValue(metadata);
     metadata->logosStack.exitScope();
     return IRFunc;
 }

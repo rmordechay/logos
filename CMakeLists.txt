@@ -40,6 +40,7 @@ add_library(lib STATIC
     include/cli/LgsGenerateCmd.h
 
     # Symbols headers
+    include/symbols/LgsValue.h
     include/symbols/exprs/binary/LgsBinaryExpr.h
     include/symbols/exprs/unary/constants/LgsConst.h
     include/symbols/exprs/unary/constants/LgsStrConst.h
@@ -79,7 +80,6 @@ add_library(lib STATIC
     include/symbols/types/LgsStr.h
     include/symbols/types/LgsVoid.h
     include/symbols/types/LgsChar.h
-    include/symbols/types/LgsChar.h
 
     # src
     src/logos/Logos.cpp
@@ -98,6 +98,7 @@ add_library(lib STATIC
     src/analysis/ProjectAnalyser.cpp
 
     # Symbols src
+    src/symbols/LgsValue.cpp
     src/symbols/exprs/binary/LgsBinaryExpr.cpp
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
     src/symbols/exprs/unary/constants/LgsTypeConst.cpp
@@ -135,8 +136,7 @@ add_library(lib STATIC
     src/symbols/types/LgsType.cpp
 )
 
-add_executable(lgs main.cpp
-    src/symbols/LgsValue.cpp)
+add_executable(lgs main.cpp)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE
@@ -161,7 +161,6 @@ add_executable(lgs_tests
     tests/parser/ParserTest.cpp
     tests/analysis/sema/LoopTest.cpp
     tests/TestUtils.h
-    tests/LgsTest.h
 )
 
 target_include_directories(lgs_tests PRIVATE

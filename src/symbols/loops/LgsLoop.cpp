@@ -7,7 +7,7 @@ Value* LgsLoop::createIRValue(CodeGenMetadata* metadata) {
     startBlock(metadata, loopBody);
     metadata->logosStack.enterScope();
     setIRBody(metadata);
-    stmtBlock->getIRValue(metadata);
+    stmtBlock->createIRValue(metadata);
     exitIRLoop(metadata);
     metadata->logosStack.exitScope();
     return nullptr;

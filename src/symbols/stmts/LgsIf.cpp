@@ -13,7 +13,7 @@ Value* LgsIf::createIRValue(CodeGenMetadata* metadata) {
 }
 
 
-void LgsIf::computeSimpleIf(CodeGenMetadata* metadata) const {
+void LgsIf::computeSimpleIf(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto ifStartBlock = createBasicBlock(BB_IF_START);
     const auto ifEndBlock = createBasicBlock(BB_IF_END);
@@ -27,7 +27,7 @@ void LgsIf::computeSimpleIf(CodeGenMetadata* metadata) const {
     }
 
     startBlock(metadata, ifStartBlock);
-    ifStmtBlock->getIRValue(metadata);
+    ifStmtBlock->createIRValue(metadata);
     builder.CreateBr(ifEndBlock);
 
     if (elseStmtBlock) {
@@ -38,11 +38,11 @@ void LgsIf::computeSimpleIf(CodeGenMetadata* metadata) const {
 
 void LgsIf::createElseBlock(CodeGenMetadata* metadata, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const {
     startBlock(metadata, elseBlock);
-    elseStmtBlock->getIRValue(metadata);
+    elseStmtBlock->createIRValue(metadata);
     metadata->builder.CreateBr(ifEndBlock);
 }
 
-void LgsIf::computeComplexIf(CodeGenMetadata* metadata) const {
+void LgsIf::computeComplexIf(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto ifStartBlock = createBasicBlock(BB_IF_START);
     auto elseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK);
@@ -53,7 +53,7 @@ void LgsIf::computeComplexIf(CodeGenMetadata* metadata) const {
     const auto ifCondIR = ifCond->getIRValue(metadata);
     builder.CreateCondBr(ifCondIR, ifStartBlock, elseIfCheckBlock);
     startBlock(metadata, ifStartBlock);
-    ifStmtBlock->getIRValue(metadata);
+    ifStmtBlock->createIRValue(metadata);
     builder.CreateBr(ifEndBlock);
 
     // else-if blocks
@@ -74,7 +74,7 @@ void LgsIf::computeComplexIf(CodeGenMetadata* metadata) const {
         }
 
         startBlock(metadata, elseIfStartBlock);
-        elseIfStmtBlocks[i]->getIRValue(metadata);
+        elseIfStmtBlocks[i]->createIRValue(metadata);
         builder.CreateBr(ifEndBlock);
     }
 

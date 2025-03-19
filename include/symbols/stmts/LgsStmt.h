@@ -4,6 +4,7 @@
 
 class LgsStmt : virtual public LgsValue {
 public:
+    virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
     ~LgsStmt() override = default;
 };
 

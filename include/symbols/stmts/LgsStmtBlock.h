@@ -7,7 +7,7 @@ public:
     vector<LgsStmt*> stmts;
 
     explicit LgsStmtBlock(const vector<LgsStmt*>& stmts) : stmts(stmts) {}
-    Value* createIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodeGenMetadata* metadata) const;
     ~LgsStmtBlock() override = default;
     LgsStmtBlock();
 };

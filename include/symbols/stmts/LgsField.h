@@ -23,7 +23,8 @@ public:
         expr(expr) {
     }
 
-    Value* createIRValue(CodeGenMetadata* metadata) override;
+    Value* getIRValue(CodeGenMetadata* metadata);
+    Value* createIRValue(CodeGenMetadata* metadata);
     void setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* lvalueExpr, LgsInstance* instance);
     ~LgsField() override = default;
 };

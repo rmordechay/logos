@@ -16,18 +16,15 @@ struct Location {
 class LgsValue {
 public:
     Location location;
+    Value* IRValue = nullptr;
 
     void setIRValue(Value* value);
-    Value* getIRValue(CodeGenMetadata* metadata);
     GlobalVariable* createIRGlobal(Module* module, Constant* strConstant) const;
+    BasicBlock* createBasicBlock(const char* name) const;
+    void startBlock(CodeGenMetadata* metadata, BasicBlock* block, bool enterScope = false) const;
     virtual void setLocation(const antlr4::Token* ctx);
     virtual json asJson();
-    static BasicBlock* createBasicBlock(const char* name);
-    static void startBlock(CodeGenMetadata* metadata, BasicBlock* block, bool enterScope = false);
     virtual ~LgsValue() = default;
-private:
-    virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
-    Value* IRValue = nullptr;
 };
 
 #endif //CODEGENERATION_H
