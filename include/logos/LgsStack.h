@@ -12,16 +12,31 @@ struct LgsStackFrame {
     map<string, LgsSymbol> symbols;
 };
 
+inline mutex mtx;
+
+struct LgsGlobals {
+    map<string, LgsSymbol> symbols;
+    map<string, vector<LgsFunc*>> funcs;
+
+    void addSymbol(const string& name, const LgsSymbol symbol) {
+        lock_guard lock(mtx);
+        if (symbols.find(name) != symbols.end()) {
+            assert(false && "element already exists");
+        }
+        symbols[name] = symbol;
+    }
+};
+
+inline LgsGlobals globals;
+
 class LgsStack : stack<LgsStackFrame> {
 public:
-    LgsGlobals* globals = nullptr;
     Function* currentFunc = nullptr;
 
     void enterScope();
     void exitScope();
     LgsSymbol* getSymbol(const string& name);
     LgsFunc* getFunc(const LgsFuncCall* funcCall) const;
-    void addGlobalSymbol(const string& name, const LgsSymbol& symbol);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     void addLocalSymbol(const string& name, LgsObject* symbol);
     void addLocalSymbol(const string& name, LgsVarDec* symbol);

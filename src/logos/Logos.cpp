@@ -27,7 +27,7 @@ void Logos::run() {
     if (!projectAnalyser.analyse()) return;
 
     // Semantic analysis
-    loadGlobals(files);
+    loadBuiltinFuncs();
     if (!analyse(files)) return;
 
     // Code generation
@@ -92,7 +92,6 @@ bool Logos::analyse(const vector<LgsFile*>& files) {
     for (const auto& file : files) {
         threadPool.runTask([=, &file] {
             SemaAnalyser semaAnalyser(file);
-            semaAnalyser.logosStack.globals = &globals;
             semaAnalyser.analyse();
             {
                 lock_guard lock(mtx);
@@ -104,21 +103,7 @@ bool Logos::analyse(const vector<LgsFile*>& files) {
     return errors.empty();
 }
 
-void Logos::loadGlobals(const vector<LgsFile*>& files) {
-    addBuiltinFuncs();
-    for (const auto& file : files) {
-        if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-            const auto object = objFile->obj;
-            globals.symbols[object->getName()] = LgsSymbol(OBJECT, object);
-        } else if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
-            for (const auto &func : mainFile->funcs) {
-                globals.funcs[func->composedName].emplace_back(func);
-            }
-        }
-    }
-}
-
-void Logos::addBuiltinFuncs() {
+void Logos::loadBuiltinFuncs() const {
     globals.funcs[LgsPrint::name] = {
         new LgsPrint({new LgsParam("input", &LOGOS_INT)}),
         new LgsPrint({new LgsParam("input", &LOGOS_FLOAT)}),
@@ -150,7 +135,7 @@ inline void initLLVM() {
 void Logos::generateCode(const LgsMainFile* mainFile) {
     initLLVM();
     create_directories(buildDir);
-    CodeGenerator::generateModule(buildDir, mainFile, &globals);
+    CodeGenerator::generateModule(buildDir, mainFile);
 }
 
 void Logos::validateProject() const {

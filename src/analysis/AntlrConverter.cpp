@@ -93,6 +93,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
         const auto method = getMethodImpl(func, obj);
         obj->methods[funcName] = method;
     }
+    globals.symbols[obj->name] = LgsSymbol(OBJECT, obj);
     return obj;
 }
 
@@ -183,8 +184,8 @@ LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext
 
 LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
-    const auto expr = getExpr(ctx->expr());
     const auto userType = getType(ctx->type());
+    const auto expr = getExpr(ctx->expr());
     const auto varDec = new LgsVarDec(variableName, userType, expr);
     varDec->setLocation(ctx->start);
     return varDec;
@@ -192,8 +193,8 @@ LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext
 
 LgsParam* AntlerConverter::getParam(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
-    const auto expr = getExpr(ctx->expr());
     const auto userType = getType(ctx->type());
+    const auto expr = getExpr(ctx->expr());
     const auto param = new LgsParam(variableName, userType, expr);
     param->setLocation(ctx->start);
     return param;
@@ -405,11 +406,10 @@ LgsConst* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
 }
 
 LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) {
-    const auto typeConst = new LgsTypeConst(new LgsObject(type->getText()));
+    const auto typeConst = new LgsTypeConst(getType(type->getText()));
     typeConst->setLocation(ctx->start);
     return typeConst;
 }
-
 
 LgsType* AntlerConverter::getType(LogosParser::TypeContext* type) {
     if (!type) return nullptr;
@@ -419,7 +419,15 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* type) {
     if (typeText == LOGOS_BOOL.getName()) return &LOGOS_BOOL;
     if (typeText == LOGOS_STR.getName()) return &LOGOS_STR;
     if (type->LBRACE()) return new LgsArrayType();
-    return new LgsObject(type->getText());
+    return new LgsTempType(type->getText());
+}
+
+LgsType* AntlerConverter::getType(const string& typeText) {
+    if (typeText == LOGOS_INT.getName()) return &LOGOS_INT;
+    if (typeText == LOGOS_FLOAT.getName()) return &LOGOS_FLOAT;
+    if (typeText == LOGOS_BOOL.getName()) return &LOGOS_BOOL;
+    if (typeText == LOGOS_STR.getName()) return &LOGOS_STR;
+    return new LgsTempType(typeText);
 }
 
 LgsType* AntlerConverter::getFuncType(LogosParser::FuncImplementationContext* ctx) {

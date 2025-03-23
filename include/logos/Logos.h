@@ -21,7 +21,6 @@ public:
     path buildDir;
     path objFilePath;
     path execFilePath;
-    LgsGlobals globals;
     vector<LgsError> errors;
 
     Logos() = default;
@@ -38,10 +37,9 @@ public:
     LgsFile* parseFile(const directory_entry&) const;
     LgsFile* parseFile(const string& codeText, path absFilePath = "") const;
     void parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool);
-    void addBuiltinFuncs();
+    void loadBuiltinFuncs() const;
     bool analyse(const vector<LgsFile*>& files);
     LgsMainFile* getMainFile(const vector<LgsFile*>& files) const;
-    void loadGlobals(const vector<LgsFile*>& files = {});
     bool isLogosFile(const directory_entry& filePath) const;
     ~Logos() = default;
 };

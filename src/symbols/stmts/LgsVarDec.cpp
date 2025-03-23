@@ -4,14 +4,15 @@
 #include <json/json.hpp>
 
 Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
-    if (!expr) return nullptr;
+    auto& builder = metadata->builder;
+    if (!expr) return builder.CreateAlloca(type->getIRType());
+
     const auto exprValue = expr->getIRValue(metadata);
     const auto valueType = exprValue->getType();
     // Pointers don't need to be stored
     if (!valueType->isPointerTy()) {
-        auto& builder = metadata->builder;
-        const auto allocaInst = builder.CreateAlloca(valueType);
-        builder.CreateStore(exprValue, allocaInst);
+        const auto ptr = builder.CreateAlloca(valueType);
+        builder.CreateStore(exprValue, ptr);
     }
     metadata->logosStack.addLocalSymbol(name, this);
     return exprValue;

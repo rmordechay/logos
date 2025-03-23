@@ -305,10 +305,10 @@ void SemaAnalyser::setFuncType(LgsFunc* func) {
 }
 
 void SemaAnalyser::setExprType(LgsExpr* expr, LgsType* type) {
-    const auto symbol = logosStack.getSymbol(type->getName());
-    if (symbol && symbol->type == OBJECT && symbol->object != type) {
-        delete type;
+    if (dynamic_cast<LgsTempType*>(type)) {
+        const auto symbol = logosStack.getSymbol(type->getName());
         expr->type = symbol->object;
+        delete type;
     } else {
         expr->type = type;
     }

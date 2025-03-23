@@ -3,6 +3,7 @@
 #include <types/LgsInt.h>
 
 Value* LgsFuncImpl::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
+    if (!IRFunc) setIRFunc(metadata);
     const auto symbol = metadata->logosStack.getSymbol(composedName);
     vector<Value*> paramValues;
     for (const auto& arg : args) {

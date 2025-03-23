@@ -44,6 +44,7 @@ public:
     static LgsConst* getConstant(LogosParser::ConstantContext* ctx);
     static LgsTypeConst* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
     static LgsType* getType(LogosParser::TypeContext* type);
+    static LgsType* getType(const string& typeText);
     static LgsType* getFuncType(LogosParser::FuncImplementationContext* ctx);
     ~AntlerConverter() = default;
 };

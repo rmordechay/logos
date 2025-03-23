@@ -19,14 +19,13 @@ string LgsFunc::getComposedName(const string& name, const vector<string>& paramT
     return composedName;
 }
 
-Value* LgsFunc::createIRValue(CodeGenMetadata* metadata) {
+void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     metadata->logosStack.enterScope();
     if (!IRFunc) setIRFunc(metadata);
     metadata->logosStack.currentFunc = IRFunc;
     startBlock(metadata, entryBlock);
     stmtBlock->createIRValue(metadata);
     metadata->logosStack.exitScope();
-    return IRFunc;
 }
 
 json LgsFunc::asJson() {

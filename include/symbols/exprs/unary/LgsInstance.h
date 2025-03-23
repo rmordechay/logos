@@ -10,7 +10,6 @@ public:
     map<string, LgsField*> fields;
 
     explicit LgsInstance(const string& name) : name(name) {}
-    Value* getInstanceIRValue(CodeGenMetadata* metadata) const;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
     ~LgsInstance() override;

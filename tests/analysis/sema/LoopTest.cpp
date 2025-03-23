@@ -30,7 +30,7 @@ TEST_F(LoopTests, TestNotIterable) {
     }
     )";
     const auto file = logos.parseFile(code);
-    logos.loadGlobals();
+    logos.loadBuiltinFuncs();
     logos.analyse({file});
 
     ASSERT_THAT(logos.errors.size(), 1);

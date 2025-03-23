@@ -16,6 +16,4 @@ void LgsPrint::setIRFunc(CodeGenMetadata* metadata) {
     IRFunc = Function::Create(IRFuncType, GlobalValue::ExternalLinkage, composedName, metadata->currentModule);
 }
 
-Value* LgsPrint::createIRValue(CodeGenMetadata* metadata) {
-    return nullptr;
-}
+void LgsPrint::createIRValue(CodeGenMetadata* metadata) {}

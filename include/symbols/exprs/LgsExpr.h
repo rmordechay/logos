@@ -20,7 +20,8 @@ public:
 
 inline Value* LgsExpr::getIRValue(CodeGenMetadata* metadata) {
     if (IRValue) return IRValue;
-    return createIRValue(metadata);
+    IRValue = createIRValue(metadata);
+    return IRValue;
 }
 
 inline Value* LgsExpr::sub(CodeGenMetadata* metadata, LgsExpr* other) {

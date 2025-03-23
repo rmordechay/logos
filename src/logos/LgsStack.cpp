@@ -22,15 +22,15 @@ LgsSymbol* LgsStack::getSymbol(const string& name) {
         return &symbols[name];
     }
     // Globals
-    if (globals->symbols.find(name) != globals->symbols.end()) {
-        return &globals->symbols[name];
+    if (globals.symbols.find(name) != globals.symbols.end()) {
+        return &globals.symbols[name];
     }
     return nullptr;
 }
 
 LgsFunc* LgsStack::getFunc(const LgsFuncCall* funcCall) const {
-    const auto func = globals->funcs.find(funcCall->name);
-    if (func != globals->funcs.end()) {
+    const auto func = globals.funcs.find(funcCall->name);
+    if (func != globals.funcs.end()) {
         for (const auto& overload : func->second) {
             if (overload->composedName == funcCall->composedName) {
                 return overload;
@@ -38,10 +38,6 @@ LgsFunc* LgsStack::getFunc(const LgsFuncCall* funcCall) const {
         }
     }
     return nullptr;
-}
-
-void LgsStack::addGlobalSymbol(const string& name, const LgsSymbol& symbol) {
-
 }
 
 void LgsStack::addLocalSymbol(const string& name, const LgsSymbol& symbol) {

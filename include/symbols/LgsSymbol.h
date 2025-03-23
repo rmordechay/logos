@@ -65,9 +65,4 @@ struct LgsSymbol {
     }
 };
 
-struct LgsGlobals {
-    map<string, LgsSymbol> symbols;
-    map<string, vector<LgsFunc*>> funcs;
-};
-
 #endif //LOGOSSYMBOL_H

@@ -7,19 +7,15 @@ string LgsInstance::getName() {
 }
 
 Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
-    const auto value = getInstanceIRValue(metadata);
-    if (modules.find(name) != modules.end()) {
-        CodeGenerator::generateModule(metadata->buildDir, obj, metadata->logosStack.globals);
+    if (modules.find(name) == modules.end()) {
+        CodeGenerator::generateModule(metadata->buildDir, obj);
     }
-    return value;
-}
-
-Value* LgsInstance::getInstanceIRValue(CodeGenMetadata* metadata) const {
     const auto currentFunc = metadata->logosStack.currentFunc;
     if (currentFunc->arg_size() > 0) {
         const auto firstArg = currentFunc->arg_begin();
-        if (firstArg->getName() == LOGOS_SELF) return firstArg;
-        return metadata->builder.CreateAlloca(obj->getIRType());
+        if (firstArg->getName() == LOGOS_SELF) {
+            return firstArg;
+        }
     }
     return metadata->builder.CreateAlloca(obj->getIRType());
 }

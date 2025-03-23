@@ -13,7 +13,7 @@ protected:
 
     void SetUp() override {
         LgsFile* file = logos.parseFile("main() {print(\"Hello world\")}");
-        logos.loadGlobals();
+        logos.loadBuiltinFuncs();
         logos.analyse({file});
         logos.generateCode(dynamic_cast<LgsMainFile*>(file));
         const LgsLinker linker(logos.objFilePath, logos.execFilePath);
