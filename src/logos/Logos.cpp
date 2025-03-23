@@ -79,13 +79,11 @@ LgsFile* Logos::parseFile(const directory_entry& fileEntry) const {
 }
 
 LgsFile* Logos::parseFile(const string& codeText, path absFilePath) const {
-    auto input = ANTLRInputStream(codeText);
-    auto lexer = LogosLexer(&input);
-    auto tokens = CommonTokenStream(&lexer);
-    auto parser = LogosParser(&tokens);
-    auto parsedFile = parser.logosFile();
-    auto logosFile = AntlerConverter::getLogosFile(parsedFile, absFilePath);
-    return logosFile;
+    ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+    return AntlerConverter::getLogosFile(parser.logosFile(), absFilePath);
 }
 
 bool Logos::analyse(const vector<LgsFile*>& files) {

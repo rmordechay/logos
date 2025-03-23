@@ -36,7 +36,7 @@ using namespace std;
     #define DEFAULT_LINKER "ld.lld"
     #define LIB_ROOT "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
     #define ENTRY_POINT "_main"
-    #define PLATFORM_VERSION "14.0"
+    #define PLATFORM_VERSION "15.0"
 #elif defined(__unix__)
     #define OS_NAME "Unix"
     #define DEFAULT_LINKER "ld"
