@@ -22,7 +22,7 @@ protected:
     }
 };
 
-TEST_F(LoopTests, TestRangeLoopWorks) {
+TEST_F(LoopTests, TestSemaRangeLoopWorks) {
     const auto code = R"(
     main() {
         for i in [1, 2, 3, 4] {

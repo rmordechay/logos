@@ -13,7 +13,7 @@ void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* main
     mainFile->mainFunc->createIRValue(&metadata);
 
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
-    writeIRToFile(metadata.currentModule, buildDir, LOGOS_MAIN_FILE);
+    // writeIRToFile(metadata.currentModule, buildDir, LOGOS_MAIN_FILE);
 }
 
 void CodeGenerator::generateModule(const path& buildDir, LgsObject* obj) {
@@ -24,7 +24,7 @@ void CodeGenerator::generateModule(const path& buildDir, LgsObject* obj) {
     for (const auto& [_, method] : obj->methods) {
         method->createIRValue(&metadata);
     }
-    writeIRToFile(metadata.currentModule, buildDir, objName);
+    // writeIRToFile(metadata.currentModule, buildDir, objName);
 }
 
 Module* CodeGenerator::createModule(const string& objName) {

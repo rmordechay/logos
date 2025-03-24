@@ -164,7 +164,9 @@ add_executable(lgs_tests
     tests/main.cpp
     tests/e2e/e2eTest.cpp
     tests/parser/ParserTest.cpp
-    tests/analysis/sema/LoopForeachTest.cpp
+    tests/analysis/sema/LoopSemaForeachTest.cpp
+    tests/analysis/sema/LoopSemaRangeTest.cpp
+    tests/codegen/LoopCodegenForeachTest.cpp
     tests/TestUtils.h
 )
 

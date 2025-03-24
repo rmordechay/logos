@@ -118,8 +118,8 @@ public:
   public:
     MainFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    EnumDeclarationContext *enumDeclaration();
     antlr4::tree::TerminalNode *EOF();
+    EnumDeclarationContext *enumDeclaration();
     std::vector<FuncImplementationContext *> funcImplementation();
     FuncImplementationContext* funcImplementation(size_t i);
 

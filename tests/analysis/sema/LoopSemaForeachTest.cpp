@@ -8,7 +8,7 @@
 
 using testing::StartsWith;
 
-class LoopTests : public testing::Test {
+class LoopSemaTests : public testing::Test {
 protected:
     path dataDir = "../tests/analysis/sema";
     Logos logos = Logos(dataDir);
@@ -22,7 +22,7 @@ protected:
     }
 };
 
-TEST_F(LoopTests, TestForeachLoopWorks) {
+TEST_F(LoopSemaTests, TestSemaForeachLoopWorks) {
     const auto code = R"(
     main() {
         for i in [1, 2, 3, 4] {
@@ -36,7 +36,7 @@ TEST_F(LoopTests, TestForeachLoopWorks) {
     ASSERT_THAT(logos.errors.size(), 0);
 }
 
-TEST_F(LoopTests, TestNotIterable) {
+TEST_F(LoopSemaTests, TestSemaNotIterable) {
     const auto code = R"(
     main() {
         arr = 4

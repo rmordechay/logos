@@ -5,7 +5,7 @@ logosFile:
     ;
 
 mainFile:
-        enumDeclaration funcImplementation+ EOF
+        enumDeclaration? funcImplementation+ EOF
     ;
 
 objectFile:
