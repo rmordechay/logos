@@ -20,7 +20,7 @@ void ProjectAnalyser::analyseStructure() {
         }
         duplicates[file->name].emplace_back(file);
     }
-    if (!hasMainFile) printError(E10008);
+    if (!hasMainFile) printError(E10008.msg);
     printDuplicateFiles(duplicates);
 }
 
@@ -31,6 +31,6 @@ void ProjectAnalyser::printDuplicateFiles(const map<string, vector<LgsFile*>>& d
         for (const auto &file : duplicate.second) {
             errMsg << "\n\t - " + file->absPath;
         }
-        printError(E10007, {duplicate.first, errMsg.str()});
+        printError(E10007.msg, {duplicate.first, errMsg.str()});
     }
 }

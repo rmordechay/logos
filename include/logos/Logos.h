@@ -31,7 +31,7 @@ public:
     }
 
     void run();
-    void generateCode(const LgsMainFile* mainFile);
+    void generateCode(const LgsMainFile* mainFile) const;
     void validateProject() const;
     vector<LgsFile*> parseFiles();
     LgsFile* parseFile(const directory_entry&) const;

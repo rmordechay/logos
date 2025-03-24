@@ -35,4 +35,5 @@ TEST_F(LoopTests, TestNotIterable) {
 
     ASSERT_THAT(logos.errors.size(), 1);
     ASSERT_THAT(logos.errors[0].msg, StartsWith("Error: 'arr' is not iterable."));
+    ASSERT_THAT(logos.errors[0].errCode, E10002.errCode);
 }

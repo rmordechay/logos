@@ -347,9 +347,9 @@ bool SemaAnalyser::checkExprType(const LgsExpr* expr, const LgsType* otherType) 
     return true;
 }
 
-void SemaAnalyser::handleError(const string& code, const Location* location, const vector<string>& args) {
-    const auto errMsg = formatErrorMsg(code, args);
-    errors.emplace_back(LgsError{.msg = errMsg});
+void SemaAnalyser::handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args) {
+    const auto errMsg = formatErrorMsg(lgsErr.msg, args);
+    errors.emplace_back(LgsError{.errCode = lgsErr.errCode, .msg = errMsg});
 
     const auto lineNumber = to_string(location->lineNumber);
     const auto pos = to_string(location->posInLine);

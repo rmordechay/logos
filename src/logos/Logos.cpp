@@ -133,7 +133,7 @@ inline void initLLVM() {
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
-void Logos::generateCode(const LgsMainFile* mainFile) {
+void Logos::generateCode(const LgsMainFile* mainFile) const {
     initLLVM();
     create_directories(buildDir);
     CodeGenerator::generateModule(buildDir, mainFile);
@@ -148,7 +148,7 @@ void Logos::validateProject() const {
         }
     }
     if (srcDirPath.empty()) {
-        cout << E10010 << '\n';
+        cout << E10010.msg << '\n';
         exit(0);
     }
 }
