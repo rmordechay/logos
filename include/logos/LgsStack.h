@@ -12,25 +12,10 @@ struct LgsStackFrame {
     map<string, LgsSymbol> symbols;
 };
 
-inline mutex mtx;
-
-struct LgsGlobals {
-    map<string, LgsSymbol> symbols;
-    map<string, vector<LgsFunc*>> funcs;
-
-    void addSymbol(const string& name, const LgsSymbol symbol) {
-        lock_guard lock(mtx);
-        if (symbols.find(name) != symbols.end()) {
-            assert(false && "element already exists");
-        }
-        symbols[name] = symbol;
-    }
-};
-
-inline LgsGlobals globals;
 
 class LgsStack : stack<LgsStackFrame> {
 public:
+    mutex mtx;
     Function* currentFunc = nullptr;
 
     void enterScope();

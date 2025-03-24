@@ -21,6 +21,7 @@ include_directories(
 add_library(lib STATIC
     # headers
     include/logos/Logos.h
+    include/logos/LgsGlobals.h
     include/logos/ThreadPool.h
     include/logos/LgsData.h
     include/logos/LgsStack.h

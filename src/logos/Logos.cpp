@@ -1,5 +1,6 @@
 #include "logos/Logos.h"
 
+#include "LgsGlobals.h"
 #include "LgsLinker.h"
 
 #include <ANTLRInputStream.h>

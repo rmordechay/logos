@@ -1,5 +1,6 @@
 #include "analysis/AntlrConverter.h"
 
+#include "LgsGlobals.h"
 #include "exprs/binary/LgsBinaryExpr.h"
 #include "exprs/binary/LgsOperator.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
