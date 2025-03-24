@@ -2,7 +2,6 @@
 #include "Logos.h"
 #include "TestUtils.h"
 
-#include <LogosParser.h>
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -15,10 +14,29 @@ protected:
     path dataDir = "../tests/analysis/sema";
     Logos logos = Logos(dataDir);
 
+    void SetUp() override {
+        logos.loadBuiltinFuncs();
+    }
+
     void TearDown() override {
         remove_all(logos.buildDir);
     }
 };
+
+TEST_F(LoopTests, TestRangeLoopWorks) {
+    const auto code = R"(
+    main() {
+        arr = [1, 2, 3, 4]
+        for i in arr {
+            print(i)
+        }
+    }
+    )";
+    const auto file = logos.parseFile(code);
+    logos.analyse({file});
+
+    ASSERT_THAT(logos.errors.size(), 0);
+}
 
 TEST_F(LoopTests, TestNotIterable) {
     const auto code = R"(
@@ -30,7 +48,6 @@ TEST_F(LoopTests, TestNotIterable) {
     }
     )";
     const auto file = logos.parseFile(code);
-    logos.loadBuiltinFuncs();
     logos.analyse({file});
 
     ASSERT_THAT(logos.errors.size(), 1);
