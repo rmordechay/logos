@@ -55,7 +55,6 @@ add_library(lib STATIC
     include/symbols/exprs/unary/LgsArrayIndex.h
     include/symbols/exprs/unary/LgsFuncCall.h
     include/symbols/exprs/unary/LgsInstance.h
-    include/symbols/types/LgsArrayType.h
     include/symbols/exprs/unary/LgsSelection.h
     include/symbols/exprs/unary/LgsVariable.h
     include/symbols/exprs/LgsExpr.h
@@ -68,13 +67,16 @@ add_library(lib STATIC
     include/symbols/loops/LgsForeachLoop.h
     include/symbols/loops/LgsRangeLoop.h
     include/symbols/stmts/LgsField.h
-    include/symbols/types/LgsObject.h
+    include/symbols/stmts/LgsEnum.h
+    include/symbols/stmts/LgsPatternMatching.h
     include/symbols/stmts/LgsAssignment.h
     include/symbols/stmts/LgsIf.h
     include/symbols/stmts/LgsReturn.h
     include/symbols/stmts/LgsStmtBlock.h
     include/symbols/stmts/LgsVarDec.h
     include/symbols/types/LgsType.h
+    include/symbols/types/LgsArrayType.h
+    include/symbols/types/LgsObject.h
     include/symbols/types/LgsBool.h
     include/symbols/types/LgsFloat.h
     include/symbols/types/LgsInt.h
@@ -128,6 +130,8 @@ add_library(lib STATIC
     src/symbols/stmts/LgsReturn.cpp
     src/symbols/stmts/LgsStmtBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
+    src/symbols/stmts/LgsEnum.cpp
+    src/symbols/stmts/LgsPatternMatching.cpp
     src/symbols/types/LgsBool.cpp
     src/symbols/types/LgsInt.cpp
     src/symbols/types/LgsStr.cpp
@@ -135,8 +139,6 @@ add_library(lib STATIC
     src/symbols/types/LgsFloat.cpp
     src/symbols/types/LgsChar.cpp
     src/symbols/types/LgsType.cpp
-    src/symbols/stmts/LgsEnum.cpp
-    include/symbols/stmts/LgsEnum.h
 )
 
 add_executable(lgs main.cpp)

@@ -49,6 +49,7 @@ statement:
     |   explicitVarDec
     |   implicitVarDec
     |   ifStatement
+    |   patternMatching
     |   loopStatement
     |   controlFlow
     |   returnStatement
@@ -74,7 +75,6 @@ implicitVarDec:
 
 ifStatement:
         IF expr statementsBlock elseIfStatement* elseStatement?
-    |   patternMatching
     ;
 
 elseIfStatement:

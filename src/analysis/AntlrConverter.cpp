@@ -22,6 +22,7 @@
 #include "types/LgsFloat.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsEnum.h"
+#include "stmts/LgsPatternMatching.h"
 
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -151,6 +152,9 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto ifStmt = ctx->ifStatement()) {
         return getIfStatement(ifStmt);
     }
+    if (const auto patternMatching = ctx->patternMatching()) {
+        return getPatternMatching(patternMatching);
+    }
     if (const auto loopStmt = ctx->loopStatement()) {
         return getLoopStatement(loopStmt);
     }
@@ -221,6 +225,12 @@ LgsIf* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
     }
     ifStmt->setLocation(ctx->start);
     return ifStmt;
+}
+
+LgsStmt* AntlerConverter::getPatternMatching(LogosParser::PatternMatchingContext* ctx) {
+    const auto patternMatching = new LgsPatternMatching(getExpr(ctx->expr()));
+    // TODO finish pattern matching
+    return patternMatching;
 }
 
 LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ctx) {

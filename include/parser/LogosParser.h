@@ -264,6 +264,7 @@ public:
     ExplicitVarDecContext *explicitVarDec();
     ImplicitVarDecContext *implicitVarDec();
     IfStatementContext *ifStatement();
+    PatternMatchingContext *patternMatching();
     LoopStatementContext *loopStatement();
     ControlFlowContext *controlFlow();
     ReturnStatementContext *returnStatement();
@@ -343,7 +344,6 @@ public:
     std::vector<ElseIfStatementContext *> elseIfStatement();
     ElseIfStatementContext* elseIfStatement(size_t i);
     ElseStatementContext *elseStatement();
-    PatternMatchingContext *patternMatching();
 
    
   };

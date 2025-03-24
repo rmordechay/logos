@@ -29,6 +29,7 @@ public:
     static LgsParam* getParam(LogosParser::ExplicitVarDecContext* ctx);
     static LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     static LgsIf* getIfStatement(LogosParser::IfStatementContext* ctx);
+    static LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
     static LgsLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
     static LgsStmt* getEnum(LogosParser::EnumDeclarationContext* ctx);
     static LgsExpr* getExpr(LogosParser::ExprContext* ctx);
