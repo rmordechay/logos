@@ -69,7 +69,7 @@ public:
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     LgsFunc* getFunc(const LgsFuncCall* funcCall);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
-    Location* getSymbolLocation(const LgsSymbol* s) const;
+    Location* getSymbolLocation(const LgsSymbol* symbol) const;
     ~SemaAnalyser() = default;
 };
 

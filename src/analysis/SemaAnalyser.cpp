@@ -267,7 +267,12 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
 
 void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
     visitExpr(arrayIndex->baseExpr);
-    setExprType(arrayIndex, arrayIndex->baseExpr->type);
+    const auto arrType = dynamic_cast<LgsArrayType*>(arrayIndex->baseExpr->type);
+    if (!arrType) {
+        handleError(E10002, &arrayIndex->location, {arrayIndex->getName()});
+        return;
+    }
+    setExprType(arrayIndex, arrType->underlyingType);
 }
 
 void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
@@ -322,6 +327,7 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     case DIV: {
         const auto lType = binaryExpr->left->type;
         const auto rType = binaryExpr->right->type;
+        if (!lType || !rType) return;
         setExprType(binaryExpr, lType->inferBinaryType(rType));
         break;
     }
@@ -383,14 +389,14 @@ void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
     logosStack.addLocalSymbol(name, symbol);
 }
 
-Location* SemaAnalyser::getSymbolLocation(const LgsSymbol* s) const {
-    switch (s->type) {
+Location* SemaAnalyser::getSymbolLocation(const LgsSymbol* symbol) const {
+    switch (symbol->type) {
     case VAR_DEC:
-        return &s->varDec->location;
+        return &symbol->varDec->location;
     case PARAM:
-        return &s->param->location;
+        return &symbol->param->location;
     case FUNC:
-        return &s->func->location;
+        return &symbol->func->location;
     default:
         return nullptr;
     }

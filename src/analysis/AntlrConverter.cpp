@@ -349,7 +349,6 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
 LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) {
     const auto name = ctx->TYPE()->getText();
     const auto instance = new LgsInstance(name);
-    instance->setLocation(ctx->start);
     const auto args = ctx->funcArgList();
     if (!args) {
         return instance;
@@ -359,6 +358,7 @@ LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) 
         auto argExpr = getExpr(arg->expr());
         instance->args.emplace_back(argExpr);
     }
+    instance->setLocation(ctx->start);
     return instance;
 }
 
@@ -375,7 +375,9 @@ LgsArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ct
         indexExprs.emplace_back(getExpr(expr));
     }
 
-    return new LgsArrayIndex(baseExpr, indexExprs);
+    const auto arrayIndex = new LgsArrayIndex(baseExpr, indexExprs);
+    arrayIndex->setLocation(ctx->start);
+    return arrayIndex;
 }
 
 LgsConst* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
