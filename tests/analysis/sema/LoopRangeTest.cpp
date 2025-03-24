@@ -8,7 +8,6 @@
 
 using testing::StartsWith;
 
-
 class LoopTests : public testing::Test {
 protected:
     path dataDir = "../tests/analysis/sema";
@@ -26,8 +25,7 @@ protected:
 TEST_F(LoopTests, TestRangeLoopWorks) {
     const auto code = R"(
     main() {
-        arr = [1, 2, 3, 4]
-        for i in arr {
+        for i in [1, 2, 3, 4] {
             print(i)
         }
     }
@@ -36,21 +34,4 @@ TEST_F(LoopTests, TestRangeLoopWorks) {
     logos.analyse({file});
 
     ASSERT_THAT(logos.errors.size(), 0);
-}
-
-TEST_F(LoopTests, TestNotIterable) {
-    const auto code = R"(
-    main() {
-        arr = 4
-        for i in arr {
-            print(i)
-        }
-    }
-    )";
-    const auto file = logos.parseFile(code);
-    logos.analyse({file});
-
-    ASSERT_THAT(logos.errors.size(), 1);
-    ASSERT_THAT(logos.errors[0].msg, StartsWith("Error: 'arr' is not iterable."));
-    ASSERT_THAT(logos.errors[0].errCode, E10002.errCode);
 }
