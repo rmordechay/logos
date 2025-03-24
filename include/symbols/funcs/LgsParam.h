@@ -12,8 +12,6 @@ public:
 
     LgsParam(const string& name, LgsType* type, LgsExpr* expr) : name(name), type(type), expr(expr) {}
     LgsParam(const string& name, LgsType* type) : LgsParam(name, type, nullptr) {}
-    Value* getIRValue(CodeGenMetadata* metadata);
-    Value* createIRValue(CodeGenMetadata* metadata) const;
     json asJson() override;
     ~LgsParam() override;
 };

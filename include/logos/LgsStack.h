@@ -23,10 +23,8 @@ public:
     LgsSymbol* getSymbol(const string& name);
     LgsFunc* getFunc(const LgsFuncCall* funcCall) const;
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
-    void addLocalSymbol(const string& name, LgsObject* symbol);
     void addLocalSymbol(const string& name, LgsVarDec* symbol);
     void addLocalSymbol(const string& name, LgsParam* symbol);
-    void addLocalSymbol(const string& name, LgsFunc* symbol);
     string getStackString() const;
     void reset();
     ~LgsStack() = default;

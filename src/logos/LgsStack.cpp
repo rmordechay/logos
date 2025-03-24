@@ -46,20 +46,12 @@ void LgsStack::addLocalSymbol(const string& name, const LgsSymbol& symbol) {
     top().symbols[name] = symbol;
 }
 
-void LgsStack::addLocalSymbol(const string& name, LgsObject* symbol) {
-    addLocalSymbol(name, LgsSymbol(OBJECT, symbol));
-}
-
 void LgsStack::addLocalSymbol(const string& name, LgsVarDec* symbol) {
     addLocalSymbol(name, LgsSymbol(VAR_DEC, symbol));
 }
 
 void LgsStack::addLocalSymbol(const string& name, LgsParam* symbol) {
     addLocalSymbol(name, LgsSymbol(PARAM, symbol));
-}
-
-void LgsStack::addLocalSymbol(const string& name, LgsFunc* symbol) {
-    addLocalSymbol(name, LgsSymbol(FUNC, symbol));
 }
 
 string LgsStack::getStackString() const {
