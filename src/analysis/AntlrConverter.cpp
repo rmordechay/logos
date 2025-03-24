@@ -21,6 +21,8 @@
 #include "types/LgsBool.h"
 #include "types/LgsFloat.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
+#include "stmts/LgsEnum.h"
+
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
 #include <types/LgsStr.h>
@@ -152,6 +154,9 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto loopStmt = ctx->loopStatement()) {
         return getLoopStatement(loopStmt);
     }
+    if (const auto enumDec = ctx->enumDeclaration()) {
+        return getEnum(enumDec);
+    }
     if (const auto returnStmt = ctx->returnStatement()) {
         return new LgsReturn(getExpr(returnStmt->expr()));
     }
@@ -235,6 +240,20 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
 
     loopStmt->setLocation(ctx->start);
     return loopStmt;
+}
+
+LgsStmt* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
+    const auto lgsEnum = new LgsEnum();
+    for (size_t i = 0; i < ctx->enumField().size(); ++i) {
+        const auto& enumField = ctx->enumField()[i];
+        const auto enumName = enumField->CONST()->getText();
+        const auto enumText = enumField->STRING()->getText();
+        EnumField field(i, enumName, enumText);
+        field.setLocation(ctx->start);
+        lgsEnum->fields.emplace_back(field);
+    }
+    lgsEnum->setLocation(ctx->start);
+    return lgsEnum;
 }
 
 LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {

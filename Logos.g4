@@ -5,7 +5,7 @@ logosFile:
     ;
 
 mainFile:
-        funcImplementation+ EOF
+        enumDeclaration funcImplementation+ EOF
     ;
 
 objectFile:
@@ -134,6 +134,7 @@ unaryExpr:
         VARIABLE
     |   SELF_INSTANCE
     |   SELF_CLASS
+    |   NULL
     |   funcCall
     |   constructor
     |   constant
@@ -271,6 +272,7 @@ IN: 'in';
 INTEGER: [0-9]+;
 FLOAT: [0-9]+ '.' [0-9]+;
 BOOL: 'true' | 'false';
+NULL: 'null';
 CONST: [A-Z0-9_]+;
 TYPE: [A-Z][a-zA-Z0-9_]*;
 VARIABLE: [a-z_][a-zA-Z0-9_]*;

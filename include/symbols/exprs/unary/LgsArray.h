@@ -7,7 +7,6 @@
 
 class LgsArray final : public LgsUnaryExpr, public LgsIterable {
 public:
-
     vector<LgsExpr*> elements;
 
     explicit LgsArray() : LgsUnaryExpr(nullptr) {}

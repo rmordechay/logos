@@ -12,7 +12,6 @@ Value* LgsArray::createIRValue(CodeGenMetadata* metadata) {
     return createIRGlobal(metadata->currentModule, ConstantArray::get(arrType, arrValues));
 }
 
-
 size_t LgsArray::size() {
     return elements.size();
 }

@@ -20,8 +20,9 @@ public:
     SELF_CLASS = 30, INTERFACE = 31, ENUM = 32, VEC = 33, VEC2 = 34, VEC3 = 35, 
     VEC4 = 36, IMPLEMENTS = 37, IMPORT = 38, IF = 39, ELSE = 40, FOR = 41, 
     BREAK = 42, CONTINUE = 43, RETURN = 44, AND = 45, OR = 46, NOT = 47, 
-    IN = 48, INTEGER = 49, FLOAT = 50, BOOL = 51, CONST = 52, TYPE = 53, 
-    VARIABLE = 54, STRING = 55, LINE_COMMENT = 56, BLOCK_COMMENT = 57, WS = 58
+    IN = 48, INTEGER = 49, FLOAT = 50, BOOL = 51, NULL_ = 52, CONST = 53, 
+    TYPE = 54, VARIABLE = 55, STRING = 56, LINE_COMMENT = 57, BLOCK_COMMENT = 58, 
+    WS = 59
   };
 
   enum {
@@ -117,6 +118,7 @@ public:
   public:
     MainFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    EnumDeclarationContext *enumDeclaration();
     antlr4::tree::TerminalNode *EOF();
     std::vector<FuncImplementationContext *> funcImplementation();
     FuncImplementationContext* funcImplementation(size_t i);
@@ -530,6 +532,7 @@ public:
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *SELF_INSTANCE();
     antlr4::tree::TerminalNode *SELF_CLASS();
+    antlr4::tree::TerminalNode *NULL_();
     FuncCallContext *funcCall();
     ConstructorContext *constructor();
     ConstantContext *constant();

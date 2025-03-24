@@ -30,6 +30,7 @@ public:
     static LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     static LgsIf* getIfStatement(LogosParser::IfStatementContext* ctx);
     static LgsLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
+    static LgsStmt* getEnum(LogosParser::EnumDeclarationContext* ctx);
     static LgsExpr* getExpr(LogosParser::ExprContext* ctx);
     static LgsUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     static LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
