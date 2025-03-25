@@ -10,10 +10,8 @@ declare void @free(ptr)
 
 @str = private constant [4 x i8] c"%d\0A\00"
 %arr = type {i64, i64, ptr}
-%struct = type {i32, i32}
 
-
-define ptr @get_capacity(ptr %arr_ptr) {
+define ptr @get_cap(ptr %arr_ptr) {
     %cap_ptr = getelementptr %arr, ptr %arr_ptr, i32 0, i32 0
     ret ptr %cap_ptr
 }
@@ -28,10 +26,10 @@ define ptr @get_data(ptr %arr_ptr) {
     ret ptr %data_ptr
 }
 
-define ptr @init_array() {
+define ptr @init_arr() {
     %arr_ptr = call ptr @malloc(i64 16)
 
-    %cap_ptr = call ptr @get_capacity(ptr %arr_ptr)
+    %cap_ptr = call ptr @get_cap(ptr %arr_ptr)
     store i64 2, ptr %cap_ptr
 
     %size_ptr = call ptr @get_size(ptr %arr_ptr)
@@ -44,9 +42,9 @@ define ptr @init_array() {
     ret ptr %arr_ptr
 }
 
-define void @add_element(ptr %arr_ptr, ptr %new_elem) {
+define void @add_element(ptr %arr_ptr, i32 %new_elem) {
 entry:
-    %cap_ptr = call ptr @get_capacity(ptr %arr_ptr)
+    %cap_ptr = call ptr @get_cap(ptr %arr_ptr)
     %size_ptr = call ptr @get_size(ptr %arr_ptr)
     %capacity = load i64, ptr %cap_ptr
     %size = load i64, ptr %size_ptr
@@ -58,16 +56,15 @@ entry:
 
 resize:
     %new_cap = mul i64 %capacity, 2
-    %new_data = call ptr @realloc(ptr %data, i64 %new_cap)
+    %new_data = call ptr @realloc(ptr %data_ptr, i64 %new_cap)
     store i64 %new_cap, ptr %cap_ptr
     store ptr %new_data, ptr %data_ptr
     br label %insert
 
 insert:
     %data_final = load ptr, ptr %data_ptr
-    %offset = mul i64 %size, 8
-    %elem_ptr = getelementptr i32, ptr %data_final, i64 %offset
-    store ptr %new_elem, ptr %elem_ptr
+    %elem_ptr = getelementptr i32, ptr %data_final, i64 %size
+    store i32 %new_elem, ptr %elem_ptr
 
     %new_size = add i64 %size, 1
     store i64 %new_size, ptr %size_ptr
@@ -83,20 +80,22 @@ define void @free_arr(ptr %arr_ptr) {
 }
 
 define i32 @main() {
-    %arr_ptr = call ptr @init_array()
-    %new_elem = alloca i32
-    store i32 8, ptr %new_elem
-    call void @add_element(ptr %arr_ptr, ptr %new_elem)
-    call void @add_element(ptr %arr_ptr, ptr %new_elem)
-    call void @add_element(ptr %arr_ptr, ptr %new_elem)
-    call void @add_element(ptr %arr_ptr, ptr %new_elem)
-    call void @add_element(ptr %arr_ptr, ptr %new_elem)
+    %arr_ptr = call ptr @init_arr()
+    call ptr @add_element(ptr %arr_ptr, i32 23)
+    call ptr @add_element(ptr %arr_ptr, i32 34)
+    call ptr @add_element(ptr %arr_ptr, i32 23)
+    call ptr @add_element(ptr %arr_ptr, i32 213)
+    call ptr @add_element(ptr %arr_ptr, i32 8356)
 
     %data_ptr = call ptr @get_data(ptr %arr_ptr)
     %data = load ptr, ptr %data_ptr
-    %first_elem = load i32, ptr %data
-    %print_result = call i32 (ptr, ...) @printf(ptr @str, i32 %first_elem)
 
-    call void @free_arr(ptr %arr_ptr)
+    %index = add i32 0, 3
+    %element_ptr = getelementptr i32, ptr %data, i32 %index
+    %element = load i32, ptr %element_ptr
+
+    call i32(ptr, ...) @printf(ptr @str, i32 %element)
+
+    call ptr @free_arr(ptr %arr_ptr)
     ret i32 0
 }

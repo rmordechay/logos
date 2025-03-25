@@ -21,6 +21,24 @@ protected:
     }
 };
 
+TEST_F(SemaPatternMatchingTests, TestIntMatchingWorks) {
+    const auto code = R"(
+    main() {
+        a = 3
+        if a {
+            1: { print(1) }
+            2: { print(2) }
+            3: { print(3) }
+            else: { print("else") }
+        }
+    }
+    )";
+    const auto file = logos.parseFile(code);
+    logos.analyse({file});
+
+    ASSERT_THAT(logos.errors.size(), 0);
+}
+
 TEST_F(SemaPatternMatchingTests, TestTypeDoesNotMatch) {
     const auto code = R"(
     main() {
