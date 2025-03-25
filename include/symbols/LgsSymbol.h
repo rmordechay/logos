@@ -1,11 +1,9 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
 
-#include <string>
-#include <map>
-
 using namespace std;
 
+class LgsEnum;
 class LgsParam;
 class LgsVarDec;
 class LgsMethodImpl;
@@ -28,6 +26,7 @@ enum LgsSymbolType {
     PARAM,
     OBJECT,
     FUNC,
+    ENUM,
 };
 
 struct LgsSymbol {
@@ -37,6 +36,7 @@ struct LgsSymbol {
         LgsVarDec* varDec;
         LgsParam* param;
         LgsFunc* func;
+        LgsEnum* lgsEnum;
     };
 
     LgsSymbol() :
@@ -62,6 +62,11 @@ struct LgsSymbol {
     LgsSymbol(const LgsSymbolType type, LgsObject* object) :
         type(type),
         object(object) {
+    }
+
+    LgsSymbol(const LgsSymbolType type, LgsEnum* lgsEnum) :
+        type(type),
+        lgsEnum(lgsEnum) {
     }
 };
 

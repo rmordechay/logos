@@ -1,9 +1,7 @@
 #ifndef LGSGLOBALS_H
 #define LGSGLOBALS_H
 #include "symbols/LgsSymbol.h"
-#include <stack>
 #include <assert.h>
-
 
 struct LgsGlobals {
     mutex mtx;

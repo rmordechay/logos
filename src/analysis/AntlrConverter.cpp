@@ -103,7 +103,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
         const auto method = getMethodImpl(func, obj);
         obj->methods[funcName] = method;
     }
-    globals.symbols[obj->name] = LgsSymbol(OBJECT, obj);
+    globals.addSymbol(obj->name, LgsSymbol(OBJECT, obj));
     return obj;
 }
 
@@ -276,6 +276,7 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
         lgsEnum->fields.emplace_back(field);
     }
     lgsEnum->setLocation(ctx->start);
+    globals.addSymbol(ctx->TYPE()->getText(), LgsSymbol(ENUM, lgsEnum));
     return lgsEnum;
 }
 
