@@ -53,7 +53,7 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, con
     for (const auto& func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         if (funcName == LOGOS_MAIN_FUNC) {
-            const auto mainFunc = new LgsFuncImpl(LOGOS_MAIN_FUNC, &LOGOS_INT);
+            const auto mainFunc = new LgsFuncImpl(LOGOS_MAIN_FUNC, new LgsInt());
             mainFile->mainFunc = mainFunc;
             const auto statementsBlock = func->funcBody()->statementsBlock();
             mainFunc->stmtBlock = getStmtBlock(statementsBlock);
@@ -253,7 +253,7 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
         const auto loopVar = new LgsVarDec(loopVarName);
         loopStmt = new LgsForeachLoop({loopVar}, getUnaryExpr(iterable), stmts);
     } else if (const auto range = ctx->iterableRange) {
-        const auto loopVar = new LgsVarDec(loopVarName, &LOGOS_INT);
+        const auto loopVar = new LgsVarDec(loopVarName, new LgsInt());
         loopStmt = new LgsRangeLoop({loopVar}, getExpr(range->start), getExpr(range->end), stmts);
     } else {
         assert(false && "No loop statements found");
@@ -457,19 +457,19 @@ LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* type, const L
 LgsType* AntlerConverter::getType(LogosParser::TypeContext* type) {
     if (!type) return nullptr;
     const auto typeText = type->getText();
-    if (typeText == LOGOS_INT.getName()) return &LOGOS_INT;
-    if (typeText == LOGOS_FLOAT.getName()) return &LOGOS_FLOAT;
-    if (typeText == LOGOS_BOOL.getName()) return &LOGOS_BOOL;
-    if (typeText == LOGOS_STR.getName()) return &LOGOS_STR;
-    if (type->LBRACE()) return new LgsArrayType();
+    if (typeText == LgsInt::name) return new LgsInt();
+    if (typeText == LgsFloat::name) return new LgsFloat();
+    if (typeText == LgsBool::name) return new LgsBool();
+    if (typeText == LgsStr::name) return new LgsStr();
+    if (type->LBRACK().size() > 0) return new LgsArrayType();
     return new LgsUnknownType(type->getText());
 }
 
 LgsType* AntlerConverter::getType(const string& typeText) {
-    if (typeText == LOGOS_INT.getName()) return &LOGOS_INT;
-    if (typeText == LOGOS_FLOAT.getName()) return &LOGOS_FLOAT;
-    if (typeText == LOGOS_BOOL.getName()) return &LOGOS_BOOL;
-    if (typeText == LOGOS_STR.getName()) return &LOGOS_STR;
+    if (typeText == LgsInt::name) return new LgsInt();
+    if (typeText == LgsFloat::name) return new LgsFloat();
+    if (typeText == LgsBool::name) return new LgsBool();
+    if (typeText == LgsStr::name) return new LgsStr();
     return new LgsUnknownType(typeText);
 }
 
@@ -478,5 +478,5 @@ LgsType* AntlerConverter::getFuncType(LogosParser::FuncImplementationContext* ct
     if (signature->type()) {
         return getType(signature->type());
     }
-    return &LOGOS_VOID;
+    return new LgsVoid();
 }

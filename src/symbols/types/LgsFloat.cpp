@@ -7,7 +7,7 @@ const string LgsFloat::getName() const {
 }
 
 Type* LgsFloat::getIRType() {
-    return IRType;
+    return Type::getFloatTy(context);
 }
 
 LgsConst* LgsFloat::getZeroValue() {

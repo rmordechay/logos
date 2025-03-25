@@ -7,7 +7,6 @@ class LgsBool final : public LgsType {
 public:
     static constexpr auto name = "Bool";
     string trueLiteral = "true";
-    Type* IRType = Type::getInt1Ty(context);
 
     const string getName() const override;
     Type* getIRType() override;
@@ -17,6 +16,5 @@ public:
     ~LgsBool() override = default;
 };
 
-inline LgsBool LOGOS_BOOL;
 
 #endif // LOGOSBOOL_H

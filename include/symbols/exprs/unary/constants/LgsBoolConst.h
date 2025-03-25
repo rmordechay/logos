@@ -7,7 +7,7 @@ class LgsBoolConst final : public LgsConst {
 public:
     bool value;
 
-    explicit LgsBoolConst(const bool value) : LgsConst(&LOGOS_BOOL), value(value) {}
+    explicit LgsBoolConst(const bool value) : LgsConst(new LgsBool()), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     json asJson() override;
     ~LgsBoolConst() override = default;

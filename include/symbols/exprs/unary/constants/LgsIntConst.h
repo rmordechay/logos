@@ -7,7 +7,7 @@ class LgsIntConst final : public LgsConst {
 public:
     int value;
 
-    explicit LgsIntConst(const int value) : LgsConst(&LOGOS_INT), value(value) {}
+    explicit LgsIntConst(const int value) : LgsConst(new LgsInt()), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     LgsExpr* add(LgsExpr* other) override;
     json asJson() override;

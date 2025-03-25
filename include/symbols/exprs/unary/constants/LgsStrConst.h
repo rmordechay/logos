@@ -12,7 +12,7 @@ class LgsStrConst final : public LgsIterable, public LgsConst {
 public:
     string value;
 
-    explicit LgsStrConst(const string& value) : LgsConst(&LOGOS_STR), value(value) {}
+    explicit LgsStrConst(const string& value) : LgsConst(new LgsStr()), value(value) {}
     Value* createGlobalStr(Module* module, const std::string& value) const;
     json asJson() override;
     size_t size() override;

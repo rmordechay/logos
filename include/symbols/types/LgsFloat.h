@@ -7,7 +7,6 @@
 class LgsFloat final : public LgsType {
 public:
     static constexpr auto name = "Float";
-    Type* IRType = Type::getFloatTy(context);
 
     const string getName() const override;
     Type* getIRType() override;

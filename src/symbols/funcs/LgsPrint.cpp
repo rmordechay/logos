@@ -12,7 +12,7 @@ void LgsPrint::setIRFunc(CodeGenMetadata* metadata) {
     for (const auto& param : params) {
         paramTypes.emplace_back(param->type->getIRType());
     }
-    const auto IRFuncType = FunctionType::get(LOGOS_VOID.IRType, paramTypes, false);
+    const auto IRFuncType = FunctionType::get(Type::getVoidTy(context), paramTypes, false);
     IRFunc = Function::Create(IRFuncType, GlobalValue::ExternalLinkage, composedName, metadata->currentModule);
 }
 

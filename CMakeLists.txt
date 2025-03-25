@@ -139,6 +139,7 @@ add_library(lib STATIC
     src/symbols/types/LgsFloat.cpp
     src/symbols/types/LgsChar.cpp
     src/symbols/types/LgsType.cpp
+    src/symbols/types/LgsArrayType.cpp
 )
 
 add_executable(lgs main.cpp)

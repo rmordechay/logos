@@ -372,7 +372,7 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     case GT:
     case GE:
     case LE: {
-        setExprType(binaryExpr, &LOGOS_BOOL);
+        setExprType(binaryExpr, new LgsBool());
         return;
     }
     case NOOP:

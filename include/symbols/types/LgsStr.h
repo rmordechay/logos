@@ -8,7 +8,6 @@
 class LgsStr final : public LgsType {
 public:
     static constexpr auto name = "Str";
-    Type* IRType = PointerType::get(Type::getInt8Ty(context), 0);
 
     const string getName() const override;
     Type* getIRType() override;
@@ -24,6 +23,5 @@ inline void LgsStr::cleanStr(string& value) {
     value.pop_back();
 }
 
-inline LgsStr LOGOS_STR;
 
 #endif // LOGOSSTRING_H

@@ -7,7 +7,7 @@ const string LgsInt::getName() const {
 }
 
 Type* LgsInt::getIRType() {
-    return IRType;
+    return Type::getInt32Ty(context);
 }
 
 LgsConst* LgsInt::getZeroValue() {

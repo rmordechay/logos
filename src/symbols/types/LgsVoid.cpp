@@ -5,7 +5,7 @@ inline const std::string LgsVoid::getName() const {
 }
 
 inline Type* LgsVoid::getIRType() {
-    return IRType;
+    return Type::getVoidTy(context);
 }
 
 inline LgsConst* LgsVoid::getZeroValue() {

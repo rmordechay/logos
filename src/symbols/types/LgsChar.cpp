@@ -7,7 +7,7 @@ const string LgsChar::getName() const {
 }
 
 Type* LgsChar::getIRType() {
-    return IRType;
+    return Type::getInt8Ty(context);
 }
 
 LgsConst* LgsChar::getZeroValue() {

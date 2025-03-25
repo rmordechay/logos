@@ -16,24 +16,4 @@ public:
     ~LgsArrayType() override = default;
 };
 
-inline const string LgsArrayType::getName() const {
-    return underlyingType->getName() + "[]";
-}
-
-inline Type* LgsArrayType::getIRType(const int size) {
-    return ArrayType::get(underlyingType->getIRType(), size);
-}
-
-inline LgsConst* LgsArrayType::getZeroValue() {
-    assert(false && "not implemented");
-}
-
-inline bool LgsArrayType::equals(LgsType* other) const {
-    assert(false && "not implemented");
-}
-
-inline LgsType* LgsArrayType::inferBinaryType(LgsType* other) {
-    assert(false && "not implemented");
-}
-
 #endif //LOGOSARRAYTYPE_H

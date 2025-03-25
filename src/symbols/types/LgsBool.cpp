@@ -7,7 +7,7 @@ const string LgsBool::getName() const {
 }
 
 Type* LgsBool::getIRType() {
-    return IRType;
+    return Type::getInt1Ty(context);
 }
 
 LgsConst* LgsBool::getZeroValue() {

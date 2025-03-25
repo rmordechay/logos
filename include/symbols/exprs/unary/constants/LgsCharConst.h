@@ -7,7 +7,7 @@ class LgsCharConst final : public LgsConst {
 public:
     char value;
 
-    explicit LgsCharConst(const char value) : LgsConst(&LOGOS_CHAR), value(value) {}
+    explicit LgsCharConst(const char value) : LgsConst(new LgsChar()), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     json asJson() override;
 };
