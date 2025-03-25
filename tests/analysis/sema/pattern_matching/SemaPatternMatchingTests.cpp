@@ -36,7 +36,6 @@ TEST_F(SemaPatternMatchingTests, TestTypeDoesNotMatch) {
     const auto file = logos.parseFile(code);
     logos.analyse({file});
 
-    std::cout << logos.errors[0].msg << '\n';
     ASSERT_THAT(logos.errors.size(), 1);
     ASSERT_THAT(logos.errors[0].msg, StartsWith("Error: Pattern of type 'Int' does not match base type 'Str'."));
     ASSERT_THAT(logos.errors[0].errCode, E10014.errCode);

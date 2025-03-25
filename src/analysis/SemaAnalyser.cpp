@@ -143,6 +143,10 @@ void SemaAnalyser::visitIfStmt(const LgsIfStmt* ifStmt) {
 
 void SemaAnalyser::visitPatternMatching(const LgsPatternMatching* patternMatching) {
     const auto baseExpr = patternMatching->expr;
+    if (!baseExpr) {
+        visitBoolPatternMatching(patternMatching);
+        return;
+    }
     visitExpr(baseExpr);
     const auto baseExprType = baseExpr->type;
     for (const auto patternExpr : patternMatching->patterns) {
@@ -152,6 +156,10 @@ void SemaAnalyser::visitPatternMatching(const LgsPatternMatching* patternMatchin
             return;
         }
     }
+}
+
+void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatching* patternMatching) {
+
 }
 
 void SemaAnalyser::visitLoopStmt(LgsLoop* loopStmt) {
