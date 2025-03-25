@@ -7,6 +7,7 @@ Value* LgsReturn::createIRValue(CodeGenMetadata* metadata) {
 
 json LgsReturn::asJson() {
     json tree;
+    tree["stmtType"] = "return";
     tree["expr"] = expr->asJson();
     return tree;
 }

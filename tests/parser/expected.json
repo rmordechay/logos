@@ -5,37 +5,62 @@
       "name": "sub",
       "params": [
         {
-          "expr": null,
           "name": "a",
           "type": "Int"
         },
         {
-          "expr": null,
           "name": "b",
           "type": "Int"
         }
       ],
-      "returnType": "Int"
+      "returnType": "Int",
+      "stmts": [
+        {
+          "expr": {},
+          "stmtType": "return"
+        }
+      ]
     },
     {
       "name": "mul",
       "params": [
         {
-          "expr": null,
           "name": "a",
           "type": "Int"
         },
         {
-          "expr": null,
           "name": "b",
           "type": "Int"
         }
       ],
-      "returnType": "Int"
+      "returnType": "Int",
+      "stmts": [
+        {
+          "expr": {},
+          "stmtType": "return"
+        }
+      ]
+    },
+    {
+      "name": "forLoop",
+      "returnType": "Void",
+      "stmts": [
+        {}
+      ]
     }
   ],
   "mainFunc": {
     "name": "main",
-    "returnType": "Int"
+    "returnType": "Int",
+    "stmts": [
+      {
+        "expr": {
+          "exprType": "IntConst",
+          "type": "Int",
+          "value": 2
+        },
+        "stmtType": "varDec"
+      }
+    ]
   }
 }

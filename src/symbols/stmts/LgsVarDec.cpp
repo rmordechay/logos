@@ -21,7 +21,7 @@ Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
 
 json LgsVarDec::asJson() {
     json tree;
-    tree["name"] = name;
+    tree["stmtType"] = "varDec";
     if (type) {
         tree["type"] = type->getName();
     }

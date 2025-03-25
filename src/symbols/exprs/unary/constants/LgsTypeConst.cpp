@@ -12,6 +12,7 @@ Value* LgsTypeConst::createIRValue(CodeGenMetadata* metadata) {
 
 json LgsTypeConst::asJson() {
     json tree;
+    tree["exprType"] = "TypeConst";
     tree["name"] = type->getName();
     tree["value"] = type->getName();
     return tree;

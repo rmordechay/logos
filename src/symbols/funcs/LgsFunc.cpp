@@ -35,6 +35,7 @@ json LgsFunc::asJson() {
     for (const auto& param : params) {
         tree["params"].emplace_back(param->asJson());
     }
+    tree["stmts"] = stmtBlock->asJson();
     return tree;
 }
 

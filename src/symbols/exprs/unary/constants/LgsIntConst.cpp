@@ -21,7 +21,8 @@ LgsExpr* LgsIntConst::add(LgsExpr* other) {
 
 json LgsIntConst::asJson() {
     json tree;
-    tree["name"] = type->getName();
+    tree["exprType"] = "IntConst";
+    tree["type"] = type->getName();
     tree["value"] = value;
     return tree;
 }

@@ -6,7 +6,9 @@ json LgsParam::asJson() {
     json tree;
     tree["name"] = name;
     tree["type"] = type->getName();
-    tree["expr"] = nullptr;
+    if (expr) {
+        tree["expr"] = expr->asJson();
+    }
     return tree;
 }
 

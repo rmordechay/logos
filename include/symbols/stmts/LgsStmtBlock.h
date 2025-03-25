@@ -8,8 +8,8 @@ public:
 
     explicit LgsStmtBlock(const vector<LgsStmt*>& stmts) : stmts(stmts) {}
     Value* createIRValue(CodeGenMetadata* metadata) const;
-    ~LgsStmtBlock() override = default;
-    LgsStmtBlock();
+    json asJson() override;
+    ~LgsStmtBlock() override;
 };
 
 

@@ -1,7 +1,6 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
 
-using namespace std;
 
 class LgsEnum;
 class LgsParam;

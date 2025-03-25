@@ -3,7 +3,6 @@
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "TestUtils.h"
 
 
 class E2ETests : public testing::Test {
@@ -22,6 +21,17 @@ protected:
 
     void TearDown() override {
         remove_all(logos.buildDir);
+    }
+
+    string executeAndGetOutput(const string& command) const {
+        ostringstream outputBuffer;
+        array<char, 128> buffer;
+        const auto sFile = popen(command.c_str(), "r");
+        const unique_ptr<FILE, decltype(&pclose)> pipe(sFile, pclose);
+        while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+            outputBuffer << buffer.data();
+        }
+        return outputBuffer.str();
     }
 };
 

@@ -42,6 +42,7 @@ LgsExpr* LgsStrConst::add(LgsExpr* other) {
 
 json LgsStrConst::asJson() {
     json tree;
+    tree["exprType"] = "StrConst";
     tree["name"] = type->getName();
     tree["value"] = value;
     return tree;

@@ -15,5 +15,6 @@ TEST(ParserTest, TestParseFile) {
     json expectedJson;
     input_file >> expectedJson;
 
-    ASSERT_EQ(mainFile->asJson().dump(2), expectedJson.dump(2));
+    std::cout << mainFile->asJson().dump(2) << '\n';
+    ASSERT_EQ(mainFile->asJson(), expectedJson);
 }

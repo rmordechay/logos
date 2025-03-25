@@ -6,6 +6,7 @@ Value* LgsBoolConst::createIRValue(CodeGenMetadata* metadata) {
 
 json LgsBoolConst::asJson() {
     json tree;
+    tree["exprType"] = "BoolConst";
     tree["name"] = type->getName();
     tree["value"] = value;
     return tree;

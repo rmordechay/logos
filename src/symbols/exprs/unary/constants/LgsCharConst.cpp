@@ -7,6 +7,7 @@ Value* LgsCharConst::createIRValue(CodeGenMetadata* metadata) {
 
 json LgsCharConst::asJson() {
     json tree;
+    tree["exprType"] = "CharConst";
     tree["name"] = type->getName();
     tree["value"] = value;
     return tree;
