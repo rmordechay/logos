@@ -449,23 +449,27 @@ LgsConst* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
 }
 
 LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) {
-    const auto typeConst = new LgsTypeConst(getType(type->getText()));
+    const auto typeConst = new LgsTypeConst(getTypeFromText(type->getText()));
     typeConst->setLocation(ctx->start);
     return typeConst;
 }
 
-LgsType* AntlerConverter::getType(LogosParser::TypeContext* type) {
-    if (!type) return nullptr;
-    const auto typeText = type->getText();
-    if (typeText == LgsInt::name) return new LgsInt();
-    if (typeText == LgsFloat::name) return new LgsFloat();
-    if (typeText == LgsBool::name) return new LgsBool();
-    if (typeText == LgsStr::name) return new LgsStr();
-    if (type->LBRACK().size() > 0) return new LgsArrayType();
-    return new LgsUnknownType(type->getText());
+LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
+    if (!ctx) return nullptr;
+    const auto typeText = ctx->TYPE()->getText();
+    LgsType* result = nullptr;
+    if (ctx->LBRACK().size() > 0) {
+        result = new LgsArrayType(getTypeFromText(typeText));
+    } else {
+        result = getTypeFromText(typeText);
+        if (ctx->QUEST_MARK()) {
+            result->nullable = true;
+        }
+    }
+    return result;
 }
 
-LgsType* AntlerConverter::getType(const string& typeText) {
+LgsType* AntlerConverter::getTypeFromText(const string& typeText) {
     if (typeText == LgsInt::name) return new LgsInt();
     if (typeText == LgsFloat::name) return new LgsFloat();
     if (typeText == LgsBool::name) return new LgsBool();

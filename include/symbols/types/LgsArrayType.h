@@ -8,6 +8,8 @@ class LgsArrayType final : public LgsType {
 public:
     LgsType* underlyingType = nullptr;
 
+    LgsArrayType() = default;
+    explicit LgsArrayType(LgsType* underlyingType) : underlyingType(underlyingType) {}
     const string getName() const override;
     Type* getIRType(int size) override;
     LgsConst* getZeroValue() override;

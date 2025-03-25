@@ -14,6 +14,7 @@ class LgsMethodImpl;
 
 class LgsType {
 public:
+    bool nullable = false;
     // TODO make values const
     map<string, LgsField*> fields;
     map<string, LgsMethodImpl*> methods;

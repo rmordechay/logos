@@ -337,8 +337,8 @@ void SemaAnalyser::setVariableType(LgsVariable* variable) {
 }
 
 void SemaAnalyser::setFuncType(LgsFunc* func) {
-    const auto symbol = logosStack.getSymbol(func->type->getName());
-    if (symbol && symbol->type == OBJECT && symbol->object != func->type) {
+    if (dynamic_cast<LgsUnknownType*>(func->type)) {
+        const auto symbol = logosStack.getSymbol(func->type->getName());
         delete func->type;
         func->type = symbol->object;
     }
