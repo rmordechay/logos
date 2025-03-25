@@ -33,7 +33,9 @@ void SemaAnalyser::analyse() {
 }
 
 void SemaAnalyser::visitMainFile(const LgsMainFile* mainFile) {
-    visitEnum(mainFile->enums[0]);
+    for (const auto& lgsEnum : mainFile->enums) {
+        visitEnum(lgsEnum);
+    }
     for (const auto& func : mainFile->funcs) {
         visitFuncImpl(func);
     }
@@ -343,7 +345,7 @@ void SemaAnalyser::setFuncType(LgsFunc* func) {
 }
 
 void SemaAnalyser::setExprType(LgsExpr* expr, LgsType* type) {
-    if (dynamic_cast<LgsTempType*>(type)) {
+    if (dynamic_cast<LgsUnknownType*>(type)) {
         const auto symbol = logosStack.getSymbol(type->getName());
         expr->type = symbol->object;
         delete type;

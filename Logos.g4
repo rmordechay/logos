@@ -125,10 +125,6 @@ expr:
     |   LPAREN left=expr RPAREN
     ;
 
-exprList:
-        expr (COMMA expr)* COMMA?
-    ;
-
 unaryExpr:
         VARIABLE
     |   SELF_INSTANCE
@@ -203,7 +199,7 @@ range:
     ;
 
 type:
-        TYPE
+        TYPE QUEST_MARK?
    |    TYPE (LBRACK INTEGER? RBRACK)+
    |    LBRACE type COLON type RBRACE
    ;

@@ -29,15 +29,15 @@ public:
     virtual ~LgsType() = default;
 };
 
-class LgsTempType final : public LgsType {
+class LgsUnknownType final : public LgsType {
 public:
     string name;
 
-    explicit LgsTempType(const string& name) : name(name) {}
-    const string getName() const override { assert(false && "temp type should not be called"); }
-    LgsConst* getZeroValue() override { assert(false && "temp type should not be called"); }
-    bool equals(LgsType* other) const override { assert(false && "temp type should not be called"); }
-    LgsType* inferBinaryType(LgsType* other) override { assert(false && "temp type should not be called"); }
+    explicit LgsUnknownType(const string& name) : name(name) {}
+    const string getName() const override { assert(false && "unknown type should not be called"); }
+    LgsConst* getZeroValue() override { assert(false && "unknown type should not be called"); }
+    bool equals(LgsType* other) const override { assert(false && "unknown type should not be called"); }
+    LgsType* inferBinaryType(LgsType* other) override { assert(false && "unknown type should not be called"); }
 };
 
 #endif //LOGOSTYPE_H

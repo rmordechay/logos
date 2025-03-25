@@ -45,7 +45,10 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
 LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, const string& filePath) {
     const auto funcImplementations = ctx->funcImplementation();
     const auto mainFile = new LgsMainFile(filePath);
-    mainFile->enums.emplace_back(getEnum(ctx->enumDeclaration()));
+    if (ctx->enumDeclaration()) {
+        auto lgsEnum = getEnum(ctx->enumDeclaration());
+        mainFile->enums.emplace_back(lgsEnum);
+    }
 
     for (const auto& func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
@@ -459,7 +462,7 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* type) {
     if (typeText == LOGOS_BOOL.getName()) return &LOGOS_BOOL;
     if (typeText == LOGOS_STR.getName()) return &LOGOS_STR;
     if (type->LBRACE()) return new LgsArrayType();
-    return new LgsTempType(type->getText());
+    return new LgsUnknownType(type->getText());
 }
 
 LgsType* AntlerConverter::getType(const string& typeText) {
@@ -467,7 +470,7 @@ LgsType* AntlerConverter::getType(const string& typeText) {
     if (typeText == LOGOS_FLOAT.getName()) return &LOGOS_FLOAT;
     if (typeText == LOGOS_BOOL.getName()) return &LOGOS_BOOL;
     if (typeText == LOGOS_STR.getName()) return &LOGOS_STR;
-    return new LgsTempType(typeText);
+    return new LgsUnknownType(typeText);
 }
 
 LgsType* AntlerConverter::getFuncType(LogosParser::FuncImplementationContext* ctx) {

@@ -33,11 +33,11 @@ public:
     RuleExplicitVarDec = 14, RuleImplicitVarDec = 15, RuleIfStatement = 16, 
     RuleElseIfStatement = 17, RuleElseStatement = 18, RulePatternMatching = 19, 
     RulePattern = 20, RuleLoopStatement = 21, RuleControlFlow = 22, RuleReturnStatement = 23, 
-    RuleEnumDeclaration = 24, RuleEnumField = 25, RuleExpr = 26, RuleExprList = 27, 
-    RuleUnaryExpr = 28, RuleArray = 29, RuleMap = 30, RuleFuncCall = 31, 
-    RuleConstructor = 32, RuleFuncArgList = 33, RuleFuncArg = 34, RuleConstant = 35, 
-    RuleArrayIndex = 36, RuleSelection = 37, RuleFirstSelectionElement = 38, 
-    RuleInnerSelectionElement = 39, RuleRange = 40, RuleType = 41, RuleVector = 42
+    RuleEnumDeclaration = 24, RuleEnumField = 25, RuleExpr = 26, RuleUnaryExpr = 27, 
+    RuleArray = 28, RuleMap = 29, RuleFuncCall = 30, RuleConstructor = 31, 
+    RuleFuncArgList = 32, RuleFuncArg = 33, RuleConstant = 34, RuleArrayIndex = 35, 
+    RuleSelection = 36, RuleFirstSelectionElement = 37, RuleInnerSelectionElement = 38, 
+    RuleRange = 39, RuleType = 40, RuleVector = 41
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -84,7 +84,6 @@ public:
   class EnumDeclarationContext;
   class EnumFieldContext;
   class ExprContext;
-  class ExprListContext;
   class UnaryExprContext;
   class ArrayContext;
   class MapContext;
@@ -511,20 +510,6 @@ public:
 
   ExprContext* expr();
   ExprContext* expr(int precedence);
-  class  ExprListContext : public antlr4::ParserRuleContext {
-  public:
-    ExprListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    std::vector<ExprContext *> expr();
-    ExprContext* expr(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> COMMA();
-    antlr4::tree::TerminalNode* COMMA(size_t i);
-
-   
-  };
-
-  ExprListContext* exprList();
-
   class  UnaryExprContext : public antlr4::ParserRuleContext {
   public:
     UnaryExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -732,6 +717,7 @@ public:
     TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *TYPE();
+    antlr4::tree::TerminalNode *QUEST_MARK();
     std::vector<antlr4::tree::TerminalNode *> LBRACK();
     antlr4::tree::TerminalNode* LBRACK(size_t i);
     std::vector<antlr4::tree::TerminalNode *> RBRACK();
