@@ -20,9 +20,9 @@ public:
 
     LgsIfStmt(LgsExpr* ifCond, LgsStmtBlock* ifStmtBlock) : ifCond(ifCond), ifStmtBlock(ifStmtBlock) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    void computeSimpleIf(CodeGenMetadata* metadata);
+    void computeSimpleIf(CodeGenMetadata* metadata) const;
     void createElseBlock(CodeGenMetadata* metadata, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const;
-    void computeComplexIf(CodeGenMetadata* metadata);
+    void computeComplexIf(CodeGenMetadata* metadata) const;
     ~LgsIfStmt() override;
 };
 

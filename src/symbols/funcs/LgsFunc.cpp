@@ -40,6 +40,7 @@ json LgsFunc::asJson() {
 }
 
 LgsFunc::~LgsFunc() {
+    delete type;
     for (const auto param : params) {
         delete param;
     }

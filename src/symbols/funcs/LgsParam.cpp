@@ -13,7 +13,9 @@ json LgsParam::asJson() {
 }
 
 LgsParam::~LgsParam() {
+    delete type;
     if (expr) {
         delete expr;
     }
 }
+

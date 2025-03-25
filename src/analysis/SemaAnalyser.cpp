@@ -165,6 +165,10 @@ void SemaAnalyser::visitPatternMatching(const LgsPatternMatching* patternMatchin
             return;
         }
     }
+    for (const auto& patternsStmtBlock : patternMatching->patternsStmtBlocks) {
+        visitStmtBlock(patternsStmtBlock);
+    }
+    visitStmtBlock(patternMatching->elseStmtBlock);
 }
 
 void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatching* patternMatching) {
@@ -207,7 +211,7 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
 }
 
 void SemaAnalyser::visitEnum(LgsEnum* lgsEnum) {
-    std::cout << "" << '\n';
+
 }
 
 void SemaAnalyser::visitExpr(LgsExpr* expr) {
