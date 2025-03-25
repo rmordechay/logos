@@ -167,6 +167,7 @@ add_executable(lgs_tests
     tests/analysis/sema/loops/SemaForeachLoopTests.cpp
     tests/analysis/sema/loops/SemaRangeLoopTests.cpp
     tests/analysis/sema/pattern_matching/SemaPatternMatchingTests.cpp
+    tests/analysis/sema/enums/SemaEnumsTests.cpp
     tests/codegen/loops/CodegenForeachLoopTests.cpp
     tests/TestUtils.h
 )
