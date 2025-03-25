@@ -3,10 +3,13 @@
 #include "LgsFile.h"
 #include "funcs/LgsFuncImpl.h"
 
+class LgsEnum;
+
 class LgsMainFile final : public LgsFile {
 public:
     LgsFuncImpl* mainFunc = nullptr;
     vector<LgsFuncImpl*> funcs;
+    vector<LgsEnum*> enums;
 
     explicit LgsMainFile(const string& path) : LgsFile(LOGOS_MAIN_FILE, path) {}
     json asJson() const;

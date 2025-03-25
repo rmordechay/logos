@@ -31,7 +31,7 @@ public:
     static LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     static LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
     static LgsLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
-    static LgsStmt* getEnum(LogosParser::EnumDeclarationContext* ctx);
+    static LgsEnum* getEnum(LogosParser::EnumDeclarationContext* ctx);
     static LgsExpr* getExpr(LogosParser::ExprContext* ctx);
     static LgsUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     static LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);

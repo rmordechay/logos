@@ -1,7 +1,5 @@
 #include "LgsLinker.h"
 #include "Logos.h"
-#include "TestUtils.h"
-
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>

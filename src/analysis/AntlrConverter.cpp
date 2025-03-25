@@ -45,6 +45,8 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
 LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, const string& filePath) {
     const auto funcImplementations = ctx->funcImplementation();
     const auto mainFile = new LgsMainFile(filePath);
+    mainFile->enums.emplace_back(getEnum(ctx->enumDeclaration()));
+
     for (const auto& func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         if (funcName == LOGOS_MAIN_FUNC) {
@@ -258,12 +260,13 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
     return loopStmt;
 }
 
-LgsStmt* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
+LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
     const auto lgsEnum = new LgsEnum();
     for (size_t i = 0; i < ctx->enumField().size(); ++i) {
         const auto enumField = ctx->enumField()[i];
         const auto enumName = enumField->CONST()->getText();
-        const auto enumText = enumField->STRING()->getText();
+        auto enumText = enumField->STRING()->getText();
+        LgsStr::cleanStr(enumText);
         EnumField field(i, enumName, enumText);
         field.setLocation(ctx->start);
         lgsEnum->fields.emplace_back(field);
@@ -430,13 +433,12 @@ LgsConst* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
         constant = new LgsBoolConst(value);
     }
     if (const auto stringToken = ctx->STRING()) {
-        const auto value = stringToken->getText();
+        auto value = stringToken->getText();
+        LgsStr::cleanStr(value);
         if (value.size() == 1) {
             constant = new LgsCharConst(value[0]);
         } else {
-            const auto strConst = new LgsStrConst(value);
-            strConst->cleanStr();
-            constant = strConst;
+            constant = new LgsStrConst(value);
         }
     }
     constant->setLocation(ctx->start);

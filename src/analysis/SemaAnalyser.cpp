@@ -14,6 +14,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/binary/LgsBinaryExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "stmts/LgsEnum.h"
 #include "stmts/LgsPatternMatching.h"
 
 #include <funcs/LgsPrint.h>
@@ -32,6 +33,7 @@ void SemaAnalyser::analyse() {
 }
 
 void SemaAnalyser::visitMainFile(const LgsMainFile* mainFile) {
+    visitEnum(mainFile->enums[0]);
     for (const auto& func : mainFile->funcs) {
         visitFuncImpl(func);
     }
@@ -96,6 +98,8 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
         visitFuncCall(funcCall);
     } else if (const auto returnStmt = dynamic_cast<LgsReturn*>(stmt)) {
         visitReturnStmt(returnStmt);
+    } else if (const auto enumDec = dynamic_cast<LgsEnum*>(stmt)) {
+        visitEnum(enumDec);
     }
 }
 
@@ -195,6 +199,10 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
 
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
     visitExpr(returnStmt->expr);
+}
+
+void SemaAnalyser::visitEnum(LgsEnum* lgsEnum) {
+    std::cout << "" << '\n';
 }
 
 void SemaAnalyser::visitExpr(LgsExpr* expr) {

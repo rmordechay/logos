@@ -15,8 +15,14 @@ public:
     LgsConst* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) const override;
+    static void cleanStr(string& value);
     ~LgsStr() override = default;
 };
+
+inline void LgsStr::cleanStr(string& value) {
+    value.erase(0, 1);
+    value.pop_back();
+}
 
 inline LgsStr LOGOS_STR;
 
