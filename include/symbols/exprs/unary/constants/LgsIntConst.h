@@ -1,13 +1,13 @@
 #ifndef LGSINTCONST_H
 #define LGSINTCONST_H
-#include "LgsConst.h"
+#include "LgsConstExpr.h"
 #include "types/LgsInt.h"
 
-class LgsIntConst final : public LgsConst {
+class LgsIntConst final : public LgsConstExpr {
 public:
     int value;
 
-    explicit LgsIntConst(const int value) : LgsConst(new LgsInt()), value(value) {}
+    explicit LgsIntConst(const int value) : LgsConstExpr(new LgsInt()), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     LgsExpr* add(LgsExpr* other) override;
     json asJson() override;

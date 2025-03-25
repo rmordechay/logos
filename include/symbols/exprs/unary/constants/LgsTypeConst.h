@@ -1,12 +1,12 @@
 #ifndef LOGOSTYPECONST_H
 #define LOGOSTYPECONST_H
-#include "LgsConst.h"
+#include "LgsConstExpr.h"
 
 #include <exprs/unary/LgsUnaryExpr.h>
 
-class LgsTypeConst final : public LgsConst {
+class LgsTypeConst final : public LgsConstExpr {
 public:
-    explicit LgsTypeConst(LgsType* type) : LgsConst(type) {}
+    explicit LgsTypeConst(LgsType* type) : LgsConstExpr(type) {}
     inline string getName() override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     json asJson() override;

@@ -5,7 +5,7 @@ logosFile:
     ;
 
 mainFile:
-        enumDeclaration? funcImplementation+ EOF
+        enumDeclaration* funcImplementation+ EOF
     ;
 
 objectFile:
@@ -127,6 +127,7 @@ expr:
 
 unaryExpr:
         VARIABLE
+    |   CONST
     |   SELF_INSTANCE
     |   SELF_CLASS
     |   NULL

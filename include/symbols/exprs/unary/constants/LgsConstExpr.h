@@ -8,10 +8,10 @@ class LgsIntConst;
 class LgsStrConst;
 using namespace std;
 
-class LgsConst : public LgsUnaryExpr {
+class LgsConstExpr : public LgsUnaryExpr {
 public:
-    explicit LgsConst(LgsType* type) : LgsUnaryExpr(type) {}
-    ~LgsConst() override = default;
+    explicit LgsConstExpr(LgsType* type) : LgsUnaryExpr(type) {}
+    ~LgsConstExpr() override = default;
 };
 
 

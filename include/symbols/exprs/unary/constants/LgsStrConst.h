@@ -1,6 +1,6 @@
 #ifndef LOGOSSTRINGCONST_H
 #define LOGOSSTRINGCONST_H
-#include "LgsConst.h"
+#include "LgsConstExpr.h"
 #include "types/LgsStr.h"
 #include "exprs/unary/LgsIterable.h"
 
@@ -8,11 +8,11 @@
 
 class LgsCharConst;
 
-class LgsStrConst final : public LgsIterable, public LgsConst {
+class LgsStrConst final : public LgsIterable, public LgsConstExpr {
 public:
     string value;
 
-    explicit LgsStrConst(const string& value) : LgsConst(new LgsStr()), value(value) {}
+    explicit LgsStrConst(const string& value) : LgsConstExpr(new LgsStr()), value(value) {}
     Value* createGlobalStr(Module* module, const std::string& value) const;
     json asJson() override;
     size_t size() override;

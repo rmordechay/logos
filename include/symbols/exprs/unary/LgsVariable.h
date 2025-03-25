@@ -3,7 +3,7 @@
 #include "LgsUnaryExpr.h"
 #include "stmts/LgsVarDec.h"
 
-class LgsVariable final :  public LgsUnaryExpr {
+class LgsVariable :  public LgsUnaryExpr {
 public:
     std::string name;
 
@@ -11,6 +11,11 @@ public:
     string getName() override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsVariable() override = default;
+};
+
+class LgsConst final :  public LgsVariable {
+public:
+    explicit LgsConst(const std::string& name) : LgsVariable(name) {}
 };
 
 #endif //LOGOSVARIABLEEXPR_H

@@ -9,7 +9,7 @@ class LgsExpr;
 using namespace std;
 using namespace llvm;
 
-class LgsConst;
+class LgsConstExpr;
 class LgsField;
 class LgsMethodImpl;
 

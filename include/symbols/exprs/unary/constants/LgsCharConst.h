@@ -1,13 +1,13 @@
 #ifndef LGSCHARCONST_H
 #define LGSCHARCONST_H
-#include "LgsConst.h"
+#include "LgsConstExpr.h"
 #include "types/LgsChar.h"
 
-class LgsCharConst final : public LgsConst {
+class LgsCharConst final : public LgsConstExpr {
 public:
     char value;
 
-    explicit LgsCharConst(const char value) : LgsConst(new LgsChar()), value(value) {}
+    explicit LgsCharConst(const char value) : LgsConstExpr(new LgsChar()), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     json asJson() override;
 };

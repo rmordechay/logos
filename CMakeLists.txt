@@ -44,7 +44,7 @@ add_library(lib STATIC
     include/symbols/LgsValue.h
     include/symbols/LgsSymbol.h
     include/symbols/exprs/binary/LgsBinaryExpr.h
-    include/symbols/exprs/unary/constants/LgsConst.h
+    include/symbols/exprs/unary/constants/LgsConstExpr.h
     include/symbols/exprs/unary/constants/LgsStrConst.h
     include/symbols/exprs/unary/constants/LgsTypeConst.h
     include/symbols/exprs/unary/constants/LgsIntConst.h

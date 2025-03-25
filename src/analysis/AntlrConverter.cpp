@@ -6,7 +6,7 @@
 #include "exprs/binary/LgsOperator.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsCharConst.h"
-#include "exprs/unary/constants/LgsConst.h"
+#include "exprs/unary/constants/LgsConstExpr.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
@@ -46,9 +46,9 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
 LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, const string& filePath) {
     const auto funcImplementations = ctx->funcImplementation();
     const auto mainFile = new LgsMainFile(filePath);
-    if (ctx->enumDeclaration()) {
-        auto lgsEnum = getEnum(ctx->enumDeclaration());
-        mainFile->enums.emplace_back(lgsEnum);
+
+    for (const auto& lgsEnum : ctx->enumDeclaration()) {
+        mainFile->enums.emplace_back(getEnum(lgsEnum));
     }
 
     for (const auto& func : funcImplementations) {
@@ -289,6 +289,7 @@ LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
 
 LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto variable = ctx->VARIABLE()) return getVariable(variable->getText(), ctx);
+    if (const auto constExpr = ctx->CONST()) return getConst(constExpr->getText(), ctx);
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
     if (const auto constructor = ctx->constructor()) return getInstance(constructor);
     if (const auto constant = ctx->constant()) return getConstant(constant);
@@ -321,6 +322,12 @@ LgsVariable* AntlerConverter::getVariable(const string& varName, const ParserRul
     const auto variable = new LgsVariable(varName);
     variable->setLocation(ctx->start);
     return variable;
+}
+
+LgsUnaryExpr* AntlerConverter::getConst(const string& constName, const ParserRuleContext* ctx) {
+    const auto constVariable = new LgsConst(constName);
+    constVariable->setLocation(ctx->start);
+    return constVariable;
 }
 
 LgsFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
@@ -423,21 +430,18 @@ LgsArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ct
     return arrayIndex;
 }
 
-LgsConst* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
-    LgsConst* constant = nullptr;
+LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
+    LgsConstExpr* constant = nullptr;
     if (const auto intToken = ctx->INTEGER()) {
         const auto value = stoi(intToken->getText());
         constant = new LgsIntConst(value);
-    }
-    if (const auto floatToken = ctx->FLOAT()) {
+    } else if (const auto floatToken = ctx->FLOAT()) {
         const auto value = stof(floatToken->getText());
         constant = new LgsFloatConst(value);
-    }
-    if (const auto boolToken = ctx->BOOL()) {
+    } else if (const auto boolToken = ctx->BOOL()) {
         const auto value = boolToken->getText() == "true";
         constant = new LgsBoolConst(value);
-    }
-    if (const auto stringToken = ctx->STRING()) {
+    } else if (const auto stringToken = ctx->STRING()) {
         auto value = stringToken->getText();
         LgsStr::cleanStr(value);
         if (value.size() == 1) {

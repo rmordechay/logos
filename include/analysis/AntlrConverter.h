@@ -37,13 +37,14 @@ public:
     static LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     static LgsUnaryExpr* getArray(LogosParser::ArrayContext* ctx);
     static LgsVariable* getVariable(const string& varName, const ParserRuleContext* ctx);
+    static LgsUnaryExpr* getConst(const string& constName, const ParserRuleContext* ctx);
     static LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     static LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
     static vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
     static LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
     static LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
     static LgsArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
-    static LgsConst* getConstant(LogosParser::ConstantContext* ctx);
+    static LgsConstExpr* getConstant(LogosParser::ConstantContext* ctx);
     static LgsTypeConst* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
     static LgsType* getType(LogosParser::TypeContext* ctx);
     static LgsType* getTypeFromText(const string& typeText);
