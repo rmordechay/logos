@@ -85,7 +85,6 @@ elseStatement:
         ELSE statementsBlock
     ;
 
-
 patternMatching:
         IF expr? LBRACE pattern* (ELSE COLON statementsBlock)? RBRACE
     ;

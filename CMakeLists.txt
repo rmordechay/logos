@@ -70,7 +70,7 @@ add_library(lib STATIC
     include/symbols/stmts/LgsEnum.h
     include/symbols/stmts/LgsPatternMatching.h
     include/symbols/stmts/LgsAssignment.h
-    include/symbols/stmts/LgsIf.h
+    include/symbols/stmts/LgsIfStmt.h
     include/symbols/stmts/LgsReturn.h
     include/symbols/stmts/LgsStmtBlock.h
     include/symbols/stmts/LgsVarDec.h
@@ -126,7 +126,7 @@ add_library(lib STATIC
     src/symbols/stmts/LgsField.cpp
     src/symbols/types/LgsObject.cpp
     src/symbols/stmts/LgsAssignment.cpp
-    src/symbols/stmts/LgsIf.cpp
+    src/symbols/stmts/LgsIfStmt.cpp
     src/symbols/stmts/LgsReturn.cpp
     src/symbols/stmts/LgsStmtBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
@@ -164,9 +164,9 @@ add_executable(lgs_tests
     tests/main.cpp
     tests/e2e/e2eTest.cpp
     tests/parser/ParserTest.cpp
-    tests/analysis/sema/LoopSemaForeachTest.cpp
-    tests/analysis/sema/LoopSemaRangeTest.cpp
-    tests/codegen/LoopCodegenForeachTest.cpp
+    tests/analysis/sema/loops/LoopSemaForeachTest.cpp
+    tests/analysis/sema/loops/LoopSemaRangeTest.cpp
+    tests/codegen/loops/LoopCodegenForeachTest.cpp
     tests/TestUtils.h
 )
 

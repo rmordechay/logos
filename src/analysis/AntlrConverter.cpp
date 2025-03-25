@@ -210,10 +210,10 @@ LgsParam* AntlerConverter::getParam(LogosParser::ExplicitVarDecContext* ctx) {
     return param;
 }
 
-LgsIf* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
+LgsIfStmt* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
     const auto expr = getExpr(ctx->expr());
     const auto stmts = getStmtBlock(ctx->statementsBlock());
-    const auto ifStmt = new LgsIf(expr, stmts);
+    const auto ifStmt = new LgsIfStmt(expr, stmts);
     for (const auto &elseIfStmt : ctx->elseIfStatement()) {
         auto elseIfExpr = getExpr(elseIfStmt->expr());
         auto elseIfStmtBlock = getStmtBlock(elseIfStmt->statementsBlock());
@@ -229,7 +229,13 @@ LgsIf* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
 
 LgsStmt* AntlerConverter::getPatternMatching(LogosParser::PatternMatchingContext* ctx) {
     const auto patternMatching = new LgsPatternMatching(getExpr(ctx->expr()));
-    // TODO finish pattern matching
+    for (const auto& pattern : ctx->pattern()) {
+        const auto expr = getExpr(pattern->expr());
+        const auto stmtBlock = getStmtBlock(pattern->statementsBlock());
+        patternMatching->patterns.emplace_back(expr);
+        patternMatching->patternsStmtBlocks.emplace_back(stmtBlock);
+    }
+    patternMatching->elseStmtBlock = getStmtBlock(ctx->statementsBlock());
     return patternMatching;
 }
 

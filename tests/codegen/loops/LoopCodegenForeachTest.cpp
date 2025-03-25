@@ -6,10 +6,11 @@
 #include <gmock/gmock.h>
 
 using testing::StartsWith;
+using testing::HasSubstr;
 
 class LoopCodegenTests : public testing::Test {
 protected:
-    path dataDir = "../tests/codegen/";
+    path dataDir = "../tests/codegen/loops/";
     Logos logos = Logos(dataDir);
 
     void SetUp() override {
@@ -33,6 +34,12 @@ TEST_F(LoopCodegenTests, TestCodegenForeachLoopWorks) {
     const auto files = {file};
     logos.analyse(files);
     logos.generateCode(logos.getMainFile(files));
-
+    for (const auto& [name, module] : modules) {
+        std::cout << name << '\n';
+        const auto func = module->getFunction("main");
+        std::string funcStr;
+        raw_string_ostream stream(funcStr);
+        func->print(stream);
+    }
     ASSERT_THAT(modules.size(), 1);
 }

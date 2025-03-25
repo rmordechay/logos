@@ -6,7 +6,7 @@
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "stmts/LgsAssignment.h"
-#include "stmts/LgsIf.h"
+#include "stmts/LgsIfStmt.h"
 #include "types/LgsInt.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 
@@ -28,7 +28,7 @@ public:
     static LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     static LgsParam* getParam(LogosParser::ExplicitVarDecContext* ctx);
     static LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
-    static LgsIf* getIfStatement(LogosParser::IfStatementContext* ctx);
+    static LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     static LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
     static LgsLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
     static LgsStmt* getEnum(LogosParser::EnumDeclarationContext* ctx);

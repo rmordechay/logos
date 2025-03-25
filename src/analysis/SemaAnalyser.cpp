@@ -14,12 +14,14 @@
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/binary/LgsBinaryExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "stmts/LgsPatternMatching.h"
+
 #include <funcs/LgsPrint.h>
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsLoop.h>
 #include <loops/LgsRangeLoop.h>
 #include <stmts/LgsAssignment.h>
-#include <stmts/LgsIf.h>
+#include <stmts/LgsIfStmt.h>
 
 void SemaAnalyser::analyse() {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
@@ -82,8 +84,10 @@ void SemaAnalyser::visitParam(LgsParam* param) {
 void SemaAnalyser::visitStmt(LgsStmt* stmt) {
     if (const auto varDec = dynamic_cast<LgsVarDec*>(stmt)) {
         visitVarDec(varDec);
-    } else if (const auto ifStmt = dynamic_cast<LgsIf*>(stmt)) {
+    } else if (const auto ifStmt = dynamic_cast<LgsIfStmt*>(stmt)) {
         visitIfStmt(ifStmt);
+    } else if (const auto patternMatching = dynamic_cast<LgsPatternMatching*>(stmt)) {
+        visitPatternMatching(patternMatching);
     } else if (const auto loopStmt = dynamic_cast<LgsLoop*>(stmt)) {
         visitLoopStmt(loopStmt);
     } else if (const auto fieldDef = dynamic_cast<LgsAssignment*>(stmt)) {
@@ -128,13 +132,21 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
 }
 
 
-void SemaAnalyser::visitIfStmt(const LgsIf* ifStmt) {
+void SemaAnalyser::visitIfStmt(const LgsIfStmt* ifStmt) {
     visitExpr(ifStmt->ifCond);
     visitStmtBlock(ifStmt->ifStmtBlock);
     for (const auto& elseIfStmtBlock : ifStmt->elseIfStmtBlocks) {
         visitStmtBlock(elseIfStmtBlock);
     }
     visitStmtBlock(ifStmt->elseStmtBlock);
+}
+
+void SemaAnalyser::visitPatternMatching(const LgsPatternMatching* patternMatching) {
+    visitExpr(patternMatching->expr);
+    std::cout << patternMatching->expr->type->getName() << '\n';
+    for (const auto pattern : patternMatching->patterns) {
+
+    }
 }
 
 void SemaAnalyser::visitLoopStmt(LgsLoop* loopStmt) {

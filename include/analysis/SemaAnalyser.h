@@ -5,6 +5,7 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
+#include "stmts/LgsPatternMatching.h"
 #include "types/LgsObject.h"
 #include "stmts/LgsReturn.h"
 #include <loops/LgsForeachLoop.h>
@@ -19,7 +20,7 @@ class LgsSelection;
 class LgsFuncCall;
 class LgsBinaryExpr;
 class LgsArray;
-class LgsIf;
+class LgsIfStmt;
 class LgsAssignment;
 class LgsLoop;
 
@@ -43,7 +44,8 @@ public:
     void visitStmtBlock(const LgsStmtBlock* stmtBlock);
     void visitAssignment(const LgsAssignment* assignment);
     void visitVarDec(LgsVarDec* varDec);
-    void visitIfStmt(const LgsIf* ifStmt);
+    void visitIfStmt(const LgsIfStmt* ifStmt);
+    void visitPatternMatching(const LgsPatternMatching* patternMatching);
     void visitLoopStmt(LgsLoop* loopStmt);
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);
     void visitForeachLoop(const LgsForeachLoop* foreachLoop);

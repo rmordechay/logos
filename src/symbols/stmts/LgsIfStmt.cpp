@@ -1,7 +1,7 @@
-#include "stmts/LgsIf.h"
+#include "stmts/LgsIfStmt.h"
 #include "CodeGenerator.h"
 
-Value* LgsIf::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsIfStmt::createIRValue(CodeGenMetadata* metadata) {
     metadata->logosStack.enterScope();
     if (elseIfConds.size() > 0) {
         computeComplexIf(metadata);
@@ -13,7 +13,7 @@ Value* LgsIf::createIRValue(CodeGenMetadata* metadata) {
 }
 
 
-void LgsIf::computeSimpleIf(CodeGenMetadata* metadata) {
+void LgsIfStmt::computeSimpleIf(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto ifStartBlock = createBasicBlock(BB_IF_START);
     const auto ifEndBlock = createBasicBlock(BB_IF_END);
@@ -36,13 +36,13 @@ void LgsIf::computeSimpleIf(CodeGenMetadata* metadata) {
     startBlock(metadata, ifEndBlock);
 }
 
-void LgsIf::createElseBlock(CodeGenMetadata* metadata, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const {
+void LgsIfStmt::createElseBlock(CodeGenMetadata* metadata, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const {
     startBlock(metadata, elseBlock);
     elseStmtBlock->createIRValue(metadata);
     metadata->builder.CreateBr(ifEndBlock);
 }
 
-void LgsIf::computeComplexIf(CodeGenMetadata* metadata) {
+void LgsIfStmt::computeComplexIf(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto ifStartBlock = createBasicBlock(BB_IF_START);
     auto elseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK);
@@ -86,7 +86,7 @@ void LgsIf::computeComplexIf(CodeGenMetadata* metadata) {
     startBlock(metadata, ifEndBlock);
 }
 
-LgsIf::~LgsIf() {
+LgsIfStmt::~LgsIfStmt() {
     delete ifCond;
     delete ifStmtBlock;
     for (const auto &elseIfCond : elseIfConds) {
