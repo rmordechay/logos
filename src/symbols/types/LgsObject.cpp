@@ -1,4 +1,6 @@
 #include "types/LgsObject.h"
+
+#include "exprs/LgsNull.h"
 #include "funcs/LgsFuncImpl.h"
 #include "stmts/LgsField.h"
 
@@ -17,7 +19,8 @@ Type* LgsObject::getIRType() {
     return IRType;
 }
 
-LgsConst* LgsObject::getZeroValue() {
+LgsExpr* LgsObject::getZeroValue() {
+    if (nullable) return new LgsNull();
     // TODO return empty constructor
     return nullptr;
 }

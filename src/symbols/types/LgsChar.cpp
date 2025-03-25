@@ -1,5 +1,6 @@
 #include "types/LgsChar.h"
 
+#include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsCharConst.h"
 
 const string LgsChar::getName() const {
@@ -10,8 +11,9 @@ Type* LgsChar::getIRType() {
     return Type::getInt8Ty(context);
 }
 
-LgsConst* LgsChar::getZeroValue() {
-    return new LgsCharConst('a');
+LgsExpr* LgsChar::getZeroValue() {
+    if (nullable) return new LgsNull();
+    return new LgsCharConst('0');
 }
 
 LgsType* LgsChar::inferBinaryType(LgsType* other) {

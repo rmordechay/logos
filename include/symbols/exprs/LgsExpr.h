@@ -3,7 +3,6 @@
 #include "LgsValue.h"
 #include <types/LgsType.h>
 
-
 class LgsExpr : virtual public LgsValue {
 public:
     LgsType* type = nullptr;

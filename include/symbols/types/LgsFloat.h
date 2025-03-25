@@ -10,7 +10,7 @@ public:
 
     const string getName() const override;
     Type* getIRType() override;
-    LgsConst* getZeroValue() override;
+    LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;
     ~LgsFloat() override = default;

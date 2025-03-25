@@ -1,5 +1,6 @@
 #include "types/LgsInt.h"
 
+#include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 
 const string LgsInt::getName() const {
@@ -10,7 +11,8 @@ Type* LgsInt::getIRType() {
     return Type::getInt32Ty(context);
 }
 
-LgsConst* LgsInt::getZeroValue() {
+LgsExpr* LgsInt::getZeroValue() {
+    if (nullable) return new LgsNull();
     return new LgsIntConst(0);
 }
 

@@ -1,5 +1,6 @@
 #include "types/LgsFloat.h"
 
+#include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 
 const string LgsFloat::getName() const {
@@ -10,7 +11,8 @@ Type* LgsFloat::getIRType() {
     return Type::getFloatTy(context);
 }
 
-LgsConst* LgsFloat::getZeroValue() {
+LgsExpr* LgsFloat::getZeroValue() {
+    if (nullable) return new LgsNull();
     return new LgsFloatConst(0.0);
 }
 

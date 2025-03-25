@@ -3,7 +3,7 @@
 #include <ranges>
 #include <llvm/Support/FileSystem.h>
 
-void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* mainFile) {
+void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* mainFile, const bool writeToFile) {
     const auto module = createModule(LOGOS_MAIN_FILE);
     auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
 
@@ -11,12 +11,14 @@ void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* main
         func->createIRValue(&metadata);
     }
     mainFile->mainFunc->createIRValue(&metadata);
-
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
-    // writeIRToFile(metadata.currentModule, buildDir, LOGOS_MAIN_FILE);
+
+    if (writeToFile) {
+        writeIRToFile(metadata.currentModule, buildDir, LOGOS_MAIN_FILE);
+    }
 }
 
-void CodeGenerator::generateModule(const path& buildDir, LgsObject* obj) {
+void CodeGenerator::generateModule(const path& buildDir, LgsObject* obj, const bool writeToFile) {
     const auto objName = obj->getName();
     const auto module = createModule(objName);
     auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
@@ -24,7 +26,10 @@ void CodeGenerator::generateModule(const path& buildDir, LgsObject* obj) {
     for (const auto& [_, method] : obj->methods) {
         method->createIRValue(&metadata);
     }
-    // writeIRToFile(metadata.currentModule, buildDir, objName);
+
+    if (writeToFile) {
+        writeIRToFile(metadata.currentModule, buildDir, objName);
+    }
 }
 
 Module* CodeGenerator::createModule(const string& objName) {

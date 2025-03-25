@@ -1,5 +1,6 @@
 #include "types/LgsBool.h"
 
+#include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
 
 const string LgsBool::getName() const {
@@ -10,7 +11,8 @@ Type* LgsBool::getIRType() {
     return Type::getInt1Ty(context);
 }
 
-LgsConst* LgsBool::getZeroValue() {
+LgsExpr* LgsBool::getZeroValue() {
+    if (nullable) return new LgsNull();
     return new LgsBoolConst(false);
 }
 

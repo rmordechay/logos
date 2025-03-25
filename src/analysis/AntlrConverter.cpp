@@ -1,6 +1,7 @@
 #include "analysis/AntlrConverter.h"
 
 #include "LgsGlobals.h"
+#include "exprs/LgsNull.h"
 #include "exprs/binary/LgsBinaryExpr.h"
 #include "exprs/binary/LgsOperator.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
@@ -288,12 +289,13 @@ LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
 
 LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto variable = ctx->VARIABLE()) return getVariable(variable->getText(), ctx);
-    if (const auto constant = ctx->constant()) return getConstant(constant);
-    if (const auto selection = ctx->selection()) return getSelection(selection);
-    if (const auto constructor = ctx->constructor()) return getInstance(constructor);
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
+    if (const auto constructor = ctx->constructor()) return getInstance(constructor);
+    if (const auto constant = ctx->constant()) return getConstant(constant);
     if (const auto array = ctx->array()) return getArray(array);
     if (const auto arrayIndex = ctx->arrayIndex()) return getArrayIndex(arrayIndex);
+    if (const auto selection = ctx->selection()) return getSelection(selection);
+    if (ctx->NULL_()) return new LgsNull();
     return nullptr;
 }
 

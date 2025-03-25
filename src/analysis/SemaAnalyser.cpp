@@ -1,5 +1,6 @@
 #include "SemaAnalyser.h"
 #include "LgsErrors.h"
+#include "exprs/LgsNull.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
 #include "types/LgsArrayType.h"
@@ -127,16 +128,18 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     const auto userType = varDec->userType;
     const auto expr = varDec->expr;
-    if (expr) {
+    if (!expr) {
+        varDec->type = userType;
+        varDec->expr = varDec->type->getZeroValue();
+    } else if (dynamic_cast<LgsNull*>(expr) && userType->nullable) {
+        varDec->type = userType;
+    } else {
         visitExpr(expr);
         if (!checkExprType(expr, userType)) return;
         varDec->type = expr->type;
-    } else {
-        varDec->type = userType;
     }
     addLocalSymbol(varDec->name, LgsSymbol(VAR_DEC, varDec));
 }
-
 
 void SemaAnalyser::visitIfStmt(const LgsIfStmt* ifStmt) {
     visitExpr(ifStmt->ifCond);
@@ -380,10 +383,12 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     }
 }
 
-bool SemaAnalyser::checkExprType(const LgsExpr* expr, const LgsType* otherType) {
-    if (expr && otherType && !otherType->equals(expr->type)) {
-        handleError(E10001, &expr->location, {otherType->getName(), expr->type->getName()});
-        return false;
+bool SemaAnalyser::checkExprType(LgsExpr* expr, LgsType* userType) {
+    if (expr && userType) {
+        if (expr->type && !expr->type->equals(userType)) {
+            handleError(E10001, &expr->location, {userType->getName(), expr->type->getName()});
+            return false;
+        }
     }
     return true;
 }

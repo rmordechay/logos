@@ -5,6 +5,7 @@
 #include <map>
 #include <llvm/IR/Type.h>
 
+class LgsExpr;
 using namespace std;
 using namespace llvm;
 
@@ -21,10 +22,10 @@ public:
 
     LgsField* getField(const string& name);
     LgsMethodImpl* getMethod(const string& name);
-    virtual const string getName() const = 0;
     virtual Type* getIRType();
     virtual Type* getIRType(int size);
-    virtual LgsConst* getZeroValue() = 0;
+    virtual LgsExpr* getZeroValue() = 0;
+    virtual const string getName() const = 0;
     virtual bool equals(LgsType* other) const = 0;
     virtual LgsType* inferBinaryType(LgsType* other) = 0;
     virtual ~LgsType() = default;
@@ -36,7 +37,7 @@ public:
 
     explicit LgsUnknownType(const string& name) : name(name) {}
     const string getName() const override { assert(false && "unknown type should not be called"); }
-    LgsConst* getZeroValue() override { assert(false && "unknown type should not be called"); }
+    LgsExpr* getZeroValue() override { assert(false && "unknown type should not be called"); }
     bool equals(LgsType* other) const override { assert(false && "unknown type should not be called"); }
     LgsType* inferBinaryType(LgsType* other) override { assert(false && "unknown type should not be called"); }
 };

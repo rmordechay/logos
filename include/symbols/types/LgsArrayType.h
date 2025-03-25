@@ -12,7 +12,7 @@ public:
     explicit LgsArrayType(LgsType* underlyingType) : underlyingType(underlyingType) {}
     const string getName() const override;
     Type* getIRType(int size) override;
-    LgsConst* getZeroValue() override;
+    LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;
     ~LgsArrayType() override = default;

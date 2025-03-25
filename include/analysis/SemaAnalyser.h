@@ -69,7 +69,7 @@ public:
     void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
 
-    bool checkExprType(const LgsExpr* expr, const LgsType* otherType);
+    bool checkExprType(LgsExpr* expr, LgsType* userType);
     void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     LgsFunc* getFunc(const LgsFuncCall* funcCall);

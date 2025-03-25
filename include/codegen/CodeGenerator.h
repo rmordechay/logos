@@ -7,12 +7,10 @@
 class LgsFile;
 class LgsValue;
 
-using LogosGlobals = const std::map<std::string, LgsSymbol>&;
-
 class CodeGenerator {
 public:
-    static void generateModule(const path& buildDir, const LgsMainFile* mainFile);
-    static void generateModule(const path& buildDir, LgsObject* obj);
+    static void generateModule(const path& buildDir, const LgsMainFile* mainFile, bool writeToFile = true);
+    static void generateModule(const path& buildDir, LgsObject* obj, bool writeToFile = true);
     static Module* createModule(const string& objName);
     static void writeIRToFile(const Module* module, const path& buildDir, const path& name);
     ~CodeGenerator() = default;

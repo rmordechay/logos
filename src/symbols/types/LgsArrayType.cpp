@@ -10,12 +10,15 @@ Type* LgsArrayType::getIRType(const int size) {
     return ArrayType::get(underlyingType->getIRType(), size);
 }
 
-LgsConst* LgsArrayType::getZeroValue() {
+LgsExpr* LgsArrayType::getZeroValue() {
     assert(false && "not implemented");
 }
 
 bool LgsArrayType::equals(LgsType* other) const {
-    assert(false && "not implemented");
+    if (const auto otherArrayType = dynamic_cast<LgsArrayType*>(other)) {
+        return underlyingType->equals(otherArrayType->underlyingType);
+    }
+    return false;
 }
 
 LgsType* LgsArrayType::inferBinaryType(LgsType* other) {
