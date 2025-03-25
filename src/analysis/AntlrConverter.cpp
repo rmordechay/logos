@@ -101,7 +101,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
     for (const auto& func : ctx->funcImplementation()) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         const auto method = getMethodImpl(func, obj);
-        obj->methods[funcName] = method;
+        obj->methods[funcName] = {method};
     }
     globals.addSymbol(obj->name, LgsSymbol(OBJECT, obj));
     return obj;

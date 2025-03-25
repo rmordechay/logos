@@ -21,8 +21,10 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
         if (const auto field = currentExpr->type->getField(nextExpr->getName())) {
             const auto value = field->getIRValue(metadata);
             nextExpr->setIRValue(value);
-        } else if (const auto method = currentExpr->type->getMethod(nextExpr->getName())) {
-            const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr);
+            continue;
+        }
+        if (const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr)) {
+            const auto method = currentExpr->type->getMethod(methodCall);
             const auto value = method->call(metadata, methodCall->args);
             nextExpr->setIRValue(value);
         }

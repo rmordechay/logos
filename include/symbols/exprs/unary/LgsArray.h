@@ -10,6 +10,7 @@ public:
     vector<LgsExpr*> elements;
 
     explicit LgsArray() : LgsUnaryExpr(nullptr) {}
+    explicit LgsArray(LgsType* type) : LgsUnaryExpr(type) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     size_t size() override;
     ~LgsArray() override = default;

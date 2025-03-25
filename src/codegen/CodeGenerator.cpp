@@ -24,7 +24,9 @@ void CodeGenerator::generateModule(const path& buildDir, LgsObject* obj, const b
     auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
 
     for (const auto& [_, method] : obj->methods) {
-        method->createIRValue(&metadata);
+        for (const auto& overload : method) {
+            overload->createIRValue(&metadata);
+        }
     }
 
     if (writeToFile) {

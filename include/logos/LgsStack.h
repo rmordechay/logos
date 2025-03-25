@@ -12,7 +12,6 @@ struct LgsStackFrame {
     map<string, LgsSymbol> symbols;
 };
 
-
 class LgsStack : stack<LgsStackFrame> {
 public:
     mutex mtx;

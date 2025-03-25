@@ -52,7 +52,9 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
         visitField(field);
     }
     for (const auto& [_, method] : obj->methods) {
-        visitMethodImpl(method, obj);
+        for (const auto& overload : method) {
+            visitMethodImpl(overload, obj);
+        }
     }
 }
 
@@ -274,8 +276,10 @@ void SemaAnalyser::visitSelection(LgsSelection* selection) {
         const auto nextExpr = exprs[i + 1];
         if (const auto field = currentExpr->type->getField(nextExpr->getName())) {
             setExprType(nextExpr, field->type);
-        } else if (const auto method = currentExpr->type->getMethod(nextExpr->getName())) {
-            const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr);
+            continue;
+        }
+        if (const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr)) {
+            const auto method = currentExpr->type->getMethod(methodCall);
             methodCall->func = method;
             methodCall->args.insert(methodCall->args.begin(), currentExpr);
             setExprType(nextExpr, method->type);

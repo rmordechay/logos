@@ -1,5 +1,6 @@
 #include "types/LgsType.h"
 
+#include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
 
@@ -11,10 +12,14 @@ LgsField* LgsType::getField(const string& name) {
     return nullptr;
 }
 
-LgsMethodImpl* LgsType::getMethod(const string& name) {
-    const auto it = methods.find(name);
-    if (it != methods.end()) {
-        return it->second;
+LgsMethodImpl* LgsType::getMethod(const LgsFuncCall* funcCall) {
+    const auto func = methods.find(funcCall->name);
+    if (func != methods.end()) {
+        for (const auto& overload : func->second) {
+            if (overload->composedName == funcCall->composedName) {
+                return overload;
+            }
+        }
     }
     return nullptr;
 }

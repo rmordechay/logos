@@ -5,10 +5,11 @@
 #include <map>
 #include <llvm/IR/Type.h>
 
-class LgsExpr;
 using namespace std;
 using namespace llvm;
 
+class LgsExpr;
+class LgsFuncCall;
 class LgsConstExpr;
 class LgsField;
 class LgsMethodImpl;
@@ -18,10 +19,10 @@ public:
     bool nullable = false;
     // TODO make values const
     map<string, LgsField*> fields;
-    map<string, LgsMethodImpl*> methods;
+    map<string, vector<LgsMethodImpl*>> methods;
 
     LgsField* getField(const string& name);
-    LgsMethodImpl* getMethod(const string& name);
+    LgsMethodImpl* getMethod(const LgsFuncCall* funcCall);
     virtual Type* getIRType();
     virtual Type* getIRType(int size);
     virtual LgsExpr* getZeroValue() = 0;

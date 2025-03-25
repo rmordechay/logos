@@ -1,14 +1,19 @@
 #ifndef LOGOSARRAYTYPE_H
 #define LOGOSARRAYTYPE_H
 #include "LgsType.h"
+#include "funcs/LgsMethodImpl.h"
 
 struct CodeGenMetadata;
 
 class LgsArrayType final : public LgsType {
 public:
     LgsType* underlyingType = nullptr;
+    LgsMethodImpl arrayTypeAddFunc = LgsMethodImpl("add", nullptr, "name", {new LgsParam("n", underlyingType)});
 
-    LgsArrayType() = default;
+    LgsArrayType() {
+        methods[arrayTypeAddFunc.name] = {&arrayTypeAddFunc};
+    }
+
     explicit LgsArrayType(LgsType* underlyingType) : underlyingType(underlyingType) {}
     const string getName() const override;
     Type* getIRType(int size) override;

@@ -1,5 +1,5 @@
 #include "types/LgsArrayType.h"
-
+#include "exprs/unary/LgsArray.h"
 #include <llvm/IR/DerivedTypes.h>
 
 const string LgsArrayType::getName() const {
@@ -11,7 +11,7 @@ Type* LgsArrayType::getIRType(const int size) {
 }
 
 LgsExpr* LgsArrayType::getZeroValue() {
-    assert(false && "not implemented");
+    return new LgsArray(this);
 }
 
 bool LgsArrayType::equals(LgsType* other) const {
