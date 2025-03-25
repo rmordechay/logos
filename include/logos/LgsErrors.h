@@ -28,6 +28,7 @@ inline LgsError E10010{.errCode = ++errCodeStart, .msg = "Current path is not a 
 inline LgsError E10011{.errCode = ++errCodeStart, .msg = "'%s' is already declared at line %s."};
 inline LgsError E10012{.errCode = ++errCodeStart, .msg = "Function '%s' is not defined."};
 inline LgsError E10013{.errCode = ++errCodeStart, .msg = "Function '%s' is not defined with this overload. Declared overloads:%s"};
+inline LgsError E10014{.errCode = ++errCodeStart, .msg = "Pattern of type '%s' does not match base type '%s'."};
 
 
 #endif //LOGOSERRORS_H

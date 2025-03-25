@@ -142,10 +142,15 @@ void SemaAnalyser::visitIfStmt(const LgsIfStmt* ifStmt) {
 }
 
 void SemaAnalyser::visitPatternMatching(const LgsPatternMatching* patternMatching) {
-    visitExpr(patternMatching->expr);
-    std::cout << patternMatching->expr->type->getName() << '\n';
-    for (const auto pattern : patternMatching->patterns) {
-
+    const auto baseExpr = patternMatching->expr;
+    visitExpr(baseExpr);
+    const auto baseExprType = baseExpr->type;
+    for (const auto patternExpr : patternMatching->patterns) {
+        visitExpr(patternExpr);
+        if (!patternExpr->type->equals(baseExprType)) {
+            handleError(E10014, &patternExpr->location, {patternExpr->type->getName(), baseExprType->getName()});
+            return;
+        }
     }
 }
 

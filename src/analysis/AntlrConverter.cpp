@@ -261,7 +261,7 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
 LgsStmt* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
     const auto lgsEnum = new LgsEnum();
     for (size_t i = 0; i < ctx->enumField().size(); ++i) {
-        const auto& enumField = ctx->enumField()[i];
+        const auto enumField = ctx->enumField()[i];
         const auto enumName = enumField->CONST()->getText();
         const auto enumText = enumField->STRING()->getText();
         EnumField field(i, enumName, enumText);

@@ -8,7 +8,7 @@
 using testing::StartsWith;
 using testing::HasSubstr;
 
-class LoopCodegenTests : public testing::Test {
+class CodegenForeachLoopTests : public testing::Test {
 protected:
     path dataDir = "../tests/codegen/loops/";
     Logos logos = Logos(dataDir);
@@ -22,7 +22,7 @@ protected:
     }
 };
 
-TEST_F(LoopCodegenTests, TestCodegenForeachLoopWorks) {
+TEST_F(CodegenForeachLoopTests, TestLoopWorks) {
     const auto code = R"(
     main() {
         for i in [1, 2, 3, 4] {
