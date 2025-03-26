@@ -10,10 +10,10 @@ struct CodeGenMetadata;
 class LgsArrayType final : public LgsType {
 public:
     LgsType* underlyingType = nullptr;
-    LgsMethodImpl arrayTypeAddFunc = LgsMethodImpl("add", new LgsVoid(), "ArrayType", {new LgsParam("newElement", new LgsInt())});
+    LgsMethodImpl arrayTypeAddFunc = LgsMethodImpl("add", new LgsVoid(), "", {new LgsParam("newElement", new LgsInt())});
 
     LgsArrayType() {
-        methods[arrayTypeAddFunc.name] = {&arrayTypeAddFunc};
+        methods[arrayTypeAddFunc.signature.name] = {&arrayTypeAddFunc};
     }
 
     explicit LgsArrayType(LgsType* underlyingType) : underlyingType(underlyingType) {}

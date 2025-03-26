@@ -30,10 +30,10 @@ LgsSymbol* LgsStack::getSymbol(const string& name) {
 }
 
 LgsFunc* LgsStack::getFunc(const LgsFuncCall* funcCall) const {
-    const auto func = globals.funcs.find(funcCall->name);
+    const auto func = globals.funcs.find(funcCall->signature.name);
     if (func != globals.funcs.end()) {
         for (const auto& overload : func->second) {
-            if (overload->composedName == funcCall->composedName) {
+            if (overload->signature.composedName == funcCall->signature.composedName) {
                 return overload;
             }
         }

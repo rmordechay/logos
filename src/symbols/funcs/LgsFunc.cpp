@@ -1,11 +1,14 @@
 #include "funcs/LgsFunc.h"
 
 void LgsFunc::setComposedName() {
-    vector<string> paramTypeNames;
-    for (const auto& param : params) {
-        paramTypeNames.emplace_back(param->type->getName());
+    if (signature.name == LOGOS_MAIN_FUNC) {
+        signature.composedName = signature.name;
+        return;
     }
-    composedName = getComposedName(name, paramTypeNames);
+    for (const auto& param : params) {
+        signature.argTypeNames.emplace_back(param->type->getName());
+    }
+    signature.setComposedName();
 }
 
 void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
@@ -19,8 +22,8 @@ void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
 
 json LgsFunc::asJson() {
     json tree;
-    tree["name"] = name;
-    tree["returnType"] = type->getName();
+    tree["name"] = signature.name;
+    tree["returnType"] = signature.type->getName();
     for (const auto& param : params) {
         tree["params"].emplace_back(param->asJson());
     }
@@ -28,19 +31,6 @@ json LgsFunc::asJson() {
     return tree;
 }
 
-string LgsFunc::getComposedName(const string& name, const vector<string>& paramTypeNames) {
-    if (name == LOGOS_MAIN_FUNC) return name;
-    auto composedName = name;
-    for (int i = 0; i < paramTypeNames.size(); ++i) {
-        composedName += "_" + paramTypeNames[i];
-    }
-    return composedName;
-}
-
 LgsFunc::~LgsFunc() {
-    delete type;
-    for (const auto param : params) {
-        delete param;
-    }
     delete stmtBlock;
 }

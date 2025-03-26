@@ -285,7 +285,7 @@ void SemaAnalyser::visitSelection(LgsSelection* selection) {
             const auto method = currentExpr->type->getMethod(methodCall);
             methodCall->func = method;
             methodCall->args.insert(methodCall->args.begin(), currentExpr);
-            setExprType(nextExpr, method->type);
+            setExprType(nextExpr, method->signature.type);
         }
     }
     setExprType(selection, selection->lastExpr()->type);
@@ -332,7 +332,7 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     const auto func = getFunc(funcCall);
     if (!func) return;
     funcCall->func = func;
-    setExprType(funcCall, func->type);
+    setExprType(funcCall, func->signature.type);
 }
 
 void SemaAnalyser::setVariableType(LgsVariable* variable) {
@@ -351,10 +351,10 @@ void SemaAnalyser::setVariableType(LgsVariable* variable) {
 }
 
 void SemaAnalyser::setFuncType(LgsFunc* func) {
-    if (dynamic_cast<LgsUnknownType*>(func->type)) {
-        const auto symbol = logosStack.getSymbol(func->type->getName());
-        delete func->type;
-        func->type = symbol->object;
+    if (dynamic_cast<LgsUnknownType*>(func->signature.type)) {
+        const auto symbol = logosStack.getSymbol(func->signature.type->getName());
+        delete func->signature.type;
+        func->signature.type = symbol->object;
     }
 }
 
@@ -394,7 +394,7 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     }
 }
 
-bool SemaAnalyser::checkExprType(LgsExpr* expr, LgsType* userType) {
+bool SemaAnalyser::checkExprType(const LgsExpr* expr, LgsType* userType) {
     if (expr && userType) {
         if (expr->type && !expr->type->equals(userType)) {
             handleError(E10001, &expr->location, {userType->getName(), expr->type->getName()});
@@ -426,7 +426,7 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
 LgsFunc* SemaAnalyser::getFunc(const LgsFuncCall* funcCall) {
     const auto symbol = logosStack.getFunc(funcCall);
     if (!symbol) {
-        handleError(E10006, &funcCall->location, {funcCall->name});
+        handleError(E10006, &funcCall->location, {funcCall->signature.name});
     }
     return symbol;
 }

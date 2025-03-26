@@ -7,7 +7,8 @@ public:
     string parentName;
 
     LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam*>& params = {}) : LgsFunc(name, funcType, params), parentName(parentName) {
-        composedName = parentName + "_" + composedName;
+        signature.parentName = parentName;
+        setComposedName();
     }
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override;
     void setIRFunc(CodeGenMetadata* metadata) override;

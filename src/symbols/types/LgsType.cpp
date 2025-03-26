@@ -13,10 +13,12 @@ LgsField* LgsType::getField(const string& name) {
 }
 
 LgsMethodImpl* LgsType::getMethod(const LgsFuncCall* funcCall) {
-    const auto method = methods.find(funcCall->name);
+    const auto method = methods.find(funcCall->signature.name);
     if (method != methods.end()) {
         for (const auto& overload : method->second) {
-            if (overload->composedName == funcCall->composedName) {
+            std::cout << overload->signature.composedName << '\n';
+            std::cout << funcCall->signature.composedName << '\n';
+            if (overload->signature.composedName == funcCall->signature.composedName) {
                 return overload;
             }
         }

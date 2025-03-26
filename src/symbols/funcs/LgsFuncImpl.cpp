@@ -4,7 +4,7 @@
 
 Value* LgsFuncImpl::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     if (!IRFunc) setIRFunc(metadata);
-    const auto symbol = metadata->logosStack.getSymbol(composedName);
+    const auto symbol = metadata->logosStack.getSymbol(signature.composedName);
     vector<Value*> paramValues;
     for (const auto& arg : args) {
         const auto argValue = arg->getIRValue(metadata);
@@ -19,8 +19,8 @@ void LgsFuncImpl::setIRFunc(CodeGenMetadata* metadata) {
         IRParamsTypes.emplace_back(paramIRType);
     }
 
-    const auto rt = FunctionType::get(type->getIRType(), IRParamsTypes, false);
-    IRFunc = Function::Create(rt, Function::ExternalLinkage, composedName, metadata->currentModule);
+    const auto rt = FunctionType::get(signature.type->getIRType(), IRParamsTypes, false);
+    IRFunc = Function::Create(rt, Function::ExternalLinkage, signature.composedName, metadata->currentModule);
     metadata->logosStack.currentFunc = IRFunc;
     if (params.empty()) return;
 
