@@ -3,6 +3,7 @@
 #include <map>
 #include <llvm/IR/Module.h>
 #include <filesystem>
+#include <llvm/Linker/Linker.h>
 
 using namespace llvm;
 using namespace std;
@@ -22,7 +23,7 @@ public:
 
     void link(const map<string, Module*>& modules) const;
     vector<const char*> getLinkerOpts() const;
-    unique_ptr<Module> getStdlibModule() const;
+    void linkStdlib(const string& path, Linker* linker) const;
     ~LgsLinker() = default;
 };
 

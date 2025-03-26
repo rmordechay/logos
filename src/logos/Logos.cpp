@@ -113,13 +113,6 @@ void Logos::loadBuiltinFuncs() const {
     };
 }
 
-inline TargetMachine* getTargetMachine() {
-    string error;
-    const auto targetTriple = sys::getDefaultTargetTriple();
-    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    return target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
-}
-
 inline void initLLVM() {
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
@@ -128,7 +121,6 @@ inline void initLLVM() {
     InitializeAllTargets();
     InitializeAllTargetInfos();
     string error;
-    const auto targetTriple = sys::getDefaultTargetTriple();
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }

@@ -6,10 +6,12 @@
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Target/TargetMachine.h>
 #include <filesystem>
+#include <llvm/TargetParser/Host.h>
 
 inline LLVMContext context;
 inline map<string, Module*> modules;
 inline TargetMachine* targetMachine = nullptr;
+inline string targetTriple = sys::getDefaultTargetTriple();
 
 struct CodeGenMetadata {
     LgsStack logosStack;

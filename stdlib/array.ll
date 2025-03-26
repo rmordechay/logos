@@ -42,7 +42,7 @@ define ptr @init_arr() {
     ret ptr %arr_ptr
 }
 
-define void @add_element(ptr %arr_ptr, i32 %new_elem) {
+define void @add_Int(ptr %arr_ptr, i32 %new_elem) {
 entry:
     %cap_ptr = call ptr @get_cap(ptr %arr_ptr)
     %size_ptr = call ptr @get_size(ptr %arr_ptr)
@@ -79,23 +79,23 @@ define void @free_arr(ptr %arr_ptr) {
     ret void
 }
 
-define i32 @main() {
-    %arr_ptr = call ptr @init_arr()
-    call ptr @add_element(ptr %arr_ptr, i32 23)
-    call ptr @add_element(ptr %arr_ptr, i32 34)
-    call ptr @add_element(ptr %arr_ptr, i32 23)
-    call ptr @add_element(ptr %arr_ptr, i32 213)
-    call ptr @add_element(ptr %arr_ptr, i32 8356)
-
-    %data_ptr = call ptr @get_data(ptr %arr_ptr)
-    %data = load ptr, ptr %data_ptr
-
-    %index = add i32 0, 3
-    %element_ptr = getelementptr i32, ptr %data, i32 %index
-    %element = load i32, ptr %element_ptr
-
-    call i32(ptr, ...) @printf(ptr @str, i32 %element)
-
-    call ptr @free_arr(ptr %arr_ptr)
-    ret i32 0
-}
+;define i32 @main() {
+;    %arr_ptr = call ptr @init_arr()
+;    call ptr @add_element(ptr %arr_ptr, i32 23)
+;    call ptr @add_element(ptr %arr_ptr, i32 34)
+;    call ptr @add_element(ptr %arr_ptr, i32 23)
+;    call ptr @add_element(ptr %arr_ptr, i32 213)
+;    call ptr @add_element(ptr %arr_ptr, i32 8356)
+;
+;    %data_ptr = call ptr @get_data(ptr %arr_ptr)
+;    %data = load ptr, ptr %data_ptr
+;
+;    %index = add i32 0, 3
+;    %element_ptr = getelementptr i32, ptr %data, i32 %index
+;    %element = load i32, ptr %element_ptr
+;
+;    call i32(ptr, ...) @printf(ptr @str, i32 %element)
+;
+;    call ptr @free_arr(ptr %arr_ptr)
+;    ret i32 0
+;}

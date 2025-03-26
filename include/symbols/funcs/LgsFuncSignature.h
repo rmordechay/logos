@@ -22,6 +22,7 @@ struct LgsFuncSignature {
         }
         composedName = ss.str();
     }
+
     ~LgsFuncSignature() {
         delete type;
     }

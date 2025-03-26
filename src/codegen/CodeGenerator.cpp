@@ -36,7 +36,6 @@ void CodeGenerator::generateModule(const path& buildDir, LgsObject* obj, const b
 
 Module* CodeGenerator::createModule(const string& objName) {
     const auto module = new Module(objName, context);
-    const auto targetTriple = sys::getDefaultTargetTriple();
     module->setTargetTriple(targetTriple);
     module->setDataLayout(targetMachine->createDataLayout());
     modules[objName] = module;

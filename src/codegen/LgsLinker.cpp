@@ -10,18 +10,19 @@
 #include <llvm/Support/FileSystem.h>
 
 void LgsLinker::link(const std::map<std::string, Module*>& modules) const {
-    auto stdlibModule = getStdlibModule();
     const auto mainModule = modules.find(LOGOS_MAIN_FILE)->second;
     Linker linker(*mainModule);
-    linker.linkInModule(unique_ptr(std::move(stdlibModule)));
+
+    linkStdlib("../stdlib/lgslib.ll", &linker);
+    linkStdlib("../stdlib/array.ll", &linker);
     for (const auto& [name, file] : modules) {
         if (name == LOGOS_MAIN_FILE) continue;
         linker.linkInModule(unique_ptr<Module>(std::move(file)));
     }
 
-    error_code EC;
+    error_code ec;
     legacy::PassManager pass;
-    raw_fd_ostream outputStream(objFilePath.c_str(), EC, sys::fs::OF_None);
+    raw_fd_ostream outputStream(objFilePath.c_str(), ec, sys::fs::OF_None);
     targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
     pass.run(*mainModule);
     outputStream.flush();
@@ -29,13 +30,12 @@ void LgsLinker::link(const std::map<std::string, Module*>& modules) const {
     lld::macho::link(getLinkerOpts(), outs(), errs(), false, false);
 }
 
-std::unique_ptr<Module> LgsLinker::getStdlibModule() const {
+void LgsLinker::linkStdlib(const string& path, Linker* linker) const {
     SMDiagnostic EC;
-    std::unique_ptr<Module> stdlibModule = parseIRFile(LOGOS_STDLIB, EC, context);
-    const auto targetTriple = sys::getDefaultTargetTriple();
+    auto stdlibModule = parseIRFile(path, EC, context);
     stdlibModule->setTargetTriple(targetTriple);
     stdlibModule->setDataLayout(targetMachine->createDataLayout());
-    return stdlibModule;
+    linker->linkInModule(unique_ptr(std::move(stdlibModule)));
 }
 
 vector<const char*> LgsLinker::getLinkerOpts() const {

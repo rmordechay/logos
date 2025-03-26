@@ -17,7 +17,6 @@ using namespace std;
 #define LOGOS_SELF "self"
 #define OBJECT_FILE "output.o"
 #define EXECUTABLE_FILE "output"
-#define LOGOS_STDLIB "../stdlib/lgslib.ll"
 
 #if defined(_WIN32)
     #define OS_NAME "Windows"
