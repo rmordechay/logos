@@ -1,14 +1,16 @@
 #ifndef LOGOSARRAYTYPE_H
 #define LOGOSARRAYTYPE_H
+#include "LgsInt.h"
 #include "LgsType.h"
 #include "funcs/LgsMethodImpl.h"
 
+class LgsInt;
 struct CodeGenMetadata;
 
 class LgsArrayType final : public LgsType {
 public:
     LgsType* underlyingType = nullptr;
-    LgsMethodImpl arrayTypeAddFunc = LgsMethodImpl("add", nullptr, "name", {new LgsParam("n", underlyingType)});
+    LgsMethodImpl arrayTypeAddFunc = LgsMethodImpl("add", new LgsVoid(), "ArrayType", {new LgsParam("newElement", new LgsInt())});
 
     LgsArrayType() {
         methods[arrayTypeAddFunc.name] = {&arrayTypeAddFunc};

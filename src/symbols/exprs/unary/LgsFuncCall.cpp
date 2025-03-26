@@ -10,16 +10,12 @@ Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
     return func->call(metadata, args);
 }
 
-vector<string> LgsFuncCall::getArgTypeNames() const {
-    vector<string> names;
-    for (const auto& arg : args) {
-        names.emplace_back(arg->type->getName());
-    }
-    return names;
-}
-
 void LgsFuncCall::setComposedName() {
-    composedName = LgsFunc::getComposedName(name, getArgTypeNames());
+    vector<string> argTypeNames;
+    for (const auto& arg : args) {
+        argTypeNames.emplace_back(arg->type->getName());
+    }
+    composedName = LgsFunc::getComposedName(name, argTypeNames);
 }
 
 LgsFuncCall::~LgsFuncCall() {

@@ -13,7 +13,6 @@ public:
     explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
     string getName() override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    vector<string> getArgTypeNames() const;
     void setComposedName();
     ~LgsFuncCall() override;
 };

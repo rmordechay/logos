@@ -1,22 +1,11 @@
 #include "funcs/LgsFunc.h"
 
-vector<string> LgsFunc::getParamTypeNames() const {
-    vector<string> names;
+void LgsFunc::setComposedName() {
+    vector<string> paramTypeNames;
     for (const auto& param : params) {
-        names.emplace_back(param->type->getName());
+        paramTypeNames.emplace_back(param->type->getName());
     }
-    return names;
-}
-
-string LgsFunc::getComposedName(const string& name, const vector<string>& paramTypeNames) {
-    if (name == LOGOS_MAIN_FUNC) {
-        return name;
-    }
-    auto composedName = name;
-    for (int i = 0; i < paramTypeNames.size(); ++i) {
-        composedName += "_" + paramTypeNames[i];
-    }
-    return composedName;
+    composedName = getComposedName(name, paramTypeNames);
 }
 
 void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
@@ -37,6 +26,15 @@ json LgsFunc::asJson() {
     }
     tree["stmts"] = stmtBlock->asJson();
     return tree;
+}
+
+string LgsFunc::getComposedName(const string& name, const vector<string>& paramTypeNames) {
+    if (name == LOGOS_MAIN_FUNC) return name;
+    auto composedName = name;
+    for (int i = 0; i < paramTypeNames.size(); ++i) {
+        composedName += "_" + paramTypeNames[i];
+    }
+    return composedName;
 }
 
 LgsFunc::~LgsFunc() {

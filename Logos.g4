@@ -55,6 +55,7 @@ statement:
     |   returnStatement
     |   enumDeclaration
     |   funcCall
+    |   selection
     ;
 
 statementsBlock:

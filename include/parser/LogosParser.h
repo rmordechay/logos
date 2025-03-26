@@ -270,6 +270,7 @@ public:
     ReturnStatementContext *returnStatement();
     EnumDeclarationContext *enumDeclaration();
     FuncCallContext *funcCall();
+    SelectionContext *selection();
 
    
   };

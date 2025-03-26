@@ -13,9 +13,9 @@ LgsField* LgsType::getField(const string& name) {
 }
 
 LgsMethodImpl* LgsType::getMethod(const LgsFuncCall* funcCall) {
-    const auto func = methods.find(funcCall->name);
-    if (func != methods.end()) {
-        for (const auto& overload : func->second) {
+    const auto method = methods.find(funcCall->name);
+    if (method != methods.end()) {
+        for (const auto& overload : method->second) {
             if (overload->composedName == funcCall->composedName) {
                 return overload;
             }

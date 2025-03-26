@@ -83,7 +83,7 @@ void logosParserInitialize() {
     }
   );
   static const int32_t serializedATNSegment[] = {
-  	4,1,59,483,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
+  	4,1,59,484,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
   	7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,2,14,7,
   	14,2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,7,20,2,21,7,
   	21,2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,26,2,27,7,27,2,28,7,
@@ -96,43 +96,43 @@ void logosParserInitialize() {
   	3,10,3,12,3,140,9,3,1,3,1,3,1,4,1,4,1,4,1,4,1,5,1,5,1,5,1,5,1,6,1,6,1,
   	6,1,6,1,7,1,7,1,7,3,7,159,8,7,1,7,1,7,1,7,3,7,164,8,7,1,8,1,8,1,8,1,9,
   	1,9,1,10,1,10,1,10,5,10,174,8,10,10,10,12,10,177,9,10,1,10,3,10,180,8,
-  	10,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,3,11,192,8,11,1,
-  	12,1,12,5,12,196,8,12,10,12,12,12,199,9,12,1,12,1,12,1,13,1,13,1,13,3,
-  	13,206,8,13,1,13,1,13,1,13,1,13,1,14,1,14,1,14,1,14,1,14,3,14,217,8,14,
-  	1,15,1,15,1,15,1,15,1,16,1,16,1,16,1,16,5,16,227,8,16,10,16,12,16,230,
-  	9,16,1,16,3,16,233,8,16,1,17,1,17,1,17,1,17,1,18,1,18,1,18,1,19,1,19,
-  	3,19,244,8,19,1,19,1,19,5,19,248,8,19,10,19,12,19,251,9,19,1,19,1,19,
-  	1,19,3,19,256,8,19,1,19,1,19,1,20,1,20,1,20,1,20,1,21,1,21,1,21,1,21,
-  	5,21,268,8,21,10,21,12,21,271,9,21,1,21,1,21,1,21,1,21,1,21,1,21,1,21,
-  	1,21,5,21,281,8,21,10,21,12,21,284,9,21,1,21,1,21,1,21,1,21,1,21,1,21,
-  	3,21,292,8,21,1,21,3,21,295,8,21,1,22,1,22,1,22,1,22,1,22,3,22,302,8,
-  	22,1,23,1,23,1,23,1,24,1,24,1,24,1,24,5,24,311,8,24,10,24,12,24,314,9,
-  	24,1,24,1,24,1,25,1,25,1,25,3,25,321,8,25,1,26,1,26,1,26,1,26,1,26,1,
-  	26,3,26,329,8,26,1,26,1,26,1,26,1,26,1,26,1,26,1,26,1,26,1,26,5,26,340,
-  	8,26,10,26,12,26,343,9,26,1,27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,
-  	1,27,1,27,1,27,3,27,357,8,27,1,28,1,28,1,28,1,28,5,28,363,8,28,10,28,
-  	12,28,366,9,28,1,28,3,28,369,8,28,1,28,1,28,1,29,1,29,1,29,1,29,1,29,
-  	3,29,378,8,29,5,29,380,8,29,10,29,12,29,383,9,29,1,29,1,29,1,30,1,30,
-  	1,30,3,30,390,8,30,1,30,1,30,1,31,1,31,1,31,3,31,397,8,31,1,31,1,31,1,
-  	32,1,32,1,32,5,32,404,8,32,10,32,12,32,407,9,32,1,32,3,32,410,8,32,1,
-  	33,1,33,3,33,414,8,33,1,33,1,33,1,34,1,34,1,35,1,35,3,35,422,8,35,1,35,
-  	1,35,1,35,1,35,4,35,428,8,35,11,35,12,35,429,1,36,1,36,1,36,4,36,435,
-  	8,36,11,36,12,36,436,1,37,1,37,1,37,1,37,1,37,1,37,1,37,3,37,446,8,37,
-  	1,38,1,38,1,38,3,38,451,8,38,1,39,3,39,454,8,39,1,39,1,39,1,39,1,40,1,
-  	40,3,40,461,8,40,1,40,1,40,1,40,3,40,466,8,40,1,40,4,40,469,8,40,11,40,
-  	12,40,470,1,40,1,40,1,40,1,40,1,40,1,40,3,40,479,8,40,1,41,1,41,1,41,
+  	10,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,3,11,193,8,
+  	11,1,12,1,12,5,12,197,8,12,10,12,12,12,200,9,12,1,12,1,12,1,13,1,13,1,
+  	13,3,13,207,8,13,1,13,1,13,1,13,1,13,1,14,1,14,1,14,1,14,1,14,3,14,218,
+  	8,14,1,15,1,15,1,15,1,15,1,16,1,16,1,16,1,16,5,16,228,8,16,10,16,12,16,
+  	231,9,16,1,16,3,16,234,8,16,1,17,1,17,1,17,1,17,1,18,1,18,1,18,1,19,1,
+  	19,3,19,245,8,19,1,19,1,19,5,19,249,8,19,10,19,12,19,252,9,19,1,19,1,
+  	19,1,19,3,19,257,8,19,1,19,1,19,1,20,1,20,1,20,1,20,1,21,1,21,1,21,1,
+  	21,5,21,269,8,21,10,21,12,21,272,9,21,1,21,1,21,1,21,1,21,1,21,1,21,1,
+  	21,1,21,5,21,282,8,21,10,21,12,21,285,9,21,1,21,1,21,1,21,1,21,1,21,1,
+  	21,3,21,293,8,21,1,21,3,21,296,8,21,1,22,1,22,1,22,1,22,1,22,3,22,303,
+  	8,22,1,23,1,23,1,23,1,24,1,24,1,24,1,24,5,24,312,8,24,10,24,12,24,315,
+  	9,24,1,24,1,24,1,25,1,25,1,25,3,25,322,8,25,1,26,1,26,1,26,1,26,1,26,
+  	1,26,3,26,330,8,26,1,26,1,26,1,26,1,26,1,26,1,26,1,26,1,26,1,26,5,26,
+  	341,8,26,10,26,12,26,344,9,26,1,27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,
+  	1,27,1,27,1,27,1,27,3,27,358,8,27,1,28,1,28,1,28,1,28,5,28,364,8,28,10,
+  	28,12,28,367,9,28,1,28,3,28,370,8,28,1,28,1,28,1,29,1,29,1,29,1,29,1,
+  	29,3,29,379,8,29,5,29,381,8,29,10,29,12,29,384,9,29,1,29,1,29,1,30,1,
+  	30,1,30,3,30,391,8,30,1,30,1,30,1,31,1,31,1,31,3,31,398,8,31,1,31,1,31,
+  	1,32,1,32,1,32,5,32,405,8,32,10,32,12,32,408,9,32,1,32,3,32,411,8,32,
+  	1,33,1,33,3,33,415,8,33,1,33,1,33,1,34,1,34,1,35,1,35,3,35,423,8,35,1,
+  	35,1,35,1,35,1,35,4,35,429,8,35,11,35,12,35,430,1,36,1,36,1,36,4,36,436,
+  	8,36,11,36,12,36,437,1,37,1,37,1,37,1,37,1,37,1,37,1,37,3,37,447,8,37,
+  	1,38,1,38,1,38,3,38,452,8,38,1,39,3,39,455,8,39,1,39,1,39,1,39,1,40,1,
+  	40,3,40,462,8,40,1,40,1,40,1,40,3,40,467,8,40,1,40,4,40,470,8,40,11,40,
+  	12,40,471,1,40,1,40,1,40,1,40,1,40,1,40,3,40,480,8,40,1,41,1,41,1,41,
   	0,1,52,42,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,
   	44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,0,5,1,0,20,
-  	21,1,0,18,19,2,0,1,4,11,12,2,0,49,51,56,56,1,0,33,36,523,0,87,1,0,0,0,
+  	21,1,0,18,19,2,0,1,4,11,12,2,0,49,51,56,56,1,0,33,36,525,0,87,1,0,0,0,
   	2,92,1,0,0,0,4,102,1,0,0,0,6,120,1,0,0,0,8,143,1,0,0,0,10,147,1,0,0,0,
   	12,151,1,0,0,0,14,155,1,0,0,0,16,165,1,0,0,0,18,168,1,0,0,0,20,170,1,
-  	0,0,0,22,191,1,0,0,0,24,193,1,0,0,0,26,205,1,0,0,0,28,211,1,0,0,0,30,
-  	218,1,0,0,0,32,222,1,0,0,0,34,234,1,0,0,0,36,238,1,0,0,0,38,241,1,0,0,
-  	0,40,259,1,0,0,0,42,294,1,0,0,0,44,301,1,0,0,0,46,303,1,0,0,0,48,306,
-  	1,0,0,0,50,317,1,0,0,0,52,328,1,0,0,0,54,356,1,0,0,0,56,358,1,0,0,0,58,
-  	372,1,0,0,0,60,386,1,0,0,0,62,393,1,0,0,0,64,400,1,0,0,0,66,413,1,0,0,
-  	0,68,417,1,0,0,0,70,421,1,0,0,0,72,431,1,0,0,0,74,445,1,0,0,0,76,450,
-  	1,0,0,0,78,453,1,0,0,0,80,478,1,0,0,0,82,480,1,0,0,0,84,88,3,2,1,0,85,
+  	0,0,0,22,192,1,0,0,0,24,194,1,0,0,0,26,206,1,0,0,0,28,212,1,0,0,0,30,
+  	219,1,0,0,0,32,223,1,0,0,0,34,235,1,0,0,0,36,239,1,0,0,0,38,242,1,0,0,
+  	0,40,260,1,0,0,0,42,295,1,0,0,0,44,302,1,0,0,0,46,304,1,0,0,0,48,307,
+  	1,0,0,0,50,318,1,0,0,0,52,329,1,0,0,0,54,357,1,0,0,0,56,359,1,0,0,0,58,
+  	373,1,0,0,0,60,387,1,0,0,0,62,394,1,0,0,0,64,401,1,0,0,0,66,414,1,0,0,
+  	0,68,418,1,0,0,0,70,422,1,0,0,0,72,432,1,0,0,0,74,446,1,0,0,0,76,451,
+  	1,0,0,0,78,454,1,0,0,0,80,479,1,0,0,0,82,481,1,0,0,0,84,88,3,2,1,0,85,
   	88,3,4,2,0,86,88,3,6,3,0,87,84,1,0,0,0,87,85,1,0,0,0,87,86,1,0,0,0,88,
   	1,1,0,0,0,89,91,3,48,24,0,90,89,1,0,0,0,91,94,1,0,0,0,92,90,1,0,0,0,92,
   	93,1,0,0,0,93,96,1,0,0,0,94,92,1,0,0,0,95,97,3,16,8,0,96,95,1,0,0,0,97,
@@ -158,96 +158,97 @@ void logosParserInitialize() {
   	0,0,170,175,3,28,14,0,171,172,5,13,0,0,172,174,3,28,14,0,173,171,1,0,
   	0,0,174,177,1,0,0,0,175,173,1,0,0,0,175,176,1,0,0,0,176,179,1,0,0,0,177,
   	175,1,0,0,0,178,180,5,13,0,0,179,178,1,0,0,0,179,180,1,0,0,0,180,21,1,
-  	0,0,0,181,192,3,26,13,0,182,192,3,28,14,0,183,192,3,30,15,0,184,192,3,
-  	32,16,0,185,192,3,38,19,0,186,192,3,42,21,0,187,192,3,44,22,0,188,192,
-  	3,46,23,0,189,192,3,48,24,0,190,192,3,60,30,0,191,181,1,0,0,0,191,182,
-  	1,0,0,0,191,183,1,0,0,0,191,184,1,0,0,0,191,185,1,0,0,0,191,186,1,0,0,
-  	0,191,187,1,0,0,0,191,188,1,0,0,0,191,189,1,0,0,0,191,190,1,0,0,0,192,
-  	23,1,0,0,0,193,197,5,7,0,0,194,196,3,22,11,0,195,194,1,0,0,0,196,199,
-  	1,0,0,0,197,195,1,0,0,0,197,198,1,0,0,0,198,200,1,0,0,0,199,197,1,0,0,
-  	0,200,201,5,8,0,0,201,25,1,0,0,0,202,206,5,55,0,0,203,206,3,70,35,0,204,
-  	206,3,72,36,0,205,202,1,0,0,0,205,203,1,0,0,0,205,204,1,0,0,0,206,207,
-  	1,0,0,0,207,208,5,16,0,0,208,209,5,17,0,0,209,210,3,52,26,0,210,27,1,
-  	0,0,0,211,212,5,55,0,0,212,213,5,16,0,0,213,216,3,80,40,0,214,215,5,17,
-  	0,0,215,217,3,52,26,0,216,214,1,0,0,0,216,217,1,0,0,0,217,29,1,0,0,0,
-  	218,219,5,55,0,0,219,220,5,17,0,0,220,221,3,52,26,0,221,31,1,0,0,0,222,
-  	223,5,39,0,0,223,224,3,52,26,0,224,228,3,24,12,0,225,227,3,34,17,0,226,
-  	225,1,0,0,0,227,230,1,0,0,0,228,226,1,0,0,0,228,229,1,0,0,0,229,232,1,
-  	0,0,0,230,228,1,0,0,0,231,233,3,36,18,0,232,231,1,0,0,0,232,233,1,0,0,
-  	0,233,33,1,0,0,0,234,235,5,40,0,0,235,236,3,52,26,0,236,237,3,24,12,0,
-  	237,35,1,0,0,0,238,239,5,40,0,0,239,240,3,24,12,0,240,37,1,0,0,0,241,
-  	243,5,39,0,0,242,244,3,52,26,0,243,242,1,0,0,0,243,244,1,0,0,0,244,245,
-  	1,0,0,0,245,249,5,7,0,0,246,248,3,40,20,0,247,246,1,0,0,0,248,251,1,0,
-  	0,0,249,247,1,0,0,0,249,250,1,0,0,0,250,255,1,0,0,0,251,249,1,0,0,0,252,
-  	253,5,40,0,0,253,254,5,16,0,0,254,256,3,24,12,0,255,252,1,0,0,0,255,256,
-  	1,0,0,0,256,257,1,0,0,0,257,258,5,8,0,0,258,39,1,0,0,0,259,260,3,52,26,
-  	0,260,261,5,16,0,0,261,262,3,24,12,0,262,41,1,0,0,0,263,264,5,41,0,0,
-  	264,269,5,55,0,0,265,266,5,13,0,0,266,268,5,55,0,0,267,265,1,0,0,0,268,
-  	271,1,0,0,0,269,267,1,0,0,0,269,270,1,0,0,0,270,272,1,0,0,0,271,269,1,
-  	0,0,0,272,273,5,48,0,0,273,274,3,78,39,0,274,275,3,24,12,0,275,295,1,
-  	0,0,0,276,277,5,41,0,0,277,282,5,55,0,0,278,279,5,13,0,0,279,281,5,55,
-  	0,0,280,278,1,0,0,0,281,284,1,0,0,0,282,280,1,0,0,0,282,283,1,0,0,0,283,
-  	285,1,0,0,0,284,282,1,0,0,0,285,286,5,48,0,0,286,287,3,54,27,0,287,288,
-  	3,24,12,0,288,295,1,0,0,0,289,291,5,41,0,0,290,292,5,55,0,0,291,290,1,
-  	0,0,0,291,292,1,0,0,0,292,293,1,0,0,0,293,295,3,24,12,0,294,263,1,0,0,
-  	0,294,276,1,0,0,0,294,289,1,0,0,0,295,43,1,0,0,0,296,297,5,42,0,0,297,
-  	302,3,52,26,0,298,299,5,42,0,0,299,302,5,39,0,0,300,302,5,43,0,0,301,
-  	296,1,0,0,0,301,298,1,0,0,0,301,300,1,0,0,0,302,45,1,0,0,0,303,304,5,
-  	44,0,0,304,305,3,52,26,0,305,47,1,0,0,0,306,307,5,32,0,0,307,308,5,54,
-  	0,0,308,312,5,7,0,0,309,311,3,50,25,0,310,309,1,0,0,0,311,314,1,0,0,0,
-  	312,310,1,0,0,0,312,313,1,0,0,0,313,315,1,0,0,0,314,312,1,0,0,0,315,316,
-  	5,8,0,0,316,49,1,0,0,0,317,320,5,53,0,0,318,319,5,17,0,0,319,321,5,56,
-  	0,0,320,318,1,0,0,0,320,321,1,0,0,0,321,51,1,0,0,0,322,323,6,26,-1,0,
-  	323,329,3,54,27,0,324,325,5,5,0,0,325,326,3,52,26,0,326,327,5,6,0,0,327,
-  	329,1,0,0,0,328,322,1,0,0,0,328,324,1,0,0,0,329,341,1,0,0,0,330,331,10,
-  	5,0,0,331,332,7,0,0,0,332,340,3,52,26,6,333,334,10,4,0,0,334,335,7,1,
-  	0,0,335,340,3,52,26,5,336,337,10,3,0,0,337,338,7,2,0,0,338,340,3,52,26,
-  	4,339,330,1,0,0,0,339,333,1,0,0,0,339,336,1,0,0,0,340,343,1,0,0,0,341,
-  	339,1,0,0,0,341,342,1,0,0,0,342,53,1,0,0,0,343,341,1,0,0,0,344,357,5,
-  	55,0,0,345,357,5,53,0,0,346,357,5,29,0,0,347,357,5,30,0,0,348,357,5,52,
-  	0,0,349,357,3,60,30,0,350,357,3,62,31,0,351,357,3,68,34,0,352,357,3,56,
-  	28,0,353,357,3,58,29,0,354,357,3,70,35,0,355,357,3,72,36,0,356,344,1,
-  	0,0,0,356,345,1,0,0,0,356,346,1,0,0,0,356,347,1,0,0,0,356,348,1,0,0,0,
-  	356,349,1,0,0,0,356,350,1,0,0,0,356,351,1,0,0,0,356,352,1,0,0,0,356,353,
-  	1,0,0,0,356,354,1,0,0,0,356,355,1,0,0,0,357,55,1,0,0,0,358,359,5,9,0,
-  	0,359,364,3,52,26,0,360,361,5,13,0,0,361,363,3,52,26,0,362,360,1,0,0,
-  	0,363,366,1,0,0,0,364,362,1,0,0,0,364,365,1,0,0,0,365,368,1,0,0,0,366,
-  	364,1,0,0,0,367,369,5,13,0,0,368,367,1,0,0,0,368,369,1,0,0,0,369,370,
-  	1,0,0,0,370,371,5,10,0,0,371,57,1,0,0,0,372,381,5,7,0,0,373,374,3,52,
-  	26,0,374,375,5,16,0,0,375,377,3,52,26,0,376,378,5,13,0,0,377,376,1,0,
-  	0,0,377,378,1,0,0,0,378,380,1,0,0,0,379,373,1,0,0,0,380,383,1,0,0,0,381,
-  	379,1,0,0,0,381,382,1,0,0,0,382,384,1,0,0,0,383,381,1,0,0,0,384,385,5,
-  	8,0,0,385,59,1,0,0,0,386,387,5,55,0,0,387,389,5,5,0,0,388,390,3,64,32,
-  	0,389,388,1,0,0,0,389,390,1,0,0,0,390,391,1,0,0,0,391,392,5,6,0,0,392,
-  	61,1,0,0,0,393,394,5,54,0,0,394,396,5,5,0,0,395,397,3,64,32,0,396,395,
-  	1,0,0,0,396,397,1,0,0,0,397,398,1,0,0,0,398,399,5,6,0,0,399,63,1,0,0,
-  	0,400,405,3,66,33,0,401,402,5,13,0,0,402,404,3,66,33,0,403,401,1,0,0,
-  	0,404,407,1,0,0,0,405,403,1,0,0,0,405,406,1,0,0,0,406,409,1,0,0,0,407,
-  	405,1,0,0,0,408,410,5,13,0,0,409,408,1,0,0,0,409,410,1,0,0,0,410,65,1,
-  	0,0,0,411,412,5,55,0,0,412,414,5,17,0,0,413,411,1,0,0,0,413,414,1,0,0,
-  	0,414,415,1,0,0,0,415,416,3,52,26,0,416,67,1,0,0,0,417,418,7,3,0,0,418,
-  	69,1,0,0,0,419,422,3,60,30,0,420,422,5,55,0,0,421,419,1,0,0,0,421,420,
-  	1,0,0,0,422,427,1,0,0,0,423,424,5,9,0,0,424,425,3,52,26,0,425,426,5,10,
-  	0,0,426,428,1,0,0,0,427,423,1,0,0,0,428,429,1,0,0,0,429,427,1,0,0,0,429,
-  	430,1,0,0,0,430,71,1,0,0,0,431,434,3,74,37,0,432,433,5,15,0,0,433,435,
-  	3,76,38,0,434,432,1,0,0,0,435,436,1,0,0,0,436,434,1,0,0,0,436,437,1,0,
-  	0,0,437,73,1,0,0,0,438,446,5,55,0,0,439,446,5,54,0,0,440,446,5,30,0,0,
-  	441,446,5,29,0,0,442,446,3,60,30,0,443,446,3,62,31,0,444,446,3,70,35,
-  	0,445,438,1,0,0,0,445,439,1,0,0,0,445,440,1,0,0,0,445,441,1,0,0,0,445,
-  	442,1,0,0,0,445,443,1,0,0,0,445,444,1,0,0,0,446,75,1,0,0,0,447,451,5,
-  	55,0,0,448,451,3,60,30,0,449,451,3,70,35,0,450,447,1,0,0,0,450,448,1,
-  	0,0,0,450,449,1,0,0,0,451,77,1,0,0,0,452,454,3,52,26,0,453,452,1,0,0,
-  	0,453,454,1,0,0,0,454,455,1,0,0,0,455,456,5,14,0,0,456,457,3,52,26,0,
-  	457,79,1,0,0,0,458,460,5,54,0,0,459,461,5,23,0,0,460,459,1,0,0,0,460,
-  	461,1,0,0,0,461,479,1,0,0,0,462,468,5,54,0,0,463,465,5,9,0,0,464,466,
-  	5,49,0,0,465,464,1,0,0,0,465,466,1,0,0,0,466,467,1,0,0,0,467,469,5,10,
-  	0,0,468,463,1,0,0,0,469,470,1,0,0,0,470,468,1,0,0,0,470,471,1,0,0,0,471,
-  	479,1,0,0,0,472,473,5,7,0,0,473,474,3,80,40,0,474,475,5,16,0,0,475,476,
-  	3,80,40,0,476,477,5,8,0,0,477,479,1,0,0,0,478,458,1,0,0,0,478,462,1,0,
-  	0,0,478,472,1,0,0,0,479,81,1,0,0,0,480,481,7,4,0,0,481,83,1,0,0,0,53,
-  	87,92,98,104,109,115,122,127,133,138,158,163,175,179,191,197,205,216,
-  	228,232,243,249,255,269,282,291,294,301,312,320,328,339,341,356,364,368,
-  	377,381,389,396,405,409,413,421,429,436,445,450,453,460,465,470,478
+  	0,0,0,181,193,3,26,13,0,182,193,3,28,14,0,183,193,3,30,15,0,184,193,3,
+  	32,16,0,185,193,3,38,19,0,186,193,3,42,21,0,187,193,3,44,22,0,188,193,
+  	3,46,23,0,189,193,3,48,24,0,190,193,3,60,30,0,191,193,3,72,36,0,192,181,
+  	1,0,0,0,192,182,1,0,0,0,192,183,1,0,0,0,192,184,1,0,0,0,192,185,1,0,0,
+  	0,192,186,1,0,0,0,192,187,1,0,0,0,192,188,1,0,0,0,192,189,1,0,0,0,192,
+  	190,1,0,0,0,192,191,1,0,0,0,193,23,1,0,0,0,194,198,5,7,0,0,195,197,3,
+  	22,11,0,196,195,1,0,0,0,197,200,1,0,0,0,198,196,1,0,0,0,198,199,1,0,0,
+  	0,199,201,1,0,0,0,200,198,1,0,0,0,201,202,5,8,0,0,202,25,1,0,0,0,203,
+  	207,5,55,0,0,204,207,3,70,35,0,205,207,3,72,36,0,206,203,1,0,0,0,206,
+  	204,1,0,0,0,206,205,1,0,0,0,207,208,1,0,0,0,208,209,5,16,0,0,209,210,
+  	5,17,0,0,210,211,3,52,26,0,211,27,1,0,0,0,212,213,5,55,0,0,213,214,5,
+  	16,0,0,214,217,3,80,40,0,215,216,5,17,0,0,216,218,3,52,26,0,217,215,1,
+  	0,0,0,217,218,1,0,0,0,218,29,1,0,0,0,219,220,5,55,0,0,220,221,5,17,0,
+  	0,221,222,3,52,26,0,222,31,1,0,0,0,223,224,5,39,0,0,224,225,3,52,26,0,
+  	225,229,3,24,12,0,226,228,3,34,17,0,227,226,1,0,0,0,228,231,1,0,0,0,229,
+  	227,1,0,0,0,229,230,1,0,0,0,230,233,1,0,0,0,231,229,1,0,0,0,232,234,3,
+  	36,18,0,233,232,1,0,0,0,233,234,1,0,0,0,234,33,1,0,0,0,235,236,5,40,0,
+  	0,236,237,3,52,26,0,237,238,3,24,12,0,238,35,1,0,0,0,239,240,5,40,0,0,
+  	240,241,3,24,12,0,241,37,1,0,0,0,242,244,5,39,0,0,243,245,3,52,26,0,244,
+  	243,1,0,0,0,244,245,1,0,0,0,245,246,1,0,0,0,246,250,5,7,0,0,247,249,3,
+  	40,20,0,248,247,1,0,0,0,249,252,1,0,0,0,250,248,1,0,0,0,250,251,1,0,0,
+  	0,251,256,1,0,0,0,252,250,1,0,0,0,253,254,5,40,0,0,254,255,5,16,0,0,255,
+  	257,3,24,12,0,256,253,1,0,0,0,256,257,1,0,0,0,257,258,1,0,0,0,258,259,
+  	5,8,0,0,259,39,1,0,0,0,260,261,3,52,26,0,261,262,5,16,0,0,262,263,3,24,
+  	12,0,263,41,1,0,0,0,264,265,5,41,0,0,265,270,5,55,0,0,266,267,5,13,0,
+  	0,267,269,5,55,0,0,268,266,1,0,0,0,269,272,1,0,0,0,270,268,1,0,0,0,270,
+  	271,1,0,0,0,271,273,1,0,0,0,272,270,1,0,0,0,273,274,5,48,0,0,274,275,
+  	3,78,39,0,275,276,3,24,12,0,276,296,1,0,0,0,277,278,5,41,0,0,278,283,
+  	5,55,0,0,279,280,5,13,0,0,280,282,5,55,0,0,281,279,1,0,0,0,282,285,1,
+  	0,0,0,283,281,1,0,0,0,283,284,1,0,0,0,284,286,1,0,0,0,285,283,1,0,0,0,
+  	286,287,5,48,0,0,287,288,3,54,27,0,288,289,3,24,12,0,289,296,1,0,0,0,
+  	290,292,5,41,0,0,291,293,5,55,0,0,292,291,1,0,0,0,292,293,1,0,0,0,293,
+  	294,1,0,0,0,294,296,3,24,12,0,295,264,1,0,0,0,295,277,1,0,0,0,295,290,
+  	1,0,0,0,296,43,1,0,0,0,297,298,5,42,0,0,298,303,3,52,26,0,299,300,5,42,
+  	0,0,300,303,5,39,0,0,301,303,5,43,0,0,302,297,1,0,0,0,302,299,1,0,0,0,
+  	302,301,1,0,0,0,303,45,1,0,0,0,304,305,5,44,0,0,305,306,3,52,26,0,306,
+  	47,1,0,0,0,307,308,5,32,0,0,308,309,5,54,0,0,309,313,5,7,0,0,310,312,
+  	3,50,25,0,311,310,1,0,0,0,312,315,1,0,0,0,313,311,1,0,0,0,313,314,1,0,
+  	0,0,314,316,1,0,0,0,315,313,1,0,0,0,316,317,5,8,0,0,317,49,1,0,0,0,318,
+  	321,5,53,0,0,319,320,5,17,0,0,320,322,5,56,0,0,321,319,1,0,0,0,321,322,
+  	1,0,0,0,322,51,1,0,0,0,323,324,6,26,-1,0,324,330,3,54,27,0,325,326,5,
+  	5,0,0,326,327,3,52,26,0,327,328,5,6,0,0,328,330,1,0,0,0,329,323,1,0,0,
+  	0,329,325,1,0,0,0,330,342,1,0,0,0,331,332,10,5,0,0,332,333,7,0,0,0,333,
+  	341,3,52,26,6,334,335,10,4,0,0,335,336,7,1,0,0,336,341,3,52,26,5,337,
+  	338,10,3,0,0,338,339,7,2,0,0,339,341,3,52,26,4,340,331,1,0,0,0,340,334,
+  	1,0,0,0,340,337,1,0,0,0,341,344,1,0,0,0,342,340,1,0,0,0,342,343,1,0,0,
+  	0,343,53,1,0,0,0,344,342,1,0,0,0,345,358,5,55,0,0,346,358,5,53,0,0,347,
+  	358,5,29,0,0,348,358,5,30,0,0,349,358,5,52,0,0,350,358,3,60,30,0,351,
+  	358,3,62,31,0,352,358,3,68,34,0,353,358,3,56,28,0,354,358,3,58,29,0,355,
+  	358,3,70,35,0,356,358,3,72,36,0,357,345,1,0,0,0,357,346,1,0,0,0,357,347,
+  	1,0,0,0,357,348,1,0,0,0,357,349,1,0,0,0,357,350,1,0,0,0,357,351,1,0,0,
+  	0,357,352,1,0,0,0,357,353,1,0,0,0,357,354,1,0,0,0,357,355,1,0,0,0,357,
+  	356,1,0,0,0,358,55,1,0,0,0,359,360,5,9,0,0,360,365,3,52,26,0,361,362,
+  	5,13,0,0,362,364,3,52,26,0,363,361,1,0,0,0,364,367,1,0,0,0,365,363,1,
+  	0,0,0,365,366,1,0,0,0,366,369,1,0,0,0,367,365,1,0,0,0,368,370,5,13,0,
+  	0,369,368,1,0,0,0,369,370,1,0,0,0,370,371,1,0,0,0,371,372,5,10,0,0,372,
+  	57,1,0,0,0,373,382,5,7,0,0,374,375,3,52,26,0,375,376,5,16,0,0,376,378,
+  	3,52,26,0,377,379,5,13,0,0,378,377,1,0,0,0,378,379,1,0,0,0,379,381,1,
+  	0,0,0,380,374,1,0,0,0,381,384,1,0,0,0,382,380,1,0,0,0,382,383,1,0,0,0,
+  	383,385,1,0,0,0,384,382,1,0,0,0,385,386,5,8,0,0,386,59,1,0,0,0,387,388,
+  	5,55,0,0,388,390,5,5,0,0,389,391,3,64,32,0,390,389,1,0,0,0,390,391,1,
+  	0,0,0,391,392,1,0,0,0,392,393,5,6,0,0,393,61,1,0,0,0,394,395,5,54,0,0,
+  	395,397,5,5,0,0,396,398,3,64,32,0,397,396,1,0,0,0,397,398,1,0,0,0,398,
+  	399,1,0,0,0,399,400,5,6,0,0,400,63,1,0,0,0,401,406,3,66,33,0,402,403,
+  	5,13,0,0,403,405,3,66,33,0,404,402,1,0,0,0,405,408,1,0,0,0,406,404,1,
+  	0,0,0,406,407,1,0,0,0,407,410,1,0,0,0,408,406,1,0,0,0,409,411,5,13,0,
+  	0,410,409,1,0,0,0,410,411,1,0,0,0,411,65,1,0,0,0,412,413,5,55,0,0,413,
+  	415,5,17,0,0,414,412,1,0,0,0,414,415,1,0,0,0,415,416,1,0,0,0,416,417,
+  	3,52,26,0,417,67,1,0,0,0,418,419,7,3,0,0,419,69,1,0,0,0,420,423,3,60,
+  	30,0,421,423,5,55,0,0,422,420,1,0,0,0,422,421,1,0,0,0,423,428,1,0,0,0,
+  	424,425,5,9,0,0,425,426,3,52,26,0,426,427,5,10,0,0,427,429,1,0,0,0,428,
+  	424,1,0,0,0,429,430,1,0,0,0,430,428,1,0,0,0,430,431,1,0,0,0,431,71,1,
+  	0,0,0,432,435,3,74,37,0,433,434,5,15,0,0,434,436,3,76,38,0,435,433,1,
+  	0,0,0,436,437,1,0,0,0,437,435,1,0,0,0,437,438,1,0,0,0,438,73,1,0,0,0,
+  	439,447,5,55,0,0,440,447,5,54,0,0,441,447,5,30,0,0,442,447,5,29,0,0,443,
+  	447,3,60,30,0,444,447,3,62,31,0,445,447,3,70,35,0,446,439,1,0,0,0,446,
+  	440,1,0,0,0,446,441,1,0,0,0,446,442,1,0,0,0,446,443,1,0,0,0,446,444,1,
+  	0,0,0,446,445,1,0,0,0,447,75,1,0,0,0,448,452,5,55,0,0,449,452,3,60,30,
+  	0,450,452,3,70,35,0,451,448,1,0,0,0,451,449,1,0,0,0,451,450,1,0,0,0,452,
+  	77,1,0,0,0,453,455,3,52,26,0,454,453,1,0,0,0,454,455,1,0,0,0,455,456,
+  	1,0,0,0,456,457,5,14,0,0,457,458,3,52,26,0,458,79,1,0,0,0,459,461,5,54,
+  	0,0,460,462,5,23,0,0,461,460,1,0,0,0,461,462,1,0,0,0,462,480,1,0,0,0,
+  	463,469,5,54,0,0,464,466,5,9,0,0,465,467,5,49,0,0,466,465,1,0,0,0,466,
+  	467,1,0,0,0,467,468,1,0,0,0,468,470,5,10,0,0,469,464,1,0,0,0,470,471,
+  	1,0,0,0,471,469,1,0,0,0,471,472,1,0,0,0,472,480,1,0,0,0,473,474,5,7,0,
+  	0,474,475,3,80,40,0,475,476,5,16,0,0,476,477,3,80,40,0,477,478,5,8,0,
+  	0,478,480,1,0,0,0,479,459,1,0,0,0,479,463,1,0,0,0,479,473,1,0,0,0,480,
+  	81,1,0,0,0,481,482,7,4,0,0,482,83,1,0,0,0,53,87,92,98,104,109,115,122,
+  	127,133,138,158,163,175,179,192,198,206,217,229,233,244,250,256,270,283,
+  	292,295,302,313,321,329,340,342,357,365,369,378,382,390,397,406,410,414,
+  	422,430,437,446,451,454,461,466,471,479
   };
   staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
@@ -1137,6 +1138,10 @@ LogosParser::FuncCallContext* LogosParser::StatementContext::funcCall() {
   return getRuleContext<LogosParser::FuncCallContext>(0);
 }
 
+LogosParser::SelectionContext* LogosParser::StatementContext::selection() {
+  return getRuleContext<LogosParser::SelectionContext>(0);
+}
+
 
 size_t LogosParser::StatementContext::getRuleIndex() const {
   return LogosParser::RuleStatement;
@@ -1155,7 +1160,7 @@ LogosParser::StatementContext* LogosParser::statement() {
     exitRule();
   });
   try {
-    setState(191);
+    setState(192);
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 14, _ctx)) {
     case 1: {
@@ -1228,6 +1233,13 @@ LogosParser::StatementContext* LogosParser::statement() {
       break;
     }
 
+    case 11: {
+      enterOuterAlt(_localctx, 11);
+      setState(191);
+      selection();
+      break;
+    }
+
     default:
       break;
     }
@@ -1284,20 +1296,20 @@ LogosParser::StatementsBlockContext* LogosParser::statementsBlock() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(193);
+    setState(194);
     match(LogosParser::LBRACE);
-    setState(197);
+    setState(198);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 54076736538673152) != 0)) {
-      setState(194);
+      setState(195);
       statement();
-      setState(199);
+      setState(200);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(200);
+    setState(201);
     match(LogosParser::RBRACE);
    
   }
@@ -1359,23 +1371,23 @@ LogosParser::AssignmentContext* LogosParser::assignment() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(205);
+    setState(206);
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 16, _ctx)) {
     case 1: {
-      setState(202);
+      setState(203);
       match(LogosParser::VARIABLE);
       break;
     }
 
     case 2: {
-      setState(203);
+      setState(204);
       arrayIndex();
       break;
     }
 
     case 3: {
-      setState(204);
+      setState(205);
       selection();
       break;
     }
@@ -1383,11 +1395,11 @@ LogosParser::AssignmentContext* LogosParser::assignment() {
     default:
       break;
     }
-    setState(207);
-    match(LogosParser::COLON);
     setState(208);
-    match(LogosParser::EQUAL);
+    match(LogosParser::COLON);
     setState(209);
+    match(LogosParser::EQUAL);
+    setState(210);
     expr(0);
    
   }
@@ -1446,20 +1458,20 @@ LogosParser::ExplicitVarDecContext* LogosParser::explicitVarDec() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(211);
-    match(LogosParser::VARIABLE);
     setState(212);
-    match(LogosParser::COLON);
+    match(LogosParser::VARIABLE);
     setState(213);
+    match(LogosParser::COLON);
+    setState(214);
     type();
-    setState(216);
+    setState(217);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::EQUAL) {
-      setState(214);
-      match(LogosParser::EQUAL);
       setState(215);
+      match(LogosParser::EQUAL);
+      setState(216);
       expr(0);
     }
    
@@ -1510,11 +1522,11 @@ LogosParser::ImplicitVarDecContext* LogosParser::implicitVarDec() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(218);
-    match(LogosParser::VARIABLE);
     setState(219);
-    match(LogosParser::EQUAL);
+    match(LogosParser::VARIABLE);
     setState(220);
+    match(LogosParser::EQUAL);
+    setState(221);
     expr(0);
    
   }
@@ -1578,30 +1590,30 @@ LogosParser::IfStatementContext* LogosParser::ifStatement() {
   try {
     size_t alt;
     enterOuterAlt(_localctx, 1);
-    setState(222);
-    match(LogosParser::IF);
     setState(223);
-    expr(0);
+    match(LogosParser::IF);
     setState(224);
+    expr(0);
+    setState(225);
     statementsBlock();
-    setState(228);
+    setState(229);
     _errHandler->sync(this);
     alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 18, _ctx);
     while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER) {
       if (alt == 1) {
-        setState(225);
+        setState(226);
         elseIfStatement(); 
       }
-      setState(230);
+      setState(231);
       _errHandler->sync(this);
       alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 18, _ctx);
     }
-    setState(232);
+    setState(233);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::ELSE) {
-      setState(231);
+      setState(232);
       elseStatement();
     }
    
@@ -1652,11 +1664,11 @@ LogosParser::ElseIfStatementContext* LogosParser::elseIfStatement() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(234);
-    match(LogosParser::ELSE);
     setState(235);
-    expr(0);
+    match(LogosParser::ELSE);
     setState(236);
+    expr(0);
+    setState(237);
     statementsBlock();
    
   }
@@ -1702,9 +1714,9 @@ LogosParser::ElseStatementContext* LogosParser::elseStatement() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(238);
-    match(LogosParser::ELSE);
     setState(239);
+    match(LogosParser::ELSE);
+    setState(240);
     statementsBlock();
    
   }
@@ -1779,14 +1791,14 @@ LogosParser::PatternMatchingContext* LogosParser::patternMatching() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(241);
+    setState(242);
     match(LogosParser::IF);
-    setState(243);
+    setState(244);
     _errHandler->sync(this);
 
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 20, _ctx)) {
     case 1: {
-      setState(242);
+      setState(243);
       expr(0);
       break;
     }
@@ -1794,32 +1806,32 @@ LogosParser::PatternMatchingContext* LogosParser::patternMatching() {
     default:
       break;
     }
-    setState(245);
+    setState(246);
     match(LogosParser::LBRACE);
-    setState(249);
+    setState(250);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 143552239733047968) != 0)) {
-      setState(246);
+      setState(247);
       pattern();
-      setState(251);
+      setState(252);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(255);
+    setState(256);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::ELSE) {
-      setState(252);
-      match(LogosParser::ELSE);
       setState(253);
-      match(LogosParser::COLON);
+      match(LogosParser::ELSE);
       setState(254);
+      match(LogosParser::COLON);
+      setState(255);
       statementsBlock();
     }
-    setState(257);
+    setState(258);
     match(LogosParser::RBRACE);
    
   }
@@ -1869,11 +1881,11 @@ LogosParser::PatternContext* LogosParser::pattern() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(259);
-    expr(0);
     setState(260);
-    match(LogosParser::COLON);
+    expr(0);
     setState(261);
+    match(LogosParser::COLON);
+    setState(262);
     statementsBlock();
    
   }
@@ -1947,76 +1959,76 @@ LogosParser::LoopStatementContext* LogosParser::loopStatement() {
     exitRule();
   });
   try {
-    setState(294);
+    setState(295);
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 26, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(263);
-      match(LogosParser::FOR);
       setState(264);
+      match(LogosParser::FOR);
+      setState(265);
       match(LogosParser::VARIABLE);
-      setState(269);
+      setState(270);
       _errHandler->sync(this);
       _la = _input->LA(1);
       while (_la == LogosParser::COMMA) {
-        setState(265);
-        match(LogosParser::COMMA);
         setState(266);
+        match(LogosParser::COMMA);
+        setState(267);
         match(LogosParser::VARIABLE);
-        setState(271);
+        setState(272);
         _errHandler->sync(this);
         _la = _input->LA(1);
       }
-      setState(272);
-      match(LogosParser::IN);
       setState(273);
-      antlrcpp::downCast<LoopStatementContext *>(_localctx)->iterableRange = range();
+      match(LogosParser::IN);
       setState(274);
+      antlrcpp::downCast<LoopStatementContext *>(_localctx)->iterableRange = range();
+      setState(275);
       statementsBlock();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(276);
-      match(LogosParser::FOR);
       setState(277);
+      match(LogosParser::FOR);
+      setState(278);
       match(LogosParser::VARIABLE);
-      setState(282);
+      setState(283);
       _errHandler->sync(this);
       _la = _input->LA(1);
       while (_la == LogosParser::COMMA) {
-        setState(278);
-        match(LogosParser::COMMA);
         setState(279);
+        match(LogosParser::COMMA);
+        setState(280);
         match(LogosParser::VARIABLE);
-        setState(284);
+        setState(285);
         _errHandler->sync(this);
         _la = _input->LA(1);
       }
-      setState(285);
-      match(LogosParser::IN);
       setState(286);
-      antlrcpp::downCast<LoopStatementContext *>(_localctx)->iterableExpr = unaryExpr();
+      match(LogosParser::IN);
       setState(287);
+      antlrcpp::downCast<LoopStatementContext *>(_localctx)->iterableExpr = unaryExpr();
+      setState(288);
       statementsBlock();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(289);
+      setState(290);
       match(LogosParser::FOR);
-      setState(291);
+      setState(292);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
       if (_la == LogosParser::VARIABLE) {
-        setState(290);
+        setState(291);
         match(LogosParser::VARIABLE);
       }
-      setState(293);
+      setState(294);
       statementsBlock();
       break;
     }
@@ -2075,30 +2087,30 @@ LogosParser::ControlFlowContext* LogosParser::controlFlow() {
     exitRule();
   });
   try {
-    setState(301);
+    setState(302);
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 27, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(296);
-      match(LogosParser::BREAK);
       setState(297);
+      match(LogosParser::BREAK);
+      setState(298);
       expr(0);
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(298);
-      match(LogosParser::BREAK);
       setState(299);
+      match(LogosParser::BREAK);
+      setState(300);
       match(LogosParser::IF);
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(300);
+      setState(301);
       match(LogosParser::CONTINUE);
       break;
     }
@@ -2150,9 +2162,9 @@ LogosParser::ReturnStatementContext* LogosParser::returnStatement() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(303);
-    match(LogosParser::RETURN);
     setState(304);
+    match(LogosParser::RETURN);
+    setState(305);
     expr(0);
    
   }
@@ -2215,23 +2227,23 @@ LogosParser::EnumDeclarationContext* LogosParser::enumDeclaration() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(306);
-    match(LogosParser::ENUM);
     setState(307);
-    match(LogosParser::TYPE);
+    match(LogosParser::ENUM);
     setState(308);
+    match(LogosParser::TYPE);
+    setState(309);
     match(LogosParser::LBRACE);
-    setState(312);
+    setState(313);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while (_la == LogosParser::CONST) {
-      setState(309);
+      setState(310);
       enumField();
-      setState(314);
+      setState(315);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(315);
+    setState(316);
     match(LogosParser::RBRACE);
    
   }
@@ -2282,16 +2294,16 @@ LogosParser::EnumFieldContext* LogosParser::enumField() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(317);
+    setState(318);
     match(LogosParser::CONST);
-    setState(320);
+    setState(321);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::EQUAL) {
-      setState(318);
-      match(LogosParser::EQUAL);
       setState(319);
+      match(LogosParser::EQUAL);
+      setState(320);
       match(LogosParser::STRING);
     }
    
@@ -2403,7 +2415,7 @@ LogosParser::ExprContext* LogosParser::expr(int precedence) {
   try {
     size_t alt;
     enterOuterAlt(_localctx, 1);
-    setState(328);
+    setState(329);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
       case LogosParser::LBRACE:
@@ -2418,17 +2430,17 @@ LogosParser::ExprContext* LogosParser::expr(int precedence) {
       case LogosParser::TYPE:
       case LogosParser::VARIABLE:
       case LogosParser::STRING: {
-        setState(323);
+        setState(324);
         unaryExpr();
         break;
       }
 
       case LogosParser::LPAREN: {
-        setState(324);
-        match(LogosParser::LPAREN);
         setState(325);
-        antlrcpp::downCast<ExprContext *>(_localctx)->left = expr(0);
+        match(LogosParser::LPAREN);
         setState(326);
+        antlrcpp::downCast<ExprContext *>(_localctx)->left = expr(0);
+        setState(327);
         match(LogosParser::RPAREN);
         break;
       }
@@ -2437,7 +2449,7 @@ LogosParser::ExprContext* LogosParser::expr(int precedence) {
       throw NoViableAltException(this);
     }
     _ctx->stop = _input->LT(-1);
-    setState(341);
+    setState(342);
     _errHandler->sync(this);
     alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 32, _ctx);
     while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER) {
@@ -2445,17 +2457,17 @@ LogosParser::ExprContext* LogosParser::expr(int precedence) {
         if (!_parseListeners.empty())
           triggerExitRuleEvent();
         previousContext = _localctx;
-        setState(339);
+        setState(340);
         _errHandler->sync(this);
         switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 31, _ctx)) {
         case 1: {
           _localctx = _tracker.createInstance<ExprContext>(parentContext, parentState);
           _localctx->left = previousContext;
           pushNewRecursionContext(_localctx, startState, RuleExpr);
-          setState(330);
+          setState(331);
 
           if (!(precpred(_ctx, 5))) throw FailedPredicateException(this, "precpred(_ctx, 5)");
-          setState(331);
+          setState(332);
           antlrcpp::downCast<ExprContext *>(_localctx)->op = _input->LT(1);
           _la = _input->LA(1);
           if (!(_la == LogosParser::STAR
@@ -2467,7 +2479,7 @@ LogosParser::ExprContext* LogosParser::expr(int precedence) {
             _errHandler->reportMatch(this);
             consume();
           }
-          setState(332);
+          setState(333);
           antlrcpp::downCast<ExprContext *>(_localctx)->right = expr(6);
           break;
         }
@@ -2476,10 +2488,10 @@ LogosParser::ExprContext* LogosParser::expr(int precedence) {
           _localctx = _tracker.createInstance<ExprContext>(parentContext, parentState);
           _localctx->left = previousContext;
           pushNewRecursionContext(_localctx, startState, RuleExpr);
-          setState(333);
+          setState(334);
 
           if (!(precpred(_ctx, 4))) throw FailedPredicateException(this, "precpred(_ctx, 4)");
-          setState(334);
+          setState(335);
           antlrcpp::downCast<ExprContext *>(_localctx)->op = _input->LT(1);
           _la = _input->LA(1);
           if (!(_la == LogosParser::MINUS
@@ -2491,7 +2503,7 @@ LogosParser::ExprContext* LogosParser::expr(int precedence) {
             _errHandler->reportMatch(this);
             consume();
           }
-          setState(335);
+          setState(336);
           antlrcpp::downCast<ExprContext *>(_localctx)->right = expr(5);
           break;
         }
@@ -2500,10 +2512,10 @@ LogosParser::ExprContext* LogosParser::expr(int precedence) {
           _localctx = _tracker.createInstance<ExprContext>(parentContext, parentState);
           _localctx->left = previousContext;
           pushNewRecursionContext(_localctx, startState, RuleExpr);
-          setState(336);
+          setState(337);
 
           if (!(precpred(_ctx, 3))) throw FailedPredicateException(this, "precpred(_ctx, 3)");
-          setState(337);
+          setState(338);
           antlrcpp::downCast<ExprContext *>(_localctx)->op = _input->LT(1);
           _la = _input->LA(1);
           if (!((((_la & ~ 0x3fULL) == 0) &&
@@ -2514,7 +2526,7 @@ LogosParser::ExprContext* LogosParser::expr(int precedence) {
             _errHandler->reportMatch(this);
             consume();
           }
-          setState(338);
+          setState(339);
           antlrcpp::downCast<ExprContext *>(_localctx)->right = expr(4);
           break;
         }
@@ -2523,7 +2535,7 @@ LogosParser::ExprContext* LogosParser::expr(int precedence) {
           break;
         } 
       }
-      setState(343);
+      setState(344);
       _errHandler->sync(this);
       alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 32, _ctx);
     }
@@ -2608,89 +2620,89 @@ LogosParser::UnaryExprContext* LogosParser::unaryExpr() {
     exitRule();
   });
   try {
-    setState(356);
+    setState(357);
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 33, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(344);
+      setState(345);
       match(LogosParser::VARIABLE);
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(345);
+      setState(346);
       match(LogosParser::CONST);
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(346);
+      setState(347);
       match(LogosParser::SELF_INSTANCE);
       break;
     }
 
     case 4: {
       enterOuterAlt(_localctx, 4);
-      setState(347);
+      setState(348);
       match(LogosParser::SELF_CLASS);
       break;
     }
 
     case 5: {
       enterOuterAlt(_localctx, 5);
-      setState(348);
+      setState(349);
       match(LogosParser::NULL_);
       break;
     }
 
     case 6: {
       enterOuterAlt(_localctx, 6);
-      setState(349);
+      setState(350);
       funcCall();
       break;
     }
 
     case 7: {
       enterOuterAlt(_localctx, 7);
-      setState(350);
+      setState(351);
       constructor();
       break;
     }
 
     case 8: {
       enterOuterAlt(_localctx, 8);
-      setState(351);
+      setState(352);
       constant();
       break;
     }
 
     case 9: {
       enterOuterAlt(_localctx, 9);
-      setState(352);
+      setState(353);
       array();
       break;
     }
 
     case 10: {
       enterOuterAlt(_localctx, 10);
-      setState(353);
+      setState(354);
       map();
       break;
     }
 
     case 11: {
       enterOuterAlt(_localctx, 11);
-      setState(354);
+      setState(355);
       arrayIndex();
       break;
     }
 
     case 12: {
       enterOuterAlt(_localctx, 12);
-      setState(355);
+      setState(356);
       selection();
       break;
     }
@@ -2760,33 +2772,33 @@ LogosParser::ArrayContext* LogosParser::array() {
   try {
     size_t alt;
     enterOuterAlt(_localctx, 1);
-    setState(358);
-    match(LogosParser::LBRACK);
     setState(359);
+    match(LogosParser::LBRACK);
+    setState(360);
     expr(0);
-    setState(364);
+    setState(365);
     _errHandler->sync(this);
     alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 34, _ctx);
     while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER) {
       if (alt == 1) {
-        setState(360);
-        match(LogosParser::COMMA);
         setState(361);
+        match(LogosParser::COMMA);
+        setState(362);
         expr(0); 
       }
-      setState(366);
+      setState(367);
       _errHandler->sync(this);
       alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 34, _ctx);
     }
-    setState(368);
+    setState(369);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::COMMA) {
-      setState(367);
+      setState(368);
       match(LogosParser::COMMA);
     }
-    setState(370);
+    setState(371);
     match(LogosParser::RBRACK);
    
   }
@@ -2857,32 +2869,32 @@ LogosParser::MapContext* LogosParser::map() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(372);
+    setState(373);
     match(LogosParser::LBRACE);
-    setState(381);
+    setState(382);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 143552239733047968) != 0)) {
-      setState(373);
-      expr(0);
       setState(374);
-      match(LogosParser::COLON);
-      setState(375);
       expr(0);
-      setState(377);
+      setState(375);
+      match(LogosParser::COLON);
+      setState(376);
+      expr(0);
+      setState(378);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
       if (_la == LogosParser::COMMA) {
-        setState(376);
+        setState(377);
         match(LogosParser::COMMA);
       }
-      setState(383);
+      setState(384);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(384);
+    setState(385);
     match(LogosParser::RBRACE);
    
   }
@@ -2937,20 +2949,20 @@ LogosParser::FuncCallContext* LogosParser::funcCall() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(386);
-    match(LogosParser::VARIABLE);
     setState(387);
+    match(LogosParser::VARIABLE);
+    setState(388);
     match(LogosParser::LPAREN);
-    setState(389);
+    setState(390);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 143552239733047968) != 0)) {
-      setState(388);
+      setState(389);
       funcArgList();
     }
-    setState(391);
+    setState(392);
     match(LogosParser::RPAREN);
    
   }
@@ -3005,20 +3017,20 @@ LogosParser::ConstructorContext* LogosParser::constructor() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(393);
-    match(LogosParser::TYPE);
     setState(394);
+    match(LogosParser::TYPE);
+    setState(395);
     match(LogosParser::LPAREN);
-    setState(396);
+    setState(397);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 143552239733047968) != 0)) {
-      setState(395);
+      setState(396);
       funcArgList();
     }
-    setState(398);
+    setState(399);
     match(LogosParser::RPAREN);
    
   }
@@ -3074,28 +3086,28 @@ LogosParser::FuncArgListContext* LogosParser::funcArgList() {
   try {
     size_t alt;
     enterOuterAlt(_localctx, 1);
-    setState(400);
+    setState(401);
     funcArg();
-    setState(405);
+    setState(406);
     _errHandler->sync(this);
     alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 40, _ctx);
     while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER) {
       if (alt == 1) {
-        setState(401);
-        match(LogosParser::COMMA);
         setState(402);
+        match(LogosParser::COMMA);
+        setState(403);
         funcArg(); 
       }
-      setState(407);
+      setState(408);
       _errHandler->sync(this);
       alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 40, _ctx);
     }
-    setState(409);
+    setState(410);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LogosParser::COMMA) {
-      setState(408);
+      setState(409);
       match(LogosParser::COMMA);
     }
    
@@ -3146,14 +3158,14 @@ LogosParser::FuncArgContext* LogosParser::funcArg() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(413);
+    setState(414);
     _errHandler->sync(this);
 
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 42, _ctx)) {
     case 1: {
-      setState(411);
-      match(LogosParser::VARIABLE);
       setState(412);
+      match(LogosParser::VARIABLE);
+      setState(413);
       match(LogosParser::EQUAL);
       break;
     }
@@ -3161,7 +3173,7 @@ LogosParser::FuncArgContext* LogosParser::funcArg() {
     default:
       break;
     }
-    setState(415);
+    setState(416);
     expr(0);
    
   }
@@ -3216,7 +3228,7 @@ LogosParser::ConstantContext* LogosParser::constant() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(417);
+    setState(418);
     _la = _input->LA(1);
     if (!((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 75998243711877120) != 0))) {
@@ -3295,17 +3307,17 @@ LogosParser::ArrayIndexContext* LogosParser::arrayIndex() {
   try {
     size_t alt;
     enterOuterAlt(_localctx, 1);
-    setState(421);
+    setState(422);
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 43, _ctx)) {
     case 1: {
-      setState(419);
+      setState(420);
       funcCall();
       break;
     }
 
     case 2: {
-      setState(420);
+      setState(421);
       match(LogosParser::VARIABLE);
       break;
     }
@@ -3313,17 +3325,17 @@ LogosParser::ArrayIndexContext* LogosParser::arrayIndex() {
     default:
       break;
     }
-    setState(427); 
+    setState(428); 
     _errHandler->sync(this);
     alt = 1;
     do {
       switch (alt) {
         case 1: {
-              setState(423);
-              match(LogosParser::LBRACK);
               setState(424);
-              expr(0);
+              match(LogosParser::LBRACK);
               setState(425);
+              expr(0);
+              setState(426);
               match(LogosParser::RBRACK);
               break;
             }
@@ -3331,7 +3343,7 @@ LogosParser::ArrayIndexContext* LogosParser::arrayIndex() {
       default:
         throw NoViableAltException(this);
       }
-      setState(429); 
+      setState(430); 
       _errHandler->sync(this);
       alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 44, _ctx);
     } while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER);
@@ -3392,17 +3404,17 @@ LogosParser::SelectionContext* LogosParser::selection() {
   try {
     size_t alt;
     enterOuterAlt(_localctx, 1);
-    setState(431);
+    setState(432);
     firstSelectionElement();
-    setState(434); 
+    setState(435); 
     _errHandler->sync(this);
     alt = 1;
     do {
       switch (alt) {
         case 1: {
-              setState(432);
-              match(LogosParser::DOT);
               setState(433);
+              match(LogosParser::DOT);
+              setState(434);
               innerSelectionElement();
               break;
             }
@@ -3410,7 +3422,7 @@ LogosParser::SelectionContext* LogosParser::selection() {
       default:
         throw NoViableAltException(this);
       }
-      setState(436); 
+      setState(437); 
       _errHandler->sync(this);
       alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 45, _ctx);
     } while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER);
@@ -3477,54 +3489,54 @@ LogosParser::FirstSelectionElementContext* LogosParser::firstSelectionElement() 
     exitRule();
   });
   try {
-    setState(445);
+    setState(446);
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 46, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(438);
+      setState(439);
       match(LogosParser::VARIABLE);
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(439);
+      setState(440);
       match(LogosParser::TYPE);
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(440);
+      setState(441);
       match(LogosParser::SELF_CLASS);
       break;
     }
 
     case 4: {
       enterOuterAlt(_localctx, 4);
-      setState(441);
+      setState(442);
       match(LogosParser::SELF_INSTANCE);
       break;
     }
 
     case 5: {
       enterOuterAlt(_localctx, 5);
-      setState(442);
+      setState(443);
       funcCall();
       break;
     }
 
     case 6: {
       enterOuterAlt(_localctx, 6);
-      setState(443);
+      setState(444);
       constructor();
       break;
     }
 
     case 7: {
       enterOuterAlt(_localctx, 7);
-      setState(444);
+      setState(445);
       arrayIndex();
       break;
     }
@@ -3579,26 +3591,26 @@ LogosParser::InnerSelectionElementContext* LogosParser::innerSelectionElement() 
     exitRule();
   });
   try {
-    setState(450);
+    setState(451);
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 47, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(447);
+      setState(448);
       match(LogosParser::VARIABLE);
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(448);
+      setState(449);
       funcCall();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(449);
+      setState(450);
       arrayIndex();
       break;
     }
@@ -3655,18 +3667,18 @@ LogosParser::RangeContext* LogosParser::range() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(453);
+    setState(454);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 143552239733047968) != 0)) {
-      setState(452);
+      setState(453);
       antlrcpp::downCast<RangeContext *>(_localctx)->start = expr(0);
     }
-    setState(455);
-    match(LogosParser::DOUBLE_DOT);
     setState(456);
+    match(LogosParser::DOUBLE_DOT);
+    setState(457);
     antlrcpp::downCast<RangeContext *>(_localctx)->end = expr(0);
    
   }
@@ -3756,19 +3768,19 @@ LogosParser::TypeContext* LogosParser::type() {
     exitRule();
   });
   try {
-    setState(478);
+    setState(479);
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 52, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(458);
+      setState(459);
       match(LogosParser::TYPE);
-      setState(460);
+      setState(461);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
       if (_la == LogosParser::QUEST_MARK) {
-        setState(459);
+        setState(460);
         match(LogosParser::QUEST_MARK);
       }
       break;
@@ -3776,25 +3788,25 @@ LogosParser::TypeContext* LogosParser::type() {
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(462);
+      setState(463);
       match(LogosParser::TYPE);
-      setState(468); 
+      setState(469); 
       _errHandler->sync(this);
       _la = _input->LA(1);
       do {
-        setState(463);
+        setState(464);
         match(LogosParser::LBRACK);
-        setState(465);
+        setState(466);
         _errHandler->sync(this);
 
         _la = _input->LA(1);
         if (_la == LogosParser::INTEGER) {
-          setState(464);
+          setState(465);
           match(LogosParser::INTEGER);
         }
-        setState(467);
+        setState(468);
         match(LogosParser::RBRACK);
-        setState(470); 
+        setState(471); 
         _errHandler->sync(this);
         _la = _input->LA(1);
       } while (_la == LogosParser::LBRACK);
@@ -3803,15 +3815,15 @@ LogosParser::TypeContext* LogosParser::type() {
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(472);
-      match(LogosParser::LBRACE);
       setState(473);
-      type();
+      match(LogosParser::LBRACE);
       setState(474);
-      match(LogosParser::COLON);
-      setState(475);
       type();
+      setState(475);
+      match(LogosParser::COLON);
       setState(476);
+      type();
+      setState(477);
       match(LogosParser::RBRACE);
       break;
     }
@@ -3872,7 +3884,7 @@ LogosParser::VectorContext* LogosParser::vector() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(480);
+    setState(481);
     _la = _input->LA(1);
     if (!((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 128849018880) != 0))) {

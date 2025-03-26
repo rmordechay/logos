@@ -2,9 +2,11 @@
 #define SELECTION_H
 #include "exprs/unary/LgsUnaryExpr.h"
 
+#include <stmts/LgsStmt.h>
+
 class LgsUnaryExpr;
 
-class LgsSelection final : public LgsUnaryExpr {
+class LgsSelection final : public LgsStmt, public LgsUnaryExpr {
 public:
     vector<LgsUnaryExpr*> exprs;
 

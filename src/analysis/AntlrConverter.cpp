@@ -152,9 +152,6 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto explicitVarDec = ctx->explicitVarDec()) {
         return getExplicitVarDec(explicitVarDec);
     }
-    if (const auto funcCall = ctx->funcCall()) {
-        return getFuncCall(funcCall);
-    }
     if (const auto ifStmt = ctx->ifStatement()) {
         return getIfStatement(ifStmt);
     }
@@ -166,6 +163,12 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     }
     if (const auto enumDec = ctx->enumDeclaration()) {
         return getEnum(enumDec);
+    }
+    if (const auto funcCall = ctx->funcCall()) {
+        return getFuncCall(funcCall);
+    }
+    if (const auto selection = ctx->selection()) {
+        return getSelection(selection);
     }
     if (const auto returnStmt = ctx->returnStatement()) {
         return new LgsReturn(getExpr(returnStmt->expr()));

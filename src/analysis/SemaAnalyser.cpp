@@ -101,6 +101,8 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
         visitAssignment(fieldDef);
     } else if (const auto funcCall = dynamic_cast<LgsFuncCall*>(stmt)) {
         visitFuncCall(funcCall);
+    } else if (const auto selection = dynamic_cast<LgsSelection*>(stmt)) {
+        visitSelection(selection);
     } else if (const auto returnStmt = dynamic_cast<LgsReturn*>(stmt)) {
         visitReturnStmt(returnStmt);
     } else if (const auto enumDec = dynamic_cast<LgsEnum*>(stmt)) {
@@ -279,6 +281,7 @@ void SemaAnalyser::visitSelection(LgsSelection* selection) {
             continue;
         }
         if (const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr)) {
+            methodCall->setComposedName();
             const auto method = currentExpr->type->getMethod(methodCall);
             methodCall->func = method;
             methodCall->args.insert(methodCall->args.begin(), currentExpr);
