@@ -1,4 +1,7 @@
 #include "codegen/LgsLinker.h"
+
+#include "CodeGenMetadata.h"
+
 #include <CodeGenerator.h>
 #include <LgsData.h>
 #include "llvm/Linker/Linker.h"

@@ -5,6 +5,7 @@
 
 class LgsVarDec final : public LgsStmt {
 public:
+
     string name;
     LgsType* type = nullptr;
     LgsType* userType = nullptr;
@@ -14,6 +15,7 @@ public:
     LgsVarDec(const string& name, LgsType* type) : name(name), type(type) {}
     explicit LgsVarDec(const string& name) : LgsVarDec(name, nullptr, nullptr) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    void free(CodeGenMetadata* metadata) override;
     json asJson() override;
     ~LgsVarDec() override;
 };

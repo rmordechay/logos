@@ -8,7 +8,7 @@ Value* LgsIfStmt::createIRValue(CodeGenMetadata* metadata) {
     } else {
         computeSimpleIf(metadata);
     }
-    metadata->logosStack.exitScope();
+    metadata->logosStack.exitScope(metadata);
     return nullptr;
 }
 

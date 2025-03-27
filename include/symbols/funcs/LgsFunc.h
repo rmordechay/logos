@@ -27,7 +27,7 @@ public:
     void setComposedName();
     virtual void createIRValue(CodeGenMetadata* metadata);
     virtual void setIRFunc(CodeGenMetadata* metadata) = 0;
-    virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) = 0;
+    virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {}) = 0;
     json asJson() override;
     ~LgsFunc() override;
 };

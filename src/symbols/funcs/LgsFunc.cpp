@@ -17,7 +17,7 @@ void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     metadata->logosStack.currentFunc = IRFunc;
     startBlock(metadata, entryBlock);
     stmtBlock->createIRValue(metadata);
-    metadata->logosStack.exitScope();
+    metadata->logosStack.exitScope(metadata);
 }
 
 json LgsFunc::asJson() {

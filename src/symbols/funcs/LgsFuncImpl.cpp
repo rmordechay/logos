@@ -1,4 +1,7 @@
 #include "funcs/LgsFuncImpl.h"
+
+#include "exprs/LgsExpr.h"
+
 #include <LgsStack.h>
 #include <types/LgsInt.h>
 

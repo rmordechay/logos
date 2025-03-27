@@ -1,7 +1,7 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
 
-
+struct CodeGenMetadata;
 class LgsEnum;
 class LgsParam;
 class LgsVarDec;
@@ -31,9 +31,9 @@ enum LgsSymbolType {
 struct LgsSymbol {
     LgsSymbolType type;
     union {
-        LgsObject* object;
         LgsVarDec* varDec;
         LgsParam* param;
+        LgsObject* object;
         LgsFunc* func;
         LgsEnum* lgsEnum;
     };
@@ -67,6 +67,8 @@ struct LgsSymbol {
         type(type),
         lgsEnum(lgsEnum) {
     }
+
+    void free(CodeGenMetadata* metadata) const;
 };
 
 #endif //LOGOSSYMBOL_H

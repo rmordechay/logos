@@ -3,12 +3,14 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 
+Type* LgsInt::IRValue = Type::getInt32Ty(context);
+
 const string LgsInt::getName() const {
     return name;
 }
 
 Type* LgsInt::getIRType() {
-    return Type::getInt32Ty(context);
+    return IRValue;
 }
 
 LgsExpr* LgsInt::getZeroValue() {

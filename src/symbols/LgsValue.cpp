@@ -21,6 +21,10 @@ json LgsValue::asJson() {
     return json::object();
 }
 
+void LgsValue::free(CodeGenMetadata* metadata) {
+    assert(false && "value has nothing to free");
+}
+
 void LgsValue::setIRValue(Value* value) {
     IRValue = value;
 }

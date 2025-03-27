@@ -8,10 +8,14 @@
 #include <filesystem>
 #include <llvm/TargetParser/Host.h>
 
+using namespace llvm;
+
 inline LLVMContext context;
 inline map<string, Module*> modules;
 inline TargetMachine* targetMachine = nullptr;
 inline string targetTriple = sys::getDefaultTargetTriple();
+
+PointerType* const ptrTy = PointerType::get(Type::getInt8Ty(context), 0);
 
 struct CodeGenMetadata {
     LgsStack logosStack;

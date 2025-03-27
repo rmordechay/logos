@@ -12,7 +12,12 @@ void LgsStack::enterScope() {
     }
 }
 
-void LgsStack::exitScope() {
+void LgsStack::exitScope(CodeGenMetadata* metadata) {
+    if (metadata) {
+        for (const auto& [_, symbol] : top().symbols) {
+            symbol.free(metadata);
+        }
+    }
     pop();
 }
 

@@ -106,10 +106,10 @@ bool Logos::analyse(const vector<LgsFile*>& files) {
 
 void Logos::loadBuiltinFuncs() const {
     globals.funcs[LgsPrint::name] = {
-        new LgsPrint({new LgsParam("input", new LgsInt())}),
-        new LgsPrint({new LgsParam("input", new LgsFloat())}),
-        new LgsPrint({new LgsParam("input", new LgsStr())}),
-        new LgsPrint({new LgsParam("input", new LgsChar())}),
+        new LgsPrint({new LgsParam(new LgsInt())}),
+        new LgsPrint({new LgsParam(new LgsFloat())}),
+        new LgsPrint({new LgsParam(new LgsStr())}),
+        new LgsPrint({new LgsParam(new LgsChar())}),
     };
 }
 

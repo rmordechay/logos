@@ -1,6 +1,7 @@
 #include "exprs/unary/LgsInstance.h"
 #include "CodeGenerator.h"
 #include "stmts/LgsField.h"
+#include "types/LgsObject.h"
 
 string LgsInstance::getName() {
     return name;

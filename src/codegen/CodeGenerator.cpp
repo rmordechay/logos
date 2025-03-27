@@ -1,5 +1,8 @@
 #include "CodeGenerator.h"
 #include "funcs/LgsFuncImpl.h"
+#include "types/LgsObject.h"
+
+#include <LgsMainFile.h>
 #include <ranges>
 #include <llvm/Support/FileSystem.h>
 

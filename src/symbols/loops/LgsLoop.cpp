@@ -9,7 +9,7 @@ Value* LgsLoop::createIRValue(CodeGenMetadata* metadata) {
     setIRBody(metadata);
     stmtBlock->createIRValue(metadata);
     exitIRLoop(metadata);
-    metadata->logosStack.exitScope();
+    metadata->logosStack.exitScope(metadata);
     return nullptr;
 }
 

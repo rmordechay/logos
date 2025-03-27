@@ -2,8 +2,13 @@
 #include "exprs/unary/LgsArray.h"
 #include <llvm/IR/DerivedTypes.h>
 
+
+Type* LgsArrayType::getIRType() {
+    return ptrTy;
+}
+
 const string LgsArrayType::getName() const {
-    return underlyingType->getName() + "[]";
+    return "ArrayType";
 }
 
 Type* LgsArrayType::getIRType(const int size) {

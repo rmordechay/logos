@@ -24,6 +24,7 @@ public:
     void startBlock(CodeGenMetadata* metadata, BasicBlock* block, bool enterScope = false) const;
     virtual void setLocation(const antlr4::Token* ctx);
     virtual json asJson();
+    virtual void free(CodeGenMetadata* metadata);
     virtual ~LgsValue() = default;
 };
 
