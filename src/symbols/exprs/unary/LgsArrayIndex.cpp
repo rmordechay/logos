@@ -7,7 +7,7 @@ Value* LgsArrayIndex::createIRValue(CodeGenMetadata* metadata) {
     switch (symbol->type) {
     case VAR_DEC: {
         if (const auto array = symbol->varDec->expr->asArray()) {
-            const auto lastExprIRValue = indexExprs[indexExprs.size() - 1]->getIRValue(metadata);
+            const auto lastExprIRValue = lastExpr()->getIRValue(metadata);
             return array->getIRFuncGetElement(metadata, lastExprIRValue);
         }
         break;
@@ -20,6 +20,11 @@ Value* LgsArrayIndex::createIRValue(CodeGenMetadata* metadata) {
 
 string LgsArrayIndex::getName() {
     return baseExpr->getName();
+}
+
+LgsExpr* LgsArrayIndex::lastExpr() const {
+    if (indexExprs.empty()) return nullptr;
+    return indexExprs[indexExprs.size() - 1];
 }
 
 LgsArrayIndex::~LgsArrayIndex() {

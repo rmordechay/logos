@@ -14,7 +14,6 @@ class LgsLoop : public LgsStmt {
 public:
     vector<LgsVarDec*> loopVars;
     LgsStmtBlock* stmtBlock = nullptr;
-    Type* i32Type = Type::getInt32Ty(context);
     BasicBlock* loopCondition = nullptr;
     BasicBlock* loopBody = nullptr;
     BasicBlock* loopExit = nullptr;

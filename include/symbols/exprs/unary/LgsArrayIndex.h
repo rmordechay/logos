@@ -13,6 +13,7 @@ public:
     explicit LgsArrayIndex(LgsUnaryExpr* baseExpr, const vector<LgsExpr*>& indexExprs) : baseExpr(baseExpr), indexExprs(indexExprs) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
+    LgsExpr* lastExpr() const;
     ~LgsArrayIndex() override;
 };
 

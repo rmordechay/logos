@@ -30,7 +30,8 @@ Value* LgsArray::getIRFuncGetElement(CodeGenMetadata* metadata, Value* index) co
 }
 
 void LgsArray::free(CodeGenMetadata* metadata) {
+    if (isFreed) return;
     const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_freeArr_ArrayType", freeArrIRFuncType);
     metadata->builder.CreateCall(func);
+    isFreed = true;
 }
-

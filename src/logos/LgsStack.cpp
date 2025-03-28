@@ -44,7 +44,6 @@ vector<LgsFunc*> LgsStack::getFuncOverloads(const LgsFuncCall* funcCall) const {
 
 LgsFunc* LgsStack::getFunc(const vector<LgsFunc*>& overloads, const LgsFuncCall* funcCall) const {
     for (const auto& overload : overloads) {
-        std::cout << overload->signature.composedName << " : " << funcCall->signature.composedName << '\n';
         if (overload->signature.composedName == funcCall->signature.composedName) {
             return overload;
         }

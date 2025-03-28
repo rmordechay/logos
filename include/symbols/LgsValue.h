@@ -17,6 +17,7 @@ class LgsValue {
 public:
     Location location;
     Value* IRValue = nullptr;
+    bool isFreed = false;
 
     void setIRValue(Value* value);
     GlobalVariable* createIRGlobal(Module* module, Constant* strConstant) const;

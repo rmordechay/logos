@@ -16,6 +16,7 @@ inline TargetMachine* targetMachine = nullptr;
 inline string targetTriple = sys::getDefaultTargetTriple();
 
 PointerType* const ptrTy = PointerType::get(Type::getInt8Ty(context), 0);
+Type* const i32Type = Type::getInt32Ty(context);
 
 struct CodeGenMetadata {
     LgsStack logosStack;
