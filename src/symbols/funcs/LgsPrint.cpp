@@ -13,7 +13,8 @@ void LgsPrint::setIRFunc(CodeGenMetadata* metadata) {
         paramTypes.emplace_back(param->type->getIRType());
     }
     const auto IRFuncType = FunctionType::get(Type::getVoidTy(context), paramTypes, false);
-    IRFunc = Function::Create(IRFuncType, GlobalValue::ExternalLinkage, signature.composedName, metadata->currentModule);
+    auto func = metadata->currentModule->getOrInsertFunction(signature.composedName, IRFuncType);
+    IRFunc = dyn_cast<Function>(func.getCallee());
 }
 
 void LgsPrint::createIRValue(CodeGenMetadata* metadata) {}

@@ -17,6 +17,15 @@ void LgsFuncCall::setComposedName() {
     signature.setComposedName();
 }
 
+string LgsFuncCall::getArgsTypeStr() const {
+    std::ostringstream result;
+    for (size_t i = 0; i < args.size(); ++i) {
+        if (i > 0) result << ", ";
+        result << args[i]->type->getName();
+    }
+    return result.str();
+}
+
 LgsFuncCall::~LgsFuncCall() {
     for (const auto& arg : args) {
         delete arg;

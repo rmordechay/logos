@@ -16,9 +16,6 @@ LgsMethodImpl* LgsType::getMethod(const LgsFuncCall* funcCall) {
     const auto method = methods.find(funcCall->signature.name);
     if (method != methods.end()) {
         for (const auto& overload : method->second) {
-            std::cout << "overload: " + overload->signature.composedName << '\n';
-            std::cout << "funcCall: " + funcCall->signature.composedName << '\n';
-            std::cout << "---" << '\n';
             if (overload->signature.composedName == funcCall->signature.composedName) {
                 return overload;
             }

@@ -34,13 +34,19 @@ LgsSymbol* LgsStack::getSymbol(const string& name) {
     return nullptr;
 }
 
-LgsFunc* LgsStack::getFunc(const LgsFuncCall* funcCall) const {
+vector<LgsFunc*> LgsStack::getFuncOverloads(const LgsFuncCall* funcCall) const {
     const auto func = globals.funcs.find(funcCall->signature.name);
     if (func != globals.funcs.end()) {
-        for (const auto& overload : func->second) {
-            if (overload->signature.composedName == funcCall->signature.composedName) {
-                return overload;
-            }
+        return func->second;
+    }
+    return {};
+}
+
+LgsFunc* LgsStack::getFunc(const vector<LgsFunc*>& overloads, const LgsFuncCall* funcCall) const {
+    for (const auto& overload : overloads) {
+        std::cout << overload->signature.composedName << " : " << funcCall->signature.composedName << '\n';
+        if (overload->signature.composedName == funcCall->signature.composedName) {
+            return overload;
         }
     }
     return nullptr;

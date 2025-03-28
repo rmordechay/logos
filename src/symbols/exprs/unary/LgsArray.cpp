@@ -3,29 +3,34 @@
 
 Value* LgsArray::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto initArrFunc = getIRFuncInitArr(metadata);
+    const auto IRArr = initIRArr(metadata);
     const auto addElementFunc = getIRFuncAddElement(metadata);
-    const auto callInst = builder.CreateCall(initArrFunc);
     for (const auto & element : initialElements) {
-        builder.CreateCall(addElementFunc, {callInst, element->getIRValue(metadata)});
+        builder.CreateCall(addElementFunc, {IRArr, element->getIRValue(metadata)});
     }
-    return callInst;
+    return IRArr;
 }
 
 size_t LgsArray::size() {
     return initialElements.size();
 }
 
-FunctionCallee LgsArray::getIRFuncInitArr(const CodeGenMetadata* metadata) const {
-    return metadata->currentModule->getOrInsertFunction("ArrayType_initArr", initArrIRFuncType);
+Value* LgsArray::initIRArr(CodeGenMetadata* metadata) const {
+    const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_initArr", initArrIRFuncType);
+    return metadata->builder.CreateCall(func);
+}
+
+FunctionCallee LgsArray::getIRFuncAddElement(const CodeGenMetadata* metadata) const {
+    return metadata->currentModule->getOrInsertFunction("ArrayType_add_ArrayType_Int", addElementIRFuncType);
+}
+
+Value* LgsArray::getIRFuncGetElement(CodeGenMetadata* metadata, Value* index) const {
+    const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_getElement_ArrayType_Int", getElementIRFuncType);
+    return metadata->builder.CreateCall(func, {IRValue, index});
 }
 
 void LgsArray::free(CodeGenMetadata* metadata) {
     const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_freeArr_ArrayType", freeArrIRFuncType);
     metadata->builder.CreateCall(func);
-}
-
-FunctionCallee LgsArray::getIRFuncAddElement(const CodeGenMetadata* metadata) const {
-    return metadata->currentModule->getOrInsertFunction("ArrayType_add_ArrayType_Int", addElementIRFuncType);
 }
 

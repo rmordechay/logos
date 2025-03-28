@@ -42,6 +42,14 @@ define ptr @ArrayType_initArr() {
     ret ptr %arr_ptr
 }
 
+define i32 @ArrayType_getElement_ArrayType_Int(ptr %arr_ptr, i32 %index) {
+    %data_ptr = call ptr @get_data(ptr %arr_ptr)
+    %data = load ptr, ptr %data_ptr
+    %element_ptr = getelementptr i32, ptr %data, i32 %index
+    %element = load i32, ptr %element_ptr
+    ret i32 %element
+}
+
 define void @ArrayType_add_ArrayType_Int(ptr %arr_ptr, i32 %new_elem) {
 entry:
     %cap_ptr = call ptr @get_cap(ptr %arr_ptr)
@@ -76,16 +84,5 @@ define void @ArrayType_freeArr_ArrayType(ptr %arr_ptr) {
     %data_ptr = load ptr, ptr %data_field
     call void @free(ptr %data_ptr)
     call void @free(ptr %arr_ptr)
-    ret void
-}
-
-define void @ArrayType_getElement_ArrayType_Int() {
-    %arr_ptr = call ptr @ArrayType_initArr()
-    %data_ptr = call ptr @get_data(ptr %arr_ptr)
-    %data = load ptr, ptr %data_ptr
-    %index = add i32 0, 3
-    %element_ptr = getelementptr i32, ptr %data, i32 %index
-    %element = load i32, ptr %element_ptr
-    call i32(ptr, ...) @printf(ptr @str, i32 %element)
     ret void
 }
