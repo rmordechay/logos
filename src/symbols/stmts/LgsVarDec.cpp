@@ -22,7 +22,7 @@ Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
 }
 
 void LgsVarDec::free(CodeGenMetadata* metadata) {
-    if (const auto arr = dynamic_cast<LgsArray*>(expr)) {
+    if (const auto arr = expr->asArray()) {
         arr->free(metadata);
     }
 }

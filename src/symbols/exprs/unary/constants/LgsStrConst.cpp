@@ -11,14 +11,14 @@ size_t LgsStrConst::size() {
 }
 
 Value* LgsStrConst::add(CodeGenMetadata* metadata, LgsExpr* other) {
-    if (const auto otherStrConst = dynamic_cast<const LgsStrConst*>(other)) {
+    if (const auto otherStrConst = other->asIntConst()) {
+        return createGlobalStr(metadata->currentModule, this->value + to_string(otherStrConst->value));
+    }
+    if (const auto otherStrConst = other->asFloatConst()) {
+        return createGlobalStr(metadata->currentModule, this->value + to_string(otherStrConst->value));
+    }
+    if (const auto otherStrConst = other->asStrConst()) {
         return createGlobalStr(metadata->currentModule, this->value + otherStrConst->value);
-    }
-    if (const auto otherStrConst = dynamic_cast<const LgsIntConst*>(other)) {
-        return createGlobalStr(metadata->currentModule, this->value + to_string(otherStrConst->value));
-    }
-    if (const auto otherStrConst = dynamic_cast<const LgsFloatConst*>(other)) {
-        return createGlobalStr(metadata->currentModule, this->value + to_string(otherStrConst->value));
     }
     return nullptr;
 }
@@ -30,11 +30,11 @@ Value* LgsStrConst::createGlobalStr(Module* module, const std::string& value) co
 
 LgsExpr* LgsStrConst::add(LgsExpr* other) {
     string otherValue;
-    if (const auto intConst = dynamic_cast<LgsIntConst*>(other)) {
+    if (const auto intConst = other->asIntConst()) {
         otherValue = to_string(intConst->value);
-    } else if (const auto floatConst = dynamic_cast<const LgsFloatConst*>(other)) {
+    } else if (const auto floatConst = other->asFloatConst()) {
         otherValue = to_string(floatConst->value);
-    } else if (const auto strConst = dynamic_cast<const LgsStrConst*>(other)) {
+    } else if (const auto strConst = other->asStrConst()) {
         otherValue = this->value + strConst->value;
     }
     return new LgsStrConst(value + otherValue);

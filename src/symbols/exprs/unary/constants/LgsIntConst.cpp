@@ -7,13 +7,13 @@ Value* LgsIntConst::createIRValue(CodeGenMetadata* metadata) {
 }
 
 LgsExpr* LgsIntConst::add(LgsExpr* other) {
-    if (const auto intConst = dynamic_cast<LgsIntConst*>(other)) {
+    if (const auto intConst = other->asIntConst()) {
         return new LgsIntConst(value + intConst->value);
     }
-    if (const auto floatConst = dynamic_cast<const LgsFloatConst*>(other)) {
+    if (const auto floatConst = other->asFloatConst()) {
         return new LgsFloatConst(value + floatConst->value);
     }
-    if (const auto strConst = dynamic_cast<LgsStrConst*>(other)) {
+    if (const auto strConst = other->asStrConst()) {
         return strConst->add(this);
     }
     return nullptr;

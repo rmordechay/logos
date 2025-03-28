@@ -8,7 +8,7 @@ Value* LgsArrayIndex::createIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->logosStack.getSymbol(baseExpr->getName());
     switch (symbol->type) {
     case VAR_DEC: {
-        if (const auto array = dynamic_cast<LgsArray*>(symbol->varDec->expr)) {
+        if (const auto array = symbol->varDec->expr->asArray()) {
             const auto arrPtr = array->getIRValue(metadata);
             const auto lastExprIRValue = indexExprs[indexExprs.size() - 1]->getIRValue(metadata);
             const auto lastElement = builder.CreateGEP(irType, arrPtr, lastExprIRValue);

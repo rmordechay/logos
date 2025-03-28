@@ -10,11 +10,11 @@
 #include <types/LgsInt.h>
 
 Value* LgsAssignment::createIRValue(CodeGenMetadata* metadata) {
-    if (const auto selection = dynamic_cast<LgsSelection*>(lvalue)) {
+    if (const auto selection = lvalue->asSelection()) {
         const auto firstExprSymbol = metadata->logosStack.getSymbol(selection->exprs[0]->getName());
         switch (firstExprSymbol->type) {
         case VAR_DEC:
-            if (const auto instance = dynamic_cast<LgsInstance*>(firstExprSymbol->varDec->expr)) {
+            if (const auto instance = firstExprSymbol->varDec->expr->asInstance()) {
                 const auto nextName = selection->exprs[1]->getName();
                 const auto field = instance->obj->getField(nextName);
                 field->setFieldIRValue(metadata, rvalue, instance);

@@ -7,8 +7,8 @@
 #include <types/LgsInt.h>
 
 int LgsRangeLoop::loopSize() {
-    const int rangeStartValue = dynamic_cast<LgsIntConst*>(rangeStart)->value;
-    const int rangeEndValue = dynamic_cast<LgsIntConst*>(rangeEnd)->value;
+    const int rangeStartValue = rangeStart->asIntConst()->value;
+    const int rangeEndValue = rangeEnd->asIntConst()->value;
     return rangeEndValue - rangeStartValue;
 }
 

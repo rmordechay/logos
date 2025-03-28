@@ -65,6 +65,7 @@ add_library(lib STATIC
     include/symbols/funcs/LgsMethodImpl.h
     include/symbols/funcs/LgsParam.h
     include/symbols/funcs/LgsPrint.h
+    include/symbols/funcs/LgsFuncSignature.h
     include/symbols/types/LgsType.h
     include/symbols/loops/LgsForeachLoop.h
     include/symbols/loops/LgsRangeLoop.h
@@ -104,6 +105,7 @@ add_library(lib STATIC
 
     # Symbols src
     src/symbols/LgsValue.cpp
+    src/symbols/exprs/LgsExpr.cpp
     src/symbols/exprs/binary/LgsBinaryExpr.cpp
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
     src/symbols/exprs/unary/constants/LgsTypeConst.cpp
@@ -145,8 +147,7 @@ add_library(lib STATIC
     src/symbols/LgsSymbol.cpp
 )
 
-add_executable(lgs main.cpp
-    include/symbols/funcs/LgsFuncSignature.h)
+add_executable(lgs main.cpp)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE
