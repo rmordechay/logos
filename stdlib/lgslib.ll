@@ -1,14 +1,18 @@
-; ModuleID = 'stdlib'
-
-declare i64 @printf(ptr, ...)
+declare i32 @printf(ptr, ...)
 
 @formatInt = private constant [4 x i8] c"%d\0A\00"
+@formatLong = private constant [5 x i8] c"%ld\0A\00"
 @formatFloat = private constant [4 x i8] c"%f\0A\00"
 @formatString = private constant [4 x i8] c"%s\0A\00"
 @formatChar = private constant [4 x i8] c"%c\0A\00"
 
 define void @print_Int(i32 noundef %x) {
   call i32 (ptr, ...) @printf(ptr noundef @formatInt, i32 noundef %x)
+  ret void
+}
+
+define void @print_Long(i64 noundef %x) {
+  call i32 (ptr, ...) @printf(ptr noundef @formatLong, i64 noundef %x)
   ret void
 }
 
@@ -25,25 +29,4 @@ define void @print_Str(ptr noundef %x) {
 define void @print_Char(i8 noundef %x) {
   call i32 (ptr, ...) @printf(ptr noundef @formatChar, i8 noundef %x)
   ret void
-}
-
-define i1 @Int_isOdd_Int(i32 %n) {
-entry:
-  %rem = and i32 %n, 1
-  %result = icmp ne i32 %rem, 0
-  ret i1 %result
-}
-
-define i1 @Int_isEven_Int(i32 %n) {
-entry:
-  %rem = and i32 %n, 1
-  %result = icmp eq i32 %rem, 0
-  ret i1 %result
-}
-
-define i1 @Str_isAscii_Str(ptr %str) {
-entry:
-  %ch = load i8, ptr %str
-  %cmp = icmp ult i8 %ch, 128
-  ret i1 %cmp
 }

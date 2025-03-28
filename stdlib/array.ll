@@ -1,9 +1,3 @@
-; ModuleID = 'test.c'
-source_filename = "test.c"
-target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128-Fn32"
-target triple = "arm64-apple-macosx14.0.0"
-
-declare i32 @printf(ptr, ...)
 declare ptr @malloc(i64)
 declare ptr @realloc(ptr, i64)
 declare void @free(ptr)
@@ -26,26 +20,35 @@ define ptr @get_data(ptr %arr_ptr) {
     ret ptr %data_ptr
 }
 
-define ptr @ArrayType_initArr() {
+define ptr @ArrayType_initArr_Long(i64 %initial_cap) {
     %arr_ptr = call ptr @malloc(i64 16)
-
     %cap_ptr = call ptr @get_cap(ptr %arr_ptr)
-    store i64 2, ptr %cap_ptr
-
     %size_ptr = call ptr @get_size(ptr %arr_ptr)
-    store i64 0, ptr %size_ptr
+    %cmp = icmp sgt i64 %initial_cap, 0
+    br i1 %cmp, label %init_with_initial_cap, label %init_with_default_cap
 
-    %data_ptr = call ptr @malloc(i64 16)
-    %element = call ptr @get_data(ptr %arr_ptr)
-    store ptr %data_ptr, ptr %element
+init_with_initial_cap:
+    store i64 %initial_cap, ptr %cap_ptr
+    br label %init_array
+
+init_with_default_cap:
+    store i64 2, ptr %cap_ptr
+    br label %init_array
+
+init_array:
+    store i64 0, ptr %size_ptr
+    %cap = load i64, ptr %cap_ptr
+    %data_size = mul i64 %cap, 4
+    %data = call ptr @malloc(i64 %data_size)
+    %data_ptr = call ptr @get_data(ptr %arr_ptr)
+    store ptr %data, ptr %data_ptr
 
     ret ptr %arr_ptr
 }
 
 define i32 @ArrayType_getElement_ArrayType_Int(ptr %arr_ptr, i32 %index) {
     %data_ptr = call ptr @get_data(ptr %arr_ptr)
-    %data = load ptr, ptr %data_ptr
-    %element_ptr = getelementptr i32, ptr %data, i32 %index
+    %element_ptr = getelementptr i32, ptr %data_ptr, i32 %index
     %element = load i32, ptr %element_ptr
     ret i32 %element
 }
@@ -54,10 +57,9 @@ define void @ArrayType_add_ArrayType_Int(ptr %arr_ptr, i32 %new_elem) {
 entry:
     %cap_ptr = call ptr @get_cap(ptr %arr_ptr)
     %size_ptr = call ptr @get_size(ptr %arr_ptr)
+    %data_ptr = call ptr @get_data(ptr %arr_ptr)
     %capacity = load i64, ptr %cap_ptr
     %size = load i64, ptr %size_ptr
-    %data_ptr = call ptr @get_data(ptr %arr_ptr)
-    %data = load ptr, ptr %data_ptr
 
     %cmp = icmp eq i64 %size, %capacity
     br i1 %cmp, label %resize, label %insert
@@ -70,8 +72,7 @@ resize:
     br label %insert
 
 insert:
-    %data_final = load ptr, ptr %data_ptr
-    %elem_ptr = getelementptr i32, ptr %data_final, i64 %size
+    %elem_ptr = getelementptr i32, ptr %data_ptr, i64 %size
     store i32 %new_elem, ptr %elem_ptr
 
     %new_size = add i64 %size, 1
@@ -80,8 +81,7 @@ insert:
 }
 
 define void @ArrayType_freeArr_ArrayType(ptr %arr_ptr) {
-    %data_field = getelementptr %arr, ptr %arr_ptr, i32 0, i32 2
-    %data_ptr = load ptr, ptr %data_field
+    %data_ptr = call ptr @get_data(ptr %arr_ptr)
     call void @free(ptr %data_ptr)
     call void @free(ptr %arr_ptr)
     ret void

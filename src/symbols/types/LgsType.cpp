@@ -25,9 +25,8 @@ LgsMethodImpl* LgsType::getMethod(const LgsFuncCall* funcCall) {
 }
 
 Type* LgsType::getIRType() {
-    const auto message = "Type: " + getName();
-    std::cerr << message << std::endl;
-    assert(false && "type has no IR type");
+    std::cerr << "Type '" << getName() << "' has no IR type" << std::endl;
+    assert(false);
 }
 
 Type* LgsType::getIRType(int size) {

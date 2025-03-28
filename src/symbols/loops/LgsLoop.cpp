@@ -18,7 +18,7 @@ void LgsLoop::initIRLoop(CodeGenMetadata* metadata) {
     loopCondition = createBasicBlock(BB_LOOP_CONDITION);
     loopBody = createBasicBlock(BB_LOOP_BODY);
     loopExit = createBasicBlock(BB_LOOP_EXIT);
-    iPtr = builder.CreateAlloca(i32Type);
+    iPtr = builder.CreateAlloca(i32Ty);
     builder.CreateStore(builder.getInt32(0), iPtr);
     builder.CreateBr(loopCondition);
 }
@@ -27,7 +27,7 @@ void LgsLoop::setIRCondition(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     startBlock(metadata, loopCondition);
     const auto size = loopSize();
-    iValue = builder.CreateLoad(i32Type, iPtr);
+    iValue = builder.CreateLoad(i32Ty, iPtr);
     const auto condition = builder.CreateICmpSLT(iValue, builder.getInt32(size));
     builder.CreateCondBr(condition, loopBody, loopExit);
 }

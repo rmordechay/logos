@@ -16,8 +16,9 @@ size_t LgsArray::size() {
 }
 
 Value* LgsArray::initIRArr(CodeGenMetadata* metadata) const {
-    const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_initArr", initArrIRFuncType);
-    return metadata->builder.CreateCall(func);
+    const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_initArr_Long", initArrIRFuncType);
+    auto initialCapacity = metadata->builder.getInt64(initialElements.size());
+    return metadata->builder.CreateCall(func, {initialCapacity});
 }
 
 FunctionCallee LgsArray::getIRFuncAddElement(const CodeGenMetadata* metadata) const {
@@ -32,6 +33,6 @@ Value* LgsArray::getIRFuncGetElement(CodeGenMetadata* metadata, Value* index) co
 void LgsArray::free(CodeGenMetadata* metadata) {
     if (isFreed) return;
     const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_freeArr_ArrayType", freeArrIRFuncType);
-    metadata->builder.CreateCall(func);
+    metadata->builder.CreateCall(func, {IRValue});
     isFreed = true;
 }

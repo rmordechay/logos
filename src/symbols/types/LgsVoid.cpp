@@ -3,14 +3,12 @@
 #include "exprs/LgsNull.h"
 
 
-Type* LgsVoid::IRValue = Type::getVoidTy(context);
-
 const std::string LgsVoid::getName() const {
     return name;
 }
 
 Type* LgsVoid::getIRType() {
-    return IRValue;
+    return voidTy;
 }
 
 LgsExpr* LgsVoid::getZeroValue() {

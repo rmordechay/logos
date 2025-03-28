@@ -10,10 +10,10 @@
 class LgsArray final : public LgsUnaryExpr, public LgsIterable {
 public:
     vector<LgsExpr*> initialElements;
-    FunctionType* const initArrIRFuncType = FunctionType::get(ptrTy, false);
-    FunctionType* const freeArrIRFuncType = FunctionType::get(LgsVoid::IRValue, {ptrTy}, false);
-    FunctionType* const addElementIRFuncType = FunctionType::get(LgsVoid::IRValue, {ptrTy, LgsInt::IRValue}, false);
-    FunctionType* const getElementIRFuncType = FunctionType::get(LgsInt::IRValue, {ptrTy, LgsInt::IRValue}, false);
+    FunctionType* const initArrIRFuncType = FunctionType::get(ptrTy, {i64Ty}, false);
+    FunctionType* const freeArrIRFuncType = FunctionType::get(voidTy, {ptrTy}, false);
+    FunctionType* const addElementIRFuncType = FunctionType::get(voidTy, {ptrTy, i32Ty}, false);
+    FunctionType* const getElementIRFuncType = FunctionType::get(i32Ty, {ptrTy, i32Ty}, false);
 
     explicit LgsArray() : LgsUnaryExpr(nullptr) {}
     explicit LgsArray(LgsType* type) : LgsUnaryExpr(type) {}

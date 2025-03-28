@@ -9,7 +9,6 @@ using namespace std;
 class LgsVoid final : public LgsType {
 public:
     static constexpr auto name = "Void";
-    static Type* IRValue;
 
     const string getName() const override;
     Type* getIRType() override;
