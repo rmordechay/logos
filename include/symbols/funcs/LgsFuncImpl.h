@@ -7,7 +7,6 @@ public:
     explicit LgsFuncImpl(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {}) : LgsFunc(name, funcType, params) {
         setComposedName();
     }
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {}) override;
     void setIRFunc(CodeGenMetadata* metadata) override;
     ~LgsFuncImpl() override = default;
 };

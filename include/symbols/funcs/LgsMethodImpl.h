@@ -9,7 +9,6 @@ public:
         setComposedName();
     }
     LgsMethodImpl(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {}) : LgsMethodImpl(name, funcType, "", params) {}
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {}) override;
     void setIRFunc(CodeGenMetadata* metadata) override;
     ~LgsMethodImpl() override = default;
 };

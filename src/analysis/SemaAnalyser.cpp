@@ -1,5 +1,6 @@
 #include "SemaAnalyser.h"
 #include "LgsErrors.h"
+#include "LgsGlobals.h"
 #include "exprs/LgsNull.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
@@ -63,7 +64,8 @@ void SemaAnalyser::visitMainFunc(LgsFuncImpl* mainFunc) {
 }
 
 void SemaAnalyser::visitFuncImpl(LgsFuncImpl* func) {
-    logosStack.enterScope();
+    globals.addFunc(func);
+    logosStack.enterScope(func);
     setFuncType(func);
     for (const auto& param : func->params) {
         visitParam(param);
@@ -73,7 +75,7 @@ void SemaAnalyser::visitFuncImpl(LgsFuncImpl* func) {
 }
 
 void SemaAnalyser::visitMethodImpl(LgsMethodImpl* method, LgsObject* obj) {
-    logosStack.enterScope();
+    logosStack.enterScope(method);
     setFuncType(method);
     const auto self = new LgsParam(LOGOS_SELF, obj, new LgsInstance(obj->name));
     method->params.insert(method->params.begin(), self);
@@ -442,12 +444,12 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
 }
 
 LgsFunc* SemaAnalyser::getFunc(const LgsFuncCall* funcCall) {
-    const auto overloads = logosStack.getFuncOverloads(funcCall);
+    const auto overloads = logosStack.getFuncOverloads(funcCall->signature.name);
     if (overloads.empty()) {
         handleError(E10006, &funcCall->location, {funcCall->signature.name});
         return nullptr;
     }
-    const auto func = logosStack.getFunc(overloads, funcCall);
+    const auto func = logosStack.getFunc(overloads, funcCall->signature.composedName);
     if (!func) {
         handleError(E10015, &funcCall->location, {funcCall->getArgsTypeStr(), funcCall->signature.name});
     }

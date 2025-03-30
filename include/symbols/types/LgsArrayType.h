@@ -3,6 +3,7 @@
 #include "LgsInt.h"
 #include "LgsType.h"
 #include "funcs/LgsMethodImpl.h"
+#include "funcs/LgsParam.h"
 
 class LgsInt;
 struct CodeGenMetadata;

@@ -22,7 +22,7 @@ public:
     void setIRValue(Value* value);
     GlobalVariable* createIRGlobal(Module* module, Constant* strConstant) const;
     BasicBlock* createBasicBlock(const char* name) const;
-    void startBlock(CodeGenMetadata* metadata, BasicBlock* block, bool enterScope = false) const;
+    void startBlock(CodeGenMetadata* metadata, BasicBlock* block) const;
     virtual void setLocation(const antlr4::Token* ctx);
     virtual json asJson();
     virtual void free(CodeGenMetadata* metadata);

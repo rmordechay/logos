@@ -30,3 +30,8 @@ define void @print_Char(i8 noundef %x) {
   call i32 (ptr, ...) @printf(ptr noundef @formatChar, i8 noundef %x)
   ret void
 }
+
+define void @print_Bool(i1 noundef %x) {
+  call i32 (ptr, ...) @printf(ptr noundef @formatInt, i1 noundef %x)
+  ret void
+}

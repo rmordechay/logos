@@ -1,5 +1,9 @@
 #include "funcs/LgsFunc.h"
 
+#include "exprs/LgsExpr.h"
+#include "funcs/LgsParam.h"
+#include "types/LgsVoid.h"
+
 void LgsFunc::setComposedName() {
     if (signature.name == LOGOS_MAIN_FUNC) {
         signature.composedName = signature.name;
@@ -12,12 +16,27 @@ void LgsFunc::setComposedName() {
 }
 
 void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
-    metadata->logosStack.enterScope();
-    if (!IRFunc) setIRFunc(metadata);
-    metadata->logosStack.currentFunc = IRFunc;
+    setIRFunc(metadata);
+    metadata->logosStack.enterScope(this);
+    for (const auto& param : params) {
+        metadata->logosStack.addLocalSymbol(param->name, param);
+    }
     startBlock(metadata, entryBlock);
     stmtBlock->createIRValue(metadata);
+    if (signature.type->getName() == LgsVoid::name) {
+        metadata->builder.CreateRetVoid();
+    }
     metadata->logosStack.exitScope(metadata);
+}
+
+Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
+    if (!IRFunc) setIRFunc(metadata);
+    vector<Value*> argValues;
+    for (const auto& arg : args) {
+        const auto argValue = arg->getIRValue(metadata);
+        argValues.emplace_back(argValue);
+    }
+    return metadata->builder.CreateCall(IRFunc, argValues);
 }
 
 json LgsFunc::asJson() {

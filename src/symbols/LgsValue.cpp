@@ -1,16 +1,15 @@
 #include "LgsValue.h"
 
+#include "funcs/LgsFunc.h"
+
 void LgsValue::setLocation(const antlr4::Token* ctx) {
     location.lineNumber = ctx->getLine();
     location.posInLine = ctx->getCharPositionInLine() + 1;
 }
 
-void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block, const bool enterScope) const {
-    if (enterScope) metadata->logosStack.enterScope();
-    const auto currentFunc = metadata->logosStack.currentFunc;
-    auto& builder = metadata->builder;
-    block->insertInto(currentFunc);
-    builder.SetInsertPoint(block);
+void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) const {
+    block->insertInto(metadata->logosStack.currentFunc->IRFunc);
+    metadata->builder.SetInsertPoint(block);
 }
 
 BasicBlock* LgsValue::createBasicBlock(const char* name) const {

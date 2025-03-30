@@ -12,7 +12,6 @@ struct LgsError {
     string msg;
 };
 
-
 inline int errCodeStart = 10000;
 inline LgsError E10000{.errCode = errCodeStart, .msg = "main() function is not defined in Main.lgs file."};
 inline LgsError E10001{.errCode = ++errCodeStart, .msg = "The left-hand type '%s' is not equal to the right-hand type '%s'."};
@@ -30,6 +29,5 @@ inline LgsError E10012{.errCode = ++errCodeStart, .msg = "Function '%s' is not d
 inline LgsError E10013{.errCode = ++errCodeStart, .msg = "Function '%s' is not defined with this overload. Declared overloads:%s"};
 inline LgsError E10014{.errCode = ++errCodeStart, .msg = "Pattern of type '%s' does not match base type '%s'."};
 inline LgsError E10015{.errCode = ++errCodeStart, .msg = "Arguments with types (%s) do not match any overload of the function '%s'"};
-
 
 #endif //LOGOSERRORS_H

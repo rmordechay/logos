@@ -1,5 +1,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/LgsFuncCall.h"
+#include "funcs/LgsParam.h"
+
 #include <LgsStack.h>
 #include "stmts/LgsField.h"
 #include <funcs/LgsFuncImpl.h>

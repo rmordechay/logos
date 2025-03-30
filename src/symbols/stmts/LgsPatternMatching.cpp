@@ -1,8 +1,10 @@
 #include "stmts/LgsPatternMatching.h"
 
+#include "funcs/LgsFunc.h"
+
 Value* LgsPatternMatching::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto func = metadata->logosStack.currentFunc;
+    const auto func = metadata->logosStack.currentFunc->IRFunc;
     const auto exprIRValue = expr->getIRValue(metadata);
     const auto exitBlock = BasicBlock::Create(context, "exit_pattern_matching");
     const auto defaultCase = BasicBlock::Create(context, "default");

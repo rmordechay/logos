@@ -4,7 +4,6 @@
 #include "LgsIterable.h"
 #include "LgsUnaryExpr.h"
 #include "exprs/LgsExpr.h"
-#include "types/LgsInt.h"
 #include "types/LgsVoid.h"
 
 class LgsArray final : public LgsUnaryExpr, public LgsIterable {

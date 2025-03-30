@@ -1,5 +1,4 @@
 #include "stmts/LgsIfStmt.h"
-#include "CodeGenerator.h"
 
 Value* LgsIfStmt::createIRValue(CodeGenMetadata* metadata) {
     metadata->logosStack.enterScope();

@@ -9,7 +9,7 @@ const string LgsStr::getName() const {
 }
 
 Type* LgsStr::getIRType() {
-    return PointerType::get(Type::getInt8Ty(context), 0);
+    return ptrTy;
 }
 
 LgsExpr* LgsStr::getZeroValue() {

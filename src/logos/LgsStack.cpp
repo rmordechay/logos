@@ -12,6 +12,15 @@ void LgsStack::enterScope() {
     }
 }
 
+void LgsStack::enterScope(LgsFunc* func) {
+    currentFunc = func;
+    if (size() > 0) {
+        push(LgsStackFrame{.symbols = top().symbols});
+    } else {
+        push(LgsStackFrame());
+    }
+}
+
 void LgsStack::exitScope(CodeGenMetadata* metadata) {
     if (metadata) {
         for (const auto& [_, symbol] : top().symbols) {
@@ -34,21 +43,26 @@ LgsSymbol* LgsStack::getSymbol(const string& name) {
     return nullptr;
 }
 
-vector<LgsFunc*> LgsStack::getFuncOverloads(const LgsFuncCall* funcCall) const {
-    const auto func = globals.funcs.find(funcCall->signature.name);
-    if (func != globals.funcs.end()) {
-        return func->second;
-    }
-    return {};
+LgsFunc* LgsStack::getFunc(const LgsFuncSignature* signature) const {
+    const auto overloads = getFuncOverloads(signature->name);
+    return getFunc(overloads, signature->composedName);
 }
 
-LgsFunc* LgsStack::getFunc(const vector<LgsFunc*>& overloads, const LgsFuncCall* funcCall) const {
+LgsFunc* LgsStack::getFunc(const vector<LgsFunc*>& overloads, const string& composedName) const {
     for (const auto& overload : overloads) {
-        if (overload->signature.composedName == funcCall->signature.composedName) {
+        if (overload->signature.composedName == composedName) {
             return overload;
         }
     }
     return nullptr;
+}
+
+vector<LgsFunc*> LgsStack::getFuncOverloads(const string& funcName) const {
+    const auto func = globals.funcs.find(funcName);
+    if (func != globals.funcs.end()) {
+        return func->second;
+    }
+    return {};
 }
 
 void LgsStack::addLocalSymbol(const string& name, const LgsSymbol& symbol) {

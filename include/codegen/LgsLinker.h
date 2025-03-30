@@ -16,7 +16,7 @@ class LgsLinker {
 public:
     filesystem::path objFilePath;
     filesystem::path execFilePath;
-    const vector<const char *> paths = {"../stdlib/lgslib.ll", "../stdlib/array.ll"};
+    const vector<const char *> paths = {"../stdlib/lgslib.ll", "../stdlib/array.ll", "../stdlib/string.ll"};
 
     LgsLinker(const filesystem::path& objFilePath, const filesystem::path& execFilePath) : objFilePath(objFilePath), execFilePath(execFilePath) {}
     void link(const map<string, Module*>& modules) const;

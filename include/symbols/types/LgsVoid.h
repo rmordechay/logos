@@ -1,7 +1,5 @@
 #ifndef LOGOSVOID_H
 #define LOGOSVOID_H
-
-#include "CodeGenMetadata.h"
 #include "LgsType.h"
 
 using namespace std;

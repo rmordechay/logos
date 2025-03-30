@@ -12,7 +12,7 @@ Value* LgsField::getIRValue(CodeGenMetadata* metadata) {
 Value* LgsField::createIRValue(CodeGenMetadata* metadata) {
     if (!gep) {
         const auto parentTy = StructType::getTypeByName(context, parentName);
-        const auto self = metadata->logosStack.currentFunc->getArg(0);
+        const auto self = metadata->logosStack.currentFunc->IRFunc->getArg(0);
         gep = metadata->builder.CreateStructGEP(parentTy, self, fieldPosition);
     }
     const auto ty = type->getIRType();

@@ -1,8 +1,7 @@
 #ifndef LOGOSFUNC_H
 #define LOGOSFUNC_H
 #include "LgsFuncSignature.h"
-#include "LgsParam.h"
-#include "../types/LgsType.h"
+#include "types/LgsType.h"
 #include "LgsValue.h"
 #include "stmts/LgsStmtBlock.h"
 
@@ -27,7 +26,7 @@ public:
     void setComposedName();
     virtual void createIRValue(CodeGenMetadata* metadata);
     virtual void setIRFunc(CodeGenMetadata* metadata) = 0;
-    virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {}) = 0;
+    virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {});
     json asJson() override;
     ~LgsFunc() override;
 };

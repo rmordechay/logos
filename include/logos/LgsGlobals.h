@@ -1,6 +1,7 @@
 #ifndef LGSGLOBALS_H
 #define LGSGLOBALS_H
 #include "funcs/LgsFunc.h"
+#include "funcs/LgsParam.h"
 #include "stmts/LgsEnum.h"
 #include "stmts/LgsVarDec.h"
 #include "symbols/LgsSymbol.h"
@@ -19,6 +20,11 @@ struct LgsGlobals {
             assert(false && "element already exists");
         }
         symbols[name] = symbol;
+    }
+
+    void addFunc(LgsFunc* func) {
+        lock_guard lock(mtx);
+        funcs[func->signature.name].emplace_back(func);
     }
 
     ~LgsGlobals() {
