@@ -13,6 +13,7 @@ class LgsTypeConst;
 
 class LgsExpr : virtual public LgsValue {
 public:
+    // TODO free type
     LgsType* type = nullptr;
 
     explicit LgsExpr(LgsType* type) : type(type) {}

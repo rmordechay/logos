@@ -1,17 +1,16 @@
 #include "exprs/unary/LgsSelection.h"
-#include "exprs/unary/LgsFuncCall.h"
-#include "funcs/LgsMethodImpl.h"
 #include "exprs/unary/LgsArrayIndex.h"
+#include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsVariable.h"
+#include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
 
 string LgsSelection::getName() {
     return "";
 }
 
-LgsExpr* LgsSelection::lastExpr() const {
-    if (exprs.empty()) return nullptr;
-    return exprs[exprs.size() - 1];
+Value* LgsSelection::createIRValue(CodeGenMetadata* metadata) {
+    return resolveSelection(metadata)->getIRValue(metadata);
 }
 
 LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
@@ -20,6 +19,7 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
         const auto nextExpr = exprs[i + 1];
         if (const auto field = currentExpr->type->getField(nextExpr->getName())) {
             const auto value = field->getIRValue(metadata);
+            field->parentExpr = currentExpr;
             nextExpr->setIRValue(value);
             continue;
         }
@@ -32,8 +32,9 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
     return lastExpr();
 }
 
-Value* LgsSelection::createIRValue(CodeGenMetadata* metadata) {
-    return resolveSelection(metadata)->getIRValue(metadata);
+LgsExpr* LgsSelection::lastExpr() const {
+    if (exprs.empty()) return nullptr;
+    return exprs[exprs.size() - 1];
 }
 
 LgsSelection::~LgsSelection() {

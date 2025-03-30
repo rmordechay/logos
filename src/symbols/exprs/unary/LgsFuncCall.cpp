@@ -27,7 +27,8 @@ string LgsFuncCall::getArgsTypeStr() const {
 }
 
 LgsFuncCall::~LgsFuncCall() {
-    for (const auto& arg : args) {
-        delete arg;
+    const auto iterStart = signature.parentName == "" ? 0 : 1;
+    for (int i = iterStart; i < args.size(); ++i) {
+        delete args[i];
     }
 }

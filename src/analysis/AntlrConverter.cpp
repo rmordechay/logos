@@ -130,7 +130,7 @@ LgsField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, 
     const auto name = varDec->VARIABLE()->getText();
     const auto type = getType(varDec->type());
     const auto expr = getExpr(varDec->expr());
-    return new LgsField(name, parentName, type, position, expr);
+    return new LgsField(name, parentName, position, type, expr);
 }
 
 LgsStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
@@ -313,11 +313,11 @@ LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
 }
 
 LgsUnaryExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
-    const auto array = new LgsArray();
+    vector<LgsExpr*> initialElements;
     for (const auto& expr : ctx->expr()) {
-        array->initialElements.emplace_back(getExpr(expr));
+        initialElements.emplace_back(getExpr(expr));
     }
-    array->type = new LgsArrayType();
+    const auto array = new LgsArray(new LgsArrayType(), initialElements);
     array->setLocation(ctx->start);
     return array;
 }
@@ -389,6 +389,7 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
             exprs.emplace_back(logosField);
         } else if (const auto funcCall = currentExpr->funcCall()) {
             const auto logosFuncCall = getFuncCall(funcCall);
+            // First inner expr takes firstExpr as parent
             const auto prevExpr = i == 0 ? exprs[0] : exprs[i - 1];
             logosFuncCall->args.insert(logosFuncCall->args.begin(), prevExpr);
             exprs.emplace_back(logosFuncCall);

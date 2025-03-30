@@ -14,9 +14,11 @@ public:
     FunctionType* const addElementIRFuncType = FunctionType::get(voidTy, {ptrTy, i32Ty}, false);
     FunctionType* const getElementIRFuncType = FunctionType::get(i32Ty, {ptrTy, i32Ty}, false);
 
-    explicit LgsArray() : LgsUnaryExpr(nullptr) {}
-    explicit LgsArray(LgsType* type) : LgsUnaryExpr(type) {}
+    explicit LgsArray(LgsType* type, const vector<LgsExpr*>& elements = {}) : LgsUnaryExpr(type), initialElements(elements) {
+        setFields(type);
+    }
     size_t size() override;
+    Value* sizeIR(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* initIRArr(CodeGenMetadata* metadata) const;
     FunctionCallee getIRFuncAddElement(const CodeGenMetadata* metadata) const;

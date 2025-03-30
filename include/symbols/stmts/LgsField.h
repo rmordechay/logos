@@ -14,18 +14,14 @@ public:
     LgsType* userType = nullptr;
     LgsExpr* expr = nullptr;
     Value* gep = nullptr;
+    LgsExpr* parentExpr = nullptr;
 
-    LgsField(const string& name, const string& parentName, LgsType* type, const size_t fieldPosition, LgsExpr* expr) :
-        name(name),
-        parentName(parentName),
-        fieldPosition(fieldPosition),
-        type(type),
-        expr(expr) {
-    }
-
+    LgsField(const string& name, const string& parentName, const size_t fieldPosition, LgsType* type, LgsExpr* expr) : name(name), parentName(parentName), fieldPosition(fieldPosition), type(type), expr(expr) {}
+    LgsField(const string& name, const string& parentName, const size_t fieldPosition, LgsType* type) : LgsField(name, parentName, fieldPosition, type, nullptr) {}
     Value* getIRValue(CodeGenMetadata* metadata);
     Value* createIRValue(CodeGenMetadata* metadata);
-    void setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* lvalueExpr, LgsInstance* instance);
+    Value* getGEP(CodeGenMetadata* metadata);
+    void setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* expr);
     ~LgsField() override = default;
 };
 

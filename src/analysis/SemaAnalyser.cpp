@@ -7,7 +7,6 @@
 #include "types/LgsArrayType.h"
 #include "types/LgsBool.h"
 
-#include <ThreadPool.h>
 #include "exprs/unary/LgsArray.h"
 #include "exprs/unary/LgsArrayIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
@@ -15,11 +14,8 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/binary/LgsBinaryExpr.h"
-#include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsEnum.h"
 #include "stmts/LgsPatternMatching.h"
-
-#include <funcs/LgsPrint.h>
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -265,7 +261,14 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
 
 void SemaAnalyser::visitSelection(LgsSelection* selection) {
     const auto exprs = selection->exprs;
-    const auto firstExpr = exprs[0];
+    visitFirstSelection(exprs[0]);
+    if (!successful) return;
+    visitInnerSelections(selection);
+    if (!successful) return;
+    setExprType(selection, selection->lastExpr()->type);
+}
+
+void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
     if (const auto variable = dynamic_cast<LgsVariable*>(firstExpr)) {
         visitVariable(variable);
     } else if (const auto funcCall = dynamic_cast<LgsFuncCall*>(firstExpr)) {
@@ -273,14 +276,16 @@ void SemaAnalyser::visitSelection(LgsSelection* selection) {
     } else {
         assert(false && "first selection case not implemented");
     }
-    if (!successful) return;
+}
 
+void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
+    const auto exprs = selection->exprs;
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto currentExpr = exprs[i];
         const auto nextExpr = exprs[i + 1];
         auto nextExprName = nextExpr->getName();
-        if (dynamic_cast<LgsVariable*>(nextExpr)) {
-            setSelectionFieldType(currentExpr, nextExpr);
+        if (const auto var = dynamic_cast<LgsVariable*>(nextExpr)) {
+            setSelectionFieldType(currentExpr, var);
         } else if (const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr)) {
             for (const auto& arg : methodCall->args) {
                 visitExpr(arg);
@@ -289,20 +294,6 @@ void SemaAnalyser::visitSelection(LgsSelection* selection) {
             methodCall->setComposedName();
             setMethodCallType(currentExpr, methodCall);
         }
-    }
-    setExprType(selection, selection->lastExpr()->type);
-}
-
-void SemaAnalyser::resolveSelectionVariable(LgsVariable* variable) {
-    visitVariable(variable);
-    const auto currentSymbol = logosStack.getSymbol(variable->name);
-    if (currentSymbol->type == VAR_DEC) {
-        const auto varDec = currentSymbol->varDec;
-        setExprType(variable, varDec->type);
-    }
-    if (currentSymbol->type == PARAM) {
-        const auto param = currentSymbol->param;
-        setExprType(variable, param->type);
     }
 }
 
@@ -370,13 +361,14 @@ void SemaAnalyser::setExprType(LgsExpr* expr, LgsType* type) {
     }
 }
 
-void SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsUnaryExpr* nextExpr) {
-    const auto field = parent->type->getField(nextExpr->getName());
+void SemaAnalyser::setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
+    const auto field = parent->type->getField(fieldVariable->name);
     if (!field) {
-        handleError(E10005, &nextExpr->location, {nextExpr->getName(), parent->type->getName()});
+        handleError(E10005, &fieldVariable->location, {fieldVariable->getName(), parent->type->getName()});
         return;
     }
-    setExprType(nextExpr, field->type);
+    field->parentExpr = parent;
+    setExprType(fieldVariable, field->type);
 }
 
 void SemaAnalyser::setMethodCallType(const LgsUnaryExpr* parent, LgsFuncCall* funcCall) {

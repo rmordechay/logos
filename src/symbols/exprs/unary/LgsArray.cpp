@@ -15,6 +15,10 @@ size_t LgsArray::size() {
     return initialElements.size();
 }
 
+Value* LgsArray::sizeIR(CodeGenMetadata* metadata) {
+    return nullptr;
+}
+
 Value* LgsArray::initIRArr(CodeGenMetadata* metadata) const {
     const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_initArr_Long", initArrIRFuncType);
     auto initialCapacity = metadata->builder.getInt64(initialElements.size());

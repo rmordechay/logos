@@ -8,13 +8,16 @@
 class LgsStrConst final : public LgsIterable, public LgsConstExpr {
 public:
     string value;
-    FunctionType* const compareStrIRFuncType = FunctionType::get(i1Ty, {ptrTy, ptrTy}, false);
+    FunctionType* const cmpStrIRFuncType = FunctionType::get(i1Ty, {ptrTy, ptrTy}, false);
 
-    explicit LgsStrConst(const string& value) : LgsConstExpr(new LgsStr()), value(value) {}
+    explicit LgsStrConst(const string& value) : LgsConstExpr(new LgsStr()), value(value) {
+        setFields(type);
+    }
     size_t size() override;
     Value* createGlobalStr(Module* module, const std::string& value) const;
     LgsExpr* add(LgsExpr* other) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    Value* sizeIR(CodeGenMetadata* metadata) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     json asJson() override;

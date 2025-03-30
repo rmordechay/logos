@@ -7,7 +7,6 @@
 #include "types/LgsObject.h"
 
 #include <LgsStack.h>
-#include <types/LgsInt.h>
 
 Value* LgsAssignment::createIRValue(CodeGenMetadata* metadata) {
     if (const auto selection = lvalue->asSelection()) {
@@ -17,7 +16,8 @@ Value* LgsAssignment::createIRValue(CodeGenMetadata* metadata) {
             if (const auto instance = firstExprSymbol->varDec->expr->asInstance()) {
                 const auto nextName = selection->exprs[1]->getName();
                 const auto field = instance->obj->getField(nextName);
-                field->setFieldIRValue(metadata, rvalue, instance);
+                field->parentExpr = instance;
+                field->setFieldIRValue(metadata, rvalue);
             }
             break;
         default:

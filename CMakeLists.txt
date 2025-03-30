@@ -45,8 +45,15 @@ add_library(lib STATIC
     include/symbols/LgsSymbol.h
     include/symbols/exprs/LgsNull.h
     include/symbols/exprs/LgsExpr.h
-    include/symbols/exprs/unary/LgsUnaryExpr.h
     include/symbols/exprs/binary/LgsBinaryExpr.h
+    include/symbols/exprs/unary/LgsIterable.h
+    include/symbols/exprs/unary/LgsArray.h
+    include/symbols/exprs/unary/LgsArrayIndex.h
+    include/symbols/exprs/unary/LgsFuncCall.h
+    include/symbols/exprs/unary/LgsInstance.h
+    include/symbols/exprs/unary/LgsSelection.h
+    include/symbols/exprs/unary/LgsVariable.h
+    include/symbols/exprs/unary/LgsUnaryExpr.h
     include/symbols/exprs/unary/constants/LgsConstExpr.h
     include/symbols/exprs/unary/constants/LgsStrConst.h
     include/symbols/exprs/unary/constants/LgsTypeConst.h
@@ -54,12 +61,6 @@ add_library(lib STATIC
     include/symbols/exprs/unary/constants/LgsFloatConst.h
     include/symbols/exprs/unary/constants/LgsBoolConst.h
     include/symbols/exprs/unary/constants/LgsCharConst.h
-    include/symbols/exprs/unary/LgsArray.h
-    include/symbols/exprs/unary/LgsArrayIndex.h
-    include/symbols/exprs/unary/LgsFuncCall.h
-    include/symbols/exprs/unary/LgsInstance.h
-    include/symbols/exprs/unary/LgsSelection.h
-    include/symbols/exprs/unary/LgsVariable.h
     include/symbols/funcs/LgsFunc.h
     include/symbols/funcs/LgsFuncImpl.h
     include/symbols/funcs/LgsMethodImpl.h

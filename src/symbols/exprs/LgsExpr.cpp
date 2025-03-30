@@ -82,3 +82,4 @@ Value* LgsExpr::div(CodeGenMetadata* metadata, LgsExpr* other) {
 Value* LgsExpr::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false && "not implemented");
 }
+

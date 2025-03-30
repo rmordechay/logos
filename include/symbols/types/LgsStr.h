@@ -1,17 +1,12 @@
 #ifndef LOGOSSTRING_H
 #define LOGOSSTRING_H
-#include "LgsInt.h"
 #include "LgsType.h"
-#include "LgsVoid.h"
-#include "funcs/LgsMethodImpl.h"
-#include "funcs/LgsParam.h"
-
+#include "stmts/LgsField.h"
 #include <string>
 
 class LgsStr final : public LgsType {
 public:
     static constexpr auto name = "Str";
-    LgsMethodImpl addElementFunc = LgsMethodImpl("add", new LgsVoid(), "ArrayType", {new LgsParam(this), new LgsParam(new LgsInt())});
 
     const string getName() const override;
     Type* getIRType() override;

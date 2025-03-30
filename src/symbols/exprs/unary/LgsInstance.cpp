@@ -12,13 +12,14 @@ Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
         CodeGenerator::generateModule(metadata->buildDir, obj);
     }
     const auto currentFunc = metadata->logosStack.currentFunc->IRFunc;
-    if (currentFunc->arg_size() > 0) {
-        const auto firstArg = currentFunc->arg_begin();
-        if (firstArg->getName() == LOGOS_SELF) {
-            return firstArg;
-        }
+    if (currentFunc->arg_size() == 0) {
+        return metadata->builder.CreateAlloca(obj->getIRType());
     }
-    return metadata->builder.CreateAlloca(obj->getIRType());
+    const auto firstArg = currentFunc->arg_begin();
+    if (firstArg->getName() == LOGOS_SELF) {
+        return firstArg;
+    }
+    return nullptr;
 }
 
 LgsInstance::~LgsInstance() {

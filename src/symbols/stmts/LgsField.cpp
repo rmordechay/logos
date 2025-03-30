@@ -1,28 +1,26 @@
 #include "stmts/LgsField.h"
-
-#include "exprs/unary/LgsInstance.h"
 #include "exprs/LgsExpr.h"
-#include "types/LgsObject.h"
+
+void LgsField::setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* expr) {
+    metadata->builder.CreateStore(expr->getIRValue(metadata), getGEP(metadata));
+}
 
 Value* LgsField::getIRValue(CodeGenMetadata* metadata) {
-    if (IRValue) return IRValue;
-    return createIRValue(metadata);
+    if (!IRValue) IRValue = createIRValue(metadata);
+    return IRValue;
 }
 
 Value* LgsField::createIRValue(CodeGenMetadata* metadata) {
-    if (!gep) {
-        const auto parentTy = StructType::getTypeByName(context, parentName);
-        const auto self = metadata->logosStack.currentFunc->IRFunc->getArg(0);
-        gep = metadata->builder.CreateStructGEP(parentTy, self, fieldPosition);
+    if (expr) {
+        return expr->getIRValue(metadata);
     }
-    const auto ty = type->getIRType();
-    return metadata->builder.CreateLoad(ty, gep);
+    return metadata->builder.CreateLoad(type->getIRType(), getGEP(metadata));
 }
 
-void LgsField::setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* lvalueExpr, LgsInstance* instance) {
-    const auto ty = instance->obj->getIRType();
-    const auto v = instance->getIRValue(metadata);
-    gep = metadata->builder.CreateStructGEP(ty, v, fieldPosition);
-    const auto exprIRValue = lvalueExpr->getIRValue(metadata);
-    metadata->builder.CreateStore(exprIRValue, gep);
+Value* LgsField::getGEP(CodeGenMetadata* metadata) {
+    if (gep) return gep;
+    const auto parentTy = StructType::getTypeByName(context, parentName);
+    const auto self = parentExpr->getIRValue(metadata);
+    gep = metadata->builder.CreateStructGEP(parentTy, self, fieldPosition);
+    return gep;
 }

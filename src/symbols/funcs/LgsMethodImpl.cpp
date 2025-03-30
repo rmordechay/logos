@@ -3,7 +3,7 @@
 #include <types/LgsObject.h>
 
 void LgsMethodImpl::setIRFunc(CodeGenMetadata* metadata) {
-    IRParamsTypes.emplace_back(ptrTy);
+    // IRParamsTypes.emplace_back(ptrTy);
     for (int i = 0; i < params.size(); ++i) {
         auto paramIRType = params[i]->type->getIRType();
         IRParamsTypes.emplace_back(paramIRType);
