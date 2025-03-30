@@ -110,6 +110,7 @@ void Logos::loadBuiltinFuncs() const {
         new LgsPrint({new LgsParam(new LgsFloat())}),
         new LgsPrint({new LgsParam(new LgsStr())}),
         new LgsPrint({new LgsParam(new LgsChar())}),
+        new LgsPrint({new LgsParam(new LgsBool())}),
     };
 }
 

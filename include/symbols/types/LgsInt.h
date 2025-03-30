@@ -1,8 +1,6 @@
 #ifndef LOGOSINT_H
 #define LOGOSINT_H
-#include "CodeGenerator.h"
 #include "LgsType.h"
-#include "LgsVoid.h"
 
 class LgsInt final : public LgsType {
 public:

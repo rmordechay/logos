@@ -13,7 +13,7 @@ public:
 
     explicit LgsBinaryExpr(LgsType* type, LgsExpr* left, LgsExpr* right, const LgsOperator op) : LgsExpr(type), left(left), right(right), op(op) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* add(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     LgsExpr* compute(CodeGenMetadata* metadata);
     ~LgsBinaryExpr() override;
 };

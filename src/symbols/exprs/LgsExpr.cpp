@@ -68,19 +68,17 @@ LgsTypeConst* LgsExpr::asTypeConst() {
 }
 
 Value* LgsExpr::sub(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto l = this->getIRValue(metadata);
-    const auto r = other->getIRValue(metadata);
-    return metadata->builder.CreateSub(l, r);
+    assert(false && "not implemented");
 }
 
 Value* LgsExpr::mul(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto l = this->getIRValue(metadata);
-    const auto r = other->getIRValue(metadata);
-    return metadata->builder.CreateMul(l, r);
+    assert(false && "not implemented");
 }
 
 Value* LgsExpr::div(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto l = this->getIRValue(metadata);
-    const auto r = other->getIRValue(metadata);
-    return metadata->builder.CreateSDiv(l, r);
+    assert(false && "not implemented");
+}
+
+Value* LgsExpr::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    assert(false && "not implemented");
 }

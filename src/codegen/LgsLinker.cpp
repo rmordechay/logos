@@ -20,9 +20,9 @@ void LgsLinker::link(const std::map<std::string, Module*>& modules) const {
         linkStdlib(path, &linker);
     }
     
-    for (const auto& [name, file] : modules) {
+    for (const auto& [name, module] : modules) {
         if (name == LOGOS_MAIN_FILE) continue;
-        linker.linkInModule(std::unique_ptr<Module>(file));
+        linker.linkInModule(std::unique_ptr<Module>(module));
     }
 
     if (verifyModule(*mainModule, &errs())) return;

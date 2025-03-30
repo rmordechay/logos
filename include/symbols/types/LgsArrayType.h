@@ -2,6 +2,7 @@
 #define LOGOSARRAYTYPE_H
 #include "LgsInt.h"
 #include "LgsType.h"
+#include "LgsVoid.h"
 #include "funcs/LgsMethodImpl.h"
 #include "funcs/LgsParam.h"
 

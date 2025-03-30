@@ -1,18 +1,19 @@
 #include "exprs/binary/LgsBinaryExpr.h"
 
 #include "exprs/unary/LgsUnaryExpr.h"
-#include "types/LgsInt.h"
 
 Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
     switch (op) {
     case ADD:
-        return left->add(metadata, right);
+        return left->addIR(metadata, right);
     case SUB:
         return left->sub(metadata, right);
     case MUL:
         return left->mul(metadata, right);
     case DIV:
         return left->div(metadata, right);
+    case EQ:
+        return left->eqIR(metadata, right);
     default:
         break;
     }
@@ -22,8 +23,6 @@ Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
     switch (op) {
     case NE:
         return builder.CreateICmpNE(l, r);
-    case EQ:
-        return builder.CreateICmpEQ(l, r);
     case LT:
         return builder.CreateICmpSLT(l, r);
     case GT:
@@ -40,8 +39,8 @@ Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
     return nullptr;
 }
 
-Value* LgsBinaryExpr::add(CodeGenMetadata* metadata, LgsExpr* other) {
-    return compute(metadata)->add(metadata, other);
+Value* LgsBinaryExpr::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    return compute(metadata)->addIR(metadata, other);
 }
 
 LgsExpr* LgsBinaryExpr::compute(CodeGenMetadata* metadata) {

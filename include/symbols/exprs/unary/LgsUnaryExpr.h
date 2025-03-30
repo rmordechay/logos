@@ -10,7 +10,7 @@ public:
     explicit LgsUnaryExpr() : LgsExpr(nullptr) {}
     explicit LgsUnaryExpr(LgsType* type) : LgsExpr(type) {}
     virtual string getName();
-    Value* add(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     virtual LgsExpr* add(LgsExpr* other);
     ~LgsUnaryExpr() override = default;
 };
@@ -19,7 +19,7 @@ inline string LgsUnaryExpr::getName() {
     return "";
 }
 
-inline Value* LgsUnaryExpr::add(CodeGenMetadata* metadata, LgsExpr* other) {
+inline Value* LgsUnaryExpr::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
     const auto l = this->getIRValue(metadata);
     const auto r = other->getIRValue(metadata);
     return metadata->builder.CreateAdd(l, r);

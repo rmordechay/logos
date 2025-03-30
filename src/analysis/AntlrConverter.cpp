@@ -31,7 +31,7 @@
 #include <types/LgsVoid.h>
 #include <types/LgsArrayType.h>
 
-LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
+LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath) {
     LgsFile* logosFile = nullptr;
     if (const auto mainFileCtx = ctx->mainFile()) {
         logosFile = getMainFile(mainFileCtx, filePath);
