@@ -11,9 +11,9 @@ TEST(ParserTest, TestParseFile) {
     const auto file = logos.parseFile(fileEntry);
     const auto mainFile = dynamic_cast<LgsMainFile*>(file);
 
-    std::ifstream input_file(dataDir + "expected.json");
+    std::ifstream inputFile(dataDir + "expected.json");
     json expectedJson;
-    input_file >> expectedJson;
+    inputFile >> expectedJson;
 
     std::cout << mainFile->asJson().dump(2) << '\n';
     ASSERT_EQ(mainFile->asJson(), expectedJson);
