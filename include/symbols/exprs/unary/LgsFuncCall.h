@@ -17,6 +17,7 @@ public:
     string getName() override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     string getArgsTypeStr() const;
+    void free(CodeGenMetadata* metadata) override;
     ~LgsFuncCall() override;
 };
 

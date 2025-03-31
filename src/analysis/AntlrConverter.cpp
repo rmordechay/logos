@@ -526,9 +526,8 @@ LgsType* AntlerConverter::getTypeFromText(const string& typeText) {
 }
 
 LgsType* AntlerConverter::getFuncType(LogosParser::FuncImplementationContext* ctx) {
-    const auto signature = ctx->funcSignature();
-    if (signature->type()) {
-        return getType(signature->type());
+    if (ctx->funcSignature()->type()) {
+        return getType(ctx->funcSignature()->type());
     }
     return new LgsVoid();
 }

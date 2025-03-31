@@ -19,6 +19,10 @@ string LgsFuncCall::getArgsTypeStr() const {
     return result.str();
 }
 
+void LgsFuncCall::free(CodeGenMetadata* metadata) {
+
+}
+
 LgsFuncCall::~LgsFuncCall() {
     const auto iterStart = signature.parentName == "" ? 0 : 1;
     for (int i = iterStart; i < args.size(); ++i) {

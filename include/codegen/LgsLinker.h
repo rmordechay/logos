@@ -19,7 +19,7 @@ public:
     const vector<const char *> paths = {"../stdlib/lgslib.ll", "../stdlib/array.ll", "../stdlib/string.ll"};
 
     LgsLinker(const filesystem::path& objFilePath, const filesystem::path& execFilePath) : objFilePath(objFilePath), execFilePath(execFilePath) {}
-    void link(const map<string, Module*>& modules) const;
+    bool link(const map<string, Module*>& modules) const;
     vector<const char*> getLinkerOpts() const;
     void linkStdlib(const string& path, Linker* linker) const;
     ~LgsLinker() = default;

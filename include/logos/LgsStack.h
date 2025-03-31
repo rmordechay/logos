@@ -18,8 +18,7 @@ public:
     mutex mtx;
     LgsFunc* currentFunc = nullptr;
 
-    void enterScope();
-    void enterScope(LgsFunc* func);
+    void enterScope(LgsFunc* func = nullptr);
     void exitScope(CodeGenMetadata* metadata = nullptr);
     LgsSymbol* getSymbol(const string& name);
     LgsFunc* getFunc(const vector<LgsFunc*>& overloads, const LgsFuncSignature* signature) const;
@@ -28,6 +27,7 @@ public:
     void addLocalSymbol(const string& name, LgsVarDec* symbol);
     void addLocalSymbol(const string& name, LgsParam* symbol);
     string getStackString() const;
+    void freeSymbols(CodeGenMetadata* metadata);
     void reset();
     ~LgsStack() = default;
 };

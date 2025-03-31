@@ -15,28 +15,24 @@ struct LgsFuncSignature {
     string composedName;
     vector<LgsParam*> params;
 
-    void setNameFromArgs(const vector<string>& paramTypeNames) {
+    void setNameFromArgs(const vector<string>& argTypeNames) {
         stringstream strStream;
         if (parentName != "") {
             strStream << parentName << "_";
         }
         strStream << name;
-        for (int i = 0; i < paramTypeNames.size(); ++i) {
-            strStream << "_" + paramTypeNames[i];
+        for (int i = 0; i < argTypeNames.size(); ++i) {
+            strStream << "_" + argTypeNames[i];
         }
         composedName = strStream.str();
     }
 
     void setNameFromParams() {
-        stringstream strStream;
-        if (parentName != "") {
-            strStream << parentName << "_";
+        vector<string> argTypeNames;
+        for (const auto& param : params) {
+            argTypeNames.emplace_back(param->type->getName());
         }
-        strStream << name;
-        for (int i = 0; i < params.size(); ++i) {
-            strStream << "_" + params[i]->type->getName();
-        }
-        composedName = strStream.str();
+        setNameFromArgs(argTypeNames);
     }
 
     bool operator==(const LgsFuncSignature* other) const {

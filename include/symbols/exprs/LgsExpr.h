@@ -4,6 +4,11 @@
 #include <types/LgsType.h>
 
 
+class LgsVariable;
+class LgsSelection;
+class LgsInstance;
+class LgsArrayIndex;
+class LgsArray;
 class LgsBoolConst;
 class LgsCharConst;
 class LgsFloatConst;

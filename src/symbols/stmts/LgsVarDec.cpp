@@ -1,6 +1,7 @@
 #include "stmts/LgsVarDec.h"
 
 #include "exprs/unary/LgsArray.h"
+#include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/constants/LgsConstExpr.h"
 #include <LgsStack.h>
 #include <json/json.hpp>
@@ -22,9 +23,7 @@ Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
 }
 
 void LgsVarDec::free(CodeGenMetadata* metadata) {
-    if (const auto arr = expr->asArray()) {
-        arr->free(metadata);
-    }
+    expr->free(metadata);
 }
 
 json LgsVarDec::asJson() {

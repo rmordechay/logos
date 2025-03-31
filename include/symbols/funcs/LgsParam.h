@@ -2,6 +2,7 @@
 #define LOGOSPARAM_H
 #include <LgsValue.h>
 
+class LgsExpr;
 class LgsType;
 
 class LgsParam final : public LgsValue {

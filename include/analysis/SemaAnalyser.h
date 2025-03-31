@@ -39,7 +39,7 @@ public:
     void visitObject(LgsObject* obj);
     void visitInterface(const LgsInterface* interface);
     void visitField(const LgsField* field);
-    void visitMethodImpl(LgsMethodImpl* method, LgsObject* obj);
+    void visitMethodImpl(LgsMethodImpl* method);
     void visitMainFunc(LgsFuncImpl* mainFunc);
     void visitFuncImpl(LgsFuncImpl* func);
     void visitParam(LgsParam* param);

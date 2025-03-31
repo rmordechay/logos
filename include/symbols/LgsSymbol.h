@@ -2,24 +2,12 @@
 #define LOGOSSYMBOL_H
 
 struct CodeGenMetadata;
-class LgsInterface;
 class LgsEnum;
+class LgsFunc;
+class LgsInterface;
+class LgsObject;
 class LgsParam;
 class LgsVarDec;
-class LgsMethodImpl;
-class LgsFuncImpl;
-class LgsExpr;
-class LgsArrayIndex;
-class LgsArray;
-class LgsSelection;
-class LgsBinaryExpr;
-class LgsConstExpr;
-class LgsVariable;
-class LgsFuncCall;
-class LgsInstance;
-class LgsFunc;
-class LgsField;
-class LgsObject;
 
 enum LgsSymbolType {
     VAR_DEC,
@@ -41,41 +29,13 @@ struct LgsSymbol {
         LgsEnum* lgsEnum;
     };
 
-    LgsSymbol() :
-        type(static_cast<LgsSymbolType>(0)),
-        object(nullptr) {
-    }
-
-    LgsSymbol(const LgsSymbolType type, LgsParam* param) :
-        type(type),
-        param(param) {
-    }
-
-    LgsSymbol(const LgsSymbolType type, LgsVarDec* varDec) :
-        type(type),
-        varDec(varDec) {
-    }
-
-    LgsSymbol(const LgsSymbolType type, LgsFunc* funcImpl) :
-        type(type),
-        func(funcImpl) {
-    }
-
-    LgsSymbol(const LgsSymbolType type, LgsObject* object) :
-        type(type),
-        object(object) {
-    }
-
-    LgsSymbol(const LgsSymbolType type, LgsInterface* interface) :
-        type(type),
-        interface(interface) {
-    }
-
-    LgsSymbol(const LgsSymbolType type, LgsEnum* lgsEnum) :
-        type(type),
-        lgsEnum(lgsEnum) {
-    }
-
+    LgsSymbol();
+    LgsSymbol(LgsSymbolType type, LgsParam* param);
+    LgsSymbol(LgsSymbolType type, LgsVarDec* varDec);
+    LgsSymbol(LgsSymbolType type, LgsFunc* funcImpl);
+    LgsSymbol(LgsSymbolType type, LgsObject* object);
+    LgsSymbol(LgsSymbolType type, LgsInterface* interface);
+    LgsSymbol(LgsSymbolType type, LgsEnum* lgsEnum);
     void free(CodeGenMetadata* metadata) const;
 };
 

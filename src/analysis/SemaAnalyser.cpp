@@ -57,7 +57,7 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
     }
     for (const auto& [_, method] : obj->methods) {
         for (const auto& overload : method) {
-            visitMethodImpl(overload, obj);
+            visitMethodImpl(overload);
         }
     }
     checkObjectImplements(obj);
@@ -79,17 +79,17 @@ void SemaAnalyser::visitFuncImpl(LgsFuncImpl* func) {
     globals.addFunc(func);
     logosStack.enterScope(func);
     setFuncType(func);
-    for (const auto& param : func->params) {
+    for (const auto& param : func->signature.params) {
         visitParam(param);
     }
     visitStmtBlock(func->stmtBlock);
     logosStack.exitScope();
 }
 
-void SemaAnalyser::visitMethodImpl(LgsMethodImpl* method, LgsObject* obj) {
+void SemaAnalyser::visitMethodImpl(LgsMethodImpl* method) {
     logosStack.enterScope(method);
     setFuncType(method);
-    for (const auto& param : method->params) {
+    for (const auto& param : method->signature.params) {
         visitParam(param);
     }
     visitStmtBlock(method->stmtBlock);
@@ -343,7 +343,8 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     const auto func = resolveFuncCall(funcCall);
     if (!func) return;
     funcCall->func = func;
-    setExprType(funcCall, func->signature.rt);
+    funcCall->signature.rt = func->signature.rt;
+    setExprType(funcCall, funcCall->signature.rt);
 }
 
 void SemaAnalyser::setVariableType(LgsVariable* variable) {

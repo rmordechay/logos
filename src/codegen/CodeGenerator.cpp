@@ -5,9 +5,11 @@
 #include <LgsMainFile.h>
 #include <ranges>
 #include <llvm/Support/FileSystem.h>
+#include "llvm/ADT/ScopeExit.h"
+
 
 void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* mainFile, const bool writeToFile) {
-    const auto module = createModule(LOGOS_MAIN_FILE);
+    const auto module = createEmptryModule(LOGOS_MAIN_FILE);
     auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
 
     for (const auto& func : mainFile->funcs) {
@@ -23,7 +25,7 @@ void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* main
 
 void CodeGenerator::generateModule(const path& buildDir, LgsObject* obj, const bool writeToFile) {
     const auto objName = obj->getName();
-    const auto module = createModule(objName);
+    const auto module = createEmptryModule(objName);
     auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
 
     for (const auto& [_, method] : obj->methods) {
@@ -37,7 +39,7 @@ void CodeGenerator::generateModule(const path& buildDir, LgsObject* obj, const b
     }
 }
 
-Module* CodeGenerator::createModule(const string& objName) {
+Module* CodeGenerator::createEmptryModule(const string& objName) {
     const auto module = new Module(objName, context);
     module->setTargetTriple(targetTriple);
     module->setDataLayout(targetMachine->createDataLayout());

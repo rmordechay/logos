@@ -4,16 +4,10 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
 
-void LgsStack::enterScope() {
-    if (size() > 0) {
-        push(LgsStackFrame{.symbols = top().symbols});
-    } else {
-        push(LgsStackFrame());
-    }
-}
-
 void LgsStack::enterScope(LgsFunc* func) {
-    currentFunc = func;
+    if (func) {
+        currentFunc = func;
+    }
     if (size() > 0) {
         push(LgsStackFrame{.symbols = top().symbols});
     } else {
@@ -22,11 +16,7 @@ void LgsStack::enterScope(LgsFunc* func) {
 }
 
 void LgsStack::exitScope(CodeGenMetadata* metadata) {
-    if (metadata) {
-        for (const auto& [_, symbol] : top().symbols) {
-            symbol.free(metadata);
-        }
-    }
+    // if (metadata) freeSymbols(metadata);
     pop();
 }
 
@@ -76,6 +66,12 @@ void LgsStack::addLocalSymbol(const string& name, LgsParam* symbol) {
 
 string LgsStack::getStackString() const {
     return "";
+}
+
+void LgsStack::freeSymbols(CodeGenMetadata* metadata) {
+    for (const auto& [_, symbol] : top().symbols) {
+        symbol.free(metadata);
+    }
 }
 
 void LgsStack::reset() {

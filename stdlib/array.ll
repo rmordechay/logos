@@ -2,7 +2,6 @@ declare ptr @malloc(i64)
 declare ptr @realloc(ptr, i64)
 declare void @free(ptr)
 
-@str = private constant [4 x i8] c"%d\0A\00"
 %arr = type {i64, i64, ptr}
 
 define ptr @get_cap(ptr %self) {
@@ -47,6 +46,7 @@ init_array:
 }
 
 define i32 @ArrayType_getElement_ArrayType_Int(ptr %self, i32 %index) {
+entry:
     %data_ptr = call ptr @get_data(ptr %self)
     %element_ptr = getelementptr i32, ptr %data_ptr, i32 %index
     %element = load i32, ptr %element_ptr

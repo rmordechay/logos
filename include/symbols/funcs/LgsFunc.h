@@ -13,15 +13,15 @@ class LgsType;
 class LgsFunc : public LgsValue {
 public:
     LgsFuncSignature signature;
-    vector<LgsParam*> params;
     vector<Type*> IRParamsTypes;
     LgsStmtBlock* stmtBlock = nullptr;
     FunctionType* IRFuncType = nullptr;
     BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
 
-    explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {}) : params(params) {
+    explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {}) {
         signature.name = name;
         signature.rt = funcType;
+        signature.params = params;
     }
 
     virtual void setIRFuncType() = 0;

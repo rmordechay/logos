@@ -1,10 +1,13 @@
 #include "exprs/unary/LgsArray.h"
+
+#include "types/LgsArrayType.h"
 #include "types/LgsVoid.h"
 
 Value* LgsArray::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto IRArr = initIRArr(metadata);
-    const auto addElementFunc = getIRFuncAddElement(metadata);
+    const auto arrayType = asArrayType();
+    const auto IRArr = arrayType->initIRArr(metadata, size());
+    const auto addElementFunc = arrayType->getIRFuncAddElement(metadata);
     for (const auto & element : initialElements) {
         builder.CreateCall(addElementFunc, {IRArr, element->getIRValue(metadata)});
     }
@@ -19,24 +22,10 @@ Value* LgsArray::sizeIR(CodeGenMetadata* metadata) {
     return nullptr;
 }
 
-Value* LgsArray::initIRArr(CodeGenMetadata* metadata) const {
-    const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_initArr_Long", initArrIRFuncType);
-    auto initialCapacity = metadata->builder.getInt64(initialElements.size());
-    return metadata->builder.CreateCall(func, {initialCapacity});
-}
-
-FunctionCallee LgsArray::getIRFuncAddElement(const CodeGenMetadata* metadata) const {
-    return metadata->currentModule->getOrInsertFunction("ArrayType_add_ArrayType_Int", addElementIRFuncType);
-}
-
-Value* LgsArray::getIRFuncGetElement(CodeGenMetadata* metadata, Value* index) const {
-    const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_getElement_ArrayType_Int", getElementIRFuncType);
-    return metadata->builder.CreateCall(func, {IRValue, index});
+LgsArrayType* LgsArray::asArrayType() const {
+    return dynamic_cast<LgsArrayType*>(type);
 }
 
 void LgsArray::free(CodeGenMetadata* metadata) {
-    if (isFreed) return;
-    const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_freeArr_ArrayType", freeArrIRFuncType);
-    metadata->builder.CreateCall(func, {IRValue});
-    isFreed = true;
+    asArrayType()->free(metadata, &isFreed, IRValue);
 }

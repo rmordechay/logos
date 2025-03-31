@@ -9,10 +9,9 @@
 #include <llvm/Support/SourceMgr.h>
 #include <llvm/Support/FileSystem.h>
 #include "llvm/IR/Verifier.h"
-
 #include <iostream>
 
-void LgsLinker::link(const std::map<std::string, Module*>& modules) const {
+bool LgsLinker::link(const std::map<std::string, Module*>& modules) const {
     Module* mainModule = modules.find(LOGOS_MAIN_FILE)->second;
     Linker linker(*mainModule);
 
@@ -25,15 +24,24 @@ void LgsLinker::link(const std::map<std::string, Module*>& modules) const {
         linker.linkInModule(std::unique_ptr<Module>(module));
     }
 
-    if (verifyModule(*mainModule, &errs())) return;
+    if (verifyModule(*mainModule, &errs())) return false;
 
     error_code ec;
     legacy::PassManager pass;
     raw_fd_ostream outputStream(objFilePath.c_str(), ec, sys::fs::OF_None);
-    targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
+    const auto addedPassFailed = targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
+    if (addedPassFailed) {
+        std::cerr << ec.message() << '\n';
+        return false;
+    }
     pass.run(*mainModule);
     outputStream.flush();
-    lld::macho::link(getLinkerOpts(), outs(), errs(), false, false);
+    const bool linkingPassed = lld::macho::link(getLinkerOpts(), outs(), errs(), false, false);
+    if (!linkingPassed) {
+        errs() << "Linking failed.";
+        return false;
+    }
+    return true;
 }
 
 void LgsLinker::linkStdlib(const string& path, Linker* linker) const {

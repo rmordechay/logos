@@ -34,7 +34,7 @@ void Logos::run() {
 
     // Linking
     const LgsLinker linker(objFilePath, execFilePath);
-    linker.link(modules);
+    if (!linker.link(modules)) return;
 
     // Running
     system(execFilePath.c_str());

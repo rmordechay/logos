@@ -15,7 +15,7 @@ class CodeGenerator {
 public:
     static void generateModule(const path& buildDir, const LgsMainFile* mainFile, bool writeToFile = true);
     static void generateModule(const path& buildDir, LgsObject* obj, bool writeToFile = true);
-    static Module* createModule(const std::string& objName);
+    static Module* createEmptryModule(const std::string& objName);
     static void writeIRToFile(const Module* module, const path& buildDir, const path& name);
     ~CodeGenerator() = default;
 };
