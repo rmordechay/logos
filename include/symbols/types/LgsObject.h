@@ -9,6 +9,7 @@ class LgsObject final : public LgsType {
 public:
     string name;
     Type* IRType = nullptr;
+    vector<LgsType*> implements;
 
     explicit LgsObject(const string& typeName) : name(typeName) {}
     const string getName() const override;

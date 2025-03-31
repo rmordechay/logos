@@ -1,6 +1,5 @@
 #ifndef LOGOSSTACK_H
 #define LOGOSSTACK_H
-#include "funcs/LgsFuncSignature.h"
 #include "symbols/LgsSymbol.h"
 #include <stack>
 #include <map>
@@ -8,6 +7,7 @@
 
 using namespace std;
 using namespace llvm;
+struct LgsFuncSignature;
 
 struct LgsStackFrame {
     map<string, LgsSymbol> symbols;
@@ -22,8 +22,7 @@ public:
     void enterScope(LgsFunc* func);
     void exitScope(CodeGenMetadata* metadata = nullptr);
     LgsSymbol* getSymbol(const string& name);
-    LgsFunc* getFunc(const LgsFuncSignature* signature) const;
-    LgsFunc* getFunc(const vector<LgsFunc*>& overloads, const string& composedName) const;
+    LgsFunc* getFunc(const vector<LgsFunc*>& overloads, const LgsFuncSignature* signature) const;
     vector<LgsFunc*> getFuncOverloads(const string& funcName) const;
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     void addLocalSymbol(const string& name, LgsVarDec* symbol);

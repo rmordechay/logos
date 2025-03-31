@@ -8,11 +8,6 @@
 
 struct CodeGenMetadata;
 
-struct Location {
-    size_t lineNumber{};
-    size_t posInLine{};
-};
-
 class LgsValue {
 public:
     Location location;

@@ -97,6 +97,10 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
         const auto method = getMethodImpl(func, obj);
         obj->methods[funcName] = {method};
     }
+    for (const auto& type : ctx->objectImplements()->TYPE()) {
+        auto implementType = getTypeFromText(type->getText());
+        obj->implements.emplace_back(implementType);
+    }
     globals.addSymbol(obj->name, LgsSymbol(OBJECT, obj));
     return obj;
 }
@@ -117,6 +121,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceFileContext* c
             }
         }
         interface->funcSignatures.emplace_back(lgsFuncSignature);
+        lgsFuncSignature->setNameFromParams();
     }
     globals.addSymbol(interface->name, LgsSymbol(INTERFACE, interface));
     return interface;

@@ -1,6 +1,4 @@
 #include "types/LgsType.h"
-
-#include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
 
@@ -12,16 +10,22 @@ LgsField* LgsType::getField(const string& name) {
     return nullptr;
 }
 
-LgsMethodImpl* LgsType::getMethod(const LgsFuncCall* funcCall) {
-    const auto method = methods.find(funcCall->signature.name);
-    if (method != methods.end()) {
-        for (const auto& overload : method->second) {
-            if (overload->signature.composedName == funcCall->signature.composedName) {
-                return overload;
-            }
+LgsMethodImpl* LgsType::getMethod(const LgsFuncSignature* signature) const {
+    const auto overloads = getMethodsOverloads(signature->name);
+    for (const auto& overload : overloads) {
+        if (overload->signature == signature) {
+            return overload;
         }
     }
     return nullptr;
+}
+
+vector<LgsMethodImpl*> LgsType::getMethodsOverloads(const string& funcName) const {
+    const auto method = methods.find(funcName);
+    if (method != methods.end()) {
+        return method->second;
+    }
+    return {};
 }
 
 Type* LgsType::getIRType() {

@@ -1,9 +1,7 @@
 #ifndef LGSINTERFACEFILE_H
 #define LGSINTERFACEFILE_H
 #include "types/LgsInterface.h"
-
 #include <LgsFile.h>
-#include <vector>
 
 struct LgsFuncSignature;
 

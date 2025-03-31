@@ -7,7 +7,7 @@ class LgsMethodImpl final : public LgsFunc {
 public:
     LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam*>& params = {}) : LgsFunc(name, funcType, params) {
         signature.parentName = parentName;
-        setComposedName();
+        signature.setNameFromParams();
     }
     void setIRFuncType() override;
     ~LgsMethodImpl() override = default;

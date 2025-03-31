@@ -10,7 +10,7 @@ class LgsPrint final : public LgsFunc {
 public:
     static constexpr auto name = "print";
     explicit LgsPrint(const vector<LgsParam*>& params) : LgsFunc(name, new LgsVoid(), params) {
-        setComposedName();
+        signature.setNameFromParams();
     }
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override;
     void createIRValue(CodeGenMetadata* metadata) override;

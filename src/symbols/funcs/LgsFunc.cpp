@@ -4,17 +4,6 @@
 #include "funcs/LgsParam.h"
 #include "types/LgsVoid.h"
 
-void LgsFunc::setComposedName() {
-    if (signature.name == LOGOS_MAIN_FUNC) {
-        signature.composedName = signature.name;
-        return;
-    }
-    for (const auto& param : params) {
-        signature.paramTypeNames.emplace_back(param->type->getName());
-    }
-    signature.setComposedName();
-}
-
 void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     metadata->logosStack.enterScope(this);
     setIRFuncType();

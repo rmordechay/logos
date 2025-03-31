@@ -16,13 +16,12 @@ public:
     bool successful = true;
 
     void setUnsuccessful();
-    string formatErrorMsg(const string& errMsg, const vector<string>& args = {});
-    void printError(const string& errMsg, const vector<string>& args = {});
+    string formatErrorMsg(const string& errMsg, const vector<string>& args = {}) const;
+    void printError(const string& errMsg, const vector<string>& args = {}) const;
 };
 
 
-inline string LgsAnalyser::formatErrorMsg(const string& errMsg, const vector<string>& args) {
-    setUnsuccessful();
+inline string LgsAnalyser::formatErrorMsg(const string& errMsg, const vector<string>& args) const {
     auto pos = 0;
     auto argIndex = 0;
     auto result = errMsg;
@@ -34,7 +33,7 @@ inline string LgsAnalyser::formatErrorMsg(const string& errMsg, const vector<str
     return "Error: " + result;
 }
 
-inline void LgsAnalyser::printError(const string& errMsg, const vector<string>& args) {
+inline void LgsAnalyser::printError(const string& errMsg, const vector<string>& args) const {
     cout << "Error: " << formatErrorMsg(errMsg, args) << endl;
 }
 

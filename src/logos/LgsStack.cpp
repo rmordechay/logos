@@ -31,26 +31,22 @@ void LgsStack::exitScope(CodeGenMetadata* metadata) {
 }
 
 LgsSymbol* LgsStack::getSymbol(const string& name) {
+    // Globals
+    if (globals.symbols.find(name) != globals.symbols.end()) {
+        return &globals.symbols[name];
+    }
+    if (size() == 0) return nullptr;
     // Locals
     auto& symbols = top().symbols;
     if (symbols.find(name) != symbols.end()) {
         return &symbols[name];
     }
-    // Globals
-    if (globals.symbols.find(name) != globals.symbols.end()) {
-        return &globals.symbols[name];
-    }
     return nullptr;
 }
 
-LgsFunc* LgsStack::getFunc(const LgsFuncSignature* signature) const {
-    const auto overloads = getFuncOverloads(signature->name);
-    return getFunc(overloads, signature->composedName);
-}
-
-LgsFunc* LgsStack::getFunc(const vector<LgsFunc*>& overloads, const string& composedName) const {
+LgsFunc* LgsStack::getFunc(const vector<LgsFunc*>& overloads, const LgsFuncSignature* signature) const {
     for (const auto& overload : overloads) {
-        if (overload->signature.composedName == composedName) {
+        if (overload->signature == signature) {
             return overload;
         }
     }

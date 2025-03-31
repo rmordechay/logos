@@ -23,7 +23,7 @@ public:
         signature.name = name;
         signature.rt = funcType;
     }
-    void setComposedName();
+
     virtual void setIRFuncType() = 0;
     virtual void createIRValue(CodeGenMetadata* metadata);
     virtual Function* getIRFunc(const CodeGenMetadata* metadata);

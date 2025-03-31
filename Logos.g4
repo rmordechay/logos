@@ -25,7 +25,7 @@ interfaceDeclaration:
     ;
 
 objectImplements:
-        IMPLEMENTS COLON TYPE
+        IMPLEMENTS COLON TYPE (COMMA TYPE)? COMMA?
     ;
 
 funcSignature:

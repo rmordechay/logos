@@ -47,7 +47,7 @@ void SemaAnalyser::visitObjectFile(const LgsObjectFile* objectFile) {
     visitObject(objectFile->obj);
 }
 
-void SemaAnalyser::visitInterfaceFile(LgsInterfaceFile* interfaceFile) {
+void SemaAnalyser::visitInterfaceFile(const LgsInterfaceFile* interfaceFile) {
     visitInterface(interfaceFile->interface);
 }
 
@@ -60,6 +60,7 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
             visitMethodImpl(overload, obj);
         }
     }
+    checkObjectImplements(obj);
 }
 
 void SemaAnalyser::visitInterface(const LgsInterface* interface) {
@@ -300,12 +301,13 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
         if (const auto var = dynamic_cast<LgsVariable*>(nextExpr)) {
             setSelectionFieldType(currentExpr, var);
         } else if (const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr)) {
+            vector<string> argsTypeNames;
             for (const auto& arg : methodCall->args) {
                 visitExpr(arg);
-                methodCall->signature.paramTypeNames.emplace_back(arg->type->getName());
+                argsTypeNames.emplace_back(arg->type->getName());
             }
             methodCall->signature.parentName = currentExpr->type->getName();
-            methodCall->signature.setComposedName();
+            methodCall->signature.setNameFromArgs(argsTypeNames);
             setMethodCallType(currentExpr, methodCall);
         }
     }
@@ -332,12 +334,13 @@ void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
 }
 
 void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
+    vector<string> argsTypeNames;
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
-        funcCall->signature.paramTypeNames.emplace_back(arg->type->getName());
+        argsTypeNames.emplace_back(arg->type->getName());
     }
-    funcCall->signature.setComposedName();
-    const auto func = getFunc(funcCall);
+    funcCall->signature.setNameFromArgs(argsTypeNames);
+    const auto func = resolveFuncCall(funcCall);
     if (!func) return;
     funcCall->func = func;
     setExprType(funcCall, func->signature.rt);
@@ -358,22 +361,31 @@ void SemaAnalyser::setVariableType(LgsVariable* variable) {
     }
 }
 
-void SemaAnalyser::setFuncType(LgsFunc* func) {
-    if (dynamic_cast<LgsUnknownType*>(func->signature.rt)) {
-        const auto symbol = logosStack.getSymbol(func->signature.rt->getName());
-        delete func->signature.rt;
-        func->signature.rt = symbol->object;
+LgsType* SemaAnalyser::resolveType(LgsType* type) {
+    if (dynamic_cast<LgsUnknownType*>(type)) {
+        const auto name = type->getName();
+        const auto symbol = logosStack.getSymbol(name);
+        if (symbol) {
+            delete type;
+            if (symbol->type == OBJECT) {
+                return symbol->object;
+            }
+            if (symbol->type == INTERFACE) {
+                return symbol->interface;
+            }
+        }
+        handleError(E10006, &type->location, {name});
+        return nullptr;
     }
+    return type;
+}
+
+void SemaAnalyser::setFuncType(LgsFunc* func) {
+    func->signature.rt = resolveType(func->signature.rt);
 }
 
 void SemaAnalyser::setExprType(LgsExpr* expr, LgsType* type) {
-    if (dynamic_cast<LgsUnknownType*>(type)) {
-        const auto symbol = logosStack.getSymbol(type->getName());
-        expr->type = symbol->object;
-        delete type;
-    } else {
-        expr->type = type;
-    }
+    expr->type = resolveType(type);
 }
 
 void SemaAnalyser::setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
@@ -387,7 +399,7 @@ void SemaAnalyser::setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fiel
 }
 
 void SemaAnalyser::setMethodCallType(const LgsUnaryExpr* parent, LgsFuncCall* funcCall) {
-    const auto method = parent->type->getMethod(funcCall);
+    const auto method = parent->type->getMethod(&funcCall->signature);
     if (!method) {
         handleError(E10005, &funcCall->location, {funcCall->getName(), parent->type->getName()});
         return;
@@ -431,7 +443,21 @@ bool SemaAnalyser::checkExprType(const LgsExpr* expr, LgsType* userType) {
     return true;
 }
 
+void SemaAnalyser::checkObjectImplements(LgsObject* obj) {
+    for (int i = 0; i < obj->implements.size(); ++i) {
+        const auto interface = dynamic_cast<LgsInterface*>(resolveType(obj->implements[i]));
+        if (!interface) return;
+        obj->implements[i] = interface;
+        for (const auto& funcSignature : interface->funcSignatures) {
+            if (!obj->getMethod(funcSignature)) {
+                // handleError(E10016, &obj->location, {obj->name, interface->name});
+            }
+        }
+    }
+}
+
 void SemaAnalyser::handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args) {
+    setUnsuccessful();
     const auto errMsg = formatErrorMsg(lgsErr.msg, args);
     errors.emplace_back(LgsError{.errCode = lgsErr.errCode, .msg = errMsg});
 
@@ -450,13 +476,13 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
     return symbol;
 }
 
-LgsFunc* SemaAnalyser::getFunc(const LgsFuncCall* funcCall) {
+LgsFunc* SemaAnalyser::resolveFuncCall(const LgsFuncCall* funcCall) {
     const auto overloads = logosStack.getFuncOverloads(funcCall->signature.name);
     if (overloads.empty()) {
         handleError(E10006, &funcCall->location, {funcCall->signature.name});
         return nullptr;
     }
-    const auto func = logosStack.getFunc(overloads, funcCall->signature.composedName);
+    const auto func = logosStack.getFunc(overloads, &funcCall->signature);
     if (!func) {
         handleError(E10015, &funcCall->location, {funcCall->getArgsTypeStr(), funcCall->signature.name});
     }

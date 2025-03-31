@@ -1,5 +1,6 @@
 #ifndef LGSFUNCSIGNATURE_H
 #define LGSFUNCSIGNATURE_H
+#include "LgsParam.h"
 #include "types/LgsType.h"
 
 #include <sstream>
@@ -13,18 +14,33 @@ struct LgsFuncSignature {
     string parentName;
     string composedName;
     vector<LgsParam*> params;
-    vector<string> paramTypeNames;
 
-    void setComposedName() {
-        stringstream ss;
+    void setNameFromArgs(const vector<string>& paramTypeNames) {
+        stringstream strStream;
         if (parentName != "") {
-            ss << parentName << "_";
+            strStream << parentName << "_";
         }
-        ss << name;
+        strStream << name;
         for (int i = 0; i < paramTypeNames.size(); ++i) {
-            ss << "_" + paramTypeNames[i];
+            strStream << "_" + paramTypeNames[i];
         }
-        composedName = ss.str();
+        composedName = strStream.str();
+    }
+
+    void setNameFromParams() {
+        stringstream strStream;
+        if (parentName != "") {
+            strStream << parentName << "_";
+        }
+        strStream << name;
+        for (int i = 0; i < params.size(); ++i) {
+            strStream << "_" + params[i]->type->getName();
+        }
+        composedName = strStream.str();
+    }
+
+    bool operator==(const LgsFuncSignature* other) const {
+        return name == other->name;
     }
 };
 

@@ -8,7 +8,6 @@
 #include "files/LgsObjectFile.h"
 #include "stmts/LgsEnum.h"
 #include "stmts/LgsPatternMatching.h"
-#include "types/LgsObject.h"
 #include "stmts/LgsReturn.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -36,7 +35,7 @@ public:
     void analyse();
     void visitMainFile(const LgsMainFile* mainFile);
     void visitObjectFile(const LgsObjectFile* objectFile);
-    void visitInterfaceFile(LgsInterfaceFile* interfaceFile);
+    void visitInterfaceFile(const LgsInterfaceFile* interfaceFile);
     void visitObject(LgsObject* obj);
     void visitInterface(const LgsInterface* interface);
     void visitField(const LgsField* field);
@@ -76,9 +75,11 @@ public:
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
 
     bool checkExprType(const LgsExpr* expr, LgsType* userType);
+    void checkObjectImplements(LgsObject* obj);
     void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args);
+    LgsType* resolveType(LgsType* type);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
-    LgsFunc* getFunc(const LgsFuncCall* funcCall);
+    LgsFunc* resolveFuncCall(const LgsFuncCall* funcCall);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     Location* getSymbolLocation(const LgsSymbol* symbol) const;
     ~SemaAnalyser() = default;

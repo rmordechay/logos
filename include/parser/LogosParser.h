@@ -195,7 +195,10 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IMPLEMENTS();
     antlr4::tree::TerminalNode *COLON();
-    antlr4::tree::TerminalNode *TYPE();
+    std::vector<antlr4::tree::TerminalNode *> TYPE();
+    antlr4::tree::TerminalNode* TYPE(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
 
    
   };

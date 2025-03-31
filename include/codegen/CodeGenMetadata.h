@@ -30,4 +30,9 @@ struct CodeGenMetadata {
     IRBuilder<> builder = IRBuilder(context);
 };
 
+struct Location {
+    size_t lineNumber{};
+    size_t posInLine{};
+};
+
 #endif //CODEGENMETADATA_H

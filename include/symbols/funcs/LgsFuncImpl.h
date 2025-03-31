@@ -6,7 +6,11 @@
 class LgsFuncImpl final : public LgsFunc {
 public:
     explicit LgsFuncImpl(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {}) : LgsFunc(name, funcType, params) {
-        setComposedName();
+        if (signature.name == LOGOS_MAIN_FUNC) {
+            signature.composedName = signature.name;
+            return;
+        }
+        signature.setNameFromParams();
     }
     void setIRFuncType() override;
     ~LgsFuncImpl() override = default;
