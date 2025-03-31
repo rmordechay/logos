@@ -2,6 +2,7 @@
 #define LOGOSSYMBOL_H
 
 struct CodeGenMetadata;
+class LgsInterface;
 class LgsEnum;
 class LgsParam;
 class LgsVarDec;
@@ -24,6 +25,7 @@ enum LgsSymbolType {
     VAR_DEC,
     PARAM,
     OBJECT,
+    INTERFACE,
     FUNC,
     ENUM,
 };
@@ -34,6 +36,7 @@ struct LgsSymbol {
         LgsVarDec* varDec;
         LgsParam* param;
         LgsObject* object;
+        LgsInterface* interface;
         LgsFunc* func;
         LgsEnum* lgsEnum;
     };
@@ -61,6 +64,11 @@ struct LgsSymbol {
     LgsSymbol(const LgsSymbolType type, LgsObject* object) :
         type(type),
         object(object) {
+    }
+
+    LgsSymbol(const LgsSymbolType type, LgsInterface* interface) :
+        type(type),
+        interface(interface) {
     }
 
     LgsSymbol(const LgsSymbolType type, LgsEnum* lgsEnum) :

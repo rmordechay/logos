@@ -23,6 +23,10 @@ add_library(lib STATIC
     include/logos/Logos.h
     include/logos/LgsGlobals.h
     include/logos/ThreadPool.h
+    include/files/LgsFile.h
+    include/files/LgsInterfaceFile.h
+    include/files/LgsMainFile.h
+    include/files/LgsObjectFile.h
     include/logos/LgsData.h
     include/logos/LgsStack.h
     include/logos/LgsErrors.h
@@ -79,14 +83,15 @@ add_library(lib STATIC
     include/symbols/stmts/LgsStmtBlock.h
     include/symbols/stmts/LgsVarDec.h
     include/symbols/types/LgsType.h
-    include/symbols/types/LgsArrayType.h
-    include/symbols/types/LgsObject.h
     include/symbols/types/LgsBool.h
     include/symbols/types/LgsFloat.h
     include/symbols/types/LgsInt.h
     include/symbols/types/LgsStr.h
     include/symbols/types/LgsVoid.h
     include/symbols/types/LgsChar.h
+    include/symbols/types/LgsObject.h
+    include/symbols/types/LgsInterface.h
+    include/symbols/types/LgsArrayType.h
 
     # src
     src/logos/Logos.cpp
@@ -105,6 +110,7 @@ add_library(lib STATIC
     src/analysis/ProjectAnalyser.cpp
 
     # Symbols src
+    src/symbols/LgsSymbol.cpp
     src/symbols/LgsValue.cpp
     src/symbols/exprs/LgsExpr.cpp
     src/symbols/exprs/binary/LgsBinaryExpr.cpp
@@ -121,8 +127,6 @@ add_library(lib STATIC
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
     src/symbols/funcs/LgsFunc.cpp
-    src/symbols/funcs/LgsFuncImpl.cpp
-    src/symbols/funcs/LgsMethodImpl.cpp
     src/symbols/funcs/LgsParam.cpp
     src/symbols/funcs/LgsPrint.cpp
     src/symbols/loops/LgsLoop.cpp
@@ -145,7 +149,8 @@ add_library(lib STATIC
     src/symbols/types/LgsChar.cpp
     src/symbols/types/LgsType.cpp
     src/symbols/types/LgsArrayType.cpp
-    src/symbols/LgsSymbol.cpp
+    src/symbols/types/LgsInterface.cpp
+    src/symbols/types/LgsObject.cpp
 )
 
 add_executable(lgs main.cpp)
@@ -176,6 +181,7 @@ add_executable(lgs_tests
     tests/analysis/sema/pattern_matching/SemaPatternMatchingTests.cpp
     tests/analysis/sema/enums/SemaEnumsTests.cpp
     tests/codegen/loops/CodegenRangeLoopTests.cpp
+    tests/codegen/object/CodegenObjectTests.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE

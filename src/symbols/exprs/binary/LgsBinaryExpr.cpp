@@ -7,11 +7,11 @@ Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
     case ADD:
         return left->addIR(metadata, right);
     case SUB:
-        return left->sub(metadata, right);
+        return left->subIR(metadata, right);
     case MUL:
-        return left->mul(metadata, right);
+        return left->mulIR(metadata, right);
     case DIV:
-        return left->div(metadata, right);
+        return left->divIR(metadata, right);
     case EQ:
         return left->eqIR(metadata, right);
     default:

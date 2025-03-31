@@ -6,6 +6,7 @@
 #include "stmts/LgsVarDec.h"
 #include "symbols/LgsSymbol.h"
 #include "types/LgsObject.h"
+#include "types/LgsInterface.h"
 
 #include <assert.h>
 
@@ -38,6 +39,7 @@ struct LgsGlobals {
                 case VAR_DEC: delete symbol.varDec; break;
                 case PARAM: delete symbol.param; break;
                 case OBJECT: delete symbol.object; break;
+                case INTERFACE: delete symbol.interface; break;
                 case FUNC: delete symbol.func; break;
                 case ENUM: delete symbol.lgsEnum; break;
             }

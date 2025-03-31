@@ -32,9 +32,9 @@ public:
     LgsTypeConst* asTypeConst();
     virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
     virtual Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) = 0;
-    virtual Value* sub(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* mul(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* div(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual Value* subIR(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual Value* mulIR(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual Value* divIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other);
     ~LgsExpr() override = default;
 };

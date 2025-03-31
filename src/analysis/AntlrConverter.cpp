@@ -1,6 +1,7 @@
 #include "analysis/AntlrConverter.h"
 
 #include "LgsGlobals.h"
+#include "LgsInterfaceFile.h"
 #include "exprs/LgsNull.h"
 #include "exprs/binary/LgsBinaryExpr.h"
 #include "exprs/binary/LgsOperator.h"
@@ -39,6 +40,9 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
     if (const auto objFileCtx = ctx->objectFile()) {
         logosFile = getObjectFile(objFileCtx, filePath);
     }
+    if (const auto interfaceFileCtx = ctx->interfaceFile()) {
+        logosFile = getInterfaceFile(interfaceFileCtx, filePath);
+    }
     logosFile->absPath = filePath;
     return logosFile;
 }
@@ -73,21 +77,11 @@ LgsObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ct
     return objFile;
 }
 
-LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext* ctx) {
-    const auto rt = getFuncType(ctx);
-    const auto signature = ctx->funcSignature();
-    const auto name = signature->VARIABLE()->getText();
-    vector<LgsParam*> params;
-    if (signature->paramList()) {
-        for (const auto& varDec : signature->paramList()->explicitVarDec()) {
-            auto param = getParam(varDec);
-            params.emplace_back(param);
-        }
-    }
-    const auto func = new LgsFuncImpl(name, rt, params);
-    func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
-    func->setLocation(ctx->start);
-    return func;
+LgsFile* AntlerConverter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const filesystem::path& filePath) {
+    const auto interfaceName = ctx->interfaceDeclaration()->TYPE()->getText();
+    const auto interfaceFile = new LgsInterfaceFile(interfaceName, filePath);
+    interfaceFile->interface = getInterface(ctx, interfaceName);
+    return interfaceFile;
 }
 
 LgsObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
@@ -107,23 +101,61 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
     return obj;
 }
 
-LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationContext* ctx, const LgsObject* obj) {
+LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceFileContext* ctx, const string& parentName) {
+    const auto interfaceName = ctx->interfaceDeclaration()->TYPE()->getText();
+    const auto interface = new LgsInterface(interfaceName);
+    for (const auto& funcSignature : ctx->funcSignature()) {
+        auto lgsFuncSignature = new LgsFuncSignature{
+            .name = funcSignature->VARIABLE()->getText(),
+            .parentName = parentName,
+            .rtName = funcSignature->type()->getText(),
+        };
+        if (funcSignature->paramList()) {
+            for (const auto& varDec : funcSignature->paramList()->explicitVarDec()) {
+                auto param = getParam(varDec);
+                lgsFuncSignature->params.emplace_back(param);
+            }
+        }
+        interface->funcSignatures.emplace_back(lgsFuncSignature);
+    }
+    globals.addSymbol(interface->name, LgsSymbol(INTERFACE, interface));
+    return interface;
+}
+
+LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext* ctx) {
     const auto rt = getFuncType(ctx);
     const auto signature = ctx->funcSignature();
     const auto name = signature->VARIABLE()->getText();
+    vector<LgsParam*> params;
+    if (signature->paramList()) {
+        for (const auto& varDec : signature->paramList()->explicitVarDec()) {
+            auto param = getParam(varDec);
+            params.emplace_back(param);
+        }
+    }
+    const auto func = new LgsFuncImpl(name, rt, params);
+    func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
+    func->setLocation(ctx->start);
+    return func;
+}
 
-    const auto method = new LgsMethodImpl(name, rt, obj->name);
+LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationContext* ctx, LgsObject* obj) {
+    const auto rt = getFuncType(ctx);
+    const auto signature = ctx->funcSignature();
+    const auto name = signature->VARIABLE()->getText();
+    const auto self = new LgsParam(LOGOS_SELF, obj, new LgsInstance(obj->name));
+    vector params = {self};
+    if (signature->paramList()) {
+        for (const auto& varDec : signature->paramList()->explicitVarDec()) {
+            auto param = getParam(varDec);
+            params.emplace_back(param);
+        }
+    }
+    const auto method = new LgsMethodImpl(name, rt, obj->name, params);
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     method->setLocation(ctx->start);
-
-    const auto params = signature->paramList();
-    if (!params) return method;
-
-    for (const auto& varDec : params->explicitVarDec()) {
-        auto param = getParam(varDec);
-        method->params.emplace_back(param);
-    }
     return method;
+
 }
 
 LgsField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const size_t position, const string& parentName) {

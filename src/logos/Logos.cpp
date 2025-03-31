@@ -12,8 +12,6 @@
 #include <funcs/LgsPrint.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Target/TargetOptions.h>
-#include <llvm/TargetParser/Host.h>
-#include <llvm/IR/IRBuilder.h>
 #include <llvm/MC/TargetRegistry.h>
 
 void Logos::run() {

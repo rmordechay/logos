@@ -151,7 +151,6 @@ public:
     virtual size_t getRuleIndex() const override;
     InterfaceDeclarationContext *interfaceDeclaration();
     antlr4::tree::TerminalNode *EOF();
-    ObjectImplementsContext *objectImplements();
     std::vector<ExplicitVarDecContext *> explicitVarDec();
     ExplicitVarDecContext* explicitVarDec(size_t i);
     std::vector<FuncSignatureContext *> funcSignature();

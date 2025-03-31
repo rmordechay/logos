@@ -4,7 +4,7 @@
 
 Value* LgsPatternMatching::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto func = metadata->logosStack.currentFunc->IRFunc;
+    const auto func = metadata->logosStack.currentFunc->getIRFunc(metadata);
     const auto exprIRValue = expr->getIRValue(metadata);
     const auto exitBlock = BasicBlock::Create(context, "exit_pattern_matching");
     const auto defaultCase = BasicBlock::Create(context, "default");

@@ -15,17 +15,18 @@ public:
     LgsFuncSignature signature;
     vector<LgsParam*> params;
     vector<Type*> IRParamsTypes;
-    Function* IRFunc = nullptr;
     LgsStmtBlock* stmtBlock = nullptr;
+    FunctionType* IRFuncType = nullptr;
     BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
 
     explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {}) : params(params) {
         signature.name = name;
-        signature.type = funcType;
+        signature.rt = funcType;
     }
     void setComposedName();
+    virtual void setIRFuncType() = 0;
     virtual void createIRValue(CodeGenMetadata* metadata);
-    virtual void setIRFunc(CodeGenMetadata* metadata) = 0;
+    virtual Function* getIRFunc(const CodeGenMetadata* metadata);
     virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {});
     json asJson() override;
     ~LgsFunc() override;

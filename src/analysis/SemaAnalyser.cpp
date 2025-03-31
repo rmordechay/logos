@@ -1,6 +1,7 @@
 #include "SemaAnalyser.h"
 #include "LgsErrors.h"
 #include "LgsGlobals.h"
+#include "LgsInterfaceFile.h"
 #include "exprs/LgsNull.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
@@ -27,6 +28,8 @@ void SemaAnalyser::analyse() {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
         visitObjectFile(objFile);
+    } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+        visitInterfaceFile(interfaceFile);
     }
 }
 
@@ -44,6 +47,10 @@ void SemaAnalyser::visitObjectFile(const LgsObjectFile* objectFile) {
     visitObject(objectFile->obj);
 }
 
+void SemaAnalyser::visitInterfaceFile(LgsInterfaceFile* interfaceFile) {
+    visitInterface(interfaceFile->interface);
+}
+
 void SemaAnalyser::visitObject(LgsObject* obj) {
     for (const auto& [_, field] : obj->fields) {
         visitField(field);
@@ -51,6 +58,14 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
     for (const auto& [_, method] : obj->methods) {
         for (const auto& overload : method) {
             visitMethodImpl(overload, obj);
+        }
+    }
+}
+
+void SemaAnalyser::visitInterface(const LgsInterface* interface) {
+    for (const auto& funcSignature : interface->funcSignatures) {
+        for (const auto& param : funcSignature->params) {
+            visitParam(param);
         }
     }
 }
@@ -73,8 +88,6 @@ void SemaAnalyser::visitFuncImpl(LgsFuncImpl* func) {
 void SemaAnalyser::visitMethodImpl(LgsMethodImpl* method, LgsObject* obj) {
     logosStack.enterScope(method);
     setFuncType(method);
-    const auto self = new LgsParam(LOGOS_SELF, obj, new LgsInstance(obj->name));
-    method->params.insert(method->params.begin(), self);
     for (const auto& param : method->params) {
         visitParam(param);
     }
@@ -289,9 +302,10 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
         } else if (const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr)) {
             for (const auto& arg : methodCall->args) {
                 visitExpr(arg);
+                methodCall->signature.paramTypeNames.emplace_back(arg->type->getName());
             }
             methodCall->signature.parentName = currentExpr->type->getName();
-            methodCall->setComposedName();
+            methodCall->signature.setComposedName();
             setMethodCallType(currentExpr, methodCall);
         }
     }
@@ -320,12 +334,13 @@ void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
 void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
+        funcCall->signature.paramTypeNames.emplace_back(arg->type->getName());
     }
-    funcCall->setComposedName();
+    funcCall->signature.setComposedName();
     const auto func = getFunc(funcCall);
     if (!func) return;
     funcCall->func = func;
-    setExprType(funcCall, func->signature.type);
+    setExprType(funcCall, func->signature.rt);
 }
 
 void SemaAnalyser::setVariableType(LgsVariable* variable) {
@@ -344,10 +359,10 @@ void SemaAnalyser::setVariableType(LgsVariable* variable) {
 }
 
 void SemaAnalyser::setFuncType(LgsFunc* func) {
-    if (dynamic_cast<LgsUnknownType*>(func->signature.type)) {
-        const auto symbol = logosStack.getSymbol(func->signature.type->getName());
-        delete func->signature.type;
-        func->signature.type = symbol->object;
+    if (dynamic_cast<LgsUnknownType*>(func->signature.rt)) {
+        const auto symbol = logosStack.getSymbol(func->signature.rt->getName());
+        delete func->signature.rt;
+        func->signature.rt = symbol->object;
     }
 }
 
@@ -377,7 +392,7 @@ void SemaAnalyser::setMethodCallType(const LgsUnaryExpr* parent, LgsFuncCall* fu
         handleError(E10005, &funcCall->location, {funcCall->getName(), parent->type->getName()});
         return;
     }
-    setExprType(funcCall, method->signature.type);
+    setExprType(funcCall, method->signature.rt);
 }
 
 void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {

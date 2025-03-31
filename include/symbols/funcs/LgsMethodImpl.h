@@ -1,6 +1,7 @@
 #ifndef LOGOSMETHODIMPL_H
 #define LOGOSMETHODIMPL_H
 #include "LgsFunc.h"
+#include "LgsParam.h"
 
 class LgsMethodImpl final : public LgsFunc {
 public:
@@ -8,9 +9,17 @@ public:
         signature.parentName = parentName;
         setComposedName();
     }
-    LgsMethodImpl(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {}) : LgsMethodImpl(name, funcType, "", params) {}
-    void setIRFunc(CodeGenMetadata* metadata) override;
+    void setIRFuncType() override;
     ~LgsMethodImpl() override = default;
 };
+
+inline void LgsMethodImpl::setIRFuncType() {
+    IRParamsTypes.emplace_back(ptrTy);
+    for (int i = 1; i < params.size(); ++i) {
+        auto paramIRType = params[i]->type->getIRType();
+        IRParamsTypes.emplace_back(paramIRType);
+    }
+    IRFuncType = FunctionType::get(signature.rt->getIRType(), IRParamsTypes, false);
+}
 
 #endif //LOGOSMETHODIMPL_H

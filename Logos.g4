@@ -13,7 +13,7 @@ objectFile:
     ;
 
 interfaceFile:
-        interfaceDeclaration objectImplements? explicitVarDec* funcSignature+ funcImplementation* EOF
+        interfaceDeclaration explicitVarDec* funcSignature+ funcImplementation* EOF
     ;
 
 objectDeclaration:

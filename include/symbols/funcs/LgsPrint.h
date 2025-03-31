@@ -14,7 +14,8 @@ public:
     }
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override;
     void createIRValue(CodeGenMetadata* metadata) override;
-    void setIRFunc(CodeGenMetadata* metadata) override;
+    Function* getIRFunc(const CodeGenMetadata* metadata) override;
+    void setIRFuncType() override;
     ~LgsPrint() override = default;
 };
 

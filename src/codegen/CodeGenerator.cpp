@@ -50,6 +50,6 @@ void CodeGenerator::writeIRToFile(const Module* module, const path& buildDir, co
     std::error_code EC;
     raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
     module->print(textFile, nullptr);
-    // module->print(outs(), nullptr);
-    // std::cout << "\n-----\n\n";
+    module->print(outs(), nullptr);
+    std::cout << "\n-----\n\n";
 }

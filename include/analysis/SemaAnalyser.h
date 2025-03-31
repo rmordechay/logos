@@ -1,6 +1,7 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
 #include "LgsAnalyser.h"
+#include "LgsInterfaceFile.h"
 #include "LgsStack.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
@@ -35,7 +36,9 @@ public:
     void analyse();
     void visitMainFile(const LgsMainFile* mainFile);
     void visitObjectFile(const LgsObjectFile* objectFile);
+    void visitInterfaceFile(LgsInterfaceFile* interfaceFile);
     void visitObject(LgsObject* obj);
+    void visitInterface(const LgsInterface* interface);
     void visitField(const LgsField* field);
     void visitMethodImpl(LgsMethodImpl* method, LgsObject* obj);
     void visitMainFunc(LgsFuncImpl* mainFunc);

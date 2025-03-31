@@ -9,6 +9,7 @@
 #include "stmts/LgsIfStmt.h"
 #include "types/LgsInt.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
+#include "types/LgsInterface.h"
 
 class LgsLoop;
 class LgsAssignment;
@@ -19,10 +20,12 @@ public:
     static LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath);
     static LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const string& filePath);
     static LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath);
+    static LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const filesystem::path& filePath);
+    static LgsInterface* getInterface(LogosParser::InterfaceFileContext* ctx, const string& parentName);
     static LgsObject* getObject(LogosParser::ObjectFileContext* ctx);
     static LgsField* getField(LogosParser::ExplicitVarDecContext* varDec, size_t position, const string& parentName);
     static LgsFuncImpl* getFuncImpl(LogosParser::FuncImplementationContext* ctx);
-    static LgsMethodImpl* getMethodImpl(LogosParser::FuncImplementationContext* ctx, const LgsObject* obj);
+    static LgsMethodImpl* getMethodImpl(LogosParser::FuncImplementationContext* ctx, LgsObject* obj);
     static LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     static LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     static LgsStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);

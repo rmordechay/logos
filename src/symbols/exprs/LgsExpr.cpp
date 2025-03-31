@@ -67,15 +67,15 @@ LgsTypeConst* LgsExpr::asTypeConst() {
     return dynamic_cast<LgsTypeConst*>(this);
 }
 
-Value* LgsExpr::sub(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsExpr::subIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false && "not implemented");
 }
 
-Value* LgsExpr::mul(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsExpr::mulIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false && "not implemented");
 }
 
-Value* LgsExpr::div(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsExpr::divIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false && "not implemented");
 }
 

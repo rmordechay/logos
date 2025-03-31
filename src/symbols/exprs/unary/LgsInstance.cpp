@@ -11,7 +11,7 @@ Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
     if (modules.find(name) == modules.end()) {
         CodeGenerator::generateModule(metadata->buildDir, obj);
     }
-    const auto currentFunc = metadata->logosStack.currentFunc->IRFunc;
+    const auto currentFunc = metadata->logosStack.currentFunc->getIRFunc(metadata);
     if (currentFunc->arg_size() == 0) {
         return metadata->builder.CreateAlloca(obj->getIRType());
     }

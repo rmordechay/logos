@@ -4,12 +4,16 @@
 
 #include <sstream>
 
+class LgsParam;
+
 struct LgsFuncSignature {
     string name;
+    LgsType* rt;
+    string rtName;
     string parentName;
     string composedName;
-    LgsType* type;
-    vector<string> argTypeNames;
+    vector<LgsParam*> params;
+    vector<string> paramTypeNames;
 
     void setComposedName() {
         stringstream ss;
@@ -17,14 +21,10 @@ struct LgsFuncSignature {
             ss << parentName << "_";
         }
         ss << name;
-        for (int i = 0; i < argTypeNames.size(); ++i) {
-            ss << "_" + argTypeNames[i];
+        for (int i = 0; i < paramTypeNames.size(); ++i) {
+            ss << "_" + paramTypeNames[i];
         }
         composedName = ss.str();
-    }
-
-    ~LgsFuncSignature() {
-        delete type;
     }
 };
 
