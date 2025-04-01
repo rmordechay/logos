@@ -20,6 +20,7 @@ enum LgsSymbolType {
 
 struct LgsSymbol {
     LgsSymbolType type;
+    bool isReturnValue = false;
     union {
         LgsVarDec* varDec;
         LgsParam* param;
