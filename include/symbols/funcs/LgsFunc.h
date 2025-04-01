@@ -9,7 +9,6 @@ class LgsParam;
 class LgsExpr;
 class LgsStmt;
 class LgsType;
-
 class LgsFunc : public LgsValue {
 public:
     LgsFuncSignature signature;

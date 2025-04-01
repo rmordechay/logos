@@ -15,6 +15,7 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/binary/LgsBinaryExpr.h"
+#include "stmts/LgsBreakStmt.h"
 #include "stmts/LgsEnum.h"
 #include "stmts/LgsPatternMatching.h"
 #include <loops/LgsForeachLoop.h>
@@ -119,6 +120,8 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
         visitReturnStmt(returnStmt);
     } else if (const auto enumDec = dynamic_cast<LgsEnum*>(stmt)) {
         visitEnum(enumDec);
+    } else if (const auto breakStmt = dynamic_cast<LgsBreakStmt*>(stmt)) {
+        visitBreakStmt(breakStmt);
     }
 }
 
@@ -193,11 +196,13 @@ void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatching* patternMat
 
 void SemaAnalyser::visitLoopStmt(LgsLoop* loopStmt) {
     logosStack.enterScope();
+    logosStack.currentLoop = loopStmt;
     if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {
         visitRangeLoop(rangeLoop);
     } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loopStmt)) {
         visitForeachLoop(foreachLoop);
     }
+    logosStack.currentLoop = nullptr;
     logosStack.exitScope();
 }
 
@@ -224,6 +229,9 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
 
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
     visitExpr(returnStmt->expr);
+}
+
+void SemaAnalyser::visitBreakStmt(LgsBreakStmt* breakStmt) {
 }
 
 void SemaAnalyser::visitEnum(LgsEnum* lgsEnum) {

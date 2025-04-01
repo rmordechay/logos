@@ -80,6 +80,7 @@ add_library(lib STATIC
     include/symbols/stmts/LgsAssignment.h
     include/symbols/stmts/LgsIfStmt.h
     include/symbols/stmts/LgsReturn.h
+    include/symbols/stmts/LgsBreakStmt.h
     include/symbols/stmts/LgsStmtBlock.h
     include/symbols/stmts/LgsVarDec.h
     include/symbols/types/LgsType.h
@@ -112,6 +113,9 @@ add_library(lib STATIC
     # Symbols src
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsValue.cpp
+    src/symbols/funcs/LgsFunc.cpp
+    src/symbols/funcs/LgsParam.cpp
+    src/symbols/funcs/LgsPrint.cpp
     src/symbols/exprs/LgsExpr.cpp
     src/symbols/exprs/binary/LgsBinaryExpr.cpp
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
@@ -126,17 +130,14 @@ add_library(lib STATIC
     src/symbols/exprs/unary/LgsInstance.cpp
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
-    src/symbols/funcs/LgsFunc.cpp
-    src/symbols/funcs/LgsParam.cpp
-    src/symbols/funcs/LgsPrint.cpp
     src/symbols/loops/LgsLoop.cpp
     src/symbols/loops/LgsForeachLoop.cpp
     src/symbols/loops/LgsRangeLoop.cpp
     src/symbols/stmts/LgsField.cpp
-    src/symbols/types/LgsObject.cpp
     src/symbols/stmts/LgsAssignment.cpp
     src/symbols/stmts/LgsIfStmt.cpp
     src/symbols/stmts/LgsReturn.cpp
+    src/symbols/stmts/LgsBreakStmt.cpp
     src/symbols/stmts/LgsStmtBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
     src/symbols/stmts/LgsEnum.cpp

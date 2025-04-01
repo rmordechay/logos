@@ -23,6 +23,7 @@
 #include "types/LgsBool.h"
 #include "types/LgsFloat.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
+#include "stmts/LgsBreakStmt.h"
 #include "stmts/LgsEnum.h"
 #include "stmts/LgsPatternMatching.h"
 
@@ -209,6 +210,9 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     }
     if (const auto returnStmt = ctx->returnStatement()) {
         return new LgsReturn(getExpr(returnStmt->expr()));
+    }
+    if (ctx->breakStmt()) {
+        return new LgsBreakStmt();
     }
     return nullptr;
 }

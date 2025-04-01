@@ -6,6 +6,7 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
+#include "stmts/LgsBreakStmt.h"
 #include "stmts/LgsEnum.h"
 #include "stmts/LgsPatternMatching.h"
 #include "stmts/LgsReturn.h"
@@ -54,6 +55,7 @@ public:
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);
     void visitForeachLoop(const LgsForeachLoop* foreachLoop);
     void visitReturnStmt(const LgsReturn* returnStmt);
+    void visitBreakStmt(LgsBreakStmt* breakStmt);
     void visitEnum(LgsEnum* lgsEnum);
     void visitExpr(LgsExpr* expr);
     void visitArray(const LgsArray* array);

@@ -30,5 +30,6 @@ inline LgsError E10013{.errCode = ++errCodeStart, .msg = "Function '%s' is not d
 inline LgsError E10014{.errCode = ++errCodeStart, .msg = "Pattern of type '%s' does not match base type '%s'."};
 inline LgsError E10015{.errCode = ++errCodeStart, .msg = "Arguments with types (%s) do not match any overload of the function '%s'"};
 inline LgsError E10016{.errCode = ++errCodeStart, .msg = "Object '%s' does not fully implement '%s'. Missing functions:%s"};
+inline LgsError E10017{.errCode = ++errCodeStart, .msg = "break is not part of a loop."};
 
 #endif //LOGOSERRORS_H

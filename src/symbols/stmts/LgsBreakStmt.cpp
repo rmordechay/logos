@@ -1,0 +1,17 @@
+#include "stmts/LgsBreakStmt.h"
+
+#include "funcs/LgsFunc.h"
+
+#include <loops/LgsLoop.h>
+
+Value* LgsBreakStmt::createIRValue(CodeGenMetadata* metadata) {
+    const auto currentLoop = metadata->logosStack.currentLoop;
+    const auto currentFunc = metadata->logosStack.currentFunc;
+    const auto loopExit = currentLoop->loopExit;
+    const auto branchInst = metadata->builder.CreateBr(loopExit);
+    const auto IRFunc = currentFunc->getIRFunc(metadata);
+    const auto breakExtBlock = createBasicBlock("break_ext");
+    breakExtBlock->insertInto(IRFunc);
+    metadata->builder.SetInsertPoint(breakExtBlock);
+    return branchInst;
+}

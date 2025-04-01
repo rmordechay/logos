@@ -5,15 +5,15 @@ Value* LgsLoop::createIRValue(CodeGenMetadata* metadata) {
     initIRLoop(metadata);
     setIRCondition(metadata);
     startBlock(metadata, loopBody);
-    metadata->logosStack.enterScope();
     setIRBody(metadata);
     stmtBlock->createIRValue(metadata);
     exitIRLoop(metadata);
-    metadata->logosStack.exitScope(metadata);
     return nullptr;
 }
 
 void LgsLoop::initIRLoop(CodeGenMetadata* metadata) {
+    metadata->logosStack.enterScope();
+    metadata->logosStack.currentLoop = this;
     auto& builder = metadata->builder;
     loopCondition = createBasicBlock(BB_LOOP_CONDITION);
     loopBody = createBasicBlock(BB_LOOP_BODY);
@@ -40,4 +40,6 @@ void LgsLoop::exitIRLoop(CodeGenMetadata* metadata) const {
     builder.CreateBr(loopCondition);
     // Loop exit
     startBlock(metadata, loopExit);
+    metadata->logosStack.currentLoop = nullptr;
+    metadata->logosStack.exitScope(metadata);
 }

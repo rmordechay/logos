@@ -51,7 +51,8 @@ statement:
     |   ifStatement
     |   patternMatching
     |   loopStatement
-    |   controlFlow
+    |   CONTINUE
+    |   breakStmt
     |   returnStatement
     |   enumDeclaration
     |   funcCall
@@ -100,10 +101,8 @@ loopStatement:
     |   FOR VARIABLE? statementsBlock
     ;
 
-controlFlow:
-        BREAK expr
-    |   BREAK IF
-    |   CONTINUE
+breakStmt:
+        BREAK
     ;
 
 returnStatement:

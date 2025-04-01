@@ -7,6 +7,7 @@
 
 using namespace std;
 using namespace llvm;
+class LgsLoop;
 struct LgsFuncSignature;
 
 struct LgsStackFrame {
@@ -17,6 +18,7 @@ class LgsStack : stack<LgsStackFrame> {
 public:
     mutex mtx;
     LgsFunc* currentFunc = nullptr;
+    LgsLoop* currentLoop = nullptr;
 
     void enterScope(LgsFunc* func = nullptr);
     void exitScope(CodeGenMetadata* metadata = nullptr);

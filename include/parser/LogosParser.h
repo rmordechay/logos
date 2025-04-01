@@ -32,7 +32,7 @@ public:
     RuleParamList = 10, RuleStatement = 11, RuleStatementsBlock = 12, RuleAssignment = 13, 
     RuleExplicitVarDec = 14, RuleImplicitVarDec = 15, RuleIfStatement = 16, 
     RuleElseIfStatement = 17, RuleElseStatement = 18, RulePatternMatching = 19, 
-    RulePattern = 20, RuleLoopStatement = 21, RuleControlFlow = 22, RuleReturnStatement = 23, 
+    RulePattern = 20, RuleLoopStatement = 21, RuleBreakStmt = 22, RuleReturnStatement = 23, 
     RuleEnumDeclaration = 24, RuleEnumField = 25, RuleExpr = 26, RuleUnaryExpr = 27, 
     RuleArray = 28, RuleMap = 29, RuleFuncCall = 30, RuleConstructor = 31, 
     RuleFuncArgList = 32, RuleFuncArg = 33, RuleConstant = 34, RuleArrayIndex = 35, 
@@ -79,7 +79,7 @@ public:
   class PatternMatchingContext;
   class PatternContext;
   class LoopStatementContext;
-  class ControlFlowContext;
+  class BreakStmtContext;
   class ReturnStatementContext;
   class EnumDeclarationContext;
   class EnumFieldContext;
@@ -268,7 +268,8 @@ public:
     IfStatementContext *ifStatement();
     PatternMatchingContext *patternMatching();
     LoopStatementContext *loopStatement();
-    ControlFlowContext *controlFlow();
+    antlr4::tree::TerminalNode *CONTINUE();
+    BreakStmtContext *breakStmt();
     ReturnStatementContext *returnStatement();
     EnumDeclarationContext *enumDeclaration();
     FuncCallContext *funcCall();
@@ -431,19 +432,16 @@ public:
 
   LoopStatementContext* loopStatement();
 
-  class  ControlFlowContext : public antlr4::ParserRuleContext {
+  class  BreakStmtContext : public antlr4::ParserRuleContext {
   public:
-    ControlFlowContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    BreakStmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *BREAK();
-    ExprContext *expr();
-    antlr4::tree::TerminalNode *IF();
-    antlr4::tree::TerminalNode *CONTINUE();
 
    
   };
 
-  ControlFlowContext* controlFlow();
+  BreakStmtContext* breakStmt();
 
   class  ReturnStatementContext : public antlr4::ParserRuleContext {
   public:
