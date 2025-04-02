@@ -6,10 +6,12 @@
 #include <LgsStack.h>
 #include <types/LgsInt.h>
 
-int LgsRangeLoop::loopSize() {
-    const int rangeStartValue = rangeStart->asIntConst()->value;
-    const int rangeEndValue = rangeEnd->asIntConst()->value;
-    return rangeEndValue - rangeStartValue;
+int LgsRangeLoop::loopStart() {
+    return rangeStart->asIntConst()->value;
+}
+
+int LgsRangeLoop::loopEnd() {
+    return rangeEnd->asIntConst()->value;
 }
 
 void LgsRangeLoop::setIRBody(CodeGenMetadata* metadata) {

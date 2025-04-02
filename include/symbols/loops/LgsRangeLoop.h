@@ -9,7 +9,8 @@ public:
 
   LgsRangeLoop(const vector<LgsVarDec*>& loopVars, LgsExpr* rangeStart, LgsExpr* rangeEnd, LgsStmtBlock* stmtBlock) : LgsLoop(loopVars, stmtBlock), rangeStart(rangeStart), rangeEnd(rangeEnd) {}
   void setIRBody(CodeGenMetadata* metadata) override;
-  int loopSize() override;
+  int loopStart() override;
+  int loopEnd() override;
 };
 
 #endif //LOGOSRANGELOOP_H

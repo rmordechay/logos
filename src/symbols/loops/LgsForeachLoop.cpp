@@ -4,16 +4,19 @@
 #include "types/LgsArrayType.h"
 #include "exprs/unary/LgsArrayIndex.h"
 #include <exprs/unary/LgsArray.h>
-#include <types/LgsInt.h>
 
-int LgsForeachLoop::loopSize() {
+int LgsForeachLoop::loopStart() {
+    return 0;
+}
+
+int LgsForeachLoop::loopEnd() {
     return getExprAsIterable()->size();
 }
 
 void LgsForeachLoop::setIRBody(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto arrValue = iterableExpr->getIRValue(metadata);
-    const auto iterableIRType = iterableExpr->type->getIRType(loopSize());
+    const auto iterableIRType = iterableExpr->type->getIRType(loopStart());
     const auto gep = builder.CreateInBoundsGEP(iterableIRType, arrValue, {builder.getInt32(0), iValue});
     const auto arrayType = dynamic_cast<LgsArrayType*>(iterableExpr->type);
     const auto element = builder.CreateLoad(arrayType->underlyingType->getIRType(), gep);
