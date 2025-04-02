@@ -1,5 +1,4 @@
 #include "exprs/unary/constants/LgsTypeConst.h"
-
 #include "AntlrConverter.h"
 
 string LgsTypeConst::getName() {

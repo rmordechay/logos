@@ -14,7 +14,7 @@ Value* LgsIfStmt::createIRValue(CodeGenMetadata* metadata) {
 
 void LgsIfStmt::computeSimpleIf(CodeGenMetadata* metadata) const {
     auto& builder = metadata->builder;
-    const auto ifStartBlock = createBasicBlock(BB_IF_START);
+    const auto ifStartBlock = createBasicBlock(BB_IF_BODY);
     const auto ifEndBlock = createBasicBlock(BB_IF_END);
     const auto elseBlock = createBasicBlock(BB_ELSE);
 
@@ -37,7 +37,7 @@ void LgsIfStmt::computeSimpleIf(CodeGenMetadata* metadata) const {
 
 void LgsIfStmt::computeComplexIf(CodeGenMetadata* metadata) const {
     auto& builder = metadata->builder;
-    const auto ifStartBlock = createBasicBlock(BB_IF_START);
+    const auto ifStartBlock = createBasicBlock(BB_IF_BODY);
     auto elseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK);
     const auto ifEndBlock = createBasicBlock(BB_IF_END);
     const auto elseBlock = createBasicBlock(BB_ELSE);

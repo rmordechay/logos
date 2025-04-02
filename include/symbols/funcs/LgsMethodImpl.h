@@ -14,7 +14,9 @@ public:
 };
 
 inline void LgsMethodImpl::setIRFuncType() {
-    IRParamsTypes.emplace_back(ptrTy);
+    if (!signature.isStatic) {
+        IRParamsTypes.emplace_back(ptrTy);
+    }
     for (int i = 1; i < signature.params.size(); ++i) {
         auto paramIRType = signature.params[i]->type->getIRType();
         IRParamsTypes.emplace_back(paramIRType);

@@ -34,9 +34,9 @@ LgsSymbol* LgsStack::getSymbol(const string& name) {
     return nullptr;
 }
 
-LgsFunc* LgsStack::getFunc(const vector<LgsFunc*>& overloads, const LgsFuncSignature* signature) const {
+LgsFunc* LgsStack::getFunc(const vector<LgsFunc*>& overloads, const string& composedName) const {
     for (const auto& overload : overloads) {
-        if (overload->signature == signature) {
+        if (overload->signature.composedName == composedName) {
             return overload;
         }
     }
@@ -57,11 +57,11 @@ void LgsStack::addLocalSymbol(const string& name, const LgsSymbol& symbol) {
 }
 
 void LgsStack::addLocalSymbol(const string& name, LgsVarDec* symbol) {
-    addLocalSymbol(name, LgsSymbol(VAR_DEC, symbol));
+    addLocalSymbol(name, LgsSymbol(symbol));
 }
 
 void LgsStack::addLocalSymbol(const string& name, LgsParam* symbol) {
-    addLocalSymbol(name, LgsSymbol(PARAM, symbol));
+    addLocalSymbol(name, LgsSymbol(symbol));
 }
 
 string LgsStack::getStackString() const {

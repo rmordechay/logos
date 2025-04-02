@@ -2,6 +2,7 @@
 
 #include "LgsGlobals.h"
 #include "LgsLinker.h"
+#include "builtin/LgsSys.h"
 
 #include <ANTLRInputStream.h>
 #include <AntlrConverter.h>
@@ -26,7 +27,7 @@ void Logos::run() {
     if (!projectAnalyser.analyse()) return;
 
     // Semantic analysis
-    loadBuiltinFuncs();
+    loadBuiltins();
     if (!analyse(files)) return;
 
     // Code generation
@@ -102,7 +103,7 @@ bool Logos::analyse(const vector<LgsFile*>& files) {
     return errors.empty();
 }
 
-void Logos::loadBuiltinFuncs() const {
+void Logos::loadBuiltins() const {
     globals.funcs[LgsPrint::name] = {
         new LgsPrint({new LgsParam(new LgsInt())}),
         new LgsPrint({new LgsParam(new LgsFloat())}),
@@ -110,6 +111,7 @@ void Logos::loadBuiltinFuncs() const {
         new LgsPrint({new LgsParam(new LgsChar())}),
         new LgsPrint({new LgsParam(new LgsBool())}),
     };
+    globals.symbols[LgsSys::name] = LgsSymbol(new LgsSys());
 }
 
 inline void initLLVM() {

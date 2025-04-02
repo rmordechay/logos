@@ -2,18 +2,16 @@
 #define LOGOSFUNCCALLEXPR_H
 #include "stmts/LgsStmt.h"
 #include "LgsUnaryExpr.h"
-#include "funcs/LgsFuncSignature.h"
 
 class LgsFuncCall final : public LgsStmt, public LgsUnaryExpr {
 public:
+    string name;
+    string parentName;
+    string composedName;
     vector<LgsExpr*> args;
-    LgsFuncSignature signature;
     LgsFunc* func = nullptr;
 
-    explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : args(args) {
-        signature.name = name;
-    }
-
+    explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
     string getName() override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     string getArgsTypeStr() const;

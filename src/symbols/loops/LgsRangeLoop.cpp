@@ -17,5 +17,5 @@ int LgsRangeLoop::loopEnd() {
 void LgsRangeLoop::setIRBody(CodeGenMetadata* metadata) {
     const auto loopVar = loopVars[0];
     loopVar->setIRValue(iValue);
-    metadata->logosStack.addLocalSymbol(loopVar->name, LgsSymbol(VAR_DEC, loopVar));
+    metadata->logosStack.addLocalSymbol(loopVar->name, LgsSymbol(loopVar));
 }

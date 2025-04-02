@@ -4,7 +4,7 @@
 #include "LgsStmtBlock.h"
 #include "exprs/LgsExpr.h"
 
-#define BB_IF_START "if_start"
+#define BB_IF_BODY "if_body"
 #define BB_IF_END "if_end"
 #define BB_ELSE "else"
 #define BB_ELSE_IF_START "else_if_start"

@@ -12,6 +12,11 @@ void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) co
     metadata->builder.SetInsertPoint(block);
 }
 
+Value* LgsValue::createGlobalStr(Module* module, const std::string& value) const {
+    const auto strConstant = ConstantDataArray::getString(context, value, true);
+    return createIRGlobal(module, strConstant);
+}
+
 BasicBlock* LgsValue::createBasicBlock(const char* name) const {
     return BasicBlock::Create(context, name);
 }

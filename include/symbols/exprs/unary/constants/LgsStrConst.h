@@ -14,7 +14,6 @@ public:
         setFields(type);
     }
     size_t size() override;
-    Value* createGlobalStr(Module* module, const std::string& value) const;
     LgsExpr* add(LgsExpr* other) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* sizeIR(CodeGenMetadata* metadata) override;

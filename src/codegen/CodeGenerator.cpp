@@ -1,5 +1,6 @@
 #include "CodeGenerator.h"
 #include "funcs/LgsFuncImpl.h"
+#include "funcs/LgsMethodImpl.h"
 #include "types/LgsObject.h"
 
 #include <LgsMainFile.h>

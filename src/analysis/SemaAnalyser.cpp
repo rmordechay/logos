@@ -15,6 +15,7 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/binary/LgsBinaryExpr.h"
+#include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
 #include "stmts/LgsEnum.h"
 #include "stmts/LgsPatternMatching.h"
@@ -98,7 +99,7 @@ void SemaAnalyser::visitMethodImpl(LgsMethodImpl* method) {
 }
 
 void SemaAnalyser::visitParam(LgsParam* param) {
-    addLocalSymbol(param->name, LgsSymbol(PARAM, param));
+    addLocalSymbol(param->name, LgsSymbol(param));
 }
 
 void SemaAnalyser::visitStmt(LgsStmt* stmt) {
@@ -157,7 +158,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
         if (!checkExprType(expr, userType)) return;
         varDec->type = expr->type;
     }
-    addLocalSymbol(varDec->name, LgsSymbol(VAR_DEC, varDec));
+    addLocalSymbol(varDec->name, LgsSymbol(varDec));
 }
 
 void SemaAnalyser::visitIfStmt(const LgsIfStmt* ifStmt) {
@@ -207,9 +208,9 @@ void SemaAnalyser::visitLoopStmt(LgsLoop* loopStmt) {
 }
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
-    //  check all loop vars
+    // TODO check all loop vars
     const auto loopVar = rangeLoop->loopVars[0];
-    addLocalSymbol(loopVar->name, LgsSymbol(VAR_DEC, loopVar));
+    addLocalSymbol(loopVar->name, LgsSymbol(loopVar));
     visitStmtBlock(rangeLoop->stmtBlock);
 }
 
@@ -220,10 +221,10 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
         handleError(E10002, &iterableExpr->location, {iterableExpr->getName()});
         return;
     }
-    //  check all loop vars
+    // TODO check all loop vars
     const auto loopVar = foreachLoop->loopVars[0];
     loopVar->type = dynamic_cast<LgsArrayType*>(iterableExpr->type)->underlyingType;
-    addLocalSymbol(loopVar->name, LgsSymbol(VAR_DEC, loopVar));
+    addLocalSymbol(loopVar->name, LgsSymbol(loopVar));
     visitStmtBlock(foreachLoop->stmtBlock);
 }
 
@@ -295,6 +296,8 @@ void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
         visitVariable(variable);
     } else if (const auto funcCall = dynamic_cast<LgsFuncCall*>(firstExpr)) {
         visitFuncCall(funcCall);
+    } else if (const auto typeConst = dynamic_cast<LgsTypeConst*>(firstExpr)) {
+        typeConst->type = resolveType(typeConst->type);
     } else {
         assert(false && "first selection case not implemented");
     }
@@ -309,14 +312,12 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
         if (const auto var = dynamic_cast<LgsVariable*>(nextExpr)) {
             setSelectionFieldType(currentExpr, var);
         } else if (const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr)) {
-            vector<string> argsTypeNames;
-            for (const auto& arg : methodCall->args) {
-                visitExpr(arg);
-                argsTypeNames.emplace_back(arg->type->getName());
-            }
-            methodCall->signature.parentName = currentExpr->type->getName();
-            methodCall->signature.setNameFromArgs(argsTypeNames);
-            setMethodCallType(currentExpr, methodCall);
+            methodCall->parentName = currentExpr->type->getName();
+            setFuncCallComposedName(methodCall);
+            const auto method = getMethod(currentExpr, methodCall);
+            methodCall->func = method;
+            if (!method) return;
+            setExprType(methodCall, methodCall->func->signature.rt);
         }
     }
 }
@@ -342,17 +343,18 @@ void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
 }
 
 void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
+    setFuncCallComposedName(funcCall);
+    resolveFuncCall(funcCall);
+    setExprType(funcCall, funcCall->func->signature.rt);
+}
+
+void SemaAnalyser::setFuncCallComposedName(LgsFuncCall* funcCall) {
     vector<string> argsTypeNames;
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
         argsTypeNames.emplace_back(arg->type->getName());
     }
-    funcCall->signature.setNameFromArgs(argsTypeNames);
-    const auto func = resolveFuncCall(funcCall);
-    if (!func) return;
-    funcCall->func = func;
-    funcCall->signature.rt = func->signature.rt;
-    setExprType(funcCall, funcCall->signature.rt);
+    funcCall->composedName = LgsFuncSignature::getComposedName(funcCall->name, funcCall->parentName, argsTypeNames);
 }
 
 void SemaAnalyser::setVariableType(LgsVariable* variable) {
@@ -407,13 +409,12 @@ void SemaAnalyser::setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fiel
     setExprType(fieldVariable, field->type);
 }
 
-void SemaAnalyser::setMethodCallType(const LgsUnaryExpr* parent, LgsFuncCall* funcCall) {
-    const auto method = parent->type->getMethod(&funcCall->signature);
+LgsMethodImpl* SemaAnalyser::getMethod(const LgsUnaryExpr* parent, LgsFuncCall* funcCall) {
+    const auto method = parent->type->getMethod(funcCall->name, funcCall->composedName);
     if (!method) {
         handleError(E10005, &funcCall->location, {funcCall->getName(), parent->type->getName()});
-        return;
     }
-    setExprType(funcCall, method->signature.rt);
+    return method;
 }
 
 void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
@@ -458,7 +459,7 @@ void SemaAnalyser::checkObjectImplements(LgsObject* obj) {
         if (!interface) return;
         obj->implements[i] = interface;
         for (const auto& funcSignature : interface->funcSignatures) {
-            if (!obj->getMethod(funcSignature)) {
+            if (!obj->getMethod(funcSignature->name, funcSignature->composedName)) {
                 // handleError(E10016, &obj->location, {obj->name, interface->name});
             }
         }
@@ -485,17 +486,18 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
     return symbol;
 }
 
-LgsFunc* SemaAnalyser::resolveFuncCall(const LgsFuncCall* funcCall) {
-    const auto overloads = logosStack.getFuncOverloads(funcCall->signature.name);
+void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
+    const auto overloads = logosStack.getFuncOverloads(funcCall->name);
     if (overloads.empty()) {
-        handleError(E10006, &funcCall->location, {funcCall->signature.name});
-        return nullptr;
+        handleError(E10006, &funcCall->location, {funcCall->name});
+        return;
     }
-    const auto func = logosStack.getFunc(overloads, &funcCall->signature);
+    const auto func = logosStack.getFunc(overloads, funcCall->name);
     if (!func) {
-        handleError(E10015, &funcCall->location, {funcCall->getArgsTypeStr(), funcCall->signature.name});
+        handleError(E10015, &funcCall->location, {funcCall->getArgsTypeStr(), funcCall->name});
+        return;
     }
-    return func;
+    funcCall->func = func;
 }
 
 void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {

@@ -24,7 +24,7 @@ public:
     map<string, vector<LgsMethodImpl*>> methods;
 
     LgsField* getField(const string& name);
-    LgsMethodImpl* getMethod(const LgsFuncSignature* signature) const;
+    LgsMethodImpl* getMethod(const string& name, const string& composedName) const;
     vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
     virtual Type* getIRType();
     virtual Type* getIRType(int size);

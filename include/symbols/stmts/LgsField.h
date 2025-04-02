@@ -16,8 +16,8 @@ public:
     Value* gep = nullptr;
     LgsExpr* parentExpr = nullptr;
 
-    LgsField(const string& name, const string& parentName, const size_t fieldPosition, LgsType* type, LgsExpr* expr) : name(name), parentName(parentName), fieldPosition(fieldPosition), type(type), expr(expr) {}
-    LgsField(const string& name, const string& parentName, const size_t fieldPosition, LgsType* type) : LgsField(name, parentName, fieldPosition, type, nullptr) {}
+    LgsField(const string& name, const string& parentName, const size_t fieldPosition, LgsType* type, LgsExpr* expr = nullptr) : name(name), parentName(parentName), fieldPosition(fieldPosition), type(type), expr(expr) {}
+    LgsField(const string& name, const size_t fieldPosition, LgsType* type, LgsExpr* expr) : LgsField(name, "", fieldPosition, type, expr) {}
     Value* getIRValue(CodeGenMetadata* metadata);
     Value* createIRValue(CodeGenMetadata* metadata);
     Value* getGEP(CodeGenMetadata* metadata);

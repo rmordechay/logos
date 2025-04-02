@@ -37,7 +37,7 @@ public:
     LgsFile* parseFile(const directory_entry&) const;
     LgsFile* parseFile(const string& codeText, path absFilePath = "") const;
     void parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool);
-    void loadBuiltinFuncs() const;
+    void loadBuiltins() const;
     bool analyse(const vector<LgsFile*>& files);
     LgsMainFile* getMainFile(const vector<LgsFile*>& files) const;
     bool isLogosFile(const directory_entry& filePath) const;

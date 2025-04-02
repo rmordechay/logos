@@ -20,7 +20,6 @@ enum LgsSymbolType {
 
 struct LgsSymbol {
     LgsSymbolType type;
-    bool isReturnValue = false;
     union {
         LgsVarDec* varDec;
         LgsParam* param;
@@ -31,12 +30,12 @@ struct LgsSymbol {
     };
 
     LgsSymbol();
-    LgsSymbol(LgsSymbolType type, LgsParam* param);
-    LgsSymbol(LgsSymbolType type, LgsVarDec* varDec);
-    LgsSymbol(LgsSymbolType type, LgsFunc* funcImpl);
-    LgsSymbol(LgsSymbolType type, LgsObject* object);
-    LgsSymbol(LgsSymbolType type, LgsInterface* interface);
-    LgsSymbol(LgsSymbolType type, LgsEnum* lgsEnum);
+    explicit LgsSymbol(LgsParam* param);
+    explicit LgsSymbol(LgsVarDec* varDec);
+    explicit LgsSymbol(LgsFunc* func);
+    explicit LgsSymbol(LgsObject* object);
+    explicit LgsSymbol(LgsInterface* interface);
+    explicit LgsSymbol(LgsEnum* lgsEnum);
     void free(CodeGenMetadata* metadata) const;
 };
 

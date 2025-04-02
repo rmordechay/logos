@@ -10,11 +10,6 @@ size_t LgsStrConst::size() {
     return value.size();
 }
 
-Value* LgsStrConst::createGlobalStr(Module* module, const std::string& value) const {
-    const auto strConstant = ConstantDataArray::getString(context, value, true);
-    return createIRGlobal(module, strConstant);
-}
-
 LgsExpr* LgsStrConst::add(LgsExpr* other) {
     string otherValue;
     if (const auto intConst = other->asIntConst()) {

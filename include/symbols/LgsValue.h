@@ -22,6 +22,7 @@ public:
     virtual json asJson();
     virtual void free(CodeGenMetadata* metadata);
     virtual ~LgsValue() = default;
+    Value* createGlobalStr(Module* module, const std::string& value) const;
 };
 
 #endif //CODEGENERATION_H

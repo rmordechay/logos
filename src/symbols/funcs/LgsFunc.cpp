@@ -1,6 +1,5 @@
 #include "funcs/LgsFunc.h"
 
-#include "exprs/LgsExpr.h"
 #include "funcs/LgsParam.h"
 #include "types/LgsVoid.h"
 
@@ -19,25 +18,9 @@ void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
 }
 
 Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
+    if (!IRFuncType) setIRFuncType();
     auto func = metadata->currentModule->getOrInsertFunction(signature.composedName, IRFuncType);
-    const auto IRFunc = dyn_cast<Function>(func.getCallee());
-    if (signature.params.empty()) return IRFunc;
-    auto args = IRFunc->arg_begin();
-    for (const auto& param : signature.params) {
-        param->setIRValue(args);
-        args++->setName(param->name);
-    }
-    return IRFunc;
-}
-
-Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
-    const auto IRFunc = getIRFunc(metadata);
-    vector<Value*> argValues;
-    for (const auto& arg : args) {
-        const auto argValue = arg->getIRValue(metadata);
-        argValues.emplace_back(argValue);
-    }
-    return metadata->builder.CreateCall(IRFunc, argValues);
+    return dyn_cast<Function>(func.getCallee());
 }
 
 json LgsFunc::asJson() {

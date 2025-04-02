@@ -11,12 +11,6 @@ void LgsPrint::createIRValue(CodeGenMetadata* metadata) {
     setIRFuncType();
 }
 
-Value* LgsPrint::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
-    const auto IRFunc = getIRFunc(metadata);
-    auto argValue = args[0]->getIRValue(metadata);
-    return metadata->builder.CreateCall(IRFunc, {argValue});
-}
-
 void LgsPrint::setIRFuncType() {
     vector<Type*> paramTypes;
     for (const auto& param : signature.params) {

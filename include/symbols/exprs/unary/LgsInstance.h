@@ -2,7 +2,7 @@
 #define LOGOSINSTANCE_H
 #include "LgsUnaryExpr.h"
 
-class LgsInstance final : public LgsUnaryExpr {
+class LgsInstance : public LgsUnaryExpr {
 public:
     string name;
     vector<LgsExpr*> args;

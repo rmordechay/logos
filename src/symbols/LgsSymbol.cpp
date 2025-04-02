@@ -8,33 +8,33 @@ LgsSymbol::LgsSymbol():
     object(nullptr) {
 }
 
-LgsSymbol::LgsSymbol(const LgsSymbolType type, LgsParam* param):
-    type(type),
+LgsSymbol::LgsSymbol(LgsParam* param):
+    type(PARAM),
     param(param) {
 }
 
-LgsSymbol::LgsSymbol(const LgsSymbolType type, LgsVarDec* varDec):
-    type(type),
+LgsSymbol::LgsSymbol(LgsVarDec* varDec):
+    type(VAR_DEC),
     varDec(varDec) {
 }
 
-LgsSymbol::LgsSymbol(const LgsSymbolType type, LgsFunc* funcImpl):
-    type(type),
-    func(funcImpl) {
+LgsSymbol::LgsSymbol(LgsFunc* func):
+    type(FUNC),
+    func(func) {
 }
 
-LgsSymbol::LgsSymbol(const LgsSymbolType type, LgsObject* object):
-    type(type),
+LgsSymbol::LgsSymbol(LgsObject* object):
+    type(OBJECT),
     object(object) {
 }
 
-LgsSymbol::LgsSymbol(const LgsSymbolType type, LgsInterface* interface):
-    type(type),
+LgsSymbol::LgsSymbol(LgsInterface* interface):
+    type(INTERFACE),
     interface(interface) {
 }
 
-LgsSymbol::LgsSymbol(const LgsSymbolType type, LgsEnum* lgsEnum):
-    type(type),
+LgsSymbol::LgsSymbol(LgsEnum* lgsEnum):
+    type(ENUM),
     lgsEnum(lgsEnum) {
 }
 

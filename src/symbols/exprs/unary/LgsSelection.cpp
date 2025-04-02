@@ -24,9 +24,7 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
             continue;
         }
         if (const auto methodCall = nextExpr->asFuncCall()) {
-            const auto method = currentExpr->type->getMethod(&methodCall->signature);
-            const auto value = method->call(metadata, methodCall->args);
-            nextExpr->setIRValue(value);
+            nextExpr->setIRValue(methodCall->getIRValue(metadata));
         }
     }
     return lastExpr();

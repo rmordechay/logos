@@ -4,7 +4,7 @@
 
 #include <exprs/unary/LgsUnaryExpr.h>
 
-class LgsTypeConst final : public LgsConstExpr {
+class LgsTypeConst : public LgsConstExpr {
 public:
     explicit LgsTypeConst(LgsType* type) : LgsConstExpr(type) {}
     inline string getName() override;

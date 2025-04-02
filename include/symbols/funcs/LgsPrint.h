@@ -2,7 +2,6 @@
 #define LOGOSPRINT_H
 #include "types/LgsChar.h"
 #include "types/LgsFloat.h"
-#include <types/LgsStr.h>
 #include <types/LgsVoid.h>
 
 
@@ -12,7 +11,7 @@ public:
     explicit LgsPrint(const vector<LgsParam*>& params) : LgsFunc(name, new LgsVoid(), params) {
         signature.setNameFromParams();
     }
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override;
+
     void createIRValue(CodeGenMetadata* metadata) override;
     Function* getIRFunc(const CodeGenMetadata* metadata) override;
     void setIRFuncType() override;

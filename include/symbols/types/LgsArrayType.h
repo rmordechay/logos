@@ -12,7 +12,7 @@ struct CodeGenMetadata;
 class LgsArrayType final : public LgsType {
 public:
     LgsType* underlyingType = nullptr;
-    LgsMethodImpl addElementFunc = LgsMethodImpl("add", new LgsVoid(), "ArrayType", {new LgsParam(this), new LgsParam(new LgsInt())});
+    LgsMethodImpl addElementFunc = LgsMethodImpl("add", new LgsVoid(), getName(), {new LgsParam(this), new LgsParam(new LgsInt())});
     FunctionType* const initArrIRFuncType = FunctionType::get(ptrTy, {i64Ty}, false);
     FunctionType* const freeArrIRFuncType = FunctionType::get(voidTy, {ptrTy}, false);
     FunctionType* const addElementIRFuncType = FunctionType::get(voidTy, {ptrTy, i32Ty}, false);

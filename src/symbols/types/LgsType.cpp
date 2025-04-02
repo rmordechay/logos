@@ -10,10 +10,11 @@ LgsField* LgsType::getField(const string& name) {
     return nullptr;
 }
 
-LgsMethodImpl* LgsType::getMethod(const LgsFuncSignature* signature) const {
-    const auto overloads = getMethodsOverloads(signature->name);
+LgsMethodImpl* LgsType::getMethod(const string& name, const string& composedName) const {
+    assert(composedName != "");
+    const auto overloads = getMethodsOverloads(name);
     for (const auto& overload : overloads) {
-        if (overload->signature == signature) {
+        if (overload->signature.composedName == composedName) {
             return overload;
         }
     }

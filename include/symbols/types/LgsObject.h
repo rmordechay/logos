@@ -1,17 +1,23 @@
 #ifndef LOGOSOBJECT_H
 #define LOGOSOBJECT_H
+#include "LgsStr.h"
 #include "LgsType.h"
-#include <funcs/LgsMethodImpl.h>
+#include "exprs/unary/constants/LgsStrConst.h"
+#include "stmts/LgsField.h"
 
 class LgsField;
 
-class LgsObject final : public LgsType {
+class LgsObject : public LgsType {
 public:
     string name;
     Type* IRType = nullptr;
     vector<LgsType*> implements;
+    LgsField* nameField = new LgsField("name", 0, new LgsStr(), new LgsStrConst(name));
 
-    explicit LgsObject(const string& typeName) : name(typeName) {}
+    explicit LgsObject(const string& typeName) : name(typeName) {
+        fields[nameField->name] = nameField;
+    }
+
     const string getName() const override;
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;

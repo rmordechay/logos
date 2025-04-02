@@ -102,7 +102,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
         auto implementType = getTypeFromText(type->getText());
         obj->implements.emplace_back(implementType);
     }
-    globals.addSymbol(obj->name, LgsSymbol(OBJECT, obj));
+    globals.addSymbol(obj->name, LgsSymbol(obj));
     return obj;
 }
 
@@ -124,7 +124,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceFileContext* c
         interface->funcSignatures.emplace_back(lgsFuncSignature);
         lgsFuncSignature->setNameFromParams();
     }
-    globals.addSymbol(interface->name, LgsSymbol(INTERFACE, interface));
+    globals.addSymbol(interface->name, LgsSymbol(interface));
     return interface;
 }
 
@@ -320,7 +320,7 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
         lgsEnum->fields.emplace_back(field);
     }
     lgsEnum->setLocation(ctx->start);
-    globals.addSymbol(ctx->TYPE()->getText(), LgsSymbol(ENUM, lgsEnum));
+    globals.addSymbol(ctx->TYPE()->getText(), LgsSymbol(lgsEnum));
     return lgsEnum;
 }
 

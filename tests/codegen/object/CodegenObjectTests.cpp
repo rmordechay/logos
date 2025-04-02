@@ -13,7 +13,7 @@ protected:
     Logos logos = Logos(dataDir);
 
     void SetUp() override {
-        logos.loadBuiltinFuncs();
+        logos.loadBuiltins();
     }
 
     void TearDown() override {
@@ -58,7 +58,7 @@ TEST_F(CodegenObjectTests, TestObjectWorks) {
     )";
     const auto fileMain = logos.parseFile(codeMain);
     const auto fileObject = logos.parseFile(codeObj);
-    logos.loadBuiltinFuncs();
+    logos.loadBuiltins();
     logos.analyse({fileMain, fileObject});
     logos.generateCode(dynamic_cast<LgsMainFile*>(fileMain));
 }
