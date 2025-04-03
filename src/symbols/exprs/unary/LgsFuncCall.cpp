@@ -8,7 +8,9 @@ string LgsFuncCall::getName() {
 Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
     const auto IRFunc = func->getIRFunc(metadata);
     vector<Value*> argValues;
-    for (const auto& arg : args) {
+    const auto size = func->signature.isStatic ? 1 : 0;
+    for (int i = size; i < args.size(); ++i) {
+        const auto arg = args[i];
         const auto argValue = arg->getIRValue(metadata);
         argValues.emplace_back(argValue);
     }

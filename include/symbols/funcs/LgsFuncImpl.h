@@ -5,9 +5,7 @@
 
 class LgsFuncImpl final : public LgsFunc {
 public:
-    explicit LgsFuncImpl(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {}) : LgsFunc(name, funcType, params) {
-        signature.setNameFromParams();
-    }
+    explicit LgsFuncImpl(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {}) : LgsFunc(name, funcType, params) {}
     void setIRFuncType() override;
     ~LgsFuncImpl() override = default;
 };
@@ -17,7 +15,7 @@ inline void LgsFuncImpl::setIRFuncType() {
         auto paramIRType = signature.params[i]->type->getIRType();
         IRParamsTypes.emplace_back(paramIRType);
     }
-    IRFuncType = FunctionType::get(signature.rt->getIRType(), IRParamsTypes, false);
+    IRFuncType = FunctionType::get(signature.type->getIRType(), IRParamsTypes, false);
 }
 
 #endif //LOGOSFUNCIMPL_H

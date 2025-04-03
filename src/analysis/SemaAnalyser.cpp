@@ -313,17 +313,13 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
             setSelectionFieldType(currentExpr, var);
         } else if (const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr)) {
             methodCall->parentName = currentExpr->type->getName();
-            setFuncCallComposedName(methodCall);
-            const auto method = getMethod(currentExpr, methodCall);
-            methodCall->func = method;
-            if (!method) return;
-            setExprType(methodCall, methodCall->func->signature.rt);
+            visitMethodCall(methodCall, currentExpr->type);
         }
     }
 }
 
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
-    const auto symbol = getSymbol(instance->name, instance);
+    const auto symbol = getSymbol(instance->obj->name, instance);
     if (!symbol) return;
     instance->obj = symbol->object;
     instance->type = instance->obj;
@@ -343,19 +339,26 @@ void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
 }
 
 void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
-    setFuncCallComposedName(funcCall);
-    resolveFuncCall(funcCall);
-    setExprType(funcCall, funcCall->func->signature.rt);
-}
-
-void SemaAnalyser::setFuncCallComposedName(LgsFuncCall* funcCall) {
-    vector<string> argsTypeNames;
+    vector<string> argTypeNames;
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
-        argsTypeNames.emplace_back(arg->type->getName());
+        argTypeNames.emplace_back(arg->type->getName());
     }
-    funcCall->composedName = LgsFuncSignature::getComposedName(funcCall->name, funcCall->parentName, argsTypeNames);
+    funcCall->composedName = LgsFuncSignature::getComposedName(funcCall->name, funcCall->parentName, argTypeNames);
+    resolveFuncCall(funcCall);
+    setExprType(funcCall, funcCall->func->signature.type);
 }
+
+void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* parent) {
+    vector<string> argTypeNames;
+    for (const auto& arg : methodCall->args) {
+        visitExpr(arg);
+        argTypeNames.emplace_back(arg->type->getName());
+    }
+    methodCall->composedName = LgsFuncSignature::getComposedName(methodCall->name, methodCall->parentName, argTypeNames);
+    setMethod(parent, methodCall);
+}
+
 
 void SemaAnalyser::setVariableType(LgsVariable* variable) {
     const auto symbol = getSymbol(variable->name, variable);
@@ -392,7 +395,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
 }
 
 void SemaAnalyser::setFuncType(LgsFunc* func) {
-    func->signature.rt = resolveType(func->signature.rt);
+    func->signature.type = resolveType(func->signature.type);
 }
 
 void SemaAnalyser::setExprType(LgsExpr* expr, LgsType* type) {
@@ -409,12 +412,14 @@ void SemaAnalyser::setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fiel
     setExprType(fieldVariable, field->type);
 }
 
-LgsMethodImpl* SemaAnalyser::getMethod(const LgsUnaryExpr* parent, LgsFuncCall* funcCall) {
-    const auto method = parent->type->getMethod(funcCall->name, funcCall->composedName);
+void SemaAnalyser::setMethod(const LgsType* parent, LgsFuncCall* methodCall) {
+    const auto method = parent->getMethod(methodCall);
     if (!method) {
-        handleError(E10005, &funcCall->location, {funcCall->getName(), parent->type->getName()});
+        handleError(E10005, &methodCall->location, {methodCall->getName(), parent->getName()});
+        return;
     }
-    return method;
+    methodCall->func = method;
+    setExprType(methodCall, methodCall->func->signature.type);
 }
 
 void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
@@ -459,7 +464,7 @@ void SemaAnalyser::checkObjectImplements(LgsObject* obj) {
         if (!interface) return;
         obj->implements[i] = interface;
         for (const auto& funcSignature : interface->funcSignatures) {
-            if (!obj->getMethod(funcSignature->name, funcSignature->composedName)) {
+            if (!obj->getMethod(funcSignature)) {
                 // handleError(E10016, &obj->location, {obj->name, interface->name});
             }
         }

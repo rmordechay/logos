@@ -1,15 +1,19 @@
 #ifndef LOGOSINSTANCE_H
 #define LOGOSINSTANCE_H
 #include "LgsUnaryExpr.h"
+#include "types/LgsObject.h"
 
-class LgsInstance : public LgsUnaryExpr {
+class LgsInstance final : public LgsUnaryExpr {
 public:
-    string name;
-    vector<LgsExpr*> args;
     LgsObject* obj = nullptr;
+    vector<LgsExpr*> args;
     map<string, LgsField*> fields;
 
-    explicit LgsInstance(const string& name) : name(name) {}
+    explicit LgsInstance(LgsObject* obj) : obj(obj) {
+        type = obj;
+    }
+    explicit LgsInstance(LgsType* type) : LgsUnaryExpr(type) {}
+
     Value* createIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
     ~LgsInstance() override;

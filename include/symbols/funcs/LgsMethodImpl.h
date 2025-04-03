@@ -3,12 +3,10 @@
 #include "LgsFunc.h"
 #include "LgsParam.h"
 
-class LgsMethodImpl final : public LgsFunc {
+class LgsMethodImpl : public LgsFunc {
 public:
-    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam*>& params = {}) : LgsFunc(name, funcType, params) {
-        signature.parentName = parentName;
-        signature.setNameFromParams();
-    }
+    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam*>& params = {})
+        : LgsFunc(name, funcType, params, parentName) {}
     void setIRFuncType() override;
     ~LgsMethodImpl() override = default;
 };
@@ -21,7 +19,7 @@ inline void LgsMethodImpl::setIRFuncType() {
         auto paramIRType = signature.params[i]->type->getIRType();
         IRParamsTypes.emplace_back(paramIRType);
     }
-    IRFuncType = FunctionType::get(signature.rt->getIRType(), IRParamsTypes, false);
+    IRFuncType = FunctionType::get(signature.type->getIRType(), IRParamsTypes, false);
 }
 
 #endif //LOGOSMETHODIMPL_H

@@ -9,6 +9,7 @@ class LgsParam;
 class LgsExpr;
 class LgsStmt;
 class LgsType;
+
 class LgsFunc : public LgsValue {
 public:
     LgsFuncSignature signature;
@@ -17,10 +18,8 @@ public:
     FunctionType* IRFuncType = nullptr;
     BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
 
-    explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam*>& params = {}) {
-        signature.name = name;
-        signature.rt = funcType;
-        signature.params = params;
+    explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam*>& params, const string& parentName = "")
+        : signature(LgsFuncSignature(name, parentName, funcType, params)) {
     }
 
     virtual void setIRFuncType() = 0;
