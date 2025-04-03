@@ -330,6 +330,9 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
 
 void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
     visitExpr(arrayIndex->baseExpr);
+    for (const auto& indexExpr : arrayIndex->indexExprs) {
+        visitExpr(indexExpr);
+    }
     const auto arrType = dynamic_cast<LgsArrayType*>(arrayIndex->baseExpr->type);
     if (!arrType) {
         handleError(E10002, &arrayIndex->location, {arrayIndex->getName()});

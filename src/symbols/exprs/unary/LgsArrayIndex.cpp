@@ -8,19 +8,29 @@
 #include <exprs/unary/LgsArray.h>
 
 Value* LgsArrayIndex::createIRValue(CodeGenMetadata* metadata) {
+    // (((base_expr, expr0), expr1), expr2)
+
+    LgsExpr* leftExpr = baseExpr;
     Value* IRValue = nullptr;
-    const auto index = lastExpr()->getIRValue(metadata);
-    if (const auto array = baseExpr->asArray()) {
-        IRValue = array->getIRValue(metadata);
-    } else if (const auto funcCall = baseExpr->asFuncCall()) {
-        IRValue = funcCall->getIRValue(metadata);
-    } else if (const auto var = baseExpr->asVariable()) {
-        IRValue = var->getIRValue(metadata);
-    } else {
-        assert(false && "array index case not implemented");
+    for (int i = 0; i < indexExprs.size(); ++i) {
+        const auto index = indexExprs[i]->getIRValue(metadata);
+        if (const auto array = leftExpr->asArray()) {
+            IRValue = array->getIRValue(metadata);
+        } else if (const auto funcCall = leftExpr->asFuncCall()) {
+            IRValue = funcCall->getIRValue(metadata);
+        } else if (const auto arrayIndex = leftExpr->asArrayIndex()) {
+            IRValue = arrayIndex->getIRValue(metadata);
+        } else if (const auto var = leftExpr->asVariable()) {
+            IRValue = var->getIRValue(metadata);
+        } else {
+            assert(false && "array index case not implemented");
+        }
+        const auto arrayType = dynamic_cast<LgsArrayType*>(baseExpr->type);
+        arrayType->getIRFuncGetElement(metadata, IRValue, index);
+        leftExpr = indexExprs[i];
     }
-    const auto arrayType = dynamic_cast<LgsArrayType*>(baseExpr->type);
-    return arrayType->getIRFuncGetElement(metadata, IRValue, index);
+
+    return IRValue;
 }
 
 string LgsArrayIndex::getName() {
