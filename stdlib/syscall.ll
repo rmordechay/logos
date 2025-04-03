@@ -1,2 +1,0 @@
-declare void exit(i32)
-

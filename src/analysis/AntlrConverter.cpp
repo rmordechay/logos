@@ -110,19 +110,16 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceFileContext* c
     const auto interfaceName = ctx->interfaceDeclaration()->TYPE()->getText();
     const auto interface = new LgsInterface(interfaceName);
     for (const auto& funcSignature : ctx->funcSignature()) {
-        auto lgsFuncSignature = new LgsFuncSignature{
-            .name = funcSignature->VARIABLE()->getText(),
-            .parentName = parentName,
-            .rtName = funcSignature->type()->getText(),
-        };
+        vector<LgsParam*> params;
         if (funcSignature->paramList()) {
             for (const auto& varDec : funcSignature->paramList()->explicitVarDec()) {
                 auto param = getParam(varDec);
-                lgsFuncSignature->params.emplace_back(param);
+                params.emplace_back(param);
             }
         }
+        const auto type = getType(funcSignature->type());
+        auto lgsFuncSignature = new LgsFuncSignature(funcSignature->VARIABLE()->getText(), parentName, type, params);
         interface->funcSignatures.emplace_back(lgsFuncSignature);
-        lgsFuncSignature->setNameFromParams();
     }
     globals.addSymbol(interface->name, LgsSymbol(interface));
     return interface;
@@ -149,7 +146,7 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationCon
     const auto rt = getFuncType(ctx);
     const auto signature = ctx->funcSignature();
     const auto name = signature->VARIABLE()->getText();
-    const auto self = new LgsParam(LOGOS_SELF, obj, new LgsInstance(obj->name));
+    const auto self = new LgsParam(LOGOS_SELF, obj, new LgsInstance(obj));
     vector params = {self};
     if (signature->paramList()) {
         for (const auto& varDec : signature->paramList()->explicitVarDec()) {
@@ -443,8 +440,8 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
 }
 
 LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) {
-    const auto name = ctx->TYPE()->getText();
-    const auto instance = new LgsInstance(name);
+    const auto type = getTypeFromText(ctx->TYPE()->getText());
+    const auto instance = new LgsInstance(type);
     const auto args = ctx->funcArgList();
     if (!args) {
         return instance;

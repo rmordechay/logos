@@ -8,12 +8,9 @@
 class LgsPrint final : public LgsFunc {
 public:
     static constexpr auto name = "print";
-    explicit LgsPrint(const vector<LgsParam*>& params) : LgsFunc(name, new LgsVoid(), params) {
-        signature.setNameFromParams();
-    }
+    explicit LgsPrint(const vector<LgsParam*>& params) : LgsFunc(name, new LgsVoid(), params) {}
 
     void createIRValue(CodeGenMetadata* metadata) override;
-    Function* getIRFunc(const CodeGenMetadata* metadata) override;
     void setIRFuncType() override;
     ~LgsPrint() override = default;
 };

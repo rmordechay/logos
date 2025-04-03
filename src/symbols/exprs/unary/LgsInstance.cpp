@@ -5,11 +5,11 @@
 #include "types/LgsObject.h"
 
 string LgsInstance::getName() {
-    return name;
+    return obj->name;
 }
 
 Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
-    if (modules.find(name) == modules.end()) {
+    if (modules.find(obj->name) == modules.end()) {
         CodeGenerator::generateModule(metadata->buildDir, obj);
     }
     const auto currentFunc = metadata->logosStack.currentFunc->getIRFunc(metadata);

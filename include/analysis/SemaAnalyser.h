@@ -63,15 +63,15 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
     void setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable);
-    LgsMethodImpl* getMethod(const LgsUnaryExpr* parent, LgsFuncCall* funcCall);
+    void setMethod(const LgsType* parent, LgsFuncCall* methodCall);
     void visitFuncCall(LgsFuncCall* funcCall);
+    void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parent);
     void setVariableType(LgsVariable* variable);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
     void visitFirstSelection(LgsExpr* firstExpr);
     void visitInstance(LgsInstance* instance);
     void visitArrayIndex(LgsArrayIndex* arrayIndex);
-    void setFuncCallComposedName(LgsFuncCall* funcCall);
 
     void setFuncType(LgsFunc* func);
     void setExprType(LgsExpr* expr, LgsType* type);

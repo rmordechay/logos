@@ -11,7 +11,7 @@ void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     }
     startBlock(metadata, entryBlock);
     stmtBlock->createIRValue(metadata);
-    if (signature.rt->getName() == LgsVoid::name) {
+    if (signature.type->getName() == LgsVoid::name) {
         metadata->builder.CreateRetVoid();
     }
     metadata->logosStack.exitScope(metadata);
@@ -19,14 +19,20 @@ void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
 
 Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
     if (!IRFuncType) setIRFuncType();
-    auto func = metadata->currentModule->getOrInsertFunction(signature.composedName, IRFuncType);
+    string name;
+    if (signature.isStatic) {
+        name = signature.name;
+    } else {
+        name = signature.composedName;
+    }
+    auto func = metadata->currentModule->getOrInsertFunction(name, IRFuncType);
     return dyn_cast<Function>(func.getCallee());
 }
 
 json LgsFunc::asJson() {
     json tree;
     tree["name"] = signature.name;
-    tree["returnType"] = signature.rtName;
+    tree["returnType"] = signature.type->getName();
     for (const auto& param : signature.params) {
         tree["params"].emplace_back(param->asJson());
     }
@@ -35,5 +41,7 @@ json LgsFunc::asJson() {
 }
 
 LgsFunc::~LgsFunc() {
-    delete stmtBlock;
+    if (stmtBlock) {
+        delete stmtBlock;
+    }
 }

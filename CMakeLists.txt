@@ -156,7 +156,8 @@ add_library(lib STATIC
 
 add_executable(lgs main.cpp
     src/symbols/builtin/LgsSys.cpp
-    include/symbols/builtin/LgsSys.h)
+    include/symbols/builtin/LgsSys.h
+    include/symbols/builtin/LgsSysMethods.h)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE
