@@ -5,13 +5,11 @@
 #include <loops/LgsLoop.h>
 
 Value* LgsContinue::createIRValue(CodeGenMetadata* metadata) {
+    auto& builder = metadata->builder;
     const auto currentLoop = metadata->logosStack.currentLoop;
-    const auto currentFunc = metadata->logosStack.currentFunc;
-    const auto loopCondition = currentLoop->loopCondition;
-    const auto branch = metadata->builder.CreateBr(loopCondition);
-    const auto IRFunc = currentFunc->getIRFunc(metadata);
-    const auto breakExtBlock = createBasicBlock("continue_ext");
-    breakExtBlock->insertInto(IRFunc);
-    metadata->builder.SetInsertPoint(breakExtBlock);
+    const auto loopCondition = currentLoop->loopCondBlock;
+    const auto inc = builder.CreateAdd(currentLoop->iValue, builder.getInt32(1));
+    builder.CreateStore(inc, currentLoop->iPtr);
+    const auto branch = builder.CreateBr(loopCondition);
     return branch;
 }

@@ -15,7 +15,7 @@ public:
     LgsForeachLoop(const vector<LgsVarDec*>& loopVars, LgsUnaryExpr* iterable, LgsStmtBlock* stmtBlock) : LgsLoop(loopVars, stmtBlock), iterableExpr(iterable) {}
     int loopStart() override;
     int loopEnd() override;
-    void setIRBody(CodeGenMetadata* metadata) override;
+    void setIRLoopVariable(CodeGenMetadata* metadata) override;
     LgsIterable* getExprAsIterable() const;
     ~LgsForeachLoop() override;
 };

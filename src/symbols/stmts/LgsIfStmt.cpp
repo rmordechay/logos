@@ -12,44 +12,57 @@ Value* LgsIfStmt::createIRValue(CodeGenMetadata* metadata) {
 }
 
 
-void LgsIfStmt::computeSimpleIf(CodeGenMetadata* metadata) const {
+void LgsIfStmt::computeSimpleIf(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto ifStartBlock = createBasicBlock(BB_IF_BODY);
-    const auto ifEndBlock = createBasicBlock(BB_IF_END);
-    const auto elseBlock = createBasicBlock(BB_ELSE);
+    ifTrueBlock = createBasicBlock(BB_IF_TRUE);
+    ifEndBlock = createBasicBlock(BB_IF_END);
+    elseBlock = createBasicBlock(BB_ELSE);
 
     const auto ifCondIR = ifCond->getIRValue(metadata);
     if (!elseStmtBlock) {
-        builder.CreateCondBr(ifCondIR, ifStartBlock, ifEndBlock);
+        builder.CreateCondBr(ifCondIR, ifTrueBlock, ifEndBlock);
     } else {
-        builder.CreateCondBr(ifCondIR, ifStartBlock, elseBlock);
+        builder.CreateCondBr(ifCondIR, ifTrueBlock, elseBlock);
     }
 
-    startBlock(metadata, ifStartBlock);
+    startBlock(metadata, ifTrueBlock);
     ifStmtBlock->createIRValue(metadata);
-    builder.CreateBr(ifEndBlock);
+    if (!builder.GetInsertBlock()->getTerminator()) {
+        builder.CreateBr(ifEndBlock);
+    }
 
     if (elseStmtBlock) {
         createElseBlock(metadata, elseBlock, ifEndBlock);
     }
+
     startBlock(metadata, ifEndBlock);
 }
 
-void LgsIfStmt::computeComplexIf(CodeGenMetadata* metadata) const {
+void LgsIfStmt::computeComplexIf(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto ifStartBlock = createBasicBlock(BB_IF_BODY);
-    auto elseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK);
-    const auto ifEndBlock = createBasicBlock(BB_IF_END);
-    const auto elseBlock = createBasicBlock(BB_ELSE);
+    ifTrueBlock = createBasicBlock(BB_IF_TRUE);
+    elseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK);
+    ifEndBlock = createBasicBlock(BB_IF_END);
+    elseBlock = createBasicBlock(BB_ELSE);
 
     // if block
     const auto ifCondIR = ifCond->getIRValue(metadata);
-    builder.CreateCondBr(ifCondIR, ifStartBlock, elseIfCheckBlock);
-    startBlock(metadata, ifStartBlock);
+    builder.CreateCondBr(ifCondIR, ifTrueBlock, elseIfCheckBlock);
+    startBlock(metadata, ifTrueBlock);
     ifStmtBlock->createIRValue(metadata);
     builder.CreateBr(ifEndBlock);
 
-    // else-if blocks
+    createElseIfBlocks(metadata);
+    if (elseStmtBlock) {
+        createElseBlock(metadata, elseBlock, ifEndBlock);
+    }
+    if (!builder.GetInsertBlock()->getTerminator()) {
+        startBlock(metadata, ifEndBlock);
+    }
+}
+
+void LgsIfStmt::createElseIfBlocks(CodeGenMetadata* metadata) {
+    auto& builder = metadata->builder;
     for (size_t i = 0; i < elseIfConds.size(); ++i) {
         startBlock(metadata, elseIfCheckBlock);
         const auto elseIfCondIR = elseIfConds[i]->getIRValue(metadata);
@@ -70,13 +83,6 @@ void LgsIfStmt::computeComplexIf(CodeGenMetadata* metadata) const {
         elseIfStmtBlocks[i]->createIRValue(metadata);
         builder.CreateBr(ifEndBlock);
     }
-
-    // else block
-    if (elseStmtBlock) {
-        createElseBlock(metadata, elseBlock, ifEndBlock);
-    }
-
-    startBlock(metadata, ifEndBlock);
 }
 
 void LgsIfStmt::createElseBlock(CodeGenMetadata* metadata, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const {

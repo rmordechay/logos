@@ -349,6 +349,7 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     vector<string> argTypeNames;
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
+        if (!arg->type) return;
         argTypeNames.emplace_back(arg->type->getName());
     }
     funcCall->composedName = LgsFuncSignature::getComposedName(funcCall->name, funcCall->parentName, argTypeNames);

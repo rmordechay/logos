@@ -5,8 +5,8 @@
 Value* LgsLoop::createIRValue(CodeGenMetadata* metadata) {
     initIRLoop(metadata);
     setLoopIRCondition(metadata);
-    startBlock(metadata, loopBody);
-    setIRBody(metadata);
+    startBlock(metadata, loopBodyBlock);
+    setIRLoopVariable(metadata);
     stmtBlock->createIRValue(metadata);
     exitIRLoop(metadata);
     return nullptr;
@@ -16,20 +16,20 @@ void LgsLoop::initIRLoop(CodeGenMetadata* metadata) {
     metadata->logosStack.enterScope();
     metadata->logosStack.currentLoop = this;
     auto& builder = metadata->builder;
-    loopCondition = createBasicBlock(BB_LOOP_CONDITION);
-    loopBody = createBasicBlock(BB_LOOP_BODY);
-    loopExit = createBasicBlock(BB_LOOP_EXIT);
+    loopCondBlock = createBasicBlock(BB_LOOP_CONDITION);
+    loopBodyBlock = createBasicBlock(BB_LOOP_BODY);
+    loopExitBlock = createBasicBlock(BB_LOOP_EXIT);
     iPtr = builder.CreateAlloca(i32Ty);
     builder.CreateStore(builder.getInt32(loopStart()), iPtr);
-    builder.CreateBr(loopCondition);
+    builder.CreateBr(loopCondBlock);
 }
 
 void LgsLoop::setLoopIRCondition(CodeGenMetadata* metadata) {
-    startBlock(metadata, loopCondition);
+    startBlock(metadata, loopCondBlock);
     auto& builder = metadata->builder;
     iValue = builder.CreateLoad(i32Ty, iPtr);
     const auto condition = builder.CreateICmpSLT(iValue, builder.getInt32(loopEnd()));
-    builder.CreateCondBr(condition, loopBody, loopExit);
+    builder.CreateCondBr(condition, loopBodyBlock, loopExitBlock);
 }
 
 void LgsLoop::exitIRLoop(CodeGenMetadata* metadata) const {
@@ -37,9 +37,9 @@ void LgsLoop::exitIRLoop(CodeGenMetadata* metadata) const {
     // Increment loop variable
     const auto inc = builder.CreateAdd(iValue, builder.getInt32(1));
     builder.CreateStore(inc, iPtr);
-    builder.CreateBr(loopCondition);
+    builder.CreateBr(loopCondBlock);
     // Loop exit
-    startBlock(metadata, loopExit);
+    startBlock(metadata, loopExitBlock);
     metadata->logosStack.currentLoop = nullptr;
     metadata->logosStack.exitScope(metadata);
 }

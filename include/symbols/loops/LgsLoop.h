@@ -14,9 +14,9 @@ class LgsLoop : public LgsStmt {
 public:
     vector<LgsVarDec*> loopVars;
     LgsStmtBlock* stmtBlock = nullptr;
-    BasicBlock* loopCondition = nullptr;
-    BasicBlock* loopBody = nullptr;
-    BasicBlock* loopExit = nullptr;
+    BasicBlock* loopCondBlock = nullptr;
+    BasicBlock* loopBodyBlock = nullptr;
+    BasicBlock* loopExitBlock = nullptr;
     Value* iPtr = nullptr;
     Value* iValue = nullptr;
 
@@ -27,7 +27,7 @@ public:
     void exitIRLoop(CodeGenMetadata* metadata) const;
     virtual int loopStart() = 0;
     virtual int loopEnd() = 0;
-    virtual void setIRBody(CodeGenMetadata* metadata) = 0;
+    virtual void setIRLoopVariable(CodeGenMetadata* metadata) = 0;
     ~LgsLoop() override;
 };
 

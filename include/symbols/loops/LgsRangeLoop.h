@@ -8,7 +8,7 @@ public:
   LgsExpr* rangeEnd = nullptr;
 
   LgsRangeLoop(const vector<LgsVarDec*>& loopVars, LgsExpr* rangeStart, LgsExpr* rangeEnd, LgsStmtBlock* stmtBlock) : LgsLoop(loopVars, stmtBlock), rangeStart(rangeStart), rangeEnd(rangeEnd) {}
-  void setIRBody(CodeGenMetadata* metadata) override;
+  void setIRLoopVariable(CodeGenMetadata* metadata) override;
   int loopStart() override;
   int loopEnd() override;
   ~LgsRangeLoop() override;

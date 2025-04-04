@@ -13,7 +13,7 @@ int LgsForeachLoop::loopEnd() {
     return getExprAsIterable()->size();
 }
 
-void LgsForeachLoop::setIRBody(CodeGenMetadata* metadata) {
+void LgsForeachLoop::setIRLoopVariable(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto arrValue = iterableExpr->getIRValue(metadata);
     const auto iterableIRType = iterableExpr->type->getIRType(loopStart());

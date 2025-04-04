@@ -4,7 +4,7 @@
 #include "LgsStmtBlock.h"
 #include "exprs/LgsExpr.h"
 
-#define BB_IF_BODY "if_body"
+#define BB_IF_TRUE "if_true"
 #define BB_IF_END "if_end"
 #define BB_ELSE "else"
 #define BB_ELSE_IF_START "else_if_start"
@@ -18,11 +18,18 @@ public:
     vector<LgsStmtBlock*> elseIfStmtBlocks;
     LgsStmtBlock* elseStmtBlock = nullptr;
 
+    BasicBlock* ifTrueBlock = nullptr;
+    BasicBlock* ifEndBlock = nullptr;
+    BasicBlock* elseBlock = nullptr;
+    BasicBlock* elseIfStartBlock = nullptr;
+    BasicBlock* elseIfCheckBlock = nullptr;
+
     LgsIfStmt(LgsExpr* ifCond, LgsStmtBlock* ifStmtBlock) : ifCond(ifCond), ifStmtBlock(ifStmtBlock) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    void computeSimpleIf(CodeGenMetadata* metadata) const;
+    void computeSimpleIf(CodeGenMetadata* metadata);
+    void computeComplexIf(CodeGenMetadata* metadata);
+    void createElseIfBlocks(CodeGenMetadata* metadata);
     void createElseBlock(CodeGenMetadata* metadata, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const;
-    void computeComplexIf(CodeGenMetadata* metadata) const;
     ~LgsIfStmt() override;
 };
 
