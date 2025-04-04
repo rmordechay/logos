@@ -4,13 +4,18 @@
 
 using namespace std;
 
-bool ProjectAnalyser::analyse() {
+bool ProjectAnalyser::analyse() const {
     if (files.empty()) return false;
     analyseStructure();
+    analyseEnvs();
     return successful;
 }
 
-void ProjectAnalyser::analyseStructure() {
+void ProjectAnalyser::analyseEnvs() const {
+
+}
+
+void ProjectAnalyser::analyseStructure() const {
     bool hasMainFile = false;
     map<string, vector<LgsFile*>> duplicates;
     for (const auto& file : files) {
@@ -24,7 +29,7 @@ void ProjectAnalyser::analyseStructure() {
     printDuplicateFiles(duplicates);
 }
 
-void ProjectAnalyser::printDuplicateFiles(const map<string, vector<LgsFile*>>& duplicates) {
+void ProjectAnalyser::printDuplicateFiles(const map<string, vector<LgsFile*>>& duplicates) const {
     for (const auto &duplicate : duplicates) {
         if (duplicate.second.size() <= 1) continue;
         ostringstream errMsg;

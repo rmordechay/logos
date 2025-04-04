@@ -19,6 +19,13 @@ LgsExpr* LgsIntConst::add(LgsExpr* other) {
     return nullptr;
 }
 
+LgsExpr* LgsIntConst::castStatically(LgsType* other) {
+    if (dynamic_cast<LgsStr*>(other)) {
+        return new LgsStrConst(to_string(value));
+    }
+    return nullptr;
+}
+
 json LgsIntConst::asJson() {
     json tree;
     tree["exprType"] = "IntConst";

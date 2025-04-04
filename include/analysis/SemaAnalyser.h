@@ -14,6 +14,7 @@
 #include <loops/LgsRangeLoop.h>
 
 
+class LgsCast;
 class LgsVarDec;
 struct LgsSymbol;
 class LgsInstance;
@@ -58,6 +59,7 @@ public:
     void visitBreakStmt(LgsBreakStmt* breakStmt);
     void visitEnum(LgsEnum* lgsEnum);
     void visitExpr(LgsExpr* expr);
+    void visitCast(LgsCast* castExpr);
     void visitArray(const LgsArray* array);
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);

@@ -10,6 +10,7 @@ public:
     explicit LgsIntConst(const int value) : LgsConstExpr(new LgsInt()), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     LgsExpr* add(LgsExpr* other) override;
+    LgsExpr* castStatically(LgsType* other) override;
     json asJson() override;
     ~LgsIntConst() override = default;
 };

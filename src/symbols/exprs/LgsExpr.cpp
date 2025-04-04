@@ -11,12 +11,17 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+
 #include "exprs/unary/constants/LgsTypeConst.h"
 
 Value* LgsExpr::getIRValue(CodeGenMetadata* metadata) {
     if (IRValue) return IRValue;
     IRValue = createIRValue(metadata);
     return IRValue;
+}
+
+LgsExpr* LgsExpr::castStatically(LgsType* other) {
+    return nullptr;
 }
 
 LgsArray* LgsExpr::asArray() {
@@ -82,4 +87,3 @@ Value* LgsExpr::divIR(CodeGenMetadata* metadata, LgsExpr* other) {
 Value* LgsExpr::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false && "not implemented");
 }
-

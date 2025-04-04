@@ -2,6 +2,7 @@
 
 #include "LgsGlobals.h"
 #include "LgsInterfaceFile.h"
+#include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "exprs/binary/LgsBinaryExpr.h"
 #include "exprs/binary/LgsOperator.h"
@@ -307,15 +308,28 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
 LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx, const bool isNullable) {
     if (!ctx) return nullptr;
     LgsExpr* expr = nullptr;
-    if (const auto unary = ctx->unaryExpr()) {
+    if (ctx->cast) {
+        expr = getCast(ctx);
+    } else if (const auto unary = ctx->unaryExpr()) {
         expr = getUnaryExpr(unary);
-    } else {
+    } else if (ctx->right){
         expr = getBinaryExpr(ctx);
     }
     if (isNullable) {
         expr->type->nullable = true;
     }
     return expr;
+}
+
+LgsExpr* AntlerConverter::getCast(LogosParser::ExprContext* ctx) {
+    LgsExpr* castFromValue;
+    if (const auto unary = ctx->unaryExpr()) {
+        castFromValue = getUnaryExpr(unary);
+    } else {
+        castFromValue = getBinaryExpr(ctx);
+    }
+    LgsType* castToType = getType(ctx->cast);
+    return new LgsCast(castToType, castFromValue);
 }
 
 LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {

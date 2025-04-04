@@ -2,6 +2,7 @@
 #include "LgsErrors.h"
 #include "LgsGlobals.h"
 #include "LgsInterfaceFile.h"
+#include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
@@ -30,10 +31,9 @@ void SemaAnalyser::analyse() {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
         visitObjectFile(objFile);
+    } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+        visitInterfaceFile(interfaceFile);
     }
-    // else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-    //     visitInterfaceFile(interfaceFile);
-    // }
 }
 
 void SemaAnalyser::visitMainFile(const LgsMainFile* mainFile) {
@@ -241,19 +241,25 @@ void SemaAnalyser::visitEnum(LgsEnum* lgsEnum) {
 }
 
 void SemaAnalyser::visitExpr(LgsExpr* expr) {
-    if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(expr)) {
+    if (const auto castExpr = dynamic_cast<LgsCast*>(expr)) {
+        visitCast(castExpr);
+    } else if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(expr)) {
         visitUnaryExpr(unaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
     }
 }
 
-void SemaAnalyser::visitArray(const LgsArray* array) {
-    for (const auto& element : array->initialElements) {
-        visitExpr(element);
+void SemaAnalyser::visitCast(LgsCast* castExpr) {
+    const auto fromValue = castExpr->fromValue;
+    if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(fromValue)) {
+        visitUnaryExpr(unaryExpr);
+    } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(fromValue)) {
+        visitBinaryExpr(binaryExpr);
     }
-    if (const auto arrayType = dynamic_cast<LgsArrayType*>(array->type)) {
-        arrayType->underlyingType = array->initialElements[0]->type;
+    castExpr->toType = resolveType(castExpr->toType);
+    if (!castExpr->cast()) {
+        handleError(E10018, &castExpr->location, {fromValue->type->getName(), castExpr->toType->getName()});
     }
 }
 
@@ -277,6 +283,15 @@ void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     visitExpr(binaryExpr->left);
     visitExpr(binaryExpr->right);
     setBinaryExprType(binaryExpr);
+}
+
+void SemaAnalyser::visitArray(const LgsArray* array) {
+    for (const auto& element : array->initialElements) {
+        visitExpr(element);
+    }
+    if (const auto arrayType = dynamic_cast<LgsArrayType*>(array->type)) {
+        arrayType->underlyingType = array->initialElements[0]->type;
+    }
 }
 
 void SemaAnalyser::visitVariable(LgsVariable* variable) {

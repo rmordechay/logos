@@ -23,7 +23,7 @@ void Logos::run() {
     const auto files = parseFiles();
 
     // Project analysis
-    ProjectAnalyser projectAnalyser(files);
+    const ProjectAnalyser projectAnalyser(files);
     if (!projectAnalyser.analyse()) return;
 
     // Semantic analysis

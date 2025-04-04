@@ -14,9 +14,10 @@ public:
     const vector<LgsFile*>& files;
 
     explicit ProjectAnalyser(const vector<LgsFile*>& files) : files(files) {}
-    bool analyse();
-    void analyseStructure();
-    void printDuplicateFiles(const map<string, vector<LgsFile*>>& duplicates);
+    bool analyse() const;
+    void analyseEnvs() const;
+    void analyseStructure() const;
+    void printDuplicateFiles(const map<string, vector<LgsFile*>>& duplicates) const;
 };
 
 #endif //PROJECTANALYSER_H

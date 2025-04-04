@@ -121,8 +121,8 @@ expr:
         left=expr op=(STAR | SLASH) right=expr
     |   left=expr op=(PLUS | MINUS) right=expr
     |   left=expr op=(DOUBLE_EQUAL | NOT_EQUAL | LANGLE | RANGLE | GE | LE) right=expr
-    |   unaryExpr
-    |   LPAREN left=expr RPAREN
+    |   unaryExpr (CAST cast=type)?
+    |   LPAREN left=expr RPAREN (CAST type)?
     ;
 
 unaryExpr:
@@ -200,7 +200,8 @@ range:
     ;
 
 type:
-        TYPE QUEST_MARK?
+        SELF_CLASS
+   |    TYPE QUEST_MARK?
    |    TYPE (LBRACK INTEGER? RBRACK)+
    |    LBRACE type COLON type RBRACE
    ;
@@ -220,6 +221,7 @@ LBRACE: '{';
 RBRACE: '}';
 LBRACK: '[';
 RBRACK: ']';
+CAST: '->';
 LANGLE: '<';
 RANGLE: '>';
 
