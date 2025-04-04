@@ -35,6 +35,14 @@ LgsExpr* LgsSelection::lastExpr() const {
     return exprs[exprs.size() - 1];
 }
 
+Value* LgsSelection::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    const auto selection = resolveSelection(metadata);
+    if (const auto var = selection->asVariable()) {
+        return var->eqIR(metadata, other);
+    }
+    return nullptr;
+}
+
 LgsSelection::~LgsSelection() {
     for (const auto& expr : exprs) {
         delete expr;

@@ -13,6 +13,7 @@ public:
     explicit LgsSelection(const vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
     string getName() override;
     LgsExpr* lastExpr() const;
+    Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     LgsExpr* resolveSelection(CodeGenMetadata* metadata) const;
     ~LgsSelection() override;

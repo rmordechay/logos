@@ -82,7 +82,7 @@ public:
     void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args);
     LgsType* resolveType(LgsType* type);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
-    void resolveFuncCall(LgsFuncCall* funcCall);
+    bool resolveFuncCall(LgsFuncCall* funcCall);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     Location* getSymbolLocation(const LgsSymbol* symbol) const;
     ~SemaAnalyser() = default;

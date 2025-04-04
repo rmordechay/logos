@@ -36,7 +36,7 @@ LgsSymbol* LgsStack::getSymbol(const string& name) {
 
 LgsFunc* LgsStack::getFunc(const vector<LgsFunc*>& overloads, const string& composedName) const {
     for (const auto& overload : overloads) {
-        if (overload->signature.name == composedName) {
+        if (overload->signature.composedName == composedName) {
             return overload;
         }
     }

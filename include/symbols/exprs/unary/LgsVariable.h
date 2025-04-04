@@ -10,6 +10,7 @@ public:
     explicit LgsVariable(const std::string& name) : LgsUnaryExpr(nullptr), name(name) {}
     string getName() override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     ~LgsVariable() override = default;
 };
 

@@ -4,21 +4,6 @@ declare void @free(ptr)
 
 %arr = type {i64, i64, ptr}
 
-define ptr @get_cap(ptr %self) {
-    %cap_ptr = getelementptr %arr, ptr %self, i32 0, i32 0
-    ret ptr %cap_ptr
-}
-
-define ptr @get_size(ptr %self) {
-    %size_ptr = getelementptr %arr, ptr %self, i32 0, i32 1
-    ret ptr %size_ptr
-}
-
-define ptr @get_data(ptr %self) {
-    %data_ptr = getelementptr %arr, ptr %self, i32 0, i32 2
-    ret ptr %data_ptr
-}
-
 define ptr @ArrayType_initArr_Long(i64 %initial_cap) {
     %self = call ptr @malloc(i64 16)
     %cap_ptr = call ptr @get_cap(ptr %self)
@@ -45,15 +30,15 @@ init_array:
     ret ptr %self
 }
 
-define i32 @ArrayType_getElement_ArrayType_Int(ptr %self, i32 %index) {
+define ptr @ArrayType_getElement_ArrayType_Int(ptr %self, i32 %index) {
 entry:
     %data_ptr = call ptr @get_data(ptr %self)
-    %element_ptr = getelementptr i32, ptr %data_ptr, i32 %index
-    %element = load i32, ptr %element_ptr
-    ret i32 %element
+    %element_ptr = getelementptr ptr, ptr %data_ptr, i32 %index
+    %element = load ptr, ptr %element_ptr
+    ret ptr %element
 }
 
-define void @ArrayType_add_ArrayType_Int(ptr %self, i32 %new_elem) {
+define void @ArrayType_add_ArrayType_Int(ptr %self, ptr %new_elem) {
 entry:
     %cap_ptr = call ptr @get_cap(ptr %self)
     %size_ptr = call ptr @get_size(ptr %self)
@@ -72,8 +57,8 @@ resize:
     br label %insert
 
 insert:
-    %elem_ptr = getelementptr i32, ptr %data_ptr, i64 %size
-    store i32 %new_elem, ptr %elem_ptr
+    %elem_ptr = getelementptr ptr, ptr %data_ptr, i64 %size
+    store ptr %new_elem, ptr %elem_ptr
 
     %new_size = add i64 %size, 1
     store i64 %new_size, ptr %size_ptr
@@ -85,4 +70,19 @@ define void @ArrayType_freeArr_ArrayType(ptr %self) {
     call void @free(ptr %data_ptr)
     call void @free(ptr %self)
     ret void
+}
+
+define ptr @get_cap(ptr %self) {
+    %cap_ptr = getelementptr %arr, ptr %self, i32 0, i32 0
+    ret ptr %cap_ptr
+}
+
+define ptr @get_size(ptr %self) {
+    %size_ptr = getelementptr %arr, ptr %self, i32 0, i32 1
+    ret ptr %size_ptr
+}
+
+define ptr @get_data(ptr %self) {
+    %data_ptr = getelementptr %arr, ptr %self, i32 0, i32 2
+    ret ptr %data_ptr
 }

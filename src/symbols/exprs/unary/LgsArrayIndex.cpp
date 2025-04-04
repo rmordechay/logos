@@ -1,15 +1,10 @@
 #include "exprs/unary/LgsArrayIndex.h"
-
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsVariable.h"
-#include "stmts/LgsVarDec.h"
 #include "types/LgsArrayType.h"
-
 #include <exprs/unary/LgsArray.h>
 
 Value* LgsArrayIndex::createIRValue(CodeGenMetadata* metadata) {
-    // (((base_expr, expr0), expr1), expr2)
-
     LgsExpr* leftExpr = baseExpr;
     Value* IRValue = nullptr;
     for (int i = 0; i < indexExprs.size(); ++i) {
@@ -25,12 +20,11 @@ Value* LgsArrayIndex::createIRValue(CodeGenMetadata* metadata) {
         } else {
             assert(false && "array index case not implemented");
         }
-        const auto arrayType = dynamic_cast<LgsArrayType*>(baseExpr->type);
-        arrayType->getIRFuncGetElement(metadata, IRValue, index);
+        const auto arrayType = dynamic_cast<LgsArrayType*>(leftExpr->type);
+        indexExprs[i]->setIRValue(arrayType->getIRFuncGetElement(metadata, IRValue, index)),
         leftExpr = indexExprs[i];
     }
-
-    return IRValue;
+    return lastExpr()->getIRValue(metadata);
 }
 
 string LgsArrayIndex::getName() {

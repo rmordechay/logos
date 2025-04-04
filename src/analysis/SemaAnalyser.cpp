@@ -348,7 +348,7 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
         argTypeNames.emplace_back(arg->type->getName());
     }
     funcCall->composedName = LgsFuncSignature::getComposedName(funcCall->name, funcCall->parentName, argTypeNames);
-    resolveFuncCall(funcCall);
+    if (!resolveFuncCall(funcCall)) return;
     setExprType(funcCall, funcCall->func->signature.type);
 }
 
@@ -494,18 +494,19 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
     return symbol;
 }
 
-void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
+bool SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
     const auto overloads = logosStack.getFuncOverloads(funcCall->name);
     if (overloads.empty()) {
         handleError(E10006, &funcCall->location, {funcCall->name});
-        return;
+        return false;
     }
-    const auto func = logosStack.getFunc(overloads, funcCall->name);
+    const auto func = logosStack.getFunc(overloads, funcCall->composedName);
     if (!func) {
         handleError(E10015, &funcCall->location, {funcCall->getArgsTypeStr(), funcCall->name});
-        return;
+        return false;
     }
     funcCall->func = func;
+    return true;
 }
 
 void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {

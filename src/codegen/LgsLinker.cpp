@@ -47,6 +47,7 @@ bool LgsLinker::link(const std::map<std::string, Module*>& modules) const {
 void LgsLinker::linkStdlib(const string& path, Linker* linker) const {
     SMDiagnostic EC;
     auto module = parseIRFile(path, EC, context);
+    if (verifyModule(*module, &errs())) return;
     module->setTargetTriple(targetTriple);
     module->setDataLayout(targetMachine->createDataLayout());
     linker->linkInModule(std::move(module));
