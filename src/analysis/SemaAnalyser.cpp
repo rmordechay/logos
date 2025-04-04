@@ -383,22 +383,24 @@ void SemaAnalyser::setVariableType(LgsVariable* variable) {
 }
 
 LgsType* SemaAnalyser::resolveType(LgsType* type) {
-    if (dynamic_cast<LgsUnknownType*>(type)) {
-        const auto name = type->getName();
-        const auto symbol = logosStack.getSymbol(name);
-        if (symbol) {
-            delete type;
-            if (symbol->type == OBJECT) {
-                return symbol->object;
-            }
-            if (symbol->type == INTERFACE) {
-                return symbol->interface;
-            }
-        }
+    if (!dynamic_cast<LgsUnknownType*>(type)) return type;
+    const auto name = type->getName();
+    const auto nullable = type->nullable;
+    const auto symbol = logosStack.getSymbol(name);
+    if (!symbol) {
         handleError(E10006, &type->location, {name});
         return nullptr;
     }
-    return type;
+    delete type;
+    if (symbol->type == OBJECT) {
+        symbol->object->nullable = nullable;
+        return symbol->object;
+    }
+    if (symbol->type == INTERFACE) {
+        symbol->interface->nullable = nullable;
+        return symbol->interface;
+    }
+    return nullptr;
 }
 
 void SemaAnalyser::setFuncType(LgsFunc* func) {

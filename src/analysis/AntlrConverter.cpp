@@ -235,12 +235,7 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
 
 LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
-    LgsExpr* expr;
-    if (ctx->QUEST_MARK()) {
-        expr = getExpr(ctx->expr(), true);
-    } else {
-        expr = getExpr(ctx->expr());
-    }
+    const auto expr = getExpr(ctx->expr(), !!ctx->QUEST_MARK());
     const auto logosVarDec = new LgsVarDec(variableName, nullptr, expr);
     logosVarDec->setLocation(ctx->start);
     return logosVarDec;
@@ -295,7 +290,6 @@ LgsStmt* AntlerConverter::getPatternMatching(LogosParser::PatternMatchingContext
 
 LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ctx) {
     const auto stmts = getStmtBlock(ctx->statementsBlock());
-
     LgsLoop* loopStmt = nullptr;
     const auto loopVarName = ctx->VARIABLE()[0]->getText();
     if (const auto iterable = ctx->iterableExpr) {
