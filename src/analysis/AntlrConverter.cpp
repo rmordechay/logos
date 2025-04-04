@@ -24,6 +24,7 @@
 #include "types/LgsFloat.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
+#include "stmts/LgsContinue.h"
 #include "stmts/LgsEnum.h"
 #include "stmts/LgsPatternMatching.h"
 
@@ -212,6 +213,9 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     }
     if (ctx->breakStmt()) {
         return new LgsBreakStmt();
+    }
+    if (ctx->CONTINUE()) {
+        return new LgsContinue();
     }
     return nullptr;
 }

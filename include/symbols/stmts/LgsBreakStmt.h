@@ -6,8 +6,6 @@ class LgsLoop;
 
 class LgsBreakStmt final : public LgsStmt {
 public:
-    LgsLoop* loop = nullptr;
-
     Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsBreakStmt() override = default;
 };
