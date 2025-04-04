@@ -30,9 +30,10 @@ void SemaAnalyser::analyse() {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
         visitObjectFile(objFile);
-    } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-        visitInterfaceFile(interfaceFile);
     }
+    // else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+    //     visitInterfaceFile(interfaceFile);
+    // }
 }
 
 void SemaAnalyser::visitMainFile(const LgsMainFile* mainFile) {
@@ -319,7 +320,7 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
 }
 
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
-    const auto symbol = getSymbol(instance->obj->name, instance);
+    const auto symbol = getSymbol(instance->type->getName(), instance);
     if (!symbol) return;
     instance->obj = symbol->object;
     instance->type = instance->obj;
@@ -329,16 +330,19 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
 }
 
 void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
-    visitExpr(arrayIndex->baseExpr);
-    for (const auto& indexExpr : arrayIndex->indexExprs) {
-        visitExpr(indexExpr);
+    visitUnaryExpr(arrayIndex->expr);
+    visitExpr(arrayIndex->index);
+    const auto arrType = dynamic_cast<LgsArrayType*>(arrayIndex->expr->type);
+    if (arrType) {
+        setExprType(arrayIndex, arrType->underlyingType);
+    } else {
+        setExprType(arrayIndex, arrayIndex->expr->type);
     }
-    const auto arrType = dynamic_cast<LgsArrayType*>(arrayIndex->baseExpr->type);
-    if (!arrType) {
-        handleError(E10002, &arrayIndex->location, {arrayIndex->getName()});
-        return;
-    }
-    setExprType(arrayIndex, arrType->underlyingType);
+    // TODO add if iterable check
+    // if (!arrType) {
+    //     handleError(E10002, &arrayIndex->location, {arrayIndex->getName()});
+    //     return;
+    // }
 }
 
 void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {

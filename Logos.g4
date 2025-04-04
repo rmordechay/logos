@@ -72,7 +72,7 @@ explicitVarDec:
     ;
 
 implicitVarDec:
-        VARIABLE EQUAL expr
+        VARIABLE (QUEST_MARK)? EQUAL expr
     ;
 
 ifStatement:

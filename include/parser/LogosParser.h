@@ -332,6 +332,7 @@ public:
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
+    antlr4::tree::TerminalNode *QUEST_MARK();
 
    
   };

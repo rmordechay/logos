@@ -8,7 +8,6 @@
 #include <llvm/Support/FileSystem.h>
 #include "llvm/ADT/ScopeExit.h"
 
-
 void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* mainFile, const bool writeToFile) {
     const auto module = createEmptryModule(LOGOS_MAIN_FILE);
     auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};

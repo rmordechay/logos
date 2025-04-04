@@ -5,9 +5,12 @@
 
 void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     metadata->logosStack.enterScope(this);
-    setIRFuncType();
+    const auto IRFunc = getIRFunc(metadata);
+    auto args = IRFunc->arg_begin();
     for (const auto& param : signature.params) {
         metadata->logosStack.addLocalSymbol(param->name, param);
+        param->setIRValue(args);
+        args++->setName(param->name);
     }
     startBlock(metadata, entryBlock);
     stmtBlock->createIRValue(metadata);

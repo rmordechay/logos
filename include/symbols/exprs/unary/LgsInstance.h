@@ -9,11 +9,8 @@ public:
     vector<LgsExpr*> args;
     map<string, LgsField*> fields;
 
-    explicit LgsInstance(LgsObject* obj) : obj(obj) {
-        type = obj;
-    }
+    explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), obj(obj) {}
     explicit LgsInstance(LgsType* type) : LgsUnaryExpr(type) {}
-
     Value* createIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
     ~LgsInstance() override;
