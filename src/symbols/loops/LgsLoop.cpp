@@ -1,5 +1,6 @@
 #include "loops/LgsLoop.h"
 #include "stmts/LgsStmtBlock.h"
+#include "stmts/LgsVarDec.h"
 
 Value* LgsLoop::createIRValue(CodeGenMetadata* metadata) {
     initIRLoop(metadata);
@@ -41,4 +42,10 @@ void LgsLoop::exitIRLoop(CodeGenMetadata* metadata) const {
     startBlock(metadata, loopExit);
     metadata->logosStack.currentLoop = nullptr;
     metadata->logosStack.exitScope(metadata);
+}
+
+LgsLoop::~LgsLoop() {
+    for (const auto& loopVar : loopVars) {
+        delete loopVar;
+    }
 }

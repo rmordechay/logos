@@ -14,6 +14,11 @@ int LgsRangeLoop::loopEnd() {
     return rangeEnd->asIntConst()->value;
 }
 
+LgsRangeLoop::~LgsRangeLoop() {
+    // rangeStart will be freed with varDec freeing
+    delete rangeEnd;
+}
+
 void LgsRangeLoop::setIRBody(CodeGenMetadata* metadata) {
     const auto loopVar = loopVars[0];
     loopVar->setIRValue(iValue);

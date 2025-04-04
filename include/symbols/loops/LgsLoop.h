@@ -28,7 +28,7 @@ public:
     virtual int loopStart() = 0;
     virtual int loopEnd() = 0;
     virtual void setIRBody(CodeGenMetadata* metadata) = 0;
-    ~LgsLoop() override = default;
+    ~LgsLoop() override;
 };
 
 #endif // LOGOSLOOP_H

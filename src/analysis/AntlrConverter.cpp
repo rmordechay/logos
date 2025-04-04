@@ -181,42 +181,18 @@ LgsStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext*
 }
 
 LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
-    if (const auto fieldDef = ctx->assignment()) {
-        return getAssignment(fieldDef);
-    }
-    if (const auto implicitVarDec = ctx->implicitVarDec()) {
-        return getImplicitVarDec(implicitVarDec);
-    }
-    if (const auto explicitVarDec = ctx->explicitVarDec()) {
-        return getExplicitVarDec(explicitVarDec);
-    }
-    if (const auto ifStmt = ctx->ifStatement()) {
-        return getIfStatement(ifStmt);
-    }
-    if (const auto patternMatching = ctx->patternMatching()) {
-        return getPatternMatching(patternMatching);
-    }
-    if (const auto loopStmt = ctx->loopStatement()) {
-        return getLoopStatement(loopStmt);
-    }
-    if (const auto enumDec = ctx->enumDeclaration()) {
-        return getEnum(enumDec);
-    }
-    if (const auto funcCall = ctx->funcCall()) {
-        return getFuncCall(funcCall);
-    }
-    if (const auto selection = ctx->selection()) {
-        return getSelection(selection);
-    }
-    if (const auto returnStmt = ctx->returnStatement()) {
-        return new LgsReturn(getExpr(returnStmt->expr()));
-    }
-    if (ctx->breakStmt()) {
-        return new LgsBreakStmt();
-    }
-    if (ctx->CONTINUE()) {
-        return new LgsContinue();
-    }
+    if (const auto fieldDef = ctx->assignment()) return getAssignment(fieldDef);
+    if (const auto implicitVarDec = ctx->implicitVarDec()) return getImplicitVarDec(implicitVarDec);
+    if (const auto explicitVarDec = ctx->explicitVarDec()) return getExplicitVarDec(explicitVarDec);
+    if (const auto ifStmt = ctx->ifStatement()) return getIfStatement(ifStmt);
+    if (const auto patternMatching = ctx->patternMatching()) return getPatternMatching(patternMatching);
+    if (const auto loopStmt = ctx->loopStatement()) return getLoopStatement(loopStmt);
+    if (const auto enumDec = ctx->enumDeclaration()) return getEnum(enumDec);
+    if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
+    if (const auto selection = ctx->selection()) return getSelection(selection);
+    if (const auto returnStmt = ctx->returnStatement()) return new LgsReturn(getExpr(returnStmt->expr()));
+    if (ctx->breakStmt()) return new LgsBreakStmt();
+    if (ctx->CONTINUE()) return new LgsContinue();
     return nullptr;
 }
 
@@ -300,8 +276,10 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
         const auto loopVar = new LgsVarDec(loopVarName, nullptr, nullptr);
         loopStmt = new LgsForeachLoop({loopVar}, getUnaryExpr(iterable), stmts);
     } else if (const auto range = ctx->iterableRange) {
-        const auto loopVar = new LgsVarDec(loopVarName, new LgsInt(), nullptr);
-        loopStmt = new LgsRangeLoop({loopVar}, getExpr(range->start), getExpr(range->end), stmts);
+        const auto startExpr = getExpr(range->start);
+        const auto loopVar = new LgsVarDec(loopVarName, nullptr, startExpr);
+        loopVar->type = startExpr->type;
+        loopStmt = new LgsRangeLoop({loopVar}, startExpr, getExpr(range->end), stmts);
     } else {
         assert(false && "No loop statements found");
     }

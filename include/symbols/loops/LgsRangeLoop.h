@@ -11,6 +11,7 @@ public:
   void setIRBody(CodeGenMetadata* metadata) override;
   int loopStart() override;
   int loopEnd() override;
+  ~LgsRangeLoop() override;
 };
 
 #endif //LOGOSRANGELOOP_H
