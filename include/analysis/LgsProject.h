@@ -12,7 +12,7 @@
 
 class LgsMainFile;
 struct LgsPaths;
-class LgsEnv;
+class LgsEnvObj;
 
 class LgsProject final : public LgsAnalyser {
 public:

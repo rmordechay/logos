@@ -23,11 +23,13 @@ add_library(lib STATIC
     include/logos/Logos.h
     include/logos/LgsGlobals.h
     include/logos/ThreadPool.h
+    include/logos/LgsEnv.h
     include/logos/LgsC.h
     include/files/LgsFile.h
     include/files/LgsInterfaceFile.h
     include/files/LgsMainFile.h
     include/files/LgsObjectFile.h
+    include/files/LgsEnvFile.h
     include/logos/LgsData.h
     include/logos/LgsStack.h
     include/logos/LgsErrors.h
@@ -49,8 +51,10 @@ add_library(lib STATIC
     include/symbols/LgsValue.h
     include/symbols/LgsSymbol.h
     include/symbols/builtin/LgsSys.h
+    include/symbols/builtin/LgsEnvObj.h
     include/symbols/exprs/LgsNull.h
     include/symbols/exprs/LgsExpr.h
+    include/symbols/exprs/LgsCast.h
     include/symbols/exprs/binary/LgsBinaryExpr.h
     include/symbols/exprs/unary/LgsIterable.h
     include/symbols/exprs/unary/LgsArray.h
@@ -122,6 +126,7 @@ add_library(lib STATIC
     src/symbols/funcs/LgsParam.cpp
     src/symbols/funcs/LgsPrint.cpp
     src/symbols/exprs/LgsExpr.cpp
+    src/symbols/exprs/LgsCast.cpp
     src/symbols/exprs/binary/LgsBinaryExpr.cpp
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
     src/symbols/exprs/unary/constants/LgsTypeConst.cpp
@@ -160,11 +165,7 @@ add_library(lib STATIC
     src/symbols/types/LgsObject.cpp
 )
 
-add_executable(lgs main.cpp
-    src/symbols/exprs/LgsCast.cpp
-    include/symbols/exprs/LgsCast.h
-    include/files/LgsEnvFile.h
-    include/symbols/builtin/LgsEnv.h)
+add_executable(lgs main.cpp)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE

@@ -1,8 +1,9 @@
 #include "analysis/AntlrConverter.h"
+
 #include "LgsEnvFile.h"
 #include "LgsGlobals.h"
 #include "LgsInterfaceFile.h"
-#include "builtin/LgsEnv.h"
+#include "builtin/LgsEnvObj.h"
 #include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "exprs/binary/LgsBinaryExpr.h"
@@ -51,7 +52,7 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
     return logosFile;
 }
 
-LgsEnvFile* AntlerConverter::getLogosEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath) {
+LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath) {
     vector<LgsVarDec*> varDecs;
     for (const auto& explicitVarDec : ctx->explicitVarDec()) {
         varDecs.emplace_back(getExplicitVarDec(explicitVarDec));
@@ -59,7 +60,7 @@ LgsEnvFile* AntlerConverter::getLogosEnvFile(LogosParser::LogosEnvFileContext* c
     for (const auto& implicitVarDec : ctx->implicitVarDec()) {
         varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
     }
-    return new LgsEnvFile(filePath, new LgsEnv(varDecs));
+    return new LgsEnvFile(filePath, new LgsEnvObj(varDecs));
 }
 
 LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, const string& filePath) {

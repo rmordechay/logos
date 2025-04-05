@@ -84,7 +84,7 @@ void LgsProject::parseEnvFile(path fileEntry) {
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    auto file = AntlerConverter::getLogosEnvFile(parser.logosEnvFile(), absFilePath);
+    auto file = AntlerConverter::getEnvFile(parser.logosEnvFile(), absFilePath);
     lock_guard lock(mtx);
     envFiles.emplace_back(file);
 }

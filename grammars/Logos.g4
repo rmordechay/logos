@@ -8,6 +8,10 @@ logosEnvFile:
         (implicitVarDec | explicitVarDec)*
     ;
 
+appEnvRequire:
+        'REQUIRE' LBRACE (VARIABLE COLON type)* RBRACE
+    ;
+
 mainFile:
         enumDeclaration* funcImplementation+ EOF
     ;
