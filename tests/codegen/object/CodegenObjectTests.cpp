@@ -17,7 +17,7 @@ protected:
     }
 
     void TearDown() override {
-        remove_all(logos.buildDir);
+        remove_all(logos.paths.buildDir);
     }
 
     string getExpectedCode() const {

@@ -14,20 +14,27 @@ using namespace std;
 using namespace antlr4;
 using namespace llvm;
 
-class Logos {
-public:
-    mutex mtx;
+struct LgsPaths {
     path rootDir;
+    path srcPath;
     path buildDir;
     path objFilePath;
     path execFilePath;
+};
+
+class Logos {
+public:
+    mutex mtx;
     vector<LgsError> errors;
+    LgsPaths paths;
 
     Logos() = default;
-    explicit Logos(const path& rootDirPath) : rootDir(rootDirPath) {
-        buildDir = rootDir / LOGOS_BUILD_DIR;
-        objFilePath = buildDir / LOGOS_BUILD_DIR;
-        execFilePath = buildDir / LOGOS_BUILD_DIR;
+    explicit Logos(const path& rootDirPath) {
+        paths.rootDir = rootDirPath;
+        paths.srcPath = rootDirPath / LOGOS_SRC_DIR;
+        paths.buildDir = rootDirPath / LOGOS_BUILD_DIR;
+        paths.objFilePath = paths.buildDir / LOGOS_BUILD_DIR;
+        paths.execFilePath = paths.buildDir / LOGOS_BUILD_DIR;
     }
 
     void run();

@@ -15,12 +15,12 @@ protected:
         logos.loadBuiltins();
         logos.analyse({file});
         logos.generateCode(dynamic_cast<LgsMainFile*>(file));
-        const LgsLinker linker(logos.objFilePath, logos.execFilePath);
+        const LgsLinker linker(logos.paths.objFilePath, logos.paths.execFilePath);
         linker.link(modules);
     }
 
     void TearDown() override {
-        remove_all(logos.buildDir);
+        remove_all(logos.paths.buildDir);
     }
 
     string executeAndGetOutput(const string& command) const {
@@ -36,6 +36,6 @@ protected:
 };
 
 TEST_F(E2ETests, TestHelloWorld) {
-    const auto output = executeAndGetOutput(logos.execFilePath.c_str());
+    const auto output = executeAndGetOutput(logos.paths.execFilePath.c_str());
     ASSERT_EQ(output, "Hello world\n");
 }

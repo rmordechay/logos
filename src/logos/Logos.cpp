@@ -34,19 +34,19 @@ void Logos::run() {
     generateCode(getMainFile(files));
 
     // Linking
-    const LgsLinker linker(objFilePath, execFilePath);
+    const LgsLinker linker(paths.objFilePath, paths.execFilePath);
     if (!linker.link(modules)) return;
 
     // Running
-    system(execFilePath.c_str());
+    system(paths.execFilePath.c_str());
 }
 
 vector<LgsFile*> Logos::parseFiles() {
-    assert(rootDir != "" && "rootDir is empty");
+    assert(paths.rootDir != "" && "paths.rootDir is empty");
     ThreadPool threadPool;
     threadPool.start();
     vector<LgsFile*> files;
-    parseTree(rootDir, files, threadPool);
+    parseTree(paths.srcPath, files, threadPool);
     threadPool.wait();
     return files;
 }
@@ -74,7 +74,7 @@ LgsFile* Logos::parseFile(const directory_entry& fileEntry) const {
     fileContents << file.rdbuf();
     auto codeText = fileContents.str();
     auto lgsFile = parseFile(codeText, absFilePath);
-    lgsFile->relPath = relative(absFilePath, rootDir).lexically_relative(LOGOS_SRC_DIR);
+    lgsFile->relPath = relative(absFilePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     return lgsFile;
 }
 
@@ -128,13 +128,13 @@ inline void initLLVM() {
 
 void Logos::generateCode(const LgsMainFile* mainFile) const {
     initLLVM();
-    create_directories(buildDir);
-    CodeGenerator::generateModule(buildDir, mainFile);
+    create_directories(paths.buildDir);
+    CodeGenerator::generateModule(paths.buildDir, mainFile);
 }
 
 void Logos::validateProject() const {
     string srcDirPath;
-    for (const auto& entry : directory_iterator(rootDir)) {
+    for (const auto& entry : directory_iterator(paths.rootDir)) {
         auto fileName = entry.path().filename();
         if (entry.is_directory() && fileName == LOGOS_SRC_DIR) {
             srcDirPath = entry.path().string();
