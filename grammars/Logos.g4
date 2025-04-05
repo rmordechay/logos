@@ -8,8 +8,12 @@ logosEnvFile:
         (implicitVarDec | explicitVarDec)*
     ;
 
-appEnvRequire:
-        'REQUIRE' LBRACE (VARIABLE COLON type)* RBRACE
+logosAppFile:
+        (implicitVarDec | explicitVarDec)* requireEnvVars?
+    ;
+
+requireEnvVars:
+        'require' 'envs' LBRACE (VARIABLE COLON type)* RBRACE
     ;
 
 mainFile:

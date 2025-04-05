@@ -10,31 +10,38 @@
 #include <mutex>
 #include <vector>
 
+class LgsEnv;
+class LgsAppFile;
 class LgsMainFile;
 struct LgsPaths;
-class LgsEnvObj;
+class LgsEnvObject;
 
 class LgsProject final : public LgsAnalyser {
 public:
+    string name;
+    string version;
     std::mutex mtx;
     LgsPaths* paths;
-    const LgsMainFile* mainFile = nullptr;
     vector<LgsFile*> files;
-    vector<LgsEnvFile*> envFiles;
+    const LgsMainFile* mainFile = nullptr;
+    const LgsAppFile* appFile = nullptr;
+    const LgsEnvFile* activeEnv = nullptr;
 
     explicit LgsProject(LgsPaths* paths) : paths(paths) {}
-    void loadFiles();
     bool loadProject();
-    bool validateProject() const;
+    void loadFiles();
     void loadGlobals() const;
-    void checkDuplicateFiles() const;
     void loadSrcFiles();
+    void setAppEnv();
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
     void parseSrcFile(const directory_entry& entry);
-    bool isLogosFile(const directory_entry& entry) const;
-    string getFileText(path filePath) const;
-    void loadEnvFiles();
     void parseEnvFile(path fileEntry);
+    void parseAppFile(path fileEntry);
+    bool validateProject() const;
+    void checkEnvs() const;
+    void checkDuplicateFiles() const;
+    string getFileText(path filePath) const;
+    bool isLogosFile(const directory_entry& entry) const;
     ~LgsProject() = default;
 };
 

@@ -1,10 +1,12 @@
 #include "analysis/LgsProject.h"
 #include "AntlrConverter.h"
+#include "LgsAppFile.h"
 #include "LgsGlobals.h"
 #include "Logos.h"
 #include "LogosLexer.h"
 #include "LogosParser.h"
 #include "ThreadPool.h"
+#include "builtin/LgsEnvObject.h"
 #include "builtin/LgsSys.h"
 #include "funcs/LgsPrint.h"
 
@@ -14,15 +16,14 @@ using namespace std;
 
 bool LgsProject::loadProject() {
     if (!validateProject()) return false;
+    setAppEnv();
     loadFiles();
     return true;
 }
 
 void LgsProject::loadFiles() {
-    thread t1([this] { loadEnvFiles(); });
     thread t2([this] { loadSrcFiles(); });
     thread t3([this] { loadGlobals(); });
-    t1.join();
     t2.join();
     t3.join();
 }
@@ -34,6 +35,13 @@ void LgsProject::loadSrcFiles() {
     parseSrcFiles(paths->srcDir, threadPool);
     threadPool.wait();
     checkDuplicateFiles();
+}
+
+void LgsProject::setAppEnv() {
+    const auto appFilePath = paths->rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
+    if (!exists(appFilePath)) return;
+    parseAppFile(appFilePath);
+    checkEnvs();
 }
 
 void LgsProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
@@ -64,17 +72,28 @@ void LgsProject::parseSrcFile(const directory_entry& entry) {
     }
 }
 
-void LgsProject::loadEnvFiles() {
-    ThreadPool threadPool;
-    threadPool.start();
-    vector<LgsEnvFile*> files;
-    for (const auto& entry : directory_iterator(paths->envsDir)) {
-        if (!isLogosFile(entry)) continue;
-        threadPool.runTask([entry, this] {
-            parseEnvFile(entry);
-        });
+void LgsProject::parseAppFile(path fileEntry) {
+    auto absFilePath = canonical(fileEntry);
+    auto codeText = getFileText(fileEntry);
+    ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+    appFile = AntlerConverter::getAppFile(parser.logosAppFile(), absFilePath);
+
+    for (const auto& varDec : appFile->varDecs) {
+        if (varDec->name == "name") {
+            name = varDec->expr->asStrConst()->value;
+        }
+        if (varDec->name == "version") {
+            version = varDec->expr->asStrConst()->value;
+        }
+        if (varDec->name == "activeEnv") {
+            const auto activeEnv = varDec->expr->asStrConst()->value;
+            const auto activeEnvPath = paths->envsDir / (activeEnv + LOGOS_FILE_EXTENSION);
+            parseEnvFile(activeEnvPath);
+        }
     }
-    threadPool.wait();
 }
 
 void LgsProject::parseEnvFile(path fileEntry) {
@@ -84,9 +103,7 @@ void LgsProject::parseEnvFile(path fileEntry) {
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    auto file = AntlerConverter::getEnvFile(parser.logosEnvFile(), absFilePath);
-    lock_guard lock(mtx);
-    envFiles.emplace_back(file);
+    activeEnv = AntlerConverter::getEnvFile(parser.logosEnvFile(), absFilePath);
 }
 
 string LgsProject::getFileText(path filePath) const {
@@ -95,7 +112,6 @@ string LgsProject::getFileText(path filePath) const {
     fileContents << file.rdbuf();
     return fileContents.str();
 }
-
 
 void LgsProject::loadGlobals() const {
     globals.funcs[LgsPrint::name] = {
@@ -106,6 +122,21 @@ void LgsProject::loadGlobals() const {
         new LgsPrint({new LgsParam(new LgsBool())}),
     };
     globals.symbols[LgsSys::name] = LgsSymbol(new LgsSys());
+    globals.symbols[LgsEnvObject::name] = LgsSymbol(new LgsEnvObject());
+}
+
+void LgsProject::checkEnvs() const {
+    for (const auto& requireEnvVar : appFile->requireEnvVars) {
+        auto found = false;
+        for (const auto& varDec : activeEnv->varDecs) {
+            if (requireEnvVar.name == varDec->name) {
+                found = true;
+            }
+        }
+        if (!found) {
+            // TODO finis logic
+        }
+    }
 }
 
 bool LgsProject::validateProject() const {

@@ -9,6 +9,7 @@
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
 
+class LgsAppFile;
 class LgsLoop;
 class LgsAssignment;
 using namespace std;
@@ -17,6 +18,7 @@ class AntlerConverter {
 public:
     static LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath);
     static LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath);
+    static LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx, const path& filePath);
     static LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const string& filePath);
     static LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath);
     static LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath);

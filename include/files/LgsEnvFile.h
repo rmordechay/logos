@@ -2,14 +2,14 @@
 #define LGSENVFILE_H
 #include "LgsFile.h"
 
-class LgsEnvObj;
+class LgsEnvObject;
 class LgsVarDec;
 
 class LgsEnvFile final : public LgsFile {
 public:
-    LgsEnvObj* env;
+    vector<LgsVarDec*> varDecs;
 
-    LgsEnvFile(const path& path, LgsEnvObj* env) : LgsFile(path.filename(), path), env(env) {}
+    LgsEnvFile(const path& path, const vector<LgsVarDec*>& varDecs) : LgsFile(path.filename(), path), varDecs(varDecs) {}
 };
 
 #endif //LGSENVFILE_H

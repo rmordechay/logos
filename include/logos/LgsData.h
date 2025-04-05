@@ -14,6 +14,7 @@ using namespace std;
 #define LOGOS_ENVS_DIR "envs"
 #define LOGOS_BUILD_DIR "build"
 #define LOGOS_MAIN_FILE_NAME "Main"
+#define LOGOS_APP_FILE_NAME "App"
 #define LOGOS_MAIN_FUNC "main"
 #define LOGOS_SELF "self"
 #define OBJECT_FILE "output.o"

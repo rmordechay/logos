@@ -26,10 +26,11 @@ add_library(lib STATIC
     include/logos/LgsEnv.h
     include/logos/LgsC.h
     include/files/LgsFile.h
+    include/files/LgsAppFile.h
+    include/files/LgsEnvFile.h
     include/files/LgsInterfaceFile.h
     include/files/LgsMainFile.h
     include/files/LgsObjectFile.h
-    include/files/LgsEnvFile.h
     include/logos/LgsData.h
     include/logos/LgsStack.h
     include/logos/LgsErrors.h
@@ -51,7 +52,7 @@ add_library(lib STATIC
     include/symbols/LgsValue.h
     include/symbols/LgsSymbol.h
     include/symbols/builtin/LgsSys.h
-    include/symbols/builtin/LgsEnvObj.h
+    include/symbols/builtin/LgsEnvObject.h
     include/symbols/exprs/LgsNull.h
     include/symbols/exprs/LgsExpr.h
     include/symbols/exprs/LgsCast.h
