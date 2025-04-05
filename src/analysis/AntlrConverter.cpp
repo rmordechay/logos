@@ -330,8 +330,11 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
     for (size_t i = 0; i < ctx->enumField().size(); ++i) {
         const auto enumField = ctx->enumField()[i];
         const auto enumName = enumField->CONST()->getText();
-        auto enumText = enumField->STRING()->getText();
-        LgsStr::cleanStr(enumText);
+        string enumText = "";
+        if (enumField->STRING()) {
+            enumText = enumField->STRING()->getText();
+            LgsStr::cleanStr(enumText);
+        }
         EnumField field(i, enumName, enumText);
         field.setLocation(ctx->start);
         lgsEnum->fields.emplace_back(field);

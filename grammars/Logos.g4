@@ -12,10 +12,6 @@ logosAppFile:
         (implicitVarDec | explicitVarDec)* requireEnvVars?
     ;
 
-requireEnvVars:
-        'require' 'envs' LBRACE (VARIABLE COLON type)* RBRACE
-    ;
-
 mainFile:
         enumDeclaration* funcImplementation+ EOF
     ;
@@ -26,6 +22,10 @@ objectFile:
 
 interfaceFile:
         interfaceDeclaration explicitVarDec* funcSignature+ funcImplementation* EOF
+    ;
+
+requireEnvVars:
+        'require' 'envs' LBRACE (VARIABLE COLON type)* RBRACE
     ;
 
 objectDeclaration:
