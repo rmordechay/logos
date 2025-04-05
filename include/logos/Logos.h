@@ -1,6 +1,8 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
+#include "LgsEnvFile.h"
+
 #include <string>
 #include <thread>
 #include <filesystem>
@@ -17,6 +19,7 @@ using namespace llvm;
 struct LgsPaths {
     path rootDir;
     path srcPath;
+    path envsDir;
     path buildDir;
     path objFilePath;
     path execFilePath;
@@ -28,25 +31,24 @@ public:
     vector<LgsError> errors;
     LgsPaths paths;
 
-    Logos() = default;
     explicit Logos(const path& rootDirPath) {
-        paths.rootDir = rootDirPath;
-        paths.srcPath = rootDirPath / LOGOS_SRC_DIR;
-        paths.buildDir = rootDirPath / LOGOS_BUILD_DIR;
-        paths.objFilePath = paths.buildDir / LOGOS_BUILD_DIR;
-        paths.execFilePath = paths.buildDir / LOGOS_BUILD_DIR;
+        initPaths(rootDirPath);
     }
 
     void run();
     void generateCode(const LgsMainFile* mainFile) const;
     void validateProject() const;
     vector<LgsFile*> parseFiles();
+    vector<LgsFile*> parseEnvFiles();
+    void parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool);
     LgsFile* parseFile(const directory_entry&) const;
     LgsFile* parseFile(const string& codeText, path absFilePath = "") const;
-    void parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool);
+    LgsEnvFile* parseEnvFile(path fileEntry) const;
+    LgsMainFile* getMainFile(const vector<LgsFile*>& files) const;
     void loadBuiltins() const;
     bool analyse(const vector<LgsFile*>& files);
-    LgsMainFile* getMainFile(const vector<LgsFile*>& files) const;
+    void initPaths(const path& rootDirPath);
+    void initLLVM() const;
     bool isLogosFile(const directory_entry& filePath) const;
     ~Logos() = default;
 };

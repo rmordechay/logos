@@ -1,5 +1,6 @@
 #include "logos/Logos.h"
 
+#include "LgsEnvFile.h"
 #include "LgsGlobals.h"
 #include "LgsLinker.h"
 #include "builtin/LgsSys.h"
@@ -21,9 +22,10 @@ void Logos::run() {
 
     // Parsing
     const auto files = parseFiles();
+    const auto envFiles = parseEnvFiles();
 
     // Project analysis
-    const ProjectAnalyser projectAnalyser(files);
+    const ProjectAnalyser projectAnalyser(files, envFiles);
     if (!projectAnalyser.analyse()) return;
 
     // Semantic analysis
@@ -42,11 +44,28 @@ void Logos::run() {
 }
 
 vector<LgsFile*> Logos::parseFiles() {
-    assert(paths.rootDir != "" && "paths.rootDir is empty");
     ThreadPool threadPool;
     threadPool.start();
     vector<LgsFile*> files;
     parseTree(paths.srcPath, files, threadPool);
+    threadPool.wait();
+    return files;
+}
+
+vector<LgsFile*> Logos::parseEnvFiles() {
+    ThreadPool threadPool;
+    threadPool.start();
+    vector<LgsFile*> files;
+    for (const auto& entry : directory_iterator(paths.envsDir)) {
+        if (!isLogosFile(entry)) continue;
+        threadPool.runTask([entry, &files, this] {
+            const auto file = parseEnvFile(entry);
+            {
+                lock_guard lock(mtx);
+                files.emplace_back(file);
+            }
+        });
+    }
     threadPool.wait();
     return files;
 }
@@ -86,6 +105,19 @@ LgsFile* Logos::parseFile(const string& codeText, path absFilePath) const {
     return AntlerConverter::getLogosFile(parser.logosFile(), absFilePath);
 }
 
+LgsEnvFile* Logos::parseEnvFile(path fileEntry) const {
+    auto absFilePath = canonical(fileEntry);
+    ifstream file(absFilePath);
+    stringstream fileContents;
+    fileContents << file.rdbuf();
+    auto codeText = fileContents.str();
+    ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+    return AntlerConverter::getLogosEnvFile(parser.logosEnvFile(), absFilePath);
+}
+
 bool Logos::analyse(const vector<LgsFile*>& files) {
     ThreadPool threadPool;
     threadPool.start();
@@ -114,7 +146,17 @@ void Logos::loadBuiltins() const {
     globals.symbols[LgsSys::name] = LgsSymbol(new LgsSys());
 }
 
-inline void initLLVM() {
+void Logos::initPaths(const path& rootDirPath) {
+    paths.rootDir = rootDirPath;
+    paths.srcPath = paths.rootDir / LOGOS_SRC_DIR;
+    paths.envsDir = paths.rootDir / LOGOS_ENVS_DIR;
+    paths.buildDir = paths.rootDir / LOGOS_BUILD_DIR;
+    paths.objFilePath = paths.buildDir / LOGOS_BUILD_DIR;
+    paths.execFilePath = paths.buildDir / LOGOS_BUILD_DIR;
+    assert(paths.rootDir != "");
+}
+
+inline void Logos::initLLVM() const {
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();

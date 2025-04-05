@@ -26,18 +26,19 @@ public:
   };
 
   enum {
-    RuleLogosFile = 0, RuleMainFile = 1, RuleObjectFile = 2, RuleInterfaceFile = 3, 
-    RuleObjectDeclaration = 4, RuleInterfaceDeclaration = 5, RuleObjectImplements = 6, 
-    RuleFuncSignature = 7, RuleFuncImplementation = 8, RuleFuncBody = 9, 
-    RuleParamList = 10, RuleStatement = 11, RuleStatementsBlock = 12, RuleAssignment = 13, 
-    RuleExplicitVarDec = 14, RuleImplicitVarDec = 15, RuleIfStatement = 16, 
-    RuleElseIfStatement = 17, RuleElseStatement = 18, RulePatternMatching = 19, 
-    RulePattern = 20, RuleLoopStatement = 21, RuleBreakStmt = 22, RuleReturnStatement = 23, 
-    RuleEnumDeclaration = 24, RuleEnumField = 25, RuleExpr = 26, RuleUnaryExpr = 27, 
-    RuleArray = 28, RuleMap = 29, RuleFuncCall = 30, RuleConstructor = 31, 
-    RuleFuncArgList = 32, RuleFuncArg = 33, RuleConstant = 34, RuleArrayIndex = 35, 
-    RuleSelection = 36, RuleFirstSelectionElement = 37, RuleInnerSelectionElement = 38, 
-    RuleRange = 39, RuleType = 40, RuleVector = 41
+    RuleLogosFile = 0, RuleLogosEnvFile = 1, RuleMainFile = 2, RuleObjectFile = 3, 
+    RuleInterfaceFile = 4, RuleObjectDeclaration = 5, RuleInterfaceDeclaration = 6, 
+    RuleObjectImplements = 7, RuleFuncSignature = 8, RuleFuncImplementation = 9, 
+    RuleFuncBody = 10, RuleParamList = 11, RuleStatement = 12, RuleStatementsBlock = 13, 
+    RuleAssignment = 14, RuleExplicitVarDec = 15, RuleImplicitVarDec = 16, 
+    RuleIfStatement = 17, RuleElseIfStatement = 18, RuleElseStatement = 19, 
+    RulePatternMatching = 20, RulePattern = 21, RuleLoopStatement = 22, 
+    RuleBreakStmt = 23, RuleReturnStatement = 24, RuleEnumDeclaration = 25, 
+    RuleEnumField = 26, RuleExpr = 27, RuleUnaryExpr = 28, RuleArray = 29, 
+    RuleMap = 30, RuleFuncCall = 31, RuleConstructor = 32, RuleFuncArgList = 33, 
+    RuleFuncArg = 34, RuleConstant = 35, RuleArrayIndex = 36, RuleSelection = 37, 
+    RuleFirstSelectionElement = 38, RuleInnerSelectionElement = 39, RuleRange = 40, 
+    RuleType = 41, RuleVector = 42
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -58,6 +59,7 @@ public:
 
 
   class LogosFileContext;
+  class LogosEnvFileContext;
   class MainFileContext;
   class ObjectFileContext;
   class InterfaceFileContext;
@@ -112,6 +114,20 @@ public:
   };
 
   LogosFileContext* logosFile();
+
+  class  LogosEnvFileContext : public antlr4::ParserRuleContext {
+  public:
+    LogosEnvFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<ImplicitVarDecContext *> implicitVarDec();
+    ImplicitVarDecContext* implicitVarDec(size_t i);
+    std::vector<ExplicitVarDecContext *> explicitVarDec();
+    ExplicitVarDecContext* explicitVarDec(size_t i);
+
+   
+  };
+
+  LogosEnvFileContext* logosEnvFile();
 
   class  MainFileContext : public antlr4::ParserRuleContext {
   public:

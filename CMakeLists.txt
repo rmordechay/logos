@@ -162,7 +162,9 @@ add_library(lib STATIC
 
 add_executable(lgs main.cpp
     src/symbols/exprs/LgsCast.cpp
-    include/symbols/exprs/LgsCast.h)
+    include/symbols/exprs/LgsCast.h
+    include/files/LgsEnvFile.h
+    include/symbols/builtin/LgsEnv.h)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE

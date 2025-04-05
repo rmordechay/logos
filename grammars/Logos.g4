@@ -4,6 +4,10 @@ logosFile:
         mainFile | objectFile | interfaceFile
     ;
 
+logosEnvFile:
+        (implicitVarDec | explicitVarDec)*
+    ;
+
 mainFile:
         enumDeclaration* funcImplementation+ EOF
     ;

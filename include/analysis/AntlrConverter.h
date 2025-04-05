@@ -1,15 +1,13 @@
 #ifndef SEMANTICANALYSER_H
 #define SEMANTICANALYSER_H
 
+#include "LgsEnvFile.h"
 #include "LogosParser.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
-#include "types/LgsInt.h"
-#include "exprs/unary/constants/LgsTypeConst.h"
-#include "types/LgsInterface.h"
 
 class LgsLoop;
 class LgsAssignment;
@@ -18,6 +16,7 @@ using namespace std;
 class AntlerConverter {
 public:
     static LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath);
+    static LgsEnvFile* getLogosEnvFile(LogosParser::LogosEnvFileContext* ctx, const filesystem::path& filePath);
     static LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const string& filePath);
     static LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath);
     static LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const filesystem::path& filePath);

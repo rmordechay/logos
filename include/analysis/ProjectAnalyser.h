@@ -12,8 +12,11 @@ class ProjectAnalyser final : public LgsAnalyser {
 public:
     std::mutex mtx;
     const vector<LgsFile*>& files;
+    const vector<LgsFile*>& envFiles;
 
-    explicit ProjectAnalyser(const vector<LgsFile*>& files) : files(files) {}
+    ProjectAnalyser(const vector<LgsFile*>& files, const vector<LgsFile*>& envFiles)
+        : files(files), envFiles(envFiles) {}
+
     bool analyse() const;
     void analyseEnvs() const;
     void analyseStructure() const;

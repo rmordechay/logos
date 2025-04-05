@@ -11,9 +11,9 @@ using namespace std;
 
 class ThreadPool {
 public:
+    mutex mtx;
     vector<thread> workers;
     queue<function<void()>> tasks;
-    mutex mtx;
     std::condition_variable condition;
     const size_t threadsNumber = 10;
     bool stop = false;

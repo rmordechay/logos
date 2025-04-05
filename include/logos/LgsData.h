@@ -11,6 +11,7 @@ using namespace std;
 
 #define LOGOS_EXTENSION ".lgs"
 #define LOGOS_SRC_DIR "src"
+#define LOGOS_ENVS_DIR "envs"
 #define LOGOS_BUILD_DIR "build"
 #define LOGOS_MAIN_FILE "Main"
 #define LOGOS_MAIN_FUNC "main"
