@@ -1,9 +1,11 @@
 #ifndef LOGOSFILE_H
 #define LOGOSFILE_H
 #include <string>
+#include <filesystem>
 
 class LgsStack;
 using namespace std;
+using namespace filesystem;
 
 class LgsFile {
 public:

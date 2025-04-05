@@ -39,7 +39,7 @@ add_library(lib STATIC
     include/analysis/AntlrConverter.h
     include/analysis/LgsAnalyser.h
     include/analysis/SemaAnalyser.h
-    include/analysis/ProjectAnalyser.h
+    include/analysis/LgsProject.h
     include/cli/LgsCli.h
     include/cli/LgsCmd.h
     include/cli/LgsRunCmd.h
@@ -112,7 +112,7 @@ add_library(lib STATIC
     src/parser/LogosParser.cpp
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
-    src/analysis/ProjectAnalyser.cpp
+    src/analysis/LgsProject.cpp
 
     # Symbols src
     src/symbols/LgsSymbol.cpp
@@ -189,7 +189,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libantlr4-runtime.a
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_link_libraries(lgs PRIVATE lib
+    target_link_libraries(lgs PRIVATE
+        lib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libantlr4-runtime.so
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libLLVM.so
     )

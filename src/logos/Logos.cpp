@@ -17,19 +17,16 @@
 #include <llvm/MC/TargetRegistry.h>
 
 void Logos::run() {
-    // Initial validation
-    validateProject();
+    // Project analysis
+    const LgsProject lgsProject(&paths);
+    if (!lgsProject.validateProject()) return;
 
     // Parsing
     const auto files = parseFiles();
-    const auto envFiles = parseEnvFiles();
-
-    // Project analysis
-    const ProjectAnalyser projectAnalyser(files, envFiles);
-    if (!projectAnalyser.analyse()) return;
+    const auto envFiles = parseEnvs();
 
     // Semantic analysis
-    loadBuiltins();
+    loadBuiltins(envFiles);
     if (!analyse(files)) return;
 
     // Code generation
@@ -47,25 +44,7 @@ vector<LgsFile*> Logos::parseFiles() {
     ThreadPool threadPool;
     threadPool.start();
     vector<LgsFile*> files;
-    parseTree(paths.srcPath, files, threadPool);
-    threadPool.wait();
-    return files;
-}
-
-vector<LgsFile*> Logos::parseEnvFiles() {
-    ThreadPool threadPool;
-    threadPool.start();
-    vector<LgsFile*> files;
-    for (const auto& entry : directory_iterator(paths.envsDir)) {
-        if (!isLogosFile(entry)) continue;
-        threadPool.runTask([entry, &files, this] {
-            const auto file = parseEnvFile(entry);
-            {
-                lock_guard lock(mtx);
-                files.emplace_back(file);
-            }
-        });
-    }
+    parseTree(paths.srcDir, files, threadPool);
     threadPool.wait();
     return files;
 }
@@ -105,17 +84,39 @@ LgsFile* Logos::parseFile(const string& codeText, path absFilePath) const {
     return AntlerConverter::getLogosFile(parser.logosFile(), absFilePath);
 }
 
-LgsEnvFile* Logos::parseEnvFile(path fileEntry) const {
-    auto absFilePath = canonical(fileEntry);
-    ifstream file(absFilePath);
+vector<LgsEnv*> Logos::parseEnvs() {
+    ThreadPool threadPool;
+    threadPool.start();
+    vector<LgsEnv*> files;
+    for (const auto& entry : directory_iterator(paths.envsDir)) {
+        if (!isLogosFile(entry)) continue;
+        threadPool.runTask([entry, &files, this] {
+            const auto file = parseEnv(entry);
+            {
+                lock_guard lock(mtx);
+                files.emplace_back(file);
+            }
+        });
+    }
+    threadPool.wait();
+    return files;
+}
+
+string Logos::getFileText(path fileEntry) const {
+    ifstream file(canonical(fileEntry));
     stringstream fileContents;
     fileContents << file.rdbuf();
-    auto codeText = fileContents.str();
+    return fileContents.str();
+}
+
+LgsEnv* Logos::parseEnv(path fileEntry) const {
+    auto absFilePath = canonical(fileEntry);
+    auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    return AntlerConverter::getLogosEnvFile(parser.logosEnvFile(), absFilePath);
+    return AntlerConverter::getLogosEnv(parser.logosEnvFile(), absFilePath);
 }
 
 bool Logos::analyse(const vector<LgsFile*>& files) {
@@ -135,7 +136,7 @@ bool Logos::analyse(const vector<LgsFile*>& files) {
     return errors.empty();
 }
 
-void Logos::loadBuiltins() const {
+void Logos::loadBuiltins(const vector<LgsEnv*>& envFiles) const {
     globals.funcs[LgsPrint::name] = {
         new LgsPrint({new LgsParam(new LgsInt())}),
         new LgsPrint({new LgsParam(new LgsFloat())}),
@@ -148,7 +149,7 @@ void Logos::loadBuiltins() const {
 
 void Logos::initPaths(const path& rootDirPath) {
     paths.rootDir = rootDirPath;
-    paths.srcPath = paths.rootDir / LOGOS_SRC_DIR;
+    paths.srcDir = paths.rootDir / LOGOS_SRC_DIR;
     paths.envsDir = paths.rootDir / LOGOS_ENVS_DIR;
     paths.buildDir = paths.rootDir / LOGOS_BUILD_DIR;
     paths.objFilePath = paths.buildDir / LOGOS_BUILD_DIR;
@@ -172,20 +173,6 @@ void Logos::generateCode(const LgsMainFile* mainFile) const {
     initLLVM();
     create_directories(paths.buildDir);
     CodeGenerator::generateModule(paths.buildDir, mainFile);
-}
-
-void Logos::validateProject() const {
-    string srcDirPath;
-    for (const auto& entry : directory_iterator(paths.rootDir)) {
-        auto fileName = entry.path().filename();
-        if (entry.is_directory() && fileName == LOGOS_SRC_DIR) {
-            srcDirPath = entry.path().string();
-        }
-    }
-    if (srcDirPath.empty()) {
-        cout << E10010.msg << '\n';
-        exit(0);
-    }
 }
 
 bool Logos::isLogosFile(const directory_entry& filePath) const {
