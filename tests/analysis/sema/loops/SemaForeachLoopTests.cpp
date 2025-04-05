@@ -13,7 +13,7 @@ protected:
     Logos logos = Logos(dataDir);
 
     void SetUp() override {
-        logos.loadBuiltins(TODO);
+        logos.loadBuiltins();
     }
 
     void TearDown() override {

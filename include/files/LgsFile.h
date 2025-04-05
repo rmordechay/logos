@@ -10,6 +10,7 @@ using namespace filesystem;
 class LgsFile {
 public:
     string name;
+    string code;
     string absPath;
     string relPath;
 

@@ -12,7 +12,7 @@
 #include <iostream>
 
 bool LgsLinker::link(const std::map<std::string, Module*>& modules) const {
-    Module* mainModule = modules.find(LOGOS_MAIN_FILE)->second;
+    Module* mainModule = modules.find(LOGOS_MAIN_FILE_NAME)->second;
     Linker linker(*mainModule);
 
     for (const auto& path : paths) {
@@ -20,7 +20,7 @@ bool LgsLinker::link(const std::map<std::string, Module*>& modules) const {
     }
     
     for (const auto& [name, module] : modules) {
-        if (name == LOGOS_MAIN_FILE) continue;
+        if (name == LOGOS_MAIN_FILE_NAME) continue;
         linker.linkInModule(std::unique_ptr<Module>(module));
     }
 

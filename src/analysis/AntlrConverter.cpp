@@ -51,7 +51,7 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
     return logosFile;
 }
 
-LgsEnv* AntlerConverter::getLogosEnv(LogosParser::LogosEnvFileContext* ctx, const filesystem::path& filePath) {
+LgsEnvFile* AntlerConverter::getLogosEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath) {
     vector<LgsVarDec*> varDecs;
     for (const auto& explicitVarDec : ctx->explicitVarDec()) {
         varDecs.emplace_back(getExplicitVarDec(explicitVarDec));
@@ -59,7 +59,7 @@ LgsEnv* AntlerConverter::getLogosEnv(LogosParser::LogosEnvFileContext* ctx, cons
     for (const auto& implicitVarDec : ctx->implicitVarDec()) {
         varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
     }
-    return new LgsEnv(varDecs);
+    return new LgsEnvFile(filePath, new LgsEnv(varDecs));
 }
 
 LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, const string& filePath) {

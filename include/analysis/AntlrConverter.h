@@ -16,7 +16,7 @@ using namespace std;
 class AntlerConverter {
 public:
     static LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath);
-    static LgsEnv* getLogosEnv(LogosParser::LogosEnvFileContext* ctx, const filesystem::path& filePath);
+    static LgsEnvFile* getLogosEnvFile(LogosParser::LogosEnvFileContext* ctx, const filesystem::path& filePath);
     static LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const string& filePath);
     static LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath);
     static LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const filesystem::path& filePath);

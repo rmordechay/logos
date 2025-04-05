@@ -9,7 +9,7 @@
 #include "llvm/ADT/ScopeExit.h"
 
 void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* mainFile, const bool writeToFile) {
-    const auto module = createEmptryModule(LOGOS_MAIN_FILE);
+    const auto module = createEmptryModule(LOGOS_MAIN_FILE_NAME);
     auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
 
     for (const auto& func : mainFile->funcs) {
@@ -19,7 +19,7 @@ void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* main
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
 
     if (writeToFile) {
-        writeIRToFile(metadata.currentModule, buildDir, LOGOS_MAIN_FILE);
+        writeIRToFile(metadata.currentModule, buildDir, LOGOS_MAIN_FILE_NAME);
     }
 }
 

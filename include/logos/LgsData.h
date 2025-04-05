@@ -9,11 +9,11 @@ class LgsStack;
 using namespace nlohmann;
 using namespace std;
 
-#define LOGOS_EXTENSION ".lgs"
+#define LOGOS_FILE_EXTENSION ".lgs"
 #define LOGOS_SRC_DIR "src"
 #define LOGOS_ENVS_DIR "envs"
 #define LOGOS_BUILD_DIR "build"
-#define LOGOS_MAIN_FILE "Main"
+#define LOGOS_MAIN_FILE_NAME "Main"
 #define LOGOS_MAIN_FUNC "main"
 #define LOGOS_SELF "self"
 #define OBJECT_FILE "output.o"

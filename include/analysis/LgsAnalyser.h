@@ -34,7 +34,7 @@ inline string LgsAnalyser::formatErrorMsg(const string& errMsg, const vector<str
 }
 
 inline void LgsAnalyser::printError(const string& errMsg, const vector<string>& args) const {
-    cout << "Error: " << formatErrorMsg(errMsg, args) << endl;
+    cout << formatErrorMsg(errMsg, args) << endl;
 }
 
 inline void LgsAnalyser::setUnsuccessful() {
