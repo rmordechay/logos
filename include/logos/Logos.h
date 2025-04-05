@@ -18,7 +18,7 @@ using namespace llvm;
 
 struct LgsPaths {
     path rootDir;
-    path srcPath;
+    path srcDir;
     path envsDir;
     path buildDir;
     path objFilePath;
@@ -37,15 +37,15 @@ public:
 
     void run();
     void generateCode(const LgsMainFile* mainFile) const;
-    void validateProject() const;
     vector<LgsFile*> parseFiles();
-    vector<LgsFile*> parseEnvFiles();
+    vector<LgsEnv*> parseEnvs();
+    string getFileText(path fileEntry) const;
     void parseTree(const string& path, vector<LgsFile*>& files, ThreadPool& threadPool);
     LgsFile* parseFile(const directory_entry&) const;
     LgsFile* parseFile(const string& codeText, path absFilePath = "") const;
-    LgsEnvFile* parseEnvFile(path fileEntry) const;
+    LgsEnv* parseEnv(path fileEntry) const;
     LgsMainFile* getMainFile(const vector<LgsFile*>& files) const;
-    void loadBuiltins() const;
+    void loadBuiltins(const vector<LgsEnv*>& envFiles = {}) const;
     bool analyse(const vector<LgsFile*>& files);
     void initPaths(const path& rootDirPath);
     void initLLVM() const;

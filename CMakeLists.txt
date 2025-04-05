@@ -189,7 +189,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libantlr4-runtime.a
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_link_libraries(lgs PRIVATE lib
+    target_link_libraries(lgs PRIVATE
+        lib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libantlr4-runtime.so
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libLLVM.so
     )

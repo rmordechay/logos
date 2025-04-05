@@ -8,19 +8,20 @@
 #include <mutex>
 #include <vector>
 
+struct LgsPaths;
+class LgsEnv;
+
 class ProjectAnalyser final : public LgsAnalyser {
 public:
     std::mutex mtx;
-    const vector<LgsFile*>& files;
-    const vector<LgsFile*>& envFiles;
+    LgsPaths* paths;
+    const vector<LgsFile*> files;
+    const vector<LgsEnv*> envFiles;
 
-    ProjectAnalyser(const vector<LgsFile*>& files, const vector<LgsFile*>& envFiles)
-        : files(files), envFiles(envFiles) {}
-
-    bool analyse() const;
-    void analyseEnvs() const;
-    void analyseStructure() const;
-    void printDuplicateFiles(const map<string, vector<LgsFile*>>& duplicates) const;
+    explicit ProjectAnalyser(LgsPaths* paths) : paths(paths) {}
+    bool analyseStructure() const;
+    void checkDuplicateFiles() const;
+    ~ProjectAnalyser() = default;
 };
 
 #endif //PROJECTANALYSER_H
