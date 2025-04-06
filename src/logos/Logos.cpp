@@ -18,7 +18,7 @@ void Logos::run() {
     CodeGenerator::generateMainModule(paths.buildDir, project.mainFile);
 
     // Linking
-    const LgsLinker linker(paths.objFilePath, paths.execFilePath);
+    const LgsLinker linker(&paths);
     if (!linker.link(modules)) return;
 
     // Running
@@ -32,10 +32,8 @@ bool Logos::analyse(const vector<LgsFile*>& files) {
         threadPool.runTask([=, &file] {
             SemaAnalyser semaAnalyser(file);
             semaAnalyser.analyse();
-            {
-                lock_guard lock(mtx);
-                errors.insert(errors.end(), semaAnalyser.errors.begin(), semaAnalyser.errors.end());
-            }
+            lock_guard lock(mtx);
+            errors.insert(errors.end(), semaAnalyser.errors.begin(), semaAnalyser.errors.end());
         });
     }
     threadPool.wait();
@@ -43,14 +41,14 @@ bool Logos::analyse(const vector<LgsFile*>& files) {
 }
 
 void Logos::initPaths(const path& rootDirPath) {
+    assert(rootDirPath != "");
     paths.rootDir = rootDirPath;
     paths.srcDir = paths.rootDir / LOGOS_SRC_DIR;
     paths.envsDir = paths.rootDir / LOGOS_ENVS_DIR;
     paths.buildDir = paths.rootDir / LOGOS_BUILD_DIR;
-    paths.objFilePath = paths.buildDir / LOGOS_BUILD_DIR;
-    paths.execFilePath = paths.buildDir / LOGOS_BUILD_DIR;
-    paths.mainFilePath = paths.rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
-    assert(paths.rootDir != "");
+    paths.objFilePath = paths.buildDir / OBJECT_FILE;
+    paths.execFilePath = paths.buildDir / EXECUTABLE_FILE;
+    paths.appFilePath = paths.rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
 }
 
 LgsMainFile* Logos::getMainFile(const vector<LgsFile*>& files) const {

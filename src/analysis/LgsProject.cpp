@@ -51,7 +51,7 @@ void LgsProject::loadEnvFiles() {
 }
 
 void LgsProject::setupAppEnv() {
-    parseAppFile(paths->mainFilePath);
+    parseAppFile(paths->appFilePath);
     loadEnvFiles();
     checkEnvs();
 }
@@ -146,10 +146,10 @@ void LgsProject::checkRequiredEnvVars() {
     }
 }
 
-void LgsProject::checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* const envFile) {
+void LgsProject::checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile) {
     auto found = false;
     for (const auto& varDec : envFile->varDecs) {
-        if (requireEnvVar.name == varDec->name && requireEnvVar.type->LgsType::equals(varDec->type)) {
+        if (requireEnvVar.name == varDec->name && requireEnvVar.type->equals(varDec->type)) {
             found = true;
             break;
         }
@@ -166,7 +166,7 @@ bool LgsProject::validateProject() const {
         return false;
     }
 
-    if (!exists(paths->mainFilePath)) {
+    if (!exists(paths->appFilePath)) {
         printError(E10008.msg);
         return false;
     }

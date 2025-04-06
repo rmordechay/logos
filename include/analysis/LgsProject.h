@@ -4,11 +4,7 @@
 #include "LgsAppFile.h"
 #include "LgsEnvFile.h"
 #include "ThreadPool.h"
-#include "../logos/LgsErrors.h"
-
 #include <LgsFile.h>
-#include <LgsData.h>
-#include <mutex>
 #include <vector>
 
 class LgsEnv;

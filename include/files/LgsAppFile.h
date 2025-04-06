@@ -3,6 +3,10 @@
 #include "LgsData.h"
 #include "LgsFile.h"
 
+
+class LgsType;
+class LgsVarDec;
+
 struct RequireEnvVar {
     string name;
     LgsType* type;

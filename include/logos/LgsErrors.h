@@ -13,26 +13,26 @@ struct LgsError {
 };
 
 inline int errCodeStart = 10000;
-inline LgsError E10000{.errCode = errCodeStart, .msg = "main() function is not defined in Main.lgs file."};
-inline LgsError E10001{.errCode = ++errCodeStart, .msg = "The left-hand type '%s' is not equal to the right-hand type '%s'."};
-inline LgsError E10002{.errCode = ++errCodeStart, .msg = "'%s' is not iterable."};
-inline LgsError E10003{.errCode = ++errCodeStart, .msg = "Number of arguments does not much. Expected: %s, Given: %s."};
-inline LgsError E10004{.errCode = ++errCodeStart, .msg = "Function '%s' must return '%s'."};
-inline LgsError E10005{.errCode = ++errCodeStart, .msg = "'%s' is not a member of '%s'."};
-inline LgsError E10006{.errCode = ++errCodeStart, .msg = "'%s' is not defined."};
-inline LgsError E10007{.errCode = ++errCodeStart, .msg = "File name '%s.lgs' is duplicate. All files in a project must be unique. Locations:%s"};
-inline LgsError E10008{.errCode = ++errCodeStart, .msg = "'Main.lgs' could not be found in 'src' directory."};
-inline LgsError E10009{.errCode = ++errCodeStart, .msg = "Duplicate Main files were found in the project. Locations:%s"};
-inline LgsError E10010{.errCode = ++errCodeStart, .msg = "Current path is not a root path of a logos project."};
-inline LgsError E10011{.errCode = ++errCodeStart, .msg = "'%s' is already declared at line %s."};
-inline LgsError E10012{.errCode = ++errCodeStart, .msg = "Function '%s' is not defined."};
-inline LgsError E10013{.errCode = ++errCodeStart, .msg = "Function '%s' is not defined with this overload. Declared overloads:%s"};
-inline LgsError E10014{.errCode = ++errCodeStart, .msg = "Pattern of type '%s' does not match base type '%s'."};
-inline LgsError E10015{.errCode = ++errCodeStart, .msg = "Arguments with types (%s) do not match any overload of the function '%s'"};
-inline LgsError E10016{.errCode = ++errCodeStart, .msg = "Object '%s' does not fully implement '%s'. Missing functions:%s"};
-inline LgsError E10017{.errCode = ++errCodeStart, .msg = "break is not part of a loop."};
-inline LgsError E10018{.errCode = ++errCodeStart, .msg = "Expression of type '%s' cannot be casted to type '%s'."};
-inline LgsError E10019{.errCode = ++errCodeStart, .msg = "activeEnv '%s' could not be found in the envs directory."};
-inline LgsError E10020{.errCode = ++errCodeStart, .msg = "Environment '%s' does not define the required field '%s'."};
+inline LgsError E10000{.msg = "main() function is not defined in Main.lgs file.", .errCode = errCodeStart};
+inline LgsError E10001{.msg = "The left-hand type '%s' is not equal to the right-hand type '%s'.", .errCode = ++errCodeStart};
+inline LgsError E10002{.msg = "'%s' is not iterable.", .errCode = ++errCodeStart};
+inline LgsError E10003{.msg = "Number of arguments does not much. Expected: %s, Given: %s.", .errCode = ++errCodeStart};
+inline LgsError E10004{.msg = "Function '%s' must return '%s'.", .errCode = ++errCodeStart};
+inline LgsError E10005{.msg = "'%s' is not a member of '%s'.", .errCode = ++errCodeStart};
+inline LgsError E10006{.msg = "'%s' is not defined.", .errCode = ++errCodeStart};
+inline LgsError E10007{.msg = "File name '%s.lgs' is duplicate. All files in a project must be unique. Locations:%s", .errCode = ++errCodeStart};
+inline LgsError E10008{.msg = "'Main.lgs' could not be found in 'src' directory.", .errCode = ++errCodeStart};
+inline LgsError E10009{.msg = "Duplicate Main files were found in the project. Locations:%s", .errCode = ++errCodeStart};
+inline LgsError E10010{.msg = "Current path is not a root path of a logos project.", .errCode = ++errCodeStart};
+inline LgsError E10011{.msg = "'%s' is already declared at line %s.", .errCode = ++errCodeStart};
+inline LgsError E10012{.msg = "Function '%s' is not defined.", .errCode = ++errCodeStart};
+inline LgsError E10013{.msg = "Function '%s' is not defined with this overload. Declared overloads:%s", .errCode = ++errCodeStart};
+inline LgsError E10014{.msg = "Pattern of type '%s' does not match base type '%s'.", .errCode = ++errCodeStart};
+inline LgsError E10015{.msg = "Arguments with types (%s) do not match any overload of the function '%s'", .errCode = ++errCodeStart};
+inline LgsError E10016{.msg = "Object '%s' does not fully implement '%s'. Missing functions:%s", .errCode = ++errCodeStart};
+inline LgsError E10017{.msg = "break is not part of a loop.", .errCode = ++errCodeStart};
+inline LgsError E10018{.msg = "Expression of type '%s' cannot be casted to type '%s'.", .errCode = ++errCodeStart};
+inline LgsError E10019{.msg = "activeEnv '%s' could not be found in the envs directory.", .errCode = ++errCodeStart};
+inline LgsError E10020{.msg = "Environment '%s' does not define the required field '%s'.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

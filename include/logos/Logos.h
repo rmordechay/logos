@@ -21,7 +21,7 @@ struct LgsPaths {
     path srcDir;
     path envsDir;
     path buildDir;
-    path mainFilePath;
+    path appFilePath;
     path objFilePath;
     path execFilePath;
 };
