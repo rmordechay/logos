@@ -180,6 +180,7 @@ void SemaAnalyser::visitPatternMatching(const LgsPatternMatching* patternMatchin
     const auto baseExprType = baseExpr->type;
     for (const auto patternExpr : patternMatching->patterns) {
         visitExpr(patternExpr);
+        if (!patternExpr->type) continue;
         if (!patternExpr->type->equals(baseExprType)) {
             handleError(E10014, &patternExpr->location, {patternExpr->type->getName(), baseExprType->getName()});
             return;
