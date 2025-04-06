@@ -26,8 +26,8 @@ public:
   };
 
   enum {
-    RuleLogosFile = 0, RuleLogosEnvFile = 1, RuleLogosAppFile = 2, RuleRequireEnvVars = 3, 
-    RuleMainFile = 4, RuleObjectFile = 5, RuleInterfaceFile = 6, RuleObjectDeclaration = 7, 
+    RuleLogosFile = 0, RuleLogosEnvFile = 1, RuleLogosAppFile = 2, RuleMainFile = 3, 
+    RuleObjectFile = 4, RuleInterfaceFile = 5, RuleRequireEnvVars = 6, RuleObjectDeclaration = 7, 
     RuleInterfaceDeclaration = 8, RuleObjectImplements = 9, RuleFuncSignature = 10, 
     RuleFuncImplementation = 11, RuleFuncBody = 12, RuleParamList = 13, 
     RuleStatement = 14, RuleStatementsBlock = 15, RuleAssignment = 16, RuleExplicitVarDec = 17, 
@@ -61,10 +61,10 @@ public:
   class LogosFileContext;
   class LogosEnvFileContext;
   class LogosAppFileContext;
-  class RequireEnvVarsContext;
   class MainFileContext;
   class ObjectFileContext;
   class InterfaceFileContext;
+  class RequireEnvVarsContext;
   class ObjectDeclarationContext;
   class InterfaceDeclarationContext;
   class ObjectImplementsContext;
@@ -146,24 +146,6 @@ public:
 
   LogosAppFileContext* logosAppFile();
 
-  class  RequireEnvVarsContext : public antlr4::ParserRuleContext {
-  public:
-    RequireEnvVarsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *LBRACE();
-    antlr4::tree::TerminalNode *RBRACE();
-    std::vector<antlr4::tree::TerminalNode *> VARIABLE();
-    antlr4::tree::TerminalNode* VARIABLE(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> COLON();
-    antlr4::tree::TerminalNode* COLON(size_t i);
-    std::vector<TypeContext *> type();
-    TypeContext* type(size_t i);
-
-   
-  };
-
-  RequireEnvVarsContext* requireEnvVars();
-
   class  MainFileContext : public antlr4::ParserRuleContext {
   public:
     MainFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -213,6 +195,24 @@ public:
   };
 
   InterfaceFileContext* interfaceFile();
+
+  class  RequireEnvVarsContext : public antlr4::ParserRuleContext {
+  public:
+    RequireEnvVarsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LBRACE();
+    antlr4::tree::TerminalNode *RBRACE();
+    std::vector<antlr4::tree::TerminalNode *> VARIABLE();
+    antlr4::tree::TerminalNode* VARIABLE(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COLON();
+    antlr4::tree::TerminalNode* COLON(size_t i);
+    std::vector<TypeContext *> type();
+    TypeContext* type(size_t i);
+
+   
+  };
+
+  RequireEnvVarsContext* requireEnvVars();
 
   class  ObjectDeclarationContext : public antlr4::ParserRuleContext {
   public:

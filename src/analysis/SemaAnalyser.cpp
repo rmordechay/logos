@@ -43,7 +43,7 @@ void SemaAnalyser::visitMainFile(const LgsMainFile* mainFile) {
     for (const auto& func : mainFile->funcs) {
         visitFuncImpl(func);
     }
-    visitMainFunc(mainFile->mainFunc);
+    visitFuncImpl(mainFile->mainFunc);
 }
 
 void SemaAnalyser::visitObjectFile(const LgsObjectFile* objectFile) {
@@ -72,10 +72,6 @@ void SemaAnalyser::visitInterface(const LgsInterface* interface) {
             visitParam(param);
         }
     }
-}
-
-void SemaAnalyser::visitMainFunc(LgsFuncImpl* mainFunc) {
-    visitFuncImpl(mainFunc);
 }
 
 void SemaAnalyser::visitFuncImpl(LgsFuncImpl* func) {

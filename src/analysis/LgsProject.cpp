@@ -22,16 +22,16 @@ bool LgsProject::loadProject() {
 }
 
 void LgsProject::loadFiles() {
-    thread t2([this] { loadSrcFiles(); });
-    thread t3([this] { loadGlobals(); });
-    t2.join();
-    t3.join();
+    thread tSrcFiles([this] { loadSrcFiles(); });
+    thread tGlobals([this] { loadGlobals(); });
+    tSrcFiles.join();
+    tGlobals.join();
 }
 
 void LgsProject::loadSrcFiles() {
+    vector<LgsFile*> files;
     ThreadPool threadPool;
     threadPool.start();
-    vector<LgsFile*> files;
     parseSrcFiles(paths->srcDir, threadPool);
     threadPool.wait();
     checkDuplicateFiles();
@@ -50,8 +50,8 @@ void LgsProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
             threadPool.runTask([entry, this] {
                 parseSrcFile(entry);
             });
-        } else if (is_directory(entry.status())) {
-            parseSrcFiles(entry.path(), threadPool);
+        } else if (is_directory(entry.path())) {
+            // parseSrcFiles(entry.path(), threadPool);
         }
     }
 }

@@ -13,7 +13,6 @@ public:
     LgsStmtBlock* elseStmtBlock = nullptr;
 
     explicit LgsPatternMatching(LgsExpr* expr) : expr(expr) {}
-
     Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsPatternMatching() override = default;
 };

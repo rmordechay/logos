@@ -209,12 +209,13 @@ LgsField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, 
 }
 
 LgsStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
-    vector<LgsStmt*> stmts;
+    const auto stmtBlock = new LgsStmtBlock();
+    if (!ctx) return stmtBlock;
     for (const auto& statement : ctx->statement()) {
         auto stmt = getStmt(statement);
-        stmts.emplace_back(stmt);
+        stmtBlock->stmts.emplace_back(stmt);
     }
-    return new LgsStmtBlock(stmts);
+    return stmtBlock;
 }
 
 LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
