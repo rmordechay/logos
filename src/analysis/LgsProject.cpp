@@ -16,9 +16,10 @@ using namespace std;
 
 bool LgsProject::loadProject() {
     if (!validateProject()) return false;
-    setAppEnv();
+    setupAppEnv();
+    if (!successful) return false;
     loadFiles();
-    return true;
+    return successful;
 }
 
 void LgsProject::loadFiles() {
@@ -34,13 +35,24 @@ void LgsProject::loadSrcFiles() {
     threadPool.start();
     parseSrcFiles(paths->srcDir, threadPool);
     threadPool.wait();
-    checkDuplicateFiles();
 }
 
-void LgsProject::setAppEnv() {
-    const auto appFilePath = paths->rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
-    if (!exists(appFilePath)) return;
-    parseAppFile(appFilePath);
+void LgsProject::loadEnvFiles() {
+    vector<LgsEnvFile*> files;
+    ThreadPool threadPool;
+    threadPool.start();
+    for (const auto& entry : directory_iterator(paths->envsDir)) {
+        if (!isLogosFile(entry)) continue;
+        threadPool.runTask([entry, this] {
+            parseEnvFile(entry);
+        });
+    }
+    threadPool.wait();
+}
+
+void LgsProject::setupAppEnv() {
+    parseAppFile(paths->mainFilePath);
+    loadEnvFiles();
     checkEnvs();
 }
 
@@ -51,7 +63,7 @@ void LgsProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
                 parseSrcFile(entry);
             });
         } else if (is_directory(entry.path())) {
-            // parseSrcFiles(entry.path(), threadPool);
+            parseSrcFiles(entry.path(), threadPool);
         }
     }
 }
@@ -89,9 +101,7 @@ void LgsProject::parseAppFile(path fileEntry) {
             version = varDec->expr->asStrConst()->value;
         }
         if (varDec->name == "activeEnv") {
-            const auto activeEnv = varDec->expr->asStrConst()->value;
-            const auto activeEnvPath = paths->envsDir / (activeEnv + LOGOS_FILE_EXTENSION);
-            parseEnvFile(activeEnvPath);
+            activeEnv = varDec->expr->asStrConst()->value;
         }
     }
 }
@@ -103,7 +113,8 @@ void LgsProject::parseEnvFile(path fileEntry) {
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    activeEnv = AntlerConverter::getEnvFile(parser.logosEnvFile(), absFilePath);
+    auto envFile = AntlerConverter::getEnvFile(parser.logosEnvFile(), absFilePath);
+    envFiles.emplace_back(envFile);
 }
 
 string LgsProject::getFileText(path filePath) const {
@@ -114,28 +125,38 @@ string LgsProject::getFileText(path filePath) const {
 }
 
 void LgsProject::loadGlobals() const {
-    globals.funcs[LgsPrint::name] = {
-        new LgsPrint({new LgsParam(new LgsInt())}),
-        new LgsPrint({new LgsParam(new LgsFloat())}),
-        new LgsPrint({new LgsParam(new LgsStr())}),
-        new LgsPrint({new LgsParam(new LgsChar())}),
-        new LgsPrint({new LgsParam(new LgsBool())}),
-    };
-    globals.symbols[LgsSys::name] = LgsSymbol(new LgsSys());
-    globals.symbols[LgsEnvObject::name] = LgsSymbol(new LgsEnvObject());
+    globals.addFunc(new LgsPrint({new LgsParam(new LgsInt())}));
+    globals.addFunc(new LgsPrint({new LgsParam(new LgsFloat())}));
+    globals.addFunc(new LgsPrint({new LgsParam(new LgsStr())}));
+    globals.addFunc(new LgsPrint({new LgsParam(new LgsChar())}));
+    globals.addFunc(new LgsPrint({new LgsParam(new LgsBool())}));
+    globals.addSymbol(LgsSys::name, LgsSymbol(new LgsSys()));
+    globals.addSymbol(LgsEnvObject::name, LgsSymbol(new LgsEnvObject()));
 }
 
-void LgsProject::checkEnvs() const {
+void LgsProject::checkEnvs() {
+    checkRequiredEnvVars();
+}
+
+void LgsProject::checkRequiredEnvVars() {
     for (const auto& requireEnvVar : appFile->requireEnvVars) {
-        auto found = false;
-        for (const auto& varDec : activeEnv->varDecs) {
-            if (requireEnvVar.name == varDec->name) {
-                found = true;
-            }
+        for (const auto envFile : envFiles) {
+            checkRequiredEnvVar(requireEnvVar, envFile);
         }
-        if (!found) {
-            // TODO finis logic
+    }
+}
+
+void LgsProject::checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* const envFile) {
+    auto found = false;
+    for (const auto& varDec : envFile->varDecs) {
+        if (requireEnvVar.name == varDec->name && requireEnvVar.type->LgsType::equals(varDec->type)) {
+            found = true;
+            break;
         }
+    }
+    if (!found) {
+        printError(E10020.msg, {envFile->name, requireEnvVar.name});
+        successful = false;
     }
 }
 
@@ -145,7 +166,7 @@ bool LgsProject::validateProject() const {
         return false;
     }
 
-    if (!exists(paths->srcDir / LOGOS_MAIN_FILE_NAME LOGOS_FILE_EXTENSION)) {
+    if (!exists(paths->mainFilePath)) {
         printError(E10008.msg);
         return false;
     }

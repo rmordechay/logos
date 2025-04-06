@@ -78,7 +78,6 @@ void SemaAnalyser::visitInterface(const LgsInterface* interface) {
 }
 
 void SemaAnalyser::visitFuncImpl(LgsFuncImpl* func) {
-    globals.addFunc(func);
     logosStack.enterScope(func);
     setFuncType(func);
     for (const auto& param : func->signature.params) {

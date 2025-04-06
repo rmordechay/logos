@@ -2,6 +2,7 @@
 
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsMethodImpl.h"
+
 #include "stmts/LgsField.h"
 
 LgsField* LgsType::getField(const string& name) {
@@ -21,6 +22,10 @@ LgsMethodImpl* LgsType::getMethod(const LgsFuncCall* funcCall) const {
         }
     }
     return nullptr;
+}
+
+bool LgsType::equals(const LgsType& other) {
+    return getName() == other.getName();
 }
 
 LgsMethodImpl* LgsType::getMethod(const LgsFuncSignature* signature) const {

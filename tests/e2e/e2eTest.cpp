@@ -1,3 +1,4 @@
+#include "CodeGenerator.h"
 #include "LgsLinker.h"
 #include "Logos.h"
 #include <filesystem>
@@ -14,7 +15,7 @@ protected:
         LgsFile* file = logos.parseFile("main() {print(\"Hello world\")}");
         logos.loadBuiltins();
         logos.analyse({file});
-        logos.generateCode(dynamic_cast<LgsMainFile*>(file));
+        CodeGenerator::generateMainModule(logos.paths.buildDir, logos.project.mainFile);
         const LgsLinker linker(logos.paths.objFilePath, logos.paths.execFilePath);
         linker.link(modules);
     }

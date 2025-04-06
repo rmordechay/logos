@@ -7,8 +7,13 @@
 #include <ranges>
 #include <llvm/Support/FileSystem.h>
 #include "llvm/ADT/ScopeExit.h"
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Target/TargetOptions.h>
+#include <llvm/MC/TargetRegistry.h>
 
-void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* mainFile, const bool writeToFile) {
+void CodeGenerator::generateMainModule(const path& buildDir, const LgsMainFile* mainFile, const bool writeToFile) {
+    initLLVM();
+    create_directories(buildDir);
     const auto module = createEmptryModule(LOGOS_MAIN_FILE_NAME);
     auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
 
@@ -23,7 +28,8 @@ void CodeGenerator::generateModule(const path& buildDir, const LgsMainFile* main
     }
 }
 
-void CodeGenerator::generateModule(const path& buildDir, LgsObject* obj, const bool writeToFile) {
+void CodeGenerator::generateObjModule(const path& buildDir, LgsType* obj, const bool writeToFile) {
+    if (modules.find(obj->getName()) == modules.end()) return;
     const auto objName = obj->getName();
     const auto module = createEmptryModule(objName);
     auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
@@ -45,6 +51,18 @@ Module* CodeGenerator::createEmptryModule(const string& objName) {
     module->setDataLayout(targetMachine->createDataLayout());
     modules[objName] = module;
     return module;
+}
+
+void CodeGenerator::initLLVM() {
+    InitializeNativeTarget();
+    InitializeNativeTargetAsmPrinter();
+    InitializeNativeTargetAsmParser();
+    InitializeAllTargetMCs();
+    InitializeAllTargets();
+    InitializeAllTargetInfos();
+    string error;
+    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
 void CodeGenerator::writeIRToFile(const Module* module, const path& buildDir, const path& name){

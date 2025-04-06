@@ -29,8 +29,9 @@ public:
     vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
     virtual Type* getIRType();
     virtual Type* getIRType(int size);
-    virtual const string getName() const = 0;
+    virtual bool equals(const LgsType& other);
     virtual LgsExpr* getZeroValue() = 0;
+    virtual const string getName() const = 0;
     virtual bool equals(LgsType* other) const = 0;
     virtual LgsType* inferBinaryType(LgsType* other) = 0;
     virtual ~LgsType() = default;

@@ -1,3 +1,4 @@
+#include "CodeGenerator.h"
 #include "Logos.h"
 #include <filesystem>
 #include <gtest/gtest.h>
@@ -60,5 +61,5 @@ TEST_F(CodegenObjectTests, TestObjectWorks) {
     const auto fileObject = logos.parseFile(codeObj);
     logos.loadBuiltins();
     logos.analyse({fileMain, fileObject});
-    logos.generateCode(dynamic_cast<LgsMainFile*>(fileMain));
+    CodeGenerator::generateMainModule(logos.paths.buildDir, logos.project.mainFile);
 }

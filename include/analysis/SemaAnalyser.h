@@ -7,7 +7,6 @@
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "stmts/LgsBreakStmt.h"
-#include "stmts/LgsEnum.h"
 #include "stmts/LgsPatternMatching.h"
 #include "stmts/LgsReturn.h"
 #include <loops/LgsForeachLoop.h>

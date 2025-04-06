@@ -32,5 +32,7 @@ inline LgsError E10015{.errCode = ++errCodeStart, .msg = "Arguments with types (
 inline LgsError E10016{.errCode = ++errCodeStart, .msg = "Object '%s' does not fully implement '%s'. Missing functions:%s"};
 inline LgsError E10017{.errCode = ++errCodeStart, .msg = "break is not part of a loop."};
 inline LgsError E10018{.errCode = ++errCodeStart, .msg = "Expression of type '%s' cannot be casted to type '%s'."};
+inline LgsError E10019{.errCode = ++errCodeStart, .msg = "activeEnv '%s' could not be found in the envs directory."};
+inline LgsError E10020{.errCode = ++errCodeStart, .msg = "Environment '%s' does not define the required field '%s'."};
 
 #endif //LOGOSERRORS_H

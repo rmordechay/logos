@@ -10,21 +10,24 @@
 
 Value* LgsAssignment::createIRValue(CodeGenMetadata* metadata) {
     if (const auto selection = lvalue->asSelection()) {
-        const auto firstExprSymbol = metadata->logosStack.getSymbol(selection->exprs[0]->getName());
-        switch (firstExprSymbol->type) {
-        case VAR_DEC:
-            if (const auto instance = firstExprSymbol->varDec->expr->asInstance()) {
-                const auto nextName = selection->exprs[1]->getName();
-                const auto field = instance->obj->getField(nextName);
-                field->parentExpr = instance;
-                field->setFieldIRValue(metadata, rvalue);
-            }
-            break;
-        default:
-            break;;
-        }
+        createSelection(metadata, selection);
     }
     return nullptr;
+}
+
+void LgsAssignment::createSelection(CodeGenMetadata* metadata, const LgsSelection* selection) const {
+    const auto firstExprSymbol = metadata->logosStack.getSymbol(selection->exprs[0]->getName());
+    switch (firstExprSymbol->type) {
+    case VAR_DEC:
+        if (const auto instance = firstExprSymbol->varDec->expr->asInstance()) {
+            const auto nextName = selection->exprs[1]->getName();
+            const auto field = instance->obj->getField(nextName);
+            field->setFieldIRValue(metadata, rvalue);
+        }
+        break;
+    default:
+        break;;
+    }
 }
 
 LgsAssignment::~LgsAssignment() {

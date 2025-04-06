@@ -183,6 +183,7 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext
     const auto func = new LgsFuncImpl(name, rt, params);
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     func->setLocation(ctx->start);
+    globals.addFunc(func);
     return func;
 }
 
@@ -258,9 +259,10 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
 LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto expr = getExpr(ctx->expr(), !!ctx->QUEST_MARK());
-    const auto logosVarDec = new LgsVarDec(variableName, nullptr, expr);
-    logosVarDec->setLocation(ctx->start);
-    return logosVarDec;
+    const auto varDec = new LgsVarDec(variableName, nullptr, expr);
+    varDec->type = expr->type;
+    varDec->setLocation(ctx->start);
+    return varDec;
 }
 
 LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) {

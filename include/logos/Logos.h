@@ -21,6 +21,7 @@ struct LgsPaths {
     path srcDir;
     path envsDir;
     path buildDir;
+    path mainFilePath;
     path objFilePath;
     path execFilePath;
 };
@@ -30,17 +31,16 @@ public:
     mutex mtx;
     vector<LgsError> errors;
     LgsPaths paths;
+    LgsProject project;
 
-    explicit Logos(const path& rootDirPath) {
+    explicit Logos(const path& rootDirPath) : project(LgsProject(&paths)) {
         initPaths(rootDirPath);
     }
 
     void run();
-    void generateCode(const LgsMainFile* mainFile) const;
     LgsMainFile* getMainFile(const vector<LgsFile*>& files) const;
     bool analyse(const vector<LgsFile*>& files);
     void initPaths(const path& rootDirPath);
-    void initLLVM() const;
     ~Logos() = default;
 };
 

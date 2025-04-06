@@ -1,3 +1,4 @@
+#include "CodeGenerator.h"
 #include "LgsLinker.h"
 #include "Logos.h"
 
@@ -47,7 +48,7 @@ TEST_F(CodegenRangeLoopTests, TestLoopWorks) {
     const auto file = logos.parseFile(code);
     const auto files = {file};
     logos.analyse(files);
-    logos.generateCode(logos.getMainFile(files));
+    CodeGenerator::generateMainModule(logos.paths.buildDir, logos.getMainFile(files));
 
     for (const auto& [name, module] : modules) {
         const auto func = module->getFunction("main");
