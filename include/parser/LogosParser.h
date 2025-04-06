@@ -336,7 +336,6 @@ public:
     antlr4::tree::TerminalNode *CONTINUE();
     BreakStmtContext *breakStmt();
     ReturnStatementContext *returnStatement();
-    EnumDeclarationContext *enumDeclaration();
     FuncCallContext *funcCall();
     SelectionContext *selection();
 

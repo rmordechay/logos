@@ -1,8 +1,8 @@
 #include "CodeGenerator.h"
+
+#include "Logos.h"
 #include "funcs/LgsFuncImpl.h"
 #include "funcs/LgsMethodImpl.h"
-#include "types/LgsObject.h"
-
 #include <LgsMainFile.h>
 #include <ranges>
 #include <llvm/Support/FileSystem.h>
@@ -11,11 +11,13 @@
 #include <llvm/Target/TargetOptions.h>
 #include <llvm/MC/TargetRegistry.h>
 
-void CodeGenerator::generateMainModule(const path& buildDir, const LgsMainFile* mainFile, const bool writeToFile) {
+std::mutex mtx;
+
+void CodeGenerator::generate(const LgsMainFile* mainFile, const bool writeToFile) {
     initLLVM();
-    create_directories(buildDir);
-    const auto module = createEmptryModule(LOGOS_MAIN_FILE_NAME);
-    auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
+    create_directories(paths.buildDir);
+    const auto module = createEmptyModule(LOGOS_MAIN_FILE_NAME);
+    auto metadata = CodeGenMetadata{.module = module};
 
     for (const auto& func : mainFile->funcs) {
         func->createIRValue(&metadata);
@@ -24,15 +26,18 @@ void CodeGenerator::generateMainModule(const path& buildDir, const LgsMainFile* 
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
 
     if (writeToFile) {
-        writeIRToFile(metadata.currentModule, buildDir, LOGOS_MAIN_FILE_NAME);
+        writeIRToFile(metadata.module, LOGOS_MAIN_FILE_NAME);
     }
 }
 
-void CodeGenerator::generateObjModule(const path& buildDir, LgsType* obj, const bool writeToFile) {
-    if (modules.find(obj->getName()) == modules.end()) return;
+void CodeGenerator::generateObjModule(LgsType* obj, const bool writeToFile) {
     const auto objName = obj->getName();
-    const auto module = createEmptryModule(objName);
-    auto metadata = CodeGenMetadata{.currentModule = module, .buildDir = buildDir};
+    if (modules.find(objName) != modules.end()) return;
+    CodeGenMetadata metadata;
+    {
+        lock_guard lock(mtx);
+        metadata.module = createEmptyModule(objName);
+    }
 
     for (const auto& [_, method] : obj->methods) {
         for (const auto& overload : method) {
@@ -41,11 +46,11 @@ void CodeGenerator::generateObjModule(const path& buildDir, LgsType* obj, const 
     }
 
     if (writeToFile) {
-        writeIRToFile(metadata.currentModule, buildDir, objName);
+        writeIRToFile(metadata.module, objName);
     }
 }
 
-Module* CodeGenerator::createEmptryModule(const string& objName) {
+Module* CodeGenerator::createEmptyModule(const string& objName) {
     const auto module = new Module(objName, context);
     module->setTargetTriple(targetTriple);
     module->setDataLayout(targetMachine->createDataLayout());
@@ -65,8 +70,8 @@ void CodeGenerator::initLLVM() {
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
-void CodeGenerator::writeIRToFile(const Module* module, const path& buildDir, const path& name){
-    const auto filePath = (buildDir / name).string() + ".ll";
+void CodeGenerator::writeIRToFile(const Module* module, const path& name){
+    const auto filePath = (paths.buildDir / name).string() + ".ll";
     std::error_code EC;
     raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
     module->print(textFile, nullptr);

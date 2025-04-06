@@ -30,23 +30,23 @@ LgsType* LgsArrayType::inferBinaryType(LgsType* other) {
 }
 
 Value* LgsArrayType::initIRArr(CodeGenMetadata* metadata, const size_t size) const {
-    const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_initArr_Long", initArrIRFuncType);
+    const auto func = metadata->module->getOrInsertFunction("ArrayType_initArr_Long", initArrIRFuncType);
     auto initialCapacity = metadata->builder.getInt64(size);
     return metadata->builder.CreateCall(func, {initialCapacity});
 }
 
 FunctionCallee LgsArrayType::getIRFuncAddElement(const CodeGenMetadata* metadata) const {
-    return metadata->currentModule->getOrInsertFunction("ArrayType_add_ArrayType_Int", addElementIRFuncType);
+    return metadata->module->getOrInsertFunction("ArrayType_add_ArrayType_Int", addElementIRFuncType);
 }
 
 Value* LgsArrayType::getIRFuncGetElement(CodeGenMetadata* metadata, Value* arrPtr, Value* index) const {
-    const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_getElement_ArrayType_Int", getElementIRFuncType);
+    const auto func = metadata->module->getOrInsertFunction("ArrayType_getElement_ArrayType_Int", getElementIRFuncType);
     return metadata->builder.CreateCall(func, {arrPtr, index});
 }
 
 void LgsArrayType::free(CodeGenMetadata* metadata, bool* isFreed, Value* IRValue) const {
     if (*isFreed) return;
-    const auto func = metadata->currentModule->getOrInsertFunction("ArrayType_freeArr_ArrayType", freeArrIRFuncType);
+    const auto func = metadata->module->getOrInsertFunction("ArrayType_freeArr_ArrayType", freeArrIRFuncType);
     metadata->builder.CreateCall(func, {IRValue});
     *isFreed = true;
 }

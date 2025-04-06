@@ -1,5 +1,6 @@
 #ifndef PROJECTANALYSER_H
 #define PROJECTANALYSER_H
+#include "LgsActiveEnv.h"
 #include "LgsAnalyser.h"
 #include "LgsAppFile.h"
 #include "LgsEnvFile.h"
@@ -7,38 +8,36 @@
 #include <LgsFile.h>
 #include <vector>
 
-class LgsEnv;
+class LgsActiveEnv;
 class LgsAppFile;
 class LgsMainFile;
 struct LgsPaths;
-class LgsEnvObject;
+class LgsEnv;
 
 class LgsProject final : public LgsAnalyser {
 public:
     string name;
     string version;
-    string activeEnv;
-    LgsPaths* paths;
+    LgsActiveEnv activeEnv;
     vector<LgsFile*> files;
     vector<LgsEnvFile*> envFiles;
     const LgsMainFile* mainFile = nullptr;
     const LgsAppFile* appFile = nullptr;
     std::mutex mtx;
 
-    explicit LgsProject(LgsPaths* paths) : paths(paths) {}
     bool loadProject();
     void loadFiles();
+    void setEnvVars();
     void loadGlobals() const;
     void checkRequiredEnvVars();
     void loadSrcFiles();
     void loadEnvFiles();
-    void setupAppEnv();
+    void setupActiveEnv();
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
     void parseSrcFile(const directory_entry& entry);
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
     bool validateProject() const;
-    void checkEnvs();
     void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
     void checkDuplicateFiles() const;
     string getFileText(path filePath) const;

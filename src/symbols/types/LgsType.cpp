@@ -48,10 +48,9 @@ vector<LgsMethodImpl*> LgsType::getMethodsOverloads(const string& funcName) cons
 }
 
 Type* LgsType::getIRType() {
-    std::cerr << "Type '" << getName() << "' has no IR type" << std::endl;
     assert(false);
 }
 
 Type* LgsType::getIRType(int size) {
-    assert(false && "type has no IR type");
+    assert(false);
 }

@@ -2,7 +2,7 @@
 #define LGSENVFILE_H
 #include "LgsFile.h"
 
-class LgsEnvObject;
+class LgsEnv;
 class LgsVarDec;
 
 class LgsEnvFile final : public LgsFile {

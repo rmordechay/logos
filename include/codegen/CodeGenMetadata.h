@@ -5,7 +5,6 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Target/TargetMachine.h>
-#include <filesystem>
 #include <llvm/TargetParser/Host.h>
 
 using namespace llvm;
@@ -25,8 +24,7 @@ Type* const voidTy = Type::getVoidTy(context);
 
 struct CodeGenMetadata {
     LgsStack logosStack;
-    Module* currentModule;
-    filesystem::path buildDir;
+    Module* module;
     IRBuilder<> builder = IRBuilder(context);
 };
 

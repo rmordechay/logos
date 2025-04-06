@@ -48,7 +48,7 @@ TEST_F(CodegenRangeLoopTests, TestLoopWorks) {
     const auto file = logos.parseFile(code);
     const auto files = {file};
     logos.analyse(files);
-    CodeGenerator::generateMainModule(logos.paths.buildDir, logos.getMainFile(files));
+    CodeGenerator::generate(logos.getMainFile(files));
 
     for (const auto& [name, module] : modules) {
         const auto func = module->getFunction("main");

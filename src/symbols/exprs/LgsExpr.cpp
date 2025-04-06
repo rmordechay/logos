@@ -16,7 +16,6 @@
 
 Value* LgsExpr::getIRValue(CodeGenMetadata* metadata) {
     if (IRValue) return IRValue;
-    CodeGenerator::generateObjModule(metadata->buildDir, type);
     IRValue = createIRValue(metadata);
     return IRValue;
 }

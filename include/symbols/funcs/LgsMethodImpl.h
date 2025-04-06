@@ -3,7 +3,7 @@
 #include "LgsFunc.h"
 #include "LgsParam.h"
 
-class LgsMethodImpl final : public LgsFunc {
+class LgsMethodImpl : public LgsFunc {
 public:
     LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam*>& params = {})
         : LgsFunc(name, funcType, params, parentName) {}

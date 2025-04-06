@@ -15,10 +15,10 @@ using namespace filesystem;
 
 class CodeGenerator {
 public:
-    static void generateMainModule(const path& buildDir, const LgsMainFile* mainFile, bool writeToFile = true);
-    static void generateObjModule(const path& buildDir, LgsType* obj, bool writeToFile = true);
-    static Module* createEmptryModule(const std::string& objName);
-    static void writeIRToFile(const Module* module, const path& buildDir, const path& name);
+    static void generate(const LgsMainFile* mainFile, bool writeToFile = true);
+    static void generateObjModule(LgsType* obj, bool writeToFile = true);
+    static Module* createEmptyModule(const std::string& objName);
+    static void writeIRToFile(const Module* module, const path& name);
     static void initLLVM();
     ~CodeGenerator() = default;
 };

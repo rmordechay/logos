@@ -23,17 +23,17 @@ add_library(lib STATIC
     include/logos/Logos.h
     include/logos/LgsGlobals.h
     include/logos/ThreadPool.h
-    include/logos/LgsEnv.h
+    include/logos/LgsActiveEnv.h
     include/logos/LgsC.h
+    include/logos/LgsData.h
+    include/logos/LgsStack.h
+    include/logos/LgsErrors.h
     include/files/LgsFile.h
     include/files/LgsAppFile.h
     include/files/LgsEnvFile.h
     include/files/LgsInterfaceFile.h
     include/files/LgsMainFile.h
     include/files/LgsObjectFile.h
-    include/logos/LgsData.h
-    include/logos/LgsStack.h
-    include/logos/LgsErrors.h
     include/codegen/CodeGenerator.h
     include/codegen/CodeGenMetadata.h
     include/codegen/LgsLinker.h
@@ -52,7 +52,7 @@ add_library(lib STATIC
     include/symbols/LgsValue.h
     include/symbols/LgsSymbol.h
     include/symbols/builtin/LgsSys.h
-    include/symbols/builtin/LgsEnvObject.h
+    include/symbols/builtin/LgsEnv.h
     include/symbols/exprs/LgsNull.h
     include/symbols/exprs/LgsExpr.h
     include/symbols/exprs/LgsCast.h
@@ -78,11 +78,9 @@ add_library(lib STATIC
     include/symbols/funcs/LgsParam.h
     include/symbols/funcs/LgsPrint.h
     include/symbols/funcs/LgsFuncSignature.h
-    include/symbols/types/LgsType.h
     include/symbols/loops/LgsForeachLoop.h
     include/symbols/loops/LgsRangeLoop.h
     include/symbols/stmts/LgsField.h
-    include/symbols/stmts/LgsEnum.h
     include/symbols/stmts/LgsPatternMatching.h
     include/symbols/stmts/LgsAssignment.h
     include/symbols/stmts/LgsIfStmt.h
@@ -93,6 +91,7 @@ add_library(lib STATIC
     include/symbols/stmts/LgsVarDec.h
     include/symbols/types/LgsType.h
     include/symbols/types/LgsBool.h
+    include/symbols/types/LgsEnum.h
     include/symbols/types/LgsFloat.h
     include/symbols/types/LgsInt.h
     include/symbols/types/LgsStr.h
@@ -122,7 +121,6 @@ add_library(lib STATIC
     # Symbols src
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsValue.cpp
-    src/symbols/builtin/LgsSys.cpp
     src/symbols/funcs/LgsFunc.cpp
     src/symbols/funcs/LgsParam.cpp
     src/symbols/funcs/LgsPrint.cpp
@@ -151,9 +149,9 @@ add_library(lib STATIC
     src/symbols/stmts/LgsBreakStmt.cpp
     src/symbols/stmts/LgsContinue.cpp
     src/symbols/stmts/LgsStmtBlock.cpp
-    src/symbols/stmts/LgsVarDec.cpp
-    src/symbols/stmts/LgsEnum.cpp
     src/symbols/stmts/LgsPatternMatching.cpp
+    src/symbols/stmts/LgsVarDec.cpp
+    src/symbols/types/LgsEnum.cpp
     src/symbols/types/LgsBool.cpp
     src/symbols/types/LgsInt.cpp
     src/symbols/types/LgsStr.cpp

@@ -28,7 +28,7 @@
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
 #include "stmts/LgsContinue.h"
-#include "stmts/LgsEnum.h"
+#include "../../include/symbols/types/LgsEnum.h"
 #include "stmts/LgsPatternMatching.h"
 
 #include <loops/LgsForeachLoop.h>
@@ -230,7 +230,6 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto ifStmt = ctx->ifStatement()) return getIfStatement(ifStmt);
     if (const auto patternMatching = ctx->patternMatching()) return getPatternMatching(patternMatching);
     if (const auto loopStmt = ctx->loopStatement()) return getLoopStatement(loopStmt);
-    if (const auto enumDec = ctx->enumDeclaration()) return getEnum(enumDec);
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (const auto returnStmt = ctx->returnStatement()) return new LgsReturn(getExpr(returnStmt->expr()));
@@ -333,7 +332,7 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
 }
 
 LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
-    const auto lgsEnum = new LgsEnum();
+    const auto lgsEnum = new LgsEnum(ctx->TYPE()->getText());
     for (size_t i = 0; i < ctx->enumField().size(); ++i) {
         const auto enumField = ctx->enumField()[i];
         const auto enumName = enumField->CONST()->getText();
@@ -344,9 +343,8 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
         }
         EnumField field(i, enumName, enumText);
         field.setLocation(ctx->start);
-        lgsEnum->fields.emplace_back(field);
+        lgsEnum->enums.emplace_back(field);
     }
-    lgsEnum->setLocation(ctx->start);
     globals.addSymbol(ctx->TYPE()->getText(), LgsSymbol(lgsEnum));
     return lgsEnum;
 }

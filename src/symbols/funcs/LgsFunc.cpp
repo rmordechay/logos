@@ -28,7 +28,7 @@ Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
     } else {
         name = signature.composedName;
     }
-    auto func = metadata->currentModule->getOrInsertFunction(name, IRFuncType);
+    auto func = metadata->module->getOrInsertFunction(name, IRFuncType);
     return dyn_cast<Function>(func.getCallee());
 }
 

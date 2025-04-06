@@ -1,5 +1,6 @@
 #ifndef LOGOSSTACK_H
 #define LOGOSSTACK_H
+#include "LgsActiveEnv.h"
 #include "symbols/LgsSymbol.h"
 #include <stack>
 #include <map>
@@ -19,6 +20,7 @@ public:
     mutex mtx;
     LgsFunc* currentFunc = nullptr;
     LgsLoop* currentLoop = nullptr;
+    LgsActiveEnv* activeEnv = nullptr;
 
     void enterScope(LgsFunc* func = nullptr);
     void exitScope(CodeGenMetadata* metadata = nullptr);

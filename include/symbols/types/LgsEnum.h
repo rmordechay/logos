@@ -1,6 +1,6 @@
 #ifndef LGSENUM_H
 #define LGSENUM_H
-#include "LgsStmt.h"
+#include "LgsType.h"
 
 class EnumField final : public LgsValue {
 public:
@@ -12,11 +12,16 @@ public:
     ~EnumField() override = default;
 };
 
-class LgsEnum final : public LgsStmt {
+class LgsEnum final : public LgsType {
 public:
-    vector<EnumField> fields;
+    string name;
+    vector<EnumField> enums;
 
-    Value* createIRValue(CodeGenMetadata* metadata) override;
+    explicit LgsEnum(const string& name) : name(name) {}
+    const string getName() const override;
+    LgsExpr* getZeroValue() override;
+    bool equals(LgsType* other) const override;
+    LgsType* inferBinaryType(LgsType* other) override;
     ~LgsEnum() override = default;
 };
 

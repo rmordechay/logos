@@ -26,21 +26,22 @@ struct LgsPaths {
     path execFilePath;
 };
 
+inline LgsPaths paths;
+
 class Logos {
 public:
     mutex mtx;
     vector<LgsError> errors;
-    LgsPaths paths;
     LgsProject project;
 
-    explicit Logos(const path& rootDirPath) : project(LgsProject(&paths)) {
+    explicit Logos(const path& rootDirPath) {
         initPaths(rootDirPath);
     }
 
     void run();
     LgsMainFile* getMainFile(const vector<LgsFile*>& files) const;
     bool analyse(const vector<LgsFile*>& files);
-    void initPaths(const path& rootDirPath);
+    void initPaths(const path& rootDirPath) const;
     ~Logos() = default;
 };
 

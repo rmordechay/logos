@@ -18,7 +18,7 @@
 #include "exprs/binary/LgsBinaryExpr.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
-#include "stmts/LgsEnum.h"
+#include "../../include/symbols/types/LgsEnum.h"
 #include "stmts/LgsPatternMatching.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsLoop.h>

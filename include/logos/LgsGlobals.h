@@ -2,7 +2,7 @@
 #define LGSGLOBALS_H
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
-#include "stmts/LgsEnum.h"
+#include "../symbols/types/LgsEnum.h"
 #include "stmts/LgsVarDec.h"
 #include "symbols/LgsSymbol.h"
 #include "types/LgsObject.h"

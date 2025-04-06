@@ -15,7 +15,7 @@ void Logos::run() {
     if (!analyse(project.files)) return;
 
     // Code generation
-    CodeGenerator::generateMainModule(paths.buildDir, project.mainFile);
+    CodeGenerator::generate(project.mainFile);
 
     // Linking
     const LgsLinker linker(&paths);
@@ -30,7 +30,7 @@ bool Logos::analyse(const vector<LgsFile*>& files) {
     threadPool.start();
     for (const auto& file : files) {
         threadPool.runTask([=, &file] {
-            SemaAnalyser semaAnalyser(file);
+            SemaAnalyser semaAnalyser(file, &project.activeEnv);
             semaAnalyser.analyse();
             lock_guard lock(mtx);
             errors.insert(errors.end(), semaAnalyser.errors.begin(), semaAnalyser.errors.end());
@@ -40,7 +40,7 @@ bool Logos::analyse(const vector<LgsFile*>& files) {
     return errors.empty();
 }
 
-void Logos::initPaths(const path& rootDirPath) {
+void Logos::initPaths(const path& rootDirPath) const {
     assert(rootDirPath != "");
     paths.rootDir = rootDirPath;
     paths.srcDir = paths.rootDir / LOGOS_SRC_DIR;

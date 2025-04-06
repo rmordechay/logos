@@ -15,7 +15,7 @@ protected:
         LgsFile* file = logos.parseFile("main() {print(\"Hello world\")}");
         logos.loadBuiltins();
         logos.analyse({file});
-        CodeGenerator::generateMainModule(logos.paths.buildDir, logos.project.mainFile);
+        CodeGenerator::generate(logos.project.mainFile);
         const LgsLinker linker(logos.paths.objFilePath, logos.paths.execFilePath);
         linker.link(modules);
     }

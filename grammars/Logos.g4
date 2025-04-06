@@ -70,7 +70,6 @@ statement:
     |   CONTINUE
     |   breakStmt
     |   returnStatement
-    |   enumDeclaration
     |   funcCall
     |   selection
     ;

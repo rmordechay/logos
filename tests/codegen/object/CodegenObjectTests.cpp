@@ -61,5 +61,5 @@ TEST_F(CodegenObjectTests, TestObjectWorks) {
     const auto fileObject = logos.parseFile(codeObj);
     logos.loadBuiltins();
     logos.analyse({fileMain, fileObject});
-    CodeGenerator::generateMainModule(logos.paths.buildDir, logos.project.mainFile);
+    CodeGenerator::generate(logos.project.mainFile);
 }
