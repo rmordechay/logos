@@ -10,6 +10,7 @@ public:
     LgsFuncImpl* mainFunc = nullptr;
     vector<LgsFuncImpl*> funcs;
     vector<LgsEnum*> enums;
+    vector<LgsObject*> objects;
 
     explicit LgsMainFile(const string& path) : LgsFile(LOGOS_MAIN_FILE_NAME, path) {}
     json asJson() const;

@@ -5,27 +5,31 @@ logosFile:
     ;
 
 logosEnvFile:
-        (implicitVarDec | explicitVarDec)*
+        (implicitVarDec | explicitVarDec)* EOF
     ;
 
 logosAppFile:
-        (implicitVarDec | explicitVarDec)* requireEnvVars?
+        (implicitVarDec | explicitVarDec)* requireEnvVars? EOF
     ;
 
 mainFile:
-        enumDeclaration* funcImplementation+ EOF
+        (object | enumDeclaration)* funcImplementation+ EOF
     ;
 
 objectFile:
-        objectDeclaration objectImplements? explicitVarDec* funcImplementation* EOF
+        objectDeclaration objectBody EOF
     ;
 
 interfaceFile:
         interfaceDeclaration explicitVarDec* funcSignature+ funcImplementation* EOF
     ;
 
-requireEnvVars:
-        'require' 'envs' LBRACE (VARIABLE COLON type)* RBRACE
+object:
+        OBJECT TYPE LBRACE objectBody RBRACE
+    ;
+
+objectBody:
+        objectImplements? explicitVarDec* funcImplementation*
     ;
 
 objectDeclaration:
@@ -220,6 +224,10 @@ type:
 
 vector:
         VEC | VEC2 | VEC3 | VEC4
+    ;
+
+requireEnvVars:
+        'require' 'envs' LBRACE (VARIABLE COLON type)* RBRACE
     ;
 
 DOUBLE_EQUAL: '==';

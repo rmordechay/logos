@@ -37,6 +37,9 @@ void SemaAnalyser::analyse() {
 }
 
 void SemaAnalyser::visitMainFile(const LgsMainFile* mainFile) {
+    for (const auto& obj : mainFile->objects) {
+        visitObject(obj);
+    }
     for (const auto& lgsEnum : mainFile->enums) {
         visitEnum(lgsEnum);
     }

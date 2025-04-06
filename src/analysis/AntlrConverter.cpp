@@ -52,6 +52,34 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
     return logosFile;
 }
 
+LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, const string& filePath) {
+    const auto funcImplementations = ctx->funcImplementation();
+    const auto mainFile = new LgsMainFile(filePath);
+
+    for (const auto& lgsEnum : ctx->enumDeclaration()) {
+        mainFile->enums.emplace_back(getEnum(lgsEnum));
+    }
+
+    for (const auto& object : ctx->object()) {
+        auto obj = getObject(object->objectBody(), object->TYPE()->getText());
+        mainFile->objects.emplace_back(obj);
+    }
+
+    for (const auto& func : funcImplementations) {
+        auto funcName = func->funcSignature()->VARIABLE()->getText();
+        if (funcName == LOGOS_MAIN_FUNC) {
+            const auto mainFunc = new LgsFuncImpl(LOGOS_MAIN_FUNC, new LgsInt());
+            mainFile->mainFunc = mainFunc;
+            const auto statementsBlock = func->funcBody()->statementsBlock();
+            mainFunc->stmtBlock = getStmtBlock(statementsBlock);
+        } else {
+            auto logosFunc = getFuncImpl(func);
+            mainFile->funcs.emplace_back(logosFunc);
+        }
+    }
+    return mainFile;
+}
+
 LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath) {
     vector<LgsVarDec*> varDecs;
     for (const auto& explicitVarDec : ctx->explicitVarDec()) {
@@ -61,6 +89,20 @@ LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx, c
         varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
     }
     return new LgsEnvFile(filePath, varDecs);
+}
+
+LgsObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath) {
+    const auto objName = ctx->objectDeclaration()->TYPE()->getText();
+    const auto objFile = new LgsObjectFile(objName, filePath);
+    objFile->obj = getObject(ctx->objectBody(), objName);
+    return objFile;
+}
+
+LgsFile* AntlerConverter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath) {
+    const auto interfaceName = ctx->interfaceDeclaration()->TYPE()->getText();
+    const auto interfaceFile = new LgsInterfaceFile(interfaceName, filePath);
+    interfaceFile->interface = getInterface(ctx, interfaceName);
+    return interfaceFile;
 }
 
 LgsAppFile* AntlerConverter::getAppFile(LogosParser::LogosAppFileContext* ctx, const path& filePath) {
@@ -86,45 +128,7 @@ LgsAppFile* AntlerConverter::getAppFile(LogosParser::LogosAppFileContext* ctx, c
     return appFile;
 }
 
-LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, const string& filePath) {
-    const auto funcImplementations = ctx->funcImplementation();
-    const auto mainFile = new LgsMainFile(filePath);
-
-    for (const auto& lgsEnum : ctx->enumDeclaration()) {
-        mainFile->enums.emplace_back(getEnum(lgsEnum));
-    }
-
-    for (const auto& func : funcImplementations) {
-        auto funcName = func->funcSignature()->VARIABLE()->getText();
-        if (funcName == LOGOS_MAIN_FUNC) {
-            const auto mainFunc = new LgsFuncImpl(LOGOS_MAIN_FUNC, new LgsInt());
-            mainFile->mainFunc = mainFunc;
-            const auto statementsBlock = func->funcBody()->statementsBlock();
-            mainFunc->stmtBlock = getStmtBlock(statementsBlock);
-        } else {
-            auto logosFunc = getFuncImpl(func);
-            mainFile->funcs.emplace_back(logosFunc);
-        }
-    }
-    return mainFile;
-}
-
-LgsObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath) {
-    const auto objName = ctx->objectDeclaration()->TYPE()->getText();
-    const auto objFile = new LgsObjectFile(objName, filePath);
-    objFile->obj = getObject(ctx);
-    return objFile;
-}
-
-LgsFile* AntlerConverter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath) {
-    const auto interfaceName = ctx->interfaceDeclaration()->TYPE()->getText();
-    const auto interfaceFile = new LgsInterfaceFile(interfaceName, filePath);
-    interfaceFile->interface = getInterface(ctx, interfaceName);
-    return interfaceFile;
-}
-
-LgsObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
-    const auto objName = ctx->objectDeclaration()->TYPE()->getText();
+LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName) {
     const auto obj = new LgsObject(objName);
     for (int i = 0; i < ctx->explicitVarDec().size(); ++i) {
         const auto varDec = ctx->explicitVarDec()[i];
