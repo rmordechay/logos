@@ -186,7 +186,7 @@ void LgsProject::checkDuplicateFiles() const {
     }
 }
 
-void LgsProject::setEnvVars() {
+void LgsProject::setEnvVars() const {
     for (char **env = environ; *env != nullptr; ++env) {
         string entry(*env);
         const auto pos = entry.find('=');
@@ -194,7 +194,6 @@ void LgsProject::setEnvVars() {
             auto key = entry.substr(0, pos);
             const auto value = entry.substr(pos + 1);
             activeEnv.envVars[key] = value;
-            std::cout << key << '=' << value << '\n';
         }
     }
 }

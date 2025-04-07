@@ -1,5 +1,6 @@
 #include "funcs/LgsFunc.h"
 
+#include "exprs/LgsExpr.h"
 #include "funcs/LgsParam.h"
 #include "types/LgsVoid.h"
 
@@ -18,6 +19,18 @@ void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
         metadata->builder.CreateRetVoid();
     }
     metadata->logosStack.exitScope(metadata);
+}
+
+Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
+    const auto IRFunc = getIRFunc(metadata);
+    vector<Value*> argValues;
+    const auto size = signature.isStatic ? 1 : 0;
+    for (int i = size; i < args.size(); ++i) {
+        const auto arg = args[i];
+        const auto argValue = arg->getIRValue(metadata);
+        argValues.emplace_back(argValue);
+    }
+    return metadata->builder.CreateCall(IRFunc, argValues);
 }
 
 Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {

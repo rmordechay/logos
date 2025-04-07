@@ -18,7 +18,6 @@ class LgsProject final : public LgsAnalyser {
 public:
     string name;
     string version;
-    LgsActiveEnv activeEnv;
     vector<LgsFile*> files;
     vector<LgsEnvFile*> envFiles;
     const LgsMainFile* mainFile = nullptr;
@@ -27,7 +26,7 @@ public:
 
     bool loadProject();
     void loadFiles();
-    void setEnvVars();
+    void setEnvVars() const;
     void loadGlobals() const;
     void checkRequiredEnvVars();
     void loadSrcFiles();

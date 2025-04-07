@@ -10,6 +10,7 @@
 using namespace llvm;
 
 inline LLVMContext context;
+inline LgsActiveEnv activeEnv;
 inline map<string, Module*> modules;
 inline TargetMachine* targetMachine = nullptr;
 inline string targetTriple = sys::getDefaultTargetTriple();

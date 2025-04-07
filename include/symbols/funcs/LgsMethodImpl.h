@@ -5,8 +5,7 @@
 
 class LgsMethodImpl : public LgsFunc {
 public:
-    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam*>& params = {})
-        : LgsFunc(name, funcType, params, parentName) {}
+    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam*>& params = {}) : LgsFunc(name, funcType, params, parentName) {}
     void setIRFuncType() override;
     ~LgsMethodImpl() override = default;
 };

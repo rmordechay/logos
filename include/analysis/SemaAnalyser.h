@@ -32,9 +32,7 @@ public:
     LgsFile* file = nullptr;
     vector<LgsError> errors;
 
-    explicit SemaAnalyser(LgsFile* logosFile, LgsActiveEnv* activeEnv) : file(logosFile) {
-        logosStack.activeEnv = activeEnv;
-    }
+    explicit SemaAnalyser(LgsFile* logosFile) : file(logosFile) {}
     void analyse();
     void visitMainFile(const LgsMainFile* mainFile);
     void visitObjectFile(const LgsObjectFile* objectFile);

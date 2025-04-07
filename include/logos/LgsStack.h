@@ -20,7 +20,6 @@ public:
     mutex mtx;
     LgsFunc* currentFunc = nullptr;
     LgsLoop* currentLoop = nullptr;
-    LgsActiveEnv* activeEnv = nullptr;
 
     void enterScope(LgsFunc* func = nullptr);
     void exitScope(CodeGenMetadata* metadata = nullptr);

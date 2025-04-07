@@ -30,7 +30,7 @@ bool Logos::analyse(const vector<LgsFile*>& files) {
     threadPool.start();
     for (const auto& file : files) {
         threadPool.runTask([=, &file] {
-            SemaAnalyser semaAnalyser(file, &project.activeEnv);
+            SemaAnalyser semaAnalyser(file);
             semaAnalyser.analyse();
             lock_guard lock(mtx);
             errors.insert(errors.end(), semaAnalyser.errors.begin(), semaAnalyser.errors.end());
