@@ -62,28 +62,28 @@ public:
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
-    void setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable);
-    void setMethod(const LgsType* parent, LgsFuncCall* methodCall);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parent);
-    void setVariableType(LgsVariable* variable);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
     void visitFirstSelection(LgsExpr* firstExpr);
     void visitInstance(LgsInstance* instance);
     void visitArrayIndex(LgsArrayIndex* arrayIndex);
 
+    void setMethod(const LgsType* parent, LgsFuncCall* methodCall);
     void setFuncType(LgsFunc* func);
     void setExprType(LgsExpr* expr, LgsType* type);
+    void setVariableType(LgsVariable* variable);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
+    void setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
     bool checkExprType(const LgsExpr* expr, LgsType* userType);
     void checkObjectImplements(LgsObject* obj);
-    void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args);
     LgsType* resolveType(LgsType* type);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     bool resolveFuncCall(LgsFuncCall* funcCall);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
+    void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args);
     Location* getSymbolLocation(const LgsSymbol* symbol) const;
     ~SemaAnalyser() = default;
 };

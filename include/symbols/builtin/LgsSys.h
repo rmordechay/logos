@@ -7,7 +7,7 @@
 class LgsSys final : public LgsObject {
 public:
     static constexpr auto name = "Sys";
-    LgsMethodImpl exitFunc = LgsMethodImpl("exit", new LgsVoid(), name, {new LgsParam(this), new LgsParam(new LgsInt())});
+    LgsMethodImpl exitFunc = LgsMethodImpl("exit", new LgsVoid(), name, {LgsParam(this), LgsParam(new LgsInt())});
 
     explicit LgsSys() : LgsObject(name) {
         setExitFunc();

@@ -18,7 +18,7 @@ public:
     FunctionType* IRFuncType = nullptr;
     BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
 
-    explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam*>& params, const string& parentName = "")
+    explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam>& params, const string& parentName = "")
         : signature(LgsFuncSignature(name, parentName, funcType, params)) {
     }
 

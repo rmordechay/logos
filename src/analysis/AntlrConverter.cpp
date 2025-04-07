@@ -29,6 +29,7 @@
 #include "stmts/LgsBreakStmt.h"
 #include "stmts/LgsContinue.h"
 #include "../../include/symbols/types/LgsEnum.h"
+#include "exprs/unary/LgsEnumField.h"
 #include "stmts/LgsPatternMatching.h"
 
 #include <loops/LgsForeachLoop.h>
@@ -154,11 +155,11 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceFileContext* c
     const auto interfaceName = ctx->interfaceDeclaration()->TYPE()->getText();
     const auto interface = new LgsInterface(interfaceName);
     for (const auto& funcSignature : ctx->funcSignature()) {
-        vector<LgsParam*> params;
+        vector<LgsParam> params;
         if (funcSignature->paramList()) {
             for (const auto& varDec : funcSignature->paramList()->explicitVarDec()) {
                 auto param = getParam(varDec);
-                params.emplace_back(param);
+                params.emplace_back(*param);
             }
         }
         const auto type = getType(funcSignature->type());
@@ -173,11 +174,11 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext
     const auto rt = getFuncType(ctx);
     const auto signature = ctx->funcSignature();
     const auto name = signature->VARIABLE()->getText();
-    vector<LgsParam*> params;
+    vector<LgsParam> params;
     if (signature->paramList()) {
         for (const auto& varDec : signature->paramList()->explicitVarDec()) {
-            auto param = getParam(varDec);
-            params.emplace_back(param);
+            const auto param = getParam(varDec);
+            params.emplace_back(*param);
         }
     }
     const auto func = new LgsFuncImpl(name, rt, params);
@@ -191,12 +192,12 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationCon
     const auto rt = getFuncType(ctx);
     const auto signature = ctx->funcSignature();
     const auto name = signature->VARIABLE()->getText();
-    const auto self = new LgsParam(LOGOS_SELF, obj, new LgsInstance(obj));
+    const auto self = LgsParam(LOGOS_SELF, obj, new LgsInstance(obj));
     vector params = {self};
     if (signature->paramList()) {
         for (const auto& varDec : signature->paramList()->explicitVarDec()) {
-            auto param = getParam(varDec);
-            params.emplace_back(param);
+            const auto param = getParam(varDec);
+            params.emplace_back(*param);
         }
     }
     const auto method = new LgsMethodImpl(name, rt, obj->name, params);
@@ -341,8 +342,8 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
             enumText = enumField->STRING()->getText();
             LgsStr::cleanStr(enumText);
         }
-        EnumField field(i, enumName, enumText);
-        field.setLocation(ctx->start);
+        const auto field = new LgsEnumField(i, enumName, enumText);
+        field->setLocation(ctx->start);
         lgsEnum->enums.emplace_back(field);
     }
     globals.addSymbol(ctx->TYPE()->getText(), LgsSymbol(lgsEnum));

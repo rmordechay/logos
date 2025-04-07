@@ -126,11 +126,11 @@ string LgsProject::getFileText(path filePath) const {
 }
 
 void LgsProject::loadGlobals() const {
-    globals.addFunc(new LgsPrint({new LgsParam(new LgsInt())}));
-    globals.addFunc(new LgsPrint({new LgsParam(new LgsFloat())}));
-    globals.addFunc(new LgsPrint({new LgsParam(new LgsStr())}));
-    globals.addFunc(new LgsPrint({new LgsParam(new LgsChar())}));
-    globals.addFunc(new LgsPrint({new LgsParam(new LgsBool())}));
+    globals.addFunc(new LgsPrint({LgsParam(new LgsInt())}));
+    globals.addFunc(new LgsPrint({LgsParam(new LgsFloat())}));
+    globals.addFunc(new LgsPrint({LgsParam(new LgsStr())}));
+    globals.addFunc(new LgsPrint({LgsParam(new LgsChar())}));
+    globals.addFunc(new LgsPrint({LgsParam(new LgsBool())}));
     globals.addSymbol(LgsSys::name, LgsSymbol(new LgsSys()));
     globals.addSymbol(LgsEnv::name, LgsSymbol(new LgsEnv()));
 }

@@ -5,7 +5,7 @@
 
 class LgsMethodImpl : public LgsFunc {
 public:
-    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam*>& params = {}) : LgsFunc(name, funcType, params, parentName) {}
+    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam>& params = {}) : LgsFunc(name, funcType, params, parentName) {}
     void setIRFuncType() override;
     ~LgsMethodImpl() override = default;
 };
@@ -15,7 +15,7 @@ inline void LgsMethodImpl::setIRFuncType() {
         IRParamsTypes.emplace_back(ptrTy);
     }
     for (int i = 1; i < signature.params.size(); ++i) {
-        auto paramIRType = signature.params[i]->type->getIRType();
+        auto paramIRType = signature.params[i].type->getIRType();
         IRParamsTypes.emplace_back(paramIRType);
     }
     IRFuncType = FunctionType::get(signature.type->getIRType(), IRParamsTypes, false);

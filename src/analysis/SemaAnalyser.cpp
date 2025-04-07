@@ -71,8 +71,8 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
 
 void SemaAnalyser::visitInterface(const LgsInterface* interface) {
     for (const auto& funcSignature : interface->funcSignatures) {
-        for (const auto& param : funcSignature->params) {
-            visitParam(param);
+        for (auto& param : funcSignature->params) {
+            visitParam(&param);
         }
     }
 }
@@ -80,8 +80,8 @@ void SemaAnalyser::visitInterface(const LgsInterface* interface) {
 void SemaAnalyser::visitFuncImpl(LgsFuncImpl* func) {
     logosStack.enterScope(func);
     setFuncType(func);
-    for (const auto& param : func->signature.params) {
-        visitParam(param);
+    for (auto& param : func->signature.params) {
+        visitParam(&param);
     }
     visitStmtBlock(func->stmtBlock);
     logosStack.exitScope();
@@ -90,8 +90,8 @@ void SemaAnalyser::visitFuncImpl(LgsFuncImpl* func) {
 void SemaAnalyser::visitMethodImpl(LgsMethodImpl* method) {
     logosStack.enterScope(method);
     setFuncType(method);
-    for (const auto& param : method->signature.params) {
-        visitParam(param);
+    for (auto& param : method->signature.params) {
+        visitParam(&param);
     }
     visitStmtBlock(method->stmtBlock);
     logosStack.exitScope();

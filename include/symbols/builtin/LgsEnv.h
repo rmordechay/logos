@@ -9,7 +9,7 @@ class LgsEnvGetFunc final : public LgsMethodImpl {
 public:
     static constexpr auto name = "Env";
 
-    explicit LgsEnvGetFunc(LgsType* parentType) : LgsMethodImpl("get", new LgsStr(), name, {new LgsParam(parentType), new LgsParam(new LgsStr()), new LgsParam(new LgsStr())}) {
+    explicit LgsEnvGetFunc(LgsType* parentType) : LgsMethodImpl("get", new LgsStr(), name, {LgsParam(parentType), LgsParam(new LgsStr()), LgsParam(new LgsStr())}) {
         IRFuncType = FunctionType::get(ptrTy, {ptrTy, ptrTy}, false);
         signature.isStatic = true;
     }

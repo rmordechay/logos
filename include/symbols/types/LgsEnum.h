@@ -1,21 +1,14 @@
 #ifndef LGSENUM_H
 #define LGSENUM_H
 #include "LgsType.h"
+#include "exprs/unary/LgsUnaryExpr.h"
 
-class EnumField final : public LgsValue {
-public:
-    size_t position;
-    string name;
-    string text;
-
-    EnumField(size_t position, const string& name, const string& text) : position(position), name(name), text(text) {}
-    ~EnumField() override = default;
-};
+class LgsEnumField;
 
 class LgsEnum final : public LgsType {
 public:
     string name;
-    vector<EnumField> enums;
+    vector<LgsEnumField*> enums;
 
     explicit LgsEnum(const string& name) : name(name) {}
     const string getName() const override;

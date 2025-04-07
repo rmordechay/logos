@@ -162,9 +162,11 @@ add_library(lib STATIC
     src/symbols/types/LgsArrayType.cpp
     src/symbols/types/LgsInterface.cpp
     src/symbols/types/LgsObject.cpp
+    src/symbols/exprs/unary/LgsEnumField.cpp
 )
 
-add_executable(lgs main.cpp)
+add_executable(lgs main.cpp
+    include/symbols/exprs/unary/LgsEnumField.h)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE

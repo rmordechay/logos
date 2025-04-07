@@ -8,10 +8,10 @@ void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     metadata->logosStack.enterScope(this);
     const auto IRFunc = getIRFunc(metadata);
     auto args = IRFunc->arg_begin();
-    for (const auto& param : signature.params) {
-        metadata->logosStack.addLocalSymbol(param->name, param);
-        param->setIRValue(args);
-        args++->setName(param->name);
+    for (auto& param : signature.params) {
+        metadata->logosStack.addLocalSymbol(param.name, &param);
+        param.setIRValue(args);
+        args++->setName(param.name);
     }
     startBlock(metadata, entryBlock);
     stmtBlock->createIRValue(metadata);
@@ -49,8 +49,8 @@ json LgsFunc::asJson() {
     json tree;
     tree["name"] = signature.name;
     tree["returnType"] = signature.type->getName();
-    for (const auto& param : signature.params) {
-        tree["params"].emplace_back(param->asJson());
+    for (auto& param : signature.params) {
+        tree["params"].emplace_back(param.asJson());
     }
     tree["stmts"] = stmtBlock->asJson();
     return tree;

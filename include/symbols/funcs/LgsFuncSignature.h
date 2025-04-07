@@ -13,10 +13,10 @@ struct LgsFuncSignature {
     string internalName;
     string parentName;
     LgsType* type;
-    vector<LgsParam*> params;
+    vector<LgsParam> params;
     bool isStatic = false;
 
-    LgsFuncSignature(const string& name, const string& parentName, LgsType* type, const vector<LgsParam*>& params)
+    LgsFuncSignature(const string& name, const string& parentName, LgsType* type, const vector<LgsParam>& params)
         : name(name), parentName(parentName), type(type), params(params) {
         setIRName();
     }
@@ -24,7 +24,7 @@ struct LgsFuncSignature {
     void setIRName() {
         vector<string> argTypeNames;
         for (const auto& param : params) {
-            argTypeNames.emplace_back(param->type->getName());
+            argTypeNames.emplace_back(param.type->getName());
         }
         composedName = getComposedName(name, parentName, argTypeNames);
     }
@@ -39,13 +39,6 @@ struct LgsFuncSignature {
             strStream << "_" + argTypeNames[i];
         }
         return strStream.str();
-    }
-
-    ~LgsFuncSignature() {
-        const auto size = isStatic ? 1 : 0;
-        for (int i = size; i < params.size(); ++i) {
-            delete params[i];
-        }
     }
 };
 
