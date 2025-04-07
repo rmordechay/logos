@@ -8,7 +8,6 @@ class LgsEnumField;
 class LgsEnum final : public LgsType {
 public:
     string name;
-    vector<LgsEnumField*> enums;
 
     explicit LgsEnum(const string& name) : name(name) {}
     const string getName() const override;

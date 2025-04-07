@@ -158,7 +158,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceFileContext* c
         vector<LgsParam> params;
         if (funcSignature->paramList()) {
             for (const auto& varDec : funcSignature->paramList()->explicitVarDec()) {
-                auto param = getParam(varDec);
+                const auto param = getParam(varDec);
                 params.emplace_back(*param);
             }
         }
@@ -211,7 +211,7 @@ LgsField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, 
     const auto name = varDec->VARIABLE()->getText();
     const auto type = getType(varDec->type());
     const auto expr = getExpr(varDec->expr());
-    return new LgsField(name, parentName, position, type, expr);
+    return new LgsField(name, position, type, expr);
 }
 
 LgsStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
@@ -342,11 +342,11 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
             enumText = enumField->STRING()->getText();
             LgsStr::cleanStr(enumText);
         }
-        const auto field = new LgsEnumField(i, enumName, enumText);
+        const auto field = new LgsEnumField(enumName, i, enumText);
         field->setLocation(ctx->start);
-        lgsEnum->enums.emplace_back(field);
+        lgsEnum->fields[enumName] = field;
     }
-    globals.addSymbol(ctx->TYPE()->getText(), LgsSymbol(lgsEnum));
+    globals.addEnum(lgsEnum);
     return lgsEnum;
 }
 

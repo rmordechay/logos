@@ -21,6 +21,6 @@ Value* LgsField::getGEP(CodeGenMetadata* metadata) {
     if (gep) return gep;
     const auto parentTy = parentExpr->type->getIRType();
     const auto self = parentExpr->getIRValue(metadata);
-    gep = metadata->builder.CreateStructGEP(parentTy, self, fieldPosition);
+    gep = metadata->builder.CreateStructGEP(parentTy, self, position);
     return gep;
 }

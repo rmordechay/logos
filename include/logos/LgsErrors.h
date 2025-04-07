@@ -34,5 +34,8 @@ inline LgsError E10017{.msg = "break is not part of a loop.", .errCode = ++errCo
 inline LgsError E10018{.msg = "Expression of type '%s' cannot be casted to type '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10019{.msg = "activeEnv '%s' could not be found in the envs directory.", .errCode = ++errCodeStart};
 inline LgsError E10020{.msg = "Environment '%s' does not define the required field '%s'.", .errCode = ++errCodeStart};
+inline LgsError E10021{.msg = "Duplicate fields were found in enum '%'.", .errCode = ++errCodeStart};
+inline LgsError E10022{.msg = "'%s' cannot be instantiated.", .errCode = ++errCodeStart};
+inline LgsError E10023{.msg = "Type of variable '%s' must be nullable. Change the type to %s? or set a value.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

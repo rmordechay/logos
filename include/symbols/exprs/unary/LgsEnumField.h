@@ -1,14 +1,13 @@
 #ifndef LGSENUMFIELD_H
 #define LGSENUMFIELD_H
 #include "LgsUnaryExpr.h"
+#include "stmts/LgsField.h"
 
-class LgsEnumField final : public LgsUnaryExpr {
+class LgsEnumField final : public LgsField {
 public:
-    size_t position;
-    string name;
     string text;
 
-    LgsEnumField(const size_t position, const string& name, const string& text) : position(position), name(name), text(text) {}
+    LgsEnumField(const string& name, const size_t position, const string& text) : LgsField(name, position, nullptr, nullptr), text(text){}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsEnumField() override = default;
 };

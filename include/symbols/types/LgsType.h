@@ -27,7 +27,6 @@ public:
     LgsMethodImpl* getMethod(const LgsFuncCall* funcCall) const;
     LgsMethodImpl* getMethod(const LgsFuncSignature* signature) const;
     vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
-    Type* getIRType2(CodeGenMetadata* metadata);
     virtual Type* getIRType();
     virtual Type* getIRType(int size);
     virtual bool equals(const LgsType& other);

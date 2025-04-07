@@ -11,8 +11,12 @@ using namespace std;
 class LgsConstExpr : public LgsUnaryExpr {
 public:
     explicit LgsConstExpr(LgsType* type) : LgsUnaryExpr(type) {}
-    ~LgsConstExpr() override = default;
+    ~LgsConstExpr() override;
 };
+
+inline LgsConstExpr::~LgsConstExpr() {
+    delete type;
+}
 
 
 #endif //LOGOSCONSTANTEXPR_H

@@ -21,9 +21,17 @@ void LgsStack::exitScope(CodeGenMetadata* metadata) {
 }
 
 LgsSymbol* LgsStack::getSymbol(const string& name) {
-    // Globals
+    // Globals symbols
     if (globals.symbols.find(name) != globals.symbols.end()) {
         return &globals.symbols[name];
+    }
+    // Globals enums
+    for (auto& [_, enumSymbol] : globals.enums) {
+        if (enumSymbol.lgsEnum->name == name) return &enumSymbol;
+        for (auto [_, field] : enumSymbol.lgsEnum->fields) {
+            if (name != field->name) continue;
+            return &enumSymbol;
+        }
     }
     if (size() == 0) return nullptr;
     // Locals
@@ -79,3 +87,4 @@ void LgsStack::reset() {
         pop();
     }
 }
+

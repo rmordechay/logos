@@ -9,7 +9,7 @@ const string LgsEnum::getName() const {
 }
 
 bool LgsEnum::equals(LgsType* other) const {
-    assert(false);
+    return name == other->getName();
 }
 
 LgsType* LgsEnum::inferBinaryType(LgsType* other) {

@@ -37,6 +37,7 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsInterface* interface);
     explicit LgsSymbol(LgsEnum* lgsEnum);
     void free(CodeGenMetadata* metadata) const;
+    ~LgsSymbol() = default;
 };
 
 #endif //LOGOSSYMBOL_H

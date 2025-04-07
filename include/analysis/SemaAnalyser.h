@@ -35,17 +35,16 @@ public:
     explicit SemaAnalyser(LgsFile* logosFile) : file(logosFile) {}
     void analyse();
     void visitMainFile(const LgsMainFile* mainFile);
-    void visitObjectFile(const LgsObjectFile* objectFile);
-    void visitInterfaceFile(const LgsInterfaceFile* interfaceFile);
     void visitObject(LgsObject* obj);
     void visitInterface(const LgsInterface* interface);
-    void visitField(const LgsField* field);
+    void visitField(LgsField* field);
     void visitMethodImpl(LgsMethodImpl* method);
     void visitFuncImpl(LgsFuncImpl* func);
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
     void visitStmtBlock(const LgsStmtBlock* stmtBlock);
     void visitAssignment(const LgsAssignment* assignment);
+    void setVarDecType(LgsVarDec* varDec);
     void visitVarDec(LgsVarDec* varDec);
     void visitIfStmt(const LgsIfStmt* ifStmt);
     void visitPatternMatching(const LgsPatternMatching* patternMatching);
@@ -54,8 +53,8 @@ public:
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);
     void visitForeachLoop(const LgsForeachLoop* foreachLoop);
     void visitReturnStmt(const LgsReturn* returnStmt);
-    void visitBreakStmt(LgsBreakStmt* breakStmt);
-    void visitEnum(LgsEnum* lgsEnum);
+    void visitBreakStmt(LgsBreakStmt* breakStmt) const;
+    void visitEnum(const LgsEnum* lgsEnum) const;
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
     void visitArray(const LgsArray* array);
@@ -77,13 +76,13 @@ public:
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     void setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
-    bool checkExprType(const LgsExpr* expr, LgsType* userType);
+    bool compareExprType(LgsExpr* expr, LgsType* userType);
     void checkObjectImplements(LgsObject* obj);
     LgsType* resolveType(LgsType* type);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     bool resolveFuncCall(LgsFuncCall* funcCall);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
-    void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args);
+    void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});
     Location* getSymbolLocation(const LgsSymbol* symbol) const;
     ~SemaAnalyser() = default;
 };
