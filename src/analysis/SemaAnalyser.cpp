@@ -18,7 +18,7 @@
 #include "exprs/binary/LgsBinaryExpr.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
-#include "../../include/symbols/types/LgsEnum.h"
+#include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "stmts/LgsPatternMatching.h"
 #include <loops/LgsForeachLoop.h>
@@ -103,8 +103,8 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
         visitPatternMatching(patternMatching);
     } else if (const auto loopStmt = dynamic_cast<LgsLoop*>(stmt)) {
         visitLoopStmt(loopStmt);
-    } else if (const auto fieldDef = dynamic_cast<LgsAssignment*>(stmt)) {
-        visitAssignment(fieldDef);
+    } else if (const auto assignment = dynamic_cast<LgsAssignment*>(stmt)) {
+        visitAssignment(assignment);
     } else if (const auto funcCall = dynamic_cast<LgsFuncCall*>(stmt)) {
         visitFuncCall(funcCall);
     } else if (const auto selection = dynamic_cast<LgsSelection*>(stmt)) {
@@ -137,9 +137,9 @@ void SemaAnalyser::visitField(LgsField* field) {
 }
 
 void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
-    const auto lExpr = assignment->rvalue;
-    const auto rExpr = assignment->lvalue;
-    if (const auto selection = dynamic_cast<LgsSelection*>(rExpr)) {
+    const auto rExpr = assignment->rvalue;
+    const auto lExpr = assignment->lvalue;
+    if (const auto selection = dynamic_cast<LgsSelection*>(lExpr)) {
         visitSelection(selection);
     }
     validateUserType(lExpr, rExpr->type);
@@ -236,7 +236,6 @@ void SemaAnalyser::visitEnum(const LgsEnum* lgsEnum) const {
 }
 
 void SemaAnalyser::visitExpr(LgsExpr* expr) {
-    if (!expr) return;
     if (const auto castExpr = dynamic_cast<LgsCast*>(expr)) {
         visitCast(castExpr);
     } else if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(expr)) {
@@ -291,7 +290,24 @@ void SemaAnalyser::visitArray(const LgsArray* array) {
 }
 
 void SemaAnalyser::visitVariable(LgsVariable* variable) {
-    setVariableType(variable);
+    const auto symbol = getSymbol(variable->name, variable);
+    if (!symbol) return;
+    switch (symbol->type) {
+    case VAR_DEC:
+        setExprType(variable, symbol->varDec->type);
+        break;
+    case PARAM:
+        setExprType(variable, symbol->param->type);
+        break;
+    case ENUM:
+        setExprType(variable, symbol->lgsEnum);
+        break;
+    case ENUM_FIELD:
+        setExprType(variable, symbol->enumField->type);
+        break;
+    default:
+        assert(false);
+    }
 }
 
 void SemaAnalyser::visitSelection(LgsSelection* selection) {
@@ -383,24 +399,6 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
 }
 
 
-void SemaAnalyser::setVariableType(LgsVariable* variable) {
-    const auto symbol = getSymbol(variable->name, variable);
-    if (!symbol) return;
-    switch (symbol->type) {
-    case VAR_DEC:
-        setExprType(variable, symbol->varDec->type);
-        break;
-    case PARAM:
-        setExprType(variable, symbol->param->type);
-        break;
-    case ENUM:
-        setExprType(variable, symbol->lgsEnum);
-        break;
-    default:
-        assert(false);
-    }
-}
-
 LgsType* SemaAnalyser::resolveType(LgsType* type) {
     if (!dynamic_cast<LgsUnknownType*>(type)) return type;
     const auto name = type->getName();
@@ -422,6 +420,10 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     if (symbol->type == ENUM) {
         symbol->lgsEnum->nullable = nullable;
         return symbol->lgsEnum;
+    }
+    if (symbol->type == ENUM_FIELD) {
+        symbol->enumField->parent->nullable = nullable;
+        return symbol->enumField->parent;
     }
     return nullptr;
 }
@@ -497,7 +499,7 @@ bool SemaAnalyser::validateUserType(LgsExpr* expr, LgsType* userType) {
     if (userType) {
         // User and expr type don't match
         if (!expr->type->equals(userType)) {
-            handleError(E10001, &expr->location, {userType->getName(), expr->type->getName()});
+            handleError(E10001, &expr->location, {expr->type->getName(), userType->getName()});
             return false;
         }
     }

@@ -1,5 +1,8 @@
 #include "stmts/LgsPatternMatching.h"
 
+#include "exprs/unary/LgsEnumField.h"
+#include "exprs/unary/LgsSelection.h"
+#include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsStr.h"
@@ -32,9 +35,34 @@ Value* LgsPatternMatching::createIRValue(CodeGenMetadata* metadata) {
 }
 
 Value* LgsPatternMatching::hashIRValue(CodeGenMetadata* metadata, LgsExpr* expr) const {
-    if (const auto strConst = expr->asStrConst()) {
+    LgsExpr* e = expr;
+    if (const auto selection = e->asSelection()) {
+        e = selection->lastExpr();
+    } else if (const auto var = e->asVariable()) {
+        const auto symbol = metadata->logosStack.getSymbol(var->name);
+        switch (symbol->type) {
+        case VAR_DEC:
+            e = symbol->varDec->expr;
+            break;
+        case ENUM_FIELD: {
+            const auto hashValue = LgsStr::hashString(symbol->enumField->name);
+            return metadata->builder.getInt32(hashValue);
+        }
+        case PARAM:
+        case OBJECT:
+        case INTERFACE:
+        case FUNC:
+        case ENUM:
+            break;
+        }
+    }
+    if (const auto strConst = e->asStrConst()) {
         const auto hashValue = LgsStr::hashString(strConst->value);
         return metadata->builder.getInt32(hashValue);
     }
-    return expr->getIRValue(metadata);
+    if (const auto enumField = e->asEnumField()) {
+        const auto hashValue = LgsStr::hashString(enumField->name);
+        return metadata->builder.getInt32(hashValue);
+    }
+    assert(false);
 }

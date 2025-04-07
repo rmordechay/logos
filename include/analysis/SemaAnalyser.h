@@ -71,7 +71,6 @@ public:
     void setMethod(const LgsType* parent, LgsFuncCall* methodCall);
     void setFuncType(LgsFunc* func);
     void setExprType(LgsExpr* expr, LgsType* type);
-    void setVariableType(LgsVariable* variable);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     void setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 

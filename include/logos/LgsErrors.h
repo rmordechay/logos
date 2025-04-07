@@ -29,7 +29,7 @@ inline LgsError E10011{.msg = "'%s' is already declared at line %s.", .errCode =
 inline LgsError E10012{.msg = "Function '%s' is not defined.", .errCode = ++errCodeStart};
 inline LgsError E10013{.msg = "Function '%s' is not defined with this overload. Declared overloads:%s", .errCode = ++errCodeStart};
 inline LgsError E10014{.msg = "Pattern of type '%s' does not match base type '%s'.", .errCode = ++errCodeStart};
-inline LgsError E10015{.msg = "Arguments with types (%s) do not match any overload of the function '%s'", .errCode = ++errCodeStart};
+inline LgsError E10015{.msg = "Argument types (%s) do not match any overload of the function '%s'", .errCode = ++errCodeStart};
 inline LgsError E10016{.msg = "Object '%s' does not fully implement '%s'. Missing functions:%s", .errCode = ++errCodeStart};
 inline LgsError E10017{.msg = "break is not part of a loop.", .errCode = ++errCodeStart};
 inline LgsError E10018{.msg = "Expression of type '%s' cannot be casted to type '%s'.", .errCode = ++errCodeStart};

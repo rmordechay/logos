@@ -344,7 +344,7 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
             enumText = enumField->STRING()->getText();
             LgsStr::cleanStr(enumText);
         }
-        const auto field = new LgsEnumField(enumName, i, enumText);
+        const auto field = new LgsEnumField(lgsEnum, enumName, i, enumText);
         field->setLocation(ctx->start);
         lgsEnum->fields[enumName] = field;
     }

@@ -7,9 +7,9 @@ class LgsEnumField;
 
 class LgsEnum final : public LgsType {
 public:
-
     string name;
 
+    LgsEnum() = default;
     explicit LgsEnum(const string& name) : name(name) {}
     Type* getIRType() override;
     const string getName() const override;

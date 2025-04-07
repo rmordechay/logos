@@ -12,7 +12,7 @@ public:
     LgsExpr* rvalue;
 
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    void createSelection(CodeGenMetadata* metadata, const LgsSelection* selection) const;
+    void createIRFromSelection(CodeGenMetadata* metadata, const LgsSelection* selection) const;
     ~LgsAssignment() override;
 };
 

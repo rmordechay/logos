@@ -3,6 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
 #include "../symbols/types/LgsEnum.h"
+#include "exprs/unary/LgsEnumField.h"
 #include "stmts/LgsVarDec.h"
 #include "symbols/LgsSymbol.h"
 #include "types/LgsObject.h"
@@ -19,6 +20,7 @@ struct LgsGlobals {
 
     void addSymbol(const string& name, const LgsSymbol& symbol) {
         if (symbols.find(name) != symbols.end()) {
+            // TODO replace with proper error
             assert(false && "element already exists");
         }
         lock_guard lock(mtx);
@@ -31,11 +33,15 @@ struct LgsGlobals {
     }
 
     void addEnum(LgsEnum* lgsEnum) {
-        if (enums.find(lgsEnum->name) != enums.end()) {
+        if (symbols.find(lgsEnum->name) != symbols.end()) {
+            // TODO replace with proper error
             assert(false && "enum already exists");
         }
         lock_guard lock(mtx);
-        enums[lgsEnum->name] = LgsSymbol(lgsEnum);
+        symbols[lgsEnum->name] = LgsSymbol(lgsEnum);
+        for (const auto& [name, field] : lgsEnum->fields) {
+            symbols[name] = LgsSymbol(dynamic_cast<LgsEnumField*>(field));
+        }
     }
 
     ~LgsGlobals() {
@@ -52,6 +58,8 @@ struct LgsGlobals {
             case INTERFACE: delete symbol.interface; break;
             case FUNC: delete symbol.func; break;
             case ENUM: delete symbol.lgsEnum; break;
+            case ENUM_FIELD: delete symbol.enumField; break;
+            default: break;
             }
         }
     }

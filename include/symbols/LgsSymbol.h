@@ -3,6 +3,7 @@
 
 struct CodeGenMetadata;
 class LgsEnum;
+class LgsEnumField;
 class LgsFunc;
 class LgsInterface;
 class LgsObject;
@@ -16,6 +17,7 @@ enum LgsSymbolType {
     INTERFACE,
     FUNC,
     ENUM,
+    ENUM_FIELD
 };
 
 struct LgsSymbol {
@@ -27,6 +29,7 @@ struct LgsSymbol {
         LgsInterface* interface;
         LgsFunc* func;
         LgsEnum* lgsEnum;
+        LgsEnumField* enumField;
     };
 
     LgsSymbol();
@@ -36,6 +39,7 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsObject* object);
     explicit LgsSymbol(LgsInterface* interface);
     explicit LgsSymbol(LgsEnum* lgsEnum);
+    LgsSymbol(LgsEnumField* enumField);
     void free(CodeGenMetadata* metadata) const;
     ~LgsSymbol() = default;
 };

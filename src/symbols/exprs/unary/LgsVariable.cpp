@@ -1,6 +1,10 @@
 #include "exprs/unary/LgsVariable.h"
+
+#include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsParam.h"
+#include "types/LgsEnum.h"
+
 #include <LgsStack.h>
 
 string LgsVariable::getName() {
@@ -14,8 +18,10 @@ Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
         return symbol->varDec->IRValue;
     case PARAM:
         return symbol->param->IRValue;
+    case ENUM_FIELD:
+        return symbol->enumField->getIRValue(metadata);
     default:
-        return nullptr;
+        assert(false);
     }
 }
 
@@ -29,6 +35,7 @@ Value* LgsVariable::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
     case INTERFACE:
     case FUNC:
     case ENUM:
+    case ENUM_FIELD:
         break;
     }
     return nullptr;

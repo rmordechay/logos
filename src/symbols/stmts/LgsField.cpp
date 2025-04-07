@@ -2,11 +2,13 @@
 #include "exprs/LgsExpr.h"
 
 void LgsField::setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* expr) {
-    metadata->builder.CreateStore(expr->getIRValue(metadata), getGEP(metadata));
+    const auto exprIRValue = expr->getIRValue(metadata);
+    metadata->builder.CreateStore(exprIRValue, getGEP(metadata));
 }
 
 Value* LgsField::getIRValue(CodeGenMetadata* metadata) {
     if (!IRValue) IRValue = createIRValue(metadata);
+    assert(IRValue);
     return IRValue;
 }
 

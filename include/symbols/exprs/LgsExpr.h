@@ -43,6 +43,7 @@ public:
     LgsFloatConst* asFloatConst();
     LgsIntConst* asIntConst();
     LgsStrConst* asStrConst();
+    LgsEnumField* asEnumField();
     LgsTypeConst* asTypeConst();
     ~LgsExpr() override = default;
 };

@@ -10,7 +10,7 @@ LgsExpr* LgsEnum::getZeroValue() {
 }
 
 Type* LgsEnum::getIRType() {
-    assert(false);
+    return ptrTy;
 }
 
 const string LgsEnum::getName() const {
