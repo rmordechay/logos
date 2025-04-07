@@ -1,9 +1,7 @@
 #ifndef LOGOSANALYSER_H
 #define LOGOSANALYSER_H
-#include "../logos/LgsErrors.h"
-
+#include "LgsErrors.h"
 #include <iostream>
-#include <map>
 #include <mutex>
 #include <vector>
 #include <string>
@@ -34,7 +32,7 @@ inline string LgsAnalyser::formatErrorMsg(const string& errMsg, const vector<str
 }
 
 inline void LgsAnalyser::printError(const string& errMsg, const vector<string>& args) const {
-    cout << formatErrorMsg(errMsg, args) << endl;
+    cout << formatErrorMsg(errMsg, args) << '\n';
 }
 
 inline void LgsAnalyser::setUnsuccessful() {

@@ -39,5 +39,6 @@ inline LgsError E10021{.msg = "Duplicate fields were found in enum '%'.", .errCo
 inline LgsError E10022{.msg = "'%s' cannot be instantiated.", .errCode = ++errCodeStart};
 inline LgsError E10023{.msg = "Type '%s' must be nullable. Change the type to %s? or set a value.", .errCode = ++errCodeStart};
 inline LgsError E10024{.msg = "Declaration of null value must have an explict nullable type.", .errCode = ++errCodeStart};
+inline LgsError E10025{.msg = "'%s' must be an interface.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

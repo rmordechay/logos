@@ -29,6 +29,17 @@ struct LgsFuncSignature {
         composedName = getComposedName(name, parentName, argTypeNames);
     }
 
+    string getPrintName() const {
+        stringstream strStream;
+        strStream << name << '(';
+        for (size_t i = 0; i < params.size(); ++i) {
+            strStream << params[i].type->getName();
+            if (i != params.size() - 1) strStream << ", ";
+        }
+        strStream << "): " << type->getName();
+        return strStream.str();
+    }
+
     static string getComposedName(const string& name, const string& parentName, const vector<string>& argTypeNames) {
         stringstream strStream;
         if (parentName != "") {

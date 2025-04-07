@@ -163,8 +163,8 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceFileContext* c
             }
         }
         const auto type = getType(funcSignature->type());
-        auto lgsFuncSignature = new LgsFuncSignature(funcSignature->VARIABLE()->getText(), parentName, type, params);
-        interface->funcSignatures.emplace_back(lgsFuncSignature);
+        auto signature = new LgsFuncSignature(funcSignature->VARIABLE()->getText(), parentName, type, params);
+        interface->funcSignatures.emplace_back(signature);
     }
     globals.addSymbol(interface->name, LgsSymbol(interface));
     return interface;

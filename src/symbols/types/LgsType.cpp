@@ -5,6 +5,10 @@
 
 #include "stmts/LgsField.h"
 
+bool LgsType::equals(const LgsType& other) {
+    return getName() == other.getName();
+}
+
 LgsField* LgsType::getField(const string& name) {
     const auto it = fields.find(name);
     if (it != fields.end()) {
@@ -24,18 +28,12 @@ LgsMethodImpl* LgsType::getMethod(const LgsFuncCall* funcCall) const {
     return nullptr;
 }
 
-bool LgsType::equals(const LgsType& other) {
-    return getName() == other.getName();
-}
-
-Type* LgsUnknownType::getIRType() {
-    assert(false);
-}
-
 LgsMethodImpl* LgsType::getMethod(const LgsFuncSignature* signature) const {
     assert(signature->composedName != "");
     const auto overloads = getMethodsOverloads(signature->name);
     for (const auto& overload : overloads) {
+        // std::cout << overload->signature.composedName << '\n';
+        // std::cout << signature->composedName << '\n';
         if (overload->signature.composedName == signature->composedName) {
             return overload;
         }
@@ -49,4 +47,8 @@ vector<LgsMethodImpl*> LgsType::getMethodsOverloads(const string& funcName) cons
         return method->second;
     }
     return {};
+}
+
+Type* LgsUnknownType::getIRType() {
+    assert(false);
 }

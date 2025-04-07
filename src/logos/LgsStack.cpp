@@ -34,23 +34,6 @@ LgsSymbol* LgsStack::getSymbol(const string& name) {
     return nullptr;
 }
 
-LgsFunc* LgsStack::getFunc(const vector<LgsFunc*>& overloads, const string& composedName) const {
-    for (const auto& overload : overloads) {
-        if (overload->signature.composedName == composedName) {
-            return overload;
-        }
-    }
-    return nullptr;
-}
-
-vector<LgsFunc*> LgsStack::getFuncOverloads(const string& funcName) const {
-    const auto func = globals.funcs.find(funcName);
-    if (func != globals.funcs.end()) {
-        return func->second;
-    }
-    return {};
-}
-
 void LgsStack::addLocalSymbol(const string& name, const LgsSymbol& symbol) {
     assert(size() > 0 && "stack has no frames");
     top().symbols[name] = symbol;
