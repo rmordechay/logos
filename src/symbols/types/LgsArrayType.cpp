@@ -10,10 +10,6 @@ const string LgsArrayType::getName() const {
     return "ArrayType";
 }
 
-Type* LgsArrayType::getIRType(const int size) {
-    return ptrTy;
-}
-
 LgsExpr* LgsArrayType::getZeroValue() {
     return new LgsArray(this);
 }

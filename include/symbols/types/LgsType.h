@@ -27,9 +27,8 @@ public:
     LgsMethodImpl* getMethod(const LgsFuncCall* funcCall) const;
     LgsMethodImpl* getMethod(const LgsFuncSignature* signature) const;
     vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
-    virtual Type* getIRType();
-    virtual Type* getIRType(int size);
     virtual bool equals(const LgsType& other);
+    virtual Type* getIRType() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual const string getName() const = 0;
     virtual bool equals(LgsType* other) const = 0;
@@ -46,6 +45,8 @@ public:
     LgsExpr* getZeroValue() override { assert(false && "unknown type should not be called"); }
     bool equals(LgsType* other) const override { assert(false && "unknown type should not be called"); }
     LgsType* inferBinaryType(LgsType* other) override { assert(false && "unknown type should not be called"); }
+    Type* getIRType() override;
+    ~LgsUnknownType() override = default;
 };
 
 #endif //LOGOSTYPE_H

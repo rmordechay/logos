@@ -126,35 +126,34 @@ void SemaAnalyser::visitStmtBlock(const LgsStmtBlock* stmtBlock) {
 }
 
 void SemaAnalyser::visitField(LgsField* field) {
-    if (!compareExprType(field->expr, field->userType)) return;
-    field->type = field->expr->type;
+    field->userType = resolveType(field->userType);
+    if (field->expr) {
+        if (!validateUserType(field->expr, field->userType)) return;
+        field->type = field->expr->type;
+    } else {
+        field->type = field->userType;
+        field->expr = field->type->getZeroValue();
+    }
 }
 
 void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
-    if (const auto selection = dynamic_cast<LgsSelection*>(assignment->lvalue)) {
+    const auto lExpr = assignment->rvalue;
+    const auto rExpr = assignment->lvalue;
+    if (const auto selection = dynamic_cast<LgsSelection*>(rExpr)) {
         visitSelection(selection);
     }
-    if (!compareExprType(assignment->rvalue, assignment->lvalue->type)) return;
-}
-
-void SemaAnalyser::setVarDecType(LgsVarDec* varDec) {
-    if (!varDec->expr) {
-        varDec->type = varDec->userType;
-        varDec->expr = varDec->type->getZeroValue();
-    } else if (dynamic_cast<LgsNull*>(varDec->expr)) {
-        if (!varDec->userType->nullable) {
-            return handleError(E10023, &varDec->location, {varDec->name, varDec->userType->getName()});
-        }
-        varDec->type = varDec->userType;
-    } else {
-        if (!compareExprType(varDec->expr, varDec->userType)) return;
-        varDec->type = varDec->expr->type;
-    }
+    validateUserType(lExpr, rExpr->type);
 }
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
-    setVarDecType(varDec);
-    if (!varDec->type) return;
+    varDec->userType = resolveType(varDec->userType);
+    if (varDec->expr) {
+        if (!validateUserType(varDec->expr, varDec->userType)) return;
+        varDec->type = varDec->expr->type;
+    } else {
+        varDec->type = varDec->userType;
+        varDec->expr = varDec->type->getZeroValue();
+    }
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
 }
 
@@ -237,6 +236,7 @@ void SemaAnalyser::visitEnum(const LgsEnum* lgsEnum) const {
 }
 
 void SemaAnalyser::visitExpr(LgsExpr* expr) {
+    if (!expr) return;
     if (const auto castExpr = dynamic_cast<LgsCast*>(expr)) {
         visitCast(castExpr);
     } else if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(expr)) {
@@ -478,10 +478,28 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     }
 }
 
-bool SemaAnalyser::compareExprType(LgsExpr* expr, LgsType* userType) {
-    if (userType && !expr->type->equals(userType)) {
-        handleError(E10001, &expr->location, {userType->getName(), expr->type->getName()});
-        return false;
+bool SemaAnalyser::validateUserType(LgsExpr* expr, LgsType* userType) {
+    visitExpr(expr);
+    if (expr->isNull()) {
+        // null must have a type
+        if (!userType) {
+            handleError(E10024, &expr->location);
+            return false;
+        }
+        // userType must be nullable
+        if (!userType->nullable) {
+            handleError(E10023, &userType->location, {userType->getName(), userType->getName()});
+            return false;
+        }
+        expr->type = userType;
+        return true;
+    }
+    if (userType) {
+        // User and expr type don't match
+        if (!expr->type->equals(userType)) {
+            handleError(E10001, &expr->location, {userType->getName(), expr->type->getName()});
+            return false;
+        }
     }
     return true;
 }

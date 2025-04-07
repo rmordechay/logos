@@ -28,6 +28,10 @@ bool LgsType::equals(const LgsType& other) {
     return getName() == other.getName();
 }
 
+Type* LgsUnknownType::getIRType() {
+    assert(false);
+}
+
 LgsMethodImpl* LgsType::getMethod(const LgsFuncSignature* signature) const {
     assert(signature->composedName != "");
     const auto overloads = getMethodsOverloads(signature->name);
@@ -45,12 +49,4 @@ vector<LgsMethodImpl*> LgsType::getMethodsOverloads(const string& funcName) cons
         return method->second;
     }
     return {};
-}
-
-Type* LgsType::getIRType() {
-    assert(false);
-}
-
-Type* LgsType::getIRType(int size) {
-    assert(false);
 }

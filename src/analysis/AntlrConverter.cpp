@@ -207,11 +207,13 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationCon
 
 }
 
-LgsField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const size_t position, const string& parentName) {
-    const auto name = varDec->VARIABLE()->getText();
-    const auto type = getType(varDec->type());
-    const auto expr = getExpr(varDec->expr());
-    return new LgsField(name, position, type, expr);
+LgsField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* ctx, const size_t position, const string& parentName) {
+    const auto name = ctx->VARIABLE()->getText();
+    const auto userType = getType(ctx->type());
+    const auto expr = getExpr(ctx->expr());
+    const auto field = new LgsField(name, position, userType, expr);
+    field->setLocation(ctx->start);
+    return field;
 }
 
 LgsStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {

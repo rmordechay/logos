@@ -31,6 +31,7 @@ public:
     virtual Value* divIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other);
 
+    bool isNull();
     LgsArray* asArray();
     LgsArrayIndex* asArrayIndex();
     LgsFuncCall* asFuncCall();

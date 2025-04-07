@@ -5,6 +5,10 @@ const string LgsInterface::getName() const {
     return name;
 }
 
+Type* LgsInterface::getIRType() {
+    assert(false);
+}
+
 LgsExpr* LgsInterface::getZeroValue() {
     assert(false && "not implemented");
 }

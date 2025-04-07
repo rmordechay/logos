@@ -44,7 +44,6 @@ public:
     void visitStmt(LgsStmt* stmt);
     void visitStmtBlock(const LgsStmtBlock* stmtBlock);
     void visitAssignment(const LgsAssignment* assignment);
-    void setVarDecType(LgsVarDec* varDec);
     void visitVarDec(LgsVarDec* varDec);
     void visitIfStmt(const LgsIfStmt* ifStmt);
     void visitPatternMatching(const LgsPatternMatching* patternMatching);
@@ -76,7 +75,7 @@ public:
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     void setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
-    bool compareExprType(LgsExpr* expr, LgsType* userType);
+    bool validateUserType(LgsExpr* expr, LgsType* userType);
     void checkObjectImplements(LgsObject* obj);
     LgsType* resolveType(LgsType* type);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);

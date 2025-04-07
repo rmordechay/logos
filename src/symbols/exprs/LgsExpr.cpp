@@ -1,6 +1,7 @@
 #include "exprs/LgsExpr.h"
 
 #include "CodeGenerator.h"
+#include "exprs/LgsNull.h"
 #include "exprs/unary/LgsArray.h"
 #include "exprs/unary/LgsArrayIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
@@ -38,6 +39,10 @@ Value* LgsExpr::divIR(CodeGenMetadata* metadata, LgsExpr* other) {
 
 Value* LgsExpr::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false && "not implemented");
+}
+
+bool LgsExpr::isNull() {
+    return dynamic_cast<LgsNull*>(this);
 }
 
 LgsArray* LgsExpr::asArray() { return dynamic_cast<LgsArray*>(this); }

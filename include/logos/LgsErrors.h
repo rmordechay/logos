@@ -12,6 +12,7 @@ struct LgsError {
     string msg;
 };
 
+/** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */
 inline int errCodeStart = 10000;
 inline LgsError E10000{.msg = "main() function is not defined in Main.lgs file.", .errCode = errCodeStart};
 inline LgsError E10001{.msg = "The left-hand type '%s' is not equal to the right-hand type '%s'.", .errCode = ++errCodeStart};
@@ -36,6 +37,7 @@ inline LgsError E10019{.msg = "activeEnv '%s' could not be found in the envs dir
 inline LgsError E10020{.msg = "Environment '%s' does not define the required field '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10021{.msg = "Duplicate fields were found in enum '%'.", .errCode = ++errCodeStart};
 inline LgsError E10022{.msg = "'%s' cannot be instantiated.", .errCode = ++errCodeStart};
-inline LgsError E10023{.msg = "Type of variable '%s' must be nullable. Change the type to %s? or set a value.", .errCode = ++errCodeStart};
+inline LgsError E10023{.msg = "Type '%s' must be nullable. Change the type to %s? or set a value.", .errCode = ++errCodeStart};
+inline LgsError E10024{.msg = "Declaration of null value must have an explict nullable type.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

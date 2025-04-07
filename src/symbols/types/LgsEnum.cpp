@@ -1,6 +1,15 @@
 #include "types/LgsEnum.h"
 
+#include "stmts/LgsField.h"
+
 LgsExpr* LgsEnum::getZeroValue() {
+    for (const auto& [_, field] : fields) {
+        return field->expr;
+    }
+    assert(false);
+}
+
+Type* LgsEnum::getIRType() {
     assert(false);
 }
 

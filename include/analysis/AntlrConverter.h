@@ -24,7 +24,7 @@ public:
     static LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath);
     static LgsInterface* getInterface(LogosParser::InterfaceFileContext* ctx, const string& parentName);
     static LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName);
-    static LgsField* getField(LogosParser::ExplicitVarDecContext* varDec, size_t position, const string& parentName);
+    static LgsField* getField(LogosParser::ExplicitVarDecContext* ctx, size_t position, const string& parentName);
     static LgsFuncImpl* getFuncImpl(LogosParser::FuncImplementationContext* ctx);
     static LgsMethodImpl* getMethodImpl(LogosParser::FuncImplementationContext* ctx, LgsObject* obj);
     static LgsStmt* getStmt(LogosParser::StatementContext* ctx);

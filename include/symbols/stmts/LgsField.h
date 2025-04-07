@@ -15,7 +15,7 @@ public:
     Value* gep = nullptr;
     LgsExpr* parentExpr = nullptr;
 
-    LgsField(const string& name, const size_t position, LgsType* type, LgsExpr* expr = nullptr) : name(name), position(position), type(type), expr(expr) {}
+    LgsField(const string& name, const size_t position, LgsType* userType, LgsExpr* expr = nullptr) : name(name), position(position), userType(userType), expr(expr) {}
     Value* getIRValue(CodeGenMetadata* metadata);
     virtual Value* createIRValue(CodeGenMetadata* metadata);
     Value* getGEP(CodeGenMetadata* metadata);

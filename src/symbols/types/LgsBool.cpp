@@ -21,5 +21,8 @@ LgsType* LgsBool::inferBinaryType(LgsType* other) {
 }
 
 bool LgsBool::equals(LgsType* other) const {
+    if (nullable) {
+        return name == other->getName();
+    }
     return name == other->getName();
 }
