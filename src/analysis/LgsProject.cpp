@@ -133,6 +133,7 @@ void LgsProject::loadGlobals() const {
     globals.addFunc(new LgsPrint({LgsParam(new LgsBool())}));
     globals.addSymbol(LgsSys::name, LgsSymbol(new LgsSys()));
     globals.addSymbol(LgsEnv::name, LgsSymbol(new LgsEnv()));
+    globals.addSymbol("ROOT_PATH", LgsSymbol(new LgsVarDec("ROOT_PATH", nullptr, new LgsStrConst("djkfh"))));
 }
 
 void LgsProject::checkRequiredEnvVars() {

@@ -2,14 +2,12 @@
 #define LGSGLOBALS_H
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
-#include "../symbols/types/LgsEnum.h"
+#include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "stmts/LgsVarDec.h"
 #include "symbols/LgsSymbol.h"
 #include "types/LgsObject.h"
 #include "types/LgsInterface.h"
-
-#include <assert.h>
 
 struct LgsGlobals {
     mutex mtx;

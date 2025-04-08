@@ -261,8 +261,7 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
 LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto expr = getExpr(ctx->expr(), !!ctx->QUEST_MARK());
-    const auto varDec = new LgsVarDec(variableName, nullptr, expr);
-    varDec->type = expr->type;
+    const auto varDec = new LgsVarDec(variableName, expr->type, expr);
     varDec->setLocation(ctx->start);
     return varDec;
 }
@@ -271,7 +270,8 @@ LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext
     const auto variableName = ctx->VARIABLE()->getText();
     const auto userType = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
-    const auto varDec = new LgsVarDec(variableName, userType, expr);
+    const auto varDec = new LgsVarDec(variableName, expr);
+    varDec->userType = userType;
     varDec->setLocation(ctx->start);
     return varDec;
 }
@@ -319,11 +319,11 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
     LgsLoop* loopStmt = nullptr;
     const auto loopVarName = ctx->VARIABLE()[0]->getText();
     if (const auto iterable = ctx->iterableExpr) {
-        const auto loopVar = new LgsVarDec(loopVarName, nullptr, nullptr);
+        const auto loopVar = new LgsVarDec(loopVarName);
         loopStmt = new LgsForeachLoop({loopVar}, getUnaryExpr(iterable), stmts);
     } else if (const auto range = ctx->iterableRange) {
         const auto startExpr = getExpr(range->start);
-        const auto loopVar = new LgsVarDec(loopVarName, nullptr, startExpr);
+        const auto loopVar = new LgsVarDec(loopVarName, startExpr);
         loopVar->type = startExpr->type;
         loopStmt = new LgsRangeLoop({loopVar}, startExpr, getExpr(range->end), stmts);
     } else {

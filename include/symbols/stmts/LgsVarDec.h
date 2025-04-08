@@ -10,7 +10,8 @@ public:
     LgsType* userType = nullptr;
     LgsExpr* expr = nullptr;
 
-    LgsVarDec(const string& name, LgsType* userType, LgsExpr* expr) : name(name), userType(userType), expr(expr) {}
+    LgsVarDec(const string& name, LgsType* type, LgsExpr* expr) : name(name), type(type), expr(expr) {}
+    explicit LgsVarDec(const string& name, LgsExpr* expr = nullptr) : name(name), expr(expr) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     void free(CodeGenMetadata* metadata) override;
     json asJson() override;

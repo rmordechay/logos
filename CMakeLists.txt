@@ -166,7 +166,8 @@ add_library(lib STATIC
 )
 
 add_executable(lgs main.cpp
-    include/symbols/exprs/unary/LgsEnumField.h)
+    include/symbols/exprs/unary/LgsEnumField.h
+    include/symbols/builtin/LgsGlobalConsts.h)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE
