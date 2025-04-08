@@ -15,7 +15,7 @@ Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
     const auto symbol = metadata->logosStack.getSymbol(name);
     switch (symbol->type) {
     case VAR_DEC:
-        return symbol->varDec->IRValue;
+        return symbol->varDec->expr->getIRValue(metadata);
     case PARAM:
         return symbol->param->IRValue;
     case ENUM_FIELD:

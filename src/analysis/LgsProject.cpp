@@ -8,7 +8,8 @@
 #include "ThreadPool.h"
 #include "builtin/LgsEnv.h"
 #include "builtin/LgsSys.h"
-#include "../../include/symbols/builtin/LgsPrint.h"
+#include "builtin/LgsPrint.h"
+
 #include <iostream>
 
 using namespace std;
@@ -133,7 +134,7 @@ void LgsProject::loadGlobals() const {
     globals.addFunc(new LgsPrint({LgsParam(new LgsBool())}));
     globals.addSymbol(LgsSys::name, LgsSymbol(new LgsSys()));
     globals.addSymbol(LgsEnv::name, LgsSymbol(new LgsEnv()));
-    globals.addSymbol("ROOT_PATH", LgsSymbol(new LgsVarDec("ROOT_PATH", nullptr, new LgsStrConst("djkfh"))));
+    globals.addSymbol("ROOT_PATH", LgsSymbol(new LgsVarDec("ROOT_PATH", new LgsStr(), new LgsStrConst(paths.rootDirAbs))));
 }
 
 void LgsProject::checkRequiredEnvVars() {

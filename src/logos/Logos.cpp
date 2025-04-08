@@ -43,6 +43,7 @@ bool Logos::analyse(const vector<LgsFile*>& files) {
 void Logos::initPaths(const path& rootDirPath) const {
     assert(rootDirPath != "");
     paths.rootDir = rootDirPath;
+    paths.rootDirAbs = canonical(rootDirPath);
     paths.srcDir = paths.rootDir / LOGOS_SRC_DIR;
     paths.envsDir = paths.rootDir / LOGOS_ENVS_DIR;
     paths.buildDir = paths.rootDir / LOGOS_BUILD_DIR;

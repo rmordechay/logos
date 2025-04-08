@@ -65,6 +65,7 @@ add_library(lib STATIC
     include/symbols/exprs/unary/LgsSelection.h
     include/symbols/exprs/unary/LgsVariable.h
     include/symbols/exprs/unary/LgsUnaryExpr.h
+    include/symbols/exprs/unary/LgsEnumField.h
     include/symbols/exprs/unary/constants/LgsConstExpr.h
     include/symbols/exprs/unary/constants/LgsStrConst.h
     include/symbols/exprs/unary/constants/LgsTypeConst.h
@@ -76,8 +77,9 @@ add_library(lib STATIC
     include/symbols/funcs/LgsFuncImpl.h
     include/symbols/funcs/LgsMethodImpl.h
     include/symbols/funcs/LgsParam.h
-    include/symbols/builtin/LgsPrint.h
     include/symbols/funcs/LgsFuncSignature.h
+    include/symbols/builtin/LgsGlobalConsts.h
+    include/symbols/builtin/LgsPrint.h
     include/symbols/loops/LgsForeachLoop.h
     include/symbols/loops/LgsRangeLoop.h
     include/symbols/stmts/LgsField.h
@@ -165,9 +167,7 @@ add_library(lib STATIC
     src/symbols/exprs/unary/LgsEnumField.cpp
 )
 
-add_executable(lgs main.cpp
-    include/symbols/exprs/unary/LgsEnumField.h
-    include/symbols/builtin/LgsGlobalConsts.h)
+add_executable(lgs main.cpp)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE

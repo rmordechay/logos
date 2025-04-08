@@ -1,12 +1,7 @@
 #ifndef PROJECT_H
 #define PROJECT_H
-
-#include "LgsEnvFile.h"
-
-#include <string>
 #include <thread>
 #include <filesystem>
-
 #include "SemaAnalyser.h"
 #include "LgsProject.h"
 
@@ -18,6 +13,7 @@ using namespace llvm;
 
 struct LgsPaths {
     path rootDir;
+    path rootDirAbs;
     path srcDir;
     path envsDir;
     path buildDir;
