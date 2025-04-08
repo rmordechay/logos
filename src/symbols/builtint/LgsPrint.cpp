@@ -1,4 +1,4 @@
-#include "funcs/LgsPrint.h"
+#include "builtin/LgsPrint.h"
 #include "CodeGenMetadata.h"
 
 void LgsPrint::createIRValue(CodeGenMetadata* metadata) {

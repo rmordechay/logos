@@ -8,7 +8,7 @@
 #include "ThreadPool.h"
 #include "builtin/LgsEnv.h"
 #include "builtin/LgsSys.h"
-#include "funcs/LgsPrint.h"
+#include "../../include/symbols/builtin/LgsPrint.h"
 #include <iostream>
 
 using namespace std;
