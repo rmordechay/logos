@@ -6,7 +6,7 @@ Value* LgsStrConst::createIRValue(CodeGenMetadata* metadata) {
     return createGlobalStr(metadata->module, value);
 }
 
-size_t LgsStrConst::size() {
+size_t LgsStrConst::length() {
     return value.size();
 }
 

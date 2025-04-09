@@ -14,7 +14,7 @@ public:
     explicit LgsArray(LgsType* type, const vector<LgsExpr*>& elements = {}) : LgsUnaryExpr(type), initialElements(elements) {
         setFields(type);
     }
-    size_t size() override;
+    size_t length() override;
     Value* sizeIR(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     void free(CodeGenMetadata* metadata) override;

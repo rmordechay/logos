@@ -27,8 +27,9 @@ inline bool LgsMethodImpl::isMethodEqual(const LgsFuncSignature* otherSignature)
     if (signature.type->getName() != otherSignature->type->getName()) return false;
     if (signature.params.size() == 0) return true;
     for (size_t i = 0; i < signature.params.size() - 1; ++i) {
-        const auto isEqual = signature.params[i + 1].name == otherSignature->params[i].name;
-        if (!isEqual) return false;
+        auto thisTypeName = signature.params[i + 1].type->getName();
+        auto otherTypeName = otherSignature->params[i].type->getName();
+        if (thisTypeName != otherTypeName) return false;
     }
     return true;
 }

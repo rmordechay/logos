@@ -212,6 +212,11 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
 }
 
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
+    const auto currentFunc = logosStack.currentFunc;
+    const auto rt = currentFunc->signature.type;
+    if (rt->getName() == LgsVoid::name && returnStmt->expr) {
+        return handleError(E10026, &returnStmt->expr->location);
+    }
     visitExpr(returnStmt->expr);
 }
 
@@ -547,22 +552,53 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
 
 bool SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
     auto name = funcCall->name;
+
     // Resolve parent func
     vector<LgsFunc*> overloads;
-    if (globals.funcs.find(name) != globals.funcs.end()) {
-        overloads = globals.funcs.at(name);
+    const auto it = globals.funcs.find(name);
+    if (it != globals.funcs.end()) {
+        overloads = it->second;
     } else {
         handleError(E10006, &funcCall->location, {name});
         return false;
     }
+
     // Resolve overload
     LgsFunc* func = nullptr;
     for (const auto& overload : overloads) {
-        if (overload->signature.composedName == funcCall->composedName) {
-            func = overload;
+        if (overload->signature.name != funcCall->name) continue;
+        auto overloadParams = overload->signature.params;
+        if (overloadParams.size() == 0) return true;
+        if (funcCall->args.size() > overloadParams.size()) {
+            handleError(E10027, &funcCall->location);
+            return false;
+        }
+
+        // same size of params and args implies no use of default args
+        if (overloadParams.size() == funcCall->args.size()) {
+            if (overload->signature.composedName == funcCall->composedName) {
+                func = overload;
+            }
             break;
         }
+
+        auto pass = true;
+        for (size_t i = 0; i < overloadParams.size(); ++i) {
+            const auto overloadParam = overloadParams[i];
+            auto thisTypeName = overloadParam.type->getName();
+            if (overloadParam.expr) continue;
+            auto otherTypeName = funcCall->args[i]->type->getName();
+            if (thisTypeName != otherTypeName) {
+                pass = false;
+                break;
+            }
+        }
+
+        if (pass) {
+            func = overload;
+        }
     }
+
     if (!func) {
         handleError(E10015, &funcCall->location, {funcCall->getArgsTypeStr(), name});
         return false;

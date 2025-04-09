@@ -30,6 +30,7 @@ public:
     static LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     static LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     static LgsStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
+    static LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
     static LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     static LgsParam* getParam(LogosParser::ExplicitVarDecContext* ctx);
     static LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);

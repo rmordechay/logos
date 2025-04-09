@@ -6,7 +6,7 @@
 Value* LgsArray::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto arrayType = asArrayType();
-    const auto IRArr = arrayType->initIRArr(metadata, size());
+    const auto IRArr = arrayType->initIRArr(metadata, length());
     const auto addElementFunc = arrayType->getIRFuncAddElement(metadata);
     for (const auto & element : initialElements) {
         builder.CreateCall(addElementFunc, {IRArr, element->getIRValue(metadata)});
@@ -14,7 +14,7 @@ Value* LgsArray::createIRValue(CodeGenMetadata* metadata) {
     return IRArr;
 }
 
-size_t LgsArray::size() {
+size_t LgsArray::length() {
     return initialElements.size();
 }
 

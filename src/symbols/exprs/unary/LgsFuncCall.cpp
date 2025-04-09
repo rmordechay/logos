@@ -1,5 +1,6 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
+#include "types/LgsVoid.h"
 
 string LgsFuncCall::getName() {
     return name;
@@ -11,6 +12,10 @@ Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
 
 string LgsFuncCall::getArgsTypeStr() const {
     std::ostringstream result;
+    if (args.empty()) {
+        result << LgsVoid::name;
+        return result.str();
+    }
     for (size_t i = 0; i < args.size(); ++i) {
         if (i > 0) result << ", ";
         result << args[i]->type->getName();

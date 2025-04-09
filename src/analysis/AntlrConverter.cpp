@@ -235,7 +235,7 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto loopStmt = ctx->loopStatement()) return getLoopStatement(loopStmt);
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
     if (const auto selection = ctx->selection()) return getSelection(selection);
-    if (const auto returnStmt = ctx->returnStatement()) return new LgsReturn(getExpr(returnStmt->expr()));
+    if (const auto returnStmt = ctx->returnStatement()) return getReturnStmt(returnStmt);
     if (ctx->breakStmt()) return new LgsBreakStmt();
     if (ctx->CONTINUE()) return new LgsContinue();
     return nullptr;
@@ -274,6 +274,12 @@ LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext
     varDec->userType = userType;
     varDec->setLocation(ctx->start);
     return varDec;
+}
+
+LgsStmt* AntlerConverter::getReturnStmt(LogosParser::ReturnStatementContext* ctx) {
+    const auto rs = new LgsReturn(getExpr(ctx->expr()));
+    rs->setLocation(ctx->start);
+    return rs;
 }
 
 LgsParam* AntlerConverter::getParam(LogosParser::ExplicitVarDecContext* ctx) {

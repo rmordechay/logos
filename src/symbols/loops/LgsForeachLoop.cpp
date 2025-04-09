@@ -10,7 +10,7 @@ int LgsForeachLoop::loopStart() {
 }
 
 int LgsForeachLoop::loopEnd() {
-    return getExprAsIterable()->size();
+    return getExprAsIterable()->length();
 }
 
 void LgsForeachLoop::setIRLoopVariable(CodeGenMetadata* metadata) {
