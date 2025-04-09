@@ -4,7 +4,7 @@
 #include "types/LgsVoid.h"
 
 void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
-    metadata->logosStack.enterScope(this);
+    metadata->lgsStack.enterScope(this);
     const auto IRFunc = getIRFunc(metadata);
     auto args = IRFunc->arg_begin();
     for (auto& param : signature.params) {
@@ -16,7 +16,7 @@ void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     if (signature.type->getName() == LgsVoid::name) {
         metadata->builder.CreateRetVoid();
     }
-    metadata->logosStack.exitScope(metadata);
+    metadata->lgsStack.exitScope();
 }
 
 Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
@@ -29,20 +29,6 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
         argValues.emplace_back(argValue);
     }
     return metadata->builder.CreateCall(IRFunc, argValues);
-}
-
-bool LgsFunc::equals(const LgsFuncSignature* otherSignature) const {
-    if (signature.parentName != "" && otherSignature->parentName != "")
-    if (signature.parentName != otherSignature->parentName) return false;
-    if (signature.name != otherSignature->name) return false;
-    if (signature.type->getName() != otherSignature->type->getName()) return false;
-    if (signature.params.size() == 0) return true;
-    for (size_t i = 0; i < signature.params.size() - 1; ++i) {
-        auto thisTypeName = signature.params[i + 1].type->getName();
-        auto otherTypeName = otherSignature->params[i].type->getName();
-        if (thisTypeName != otherTypeName) return false;
-    }
-    return true;
 }
 
 Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {

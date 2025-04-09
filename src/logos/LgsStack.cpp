@@ -4,6 +4,8 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
 
+#include <llvm/Support/CommandLine.h>
+
 void LgsStack::enterScope(LgsFunc* func) {
     if (func) {
         currentFunc = func;
@@ -15,7 +17,7 @@ void LgsStack::enterScope(LgsFunc* func) {
     }
 }
 
-void LgsStack::exitScope(CodeGenMetadata* metadata) {
+void LgsStack::exitScope() {
     pop();
 }
 

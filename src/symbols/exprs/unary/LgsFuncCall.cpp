@@ -16,9 +16,10 @@ string LgsFuncCall::getArgsTypeStr() const {
         result << LgsVoid::name;
         return result.str();
     }
-    for (size_t i = 0; i < args.size(); ++i) {
-        if (i > 0) result << ", ";
+    const auto isMethod = parentName != "";
+    for (size_t i = isMethod; i < args.size(); ++i) {
         result << args[i]->type->getName();
+        if (i != args.size() - 1) result << ", ";
     }
     return result.str();
 }

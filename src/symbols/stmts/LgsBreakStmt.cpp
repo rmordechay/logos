@@ -5,8 +5,8 @@
 #include <loops/LgsLoop.h>
 
 Value* LgsBreakStmt::createIRValue(CodeGenMetadata* metadata) {
-    const auto currentLoop = metadata->logosStack.currentLoop;
-    const auto currentFunc = metadata->logosStack.currentFunc;
+    const auto currentLoop = metadata->lgsStack.currentLoop;
+    const auto currentFunc = metadata->lgsStack.currentFunc;
     const auto loopExit = currentLoop->loopExitBlock;
     const auto branch = metadata->builder.CreateBr(loopExit);
     const auto IRFunc = currentFunc->getIRFunc(metadata);

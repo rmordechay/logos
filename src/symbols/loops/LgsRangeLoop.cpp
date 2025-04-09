@@ -22,5 +22,5 @@ LgsRangeLoop::~LgsRangeLoop() {
 void LgsRangeLoop::setIRLoopVariable(CodeGenMetadata* metadata) {
     const auto loopVar = loopVars[0];
     loopVar->setIRValue(iValue);
-    metadata->logosStack.addLocalSymbol(loopVar->name, LgsSymbol(loopVar));
+    metadata->lgsStack.addLocalSymbol(loopVar->name, LgsSymbol(loopVar));
 }

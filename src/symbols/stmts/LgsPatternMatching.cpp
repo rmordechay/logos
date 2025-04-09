@@ -9,7 +9,7 @@
 
 Value* LgsPatternMatching::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto func = metadata->logosStack.currentFunc->getIRFunc(metadata);
+    const auto func = metadata->lgsStack.currentFunc->getIRFunc(metadata);
     const auto exprIRValue = hashIRValue(metadata, expr);
     exitBlock = BasicBlock::Create(context, "exit_pattern_matching");
     defaultCase = BasicBlock::Create(context, "default");
@@ -39,7 +39,7 @@ Value* LgsPatternMatching::hashIRValue(CodeGenMetadata* metadata, LgsExpr* expr)
     if (const auto selection = e->asSelection()) {
         e = selection->lastExpr();
     } else if (const auto var = e->asVariable()) {
-        const auto symbol = metadata->logosStack.getSymbol(var->name);
+        const auto symbol = metadata->lgsStack.getSymbol(var->name);
         switch (symbol->type) {
         case VAR_DEC:
             e = symbol->varDec->expr;

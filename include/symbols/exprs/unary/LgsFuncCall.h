@@ -7,7 +7,6 @@ class LgsFuncCall final : public LgsStmt, public LgsUnaryExpr {
 public:
     string name;
     string parentName;
-    string composedName;
     vector<LgsExpr*> args;
     LgsFunc* func = nullptr;
 

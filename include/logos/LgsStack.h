@@ -9,7 +9,7 @@
 using namespace std;
 using namespace llvm;
 class LgsLoop;
-struct LgsFuncSignature;
+class LgsFuncSignature;
 
 struct LgsStackFrame {
     map<string, LgsSymbol> symbols;
@@ -22,7 +22,7 @@ public:
     LgsLoop* currentLoop = nullptr;
 
     void enterScope(LgsFunc* func = nullptr);
-    void exitScope(CodeGenMetadata* metadata = nullptr);
+    void exitScope();
     LgsSymbol* getSymbol(const string& name);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     string getStackString() const;

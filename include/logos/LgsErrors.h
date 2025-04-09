@@ -19,7 +19,7 @@ inline LgsError E10001{.msg = "The left-hand type '%s' is not equal to the right
 inline LgsError E10002{.msg = "'%s' is not iterable.", .errCode = ++errCodeStart};
 inline LgsError E10003{.msg = "Number of arguments does not much. Expected: %s, Given: %s.", .errCode = ++errCodeStart};
 inline LgsError E10004{.msg = "Function '%s' must return '%s'.", .errCode = ++errCodeStart};
-inline LgsError E10005{.msg = "'%s' is not a member of '%s'.", .errCode = ++errCodeStart};
+inline LgsError E10005{.msg = "Field '%s' is not a member of '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10006{.msg = "'%s' is not defined.", .errCode = ++errCodeStart};
 inline LgsError E10007{.msg = "File name '%s.lgs' is duplicate. All files in a project must be unique. Locations:%s", .errCode = ++errCodeStart};
 inline LgsError E10008{.msg = "'Main.lgs' could not be found in 'src' directory.", .errCode = ++errCodeStart};
@@ -27,9 +27,9 @@ inline LgsError E10009{.msg = "Duplicate Main files were found in the project. L
 inline LgsError E10010{.msg = "Current path is not a root path of a logos project.", .errCode = ++errCodeStart};
 inline LgsError E10011{.msg = "'%s' is already declared at line %s.", .errCode = ++errCodeStart};
 inline LgsError E10012{.msg = "Function '%s' is not defined.", .errCode = ++errCodeStart};
-inline LgsError E10013{.msg = "Function '%s' is not defined with this overload. Declared overloads:%s", .errCode = ++errCodeStart};
+inline LgsError E10013{.msg = "Function '%s' is not a member of '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10014{.msg = "Pattern of type '%s' does not match base type '%s'.", .errCode = ++errCodeStart};
-inline LgsError E10015{.msg = "Argument types (%s) do not match any overload of the function '%s'", .errCode = ++errCodeStart};
+inline LgsError E10015{.msg = "Function with name '%s' was found but it does not match any overload.", .errCode = ++errCodeStart};
 inline LgsError E10016{.msg = "Object '%s' does not fully implement '%s'. Missing functions:%s", .errCode = ++errCodeStart};
 inline LgsError E10017{.msg = "break is not part of a loop.", .errCode = ++errCodeStart};
 inline LgsError E10018{.msg = "Expression of type '%s' cannot be casted to type '%s'.", .errCode = ++errCodeStart};
@@ -41,7 +41,7 @@ inline LgsError E10023{.msg = "Type '%s' must be nullable. Change the type to %s
 inline LgsError E10024{.msg = "Declaration of null value must have an explict nullable type.", .errCode = ++errCodeStart};
 inline LgsError E10025{.msg = "'%s' must be an interface.", .errCode = ++errCodeStart};
 inline LgsError E10026{.msg = "Void functions should not return an expression.", .errCode = ++errCodeStart};
-inline LgsError E10027{.msg = "Function call has more arguments then the function accepts.", .errCode = ++errCodeStart};
+inline LgsError E10027{.msg = "", .errCode = ++errCodeStart};
 inline LgsError E10028{.msg = "Default parameters must be defined lastly.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

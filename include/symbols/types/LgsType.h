@@ -41,8 +41,8 @@ public:
     string name;
 
     explicit LgsUnknownType(const string& name) : name(name) {}
+    const string getName() const override { return name; }
     size_t size() override { assert(false && "unknown type should not be called"); }
-    const string getName() const override { assert(false && "unknown type should not be called"); }
     LgsExpr* getZeroValue() override { assert(false && "unknown type should not be called"); }
     bool equals(LgsType* other) const override { assert(false && "unknown type should not be called"); }
     LgsType* inferBinaryType(LgsType* other) override { assert(false && "unknown type should not be called"); }

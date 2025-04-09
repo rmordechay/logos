@@ -20,7 +20,7 @@ LgsField* LgsType::getField(const string& name) {
 LgsMethodImpl* LgsType::findMethod(const LgsFuncCall* funcCall) const {
     const auto overloads = getMethodsOverloads(funcCall->name);
     for (const auto& overload : overloads) {
-        if (overload->signature.IRName == funcCall->composedName) {
+        if (overload->signature.isEqual(funcCall)) {
             return overload;
         }
     }

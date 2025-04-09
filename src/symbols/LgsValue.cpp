@@ -2,13 +2,15 @@
 
 #include "funcs/LgsFunc.h"
 
+#include <TokenSource.h>
+
 void LgsValue::setLocation(const antlr4::Token* ctx) {
     location.lineNumber = ctx->getLine();
     location.posInLine = ctx->getCharPositionInLine() + 1;
 }
 
 void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) const {
-    block->insertInto(metadata->logosStack.currentFunc->getIRFunc(metadata));
+    block->insertInto(metadata->lgsStack.currentFunc->getIRFunc(metadata));
     metadata->builder.SetInsertPoint(block);
 }
 

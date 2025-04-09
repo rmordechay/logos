@@ -10,7 +10,7 @@ using namespace std;
 
 class LgsAnalyser {
 public:
-    std::mutex mtx;
+    mutex mtx;
     bool successful = true;
 
     void setUnsuccessful();

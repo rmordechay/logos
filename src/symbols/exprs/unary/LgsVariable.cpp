@@ -26,7 +26,7 @@ Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
 }
 
 Value* LgsVariable::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto symbol = metadata->logosStack.getSymbol(name);
+    const auto symbol = metadata->lgsStack.getSymbol(name);
     switch (symbol->type) {
     case VAR_DEC:
         return symbol->varDec->expr->eqIR(metadata, other);

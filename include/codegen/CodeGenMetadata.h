@@ -24,7 +24,7 @@ Type* const i64Ty = Type::getInt64Ty(context);
 Type* const voidTy = Type::getVoidTy(context);
 
 struct CodeGenMetadata {
-    LgsStack logosStack;
+    LgsStack lgsStack;
     Module* module;
     IRBuilder<> builder = IRBuilder(context);
 };

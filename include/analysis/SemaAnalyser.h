@@ -1,11 +1,9 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
 #include "LgsAnalyser.h"
-#include "LgsInterfaceFile.h"
 #include "LgsStack.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
-#include "files/LgsObjectFile.h"
 #include "stmts/LgsBreakStmt.h"
 #include "stmts/LgsPatternMatching.h"
 #include "stmts/LgsReturn.h"
@@ -28,7 +26,7 @@ class LgsLoop;
 
 class SemaAnalyser final : public LgsAnalyser {
 public:
-    LgsStack logosStack;
+    LgsStack lgsStack;
     LgsFile* file = nullptr;
     vector<LgsError> errors;
 
@@ -36,9 +34,9 @@ public:
     void analyse();
     void visitMainFile(const LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
+    void visitObjectInterfaces(LgsObject* obj);
     void visitField(LgsField* field);
-    void visitMethodImpl(LgsMethodImpl* method);
-    void visitFuncImpl(LgsFuncImpl* func);
+    void visitFunc(LgsFunc* func);
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
     void visitStmtBlock(const LgsStmtBlock* stmtBlock);
@@ -67,21 +65,23 @@ public:
     void visitInstance(LgsInstance* instance);
     void visitArrayIndex(LgsArrayIndex* arrayIndex);
 
-    void setMethod(const LgsType* parent, LgsFuncCall* methodCall);
     void setFuncType(LgsFunc* func);
     void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     void setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
-    bool validateUserType(LgsExpr* expr, LgsType* userType);
-    void checkObjectImplements(LgsObject* obj, LgsInterface* interface);
-    void visitObjectInterfaces(LgsObject* obj);
     LgsType* resolveType(LgsType* type);
-    LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     bool resolveFuncCall(LgsFuncCall* funcCall);
+    bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
+    LgsFunc* resolveFuncOverload(LgsFunc* overload, const LgsFuncCall* funcCall);
+    bool resolveMethodCall(const LgsType* type, LgsFuncCall* methodCall);
+    bool checkDefaultParams(const LgsFuncCall* funcCall, const vector<LgsParam>& overloadParams) const;
+    bool validateUserType(LgsExpr* expr, LgsType* userType);
+    LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
-    string getFuncSignaturesStr(const vector<LgsFuncSignature*>& funcs) const;
+    void checkObjectImplements(LgsObject* obj, LgsInterface* interface);
     void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});
+    string getFuncSignaturesStr(const vector<LgsFuncSignature*>& funcs) const;
     Location* getSymbolLocation(const LgsSymbol* symbol) const;
     ~SemaAnalyser() = default;
 };

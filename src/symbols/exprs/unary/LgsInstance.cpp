@@ -9,7 +9,7 @@ string LgsInstance::getName() {
 }
 
 Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
-    const auto currentFunc = metadata->logosStack.currentFunc->getIRFunc(metadata);
+    const auto currentFunc = metadata->lgsStack.currentFunc->getIRFunc(metadata);
     if (currentFunc->arg_size() == 0) {
         return metadata->builder.CreateAlloca(obj->getIRType());
     }

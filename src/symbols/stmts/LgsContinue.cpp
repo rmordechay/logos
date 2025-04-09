@@ -6,7 +6,7 @@
 
 Value* LgsContinue::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto currentLoop = metadata->logosStack.currentLoop;
+    const auto currentLoop = metadata->lgsStack.currentLoop;
     const auto loopCondition = currentLoop->loopCondBlock;
     const auto inc = builder.CreateAdd(currentLoop->iValue, builder.getInt32(1));
     builder.CreateStore(inc, currentLoop->iPtr);

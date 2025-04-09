@@ -33,7 +33,7 @@ bool LgsLinker::link(const std::map<std::string, Module*>& modules) const {
     raw_fd_ostream outputStream(paths->objFilePath.c_str(), ec, sys::fs::OF_None);
     const auto addedPassFailed = targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
     if (addedPassFailed) {
-        std::cerr << ec.message() << '\n';
+        std::cerr << ec.message() << endl;
         return false;
     }
     pass.run(*mainModule);

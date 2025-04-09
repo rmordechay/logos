@@ -1,7 +1,6 @@
 #ifndef LOGOSFUNC_H
 #define LOGOSFUNC_H
 #include "LgsFuncSignature.h"
-#include "types/LgsType.h"
 #include "LgsValue.h"
 #include "stmts/LgsStmtBlock.h"
 
@@ -12,6 +11,7 @@ class LgsType;
 
 class LgsFunc : public LgsValue {
 public:
+    string path;
     LgsFuncSignature signature;
     vector<Type*> IRParamsTypes;
     LgsStmtBlock* stmtBlock = nullptr;
@@ -25,7 +25,6 @@ public:
     virtual void createIRValue(CodeGenMetadata* metadata);
     virtual Function* getIRFunc(const CodeGenMetadata* metadata);
     virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args);
-    bool equals(const LgsFuncSignature* otherSignature) const;
     json asJson() override;
     ~LgsFunc() override;
 };

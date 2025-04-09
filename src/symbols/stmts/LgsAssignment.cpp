@@ -16,7 +16,7 @@ Value* LgsAssignment::createIRValue(CodeGenMetadata* metadata) {
 }
 
 void LgsAssignment::createIRFromSelection(CodeGenMetadata* metadata, const LgsSelection* selection) const {
-    const auto firstExprSymbol = metadata->logosStack.getSymbol(selection->exprs[0]->getName());
+    const auto firstExprSymbol = metadata->lgsStack.getSymbol(selection->exprs[0]->getName());
     switch (firstExprSymbol->type) {
     case VAR_DEC:
         if (const auto instance = firstExprSymbol->varDec->expr->asInstance()) {

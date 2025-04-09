@@ -28,7 +28,7 @@
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
 #include "stmts/LgsContinue.h"
-#include "../../include/symbols/types/LgsEnum.h"
+#include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "stmts/LgsPatternMatching.h"
 
@@ -482,11 +482,11 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
             const auto logosField = getVariable(field->getText(), currentExpr);
             exprs.emplace_back(logosField);
         } else if (const auto funcCall = currentExpr->funcCall()) {
-            const auto logosFuncCall = getFuncCall(funcCall);
+            const auto logosMethodCall = getFuncCall(funcCall);
             // First inner expr takes firstExpr as parent
             const auto prevExpr = i == 0 ? exprs[0] : exprs[i - 1];
-            logosFuncCall->args.insert(logosFuncCall->args.begin(), prevExpr);
-            exprs.emplace_back(logosFuncCall);
+            logosMethodCall->args.insert(logosMethodCall->args.begin(), prevExpr);
+            exprs.emplace_back(logosMethodCall);
         } else if (const auto arrayIndex = currentExpr->arrayIndex()) {
             const auto logosArrayIndex = getArrayIndex(arrayIndex);
             exprs.emplace_back(logosArrayIndex);
