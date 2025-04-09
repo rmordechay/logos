@@ -1,7 +1,5 @@
 #include "exprs/unary/LgsArray.h"
-
 #include "types/LgsArrayType.h"
-#include "types/LgsVoid.h"
 
 Value* LgsArray::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;

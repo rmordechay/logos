@@ -568,7 +568,6 @@ bool SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
     for (const auto& overload : overloads) {
         if (overload->signature.name != funcCall->name) continue;
         auto overloadParams = overload->signature.params;
-        if (overloadParams.size() == 0) return true;
         if (funcCall->args.size() > overloadParams.size()) {
             handleError(E10027, &funcCall->location);
             return false;
@@ -581,6 +580,8 @@ bool SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
             }
             break;
         }
+
+        if (overloadParams.size() == 0) return true;
 
         auto pass = true;
         for (size_t i = 0; i < overloadParams.size(); ++i) {

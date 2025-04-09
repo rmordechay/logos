@@ -2,7 +2,6 @@
 #define LGSFUNCSIGNATURE_H
 #include "LgsParam.h"
 #include "types/LgsType.h"
-
 #include <sstream>
 
 class LgsParam;

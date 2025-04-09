@@ -1,5 +1,4 @@
 #include "funcs/LgsFunc.h"
-
 #include "exprs/LgsExpr.h"
 #include "funcs/LgsParam.h"
 #include "types/LgsVoid.h"

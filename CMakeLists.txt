@@ -78,7 +78,6 @@ add_library(lib STATIC
     include/symbols/funcs/LgsMethodImpl.h
     include/symbols/funcs/LgsParam.h
     include/symbols/funcs/LgsFuncSignature.h
-    include/symbols/builtin/LgsGlobalConsts.h
     include/symbols/builtin/LgsPrint.h
     include/symbols/loops/LgsForeachLoop.h
     include/symbols/loops/LgsRangeLoop.h

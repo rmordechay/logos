@@ -4,30 +4,17 @@ declare void @free(ptr)
 
 %arr = type {i64, i64, ptr}
 
-define ptr @ArrayType_initArr_Long(i64 %initial_cap) {
-    %self = call ptr @malloc(i64 16)
-    %cap_ptr = call ptr @get_cap(ptr %self)
-    %size_ptr = call ptr @get_size(ptr %self)
-    %cmp = icmp sgt i64 %initial_cap, 0
-    br i1 %cmp, label %init_with_initial_cap, label %init_with_default_cap
-
-init_with_initial_cap:
+define void @ArrayType_initArr_ArrayType_Long(ptr sret(%arr) %arr_ptr, i64 %initial_cap) {
+    %cap_ptr = call ptr @get_cap(ptr %arr_ptr)
+    %size_ptr = call ptr @get_size(ptr %arr_ptr)
     store i64 %initial_cap, ptr %cap_ptr
-    br label %init_array
-
-init_with_default_cap:
-    store i64 2, ptr %cap_ptr
-    br label %init_array
-
-init_array:
     store i64 0, ptr %size_ptr
     %cap = load i64, ptr %cap_ptr
-    %data_size = mul i64 %cap, 4
+    %data_size = mul i64 %cap, 2
     %data = call ptr @malloc(i64 %data_size)
-    %data_ptr = call ptr @get_data(ptr %self)
+    %data_ptr = call ptr @get_data(ptr %arr_ptr)
     store ptr %data, ptr %data_ptr
-
-    ret ptr %self
+    ret void
 }
 
 define ptr @ArrayType_getElement_ArrayType_Int(ptr %self, i32 %index) {
@@ -38,7 +25,7 @@ entry:
     ret ptr %element
 }
 
-define void @ArrayType_add_ArrayType_Int(ptr %self, ptr %new_elem) {
+define void @ArrayType_add_ArrayType_Str(ptr %self, ptr %new_elem) {
 entry:
     %cap_ptr = call ptr @get_cap(ptr %self)
     %size_ptr = call ptr @get_size(ptr %self)
@@ -72,17 +59,23 @@ define void @ArrayType_freeArr_ArrayType(ptr %self) {
     ret void
 }
 
-define ptr @get_cap(ptr %self) {
+define ptr @get_cap(ptr %self) alwaysinline {
     %cap_ptr = getelementptr %arr, ptr %self, i32 0, i32 0
     ret ptr %cap_ptr
 }
 
-define ptr @get_size(ptr %self) {
+define ptr @get_size(ptr %self) alwaysinline {
     %size_ptr = getelementptr %arr, ptr %self, i32 0, i32 1
     ret ptr %size_ptr
 }
 
-define ptr @get_data(ptr %self) {
+define ptr @get_data(ptr %self) alwaysinline {
     %data_ptr = getelementptr %arr, ptr %self, i32 0, i32 2
     ret ptr %data_ptr
 }
+
+;define i32 @main() {
+;    %arr_ptr = alloca %arr
+;    call void @ArrayType_initArr_Long(ptr %arr_ptr, i64 2)
+;    ret i32 0
+;}

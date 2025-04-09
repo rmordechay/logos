@@ -26,17 +26,19 @@ bool LgsArrayType::equals(LgsType* other) const {
 }
 
 LgsType* LgsArrayType::inferBinaryType(LgsType* other) {
-    assert(false && "not implemented");
+    assert(false);
 }
 
 Value* LgsArrayType::initIRArr(CodeGenMetadata* metadata, const size_t size) const {
-    const auto func = metadata->module->getOrInsertFunction("ArrayType_initArr_Long", initArrIRFuncType);
+    auto func = metadata->module->getOrInsertFunction("ArrayType_initArr_ArrayType_Long", initArrIRFuncType);
     auto initialCapacity = metadata->builder.getInt64(size);
-    return metadata->builder.CreateCall(func, {initialCapacity});
+    const auto arrPtr = metadata->builder.CreateAlloca(arrIR);
+    dyn_cast<Function>(func.getCallee())->addParamAttr(0, sret);
+    return metadata->builder.CreateCall(func, {arrPtr, initialCapacity});
 }
 
 FunctionCallee LgsArrayType::getIRFuncAddElement(const CodeGenMetadata* metadata) const {
-    return metadata->module->getOrInsertFunction("ArrayType_add_ArrayType_Int", addElementIRFuncType);
+    return metadata->module->getOrInsertFunction("ArrayType_add_ArrayType_Str", addElementIRFuncType);
 }
 
 Value* LgsArrayType::getIRFuncGetElement(CodeGenMetadata* metadata, Value* arrPtr, Value* index) const {
