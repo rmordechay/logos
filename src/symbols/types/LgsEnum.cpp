@@ -9,6 +9,10 @@ LgsExpr* LgsEnum::getZeroValue() {
     assert(false);
 }
 
+size_t LgsEnum::size() {
+    return sizeof(void*);
+}
+
 Type* LgsEnum::getIRType() {
     return ptrTy;
 }

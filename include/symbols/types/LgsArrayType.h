@@ -11,6 +11,7 @@ struct CodeGenMetadata;
 
 class LgsArrayType final : public LgsType {
 public:
+
     LgsType* underlyingType = nullptr;
     LgsMethodImpl addElementFunc = LgsMethodImpl("add", new LgsVoid(), getName(), {new LgsParam(this), new LgsParam(new LgsInt())});
     FunctionType* const initArrIRFuncType = FunctionType::get(ptrTy, {i64Ty}, false);
@@ -23,6 +24,7 @@ public:
     }
 
     explicit LgsArrayType(LgsType* underlyingType) : underlyingType(underlyingType) {}
+    size_t size() override;
     const string getName() const override;
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;

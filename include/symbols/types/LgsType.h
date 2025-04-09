@@ -28,6 +28,7 @@ public:
     LgsMethodImpl* getMethod(const LgsFuncSignature* signature) const;
     vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
     virtual bool equals(const LgsType& other);
+    virtual size_t size() = 0;
     virtual Type* getIRType() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual const string getName() const = 0;
@@ -41,7 +42,8 @@ public:
     string name;
 
     explicit LgsUnknownType(const string& name) : name(name) {}
-    const string getName() const override { return name; }
+    size_t size() override { assert(false && "unknown type should not be called"); }
+    const string getName() const override { assert(false && "unknown type should not be called"); }
     LgsExpr* getZeroValue() override { assert(false && "unknown type should not be called"); }
     bool equals(LgsType* other) const override { assert(false && "unknown type should not be called"); }
     LgsType* inferBinaryType(LgsType* other) override { assert(false && "unknown type should not be called"); }

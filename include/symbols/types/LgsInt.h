@@ -4,9 +4,11 @@
 
 class LgsInt final : public LgsType {
 public:
+
     static constexpr auto name = "Int";
 
     const string getName() const override;
+    size_t size() override;
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;

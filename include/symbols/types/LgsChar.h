@@ -1,15 +1,14 @@
 #ifndef LGSCHAR_H
 #define LGSCHAR_H
-#include "LgsBool.h"
 #include "funcs/LgsMethodImpl.h"
-#include "funcs/LgsParam.h"
-#include "exprs/unary/LgsUnaryExpr.h"
 
 class LgsChar final : public LgsType {
 public:
+
     static constexpr auto name = "Char";
 
     const string getName() const override;
+    size_t size() override;
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;

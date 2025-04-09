@@ -6,11 +6,11 @@ struct LgsFuncSignature;
 
 class LgsInterface final : public LgsType {
 public:
-
     string name;
     vector<LgsFuncSignature*> funcSignatures;
 
     explicit LgsInterface(const string& name) : name(name) {}
+    size_t size() override;
     const string getName() const override;
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;

@@ -9,6 +9,10 @@ const string LgsObject::getName() const {
     return name;
 }
 
+size_t LgsObject::size() {
+    return sizeof(void*);
+}
+
 Type* LgsObject::getIRType() {
     if (IRType) return IRType;
     CodeGenerator::generateObjModule(this);

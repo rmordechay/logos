@@ -9,6 +9,7 @@
 #include "builtin/LgsEnv.h"
 #include "builtin/LgsSys.h"
 #include "builtin/LgsPrint.h"
+#include "types/LgsBool.h"
 
 #include <iostream>
 

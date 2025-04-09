@@ -7,6 +7,10 @@ const string LgsBool::getName() const {
     return name;
 }
 
+size_t LgsBool::size() {
+    return sizeof(bool);
+}
+
 Type* LgsBool::getIRType() {
     return Type::getInt1Ty(context);
 }

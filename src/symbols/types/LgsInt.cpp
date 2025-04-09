@@ -7,6 +7,10 @@ const string LgsInt::getName() const {
     return name;
 }
 
+size_t LgsInt::size() {
+    return sizeof(int);
+}
+
 Type* LgsInt::getIRType() {
     return i32Ty;
 }
