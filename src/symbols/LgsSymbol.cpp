@@ -4,7 +4,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
-LgsSymbol::LgsSymbol(): type(static_cast<LgsSymbolType>(0)), object(nullptr) {}
+LgsSymbol::LgsSymbol(): type(UNKNOWN), object(nullptr) {}
 LgsSymbol::LgsSymbol(LgsParam* param): type(PARAM), param(param) {}
 LgsSymbol::LgsSymbol(LgsVarDec* varDec): type(VAR_DEC), varDec(varDec) {}
 LgsSymbol::LgsSymbol(LgsFunc* func): type(FUNC), func(func) {}

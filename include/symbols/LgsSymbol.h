@@ -17,7 +17,8 @@ enum LgsSymbolType {
     INTERFACE,
     FUNC,
     ENUM,
-    ENUM_FIELD
+    ENUM_FIELD,
+    UNKNOWN,
 };
 
 struct LgsSymbol {

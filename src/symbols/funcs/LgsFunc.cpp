@@ -8,7 +8,6 @@ void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     const auto IRFunc = getIRFunc(metadata);
     auto args = IRFunc->arg_begin();
     for (auto& param : signature.params) {
-        metadata->logosStack.addLocalSymbol(param.name, &param);
         param.setIRValue(args);
         args++->setName(param.name);
     }

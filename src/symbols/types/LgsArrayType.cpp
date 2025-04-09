@@ -34,7 +34,8 @@ Value* LgsArrayType::initIRArr(CodeGenMetadata* metadata, const size_t size) con
     auto initialCapacity = metadata->builder.getInt64(size);
     const auto arrPtr = metadata->builder.CreateAlloca(arrIR);
     dyn_cast<Function>(func.getCallee())->addParamAttr(0, sret);
-    return metadata->builder.CreateCall(func, {arrPtr, initialCapacity});
+    metadata->builder.CreateCall(func, {arrPtr, initialCapacity});
+    return arrPtr;
 }
 
 FunctionCallee LgsArrayType::getIRFuncAddElement(const CodeGenMetadata* metadata) const {

@@ -25,8 +25,6 @@ public:
     void exitScope(CodeGenMetadata* metadata = nullptr);
     LgsSymbol* getSymbol(const string& name);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
-    void addLocalSymbol(const string& name, LgsVarDec* symbol);
-    void addLocalSymbol(const string& name, LgsParam* symbol);
     string getStackString() const;
     void freeSymbols(CodeGenMetadata* metadata);
     void reset();

@@ -16,7 +16,6 @@ void LgsStack::enterScope(LgsFunc* func) {
 }
 
 void LgsStack::exitScope(CodeGenMetadata* metadata) {
-    // if (metadata) freeSymbols(metadata);
     pop();
 }
 
@@ -37,14 +36,6 @@ LgsSymbol* LgsStack::getSymbol(const string& name) {
 void LgsStack::addLocalSymbol(const string& name, const LgsSymbol& symbol) {
     assert(size() > 0 && "stack has no frames");
     top().symbols[name] = symbol;
-}
-
-void LgsStack::addLocalSymbol(const string& name, LgsVarDec* symbol) {
-    addLocalSymbol(name, LgsSymbol(symbol));
-}
-
-void LgsStack::addLocalSymbol(const string& name, LgsParam* symbol) {
-    addLocalSymbol(name, LgsSymbol(symbol));
 }
 
 string LgsStack::getStackString() const {

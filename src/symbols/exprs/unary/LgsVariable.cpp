@@ -12,14 +12,14 @@ string LgsVariable::getName() {
 }
 
 Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
-    const auto symbol = metadata->logosStack.getSymbol(name);
-    switch (symbol->type) {
+    assert(ref.type != UNKNOWN);
+    switch (ref.type) {
     case VAR_DEC:
-        return symbol->varDec->expr->getIRValue(metadata);
+        return ref.varDec->expr->getIRValue(metadata);
     case PARAM:
-        return symbol->param->IRValue;
+        return ref.param->IRValue;
     case ENUM_FIELD:
-        return symbol->enumField->getIRValue(metadata);
+        return ref.enumField->getIRValue(metadata);
     default:
         assert(false);
     }
@@ -37,6 +37,8 @@ Value* LgsVariable::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
     case ENUM:
     case ENUM_FIELD:
         break;
+    case UNKNOWN:
+        assert(false);
     }
     return nullptr;
 }

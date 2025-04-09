@@ -300,6 +300,7 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     default:
         assert(false);
     }
+    variable->ref = *symbol;
 }
 
 void SemaAnalyser::visitSelection(LgsSelection* selection) {

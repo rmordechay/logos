@@ -54,6 +54,8 @@ Value* LgsPatternMatching::hashIRValue(CodeGenMetadata* metadata, LgsExpr* expr)
         case FUNC:
         case ENUM:
             break;
+        case UNKNOWN:
+            assert(false);
         }
     }
     if (const auto strConst = e->asStrConst()) {
