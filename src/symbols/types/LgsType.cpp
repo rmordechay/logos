@@ -17,26 +17,10 @@ LgsField* LgsType::getField(const string& name) {
     return nullptr;
 }
 
-LgsMethodImpl* LgsType::getMethod(const LgsFuncCall* funcCall) const {
-    assert(funcCall->composedName != "");
+LgsMethodImpl* LgsType::findMethod(const LgsFuncCall* funcCall) const {
     const auto overloads = getMethodsOverloads(funcCall->name);
     for (const auto& overload : overloads) {
-        std::cout << overload->signature.composedName << '\n';
-        std::cout << funcCall->composedName << '\n';
-        if (overload->signature.composedName == funcCall->composedName) {
-            return overload;
-        }
-    }
-    return nullptr;
-}
-
-LgsMethodImpl* LgsType::getMethod(const LgsFuncSignature* signature) const {
-    assert(signature->composedName != "");
-    const auto overloads = getMethodsOverloads(signature->name);
-    for (const auto& overload : overloads) {
-        // std::cout << overload->signature.composedName << '\n';
-        // std::cout << signature->composedName << '\n';
-        if (overload->signature.composedName == signature->composedName) {
+        if (overload->signature.IRName == funcCall->composedName) {
             return overload;
         }
     }

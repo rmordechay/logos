@@ -42,5 +42,6 @@ inline LgsError E10024{.msg = "Declaration of null value must have an explict nu
 inline LgsError E10025{.msg = "'%s' must be an interface.", .errCode = ++errCodeStart};
 inline LgsError E10026{.msg = "Void functions should not return an expression.", .errCode = ++errCodeStart};
 inline LgsError E10027{.msg = "Function call has more arguments then the function accepts.", .errCode = ++errCodeStart};
+inline LgsError E10028{.msg = "Default parameters must be defined lastly.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

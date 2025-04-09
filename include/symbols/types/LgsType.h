@@ -24,8 +24,7 @@ public:
     map<string, vector<LgsMethodImpl*>> methods;
 
     LgsField* getField(const string& name);
-    LgsMethodImpl* getMethod(const LgsFuncCall* funcCall) const;
-    LgsMethodImpl* getMethod(const LgsFuncSignature* signature) const;
+    LgsMethodImpl* findMethod(const LgsFuncCall* funcCall) const;
     vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
     virtual bool equals(const LgsType& other);
     virtual size_t size() = 0;

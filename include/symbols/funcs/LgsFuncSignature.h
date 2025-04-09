@@ -8,8 +8,7 @@ class LgsParam;
 
 struct LgsFuncSignature {
     string name;
-    string composedName;
-    string internalName;
+    string IRName;
     string parentName;
     LgsType* type;
     vector<LgsParam> params;
@@ -25,7 +24,7 @@ struct LgsFuncSignature {
         for (const auto& param : params) {
             argTypeNames.emplace_back(param.type->getName());
         }
-        composedName = getComposedName(name, parentName, argTypeNames);
+        IRName = getComposedName(name, parentName, argTypeNames);
     }
 
     string getPrintName() const {

@@ -74,7 +74,8 @@ public:
     void setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
     bool validateUserType(LgsExpr* expr, LgsType* userType);
-    void checkObjectImplements(LgsObject* obj);
+    void checkObjectImplements(LgsObject* obj, LgsInterface* interface);
+    void visitObjectInterfaces(LgsObject* obj);
     LgsType* resolveType(LgsType* type);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     bool resolveFuncCall(LgsFuncCall* funcCall);

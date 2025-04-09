@@ -31,15 +31,23 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     return metadata->builder.CreateCall(IRFunc, argValues);
 }
 
+bool LgsFunc::equals(const LgsFuncSignature* otherSignature) const {
+    if (signature.parentName != "" && otherSignature->parentName != "")
+    if (signature.parentName != otherSignature->parentName) return false;
+    if (signature.name != otherSignature->name) return false;
+    if (signature.type->getName() != otherSignature->type->getName()) return false;
+    if (signature.params.size() == 0) return true;
+    for (size_t i = 0; i < signature.params.size() - 1; ++i) {
+        auto thisTypeName = signature.params[i + 1].type->getName();
+        auto otherTypeName = otherSignature->params[i].type->getName();
+        if (thisTypeName != otherTypeName) return false;
+    }
+    return true;
+}
+
 Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
     if (!IRFuncType) setIRFuncType();
-    string name;
-    if (signature.isStatic) {
-        name = signature.name;
-    } else {
-        name = signature.composedName;
-    }
-    auto func = metadata->module->getOrInsertFunction(name, IRFuncType);
+    auto func = metadata->module->getOrInsertFunction(signature.IRName, IRFuncType);
     return dyn_cast<Function>(func.getCallee());
 }
 

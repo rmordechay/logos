@@ -56,7 +56,22 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
             visitMethodImpl(overload);
         }
     }
-    checkObjectImplements(obj);
+    visitObjectInterfaces(obj);
+}
+
+void SemaAnalyser::visitObjectInterfaces(LgsObject* obj) {
+    for (int i = 0; i < obj->implements.size(); ++i) {
+        obj->implements[i] = resolveType(obj->implements[i]);
+        const auto implement = obj->implements[i];
+        if (!implement) continue;
+
+        const auto interface = dynamic_cast<LgsInterface*>(implement);
+        if (!interface) {
+            handleError(E10025, &implement->location, {implement->getName()});
+            continue;
+        }
+        checkObjectImplements(obj, interface);
+    }
 }
 
 void SemaAnalyser::visitFuncImpl(LgsFuncImpl* func) {
@@ -440,7 +455,7 @@ void SemaAnalyser::setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fiel
 }
 
 void SemaAnalyser::setMethod(const LgsType* parent, LgsFuncCall* methodCall) {
-    const auto method = parent->getMethod(methodCall);
+    const auto method = parent->findMethod(methodCall);
     if (!method) {
         return handleError(E10005, &methodCall->location, {methodCall->getName(), parent->getName()});
     }
@@ -500,35 +515,23 @@ bool SemaAnalyser::validateUserType(LgsExpr* expr, LgsType* userType) {
     return true;
 }
 
-void SemaAnalyser::checkObjectImplements(LgsObject* obj) {
-    for (int i = 0; i < obj->implements.size(); ++i) {
-        obj->implements[i] = resolveType(obj->implements[i]);
-        const auto implement = obj->implements[i];
-        if (!implement) continue;
-
-        const auto interface = dynamic_cast<LgsInterface*>(implement);
-        if (!interface) {
-            handleError(E10025, &implement->location, {implement->getName()});
-            continue;
-        }
-
-        vector<LgsFuncSignature*> missingFuncs;
-        for (const auto& signature : interface->funcSignatures) {
-            const auto overloads = obj->getMethodsOverloads(signature->name);
-            auto found = false;
-            for (const auto& overload : overloads) {
-                if (overload->isMethodEqual(signature)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                missingFuncs.emplace_back(signature);
+void SemaAnalyser::checkObjectImplements(LgsObject* obj, LgsInterface* const interface) {
+    vector<LgsFuncSignature*> missingFuncs;
+    for (const auto& signature : interface->funcSignatures) {
+        const auto overloads = obj->getMethodsOverloads(signature->name);
+        auto found = false;
+        for (const auto& overload : overloads) {
+            if (overload->equals(signature)) {
+                found = true;
+                break;
             }
         }
-        if (!missingFuncs.empty()) {
-            handleError(E10016, &obj->location, {obj->name, interface->name, getFuncSignaturesStr(missingFuncs)});
+        if (!found) {
+            missingFuncs.emplace_back(signature);
         }
+    }
+    if (!missingFuncs.empty()) {
+        handleError(E10016, &obj->location, {obj->name, interface->name, getFuncSignaturesStr(missingFuncs)});
     }
 }
 
@@ -576,7 +579,7 @@ bool SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
 
         // same size of params and args implies no use of default args
         if (overloadParams.size() == funcCall->args.size()) {
-            if (overload->signature.composedName == funcCall->composedName) {
+            if (overload->signature.IRName == funcCall->composedName) {
                 func = overload;
             }
             break;
