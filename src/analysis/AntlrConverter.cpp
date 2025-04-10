@@ -1,8 +1,9 @@
 #include "analysis/AntlrConverter.h"
+
+#include "LgsAppFile.h"
 #include "LgsEnvFile.h"
 #include "LgsGlobals.h"
 #include "LgsInterfaceFile.h"
-#include "builtin/LgsEnv.h"
 #include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "exprs/binary/LgsBinaryExpr.h"
@@ -27,7 +28,8 @@
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
 #include "stmts/LgsContinue.h"
-#include "stmts/LgsEnum.h"
+#include "types/LgsEnum.h"
+#include "exprs/unary/LgsEnumField.h"
 #include "stmts/LgsPatternMatching.h"
 
 #include <loops/LgsForeachLoop.h>
@@ -36,7 +38,7 @@
 #include <types/LgsVoid.h>
 #include <types/LgsArrayType.h>
 
-LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const filesystem::path& filePath) {
+LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
     LgsFile* logosFile = nullptr;
     if (const auto mainFileCtx = ctx->mainFile()) {
         logosFile = getMainFile(mainFileCtx, filePath);
@@ -51,23 +53,17 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
     return logosFile;
 }
 
-LgsEnv* AntlerConverter::getLogosEnv(LogosParser::LogosEnvFileContext* ctx, const filesystem::path& filePath) {
-    vector<LgsVarDec*> varDecs;
-    for (const auto& explicitVarDec : ctx->explicitVarDec()) {
-        varDecs.emplace_back(getExplicitVarDec(explicitVarDec));
-    }
-    for (const auto& implicitVarDec : ctx->implicitVarDec()) {
-        varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
-    }
-    return new LgsEnv(varDecs);
-}
-
 LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, const string& filePath) {
     const auto funcImplementations = ctx->funcImplementation();
     const auto mainFile = new LgsMainFile(filePath);
 
     for (const auto& lgsEnum : ctx->enumDeclaration()) {
         mainFile->enums.emplace_back(getEnum(lgsEnum));
+    }
+
+    for (const auto& object : ctx->object()) {
+        auto obj = getObject(object->objectBody(), object->TYPE()->getText());
+        mainFile->objects.emplace_back(obj);
     }
 
     for (const auto& func : funcImplementations) {
@@ -85,22 +81,55 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, con
     return mainFile;
 }
 
+LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath) {
+    vector<LgsVarDec*> varDecs;
+    for (const auto& explicitVarDec : ctx->explicitVarDec()) {
+        varDecs.emplace_back(getExplicitVarDec(explicitVarDec));
+    }
+    for (const auto& implicitVarDec : ctx->implicitVarDec()) {
+        varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
+    }
+    return new LgsEnvFile(filePath, varDecs);
+}
+
 LgsObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath) {
     const auto objName = ctx->objectDeclaration()->TYPE()->getText();
     const auto objFile = new LgsObjectFile(objName, filePath);
-    objFile->obj = getObject(ctx);
+    objFile->obj = getObject(ctx->objectBody(), objName);
     return objFile;
 }
 
-LgsFile* AntlerConverter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const filesystem::path& filePath) {
+LgsFile* AntlerConverter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath) {
     const auto interfaceName = ctx->interfaceDeclaration()->TYPE()->getText();
     const auto interfaceFile = new LgsInterfaceFile(interfaceName, filePath);
     interfaceFile->interface = getInterface(ctx, interfaceName);
     return interfaceFile;
 }
 
-LgsObject* AntlerConverter::getObject(LogosParser::ObjectFileContext* ctx) {
-    const auto objName = ctx->objectDeclaration()->TYPE()->getText();
+LgsAppFile* AntlerConverter::getAppFile(LogosParser::LogosAppFileContext* ctx, const path& filePath) {
+    vector<LgsVarDec*> varDecs;
+    for (const auto& explicitVarDec : ctx->explicitVarDec()) {
+        varDecs.emplace_back(getExplicitVarDec(explicitVarDec));
+    }
+    for (const auto& implicitVarDec : ctx->implicitVarDec()) {
+        varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
+    }
+    const auto appFile = new LgsAppFile(filePath, varDecs);
+    const auto requireEnvs = ctx->requireEnvVars();
+    if (!requireEnvs) return appFile;
+
+    vector<RequireEnvVar> requireEnvVars;
+    for (int i = 0; i < requireEnvs->type().size(); ++i) {
+        const auto name = requireEnvs->VARIABLE()[i]->getText();
+        const auto type = getType(requireEnvs->type()[i]);
+        const RequireEnvVar requireEnvVar{.name = name, .type = type};
+        requireEnvVars.emplace_back(requireEnvVar);
+    }
+    appFile->requireEnvVars = requireEnvVars;
+    return appFile;
+}
+
+LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName) {
     const auto obj = new LgsObject(objName);
     for (int i = 0; i < ctx->explicitVarDec().size(); ++i) {
         const auto varDec = ctx->explicitVarDec()[i];
@@ -126,16 +155,16 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceFileContext* c
     const auto interfaceName = ctx->interfaceDeclaration()->TYPE()->getText();
     const auto interface = new LgsInterface(interfaceName);
     for (const auto& funcSignature : ctx->funcSignature()) {
-        vector<LgsParam*> params;
+        vector<LgsParam> params;
         if (funcSignature->paramList()) {
             for (const auto& varDec : funcSignature->paramList()->explicitVarDec()) {
-                auto param = getParam(varDec);
-                params.emplace_back(param);
+                const auto param = getParam(varDec);
+                params.emplace_back(*param);
             }
         }
         const auto type = getType(funcSignature->type());
-        auto lgsFuncSignature = new LgsFuncSignature(funcSignature->VARIABLE()->getText(), parentName, type, params);
-        interface->funcSignatures.emplace_back(lgsFuncSignature);
+        auto signature = new LgsFuncSignature(funcSignature->VARIABLE()->getText(), parentName, type, params);
+        interface->funcSignatures.emplace_back(signature);
     }
     globals.addSymbol(interface->name, LgsSymbol(interface));
     return interface;
@@ -145,16 +174,17 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext
     const auto rt = getFuncType(ctx);
     const auto signature = ctx->funcSignature();
     const auto name = signature->VARIABLE()->getText();
-    vector<LgsParam*> params;
+    vector<LgsParam> params;
     if (signature->paramList()) {
         for (const auto& varDec : signature->paramList()->explicitVarDec()) {
-            auto param = getParam(varDec);
-            params.emplace_back(param);
+            const auto param = getParam(varDec);
+            params.emplace_back(*param);
         }
     }
     const auto func = new LgsFuncImpl(name, rt, params);
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     func->setLocation(ctx->start);
+    globals.addFunc(func);
     return func;
 }
 
@@ -162,12 +192,12 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationCon
     const auto rt = getFuncType(ctx);
     const auto signature = ctx->funcSignature();
     const auto name = signature->VARIABLE()->getText();
-    const auto self = new LgsParam(LOGOS_SELF, obj, new LgsInstance(obj));
+    const auto self = LgsParam(LOGOS_SELF, obj, new LgsInstance(obj));
     vector params = {self};
     if (signature->paramList()) {
         for (const auto& varDec : signature->paramList()->explicitVarDec()) {
-            auto param = getParam(varDec);
-            params.emplace_back(param);
+            const auto param = getParam(varDec);
+            params.emplace_back(*param);
         }
     }
     const auto method = new LgsMethodImpl(name, rt, obj->name, params);
@@ -177,20 +207,23 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationCon
 
 }
 
-LgsField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* varDec, const size_t position, const string& parentName) {
-    const auto name = varDec->VARIABLE()->getText();
-    const auto type = getType(varDec->type());
-    const auto expr = getExpr(varDec->expr());
-    return new LgsField(name, parentName, position, type, expr);
+LgsField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* ctx, const size_t position, const string& parentName) {
+    const auto name = ctx->VARIABLE()->getText();
+    const auto userType = getType(ctx->type());
+    const auto expr = getExpr(ctx->expr());
+    const auto field = new LgsField(name, position, userType, expr);
+    field->setLocation(ctx->start);
+    return field;
 }
 
 LgsStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
-    vector<LgsStmt*> stmts;
+    const auto stmtBlock = new LgsStmtBlock();
+    if (!ctx) return stmtBlock;
     for (const auto& statement : ctx->statement()) {
         auto stmt = getStmt(statement);
-        stmts.emplace_back(stmt);
+        stmtBlock->stmts.emplace_back(stmt);
     }
-    return new LgsStmtBlock(stmts);
+    return stmtBlock;
 }
 
 LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
@@ -200,10 +233,9 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto ifStmt = ctx->ifStatement()) return getIfStatement(ifStmt);
     if (const auto patternMatching = ctx->patternMatching()) return getPatternMatching(patternMatching);
     if (const auto loopStmt = ctx->loopStatement()) return getLoopStatement(loopStmt);
-    if (const auto enumDec = ctx->enumDeclaration()) return getEnum(enumDec);
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
     if (const auto selection = ctx->selection()) return getSelection(selection);
-    if (const auto returnStmt = ctx->returnStatement()) return new LgsReturn(getExpr(returnStmt->expr()));
+    if (const auto returnStmt = ctx->returnStatement()) return getReturnStmt(returnStmt);
     if (ctx->breakStmt()) return new LgsBreakStmt();
     if (ctx->CONTINUE()) return new LgsContinue();
     return nullptr;
@@ -229,18 +261,25 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
 LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto expr = getExpr(ctx->expr(), !!ctx->QUEST_MARK());
-    const auto logosVarDec = new LgsVarDec(variableName, nullptr, expr);
-    logosVarDec->setLocation(ctx->start);
-    return logosVarDec;
+    const auto varDec = new LgsVarDec(variableName, expr->type, expr);
+    varDec->setLocation(ctx->start);
+    return varDec;
 }
 
 LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto userType = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
-    const auto varDec = new LgsVarDec(variableName, userType, expr);
+    const auto varDec = new LgsVarDec(variableName, expr);
+    varDec->userType = userType;
     varDec->setLocation(ctx->start);
     return varDec;
+}
+
+LgsStmt* AntlerConverter::getReturnStmt(LogosParser::ReturnStatementContext* ctx) {
+    const auto rs = new LgsReturn(getExpr(ctx->expr()));
+    rs->setLocation(ctx->start);
+    return rs;
 }
 
 LgsParam* AntlerConverter::getParam(LogosParser::ExplicitVarDecContext* ctx) {
@@ -286,11 +325,11 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
     LgsLoop* loopStmt = nullptr;
     const auto loopVarName = ctx->VARIABLE()[0]->getText();
     if (const auto iterable = ctx->iterableExpr) {
-        const auto loopVar = new LgsVarDec(loopVarName, nullptr, nullptr);
+        const auto loopVar = new LgsVarDec(loopVarName);
         loopStmt = new LgsForeachLoop({loopVar}, getUnaryExpr(iterable), stmts);
     } else if (const auto range = ctx->iterableRange) {
         const auto startExpr = getExpr(range->start);
-        const auto loopVar = new LgsVarDec(loopVarName, nullptr, startExpr);
+        const auto loopVar = new LgsVarDec(loopVarName, startExpr);
         loopVar->type = startExpr->type;
         loopStmt = new LgsRangeLoop({loopVar}, startExpr, getExpr(range->end), stmts);
     } else {
@@ -302,18 +341,20 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
 }
 
 LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
-    const auto lgsEnum = new LgsEnum();
+    const auto lgsEnum = new LgsEnum(ctx->TYPE()->getText());
     for (size_t i = 0; i < ctx->enumField().size(); ++i) {
         const auto enumField = ctx->enumField()[i];
         const auto enumName = enumField->CONST()->getText();
-        auto enumText = enumField->STRING()->getText();
-        LgsStr::cleanStr(enumText);
-        EnumField field(i, enumName, enumText);
-        field.setLocation(ctx->start);
-        lgsEnum->fields.emplace_back(field);
+        string enumText = "";
+        if (enumField->STRING()) {
+            enumText = enumField->STRING()->getText();
+            LgsStr::cleanStr(enumText);
+        }
+        const auto field = new LgsEnumField(lgsEnum, enumName, i, enumText);
+        field->setLocation(ctx->start);
+        lgsEnum->fields[enumName] = field;
     }
-    lgsEnum->setLocation(ctx->start);
-    globals.addSymbol(ctx->TYPE()->getText(), LgsSymbol(lgsEnum));
+    globals.addEnum(lgsEnum);
     return lgsEnum;
 }
 
@@ -441,11 +482,11 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
             const auto logosField = getVariable(field->getText(), currentExpr);
             exprs.emplace_back(logosField);
         } else if (const auto funcCall = currentExpr->funcCall()) {
-            const auto logosFuncCall = getFuncCall(funcCall);
+            const auto logosMethodCall = getFuncCall(funcCall);
             // First inner expr takes firstExpr as parent
             const auto prevExpr = i == 0 ? exprs[0] : exprs[i - 1];
-            logosFuncCall->args.insert(logosFuncCall->args.begin(), prevExpr);
-            exprs.emplace_back(logosFuncCall);
+            logosMethodCall->args.insert(logosMethodCall->args.begin(), prevExpr);
+            exprs.emplace_back(logosMethodCall);
         } else if (const auto arrayIndex = currentExpr->arrayIndex()) {
             const auto logosArrayIndex = getArrayIndex(arrayIndex);
             exprs.emplace_back(logosArrayIndex);

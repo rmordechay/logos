@@ -12,33 +12,33 @@
 class  LogosParser : public antlr4::Parser {
 public:
   enum {
-    DOUBLE_EQUAL = 1, NOT_EQUAL = 2, GE = 3, LE = 4, LPAREN = 5, RPAREN = 6, 
-    LBRACE = 7, RBRACE = 8, LBRACK = 9, RBRACK = 10, CAST = 11, LANGLE = 12, 
-    RANGLE = 13, COMMA = 14, DOUBLE_DOT = 15, DOT = 16, COLON = 17, EQUAL = 18, 
-    MINUS = 19, PLUS = 20, STAR = 21, SLASH = 22, HASH = 23, QUEST_MARK = 24, 
-    EXCLA_MARK = 25, PERCENT = 26, DOLLAR = 27, AMPERSAND = 28, OBJECT = 29, 
-    SELF_INSTANCE = 30, SELF_CLASS = 31, INTERFACE = 32, ENUM = 33, VEC = 34, 
-    VEC2 = 35, VEC3 = 36, VEC4 = 37, IMPLEMENTS = 38, IMPORT = 39, IF = 40, 
-    ELSE = 41, FOR = 42, BREAK = 43, CONTINUE = 44, RETURN = 45, AND = 46, 
-    OR = 47, NOT = 48, IN = 49, INTEGER = 50, FLOAT = 51, BOOL = 52, NULL_ = 53, 
-    CONST = 54, TYPE = 55, VARIABLE = 56, STRING = 57, LINE_COMMENT = 58, 
-    BLOCK_COMMENT = 59, WS = 60
+    T__0 = 1, T__1 = 2, DOUBLE_EQUAL = 3, NOT_EQUAL = 4, GE = 5, LE = 6, 
+    LPAREN = 7, RPAREN = 8, LBRACE = 9, RBRACE = 10, LBRACK = 11, RBRACK = 12, 
+    CAST = 13, LANGLE = 14, RANGLE = 15, COMMA = 16, DOUBLE_DOT = 17, DOT = 18, 
+    COLON = 19, EQUAL = 20, MINUS = 21, PLUS = 22, STAR = 23, SLASH = 24, 
+    HASH = 25, QUEST_MARK = 26, EXCLA_MARK = 27, PERCENT = 28, DOLLAR = 29, 
+    AMPERSAND = 30, OBJECT = 31, SELF_INSTANCE = 32, SELF_CLASS = 33, INTERFACE = 34, 
+    ENUM = 35, VEC = 36, VEC2 = 37, VEC3 = 38, VEC4 = 39, IMPLEMENTS = 40, 
+    IMPORT = 41, IF = 42, ELSE = 43, FOR = 44, BREAK = 45, CONTINUE = 46, 
+    RETURN = 47, AND = 48, OR = 49, NOT = 50, IN = 51, INTEGER = 52, FLOAT = 53, 
+    BOOL = 54, NULL_ = 55, CONST = 56, TYPE = 57, VARIABLE = 58, STRING = 59, 
+    LINE_COMMENT = 60, BLOCK_COMMENT = 61, WS = 62
   };
 
   enum {
-    RuleLogosFile = 0, RuleLogosEnvFile = 1, RuleMainFile = 2, RuleObjectFile = 3, 
-    RuleInterfaceFile = 4, RuleObjectDeclaration = 5, RuleInterfaceDeclaration = 6, 
-    RuleObjectImplements = 7, RuleFuncSignature = 8, RuleFuncImplementation = 9, 
-    RuleFuncBody = 10, RuleParamList = 11, RuleStatement = 12, RuleStatementsBlock = 13, 
-    RuleAssignment = 14, RuleExplicitVarDec = 15, RuleImplicitVarDec = 16, 
-    RuleIfStatement = 17, RuleElseIfStatement = 18, RuleElseStatement = 19, 
-    RulePatternMatching = 20, RulePattern = 21, RuleLoopStatement = 22, 
-    RuleBreakStmt = 23, RuleReturnStatement = 24, RuleEnumDeclaration = 25, 
-    RuleEnumField = 26, RuleExpr = 27, RuleUnaryExpr = 28, RuleArray = 29, 
-    RuleMap = 30, RuleFuncCall = 31, RuleConstructor = 32, RuleFuncArgList = 33, 
-    RuleFuncArg = 34, RuleConstant = 35, RuleArrayIndex = 36, RuleSelection = 37, 
-    RuleFirstSelectionElement = 38, RuleInnerSelectionElement = 39, RuleRange = 40, 
-    RuleType = 41, RuleVector = 42
+    RuleLogosFile = 0, RuleLogosEnvFile = 1, RuleLogosAppFile = 2, RuleMainFile = 3, 
+    RuleObjectFile = 4, RuleInterfaceFile = 5, RuleObject = 6, RuleObjectBody = 7, 
+    RuleObjectDeclaration = 8, RuleInterfaceDeclaration = 9, RuleObjectImplements = 10, 
+    RuleFuncSignature = 11, RuleFuncImplementation = 12, RuleFuncBody = 13, 
+    RuleParamList = 14, RuleStatement = 15, RuleStatementsBlock = 16, RuleAssignment = 17, 
+    RuleExplicitVarDec = 18, RuleImplicitVarDec = 19, RuleIfStatement = 20, 
+    RuleElseIfStatement = 21, RuleElseStatement = 22, RulePatternMatching = 23, 
+    RulePattern = 24, RuleLoopStatement = 25, RuleBreakStmt = 26, RuleReturnStatement = 27, 
+    RuleEnumDeclaration = 28, RuleEnumField = 29, RuleExpr = 30, RuleUnaryExpr = 31, 
+    RuleArray = 32, RuleMap = 33, RuleFuncCall = 34, RuleConstructor = 35, 
+    RuleFuncArgList = 36, RuleFuncArg = 37, RuleConstant = 38, RuleArrayIndex = 39, 
+    RuleSelection = 40, RuleFirstSelectionElement = 41, RuleInnerSelectionElement = 42, 
+    RuleRange = 43, RuleType = 44, RuleVector = 45, RuleRequireEnvVars = 46
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -60,9 +60,12 @@ public:
 
   class LogosFileContext;
   class LogosEnvFileContext;
+  class LogosAppFileContext;
   class MainFileContext;
   class ObjectFileContext;
   class InterfaceFileContext;
+  class ObjectContext;
+  class ObjectBodyContext;
   class ObjectDeclarationContext;
   class InterfaceDeclarationContext;
   class ObjectImplementsContext;
@@ -100,7 +103,8 @@ public:
   class InnerSelectionElementContext;
   class RangeContext;
   class TypeContext;
-  class VectorContext; 
+  class VectorContext;
+  class RequireEnvVarsContext; 
 
   class  LogosFileContext : public antlr4::ParserRuleContext {
   public:
@@ -119,6 +123,7 @@ public:
   public:
     LogosEnvFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *EOF();
     std::vector<ImplicitVarDecContext *> implicitVarDec();
     ImplicitVarDecContext* implicitVarDec(size_t i);
     std::vector<ExplicitVarDecContext *> explicitVarDec();
@@ -129,11 +134,29 @@ public:
 
   LogosEnvFileContext* logosEnvFile();
 
+  class  LogosAppFileContext : public antlr4::ParserRuleContext {
+  public:
+    LogosAppFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *EOF();
+    std::vector<ImplicitVarDecContext *> implicitVarDec();
+    ImplicitVarDecContext* implicitVarDec(size_t i);
+    std::vector<ExplicitVarDecContext *> explicitVarDec();
+    ExplicitVarDecContext* explicitVarDec(size_t i);
+    RequireEnvVarsContext *requireEnvVars();
+
+   
+  };
+
+  LogosAppFileContext* logosAppFile();
+
   class  MainFileContext : public antlr4::ParserRuleContext {
   public:
     MainFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *EOF();
+    std::vector<ObjectContext *> object();
+    ObjectContext* object(size_t i);
     std::vector<EnumDeclarationContext *> enumDeclaration();
     EnumDeclarationContext* enumDeclaration(size_t i);
     std::vector<FuncImplementationContext *> funcImplementation();
@@ -149,12 +172,8 @@ public:
     ObjectFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     ObjectDeclarationContext *objectDeclaration();
+    ObjectBodyContext *objectBody();
     antlr4::tree::TerminalNode *EOF();
-    ObjectImplementsContext *objectImplements();
-    std::vector<ExplicitVarDecContext *> explicitVarDec();
-    ExplicitVarDecContext* explicitVarDec(size_t i);
-    std::vector<FuncImplementationContext *> funcImplementation();
-    FuncImplementationContext* funcImplementation(size_t i);
 
    
   };
@@ -178,6 +197,36 @@ public:
   };
 
   InterfaceFileContext* interfaceFile();
+
+  class  ObjectContext : public antlr4::ParserRuleContext {
+  public:
+    ObjectContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *OBJECT();
+    antlr4::tree::TerminalNode *TYPE();
+    antlr4::tree::TerminalNode *LBRACE();
+    ObjectBodyContext *objectBody();
+    antlr4::tree::TerminalNode *RBRACE();
+
+   
+  };
+
+  ObjectContext* object();
+
+  class  ObjectBodyContext : public antlr4::ParserRuleContext {
+  public:
+    ObjectBodyContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    ObjectImplementsContext *objectImplements();
+    std::vector<ExplicitVarDecContext *> explicitVarDec();
+    ExplicitVarDecContext* explicitVarDec(size_t i);
+    std::vector<FuncImplementationContext *> funcImplementation();
+    FuncImplementationContext* funcImplementation(size_t i);
+
+   
+  };
+
+  ObjectBodyContext* objectBody();
 
   class  ObjectDeclarationContext : public antlr4::ParserRuleContext {
   public:
@@ -287,7 +336,6 @@ public:
     antlr4::tree::TerminalNode *CONTINUE();
     BreakStmtContext *breakStmt();
     ReturnStatementContext *returnStatement();
-    EnumDeclarationContext *enumDeclaration();
     FuncCallContext *funcCall();
     SelectionContext *selection();
 
@@ -772,6 +820,24 @@ public:
   };
 
   VectorContext* vector();
+
+  class  RequireEnvVarsContext : public antlr4::ParserRuleContext {
+  public:
+    RequireEnvVarsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LBRACE();
+    antlr4::tree::TerminalNode *RBRACE();
+    std::vector<antlr4::tree::TerminalNode *> VARIABLE();
+    antlr4::tree::TerminalNode* VARIABLE(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COLON();
+    antlr4::tree::TerminalNode* COLON(size_t i);
+    std::vector<TypeContext *> type();
+    TypeContext* type(size_t i);
+
+   
+  };
+
+  RequireEnvVarsContext* requireEnvVars();
 
 
   bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;

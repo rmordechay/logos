@@ -6,8 +6,8 @@ class LgsStmtBlock final : public LgsValue {
 public:
     vector<LgsStmt*> stmts;
 
-    explicit LgsStmtBlock(const vector<LgsStmt*>& stmts) : stmts(stmts) {}
-    Value* createIRValue(CodeGenMetadata* metadata) const;
+    explicit LgsStmtBlock(const vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
+    void createIRValue(CodeGenMetadata* metadata) const;
     json asJson() override;
     ~LgsStmtBlock() override;
 };

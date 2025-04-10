@@ -3,10 +3,10 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 
 Value* LgsStrConst::createIRValue(CodeGenMetadata* metadata) {
-    return createGlobalStr(metadata->currentModule, value);
+    return createGlobalStr(metadata->module, value);
 }
 
-size_t LgsStrConst::size() {
+size_t LgsStrConst::length() {
     return value.size();
 }
 
@@ -28,20 +28,20 @@ Value* LgsStrConst::sizeIR(CodeGenMetadata* metadata) {
 
 Value* LgsStrConst::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
     if (const auto otherStrConst = other->asIntConst()) {
-        return createGlobalStr(metadata->currentModule, this->value + to_string(otherStrConst->value));
+        return createGlobalStr(metadata->module, this->value + to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asFloatConst()) {
-        return createGlobalStr(metadata->currentModule, this->value + to_string(otherStrConst->value));
+        return createGlobalStr(metadata->module, this->value + to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asStrConst()) {
-        return createGlobalStr(metadata->currentModule, this->value + otherStrConst->value);
+        return createGlobalStr(metadata->module, this->value + otherStrConst->value);
     }
     return nullptr;
 }
 
 Value* LgsStrConst::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
     if (const auto otherStrConst = other->asStrConst()) {
-        const auto func = metadata->currentModule->getOrInsertFunction("Str_compare_Str_Str", cmpStrIRFuncType);
+        const auto func = metadata->module->getOrInsertFunction("Str_compare_Str_Str", cmpStrIRFuncType);
         return metadata->builder.CreateCall(func, {getIRValue(metadata), otherStrConst->getIRValue(metadata)});
     }
     return nullptr;

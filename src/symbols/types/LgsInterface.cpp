@@ -1,8 +1,16 @@
 #include "types/LgsInterface.h"
 
 
+size_t LgsInterface::size() {
+    return sizeof(void*);
+}
+
 const string LgsInterface::getName() const {
     return name;
+}
+
+Type* LgsInterface::getIRType() {
+    assert(false);
 }
 
 LgsExpr* LgsInterface::getZeroValue() {

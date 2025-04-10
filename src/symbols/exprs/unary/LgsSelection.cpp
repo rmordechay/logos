@@ -19,7 +19,6 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
         const auto nextExpr = exprs[i + 1];
         if (const auto field = currentExpr->type->getField(nextExpr->getName())) {
             const auto value = field->getIRValue(metadata);
-            field->parentExpr = currentExpr;
             nextExpr->setIRValue(value);
             continue;
         }

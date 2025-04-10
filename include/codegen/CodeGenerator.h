@@ -1,5 +1,7 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
+#include "types/LgsType.h"
+
 #include <filesystem>
 #include <llvm/IR/Module.h>
 class LgsFile;
@@ -13,10 +15,11 @@ using namespace filesystem;
 
 class CodeGenerator {
 public:
-    static void generateModule(const path& buildDir, const LgsMainFile* mainFile, bool writeToFile = true);
-    static void generateModule(const path& buildDir, LgsObject* obj, bool writeToFile = true);
-    static Module* createEmptryModule(const std::string& objName);
-    static void writeIRToFile(const Module* module, const path& buildDir, const path& name);
+    static void generate(const LgsMainFile* mainFile, bool writeToFile = true);
+    static void generateObjModule(LgsType* obj, bool writeToFile = true);
+    static Module* createEmptyModule(const std::string& objName);
+    static void writeIRToFile(const Module* module, const path& name);
+    static void initLLVM();
     ~CodeGenerator() = default;
 };
 

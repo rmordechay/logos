@@ -12,13 +12,10 @@ public:
     string name;
     Type* IRType = nullptr;
     vector<LgsType*> implements;
-    LgsField* nameField = new LgsField("name", 0, new LgsStr(), new LgsStrConst(name));
 
-    explicit LgsObject(const string& typeName) : name(typeName) {
-        fields[nameField->name] = nameField;
-    }
-
+    explicit LgsObject(const string& typeName) : name(typeName) {}
     const string getName() const override;
+    size_t size() override;
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;

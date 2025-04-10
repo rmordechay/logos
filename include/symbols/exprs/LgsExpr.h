@@ -23,6 +23,15 @@ public:
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     virtual LgsExpr* castStatically(LgsType* other);
+    Value* getIRValue(CodeGenMetadata* metadata);
+    virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
+    virtual Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) = 0;
+    virtual Value* subIR(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual Value* mulIR(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual Value* divIR(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other);
+
+    bool isNull();
     LgsArray* asArray();
     LgsArrayIndex* asArrayIndex();
     LgsFuncCall* asFuncCall();
@@ -34,15 +43,8 @@ public:
     LgsFloatConst* asFloatConst();
     LgsIntConst* asIntConst();
     LgsStrConst* asStrConst();
+    LgsEnumField* asEnumField();
     LgsTypeConst* asTypeConst();
-
-    Value* getIRValue(CodeGenMetadata* metadata);
-    virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
-    virtual Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) = 0;
-    virtual Value* subIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* mulIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* divIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other);
     ~LgsExpr() override = default;
 };
 

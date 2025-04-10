@@ -14,5 +14,4 @@ public:
     ~LgsConstExpr() override = default;
 };
 
-
 #endif //LOGOSCONSTANTEXPR_H

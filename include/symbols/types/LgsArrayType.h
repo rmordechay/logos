@@ -1,31 +1,35 @@
 #ifndef LOGOSARRAYTYPE_H
 #define LOGOSARRAYTYPE_H
 #include "LgsInt.h"
+#include "LgsStr.h"
 #include "LgsType.h"
 #include "LgsVoid.h"
 #include "funcs/LgsMethodImpl.h"
 #include "funcs/LgsParam.h"
 
+class LgsStr;
 class LgsInt;
 struct CodeGenMetadata;
 
 class LgsArrayType final : public LgsType {
 public:
     LgsType* underlyingType = nullptr;
-    LgsMethodImpl addElementFunc = LgsMethodImpl("add", new LgsVoid(), getName(), {new LgsParam(this), new LgsParam(new LgsInt())});
-    FunctionType* const initArrIRFuncType = FunctionType::get(ptrTy, {i64Ty}, false);
+    StructType* arrIR = StructType::create(context, {i64Ty, i64Ty, ptrTy});
+    Attribute sret = Attribute::getWithStructRetType(context, arrIR);
+    LgsMethodImpl addFunc = LgsMethodImpl("add", new LgsVoid(), getName(), {LgsParam(this), LgsParam(new LgsStr())});
+    FunctionType* const initArrIRFuncType = FunctionType::get(voidTy, {ptrTy, i64Ty}, false);
     FunctionType* const freeArrIRFuncType = FunctionType::get(voidTy, {ptrTy}, false);
     FunctionType* const addElementIRFuncType = FunctionType::get(voidTy, {ptrTy, ptrTy}, false);
     FunctionType* const getElementIRFuncType = FunctionType::get(ptrTy, {ptrTy, i32Ty}, false);
 
     LgsArrayType() {
-        methods[addElementFunc.signature.name] = {&addElementFunc};
+        methods[addFunc.signature.name] = {&addFunc};
     }
 
     explicit LgsArrayType(LgsType* underlyingType) : underlyingType(underlyingType) {}
+    size_t size() override;
     const string getName() const override;
     Type* getIRType() override;
-    Type* getIRType(int size) override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;

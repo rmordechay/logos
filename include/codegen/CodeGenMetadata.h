@@ -5,12 +5,12 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Target/TargetMachine.h>
-#include <filesystem>
 #include <llvm/TargetParser/Host.h>
 
 using namespace llvm;
 
 inline LLVMContext context;
+inline LgsActiveEnv activeEnv;
 inline map<string, Module*> modules;
 inline TargetMachine* targetMachine = nullptr;
 inline string targetTriple = sys::getDefaultTargetTriple();
@@ -24,9 +24,8 @@ Type* const i64Ty = Type::getInt64Ty(context);
 Type* const voidTy = Type::getVoidTy(context);
 
 struct CodeGenMetadata {
-    LgsStack logosStack;
-    Module* currentModule;
-    filesystem::path buildDir;
+    LgsStack lgsStack;
+    Module* module;
     IRBuilder<> builder = IRBuilder(context);
 };
 

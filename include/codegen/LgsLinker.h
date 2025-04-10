@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <llvm/Linker/Linker.h>
 
+struct LgsPaths;
 using namespace llvm;
 using namespace std;
 
@@ -14,11 +15,10 @@ namespace lld::macho {
 
 class LgsLinker {
 public:
-    filesystem::path objFilePath;
-    filesystem::path execFilePath;
-    const vector<const char *> paths = {"../stdlib/lgslib.ll", "../stdlib/array.ll", "../stdlib/string.ll"};
+    LgsPaths* paths;
+    const vector<const char *> stdlibPaths = {"../stdlib/lgslib.ll", "../stdlib/array.ll", "../stdlib/string.ll"};
 
-    LgsLinker(const filesystem::path& objFilePath, const filesystem::path& execFilePath) : objFilePath(objFilePath), execFilePath(execFilePath) {}
+    explicit LgsLinker(LgsPaths* paths) : paths(paths) {}
     bool link(const map<string, Module*>& modules) const;
     vector<const char*> getLinkerOpts() const;
     void linkStdlib(const string& path, Linker* linker) const;

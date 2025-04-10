@@ -10,7 +10,9 @@ public:
     vector<LgsFuncSignature*> funcSignatures;
 
     explicit LgsInterface(const string& name) : name(name) {}
+    size_t size() override;
     const string getName() const override;
+    Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;

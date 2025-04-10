@@ -9,6 +9,7 @@ public:
     static constexpr auto name = "Float";
 
     const string getName() const override;
+    size_t size() override;
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) const override;

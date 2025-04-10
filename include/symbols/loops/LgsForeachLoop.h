@@ -9,7 +9,6 @@ class LgsArrayType;
 
 class LgsForeachLoop final : public LgsLoop {
 public:
-
     LgsUnaryExpr* iterableExpr = nullptr;
 
     LgsForeachLoop(const vector<LgsVarDec*>& loopVars, LgsUnaryExpr* iterable, LgsStmtBlock* stmtBlock) : LgsLoop(loopVars, stmtBlock), iterableExpr(iterable) {}

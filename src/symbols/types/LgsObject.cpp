@@ -1,5 +1,6 @@
 #include "types/LgsObject.h"
 
+#include "CodeGenerator.h"
 #include "exprs/LgsNull.h"
 #include "funcs/LgsFuncImpl.h"
 #include "stmts/LgsField.h"
@@ -8,8 +9,13 @@ const string LgsObject::getName() const {
     return name;
 }
 
+size_t LgsObject::size() {
+    return sizeof(void*);
+}
+
 Type* LgsObject::getIRType() {
     if (IRType) return IRType;
+    CodeGenerator::generateObjModule(this);
     vector<Type*> elementTypes;
     for (const auto& [_, val] : fields) {
         auto fieldType = val->type->getIRType();

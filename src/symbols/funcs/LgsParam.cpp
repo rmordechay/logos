@@ -11,11 +11,3 @@ json LgsParam::asJson() {
     }
     return tree;
 }
-
-LgsParam::~LgsParam() {
-    delete type;
-    if (expr) {
-        delete expr;
-    }
-}
-

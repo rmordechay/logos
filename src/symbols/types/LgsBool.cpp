@@ -7,6 +7,10 @@ const string LgsBool::getName() const {
     return name;
 }
 
+size_t LgsBool::size() {
+    return sizeof(bool);
+}
+
 Type* LgsBool::getIRType() {
     return Type::getInt1Ty(context);
 }
@@ -21,5 +25,8 @@ LgsType* LgsBool::inferBinaryType(LgsType* other) {
 }
 
 bool LgsBool::equals(LgsType* other) const {
+    if (nullable) {
+        return name == other->getName();
+    }
     return name == other->getName();
 }

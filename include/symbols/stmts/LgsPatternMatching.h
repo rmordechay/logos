@@ -11,10 +11,12 @@ public:
     vector<LgsExpr*> patterns;
     vector<LgsStmtBlock*> patternsStmtBlocks;
     LgsStmtBlock* elseStmtBlock = nullptr;
+    BasicBlock* exitBlock = nullptr;
+    BasicBlock* defaultCase = nullptr;
 
     explicit LgsPatternMatching(LgsExpr* expr) : expr(expr) {}
-
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    Value* hashIRValue(CodeGenMetadata* metadata, LgsExpr* expr) const;
     ~LgsPatternMatching() override = default;
 };
 

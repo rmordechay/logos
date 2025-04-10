@@ -13,7 +13,7 @@ public:
     explicit LgsStrConst(const string& value) : LgsConstExpr(new LgsStr()), value(value) {
         setFields(type);
     }
-    size_t size() override;
+    size_t length() override;
     LgsExpr* add(LgsExpr* other) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* sizeIR(CodeGenMetadata* metadata) override;

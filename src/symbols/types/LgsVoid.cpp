@@ -7,6 +7,10 @@ const std::string LgsVoid::getName() const {
     return name;
 }
 
+size_t LgsVoid::size() {
+    return 0;
+}
+
 Type* LgsVoid::getIRType() {
     return voidTy;
 }

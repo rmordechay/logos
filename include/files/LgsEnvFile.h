@@ -7,9 +7,9 @@ class LgsVarDec;
 
 class LgsEnvFile final : public LgsFile {
 public:
-    LgsEnv* env;
+    vector<LgsVarDec*> varDecs;
 
-    LgsEnvFile(const path& path, LgsEnv* env) : LgsFile(path.filename(), path), env(env) {}
+    LgsEnvFile(const path& path, const vector<LgsVarDec*>& varDecs) : LgsFile(path.filename(), path), varDecs(varDecs) {}
 };
 
 #endif //LGSENVFILE_H

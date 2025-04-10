@@ -2,7 +2,12 @@
 
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsMethodImpl.h"
+
 #include "stmts/LgsField.h"
+
+bool LgsType::equals(const LgsType& other) {
+    return getName() == other.getName();
+}
 
 LgsField* LgsType::getField(const string& name) {
     const auto it = fields.find(name);
@@ -12,22 +17,10 @@ LgsField* LgsType::getField(const string& name) {
     return nullptr;
 }
 
-LgsMethodImpl* LgsType::getMethod(const LgsFuncCall* funcCall) const {
-    assert(funcCall->composedName != "");
+LgsMethodImpl* LgsType::findMethod(const LgsFuncCall* funcCall) const {
     const auto overloads = getMethodsOverloads(funcCall->name);
     for (const auto& overload : overloads) {
-        if (overload->signature.composedName == funcCall->composedName) {
-            return overload;
-        }
-    }
-    return nullptr;
-}
-
-LgsMethodImpl* LgsType::getMethod(const LgsFuncSignature* signature) const {
-    assert(signature->composedName != "");
-    const auto overloads = getMethodsOverloads(signature->name);
-    for (const auto& overload : overloads) {
-        if (overload->signature.composedName == signature->composedName) {
+        if (overload->signature.isEqual(funcCall)) {
             return overload;
         }
     }
@@ -42,11 +35,6 @@ vector<LgsMethodImpl*> LgsType::getMethodsOverloads(const string& funcName) cons
     return {};
 }
 
-Type* LgsType::getIRType() {
-    std::cerr << "Type '" << getName() << "' has no IR type" << std::endl;
+Type* LgsUnknownType::getIRType() {
     assert(false);
-}
-
-Type* LgsType::getIRType(int size) {
-    assert(false && "type has no IR type");
 }

@@ -18,11 +18,11 @@ public:
     GlobalVariable* createIRGlobal(Module* module, Constant* strConstant) const;
     BasicBlock* createBasicBlock(const char* name) const;
     void startBlock(CodeGenMetadata* metadata, BasicBlock* block) const;
+    Value* createGlobalStr(Module* module, const std::string& value) const;
     virtual void setLocation(const antlr4::Token* ctx);
     virtual json asJson();
     virtual void free(CodeGenMetadata* metadata);
     virtual ~LgsValue() = default;
-    Value* createGlobalStr(Module* module, const std::string& value) const;
 };
 
 #endif //CODEGENERATION_H

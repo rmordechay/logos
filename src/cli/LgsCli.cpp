@@ -36,12 +36,12 @@ void LgsCli::printHelp() {
     ostringstream txt;
     txt << "Usage: lgs <command> <options>" << "\n\n";
 
-    txt << "Commands:" << '\n';
-    txt << "run                       execute a logos script or run application" << '\n';
-    txt << "help                      print logos help" << '\n';
-    txt << "version, -v, --version    print logos version" << '\n';
+    txt << "Commands:" << endl;
+    txt << "run                       execute a logos script or run application" << endl;
+    txt << "help                      print logos help" << endl;
+    txt << "version, -v, --version    print logos version" << endl;
 
-    txt << '\n' << "For more information: lgs [command] help" << '\n';
+    txt << endl << "For more information: lgs [command] help" << endl;
     cout << txt.str();
 }
 

@@ -24,13 +24,13 @@ public:
     map<string, vector<LgsMethodImpl*>> methods;
 
     LgsField* getField(const string& name);
-    LgsMethodImpl* getMethod(const LgsFuncCall* funcCall) const;
-    LgsMethodImpl* getMethod(const LgsFuncSignature* signature) const;
+    LgsMethodImpl* findMethod(const LgsFuncCall* funcCall) const;
     vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
-    virtual Type* getIRType();
-    virtual Type* getIRType(int size);
-    virtual const string getName() const = 0;
+    virtual bool equals(const LgsType& other);
+    virtual size_t size() = 0;
+    virtual Type* getIRType() = 0;
     virtual LgsExpr* getZeroValue() = 0;
+    virtual const string getName() const = 0;
     virtual bool equals(LgsType* other) const = 0;
     virtual LgsType* inferBinaryType(LgsType* other) = 0;
     virtual ~LgsType() = default;
@@ -42,9 +42,12 @@ public:
 
     explicit LgsUnknownType(const string& name) : name(name) {}
     const string getName() const override { return name; }
+    size_t size() override { assert(false && "unknown type should not be called"); }
     LgsExpr* getZeroValue() override { assert(false && "unknown type should not be called"); }
     bool equals(LgsType* other) const override { assert(false && "unknown type should not be called"); }
     LgsType* inferBinaryType(LgsType* other) override { assert(false && "unknown type should not be called"); }
+    Type* getIRType() override;
+    ~LgsUnknownType() override = default;
 };
 
 #endif //LOGOSTYPE_H

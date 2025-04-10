@@ -8,6 +8,10 @@ const string LgsStr::getName() const {
     return name;
 }
 
+size_t LgsStr::size() {
+    return sizeof(void*);
+}
+
 Type* LgsStr::getIRType() {
     return ptrTy;
 }

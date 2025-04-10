@@ -1,27 +1,25 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
+#include "types/LgsVoid.h"
 
 string LgsFuncCall::getName() {
     return name;
 }
 
 Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
-    const auto IRFunc = func->getIRFunc(metadata);
-    vector<Value*> argValues;
-    const auto size = func->signature.isStatic ? 1 : 0;
-    for (int i = size; i < args.size(); ++i) {
-        const auto arg = args[i];
-        const auto argValue = arg->getIRValue(metadata);
-        argValues.emplace_back(argValue);
-    }
-    return metadata->builder.CreateCall(IRFunc, argValues);
+    return func->call(metadata, args);
 }
 
 string LgsFuncCall::getArgsTypeStr() const {
     std::ostringstream result;
-    for (size_t i = 0; i < args.size(); ++i) {
-        if (i > 0) result << ", ";
+    if (args.empty()) {
+        result << LgsVoid::name;
+        return result.str();
+    }
+    const auto isMethod = parentName != "";
+    for (size_t i = isMethod; i < args.size(); ++i) {
         result << args[i]->type->getName();
+        if (i != args.size() - 1) result << ", ";
     }
     return result.str();
 }
