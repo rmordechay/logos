@@ -1,12 +1,10 @@
 #ifndef LOGOSMETADATA_H
 #define LOGOSMETADATA_H
 
-#include "json/json.hpp"
 
 class CodeGenerator;
 class LgsStack;
 
-using namespace nlohmann;
 using namespace std;
 
 #define LOGOS_FILE_EXTENSION ".lgs"

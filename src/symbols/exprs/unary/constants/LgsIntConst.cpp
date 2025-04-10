@@ -25,11 +25,3 @@ LgsExpr* LgsIntConst::castStatically(LgsType* other) {
     }
     return nullptr;
 }
-
-json LgsIntConst::asJson() {
-    json tree;
-    tree["exprType"] = "IntConst";
-    tree["type"] = type->getName();
-    tree["value"] = value;
-    return tree;
-}

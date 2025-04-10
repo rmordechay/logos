@@ -6,13 +6,6 @@ Value* LgsReturn::createIRValue(CodeGenMetadata* metadata) {
     return metadata->builder.CreateRet(exprIR);
 }
 
-json LgsReturn::asJson() {
-    json tree;
-    tree["stmtType"] = "return";
-    tree["expr"] = expr->asJson();
-    return tree;
-}
-
 LgsReturn::~LgsReturn() {
     delete expr;
 }

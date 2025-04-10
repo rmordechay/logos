@@ -14,7 +14,6 @@ public:
     explicit LgsVarDec(const string& name, LgsExpr* expr = nullptr) : name(name), expr(expr) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     void free(CodeGenMetadata* metadata) override;
-    json asJson() override;
     ~LgsVarDec() override;
 };
 

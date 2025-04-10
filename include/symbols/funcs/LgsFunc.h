@@ -25,7 +25,6 @@ public:
     virtual void createIRValue(CodeGenMetadata* metadata);
     virtual Function* getIRFunc(const CodeGenMetadata* metadata);
     virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args);
-    json asJson() override;
     ~LgsFunc() override;
 };
 

@@ -1,10 +1,6 @@
 #include "stmts/LgsVarDec.h"
 
 #include "exprs/unary/LgsArray.h"
-#include "exprs/unary/LgsFuncCall.h"
-#include "exprs/unary/constants/LgsConstExpr.h"
-#include <LgsStack.h>
-#include <json/json.hpp>
 
 Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
@@ -23,18 +19,6 @@ Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
 
 void LgsVarDec::free(CodeGenMetadata* metadata) {
     expr->free(metadata);
-}
-
-json LgsVarDec::asJson() {
-    json tree;
-    tree["stmtType"] = "varDec";
-    if (type) {
-        tree["type"] = type->getName();
-    }
-    if (expr) {
-        tree["expr"] = expr->asJson();
-    }
-    return tree;
 }
 
 LgsVarDec::~LgsVarDec() {

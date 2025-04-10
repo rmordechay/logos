@@ -568,8 +568,8 @@ bool SemaAnalyser::resolveMethodCall(const LgsType* type, LgsFuncCall* methodCal
 bool SemaAnalyser::resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall) {
     LgsFunc* func = nullptr;
     for (const auto& overload : overloads) {
-        assert(overload->signature.name == funcCall->name);
         const auto overloadParams = overload->signature.params;
+        if (funcCall->args.size() > overloadParams.size()) continue;
         // same size of params and args implies no use of default params
         if (overloadParams.size() == funcCall->args.size()) {
             if (overload->signature.isEqual(funcCall)) {
@@ -579,16 +579,20 @@ bool SemaAnalyser::resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCal
             continue;
         }
 
-        // for (size_t i = 0; i < overloadParams.size(); ++i) {
-        //     const auto overloadParam = overloadParams[i];
-        //     auto thisTypeName = overloadParam.type->getName();
-        //     if (overloadParam.expr) continue;
-        //     auto otherTypeName = funcCall->args[i]->type->getName();
-        //     if (thisTypeName == otherTypeName) {
-        //         func = overload;
-        //         break;
-        //     }
-        // }
+        auto found = true;
+        for (size_t i = 0; i < overloadParams.size(); ++i) {
+            if (i + 1 > funcCall->args.size()) continue;
+            const auto paramType = overloadParams[i].type;
+            const auto argType = funcCall->args[i]->type;
+            if (!paramType->equals(argType)) {
+                found = false;
+                break;
+            }
+        }
+
+        if (found) {
+            func = overload;
+        }
     }
 
     if (!func) {

@@ -13,19 +13,8 @@ public:
     vector<LgsObject*> objects;
 
     explicit LgsMainFile(const string& path) : LgsFile(LOGOS_MAIN_FILE_NAME, path) {}
-    json asJson() const;
     ~LgsMainFile() override;
 };
-
-inline json LgsMainFile::asJson() const {
-    json fileTree;
-    fileTree["file"] = name;
-    fileTree["mainFunc"] = mainFunc->asJson();
-    for (const auto& func : funcs) {
-        fileTree["funcs"].emplace_back(func->asJson());
-    }
-    return fileTree;
-}
 
 inline LgsMainFile::~LgsMainFile() {
     delete mainFunc;

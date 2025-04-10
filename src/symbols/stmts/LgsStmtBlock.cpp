@@ -6,14 +6,6 @@ void LgsStmtBlock::createIRValue(CodeGenMetadata* metadata) const {
     }
 }
 
-json LgsStmtBlock::asJson() {
-    json tree = {};
-    for (const auto& stmt : stmts) {
-        tree.emplace_back(stmt->asJson());
-    }
-    return tree;
-}
-
 LgsStmtBlock::~LgsStmtBlock() {
     for (const auto& stmt : stmts) {
         delete stmt;

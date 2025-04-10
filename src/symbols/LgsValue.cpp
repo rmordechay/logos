@@ -23,10 +23,6 @@ BasicBlock* LgsValue::createBasicBlock(const char* name) const {
     return BasicBlock::Create(context, name);
 }
 
-json LgsValue::asJson() {
-    return json::object();
-}
-
 void LgsValue::free(CodeGenMetadata* metadata) {
     assert(false && "value has nothing to free");
 }

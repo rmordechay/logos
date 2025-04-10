@@ -9,7 +9,6 @@ public:
     explicit LgsTypeConst(LgsType* type) : LgsConstExpr(type) {}
     inline string getName() override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    json asJson() override;
     ~LgsTypeConst() override = default;
 };
 
