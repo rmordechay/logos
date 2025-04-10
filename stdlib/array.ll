@@ -25,6 +25,13 @@ entry:
     ret ptr %element
 }
 
+define i1 @ArrayType_isEmpty_ArrayType(ptr %self) {
+    %size_ptr = call ptr @get_size(ptr %self)
+    %size = load i64, ptr %size_ptr
+    %cmp = icmp eq i64 %size, 0
+    ret i1 %cmp
+}
+
 define void @ArrayType_add_ArrayType_Str(ptr %self, ptr %new_elem) {
 entry:
     %cap_ptr = call ptr @get_cap(ptr %self)
@@ -74,8 +81,3 @@ define ptr @get_data(ptr %self) alwaysinline {
     ret ptr %data_ptr
 }
 
-;define i32 @main() {
-;    %arr_ptr = alloca %arr
-;    call void @ArrayType_initArr_Long(ptr %arr_ptr, i64 2)
-;    ret i32 0
-;}

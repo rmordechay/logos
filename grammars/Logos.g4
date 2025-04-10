@@ -156,7 +156,7 @@ unaryExpr:
     ;
 
 array:
-        LBRACK expr (COMMA expr)* COMMA? RBRACK
+        LBRACK (expr (COMMA expr)* COMMA?)? RBRACK
     ;
 
 map:
