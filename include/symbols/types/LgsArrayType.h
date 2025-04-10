@@ -18,7 +18,7 @@ public:
     LgsType* underlyingType = nullptr;
     StructType* arrIR = StructType::create(context, {i64Ty, i64Ty, ptrTy});
     Attribute sret = Attribute::getWithStructRetType(context, arrIR);
-    FunctionType* const initArrIRFuncType = FunctionType::get(voidTy, {ptrTy, i64Ty}, false);
+    FunctionType* const initArrIRFuncType = FunctionType::get(voidTy, {ptrTy, i64Ty, i64Ty}, false);
     FunctionType* const freeArrIRFuncType = FunctionType::get(voidTy, {ptrTy}, false);
     FunctionType* const addElementIRFuncType = FunctionType::get(voidTy, {ptrTy, ptrTy}, false);
     FunctionType* const getElementIRFuncType = FunctionType::get(ptrTy, {ptrTy, i32Ty}, false);

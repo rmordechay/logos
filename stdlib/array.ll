@@ -4,14 +4,12 @@ declare void @free(ptr)
 
 %arr = type {i64, i64, ptr}
 
-define void @ArrayType_initArr_ArrayType_Long(ptr sret(%arr) %arr_ptr, i64 %initial_cap) {
+define void @ArrayType_initArr_ArrayType_Long(ptr sret(%arr) %arr_ptr, i64 %initial_size, i64 %initial_cap) {
     %cap_ptr = call ptr @get_cap(ptr %arr_ptr)
     %size_ptr = call ptr @get_size(ptr %arr_ptr)
     store i64 %initial_cap, ptr %cap_ptr
-    store i64 0, ptr %size_ptr
-    %cap = load i64, ptr %cap_ptr
-    %data_size = mul i64 %cap, 2
-    %data = call ptr @malloc(i64 %data_size)
+    store i64 %initial_size, ptr %size_ptr
+    %data = call ptr @malloc(i64 %initial_cap)
     %data_ptr = call ptr @get_data(ptr %arr_ptr)
     store ptr %data, ptr %data_ptr
     ret void
@@ -45,7 +43,8 @@ entry:
 
 resize:
     %new_cap = mul i64 %capacity, 2
-    %new_data = call ptr @realloc(ptr %data_ptr, i64 %new_cap)
+    %data = load ptr, ptr %data_ptr
+    %new_data = call ptr @realloc(ptr %data, i64 %new_cap)
     store i64 %new_cap, ptr %cap_ptr
     store ptr %new_data, ptr %data_ptr
     br label %insert
