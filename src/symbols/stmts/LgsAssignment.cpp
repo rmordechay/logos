@@ -27,7 +27,7 @@ void LgsAssignment::createIRFromSelection(CodeGenMetadata* metadata, const LgsSe
         }
         break;
     default:
-        break;;
+        break;
     }
 }
 
