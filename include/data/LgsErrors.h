@@ -5,7 +5,7 @@
 
 using namespace std;
 
-inline string ERROR_PLACE_HOLDER = "%s";
+inline string ERROR_PLACEHOLDER = "%s";
 
 struct LgsError {
     int errCode;

@@ -3,6 +3,7 @@
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsParam.h"
+#include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
 
 #include <LgsStack.h>

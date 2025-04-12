@@ -10,6 +10,7 @@ include_directories(
     external/include/antlr4-runtime
     include
     include/logos
+    include/data
     include/cli
     include/files
     include/codegen
@@ -25,9 +26,10 @@ add_library(lib STATIC
     include/logos/ThreadPool.h
     include/logos/LgsActiveEnv.h
     include/logos/LgsC.h
-    include/logos/LgsData.h
+    include/data/LgsData.h
     include/logos/LgsStack.h
-    include/logos/LgsErrors.h
+    include/data/LgsErrors.h
+    include/data/LgsWarnings.h
     include/files/LgsFile.h
     include/files/LgsAppFile.h
     include/files/LgsEnvFile.h

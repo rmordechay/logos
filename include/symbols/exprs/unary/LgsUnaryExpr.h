@@ -50,5 +50,4 @@ inline LgsExpr* LgsUnaryExpr::add(LgsExpr* other) {
     return nullptr;
 }
 
-
 #endif //LOGOSUNARYEXPR_H

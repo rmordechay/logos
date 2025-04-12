@@ -2,6 +2,7 @@
 #include "LgsErrors.h"
 #include "LgsGlobals.h"
 #include "LgsObjectFile.h"
+#include "LgsWarnings.h"
 #include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "stmts/LgsField.h"
@@ -182,9 +183,7 @@ void SemaAnalyser::visitPatternMatching(const LgsPatternMatching* patternMatchin
     visitStmtBlock(patternMatching->elseStmtBlock);
 }
 
-void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatching* patternMatching) const {
-
-}
+void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatching* patternMatching) const {}
 
 void SemaAnalyser::visitLoopStmt(LgsLoop* loopStmt) {
     lgsStack.enterScope();
@@ -227,12 +226,9 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
     visitExpr(returnStmt->expr);
 }
 
-void SemaAnalyser::visitBreakStmt(LgsBreakStmt* breakStmt) const {
-}
+void SemaAnalyser::visitBreakStmt(LgsBreakStmt* breakStmt) const {}
 
-void SemaAnalyser::visitEnum(const LgsEnum* lgsEnum) const {
-
-}
+void SemaAnalyser::visitEnum(const LgsEnum* lgsEnum) const {}
 
 void SemaAnalyser::visitExpr(LgsExpr* expr) {
     if (const auto castExpr = dynamic_cast<LgsCast*>(expr)) {
@@ -293,9 +289,11 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     if (!symbol) return;
     switch (symbol->type) {
     case VAR_DEC:
+        symbol->varDec->refs.emplace_back(variable);
         setExprType(variable, symbol->varDec->type);
         break;
     case PARAM:
+        symbol->param->refs.emplace_back(variable);
         setExprType(variable, symbol->param->type);
         break;
     case ENUM:
@@ -519,14 +517,25 @@ void SemaAnalyser::checkObjectImplements(LgsObject* obj, LgsInterface* const int
 
 void SemaAnalyser::handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args) {
     setUnsuccessful();
-    const auto errMsg = formatErrorMsg(lgsErr.msg, args);
+    const auto errMsg = formatMsg(lgsErr.msg, args);
     errors.emplace_back(LgsError{.errCode = lgsErr.errCode, .msg = errMsg});
 
     const auto lineNumber = to_string(location->lineNumber);
     const auto pos = to_string(location->posInLine);
     const auto fullPath = file->absPath + ":" + lineNumber + ":" + pos;
     const auto path = "\tat " + fullPath;
-    cout << errMsg << endl << path << endl;
+    cout <<  "Error: "  << errMsg << endl << path << endl;
+}
+
+void SemaAnalyser::handleWarning(const LgsWarning& lgsWarning, const Location* location, const vector<string>& args) {
+    const auto warningMessage = formatMsg(lgsWarning.msg, args);
+    warnings.emplace_back(LgsWarning{.warningCode = lgsWarning.warningCode, .msg = warningMessage});
+
+    const auto lineNumber = to_string(location->lineNumber);
+    const auto pos = to_string(location->posInLine);
+    const auto fullPath = file->absPath + ":" + lineNumber + ":" + pos;
+    const auto path = "\tat " + fullPath;
+    cout << "Error: " << warningMessage << endl << path << endl;
 }
 
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {

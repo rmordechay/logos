@@ -2,6 +2,7 @@
 #define SEMAANALYSER_H
 #include "LgsAnalyser.h"
 #include "LgsStack.h"
+#include "LgsWarnings.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "stmts/LgsBreakStmt.h"
@@ -29,6 +30,7 @@ public:
     LgsStack lgsStack;
     LgsFile* file = nullptr;
     vector<LgsError> errors;
+    vector<LgsWarning> warnings;
 
     explicit SemaAnalyser(LgsFile* logosFile) : file(logosFile) {}
     void analyse();
@@ -81,6 +83,7 @@ public:
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     void checkObjectImplements(LgsObject* obj, LgsInterface* interface);
     void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});
+    void handleWarning(const LgsWarning& lgsWarning, const Location* location, const vector<string>& args);
     string getFuncSignaturesStr(const vector<LgsFuncSignature*>& funcs) const;
     Location* getSymbolLocation(const LgsSymbol* symbol) const;
     ~SemaAnalyser() = default;

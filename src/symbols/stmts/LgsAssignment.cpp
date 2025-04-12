@@ -4,6 +4,7 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
+#include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
 #include <LgsStack.h>

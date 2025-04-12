@@ -5,6 +5,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
+#include "stmts/LgsVarDec.h"
 #include "types/LgsStr.h"
 
 Value* LgsPatternMatching::createIRValue(CodeGenMetadata* metadata) {
