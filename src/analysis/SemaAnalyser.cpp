@@ -588,24 +588,27 @@ bool SemaAnalyser::resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCal
             continue;
         }
 
-        // TODO finish default params check
-        // auto found = true;
-        // for (size_t i = 0; i < overloadParams.size(); ++i) {
-        //     const long a = i - funcCall->args.size();
-        //     if (abs(a) != 0) {
-        //         continue;
-        //     }
-        //     const auto paramType = overloadParams[i].type;
-        //     const auto argType = funcCall->args[i]->type;
-        //     if (!paramType->equals(argType)) {
-        //         found = false;
-        //         break;
-        //     }
-        // }
-        //
-        // if (found) {
-        //     func = overload;
-        // }
+        auto found = true;
+        for (size_t i = 0; i < overloadParams.size(); ++i) {
+            const auto overloadParam = overloadParams[i];
+            const auto paramType = overloadParam.type;
+            if (overloadParam.expr) {
+                if (overloadParams.size() > funcCall->args.size()) {
+                    continue;
+                }
+                found = false;
+                break;
+            }
+            const auto argType = funcCall->args[i]->type;
+            if (!paramType->equals(argType)) {
+                found = false;
+                break;
+            }
+        }
+
+        if (found) {
+            func = overload;
+        }
     }
 
     if (!func) {

@@ -126,7 +126,7 @@ add_library(lib STATIC
     src/symbols/LgsValue.cpp
     src/symbols/funcs/LgsFunc.cpp
     src/symbols/funcs/LgsParam.cpp
-    src/symbols/builtint/LgsPrint.cpp
+    src/symbols/builtin/LgsPrint.cpp
     src/symbols/exprs/LgsExpr.cpp
     src/symbols/exprs/LgsCast.cpp
     src/symbols/exprs/binary/LgsBinaryExpr.cpp
@@ -139,6 +139,7 @@ add_library(lib STATIC
     src/symbols/exprs/unary/LgsArray.cpp
     src/symbols/exprs/unary/LgsArrayIndex.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
+    src/symbols/exprs/unary/LgsEnumField.cpp
     src/symbols/exprs/unary/LgsInstance.cpp
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
@@ -165,7 +166,6 @@ add_library(lib STATIC
     src/symbols/types/LgsArrayType.cpp
     src/symbols/types/LgsInterface.cpp
     src/symbols/types/LgsObject.cpp
-    src/symbols/exprs/unary/LgsEnumField.cpp
 )
 
 add_executable(lgs main.cpp)

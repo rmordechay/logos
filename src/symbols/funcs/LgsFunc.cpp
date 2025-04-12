@@ -22,12 +22,28 @@ void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
 Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     const auto IRFunc = getIRFunc(metadata);
     vector<Value*> argValues;
-    for (int i = signature.isStatic; i < args.size(); ++i) {
-        const auto arg = args[i];
-        const auto argValue = arg->getIRValue(metadata);
-        argValues.emplace_back(argValue);
+    // Without default params
+    if (signature.params.size() == args.size()) {
+        for (int i = signature.isStatic; i < args.size(); ++i) {
+            const auto arg = args[i];
+            const auto argValue = arg->getIRValue(metadata);
+            argValues.emplace_back(argValue);
+        }
+    } else {
+        // With default params
+        for (int i = signature.isStatic; i < signature.params.size(); ++i) {
+            LgsExpr* arg;
+            if (i < args.size()) {
+                arg = args[i];
+            } else {
+                arg = signature.params[i].expr;
+                assert(arg);
+            }
+            const auto argValue = arg->getIRValue(metadata);
+            argValues.emplace_back(argValue);
+        }
     }
-    return metadata->builder.CreateCall(IRFunc, argValues);
+    return metadata->builder.CreateCall(IRFunc, argValues);;
 }
 
 Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
