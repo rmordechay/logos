@@ -12,14 +12,15 @@ public:
     LgsType* type = nullptr;
     LgsType* userType = nullptr;
     LgsExpr* expr = nullptr;
-    Value* gep = nullptr;
-    LgsExpr* parentExpr = nullptr;
+    LgsObject* parent = nullptr;
+    Value* parentIRValue = nullptr;
+    Type* parentIRType = nullptr;
 
     LgsField(const string& name, const size_t position, LgsType* userType, LgsExpr* expr = nullptr) : name(name), position(position), userType(userType), expr(expr) {}
     Value* getIRValue(CodeGenMetadata* metadata);
     virtual Value* createIRValue(CodeGenMetadata* metadata);
-    Value* getGEP(CodeGenMetadata* metadata);
-    void setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* expr);
+    void setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* expr) const;
+    Value* getGEP(CodeGenMetadata* metadata) const;
     ~LgsField() override = default;
 };
 

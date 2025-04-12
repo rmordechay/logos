@@ -6,14 +6,14 @@
 class LgsInstance final : public LgsUnaryExpr {
 public:
     LgsObject* obj = nullptr;
-    vector<LgsExpr*> args;
-    map<string, LgsField*> fields;
+    vector<LgsVarDec*> args;
+    bool isSelf;
 
-    explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), obj(obj) {}
-    explicit LgsInstance(LgsType* type) : LgsUnaryExpr(type) {}
+    explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), obj(obj), isSelf(true) {}
+    explicit LgsInstance(LgsType* type) : LgsUnaryExpr(type), isSelf(false) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
-    ~LgsInstance() override;
+    ~LgsInstance() override = default;
 };
 
 #endif //LOGOSINSTANCE_H

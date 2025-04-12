@@ -498,14 +498,15 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
 LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) {
     const auto type = getTypeFromText(ctx->TYPE()->getText());
     const auto instance = new LgsInstance(type);
-    const auto args = ctx->funcArgList();
+    const auto args = ctx->constructorArgList();
     if (!args) {
         return instance;
     }
 
-    for (const auto& arg : args->funcArg()) {
-        auto argExpr = getExpr(arg->expr());
-        instance->args.emplace_back(argExpr);
+    for (const auto& arg : args->constructorArg()) {
+        const auto argExpr = getExpr(arg->expr());
+        auto varDec = new LgsVarDec(arg->VARIABLE()->getText(), argExpr);
+        instance->args.emplace_back(varDec);
     }
     instance->setLocation(ctx->start);
     return instance;

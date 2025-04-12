@@ -1,5 +1,6 @@
 #ifndef LOGOSMAINFILE_H
 #define LOGOSMAINFILE_H
+#include "LgsData.h"
 #include "LgsFile.h"
 #include "funcs/LgsFuncImpl.h"
 

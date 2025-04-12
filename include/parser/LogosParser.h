@@ -21,7 +21,7 @@ public:
     ENUM = 35, VEC = 36, VEC2 = 37, VEC3 = 38, VEC4 = 39, IMPLEMENTS = 40, 
     IMPORT = 41, IF = 42, ELSE = 43, FOR = 44, BREAK = 45, CONTINUE = 46, 
     RETURN = 47, AND = 48, OR = 49, NOT = 50, IN = 51, INTEGER = 52, FLOAT = 53, 
-    BOOL = 54, NULL_ = 55, CONST = 56, TYPE = 57, VARIABLE = 58, STRING = 59, 
+    BOOL = 54, NULL_ = 55, TYPE = 56, CONST = 57, VARIABLE = 58, STRING = 59, 
     LINE_COMMENT = 60, BLOCK_COMMENT = 61, WS = 62
   };
 
@@ -35,10 +35,11 @@ public:
     RuleElseIfStatement = 21, RuleElseStatement = 22, RulePatternMatching = 23, 
     RulePattern = 24, RuleLoopStatement = 25, RuleBreakStmt = 26, RuleReturnStatement = 27, 
     RuleEnumDeclaration = 28, RuleEnumField = 29, RuleExpr = 30, RuleUnaryExpr = 31, 
-    RuleArray = 32, RuleMap = 33, RuleFuncCall = 34, RuleConstructor = 35, 
-    RuleFuncArgList = 36, RuleFuncArg = 37, RuleConstant = 38, RuleArrayIndex = 39, 
-    RuleSelection = 40, RuleFirstSelectionElement = 41, RuleInnerSelectionElement = 42, 
-    RuleRange = 43, RuleType = 44, RuleVector = 45, RuleRequireEnvVars = 46
+    RuleArray = 32, RuleMap = 33, RuleFuncCall = 34, RuleFuncArgList = 35, 
+    RuleFuncArg = 36, RuleConstructor = 37, RuleConstructorArgList = 38, 
+    RuleConstructorArg = 39, RuleConstant = 40, RuleArrayIndex = 41, RuleSelection = 42, 
+    RuleFirstSelectionElement = 43, RuleInnerSelectionElement = 44, RuleRange = 45, 
+    RuleType = 46, RuleVector = 47, RuleRequireEnvVars = 48
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -93,9 +94,11 @@ public:
   class ArrayContext;
   class MapContext;
   class FuncCallContext;
-  class ConstructorContext;
   class FuncArgListContext;
   class FuncArgContext;
+  class ConstructorContext;
+  class ConstructorArgListContext;
+  class ConstructorArgContext;
   class ConstantContext;
   class ArrayIndexContext;
   class SelectionContext;
@@ -650,20 +653,6 @@ public:
 
   FuncCallContext* funcCall();
 
-  class  ConstructorContext : public antlr4::ParserRuleContext {
-  public:
-    ConstructorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *TYPE();
-    antlr4::tree::TerminalNode *LPAREN();
-    antlr4::tree::TerminalNode *RPAREN();
-    FuncArgListContext *funcArgList();
-
-   
-  };
-
-  ConstructorContext* constructor();
-
   class  FuncArgListContext : public antlr4::ParserRuleContext {
   public:
     FuncArgListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -690,6 +679,47 @@ public:
   };
 
   FuncArgContext* funcArg();
+
+  class  ConstructorContext : public antlr4::ParserRuleContext {
+  public:
+    ConstructorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *TYPE();
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
+    ConstructorArgListContext *constructorArgList();
+
+   
+  };
+
+  ConstructorContext* constructor();
+
+  class  ConstructorArgListContext : public antlr4::ParserRuleContext {
+  public:
+    ConstructorArgListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<ConstructorArgContext *> constructorArg();
+    ConstructorArgContext* constructorArg(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+
+   
+  };
+
+  ConstructorArgListContext* constructorArgList();
+
+  class  ConstructorArgContext : public antlr4::ParserRuleContext {
+  public:
+    ConstructorArgContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *VARIABLE();
+    antlr4::tree::TerminalNode *EQUAL();
+    ExprContext *expr();
+
+   
+  };
+
+  ConstructorArgContext* constructorArg();
 
   class  ConstantContext : public antlr4::ParserRuleContext {
   public:

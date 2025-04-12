@@ -167,16 +167,24 @@ funcCall:
         VARIABLE LPAREN funcArgList? RPAREN
     ;
 
-constructor:
-        TYPE LPAREN funcArgList? RPAREN
-    ;
-
 funcArgList:
         funcArg (COMMA funcArg)* COMMA?
     ;
 
 funcArg:
         (VARIABLE EQUAL)? expr
+    ;
+
+constructor:
+        TYPE LPAREN constructorArgList? RPAREN
+    ;
+
+constructorArgList:
+        constructorArg (COMMA constructorArg)* COMMA?
+    ;
+
+constructorArg:
+        VARIABLE EQUAL expr
     ;
 
 constant:
@@ -290,8 +298,8 @@ INTEGER: [0-9]+;
 FLOAT: [0-9]+ '.' [0-9]+;
 BOOL: 'true' | 'false';
 NULL: 'null';
-CONST: [A-Z0-9_]+;
 TYPE: [A-Z][a-zA-Z0-9_]*;
+CONST: [A-Z0-9_]+;
 VARIABLE: [a-z_][a-zA-Z0-9_]*;
 STRING: '"' ( ~["\\] | '\\' . )* '"';
 LINE_COMMENT: '//' ~( '\r' | '\n' )* -> skip;

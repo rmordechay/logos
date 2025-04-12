@@ -4,7 +4,6 @@
 #include <Token.h>
 #include <llvm/IR/Value.h>
 #include "CodeGenMetadata.h"
-#include "LgsData.h"
 
 struct CodeGenMetadata;
 

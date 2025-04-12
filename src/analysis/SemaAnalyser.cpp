@@ -353,9 +353,6 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     }
     instance->obj = symbol->object;
     instance->type = instance->obj;
-    for (const auto& field : instance->type->fields) {
-        instance->fields[field.first] = new LgsField(*field.second);
-    }
 }
 
 void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
@@ -439,7 +436,6 @@ void SemaAnalyser::setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fiel
     if (!field) {
         return handleError(E10005, &fieldVariable->location, {fieldVariable->getName(), parent->type->getName()});
     }
-    field->parentExpr = parent;
     setExprType(fieldVariable, field->type);
 }
 
@@ -535,7 +531,7 @@ void SemaAnalyser::handleWarning(const LgsWarning& lgsWarning, const Location* l
     const auto pos = to_string(location->posInLine);
     const auto fullPath = file->absPath + ":" + lineNumber + ":" + pos;
     const auto path = "\tat " + fullPath;
-    cout << "Error: " << warningMessage << endl << path << endl;
+    cout << "Warning: " << warningMessage << endl << path << endl;
 }
 
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {

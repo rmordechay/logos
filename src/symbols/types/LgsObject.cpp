@@ -1,5 +1,4 @@
 #include "types/LgsObject.h"
-
 #include "CodeGenerator.h"
 #include "exprs/LgsNull.h"
 #include "funcs/LgsFuncImpl.h"

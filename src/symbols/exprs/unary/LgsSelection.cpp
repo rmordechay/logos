@@ -10,14 +10,15 @@ string LgsSelection::getName() {
 }
 
 Value* LgsSelection::createIRValue(CodeGenMetadata* metadata) {
-    return resolveSelection(metadata)->getIRValue(metadata);
+    return resolveSelection(metadata)->IRValue;
 }
 
 LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto currentExpr = exprs[i];
         const auto nextExpr = exprs[i + 1];
-        if (const auto field = currentExpr->type->getField(nextExpr->getName())) {
+        const auto field = currentExpr->type->getField(nextExpr->getName());
+        if (field) {
             const auto value = field->getIRValue(metadata);
             nextExpr->setIRValue(value);
             continue;
