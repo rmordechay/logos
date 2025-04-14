@@ -78,7 +78,8 @@ void LgsProject::parseSrcFile(const directory_entry& entry) {
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    const auto file = AntlerConverter::getLogosFile(parser.logosFile(), absFilePath);
+    AntlerConverter antlerConverter;
+    const auto file = antlerConverter.getLogosFile(parser.logosFile(), absFilePath);
     file->relPath = relative(absFilePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     lock_guard lock(mtx);
     files.emplace_back(file);
@@ -94,7 +95,8 @@ void LgsProject::parseAppFile(path fileEntry) {
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    appFile = AntlerConverter::getAppFile(parser.logosAppFile(), absFilePath);
+    AntlerConverter antlerConverter;
+    appFile = antlerConverter.getAppFile(parser.logosAppFile(), absFilePath);
 
     for (const auto& varDec : appFile->varDecs) {
         if (varDec->name == "name") {
@@ -116,7 +118,8 @@ void LgsProject::parseEnvFile(path fileEntry) {
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    auto envFile = AntlerConverter::getEnvFile(parser.logosEnvFile(), absFilePath);
+    AntlerConverter antlerConverter;
+    auto envFile = antlerConverter.getEnvFile(parser.logosEnvFile(), absFilePath);
     envFiles.emplace_back(envFile);
 }
 

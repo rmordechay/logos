@@ -170,9 +170,11 @@ add_library(lib STATIC
     src/symbols/types/LgsObject.cpp
     src/analysis/LgsAnalyser.cpp
     src/analysis/LgsProjectAnalyser.cpp
+    src/analysis/LgsParserAnalyser.cpp
 )
 
-add_executable(lgs main.cpp)
+add_executable(lgs main.cpp
+    include/analysis/LgsParserAnalyser.h)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE

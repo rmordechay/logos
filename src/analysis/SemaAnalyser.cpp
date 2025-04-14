@@ -129,7 +129,6 @@ void SemaAnalyser::visitField(LgsField* field) {
         field->type = field->expr->type;
     } else {
         field->type = field->userType;
-        field->expr = field->type->getZeroValue();
     }
 }
 
@@ -626,9 +625,9 @@ bool SemaAnalyser::checkDefaultParams(const LgsFuncCall* funcCall, const vector<
 }
 
 void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
-    if (const auto s = lgsStack.getSymbol(name)) {
-        const auto symbolPosition = getSymbolLocation(s);
-        return handleError(E10011, &symbol.varDec->location, {name, to_string(symbolPosition->lineNumber)});
+    if (const auto alreadyExistSymbol = lgsStack.getSymbol(name)) {
+        const auto location = getSymbolLocation(alreadyExistSymbol);
+        return handleError(E10011, location, {name, to_string(location->lineNumber)});
     }
     lgsStack.addLocalSymbol(name, symbol);
 }

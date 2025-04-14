@@ -43,6 +43,5 @@ inline LgsError E10025{.msg = "'%s' must be an interface.", .errCode = ++errCode
 inline LgsError E10026{.msg = "Void functions should not return an expression.", .errCode = ++errCodeStart};
 inline LgsError E10027{.msg = "", .errCode = ++errCodeStart};
 inline LgsError E10028{.msg = "Default parameters must be defined lastly.", .errCode = ++errCodeStart};
-inline LgsError E10029{.msg = "Argument for field '%s' is defined multiple types.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

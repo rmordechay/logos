@@ -21,6 +21,7 @@ void LgsAnalyser::handleError(const LgsError& lgsErr, const Location* location, 
     errors.emplace_back(LgsError{.errCode = lgsErr.errCode, .msg = errMsg});
     cout <<  "Error: "  << errMsg << endl;
     if (location) {
+        assert(location->lineNumber != 0);
         const auto lineNumber = to_string(location->lineNumber);
         const auto pos = to_string(location->posInLine);
         const auto fullPath = file->absPath + ":" + lineNumber + ":" + pos;

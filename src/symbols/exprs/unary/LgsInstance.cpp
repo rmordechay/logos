@@ -22,8 +22,8 @@ Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
     }
     if (args.empty()) return instanceIR;
     for (const auto& arg : args) {
-        const auto field = obj->fields.find(arg->name);
-        field->second->setFieldIRValue(metadata, arg->expr);
+        const auto field = obj->getField(arg->name);
+        field->setFieldIRValue(metadata, arg->expr);
     }
     return instanceIR;
 }
