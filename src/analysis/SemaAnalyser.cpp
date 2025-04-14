@@ -511,29 +511,6 @@ void SemaAnalyser::checkObjectImplements(LgsObject* obj, LgsInterface* const int
     }
 }
 
-void SemaAnalyser::handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args) {
-    setUnsuccessful();
-    const auto errMsg = formatMsg(lgsErr.msg, args);
-    errors.emplace_back(LgsError{.errCode = lgsErr.errCode, .msg = errMsg});
-
-    const auto lineNumber = to_string(location->lineNumber);
-    const auto pos = to_string(location->posInLine);
-    const auto fullPath = file->absPath + ":" + lineNumber + ":" + pos;
-    const auto path = "\tat " + fullPath;
-    cout <<  "Error: "  << errMsg << endl << path << endl;
-}
-
-void SemaAnalyser::handleWarning(const LgsWarning& lgsWarning, const Location* location, const vector<string>& args) {
-    const auto warningMessage = formatMsg(lgsWarning.msg, args);
-    warnings.emplace_back(LgsWarning{.warningCode = lgsWarning.warningCode, .msg = warningMessage});
-
-    const auto lineNumber = to_string(location->lineNumber);
-    const auto pos = to_string(location->posInLine);
-    const auto fullPath = file->absPath + ":" + lineNumber + ":" + pos;
-    const auto path = "\tat " + fullPath;
-    cout << "Warning: " << warningMessage << endl << path << endl;
-}
-
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
     const auto symbol = lgsStack.getSymbol(name);
     if (!symbol) {

@@ -28,11 +28,8 @@ class LgsLoop;
 class SemaAnalyser final : public LgsAnalyser {
 public:
     LgsStack lgsStack;
-    LgsFile* file = nullptr;
-    vector<LgsError> errors;
-    vector<LgsWarning> warnings;
 
-    explicit SemaAnalyser(LgsFile* logosFile) : file(logosFile) {}
+    explicit SemaAnalyser(LgsFile* logosFile) : LgsAnalyser(logosFile) {}
     void analyse();
     void visitMainFile(const LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
@@ -82,8 +79,6 @@ public:
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     void checkObjectImplements(LgsObject* obj, LgsInterface* interface);
-    void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});
-    void handleWarning(const LgsWarning& lgsWarning, const Location* location, const vector<string>& args);
     string getFuncSignaturesStr(const vector<LgsFuncSignature*>& funcs) const;
     Location* getSymbolLocation(const LgsSymbol* symbol) const;
     ~SemaAnalyser() = default;

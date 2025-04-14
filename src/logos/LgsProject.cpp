@@ -1,15 +1,15 @@
-#include "analysis/LgsProject.h"
-#include "AntlrConverter.h"
-#include "LgsAppFile.h"
-#include "LgsGlobals.h"
-#include "Logos.h"
-#include "LogosLexer.h"
-#include "LogosParser.h"
-#include "ThreadPool.h"
-#include "builtin/LgsEnv.h"
-#include "builtin/LgsSys.h"
-#include "builtin/LgsPrint.h"
-#include "types/LgsBool.h"
+#include "logos/LgsProject.h"
+#include "analysis/AntlrConverter.h"
+#include "files/LgsAppFile.h"
+#include "logos/LgsGlobals.h"
+#include "logos/Logos.h"
+#include "parser/LogosLexer.h"
+#include "parser/LogosParser.h"
+#include "symbols/builtin/LgsEnv.h"
+#include "symbols/builtin/LgsSys.h"
+#include "symbols/builtin/LgsPrint.h"
+#include "symbols/types/LgsBool.h"
+#include "utils/ThreadPool.h"
 
 #include <iostream>
 
@@ -17,11 +17,11 @@ using namespace std;
 extern char **environ;
 
 bool LgsProject::loadProject() {
-    if (!validateProject()) return false;
+    if (!projectAnalyser.validateProject()) return false;
     setupActiveEnv();
-    if (!successful) return false;
+    if (!projectAnalyser.successful) return false;
     loadFiles();
-    return successful;
+    return projectAnalyser.successful;
 }
 
 void LgsProject::loadFiles() {
@@ -141,51 +141,8 @@ void LgsProject::loadGlobals() const {
 void LgsProject::checkRequiredEnvVars() {
     for (const auto& requireEnvVar : appFile->requireEnvVars) {
         for (const auto envFile : envFiles) {
-            checkRequiredEnvVar(requireEnvVar, envFile);
+            projectAnalyser.checkRequiredEnvVar(requireEnvVar, envFile);
         }
-    }
-}
-
-void LgsProject::checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile) {
-    auto found = false;
-    for (const auto& varDec : envFile->varDecs) {
-        if (requireEnvVar.name == varDec->name && requireEnvVar.type->equals(varDec->type)) {
-            found = true;
-            break;
-        }
-    }
-    if (!found) {
-        printError(E10020.msg, {envFile->name, requireEnvVar.name});
-        successful = false;
-    }
-}
-
-bool LgsProject::validateProject() const {
-    if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {
-        printError(E10010.msg);
-        return false;
-    }
-
-    if (!exists(paths.appFilePath)) {
-        printError(E10008.msg);
-        return false;
-    }
-    return true;
-}
-
-void LgsProject::checkDuplicateFiles() const {
-    map<string, vector<LgsFile*>> duplicates;
-    for (const auto& file : files) {
-        duplicates[file->name].emplace_back(file);
-    }
-    if (duplicates.empty()) return;
-    for (const auto& [name, duplicate] : duplicates) {
-        if (duplicate.size() <= 1) continue;
-        ostringstream errMsg;
-        for (const auto &file : duplicate) {
-            errMsg << "\n\t - " + file->absPath;
-        }
-        printError(E10007.msg, {name, errMsg.str()});
     }
 }
 

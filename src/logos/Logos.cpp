@@ -1,9 +1,10 @@
 #include "logos/Logos.h"
 #include "LgsLinker.h"
+#include "utils/ThreadPool.h"
+
 #include <AntlrConverter.h>
 #include <CodeGenerator.h>
 #include <LogosLexer.h>
-#include <ThreadPool.h>
 #include <unistd.h>
 
 void Logos::run() {

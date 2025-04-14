@@ -17,17 +17,17 @@ include_directories(
     include/analysis
     include/symbols
     include/parser
+    include/utils
 )
 
 add_library(lib STATIC
     # headers
     include/logos/Logos.h
     include/logos/LgsGlobals.h
-    include/logos/ThreadPool.h
     include/logos/LgsActiveEnv.h
-    include/logos/LgsC.h
-    include/data/LgsData.h
+    include/logos/LgsProject.h
     include/logos/LgsStack.h
+    include/data/LgsData.h
     include/data/LgsErrors.h
     include/data/LgsWarnings.h
     include/files/LgsFile.h
@@ -44,11 +44,13 @@ add_library(lib STATIC
     include/analysis/AntlrConverter.h
     include/analysis/LgsAnalyser.h
     include/analysis/SemaAnalyser.h
-    include/analysis/LgsProject.h
+    include/analysis/LgsProjectAnalyser.h
     include/cli/LgsCli.h
     include/cli/LgsCmd.h
     include/cli/LgsRunCmd.h
     include/cli/LgsGenerateCmd.h
+    include/utils/ThreadPool.h
+    include/utils/LgsC.h
 
     # Symbols headers
     include/symbols/LgsValue.h
@@ -107,8 +109,8 @@ add_library(lib STATIC
     # src
     src/logos/Logos.cpp
     src/logos/LgsStack.cpp
-    src/logos/ThreadPool.cpp
-    src/logos/LgsC.cpp
+    src/utils/ThreadPool.cpp
+    src/utils/LgsC.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsRunCmd.cpp
@@ -119,7 +121,7 @@ add_library(lib STATIC
     src/parser/LogosParser.cpp
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
-    src/analysis/LgsProject.cpp
+    src/logos/LgsProject.cpp
 
     # Symbols src
     src/symbols/LgsSymbol.cpp
@@ -166,6 +168,8 @@ add_library(lib STATIC
     src/symbols/types/LgsArrayType.cpp
     src/symbols/types/LgsInterface.cpp
     src/symbols/types/LgsObject.cpp
+    src/analysis/LgsAnalyser.cpp
+    src/analysis/LgsProjectAnalyser.cpp
 )
 
 add_executable(lgs main.cpp)

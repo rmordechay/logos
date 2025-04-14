@@ -1,9 +1,9 @@
-#include "LgsC.h"
+#include "../../include/utils/LgsC.h"
 
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/FrontendAction.h"
-#include "clang/Tooling/Tooling.h"
-#include <clang/Tooling/CompilationDatabase.h>
+#include "../../external/include/clang/Frontend/CompilerInstance.h"
+#include "../../external/include/clang/Frontend/FrontendAction.h"
+#include "../../external/include/clang/Tooling/Tooling.h"
+#include <../../external/include/clang/Tooling/CompilationDatabase.h>
 
 using namespace clang;
 using namespace std;
