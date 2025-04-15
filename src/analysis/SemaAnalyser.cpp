@@ -84,11 +84,12 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
     }
     visitStmtBlock(func->stmtBlock);
     lgsStack.exitScope();
-    validateFuncFlow(func);
+    validateFuncControlFlow(func);
 }
 
-void SemaAnalyser::validateFuncFlow(const LgsFunc* func) {
+void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
     const auto stmtBlock = func->stmtBlock;
+    // TODO finish logic
     if (func->signature.name != LOGOS_MAIN_FUNC && !stmtBlock->hasReturn) {
         handleError(E10004, &func->location, {func->signature.name, func->signature.type->getName()});
     }

@@ -9,6 +9,11 @@ bool LgsType::equals(const LgsType& other) {
     return getName() == other.getName();
 }
 
+void LgsType::setLocation(const antlr4::Token* ctx) {
+    location.lineNumber = ctx->getLine();
+    location.posInLine = ctx->getCharPositionInLine() + 1;
+}
+
 LgsField* LgsType::getField(const string& name) {
     const auto it = fields.find(name);
     if (it != fields.end()) {

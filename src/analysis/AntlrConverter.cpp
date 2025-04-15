@@ -342,9 +342,15 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
 
 LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
     const auto lgsEnum = new LgsEnum(ctx->TYPE()->getText());
+    lgsEnum->setLocation(ctx->start);
+    unordered_set<string> seenNames;
     for (size_t i = 0; i < ctx->enumField().size(); ++i) {
         const auto enumField = ctx->enumField()[i];
         const auto enumName = enumField->CONST()->getText();
+        if (!seenNames.insert(enumName).second) {
+            analyser.handleError(E10004, &lgsEnum->location, {enumName});
+            return nullptr;
+        }
         string enumText = "";
         if (enumField->STRING()) {
             enumText = enumField->STRING()->getText();
