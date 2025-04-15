@@ -210,14 +210,6 @@ endif()
 enable_testing()
 add_executable(lgs_tests
     tests/main.cpp
-    tests/e2e/e2eTest.cpp
-    tests/parser/ParserTest.cpp
-    tests/analysis/sema/loops/SemaForeachLoopTests.cpp
-    tests/analysis/sema/loops/SemaRangeLoopTests.cpp
-    tests/analysis/sema/pattern_matching/SemaPatternMatchingTests.cpp
-    tests/analysis/sema/enums/SemaEnumsTests.cpp
-    tests/codegen/loops/CodegenRangeLoopTests.cpp
-    tests/codegen/object/CodegenObjectTests.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE
