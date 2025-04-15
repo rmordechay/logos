@@ -2,7 +2,6 @@
 #define LOGOSOBJECT_H
 #include "LgsStr.h"
 #include "LgsType.h"
-#include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsField.h"
 
 class LgsField;
@@ -14,6 +13,7 @@ public:
     vector<LgsType*> implements;
 
     explicit LgsObject(const string& typeName) : name(typeName) {}
+    LgsObject(const LgsObject& other);
     const string getName() const override;
     size_t size() override;
     Type* getIRType() override;

@@ -1,8 +1,23 @@
 #include "types/LgsObject.h"
 #include "CodeGenerator.h"
 #include "exprs/LgsNull.h"
-#include "funcs/LgsFuncImpl.h"
+#include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
+
+LgsObject::LgsObject(const LgsObject& other) {
+    for (const auto& [name, fieldPtr] : other.fields) {
+        if (!fieldPtr) continue;
+        fields[name] = new LgsField(*fieldPtr);
+    }
+    for (const auto& [name, methodList] : other.methods) {
+        vector<LgsMethodImpl*> clonedList;
+        for (const auto& methodPtr : methodList) {
+            if (!methodPtr) continue;
+            clonedList.emplace_back(new LgsMethodImpl(*methodPtr));
+        }
+        methods[name] = std::move(clonedList);
+    }
+}
 
 const string LgsObject::getName() const {
     return name;

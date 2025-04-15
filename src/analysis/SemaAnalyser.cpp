@@ -350,7 +350,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     if (symbol->type != OBJECT) {
         return handleError(E10022, &instance->location, {instance->type->getName()});
     }
-    instance->obj = symbol->object;
+    instance->obj = new LgsObject(*symbol->object);
     instance->type = instance->obj;
 }
 

@@ -1,6 +1,7 @@
 #ifndef LGSENVS_H
 #define LGSENVS_H
 
+#include "exprs/unary/constants/LgsStrConst.h"
 #include "funcs/LgsMethodImpl.h"
 #include "types/LgsObject.h"
 #include "types/LgsVoid.h"
