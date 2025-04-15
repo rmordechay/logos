@@ -44,4 +44,5 @@ inline LgsError E10026{.msg = "Void functions should not return an expression.",
 inline LgsError E10027{.msg = "", .errCode = ++errCodeStart};
 inline LgsError E10028{.msg = "Default parameters must be defined lastly.", .errCode = ++errCodeStart};
 
+
 #endif //LOGOSERRORS_H

@@ -2,7 +2,6 @@
 #include "LgsErrors.h"
 #include "LgsGlobals.h"
 #include "LgsObjectFile.h"
-#include "LgsWarnings.h"
 #include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "stmts/LgsField.h"
@@ -85,6 +84,14 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
     }
     visitStmtBlock(func->stmtBlock);
     lgsStack.exitScope();
+    validateFuncFlow(func);
+}
+
+void SemaAnalyser::validateFuncFlow(const LgsFunc* func) {
+    const auto stmtBlock = func->stmtBlock;
+    if (func->signature.name != LOGOS_MAIN_FUNC && !stmtBlock->hasReturn) {
+        handleError(E10004, &func->location, {func->signature.name, func->signature.type->getName()});
+    }
 }
 
 void SemaAnalyser::visitParam(LgsParam* param) {
@@ -115,10 +122,13 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
     }
 }
 
-void SemaAnalyser::visitStmtBlock(const LgsStmtBlock* stmtBlock) {
+void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
     if (!stmtBlock) return;
     for (const auto& stmt : stmtBlock->stmts) {
         visitStmt(stmt);
+    }
+    if (dynamic_cast<LgsReturn*>(stmtBlock->lastStmt())) {
+        stmtBlock->hasReturn = true;
     }
 }
 

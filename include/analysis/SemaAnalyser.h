@@ -36,9 +36,10 @@ public:
     void visitObjectInterfaces(LgsObject* obj);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
+    void validateFuncFlow(const LgsFunc* func);
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
-    void visitStmtBlock(const LgsStmtBlock* stmtBlock);
+    void visitStmtBlock(LgsStmtBlock* stmtBlock);
     void visitAssignment(const LgsAssignment* assignment);
     void visitVarDec(LgsVarDec* varDec);
     void visitIfStmt(const LgsIfStmt* ifStmt);
