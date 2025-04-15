@@ -24,6 +24,7 @@ public:
     LgsProjectAnalyser projectAnalyser;
     const LgsMainFile* mainFile = nullptr;
     const LgsAppFile* appFile = nullptr;
+    vector<LgsError> errors;
     std::mutex mtx;
 
     bool loadProject();

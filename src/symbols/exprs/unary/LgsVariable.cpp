@@ -12,15 +12,26 @@ string LgsVariable::getName() {
     return name;
 }
 
+uint32_t LgsVariable::hashValue() {
+    assert(ref && ref->type != UNKNOWN);
+    switch (ref->type) {
+    case FIELD:
+        break;
+    default:
+        assert(false);
+    }
+    return 0;
+}
+
 Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
-    assert(ref.type != UNKNOWN);
-    switch (ref.type) {
+    assert(ref && ref->type != UNKNOWN);
+    switch (ref->type) {
     case VAR_DEC:
-        return ref.varDec->expr->getIRValue(metadata);
+        return ref->varDec->expr->getIRValue(metadata);
     case PARAM:
-        return ref.param->IRValue;
+        return ref->param->IRValue;
     case ENUM_FIELD:
-        return ref.enumField->getIRValue(metadata);
+        return ref->enumField->getIRValue(metadata);
     default:
         assert(false);
     }
@@ -31,15 +42,16 @@ Value* LgsVariable::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
     switch (symbol->type) {
     case VAR_DEC:
         return symbol->varDec->expr->eqIR(metadata, other);
-    case PARAM:
-    case OBJECT:
-    case INTERFACE:
-    case FUNC:
-    case ENUM:
-    case ENUM_FIELD:
-        break;
     case UNKNOWN:
         assert(false);
+    default:
+        break;
     }
     return nullptr;
+}
+
+LgsVariable::~LgsVariable() {
+    if (ref && ref->type == FIELD) {
+        delete ref;
+    }
 }

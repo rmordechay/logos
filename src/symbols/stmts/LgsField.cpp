@@ -8,9 +8,7 @@ Value* LgsField::getIRValue(CodeGenMetadata* metadata) {
 }
 
 Value* LgsField::createIRValue(CodeGenMetadata* metadata) {
-    if (expr) {
-        return expr->getIRValue(metadata);
-    }
+    if (expr) return expr->getIRValue(metadata);
     const auto gep = getGEP(metadata);
     return metadata->builder.CreateLoad(type->getIRType(), gep);
 }

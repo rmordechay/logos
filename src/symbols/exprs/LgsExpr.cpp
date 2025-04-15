@@ -26,6 +26,10 @@ LgsExpr* LgsExpr::castStatically(LgsType* other) {
     return nullptr;
 }
 
+uint32_t LgsExpr::hashValue() {
+    assert(false);
+}
+
 Value* LgsExpr::subIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false && "not implemented");
 }

@@ -145,6 +145,7 @@ void SemaAnalyser::visitField(LgsField* field) {
 
 void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
     const auto rExpr = assignment->rvalue;
+    visitExpr(rExpr);
     const auto lExpr = assignment->lvalue;
     if (const auto selection = dynamic_cast<LgsSelection*>(lExpr)) {
         visitSelection(selection);
@@ -311,19 +312,18 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
         break;
     case ENUM_FIELD:
         setExprType(variable, symbol->enumField->type);
+        variable->ref = symbol;
         break;
     default:
         assert(false);
     }
-    variable->ref = *symbol;
+    variable->ref = symbol;
 }
 
 void SemaAnalyser::visitSelection(LgsSelection* selection) {
     const auto exprs = selection->exprs;
     visitFirstSelection(exprs[0]);
-    if (!successful) return;
     visitInnerSelections(selection);
-    if (!successful) return;
     setExprType(selection, selection->lastExpr()->type);
 }
 
@@ -441,11 +441,12 @@ void SemaAnalyser::setExprType(LgsExpr* expr, LgsType* type) {
     expr->type = resolveType(type);
 }
 
-void SemaAnalyser::setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
+void SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
     const auto field = parent->type->getField(fieldVariable->name);
     if (!field) {
         return handleError(E10005, &fieldVariable->location, {fieldVariable->getName(), parent->type->getName()});
     }
+    fieldVariable->ref = new LgsSymbol(field);
     setExprType(fieldVariable, field->type);
 }
 

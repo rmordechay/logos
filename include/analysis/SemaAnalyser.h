@@ -28,8 +28,9 @@ class LgsLoop;
 class SemaAnalyser final : public LgsAnalyser {
 public:
     LgsStack lgsStack;
+    LgsFile* file = nullptr;
 
-    explicit SemaAnalyser(LgsFile* logosFile) : LgsAnalyser(logosFile) {}
+    explicit SemaAnalyser(LgsFile* file) : file(file) {}
     void analyse();
     void visitMainFile(const LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
@@ -68,7 +69,7 @@ public:
     void setFuncType(LgsFunc* func);
     void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
-    void setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable);
+    void setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
     LgsType* resolveType(LgsType* type);
     bool resolveFuncCall(LgsFuncCall* funcCall);

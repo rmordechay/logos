@@ -1,0 +1,14 @@
+enum MyEnum {
+    ENUM1
+    ENUM2
+}
+
+object Obj {
+    a: Str
+    b: MyEnum
+}
+
+main() {
+    obj = Obj(a = "odi")
+    obj.b := ENUM1
+}

@@ -16,7 +16,6 @@ public:
 
     explicit LgsPatternMatching(LgsExpr* expr) : expr(expr) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* hashIRValue(CodeGenMetadata* metadata, LgsExpr* expr) const;
     ~LgsPatternMatching() override = default;
 };
 

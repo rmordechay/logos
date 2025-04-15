@@ -27,8 +27,8 @@ inline LgsPaths paths;
 class Logos {
 public:
     mutex mtx;
-    vector<LgsError> errors;
     LgsProject project;
+    vector<LgsError> errors;
 
     explicit Logos(const path& rootDirPath) {
         initPaths(rootDirPath);

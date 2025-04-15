@@ -348,8 +348,8 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
         const auto enumField = ctx->enumField()[i];
         const auto enumName = enumField->CONST()->getText();
         if (!seenNames.insert(enumName).second) {
-            analyser.handleError(E10004, &lgsEnum->location, {enumName});
-            return nullptr;
+            handleError(E10011, &lgsEnum->location, {enumName, to_string(lgsEnum->location.lineNumber)});
+            break;
         }
         string enumText = "";
         if (enumField->STRING()) {
@@ -422,13 +422,13 @@ LgsUnaryExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
     return array;
 }
 
-LgsVariable* AntlerConverter::getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) {
+LgsVariable* AntlerConverter::getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) const {
     const auto variable = new LgsVariable(varName);
     variable->setLocation(ctx->start);
     return variable;
 }
 
-LgsUnaryExpr* AntlerConverter::getConst(const string& constName, const antlr4::ParserRuleContext* ctx) {
+LgsUnaryExpr* AntlerConverter::getConst(const string& constName, const antlr4::ParserRuleContext* ctx) const {
     const auto constVariable = new LgsConst(constName);
     constVariable->setLocation(ctx->start);
     return constVariable;

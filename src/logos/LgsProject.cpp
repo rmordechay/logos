@@ -21,6 +21,7 @@ bool LgsProject::loadProject() {
     setupActiveEnv();
     if (!projectAnalyser.successful) return false;
     loadFiles();
+    if (!errors.empty()) return false;
     return projectAnalyser.successful;
 }
 
@@ -79,10 +80,12 @@ void LgsProject::parseSrcFile(const directory_entry& entry) {
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     AntlerConverter antlerConverter;
+    antlerConverter.filePath = absFilePath;
     const auto file = antlerConverter.getLogosFile(parser.logosFile(), absFilePath);
     file->relPath = relative(absFilePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     lock_guard lock(mtx);
     files.emplace_back(file);
+    errors.insert(errors.end(), antlerConverter.errors.begin(), antlerConverter.errors.end());
     if (file->name == LOGOS_MAIN_FILE_NAME) {
         mainFile = dynamic_cast<LgsMainFile*>(file);
     }
@@ -97,7 +100,6 @@ void LgsProject::parseAppFile(path fileEntry) {
     LogosParser parser(&tokens);
     AntlerConverter antlerConverter;
     appFile = antlerConverter.getAppFile(parser.logosAppFile(), absFilePath);
-
     for (const auto& varDec : appFile->varDecs) {
         if (varDec->name == "name") {
             name = varDec->expr->asStrConst()->value;

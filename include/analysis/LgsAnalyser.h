@@ -7,6 +7,7 @@
 #include <mutex>
 #include <vector>
 #include <string>
+#include <filesystem>
 
 class LgsFile;
 struct Location;
@@ -18,10 +19,8 @@ public:
     bool successful = true;
     vector<LgsError> errors;
     vector<LgsWarning> warnings;
-    LgsFile* file = nullptr;
+    filesystem::path filePath;
 
-    LgsAnalyser() = default;
-    explicit LgsAnalyser(LgsFile* file) : file(file) {}
     void setUnsuccessful();
     string formatMsg(const string& errMsg, const vector<string>& args = {}) const;
     void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});

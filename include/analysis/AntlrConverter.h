@@ -1,8 +1,8 @@
 #ifndef SEMANTICANALYSER_H
 #define SEMANTICANALYSER_H
 
+#include "LgsAnalyser.h"
 #include "LgsEnvFile.h"
-#include "LgsParserAnalyser.h"
 #include "LogosParser.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
@@ -15,10 +15,8 @@ class LgsLoop;
 class LgsAssignment;
 using namespace std;
 
-class AntlerConverter {
+class AntlerConverter : public LgsAnalyser {
 public:
-    LgsParserAnalyser analyser;
-
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath);
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath);
     LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx, const path& filePath);
@@ -46,8 +44,8 @@ public:
     LgsUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     LgsUnaryExpr* getArray(LogosParser::ArrayContext* ctx);
-    LgsVariable* getVariable(const string& varName, const antlr4::ParserRuleContext* ctx);
-    LgsUnaryExpr* getConst(const string& constName, const antlr4::ParserRuleContext* ctx);
+    LgsVariable* getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) const;
+    LgsUnaryExpr* getConst(const string& constName, const antlr4::ParserRuleContext* ctx) const;
     LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
     LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);

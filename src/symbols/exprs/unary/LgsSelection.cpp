@@ -35,6 +35,10 @@ LgsExpr* LgsSelection::lastExpr() const {
     return exprs[exprs.size() - 1];
 }
 
+uint32_t LgsSelection::hashValue() {
+    return lastExpr()->hashValue();
+}
+
 Value* LgsSelection::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
     const auto selection = resolveSelection(metadata);
     if (const auto var = selection->asVariable()) {
