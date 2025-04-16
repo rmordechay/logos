@@ -1,17 +1,14 @@
-#include "stmts/LgsPatternMatching.h"
+#include "stmts/LgsPatternMatch.h"
 
-#include "exprs/unary/LgsEnumField.h"
-#include "exprs/unary/LgsSelection.h"
-#include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsStr.h"
 
-Value* LgsPatternMatching::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsPatternMatch::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto func = metadata->lgsStack.currentFunc->getIRFunc(metadata);
-    const auto exprIRValue = metadata->builder.getInt32(expr->hashValue());
+    uint32_t c = expr->hashValue();
+    const auto exprIRValue = metadata->builder.getInt32(c);
     exitBlock = BasicBlock::Create(context, "exit_pattern_matching");
     defaultCase = BasicBlock::Create(context, "default");
     const auto switchInst = builder.CreateSwitch(exprIRValue, defaultCase);

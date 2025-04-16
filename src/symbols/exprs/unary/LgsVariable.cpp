@@ -1,26 +1,12 @@
 #include "exprs/unary/LgsVariable.h"
-
 #include "exprs/unary/LgsEnumField.h"
-#include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsParam.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsEnum.h"
-
+#include "types/LgsStr.h"
 #include <LgsStack.h>
 
 string LgsVariable::getName() {
     return name;
-}
-
-uint32_t LgsVariable::hashValue() {
-    assert(ref && ref->type != UNKNOWN);
-    switch (ref->type) {
-    case FIELD:
-        break;
-    default:
-        assert(false);
-    }
-    return 0;
 }
 
 Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
@@ -48,6 +34,19 @@ Value* LgsVariable::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
         break;
     }
     return nullptr;
+}
+
+uint32_t LgsVariable::hashValue() {
+    assert(ref && ref->type != UNKNOWN);
+    string text;
+    switch (ref->type) {
+    case FIELD:
+        return ref->field->expr->hashValue();
+    case ENUM_FIELD:
+        return LgsStr::hashString(ref->enumField->name);
+    default:
+        assert(false);
+    }
 }
 
 LgsVariable::~LgsVariable() {

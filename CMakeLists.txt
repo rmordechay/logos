@@ -86,7 +86,7 @@ add_library(lib STATIC
     include/symbols/loops/LgsForeachLoop.h
     include/symbols/loops/LgsRangeLoop.h
     include/symbols/stmts/LgsField.h
-    include/symbols/stmts/LgsPatternMatching.h
+    include/symbols/stmts/LgsPatternMatch.h
     include/symbols/stmts/LgsAssignment.h
     include/symbols/stmts/LgsIfStmt.h
     include/symbols/stmts/LgsReturn.h
@@ -155,7 +155,7 @@ add_library(lib STATIC
     src/symbols/stmts/LgsBreakStmt.cpp
     src/symbols/stmts/LgsContinue.cpp
     src/symbols/stmts/LgsStmtBlock.cpp
-    src/symbols/stmts/LgsPatternMatching.cpp
+    src/symbols/stmts/LgsPatternMatch.cpp
     src/symbols/stmts/LgsVarDec.cpp
     src/symbols/types/LgsEnum.cpp
     src/symbols/types/LgsBool.cpp

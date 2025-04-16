@@ -29,7 +29,11 @@ object:
     ;
 
 objectBody:
-        objectImplements? explicitVarDec* funcImplementation*
+        objectImplements? field* funcImplementation*
+    ;
+
+field:
+        VISIBILITY? CONST? VARIABLE COLON type (EQUAL expr)?
     ;
 
 objectDeclaration:
@@ -129,7 +133,7 @@ enumDeclaration:
     ;
 
 enumField:
-        CONST (EQUAL STRING)?
+        CONST_NAME (EQUAL STRING)?
     ;
 
 expr:
@@ -142,7 +146,7 @@ expr:
 
 unaryExpr:
         VARIABLE
-    |   CONST
+    |   CONST_NAME
     |   SELF_INSTANCE
     |   SELF_CLASS
     |   NULL
@@ -288,6 +292,8 @@ FOR: 'for';
 BREAK: 'break';
 CONTINUE: 'continue';
 RETURN: 'return';
+VISIBILITY: 'pub';
+CONST: 'const';
 
 AND: 'and';
 OR: 'or';
@@ -298,7 +304,7 @@ INTEGER: [0-9]+;
 FLOAT: [0-9]+ '.' [0-9]+;
 BOOL: 'true' | 'false';
 NULL: 'null';
-CONST: [A-Z0-9_]+;
+CONST_NAME: [A-Z0-9_]+;
 TYPE: [A-Z][a-zA-Z0-9_]*;
 VARIABLE: [a-z_][a-zA-Z0-9_]*;
 STRING: '"' ( ~["\\] | '\\' . )* '"';

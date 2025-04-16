@@ -14,7 +14,7 @@ void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) co
     metadata->builder.SetInsertPoint(block);
 }
 
-Value* LgsValue::createGlobalStr(Module* module, const std::string& value) const {
+Value* LgsValue::createIRStr(Module* module, const std::string& value) const {
     const auto strConstant = ConstantDataArray::getString(context, value, true);
     return createIRGlobal(module, strConstant);
 }
@@ -29,6 +29,12 @@ BasicBlock* LgsValue::createBasicBlock(const char* name) const {
 
 void LgsValue::free(CodeGenMetadata* metadata) {
     assert(false && "value has nothing to free");
+}
+
+Value* LgsValue::hashIRValue(CodeGenMetadata* metadata, Value* value) const {
+    const auto hashValueIRFuncType = FunctionType::get(i32Ty, {ptrTy}, false);
+    const auto func = metadata->module->getOrInsertFunction("hash_Str", hashValueIRFuncType);
+    return metadata->builder.CreateCall(func, {value});
 }
 
 void LgsValue::setIRValue(Value* value) {

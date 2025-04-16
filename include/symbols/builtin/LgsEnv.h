@@ -24,7 +24,7 @@ public:
         } else {
             value = args[2]->asStrConst()->value;
         }
-        return createGlobalStr(metadata->module, value);
+        return createIRStr(metadata->module, value);
     }
 };
 

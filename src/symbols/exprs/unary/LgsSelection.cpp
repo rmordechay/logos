@@ -36,7 +36,8 @@ LgsExpr* LgsSelection::lastExpr() const {
 }
 
 uint32_t LgsSelection::hashValue() {
-    return lastExpr()->hashValue();
+    const auto lgsExpr = lastExpr();
+    return lgsExpr->hashValue();
 }
 
 Value* LgsSelection::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {

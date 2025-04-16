@@ -25,7 +25,7 @@ public:
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath);
     LgsInterface* getInterface(LogosParser::InterfaceFileContext* ctx, const string& parentName);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName);
-    LgsField* getField(LogosParser::ExplicitVarDecContext* ctx, size_t position, const string& parentName);
+    LgsField* getField(LogosParser::FieldContext* ctx, size_t position);
     LgsFuncImpl* getFuncImpl(LogosParser::FuncImplementationContext* ctx);
     LgsMethodImpl* getMethodImpl(LogosParser::FuncImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);

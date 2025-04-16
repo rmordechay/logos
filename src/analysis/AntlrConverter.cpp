@@ -30,7 +30,7 @@
 #include "stmts/LgsContinue.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
-#include "stmts/LgsPatternMatching.h"
+#include "stmts/LgsPatternMatch.h"
 
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -131,10 +131,10 @@ LgsAppFile* AntlerConverter::getAppFile(LogosParser::LogosAppFileContext* ctx, c
 
 LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName) {
     const auto obj = new LgsObject(objName);
-    for (int i = 0; i < ctx->explicitVarDec().size(); ++i) {
-        const auto varDec = ctx->explicitVarDec()[i];
-        const auto field = getField(varDec, i, obj->name);
-        obj->fields[field->name] = field;
+    for (int i = 0; i < ctx->field().size(); ++i) {
+        const auto field = ctx->field()[i];
+        const auto lgsField = getField(field, i);
+        obj->fields[lgsField->name] = lgsField;
     }
     for (const auto& func : ctx->funcImplementation()) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
@@ -207,11 +207,17 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationCon
 
 }
 
-LgsField* AntlerConverter::getField(LogosParser::ExplicitVarDecContext* ctx, const size_t position, const string& parentName) {
+LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx, const size_t position) {
     const auto name = ctx->VARIABLE()->getText();
     const auto userType = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
     const auto field = new LgsField(name, position, userType, expr);
+    if (ctx->VISIBILITY()) {
+        field->isPublic = true;
+    }
+    if (ctx->CONST()) {
+        field->isConst = true;
+    }
     field->setLocation(ctx->start);
     return field;
 }
@@ -309,7 +315,7 @@ LgsIfStmt* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx)
 }
 
 LgsStmt* AntlerConverter::getPatternMatching(LogosParser::PatternMatchingContext* ctx) {
-    const auto patternMatching = new LgsPatternMatching(getExpr(ctx->expr()));
+    const auto patternMatching = new LgsPatternMatch(getExpr(ctx->expr()));
     for (const auto& pattern : ctx->pattern()) {
         const auto expr = getExpr(pattern->expr());
         const auto stmtBlock = getStmtBlock(pattern->statementsBlock());
@@ -346,7 +352,7 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
     unordered_set<string> seenNames;
     for (size_t i = 0; i < ctx->enumField().size(); ++i) {
         const auto enumField = ctx->enumField()[i];
-        const auto enumName = enumField->CONST()->getText();
+        const auto enumName = enumField->CONST_NAME()->getText();
         if (!seenNames.insert(enumName).second) {
             handleError(E10011, &lgsEnum->location, {enumName, to_string(lgsEnum->location.lineNumber)});
             break;
@@ -393,7 +399,7 @@ LgsExpr* AntlerConverter::getCast(LogosParser::ExprContext* ctx) {
 
 LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto variable = ctx->VARIABLE()) return getVariable(variable->getText(), ctx);
-    if (const auto constExpr = ctx->CONST()) return getConst(constExpr->getText(), ctx);
+    if (const auto constExpr = ctx->CONST_NAME()) return getConst(constExpr->getText(), ctx);
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
     if (const auto constructor = ctx->constructor()) return getInstance(constructor);
     if (const auto constant = ctx->constant()) return getConstant(constant);

@@ -9,6 +9,8 @@ class LgsField : public LgsValue {
 public:
     string name;
     size_t position;
+    bool isPublic = false;
+    bool isConst = false;
     LgsType* type = nullptr;
     LgsType* userType = nullptr;
     LgsExpr* expr = nullptr;

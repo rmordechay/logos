@@ -20,7 +20,7 @@
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
-#include "stmts/LgsPatternMatching.h"
+#include "stmts/LgsPatternMatch.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -96,7 +96,7 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
         visitVarDec(varDec);
     } else if (const auto ifStmt = dynamic_cast<LgsIfStmt*>(stmt)) {
         visitIfStmt(ifStmt);
-    } else if (const auto patternMatching = dynamic_cast<LgsPatternMatching*>(stmt)) {
+    } else if (const auto patternMatching = dynamic_cast<LgsPatternMatch*>(stmt)) {
         visitPatternMatching(patternMatching);
     } else if (const auto loopStmt = dynamic_cast<LgsLoop*>(stmt)) {
         visitLoopStmt(loopStmt);
@@ -166,7 +166,7 @@ void SemaAnalyser::visitIfStmt(const LgsIfStmt* ifStmt) {
     visitStmtBlock(ifStmt->elseStmtBlock);
 }
 
-void SemaAnalyser::visitPatternMatching(const LgsPatternMatching* patternMatching) {
+void SemaAnalyser::visitPatternMatching(const LgsPatternMatch* patternMatching) {
     const auto baseExpr = patternMatching->expr;
     if (!baseExpr) {
         return visitBoolPatternMatching(patternMatching);
@@ -186,7 +186,7 @@ void SemaAnalyser::visitPatternMatching(const LgsPatternMatching* patternMatchin
     visitStmtBlock(patternMatching->elseStmtBlock);
 }
 
-void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatching* patternMatching) const {}
+void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const {}
 
 void SemaAnalyser::visitLoopStmt(LgsLoop* loopStmt) {
     lgsStack.enterScope();
@@ -352,7 +352,13 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     if (symbol->type != OBJECT) {
         return handleError(E10022, &instance->location, {instance->type->getName()});
     }
-    instance->obj = new LgsObject(*symbol->object);
+    const auto obj = new LgsObject(*symbol->object);
+    for (const auto& arg : instance->args) {
+        visitExpr(arg->expr);
+        const auto lgsField = obj->getField(arg->name);
+        lgsField->expr = arg->expr;
+    }
+    instance->obj = obj;
     instance->type = instance->obj;
 }
 

@@ -6,7 +6,7 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "stmts/LgsBreakStmt.h"
-#include "stmts/LgsPatternMatching.h"
+#include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsReturn.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -46,8 +46,8 @@ public:
     void visitAssignment(const LgsAssignment* assignment);
     void visitVarDec(LgsVarDec* varDec);
     void visitIfStmt(const LgsIfStmt* ifStmt);
-    void visitPatternMatching(const LgsPatternMatching* patternMatching);
-    void visitBoolPatternMatching(const LgsPatternMatching* patternMatching) const;
+    void visitPatternMatching(const LgsPatternMatch* patternMatching);
+    void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const;
     void visitLoopStmt(LgsLoop* loopStmt);
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);
     void visitForeachLoop(const LgsForeachLoop* foreachLoop);
