@@ -87,14 +87,6 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
     validateFuncControlFlow(func);
 }
 
-void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
-    const auto stmtBlock = func->stmtBlock;
-    // TODO finish logic
-    if (func->signature.name != LOGOS_MAIN_FUNC && !stmtBlock->hasReturn) {
-        handleError(E10004, &func->location, {func->signature.name, func->signature.type->getName()});
-    }
-}
-
 void SemaAnalyser::visitParam(LgsParam* param) {
     addLocalSymbol(param->name, LgsSymbol(param));
 }
@@ -621,6 +613,15 @@ LgsFunc* SemaAnalyser::resolveFuncOverload(LgsFunc* overload, const LgsFuncCall*
         return nullptr;
     }
     return overload;
+}
+
+void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
+    if (dynamic_cast<LgsVoid*>(func->signature.type)) return;
+    const auto stmtBlock = func->stmtBlock;
+    const bool isFlowCorrect = func->signature.name != LOGOS_MAIN_FUNC && !stmtBlock->hasReturn;
+    if (isFlowCorrect) {
+        handleError(E10004, &func->location, {func->signature.name, func->signature.type->getName()});
+    }
 }
 
 bool SemaAnalyser::checkDefaultParams(const LgsFuncCall* funcCall, const vector<LgsParam>& overloadParams) const {

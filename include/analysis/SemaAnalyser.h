@@ -30,7 +30,9 @@ public:
     LgsStack lgsStack;
     LgsFile* file = nullptr;
 
-    explicit SemaAnalyser(LgsFile* file) : file(file) {}
+    explicit SemaAnalyser(LgsFile* file) : file(file) {
+        filePath = file->absPath;
+    }
     void analyse();
     void visitMainFile(const LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
