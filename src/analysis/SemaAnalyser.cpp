@@ -304,12 +304,11 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
         break;
     case ENUM_FIELD:
         setExprType(variable, symbol->enumField->type);
-        variable->ref = symbol;
         break;
     default:
         assert(false);
     }
-    variable->ref = symbol;
+    variable->ref = new LgsSymbol(*symbol);
 }
 
 void SemaAnalyser::visitSelection(LgsSelection* selection) {

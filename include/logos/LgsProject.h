@@ -20,12 +20,11 @@ public:
     string name;
     string version;
     vector<LgsFile*> files;
+    vector<LgsError> errors;
     vector<LgsEnvFile*> envFiles;
     LgsProjectAnalyser projectAnalyser;
-    const LgsMainFile* mainFile = nullptr;
+    LgsMainFile* mainFile = nullptr;
     const LgsAppFile* appFile = nullptr;
-    vector<LgsError> errors;
-    std::mutex mtx;
 
     bool loadProject();
     void loadFiles();

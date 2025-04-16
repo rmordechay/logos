@@ -14,8 +14,15 @@ public:
     vector<LgsObject*> objects;
 
     explicit LgsMainFile(const string& path) : LgsFile(LOGOS_MAIN_FILE_NAME, path) {}
+    void format() override;
     ~LgsMainFile() override;
 };
+
+inline void LgsMainFile::format() {
+    string indentStr = "";
+    ofstream outFile(absPath, ios::trunc);
+    outFile << mainFunc->format(indentStr);
+}
 
 inline LgsMainFile::~LgsMainFile() {
     delete mainFunc;

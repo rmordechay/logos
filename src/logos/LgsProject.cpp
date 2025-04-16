@@ -15,6 +15,7 @@
 
 using namespace std;
 extern char **environ;
+std::mutex projectMtx;
 
 bool LgsProject::loadProject() {
     if (!projectAnalyser.validateProject()) return false;
@@ -83,7 +84,7 @@ void LgsProject::parseSrcFile(const directory_entry& entry) {
     antlerConverter.filePath = absFilePath;
     const auto file = antlerConverter.getLogosFile(parser.logosFile(), absFilePath);
     file->relPath = relative(absFilePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
-    lock_guard lock(mtx);
+    lock_guard lock(projectMtx);
     files.emplace_back(file);
     errors.insert(errors.end(), antlerConverter.errors.begin(), antlerConverter.errors.end());
     if (file->name == LOGOS_MAIN_FILE_NAME) {

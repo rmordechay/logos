@@ -10,6 +10,7 @@ public:
     explicit LgsStmtBlock(const vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
     void createIRValue(CodeGenMetadata* metadata) const;
     LgsStmt* lastStmt() const;
+    string format(string& indentStr) override;
     ~LgsStmtBlock() override;
 };
 

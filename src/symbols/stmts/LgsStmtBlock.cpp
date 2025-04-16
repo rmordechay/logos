@@ -13,6 +13,17 @@ LgsStmt* LgsStmtBlock::lastStmt() const {
     return stmts[stmts.size() - 1];
 }
 
+string LgsStmtBlock::format(string& indentStr) {
+    stringstream oss;
+    oss << " {\n";
+    indentStr += '\t';
+    for (const auto& stmt : stmts) {
+        oss << stmt->format(indentStr) << '\n';
+    }
+    oss << "}\n\n";
+    return oss.str();
+}
+
 LgsStmtBlock::~LgsStmtBlock() {
     for (const auto& stmt : stmts) {
         delete stmt;

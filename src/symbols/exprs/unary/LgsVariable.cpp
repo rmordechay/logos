@@ -51,7 +51,5 @@ Value* LgsVariable::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
 }
 
 LgsVariable::~LgsVariable() {
-    if (ref && ref->type == FIELD) {
-        delete ref;
-    }
+    delete ref;
 }

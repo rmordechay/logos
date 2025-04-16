@@ -1,7 +1,27 @@
 #include "funcs/LgsFunc.h"
+
+#include "LgsData.h"
 #include "exprs/LgsExpr.h"
 #include "funcs/LgsParam.h"
 #include "types/LgsVoid.h"
+
+string LgsFunc::format(string& indentStr) {
+    stringstream ss;
+    ss << signature.name << "(";
+    for (int i = 0; i < signature.params.size(); ++i) {
+        auto param = signature.params[i];
+        ss << param.format(indentStr);
+        if (i != signature.params.size() - 1) {
+            ss << ", ";
+        }
+    }
+    ss << ")";
+    if (signature.name != LOGOS_MAIN_FUNC) {
+        ss << signature.type->getName();
+    }
+    ss << stmtBlock->format(indentStr);
+    return ss.str();
+}
 
 void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);

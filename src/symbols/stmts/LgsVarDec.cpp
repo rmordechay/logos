@@ -2,6 +2,10 @@
 
 #include "exprs/unary/LgsArray.h"
 
+string LgsVarDec::format(string& indentStr) {
+    return indentStr + name + " = ";
+}
+
 Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     if (!expr) return builder.CreateAlloca(type->getIRType());

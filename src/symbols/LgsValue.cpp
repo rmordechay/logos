@@ -19,6 +19,10 @@ Value* LgsValue::createGlobalStr(Module* module, const std::string& value) const
     return createIRGlobal(module, strConstant);
 }
 
+string LgsValue::format(string& indentStr) {
+    assert(false);
+}
+
 BasicBlock* LgsValue::createBasicBlock(const char* name) const {
     return BasicBlock::Create(context, name);
 }
