@@ -1,4 +1,5 @@
-#include "logos/LgsProject.h"
+#include "logos/LogosProject.h"
+
 #include "analysis/AntlrConverter.h"
 #include "files/LgsAppFile.h"
 #include "logos/LgsGlobals.h"
@@ -9,6 +10,7 @@
 #include "symbols/builtin/LgsSys.h"
 #include "symbols/builtin/LgsPrint.h"
 #include "symbols/types/LgsBool.h"
+#include "types/LgsChar.h"
 #include "utils/ThreadPool.h"
 
 #include <iostream>
@@ -17,23 +19,24 @@ using namespace std;
 extern char **environ;
 std::mutex projectMtx;
 
-bool LgsProject::loadProject() {
+bool LogosProject::loadProject() {
     if (!projectAnalyser.validateProject()) return false;
     setupActiveEnv();
     if (!projectAnalyser.successful) return false;
     loadFiles();
     if (!errors.empty()) return false;
+    projectAnalyser.resolveGlobalTypes(files);
     return projectAnalyser.successful;
 }
 
-void LgsProject::loadFiles() {
+void LogosProject::loadFiles() {
     thread tSrcFiles([this] { loadSrcFiles(); });
     thread tGlobals([this] { loadGlobals(); });
     tSrcFiles.join();
     tGlobals.join();
 }
 
-void LgsProject::loadSrcFiles() {
+void LogosProject::loadSrcFiles() {
     vector<LgsFile*> files;
     ThreadPool threadPool;
     threadPool.start();
@@ -41,7 +44,7 @@ void LgsProject::loadSrcFiles() {
     threadPool.wait();
 }
 
-void LgsProject::loadEnvFiles() {
+void LogosProject::loadEnvFiles() {
     vector<LgsEnvFile*> files;
     ThreadPool threadPool;
     threadPool.start();
@@ -54,14 +57,14 @@ void LgsProject::loadEnvFiles() {
     threadPool.wait();
 }
 
-void LgsProject::setupActiveEnv() {
+void LogosProject::setupActiveEnv() {
     setEnvVars();
     parseAppFile(paths.appFilePath);
     loadEnvFiles();
     checkRequiredEnvVars();
 }
 
-void LgsProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
+void LogosProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
     for (const auto& entry : directory_iterator(path)) {
         if (isLogosFile(entry)) {
             threadPool.runTask([entry, this] {
@@ -73,7 +76,7 @@ void LgsProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
     }
 }
 
-void LgsProject::parseSrcFile(const directory_entry& entry) {
+void LogosProject::parseSrcFile(const directory_entry& entry) {
     const auto absFilePath = canonical(entry);
     const auto codeText = getFileText(entry);
     ANTLRInputStream input(codeText);
@@ -92,7 +95,7 @@ void LgsProject::parseSrcFile(const directory_entry& entry) {
     }
 }
 
-void LgsProject::parseAppFile(path fileEntry) {
+void LogosProject::parseAppFile(path fileEntry) {
     auto absFilePath = canonical(fileEntry);
     auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
@@ -114,7 +117,7 @@ void LgsProject::parseAppFile(path fileEntry) {
     }
 }
 
-void LgsProject::parseEnvFile(path fileEntry) {
+void LogosProject::parseEnvFile(path fileEntry) {
     auto absFilePath = canonical(fileEntry);
     auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
@@ -126,14 +129,14 @@ void LgsProject::parseEnvFile(path fileEntry) {
     envFiles.emplace_back(envFile);
 }
 
-string LgsProject::getFileText(path filePath) const {
+string LogosProject::getFileText(path filePath) const {
     ifstream file(canonical(filePath));
     stringstream fileContents;
     fileContents << file.rdbuf();
     return fileContents.str();
 }
 
-void LgsProject::loadGlobals() const {
+void LogosProject::loadGlobals() const {
     globals.addFunc(new LgsPrint({LgsParam(new LgsInt())}));
     globals.addFunc(new LgsPrint({LgsParam(new LgsFloat())}));
     globals.addFunc(new LgsPrint({LgsParam(new LgsStr())}));
@@ -144,7 +147,7 @@ void LgsProject::loadGlobals() const {
     globals.addSymbol("ROOT_PATH", LgsSymbol(new LgsVarDec("ROOT_PATH", new LgsStr(), new LgsStrConst(paths.rootDirAbs))));
 }
 
-void LgsProject::checkRequiredEnvVars() {
+void LogosProject::checkRequiredEnvVars() {
     for (const auto& requireEnvVar : appFile->requireEnvVars) {
         for (const auto envFile : envFiles) {
             projectAnalyser.checkRequiredEnvVar(requireEnvVar, envFile);
@@ -152,7 +155,7 @@ void LgsProject::checkRequiredEnvVars() {
     }
 }
 
-void LgsProject::setEnvVars() const {
+void LogosProject::setEnvVars() const {
     for (char **env = environ; *env != nullptr; ++env) {
         string entry(*env);
         const auto pos = entry.find('=');
@@ -164,6 +167,6 @@ void LgsProject::setEnvVars() const {
     }
 }
 
-bool LgsProject::isLogosFile(const directory_entry& entry) const {
+bool LogosProject::isLogosFile(const directory_entry& entry) const {
     return entry.is_regular_file() && entry.path().extension().string() == LOGOS_FILE_EXTENSION;
 }

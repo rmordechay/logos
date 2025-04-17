@@ -2,6 +2,78 @@
 
 #include "CodeGenMetadata.h"
 #include "LgsFile.h"
+#include "LgsGlobals.h"
+#include "LgsInterfaceFile.h"
+#include "LgsMainFile.h"
+#include "LgsObjectFile.h"
+#include "funcs/LgsMethodImpl.h"
+
+LgsType* LgsAnalyser::resolveType(LgsType* type) {
+    if (!dynamic_cast<LgsUnknownType*>(type)) return type;
+    auto typeName = type->getName();
+    const auto nullable = type->nullable;
+    if (globals.symbols.find(typeName) == globals.symbols.end()) {
+        handleError(E10006, &type->location, {typeName});
+        return nullptr;
+    }
+    const auto symbol = &globals.symbols[typeName];
+    delete type;
+    LgsType* newType = nullptr;
+    if (symbol->type == OBJECT) {
+        symbol->object->nullable = nullable;
+        newType = symbol->object;
+    }
+    if (symbol->type == INTERFACE) {
+        symbol->interface->nullable = nullable;
+        newType = symbol->interface;
+    }
+    if (symbol->type == ENUM) {
+        symbol->lgsEnum->nullable = nullable;
+        newType = symbol->lgsEnum;
+    }
+    if (symbol->type == ENUM_FIELD) {
+        symbol->enumField->parent->nullable = nullable;
+        newType = symbol->enumField->parent;
+    }
+    assert(newType);
+    return newType;
+}
+
+void LgsAnalyser::resolveGlobalTypes(const vector<LgsFile*>& files) {
+    for (const auto& file : files) {
+        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+            for (const auto& object : mainFile->objects) {
+                resolveObjMemberTypes(object);
+            }
+        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+            resolveObjMemberTypes(objFile->obj);
+        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+            for (const auto& signature : interfaceFile->interface->funcSignatures) {
+                signature->type = resolveType(signature->type);
+                for (int i = 0; i < signature->params.size(); ++i) {
+                    signature->params[i].type = resolveType(signature->params[i].type);
+                }
+            }
+        }
+    }
+}
+
+void LgsAnalyser::resolveObjMemberTypes(LgsObject* const& object) {
+    for (const auto& [_, field] : object->fields) {
+        field->userType = resolveType(field->userType);
+    }
+    for (const auto& [_, method] : object->methods) {
+        for (const auto& overload : method) {
+            overload->signature.type = resolveType(overload->signature.type);
+            for (int i = 0; i < overload->signature.params.size(); ++i) {
+                overload->signature.params[i].type = resolveType(overload->signature.params[i].type);
+            }
+        }
+    }
+    for (int i = 0; i < object->implements.size(); ++i) {
+        object->implements[i] = resolveType(object->implements[i]);
+    }
+}
 
 string LgsAnalyser::formatMsg(const string& errMsg, const vector<string>& args) const {
     auto pos = 0;

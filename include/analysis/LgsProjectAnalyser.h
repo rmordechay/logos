@@ -2,6 +2,8 @@
 #define PROJECTANALYSER_H
 #include "LgsAnalyser.h"
 
+class LgsObject;
+class LgsType;
 class LgsEnvFile;
 struct RequireEnvVar;
 

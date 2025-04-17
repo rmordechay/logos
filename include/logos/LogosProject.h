@@ -5,6 +5,8 @@
 #include "analysis/LgsAnalyser.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
+#include "types/LgsObject.h"
+
 #include <files/LgsFile.h>
 #include <vector>
 
@@ -15,7 +17,7 @@ class LgsMainFile;
 struct LgsPaths;
 class LgsEnv;
 
-class LgsProject final {
+class LogosProject final {
 public:
     string name;
     string version;
@@ -40,7 +42,7 @@ public:
     void parseAppFile(path fileEntry);
     string getFileText(path filePath) const;
     bool isLogosFile(const directory_entry& entry) const;
-    ~LgsProject() = default;
+    ~LogosProject() = default;
 };
 
 #endif // LGSPROJECT_H

@@ -1,6 +1,5 @@
 #ifndef LOGOSPRINT_H
 #define LOGOSPRINT_H
-#include "types/LgsChar.h"
 #include "types/LgsFloat.h"
 #include <types/LgsVoid.h>
 
@@ -10,8 +9,8 @@ public:
     static constexpr auto name = "print";
     explicit LgsPrint(const vector<LgsParam>& params) : LgsFunc(name, new LgsVoid(), params) {}
 
-    void createIRValue(CodeGenMetadata* metadata) override;
-    void setIRFuncType() override;
+    void createIRFunc(CodeGenMetadata* metadata) override;
+    Function* getIRFunc(const CodeGenMetadata* metadata) override;
     ~LgsPrint() override = default;
 };
 

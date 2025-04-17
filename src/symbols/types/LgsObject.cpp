@@ -4,7 +4,8 @@
 #include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
 
-LgsObject::LgsObject(const LgsObject& other) {
+LgsObject::LgsObject(LgsObject& other) {
+    name = other.name;
     for (const auto& [name, fieldPtr] : other.fields) {
         if (!fieldPtr) continue;
         fields[name] = new LgsField(*fieldPtr);

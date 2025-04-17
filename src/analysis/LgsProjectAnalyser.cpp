@@ -1,5 +1,8 @@
 #include "analysis/LgsProjectAnalyser.h"
+
+#include "LgsGlobals.h"
 #include "Logos.h"
+#include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsVarDec.h"
 
 void LgsProjectAnalyser::checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile) {

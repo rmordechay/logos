@@ -5,25 +5,7 @@
 #include "funcs/LgsParam.h"
 #include "types/LgsVoid.h"
 
-string LgsFunc::format(string& indentStr) {
-    stringstream ss;
-    ss << signature.name << "(";
-    for (int i = 0; i < signature.params.size(); ++i) {
-        auto param = signature.params[i];
-        ss << param.format(indentStr);
-        if (i != signature.params.size() - 1) {
-            ss << ", ";
-        }
-    }
-    ss << ")";
-    if (signature.name != LOGOS_MAIN_FUNC) {
-        ss << signature.type->getName();
-    }
-    ss << stmtBlock->format(indentStr);
-    return ss.str();
-}
-
-void LgsFunc::createIRValue(CodeGenMetadata* metadata) {
+void LgsFunc::createIRFunc(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);
     const auto IRFunc = getIRFunc(metadata);
     auto args = IRFunc->arg_begin();
@@ -66,10 +48,23 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     return metadata->builder.CreateCall(IRFunc, argValues);;
 }
 
-Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
-    if (!IRFuncType) setIRFuncType();
-    auto func = metadata->module->getOrInsertFunction(signature.IRName, IRFuncType);
-    return dyn_cast<Function>(func.getCallee());
+
+string LgsFunc::format(string& indentStr) {
+    stringstream ss;
+    ss << signature.name << "(";
+    for (int i = 0; i < signature.params.size(); ++i) {
+        auto param = signature.params[i];
+        ss << param.format(indentStr);
+        if (i != signature.params.size() - 1) {
+            ss << ", ";
+        }
+    }
+    ss << ")";
+    if (signature.name != LOGOS_MAIN_FUNC) {
+        ss << signature.type->getName();
+    }
+    ss << stmtBlock->format(indentStr);
+    return ss.str();
 }
 
 LgsFunc::~LgsFunc() {

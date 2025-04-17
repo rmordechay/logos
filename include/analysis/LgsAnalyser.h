@@ -2,6 +2,7 @@
 #define LOGOSANALYSER_H
 #include "LgsErrors.h"
 #include "LgsWarnings.h"
+#include "types/LgsType.h"
 
 #include <iostream>
 #include <mutex>
@@ -22,8 +23,12 @@ public:
     filesystem::path filePath;
 
     void setUnsuccessful();
-    string formatMsg(const string& errMsg, const vector<string>& args = {}) const;
     void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});
+    LgsType* resolveType(LgsType* type);
+    void resolveGlobalTypes(const vector<LgsFile*>& files);
+    void resolveObjMemberTypes(LgsObject* const& object);
+    string formatMsg(const string& errMsg, const vector<string>& args = {}) const;
+    ~LgsAnalyser() = default;
 };
 
 

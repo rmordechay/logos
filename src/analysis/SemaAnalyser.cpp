@@ -356,6 +356,10 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     for (const auto& arg : instance->args) {
         visitExpr(arg->expr);
         const auto lgsField = obj->getField(arg->name);
+        if (!lgsField) {
+            handleError(E10005, &arg->location, {arg->name, obj->name});
+            continue;
+        }
         lgsField->expr = arg->expr;
     }
     instance->obj = obj;
@@ -399,37 +403,6 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
     setExprType(methodCall, methodCall->func->signature.type);
 }
 
-LgsType* SemaAnalyser::resolveType(LgsType* type) {
-    if (!dynamic_cast<LgsUnknownType*>(type)) return type;
-    const auto name = type->getName();
-    const auto nullable = type->nullable;
-    const auto symbol = lgsStack.getSymbol(name);
-    if (!symbol) {
-        handleError(E10006, &type->location, {name});
-        return nullptr;
-    }
-    delete type;
-    LgsType* newType = nullptr;
-    if (symbol->type == OBJECT) {
-        symbol->object->nullable = nullable;
-        newType = symbol->object;
-    }
-    if (symbol->type == INTERFACE) {
-        symbol->interface->nullable = nullable;
-        newType = symbol->interface;
-    }
-    if (symbol->type == ENUM) {
-        symbol->lgsEnum->nullable = nullable;
-        newType = symbol->lgsEnum;
-    }
-    if (symbol->type == ENUM_FIELD) {
-        symbol->enumField->parent->nullable = nullable;
-        newType = symbol->enumField->parent;
-    }
-    assert(newType);
-    return newType;
-}
-
 void SemaAnalyser::setFuncType(LgsFunc* func) {
     func->signature.type = resolveType(func->signature.type);
 }
@@ -438,11 +411,12 @@ void SemaAnalyser::setExprType(LgsExpr* expr, LgsType* type) {
     expr->type = resolveType(type);
 }
 
-void SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
+void SemaAnalyser::setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
     const auto field = parent->type->getField(fieldVariable->name);
     if (!field) {
         return handleError(E10005, &fieldVariable->location, {fieldVariable->getName(), parent->type->getName()});
     }
+    if (!field->isPublic) {}
     fieldVariable->ref = new LgsSymbol(field);
     setExprType(fieldVariable, field->type);
 }

@@ -10,21 +10,17 @@ string LgsInstance::getName() {
 }
 
 Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
+    const auto parentType = obj->getIRType();
     if (isSelf) {
         const auto currentFunc = metadata->lgsStack.currentFunc->getIRFunc(metadata);
-        return currentFunc->arg_begin();
+        IRValue = currentFunc->arg_begin();
+    } else {
+        IRValue = metadata->builder.CreateAlloca(parentType);
     }
-    const auto parentType = obj->getIRType();
-    const auto instanceIR = metadata->builder.CreateAlloca(parentType);
-    for (const auto& [_, field] : obj->fields) {
-        field->parentIRValue = instanceIR;
-        field->parentIRType = parentType;
-    }
-    if (args.empty()) return instanceIR;
     for (const auto& arg : args) {
         const auto field = obj->getField(arg->name);
         field->setFieldIRValue(metadata, arg->expr);
     }
-    return instanceIR;
+    return IRValue;
 }
 

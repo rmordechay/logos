@@ -13,7 +13,7 @@ public:
     vector<LgsType*> implements;
 
     explicit LgsObject(const string& typeName) : name(typeName) {}
-    LgsObject(const LgsObject& other);
+    LgsObject(LgsObject& other);
     const string getName() const override;
     size_t size() override;
     Type* getIRType() override;

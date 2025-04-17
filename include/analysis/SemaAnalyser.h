@@ -71,9 +71,8 @@ public:
     void setFuncType(LgsFunc* func);
     void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
-    void setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
+    void setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
-    LgsType* resolveType(LgsType* type);
     bool resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
     LgsFunc* resolveFuncOverload(LgsFunc* overload, const LgsFuncCall* funcCall);
