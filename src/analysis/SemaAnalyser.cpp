@@ -64,7 +64,6 @@ void SemaAnalyser::visitObjectInterfaces(LgsObject* obj) {
     for (int i = 0; i < obj->implements.size(); ++i) {
         const auto implement = obj->implements[i];
         if (!implement) continue;
-
         const auto interface = dynamic_cast<LgsInterface*>(implement);
         if (!interface) {
             handleError(E10025, &implement->location, {implement->getName()});
@@ -90,25 +89,23 @@ void SemaAnalyser::visitParam(LgsParam* param) {
 }
 
 void SemaAnalyser::visitStmt(LgsStmt* stmt) {
-    if (const auto varDec = dynamic_cast<LgsVarDec*>(stmt)) {
+    if (const auto varDec = stmt->asVarDec()) {
         visitVarDec(varDec);
-    } else if (const auto ifStmt = dynamic_cast<LgsIfStmt*>(stmt)) {
+    } else if (const auto ifStmt = stmt->asIfStmt()) {
         visitIfStmt(ifStmt);
-    } else if (const auto patternMatching = dynamic_cast<LgsPatternMatch*>(stmt)) {
-        visitPatternMatching(patternMatching);
-    } else if (const auto loopStmt = dynamic_cast<LgsLoop*>(stmt)) {
+    } else if (const auto patternMatch = stmt->asPatternMatch()) {
+        visitPatternMatch(patternMatch);
+    } else if (const auto loopStmt = stmt->asLoop()) {
         visitLoopStmt(loopStmt);
-    } else if (const auto assignment = dynamic_cast<LgsAssignment*>(stmt)) {
+    } else if (const auto assignment = stmt->asAssignment()) {
         visitAssignment(assignment);
-    } else if (const auto funcCall = dynamic_cast<LgsFuncCall*>(stmt)) {
+    } else if (const auto funcCall = stmt->asFuncCall()) {
         visitFuncCall(funcCall);
-    } else if (const auto selection = dynamic_cast<LgsSelection*>(stmt)) {
+    } else if (const auto selection = stmt->asSelection()) {
         visitSelection(selection);
-    } else if (const auto returnStmt = dynamic_cast<LgsReturn*>(stmt)) {
+    } else if (const auto returnStmt = stmt->asReturn()) {
         visitReturnStmt(returnStmt);
-    } else if (const auto enumDec = dynamic_cast<LgsEnum*>(stmt)) {
-        visitEnum(enumDec);
-    } else if (const auto breakStmt = dynamic_cast<LgsBreakStmt*>(stmt)) {
+    } else if (const auto breakStmt = stmt->asBreakStmt()) {
         visitBreakStmt(breakStmt);
     }
 }
@@ -163,7 +160,7 @@ void SemaAnalyser::visitIfStmt(const LgsIfStmt* ifStmt) {
     visitStmtBlock(ifStmt->elseStmtBlock);
 }
 
-void SemaAnalyser::visitPatternMatching(const LgsPatternMatch* patternMatching) {
+void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
     const auto baseExpr = patternMatching->expr;
     if (!baseExpr) {
         return visitBoolPatternMatching(patternMatching);

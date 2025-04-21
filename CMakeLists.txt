@@ -170,6 +170,7 @@ add_library(lib STATIC
     src/symbols/types/LgsObject.cpp
     src/analysis/LgsAnalyser.cpp
     src/analysis/LgsProjectAnalyser.cpp
+    src/symbols/stmts/LgsStmt.cpp
 )
 
 add_executable(lgs main.cpp)
