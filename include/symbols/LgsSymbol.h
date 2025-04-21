@@ -1,5 +1,7 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
+#include <string>
+#include <json/json.hpp>
 
 class LgsField;
 struct CodeGenMetadata;
@@ -44,8 +46,9 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsInterface* interface);
     explicit LgsSymbol(LgsField* field);
     explicit LgsSymbol(LgsEnum* lgsEnum);
-    LgsSymbol(LgsEnumField* enumField);
+    explicit LgsSymbol(LgsEnumField* enumField);
     void free(CodeGenMetadata* metadata) const;
+    nlohmann::json asJSON() const;
     ~LgsSymbol() = default;
 };
 

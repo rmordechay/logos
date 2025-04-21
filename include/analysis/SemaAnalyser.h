@@ -67,10 +67,9 @@ public:
     void visitInstance(LgsInstance* instance);
     void visitArrayIndex(LgsArrayIndex* arrayIndex);
 
-    void setFuncType(LgsFunc* func);
     void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
-    void setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable);
+    void setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
     bool resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);

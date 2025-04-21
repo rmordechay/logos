@@ -1,6 +1,5 @@
 #include "logos/Logos.h"
 #include "LgsLinker.h"
-#include "types/LgsInterface.h"
 #include "utils/ThreadPool.h"
 
 #include <AntlrConverter.h>

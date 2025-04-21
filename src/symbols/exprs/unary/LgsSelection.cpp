@@ -33,7 +33,7 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
 json LgsSelection::asJSON() {
     json tree;
     tree["exprs"] = {};
-    tree["exprType"] = "selection";
+    tree["exprType"] = "SELECTION";
     for (const auto& expr : exprs) {
         tree["exprs"].emplace_back(expr->asJSON());
     }

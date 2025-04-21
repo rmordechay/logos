@@ -18,3 +18,11 @@ Value* LgsField::getGEP(CodeGenMetadata* metadata) const {
     // return metadata->builder.CreateStructGEP(parentIRType, parentIRValue, position);
     return nullptr;
 }
+
+json LgsField::asJSON() {
+    json tree;
+    tree["name"] = name;
+    tree["type"] = type->getName();
+    // tree["parent"] = parent->name;
+    return tree;
+}

@@ -39,6 +39,9 @@ Value* LgsVariable::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
 json LgsVariable::asJSON() {
     json tree;
     tree["name"] = name;
+    tree["exprType"] = "VARIABLE";
+    tree["type"] = type->getName();
+    tree["ref"] = ref->asJSON();
     return tree;
 }
 

@@ -24,7 +24,7 @@ json LgsVarDec::asJSON() {
     json tree;
     tree["name"] = name;
     tree["type"] = type->getName();
-    tree["stmtType"] = "varDec";
+    tree["stmtType"] = "VAR_DEC";
     return tree;
 }
 

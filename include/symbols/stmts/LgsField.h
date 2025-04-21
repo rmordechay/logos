@@ -21,6 +21,7 @@ public:
     virtual Value* getIRValue(CodeGenMetadata* metadata);
     void setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* expr) const;
     Value* getGEP(CodeGenMetadata* metadata) const;
+    json asJSON() override;
     ~LgsField() override = default;
 };
 

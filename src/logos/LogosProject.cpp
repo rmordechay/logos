@@ -26,9 +26,7 @@ bool LogosProject::loadProject() {
     loadFiles();
     if (!errors.empty()) return false;
     projectAnalyser.resolveGlobalTypes(files);
-    std::cout << mainFile->asJSON().dump(2) << '\n';
-    // return projectAnalyser.successful;
-    return false;
+    return projectAnalyser.successful;
 }
 
 void LogosProject::loadFiles() {
@@ -167,6 +165,11 @@ void LogosProject::setEnvVars() const {
             activeEnv.envVars[key] = value;
         }
     }
+}
+
+void LogosProject::asJSON() {
+    std::cout << mainFile->asJSON().dump(2) << '\n';
+    return;
 }
 
 bool LogosProject::isLogosFile(const directory_entry& entry) const {

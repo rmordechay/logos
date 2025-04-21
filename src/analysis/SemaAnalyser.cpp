@@ -62,7 +62,6 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
 
 void SemaAnalyser::visitObjectInterfaces(LgsObject* obj) {
     for (int i = 0; i < obj->implements.size(); ++i) {
-        obj->implements[i] = resolveType(obj->implements[i]);
         const auto implement = obj->implements[i];
         if (!implement) continue;
 
@@ -78,7 +77,6 @@ void SemaAnalyser::visitObjectInterfaces(LgsObject* obj) {
 void SemaAnalyser::visitFunc(LgsFunc* func) {
     func->path = file->absPath;
     lgsStack.enterScope(func);
-    setFuncType(func);
     for (auto& param : func->signature.params) {
         visitParam(&param);
     }
@@ -126,7 +124,6 @@ void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
 }
 
 void SemaAnalyser::visitField(LgsField* field) {
-    field->userType = resolveType(field->userType);
     if (field->expr) {
         if (!validateUserType(field->expr, field->userType)) return;
         field->type = field->expr->type;
@@ -403,15 +400,11 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
     setExprType(methodCall, methodCall->func->signature.type);
 }
 
-void SemaAnalyser::setFuncType(LgsFunc* func) {
-    func->signature.type = resolveType(func->signature.type);
-}
-
 void SemaAnalyser::setExprType(LgsExpr* expr, LgsType* type) {
     expr->type = resolveType(type);
 }
 
-void SemaAnalyser::setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
+void SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
     const auto field = parent->type->getField(fieldVariable->name);
     if (!field) {
         return handleError(E10005, &fieldVariable->location, {fieldVariable->getName(), parent->type->getName()});
