@@ -334,7 +334,7 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
         const auto nextExpr = exprs[i + 1];
         auto nextExprName = nextExpr->getName();
         if (const auto var = dynamic_cast<LgsVariable*>(nextExpr)) {
-            setSelectionFieldType(currentExpr, var);
+            if (!setSelectionFieldType(currentExpr, var)) break;
         } else if (const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr)) {
             methodCall->parentName = currentExpr->type->getName();
             visitMethodCall(methodCall, currentExpr->type);
@@ -344,6 +344,7 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
 
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
     instance->type = resolveType(instance->type);
+    if (!instance->type) return;
     const auto symbol = getSymbol(instance->type->getName(), instance);
     if (!symbol) return;
     if (symbol->type != OBJECT) {
@@ -413,14 +414,18 @@ void SemaAnalyser::setExprType(LgsExpr* expr, LgsType* type) {
     expr->type = resolveType(type);
 }
 
-void SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
-    const auto field = parent->type->getField(fieldVariable->name);
-    if (!field) {
-        return handleError(E10005, &fieldVariable->location, {fieldVariable->getName(), parent->type->getName()});
+bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
+    const auto type = parent->type;
+    const auto field = type ? type->getField(fieldVariable->name) : nullptr;
+    if (!type || !field) {
+        const auto name = type ? type->getName() : "Unknown";
+        handleError(E10005, &fieldVariable->location, {fieldVariable->getName(), name});
+        return false;
     }
     if (!field->isPublic) {}
     fieldVariable->ref = new LgsSymbol(field);
     setExprType(fieldVariable, field->type);
+    return true;
 }
 
 void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {

@@ -52,11 +52,11 @@ public:
     vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
     LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LgsArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
-    LgsConstExpr* getConstant(LogosParser::ConstantContext* ctx);
-    LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
-    LgsType* getType(LogosParser::TypeContext* ctx);
-    LgsType* getTypeFromText(const string& typeText);
-    LgsType* getFuncType(LogosParser::FuncImplementationContext* ctx);
+    LgsConstExpr* getConstant(LogosParser::ConstantContext* ctx) const;
+    LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
+    LgsType* getType(LogosParser::TypeContext* ctx) const;
+    LgsType* getTypeFromText(const string& typeText, const antlr4::ParserRuleContext* ctx) const;
+    LgsType* getFuncType(LogosParser::FuncImplementationContext* ctx) const;
     ~AntlerConverter() = default;
 };
 
