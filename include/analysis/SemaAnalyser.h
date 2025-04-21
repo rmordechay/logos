@@ -44,7 +44,7 @@ public:
     void visitStmtBlock(LgsStmtBlock* stmtBlock);
     void visitAssignment(const LgsAssignment* assignment);
     void visitVarDec(LgsVarDec* varDec);
-    void visitIfStmt(const LgsIfStmt* ifStmt);
+    void visitIfStmt(LgsIfStmt* ifStmt);
     void visitPatternMatch(const LgsPatternMatch* patternMatching);
     void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const;
     void visitLoopStmt(LgsLoop* loopStmt);

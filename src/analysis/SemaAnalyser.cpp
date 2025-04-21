@@ -115,8 +115,11 @@ void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
     for (const auto& stmt : stmtBlock->stmts) {
         visitStmt(stmt);
     }
-    if (dynamic_cast<LgsReturn*>(stmtBlock->lastStmt())) {
+    const auto lastStmt = stmtBlock->lastStmt();
+    if (lastStmt->asReturn()) {
         stmtBlock->hasReturn = true;
+    } else if (const auto ifStmt = lastStmt->asIfStmt()) {
+        stmtBlock->hasReturn = ifStmt->hasReturn;
     }
 }
 
@@ -151,13 +154,16 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
 }
 
-void SemaAnalyser::visitIfStmt(const LgsIfStmt* ifStmt) {
+void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
     visitExpr(ifStmt->ifCond);
     visitStmtBlock(ifStmt->ifStmtBlock);
+    ifStmt->hasReturn = ifStmt->ifStmtBlock->hasReturn;
     for (const auto& elseIfStmtBlock : ifStmt->elseIfStmtBlocks) {
         visitStmtBlock(elseIfStmtBlock);
+        ifStmt->hasReturn = ifStmt->hasReturn && elseIfStmtBlock->hasReturn;
     }
     visitStmtBlock(ifStmt->elseStmtBlock);
+    ifStmt->hasReturn = ifStmt->elseStmtBlock->hasReturn;
 }
 
 void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
