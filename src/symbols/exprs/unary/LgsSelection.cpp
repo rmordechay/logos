@@ -10,7 +10,8 @@ string LgsSelection::getName() {
 }
 
 Value* LgsSelection::createIRValue(CodeGenMetadata* metadata) {
-    return resolveSelection(metadata)->IRValue;
+    const auto gep = resolveSelection(metadata)->IRValue;
+    return metadata->builder.CreateLoad(gep->getType(), gep);
 }
 
 LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
@@ -19,7 +20,9 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
         const auto nextExpr = exprs[i + 1];
         const auto field = currentExpr->type->getField(nextExpr->getName());
         if (field) {
-            const auto value = field->getIRValue(metadata);
+            const auto parentInstance = currentExpr->getIRValue(metadata);
+            const auto parent = metadata->builder.CreateLoad(parentInstance->getType(), parentInstance);
+            const auto value = field->getGEP(metadata, parent);
             nextExpr->setIRValue(value);
             continue;
         }

@@ -17,12 +17,11 @@ public:
     LgsType* userType = nullptr;
     LgsObject* parent = nullptr;
 
-    LgsField(const string& name, const size_t position, LgsType* userType, LgsExpr* expr = nullptr) : name(name), position(position), userType(userType), expr(expr) {}
-    virtual Value* getIRValue(CodeGenMetadata* metadata);
-    void setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* expr) const;
-    Value* getGEP(CodeGenMetadata* metadata) const;
+    LgsField(const string& name, const size_t position, LgsType* userType, LgsExpr* expr = nullptr) : name(name), position(position), expr(expr), userType(userType) {}
+    virtual Value* getGEP(CodeGenMetadata* metadata, Value* instance = nullptr);
+    void setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* expr, Value* instance = nullptr);
     json asJSON() override;
-    ~LgsField() override = default;
+    ~LgsField() override;
 };
 
 

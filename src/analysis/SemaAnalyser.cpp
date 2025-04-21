@@ -349,6 +349,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     if (symbol->type != OBJECT) {
         return handleError(E10022, &instance->location, {instance->type->getName()});
     }
+
     const auto obj = new LgsObject(*symbol->object);
     for (const auto& arg : instance->args) {
         visitExpr(arg->expr);
@@ -359,6 +360,14 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
         }
         lgsField->expr = arg->expr;
     }
+
+    for (const auto [_, field] : obj->fields) {
+        if (field->isConst && !field->expr) {
+            handleError(E10029, &field->location, {field->name});
+            continue;
+        }
+    }
+
     instance->obj = obj;
     instance->type = instance->obj;
 }

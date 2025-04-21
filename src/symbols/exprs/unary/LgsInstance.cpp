@@ -15,11 +15,11 @@ Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
         const auto currentFunc = metadata->lgsStack.currentFunc->getIRFunc(metadata);
         IRValue = currentFunc->arg_begin();
     } else {
-        IRValue = metadata->builder.CreateAlloca(parentType);
+        IRValue = metadata->builder.CreateAlloca(parentType, nullptr, getName() + "_ptr");
     }
     for (const auto& arg : args) {
         const auto field = obj->getField(arg->name);
-        field->setFieldIRValue(metadata, arg->expr);
+        field->setFieldIRValue(metadata, arg->expr, IRValue);
     }
     return IRValue;
 }

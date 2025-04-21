@@ -8,7 +8,7 @@ public:
     LgsEnum* parent;
 
     LgsEnumField(LgsEnum* parent, const string& name, const size_t position, const string& text) : LgsField(name, position, nullptr, nullptr), text(text), parent(parent){}
-    Value* getIRValue(CodeGenMetadata* metadata) override;
+    Value* getGEP(CodeGenMetadata* metadata, Value* instance = nullptr) override;
     ~LgsEnumField() override = default;
 };
 

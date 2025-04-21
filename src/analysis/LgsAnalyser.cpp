@@ -58,11 +58,12 @@ void LgsAnalyser::resolveGlobalTypes(const vector<LgsFile*>& files) {
     }
 }
 
-void LgsAnalyser::resolveObjMemberTypes(LgsObject* const& object) {
-    for (const auto& [_, field] : object->fields) {
+void LgsAnalyser::resolveObjMemberTypes(LgsObject* const& obj) {
+    for (const auto& [_, field] : obj->fields) {
         field->userType = resolveType(field->userType);
+        field->parent = obj;
     }
-    for (const auto& [_, method] : object->methods) {
+    for (const auto& [_, method] : obj->methods) {
         for (const auto& overload : method) {
             overload->signature.type = resolveType(overload->signature.type);
             for (int i = 0; i < overload->signature.params.size(); ++i) {
@@ -70,8 +71,8 @@ void LgsAnalyser::resolveObjMemberTypes(LgsObject* const& object) {
             }
         }
     }
-    for (int i = 0; i < object->implements.size(); ++i) {
-        object->implements[i] = resolveType(object->implements[i]);
+    for (int i = 0; i < obj->implements.size(); ++i) {
+        obj->implements[i] = resolveType(obj->implements[i]);
     }
 }
 
