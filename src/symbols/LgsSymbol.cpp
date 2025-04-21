@@ -10,6 +10,7 @@ LgsSymbol::LgsSymbol(LgsVarDec* varDec): type(VAR_DEC), varDec(varDec) {}
 LgsSymbol::LgsSymbol(LgsFunc* func): type(FUNC), func(func) {}
 LgsSymbol::LgsSymbol(LgsObject* object): type(OBJECT), object(object) {}
 LgsSymbol::LgsSymbol(LgsInterface* interface): type(INTERFACE), interface(interface) {}
+LgsSymbol::LgsSymbol(LgsField* field): type(FIELD), field(field) {}
 LgsSymbol::LgsSymbol(LgsEnum* lgsEnum): type(ENUM), lgsEnum(lgsEnum) {}
 LgsSymbol::LgsSymbol(LgsEnumField* enumField): type(ENUM_FIELD), enumField(enumField) {}
 

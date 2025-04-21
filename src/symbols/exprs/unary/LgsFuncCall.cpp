@@ -6,6 +6,10 @@ string LgsFuncCall::getName() {
     return name;
 }
 
+string LgsFuncCall::format(string& indentStr) {
+    return indentStr + name + "()";
+}
+
 Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
     return func->call(metadata, args);
 }

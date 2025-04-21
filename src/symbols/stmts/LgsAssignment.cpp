@@ -1,11 +1,8 @@
 #include "stmts/LgsAssignment.h"
-
-#include "exprs/unary/LgsInstance.h"
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
-#include "types/LgsObject.h"
-
+#include "stmts/LgsVarDec.h"
 #include <LgsStack.h>
 
 Value* LgsAssignment::createIRValue(CodeGenMetadata* metadata) {
@@ -16,17 +13,19 @@ Value* LgsAssignment::createIRValue(CodeGenMetadata* metadata) {
 }
 
 void LgsAssignment::createIRFromSelection(CodeGenMetadata* metadata, const LgsSelection* selection) const {
-    const auto firstExprSymbol = metadata->lgsStack.getSymbol(selection->exprs[0]->getName());
-    switch (firstExprSymbol->type) {
-    case VAR_DEC:
-        if (const auto instance = firstExprSymbol->varDec->expr->asInstance()) {
-            const auto nextName = selection->exprs[1]->getName();
-            const auto field = instance->obj->getField(nextName);
-            field->setFieldIRValue(metadata, rvalue);
+    const auto lastExpr = selection->lastExpr();
+    if (const auto var = lastExpr->asVariable()) {
+        switch (var->ref->type) {
+        case FIELD:
+            var->ref->field->setFieldIRValue(metadata, rvalue);
+            break;
+        case UNKNOWN:
+            assert(false);
+        default:
+            break;
         }
-        break;
-    default:
-        break;;
+    } else if (const auto funcCall = lastExpr->asFuncCall()) {
+        assert(false);
     }
 }
 

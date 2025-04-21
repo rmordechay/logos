@@ -27,12 +27,14 @@ public:
     LgsMethodImpl* findMethod(const LgsFuncCall* funcCall) const;
     vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
     virtual bool equals(const LgsType& other);
+    void setLocation(const antlr4::Token* ctx);
     virtual size_t size() = 0;
     virtual Type* getIRType() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual const string getName() const = 0;
     virtual bool equals(LgsType* other) const = 0;
     virtual LgsType* inferBinaryType(LgsType* other) = 0;
+    virtual json asJSON() const;
     virtual ~LgsType() = default;
 };
 

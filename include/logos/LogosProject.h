@@ -1,28 +1,32 @@
-#ifndef PROJECTANALYSER_H
-#define PROJECTANALYSER_H
+#ifndef LGSPROJECT_H
+#define LGSPROJECT_H
 #include "LgsActiveEnv.h"
-#include "LgsAnalyser.h"
-#include "LgsAppFile.h"
-#include "LgsEnvFile.h"
-#include "ThreadPool.h"
-#include <LgsFile.h>
+#include "LgsProjectAnalyser.h"
+#include "analysis/LgsAnalyser.h"
+#include "files/LgsAppFile.h"
+#include "files/LgsEnvFile.h"
+#include "types/LgsObject.h"
+
+#include <files/LgsFile.h>
 #include <vector>
 
+class ThreadPool;
 class LgsActiveEnv;
 class LgsAppFile;
 class LgsMainFile;
 struct LgsPaths;
 class LgsEnv;
 
-class LgsProject final : public LgsAnalyser {
+class LogosProject final {
 public:
     string name;
     string version;
     vector<LgsFile*> files;
+    vector<LgsError> errors;
     vector<LgsEnvFile*> envFiles;
-    const LgsMainFile* mainFile = nullptr;
+    LgsProjectAnalyser projectAnalyser;
+    LgsMainFile* mainFile = nullptr;
     const LgsAppFile* appFile = nullptr;
-    std::mutex mtx;
 
     bool loadProject();
     void loadFiles();
@@ -36,12 +40,9 @@ public:
     void parseSrcFile(const directory_entry& entry);
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
-    bool validateProject() const;
-    void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
-    void checkDuplicateFiles() const;
     string getFileText(path filePath) const;
     bool isLogosFile(const directory_entry& entry) const;
-    ~LgsProject() = default;
+    ~LogosProject() = default;
 };
 
-#endif //PROJECTANALYSER_H
+#endif // LGSPROJECT_H

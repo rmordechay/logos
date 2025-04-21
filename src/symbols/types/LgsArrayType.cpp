@@ -31,10 +31,16 @@ LgsType* LgsArrayType::inferBinaryType(LgsType* other) {
 
 Value* LgsArrayType::initIRArr(CodeGenMetadata* metadata, const size_t size) const {
     auto func = metadata->module->getOrInsertFunction("ArrayType_initArr_ArrayType_Long", initArrIRFuncType);
-    auto initialCapacity = metadata->builder.getInt64(size);
+    auto initialSize = metadata->builder.getInt64(size);
+    Value* initialCapacity;
+    if (size < 2) {
+        initialCapacity = metadata->builder.getInt64(2);
+    } else {
+        initialCapacity = metadata->builder.getInt64(size * 2);
+    }
     const auto arrPtr = metadata->builder.CreateAlloca(arrIR);
     dyn_cast<Function>(func.getCallee())->addParamAttr(0, sret);
-    metadata->builder.CreateCall(func, {arrPtr, initialCapacity});
+    metadata->builder.CreateCall(func, {arrPtr, initialSize, initialCapacity});
     return arrPtr;
 }
 

@@ -3,7 +3,7 @@
 #include <thread>
 #include <filesystem>
 #include "SemaAnalyser.h"
-#include "LgsProject.h"
+#include "LogosProject.h"
 
 class ThreadPool;
 using namespace filesystem;
@@ -27,8 +27,8 @@ inline LgsPaths paths;
 class Logos {
 public:
     mutex mtx;
+    LogosProject project;
     vector<LgsError> errors;
-    LgsProject project;
 
     explicit Logos(const path& rootDirPath) {
         initPaths(rootDirPath);

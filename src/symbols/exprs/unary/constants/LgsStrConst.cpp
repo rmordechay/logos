@@ -3,7 +3,7 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 
 Value* LgsStrConst::createIRValue(CodeGenMetadata* metadata) {
-    return createGlobalStr(metadata->module, value);
+    return createIRStr(metadata->module, value);
 }
 
 size_t LgsStrConst::length() {
@@ -28,13 +28,13 @@ Value* LgsStrConst::sizeIR(CodeGenMetadata* metadata) {
 
 Value* LgsStrConst::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
     if (const auto otherStrConst = other->asIntConst()) {
-        return createGlobalStr(metadata->module, this->value + to_string(otherStrConst->value));
+        return createIRStr(metadata->module, this->value + to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asFloatConst()) {
-        return createGlobalStr(metadata->module, this->value + to_string(otherStrConst->value));
+        return createIRStr(metadata->module, this->value + to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asStrConst()) {
-        return createGlobalStr(metadata->module, this->value + otherStrConst->value);
+        return createIRStr(metadata->module, this->value + otherStrConst->value);
     }
     return nullptr;
 }
@@ -46,12 +46,3 @@ Value* LgsStrConst::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
     }
     return nullptr;
 }
-
-json LgsStrConst::asJson() {
-    json tree;
-    tree["exprType"] = "StrConst";
-    tree["name"] = type->getName();
-    tree["value"] = value;
-    return tree;
-}
-

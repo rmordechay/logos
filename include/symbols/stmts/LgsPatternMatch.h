@@ -5,7 +5,7 @@
 
 #include <exprs/unary/LgsUnaryExpr.h>
 
-class LgsPatternMatching final : public LgsStmt {
+class LgsPatternMatch final : public LgsStmt {
 public:
     LgsExpr* expr;
     vector<LgsExpr*> patterns;
@@ -14,10 +14,10 @@ public:
     BasicBlock* exitBlock = nullptr;
     BasicBlock* defaultCase = nullptr;
 
-    explicit LgsPatternMatching(LgsExpr* expr) : expr(expr) {}
+    explicit LgsPatternMatch(LgsExpr* expr) : expr(expr) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* hashIRValue(CodeGenMetadata* metadata, LgsExpr* expr) const;
-    ~LgsPatternMatching() override = default;
+    json asJSON() override;
+    ~LgsPatternMatch() override = default;
 };
 
 #endif //LGSPATTERNMATCHING_H

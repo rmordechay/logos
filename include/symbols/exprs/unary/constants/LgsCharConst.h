@@ -9,7 +9,6 @@ public:
 
     explicit LgsCharConst(const char value) : LgsConstExpr(new LgsChar()), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    json asJson() override;
 };
 
 #endif //LGSCHARCONST_H

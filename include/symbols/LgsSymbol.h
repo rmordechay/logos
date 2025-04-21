@@ -1,6 +1,7 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
 
+class LgsField;
 struct CodeGenMetadata;
 class LgsEnum;
 class LgsEnumField;
@@ -15,6 +16,7 @@ enum LgsSymbolType {
     PARAM,
     OBJECT,
     INTERFACE,
+    FIELD,
     FUNC,
     ENUM,
     ENUM_FIELD,
@@ -28,6 +30,7 @@ struct LgsSymbol {
         LgsParam* param;
         LgsObject* object;
         LgsInterface* interface;
+        LgsField* field;
         LgsFunc* func;
         LgsEnum* lgsEnum;
         LgsEnumField* enumField;
@@ -39,6 +42,7 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsFunc* func);
     explicit LgsSymbol(LgsObject* object);
     explicit LgsSymbol(LgsInterface* interface);
+    explicit LgsSymbol(LgsField* field);
     explicit LgsSymbol(LgsEnum* lgsEnum);
     LgsSymbol(LgsEnumField* enumField);
     void free(CodeGenMetadata* metadata) const;

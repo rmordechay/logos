@@ -1,11 +1,12 @@
 #include "logos/Logos.h"
-
-#include "LgsGlobals.h"
 #include "LgsLinker.h"
+#include "types/LgsInterface.h"
+#include "utils/ThreadPool.h"
+
 #include <AntlrConverter.h>
 #include <CodeGenerator.h>
 #include <LogosLexer.h>
-#include <ThreadPool.h>
+#include <unistd.h>
 
 void Logos::run() {
     // Project loading
@@ -22,7 +23,7 @@ void Logos::run() {
     if (!linker.link(modules)) return;
 
     // Running
-    system(paths.execFilePath.c_str());
+    execl(paths.execFilePath.c_str(), nullptr);
 }
 
 bool Logos::analyse(const vector<LgsFile*>& files) {

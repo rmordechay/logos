@@ -2,12 +2,14 @@
 #define CODEGENMETADATA_H
 
 #include <LgsStack.h>
+#include <json/json.hpp>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/TargetParser/Host.h>
 
 using namespace llvm;
+using namespace nlohmann;
 
 inline LLVMContext context;
 inline LgsActiveEnv activeEnv;

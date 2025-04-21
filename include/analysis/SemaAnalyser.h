@@ -5,7 +5,7 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "stmts/LgsBreakStmt.h"
-#include "stmts/LgsPatternMatching.h"
+#include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsReturn.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -28,23 +28,25 @@ class SemaAnalyser final : public LgsAnalyser {
 public:
     LgsStack lgsStack;
     LgsFile* file = nullptr;
-    vector<LgsError> errors;
 
-    explicit SemaAnalyser(LgsFile* logosFile) : file(logosFile) {}
+    explicit SemaAnalyser(LgsFile* file) : file(file) {
+        filePath = file->absPath;
+    }
     void analyse();
     void visitMainFile(const LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitObjectInterfaces(LgsObject* obj);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
+    void validateFuncControlFlow(const LgsFunc* func);
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
-    void visitStmtBlock(const LgsStmtBlock* stmtBlock);
+    void visitStmtBlock(LgsStmtBlock* stmtBlock);
     void visitAssignment(const LgsAssignment* assignment);
     void visitVarDec(LgsVarDec* varDec);
     void visitIfStmt(const LgsIfStmt* ifStmt);
-    void visitPatternMatching(const LgsPatternMatching* patternMatching);
-    void visitBoolPatternMatching(const LgsPatternMatching* patternMatching) const;
+    void visitPatternMatching(const LgsPatternMatch* patternMatching);
+    void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const;
     void visitLoopStmt(LgsLoop* loopStmt);
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);
     void visitForeachLoop(const LgsForeachLoop* foreachLoop);
@@ -70,7 +72,6 @@ public:
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     void setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
-    LgsType* resolveType(LgsType* type);
     bool resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
     LgsFunc* resolveFuncOverload(LgsFunc* overload, const LgsFuncCall* funcCall);
@@ -80,7 +81,6 @@ public:
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     void checkObjectImplements(LgsObject* obj, LgsInterface* interface);
-    void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});
     string getFuncSignaturesStr(const vector<LgsFuncSignature*>& funcs) const;
     Location* getSymbolLocation(const LgsSymbol* symbol) const;
     ~SemaAnalyser() = default;

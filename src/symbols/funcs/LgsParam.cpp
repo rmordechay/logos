@@ -2,12 +2,12 @@
 
 #include "exprs/LgsExpr.h"
 
-json LgsParam::asJson() {
+string LgsParam::format(string& indentStr) {
+    return name + ": " + type->getName();
+}
+
+json LgsParam::asJSON() {
     json tree;
     tree["name"] = name;
-    tree["type"] = type->getName();
-    if (expr) {
-        tree["expr"] = expr->asJson();
-    }
     return tree;
 }

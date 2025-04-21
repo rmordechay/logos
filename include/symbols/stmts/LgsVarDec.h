@@ -9,16 +9,15 @@ public:
     LgsType* type = nullptr;
     LgsType* userType = nullptr;
     LgsExpr* expr = nullptr;
+    vector<LgsVariable*> refs;
 
     LgsVarDec(const string& name, LgsType* type, LgsExpr* expr) : name(name), type(type), expr(expr) {}
     explicit LgsVarDec(const string& name, LgsExpr* expr = nullptr) : name(name), expr(expr) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    string format(string& indentStr) override;
+    json asJSON() override;
     void free(CodeGenMetadata* metadata) override;
-    json asJson() override;
     ~LgsVarDec() override;
 };
-
-
-
 
 #endif //LOGOSVARDEFINITION_H

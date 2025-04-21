@@ -1,6 +1,7 @@
 #ifndef LGSENVS_H
 #define LGSENVS_H
 
+#include "exprs/unary/constants/LgsStrConst.h"
 #include "funcs/LgsMethodImpl.h"
 #include "types/LgsObject.h"
 #include "types/LgsVoid.h"
@@ -23,7 +24,7 @@ public:
         } else {
             value = args[2]->asStrConst()->value;
         }
-        return createGlobalStr(metadata->module, value);
+        return createIRStr(metadata->module, value);
     }
 };
 

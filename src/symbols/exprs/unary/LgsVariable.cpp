@@ -1,10 +1,8 @@
 #include "exprs/unary/LgsVariable.h"
-
 #include "exprs/unary/LgsEnumField.h"
-#include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsParam.h"
-#include "types/LgsEnum.h"
-
+#include "stmts/LgsVarDec.h"
+#include "types/LgsStr.h"
 #include <LgsStack.h>
 
 string LgsVariable::getName() {
@@ -12,14 +10,14 @@ string LgsVariable::getName() {
 }
 
 Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
-    assert(ref.type != UNKNOWN);
-    switch (ref.type) {
+    assert(ref && ref->type != UNKNOWN);
+    switch (ref->type) {
     case VAR_DEC:
-        return ref.varDec->expr->getIRValue(metadata);
+        return ref->varDec->expr->getIRValue(metadata);
     case PARAM:
-        return ref.param->IRValue;
+        return ref->param->IRValue;
     case ENUM_FIELD:
-        return ref.enumField->getIRValue(metadata);
+        return ref->enumField->getIRValue(metadata);
     default:
         assert(false);
     }
@@ -30,15 +28,33 @@ Value* LgsVariable::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
     switch (symbol->type) {
     case VAR_DEC:
         return symbol->varDec->expr->eqIR(metadata, other);
-    case PARAM:
-    case OBJECT:
-    case INTERFACE:
-    case FUNC:
-    case ENUM:
-    case ENUM_FIELD:
-        break;
     case UNKNOWN:
         assert(false);
+    default:
+        break;
     }
     return nullptr;
+}
+
+json LgsVariable::asJSON() {
+    json tree;
+    tree["name"] = name;
+    return tree;
+}
+
+uint32_t LgsVariable::hashValue() {
+    assert(ref && ref->type != UNKNOWN);
+    string text;
+    switch (ref->type) {
+    case FIELD:
+        return ref->field->expr->hashValue();
+    case ENUM_FIELD:
+        return LgsStr::hashString(ref->enumField->name);
+    default:
+        assert(false);
+    }
+}
+
+LgsVariable::~LgsVariable() {
+    delete ref;
 }

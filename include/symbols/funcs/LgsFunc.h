@@ -21,11 +21,11 @@ public:
     explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam>& params, const string& parentName = "")
         : signature(LgsFuncSignature(name, parentName, funcType, params)) {}
 
-    virtual void setIRFuncType() = 0;
-    virtual void createIRValue(CodeGenMetadata* metadata);
-    virtual Function* getIRFunc(const CodeGenMetadata* metadata);
+    virtual void createIRFunc(CodeGenMetadata* metadata);
+    virtual Function* getIRFunc(const CodeGenMetadata* metadata) = 0;
     virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args);
-    json asJson() override;
+    string format(string& indentStr) override;
+    json asJSON() override;
     ~LgsFunc() override;
 };
 

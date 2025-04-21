@@ -5,10 +5,13 @@
 class LgsStmtBlock final : public LgsValue {
 public:
     vector<LgsStmt*> stmts;
+    bool hasReturn = false;
 
     explicit LgsStmtBlock(const vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
     void createIRValue(CodeGenMetadata* metadata) const;
-    json asJson() override;
+    LgsStmt* lastStmt() const;
+    string format(string& indentStr) override;
+    json asJSON() override;
     ~LgsStmtBlock() override;
 };
 

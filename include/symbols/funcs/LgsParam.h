@@ -2,6 +2,7 @@
 #define LOGOSPARAM_H
 #include <LgsValue.h>
 
+class LgsVariable;
 class LgsExpr;
 class LgsType;
 
@@ -10,11 +11,13 @@ public:
     string name;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
+    vector<LgsVariable*> refs;
 
     LgsParam(const string& name, LgsType* type, LgsExpr* expr) : name(name), type(type), expr(expr) {}
     LgsParam(const string& name, LgsType* type) : LgsParam(name, type, nullptr) {}
     explicit LgsParam(LgsType* type) : LgsParam("", type, nullptr) {}
-    json asJson() override;
+    string format(string& indentStr) override;
+    json asJSON() override;
     ~LgsParam() override = default;
 };
 

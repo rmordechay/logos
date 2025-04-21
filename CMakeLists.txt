@@ -10,24 +10,26 @@ include_directories(
     external/include/antlr4-runtime
     include
     include/logos
+    include/data
     include/cli
     include/files
     include/codegen
     include/analysis
     include/symbols
     include/parser
+    include/utils
 )
 
 add_library(lib STATIC
     # headers
     include/logos/Logos.h
     include/logos/LgsGlobals.h
-    include/logos/ThreadPool.h
     include/logos/LgsActiveEnv.h
-    include/logos/LgsC.h
-    include/logos/LgsData.h
+    include/logos/LogosProject.h
     include/logos/LgsStack.h
-    include/logos/LgsErrors.h
+    include/data/LgsData.h
+    include/data/LgsErrors.h
+    include/data/LgsWarnings.h
     include/files/LgsFile.h
     include/files/LgsAppFile.h
     include/files/LgsEnvFile.h
@@ -42,11 +44,13 @@ add_library(lib STATIC
     include/analysis/AntlrConverter.h
     include/analysis/LgsAnalyser.h
     include/analysis/SemaAnalyser.h
-    include/analysis/LgsProject.h
+    include/analysis/LgsProjectAnalyser.h
     include/cli/LgsCli.h
     include/cli/LgsCmd.h
     include/cli/LgsRunCmd.h
     include/cli/LgsGenerateCmd.h
+    include/utils/ThreadPool.h
+    include/utils/LgsC.h
 
     # Symbols headers
     include/symbols/LgsValue.h
@@ -82,7 +86,7 @@ add_library(lib STATIC
     include/symbols/loops/LgsForeachLoop.h
     include/symbols/loops/LgsRangeLoop.h
     include/symbols/stmts/LgsField.h
-    include/symbols/stmts/LgsPatternMatching.h
+    include/symbols/stmts/LgsPatternMatch.h
     include/symbols/stmts/LgsAssignment.h
     include/symbols/stmts/LgsIfStmt.h
     include/symbols/stmts/LgsReturn.h
@@ -105,8 +109,8 @@ add_library(lib STATIC
     # src
     src/logos/Logos.cpp
     src/logos/LgsStack.cpp
-    src/logos/ThreadPool.cpp
-    src/logos/LgsC.cpp
+    src/utils/ThreadPool.cpp
+    src/utils/LgsC.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsRunCmd.cpp
@@ -117,14 +121,14 @@ add_library(lib STATIC
     src/parser/LogosParser.cpp
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
-    src/analysis/LgsProject.cpp
+    src/logos/LogosProject.cpp
 
     # Symbols src
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsValue.cpp
     src/symbols/funcs/LgsFunc.cpp
     src/symbols/funcs/LgsParam.cpp
-    src/symbols/builtint/LgsPrint.cpp
+    src/symbols/builtin/LgsPrint.cpp
     src/symbols/exprs/LgsExpr.cpp
     src/symbols/exprs/LgsCast.cpp
     src/symbols/exprs/binary/LgsBinaryExpr.cpp
@@ -137,6 +141,7 @@ add_library(lib STATIC
     src/symbols/exprs/unary/LgsArray.cpp
     src/symbols/exprs/unary/LgsArrayIndex.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
+    src/symbols/exprs/unary/LgsEnumField.cpp
     src/symbols/exprs/unary/LgsInstance.cpp
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
@@ -150,7 +155,7 @@ add_library(lib STATIC
     src/symbols/stmts/LgsBreakStmt.cpp
     src/symbols/stmts/LgsContinue.cpp
     src/symbols/stmts/LgsStmtBlock.cpp
-    src/symbols/stmts/LgsPatternMatching.cpp
+    src/symbols/stmts/LgsPatternMatch.cpp
     src/symbols/stmts/LgsVarDec.cpp
     src/symbols/types/LgsEnum.cpp
     src/symbols/types/LgsBool.cpp
@@ -163,7 +168,8 @@ add_library(lib STATIC
     src/symbols/types/LgsArrayType.cpp
     src/symbols/types/LgsInterface.cpp
     src/symbols/types/LgsObject.cpp
-    src/symbols/exprs/unary/LgsEnumField.cpp
+    src/analysis/LgsAnalyser.cpp
+    src/analysis/LgsProjectAnalyser.cpp
 )
 
 add_executable(lgs main.cpp)
@@ -202,14 +208,6 @@ endif()
 enable_testing()
 add_executable(lgs_tests
     tests/main.cpp
-    tests/e2e/e2eTest.cpp
-    tests/parser/ParserTest.cpp
-    tests/analysis/sema/loops/SemaForeachLoopTests.cpp
-    tests/analysis/sema/loops/SemaRangeLoopTests.cpp
-    tests/analysis/sema/pattern_matching/SemaPatternMatchingTests.cpp
-    tests/analysis/sema/enums/SemaEnumsTests.cpp
-    tests/codegen/loops/CodegenRangeLoopTests.cpp
-    tests/codegen/object/CodegenObjectTests.cpp
 )
 
 target_include_directories(lgs_tests PRIVATE

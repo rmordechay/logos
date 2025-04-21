@@ -10,14 +10,15 @@ string LgsSelection::getName() {
 }
 
 Value* LgsSelection::createIRValue(CodeGenMetadata* metadata) {
-    return resolveSelection(metadata)->getIRValue(metadata);
+    return resolveSelection(metadata)->IRValue;
 }
 
 LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto currentExpr = exprs[i];
         const auto nextExpr = exprs[i + 1];
-        if (const auto field = currentExpr->type->getField(nextExpr->getName())) {
+        const auto field = currentExpr->type->getField(nextExpr->getName());
+        if (field) {
             const auto value = field->getIRValue(metadata);
             nextExpr->setIRValue(value);
             continue;
@@ -29,9 +30,24 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
     return lastExpr();
 }
 
+json LgsSelection::asJSON() {
+    json tree;
+    tree["exprs"] = {};
+    tree["exprType"] = "selection";
+    for (const auto& expr : exprs) {
+        tree["exprs"].emplace_back(expr->asJSON());
+    }
+    return tree;
+}
+
 LgsExpr* LgsSelection::lastExpr() const {
     if (exprs.empty()) return nullptr;
     return exprs[exprs.size() - 1];
+}
+
+uint32_t LgsSelection::hashValue() {
+    const auto lgsExpr = lastExpr();
+    return lgsExpr->hashValue();
 }
 
 Value* LgsSelection::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {

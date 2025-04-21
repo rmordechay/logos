@@ -2,6 +2,7 @@
 #include "CodeGenerator.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
+#include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
 string LgsInstance::getName() {
@@ -9,19 +10,17 @@ string LgsInstance::getName() {
 }
 
 Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
-    const auto currentFunc = metadata->lgsStack.currentFunc->getIRFunc(metadata);
-    if (currentFunc->arg_size() == 0) {
-        return metadata->builder.CreateAlloca(obj->getIRType());
+    const auto parentType = obj->getIRType();
+    if (isSelf) {
+        const auto currentFunc = metadata->lgsStack.currentFunc->getIRFunc(metadata);
+        IRValue = currentFunc->arg_begin();
+    } else {
+        IRValue = metadata->builder.CreateAlloca(parentType);
     }
-    const auto firstArg = currentFunc->arg_begin();
-    if (firstArg->getName() == LOGOS_SELF) {
-        return firstArg;
+    for (const auto& arg : args) {
+        const auto field = obj->getField(arg->name);
+        field->setFieldIRValue(metadata, arg->expr);
     }
-    return nullptr;
+    return IRValue;
 }
 
-LgsInstance::~LgsInstance() {
-    for (const auto &field : fields) {
-        delete field.second;
-    }
-}

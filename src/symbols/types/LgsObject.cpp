@@ -1,9 +1,24 @@
 #include "types/LgsObject.h"
-
 #include "CodeGenerator.h"
 #include "exprs/LgsNull.h"
-#include "funcs/LgsFuncImpl.h"
+#include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
+
+LgsObject::LgsObject(LgsObject& other) {
+    name = other.name;
+    for (const auto& [name, fieldPtr] : other.fields) {
+        if (!fieldPtr) continue;
+        fields[name] = new LgsField(*fieldPtr);
+    }
+    for (const auto& [name, methodList] : other.methods) {
+        vector<LgsMethodImpl*> clonedList;
+        for (const auto& methodPtr : methodList) {
+            if (!methodPtr) continue;
+            clonedList.emplace_back(new LgsMethodImpl(*methodPtr));
+        }
+        methods[name] = std::move(clonedList);
+    }
+}
 
 const string LgsObject::getName() const {
     return name;
@@ -23,6 +38,12 @@ Type* LgsObject::getIRType() {
     }
     IRType = StructType::create(context, elementTypes, name);
     return IRType;
+}
+
+json LgsObject::asJSON() const {
+    json tree;
+    tree["name"] = name;
+    return tree;
 }
 
 LgsExpr* LgsObject::getZeroValue() {

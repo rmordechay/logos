@@ -19,7 +19,6 @@ public:
     Value* sizeIR(CodeGenMetadata* metadata) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;
-    json asJson() override;
     ~LgsStrConst() override = default;
 };
 

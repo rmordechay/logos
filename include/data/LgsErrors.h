@@ -5,7 +5,7 @@
 
 using namespace std;
 
-inline string ERROR_PLACE_HOLDER = "%s";
+inline string ERROR_PLACEHOLDER = "%s";
 
 struct LgsError {
     int errCode;
@@ -41,7 +41,8 @@ inline LgsError E10023{.msg = "Type '%s' must be nullable. Change the type to %s
 inline LgsError E10024{.msg = "Declaration of null value must have an explict nullable type.", .errCode = ++errCodeStart};
 inline LgsError E10025{.msg = "'%s' must be an interface.", .errCode = ++errCodeStart};
 inline LgsError E10026{.msg = "Void functions should not return an expression.", .errCode = ++errCodeStart};
-inline LgsError E10027{.msg = "", .errCode = ++errCodeStart};
+inline LgsError E10027{.msg = "Function '%s' must return '%s'. Given: '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10028{.msg = "Default parameters must be defined lastly.", .errCode = ++errCodeStart};
+
 
 #endif //LOGOSERRORS_H

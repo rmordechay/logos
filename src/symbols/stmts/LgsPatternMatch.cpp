@@ -1,0 +1,40 @@
+#include "stmts/LgsPatternMatch.h"
+
+#include "exprs/unary/constants/LgsStrConst.h"
+#include "funcs/LgsFunc.h"
+#include "stmts/LgsVarDec.h"
+
+Value* LgsPatternMatch::createIRValue(CodeGenMetadata* metadata) {
+    auto& builder = metadata->builder;
+    const auto func = metadata->lgsStack.currentFunc->getIRFunc(metadata);
+    uint32_t c = expr->hashValue();
+    const auto exprIRValue = metadata->builder.getInt32(c);
+    exitBlock = BasicBlock::Create(context, "exit_pattern_matching");
+    defaultCase = BasicBlock::Create(context, "default");
+    const auto switchInst = builder.CreateSwitch(exprIRValue, defaultCase);
+
+    vector<BasicBlock*> blocks;
+    for (size_t i = 0; i < patterns.size(); ++i) {
+        const auto pattern = patterns[i];
+        const auto patterIRValue = metadata->builder.getInt32(pattern->hashValue());
+        const auto patternBlock = BasicBlock::Create(context, "case_" + to_string(i), func);
+        switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
+        builder.SetInsertPoint(patternBlock);
+        patternsStmtBlocks[i]->createIRValue(metadata);
+        builder.CreateBr(exitBlock);
+    }
+
+    startBlock(metadata, defaultCase);
+    elseStmtBlock->createIRValue(metadata);
+
+    builder.CreateBr(exitBlock);
+    startBlock(metadata, exitBlock);
+    return nullptr;
+}
+
+json LgsPatternMatch::asJSON() {
+    json tree;
+    tree["expr"] = expr->asJSON();
+    tree["stmtType"] = "patternMatch";
+    return tree;
+}

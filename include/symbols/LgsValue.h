@@ -4,7 +4,8 @@
 #include <Token.h>
 #include <llvm/IR/Value.h>
 #include "CodeGenMetadata.h"
-#include "LgsData.h"
+
+#include <json/json.hpp>
 
 struct CodeGenMetadata;
 
@@ -18,10 +19,12 @@ public:
     GlobalVariable* createIRGlobal(Module* module, Constant* strConstant) const;
     BasicBlock* createBasicBlock(const char* name) const;
     void startBlock(CodeGenMetadata* metadata, BasicBlock* block) const;
-    Value* createGlobalStr(Module* module, const std::string& value) const;
+    Value* createIRStr(Module* module, const std::string& value) const;
+    virtual string format(string& indentStr);
     virtual void setLocation(const antlr4::Token* ctx);
-    virtual json asJson();
     virtual void free(CodeGenMetadata* metadata);
+    Value* hashIRValue(CodeGenMetadata* metadata, Value* value) const;
+    virtual json asJSON();
     virtual ~LgsValue() = default;
 };
 
