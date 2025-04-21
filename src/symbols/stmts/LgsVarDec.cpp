@@ -1,5 +1,4 @@
 #include "stmts/LgsVarDec.h"
-
 #include "exprs/unary/LgsArray.h"
 
 string LgsVarDec::format(string& indentStr) {
@@ -19,6 +18,14 @@ Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
     }
     IRValue = exprValue;
     return exprValue;
+}
+
+json LgsVarDec::asJSON() {
+    json tree;
+    tree["name"] = name;
+    tree["type"] = type->getName();
+    tree["stmtType"] = "varDec";
+    return tree;
 }
 
 void LgsVarDec::free(CodeGenMetadata* metadata) {

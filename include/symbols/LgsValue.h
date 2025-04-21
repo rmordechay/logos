@@ -5,6 +5,8 @@
 #include <llvm/IR/Value.h>
 #include "CodeGenMetadata.h"
 
+#include <json/json.hpp>
+
 struct CodeGenMetadata;
 
 class LgsValue {
@@ -22,6 +24,7 @@ public:
     virtual void setLocation(const antlr4::Token* ctx);
     virtual void free(CodeGenMetadata* metadata);
     Value* hashIRValue(CodeGenMetadata* metadata, Value* value) const;
+    virtual json asJSON();
     virtual ~LgsValue() = default;
 };
 

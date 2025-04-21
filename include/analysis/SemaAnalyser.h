@@ -2,7 +2,6 @@
 #define SEMAANALYSER_H
 #include "LgsAnalyser.h"
 #include "LgsStack.h"
-#include "LgsWarnings.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "stmts/LgsBreakStmt.h"

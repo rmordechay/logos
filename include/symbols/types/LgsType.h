@@ -34,6 +34,7 @@ public:
     virtual const string getName() const = 0;
     virtual bool equals(LgsType* other) const = 0;
     virtual LgsType* inferBinaryType(LgsType* other) = 0;
+    virtual json asJSON() const;
     virtual ~LgsType() = default;
 };
 

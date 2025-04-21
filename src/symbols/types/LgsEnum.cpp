@@ -17,6 +17,12 @@ Type* LgsEnum::getIRType() {
     return ptrTy;
 }
 
+json LgsEnum::asJSON() const {
+    json tree;
+    tree["name"] = name;
+    return tree;
+}
+
 const string LgsEnum::getName() const {
     return name;
 }

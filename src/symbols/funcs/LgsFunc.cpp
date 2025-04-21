@@ -67,6 +67,18 @@ string LgsFunc::format(string& indentStr) {
     return ss.str();
 }
 
+json LgsFunc::asJSON() {
+    json tree;
+    tree["name"] = signature.name;
+    tree["type"] = signature.type->getName();
+    tree["params"] = {};
+    for (auto& param : signature.params) {
+        tree["params"].emplace_back(param.asJSON());
+    }
+    tree["stmts"] = stmtBlock->asJSON();
+    return tree;
+}
+
 LgsFunc::~LgsFunc() {
     if (stmtBlock) {
         delete stmtBlock;

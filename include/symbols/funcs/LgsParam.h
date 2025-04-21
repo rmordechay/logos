@@ -17,6 +17,7 @@ public:
     LgsParam(const string& name, LgsType* type) : LgsParam(name, type, nullptr) {}
     explicit LgsParam(LgsType* type) : LgsParam("", type, nullptr) {}
     string format(string& indentStr) override;
+    json asJSON() override;
     ~LgsParam() override = default;
 };
 

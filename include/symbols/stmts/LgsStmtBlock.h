@@ -11,6 +11,7 @@ public:
     void createIRValue(CodeGenMetadata* metadata) const;
     LgsStmt* lastStmt() const;
     string format(string& indentStr) override;
+    json asJSON() override;
     ~LgsStmtBlock() override;
 };
 

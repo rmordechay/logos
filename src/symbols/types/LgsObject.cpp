@@ -40,6 +40,12 @@ Type* LgsObject::getIRType() {
     return IRType;
 }
 
+json LgsObject::asJSON() const {
+    json tree;
+    tree["name"] = name;
+    return tree;
+}
+
 LgsExpr* LgsObject::getZeroValue() {
     if (nullable) return new LgsNull();
     // TODO return empty constructor

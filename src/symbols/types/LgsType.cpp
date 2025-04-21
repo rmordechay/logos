@@ -1,8 +1,6 @@
 #include "types/LgsType.h"
-
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsMethodImpl.h"
-
 #include "stmts/LgsField.h"
 
 bool LgsType::equals(const LgsType& other) {
@@ -12,6 +10,10 @@ bool LgsType::equals(const LgsType& other) {
 void LgsType::setLocation(const antlr4::Token* ctx) {
     location.lineNumber = ctx->getLine();
     location.posInLine = ctx->getCharPositionInLine() + 1;
+}
+
+json LgsType::asJSON() const {
+    assert(false);
 }
 
 LgsField* LgsType::getField(const string& name) {

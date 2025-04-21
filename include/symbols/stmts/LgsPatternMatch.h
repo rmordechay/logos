@@ -16,6 +16,7 @@ public:
 
     explicit LgsPatternMatch(LgsExpr* expr) : expr(expr) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    json asJSON() override;
     ~LgsPatternMatch() override = default;
 };
 

@@ -17,6 +17,7 @@ public:
     const string getName() const override;
     size_t size() override;
     Type* getIRType() override;
+    json asJSON() const override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) const override;

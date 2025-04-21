@@ -16,6 +16,7 @@ public:
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     LgsExpr* resolveSelection(CodeGenMetadata* metadata) const;
+    json asJSON() override;
     ~LgsSelection() override;
 };
 

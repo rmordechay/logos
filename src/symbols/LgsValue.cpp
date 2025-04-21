@@ -1,6 +1,7 @@
 #include "LgsValue.h"
 
 #include "funcs/LgsFunc.h"
+#include "json/json.hpp"
 
 #include <TokenSource.h>
 
@@ -35,6 +36,10 @@ Value* LgsValue::hashIRValue(CodeGenMetadata* metadata, Value* value) const {
     const auto hashValueIRFuncType = FunctionType::get(i32Ty, {ptrTy}, false);
     const auto func = metadata->module->getOrInsertFunction("hash_Str", hashValueIRFuncType);
     return metadata->builder.CreateCall(func, {value});
+}
+
+json LgsValue::asJSON() {
+    assert(false);
 }
 
 void LgsValue::setIRValue(Value* value) {

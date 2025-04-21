@@ -36,6 +36,12 @@ Value* LgsVariable::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
     return nullptr;
 }
 
+json LgsVariable::asJSON() {
+    json tree;
+    tree["name"] = name;
+    return tree;
+}
+
 uint32_t LgsVariable::hashValue() {
     assert(ref && ref->type != UNKNOWN);
     string text;

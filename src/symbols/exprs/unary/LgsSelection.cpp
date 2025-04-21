@@ -30,6 +30,16 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
     return lastExpr();
 }
 
+json LgsSelection::asJSON() {
+    json tree;
+    tree["exprs"] = {};
+    tree["exprType"] = "selection";
+    for (const auto& expr : exprs) {
+        tree["exprs"].emplace_back(expr->asJSON());
+    }
+    return tree;
+}
+
 LgsExpr* LgsSelection::lastExpr() const {
     if (exprs.empty()) return nullptr;
     return exprs[exprs.size() - 1];

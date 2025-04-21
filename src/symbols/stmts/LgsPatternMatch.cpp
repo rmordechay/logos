@@ -31,3 +31,10 @@ Value* LgsPatternMatch::createIRValue(CodeGenMetadata* metadata) {
     startBlock(metadata, exitBlock);
     return nullptr;
 }
+
+json LgsPatternMatch::asJSON() {
+    json tree;
+    tree["expr"] = expr->asJSON();
+    tree["stmtType"] = "patternMatch";
+    return tree;
+}

@@ -26,7 +26,9 @@ bool LogosProject::loadProject() {
     loadFiles();
     if (!errors.empty()) return false;
     projectAnalyser.resolveGlobalTypes(files);
-    return projectAnalyser.successful;
+    std::cout << mainFile->asJSON().dump(2) << '\n';
+    // return projectAnalyser.successful;
+    return false;
 }
 
 void LogosProject::loadFiles() {
