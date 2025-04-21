@@ -515,9 +515,9 @@ bool SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
     // Resolve parent func
     vector<LgsFunc*> overloads;
     auto funcCallName = funcCall->name;
-    const auto it = globals.funcs.find(funcCallName);
-    if (it != globals.funcs.end()) {
-        overloads = it->second;
+    const auto func = globals.funcs.find(funcCallName);
+    if (func != globals.funcs.end()) {
+        overloads = func->second;
     } else {
         handleError(E10006, &funcCall->location, {funcCallName});
         return false;

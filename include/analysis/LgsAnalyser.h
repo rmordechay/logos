@@ -25,6 +25,7 @@ public:
     void setUnsuccessful();
     void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});
     LgsType* resolveType(LgsType* type);
+    void resolveFuncTypes(LgsFuncSignature* signature);
     void resolveGlobalTypes(const vector<LgsFile*>& files);
     void resolveObjMemberTypes(LgsObject* const& obj);
     string formatMsg(const string& errMsg, const vector<string>& args = {}) const;
