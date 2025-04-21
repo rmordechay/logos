@@ -2,6 +2,7 @@
 #define LOGOSFUNCIMPL_H
 #include "LgsFunc.h"
 #include "LgsParam.h"
+#include "types/LgsObject.h"
 
 class LgsFuncImpl final : public LgsFunc {
 public:
@@ -13,7 +14,11 @@ public:
 inline Function* LgsFuncImpl::getIRFunc(const CodeGenMetadata* metadata) {
     if (!IRFuncType) {
         for (int i = 0; i < signature.params.size(); ++i) {
-            auto paramIRType = signature.params[i].type->getIRType();
+            const auto type = signature.params[i].type;
+            auto paramIRType = type->getIRType();
+            if (dynamic_cast<LgsObject*>(type)) {
+                paramIRType = paramIRType->getPointerTo();
+            }
             IRParamsTypes.emplace_back(paramIRType);
         }
         IRFuncType = FunctionType::get(signature.type->getIRType(), IRParamsTypes, false);

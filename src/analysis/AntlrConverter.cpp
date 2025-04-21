@@ -587,6 +587,7 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) const {
             result->nullable = true;
         }
     }
+    result->setLocation(ctx->start);
     return result;
 }
 
@@ -608,6 +609,11 @@ LgsType* AntlerConverter::getTypeFromText(const string& typeText, const antlr4::
     }
     if (typeText == LgsStr::name) {
         const auto type = new LgsStr();
+        type->setLocation(ctx->start);
+        return type;
+    }
+    if (typeText == LgsVoid::name) {
+        const auto type = new LgsVoid();
         type->setLocation(ctx->start);
         return type;
     }

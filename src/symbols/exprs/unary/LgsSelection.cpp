@@ -21,8 +21,7 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
         const auto field = currentExpr->type->getField(nextExpr->getName());
         if (field) {
             const auto parentInstance = currentExpr->getIRValue(metadata);
-            const auto parent = metadata->builder.CreateLoad(parentInstance->getType(), parentInstance);
-            const auto value = field->getGEP(metadata, parent);
+            const auto value = field->getGEP(metadata, parentInstance);
             nextExpr->setIRValue(value);
             continue;
         }
