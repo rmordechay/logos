@@ -91,7 +91,7 @@ string LgsAnalyser::formatMsg(const string& errMsg, const vector<string>& args) 
 void LgsAnalyser::handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args) {
     setUnsuccessful();
     const auto errMsg = formatMsg(lgsErr.msg, args);
-    errors.emplace_back(LgsError{.errCode = lgsErr.errCode, .msg = errMsg});
+    errors.emplace_back(LgsError{.msg = errMsg, .errCode = lgsErr.errCode});
     cout <<  "Error: "  << errMsg << endl;
     if (location) {
         assert(location->lineNumber != 0);

@@ -8,8 +8,8 @@ using namespace std;
 inline string ERROR_PLACEHOLDER = "%s";
 
 struct LgsError {
-    int errCode;
     string msg;
+    int errCode;
 };
 
 /** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */

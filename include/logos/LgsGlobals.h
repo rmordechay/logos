@@ -10,7 +10,7 @@
 #include "types/LgsInterface.h"
 
 struct LgsGlobals {
-    mutex mtx;
+    std::mutex mtx;
     // TODO make symbols and enums map for faster retrieval
     map<string, LgsSymbol> symbols;
     map<string, LgsSymbol> enums;

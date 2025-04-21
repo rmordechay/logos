@@ -4,6 +4,7 @@
 #include "symbols/LgsSymbol.h"
 #include <stack>
 #include <map>
+#include <mutex>
 #include <llvm/IR/Module.h>
 
 using namespace std;
@@ -17,7 +18,7 @@ struct LgsStackFrame {
 
 class LgsStack : stack<LgsStackFrame> {
 public:
-    mutex mtx;
+    std::mutex mtx;
     LgsFunc* currentFunc = nullptr;
     LgsLoop* currentLoop = nullptr;
 

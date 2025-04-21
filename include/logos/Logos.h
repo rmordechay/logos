@@ -26,7 +26,7 @@ inline LgsPaths paths;
 
 class Logos {
 public:
-    mutex mtx;
+    std::mutex mtx;
     LogosProject project;
     vector<LgsError> errors;
 
