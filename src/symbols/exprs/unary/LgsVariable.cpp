@@ -10,14 +10,15 @@ string LgsVariable::getName() {
 }
 
 Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
-    assert(ref && ref->type != UNKNOWN);
-    switch (ref->type) {
+    const auto symbol = metadata->lgsStack.getSymbol(name);
+    assert(symbol);
+    switch (symbol->type) {
     case VAR_DEC:
-        return ref->varDec->expr->getIRValue(metadata);
+        return symbol->varDec->expr->getIRValue(metadata);
     case PARAM:
-        return ref->param->IRValue;
+        return symbol->param->IRValue;
     case ENUM_FIELD:
-        return ref->enumField->getGEP(metadata);
+        return symbol->enumField->getGEP(metadata);
     default:
         assert(false);
     }
@@ -41,23 +42,18 @@ json LgsVariable::asJSON() {
     tree["name"] = name;
     tree["exprType"] = "VARIABLE";
     tree["type"] = type->getName();
-    tree["ref"] = ref->asJSON();
     return tree;
 }
 
-uint32_t LgsVariable::hashValue() {
-    assert(ref && ref->type != UNKNOWN);
+uint32_t LgsVariable::hashValue(CodeGenMetadata* metadata) {
+    const auto symbol = metadata->lgsStack.getSymbol(name);
     string text;
-    switch (ref->type) {
+    switch (symbol->type) {
     case FIELD:
-        return ref->field->expr->hashValue();
+        return symbol->field->expr->hashValue(metadata);
     case ENUM_FIELD:
-        return LgsStr::hashString(ref->enumField->name);
+        return LgsStr::hashString(symbol->enumField->name);
     default:
         assert(false);
     }
-}
-
-LgsVariable::~LgsVariable() {
-    delete ref;
 }

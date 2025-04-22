@@ -16,9 +16,10 @@ void LgsAssignment::createIRFromSelection(CodeGenMetadata* metadata, const LgsSe
     const auto lastExpr = selection->lastExpr();
     const auto beforeLastExpr = selection->exprs[selection->exprs.size() - 2];
     if (const auto var = lastExpr->asVariable()) {
-        switch (var->ref->type) {
+        const auto symbol = metadata->lgsStack.getSymbol(var->name);
+        switch (symbol->type) {
         case FIELD:
-            var->ref->field->setFieldIRValue(metadata, rvalue, beforeLastExpr->getIRValue(metadata));
+            symbol->field->setFieldIRValue(metadata, rvalue, beforeLastExpr->getIRValue(metadata));
             break;
         case UNKNOWN:
             assert(false);

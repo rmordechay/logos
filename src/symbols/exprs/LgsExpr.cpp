@@ -26,7 +26,7 @@ LgsExpr* LgsExpr::castStatically(LgsType* other) {
     return nullptr;
 }
 
-uint32_t LgsExpr::hashValue() {
+uint32_t LgsExpr::hashValue(CodeGenMetadata* metadata) {
     assert(false);
 }
 

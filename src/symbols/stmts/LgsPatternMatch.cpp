@@ -7,8 +7,7 @@
 Value* LgsPatternMatch::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto func = metadata->lgsStack.currentFunc->getIRFunc(metadata);
-    uint32_t c = expr->hashValue();
-    const auto exprIRValue = metadata->builder.getInt32(c);
+    const auto exprIRValue = metadata->builder.getInt32(expr->hashValue(metadata));
     exitBlock = BasicBlock::Create(context, "exit_pattern_matching");
     defaultCase = BasicBlock::Create(context, "default");
     const auto switchInst = builder.CreateSwitch(exprIRValue, defaultCase);
@@ -16,7 +15,7 @@ Value* LgsPatternMatch::createIRValue(CodeGenMetadata* metadata) {
     vector<BasicBlock*> blocks;
     for (size_t i = 0; i < patterns.size(); ++i) {
         const auto pattern = patterns[i];
-        const auto patterIRValue = metadata->builder.getInt32(pattern->hashValue());
+        const auto patterIRValue = metadata->builder.getInt32(pattern->hashValue(metadata));
         const auto patternBlock = BasicBlock::Create(context, "case_" + to_string(i), func);
         switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
         builder.SetInsertPoint(patternBlock);

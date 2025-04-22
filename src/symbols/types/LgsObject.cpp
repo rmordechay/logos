@@ -30,7 +30,7 @@ size_t LgsObject::size() {
 
 Type* LgsObject::getIRType() {
     if (IRType) return IRType;
-    // CodeGenerator::generateObjModule(this);
+    CodeGenerator::generateObjModule(this);
     vector<Type*> elementTypes;
     for (const auto& [_, val] : fields) {
         auto fieldType = val->type->getIRType();

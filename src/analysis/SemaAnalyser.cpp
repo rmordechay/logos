@@ -308,7 +308,6 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     default:
         assert(false);
     }
-    variable->ref = new LgsSymbol(*symbol);
 }
 
 void SemaAnalyser::visitSelection(LgsSelection* selection) {
@@ -426,7 +425,6 @@ bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable
         return false;
     }
     if (!field->isPublic) {}
-    fieldVariable->ref = new LgsSymbol(field);
     setExprType(fieldVariable, field->type);
     return true;
 }
