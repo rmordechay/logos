@@ -4,32 +4,15 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
-LgsSymbol::LgsSymbol(): type(UNKNOWN), object(nullptr) {
-}
-
-LgsSymbol::LgsSymbol(LgsParam* param): type(PARAM), param(param) {
-}
-
-LgsSymbol::LgsSymbol(LgsVarDec* varDec): type(VAR_DEC), varDec(varDec) {
-}
-
-LgsSymbol::LgsSymbol(LgsFunc* func): type(FUNC), func(func) {
-}
-
-LgsSymbol::LgsSymbol(LgsObject* object): type(OBJECT), object(object) {
-}
-
-LgsSymbol::LgsSymbol(LgsInterface* interface): type(INTERFACE), interface(interface) {
-}
-
-LgsSymbol::LgsSymbol(LgsField* field): type(FIELD), field(field) {
-}
-
-LgsSymbol::LgsSymbol(LgsEnum* lgsEnum): type(ENUM), lgsEnum(lgsEnum) {
-}
-
-LgsSymbol::LgsSymbol(LgsEnumField* enumField): type(ENUM_FIELD), enumField(enumField) {
-}
+LgsSymbol::LgsSymbol(): type(UNKNOWN), object(nullptr) {}
+LgsSymbol::LgsSymbol(LgsParam* param): type(PARAM), param(param) {}
+LgsSymbol::LgsSymbol(LgsVarDec* varDec): type(VAR_DEC), varDec(varDec) {}
+LgsSymbol::LgsSymbol(LgsFunc* func): type(FUNC), func(func) {}
+LgsSymbol::LgsSymbol(LgsObject* object): type(OBJECT), object(object) {}
+LgsSymbol::LgsSymbol(LgsInterface* interface): type(INTERFACE), interface(interface) {}
+LgsSymbol::LgsSymbol(LgsField* field): type(FIELD), field(field) {}
+LgsSymbol::LgsSymbol(LgsEnum* lgsEnum): type(ENUM), lgsEnum(lgsEnum) {}
+LgsSymbol::LgsSymbol(LgsEnumField* enumField): type(ENUM_FIELD), enumField(enumField) {}
 
 void LgsSymbol::free(CodeGenMetadata* metadata) const {
     switch (type) {
@@ -38,6 +21,10 @@ void LgsSymbol::free(CodeGenMetadata* metadata) const {
         break;
     default: assert(false);
     }
+}
+
+LgsSymbol* LgsSymbol::clone() const {
+    return new LgsSymbol(*this);
 }
 
 json LgsSymbol::asJSON() const {

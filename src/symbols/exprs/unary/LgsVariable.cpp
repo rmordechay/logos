@@ -10,25 +10,23 @@ string LgsVariable::getName() {
 }
 
 Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
-    const auto symbol = metadata->lgsStack.getSymbol(name);
-    assert(symbol);
-    switch (symbol->type) {
+    assert(ref);
+    switch (ref->type) {
     case VAR_DEC:
-        return symbol->varDec->expr->getIRValue(metadata);
+        return ref->varDec->expr->getIRValue(metadata);
     case PARAM:
-        return symbol->param->IRValue;
+        return ref->param->IRValue;
     case ENUM_FIELD:
-        return symbol->enumField->getGEP(metadata);
+        return ref->enumField->getGEP(metadata);
     default:
         assert(false);
     }
 }
 
 Value* LgsVariable::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto symbol = metadata->lgsStack.getSymbol(name);
-    switch (symbol->type) {
+    switch (ref->type) {
     case VAR_DEC:
-        return symbol->varDec->expr->eqIR(metadata, other);
+        return ref->varDec->expr->eqIR(metadata, other);
     case UNKNOWN:
         assert(false);
     default:
@@ -46,13 +44,12 @@ json LgsVariable::asJSON() {
 }
 
 uint32_t LgsVariable::hashValue(CodeGenMetadata* metadata) {
-    const auto symbol = metadata->lgsStack.getSymbol(name);
     string text;
-    switch (symbol->type) {
+    switch (ref->type) {
     case FIELD:
-        return symbol->field->expr->hashValue(metadata);
+        return ref->field->expr->hashValue(metadata);
     case ENUM_FIELD:
-        return LgsStr::hashString(symbol->enumField->name);
+        return LgsStr::hashString(ref->enumField->name);
     default:
         assert(false);
     }

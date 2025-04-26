@@ -124,7 +124,7 @@ void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
 }
 
 void SemaAnalyser::visitField(const LgsField* field) {
-    validateUserType(field->expr, field->type);
+    validateExprType(field->expr, field->type);
 }
 
 void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
@@ -134,16 +134,16 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
     if (const auto selection = dynamic_cast<LgsSelection*>(lExpr)) {
         visitSelection(selection);
     }
-    validateUserType(lExpr, rExpr->type);
+    validateExprType(lExpr, rExpr->type);
 }
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
-    varDec->userType = resolveType(varDec->userType);
     if (varDec->expr) {
-        if (!validateUserType(varDec->expr, varDec->userType)) return;
+        varDec->expr->type = resolveType(varDec->expr->type);
         varDec->type = varDec->expr->type;
+        if (!validateExprType(varDec->expr, varDec->type)) return;
     } else {
-        varDec->type = varDec->userType;
+        varDec->type = resolveType(varDec->type);
         varDec->expr = varDec->type->getZeroValue();
     }
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
@@ -303,6 +303,7 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     default:
         assert(false);
     }
+    variable->ref = symbol->clone();
 }
 
 void SemaAnalyser::visitSelection(LgsSelection* selection) {
@@ -331,7 +332,15 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
         const auto nextExpr = exprs[i + 1];
         auto nextExprName = nextExpr->getName();
         if (const auto var = dynamic_cast<LgsVariable*>(nextExpr)) {
-            if (!setSelectionFieldType(currentExpr, var)) break;
+            const auto type = currentExpr->type;
+            const auto field = type ? type->getField(var->name) : nullptr;
+            if (!type || !field) {
+                const auto name = type ? type->getName() : "Unknown";
+                handleError(E10005, &var->location, {var->getName(), name});
+                break;
+            }
+            setExprType(var, field->type);
+            var->ref = new LgsSymbol(field->clone());
         } else if (const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr)) {
             methodCall->parentName = currentExpr->type->getName();
             visitMethodCall(methodCall, currentExpr->type);
@@ -450,27 +459,27 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     }
 }
 
-bool SemaAnalyser::validateUserType(LgsExpr* expr, LgsType* userType) {
+bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
     if (!expr) return true;
     visitExpr(expr);
     if (expr->isNull()) {
         // null must have a type
-        if (!userType) {
+        if (!type) {
             handleError(E10024, &expr->location);
             return false;
         }
         // userType must be nullable
-        if (!userType->nullable) {
-            handleError(E10023, &userType->location, {userType->getName(), userType->getName()});
+        if (!type->nullable) {
+            handleError(E10023, &type->location, {type->getName(), type->getName()});
             return false;
         }
-        expr->type = userType;
+        expr->type = type;
         return true;
     }
-    if (userType) {
+    if (type) {
         // User and expr type don't match
-        if (!expr->type->equals(userType)) {
-            handleError(E10001, &expr->location, {expr->type->getName(), userType->getName()});
+        if (!expr->type->equals(type)) {
+            handleError(E10001, &expr->location, {expr->type->getName(), type->getName()});
             return false;
         }
     }

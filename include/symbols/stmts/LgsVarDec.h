@@ -7,7 +7,6 @@ class LgsVarDec final : public LgsStmt {
 public:
     string name;
     LgsType* type = nullptr;
-    LgsType* userType = nullptr;
     LgsExpr* expr = nullptr;
     vector<LgsVariable*> refs;
 

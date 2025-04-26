@@ -19,6 +19,7 @@ public:
     LgsField(const string& name, const size_t position, LgsType* type, LgsExpr* expr = nullptr) : name(name), position(position), expr(expr), type(type) {}
     virtual Value* getGEP(CodeGenMetadata* metadata, Value* instance = nullptr);
     void setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* expr, Value* instance = nullptr);
+    LgsField* clone() const;
     json asJSON() override;
     ~LgsField() override;
 };

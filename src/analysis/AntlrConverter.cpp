@@ -274,10 +274,9 @@ LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext
 
 LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
-    const auto userType = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
     const auto varDec = new LgsVarDec(variableName, expr);
-    varDec->userType = userType;
+    varDec->type = getType(ctx->type());
     varDec->setLocation(ctx->start);
     return varDec;
 }

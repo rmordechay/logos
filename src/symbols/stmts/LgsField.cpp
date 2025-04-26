@@ -14,6 +14,10 @@ void LgsField::setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* expr, Value* 
     metadata->builder.CreateStore(exprIRValue, getGEP(metadata, instance));
 }
 
+LgsField* LgsField::clone() const {
+    return new LgsField(*this);
+}
+
 json LgsField::asJSON() {
     json tree;
     tree["name"] = name;

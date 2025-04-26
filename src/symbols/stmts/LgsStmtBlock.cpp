@@ -1,5 +1,6 @@
 #include "stmts/LgsStmtBlock.h"
 
+#include "exprs/unary/LgsSelection.h"
 #include "stmts/LgsReturn.h"
 
 void LgsStmtBlock::createIRValue(CodeGenMetadata* metadata) const {

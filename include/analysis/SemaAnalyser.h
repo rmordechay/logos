@@ -76,7 +76,7 @@ public:
     LgsFunc* resolveFuncOverload(LgsFunc* overload, const LgsFuncCall* funcCall);
     bool resolveMethodCall(const LgsType* type, LgsFuncCall* methodCall);
     bool checkDefaultParams(const LgsFuncCall* funcCall, const vector<LgsParam>& overloadParams) const;
-    bool validateUserType(LgsExpr* expr, LgsType* userType);
+    bool validateExprType(LgsExpr* expr, LgsType* type);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     void checkObjectImplements(LgsObject* obj, LgsInterface* interface);

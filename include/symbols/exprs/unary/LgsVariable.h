@@ -5,6 +5,7 @@
 class LgsVariable :  public LgsUnaryExpr {
 public:
     std::string name;
+    LgsSymbol* ref = nullptr;
 
     explicit LgsVariable(const std::string& name) : LgsUnaryExpr(nullptr), name(name) {}
     string getName() override;

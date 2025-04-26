@@ -59,13 +59,6 @@ LgsObject* LgsObject::clone() {
     for (const auto& [name, field] : fields) {
         newObj->fields[name] = new LgsField(*field);
     }
-    // for (const auto& [name, methodList] : other.methods) {
-    //     vector<LgsMethodImpl*> clonedList;
-    //     for (const auto& method : methodList) {
-    //         clonedList.emplace_back(new LgsMethodImpl(*method));
-    //     }
-    //     methods[name] = std::move(clonedList);
-    // }
     newObj->methods = methods;
     return newObj;
 }

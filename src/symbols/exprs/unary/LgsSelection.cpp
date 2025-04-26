@@ -2,7 +2,6 @@
 #include "exprs/unary/LgsArrayIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsVariable.h"
-#include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
 
 string LgsSelection::getName() {
@@ -10,8 +9,7 @@ string LgsSelection::getName() {
 }
 
 Value* LgsSelection::createIRValue(CodeGenMetadata* metadata) {
-    const auto gep = resolveSelection(metadata)->IRValue;
-    return metadata->builder.CreateLoad(gep->getType(), gep);
+    return resolveSelection(metadata)->IRValue;
 }
 
 LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
@@ -22,7 +20,8 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
         if (field) {
             const auto parentInstance = currentExpr->getIRValue(metadata);
             const auto value = field->getGEP(metadata, parentInstance);
-            nextExpr->setIRValue(value);
+            const auto valueLoad = metadata->builder.CreateLoad(field->type->getIRType(), value);
+            nextExpr->setIRValue(valueLoad);
             continue;
         }
         if (const auto methodCall = nextExpr->asFuncCall()) {

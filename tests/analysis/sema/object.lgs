@@ -1,0 +1,25 @@
+object MyObject {
+    //implements: MyInterface
+    x: Int
+    y: Int
+
+    add(): Int {
+        return 1
+    }
+
+    mul(a: Int, b: Int): Int {
+        return a * b
+    }
+
+    bla(): Str {
+        return "fd1"
+}}
+
+main() {
+     obj = MyObject()
+     obj.x := 243
+     print(obj.x)
+     print(obj.y)
+     print(obj.add())
+     print(obj.mul(23, 34))
+}
