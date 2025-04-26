@@ -19,9 +19,9 @@ void CodeGenerator::generate(const LgsMainFile* mainFile, const bool writeToFile
     auto metadata = CodeGenMetadata{.module = module};
 
     for (const auto& func : mainFile->funcs) {
-        func->createIRFunc(&metadata);
+        func->generateIRFunc(&metadata);
     }
-    mainFile->mainFunc->createIRFunc(&metadata);
+    mainFile->mainFunc->generateIRFunc(&metadata);
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
 
     if (writeToFile) {
@@ -35,7 +35,7 @@ void CodeGenerator::generateObjModule(LgsType* obj, const bool writeToFile) {
     auto metadata = CodeGenMetadata{.module = createEmptyModule(objName)};
     for (const auto& [_, method] : obj->methods) {
         for (const auto& overload : method) {
-            overload->createIRFunc(&metadata);
+            overload->generateIRFunc(&metadata);
         }
     }
 

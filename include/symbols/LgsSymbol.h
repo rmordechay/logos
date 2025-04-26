@@ -26,21 +26,19 @@ enum LgsSymbolType {
 
 struct LgsSymbol {
     LgsSymbolType type;
-    union {
-        LgsVarDec* varDec;
-        LgsParam* param;
-        LgsObject* object;
-        LgsInterface* interface;
-        LgsField* field;
-        LgsFunc* func;
-        LgsEnum* lgsEnum;
-        LgsEnumField* enumField;
-    };
+    LgsVarDec* varDec = nullptr;
+    LgsParam* param = nullptr;
+    LgsObject* object = nullptr;
+    LgsInterface* interface = nullptr;
+    LgsField* field = nullptr;
+    LgsEnum* lgsEnum = nullptr;
+    LgsEnumField* enumField = nullptr;
+    std::vector<LgsFunc*> func;
 
     LgsSymbol();
     explicit LgsSymbol(LgsParam* param);
     explicit LgsSymbol(LgsVarDec* varDec);
-    explicit LgsSymbol(LgsFunc* func);
+    explicit LgsSymbol(const std::vector<LgsFunc*>& func);
     explicit LgsSymbol(LgsObject* object);
     explicit LgsSymbol(LgsInterface* interface);
     explicit LgsSymbol(LgsField* field);

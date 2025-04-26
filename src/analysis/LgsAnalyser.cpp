@@ -65,10 +65,7 @@ void LgsAnalyser::resolveObjMemberTypes(LgsObject* const& obj) {
     }
     for (const auto& [_, method] : obj->methods) {
         for (const auto& overload : method) {
-            overload->signature.type = resolveType(overload->signature.type);
-            for (int i = 0; i < overload->signature.params.size(); ++i) {
-                overload->signature.params[i].type = resolveType(overload->signature.params[i].type);
-            }
+            resolveFuncTypes(&overload->signature);
         }
     }
     for (int i = 0; i < obj->implements.size(); ++i) {
@@ -79,6 +76,10 @@ void LgsAnalyser::resolveObjMemberTypes(LgsObject* const& obj) {
 void LgsAnalyser::resolveFuncTypes(LgsFuncSignature* signature) {
     signature->type = resolveType(signature->type);
     for (int i = 0; i < signature->params.size(); ++i) {
+        const auto lgsParam = signature->params[i];
+        if (lgsParam.func) {
+            resolveFuncTypes(&lgsParam.func->signature);
+        }
         signature->params[i].type = resolveType(signature->params[i].type);
     }
 }

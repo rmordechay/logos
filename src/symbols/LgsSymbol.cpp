@@ -2,12 +2,11 @@
 #include "types/LgsEnum.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsObject.h"
 
-LgsSymbol::LgsSymbol(): type(UNKNOWN), object(nullptr) {}
+LgsSymbol::LgsSymbol(): type(UNKNOWN) {}
 LgsSymbol::LgsSymbol(LgsParam* param): type(PARAM), param(param) {}
 LgsSymbol::LgsSymbol(LgsVarDec* varDec): type(VAR_DEC), varDec(varDec) {}
-LgsSymbol::LgsSymbol(LgsFunc* func): type(FUNC), func(func) {}
+LgsSymbol::LgsSymbol(const std::vector<LgsFunc*>& func): type(FUNC), func(func) {}
 LgsSymbol::LgsSymbol(LgsObject* object): type(OBJECT), object(object) {}
 LgsSymbol::LgsSymbol(LgsInterface* interface): type(INTERFACE), interface(interface) {}
 LgsSymbol::LgsSymbol(LgsField* field): type(FIELD), field(field) {}

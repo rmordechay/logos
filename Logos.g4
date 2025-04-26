@@ -61,7 +61,11 @@ funcBody:
     ;
 
 paramList:
-        explicitVarDec (COMMA explicitVarDec)* COMMA?
+        param (COMMA param)* COMMA?
+    ;
+
+param:
+        explicitVarDec | funcSignature
     ;
 
 statement:

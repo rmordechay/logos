@@ -1,11 +1,10 @@
 #include "funcs/LgsFunc.h"
-
 #include "LgsData.h"
 #include "exprs/LgsExpr.h"
 #include "funcs/LgsParam.h"
 #include "types/LgsVoid.h"
 
-void LgsFunc::createIRFunc(CodeGenMetadata* metadata) {
+void LgsFunc::generateIRFunc(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);
     const auto IRFunc = getIRFunc(metadata);
     auto args = IRFunc->arg_begin();
@@ -19,6 +18,14 @@ void LgsFunc::createIRFunc(CodeGenMetadata* metadata) {
         metadata->builder.CreateRetVoid();
     }
     metadata->lgsStack.exitScope();
+}
+
+Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
+    if (!IRFuncType) {
+        IRFuncType = FunctionType::get(signature.type->getIRType(), getIRParamTypes(metadata), false);
+    }
+    auto func = metadata->module->getOrInsertFunction(signature.IRName, IRFuncType);
+    return dyn_cast<Function>(func.getCallee());
 }
 
 Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {

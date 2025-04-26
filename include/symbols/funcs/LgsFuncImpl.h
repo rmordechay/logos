@@ -7,24 +7,28 @@
 class LgsFuncImpl final : public LgsFunc {
 public:
     explicit LgsFuncImpl(const string& name, LgsType* funcType, const vector<LgsParam>& params = {}) : LgsFunc(name, funcType, params) {}
-    Function* getIRFunc(const CodeGenMetadata* metadata) override;
+    vector<Type*> getIRParamTypes(const CodeGenMetadata* metadata) override;
     ~LgsFuncImpl() override = default;
 };
 
-inline Function* LgsFuncImpl::getIRFunc(const CodeGenMetadata* metadata) {
-    if (!IRFuncType) {
-        for (int i = 0; i < signature.params.size(); ++i) {
-            const auto type = signature.params[i].type;
+inline vector<Type*> LgsFuncImpl::getIRParamTypes(const CodeGenMetadata* metadata) {
+    vector<Type*> IRParamsTypes;
+    for (int i = 0; i < signature.params.size(); ++i) {
+        const auto param = signature.params[i];
+        if (param.func) {
+            const auto rty = param.func->signature.type->getIRType();
+            const auto funcType = FunctionType::get(rty, param.func->getIRParamTypes(metadata), false);
+            IRParamsTypes.emplace_back(funcType->getPointerTo());
+        } else {
+            const auto type = param.type;
             auto paramIRType = type->getIRType();
             if (dynamic_cast<LgsObject*>(type)) {
                 paramIRType = paramIRType->getPointerTo();
             }
             IRParamsTypes.emplace_back(paramIRType);
         }
-        IRFuncType = FunctionType::get(signature.type->getIRType(), IRParamsTypes, false);
     }
-    auto func = metadata->module->getOrInsertFunction(signature.IRName, IRFuncType);
-    return dyn_cast<Function>(func.getCallee());
+    return IRParamsTypes;
 }
 
 #endif //LOGOSFUNCIMPL_H

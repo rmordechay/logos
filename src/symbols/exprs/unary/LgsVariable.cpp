@@ -1,5 +1,6 @@
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/LgsEnumField.h"
+#include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsStr.h"
@@ -18,6 +19,9 @@ Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
         return ref->param->IRValue;
     case ENUM_FIELD:
         return ref->enumField->getGEP(metadata);
+    case FUNC:
+        // TODO incorrect call, should return function ptr
+        return ref->func[0]->call(metadata);
     default:
         assert(false);
     }

@@ -73,7 +73,6 @@ public:
 
     bool resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
-    LgsFunc* resolveFuncOverload(LgsFunc* overload, const LgsFuncCall* funcCall);
     bool resolveMethodCall(const LgsType* type, LgsFuncCall* methodCall);
     bool checkDefaultParams(const LgsFuncCall* funcCall, const vector<LgsParam>& overloadParams) const;
     bool validateExprType(LgsExpr* expr, LgsType* type);

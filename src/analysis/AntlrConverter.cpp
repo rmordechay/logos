@@ -156,12 +156,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceFileContext* c
     const auto interface = new LgsInterface(interfaceName);
     for (const auto& funcSignature : ctx->funcSignature()) {
         vector<LgsParam> params;
-        if (funcSignature->paramList()) {
-            for (const auto& varDec : funcSignature->paramList()->explicitVarDec()) {
-                const auto param = getParam(varDec);
-                params.emplace_back(*param);
-            }
-        }
+        setParams(funcSignature, params);
         const auto type = getType(funcSignature->type());
         auto signature = new LgsFuncSignature(funcSignature->VARIABLE()->getText(), parentName, type, params);
         interface->funcSignatures.emplace_back(signature);
@@ -172,15 +167,10 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceFileContext* c
 
 LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext* ctx) {
     const auto rt = getFuncType(ctx);
-    const auto signature = ctx->funcSignature();
-    const auto name = signature->VARIABLE()->getText();
+    const auto funcSignature = ctx->funcSignature();
+    const auto name = funcSignature->VARIABLE()->getText();
     vector<LgsParam> params;
-    if (signature->paramList()) {
-        for (const auto& varDec : signature->paramList()->explicitVarDec()) {
-            const auto param = getParam(varDec);
-            params.emplace_back(*param);
-        }
-    }
+    setParams(funcSignature, params);
     const auto func = new LgsFuncImpl(name, rt, params);
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     func->setLocation(ctx->start);
@@ -190,16 +180,11 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext
 
 LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationContext* ctx, LgsObject* obj) {
     const auto rt = getFuncType(ctx);
-    const auto signature = ctx->funcSignature();
-    const auto name = signature->VARIABLE()->getText();
+    const auto funcSignature = ctx->funcSignature();
+    const auto name = funcSignature->VARIABLE()->getText();
     const auto self = LgsParam(LOGOS_SELF, obj, new LgsInstance(obj));
     vector params = {self};
-    if (signature->paramList()) {
-        for (const auto& varDec : signature->paramList()->explicitVarDec()) {
-            const auto param = getParam(varDec);
-            params.emplace_back(*param);
-        }
-    }
+    setParams(funcSignature, params);
     const auto method = new LgsMethodImpl(name, rt, obj->name, params);
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     method->setLocation(ctx->start);
@@ -207,11 +192,24 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationCon
 
 }
 
+void AntlerConverter::setParams(LogosParser::FuncSignatureContext* funcSignature, vector<LgsParam>& params) {
+    if (!funcSignature->paramList()) return;
+    for (const auto& param : funcSignature->paramList()->param()) {
+        if (const auto varDec = param->explicitVarDec()) {
+            const auto lgsParam = getParam(varDec);
+            params.emplace_back(*lgsParam);
+        } else if (const auto func = param->funcSignature()) {
+            const auto lgsParam = getParam(func);
+            params.emplace_back(*lgsParam);
+        }
+    }
+}
+
 LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx, const size_t position) {
     const auto name = ctx->VARIABLE()->getText();
-    const auto userType = getType(ctx->type());
+    const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
-    const auto field = new LgsField(name, position, userType, expr);
+    const auto field = new LgsField(name, position, type, expr);
     if (ctx->VISIBILITY()) {
         field->isPublic = true;
     }
@@ -289,9 +287,20 @@ LgsStmt* AntlerConverter::getReturnStmt(LogosParser::ReturnStatementContext* ctx
 
 LgsParam* AntlerConverter::getParam(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
-    const auto userType = getType(ctx->type());
+    const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
-    const auto param = new LgsParam(variableName, userType, expr);
+    const auto param = new LgsParam(variableName, type, expr);
+    param->setLocation(ctx->start);
+    return param;
+}
+
+LgsParam* AntlerConverter::getParam(LogosParser::FuncSignatureContext* ctx) {
+    const auto variableName = ctx->VARIABLE()->getText();
+    const auto type = getType(ctx->type());
+    vector<LgsParam> params;
+    setParams(ctx, params);
+    const auto func = new LgsFuncImpl(variableName, type, params);
+    const auto param = new LgsParam(func);
     param->setLocation(ctx->start);
     return param;
 }

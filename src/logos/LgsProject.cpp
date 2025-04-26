@@ -167,7 +167,7 @@ void LogosProject::setEnvVars() const {
     }
 }
 
-void LogosProject::asJSON() {
+void LogosProject::asJSON() const {
     std::cout << mainFile->asJSON().dump(2) << '\n';
     return;
 }
