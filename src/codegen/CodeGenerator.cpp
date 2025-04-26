@@ -1,8 +1,8 @@
 #include "CodeGenerator.h"
-
 #include "Logos.h"
 #include "funcs/LgsFuncImpl.h"
 #include "funcs/LgsMethodImpl.h"
+#include "stmts/LgsVarDec.h"
 #include <LgsMainFile.h>
 #include <ranges>
 #include <llvm/Support/FileSystem.h>
@@ -11,7 +11,6 @@
 #include <llvm/Target/TargetOptions.h>
 #include <llvm/MC/TargetRegistry.h>
 
-std::mutex mtx;
 
 void CodeGenerator::generate(const LgsMainFile* mainFile, const bool writeToFile) {
     initLLVM();
@@ -33,12 +32,7 @@ void CodeGenerator::generate(const LgsMainFile* mainFile, const bool writeToFile
 void CodeGenerator::generateObjModule(LgsType* obj, const bool writeToFile) {
     const auto objName = obj->getName();
     if (modules.find(objName) != modules.end()) return;
-    CodeGenMetadata metadata;
-    {
-        lock_guard lock(mtx);
-        metadata.module = createEmptyModule(objName);
-    }
-
+    auto metadata = CodeGenMetadata{.module = createEmptyModule(objName)};
     for (const auto& [_, method] : obj->methods) {
         for (const auto& overload : method) {
             overload->createIRFunc(&metadata);

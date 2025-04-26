@@ -1,7 +1,6 @@
 #ifndef LOGOSUNARYEXPR_H
 #define LOGOSUNARYEXPR_H
 #include "exprs/LgsExpr.h"
-
 #include <string>
 #include <types/LgsType.h>
 

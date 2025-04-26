@@ -23,6 +23,5 @@ json LgsField::asJSON() {
 }
 
 LgsField::~LgsField() {
-    delete userType;
     if (expr) delete expr;
 }

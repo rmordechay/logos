@@ -3,7 +3,7 @@
 #include <thread>
 #include <filesystem>
 #include "SemaAnalyser.h"
-#include "LogosProject.h"
+#include "LgsProject.h"
 
 class ThreadPool;
 using namespace filesystem;

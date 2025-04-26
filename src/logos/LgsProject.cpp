@@ -1,4 +1,4 @@
-#include "logos/LogosProject.h"
+#include "logos/LgsProject.h"
 
 #include "analysis/AntlrConverter.h"
 #include "files/LgsAppFile.h"

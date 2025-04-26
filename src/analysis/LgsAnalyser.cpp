@@ -60,7 +60,7 @@ void LgsAnalyser::resolveGlobalTypes(const vector<LgsFile*>& files) {
 
 void LgsAnalyser::resolveObjMemberTypes(LgsObject* const& obj) {
     for (const auto& [_, field] : obj->fields) {
-        field->userType = resolveType(field->userType);
+        field->type = resolveType(field->type);
         field->parent = obj;
     }
     for (const auto& [_, method] : obj->methods) {

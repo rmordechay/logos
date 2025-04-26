@@ -25,7 +25,7 @@ add_library(lib STATIC
     include/logos/Logos.h
     include/logos/LgsGlobals.h
     include/logos/LgsActiveEnv.h
-    include/logos/LogosProject.h
+    include/logos/LgsProject.h
     include/logos/LgsStack.h
     include/data/LgsData.h
     include/data/LgsErrors.h
@@ -121,7 +121,7 @@ add_library(lib STATIC
     src/parser/LogosParser.cpp
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
-    src/logos/LogosProject.cpp
+    src/logos/LgsProject.cpp
 
     # Symbols src
     src/symbols/LgsSymbol.cpp

@@ -123,13 +123,8 @@ void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
     }
 }
 
-void SemaAnalyser::visitField(LgsField* field) {
-    if (field->expr) {
-        if (!validateUserType(field->expr, field->userType)) return;
-        field->type = field->expr->type;
-    } else {
-        field->type = field->userType;
-    }
+void SemaAnalyser::visitField(const LgsField* field) {
+    validateUserType(field->expr, field->type);
 }
 
 void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
@@ -353,7 +348,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
         return handleError(E10022, &instance->location, {instance->type->getName()});
     }
 
-    const auto obj = new LgsObject(*symbol->object);
+    const auto obj = symbol->object->clone();
     for (const auto& arg : instance->args) {
         visitExpr(arg->expr);
         const auto lgsField = obj->getField(arg->name);
@@ -456,6 +451,7 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
 }
 
 bool SemaAnalyser::validateUserType(LgsExpr* expr, LgsType* userType) {
+    if (!expr) return true;
     visitExpr(expr);
     if (expr->isNull()) {
         // null must have a type
