@@ -180,20 +180,6 @@ add_executable(lgs main.cpp)
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE
         lib
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangAST.a
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangLex.a
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangFrontend.a
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangSema.a
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangParse.a
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangAnalysis.a
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangASTMatchers.a
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangEdit.a
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangAPINotes.a
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangSupport.a
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangDriver.a
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangTooling.a
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangSerialization.a
-#        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclangBasic.a
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libLLVM.dylib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldCommon.dylib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldMachO.dylib

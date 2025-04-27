@@ -33,24 +33,14 @@ using namespace nlohmann;
     #define LIB_ROOT "/usr/lib"
     #define ENTRY_POINT "_start"
     #define PLATFORM_VERSION "5.15"  // Example Linux kernel version
+    #define LINK_FUNC lld::elf::link(getLinkerOpts(), outs(), errs(), false, false);
 #elif defined(__APPLE__) && defined(__MACH__)
     #define OS_NAME "macos"
     #define DEFAULT_LINKER "ld.lld"
     #define LIB_ROOT "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
     #define ENTRY_POINT "_main"
     #define PLATFORM_VERSION "15.0"
-#elif defined(__unix__)
-    #define OS_NAME "Unix"
-    #define DEFAULT_LINKER "ld"
-    #define LIB_ROOT "/usr/lib"
-    #define ENTRY_POINT "_start"
-    #define PLATFORM_VERSION "1.0"  // Generic Unix version
-#else
-    #define OS_NAME "Unknown OS"
-    #define DEFAULT_LINKER "unknown_linker"
-    #define LIB_ROOT "/unknown"
-    #define ENTRY_POINT "unknown"
-    #define PLATFORM_VERSION "0.0"
+    #define LINK_FUNC lld::macho::link(getLinkerOpts(), outs(), errs(), false, false);
 #endif
 
 #if defined(__x86_64__) || defined(_M_X64)

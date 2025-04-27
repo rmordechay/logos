@@ -12,6 +12,10 @@
 #include <llvm/Support/FileSystem.h>
 #include "llvm/IR/Verifier.h"
 #include <iostream>
+#include "lld/Common/Driver.h"
+
+LLD_HAS_DRIVER(macho)
+LLD_HAS_DRIVER(elf)
 
 bool LgsLinker::link(const std::map<std::string, Module*>& modules) const {
     Module* mainModule = modules.find(LOGOS_MAIN_FILE_NAME)->second;
@@ -38,7 +42,11 @@ bool LgsLinker::link(const std::map<std::string, Module*>& modules) const {
     }
     pass.run(*mainModule);
     outputStream.flush();
-    const bool linkingPassed = lld::macho::link(getLinkerOpts(), outs(), errs(), false, false);
+    return getLinkFunc();
+}
+
+bool LgsLinker::getLinkFunc() const {
+    const bool linkingPassed = LINK_FUNC;
     if (!linkingPassed) {
         errs() << "Linking failed.";
         return false;

@@ -9,9 +9,13 @@ struct LgsPaths;
 using namespace llvm;
 using namespace std;
 
-namespace lld::macho {
-    bool link(ArrayRef<const char *> argsArr, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
-}
+// namespace lld::macho {
+//     extern bool link(ArrayRef<const char*> argsArr, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
+// }
+//
+// namespace lld::elf {
+//     extern bool link(ArrayRef<const char*> argsArr, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
+// }
 
 class LgsLinker {
 public:
@@ -20,6 +24,7 @@ public:
 
     explicit LgsLinker(LgsPaths* paths) : paths(paths) {}
     bool link(const map<string, Module*>& modules) const;
+    bool getLinkFunc() const;
     vector<const char*> getLinkerOpts() const;
     void linkStdlib(const string& path, Linker* linker) const;
     ~LgsLinker() = default;
