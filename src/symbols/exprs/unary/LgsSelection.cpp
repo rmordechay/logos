@@ -2,7 +2,6 @@
 #include "exprs/unary/LgsArrayIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsVariable.h"
-#include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
 
 string LgsSelection::getName() {
@@ -19,8 +18,10 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
         const auto nextExpr = exprs[i + 1];
         const auto field = currentExpr->type->getField(nextExpr->getName());
         if (field) {
-            const auto value = field->getIRValue(metadata);
-            nextExpr->setIRValue(value);
+            const auto parentInstance = currentExpr->getIRValue(metadata);
+            const auto value = field->getGEP(metadata, parentInstance);
+            const auto valueLoad = metadata->builder.CreateLoad(field->type->getIRType(), value);
+            nextExpr->setIRValue(valueLoad);
             continue;
         }
         if (const auto methodCall = nextExpr->asFuncCall()) {
@@ -33,7 +34,7 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
 json LgsSelection::asJSON() {
     json tree;
     tree["exprs"] = {};
-    tree["exprType"] = "selection";
+    tree["exprType"] = "SELECTION";
     for (const auto& expr : exprs) {
         tree["exprs"].emplace_back(expr->asJSON());
     }
@@ -45,9 +46,9 @@ LgsExpr* LgsSelection::lastExpr() const {
     return exprs[exprs.size() - 1];
 }
 
-uint32_t LgsSelection::hashValue() {
+uint32_t LgsSelection::hashValue(CodeGenMetadata* metadata) {
     const auto lgsExpr = lastExpr();
-    return lgsExpr->hashValue();
+    return lgsExpr->hashValue(metadata);
 }
 
 Value* LgsSelection::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {

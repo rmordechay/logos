@@ -36,7 +36,7 @@ public:
     void visitMainFile(const LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitObjectInterfaces(LgsObject* obj);
-    void visitField(LgsField* field);
+    void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
     void validateFuncControlFlow(const LgsFunc* func);
     void visitParam(LgsParam* param);
@@ -44,8 +44,8 @@ public:
     void visitStmtBlock(LgsStmtBlock* stmtBlock);
     void visitAssignment(const LgsAssignment* assignment);
     void visitVarDec(LgsVarDec* varDec);
-    void visitIfStmt(const LgsIfStmt* ifStmt);
-    void visitPatternMatching(const LgsPatternMatch* patternMatching);
+    void visitIfStmt(LgsIfStmt* ifStmt);
+    void visitPatternMatch(const LgsPatternMatch* patternMatching);
     void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const;
     void visitLoopStmt(LgsLoop* loopStmt);
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);
@@ -67,17 +67,15 @@ public:
     void visitInstance(LgsInstance* instance);
     void visitArrayIndex(LgsArrayIndex* arrayIndex);
 
-    void setFuncType(LgsFunc* func);
     void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
-    void setSelectionFieldType(LgsUnaryExpr* parent, LgsVariable* fieldVariable);
+    bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
     bool resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
-    LgsFunc* resolveFuncOverload(LgsFunc* overload, const LgsFuncCall* funcCall);
     bool resolveMethodCall(const LgsType* type, LgsFuncCall* methodCall);
     bool checkDefaultParams(const LgsFuncCall* funcCall, const vector<LgsParam>& overloadParams) const;
-    bool validateUserType(LgsExpr* expr, LgsType* userType);
+    bool validateExprType(LgsExpr* expr, LgsType* type);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     void checkObjectImplements(LgsObject* obj, LgsInterface* interface);

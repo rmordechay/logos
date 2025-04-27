@@ -10,11 +10,8 @@
 #include "types/LgsInterface.h"
 
 struct LgsGlobals {
-    mutex mtx;
-    // TODO make symbols and enums map for faster retrieval
+    std::mutex mtx;
     map<string, LgsSymbol> symbols;
-    map<string, LgsSymbol> enums;
-    map<string, vector<LgsFunc*>> funcs;
 
     void addSymbol(const string& name, const LgsSymbol& symbol) {
         if (symbols.find(name) != symbols.end()) {
@@ -26,8 +23,12 @@ struct LgsGlobals {
     }
 
     void addFunc(LgsFunc* func) {
-        lock_guard lock(mtx);
-        funcs[func->signature.name].emplace_back(func);
+        std::lock_guard lock(mtx);
+        auto [symbol, inserted] = symbols.try_emplace(func->signature.name);
+        if (inserted) {
+            symbol->second.type = FUNC;
+        }
+        symbol->second.func.emplace_back(func);
     }
 
     void addEnum(LgsEnum* lgsEnum) {
@@ -43,18 +44,18 @@ struct LgsGlobals {
     }
 
     ~LgsGlobals() {
-        for (const auto& [_, func] : funcs) {
-            for (const auto& overload : func) {
-                delete overload;
-            }
-        }
         for (const auto& [_, symbol] : symbols) {
             switch (symbol.type) {
             case VAR_DEC: delete symbol.varDec; break;
             case PARAM: delete symbol.param; break;
             case OBJECT: delete symbol.object; break;
             case INTERFACE: delete symbol.interface; break;
-            case FUNC: delete symbol.func; break;
+            case FUNC: {
+                for (const auto& overload : symbol.func) {
+                    delete overload;
+                }
+                break;
+            }
             case ENUM: delete symbol.lgsEnum; break;
             case ENUM_FIELD: delete symbol.enumField; break;
             default: break;

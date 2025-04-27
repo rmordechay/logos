@@ -17,6 +17,7 @@ public:
     vector<LgsExpr*> elseIfConds;
     vector<LgsStmtBlock*> elseIfStmtBlocks;
     LgsStmtBlock* elseStmtBlock = nullptr;
+    bool hasReturn = false;
 
     BasicBlock* ifTrueBlock = nullptr;
     BasicBlock* ifEndBlock = nullptr;

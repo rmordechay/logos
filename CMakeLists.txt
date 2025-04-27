@@ -25,7 +25,7 @@ add_library(lib STATIC
     include/logos/Logos.h
     include/logos/LgsGlobals.h
     include/logos/LgsActiveEnv.h
-    include/logos/LogosProject.h
+    include/logos/LgsProject.h
     include/logos/LgsStack.h
     include/data/LgsData.h
     include/data/LgsErrors.h
@@ -105,6 +105,7 @@ add_library(lib STATIC
     include/symbols/types/LgsObject.h
     include/symbols/types/LgsInterface.h
     include/symbols/types/LgsArrayType.h
+    include/symbols/types/LgsAny.h
 
     # src
     src/logos/Logos.cpp
@@ -119,9 +120,11 @@ add_library(lib STATIC
     src/codegen/LgsLinker.cpp
     src/parser/LogosLexer.cpp
     src/parser/LogosParser.cpp
+    src/analysis/LgsAnalyser.cpp
     src/analysis/AntlrConverter.cpp
+    src/analysis/LgsProjectAnalyser.cpp
     src/analysis/SemaAnalyser.cpp
-    src/logos/LogosProject.cpp
+    src/logos/LgsProject.cpp
 
     # Symbols src
     src/symbols/LgsSymbol.cpp
@@ -148,6 +151,7 @@ add_library(lib STATIC
     src/symbols/loops/LgsLoop.cpp
     src/symbols/loops/LgsForeachLoop.cpp
     src/symbols/loops/LgsRangeLoop.cpp
+    src/symbols/stmts/LgsStmt.cpp
     src/symbols/stmts/LgsField.cpp
     src/symbols/stmts/LgsAssignment.cpp
     src/symbols/stmts/LgsIfStmt.cpp
@@ -167,9 +171,8 @@ add_library(lib STATIC
     src/symbols/types/LgsType.cpp
     src/symbols/types/LgsArrayType.cpp
     src/symbols/types/LgsInterface.cpp
+    src/symbols/types/LgsAny.cpp
     src/symbols/types/LgsObject.cpp
-    src/analysis/LgsAnalyser.cpp
-    src/analysis/LgsProjectAnalyser.cpp
 )
 
 add_executable(lgs main.cpp)
@@ -204,34 +207,4 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 endif()
 
-
-enable_testing()
-add_executable(lgs_tests
-    tests/main.cpp
-)
-
-target_include_directories(lgs_tests PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/tests
-)
-
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    target_link_libraries(lgs_tests PRIVATE
-        lib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libgtest.a
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libgmock.a
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libgtest_main.a
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libLLVM.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldCommon.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldMachO.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libantlr4-runtime.a
-    )
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_link_libraries(lgs PRIVATE
-        lib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libgtest.a
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libgtest_main.a
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libantlr4-runtime.so
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libLLVM.so
-    )
-endif()
+add_subdirectory(tests)

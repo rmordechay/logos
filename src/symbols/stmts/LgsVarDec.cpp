@@ -12,7 +12,7 @@ Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
     const auto exprValue = expr->getIRValue(metadata);
     const auto valueType = exprValue->getType();
     // Pointers don't need to be stored
-    if (!valueType->isPointerTy()) {
+    if (!(valueType->isPointerTy() || valueType->isVoidTy())) {
         const auto ptr = builder.CreateAlloca(valueType);
         builder.CreateStore(exprValue, ptr);
     }
@@ -24,7 +24,7 @@ json LgsVarDec::asJSON() {
     json tree;
     tree["name"] = name;
     tree["type"] = type->getName();
-    tree["stmtType"] = "varDec";
+    tree["stmtType"] = "VAR_DEC";
     return tree;
 }
 

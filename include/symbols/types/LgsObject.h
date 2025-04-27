@@ -10,10 +10,10 @@ class LgsObject : public LgsType {
 public:
     string name;
     Type* IRType = nullptr;
+    bool isSingleton = false;
     vector<LgsType*> implements;
 
     explicit LgsObject(const string& typeName) : name(typeName) {}
-    LgsObject(LgsObject& other);
     const string getName() const override;
     size_t size() override;
     Type* getIRType() override;
@@ -21,6 +21,7 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) const override;
+    LgsObject* clone();
     ~LgsObject() override = default;
 };
 

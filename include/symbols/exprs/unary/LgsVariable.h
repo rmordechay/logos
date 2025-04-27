@@ -9,11 +9,11 @@ public:
 
     explicit LgsVariable(const std::string& name) : LgsUnaryExpr(nullptr), name(name) {}
     string getName() override;
-    uint32_t hashValue() override;
+    uint32_t hashValue(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     json asJSON() override;
-    ~LgsVariable() override;
+    ~LgsVariable() override = default;
 };
 
 class LgsConst final :  public LgsVariable {

@@ -8,8 +8,8 @@ using namespace std;
 inline string ERROR_PLACEHOLDER = "%s";
 
 struct LgsError {
-    int errCode;
     string msg;
+    int errCode;
 };
 
 /** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */
@@ -43,6 +43,9 @@ inline LgsError E10025{.msg = "'%s' must be an interface.", .errCode = ++errCode
 inline LgsError E10026{.msg = "Void functions should not return an expression.", .errCode = ++errCodeStart};
 inline LgsError E10027{.msg = "Function '%s' must return '%s'. Given: '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10028{.msg = "Default parameters must be defined lastly.", .errCode = ++errCodeStart};
+inline LgsError E10029{.msg = "const field '%s' must be initialized in the constructor.", .errCode = ++errCodeStart};
+inline LgsError E10030{.msg = "non-public field '%s' is used outside the object.", .errCode = ++errCodeStart};
+inline LgsError E10031{.msg = "Singleton object '%s' cannot be instantiated.", .errCode = ++errCodeStart};
 
 
 #endif //LOGOSERRORS_H

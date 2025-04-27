@@ -3,14 +3,12 @@
 #include "types/LgsFloat.h"
 #include <types/LgsVoid.h>
 
-
 class LgsPrint final : public LgsFunc {
 public:
     static constexpr auto name = "print";
     explicit LgsPrint(const vector<LgsParam>& params) : LgsFunc(name, new LgsVoid(), params) {}
 
-    void createIRFunc(CodeGenMetadata* metadata) override;
-    Function* getIRFunc(const CodeGenMetadata* metadata) override;
+    vector<Type*> getIRParamTypes(const CodeGenMetadata* metadata) override;
     ~LgsPrint() override = default;
 };
 

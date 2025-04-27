@@ -24,7 +24,8 @@ public:
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath);
     LgsInterface* getInterface(LogosParser::InterfaceFileContext* ctx, const string& parentName);
-    LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName);
+    LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, bool isSingleton = false);
+    void setParams(LogosParser::FuncSignatureContext* funcSignature, vector<LgsParam>& params);
     LgsField* getField(LogosParser::FieldContext* ctx, size_t position);
     LgsFuncImpl* getFuncImpl(LogosParser::FuncImplementationContext* ctx);
     LgsMethodImpl* getMethodImpl(LogosParser::FuncImplementationContext* ctx, LgsObject* obj);
@@ -34,6 +35,7 @@ public:
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LgsParam* getParam(LogosParser::ExplicitVarDecContext* ctx);
+    LgsParam* getParam(LogosParser::FuncSignatureContext* ctx);
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
@@ -52,11 +54,11 @@ public:
     vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
     LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LgsArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
-    LgsConstExpr* getConstant(LogosParser::ConstantContext* ctx);
-    LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
-    LgsType* getType(LogosParser::TypeContext* ctx);
-    LgsType* getTypeFromText(const string& typeText);
-    LgsType* getFuncType(LogosParser::FuncImplementationContext* ctx);
+    LgsConstExpr* getConstant(LogosParser::ConstantContext* ctx) const;
+    LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
+    LgsType* getType(LogosParser::TypeContext* ctx) const;
+    LgsType* getTypeFromText(const string& typeText, const antlr4::ParserRuleContext* ctx) const;
+    LgsType* getFuncType(LogosParser::FuncImplementationContext* ctx) const;
     ~AntlerConverter() = default;
 };
 

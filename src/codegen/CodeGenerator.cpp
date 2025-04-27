@@ -1,8 +1,8 @@
 #include "CodeGenerator.h"
-
 #include "Logos.h"
 #include "funcs/LgsFuncImpl.h"
 #include "funcs/LgsMethodImpl.h"
+#include "stmts/LgsVarDec.h"
 #include <LgsMainFile.h>
 #include <ranges>
 #include <llvm/Support/FileSystem.h>
@@ -11,18 +11,16 @@
 #include <llvm/Target/TargetOptions.h>
 #include <llvm/MC/TargetRegistry.h>
 
-std::mutex mtx;
-
 void CodeGenerator::generate(const LgsMainFile* mainFile, const bool writeToFile) {
     initLLVM();
-    create_directories(paths.buildDir);
+    createBuildDir();
     const auto module = createEmptyModule(LOGOS_MAIN_FILE_NAME);
     auto metadata = CodeGenMetadata{.module = module};
 
     for (const auto& func : mainFile->funcs) {
-        func->createIRFunc(&metadata);
+        func->generateIRCode(&metadata);
     }
-    mainFile->mainFunc->createIRFunc(&metadata);
+    mainFile->mainFunc->generateIRCode(&metadata);
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
 
     if (writeToFile) {
@@ -33,15 +31,10 @@ void CodeGenerator::generate(const LgsMainFile* mainFile, const bool writeToFile
 void CodeGenerator::generateObjModule(LgsType* obj, const bool writeToFile) {
     const auto objName = obj->getName();
     if (modules.find(objName) != modules.end()) return;
-    CodeGenMetadata metadata;
-    {
-        lock_guard lock(mtx);
-        metadata.module = createEmptyModule(objName);
-    }
-
+    auto metadata = CodeGenMetadata{.module = createEmptyModule(objName)};
     for (const auto& [_, method] : obj->methods) {
         for (const auto& overload : method) {
-            overload->createIRFunc(&metadata);
+            overload->generateIRCode(&metadata);
         }
     }
 
@@ -68,6 +61,13 @@ void CodeGenerator::initLLVM() {
     string error;
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
+}
+
+void CodeGenerator::createBuildDir() {
+    if (exists(paths.buildDir)) {
+        remove_all(paths.buildDir);
+    }
+    create_directories(paths.buildDir);
 }
 
 void CodeGenerator::writeIRToFile(const Module* module, const path& name){

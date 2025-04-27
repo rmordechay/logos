@@ -11,7 +11,7 @@ using namespace std;
 
 class ThreadPool {
 public:
-    mutex mtx;
+    std::mutex mtx;
     vector<thread> workers;
     queue<function<void()>> tasks;
     std::condition_variable condition;

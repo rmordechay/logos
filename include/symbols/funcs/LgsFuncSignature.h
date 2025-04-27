@@ -17,11 +17,9 @@ public:
     bool isMethod = false;
     bool isStatic = false;
 
-    LgsFuncSignature(const string& name, const string& parentName, LgsType* type, const vector<LgsParam>& params)
-        : name(name), parentName(parentName), type(type), params(params) {
-        if (parentName != "") {
-            isMethod = true;
-        }
+    LgsFuncSignature(const string& name, LgsType* type, const vector<LgsParam>& params): LgsFuncSignature(name, "", type, params) {}
+    LgsFuncSignature(const string& name, const string& parentName, LgsType* type, const vector<LgsParam>& params) : name(name), parentName(parentName), type(type), params(params) {
+        if (parentName != "") isMethod = true;
         setIRName();
     }
 

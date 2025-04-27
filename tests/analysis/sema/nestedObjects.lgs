@@ -1,0 +1,17 @@
+enum MyEnum {
+    ENUM1
+    ENUM2
+}
+
+object Person {
+    address: Address
+}
+
+object Address {
+    street: Str
+}
+
+main() {
+    per = Person(address = Address(street = "tabbert 15"))
+    print(per.address.street)
+}

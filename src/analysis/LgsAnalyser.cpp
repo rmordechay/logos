@@ -45,33 +45,42 @@ void LgsAnalyser::resolveGlobalTypes(const vector<LgsFile*>& files) {
             for (const auto& object : mainFile->objects) {
                 resolveObjMemberTypes(object);
             }
+            for (const auto& func : mainFile->funcs) {
+                resolveFuncTypes(&func->signature);
+            }
         } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             resolveObjMemberTypes(objFile->obj);
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
             for (const auto& signature : interfaceFile->interface->funcSignatures) {
-                signature->type = resolveType(signature->type);
-                for (int i = 0; i < signature->params.size(); ++i) {
-                    signature->params[i].type = resolveType(signature->params[i].type);
-                }
+                resolveFuncTypes(signature);
             }
         }
     }
 }
 
-void LgsAnalyser::resolveObjMemberTypes(LgsObject* const& object) {
-    for (const auto& [_, field] : object->fields) {
-        field->userType = resolveType(field->userType);
+void LgsAnalyser::resolveObjMemberTypes(LgsObject* const& obj) {
+    for (const auto& [_, field] : obj->fields) {
+        field->type = resolveType(field->type);
+        field->parent = obj;
     }
-    for (const auto& [_, method] : object->methods) {
+    for (const auto& [_, method] : obj->methods) {
         for (const auto& overload : method) {
-            overload->signature.type = resolveType(overload->signature.type);
-            for (int i = 0; i < overload->signature.params.size(); ++i) {
-                overload->signature.params[i].type = resolveType(overload->signature.params[i].type);
-            }
+            resolveFuncTypes(&overload->signature);
         }
     }
-    for (int i = 0; i < object->implements.size(); ++i) {
-        object->implements[i] = resolveType(object->implements[i]);
+    for (int i = 0; i < obj->implements.size(); ++i) {
+        obj->implements[i] = resolveType(obj->implements[i]);
+    }
+}
+
+void LgsAnalyser::resolveFuncTypes(LgsFuncSignature* signature) {
+    signature->type = resolveType(signature->type);
+    for (int i = 0; i < signature->params.size(); ++i) {
+        const auto lgsParam = signature->params[i];
+        if (lgsParam.func) {
+            resolveFuncTypes(&lgsParam.func->signature);
+        }
+        signature->params[i].type = resolveType(signature->params[i].type);
     }
 }
 
@@ -90,7 +99,7 @@ string LgsAnalyser::formatMsg(const string& errMsg, const vector<string>& args) 
 void LgsAnalyser::handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args) {
     setUnsuccessful();
     const auto errMsg = formatMsg(lgsErr.msg, args);
-    errors.emplace_back(LgsError{.errCode = lgsErr.errCode, .msg = errMsg});
+    errors.emplace_back(LgsError{.msg = errMsg, .errCode = lgsErr.errCode});
     cout <<  "Error: "  << errMsg << endl;
     if (location) {
         assert(location->lineNumber != 0);

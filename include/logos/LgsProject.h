@@ -28,6 +28,7 @@ public:
     LgsMainFile* mainFile = nullptr;
     const LgsAppFile* appFile = nullptr;
 
+    void asJSON() const;
     bool loadProject();
     void loadFiles();
     void setEnvVars() const;

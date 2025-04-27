@@ -17,13 +17,13 @@ public:
     CAST = 13, LANGLE = 14, RANGLE = 15, COMMA = 16, DOUBLE_DOT = 17, DOT = 18, 
     COLON = 19, EQUAL = 20, MINUS = 21, PLUS = 22, STAR = 23, SLASH = 24, 
     HASH = 25, QUEST_MARK = 26, EXCLA_MARK = 27, PERCENT = 28, DOLLAR = 29, 
-    AMPERSAND = 30, OBJECT = 31, SELF_INSTANCE = 32, SELF_CLASS = 33, INTERFACE = 34, 
-    ENUM = 35, VEC = 36, VEC2 = 37, VEC3 = 38, VEC4 = 39, IMPLEMENTS = 40, 
-    IMPORT = 41, IF = 42, ELSE = 43, FOR = 44, BREAK = 45, CONTINUE = 46, 
-    RETURN = 47, VISIBILITY = 48, CONST = 49, AND = 50, OR = 51, NOT = 52, 
-    IN = 53, INTEGER = 54, FLOAT = 55, BOOL = 56, NULL_ = 57, CONST_NAME = 58, 
-    TYPE = 59, VARIABLE = 60, STRING = 61, LINE_COMMENT = 62, BLOCK_COMMENT = 63, 
-    WS = 64
+    AMPERSAND = 30, OBJECT = 31, SINGLETON = 32, SELF_INSTANCE = 33, SELF_CLASS = 34, 
+    INTERFACE = 35, ENUM = 36, VEC = 37, VEC2 = 38, VEC3 = 39, VEC4 = 40, 
+    IMPLEMENTS = 41, IMPORT = 42, IF = 43, ELSE = 44, FOR = 45, BREAK = 46, 
+    CONTINUE = 47, RETURN = 48, VISIBILITY = 49, CONST = 50, AND = 51, OR = 52, 
+    NOT = 53, IN = 54, INTEGER = 55, FLOAT = 56, BOOL = 57, NULL_ = 58, 
+    CONST_NAME = 59, TYPE = 60, VARIABLE = 61, STRING = 62, LINE_COMMENT = 63, 
+    BLOCK_COMMENT = 64, WS = 65
   };
 
   enum {
@@ -31,17 +31,17 @@ public:
     RuleObjectFile = 4, RuleInterfaceFile = 5, RuleObject = 6, RuleObjectBody = 7, 
     RuleField = 8, RuleObjectDeclaration = 9, RuleInterfaceDeclaration = 10, 
     RuleObjectImplements = 11, RuleFuncSignature = 12, RuleFuncImplementation = 13, 
-    RuleFuncBody = 14, RuleParamList = 15, RuleStatement = 16, RuleStatementsBlock = 17, 
-    RuleAssignment = 18, RuleExplicitVarDec = 19, RuleImplicitVarDec = 20, 
-    RuleIfStatement = 21, RuleElseIfStatement = 22, RuleElseStatement = 23, 
-    RulePatternMatching = 24, RulePattern = 25, RuleLoopStatement = 26, 
-    RuleBreakStmt = 27, RuleReturnStatement = 28, RuleEnumDeclaration = 29, 
-    RuleEnumField = 30, RuleExpr = 31, RuleUnaryExpr = 32, RuleArray = 33, 
-    RuleMap = 34, RuleFuncCall = 35, RuleFuncArgList = 36, RuleFuncArg = 37, 
-    RuleConstructor = 38, RuleConstructorArgList = 39, RuleConstructorArg = 40, 
-    RuleConstant = 41, RuleArrayIndex = 42, RuleSelection = 43, RuleFirstSelectionElement = 44, 
-    RuleInnerSelectionElement = 45, RuleRange = 46, RuleType = 47, RuleVector = 48, 
-    RuleRequireEnvVars = 49
+    RuleFuncBody = 14, RuleParamList = 15, RuleParam = 16, RuleStatement = 17, 
+    RuleStatementsBlock = 18, RuleAssignment = 19, RuleExplicitVarDec = 20, 
+    RuleImplicitVarDec = 21, RuleIfStatement = 22, RuleElseIfStatement = 23, 
+    RuleElseStatement = 24, RulePatternMatching = 25, RulePattern = 26, 
+    RuleLoopStatement = 27, RuleBreakStmt = 28, RuleReturnStatement = 29, 
+    RuleEnumDeclaration = 30, RuleEnumField = 31, RuleExpr = 32, RuleUnaryExpr = 33, 
+    RuleArray = 34, RuleMap = 35, RuleFuncCall = 36, RuleFuncArgList = 37, 
+    RuleFuncArg = 38, RuleConstructor = 39, RuleConstructorArgList = 40, 
+    RuleConstructorArg = 41, RuleConstant = 42, RuleArrayIndex = 43, RuleSelection = 44, 
+    RuleFirstSelectionElement = 45, RuleInnerSelectionElement = 46, RuleRange = 47, 
+    RuleType = 48, RuleVector = 49, RuleRequireEnvVars = 50
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -77,6 +77,7 @@ public:
   class FuncImplementationContext;
   class FuncBodyContext;
   class ParamListContext;
+  class ParamContext;
   class StatementContext;
   class StatementsBlockContext;
   class AssignmentContext;
@@ -208,11 +209,12 @@ public:
   public:
     ObjectContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *OBJECT();
     antlr4::tree::TerminalNode *TYPE();
     antlr4::tree::TerminalNode *LBRACE();
     ObjectBodyContext *objectBody();
     antlr4::tree::TerminalNode *RBRACE();
+    antlr4::tree::TerminalNode *OBJECT();
+    antlr4::tree::TerminalNode *SINGLETON();
 
    
   };
@@ -255,9 +257,10 @@ public:
   public:
     ObjectDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *OBJECT();
     antlr4::tree::TerminalNode *COLON();
     antlr4::tree::TerminalNode *TYPE();
+    antlr4::tree::TerminalNode *OBJECT();
+    antlr4::tree::TerminalNode *SINGLETON();
 
    
   };
@@ -336,8 +339,8 @@ public:
   public:
     ParamListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<ExplicitVarDecContext *> explicitVarDec();
-    ExplicitVarDecContext* explicitVarDec(size_t i);
+    std::vector<ParamContext *> param();
+    ParamContext* param(size_t i);
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
@@ -345,6 +348,18 @@ public:
   };
 
   ParamListContext* paramList();
+
+  class  ParamContext : public antlr4::ParserRuleContext {
+  public:
+    ParamContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    ExplicitVarDecContext *explicitVarDec();
+    FuncSignatureContext *funcSignature();
+
+   
+  };
+
+  ParamContext* param();
 
   class  StatementContext : public antlr4::ParserRuleContext {
   public:

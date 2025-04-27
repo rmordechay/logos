@@ -7,8 +7,8 @@ using namespace std;
 inline string WARNING_PLACEHOLDER = "%s";
 
 struct LgsWarning {
-    int warningCode;
     string msg;
+    int warningCode;
 };
 
 /** Templates warnings. Should not be returned directly, but formatted and returned as a new LgsWarning */

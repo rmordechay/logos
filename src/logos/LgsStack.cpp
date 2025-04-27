@@ -1,10 +1,6 @@
 #include "LgsStack.h"
-
 #include "LgsGlobals.h"
-#include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
-
-#include <llvm/Support/CommandLine.h>
 
 void LgsStack::enterScope(LgsFunc* func) {
     if (func) {
