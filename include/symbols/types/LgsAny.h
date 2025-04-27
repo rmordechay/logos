@@ -1,0 +1,19 @@
+#ifndef LGSANY_H
+#define LGSANY_H
+#include "LgsType.h"
+
+class LgsAny final : public LgsType {
+public:
+    string name;
+
+    explicit LgsAny(const string& name) : name(name) {}
+    size_t size() override;
+    Type* getIRType() override;
+    LgsExpr* getZeroValue() override;
+    const string getName() const override;
+    bool equals(LgsType* other) const override;
+    LgsType* inferBinaryType(LgsType* other) override;
+    ~LgsAny() override = default;
+};
+
+#endif //LGSANY_H

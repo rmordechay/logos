@@ -1,8 +1,6 @@
 enable_testing()
 
-add_executable(lgs_tests
-    main.cpp
-)
+add_executable(lgs_tests main.cpp)
 
 target_include_directories(lgs_tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../external/include

@@ -105,6 +105,7 @@ add_library(lib STATIC
     include/symbols/types/LgsObject.h
     include/symbols/types/LgsInterface.h
     include/symbols/types/LgsArrayType.h
+    include/symbols/types/LgsAny.h
 
     # src
     src/logos/Logos.cpp
@@ -119,7 +120,9 @@ add_library(lib STATIC
     src/codegen/LgsLinker.cpp
     src/parser/LogosLexer.cpp
     src/parser/LogosParser.cpp
+    src/analysis/LgsAnalyser.cpp
     src/analysis/AntlrConverter.cpp
+    src/analysis/LgsProjectAnalyser.cpp
     src/analysis/SemaAnalyser.cpp
     src/logos/LgsProject.cpp
 
@@ -148,6 +151,7 @@ add_library(lib STATIC
     src/symbols/loops/LgsLoop.cpp
     src/symbols/loops/LgsForeachLoop.cpp
     src/symbols/loops/LgsRangeLoop.cpp
+    src/symbols/stmts/LgsStmt.cpp
     src/symbols/stmts/LgsField.cpp
     src/symbols/stmts/LgsAssignment.cpp
     src/symbols/stmts/LgsIfStmt.cpp
@@ -167,10 +171,8 @@ add_library(lib STATIC
     src/symbols/types/LgsType.cpp
     src/symbols/types/LgsArrayType.cpp
     src/symbols/types/LgsInterface.cpp
+    src/symbols/types/LgsAny.cpp
     src/symbols/types/LgsObject.cpp
-    src/analysis/LgsAnalyser.cpp
-    src/analysis/LgsProjectAnalyser.cpp
-    src/symbols/stmts/LgsStmt.cpp
 )
 
 add_executable(lgs main.cpp)
