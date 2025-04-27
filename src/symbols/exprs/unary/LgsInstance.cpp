@@ -11,8 +11,12 @@ string LgsInstance::getName() {
 
 Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
     const auto parentType = obj->getIRType();
-    if (isSelf) {
-        const auto currentFunc = metadata->lgsStack.currentFunc->getIRFunc(metadata);
+    const auto currentFunc = metadata->lgsStack.currentFunc->getIRFunc(metadata);
+    if (isSelf && isReturnValue) {
+        IRValue = currentFunc->arg_begin();
+    } else if (isSelf) {
+        IRValue = currentFunc->arg_begin();
+    } else if (isReturnValue) {
         IRValue = currentFunc->arg_begin();
     } else {
         IRValue = metadata->builder.CreateAlloca(parentType, nullptr, getName() + "_ptr");

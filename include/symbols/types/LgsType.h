@@ -28,6 +28,7 @@ public:
     vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
     virtual bool equals(const LgsType& other);
     void setLocation(const antlr4::Token* ctx);
+    LgsObject* asObject();
     virtual size_t size() = 0;
     virtual Type* getIRType() = 0;
     virtual LgsExpr* getZeroValue() = 0;

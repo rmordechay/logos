@@ -2,6 +2,7 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
+#include "types/LgsObject.h"
 
 bool LgsType::equals(const LgsType& other) {
     return getName() == other.getName();
@@ -10,6 +11,10 @@ bool LgsType::equals(const LgsType& other) {
 void LgsType::setLocation(const antlr4::Token* ctx) {
     location.lineNumber = ctx->getLine();
     location.posInLine = ctx->getCharPositionInLine() + 1;
+}
+
+LgsObject* LgsType::asObject() {
+    return dynamic_cast<LgsObject*>(this);
 }
 
 json LgsType::asJSON() const {

@@ -11,17 +11,16 @@
 #include <llvm/Target/TargetOptions.h>
 #include <llvm/MC/TargetRegistry.h>
 
-
 void CodeGenerator::generate(const LgsMainFile* mainFile, const bool writeToFile) {
     initLLVM();
-    create_directories(paths.buildDir);
+    createBuildDir();
     const auto module = createEmptyModule(LOGOS_MAIN_FILE_NAME);
     auto metadata = CodeGenMetadata{.module = module};
 
     for (const auto& func : mainFile->funcs) {
-        func->generateIRFunc(&metadata);
+        func->generateIRCode(&metadata);
     }
-    mainFile->mainFunc->generateIRFunc(&metadata);
+    mainFile->mainFunc->generateIRCode(&metadata);
     metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
 
     if (writeToFile) {
@@ -35,7 +34,7 @@ void CodeGenerator::generateObjModule(LgsType* obj, const bool writeToFile) {
     auto metadata = CodeGenMetadata{.module = createEmptyModule(objName)};
     for (const auto& [_, method] : obj->methods) {
         for (const auto& overload : method) {
-            overload->generateIRFunc(&metadata);
+            overload->generateIRCode(&metadata);
         }
     }
 
@@ -62,6 +61,13 @@ void CodeGenerator::initLLVM() {
     string error;
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
+}
+
+void CodeGenerator::createBuildDir() {
+    if (exists(paths.buildDir)) {
+        remove_all(paths.buildDir);
+    }
+    create_directories(paths.buildDir);
 }
 
 void CodeGenerator::writeIRToFile(const Module* module, const path& name){

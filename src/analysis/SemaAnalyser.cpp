@@ -139,6 +139,7 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     if (varDec->expr) {
+        visitExpr(varDec->expr);
         varDec->expr->type = resolveType(varDec->expr->type);
         varDec->type = varDec->expr->type;
         if (!validateExprType(varDec->expr, varDec->type)) return;
@@ -146,6 +147,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
         varDec->type = resolveType(varDec->type);
         varDec->expr = varDec->type->getZeroValue();
     }
+    assert(varDec->type);
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
 }
 
@@ -307,6 +309,7 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     default:
         assert(false);
     }
+    assert(variable->type);
     variable->ref = symbol->clone();
 }
 
@@ -327,6 +330,7 @@ void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
     } else {
         assert(false && "first selection case not implemented");
     }
+    assert(firstExpr->type);
 }
 
 void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
@@ -336,15 +340,14 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
         const auto nextExpr = exprs[i + 1];
         auto nextExprName = nextExpr->getName();
         if (const auto var = dynamic_cast<LgsVariable*>(nextExpr)) {
-            const auto type = currentExpr->type;
-            assert(type);
-            const auto field = type->getField(var->name);
-            if (!field) {
-                handleError(E10005, &var->location, {var->getName(), type->getName()});
+            const auto currentExprType = currentExpr->type;
+            const auto currentExprField = currentExprType->getField(var->name);
+            if (!currentExprField) {
+                handleError(E10005, &var->location, {var->getName(), currentExprType->getName()});
                 break;
             }
-            setExprType(var, field->type);
-            var->ref = new LgsSymbol(field->clone());
+            setExprType(var, currentExprField->type);
+            var->ref = new LgsSymbol(currentExprField->clone());
         } else if (const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr)) {
             methodCall->parentName = currentExpr->type->getName();
             visitMethodCall(methodCall, currentExpr->type);
@@ -424,7 +427,9 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
 }
 
 void SemaAnalyser::setExprType(LgsExpr* expr, LgsType* type) {
+    assert(type);
     expr->type = resolveType(type);
+    assert(expr->type);
 }
 
 bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
