@@ -10,6 +10,7 @@ class LgsObject : public LgsType {
 public:
     string name;
     Type* IRType = nullptr;
+    bool isSingleton = false;
     vector<LgsType*> implements;
 
     explicit LgsObject(const string& typeName) : name(typeName) {}

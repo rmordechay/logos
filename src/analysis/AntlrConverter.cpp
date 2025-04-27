@@ -62,7 +62,7 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, con
     }
 
     for (const auto& object : ctx->object()) {
-        auto obj = getObject(object->objectBody(), object->TYPE()->getText());
+        auto obj = getObject(object->objectBody(), object->TYPE()->getText(), !!object->SINGLETON());
         mainFile->objects.emplace_back(obj);
     }
 
@@ -95,7 +95,7 @@ LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx, c
 LgsObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath) {
     const auto objName = ctx->objectDeclaration()->TYPE()->getText();
     const auto objFile = new LgsObjectFile(objName, filePath);
-    objFile->obj = getObject(ctx->objectBody(), objName);
+    objFile->obj = getObject(ctx->objectBody(), objName, !!ctx->objectDeclaration()->SINGLETON());
     return objFile;
 }
 
@@ -129,8 +129,9 @@ LgsAppFile* AntlerConverter::getAppFile(LogosParser::LogosAppFileContext* ctx, c
     return appFile;
 }
 
-LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName) {
+LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, bool isSingleton) {
     const auto obj = new LgsObject(objName);
+    obj->isSingleton = isSingleton;
     for (int i = 0; i < ctx->field().size(); ++i) {
         const auto field = ctx->field()[i];
         const auto lgsField = getField(field, i);
@@ -520,6 +521,7 @@ LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) 
     const auto type = getTypeFromText(ctx->TYPE()->getText(), ctx);
     type->setLocation(ctx->start);
     const auto instance = new LgsInstance(type);
+    instance->setLocation(ctx->start);
     const auto args = ctx->constructorArgList();
     if (!args) return instance;
     for (const auto& arg : args->constructorArg()) {
@@ -528,7 +530,6 @@ LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) 
         varDec->setLocation(arg->start);
         instance->args.emplace_back(varDec);
     }
-    instance->setLocation(ctx->start);
     return instance;
 }
 

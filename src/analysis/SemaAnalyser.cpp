@@ -360,6 +360,9 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     if (symbol->type != OBJECT) {
         return handleError(E10022, &instance->location, {instance->type->getName()});
     }
+    if (symbol->object->isSingleton) {
+        return handleError(E10031, &instance->location, {instance->type->getName()});
+    }
 
     const auto obj = symbol->object->clone();
     for (const auto& arg : instance->args) {
@@ -472,7 +475,7 @@ bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
             handleError(E10024, &expr->location);
             return false;
         }
-        // userType must be nullable
+        // type must be nullable
         if (!type->nullable) {
             handleError(E10023, &type->location, {type->getName(), type->getName()});
             return false;
@@ -481,7 +484,7 @@ bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
         return true;
     }
     if (type) {
-        // User and expr type don't match
+        // types don't match
         if (!expr->type->equals(type)) {
             handleError(E10001, &expr->location, {expr->type->getName(), type->getName()});
             return false;

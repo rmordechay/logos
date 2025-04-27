@@ -25,7 +25,7 @@ interfaceFile:
     ;
 
 object:
-        OBJECT TYPE LBRACE objectBody RBRACE
+        (OBJECT | SINGLETON) TYPE LBRACE objectBody RBRACE
     ;
 
 objectBody:
@@ -37,7 +37,7 @@ field:
     ;
 
 objectDeclaration:
-        OBJECT COLON TYPE
+        (OBJECT | SINGLETON) COLON TYPE
     ;
 
 interfaceDeclaration:
@@ -277,6 +277,7 @@ DOLLAR: '$';
 AMPERSAND: '&';
 
 OBJECT: 'object';
+SINGLETON: 'singleton';
 SELF_INSTANCE: 'self';
 SELF_CLASS: 'Self';
 INTERFACE: 'interface';
