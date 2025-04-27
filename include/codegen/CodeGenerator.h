@@ -19,6 +19,7 @@ public:
     static void generateObjModule(LgsType* obj, bool writeToFile = true);
     static Module* createEmptyModule(const std::string& objName);
     static void writeIRToFile(const Module* module, const path& name);
+    static void createBuildDir();
     static void initLLVM();
     ~CodeGenerator() = default;
 };

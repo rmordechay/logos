@@ -20,7 +20,7 @@ public:
     explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam>& params, const string& parentName = "")
         : signature(LgsFuncSignature(name, parentName, funcType, params)) {}
 
-    void generateIRFunc(CodeGenMetadata* metadata);
+    void generateIRCode(CodeGenMetadata* metadata);
     Function* getIRFunc(const CodeGenMetadata* metadata);
     virtual vector<Type*> getIRParamTypes(const CodeGenMetadata* metadata) = 0;
     virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {});

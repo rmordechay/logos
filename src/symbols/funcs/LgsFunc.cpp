@@ -2,16 +2,12 @@
 #include "LgsData.h"
 #include "exprs/LgsExpr.h"
 #include "funcs/LgsParam.h"
+#include "types/LgsObject.h"
 #include "types/LgsVoid.h"
 
-void LgsFunc::generateIRFunc(CodeGenMetadata* metadata) {
+void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);
-    const auto IRFunc = getIRFunc(metadata);
-    auto args = IRFunc->arg_begin();
-    for (auto& param : signature.params) {
-        param.setIRValue(args);
-        args++->setName(param.name);
-    }
+    getIRFunc(metadata);
     startBlock(metadata, entryBlock);
     stmtBlock->createIRValue(metadata);
     if (signature.type->getName() == LgsVoid::name) {
@@ -22,15 +18,40 @@ void LgsFunc::generateIRFunc(CodeGenMetadata* metadata) {
 
 Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
     if (!IRFuncType) {
-        IRFuncType = FunctionType::get(signature.type->getIRType(), getIRParamTypes(metadata), false);
+        auto params = getIRParamTypes(metadata);
+        if (const auto obj = signature.type->asObject()) {
+            params.insert(params.begin(), obj->getIRType()->getPointerTo());
+            IRFuncType = FunctionType::get(voidTy, params, false);
+        } else {
+            IRFuncType = FunctionType::get(signature.type->getIRType(), params, false);
+        }
     }
     auto func = metadata->module->getOrInsertFunction(signature.IRName, IRFuncType);
-    return dyn_cast<Function>(func.getCallee());
+    const auto IRFunc = dyn_cast<Function>(func.getCallee());
+    auto args = IRFunc->arg_begin();
+    AttrBuilder builder(context);
+    if (const auto obj = signature.type->asObject()) {
+        builder.addStructRetAttr(obj->getIRType());
+        args->addAttrs(builder);
+        args->setName("rt");
+        args++;
+    }
+    for (auto& param : signature.params) {
+        param.setIRValue(args);
+        args->setName(param.name);
+        args++;
+    }
+    return IRFunc;
 }
 
 Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     const auto IRFunc = getIRFunc(metadata);
     vector<Value*> argValues;
+    Value* objPtr = nullptr;
+    if (const auto obj = signature.type->asObject()) {
+        objPtr = metadata->builder.CreateAlloca(obj->getIRType(), nullptr, obj->name + "_ptr");;
+        argValues.push_back(objPtr);
+    }
     // Without default params
     if (signature.params.size() == args.size()) {
         for (int i = signature.isStatic; i < args.size(); ++i) {
@@ -52,26 +73,30 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
             argValues.emplace_back(argValue);
         }
     }
-    return metadata->builder.CreateCall(IRFunc, argValues);;
+    const auto funcCall = metadata->builder.CreateCall(IRFunc, argValues);
+    if (objPtr) {
+        return objPtr;
+    }
+    return funcCall;
 }
 
 
 string LgsFunc::format(string& indentStr) {
-    stringstream ss;
-    ss << signature.name << "(";
+    stringstream str;
+    str << signature.name << "(";
     for (int i = 0; i < signature.params.size(); ++i) {
         auto param = signature.params[i];
-        ss << param.format(indentStr);
+        str << param.format(indentStr);
         if (i != signature.params.size() - 1) {
-            ss << ", ";
+            str << ", ";
         }
     }
-    ss << ")";
+    str << ")";
     if (signature.name != LOGOS_MAIN_FUNC) {
-        ss << signature.type->getName();
+        str << signature.type->getName();
     }
-    ss << stmtBlock->format(indentStr);
-    return ss.str();
+    str << stmtBlock->format(indentStr);
+    return str.str();
 }
 
 json LgsFunc::asJSON() {
