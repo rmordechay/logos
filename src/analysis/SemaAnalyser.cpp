@@ -337,10 +337,10 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
         auto nextExprName = nextExpr->getName();
         if (const auto var = dynamic_cast<LgsVariable*>(nextExpr)) {
             const auto type = currentExpr->type;
-            const auto field = type ? type->getField(var->name) : nullptr;
-            if (!type || !field) {
-                const auto name = type ? type->getName() : "Unknown";
-                handleError(E10005, &var->location, {var->getName(), name});
+            assert(type);
+            const auto field = type->getField(var->name);
+            if (!field) {
+                handleError(E10005, &var->location, {var->getName(), type->getName()});
                 break;
             }
             setExprType(var, field->type);
