@@ -3,7 +3,7 @@
 #include "exprs/unary/LgsInstance.h"
 
 Value* LgsReturn::createIRValue(CodeGenMetadata* metadata) {
-    if (expr->asInstance()) {
+    if (expr->type->asObject()) {
         expr->isReturnValue = true;
         expr->getIRValue(metadata);
         return metadata->builder.CreateRetVoid();
