@@ -45,7 +45,8 @@ inline LgsError E10027{.msg = "Function '%s' must return '%s'. Given: '%s'.", .e
 inline LgsError E10028{.msg = "Default parameters must be defined lastly.", .errCode = ++errCodeStart};
 inline LgsError E10029{.msg = "const field '%s' must be initialized in the constructor.", .errCode = ++errCodeStart};
 inline LgsError E10030{.msg = "Non-public field '%s' is used outside its parent object '%s'.", .errCode = ++errCodeStart};
-inline LgsError E10031{.msg = "Singleton object '%s' cannot be instantiated.", .errCode = ++errCodeStart};
+inline LgsError E10031{.msg = "Non-public method '%s' is used outside its parent object '%s'.", .errCode = ++errCodeStart};
+inline LgsError E10032{.msg = "Singleton object '%s' cannot be instantiated.", .errCode = ++errCodeStart};
 
 
 #endif //LOGOSERRORS_H

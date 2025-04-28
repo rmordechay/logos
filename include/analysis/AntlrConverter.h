@@ -28,7 +28,7 @@ public:
     void setParams(LogosParser::FuncSignatureContext* funcSignature, vector<LgsParam>& params);
     LgsField* getField(LogosParser::FieldContext* ctx, size_t position);
     LgsFuncImpl* getFuncImpl(LogosParser::FuncImplementationContext* ctx);
-    LgsMethodImpl* getMethodImpl(LogosParser::FuncImplementationContext* ctx, LgsObject* obj);
+    LgsMethodImpl* getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     LgsStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
@@ -58,7 +58,7 @@ public:
     LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx) const;
     LgsType* getTypeFromText(const string& typeText, const antlr4::ParserRuleContext* ctx) const;
-    LgsType* getFuncType(LogosParser::FuncImplementationContext* ctx) const;
+    LgsType* getFuncType(LogosParser::FuncSignatureContext* ctx) const;
     ~AntlerConverter() = default;
 };
 

@@ -137,7 +137,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
         const auto lgsField = getField(field, i);
         obj->fields[lgsField->name] = lgsField;
     }
-    for (const auto& func : ctx->funcImplementation()) {
+    for (const auto& func : ctx->methodImplementation()) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         const auto method = getMethodImpl(func, obj);
         obj->methods[funcName] = {method};
@@ -167,7 +167,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceFileContext* c
 }
 
 LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext* ctx) {
-    const auto rt = getFuncType(ctx);
+    const auto rt = getFuncType(ctx->funcSignature());
     const auto funcSignature = ctx->funcSignature();
     const auto name = funcSignature->VARIABLE()->getText();
     vector<LgsParam> params;
@@ -179,14 +179,18 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext
     return func;
 }
 
-LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationContext* ctx, LgsObject* obj) {
-    const auto rt = getFuncType(ctx);
+LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj) {
+    const auto rt = getFuncType(ctx->funcSignature());
     const auto funcSignature = ctx->funcSignature();
     const auto name = funcSignature->VARIABLE()->getText();
     const auto self = LgsParam(LOGOS_SELF, obj, new LgsInstance(obj));
     vector params = {self};
     setParams(funcSignature, params);
     const auto method = new LgsMethodImpl(name, rt, obj->name, params);
+    method->filePath = obj->filePath;
+    if (ctx->VISIBILITY()) {
+        method->isPublic = true;
+    }
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     method->setLocation(ctx->start);
     return method;
@@ -628,9 +632,9 @@ LgsType* AntlerConverter::getTypeFromText(const string& typeText, const antlr4::
     return new LgsUnknownType(typeText);
 }
 
-LgsType* AntlerConverter::getFuncType(LogosParser::FuncImplementationContext* ctx) const {
-    if (ctx->funcSignature()->type()) {
-        return getType(ctx->funcSignature()->type());
+LgsType* AntlerConverter::getFuncType(LogosParser::FuncSignatureContext* ctx) const {
+    if (ctx->type()) {
+        return getType(ctx->type());
     }
     return new LgsVoid();
 }

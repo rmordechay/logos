@@ -29,7 +29,7 @@ object:
     ;
 
 objectBody:
-        objectImplements? field* funcImplementation*
+        objectImplements? field* methodImplementation*
     ;
 
 field:
@@ -54,6 +54,10 @@ funcSignature:
 
 funcImplementation:
         funcSignature funcBody
+    ;
+
+methodImplementation:
+        VISIBILITY? funcSignature funcBody
     ;
 
 funcBody:

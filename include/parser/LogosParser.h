@@ -31,17 +31,17 @@ public:
     RuleObjectFile = 4, RuleInterfaceFile = 5, RuleObject = 6, RuleObjectBody = 7, 
     RuleField = 8, RuleObjectDeclaration = 9, RuleInterfaceDeclaration = 10, 
     RuleObjectImplements = 11, RuleFuncSignature = 12, RuleFuncImplementation = 13, 
-    RuleFuncBody = 14, RuleParamList = 15, RuleParam = 16, RuleStatement = 17, 
-    RuleStatementsBlock = 18, RuleAssignment = 19, RuleExplicitVarDec = 20, 
-    RuleImplicitVarDec = 21, RuleIfStatement = 22, RuleElseIfStatement = 23, 
-    RuleElseStatement = 24, RulePatternMatching = 25, RulePattern = 26, 
-    RuleLoopStatement = 27, RuleBreakStmt = 28, RuleReturnStatement = 29, 
-    RuleEnumDeclaration = 30, RuleEnumField = 31, RuleExpr = 32, RuleUnaryExpr = 33, 
-    RuleArray = 34, RuleMap = 35, RuleFuncCall = 36, RuleFuncArgList = 37, 
-    RuleFuncArg = 38, RuleConstructor = 39, RuleConstructorArgList = 40, 
-    RuleConstructorArg = 41, RuleConstant = 42, RuleArrayIndex = 43, RuleSelection = 44, 
-    RuleFirstSelectionElement = 45, RuleInnerSelectionElement = 46, RuleRange = 47, 
-    RuleType = 48, RuleVector = 49, RuleRequireEnvVars = 50
+    RuleMethodImplementation = 14, RuleFuncBody = 15, RuleParamList = 16, 
+    RuleParam = 17, RuleStatement = 18, RuleStatementsBlock = 19, RuleAssignment = 20, 
+    RuleExplicitVarDec = 21, RuleImplicitVarDec = 22, RuleIfStatement = 23, 
+    RuleElseIfStatement = 24, RuleElseStatement = 25, RulePatternMatching = 26, 
+    RulePattern = 27, RuleLoopStatement = 28, RuleBreakStmt = 29, RuleReturnStatement = 30, 
+    RuleEnumDeclaration = 31, RuleEnumField = 32, RuleExpr = 33, RuleUnaryExpr = 34, 
+    RuleArray = 35, RuleMap = 36, RuleFuncCall = 37, RuleFuncArgList = 38, 
+    RuleFuncArg = 39, RuleConstructor = 40, RuleConstructorArgList = 41, 
+    RuleConstructorArg = 42, RuleConstant = 43, RuleArrayIndex = 44, RuleSelection = 45, 
+    RuleFirstSelectionElement = 46, RuleInnerSelectionElement = 47, RuleRange = 48, 
+    RuleType = 49, RuleVector = 50, RuleRequireEnvVars = 51
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -75,6 +75,7 @@ public:
   class ObjectImplementsContext;
   class FuncSignatureContext;
   class FuncImplementationContext;
+  class MethodImplementationContext;
   class FuncBodyContext;
   class ParamListContext;
   class ParamContext;
@@ -228,8 +229,8 @@ public:
     ObjectImplementsContext *objectImplements();
     std::vector<FieldContext *> field();
     FieldContext* field(size_t i);
-    std::vector<FuncImplementationContext *> funcImplementation();
-    FuncImplementationContext* funcImplementation(size_t i);
+    std::vector<MethodImplementationContext *> methodImplementation();
+    MethodImplementationContext* methodImplementation(size_t i);
 
    
   };
@@ -323,6 +324,19 @@ public:
   };
 
   FuncImplementationContext* funcImplementation();
+
+  class  MethodImplementationContext : public antlr4::ParserRuleContext {
+  public:
+    MethodImplementationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    FuncSignatureContext *funcSignature();
+    FuncBodyContext *funcBody();
+    antlr4::tree::TerminalNode *VISIBILITY();
+
+   
+  };
+
+  MethodImplementationContext* methodImplementation();
 
   class  FuncBodyContext : public antlr4::ParserRuleContext {
   public:

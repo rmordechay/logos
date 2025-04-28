@@ -5,6 +5,8 @@
 
 class LgsMethodImpl : public LgsFunc {
 public:
+    bool isPublic = false;
+    string filePath;
 
     LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam>& params = {}) : LgsFunc(name, funcType, params, parentName) {}
     vector<Type*> getIRParamTypes(const CodeGenMetadata* metadata) override;
