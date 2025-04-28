@@ -1,6 +1,7 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
 #include "LgsAnalyser.h"
+#include "LgsInterfaceFile.h"
 #include "LgsStack.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
@@ -32,12 +33,15 @@ public:
     explicit SemaAnalyser(LgsFile* file) : file(file) {
         filePath = file->absPath;
     }
+
     void analyse();
     void visitMainFile(const LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
+    void visitInterface(LgsInterface* interface);
     void visitObjectInterfaces(LgsObject* obj);
     void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
+    void visitFuncSignature(LgsFuncSignature* funcSignature);
     void validateFuncControlFlow(const LgsFunc* func);
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
@@ -71,10 +75,9 @@ public:
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
-    bool resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
-    bool resolveMethodCall(const LgsType* type, LgsFuncCall* methodCall);
-    bool checkDefaultParams(const LgsFuncCall* funcCall, const vector<LgsParam>& overloadParams) const;
+    LgsFunc* resolveFuncCallWithoutDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const;
+    LgsFunc* resolveFuncCallWithDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const;
     bool validateExprType(LgsExpr* expr, LgsType* type);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);

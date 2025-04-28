@@ -190,7 +190,6 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::FuncImplementationCon
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     method->setLocation(ctx->start);
     return method;
-
 }
 
 void AntlerConverter::setParams(LogosParser::FuncSignatureContext* funcSignature, vector<LgsParam>& params) {
@@ -200,7 +199,7 @@ void AntlerConverter::setParams(LogosParser::FuncSignatureContext* funcSignature
             const auto lgsParam = getParam(varDec);
             params.emplace_back(*lgsParam);
         } else if (const auto func = param->funcSignature()) {
-            const auto lgsParam = getParam(func);
+            const auto lgsParam = getParamFunc(func);
             params.emplace_back(*lgsParam);
         }
     }
@@ -295,7 +294,7 @@ LgsParam* AntlerConverter::getParam(LogosParser::ExplicitVarDecContext* ctx) {
     return param;
 }
 
-LgsParam* AntlerConverter::getParam(LogosParser::FuncSignatureContext* ctx) {
+LgsParam* AntlerConverter::getParamFunc(LogosParser::FuncSignatureContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto type = getType(ctx->type());
     vector<LgsParam> params;

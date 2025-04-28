@@ -3,6 +3,7 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsConstExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "types/LgsChar.h"
 
 const string LgsStr::getName() const {
     return name;
@@ -26,5 +27,6 @@ LgsType* LgsStr::inferBinaryType(LgsType* other) {
 }
 
 bool LgsStr::equals(LgsType* other) const {
+    if (dynamic_cast<LgsChar*>(other)) return true;
     return name == other->getName();
 }

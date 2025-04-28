@@ -35,7 +35,7 @@ public:
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LgsParam* getParam(LogosParser::ExplicitVarDecContext* ctx);
-    LgsParam* getParam(LogosParser::FuncSignatureContext* ctx);
+    LgsParam* getParamFunc(LogosParser::FuncSignatureContext* ctx);
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
