@@ -9,11 +9,12 @@ class LgsField;
 class LgsObject : public LgsType {
 public:
     string name;
+    string fileName;
     Type* IRType = nullptr;
     bool isSingleton = false;
     vector<LgsType*> implements;
 
-    explicit LgsObject(const string& typeName) : name(typeName) {}
+    explicit LgsObject(const string& name, const string& fileName = "") : name(name), fileName(fileName) {}
     const string getName() const override;
     size_t size() override;
     Type* getIRType() override;

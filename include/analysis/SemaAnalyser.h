@@ -1,7 +1,6 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
 #include "LgsAnalyser.h"
-#include "LgsInterfaceFile.h"
 #include "LgsStack.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
@@ -64,9 +63,10 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
     void visitFuncCall(LgsFuncCall* funcCall);
-    void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parent);
+    void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
+    void visitFieldCall(const LgsExpr* parentExpr, LgsVariable* childField);
     void visitFirstSelection(LgsExpr* firstExpr);
     void visitInstance(LgsInstance* instance);
     void visitArrayIndex(LgsArrayIndex* arrayIndex);

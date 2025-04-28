@@ -62,7 +62,7 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, con
     }
 
     for (const auto& object : ctx->object()) {
-        auto obj = getObject(object->objectBody(), object->TYPE()->getText(), !!object->SINGLETON());
+        auto obj = getObject(object->objectBody(), object->TYPE()->getText(), filePath, !!object->SINGLETON());
         mainFile->objects.emplace_back(obj);
     }
 
@@ -95,7 +95,7 @@ LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx, c
 LgsObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath) {
     const auto objName = ctx->objectDeclaration()->TYPE()->getText();
     const auto objFile = new LgsObjectFile(objName, filePath);
-    objFile->obj = getObject(ctx->objectBody(), objName, !!ctx->objectDeclaration()->SINGLETON());
+    objFile->obj = getObject(ctx->objectBody(), objName, filePath, !!ctx->objectDeclaration()->SINGLETON());
     return objFile;
 }
 
@@ -129,8 +129,8 @@ LgsAppFile* AntlerConverter::getAppFile(LogosParser::LogosAppFileContext* ctx, c
     return appFile;
 }
 
-LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, bool isSingleton) {
-    const auto obj = new LgsObject(objName);
+LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const string& filePath, const bool isSingleton) {
+    const auto obj = new LgsObject(objName, filePath);
     obj->isSingleton = isSingleton;
     for (int i = 0; i < ctx->field().size(); ++i) {
         const auto field = ctx->field()[i];

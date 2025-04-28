@@ -349,26 +349,31 @@ void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
     assert(firstExpr->type);
 }
 
+
 void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
     const auto exprs = selection->exprs;
     for (int i = 0; i < exprs.size() - 1; ++i) {
-        const auto currentExpr = exprs[i];
-        const auto nextExpr = exprs[i + 1];
-        auto nextExprName = nextExpr->getName();
-        if (const auto var = dynamic_cast<LgsVariable*>(nextExpr)) {
-            const auto currentExprType = currentExpr->type;
-            const auto currentExprField = currentExprType->getField(var->name);
-            if (!currentExprField) {
-                handleError(E10005, &var->location, {var->getName(), currentExprType->getName()});
-                break;
-            }
-            setExprType(var, currentExprField->type);
-            var->ref = new LgsSymbol(currentExprField->clone());
-        } else if (const auto methodCall = dynamic_cast<LgsFuncCall*>(nextExpr)) {
-            methodCall->parentName = currentExpr->type->getName();
-            visitMethodCall(methodCall, currentExpr->type);
+        const auto parentExpr = exprs[i];
+        const auto childExpr = exprs[i + 1];
+        if (const auto var = dynamic_cast<LgsVariable*>(childExpr)) {
+            visitFieldCall(parentExpr, var);
+        } else if (const auto methodCall = dynamic_cast<LgsFuncCall*>(childExpr)) {
+            visitMethodCall(methodCall, parentExpr->type);
         }
     }
+}
+
+void SemaAnalyser::visitFieldCall(const LgsExpr* parentExpr, LgsVariable* childField) {
+    const auto parentType = parentExpr->type;
+    const auto field = parentType->getField(childField->name);
+    if (!field) {
+        return handleError(E10005, &childField->location, {childField->getName(), parentType->getName()});
+    }
+    if (!field->isPublic && file->name != field->parent->fileName) {
+        return handleError(E10030, &childField->location, {childField->getName(), field->parent->name});
+    }
+    setExprType(childField, field->type);
+    childField->ref = new LgsSymbol(field->clone());
 }
 
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
@@ -431,25 +436,24 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     auto funcCallName = funcCall->name;
     const auto symbol = lgsStack.getSymbol(funcCallName);
     if (!symbol) {
-        handleError(E10006, &funcCall->location, {funcCallName});
-        return;
+        return handleError(E10006, &funcCall->location, {funcCallName});
     }
     if (symbol->type == PARAM && !resolveFuncCall({symbol->param->func}, funcCall)) return;
     if (symbol->type == FUNC && !resolveFuncCall(symbol->func, funcCall)) return;
     setExprType(funcCall, funcCall->func->signature.type);
 }
 
-void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* parent) {
+void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {
+    methodCall->parentName = parentType->getName();
     vector<string> argTypeNames;
     for (const auto& arg : methodCall->args) {
         visitExpr(arg);
         argTypeNames.emplace_back(arg->type->getName());
     }
     auto name = methodCall->name;
-    const auto overloads = parent->getMethodsOverloads(name);
+    const auto overloads = parentType->getMethodsOverloads(name);
     if (overloads.empty()) {
-        handleError(E10013, &methodCall->location, {name});
-        return;
+        return handleError(E10013, &methodCall->location, {name});
     }
     vector<LgsFunc*> castedOverloads;
     for (const auto& overload : overloads) {
