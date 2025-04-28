@@ -12,6 +12,11 @@ public:
     uint32_t hashValue(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* neIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* gtIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* ltIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* geIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* leIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     json asJSON() override;
     ~LgsVariable() override = default;
 };

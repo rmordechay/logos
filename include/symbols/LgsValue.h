@@ -20,10 +20,10 @@ public:
     BasicBlock* createBasicBlock(const char* name) const;
     void startBlock(CodeGenMetadata* metadata, BasicBlock* block) const;
     Value* createIRStr(Module* module, const std::string& value) const;
+    Value* hashIRValue(CodeGenMetadata* metadata, Value* value) const;
     virtual string format(string& indentStr);
     virtual void setLocation(const antlr4::Token* ctx);
     virtual void free(CodeGenMetadata* metadata);
-    Value* hashIRValue(CodeGenMetadata* metadata, Value* value) const;
     virtual json asJSON();
     virtual ~LgsValue() = default;
 };

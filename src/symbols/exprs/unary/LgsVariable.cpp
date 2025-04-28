@@ -28,15 +28,45 @@ Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
 }
 
 Value* LgsVariable::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    switch (ref->type) {
-    case VAR_DEC:
+    if (ref->type == VAR_DEC) {
         return ref->varDec->expr->eqIR(metadata, other);
-    case UNKNOWN:
-        assert(false);
-    default:
-        break;
     }
-    return nullptr;
+    return LgsUnaryExpr::eqIR(metadata, other);
+}
+
+Value* LgsVariable::neIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    if (ref->type == VAR_DEC) {
+        return ref->varDec->expr->neIR(metadata, other);
+    }
+    return LgsUnaryExpr::neIR(metadata, other);
+}
+
+Value* LgsVariable::gtIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    if (ref->type == VAR_DEC) {
+        return ref->varDec->expr->gtIR(metadata, other);
+    }
+    return LgsUnaryExpr::gtIR(metadata, other);
+}
+
+Value* LgsVariable::ltIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    if (ref->type == VAR_DEC) {
+        return ref->varDec->expr->ltIR(metadata, other);
+    }
+    return LgsUnaryExpr::gtIR(metadata, other);
+}
+
+Value* LgsVariable::geIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    if (ref->type == VAR_DEC) {
+        return ref->varDec->expr->geIR(metadata, other);
+    }
+    return LgsUnaryExpr::geIR(metadata, other);
+}
+
+Value* LgsVariable::leIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    if (ref->type == VAR_DEC) {
+        return ref->varDec->expr->leIR(metadata, other);
+    }
+    return LgsUnaryExpr::leIR(metadata, other);
 }
 
 json LgsVariable::asJSON() {

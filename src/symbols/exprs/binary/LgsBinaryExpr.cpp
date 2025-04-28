@@ -13,30 +13,21 @@ Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
         return left->divIR(metadata, right);
     case EQ:
         return left->eqIR(metadata, right);
+    case NE:
+        return left->neIR(metadata, right);
     case AND:
         return left->andIR(metadata, right);
     case OR:
         return left->orIR(metadata, right);
-    default:
-        break;
-    }
-    const auto l = left->getIRValue(metadata);
-    const auto r = right->getIRValue(metadata);
-    auto& builder = metadata->builder;
-    switch (op) {
-    case NE:
-        return builder.CreateICmpNE(l, r);
     case LT:
-        return builder.CreateICmpSLT(l, r);
+        return left->ltIR(metadata, right);
     case GT:
-        return builder.CreateICmpSGT(l, r);
+        return left->gtIR(metadata, right);
     case GE:
-        return builder.CreateICmpSGE(l, r);
+        return left->geIR(metadata, right);
     case LE:
-        return builder.CreateICmpSLE(l, r);
+        return left->leIR(metadata, right);
     case NOOP:
-        break;
-    default:
         break;
     }
     return nullptr;

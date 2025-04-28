@@ -23,7 +23,7 @@ Value* LgsExpr::getIRValue(CodeGenMetadata* metadata) {
 }
 
 LgsExpr* LgsExpr::castStatically(LgsType* other) {
-    return nullptr;
+    assert(false);
 }
 
 uint32_t LgsExpr::hashValue(CodeGenMetadata* metadata) {
@@ -31,27 +31,47 @@ uint32_t LgsExpr::hashValue(CodeGenMetadata* metadata) {
 }
 
 Value* LgsExpr::subIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false && "not implemented");
+    assert(false);
 }
 
 Value* LgsExpr::mulIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false && "not implemented");
+    assert(false);
 }
 
 Value* LgsExpr::divIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false && "not implemented");
+    assert(false);
 }
 
 Value* LgsExpr::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false && "not implemented");
+    assert(false);
+}
+
+Value* LgsExpr::neIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    assert(false);
+}
+
+Value* LgsExpr::ltIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    assert(false);
+}
+
+Value* LgsExpr::gtIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    assert(false);
+}
+
+Value* LgsExpr::geIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    assert(false);
+}
+
+Value* LgsExpr::leIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    assert(false);
 }
 
 Value* LgsExpr::andIR(CodeGenMetadata* metadata, LgsExpr* right) {
-    assert(false && "not implemented");
+    assert(false);
 }
 
 Value* LgsExpr::orIR(CodeGenMetadata* metadata, LgsExpr* right) {
-    assert(false && "not implemented");
+    assert(false);
 }
 
 bool LgsExpr::isNull() {

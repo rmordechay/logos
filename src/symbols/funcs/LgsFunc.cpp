@@ -26,6 +26,7 @@ Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
             IRFuncType = FunctionType::get(signature.type->getIRType(), params, false);
         }
     }
+
     if (signature.IRName.empty()) signature.setIRName();
     auto func = metadata->module->getOrInsertFunction(signature.IRName, IRFuncType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
@@ -37,8 +38,10 @@ Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
         args->setName("rt");
         args++;
     }
+
     for (auto& param : signature.params) {
         param.setIRValue(args);
+        if (param.expr) param.expr->setIRValue(args);
         args->setName(param.name);
         args++;
     }
