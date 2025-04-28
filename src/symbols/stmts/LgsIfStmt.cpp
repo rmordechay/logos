@@ -17,7 +17,7 @@ void LgsIfStmt::computeSimpleIf(CodeGenMetadata* metadata) {
     ifTrueBlock = createBasicBlock(BB_IF_TRUE);
     ifEndBlock = createBasicBlock(BB_IF_END);
     elseBlock = createBasicBlock(BB_ELSE);
-
+    assert(ifCond);
     const auto ifCondIR = ifCond->getIRValue(metadata);
     if (!elseStmtBlock) {
         builder.CreateCondBr(ifCondIR, ifTrueBlock, ifEndBlock);

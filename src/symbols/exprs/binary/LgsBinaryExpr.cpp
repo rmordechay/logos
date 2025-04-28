@@ -1,5 +1,4 @@
 #include "exprs/binary/LgsBinaryExpr.h"
-
 #include "exprs/unary/LgsUnaryExpr.h"
 
 Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
@@ -14,6 +13,10 @@ Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
         return left->divIR(metadata, right);
     case EQ:
         return left->eqIR(metadata, right);
+    case AND:
+        return left->andIR(metadata, right);
+    case OR:
+        return left->orIR(metadata, right);
     default:
         break;
     }

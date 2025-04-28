@@ -26,6 +26,7 @@ Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
             IRFuncType = FunctionType::get(signature.type->getIRType(), params, false);
         }
     }
+    if (signature.IRName.empty()) signature.setIRName();
     auto func = metadata->module->getOrInsertFunction(signature.IRName, IRFuncType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
     auto args = IRFunc->arg_begin();

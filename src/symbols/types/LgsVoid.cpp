@@ -7,6 +7,10 @@ const std::string LgsVoid::getName() const {
     return name;
 }
 
+bool LgsVoid::isVoid() {
+    return true;
+}
+
 size_t LgsVoid::size() {
     return 0;
 }

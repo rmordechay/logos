@@ -13,6 +13,8 @@ enum LgsOperator {
     GT,
     GE,
     LE,
+    AND,
+    OR,
     NOOP,
 };
 
@@ -27,6 +29,8 @@ inline LgsOperator mapOperator(LogosParser::ExprContext* expr) {
     if (expr->LANGLE()) return LT;
     if (expr->GE()) return GE;
     if (expr->LE()) return LE;
+    if (expr->AND()) return AND;
+    if (expr->OR()) return OR;
     return NOOP;
 }
 

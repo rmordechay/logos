@@ -26,9 +26,10 @@ public:
     LgsField* getField(const string& name);
     LgsMethodImpl* findMethod(const LgsFuncCall* funcCall) const;
     vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
-    virtual bool equals(const LgsType& other);
     void setLocation(const antlr4::Token* ctx);
     LgsObject* asObject();
+    virtual bool isVoid();
+    virtual bool equals(const LgsType& other);
     virtual size_t size() = 0;
     virtual Type* getIRType() = 0;
     virtual LgsExpr* getZeroValue() = 0;

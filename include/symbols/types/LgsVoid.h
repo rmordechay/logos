@@ -10,6 +10,7 @@ public:
     static constexpr auto name = "Void";
 
     const string getName() const override;
+    bool isVoid() override;
     size_t size() override;
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;

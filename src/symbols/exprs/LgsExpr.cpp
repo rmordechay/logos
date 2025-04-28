@@ -46,6 +46,14 @@ Value* LgsExpr::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false && "not implemented");
 }
 
+Value* LgsExpr::andIR(CodeGenMetadata* metadata, LgsExpr* right) {
+    assert(false && "not implemented");
+}
+
+Value* LgsExpr::orIR(CodeGenMetadata* metadata, LgsExpr* right) {
+    assert(false && "not implemented");
+}
+
 bool LgsExpr::isNull() {
     return dynamic_cast<LgsNull*>(this);
 }

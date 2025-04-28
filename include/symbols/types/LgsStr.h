@@ -6,7 +6,6 @@
 
 class LgsStr final : public LgsType {
 public:
-
     static constexpr auto name = "Str";
 
     const string getName() const override;

@@ -1,6 +1,7 @@
 #ifndef LOGOSEXPR_H
 #define LOGOSEXPR_H
 #include "LgsValue.h"
+
 #include <types/LgsType.h>
 
 
@@ -32,6 +33,8 @@ public:
     virtual Value* mulIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* divIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual Value* andIR(CodeGenMetadata* metadata, LgsExpr* right);
+    virtual Value* orIR(CodeGenMetadata* metadata, LgsExpr* right);
 
     bool isNull();
     LgsArray* asArray();

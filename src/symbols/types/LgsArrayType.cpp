@@ -11,7 +11,8 @@ size_t LgsArrayType::size() {
 }
 
 const string LgsArrayType::getName() const {
-    return "ArrayType";
+    assert(underlyingType);
+    return underlyingType->getName() + "[]";
 }
 
 LgsExpr* LgsArrayType::getZeroValue() {
@@ -20,6 +21,7 @@ LgsExpr* LgsArrayType::getZeroValue() {
 
 bool LgsArrayType::equals(LgsType* other) const {
     if (const auto otherArrayType = dynamic_cast<LgsArrayType*>(other)) {
+        assert(otherArrayType->underlyingType);
         return underlyingType->equals(otherArrayType->underlyingType);
     }
     return false;

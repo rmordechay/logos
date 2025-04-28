@@ -84,6 +84,7 @@ public:
     void checkObjectImplements(LgsObject* obj, LgsInterface* interface);
     string getFuncSignaturesStr(const vector<LgsFuncSignature*>& funcs) const;
     Location* getSymbolLocation(const LgsSymbol* symbol) const;
+    string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
     ~SemaAnalyser() = default;
 };
 

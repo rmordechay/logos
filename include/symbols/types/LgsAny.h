@@ -4,9 +4,8 @@
 
 class LgsAny final : public LgsType {
 public:
-    string name;
+    static constexpr auto name = "Any";
 
-    explicit LgsAny(const string& name) : name(name) {}
     size_t size() override;
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;

@@ -1,7 +1,6 @@
 #ifndef LOGOSFLOAT_H
 #define LOGOSFLOAT_H
 #include "LgsType.h"
-#include "exprs/unary/constants/LgsConstExpr.h"
 #include "funcs/LgsMethodImpl.h"
 
 class LgsFloat final : public LgsType {

@@ -609,23 +609,25 @@ public:
     LogosParser::ExprContext *right = nullptr;
     ExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    UnaryExprContext *unaryExpr();
-    antlr4::tree::TerminalNode *CAST();
-    TypeContext *type();
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
     std::vector<ExprContext *> expr();
     ExprContext* expr(size_t i);
+    antlr4::tree::TerminalNode *CAST();
+    TypeContext *type();
+    UnaryExprContext *unaryExpr();
     antlr4::tree::TerminalNode *STAR();
     antlr4::tree::TerminalNode *SLASH();
     antlr4::tree::TerminalNode *PLUS();
     antlr4::tree::TerminalNode *MINUS();
-    antlr4::tree::TerminalNode *DOUBLE_EQUAL();
-    antlr4::tree::TerminalNode *NOT_EQUAL();
     antlr4::tree::TerminalNode *LANGLE();
     antlr4::tree::TerminalNode *RANGLE();
     antlr4::tree::TerminalNode *GE();
     antlr4::tree::TerminalNode *LE();
+    antlr4::tree::TerminalNode *DOUBLE_EQUAL();
+    antlr4::tree::TerminalNode *NOT_EQUAL();
+    antlr4::tree::TerminalNode *AND();
+    antlr4::tree::TerminalNode *OR();
 
    
   };

@@ -145,11 +145,13 @@ enumField:
     ;
 
 expr:
-        left=expr op=(STAR | SLASH) right=expr
-    |   left=expr op=(PLUS | MINUS) right=expr
-    |   left=expr op=(DOUBLE_EQUAL | NOT_EQUAL | LANGLE | RANGLE | GE | LE) right=expr
+        LPAREN left=expr RPAREN (CAST type)?
     |   unaryExpr (CAST cast=type)?
-    |   LPAREN left=expr RPAREN (CAST type)?
+    |   left=expr op=(STAR | SLASH) right=expr
+    |   left=expr op=(PLUS | MINUS) right=expr
+    |   left=expr op=(LANGLE | RANGLE | GE | LE) right=expr
+    |   left=expr op=(DOUBLE_EQUAL | NOT_EQUAL) right=expr
+    |   left=expr op=(AND | OR) right=expr
     ;
 
 unaryExpr:

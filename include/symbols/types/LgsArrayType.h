@@ -1,7 +1,7 @@
 #ifndef LOGOSARRAYTYPE_H
 #define LOGOSARRAYTYPE_H
+#include "LgsAny.h"
 #include "LgsBool.h"
-#include "LgsInt.h"
 #include "LgsStr.h"
 #include "LgsType.h"
 #include "LgsVoid.h"
@@ -15,7 +15,9 @@ struct CodeGenMetadata;
 
 class LgsArrayType final : public LgsType {
 public:
+    static constexpr auto name = "ArrayType";
     LgsType* underlyingType = nullptr;
+
     StructType* arrIR = StructType::create(context, {i64Ty, i64Ty, ptrTy});
     Attribute sret = Attribute::getWithStructRetType(context, arrIR);
     FunctionType* const initArrIRFuncType = FunctionType::get(voidTy, {ptrTy, i64Ty, i64Ty}, false);
@@ -23,10 +25,11 @@ public:
     FunctionType* const addElementIRFuncType = FunctionType::get(voidTy, {ptrTy, ptrTy}, false);
     FunctionType* const getElementIRFuncType = FunctionType::get(ptrTy, {ptrTy, i32Ty}, false);
 
-    LgsMethodImpl addFunc = LgsMethodImpl("add", new LgsVoid(), getName(), {LgsParam(this), LgsParam(new LgsStr())});
-    LgsMethodImpl isEmptyFunc = LgsMethodImpl("isEmpty", new LgsBool(), getName(), {LgsParam(this)});
+    LgsMethodImpl addFunc = LgsMethodImpl("add", new LgsVoid(), name, {LgsParam(this), LgsParam(new LgsStr())});
+    LgsMethodImpl isEmptyFunc = LgsMethodImpl("isEmpty", new LgsBool(), name, {LgsParam(this)});
 
     LgsArrayType() {
+        underlyingType = new LgsAny();
         methods[addFunc.signature.name] = {&addFunc};
         methods[isEmptyFunc.signature.name] = {&isEmptyFunc};
     }

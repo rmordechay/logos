@@ -167,6 +167,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
 }
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
+    assert(ifStmt->ifCond);
     visitExpr(ifStmt->ifCond);
     visitStmtBlock(ifStmt->ifStmtBlock);
     ifStmt->hasReturn = ifStmt->ifStmtBlock->hasReturn;
@@ -174,8 +175,10 @@ void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
         visitStmtBlock(elseIfStmtBlock);
         ifStmt->hasReturn = ifStmt->hasReturn && elseIfStmtBlock->hasReturn;
     }
-    visitStmtBlock(ifStmt->elseStmtBlock);
-    ifStmt->hasReturn = ifStmt->elseStmtBlock->hasReturn;
+    if (ifStmt->elseStmtBlock) {
+        visitStmtBlock(ifStmt->elseStmtBlock);
+        ifStmt->hasReturn = ifStmt->elseStmtBlock->hasReturn;
+    }
 }
 
 void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
@@ -233,13 +236,24 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
 }
 
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
-    const auto currentFunc = lgsStack.currentFunc;
-    const auto rt = currentFunc->signature.type;
-    if (rt->getName() == LgsVoid::name && returnStmt->expr) {
-        return handleError(E10026, &returnStmt->expr->location);
+    auto funcSignature = lgsStack.currentFunc->signature;
+    const auto rt = funcSignature.type;
+    if (returnStmt->expr) {
+        returnStmt->expr->isReturnValue = true;
+        visitExpr(returnStmt->expr);
     }
-    returnStmt->expr->isReturnValue = true;
-    visitExpr(returnStmt->expr);
+    if (rt->isVoid()) {
+        if (returnStmt->expr) {
+            const auto exprType = returnStmt->expr->type;
+            if (!exprType->isVoid()) {
+                return handleError(E10027, &returnStmt->location, {funcSignature.name, rt->getName(), exprType->getName()});
+            }
+        }
+    } else if (!returnStmt->expr) {
+        return handleError(E10026, &returnStmt->location, {funcSignature.name, rt->getName()});
+    } else if (!rt->equals(returnStmt->expr->type)) {
+        return handleError(E10027, &returnStmt->location, {funcSignature.name, rt->getName(), returnStmt->expr->type->getName()});
+    }
 }
 
 void SemaAnalyser::visitBreakStmt(LgsBreakStmt* breakStmt) const {}
@@ -498,6 +512,8 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
         setExprType(binaryExpr, lType->inferBinaryType(rType));
         break;
     }
+    case AND:
+    case OR:
     case NE:
     case EQ:
     case LT:
@@ -578,7 +594,7 @@ bool SemaAnalyser::resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCal
     }
 
     if (!func) {
-        handleError(E10015, &funcCall->location, {funcCall->name, funcCall->name, funcCall->getArgsTypeStr()});
+        handleError(E10015, &funcCall->location, {funcCall->name, getOverloadsAsStr(overloads)});
         return false;
     }
 
@@ -649,4 +665,12 @@ Location* SemaAnalyser::getSymbolLocation(const LgsSymbol* symbol) const {
     default:
         return nullptr;
     }
+}
+
+string SemaAnalyser::getOverloadsAsStr(const vector<LgsFunc*>& overloads) const {
+    stringstream str;
+    for (const auto& overload : overloads) {
+        str << "\n  - " << overload->signature.getPrintName();
+    }
+    return str.str();
 }

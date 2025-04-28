@@ -17,6 +17,10 @@ LgsObject* LgsType::asObject() {
     return dynamic_cast<LgsObject*>(this);
 }
 
+bool LgsType::isVoid() {
+    return false;
+}
+
 json LgsType::asJSON() const {
     assert(false);
 }
