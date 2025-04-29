@@ -1,14 +1,15 @@
 #ifndef LOGOSPRINT_H
 #define LOGOSPRINT_H
+#include "funcs/LgsFuncImpl.h"
 #include "types/LgsFloat.h"
 #include <types/LgsVoid.h>
 
-class LgsPrint final : public LgsFunc {
+class LgsPrint final : public LgsFuncImpl {
 public:
     static constexpr auto name = "print";
-    explicit LgsPrint(const vector<LgsParam>& params) : LgsFunc(name, new LgsVoid(), params) {}
+    explicit LgsPrint(const vector<LgsParam>& params) : LgsFuncImpl(name, new LgsVoid(), params) {}
 
-    vector<Type*> getIRParamTypes(const CodeGenMetadata* metadata) override;
+    void setIRFuncType(const CodeGenMetadata* metadata) override;
     ~LgsPrint() override = default;
 };
 

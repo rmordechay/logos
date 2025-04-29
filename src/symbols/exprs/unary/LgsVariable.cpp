@@ -16,6 +16,7 @@ Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
     case VAR_DEC:
         return ref->varDec->expr->getIRValue(metadata);
     case PARAM:
+        assert(ref->param->IRValue);
         return ref->param->IRValue;
     case ENUM_FIELD:
         return ref->enumField->getGEP(metadata);

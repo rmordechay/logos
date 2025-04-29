@@ -176,6 +176,8 @@ add_library(lib STATIC
     src/symbols/types/LgsInterface.cpp
     src/symbols/types/LgsAny.cpp
     src/symbols/types/LgsObject.cpp
+    src/symbols/funcs/LgsFuncImpl.cpp
+    src/symbols/funcs/LgsMethodImpl.cpp
 )
 
 add_executable(lgs main.cpp

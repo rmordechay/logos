@@ -22,31 +22,13 @@ Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
     auto func = metadata->module->getOrInsertFunction(signature.IRName, IRFuncType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
     auto args = IRFunc->arg_begin();
-    AttrBuilder builder(context);
     if (const auto obj = signature.type->asObject()) {
-        builder.addStructRetAttr(obj->getIRType());
-        args->addAttrs(builder);
-        args->setName("rt");
-        args++;
+        setSRet(args, obj);
     }
-
-    for (auto& param : signature.params) {
-        param.setIRValue(args);
-        if (param.expr) param.expr->setIRValue(args);
-        args->setName(param.name);
-        args++;
+    if (args) {
+        setIRFuncParams(args);
     }
     return IRFunc;
-}
-
-void LgsFunc::setIRFuncType(const CodeGenMetadata* metadata) {
-    auto params = getIRParamTypes(metadata);
-    if (const auto obj = signature.type->asObject()) {
-        params.insert(params.begin(), obj->getIRType()->getPointerTo());
-        IRFuncType = FunctionType::get(voidTy, params, false);
-    } else {
-        IRFuncType = FunctionType::get(signature.type->getIRType(), params, false);
-    }
 }
 
 Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
@@ -86,6 +68,14 @@ string LgsFunc::format(string& indentStr) {
     }
     str << stmtBlock->format(indentStr);
     return str.str();
+}
+
+void LgsFunc::setSRet(Function::arg_iterator& args, LgsObject* const obj) const {
+    AttrBuilder builder(context);
+    builder.addStructRetAttr(obj->getIRType());
+    args->addAttrs(builder);
+    args->setName("rt");
+    args++;
 }
 
 json LgsFunc::asJSON() {

@@ -567,7 +567,7 @@ void SemaAnalyser::checkObjectImplements(LgsObject* obj, LgsInterface* const int
         const auto overloads = obj->getMethodsOverloads(signature->name);
         auto found = false;
         for (const auto& overload : overloads) {
-            if (overload->signature.isEqual(signature)) {
+            if (overload->isEqual(signature)) {
                 found = true;
                 break;
             }
@@ -607,7 +607,7 @@ LgsFunc* SemaAnalyser::resolveFuncCallWithoutDefaultParams(LgsFunc* func, const 
     const auto params = func->signature.params;
     if (funcCall->args.size() > params.size()) return nullptr;
     if (params.size() == funcCall->args.size()) {
-        if (func->signature.isEqual(funcCall)) {
+        if (func->isEqual(funcCall)) {
             return func;
         }
     }

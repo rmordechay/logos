@@ -19,6 +19,7 @@
 Value* LgsExpr::getIRValue(CodeGenMetadata* metadata) {
     if (IRValue) return IRValue;
     IRValue = createIRValue(metadata);
+    assert(IRValue);
     return IRValue;
 }
 
