@@ -6,10 +6,6 @@ Type* LgsArrayType::getIRType() {
     return ptrTy;
 }
 
-size_t LgsArrayType::size() {
-    return sizeof(void*);
-}
-
 const string LgsArrayType::getName() const {
     assert(underlyingType);
     return underlyingType->getName() + "[]";

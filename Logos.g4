@@ -161,6 +161,7 @@ unaryExpr:
     |   SELF_CLASS
     |   NULL
     |   funcCall
+    |   vector
     |   constructor
     |   constant
     |   array
@@ -244,7 +245,7 @@ type:
    ;
 
 vector:
-        VEC | VEC2 | VEC3 | VEC4
+        (VEC2 | VEC3 | VEC4) LPAREN (expr (COMMA expr)* COMMA?)? RPAREN
     ;
 
 requireEnvVars:
@@ -289,7 +290,6 @@ SELF_CLASS: 'Self';
 INTERFACE: 'interface';
 ENUM: 'enum';
 
-VEC: 'vec';
 VEC2: 'vec2';
 VEC3: 'vec3';
 VEC4: 'vec4';

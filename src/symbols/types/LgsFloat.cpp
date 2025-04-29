@@ -7,10 +7,6 @@ const string LgsFloat::getName() const {
     return name;
 }
 
-size_t LgsFloat::size() {
-    return sizeof(float);
-}
-
 Type* LgsFloat::getIRType() {
     return Type::getFloatTy(context);
 }

@@ -415,13 +415,14 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     if (const auto variable = ctx->VARIABLE()) return getVariable(variable->getText(), ctx);
     if (const auto constExpr = ctx->CONST_NAME()) return getConst(constExpr->getText(), ctx);
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
+    if (const auto vector = ctx->vector()) return getVector(vector);
     if (const auto constructor = ctx->constructor()) return getInstance(constructor);
     if (const auto constant = ctx->constant()) return getConstant(constant);
     if (const auto array = ctx->array()) return getArray(array);
     if (const auto arrayIndex = ctx->arrayIndex()) return getArrayIndex(arrayIndex);
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (ctx->NULL_()) return new LgsNull();
-    return nullptr;
+    assert(false);
 }
 
 LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
@@ -466,6 +467,17 @@ LgsFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
     const auto funcCall = new LgsFuncCall(name, args);
     funcCall->setLocation(ctx->start);
     return funcCall;
+}
+
+LgsUnaryExpr* AntlerConverter::getVector(LogosParser::VectorContext* vector) {
+    if (vector->VEC2()) {
+
+    } else if (vector->VEC3()) {
+
+    } else if (vector->VEC4()) {
+
+    }
+    assert(false);
 }
 
 LgsSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) {

@@ -6,7 +6,7 @@ class LgsAny final : public LgsType {
 public:
     static constexpr auto name = "Any";
 
-    size_t size() override;
+
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     const string getName() const override;

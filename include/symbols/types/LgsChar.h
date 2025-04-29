@@ -8,7 +8,6 @@ public:
     static constexpr auto name = "Char";
 
     const string getName() const override;
-    size_t size() override;
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;

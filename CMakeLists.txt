@@ -70,6 +70,9 @@ add_library(lib STATIC
     include/symbols/exprs/unary/LgsVariable.h
     include/symbols/exprs/unary/LgsUnaryExpr.h
     include/symbols/exprs/unary/LgsEnumField.h
+    include/symbols/exprs/unary/vectors/LgsVec2.h
+    include/symbols/exprs/unary/vectors/LgsVec3.h
+    include/symbols/exprs/unary/vectors/LgsVec4.h
     include/symbols/exprs/unary/constants/LgsConstExpr.h
     include/symbols/exprs/unary/constants/LgsStrConst.h
     include/symbols/exprs/unary/constants/LgsTypeConst.h

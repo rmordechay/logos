@@ -11,10 +11,6 @@ bool LgsVoid::isVoid() {
     return true;
 }
 
-size_t LgsVoid::size() {
-    return 0;
-}
-
 Type* LgsVoid::getIRType() {
     return voidTy;
 }

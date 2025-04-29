@@ -18,12 +18,12 @@ public:
     COLON = 19, EQUAL = 20, MINUS = 21, PLUS = 22, STAR = 23, SLASH = 24, 
     HASH = 25, QUEST_MARK = 26, EXCLA_MARK = 27, PERCENT = 28, DOLLAR = 29, 
     AMPERSAND = 30, OBJECT = 31, SINGLETON = 32, SELF_INSTANCE = 33, SELF_CLASS = 34, 
-    INTERFACE = 35, ENUM = 36, VEC = 37, VEC2 = 38, VEC3 = 39, VEC4 = 40, 
-    IMPLEMENTS = 41, IMPORT = 42, IF = 43, ELSE = 44, FOR = 45, BREAK = 46, 
-    CONTINUE = 47, RETURN = 48, VISIBILITY = 49, CONST = 50, AND = 51, OR = 52, 
-    NOT = 53, IN = 54, INTEGER = 55, FLOAT = 56, BOOL = 57, NULL_ = 58, 
-    CONST_NAME = 59, TYPE = 60, VARIABLE = 61, STRING = 62, LINE_COMMENT = 63, 
-    BLOCK_COMMENT = 64, WS = 65
+    INTERFACE = 35, ENUM = 36, VEC2 = 37, VEC3 = 38, VEC4 = 39, IMPLEMENTS = 40, 
+    IMPORT = 41, IF = 42, ELSE = 43, FOR = 44, BREAK = 45, CONTINUE = 46, 
+    RETURN = 47, VISIBILITY = 48, CONST = 49, AND = 50, OR = 51, NOT = 52, 
+    IN = 53, INTEGER = 54, FLOAT = 55, BOOL = 56, NULL_ = 57, CONST_NAME = 58, 
+    TYPE = 59, VARIABLE = 60, STRING = 61, LINE_COMMENT = 62, BLOCK_COMMENT = 63, 
+    WS = 64
   };
 
   enum {
@@ -644,6 +644,7 @@ public:
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *NULL_();
     FuncCallContext *funcCall();
+    VectorContext *vector();
     ConstructorContext *constructor();
     ConstantContext *constant();
     ArrayContext *array();
@@ -892,10 +893,15 @@ public:
   public:
     VectorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *VEC();
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
     antlr4::tree::TerminalNode *VEC2();
     antlr4::tree::TerminalNode *VEC3();
     antlr4::tree::TerminalNode *VEC4();
+    std::vector<ExprContext *> expr();
+    ExprContext* expr(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
 
    
   };

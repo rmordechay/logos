@@ -30,7 +30,6 @@ public:
     LgsObject* asObject();
     virtual bool isVoid();
     virtual bool equals(const LgsType& other);
-    virtual size_t size() = 0;
     virtual Type* getIRType() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual const string getName() const = 0;
@@ -46,7 +45,6 @@ public:
 
     explicit LgsUnknownType(const string& name) : name(name) {}
     const string getName() const override { return name; }
-    size_t size() override { assert(false && "unknown type should not be called"); }
     LgsExpr* getZeroValue() override { assert(false && "unknown type should not be called"); }
     bool equals(LgsType* other) const override { assert(false && "unknown type should not be called"); }
     LgsType* inferBinaryType(LgsType* other) override { assert(false && "unknown type should not be called"); }

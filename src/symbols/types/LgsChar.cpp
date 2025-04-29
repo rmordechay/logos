@@ -7,10 +7,6 @@ const string LgsChar::getName() const {
     return name;
 }
 
-size_t LgsChar::size() {
-    return sizeof(char);
-}
-
 Type* LgsChar::getIRType() {
     return Type::getInt8Ty(context);
 }

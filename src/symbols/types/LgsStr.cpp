@@ -9,10 +9,6 @@ const string LgsStr::getName() const {
     return name;
 }
 
-size_t LgsStr::size() {
-    return sizeof(void*);
-}
-
 Type* LgsStr::getIRType() {
     return ptrTy;
 }
@@ -30,4 +26,21 @@ bool LgsStr::equals(LgsType* other) const {
     assert(other);
     if (dynamic_cast<LgsChar*>(other)) return true;
     return name == other->getName();
+}
+
+void LgsStr::cleanStr(string& value) {
+    value.erase(0, 1);
+    value.pop_back();
+}
+
+/**
+ * FNV-1a 32-bit hash
+ */
+uint32_t LgsStr::hashString(const string& str) {
+    uint32_t hash = 2166136261u;
+    for (const auto c : str) {
+        hash ^= static_cast<uint8_t>(c);
+        hash *= 16777619u;
+    }
+    return hash;
 }
