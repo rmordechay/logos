@@ -14,6 +14,7 @@ public:
     vector<LgsFuncImpl*> funcs;
     vector<LgsEnum*> enums;
     vector<LgsObject*> objects;
+    vector<LgsInterface*> interfaces;
 
     explicit LgsMainFile(const string& path) : LgsFile(LOGOS_MAIN_FILE_NAME, path) {}
     void format() override;

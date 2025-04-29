@@ -8,6 +8,8 @@
 #include "LgsObjectFile.h"
 #include "funcs/LgsMethodImpl.h"
 
+#define ERROR_STR "\033[1;31mError:\033[0m "
+
 LgsType* LgsAnalyser::resolveType(LgsType* type) {
     if (!dynamic_cast<LgsUnknownType*>(type)) return type;
     auto typeName = type->getName();
@@ -45,14 +47,19 @@ void LgsAnalyser::resolveGlobalTypes(const vector<LgsFile*>& files) {
             for (const auto& object : mainFile->objects) {
                 resolveObjMemberTypes(object);
             }
+            for (const auto& object : mainFile->objects) {
+                resolveObjMemberTypes(object);
+            }
             for (const auto& func : mainFile->funcs) {
                 resolveFuncTypes(&func->signature);
             }
         } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             resolveObjMemberTypes(objFile->obj);
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            for (const auto& signature : interfaceFile->interface->funcSignatures) {
-                resolveFuncTypes(signature);
+            for (const auto& [_, method] : interfaceFile->interface->methods) {
+                for (const auto& overload : method) {
+                    resolveFuncTypes(&overload->signature);
+                }
             }
         }
     }
@@ -100,15 +107,13 @@ void LgsAnalyser::handleError(const LgsError& lgsErr, const Location* location, 
     setUnsuccessful();
     const auto errMsg = formatMsg(lgsErr.msg, args);
     errors.emplace_back(LgsError{.msg = errMsg, .errCode = lgsErr.errCode});
-    cout <<  "Error: "  << errMsg << endl;
+    cout <<  ERROR_STR << errMsg << endl;
     if (location) {
-        assert(location->lineNumber != 0);
-        assert(filePath != "");
         const auto lineNumber = to_string(location->lineNumber);
         const auto pos = to_string(location->posInLine);
         const auto fullPath = filePath.string() + ":" + lineNumber + ":" + pos;
-        const auto path = "\tat " + fullPath;
-        cout << path << endl;
+        const auto path = "\t   at " + fullPath;
+        cout << path << "\n---" << endl;
     }
 }
 

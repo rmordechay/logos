@@ -2,6 +2,7 @@
 #include "types/LgsObject.h"
 
 void LgsMethodImpl::setIRFuncType(const CodeGenMetadata* metadata) {
+    // TODO implement static
     vector<Type*> IRParamsTypes;
     IRParamsTypes.emplace_back(ptrTy);
     for (int i = 1; i < signature.params.size(); ++i) {
@@ -26,7 +27,7 @@ void LgsMethodImpl::setIRFuncParams(Argument* args) {
 }
 
 bool LgsMethodImpl::isEqual(const LgsFuncCall* funcCall) {
-    if (!signature.isEqual(funcCall->name, funcCall->parentName, funcCall->type)) return false;
+    if (!signature.isEqual(funcCall->name, funcCall->type)) return false;
     if (signature.params.size() == 0) return true;
     for (size_t i = 1; i < signature.params.size(); ++i) {
         auto thisTypeName = signature.params[i].type->getName();
@@ -37,7 +38,7 @@ bool LgsMethodImpl::isEqual(const LgsFuncCall* funcCall) {
 }
 
 bool LgsMethodImpl::isEqual(const LgsFuncSignature* other) {
-    if (!signature.isEqual(other->name, other->parentName, other->type)) return false;
+    if (!signature.isEqual(other->name, other->type)) return false;
     if (signature.params.size() == 0) return true;
     for (size_t i = 0; i < signature.params.size() - 1; ++i) {
         auto thisTypeName = signature.params[i + 1].type->getName();

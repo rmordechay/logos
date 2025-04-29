@@ -13,7 +13,7 @@ logosAppFile:
     ;
 
 mainFile:
-        (object | enumDeclaration)* funcImplementation+ EOF
+        (object | enumDeclaration | interface)* funcImplementation+ EOF
     ;
 
 objectFile:
@@ -21,7 +21,15 @@ objectFile:
     ;
 
 interfaceFile:
-        interfaceDeclaration explicitVarDec* funcSignature+ funcImplementation* EOF
+        interfaceDeclaration interfaceBody EOF
+    ;
+
+interface:
+        INTERFACE TYPE LBRACE interfaceBody RBRACE
+    ;
+
+interfaceBody:
+        explicitVarDec* funcSignature+ funcImplementation*
     ;
 
 object:

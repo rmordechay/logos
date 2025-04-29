@@ -4,7 +4,7 @@
 
 void LgsFuncImpl::setIRFuncType(const CodeGenMetadata* metadata) {
     vector<Type*> IRParamsTypes;
-    for (int i = 1; i < signature.params.size(); ++i) {
+    for (int i = 0; i < signature.params.size(); ++i) {
         auto paramIRType = signature.params[i].type->getIRType();
         IRParamsTypes.emplace_back(paramIRType);
     }
@@ -26,7 +26,7 @@ void LgsFuncImpl::setIRFuncParams(Argument* args) {
 }
 
 bool LgsFuncImpl::isEqual(const LgsFuncCall* funcCall) {
-    if (!signature.isEqual(funcCall->name, funcCall->parentName, funcCall->type)) return false;
+    if (!signature.isEqual(funcCall->name, funcCall->type)) return false;
     if (signature.params.size() == 0) return true;
     for (size_t i = 0; i < signature.params.size(); ++i) {
         auto thisTypeName = signature.params[i].type->getName();
@@ -37,7 +37,7 @@ bool LgsFuncImpl::isEqual(const LgsFuncCall* funcCall) {
 }
 
 bool LgsFuncImpl::isEqual(const LgsFuncSignature* other) {
-    if (!signature.isEqual(other->name, other->parentName, other->type)) return false;
+    if (!signature.isEqual(other->name, other->type)) return false;
     if (signature.params.size() == 0) return true;
     for (size_t i = 0; i < signature.params.size() - 1; ++i) {
         auto thisTypeName = signature.params[i + 1].type->getName();

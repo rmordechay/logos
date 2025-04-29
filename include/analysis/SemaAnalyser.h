@@ -37,7 +37,7 @@ public:
     void visitMainFile(const LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
-    void visitObjectInterfaces(LgsObject* obj);
+    void visitObjectImplements(LgsObject* obj);
     void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitFuncSignature(LgsFuncSignature* funcSignature);
@@ -81,8 +81,6 @@ public:
     bool validateExprType(LgsExpr* expr, LgsType* type);
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
-    void checkObjectImplements(LgsObject* obj, LgsInterface* interface);
-    string getFuncSignaturesStr(const vector<LgsFuncSignature*>& funcs) const;
     Location* getSymbolLocation(const LgsSymbol* symbol) const;
     string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
     ~SemaAnalyser() = default;

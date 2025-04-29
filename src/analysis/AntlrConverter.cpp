@@ -62,8 +62,13 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, con
     }
 
     for (const auto& object : ctx->object()) {
-        auto obj = getObject(object->objectBody(), object->TYPE()->getText(), filePath, !!object->SINGLETON());
-        mainFile->objects.emplace_back(obj);
+        auto lgsObject = getObject(object->objectBody(), object->TYPE()->getText(), filePath, !!object->SINGLETON());
+        mainFile->objects.emplace_back(lgsObject);
+    }
+
+    for (const auto& interface : ctx->interface()) {
+        auto lgsInterface = getInterface(interface->interfaceBody(), interface->TYPE()->getText(), filePath);
+        mainFile->interfaces.emplace_back(lgsInterface);
     }
 
     for (const auto& func : funcImplementations) {
@@ -102,7 +107,7 @@ LgsObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ct
 LgsFile* AntlerConverter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath) {
     const auto interfaceName = ctx->interfaceDeclaration()->TYPE()->getText();
     const auto interfaceFile = new LgsInterfaceFile(interfaceName, filePath);
-    interfaceFile->interface = getInterface(ctx, interfaceName);
+    interfaceFile->interface = getInterface(ctx->interfaceBody(), interfaceName, interfaceName);
     return interfaceFile;
 }
 
@@ -131,6 +136,7 @@ LgsAppFile* AntlerConverter::getAppFile(LogosParser::LogosAppFileContext* ctx, c
 
 LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const string& filePath, const bool isSingleton) {
     const auto obj = new LgsObject(objName, filePath);
+    obj->setLocation(ctx->start);
     obj->isSingleton = isSingleton;
     for (int i = 0; i < ctx->field().size(); ++i) {
         const auto field = ctx->field()[i];
@@ -140,7 +146,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
     for (const auto& func : ctx->methodImplementation()) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         const auto method = getMethodImpl(func, obj);
-        obj->methods[funcName] = {method};
+        obj->methods[funcName].push_back(method);
     }
     if (ctx->objectImplements()) {
         for (const auto& type : ctx->objectImplements()->TYPE()) {
@@ -152,15 +158,17 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
     return obj;
 }
 
-LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceFileContext* ctx, const string& parentName) {
-    const auto interfaceName = ctx->interfaceDeclaration()->TYPE()->getText();
+LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName, const string& filePath) {
     const auto interface = new LgsInterface(interfaceName);
+    interface->setLocation(ctx->start);
     for (const auto& funcSignature : ctx->funcSignature()) {
-        vector<LgsParam> params;
+        const auto self = LgsParam(LOGOS_SELF, interface);
+        vector params = {self};
         setParams(funcSignature, params);
-        const auto type = getType(funcSignature->type());
-        auto signature = new LgsFuncSignature(funcSignature->VARIABLE()->getText(), parentName, type, params);
-        interface->funcSignatures.emplace_back(signature);
+        const auto type = getFuncType(funcSignature);
+        auto method = new LgsMethodImpl(funcSignature->VARIABLE()->getText(), type, interfaceName, params);
+        method->signature.path = filePath;
+        interface->methods[method->signature.name].push_back(method);
     }
     globals.addSymbol(interface->name, LgsSymbol(interface));
     return interface;
@@ -187,7 +195,7 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
     vector params = {self};
     setParams(funcSignature, params);
     const auto method = new LgsMethodImpl(name, rt, obj->name, params);
-    method->filePath = obj->filePath;
+    method->signature.path = obj->path;
     if (ctx->VISIBILITY()) {
         method->isPublic = true;
     }
@@ -608,48 +616,42 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) const {
     LgsType* result = nullptr;
     if (ctx->LBRACK().size() > 0) {
         result = new LgsArrayType(getTypeFromText(typeText, ctx));
+        result->setLocation(ctx->start);
     } else {
         result = getTypeFromText(typeText, ctx);
         if (ctx->QUEST_MARK()) {
             result->nullable = true;
         }
     }
-    result->setLocation(ctx->start);
     return result;
 }
 
 LgsType* AntlerConverter::getTypeFromText(const string& typeText, const antlr4::ParserRuleContext* ctx) const {
+    LgsType* type = nullptr;
     if (typeText == LgsInt::name) {
-        const auto type = new LgsInt();
-        type->setLocation(ctx->start);
-        return type;
+        type = new LgsInt();
+    } else if (typeText == LgsFloat::name) {
+        type = new LgsFloat();
+    } else if (typeText == LgsBool::name) {
+        type = new LgsBool();
+    } else if (typeText == LgsStr::name) {
+        type = new LgsStr();
+    } else if (typeText == LgsVoid::name) {
+        type = new LgsVoid();
+    } else {
+        type = new LgsUnknownType(typeText);
     }
-    if (typeText == LgsFloat::name) {
-        const auto type = new LgsFloat();
-        type->setLocation(ctx->start);
-        return type;
-    }
-    if (typeText == LgsBool::name) {
-        const auto type = new LgsBool();
-        type->setLocation(ctx->start);
-        return type;
-    }
-    if (typeText == LgsStr::name) {
-        const auto type = new LgsStr();
-        type->setLocation(ctx->start);
-        return type;
-    }
-    if (typeText == LgsVoid::name) {
-        const auto type = new LgsVoid();
-        type->setLocation(ctx->start);
-        return type;
-    }
-    return new LgsUnknownType(typeText);
+    type->setLocation(ctx->start);
+    return type;
 }
 
 LgsType* AntlerConverter::getFuncType(LogosParser::FuncSignatureContext* ctx) const {
+    LgsType* result = nullptr;
     if (ctx->type()) {
-        return getType(ctx->type());
+        result = getType(ctx->type());
+    } else {
+        result = new LgsVoid();
     }
-    return new LgsVoid();
+    result->setLocation(ctx->start);
+    return result;
 }

@@ -6,7 +6,7 @@
 class LgsMethodImpl : public LgsFunc {
 public:
     bool isPublic = false;
-    string filePath;
+    bool isStatic = false;
 
     LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam>& params = {}) : LgsFunc(name, funcType, params, parentName) {}
     void setIRFuncType(const CodeGenMetadata* metadata) override;

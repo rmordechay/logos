@@ -23,7 +23,7 @@ public:
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const string& filePath);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath);
-    LgsInterface* getInterface(LogosParser::InterfaceFileContext* ctx, const string& parentName);
+    LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName, const string& filePath);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const string& filePath, bool isSingleton = false);
     void setParams(LogosParser::FuncSignatureContext* funcSignature, vector<LgsParam>& params);
     LgsField* getField(LogosParser::FieldContext* ctx, size_t position);

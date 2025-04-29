@@ -15,7 +15,7 @@ public:
     LgsFuncImpl* callbackFunc = nullptr;
     vector<LgsVariable*> refs;
 
-    LgsParam(const string& name, LgsType* type, LgsExpr* expr) : name(name), type(type), expr(expr) {}
+    LgsParam(const string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     explicit LgsParam(LgsFuncImpl* func);
     explicit LgsParam(LgsType* type) : name(""), type(type) {}
     string format(string& indentStr) override;

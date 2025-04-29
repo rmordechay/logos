@@ -12,6 +12,7 @@ public:
     string name;
     string IRName;
     string parentName;
+    string path;
     LgsType* type;
     vector<LgsParam> params;
     bool isCallback = false;
@@ -19,7 +20,6 @@ public:
 
     LgsFuncSignature(const string& name, LgsType* type, const vector<LgsParam>& params): LgsFuncSignature(name, "", type, params) {}
     LgsFuncSignature(const string& name, const string& parentName, LgsType* type, const vector<LgsParam>& params) : name(name), parentName(parentName), type(type), params(params) {}
-
     void setIRName() {
         vector<string> argTypeNames;
         for (const auto& param : params) {
@@ -28,14 +28,13 @@ public:
         IRName = getComposedName(name, parentName, argTypeNames);
     }
 
-    bool isEqual(const string& otherName, const string& otherParentName, const LgsType* otherType) const {
-        if (parentName != otherParentName) return false;
+    bool isEqual(const string& otherName, const LgsType* otherType) const {
         if (name != otherName) return false;
         if (otherType && type->getName() != otherType->getName()) return false;
         return true;
     }
 
-    string getPrintName() const {
+    string getAsStr() const {
         stringstream strStream;
         strStream << name << '(';
         for (size_t i = 0; i < params.size(); ++i) {

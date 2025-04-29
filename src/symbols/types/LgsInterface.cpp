@@ -5,17 +5,17 @@ const string LgsInterface::getName() const {
 }
 
 Type* LgsInterface::getIRType() {
-    assert(false);
+    return ptrTy;
 }
 
 LgsExpr* LgsInterface::getZeroValue() {
-    assert(false && "not implemented");
+    assert(false);
 }
 
 bool LgsInterface::equals(LgsType* other) const {
-    assert(false && "not implemented");
+    assert(false);
 }
 
 LgsType* LgsInterface::inferBinaryType(LgsType* other) {
-    assert(false && "not implemented");
+    assert(false);
 }

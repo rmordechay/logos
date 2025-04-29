@@ -9,17 +9,17 @@
 
 void Logos::run() {
     // Project loading
-    if (!project.loadProject()) return;
+    if (!project.loadProject()) exit(1);
 
     // Semantic analysis
-    if (!analyse(project.files)) return;
+    if (!analyse(project.files)) exit(1);
 
     // Code generation
     CodeGenerator::generate(project.mainFile);
 
     // Linking
     const LgsLinker linker(&paths);
-    if (!linker.link(modules)) return;
+    if (!linker.link(modules)) exit(1);
 
     // Running
     execl(paths.execFilePath.c_str(), static_cast<char*>(nullptr));
