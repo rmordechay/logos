@@ -68,6 +68,41 @@ Value* LgsVariable::leIR(CodeGenMetadata* metadata, LgsExpr* other) {
     return LgsUnaryExpr::leIR(metadata, other);
 }
 
+Value* LgsVariable::bitAndIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    if (ref->type == VAR_DEC) {
+        return ref->varDec->expr->bitAndIR(metadata, other);
+    }
+    return LgsUnaryExpr::bitAndIR(metadata, other);
+}
+
+Value* LgsVariable::bitOrIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    if (ref->type == VAR_DEC) {
+        return ref->varDec->expr->bitOrIR(metadata, other);
+    }
+    return LgsUnaryExpr::bitOrIR(metadata, other);
+}
+
+Value* LgsVariable::bitXorIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    if (ref->type == VAR_DEC) {
+        return ref->varDec->expr->bitXorIR(metadata, other);
+    }
+    return LgsUnaryExpr::bitXorIR(metadata, other);
+}
+
+Value* LgsVariable::rshiftIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    if (ref->type == VAR_DEC) {
+        return ref->varDec->expr->rshiftIR(metadata, other);
+    }
+    return LgsUnaryExpr::rshiftIR(metadata, other);
+}
+
+Value* LgsVariable::lshiftIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    if (ref->type == VAR_DEC) {
+        return ref->varDec->expr->lshiftIR(metadata, other);
+    }
+    return LgsUnaryExpr::lshiftIR(metadata, other);
+}
+
 json LgsVariable::asJSON() {
     json tree;
     tree["name"] = name;

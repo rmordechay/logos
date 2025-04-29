@@ -17,6 +17,11 @@ public:
     Value* ltIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* geIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* leIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* bitAndIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* bitOrIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* bitXorIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* rshiftIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* lshiftIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     json asJSON() override;
     ~LgsVariable() override = default;
 };

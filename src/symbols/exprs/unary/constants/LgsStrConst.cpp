@@ -10,18 +10,6 @@ size_t LgsStrConst::length() {
     return value.size();
 }
 
-LgsExpr* LgsStrConst::add(LgsExpr* other) {
-    string otherValue;
-    if (const auto intConst = other->asIntConst()) {
-        otherValue = to_string(intConst->value);
-    } else if (const auto floatConst = other->asFloatConst()) {
-        otherValue = to_string(floatConst->value);
-    } else if (const auto strConst = other->asStrConst()) {
-        otherValue = this->value + strConst->value;
-    }
-    return new LgsStrConst(value + otherValue);
-}
-
 Value* LgsStrConst::sizeIR(CodeGenMetadata* metadata) {
     return metadata->builder.getInt32(value.size());
 }

@@ -14,7 +14,6 @@ public:
         setFields(type);
     }
     size_t length() override;
-    LgsExpr* add(LgsExpr* other) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* sizeIR(CodeGenMetadata* metadata) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;

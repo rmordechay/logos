@@ -74,6 +74,26 @@ Value* LgsExpr::orIR(CodeGenMetadata* metadata, LgsExpr* right) {
     assert(false);
 }
 
+Value* LgsExpr::bitAndIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    assert(false);
+}
+
+Value* LgsExpr::bitOrIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    assert(false);
+}
+
+Value* LgsExpr::bitXorIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    assert(false);
+}
+
+Value* LgsExpr::rshiftIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    assert(false);
+}
+
+Value* LgsExpr::lshiftIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    assert(false);
+}
+
 bool LgsExpr::isNull() {
     return dynamic_cast<LgsNull*>(this);
 }

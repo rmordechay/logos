@@ -389,7 +389,9 @@ LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx, const bool isNu
     LgsExpr* expr = nullptr;
     if (ctx->cast) {
         expr = getCast(ctx);
-    } else if (const auto unary = ctx->unaryExpr()) {
+    } else if (ctx->LPAREN() && ctx->RPAREN()) {
+        expr = getExpr(ctx->left);
+    }  else if (const auto unary = ctx->unaryExpr()) {
         expr = getUnaryExpr(unary);
     } else if (ctx->right){
         expr = getBinaryExpr(ctx);

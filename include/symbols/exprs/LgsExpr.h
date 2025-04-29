@@ -40,6 +40,11 @@ public:
     virtual Value* leIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* andIR(CodeGenMetadata* metadata, LgsExpr* right);
     virtual Value* orIR(CodeGenMetadata* metadata, LgsExpr* right);
+    virtual Value* bitAndIR(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual Value* bitOrIR(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual Value* bitXorIR(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual Value* rshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual Value* lshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
 
     bool isNull();
     LgsArray* asArray();

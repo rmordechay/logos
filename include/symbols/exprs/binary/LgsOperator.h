@@ -15,6 +15,11 @@ enum LgsOperator {
     LE,
     AND,
     OR,
+    BIT_AND,
+    BIT_OR,
+    BIT_XOR,
+    LSHIFT,
+    RSHIFT,
     NOOP,
 };
 
@@ -31,6 +36,11 @@ inline LgsOperator mapOperator(LogosParser::ExprContext* expr) {
     if (expr->LE()) return LE;
     if (expr->AND()) return AND;
     if (expr->OR()) return OR;
+    if (expr->AMPERSAND()) return BIT_AND;
+    if (expr->PIPE()) return BIT_OR;
+    if (expr->DOUBLE_LANGLE()) return LSHIFT;
+    if (expr->DOUBLE_RANGLE()) return RSHIFT;
+    if (expr->CARET()) return BIT_XOR;
     return NOOP;
 }
 

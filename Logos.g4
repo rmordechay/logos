@@ -152,6 +152,8 @@ expr:
     |   left=expr op=(LANGLE | RANGLE | GE | LE) right=expr
     |   left=expr op=(DOUBLE_EQUAL | NOT_EQUAL) right=expr
     |   left=expr op=(AND | OR) right=expr
+    |   left=expr op=(AMPERSAND | CARET | PIPE) right=expr
+    |   left=expr op=(DOUBLE_LANGLE | DOUBLE_RANGLE) right=expr
     ;
 
 unaryExpr:
@@ -282,6 +284,10 @@ EXCLA_MARK: '!';
 PERCENT: '%';
 DOLLAR: '$';
 AMPERSAND: '&';
+PIPE: '|';
+CARET: '^';
+DOUBLE_RANGLE: '<<';
+DOUBLE_LANGLE: '>>';
 
 OBJECT: 'object';
 SINGLETON: 'singleton';

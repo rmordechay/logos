@@ -27,6 +27,16 @@ Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
         return left->geIR(metadata, right);
     case LE:
         return left->leIR(metadata, right);
+    case BIT_AND:
+        return left->bitAndIR(metadata, right);
+    case BIT_OR:
+        return left->bitOrIR(metadata, right);
+    case BIT_XOR:
+        return left->bitXorIR(metadata, right);
+    case LSHIFT:
+        return left->rshiftIR(metadata, right);
+    case RSHIFT:
+        return left->lshiftIR(metadata, right);
     case NOOP:
         break;
     }
@@ -34,20 +44,25 @@ Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
 }
 
 Value* LgsBinaryExpr::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    return compute(metadata)->addIR(metadata, other);
+    const auto lIRValue = createIRValue(metadata);
+    const auto rIRValue = other->createIRValue(metadata);
+    return metadata->builder.CreateAdd(lIRValue, rIRValue);
 }
 
-LgsExpr* LgsBinaryExpr::compute(CodeGenMetadata* metadata) {
-    if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(left)) {
-        results = unaryExpr->add(right);
-        return results;
-    }
-    if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(left)) {
-        return binaryExpr->compute(metadata);
-    }
-    return nullptr;
+Value* LgsBinaryExpr::subIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    const auto lIRValue = createIRValue(metadata);
+    const auto rIRValue = other->createIRValue(metadata);
+    return metadata->builder.CreateSub(lIRValue, rIRValue);
 }
 
-LgsBinaryExpr::~LgsBinaryExpr() {
-    if (results) delete results;
+Value* LgsBinaryExpr::mulIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    const auto lIRValue = createIRValue(metadata);
+    const auto rIRValue = other->createIRValue(metadata);
+    return metadata->builder.CreateMul(lIRValue, rIRValue);
+}
+
+Value* LgsBinaryExpr::divIR(CodeGenMetadata* metadata, LgsExpr* other) {
+    const auto lIRValue = createIRValue(metadata);
+    const auto rIRValue = other->createIRValue(metadata);
+    return metadata->builder.CreateSDiv(lIRValue, rIRValue);
 }

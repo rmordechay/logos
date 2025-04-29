@@ -9,7 +9,6 @@ public:
 
     explicit LgsIntConst(const int value) : LgsConstExpr(new LgsInt()), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    LgsExpr* add(LgsExpr* other) override;
     LgsExpr* castStatically(LgsType* other) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* neIR(CodeGenMetadata* metadata, LgsExpr* other) override;
@@ -17,6 +16,13 @@ public:
     Value* ltIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* geIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* leIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* andIR(CodeGenMetadata* metadata, LgsExpr* right) override;
+    Value* orIR(CodeGenMetadata* metadata, LgsExpr* right) override;
+    Value* bitAndIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* bitOrIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* bitXorIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* rshiftIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* lshiftIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     ~LgsIntConst() override = default;
 };
 
