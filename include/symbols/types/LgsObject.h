@@ -16,7 +16,6 @@ public:
 
     explicit LgsObject(const string& name, const string& fileName = "") : name(name), filePath(fileName) {}
     const string getName() const override;
-
     Type* getIRType() override;
     json asJSON() const override;
     LgsExpr* getZeroValue() override;
