@@ -8,11 +8,8 @@
 
 class LgsEnvGetFunc final : public LgsMethodImpl {
 public:
-    static constexpr auto name = "Env";
-
-    explicit LgsEnvGetFunc(LgsType* parentType) : LgsMethodImpl("get", new LgsStr(), name, {LgsParam(parentType), LgsParam(new LgsStr()), LgsParam(new LgsStr())}) {
+    explicit LgsEnvGetFunc() : LgsMethodImpl("get", new LgsStr(), "Env", {LgsParam(new LgsStr()), LgsParam(new LgsStr())}) {
         IRFuncType = FunctionType::get(ptrTy, {ptrTy, ptrTy}, false);
-        signature.isStatic = true;
     }
 
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
@@ -31,9 +28,9 @@ public:
 class LgsEnv final : public LgsObject {
 public:
     static constexpr auto name = "Env";
-    LgsEnvGetFunc getFunc = LgsEnvGetFunc(this);
+    LgsMethodImpl getFunc = LgsMethodImpl("get", new LgsStr(), name, {LgsParam(this), LgsParam(new LgsStr()), LgsParam(new LgsStr())});
 
-    explicit LgsEnv() : LgsObject(name) {
+    explicit LgsEnv(): LgsObject(name) {
         methods[getFunc.signature.name] = {&getFunc};
     }
 };

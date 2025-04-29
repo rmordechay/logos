@@ -15,7 +15,6 @@ public:
     LgsType* type;
     vector<LgsParam> params;
     bool isMethod = false;
-    bool isStatic = false;
     bool isCallback = false;
     bool hasDefaultParams = false;
 

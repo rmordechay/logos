@@ -1,6 +1,7 @@
 #include "logos/LgsProject.h"
 
 #include "analysis/AntlrConverter.h"
+#include "builtin/LgsReflect.h"
 #include "files/LgsAppFile.h"
 #include "logos/LgsGlobals.h"
 #include "logos/Logos.h"
@@ -144,6 +145,7 @@ void LogosProject::loadGlobals() const {
     globals.addFunc(new LgsPrint({LgsParam(new LgsBool())}));
     globals.addSymbol(LgsSys::name, LgsSymbol(new LgsSys()));
     globals.addSymbol(LgsEnv::name, LgsSymbol(new LgsEnv()));
+    globals.addSymbol(LgsReflect::name, LgsSymbol(new LgsReflect()));
     globals.addSymbol("ROOT_PATH", LgsSymbol(new LgsVarDec("ROOT_PATH", new LgsStr(), new LgsStrConst(paths.rootDirAbs))));
 }
 

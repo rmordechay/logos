@@ -57,7 +57,7 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
         objPtr = metadata->builder.CreateAlloca(obj->getIRType(), nullptr);;
         argValues.push_back(objPtr);
     }
-    for (int i = signature.isStatic; i < args.size(); ++i) {
+    for (int i = 0; i < args.size(); ++i) {
         const auto arg = args[i];
         const auto argValue = arg->getIRValue(metadata);
         argValues.emplace_back(argValue);
