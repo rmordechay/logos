@@ -304,6 +304,7 @@ LgsParam* AntlerConverter::getParamFunc(LogosParser::FuncSignatureContext* ctx) 
     vector<LgsParam> params;
     setParams(ctx, params);
     const auto func = new LgsFuncImpl(variableName, type, params);
+    func->signature.isCallback = true;
     const auto param = new LgsParam(func);
     param->setLocation(ctx->start);
     return param;

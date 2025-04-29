@@ -20,8 +20,7 @@ Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
     case ENUM_FIELD:
         return ref->enumField->getGEP(metadata);
     case FUNC:
-        // TODO incorrect call, should return function ptr
-        return ref->func[0]->call(metadata);
+        return ref->func[0]->getIRFunc(metadata);
     default:
         assert(false);
     }

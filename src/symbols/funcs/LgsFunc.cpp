@@ -17,16 +17,7 @@ void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
 }
 
 Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
-    if (!IRFuncType) {
-        auto params = getIRParamTypes(metadata);
-        if (const auto obj = signature.type->asObject()) {
-            params.insert(params.begin(), obj->getIRType()->getPointerTo());
-            IRFuncType = FunctionType::get(voidTy, params, false);
-        } else {
-            IRFuncType = FunctionType::get(signature.type->getIRType(), params, false);
-        }
-    }
-
+    if (!IRFuncType) setIRFuncType(metadata);
     if (signature.IRName.empty()) signature.setIRName();
     auto func = metadata->module->getOrInsertFunction(signature.IRName, IRFuncType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
@@ -48,36 +39,30 @@ Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
     return IRFunc;
 }
 
+void LgsFunc::setIRFuncType(const CodeGenMetadata* metadata) {
+    auto params = getIRParamTypes(metadata);
+    if (const auto obj = signature.type->asObject()) {
+        params.insert(params.begin(), obj->getIRType()->getPointerTo());
+        IRFuncType = FunctionType::get(voidTy, params, false);
+    } else {
+        IRFuncType = FunctionType::get(signature.type->getIRType(), params, false);
+    }
+}
+
 Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     const auto IRFunc = getIRFunc(metadata);
     vector<Value*> argValues;
     Value* objPtr = nullptr;
     if (const auto obj = signature.type->asObject()) {
-        objPtr = metadata->builder.CreateAlloca(obj->getIRType(), nullptr, obj->name + "_ptr");;
+        objPtr = metadata->builder.CreateAlloca(obj->getIRType(), nullptr);;
         argValues.push_back(objPtr);
     }
-    // Without default params
-    if (signature.params.size() == args.size()) {
-        for (int i = signature.isStatic; i < args.size(); ++i) {
-            const auto arg = args[i];
-            const auto argValue = arg->getIRValue(metadata);
-            argValues.emplace_back(argValue);
-        }
-    } else {
-        // With default params
-        for (int i = signature.isStatic; i < signature.params.size(); ++i) {
-            LgsExpr* arg;
-            if (i < args.size()) {
-                arg = args[i];
-            } else {
-                arg = signature.params[i].expr;
-                assert(arg);
-            }
-            const auto argValue = arg->getIRValue(metadata);
-            argValues.emplace_back(argValue);
-        }
+    for (int i = signature.isStatic; i < args.size(); ++i) {
+        const auto arg = args[i];
+        const auto argValue = arg->getIRValue(metadata);
+        argValues.emplace_back(argValue);
     }
-    const auto funcCall = metadata->builder.CreateCall(IRFunc, argValues);
+    const auto funcCall = metadata->builder.CreateCall(IRFuncType, IRFunc, argValues);
     if (objPtr) {
         return objPtr;
     }

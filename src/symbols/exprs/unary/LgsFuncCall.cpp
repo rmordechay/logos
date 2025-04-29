@@ -11,6 +11,9 @@ string LgsFuncCall::format(string& indentStr) {
 }
 
 Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
+    // if (ref->type == PARAM) {
+    //     return ref->param->IRValue;
+    // }
     return func->call(metadata, args);
 }
 

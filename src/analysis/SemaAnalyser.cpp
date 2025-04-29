@@ -426,9 +426,10 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     if (!symbol) {
         return handleError(E10006, &funcCall->location, {funcCallName});
     }
-    if (symbol->type == PARAM && !resolveFuncCall({symbol->param->func}, funcCall)) return;
+    if (symbol->type == PARAM && !resolveFuncCall({symbol->param->callbackFunc}, funcCall)) return;
     if (symbol->type == FUNC && !resolveFuncCall(symbol->func, funcCall)) return;
     setExprType(funcCall, funcCall->func->signature.type);
+    funcCall->ref = symbol->clone();
 }
 
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
@@ -575,12 +576,6 @@ void SemaAnalyser::checkObjectImplements(LgsObject* obj, LgsInterface* const int
     }
 }
 
-LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
-    const auto symbol = lgsStack.getSymbol(name);
-    if (!symbol) handleError(E10006, &value->location, {name});
-    return symbol;
-}
-
 bool SemaAnalyser::resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall) {
     LgsFunc* func = nullptr;
     for (const auto& overload : overloads) {
@@ -633,6 +628,12 @@ void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
     if (isFlowCorrect) {
         handleError(E10004, &func->location, {func->signature.name, func->signature.type->getName()});
     }
+}
+
+LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
+    const auto symbol = lgsStack.getSymbol(name);
+    if (!symbol) handleError(E10006, &value->location, {name});
+    return symbol;
 }
 
 void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {

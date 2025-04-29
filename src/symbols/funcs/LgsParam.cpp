@@ -5,7 +5,7 @@
 #include "funcs/LgsFuncSignature.h"
 
 LgsParam::LgsParam(LgsFuncImpl* func)
-    : name(func->signature.name), type(func->signature.type), func(func) {}
+    : name(func->signature.name), type(func->signature.type), callbackFunc(func) {}
 
 string LgsParam::format(string& indentStr) {
     return name + ": " + type->getName();

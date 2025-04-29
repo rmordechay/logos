@@ -12,7 +12,7 @@ public:
     string name;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
-    LgsFuncImpl* func = nullptr;
+    LgsFuncImpl* callbackFunc = nullptr;
     vector<LgsVariable*> refs;
 
     LgsParam(const string& name, LgsType* type, LgsExpr* expr) : name(name), type(type), expr(expr) {}

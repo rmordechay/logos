@@ -77,8 +77,8 @@ void LgsAnalyser::resolveFuncTypes(LgsFuncSignature* signature) {
     signature->type = resolveType(signature->type);
     for (int i = 0; i < signature->params.size(); ++i) {
         const auto lgsParam = signature->params[i];
-        if (lgsParam.func) {
-            resolveFuncTypes(&lgsParam.func->signature);
+        if (lgsParam.callbackFunc) {
+            resolveFuncTypes(&lgsParam.callbackFunc->signature);
         }
         signature->params[i].type = resolveType(signature->params[i].type);
     }

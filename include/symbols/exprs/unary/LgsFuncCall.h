@@ -9,6 +9,7 @@ public:
     string parentName;
     vector<LgsExpr*> args;
     LgsFunc* func = nullptr;
+    LgsSymbol* ref = nullptr;
 
     explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
     string getName() override;

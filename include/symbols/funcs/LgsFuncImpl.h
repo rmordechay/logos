@@ -15,9 +15,9 @@ inline vector<Type*> LgsFuncImpl::getIRParamTypes(const CodeGenMetadata* metadat
     vector<Type*> IRParamsTypes;
     for (int i = 0; i < signature.params.size(); ++i) {
         const auto param = signature.params[i];
-        if (param.func) {
-            const auto rty = param.func->signature.type->getIRType();
-            const auto funcType = FunctionType::get(rty, param.func->getIRParamTypes(metadata), false);
+        if (param.callbackFunc) {
+            const auto rty = param.callbackFunc->signature.type->getIRType();
+            const auto funcType = FunctionType::get(rty, param.callbackFunc->getIRParamTypes(metadata), false);
             IRParamsTypes.emplace_back(funcType->getPointerTo());
         } else {
             const auto type = param.type;

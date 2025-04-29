@@ -16,6 +16,7 @@ public:
     vector<LgsParam> params;
     bool isMethod = false;
     bool isStatic = false;
+    bool isCallback = false;
     bool hasDefaultParams = false;
 
     LgsFuncSignature(const string& name, LgsType* type, const vector<LgsParam>& params): LgsFuncSignature(name, "", type, params) {}

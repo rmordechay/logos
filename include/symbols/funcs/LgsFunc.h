@@ -21,6 +21,7 @@ public:
         : signature(LgsFuncSignature(name, parentName, funcType, params)) {}
 
     void generateIRCode(CodeGenMetadata* metadata);
+    void setIRFuncType(const CodeGenMetadata* metadata);
     Function* getIRFunc(const CodeGenMetadata* metadata);
     virtual vector<Type*> getIRParamTypes(const CodeGenMetadata* metadata) = 0;
     virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {});
