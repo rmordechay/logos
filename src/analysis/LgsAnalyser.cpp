@@ -56,10 +56,9 @@ void LgsAnalyser::resolveGlobalTypes(const vector<LgsFile*>& files) {
         } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             resolveObjMemberTypes(objFile->obj);
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            for (const auto& [_, method] : interfaceFile->interface->methods) {
-                for (const auto& overload : method) {
-                    resolveFuncTypes(&overload->signature);
-                }
+            auto overloads = interfaceFile->interface->getAllMethods();
+            for (const auto& overload : overloads) {
+                resolveFuncTypes(&overload->signature);
             }
         }
     }
@@ -70,10 +69,8 @@ void LgsAnalyser::resolveObjMemberTypes(LgsObject* const& obj) {
         field->type = resolveType(field->type);
         field->parent = obj;
     }
-    for (const auto& [_, method] : obj->methods) {
-        for (const auto& overload : method) {
-            resolveFuncTypes(&overload->signature);
-        }
+    for (const auto& overload : obj->getAllMethods()) {
+        resolveFuncTypes(&overload->signature);
     }
     for (int i = 0; i < obj->implements.size(); ++i) {
         obj->implements[i] = resolveType(obj->implements[i]);

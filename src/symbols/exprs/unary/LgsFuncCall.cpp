@@ -1,5 +1,6 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
+#include "funcs/LgsMethodImpl.h"
 #include "types/LgsVoid.h"
 
 string LgsFuncCall::getName() {
@@ -25,9 +26,6 @@ string LgsFuncCall::getSignatureText() const {
 }
 
 Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
-    // if (ref->type == PARAM) {
-    //     return ref->param->IRValue;
-    // }
     return func->call(metadata, args);
 }
 
@@ -36,9 +34,9 @@ void LgsFuncCall::free(CodeGenMetadata* metadata) {
 }
 
 LgsFuncCall::~LgsFuncCall() {
-    assert(func);
-    const auto iterStart = func->signature.parentName == "" ? 0 : 1;
-    for (int i = iterStart; i < args.size(); ++i) {
+    // First arg of method is not freed here
+    const auto indexStart = !!dynamic_cast<LgsMethodImpl*>(func);
+    for (int i = indexStart; i < args.size(); ++i) {
         delete args[i];
     }
 }

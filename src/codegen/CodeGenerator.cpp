@@ -28,14 +28,12 @@ void CodeGenerator::generate(const LgsMainFile* mainFile, const bool writeToFile
     }
 }
 
-void CodeGenerator::generateObjModule(LgsType* obj, const bool writeToFile) {
+void CodeGenerator::generateObjModule(const LgsType* obj, const bool writeToFile) {
     const auto objName = obj->getName();
     if (modules.find(objName) != modules.end()) return;
     auto metadata = CodeGenMetadata{.module = createEmptyModule(objName)};
-    for (const auto& [_, method] : obj->methods) {
-        for (const auto& overload : method) {
-            overload->generateIRCode(&metadata);
-        }
+    for (const auto& overload : obj->getAllMethods()) {
+        overload->generateIRCode(&metadata);
     }
 
     if (writeToFile) {

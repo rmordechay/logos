@@ -17,10 +17,15 @@
 #include "exprs/unary/constants/LgsTypeConst.h"
 
 Value* LgsExpr::getIRValue(CodeGenMetadata* metadata) {
-    if (IRValue) return IRValue;
-    IRValue = createIRValue(metadata);
+    initIRValue(metadata);
     assert(IRValue);
     return IRValue;
+}
+
+void LgsExpr::initIRValue(CodeGenMetadata* metadata) {
+    if (!IRValue) {
+        IRValue = createIRValue(metadata);
+    }
 }
 
 LgsExpr* LgsExpr::castStatically(LgsType* other) {

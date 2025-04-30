@@ -25,6 +25,7 @@ public:
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     Value* getIRValue(CodeGenMetadata* metadata);
+    void initIRValue(CodeGenMetadata* metadata);
     virtual LgsExpr* castStatically(LgsType* other);
     virtual uint32_t hashValue(CodeGenMetadata* metadata);
     virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;

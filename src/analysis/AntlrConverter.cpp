@@ -138,15 +138,14 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
     const auto obj = new LgsObject(objName, filePath);
     obj->setLocation(ctx->start);
     obj->isSingleton = isSingleton;
-    for (int i = 0; i < ctx->field().size(); ++i) {
-        const auto field = ctx->field()[i];
-        const auto lgsField = getField(field, i);
+    for (const auto& field : ctx->field()) {
+        const auto lgsField = getField(field);
         obj->fields[lgsField->name] = lgsField;
     }
     for (const auto& func : ctx->methodImplementation()) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         const auto method = getMethodImpl(func, obj);
-        obj->methods[funcName].push_back(method);
+        obj->addMethod(method);
     }
     if (ctx->objectImplements()) {
         for (const auto& type : ctx->objectImplements()->TYPE()) {
@@ -166,9 +165,9 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
         vector params = {self};
         setParams(funcSignature, params);
         const auto type = getFuncType(funcSignature);
-        auto method = new LgsMethodImpl(funcSignature->VARIABLE()->getText(), type, interfaceName, params);
+        const auto method = new LgsMethodImpl(funcSignature->VARIABLE()->getText(), type, interfaceName, params);
         method->signature.path = filePath;
-        interface->methods[method->signature.name].push_back(method);
+        interface->addMethod(method);
     }
     globals.addSymbol(interface->name, LgsSymbol(interface));
     return interface;
@@ -217,11 +216,11 @@ void AntlerConverter::setParams(LogosParser::FuncSignatureContext* funcSignature
     }
 }
 
-LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx, const size_t position) {
+LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx) {
     const auto name = ctx->VARIABLE()->getText();
     const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
-    const auto field = new LgsField(name, position, type, expr);
+    const auto field = new LgsField(name, type, expr);
     if (ctx->VISIBILITY()) {
         field->isPublic = true;
     }
@@ -383,7 +382,7 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
             enumText = enumField->STRING()->getText();
             LgsStr::cleanStr(enumText);
         }
-        const auto field = new LgsEnumField(lgsEnum, enumName, i, enumText);
+        const auto field = new LgsEnumField(lgsEnum, enumName, enumText);
         field->type = lgsEnum;
         field->setLocation(ctx->start);
         lgsEnum->fields[enumName] = field;

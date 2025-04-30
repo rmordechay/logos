@@ -5,14 +5,18 @@
 
 class LgsMethodImpl : public LgsFunc {
 public:
+    string parentName;
+    int vtableKey = -1;
     bool isPublic = false;
     bool isStatic = false;
+    LgsMethodImpl* implements = nullptr;
 
-    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam>& params = {}) : LgsFunc(name, funcType, params, parentName) {}
+    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam>& params = {}) : LgsFunc(name, funcType, params), parentName(parentName) {}
+    void setIRName() override;
     void setIRFuncType(const CodeGenMetadata* metadata) override;
     void setIRFuncParams(Argument* args) override;
-    bool isEqual(const LgsFuncCall* funcCall) override;
-    bool isEqual(const LgsFuncSignature* other) override;
+    bool equals(const LgsFuncCall* other) override;
+    bool equals(const LgsFuncSignature* other) override;
     ~LgsMethodImpl() override = default;
 };
 

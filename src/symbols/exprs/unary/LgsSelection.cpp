@@ -2,7 +2,10 @@
 #include "exprs/unary/LgsArrayIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsVariable.h"
+#include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
+#include "types/LgsEnum.h"
+#include "types/LgsInterface.h"
 
 string LgsSelection::getName() {
     return "";
@@ -14,21 +17,35 @@ Value* LgsSelection::createIRValue(CodeGenMetadata* metadata) {
 
 LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
     for (int i = 0; i < exprs.size() - 1; ++i) {
-        const auto currentExpr = exprs[i];
-        const auto nextExpr = exprs[i + 1];
-        const auto field = currentExpr->type->getField(nextExpr->getName());
+        const auto parentExpr = exprs[i];
+        const auto childExpr = exprs[i + 1];
+        const auto field = parentExpr->type->getField(childExpr->getName());
+        const auto parentIRValue = parentExpr->getIRValue(metadata);
         if (field) {
-            const auto parentInstance = currentExpr->getIRValue(metadata);
-            const auto value = field->getGEP(metadata, parentInstance);
+            const auto value = field->getGEP(metadata, parentIRValue);
             const auto valueLoad = metadata->builder.CreateLoad(field->type->getIRType(), value);
-            nextExpr->setIRValue(valueLoad);
+            childExpr->setIRValue(valueLoad);
             continue;
         }
-        if (const auto methodCall = nextExpr->asFuncCall()) {
-            nextExpr->setIRValue(methodCall->getIRValue(metadata));
+
+        if (const auto methodCall = childExpr->asFuncCall()) {
+            if (const auto interface = parentExpr->type->asInterface()) {
+                dispatchInterfaceFunc(metadata, parentIRValue, methodCall, interface);
+            } else {
+                methodCall->initIRValue(metadata);
+            }
         }
     }
     return lastExpr();
+}
+
+Value* LgsSelection::dispatchInterfaceFunc(CodeGenMetadata* metadata, Value* parentIRValue, const LgsFuncCall* methodCall, LgsInterface* interface) const {
+    auto& builder = metadata->builder;
+    const auto interfaceIRType = interface->getIRType();
+    const auto interfaceGEP = builder.CreateStructGEP(interfaceIRType, parentIRValue, 0);
+    const auto interfacePtr = builder.CreateLoad(ptrTy, interfaceGEP);
+    if (!methodCall->func->IRFuncType) methodCall->func->setIRFuncType(metadata);
+    return builder.CreateCall(methodCall->func->IRFuncType, interfacePtr, {parentIRValue});
 }
 
 json LgsSelection::asJSON() {

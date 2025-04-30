@@ -15,7 +15,7 @@ public:
 
     void setExitFunc() {
         exitFunc.IRFuncType = FunctionType::get(voidTy, {i32Ty}, false);
-        methods[exitFunc.signature.name].push_back(&exitFunc);
+        addMethod(&exitFunc);
     }
 };
 

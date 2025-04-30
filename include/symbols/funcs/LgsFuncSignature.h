@@ -11,28 +11,13 @@ class LgsFuncSignature {
 public:
     string name;
     string IRName;
-    string parentName;
     string path;
     LgsType* type;
     vector<LgsParam> params;
     bool isCallback = false;
     bool hasDefaultParams = false;
 
-    LgsFuncSignature(const string& name, LgsType* type, const vector<LgsParam>& params): LgsFuncSignature(name, "", type, params) {}
-    LgsFuncSignature(const string& name, const string& parentName, LgsType* type, const vector<LgsParam>& params) : name(name), parentName(parentName), type(type), params(params) {}
-    void setIRName() {
-        vector<string> argTypeNames;
-        for (const auto& param : params) {
-            argTypeNames.emplace_back(param.type->getName());
-        }
-        IRName = getComposedName(name, parentName, argTypeNames);
-    }
-
-    bool isEqual(const string& otherName, const LgsType* otherType) const {
-        if (name != otherName) return false;
-        if (otherType && type->getName() != otherType->getName()) return false;
-        return true;
-    }
+    LgsFuncSignature(const string& name, LgsType* type, const vector<LgsParam>& params) : name(name), type(type), params(params) {}
 
     string getAsStr() const {
         stringstream strStream;

@@ -15,6 +15,8 @@ public:
     uint32_t hashValue(CodeGenMetadata* metadata) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    Value* dispatchInterfaceFunc(CodeGenMetadata* metadata, Value* parentIRValue, const LgsFuncCall* methodCall,
+                  LgsInterface* interface) const;
     LgsExpr* resolveSelection(CodeGenMetadata* metadata) const;
     json asJSON() override;
     ~LgsSelection() override;

@@ -4,7 +4,7 @@
 
 Value* LgsReturn::createIRValue(CodeGenMetadata* metadata) {
     if (expr->type->asObject()) {
-        expr->getIRValue(metadata);
+        expr->initIRValue(metadata);
         return metadata->builder.CreateRetVoid();
     }
     const auto exprIR = expr->getIRValue(metadata);

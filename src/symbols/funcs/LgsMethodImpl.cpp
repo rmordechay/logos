@@ -1,6 +1,14 @@
 #include "funcs/LgsMethodImpl.h"
 #include "types/LgsObject.h"
 
+void LgsMethodImpl::setIRName() {
+    vector<string> argTypeNames;
+    for (const auto& param : signature.params) {
+        argTypeNames.emplace_back(param.type->getName());
+    }
+    signature.IRName = signature.getComposedName(signature.name, parentName, argTypeNames);
+}
+
 void LgsMethodImpl::setIRFuncType(const CodeGenMetadata* metadata) {
     // TODO implement static
     vector<Type*> IRParamsTypes;
@@ -26,19 +34,19 @@ void LgsMethodImpl::setIRFuncParams(Argument* args) {
     }
 }
 
-bool LgsMethodImpl::isEqual(const LgsFuncCall* funcCall) {
-    if (!signature.isEqual(funcCall->name, funcCall->type)) return false;
+bool LgsMethodImpl::equals(const LgsFuncCall* other) {
+    if (signature.name != other->name) return false;
     if (signature.params.size() == 0) return true;
     for (size_t i = 1; i < signature.params.size(); ++i) {
         auto thisTypeName = signature.params[i].type->getName();
-        auto otherTypeName = funcCall->args[i]->type->getName();
+        auto otherTypeName = other->args[i]->type->getName();
         if (thisTypeName != otherTypeName) return false;
     }
     return true;
 }
 
-bool LgsMethodImpl::isEqual(const LgsFuncSignature* other) {
-    if (!signature.isEqual(other->name, other->type)) return false;
+bool LgsMethodImpl::equals(const LgsFuncSignature* other) {
+    if (signature.name != other->name) return false;
     if (signature.params.size() == 0) return true;
     for (size_t i = 0; i < signature.params.size() - 1; ++i) {
         auto thisTypeName = signature.params[i + 1].type->getName();

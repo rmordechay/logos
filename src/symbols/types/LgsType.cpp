@@ -2,6 +2,7 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
+#include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
 bool LgsType::equals(const LgsType& other) {
@@ -15,6 +16,10 @@ void LgsType::setLocation(const antlr4::Token* ctx) {
 
 LgsObject* LgsType::asObject() {
     return dynamic_cast<LgsObject*>(this);
+}
+
+LgsInterface* LgsType::asInterface() {
+    return dynamic_cast<LgsInterface*>(this);
 }
 
 bool LgsType::isVoid() {
@@ -33,10 +38,14 @@ LgsField* LgsType::getField(const string& name) {
     return nullptr;
 }
 
+void LgsType::addMethod(LgsMethodImpl* method) {
+    methods[method->signature.name].push_back(method);
+}
+
 LgsMethodImpl* LgsType::findMethod(const LgsFuncCall* funcCall) const {
     const auto overloads = getMethodsOverloads(funcCall->name);
     for (const auto& overload : overloads) {
-        if (overload->isEqual(funcCall)) {
+        if (overload->equals(funcCall)) {
             return overload;
         }
     }
@@ -49,6 +58,16 @@ vector<LgsMethodImpl*> LgsType::getMethodsOverloads(const string& funcName) cons
         return method->second;
     }
     return {};
+}
+
+vector<LgsMethodImpl*> LgsType::getAllMethods() const {
+    vector<LgsMethodImpl*> overloads;
+    for (const auto& method : methods) {
+        for (const auto& overload : method.second) {
+            overloads.emplace_back(overload);
+        }
+    }
+    return overloads;
 }
 
 Type* LgsUnknownType::getIRType() {

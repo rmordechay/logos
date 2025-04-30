@@ -18,12 +18,12 @@ void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
 
 Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
     if (!IRFuncType) setIRFuncType(metadata);
-    if (signature.IRName.empty()) signature.setIRName();
+    if (signature.IRName.empty()) setIRName();
     auto func = metadata->module->getOrInsertFunction(signature.IRName, IRFuncType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
     auto args = IRFunc->arg_begin();
     if (const auto obj = signature.type->asObject()) {
-        setSRet(args, obj);
+        setStructRet(args, obj);
     }
     if (args) {
         setIRFuncParams(args);
@@ -45,9 +45,7 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
         argValues.emplace_back(argValue);
     }
     const auto funcCall = metadata->builder.CreateCall(IRFuncType, IRFunc, argValues);
-    if (objPtr) {
-        return objPtr;
-    }
+    if (objPtr) return objPtr;
     return funcCall;
 }
 
@@ -70,7 +68,7 @@ string LgsFunc::format(string& indentStr) {
     return str.str();
 }
 
-void LgsFunc::setSRet(Function::arg_iterator& args, LgsObject* const obj) const {
+void LgsFunc::setStructRet(Function::arg_iterator& args, LgsObject* const obj) const {
     AttrBuilder builder(context);
     builder.addStructRetAttr(obj->getIRType());
     args->addAttrs(builder);

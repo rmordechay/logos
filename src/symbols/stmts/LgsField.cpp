@@ -5,7 +5,7 @@
 Value* LgsField::getGEP(CodeGenMetadata* metadata, Value* instance) {
     if (IRValue) return IRValue;
     assert(instance);
-    IRValue = metadata->builder.CreateStructGEP(parent->getIRType(), instance, position, parent->name + "_" + name + "_gep");
+    IRValue = metadata->builder.CreateStructGEP(parent->getIRType(), instance, position);
     return IRValue;
 }
 

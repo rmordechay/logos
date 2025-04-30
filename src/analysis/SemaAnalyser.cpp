@@ -55,48 +55,14 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
     for (const auto& [_, field] : obj->fields) {
         visitField(field);
     }
-    for (const auto& [_, method] : obj->methods) {
-        for (const auto& overload : method) {
-            visitFunc(overload);
-        }
+    for (const auto& overload : obj->getAllMethods()) {
+        visitFunc(overload);
     }
     visitObjectImplements(obj);
 }
 
 void SemaAnalyser::visitInterface(LgsInterface* interface) {
 
-}
-
-void SemaAnalyser::visitObjectImplements(LgsObject* obj) {
-    for (int i = 0; i < obj->implements.size(); ++i) {
-        const auto implement = obj->implements[i];
-        if (!implement) continue;
-        const auto interface = dynamic_cast<LgsInterface*>(implement);
-        if (!interface) {
-            handleError(E10025, &implement->location, {implement->getName()});
-            continue;
-        }
-
-        vector<LgsFunc*> missingFuncs;
-        for (const auto& [_, interfaceMethod] : implement->methods) {
-            for (const auto& interfaceOverload : interfaceMethod) {
-                const auto overloads = obj->getMethodsOverloads(interfaceOverload->signature.name);
-                auto found = false;
-                for (const auto& overload : overloads) {
-                    if (overload->isEqual(&overload->signature)) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    missingFuncs.emplace_back(interfaceOverload);
-                }
-            }
-        }
-        if (!missingFuncs.empty()) {
-            handleError(E10016, &obj->location, {obj->name, interface->name, getOverloadsAsStr(missingFuncs)});
-        }
-    }
 }
 
 void SemaAnalyser::visitFunc(LgsFunc* func) {
@@ -428,7 +394,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
     setExprType(methodCall, methodCall->func->signature.type);
     const auto method = dynamic_cast<LgsMethodImpl*>(methodCall->func);
     if (!method->isPublic && file->absPath != method->signature.path) {
-        handleError(E10031, &method->location, {method->signature.name, method->signature.parentName});
+        handleError(E10031, &method->location, {method->signature.name, method->parentName});
     }
 }
 
@@ -498,6 +464,39 @@ void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
     //     handleError(E10002, &arrayIndex->location, {arrayIndex->getName()});
     //     return;
     // }
+}
+
+void SemaAnalyser::visitObjectImplements(LgsObject* obj) {
+    for (int i = 0; i < obj->implements.size(); ++i) {
+        const auto implement = obj->implements[i];
+        if (!implement) continue;
+        const auto interface = dynamic_cast<LgsInterface*>(implement);
+        if (!interface) {
+            handleError(E10025, &implement->location, {implement->getName()});
+            continue;
+        }
+
+        vector<LgsFunc*> missingFuncs;
+        for (const auto& [name, interfaceOverloads] : interface->methods) {
+            const auto objOverloads = obj->getMethodsOverloads(name);
+            auto found = false;
+            for (const auto& interfaceOverload : interfaceOverloads) {
+                for (const auto& objOverload : objOverloads) {
+                    if (objOverload->equals(&interfaceOverload->signature)) {
+                        objOverload->implements = interfaceOverload;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    missingFuncs.emplace_back(interfaceOverload);
+                }
+            }
+        }
+        if (!missingFuncs.empty()) {
+            handleError(E10016, &obj->location, {obj->name, interface->name, getOverloadsAsStr(missingFuncs)});
+        }
+    }
 }
 
 void SemaAnalyser::setExprType(LgsExpr* expr, LgsType* type) {
@@ -603,7 +602,7 @@ LgsFunc* SemaAnalyser::resolveFuncCallWithoutDefaultParams(LgsFunc* func, const 
     const auto params = func->signature.params;
     if (funcCall->args.size() > params.size()) return nullptr;
     if (params.size() == funcCall->args.size()) {
-        if (func->isEqual(funcCall)) {
+        if (func->equals(funcCall)) {
             return func;
         }
     }

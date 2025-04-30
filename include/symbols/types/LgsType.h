@@ -20,14 +20,18 @@ class LgsType {
 public:
     Location location;
     bool nullable = false;
+    Type* IRType = nullptr;
     map<string, LgsField*> fields;
     map<string, vector<LgsMethodImpl*>> methods;
 
     LgsField* getField(const string& name);
+    void addMethod(LgsMethodImpl* method);
     LgsMethodImpl* findMethod(const LgsFuncCall* funcCall) const;
     vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
+    vector<LgsMethodImpl*> getAllMethods() const;
     void setLocation(const antlr4::Token* ctx);
     LgsObject* asObject();
+    LgsInterface* asInterface();
     virtual bool isVoid();
     virtual bool equals(const LgsType& other);
     virtual Type* getIRType() = 0;

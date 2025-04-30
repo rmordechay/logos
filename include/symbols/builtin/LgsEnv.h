@@ -31,7 +31,7 @@ public:
     LgsMethodImpl getFunc = LgsMethodImpl("get", new LgsStr(), name, {LgsParam(this), LgsParam(new LgsStr()), LgsParam(new LgsStr())});
 
     explicit LgsEnv(): LgsObject(name) {
-        methods[getFunc.signature.name].push_back(&getFunc);
+        addMethod(&getFunc);
     }
 };
 

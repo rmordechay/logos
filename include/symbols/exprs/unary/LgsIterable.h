@@ -17,7 +17,7 @@ public:
 };
 
 inline void LgsIterable::setFields(LgsType* type) {
-    const auto lenField = new LgsField("len", 0, new LgsInt(), new LgsIntConst(length()));
+    const auto lenField = new LgsField("len", new LgsInt(), new LgsIntConst(length()));
     type->fields[lenField->name] = lenField;
 }
 

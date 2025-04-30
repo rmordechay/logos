@@ -22,8 +22,8 @@ public:
 
     LgsArrayType() {
         underlyingType = new LgsAny();
-        methods[addFunc.signature.name].push_back(&addFunc);
-        methods[isEmptyFunc.signature.name].push_back(&isEmptyFunc);
+        addMethod(&addFunc);
+        addMethod(&isEmptyFunc);
     }
     explicit LgsArrayType(LgsType* underlyingType) : underlyingType(underlyingType) {}
     const string getName() const override;

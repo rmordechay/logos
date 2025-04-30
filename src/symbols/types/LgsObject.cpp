@@ -3,6 +3,7 @@
 #include "exprs/LgsNull.h"
 #include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
+#include "types/LgsInterface.h"
 
 const string LgsObject::getName() const {
     return name;
@@ -11,15 +12,21 @@ const string LgsObject::getName() const {
 Type* LgsObject::getIRType() {
     if (IRType) return IRType;
     CodeGenerator::generateObjModule(this);
+
     vector<Type*> elementTypes;
+    size_t structPosition = 0;
     for (const auto& [_, field] : fields) {
         auto fieldType = field->type->getIRType();
         elementTypes.push_back(fieldType);
+        field->position = structPosition++;
     }
-    const auto typeByName = StructType::getTypeByName(context, name);
-    if (typeByName) {
-        IRType = typeByName;
-    } else {
+
+    for (const auto& implement : implements) {
+        elementTypes.push_back(implement->getIRType());
+    }
+
+    IRType = StructType::getTypeByName(context, name);
+    if (!IRType) {
         IRType = StructType::create(context, elementTypes, name);
     }
     return IRType;

@@ -10,7 +10,6 @@ class LgsObject : public LgsType {
 public:
     string name;
     string path;
-    Type* IRType = nullptr;
     bool isSingleton = false;
     vector<LgsType*> implements;
 
