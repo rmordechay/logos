@@ -1,6 +1,6 @@
 #include "stmts/LgsIfStmt.h"
 
-Value* LgsIfStmt::createIRValue(CodeGenMetadata* metadata) {
+void LgsIfStmt::createIRStmt(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope();
     if (elseIfConds.size() > 0) {
         computeComplexIf(metadata);
@@ -8,7 +8,6 @@ Value* LgsIfStmt::createIRValue(CodeGenMetadata* metadata) {
         computeSimpleIf(metadata);
     }
     metadata->lgsStack.exitScope();
-    return nullptr;
 }
 
 

@@ -5,7 +5,7 @@
 
 void LgsStmtBlock::createIRValue(CodeGenMetadata* metadata) const {
     for (const auto& stmt : stmts) {
-        stmt->createIRValue(metadata);
+        stmt->createIRStmt(metadata);
     }
 }
 

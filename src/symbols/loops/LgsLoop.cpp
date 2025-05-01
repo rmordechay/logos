@@ -2,14 +2,13 @@
 #include "stmts/LgsStmtBlock.h"
 #include "stmts/LgsVarDec.h"
 
-Value* LgsLoop::createIRValue(CodeGenMetadata* metadata) {
+void LgsLoop::createIRStmt(CodeGenMetadata* metadata) {
     initIRLoop(metadata);
     setLoopIRCondition(metadata);
     startBlock(metadata, loopBodyBlock);
     setIRLoopVariable(metadata);
     stmtBlock->createIRValue(metadata);
     exitIRLoop(metadata);
-    return nullptr;
 }
 
 void LgsLoop::initIRLoop(CodeGenMetadata* metadata) {

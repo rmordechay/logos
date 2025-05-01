@@ -21,7 +21,7 @@ public:
     Value* iValue = nullptr;
 
     LgsLoop(const vector<LgsVarDec*>& loopVars, LgsStmtBlock* stmtBlock) : loopVars(loopVars), stmtBlock(stmtBlock) {}
-    Value* createIRValue(CodeGenMetadata* metadata) override;
+    void createIRStmt(CodeGenMetadata* metadata) override;
     void initIRLoop(CodeGenMetadata* metadata);
     void setLoopIRCondition(CodeGenMetadata* metadata);
     void exitIRLoop(CodeGenMetadata* metadata) const;

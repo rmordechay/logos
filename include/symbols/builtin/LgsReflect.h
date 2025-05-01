@@ -1,13 +1,14 @@
 #ifndef LGSREFLECT_H
 #define LGSREFLECT_H
-#include "exprs/unary/LgsArray.h"
+#include "exprs/unary/LgsDArray.h"
 #include "exprs/unary/LgsVariable.h"
 #include "funcs/LgsMethodImpl.h"
+#include "types/LgsAny.h"
 #include "types/LgsObject.h"
 
 class LgsReflectGetFields final : public LgsMethodImpl {
 public:
-    LgsArrayType rt = LgsArrayType(&LGS_STR);
+    LgsAny rt = LgsAny();
     const LgsObject* parent;
 
     explicit LgsReflectGetFields(const LgsObject* parent) : LgsMethodImpl("getFields", &rt, parent->name, {LgsParam(new LgsObject())}), parent(parent) {

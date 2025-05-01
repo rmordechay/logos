@@ -4,7 +4,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsVarDec.h"
 
-Value* LgsPatternMatch::createIRValue(CodeGenMetadata* metadata) {
+void LgsPatternMatch::createIRStmt(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto func = metadata->lgsStack.currentFunc->getIRFunc(metadata);
     const auto exprIRValue = metadata->builder.getInt32(expr->hashValue(metadata));
@@ -28,7 +28,6 @@ Value* LgsPatternMatch::createIRValue(CodeGenMetadata* metadata) {
 
     builder.CreateBr(exitBlock);
     startBlock(metadata, exitBlock);
-    return nullptr;
 }
 
 json LgsPatternMatch::asJSON() {

@@ -1,14 +1,13 @@
 #include "stmts/LgsVarDec.h"
-#include "exprs/unary/LgsArray.h"
+#include "exprs/unary/LgsDArray.h"
 
 string LgsVarDec::format(string& indentStr) {
     return indentStr + name + " = ";
 }
 
-Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
+void LgsVarDec::createIRStmt(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    if (!expr) return builder.CreateAlloca(type->getIRType());
-
+    assert(expr);
     const auto exprValue = expr->getIRValue(metadata);
     const auto valueType = exprValue->getType();
     // Pointers don't need to be stored
@@ -17,7 +16,6 @@ Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
         builder.CreateStore(exprValue, ptr);
     }
     IRValue = exprValue;
-    return exprValue;
 }
 
 json LgsVarDec::asJSON() {

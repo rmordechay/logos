@@ -13,6 +13,10 @@ Type* LgsStr::getIRType() {
     return ptrTy;
 }
 
+Type* LgsStr::getUnderlyingIRType() {
+    assert(false);
+}
+
 LgsExpr* LgsStr::getZeroValue() {
     if (nullable) return new LgsNull();
     return new LgsStrConst("");

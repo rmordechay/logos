@@ -4,12 +4,11 @@
 
 #include <loops/LgsLoop.h>
 
-Value* LgsContinue::createIRValue(CodeGenMetadata* metadata) {
+void LgsContinue::createIRStmt(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto currentLoop = metadata->lgsStack.currentLoop;
     const auto loopCondition = currentLoop->loopCondBlock;
     const auto inc = builder.CreateAdd(currentLoop->iValue, builder.getInt32(1));
     builder.CreateStore(inc, currentLoop->iPtr);
-    const auto branch = builder.CreateBr(loopCondition);
-    return branch;
+    builder.CreateBr(loopCondition);
 }

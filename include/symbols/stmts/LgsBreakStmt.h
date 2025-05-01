@@ -6,7 +6,7 @@ class LgsLoop;
 
 class LgsBreakStmt final : public LgsStmt {
 public:
-    Value* createIRValue(CodeGenMetadata* metadata) override;
+    void createIRStmt(CodeGenMetadata* metadata) override;
     ~LgsBreakStmt() override = default;
 };
 

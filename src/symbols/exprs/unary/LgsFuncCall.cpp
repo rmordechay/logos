@@ -26,6 +26,10 @@ string LgsFuncCall::getSignatureText(const bool withType) const {
     return strStream.str();
 }
 
+void LgsFuncCall::createIRStmt(CodeGenMetadata* metadata) {
+    func->call(metadata, args);
+}
+
 Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
     return func->call(metadata, args);
 }

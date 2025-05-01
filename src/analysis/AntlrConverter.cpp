@@ -16,7 +16,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "exprs/unary/LgsInstance.h"
 #include "exprs/unary/LgsSelection.h"
-#include <exprs/unary/LgsArray.h>
+#include <exprs/unary/LgsDArray.h>
 #include <exprs/unary/LgsArrayIndex.h>
 #include <exprs/unary/LgsFuncCall.h>
 #include <exprs/unary/LgsVariable.h>
@@ -31,12 +31,13 @@
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "stmts/LgsPatternMatch.h"
+#include "types/LgsSArrType.h"
 
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
 #include <types/LgsStr.h>
 #include <types/LgsVoid.h>
-#include <types/LgsArrayType.h>
+#include <types/LgsDArrType.h>
 
 LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
     LgsFile* logosFile = nullptr;
@@ -453,7 +454,7 @@ LgsUnaryExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
     for (const auto& expr : ctx->expr()) {
         initialElements.emplace_back(getExpr(expr));
     }
-    const auto array = new LgsArray(initialElements);
+    const auto array = new LgsDArray(new LgsUnknownType(), initialElements);
     array->setLocation(ctx->start);
     return array;
 }
@@ -575,14 +576,14 @@ LgsArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ct
         assert(false && "not implemented");
     }
 
-    auto arrayIndex = new LgsArrayIndex(baseExpr, getExpr(ctx->expr()[0]));
-    arrayIndex->setLocation(ctx->start);
+    vector<LgsExpr*> exprs;
     for (int i = 0; i < ctx->expr().size(); ++i) {
         const auto expr = ctx->expr()[i];
-        arrayIndex = new LgsArrayIndex(arrayIndex, getExpr(expr));
-        arrayIndex->setLocation(expr->start);
+        auto lgsExpr = getExpr(expr);
+        exprs.emplace_back(lgsExpr);
     }
-
+    const auto arrayIndex = new LgsArrayIndex(baseExpr, exprs);
+    arrayIndex->setLocation(ctx->start);
     return arrayIndex;
 }
 
@@ -620,16 +621,28 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) const {
     if (!ctx) return nullptr;
     const auto typeText = ctx->TYPE()->getText();
     LgsType* result = nullptr;
+    const auto type = getTypeFromText(typeText, ctx);
     if (ctx->LBRACK().size() > 0) {
-        result = new LgsArrayType(getTypeFromText(typeText, ctx));
-        result->setLocation(ctx->start);
+        result = getArrayType(ctx, type);
     } else {
-        result = getTypeFromText(typeText, ctx);
+        result = type;
         if (ctx->QUEST_MARK()) {
             result->nullable = true;
         }
     }
+    result->setLocation(ctx->start);
     return result;
+}
+
+LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx, LgsType* underlyingType) const {
+    if (ctx->INTEGER().size() > 0) {
+        vector<size_t> arraySize;
+        for (const auto& integer : ctx->INTEGER()) {
+            arraySize.emplace_back(std::stoi(integer->getText()));
+        }
+        return new LgsSArrType(underlyingType, arraySize);
+    }
+    return new LgsDArrType(underlyingType);
 }
 
 LgsType* AntlerConverter::getTypeFromText(const string& typeText, const antlr4::ParserRuleContext* ctx) const {

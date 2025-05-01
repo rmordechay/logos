@@ -8,7 +8,7 @@ public:
     LgsExpr *expr = nullptr;
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
-    Value* createIRValue(CodeGenMetadata* metadata) override;
+    void createIRStmt(CodeGenMetadata* metadata) override;
     ~LgsReturn() override;
 };
 

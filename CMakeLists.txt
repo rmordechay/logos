@@ -27,6 +27,7 @@ add_library(lib STATIC
     include/logos/LgsActiveEnv.h
     include/logos/LgsProject.h
     include/logos/LgsStack.h
+    include/logos/LgsErrorHandler.h
     include/data/LgsData.h
     include/data/LgsErrors.h
     include/data/LgsWarnings.h
@@ -55,12 +56,13 @@ add_library(lib STATIC
     include/symbols/LgsSymbol.h
     include/symbols/builtin/LgsSys.h
     include/symbols/builtin/LgsEnv.h
+    include/symbols/builtin/LgsReflect.h
     include/symbols/exprs/LgsNull.h
     include/symbols/exprs/LgsExpr.h
     include/symbols/exprs/LgsCast.h
     include/symbols/exprs/binary/LgsBinaryExpr.h
-    include/symbols/exprs/unary/LgsIterable.h
-    include/symbols/exprs/unary/LgsArray.h
+    include/symbols/exprs/unary/LgsDArray.h
+    include/symbols/exprs/unary/LgsSArray.h
     include/symbols/exprs/unary/LgsArrayIndex.h
     include/symbols/exprs/unary/LgsFuncCall.h
     include/symbols/exprs/unary/LgsInstance.h
@@ -105,14 +107,16 @@ add_library(lib STATIC
     include/symbols/types/LgsChar.h
     include/symbols/types/LgsObject.h
     include/symbols/types/LgsInterface.h
-    include/symbols/types/LgsArrayType.h
+    include/symbols/types/LgsDArrType.h
+    include/symbols/types/LgsSArrType.h
     include/symbols/types/LgsAny.h
+    include/symbols/types/LgsIterable.h
 
     # src
     src/logos/Logos.cpp
+    src/logos/LgsErrorHandler.cpp
+    src/logos/LgsProject.cpp
     src/logos/LgsStack.cpp
-    src/utils/ThreadPool.cpp
-    src/utils/LgsC.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsRunCmd.cpp
@@ -123,7 +127,8 @@ add_library(lib STATIC
     src/parser/LogosParser.cpp
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
-    src/logos/LgsProject.cpp
+    src/utils/ThreadPool.cpp
+    src/utils/LgsC.cpp
 
     # Symbols src
     src/symbols/LgsSymbol.cpp
@@ -140,7 +145,8 @@ add_library(lib STATIC
     src/symbols/exprs/unary/constants/LgsFloatConst.cpp
     src/symbols/exprs/unary/constants/LgsBoolConst.cpp
     src/symbols/exprs/unary/constants/LgsCharConst.cpp
-    src/symbols/exprs/unary/LgsArray.cpp
+    src/symbols/exprs/unary/constants/LgsSArray.cpp
+    src/symbols/exprs/unary/LgsDArray.cpp
     src/symbols/exprs/unary/LgsArrayIndex.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
     src/symbols/exprs/unary/LgsEnumField.cpp
@@ -168,18 +174,17 @@ add_library(lib STATIC
     src/symbols/types/LgsFloat.cpp
     src/symbols/types/LgsChar.cpp
     src/symbols/types/LgsType.cpp
-    src/symbols/types/LgsArrayType.cpp
+    src/symbols/types/LgsDArrType.cpp
     src/symbols/types/LgsInterface.cpp
     src/symbols/types/LgsAny.cpp
     src/symbols/types/LgsObject.cpp
     src/symbols/funcs/LgsFuncImpl.cpp
     src/symbols/funcs/LgsMethodImpl.cpp
-    src/logos/LgsErrorHandler.cpp
+    src/symbols/types/LgsSArrType.cpp
 )
 
-add_executable(lgs main.cpp
-    include/symbols/builtin/LgsReflect.h
-    include/logos/LgsErrorHandler.h)
+add_executable(lgs main.cpp)
+
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE

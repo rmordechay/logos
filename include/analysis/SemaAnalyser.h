@@ -19,7 +19,7 @@ class LgsArrayIndex;
 class LgsSelection;
 class LgsFuncCall;
 class LgsBinaryExpr;
-class LgsArray;
+class LgsDArray;
 class LgsIfStmt;
 class LgsAssignment;
 class LgsLoop;
@@ -52,13 +52,13 @@ public:
     void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const;
     void visitLoopStmt(LgsLoop* loopStmt);
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);
-    void visitForeachLoop(LgsForeachLoop* foreachLoop);
+    void visitForeachLoop(const LgsForeachLoop* foreachLoop);
     void visitReturnStmt(const LgsReturn* returnStmt);
     void visitBreakStmt(LgsBreakStmt* breakStmt) const;
     void visitEnum(const LgsEnum* lgsEnum) const;
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
-    void visitArray(const LgsArray* array);
+    void visitArray(const LgsDArray* array);
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
@@ -74,7 +74,6 @@ public:
     void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
-    LgsIterable* getExprIterable(LgsForeachLoop* loop, LgsExpr* expr);
 
     bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall, const string& parentName = "");
     LgsFunc* resolveFuncCallWithDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const;

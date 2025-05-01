@@ -2,15 +2,14 @@
 #define LOGOSFOREACHLOOP_H
 #include "LgsLoop.h"
 
-#include <exprs/unary/LgsIterable.h>
+#include <types/LgsIterable.h>
 #include <exprs/unary/LgsUnaryExpr.h>
 
-class LgsArrayType;
+class LgsDArrType;
 
 class LgsForeachLoop final : public LgsLoop {
 public:
     LgsUnaryExpr* expr = nullptr;
-    LgsIterable* iterable = nullptr;
 
     LgsForeachLoop(const vector<LgsVarDec*>& loopVars, LgsUnaryExpr* iterable, LgsStmtBlock* stmtBlock) : LgsLoop(loopVars, stmtBlock), expr(iterable) {}
     int loopStart() override;

@@ -15,6 +15,7 @@ public:
     string getName() override;
     string format(string& indentStr) override;
     string getSignatureText(bool withType = false) const;
+    void createIRStmt(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     void free(CodeGenMetadata* metadata) override;
     ~LgsFuncCall() override;

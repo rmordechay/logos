@@ -73,6 +73,7 @@ inline LgsGlobals globals;
 inline LgsType* resolveType(LgsType* type, LgsErrorHandler* errorHandler) {
     if (!dynamic_cast<LgsUnknownType*>(type)) return type;
     auto typeName = type->getName();
+    assert(typeName != "");
     const auto nullable = type->nullable;
     if (globals.symbols.find(typeName) == globals.symbols.end()) {
         errorHandler->handleError(E10006, &type->location, {typeName});

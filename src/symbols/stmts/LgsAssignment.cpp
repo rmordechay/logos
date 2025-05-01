@@ -1,15 +1,22 @@
 #include "stmts/LgsAssignment.h"
+
+#include "exprs/unary/LgsArrayIndex.h"
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include <LgsStack.h>
 
-Value* LgsAssignment::createIRValue(CodeGenMetadata* metadata) {
+void LgsAssignment::createIRStmt(CodeGenMetadata* metadata) {
     if (const auto selection = lvalue->asSelection()) {
         createIRFromSelection(metadata, selection);
+        return;
     }
-    return nullptr;
+    if (const auto arrIndex = lvalue->asArrayIndex()) {
+        createIRFromArrIndex(metadata, arrIndex);
+        return;
+    }
+    assert(false);
 }
 
 void LgsAssignment::createIRFromSelection(CodeGenMetadata* metadata, const LgsSelection* selection) const {
@@ -29,6 +36,10 @@ void LgsAssignment::createIRFromSelection(CodeGenMetadata* metadata, const LgsSe
     } else if (const auto funcCall = lastExpr->asFuncCall()) {
         assert(false);
     }
+}
+
+void LgsAssignment::createIRFromArrIndex(CodeGenMetadata* metadata, LgsArrayIndex* arrIndex) {
+    assert(false);
 }
 
 LgsAssignment::~LgsAssignment() {

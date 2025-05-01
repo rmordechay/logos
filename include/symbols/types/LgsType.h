@@ -50,6 +50,7 @@ class LgsUnknownType final : public LgsType {
 public:
     string name;
 
+    LgsUnknownType() = default;
     explicit LgsUnknownType(const string& name) : name(name) {}
     const string getName() const override { return name; }
     LgsExpr* getZeroValue() override { assert(false && "unknown type should not be called"); }

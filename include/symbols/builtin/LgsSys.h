@@ -1,6 +1,7 @@
 #ifndef LGSSYSCALL_H
 #define LGSSYSCALL_H
 #include "funcs/LgsMethodImpl.h"
+#include "types/LgsInt.h"
 #include "types/LgsObject.h"
 #include "types/LgsVoid.h"
 

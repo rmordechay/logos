@@ -8,7 +8,7 @@ class LgsVariable;
 class LgsSelection;
 class LgsInstance;
 class LgsArrayIndex;
-class LgsArray;
+class LgsDArray;
 class LgsBoolConst;
 class LgsCharConst;
 class LgsFloatConst;
@@ -47,7 +47,7 @@ public:
     virtual Value* lshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
 
     bool isNull();
-    LgsArray* asArray();
+    LgsDArray* asArray();
     LgsArrayIndex* asArrayIndex();
     LgsFuncCall* asFuncCall();
     LgsInstance* asInstance();

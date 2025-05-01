@@ -7,10 +7,10 @@
 #include "exprs/LgsNull.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
-#include "types/LgsArrayType.h"
+#include "types/LgsDArrType.h"
 #include "types/LgsBool.h"
 
-#include "exprs/unary/LgsArray.h"
+#include "exprs/unary/LgsDArray.h"
 #include "exprs/unary/LgsArrayIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsInstance.h"
@@ -208,16 +208,14 @@ void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
     visitStmtBlock(rangeLoop->stmtBlock);
 }
 
-void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
+void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
     const auto iterableExpr = foreachLoop->expr;
     visitUnaryExpr(iterableExpr);
-    foreachLoop->iterable = getExprIterable(foreachLoop, iterableExpr);
-    if (!foreachLoop->iterable) {
+    if (!iterableExpr->isIterable()) {
         return errHandler.handleError(E10002, &iterableExpr->location, {iterableExpr->getName()});
     }
     // TODO check all loop vars
     for (const auto var : foreachLoop->loopVars) {
-        var->type = foreachLoop->iterable->underlyingType;
         addLocalSymbol(var->name, LgsSymbol(var));
     }
     visitStmtBlock(foreachLoop->stmtBlock);
@@ -293,12 +291,9 @@ void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     setBinaryExprType(binaryExpr);
 }
 
-void SemaAnalyser::visitArray(const LgsArray* array) {
+void SemaAnalyser::visitArray(const LgsDArray* array) {
     for (const auto& element : array->initialElements) {
         visitExpr(element);
-    }
-    if (const auto arrayType = dynamic_cast<LgsArrayType*>(array->type)) {
-        arrayType->underlyingType = array->initialElements[0]->type;
     }
 }
 
@@ -454,14 +449,11 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
 }
 
 void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
-    visitUnaryExpr(arrayIndex->expr);
-    visitExpr(arrayIndex->index);
-    const auto arrType = dynamic_cast<LgsArrayType*>(arrayIndex->expr->type);
-    if (arrType) {
-        setExprType(arrayIndex, arrType->underlyingType);
-    } else {
-        setExprType(arrayIndex, arrayIndex->expr->type);
+    visitUnaryExpr(arrayIndex->baseExpr);
+    for (const auto& indexExpr : arrayIndex->indices) {
+        visitExpr(indexExpr);
     }
+    setExprType(arrayIndex, arrayIndex->baseExpr->type);
     // TODO add if iterable check
     // if (!arrType) {
     //     errorHandler.handleError(E10002, &arrayIndex->location, {arrayIndex->getName()});
@@ -519,31 +511,6 @@ bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable
     return true;
 }
 
-LgsIterable* SemaAnalyser::getExprIterable(LgsForeachLoop* loop, LgsExpr* expr) {
-    if (const auto variable = expr->asVariable()) {
-        switch (variable->ref->type) {
-        case VAR_DEC:
-            return getExprIterable(loop, variable->ref->varDec->expr);
-        case PARAM:
-        case FIELD:
-        case ENUM:
-        case FUNC:
-        case ENUM_FIELD:
-        case INTERFACE:
-        case OBJECT:
-        case UNKNOWN:
-            assert(false);
-        }
-    }
-    if (const auto array = expr->asArray()) {
-        return &array->iterable;
-    }
-    if (const auto strConst = expr->asStrConst()) {
-        return &strConst->iterable;
-    }
-    return nullptr;
-}
-
 void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     switch (binaryExpr->op) {
     case ADD:
@@ -594,12 +561,9 @@ bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
         expr->type = type;
         return true;
     }
-    if (type) {
-        // types don't match
-        if (!expr->type->equals(type)) {
-            errHandler.handleError(E10001, &expr->location, {type->getName(), expr->type->getName()});
-            return false;
-        }
+    if (type && !expr->type->equals(type)) {
+        errHandler.handleError(E10001, &expr->location, {type->getName(), expr->type->getName()});
+        return false;
     }
     return true;
 }

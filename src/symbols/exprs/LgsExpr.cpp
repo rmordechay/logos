@@ -2,7 +2,7 @@
 
 #include "CodeGenerator.h"
 #include "exprs/LgsNull.h"
-#include "exprs/unary/LgsArray.h"
+#include "exprs/unary/LgsDArray.h"
 #include "exprs/unary/LgsArrayIndex.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsFuncCall.h"
@@ -18,13 +18,13 @@
 
 Value* LgsExpr::getIRValue(CodeGenMetadata* metadata) {
     initIRValue(metadata);
-    assert(IRValue);
     return IRValue;
 }
 
 void LgsExpr::initIRValue(CodeGenMetadata* metadata) {
     if (!IRValue) {
         IRValue = createIRValue(metadata);
+        assert(IRValue);
     }
 }
 
@@ -104,7 +104,7 @@ bool LgsExpr::isNull() {
     return dynamic_cast<LgsNull*>(this);
 }
 
-LgsArray* LgsExpr::asArray() { return dynamic_cast<LgsArray*>(this); }
+LgsDArray* LgsExpr::asArray() { return dynamic_cast<LgsDArray*>(this); }
 LgsArrayIndex* LgsExpr::asArrayIndex() { return dynamic_cast<LgsArrayIndex*>(this); }
 LgsFuncCall* LgsExpr::asFuncCall() { return dynamic_cast<LgsFuncCall*>(this); }
 LgsInstance* LgsExpr::asInstance() { return dynamic_cast<LgsInstance*>(this); }

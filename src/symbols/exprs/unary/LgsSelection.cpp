@@ -11,6 +11,10 @@ string LgsSelection::getName() {
     return "";
 }
 
+void LgsSelection::createIRStmt(CodeGenMetadata* metadata) {
+    resolveSelection(metadata);
+}
+
 Value* LgsSelection::createIRValue(CodeGenMetadata* metadata) {
     return resolveSelection(metadata)->IRValue;
 }
