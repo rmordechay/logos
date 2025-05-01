@@ -13,13 +13,13 @@ struct LgsGlobals {
     std::mutex mtx;
     map<string, LgsSymbol> symbols;
 
-    void addSymbol(const string& name, const LgsSymbol& symbol) {
+    bool addSymbol(const string& name, const LgsSymbol& symbol) {
         if (symbols.find(name) != symbols.end()) {
-            // TODO replace with proper error
-            assert(false && "element already exists");
+            return false;
         }
         lock_guard lock(mtx);
         symbols[name] = symbol;
+        return true;
     }
 
     void addFunc(LgsFunc* func) {

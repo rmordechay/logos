@@ -153,7 +153,9 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
             obj->implements.emplace_back(implementType);
         }
     }
-    globals.addSymbol(obj->name, LgsSymbol(obj));
+    if (!globals.addSymbol(obj->name, LgsSymbol(obj))) {
+        handleError(E10031, &obj->location, {obj->name});
+    }
     return obj;
 }
 

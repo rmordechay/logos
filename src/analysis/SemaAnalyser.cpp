@@ -45,6 +45,7 @@ void SemaAnalyser::visitMainFile(const LgsMainFile* mainFile) {
     for (const auto& lgsEnum : mainFile->enums) {
         visitEnum(lgsEnum);
     }
+    checkDuplicateFuncs(mainFile->funcs);
     for (const auto& func : mainFile->funcs) {
         visitFunc(func);
     }
@@ -598,6 +599,14 @@ bool SemaAnalyser::resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCal
     return true;
 }
 
+void SemaAnalyser::checkDuplicateFuncs(const vector<LgsFuncImpl*>& funcs) {
+    for (const auto& func1 : funcs) {
+        for (const auto& func2 : funcs) {
+
+        }
+    }
+}
+
 LgsFunc* SemaAnalyser::resolveFuncCallWithoutDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const {
     const auto params = func->signature.params;
     if (funcCall->args.size() > params.size()) return nullptr;
@@ -630,6 +639,14 @@ void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
     }
 }
 
+string SemaAnalyser::getOverloadsAsStr(const vector<LgsFunc*>& overloads) const {
+    stringstream str;
+    for (const auto& overload : overloads) {
+        str << "\n\t     - " << overload->signature.getAsStr();
+    }
+    return str.str();
+}
+
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
     const auto symbol = lgsStack.getSymbol(name);
     if (!symbol) handleError(E10006, &value->location, {name});
@@ -637,30 +654,9 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
 }
 
 void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
-    if (const auto alreadyExistSymbol = lgsStack.getSymbol(name)) {
-        const auto location = getSymbolLocation(alreadyExistSymbol);
+    if (lgsStack.getSymbol(name)) {
+        const auto location = symbol.getSymbolLocation();
         return handleError(E10011, location, {name, to_string(location->lineNumber)});
     }
     lgsStack.addLocalSymbol(name, symbol);
-}
-
-Location* SemaAnalyser::getSymbolLocation(const LgsSymbol* symbol) const {
-    switch (symbol->type) {
-    case VAR_DEC:
-        return &symbol->varDec->location;
-    case PARAM:
-        return &symbol->param->location;
-    case FUNC:
-        assert(false);
-    default:
-        return nullptr;
-    }
-}
-
-string SemaAnalyser::getOverloadsAsStr(const vector<LgsFunc*>& overloads) const {
-    stringstream str;
-    for (const auto& overload : overloads) {
-        str << "\n\t     - " << overload->signature.getAsStr();
-    }
-    return str.str();
 }

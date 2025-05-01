@@ -78,11 +78,12 @@ public:
     bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
     LgsFunc* resolveFuncCallWithoutDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const;
     LgsFunc* resolveFuncCallWithDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const;
+    void checkDuplicateFuncs(const vector<LgsFuncImpl*>& funcs);
     bool validateExprType(LgsExpr* expr, LgsType* type);
+    string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
+
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
-    Location* getSymbolLocation(const LgsSymbol* symbol) const;
-    string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
     ~SemaAnalyser() = default;
 };
 

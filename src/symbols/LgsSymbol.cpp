@@ -26,6 +26,19 @@ LgsSymbol* LgsSymbol::clone() const {
     return new LgsSymbol(*this);
 }
 
+Location* LgsSymbol::getSymbolLocation() const {
+    switch (type) {
+    case VAR_DEC:
+        return &varDec->location;
+    case PARAM:
+        return &param->location;
+    case FUNC:
+        assert(false);
+    default:
+        return nullptr;
+    }
+}
+
 json LgsSymbol::asJSON() const {
     json tree;
     switch (type) {

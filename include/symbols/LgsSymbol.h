@@ -11,6 +11,7 @@ class LgsInterface;
 class LgsObject;
 class LgsParam;
 class LgsVarDec;
+class Location;
 
 enum LgsSymbolType {
     VAR_DEC,
@@ -46,6 +47,7 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsEnumField* enumField);
     void free(CodeGenMetadata* metadata) const;
     LgsSymbol* clone() const;
+    Location* getSymbolLocation() const;
     nlohmann::json asJSON() const;
     ~LgsSymbol() = default;
 };
