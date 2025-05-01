@@ -7,7 +7,7 @@ class LgsIntConst final : public LgsConstExpr {
 public:
     int value;
 
-    explicit LgsIntConst(const int value) : LgsConstExpr(new LgsInt()), value(value) {}
+    explicit LgsIntConst(const int value) : LgsConstExpr(&LGS_INT), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     LgsExpr* castStatically(LgsType* other) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;

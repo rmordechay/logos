@@ -226,15 +226,15 @@ string LogosProject::getFileText(path filePath) const {
 }
 
 void LogosProject::loadGlobals() {
-    globals.addFunc(new LgsPrint({LgsParam(new LgsInt())}));
+    globals.addFunc(new LgsPrint({LgsParam(&LGS_INT)}));
     globals.addFunc(new LgsPrint({LgsParam(new LgsFloat())}));
-    globals.addFunc(new LgsPrint({LgsParam(new LgsStr())}));
+    globals.addFunc(new LgsPrint({LgsParam(&LGS_STR)}));
     globals.addFunc(new LgsPrint({LgsParam(new LgsChar())}));
-    globals.addFunc(new LgsPrint({LgsParam(new LgsBool())}));
+    globals.addFunc(new LgsPrint({LgsParam(&LGS_BOOL)}));
     globals.addSymbol(LgsSys::name, LgsSymbol(new LgsSys()), &errHandler);
     globals.addSymbol(LgsEnv::name, LgsSymbol(new LgsEnv()), &errHandler);
     globals.addSymbol(LgsReflect::name, LgsSymbol(new LgsReflect()), &errHandler);
-    globals.addSymbol("ROOT_PATH", LgsSymbol(new LgsVarDec("ROOT_PATH", new LgsStr(), new LgsStrConst(paths.rootDirAbs))), &errHandler);
+    globals.addSymbol("ROOT_PATH", LgsSymbol(new LgsVarDec("ROOT_PATH", &LGS_STR, new LgsStrConst(paths.rootDirAbs))), &errHandler);
 }
 
 void LogosProject::checkRequiredEnvVars() {

@@ -19,5 +19,7 @@ public:
 };
 
 
+inline LgsStr LGS_STR;
+
 
 #endif // LOGOSSTRING_H

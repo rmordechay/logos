@@ -74,7 +74,7 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, con
     for (const auto& func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         if (funcName == LOGOS_MAIN_FUNC) {
-            const auto mainFunc = new LgsFuncImpl(LOGOS_MAIN_FUNC, new LgsInt());
+            const auto mainFunc = new LgsFuncImpl(LOGOS_MAIN_FUNC, &LGS_INT);
             mainFile->mainFunc = mainFunc;
             const auto statementsBlock = func->funcBody()->statementsBlock();
             mainFunc->stmtBlock = getStmtBlock(statementsBlock);
@@ -629,15 +629,15 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) const {
 LgsType* AntlerConverter::getTypeFromText(const string& typeText, const antlr4::ParserRuleContext* ctx) const {
     LgsType* type = nullptr;
     if (typeText == LgsInt::name) {
-        type = new LgsInt();
+        type = &LGS_INT;
     } else if (typeText == LgsFloat::name) {
         type = new LgsFloat();
     } else if (typeText == LgsBool::name) {
-        type = new LgsBool();
+        type = &LGS_BOOL;
     } else if (typeText == LgsStr::name) {
-        type = new LgsStr();
+        type = &LGS_STR;
     } else if (typeText == LgsVoid::name) {
-        type = new LgsVoid();
+        type = &LGS_VOID;
     } else {
         type = new LgsUnknownType(typeText);
     }
@@ -650,7 +650,7 @@ LgsType* AntlerConverter::getFuncType(LogosParser::FuncSignatureContext* ctx) co
     if (ctx->type()) {
         result = getType(ctx->type());
     } else {
-        result = new LgsVoid();
+        result = &LGS_VOID;
     }
     result->setLocation(ctx->start);
     return result;

@@ -10,7 +10,7 @@ public:
     string value;
     FunctionType* const cmpStrIRFuncType = FunctionType::get(i1Ty, {ptrTy, ptrTy}, false);
 
-    explicit LgsStrConst(const string& value) : LgsConstExpr(new LgsStr()), value(value) {
+    explicit LgsStrConst(const string& value) : LgsConstExpr(&LGS_STR), value(value) {
         setFields(type);
     }
     size_t length() override;

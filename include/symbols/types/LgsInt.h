@@ -14,6 +14,6 @@ public:
     ~LgsInt() override = default;
 };
 
-// inline LgsInt LOGOS_INT;
+inline LgsInt LGS_INT;
 
 #endif //LOGOSINT_H

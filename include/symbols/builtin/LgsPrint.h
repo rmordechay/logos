@@ -7,7 +7,7 @@
 class LgsPrint final : public LgsFuncImpl {
 public:
     static constexpr auto name = "print";
-    explicit LgsPrint(const vector<LgsParam>& params) : LgsFuncImpl(name, new LgsVoid(), params) {}
+    explicit LgsPrint(const vector<LgsParam>& params) : LgsFuncImpl(name, &LGS_VOID, params) {}
 
     void setIRFuncType(const CodeGenMetadata* metadata) override;
     ~LgsPrint() override = default;

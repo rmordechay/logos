@@ -38,25 +38,29 @@ void LgsFuncImpl::setIRFuncParams(Argument* args) {
     }
 }
 
-bool LgsFuncImpl::equals(const LgsFuncCall* funcCall) {
-    if (signature.name != funcCall->name) return false;
-    if (signature.params.size() == 0) return true;
-    for (size_t i = 0; i < signature.params.size(); ++i) {
-        const auto thisType = signature.params[i].type;
-        const auto otherType = funcCall->args[i]->type;
-        if (!thisType->equals(otherType)) return false;
+bool LgsFuncImpl::equals(const LgsFuncCall* other) {
+    if (signature.name != other->name) return false;
+    const auto params = signature.params;
+    const auto args = other->args;
+    if (params.size() == 0 && args.size() == 0) return true;
+    if (params.size() < args.size()) return false;
+    for (size_t i = 0; i < params.size(); ++i) {
+        assert(args[i]);
+        auto thisTypeName = params[i].type->getName();
+        auto otherTypeName = args[i]->type->getName();
+        if (thisTypeName != otherTypeName) return false;
     }
     return true;
 }
 
 bool LgsFuncImpl::equals(const LgsFunc* other) {
+    if (signature.name != other->signature.name) return false;
     const auto thisParams = signature.params;
     const auto otherParams = other->signature.params;
     if (thisParams.size() == 0 && otherParams.size() == 0) return true;
-    if (signature.name != other->signature.name) return false;
-    for (size_t i = 0; i < thisParams.size() - 1; ++i) {
-        auto thisTypeName = thisParams[i + 1].type->getName();
-        auto otherTypeName = otherParams[i].type->getName();
+    for (size_t i = 0; i < signature.params.size() - 1; ++i) {
+        auto thisTypeName = signature.params[i + 1].type->getName();
+        auto otherTypeName = other->signature.params[i].type->getName();
         if (thisTypeName != otherTypeName) return false;
     }
     return true;

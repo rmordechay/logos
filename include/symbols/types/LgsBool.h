@@ -16,5 +16,6 @@ public:
     ~LgsBool() override = default;
 };
 
+inline LgsBool LGS_BOOL;
 
 #endif // LOGOSBOOL_H

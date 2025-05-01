@@ -541,7 +541,7 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     case GT:
     case GE:
     case LE: {
-        setExprType(binaryExpr, new LgsBool());
+        setExprType(binaryExpr, &LGS_BOOL);
         return;
     }
     case NOOP:
@@ -589,7 +589,7 @@ bool SemaAnalyser::resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCal
     }
 
     if (!func) {
-        errHandler.handleError(E10015, &funcCall->location, {funcCall->name, getOverloadsAsStr(overloads), funcCall->getSignatureText()});
+        errHandler.handleError(E10015, &funcCall->location, {funcCall->getSignatureText(), getOverloadsAsStr(overloads)});
         return false;
     }
 

@@ -7,7 +7,7 @@ class LgsBoolConst final : public LgsConstExpr {
 public:
     bool value;
 
-    explicit LgsBoolConst(const bool value) : LgsConstExpr(new LgsBool()), value(value) {}
+    explicit LgsBoolConst(const bool value) : LgsConstExpr(&LGS_BOOL), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* andIR(CodeGenMetadata* metadata, LgsExpr* right) override;
     ~LgsBoolConst() override = default;

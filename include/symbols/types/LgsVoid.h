@@ -17,4 +17,6 @@ public:
     ~LgsVoid() override = default;
 };
 
+inline LgsVoid LGS_VOID;
+
 #endif //LOGOSVOID_H

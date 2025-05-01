@@ -13,7 +13,7 @@ public:
     bool isSingleton = false;
     vector<LgsType*> implements;
 
-    explicit LgsObject(const string& name, const string& path = "") : name(name), path(path) {}
+    explicit LgsObject(const string& name = "", const string& path = "") : name(name), path(path) {}
     const string getName() const override;
     Type* getIRType() override;
     json asJSON() const override;

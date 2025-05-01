@@ -7,13 +7,9 @@
 class LgsSys final : public LgsObject {
 public:
     static constexpr auto name = "Sys";
-    LgsMethodImpl exitFunc = LgsMethodImpl("exit", new LgsVoid(), name, {LgsParam(this), LgsParam(new LgsInt())});
+    LgsMethodImpl exitFunc = LgsMethodImpl("exit", &LGS_VOID, name, {LgsParam(this), LgsParam(&LGS_INT)});
 
     explicit LgsSys() : LgsObject(name) {
-        setExitFunc();
-    }
-
-    void setExitFunc() {
         exitFunc.IRFuncType = FunctionType::get(voidTy, {i32Ty}, false);
         addMethod(&exitFunc);
     }

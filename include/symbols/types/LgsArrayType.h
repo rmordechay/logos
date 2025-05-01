@@ -17,8 +17,8 @@ class LgsArrayType final : public LgsType {
 public:
     static constexpr auto name = "ArrayType";
     LgsType* underlyingType = nullptr;
-    LgsMethodImpl addFunc = LgsMethodImpl("add", new LgsVoid(), name, {LgsParam(this), LgsParam(new LgsStr())});
-    LgsMethodImpl isEmptyFunc = LgsMethodImpl("isEmpty", new LgsBool(), name, {LgsParam(this)});
+    LgsMethodImpl addFunc = LgsMethodImpl("add", &LGS_VOID, name, {LgsParam(this), LgsParam(&LGS_STR)});
+    LgsMethodImpl isEmptyFunc = LgsMethodImpl("isEmpty", &LGS_BOOL, name, {LgsParam(this)});
 
     LgsArrayType() {
         underlyingType = new LgsAny();

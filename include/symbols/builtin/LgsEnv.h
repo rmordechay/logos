@@ -8,7 +8,7 @@
 
 class LgsEnvGetFunc final : public LgsMethodImpl {
 public:
-    explicit LgsEnvGetFunc() : LgsMethodImpl("get", new LgsStr(), "Env", {LgsParam(new LgsStr()), LgsParam(new LgsStr())}) {
+    explicit LgsEnvGetFunc(const string& parentName) : LgsMethodImpl("get", &LGS_STR, parentName, {LgsParam(&LGS_STR), LgsParam(&LGS_STR)}) {
         IRFuncType = FunctionType::get(ptrTy, {ptrTy, ptrTy}, false);
     }
 
@@ -28,11 +28,12 @@ public:
 class LgsEnv final : public LgsObject {
 public:
     static constexpr auto name = "Env";
-    LgsMethodImpl getFunc = LgsMethodImpl("get", new LgsStr(), name, {LgsParam(this), LgsParam(new LgsStr()), LgsParam(new LgsStr())});
+    LgsEnvGetFunc getFunc = LgsEnvGetFunc(name);
 
     explicit LgsEnv(): LgsObject(name) {
         addMethod(&getFunc);
     }
 };
+
 
 #endif //LGSENVS_H
