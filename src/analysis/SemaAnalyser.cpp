@@ -578,12 +578,12 @@ bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
 
 bool SemaAnalyser::resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall) {
     LgsFunc* func = nullptr;
-    for (const auto& overload : overloads) {
+    for (const auto overload : overloads) {
         if (overload->signature.params.size() < funcCall->args.size()) continue;
         if (overload->signature.hasDefaultParams) {
             func = resolveFuncCallWithDefaultParams(overload, funcCall);
-        } else {
-            func = resolveFuncCallWithoutDefaultParams(overload, funcCall);
+        } else if (overload->equals(funcCall)) {
+            func = overload;
         }
         if (func) break;
     }
@@ -619,16 +619,10 @@ void SemaAnalyser::checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads) {
     }
 }
 
-LgsFunc* SemaAnalyser::resolveFuncCallWithoutDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const {
-    const auto params = func->signature.params;
-    if (func->equals(funcCall)) return func;
-    return nullptr;
-}
-
 LgsFunc* SemaAnalyser::resolveFuncCallWithDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const {
     const auto params = func->signature.params;
     const auto argsSize = funcCall->args.size();
-    for (size_t i = 0; i < params.size(); ++i) {
+    for (size_t i = funcCall->isMethodCall; i < params.size(); ++i) {
         const auto param = params[i];
         if (i >= argsSize) continue;
         const auto arg = funcCall->args[i];

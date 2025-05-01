@@ -465,7 +465,7 @@ LgsUnaryExpr* AntlerConverter::getConst(const string& constName, const antlr4::P
     return constVariable;
 }
 
-LgsFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
+LgsFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx, const bool isMethodCall) {
     const auto name = ctx->VARIABLE()->getText();
     vector<LgsExpr*> args;
     if (ctx->funcArgList()) {
@@ -474,7 +474,7 @@ LgsFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
             args.emplace_back(argExpr);
         }
     }
-    const auto funcCall = new LgsFuncCall(name, args);
+    const auto funcCall = new LgsFuncCall(name, isMethodCall, args);
     funcCall->setLocation(ctx->start);
     return funcCall;
 }
@@ -530,7 +530,7 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
             const auto logosField = getVariable(field->getText(), currentExpr);
             exprs.emplace_back(logosField);
         } else if (const auto funcCall = currentExpr->funcCall()) {
-            const auto logosMethodCall = getFuncCall(funcCall);
+            const auto logosMethodCall = getFuncCall(funcCall, true);
             // First inner expr takes firstExpr as parent
             const auto prevExpr = i == 0 ? exprs[0] : exprs[i - 1];
             logosMethodCall->args.insert(logosMethodCall->args.begin(), prevExpr);

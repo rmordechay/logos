@@ -6,10 +6,10 @@
 
 class LgsReflectGetFields final : public LgsMethodImpl {
 public:
-    explicit LgsReflectGetFields(const string& parentName) : LgsMethodImpl("getFields", new LgsArrayType(&LGS_STR), parentName, {LgsParam("object", new LgsObject())}) {}
+    explicit LgsReflectGetFields(LgsObject* parent) : LgsMethodImpl("getFields", new LgsArrayType(&LGS_STR), parent->name, {LgsParam(parent), LgsParam(new LgsObject())}) {}
 
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
-        return nullptr;
+        assert(false);
     }
 
     ~LgsReflectGetFields() override = default;
@@ -18,7 +18,7 @@ public:
 class LgsReflect final : public LgsObject {
 public:
     static constexpr auto name = "Reflect";
-    LgsReflectGetFields getFieldsFunc = LgsReflectGetFields(name);
+    LgsReflectGetFields getFieldsFunc = LgsReflectGetFields(this);
 
     explicit LgsReflect() : LgsObject(name) {
         addMethod(&getFieldsFunc);

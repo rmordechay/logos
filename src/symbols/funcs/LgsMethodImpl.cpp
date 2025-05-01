@@ -40,10 +40,10 @@ bool LgsMethodImpl::equals(const LgsFuncCall* other) {
     const auto args = other->args;
     if (params.size() == 0 && args.size() == 0) return true;
     if (params.size() < args.size()) return false;
-    for (size_t i = 1; i < params.size(); ++i) {
-        auto thisTypeName = params[i].type->getName();
-        auto otherTypeName = args[i]->type->getName();
-        if (thisTypeName != otherTypeName) return false;
+    for (size_t i = 0; i < params.size(); ++i) {
+        const auto paramType = params[i].type;
+        const auto argType = args[i]->type;
+        if (!paramType->equals(argType)) return false;
     }
     return true;
 }

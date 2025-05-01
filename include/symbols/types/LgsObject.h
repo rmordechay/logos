@@ -1,5 +1,6 @@
 #ifndef LOGOSOBJECT_H
 #define LOGOSOBJECT_H
+#include "LgsData.h"
 #include "LgsStr.h"
 #include "LgsType.h"
 #include "stmts/LgsField.h"
@@ -13,7 +14,9 @@ public:
     bool isSingleton = false;
     vector<LgsType*> implements;
 
-    explicit LgsObject(const string& name = "", const string& path = "") : name(name), path(path) {}
+    explicit LgsObject() : name(LOGOS_PARENT_OBJ), path("") {}
+    explicit LgsObject(const string& name) : name(name), path("") {}
+    explicit LgsObject(const string& name, const string& path) : name(name), path(path) {}
     const string getName() const override;
     Type* getIRType() override;
     json asJSON() const override;

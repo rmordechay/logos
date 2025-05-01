@@ -76,7 +76,6 @@ public:
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
     bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
-    LgsFunc* resolveFuncCallWithoutDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const;
     LgsFunc* resolveFuncCallWithDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const;
     void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     bool validateExprType(LgsExpr* expr, LgsType* type);

@@ -11,16 +11,17 @@ string LgsFuncCall::format(string& indentStr) {
     return indentStr + name + "()";
 }
 
-string LgsFuncCall::getSignatureText() const {
+string LgsFuncCall::getSignatureText(const bool withType) const {
     stringstream strStream;
     strStream << name << '(';
-    for (size_t i = 0; i < args.size(); ++i) {
+    for (size_t i = isMethodCall; i < args.size(); ++i) {
         strStream << args[i]->type->getName();
         if (i != args.size() - 1) strStream << ", ";
     }
-    strStream << ')';
-    if (type) {
-        strStream << ": " << type->getName();
+    if (withType) {
+        strStream << "): " << type->getName();
+    } else {
+        strStream << ")";
     }
     return strStream.str();
 }

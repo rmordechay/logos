@@ -43,6 +43,8 @@ LgsType* LgsObject::inferBinaryType(LgsType* other) {
 }
 
 bool LgsObject::equals(LgsType* other) const {
+    // TODO make Object object
+    if (name == "Object") return true;
     return name == other->getName();
 }
 

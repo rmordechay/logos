@@ -17,6 +17,7 @@ using namespace nlohmann;
 #define LOGOS_APP_FILE_NAME "App"
 #define LOGOS_MAIN_FUNC "main"
 #define LOGOS_SELF "self"
+#define LOGOS_PARENT_OBJ "Object"
 
 #define OBJECT_FILE "output.o"
 #define EXECUTABLE_FILE "output"

@@ -20,14 +20,18 @@ public:
     LgsFuncSignature(const string& name, LgsType* type) : name(name), type(type) {}
     LgsFuncSignature(const string& name, LgsType* type, const vector<LgsParam>& params) : name(name), type(type), params(params) {}
 
-    string getAsStr() const {
+    string getAsStr(const bool withType = false) const {
         stringstream strStream;
         strStream << name << '(';
         for (size_t i = 0; i < params.size(); ++i) {
             strStream << params[i].type->getName();
             if (i != params.size() - 1) strStream << ", ";
         }
-        strStream << "): " << type->getName();
+        if (withType) {
+            strStream << "): " << type->getName();
+        } else {
+            strStream << ")";
+        }
         return strStream.str();
     }
 
