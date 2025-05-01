@@ -17,7 +17,7 @@ void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) co
 
 Value* LgsValue::createIRStr(Module* module, const std::string& value) const {
     const auto strConstant = ConstantDataArray::getString(context, value, true);
-    return createIRGlobal(module, strConstant);
+    return new GlobalVariable(*module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
 }
 
 string LgsValue::format(string& indentStr) {
@@ -44,8 +44,4 @@ json LgsValue::asJSON() {
 
 void LgsValue::setIRValue(Value* value) {
     IRValue = value;
-}
-
-GlobalVariable* LgsValue::createIRGlobal(Module* module, Constant* strConstant) const {
-    return new GlobalVariable(*module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
 }

@@ -7,6 +7,16 @@ declare i32 @printf(ptr, ...)
 @formatChar = private constant [4 x i8] c"%c\0A\00"
 @formatPtr = private constant [4 x i8] c"%p\0A\00"
 
+define void @print_Bool(i1 noundef %x) {
+  call void (ptr, ...) @printf(ptr noundef @formatInt, i1 noundef %x)
+  ret void
+}
+
+define void @print_Char(i8 noundef %x) {
+  call void (ptr, ...) @printf(ptr noundef @formatChar, i8 noundef %x)
+  ret void
+}
+
 define void @print_Int(i32 noundef %x) {
   call void (ptr, ...) @printf(ptr noundef @formatInt, i32 noundef %x)
   ret void
@@ -24,16 +34,6 @@ define void @print_Float(float noundef %x) {
 
 define void @print_Str(ptr noundef %x) {
   call void (ptr, ...) @printf(ptr noundef @formatString, ptr noundef %x)
-  ret void
-}
-
-define void @print_Char(i8 noundef %x) {
-  call void (ptr, ...) @printf(ptr noundef @formatChar, i8 noundef %x)
-  ret void
-}
-
-define void @print_Bool(i1 noundef %x) {
-  call void (ptr, ...) @printf(ptr noundef @formatInt, i1 noundef %x)
   ret void
 }
 

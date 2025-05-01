@@ -453,7 +453,7 @@ LgsUnaryExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
     for (const auto& expr : ctx->expr()) {
         initialElements.emplace_back(getExpr(expr));
     }
-    const auto array = new LgsArray(new LgsArrayType(), initialElements);
+    const auto array = new LgsArray(initialElements);
     array->setLocation(ctx->start);
     return array;
 }

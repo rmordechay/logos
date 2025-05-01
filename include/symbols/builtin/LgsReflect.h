@@ -18,7 +18,7 @@ public:
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
         const auto arg = args[1]->asVariable();
         for (const auto& field : arg->type->fields) {
-            std::cout << field.first << '\n';
+            assert(false);
         }
         return nullptr;
     }

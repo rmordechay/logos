@@ -2,5 +2,5 @@
 
 
 Value* LgsCharConst::createIRValue(CodeGenMetadata* metadata) {
-    return metadata->builder.getInt1(value);
+    return metadata->builder.getInt8(value);
 }

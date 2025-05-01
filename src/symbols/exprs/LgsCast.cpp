@@ -1,5 +1,7 @@
 #include "exprs/LgsCast.h"
 
+#include "types/LgsType.h"
+
 Value* LgsCast::createIRValue(CodeGenMetadata* metadata) {
     return toValue->getIRValue(metadata);
 }

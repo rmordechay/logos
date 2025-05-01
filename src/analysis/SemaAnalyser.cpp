@@ -21,6 +21,7 @@
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
+#include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsPatternMatch.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsLoop.h>
@@ -207,16 +208,18 @@ void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
     visitStmtBlock(rangeLoop->stmtBlock);
 }
 
-void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
-    const auto iterableExpr = foreachLoop->iterableExpr;
+void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
+    const auto iterableExpr = foreachLoop->expr;
     visitUnaryExpr(iterableExpr);
-    if (!foreachLoop->getExprAsIterable()) {
+    foreachLoop->iterable = getExprIterable(foreachLoop, iterableExpr);
+    if (!foreachLoop->iterable) {
         return errHandler.handleError(E10002, &iterableExpr->location, {iterableExpr->getName()});
     }
     // TODO check all loop vars
-    const auto loopVar = foreachLoop->loopVars[0];
-    loopVar->type = dynamic_cast<LgsArrayType*>(iterableExpr->type)->underlyingType;
-    addLocalSymbol(loopVar->name, LgsSymbol(loopVar));
+    for (const auto var : foreachLoop->loopVars) {
+        var->type = foreachLoop->iterable->underlyingType;
+        addLocalSymbol(var->name, LgsSymbol(var));
+    }
     visitStmtBlock(foreachLoop->stmtBlock);
 }
 
@@ -514,6 +517,31 @@ bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable
     if (!field->isPublic) {}
     setExprType(fieldVariable, field->type);
     return true;
+}
+
+LgsIterable* SemaAnalyser::getExprIterable(LgsForeachLoop* loop, LgsExpr* expr) {
+    if (const auto variable = expr->asVariable()) {
+        switch (variable->ref->type) {
+        case VAR_DEC:
+            return getExprIterable(loop, variable->ref->varDec->expr);
+        case PARAM:
+        case FIELD:
+        case ENUM:
+        case FUNC:
+        case ENUM_FIELD:
+        case INTERFACE:
+        case OBJECT:
+        case UNKNOWN:
+            assert(false);
+        }
+    }
+    if (const auto array = expr->asArray()) {
+        return &array->iterable;
+    }
+    if (const auto strConst = expr->asStrConst()) {
+        return &strConst->iterable;
+    }
+    return nullptr;
 }
 
 void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {

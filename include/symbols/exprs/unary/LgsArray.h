@@ -6,18 +6,22 @@
 #include "exprs/LgsExpr.h"
 #include "types/LgsArrayType.h"
 
-class LgsArray final : public LgsUnaryExpr, public LgsIterable {
+class LgsArray final : public LgsUnaryExpr {
 public:
     vector<LgsExpr*> initialElements;
+    LgsIterable iterable;
 
-    explicit LgsArray(LgsType* type, const vector<LgsExpr*>& elements = {}) : LgsUnaryExpr(type), initialElements(elements) {
-        setFields(type);
+    explicit LgsArray(const vector<LgsExpr*>& elements = {}) : LgsUnaryExpr(new LgsArrayType()), initialElements(elements) {
+        iterable.length = elements.size();
+        iterable.type = type;
+        iterable.underlyingType = type;
+        iterable.setFields();
     }
-    size_t length() override;
-    Value* sizeIR(CodeGenMetadata* metadata) override;
+    size_t length() const;
+    LgsArrayType* getArrayType() const;
+    bool isIterable() override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     void free(CodeGenMetadata* metadata) override;
-    LgsArrayType* asArrayType() const;
     ~LgsArray() override = default;
 };
 

@@ -9,13 +9,13 @@ class LgsArrayType;
 
 class LgsForeachLoop final : public LgsLoop {
 public:
-    LgsUnaryExpr* iterableExpr = nullptr;
+    LgsUnaryExpr* expr = nullptr;
+    LgsIterable* iterable = nullptr;
 
-    LgsForeachLoop(const vector<LgsVarDec*>& loopVars, LgsUnaryExpr* iterable, LgsStmtBlock* stmtBlock) : LgsLoop(loopVars, stmtBlock), iterableExpr(iterable) {}
+    LgsForeachLoop(const vector<LgsVarDec*>& loopVars, LgsUnaryExpr* iterable, LgsStmtBlock* stmtBlock) : LgsLoop(loopVars, stmtBlock), expr(iterable) {}
     int loopStart() override;
     int loopEnd() override;
     void setIRLoopVariable(CodeGenMetadata* metadata) override;
-    LgsIterable* getExprAsIterable() const;
     ~LgsForeachLoop() override;
 };
 

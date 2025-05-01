@@ -9,6 +9,7 @@
 using namespace std;
 using namespace llvm;
 
+class LgsStr;
 class LgsExpr;
 class LgsFuncCall;
 class LgsConstExpr;
@@ -29,9 +30,11 @@ public:
     LgsMethodImpl* findMethod(const LgsFuncCall* funcCall) const;
     vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
     vector<LgsMethodImpl*> getAllMethods() const;
-    void setLocation(const antlr4::Token* ctx);
+    LgsStr* asStr();
     LgsObject* asObject();
     LgsInterface* asInterface();
+    void setLocation(const antlr4::Token* ctx);
+
     virtual bool isVoid();
     virtual bool equals(const LgsType& other);
     virtual Type* getIRType() = 0;

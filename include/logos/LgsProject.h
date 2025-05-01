@@ -39,15 +39,15 @@ public:
     void loadSrcFiles();
     void loadEnvFiles();
     void setupActiveEnv();
+    bool validateProject();
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
     void parseSrcFile(const directory_entry& entry);
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
     string getFileText(path filePath) const;
-    void resolveFuncTypes(LgsFuncSignature* signature);
     void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
-    bool validateProject();
     void checkDuplicateFiles(const vector<LgsFile*>& files);
+    void resolveFuncTypes(LgsFuncSignature* signature);
     void resolveGlobalTypes(const vector<LgsFile*>& files);
     void resolveObjMemberTypes(LgsObject* const& obj);
     bool isLogosFile(const directory_entry& entry) const;

@@ -9,19 +9,6 @@ bool LgsType::equals(const LgsType& other) {
     return getName() == other.getName();
 }
 
-void LgsType::setLocation(const antlr4::Token* ctx) {
-    location.lineNumber = ctx->getLine();
-    location.posInLine = ctx->getCharPositionInLine() + 1;
-}
-
-LgsObject* LgsType::asObject() {
-    return dynamic_cast<LgsObject*>(this);
-}
-
-LgsInterface* LgsType::asInterface() {
-    return dynamic_cast<LgsInterface*>(this);
-}
-
 bool LgsType::isVoid() {
     return false;
 }
@@ -68,6 +55,23 @@ vector<LgsMethodImpl*> LgsType::getAllMethods() const {
         }
     }
     return overloads;
+}
+
+void LgsType::setLocation(const antlr4::Token* ctx) {
+    location.lineNumber = ctx->getLine();
+    location.posInLine = ctx->getCharPositionInLine() + 1;
+}
+
+LgsObject* LgsType::asObject() {
+    return dynamic_cast<LgsObject*>(this);
+}
+
+LgsInterface* LgsType::asInterface() {
+    return dynamic_cast<LgsInterface*>(this);
+}
+
+LgsStr* LgsType::asStr() {
+    return dynamic_cast<LgsStr*>(this);
 }
 
 Type* LgsUnknownType::getIRType() {

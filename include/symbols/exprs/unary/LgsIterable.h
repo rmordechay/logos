@@ -1,24 +1,29 @@
 #ifndef LOGOSITERABLE_H
 #define LOGOSITERABLE_H
-
 #include "constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInt.h"
 
-#include <cstddef>
 struct CodeGenMetadata;
 
-class LgsIterable {
+class LgsIterable final {
 public:
-    virtual size_t length() = 0;
-    virtual Value* sizeIR(CodeGenMetadata* metadata) = 0;
-    virtual ~LgsIterable() = default;
-    void setFields(LgsType* type);
+    size_t length;
+    LgsType* type = nullptr;
+    LgsType* underlyingType = nullptr;
+
+    void setFields() const;
+    Type* getIRType(int size) const;
+    ~LgsIterable() = default;
 };
 
-inline void LgsIterable::setFields(LgsType* type) {
-    const auto lenField = new LgsField("len", &LGS_INT, new LgsIntConst(length()));
+inline void LgsIterable::setFields() const {
+    const auto lenField = new LgsField("len", &LGS_INT, new LgsIntConst(length));
     type->fields[lenField->name] = lenField;
+}
+
+inline Type* LgsIterable::getIRType(const int size) const {
+    return ArrayType::get(underlyingType->getIRType(), size);
 }
 
 #endif //LOGOSITERABLE_H

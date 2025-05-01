@@ -19,7 +19,7 @@ const string LgsArrayType::getName() const {
 }
 
 LgsExpr* LgsArrayType::getZeroValue() {
-    return new LgsArray(this);
+    return new LgsArray();
 }
 
 bool LgsArrayType::equals(LgsType* other) const {

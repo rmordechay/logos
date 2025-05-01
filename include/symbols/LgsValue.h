@@ -16,7 +16,6 @@ public:
     bool isFreed = false;
 
     void setIRValue(Value* value);
-    GlobalVariable* createIRGlobal(Module* module, Constant* strConstant) const;
     BasicBlock* createBasicBlock(const char* name) const;
     void startBlock(CodeGenMetadata* metadata, BasicBlock* block) const;
     Value* createIRStr(Module* module, const std::string& value) const;

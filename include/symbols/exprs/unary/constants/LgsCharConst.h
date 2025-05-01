@@ -11,4 +11,6 @@ public:
     Value* createIRValue(CodeGenMetadata* metadata) override;
 };
 
+inline LgsChar LGS_CHAR;
+
 #endif //LGSCHARCONST_H

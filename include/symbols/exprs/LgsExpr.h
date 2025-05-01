@@ -2,9 +2,8 @@
 #define LOGOSEXPR_H
 #include "LgsValue.h"
 
-#include <types/LgsType.h>
-
-
+class LgsFuncCall;
+class LgsType;
 class LgsVariable;
 class LgsSelection;
 class LgsInstance;

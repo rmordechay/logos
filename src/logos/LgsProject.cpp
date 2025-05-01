@@ -52,6 +52,19 @@ void LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) {
     }
 }
 
+bool LogosProject::validateProject() {
+    if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {
+        errHandler.handleError(E10010, nullptr);
+        return false;
+    }
+
+    if (!exists(paths.appFilePath)) {
+        errHandler.handleError(E10008, nullptr);
+        return false;
+    }
+    return true;
+}
+
 void LogosProject::resolveObjMemberTypes(LgsObject* const& obj) {
     for (const auto& [_, field] : obj->fields) {
         field->type = resolveType(field->type, &errHandler);
@@ -87,19 +100,6 @@ void LogosProject::checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEn
     if (!found) {
         errHandler.handleError(E10020, nullptr, {envFile->name, requireEnvVar.name});
     }
-}
-
-bool LogosProject::validateProject() {
-    if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {
-        errHandler.handleError(E10010, nullptr);
-        return false;
-    }
-
-    if (!exists(paths.appFilePath)) {
-        errHandler.handleError(E10008, nullptr);
-        return false;
-    }
-    return true;
 }
 
 void LogosProject::checkDuplicateFiles(const vector<LgsFile*>& files) {

@@ -17,7 +17,7 @@ inline int errCodeStart = 10000;
 inline LgsError E10000{.msg = "main() function is not defined in Main.lgs file.", .errCode = errCodeStart};
 inline LgsError E10001{.msg = "The left-hand type '%s' is not equal to the right-hand type '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10002{.msg = "'%s' is not iterable.", .errCode = ++errCodeStart};
-inline LgsError E10003{.msg = "Number of arguments does not much. Expected: %s, Given: %s.", .errCode = ++errCodeStart};
+inline LgsError E10003{.msg = "", .errCode = ++errCodeStart};
 inline LgsError E10004{.msg = "Function '%s' must return '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10005{.msg = "Field '%s' is not a member of '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10006{.msg = "'%s' is not defined.", .errCode = ++errCodeStart};

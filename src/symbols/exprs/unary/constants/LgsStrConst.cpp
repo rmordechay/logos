@@ -6,14 +6,6 @@ Value* LgsStrConst::createIRValue(CodeGenMetadata* metadata) {
     return createIRStr(metadata->module, value);
 }
 
-size_t LgsStrConst::length() {
-    return value.size();
-}
-
-Value* LgsStrConst::sizeIR(CodeGenMetadata* metadata) {
-    return metadata->builder.getInt32(value.size());
-}
-
 Value* LgsStrConst::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
     if (const auto otherStrConst = other->asIntConst()) {
         return createIRStr(metadata->module, this->value + to_string(otherStrConst->value));
@@ -25,6 +17,10 @@ Value* LgsStrConst::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
         return createIRStr(metadata->module, this->value + otherStrConst->value);
     }
     return nullptr;
+}
+
+bool LgsStrConst::isIterable() {
+    return true;
 }
 
 Value* LgsStrConst::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {

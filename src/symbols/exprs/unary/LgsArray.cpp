@@ -3,7 +3,7 @@
 
 Value* LgsArray::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto arrayType = asArrayType();
+    const auto arrayType = getArrayType();
     const auto IRArr = arrayType->initIRArr(metadata, length());
     const auto addElementFunc = arrayType->getIRFuncAddElement(metadata);
     for (const auto & element : initialElements) {
@@ -12,18 +12,18 @@ Value* LgsArray::createIRValue(CodeGenMetadata* metadata) {
     return IRArr;
 }
 
-size_t LgsArray::length() {
+size_t LgsArray::length() const {
     return initialElements.size();
 }
 
-Value* LgsArray::sizeIR(CodeGenMetadata* metadata) {
-    return nullptr;
-}
-
-LgsArrayType* LgsArray::asArrayType() const {
+LgsArrayType* LgsArray::getArrayType() const {
     return dynamic_cast<LgsArrayType*>(type);
 }
 
+bool LgsArray::isIterable() {
+    return true;
+}
+
 void LgsArray::free(CodeGenMetadata* metadata) {
-    asArrayType()->free(metadata, &isFreed, IRValue);
+    getArrayType()->free(metadata, &isFreed, IRValue);
 }
