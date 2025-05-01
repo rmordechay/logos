@@ -75,7 +75,7 @@ public:
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
-    bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
+    bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall, const string& parentName = "");
     LgsFunc* resolveFuncCallWithDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const;
     void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     bool validateExprType(LgsExpr* expr, LgsType* type);

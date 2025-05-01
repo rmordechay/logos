@@ -1,15 +1,15 @@
 #ifndef LGSENVS_H
 #define LGSENVS_H
-
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "funcs/LgsMethodImpl.h"
 #include "types/LgsObject.h"
-#include "types/LgsVoid.h"
 
 class LgsEnvGetFunc final : public LgsMethodImpl {
 public:
     explicit LgsEnvGetFunc(const string& parentName) : LgsMethodImpl("get", &LGS_STR, parentName, {LgsParam(&LGS_STR), LgsParam(&LGS_STR)}) {
         IRFuncType = FunctionType::get(ptrTy, {ptrTy, ptrTy}, false);
+        isStatic = true;
+        isPublic = true;
     }
 
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {

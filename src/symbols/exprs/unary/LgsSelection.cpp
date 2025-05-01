@@ -20,8 +20,8 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
         const auto field = parentExpr->type->getField(childExpr->getName());
-        const auto parentIRValue = parentExpr->getIRValue(metadata);
         if (field) {
+            const auto parentIRValue = parentExpr->getIRValue(metadata);
             const auto value = field->getGEP(metadata, parentIRValue);
             const auto valueLoad = metadata->builder.CreateLoad(field->type->getIRType(), value);
             childExpr->setIRValue(valueLoad);
@@ -29,23 +29,10 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
         }
 
         if (const auto methodCall = childExpr->asFuncCall()) {
-            if (const auto interface = parentExpr->type->asInterface()) {
-                dispatchInterfaceFunc(metadata, parentIRValue, methodCall, interface);
-            } else {
-                methodCall->initIRValue(metadata);
-            }
+            methodCall->initIRValue(metadata);
         }
     }
     return lastExpr();
-}
-
-Value* LgsSelection::dispatchInterfaceFunc(CodeGenMetadata* metadata, Value* parentIRValue, const LgsFuncCall* methodCall, LgsInterface* interface) const {
-    auto& builder = metadata->builder;
-    const auto interfaceIRType = interface->getIRType();
-    const auto interfaceGEP = builder.CreateStructGEP(interfaceIRType, parentIRValue, 0);
-    const auto interfacePtr = builder.CreateLoad(ptrTy, interfaceGEP);
-    if (!methodCall->func->IRFuncType) methodCall->func->setIRFuncType(metadata);
-    return builder.CreateCall(methodCall->func->IRFuncType, interfacePtr, {parentIRValue});
 }
 
 json LgsSelection::asJSON() {

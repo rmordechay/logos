@@ -6,5 +6,5 @@ string LgsTypeConst::getName() {
 }
 
 Value* LgsTypeConst::createIRValue(CodeGenMetadata* metadata) {
-    return nullptr;
+    assert(false);
 }

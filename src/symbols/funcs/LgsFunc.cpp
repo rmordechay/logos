@@ -1,6 +1,7 @@
 #include "funcs/LgsFunc.h"
 #include "LgsData.h"
 #include "exprs/LgsExpr.h"
+#include "funcs/LgsMethodImpl.h"
 #include "funcs/LgsParam.h"
 #include "types/LgsObject.h"
 #include "types/LgsVoid.h"
@@ -39,7 +40,11 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
         objPtr = metadata->builder.CreateAlloca(obj->getIRType(), nullptr);;
         argValues.push_back(objPtr);
     }
-    for (int i = 0; i < args.size(); ++i) {
+    auto iterSize = 0;
+    if (const auto method = dynamic_cast<LgsMethodImpl*>(this)) {
+        iterSize = method->isStatic;
+    }
+    for (int i = iterSize; i < args.size(); ++i) {
         const auto arg = args[i];
         const auto argValue = arg->getIRValue(metadata);
         argValues.emplace_back(argValue);

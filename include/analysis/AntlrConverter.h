@@ -18,6 +18,8 @@ using namespace filesystem;
 
 class AntlerConverter {
 public:
+    LgsFuncImpl* currentFunc = nullptr;
+    LgsMethodImpl* currentMethod = nullptr;
     LgsErrorHandler errHandler;
 
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath);

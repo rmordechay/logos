@@ -178,10 +178,12 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext
     const auto funcSignature = ctx->funcSignature();
     const auto name = funcSignature->VARIABLE()->getText();
     const auto func = new LgsFuncImpl(name, rt);
+    currentFunc = func;
     setParams(funcSignature, &func->signature);
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     func->setLocation(ctx->start);
     globals.addFunc(func);
+    currentFunc = nullptr;
     return func;
 }
 
@@ -191,6 +193,7 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
     const auto name = funcSignature->VARIABLE()->getText();
     const auto self = LgsParam(LOGOS_SELF, obj, new LgsInstance(obj));
     const auto method = new LgsMethodImpl(name, rt, obj->name);
+    currentMethod = method;
     method->signature.params.emplace_back(self);
     setParams(funcSignature, &method->signature);
     method->signature.path = obj->path;
@@ -198,7 +201,9 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
         method->isPublic = true;
     }
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
+    method->isStatic = currentMethod->isStatic;
     method->setLocation(ctx->start);
+    currentMethod = nullptr;
     return method;
 }
 
@@ -502,20 +507,21 @@ LgsUnaryExpr* AntlerConverter::getFirstSelection(LogosParser::SelectionContext* 
     if (const auto variable = firstExpr->VARIABLE()) {
         return getVariable(variable->getText(), ctx);
     }
-    if (const auto selfInstance = firstExpr->SELF_INSTANCE()) {
-        return getVariable(selfInstance->getText(), ctx);
-    }
     if (const auto funcCall = firstExpr->funcCall()) {
         return getFuncCall(funcCall);
     }
     if (const auto arrayIndex = firstExpr->arrayIndex()) {
         return getArrayIndex(arrayIndex);
     }
-    if (const auto type = firstExpr->TYPE()) {
-        return getTypeConstant(type, ctx);
+    if (const auto selfInstance = firstExpr->SELF_INSTANCE()) {
+        currentMethod->isStatic = true;
+        return getVariable(selfInstance->getText(), ctx);
     }
     if (const auto selfClass = firstExpr->SELF_CLASS()) {
         return getTypeConstant(selfClass, ctx);
+    }
+    if (const auto type = firstExpr->TYPE()) {
+        return getTypeConstant(type, ctx);
     }
     return nullptr;
 }

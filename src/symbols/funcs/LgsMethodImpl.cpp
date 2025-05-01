@@ -29,7 +29,8 @@ void LgsMethodImpl::setIRFuncParams(Argument* args) {
     for (int i = 0; i < signature.params.size(); ++i) {
         signature.params[i].setIRValue(args);
         if (signature.params[i].expr) signature.params[i].expr->setIRValue(args);
-        args->setName(signature.params[i].name);
+        auto paramName = signature.params[i].name;
+        if (paramName != "") args->setName(paramName);
         args++;
     }
 }
@@ -39,10 +40,11 @@ bool LgsMethodImpl::equals(const LgsFuncCall* other) {
     const auto params = signature.params;
     const auto args = other->args;
     if (params.size() == 0 && args.size() == 0) return true;
-    if (params.size() < args.size()) return false;
+    const auto argsSize = isStatic ? args.size() - 1 : args.size();
+    if (params.size() < argsSize) return false;
     for (size_t i = 0; i < params.size(); ++i) {
         const auto paramType = params[i].type;
-        const auto argType = args[i]->type;
+        const auto argType = args[i + isStatic]->type;
         if (!paramType->equals(argType)) return false;
     }
     return true;
