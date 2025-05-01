@@ -47,6 +47,6 @@ inline LgsError E10029{.msg = "const field '%s' must be initialized in the const
 inline LgsError E10030{.msg = "Non-public field '%s' is used outside its parent object '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10031{.msg = "Non-public method '%s' is used outside its parent object '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10032{.msg = "Singleton object '%s' cannot be instantiated.", .errCode = ++errCodeStart};
-
+inline LgsError E10033{.msg = "Function '%s' is declared multiple times.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

@@ -38,15 +38,17 @@ void SemaAnalyser::analyse() {
     }
 }
 
-void SemaAnalyser::visitMainFile(const LgsMainFile* mainFile) {
+void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
     for (const auto& obj : mainFile->objects) {
         visitObject(obj);
     }
     for (const auto& lgsEnum : mainFile->enums) {
         visitEnum(lgsEnum);
     }
-    checkDuplicateFuncs(mainFile->funcs);
-    for (const auto& func : mainFile->funcs) {
+    for (const auto& [_, overloads] : mainFile->funcs) {
+        checkDuplicateFuncs(overloads);
+    }
+    for (const auto& func : mainFile->getAllFuncs()) {
         visitFunc(func);
     }
     visitFunc(mainFile->mainFunc);
@@ -77,9 +79,6 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
 
 void SemaAnalyser::visitFuncSignature(LgsFuncSignature* funcSignature) {
     for (auto& param : funcSignature->params) {
-        if (param.expr) {
-            funcSignature->hasDefaultParams = true;
-        }
         visitParam(&param);
     }
 }
@@ -483,7 +482,7 @@ void SemaAnalyser::visitObjectImplements(LgsObject* obj) {
             auto found = false;
             for (const auto& interfaceOverload : interfaceOverloads) {
                 for (const auto& objOverload : objOverloads) {
-                    if (objOverload->equals(&interfaceOverload->signature)) {
+                    if (objOverload->equals(interfaceOverload)) {
                         objOverload->implements = interfaceOverload;
                         found = true;
                         break;
@@ -599,22 +598,30 @@ bool SemaAnalyser::resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCal
     return true;
 }
 
-void SemaAnalyser::checkDuplicateFuncs(const vector<LgsFuncImpl*>& funcs) {
-    for (const auto& func1 : funcs) {
-        for (const auto& func2 : funcs) {
-
+void SemaAnalyser::checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads) {
+    for (size_t i = 0; i < overloads.size(); ++i) {
+        const auto overload1 = overloads[i];
+        for (size_t j = i + 1; j < overloads.size(); ++j) {
+            const auto overload2 = overloads[j];
+            if (overload1->signature.hasDefaultParams && overload2->signature.hasDefaultParams) {
+                if (!overload1->equals(overload2)) {
+                    return errHandler.handleError(E10033, &overload1->location, {overload1->signature.getAsStr()});
+                }
+            } else if (overload1->signature.hasDefaultParams) {
+                assert(false);
+            } else if (overload2->signature.hasDefaultParams) {
+                assert(false);
+            }
+            if (overload1->equals(overload2)) {
+                errHandler.handleError(E10033, &overload1->location, {overload1->signature.getAsStr()});
+            }
         }
     }
 }
 
 LgsFunc* SemaAnalyser::resolveFuncCallWithoutDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const {
     const auto params = func->signature.params;
-    if (funcCall->args.size() > params.size()) return nullptr;
-    if (params.size() == funcCall->args.size()) {
-        if (func->equals(funcCall)) {
-            return func;
-        }
-    }
+    if (func->equals(funcCall)) return func;
     return nullptr;
 }
 

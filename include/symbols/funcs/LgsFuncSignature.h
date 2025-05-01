@@ -17,6 +17,7 @@ public:
     bool isCallback = false;
     bool hasDefaultParams = false;
 
+    LgsFuncSignature(const string& name, LgsType* type) : name(name), type(type) {}
     LgsFuncSignature(const string& name, LgsType* type, const vector<LgsParam>& params) : name(name), type(type), params(params) {}
 
     string getAsStr() const {

@@ -11,13 +11,13 @@
 #include <llvm/Target/TargetOptions.h>
 #include <llvm/MC/TargetRegistry.h>
 
-void CodeGenerator::generate(const LgsMainFile* mainFile, const bool writeToFile) {
+void CodeGenerator::generate(LgsMainFile* mainFile, const bool writeToFile) {
     initLLVM();
     createBuildDir();
     const auto module = createEmptyModule(LOGOS_MAIN_FILE_NAME);
     auto metadata = CodeGenMetadata{.module = module};
 
-    for (const auto& func : mainFile->funcs) {
+    for (const auto& func : mainFile->getAllFuncs()) {
         func->generateIRCode(&metadata);
     }
     mainFile->mainFunc->generateIRCode(&metadata);

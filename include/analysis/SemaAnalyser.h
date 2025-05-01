@@ -30,9 +30,11 @@ public:
     LgsFile* file = nullptr;
     LgsErrorHandler errHandler;
 
-    explicit SemaAnalyser(LgsFile* file) : file(file) {}
+    explicit SemaAnalyser(LgsFile* file) : file(file) {
+        errHandler.filePath = file->absPath;
+    }
     void analyse();
-    void visitMainFile(const LgsMainFile* mainFile);
+    void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
     void visitObjectImplements(LgsObject* obj);
@@ -76,7 +78,7 @@ public:
     bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
     LgsFunc* resolveFuncCallWithoutDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const;
     LgsFunc* resolveFuncCallWithDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const;
-    void checkDuplicateFuncs(const vector<LgsFuncImpl*>& funcs);
+    void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     bool validateExprType(LgsExpr* expr, LgsType* type);
     string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
 

@@ -45,12 +45,12 @@ bool LgsMethodImpl::equals(const LgsFuncCall* other) {
     return true;
 }
 
-bool LgsMethodImpl::equals(const LgsFuncSignature* other) {
-    if (signature.name != other->name) return false;
+bool LgsMethodImpl::equals(const LgsFunc* other) {
+    if (signature.name != other->signature.name) return false;
     if (signature.params.size() == 0) return true;
     for (size_t i = 0; i < signature.params.size() - 1; ++i) {
         auto thisTypeName = signature.params[i + 1].type->getName();
-        auto otherTypeName = other->params[i].type->getName();
+        auto otherTypeName = other->signature.params[i].type->getName();
         if (thisTypeName != otherTypeName) return false;
     }
     return true;

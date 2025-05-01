@@ -49,12 +49,14 @@ bool LgsFuncImpl::equals(const LgsFuncCall* funcCall) {
     return true;
 }
 
-bool LgsFuncImpl::equals(const LgsFuncSignature* other) {
-    if (signature.name != other->name) return false;
-    if (signature.params.size() == 0) return true;
-    for (size_t i = 0; i < signature.params.size() - 1; ++i) {
-        auto thisTypeName = signature.params[i + 1].type->getName();
-        auto otherTypeName = other->params[i].type->getName();
+bool LgsFuncImpl::equals(const LgsFunc* other) {
+    const auto thisParams = signature.params;
+    const auto otherParams = other->signature.params;
+    if (thisParams.size() == 0 && otherParams.size() == 0) return true;
+    if (signature.name != other->signature.name) return false;
+    for (size_t i = 0; i < thisParams.size() - 1; ++i) {
+        auto thisTypeName = thisParams[i + 1].type->getName();
+        auto otherTypeName = otherParams[i].type->getName();
         if (thisTypeName != otherTypeName) return false;
     }
     return true;

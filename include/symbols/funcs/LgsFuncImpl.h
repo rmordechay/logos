@@ -5,12 +5,13 @@
 
 class LgsFuncImpl : public LgsFunc {
 public:
-    explicit LgsFuncImpl(const string& name, LgsType* funcType, const vector<LgsParam>& params = {}) : LgsFunc(name, funcType, params) {}
+    explicit LgsFuncImpl(const string& name, LgsType* funcType) : LgsFunc(name, funcType) {}
+    explicit LgsFuncImpl(const string& name, LgsType* funcType, const vector<LgsParam>& params) : LgsFunc(name, funcType, params) {}
     void setIRName() override;
     void setIRFuncType(const CodeGenMetadata* metadata) override;
     void setIRFuncParams(Argument* args) override;
     bool equals(const LgsFuncCall* funcCall) override;
-    bool equals(const LgsFuncSignature* other) override;
+    bool equals(const LgsFunc* other) override;
     ~LgsFuncImpl() override = default;
 };
 

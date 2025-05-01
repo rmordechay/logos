@@ -38,7 +38,7 @@ void LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) {
             for (const auto& object : mainFile->objects) {
                 resolveObjMemberTypes(object);
             }
-            for (const auto& func : mainFile->funcs) {
+            for (const auto& func : mainFile->getAllFuncs()) {
                 resolveFuncTypes(&func->signature);
             }
         } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
