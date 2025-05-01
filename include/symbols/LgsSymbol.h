@@ -47,7 +47,7 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsEnumField* enumField);
     void free(CodeGenMetadata* metadata) const;
     LgsSymbol* clone() const;
-    Location* getSymbolLocation() const;
+    Location* getLocation() const;
     nlohmann::json asJSON() const;
     ~LgsSymbol() = default;
 };

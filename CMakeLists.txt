@@ -42,9 +42,7 @@ add_library(lib STATIC
     include/parser/LogosLexer.h
     include/parser/LogosParser.h
     include/analysis/AntlrConverter.h
-    include/analysis/LgsAnalyser.h
     include/analysis/SemaAnalyser.h
-    include/analysis/LgsProjectAnalyser.h
     include/cli/LgsCli.h
     include/cli/LgsCmd.h
     include/cli/LgsRunCmd.h
@@ -123,9 +121,7 @@ add_library(lib STATIC
     src/codegen/LgsLinker.cpp
     src/parser/LogosLexer.cpp
     src/parser/LogosParser.cpp
-    src/analysis/LgsAnalyser.cpp
     src/analysis/AntlrConverter.cpp
-    src/analysis/LgsProjectAnalyser.cpp
     src/analysis/SemaAnalyser.cpp
     src/logos/LgsProject.cpp
 
@@ -178,10 +174,12 @@ add_library(lib STATIC
     src/symbols/types/LgsObject.cpp
     src/symbols/funcs/LgsFuncImpl.cpp
     src/symbols/funcs/LgsMethodImpl.cpp
+    src/logos/LgsErrorHandler.cpp
 )
 
 add_executable(lgs main.cpp
-    include/symbols/builtin/LgsReflect.h)
+    include/symbols/builtin/LgsReflect.h
+    include/logos/LgsErrorHandler.h)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lgs PRIVATE

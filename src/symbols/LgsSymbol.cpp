@@ -1,7 +1,12 @@
 #include "LgsSymbol.h"
+
+#include "exprs/unary/LgsEnumField.h"
 #include "types/LgsEnum.h"
 #include "funcs/LgsFunc.h"
+#include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsInterface.h"
+#include "types/LgsObject.h"
 
 LgsSymbol::LgsSymbol(): type(UNKNOWN) {}
 LgsSymbol::LgsSymbol(LgsParam* param): type(PARAM), param(param) {}
@@ -26,7 +31,7 @@ LgsSymbol* LgsSymbol::clone() const {
     return new LgsSymbol(*this);
 }
 
-Location* LgsSymbol::getSymbolLocation() const {
+Location* LgsSymbol::getLocation() const {
     switch (type) {
     case VAR_DEC:
         return &varDec->location;
@@ -34,8 +39,19 @@ Location* LgsSymbol::getSymbolLocation() const {
         return &param->location;
     case FUNC:
         assert(false);
+    case OBJECT:
+        return &object->location;
+    case INTERFACE:
+        return &interface->location;
+    case FIELD:
+        return &field->location;
+    case ENUM:
+        return &lgsEnum->location;
+    case ENUM_FIELD:
+        return &enumField->location;
+    case UNKNOWN:
     default:
-        return nullptr;
+        assert(false);
     }
 }
 

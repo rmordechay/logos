@@ -34,6 +34,10 @@ struct CodeGenMetadata {
 struct Location {
     size_t lineNumber{};
     size_t posInLine{};
+
+    string lineNumberStr() const {
+        return to_string(lineNumber);
+    }
 };
 
 #endif //CODEGENMETADATA_H

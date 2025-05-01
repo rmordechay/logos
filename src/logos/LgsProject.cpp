@@ -1,5 +1,6 @@
 #include "logos/LgsProject.h"
 
+#include "LgsInterfaceFile.h"
 #include "analysis/AntlrConverter.h"
 #include "builtin/LgsReflect.h"
 #include "files/LgsAppFile.h"
@@ -21,13 +22,100 @@ extern char **environ;
 std::mutex projectMtx;
 
 bool LogosProject::loadProject() {
-    if (!projectAnalyser.validateProject()) return false;
+    if (!validateProject()) return false;
     setupActiveEnv();
-    if (!projectAnalyser.successful) return false;
+    if (!errHandler.successful) return false;
     loadFiles();
     if (!errors.empty()) return false;
-    projectAnalyser.resolveGlobalTypes(files);
-    return projectAnalyser.successful;
+    resolveGlobalTypes(files);
+    return errHandler.successful;
+}
+
+
+void LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) {
+    for (const auto& file : files) {
+        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+            for (const auto& object : mainFile->objects) {
+                resolveObjMemberTypes(object);
+            }
+            for (const auto& func : mainFile->funcs) {
+                resolveFuncTypes(&func->signature);
+            }
+        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+            resolveObjMemberTypes(objFile->obj);
+        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+            auto overloads = interfaceFile->interface->getAllMethods();
+            for (const auto& overload : overloads) {
+                resolveFuncTypes(&overload->signature);
+            }
+        }
+    }
+}
+
+void LogosProject::resolveObjMemberTypes(LgsObject* const& obj) {
+    for (const auto& [_, field] : obj->fields) {
+        field->type = resolveType(field->type, &errHandler);
+        field->parent = obj;
+    }
+    for (const auto& overload : obj->getAllMethods()) {
+        resolveFuncTypes(&overload->signature);
+    }
+    for (int i = 0; i < obj->implements.size(); ++i) {
+        obj->implements[i] = resolveType(obj->implements[i], &errHandler);
+    }
+}
+
+void LogosProject::resolveFuncTypes(LgsFuncSignature* signature) {
+    signature->type = resolveType(signature->type, &errHandler);
+    for (int i = 0; i < signature->params.size(); ++i) {
+        const auto lgsParam = signature->params[i];
+        if (lgsParam.callbackFunc) {
+            resolveFuncTypes(&lgsParam.callbackFunc->signature);
+        }
+        signature->params[i].type = resolveType(signature->params[i].type, &errHandler);
+    }
+}
+
+void LogosProject::checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile) {
+    auto found = false;
+    for (const auto& varDec : envFile->varDecs) {
+        if (requireEnvVar.name == varDec->name && requireEnvVar.type->equals(varDec->type)) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        errHandler.handleError(E10020, nullptr, {envFile->name, requireEnvVar.name});
+    }
+}
+
+bool LogosProject::validateProject() {
+    if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {
+        errHandler.handleError(E10010, nullptr);
+        return false;
+    }
+
+    if (!exists(paths.appFilePath)) {
+        errHandler.handleError(E10008, nullptr);
+        return false;
+    }
+    return true;
+}
+
+void LogosProject::checkDuplicateFiles(const vector<LgsFile*>& files) {
+    map<string, vector<LgsFile*>> duplicates;
+    for (const auto& file : files) {
+        duplicates[file->name].emplace_back(file);
+    }
+    if (duplicates.empty()) return;
+    for (const auto& [name, duplicate] : duplicates) {
+        if (duplicate.size() <= 1) continue;
+        ostringstream errMsg;
+        for (const auto &file : duplicate) {
+            errMsg << "\n\t - " + file->absPath;
+        }
+        errHandler.handleError(E10007, nullptr, {name, errMsg.str()});
+    }
 }
 
 void LogosProject::loadFiles() {
@@ -85,12 +173,12 @@ void LogosProject::parseSrcFile(const directory_entry& entry) {
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     AntlerConverter antlerConverter;
-    antlerConverter.filePath = absFilePath;
+    antlerConverter.errHandler.filePath = absFilePath;
     const auto file = antlerConverter.getLogosFile(parser.logosFile(), absFilePath);
     file->relPath = relative(absFilePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     lock_guard lock(projectMtx);
     files.emplace_back(file);
-    errors.insert(errors.end(), antlerConverter.errors.begin(), antlerConverter.errors.end());
+    errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
     if (file->name == LOGOS_MAIN_FILE_NAME) {
         mainFile = dynamic_cast<LgsMainFile*>(file);
     }
@@ -137,22 +225,22 @@ string LogosProject::getFileText(path filePath) const {
     return fileContents.str();
 }
 
-void LogosProject::loadGlobals() const {
+void LogosProject::loadGlobals() {
     globals.addFunc(new LgsPrint({LgsParam(new LgsInt())}));
     globals.addFunc(new LgsPrint({LgsParam(new LgsFloat())}));
     globals.addFunc(new LgsPrint({LgsParam(new LgsStr())}));
     globals.addFunc(new LgsPrint({LgsParam(new LgsChar())}));
     globals.addFunc(new LgsPrint({LgsParam(new LgsBool())}));
-    globals.addSymbol(LgsSys::name, LgsSymbol(new LgsSys()));
-    globals.addSymbol(LgsEnv::name, LgsSymbol(new LgsEnv()));
-    globals.addSymbol(LgsReflect::name, LgsSymbol(new LgsReflect()));
-    globals.addSymbol("ROOT_PATH", LgsSymbol(new LgsVarDec("ROOT_PATH", new LgsStr(), new LgsStrConst(paths.rootDirAbs))));
+    globals.addSymbol(LgsSys::name, LgsSymbol(new LgsSys()), &errHandler);
+    globals.addSymbol(LgsEnv::name, LgsSymbol(new LgsEnv()), &errHandler);
+    globals.addSymbol(LgsReflect::name, LgsSymbol(new LgsReflect()), &errHandler);
+    globals.addSymbol("ROOT_PATH", LgsSymbol(new LgsVarDec("ROOT_PATH", new LgsStr(), new LgsStrConst(paths.rootDirAbs))), &errHandler);
 }
 
 void LogosProject::checkRequiredEnvVars() {
     for (const auto& requireEnvVar : appFile->requireEnvVars) {
         for (const auto envFile : envFiles) {
-            projectAnalyser.checkRequiredEnvVar(requireEnvVar, envFile);
+            checkRequiredEnvVar(requireEnvVar, envFile);
         }
     }
 }

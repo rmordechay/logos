@@ -1,21 +1,23 @@
 #ifndef LGSPROJECT_H
 #define LGSPROJECT_H
 #include "LgsActiveEnv.h"
-#include "LgsProjectAnalyser.h"
-#include "analysis/LgsAnalyser.h"
+#include "LgsErrorHandler.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
-#include "types/LgsObject.h"
 
 #include <files/LgsFile.h>
 #include <vector>
 
+class LgsObject;
+class LgsFuncSignature;
 class ThreadPool;
 class LgsActiveEnv;
 class LgsAppFile;
 class LgsMainFile;
-struct LgsPaths;
 class LgsEnv;
+struct LgsPaths;
+
+using namespace filesystem;
 
 class LogosProject final {
 public:
@@ -24,7 +26,7 @@ public:
     vector<LgsFile*> files;
     vector<LgsError> errors;
     vector<LgsEnvFile*> envFiles;
-    LgsProjectAnalyser projectAnalyser;
+    LgsErrorHandler errHandler;
     LgsMainFile* mainFile = nullptr;
     const LgsAppFile* appFile = nullptr;
 
@@ -32,7 +34,7 @@ public:
     bool loadProject();
     void loadFiles();
     void setEnvVars() const;
-    void loadGlobals() const;
+    void loadGlobals();
     void checkRequiredEnvVars();
     void loadSrcFiles();
     void loadEnvFiles();
@@ -42,6 +44,12 @@ public:
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
     string getFileText(path filePath) const;
+    void resolveFuncTypes(LgsFuncSignature* signature);
+    void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
+    bool validateProject();
+    void checkDuplicateFiles(const vector<LgsFile*>& files);
+    void resolveGlobalTypes(const vector<LgsFile*>& files);
+    void resolveObjMemberTypes(LgsObject* const& obj);
     bool isLogosFile(const directory_entry& entry) const;
     ~LogosProject() = default;
 };

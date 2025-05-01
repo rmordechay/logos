@@ -2,10 +2,12 @@
 #define LOGOSFILE_H
 #include <string>
 #include <assert.h>
+#include <json/json.hpp>
+
 
 class LgsStack;
 using namespace std;
-using namespace filesystem;
+using namespace nlohmann;
 
 class LgsFile {
 public:

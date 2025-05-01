@@ -1,6 +1,6 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
-#include "LgsAnalyser.h"
+#include "LgsErrorHandler.h"
 #include "LgsStack.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
@@ -24,15 +24,13 @@ class LgsIfStmt;
 class LgsAssignment;
 class LgsLoop;
 
-class SemaAnalyser final : public LgsAnalyser {
+class SemaAnalyser final {
 public:
     LgsStack lgsStack;
     LgsFile* file = nullptr;
+    LgsErrorHandler errHandler;
 
-    explicit SemaAnalyser(LgsFile* file) : file(file) {
-        filePath = file->absPath;
-    }
-
+    explicit SemaAnalyser(LgsFile* file) : file(file) {}
     void analyse();
     void visitMainFile(const LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);

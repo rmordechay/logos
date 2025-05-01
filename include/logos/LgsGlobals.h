@@ -8,18 +8,21 @@
 #include "symbols/LgsSymbol.h"
 #include "types/LgsObject.h"
 #include "types/LgsInterface.h"
+#include "LgsErrorHandler.h"
 
 struct LgsGlobals {
     std::mutex mtx;
     map<string, LgsSymbol> symbols;
 
-    bool addSymbol(const string& name, const LgsSymbol& symbol) {
+    void addSymbol(const string& name, const LgsSymbol& symbol, LgsErrorHandler* errHandler) {
         if (symbols.find(name) != symbols.end()) {
-            return false;
+            const auto location = symbol.getLocation();
+            errHandler->handleError(E10011, location, {name, location->lineNumberStr()});
+            return;
         }
         lock_guard lock(mtx);
         symbols[name] = symbol;
-        return true;
+        return;
     }
 
     void addFunc(LgsFunc* func) {
@@ -65,5 +68,37 @@ struct LgsGlobals {
 };
 
 inline LgsGlobals globals;
+
+// TODO Put somewhere else
+inline LgsType* resolveType(LgsType* type, LgsErrorHandler* errorHandler) {
+    if (!dynamic_cast<LgsUnknownType*>(type)) return type;
+    auto typeName = type->getName();
+    const auto nullable = type->nullable;
+    if (globals.symbols.find(typeName) == globals.symbols.end()) {
+        errorHandler->handleError(E10006, &type->location, {typeName});
+        return nullptr;
+    }
+    const auto symbol = &globals.symbols[typeName];
+    delete type;
+    LgsType* newType = nullptr;
+    if (symbol->type == OBJECT) {
+        symbol->object->nullable = nullable;
+        newType = symbol->object;
+    }
+    if (symbol->type == INTERFACE) {
+        symbol->interface->nullable = nullable;
+        newType = symbol->interface;
+    }
+    if (symbol->type == ENUM) {
+        symbol->lgsEnum->nullable = nullable;
+        newType = symbol->lgsEnum;
+    }
+    if (symbol->type == ENUM_FIELD) {
+        symbol->enumField->parent->nullable = nullable;
+        newType = symbol->enumField->parent;
+    }
+    assert(newType);
+    return newType;
+}
 
 #endif //LGSGLOBALS_H

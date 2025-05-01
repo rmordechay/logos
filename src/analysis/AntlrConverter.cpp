@@ -153,9 +153,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
             obj->implements.emplace_back(implementType);
         }
     }
-    if (!globals.addSymbol(obj->name, LgsSymbol(obj))) {
-        handleError(E10031, &obj->location, {obj->name});
-    }
+    globals.addSymbol(obj->name, LgsSymbol(obj), &errHandler);
     return obj;
 }
 
@@ -171,7 +169,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
         method->signature.path = filePath;
         interface->addMethod(method);
     }
-    globals.addSymbol(interface->name, LgsSymbol(interface));
+    globals.addSymbol(interface->name, LgsSymbol(interface), &errHandler);
     return interface;
 }
 
@@ -376,7 +374,7 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
         const auto enumField = ctx->enumField()[i];
         const auto enumName = enumField->CONST_NAME()->getText();
         if (!seenNames.insert(enumName).second) {
-            handleError(E10011, &lgsEnum->location, {enumName, to_string(lgsEnum->location.lineNumber)});
+            errHandler.handleError(E10011, &lgsEnum->location, {enumName, to_string(lgsEnum->location.lineNumber)});
             break;
         }
         string enumText = "";

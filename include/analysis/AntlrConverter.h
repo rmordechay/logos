@@ -1,8 +1,8 @@
 #ifndef SEMANTICANALYSER_H
 #define SEMANTICANALYSER_H
 
-#include "LgsAnalyser.h"
 #include "LgsEnvFile.h"
+#include "LgsErrorHandler.h"
 #include "LogosParser.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
@@ -14,9 +14,12 @@ class LgsAppFile;
 class LgsLoop;
 class LgsAssignment;
 using namespace std;
+using namespace filesystem;
 
-class AntlerConverter : public LgsAnalyser {
+class AntlerConverter {
 public:
+    LgsErrorHandler errHandler;
+
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath);
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath);
     LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx, const path& filePath);

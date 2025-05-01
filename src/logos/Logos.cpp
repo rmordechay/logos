@@ -33,7 +33,7 @@ bool Logos::analyse(const vector<LgsFile*>& files) {
             SemaAnalyser semaAnalyser(file);
             semaAnalyser.analyse();
             lock_guard lock(mtx);
-            errors.insert(errors.end(), semaAnalyser.errors.begin(), semaAnalyser.errors.end());
+            errors.insert(errors.end(), semaAnalyser.errHandler.errors.begin(), semaAnalyser.errHandler.errors.end());
         });
     }
     threadPool.wait();
