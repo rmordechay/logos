@@ -1,5 +1,6 @@
 func(f(x: Int): Int) {
-    print(f(2))
+    result = f(2)
+    print(result)
 }
 
 callback(x: Int): Int {
@@ -8,4 +9,5 @@ callback(x: Int): Int {
 
 main() {
     func(callback)
+    func((x): { return x })
 }

@@ -22,7 +22,7 @@ void Logos::run() {
     if (!linker.link(modules)) exit(1);
 
     // Running
-    execl(paths.execFilePath.c_str(), static_cast<char*>(nullptr));
+    execl(paths.execFilePath.c_str(), nullptr);
 }
 
 bool Logos::analyse(const vector<LgsFile*>& files) {

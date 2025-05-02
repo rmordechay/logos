@@ -3,6 +3,9 @@
 #include "LgsErrors.h"
 #include "LgsWarnings.h"
 #include <filesystem>
+#include <vector>
+#include <string>
+#include <mutex>
 
 struct Location;
 
