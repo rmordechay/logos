@@ -10,7 +10,6 @@ Value* LgsArrayIndex::createIRValue(CodeGenMetadata* metadata) {
 
 Value* LgsArrayIndex::getGEP(CodeGenMetadata* metadata) const {
     vector<Value*> IRIndices;
-
     IRIndices.emplace_back(metadata->builder.getInt32(0));
     for (const auto& index : indices) {
         IRIndices.emplace_back(index->getIRValue(metadata));

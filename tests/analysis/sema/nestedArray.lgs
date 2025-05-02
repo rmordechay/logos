@@ -1,0 +1,5 @@
+main() {
+    obj: Int[5][1]
+    obj[1][1] := 23
+    print(obj[1][1])
+}
