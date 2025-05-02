@@ -13,7 +13,6 @@ public:
         type = new LgsDArrType(underlyingType);
     }
     size_t length() const;
-    bool isIterable() override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     void free(CodeGenMetadata* metadata) override;
     ~LgsDArray() override = default;

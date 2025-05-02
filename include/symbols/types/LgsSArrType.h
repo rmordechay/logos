@@ -14,6 +14,7 @@ public:
     const string getName() const override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;
+    ~LgsSArrType() override = default;
 };
 
 #endif //LGSSARRAYTYPE_H

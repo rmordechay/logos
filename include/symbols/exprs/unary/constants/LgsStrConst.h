@@ -12,7 +12,6 @@ public:
     FunctionType* const cmpStrIRFuncType = FunctionType::get(i1Ty, {ptrTy, ptrTy}, false);
 
     explicit LgsStrConst(const string& value) : LgsConstExpr(&LGS_STR), value(value) {}
-    bool isIterable() override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;

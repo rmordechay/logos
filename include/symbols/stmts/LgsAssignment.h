@@ -13,7 +13,7 @@ public:
 
     void createIRStmt(CodeGenMetadata* metadata) override;
     void createIRFromSelection(CodeGenMetadata* metadata, const LgsSelection* selection) const;
-    void createIRFromArrIndex(CodeGenMetadata* metadata, LgsArrayIndex* arrIndex);
+    void createIRFromArrIndex(CodeGenMetadata* metadata, LgsArrayIndex* arrIndex) const;
     ~LgsAssignment() override;
 };
 

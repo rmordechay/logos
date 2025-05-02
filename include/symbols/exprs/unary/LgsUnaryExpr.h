@@ -9,7 +9,6 @@ public:
     explicit LgsUnaryExpr() : LgsExpr(nullptr) {}
     explicit LgsUnaryExpr(LgsType* type) : LgsExpr(type) {}
     virtual string getName();
-    virtual bool isIterable();
     Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* subIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* mulIR(CodeGenMetadata* metadata, LgsExpr* other) override;
@@ -19,10 +18,6 @@ public:
 
 inline string LgsUnaryExpr::getName() {
     return "";
-}
-
-inline bool LgsUnaryExpr::isIterable() {
-    return false;
 }
 
 inline Value* LgsUnaryExpr::addIR(CodeGenMetadata* metadata, LgsExpr* other) {

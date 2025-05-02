@@ -27,19 +27,19 @@ void LgsAssignment::createIRFromSelection(CodeGenMetadata* metadata, const LgsSe
         switch (var->ref->type) {
         case FIELD:
             var->ref->field->setFieldIRValue(metadata, rvalue, beforeLastExpr->getIRValue(metadata));
-            break;
+            return;
         case UNKNOWN:
-            assert(false);
         default:
             break;
         }
-    } else if (const auto funcCall = lastExpr->asFuncCall()) {
-        assert(false);
     }
+    assert(false);
 }
 
-void LgsAssignment::createIRFromArrIndex(CodeGenMetadata* metadata, LgsArrayIndex* arrIndex) {
-    assert(false);
+void LgsAssignment::createIRFromArrIndex(CodeGenMetadata* metadata, LgsArrayIndex* arrIndex) const {
+    const auto gep = arrIndex->getGEP(metadata);
+    const auto rValue = rvalue->getIRValue(metadata);
+    metadata->builder.CreateStore(rValue, gep);
 }
 
 LgsAssignment::~LgsAssignment() {

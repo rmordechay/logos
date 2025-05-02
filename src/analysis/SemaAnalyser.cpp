@@ -21,6 +21,7 @@
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
+#include "exprs/unary/LgsSArray.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsPatternMatch.h"
 #include <loops/LgsForeachLoop.h>
@@ -135,6 +136,9 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
     if (const auto selection = dynamic_cast<LgsSelection*>(lExpr)) {
         visitSelection(selection);
     }
+    if (const auto arrIndex = dynamic_cast<LgsArrayIndex*>(lExpr)) {
+        visitArrayIndex(arrIndex);
+    }
     validateExprType(lExpr, rExpr->type);
 }
 
@@ -211,7 +215,7 @@ void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
 void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
     const auto iterableExpr = foreachLoop->expr;
     visitUnaryExpr(iterableExpr);
-    if (!iterableExpr->isIterable()) {
+    if (!iterableExpr->type->isIterable()) {
         return errHandler.handleError(E10002, &iterableExpr->location, {iterableExpr->getName()});
     }
     // TODO check all loop vars
@@ -450,15 +454,11 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
 
 void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
     visitUnaryExpr(arrayIndex->baseExpr);
-    for (const auto& indexExpr : arrayIndex->indices) {
-        visitExpr(indexExpr);
+    if (const auto iter = dynamic_cast<LgsIterable*>(arrayIndex->baseExpr->type)) {
+        arrayIndex->type = iter->underlyingType;
+    } else {
+        arrayIndex->type = arrayIndex->baseExpr->type;
     }
-    setExprType(arrayIndex, arrayIndex->baseExpr->type);
-    // TODO add if iterable check
-    // if (!arrType) {
-    //     errorHandler.handleError(E10002, &arrayIndex->location, {arrayIndex->getName()});
-    //     return;
-    // }
 }
 
 void SemaAnalyser::visitObjectImplements(LgsObject* obj) {

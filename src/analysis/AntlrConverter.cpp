@@ -576,13 +576,14 @@ LgsArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ct
         assert(false && "not implemented");
     }
 
-    vector<LgsExpr*> exprs;
+    vector<LgsExpr*> indices;
     for (int i = 0; i < ctx->expr().size(); ++i) {
         const auto expr = ctx->expr()[i];
-        auto lgsExpr = getExpr(expr);
-        exprs.emplace_back(lgsExpr);
+        const auto arrayIndex = getExpr(expr);
+        arrayIndex->setLocation(expr->start);
+        indices.emplace_back(arrayIndex);
     }
-    const auto arrayIndex = new LgsArrayIndex(baseExpr, exprs);
+    const auto arrayIndex = new LgsArrayIndex(baseExpr, indices);
     arrayIndex->setLocation(ctx->start);
     return arrayIndex;
 }

@@ -13,6 +13,10 @@ bool LgsType::isVoid() {
     return false;
 }
 
+bool LgsType::isIterable() {
+    return false;
+}
+
 json LgsType::asJSON() const {
     assert(false);
 }

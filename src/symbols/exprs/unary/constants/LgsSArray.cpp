@@ -10,10 +10,6 @@ size_t LgsSArray::length() const {
     return arraySize[0];
 }
 
-bool LgsSArray::isIterable() {
-    return true;
-}
-
 void LgsSArray::free(CodeGenMetadata* metadata) {
     assert(false);
 }

@@ -2,15 +2,18 @@
 #include "exprs/unary/LgsSArray.h"
 
 Type* LgsSArrType::getIRType() {
-    assert(false);
+    if (IRType) return IRType;
+    IRType = getUnderlyingIRType();
+    return IRType;
 }
 
 Type* LgsSArrType::getUnderlyingIRType() {
-    Type *arrayTy = underlyingType->getIRType();
+    if (IRType) return IRType;
+    IRType = underlyingType->getIRType();
     for (auto it = iterableSize.rbegin(); it != iterableSize.rend(); ++it) {
-        arrayTy = ArrayType::get(arrayTy, *it);
+        IRType = ArrayType::get(IRType, *it);
     }
-    return arrayTy;
+    return IRType;
 }
 
 LgsExpr* LgsSArrType::getZeroValue() {

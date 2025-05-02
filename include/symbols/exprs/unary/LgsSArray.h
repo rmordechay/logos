@@ -14,7 +14,6 @@ public:
         type = new LgsSArrType(underlyingType, arraySize);
     }
     size_t length() const;
-    bool isIterable() override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     void free(CodeGenMetadata* metadata) override;
     ~LgsSArray() override = default;

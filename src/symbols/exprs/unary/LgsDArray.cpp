@@ -9,10 +9,6 @@ size_t LgsDArray::length() const {
     return initialElements.size();
 }
 
-bool LgsDArray::isIterable() {
-    return true;
-}
-
 void LgsDArray::free(CodeGenMetadata* metadata) {
 
 }

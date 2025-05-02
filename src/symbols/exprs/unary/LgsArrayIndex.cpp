@@ -3,8 +3,21 @@
 #include <exprs/unary/LgsDArray.h>
 
 Value* LgsArrayIndex::createIRValue(CodeGenMetadata* metadata) {
-    Value* IRValue = baseExpr->getIRValue(metadata);
-    return IRValue;
+    const auto iterable = dynamic_cast<LgsIterable*>(baseExpr->type);
+    const auto irType = iterable->underlyingType->getIRType();
+    return metadata->builder.CreateLoad(irType, getGEP(metadata));
+}
+
+Value* LgsArrayIndex::getGEP(CodeGenMetadata* metadata) const {
+    vector<Value*> IRIndices;
+
+    IRIndices.emplace_back(metadata->builder.getInt32(0));
+    for (const auto& index : indices) {
+        IRIndices.emplace_back(index->getIRValue(metadata));
+    }
+    const auto ty = baseExpr->type->getIRType();
+    const auto ptr = baseExpr->getIRValue(metadata);
+    return metadata->builder.CreateGEP(ty, ptr, IRIndices);
 }
 
 string LgsArrayIndex::getName() {
@@ -13,7 +26,7 @@ string LgsArrayIndex::getName() {
 
 LgsArrayIndex::~LgsArrayIndex() {
     delete baseExpr;
-    for (const auto& index : indices) {
+    for (auto const& index : indices) {
         delete index;
     }
 }
