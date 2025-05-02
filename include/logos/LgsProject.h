@@ -41,7 +41,7 @@ public:
     void setupActiveEnv();
     bool validateProject();
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
-    void parseSrcFile(const directory_entry& entry);
+    void parseSrcFile(path entry);
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
     string getFileText(path filePath) const;

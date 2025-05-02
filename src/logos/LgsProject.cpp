@@ -165,7 +165,7 @@ void LogosProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
     }
 }
 
-void LogosProject::parseSrcFile(const directory_entry& entry) {
+void LogosProject::parseSrcFile(path entry) {
     const auto absFilePath = canonical(entry);
     const auto codeText = getFileText(entry);
     ANTLRInputStream input(codeText);
