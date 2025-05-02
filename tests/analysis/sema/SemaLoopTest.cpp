@@ -1,21 +1,20 @@
 #include "LgsLinker.h"
 #include "Logos.h"
-
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-
 
 using testing::StartsWith;
 
 class SemaLoopTest : public testing::Test {
 protected:
-    path dataDir = "../tests/analysis/sema/code";
+    path dataDir = "../../tests/analysis/sema/code";
     Logos logos = Logos(dataDir);
 
     void SetUp() override {
-        path a = path(dataDir / "idjf");
-        logos.project.parseSrcFile(a)
+        logos.project.parseSrcFile(dataDir / "loop.lgs");
+        logos.project.loadGlobals();
+        logos.analyse(logos.project.files);
     }
 
     void TearDown() override {
