@@ -9,7 +9,19 @@ public:
 
     explicit LgsBoolConst(const bool value) : LgsConstExpr(&LGS_BOOL), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* andIR(CodeGenMetadata* metadata, LgsExpr* right) override;
+    Value* andIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* neIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* ltIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* gtIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* geIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* leIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* orIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* bitAndIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* bitOrIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* bitXorIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* rshiftIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* lshiftIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     ~LgsBoolConst() override = default;
 };
 

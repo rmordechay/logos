@@ -20,6 +20,8 @@
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
+#include "exprs/unary/LgsSArray.h"
+#include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsPatternMatch.h"
 #include <loops/LgsForeachLoop.h>
@@ -85,6 +87,7 @@ void SemaAnalyser::visitFuncSignature(LgsFuncType* funcSignature) {
 
 void SemaAnalyser::visitParam(LgsParam* param) {
     addLocalSymbol(param->name, LgsSymbol(param));
+    visitExpr(param->expr);
     validateExprType(param->expr, param->type);
 }
 
@@ -124,13 +127,14 @@ void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
 }
 
 void SemaAnalyser::visitField(const LgsField* field) {
+    visitExpr(field->expr);
     validateExprType(field->expr, field->type);
 }
 
 void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
     const auto rExpr = assignment->rvalue;
-    visitExpr(rExpr);
     const auto lExpr = assignment->lvalue;
+    visitExpr(rExpr);
     if (const auto selection = dynamic_cast<LgsSelection*>(lExpr)) {
         visitSelection(selection);
     }
@@ -249,6 +253,7 @@ void SemaAnalyser::visitBreakStmt(LgsBreakStmt* breakStmt) const {}
 void SemaAnalyser::visitEnum(const LgsEnum* lgsEnum) const {}
 
 void SemaAnalyser::visitExpr(LgsExpr* expr) {
+    if (!expr) return;
     if (const auto castExpr = dynamic_cast<LgsCast*>(expr)) {
         visitCast(castExpr);
     } else if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(expr)) {
@@ -278,7 +283,7 @@ void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
         visitFuncCall(funcCall);
     } else if (const auto selection = unaryExpr->asSelection()) {
         visitSelection(selection);
-    } else if (const auto array = unaryExpr->asArray()) {
+    } else if (const auto array = unaryExpr->asDArray()) {
         visitArray(array);
     } else if (const auto arrIndex = unaryExpr->asArrayIndex()) {
         visitArrayIndex(arrIndex);
@@ -438,12 +443,17 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     instance->type = instance->obj;
 }
 
-void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrayIndex) {
-    visitUnaryExpr(arrayIndex->baseExpr);
-    if (const auto iter = dynamic_cast<LgsIterable*>(arrayIndex->baseExpr->type)) {
-        arrayIndex->type = iter->underlyingType;
+void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrIndex) {
+    const auto baseExpr = arrIndex->baseExpr;
+    visitUnaryExpr(baseExpr);
+    const auto baseExprType = baseExpr->type;
+    if (baseExprType->isIterable()) {
+        arrIndex->type = dynamic_cast<LgsIterable*>(baseExprType)->underlyingType;
+        if (checkArrDimensions(arrIndex)) {
+            checkArrBoundaries(arrIndex);
+        }
     } else {
-        arrayIndex->type = arrayIndex->baseExpr->type;
+        return errHandler.handleError(E10002, &arrIndex->location, {baseExpr->getName()});
     }
 }
 
@@ -451,7 +461,7 @@ void SemaAnalyser::visitObjectImplements(LgsObject* obj) {
     for (int i = 0; i < obj->implements.size(); ++i) {
         const auto implement = obj->implements[i];
         if (!implement) continue;
-        const auto interface = dynamic_cast<LgsInterface*>(implement);
+        const auto interface = implement->asInterface();
         if (!interface) {
             errHandler.handleError(E10025, &implement->location, {implement->getName()});
             continue;
@@ -531,7 +541,6 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
 
 bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
     if (!expr) return true;
-    visitExpr(expr);
     if (expr->isNull()) {
         // null must have a type
         if (!type) {
@@ -546,14 +555,66 @@ bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
         expr->type = type;
         return true;
     }
-    if (type && !expr->type->equals(type)) {
+    if (type && expr->type && !expr->type->equals(type)) {
         errHandler.handleError(E10001, &expr->location, {type->getName(), expr->type->getName()});
         return false;
     }
     return true;
 }
 
-bool SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall, LgsSymbol* symbol) {
+void SemaAnalyser::checkArrBoundaries(LgsArrayIndex* arrIndex) {
+    bool outOfBounds = false;
+    vector<size_t> boundaries;
+    if (const auto var = arrIndex->baseExpr->asVariable()) {
+        const auto ref = var->ref;
+        if (ref->type == VAR_DEC) {
+            const auto expr = ref->varDec->expr;
+            boundaries = expr->type->asSArrayType()->iterableSize;
+        }
+    }
+
+    for (int i = 0; i < arrIndex->indices.size(); ++i) {
+        const auto upperBound = boundaries[i];
+        const auto index = arrIndex->indices[i];
+        visitExpr(index);
+        if (!index->type->asInt()) {
+            errHandler.handleError(E10036, &arrIndex->location, {arrIndex->getNameWithTypes()});
+            break;
+        }
+        outOfBounds = !validateArrBoundries(upperBound, index);
+        if (outOfBounds) break;
+    }
+    if (outOfBounds) {
+        return errHandler.handleError(E10003, &arrIndex->location, {arrIndex->code});
+    }
+}
+
+bool SemaAnalyser::validateArrBoundries(const size_t upperBound, LgsExpr* index) const {
+    if (const auto indexInt = index->asIntConst()) {
+        return indexInt->value < upperBound;
+    }
+    assert(false);
+}
+
+bool SemaAnalyser::checkArrDimensions(const LgsArrayIndex* arrIndex) {
+    int maxIndexLevel = -1;
+    if (const auto var = arrIndex->baseExpr->asVariable()) {
+        const auto ref = var->ref;
+        if (ref->type == VAR_DEC) {
+            const auto expr = ref->varDec->expr;
+            const auto sarray = expr->type->asIterable();
+            maxIndexLevel = sarray->iterableSize.size();
+        }
+    }
+    assert(maxIndexLevel >= 0);
+    if (arrIndex->indices.size() > maxIndexLevel) {
+        errHandler.handleError(E10035, &arrIndex->location, {arrIndex->code, to_string(maxIndexLevel)});
+        return false;
+    }
+    return true;
+}
+
+bool SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall, const LgsSymbol* symbol) {
     if (symbol->type == PARAM) {
         const auto funcType = dynamic_cast<LgsFuncType*>(symbol->param->type);
         if (isFuncCallEqual(funcType, funcCall)) {

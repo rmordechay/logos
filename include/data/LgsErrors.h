@@ -17,7 +17,7 @@ inline int errCodeStart = 10000;
 inline LgsError E10000{.msg = "main() function is not defined in Main.lgs file.", .errCode = errCodeStart};
 inline LgsError E10001{.msg = "The left-hand type '%s' is not equal to the right-hand type '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10002{.msg = "'%s' is not iterable.", .errCode = ++errCodeStart};
-inline LgsError E10003{.msg = "", .errCode = ++errCodeStart};
+inline LgsError E10003{.msg = "Array index '%s' is out of bounds.", .errCode = ++errCodeStart};
 inline LgsError E10004{.msg = "Function '%s' must return '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10005{.msg = "Field '%s' is not a member of '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10006{.msg = "'%s' is not defined.", .errCode = ++errCodeStart};
@@ -31,7 +31,7 @@ inline LgsError E10013{.msg = "Function '%s' is not a member of '%s'.", .errCode
 inline LgsError E10014{.msg = "Pattern of type '%s' does not match base type '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10015{.msg = "Function with name '%s' was found but it does not match any overload.\n\t   Given: %s\n\t   Possible overloads:%s", .errCode = ++errCodeStart};
 inline LgsError E10016{.msg = "Object '%s' does not fully implement '%s'. Missing functions:%s", .errCode = ++errCodeStart};
-inline LgsError E10017{.msg = "break is not part of a loop.", .errCode = ++errCodeStart};
+inline LgsError E10017{.msg = "'break' must be inside a loop statement.", .errCode = ++errCodeStart};
 inline LgsError E10018{.msg = "Expression of type '%s' cannot be casted to type '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10019{.msg = "activeEnv '%s' could not be found in the envs directory.", .errCode = ++errCodeStart};
 inline LgsError E10020{.msg = "Environment '%s' does not define the required field '%s'.", .errCode = ++errCodeStart};
@@ -49,5 +49,7 @@ inline LgsError E10031{.msg = "Non-public method '%s' is used outside its parent
 inline LgsError E10032{.msg = "Singleton object '%s' cannot be instantiated.", .errCode = ++errCodeStart};
 inline LgsError E10033{.msg = "Function '%s' is declared multiple times.", .errCode = ++errCodeStart};
 inline LgsError E10034{.msg = "Object '%s' has method(s) with name '%s' but it does not match any overload.\n\t   Given: %s\n\t   Possible overloads:%s", .errCode = ++errCodeStart};
+inline LgsError E10035{.msg = "Array indexing of '%s' is too deep. Max level: %s.", .errCode = ++errCodeStart};
+inline LgsError E10036{.msg = "Array indices must be of type 'Int'. Given: %s.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

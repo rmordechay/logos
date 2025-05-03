@@ -2,7 +2,7 @@
 
 void LgsIfStmt::createIRStmt(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope();
-    if (elseIfConds.size() > 0) {
+    if (elseBlock || elseIfConds.size() > 0) {
         computeComplexIf(metadata);
     } else {
         computeSimpleIf(metadata);
@@ -16,24 +16,23 @@ void LgsIfStmt::computeSimpleIf(CodeGenMetadata* metadata) {
     ifTrueBlock = createBasicBlock(BB_IF_TRUE);
     ifEndBlock = createBasicBlock(BB_IF_END);
     elseBlock = createBasicBlock(BB_ELSE);
-    assert(ifCond);
+
+    // if block
     const auto ifCondIR = ifCond->getIRValue(metadata);
     if (!elseStmtBlock) {
         builder.CreateCondBr(ifCondIR, ifTrueBlock, ifEndBlock);
     } else {
         builder.CreateCondBr(ifCondIR, ifTrueBlock, elseBlock);
     }
-
     startBlock(metadata, ifTrueBlock);
     ifStmtBlock->createIRValue(metadata);
-    if (!builder.GetInsertBlock()->getTerminator()) {
-        builder.CreateBr(ifEndBlock);
-    }
+    if (builder.GetInsertBlock()->getTerminator()) return;
+    builder.CreateBr(ifEndBlock);
 
-    if (elseStmtBlock) {
-        createElseBlock(metadata, elseBlock, ifEndBlock);
-    }
+    // else block
+    createElseBlock(metadata, elseBlock, ifEndBlock);
 
+    // exit
     startBlock(metadata, ifEndBlock);
 }
 
@@ -51,10 +50,13 @@ void LgsIfStmt::computeComplexIf(CodeGenMetadata* metadata) {
     ifStmtBlock->createIRValue(metadata);
     builder.CreateBr(ifEndBlock);
 
+    // else if blocks
     createElseIfBlocks(metadata);
-    if (elseStmtBlock) {
-        createElseBlock(metadata, elseBlock, ifEndBlock);
-    }
+
+    // else block
+    createElseBlock(metadata, elseBlock, ifEndBlock);
+
+    // exit
     if (!builder.GetInsertBlock()->getTerminator()) {
         startBlock(metadata, ifEndBlock);
     }
@@ -85,6 +87,7 @@ void LgsIfStmt::createElseIfBlocks(CodeGenMetadata* metadata) {
 }
 
 void LgsIfStmt::createElseBlock(CodeGenMetadata* metadata, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const {
+    if (!elseStmtBlock) return;
     startBlock(metadata, elseBlock);
     elseStmtBlock->createIRValue(metadata);
     metadata->builder.CreateBr(ifEndBlock);

@@ -14,6 +14,7 @@ public:
     Location location;
     Value* IRValue = nullptr;
     bool isFreed = false;
+    string code;
 
     void setIRValue(Value* value);
     BasicBlock* createBasicBlock(const char* name) const;

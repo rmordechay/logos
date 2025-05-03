@@ -2,8 +2,10 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
+#include "types/LgsInt.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
+#include "types/LgsSArrType.h"
 
 bool LgsType::equals(const LgsType& other) {
     return getName() == other.getName();
@@ -74,8 +76,20 @@ LgsInterface* LgsType::asInterface() {
     return dynamic_cast<LgsInterface*>(this);
 }
 
+LgsIterable* LgsType::asIterable() {
+    return dynamic_cast<LgsIterable*>(this);
+}
+
+LgsSArrType* LgsType::asSArrayType() {
+    return dynamic_cast<LgsSArrType*>(this);
+}
+
 LgsStr* LgsType::asStr() {
     return dynamic_cast<LgsStr*>(this);
+}
+
+LgsInt* LgsType::asInt() {
+    return dynamic_cast<LgsInt*>(this);
 }
 
 Type* LgsUnknownType::getIRType() {

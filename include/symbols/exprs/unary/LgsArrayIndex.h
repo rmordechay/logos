@@ -14,6 +14,7 @@ public:
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* getGEP(CodeGenMetadata* metadata) const;
     string getName() override;
+    string getNameWithTypes();
     ~LgsArrayIndex() override;
 };
 

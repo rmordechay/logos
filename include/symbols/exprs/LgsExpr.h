@@ -9,6 +9,7 @@ class LgsSelection;
 class LgsInstance;
 class LgsArrayIndex;
 class LgsDArray;
+class LgsSArray;
 class LgsBoolConst;
 class LgsCharConst;
 class LgsFloatConst;
@@ -38,8 +39,8 @@ public:
     virtual Value* gtIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* geIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* leIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* andIR(CodeGenMetadata* metadata, LgsExpr* right);
-    virtual Value* orIR(CodeGenMetadata* metadata, LgsExpr* right);
+    virtual Value* andIR(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual Value* orIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* bitAndIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* bitOrIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* bitXorIR(CodeGenMetadata* metadata, LgsExpr* other);
@@ -47,12 +48,13 @@ public:
     virtual Value* lshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
 
     bool isNull();
-    LgsDArray* asArray();
-    LgsArrayIndex* asArrayIndex();
+    LgsVariable* asVariable();
     LgsFuncCall* asFuncCall();
+    LgsArrayIndex* asArrayIndex();
     LgsInstance* asInstance();
     LgsSelection* asSelection();
-    LgsVariable* asVariable();
+    LgsDArray* asDArray();
+    LgsSArray* asSArray();
     LgsBoolConst* asBoolConst();
     LgsCharConst* asCharConst();
     LgsFloatConst* asFloatConst();

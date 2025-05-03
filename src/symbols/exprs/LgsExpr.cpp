@@ -1,12 +1,11 @@
 #include "exprs/LgsExpr.h"
-
-#include "CodeGenerator.h"
 #include "exprs/LgsNull.h"
 #include "exprs/unary/LgsDArray.h"
 #include "exprs/unary/LgsArrayIndex.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsInstance.h"
+#include "exprs/unary/LgsSArray.h"
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
@@ -72,11 +71,11 @@ Value* LgsExpr::leIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsExpr::andIR(CodeGenMetadata* metadata, LgsExpr* right) {
+Value* LgsExpr::andIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsExpr::orIR(CodeGenMetadata* metadata, LgsExpr* right) {
+Value* LgsExpr::orIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
@@ -104,14 +103,15 @@ bool LgsExpr::isNull() {
     return dynamic_cast<LgsNull*>(this);
 }
 
-LgsDArray* LgsExpr::asArray() { return dynamic_cast<LgsDArray*>(this); }
-LgsArrayIndex* LgsExpr::asArrayIndex() { return dynamic_cast<LgsArrayIndex*>(this); }
+LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }
 LgsFuncCall* LgsExpr::asFuncCall() { return dynamic_cast<LgsFuncCall*>(this); }
 LgsInstance* LgsExpr::asInstance() { return dynamic_cast<LgsInstance*>(this); }
 LgsSelection* LgsExpr::asSelection() { return dynamic_cast<LgsSelection*>(this); }
-LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }
+LgsDArray* LgsExpr::asDArray() { return dynamic_cast<LgsDArray*>(this); }
+LgsSArray* LgsExpr::asSArray() { return dynamic_cast<LgsSArray*>(this); }
 LgsBoolConst* LgsExpr::asBoolConst() { return dynamic_cast<LgsBoolConst*>(this); }
 LgsCharConst* LgsExpr::asCharConst() { return dynamic_cast<LgsCharConst*>(this); }
+LgsArrayIndex* LgsExpr::asArrayIndex() { return dynamic_cast<LgsArrayIndex*>(this); }
 LgsFloatConst* LgsExpr::asFloatConst() { return dynamic_cast<LgsFloatConst*>(this); }
 LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
 LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }

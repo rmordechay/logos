@@ -584,6 +584,7 @@ LgsArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ct
     }
     const auto arrayIndex = new LgsArrayIndex(baseExpr, indices);
     arrayIndex->setLocation(ctx->start);
+    arrayIndex->code = ctx->getText();
     return arrayIndex;
 }
 

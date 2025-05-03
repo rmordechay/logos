@@ -6,6 +6,9 @@
 #include <string>
 #include <map>
 
+class LgsInt;
+class LgsSArrType;
+class LgsIterable;
 using namespace std;
 using namespace llvm;
 
@@ -30,9 +33,6 @@ public:
     LgsMethodImpl* findMethod(const LgsFuncCall* funcCall) const;
     vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
     vector<LgsMethodImpl*> getAllMethods() const;
-    LgsStr* asStr();
-    LgsObject* asObject();
-    LgsInterface* asInterface();
     void setLocation(const antlr4::Token* ctx);
 
     virtual bool isVoid();
@@ -44,6 +44,13 @@ public:
     virtual bool isIterable();
     virtual LgsType* inferBinaryType(LgsType* other) = 0;
     virtual json asJSON() const;
+
+    LgsStr* asStr();
+    LgsInt* asInt();
+    LgsObject* asObject();
+    LgsInterface* asInterface();
+    LgsIterable* asIterable();
+    LgsSArrType* asSArrayType();
     virtual ~LgsType() = default;
 };
 

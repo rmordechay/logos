@@ -23,6 +23,15 @@ string LgsArrayIndex::getName() {
     return baseExpr->getName();
 }
 
+string LgsArrayIndex::getNameWithTypes() {
+    stringstream str;
+    str << getName();
+    for (const auto index : indices) {
+        str << '[' << index->type->getName() << ']';
+    }
+    return str.str();
+}
+
 LgsArrayIndex::~LgsArrayIndex() {
     delete baseExpr;
     for (auto const& index : indices) {

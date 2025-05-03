@@ -64,29 +64,31 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
     void visitFuncCall(LgsFuncCall* funcCall);
-    bool resolveFuncCall(LgsFuncCall* funcCall, LgsSymbol* symbol);
-    void checkMethodVisibility(const LgsFuncCall* methodCall);
+    bool resolveFuncCall(LgsFuncCall* funcCall, const LgsSymbol* symbol);
     void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
     void visitFieldCall(const LgsExpr* parentExpr, LgsVariable* childField);
     void visitFirstSelection(LgsExpr* firstExpr);
     void visitInstance(LgsInstance* instance);
-    void visitArrayIndex(LgsArrayIndex* arrayIndex);
+    void visitArrayIndex(LgsArrayIndex* arrIndex);
 
     void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
     LgsFunc* resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
-    LgsFunc* resolveMethodCall(const vector<LgsMethodImpl*>& overloads, LgsFuncCall* methodCall,
-                               const string& parentName);
+    LgsFunc* resolveMethodCall(const vector<LgsMethodImpl*>& overloads, LgsFuncCall* methodCall, const string& parentName);
     bool resolveFuncCallWithDefaultParams(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
     void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
-    bool validateExprType(LgsExpr* expr, LgsType* type);
     bool isFuncCallEqual(LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
-    string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
+    bool validateExprType(LgsExpr* expr, LgsType* type);
+    bool validateArrBoundries(size_t upperBound, LgsExpr* index) const;
+    void checkArrBoundaries(LgsArrayIndex* arrIndex);
+    bool checkArrDimensions(const LgsArrayIndex* arrIndex);
+    void checkMethodVisibility(const LgsFuncCall* methodCall);
 
+    string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     ~SemaAnalyser() = default;

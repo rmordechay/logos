@@ -1,0 +1,5 @@
+main() {
+    arr: Int[6][4]
+    arr[5][3] := 23
+    arr[true][true] := 23
+}
