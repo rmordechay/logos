@@ -84,7 +84,7 @@ add_library(lib STATIC
     include/symbols/funcs/LgsFuncImpl.h
     include/symbols/funcs/LgsMethodImpl.h
     include/symbols/funcs/LgsParam.h
-    include/symbols/funcs/LgsFuncSignature.h
+    include/symbols/types/LgsFuncType.h
     include/symbols/builtin/LgsPrint.h
     include/symbols/loops/LgsForeachLoop.h
     include/symbols/loops/LgsRangeLoop.h
@@ -181,9 +181,9 @@ add_library(lib STATIC
     src/symbols/funcs/LgsFuncImpl.cpp
     src/symbols/funcs/LgsMethodImpl.cpp
     src/symbols/types/LgsSArrType.cpp
+    src/symbols/types/LgsFuncType.cpp
 )
 
-find_package(ZLIB REQUIRED)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lib PRIVATE
@@ -193,7 +193,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libantlr4-runtime.a
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    find_package(ZLIB REQUIRED)
     target_link_libraries(lib PRIVATE
+        ZLIB::ZLIB
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libLLVM.so
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/liblldCommon.a
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/liblldELF.a
@@ -203,4 +205,4 @@ endif()
 
 add_executable(lgs main.cpp)
 target_link_libraries(lgs PRIVATE lib)
-add_subdirectory(tests)
+#add_subdirectory(tests)

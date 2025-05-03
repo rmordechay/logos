@@ -9,7 +9,7 @@ public:
     static constexpr auto name = "print";
     explicit LgsPrint(const vector<LgsParam>& params) : LgsFuncImpl(name, &LGS_VOID, params) {}
 
-    void setIRFuncType(const CodeGenMetadata* metadata) override;
+    void setIRFuncType(const CodeGenMetadata* metadata);
     ~LgsPrint() override = default;
 };
 

@@ -49,11 +49,12 @@ public:
 
 class LgsUnknownType final : public LgsType {
 public:
+    static constexpr auto typeName = "Unknown";
     string name;
 
     LgsUnknownType() = default;
     explicit LgsUnknownType(const string& name) : name(name) {}
-    const string getName() const override { return name; }
+    const string getName() const override { return name == "" ? typeName : name; }
     LgsExpr* getZeroValue() override { assert(false && "unknown type should not be called"); }
     bool equals(LgsType* other) const override { assert(false && "unknown type should not be called"); }
     LgsType* inferBinaryType(LgsType* other) override { assert(false && "unknown type should not be called"); }

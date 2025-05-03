@@ -1,92 +1,43 @@
 #include "funcs/LgsFunc.h"
 #include "LgsData.h"
-#include "exprs/LgsExpr.h"
-#include "funcs/LgsMethodImpl.h"
 #include "funcs/LgsParam.h"
 #include "types/LgsObject.h"
 #include "types/LgsVoid.h"
 
 void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);
-    getIRFunc(metadata);
     startBlock(metadata, entryBlock);
     stmtBlock->createIRValue(metadata);
-    if (signature.type->getName() == LgsVoid::name) {
+    if (funcType.type->getName() == LgsVoid::name) {
         metadata->builder.CreateRetVoid();
     }
     metadata->lgsStack.exitScope();
 }
 
-Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
-    if (!IRFuncType) setIRFuncType(metadata);
-    if (signature.IRName.empty()) setIRName();
-    auto func = metadata->module->getOrInsertFunction(signature.IRName, IRFuncType);
-    const auto IRFunc = dyn_cast<Function>(func.getCallee());
-    auto args = IRFunc->arg_begin();
-    if (const auto obj = signature.type->asObject()) {
-        setStructRet(args, obj);
-    }
-    if (args) {
-        setIRFuncParams(args);
-    }
-    return IRFunc;
-}
-
-Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
-    const auto IRFunc = getIRFunc(metadata);
-    vector<Value*> argValues;
-    Value* objPtr = nullptr;
-    if (const auto obj = signature.type->asObject()) {
-        objPtr = metadata->builder.CreateAlloca(obj->getIRType(), nullptr);;
-        argValues.push_back(objPtr);
-    }
-    auto iterSize = 0;
-    if (const auto method = dynamic_cast<LgsMethodImpl*>(this)) {
-        iterSize = method->isStatic;
-    }
-    for (int i = iterSize; i < args.size(); ++i) {
-        const auto arg = args[i];
-        const auto argValue = arg->getIRValue(metadata);
-        argValues.emplace_back(argValue);
-    }
-    const auto funcCall = metadata->builder.CreateCall(IRFuncType, IRFunc, argValues);
-    if (objPtr) return objPtr;
-    return funcCall;
-}
-
-
 string LgsFunc::format(string& indentStr) {
     stringstream str;
-    str << signature.name << "(";
-    for (int i = 0; i < signature.params.size(); ++i) {
-        auto param = signature.params[i];
+    str << funcType.name << "(";
+    for (int i = 0; i < funcType.params.size(); ++i) {
+        auto param = funcType.params[i];
         str << param.format(indentStr);
-        if (i != signature.params.size() - 1) {
+        if (i != funcType.params.size() - 1) {
             str << ", ";
         }
     }
     str << ")";
-    if (signature.name != LOGOS_MAIN_FUNC) {
-        str << signature.type->getName();
+    if (funcType.name != LOGOS_MAIN_FUNC) {
+        str << funcType.type->getName();
     }
     str << stmtBlock->format(indentStr);
     return str.str();
 }
 
-void LgsFunc::setStructRet(Function::arg_iterator& args, LgsObject* const obj) const {
-    AttrBuilder builder(context);
-    builder.addStructRetAttr(obj->getIRType());
-    args->addAttrs(builder);
-    args->setName("rt");
-    args++;
-}
-
 json LgsFunc::asJSON() {
     json tree;
-    tree["name"] = signature.name;
-    tree["type"] = signature.type->getName();
+    tree["name"] = funcType.name;
+    tree["type"] = funcType.type->getName();
     tree["params"] = {};
-    for (auto& param : signature.params) {
+    for (auto& param : funcType.params) {
         tree["params"].emplace_back(param.asJSON());
     }
     tree["stmts"] = stmtBlock->asJSON();

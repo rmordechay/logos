@@ -2,7 +2,7 @@
 #define LGSINTERFACE_H
 #include "LgsType.h"
 
-struct LgsFuncSignature;
+struct LgsFuncType;
 
 class LgsInterface final : public LgsType {
 public:

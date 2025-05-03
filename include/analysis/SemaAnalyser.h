@@ -40,8 +40,9 @@ public:
     void visitObjectImplements(LgsObject* obj);
     void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
-    void visitFuncSignature(LgsFuncSignature* funcSignature);
+    void visitFuncSignature(LgsFuncType* funcSignature);
     void validateFuncControlFlow(const LgsFunc* func);
+    string getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads) const;
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
     void visitStmtBlock(LgsStmtBlock* stmtBlock);
@@ -63,6 +64,8 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
     void visitFuncCall(LgsFuncCall* funcCall);
+    bool resolveFuncCall(LgsFuncCall* funcCall, LgsSymbol* symbol);
+    void checkMethodVisibility(const LgsFuncCall* methodCall);
     void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
@@ -75,10 +78,13 @@ public:
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
 
-    bool resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall, const string& parentName = "");
-    LgsFunc* resolveFuncCallWithDefaultParams(LgsFunc* func, const LgsFuncCall* funcCall) const;
+    LgsFunc* resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
+    LgsFunc* resolveMethodCall(const vector<LgsMethodImpl*>& overloads, LgsFuncCall* methodCall,
+                               const string& parentName);
+    bool resolveFuncCallWithDefaultParams(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
     void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     bool validateExprType(LgsExpr* expr, LgsType* type);
+    bool isFuncCallEqual(LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
     string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
 
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);

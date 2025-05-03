@@ -6,7 +6,7 @@
 
 void LgsPatternMatch::createIRStmt(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto func = metadata->lgsStack.currentFunc->getIRFunc(metadata);
+    const auto func = metadata->lgsStack.currentFunc->funcType.getIRFunc(metadata);
     const auto exprIRValue = metadata->builder.getInt32(expr->hashValue(metadata));
     exitBlock = BasicBlock::Create(context, "exit_pattern_matching");
     defaultCase = BasicBlock::Create(context, "default");

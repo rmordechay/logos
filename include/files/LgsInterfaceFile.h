@@ -3,7 +3,7 @@
 #include "types/LgsInterface.h"
 #include <LgsFile.h>
 
-struct LgsFuncSignature;
+struct LgsFuncType;
 
 class LgsInterfaceFile final : public LgsFile {
 public:

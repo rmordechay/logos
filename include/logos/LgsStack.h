@@ -10,7 +10,7 @@
 using namespace std;
 using namespace llvm;
 class LgsLoop;
-class LgsFuncSignature;
+class LgsFuncType;
 
 struct LgsStackFrame {
     map<string, LgsSymbol> symbols;

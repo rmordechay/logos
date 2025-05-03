@@ -3,9 +3,9 @@
 
 void LgsPrint::setIRFuncType(const CodeGenMetadata* metadata) {
     vector<Type*> paramTypes;
-    for (const auto& param : signature.params) {
+    for (const auto& param : funcType.params) {
         paramTypes.emplace_back(param.type->getIRType());
     }
-    IRFuncType = FunctionType::get(signature.type->getIRType(), paramTypes, false);
+    IRFuncType = FunctionType::get(funcType.type->getIRType(), paramTypes, false);
 }
 

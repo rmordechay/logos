@@ -12,12 +12,6 @@ public:
         isStatic = true;
         isPublic = true;
     }
-
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
-        const auto exitCode = args[1]->getIRValue(metadata);
-        const auto exitFunc = metadata->module->getOrInsertFunction("exit", IRFuncType);
-        return metadata->builder.CreateCall(exitFunc, {exitCode});
-    }
 };
 
 class LgsSys final : public LgsObject {

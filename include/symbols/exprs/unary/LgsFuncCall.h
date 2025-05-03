@@ -8,6 +8,7 @@ public:
     string name;
     vector<LgsExpr*> args;
     LgsFunc* func = nullptr;
+    LgsFuncType* funcType = nullptr;
     LgsSymbol* ref = nullptr;
     bool isMethodCall;
 
@@ -18,6 +19,8 @@ public:
     void createIRStmt(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     void free(CodeGenMetadata* metadata) override;
+    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args);
+    Value* setIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args);
     ~LgsFuncCall() override;
 };
 

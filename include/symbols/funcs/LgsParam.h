@@ -12,14 +12,13 @@ public:
     string name;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
-    LgsFuncImpl* callbackFunc = nullptr;
     vector<LgsVariable*> refs;
 
     LgsParam(const string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
-    explicit LgsParam(LgsFuncImpl* func);
     explicit LgsParam(LgsType* type) : name(""), type(type) {}
     string format(string& indentStr) override;
     json asJSON() override;
+    string getIRName();
     ~LgsParam() override = default;
 };
 

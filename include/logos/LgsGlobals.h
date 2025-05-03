@@ -27,7 +27,7 @@ struct LgsGlobals {
 
     void addFunc(LgsFunc* func) {
         std::lock_guard lock(mtx);
-        auto [symbol, inserted] = symbols.try_emplace(func->signature.name);
+        auto [symbol, inserted] = symbols.try_emplace(func->funcType.name);
         if (inserted) {
             symbol->second.type = FUNC;
         }
@@ -71,6 +71,7 @@ inline LgsGlobals globals;
 
 // TODO Put somewhere else
 inline LgsType* resolveType(LgsType* type, LgsErrorHandler* errorHandler) {
+    assert(type);
     if (!dynamic_cast<LgsUnknownType*>(type)) return type;
     auto typeName = type->getName();
     assert(typeName != "");

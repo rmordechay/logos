@@ -39,14 +39,14 @@ void LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) {
                 resolveObjMemberTypes(object);
             }
             for (const auto& func : mainFile->getAllFuncs()) {
-                resolveFuncTypes(&func->signature);
+                resolveFuncTypes(&func->funcType);
             }
         } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             resolveObjMemberTypes(objFile->obj);
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
             auto overloads = interfaceFile->interface->getAllMethods();
             for (const auto& overload : overloads) {
-                resolveFuncTypes(&overload->signature);
+                resolveFuncTypes(&overload->funcType);
             }
         }
     }
@@ -71,20 +71,17 @@ void LogosProject::resolveObjMemberTypes(LgsObject* const& obj) {
         field->parent = obj;
     }
     for (const auto& overload : obj->getAllMethods()) {
-        resolveFuncTypes(&overload->signature);
+        resolveFuncTypes(&overload->funcType);
     }
     for (int i = 0; i < obj->implements.size(); ++i) {
         obj->implements[i] = resolveType(obj->implements[i], &errHandler);
     }
 }
 
-void LogosProject::resolveFuncTypes(LgsFuncSignature* signature) {
+void LogosProject::resolveFuncTypes(LgsFuncType* signature) {
     signature->type = resolveType(signature->type, &errHandler);
     for (int i = 0; i < signature->params.size(); ++i) {
         const auto lgsParam = signature->params[i];
-        if (lgsParam.callbackFunc) {
-            resolveFuncTypes(&lgsParam.callbackFunc->signature);
-        }
         signature->params[i].type = resolveType(signature->params[i].type, &errHandler);
     }
 }

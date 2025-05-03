@@ -165,9 +165,9 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
         const auto self = LgsParam(LOGOS_SELF, interface);
         const auto type = getFuncType(funcSignature);
         const auto method = new LgsMethodImpl(funcSignature->VARIABLE()->getText(), type, interfaceName);
-        method->signature.params.emplace_back(self);
-        setParams(funcSignature, &method->signature);
-        method->signature.path = filePath;
+        method->funcType.params.emplace_back(self);
+        setParams(funcSignature, &method->funcType);
+        method->path = filePath;
         interface->addMethod(method);
     }
     globals.addSymbol(interface->name, LgsSymbol(interface), &errHandler);
@@ -180,7 +180,7 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext
     const auto name = funcSignature->VARIABLE()->getText();
     const auto func = new LgsFuncImpl(name, rt);
     currentFunc = func;
-    setParams(funcSignature, &func->signature);
+    setParams(funcSignature, &func->funcType);
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     func->setLocation(ctx->start);
     globals.addFunc(func);
@@ -195,9 +195,9 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
     const auto self = LgsParam(LOGOS_SELF, obj, new LgsInstance(obj));
     const auto method = new LgsMethodImpl(name, rt, obj->name);
     currentMethod = method;
-    method->signature.params.emplace_back(self);
-    setParams(funcSignature, &method->signature);
-    method->signature.path = obj->path;
+    method->funcType.params.emplace_back(self);
+    setParams(funcSignature, &method->funcType);
+    method->path = obj->path;
     if (ctx->VISIBILITY()) {
         method->isPublic = true;
     }
@@ -208,18 +208,18 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
     return method;
 }
 
-void AntlerConverter::setParams(LogosParser::FuncSignatureContext* funcSignature, LgsFuncSignature* signature) {
+void AntlerConverter::setParams(LogosParser::FuncSignatureContext* funcSignature, LgsFuncType* funcType) {
     if (!funcSignature->paramList()) return;
     for (const auto& param : funcSignature->paramList()->param()) {
         if (const auto varDec = param->explicitVarDec()) {
             const auto lgsParam = getParam(varDec);
             if (lgsParam->expr) {
-                signature->hasDefaultParams = true;
+                funcType->hasDefaultParams = true;
             }
-            signature->params.emplace_back(*lgsParam);
+            funcType->params.emplace_back(*lgsParam);
         } else if (const auto func = param->funcSignature()) {
             const auto lgsParam = getParamFunc(func);
-            signature->params.emplace_back(*lgsParam);
+            funcType->params.emplace_back(*lgsParam);
         }
     }
 }
@@ -315,11 +315,10 @@ LgsParam* AntlerConverter::getParam(LogosParser::ExplicitVarDecContext* ctx) {
 
 LgsParam* AntlerConverter::getParamFunc(LogosParser::FuncSignatureContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
-    const auto type = getType(ctx->type());
-    const auto func = new LgsFuncImpl(variableName, type);
-    setParams(ctx, &func->signature);
-    func->signature.isCallback = true;
-    const auto param = new LgsParam(func);
+    const auto rt = getType(ctx->type());
+    const auto funcType = new LgsFuncType(variableName, rt);
+    setParams(ctx, funcType);
+    const auto param = new LgsParam(variableName, funcType);
     param->setLocation(ctx->start);
     return param;
 }

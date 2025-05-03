@@ -9,7 +9,7 @@
 #include <vector>
 
 class LgsObject;
-class LgsFuncSignature;
+class LgsFuncType;
 class ThreadPool;
 class LgsActiveEnv;
 class LgsAppFile;
@@ -47,7 +47,7 @@ public:
     string getFileText(path filePath) const;
     void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
     void checkDuplicateFiles(const vector<LgsFile*>& files);
-    void resolveFuncTypes(LgsFuncSignature* signature);
+    void resolveFuncTypes(LgsFuncType* signature);
     void resolveGlobalTypes(const vector<LgsFile*>& files);
     void resolveObjMemberTypes(LgsObject* const& obj);
     bool isLogosFile(const directory_entry& entry) const;

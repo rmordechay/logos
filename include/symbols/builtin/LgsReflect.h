@@ -15,15 +15,6 @@ public:
         isPublic = true;
         isStatic = true;
     }
-
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
-        const auto arg = args[1]->asVariable();
-        for (const auto& field : arg->type->fields) {
-            assert(false);
-        }
-        return nullptr;
-    }
-
     ~LgsReflectGetFields() override = default;
 };
 

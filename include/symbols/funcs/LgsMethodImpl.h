@@ -13,11 +13,7 @@ public:
 
     LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName) : LgsFunc(name, funcType), parentName(parentName) {}
     LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam>& params) : LgsFunc(name, funcType, params), parentName(parentName) {}
-    void setIRName() override;
-    void setIRFuncType(const CodeGenMetadata* metadata) override;
-    void setIRFuncParams(Argument* args) override;
     bool equals(const LgsFuncCall* other) override;
-    bool equals(const LgsFunc* other) override;
     ~LgsMethodImpl() override = default;
 };
 

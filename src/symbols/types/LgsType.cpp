@@ -30,7 +30,7 @@ LgsField* LgsType::getField(const string& name) {
 }
 
 void LgsType::addMethod(LgsMethodImpl* method) {
-    methods[method->signature.name].push_back(method);
+    methods[method->funcType.name].push_back(method);
 }
 
 LgsMethodImpl* LgsType::findMethod(const LgsFuncCall* funcCall) const {
