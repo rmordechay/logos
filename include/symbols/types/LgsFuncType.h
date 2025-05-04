@@ -23,7 +23,7 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     string getAsStr(bool withType = false) const;
     void setStructRet(Function::arg_iterator& args, LgsObject* obj) const;
-    
+
 
     virtual string getIRName();
     virtual Function* getIRFunc(const CodeGenMetadata* metadata);
@@ -31,18 +31,6 @@ public:
     virtual void setIRFuncParams(Argument* IRParams);
     static string getComposedName(const string& name, const string& parentName, const vector<string>& argTypeNames);
     ~LgsFuncType() override = default;
-};
-
-class LgsMethodType final : public LgsFuncType {
-public:
-    string parentName;
-
-    LgsMethodType(const string& name, LgsType* type, const vector<LgsParam>& params): LgsFuncType(name, type, params) {}
-    string getIRName() override;
-    FunctionType* getIRFuncType(const CodeGenMetadata* metadata) override;
-    void setIRFuncParams(Argument* args) override;
-    bool equals(LgsType* other) const override;
-    ~LgsMethodType() override = default;
 };
 
 
