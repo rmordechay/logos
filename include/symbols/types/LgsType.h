@@ -42,6 +42,7 @@ public:
     virtual const string getName() const = 0;
     virtual bool equals(LgsType* other) const = 0;
     virtual bool isIterable();
+    virtual LgsType* getUnderlyingType();
     virtual LgsType* inferBinaryType(LgsType* other) = 0;
     virtual json asJSON() const;
 

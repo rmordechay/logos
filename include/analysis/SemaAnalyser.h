@@ -84,9 +84,9 @@ public:
     void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     bool isFuncCallEqual(LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
     bool validateExprType(LgsExpr* expr, LgsType* type);
-    bool checkIndexBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, size_t upperBound);
+    bool checkSingleIndexBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, size_t upperBound);
     bool checkSliceBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, size_t upperBound);
-    void checkArrBoundaries(LgsArrayIndex* arrIndex);
+    bool checkIndexBoundaries(LgsArrayIndex* arrIndex);
     bool checkArrDimensions(const LgsArrayIndex* arrIndex);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 

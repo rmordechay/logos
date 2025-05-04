@@ -10,10 +10,14 @@ public:
     LgsType* underlyingType;
 
     explicit LgsIterable(LgsType* underlyingType, const vector<size_t>& iterableSize = {}) : iterableSize(iterableSize), underlyingType(underlyingType) {}
-    virtual Type* getUnderlyingIRType() = 0;
+    LgsType* getUnderlyingType() override;
     bool isIterable() override;
     ~LgsIterable() override = default;
 };
+
+inline LgsType* LgsIterable::getUnderlyingType() {
+    return underlyingType;
+}
 
 inline bool LgsIterable::isIterable() {
     return true;

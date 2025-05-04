@@ -13,7 +13,6 @@ public:
     LgsStr() : LgsIterable(&LGS_CHAR) {}
     const string getName() const override;
     Type* getIRType() override;
-    Type* getUnderlyingIRType() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) const override;

@@ -13,10 +13,6 @@ Type* LgsDArrType::getIRType() {
     return ptrTy;
 }
 
-Type* LgsDArrType::getUnderlyingIRType() {
-    assert(false);
-}
-
 const string LgsDArrType::getName() const {
     return name;
 }

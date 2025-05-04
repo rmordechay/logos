@@ -3,12 +3,6 @@
 
 Type* LgsSArrType::getIRType() {
     if (IRType) return IRType;
-    IRType = getUnderlyingIRType();
-    return IRType;
-}
-
-Type* LgsSArrType::getUnderlyingIRType() {
-    if (IRType) return IRType;
     IRType = underlyingType->getIRType();
     for (auto it = iterableSize.rbegin(); it != iterableSize.rend(); ++it) {
         IRType = ArrayType::get(IRType, *it);

@@ -9,7 +9,6 @@ public:
 
     explicit LgsSArrType(LgsType* underlyingType, const vector<size_t>& arraySize) : LgsIterable(underlyingType, arraySize) {}
     Type* getIRType() override;
-    Type* getUnderlyingIRType() override;
     LgsExpr* getZeroValue() override;
     const string getName() const override;
     bool equals(LgsType* other) const override;

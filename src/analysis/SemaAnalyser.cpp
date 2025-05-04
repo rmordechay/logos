@@ -438,7 +438,6 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
             continue;
         }
     }
-
     instance->obj = obj;
     instance->type = instance->obj;
 }
@@ -448,10 +447,11 @@ void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrIndex) {
     visitUnaryExpr(baseExpr);
     const auto baseExprType = baseExpr->type;
     if (baseExprType->isIterable()) {
-        arrIndex->type = dynamic_cast<LgsIterable*>(baseExprType)->underlyingType;
-        if (checkArrDimensions(arrIndex)) {
-            checkArrBoundaries(arrIndex);
-        }
+        const bool arrDimsValid = checkArrDimensions(arrIndex);
+        if (!arrDimsValid) return;
+        const bool indexBoundariesValid = checkIndexBoundaries(arrIndex);
+        if (!indexBoundariesValid) return;
+        arrIndex->type = baseExprType->asIterable()->underlyingType;
     } else {
         return errHandler.handleError(E10002, &arrIndex->location, {baseExpr->getName()});
     }
@@ -562,8 +562,7 @@ bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
     return true;
 }
 
-void SemaAnalyser::checkArrBoundaries(LgsArrayIndex* arrIndex) {
-    bool outOfBounds = false;
+bool SemaAnalyser::checkIndexBoundaries(LgsArrayIndex* arrIndex) {
     vector<size_t> boundaries;
     if (const auto var = arrIndex->baseExpr->asVariable()) {
         const auto ref = var->ref;
@@ -572,33 +571,37 @@ void SemaAnalyser::checkArrBoundaries(LgsArrayIndex* arrIndex) {
             boundaries = expr->type->asSArrayType()->iterableSize;
         }
     }
-
+    assert(!boundaries.empty());
+    bool boundariesValid = false;
     for (int i = 0; i < arrIndex->indices.size(); ++i) {
         const auto upperBound = boundaries[i];
         const auto index = arrIndex->indices[i];
         visitExpr(index->from);
         if (index->to) {
             visitExpr(index->to);
-            outOfBounds = checkSliceBoundaries(arrIndex, index, upperBound);
+            boundariesValid = checkSliceBoundaries(arrIndex, index, upperBound);
         } else {
-            outOfBounds = !checkIndexBoundaries(arrIndex, index, upperBound);
+            boundariesValid = checkSingleIndexBoundaries(arrIndex, index, upperBound);
         }
-        if (outOfBounds) break;
+        if (!boundariesValid) break;
     }
-    if (outOfBounds) {
-        return errHandler.handleError(E10003, &arrIndex->location, {arrIndex->code});
-    }
+    return boundariesValid;
 }
 
-bool SemaAnalyser::checkIndexBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, const size_t upperBound) {
+bool SemaAnalyser::checkSingleIndexBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, const size_t upperBound) {
     if (!index->from->type->asInt()) {
         errHandler.handleError(E10036, &arrIndex->location, {arrIndex->getNameWithTypes()});
         return false;
     }
+    bool outOfBounds = false;
     if (const auto indexInt = index->from->asIntConst()) {
-        return indexInt->value < upperBound;
+        outOfBounds = indexInt->value >= upperBound;
     }
-    assert(false);
+    if (outOfBounds) {
+        errHandler.handleError(E10003, &arrIndex->location, {arrIndex->code});
+        return false;
+    }
+    return true;
 }
 
 bool SemaAnalyser::checkSliceBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, const size_t upperBound) {
