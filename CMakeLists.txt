@@ -93,7 +93,7 @@ add_library(lib STATIC
     include/symbols/stmts/LgsAssignment.h
     include/symbols/stmts/LgsIfStmt.h
     include/symbols/stmts/LgsReturn.h
-    include/symbols/stmts/LgsContinue.h
+    include/symbols/stmts/LgsContinueStmt.h
     include/symbols/stmts/LgsBreakStmt.h
     include/symbols/stmts/LgsStmtBlock.h
     include/symbols/stmts/LgsVarDec.h
@@ -161,7 +161,7 @@ add_library(lib STATIC
     src/symbols/stmts/LgsIfStmt.cpp
     src/symbols/stmts/LgsReturn.cpp
     src/symbols/stmts/LgsBreakStmt.cpp
-    src/symbols/stmts/LgsContinue.cpp
+    src/symbols/stmts/LgsContinueStmt.cpp
     src/symbols/stmts/LgsStmtBlock.cpp
     src/symbols/stmts/LgsPatternMatch.cpp
     src/symbols/stmts/LgsVarDec.cpp
@@ -185,8 +185,8 @@ add_library(lib STATIC
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lib PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libLLVM.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldCommon.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldMachO.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldCommon.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldMachO.a
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libantlr.a
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")

@@ -1,8 +1,6 @@
 #include "stmts/LgsBreakStmt.h"
-
 #include "funcs/LgsFunc.h"
-
-#include <loops/LgsLoop.h>
+#include "loops/LgsLoop.h"
 
 void LgsBreakStmt::createIRStmt(CodeGenMetadata* metadata) {
     const auto currentLoop = metadata->lgsStack.currentLoop;

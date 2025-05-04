@@ -7,7 +7,7 @@ class LgsFuncCall;
 class LgsReturn;
 class LgsPatternMatch;
 class LgsIfStmt;
-class LgsContinue;
+class LgsContinueStmt;
 class LgsBreakStmt;
 class LgsAssignment;
 
@@ -19,7 +19,7 @@ public:
     LgsLoop* asLoop();
     LgsPatternMatch* asPatternMatch();
     LgsReturn* asReturn();
-    LgsContinue* asContinue();
+    LgsContinueStmt* asContinue();
     LgsBreakStmt* asBreakStmt();
     LgsFuncCall* asFuncCall();
     LgsSelection* asSelection();

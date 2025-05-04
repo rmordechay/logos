@@ -1,10 +1,10 @@
-#include "stmts/LgsContinue.h"
+#include "stmts/LgsContinueStmt.h"
 
 #include "funcs/LgsFunc.h"
 
 #include <loops/LgsLoop.h>
 
-void LgsContinue::createIRStmt(CodeGenMetadata* metadata) {
+void LgsContinueStmt::createIRStmt(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto currentLoop = metadata->lgsStack.currentLoop;
     const auto loopCondition = currentLoop->loopCondBlock;

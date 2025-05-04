@@ -55,7 +55,8 @@ public:
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);
     void visitForeachLoop(const LgsForeachLoop* foreachLoop);
     void visitReturnStmt(const LgsReturn* returnStmt);
-    void visitBreakStmt(LgsBreakStmt* breakStmt) const;
+    void visitBreakStmt(const LgsBreakStmt* breakStmt);
+    void visitContinueStmt(const LgsContinueStmt* continueStmt);
     void visitEnum(const LgsEnum* lgsEnum) const;
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
@@ -82,7 +83,7 @@ public:
     LgsFunc* resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
     LgsFunc* resolveMethodCall(const vector<LgsMethodImpl*>& overloads, LgsFuncCall* methodCall, const string& parentName);
     bool resolveFuncCallWithDefaultParams(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
-    bool isFuncCallEqual(LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
+    bool isFuncCallEqual(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
     bool checkExprType(LgsExpr* expr, LgsType* type);
     bool checkSingleIndexBoundaries(LgsArrayIndex* arrIndex, LgsExpr* index, size_t upperBound);
     bool checkSliceBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, size_t dimension, size_t upperBound);

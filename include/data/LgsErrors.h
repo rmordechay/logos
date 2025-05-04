@@ -52,5 +52,6 @@ inline LgsError E10034{.msg = "Object '%s' has method(s) with name '%s' but it d
 inline LgsError E10035{.msg = "Array indexing of '%s' is too deep. Max level: %s.", .errCode = ++errCodeStart};
 inline LgsError E10036{.msg = "Array indices must be of type 'Int'. Given: %s.", .errCode = ++errCodeStart};
 inline LgsError E10037{.msg = "Left-hand index of slice must be less than right-hand index. Given: %s.", .errCode = ++errCodeStart};
+inline LgsError E10038{.msg = "'continue' must be inside a loop statement.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

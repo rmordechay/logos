@@ -22,6 +22,7 @@
 #include "exprs/unary/LgsSArray.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsPatternMatch.h"
 #include "types/LgsArrayType.h"
 #include "types/LgsVoid.h"
@@ -112,6 +113,8 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
         visitReturnStmt(returnStmt);
     } else if (const auto breakStmt = stmt->asBreakStmt()) {
         visitBreakStmt(breakStmt);
+    } else if (const auto continueStmt = stmt->asContinue()) {
+        visitContinueStmt(continueStmt);
     }
 }
 
@@ -254,7 +257,17 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
     }
 }
 
-void SemaAnalyser::visitBreakStmt(LgsBreakStmt* breakStmt) const {}
+void SemaAnalyser::visitBreakStmt(const LgsBreakStmt* breakStmt) {
+    if (!lgsStack.currentLoop) {
+        return errHandler.handleError(E10017, &breakStmt->location);
+    }
+}
+
+void SemaAnalyser::visitContinueStmt(const LgsContinueStmt* continueStmt) {
+    if (!lgsStack.currentLoop) {
+        return errHandler.handleError(E10038, &continueStmt->location);
+    }
+}
 
 void SemaAnalyser::visitEnum(const LgsEnum* lgsEnum) const {}
 
@@ -726,7 +739,7 @@ bool SemaAnalyser::resolveFuncCallWithDefaultParams(const LgsFuncType* funcType,
     return true;
 }
 
-bool SemaAnalyser::isFuncCallEqual(LgsFuncType* funcType, const LgsFuncCall* funcCall) const {
+bool SemaAnalyser::isFuncCallEqual(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const {
     if (!funcType) return false;
     if (funcType->hasDefaultParams) {
         return resolveFuncCallWithDefaultParams(funcType, funcCall);

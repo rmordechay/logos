@@ -27,7 +27,7 @@
 #include "types/LgsFloat.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
-#include "stmts/LgsContinue.h"
+#include "stmts/LgsContinueStmt.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsSArray.h"
@@ -260,7 +260,7 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (const auto returnStmt = ctx->returnStatement()) return getReturnStmt(returnStmt);
     if (ctx->breakStmt()) return new LgsBreakStmt();
-    if (ctx->CONTINUE()) return new LgsContinue();
+    if (ctx->CONTINUE()) return new LgsContinueStmt();
     return nullptr;
 }
 
