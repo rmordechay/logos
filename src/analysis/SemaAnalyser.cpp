@@ -818,10 +818,10 @@ void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
 LgsType* SemaAnalyser::resolveType(LgsType* type, LgsErrorHandler* errorHandler) {
     assert(type);
     if (const auto iterable = type->asIterable()) {
-        if (!iterable->underlyingType) {
+        if (dynamic_cast<LgsUnknownType*>(iterable->underlyingType)) {
             iterable->underlyingType = resolveType(iterable->underlyingType, errorHandler);
-            return iterable;
         }
+        return type;
     }
 
     if (!dynamic_cast<LgsUnknownType*>(type)) return type;
