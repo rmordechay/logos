@@ -584,6 +584,7 @@ void SemaAnalyser::checkArrBoundaries(LgsArrayIndex* arrIndex) {
         outOfBounds = !validateArrBoundries(upperBound, index);
         if (outOfBounds) break;
     }
+
     if (outOfBounds) {
         return errHandler.handleError(E10003, &arrIndex->location, {arrIndex->code});
     }
