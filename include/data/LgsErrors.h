@@ -15,7 +15,7 @@ struct LgsError {
 /** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */
 inline int errCodeStart = 10000;
 inline LgsError E10000{.msg = "main() function is not defined in Main.lgs file.", .errCode = errCodeStart};
-inline LgsError E10001{.msg = "The left-hand type '%s' is not equal to the right-hand type '%s'.", .errCode = ++errCodeStart};
+inline LgsError E10001{.msg = "Left-hand type '%s' is not equal to the right-hand type '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10002{.msg = "'%s' is not iterable.", .errCode = ++errCodeStart};
 inline LgsError E10003{.msg = "Array index '%s' is out of bounds.", .errCode = ++errCodeStart};
 inline LgsError E10004{.msg = "Function '%s' must return '%s'.", .errCode = ++errCodeStart};
@@ -51,5 +51,6 @@ inline LgsError E10033{.msg = "Function '%s' is declared multiple times.", .errC
 inline LgsError E10034{.msg = "Object '%s' has method(s) with name '%s' but it does not match any overload.\n\t   Given: %s\n\t   Possible overloads:%s", .errCode = ++errCodeStart};
 inline LgsError E10035{.msg = "Array indexing of '%s' is too deep. Max level: %s.", .errCode = ++errCodeStart};
 inline LgsError E10036{.msg = "Array indices must be of type 'Int'. Given: %s.", .errCode = ++errCodeStart};
+inline LgsError E10037{.msg = "Left-hand index of slice must be less than right-hand index. Given: %s.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

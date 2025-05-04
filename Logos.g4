@@ -220,7 +220,13 @@ constant:
     ;
 
 arrayIndex:
-        (funcCall | VARIABLE) (LBRACK expr RBRACK)+
+        (funcCall | VARIABLE) (index)+
+    ;
+
+index:
+        LBRACK from=expr COLON? RBRACK
+    |   LBRACK COLON to=expr RBRACK
+    |   LBRACK from=expr COLON to=expr RBRACK
     ;
 
 selection:

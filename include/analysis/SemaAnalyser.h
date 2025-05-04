@@ -11,6 +11,7 @@
 #include <loops/LgsRangeLoop.h>
 
 
+class LgsIndex;
 class LgsCast;
 class LgsVarDec;
 struct LgsSymbol;
@@ -83,7 +84,8 @@ public:
     void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     bool isFuncCallEqual(LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
     bool validateExprType(LgsExpr* expr, LgsType* type);
-    bool validateArrBoundries(size_t upperBound, LgsExpr* index) const;
+    bool checkIndexBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, size_t upperBound);
+    bool checkSliceBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, size_t upperBound);
     void checkArrBoundaries(LgsArrayIndex* arrIndex);
     bool checkArrDimensions(const LgsArrayIndex* arrIndex);
     void checkMethodVisibility(const LgsFuncCall* methodCall);

@@ -576,25 +576,43 @@ void SemaAnalyser::checkArrBoundaries(LgsArrayIndex* arrIndex) {
     for (int i = 0; i < arrIndex->indices.size(); ++i) {
         const auto upperBound = boundaries[i];
         const auto index = arrIndex->indices[i];
-        visitExpr(index);
-        if (!index->type->asInt()) {
-            errHandler.handleError(E10036, &arrIndex->location, {arrIndex->getNameWithTypes()});
-            break;
+        visitExpr(index->from);
+        if (index->to) {
+            visitExpr(index->to);
+            outOfBounds = checkSliceBoundaries(arrIndex, index, upperBound);
+        } else {
+            outOfBounds = !checkIndexBoundaries(arrIndex, index, upperBound);
         }
-        outOfBounds = !validateArrBoundries(upperBound, index);
         if (outOfBounds) break;
     }
-
     if (outOfBounds) {
         return errHandler.handleError(E10003, &arrIndex->location, {arrIndex->code});
     }
 }
 
-bool SemaAnalyser::validateArrBoundries(const size_t upperBound, LgsExpr* index) const {
-    if (const auto indexInt = index->asIntConst()) {
+bool SemaAnalyser::checkIndexBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, const size_t upperBound) {
+    if (!index->from->type->asInt()) {
+        errHandler.handleError(E10036, &arrIndex->location, {arrIndex->getNameWithTypes()});
+        return false;
+    }
+    if (const auto indexInt = index->from->asIntConst()) {
         return indexInt->value < upperBound;
     }
     assert(false);
+}
+
+bool SemaAnalyser::checkSliceBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, const size_t upperBound) {
+    if (!index->from->type->asInt() || !index->to->type->asInt()) {
+        errHandler.handleError(E10036, &arrIndex->location, {arrIndex->getNameWithTypes()});
+        return false;
+    }
+    const auto fromIntConst = index->from->asIntConst()->value;
+    const auto toIntConst = index->to->asIntConst()->value;
+    if (fromIntConst >= toIntConst) {
+        errHandler.handleError(E10037, &arrIndex->location, {arrIndex->code});
+        return false;
+    }
+    return true;
 }
 
 bool SemaAnalyser::checkArrDimensions(const LgsArrayIndex* arrIndex) {

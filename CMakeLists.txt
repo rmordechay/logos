@@ -196,6 +196,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(ZLIB REQUIRED)
     target_link_libraries(lib PRIVATE
         ZLIB::ZLIB
+        zstd
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libLLVM.so
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/liblldCommon.a
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/liblldELF.a

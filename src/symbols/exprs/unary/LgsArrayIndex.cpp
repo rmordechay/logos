@@ -12,7 +12,7 @@ Value* LgsArrayIndex::getGEP(CodeGenMetadata* metadata) const {
     vector<Value*> IRIndices;
     IRIndices.emplace_back(metadata->builder.getInt32(0));
     for (const auto& index : indices) {
-        IRIndices.emplace_back(index->getIRValue(metadata));
+        IRIndices.emplace_back(index->from->getIRValue(metadata));
     }
     const auto ty = baseExpr->type->getIRType();
     const auto ptr = baseExpr->getIRValue(metadata);
@@ -27,7 +27,7 @@ string LgsArrayIndex::getNameWithTypes() {
     stringstream str;
     str << getName();
     for (const auto index : indices) {
-        str << '[' << index->type->getName() << ']';
+        str << '[' << index->from->type->getName() << ']';
     }
     return str.str();
 }

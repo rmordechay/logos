@@ -40,9 +40,9 @@ public:
     RuleEnumField = 34, RuleExpr = 35, RuleUnaryExpr = 36, RuleArray = 37, 
     RuleMap = 38, RuleFuncCall = 39, RuleFuncArgList = 40, RuleFuncArg = 41, 
     RuleConstructor = 42, RuleConstructorArgList = 43, RuleConstructorArg = 44, 
-    RuleConstant = 45, RuleArrayIndex = 46, RuleSelection = 47, RuleFirstSelectionElement = 48, 
-    RuleInnerSelectionElement = 49, RuleRange = 50, RuleType = 51, RuleVector = 52, 
-    RuleRequireEnvVars = 53
+    RuleConstant = 45, RuleArrayIndex = 46, RuleIndex = 47, RuleSelection = 48, 
+    RuleFirstSelectionElement = 49, RuleInnerSelectionElement = 50, RuleRange = 51, 
+    RuleType = 52, RuleVector = 53, RuleRequireEnvVars = 54
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -109,6 +109,7 @@ public:
   class ConstructorArgContext;
   class ConstantContext;
   class ArrayIndexContext;
+  class IndexContext;
   class SelectionContext;
   class FirstSelectionElementContext;
   class InnerSelectionElementContext;
@@ -829,17 +830,30 @@ public:
     virtual size_t getRuleIndex() const override;
     FuncCallContext *funcCall();
     antlr4::tree::TerminalNode *VARIABLE();
-    std::vector<antlr4::tree::TerminalNode *> LBRACK();
-    antlr4::tree::TerminalNode* LBRACK(size_t i);
-    std::vector<ExprContext *> expr();
-    ExprContext* expr(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> RBRACK();
-    antlr4::tree::TerminalNode* RBRACK(size_t i);
+    std::vector<IndexContext *> index();
+    IndexContext* index(size_t i);
 
    
   };
 
   ArrayIndexContext* arrayIndex();
+
+  class  IndexContext : public antlr4::ParserRuleContext {
+  public:
+    LogosParser::ExprContext *from = nullptr;
+    LogosParser::ExprContext *to = nullptr;
+    IndexContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LBRACK();
+    antlr4::tree::TerminalNode *RBRACK();
+    std::vector<ExprContext *> expr();
+    ExprContext* expr(size_t i);
+    antlr4::tree::TerminalNode *COLON();
+
+   
+  };
+
+  IndexContext* index();
 
   class  SelectionContext : public antlr4::ParserRuleContext {
   public:
