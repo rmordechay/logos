@@ -202,7 +202,6 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
         method->isPublic = true;
     }
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
-    method->isStatic = currentMethod->isStatic;
     method->setLocation(ctx->start);
     currentMethod = nullptr;
     return method;

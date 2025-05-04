@@ -2,6 +2,7 @@
 #define LOGOSMETHODIMPL_H
 #include "LgsFunc.h"
 #include "LgsParam.h"
+#include "types/LgsMethodType.h"
 
 class LgsMethodImpl : public LgsFunc {
 public:

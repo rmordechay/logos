@@ -76,14 +76,14 @@ void SemaAnalyser::visitInterface(LgsInterface* interface) {
 void SemaAnalyser::visitFunc(LgsFunc* func) {
     func->path = file->absPath;
     lgsStack.enterScope(func);
-    visitFuncSignature(func->getFuncType());
+    visitFuncType(func->getFuncType());
     visitStmtBlock(func->stmtBlock);
     lgsStack.exitScope();
     validateFuncControlFlow(func);
 }
 
-void SemaAnalyser::visitFuncSignature(LgsFuncType* funcSignature) {
-    for (auto& param : funcSignature->params) {
+void SemaAnalyser::visitFuncType(LgsFuncType* funcType) {
+    for (auto& param : funcType->params) {
         visitParam(&param);
     }
 }
@@ -379,7 +379,7 @@ void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
     } else if (const auto typeConst = dynamic_cast<LgsTypeConst*>(firstExpr)) {
         typeConst->type = resolveType(typeConst->type, &errHandler);
     } else {
-        assert(false && "first selection case not implemented");
+        assert(false);
     }
     assert(firstExpr->type);
 }

@@ -12,6 +12,7 @@ public:
 
     explicit LgsStrConst(const string& value) : LgsConstExpr(&rt), value(value) {
         rt.sizes = {value.size()};
+        rt.isStatic = true;
     }
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;

@@ -41,7 +41,7 @@ public:
     void visitObjectImplements(LgsObject* obj);
     void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
-    void visitFuncSignature(LgsFuncType* funcSignature);
+    void visitFuncType(LgsFuncType* funcType);
     void validateFuncControlFlow(LgsFunc* func);
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
