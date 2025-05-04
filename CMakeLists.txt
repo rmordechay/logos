@@ -195,8 +195,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         ZLIB::ZLIB
         zstd
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libLLVM.so
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/liblldCommon.a
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/liblldELF.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/liblldCommon.a
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libantlr.a
     )
 endif()

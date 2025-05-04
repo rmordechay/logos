@@ -25,7 +25,6 @@ public:
     explicit LgsLinker(LgsPaths* paths) : paths(paths) {}
     bool link(const map<string, Module*>& modules) const;
     bool getLinkFunc() const;
-    vector<const char*> getLinkerOpts() const;
     void linkStdlib(const string& path, Linker* linker) const;
     ~LgsLinker() = default;
 };

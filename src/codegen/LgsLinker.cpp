@@ -46,8 +46,7 @@ bool LgsLinker::link(const std::map<std::string, Module*>& modules) const {
 }
 
 bool LgsLinker::getLinkFunc() const {
-    const bool linkingPassed = LINK_FUNC;
-    if (!linkingPassed) {
+    if (!LINK_FUNC) {
         errs() << "Linking failed.";
         return false;
     }
@@ -61,17 +60,4 @@ void LgsLinker::linkStdlib(const string& path, Linker* linker) const {
     module->setTargetTriple(targetTriple);
     module->setDataLayout(targetMachine->createDataLayout());
     linker->linkInModule(std::move(module));
-}
-
-vector<const char*> LgsLinker::getLinkerOpts() const {
-    return {
-        DEFAULT_LINKER,
-        paths->objFilePath.c_str(),
-        "-o", paths->execFilePath.c_str(),
-        "-lSystem",
-        "-syslibroot", LIB_ROOT,
-        "-e", ENTRY_POINT,
-        "-platform_version", OS_NAME, PLATFORM_VERSION, PLATFORM_VERSION,
-        "-arch", ARCH_NAME,
-    };
 }

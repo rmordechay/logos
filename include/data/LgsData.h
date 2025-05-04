@@ -31,17 +31,38 @@ using namespace nlohmann;
 #elif defined(__linux__)
     #define OS_NAME "Linux"
     #define DEFAULT_LINKER "ld"
-    #define LIB_ROOT "/usr/lib"
-    #define ENTRY_POINT "_start"
-    #define PLATFORM_VERSION "5.15"  // Example Linux kernel version
-    #define LINK_FUNC lld::elf::link(getLinkerOpts(), outs(), errs(), false, false);
+    #define LIB_ROOT "/usr/lib/aarch64-linux-gnu"
+    #define ENTRY_POINT "main"
+    #define PLATFORM_VERSION "5.15"
+    #define LINKER_OPTIONS \
+    { \
+        DEFAULT_LINKER, \
+        paths->objFilePath.c_str(), \
+        "-o", paths->execFilePath.c_str(), \
+        "-L", LIB_ROOT, \
+        "-lc", \
+        "-e", ENTRY_POINT, \
+    }
+    #define LINK_FUNC lld::elf::link(LINKER_OPTIONS, outs(), errs(), false, false)
 #elif defined(__APPLE__) && defined(__MACH__)
     #define OS_NAME "macos"
     #define DEFAULT_LINKER "ld.lld"
     #define LIB_ROOT "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
     #define ENTRY_POINT "_main"
     #define PLATFORM_VERSION "15.0"
-    #define LINK_FUNC lld::macho::link(getLinkerOpts(), outs(), errs(), false, false);
+    #define LINKER_OPTIONS \
+    { \
+        DEFAULT_LINKER, \
+        paths->objFilePath.c_str(), \
+        "-o", paths->execFilePath.c_str(), \
+        "-lSystem", \
+        "-syslibroot", LIB_ROOT, \
+        "-e", ENTRY_POINT, \
+        "-platform_version", OS_NAME, PLATFORM_VERSION, PLATFORM_VERSION, \
+        "-arch", ARCH_NAME, \
+    }
+    #define LINK_FUNC lld::macho::link(LINKER_OPTIONS, outs(), errs(), false, false)
+
 #endif
 
 #if defined(__x86_64__) || defined(_M_X64)
