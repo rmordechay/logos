@@ -59,8 +59,8 @@ public:
     void visitEnum(const LgsEnum* lgsEnum) const;
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
-    void visitDArray(const LgsDArray* array);
-    void visitSArray(const LgsSArray* array);
+    void visitDArray(LgsDArray* array);
+    void visitSArray(LgsSArray* array);
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
@@ -95,6 +95,11 @@ public:
     string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
+
+    static LgsType* resolveType(LgsType* type, LgsErrorHandler* errorHandler);
+    static void resolveFuncTypes(LgsFuncType* signature, LgsErrorHandler* errHandler);
+    static void resolveGlobalTypes(const vector<LgsFile*>& files, LgsErrorHandler* errHandler);
+    static void resolveObjMemberTypes(LgsObject* const& obj, LgsErrorHandler* errHandler);
     ~SemaAnalyser() = default;
 };
 

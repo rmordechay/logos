@@ -8,8 +8,8 @@ public:
     LgsArrayType arrType;
     vector<LgsExpr*> initialElements;
 
-    explicit LgsSArray(LgsType* underlyingType, const vector<LgsExpr*>& initialElements = {}) : initialElements(initialElements) {
-        arrType.sizes.emplace_back(initialElements.size());
+    explicit LgsSArray(LgsType* underlyingType = nullptr, const vector<size_t>& sizes = {}) {
+        arrType.sizes = sizes;
         arrType.underlyingType = underlyingType;
         arrType.isStatic = true;
         type = &arrType;

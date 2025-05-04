@@ -64,7 +64,7 @@ public:
     LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx) const;
     LgsType* getArrayType(LogosParser::TypeContext* ctx) const;
-    LgsType* getTypeFromText(const string& typeText, const antlr4::ParserRuleContext* ctx) const;
+    LgsType* getTypeFromText(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const;
     LgsType* getFuncType(LogosParser::FuncSignatureContext* ctx) const;
     ~AntlerConverter() = default;
 };

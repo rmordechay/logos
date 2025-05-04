@@ -27,30 +27,10 @@ bool LogosProject::loadProject() {
     if (!errHandler.successful) return false;
     loadFiles();
     if (!errors.empty()) return false;
-    resolveGlobalTypes(files);
+    SemaAnalyser::resolveGlobalTypes(files, &errHandler);
     return errHandler.successful;
 }
 
-
-void LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) {
-    for (const auto& file : files) {
-        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
-            for (const auto& object : mainFile->objects) {
-                resolveObjMemberTypes(object);
-            }
-            for (const auto& func : mainFile->getAllFuncs()) {
-                resolveFuncTypes(&func->funcType);
-            }
-        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-            resolveObjMemberTypes(objFile->obj);
-        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            auto overloads = interfaceFile->interface->getAllMethods();
-            for (const auto& overload : overloads) {
-                resolveFuncTypes(&overload->funcType);
-            }
-        }
-    }
-}
 
 bool LogosProject::validateProject() {
     if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {
@@ -63,27 +43,6 @@ bool LogosProject::validateProject() {
         return false;
     }
     return true;
-}
-
-void LogosProject::resolveObjMemberTypes(LgsObject* const& obj) {
-    for (const auto& [_, field] : obj->fields) {
-        field->type = resolveType(field->type, &errHandler);
-        field->parent = obj;
-    }
-    for (const auto& overload : obj->getAllMethods()) {
-        resolveFuncTypes(&overload->funcType);
-    }
-    for (int i = 0; i < obj->implements.size(); ++i) {
-        obj->implements[i] = resolveType(obj->implements[i], &errHandler);
-    }
-}
-
-void LogosProject::resolveFuncTypes(LgsFuncType* signature) {
-    signature->type = resolveType(signature->type, &errHandler);
-    for (int i = 0; i < signature->params.size(); ++i) {
-        const auto lgsParam = signature->params[i];
-        signature->params[i].type = resolveType(signature->params[i].type, &errHandler);
-    }
 }
 
 void LogosProject::checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile) {

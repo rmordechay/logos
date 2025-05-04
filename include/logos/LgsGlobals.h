@@ -69,38 +69,4 @@ struct LgsGlobals {
 
 inline LgsGlobals globals;
 
-// TODO Put somewhere else
-inline LgsType* resolveType(LgsType* type, LgsErrorHandler* errorHandler) {
-    assert(type);
-    if (!dynamic_cast<LgsUnknownType*>(type)) return type;
-    auto typeName = type->getName();
-    assert(typeName != "");
-    const auto nullable = type->nullable;
-    if (globals.symbols.find(typeName) == globals.symbols.end()) {
-        errorHandler->handleError(E10006, &type->location, {typeName});
-        return nullptr;
-    }
-    const auto symbol = &globals.symbols[typeName];
-    delete type;
-    LgsType* newType = nullptr;
-    if (symbol->type == OBJECT) {
-        symbol->object->nullable = nullable;
-        newType = symbol->object;
-    }
-    if (symbol->type == INTERFACE) {
-        symbol->interface->nullable = nullable;
-        newType = symbol->interface;
-    }
-    if (symbol->type == ENUM) {
-        symbol->lgsEnum->nullable = nullable;
-        newType = symbol->lgsEnum;
-    }
-    if (symbol->type == ENUM_FIELD) {
-        symbol->enumField->parent->nullable = nullable;
-        newType = symbol->enumField->parent;
-    }
-    assert(newType);
-    return newType;
-}
-
 #endif //LGSGLOBALS_H

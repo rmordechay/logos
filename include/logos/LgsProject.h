@@ -47,9 +47,6 @@ public:
     string getFileText(path filePath) const;
     void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
     void checkDuplicateFiles(const vector<LgsFile*>& files);
-    void resolveFuncTypes(LgsFuncType* signature);
-    void resolveGlobalTypes(const vector<LgsFile*>& files);
-    void resolveObjMemberTypes(LgsObject* const& obj);
     bool isLogosFile(const directory_entry& entry) const;
     ~LogosProject() = default;
 };

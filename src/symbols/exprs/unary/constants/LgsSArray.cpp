@@ -3,9 +3,7 @@
 #include "types/LgsIterable.h"
 
 Value* LgsSArray::createIRValue(CodeGenMetadata* metadata) {
-    const auto iterable = type->asIterable();
-    assert(iterable);
-    const auto irType = iterable->getUnderlyingType()->getIRType();
+    const auto irType = type->getIRType();
     return metadata->builder.CreateAlloca(irType);
 }
 
