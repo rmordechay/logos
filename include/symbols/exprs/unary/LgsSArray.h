@@ -1,17 +1,18 @@
 #ifndef LGSSARRAY_H
 #define LGSSARRAY_H
-#include "../../types/LgsIterable.h"
 #include "LgsUnaryExpr.h"
-#include "types/LgsSArrType.h"
+#include "types/LgsArrayType.h"
 
 class LgsSArray final : public LgsUnaryExpr {
 public:
-    vector<size_t> arraySize;
+    LgsArrayType arrType;
     vector<LgsExpr*> initialElements;
 
-    explicit LgsSArray(LgsType* underlyingType, const vector<size_t>& arraySize, const vector<LgsExpr*>& initialElements = {}) : arraySize(arraySize), initialElements(initialElements) {
-        assert(!arraySize.empty());
-        type = new LgsSArrType(underlyingType, arraySize);
+    explicit LgsSArray(LgsType* underlyingType, const vector<LgsExpr*>& initialElements = {}) : initialElements(initialElements) {
+        arrType.sizes.emplace_back(initialElements.size());
+        arrType.underlyingType = underlyingType;
+        arrType.isStatic = true;
+        type = &arrType;
     }
     size_t length() const;
     Value* createIRValue(CodeGenMetadata* metadata) override;

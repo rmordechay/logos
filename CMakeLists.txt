@@ -107,8 +107,7 @@ add_library(lib STATIC
     include/symbols/types/LgsChar.h
     include/symbols/types/LgsObject.h
     include/symbols/types/LgsInterface.h
-    include/symbols/types/LgsDArrType.h
-    include/symbols/types/LgsSArrType.h
+    include/symbols/types/LgsArrayType.h
     include/symbols/types/LgsAny.h
     include/symbols/types/LgsIterable.h
 
@@ -174,13 +173,12 @@ add_library(lib STATIC
     src/symbols/types/LgsFloat.cpp
     src/symbols/types/LgsChar.cpp
     src/symbols/types/LgsType.cpp
-    src/symbols/types/LgsDArrType.cpp
     src/symbols/types/LgsInterface.cpp
     src/symbols/types/LgsAny.cpp
     src/symbols/types/LgsObject.cpp
     src/symbols/funcs/LgsFuncImpl.cpp
     src/symbols/funcs/LgsMethodImpl.cpp
-    src/symbols/types/LgsSArrType.cpp
+    src/symbols/types/LgsArrayType.cpp
     src/symbols/types/LgsFuncType.cpp
 )
 

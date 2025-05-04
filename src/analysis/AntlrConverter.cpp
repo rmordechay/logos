@@ -30,14 +30,14 @@
 #include "stmts/LgsContinue.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
+#include "exprs/unary/LgsSArray.h"
 #include "stmts/LgsPatternMatch.h"
-#include "types/LgsSArrType.h"
+#include "types/LgsArrayType.h"
 
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
 #include <types/LgsStr.h>
 #include <types/LgsVoid.h>
-#include <types/LgsDArrType.h>
 
 LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
     LgsFile* logosFile = nullptr;
@@ -453,7 +453,7 @@ LgsUnaryExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
     for (const auto& expr : ctx->expr()) {
         initialElements.emplace_back(getExpr(expr));
     }
-    const auto array = new LgsDArray(new LgsUnknownType(), initialElements);
+    const auto array = new LgsSArray(nullptr, initialElements);
     array->setLocation(ctx->start);
     return array;
 }
@@ -628,7 +628,7 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) const {
     LgsType* result = nullptr;
     const auto type = getTypeFromText(typeText, ctx);
     if (ctx->LBRACK().size() > 0) {
-        result = getArrayType(ctx, type);
+        result = getArrayType(ctx);
     } else {
         result = type;
         if (ctx->QUEST_MARK()) {
@@ -639,15 +639,15 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) const {
     return result;
 }
 
-LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx, LgsType* underlyingType) const {
+LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) const {
+    const auto arrType = new LgsArrayType();
     if (ctx->INTEGER().size() > 0) {
-        vector<size_t> arraySize;
         for (const auto& integer : ctx->INTEGER()) {
-            arraySize.emplace_back(std::stoi(integer->getText()));
+            arrType->sizes.emplace_back(std::stoi(integer->getText()));
         }
-        return new LgsSArrType(underlyingType, arraySize);
+        arrType->isStatic = true;
     }
-    return new LgsDArrType(underlyingType);
+    return arrType;
 }
 
 LgsType* AntlerConverter::getTypeFromText(const string& typeText, const antlr4::ParserRuleContext* ctx) const {

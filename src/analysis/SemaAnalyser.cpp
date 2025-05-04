@@ -7,7 +7,6 @@
 #include "exprs/LgsNull.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
-#include "types/LgsDArrType.h"
 #include "types/LgsBool.h"
 #include "exprs/unary/LgsDArray.h"
 #include "exprs/unary/LgsArrayIndex.h"
@@ -24,6 +23,9 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsPatternMatch.h"
+#include "types/LgsArrayType.h"
+#include "types/LgsVoid.h"
+
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -88,7 +90,7 @@ void SemaAnalyser::visitFuncSignature(LgsFuncType* funcSignature) {
 void SemaAnalyser::visitParam(LgsParam* param) {
     addLocalSymbol(param->name, LgsSymbol(param));
     visitExpr(param->expr);
-    validateExprType(param->expr, param->type);
+    checkExprType(param->expr, param->type);
 }
 
 void SemaAnalyser::visitStmt(LgsStmt* stmt) {
@@ -128,7 +130,7 @@ void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
 
 void SemaAnalyser::visitField(const LgsField* field) {
     visitExpr(field->expr);
-    validateExprType(field->expr, field->type);
+    checkExprType(field->expr, field->type);
 }
 
 void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
@@ -137,11 +139,12 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
     visitExpr(rExpr);
     if (const auto selection = dynamic_cast<LgsSelection*>(lExpr)) {
         visitSelection(selection);
-    }
-    if (const auto arrIndex = dynamic_cast<LgsArrayIndex*>(lExpr)) {
+    } else if (const auto arrIndex = dynamic_cast<LgsArrayIndex*>(lExpr)) {
         visitArrayIndex(arrIndex);
+    } else {
+        assert(false);
     }
-    validateExprType(lExpr, rExpr->type);
+    checkExprType(lExpr, rExpr->type);
 }
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
@@ -149,7 +152,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
         visitExpr(varDec->expr);
         varDec->expr->type = resolveType(varDec->expr->type, &errHandler);
         varDec->type = varDec->expr->type;
-        if (!validateExprType(varDec->expr, varDec->type)) return;
+        if (!checkExprType(varDec->expr, varDec->type)) return;
     } else {
         varDec->type = resolveType(varDec->type, &errHandler);
         varDec->expr = varDec->type->getZeroValue();
@@ -283,8 +286,10 @@ void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
         visitFuncCall(funcCall);
     } else if (const auto selection = unaryExpr->asSelection()) {
         visitSelection(selection);
-    } else if (const auto array = unaryExpr->asDArray()) {
-        visitArray(array);
+    } else if (const auto dArray = unaryExpr->asDArray()) {
+        visitDArray(dArray);
+    } else if (const auto sArray = unaryExpr->asSArray()) {
+        visitSArray(sArray);
     } else if (const auto arrIndex = unaryExpr->asArrayIndex()) {
         visitArrayIndex(arrIndex);
     } else if (const auto variable = unaryExpr->asVariable()) {
@@ -298,10 +303,17 @@ void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     setBinaryExprType(binaryExpr);
 }
 
-void SemaAnalyser::visitArray(const LgsDArray* array) {
+void SemaAnalyser::visitDArray(const LgsDArray* array) {
     for (const auto& element : array->initialElements) {
         visitExpr(element);
     }
+}
+
+void SemaAnalyser::visitSArray(const LgsSArray* array) {
+    for (const auto& element : array->initialElements) {
+        visitExpr(element);
+    }
+    assert(array->type);
 }
 
 void SemaAnalyser::visitVariable(LgsVariable* variable) {
@@ -451,7 +463,7 @@ void SemaAnalyser::visitArrayIndex(LgsArrayIndex* arrIndex) {
         if (!arrDimsValid) return;
         const bool indexBoundariesValid = checkIndexBoundaries(arrIndex);
         if (!indexBoundariesValid) return;
-        arrIndex->type = baseExprType->asIterable()->underlyingType;
+        setArrayIndexType(arrIndex);
     } else {
         return errHandler.handleError(E10002, &arrIndex->location, {baseExpr->getName()});
     }
@@ -506,6 +518,22 @@ bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable
     return true;
 }
 
+void SemaAnalyser::setArrayIndexType(LgsArrayIndex* arrIndex) const {
+    assert(arrIndex->baseExpr->type);
+    const auto iterable = arrIndex->baseExpr->type->asIterable();
+    const auto sizeDefinition = iterable->sizes.size();
+    const auto sizeCall = arrIndex->indices.size();
+    assert(sizeDefinition >= sizeCall);
+    const auto diff = sizeDefinition - sizeCall;
+    if (diff == 0) {
+        arrIndex->type = iterable->underlyingType;
+    } else {
+        const vector sizes(iterable->sizes.begin() + diff, iterable->sizes.end());
+        return;
+    }
+    assert(arrIndex->type);
+}
+
 void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     switch (binaryExpr->op) {
     case ADD:
@@ -539,7 +567,7 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     }
 }
 
-bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
+bool SemaAnalyser::checkExprType(LgsExpr* expr, LgsType* type) {
     if (!expr) return true;
     if (expr->isNull()) {
         // null must have a type
@@ -568,33 +596,33 @@ bool SemaAnalyser::checkIndexBoundaries(LgsArrayIndex* arrIndex) {
         const auto ref = var->ref;
         if (ref->type == VAR_DEC) {
             const auto expr = ref->varDec->expr;
-            boundaries = expr->type->asSArrayType()->iterableSize;
+            boundaries = expr->type->asSArrayType()->sizes;
         }
     }
     assert(!boundaries.empty());
-    bool boundariesValid = false;
+    bool valid = false;
     for (int i = 0; i < arrIndex->indices.size(); ++i) {
         const auto upperBound = boundaries[i];
         const auto index = arrIndex->indices[i];
         visitExpr(index->from);
         if (index->to) {
             visitExpr(index->to);
-            boundariesValid = checkSliceBoundaries(arrIndex, index, upperBound);
+            valid = checkSliceBoundaries(arrIndex, index, i, upperBound);
         } else {
-            boundariesValid = checkSingleIndexBoundaries(arrIndex, index, upperBound);
+            valid = checkSingleIndexBoundaries(arrIndex, index->from, upperBound);
         }
-        if (!boundariesValid) break;
+        if (!valid) break;
     }
-    return boundariesValid;
+    return valid;
 }
 
-bool SemaAnalyser::checkSingleIndexBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, const size_t upperBound) {
-    if (!index->from->type->asInt()) {
+bool SemaAnalyser::checkSingleIndexBoundaries(LgsArrayIndex* arrIndex, LgsExpr* index, const size_t upperBound) {
+    if (!index->type->asInt()) {
         errHandler.handleError(E10036, &arrIndex->location, {arrIndex->getNameWithTypes()});
         return false;
     }
     bool outOfBounds = false;
-    if (const auto indexInt = index->from->asIntConst()) {
+    if (const auto indexInt = index->asIntConst()) {
         outOfBounds = indexInt->value >= upperBound;
     }
     if (outOfBounds) {
@@ -604,11 +632,11 @@ bool SemaAnalyser::checkSingleIndexBoundaries(LgsArrayIndex* arrIndex, const Lgs
     return true;
 }
 
-bool SemaAnalyser::checkSliceBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, const size_t upperBound) {
-    if (!index->from->type->asInt() || !index->to->type->asInt()) {
-        errHandler.handleError(E10036, &arrIndex->location, {arrIndex->getNameWithTypes()});
-        return false;
-    }
+bool SemaAnalyser::checkSliceBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, const size_t dimension, const size_t upperBound) {
+    bool valid = checkSingleIndexBoundaries(arrIndex, index->from, upperBound);
+    if (!valid) return false;
+    valid = checkSingleIndexBoundaries(arrIndex, index->to, upperBound);
+    if (!valid) return false;
     const auto fromIntConst = index->from->asIntConst()->value;
     const auto toIntConst = index->to->asIntConst()->value;
     if (fromIntConst >= toIntConst) {
@@ -625,7 +653,7 @@ bool SemaAnalyser::checkArrDimensions(const LgsArrayIndex* arrIndex) {
         if (ref->type == VAR_DEC) {
             const auto expr = ref->varDec->expr;
             const auto sarray = expr->type->asIterable();
-            maxIndexLevel = sarray->iterableSize.size();
+            maxIndexLevel = sarray->sizes.size();
         }
     }
     assert(maxIndexLevel >= 0);

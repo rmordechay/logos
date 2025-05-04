@@ -5,7 +5,7 @@
 #include <types/LgsIterable.h>
 #include <exprs/unary/LgsUnaryExpr.h>
 
-class LgsDArrType;
+class LgsDArrayType;
 
 class LgsForeachLoop final : public LgsLoop {
 public:

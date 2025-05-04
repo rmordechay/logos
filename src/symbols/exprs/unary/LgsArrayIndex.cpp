@@ -3,8 +3,7 @@
 #include <exprs/unary/LgsDArray.h>
 
 Value* LgsArrayIndex::createIRValue(CodeGenMetadata* metadata) {
-    const auto iterable = dynamic_cast<LgsIterable*>(baseExpr->type);
-    const auto irType = iterable->underlyingType->getIRType();
+    const auto irType = baseExpr->type->getUnderlyingType()->getIRType();
     return metadata->builder.CreateLoad(irType, getGEP(metadata));
 }
 

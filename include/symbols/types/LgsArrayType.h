@@ -3,17 +3,18 @@
 #include "LgsType.h"
 #include "LgsIterable.h"
 
-class LgsSArrType final : public LgsIterable {
+class LgsArrayType final : public LgsIterable {
 public:
-    static constexpr auto name = "SArrayType";
+    static constexpr auto name = "ArrayType";
+    bool isStatic = false;
 
-    explicit LgsSArrType(LgsType* underlyingType, const vector<size_t>& arraySize) : LgsIterable(underlyingType, arraySize) {}
+    explicit LgsArrayType() : LgsIterable(nullptr, {}) {}
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     const string getName() const override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;
-    ~LgsSArrType() override = default;
+    ~LgsArrayType() override = default;
 };
 
 #endif //LGSSARRAYTYPE_H

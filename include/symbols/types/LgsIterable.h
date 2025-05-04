@@ -6,10 +6,10 @@ struct CodeGenMetadata;
 
 class LgsIterable : public LgsType {
 public:
-    vector<size_t> iterableSize;
+    vector<size_t> sizes;
     LgsType* underlyingType;
 
-    explicit LgsIterable(LgsType* underlyingType, const vector<size_t>& iterableSize = {}) : iterableSize(iterableSize), underlyingType(underlyingType) {}
+    explicit LgsIterable(LgsType* underlyingType, const vector<size_t>& iterableSize = {}) : sizes(iterableSize), underlyingType(underlyingType) {}
     LgsType* getUnderlyingType() override;
     bool isIterable() override;
     ~LgsIterable() override = default;

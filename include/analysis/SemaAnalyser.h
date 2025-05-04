@@ -43,7 +43,6 @@ public:
     void visitFunc(LgsFunc* func);
     void visitFuncSignature(LgsFuncType* funcSignature);
     void validateFuncControlFlow(const LgsFunc* func);
-    string getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads) const;
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
     void visitStmtBlock(LgsStmtBlock* stmtBlock);
@@ -60,7 +59,8 @@ public:
     void visitEnum(const LgsEnum* lgsEnum) const;
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
-    void visitArray(const LgsDArray* array);
+    void visitDArray(const LgsDArray* array);
+    void visitSArray(const LgsSArray* array);
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
@@ -77,19 +77,21 @@ public:
     void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
+    void setArrayIndexType(LgsArrayIndex* arrIndex) const;
 
     LgsFunc* resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
     LgsFunc* resolveMethodCall(const vector<LgsMethodImpl*>& overloads, LgsFuncCall* methodCall, const string& parentName);
     bool resolveFuncCallWithDefaultParams(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
-    void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     bool isFuncCallEqual(LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
-    bool validateExprType(LgsExpr* expr, LgsType* type);
-    bool checkSingleIndexBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, size_t upperBound);
-    bool checkSliceBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, size_t upperBound);
+    bool checkExprType(LgsExpr* expr, LgsType* type);
+    bool checkSingleIndexBoundaries(LgsArrayIndex* arrIndex, LgsExpr* index, size_t upperBound);
+    bool checkSliceBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, size_t dimension, size_t upperBound);
     bool checkIndexBoundaries(LgsArrayIndex* arrIndex);
     bool checkArrDimensions(const LgsArrayIndex* arrIndex);
+    void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 
+    string getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads) const;
     string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);

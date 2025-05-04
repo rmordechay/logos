@@ -7,7 +7,7 @@
 #include <map>
 
 class LgsInt;
-class LgsSArrType;
+class LgsArrayType;
 class LgsIterable;
 using namespace std;
 using namespace llvm;
@@ -51,7 +51,7 @@ public:
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsIterable* asIterable();
-    LgsSArrType* asSArrayType();
+    LgsArrayType* asSArrayType();
     virtual ~LgsType() = default;
 };
 

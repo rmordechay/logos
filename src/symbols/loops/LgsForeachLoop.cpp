@@ -1,6 +1,5 @@
 #include "loops/LgsForeachLoop.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsDArrType.h"
 #include "exprs/unary/LgsArrayIndex.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 
