@@ -7,3 +7,7 @@
 bool LgsFuncImpl::equals(const LgsFuncCall* other) {
     return funcType.equals(other);
 }
+
+LgsFuncType* LgsFuncImpl::getFuncType() {
+    return &funcType;
+}

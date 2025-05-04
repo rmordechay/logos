@@ -42,7 +42,7 @@ public:
     void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitFuncSignature(LgsFuncType* funcSignature);
-    void validateFuncControlFlow(const LgsFunc* func);
+    void validateFuncControlFlow(LgsFunc* func);
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
     void visitStmtBlock(LgsStmtBlock* stmtBlock);

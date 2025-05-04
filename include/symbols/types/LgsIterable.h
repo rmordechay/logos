@@ -21,7 +21,6 @@ inline Type* LgsIterable::getIRType() {
     if (!isStatic) return ptrTy;
     if (IRType) return IRType;
     IRType = underlyingType->getIRType();
-    assert(getDims() > 0);
     for (auto size = sizes.rbegin(); size != sizes.rend(); ++size) {
         IRType = ArrayType::get(IRType, *size);
     }

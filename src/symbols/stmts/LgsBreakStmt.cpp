@@ -7,7 +7,7 @@ void LgsBreakStmt::createIRStmt(CodeGenMetadata* metadata) {
     const auto currentFunc = metadata->lgsStack.currentFunc;
     const auto loopExit = currentLoop->loopExitBlock;
     metadata->builder.CreateBr(loopExit);
-    const auto IRFunc = currentFunc->funcType.getIRFunc(metadata);
+    const auto IRFunc = currentFunc->getFuncType()->getIRFunc(metadata);
     const auto breakExtBlock = createBasicBlock("break_ext");
     breakExtBlock->insertInto(IRFunc);
     metadata->builder.SetInsertPoint(breakExtBlock);

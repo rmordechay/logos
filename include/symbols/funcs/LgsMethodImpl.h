@@ -9,11 +9,12 @@ public:
     int vtableKey = -1;
     bool isPublic = false;
     bool isStatic = false;
+    LgsMethodType methodType;
     LgsMethodImpl* implements = nullptr;
 
-    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName) : LgsFunc(name, funcType), parentName(parentName) {}
-    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam>& params) : LgsFunc(name, funcType, params), parentName(parentName) {}
+    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam>& params = {}) : parentName(parentName), methodType(LgsMethodType(name, funcType, params)) {}
     bool equals(const LgsFuncCall* other) override;
+    LgsFuncType* getFuncType() override;
     ~LgsMethodImpl() override = default;
 };
 

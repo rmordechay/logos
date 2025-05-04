@@ -9,6 +9,7 @@
 #include "types/LgsObject.h"
 #include "types/LgsInterface.h"
 #include "LgsErrorHandler.h"
+#include "funcs/LgsFuncImpl.h"
 
 struct LgsGlobals {
     std::mutex mtx;
@@ -25,7 +26,7 @@ struct LgsGlobals {
         return;
     }
 
-    void addFunc(LgsFunc* func) {
+    void addFunc(LgsFuncImpl* func) {
         std::lock_guard lock(mtx);
         auto [symbol, inserted] = symbols.try_emplace(func->funcType.name);
         if (inserted) {

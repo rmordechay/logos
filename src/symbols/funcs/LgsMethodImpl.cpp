@@ -4,8 +4,8 @@
 #include "types/LgsObject.h"
 
 bool LgsMethodImpl::equals(const LgsFuncCall* other) {
-    if (funcType.name != other->name) return false;
-    const auto params = funcType.params;
+    if (methodType.name != other->name) return false;
+    const auto params = methodType.params;
     const auto args = other->args;
     if (params.size() == 0 && args.size() == 0) return true;
     const auto argsSize = isStatic ? args.size() - 1 : args.size();
@@ -16,4 +16,8 @@ bool LgsMethodImpl::equals(const LgsFuncCall* other) {
         if (!paramType->equals(argType)) return false;
     }
     return true;
+}
+
+LgsFuncType* LgsMethodImpl::getFuncType() {
+    return &methodType;
 }

@@ -165,8 +165,8 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
         const auto self = LgsParam(LOGOS_SELF, interface);
         const auto type = getFuncType(funcSignature);
         const auto method = new LgsMethodImpl(funcSignature->VARIABLE()->getText(), type, interfaceName);
-        method->funcType.params.emplace_back(self);
-        setParams(funcSignature, &method->funcType);
+        method->getFuncType()->params.emplace_back(self);
+        setParams(funcSignature, method->getFuncType());
         method->path = filePath;
         interface->addMethod(method);
     }
@@ -195,8 +195,8 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
     const auto self = LgsParam(LOGOS_SELF, obj, new LgsInstance(obj));
     const auto method = new LgsMethodImpl(name, rt, obj->name);
     currentMethod = method;
-    method->funcType.params.emplace_back(self);
-    setParams(funcSignature, &method->funcType);
+    method->getFuncType()->params.emplace_back(self);
+    setParams(funcSignature, method->getFuncType());
     method->path = obj->path;
     if (ctx->VISIBILITY()) {
         method->isPublic = true;
