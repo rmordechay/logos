@@ -184,13 +184,12 @@ add_library(lib STATIC
     src/symbols/types/LgsFuncType.cpp
 )
 
-
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lib PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libLLVM.dylib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldCommon.dylib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldMachO.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libantlr4-runtime.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libantlr.a
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(ZLIB REQUIRED)
@@ -200,7 +199,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libLLVM.so
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/liblldCommon.a
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/liblldELF.a
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libantlr4-runtime.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libantlr.a
     )
 endif()
 
