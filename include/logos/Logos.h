@@ -34,7 +34,7 @@ public:
         initPaths(rootDirPath);
     }
 
-    void run();
+    void run(char* argv[]);
     LgsMainFile* getMainFile(const vector<LgsFile*>& files) const;
     bool analyse(const vector<LgsFile*>& files);
     void initPaths(const path& rootDirPath) const;

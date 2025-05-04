@@ -7,7 +7,7 @@
 #include <LogosLexer.h>
 #include <unistd.h>
 
-void Logos::run() {
+void Logos::run(char* argv[]) {
     // Project loading
     if (!project.loadProject()) exit(1);
 
@@ -22,7 +22,7 @@ void Logos::run() {
     if (!linker.link(modules)) exit(1);
 
     // Running
-    execl(paths.execFilePath.c_str(), paths.execFilePath.c_str(), nullptr);
+    execv(paths.execFilePath.c_str(), argv);
 }
 
 bool Logos::analyse(const vector<LgsFile*>& files) {
