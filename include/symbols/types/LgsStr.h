@@ -12,7 +12,6 @@ public:
 
     LgsStr() : LgsIterable(&LGS_CHAR) {}
     const string getName() const override;
-    Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) const override;
@@ -20,7 +19,5 @@ public:
     static uint32_t hashString(const string& str);
     ~LgsStr() override = default;
 };
-
-inline LgsStr LGS_STR;
 
 #endif // LOGOSSTRING_H

@@ -15,6 +15,6 @@ public:
     ~LgsFloat() override = default;
 };
 
-inline LgsFloat LOGOS_FLOAT;
+inline LgsFloat LGS_FLOAT;
 
 #endif // LOGOSFLOAT_H

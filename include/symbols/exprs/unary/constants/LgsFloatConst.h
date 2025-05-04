@@ -7,7 +7,7 @@ class LgsFloatConst final : public LgsConstExpr {
 public:
     double value;
 
-    explicit LgsFloatConst(const float value) : LgsConstExpr(&LOGOS_FLOAT), value(value) {}
+    explicit LgsFloatConst(const float value) : LgsConstExpr(&LGS_FLOAT), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsFloatConst() override = default;
 };

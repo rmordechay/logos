@@ -1,8 +1,6 @@
 #ifndef LOGOSFOREACHLOOP_H
 #define LOGOSFOREACHLOOP_H
 #include "LgsLoop.h"
-
-#include <types/LgsIterable.h>
 #include <exprs/unary/LgsUnaryExpr.h>
 
 class LgsDArrayType;

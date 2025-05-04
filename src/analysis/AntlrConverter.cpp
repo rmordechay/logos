@@ -640,14 +640,14 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) const {
 }
 
 LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) const {
-    const auto arrType = new LgsArrayType();
+    const auto underlyingType = getTypeFromText(ctx->TYPE(), ctx);
+    const auto arrType = new LgsArrayType(underlyingType);
     if (ctx->INTEGER().size() > 0) {
         for (const auto& integer : ctx->INTEGER()) {
             arrType->sizes.emplace_back(std::stoi(integer->getText()));
         }
         arrType->isStatic = true;
     }
-    arrType->underlyingType = getTypeFromText(ctx->TYPE(), ctx);
     return arrType;
 }
 
@@ -661,7 +661,7 @@ LgsType* AntlerConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken,
     } else if (typeText == LgsBool::name) {
         type = &LGS_BOOL;
     } else if (typeText == LgsStr::name) {
-        type = &LGS_STR;
+        type = new LgsStr();
     } else if (typeText == LgsVoid::name) {
         type = &LGS_VOID;
     } else {

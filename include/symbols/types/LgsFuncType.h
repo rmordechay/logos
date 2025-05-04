@@ -19,6 +19,7 @@ public:
     LgsExpr* getZeroValue() override;
     const string getName() const override;
     bool equals(LgsType* other) const override;
+    bool equals(const LgsFuncCall* other) const;
     LgsType* inferBinaryType(LgsType* other) override;
     string getAsStr(bool withType = false) const;
     void setStructRet(Function::arg_iterator& args, LgsObject* obj) const;
@@ -40,6 +41,7 @@ public:
     FunctionType* getIRFuncType(const CodeGenMetadata* metadata) override;
     void setIRFuncParams(Argument* args) override;
     bool equals(LgsType* other) const override;
+    bool equals(const LgsFuncCall* other);
     ~LgsMethodType() override = default;
 };
 

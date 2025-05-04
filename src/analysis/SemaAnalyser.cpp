@@ -220,12 +220,14 @@ void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
 void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
     const auto iterableExpr = foreachLoop->expr;
     visitUnaryExpr(iterableExpr);
-    if (!iterableExpr->type->isIterable()) {
+    const auto iterable = iterableExpr->type->asIterable();
+    if (!iterable) {
         return errHandler.handleError(E10002, &iterableExpr->location, {iterableExpr->getName()});
     }
     // TODO check all loop vars
-    for (const auto var : foreachLoop->loopVars) {
-        addLocalSymbol(var->name, LgsSymbol(var));
+    for (const auto varDec : foreachLoop->loopVars) {
+        varDec->type = iterable->underlyingType;
+        addLocalSymbol(varDec->name, LgsSymbol(varDec));
     }
     visitStmtBlock(foreachLoop->stmtBlock);
 }
@@ -347,6 +349,7 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     assert(variable->type);
     variable->ref = symbol->clone();
 }
+
 
 void SemaAnalyser::visitSelection(LgsSelection* selection) {
     const auto exprs = selection->exprs;
@@ -524,7 +527,7 @@ bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable
 void SemaAnalyser::setArrayIndexType(LgsArrayIndex* arrIndex) const {
     assert(arrIndex->baseExpr->type);
     const auto iterable = arrIndex->baseExpr->type->asIterable();
-    const auto sizeDefinition = iterable->sizes.size();
+    const auto sizeDefinition = iterable->getDims();
     const auto sizeCall = arrIndex->indices.size();
     assert(sizeDefinition >= sizeCall);
     const auto diff = sizeDefinition - sizeCall;
@@ -532,6 +535,7 @@ void SemaAnalyser::setArrayIndexType(LgsArrayIndex* arrIndex) const {
         arrIndex->type = iterable->underlyingType;
     } else {
         const vector sizes(iterable->sizes.begin() + diff, iterable->sizes.end());
+        assert(false);
         return;
     }
     assert(arrIndex->type);
@@ -598,8 +602,8 @@ bool SemaAnalyser::checkIndexBoundaries(LgsArrayIndex* arrIndex) {
     if (const auto var = arrIndex->baseExpr->asVariable()) {
         const auto ref = var->ref;
         if (ref->type == VAR_DEC) {
-            const auto expr = ref->varDec->expr;
-            boundaries = expr->type->asSArrayType()->sizes;
+            const auto iterable = ref->varDec->type->asIterable();
+            boundaries = iterable->sizes;
         }
     }
     assert(!boundaries.empty());
@@ -655,8 +659,8 @@ bool SemaAnalyser::checkArrDimensions(const LgsArrayIndex* arrIndex) {
         const auto ref = var->ref;
         if (ref->type == VAR_DEC) {
             const auto expr = ref->varDec->expr;
-            const auto sarray = expr->type->asIterable();
-            maxIndexLevel = sarray->sizes.size();
+            const auto iterable = expr->type->asIterable();
+            maxIndexLevel = iterable->sizes.size();
         }
     }
     assert(maxIndexLevel >= 0);
@@ -727,7 +731,7 @@ bool SemaAnalyser::isFuncCallEqual(LgsFuncType* funcType, const LgsFuncCall* fun
     if (funcType->hasDefaultParams) {
         return resolveFuncCallWithDefaultParams(funcType, funcCall);
     }
-    return funcType->equals(funcType);
+    return funcType->equals(funcCall);
 }
 
 void SemaAnalyser::checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads) {
@@ -799,9 +803,12 @@ void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
 }
 
 LgsType* SemaAnalyser::resolveType(LgsType* type, LgsErrorHandler* errorHandler) {
+    assert(type);
     if (const auto iterable = type->asIterable()) {
-        iterable->underlyingType = resolveType(iterable->underlyingType, errorHandler);
-        return iterable;
+        if (!iterable->underlyingType) {
+            iterable->underlyingType = resolveType(iterable->underlyingType, errorHandler);
+            return iterable;
+        }
     }
 
     if (!dynamic_cast<LgsUnknownType*>(type)) return type;

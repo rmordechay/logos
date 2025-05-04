@@ -3,13 +3,13 @@
 #include <exprs/unary/LgsDArray.h>
 
 Value* LgsArrayIndex::createIRValue(CodeGenMetadata* metadata) {
-    const auto irType = baseExpr->type->getUnderlyingType()->getIRType();
+    const auto irType = baseExpr->type->asIterable()->underlyingType->getIRType();
     return metadata->builder.CreateLoad(irType, getGEP(metadata));
 }
 
 Value* LgsArrayIndex::getGEP(CodeGenMetadata* metadata) const {
     vector<Value*> IRIndices;
-    IRIndices.emplace_back(metadata->builder.getInt32(0));
+    IRIndices.emplace_back(i32Zero);
     for (const auto& index : indices) {
         IRIndices.emplace_back(index->from->getIRValue(metadata));
     }

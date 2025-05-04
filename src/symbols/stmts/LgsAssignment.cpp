@@ -36,7 +36,7 @@ void LgsAssignment::createIRFromSelection(CodeGenMetadata* metadata, const LgsSe
     assert(false);
 }
 
-void LgsAssignment::createIRFromArrIndex(CodeGenMetadata* metadata, LgsArrayIndex* arrIndex) const {
+void LgsAssignment::createIRFromArrIndex(CodeGenMetadata* metadata, const LgsArrayIndex* arrIndex) const {
     const auto gep = arrIndex->getGEP(metadata);
     const auto rValue = rvalue->getIRValue(metadata);
     metadata->builder.CreateStore(rValue, gep);

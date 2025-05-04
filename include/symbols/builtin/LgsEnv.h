@@ -6,7 +6,9 @@
 
 class LgsEnvGetFunc final : public LgsMethodImpl {
 public:
-    explicit LgsEnvGetFunc(const string& parentName) : LgsMethodImpl("get", &LGS_STR, parentName, {LgsParam(&LGS_STR), LgsParam(&LGS_STR)}) {
+    LgsStr rt;
+
+    explicit LgsEnvGetFunc(const string& parentName) : LgsMethodImpl("get", &rt, parentName, {LgsParam(new LgsStr()), LgsParam(new LgsStr())}) {
         IRFuncType = FunctionType::get(ptrTy, {ptrTy, ptrTy}, false);
         isStatic = true;
         isPublic = true;

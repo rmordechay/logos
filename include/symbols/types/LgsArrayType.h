@@ -6,10 +6,8 @@
 class LgsArrayType final : public LgsIterable {
 public:
     static constexpr auto name = "ArrayType";
-    bool isStatic = false;
 
-    explicit LgsArrayType() : LgsIterable(nullptr, {}) {}
-    Type* getIRType() override;
+    explicit LgsArrayType(LgsType* underlyingType = nullptr): LgsIterable(underlyingType) {}
     LgsExpr* getZeroValue() override;
     const string getName() const override;
     bool equals(LgsType* other) const override;

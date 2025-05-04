@@ -19,10 +19,6 @@ bool LgsType::isIterable() {
     return false;
 }
 
-LgsType* LgsType::getUnderlyingType() {
-    assert(false);
-}
-
 json LgsType::asJSON() const {
     assert(false);
 }

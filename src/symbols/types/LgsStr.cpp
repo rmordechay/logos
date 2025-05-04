@@ -9,10 +9,6 @@ const string LgsStr::getName() const {
     return name;
 }
 
-Type* LgsStr::getIRType() {
-    return ptrTy;
-}
-
 LgsExpr* LgsStr::getZeroValue() {
     if (nullable) return new LgsNull();
     return new LgsStrConst("");
