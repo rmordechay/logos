@@ -4,34 +4,25 @@
 #include "LgsIterable.h"
 #include "LgsPair.h"
 #include "LgsVoid.h"
+#include "LgsMapMethods.h"
 #include "funcs/LgsMethodImpl.h"
-
-class LgsMapInsertFunc final : public LgsMethodImpl {
-public:
-    LgsParam mapParam = LgsParam();
-    LgsParam keyParam = LgsParam(&LGS_ANY);
-    LgsParam valueParam = LgsParam(&LGS_ANY);
-
-    explicit LgsMapInsertFunc(LgsType* parent) {
-        mapParam.type = parent;
-        methodType.name = "insert";
-        methodType.rt = &LGS_VOID;
-        methodType.parentName = parentName;
-        methodType.parentName = parent->getIRName();
-        methodType.params = {&mapParam, &keyParam, &valueParam};
-    }
-};
 
 class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "Map";
     LgsPair underlyingType;
-    LgsMapInsertFunc insertFunc = LgsMapInsertFunc(this);
+    LgsMapGetFunc get{this};
+    LgsMapInsertFunc insert{this};
+    LgsMapDeleteFunc delete_{this};
+    LgsMapLenFunc len{this};
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&underlyingType) {
         underlyingType.key = keyType;
         underlyingType.value = valueType;
+        addMethod(&len);
     }
+
+    Value* IRLength(CodeGenMetadata* metadata) override;
     Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;

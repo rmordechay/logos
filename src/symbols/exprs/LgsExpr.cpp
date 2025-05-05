@@ -22,10 +22,9 @@ Value* LgsExpr::getIRValue(CodeGenMetadata* metadata) {
 }
 
 void LgsExpr::initIRValue(CodeGenMetadata* metadata) {
-    if (!IRValue) {
-        IRValue = createIRValue(metadata);
-        assert(IRValue);
-    }
+    if (IRValue) return;
+    IRValue = createIRValue(metadata);
+    assert(IRValue);
 }
 
 LgsExpr* LgsExpr::castStatically(LgsType* other) {

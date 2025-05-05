@@ -208,6 +208,7 @@ add_executable(lgs main.cpp
     include/symbols/exprs/unary/LgsHashMap.h
     include/symbols/types/LgsPair.h
     include/logos/Platform.h
-    include/symbols/types/LgsUnknownType.h)
+    include/symbols/types/LgsUnknownType.h
+    include/symbols/types/LgsMapMethods.h)
 target_link_libraries(lgs PRIVATE lib)
 #add_subdirectory(tests)

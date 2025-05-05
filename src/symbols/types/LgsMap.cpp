@@ -1,6 +1,10 @@
 #include "types/LgsMap.h"
 #include "exprs/unary/LgsHashMap.h"
 
+Value* LgsMap::IRLength(CodeGenMetadata* metadata) {
+    return len.call(metadata, {});
+}
+
 Type* LgsMap::getIRType() {
     return ptrTy;
 }

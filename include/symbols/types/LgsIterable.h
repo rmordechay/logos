@@ -14,6 +14,7 @@ public:
     size_t getDims() const;
     bool isIterable() override;
     virtual LgsType* getUnderlyingType();
+    virtual Value* IRLength(CodeGenMetadata* metadata);
     ~LgsIterable() override = default;
 };
 
@@ -27,6 +28,10 @@ inline bool LgsIterable::isIterable() {
 
 inline LgsType* LgsIterable::getUnderlyingType() {
     return underlyingType;
+}
+
+inline Value* LgsIterable::IRLength(CodeGenMetadata* metadata) {
+    assert(false);
 }
 
 #endif //LOGOSITERABLE_H

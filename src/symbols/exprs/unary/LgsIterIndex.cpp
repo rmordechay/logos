@@ -1,13 +1,19 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "types/LgsMap.h"
-
 #include <exprs/unary/LgsDArray.h>
 
 Value* LgsIterIndex::createIRValue(CodeGenMetadata* metadata) {
-    const auto iterable = baseExpr->type->asIterable();
-    const auto irType = iterable->getUnderlyingType()->getIRType();
-    return metadata->builder.CreateLoad(irType, getGEP(metadata));
+    const auto baseExprType = baseExpr->type;
+    if (const auto lgsMap = baseExprType->asMap()) {
+        return lgsMap->get.call(metadata, {baseExpr, indices[0]->from});
+    }
+    if (baseExprType->asArray()) {
+        const auto iterable = baseExprType->asIterable();
+        const auto IRType = iterable->getUnderlyingType()->getIRType();
+        return metadata->builder.CreateLoad(IRType, getGEP(metadata));
+    }
+    assert(false);
 }
 
 Value* LgsIterIndex::getGEP(CodeGenMetadata* metadata) const {
@@ -21,12 +27,12 @@ Value* LgsIterIndex::getGEP(CodeGenMetadata* metadata) const {
     return metadata->builder.CreateGEP(ty, ptr, IRIndices);
 }
 
-void LgsIterIndex::assignIRValue(CodeGenMetadata* metadata, LgsExpr* expr) const {
+void LgsIterIndex::assignIRValue(CodeGenMetadata* metadata, LgsExpr* value) const {
     if (const auto lgsMap = baseExpr->type->asMap()) {
-        lgsMap->insertFunc.call(metadata, {expr});
+        lgsMap->insert.call(metadata, {baseExpr, indices[0]->from, value});
     } else if (baseExpr->type->asArray()) {
         const auto gep = getGEP(metadata);
-        const auto rValue = expr->getIRValue(metadata);
+        const auto rValue = value->getIRValue(metadata);
         metadata->builder.CreateStore(rValue, gep);
     }
 }

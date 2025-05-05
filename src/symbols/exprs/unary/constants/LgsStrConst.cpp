@@ -3,6 +3,12 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 
 Value* LgsStrConst::createIRValue(CodeGenMetadata* metadata) {
+    for (auto& global : metadata->module->globals()) {
+        if (!global.isConstant() || !global.hasInitializer()) continue;
+        const auto* dataArray = dyn_cast<ConstantDataArray>(global.getInitializer());
+        if (!dataArray || !dataArray->isString()) continue;
+        if (dataArray->getAsString().str().c_str() == value) return &global;
+    }
     return createIRStr(metadata->module, value);
 }
 

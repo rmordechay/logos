@@ -1,8 +1,3 @@
-; ModuleID = 'main.c'
-source_filename = "main.c"
-target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128-Fn32"
-target triple = "arm64-apple-macosx15.0.0"
-
 %struct.stbds_array_header = type { i64, i64, ptr, i64 }
 %struct.stbds_hash_index = type { ptr, i64, i64, i64, i64, i64, i64, i64, i64, %struct.stbds_string_arena, ptr }
 %struct.stbds_string_arena = type { ptr, i64, i8, i8 }
@@ -3437,7 +3432,7 @@ define void @Map_insert_Map_Any_Any(ptr noundef %0, ptr noundef %1, ptr noundef 
 }
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define ptr @Map_get(ptr noundef %0, ptr noundef %1) #0 {
+define ptr @Map_get_Map_Any(ptr noundef %0, ptr noundef %1) #0 {
   %3 = alloca ptr, align 8
   %4 = alloca ptr, align 8
   %5 = alloca [1 x ptr], align 8
@@ -3472,7 +3467,7 @@ define ptr @Map_get(ptr noundef %0, ptr noundef %1) #0 {
 }
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define i32 @Map_del(ptr noundef %0, ptr noundef %1) #0 {
+define i32 @Map_del_Map_Any(ptr noundef %0, ptr noundef %1) #0 {
   %3 = alloca ptr, align 8
   %4 = alloca ptr, align 8
   %5 = alloca [1 x ptr], align 8
@@ -3518,7 +3513,7 @@ define i32 @Map_del(ptr noundef %0, ptr noundef %1) #0 {
 }
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define i32 @Map_len(ptr noundef %0) #0 {
+define i32 @Map_len_Map(ptr noundef %0) #0 {
   %2 = alloca ptr, align 8
   store ptr %0, ptr %2, align 8
   %3 = load ptr, ptr %2, align 8
@@ -3546,7 +3541,7 @@ define i32 @Map_len(ptr noundef %0) #0 {
 }
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define void @Map_free(ptr noundef %0) #0 {
+define void @Map_free_Map(ptr noundef %0) #0 {
   %2 = alloca ptr, align 8
   store ptr %0, ptr %2, align 8
   %3 = load ptr, ptr %2, align 8
