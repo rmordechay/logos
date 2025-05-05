@@ -15,7 +15,7 @@
 #include <iostream>
 
 bool LgsLinker::link() const {
-    setPlatform(paths->objFilePath, paths->execFilePath);
+    setPlatform(paths.objFilePath, paths.execFilePath);
     Module* mainModule = IRModules.find(LOGOS_MAIN_FILE_NAME)->second;
     Linker linker(*mainModule);
 
@@ -32,7 +32,7 @@ bool LgsLinker::link() const {
 
     error_code ec;
     legacy::PassManager pass;
-    raw_fd_ostream outputStream(paths->objFilePath.c_str(), ec, sys::fs::OF_None);
+    raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
     const auto addedPassFailed = targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
     if (addedPassFailed) {
         std::cerr << ec.message() << endl;

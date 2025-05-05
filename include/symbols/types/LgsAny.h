@@ -14,4 +14,6 @@ public:
     ~LgsAny() override = default;
 };
 
+inline LgsAny LGS_ANY;
+
 #endif //LGSANY_H

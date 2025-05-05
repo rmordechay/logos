@@ -44,6 +44,22 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
     return lastExpr();
 }
 
+void LgsSelection::assignIRValue(CodeGenMetadata* metadata, LgsExpr* expr) const {
+    const auto beforeLastExpr = exprs[exprs.size() - 2];
+    if (const auto var = lastExpr()->asVariable()) {
+        assert(var->ref);
+        switch (var->ref->type) {
+        case FIELD:
+            var->ref->field->setFieldIRValue(metadata, expr, beforeLastExpr->getIRValue(metadata));
+            return;
+        case UNKNOWN:
+        default:
+            break;
+        }
+    }
+    assert(false);
+}
+
 json LgsSelection::asJSON() {
     json tree;
     tree["exprs"] = {};

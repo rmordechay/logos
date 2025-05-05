@@ -1,9 +1,7 @@
 #include "types/LgsArray.h"
 #include "exprs/unary/LgsDArray.h"
-#include "exprs/unary/LgsSArray.h"
 
 LgsExpr* LgsArray::getZeroValue() {
-    if (isStatic) return new LgsSArray(underlyingType, sizes);
     return new LgsDArray(underlyingType);
 }
 
@@ -12,13 +10,20 @@ const string LgsArray::getName() const {
 }
 
 bool LgsArray::equals(LgsType* other) const {
-    if (isStatic) {
-        if (const auto otherSArrType = other->asSArrayType()) {
-            return getDims() == otherSArrType->getDims();
-        }
-        return false;
+    if (const auto otherSArrType = other->asArray()) {
+        return getDims() == otherSArrType->getDims();
     }
-    assert(false);
+    return false;
+}
+
+Type* LgsArray::getIRType() {
+    if (!isStatic) return ptrTy;
+    if (IRType) return IRType;
+    IRType = underlyingType->getIRType();
+    for (auto size = sizes.rbegin(); size != sizes.rend(); ++size) {
+        IRType = ArrayType::get(IRType, *size);
+    }
+    return IRType;
 }
 
 LgsType* LgsArray::inferBinaryType(LgsType* other) {

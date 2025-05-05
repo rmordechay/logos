@@ -1,17 +1,15 @@
 #ifndef LOGOSTYPE_H
 #define LOGOSTYPE_H
-
 #include "LgsValue.h"
-
 #include <string>
 #include <map>
 
+using namespace std;
+using namespace llvm;
+class LgsMap;
 class LgsInt;
 class LgsArray;
 class LgsIterable;
-using namespace std;
-using namespace llvm;
-
 class LgsStr;
 class LgsExpr;
 class LgsFuncCall;
@@ -48,10 +46,11 @@ public:
 
     LgsStr* asStr();
     LgsInt* asInt();
+    LgsMap* asMap();
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsIterable* asIterable();
-    LgsArray* asSArrayType();
+    LgsArray* asArray();
     virtual ~LgsType() = default;
 };
 

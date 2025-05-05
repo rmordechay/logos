@@ -19,7 +19,7 @@ void Logos::run(char* argv[]) {
     CodeGenerator::generate(project.mainFile);
 
     // Linking
-    const LgsLinker linker(&paths);
+    const LgsLinker linker;
     if (!linker.link()) exit(1);
 
     // Running

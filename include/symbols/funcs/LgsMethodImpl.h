@@ -1,7 +1,6 @@
 #ifndef LOGOSMETHODIMPL_H
 #define LOGOSMETHODIMPL_H
 #include "LgsFunc.h"
-#include "LgsParam.h"
 #include "types/LgsMethodType.h"
 
 class LgsMethodImpl : public LgsFunc {
@@ -13,7 +12,12 @@ public:
     LgsMethodType methodType;
     LgsMethodImpl* implements = nullptr;
 
-    LgsMethodImpl(const string& name, LgsType* funcType, const string& parentName, const vector<LgsParam>& params = {}) : parentName(parentName), methodType(LgsMethodType(name, funcType, params)) {}
+    LgsMethodImpl() = default;
+    LgsMethodImpl(const string& name, const string& parentName, LgsType* rt) {
+        methodType.name = name;
+        methodType.parentName = parentName;
+        methodType.rt = rt;
+    }
     bool equals(const LgsFuncCall* other) override;
     LgsFuncType* getFuncType() override;
     ~LgsMethodImpl() override = default;

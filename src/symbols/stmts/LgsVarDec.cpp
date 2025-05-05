@@ -26,10 +26,6 @@ json LgsVarDec::asJSON() {
     return tree;
 }
 
-void LgsVarDec::free(CodeGenMetadata* metadata) {
-    expr->free(metadata);
-}
-
 LgsVarDec::~LgsVarDec() {
     delete expr;
 }

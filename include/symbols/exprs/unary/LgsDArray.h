@@ -10,14 +10,11 @@ public:
     LgsArray arrType;
     vector<LgsExpr*> initialElements;
 
-    explicit LgsDArray(LgsType* underlyingType, const vector<LgsExpr*>& initialElements = {}) : initialElements(initialElements) {
-        arrType.sizes.emplace_back(initialElements.size());
+    explicit LgsDArray(LgsType* underlyingType) {
         arrType.underlyingType = underlyingType;
         type = &arrType;
     }
-    size_t length() const;
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    void free(CodeGenMetadata* metadata) override;
     ~LgsDArray() override = default;
 };
 

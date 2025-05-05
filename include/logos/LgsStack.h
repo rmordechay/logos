@@ -26,7 +26,6 @@ public:
     LgsSymbol* getSymbol(const string& name);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     string getStackString() const;
-    void freeSymbols(CodeGenMetadata* metadata);
     void reset();
     ~LgsStack() = default;
 };

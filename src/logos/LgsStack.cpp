@@ -40,12 +40,6 @@ string LgsStack::getStackString() const {
     return "";
 }
 
-void LgsStack::freeSymbols(CodeGenMetadata* metadata) {
-    for (const auto& [_, symbol] : top().symbols) {
-        symbol.free(metadata);
-    }
-}
-
 void LgsStack::reset() {
     while (size() > 0) {
         pop();

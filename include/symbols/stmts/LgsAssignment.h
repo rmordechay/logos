@@ -12,8 +12,6 @@ public:
     LgsExpr* rvalue;
 
     void createIRStmt(CodeGenMetadata* metadata) override;
-    void createIRFromSelection(CodeGenMetadata* metadata, const LgsSelection* selection) const;
-    void createIRFromIterIndex(CodeGenMetadata* metadata, const LgsIterIndex* iterIndex) const;
     ~LgsAssignment() override;
 };
 

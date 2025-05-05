@@ -1,13 +1,31 @@
 #ifndef LGSMAP_H
 #define LGSMAP_H
+#include "LgsAny.h"
 #include "LgsIterable.h"
 #include "LgsPair.h"
-#include "LgsType.h"
+#include "LgsVoid.h"
+#include "funcs/LgsMethodImpl.h"
+
+class LgsMapInsertFunc final : public LgsMethodImpl {
+public:
+    LgsParam mapParam = LgsParam();
+    LgsParam keyParam = LgsParam(&LGS_ANY);
+    LgsParam valueParam = LgsParam(&LGS_ANY);
+
+    explicit LgsMapInsertFunc(LgsType* parent) {
+        methodType.name = "name";
+        methodType.rt = &LGS_VOID;
+        methodType.parentName = parentName;
+        mapParam.type = parent;
+        methodType.params = {&mapParam, &keyParam, &valueParam};
+    }
+};
 
 class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "Map";
     LgsPair underlyingType;
+    LgsMapInsertFunc insertFunc = LgsMapInsertFunc(this);
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&underlyingType) {
         underlyingType.key = keyType;

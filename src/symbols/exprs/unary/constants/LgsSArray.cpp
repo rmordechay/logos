@@ -14,11 +14,3 @@ Value* LgsSArray::createIRValue(CodeGenMetadata* metadata) {
     }
     return arrPtr;
 }
-
-size_t LgsSArray::length() const {
-    return type->asIterable()->sizes[0];
-}
-
-void LgsSArray::free(CodeGenMetadata* metadata) {
-    assert(false);
-}

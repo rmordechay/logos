@@ -1,9 +1,11 @@
 #include "types/LgsStr.h"
-
 #include "exprs/LgsNull.h"
-#include "exprs/unary/constants/LgsConstExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "types/LgsChar.h"
+
+Type* LgsStr::getIRType() {
+    return ptrTy;
+}
 
 const string LgsStr::getName() const {
     return name;

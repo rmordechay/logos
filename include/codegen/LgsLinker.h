@@ -11,9 +11,6 @@ using namespace std;
 
 class LgsLinker {
 public:
-    LgsPaths* paths;
-
-    explicit LgsLinker(LgsPaths* paths) : paths(paths) {}
     bool link() const;
     bool getLinkFunc() const;
     void linkStdlib(const string& path, Linker* linker) const;

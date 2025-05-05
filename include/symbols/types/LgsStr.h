@@ -10,9 +10,8 @@ class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
 
-    LgsStr() : LgsIterable(&LGS_CHAR) {
-        isStatic = false;
-    }
+    LgsStr() : LgsIterable(&LGS_CHAR) {}
+    Type* getIRType() override;
     const string getName() const override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;

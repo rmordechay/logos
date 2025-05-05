@@ -1,20 +1,13 @@
 #include "logos/LgsProject.h"
-
-#include "LgsInterfaceFile.h"
 #include "analysis/AntlrConverter.h"
-#include "builtin/LgsReflect.h"
+#include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsAppFile.h"
 #include "logos/LgsGlobals.h"
 #include "logos/Logos.h"
 #include "parser/LogosLexer.h"
 #include "parser/LogosParser.h"
-#include "symbols/builtin/LgsEnv.h"
-#include "symbols/builtin/LgsSys.h"
 #include "symbols/builtin/LgsPrint.h"
-#include "symbols/types/LgsBool.h"
-#include "types/LgsChar.h"
 #include "utils/ThreadPool.h"
-
 #include <iostream>
 
 using namespace std;
@@ -181,16 +174,12 @@ string LogosProject::getFileText(path filePath) const {
     return fileContents.str();
 }
 
-void LogosProject::loadGlobals() {
-    globals.addFunc(new LgsPrint({LgsParam(&LGS_INT)}));
-    globals.addFunc(new LgsPrint({LgsParam(&LGS_FLOAT)}));
-    globals.addFunc(new LgsPrint({LgsParam(&LGS_CHAR)}));
-    globals.addFunc(new LgsPrint({LgsParam(&LGS_BOOL)}));
-    globals.addFunc(new LgsPrint({LgsParam(new LgsStr())}));
-    globals.addSymbol(LgsSys::name, LgsSymbol(new LgsSys()), &errHandler);
-    globals.addSymbol(LgsEnv::name, LgsSymbol(new LgsEnv()), &errHandler);
-    globals.addSymbol(LgsReflect::name, LgsSymbol(new LgsReflect()), &errHandler);
-    globals.addSymbol("ROOT_PATH", LgsSymbol(new LgsVarDec("ROOT_PATH", new LgsStr(), new LgsStrConst(paths.rootDirAbs))), &errHandler);
+void LogosProject::loadGlobals() const {
+    globals.addFunc(&lgsPrintInt);
+    globals.addFunc(&lgsPrintFloat);
+    globals.addFunc(&lgsPrintChar);
+    globals.addFunc(&lgsPrintBool);
+    globals.addFunc(&lgsPrintStr);
 }
 
 void LogosProject::checkRequiredEnvVars() {

@@ -23,7 +23,6 @@ public:
     Value* hashIRValue(CodeGenMetadata* metadata, Value* value) const;
     virtual string format(string& indentStr);
     virtual void setLocation(const antlr4::Token* ctx);
-    virtual void free(CodeGenMetadata* metadata);
     virtual json asJSON();
     virtual ~LgsValue() = default;
 };

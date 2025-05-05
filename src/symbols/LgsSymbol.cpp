@@ -18,15 +18,6 @@ LgsSymbol::LgsSymbol(LgsField* field): type(FIELD), field(field) {}
 LgsSymbol::LgsSymbol(LgsEnum* lgsEnum): type(ENUM), lgsEnum(lgsEnum) {}
 LgsSymbol::LgsSymbol(LgsEnumField* enumField): type(ENUM_FIELD), enumField(enumField) {}
 
-void LgsSymbol::free(CodeGenMetadata* metadata) const {
-    switch (type) {
-    case VAR_DEC:
-        varDec->free(metadata);
-        break;
-    default: assert(false);
-    }
-}
-
 LgsSymbol* LgsSymbol::clone() const {
     return new LgsSymbol(*this);
 }

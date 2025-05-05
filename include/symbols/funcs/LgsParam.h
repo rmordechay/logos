@@ -15,7 +15,7 @@ public:
     vector<LgsVariable*> refs;
 
     LgsParam(const string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
-    explicit LgsParam(LgsType* type) : name(""), type(type) {}
+    explicit LgsParam(LgsType* type = nullptr) : name(""), type(type) {}
     string format(string& indentStr) override;
     json asJSON() override;
     string getIRName();

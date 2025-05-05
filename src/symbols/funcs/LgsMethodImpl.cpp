@@ -10,7 +10,7 @@ bool LgsMethodImpl::equals(const LgsFuncCall* other) {
     const auto argsSize = isStatic ? args.size() - 1 : args.size();
     if (params.size() < argsSize) return false;
     for (size_t i = 0; i < params.size(); ++i) {
-        const auto paramType = params[i].type;
+        const auto paramType = params[i]->type;
         const auto argType = args[i + isStatic]->type;
         if (!paramType->equals(argType)) return false;
     }

@@ -77,7 +77,7 @@ public:
     void visitFieldCall(const LgsExpr* parentExpr, LgsVariable* childField);
     void visitFirstSelection(LgsExpr* firstExpr);
     void visitInstance(LgsInstance* instance);
-    void visitArrayIndex(LgsIterIndex* iterIndex);
+    void visitIterIndex(LgsIterIndex* iterIndex);
 
     void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
@@ -92,7 +92,7 @@ public:
     bool checkSingleIndexBoundaries(LgsIterIndex* iterIndex, LgsExpr* index, size_t upperBound);
     bool checkSliceBoundaries(LgsIterIndex* iterIndex, const LgsIndex* index, size_t upperBound);
     bool checkIndexBoundaries(LgsIterIndex* iterIndex);
-    bool checkArrDimensions(const LgsIterIndex* iterIndex);
+    bool checkIndexDimensions(const LgsIterIndex* iterIndex);
     void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 

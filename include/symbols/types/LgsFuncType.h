@@ -9,12 +9,11 @@ class LgsFuncType : public LgsType {
 public:
     string name;
     string IRName;
-    LgsType* type;
-    vector<LgsParam> params;
+    LgsType* rt;
+    vector<LgsParam*> params;
     bool hasDefaultParams = false;
     FunctionType* IRFuncType = nullptr;
 
-    LgsFuncType(const string& name, LgsType* type, const vector<LgsParam>& params = {}) : name(name), type(type), params(params) {}
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     const string getName() const override;
@@ -24,13 +23,12 @@ public:
     string getAsStr(bool withType = false) const;
     void setStructRet(Function::arg_iterator& args, LgsObject* obj) const;
 
-
     virtual string getIRName();
     virtual Function* getIRFunc(const CodeGenMetadata* metadata);
     virtual FunctionType* getIRFuncType(const CodeGenMetadata* metadata);
     virtual void setIRFuncParams(Argument* IRParams);
     static string getComposedName(const string& name, const string& parentName, const vector<string>& argTypeNames);
-    ~LgsFuncType() override = default;
+    ~LgsFuncType() override;
 };
 
 

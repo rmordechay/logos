@@ -1,6 +1,8 @@
 #include "LgsValue.h"
 
 #include "funcs/LgsFunc.h"
+#include "types/LgsFuncType.h"
+
 #include "json/json.hpp"
 
 #include <TokenSource.h>
@@ -26,10 +28,6 @@ string LgsValue::format(string& indentStr) {
 
 BasicBlock* LgsValue::createBasicBlock(const char* name) const {
     return BasicBlock::Create(context, name);
-}
-
-void LgsValue::free(CodeGenMetadata* metadata) {
-    assert(false && "value has nothing to free");
 }
 
 Value* LgsValue::hashIRValue(CodeGenMetadata* metadata, Value* value) const {

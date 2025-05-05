@@ -8,6 +8,7 @@ public:
     static constexpr auto name = "Array";
 
     explicit LgsArray(LgsType* underlyingType = nullptr): LgsIterable(underlyingType) {}
+    Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     const string getName() const override;
     bool equals(LgsType* other) const override;

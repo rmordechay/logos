@@ -6,13 +6,12 @@
 
 class LgsStrConst final : public LgsConstExpr {
 public:
-    LgsStr rt;
+    LgsStr strType;
     string value;
     FunctionType* const cmpStrIRFuncType = FunctionType::get(i1Ty, {ptrTy, ptrTy}, false);
 
-    explicit LgsStrConst(const string& value) : LgsConstExpr(&rt), value(value) {
-        rt.sizes = {value.size()};
-        rt.isStatic = true;
+    explicit LgsStrConst(const string& value) : LgsConstExpr(&strType), value(value) {
+        strType.isStatic = true;
     }
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;

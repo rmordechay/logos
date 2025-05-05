@@ -35,10 +35,6 @@ Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
     return call(metadata, args);
 }
 
-void LgsFuncCall::free(CodeGenMetadata* metadata) {
-    assert(false);
-}
-
 Value* LgsFuncCall::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     vector<Value*> argValues;
     const auto objRtPtr = setIRArgs(metadata, argValues, args);
@@ -59,7 +55,7 @@ Value* LgsFuncCall::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args
 
 Value* LgsFuncCall::setIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) {
     Value* objRtPtr = nullptr;
-    if (const auto obj = funcType->type->asObject()) {
+    if (const auto obj = funcType->rt->asObject()) {
         objRtPtr = metadata->builder.CreateAlloca(obj->getIRType(), nullptr);
         argValues.push_back(objRtPtr);
     }

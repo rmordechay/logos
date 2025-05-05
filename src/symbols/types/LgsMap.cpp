@@ -1,15 +1,15 @@
 #include "types/LgsMap.h"
-
 #include "exprs/unary/LgsHashMap.h"
 
 Type* LgsMap::getIRType() {
-    return nullPtrTy;
+    return ptrTy;
 }
 
 LgsExpr* LgsMap::getZeroValue() {
     const auto hashMap = new LgsHashMap();
     hashMap->mapType.underlyingType.key = underlyingType.key;
     hashMap->mapType.underlyingType.value = underlyingType.value;
+    hashMap->mapType.sizes.emplace_back(1);
     return hashMap;
 }
 

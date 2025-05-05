@@ -8,15 +8,12 @@ public:
     LgsArray arrType;
     vector<LgsExpr*> initialElements;
 
-    explicit LgsSArray(LgsType* underlyingType = nullptr, const vector<size_t>& sizes = {}) {
-        arrType.sizes = sizes;
-        arrType.underlyingType = underlyingType;
-        arrType.isStatic = true;
+    explicit LgsSArray() {
         type = &arrType;
+        arrType.isStatic = true;
     }
-    size_t length() const;
+
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    void free(CodeGenMetadata* metadata) override;
     ~LgsSArray() override = default;
 };
 

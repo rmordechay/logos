@@ -6,6 +6,7 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsArray.h"
+#include "types/LgsMap.h"
 
 bool LgsType::equals(const LgsType& other) {
     return getName() == other.getName();
@@ -84,7 +85,7 @@ LgsIterable* LgsType::asIterable() {
     return dynamic_cast<LgsIterable*>(this);
 }
 
-LgsArray* LgsType::asSArrayType() {
+LgsArray* LgsType::asArray() {
     return dynamic_cast<LgsArray*>(this);
 }
 
@@ -94,6 +95,10 @@ LgsStr* LgsType::asStr() {
 
 LgsInt* LgsType::asInt() {
     return dynamic_cast<LgsInt*>(this);
+}
+
+LgsMap* LgsType::asMap() {
+    return dynamic_cast<LgsMap*>(this);
 }
 
 Type* LgsUnknownType::getIRType() {

@@ -1,6 +1,5 @@
 #ifndef LOGOSFUNC_H
 #define LOGOSFUNC_H
-#include "../types/LgsFuncType.h"
 #include "LgsValue.h"
 #include "stmts/LgsStmtBlock.h"
 

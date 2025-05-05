@@ -7,7 +7,7 @@ void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);
     startBlock(metadata, entryBlock);
     stmtBlock->createIRValue(metadata);
-    if (getFuncType()->type->getName() == LgsVoid::name) {
+    if (getFuncType()->rt->getName() == LgsVoid::name) {
         metadata->builder.CreateRetVoid();
     }
     metadata->lgsStack.exitScope();
@@ -19,14 +19,14 @@ string LgsFunc::format(string& indentStr) {
     str << funcType->name << "(";
     for (int i = 0; i < funcType->params.size(); ++i) {
         auto param = funcType->params[i];
-        str << param.format(indentStr);
+        str << param->format(indentStr);
         if (i != funcType->params.size() - 1) {
             str << ", ";
         }
     }
     str << ")";
     if (funcType->name != LOGOS_MAIN_FUNC) {
-        str << funcType->type->getName();
+        str << funcType->rt->getName();
     }
     str << stmtBlock->format(indentStr);
     return str.str();
@@ -36,10 +36,10 @@ json LgsFunc::asJSON() {
     json tree;
     const auto funcType = getFuncType();
     tree["name"] = funcType->name;
-    tree["type"] = funcType->type->getName();
+    tree["type"] = funcType->rt->getName();
     tree["params"] = {};
     for (auto& param : funcType->params) {
-        tree["params"].emplace_back(param.asJSON());
+        tree["params"].emplace_back(param->asJSON());
     }
     tree["stmts"] = stmtBlock->asJSON();
     return tree;

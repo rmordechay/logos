@@ -13,6 +13,7 @@ public:
     string getName() override;
     LgsExpr* lastExpr() const;
     uint32_t hashValue(CodeGenMetadata* metadata) override;
+    void assignIRValue(CodeGenMetadata* metadata, LgsExpr* expr) const;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     void createIRStmt(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;

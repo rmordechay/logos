@@ -34,7 +34,7 @@ public:
     bool loadProject();
     void loadFiles();
     void setEnvVars() const;
-    void loadGlobals();
+    void loadGlobals() const;
     void checkRequiredEnvVars();
     void loadSrcFiles();
     void loadEnvFiles();

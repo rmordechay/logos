@@ -19,6 +19,16 @@ Value* LgsIterIndex::getGEP(CodeGenMetadata* metadata) const {
     return metadata->builder.CreateGEP(ty, ptr, IRIndices);
 }
 
+void LgsIterIndex::assignIRValue(CodeGenMetadata* metadata, LgsExpr* expr) const {
+    if (const auto lgsMap = baseExpr->type->asMap()) {
+        assert(false);
+    } else if (baseExpr->type->asArray()) {
+        const auto gep = getGEP(metadata);
+        const auto rValue = expr->getIRValue(metadata);
+        metadata->builder.CreateStore(rValue, gep);
+    }
+}
+
 string LgsIterIndex::getName() {
     return baseExpr->getName();
 }

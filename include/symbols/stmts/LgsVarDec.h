@@ -15,7 +15,6 @@ public:
     void createIRStmt(CodeGenMetadata* metadata) override;
     string format(string& indentStr) override;
     json asJSON() override;
-    void free(CodeGenMetadata* metadata) override;
     ~LgsVarDec() override;
 };
 

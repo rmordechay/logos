@@ -99,7 +99,7 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
 
 void SemaAnalyser::visitFuncType(LgsFuncType* funcType) {
     for (auto& param : funcType->params) {
-        visitParam(&param);
+        visitParam(param);
     }
 }
 
@@ -158,7 +158,7 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
     if (const auto selection = dynamic_cast<LgsSelection*>(lExpr)) {
         visitSelection(selection);
     } else if (const auto iterIndex = dynamic_cast<LgsIterIndex*>(lExpr)) {
-        visitArrayIndex(iterIndex);
+        visitIterIndex(iterIndex);
     } else {
         assert(false);
     }
@@ -172,8 +172,9 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
         varDec->type = varDec->expr->type;
         if (!checkExprType(varDec->expr, varDec->type)) return;
     } else {
-        varDec->type = resolveType(varDec->type, &errHandler);
-        varDec->expr = varDec->type->getZeroValue();
+        const auto type = resolveType(varDec->type, &errHandler);
+        varDec->expr = type->getZeroValue();
+        varDec->type = varDec->expr->type;
     }
     assert(varDec->type);
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
@@ -252,7 +253,7 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
 
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
     auto funcSignature = lgsStack.currentFunc->getFuncType();
-    const auto rt = funcSignature->type;
+    const auto rt = funcSignature->rt;
     if (returnStmt->expr) {
         returnStmt->expr->isReturnValue = true;
         visitExpr(returnStmt->expr);
@@ -324,7 +325,7 @@ void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     } else if (const auto hashMap = unaryExpr->asHashMap()) {
         visitHashMap(hashMap);
     } else if (const auto iterIndex = unaryExpr->asArrayIndex()) {
-        visitArrayIndex(iterIndex);
+        visitIterIndex(iterIndex);
     } else if (const auto variable = unaryExpr->asVariable()) {
         visitVariable(variable);
     }
@@ -375,7 +376,7 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
         break;
     case FUNC:
         // TODO add func matching
-        setExprType(variable, symbol->func[0]->getFuncType()->type);
+        setExprType(variable, symbol->func[0]->getFuncType()->rt);
         break;
     default:
         assert(false);
@@ -400,7 +401,7 @@ void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
     } else if (const auto typeConst = dynamic_cast<LgsTypeConst*>(firstExpr)) {
         typeConst->type = resolveType(typeConst->type, &errHandler);
     } else if (const auto iterIndex = dynamic_cast<LgsIterIndex*>(firstExpr)) {
-        visitArrayIndex(iterIndex);
+        visitIterIndex(iterIndex);
     } else {
         assert(false);
     }
@@ -496,15 +497,15 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     instance->type = instance->obj;
 }
 
-void SemaAnalyser::visitArrayIndex(LgsIterIndex* iterIndex) {
+void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     visitUnaryExpr(baseExpr);
     const auto baseExprType = baseExpr->type;
     if (baseExprType->isIterable()) {
-        const bool arrDimsValid = checkArrDimensions(iterIndex);
-        if (!arrDimsValid) return;
-        const bool indexBoundariesValid = checkIndexBoundaries(iterIndex);
-        if (!indexBoundariesValid) return;
+        const auto indexDimsValid = checkIndexDimensions(iterIndex);
+        if (!indexDimsValid) return;
+        const auto boundariesValid = !checkIndexBoundaries(iterIndex);
+        if (!boundariesValid) return;
         setIterIndexType(iterIndex);
     } else {
         return errHandler.handleError(E10002, &iterIndex->location, {baseExpr->getName()});
@@ -570,7 +571,6 @@ void SemaAnalyser::setIterIndexType(LgsIterIndex* iterIndex) const {
     if (diff == 0) {
         iterIndex->type = iterable->getUnderlyingType();
     } else {
-        const vector sizes(iterable->sizes.begin() + diff, iterable->sizes.end());
         assert(false);
     }
     assert(iterIndex->type);
@@ -633,8 +633,10 @@ bool SemaAnalyser::checkExprType(LgsExpr* expr, LgsType* type) {
 }
 
 bool SemaAnalyser::checkIndexBoundaries(LgsIterIndex* iterIndex) {
+    const auto baseExpr = iterIndex->baseExpr;
+    if (!baseExpr->type->asIterable()->isStatic) return false;
     vector<size_t> boundaries;
-    if (const auto var = iterIndex->baseExpr->asVariable()) {
+    if (const auto var = baseExpr->asVariable()) {
         const auto ref = var->ref;
         if (ref->type == VAR_DEC) {
             const auto iterable = ref->varDec->type->asIterable();
@@ -689,7 +691,7 @@ bool SemaAnalyser::checkSliceBoundaries(LgsIterIndex* iterIndex, const LgsIndex*
     return true;
 }
 
-bool SemaAnalyser::checkArrDimensions(const LgsIterIndex* iterIndex) {
+bool SemaAnalyser::checkIndexDimensions(const LgsIterIndex* iterIndex) {
     int maxIndexLevel = -1;
     if (const auto var = iterIndex->baseExpr->asVariable()) {
         const auto ref = var->ref;
@@ -700,7 +702,7 @@ bool SemaAnalyser::checkArrDimensions(const LgsIterIndex* iterIndex) {
             maxIndexLevel = iterable->getDims();
         }
     }
-    assert(maxIndexLevel >= 0);
+    assert(maxIndexLevel > 0);
     if (iterIndex->indices.size() > maxIndexLevel) {
         errHandler.handleError(E10035, &iterIndex->location, {iterIndex->code, to_string(maxIndexLevel)});
         return false;
@@ -713,7 +715,7 @@ bool SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall, const LgsSymbol* symbo
         const auto funcType = dynamic_cast<LgsFuncType*>(symbol->param->type);
         if (isFuncCallEqual(funcType, funcCall)) {
             funcCall->funcType = funcType;
-            funcCall->type = funcType->type;
+            funcCall->type = funcType->rt;
             funcCall->ref = symbol->clone();
             return true;
         }
@@ -731,7 +733,7 @@ LgsFunc* SemaAnalyser::resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFun
         if (isFuncCallEqual(funcType, funcCall)) {
             funcCall->func = overload;
             funcCall->funcType = funcType;
-            funcCall->type = funcType->type;
+            funcCall->type = funcType->rt;
             return overload;
         }
     }
@@ -745,7 +747,7 @@ LgsFunc* SemaAnalyser::resolveMethodCall(const vector<LgsMethodImpl*>& overloads
         if (isFuncCallEqual(funcType, methodCall)) {
             methodCall->func = overload;
             methodCall->funcType = funcType;
-            methodCall->type = funcType->type;
+            methodCall->type = funcType->rt;
             return overload;
         }
     }
@@ -760,7 +762,7 @@ bool SemaAnalyser::resolveFuncCallWithDefaultParams(const LgsFuncType* funcType,
         const auto param = params[i];
         if (i >= argsSize) continue;
         const auto arg = funcCall->args[i];
-        if (!param.type->equals(arg->type)) return false;
+        if (!param->type->equals(arg->type)) return false;
     }
     return true;
 }
@@ -806,11 +808,11 @@ void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
 
 void SemaAnalyser::validateFuncControlFlow(LgsFunc* func) {
     const auto funcType = func->getFuncType();
-    if (dynamic_cast<LgsVoid*>(funcType->type)) return;
+    if (dynamic_cast<LgsVoid*>(funcType->rt)) return;
     const auto stmtBlock = func->stmtBlock;
     const bool isFlowCorrect = funcType->name != LOGOS_MAIN_FUNC && !stmtBlock->hasReturn;
     if (isFlowCorrect) {
-        errHandler.handleError(E10004, &func->location, {funcType->name, funcType->type->getName()});
+        errHandler.handleError(E10004, &func->location, {funcType->name, funcType->rt->getName()});
     }
 }
 
@@ -918,9 +920,8 @@ void SemaAnalyser::resolveObjMemberTypes(LgsObject* const& obj, LgsErrorHandler*
 }
 
 void SemaAnalyser::resolveFuncTypes(LgsFuncType* signature, LgsErrorHandler* errHandler) {
-    signature->type = resolveType(signature->type, errHandler);
+    signature->rt = resolveType(signature->rt, errHandler);
     for (int i = 0; i < signature->params.size(); ++i) {
-        const auto lgsParam = signature->params[i];
-        signature->params[i].type = resolveType(signature->params[i].type, errHandler);
+        signature->params[i]->type = resolveType(signature->params[i]->type, errHandler);
     }
 }
