@@ -2,6 +2,7 @@
 #define LOGOSEXPR_H
 #include "LgsValue.h"
 
+class LgsHashMap;
 class LgsFuncCall;
 class LgsType;
 class LgsVariable;
@@ -55,6 +56,7 @@ public:
     LgsSelection* asSelection();
     LgsDArray* asDArray();
     LgsSArray* asSArray();
+    LgsHashMap* asHashMap();
     LgsBoolConst* asBoolConst();
     LgsCharConst* asCharConst();
     LgsFloatConst* asFloatConst();

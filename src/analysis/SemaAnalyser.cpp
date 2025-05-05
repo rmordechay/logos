@@ -24,7 +24,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsPatternMatch.h"
-#include "types/LgsArrayType.h"
+#include "types/LgsArray.h"
 #include "types/LgsVoid.h"
 
 #include <loops/LgsForeachLoop.h>
@@ -306,6 +306,8 @@ void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
         visitDArray(dArray);
     } else if (const auto sArray = unaryExpr->asSArray()) {
         visitSArray(sArray);
+    } else if (const auto hashMap = unaryExpr->asHashMap()) {
+        visitHashMap(hashMap);
     } else if (const auto arrIndex = unaryExpr->asArrayIndex()) {
         visitArrayIndex(arrIndex);
     } else if (const auto variable = unaryExpr->asVariable()) {
@@ -332,6 +334,10 @@ void SemaAnalyser::visitSArray(LgsSArray* array) {
     }
     array->arrType.underlyingType = array->initialElements[0]->type;
     array->arrType.sizes.emplace_back(array->initialElements.size());
+}
+
+void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) {
+    assert(false);
 }
 
 void SemaAnalyser::visitVariable(LgsVariable* variable) {

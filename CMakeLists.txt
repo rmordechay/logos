@@ -97,7 +97,7 @@ add_library(lib STATIC
     include/symbols/stmts/LgsStmtBlock.h
     include/symbols/stmts/LgsVarDec.h
     include/symbols/types/LgsAny.h
-    include/symbols/types/LgsArrayType.h
+    include/symbols/types/LgsArray.h
     include/symbols/types/LgsBool.h
     include/symbols/types/LgsChar.h
     include/symbols/types/LgsEnum.h
@@ -111,6 +111,7 @@ add_library(lib STATIC
     include/symbols/types/LgsStr.h
     include/symbols/types/LgsType.h
     include/symbols/types/LgsVoid.h
+    include/symbols/types/LgsMap.h
 
     # src
     src/analysis/AntlrConverter.cpp
@@ -169,7 +170,7 @@ add_library(lib STATIC
     src/symbols/stmts/LgsStmtBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
     src/symbols/types/LgsAny.cpp
-    src/symbols/types/LgsArrayType.cpp
+    src/symbols/types/LgsArray.cpp
     src/symbols/types/LgsBool.cpp
     src/symbols/types/LgsChar.cpp
     src/symbols/types/LgsEnum.cpp
@@ -182,6 +183,7 @@ add_library(lib STATIC
     src/symbols/types/LgsStr.cpp
     src/symbols/types/LgsType.cpp
     src/symbols/types/LgsVoid.cpp
+    src/symbols/types/LgsMap.cpp
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -203,6 +205,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 endif()
 
-add_executable(lgs main.cpp)
+add_executable(lgs main.cpp
+    src/symbols/exprs/unary/LgsHashMap.cpp
+    include/symbols/exprs/unary/LgsHashMap.h
+    include/symbols/types/LgsPair.h)
 target_link_libraries(lgs PRIVATE lib)
 #add_subdirectory(tests)

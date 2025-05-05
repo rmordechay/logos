@@ -30,9 +30,11 @@
 #include "stmts/LgsContinueStmt.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
+#include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsSArray.h"
 #include "stmts/LgsPatternMatch.h"
-#include "types/LgsArrayType.h"
+#include "types/LgsArray.h"
+#include "types/LgsMap.h"
 
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -435,6 +437,7 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     if (const auto constructor = ctx->constructor()) return getInstance(constructor);
     if (const auto constant = ctx->constant()) return getConstant(constant);
     if (const auto array = ctx->array()) return getArray(array);
+    if (const auto hashMap = ctx->hashMap()) return getHashMap(hashMap);
     if (const auto arrayIndex = ctx->arrayIndex()) return getArrayIndex(arrayIndex);
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (ctx->NULL_()) return new LgsNull();
@@ -456,6 +459,14 @@ LgsUnaryExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
     }
     array->setLocation(ctx->start);
     return array;
+}
+
+LgsUnaryExpr* AntlerConverter::getHashMap(LogosParser::HashMapContext* ctx) {
+    const auto hashMap = new LgsHashMap();
+    for (const auto keyValue : ctx->keyValue()) {
+        hashMap->initialElements[getExpr(keyValue->key)] = getExpr(keyValue->value);
+    }
+    return hashMap;
 }
 
 LgsVariable* AntlerConverter::getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) const {
@@ -625,11 +636,12 @@ LgsTypeConst* AntlerConverter::getTypeConstant(antlr4::tree::TerminalNode* type,
 LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) const {
     if (!ctx) return nullptr;
     LgsType* result = nullptr;
-    const auto type = getTypeFromText(ctx->TYPE(), ctx);
-    if (ctx->LBRACK().size() > 0) {
+    if (ctx->key && ctx->value) {
+        result = new LgsMap(getType(ctx->key), getType(ctx->value));
+    } else if (ctx->LBRACK().size() > 0) {
         result = getArrayType(ctx);
     } else {
-        result = type;
+        result = getTypeFromText(ctx->TYPE(), ctx);
         if (ctx->QUEST_MARK()) {
             result->nullable = true;
         }
@@ -640,7 +652,7 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) const {
 
 LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) const {
     const auto underlyingType = getTypeFromText(ctx->TYPE(), ctx);
-    const auto arrType = new LgsArrayType(underlyingType);
+    const auto arrType = new LgsArray(underlyingType);
     if (ctx->INTEGER().size() > 0) {
         for (const auto& integer : ctx->INTEGER()) {
             arrType->sizes.emplace_back(std::stoi(integer->getText()));

@@ -3,11 +3,11 @@
 
 #include "LgsUnaryExpr.h"
 #include "exprs/LgsExpr.h"
-#include "types/LgsArrayType.h"
+#include "types/LgsArray.h"
 
 class LgsDArray final : public LgsUnaryExpr {
 public:
-    LgsArrayType arrType;
+    LgsArray arrType;
     vector<LgsExpr*> initialElements;
 
     explicit LgsDArray(LgsType* underlyingType, const vector<LgsExpr*>& initialElements = {}) : initialElements(initialElements) {

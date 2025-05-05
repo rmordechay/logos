@@ -175,7 +175,7 @@ unaryExpr:
     |   constructor
     |   constant
     |   array
-    |   map
+    |   hashMap
     |   arrayIndex
     |   selection
     ;
@@ -184,8 +184,12 @@ array:
         LBRACK (expr (COMMA expr)* COMMA?)? RBRACK
     ;
 
-map:
-        LBRACE (expr COLON expr COMMA?)* RBRACE
+hashMap:
+        LBRACE (keyValue (COMMA keyValue)* COMMA?)? RBRACE
+    ;
+
+keyValue:
+        key=expr COLON value=expr
     ;
 
 funcCall:
@@ -257,7 +261,7 @@ type:
         SELF_CLASS
    |    TYPE QUEST_MARK?
    |    TYPE (LBRACK INTEGER? RBRACK)+
-   |    LBRACE type COLON type RBRACE
+   |    LBRACE key=type COLON value=type RBRACE
    ;
 
 vector:

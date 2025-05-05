@@ -24,6 +24,7 @@ Type* const i16Ty = Type::getInt16Ty(context);
 Type* const i32Ty = Type::getInt32Ty(context);
 Type* const i64Ty = Type::getInt64Ty(context);
 Type* const voidTy = Type::getVoidTy(context);
+Type* const nullPtrTy = PointerType::get(i8Ty, 0);
 Value* const i32Zero = ConstantInt::get(i32Ty, 0);
 
 struct CodeGenMetadata {

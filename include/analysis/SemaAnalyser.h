@@ -62,6 +62,7 @@ public:
     void visitCast(LgsCast* castExpr);
     void visitDArray(LgsDArray* array);
     void visitSArray(LgsSArray* array);
+    void visitHashMap(LgsHashMap* hashMap);
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);

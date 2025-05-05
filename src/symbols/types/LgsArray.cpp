@@ -1,17 +1,17 @@
-#include "types/LgsArrayType.h"
+#include "types/LgsArray.h"
 #include "exprs/unary/LgsDArray.h"
 #include "exprs/unary/LgsSArray.h"
 
-LgsExpr* LgsArrayType::getZeroValue() {
+LgsExpr* LgsArray::getZeroValue() {
     if (isStatic) return new LgsSArray(underlyingType, sizes);
     return new LgsDArray(underlyingType);
 }
 
-const string LgsArrayType::getName() const {
+const string LgsArray::getName() const {
     return name;
 }
 
-bool LgsArrayType::equals(LgsType* other) const {
+bool LgsArray::equals(LgsType* other) const {
     if (isStatic) {
         if (const auto otherSArrType = other->asSArrayType()) {
             return getDims() == otherSArrType->getDims();
@@ -21,6 +21,6 @@ bool LgsArrayType::equals(LgsType* other) const {
     assert(false);
 }
 
-LgsType* LgsArrayType::inferBinaryType(LgsType* other) {
+LgsType* LgsArray::inferBinaryType(LgsType* other) {
     assert(false);
 }

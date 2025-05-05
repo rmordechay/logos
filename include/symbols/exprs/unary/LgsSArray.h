@@ -1,11 +1,11 @@
 #ifndef LGSSARRAY_H
 #define LGSSARRAY_H
 #include "LgsUnaryExpr.h"
-#include "types/LgsArrayType.h"
+#include "types/LgsArray.h"
 
 class LgsSArray final : public LgsUnaryExpr {
 public:
-    LgsArrayType arrType;
+    LgsArray arrType;
     vector<LgsExpr*> initialElements;
 
     explicit LgsSArray(LgsType* underlyingType = nullptr, const vector<size_t>& sizes = {}) {
