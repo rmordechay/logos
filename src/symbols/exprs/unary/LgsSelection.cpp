@@ -25,14 +25,19 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
         const auto childExpr = exprs[i + 1];
         const auto field = parentExpr->type->getField(childExpr->getName());
         if (field) {
-            const auto parentIRValue = parentExpr->getIRValue(metadata);
-            const auto value = field->getGEP(metadata, parentIRValue);
-            const auto valueLoad = metadata->builder.CreateLoad(field->type->getIRType(), value);
-            childExpr->setIRValue(valueLoad);
-            continue;
-        }
-
-        if (const auto methodCall = childExpr->asFuncCall()) {
+            if (const auto arrIndex = parentExpr->asArrayIndex()) {
+                const auto gep = arrIndex->getGEP(metadata);
+                auto valueLoad = metadata->builder.CreateLoad(ptrTy, gep);
+                const auto value = field->getGEP(metadata, valueLoad);
+                valueLoad = metadata->builder.CreateLoad(field->type->getIRType(), value);
+                childExpr->setIRValue(valueLoad);
+            } else {
+                const auto parentIRValue = parentExpr->getIRValue(metadata);
+                const auto value = field->getGEP(metadata, parentIRValue);
+                const auto valueLoad = metadata->builder.CreateLoad(field->type->getIRType(), value);
+                childExpr->setIRValue(valueLoad);
+            }
+        } else if (const auto methodCall = childExpr->asFuncCall()) {
             methodCall->initIRValue(metadata);
         }
     }

@@ -3,7 +3,6 @@
 #include "exprs/unary/LgsInstance.h"
 
 Value* LgsField::getGEP(CodeGenMetadata* metadata, Value* instance) {
-    if (IRValue) return IRValue;
     assert(instance);
     IRValue = metadata->builder.CreateStructGEP(parent->getIRType(), instance, position);
     return IRValue;

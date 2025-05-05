@@ -378,6 +378,8 @@ void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
         visitFuncCall(funcCall);
     } else if (const auto typeConst = dynamic_cast<LgsTypeConst*>(firstExpr)) {
         typeConst->type = resolveType(typeConst->type, &errHandler);
+    } else if (const auto arrIndex = dynamic_cast<LgsArrayIndex*>(firstExpr)) {
+        visitArrayIndex(arrIndex);
     } else {
         assert(false);
     }
