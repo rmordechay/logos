@@ -17,7 +17,7 @@ public:
     explicit LgsObject() : name(LOGOS_PARENT_OBJ), path("") {}
     explicit LgsObject(const string& name) : name(name), path("") {}
     explicit LgsObject(const string& name, const string& path) : name(name), path(path) {}
-    const string getName() const override;
+    const string getPrettyName() const override;
     Type* getIRType() override;
     json asJSON() const override;
     LgsExpr* getZeroValue() override;

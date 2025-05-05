@@ -22,7 +22,7 @@ Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
     case ENUM_FIELD:
         return ref->enumField->getGEP(metadata);
     case FUNC:
-        return ref->func[0]->getFuncType()->getIRFunc(metadata);
+        return ref->func[0]->getIRFunc(metadata);
     default:
         assert(false);
     }
@@ -109,7 +109,7 @@ json LgsVariable::asJSON() {
     json tree;
     tree["name"] = name;
     tree["exprType"] = "VARIABLE";
-    tree["type"] = type->getName();
+    tree["type"] = type->getPrettyName();
     return tree;
 }
 

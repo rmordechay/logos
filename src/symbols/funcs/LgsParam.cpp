@@ -4,7 +4,7 @@
 #include "types/LgsFuncType.h"
 
 string LgsParam::format(string& indentStr) {
-    return name + ": " + type->getName();
+    return name + ": " + type->getPrettyName();
 }
 
 json LgsParam::asJSON() {

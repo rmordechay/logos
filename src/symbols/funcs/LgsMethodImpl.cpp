@@ -17,6 +17,33 @@ bool LgsMethodImpl::equals(const LgsFuncCall* other) {
     return true;
 }
 
+FunctionType* LgsMethodImpl::getIRFuncType(const CodeGenMetadata* metadata) {
+    vector<Type*> IRParamsTypes;
+    IRParamsTypes.emplace_back(ptrTy);
+    for (int i = 1; i < methodType.params.size(); ++i) {
+        auto paramIRType = methodType.params[i]->type->getIRType();
+        IRParamsTypes.emplace_back(paramIRType);
+    }
+    if (const auto obj = methodType.rt->asObject()) {
+        IRParamsTypes.insert(IRParamsTypes.begin(), obj->getIRType()->getPointerTo());
+        IRFuncType = FunctionType::get(voidTy, IRParamsTypes, false);
+    } else {
+        IRFuncType = FunctionType::get(methodType.rt->getIRType(), IRParamsTypes, false);
+    }
+    return IRFuncType;
+}
+
+void LgsMethodImpl::setIRFuncParams(Argument* args) {
+    for (int i = 0; i < methodType.params.size(); ++i) {
+        const auto param = methodType.params[i];
+        param->setIRValue(args);
+        if (param->expr) param->expr->setIRValue(args);
+        auto paramName = param->name;
+        if (paramName != "") args->setName(paramName);
+        args++;
+    }
+}
+
 LgsFuncType* LgsMethodImpl::getFuncType() {
     return &methodType;
 }

@@ -23,12 +23,12 @@ json LgsEnum::asJSON() const {
     return tree;
 }
 
-const string LgsEnum::getName() const {
+const string LgsEnum::getPrettyName() const {
     return name;
 }
 
 bool LgsEnum::equals(LgsType* other) const {
-    return name == other->getName();
+    return name == other->getPrettyName();
 }
 
 LgsType* LgsEnum::inferBinaryType(LgsType* other) {

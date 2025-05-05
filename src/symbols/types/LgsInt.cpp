@@ -3,7 +3,7 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 
-const string LgsInt::getName() const {
+const string LgsInt::getPrettyName() const {
     return name;
 }
 
@@ -22,5 +22,5 @@ LgsType* LgsInt::inferBinaryType(LgsType* other) {
 
 bool LgsInt::equals(LgsType* other) const {
     assert(other);
-    return name == other->getName();
+    return name == other->getPrettyName();
 }

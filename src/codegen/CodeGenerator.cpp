@@ -29,7 +29,7 @@ void CodeGenerator::generate(LgsMainFile* mainFile, const bool writeToFile) {
 }
 
 void CodeGenerator::generateObjModule(const LgsType* obj, const bool writeToFile) {
-    const auto objName = obj->getName();
+    const auto objName = obj->getPrettyName();
     if (IRModules.find(objName) != IRModules.end()) return;
     auto metadata = CodeGenMetadata{.module = createEmptyModule(objName)};
     for (const auto& overload : obj->getAllMethods()) {

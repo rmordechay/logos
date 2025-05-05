@@ -8,12 +8,13 @@ LgsExpr* LgsAny::getZeroValue() {
     assert(false);
 }
 
-const string LgsAny::getName() const {
+const string LgsAny::getPrettyName() const {
     return name;
 }
 
 bool LgsAny::equals(LgsType* other) const {
-    assert(false);
+    // TODO should everything equals Any?
+    return true;
 }
 
 LgsType* LgsAny::inferBinaryType(LgsType* other) {

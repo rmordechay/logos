@@ -2,7 +2,7 @@
 #include "funcs/LgsMethodImpl.h"
 #include "types/LgsObject.h"
 
-const string LgsInterface::getName() const {
+const string LgsInterface::getPrettyName() const {
     return name;
 }
 
@@ -28,7 +28,7 @@ LgsExpr* LgsInterface::getZeroValue() {
 bool LgsInterface::equals(LgsType* other) const {
     if (const auto obj = other->asObject()) {
         for (const auto& implement : obj->implements) {
-            if (implement->getName() == name) return true;
+            if (implement->getPrettyName() == name) return true;
         }
     }
     return false;

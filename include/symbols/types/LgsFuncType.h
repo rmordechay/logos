@@ -16,17 +16,12 @@ public:
 
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;
-    const string getName() const override;
+    const string getPrettyName() const override;
     bool equals(LgsType* other) const override;
-    bool equals(const LgsFuncCall* other) const;
     LgsType* inferBinaryType(LgsType* other) override;
+    bool equals(const LgsFuncCall* other) const;
     string getAsStr(bool withType = false) const;
-    void setStructRet(Function::arg_iterator& args, LgsObject* obj) const;
-
     virtual string getIRName();
-    virtual Function* getIRFunc(const CodeGenMetadata* metadata);
-    virtual FunctionType* getIRFuncType(const CodeGenMetadata* metadata);
-    virtual void setIRFuncParams(Argument* IRParams);
     static string getComposedName(const string& name, const string& parentName, const vector<string>& argTypeNames);
     ~LgsFuncType() override;
 };

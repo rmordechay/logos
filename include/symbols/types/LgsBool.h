@@ -8,7 +8,7 @@ public:
     static constexpr auto name = "Bool";
     string trueLiteral = "true";
 
-    const string getName() const override;
+    const string getPrettyName() const override;
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;

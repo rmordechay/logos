@@ -9,7 +9,7 @@ public:
     string name;
 
     explicit LgsInterface(const string& name) : name(name) {}
-    const string getName() const override;
+    const string getPrettyName() const override;
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) const override;

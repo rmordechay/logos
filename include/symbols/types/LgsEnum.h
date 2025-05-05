@@ -13,7 +13,7 @@ public:
     explicit LgsEnum(const string& name) : name(name) {}
     Type* getIRType() override;
     json asJSON() const override;
-    const string getName() const override;
+    const string getPrettyName() const override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;

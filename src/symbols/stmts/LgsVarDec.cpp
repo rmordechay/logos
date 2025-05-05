@@ -21,7 +21,7 @@ void LgsVarDec::createIRStmt(CodeGenMetadata* metadata) {
 json LgsVarDec::asJSON() {
     json tree;
     tree["name"] = name;
-    tree["type"] = type->getName();
+    tree["type"] = type->getPrettyName();
     tree["stmtType"] = "VAR_DEC";
     return tree;
 }

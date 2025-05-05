@@ -38,7 +38,7 @@ public:
     virtual bool equals(const LgsType& other);
     virtual Type* getIRType() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual const string getName() const = 0;
+    virtual const string getPrettyName() const = 0;
     virtual bool equals(LgsType* other) const = 0;
     virtual bool isIterable();
     virtual LgsType* inferBinaryType(LgsType* other) = 0;
@@ -61,7 +61,7 @@ public:
 
     LgsUnknownType() = default;
     explicit LgsUnknownType(const string& name) : name(name) {}
-    const string getName() const override { return name == "" ? typeName : name; }
+    const string getPrettyName() const override { return name == "" ? typeName : name; }
     LgsExpr* getZeroValue() override { assert(false && "unknown type should not be called"); }
     bool equals(LgsType* other) const override { assert(false && "unknown type should not be called"); }
     LgsType* inferBinaryType(LgsType* other) override { assert(false && "unknown type should not be called"); }

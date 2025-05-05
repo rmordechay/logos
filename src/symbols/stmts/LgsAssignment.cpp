@@ -1,9 +1,6 @@
 #include "stmts/LgsAssignment.h"
-
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsSelection.h"
-#include "exprs/unary/LgsVariable.h"
-#include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include <LgsStack.h>
 

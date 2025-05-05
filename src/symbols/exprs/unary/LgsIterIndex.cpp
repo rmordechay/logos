@@ -1,5 +1,7 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
+#include "types/LgsMap.h"
+
 #include <exprs/unary/LgsDArray.h>
 
 Value* LgsIterIndex::createIRValue(CodeGenMetadata* metadata) {
@@ -21,7 +23,7 @@ Value* LgsIterIndex::getGEP(CodeGenMetadata* metadata) const {
 
 void LgsIterIndex::assignIRValue(CodeGenMetadata* metadata, LgsExpr* expr) const {
     if (const auto lgsMap = baseExpr->type->asMap()) {
-        assert(false);
+        lgsMap->insertFunc.call(metadata, {expr});
     } else if (baseExpr->type->asArray()) {
         const auto gep = getGEP(metadata);
         const auto rValue = expr->getIRValue(metadata);
@@ -37,7 +39,7 @@ string LgsIterIndex::getNameWithTypes() {
     stringstream str;
     str << getName();
     for (const auto index : indices) {
-        str << '[' << index->from->type->getName() << ']';
+        str << '[' << index->from->type->getPrettyName() << ']';
     }
     return str.str();
 }

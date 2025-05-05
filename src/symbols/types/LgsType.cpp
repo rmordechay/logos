@@ -9,7 +9,7 @@
 #include "types/LgsMap.h"
 
 bool LgsType::equals(const LgsType& other) {
-    return getName() == other.getName();
+    return getPrettyName() == other.getPrettyName();
 }
 
 bool LgsType::isVoid() {

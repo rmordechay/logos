@@ -8,7 +8,7 @@ class LgsVoid final : public LgsType {
 public:
     static constexpr auto name = "Void";
 
-    const string getName() const override;
+    const string getPrettyName() const override;
     bool isVoid() override;
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;

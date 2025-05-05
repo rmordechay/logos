@@ -5,7 +5,7 @@ LgsExpr* LgsArray::getZeroValue() {
     return new LgsDArray(underlyingType);
 }
 
-const string LgsArray::getName() const {
+const string LgsArray::getPrettyName() const {
     return name;
 }
 

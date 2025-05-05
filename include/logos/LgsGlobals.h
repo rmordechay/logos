@@ -55,9 +55,7 @@ struct LgsGlobals {
             case OBJECT: delete symbol.object; break;
             case INTERFACE: delete symbol.interface; break;
             case FUNC: {
-                for (const auto& overload : symbol.func) {
-                    delete overload;
-                }
+                // TODO free global funcs that are not builtin
                 break;
             }
             case ENUM: delete symbol.lgsEnum; break;

@@ -13,8 +13,8 @@ LgsExpr* LgsMap::getZeroValue() {
     return hashMap;
 }
 
-const string LgsMap::getName() const {
-    return name  + underlyingType.getName();
+const string LgsMap::getPrettyName() const {
+    return name  + underlyingType.getPrettyName();
 }
 
 bool LgsMap::equals(LgsType* other) const {
