@@ -18,7 +18,6 @@ struct LgsStackFrame {
 
 class LgsStack : stack<LgsStackFrame> {
 public:
-    std::mutex mtx;
     LgsFunc* currentFunc = nullptr;
     LgsLoop* currentLoop = nullptr;
 

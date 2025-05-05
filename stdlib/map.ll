@@ -1,9 +1,13 @@
+; ModuleID = 'main.c'
+source_filename = "main.c"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target triple = "arm64-apple-macosx15.0.0"
+
 %struct.stbds_array_header = type { i64, i64, ptr, i64 }
 %struct.stbds_hash_index = type { ptr, i64, i64, i64, i64, i64, i64, i64, i64, %struct.stbds_string_arena, ptr }
 %struct.stbds_string_arena = type { ptr, i64, i8, i8 }
 %struct.stbds_string_block = type { ptr, [8 x i8] }
 %struct.stbds_hash_bucket = type { [8 x i64], [8 x i64] }
-%struct.Map = type { ptr, ptr }
 
 @stbds_hash_seed = internal global i64 826366246, align 8
 
@@ -3385,185 +3389,6 @@ define ptr @stbds_hmdel_key(ptr noundef %0, i64 noundef %1, ptr noundef %2, i64 
 declare ptr @__memmove_chk(ptr noundef, ptr noundef, i64 noundef, i64 noundef) #4
 
 declare i64 @strlen(ptr noundef) #3
-
-; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define void @Map_insert(ptr noundef %0, ptr noundef %1, ptr noundef %2) #0 {
-  %4 = alloca ptr, align 8
-  %5 = alloca ptr, align 8
-  %6 = alloca ptr, align 8
-  %7 = alloca [1 x ptr], align 8
-  store ptr %0, ptr %4, align 8
-  store ptr %1, ptr %5, align 8
-  store ptr %2, ptr %6, align 8
-  %8 = load ptr, ptr %4, align 8
-  %9 = load ptr, ptr %8, align 8
-  %10 = getelementptr inbounds [1 x ptr], ptr %7, i64 0, i64 0
-  %11 = load ptr, ptr %5, align 8
-  store ptr %11, ptr %10, align 8
-  %12 = getelementptr inbounds [1 x ptr], ptr %7, i64 0, i64 0
-  %13 = call ptr @stbds_hmput_key(ptr noundef %9, i64 noundef 16, ptr noundef %12, i64 noundef 8, i32 noundef 0)
-  %14 = load ptr, ptr %4, align 8
-  store ptr %13, ptr %14, align 8
-  %15 = load ptr, ptr %5, align 8
-  %16 = load ptr, ptr %4, align 8
-  %17 = load ptr, ptr %16, align 8
-  %18 = load ptr, ptr %4, align 8
-  %19 = load ptr, ptr %18, align 8
-  %20 = getelementptr inbounds %struct.Map, ptr %19, i64 -1
-  %21 = getelementptr inbounds %struct.stbds_array_header, ptr %20, i64 -1
-  %22 = getelementptr inbounds %struct.stbds_array_header, ptr %21, i32 0, i32 3
-  %23 = load i64, ptr %22, align 8
-  %24 = getelementptr inbounds %struct.Map, ptr %17, i64 %23
-  %25 = getelementptr inbounds %struct.Map, ptr %24, i32 0, i32 0
-  store ptr %15, ptr %25, align 8
-  %26 = load ptr, ptr %6, align 8
-  %27 = load ptr, ptr %4, align 8
-  %28 = load ptr, ptr %27, align 8
-  %29 = load ptr, ptr %4, align 8
-  %30 = load ptr, ptr %29, align 8
-  %31 = getelementptr inbounds %struct.Map, ptr %30, i64 -1
-  %32 = getelementptr inbounds %struct.stbds_array_header, ptr %31, i64 -1
-  %33 = getelementptr inbounds %struct.stbds_array_header, ptr %32, i32 0, i32 3
-  %34 = load i64, ptr %33, align 8
-  %35 = getelementptr inbounds %struct.Map, ptr %28, i64 %34
-  %36 = getelementptr inbounds %struct.Map, ptr %35, i32 0, i32 1
-  store ptr %26, ptr %36, align 8
-  ret void
-}
-
-; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define ptr @Map_get(ptr noundef %0, ptr noundef %1) #0 {
-  %3 = alloca ptr, align 8
-  %4 = alloca ptr, align 8
-  %5 = alloca [1 x ptr], align 8
-  store ptr %0, ptr %3, align 8
-  store ptr %1, ptr %4, align 8
-  %6 = load ptr, ptr %3, align 8
-  %7 = load ptr, ptr %6, align 8
-  %8 = getelementptr inbounds [1 x ptr], ptr %5, i64 0, i64 0
-  %9 = load ptr, ptr %4, align 8
-  store ptr %9, ptr %8, align 8
-  %10 = getelementptr inbounds [1 x ptr], ptr %5, i64 0, i64 0
-  %11 = call ptr @stbds_hmget_key(ptr noundef %7, i64 noundef 16, ptr noundef %10, i64 noundef 8, i32 noundef 0)
-  %12 = load ptr, ptr %3, align 8
-  store ptr %11, ptr %12, align 8
-  %13 = load ptr, ptr %3, align 8
-  %14 = load ptr, ptr %13, align 8
-  %15 = getelementptr inbounds %struct.Map, ptr %14, i64 -1
-  %16 = getelementptr inbounds %struct.stbds_array_header, ptr %15, i64 -1
-  %17 = getelementptr inbounds %struct.stbds_array_header, ptr %16, i32 0, i32 3
-  %18 = load i64, ptr %17, align 8
-  %19 = load ptr, ptr %3, align 8
-  %20 = load ptr, ptr %19, align 8
-  %21 = load ptr, ptr %3, align 8
-  %22 = load ptr, ptr %21, align 8
-  %23 = getelementptr inbounds %struct.Map, ptr %22, i64 -1
-  %24 = getelementptr inbounds %struct.stbds_array_header, ptr %23, i64 -1
-  %25 = getelementptr inbounds %struct.stbds_array_header, ptr %24, i32 0, i32 3
-  %26 = load i64, ptr %25, align 8
-  %27 = getelementptr inbounds %struct.Map, ptr %20, i64 %26
-  %28 = getelementptr inbounds %struct.Map, ptr %27, i32 0, i32 1
-  %29 = load ptr, ptr %28, align 8
-  ret ptr %29
-}
-
-; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define i32 @Map_del(ptr noundef %0, ptr noundef %1) #0 {
-  %3 = alloca ptr, align 8
-  %4 = alloca ptr, align 8
-  %5 = alloca [1 x ptr], align 8
-  store ptr %0, ptr %3, align 8
-  store ptr %1, ptr %4, align 8
-  %6 = load ptr, ptr %3, align 8
-  %7 = load ptr, ptr %6, align 8
-  %8 = getelementptr inbounds [1 x ptr], ptr %5, i64 0, i64 0
-  %9 = load ptr, ptr %4, align 8
-  store ptr %9, ptr %8, align 8
-  %10 = getelementptr inbounds [1 x ptr], ptr %5, i64 0, i64 0
-  %11 = load ptr, ptr %3, align 8
-  %12 = load ptr, ptr %11, align 8
-  %13 = getelementptr inbounds %struct.Map, ptr %12, i32 0, i32 0
-  %14 = load ptr, ptr %3, align 8
-  %15 = load ptr, ptr %14, align 8
-  %16 = ptrtoint ptr %13 to i64
-  %17 = ptrtoint ptr %15 to i64
-  %18 = sub i64 %16, %17
-  %19 = call ptr @stbds_hmdel_key(ptr noundef %7, i64 noundef 16, ptr noundef %10, i64 noundef 8, i64 noundef %18, i32 noundef 0)
-  %20 = load ptr, ptr %3, align 8
-  store ptr %19, ptr %20, align 8
-  %21 = load ptr, ptr %3, align 8
-  %22 = load ptr, ptr %21, align 8
-  %23 = icmp ne ptr %22, null
-  br i1 %23, label %24, label %31
-
-24:                                               ; preds = %2
-  %25 = load ptr, ptr %3, align 8
-  %26 = load ptr, ptr %25, align 8
-  %27 = getelementptr inbounds %struct.Map, ptr %26, i64 -1
-  %28 = getelementptr inbounds %struct.stbds_array_header, ptr %27, i64 -1
-  %29 = getelementptr inbounds %struct.stbds_array_header, ptr %28, i32 0, i32 3
-  %30 = load i64, ptr %29, align 8
-  br label %32
-
-31:                                               ; preds = %2
-  br label %32
-
-32:                                               ; preds = %31, %24
-  %33 = phi i64 [ %30, %24 ], [ 0, %31 ]
-  %34 = trunc i64 %33 to i32
-  ret i32 %34
-}
-
-; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define i32 @Map_len(ptr noundef %0) #0 {
-  %2 = alloca ptr, align 8
-  store ptr %0, ptr %2, align 8
-  %3 = load ptr, ptr %2, align 8
-  %4 = load ptr, ptr %3, align 8
-  %5 = icmp ne ptr %4, null
-  br i1 %5, label %6, label %14
-
-6:                                                ; preds = %1
-  %7 = load ptr, ptr %2, align 8
-  %8 = load ptr, ptr %7, align 8
-  %9 = getelementptr inbounds %struct.Map, ptr %8, i64 -1
-  %10 = getelementptr inbounds %struct.stbds_array_header, ptr %9, i64 -1
-  %11 = getelementptr inbounds %struct.stbds_array_header, ptr %10, i32 0, i32 0
-  %12 = load i64, ptr %11, align 8
-  %13 = sub nsw i64 %12, 1
-  br label %15
-
-14:                                               ; preds = %1
-  br label %15
-
-15:                                               ; preds = %14, %6
-  %16 = phi i64 [ %13, %6 ], [ 0, %14 ]
-  %17 = trunc i64 %16 to i32
-  ret i32 %17
-}
-
-; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define void @Map_free(ptr noundef %0) #0 {
-  %2 = alloca ptr, align 8
-  store ptr %0, ptr %2, align 8
-  %3 = load ptr, ptr %2, align 8
-  %4 = icmp ne ptr %3, null
-  br i1 %4, label %5, label %8
-
-5:                                                ; preds = %1
-  %6 = load ptr, ptr %2, align 8
-  %7 = getelementptr inbounds ptr, ptr %6, i64 -1
-  call void @stbds_hmfree_func(ptr noundef %7, i64 noundef 8)
-  br label %9
-
-8:                                                ; preds = %1
-  br label %9
-
-9:                                                ; preds = %8, %5
-  %10 = phi i32 [ 0, %5 ], [ 0, %8 ]
-  store ptr null, ptr %2, align 8
-  ret void
-}
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
 define internal i64 @stbds_log2(i64 noundef %0) #0 {

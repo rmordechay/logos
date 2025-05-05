@@ -1,13 +1,14 @@
 #ifndef LOGOSMETADATA_H
 #define LOGOSMETADATA_H
 #include <json/json.hpp>
-
+#include <lld/Common/Driver.h>
 
 class CodeGenerator;
 class LgsStack;
 
 using namespace std;
 using namespace nlohmann;
+using namespace llvm;
 
 #define LOGOS_FILE_EXTENSION ".lgs"
 #define LOGOS_SRC_DIR "src"
@@ -18,64 +19,27 @@ using namespace nlohmann;
 #define LOGOS_MAIN_FUNC "main"
 #define LOGOS_SELF "self"
 #define LOGOS_PARENT_OBJ "Object"
-
 #define OBJECT_FILE "output.o"
 #define EXECUTABLE_FILE "output"
 
-#if defined(_WIN32)
-    #define OS_NAME "Windows"
-    #define DEFAULT_LINKER "lld-link.exe"
-    #define LIB_ROOT "C:/Program Files (x86)/Microsoft SDKs"
-    #define ENTRY_POINT "main"
-    #define PLATFORM_VERSION "10.0"  // Example Windows version
-#elif defined(__linux__)
-    #define OS_NAME "Linux"
-    #define DEFAULT_LINKER "ld"
-    #define LIB_ROOT "/usr/lib/aarch64-linux-gnu"
-    #define ENTRY_POINT "main"
-    #define PLATFORM_VERSION "5.15"
-    #define LINKER_OPTIONS \
-    { \
-        DEFAULT_LINKER, \
-        paths->objFilePath.c_str(), \
-        "-o", paths->execFilePath.c_str(), \
-        "-L", LIB_ROOT, \
-        "-lc", \
-        "-e", ENTRY_POINT, \
-    }
-    #define LINK_FUNC lld::elf::link(LINKER_OPTIONS, outs(), errs(), false, false)
+#if defined(__linux__)
+LLD_HAS_DRIVER(elf);
 #elif defined(__APPLE__) && defined(__MACH__)
-    #define OS_NAME "macos"
-    #define DEFAULT_LINKER "ld.lld"
-    #define LIB_ROOT "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
-    #define ENTRY_POINT "_main"
-    #define PLATFORM_VERSION "15.0"
-    #define LINKER_OPTIONS \
-    { \
-        DEFAULT_LINKER, \
-        paths->objFilePath.c_str(), \
-        "-o", paths->execFilePath.c_str(), \
-        "-lSystem", \
-        "-syslibroot", LIB_ROOT, \
-        "-e", ENTRY_POINT, \
-        "-platform_version", OS_NAME, PLATFORM_VERSION, PLATFORM_VERSION, \
-        "-arch", ARCH_NAME, \
-    }
-    #define LINK_FUNC lld::macho::link(LINKER_OPTIONS, outs(), errs(), false, false)
-
+LLD_HAS_DRIVER(macho);
+#elif defined(_WIN32)
+LLD_HAS_DRIVER(coff);
 #endif
 
 #if defined(__x86_64__) || defined(_M_X64)
-    #define ARCH_NAME "x86_64 (64-bit)"
+#define ARCH_NAME "x86_64 (64-bit)"
 #elif defined(__i386__) || defined(_M_IX86)
-    #define ARCH_NAME "x86 (32-bit)"
+#define ARCH_NAME "x86 (32-bit)"
 #elif defined(__aarch64__) || defined(_M_ARM64)
-    #define ARCH_NAME "arm64"
+#define ARCH_NAME "arm64"
 #elif defined(__arm__) || defined(_M_ARM)
-    #define ARCH_NAME "ARM (32-bit)"
+#define ARCH_NAME "ARM (32-bit)"
 #else
-    #define ARCH_NAME "Unknown Architecture"
+#define ARCH_NAME "Unknown Architecture"
 #endif
-
 
 #endif //LOGOSMETADATA_H

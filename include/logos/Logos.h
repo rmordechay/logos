@@ -26,7 +26,6 @@ inline LgsPaths paths;
 
 class Logos {
 public:
-    std::mutex mtx;
     LogosProject project;
     vector<LgsError> errors;
 
@@ -36,7 +35,6 @@ public:
 
     void run(char* argv[]);
     LgsMainFile* getMainFile(const vector<LgsFile*>& files) const;
-    bool analyse(const vector<LgsFile*>& files);
     void initPaths(const path& rootDirPath) const;
     ~Logos() = default;
 };

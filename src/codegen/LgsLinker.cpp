@@ -1,6 +1,7 @@
 #include "codegen/LgsLinker.h"
 #include "CodeGenMetadata.h"
 #include "Logos.h"
+#include "Platform.h"
 
 #include <CodeGenerator.h>
 #include <LgsData.h>
@@ -12,20 +13,17 @@
 #include <llvm/Support/FileSystem.h>
 #include "llvm/IR/Verifier.h"
 #include <iostream>
-#include "lld/Common/Driver.h"
 
-LLD_HAS_DRIVER(macho)
-LLD_HAS_DRIVER(elf)
-
-bool LgsLinker::link(const std::map<std::string, Module*>& modules) const {
-    Module* mainModule = modules.find(LOGOS_MAIN_FILE_NAME)->second;
+bool LgsLinker::link() const {
+    setPlatform(paths->objFilePath, paths->execFilePath);
+    Module* mainModule = IRModules.find(LOGOS_MAIN_FILE_NAME)->second;
     Linker linker(*mainModule);
 
-    for (const auto& path : stdlibPaths) {
+    for (const auto& path : STD_LIBS) {
         linkStdlib(path, &linker);
     }
-    
-    for (const auto& [name, module] : modules) {
+
+    for (const auto& [name, module] : IRModules) {
         if (name == LOGOS_MAIN_FILE_NAME) continue;
         linker.linkInModule(std::unique_ptr<Module>(module));
     }
@@ -40,13 +38,14 @@ bool LgsLinker::link(const std::map<std::string, Module*>& modules) const {
         std::cerr << ec.message() << endl;
         return false;
     }
+
     pass.run(*mainModule);
     outputStream.flush();
     return getLinkFunc();
 }
 
 bool LgsLinker::getLinkFunc() const {
-    if (!LINK_FUNC) {
+    if (!platform.link(platform.linkerOpts, outs(), errs(), false, false)) {
         errs() << "Linking failed.";
         return false;
     }

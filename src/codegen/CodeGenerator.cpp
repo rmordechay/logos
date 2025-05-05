@@ -30,7 +30,7 @@ void CodeGenerator::generate(LgsMainFile* mainFile, const bool writeToFile) {
 
 void CodeGenerator::generateObjModule(const LgsType* obj, const bool writeToFile) {
     const auto objName = obj->getName();
-    if (modules.find(objName) != modules.end()) return;
+    if (IRModules.find(objName) != IRModules.end()) return;
     auto metadata = CodeGenMetadata{.module = createEmptyModule(objName)};
     for (const auto& overload : obj->getAllMethods()) {
         overload->generateIRCode(&metadata);
@@ -45,7 +45,7 @@ Module* CodeGenerator::createEmptyModule(const string& objName) {
     const auto module = new Module(objName, context);
     module->setTargetTriple(targetTriple);
     module->setDataLayout(targetMachine->createDataLayout());
-    modules[objName] = module;
+    IRModules[objName] = module;
     return module;
 }
 

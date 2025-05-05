@@ -25,6 +25,8 @@ class LgsIfStmt;
 class LgsAssignment;
 class LgsLoop;
 
+inline std::mutex mtx;
+
 class SemaAnalyser final {
 public:
     LgsStack lgsStack;
@@ -34,6 +36,7 @@ public:
     explicit SemaAnalyser(LgsFile* file) : file(file) {
         errHandler.filePath = file->absPath;
     }
+    static void analyseFiles(const vector<LgsFile*>& files, vector<LgsError>& errors);
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);

@@ -3,6 +3,7 @@
 #include "LgsGlobals.h"
 #include "LgsInterfaceFile.h"
 #include "LgsObjectFile.h"
+#include "ThreadPool.h"
 #include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "stmts/LgsField.h"
@@ -32,6 +33,20 @@
 #include <loops/LgsRangeLoop.h>
 #include <stmts/LgsAssignment.h>
 #include <stmts/LgsIfStmt.h>
+
+void SemaAnalyser::analyseFiles(const vector<LgsFile*>& files, vector<LgsError>& errors) {
+    ThreadPool threadPool;
+    threadPool.start();
+    for (const auto& file : files) {
+        threadPool.runTask([=, &file, &errors] {
+            SemaAnalyser semaAnalyser(file);
+            semaAnalyser.analyse();
+            lock_guard lock(mtx);
+            errors.insert(errors.end(), semaAnalyser.errHandler.errors.begin(), semaAnalyser.errHandler.errors.end());
+        });
+    }
+    threadPool.wait();
+}
 
 void SemaAnalyser::analyse() {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {

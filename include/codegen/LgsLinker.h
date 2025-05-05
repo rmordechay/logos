@@ -1,29 +1,20 @@
 #ifndef LOGOSLINKER_H
 #define LOGOSLINKER_H
-#include <map>
 #include <llvm/IR/Module.h>
-#include <filesystem>
 #include <llvm/Linker/Linker.h>
 
 struct LgsPaths;
 using namespace llvm;
 using namespace std;
 
-// namespace lld::macho {
-//     extern bool link(ArrayRef<const char*> argsArr, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
-// }
-//
-// namespace lld::elf {
-//     extern bool link(ArrayRef<const char*> argsArr, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
-// }
+#define STD_LIBS {"../stdlib/lgslib.ll", "../stdlib/array.ll", "../stdlib/string.ll", "../stdlib/map.ll"}
 
 class LgsLinker {
 public:
     LgsPaths* paths;
-    const vector<const char *> stdlibPaths = {"../stdlib/lgslib.ll", "../stdlib/array.ll", "../stdlib/string.ll"};
 
     explicit LgsLinker(LgsPaths* paths) : paths(paths) {}
-    bool link(const map<string, Module*>& modules) const;
+    bool link() const;
     bool getLinkFunc() const;
     void linkStdlib(const string& path, Linker* linker) const;
     ~LgsLinker() = default;

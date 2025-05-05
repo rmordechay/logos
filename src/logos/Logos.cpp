@@ -12,32 +12,18 @@ void Logos::run(char* argv[]) {
     if (!project.loadProject()) exit(1);
 
     // Semantic analysis
-    if (!analyse(project.files)) exit(1);
+    SemaAnalyser::analyseFiles(project.files, errors);
+    if (!errors.empty()) exit(1);
 
     // Code generation
     CodeGenerator::generate(project.mainFile);
 
     // Linking
     const LgsLinker linker(&paths);
-    if (!linker.link(modules)) exit(1);
+    if (!linker.link()) exit(1);
 
     // Running
     execv(paths.execFilePath.c_str(), argv);
-}
-
-bool Logos::analyse(const vector<LgsFile*>& files) {
-    ThreadPool threadPool;
-    threadPool.start();
-    for (const auto& file : files) {
-        threadPool.runTask([=, &file] {
-            SemaAnalyser semaAnalyser(file);
-            semaAnalyser.analyse();
-            lock_guard lock(mtx);
-            errors.insert(errors.end(), semaAnalyser.errHandler.errors.begin(), semaAnalyser.errHandler.errors.end());
-        });
-    }
-    threadPool.wait();
-    return errors.empty();
 }
 
 void Logos::initPaths(const path& rootDirPath) const {

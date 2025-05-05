@@ -13,7 +13,7 @@ using namespace nlohmann;
 
 inline LLVMContext context;
 inline LgsActiveEnv activeEnv;
-inline map<string, Module*> modules;
+inline map<string, Module*> IRModules;
 inline TargetMachine* targetMachine = nullptr;
 inline string targetTriple = sys::getDefaultTargetTriple();
 

@@ -11,7 +11,6 @@ struct Location;
 
 class LgsErrorHandler {
 public:
-    mutex mtx;
     bool successful = true;
     vector<LgsError> errors;
     vector<LgsWarning> warnings;

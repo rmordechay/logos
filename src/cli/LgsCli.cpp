@@ -27,7 +27,7 @@ void LgsCli::printVersion() {
     ostringstream txt;
     txt << "Logos version: " + string(LOGOS_VERSION) << endl;
     txt << "Architecture: " + string(ARCH_NAME) << endl;
-    txt << "Operation System: " + string(OS_NAME) << endl;
+    txt << "Operation System: " + string("macOS") << endl;
     cout << txt.str();
 
 }
