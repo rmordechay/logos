@@ -7,9 +7,10 @@
 #include "types/LgsObject.h"
 #include "types/LgsArray.h"
 #include "types/LgsMap.h"
+#include "types/LgsUnknownType.h"
 
-bool LgsType::equals(const LgsType& other) {
-    return getPrettyName() == other.getPrettyName();
+bool LgsType::equals(LgsType& other) {
+    return getIRName() == other.getIRName();
 }
 
 bool LgsType::isVoid() {
@@ -99,8 +100,4 @@ LgsInt* LgsType::asInt() {
 
 LgsMap* LgsType::asMap() {
     return dynamic_cast<LgsMap*>(this);
-}
-
-Type* LgsUnknownType::getIRType() {
-    assert(false);
 }

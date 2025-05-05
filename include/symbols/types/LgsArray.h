@@ -9,8 +9,9 @@ public:
 
     explicit LgsArray(LgsType* underlyingType = nullptr): LgsIterable(underlyingType) {}
     Type* getIRType() override;
+    string getIRName() override;
     LgsExpr* getZeroValue() override;
-    const string getPrettyName() const override;
+    string prettyName() const override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool isIndexable(LgsType* indexType) override;

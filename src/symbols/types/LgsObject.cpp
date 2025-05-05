@@ -5,7 +5,7 @@
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 
-const string LgsObject::getPrettyName() const {
+string LgsObject::prettyName() const {
     return name;
 }
 
@@ -45,7 +45,7 @@ LgsType* LgsObject::inferBinaryType(LgsType* other) {
 bool LgsObject::equals(LgsType* other) const {
     // TODO make Object object
     if (name == "Object") return true;
-    return name == other->getPrettyName();
+    return name == other->getIRName();
 }
 
 json LgsObject::asJSON() const {
@@ -66,4 +66,8 @@ LgsObject* LgsObject::clone() {
     }
     newObj->methods = methods;
     return newObj;
+}
+
+string LgsObject::getIRName() {
+    return name;
 }

@@ -5,7 +5,7 @@ LgsExpr* LgsArray::getZeroValue() {
     return new LgsDArray(underlyingType);
 }
 
-const string LgsArray::getPrettyName() const {
+string LgsArray::prettyName() const {
     return name;
 }
 
@@ -24,6 +24,10 @@ Type* LgsArray::getIRType() {
         IRType = ArrayType::get(IRType, *size);
     }
     return IRType;
+}
+
+string LgsArray::getIRName() {
+    assert(false);
 }
 
 LgsType* LgsArray::inferBinaryType(LgsType* other) {

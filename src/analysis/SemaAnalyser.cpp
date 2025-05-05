@@ -26,6 +26,7 @@
 #include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsPatternMatch.h"
 #include "types/LgsArray.h"
+#include "types/LgsUnknownType.h"
 #include "types/LgsVoid.h"
 
 #include <loops/LgsForeachLoop.h>
@@ -206,7 +207,7 @@ void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
         visitExpr(patternExpr);
         if (!patternExpr->type) continue;
         if (!patternExpr->type->equals(baseExprType)) {
-            return errHandler.handleError(E10014, &patternExpr->location, {patternExpr->type->getPrettyName(), baseExprType->getPrettyName()});
+            return errHandler.handleError(E10014, &patternExpr->location, {patternExpr->type->prettyName(), baseExprType->prettyName()});
         }
     }
     for (const auto& patternsStmtBlock : patternMatching->patternsStmtBlocks) {
@@ -262,14 +263,14 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
         if (returnStmt->expr) {
             const auto exprType = returnStmt->expr->type;
             if (!exprType->isVoid()) {
-                errHandler.handleError(E10027, &returnStmt->location, {funcSignature->name, rt->getPrettyName(), exprType->getPrettyName()});
+                errHandler.handleError(E10027, &returnStmt->location, {funcSignature->name, rt->prettyName(), exprType->prettyName()});
                 return;
             }
         }
     } else if (!returnStmt->expr) {
-        return errHandler.handleError(E10026, &returnStmt->location, {funcSignature->name, rt->getPrettyName()});
+        return errHandler.handleError(E10026, &returnStmt->location, {funcSignature->name, rt->prettyName()});
     } else if (!rt->equals(returnStmt->expr->type)) {
-        return errHandler.handleError(E10027, &returnStmt->location, {funcSignature->name, rt->getPrettyName(), returnStmt->expr->type->getPrettyName()});
+        return errHandler.handleError(E10027, &returnStmt->location, {funcSignature->name, rt->prettyName(), returnStmt->expr->type->prettyName()});
     }
 }
 
@@ -307,7 +308,7 @@ void SemaAnalyser::visitCast(LgsCast* castExpr) {
     }
     castExpr->toType = resolveType(castExpr->toType, &errHandler);
     if (!castExpr->cast()) {
-        errHandler.handleError(E10018, &castExpr->location, {fromValue->type->getPrettyName(), castExpr->toType->getPrettyName()});
+        errHandler.handleError(E10018, &castExpr->location, {fromValue->type->prettyName(), castExpr->toType->prettyName()});
     }
 }
 
@@ -426,7 +427,7 @@ void SemaAnalyser::visitFieldCall(const LgsExpr* parentExpr, LgsVariable* childF
     const auto parentType = parentExpr->type;
     const auto field = parentType->getField(childField->name);
     if (!field) {
-        return errHandler.handleError(E10005, &childField->location, {childField->getName(), parentType->getPrettyName()});
+        return errHandler.handleError(E10005, &childField->location, {childField->getName(), parentType->prettyName()});
     }
     setExprType(childField, field->type);
     childField->ref = new LgsSymbol(field->clone());
@@ -440,7 +441,7 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
         if (!arg->type) return;
-        argTypeNames.emplace_back(arg->type->getPrettyName());
+        argTypeNames.emplace_back(arg->type->prettyName());
     }
 
     const auto funcCallName = funcCall->name;
@@ -453,27 +454,27 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
     vector<string> argTypeNames;
     for (const auto& arg : methodCall->args) {
         visitExpr(arg);
-        argTypeNames.emplace_back(arg->type->getPrettyName());
+        argTypeNames.emplace_back(arg->type->prettyName());
     }
     auto name = methodCall->name;
     const auto overloads = parentType->getMethodsOverloads(name);
     if (overloads.empty()) {
         return errHandler.handleError(E10013, &methodCall->location, {name});
     }
-    if (!resolveMethodCall(overloads, methodCall, parentType->getPrettyName())) return;
+    if (!resolveMethodCall(overloads, methodCall, parentType->prettyName())) return;
     checkMethodVisibility(methodCall);
 }
 
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
     instance->type = resolveType(instance->type, &errHandler);
     if (!instance->type) return;
-    const auto symbol = getSymbol(instance->type->getPrettyName(), instance);
+    const auto symbol = getSymbol(instance->type->prettyName(), instance);
     if (!symbol) return;
     if (symbol->type != OBJECT) {
-        return errHandler.handleError(E10022, &instance->location, {instance->type->getPrettyName()});
+        return errHandler.handleError(E10022, &instance->location, {instance->type->prettyName()});
     }
     if (symbol->object->isSingleton) {
-        return errHandler.handleError(E10032, &instance->location, {instance->type->getPrettyName()});
+        return errHandler.handleError(E10032, &instance->location, {instance->type->prettyName()});
     }
 
     const auto obj = symbol->object->clone();
@@ -518,7 +519,7 @@ void SemaAnalyser::visitObjectImplements(LgsObject* obj) {
         if (!implement) continue;
         const auto interface = implement->asInterface();
         if (!interface) {
-            errHandler.handleError(E10025, &implement->location, {implement->getPrettyName()});
+            errHandler.handleError(E10025, &implement->location, {implement->prettyName()});
             continue;
         }
 
@@ -553,7 +554,7 @@ bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable
     const auto type = parent->type;
     const auto field = type ? type->getField(fieldVariable->name) : nullptr;
     if (!type || !field) {
-        errHandler.handleError(E10005, &fieldVariable->location, {fieldVariable->getName(), type->getPrettyName()});
+        errHandler.handleError(E10005, &fieldVariable->location, {fieldVariable->getName(), type->prettyName()});
         return false;
     }
     if (!field->isPublic) {}
@@ -619,14 +620,14 @@ bool SemaAnalyser::checkExprType(LgsExpr* expr, LgsType* type) {
         }
         // type must be nullable
         if (!type->nullable) {
-            errHandler.handleError(E10023, &type->location, {type->getPrettyName(), type->getPrettyName()});
+            errHandler.handleError(E10023, &type->location, {type->prettyName(), type->prettyName()});
             return false;
         }
         expr->type = type;
         return true;
     }
     if (type && expr->type && !expr->type->equals(type)) {
-        errHandler.handleError(E10001, &expr->location, {type->getPrettyName(), expr->type->getPrettyName()});
+        errHandler.handleError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
         return false;
     }
     return true;
@@ -663,7 +664,7 @@ bool SemaAnalyser::checkIndexBoundaries(LgsIterIndex* iterIndex) {
 bool SemaAnalyser::checkSingleIndexBoundaries(LgsIterIndex* iterIndex, LgsExpr* index, const size_t upperBound) {
     const auto baseExprType = iterIndex->baseExpr->type;
     if (!baseExprType->isIndexable(index->type)) {
-        errHandler.handleError(E10036, &iterIndex->location, {baseExprType->getPrettyName(), index->type->getPrettyName()});
+        errHandler.handleError(E10036, &iterIndex->location, {baseExprType->prettyName(), index->type->prettyName()});
         return false;
     }
     bool outOfBounds = false;
@@ -812,7 +813,7 @@ void SemaAnalyser::validateFuncControlFlow(LgsFunc* func) {
     const auto stmtBlock = func->stmtBlock;
     const bool isFlowCorrect = funcType->name != LOGOS_MAIN_FUNC && !stmtBlock->hasReturn;
     if (isFlowCorrect) {
-        errHandler.handleError(E10004, &func->location, {funcType->name, funcType->rt->getPrettyName()});
+        errHandler.handleError(E10004, &func->location, {funcType->name, funcType->rt->prettyName()});
     }
 }
 
@@ -856,7 +857,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type, LgsErrorHandler* errorHandler)
     }
 
     if (!dynamic_cast<LgsUnknownType*>(type)) return type;
-    auto typeName = type->getPrettyName();
+    auto typeName = type->prettyName();
     const auto nullable = type->nullable;
     if (globals.symbols.find(typeName) == globals.symbols.end()) {
         errorHandler->handleError(E10006, &type->location, {typeName});

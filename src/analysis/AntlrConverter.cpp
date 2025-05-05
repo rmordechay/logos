@@ -35,6 +35,7 @@
 #include "stmts/LgsPatternMatch.h"
 #include "types/LgsArray.h"
 #include "types/LgsMap.h"
+#include "types/LgsUnknownType.h"
 
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>

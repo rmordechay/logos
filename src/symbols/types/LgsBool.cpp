@@ -3,12 +3,16 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
 
-const string LgsBool::getPrettyName() const {
+string LgsBool::prettyName() const {
     return name;
 }
 
 Type* LgsBool::getIRType() {
     return Type::getInt1Ty(context);
+}
+
+string LgsBool::getIRName() {
+    return name;
 }
 
 LgsExpr* LgsBool::getZeroValue() {
@@ -22,7 +26,7 @@ LgsType* LgsBool::inferBinaryType(LgsType* other) {
 
 bool LgsBool::equals(LgsType* other) const {
     if (nullable) {
-        return name == other->getPrettyName();
+        return name == other->getIRName();
     }
-    return name == other->getPrettyName();
+    return name == other->getIRName();
 }

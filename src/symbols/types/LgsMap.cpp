@@ -5,6 +5,10 @@ Type* LgsMap::getIRType() {
     return ptrTy;
 }
 
+string LgsMap::getIRName() {
+    return name;
+}
+
 LgsExpr* LgsMap::getZeroValue() {
     const auto hashMap = new LgsHashMap();
     hashMap->mapType.underlyingType.key = underlyingType.key;
@@ -13,8 +17,8 @@ LgsExpr* LgsMap::getZeroValue() {
     return hashMap;
 }
 
-const string LgsMap::getPrettyName() const {
-    return name  + underlyingType.getPrettyName();
+string LgsMap::prettyName() const {
+    return name  + underlyingType.prettyName();
 }
 
 bool LgsMap::equals(LgsType* other) const {

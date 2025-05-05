@@ -2,10 +2,6 @@
 #include "funcs/LgsMethodImpl.h"
 #include "types/LgsObject.h"
 
-const string LgsInterface::getPrettyName() const {
-    return name;
-}
-
 Type* LgsInterface::getIRType() {
     if (IRType) return IRType;
     IRType = StructType::getTypeByName(context, name);
@@ -21,6 +17,10 @@ Type* LgsInterface::getIRType() {
     return IRType;
 }
 
+string LgsInterface::getIRName() {
+    return name;
+}
+
 LgsExpr* LgsInterface::getZeroValue() {
     assert(false);
 }
@@ -28,7 +28,7 @@ LgsExpr* LgsInterface::getZeroValue() {
 bool LgsInterface::equals(LgsType* other) const {
     if (const auto obj = other->asObject()) {
         for (const auto& implement : obj->implements) {
-            if (implement->getPrettyName() == name) return true;
+            if (implement->getIRName() == name) return true;
         }
     }
     return false;
@@ -36,4 +36,8 @@ bool LgsInterface::equals(LgsType* other) const {
 
 LgsType* LgsInterface::inferBinaryType(LgsType* other) {
     assert(false);
+}
+
+string LgsInterface::prettyName() const {
+    return name;
 }

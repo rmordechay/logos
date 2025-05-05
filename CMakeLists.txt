@@ -52,10 +52,7 @@ add_library(lib STATIC
     include/utils/ThreadPool.h
 
     # Symbols headers
-    include/symbols/builtin/LgsEnv.h
     include/symbols/builtin/LgsPrint.h
-    include/symbols/builtin/LgsReflect.h
-    include/symbols/builtin/LgsSys.h
     include/symbols/exprs/binary/LgsBinaryExpr.h
     include/symbols/exprs/LgsCast.h
     include/symbols/exprs/LgsExpr.h
@@ -184,6 +181,7 @@ add_library(lib STATIC
     src/symbols/types/LgsType.cpp
     src/symbols/types/LgsVoid.cpp
     src/symbols/types/LgsMap.cpp
+    src/symbols/types/LgsUnknownType.cpp
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -209,6 +207,7 @@ add_executable(lgs main.cpp
     src/symbols/exprs/unary/LgsHashMap.cpp
     include/symbols/exprs/unary/LgsHashMap.h
     include/symbols/types/LgsPair.h
-    include/logos/Platform.h)
+    include/logos/Platform.h
+    include/symbols/types/LgsUnknownType.h)
 target_link_libraries(lgs PRIVATE lib)
 #add_subdirectory(tests)

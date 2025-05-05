@@ -109,7 +109,7 @@ json LgsVariable::asJSON() {
     json tree;
     tree["name"] = name;
     tree["exprType"] = "VARIABLE";
-    tree["type"] = type->getPrettyName();
+    tree["type"] = type->prettyName();
     return tree;
 }
 

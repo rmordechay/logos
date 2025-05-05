@@ -7,7 +7,11 @@ Type* LgsStr::getIRType() {
     return ptrTy;
 }
 
-const string LgsStr::getPrettyName() const {
+string LgsStr::getIRName() {
+    return name;
+}
+
+string LgsStr::prettyName() const {
     return name;
 }
 
@@ -23,7 +27,7 @@ LgsType* LgsStr::inferBinaryType(LgsType* other) {
 bool LgsStr::equals(LgsType* other) const {
     assert(other);
     if (dynamic_cast<LgsChar*>(other)) return true;
-    return name == other->getPrettyName();
+    return name == other->getIRName();
 }
 
 void LgsStr::cleanStr(string& value) {

@@ -10,8 +10,9 @@ public:
 
     explicit LgsPair(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : key(keyType), value(valueType) {}
     Type* getIRType() override;
+    string getIRName() override;
     LgsExpr* getZeroValue() override;
-    const string getPrettyName() const override;
+    string prettyName() const override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;
 };
@@ -20,12 +21,16 @@ inline Type* LgsPair::getIRType() {
     assert(false);
 }
 
+inline string LgsPair::getIRName() {
+    assert(false);
+}
+
 inline LgsExpr* LgsPair::getZeroValue() {
     assert(false);
 }
 
-inline const string LgsPair::getPrettyName() const {
-    return '<' + key->getPrettyName() + ", " + value->getPrettyName() + '>';
+inline string LgsPair::prettyName() const {
+    return '<' + key->prettyName() + ", " + value->prettyName() + '>';
 }
 
 inline bool LgsPair::equals(LgsType* other) const {

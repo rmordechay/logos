@@ -4,11 +4,15 @@ Type* LgsAny::getIRType() {
     return ptrTy;
 }
 
+string LgsAny::getIRName() {
+    return name;
+}
+
 LgsExpr* LgsAny::getZeroValue() {
     assert(false);
 }
 
-const string LgsAny::getPrettyName() const {
+string LgsAny::prettyName() const {
     return name;
 }
 

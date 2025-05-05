@@ -7,8 +7,9 @@ public:
     static constexpr auto name = "Any";
 
     Type* getIRType() override;
+    string getIRName() override;
     LgsExpr* getZeroValue() override;
-    const string getPrettyName() const override;
+    string prettyName() const override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;
     ~LgsAny() override = default;

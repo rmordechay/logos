@@ -6,7 +6,7 @@ string LgsMethodType::getIRName() {
     if (IRName != "") return IRName;
     vector<string> argTypeNames;
     for (const auto& param : params) {
-        argTypeNames.emplace_back(param->type->getPrettyName());
+        argTypeNames.emplace_back(param->type->getIRName());
     }
     IRName = getComposedName(name, parentName, argTypeNames);
     return IRName;
@@ -19,8 +19,8 @@ bool LgsMethodType::equals(LgsType* other) const {
     const auto otherParams = otherFuncType->params;
     if (params.size() == 0 && otherParams.size() == 0) return true;
     for (size_t i = 0; i < params.size() - 1; ++i) {
-        auto thisTypeName = params[i + 1]->type->getPrettyName();
-        auto otherTypeName = otherFuncType->params[i]->type->getPrettyName();
+        auto thisTypeName = params[i + 1]->type->getIRName();
+        auto otherTypeName = otherFuncType->params[i]->type->getIRName();
         if (thisTypeName != otherTypeName) return false;
     }
     return true;

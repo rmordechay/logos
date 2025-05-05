@@ -3,12 +3,16 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 
-const string LgsFloat::getPrettyName() const {
+string LgsFloat::prettyName() const {
     return name;
 }
 
 Type* LgsFloat::getIRType() {
     return Type::getFloatTy(context);
+}
+
+string LgsFloat::getIRName() {
+    return name;
 }
 
 LgsExpr* LgsFloat::getZeroValue() {
@@ -17,7 +21,7 @@ LgsExpr* LgsFloat::getZeroValue() {
 }
 
 bool LgsFloat::equals(LgsType* other) const {
-    return name == other->getPrettyName();
+    return name == other->getIRName();
 }
 
 LgsType* LgsFloat::inferBinaryType(LgsType* other) {

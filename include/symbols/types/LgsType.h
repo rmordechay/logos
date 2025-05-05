@@ -33,17 +33,6 @@ public:
     vector<LgsMethodImpl*> getAllMethods() const;
     void setLocation(const antlr4::Token* ctx);
 
-    virtual bool isVoid();
-    virtual bool isIndexable(LgsType* indexType);
-    virtual bool equals(const LgsType& other);
-    virtual Type* getIRType() = 0;
-    virtual LgsExpr* getZeroValue() = 0;
-    virtual const string getPrettyName() const = 0;
-    virtual bool equals(LgsType* other) const = 0;
-    virtual bool isIterable();
-    virtual LgsType* inferBinaryType(LgsType* other) = 0;
-    virtual json asJSON() const;
-
     LgsStr* asStr();
     LgsInt* asInt();
     LgsMap* asMap();
@@ -51,22 +40,19 @@ public:
     LgsInterface* asInterface();
     LgsIterable* asIterable();
     LgsArray* asArray();
+
+    virtual bool isVoid();
+    virtual bool isIndexable(LgsType* indexType);
+    virtual bool equals(LgsType& other);
+    virtual json asJSON() const;
+    virtual Type* getIRType() = 0;
+    virtual LgsExpr* getZeroValue() = 0;
+    virtual string prettyName() const = 0;
+    virtual string getIRName() = 0;
+    virtual bool equals(LgsType* other) const = 0;
+    virtual bool isIterable();
+    virtual LgsType* inferBinaryType(LgsType* other) = 0;
     virtual ~LgsType() = default;
-};
-
-class LgsUnknownType final : public LgsType {
-public:
-    static constexpr auto typeName = "Unknown";
-    string name;
-
-    LgsUnknownType() = default;
-    explicit LgsUnknownType(const string& name) : name(name) {}
-    const string getPrettyName() const override { return name == "" ? typeName : name; }
-    LgsExpr* getZeroValue() override { assert(false && "unknown type should not be called"); }
-    bool equals(LgsType* other) const override { assert(false && "unknown type should not be called"); }
-    LgsType* inferBinaryType(LgsType* other) override { assert(false && "unknown type should not be called"); }
-    Type* getIRType() override;
-    ~LgsUnknownType() override = default;
 };
 
 #endif //LOGOSTYPE_H

@@ -36,11 +36,11 @@ string LgsFuncCall::getSignatureText(const bool withType) const {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = isMethodCall; i < args.size(); ++i) {
-        strStream << args[i]->type->getPrettyName();
+        strStream << args[i]->type->prettyName();
         if (i != args.size() - 1) strStream << ", ";
     }
     if (withType) {
-        strStream << "): " << type->getPrettyName();
+        strStream << "): " << type->prettyName();
     } else {
         strStream << ")";
     }

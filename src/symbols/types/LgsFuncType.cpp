@@ -12,10 +12,6 @@ LgsExpr* LgsFuncType::getZeroValue() {
     assert(false);
 }
 
-const string LgsFuncType::getPrettyName() const {
-    return name;
-}
-
 bool LgsFuncType::equals(LgsType* other) const {
     const auto otherFuncType = dynamic_cast<LgsFuncType*>(other);
     if (!otherFuncType) return false;
@@ -23,8 +19,8 @@ bool LgsFuncType::equals(LgsType* other) const {
     const auto otherParams = otherFuncType->params;
     if (params.size() == 0 && otherParams.size() == 0) return true;
     for (size_t i = 0; i < params.size(); ++i) {
-        auto thisTypeName = params[i]->type->getPrettyName();
-        auto otherTypeName = otherFuncType->params[i]-> type->getPrettyName();
+        auto thisTypeName = params[i]->type->getIRName();
+        auto otherTypeName = otherFuncType->params[i]-> type->getIRName();
         if (thisTypeName != otherTypeName) return false;
     }
     return true;
@@ -37,8 +33,8 @@ bool LgsFuncType::equals(const LgsFuncCall* other) const {
     if (params.size() < args.size()) return false;
     for (size_t i = 0; i < params.size(); ++i) {
         assert(args[i]);
-        auto thisTypeName = params[i]->type->getPrettyName();
-        auto otherTypeName = args[i]->type->getPrettyName();
+        auto thisTypeName = params[i]->type->getIRName();
+        auto otherTypeName = args[i]->type->getIRName();
         if (thisTypeName != otherTypeName) return false;
     }
     return true;
@@ -52,22 +48,26 @@ string LgsFuncType::getAsStr(const bool withType) const {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = 0; i < params.size(); ++i) {
-        strStream << params[i]->type->getPrettyName();
+        strStream << params[i]->type->prettyName();
         if (i != params.size() - 1) strStream << ", ";
     }
     if (withType) {
-        strStream << "): " << rt->getPrettyName();
+        strStream << "): " << rt->prettyName();
     } else {
         strStream << ")";
     }
     return strStream.str();
 }
 
+string LgsFuncType::prettyName() const {
+    return name;
+}
+
 string LgsFuncType::getIRName() {
     if (IRName != "") return IRName;
     vector<string> argTypeNames;
     for (const auto& param : params) {
-        argTypeNames.emplace_back(param->type->getPrettyName());
+        argTypeNames.emplace_back(param->type->getIRName());
     }
     IRName = getComposedName(name, "", argTypeNames);
     return IRName;

@@ -8,30 +8,20 @@ void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);
     startBlock(metadata, entryBlock);
     stmtBlock->createIRValue(metadata);
-    if (getFuncType()->rt->getPrettyName() == LgsVoid::name) {
+    if (getFuncType()->rt->getIRName() == LgsVoid::name) {
         metadata->builder.CreateRetVoid();
     }
     metadata->lgsStack.exitScope();
 }
 
-Value* LgsFunc::setIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) {
-    Value* objRtPtr = nullptr;
-    const auto funcType = getFuncType();
-    if (const auto obj = funcType->rt->asObject()) {
-        objRtPtr = metadata->builder.CreateAlloca(obj->getIRType(), nullptr);
-        argValues.push_back(objRtPtr);
-    }
-    auto iterSize = 0;
-    if (const auto method = dynamic_cast<LgsMethodImpl*>(this)) {
-        iterSize = method->isStatic;
-    }
-    for (int i = iterSize; i < args.size(); ++i) {
-        const auto arg = args[i];
-        const auto argValue = arg->getIRValue(metadata);
-        argValues.emplace_back(argValue);
-    }
+Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args, Value* callback) {
+    vector<Value*> argValues;
+    const auto objRtPtr = setIRArgs(metadata, argValues, args);
+    const auto IRFuncType = getIRFuncType(metadata);
+    const auto IRFunc = callback ? callback : getIRFunc(metadata);
+    const auto funcCall = metadata->builder.CreateCall(IRFuncType, IRFunc, argValues);
     if (objRtPtr) return objRtPtr;
-    return nullptr;
+    return funcCall;
 }
 
 Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
@@ -42,16 +32,8 @@ Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
     if (const auto obj = funcType->rt->asObject()) {
         setStructRet(args, obj);
     }
-    setIRFuncParams(args);
+    setIRParams(args);
     return IRFunc;
-}
-
-void LgsFunc::setStructRet(Function::arg_iterator& args, LgsObject* const obj) const {
-    AttrBuilder builder(context);
-    builder.addStructRetAttr(obj->getIRType());
-    args->addAttrs(builder);
-    args->setName("rt");
-    args++;
 }
 
 FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {
@@ -75,24 +57,42 @@ FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {
     return IRFuncType;
 }
 
+Value* LgsFunc::setIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) {
+    Value* objRtPtr = nullptr;
+    const auto funcType = getFuncType();
+    if (const auto obj = funcType->rt->asObject()) {
+        objRtPtr = metadata->builder.CreateAlloca(obj->getIRType(), nullptr);
+        argValues.push_back(objRtPtr);
+    }
+    auto iterSize = 0;
+    if (const auto method = dynamic_cast<LgsMethodImpl*>(this)) {
+        iterSize = method->isStatic;
+    }
+    for (int i = iterSize; i < args.size(); ++i) {
+        const auto arg = args[i];
+        const auto argValue = arg->getIRValue(metadata);
+        argValues.emplace_back(argValue);
+    }
+    if (objRtPtr) return objRtPtr;
+    return nullptr;
+}
 
-void LgsFunc::setIRFuncParams(Argument* IRParams) {
+void LgsFunc::setStructRet(Function::arg_iterator& args, LgsObject* const obj) const {
+    AttrBuilder builder(context);
+    builder.addStructRetAttr(obj->getIRType());
+    args->addAttrs(builder);
+    args->setName("rt");
+    args++;
+}
+
+
+void LgsFunc::setIRParams(Argument* IRParams) {
     for (auto& param : getFuncType()->params) {
         param->setIRValue(IRParams);
         if (param->expr) param->expr->setIRValue(IRParams);
         IRParams->setName(param->getIRName());
         IRParams++;
     }
-}
-
-Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args, Value* callback) {
-    vector<Value*> argValues;
-    const auto objRtPtr = setIRArgs(metadata, argValues, args);
-    const auto IRFuncType = getIRFuncType(metadata);
-    const auto IRFunc = callback ? callback : getIRFunc(metadata);
-    const auto funcCall = metadata->builder.CreateCall(IRFuncType, IRFunc, argValues);
-    if (objRtPtr) return objRtPtr;
-    return funcCall;
 }
 
 string LgsFunc::format(string& indentStr) {
@@ -108,7 +108,7 @@ string LgsFunc::format(string& indentStr) {
     }
     str << ")";
     if (funcType->name != LOGOS_MAIN_FUNC) {
-        str << funcType->rt->getPrettyName();
+        str << funcType->rt->getIRName();
     }
     str << stmtBlock->format(indentStr);
     return str.str();
@@ -118,7 +118,7 @@ json LgsFunc::asJSON() {
     json tree;
     const auto funcType = getFuncType();
     tree["name"] = funcType->name;
-    tree["type"] = funcType->rt->getPrettyName();
+    tree["type"] = funcType->rt->getIRName();
     tree["params"] = {};
     for (auto& param : funcType->params) {
         tree["params"].emplace_back(param->asJSON());

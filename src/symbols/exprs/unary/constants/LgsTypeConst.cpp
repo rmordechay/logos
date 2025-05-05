@@ -2,7 +2,7 @@
 #include "AntlrConverter.h"
 
 string LgsTypeConst::getName() {
-    return type->getPrettyName();
+    return type->prettyName();
 }
 
 Value* LgsTypeConst::createIRValue(CodeGenMetadata* metadata) {

@@ -13,6 +13,10 @@ Type* LgsEnum::getIRType() {
     return ptrTy;
 }
 
+string LgsEnum::getIRName() {
+    return name;
+}
+
 json LgsEnum::asJSON() const {
     json tree;
     tree["name"] = name;
@@ -23,12 +27,12 @@ json LgsEnum::asJSON() const {
     return tree;
 }
 
-const string LgsEnum::getPrettyName() const {
+string LgsEnum::prettyName() const {
     return name;
 }
 
 bool LgsEnum::equals(LgsType* other) const {
-    return name == other->getPrettyName();
+    return name == other->getIRName();
 }
 
 LgsType* LgsEnum::inferBinaryType(LgsType* other) {

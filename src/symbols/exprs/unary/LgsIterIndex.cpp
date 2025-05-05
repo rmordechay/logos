@@ -39,7 +39,7 @@ string LgsIterIndex::getNameWithTypes() {
     stringstream str;
     str << getName();
     for (const auto index : indices) {
-        str << '[' << index->from->type->getPrettyName() << ']';
+        str << '[' << index->from->type->prettyName() << ']';
     }
     return str.str();
 }

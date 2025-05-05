@@ -3393,7 +3393,7 @@ declare ptr @__memmove_chk(ptr noundef, ptr noundef, i64 noundef, i64 noundef) #
 declare i64 @strlen(ptr noundef) #4
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define void @Map_insert(ptr noundef %0, ptr noundef %1, ptr noundef %2) #0 {
+define void @Map_insert_Map_Any_Any(ptr noundef %0, ptr noundef %1, ptr noundef %2) #0 {
   %4 = alloca ptr, align 8
   %5 = alloca ptr, align 8
   %6 = alloca ptr, align 8

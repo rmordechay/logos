@@ -3,7 +3,7 @@
 #include "exprs/LgsNull.h"
 
 
-const std::string LgsVoid::getPrettyName() const {
+string LgsVoid::prettyName() const {
     return name;
 }
 
@@ -15,6 +15,10 @@ Type* LgsVoid::getIRType() {
     return voidTy;
 }
 
+string LgsVoid::getIRName() {
+    return name;
+}
+
 LgsExpr* LgsVoid::getZeroValue() {
     return new LgsNull();
 }
@@ -24,5 +28,5 @@ LgsType* LgsVoid::inferBinaryType(LgsType* other) {
 }
 
 bool LgsVoid::equals(LgsType* other) const {
-    return name == other->getPrettyName();
+    return name == other->getIRName();
 }

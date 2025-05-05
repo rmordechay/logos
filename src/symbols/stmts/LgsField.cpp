@@ -20,7 +20,7 @@ LgsField* LgsField::clone() const {
 json LgsField::asJSON() {
     json tree;
     tree["name"] = name;
-    tree["type"] = type->getPrettyName();
+    tree["type"] = type->prettyName();
     tree["parent"] = parent->name;
     return tree;
 }

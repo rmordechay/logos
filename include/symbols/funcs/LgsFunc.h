@@ -16,14 +16,14 @@ public:
     BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
 
     void generateIRCode(CodeGenMetadata* metadata);
-    virtual Function* getIRFunc(const CodeGenMetadata* metadata);
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args, Value* callback = nullptr);
     Value* setIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args);
-    virtual FunctionType* getIRFuncType(const CodeGenMetadata* metadata);
-    virtual void setIRFuncParams(Argument* IRParams);
     void setStructRet(Function::arg_iterator& args, LgsObject* obj) const;
     string format(string& indentStr) override;
     json asJSON() override;
+    virtual Function* getIRFunc(const CodeGenMetadata* metadata);
+    virtual FunctionType* getIRFuncType(const CodeGenMetadata* metadata);
+    virtual void setIRParams(Argument* IRParams);
     virtual bool equals(const LgsFuncCall* funcCall) = 0;
     virtual LgsFuncType* getFuncType() = 0;
     ~LgsFunc() override;

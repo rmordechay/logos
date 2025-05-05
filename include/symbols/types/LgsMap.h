@@ -13,10 +13,11 @@ public:
     LgsParam valueParam = LgsParam(&LGS_ANY);
 
     explicit LgsMapInsertFunc(LgsType* parent) {
+        mapParam.type = parent;
         methodType.name = "insert";
         methodType.rt = &LGS_VOID;
         methodType.parentName = parentName;
-        mapParam.type = parent;
+        methodType.parentName = parent->getIRName();
         methodType.params = {&mapParam, &keyParam, &valueParam};
     }
 };
@@ -32,8 +33,9 @@ public:
         underlyingType.value = valueType;
     }
     Type* getIRType() override;
+    string getIRName() override;
     LgsExpr* getZeroValue() override;
-    const string getPrettyName() const override;
+    string prettyName() const override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool isIndexable(LgsType* indexType) override;

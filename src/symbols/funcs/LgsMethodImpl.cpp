@@ -33,7 +33,7 @@ FunctionType* LgsMethodImpl::getIRFuncType(const CodeGenMetadata* metadata) {
     return IRFuncType;
 }
 
-void LgsMethodImpl::setIRFuncParams(Argument* args) {
+void LgsMethodImpl::setIRParams(Argument* args) {
     for (int i = 0; i < methodType.params.size(); ++i) {
         const auto param = methodType.params[i];
         param->setIRValue(args);

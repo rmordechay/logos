@@ -20,7 +20,7 @@ public:
     }
     bool equals(const LgsFuncCall* other) override;
     FunctionType* getIRFuncType(const CodeGenMetadata* metadata) override;
-    void setIRFuncParams(Argument* args) override;
+    void setIRParams(Argument* args) override;
     LgsFuncType* getFuncType() override;
     ~LgsMethodImpl() override = default;
 };
