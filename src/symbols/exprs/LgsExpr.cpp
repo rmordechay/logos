@@ -1,7 +1,7 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsNull.h"
 #include "exprs/unary/LgsDArray.h"
-#include "exprs/unary/LgsArrayIndex.h"
+#include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsHashMap.h"
@@ -113,7 +113,7 @@ LgsSArray* LgsExpr::asSArray() { return dynamic_cast<LgsSArray*>(this); }
 LgsHashMap* LgsExpr::asHashMap() { return dynamic_cast<LgsHashMap*>(this); }
 LgsBoolConst* LgsExpr::asBoolConst() { return dynamic_cast<LgsBoolConst*>(this); }
 LgsCharConst* LgsExpr::asCharConst() { return dynamic_cast<LgsCharConst*>(this); }
-LgsArrayIndex* LgsExpr::asArrayIndex() { return dynamic_cast<LgsArrayIndex*>(this); }
+LgsIterIndex* LgsExpr::asArrayIndex() { return dynamic_cast<LgsIterIndex*>(this); }
 LgsFloatConst* LgsExpr::asFloatConst() { return dynamic_cast<LgsFloatConst*>(this); }
 LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
 LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }

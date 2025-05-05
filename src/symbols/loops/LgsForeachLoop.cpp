@@ -1,6 +1,6 @@
 #include "loops/LgsForeachLoop.h"
 #include "stmts/LgsVarDec.h"
-#include "exprs/unary/LgsArrayIndex.h"
+#include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 
 int LgsForeachLoop::loopStart() {

@@ -8,7 +8,7 @@ class LgsType;
 class LgsVariable;
 class LgsSelection;
 class LgsInstance;
-class LgsArrayIndex;
+class LgsIterIndex;
 class LgsDArray;
 class LgsSArray;
 class LgsBoolConst;
@@ -51,7 +51,7 @@ public:
     bool isNull();
     LgsVariable* asVariable();
     LgsFuncCall* asFuncCall();
-    LgsArrayIndex* asArrayIndex();
+    LgsIterIndex* asArrayIndex();
     LgsInstance* asInstance();
     LgsSelection* asSelection();
     LgsDArray* asDArray();

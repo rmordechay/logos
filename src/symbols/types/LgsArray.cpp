@@ -24,3 +24,7 @@ bool LgsArray::equals(LgsType* other) const {
 LgsType* LgsArray::inferBinaryType(LgsType* other) {
     assert(false);
 }
+
+bool LgsArray::isIndexable(LgsType* indexType) {
+    return !!indexType->asInt();
+}

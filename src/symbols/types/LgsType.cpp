@@ -15,6 +15,10 @@ bool LgsType::isVoid() {
     return false;
 }
 
+bool LgsType::isIndexable(LgsType* indexType) {
+    return false;
+}
+
 bool LgsType::isIterable() {
     return false;
 }

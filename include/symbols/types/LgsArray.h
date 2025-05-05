@@ -12,6 +12,7 @@ public:
     const string getName() const override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;
+    bool isIndexable(LgsType* indexType) override;
     ~LgsArray() override = default;
 };
 

@@ -3,18 +3,18 @@
 #include "exprs/unary/LgsHashMap.h"
 
 Type* LgsMap::getIRType() {
-    assert(false);
+    return nullPtrTy;
 }
 
 LgsExpr* LgsMap::getZeroValue() {
     const auto hashMap = new LgsHashMap();
-    hashMap->mapType.types.key = types.key;
-    hashMap->mapType.types.value = types.value;
+    hashMap->mapType.underlyingType.key = underlyingType.key;
+    hashMap->mapType.underlyingType.value = underlyingType.value;
     return hashMap;
 }
 
 const string LgsMap::getName() const {
-    return name;
+    return name  + underlyingType.getName();
 }
 
 bool LgsMap::equals(LgsType* other) const {
@@ -23,4 +23,12 @@ bool LgsMap::equals(LgsType* other) const {
 
 LgsType* LgsMap::inferBinaryType(LgsType* other) {
     assert(false);
+}
+
+bool LgsMap::isIndexable(LgsType* indexType) {
+    return underlyingType.key->equals(indexType);
+}
+
+LgsType* LgsMap::getUnderlyingType() {
+    return underlyingType.value;
 }

@@ -1,6 +1,6 @@
 #include "stmts/LgsAssignment.h"
 
-#include "exprs/unary/LgsArrayIndex.h"
+#include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
@@ -13,7 +13,7 @@ void LgsAssignment::createIRStmt(CodeGenMetadata* metadata) {
         return;
     }
     if (const auto arrIndex = lvalue->asArrayIndex()) {
-        createIRFromArrIndex(metadata, arrIndex);
+        createIRFromIterIndex(metadata, arrIndex);
         return;
     }
     assert(false);
@@ -36,8 +36,8 @@ void LgsAssignment::createIRFromSelection(CodeGenMetadata* metadata, const LgsSe
     assert(false);
 }
 
-void LgsAssignment::createIRFromArrIndex(CodeGenMetadata* metadata, const LgsArrayIndex* arrIndex) const {
-    const auto gep = arrIndex->getGEP(metadata);
+void LgsAssignment::createIRFromIterIndex(CodeGenMetadata* metadata, const LgsIterIndex* iterIndex) const {
+    const auto gep = iterIndex->getGEP(metadata);
     const auto rValue = rvalue->getIRValue(metadata);
     metadata->builder.CreateStore(rValue, gep);
 }

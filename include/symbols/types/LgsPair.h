@@ -25,11 +25,13 @@ inline LgsExpr* LgsPair::getZeroValue() {
 }
 
 inline const string LgsPair::getName() const {
-    assert(false);
+    return '<' + key->getName() + ", " + key->getName() + '>';
 }
 
 inline bool LgsPair::equals(LgsType* other) const {
-    assert(false);
+    const auto otherPair = dynamic_cast<LgsPair*>(other);
+    if (!otherPair) return false;
+    return key->equals(otherPair->key) && value->equals(otherPair->value);
 }
 
 inline LgsType* LgsPair::inferBinaryType(LgsType* other) {

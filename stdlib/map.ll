@@ -1,6 +1,6 @@
 ; ModuleID = 'main.c'
 source_filename = "main.c"
-target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128-Fn32"
 target triple = "arm64-apple-macosx15.0.0"
 
 %struct.stbds_array_header = type { i64, i64, ptr, i64 }
@@ -8,6 +8,7 @@ target triple = "arm64-apple-macosx15.0.0"
 %struct.stbds_string_arena = type { ptr, i64, i8, i8 }
 %struct.stbds_string_block = type { ptr, [8 x i8] }
 %struct.stbds_hash_bucket = type { [8 x i64], [8 x i64] }
+%struct.Map = type { ptr, ptr }
 
 @stbds_hash_seed = internal global i64 826366246, align 8
 
@@ -2807,7 +2808,7 @@ define internal i32 @stbds_is_key_equal(ptr noundef %0, i64 noundef %1, ptr noun
   %25 = load i64, ptr %13, align 8
   %26 = getelementptr inbounds i8, ptr %24, i64 %25
   %27 = load ptr, ptr %26, align 8
-  %28 = call i32 @strcmp(ptr noundef %19, ptr noundef %27)
+  %28 = call i32 @strcmp(ptr noundef %19, ptr noundef %27) #8
   %29 = icmp eq i32 0, %28
   %30 = zext i1 %29 to i32
   store i32 %30, ptr %8, align 4
@@ -2841,7 +2842,7 @@ define internal ptr @stbds_strdup(ptr noundef %0) #0 {
   %4 = alloca ptr, align 8
   store ptr %0, ptr %2, align 8
   %5 = load ptr, ptr %2, align 8
-  %6 = call i64 @strlen(ptr noundef %5)
+  %6 = call i64 @strlen(ptr noundef %5) #8
   %7 = add i64 %6, 1
   store i64 %7, ptr %3, align 8
   %8 = load i64, ptr %3, align 8
@@ -2870,7 +2871,7 @@ define ptr @stbds_stralloc(ptr noundef %0, ptr noundef %1) #0 {
   store ptr %0, ptr %4, align 8
   store ptr %1, ptr %5, align 8
   %11 = load ptr, ptr %5, align 8
-  %12 = call i64 @strlen(ptr noundef %11)
+  %12 = call i64 @strlen(ptr noundef %11) #8
   %13 = add i64 %12, 1
   store i64 %13, ptr %7, align 8
   %14 = load i64, ptr %7, align 8
@@ -3388,7 +3389,184 @@ define ptr @stbds_hmdel_key(ptr noundef %0, i64 noundef %1, ptr noundef %2, i64 
 ; Function Attrs: nounwind
 declare ptr @__memmove_chk(ptr noundef, ptr noundef, i64 noundef, i64 noundef) #4
 
-declare i64 @strlen(ptr noundef) #3
+; Function Attrs: nounwind
+declare i64 @strlen(ptr noundef) #4
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define void @Map_insert(ptr noundef %0, ptr noundef %1, ptr noundef %2) #0 {
+  %4 = alloca ptr, align 8
+  %5 = alloca ptr, align 8
+  %6 = alloca ptr, align 8
+  %7 = alloca [1 x ptr], align 8
+  store ptr %0, ptr %4, align 8
+  store ptr %1, ptr %5, align 8
+  store ptr %2, ptr %6, align 8
+  %8 = load ptr, ptr %4, align 8
+  %9 = load ptr, ptr %8, align 8
+  %10 = load ptr, ptr %5, align 8
+  store ptr %10, ptr %7, align 8
+  %11 = getelementptr inbounds [1 x ptr], ptr %7, i64 0, i64 0
+  %12 = call ptr @stbds_hmput_key(ptr noundef %9, i64 noundef 16, ptr noundef %11, i64 noundef 8, i32 noundef 0)
+  %13 = load ptr, ptr %4, align 8
+  store ptr %12, ptr %13, align 8
+  %14 = load ptr, ptr %5, align 8
+  %15 = load ptr, ptr %4, align 8
+  %16 = load ptr, ptr %15, align 8
+  %17 = load ptr, ptr %4, align 8
+  %18 = load ptr, ptr %17, align 8
+  %19 = getelementptr inbounds %struct.Map, ptr %18, i64 -1
+  %20 = getelementptr inbounds %struct.stbds_array_header, ptr %19, i64 -1
+  %21 = getelementptr inbounds %struct.stbds_array_header, ptr %20, i32 0, i32 3
+  %22 = load i64, ptr %21, align 8
+  %23 = getelementptr inbounds %struct.Map, ptr %16, i64 %22
+  %24 = getelementptr inbounds %struct.Map, ptr %23, i32 0, i32 0
+  store ptr %14, ptr %24, align 8
+  %25 = load ptr, ptr %6, align 8
+  %26 = load ptr, ptr %4, align 8
+  %27 = load ptr, ptr %26, align 8
+  %28 = load ptr, ptr %4, align 8
+  %29 = load ptr, ptr %28, align 8
+  %30 = getelementptr inbounds %struct.Map, ptr %29, i64 -1
+  %31 = getelementptr inbounds %struct.stbds_array_header, ptr %30, i64 -1
+  %32 = getelementptr inbounds %struct.stbds_array_header, ptr %31, i32 0, i32 3
+  %33 = load i64, ptr %32, align 8
+  %34 = getelementptr inbounds %struct.Map, ptr %27, i64 %33
+  %35 = getelementptr inbounds %struct.Map, ptr %34, i32 0, i32 1
+  store ptr %25, ptr %35, align 8
+  ret void
+}
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define ptr @Map_get(ptr noundef %0, ptr noundef %1) #0 {
+  %3 = alloca ptr, align 8
+  %4 = alloca ptr, align 8
+  %5 = alloca [1 x ptr], align 8
+  store ptr %0, ptr %3, align 8
+  store ptr %1, ptr %4, align 8
+  %6 = load ptr, ptr %3, align 8
+  %7 = load ptr, ptr %6, align 8
+  %8 = load ptr, ptr %4, align 8
+  store ptr %8, ptr %5, align 8
+  %9 = getelementptr inbounds [1 x ptr], ptr %5, i64 0, i64 0
+  %10 = call ptr @stbds_hmget_key(ptr noundef %7, i64 noundef 16, ptr noundef %9, i64 noundef 8, i32 noundef 0)
+  %11 = load ptr, ptr %3, align 8
+  store ptr %10, ptr %11, align 8
+  %12 = load ptr, ptr %3, align 8
+  %13 = load ptr, ptr %12, align 8
+  %14 = getelementptr inbounds %struct.Map, ptr %13, i64 -1
+  %15 = getelementptr inbounds %struct.stbds_array_header, ptr %14, i64 -1
+  %16 = getelementptr inbounds %struct.stbds_array_header, ptr %15, i32 0, i32 3
+  %17 = load i64, ptr %16, align 8
+  %18 = load ptr, ptr %3, align 8
+  %19 = load ptr, ptr %18, align 8
+  %20 = load ptr, ptr %3, align 8
+  %21 = load ptr, ptr %20, align 8
+  %22 = getelementptr inbounds %struct.Map, ptr %21, i64 -1
+  %23 = getelementptr inbounds %struct.stbds_array_header, ptr %22, i64 -1
+  %24 = getelementptr inbounds %struct.stbds_array_header, ptr %23, i32 0, i32 3
+  %25 = load i64, ptr %24, align 8
+  %26 = getelementptr inbounds %struct.Map, ptr %19, i64 %25
+  %27 = getelementptr inbounds %struct.Map, ptr %26, i32 0, i32 1
+  %28 = load ptr, ptr %27, align 8
+  ret ptr %28
+}
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @Map_del(ptr noundef %0, ptr noundef %1) #0 {
+  %3 = alloca ptr, align 8
+  %4 = alloca ptr, align 8
+  %5 = alloca [1 x ptr], align 8
+  store ptr %0, ptr %3, align 8
+  store ptr %1, ptr %4, align 8
+  %6 = load ptr, ptr %3, align 8
+  %7 = load ptr, ptr %6, align 8
+  %8 = load ptr, ptr %4, align 8
+  store ptr %8, ptr %5, align 8
+  %9 = getelementptr inbounds [1 x ptr], ptr %5, i64 0, i64 0
+  %10 = load ptr, ptr %3, align 8
+  %11 = load ptr, ptr %10, align 8
+  %12 = getelementptr inbounds %struct.Map, ptr %11, i32 0, i32 0
+  %13 = load ptr, ptr %3, align 8
+  %14 = load ptr, ptr %13, align 8
+  %15 = ptrtoint ptr %12 to i64
+  %16 = ptrtoint ptr %14 to i64
+  %17 = sub i64 %15, %16
+  %18 = call ptr @stbds_hmdel_key(ptr noundef %7, i64 noundef 16, ptr noundef %9, i64 noundef 8, i64 noundef %17, i32 noundef 0)
+  %19 = load ptr, ptr %3, align 8
+  store ptr %18, ptr %19, align 8
+  %20 = load ptr, ptr %3, align 8
+  %21 = load ptr, ptr %20, align 8
+  %22 = icmp ne ptr %21, null
+  br i1 %22, label %23, label %30
+
+23:                                               ; preds = %2
+  %24 = load ptr, ptr %3, align 8
+  %25 = load ptr, ptr %24, align 8
+  %26 = getelementptr inbounds %struct.Map, ptr %25, i64 -1
+  %27 = getelementptr inbounds %struct.stbds_array_header, ptr %26, i64 -1
+  %28 = getelementptr inbounds %struct.stbds_array_header, ptr %27, i32 0, i32 3
+  %29 = load i64, ptr %28, align 8
+  br label %31
+
+30:                                               ; preds = %2
+  br label %31
+
+31:                                               ; preds = %30, %23
+  %32 = phi i64 [ %29, %23 ], [ 0, %30 ]
+  %33 = trunc i64 %32 to i32
+  ret i32 %33
+}
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @Map_len(ptr noundef %0) #0 {
+  %2 = alloca ptr, align 8
+  store ptr %0, ptr %2, align 8
+  %3 = load ptr, ptr %2, align 8
+  %4 = load ptr, ptr %3, align 8
+  %5 = icmp ne ptr %4, null
+  br i1 %5, label %6, label %14
+
+6:                                                ; preds = %1
+  %7 = load ptr, ptr %2, align 8
+  %8 = load ptr, ptr %7, align 8
+  %9 = getelementptr inbounds %struct.Map, ptr %8, i64 -1
+  %10 = getelementptr inbounds %struct.stbds_array_header, ptr %9, i64 -1
+  %11 = getelementptr inbounds %struct.stbds_array_header, ptr %10, i32 0, i32 0
+  %12 = load i64, ptr %11, align 8
+  %13 = sub nsw i64 %12, 1
+  br label %15
+
+14:                                               ; preds = %1
+  br label %15
+
+15:                                               ; preds = %14, %6
+  %16 = phi i64 [ %13, %6 ], [ 0, %14 ]
+  %17 = trunc i64 %16 to i32
+  ret i32 %17
+}
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define void @Map_free(ptr noundef %0) #0 {
+  %2 = alloca ptr, align 8
+  store ptr %0, ptr %2, align 8
+  %3 = load ptr, ptr %2, align 8
+  %4 = icmp ne ptr %3, null
+  br i1 %4, label %5, label %8
+
+5:                                                ; preds = %1
+  %6 = load ptr, ptr %2, align 8
+  %7 = getelementptr inbounds ptr, ptr %6, i64 -1
+  call void @stbds_hmfree_func(ptr noundef %7, i64 noundef 8)
+  br label %9
+
+8:                                                ; preds = %1
+  br label %9
+
+9:                                                ; preds = %8, %5
+  %10 = phi i32 [ 0, %5 ], [ 0, %8 ]
+  store ptr null, ptr %2, align 8
+  ret void
+}
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
 define internal i64 @stbds_log2(i64 noundef %0) #0 {
@@ -3420,15 +3598,16 @@ define internal i64 @stbds_log2(i64 noundef %0) #0 {
 ; Function Attrs: nocallback nofree nounwind willreturn memory(argmem: readwrite)
 declare void @llvm.memcpy.p0.p0.i64(ptr noalias nocapture writeonly, ptr noalias nocapture readonly, i64, i1 immarg) #6
 
-declare i32 @strcmp(ptr noundef, ptr noundef) #3
+; Function Attrs: nounwind
+declare i32 @strcmp(ptr noundef, ptr noundef) #4
 
 declare i32 @memcmp(ptr noundef, ptr noundef, i64 noundef) #3
 
-attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "probe-stack"="__chkstk_darwin" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+lse,+neon,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
 attributes #1 = { nocallback nofree nounwind willreturn memory(argmem: write) }
-attributes #2 = { allocsize(1) "frame-pointer"="non-leaf" "no-trapping-math"="true" "probe-stack"="__chkstk_darwin" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+lse,+neon,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
-attributes #3 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "probe-stack"="__chkstk_darwin" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+lse,+neon,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
-attributes #4 = { nounwind "frame-pointer"="non-leaf" "no-trapping-math"="true" "probe-stack"="__chkstk_darwin" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+lse,+neon,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #2 = { allocsize(1) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
+attributes #3 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
+attributes #4 = { nounwind "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
 attributes #5 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
 attributes #6 = { nocallback nofree nounwind willreturn memory(argmem: readwrite) }
 attributes #7 = { allocsize(1) }
@@ -3442,7 +3621,7 @@ attributes #8 = { nounwind }
 !2 = !{i32 8, !"PIC Level", i32 2}
 !3 = !{i32 7, !"uwtable", i32 1}
 !4 = !{i32 7, !"frame-pointer", i32 1}
-!5 = !{!"Apple clang version 16.0.0 (clang-1600.0.26.6)"}
+!5 = !{!"Homebrew clang version 19.1.7"}
 !6 = distinct !{!6, !7}
 !7 = !{!"llvm.loop.mustprogress"}
 !8 = distinct !{!8, !7}

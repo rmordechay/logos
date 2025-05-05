@@ -1,13 +1,14 @@
-#include "exprs/unary/LgsArrayIndex.h"
+#include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include <exprs/unary/LgsDArray.h>
 
-Value* LgsArrayIndex::createIRValue(CodeGenMetadata* metadata) {
-    const auto irType = baseExpr->type->asIterable()->underlyingType->getIRType();
+Value* LgsIterIndex::createIRValue(CodeGenMetadata* metadata) {
+    const auto iterable = baseExpr->type->asIterable();
+    const auto irType = iterable->getUnderlyingType()->getIRType();
     return metadata->builder.CreateLoad(irType, getGEP(metadata));
 }
 
-Value* LgsArrayIndex::getGEP(CodeGenMetadata* metadata) const {
+Value* LgsIterIndex::getGEP(CodeGenMetadata* metadata) const {
     vector<Value*> IRIndices;
     IRIndices.emplace_back(i32Zero);
     for (const auto& index : indices) {
@@ -18,11 +19,11 @@ Value* LgsArrayIndex::getGEP(CodeGenMetadata* metadata) const {
     return metadata->builder.CreateGEP(ty, ptr, IRIndices);
 }
 
-string LgsArrayIndex::getName() {
+string LgsIterIndex::getName() {
     return baseExpr->getName();
 }
 
-string LgsArrayIndex::getNameWithTypes() {
+string LgsIterIndex::getNameWithTypes() {
     stringstream str;
     str << getName();
     for (const auto index : indices) {
@@ -31,7 +32,7 @@ string LgsArrayIndex::getNameWithTypes() {
     return str.str();
 }
 
-LgsArrayIndex::~LgsArrayIndex() {
+LgsIterIndex::~LgsIterIndex() {
     delete baseExpr;
     for (auto const& index : indices) {
         delete index;

@@ -60,7 +60,7 @@ public:
     LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
     vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
     LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
-    LgsArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
+    LgsIterIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
     LgsConstExpr* getConstant(LogosParser::ConstantContext* ctx) const;
     LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx) const;

@@ -16,7 +16,7 @@ class LgsCast;
 class LgsVarDec;
 struct LgsSymbol;
 class LgsInstance;
-class LgsArrayIndex;
+class LgsIterIndex;
 class LgsSelection;
 class LgsFuncCall;
 class LgsBinaryExpr;
@@ -65,7 +65,7 @@ public:
     void visitCast(LgsCast* castExpr);
     void visitDArray(LgsDArray* array);
     void visitSArray(LgsSArray* array);
-    void visitHashMap(LgsHashMap* hashMap);
+    void visitHashMap(LgsHashMap* hashMap) const;
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
@@ -77,22 +77,22 @@ public:
     void visitFieldCall(const LgsExpr* parentExpr, LgsVariable* childField);
     void visitFirstSelection(LgsExpr* firstExpr);
     void visitInstance(LgsInstance* instance);
-    void visitArrayIndex(LgsArrayIndex* arrIndex);
+    void visitArrayIndex(LgsIterIndex* iterIndex);
 
     void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
-    void setArrayIndexType(LgsArrayIndex* arrIndex) const;
+    void setIterIndexType(LgsIterIndex* iterIndex) const;
 
     LgsFunc* resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
     LgsFunc* resolveMethodCall(const vector<LgsMethodImpl*>& overloads, LgsFuncCall* methodCall, const string& parentName);
     bool resolveFuncCallWithDefaultParams(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
     bool isFuncCallEqual(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
     bool checkExprType(LgsExpr* expr, LgsType* type);
-    bool checkSingleIndexBoundaries(LgsArrayIndex* arrIndex, LgsExpr* index, size_t upperBound);
-    bool checkSliceBoundaries(LgsArrayIndex* arrIndex, const LgsIndex* index, size_t dimension, size_t upperBound);
-    bool checkIndexBoundaries(LgsArrayIndex* arrIndex);
-    bool checkArrDimensions(const LgsArrayIndex* arrIndex);
+    bool checkSingleIndexBoundaries(LgsIterIndex* iterIndex, LgsExpr* index, size_t upperBound);
+    bool checkSliceBoundaries(LgsIterIndex* iterIndex, const LgsIndex* index, size_t upperBound);
+    bool checkIndexBoundaries(LgsIterIndex* iterIndex);
+    bool checkArrDimensions(const LgsIterIndex* iterIndex);
     void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 

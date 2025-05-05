@@ -1,5 +1,5 @@
 #include "exprs/unary/LgsSelection.h"
-#include "exprs/unary/LgsArrayIndex.h"
+#include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsVariable.h"
 #include "funcs/LgsMethodImpl.h"
@@ -25,8 +25,8 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
         const auto childExpr = exprs[i + 1];
         const auto field = parentExpr->type->getField(childExpr->getName());
         if (field) {
-            if (const auto arrIndex = parentExpr->asArrayIndex()) {
-                const auto gep = arrIndex->getGEP(metadata);
+            if (const auto iterIndex = parentExpr->asArrayIndex()) {
+                const auto gep = iterIndex->getGEP(metadata);
                 auto valueLoad = metadata->builder.CreateLoad(ptrTy, gep);
                 const auto value = field->getGEP(metadata, valueLoad);
                 valueLoad = metadata->builder.CreateLoad(field->type->getIRType(), value);

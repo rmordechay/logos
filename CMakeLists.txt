@@ -67,7 +67,7 @@ add_library(lib STATIC
     include/symbols/exprs/unary/constants/LgsIntConst.h
     include/symbols/exprs/unary/constants/LgsStrConst.h
     include/symbols/exprs/unary/constants/LgsTypeConst.h
-    include/symbols/exprs/unary/LgsArrayIndex.h
+    include/symbols/exprs/unary/LgsIterIndex.h
     include/symbols/exprs/unary/LgsDArray.h
     include/symbols/exprs/unary/LgsEnumField.h
     include/symbols/exprs/unary/LgsFuncCall.h
@@ -143,7 +143,7 @@ add_library(lib STATIC
     src/symbols/exprs/unary/constants/LgsSArray.cpp
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
     src/symbols/exprs/unary/constants/LgsTypeConst.cpp
-    src/symbols/exprs/unary/LgsArrayIndex.cpp
+    src/symbols/exprs/unary/LgsIterIndex.cpp
     src/symbols/exprs/unary/LgsDArray.cpp
     src/symbols/exprs/unary/LgsEnumField.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp

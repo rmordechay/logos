@@ -36,6 +36,7 @@ public:
     void setLocation(const antlr4::Token* ctx);
 
     virtual bool isVoid();
+    virtual bool isIndexable(LgsType* indexType);
     virtual bool equals(const LgsType& other);
     virtual Type* getIRType() = 0;
     virtual LgsExpr* getZeroValue() = 0;

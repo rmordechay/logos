@@ -17,7 +17,7 @@
 #include "exprs/unary/LgsInstance.h"
 #include "exprs/unary/LgsSelection.h"
 #include <exprs/unary/LgsDArray.h>
-#include <exprs/unary/LgsArrayIndex.h>
+#include <exprs/unary/LgsIterIndex.h>
 #include <exprs/unary/LgsFuncCall.h>
 #include <exprs/unary/LgsVariable.h>
 #include "funcs/LgsParam.h"
@@ -576,7 +576,7 @@ LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) 
     return instance;
 }
 
-LgsArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ctx) {
+LgsIterIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ctx) {
     LgsUnaryExpr* baseExpr;
     if (const auto variable = ctx->VARIABLE()) {
         baseExpr = getVariable(variable->getText(), ctx);
@@ -597,7 +597,7 @@ LgsArrayIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ct
         indices.emplace_back(new LgsIndex(arrayIndexFrom, arrayIndexTo));
     }
 
-    const auto arrayIndex = new LgsArrayIndex(baseExpr, indices);
+    const auto arrayIndex = new LgsIterIndex(baseExpr, indices);
     arrayIndex->setLocation(ctx->start);
     arrayIndex->code = ctx->getText();
     return arrayIndex;

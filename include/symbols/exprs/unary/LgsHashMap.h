@@ -8,6 +8,9 @@ public:
     LgsMap mapType;
     map<LgsExpr*, LgsExpr*> initialElements;
 
+    LgsHashMap() {
+        type = &mapType;
+    }
     Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsHashMap() override = default;
 };

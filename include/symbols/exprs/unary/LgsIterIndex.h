@@ -12,17 +12,17 @@ public:
     ~LgsIndex() = default;
 };
 
-class LgsArrayIndex final : public LgsUnaryExpr {
+class LgsIterIndex final : public LgsUnaryExpr {
 public:
     LgsUnaryExpr* baseExpr;
     vector<LgsIndex*> indices;
 
-    explicit LgsArrayIndex(LgsUnaryExpr* baseExpr, const vector<LgsIndex*>& indices) : baseExpr(baseExpr), indices(indices) {}
+    explicit LgsIterIndex(LgsUnaryExpr* baseExpr, const vector<LgsIndex*>& indices) : baseExpr(baseExpr), indices(indices) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* getGEP(CodeGenMetadata* metadata) const;
     string getName() override;
     string getNameWithTypes();
-    ~LgsArrayIndex() override;
+    ~LgsIterIndex() override;
 };
 
 #endif //LOGOSARRAYINDEX_H

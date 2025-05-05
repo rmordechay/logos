@@ -50,7 +50,7 @@ inline LgsError E10032{.msg = "Singleton object '%s' cannot be instantiated.", .
 inline LgsError E10033{.msg = "Function '%s' is declared multiple times.", .errCode = ++errCodeStart};
 inline LgsError E10034{.msg = "Object '%s' has method(s) with name '%s' but it does not match any overload.\n\t   Given: %s\n\t   Possible overloads:%s", .errCode = ++errCodeStart};
 inline LgsError E10035{.msg = "Array indexing of '%s' is too deep. Max level: %s.", .errCode = ++errCodeStart};
-inline LgsError E10036{.msg = "Array indices must be of type 'Int'. Given: %s.", .errCode = ++errCodeStart};
+inline LgsError E10036{.msg = "'%s' cannot be indexed with type '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10037{.msg = "Left-hand index of slice must be less than right-hand index. Given: %s.", .errCode = ++errCodeStart};
 inline LgsError E10038{.msg = "'continue' must be inside a loop statement.", .errCode = ++errCodeStart};
 
