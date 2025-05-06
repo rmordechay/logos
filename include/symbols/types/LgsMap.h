@@ -1,9 +1,7 @@
 #ifndef LGSMAP_H
 #define LGSMAP_H
-#include "LgsAny.h"
 #include "LgsIterable.h"
 #include "LgsPair.h"
-#include "LgsVoid.h"
 #include "LgsMapMethods.h"
 #include "funcs/LgsMethodImpl.h"
 
@@ -12,7 +10,7 @@ public:
     static constexpr auto name = "Map";
     LgsPair underlyingType;
     LgsMapGetFunc get{this};
-    LgsMapInsertFunc insert{this};
+    LgsMapAddFunc add{this};
     LgsMapDeleteFunc delete_{this};
     LgsMapLenFunc len{this};
 

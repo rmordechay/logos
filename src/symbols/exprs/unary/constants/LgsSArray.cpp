@@ -1,14 +1,13 @@
 #include "exprs/unary/LgsSArray.h"
 
-#include "types/LgsIterable.h"
 
 Value* LgsSArray::createIRValue(CodeGenMetadata* metadata) {
-    const auto irType = type->getIRType();
-    const auto arrPtr = metadata->builder.CreateAlloca(irType);
+    const auto IRType = type->getIRType();
+    const auto arrPtr = metadata->builder.CreateAlloca(IRType);
     for (int i = 0; i < initialElements.size(); ++i) {
         const auto initialElement = initialElements[i];
-        auto irIndex = metadata->builder.getInt32(i);
-        const auto gep = metadata->builder.CreateGEP(irType, arrPtr, {i32Zero, irIndex});
+        auto IRIndex = metadata->builder.getInt32(i);
+        const auto gep = metadata->builder.CreateGEP(IRType, arrPtr, {i32Zero, IRIndex});
         const auto rValue = initialElement->getIRValue(metadata);
         metadata->builder.CreateStore(rValue, gep);
     }

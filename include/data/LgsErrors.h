@@ -49,7 +49,7 @@ inline LgsError E10031{.msg = "Non-public method '%s' is used outside its parent
 inline LgsError E10032{.msg = "Singleton object '%s' cannot be instantiated.", .errCode = ++errCodeStart};
 inline LgsError E10033{.msg = "Function '%s' is declared multiple times.", .errCode = ++errCodeStart};
 inline LgsError E10034{.msg = "Object '%s' has method(s) with name '%s' but it does not match any overload.\n\t   Given: %s\n\t   Possible overloads:%s", .errCode = ++errCodeStart};
-inline LgsError E10035{.msg = "Index of %s is too deep. Max level: %s.", .errCode = ++errCodeStart};
+inline LgsError E10035{.msg = "Index of %s has %s level which is too deep. Max level: %s.", .errCode = ++errCodeStart};
 inline LgsError E10036{.msg = "'%s' cannot be indexed with type '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10037{.msg = "Left-hand index of slice must be less than right-hand index. Given: %s.", .errCode = ++errCodeStart};
 inline LgsError E10038{.msg = "'continue' must be inside a loop statement.", .errCode = ++errCodeStart};

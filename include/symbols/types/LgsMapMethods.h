@@ -16,13 +16,13 @@ public:
     }
 };
 
-class LgsMapInsertFunc final : public LgsMethodImpl {
+class LgsMapAddFunc final : public LgsMethodImpl {
 public:
     LgsParam self{};
     LgsParam keyParam{&LGS_ANY};
     LgsParam valueParam{&LGS_ANY};
 
-    explicit LgsMapInsertFunc(LgsType* parent) : LgsMethodImpl("insert", parent->getIRName(), &LGS_VOID) {
+    explicit LgsMapAddFunc(LgsType* parent) : LgsMethodImpl("add", parent->getIRName(), &LGS_VOID) {
         self.type = parent;
         methodType.params = {&self, &keyParam, &valueParam};
     }

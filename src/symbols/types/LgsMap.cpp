@@ -2,7 +2,7 @@
 #include "exprs/unary/LgsHashMap.h"
 
 Value* LgsMap::IRLength(CodeGenMetadata* metadata) {
-    return len.call(metadata, {});
+    return len.call(metadata);
 }
 
 Type* LgsMap::getIRType() {
@@ -17,7 +17,6 @@ LgsExpr* LgsMap::getZeroValue() {
     const auto hashMap = new LgsHashMap();
     hashMap->mapType.underlyingType.key = underlyingType.key;
     hashMap->mapType.underlyingType.value = underlyingType.value;
-    hashMap->mapType.sizes.emplace_back(1);
     return hashMap;
 }
 

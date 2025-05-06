@@ -41,6 +41,7 @@ add_library(lib STATIC
     include/files/LgsMainFile.h
     include/files/LgsObjectFile.h
     include/logos/LgsActiveEnv.h
+    include/logos/Platform.h
     include/logos/LgsErrorHandler.h
     include/logos/LgsGlobals.h
     include/logos/LgsProject.h
@@ -62,6 +63,7 @@ add_library(lib STATIC
     include/symbols/exprs/unary/constants/LgsConstExpr.h
     include/symbols/exprs/unary/constants/LgsFloatConst.h
     include/symbols/exprs/unary/constants/LgsIntConst.h
+    include/symbols/exprs/unary/constants/LgsLongConst.h
     include/symbols/exprs/unary/constants/LgsStrConst.h
     include/symbols/exprs/unary/constants/LgsTypeConst.h
     include/symbols/exprs/unary/LgsIterIndex.h
@@ -73,6 +75,7 @@ add_library(lib STATIC
     include/symbols/exprs/unary/LgsSelection.h
     include/symbols/exprs/unary/LgsUnaryExpr.h
     include/symbols/exprs/unary/LgsVariable.h
+    include/symbols/exprs/unary/LgsHashMap.h
     include/symbols/exprs/unary/vectors/LgsVec2.h
     include/symbols/exprs/unary/vectors/LgsVec3.h
     include/symbols/exprs/unary/vectors/LgsVec4.h
@@ -108,7 +111,12 @@ add_library(lib STATIC
     include/symbols/types/LgsStr.h
     include/symbols/types/LgsType.h
     include/symbols/types/LgsVoid.h
+    include/symbols/types/LgsLong.h
     include/symbols/types/LgsMap.h
+    include/symbols/types/LgsPair.h
+    include/symbols/types/LgsUnknownType.h
+    include/symbols/types/LgsMapMethods.h
+    include/symbols/types/LgsArrayMethods.h
 
     # src
     src/analysis/AntlrConverter.cpp
@@ -147,6 +155,7 @@ add_library(lib STATIC
     src/symbols/exprs/unary/LgsInstance.cpp
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
+    src/symbols/exprs/unary/LgsHashMap.cpp
     src/symbols/funcs/LgsFunc.cpp
     src/symbols/funcs/LgsFuncImpl.cpp
     src/symbols/funcs/LgsMethodImpl.cpp
@@ -182,6 +191,9 @@ add_library(lib STATIC
     src/symbols/types/LgsVoid.cpp
     src/symbols/types/LgsMap.cpp
     src/symbols/types/LgsUnknownType.cpp
+    src/symbols/types/LgsLong.cpp
+    src/symbols/exprs/unary/constants/LgsLongConst.cpp
+    src/utils/DynArray.c
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -203,12 +215,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 endif()
 
-add_executable(lgs main.cpp
-    src/symbols/exprs/unary/LgsHashMap.cpp
-    include/symbols/exprs/unary/LgsHashMap.h
-    include/symbols/types/LgsPair.h
-    include/logos/Platform.h
-    include/symbols/types/LgsUnknownType.h
-    include/symbols/types/LgsMapMethods.h)
+add_executable(lgs main.cpp)
 target_link_libraries(lgs PRIVATE lib)
 #add_subdirectory(tests)

@@ -501,12 +501,15 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
 void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     visitUnaryExpr(baseExpr);
+    for (const auto index : iterIndex->indices) {
+        visitExpr(index->from);
+        visitExpr(index->to);
+    }
     const auto baseExprType = baseExpr->type;
-    if (baseExprType->isIterable()) {
-        const auto indexDimsValid = checkIndexDimensions(iterIndex);
-        if (!indexDimsValid) return;
-        const auto boundariesValid = !checkIndexBoundaries(iterIndex);
-        if (!boundariesValid) return;
+    if (const auto iter = baseExprType->asIterable()) {
+        if (iter->isStatic) {
+            if (!checkIndexBoundaries(iterIndex)) return;
+        }
         setIterIndexType(iterIndex);
     } else {
         return errHandler.handleError(E10002, &iterIndex->location, {baseExpr->getName()});
@@ -563,17 +566,8 @@ bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable
 }
 
 void SemaAnalyser::setIterIndexType(LgsIterIndex* iterIndex) const {
-    assert(iterIndex->baseExpr->type);
     const auto iterable = iterIndex->baseExpr->type->asIterable();
-    const auto sizeDefinition = iterable->getDims();
-    const auto sizeCall = iterIndex->indices.size();
-    assert(sizeDefinition >= sizeCall);
-    const auto diff = sizeDefinition - sizeCall;
-    if (diff == 0) {
-        iterIndex->type = iterable->getUnderlyingType();
-    } else {
-        assert(false);
-    }
+    iterIndex->type = iterable->getUnderlyingType();
     assert(iterIndex->type);
 }
 
@@ -634,31 +628,36 @@ bool SemaAnalyser::checkExprType(LgsExpr* expr, LgsType* type) {
 }
 
 bool SemaAnalyser::checkIndexBoundaries(LgsIterIndex* iterIndex) {
-    const auto baseExpr = iterIndex->baseExpr;
-    if (!baseExpr->type->asIterable()->isStatic) return false;
-    vector<size_t> boundaries;
-    if (const auto var = baseExpr->asVariable()) {
+    const LgsIterable* baseIterable = nullptr;
+    if (const auto var = iterIndex->baseExpr->asVariable()) {
         const auto ref = var->ref;
         if (ref->type == VAR_DEC) {
-            const auto iterable = ref->varDec->type->asIterable();
-            boundaries = iterable->sizes;
+            const auto expr = ref->varDec->expr;
+            baseIterable = expr->type->asIterable();
         }
     }
-    assert(!boundaries.empty());
-    bool valid = false;
+    assert(baseIterable);
+    const auto iterDims = baseIterable->getDims();
+    if (iterDims < iterIndex->indices.size()) {
+        errHandler.handleError(E10035, &iterIndex->location, {iterIndex->code, to_string(iterIndex->indices.size()), to_string(iterDims)});
+        return false;
+    }
+
     for (int i = 0; i < iterIndex->indices.size(); ++i) {
-        const auto upperBound = boundaries[i];
-        const auto index = iterIndex->indices[i];
-        visitExpr(index->from);
-        if (index->to) {
-            visitExpr(index->to);
-            valid = checkSliceBoundaries(iterIndex, index, upperBound);
-        } else {
-            valid = checkSingleIndexBoundaries(iterIndex, index->from, upperBound);
+        const auto upperBound = baseIterable->sizes[i];
+        const auto indexCallFrom = iterIndex->indices[i]->from;
+        bool valid = checkSingleIndexBoundaries(iterIndex, indexCallFrom, upperBound);
+        if (!valid) return false;
+        const auto indexCallTo = iterIndex->indices[i]->to;
+        if (indexCallTo) {
+            valid = checkSingleIndexBoundaries(iterIndex, indexCallTo, upperBound);
         }
-        if (!valid) break;
+        if (!valid) return false;
     }
-    return valid;
+    for (const auto index : iterIndex->indices) {
+
+    }
+    return true;
 }
 
 bool SemaAnalyser::checkSingleIndexBoundaries(LgsIterIndex* iterIndex, LgsExpr* index, const size_t upperBound) {
@@ -687,25 +686,6 @@ bool SemaAnalyser::checkSliceBoundaries(LgsIterIndex* iterIndex, const LgsIndex*
     const auto toIntConst = index->to->asIntConst()->value;
     if (fromIntConst >= toIntConst) {
         errHandler.handleError(E10037, &iterIndex->location, {iterIndex->code});
-        return false;
-    }
-    return true;
-}
-
-bool SemaAnalyser::checkIndexDimensions(const LgsIterIndex* iterIndex) {
-    int maxIndexLevel = -1;
-    if (const auto var = iterIndex->baseExpr->asVariable()) {
-        const auto ref = var->ref;
-        if (ref->type == VAR_DEC) {
-            const auto expr = ref->varDec->expr;
-            const auto iterable = expr->type->asIterable();
-            assert(iterable);
-            maxIndexLevel = iterable->getDims();
-        }
-    }
-    assert(maxIndexLevel > 0);
-    if (iterIndex->indices.size() > maxIndexLevel) {
-        errHandler.handleError(E10035, &iterIndex->location, {iterIndex->code, to_string(maxIndexLevel)});
         return false;
     }
     return true;
@@ -848,7 +828,6 @@ void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
 }
 
 LgsType* SemaAnalyser::resolveType(LgsType* type, LgsErrorHandler* errorHandler) {
-    assert(type);
     if (const auto iterable = type->asIterable()) {
         if (dynamic_cast<LgsUnknownType*>(iterable->underlyingType)) {
             iterable->underlyingType = resolveType(iterable->underlyingType, errorHandler);

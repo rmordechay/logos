@@ -1,0 +1,20 @@
+#ifndef LGSLONG_H
+#define LGSLONG_H
+#include "LgsType.h"
+
+class LgsLong final : public LgsType {
+public:
+    static constexpr auto name = "Long";
+
+    Type* getIRType() override;
+    LgsExpr* getZeroValue() override;
+    LgsType* inferBinaryType(LgsType* other) override;
+    string getIRName() override;
+    string prettyName() const override;
+    bool equals(LgsType* other) const override;
+    ~LgsLong() override = default;
+};
+
+inline LgsLong LGS_LONG;
+
+#endif //LGSLONG_H

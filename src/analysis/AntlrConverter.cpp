@@ -456,7 +456,7 @@ LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
 }
 
 LgsUnaryExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
-    const auto array = new LgsSArray();
+    const auto array = new LgsDArray();
     for (const auto& expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }
@@ -657,6 +657,7 @@ LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) const {
     const auto underlyingType = getTypeFromText(ctx->TYPE(), ctx);
     const auto arrType = new LgsArray(underlyingType);
     if (ctx->INTEGER().size() > 0) {
+        arrType->isStatic = true;
         for (const auto& integer : ctx->INTEGER()) {
             arrType->sizes.emplace_back(std::stoi(integer->getText()));
         }

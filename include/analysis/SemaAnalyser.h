@@ -92,7 +92,6 @@ public:
     bool checkSingleIndexBoundaries(LgsIterIndex* iterIndex, LgsExpr* index, size_t upperBound);
     bool checkSliceBoundaries(LgsIterIndex* iterIndex, const LgsIndex* index, size_t upperBound);
     bool checkIndexBoundaries(LgsIterIndex* iterIndex);
-    bool checkIndexDimensions(const LgsIterIndex* iterIndex);
     void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 

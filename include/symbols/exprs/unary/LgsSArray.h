@@ -8,11 +8,11 @@ public:
     LgsArray arrType;
     vector<LgsExpr*> initialElements;
 
-    explicit LgsSArray() {
+    explicit LgsSArray(LgsType* underlyingType = nullptr) {
         type = &arrType;
         arrType.isStatic = true;
+        arrType.underlyingType = underlyingType;
     }
-
     Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsSArray() override = default;
 };

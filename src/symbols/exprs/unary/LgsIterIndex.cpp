@@ -5,13 +5,20 @@
 
 Value* LgsIterIndex::createIRValue(CodeGenMetadata* metadata) {
     const auto baseExprType = baseExpr->type;
-    if (const auto lgsMap = baseExprType->asMap()) {
-        return lgsMap->get.call(metadata, {baseExpr, indices[0]->from});
+    const auto baseExprIRValue = baseExpr->getIRValue(metadata);
+    auto firstIndex = indices[0]->from;
+    if (const auto map = baseExprType->asMap()) {
+        return map->get.call(metadata, {baseExpr, firstIndex});
     }
-    if (baseExprType->asArray()) {
-        const auto iterable = baseExprType->asIterable();
-        const auto IRType = iterable->getUnderlyingType()->getIRType();
-        return metadata->builder.CreateLoad(IRType, getGEP(metadata));
+    if (const auto arr = baseExprType->asArray()) {
+        if (arr->isStatic) {
+            const auto iterable = baseExpr->type->asIterable();
+            const auto IRType = iterable->getUnderlyingType()->getIRType();
+            return metadata->builder.CreateLoad(IRType, getGEP(metadata));
+        }
+        const auto arrPtrValue = metadata->builder.CreateLoad(ptrTy, baseExprIRValue);
+        const auto value = arr->get.call(metadata, {arrPtrValue, firstIndex->getIRValue(metadata)});
+        return metadata->builder.CreateLoad(ptrTy, value);
     }
     assert(false);
 }
@@ -28,12 +35,17 @@ Value* LgsIterIndex::getGEP(CodeGenMetadata* metadata) const {
 }
 
 void LgsIterIndex::assignIRValue(CodeGenMetadata* metadata, LgsExpr* value) const {
-    if (const auto lgsMap = baseExpr->type->asMap()) {
-        lgsMap->insert.call(metadata, {baseExpr, indices[0]->from, value});
-    } else if (baseExpr->type->asArray()) {
-        const auto gep = getGEP(metadata);
-        const auto rValue = value->getIRValue(metadata);
-        metadata->builder.CreateStore(rValue, gep);
+    // TODO make for all indices
+    if (const auto map = baseExpr->type->asMap()) {
+        map->add.call(metadata, {baseExpr, indices[0]->from, value});
+    } else if (const auto arr = baseExpr->type->asArray()) {
+        if (arr->isStatic) {
+            const auto gep = getGEP(metadata);
+            const auto rValue = value->getIRValue(metadata);
+            metadata->builder.CreateStore(rValue, gep);
+        } else {
+            arr->add.call(metadata, {baseExpr, indices[0]->from, value});
+        }
     }
 }
 

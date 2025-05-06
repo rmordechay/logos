@@ -33,9 +33,9 @@ bool LgsFuncType::equals(const LgsFuncCall* other) const {
     if (params.size() < args.size()) return false;
     for (size_t i = 0; i < params.size(); ++i) {
         assert(args[i]);
-        auto thisTypeName = params[i]->type->getIRName();
-        auto otherTypeName = args[i]->type->getIRName();
-        if (thisTypeName != otherTypeName) return false;
+        const auto thisType = params[i]->type;
+        const auto otherType = args[i]->type;
+        if (!thisType->equals(otherType)) return false;
     }
     return true;
 }

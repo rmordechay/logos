@@ -9,7 +9,7 @@ int LgsForeachLoop::loopStart() {
 
 int LgsForeachLoop::loopEnd() {
     const auto iterable = expr->type->asIterable();
-    return iterable->sizes[0];
+    assert(false);
 }
 
 void LgsForeachLoop::setIRLoopVariable(CodeGenMetadata* metadata) {

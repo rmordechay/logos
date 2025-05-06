@@ -19,8 +19,8 @@ bool LgsMethodImpl::equals(const LgsFuncCall* other) {
 
 FunctionType* LgsMethodImpl::getIRFuncType(const CodeGenMetadata* metadata) {
     vector<Type*> IRParamsTypes;
-    IRParamsTypes.emplace_back(ptrTy);
-    for (int i = 1; i < methodType.params.size(); ++i) {
+    // if (!isStatic) IRParamsTypes.emplace_back(ptrTy);
+    for (int i = 0; i < methodType.params.size(); ++i) {
         auto paramIRType = methodType.params[i]->type->getIRType();
         IRParamsTypes.emplace_back(paramIRType);
     }

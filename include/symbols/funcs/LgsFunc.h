@@ -16,8 +16,9 @@ public:
     BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
 
     void generateIRCode(CodeGenMetadata* metadata);
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args, Value* callback = nullptr);
-    Value* setIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args);
+    virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {}, Value* callback = nullptr);
+    virtual Value* call(CodeGenMetadata* metadata, const vector<Value*>& args);
+    bool setIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args);
     void setStructRet(Function::arg_iterator& args, LgsObject* obj) const;
     string format(string& indentStr) override;
     json asJSON() override;
