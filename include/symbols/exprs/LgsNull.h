@@ -4,7 +4,9 @@
 
 class LgsNull final : public LgsUnaryExpr {
 public:
-    explicit LgsNull() : LgsUnaryExpr(nullptr) {}
+    explicit LgsNull() : LgsUnaryExpr(nullptr) {
+        isNull = true;
+    }
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;
 };

@@ -13,7 +13,6 @@ class LgsValue {
 public:
     Location location;
     Value* IRValue = nullptr;
-    bool isFreed = false;
     string code;
 
     void setIRValue(Value* value);

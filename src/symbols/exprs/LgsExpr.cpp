@@ -1,5 +1,4 @@
 #include "exprs/LgsExpr.h"
-#include "exprs/LgsNull.h"
 #include "exprs/unary/LgsDArray.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsEnumField.h"
@@ -97,10 +96,6 @@ Value* LgsExpr::rshiftIR(CodeGenMetadata* metadata, LgsExpr* other) {
 
 Value* LgsExpr::lshiftIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
-}
-
-bool LgsExpr::isNull() {
-    return dynamic_cast<LgsNull*>(this);
 }
 
 LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }

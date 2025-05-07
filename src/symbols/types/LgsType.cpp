@@ -13,10 +13,6 @@ bool LgsType::equals(LgsType& other) {
     return getIRName() == other.getIRName();
 }
 
-bool LgsType::isVoid() {
-    return false;
-}
-
 bool LgsType::isIndexable(LgsType* indexType) {
     return false;
 }

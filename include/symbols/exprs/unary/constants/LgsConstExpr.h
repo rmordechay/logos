@@ -10,7 +10,9 @@ using namespace std;
 
 class LgsConstExpr : public LgsUnaryExpr {
 public:
-    explicit LgsConstExpr(LgsType* type) : LgsUnaryExpr(type) {}
+    explicit LgsConstExpr(LgsType* type) : LgsUnaryExpr(type) {
+        type->isConst = true;
+    }
     ~LgsConstExpr() override = default;
 };
 

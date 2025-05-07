@@ -21,8 +21,10 @@ class LgsMethodImpl;
 class LgsType {
 public:
     Location location;
-    bool nullable = false;
+    bool isNullable = false;
     Type* IRType = nullptr;
+    bool isVoidType = false;
+    bool isConst = false;
     map<string, LgsField*> fields;
     map<string, vector<LgsMethodImpl*>> methods;
 
@@ -41,7 +43,6 @@ public:
     LgsIterable* asIterable();
     LgsArray* asArray();
 
-    virtual bool isVoid();
     virtual bool isIndexable(LgsType* indexType);
     virtual bool equals(LgsType& other);
     virtual json asJSON() const;

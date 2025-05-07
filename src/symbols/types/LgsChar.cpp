@@ -16,7 +16,7 @@ string LgsChar::getIRName() {
 }
 
 LgsExpr* LgsChar::getZeroValue() {
-    if (nullable) return new LgsNull();
+    if (isNullable) return new LgsNull();
     return new LgsCharConst('0');
 }
 

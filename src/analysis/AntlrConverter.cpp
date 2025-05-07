@@ -416,7 +416,7 @@ LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx, const bool isNu
         expr = getBinaryExpr(ctx);
     }
     if (isNullable) {
-        expr->type->nullable = true;
+        expr->type->isNullable = true;
     }
     return expr;
 }
@@ -646,7 +646,7 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) const {
     } else {
         result = getTypeFromText(ctx->TYPE(), ctx);
         if (ctx->QUEST_MARK()) {
-            result->nullable = true;
+            result->isNullable = true;
         }
     }
     result->setLocation(ctx->start);

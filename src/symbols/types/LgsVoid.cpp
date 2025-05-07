@@ -7,10 +7,6 @@ string LgsVoid::prettyName() const {
     return name;
 }
 
-bool LgsVoid::isVoid() {
-    return true;
-}
-
 Type* LgsVoid::getIRType() {
     return voidTy;
 }

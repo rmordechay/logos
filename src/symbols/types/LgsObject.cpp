@@ -33,7 +33,7 @@ Type* LgsObject::getIRType() {
 }
 
 LgsExpr* LgsObject::getZeroValue() {
-    if (nullable) return new LgsNull();
+    if (isNullable) return new LgsNull();
     // TODO return empty constructor
     return nullptr;
 }

@@ -16,7 +16,7 @@ string LgsStr::prettyName() const {
 }
 
 LgsExpr* LgsStr::getZeroValue() {
-    if (nullable) return new LgsNull();
+    if (isNullable) return new LgsNull();
     return new LgsStrConst("");
 }
 

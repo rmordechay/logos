@@ -16,7 +16,7 @@ string LgsInt::getIRName() {
 }
 
 LgsExpr* LgsInt::getZeroValue() {
-    if (nullable) return new LgsNull();
+    if (isNullable) return new LgsNull();
     return new LgsIntConst(0);
 }
 

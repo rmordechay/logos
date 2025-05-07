@@ -259,10 +259,10 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
         returnStmt->expr->isReturnValue = true;
         visitExpr(returnStmt->expr);
     }
-    if (rt->isVoid()) {
+    if (rt->isVoidType) {
         if (returnStmt->expr) {
             const auto exprType = returnStmt->expr->type;
-            if (!exprType->isVoid()) {
+            if (!exprType->isVoidType) {
                 errHandler.handleError(E10027, &returnStmt->location, {funcSignature->name, rt->prettyName(), exprType->prettyName()});
                 return;
             }
@@ -606,14 +606,14 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
 
 bool SemaAnalyser::checkExprType(LgsExpr* expr, LgsType* type) {
     if (!expr) return true;
-    if (expr->isNull()) {
+    if (expr->isNull) {
         // null must have a type
         if (!type) {
             errHandler.handleError(E10024, &expr->location);
             return false;
         }
         // type must be nullable
-        if (!type->nullable) {
+        if (!type->isNullable) {
             errHandler.handleError(E10023, &type->location, {type->prettyName(), type->prettyName()});
             return false;
         }
@@ -654,9 +654,6 @@ bool SemaAnalyser::checkIndexBoundaries(LgsIterIndex* iterIndex) {
         }
         if (!valid) return false;
     }
-    for (const auto index : iterIndex->indices) {
-
-    }
     return true;
 }
 
@@ -666,13 +663,16 @@ bool SemaAnalyser::checkSingleIndexBoundaries(LgsIterIndex* iterIndex, LgsExpr* 
         errHandler.handleError(E10036, &iterIndex->location, {baseExprType->prettyName(), index->type->prettyName()});
         return false;
     }
-    bool outOfBounds = false;
-    if (const auto indexInt = index->asIntConst()) {
-        outOfBounds = indexInt->value >= upperBound;
-    }
-    if (outOfBounds) {
-        errHandler.handleError(E10003, &iterIndex->location, {iterIndex->code});
-        return false;
+
+    if (index->type->isConst) {
+        if (const auto indexInt = index->asIntConst()) {
+            if (indexInt->value >= upperBound) {
+                errHandler.handleError(E10003, &iterIndex->location, {iterIndex->code});
+                return false;
+            }
+            return true;
+        }
+        assert(false);
     }
     return true;
 }
@@ -837,7 +837,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type, LgsErrorHandler* errorHandler)
 
     if (!dynamic_cast<LgsUnknownType*>(type)) return type;
     auto typeName = type->prettyName();
-    const auto nullable = type->nullable;
+    const auto nullable = type->isNullable;
     if (globals.symbols.find(typeName) == globals.symbols.end()) {
         errorHandler->handleError(E10006, &type->location, {typeName});
         return nullptr;
@@ -847,19 +847,19 @@ LgsType* SemaAnalyser::resolveType(LgsType* type, LgsErrorHandler* errorHandler)
     delete type;
     LgsType* newType = nullptr;
     if (symbol->type == OBJECT) {
-        symbol->object->nullable = nullable;
+        symbol->object->isNullable = nullable;
         newType = symbol->object;
     }
     if (symbol->type == INTERFACE) {
-        symbol->interface->nullable = nullable;
+        symbol->interface->isNullable = nullable;
         newType = symbol->interface;
     }
     if (symbol->type == ENUM) {
-        symbol->lgsEnum->nullable = nullable;
+        symbol->lgsEnum->isNullable = nullable;
         newType = symbol->lgsEnum;
     }
     if (symbol->type == ENUM_FIELD) {
-        symbol->enumField->parent->nullable = nullable;
+        symbol->enumField->parent->isNullable = nullable;
         newType = symbol->enumField->parent;
     }
     assert(newType);

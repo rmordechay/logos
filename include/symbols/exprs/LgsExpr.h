@@ -23,10 +23,28 @@ public:
     // TODO free type
     LgsType* type = nullptr;
     bool isReturnValue = false;
+    bool isNull = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     Value* getIRValue(CodeGenMetadata* metadata);
     void initIRValue(CodeGenMetadata* metadata);
+
+    LgsVariable* asVariable();
+    LgsFuncCall* asFuncCall();
+    LgsIterIndex* asArrayIndex();
+    LgsInstance* asInstance();
+    LgsSelection* asSelection();
+    LgsDArray* asDArray();
+    LgsSArray* asSArray();
+    LgsHashMap* asHashMap();
+    LgsBoolConst* asBoolConst();
+    LgsCharConst* asCharConst();
+    LgsFloatConst* asFloatConst();
+    LgsIntConst* asIntConst();
+    LgsStrConst* asStrConst();
+    LgsEnumField* asEnumField();
+    LgsTypeConst* asTypeConst();
+
     virtual LgsExpr* castStatically(LgsType* other);
     virtual uint32_t hashValue(CodeGenMetadata* metadata);
     virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
@@ -47,23 +65,6 @@ public:
     virtual Value* bitXorIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* rshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* lshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
-
-    bool isNull();
-    LgsVariable* asVariable();
-    LgsFuncCall* asFuncCall();
-    LgsIterIndex* asArrayIndex();
-    LgsInstance* asInstance();
-    LgsSelection* asSelection();
-    LgsDArray* asDArray();
-    LgsSArray* asSArray();
-    LgsHashMap* asHashMap();
-    LgsBoolConst* asBoolConst();
-    LgsCharConst* asCharConst();
-    LgsFloatConst* asFloatConst();
-    LgsIntConst* asIntConst();
-    LgsStrConst* asStrConst();
-    LgsEnumField* asEnumField();
-    LgsTypeConst* asTypeConst();
     ~LgsExpr() override = default;
 };
 
