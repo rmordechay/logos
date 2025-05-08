@@ -1,5 +1,6 @@
 #include "CodeGenerator.h"
 #include "Logos.h"
+#include "Platform.h"
 #include "funcs/LgsFuncImpl.h"
 #include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsVarDec.h"

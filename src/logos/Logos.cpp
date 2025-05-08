@@ -1,5 +1,6 @@
 #include "logos/Logos.h"
 #include "LgsLinker.h"
+#include "Platform.h"
 #include "utils/ThreadPool.h"
 
 #include <AntlrConverter.h>
@@ -7,7 +8,7 @@
 #include <LogosLexer.h>
 #include <unistd.h>
 
-void Logos::run(char* argv[]) {
+void Logos::run(const int argc, char* argv[]) {
     // Project loading
     if (!project.loadProject()) exit(1);
 

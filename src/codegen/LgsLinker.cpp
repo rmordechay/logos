@@ -55,6 +55,10 @@ bool LgsLinker::getLinkFunc() const {
 void LgsLinker::linkStdlib(const string& path, Linker* linker) const {
     SMDiagnostic EC;
     auto module = parseIRFile(path, EC, context);
+    if (!module) {
+        std::cout << path << '\n';
+        // std::cout << EC.getMessage().str() << '\n';
+    }
     assert(module);
     if (verifyModule(*module, &errs())) return;
     module->setTargetTriple(targetTriple);

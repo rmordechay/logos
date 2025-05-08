@@ -8,6 +8,18 @@
 using namespace std;
 using namespace llvm;
 
+
+struct LgsPaths {
+    path rootDir;
+    path rootDirAbs;
+    path srcDir;
+    path envsDir;
+    path buildDir;
+    path appFilePath;
+    path objFilePath;
+    path execFilePath;
+};
+
 struct Platform {
     string osName;
     string linker;
@@ -21,6 +33,7 @@ struct Platform {
     bool (*link)(ArrayRef<const char*>, raw_ostream&, raw_ostream&, bool, bool);
 };
 
+inline LgsPaths paths;
 inline Platform platform;
 
 inline void setPlatform(const string& inputFile, const string& outputFile) {

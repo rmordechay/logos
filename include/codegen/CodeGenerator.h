@@ -3,7 +3,6 @@
 #include "types/LgsType.h"
 
 #include <filesystem>
-#include <llvm/IR/Module.h>
 class LgsFile;
 class LgsValue;
 class LgsMainFile;

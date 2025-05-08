@@ -1,6 +1,5 @@
 #ifndef PROJECT_H
 #define PROJECT_H
-#include <thread>
 #include <filesystem>
 #include "SemaAnalyser.h"
 #include "LgsProject.h"
@@ -11,19 +10,6 @@ using namespace std;
 using namespace antlr4;
 using namespace llvm;
 
-struct LgsPaths {
-    path rootDir;
-    path rootDirAbs;
-    path srcDir;
-    path envsDir;
-    path buildDir;
-    path appFilePath;
-    path objFilePath;
-    path execFilePath;
-};
-
-inline LgsPaths paths;
-
 class Logos {
 public:
     LogosProject project;
@@ -33,7 +19,7 @@ public:
         initPaths(rootDirPath);
     }
 
-    void run(char* argv[]);
+    void run(int argc, char* argv[]);
     LgsMainFile* getMainFile(const vector<LgsFile*>& files) const;
     void initPaths(const path& rootDirPath) const;
     ~Logos() = default;

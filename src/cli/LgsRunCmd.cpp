@@ -5,7 +5,7 @@
 void LgsRunCmd::runCmd() {
     validate();
     Logos project(rootPath);
-    project.run(argv);
+    project.run(argc, argv);
 }
 
 void LgsRunCmd::validate() {

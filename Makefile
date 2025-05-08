@@ -1,5 +1,6 @@
 .PHONY: all configure build clean run
 all: configure build
+run_clean: configure build run
 
 configure:
 	@mkdir -p build
@@ -12,7 +13,8 @@ clean:
 	rm -rf build
 
 run:
-	./build/lgs run project
+	@cd project && ../build/lgs run .
+
 
 generate_grammar:
 	rm -rf src/parser
