@@ -15,4 +15,6 @@ public:
     ~LgsChar() override = default;
 };
 
+inline LgsChar LGS_CHAR;
+
 #endif //LGSCHAR_H

@@ -3,13 +3,24 @@
 #include "LgsUnaryExpr.h"
 #include "types/LgsMap.h"
 
+class LgsMapPair final {
+public:
+    LgsExpr* key;
+    LgsExpr* value;
+
+    LgsMapPair(LgsExpr* key, LgsExpr* value) : key(key), value(value) {}
+    ~LgsMapPair() = default;
+};
+
 class LgsHashMap final : public LgsUnaryExpr {
 public:
     LgsMap mapType;
-    map<LgsExpr*, LgsExpr*> initialElements;
+    vector<LgsMapPair*> initialElements;
 
-    LgsHashMap() {
+    explicit LgsHashMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {
         type = &mapType;
+        mapType.kvType.key = keyType;
+        mapType.kvType.value = valueType;
     }
     Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsHashMap() override = default;

@@ -11,6 +11,7 @@ public:
     static constexpr auto name = "Str";
 
     LgsStr() : LgsIterable(&LGS_CHAR) {}
+    size_t getSize() override;
     Type* getIRType() override;
     string getIRName() override;
     string prettyName() const override;
@@ -21,5 +22,7 @@ public:
     static uint32_t hashString(const string& str);
     ~LgsStr() override = default;
 };
+
+inline LgsStr LGS_STR;
 
 #endif // LOGOSSTRING_H

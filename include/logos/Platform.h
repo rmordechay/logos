@@ -8,7 +8,6 @@
 using namespace std;
 using namespace llvm;
 
-
 struct LgsPaths {
     path rootDir;
     path rootDirAbs;

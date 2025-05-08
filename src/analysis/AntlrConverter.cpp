@@ -31,12 +31,10 @@
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsHashMap.h"
-#include "exprs/unary/LgsSArray.h"
 #include "stmts/LgsPatternMatch.h"
 #include "types/LgsArray.h"
 #include "types/LgsMap.h"
 #include "types/LgsUnknownType.h"
-
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
 #include <types/LgsStr.h>
@@ -97,7 +95,7 @@ void AntlerConverter::setMainFunc(LgsMainFile* mainFile, LogosParser::FuncImplem
     bool isValid;
     if (params.size() == 1) {
         const auto arr = params[0]->type->asArray();
-        isValid = arr && !arr->isStatic && arr->underlyingType->asStr();
+        isValid = arr && !arr->isStaticIter && arr->underlyingType->asStr();
     } else {
         isValid = params.empty();
     }
@@ -481,7 +479,10 @@ LgsUnaryExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
 LgsUnaryExpr* AntlerConverter::getHashMap(LogosParser::HashMapContext* ctx) {
     const auto hashMap = new LgsHashMap();
     for (const auto keyValue : ctx->keyValue()) {
-        hashMap->initialElements[getExpr(keyValue->key)] = getExpr(keyValue->value);
+        const auto kExpr = getExpr(keyValue->key);
+        const auto vExpr = getExpr(keyValue->value);
+        const auto mapEntry = new LgsMapPair(kExpr, vExpr);
+        hashMap->initialElements.emplace_back(mapEntry);
     }
     return hashMap;
 }
@@ -630,14 +631,14 @@ LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) co
         const auto value = stof(floatToken->getText());
         constant = new LgsFloatConst(value);
     } else if (const auto boolToken = ctx->BOOL()) {
-        const auto value = boolToken->getText() == "true";
+        const auto value = boolToken->getText() == LgsBool::trueLiteral;
         constant = new LgsBoolConst(value);
     } else if (const auto stringToken = ctx->STRING()) {
         auto value = stringToken->getText();
-        LgsStr::cleanStr(value);
         if (value.size() == 1) {
             constant = new LgsCharConst(value[0]);
         } else {
+            LgsStr::cleanStr(value);
             constant = new LgsStrConst(value);
         }
     }
@@ -672,7 +673,7 @@ LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) const {
     const auto underlyingType = getTypeFromText(ctx->TYPE(), ctx);
     const auto arrType = new LgsArray(underlyingType);
     if (ctx->INTEGER().size() > 0) {
-        arrType->isStatic = true;
+        arrType->isStaticIter = true;
         for (const auto& integer : ctx->INTEGER()) {
             arrType->sizes.emplace_back(std::stoi(integer->getText()));
         }

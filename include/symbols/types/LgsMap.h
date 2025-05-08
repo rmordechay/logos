@@ -5,30 +5,33 @@
 #include "LgsMapMethods.h"
 #include "funcs/LgsMethodImpl.h"
 
+class LgsMapPair;
+
 class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "Map";
-    LgsPair underlyingType;
+    LgsPair kvType;
+    LgsMapNewFunc new_{this};
     LgsMapGetFunc get{this};
     LgsMapAddFunc add{this};
     LgsMapDeleteFunc delete_{this};
     LgsMapLenFunc len{this};
 
-    explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&underlyingType) {
-        underlyingType.key = keyType;
-        underlyingType.value = valueType;
+    explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&kvType) {
+        kvType.key = keyType;
+        kvType.value = valueType;
         addMethod(&len);
     }
-
-    Value* IRLength(CodeGenMetadata* metadata) override;
+    void setUnderlyingType(const vector<LgsMapPair*>& exprs);
     Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;
-    bool equals(LgsType* other) const override;
-    LgsType* inferBinaryType(LgsType* other) override;
-    bool isIndexable(LgsType* indexType) override;
     LgsType* getUnderlyingType() override;
+    bool equals(LgsType* other) const override;
+    bool isIndexable(LgsType* indexType) override;
+    LgsType* inferBinaryType(LgsType* other) override;
+    Value* IRLength(CodeGenMetadata* metadata) override;
     ~LgsMap() override = default;
 };
 

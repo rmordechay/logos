@@ -3,6 +3,10 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "types/LgsChar.h"
 
+size_t LgsStr::getSize() {
+    return sizeof(void*);
+}
+
 Type* LgsStr::getIRType() {
     return ptrTy;
 }

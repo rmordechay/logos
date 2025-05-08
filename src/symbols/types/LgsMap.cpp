@@ -1,6 +1,17 @@
 #include "types/LgsMap.h"
 #include "exprs/unary/LgsHashMap.h"
 
+void LgsMap::setUnderlyingType(const vector<LgsMapPair*>& exprs) {
+    vector<LgsExpr*> keyExprs;
+    vector<LgsExpr*> valueExprs;
+    for (const auto expr : exprs) {
+        keyExprs.emplace_back(expr->key);
+        valueExprs.emplace_back(expr->value);
+    }
+    kvType.key = inferTypeFromIter(keyExprs);
+    kvType.value = inferTypeFromIter(valueExprs);
+}
+
 Value* LgsMap::IRLength(CodeGenMetadata* metadata) {
     return len.call(metadata);
 }
@@ -14,18 +25,17 @@ string LgsMap::getIRName() {
 }
 
 LgsExpr* LgsMap::getZeroValue() {
-    const auto hashMap = new LgsHashMap();
-    hashMap->mapType.underlyingType.key = underlyingType.key;
-    hashMap->mapType.underlyingType.value = underlyingType.value;
-    return hashMap;
+    return new LgsHashMap(kvType.key, kvType.value);
 }
 
 string LgsMap::prettyName() const {
-    return name  + underlyingType.prettyName();
+    return name + underlyingType->prettyName();
 }
 
 bool LgsMap::equals(LgsType* other) const {
-    assert(false);
+    const auto otherMap = other->asMap();
+    const auto keyEqual = otherMap && kvType.key->equals(otherMap->kvType.key);
+    return keyEqual && kvType.value->equals(otherMap->kvType.value);
 }
 
 LgsType* LgsMap::inferBinaryType(LgsType* other) {
@@ -33,9 +43,9 @@ LgsType* LgsMap::inferBinaryType(LgsType* other) {
 }
 
 bool LgsMap::isIndexable(LgsType* indexType) {
-    return underlyingType.key->equals(indexType);
+    return kvType.key->equals(indexType);
 }
 
 LgsType* LgsMap::getUnderlyingType() {
-    return underlyingType.value;
+    return kvType.value;
 }

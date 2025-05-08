@@ -42,12 +42,12 @@ public:
 
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args, Value* callback = nullptr) override {
         auto& builder = metadata->builder;
+        const auto arrPtr = args[0]->getIRValue(metadata);
+        const auto arrPtrLoad = builder.CreateLoad(ptrTy, arrPtr);
         const auto element = args[1];
         const auto elementType = element->type->getIRType();
         const auto valurPtr = builder.CreateAlloca(elementType);
         builder.CreateStore(element->getIRValue(metadata), valurPtr);
-        const auto arrPtr = args[0]->getIRValue(metadata);
-        const auto arrPtrLoad = builder.CreateLoad(ptrTy, arrPtr);
         return LgsMethodImpl::makeCall(metadata, {arrPtrLoad, valurPtr});
     }
 };

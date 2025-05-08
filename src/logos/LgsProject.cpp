@@ -22,7 +22,7 @@ bool LogosProject::loadProject(const vector<char*>& args) {
     if (!errHandler.successful) return false;
     loadFiles();
     if (!errors.empty()) return false;
-    SemaAnalyser::resolveGlobalTypes(files, &errHandler);
+    resolveGlobalTypes(files, &errHandler);
     mainFile->mainFunc->setArgs(args);
     return errHandler.successful;
 }

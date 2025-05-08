@@ -28,6 +28,11 @@ class LgsLoop;
 
 inline std::mutex mtx;
 
+LgsType* resolveType(LgsType* type, LgsErrorHandler* errorHandler);
+void resolveFuncTypes(LgsFuncType* signature, LgsErrorHandler* errHandler);
+void resolveGlobalTypes(const vector<LgsFile*>& files, LgsErrorHandler* errHandler);
+void resolveObjMemberTypes(LgsObject* const& obj, LgsErrorHandler* errHandler);
+
 class SemaAnalyser final {
 public:
     LgsStack lgsStack;
@@ -100,11 +105,6 @@ public:
     string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
     LgsSymbol* getSymbol(const string& name, const LgsValue* value);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
-
-    static LgsType* resolveType(LgsType* type, LgsErrorHandler* errorHandler);
-    static void resolveFuncTypes(LgsFuncType* signature, LgsErrorHandler* errHandler);
-    static void resolveGlobalTypes(const vector<LgsFile*>& files, LgsErrorHandler* errHandler);
-    static void resolveObjMemberTypes(LgsObject* const& obj, LgsErrorHandler* errHandler);
     ~SemaAnalyser() = default;
 };
 

@@ -195,6 +195,8 @@ add_library(lib STATIC
     src/symbols/exprs/unary/constants/LgsLongConst.cpp
     src/utils/DynArray.c
     src/utils/VirtualTable.c
+    src/utils/HashMap.c
+    src/symbols/types/LgsIterable.cpp
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")

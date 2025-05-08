@@ -11,7 +11,7 @@ public:
     FunctionType* const cmpStrIRFuncType = FunctionType::get(i1Ty, {ptrTy, ptrTy}, false);
 
     explicit LgsStrConst(const string& value) : LgsConstExpr(&strType), value(value) {
-        strType.isStatic = true;
+        strType.isStaticIter = true;
         strType.sizes = {value.size()};
     }
     Value* createIRValue(CodeGenMetadata* metadata) override;

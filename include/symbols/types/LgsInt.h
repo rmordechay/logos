@@ -6,6 +6,7 @@ class LgsInt final : public LgsType {
 public:
     static constexpr auto name = "Int";
 
+    size_t getSize() override;
     string prettyName() const override;
     Type* getIRType() override;
     string getIRName() override;

@@ -40,7 +40,7 @@ Function* LgsFunc::createIRFunc(const CodeGenMetadata* metadata) {
     if (const auto obj = funcType->rt->asObject()) {
         setStructRet(args, obj);
     }
-    setIRParams(args);
+    setIRParams(IRFunc, args);
     return IRFunc;
 }
 
@@ -88,6 +88,18 @@ bool LgsFunc::setIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, co
     return isObjReturn;
 }
 
+void LgsFunc::setIRParams(Function* func, Argument* IRParams) {
+    const auto params = getFuncType()->params;
+    for (int i = 0; i < params.size(); ++i) {
+        const auto param = params[i];
+        param->setIRValue(IRParams);
+        if (param->expr) param->expr->setIRValue(IRParams);
+        func->addParamAttr(0, Attribute::NoUndef);
+        IRParams->setName(param->getIRName());
+        IRParams++;
+    }
+}
+
 void LgsFunc::setStructRet(Function::arg_iterator& args, LgsObject* const obj) const {
     AttrBuilder builder(context);
     builder.addStructRetAttr(obj->getIRType());
@@ -96,22 +108,12 @@ void LgsFunc::setStructRet(Function::arg_iterator& args, LgsObject* const obj) c
     args++;
 }
 
-
-void LgsFunc::setIRParams(Argument* IRParams) {
-    for (auto& param : getFuncType()->params) {
-        param->setIRValue(IRParams);
-        if (param->expr) param->expr->setIRValue(IRParams);
-        IRParams->setName(param->getIRName());
-        IRParams++;
-    }
-}
-
 string LgsFunc::format(string& indentStr) {
     stringstream str;
     const auto funcType = getFuncType();
     str << funcType->name << "(";
     for (int i = 0; i < funcType->params.size(); ++i) {
-        auto param = funcType->params[i];
+        const auto param = funcType->params[i];
         str << param->format(indentStr);
         if (i != funcType->params.size() - 1) {
             str << ", ";

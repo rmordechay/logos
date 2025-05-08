@@ -2,8 +2,12 @@
 #include "exprs/unary/LgsDArray.h"
 #include "exprs/unary/LgsSArray.h"
 
+void LgsArray::setUnderlyingType(const vector<LgsExpr*>& exprs) {
+    underlyingType = inferTypeFromIter(exprs);
+}
+
 LgsExpr* LgsArray::getZeroValue() {
-    if (!isStatic) return new LgsDArray(underlyingType);
+    if (!isStaticIter) return new LgsDArray(underlyingType);
     const auto sArray = new LgsSArray(underlyingType);
     sArray->arrType.sizes = sizes;
     return sArray;
@@ -20,7 +24,7 @@ bool LgsArray::equals(LgsType* other) const {
 }
 
 Type* LgsArray::getIRType() {
-    if (!isStatic) return ptrTy;
+    if (!isStaticIter) return ptrTy;
     if (IRType) return IRType;
     IRType = underlyingType->getIRType();
     for (auto size = sizes.rbegin(); size != sizes.rend(); ++size) {

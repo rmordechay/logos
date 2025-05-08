@@ -22,6 +22,7 @@ public:
     string prettyName() const override;
     bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;
+    void setUnderlyingType(const vector<LgsExpr*>& exprs);
     bool isIndexable(LgsType* indexType) override;
     ~LgsArray() override = default;
 };

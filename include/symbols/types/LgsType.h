@@ -44,6 +44,7 @@ public:
     LgsArray* asArray();
 
     virtual bool isIndexable(LgsType* indexType);
+    virtual size_t getSize();
     virtual bool equals(LgsType& other);
     virtual json asJSON() const;
     virtual Type* getIRType() = 0;

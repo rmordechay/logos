@@ -17,6 +17,10 @@ bool LgsType::isIndexable(LgsType* indexType) {
     return false;
 }
 
+size_t LgsType::getSize() {
+    assert(false);
+}
+
 bool LgsType::isIterable() {
     return false;
 }

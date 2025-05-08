@@ -21,6 +21,7 @@
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
+#include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsSArray.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
@@ -344,21 +345,19 @@ void SemaAnalyser::visitDArray(LgsDArray* array) {
     for (const auto& element : array->initialElements) {
         visitExpr(element);
     }
-    // TODO add proper type check
-    array->arrType.underlyingType = array->initialElements[0]->type;
+    array->arrType.setUnderlyingType(array->initialElements);
 }
 
 void SemaAnalyser::visitSArray(LgsSArray* array) {
     for (const auto& element : array->initialElements) {
         visitExpr(element);
     }
-    // TODO add proper type check
-    array->arrType.underlyingType = array->initialElements[0]->type;
+    array->arrType.setUnderlyingType(array->initialElements);
     array->arrType.sizes.emplace_back(array->initialElements.size());
 }
 
 void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) const {
-    assert(false);
+    hashMap->mapType.setUnderlyingType(hashMap->initialElements);
 }
 
 void SemaAnalyser::visitVariable(LgsVariable* variable) {
@@ -511,7 +510,7 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     }
     const auto baseExprType = baseExpr->type;
     if (const auto iter = baseExprType->asIterable()) {
-        if (iter->isStatic) {
+        if (iter->isStaticIter) {
             if (!checkIndexBoundaries(iterIndex)) return;
         }
         setIterIndexType(iterIndex);
@@ -831,7 +830,7 @@ void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
     lgsStack.addLocalSymbol(name, symbol);
 }
 
-LgsType* SemaAnalyser::resolveType(LgsType* type, LgsErrorHandler* errorHandler) {
+LgsType* resolveType(LgsType* type, LgsErrorHandler* errorHandler) {
     if (const auto iterable = type->asIterable()) {
         if (dynamic_cast<LgsUnknownType*>(iterable->underlyingType)) {
             iterable->underlyingType = resolveType(iterable->underlyingType, errorHandler);
@@ -870,7 +869,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type, LgsErrorHandler* errorHandler)
     return newType;
 }
 
-void SemaAnalyser::resolveGlobalTypes(const vector<LgsFile*>& files, LgsErrorHandler* errHandler) {
+void resolveGlobalTypes(const vector<LgsFile*>& files, LgsErrorHandler* errHandler) {
     for (const auto& file : files) {
         if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
             for (const auto& object : mainFile->objects) {
@@ -890,7 +889,7 @@ void SemaAnalyser::resolveGlobalTypes(const vector<LgsFile*>& files, LgsErrorHan
     }
 }
 
-void SemaAnalyser::resolveObjMemberTypes(LgsObject* const& obj, LgsErrorHandler* errHandler) {
+void resolveObjMemberTypes(LgsObject* const& obj, LgsErrorHandler* errHandler) {
     for (const auto& [_, field] : obj->fields) {
         field->type = resolveType(field->type, errHandler);
         field->parent = obj;
@@ -903,7 +902,7 @@ void SemaAnalyser::resolveObjMemberTypes(LgsObject* const& obj, LgsErrorHandler*
     }
 }
 
-void SemaAnalyser::resolveFuncTypes(LgsFuncType* signature, LgsErrorHandler* errHandler) {
+void resolveFuncTypes(LgsFuncType* signature, LgsErrorHandler* errHandler) {
     signature->rt = resolveType(signature->rt, errHandler);
     for (int i = 0; i < signature->params.size(); ++i) {
         signature->params[i]->type = resolveType(signature->params[i]->type, errHandler);

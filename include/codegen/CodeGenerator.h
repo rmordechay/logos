@@ -13,12 +13,14 @@ using namespace llvm;
 using namespace std;
 using namespace filesystem;
 
+#define WRITE_TO_FILE true
+
 class CodeGenerator {
 public:
-    static void generate(LgsMainFile* mainFile, bool writeToFile = true);
+    static void generate(LgsMainFile* mainFile);
     static void generateMainFunc(CodeGenMetadata* metadata, LgsFuncImpl* mainFunc);
     static void createIRMainFunc(const CodeGenMetadata* metadata);
-    static void generateObjModule(const LgsType* obj, bool writeToFile = true);
+    static void generateObjModule(const LgsType* obj);
     static Module* createEmptyModule(const std::string& objName);
     static void writeIRToFile(const Module* module, const path& name);
     static void createBuildDir();

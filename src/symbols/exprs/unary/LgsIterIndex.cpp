@@ -5,21 +5,11 @@
 
 Value* LgsIterIndex::createIRValue(CodeGenMetadata* metadata) {
     const auto baseExprType = baseExpr->type;
-    const auto baseExprIRValue = baseExpr->getIRValue(metadata);
-    auto firstIndex = indices[0]->from;
     if (const auto map = baseExprType->asMap()) {
-        return map->get.call(metadata, {baseExpr, firstIndex});
+        return createIRValueFromMap(metadata, map);
     }
     if (const auto arr = baseExprType->asArray()) {
-        if (arr->isStatic) {
-            const auto iterable = baseExpr->type->asIterable();
-            const auto IRType = iterable->getUnderlyingType()->getIRType();
-            return metadata->builder.CreateLoad(IRType, getGEP(metadata));
-        }
-        const auto arrPtrValue = metadata->builder.CreateLoad(ptrTy, baseExprIRValue);
-        auto indexIRValue = firstIndex->getIRValue(metadata);
-        const auto value = arr->get.makeCall(metadata, {arrPtrValue, indexIRValue});
-        return metadata->builder.CreateLoad(ptrTy, value);
+        return createIRValueFromArray(metadata, arr);
     }
     assert(false);
 }
@@ -40,7 +30,7 @@ void LgsIterIndex::assignIRValue(CodeGenMetadata* metadata, LgsExpr* value) cons
     if (const auto map = baseExpr->type->asMap()) {
         map->add.call(metadata, {baseExpr, indices[0]->from, value});
     } else if (const auto arr = baseExpr->type->asArray()) {
-        if (arr->isStatic) {
+        if (arr->isStaticIter) {
             const auto gep = getGEP(metadata);
             const auto rValue = value->getIRValue(metadata);
             metadata->builder.CreateStore(rValue, gep);
@@ -48,6 +38,31 @@ void LgsIterIndex::assignIRValue(CodeGenMetadata* metadata, LgsExpr* value) cons
             arr->add.call(metadata, {baseExpr, indices[0]->from, value});
         }
     }
+}
+
+
+Value* LgsIterIndex::createIRValueFromArray(CodeGenMetadata* metadata, LgsArray* arr) const {
+    const auto baseExprIRValue = baseExpr->getIRValue(metadata);
+    const auto firstIndex = indices[0]->from;
+    if (arr->isStaticIter) {
+        const auto iterable = baseExpr->type->asIterable();
+        const auto IRType = iterable->getUnderlyingType()->getIRType();
+        return metadata->builder.CreateLoad(IRType, getGEP(metadata));
+    }
+    const auto arrPtrValue = metadata->builder.CreateLoad(ptrTy, baseExprIRValue);
+    const auto indexIRValue = firstIndex->getIRValue(metadata);
+    const auto rv = arr->get.makeCall(metadata, {arrPtrValue, indexIRValue});
+    return metadata->builder.CreateLoad(ptrTy, rv);
+}
+
+Value* LgsIterIndex::createIRValueFromMap(CodeGenMetadata* metadata, LgsMap* map) const {
+    const auto mapIRType = baseExpr->type->getIRType();
+    const auto mapValueIRType = map->kvType.value->getIRType();
+    const auto mapPtr = baseExpr->getIRValue(metadata);
+    const auto mapLoaded = metadata->builder.CreateLoad(mapIRType, mapPtr);
+    const auto indexIRValue = indices[0]->from->getIRValue(metadata);
+    const auto rv = map->get.makeCall(metadata, {mapLoaded, indexIRValue});
+    return metadata->builder.CreateLoad(mapValueIRType, rv);
 }
 
 string LgsIterIndex::getName() {

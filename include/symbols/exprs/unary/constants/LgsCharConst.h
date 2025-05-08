@@ -7,10 +7,8 @@ class LgsCharConst final : public LgsConstExpr {
 public:
     char value;
 
-    explicit LgsCharConst(const char value) : LgsConstExpr(new LgsChar()), value(value) {}
+    explicit LgsCharConst(const char value) : LgsConstExpr(&LGS_CHAR), value(value) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
 };
-
-inline LgsChar LGS_CHAR;
 
 #endif //LGSCHARCONST_H

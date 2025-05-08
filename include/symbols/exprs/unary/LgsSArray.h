@@ -10,7 +10,7 @@ public:
 
     explicit LgsSArray(LgsType* underlyingType = nullptr) {
         type = &arrType;
-        arrType.isStatic = true;
+        arrType.isStaticIter = true;
         arrType.underlyingType = underlyingType;
     }
     Value* createIRValue(CodeGenMetadata* metadata) override;
