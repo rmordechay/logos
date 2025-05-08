@@ -7,7 +7,7 @@ struct LgsPaths;
 using namespace llvm;
 using namespace std;
 
-#define STD_LIBS {"../stdlib/lgslib.ll", "../stdlib/array.ll", "../stdlib/string.ll", "../stdlib/map.ll"}
+#define STD_LIBS {"../stdlib/lgslib.ll", "../stdlib/string.ll"}
 
 class LgsLinker {
 public:

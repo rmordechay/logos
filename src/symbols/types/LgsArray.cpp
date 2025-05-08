@@ -14,7 +14,9 @@ string LgsArray::prettyName() const {
 }
 
 bool LgsArray::equals(LgsType* other) const {
-    assert(false);
+    const auto otherArr = other->asArray();
+    if (!otherArr) return false;
+    return underlyingType->equals(otherArr->underlyingType);
 }
 
 Type* LgsArray::getIRType() {

@@ -342,6 +342,7 @@ void SemaAnalyser::visitDArray(LgsDArray* array) {
     for (const auto& element : array->initialElements) {
         visitExpr(element);
     }
+    // TODO add proper type check
     array->arrType.underlyingType = array->initialElements[0]->type;
 }
 
@@ -349,6 +350,7 @@ void SemaAnalyser::visitSArray(LgsSArray* array) {
     for (const auto& element : array->initialElements) {
         visitExpr(element);
     }
+    // TODO add proper type check
     array->arrType.underlyingType = array->initialElements[0]->type;
     array->arrType.sizes.emplace_back(array->initialElements.size());
 }

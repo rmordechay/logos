@@ -24,7 +24,7 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args, Va
     return funcCall;
 }
 
-Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<Value*>& args) {
+Value* LgsFunc::makeCall(CodeGenMetadata* metadata, const vector<Value*>& args) {
     const auto IRFuncType = getIRFuncType(metadata);
     const auto IRFunc = getIRFunc(metadata);
     return metadata->builder.CreateCall(IRFuncType, IRFunc, args);

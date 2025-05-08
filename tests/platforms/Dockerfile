@@ -6,8 +6,6 @@ RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 19 all &&
 RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang-19 100
 RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-19 100
 
-WORKDIR /app/build
-RUN cmake ..
+WORKDIR /app/
 
 CMD ["/bin/bash"]
-

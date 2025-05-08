@@ -48,7 +48,7 @@ public:
         builder.CreateStore(element->getIRValue(metadata), valurPtr);
         const auto arrPtr = args[0]->getIRValue(metadata);
         const auto arrPtrLoad = builder.CreateLoad(ptrTy, arrPtr);
-        return LgsMethodImpl::call(metadata, {arrPtrLoad, valurPtr});
+        return LgsMethodImpl::makeCall(metadata, {arrPtrLoad, valurPtr});
     }
 };
 

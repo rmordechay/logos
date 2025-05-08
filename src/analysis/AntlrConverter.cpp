@@ -608,6 +608,7 @@ LgsIterIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ctx
 
 LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) const {
     LgsConstExpr* constant = nullptr;
+    // TODO handle underscore for numbers
     if (const auto intToken = ctx->INTEGER()) {
         const auto value = stoi(intToken->getText());
         constant = new LgsIntConst(value);

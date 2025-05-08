@@ -17,7 +17,8 @@ Value* LgsIterIndex::createIRValue(CodeGenMetadata* metadata) {
             return metadata->builder.CreateLoad(IRType, getGEP(metadata));
         }
         const auto arrPtrValue = metadata->builder.CreateLoad(ptrTy, baseExprIRValue);
-        const auto value = arr->get.call(metadata, {arrPtrValue, firstIndex->getIRValue(metadata)});
+        auto indexIRValue = firstIndex->getIRValue(metadata);
+        const auto value = arr->get.makeCall(metadata, {arrPtrValue, indexIRValue});
         return metadata->builder.CreateLoad(ptrTy, value);
     }
     assert(false);

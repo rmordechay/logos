@@ -5,6 +5,8 @@
 #include "exprs/LgsExpr.h"
 #include "types/LgsArray.h"
 
+#define INITIAL_ARRAY_SIZE 2
+
 class LgsDArray final : public LgsUnaryExpr {
 public:
     LgsArray arrType;

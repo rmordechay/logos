@@ -1,243 +1,154 @@
-%struct.Array = type { i64, i32, i32, ptr }
+define noalias noundef ptr @Array_new_Int_Long(i32 noundef %0, i64 noundef %1) local_unnamed_addr #0 {
+  %3 = tail call dereferenceable_or_null(24) ptr @malloc(i64 noundef 24) #8
+  %4 = icmp eq ptr %3, null
+  br i1 %4, label %14, label %5
 
-; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define ptr @Array_new_Int_Long(i32 noundef %0, i64 noundef %1) #0 {
-  %3 = alloca ptr, align 8
-  %4 = alloca i32, align 4
-  %5 = alloca i64, align 8
-  %6 = alloca ptr, align 8
-  store i32 %0, ptr %4, align 4
-  store i64 %1, ptr %5, align 8
-  %7 = call ptr @malloc(i64 noundef 24) #6
-  store ptr %7, ptr %6, align 8
-  %8 = load ptr, ptr %6, align 8
-  %9 = icmp ne ptr %8, null
-  br i1 %9, label %11, label %10
+5:
+  %6 = getelementptr inbounds i8, ptr %3, i64 8
+  store i32 %0, ptr %6, align 8, !tbaa !6
+  %7 = getelementptr inbounds i8, ptr %3, i64 12
+  store i32 0, ptr %7, align 4, !tbaa !13
+  store i64 %1, ptr %3, align 8, !tbaa !14
+  %8 = zext i32 %0 to i64
+  %9 = mul i64 %8, %1
+  %10 = tail call ptr @malloc(i64 noundef %9) #8
+  %11 = getelementptr inbounds i8, ptr %3, i64 16
+  store ptr %10, ptr %11, align 8, !tbaa !15
+  %12 = icmp eq ptr %10, null
+  br i1 %12, label %13, label %14
 
-10:                                               ; preds = %2
-  store ptr null, ptr %3, align 8
-  br label %35
+13:
+  tail call void @free(ptr noundef nonnull %3)
+  br label %14
 
-11:                                               ; preds = %2
-  %12 = load i32, ptr %4, align 4
-  %13 = load ptr, ptr %6, align 8
-  %14 = getelementptr inbounds %struct.Array, ptr %13, i32 0, i32 1
-  store i32 %12, ptr %14, align 8
-  %15 = load ptr, ptr %6, align 8
-  %16 = getelementptr inbounds %struct.Array, ptr %15, i32 0, i32 2
-  store i32 0, ptr %16, align 4
-  %17 = load i64, ptr %5, align 8
-  %18 = load ptr, ptr %6, align 8
-  %19 = getelementptr inbounds %struct.Array, ptr %18, i32 0, i32 0
-  store i64 %17, ptr %19, align 8
-  %20 = load i32, ptr %4, align 4
-  %21 = sext i32 %20 to i64
-  %22 = load i64, ptr %5, align 8
-  %23 = mul i64 %21, %22
-  %24 = call ptr @malloc(i64 noundef %23) #6
-  %25 = load ptr, ptr %6, align 8
-  %26 = getelementptr inbounds %struct.Array, ptr %25, i32 0, i32 3
-  store ptr %24, ptr %26, align 8
-  %27 = load ptr, ptr %6, align 8
-  %28 = getelementptr inbounds %struct.Array, ptr %27, i32 0, i32 3
-  %29 = load ptr, ptr %28, align 8
-  %30 = icmp ne ptr %29, null
-  br i1 %30, label %33, label %31
-
-31:                                               ; preds = %11
-  %32 = load ptr, ptr %6, align 8
-  call void @free(ptr noundef %32)
-  store ptr null, ptr %3, align 8
-  br label %35
-
-33:                                               ; preds = %11
-  %34 = load ptr, ptr %6, align 8
-  store ptr %34, ptr %3, align 8
-  br label %35
-
-35:                                               ; preds = %33, %31, %10
-  %36 = load ptr, ptr %3, align 8
-  ret ptr %36
+14:
+  %15 = phi ptr [ null, %13 ], [ null, %2 ], [ %3, %5 ]
+  ret ptr %15
 }
 
-; Function Attrs: allocsize(0)
-declare ptr @malloc(i64 noundef) #1
 
-declare void @free(ptr noundef) #2
+declare noalias noundef ptr @malloc(i64 noundef) local_unnamed_addr #1
 
-; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define void @Array_resize_Array(ptr noundef %0) #0 {
-  %2 = alloca ptr, align 8
-  %3 = alloca ptr, align 8
-  store ptr %0, ptr %2, align 8
-  %4 = load ptr, ptr %2, align 8
-  %5 = getelementptr inbounds %struct.Array, ptr %4, i32 0, i32 1
-  %6 = load i32, ptr %5, align 8
-  %7 = mul nsw i32 %6, 2
-  store i32 %7, ptr %5, align 8
-  %8 = load ptr, ptr %2, align 8
-  %9 = getelementptr inbounds %struct.Array, ptr %8, i32 0, i32 3
-  %10 = load ptr, ptr %9, align 8
-  %11 = load ptr, ptr %2, align 8
-  %12 = getelementptr inbounds %struct.Array, ptr %11, i32 0, i32 1
-  %13 = load i32, ptr %12, align 8
-  %14 = sext i32 %13 to i64
-  %15 = load ptr, ptr %2, align 8
-  %16 = getelementptr inbounds %struct.Array, ptr %15, i32 0, i32 0
-  %17 = load i64, ptr %16, align 8
-  %18 = mul i64 %14, %17
-  %19 = call ptr @realloc(ptr noundef %10, i64 noundef %18) #7
-  store ptr %19, ptr %3, align 8
-  %20 = load ptr, ptr %3, align 8
-  %21 = icmp ne ptr %20, null
-  br i1 %21, label %22, label %26
 
-22:                                               ; preds = %1
-  %23 = load ptr, ptr %3, align 8
-  %24 = load ptr, ptr %2, align 8
-  %25 = getelementptr inbounds %struct.Array, ptr %24, i32 0, i32 3
-  store ptr %23, ptr %25, align 8
-  br label %26
+declare void @free(ptr allocptr nocapture noundef) local_unnamed_addr #2
 
-26:                                               ; preds = %22, %1
+
+define void @resize(ptr nocapture noundef %0) local_unnamed_addr #3 {
+  %2 = getelementptr inbounds i8, ptr %0, i64 8
+  %3 = load i32, ptr %2, align 8, !tbaa !6
+  %4 = shl i32 %3, 1
+  store i32 %4, ptr %2, align 8, !tbaa !6
+  %5 = getelementptr inbounds i8, ptr %0, i64 16
+  %6 = load ptr, ptr %5, align 8, !tbaa !15
+  %7 = zext i32 %4 to i64
+  %8 = load i64, ptr %0, align 8, !tbaa !14
+  %9 = mul i64 %8, %7
+  %10 = tail call ptr @realloc(ptr noundef %6, i64 noundef %9) #9
+  %11 = icmp eq ptr %10, null
+  br i1 %11, label %13, label %12
+
+12:
+  store ptr %10, ptr %5, align 8, !tbaa !15
+  br label %13
+
+13:
   ret void
 }
 
-; Function Attrs: allocsize(1)
-declare ptr @realloc(ptr noundef, i64 noundef) #3
 
-; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define void @Array_add_Array_Any(ptr noundef %0, ptr noundef %1) #0 {
-  %3 = alloca ptr, align 8
-  %4 = alloca ptr, align 8
-  %5 = alloca ptr, align 8
-  store ptr %0, ptr %3, align 8
-  store ptr %1, ptr %4, align 8
-  %6 = load ptr, ptr %3, align 8
-  %7 = getelementptr inbounds %struct.Array, ptr %6, i32 0, i32 2
-  %8 = load i32, ptr %7, align 4
-  %9 = load ptr, ptr %3, align 8
-  %10 = getelementptr inbounds %struct.Array, ptr %9, i32 0, i32 1
-  %11 = load i32, ptr %10, align 8
-  %12 = icmp eq i32 %8, %11
-  br i1 %12, label %13, label %15
+declare noalias noundef ptr @realloc(ptr allocptr nocapture noundef, i64 noundef) local_unnamed_addr #4
 
-13:                                               ; preds = %2
-  %14 = load ptr, ptr %3, align 8
-  call void @Array_resize_Array(ptr noundef %14)
-  br label %15
 
-15:                                               ; preds = %13, %2
-  %16 = load ptr, ptr %3, align 8
-  %17 = getelementptr inbounds %struct.Array, ptr %16, i32 0, i32 3
-  %18 = load ptr, ptr %17, align 8
-  %19 = load ptr, ptr %3, align 8
-  %20 = getelementptr inbounds %struct.Array, ptr %19, i32 0, i32 2
-  %21 = load i32, ptr %20, align 4
-  %22 = sext i32 %21 to i64
-  %23 = load ptr, ptr %3, align 8
-  %24 = getelementptr inbounds %struct.Array, ptr %23, i32 0, i32 0
-  %25 = load i64, ptr %24, align 8
-  %26 = mul i64 %22, %25
-  %27 = getelementptr inbounds i8, ptr %18, i64 %26
-  store ptr %27, ptr %5, align 8
-  %28 = load ptr, ptr %5, align 8
-  %29 = load ptr, ptr %4, align 8
-  %30 = load ptr, ptr %3, align 8
-  %31 = getelementptr inbounds %struct.Array, ptr %30, i32 0, i32 0
-  %32 = load i64, ptr %31, align 8
-  %33 = load ptr, ptr %5, align 8
-  %34 = call i64 @llvm.objectsize.i64.p0(ptr %33, i1 false, i1 true, i1 false)
-  %35 = call ptr @__memcpy_chk(ptr noundef %28, ptr noundef %29, i64 noundef %32, i64 noundef %34) #8
-  %36 = load ptr, ptr %3, align 8
-  %37 = getelementptr inbounds %struct.Array, ptr %36, i32 0, i32 2
-  %38 = load i32, ptr %37, align 4
-  %39 = add nsw i32 %38, 1
-  store i32 %39, ptr %37, align 4
+define void @Array_add_Array_Any(ptr nocapture noundef %0, ptr nocapture noundef readonly %1) local_unnamed_addr #5 {
+  %3 = getelementptr inbounds i8, ptr %0, i64 12
+  %4 = load i32, ptr %3, align 4, !tbaa !13
+  %5 = getelementptr inbounds i8, ptr %0, i64 8
+  %6 = load i32, ptr %5, align 8, !tbaa !6
+  %7 = icmp eq i32 %4, %6
+  br i1 %7, label %8, label %18
+
+8:
+  %9 = shl i32 %4, 1
+  store i32 %9, ptr %5, align 8, !tbaa !6
+  %10 = getelementptr inbounds i8, ptr %0, i64 16
+  %11 = load ptr, ptr %10, align 8, !tbaa !15
+  %12 = zext i32 %9 to i64
+  %13 = load i64, ptr %0, align 8, !tbaa !14
+  %14 = mul i64 %13, %12
+  %15 = tail call ptr @realloc(ptr noundef %11, i64 noundef %14) #9
+  %16 = icmp eq ptr %15, null
+  br i1 %16, label %18, label %17
+
+17:
+  store ptr %15, ptr %10, align 8, !tbaa !15
+  br label %18
+
+18:
+  %19 = getelementptr inbounds i8, ptr %0, i64 16
+  %20 = load ptr, ptr %19, align 8, !tbaa !15
+  %21 = load i32, ptr %3, align 4, !tbaa !13
+  %22 = zext i32 %21 to i64
+  %23 = load i64, ptr %0, align 8, !tbaa !14
+  %24 = mul i64 %23, %22
+  %25 = getelementptr inbounds i8, ptr %20, i64 %24
+  tail call void @llvm.memcpy.p0.p0.i64(ptr noundef align 1 %25, ptr noundef align 1 %1, i64 noundef %23, i1 noundef false) #10
+  %26 = load i32, ptr %3, align 4, !tbaa !13
+  %27 = add i32 %26, 1
+  store i32 %27, ptr %3, align 4, !tbaa !13
   ret void
 }
 
-; Function Attrs: nounwind
-declare ptr @__memcpy_chk(ptr noundef, ptr noundef, i64 noundef, i64 noundef) #4
 
-; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
-declare i64 @llvm.objectsize.i64.p0(ptr, i1 immarg, i1 immarg, i1 immarg) #5
+define ptr @Array_get_Array_Int(ptr nocapture noundef readonly %0, i32 noundef %1) local_unnamed_addr #6 {
+  %3 = getelementptr inbounds i8, ptr %0, i64 12
+  %4 = load i32, ptr %3, align 4, !tbaa !13
+  %5 = icmp ugt i32 %4, %1
+  br i1 %5, label %6, label %13
 
-; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define ptr @Array_get_Array_Int(ptr noundef %0, i32 noundef %1) #0 {
-  %3 = alloca ptr, align 8
-  %4 = alloca ptr, align 8
-  %5 = alloca i32, align 4
-  store ptr %0, ptr %4, align 8
-  store i32 %1, ptr %5, align 4
-  %6 = load i32, ptr %5, align 4
-  %7 = icmp slt i32 %6, 0
-  br i1 %7, label %14, label %8
+6:
+  %7 = getelementptr inbounds i8, ptr %0, i64 16
+  %8 = load ptr, ptr %7, align 8, !tbaa !15
+  %9 = zext i32 %1 to i64
+  %10 = load i64, ptr %0, align 8, !tbaa !14
+  %11 = mul i64 %10, %9
+  %12 = getelementptr inbounds i8, ptr %8, i64 %11
+  br label %13
 
-8:                                                ; preds = %2
-  %9 = load i32, ptr %5, align 4
-  %10 = load ptr, ptr %4, align 8
-  %11 = getelementptr inbounds %struct.Array, ptr %10, i32 0, i32 2
-  %12 = load i32, ptr %11, align 4
-  %13 = icmp sge i32 %9, %12
-  br i1 %13, label %14, label %15
-
-14:                                               ; preds = %8, %2
-  store ptr null, ptr %3, align 8
-  br label %26
-
-15:                                               ; preds = %8
-  %16 = load ptr, ptr %4, align 8
-  %17 = getelementptr inbounds %struct.Array, ptr %16, i32 0, i32 3
-  %18 = load ptr, ptr %17, align 8
-  %19 = load i32, ptr %5, align 4
-  %20 = sext i32 %19 to i64
-  %21 = load ptr, ptr %4, align 8
-  %22 = getelementptr inbounds %struct.Array, ptr %21, i32 0, i32 0
-  %23 = load i64, ptr %22, align 8
-  %24 = mul i64 %20, %23
-  %25 = getelementptr inbounds i8, ptr %18, i64 %24
-  store ptr %25, ptr %3, align 8
-  br label %26
-
-26:                                               ; preds = %15, %14
-  %27 = load ptr, ptr %3, align 8
-  ret ptr %27
+13:
+  %14 = phi ptr [ %12, %6 ], [ null, %2 ]
+  ret ptr %14
 }
 
-; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define void @Array_free_Array(ptr noundef %0) #0 {
-  %2 = alloca ptr, align 8
-  store ptr %0, ptr %2, align 8
-  %3 = load ptr, ptr %2, align 8
-  %4 = icmp ne ptr %3, null
-  br i1 %4, label %6, label %5
 
-5:                                                ; preds = %1
-  br label %11
+define void @Array_free_Array(ptr noundef %0) local_unnamed_addr #3 {
+  %2 = icmp eq ptr %0, null
+  br i1 %2, label %6, label %3
 
-6:                                                ; preds = %1
-  %7 = load ptr, ptr %2, align 8
-  %8 = getelementptr inbounds %struct.Array, ptr %7, i32 0, i32 3
-  %9 = load ptr, ptr %8, align 8
-  call void @free(ptr noundef %9)
-  %10 = load ptr, ptr %2, align 8
-  call void @free(ptr noundef %10)
-  br label %11
+3:
+  %4 = getelementptr inbounds i8, ptr %0, i64 16
+  %5 = load ptr, ptr %4, align 8, !tbaa !15
+  tail call void @free(ptr noundef %5)
+  tail call void @free(ptr noundef nonnull %0)
+  br label %6
 
-11:                                               ; preds = %6, %5
+6:
   ret void
 }
 
-attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
-attributes #1 = { allocsize(0) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
-attributes #2 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
-attributes #3 = { allocsize(1) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
-attributes #4 = { nounwind "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
-attributes #5 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
-attributes #6 = { allocsize(0) }
-attributes #7 = { allocsize(1) }
-attributes #8 = { nounwind }
+
+declare void @llvm.memcpy.p0.p0.i64(ptr noalias nocapture writeonly, ptr noalias nocapture readonly, i64, i1 immarg) #7
+
+attributes #0 = { mustprogress nounwind ssp willreturn memory(readwrite, argmem: none) uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
+attributes #1 = { mustprogress nofree nounwind willreturn allockind("alloc,uninitialized") allocsize(0) memory(inaccessiblemem: readwrite) "alloc-family"="malloc" "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
+attributes #2 = { mustprogress nounwind willreturn allockind("free") memory(argmem: readwrite, inaccessiblemem: readwrite) "alloc-family"="malloc" "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
+attributes #3 = { mustprogress nounwind ssp willreturn uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
+attributes #4 = { mustprogress nounwind willreturn allockind("realloc") allocsize(1) memory(argmem: readwrite, inaccessiblemem: readwrite) "alloc-family"="malloc" "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
+attributes #5 = { nounwind ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
+attributes #6 = { mustprogress nofree norecurse nosync nounwind ssp willreturn memory(argmem: read) uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
+attributes #7 = { nocallback nofree nounwind willreturn memory(argmem: readwrite) }
+attributes #8 = { allocsize(0) }
+attributes #9 = { allocsize(1) }
+attributes #10 = { nounwind }
 
 !llvm.module.flags = !{!0, !1, !2, !3, !4}
 !llvm.ident = !{!5}
@@ -248,3 +159,13 @@ attributes #8 = { nounwind }
 !3 = !{i32 7, !"uwtable", i32 1}
 !4 = !{i32 7, !"frame-pointer", i32 1}
 !5 = !{!"Homebrew clang version 19.1.7"}
+!6 = !{!7, !11, i64 8}
+!7 = !{!"", !8, i64 0, !11, i64 8, !11, i64 12, !12, i64 16}
+!8 = !{!"long", !9, i64 0}
+!9 = !{!"omnipotent char", !10, i64 0}
+!10 = !{!"Simple C/C++ TBAA"}
+!11 = !{!"int", !9, i64 0}
+!12 = !{!"any pointer", !9, i64 0}
+!13 = !{!7, !11, i64 12}
+!14 = !{!7, !8, i64 0}
+!15 = !{!7, !12, i64 16}

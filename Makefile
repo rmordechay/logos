@@ -1,3 +1,19 @@
+.PHONY: all configure build clean run
+all: configure build
+
+configure:
+	@mkdir -p build
+	@cd build && cmake ..
+
+build:
+	@cd build && make -j16
+
+clean:
+	rm -rf build
+
+run:
+	./build/lgs run project
+
 generate_grammar:
 	rm -rf src/parser
 	java -jar external/bin/antlr.jar -no-listener -Dlanguage=Cpp -o src/parser Logos.g4

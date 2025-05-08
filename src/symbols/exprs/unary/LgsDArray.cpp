@@ -2,12 +2,12 @@
 
 Value* LgsDArray::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto constantInt = builder.getInt64(sizeof(void*));
-    const auto size = initialElements.empty() ? 2 : initialElements.size();
-    const auto capacity = builder.getInt32(size);
+    const auto capacity = initialElements.empty() ? INITIAL_ARRAY_SIZE : initialElements.size() * 2;
+    const auto capacityIR = builder.getInt32(capacity);
 
     IRValue = builder.CreateAlloca(ptrTy);
-    const auto rt = arrType.new_.call(metadata, {capacity, constantInt});
+    const auto constantInt = builder.getInt64(sizeof(void*));
+    const auto rt = arrType.new_.makeCall(metadata, {capacityIR, constantInt});
     builder.CreateStore(rt, IRValue);
 
     for (const auto element : initialElements) {
