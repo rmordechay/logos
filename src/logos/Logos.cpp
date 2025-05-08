@@ -2,13 +2,11 @@
 #include "LgsLinker.h"
 #include "Platform.h"
 #include "utils/ThreadPool.h"
-
 #include <AntlrConverter.h>
 #include <CodeGenerator.h>
-#include <LogosLexer.h>
 #include <unistd.h>
 
-void Logos::run(const int argc, char* argv[]) {
+void Logos::run() {
     // Project loading
     if (!project.loadProject()) exit(1);
 
@@ -24,7 +22,7 @@ void Logos::run(const int argc, char* argv[]) {
     if (!linker.link()) exit(1);
 
     // Running
-    execv(paths.execFilePath.c_str(), argv);
+    execv(paths.execFilePath.c_str(), args.data());
 }
 
 void Logos::initPaths(const path& rootDirPath) const {

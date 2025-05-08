@@ -1,5 +1,6 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
+#include "funcs/LgsFuncImpl.h"
 #include "types/LgsType.h"
 
 #include <filesystem>
@@ -15,6 +16,7 @@ using namespace filesystem;
 class CodeGenerator {
 public:
     static void generate(LgsMainFile* mainFile, bool writeToFile = true);
+    static void generateMainFunc(CodeGenMetadata* metadata, LgsFuncImpl* mainFunc);
     static void generateObjModule(const LgsType* obj, bool writeToFile = true);
     static Module* createEmptyModule(const std::string& objName);
     static void writeIRToFile(const Module* module, const path& name);

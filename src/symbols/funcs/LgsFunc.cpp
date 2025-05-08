@@ -7,8 +7,9 @@
 void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);
     startBlock(metadata, entryBlock);
+    createIRFunc(metadata);
     stmtBlock->createIRValue(metadata);
-    if (getFuncType()->rt->getIRName() == LgsVoid::name) {
+    if (getFuncType()->rt->isVoidType) {
         metadata->builder.CreateRetVoid();
     }
     metadata->lgsStack.exitScope();
@@ -18,7 +19,7 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args, Va
     vector<Value*> argValues;
     const auto isObjReturn = setIRArgs(metadata, argValues, args);
     const auto IRFuncType = getIRFuncType(metadata);
-    const auto IRFunc = callback ? callback : getIRFunc(metadata);
+    const auto IRFunc = callback ? callback : createIRFunc(metadata);
     const auto funcCall = metadata->builder.CreateCall(IRFuncType, IRFunc, argValues);
     if (isObjReturn) return argValues[0];
     return funcCall;
@@ -26,11 +27,11 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args, Va
 
 Value* LgsFunc::makeCall(CodeGenMetadata* metadata, const vector<Value*>& args) {
     const auto IRFuncType = getIRFuncType(metadata);
-    const auto IRFunc = getIRFunc(metadata);
+    const auto IRFunc = createIRFunc(metadata);
     return metadata->builder.CreateCall(IRFuncType, IRFunc, args);
 }
 
-Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
+Function* LgsFunc::createIRFunc(const CodeGenMetadata* metadata) {
     const auto funcType = getFuncType();
     const auto funcIRType = getIRFuncType(metadata);
     auto func = metadata->module->getOrInsertFunction(funcType->getIRName(), funcIRType);
@@ -41,6 +42,14 @@ Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
     }
     setIRParams(args);
     return IRFunc;
+}
+
+void LgsFunc::createIRMainFunc(const CodeGenMetadata* metadata) const {
+    const auto mainFuncType = FunctionType::get(i32Ty, {i32Ty, ptrTy}, false);
+    const auto mainFunc = Function::Create(mainFuncType, Function::ExternalLinkage, LOGOS_MAIN_FUNC, metadata->module);
+    Function::arg_iterator args = mainFunc->arg_begin();
+    args++->setName("argc");
+    args->setName("argv");
 }
 
 FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {

@@ -3,7 +3,6 @@
 #include "Platform.h"
 #include "funcs/LgsFuncImpl.h"
 #include "funcs/LgsMethodImpl.h"
-#include "stmts/LgsVarDec.h"
 #include <LgsMainFile.h>
 #include <ranges>
 #include <llvm/Support/FileSystem.h>
@@ -21,8 +20,7 @@ void CodeGenerator::generate(LgsMainFile* mainFile, const bool writeToFile) {
     for (const auto& func : mainFile->getAllFuncs()) {
         func->generateIRCode(&metadata);
     }
-    mainFile->mainFunc->generateIRCode(&metadata);
-    metadata.builder.CreateRet(metadata.builder.getInt32(EXIT_SUCCESS));
+    generateMainFunc(&metadata, mainFile->mainFunc);
 
     if (writeToFile) {
         writeIRToFile(metadata.module, LOGOS_MAIN_FILE_NAME);
@@ -40,6 +38,18 @@ void CodeGenerator::generateObjModule(const LgsType* obj, const bool writeToFile
     if (writeToFile) {
         writeIRToFile(metadata.module, objName);
     }
+}
+
+void CodeGenerator::generateMainFunc(CodeGenMetadata* metadata, LgsFuncImpl* mainFunc) {
+    mainFunc->createIRMainFunc(metadata);
+    metadata->lgsStack.enterScope(mainFunc);
+    mainFunc->startBlock(metadata, mainFunc->entryBlock);
+    mainFunc->stmtBlock->createIRValue(metadata);
+    if (mainFunc->getFuncType()->rt->isVoidType) {
+        metadata->builder.CreateRetVoid();
+    }
+    metadata->lgsStack.exitScope();
+    metadata->builder.CreateRet(metadata->builder.getInt32(EXIT_SUCCESS));
 }
 
 Module* CodeGenerator::createEmptyModule(const string& objName) {

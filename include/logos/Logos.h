@@ -14,12 +14,13 @@ class Logos {
 public:
     LogosProject project;
     vector<LgsError> errors;
+    vector<char*> args;
 
     explicit Logos(const path& rootDirPath) {
         initPaths(rootDirPath);
     }
 
-    void run(int argc, char* argv[]);
+    void run();
     LgsMainFile* getMainFile(const vector<LgsFile*>& files) const;
     void initPaths(const path& rootDirPath) const;
     ~Logos() = default;

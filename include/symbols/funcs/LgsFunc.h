@@ -22,8 +22,9 @@ public:
     void setStructRet(Function::arg_iterator& args, LgsObject* obj) const;
     string format(string& indentStr) override;
     json asJSON() override;
-    virtual Function* getIRFunc(const CodeGenMetadata* metadata);
+    virtual Function* createIRFunc(const CodeGenMetadata* metadata);
     virtual FunctionType* getIRFuncType(const CodeGenMetadata* metadata);
+    void createIRMainFunc(const CodeGenMetadata* metadata) const;
     virtual void setIRParams(Argument* IRParams);
     virtual bool equals(const LgsFuncCall* funcCall) = 0;
     virtual LgsFuncType* getFuncType() = 0;

@@ -13,7 +13,7 @@ string LgsInstance::getName() {
 
 Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
     const auto IRType = obj->getIRType();
-    const auto currentFunc = metadata->lgsStack.currentFunc->getIRFunc(metadata);
+    const auto currentFunc = metadata->lgsStack.currentFunc->createIRFunc(metadata);
     auto& builder = metadata->builder;
     // TODO cover all cases
     if (isSelf || isReturnValue) {
@@ -37,6 +37,6 @@ void LgsInstance::setVirtualFuncs(CodeGenMetadata* metadata) const {
     for (const auto& method : methods) {
         if (!method->implements) continue;
         const auto gep = builder.CreateStructGEP(obj->getIRType(), IRValue, method->implements->vtableKey);
-        builder.CreateStore(method->getIRFunc(metadata), gep);
+        builder.CreateStore(method->createIRFunc(metadata), gep);
     }
 }
