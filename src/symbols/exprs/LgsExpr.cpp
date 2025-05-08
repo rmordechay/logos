@@ -16,12 +16,12 @@
 #include "exprs/unary/constants/LgsTypeConst.h"
 
 Value* LgsExpr::getIRValue(CodeGenMetadata* metadata) {
+    if (IRValue) return IRValue;
     initIRValue(metadata);
     return IRValue;
 }
 
 void LgsExpr::initIRValue(CodeGenMetadata* metadata) {
-    if (IRValue) return;
     IRValue = createIRValue(metadata);
     assert(IRValue);
 }

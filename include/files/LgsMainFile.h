@@ -10,11 +10,11 @@ class LgsEnum;
 
 class LgsMainFile final : public LgsFile {
 public:
-    LgsFuncImpl* mainFunc = nullptr;
-    map<string, vector<LgsFuncImpl*>> funcs;
     vector<LgsEnum*> enums;
     vector<LgsObject*> objects;
     vector<LgsInterface*> interfaces;
+    map<string, vector<LgsFuncImpl*>> funcs;
+    LgsMainFunc* mainFunc = nullptr;
 
     explicit LgsMainFile(const string& path) : LgsFile(LOGOS_MAIN_FILE_NAME, path) {}
     void format() override;

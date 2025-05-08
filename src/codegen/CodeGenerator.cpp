@@ -41,7 +41,7 @@ void CodeGenerator::generateObjModule(const LgsType* obj, const bool writeToFile
 }
 
 void CodeGenerator::generateMainFunc(CodeGenMetadata* metadata, LgsFuncImpl* mainFunc) {
-    mainFunc->createIRMainFunc(metadata);
+    createIRMainFunc(metadata);
     metadata->lgsStack.enterScope(mainFunc);
     mainFunc->startBlock(metadata, mainFunc->entryBlock);
     mainFunc->stmtBlock->createIRValue(metadata);
@@ -50,6 +50,14 @@ void CodeGenerator::generateMainFunc(CodeGenMetadata* metadata, LgsFuncImpl* mai
     }
     metadata->lgsStack.exitScope();
     metadata->builder.CreateRet(metadata->builder.getInt32(EXIT_SUCCESS));
+}
+
+void CodeGenerator::createIRMainFunc(const CodeGenMetadata* metadata) {
+    const auto mainFuncType = FunctionType::get(i32Ty, {i32Ty, ptrTy}, false);
+    const auto mainFunc = Function::Create(mainFuncType, Function::ExternalLinkage, LOGOS_MAIN_FUNC, metadata->module);
+    Function::arg_iterator args = mainFunc->arg_begin();
+    args++->setName("argc");
+    args->setName("argv");
 }
 
 Module* CodeGenerator::createEmptyModule(const string& objName) {

@@ -78,16 +78,30 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, con
     for (const auto& func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         if (funcName == LOGOS_MAIN_FUNC) {
-            const auto mainFunc = new LgsFuncImpl(LOGOS_MAIN_FUNC, &LGS_INT);
-            mainFile->mainFunc = mainFunc;
-            const auto statementsBlock = func->funcBody()->statementsBlock();
-            mainFunc->stmtBlock = getStmtBlock(statementsBlock);
+            setMainFunc(mainFile, func);
         } else {
             auto logosFunc = getFuncImpl(func);
             mainFile->funcs[funcName].emplace_back(logosFunc);
         }
     }
     return mainFile;
+}
+
+void AntlerConverter::setMainFunc(LgsMainFile* mainFile, LogosParser::FuncImplementationContext* func) {
+    const auto mainFunc = new LgsMainFunc();
+    mainFile->mainFunc = mainFunc;
+    const auto statementsBlock = func->funcBody()->statementsBlock();
+    mainFunc->stmtBlock = getStmtBlock(statementsBlock);
+    setParams(func->funcSignature(), &mainFunc->funcType);
+    const auto params = mainFunc->funcType.params;
+    bool isValid;
+    if (params.size() == 1) {
+        const auto arr = params[0]->type->asArray();
+        isValid = arr && !arr->isStatic && arr->underlyingType->asStr();
+    } else {
+        isValid = params.empty();
+    }
+    if (!isValid) errHandler.handleError(E10039, &mainFunc->location);
 }
 
 LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath) {
@@ -180,12 +194,12 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
 LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext* ctx) {
     const auto rt = getFuncType(ctx->funcSignature());
     const auto funcSignature = ctx->funcSignature();
-    const auto name = funcSignature->VARIABLE()->getText();
-    const auto func = new LgsFuncImpl(name, rt);
+    const auto nameToken = funcSignature->VARIABLE();
+    const auto func = new LgsFuncImpl(nameToken->getText(), rt);
     currentFunc = func;
     setParams(funcSignature, &func->funcType);
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
-    func->setLocation(ctx->start);
+    func->setLocation(nameToken->getSymbol());
     globals.addFunc(func);
     currentFunc = nullptr;
     return func;
@@ -194,9 +208,9 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext
 LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj) {
     const auto rt = getFuncType(ctx->funcSignature());
     const auto funcSignature = ctx->funcSignature();
-    const auto name = funcSignature->VARIABLE()->getText();
+    const auto nameToken = funcSignature->VARIABLE();
     const auto self = new LgsParam(LOGOS_SELF, obj, new LgsInstance(obj));
-    const auto method = new LgsMethodImpl(name, obj->name, rt);
+    const auto method = new LgsMethodImpl(nameToken->getText(), obj->name, rt);
     currentMethod = method;
     method->getFuncType()->params.emplace_back(self);
     setParams(funcSignature, method->getFuncType());
@@ -205,7 +219,7 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
         method->isPublic = true;
     }
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
-    method->setLocation(ctx->start);
+    method->setLocation(nameToken->getSymbol());
     currentMethod = nullptr;
     return method;
 }

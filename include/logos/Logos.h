@@ -13,15 +13,13 @@ using namespace llvm;
 class Logos {
 public:
     LogosProject project;
-    vector<LgsError> errors;
     vector<char*> args;
+    vector<LgsError> errors;
 
     explicit Logos(const path& rootDirPath) {
         initPaths(rootDirPath);
     }
-
     void run();
-    LgsMainFile* getMainFile(const vector<LgsFile*>& files) const;
     void initPaths(const path& rootDirPath) const;
     ~Logos() = default;
 };

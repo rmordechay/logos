@@ -16,13 +16,14 @@ using namespace std;
 extern char **environ;
 std::mutex projectMtx;
 
-bool LogosProject::loadProject() {
+bool LogosProject::loadProject(const vector<char*>& args) {
     if (!validateProject()) return false;
     setupActiveEnv();
     if (!errHandler.successful) return false;
     loadFiles();
     if (!errors.empty()) return false;
     SemaAnalyser::resolveGlobalTypes(files, &errHandler);
+    mainFile->mainFunc->setArgs(args);
     return errHandler.successful;
 }
 

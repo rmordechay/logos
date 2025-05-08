@@ -21,7 +21,7 @@ void LgsRunCmd::validate() {
 }
 
 void LgsRunCmd::setArgs(Logos* logos) const {
-    vector<string> args;
+    vector<char*> args;
     for (int i = 0; i < argc; ++i) {
         logos->args.emplace_back(argv[i]);
     }

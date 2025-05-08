@@ -44,14 +44,6 @@ Function* LgsFunc::createIRFunc(const CodeGenMetadata* metadata) {
     return IRFunc;
 }
 
-void LgsFunc::createIRMainFunc(const CodeGenMetadata* metadata) const {
-    const auto mainFuncType = FunctionType::get(i32Ty, {i32Ty, ptrTy}, false);
-    const auto mainFunc = Function::Create(mainFuncType, Function::ExternalLinkage, LOGOS_MAIN_FUNC, metadata->module);
-    Function::arg_iterator args = mainFunc->arg_begin();
-    args++->setName("argc");
-    args->setName("argv");
-}
-
 FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {
     if (IRFuncType) return IRFuncType;
     const auto funcType = getFuncType();

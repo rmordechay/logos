@@ -6,7 +6,6 @@
 #include "types/LgsFloat.h"
 #include "types/LgsInt.h"
 #include "types/LgsStr.h"
-
 #include <types/LgsVoid.h>
 
 class LgsPrint final : public LgsFuncImpl {

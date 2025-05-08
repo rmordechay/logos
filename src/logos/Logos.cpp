@@ -8,10 +8,10 @@
 
 void Logos::run() {
     // Project loading
-    if (!project.loadProject()) exit(1);
+    if (!project.loadProject(args)) exit(1);
 
     // Semantic analysis
-    SemaAnalyser::analyseFiles(project.files, errors);
+    SemaAnalyser::analyseFiles(&project, errors);
     if (!errors.empty()) exit(1);
 
     // Code generation
@@ -35,13 +35,4 @@ void Logos::initPaths(const path& rootDirPath) const {
     paths.objFilePath = paths.buildDir / OBJECT_FILE;
     paths.execFilePath = paths.buildDir / EXECUTABLE_FILE;
     paths.appFilePath = paths.rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
-}
-
-LgsMainFile* Logos::getMainFile(const vector<LgsFile*>& files) const {
-    for (const auto& file : files) {
-        if (file->name == LOGOS_MAIN_FILE_NAME) {
-            return dynamic_cast<LgsMainFile*>(file);
-        }
-    }
-    return nullptr;
 }

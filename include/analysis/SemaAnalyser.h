@@ -11,6 +11,7 @@
 #include <loops/LgsRangeLoop.h>
 
 
+class LogosProject;
 class LgsIndex;
 class LgsCast;
 class LgsVarDec;
@@ -36,7 +37,7 @@ public:
     explicit SemaAnalyser(LgsFile* file) : file(file) {
         errHandler.filePath = file->absPath;
     }
-    static void analyseFiles(const vector<LgsFile*>& files, vector<LgsError>& errors);
+    static void analyseFiles(const LogosProject* project, vector<LgsError>& errors);
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
@@ -44,7 +45,7 @@ public:
     void visitObjectImplements(LgsObject* obj);
     void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
-    void visitFuncType(LgsFuncType* funcType);
+    void visitFuncType(const LgsFuncType* funcType);
     void validateFuncControlFlow(LgsFunc* func);
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);

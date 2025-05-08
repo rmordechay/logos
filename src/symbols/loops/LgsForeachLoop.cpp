@@ -8,16 +8,18 @@ int LgsForeachLoop::loopStart() {
 }
 
 int LgsForeachLoop::loopEnd() {
-    const auto iterable = expr->type->asIterable();
-    assert(false);
+    const auto iterable = iterExpr->type->asIterable();
+    assert(iterable->sizes.size() > 0);
+    return iterable->sizes[0];
 }
 
 void LgsForeachLoop::setIRLoopVariable(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto arrValue = expr->getIRValue(metadata);
-    const auto iterable = expr->type->asIterable();
-    const auto iterableIRType = iterable->getIRType();
-    const auto gep = builder.CreateInBoundsGEP(iterableIRType, arrValue, {builder.getInt32(0), iValue});
+    assert(iterExpr);
+    const auto iterIRValue = iterExpr->getIRValue(metadata);
+    const auto iterable = iterExpr->type->asIterable();
+    const vector<Value*> args = {builder.getInt32(0), iValue};
+    const auto gep = builder.CreateInBoundsGEP(iterable->getIRType(), iterIRValue, args);
     const auto element = builder.CreateLoad(iterable->underlyingType->getIRType(), gep);
     const auto loopVar = loopVars[0];
     loopVar->setIRValue(element);
@@ -25,8 +27,8 @@ void LgsForeachLoop::setIRLoopVariable(CodeGenMetadata* metadata) {
 }
 
 LgsForeachLoop::~LgsForeachLoop() {
-    if (expr) {
-        delete expr;
+    if (iterExpr) {
+        delete iterExpr;
     }
     if (stmtBlock) {
         delete stmtBlock;

@@ -7,9 +7,9 @@ class LgsDArrayType;
 
 class LgsForeachLoop final : public LgsLoop {
 public:
-    LgsUnaryExpr* expr = nullptr;
+    LgsUnaryExpr* iterExpr = nullptr;
 
-    LgsForeachLoop(const vector<LgsVarDec*>& loopVars, LgsUnaryExpr* iterable, LgsStmtBlock* stmtBlock) : LgsLoop(loopVars, stmtBlock), expr(iterable) {}
+    LgsForeachLoop(const vector<LgsVarDec*>& loopVars, LgsUnaryExpr* iterable, LgsStmtBlock* stmtBlock) : LgsLoop(loopVars, stmtBlock), iterExpr(iterable) {}
     int loopStart() override;
     int loopEnd() override;
     void setIRLoopVariable(CodeGenMetadata* metadata) override;

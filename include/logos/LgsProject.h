@@ -31,7 +31,7 @@ public:
     const LgsAppFile* appFile = nullptr;
 
     void asJSON() const;
-    bool loadProject();
+    bool loadProject(const vector<char*>& args);
     void loadFiles();
     void setEnvVars() const;
     void loadGlobals() const;

@@ -3,6 +3,7 @@
 #include "LgsGlobals.h"
 #include "LgsInterfaceFile.h"
 #include "LgsObjectFile.h"
+#include "LgsProject.h"
 #include "ThreadPool.h"
 #include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
@@ -35,10 +36,10 @@
 #include <stmts/LgsAssignment.h>
 #include <stmts/LgsIfStmt.h>
 
-void SemaAnalyser::analyseFiles(const vector<LgsFile*>& files, vector<LgsError>& errors) {
+void SemaAnalyser::analyseFiles(const LogosProject* project, vector<LgsError>& errors) {
     ThreadPool threadPool;
     threadPool.start();
-    for (const auto& file : files) {
+    for (const auto& file : project->files) {
         threadPool.runTask([=, &file, &errors] {
             SemaAnalyser semaAnalyser(file);
             semaAnalyser.analyse();
@@ -98,8 +99,8 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
     validateFuncControlFlow(func);
 }
 
-void SemaAnalyser::visitFuncType(LgsFuncType* funcType) {
-    for (auto& param : funcType->params) {
+void SemaAnalyser::visitFuncType(const LgsFuncType* funcType) {
+    for (const auto param : funcType->params) {
         visitParam(param);
     }
 }
@@ -238,7 +239,7 @@ void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
 }
 
 void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
-    const auto iterableExpr = foreachLoop->expr;
+    const auto iterableExpr = foreachLoop->iterExpr;
     visitUnaryExpr(iterableExpr);
     const auto iterable = iterableExpr->type->asIterable();
     if (!iterable) {
@@ -247,6 +248,7 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
     // TODO check all loop vars
     for (const auto varDec : foreachLoop->loopVars) {
         varDec->type = iterable->underlyingType;
+        varDec->expr = iterable->getZeroValue();
         addLocalSymbol(varDec->name, LgsSymbol(varDec));
     }
     visitStmtBlock(foreachLoop->stmtBlock);

@@ -26,6 +26,7 @@ public:
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath);
     LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx, const path& filePath);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const string& filePath);
+    void setMainFunc(LgsMainFile* mainFile, LogosParser::FuncImplementationContext* func);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName, const string& filePath);

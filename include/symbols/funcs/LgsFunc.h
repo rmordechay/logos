@@ -24,7 +24,6 @@ public:
     json asJSON() override;
     virtual Function* createIRFunc(const CodeGenMetadata* metadata);
     virtual FunctionType* getIRFuncType(const CodeGenMetadata* metadata);
-    void createIRMainFunc(const CodeGenMetadata* metadata) const;
     virtual void setIRParams(Argument* IRParams);
     virtual bool equals(const LgsFuncCall* funcCall) = 0;
     virtual LgsFuncType* getFuncType() = 0;

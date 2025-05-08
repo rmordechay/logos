@@ -53,5 +53,6 @@ inline LgsError E10035{.msg = "Index of %s has %s level which is too deep. Max l
 inline LgsError E10036{.msg = "'%s' cannot be indexed with type '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10037{.msg = "Left-hand index of slice must be less than right-hand index. Given: %s.", .errCode = ++errCodeStart};
 inline LgsError E10038{.msg = "'continue' must be inside a loop statement.", .errCode = ++errCodeStart};
+inline LgsError E10039{.msg = "main() function accepts only one optional parameter of type 'Str[]'.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H
