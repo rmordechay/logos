@@ -13,8 +13,6 @@ using namespace llvm;
 using namespace std;
 using namespace filesystem;
 
-#define WRITE_TO_FILE true
-
 class CodeGenerator {
 public:
     static void generate(LgsMainFile* mainFile);
@@ -23,8 +21,7 @@ public:
     static void generateObjModule(const LgsType* obj);
     static Module* createEmptyModule(const std::string& objName);
     static void writeIRToFile(const Module* module, const path& name);
-    static void createBuildDir();
-    static void initLLVM();
+    static void init();
     ~CodeGenerator() = default;
 };
 

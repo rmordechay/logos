@@ -1,6 +1,6 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
-#include "LgsErrorHandler.h"
+#include "LgsErrHandler.h"
 #include "LgsStack.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"

@@ -510,7 +510,7 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     }
     const auto baseExprType = baseExpr->type;
     if (const auto iter = baseExprType->asIterable()) {
-        if (iter->isStaticIter) {
+        if (iter->isStatic) {
             if (!checkIndexBoundaries(iterIndex)) return;
         }
         setIterIndexType(iterIndex);

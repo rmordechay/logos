@@ -7,7 +7,7 @@ void LgsArray::setUnderlyingType(const vector<LgsExpr*>& exprs) {
 }
 
 LgsExpr* LgsArray::getZeroValue() {
-    if (!isStaticIter) return new LgsDArray(underlyingType);
+    if (!isStatic) return new LgsDArray(underlyingType);
     const auto sArray = new LgsSArray(underlyingType);
     sArray->arrType.sizes = sizes;
     return sArray;
@@ -24,7 +24,7 @@ bool LgsArray::equals(LgsType* other) const {
 }
 
 Type* LgsArray::getIRType() {
-    if (!isStaticIter) return ptrTy;
+    if (!isStatic) return ptrTy;
     if (IRType) return IRType;
     IRType = underlyingType->getIRType();
     for (auto size = sizes.rbegin(); size != sizes.rend(); ++size) {

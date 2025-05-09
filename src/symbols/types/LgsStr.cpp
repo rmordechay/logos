@@ -34,11 +34,6 @@ bool LgsStr::equals(LgsType* other) const {
     return name == other->getIRName();
 }
 
-void LgsStr::cleanStr(string& value) {
-    value.erase(0, 1);
-    value.pop_back();
-}
-
 /**
  * FNV-1a 32-bit hash
  */

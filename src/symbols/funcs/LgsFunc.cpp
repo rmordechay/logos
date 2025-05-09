@@ -1,5 +1,5 @@
 #include "funcs/LgsFunc.h"
-#include "LgsData.h"
+#include "LgsDefinitions.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsVoid.h"

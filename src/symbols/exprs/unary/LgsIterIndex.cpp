@@ -30,7 +30,7 @@ void LgsIterIndex::assignIRValue(CodeGenMetadata* metadata, LgsExpr* value) cons
     if (const auto map = baseExpr->type->asMap()) {
         map->add.call(metadata, {baseExpr, indices[0]->from, value});
     } else if (const auto arr = baseExpr->type->asArray()) {
-        if (arr->isStaticIter) {
+        if (arr->isStatic) {
             const auto gep = getGEP(metadata);
             const auto rValue = value->getIRValue(metadata);
             metadata->builder.CreateStore(rValue, gep);
@@ -44,7 +44,7 @@ void LgsIterIndex::assignIRValue(CodeGenMetadata* metadata, LgsExpr* value) cons
 Value* LgsIterIndex::createIRValueFromArray(CodeGenMetadata* metadata, LgsArray* arr) const {
     const auto baseExprIRValue = baseExpr->getIRValue(metadata);
     const auto firstIndex = indices[0]->from;
-    if (arr->isStaticIter) {
+    if (arr->isStatic) {
         const auto iterable = baseExpr->type->asIterable();
         const auto IRType = iterable->getUnderlyingType()->getIRType();
         return metadata->builder.CreateLoad(IRType, getGEP(metadata));

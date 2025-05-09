@@ -128,7 +128,6 @@ void LogosProject::parseSrcFile(path entry) {
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     const auto file = antlerConverter.getLogosFile(parser.logosFile(), absFilePath);
-    file->relPath = relative(absFilePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     lock_guard lock(projectMtx);
     files.emplace_back(file);
     errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
@@ -137,15 +136,33 @@ void LogosProject::parseSrcFile(path entry) {
     }
 }
 
+void LogosProject::parseEnvFile(path fileEntry) {
+    const auto absFilePath = canonical(fileEntry);
+    AntlerConverter antlerConverter;
+    antlerConverter.errHandler.filePath = absFilePath;
+
+    const auto codeText = getFileText(fileEntry);
+    ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+    auto file = antlerConverter.getEnvFile(parser.logosEnvFile(), absFilePath);
+    lock_guard lock(projectMtx);
+    envFiles.emplace_back(file);
+    errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
+}
+
 void LogosProject::parseAppFile(path fileEntry) {
     auto absFilePath = canonical(fileEntry);
+    AntlerConverter antlerConverter;
+    antlerConverter.errHandler.filePath = absFilePath;
+
     auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    AntlerConverter antlerConverter;
-    antlerConverter.errHandler.filePath = absFilePath;
+
     appFile = antlerConverter.getAppFile(parser.logosAppFile(), absFilePath);
     for (const auto& varDec : appFile->varDecs) {
         if (varDec->name == "name") {
@@ -158,18 +175,6 @@ void LogosProject::parseAppFile(path fileEntry) {
             activeEnv.name = varDec->expr->asStrConst()->value;
         }
     }
-}
-
-void LogosProject::parseEnvFile(path fileEntry) {
-    auto absFilePath = canonical(fileEntry);
-    auto codeText = getFileText(fileEntry);
-    ANTLRInputStream input(codeText);
-    LogosLexer lexer(&input);
-    CommonTokenStream tokens(&lexer);
-    LogosParser parser(&tokens);
-    AntlerConverter antlerConverter;
-    auto envFile = antlerConverter.getEnvFile(parser.logosEnvFile(), absFilePath);
-    envFiles.emplace_back(envFile);
 }
 
 string LogosProject::getFileText(path filePath) const {
@@ -208,7 +213,7 @@ void LogosProject::setEnvVars() const {
 }
 
 void LogosProject::asJSON() const {
-    std::cout << mainFile->asJSON().dump(2) << '\n';
+    cout << mainFile->asJSON().dump(2) << '\n';
     return;
 }
 

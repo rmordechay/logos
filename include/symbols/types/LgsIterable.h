@@ -7,7 +7,7 @@ struct CodeGenMetadata;
 class LgsIterable : public LgsType {
 public:
     LgsType* underlyingType;
-    bool isStaticIter = false;
+    bool isStatic = false;
     vector<size_t> sizes;
 
     explicit LgsIterable(LgsType* underlyingType) : underlyingType(underlyingType) {}

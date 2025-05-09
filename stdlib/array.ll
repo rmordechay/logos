@@ -1,3 +1,8 @@
+declare noalias noundef ptr @malloc(i64 noundef) local_unnamed_addr #1
+declare void @free(ptr allocptr nocapture noundef) local_unnamed_addr #2
+declare noalias noundef ptr @realloc(ptr allocptr nocapture noundef, i64 noundef) local_unnamed_addr #4
+declare void @llvm.memcpy.p0.p0.i64(ptr noalias nocapture writeonly, ptr noalias nocapture readonly, i64, i1 immarg) #7
+
 define noalias noundef ptr @Array_new_Int_Long(i32 noundef %0, i64 noundef %1) local_unnamed_addr #0 {
   %3 = tail call dereferenceable_or_null(24) ptr @malloc(i64 noundef 24) #8
   %4 = icmp eq ptr %3, null
@@ -27,11 +32,6 @@ define noalias noundef ptr @Array_new_Int_Long(i32 noundef %0, i64 noundef %1) l
 }
 
 
-declare noalias noundef ptr @malloc(i64 noundef) local_unnamed_addr #1
-
-
-declare void @free(ptr allocptr nocapture noundef) local_unnamed_addr #2
-
 
 define void @resize(ptr nocapture noundef %0) local_unnamed_addr #3 {
   %2 = getelementptr inbounds i8, ptr %0, i64 8
@@ -56,7 +56,6 @@ define void @resize(ptr nocapture noundef %0) local_unnamed_addr #3 {
 }
 
 
-declare noalias noundef ptr @realloc(ptr allocptr nocapture noundef, i64 noundef) local_unnamed_addr #4
 
 
 define void @Array_add_Array_Any(ptr nocapture noundef %0, ptr nocapture noundef readonly %1) local_unnamed_addr #5 {
@@ -134,9 +133,6 @@ define void @Array_free_Array(ptr noundef %0) local_unnamed_addr #3 {
 6:
   ret void
 }
-
-
-declare void @llvm.memcpy.p0.p0.i64(ptr noalias nocapture writeonly, ptr noalias nocapture readonly, i64, i1 immarg) #7
 
 attributes #0 = { mustprogress nounwind ssp willreturn memory(readwrite, argmem: none) uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }
 attributes #1 = { mustprogress nofree nounwind willreturn allockind("alloc,uninitialized") allocsize(0) memory(inaccessiblemem: readwrite) "alloc-family"="malloc" "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8a,+zcm,+zcz" }

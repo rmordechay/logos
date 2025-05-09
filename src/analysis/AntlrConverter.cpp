@@ -4,6 +4,7 @@
 #include "LgsEnvFile.h"
 #include "LgsGlobals.h"
 #include "LgsInterfaceFile.h"
+#include "LogosLexer.h"
 #include "Platform.h"
 #include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
@@ -97,7 +98,7 @@ void AntlerConverter::setMainFunc(LgsMainFile* mainFile, LogosParser::FuncImplem
     bool isValid;
     if (params.size() == 1) {
         const auto arr = params[0]->type->asArray();
-        isValid = arr && !arr->isStaticIter && arr->underlyingType->asStr();
+        isValid = arr && !arr->isStatic && arr->underlyingType->asStr();
     } else {
         isValid = params.empty();
     }
@@ -409,7 +410,7 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
         string enumText = "";
         if (enumField->STRING()) {
             enumText = enumField->STRING()->getText();
-            LgsStr::cleanStr(enumText);
+            cleanStr(enumText);
         }
         const auto field = new LgsEnumField(lgsEnum, enumName, enumText);
         field->type = lgsEnum;
@@ -433,6 +434,7 @@ LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx, const bool isNu
         expr = getBinaryExpr(ctx);
     }
     if (isNullable) {
+        assert(expr && expr->type);
         expr->type->isNullable = true;
     }
     return expr;
@@ -643,12 +645,18 @@ LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) co
         if (value.size() == 1) {
             constant = new LgsCharConst(value[0]);
         } else {
-            LgsStr::cleanStr(value);
-            constant = new LgsStrConst(value);
+            constant = getStrConst(value);
         }
     }
     constant->setLocation(ctx->start);
     return constant;
+}
+
+LgsConstExpr* AntlerConverter::getStrConst(string& value) const {
+    cleanStr(value);
+    const auto strConst = new LgsStrConst(value);
+    parseTemplateStr(strConst);
+    return strConst;
 }
 
 LgsTypeConst* AntlerConverter::getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const {
@@ -678,7 +686,7 @@ LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) const {
     const auto underlyingType = getTypeFromText(ctx->TYPE(), ctx);
     const auto arrType = new LgsArray(underlyingType);
     if (ctx->INTEGER().size() > 0) {
-        arrType->isStaticIter = true;
+        arrType->isStatic = true;
         for (const auto& integer : ctx->INTEGER()) {
             arrType->sizes.emplace_back(std::stoi(integer->getText()));
         }
@@ -715,4 +723,46 @@ LgsType* AntlerConverter::getFuncType(LogosParser::FuncSignatureContext* ctx) co
     }
     result->setLocation(ctx->start);
     return result;
+}
+
+void AntlerConverter::parseTemplateStr(LgsStrConst* strConst) const {
+    if (strConst->value.find('{') == string::npos) return;
+    string templateStr;
+    string newStr = strConst->value;
+    auto bracesCount = 0;
+    for (size_t i = 0; i < strConst->value.length(); ++i) {
+        const auto currentChar = strConst->value[i];
+        if (currentChar == '{') {
+            bracesCount++;
+        } else if (currentChar == '}' && bracesCount > 0) {
+            bracesCount--;
+            const auto expr = getExpr(templateStr);
+            if (!expr) { // If any error occur, then return the string as is
+                strConst->templateParts.clear();
+                return;
+            }
+            strConst->templateParts.push_back(expr);
+            templateStr.clear();
+        } else if (bracesCount > 0) {
+            templateStr += currentChar;
+        }
+    }
+    assert(bracesCount == 0);
+}
+
+LgsExpr* AntlerConverter::getExpr(const string& codeText) const {
+    antlr4::ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    antlr4::CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+    lexer.removeErrorListeners();
+    parser.removeErrorListeners();
+    auto exprContext = parser.expr();
+    AntlerConverter antlerConverter;
+    return antlerConverter.getExpr(exprContext);
+}
+
+void AntlerConverter::cleanStr(string& value) const {
+    value.erase(0, 1);
+    value.pop_back();
 }

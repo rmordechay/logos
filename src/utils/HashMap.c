@@ -82,12 +82,3 @@ void Map_free_Map(HashMap* map) {
     free(map->buckets);
     free(map);
 }
-
-int main(void) {
-    HashMap* map = Map_new_Int(sizeof(char*));
-    const char* x = "kdjfh";
-    Map_add_Map_Str_Any(map, "answer", &x);
-    printf("Value: %s\n", *(char**)Map_get_Map_Str(map, "answer"));
-    // Map_free_Map(map);
-    return 0;
-}

@@ -16,5 +16,5 @@ void LgsMainFunc::setArgs(const vector<char*>& args) {
     const auto argv = funcType.params[0];
     const auto iterable = argv->type->asIterable();
     iterable->sizes = {args.size()};
-    iterable->isStaticIter = true;
+    iterable->isStatic = true;
 }

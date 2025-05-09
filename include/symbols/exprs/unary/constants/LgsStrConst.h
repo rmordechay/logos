@@ -8,10 +8,10 @@ class LgsStrConst final : public LgsConstExpr {
 public:
     LgsStr strType;
     string value;
-    FunctionType* const cmpStrIRFuncType = FunctionType::get(i1Ty, {ptrTy, ptrTy}, false);
+    vector<LgsExpr*> templateParts;
 
     explicit LgsStrConst(const string& value) : LgsConstExpr(&strType), value(value) {
-        strType.isStaticIter = true;
+        strType.isStatic = true;
         strType.sizes = {value.size()};
     }
     Value* createIRValue(CodeGenMetadata* metadata) override;

@@ -1,4 +1,4 @@
-#include "LgsErrorHandler.h"
+#include "LgsErrHandler.h"
 #include "LgsGlobals.h"
 #include <iostream>
 

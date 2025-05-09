@@ -1,6 +1,6 @@
 #ifndef LOGOSFUNCIMPL_H
 #define LOGOSFUNCIMPL_H
-#include "LgsData.h"
+#include "LgsDefinitions.h"
 #include "LgsFunc.h"
 #include "LgsParam.h"
 #include "types/LgsFuncType.h"

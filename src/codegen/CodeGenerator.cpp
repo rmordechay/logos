@@ -1,4 +1,6 @@
 #include "CodeGenerator.h"
+
+#include "LgsConfig.h"
 #include "Logos.h"
 #include "Platform.h"
 #include "funcs/LgsFuncImpl.h"
@@ -6,38 +8,18 @@
 #include <LgsMainFile.h>
 #include <ranges>
 #include <llvm/Support/FileSystem.h>
-#include "llvm/ADT/ScopeExit.h"
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Target/TargetOptions.h>
 #include <llvm/MC/TargetRegistry.h>
 
 void CodeGenerator::generate(LgsMainFile* mainFile) {
-    initLLVM();
-    createBuildDir();
+    init();
     const auto module = createEmptyModule(LOGOS_MAIN_FILE_NAME);
     auto metadata = CodeGenMetadata{.module = module};
-
     for (const auto& func : mainFile->getAllFuncs()) {
         func->generateIRCode(&metadata);
     }
     generateMainFunc(&metadata, mainFile->mainFunc);
-
-    if constexpr (WRITE_TO_FILE) {
-        writeIRToFile(metadata.module, LOGOS_MAIN_FILE_NAME);
-    }
-}
-
-void CodeGenerator::generateObjModule(const LgsType* obj) {
-    const auto objName = obj->prettyName();
-    if (IRModules.find(objName) != IRModules.end()) return;
-    auto metadata = CodeGenMetadata{.module = createEmptyModule(objName)};
-    for (const auto& overload : obj->getAllMethods()) {
-        overload->generateIRCode(&metadata);
-    }
-
-    if constexpr (WRITE_TO_FILE) {
-        writeIRToFile(metadata.module, objName);
-    }
 }
 
 void CodeGenerator::generateMainFunc(CodeGenMetadata* metadata, LgsFuncImpl* mainFunc) {
@@ -50,13 +32,27 @@ void CodeGenerator::generateMainFunc(CodeGenMetadata* metadata, LgsFuncImpl* mai
     }
     metadata->lgsStack.exitScope();
     metadata->builder.CreateRet(metadata->builder.getInt32(EXIT_SUCCESS));
+    if constexpr (DEBUG) {
+        writeIRToFile(metadata->module, LOGOS_MAIN_FILE_NAME);
+    }
+}
+
+void CodeGenerator::generateObjModule(const LgsType* obj) {
+    const auto objName = obj->prettyName();
+    if (IRModules.find(objName) != IRModules.end()) return;
+    auto metadata = CodeGenMetadata{.module = createEmptyModule(objName)};
+    for (const auto& overload : obj->getAllMethods()) {
+        overload->generateIRCode(&metadata);
+    }
+    if constexpr (DEBUG) {
+        writeIRToFile(metadata.module, objName);
+    }
 }
 
 void CodeGenerator::createIRMainFunc(const CodeGenMetadata* metadata) {
     const auto mainFuncType = FunctionType::get(i32Ty, {i32Ty, ptrTy}, false);
     const auto mainFunc = Function::Create(mainFuncType, Function::ExternalLinkage, LOGOS_MAIN_FUNC, metadata->module);
-    Function::arg_iterator args = mainFunc->arg_begin();
-    args++->setName("argc");
+    const auto args = mainFunc->arg_begin();
     args->setName("argv");
 }
 
@@ -68,7 +64,9 @@ Module* CodeGenerator::createEmptyModule(const string& objName) {
     return module;
 }
 
-void CodeGenerator::initLLVM() {
+void CodeGenerator::init() {
+    if (exists(paths.buildDir)) remove_all(paths.buildDir);
+    create_directories(paths.buildDir);
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();
@@ -78,13 +76,6 @@ void CodeGenerator::initLLVM() {
     string error;
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
-}
-
-void CodeGenerator::createBuildDir() {
-    if (exists(paths.buildDir)) {
-        remove_all(paths.buildDir);
-    }
-    create_directories(paths.buildDir);
 }
 
 void CodeGenerator::writeIRToFile(const Module* module, const path& name){

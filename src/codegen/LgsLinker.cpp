@@ -4,7 +4,7 @@
 #include "Platform.h"
 
 #include <CodeGenerator.h>
-#include <LgsData.h>
+#include <LgsDefinitions.h>
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/IR/LegacyPassManager.h>

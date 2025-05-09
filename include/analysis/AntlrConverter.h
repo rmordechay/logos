@@ -2,7 +2,7 @@
 #define SEMANTICANALYSER_H
 
 #include "LgsEnvFile.h"
-#include "LgsErrorHandler.h"
+#include "LgsErrHandler.h"
 #include "LogosParser.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
@@ -63,11 +63,15 @@ public:
     LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LgsIterIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
     LgsConstExpr* getConstant(LogosParser::ConstantContext* ctx) const;
+    LgsConstExpr* getStrConst(string& value) const;
     LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx) const;
     LgsType* getArrayType(LogosParser::TypeContext* ctx) const;
     LgsType* getTypeFromText(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const;
     LgsType* getFuncType(LogosParser::FuncSignatureContext* ctx) const;
+    LgsExpr* getExpr(const string& codeText) const;
+    void parseTemplateStr(LgsStrConst* strConst) const;
+    void cleanStr(string& value) const;
     ~AntlerConverter() = default;
 };
 

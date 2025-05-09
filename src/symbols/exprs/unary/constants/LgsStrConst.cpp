@@ -26,9 +26,5 @@ Value* LgsStrConst::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
 }
 
 Value* LgsStrConst::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    if (const auto otherStrConst = other->asStrConst()) {
-        const auto func = metadata->module->getOrInsertFunction("Str_compare_Str_Str", cmpStrIRFuncType);
-        return metadata->builder.CreateCall(func, {getIRValue(metadata), otherStrConst->getIRValue(metadata)});
-    }
     return nullptr;
 }

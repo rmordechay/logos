@@ -8,7 +8,7 @@
 #include "symbols/LgsSymbol.h"
 #include "types/LgsObject.h"
 #include "types/LgsInterface.h"
-#include "LgsErrorHandler.h"
+#include "LgsErrHandler.h"
 #include "funcs/LgsFuncImpl.h"
 
 struct LgsGlobals {

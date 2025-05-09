@@ -20,7 +20,7 @@ include_directories(
     include/utils
 )
 
-add_library(lib STATIC
+add_library(lib
     # headers
     include/analysis/AntlrConverter.h
     include/analysis/SemaAnalyser.h
@@ -31,7 +31,7 @@ add_library(lib STATIC
     include/codegen/CodeGenerator.h
     include/codegen/CodeGenMetadata.h
     include/codegen/LgsLinker.h
-    include/data/LgsData.h
+    include/data/LgsDefinitions.h
     include/data/LgsErrors.h
     include/data/LgsWarnings.h
     include/files/LgsAppFile.h
@@ -40,13 +40,14 @@ add_library(lib STATIC
     include/files/LgsInterfaceFile.h
     include/files/LgsMainFile.h
     include/files/LgsObjectFile.h
+    include/logos/Logos.h
     include/logos/LgsActiveEnv.h
     include/logos/Platform.h
-    include/logos/LgsErrorHandler.h
+    include/logos/LgsErrHandler.h
     include/logos/LgsGlobals.h
     include/logos/LgsProject.h
     include/logos/LgsStack.h
-    include/logos/Logos.h
+    include/logos/LgsConfig.h
     include/parser/LogosLexer.h
     include/parser/LogosParser.h
     include/utils/LgsC.h
@@ -127,7 +128,7 @@ add_library(lib STATIC
     src/cli/LgsRunCmd.cpp
     src/codegen/CodeGenerator.cpp
     src/codegen/LgsLinker.cpp
-    src/logos/LgsErrorHandler.cpp
+    src/logos/LgsErrHandler.cpp
     src/logos/LgsProject.cpp
     src/logos/LgsStack.cpp
     src/logos/Logos.cpp

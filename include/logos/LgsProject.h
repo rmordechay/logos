@@ -2,7 +2,7 @@
 #define LGSPROJECT_H
 #include "AntlrConverter.h"
 #include "LgsActiveEnv.h"
-#include "LgsErrorHandler.h"
+#include "LgsErrHandler.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 
@@ -41,12 +41,11 @@ public:
     void loadEnvFiles();
     void setupActiveEnv();
     bool validateProject();
+    string getFileText(path filePath) const;
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
-    LgsFile* parseFile(path entry, AntlerConverter* antlerConverter);
     void parseSrcFile(path entry);
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
-    string getFileText(path filePath) const;
     void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
     void checkDuplicateFiles(const vector<LgsFile*>& files);
     bool isLogosFile(const directory_entry& entry) const;

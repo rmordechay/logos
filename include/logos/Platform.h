@@ -1,6 +1,6 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
-#include "LgsData.h"
+#include "LgsDefinitions.h"
 #include <string>
 #include <vector>
 #include <lld/Common/Driver.h>
@@ -73,7 +73,7 @@ inline void setPlatform(const string& inputFile, const string& outputFile) {
     };
     platform.link = lld::macho::link;
 #elif defined(_WIN32)
-#define OS_NAME "Windows"
+    platform.osName = "macos";
 #endif
 }
 

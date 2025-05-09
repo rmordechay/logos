@@ -1,6 +1,6 @@
 #ifndef LOGOSOBJECT_H
 #define LOGOSOBJECT_H
-#include "LgsData.h"
+#include "LgsDefinitions.h"
 #include "LgsStr.h"
 #include "LgsType.h"
 #include "stmts/LgsField.h"

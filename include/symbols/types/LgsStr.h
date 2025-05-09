@@ -18,7 +18,6 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) const override;
-    static void cleanStr(string& value);
     static uint32_t hashString(const string& str);
     ~LgsStr() override = default;
 };

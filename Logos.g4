@@ -342,7 +342,7 @@ NULL: 'null';
 CONST_NAME: [A-Z0-9_]+;
 TYPE: [A-Z][a-zA-Z0-9_]*;
 VARIABLE: [a-z_][a-zA-Z0-9_]*;
-STRING: '"' ( ~["\\] | '\\' . )* '"';
+STRING: '"' ( ~["\\] | '\\'.)* '"';
 LINE_COMMENT: '//' ~( '\r' | '\n' )* -> skip;
 BLOCK_COMMENT: '///' .*? '///' -> skip;
 WS: [ \t\r\n]+ -> skip;
