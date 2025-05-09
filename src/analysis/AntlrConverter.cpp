@@ -4,6 +4,7 @@
 #include "LgsEnvFile.h"
 #include "LgsGlobals.h"
 #include "LgsInterfaceFile.h"
+#include "Platform.h"
 #include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "exprs/binary/LgsBinaryExpr.h"
@@ -41,18 +42,19 @@
 #include <types/LgsVoid.h>
 
 LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
-    LgsFile* logosFile = nullptr;
+    LgsFile* file = nullptr;
     if (const auto mainFileCtx = ctx->mainFile()) {
-        logosFile = getMainFile(mainFileCtx, filePath);
+        file = getMainFile(mainFileCtx, filePath);
     }
     if (const auto objFileCtx = ctx->objectFile()) {
-        logosFile = getObjectFile(objFileCtx, filePath);
+        file = getObjectFile(objFileCtx, filePath);
     }
     if (const auto interfaceFileCtx = ctx->interfaceFile()) {
-        logosFile = getInterfaceFile(interfaceFileCtx, filePath);
+        file = getInterfaceFile(interfaceFileCtx, filePath);
     }
-    logosFile->absPath = filePath;
-    return logosFile;
+    file->absPath = filePath;
+    file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
+    return file;
 }
 
 LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, const string& filePath) {
@@ -110,7 +112,33 @@ LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx, c
     for (const auto& implicitVarDec : ctx->implicitVarDec()) {
         varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
     }
-    return new LgsEnvFile(filePath, varDecs);
+    const auto file = new LgsEnvFile(filePath, varDecs);
+    file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
+    return file;
+}
+
+LgsAppFile* AntlerConverter::getAppFile(LogosParser::LogosAppFileContext* ctx, const path& filePath) {
+    vector<LgsVarDec*> varDecs;
+    for (const auto& explicitVarDec : ctx->explicitVarDec()) {
+        varDecs.emplace_back(getExplicitVarDec(explicitVarDec));
+    }
+    for (const auto& implicitVarDec : ctx->implicitVarDec()) {
+        varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
+    }
+    const auto file = new LgsAppFile(filePath, varDecs);
+    const auto requireEnvs = ctx->requireEnvVars();
+    if (!requireEnvs) return file;
+
+    vector<RequireEnvVar> requireEnvVars;
+    for (int i = 0; i < requireEnvs->type().size(); ++i) {
+        const auto name = requireEnvs->VARIABLE()[i]->getText();
+        const auto type = getType(requireEnvs->type()[i]);
+        const RequireEnvVar requireEnvVar{.name = name, .type = type};
+        requireEnvVars.emplace_back(requireEnvVar);
+    }
+    file->requireEnvVars = requireEnvVars;
+    file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
+    return file;
 }
 
 LgsObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath) {
@@ -125,29 +153,6 @@ LgsFile* AntlerConverter::getInterfaceFile(LogosParser::InterfaceFileContext* ct
     const auto interfaceFile = new LgsInterfaceFile(interfaceName, filePath);
     interfaceFile->interface = getInterface(ctx->interfaceBody(), interfaceName, interfaceName);
     return interfaceFile;
-}
-
-LgsAppFile* AntlerConverter::getAppFile(LogosParser::LogosAppFileContext* ctx, const path& filePath) {
-    vector<LgsVarDec*> varDecs;
-    for (const auto& explicitVarDec : ctx->explicitVarDec()) {
-        varDecs.emplace_back(getExplicitVarDec(explicitVarDec));
-    }
-    for (const auto& implicitVarDec : ctx->implicitVarDec()) {
-        varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
-    }
-    const auto appFile = new LgsAppFile(filePath, varDecs);
-    const auto requireEnvs = ctx->requireEnvVars();
-    if (!requireEnvs) return appFile;
-
-    vector<RequireEnvVar> requireEnvVars;
-    for (int i = 0; i < requireEnvs->type().size(); ++i) {
-        const auto name = requireEnvs->VARIABLE()[i]->getText();
-        const auto type = getType(requireEnvs->type()[i]);
-        const RequireEnvVar requireEnvVar{.name = name, .type = type};
-        requireEnvVars.emplace_back(requireEnvVar);
-    }
-    appFile->requireEnvVars = requireEnvVars;
-    return appFile;
 }
 
 LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const string& filePath, const bool isSingleton) {

@@ -119,13 +119,14 @@ void LogosProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
 
 void LogosProject::parseSrcFile(path entry) {
     const auto absFilePath = canonical(entry);
+    AntlerConverter antlerConverter;
+    antlerConverter.errHandler.filePath = absFilePath;
+
     const auto codeText = getFileText(entry);
     ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    AntlerConverter antlerConverter;
-    antlerConverter.errHandler.filePath = absFilePath;
     const auto file = antlerConverter.getLogosFile(parser.logosFile(), absFilePath);
     file->relPath = relative(absFilePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     lock_guard lock(projectMtx);
@@ -144,6 +145,7 @@ void LogosProject::parseAppFile(path fileEntry) {
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     AntlerConverter antlerConverter;
+    antlerConverter.errHandler.filePath = absFilePath;
     appFile = antlerConverter.getAppFile(parser.logosAppFile(), absFilePath);
     for (const auto& varDec : appFile->varDecs) {
         if (varDec->name == "name") {

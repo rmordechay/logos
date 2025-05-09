@@ -1,5 +1,6 @@
 #ifndef LGSPROJECT_H
 #define LGSPROJECT_H
+#include "AntlrConverter.h"
 #include "LgsActiveEnv.h"
 #include "LgsErrorHandler.h"
 #include "files/LgsAppFile.h"
@@ -41,6 +42,7 @@ public:
     void setupActiveEnv();
     bool validateProject();
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
+    LgsFile* parseFile(path entry, AntlerConverter* antlerConverter);
     void parseSrcFile(path entry);
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
