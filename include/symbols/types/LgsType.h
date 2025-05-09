@@ -17,7 +17,6 @@ class LgsConstExpr;
 class LgsField;
 class LgsMethodImpl;
 
-
 class LgsType {
 public:
     Location location;
@@ -43,16 +42,16 @@ public:
     LgsIterable* asIterable();
     LgsArray* asArray();
 
-    virtual bool isIndexable(LgsType* indexType);
     virtual size_t getSize();
     virtual bool equals(LgsType& other);
+    virtual bool isIndexable(LgsType* indexType);
     virtual json asJSON() const;
+
     virtual Type* getIRType() = 0;
+    virtual string getIRName() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual string prettyName() const = 0;
-    virtual string getIRName() = 0;
     virtual bool equals(LgsType* other) const = 0;
-    virtual bool isIterable();
     virtual LgsType* inferBinaryType(LgsType* other) = 0;
     virtual ~LgsType() = default;
 };

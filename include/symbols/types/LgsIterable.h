@@ -12,7 +12,6 @@ public:
 
     explicit LgsIterable(LgsType* underlyingType) : underlyingType(underlyingType) {}
     size_t getDims() const;
-    bool isIterable() override;
     virtual LgsType* getUnderlyingType();
     virtual Value* IRLength(CodeGenMetadata* metadata);
     LgsType* inferTypeFromIter(const vector<LgsExpr*>& exprs) const;

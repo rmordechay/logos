@@ -21,10 +21,6 @@ size_t LgsType::getSize() {
     assert(false);
 }
 
-bool LgsType::isIterable() {
-    return false;
-}
-
 json LgsType::asJSON() const {
     assert(false);
 }

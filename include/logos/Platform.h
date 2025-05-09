@@ -24,7 +24,6 @@ struct Platform {
     string linker;
     string libRoot;
     string arch;
-    string entryPoint;
     string platformVersion;
     string inputFile;
     string outputFile;
@@ -42,23 +41,20 @@ inline void setPlatform(const string& inputFile, const string& outputFile) {
     platform.osName = "Linux";
     platform.linker = "ld";
     platform.libRoot = "/usr/lib/aarch64-linux-gnu";
-    platform.entryPoint = "main";
     platform.platformVersion = "5.15";
     platform.arch = ARCH_NAME;
     platform.linkerOpts = {
         platform.linker.c_str(),
-        platform.inputFile.c_str(),
-        "-o", platform.outputFile.c_str(),
-        "-lc",
         "-L", platform.libRoot.c_str(),
-        "-e", platform.entryPoint.c_str()
+        "-lc",
+        "-o", platform.outputFile.c_str(),
+        platform.inputFile.c_str(),
     };
     platform.link = lld::elf::link;
 #elif defined(__APPLE__) && defined(__MACH__)
     platform.osName = "macos";
     platform.linker = "ld.lld";
     platform.libRoot = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk";
-    platform.entryPoint = "_main";
     platform.platformVersion = "15.0";
     platform.arch = ARCH_NAME;
     platform.linkerOpts = {
@@ -67,7 +63,6 @@ inline void setPlatform(const string& inputFile, const string& outputFile) {
         "-o", platform.outputFile.c_str(),
         "-lSystem",
         "-syslibroot", platform.libRoot.c_str(),
-        "-e", platform.entryPoint.c_str(),
         "-platform_version", platform.osName.c_str(), platform.platformVersion.c_str(), platform.platformVersion.c_str(),
         "-arch", platform.arch.c_str()
     };

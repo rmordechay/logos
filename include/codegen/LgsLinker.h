@@ -7,12 +7,17 @@ struct LgsPaths;
 using namespace llvm;
 using namespace std;
 
-#define STD_LIBS {"../stdlib/lgslib.ll", "../stdlib/array.ll", "../stdlib/string.ll", "../stdlib/map.ll"}
+const string STD_LIBS[] = {
+    "../stdlib/start.ll",
+    "../stdlib/lgslib.ll",
+    // "../stdlib/array.ll",
+    // "../stdlib/string.ll",
+    // "../stdlib/map.ll",
+};
 
 class LgsLinker {
 public:
     bool link() const;
-    bool getLinkFunc() const;
     void linkStdlib(const string& path, Linker* linker) const;
     ~LgsLinker() = default;
 };

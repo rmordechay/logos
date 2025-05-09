@@ -7,10 +7,6 @@ size_t LgsIterable::getDims() const {
     return sizes.size();
 }
 
-bool LgsIterable::isIterable() {
-    return true;
-}
-
 LgsType* LgsIterable::getUnderlyingType() {
     return underlyingType;
 }

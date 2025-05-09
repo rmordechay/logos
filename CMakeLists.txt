@@ -194,9 +194,6 @@ add_library(lib
     src/symbols/types/LgsUnknownType.cpp
     src/symbols/types/LgsLong.cpp
     src/symbols/exprs/unary/constants/LgsLongConst.cpp
-    src/utils/DynArray.c
-    src/utils/VirtualTable.c
-    src/utils/HashMap.c
     src/symbols/types/LgsIterable.cpp
 )
 
