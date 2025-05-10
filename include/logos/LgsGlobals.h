@@ -10,12 +10,13 @@
 #include "types/LgsInterface.h"
 #include "LgsErrHandler.h"
 #include "funcs/LgsFuncImpl.h"
+#include "types/LgsBool.h"
 
 struct LgsGlobals {
     std::mutex mtx;
     map<string, LgsSymbol> symbols;
 
-    void addSymbol(const string& name, const LgsSymbol& symbol, LgsErrorHandler* errHandler) {
+    void addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
         if (symbols.find(name) != symbols.end()) {
             const auto location = symbol.getLocation();
             errHandler->handleError(E10011, location, {name, location->lineNumberStr()});
@@ -23,22 +24,26 @@ struct LgsGlobals {
         }
         lock_guard lock(mtx);
         symbols[name] = symbol;
-        return;
     }
 
-    void addFunc(LgsFuncImpl* func) {
+    void addFunc(LgsFuncImpl* newFunc) {
+        const auto name = newFunc->funcType.name;
+        const auto symbol = symbols.find(name);
         std::lock_guard lock(mtx);
-        auto [symbol, inserted] = symbols.try_emplace(func->funcType.name);
-        if (inserted) {
-            symbol->second.type = FUNC;
+        if (symbol == symbols.end()) {
+            const auto funcFamily = new LgsFuncFamily();
+            funcFamily->overloads.push_back(newFunc);
+            symbols[name] = LgsSymbol(funcFamily);
+        } else {
+            symbol->second.func->overloads.emplace_back(newFunc);
         }
-        symbol->second.func.emplace_back(func);
     }
 
-    void addEnum(LgsEnum* lgsEnum) {
+    void addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler = nullptr) {
         if (symbols.find(lgsEnum->name) != symbols.end()) {
-            // TODO replace with proper error
-            assert(false && "enum already exists");
+            const auto location = lgsEnum->location;
+            errHandler->handleError(E10011, &location, {lgsEnum->name, location.lineNumberStr()});
+            return;
         }
         lock_guard lock(mtx);
         symbols[lgsEnum->name] = LgsSymbol(lgsEnum);

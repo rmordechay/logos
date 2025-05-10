@@ -26,21 +26,21 @@ json LgsType::asJSON() const {
 }
 
 LgsField* LgsType::getField(const string& name) {
-    const auto it = fields.find(name);
-    if (it != fields.end()) {
-        return it->second;
+    const auto field = fields.find(name);
+    if (field != fields.end()) {
+        return field->second;
     }
     return nullptr;
 }
 
 void LgsType::addMethod(LgsMethodImpl* method) {
-    methods[method->getFuncType()->name].push_back(method);
+    methods[method->funcType.name].push_back(method);
 }
 
-LgsMethodImpl* LgsType::findMethod(const LgsFuncCall* funcCall) const {
+LgsMethodImpl* LgsType::findMethod(LgsFuncCall* funcCall) const {
     const auto overloads = getMethodsOverloads(funcCall->name);
     for (const auto& overload : overloads) {
-        if (overload->equals(funcCall)) {
+        if (overload->funcType.equals(funcCall)) {
             return overload;
         }
     }
@@ -84,6 +84,10 @@ LgsIterable* LgsType::asIterable() {
 
 LgsArray* LgsType::asArray() {
     return dynamic_cast<LgsArray*>(this);
+}
+
+LgsFuncType* LgsType::asFuncType() {
+    return dynamic_cast<LgsFuncType*>(this);
 }
 
 LgsStr* LgsType::asStr() {

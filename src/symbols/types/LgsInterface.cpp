@@ -25,11 +25,13 @@ LgsExpr* LgsInterface::getZeroValue() {
     assert(false);
 }
 
-bool LgsInterface::equals(LgsType* other) const {
+bool LgsInterface::equals(LgsType* other) {
     if (const auto obj = other->asObject()) {
         for (const auto& implement : obj->implements) {
-            if (implement->getIRName() == name) return true;
+            if (implement->getIRName() == getIRName()) return true;
         }
+    } else if (const auto interface = other->asInterface()) {
+        if (interface->getIRName() == getIRName()) return true;
     }
     return false;
 }

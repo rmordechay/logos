@@ -32,7 +32,7 @@ string LgsMap::prettyName() const {
     return name + underlyingType->prettyName();
 }
 
-bool LgsMap::equals(LgsType* other) const {
+bool LgsMap::equals(LgsType* other) {
     const auto otherMap = other->asMap();
     const auto keyEqual = otherMap && kvType.key->equals(otherMap->kvType.key);
     return keyEqual && kvType.value->equals(otherMap->kvType.value);

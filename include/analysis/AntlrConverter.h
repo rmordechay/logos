@@ -20,7 +20,7 @@ class AntlerConverter {
 public:
     LgsFuncImpl* currentFunc = nullptr;
     LgsMethodImpl* currentMethod = nullptr;
-    LgsErrorHandler errHandler;
+    LgsErrHandler errHandler;
 
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath);
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath);

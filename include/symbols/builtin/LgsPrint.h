@@ -12,9 +12,7 @@ class LgsPrint final : public LgsFuncImpl {
 public:
     static constexpr auto name = "print";
 
-    explicit LgsPrint(const vector<LgsParam*>& params) {
-        funcType.name = name;
-        funcType.rt = &LGS_VOID;
+    explicit LgsPrint(const vector<LgsParam*>& params): LgsFuncImpl(name, &LGS_VOID) {
         funcType.params = params;
     }
     void setIRFuncType(const CodeGenMetadata* metadata);

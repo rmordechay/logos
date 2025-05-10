@@ -16,7 +16,7 @@ string LgsAny::prettyName() const {
     return name;
 }
 
-bool LgsAny::equals(LgsType* other) const {
+bool LgsAny::equals(LgsType* other) {
     // TODO should everything equals Any?
     return true;
 }

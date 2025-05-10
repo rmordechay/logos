@@ -13,8 +13,8 @@ public:
     LgsParam elementSizeParam{&LGS_LONG};
 
     explicit LgsArrayNewFunc(LgsType* parent) : LgsMethodImpl("new", parent->getIRName(), &LGS_ANY) {
-        methodType.params = {&capacityParam, &elementSizeParam};
-        isStatic = true;
+        funcType.params = {&capacityParam, &elementSizeParam};
+        funcType.isStatic = true;
     }
 };
 
@@ -25,7 +25,7 @@ public:
 
     explicit LgsArrayGetFunc(LgsType* parent) : LgsMethodImpl("get", parent->getIRName(), &LGS_ANY) {
         self.type = parent;
-        methodType.params = {&self, &indexParam};
+        funcType.params = {&self, &indexParam};
     }
 };
 
@@ -36,11 +36,11 @@ public:
 
     explicit LgsArrayAddFunc(LgsType* parent) : LgsMethodImpl("add", parent->getIRName(), &LGS_VOID) {
         self.type = parent;
-        methodType.params = {&self, &valueParam};
-        isPublic = true;
+        funcType.params = {&self, &valueParam};
+        funcType.isPublic = true;
     }
 
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args, Value* callback = nullptr) override {
+    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
         auto& builder = metadata->builder;
         const auto arrPtr = args[0]->getIRValue(metadata);
         const auto arrPtrLoad = builder.CreateLoad(ptrTy, arrPtr);
@@ -59,7 +59,7 @@ public:
 
     explicit LgsArrayDeleteFunc(LgsType* parent) : LgsMethodImpl("delete", parent->getIRName(), &LGS_VOID) {
         self.type = parent;
-        methodType.params = {&self, &indexParam};
+        funcType.params = {&self, &indexParam};
     }
 };
 
@@ -69,8 +69,8 @@ public:
 
     explicit LgsArrayLenFunc(LgsType* parent) : LgsMethodImpl("len", parent->getIRName(), &LGS_INT) {
         self.type = parent;
-        methodType.params = {&self};
-        isPublic = true;
+        funcType.params = {&self};
+        funcType.isPublic = true;
     }
 };
 

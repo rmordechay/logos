@@ -10,7 +10,7 @@ public:
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;
-    bool equals(LgsType* other) const override;
+    bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     ~LgsAny() override = default;
 };

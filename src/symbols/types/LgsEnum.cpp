@@ -31,7 +31,7 @@ string LgsEnum::prettyName() const {
     return name;
 }
 
-bool LgsEnum::equals(LgsType* other) const {
+bool LgsEnum::equals(LgsType* other) {
     return name == other->getIRName();
 }
 

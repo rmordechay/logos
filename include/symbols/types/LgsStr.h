@@ -17,7 +17,7 @@ public:
     string prettyName() const override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
-    bool equals(LgsType* other) const override;
+    bool equals(LgsType* other) override;
     static uint32_t hashString(const string& str);
     ~LgsStr() override = default;
 };

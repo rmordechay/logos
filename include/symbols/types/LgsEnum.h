@@ -16,7 +16,7 @@ public:
     json asJSON() const override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;
-    bool equals(LgsType* other) const override;
+    bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     ~LgsEnum() override = default;
 };

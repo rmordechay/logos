@@ -28,7 +28,7 @@ LgsType* LgsStr::inferBinaryType(LgsType* other) {
     return this;
 }
 
-bool LgsStr::equals(LgsType* other) const {
+bool LgsStr::equals(LgsType* other) {
     assert(other);
     if (dynamic_cast<LgsChar*>(other)) return true;
     return name == other->getIRName();

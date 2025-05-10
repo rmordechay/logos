@@ -5,23 +5,26 @@
 
 class LgsParam;
 
-class LgsFuncType : public LgsType {
+class LgsFuncType final : public LgsType {
 public:
     string name;
     string IRName;
+    string parentName;
     LgsType* rt;
     vector<LgsParam*> params;
+    bool isStatic = false;
+    bool isPublic = false;
     bool hasDefaultParams = false;
     FunctionType* IRFuncType = nullptr;
 
+    string getAsStr() const;
     Type* getIRType() override;
+    string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;
-    string getIRName() override;
-    bool equals(LgsType* other) const override;
     LgsType* inferBinaryType(LgsType* other) override;
+    bool equals(LgsType* other) override;
     bool equals(const LgsFuncCall* other) const;
-    string getAsStr(bool withType = false) const;
     static string getComposedName(const string& name, const string& parentName, const vector<string>& argTypeNames);
     ~LgsFuncType() override;
 };

@@ -13,7 +13,7 @@ public:
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;
-    bool equals(LgsType* other) const override;
+    bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
 };
 
@@ -33,7 +33,7 @@ inline string LgsPair::prettyName() const {
     return '<' + key->prettyName() + ", " + value->prettyName() + '>';
 }
 
-inline bool LgsPair::equals(LgsType* other) const {
+inline bool LgsPair::equals(LgsType* other) {
     const auto otherPair = dynamic_cast<LgsPair*>(other);
     if (!otherPair) return false;
     return key->equals(otherPair->key) && value->equals(otherPair->value);

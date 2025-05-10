@@ -1,19 +1,26 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
-#include "funcs/LgsMethodImpl.h"
+#include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
-#include "types/LgsVoid.h"
 
 Value* LgsFuncCall::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const {
-    if (!ref) {
-        return func->call(metadata, args);
-    }
-    Value* IRFunc = nullptr;
+    if (!ref) return func->call(metadata, args);
     if (ref->type == PARAM) {
-        IRFunc = ref->param->IRValue;
+        func->setIRValue(ref->param->IRValue);
+    } else if (ref->type == VAR_DEC) {
+        func->setIRValue(ref->varDec->IRValue);
+    } else if (ref->type == FUNC) {
+        assert(false);
     }
-    assert(IRFunc);
-    return func->call(metadata, args, IRFunc);
+    return func->call(metadata, args);
+}
+
+string LgsFuncCall::getIRName() const {
+    vector<string> paramTypeNames;
+    for (const auto& arg : args) {
+        paramTypeNames.emplace_back(arg->type->getIRName());
+    }
+    return LgsFuncType::getComposedName(name, "", paramTypeNames);
 }
 
 string LgsFuncCall::getName() {
@@ -32,18 +39,14 @@ Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
     return call(metadata, args);
 }
 
-string LgsFuncCall::getSignatureText(const bool withType) const {
+string LgsFuncCall::getText() const {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = isMethodCall; i < args.size(); ++i) {
         strStream << args[i]->type->prettyName();
         if (i != args.size() - 1) strStream << ", ";
     }
-    if (withType) {
-        strStream << "): " << type->prettyName();
-    } else {
-        strStream << ")";
-    }
+    strStream << ")";
     return strStream.str();
 }
 

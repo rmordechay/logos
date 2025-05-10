@@ -184,7 +184,7 @@ string LogosProject::getFileText(path filePath) const {
     return fileContents.str();
 }
 
-void LogosProject::loadGlobals() const {
+void LogosProject::loadGlobals() {
     globals.addFunc(&lgsPrintInt);
     globals.addFunc(&lgsPrintFloat);
     globals.addFunc(&lgsPrintChar);

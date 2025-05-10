@@ -9,7 +9,7 @@ public:
     Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
-    bool equals(LgsType* other) const override;
+    bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     string prettyName() const override;
     ~LgsFloat() override = default;

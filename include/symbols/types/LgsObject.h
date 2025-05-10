@@ -23,7 +23,7 @@ public:
     json asJSON() const override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
-    bool equals(LgsType* other) const override;
+    bool equals(LgsType* other) override;
     LgsObject* clone();
     ~LgsObject() override = default;
 };

@@ -8,15 +8,14 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
-LgsSymbol::LgsSymbol(): type(UNKNOWN) {}
 LgsSymbol::LgsSymbol(LgsParam* param): type(PARAM), param(param) {}
 LgsSymbol::LgsSymbol(LgsVarDec* varDec): type(VAR_DEC), varDec(varDec) {}
-LgsSymbol::LgsSymbol(const std::vector<LgsFunc*>& func): type(FUNC), func(func) {}
 LgsSymbol::LgsSymbol(LgsObject* object): type(OBJECT), object(object) {}
 LgsSymbol::LgsSymbol(LgsInterface* interface): type(INTERFACE), interface(interface) {}
 LgsSymbol::LgsSymbol(LgsField* field): type(FIELD), field(field) {}
 LgsSymbol::LgsSymbol(LgsEnum* lgsEnum): type(ENUM), lgsEnum(lgsEnum) {}
 LgsSymbol::LgsSymbol(LgsEnumField* enumField): type(ENUM_FIELD), enumField(enumField) {}
+LgsSymbol::LgsSymbol(LgsFuncFamily* funcFamily): type(FUNC), func(funcFamily) {}
 
 LgsSymbol* LgsSymbol::clone() const {
     return new LgsSymbol(*this);

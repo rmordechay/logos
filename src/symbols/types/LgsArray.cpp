@@ -17,7 +17,7 @@ string LgsArray::prettyName() const {
     return name;
 }
 
-bool LgsArray::equals(LgsType* other) const {
+bool LgsArray::equals(LgsType* other) {
     const auto otherArr = other->asArray();
     if (!otherArr) return false;
     return underlyingType->equals(otherArr->underlyingType);
