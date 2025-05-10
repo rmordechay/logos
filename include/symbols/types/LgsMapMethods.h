@@ -11,7 +11,7 @@ public:
     LgsParam valueSizeParam{&LGS_INT};
 
     explicit LgsMapNewFunc(LgsType* parent) : LgsMethodImpl("new", parent->getIRName(), &LGS_ANY) {
-        methodType.params = {&valueSizeParam};
+        funcType.params = {&valueSizeParam};
     }
 };
 
@@ -22,7 +22,7 @@ public:
 
     explicit LgsMapGetFunc(LgsType* parent) : LgsMethodImpl("get", parent->getIRName(), &LGS_ANY) {
         self.type = parent;
-        methodType.params = {&self, &keyParam};
+        funcType.params = {&self, &keyParam};
     }
 };
 
@@ -34,10 +34,10 @@ public:
 
     explicit LgsMapAddFunc(LgsType* parent) : LgsMethodImpl("add", parent->getIRName(), &LGS_VOID) {
         self.type = parent;
-        methodType.params = {&self, &keyParam, &valueParam};
+        funcType.params = {&self, &keyParam, &valueParam};
     }
 
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args, Value* callback = nullptr) override {
+    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
         auto& builder = metadata->builder;
         const auto map = args[0];
         const auto key = args[1];
@@ -61,7 +61,7 @@ public:
 
     explicit LgsMapDeleteFunc(LgsType* parent) : LgsMethodImpl("delete", parent->getIRName(), &LGS_VOID) {
         self.type = parent;
-        methodType.params = {&self};
+        funcType.params = {&self};
     }
 };
 
@@ -71,8 +71,8 @@ public:
 
     explicit LgsMapLenFunc(LgsType* parent) : LgsMethodImpl("len", parent->getIRName(), &LGS_INT) {
         self.type = parent;
-        methodType.params = {&self};
-        isPublic = true;
+        funcType.params = {&self};
+        funcType.isPublic = true;
     }
 };
 

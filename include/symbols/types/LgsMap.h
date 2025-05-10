@@ -28,7 +28,7 @@ public:
     LgsExpr* getZeroValue() override;
     string prettyName() const override;
     LgsType* getUnderlyingType() override;
-    bool equals(LgsType* other) const override;
+    bool equals(LgsType* other) override;
     bool isIndexable(LgsType* indexType) override;
     LgsType* inferBinaryType(LgsType* other) override;
     Value* IRLength(CodeGenMetadata* metadata) override;

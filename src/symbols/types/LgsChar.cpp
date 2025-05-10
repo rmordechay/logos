@@ -24,6 +24,6 @@ LgsType* LgsChar::inferBinaryType(LgsType* other) {
     return this;
 }
 
-bool LgsChar::equals(LgsType* other) const {
+bool LgsChar::equals(LgsType* other) {
     return name == other->getIRName();
 }

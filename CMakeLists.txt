@@ -107,7 +107,6 @@ add_library(lib
     include/symbols/types/LgsInt.h
     include/symbols/types/LgsInterface.h
     include/symbols/types/LgsIterable.h
-    include/symbols/types/LgsMethodType.h
     include/symbols/types/LgsObject.h
     include/symbols/types/LgsStr.h
     include/symbols/types/LgsType.h
@@ -185,7 +184,6 @@ add_library(lib
     src/symbols/types/LgsFuncType.cpp
     src/symbols/types/LgsInt.cpp
     src/symbols/types/LgsInterface.cpp
-    src/symbols/types/LgsMethodType.cpp
     src/symbols/types/LgsObject.cpp
     src/symbols/types/LgsStr.cpp
     src/symbols/types/LgsType.cpp

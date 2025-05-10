@@ -20,7 +20,7 @@ LgsExpr* LgsFloat::getZeroValue() {
     return new LgsFloatConst(0.0);
 }
 
-bool LgsFloat::equals(LgsType* other) const {
+bool LgsFloat::equals(LgsType* other) {
     return name == other->getIRName();
 }
 

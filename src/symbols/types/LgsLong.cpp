@@ -4,7 +4,7 @@ string LgsLong::prettyName() const {
     return name;
 }
 
-bool LgsLong::equals(LgsType* other) const {
+bool LgsLong::equals(LgsType* other) {
     assert(false);
 }
 

@@ -8,7 +8,7 @@ LgsExpr* LgsUnknownType::getZeroValue() {
     assert(false);
 }
 
-bool LgsUnknownType::equals(LgsType* other) const {
+bool LgsUnknownType::equals(LgsType* other) {
     assert(false);
 }
 
@@ -21,5 +21,5 @@ Type* LgsUnknownType::getIRType() {
 }
 
 string LgsUnknownType::getIRName() {
-    assert(false);
+    return name;
 }

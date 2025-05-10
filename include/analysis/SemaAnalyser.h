@@ -28,16 +28,16 @@ class LgsLoop;
 
 inline std::mutex mtx;
 
-LgsType* resolveType(LgsType* type, LgsErrorHandler* errorHandler);
-void resolveFuncTypes(LgsFuncType* signature, LgsErrorHandler* errHandler);
-void resolveGlobalTypes(const vector<LgsFile*>& files, LgsErrorHandler* errHandler);
-void resolveObjMemberTypes(LgsObject* const& obj, LgsErrorHandler* errHandler);
+LgsType* resolveType(LgsType* type, LgsErrHandler* errorHandler);
+void resolveFuncTypes(LgsFuncType* signature, LgsErrHandler* errHandler);
+void resolveGlobalTypes(const vector<LgsFile*>& files, LgsErrHandler* errHandler);
+void resolveObjMemberTypes(LgsObject* const& obj, LgsErrHandler* errHandler);
 
 class SemaAnalyser final {
 public:
     LgsStack lgsStack;
     LgsFile* file = nullptr;
-    LgsErrorHandler errHandler;
+    LgsErrHandler errHandler;
 
     explicit SemaAnalyser(LgsFile* file) : file(file) {
         errHandler.filePath = file->absPath;
@@ -51,7 +51,7 @@ public:
     void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitFuncType(const LgsFuncType* funcType);
-    void validateFuncControlFlow(LgsFunc* func);
+    void validateFuncControlFlow(const LgsFunc* func);
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
     void visitStmtBlock(LgsStmtBlock* stmtBlock);
@@ -76,7 +76,7 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
     void visitFuncCall(LgsFuncCall* funcCall);
-    bool resolveFuncCall(LgsFuncCall* funcCall, const LgsSymbol* symbol);
+    void resolveFuncCall(LgsFuncCall* funcCall);
     void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
@@ -90,10 +90,10 @@ public:
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     void setIterIndexType(LgsIterIndex* iterIndex) const;
 
-    LgsFunc* resolveFuncCall(const vector<LgsFunc*>& overloads, LgsFuncCall* funcCall);
     LgsFunc* resolveMethodCall(const vector<LgsMethodImpl*>& overloads, LgsFuncCall* methodCall, const string& parentName);
     bool resolveFuncCallWithDefaultParams(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
-    bool isFuncCallEqual(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
+    bool isFuncCallEqual(const LgsFuncType* funcType, LgsFuncCall* funcCall) const;
+    bool isFuncCallEqual(LgsFunc* func, LgsFuncCall* funcCall) const;
     bool checkExprType(LgsExpr* expr, LgsType* type);
     bool checkSingleIndexBoundaries(LgsIterIndex* iterIndex, LgsExpr* index, size_t upperBound);
     bool checkSliceBoundaries(LgsIterIndex* iterIndex, const LgsIndex* index, size_t upperBound);
@@ -103,7 +103,7 @@ public:
 
     string getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads) const;
     string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
-    LgsSymbol* getSymbol(const string& name, const LgsValue* value);
+    LgsSymbol* getSymbol(const string& name, const LgsValue* value = nullptr);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     ~SemaAnalyser() = default;
 };

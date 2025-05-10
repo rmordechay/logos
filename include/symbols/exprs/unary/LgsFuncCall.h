@@ -1,5 +1,5 @@
-#ifndef LOGOSFUNCCALLEXPR_H
-#define LOGOSFUNCCALLEXPR_H
+#ifndef LOGOSFUNCCALL_H
+#define LOGOSFUNCCALL_H
 #include "stmts/LgsStmt.h"
 #include "LgsUnaryExpr.h"
 
@@ -8,18 +8,19 @@ public:
     string name;
     vector<LgsExpr*> args;
     LgsFunc* func = nullptr;
-    LgsFuncType* funcType = nullptr;
     LgsSymbol* ref = nullptr;
     bool isMethodCall;
 
     explicit LgsFuncCall(const string& name, const bool isMethodCall, const vector<LgsExpr*>& args = {}) : name(name), args(args), isMethodCall(isMethodCall) {}
+    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const;
+    string getIRName() const;
+    string getText() const;
+
     string getName() override;
     string format(string& indentStr) override;
-    string getSignatureText(bool withType = false) const;
     void createIRStmt(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const;
     ~LgsFuncCall() override;
 };
 
-#endif //LOGOSFUNCCALLEXPR_H
+#endif //LOGOSFUNCCALL_H

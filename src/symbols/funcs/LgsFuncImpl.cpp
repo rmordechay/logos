@@ -2,14 +2,6 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "types/LgsIterable.h"
 
-bool LgsFuncImpl::equals(const LgsFuncCall* other) {
-    return funcType.equals(other);
-}
-
-LgsFuncType* LgsFuncImpl::getFuncType() {
-    return &funcType;
-}
-
 void LgsMainFunc::setArgs(const vector<char*>& args) {
     if (funcType.params.empty()) return;
     this->args = args;

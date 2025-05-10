@@ -4,7 +4,6 @@
 #include "symbols/LgsSymbol.h"
 #include <stack>
 #include <map>
-#include <mutex>
 #include <llvm/IR/Module.h>
 
 using namespace std;
@@ -16,14 +15,13 @@ struct LgsStackFrame {
     map<string, LgsSymbol> symbols;
 };
 
-class LgsStack : stack<LgsStackFrame> {
+class LgsStack : public stack<LgsStackFrame> {
 public:
     LgsFunc* currentFunc = nullptr;
     LgsLoop* currentLoop = nullptr;
 
     void enterScope(LgsFunc* func = nullptr);
     void exitScope();
-    LgsSymbol* getSymbol(const string& name);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     string getStackString() const;
     void reset();

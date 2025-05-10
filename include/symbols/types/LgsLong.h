@@ -11,7 +11,7 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     string getIRName() override;
     string prettyName() const override;
-    bool equals(LgsType* other) const override;
+    bool equals(LgsType* other) override;
     ~LgsLong() override = default;
 };
 

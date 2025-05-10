@@ -23,6 +23,6 @@ LgsType* LgsVoid::inferBinaryType(LgsType* other) {
     return this;
 }
 
-bool LgsVoid::equals(LgsType* other) const {
+bool LgsVoid::equals(LgsType* other) {
     return name == other->getIRName();
 }

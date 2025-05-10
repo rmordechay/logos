@@ -27,7 +27,7 @@ public:
     vector<LgsFile*> files;
     vector<LgsError> errors;
     vector<LgsEnvFile*> envFiles;
-    LgsErrorHandler errHandler;
+    LgsErrHandler errHandler;
     LgsMainFile* mainFile = nullptr;
     const LgsAppFile* appFile = nullptr;
 
@@ -35,7 +35,7 @@ public:
     bool loadProject(const vector<char*>& args);
     void loadFiles();
     void setEnvVars() const;
-    void loadGlobals() const;
+    void loadGlobals();
     void checkRequiredEnvVars();
     void loadSrcFiles();
     void loadEnvFiles();

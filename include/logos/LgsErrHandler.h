@@ -9,7 +9,7 @@
 
 struct Location;
 
-class LgsErrorHandler {
+class LgsErrHandler {
 public:
     bool successful = true;
     vector<LgsError> errors;
@@ -19,7 +19,7 @@ public:
     void setUnsuccessful();
     void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});
     string formatMsg(const string& errMsg, const vector<string>& args = {}) const;
-    ~LgsErrorHandler() = default;
+    ~LgsErrHandler() = default;
 };
 
 #endif //LGSERRORHANDLER_H

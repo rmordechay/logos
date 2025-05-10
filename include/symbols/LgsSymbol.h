@@ -34,17 +34,17 @@ struct LgsSymbol {
     LgsField* field = nullptr;
     LgsEnum* lgsEnum = nullptr;
     LgsEnumField* enumField = nullptr;
-    std::vector<LgsFunc*> func;
+    LgsFunc* func = nullptr;
 
-    LgsSymbol();
+    explicit LgsSymbol(): type(UNKNOWN) {}
     explicit LgsSymbol(LgsParam* param);
     explicit LgsSymbol(LgsVarDec* varDec);
-    explicit LgsSymbol(const std::vector<LgsFunc*>& func);
     explicit LgsSymbol(LgsObject* object);
     explicit LgsSymbol(LgsInterface* interface);
     explicit LgsSymbol(LgsField* field);
     explicit LgsSymbol(LgsEnum* lgsEnum);
     explicit LgsSymbol(LgsEnumField* enumField);
+    explicit LgsSymbol(LgsFunc* func);
     LgsSymbol* clone() const;
     Location* getLocation() const;
     nlohmann::json asJSON() const;

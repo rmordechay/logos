@@ -10,12 +10,14 @@
 #include "types/LgsInterface.h"
 #include "LgsErrHandler.h"
 #include "funcs/LgsFuncImpl.h"
+#include "types/LgsBool.h"
 
 struct LgsGlobals {
     std::mutex mtx;
     map<string, LgsSymbol> symbols;
+    map<string, LgsSymbol> funcs;
 
-    void addSymbol(const string& name, const LgsSymbol& symbol, LgsErrorHandler* errHandler) {
+    void addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
         if (symbols.find(name) != symbols.end()) {
             const auto location = symbol.getLocation();
             errHandler->handleError(E10011, location, {name, location->lineNumberStr()});
@@ -23,22 +25,24 @@ struct LgsGlobals {
         }
         lock_guard lock(mtx);
         symbols[name] = symbol;
-        return;
     }
 
-    void addFunc(LgsFuncImpl* func) {
-        std::lock_guard lock(mtx);
-        auto [symbol, inserted] = symbols.try_emplace(func->funcType.name);
-        if (inserted) {
-            symbol->second.type = FUNC;
+    void addFunc(LgsFuncImpl* newFunc, LgsErrHandler* errHandler = nullptr) {
+        const auto name = newFunc->funcType.getIRName();
+        const auto func = funcs.find(name);
+        if (func != funcs.end()) {
+            const auto location = func->second.getLocation();
+            errHandler->handleError(E10011, location, {name, location->lineNumberStr()});
         }
-        symbol->second.func.emplace_back(func);
+        std::lock_guard lock(mtx);
+        funcs[name] = LgsSymbol(newFunc);
     }
 
-    void addEnum(LgsEnum* lgsEnum) {
+    void addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler = nullptr) {
         if (symbols.find(lgsEnum->name) != symbols.end()) {
-            // TODO replace with proper error
-            assert(false && "enum already exists");
+            const auto location = lgsEnum->location;
+            errHandler->handleError(E10011, &location, {lgsEnum->name, location.lineNumberStr()});
+            return;
         }
         lock_guard lock(mtx);
         symbols[lgsEnum->name] = LgsSymbol(lgsEnum);
