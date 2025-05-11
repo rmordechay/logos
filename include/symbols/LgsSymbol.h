@@ -2,6 +2,8 @@
 #define LOGOSSYMBOL_H
 #include <json/json.hpp>
 
+using namespace nlohmann;
+
 class LgsField;
 struct CodeGenMetadata;
 class LgsEnum;
@@ -12,6 +14,10 @@ class LgsObject;
 class LgsParam;
 class LgsVarDec;
 class Location;
+
+struct LgsFuncSymbol {
+    std::vector<LgsFunc*> overloads;
+};
 
 enum LgsSymbolType {
     VAR_DEC,
@@ -34,7 +40,7 @@ struct LgsSymbol {
     LgsField* field = nullptr;
     LgsEnum* lgsEnum = nullptr;
     LgsEnumField* enumField = nullptr;
-    LgsFunc* func = nullptr;
+    LgsFuncSymbol* func = nullptr;
 
     explicit LgsSymbol(): type(UNKNOWN) {}
     explicit LgsSymbol(LgsParam* param);
@@ -44,10 +50,10 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsField* field);
     explicit LgsSymbol(LgsEnum* lgsEnum);
     explicit LgsSymbol(LgsEnumField* enumField);
-    explicit LgsSymbol(LgsFunc* func);
+    explicit LgsSymbol(LgsFuncSymbol* funcFamily);
     LgsSymbol* clone() const;
     Location* getLocation() const;
-    nlohmann::json asJSON() const;
+    json asJSON() const;
     ~LgsSymbol() = default;
 };
 

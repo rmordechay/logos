@@ -204,7 +204,7 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplementationContext
     setParams(funcSignature, &func->funcType);
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     func->setLocation(nameToken->getSymbol());
-    globals.addFunc(func, &errHandler);
+    globals.addFunc(func);
     currentFunc = nullptr;
     return func;
 }

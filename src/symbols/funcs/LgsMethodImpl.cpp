@@ -1,5 +1,4 @@
 #include "funcs/LgsMethodImpl.h"
-#include "exprs/unary/LgsFuncCall.h"
 #include "types/LgsObject.h"
 
 FunctionType* LgsMethodImpl::getIRFuncType(const CodeGenMetadata* metadata) {

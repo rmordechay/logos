@@ -7,6 +7,7 @@ struct LgsFuncType;
 class LgsInterface final : public LgsType {
 public:
     string name;
+    size_t posInObj{};
 
     explicit LgsInterface(const string& name) : name(name) {}
     string prettyName() const override;

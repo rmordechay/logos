@@ -43,6 +43,7 @@ bool LgsLinker::link() const {
         linker.linkInModule(std::unique_ptr<Module>(module));
     }
 
+
     error_code ec;
     legacy::PassManager pass;
     raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
@@ -51,7 +52,10 @@ bool LgsLinker::link() const {
         std::cerr << ec.message() << endl;
         return false;
     }
-
+    if (verifyModule(*mainModule, &errs())) {
+        errs().flush();
+        return false;
+    }
     pass.run(*mainModule);
     outputStream.flush();
     outputStream.close();

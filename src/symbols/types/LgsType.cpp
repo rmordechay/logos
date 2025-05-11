@@ -38,7 +38,7 @@ void LgsType::addMethod(LgsMethodImpl* method) {
 }
 
 LgsMethodImpl* LgsType::findMethod(LgsFuncCall* funcCall) const {
-    const auto overloads = getMethodsOverloads(funcCall->name);
+    const auto overloads = getMethodOverloads(funcCall->name);
     for (const auto& overload : overloads) {
         if (overload->funcType.equals(funcCall)) {
             return overload;
@@ -47,7 +47,7 @@ LgsMethodImpl* LgsType::findMethod(LgsFuncCall* funcCall) const {
     return nullptr;
 }
 
-vector<LgsMethodImpl*> LgsType::getMethodsOverloads(const string& funcName) const {
+vector<LgsMethodImpl*> LgsType::getMethodOverloads(const string& funcName) const {
     const auto method = methods.find(funcName);
     if (method != methods.end()) {
         return method->second;
@@ -55,6 +55,7 @@ vector<LgsMethodImpl*> LgsType::getMethodsOverloads(const string& funcName) cons
     return {};
 }
 
+// TODO remove this func due to double iterations
 vector<LgsMethodImpl*> LgsType::getAllMethods() const {
     vector<LgsMethodImpl*> overloads;
     for (const auto& method : methods) {

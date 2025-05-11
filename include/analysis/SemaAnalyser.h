@@ -32,6 +32,9 @@ LgsType* resolveType(LgsType* type, LgsErrHandler* errorHandler);
 void resolveFuncTypes(LgsFuncType* signature, LgsErrHandler* errHandler);
 void resolveGlobalTypes(const vector<LgsFile*>& files, LgsErrHandler* errHandler);
 void resolveObjMemberTypes(LgsObject* const& obj, LgsErrHandler* errHandler);
+void resolveObjectImplements(LgsObject* obj, LgsErrHandler* errHandler);
+string getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads);
+string getOverloadsAsStr(const vector<LgsFunc*>& overloads);
 
 class SemaAnalyser final {
 public:
@@ -47,7 +50,6 @@ public:
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
-    void visitObjectImplements(LgsObject* obj);
     void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitFuncType(const LgsFuncType* funcType);
@@ -101,8 +103,6 @@ public:
     void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 
-    string getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads) const;
-    string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
     LgsSymbol* getSymbol(const string& name, const LgsValue* value = nullptr);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     ~SemaAnalyser() = default;

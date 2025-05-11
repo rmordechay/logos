@@ -7,7 +7,7 @@
 void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);
     startBlock(metadata, entryBlock);
-    createIRFunc(metadata);
+    getIRFunc(metadata);
     stmtBlock->createIRValue(metadata);
     if (funcType.rt->isVoidType) {
         metadata->builder.CreateRetVoid();
@@ -19,7 +19,7 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     vector<Value*> argValues;
     const auto isObjReturn = setIRArgs(metadata, argValues, args);
     const auto IRFuncType = getIRFuncType(metadata);
-    const auto IRFunc = IRValue ? IRValue : createIRFunc(metadata);
+    const auto IRFunc = IRValue ? IRValue : getIRFunc(metadata);
     const auto funcCall = metadata->builder.CreateCall(IRFuncType, IRFunc, argValues);
     if (isObjReturn) return argValues[0];
     return funcCall;
@@ -27,17 +27,21 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
 
 Value* LgsFunc::makeCall(CodeGenMetadata* metadata, const vector<Value*>& args) {
     const auto IRFuncType = getIRFuncType(metadata);
-    const auto IRFunc = createIRFunc(metadata);
+    const auto IRFunc = getIRFunc(metadata);
     return metadata->builder.CreateCall(IRFuncType, IRFunc, args);
 }
 
-Function* LgsFunc::createIRFunc(const CodeGenMetadata* metadata) {
+Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
     const auto funcIRType = getIRFuncType(metadata);
     auto func = metadata->module->getOrInsertFunction(funcType.getIRName(), funcIRType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
     auto args = IRFunc->arg_begin();
     if (const auto obj = funcType.rt->asObject()) {
-        setStructRet(args, obj);
+        AttrBuilder builder(context);
+        builder.addStructRetAttr(obj->getIRType());
+        args->addAttrs(builder);
+        args->setName("rt");
+        args++;
     }
     setIRParams(IRFunc, args);
     return IRFunc;
@@ -91,14 +95,6 @@ void LgsFunc::setIRParams(Function* func, Argument* IRParams) {
         IRParams->setName(param->getIRName());
         IRParams++;
     }
-}
-
-void LgsFunc::setStructRet(Function::arg_iterator& args, LgsObject* const obj) const {
-    AttrBuilder builder(context);
-    builder.addStructRetAttr(obj->getIRType());
-    args->addAttrs(builder);
-    args->setName("rt");
-    args++;
 }
 
 string LgsFunc::format(string& tabs) {

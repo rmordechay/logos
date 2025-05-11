@@ -184,12 +184,12 @@ string LogosProject::getFileText(path filePath) const {
     return fileContents.str();
 }
 
-void LogosProject::loadGlobals() {
-    globals.addFunc(&lgsPrintInt, &errHandler);
-    globals.addFunc(&lgsPrintFloat, &errHandler);
-    globals.addFunc(&lgsPrintChar, &errHandler);
-    globals.addFunc(&lgsPrintBool, &errHandler);
-    globals.addFunc(&lgsPrintStr, &errHandler);
+void LogosProject::loadGlobals() const {
+    globals.addFunc(&lgsPrintInt);
+    globals.addFunc(&lgsPrintFloat);
+    globals.addFunc(&lgsPrintChar);
+    globals.addFunc(&lgsPrintBool);
+    globals.addFunc(&lgsPrintStr);
 }
 
 void LogosProject::checkRequiredEnvVars() {

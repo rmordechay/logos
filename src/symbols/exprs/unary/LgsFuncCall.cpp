@@ -1,18 +1,51 @@
 #include "exprs/unary/LgsFuncCall.h"
+
+#include "builtin/LgsPrint.h"
+#include "exprs/unary/LgsVariable.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
+
 Value* LgsFuncCall::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const {
-    if (!ref) return func->call(metadata, args);
-    if (ref->type == PARAM) {
-        func->setIRValue(ref->param->IRValue);
-    } else if (ref->type == VAR_DEC) {
-        func->setIRValue(ref->varDec->IRValue);
-    } else if (ref->type == FUNC) {
-        ref->func->call(metadata, args);
+    if (func->funcType.vtableKey >= 0) {
+        return resolveVirtualFunc(metadata, args);
+    }
+    if (ref) {
+        if (ref->type == PARAM) {
+            func->setIRValue(ref->param->IRValue);
+        } else if (ref->type == VAR_DEC) {
+            func->setIRValue(ref->varDec->IRValue);
+        } else if (ref->type == FUNC) {
+            assert(false);
+        }
     }
     return func->call(metadata, args);
+}
+
+Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const {
+    const auto parent = args[0];
+    LgsType* type = nullptr;
+    if (const auto var = parent->asVariable()) {
+        switch (var->ref->type) {
+        case VAR_DEC:
+            assert(false);
+        case PARAM:
+            type = var->ref->param->type;
+            break;
+        default:
+            assert(false);
+        }
+    }
+    const auto interfaceName = type->asInterface()->name;
+    const auto parentIRValue = parent->getIRValue(metadata);
+    const auto funcIRType = FunctionType::get(ptrTy, {ptrTy, ptrTy}, false);
+    auto IRFunc = metadata->module->getOrInsertFunction("getVFunc", funcIRType);
+    auto irStr = createIRStr(metadata->module, interfaceName);
+    const auto bitCast = metadata->builder.CreateBitCast(parentIRValue, ptrTy);
+    auto loadInst = metadata->builder.CreateLoad(ptrTy, bitCast);
+    return metadata->builder.CreateCall(funcIRType, IRFunc.getCallee(), {loadInst, irStr});
 }
 
 string LgsFuncCall::getIRName() const {

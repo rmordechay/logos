@@ -13,7 +13,7 @@ void LgsValue::setLocation(const antlr4::Token* ctx) {
 }
 
 void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) const {
-    block->insertInto(metadata->lgsStack.currentFunc->createIRFunc(metadata));
+    block->insertInto(metadata->lgsStack.currentFunc->getIRFunc(metadata));
     metadata->builder.SetInsertPoint(block);
 }
 

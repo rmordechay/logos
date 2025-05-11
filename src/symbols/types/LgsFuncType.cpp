@@ -58,18 +58,14 @@ LgsType* LgsFuncType::inferBinaryType(LgsType* other) {
     return nullptr;
 }
 
-string LgsFuncType::getAsStr(const bool withType) const {
+string LgsFuncType::getAsStr() const {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = 0; i < params.size(); ++i) {
         strStream << params[i]->type->prettyName();
         if (i != params.size() - 1) strStream << ", ";
     }
-    if (withType) {
-        strStream << "): " << rt->prettyName();
-    } else {
-        strStream << ")";
-    }
+    strStream << ")";
     return strStream.str();
 }
 

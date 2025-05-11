@@ -15,7 +15,6 @@
 struct LgsGlobals {
     std::mutex mtx;
     map<string, LgsSymbol> symbols;
-    map<string, LgsSymbol> funcs;
 
     void addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
         if (symbols.find(name) != symbols.end()) {
@@ -27,15 +26,17 @@ struct LgsGlobals {
         symbols[name] = symbol;
     }
 
-    void addFunc(LgsFuncImpl* newFunc, LgsErrHandler* errHandler = nullptr) {
-        const auto name = newFunc->funcType.getIRName();
-        const auto func = funcs.find(name);
-        if (func != funcs.end()) {
-            const auto location = func->second.getLocation();
-            errHandler->handleError(E10011, location, {name, location->lineNumberStr()});
-        }
+    void addFunc(LgsFuncImpl* newFunc) {
+        const auto name = newFunc->funcType.name;
+        const auto symbol = symbols.find(name);
         std::lock_guard lock(mtx);
-        funcs[name] = LgsSymbol(newFunc);
+        if (symbol == symbols.end()) {
+            const auto funcFamily = new LgsFuncSymbol();
+            funcFamily->overloads.push_back(newFunc);
+            symbols[name] = LgsSymbol(funcFamily);
+        } else {
+            symbol->second.func->overloads.emplace_back(newFunc);
+        }
     }
 
     void addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler = nullptr) {

@@ -16,8 +16,10 @@ public:
     bool isPublic = false;
     bool hasDefaultParams = false;
     FunctionType* IRFuncType = nullptr;
+    LgsMethodImpl* implements = nullptr;
+    int vtableKey = -1;
 
-    string getAsStr(bool withType = false) const;
+    string getAsStr() const;
     Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;

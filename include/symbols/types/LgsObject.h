@@ -7,7 +7,7 @@
 
 class LgsField;
 
-class LgsObject : public LgsType {
+class LgsObject final : public LgsType {
 public:
     string name;
     string path;
@@ -17,10 +17,12 @@ public:
     explicit LgsObject() : name(LOGOS_PARENT_OBJ), path("") {}
     explicit LgsObject(const string& name) : name(name), path("") {}
     explicit LgsObject(const string& name, const string& path) : name(name), path(path) {}
+    void setVirtualFuncs(size_t structPosition, vector<Type*>& elementTypes) const;
     string prettyName() const override;
     Type* getIRType() override;
     string getIRName() override;
     json asJSON() const override;
+    LgsInterface* getInterface(const string& interfaceName) const;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) override;

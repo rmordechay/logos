@@ -30,7 +30,7 @@ public:
     LgsField* getField(const string& name);
     void addMethod(LgsMethodImpl* method);
     LgsMethodImpl* findMethod(LgsFuncCall* funcCall) const;
-    vector<LgsMethodImpl*> getMethodsOverloads(const string& funcName) const;
+    vector<LgsMethodImpl*> getMethodOverloads(const string& funcName) const;
     vector<LgsMethodImpl*> getAllMethods() const;
     void setLocation(const antlr4::Token* ctx);
 

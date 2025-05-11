@@ -15,7 +15,7 @@ LgsSymbol::LgsSymbol(LgsInterface* interface): type(INTERFACE), interface(interf
 LgsSymbol::LgsSymbol(LgsField* field): type(FIELD), field(field) {}
 LgsSymbol::LgsSymbol(LgsEnum* lgsEnum): type(ENUM), lgsEnum(lgsEnum) {}
 LgsSymbol::LgsSymbol(LgsEnumField* enumField): type(ENUM_FIELD), enumField(enumField) {}
-LgsSymbol::LgsSymbol(LgsFunc* func): type(FUNC), func(func) {}
+LgsSymbol::LgsSymbol(LgsFuncSymbol* funcFamily): type(FUNC), func(funcFamily) {}
 
 LgsSymbol* LgsSymbol::clone() const {
     return new LgsSymbol(*this);
@@ -28,7 +28,7 @@ Location* LgsSymbol::getLocation() const {
     case PARAM:
         return &param->location;
     case FUNC:
-        return &func->location;
+        assert(false);
     case OBJECT:
         return &object->location;
     case INTERFACE:

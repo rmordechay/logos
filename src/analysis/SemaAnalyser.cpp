@@ -84,7 +84,6 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
     for (const auto& overload : obj->getAllMethods()) {
         visitFunc(overload);
     }
-    visitObjectImplements(obj);
 }
 
 void SemaAnalyser::visitInterface(LgsInterface* interface) {
@@ -382,7 +381,7 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
         break;
     case FUNC:
         // TODO add func matching
-        setExprType(variable, symbol->func->funcType.rt);
+        setExprType(variable, symbol->func->overloads[0]->funcType.rt);
         break;
     default:
         assert(false);
@@ -458,7 +457,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
         argTypeNames.emplace_back(arg->type->prettyName());
     }
     auto name = methodCall->name;
-    const auto overloads = parentType->getMethodsOverloads(name);
+    const auto overloads = parentType->getMethodOverloads(name);
     if (overloads.empty()) {
         return errHandler.handleError(E10013, &methodCall->location, {name, parentType->prettyName()});
     }
@@ -515,39 +514,6 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
         setIterIndexType(iterIndex);
     } else {
         return errHandler.handleError(E10002, &iterIndex->location, {baseExpr->getName()});
-    }
-}
-
-void SemaAnalyser::visitObjectImplements(LgsObject* obj) {
-    for (int i = 0; i < obj->implements.size(); ++i) {
-        const auto implement = obj->implements[i];
-        if (!implement) continue;
-        const auto interface = implement->asInterface();
-        if (!interface) {
-            errHandler.handleError(E10025, &implement->location, {implement->prettyName()});
-            continue;
-        }
-
-        vector<LgsFunc*> missingFuncs;
-        for (const auto& [name, interfaceOverloads] : interface->methods) {
-            const auto objOverloads = obj->getMethodsOverloads(name);
-            auto found = false;
-            for (const auto& interfaceOverload : interfaceOverloads) {
-                for (const auto& objOverload : objOverloads) {
-                    if (objOverload->funcType.equals(&interfaceOverload->funcType)) {
-                        objOverload->implements = interfaceOverload;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    missingFuncs.emplace_back(interfaceOverload);
-                }
-            }
-        }
-        if (!missingFuncs.empty()) {
-            errHandler.handleError(E10016, &obj->location, {obj->name, interface->name, getOverloadsAsStr(missingFuncs)});
-        }
     }
 }
 
@@ -694,11 +660,7 @@ bool SemaAnalyser::checkSliceBoundaries(LgsIterIndex* iterIndex, const LgsIndex*
 }
 
 void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
-    const auto IRName = funcCall->getIRName();
-    if (globals.funcs.find(IRName) == globals.funcs.end()) {
-        return errHandler.handleError(E10006, &funcCall->location, {funcCall->getText()});
-    }
-    const LgsSymbol* symbol = &globals.funcs[IRName];
+    const auto symbol = getSymbol(funcCall->name);
     if (!symbol) return;
     switch (symbol->type) {
     case VAR_DEC: {
@@ -714,16 +676,20 @@ void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
         break;
     }
     case FUNC: {
-        const auto func = symbol->func;
-        const auto& funcType = func->funcType;
-        if (isFuncCallEqual(func, funcCall)) break;
-        errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->getText(), funcType.getAsStr()});
+        auto found = false;
+        const auto& overloads = symbol->func->overloads;
+        for (const auto overload : overloads) {
+            if (!isFuncCallEqual(overload, funcCall)) continue;
+            found = true;
+        }
+        if (!found) {
+            errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->getText(), getOverloadsAsStr(overloads)});
+        }
         break;
     }
     default:
         assert(false);
     }
-    assert(funcCall->func);
 }
 
 LgsFunc* SemaAnalyser::resolveMethodCall(const vector<LgsMethodImpl*>& overloads, LgsFuncCall* methodCall, const string& parentName) {
@@ -814,7 +780,7 @@ void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
     }
 }
 
-string SemaAnalyser::getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads) const {
+string getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads) {
     stringstream str;
     for (const auto& overload : overloads) {
         str << "\n\t     - " << overload->funcType.getAsStr();
@@ -822,7 +788,7 @@ string SemaAnalyser::getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads) 
     return str.str();
 }
 
-string SemaAnalyser::getOverloadsAsStr(const vector<LgsFunc*>& overloads) const {
+string getOverloadsAsStr(const vector<LgsFunc*>& overloads) {
     stringstream str;
     for (const auto& overload : overloads) {
         str << "\n\t     - " << overload->funcType.getAsStr();
@@ -926,11 +892,47 @@ void resolveObjMemberTypes(LgsObject* const& obj, LgsErrHandler* errHandler) {
     for (int i = 0; i < obj->implements.size(); ++i) {
         obj->implements[i] = resolveType(obj->implements[i], errHandler);
     }
+    resolveObjectImplements(obj, errHandler);
 }
 
 void resolveFuncTypes(LgsFuncType* signature, LgsErrHandler* errHandler) {
     signature->rt = resolveType(signature->rt, errHandler);
     for (int i = 0; i < signature->params.size(); ++i) {
         signature->params[i]->type = resolveType(signature->params[i]->type, errHandler);
+    }
+}
+
+void resolveObjectImplements(LgsObject* obj, LgsErrHandler* errHandler) {
+    for (int i = 0; i < obj->implements.size(); ++i) {
+        const auto implement = obj->implements[i];
+        if (!implement) continue;
+        const auto interface = implement->asInterface();
+        if (!interface) {
+            errHandler->handleError(E10025, &implement->location, {implement->prettyName()});
+            continue;
+        }
+
+        vector<LgsFunc*> missingFuncs;
+        for (const auto& [name, interfaceOverloads] : interface->methods) {
+            const auto& objOverloads = obj->getMethodOverloads(name);
+            for (const auto interfaceOverload : interfaceOverloads) {
+                auto found = false;
+                for (const auto objOverload : objOverloads) {
+                    if (objOverload->funcType.equals(&interfaceOverload->funcType)) {
+                        objOverload->funcType.implements = interfaceOverload;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    missingFuncs.emplace_back(interfaceOverload);
+                } else {
+                    break;
+                }
+            }
+        }
+        if (!missingFuncs.empty()) {
+            errHandler->handleError(E10016, &obj->location, {obj->name, interface->name, getOverloadsAsStr(missingFuncs)});
+        }
     }
 }

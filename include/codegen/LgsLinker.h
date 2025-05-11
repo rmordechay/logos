@@ -10,9 +10,10 @@ using namespace std;
 const string STD_LIBS[] = {
     "../stdlib/start.ll",
     "../stdlib/lgslib.ll",
-    // "../stdlib/array.ll",
-    // "../stdlib/string.ll",
-    // "../stdlib/map.ll",
+    "../stdlib/array.ll",
+    "../stdlib/string.ll",
+    "../stdlib/map.ll",
+    "../stdlib/vtable.ll",
 };
 
 class LgsLinker {

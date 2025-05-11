@@ -13,16 +13,16 @@ Type* LgsObject::getIRType() {
     if (IRType) return IRType;
     CodeGenerator::generateObjModule(this);
 
-    vector<Type*> elementTypes;
     size_t structPosition = 0;
+    vector<Type*> elementTypes;
+
+    // vtable is always first field
+    elementTypes.push_back(ptrTy);;
+
     for (const auto& [_, field] : fields) {
         auto fieldType = field->type->getIRType();
         elementTypes.push_back(fieldType);
         field->position = structPosition++;
-    }
-
-    for (const auto& implement : implements) {
-        elementTypes.push_back(implement->getIRType());
     }
 
     IRType = StructType::getTypeByName(context, name);
@@ -30,6 +30,19 @@ Type* LgsObject::getIRType() {
         IRType = StructType::create(context, elementTypes, name);
     }
     return IRType;
+}
+
+void LgsObject::setVirtualFuncs(size_t structPosition, vector<Type*>& elementTypes) const {
+    vector<Type*> vtableTypes;
+    for (const auto [_, method] : methods) {
+        for (const auto overload : method) {
+            if (!overload->funcType.implements) continue;
+            overload->funcType.vtableKey = structPosition++;
+            vtableTypes.push_back(ptrTy);
+        }
+    }
+    const auto vtable = StructType::create(context, vtableTypes, name + "_vtable");
+    elementTypes.push_back(vtable);
 }
 
 LgsExpr* LgsObject::getZeroValue() {
@@ -44,7 +57,7 @@ LgsType* LgsObject::inferBinaryType(LgsType* other) {
 
 bool LgsObject::equals(LgsType* other) {
     // TODO make Object object
-    if (name == "Object") return true;
+    if (name == LOGOS_PARENT_OBJ) return true;
     return name == other->getIRName();
 }
 
@@ -56,6 +69,16 @@ json LgsObject::asJSON() const {
         tree["fields"].emplace_back(field.second->asJSON());
     }
     return tree;
+}
+
+LgsInterface* LgsObject::getInterface(const string& interfaceName) const {
+    for (const auto implement : implements) {
+        const auto interface = implement->asInterface();
+        if (interface->name == interfaceName) {
+            return interface;
+        }
+    }
+    return nullptr;
 }
 
 LgsObject* LgsObject::clone() {

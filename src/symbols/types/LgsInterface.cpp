@@ -8,7 +8,7 @@ Type* LgsInterface::getIRType() {
     vector<Type*> elementTypes;
     size_t structPosition = 0;
     for (const auto method : getAllMethods()) {
-        method->vtableKey = structPosition++;
+        method->funcType.vtableKey = structPosition++;
         elementTypes.emplace_back(ptrTy);
     }
     if (!IRType) {
