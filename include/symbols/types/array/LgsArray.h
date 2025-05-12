@@ -1,8 +1,8 @@
 #ifndef LGSSARRAYTYPE_H
 #define LGSSARRAYTYPE_H
 #include "LgsArrayMethods.h"
-#include "LgsType.h"
-#include "LgsIterable.h"
+#include "types/LgsType.h"
+#include "types/LgsIterable.h"
 
 class LgsArray final : public LgsIterable {
 public:

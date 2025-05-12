@@ -45,6 +45,22 @@ Location* LgsSymbol::getLocation() const {
     }
 }
 
+Value* LgsSymbol::getIRValue() const {
+    switch (type) {
+    case VAR_DEC:
+        return varDec->expr->IRValue;
+    case PARAM:
+        return param->IRValue;
+    case FIELD:
+        return field->IRValue;
+    case ENUM_FIELD:
+        return enumField->IRValue;
+    case UNKNOWN:
+    default:
+        assert(false);
+    }
+}
+
 json LgsSymbol::asJSON() const {
     json tree;
     switch (type) {

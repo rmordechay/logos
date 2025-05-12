@@ -1,9 +1,9 @@
-#ifndef METHODS_H
-#define METHODS_H
-#include "LgsAny.h"
-#include "LgsInt.h"
-#include "LgsStr.h"
-#include "LgsVoid.h"
+#ifndef LGSMAPMETHODS_H
+#define LGSMAPMETHODS_H
+#include "types/LgsAny.h"
+#include "types/primitives/LgsInt.h"
+#include "types/str/LgsStr.h"
+#include "types/primitives/LgsVoid.h"
 #include "funcs/LgsMethodImpl.h"
 
 class LgsMapNewFunc final : public LgsMethodImpl {
@@ -52,7 +52,7 @@ public:
         const auto valueIRValue = value->getIRValue(metadata);
         builder.CreateStore(valueIRValue, valuePtr);
         const auto mapPtrLoad = builder.CreateLoad(keyType, mapPtr);
-        return LgsMethodImpl::makeCall(metadata, {mapPtrLoad, keyIRValue, valuePtr});
+        return LgsMethodImpl::callIR(metadata, {mapPtrLoad, keyIRValue, valuePtr});
     }
 };
 
@@ -77,4 +77,4 @@ public:
     }
 };
 
-#endif //METHODS_H
+#endif //LGSMAPMETHODS_H

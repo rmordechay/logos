@@ -54,11 +54,12 @@ add_library(lib
     include/utils/ThreadPool.h
 
     # Symbols headers
-    include/symbols/builtin/LgsPrint.h
-    include/symbols/exprs/binary/LgsBinaryExpr.h
+    include/symbols/LgsSymbol.h
+    include/symbols/LgsValue.h
     include/symbols/exprs/LgsCast.h
     include/symbols/exprs/LgsExpr.h
     include/symbols/exprs/LgsNull.h
+    include/symbols/exprs/binary/LgsBinaryExpr.h
     include/symbols/exprs/unary/constants/LgsBoolConst.h
     include/symbols/exprs/unary/constants/LgsCharConst.h
     include/symbols/exprs/unary/constants/LgsConstExpr.h
@@ -84,8 +85,6 @@ add_library(lib
     include/symbols/funcs/LgsFuncImpl.h
     include/symbols/funcs/LgsMethodImpl.h
     include/symbols/funcs/LgsParam.h
-    include/symbols/LgsSymbol.h
-    include/symbols/LgsValue.h
     include/symbols/loops/LgsForeachLoop.h
     include/symbols/loops/LgsRangeLoop.h
     include/symbols/stmts/LgsAssignment.h
@@ -97,26 +96,28 @@ add_library(lib
     include/symbols/stmts/LgsReturn.h
     include/symbols/stmts/LgsStmtBlock.h
     include/symbols/stmts/LgsVarDec.h
+    include/symbols/builtin/LgsPrint.h
     include/symbols/types/LgsAny.h
-    include/symbols/types/LgsArray.h
-    include/symbols/types/LgsBool.h
-    include/symbols/types/LgsChar.h
     include/symbols/types/LgsEnum.h
-    include/symbols/types/LgsFloat.h
     include/symbols/types/LgsFuncType.h
-    include/symbols/types/LgsInt.h
     include/symbols/types/LgsInterface.h
     include/symbols/types/LgsIterable.h
     include/symbols/types/LgsObject.h
-    include/symbols/types/LgsStr.h
     include/symbols/types/LgsType.h
-    include/symbols/types/LgsVoid.h
-    include/symbols/types/LgsLong.h
-    include/symbols/types/LgsMap.h
     include/symbols/types/LgsPair.h
     include/symbols/types/LgsUnknownType.h
-    include/symbols/types/LgsMapMethods.h
-    include/symbols/types/LgsArrayMethods.h
+    include/symbols/types/str/LgsStr.h
+    include/symbols/types/str/LgsStrMethods.h
+    include/symbols/types/array/LgsArray.h
+    include/symbols/types/array/LgsArrayMethods.h
+    include/symbols/types/map/LgsMap.h
+    include/symbols/types/map/LgsMapMethods.h
+    include/symbols/types/primitives/LgsBool.h
+    include/symbols/types/primitives/LgsChar.h
+    include/symbols/types/primitives/LgsFloat.h
+    include/symbols/types/primitives/LgsInt.h
+    include/symbols/types/primitives/LgsVoid.h
+    include/symbols/types/primitives/LgsLong.h
 
     # src
     src/analysis/AntlrConverter.cpp
@@ -176,21 +177,21 @@ add_library(lib
     src/symbols/stmts/LgsStmtBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
     src/symbols/types/LgsAny.cpp
-    src/symbols/types/LgsArray.cpp
-    src/symbols/types/LgsBool.cpp
-    src/symbols/types/LgsChar.cpp
+    src/symbols/types/array/LgsArray.cpp
+    src/symbols/types/primitives/LgsBool.cpp
+    src/symbols/types/primitives/LgsChar.cpp
     src/symbols/types/LgsEnum.cpp
-    src/symbols/types/LgsFloat.cpp
+    src/symbols/types/primitives/LgsFloat.cpp
     src/symbols/types/LgsFuncType.cpp
-    src/symbols/types/LgsInt.cpp
+    src/symbols/types/primitives/LgsInt.cpp
     src/symbols/types/LgsInterface.cpp
     src/symbols/types/LgsObject.cpp
-    src/symbols/types/LgsStr.cpp
+    src/symbols/types/str/LgsStr.cpp
     src/symbols/types/LgsType.cpp
-    src/symbols/types/LgsVoid.cpp
-    src/symbols/types/LgsMap.cpp
+    src/symbols/types/primitives/LgsVoid.cpp
+    src/symbols/types/map/LgsMap.cpp
     src/symbols/types/LgsUnknownType.cpp
-    src/symbols/types/LgsLong.cpp
+    src/symbols/types/primitives/LgsLong.cpp
     src/symbols/exprs/unary/constants/LgsLongConst.cpp
     src/symbols/types/LgsIterable.cpp
 )

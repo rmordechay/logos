@@ -23,7 +23,7 @@ public:
     string format(string& tabs) override;
     virtual Function* getIRFunc(const CodeGenMetadata* metadata);
     virtual FunctionType* getIRFuncType(const CodeGenMetadata* metadata);
-    virtual Value* makeCall(CodeGenMetadata* metadata, const vector<Value*>& args);
+    virtual Value* callIR(CodeGenMetadata* metadata, const vector<Value*>& args);
     virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {});
     ~LgsFunc() override;
 };

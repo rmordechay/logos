@@ -1,7 +1,7 @@
 #ifndef LOGOSSTRINGCONST_H
 #define LOGOSSTRINGCONST_H
 #include "LgsConstExpr.h"
-#include "types/LgsStr.h"
+#include "types/str/LgsStr.h"
 #include <string>
 
 class LgsStrConst final : public LgsConstExpr {

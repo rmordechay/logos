@@ -25,8 +25,8 @@
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
-#include "types/LgsBool.h"
-#include "types/LgsFloat.h"
+#include "types/primitives/LgsBool.h"
+#include "types/primitives/LgsFloat.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
 #include "stmts/LgsContinueStmt.h"
@@ -34,13 +34,13 @@
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "stmts/LgsPatternMatch.h"
-#include "types/LgsArray.h"
-#include "types/LgsMap.h"
+#include "types/array/LgsArray.h"
+#include "types/map/LgsMap.h"
 #include "types/LgsUnknownType.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
-#include <types/LgsStr.h>
-#include <types/LgsVoid.h>
+#include <types/str/LgsStr.h>
+#include <types/primitives/LgsVoid.h>
 
 LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
     LgsFile* file = nullptr;

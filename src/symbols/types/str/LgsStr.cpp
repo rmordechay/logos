@@ -1,7 +1,7 @@
-#include "types/LgsStr.h"
+#include "types/str/LgsStr.h"
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "types/LgsChar.h"
+#include "types/primitives/LgsChar.h"
 
 size_t LgsStr::getSize() {
     return sizeof(void*);

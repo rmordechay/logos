@@ -1,7 +1,7 @@
 #ifndef LGSFLOATCONST_H
 #define LGSFLOATCONST_H
 #include "LgsConstExpr.h"
-#include "types/LgsFloat.h"
+#include "types/primitives/LgsFloat.h"
 
 class LgsFloatConst final : public LgsConstExpr {
 public:

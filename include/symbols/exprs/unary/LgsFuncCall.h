@@ -11,10 +11,9 @@ public:
     LgsSymbol* ref = nullptr;
 
     explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
+    string getAsStr() const;
     Value* call(CodeGenMetadata* metadata) const;
     Value* resolveVirtualFunc(CodeGenMetadata* metadata) const;
-    LgsType* getParentIRType(LgsExpr* parent) const;
-    string getAsStr() const;
     string getName() override;
     string format(string& indentStr) override;
     void createIRStmt(CodeGenMetadata* metadata) override;

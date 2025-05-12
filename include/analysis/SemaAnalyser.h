@@ -94,7 +94,7 @@ public:
 
     LgsFunc* resolveMethodCall(const vector<LgsMethodImpl*>& overloads, LgsFuncCall* methodCall, const string& parentName);
     bool resolveFuncCallWithDefaultParams(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
-    bool isFuncCallEqual(const LgsFuncType* funcType, LgsFuncCall* funcCall) const;
+    bool isFuncCallEqual(const LgsFuncType* funcType, LgsFuncCall* funcCall);
     bool isFuncCallEqual(LgsFunc* func, LgsFuncCall* funcCall) const;
     bool checkExprType(LgsExpr* expr, LgsType* type);
     bool checkSingleIndexBoundaries(LgsIterIndex* iterIndex, LgsExpr* index, size_t upperBound);

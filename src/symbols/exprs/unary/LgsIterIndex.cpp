@@ -1,6 +1,6 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
-#include "types/LgsMap.h"
+#include "types/map/LgsMap.h"
 #include <exprs/unary/LgsDArray.h>
 
 Value* LgsIterIndex::createIRValue(CodeGenMetadata* metadata) {
@@ -51,7 +51,7 @@ Value* LgsIterIndex::createIRValueFromArray(CodeGenMetadata* metadata, LgsArray*
     }
     const auto arrPtrValue = metadata->builder.CreateLoad(ptrTy, baseExprIRValue);
     const auto indexIRValue = firstIndex->getIRValue(metadata);
-    const auto rv = arr->get.makeCall(metadata, {arrPtrValue, indexIRValue});
+    const auto rv = arr->get.callIR(metadata, {arrPtrValue, indexIRValue});
     return metadata->builder.CreateLoad(ptrTy, rv);
 }
 
@@ -61,7 +61,7 @@ Value* LgsIterIndex::createIRValueFromMap(CodeGenMetadata* metadata, LgsMap* map
     const auto mapPtr = baseExpr->getIRValue(metadata);
     const auto mapLoaded = metadata->builder.CreateLoad(mapIRType, mapPtr);
     const auto indexIRValue = indices[0]->from->getIRValue(metadata);
-    const auto rv = map->get.makeCall(metadata, {mapLoaded, indexIRValue});
+    const auto rv = map->get.callIR(metadata, {mapLoaded, indexIRValue});
     return metadata->builder.CreateLoad(mapValueIRType, rv);
 }
 

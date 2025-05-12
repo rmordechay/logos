@@ -3,7 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsStr.h"
+#include "types/str/LgsStr.h"
 #include <LgsStack.h>
 
 string LgsVariable::getName() {

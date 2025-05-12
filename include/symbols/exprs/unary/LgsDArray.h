@@ -3,7 +3,7 @@
 
 #include "LgsUnaryExpr.h"
 #include "exprs/LgsExpr.h"
-#include "types/LgsArray.h"
+#include "types/array/LgsArray.h"
 
 #define INITIAL_ARRAY_SIZE 2
 

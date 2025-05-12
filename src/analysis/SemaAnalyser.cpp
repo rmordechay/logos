@@ -9,7 +9,7 @@
 #include "exprs/LgsNull.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
-#include "types/LgsBool.h"
+#include "types/primitives/LgsBool.h"
 #include "exprs/unary/LgsDArray.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
@@ -27,9 +27,9 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsPatternMatch.h"
-#include "types/LgsArray.h"
+#include "types/array/LgsArray.h"
 #include "types/LgsUnknownType.h"
-#include "types/LgsVoid.h"
+#include "types/primitives/LgsVoid.h"
 
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsLoop.h>
@@ -664,13 +664,11 @@ void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
     case VAR_DEC: {
         const auto funcType = symbol->param->type->asFuncType();
         if (isFuncCallEqual(funcType, funcCall)) break;
-        errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->getAsStr(), funcType->getAsStr()});
         break;
     }
     case PARAM: {
         const auto funcType = symbol->varDec->type->asFuncType();
         if (isFuncCallEqual(funcType, funcCall)) break;
-        errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->getAsStr(), funcType->getAsStr()});
         break;
     }
     case FUNC: {
@@ -710,7 +708,7 @@ bool SemaAnalyser::resolveFuncCallWithDefaultParams(const LgsFuncType* funcType,
     return true;
 }
 
-bool SemaAnalyser::isFuncCallEqual(const LgsFuncType* funcType, LgsFuncCall* funcCall) const {
+bool SemaAnalyser::isFuncCallEqual(const LgsFuncType* funcType, LgsFuncCall* funcCall) {
     if (!funcType) return false;
     auto equal = false;
     if (funcType->hasDefaultParams) {
@@ -721,6 +719,8 @@ bool SemaAnalyser::isFuncCallEqual(const LgsFuncType* funcType, LgsFuncCall* fun
     if (equal) {
         funcCall->type = funcType->rt;
         funcCall->func = new LgsFuncImpl(funcType);
+    } else {
+        errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->getAsStr(), funcType->getAsStr()});
     }
     return equal;
 }
@@ -742,21 +742,12 @@ bool SemaAnalyser::isFuncCallEqual(LgsFunc* func, LgsFuncCall* funcCall) const {
 void SemaAnalyser::checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads) {
     for (size_t i = 0; i < overloads.size(); ++i) {
         const auto overload1 = overloads[i];
+        const auto funcType1 = &overload1->funcType;
         for (size_t j = i + 1; j < overloads.size(); ++j) {
             const auto overload2 = overloads[j];
-            const auto funcType1 = &overload1->funcType;
             const auto funcType2 = &overload2->funcType;
-            if (funcType1->hasDefaultParams && funcType2->hasDefaultParams) {
-                if (!funcType1->equals(funcType2)) {
-                    return errHandler.handleError(E10033, &overload1->location, {funcType1->getAsStr()});
-                }
-            } else if (funcType1->hasDefaultParams) {
-                assert(false);
-            } else if (funcType2->hasDefaultParams) {
-                assert(false);
-            }
             if (funcType1->equals(funcType2)) {
-                errHandler.handleError(E10033, &overload1->location, {funcType1->getAsStr()});
+                return errHandler.handleError(E10033, &overload1->location, {funcType1->getAsStr()});
             }
         }
     }

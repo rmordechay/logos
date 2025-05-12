@@ -2,11 +2,11 @@
 #define LOGOSPRINT_H
 #include "exprs/unary/constants/LgsCharConst.h"
 #include "funcs/LgsFuncImpl.h"
-#include "types/LgsBool.h"
-#include "types/LgsFloat.h"
-#include "types/LgsInt.h"
-#include "types/LgsStr.h"
-#include <types/LgsVoid.h>
+#include "types/primitives/LgsBool.h"
+#include "types/primitives/LgsFloat.h"
+#include "types/primitives/LgsInt.h"
+#include "types/str/LgsStr.h"
+#include <types/primitives/LgsVoid.h>
 
 class LgsPrint final : public LgsFuncImpl {
 public:

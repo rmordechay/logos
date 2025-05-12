@@ -1,9 +1,9 @@
 #ifndef LGSARRAYMETHODS_H
 #define LGSARRAYMETHODS_H
-#include "LgsAny.h"
-#include "LgsInt.h"
-#include "LgsLong.h"
-#include "LgsVoid.h"
+#include "types/LgsAny.h"
+#include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsLong.h"
+#include "types/primitives/LgsVoid.h"
 #include "funcs/LgsMethodImpl.h"
 #include "exprs/LgsExpr.h"
 
@@ -48,7 +48,7 @@ public:
         const auto elementType = element->type->getIRType();
         const auto valurPtr = builder.CreateAlloca(elementType);
         builder.CreateStore(element->getIRValue(metadata), valurPtr);
-        return LgsMethodImpl::makeCall(metadata, {arrPtrLoad, valurPtr});
+        return LgsMethodImpl::callIR(metadata, {arrPtrLoad, valurPtr});
     }
 };
 

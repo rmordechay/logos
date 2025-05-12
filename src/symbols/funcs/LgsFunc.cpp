@@ -24,7 +24,7 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     return funcCall;
 }
 
-Value* LgsFunc::makeCall(CodeGenMetadata* metadata, const vector<Value*>& args) {
+Value* LgsFunc::callIR(CodeGenMetadata* metadata, const vector<Value*>& args) {
     const auto IRFuncType = getIRFuncType(metadata);
     const auto IRFunc = getIRFunc(metadata);
     return metadata->builder.CreateCall(IRFuncType, IRFunc, args);
@@ -59,7 +59,7 @@ FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {
     for (int i = 0; i < funcType.params.size(); ++i) {
         auto paramIRType = funcType.params[i]->type->getIRType();
         // TODO make generic
-        if (dynamic_cast<LgsInterface*>(funcType.params[i]->type)) {
+        if (funcType.params[i]->type->asInterface()) {
             paramIRType = paramIRType->getPointerTo();
         }
         IRParamsTypes.emplace_back(paramIRType);

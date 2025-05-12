@@ -1,30 +1,19 @@
 #ifndef LOGOSSTRING_H
 #define LOGOSSTRING_H
-#include "LgsIterable.h"
-#include "LgsType.h"
+#include "LgsStrMethods.h"
 #include <string>
 #include "stmts/LgsField.h"
 #include "exprs/unary/constants/LgsCharConst.h"
-
-class LgsStrFormatFunc final : public LgsMethodImpl {
-public:
-    LgsParam self{};
-    LgsParam args{};
-
-    explicit LgsStrFormatFunc(LgsType* parent) : LgsMethodImpl("format", parent->getIRName(), parent) {
-        self.type = parent;
-        funcType.params = {&self, &args};
-        funcType.isPublic = true;
-        funcType.isVariadic = true;
-    }
-};
+#include "types/LgsIterable.h"
 
 class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
     LgsStrFormatFunc format{this};
 
-    LgsStr() : LgsIterable(&LGS_CHAR) {}
+    LgsStr() : LgsIterable(&LGS_CHAR) {
+        addMethod(&format);
+    }
     size_t getSize() override;
     Type* getIRType() override;
     string getIRName() override;

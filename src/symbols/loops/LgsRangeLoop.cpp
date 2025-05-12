@@ -4,7 +4,7 @@
 #include "stmts/LgsVarDec.h"
 
 #include <LgsStack.h>
-#include <types/LgsInt.h>
+#include <types/primitives/LgsInt.h>
 
 int LgsRangeLoop::loopStart() {
     return rangeStart->asIntConst()->value;

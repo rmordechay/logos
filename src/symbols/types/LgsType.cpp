@@ -2,11 +2,11 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
-#include "types/LgsInt.h"
+#include "types/primitives/LgsInt.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
-#include "types/LgsArray.h"
-#include "types/LgsMap.h"
+#include "types/array/LgsArray.h"
+#include "types/map/LgsMap.h"
 #include "types/LgsUnknownType.h"
 
 bool LgsType::equals(LgsType& other) {

@@ -1,4 +1,4 @@
-#include "types/LgsArray.h"
+#include "types/array/LgsArray.h"
 #include "exprs/unary/LgsDArray.h"
 #include "exprs/unary/LgsSArray.h"
 

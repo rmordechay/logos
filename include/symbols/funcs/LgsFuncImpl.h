@@ -3,7 +3,7 @@
 #include "LgsDefinitions.h"
 #include "LgsFunc.h"
 #include "types/LgsFuncType.h"
-#include "types/LgsInt.h"
+#include "types/primitives/LgsInt.h"
 
 class LgsFuncImpl : public LgsFunc {
 public:

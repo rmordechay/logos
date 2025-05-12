@@ -1,7 +1,7 @@
 #ifndef LGSCHARCONST_H
 #define LGSCHARCONST_H
 #include "LgsConstExpr.h"
-#include "types/LgsChar.h"
+#include "types/primitives/LgsChar.h"
 
 class LgsCharConst final : public LgsConstExpr {
 public:

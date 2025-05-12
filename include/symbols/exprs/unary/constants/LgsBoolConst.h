@@ -1,7 +1,7 @@
 #ifndef LGSBOOL_H
 #define LGSBOOL_H
 #include "LgsConstExpr.h"
-#include "types/LgsBool.h"
+#include "types/primitives/LgsBool.h"
 
 class LgsBoolConst final : public LgsConstExpr {
 public:

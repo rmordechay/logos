@@ -1,7 +1,7 @@
 #ifndef LGSSARRAY_H
 #define LGSSARRAY_H
 #include "LgsUnaryExpr.h"
-#include "types/LgsArray.h"
+#include "types/array/LgsArray.h"
 
 class LgsSArray final : public LgsUnaryExpr {
 public:

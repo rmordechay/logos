@@ -1,4 +1,4 @@
-#include "types/LgsMap.h"
+#include "types/map/LgsMap.h"
 #include "exprs/unary/LgsHashMap.h"
 
 void LgsMap::setUnderlyingType(const vector<LgsMapPair*>& exprs) {

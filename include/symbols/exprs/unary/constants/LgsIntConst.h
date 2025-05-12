@@ -1,7 +1,7 @@
 #ifndef LGSINTCONST_H
 #define LGSINTCONST_H
 #include "LgsConstExpr.h"
-#include "types/LgsInt.h"
+#include "types/primitives/LgsInt.h"
 
 class LgsIntConst final : public LgsConstExpr {
 public:

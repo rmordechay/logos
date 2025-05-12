@@ -1,4 +1,4 @@
-#include "types/LgsLong.h"
+#include "types/primitives/LgsLong.h"
 
 string LgsLong::prettyName() const {
     return name;

@@ -1,6 +1,7 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
 #include <json/json.hpp>
+#include <llvm/IR/Value.h>
 
 using namespace nlohmann;
 
@@ -53,6 +54,7 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsFuncSymbol* funcFamily);
     LgsSymbol* clone() const;
     Location* getLocation() const;
+    llvm::Value* getIRValue() const;
     json asJSON() const;
     ~LgsSymbol() = default;
 };

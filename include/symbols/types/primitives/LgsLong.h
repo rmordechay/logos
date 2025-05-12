@@ -1,6 +1,6 @@
 #ifndef LGSLONG_H
 #define LGSLONG_H
-#include "LgsType.h"
+#include "types/LgsType.h"
 
 class LgsLong final : public LgsType {
 public:

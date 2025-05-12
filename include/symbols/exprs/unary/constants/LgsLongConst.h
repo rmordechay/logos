@@ -1,7 +1,7 @@
 #ifndef LGSLONGCONST_H
 #define LGSLONGCONST_H
 #include "LgsConstExpr.h"
-#include "types/LgsLong.h"
+#include "types/primitives/LgsLong.h"
 
 
 class LgsLongConst final : public LgsConstExpr {
