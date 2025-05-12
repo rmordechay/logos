@@ -30,7 +30,7 @@ inline std::mutex mtx;
 
 LgsType* resolveType(LgsType* type, LgsErrHandler* errorHandler);
 void resolveFuncTypes(LgsFuncType* signature, LgsErrHandler* errHandler);
-void resolveGlobalTypes(const vector<LgsFile*>& files, LgsErrHandler* errHandler);
+bool resolveGlobalTypes(const vector<LgsFile*>& files);
 void resolveObjMemberTypes(LgsObject* const& obj, LgsErrHandler* errHandler);
 void resolveObjectImplements(LgsObject* obj, LgsErrHandler* errHandler);
 string getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads);

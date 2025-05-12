@@ -32,12 +32,12 @@ Type* LgsObject::getIRType() {
     return IRType;
 }
 
-void LgsObject::setVirtualFuncs(size_t structPosition, vector<Type*>& elementTypes) const {
+void LgsObject::setVirtualFuncs(vector<Type*>& elementTypes) const {
     vector<Type*> vtableTypes;
     for (const auto [_, method] : methods) {
         for (const auto overload : method) {
-            if (!overload->funcType.implements) continue;
-            overload->funcType.vtableKey = structPosition++;
+            if (!overload->implements) continue;
+            overload->funcType.isVirtual = true;
             vtableTypes.push_back(ptrTy);
         }
     }

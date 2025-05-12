@@ -1,5 +1,9 @@
 #include "types/LgsAny.h"
 
+size_t LgsAny::getSize() {
+    return sizeof(void*);
+}
+
 Type* LgsAny::getIRType() {
     return ptrTy;
 }

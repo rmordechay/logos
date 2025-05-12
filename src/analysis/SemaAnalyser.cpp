@@ -861,24 +861,28 @@ LgsType* resolveType(LgsType* type, LgsErrHandler* errorHandler) {
     return newType;
 }
 
-void resolveGlobalTypes(const vector<LgsFile*>& files, LgsErrHandler* errHandler) {
+bool resolveGlobalTypes(const vector<LgsFile*>& files) {
     for (const auto& file : files) {
+        LgsErrHandler errHandler;
+        errHandler.filePath = file->absPath;
         if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
             for (const auto& object : mainFile->objects) {
-                resolveObjMemberTypes(object, errHandler);
+                resolveObjMemberTypes(object, &errHandler);
             }
             for (const auto& func : mainFile->getAllFuncs()) {
-                resolveFuncTypes(&func->funcType, errHandler);
+                resolveFuncTypes(&func->funcType, &errHandler);
             }
         } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-            resolveObjMemberTypes(objFile->obj, errHandler);
+            resolveObjMemberTypes(objFile->obj, &errHandler);
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
             auto overloads = interfaceFile->interface->getAllMethods();
             for (const auto& overload : overloads) {
-                resolveFuncTypes(&overload->funcType, errHandler);
+                resolveFuncTypes(&overload->funcType, &errHandler);
             }
         }
+        if (!errHandler.successful) return false;
     }
+    return true;
 }
 
 void resolveObjMemberTypes(LgsObject* const& obj, LgsErrHandler* errHandler) {
@@ -919,7 +923,7 @@ void resolveObjectImplements(LgsObject* obj, LgsErrHandler* errHandler) {
                 auto found = false;
                 for (const auto objOverload : objOverloads) {
                     if (objOverload->funcType.equals(&interfaceOverload->funcType)) {
-                        objOverload->funcType.implements = interfaceOverload;
+                        objOverload->implements = interfaceOverload;
                         found = true;
                         break;
                     }

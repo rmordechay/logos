@@ -14,6 +14,7 @@ public:
     explicit LgsFuncCall(const string& name, const bool isMethodCall, const vector<LgsExpr*>& args = {}) : name(name), args(args), isMethodCall(isMethodCall) {}
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const;
     Value* resolveVirtualFunc(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const;
+    LgsType* getParentIRType(LgsExpr* parent) const;
     string getIRName() const;
     string getText() const;
 

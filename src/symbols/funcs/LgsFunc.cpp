@@ -2,7 +2,6 @@
 #include "LgsDefinitions.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
-#include "types/LgsVoid.h"
 
 void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);

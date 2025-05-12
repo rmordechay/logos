@@ -9,10 +9,10 @@
 
 
 Value* LgsFuncCall::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const {
-    if (func->funcType.vtableKey >= 0) {
-        return resolveVirtualFunc(metadata, args);
-    }
-    if (ref) {
+    if (func->funcType.isVirtual) {
+        const auto virtualFunc = resolveVirtualFunc(metadata, args);
+        func->setIRValue(virtualFunc);
+    } else if (ref) {
         if (ref->type == PARAM) {
             func->setIRValue(ref->param->IRValue);
         } else if (ref->type == VAR_DEC) {
@@ -25,7 +25,24 @@ Value* LgsFuncCall::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args
 }
 
 Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const {
+    auto& builder = metadata->builder;
     const auto parent = args[0];
+    const auto type = getParentIRType(parent);
+    const auto interfaceName = type->asInterface()->name;
+    const auto keyIR = createIRStr(metadata->module, name);
+    const auto parentIRValue = parent->getIRValue(metadata);
+
+    const auto funcIRType = FunctionType::get(ptrTy, {ptrTy, ptrTy}, false);
+    const auto IRFunc = metadata->module->getOrInsertFunction("Map_get_Map_Str", funcIRType);
+
+    const auto mapPtr = builder.CreateLoad(ptrTy, parentIRValue);
+    const auto callInst = builder.CreateCall(IRFunc, {mapPtr, keyIR});
+    const auto getValuePtr = builder.CreateAlloca(ptrTy);
+    builder.CreateStore(callInst, getValuePtr);
+    return builder.CreateLoad(ptrTy, builder.CreateLoad(ptrTy, getValuePtr));
+}
+
+LgsType* LgsFuncCall::getParentIRType(LgsExpr* parent) const {
     LgsType* type = nullptr;
     if (const auto var = parent->asVariable()) {
         switch (var->ref->type) {
@@ -38,14 +55,7 @@ Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata, const vector<L
             assert(false);
         }
     }
-    const auto interfaceName = type->asInterface()->name;
-    const auto parentIRValue = parent->getIRValue(metadata);
-    const auto funcIRType = FunctionType::get(ptrTy, {ptrTy, ptrTy}, false);
-    auto IRFunc = metadata->module->getOrInsertFunction("getVFunc", funcIRType);
-    auto irStr = createIRStr(metadata->module, interfaceName);
-    const auto bitCast = metadata->builder.CreateBitCast(parentIRValue, ptrTy);
-    auto loadInst = metadata->builder.CreateLoad(ptrTy, bitCast);
-    return metadata->builder.CreateCall(funcIRType, IRFunc.getCallee(), {loadInst, irStr});
+    return type;
 }
 
 string LgsFuncCall::getIRName() const {

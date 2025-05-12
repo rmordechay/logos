@@ -13,7 +13,6 @@ const string STD_LIBS[] = {
     "../stdlib/array.ll",
     "../stdlib/string.ll",
     "../stdlib/map.ll",
-    "../stdlib/vtable.ll",
 };
 
 class LgsLinker {

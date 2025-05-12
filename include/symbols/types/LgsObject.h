@@ -17,7 +17,7 @@ public:
     explicit LgsObject() : name(LOGOS_PARENT_OBJ), path("") {}
     explicit LgsObject(const string& name) : name(name), path("") {}
     explicit LgsObject(const string& name, const string& path) : name(name), path(path) {}
-    void setVirtualFuncs(size_t structPosition, vector<Type*>& elementTypes) const;
+    void setVirtualFuncs(vector<Type*>& elementTypes) const;
     string prettyName() const override;
     Type* getIRType() override;
     string getIRName() override;

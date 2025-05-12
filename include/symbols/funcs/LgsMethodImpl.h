@@ -4,6 +4,8 @@
 
 class LgsMethodImpl : public LgsFunc {
 public:
+    LgsMethodImpl* implements = nullptr;
+
     LgsMethodImpl(const string& name, const string& parentName, LgsType* rt) {
         funcType.name = name;
         funcType.parentName = parentName;

@@ -12,6 +12,7 @@ public:
 
     explicit LgsMapNewFunc(LgsType* parent) : LgsMethodImpl("new", parent->getIRName(), &LGS_ANY) {
         funcType.params = {&valueSizeParam};
+        funcType.isStatic = true;
     }
 };
 

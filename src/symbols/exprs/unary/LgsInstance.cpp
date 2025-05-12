@@ -1,5 +1,6 @@
 #include "exprs/unary/LgsInstance.h"
 #include "CodeGenerator.h"
+#include "builtin/LgsPrint.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
@@ -30,19 +31,20 @@ Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
 }
 
 void LgsInstance::setVirtualFuncs(CodeGenMetadata* metadata) {
-    const auto value = vtable.getIRValue(metadata);
-    const auto vtableGEP = metadata->builder.CreateStructGEP(obj->getIRType(), IRValue, 0);
-    metadata->builder.CreateStore(value, vtableGEP);
+    const auto map = vtable.getIRValue(metadata);
+    auto& builder = metadata->builder;
+    const auto vtableGEP = builder.CreateStructGEP(obj->getIRType(), IRValue, 0);
+    builder.CreateStore(map, vtableGEP);
+    auto mapPtr = builder.CreateLoad(ptrTy, vtableGEP);
 
-    for (const auto [_, method] : obj->getAllMethods()) {
-        for (const auto overload : method) {
-            if (!overload->funcType.implements) continue;
-
+    for (const auto& method : obj->methods) {
+        for (const auto overload : method.second) {
+            if (!overload->implements) continue;
+            const auto keyIRStr = createIRStr(metadata->module, overload->funcType.name);
+            const auto IRFunc = overload->getIRFunc(metadata);
+            auto valuePtr = builder.CreateAlloca(ptrTy);
+            builder.CreateStore(IRFunc, valuePtr);
+            vtable.mapType.add.makeCall(metadata, {mapPtr, keyIRStr, valuePtr});
         }
     }
-    const auto constantInt = metadata->builder.getInt32(23);
-    const auto valuePtr = metadata->builder.CreateAlloca(i32Ty);
-    metadata->builder.CreateStore(constantInt, valuePtr);
-    auto keyIRStr = createIRStr(metadata->module, "roi");
-    vtable.mapType.add.makeCall(metadata, {value, keyIRStr, valuePtr});
 }

@@ -14,10 +14,9 @@ public:
     vector<LgsParam*> params;
     bool isStatic = false;
     bool isPublic = false;
+    bool isVirtual = false;
     bool hasDefaultParams = false;
     FunctionType* IRFuncType = nullptr;
-    LgsMethodImpl* implements = nullptr;
-    int vtableKey = -1;
 
     string getAsStr() const;
     Type* getIRType() override;
