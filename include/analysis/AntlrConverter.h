@@ -68,6 +68,7 @@ public:
     LgsType* getType(LogosParser::TypeContext* ctx) const;
     LgsType* getArrayType(LogosParser::TypeContext* ctx) const;
     LgsType* getTypeFromText(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const;
+    bool isTypePrimitive(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const;
     LgsType* getFuncType(LogosParser::FuncSignatureContext* ctx) const;
     LgsExpr* getExpr(const string& codeText) const;
     void parseTemplateStr(LgsStrConst* strConst) const;

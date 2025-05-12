@@ -1,15 +1,15 @@
 #ifndef LGSINTERFACE_H
 #define LGSINTERFACE_H
+#include "LgsObject.h"
 #include "LgsType.h"
 
 struct LgsFuncType;
 
-class LgsInterface final : public LgsType {
+class LgsInterface final : public LgsObject {
 public:
-    string name;
-    size_t posInObj{};
+    string interfaceName;
 
-    explicit LgsInterface(const string& name) : name(name) {}
+    explicit LgsInterface(const string& name) : interfaceName(name) {}
     string prettyName() const override;
     Type* getIRType() override;
     string getIRName() override;
@@ -18,7 +18,5 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     ~LgsInterface() override = default;
 };
-
-
 
 #endif //LGSINTERFACE_H

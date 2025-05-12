@@ -915,6 +915,7 @@ void resolveObjectImplements(LgsObject* obj, LgsErrHandler* errHandler) {
             errHandler->handleError(E10025, &implement->location, {implement->prettyName()});
             continue;
         }
+        obj->interfaces.push_back(interface);
 
         vector<LgsFunc*> missingFuncs;
         for (const auto& [name, interfaceOverloads] : interface->methods) {
@@ -935,8 +936,9 @@ void resolveObjectImplements(LgsObject* obj, LgsErrHandler* errHandler) {
                 }
             }
         }
+
         if (!missingFuncs.empty()) {
-            errHandler->handleError(E10016, &obj->location, {obj->name, interface->name, getOverloadsAsStr(missingFuncs)});
+            errHandler->handleError(E10016, &obj->location, {obj->name, interface->interfaceName, getOverloadsAsStr(missingFuncs)});
         }
     }
 }

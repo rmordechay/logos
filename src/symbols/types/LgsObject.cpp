@@ -1,6 +1,7 @@
 #include "types/LgsObject.h"
 #include "CodeGenerator.h"
 #include "exprs/LgsNull.h"
+#include "exprs/unary/LgsInstance.h"
 #include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
@@ -74,7 +75,7 @@ json LgsObject::asJSON() const {
 LgsInterface* LgsObject::getInterface(const string& interfaceName) const {
     for (const auto implement : implements) {
         const auto interface = implement->asInterface();
-        if (interface->name == interfaceName) {
+        if (interface->interfaceName == interfaceName) {
             return interface;
         }
     }
@@ -86,6 +87,9 @@ LgsObject* LgsObject::clone() {
     newObj->name = name;
     for (const auto& [name, field] : fields) {
         newObj->fields[name] = new LgsField(*field);
+    }
+    for (const auto interface : implements) {
+        newObj->implements.emplace_back(new LgsInterface(*interface->asInterface()));
     }
     newObj->methods = methods;
     return newObj;

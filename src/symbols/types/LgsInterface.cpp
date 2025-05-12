@@ -4,20 +4,20 @@
 
 Type* LgsInterface::getIRType() {
     if (IRType) return IRType;
-    IRType = StructType::getTypeByName(context, name);
+    IRType = StructType::getTypeByName(context, interfaceName);
     vector<Type*> elementTypes;
     for (const auto method : getAllMethods()) {
         method->funcType.isVirtual = true;
         elementTypes.emplace_back(ptrTy);
     }
     if (!IRType) {
-        IRType = StructType::create(context, elementTypes, name);
+        IRType = StructType::create(context, elementTypes, interfaceName);
     }
     return IRType;
 }
 
 string LgsInterface::getIRName() {
-    return name;
+    return interfaceName;
 }
 
 LgsExpr* LgsInterface::getZeroValue() {
@@ -25,12 +25,13 @@ LgsExpr* LgsInterface::getZeroValue() {
 }
 
 bool LgsInterface::equals(LgsType* other) {
-    if (const auto obj = other->asObject()) {
+    // Interface must be checked first
+    if (const auto interface = other->asInterface()) {
+        if (interface->getIRName() == getIRName()) return true;
+    } else if (const auto obj = other->asObject()) {
         for (const auto& implement : obj->implements) {
             if (implement->getIRName() == getIRName()) return true;
         }
-    } else if (const auto interface = other->asInterface()) {
-        if (interface->getIRName() == getIRName()) return true;
     }
     return false;
 }
@@ -40,5 +41,5 @@ LgsType* LgsInterface::inferBinaryType(LgsType* other) {
 }
 
 string LgsInterface::prettyName() const {
-    return name;
+    return interfaceName;
 }

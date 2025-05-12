@@ -30,8 +30,8 @@ Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
     return IRValue;
 }
 
-void LgsInstance::setVirtualFuncs(CodeGenMetadata* metadata) {
-    const auto map = vtable.getIRValue(metadata);
+void LgsInstance::setVirtualFuncs(CodeGenMetadata* metadata) const {
+    const auto map = obj->vtable.getIRValue(metadata);
     auto& builder = metadata->builder;
     const auto vtableGEP = builder.CreateStructGEP(obj->getIRType(), IRValue, 0);
     builder.CreateStore(map, vtableGEP);
@@ -44,7 +44,7 @@ void LgsInstance::setVirtualFuncs(CodeGenMetadata* metadata) {
             const auto IRFunc = overload->getIRFunc(metadata);
             auto valuePtr = builder.CreateAlloca(ptrTy);
             builder.CreateStore(IRFunc, valuePtr);
-            vtable.mapType.add.makeCall(metadata, {mapPtr, keyIRStr, valuePtr});
+            obj->vtable.mapType.add.makeCall(metadata, {mapPtr, keyIRStr, valuePtr});
         }
     }
 }

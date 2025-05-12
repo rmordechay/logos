@@ -191,7 +191,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
         method->path = filePath;
         interface->addMethod(method);
     }
-    globals.addSymbol(interface->name, LgsSymbol(interface), &errHandler);
+    globals.addSymbol(interface->interfaceName, LgsSymbol(interface), &errHandler);
     return interface;
 }
 
@@ -712,6 +712,18 @@ LgsType* AntlerConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken,
     }
     type->setLocation(ctx->start);
     return type;
+}
+
+bool AntlerConverter::isTypePrimitive(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const {
+    const auto typeText = typeToken->getText();
+    if (typeText == LgsInt::name) return false;
+    if (typeText == LgsFloat::name) return false;
+    if (typeText == LgsChar::name) return false;
+    if (typeText == LgsAny::name) return false;
+    if (typeText == LgsBool::name) return false;
+    if (typeText == LgsStr::name) return false;
+    if (typeText == LgsVoid::name) return false;
+    return true;
 }
 
 LgsType* AntlerConverter::getFuncType(LogosParser::FuncSignatureContext* ctx) const {

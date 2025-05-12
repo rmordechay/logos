@@ -28,17 +28,14 @@ Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata, const vector<L
     auto& builder = metadata->builder;
     const auto parent = args[0];
     const auto type = getParentIRType(parent);
-    const auto interfaceName = type->asInterface()->name;
-    const auto keyIR = createIRStr(metadata->module, name);
+    const auto interface = type->asInterface();
     const auto parentIRValue = parent->getIRValue(metadata);
 
-    const auto funcIRType = FunctionType::get(ptrTy, {ptrTy, ptrTy}, false);
-    const auto IRFunc = metadata->module->getOrInsertFunction("Map_get_Map_Str", funcIRType);
-
+    const auto keyIR = createIRStr(metadata->module, name);
     const auto mapPtr = builder.CreateLoad(ptrTy, parentIRValue);
-    const auto callInst = builder.CreateCall(IRFunc, {mapPtr, keyIR});
+    const auto rv = interface->vtable.mapType.get.makeCall(metadata, {mapPtr, keyIR});
     const auto getValuePtr = builder.CreateAlloca(ptrTy);
-    builder.CreateStore(callInst, getValuePtr);
+    builder.CreateStore(rv, getValuePtr);
     return builder.CreateLoad(ptrTy, builder.CreateLoad(ptrTy, getValuePtr));
 }
 
