@@ -18,7 +18,7 @@ public:
     void setIRValue(Value* value);
     BasicBlock* createBasicBlock(const char* name) const;
     void startBlock(CodeGenMetadata* metadata, BasicBlock* block) const;
-    Value* createIRStr(Module* module, const std::string& value) const;
+    Value* getIRStr(Module* module, const std::string& value) const;
     Value* hashIRValue(CodeGenMetadata* metadata, Value* value) const;
     virtual string format(string& indentStr);
     virtual void setLocation(const antlr4::Token* ctx);

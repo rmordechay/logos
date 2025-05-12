@@ -1,10 +1,6 @@
 #include "LgsValue.h"
-
 #include "funcs/LgsFunc.h"
-#include "types/LgsFuncType.h"
-
 #include "json/json.hpp"
-
 #include <TokenSource.h>
 
 void LgsValue::setLocation(const antlr4::Token* ctx) {
@@ -17,7 +13,14 @@ void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) co
     metadata->builder.SetInsertPoint(block);
 }
 
-Value* LgsValue::createIRStr(Module* module, const std::string& value) const {
+Value* LgsValue::getIRStr(Module* module, const string& value) const {
+    for (auto& gv : module->globals()) {
+        if (!gv.hasInitializer()) continue;
+        const auto ca = dyn_cast<ConstantDataArray>(gv.getInitializer());
+        if (!ca) continue;
+        if (!ca->isCString() || ca->getAsCString() != value) continue;
+        return &gv;
+    }
     const auto strConstant = ConstantDataArray::getString(context, value, true);
     return new GlobalVariable(*module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
 }

@@ -9,18 +9,18 @@ Value* LgsStrConst::createIRValue(CodeGenMetadata* metadata) {
         if (!dataArray || !dataArray->isString()) continue;
         if (dataArray->getAsString().str().c_str() == value) return &global;
     }
-    return createIRStr(metadata->module, value);
+    return getIRStr(metadata->module, value);
 }
 
 Value* LgsStrConst::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
     if (const auto otherStrConst = other->asIntConst()) {
-        return createIRStr(metadata->module, this->value + to_string(otherStrConst->value));
+        return getIRStr(metadata->module, this->value + to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asFloatConst()) {
-        return createIRStr(metadata->module, this->value + to_string(otherStrConst->value));
+        return getIRStr(metadata->module, this->value + to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asStrConst()) {
-        return createIRStr(metadata->module, this->value + otherStrConst->value);
+        return getIRStr(metadata->module, this->value + otherStrConst->value);
     }
     return nullptr;
 }

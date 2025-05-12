@@ -24,37 +24,6 @@ Value* LgsFuncCall::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args
     return func->call(metadata, args);
 }
 
-Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const {
-    auto& builder = metadata->builder;
-    const auto parent = args[0];
-    const auto type = getParentIRType(parent);
-    const auto interface = type->asInterface();
-    const auto parentIRValue = parent->getIRValue(metadata);
-
-    const auto keyIR = createIRStr(metadata->module, name);
-    const auto mapPtr = builder.CreateLoad(ptrTy, parentIRValue);
-    const auto rv = interface->vtable.mapType.get.makeCall(metadata, {mapPtr, keyIR});
-    const auto getValuePtr = builder.CreateAlloca(ptrTy);
-    builder.CreateStore(rv, getValuePtr);
-    return builder.CreateLoad(ptrTy, builder.CreateLoad(ptrTy, getValuePtr));
-}
-
-LgsType* LgsFuncCall::getParentIRType(LgsExpr* parent) const {
-    LgsType* type = nullptr;
-    if (const auto var = parent->asVariable()) {
-        switch (var->ref->type) {
-        case VAR_DEC:
-            assert(false);
-        case PARAM:
-            type = var->ref->param->type;
-            break;
-        default:
-            assert(false);
-        }
-    }
-    return type;
-}
-
 string LgsFuncCall::getIRName() const {
     vector<string> paramTypeNames;
     for (const auto& arg : args) {
@@ -77,6 +46,37 @@ void LgsFuncCall::createIRStmt(CodeGenMetadata* metadata) {
 
 Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
     return call(metadata, args);
+}
+
+Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const {
+    auto& builder = metadata->builder;
+    const auto parent = args[0];
+    const auto type = getParentIRType(parent);
+    const auto interface = type->asInterface();
+    const auto parentIRValue = parent->getIRValue(metadata);
+
+    const auto keyIR = getIRStr(metadata->module, name);
+    const auto mapPtr = builder.CreateLoad(ptrTy, parentIRValue);
+    const auto rv = interface->vtable.mapType.get.makeCall(metadata, {mapPtr, keyIR});
+    const auto getValuePtr = builder.CreateAlloca(ptrTy);
+    builder.CreateStore(rv, getValuePtr);
+    return builder.CreateLoad(ptrTy, builder.CreateLoad(ptrTy, getValuePtr));
+}
+
+LgsType* LgsFuncCall::getParentIRType(LgsExpr* parent) const {
+    LgsType* type = nullptr;
+    if (const auto var = parent->asVariable()) {
+        switch (var->ref->type) {
+        case VAR_DEC:
+            assert(false);
+        case PARAM:
+            type = var->ref->param->type;
+            break;
+        default:
+            assert(false);
+        }
+    }
+    return type;
 }
 
 string LgsFuncCall::getText() const {
