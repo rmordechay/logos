@@ -40,15 +40,17 @@ inline void setPlatform(const string& inputFile, const string& outputFile) {
 #if defined(__linux__)
     platform.osName = "Linux";
     platform.linker = "ld";
-    platform.libRoot = "/usr/lib/aarch64-linux-gnu";
-    platform.platformVersion = "5.15";
+    platform.libRoot = "/usr/lib/aarch64-linux-gnu/";
     platform.arch = ARCH_NAME;
     platform.linkerOpts = {
-        platform.linker.c_str(),
-        "-L", platform.libRoot.c_str(),
+        "ld.lld",
+        "-L", "/usr/lib/aarch64-linux-gnu",
         "-lc",
-        "-o", platform.outputFile.c_str(),
+        "--dynamic-linker", "/lib/ld-linux-aarch64.so.1",
+        "/usr/lib/aarch64-linux-gnu/crti.o",
+        "/usr/lib/aarch64-linux-gnu/crtn.o",
         platform.inputFile.c_str(),
+        "-o", platform.outputFile.c_str()
     };
     platform.link = lld::elf::link;
 #elif defined(__APPLE__) && defined(__MACH__)

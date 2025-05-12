@@ -15,8 +15,7 @@ public:
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const;
     Value* resolveVirtualFunc(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const;
     LgsType* getParentIRType(LgsExpr* parent) const;
-    string getIRName() const;
-    string getText() const;
+    string getAsStr() const;
 
     string getName() override;
     string format(string& indentStr) override;

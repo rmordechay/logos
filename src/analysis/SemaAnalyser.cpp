@@ -666,13 +666,13 @@ void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
     case VAR_DEC: {
         const auto funcType = symbol->param->type->asFuncType();
         if (isFuncCallEqual(funcType, funcCall)) break;
-        errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->getText(), funcType->getAsStr()});
+        errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->getAsStr(), funcType->getAsStr()});
         break;
     }
     case PARAM: {
         const auto funcType = symbol->varDec->type->asFuncType();
         if (isFuncCallEqual(funcType, funcCall)) break;
-        errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->getText(), funcType->getAsStr()});
+        errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->getAsStr(), funcType->getAsStr()});
         break;
     }
     case FUNC: {
@@ -683,7 +683,7 @@ void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
             found = true;
         }
         if (!found) {
-            errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->getText(), getOverloadsAsStr(overloads)});
+            errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->getAsStr(), getOverloadsAsStr(overloads)});
         }
         break;
     }
@@ -696,7 +696,7 @@ LgsFunc* SemaAnalyser::resolveMethodCall(const vector<LgsMethodImpl*>& overloads
     for (const auto overload : overloads) {
         if (isFuncCallEqual(overload, methodCall)) return overload;
     }
-    errHandler.handleError(E10034, &methodCall->location, {parentName, methodCall->name, methodCall->getText(), getOverloadsAsStr(overloads)});
+    errHandler.handleError(E10034, &methodCall->location, {parentName, methodCall->name, methodCall->getAsStr(), getOverloadsAsStr(overloads)});
     return nullptr;
 }
 
@@ -915,7 +915,6 @@ void resolveObjectImplements(LgsObject* obj, LgsErrHandler* errHandler) {
             errHandler->handleError(E10025, &implement->location, {implement->prettyName()});
             continue;
         }
-        obj->interfaces.push_back(interface);
 
         vector<LgsFunc*> missingFuncs;
         for (const auto& [name, interfaceOverloads] : interface->methods) {

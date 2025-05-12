@@ -10,7 +10,7 @@
 #include "types/LgsInterface.h"
 #include "LgsErrHandler.h"
 #include "funcs/LgsFuncImpl.h"
-#include "types/LgsBool.h"
+#include <mutex>
 
 struct LgsGlobals {
     std::mutex mtx;

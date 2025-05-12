@@ -1,5 +1,4 @@
 #include "exprs/unary/LgsFuncCall.h"
-
 #include "builtin/LgsPrint.h"
 #include "exprs/unary/LgsVariable.h"
 #include "funcs/LgsFunc.h"
@@ -22,14 +21,6 @@ Value* LgsFuncCall::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args
         }
     }
     return func->call(metadata, args);
-}
-
-string LgsFuncCall::getIRName() const {
-    vector<string> paramTypeNames;
-    for (const auto& arg : args) {
-        paramTypeNames.emplace_back(arg->type->getIRName());
-    }
-    return LgsFuncType::getComposedName(name, "", paramTypeNames);
 }
 
 string LgsFuncCall::getName() {
@@ -64,22 +55,18 @@ Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata, const vector<L
 }
 
 LgsType* LgsFuncCall::getParentIRType(LgsExpr* parent) const {
-    LgsType* type = nullptr;
     if (const auto var = parent->asVariable()) {
         switch (var->ref->type) {
-        case VAR_DEC:
-            assert(false);
         case PARAM:
-            type = var->ref->param->type;
-            break;
+            return var->ref->param->type;
         default:
-            assert(false);
+            break;
         }
     }
-    return type;
+    assert(false);
 }
 
-string LgsFuncCall::getText() const {
+string LgsFuncCall::getAsStr() const {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = isMethodCall; i < args.size(); ++i) {

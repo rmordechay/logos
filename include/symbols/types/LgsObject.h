@@ -15,7 +15,6 @@ public:
     string path;
     bool isSingleton = false;
     vector<LgsType*> implements;
-    vector<LgsInterface*> interfaces;
     LgsHashMap vtable = LgsHashMap(&LGS_STR, &LGS_ANY);
 
     explicit LgsObject() : name(LOGOS_PARENT_OBJ), path("") {}
