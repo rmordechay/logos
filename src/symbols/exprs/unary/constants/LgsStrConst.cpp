@@ -1,4 +1,6 @@
 #include "exprs/unary/constants/LgsStrConst.h"
+
+#include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 
@@ -22,7 +24,10 @@ Value* LgsStrConst::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
     if (const auto otherStrConst = other->asStrConst()) {
         return getIRStr(metadata->module, this->value + otherStrConst->value);
     }
-    return nullptr;
+    if (const auto otherBoolConst = other->asBoolConst()) {
+        return getIRStr(metadata->module, this->value + otherBoolConst->getValueAsString());
+    }
+    assert(false);
 }
 
 Value* LgsStrConst::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {

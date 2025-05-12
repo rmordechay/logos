@@ -44,25 +44,17 @@ Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {
 }
 
 Value* LgsBinaryExpr::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto lIRValue = createIRValue(metadata);
-    const auto rIRValue = other->createIRValue(metadata);
-    return metadata->builder.CreateAdd(lIRValue, rIRValue);
+    return left->addIR(metadata, right);
 }
 
 Value* LgsBinaryExpr::subIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto lIRValue = createIRValue(metadata);
-    const auto rIRValue = other->createIRValue(metadata);
-    return metadata->builder.CreateSub(lIRValue, rIRValue);
+    return left->subIR(metadata, right);
 }
 
 Value* LgsBinaryExpr::mulIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto lIRValue = createIRValue(metadata);
-    const auto rIRValue = other->createIRValue(metadata);
-    return metadata->builder.CreateMul(lIRValue, rIRValue);
+    return left->mulIR(metadata, right);
 }
 
 Value* LgsBinaryExpr::divIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto lIRValue = createIRValue(metadata);
-    const auto rIRValue = other->createIRValue(metadata);
-    return metadata->builder.CreateSDiv(lIRValue, rIRValue);
+    return left->divIR(metadata, right);
 }

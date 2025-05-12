@@ -42,7 +42,14 @@ Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
         args->setName("rt");
         args++;
     }
-    setIRParams(IRFunc, args);
+    for (int i = 0; i < funcType.params.size(); ++i) {
+        const auto param = funcType.params[i];
+        param->setIRValue(args);
+        if (param->expr) param->expr->setIRValue(args);
+        auto paramName = param->name;
+        if (funcType.isMethod) args->setName(paramName);
+        args++;
+    }
     return IRFunc;
 }
 
@@ -84,18 +91,6 @@ bool LgsFunc::setIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, co
     return isObjReturn;
 }
 
-void LgsFunc::setIRParams(Function* func, Argument* IRParams) {
-    const auto params = funcType.params;
-    for (int i = 0; i < params.size(); ++i) {
-        const auto param = params[i];
-        param->setIRValue(IRParams);
-        if (param->expr) param->expr->setIRValue(IRParams);
-        func->addParamAttr(0, Attribute::NoUndef);
-        IRParams->setName(param->getIRName());
-        IRParams++;
-    }
-}
-
 string LgsFunc::format(string& tabs) {
     stringstream str;
     str << funcType.name << "(";
@@ -128,6 +123,10 @@ json LgsFunc::asJSON() {
 
 
 LgsFunc::~LgsFunc() {
+    // TODO free params
+    // for (int i = funcType.isMethod; i < funcType.params.size(); ++i) {
+    //     delete funcType.params[i];
+    // }
     if (stmtBlock) {
         delete stmtBlock;
     }

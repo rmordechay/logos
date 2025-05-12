@@ -47,6 +47,7 @@ public:
     virtual bool equals(LgsType& other);
     virtual bool isIndexable(LgsType* indexType);
     virtual json asJSON() const;
+    virtual string getFormatStr();
 
     virtual Type* getIRType() = 0;
     virtual string getIRName() = 0;

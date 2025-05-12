@@ -19,6 +19,10 @@ string LgsStr::prettyName() const {
     return name;
 }
 
+string LgsStr::getFormatStr() {
+    return "%d";
+}
+
 LgsExpr* LgsStr::getZeroValue() {
     if (isNullable) return new LgsNull();
     return new LgsStrConst("");

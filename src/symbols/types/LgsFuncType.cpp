@@ -34,9 +34,6 @@ bool LgsFuncType::equals(const LgsFuncCall* other) const {
 
 string LgsFuncType::getIRName() {
     if (IRName != "") return IRName;
-    if (parentName != "") {
-
-    }
     vector<string> paramTypeNames;
     for (const auto& param : params) {
         paramTypeNames.emplace_back(param->type->getIRName());
@@ -84,8 +81,3 @@ string LgsFuncType::getComposedName(const string& name, const string& parentName
     return strStream.str();
 }
 
-LgsFuncType::~LgsFuncType() {
-    for (const auto param : params) {
-        delete param;
-    }
-}

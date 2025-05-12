@@ -21,7 +21,6 @@ public:
     bool setIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) const;
     json asJSON() override;
     string format(string& tabs) override;
-    virtual void setIRParams(Function* func, Argument* IRParams);
     virtual Function* getIRFunc(const CodeGenMetadata* metadata);
     virtual FunctionType* getIRFuncType(const CodeGenMetadata* metadata);
     virtual Value* makeCall(CodeGenMetadata* metadata, const vector<Value*>& args);

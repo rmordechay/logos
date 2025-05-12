@@ -12,11 +12,13 @@ public:
     string parentName;
     LgsType* rt;
     vector<LgsParam*> params;
+    FunctionType* IRFuncType = nullptr;
+    bool isMethod = false;
     bool isStatic = false;
     bool isPublic = false;
     bool isVirtual = false;
+    bool isVariadic = false;
     bool hasDefaultParams = false;
-    FunctionType* IRFuncType = nullptr;
 
     string getAsStr() const;
     Type* getIRType() override;
@@ -27,7 +29,7 @@ public:
     bool equals(LgsType* other) override;
     bool equals(const LgsFuncCall* other) const;
     static string getComposedName(const string& name, const string& parentName, const vector<string>& argTypeNames);
-    ~LgsFuncType() override;
+    ~LgsFuncType() override = default;
 };
 
 

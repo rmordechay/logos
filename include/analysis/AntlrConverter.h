@@ -55,7 +55,7 @@ public:
     LgsUnaryExpr* getHashMap(LogosParser::HashMapContext* ctx);
     LgsVariable* getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) const;
     LgsUnaryExpr* getConst(const string& constName, const antlr4::ParserRuleContext* ctx) const;
-    LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx, bool isMethodCall = false);
+    LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     LgsUnaryExpr* getVector(LogosParser::VectorContext* vector);
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
     LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);

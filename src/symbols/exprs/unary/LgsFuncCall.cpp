@@ -6,10 +6,9 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
-
-Value* LgsFuncCall::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const {
+Value* LgsFuncCall::call(CodeGenMetadata* metadata) const {
     if (func->funcType.isVirtual) {
-        const auto virtualFunc = resolveVirtualFunc(metadata, args);
+        const auto virtualFunc = resolveVirtualFunc(metadata);
         func->setIRValue(virtualFunc);
     } else if (ref) {
         if (ref->type == PARAM) {
@@ -32,14 +31,14 @@ string LgsFuncCall::format(string& indentStr) {
 }
 
 void LgsFuncCall::createIRStmt(CodeGenMetadata* metadata) {
-    call(metadata, args);
+    call(metadata);
 }
 
 Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
-    return call(metadata, args);
+    return call(metadata);
 }
 
-Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const {
+Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata) const {
     auto& builder = metadata->builder;
     const auto parent = args[0];
     const auto type = getParentIRType(parent);
@@ -69,7 +68,7 @@ LgsType* LgsFuncCall::getParentIRType(LgsExpr* parent) const {
 string LgsFuncCall::getAsStr() const {
     stringstream strStream;
     strStream << name << '(';
-    for (size_t i = isMethodCall; i < args.size(); ++i) {
+    for (size_t i = func->funcType.isMethod; i < args.size(); ++i) {
         strStream << args[i]->type->prettyName();
         if (i != args.size() - 1) strStream << ", ";
     }

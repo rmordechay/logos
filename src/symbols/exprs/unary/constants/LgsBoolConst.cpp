@@ -1,5 +1,9 @@
 #include "exprs/unary/constants/LgsBoolConst.h"
 
+string LgsBoolConst::getValueAsString() const {
+    return value ? LgsBool::trueLiteral : LgsBool::falseLiteral;
+}
+
 Value* LgsBoolConst::createIRValue(CodeGenMetadata* metadata) {
     return metadata->builder.getInt1(value);
 }

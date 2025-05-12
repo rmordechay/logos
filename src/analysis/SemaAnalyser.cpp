@@ -180,7 +180,6 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
         varDec->expr = type->getZeroValue();
         varDec->type = varDec->expr->type;
     }
-    assert(varDec->type);
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
 }
 
@@ -386,7 +385,6 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     default:
         assert(false);
     }
-    assert(variable->type);
     variable->ref = symbol->clone();
 }
 
@@ -703,7 +701,7 @@ LgsFunc* SemaAnalyser::resolveMethodCall(const vector<LgsMethodImpl*>& overloads
 bool SemaAnalyser::resolveFuncCallWithDefaultParams(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const {
     const auto params = funcType->params;
     const auto argsSize = funcCall->args.size();
-    for (size_t i = funcCall->isMethodCall; i < params.size(); ++i) {
+    for (size_t i = funcCall->func->funcType.isMethod; i < params.size(); ++i) {
         const auto param = params[i];
         if (i >= argsSize) continue;
         const auto arg = funcCall->args[i];

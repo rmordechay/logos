@@ -7,6 +7,7 @@ class LgsBool final : public LgsType {
 public:
     static constexpr auto name = "Bool";
     static constexpr auto trueLiteral = "true";
+    static constexpr auto falseLiteral = "false";
 
     string prettyName() const override;
     Type* getIRType() override;

@@ -10,9 +10,9 @@ public:
         funcType.name = name;
         funcType.parentName = parentName;
         funcType.rt = rt;
+        funcType.isMethod = true;
     }
     FunctionType* getIRFuncType(const CodeGenMetadata* metadata) override;
-    void setIRParams(Function* func, Argument* args) override;
     ~LgsMethodImpl() override = default;
 };
 

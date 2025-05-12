@@ -18,6 +18,10 @@ string LgsInt::getIRName() {
     return name;
 }
 
+string LgsInt::getFormatStr() {
+    return "%d";
+}
+
 LgsExpr* LgsInt::getZeroValue() {
     if (isNullable) return new LgsNull();
     return new LgsIntConst(0);

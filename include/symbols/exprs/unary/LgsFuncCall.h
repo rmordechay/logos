@@ -9,14 +9,12 @@ public:
     vector<LgsExpr*> args;
     LgsFunc* func = nullptr;
     LgsSymbol* ref = nullptr;
-    bool isMethodCall;
 
-    explicit LgsFuncCall(const string& name, const bool isMethodCall, const vector<LgsExpr*>& args = {}) : name(name), args(args), isMethodCall(isMethodCall) {}
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const;
-    Value* resolveVirtualFunc(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) const;
+    explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
+    Value* call(CodeGenMetadata* metadata) const;
+    Value* resolveVirtualFunc(CodeGenMetadata* metadata) const;
     LgsType* getParentIRType(LgsExpr* parent) const;
     string getAsStr() const;
-
     string getName() override;
     string format(string& indentStr) override;
     void createIRStmt(CodeGenMetadata* metadata) override;
