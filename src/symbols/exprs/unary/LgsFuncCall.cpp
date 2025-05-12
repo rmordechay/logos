@@ -46,7 +46,7 @@ Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata, const vector<L
     const auto interface = type->asInterface();
     const auto parentIRValue = parent->getIRValue(metadata);
 
-    const auto keyIR = getIRStr(metadata->module, name);
+    const auto keyIR = getIRStr(metadata->module, func->funcType.getIRName());
     const auto mapPtr = builder.CreateLoad(ptrTy, parentIRValue);
     const auto rv = interface->vtable.mapType.get.makeCall(metadata, {mapPtr, keyIR});
     const auto getValuePtr = builder.CreateAlloca(ptrTy);

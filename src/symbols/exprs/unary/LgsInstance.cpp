@@ -39,8 +39,9 @@ void LgsInstance::setVirtualFuncs(CodeGenMetadata* metadata) const {
 
     for (const auto& method : obj->methods) {
         for (const auto overload : method.second) {
-            if (!overload->implements) continue;
-            const auto keyIRStr = getIRStr(metadata->module, overload->funcType.name);
+            const auto interface = overload->implements;
+            if (!interface) continue;
+            const auto keyIRStr = getIRStr(metadata->module, interface->funcType.getIRName());
             const auto IRFunc = overload->getIRFunc(metadata);
             auto valuePtr = builder.CreateAlloca(ptrTy);
             builder.CreateStore(IRFunc, valuePtr);
