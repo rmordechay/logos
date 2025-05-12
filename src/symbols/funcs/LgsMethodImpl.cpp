@@ -13,9 +13,9 @@ FunctionType* LgsMethodImpl::getIRFuncType(const CodeGenMetadata* metadata) {
     }
     if (const auto obj = funcType.rt->asObject()) {
         IRParamsTypes.insert(IRParamsTypes.begin(), obj->getIRType()->getPointerTo());
-        IRFuncType = FunctionType::get(voidTy, IRParamsTypes, false);
+        IRFuncType = FunctionType::get(voidTy, IRParamsTypes, funcType.isVariadic);
     } else {
-        IRFuncType = FunctionType::get(funcType.rt->getIRType(), IRParamsTypes, false);
+        IRFuncType = FunctionType::get(funcType.rt->getIRType(), IRParamsTypes, funcType.isVariadic);
     }
     return IRFuncType;
 }

@@ -19,9 +19,9 @@ using namespace llvm;
 #define LOGOS_MAIN_FUNC "main"
 #define LOGOS_SELF "self"
 #define LOGOS_PARENT_OBJ "Object"
-#define OBJECT_FILE "output.o"
-#define EXECUTABLE_FILE "output"
-#define STR_TEMPLATE_CHAR '$'
+#define LOGOS_OBJECT_FILE "output.o"
+#define LOGOS_EXECUTABLE_FILE "output"
+#define LOGOS_STR_FORMAT_PART "%v"
 
 #if defined(__linux__)
 LLD_HAS_DRIVER(elf);

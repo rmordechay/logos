@@ -25,7 +25,7 @@ json LgsType::asJSON() const {
     assert(false);
 }
 
-string LgsType::getFormatStr() {
+string LgsType::getStrFormatPart() {
     assert(false);
 }
 

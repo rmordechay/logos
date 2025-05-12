@@ -696,47 +696,34 @@ LgsFunc* SemaAnalyser::resolveMethodCall(const vector<LgsMethodImpl*>& overloads
     return nullptr;
 }
 
-bool SemaAnalyser::resolveFuncCallWithDefaultParams(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const {
-    const auto params = funcType->params;
-    const auto argsSize = funcCall->args.size();
-    for (size_t i = funcCall->func->funcType.isMethod; i < params.size(); ++i) {
-        const auto param = params[i];
-        if (i >= argsSize) continue;
-        const auto arg = funcCall->args[i];
-        if (!param->type->equals(arg->type)) return false;
+bool SemaAnalyser::isFuncCall(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const {
+    if (!funcType) return false;
+    if (funcType->hasDefaultParams) {
+        return funcType->equalsDefaultParams(funcCall);;
     }
-    return true;
+    if (funcType->isVariadic) {
+        return funcType->equalsVariadic(funcCall);
+    }
+    return funcType->equals(funcCall);
 }
 
 bool SemaAnalyser::isFuncCallEqual(const LgsFuncType* funcType, LgsFuncCall* funcCall) {
-    if (!funcType) return false;
-    auto equal = false;
-    if (funcType->hasDefaultParams) {
-        equal =resolveFuncCallWithDefaultParams(funcType, funcCall);
-    } else {
-        equal = funcType->equals(funcCall);
-    }
-    if (equal) {
-        funcCall->type = funcType->rt;
+    if (isFuncCall(funcType, funcCall)) {
         funcCall->func = new LgsFuncImpl(funcType);
-    } else {
-        errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->getAsStr(), funcType->getAsStr()});
+        funcCall->type = funcType->rt;
+        return true;
     }
-    return equal;
+    errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->getAsStr(), funcType->getAsStr()});
+    return false;
 }
 
 bool SemaAnalyser::isFuncCallEqual(LgsFunc* func, LgsFuncCall* funcCall) const {
-    auto equal = false;
-    if (func->funcType.hasDefaultParams) {
-        equal = resolveFuncCallWithDefaultParams(&func->funcType, funcCall);
-    } else {
-        equal = func->funcType.equals(funcCall);
-    }
-    if (equal) {
+    if (isFuncCall(&func->funcType, funcCall)) {
         funcCall->func = func;
         funcCall->type = func->funcType.rt;
+        return true;
     }
-    return equal;
+    return false;
 }
 
 void SemaAnalyser::checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads) {

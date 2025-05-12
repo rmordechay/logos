@@ -1,5 +1,4 @@
 #include "exprs/unary/constants/LgsStrConst.h"
-
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"

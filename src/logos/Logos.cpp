@@ -32,7 +32,7 @@ void Logos::initPaths(const path& rootDirPath) const {
     paths.srcDir = paths.rootDir / LOGOS_SRC_DIR;
     paths.envsDir = paths.rootDir / LOGOS_ENVS_DIR;
     paths.buildDir = paths.rootDir / LOGOS_BUILD_DIR;
-    paths.objFilePath = paths.buildDir / OBJECT_FILE;
-    paths.execFilePath = paths.buildDir / EXECUTABLE_FILE;
+    paths.objFilePath = paths.buildDir / LOGOS_OBJECT_FILE;
+    paths.execFilePath = paths.buildDir / LOGOS_EXECUTABLE_FILE;
     paths.appFilePath = paths.rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
 }

@@ -18,7 +18,7 @@ public:
     BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
 
     void generateIRCode(CodeGenMetadata* metadata);
-    bool setIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) const;
+    bool setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) const;
     json asJSON() override;
     string format(string& tabs) override;
     virtual Function* getIRFunc(const CodeGenMetadata* metadata);

@@ -14,6 +14,7 @@ public:
     string getAsStr() const;
     Value* call(CodeGenMetadata* metadata) const;
     Value* resolveVirtualFunc(CodeGenMetadata* metadata) const;
+    Value* getRefIRValue() const;
     string getName() override;
     string format(string& indentStr) override;
     void createIRStmt(CodeGenMetadata* metadata) override;

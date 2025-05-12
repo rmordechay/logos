@@ -54,7 +54,6 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsFuncSymbol* funcFamily);
     LgsSymbol* clone() const;
     Location* getLocation() const;
-    llvm::Value* getIRValue() const;
     json asJSON() const;
     ~LgsSymbol() = default;
 };

@@ -6,7 +6,6 @@
 void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);
     startBlock(metadata, entryBlock);
-    getIRFunc(metadata);
     stmtBlock->createIRValue(metadata);
     if (funcType.rt->isVoidType) {
         metadata->builder.CreateRetVoid();
@@ -16,7 +15,7 @@ void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
 
 Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     vector<Value*> argValues;
-    const auto isObjReturn = setIRArgs(metadata, argValues, args);
+    const auto isObjReturn = setFuncCallIRArgs(metadata, argValues, args);
     const auto IRFuncType = getIRFuncType(metadata);
     const auto IRFunc = IRValue ? IRValue : getIRFunc(metadata);
     const auto funcCall = metadata->builder.CreateCall(IRFuncType, IRFunc, argValues);
@@ -57,9 +56,10 @@ FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {
     if (IRFuncType) return IRFuncType;
     vector<Type*> IRParamsTypes;
     for (int i = 0; i < funcType.params.size(); ++i) {
-        auto paramIRType = funcType.params[i]->type->getIRType();
+        const auto paramType = funcType.params[i]->type;
+        auto paramIRType = paramType->getIRType();
         // TODO make generic
-        if (funcType.params[i]->type->asInterface()) {
+        if (paramType->asInterface()) {
             paramIRType = paramIRType->getPointerTo();
         }
         IRParamsTypes.emplace_back(paramIRType);
@@ -72,11 +72,12 @@ FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {
     } else {
         rt = funcType.rt->getIRType();
     }
-    IRFuncType = FunctionType::get(rt, IRParamsTypes, false);
+
+    IRFuncType = FunctionType::get(rt, IRParamsTypes, funcType.isVariadic);
     return IRFuncType;
 }
 
-bool LgsFunc::setIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) const {
+bool LgsFunc::setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) const {
     bool isObjReturn = false;
     if (const auto obj = funcType.rt->asObject()) {
         const auto objRtPtr = metadata->builder.CreateAlloca(obj->getIRType(), nullptr);

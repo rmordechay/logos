@@ -28,6 +28,8 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) override;
     bool equals(const LgsFuncCall* other) const;
+    bool equalsVariadic(const LgsFuncCall* funcCall) const;
+    bool equalsDefaultParams(const LgsFuncCall* funcCall) const;
     static string getComposedName(const string& name, const string& parentName, const vector<string>& argTypeNames);
     ~LgsFuncType() override = default;
 };

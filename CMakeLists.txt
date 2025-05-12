@@ -194,6 +194,7 @@ add_library(lib
     src/symbols/types/primitives/LgsLong.cpp
     src/symbols/exprs/unary/constants/LgsLongConst.cpp
     src/symbols/types/LgsIterable.cpp
+    src/symbols/types/str/LgsStrMethods.cpp
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")

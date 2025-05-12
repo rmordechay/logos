@@ -32,6 +32,21 @@ bool LgsFuncType::equals(const LgsFuncCall* other) const {
     return true;
 }
 
+bool LgsFuncType::equalsVariadic(const LgsFuncCall* funcCall) const {
+    return true;
+}
+
+bool LgsFuncType::equalsDefaultParams(const LgsFuncCall* funcCall) const {
+    const auto argsSize = funcCall->args.size();
+    for (size_t i = funcCall->func->funcType.isMethod; i < params.size(); ++i) {
+        const auto param = params[i];
+        if (i >= argsSize) continue;
+        const auto arg = funcCall->args[i];
+        if (!param->type->equals(arg->type)) return false;
+    }
+    return true;
+}
+
 string LgsFuncType::getIRName() {
     if (IRName != "") return IRName;
     vector<string> paramTypeNames;

@@ -1,5 +1,6 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "builtin/LgsPrint.h"
+#include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsVariable.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsVarDec.h"
@@ -11,7 +12,7 @@ Value* LgsFuncCall::call(CodeGenMetadata* metadata) const {
         const auto virtualFunc = resolveVirtualFunc(metadata);
         func->setIRValue(virtualFunc);
     } else if (ref) {
-        func->setIRValue(ref->getIRValue());
+        func->setIRValue(getRefIRValue());
     }
     return func->call(metadata, args);
 }
@@ -45,6 +46,22 @@ Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata) const {
     const auto getValuePtr = builder.CreateAlloca(ptrTy);
     builder.CreateStore(rv, getValuePtr);
     return builder.CreateLoad(ptrTy, builder.CreateLoad(ptrTy, getValuePtr));
+}
+
+Value* LgsFuncCall::getRefIRValue() const {
+    switch (ref->type) {
+    case VAR_DEC:
+        return ref->varDec->expr->IRValue;
+    case PARAM:
+        return ref->param->IRValue;
+    case FIELD:
+        return ref->field->IRValue;
+    case ENUM_FIELD:
+        return ref->enumField->IRValue;
+    case UNKNOWN:
+    default:
+        assert(false);
+    }
 }
 
 string LgsFuncCall::getAsStr() const {

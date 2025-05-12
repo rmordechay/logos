@@ -93,7 +93,7 @@ public:
     void setIterIndexType(LgsIterIndex* iterIndex) const;
 
     LgsFunc* resolveMethodCall(const vector<LgsMethodImpl*>& overloads, LgsFuncCall* methodCall, const string& parentName);
-    bool resolveFuncCallWithDefaultParams(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
+    bool isFuncCall(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
     bool isFuncCallEqual(const LgsFuncType* funcType, LgsFuncCall* funcCall);
     bool isFuncCallEqual(LgsFunc* func, LgsFuncCall* funcCall) const;
     bool checkExprType(LgsExpr* expr, LgsType* type);

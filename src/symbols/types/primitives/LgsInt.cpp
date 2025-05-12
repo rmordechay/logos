@@ -18,7 +18,7 @@ string LgsInt::getIRName() {
     return name;
 }
 
-string LgsInt::getFormatStr() {
+string LgsInt::getStrFormatPart() {
     return "%d";
 }
 

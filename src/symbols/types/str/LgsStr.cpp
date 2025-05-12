@@ -1,4 +1,5 @@
 #include "types/str/LgsStr.h"
+#include "LgsDefinitions.h"
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "types/primitives/LgsChar.h"
@@ -19,8 +20,8 @@ string LgsStr::prettyName() const {
     return name;
 }
 
-string LgsStr::getFormatStr() {
-    return "%d";
+string LgsStr::getStrFormatPart() {
+    return "%s";
 }
 
 LgsExpr* LgsStr::getZeroValue() {
@@ -49,3 +50,4 @@ uint32_t LgsStr::hashString(const string& str) {
     }
     return hash;
 }
+
