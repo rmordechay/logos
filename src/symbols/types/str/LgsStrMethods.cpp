@@ -8,7 +8,10 @@
 void replaceNextPlaceholder(string& str, const LgsExpr* expr) {
     const auto pos = str.find(LOGOS_STR_FORMAT_PART);
     if (pos == string::npos) return;
-    str.replace(pos, 2, expr->type->getStrFormatPart());
+    if (expr->type->asBool()) {
+
+    }
+    str.replace(pos, 2, expr->getStrFormatPart());
 }
 
 string getBaseStr(LgsExpr* baseExpr) {

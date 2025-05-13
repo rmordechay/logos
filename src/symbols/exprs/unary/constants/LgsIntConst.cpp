@@ -2,6 +2,10 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 
+string LgsIntConst::getStrFormatPart() const {
+    return to_string(value);
+}
+
 Value* LgsIntConst::createIRValue(CodeGenMetadata* metadata) {
     return metadata->builder.getInt32(value);
 }
@@ -10,7 +14,7 @@ LgsExpr* LgsIntConst::castStatically(LgsType* other) {
     if (dynamic_cast<LgsStr*>(other)) {
         return new LgsStrConst(to_string(value));
     }
-    return nullptr;
+    assert(false);
 }
 
 Value* LgsIntConst::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {

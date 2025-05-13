@@ -3,198 +3,32 @@ project(logos VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_UNITY_BUILD ON)
+set(CMAKE_UNITY_BUILD_BATCH_SIZE 10)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
-include_directories(
-    external/include
-    external/include/antlr4-runtime
-    include
-    include/logos
-    include/data
-    include/cli
-    include/files
-    include/codegen
-    include/analysis
-    include/symbols
-    include/parser
-    include/utils
-)
+include(ProcessorCount)
+ProcessorCount(CPU_COUNT)
+set(CMAKE_BUILD_PARALLEL_LEVEL ${CPU_COUNT})
 
-add_library(lib
-    # headers
-    include/analysis/AntlrConverter.h
-    include/analysis/SemaAnalyser.h
-    include/cli/LgsCli.h
-    include/cli/LgsCmd.h
-    include/cli/LgsGenerateCmd.h
-    include/cli/LgsRunCmd.h
-    include/codegen/CodeGenerator.h
-    include/codegen/CodeGenMetadata.h
-    include/codegen/LgsLinker.h
-    include/data/LgsDefinitions.h
-    include/data/LgsErrors.h
-    include/data/LgsWarnings.h
-    include/files/LgsAppFile.h
-    include/files/LgsEnvFile.h
-    include/files/LgsFile.h
-    include/files/LgsInterfaceFile.h
-    include/files/LgsMainFile.h
-    include/files/LgsObjectFile.h
-    include/logos/Logos.h
-    include/logos/LgsActiveEnv.h
-    include/logos/Platform.h
-    include/logos/LgsErrHandler.h
-    include/logos/LgsGlobals.h
-    include/logos/LgsProject.h
-    include/logos/LgsStack.h
-    include/logos/LgsConfig.h
-    include/parser/LogosLexer.h
-    include/parser/LogosParser.h
-    include/utils/LgsC.h
-    include/utils/ThreadPool.h
+file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS include/*.h)
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
+add_library(lib ${HEADER_FILES} ${SOURCE_FILES})
 
-    # Symbols headers
-    include/symbols/LgsSymbol.h
-    include/symbols/LgsValue.h
-    include/symbols/exprs/LgsCast.h
-    include/symbols/exprs/LgsExpr.h
-    include/symbols/exprs/LgsNull.h
-    include/symbols/exprs/binary/LgsBinaryExpr.h
-    include/symbols/exprs/unary/constants/LgsBoolConst.h
-    include/symbols/exprs/unary/constants/LgsCharConst.h
-    include/symbols/exprs/unary/constants/LgsConstExpr.h
-    include/symbols/exprs/unary/constants/LgsFloatConst.h
-    include/symbols/exprs/unary/constants/LgsIntConst.h
-    include/symbols/exprs/unary/constants/LgsLongConst.h
-    include/symbols/exprs/unary/constants/LgsStrConst.h
-    include/symbols/exprs/unary/constants/LgsTypeConst.h
-    include/symbols/exprs/unary/LgsIterIndex.h
-    include/symbols/exprs/unary/LgsDArray.h
-    include/symbols/exprs/unary/LgsEnumField.h
-    include/symbols/exprs/unary/LgsFuncCall.h
-    include/symbols/exprs/unary/LgsInstance.h
-    include/symbols/exprs/unary/LgsSArray.h
-    include/symbols/exprs/unary/LgsSelection.h
-    include/symbols/exprs/unary/LgsUnaryExpr.h
-    include/symbols/exprs/unary/LgsVariable.h
-    include/symbols/exprs/unary/LgsHashMap.h
-    include/symbols/exprs/unary/vectors/LgsVec2.h
-    include/symbols/exprs/unary/vectors/LgsVec3.h
-    include/symbols/exprs/unary/vectors/LgsVec4.h
-    include/symbols/funcs/LgsFunc.h
-    include/symbols/funcs/LgsFuncImpl.h
-    include/symbols/funcs/LgsMethodImpl.h
-    include/symbols/funcs/LgsParam.h
-    include/symbols/loops/LgsForeachLoop.h
-    include/symbols/loops/LgsRangeLoop.h
-    include/symbols/stmts/LgsAssignment.h
-    include/symbols/stmts/LgsBreakStmt.h
-    include/symbols/stmts/LgsContinueStmt.h
-    include/symbols/stmts/LgsField.h
-    include/symbols/stmts/LgsIfStmt.h
-    include/symbols/stmts/LgsPatternMatch.h
-    include/symbols/stmts/LgsReturn.h
-    include/symbols/stmts/LgsStmtBlock.h
-    include/symbols/stmts/LgsVarDec.h
-    include/symbols/builtin/LgsPrint.h
-    include/symbols/types/LgsAny.h
-    include/symbols/types/LgsEnum.h
-    include/symbols/types/LgsFuncType.h
-    include/symbols/types/LgsInterface.h
-    include/symbols/types/LgsIterable.h
-    include/symbols/types/LgsObject.h
-    include/symbols/types/LgsType.h
-    include/symbols/types/LgsPair.h
-    include/symbols/types/LgsUnknownType.h
-    include/symbols/types/str/LgsStr.h
-    include/symbols/types/str/LgsStrMethods.h
-    include/symbols/types/array/LgsArray.h
-    include/symbols/types/array/LgsArrayMethods.h
-    include/symbols/types/map/LgsMap.h
-    include/symbols/types/map/LgsMapMethods.h
-    include/symbols/types/primitives/LgsBool.h
-    include/symbols/types/primitives/LgsChar.h
-    include/symbols/types/primitives/LgsFloat.h
-    include/symbols/types/primitives/LgsInt.h
-    include/symbols/types/primitives/LgsVoid.h
-    include/symbols/types/primitives/LgsLong.h
 
-    # src
-    src/analysis/AntlrConverter.cpp
-    src/analysis/SemaAnalyser.cpp
-    src/cli/LgsCli.cpp
-    src/cli/LgsCli.cpp
-    src/cli/LgsGenerateCmd.cpp
-    src/cli/LgsRunCmd.cpp
-    src/codegen/CodeGenerator.cpp
-    src/codegen/LgsLinker.cpp
-    src/logos/LgsErrHandler.cpp
-    src/logos/LgsProject.cpp
-    src/logos/LgsStack.cpp
-    src/logos/Logos.cpp
-    src/parser/LogosLexer.cpp
-    src/parser/LogosParser.cpp
-    src/utils/LgsC.cpp
-    src/utils/ThreadPool.cpp
-
-    # Symbols src
-    src/symbols/builtin/LgsPrint.cpp
-    src/symbols/exprs/binary/LgsBinaryExpr.cpp
-    src/symbols/exprs/LgsCast.cpp
-    src/symbols/exprs/LgsExpr.cpp
-    src/symbols/exprs/unary/constants/LgsBoolConst.cpp
-    src/symbols/exprs/unary/constants/LgsCharConst.cpp
-    src/symbols/exprs/unary/constants/LgsFloatConst.cpp
-    src/symbols/exprs/unary/constants/LgsIntConst.cpp
-    src/symbols/exprs/unary/constants/LgsSArray.cpp
-    src/symbols/exprs/unary/constants/LgsStrConst.cpp
-    src/symbols/exprs/unary/constants/LgsTypeConst.cpp
-    src/symbols/exprs/unary/LgsIterIndex.cpp
-    src/symbols/exprs/unary/LgsDArray.cpp
-    src/symbols/exprs/unary/LgsEnumField.cpp
-    src/symbols/exprs/unary/LgsFuncCall.cpp
-    src/symbols/exprs/unary/LgsInstance.cpp
-    src/symbols/exprs/unary/LgsSelection.cpp
-    src/symbols/exprs/unary/LgsVariable.cpp
-    src/symbols/exprs/unary/LgsHashMap.cpp
-    src/symbols/funcs/LgsFunc.cpp
-    src/symbols/funcs/LgsFuncImpl.cpp
-    src/symbols/funcs/LgsMethodImpl.cpp
-    src/symbols/funcs/LgsParam.cpp
-    src/symbols/LgsSymbol.cpp
-    src/symbols/LgsValue.cpp
-    src/symbols/loops/LgsForeachLoop.cpp
-    src/symbols/loops/LgsLoop.cpp
-    src/symbols/loops/LgsRangeLoop.cpp
-    src/symbols/stmts/LgsAssignment.cpp
-    src/symbols/stmts/LgsBreakStmt.cpp
-    src/symbols/stmts/LgsContinueStmt.cpp
-    src/symbols/stmts/LgsField.cpp
-    src/symbols/stmts/LgsIfStmt.cpp
-    src/symbols/stmts/LgsPatternMatch.cpp
-    src/symbols/stmts/LgsReturn.cpp
-    src/symbols/stmts/LgsStmt.cpp
-    src/symbols/stmts/LgsStmtBlock.cpp
-    src/symbols/stmts/LgsVarDec.cpp
-    src/symbols/types/LgsAny.cpp
-    src/symbols/types/array/LgsArray.cpp
-    src/symbols/types/primitives/LgsBool.cpp
-    src/symbols/types/primitives/LgsChar.cpp
-    src/symbols/types/LgsEnum.cpp
-    src/symbols/types/primitives/LgsFloat.cpp
-    src/symbols/types/LgsFuncType.cpp
-    src/symbols/types/primitives/LgsInt.cpp
-    src/symbols/types/LgsInterface.cpp
-    src/symbols/types/LgsObject.cpp
-    src/symbols/types/str/LgsStr.cpp
-    src/symbols/types/LgsType.cpp
-    src/symbols/types/primitives/LgsVoid.cpp
-    src/symbols/types/map/LgsMap.cpp
-    src/symbols/types/LgsUnknownType.cpp
-    src/symbols/types/primitives/LgsLong.cpp
-    src/symbols/exprs/unary/constants/LgsLongConst.cpp
-    src/symbols/types/LgsIterable.cpp
-    src/symbols/types/str/LgsStrMethods.cpp
+target_include_directories(lib PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/analysis
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/cli
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/codegen
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/data
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/files
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/logos
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/utils
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -218,4 +52,4 @@ endif()
 
 add_executable(lgs main.cpp)
 target_link_libraries(lgs PRIVATE lib)
-#add_subdirectory(tests)
+# add_subdirectory(tests)

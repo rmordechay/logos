@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 
+class LgsBool;
 using namespace std;
 using namespace llvm;
 class LgsMap;
@@ -34,6 +35,7 @@ public:
     vector<LgsMethodImpl*> getAllMethods() const;
     void setLocation(const antlr4::Token* ctx);
 
+    LgsBool* asBool();
     LgsStr* asStr();
     LgsInt* asInt();
     LgsMap* asMap();
@@ -47,7 +49,6 @@ public:
     virtual bool equals(LgsType& other);
     virtual bool isIndexable(LgsType* indexType);
     virtual json asJSON() const;
-    virtual string getStrFormatPart();
 
     virtual Type* getIRType() = 0;
     virtual string getIRName() = 0;

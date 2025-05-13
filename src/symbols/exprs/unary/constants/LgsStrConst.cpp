@@ -3,6 +3,10 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 
+string LgsStrConst::getStrFormatPart() const {
+    return value;
+}
+
 Value* LgsStrConst::createIRValue(CodeGenMetadata* metadata) {
     for (auto& global : metadata->module->globals()) {
         if (!global.isConstant() || !global.hasInitializer()) continue;

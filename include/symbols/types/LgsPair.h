@@ -22,7 +22,7 @@ inline Type* LgsPair::getIRType() {
 }
 
 inline string LgsPair::getIRName() {
-    assert(false);
+    return name;
 }
 
 inline LgsExpr* LgsPair::getZeroValue() {
@@ -30,7 +30,7 @@ inline LgsExpr* LgsPair::getZeroValue() {
 }
 
 inline string LgsPair::prettyName() const {
-    return '<' + key->prettyName() + ", " + value->prettyName() + '>';
+    return '<' + key->prettyName() + "," + value->prettyName() + '>';
 }
 
 inline bool LgsPair::equals(LgsType* other) {

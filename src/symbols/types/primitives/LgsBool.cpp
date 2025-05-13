@@ -14,10 +14,6 @@ string LgsBool::getIRName() {
     return name;
 }
 
-string LgsBool::getStrFormatPart() {
-    return "%d";
-}
-
 LgsExpr* LgsBool::getZeroValue() {
     if (isNullable) return new LgsNull();
     return new LgsBoolConst(false);

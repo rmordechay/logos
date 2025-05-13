@@ -377,23 +377,38 @@ LgsStmt* AntlerConverter::getPatternMatching(LogosParser::PatternMatchingContext
 }
 
 LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ctx) {
-    const auto stmts = getStmtBlock(ctx->statementsBlock());
     LgsLoop* loopStmt = nullptr;
-    const auto loopVarName = ctx->VARIABLE()[0]->getText();
-    if (const auto iterable = ctx->iterableExpr) {
-        const auto loopVar = new LgsVarDec(loopVarName);
-        loopStmt = new LgsForeachLoop({loopVar}, getUnaryExpr(iterable), stmts);
-    } else if (const auto range = ctx->iterableRange) {
-        const auto startExpr = getExpr(range->start);
-        const auto loopVar = new LgsVarDec(loopVarName, startExpr);
-        loopVar->type = startExpr->type;
-        loopStmt = new LgsRangeLoop({loopVar}, startExpr, getExpr(range->end), stmts);
+    if (ctx->iterableExpr) {
+        loopStmt = getForeachLoop(ctx);
+    } else if (ctx->iterableRange) {
+        loopStmt = getRangeLoop(ctx);
     } else {
         assert(false && "No loop statements found");
     }
-
+    loopStmt->stmtBlock = getStmtBlock(ctx->statementsBlock());
     loopStmt->setLocation(ctx->start);
     return loopStmt;
+}
+
+LgsForeachLoop* AntlerConverter::getForeachLoop(LogosParser::LoopStatementContext* ctx) {
+    const auto forLoop = new LgsForeachLoop(getUnaryExpr(ctx->iterableExpr));
+    for (const auto variable : ctx->VARIABLE()) {
+        const auto loopVarName = variable->getText();
+        forLoop->loopVars.emplace_back(new LgsVarDec(loopVarName));
+    }
+    return forLoop;
+}
+
+LgsRangeLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx) {
+    const auto startExpr = getExpr(ctx->iterableRange->start);
+    const auto endExpr = getExpr(ctx->iterableRange->end);
+    const auto forLoop = new LgsRangeLoop(startExpr, endExpr);
+    for (const auto variable : ctx->VARIABLE()) {
+        const auto loopVarName = variable->getText();
+        auto loopVarDec = new LgsVarDec(loopVarName, startExpr->type);
+        forLoop->loopVars.emplace_back(loopVarDec);
+    }
+    return forLoop;
 }
 
 LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {

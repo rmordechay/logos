@@ -8,6 +8,7 @@ public:
     int value;
 
     explicit LgsIntConst(const int value) : LgsConstExpr(&LGS_INT), value(value) {}
+    string getStrFormatPart() const override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     LgsExpr* castStatically(LgsType* other) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;

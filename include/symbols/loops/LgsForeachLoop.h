@@ -9,7 +9,7 @@ class LgsForeachLoop final : public LgsLoop {
 public:
     LgsUnaryExpr* iterExpr = nullptr;
 
-    LgsForeachLoop(const vector<LgsVarDec*>& loopVars, LgsUnaryExpr* iterable, LgsStmtBlock* stmtBlock) : LgsLoop(loopVars, stmtBlock), iterExpr(iterable) {}
+    explicit LgsForeachLoop(LgsUnaryExpr* iterable) : iterExpr(iterable) {}
     int loopStart() override;
     int loopEnd() override;
     void setIRLoopVariable(CodeGenMetadata* metadata) override;

@@ -131,8 +131,8 @@ pattern:
     ;
 
 loopStatement:
-        FOR VARIABLE (COMMA VARIABLE)* IN iterableRange=range statementsBlock
-    |   FOR VARIABLE (COMMA VARIABLE)* IN iterableExpr=unaryExpr statementsBlock
+        FOR VARIABLE (COMMA VARIABLE)* COMMA? IN iterableRange=range statementsBlock
+    |   FOR VARIABLE (COMMA VARIABLE)* COMMA? IN iterableExpr=unaryExpr statementsBlock
     |   FOR VARIABLE? statementsBlock
     ;
 
@@ -254,7 +254,9 @@ innerSelectionElement:
     ;
 
 range:
-        start=expr? DOUBLE_DOT end=expr
+        start=expr DOUBLE_DOT end=expr
+    |   DOUBLE_DOT end=expr
+    |   start=expr DOUBLE_DOT
     ;
 
 type:

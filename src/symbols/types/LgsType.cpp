@@ -8,6 +8,7 @@
 #include "types/array/LgsArray.h"
 #include "types/map/LgsMap.h"
 #include "types/LgsUnknownType.h"
+#include "types/primitives/LgsBool.h"
 
 bool LgsType::equals(LgsType& other) {
     return getIRName() == other.getIRName();
@@ -22,10 +23,6 @@ size_t LgsType::getSize() {
 }
 
 json LgsType::asJSON() const {
-    assert(false);
-}
-
-string LgsType::getStrFormatPart() {
     assert(false);
 }
 
@@ -73,6 +70,10 @@ vector<LgsMethodImpl*> LgsType::getAllMethods() const {
 void LgsType::setLocation(const antlr4::Token* ctx) {
     location.lineNumber = ctx->getLine();
     location.posInLine = ctx->getCharPositionInLine() + 1;
+}
+
+LgsBool* LgsType::asBool() {
+    return dynamic_cast<LgsBool*>(this);
 }
 
 LgsObject* LgsType::asObject() {

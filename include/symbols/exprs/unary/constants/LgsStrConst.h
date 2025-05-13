@@ -14,6 +14,8 @@ public:
         strType.isStatic = true;
         strType.sizes = {value.size()};
     }
+
+    string getStrFormatPart() const override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;

@@ -26,6 +26,10 @@ void LgsExpr::initIRValue(CodeGenMetadata* metadata) {
     assert(IRValue);
 }
 
+string LgsExpr::getStrFormatPart() const {
+    assert(false);
+}
+
 LgsExpr* LgsExpr::castStatically(LgsType* other) {
     assert(false);
 }

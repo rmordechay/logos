@@ -20,7 +20,6 @@ public:
     Value* iPtr = nullptr;
     Value* iValue = nullptr;
 
-    LgsLoop(const vector<LgsVarDec*>& loopVars, LgsStmtBlock* stmtBlock) : loopVars(loopVars), stmtBlock(stmtBlock) {}
     void createIRStmt(CodeGenMetadata* metadata) override;
     void initIRLoop(CodeGenMetadata* metadata);
     void setLoopIRCondition(CodeGenMetadata* metadata);

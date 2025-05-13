@@ -9,7 +9,6 @@ public:
     size_t getSize() override;
     Type* getIRType() override;
     string getIRName() override;
-    string getStrFormatPart() override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;

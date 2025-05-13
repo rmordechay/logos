@@ -7,6 +7,8 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
+#include "loops/LgsForeachLoop.h"
+#include "loops/LgsRangeLoop.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
 
@@ -46,6 +48,8 @@ public:
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
     LgsLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
+    LgsForeachLoop* getForeachLoop(LogosParser::LoopStatementContext* ctx);
+    LgsRangeLoop* getRangeLoop(LogosParser::LoopStatementContext* ctx);
     LgsEnum* getEnum(LogosParser::EnumDeclarationContext* ctx);
     LgsExpr* getExpr(LogosParser::ExprContext* ctx, bool isNullable = false);
     LgsExpr* getCast(LogosParser::ExprContext* ctx);
