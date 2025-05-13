@@ -10,8 +10,8 @@ public:
     LgsUnaryExpr* iterExpr = nullptr;
 
     explicit LgsForeachLoop(LgsUnaryExpr* iterable) : iterExpr(iterable) {}
-    int loopStart() override;
-    int loopEnd() override;
+    Value* loopStart(CodeGenMetadata* metadata) override;
+    Value* loopEnd(CodeGenMetadata* metadata) override;
     void setIRLoopVariable(CodeGenMetadata* metadata) override;
     ~LgsForeachLoop() override;
 };

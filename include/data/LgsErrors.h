@@ -55,6 +55,6 @@ inline LgsError E10037{.msg = "Left-hand index of slice must be less than right-
 inline LgsError E10038{.msg = "'continue' must be inside a loop statement.", .errCode = ++errCodeStart};
 inline LgsError E10039{.msg = "main() function accepts only one optional parameter of type 'Str[]'.", .errCode = ++errCodeStart};
 inline LgsError E10040{.msg = "The number of variables in the for loop (%s) do not match the number of the iterable's returned values (%s).", .errCode = ++errCodeStart};
-inline LgsError E10041{.msg = "Static array size must be a constant of type Int or any implicit type of Int. Given: '%s'.", .errCode = ++errCodeStart};
+//inline LgsError E10041{.msg = "Static array size must be a constant of type Int or any implicit type of Int. Given: '%s'.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

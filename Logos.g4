@@ -262,9 +262,13 @@ range:
 type:
         SELF_CLASS
    |    TYPE QUEST_MARK?
-   |    TYPE (LBRACK expr? RBRACK)+  // Array
+   |    TYPE (arrTypeSize)+  // Array
    |    LBRACE key=type COLON value=type RBRACE // Map
    ;
+
+arrTypeSize:
+        LBRACK expr? RBRACK
+    ;
 
 vector:
         (VEC2 | VEC3 | VEC4) LPAREN (expr (COMMA expr)* COMMA?)? RPAREN

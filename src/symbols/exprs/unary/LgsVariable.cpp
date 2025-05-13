@@ -26,8 +26,11 @@ string LgsVariable::getStrFormatPart() const {
 Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
     assert(ref);
     switch (ref->type) {
-    case VAR_DEC:
-        return ref->varDec->expr->getIRValue(metadata);
+    case VAR_DEC: {
+        const auto varDec = ref->varDec;
+        if (varDec->IRValue) return varDec->IRValue;
+        return varDec->expr->getIRValue(metadata);
+    }
     case PARAM:
         assert(ref->param->IRValue);
         return ref->param->IRValue;
@@ -132,6 +135,15 @@ uint32_t LgsVariable::hashValue(CodeGenMetadata* metadata) {
         return ref->field->expr->hashValue(metadata);
     case ENUM_FIELD:
         return LgsStr::hashString(ref->enumField->name);
+    default:
+        assert(false);
+    }
+}
+
+Value* LgsVariable::getLength(CodeGenMetadata* metadata) {
+    switch (ref->type) {
+    case VAR_DEC:
+        return ref->varDec->expr->getLength(metadata);
     default:
         assert(false);
     }

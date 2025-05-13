@@ -14,7 +14,7 @@ bool LgsType::equals(LgsType& other) {
     return getIRName() == other.getIRName();
 }
 
-bool LgsType::isIndexable(LgsType* indexType) {
+bool LgsType::canIndexTo(LgsType* indexType) {
     return false;
 }
 
@@ -72,42 +72,13 @@ void LgsType::setLocation(const antlr4::Token* ctx) {
     location.posInLine = ctx->getCharPositionInLine() + 1;
 }
 
-LgsBool* LgsType::asBool() {
-    return dynamic_cast<LgsBool*>(this);
-}
-
-LgsObject* LgsType::asObject() {
-    return dynamic_cast<LgsObject*>(this);
-}
-
-LgsInterface* LgsType::asInterface() {
-    return dynamic_cast<LgsInterface*>(this);
-}
-
-LgsIterable* LgsType::asIterable() {
-    return dynamic_cast<LgsIterable*>(this);
-}
-
-LgsArray* LgsType::asArray() {
-    return dynamic_cast<LgsArray*>(this);
-}
-
-LgsFuncType* LgsType::asFuncType() {
-    return dynamic_cast<LgsFuncType*>(this);
-}
-
-bool LgsType::isUnknown() {
-    return dynamic_cast<LgsUnknownType*>(this);
-}
-
-LgsStr* LgsType::asStr() {
-    return dynamic_cast<LgsStr*>(this);
-}
-
-LgsInt* LgsType::asInt() {
-    return dynamic_cast<LgsInt*>(this);
-}
-
-LgsMap* LgsType::asMap() {
-    return dynamic_cast<LgsMap*>(this);
-}
+LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
+LgsObject* LgsType::asObject() { return dynamic_cast<LgsObject*>(this); }
+LgsInterface* LgsType::asInterface() { return dynamic_cast<LgsInterface*>(this); }
+LgsIterable* LgsType::asIterable() { return dynamic_cast<LgsIterable*>(this); }
+LgsArray* LgsType::asArray() { return dynamic_cast<LgsArray*>(this); }
+LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
+LgsStr* LgsType::asStr() { return dynamic_cast<LgsStr*>(this); }
+LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }
+LgsMap* LgsType::asMap() { return dynamic_cast<LgsMap*>(this); }
+bool LgsType::isUnknown() { return dynamic_cast<LgsUnknownType*>(this); }

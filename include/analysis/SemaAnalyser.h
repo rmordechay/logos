@@ -21,7 +21,7 @@ class LgsIterIndex;
 class LgsSelection;
 class LgsFuncCall;
 class LgsBinaryExpr;
-class LgsDArray;
+class LgsArrayExpr;
 class LgsIfStmt;
 class LgsAssignment;
 class LgsLoop;
@@ -51,6 +51,7 @@ public:
     void visitStmt(LgsStmt* stmt);
     void visitStmtBlock(LgsStmtBlock* stmtBlock);
     void visitAssignment(const LgsAssignment* assignment);
+    void visitAssignIterIndex(const LgsIterIndex* iterIndex, LgsExpr* expr) const;
     void visitVarDec(LgsVarDec* varDec);
     void visitIfStmt(LgsIfStmt* ifStmt);
     void visitPatternMatch(const LgsPatternMatch* patternMatching);
@@ -64,9 +65,9 @@ public:
     void visitEnum(const LgsEnum* lgsEnum) const;
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
-    void visitDArray(LgsDArray* array);
-    void visitSArray(LgsSArray* array);
+    void visitArrayExpr(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap) const;
+    void visitStrConst(LgsStrConst* strConst) const;
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
@@ -75,21 +76,20 @@ public:
     void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
-    void visitFieldCall(const LgsExpr* parentExpr, LgsVariable* childField);
+    void visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* childField);
     void visitFirstSelection(LgsExpr* firstExpr);
     void visitInstance(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex);
 
-    void setExprType(LgsExpr* expr, LgsType* type);
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
-    void setIterIndexType(LgsIterIndex* iterIndex) const;
+    void setIterIndexType(LgsIterIndex* iterIndex);
 
     LgsFunc* resolveMethodCall(const vector<LgsMethodImpl*>& overloads, LgsFuncCall* methodCall, const string& parentName);
     bool isFuncCall(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
     bool isFuncCallEqual(const LgsFuncType* funcType, LgsFuncCall* funcCall);
     bool isFuncCallEqual(LgsFunc* func, LgsFuncCall* funcCall) const;
-    bool checkExprType(LgsExpr* expr, LgsType* type);
+    bool validateExprType(const LgsExpr* expr, LgsType* type);
     void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 
@@ -97,6 +97,7 @@ public:
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
 
     LgsType* resolveType(LgsType* type);
+    LgsType* resolveArrayType(LgsArray* array);
     void resolveFuncTypes(LgsFuncType* signature);
     void resolveObjMemberTypes(LgsObject* const& obj);
     void resolveObjectImplements(LgsObject* obj);

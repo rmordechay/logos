@@ -13,6 +13,7 @@ class LgsFunc : public LgsValue {
 public:
     string path;
     LgsFuncType funcType;
+    vector<LgsVariable*> refs;
     LgsStmtBlock* stmtBlock = nullptr;
     FunctionType* IRFuncType = nullptr;
     BasicBlock* entryBlock = BasicBlock::Create(context, "entry");

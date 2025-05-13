@@ -9,7 +9,7 @@ class LgsVariable;
 class LgsSelection;
 class LgsInstance;
 class LgsIterIndex;
-class LgsDArray;
+class LgsArrayExpr;
 class LgsSArray;
 class LgsBoolConst;
 class LgsCharConst;
@@ -28,13 +28,14 @@ public:
     explicit LgsExpr(LgsType* type) : type(type) {}
     Value* getIRValue(CodeGenMetadata* metadata);
     void initIRValue(CodeGenMetadata* metadata);
+    void setType(LgsType* type);
+    bool isGEP() const;
     LgsVariable* asVariable();
     LgsFuncCall* asFuncCall();
-    LgsIterIndex* asArrayIndex();
+    LgsIterIndex* asIterIndex();
     LgsInstance* asInstance();
     LgsSelection* asSelection();
-    LgsDArray* asDArray();
-    LgsSArray* asSArray();
+    LgsArrayExpr* asArrayExpr();
     LgsHashMap* asHashMap();
     LgsBoolConst* asBoolConst();
     LgsCharConst* asCharConst();
@@ -45,7 +46,9 @@ public:
     LgsTypeConst* asTypeConst();
     virtual string prettyName();
     virtual string getStrFormatPart() const;
-    virtual LgsExpr* castStatically(LgsType* other);
+    virtual void castExpr(LgsType* other);
+    virtual LgsExpr* convertExpr(LgsType* other);
+    virtual Value* getLength(CodeGenMetadata* metadata);
     virtual uint32_t hashValue(CodeGenMetadata* metadata);
     virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
     virtual Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) = 0;
@@ -65,6 +68,7 @@ public:
     virtual Value* bitXorIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* rshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* lshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual LgsExpr* clone();
     ~LgsExpr() override = default;
 };
 

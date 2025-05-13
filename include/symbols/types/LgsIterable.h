@@ -7,13 +7,16 @@ struct CodeGenMetadata;
 class LgsIterable : public LgsType {
 public:
     LgsType* baseType;
-    bool isStatic = false;
-    vector<LgsExpr*> sizeExprs;
+    vector<LgsExpr*> dimsExprs;
 
     explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}
+    Type* getIRType() override;
+    int getExprConstNumber(LgsExpr* expr);
     LgsType* inferTypeFromIter(const vector<LgsExpr*>& exprs) const;
+    virtual int getDims();
     virtual LgsType* getBaseType();
     virtual Value* IRLength(CodeGenMetadata* metadata);
+    virtual LgsType* createInnerType(size_t indexRange) const = 0;
     ~LgsIterable() override = default;
 };
 

@@ -7,7 +7,7 @@ void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);
     startBlock(metadata, entryBlock);
     stmtBlock->createIRValue(metadata);
-    if (funcType.rt->isVoidType) {
+    if (funcType.rt->isVoid) {
         metadata->builder.CreateRetVoid();
     }
     metadata->lgsStack.exitScope();
@@ -41,6 +41,7 @@ Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
         args->setName("rt");
         args++;
     }
+
     for (int i = 0; i < funcType.params.size(); ++i) {
         const auto param = funcType.params[i];
         param->setIRValue(args);
@@ -86,8 +87,14 @@ bool LgsFunc::setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argVa
     }
     for (int i = funcType.isStatic; i < args.size(); ++i) {
         const auto arg = args[i];
-        const auto argValue = arg->getIRValue(metadata);
-        argValues.emplace_back(argValue);
+        const auto argIRValue = arg->getIRValue(metadata);
+        const auto artIRType = arg->type->getIRType();
+        if (arg->isGEP()) {
+            const auto value = metadata->builder.CreateLoad(artIRType, argIRValue);
+            argValues.emplace_back(value);
+        } else {
+            argValues.emplace_back(argIRValue);
+        }
     }
     return isObjReturn;
 }

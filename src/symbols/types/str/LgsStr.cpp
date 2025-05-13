@@ -1,19 +1,21 @@
 #include "types/str/LgsStr.h"
-#include "LgsDefinitions.h"
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "types/primitives/LgsChar.h"
+
+int LgsStr::getDims() {
+    return 1;
+}
 
 size_t LgsStr::getSize() {
     return sizeof(void*);
 }
 
-Type* LgsStr::getIRType() {
-    return ptrTy;
-}
-
 string LgsStr::getIRName() {
     return name;
+}
+
+Type* LgsStr::getIRType() {
+    return ptrTy;
 }
 
 string LgsStr::prettyName() const {
@@ -29,9 +31,12 @@ LgsType* LgsStr::inferBinaryType(LgsType* other) {
     return this;
 }
 
+LgsType* LgsStr::createInnerType(size_t indexRange) const {
+    return baseType;
+}
+
 bool LgsStr::equals(LgsType* other) {
     assert(other);
-    if (dynamic_cast<LgsChar*>(other)) return true;
     return name == other->getIRName();
 }
 

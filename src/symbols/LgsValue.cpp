@@ -14,12 +14,11 @@ void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) co
 }
 
 Value* LgsValue::getIRStr(Module* module, const string& value) const {
-    for (auto& gv : module->globals()) {
-        if (!gv.hasInitializer()) continue;
-        const auto ca = dyn_cast<ConstantDataArray>(gv.getInitializer());
-        if (!ca) continue;
-        if (!ca->isCString() || ca->getAsCString() != value) continue;
-        return &gv;
+    for (auto& globals : module->globals()) {
+        if (!globals.hasInitializer()) continue;
+        const auto dataArray = dyn_cast<ConstantDataArray>(globals.getInitializer());
+        if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
+        return &globals;
     }
     const auto strConstant = ConstantDataArray::getString(context, value, true);
     return new GlobalVariable(*module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);

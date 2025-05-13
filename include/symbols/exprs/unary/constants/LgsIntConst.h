@@ -11,7 +11,7 @@ public:
     string getStrFormatPart() const override;
     string prettyName() override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    LgsExpr* castStatically(LgsType* other) override;
+    LgsExpr* convertExpr(LgsType* other) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* neIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* gtIR(CodeGenMetadata* metadata, LgsExpr* other) override;
@@ -25,6 +25,7 @@ public:
     Value* bitXorIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* rshiftIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* lshiftIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    LgsExpr* clone() override;
     ~LgsIntConst() override = default;
 };
 

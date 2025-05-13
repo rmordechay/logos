@@ -19,7 +19,7 @@ public:
 class LgsMapGetFunc final : public LgsMethodImpl {
 public:
     LgsParam self{};
-    LgsParam keyParam{&LGS_STR};
+    LgsParam keyParam{new LgsStr()};
 
     explicit LgsMapGetFunc(LgsType* parent) : LgsMethodImpl("get", parent->getIRName(), &LGS_ANY) {
         self.type = parent;
@@ -30,7 +30,7 @@ public:
 class LgsMapAddFunc final : public LgsMethodImpl {
 public:
     LgsParam self{};
-    LgsParam keyParam{&LGS_STR};
+    LgsParam keyParam{new LgsStr()};
     LgsParam valueParam{&LGS_ANY};
 
     explicit LgsMapAddFunc(LgsType* parent) : LgsMethodImpl("add", parent->getIRName(), &LGS_VOID) {

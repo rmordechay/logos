@@ -3,17 +3,15 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 
+Value* LgsStrConst::getLength(CodeGenMetadata* metadata) {
+    return metadata->builder.getInt32(value.size());
+}
+
 string LgsStrConst::getStrFormatPart() const {
     return value;
 }
 
 Value* LgsStrConst::createIRValue(CodeGenMetadata* metadata) {
-    for (auto& global : metadata->module->globals()) {
-        if (!global.isConstant() || !global.hasInitializer()) continue;
-        const auto* dataArray = dyn_cast<ConstantDataArray>(global.getInitializer());
-        if (!dataArray || !dataArray->isString()) continue;
-        if (dataArray->getAsString().str().c_str() == value) return &global;
-    }
     return getIRStr(metadata->module, value);
 }
 

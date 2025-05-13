@@ -4,9 +4,9 @@
 #include <string>
 #include <map>
 
-class LgsBool;
 using namespace std;
 using namespace llvm;
+class LgsBool;
 class LgsMap;
 class LgsInt;
 class LgsArray;
@@ -21,10 +21,10 @@ class LgsMethodImpl;
 class LgsType {
 public:
     Location location;
+    bool isVoid = false;
+    bool isConst = false;
     bool isNullable = false;
     Type* IRType = nullptr;
-    bool isVoidType = false;
-    bool isConst = false;
     map<string, LgsField*> fields;
     map<string, vector<LgsMethodImpl*>> methods;
 
@@ -48,7 +48,7 @@ public:
 
     virtual size_t getSize();
     virtual bool equals(LgsType& other);
-    virtual bool isIndexable(LgsType* indexType);
+    virtual bool canIndexTo(LgsType* indexType);
     virtual json asJSON() const;
 
     virtual Type* getIRType() = 0;

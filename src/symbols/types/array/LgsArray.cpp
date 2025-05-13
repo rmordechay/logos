@@ -1,17 +1,19 @@
 #include "types/array/LgsArray.h"
-#include "exprs/unary/LgsDArray.h"
-#include "exprs/unary/LgsSArray.h"
+#include "exprs/unary/LgsArrayExpr.h"
+#include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsIntConst.h"
+#include "stmts/LgsField.h"
 
-void LgsArray::setBaseType(const vector<LgsExpr*>& exprs) {
+void LgsArray::inferArrayType(const vector<LgsExpr*>& exprs) {
     baseType = inferTypeFromIter(exprs);
+    dimsExprs = {new LgsIntConst(exprs.size())};
 }
 
 LgsExpr* LgsArray::getZeroValue() {
-    if (!isStatic) return new LgsDArray(baseType);
-    const auto sArray = new LgsSArray(baseType);
-    sArray->arrType.sizeExprs = sizeExprs;
-    return sArray;
+    const auto arr = new LgsArrayExpr(baseType);
+    arr->arrType.dimsExprs = dimsExprs;
+    arr->arrType.isConst = isConst;
+    return arr;
 }
 
 string LgsArray::prettyName() const {
@@ -24,14 +26,8 @@ bool LgsArray::equals(LgsType* other) {
     return baseType->equals(otherArr->baseType);
 }
 
-Type* LgsArray::getIRType() {
-    if (!isStatic) return ptrTy;
-    if (IRType) return IRType;
-    IRType = baseType->getIRType();
-    for (auto sizeExpr = sizeExprs.rbegin(); sizeExpr != sizeExprs.rend(); ++sizeExpr) {
-        IRType = ArrayType::get(IRType, (*sizeExpr)->asIntConst()->value);
-    }
-    return IRType;
+int LgsArray::getDims() {
+    return dimsExprs.size();
 }
 
 string LgsArray::getIRName() {
@@ -42,6 +38,21 @@ LgsType* LgsArray::inferBinaryType(LgsType* other) {
     assert(false);
 }
 
-bool LgsArray::isIndexable(LgsType* indexType) {
+bool LgsArray::canIndexTo(LgsType* indexType) {
     return !!indexType->asInt();
+}
+
+LgsType* LgsArray::createInnerType(const size_t indexRange) const {
+    if (!isConst) assert(false);
+    const auto innerType = new LgsArray(baseType);
+    innerType->isConst = isConst;
+    innerType->dimsExprs = dimsExprs;
+    innerType->dimsExprs.erase(innerType->dimsExprs.begin() + (innerType->dimsExprs.size() - 1 - indexRange));
+    return innerType;
+}
+
+LgsArray::~LgsArray() {
+    for (const auto dimsExpr : dimsExprs) {
+        delete dimsExpr;
+    }
 }

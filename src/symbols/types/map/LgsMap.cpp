@@ -12,8 +12,16 @@ void LgsMap::setBaseType(const vector<LgsMapPair*>& exprs) {
     kvType.value = inferTypeFromIter(valueExprs);
 }
 
+int LgsMap::getDims() {
+    return 1;
+}
+
 Value* LgsMap::IRLength(CodeGenMetadata* metadata) {
     return len.call(metadata);
+}
+
+LgsType* LgsMap::createInnerType(size_t indexRange) const {
+    assert(false);
 }
 
 Type* LgsMap::getIRType() {
@@ -42,7 +50,7 @@ LgsType* LgsMap::inferBinaryType(LgsType* other) {
     assert(false);
 }
 
-bool LgsMap::isIndexable(LgsType* indexType) {
+bool LgsMap::canIndexTo(LgsType* indexType) {
     return kvType.key->equals(indexType);
 }
 

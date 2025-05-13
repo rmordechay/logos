@@ -18,7 +18,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "exprs/unary/LgsInstance.h"
 #include "exprs/unary/LgsSelection.h"
-#include <exprs/unary/LgsDArray.h>
+#include <exprs/unary/LgsArrayExpr.h>
 #include <exprs/unary/LgsIterIndex.h>
 #include <exprs/unary/LgsFuncCall.h>
 #include <exprs/unary/LgsVariable.h>
@@ -98,7 +98,7 @@ void AntlerConverter::setMainFunc(LgsMainFile* mainFile, LogosParser::FuncImplem
     bool isValid;
     if (params.size() == 1) {
         const auto arr = params[0]->type->asArray();
-        isValid = arr && !arr->isStatic && arr->baseType->asStr();
+        isValid = arr && !arr->isConst && arr->baseType->asStr();
     } else {
         isValid = params.empty();
     }
@@ -284,17 +284,16 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     return nullptr;
 }
 
-
 LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ctx) {
     const auto assignment = new LgsAssignment();
-    assignment->rvalue = getExpr(ctx->expr());
+    assignment->rValue = getExpr(ctx->expr());
 
     if (const auto variable = ctx->VARIABLE()) {
-        assignment->lvalue = getVariable(variable->getText(), ctx);
+        assignment->lValue = getVariable(variable->getText(), ctx);
     } else if (const auto arrayIndex = ctx->arrayIndex()) {
-        assignment->lvalue = getIterIndex(arrayIndex);
+        assignment->lValue = getIterIndex(arrayIndex);
     } else if (const auto selection = ctx->selection()) {
-        assignment->lvalue = getSelection(selection);
+        assignment->lValue = getSelection(selection);
     } else {
         assert(false);
     }
@@ -381,21 +380,40 @@ LgsStmt* AntlerConverter::getPatternMatching(LogosParser::PatternMatchingContext
 LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ctx) {
     LgsLoop* loopStmt = nullptr;
     if (ctx->iterableExpr) {
-        loopStmt = new LgsForeachLoop(getUnaryExpr(ctx->iterableExpr));
+        loopStmt = getForeachLoop(ctx);
     } else if (ctx->iterableRange) {
-        loopStmt = new LgsRangeLoop(getExpr(ctx->iterableRange->start), getExpr(ctx->iterableRange->end));
+        loopStmt = getRangeLoop(ctx);
     } else {
         assert(false && "No loop statements found");
     }
 
-    for (const auto variable : ctx->VARIABLE()) {
-        const auto loopVarName = variable->getText();
-        loopStmt->loopVars.emplace_back(new LgsVarDec(loopVarName));
-        loopStmt->loopVar.emplace_back(new LgsVariable(loopVarName));
-    }
     loopStmt->stmtBlock = getStmtBlock(ctx->statementsBlock());
     loopStmt->setLocation(ctx->start);
     return loopStmt;
+}
+
+LgsLoop* AntlerConverter::getForeachLoop(LogosParser::LoopStatementContext* ctx) {
+    const auto iterExpr = getUnaryExpr(ctx->iterableExpr);
+    const auto foreachLoop = new LgsForeachLoop(iterExpr);
+    for (const auto variable : ctx->VARIABLE()) {
+        const auto loopVarName = variable->getText();
+        auto varDec = new LgsVarDec(loopVarName);
+        varDec->expr = new LgsIterIndex(iterExpr, {new LgsIndex(LGS_INT.getZeroValue())});
+        foreachLoop->loopVars.emplace_back(varDec);
+    }
+    return foreachLoop;
+}
+
+LgsLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx) {
+    const auto startExpr = getExpr(ctx->iterableRange->start);
+    const auto endExpr = getExpr(ctx->iterableRange->end);
+    const auto rangeLoop = new LgsRangeLoop(startExpr, endExpr);
+    for (const auto variable : ctx->VARIABLE()) {
+        const auto loopVarName = variable->getText();
+        auto loopVarDec = new LgsVarDec(loopVarName, &LGS_INT, LGS_INT.getZeroValue());
+        rangeLoop->loopVars.emplace_back(loopVarDec);
+    }
+    return rangeLoop;
 }
 
 LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
@@ -460,7 +478,7 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     if (const auto vector = ctx->vector()) return getVector(vector);
     if (const auto constructor = ctx->constructor()) return getInstance(constructor);
     if (const auto constant = ctx->constant()) return getConstant(constant);
-    if (const auto array = ctx->array()) return getArray(array);
+    if (const auto array = ctx->array()) return getArrayExpr(array);
     if (const auto hashMap = ctx->hashMap()) return getHashMap(hashMap);
     if (const auto arrayIndex = ctx->arrayIndex()) return getIterIndex(arrayIndex);
     if (const auto selection = ctx->selection()) return getSelection(selection);
@@ -476,8 +494,8 @@ LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     return logosBinaryExpr;
 }
 
-LgsUnaryExpr* AntlerConverter::getArray(LogosParser::ArrayContext* ctx) {
-    const auto array = new LgsDArray();
+LgsUnaryExpr* AntlerConverter::getArrayExpr(LogosParser::ArrayContext* ctx) {
+    const auto array = new LgsArrayExpr();
     for (const auto& expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }
@@ -610,7 +628,7 @@ LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::ArrayIndexContext* ctx)
     } else if (const auto funcCall = ctx->funcCall()) {
         baseExpr = getFuncCall(funcCall);
     } else {
-        assert(false && "not implemented");
+        assert(false);
     }
 
     vector<LgsIndex*> indices;
@@ -626,7 +644,6 @@ LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::ArrayIndexContext* ctx)
 
     const auto arrayIndex = new LgsIterIndex(baseExpr, indices);
     arrayIndex->setLocation(ctx->start);
-    arrayIndex->code = ctx->getText();
     return arrayIndex;
 }
 
@@ -672,7 +689,7 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
     LgsType* result = nullptr;
     if (ctx->key && ctx->value) {
         result = new LgsMap(getType(ctx->key), getType(ctx->value));
-    } else if (ctx->LBRACK().size() > 0) {
+    } else if (ctx->arrTypeSize().size() > 0) {
         result = getArrayType(ctx);
     } else {
         result = getTypeFromText(ctx->TYPE(), ctx);
@@ -687,10 +704,9 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
 LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
     const auto baseType = getTypeFromText(ctx->TYPE(), ctx);
     const auto arrType = new LgsArray(baseType);
-    if (ctx->expr().size() == 0) return arrType;
-    arrType->isStatic = true;
-    for (const auto expr : ctx->expr()) {
-        arrType->sizeExprs.emplace_back(getExpr(expr));
+    for (const auto sizeExpr : ctx->arrTypeSize()) {
+        auto expr = getExpr(sizeExpr->expr());
+        arrType->dimsExprs.push_back(expr);
     }
     return arrType;
 }
@@ -701,7 +717,7 @@ LgsType* AntlerConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken,
     if (typeText == LgsInt::name) {
         type = &LGS_INT;
     } else if (typeText == LgsFloat::name) {
-        type = new LgsFloat();
+        type = &LGS_FLOAT;
     } else if (typeText == LgsBool::name) {
         type = &LGS_BOOL;
     } else if (typeText == LgsStr::name) {

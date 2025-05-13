@@ -48,12 +48,14 @@ public:
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
     LgsLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
+    LgsLoop* getRangeLoop(LogosParser::LoopStatementContext* ctx);
+    LgsLoop* getForeachLoop(LogosParser::LoopStatementContext* ctx);
     LgsEnum* getEnum(LogosParser::EnumDeclarationContext* ctx);
     LgsExpr* getExpr(LogosParser::ExprContext* ctx, bool isNullable = false);
     LgsExpr* getCast(LogosParser::ExprContext* ctx);
     LgsUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
-    LgsUnaryExpr* getArray(LogosParser::ArrayContext* ctx);
+    LgsUnaryExpr* getArrayExpr(LogosParser::ArrayContext* ctx);
     LgsUnaryExpr* getHashMap(LogosParser::HashMapContext* ctx);
     LgsVariable* getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) const;
     LgsUnaryExpr* getConst(const string& constName, const antlr4::ParserRuleContext* ctx) const;

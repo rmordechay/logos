@@ -1,5 +1,4 @@
 #include "exprs/LgsCast.h"
-
 #include "types/LgsType.h"
 
 Value* LgsCast::createIRValue(CodeGenMetadata* metadata) {
@@ -11,7 +10,7 @@ Value* LgsCast::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
 }
 
 bool LgsCast::cast() {
-    if (const auto v = fromValue->castStatically(toType)) {
+    if (const auto v = fromValue->convertExpr(toType)) {
         toValue = v;
         return true;
     }

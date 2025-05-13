@@ -9,7 +9,7 @@ public:
     static constexpr auto name = "Void";
 
     LgsVoid() {
-        isVoidType = true;
+        isVoid = true;
     }
     string prettyName() const override;
     Type* getIRType() override;

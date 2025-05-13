@@ -25,7 +25,7 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
         const auto childExpr = exprs[i + 1];
         const auto field = parentExpr->type->getField(childExpr->getName());
         if (field) {
-            if (const auto iterIndex = parentExpr->asArrayIndex()) {
+            if (const auto iterIndex = parentExpr->asIterIndex()) {
                 const auto gep = iterIndex->getGEP(metadata);
                 auto valueLoad = metadata->builder.CreateLoad(ptrTy, gep);
                 const auto value = field->getGEP(metadata, valueLoad);
@@ -42,22 +42,6 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
         }
     }
     return lastExpr();
-}
-
-void LgsSelection::assignIRValue(CodeGenMetadata* metadata, LgsExpr* expr) const {
-    const auto beforeLastExpr = exprs[exprs.size() - 2];
-    if (const auto var = lastExpr()->asVariable()) {
-        assert(var->ref);
-        switch (var->ref->type) {
-        case FIELD:
-            var->ref->field->setFieldIRValue(metadata, expr, beforeLastExpr->getIRValue(metadata));
-            return;
-        case UNKNOWN:
-        default:
-            break;
-        }
-    }
-    assert(false);
 }
 
 json LgsSelection::asJSON() {

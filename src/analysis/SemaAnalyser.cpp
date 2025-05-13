@@ -9,7 +9,7 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
 #include "types/primitives/LgsBool.h"
-#include "exprs/unary/LgsDArray.h"
+#include "exprs/unary/LgsArrayExpr.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsInstance.h"
@@ -21,7 +21,8 @@
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsHashMap.h"
-#include "exprs/unary/LgsSArray.h"
+#include "exprs/unary/constants/LgsIntConst.h"
+#include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsPatternMatch.h"
 #include "types/array/LgsArray.h"
@@ -103,7 +104,9 @@ void SemaAnalyser::visitFuncType(const LgsFuncType* funcType) {
 void SemaAnalyser::visitParam(LgsParam* param) {
     if (param->expr) {
         visitExpr(param->expr);
-        checkExprType(param->expr, param->type);
+        if (validateExprType(param->expr, param->type)) {
+            param->expr->setType(param->type);
+        }
     }
     addLocalSymbol(param->name, LgsSymbol(param));
 }
@@ -147,29 +150,40 @@ void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
 
 void SemaAnalyser::visitField(const LgsField* field) {
     visitExpr(field->expr);
-    checkExprType(field->expr, field->type);
-}
-
-void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
-    const auto rExpr = assignment->rvalue;
-    const auto lExpr = assignment->lvalue;
-    visitExpr(lExpr);
-    visitExpr(rExpr);
-    checkExprType(rExpr, lExpr->type);
+    if (field->expr) validateExprType(field->expr, field->type);
 }
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
+    varDec->type = resolveType(varDec->type);
     if (varDec->expr) {
         visitExpr(varDec->expr);
-        varDec->expr->type = resolveType(varDec->expr->type);
-        if (!checkExprType(varDec->expr, varDec->type)) return;
-        varDec->type = varDec->expr->type;
+        if (validateExprType(varDec->expr, varDec->type)) {
+            varDec->type = varDec->expr->type;
+        }
     } else {
-        const auto type = resolveType(varDec->type);
-        varDec->expr = type->getZeroValue();
+        varDec->expr = varDec->type->getZeroValue();
         varDec->type = varDec->expr->type;
     }
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
+}
+
+void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
+    const auto rightExpr = assignment->rValue;
+    const auto leftExpr = assignment->lValue;
+    visitExpr(leftExpr);
+    visitExpr(rightExpr);
+    if (!validateExprType(rightExpr, leftExpr->type)) return;
+    if (const auto iterIndex = leftExpr->asIterIndex()) {
+        visitAssignIterIndex(iterIndex, rightExpr);
+    } else {
+        assert(false);
+    }
+}
+
+void SemaAnalyser::visitAssignIterIndex(const LgsIterIndex* iterIndex, LgsExpr* expr) const {
+    if (const auto arr = expr->asArrayExpr()) {
+        arr->type->isConst = iterIndex->type->isConst;
+    }
 }
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -229,15 +243,16 @@ void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
 }
 
 void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
-    const auto iterableExpr = foreachLoop->iterExpr;
-    visitUnaryExpr(iterableExpr);
-    const auto iterable = iterableExpr->type->asIterable();
+    const auto iterExpr = foreachLoop->iterExpr;
+    visitUnaryExpr(iterExpr);
+    const auto iterable = iterExpr->type->asIterable();
     if (!iterable) {
-        return errHandler.handleError(E10002, &iterableExpr->location, {iterableExpr->prettyName()});
+        return errHandler.handleError(E10002, &iterExpr->location, {iterExpr->prettyName()});
     }
     for (const auto varDec : foreachLoop->loopVars) {
-        varDec->type = iterable->baseType;
-        varDec->expr = iterable->getZeroValue();
+        const auto iterIndex = varDec->expr->asIterIndex();
+        visitIterIndex(iterIndex);
+        varDec->type = iterIndex->type;
         addLocalSymbol(varDec->name, LgsSymbol(varDec));
     }
     visitStmtBlock(foreachLoop->stmtBlock);
@@ -250,10 +265,10 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
         returnStmt->expr->isReturnValue = true;
         visitExpr(returnStmt->expr);
     }
-    if (rt->isVoidType) {
+    if (rt->isVoid) {
         if (returnStmt->expr) {
             const auto exprType = returnStmt->expr->type;
-            if (!exprType->isVoidType) {
+            if (!exprType->isVoid) {
                 errHandler.handleError(E10027, &returnStmt->location, {funcType.name, rt->prettyName(), exprType->prettyName()});
                 return;
             }
@@ -310,16 +325,16 @@ void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
         visitFuncCall(funcCall);
     } else if (const auto selection = unaryExpr->asSelection()) {
         visitSelection(selection);
-    } else if (const auto dArray = unaryExpr->asDArray()) {
-        visitDArray(dArray);
-    } else if (const auto sArray = unaryExpr->asSArray()) {
-        visitSArray(sArray);
+    } else if (const auto arrayExpr = unaryExpr->asArrayExpr()) {
+        visitArrayExpr(arrayExpr);
     } else if (const auto hashMap = unaryExpr->asHashMap()) {
         visitHashMap(hashMap);
-    } else if (const auto iterIndex = unaryExpr->asArrayIndex()) {
+    } else if (const auto iterIndex = unaryExpr->asIterIndex()) {
         visitIterIndex(iterIndex);
     } else if (const auto variable = unaryExpr->asVariable()) {
         visitVariable(variable);
+    } else if (const auto strConst = unaryExpr->asStrConst()) {
+        visitStrConst(strConst);
     }
 }
 
@@ -329,49 +344,49 @@ void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     setBinaryExprType(binaryExpr);
 }
 
-void SemaAnalyser::visitDArray(LgsDArray* array) {
-    for (const auto& element : array->initialElements) {
+void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
+    for (const auto element : array->initialElements) {
         visitExpr(element);
     }
-    array->arrType.setBaseType(array->initialElements);
-}
-
-void SemaAnalyser::visitSArray(LgsSArray* array) {
-    for (const auto& element : array->initialElements) {
-        visitExpr(element);
-    }
-    array->arrType.setBaseType(array->initialElements);
+    array->arrType.inferArrayType(array->initialElements);
 }
 
 void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) const {
     hashMap->mapType.setBaseType(hashMap->initialElements);
 }
 
+void SemaAnalyser::visitStrConst(LgsStrConst* strConst) const {
+    const auto size = new LgsIntConst(strConst->value.size());
+    strConst->strType.dimsExprs.push_back(size);
+}
+
 void SemaAnalyser::visitVariable(LgsVariable* variable) {
     const auto symbol = getSymbol(variable->name, variable);
     if (!symbol) return;
+    LgsType* type = nullptr;
     switch (symbol->type) {
     case VAR_DEC:
         symbol->varDec->refs.emplace_back(variable);
-        setExprType(variable, symbol->varDec->type);
+        type = symbol->varDec->type;
         break;
     case PARAM:
         symbol->param->refs.emplace_back(variable);
-        setExprType(variable, symbol->param->type);
+        type = symbol->param->type;
         break;
     case ENUM:
-        setExprType(variable, symbol->lgsEnum);
+        type = symbol->lgsEnum;
         break;
     case ENUM_FIELD:
-        setExprType(variable, symbol->enumField->type);
+        type = symbol->enumField->type;
         break;
     case FUNC:
         // TODO add func matching
-        setExprType(variable, symbol->func->overloads[0]->funcType.rt);
+        type = symbol->func->overloads[0]->funcType.rt;
         break;
     default:
         assert(false);
     }
+    variable->setType(type);
     variable->ref = symbol->clone();
 }
 
@@ -380,7 +395,7 @@ void SemaAnalyser::visitSelection(LgsSelection* selection) {
     const auto exprs = selection->exprs;
     visitFirstSelection(exprs[0]);
     visitInnerSelections(selection);
-    setExprType(selection, selection->lastExpr()->type);
+    selection->setType(selection->lastExpr()->type);
 }
 
 void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
@@ -405,20 +420,20 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
         if (const auto var = dynamic_cast<LgsVariable*>(childExpr)) {
-            visitFieldCall(parentExpr, var);
+            visitFieldSelection(parentExpr, var);
         } else if (const auto methodCall = dynamic_cast<LgsFuncCall*>(childExpr)) {
             visitMethodCall(methodCall, parentExpr->type);
         }
     }
 }
 
-void SemaAnalyser::visitFieldCall(const LgsExpr* parentExpr, LgsVariable* childField) {
+void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* childField) {
     const auto parentType = parentExpr->type;
     const auto field = parentType->getField(childField->name);
     if (!field) {
         return errHandler.handleError(E10005, &childField->location, {childField->getName(), parentType->prettyName()});
     }
-    setExprType(childField, field->type);
+    childField->setType(field->type);
     childField->ref = new LgsSymbol(field->clone());
     if (!field->isPublic && file->absPath != field->parent->path) {
         errHandler.handleError(E10030, &childField->location, {childField->getName(), field->parent->name});
@@ -491,43 +506,44 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
         visitExpr(index->from);
         visitExpr(index->to);
     }
-    const auto baseExprType = baseExpr->type;
-    if (!baseExprType->asIterable()) {
-        return errHandler.handleError(E10002, &iterIndex->location, {baseExpr->getName()});
-    }
     setIterIndexType(iterIndex);
-}
-
-void SemaAnalyser::setExprType(LgsExpr* expr, LgsType* type) {
-    expr->type = resolveType(type);
 }
 
 bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
     const auto type = parent->type;
     const auto field = type ? type->getField(fieldVariable->name) : nullptr;
     if (!type || !field) {
-        errHandler.handleError(E10005, &fieldVariable->location, {fieldVariable->getName(), type->prettyName()});
+        errHandler.handleError(E10005, &fieldVariable->location, {fieldVariable->prettyName(), type->prettyName()});
         return false;
     }
-    setExprType(fieldVariable, field->type);
+    fieldVariable->setType(field->type);
     return true;
 }
 
-void SemaAnalyser::setIterIndexType(LgsIterIndex* iterIndex) const {
-    const auto iterable = iterIndex->baseExpr->type->asIterable();
-    const auto baseType = iterable->getBaseType();
-    const auto size = iterIndex->indices.size();
-    if (size == 1) {
-        iterIndex->type = baseType;
-    } else {
-        const auto array = new LgsArray(baseType);
-        iterIndex->type = array;
+void SemaAnalyser::setIterIndexType(LgsIterIndex* iterIndex) {
+    const auto baseExpr = iterIndex->baseExpr;
+    const auto iterable = baseExpr->type->asIterable();
+    if (!iterable) {
+        return errHandler.handleError(E10002, &iterIndex->location, {iterIndex->prettyName()});
     }
-
+    const auto baseDims = iterable->getDims();
+    const auto iterIndexDims = iterIndex->indices.size();
+    const int diff = baseDims - iterIndexDims;
+    const auto iterBaseType = iterable->getBaseType();
+    if (diff > 0) {
+        iterIndex->type = iterable->createInnerType(diff);
+    } else if (diff == 0) {
+        iterIndex->type = iterBaseType;
+    } else {
+        assert(false);
+    }
     assert(iterIndex->type);
 }
 
 void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
+    visitExpr(binaryExpr->left);
+    visitExpr(binaryExpr->right);
+    LgsType* type = nullptr;
     switch (binaryExpr->op) {
     case ADD:
     case SUB:
@@ -541,7 +557,7 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
         const auto lType = binaryExpr->left->type;
         const auto rType = binaryExpr->right->type;
         if (!lType || !rType) return;
-        setExprType(binaryExpr, lType->inferBinaryType(rType));
+        type = lType->inferBinaryType(rType);
         break;
     }
     case AND:
@@ -552,15 +568,16 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     case GT:
     case GE:
     case LE: {
-        setExprType(binaryExpr, &LGS_BOOL);
-        return;
+        type = &LGS_BOOL;
+        break;
     }
     case NOOP:
         break;
     }
+    binaryExpr->setType(type);
 }
 
-bool SemaAnalyser::checkExprType(LgsExpr* expr, LgsType* type) {
+bool SemaAnalyser::validateExprType(const LgsExpr* expr, LgsType* type) {
     if (!expr) return true;
     if (expr->isNull) {
         // null must have a type
@@ -573,7 +590,6 @@ bool SemaAnalyser::checkExprType(LgsExpr* expr, LgsType* type) {
             errHandler.handleError(E10023, &type->location, {type->prettyName(), type->prettyName()});
             return false;
         }
-        expr->type = type;
         return true;
     }
     if (type && expr->type && !expr->type->equals(type)) {
@@ -709,20 +725,11 @@ void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
 }
 
 LgsType* SemaAnalyser::resolveType(LgsType* type) {
-    if (const auto iterable = type->asIterable()) {
-        if (iterable->baseType->isUnknown()) {
-            iterable->baseType = resolveType(iterable->baseType);
-        }
-        for (const auto sizeExpr : iterable->sizeExprs) {
-            visitExpr(sizeExpr);
-            if (!sizeExpr->type->isConst || !sizeExpr->type->asInt()) {
-                errHandler.handleError(E10041, &sizeExpr->location, {sizeExpr->type->prettyName()});
-            }
-        }
-        return type;
+    if (const auto arr = type->asArray()) {
+        return resolveArrayType(arr);
     }
-    if (!type->isUnknown()) return type;
 
+    if (!type->isUnknown()) return type;
     auto typeName = type->prettyName();
     const auto nullable = type->isNullable;
     if (globals.symbols.find(typeName) == globals.symbols.end()) {
@@ -751,6 +758,21 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     }
     assert(newType);
     return newType;
+}
+
+LgsType* SemaAnalyser::resolveArrayType(LgsArray* array) {
+    if (array->baseType->isUnknown()) {
+        array->baseType = resolveType(array->baseType);
+    }
+    auto iterIsConst = true;
+    for (const auto sizeExpr : array->dimsExprs) {
+        visitExpr(sizeExpr);
+        if (!sizeExpr || !sizeExpr->type->equals(&LGS_INT)) {
+            iterIsConst = false;
+        }
+    }
+    array->isConst = iterIsConst;
+    return array;
 }
 
 void SemaAnalyser::resolveObjMemberTypes(LgsObject* const& obj) {
@@ -790,17 +812,13 @@ void SemaAnalyser::resolveObjectImplements(LgsObject* obj) {
             for (const auto interfaceOverload : interfaceOverloads) {
                 auto found = false;
                 for (const auto objOverload : objOverloads) {
-                    if (objOverload->funcType.equals(&interfaceOverload->funcType)) {
-                        objOverload->implements = interfaceOverload;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    missingFuncs.emplace_back(interfaceOverload);
-                } else {
+                    if (!objOverload->funcType.equals(&interfaceOverload->funcType)) continue;
+                    objOverload->implements = interfaceOverload;
+                    found = true;
                     break;
                 }
+                if (found) break;
+                missingFuncs.emplace_back(interfaceOverload);
             }
         }
 
@@ -809,6 +827,7 @@ void SemaAnalyser::resolveObjectImplements(LgsObject* obj) {
         }
     }
 }
+
 
 string SemaAnalyser::getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads) const {
     stringstream str;
@@ -825,4 +844,3 @@ string SemaAnalyser::getOverloadsAsStr(const vector<LgsFunc*>& overloads) const 
     }
     return str.str();
 }
-

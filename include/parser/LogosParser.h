@@ -42,7 +42,8 @@ public:
     RuleFuncArg = 42, RuleConstructor = 43, RuleConstructorArgList = 44, 
     RuleConstructorArg = 45, RuleConstant = 46, RuleArrayIndex = 47, RuleIndex = 48, 
     RuleSelection = 49, RuleFirstSelectionElement = 50, RuleInnerSelectionElement = 51, 
-    RuleRange = 52, RuleType = 53, RuleVector = 54, RuleRequireEnvVars = 55
+    RuleRange = 52, RuleType = 53, RuleArrTypeSize = 54, RuleVector = 55, 
+    RuleRequireEnvVars = 56
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -116,6 +117,7 @@ public:
   class InnerSelectionElementContext;
   class RangeContext;
   class TypeContext;
+  class ArrTypeSizeContext;
   class VectorContext;
   class RequireEnvVarsContext; 
 
@@ -938,12 +940,8 @@ public:
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *TYPE();
     antlr4::tree::TerminalNode *QUEST_MARK();
-    std::vector<antlr4::tree::TerminalNode *> LBRACK();
-    antlr4::tree::TerminalNode* LBRACK(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> RBRACK();
-    antlr4::tree::TerminalNode* RBRACK(size_t i);
-    std::vector<ExprContext *> expr();
-    ExprContext* expr(size_t i);
+    std::vector<ArrTypeSizeContext *> arrTypeSize();
+    ArrTypeSizeContext* arrTypeSize(size_t i);
     antlr4::tree::TerminalNode *LBRACE();
     antlr4::tree::TerminalNode *COLON();
     antlr4::tree::TerminalNode *RBRACE();
@@ -954,6 +952,19 @@ public:
   };
 
   TypeContext* type();
+
+  class  ArrTypeSizeContext : public antlr4::ParserRuleContext {
+  public:
+    ArrTypeSizeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LBRACK();
+    antlr4::tree::TerminalNode *RBRACK();
+    ExprContext *expr();
+
+   
+  };
+
+  ArrTypeSizeContext* arrTypeSize();
 
   class  VectorContext : public antlr4::ParserRuleContext {
   public:

@@ -10,21 +10,22 @@ public:
     LgsArrayNewFunc new_{this};
     LgsArrayGetFunc get{this};
     LgsArrayAddFunc add{this};
-    LgsArrayDeleteFunc delete_{this};
     LgsArrayLenFunc len{this};
+    LgsArrayDeleteFunc delete_{this};
 
     explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         addMethod(&add);
     }
-    Type* getIRType() override;
+    void inferArrayType(const vector<LgsExpr*>& exprs);
+    int getDims() override;
     string getIRName() override;
-    LgsExpr* getZeroValue() override;
     string prettyName() const override;
+    LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
-    void setBaseType(const vector<LgsExpr*>& exprs);
-    bool isIndexable(LgsType* indexType) override;
-    ~LgsArray() override = default;
+    LgsType* createInnerType(size_t indexRange) const override;
+    bool canIndexTo(LgsType* indexType) override;
+    ~LgsArray() override;
 };
 
 #endif //LGSSARRAYTYPE_H

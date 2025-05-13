@@ -18,7 +18,7 @@ public:
     vector<LgsMapPair*> initialElements;
 
     explicit LgsHashMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {
-        type = &mapType;
+        setType(&mapType);
         mapType.kvType.key = keyType;
         mapType.kvType.value = valueType;
     }

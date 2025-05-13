@@ -13,7 +13,6 @@ class LgsValue {
 public:
     Location location;
     Value* IRValue = nullptr;
-    string code;
 
     void setIRValue(Value* value);
     BasicBlock* createBasicBlock(const char* name) const;

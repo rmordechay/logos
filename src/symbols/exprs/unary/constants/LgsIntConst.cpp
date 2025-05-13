@@ -14,7 +14,7 @@ Value* LgsIntConst::createIRValue(CodeGenMetadata* metadata) {
     return metadata->builder.getInt32(value);
 }
 
-LgsExpr* LgsIntConst::castStatically(LgsType* other) {
+LgsExpr* LgsIntConst::convertExpr(LgsType* other) {
     if (dynamic_cast<LgsStr*>(other)) {
         return new LgsStrConst(to_string(value));
     }
@@ -122,6 +122,10 @@ Value* LgsIntConst::lshiftIR(CodeGenMetadata* metadata, LgsExpr* other) {
         return metadata->builder.CreateShl(thisIRValue, otherIRValue);
     }
     assert(false);
+}
+
+LgsExpr* LgsIntConst::clone() {
+    return new LgsIntConst(value);
 }
 
 Value* LgsIntConst::rshiftIR(CodeGenMetadata* metadata, LgsExpr* other) {

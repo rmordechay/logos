@@ -27,7 +27,7 @@ void CodeGenerator::generateMainFunc(CodeGenMetadata* metadata, LgsFuncImpl* mai
     metadata->lgsStack.enterScope(mainFunc);
     mainFunc->startBlock(metadata, mainFunc->entryBlock);
     mainFunc->stmtBlock->createIRValue(metadata);
-    if (mainFunc->funcType.rt->isVoidType) {
+    if (mainFunc->funcType.rt->isVoid) {
         metadata->builder.CreateRetVoid();
     }
     metadata->lgsStack.exitScope();

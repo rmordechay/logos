@@ -1,11 +1,10 @@
 #include "exprs/LgsExpr.h"
-#include "exprs/unary/LgsDArray.h"
+#include "exprs/unary/LgsArrayExpr.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsInstance.h"
-#include "exprs/unary/LgsSArray.h"
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
@@ -15,107 +14,63 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 
+void LgsExpr::initIRValue(CodeGenMetadata* metadata) {
+    IRValue = createIRValue(metadata);
+    assert(IRValue);
+}
+
 Value* LgsExpr::getIRValue(CodeGenMetadata* metadata) {
     if (IRValue) return IRValue;
     initIRValue(metadata);
     return IRValue;
 }
 
-void LgsExpr::initIRValue(CodeGenMetadata* metadata) {
-    IRValue = createIRValue(metadata);
-    assert(IRValue);
+void LgsExpr::setType(LgsType* type) {
+    this->type = type;
 }
 
-string LgsExpr::prettyName() {
-    assert(false);
+bool LgsExpr::isGEP() const {
+    if (!IRValue) return false;
+    auto isGEP = isa<GetElementPtrInst>(IRValue);
+    if (!isGEP && isa<ConstantExpr>(IRValue)) {
+        const auto constExpr = cast<ConstantExpr>(IRValue);
+        isGEP = constExpr->getOpcode() == Instruction::GetElementPtr;
+    }
+    return isGEP;
 }
 
-string LgsExpr::getStrFormatPart() const {
-    assert(false);
-}
-
-LgsExpr* LgsExpr::castStatically(LgsType* other) {
-    assert(false);
-}
-
-uint32_t LgsExpr::hashValue(CodeGenMetadata* metadata) {
-    assert(false);
-}
-
-Value* LgsExpr::subIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::mulIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::divIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::neIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::ltIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::gtIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::geIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::leIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::andIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::orIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::bitAndIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::bitOrIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::bitXorIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::rshiftIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
-Value* LgsExpr::lshiftIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    assert(false);
-}
-
+LgsExpr* LgsExpr::clone() { assert(false); }
+string LgsExpr::prettyName() { assert(false); }
+string LgsExpr::getStrFormatPart() const { assert(false); }
+void LgsExpr::castExpr(LgsType* other) { assert(false); }
+uint32_t LgsExpr::hashValue(CodeGenMetadata* metadata) { assert(false); }
+Value* LgsExpr::getLength(CodeGenMetadata* metadata) { assert(false); }
+LgsExpr* LgsExpr::convertExpr(LgsType* other) { assert(false); }
+Value* LgsExpr::subIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::mulIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::divIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::eqIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::neIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::ltIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::gtIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::geIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::leIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::andIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::orIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::bitAndIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::bitOrIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::bitXorIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::rshiftIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::lshiftIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
 LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }
 LgsFuncCall* LgsExpr::asFuncCall() { return dynamic_cast<LgsFuncCall*>(this); }
 LgsInstance* LgsExpr::asInstance() { return dynamic_cast<LgsInstance*>(this); }
 LgsSelection* LgsExpr::asSelection() { return dynamic_cast<LgsSelection*>(this); }
-LgsDArray* LgsExpr::asDArray() { return dynamic_cast<LgsDArray*>(this); }
-LgsSArray* LgsExpr::asSArray() { return dynamic_cast<LgsSArray*>(this); }
+LgsArrayExpr* LgsExpr::asArrayExpr() { return dynamic_cast<LgsArrayExpr*>(this); }
 LgsHashMap* LgsExpr::asHashMap() { return dynamic_cast<LgsHashMap*>(this); }
 LgsBoolConst* LgsExpr::asBoolConst() { return dynamic_cast<LgsBoolConst*>(this); }
 LgsCharConst* LgsExpr::asCharConst() { return dynamic_cast<LgsCharConst*>(this); }
-LgsIterIndex* LgsExpr::asArrayIndex() { return dynamic_cast<LgsIterIndex*>(this); }
+LgsIterIndex* LgsExpr::asIterIndex() { return dynamic_cast<LgsIterIndex*>(this); }
 LgsFloatConst* LgsExpr::asFloatConst() { return dynamic_cast<LgsFloatConst*>(this); }
 LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
 LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }

@@ -1,5 +1,6 @@
 #include "logos/LgsProject.h"
 
+#include "LgsInterfaceFile.h"
 #include "Platform.h"
 #include "analysis/AntlrConverter.h"
 #include "exprs/unary/constants/LgsStrConst.h"
