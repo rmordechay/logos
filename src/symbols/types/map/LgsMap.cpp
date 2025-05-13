@@ -1,7 +1,7 @@
 #include "types/map/LgsMap.h"
 #include "exprs/unary/LgsHashMap.h"
 
-void LgsMap::setUnderlyingType(const vector<LgsMapPair*>& exprs) {
+void LgsMap::setBaseType(const vector<LgsMapPair*>& exprs) {
     vector<LgsExpr*> keyExprs;
     vector<LgsExpr*> valueExprs;
     for (const auto expr : exprs) {
@@ -29,7 +29,7 @@ LgsExpr* LgsMap::getZeroValue() {
 }
 
 string LgsMap::prettyName() const {
-    return name + underlyingType->prettyName();
+    return name + baseType->prettyName();
 }
 
 bool LgsMap::equals(LgsType* other) {
@@ -46,6 +46,6 @@ bool LgsMap::isIndexable(LgsType* indexType) {
     return kvType.key->equals(indexType);
 }
 
-LgsType* LgsMap::getUnderlyingType() {
+LgsType* LgsMap::getBaseType() {
     return kvType.value;
 }

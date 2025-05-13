@@ -10,6 +10,10 @@ string LgsVariable::getName() {
     return name;
 }
 
+string LgsVariable::prettyName() {
+    return name;
+}
+
 string LgsVariable::getStrFormatPart() const {
     switch (ref->type) {
     case VAR_DEC:

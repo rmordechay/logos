@@ -12,7 +12,6 @@ public:
 
     explicit LgsStrConst(const string& value) : LgsConstExpr(&strType), value(value) {
         strType.isStatic = true;
-        strType.sizes = {value.size()};
     }
 
     string getStrFormatPart() const override;

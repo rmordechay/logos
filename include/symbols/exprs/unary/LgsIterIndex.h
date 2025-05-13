@@ -18,13 +18,14 @@ public:
     vector<LgsIndex*> indices;
 
     explicit LgsIterIndex(LgsUnaryExpr* baseExpr, const vector<LgsIndex*>& indices) : baseExpr(baseExpr), indices(indices) {}
-    Value* createIRValue(CodeGenMetadata* metadata) override;
+    string getNameWithTypes();
+    Value* getGEP(CodeGenMetadata* metadata) const;
     Value* createIRValueFromMap(CodeGenMetadata* metadata, LgsMap* map) const;
     Value* createIRValueFromArray(CodeGenMetadata* metadata, LgsArray* arr) const;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
     void assignIRValue(CodeGenMetadata* metadata, LgsExpr* value) const;
-    Value* getGEP(CodeGenMetadata* metadata) const;
     string getName() override;
-    string getNameWithTypes();
+    string prettyName() override;
     ~LgsIterIndex() override;
 };
 

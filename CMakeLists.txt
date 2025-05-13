@@ -15,7 +15,6 @@ file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS include/*.h)
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
 add_library(lib ${HEADER_FILES} ${SOURCE_FILES})
 
-
 target_include_directories(lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/analysis

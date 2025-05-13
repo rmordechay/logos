@@ -8,9 +8,7 @@ int LgsForeachLoop::loopStart() {
 }
 
 int LgsForeachLoop::loopEnd() {
-    const auto iterable = iterExpr->type->asIterable();
-    assert(iterable->sizes.size() > 0);
-    return iterable->sizes[0];
+    return iterExpr->type->asIterable()->arrSize.size();
 }
 
 void LgsForeachLoop::setIRLoopVariable(CodeGenMetadata* metadata) {
@@ -20,7 +18,7 @@ void LgsForeachLoop::setIRLoopVariable(CodeGenMetadata* metadata) {
     const auto iterable = iterExpr->type->asIterable();
     const vector<Value*> args = {builder.getInt32(0), iValue};
     const auto gep = builder.CreateInBoundsGEP(iterable->getIRType(), iterIRValue, args);
-    const auto element = builder.CreateLoad(iterable->underlyingType->getIRType(), gep);
+    const auto element = builder.CreateLoad(iterable->baseType->getIRType(), gep);
     const auto loopVar = loopVars[0];
     loopVar->setIRValue(element);
     metadata->lgsStack.addLocalSymbol(loopVar->name, LgsSymbol(loopVar));

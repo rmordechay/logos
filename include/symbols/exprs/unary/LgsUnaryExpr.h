@@ -13,16 +13,16 @@ class LgsUnaryExpr : public LgsExpr {
 public:
     explicit LgsUnaryExpr() : LgsExpr(nullptr) {}
     explicit LgsUnaryExpr(LgsType* type) : LgsExpr(type) {}
-    virtual string getName();
     Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* subIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* mulIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* divIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    virtual string getName();
     ~LgsUnaryExpr() override = default;
 };
 
 inline string LgsUnaryExpr::getName() {
-    return "";
+    assert(false);
 }
 
 inline Value* LgsUnaryExpr::addIR(CodeGenMetadata* metadata, LgsExpr* other) {

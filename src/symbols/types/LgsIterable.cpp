@@ -3,12 +3,8 @@
 #include "exprs/LgsExpr.h"
 #include "types/LgsAny.h"
 
-size_t LgsIterable::getDims() const {
-    return sizes.size();
-}
-
-LgsType* LgsIterable::getUnderlyingType() {
-    return underlyingType;
+LgsType* LgsIterable::getBaseType() {
+    return baseType;
 }
 
 Value* LgsIterable::IRLength(CodeGenMetadata* metadata) {

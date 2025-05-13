@@ -96,6 +96,10 @@ LgsFuncType* LgsType::asFuncType() {
     return dynamic_cast<LgsFuncType*>(this);
 }
 
+bool LgsType::isUnknown() {
+    return dynamic_cast<LgsUnknownType*>(this);
+}
+
 LgsStr* LgsType::asStr() {
     return dynamic_cast<LgsStr*>(this);
 }

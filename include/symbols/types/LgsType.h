@@ -44,6 +44,7 @@ public:
     LgsIterable* asIterable();
     LgsArray* asArray();
     LgsFuncType* asFuncType();
+    bool isUnknown();
 
     virtual size_t getSize();
     virtual bool equals(LgsType& other);

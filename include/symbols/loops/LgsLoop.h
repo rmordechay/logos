@@ -12,6 +12,7 @@ class LgsExpr;
 
 class LgsLoop : public LgsStmt {
 public:
+    vector<LgsVariable*> loopVar;
     vector<LgsVarDec*> loopVars;
     LgsStmtBlock* stmtBlock = nullptr;
     BasicBlock* loopCondBlock = nullptr;

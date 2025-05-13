@@ -12,9 +12,9 @@ public:
     LgsArray arrType;
     vector<LgsExpr*> initialElements;
 
-    explicit LgsDArray(LgsType* underlyingType = nullptr) {
+    explicit LgsDArray(LgsType* baseType = nullptr) {
         type = &arrType;
-        arrType.underlyingType = underlyingType;
+        arrType.baseType = baseType;
     }
     Value* createIRValue(CodeGenMetadata* metadata) override;
     ~LgsDArray() override = default;

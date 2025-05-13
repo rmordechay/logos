@@ -304,7 +304,7 @@ void logosParserInitialize() {
   	35,0,615,616,5,17,0,0,616,618,1,0,0,0,617,608,1,0,0,0,617,612,1,0,0,0,
   	617,614,1,0,0,0,618,105,1,0,0,0,619,641,5,38,0,0,620,622,5,63,0,0,621,
   	623,5,26,0,0,622,621,1,0,0,0,622,623,1,0,0,0,623,641,1,0,0,0,624,630,
-  	5,63,0,0,625,627,5,11,0,0,626,628,5,58,0,0,627,626,1,0,0,0,627,628,1,
+  	5,63,0,0,625,627,5,11,0,0,626,628,3,70,35,0,627,626,1,0,0,0,627,628,1,
   	0,0,0,628,629,1,0,0,0,629,631,5,12,0,0,630,625,1,0,0,0,631,632,1,0,0,
   	0,632,630,1,0,0,0,632,633,1,0,0,0,633,641,1,0,0,0,634,635,5,9,0,0,635,
   	636,3,106,53,0,636,637,5,19,0,0,637,638,3,106,53,0,638,639,5,10,0,0,639,
@@ -4981,12 +4981,12 @@ tree::TerminalNode* LogosParser::TypeContext::RBRACK(size_t i) {
   return getToken(LogosParser::RBRACK, i);
 }
 
-std::vector<tree::TerminalNode *> LogosParser::TypeContext::INTEGER() {
-  return getTokens(LogosParser::INTEGER);
+std::vector<LogosParser::ExprContext *> LogosParser::TypeContext::expr() {
+  return getRuleContexts<LogosParser::ExprContext>();
 }
 
-tree::TerminalNode* LogosParser::TypeContext::INTEGER(size_t i) {
-  return getToken(LogosParser::INTEGER, i);
+LogosParser::ExprContext* LogosParser::TypeContext::expr(size_t i) {
+  return getRuleContext<LogosParser::ExprContext>(i);
 }
 
 tree::TerminalNode* LogosParser::TypeContext::LBRACE() {
@@ -5075,9 +5075,10 @@ LogosParser::TypeContext* LogosParser::type() {
                 _errHandler->sync(this);
 
                 _la = _input->LA(1);
-                if (_la == LogosParser::INTEGER) {
+                if (((((_la - 7) & ~ 0x3fULL) == 0) &&
+                  ((1ULL << (_la - 7)) & 574209075970048021) != 0)) {
                   setState(626);
-                  match(LogosParser::INTEGER);
+                  expr(0);
                 }
                 setState(629);
                 match(LogosParser::RBRACK);

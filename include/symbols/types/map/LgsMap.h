@@ -22,12 +22,12 @@ public:
         kvType.value = valueType;
         addMethod(&len);
     }
-    void setUnderlyingType(const vector<LgsMapPair*>& exprs);
+    void setBaseType(const vector<LgsMapPair*>& exprs);
     Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;
-    LgsType* getUnderlyingType() override;
+    LgsType* getBaseType() override;
     bool equals(LgsType* other) override;
     bool isIndexable(LgsType* indexType) override;
     LgsType* inferBinaryType(LgsType* other) override;

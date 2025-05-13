@@ -1,15 +1,16 @@
 #include "types/array/LgsArray.h"
 #include "exprs/unary/LgsDArray.h"
 #include "exprs/unary/LgsSArray.h"
+#include "exprs/unary/constants/LgsIntConst.h"
 
-void LgsArray::setUnderlyingType(const vector<LgsExpr*>& exprs) {
-    underlyingType = inferTypeFromIter(exprs);
+void LgsArray::setBaseType(const vector<LgsExpr*>& exprs) {
+    baseType = inferTypeFromIter(exprs);
 }
 
 LgsExpr* LgsArray::getZeroValue() {
-    if (!isStatic) return new LgsDArray(underlyingType);
-    const auto sArray = new LgsSArray(underlyingType);
-    sArray->arrType.sizes = sizes;
+    if (!isStatic) return new LgsDArray(baseType);
+    const auto sArray = new LgsSArray(baseType);
+    sArray->arrType.arrSize = arrSize;
     return sArray;
 }
 
@@ -20,15 +21,15 @@ string LgsArray::prettyName() const {
 bool LgsArray::equals(LgsType* other) {
     const auto otherArr = other->asArray();
     if (!otherArr) return false;
-    return underlyingType->equals(otherArr->underlyingType);
+    return baseType->equals(otherArr->baseType);
 }
 
 Type* LgsArray::getIRType() {
     if (!isStatic) return ptrTy;
     if (IRType) return IRType;
-    IRType = underlyingType->getIRType();
-    for (auto size = sizes.rbegin(); size != sizes.rend(); ++size) {
-        IRType = ArrayType::get(IRType, *size);
+    IRType = baseType->getIRType();
+    for (auto size = arrSize.rbegin(); size != arrSize.rend(); ++size) {
+        IRType = ArrayType::get(IRType, (*size)->asIntConst()->value);
     }
     return IRType;
 }

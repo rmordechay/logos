@@ -46,7 +46,7 @@ Value* LgsIterIndex::createIRValueFromArray(CodeGenMetadata* metadata, LgsArray*
     const auto firstIndex = indices[0]->from;
     if (arr->isStatic) {
         const auto iterable = baseExpr->type->asIterable();
-        const auto IRType = iterable->getUnderlyingType()->getIRType();
+        const auto IRType = iterable->getBaseType()->getIRType();
         return metadata->builder.CreateLoad(IRType, getGEP(metadata));
     }
     const auto arrPtrValue = metadata->builder.CreateLoad(ptrTy, baseExprIRValue);
@@ -67,6 +67,15 @@ Value* LgsIterIndex::createIRValueFromMap(CodeGenMetadata* metadata, LgsMap* map
 
 string LgsIterIndex::getName() {
     return baseExpr->getName();
+}
+
+string LgsIterIndex::prettyName() {
+    stringstream str;
+    str << baseExpr->prettyName();
+    for (const auto index : indices) {
+        str << '[' << index->from->prettyName() << ']';
+    }
+    return str.str();
 }
 
 string LgsIterIndex::getNameWithTypes() {

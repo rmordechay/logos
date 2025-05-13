@@ -15,7 +15,7 @@ struct LgsError {
 /** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */
 inline int errCodeStart = 10000;
 inline LgsError E10000{.msg = "main() function is not defined in Main.lgs file.", .errCode = errCodeStart};
-inline LgsError E10001{.msg = "Left-hand type '%s' is not equal to the right-hand type '%s'.", .errCode = ++errCodeStart};
+inline LgsError E10001{.msg = "Left type '%s' does not match the right type '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10002{.msg = "'%s' is not iterable.", .errCode = ++errCodeStart};
 inline LgsError E10003{.msg = "Array index '%s' is out of bounds.", .errCode = ++errCodeStart};
 inline LgsError E10004{.msg = "Function '%s' must return '%s'.", .errCode = ++errCodeStart};
@@ -54,5 +54,6 @@ inline LgsError E10036{.msg = "'%s' cannot be indexed with type '%s'.", .errCode
 inline LgsError E10037{.msg = "Left-hand index of slice must be less than right-hand index. Given: %s.", .errCode = ++errCodeStart};
 inline LgsError E10038{.msg = "'continue' must be inside a loop statement.", .errCode = ++errCodeStart};
 inline LgsError E10039{.msg = "main() function accepts only one optional parameter of type 'Str[]'.", .errCode = ++errCodeStart};
+inline LgsError E10040{.msg = "The number of variables in the for loop (%s) do not match the number of the iterable's returned values (%s).", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

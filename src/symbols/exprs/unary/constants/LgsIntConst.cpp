@@ -6,6 +6,10 @@ string LgsIntConst::getStrFormatPart() const {
     return to_string(value);
 }
 
+string LgsIntConst::prettyName() {
+    return to_string(value);
+}
+
 Value* LgsIntConst::createIRValue(CodeGenMetadata* metadata) {
     return metadata->builder.getInt32(value);
 }

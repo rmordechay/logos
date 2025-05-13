@@ -6,15 +6,14 @@ struct CodeGenMetadata;
 
 class LgsIterable : public LgsType {
 public:
-    LgsType* underlyingType;
+    LgsType* baseType;
     bool isStatic = false;
-    vector<size_t> sizes;
+    vector<LgsExpr*> arrSize;
 
-    explicit LgsIterable(LgsType* underlyingType) : underlyingType(underlyingType) {}
-    size_t getDims() const;
-    virtual LgsType* getUnderlyingType();
-    virtual Value* IRLength(CodeGenMetadata* metadata);
+    explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}
     LgsType* inferTypeFromIter(const vector<LgsExpr*>& exprs) const;
+    virtual LgsType* getBaseType();
+    virtual Value* IRLength(CodeGenMetadata* metadata);
     ~LgsIterable() override = default;
 };
 

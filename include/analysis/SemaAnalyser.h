@@ -27,14 +27,7 @@ class LgsAssignment;
 class LgsLoop;
 
 inline std::mutex mtx;
-
-LgsType* resolveType(LgsType* type, LgsErrHandler* errorHandler);
-void resolveFuncTypes(LgsFuncType* signature, LgsErrHandler* errHandler);
 bool resolveGlobalTypes(const vector<LgsFile*>& files);
-void resolveObjMemberTypes(LgsObject* const& obj, LgsErrHandler* errHandler);
-void resolveObjectImplements(LgsObject* obj, LgsErrHandler* errHandler);
-string getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads);
-string getOverloadsAsStr(const vector<LgsFunc*>& overloads);
 
 class SemaAnalyser final {
 public:
@@ -49,7 +42,7 @@ public:
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
-    void visitInterface(LgsInterface* interface);
+    void visitInterface(LgsInterface* interface) const;
     void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitFuncType(const LgsFuncType* funcType);
@@ -97,14 +90,18 @@ public:
     bool isFuncCallEqual(const LgsFuncType* funcType, LgsFuncCall* funcCall);
     bool isFuncCallEqual(LgsFunc* func, LgsFuncCall* funcCall) const;
     bool checkExprType(LgsExpr* expr, LgsType* type);
-    bool checkSingleIndexBoundaries(LgsIterIndex* iterIndex, LgsExpr* index, size_t upperBound);
-    bool checkSliceBoundaries(LgsIterIndex* iterIndex, const LgsIndex* index, size_t upperBound);
-    bool checkIndexBoundaries(LgsIterIndex* iterIndex);
     void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 
     LgsSymbol* getSymbol(const string& name, const LgsValue* value = nullptr);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
+
+    LgsType* resolveType(LgsType* type);
+    void resolveFuncTypes(LgsFuncType* signature);
+    void resolveObjMemberTypes(LgsObject* const& obj);
+    void resolveObjectImplements(LgsObject* obj);
+    string getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads) const;
+    string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
     ~SemaAnalyser() = default;
 };
 

@@ -262,8 +262,8 @@ range:
 type:
         SELF_CLASS
    |    TYPE QUEST_MARK?
-   |    TYPE (LBRACK INTEGER? RBRACK)+
-   |    LBRACE key=type COLON value=type RBRACE
+   |    TYPE (LBRACK expr? RBRACK)+  // Array
+   |    LBRACE key=type COLON value=type RBRACE // Map
    ;
 
 vector:

@@ -48,8 +48,6 @@ public:
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
     LgsLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
-    LgsForeachLoop* getForeachLoop(LogosParser::LoopStatementContext* ctx);
-    LgsRangeLoop* getRangeLoop(LogosParser::LoopStatementContext* ctx);
     LgsEnum* getEnum(LogosParser::EnumDeclarationContext* ctx);
     LgsExpr* getExpr(LogosParser::ExprContext* ctx, bool isNullable = false);
     LgsExpr* getCast(LogosParser::ExprContext* ctx);
@@ -65,15 +63,15 @@ public:
     LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
     vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
     LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
-    LgsIterIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
+    LgsIterIndex* getIterIndex(LogosParser::ArrayIndexContext* ctx);
     LgsConstExpr* getConstant(LogosParser::ConstantContext* ctx) const;
     LgsConstExpr* getStrConst(string& value) const;
     LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
-    LgsType* getType(LogosParser::TypeContext* ctx) const;
-    LgsType* getArrayType(LogosParser::TypeContext* ctx) const;
+    LgsType* getType(LogosParser::TypeContext* ctx);
+    LgsType* getArrayType(LogosParser::TypeContext* ctx);
     LgsType* getTypeFromText(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const;
     bool isTypePrimitive(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const;
-    LgsType* getFuncType(LogosParser::FuncSignatureContext* ctx) const;
+    LgsType* getFuncType(LogosParser::FuncSignatureContext* ctx);
     LgsExpr* getExpr(const string& codeText) const;
     void parseTemplateStr(LgsStrConst* strConst) const;
     void cleanStr(string& value) const;

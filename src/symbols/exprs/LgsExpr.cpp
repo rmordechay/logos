@@ -26,6 +26,10 @@ void LgsExpr::initIRValue(CodeGenMetadata* metadata) {
     assert(IRValue);
 }
 
+string LgsExpr::prettyName() {
+    assert(false);
+}
+
 string LgsExpr::getStrFormatPart() const {
     assert(false);
 }

@@ -43,6 +43,7 @@ public:
     LgsStrConst* asStrConst();
     LgsEnumField* asEnumField();
     LgsTypeConst* asTypeConst();
+    virtual string prettyName();
     virtual string getStrFormatPart() const;
     virtual LgsExpr* castStatically(LgsType* other);
     virtual uint32_t hashValue(CodeGenMetadata* metadata);

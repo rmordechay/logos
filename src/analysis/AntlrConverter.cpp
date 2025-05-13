@@ -98,7 +98,7 @@ void AntlerConverter::setMainFunc(LgsMainFile* mainFile, LogosParser::FuncImplem
     bool isValid;
     if (params.size() == 1) {
         const auto arr = params[0]->type->asArray();
-        isValid = arr && !arr->isStatic && arr->underlyingType->asStr();
+        isValid = arr && !arr->isStatic && arr->baseType->asStr();
     } else {
         isValid = params.empty();
     }
@@ -292,9 +292,11 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
     if (const auto variable = ctx->VARIABLE()) {
         assignment->lvalue = getVariable(variable->getText(), ctx);
     } else if (const auto arrayIndex = ctx->arrayIndex()) {
-        assignment->lvalue = getArrayIndex(arrayIndex);
+        assignment->lvalue = getIterIndex(arrayIndex);
     } else if (const auto selection = ctx->selection()) {
         assignment->lvalue = getSelection(selection);
+    } else {
+        assert(false);
     }
 
     assignment->setLocation(ctx->start);
@@ -379,36 +381,21 @@ LgsStmt* AntlerConverter::getPatternMatching(LogosParser::PatternMatchingContext
 LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ctx) {
     LgsLoop* loopStmt = nullptr;
     if (ctx->iterableExpr) {
-        loopStmt = getForeachLoop(ctx);
+        loopStmt = new LgsForeachLoop(getUnaryExpr(ctx->iterableExpr));
     } else if (ctx->iterableRange) {
-        loopStmt = getRangeLoop(ctx);
+        loopStmt = new LgsRangeLoop(getExpr(ctx->iterableRange->start), getExpr(ctx->iterableRange->end));
     } else {
         assert(false && "No loop statements found");
+    }
+
+    for (const auto variable : ctx->VARIABLE()) {
+        const auto loopVarName = variable->getText();
+        loopStmt->loopVars.emplace_back(new LgsVarDec(loopVarName));
+        loopStmt->loopVar.emplace_back(new LgsVariable(loopVarName));
     }
     loopStmt->stmtBlock = getStmtBlock(ctx->statementsBlock());
     loopStmt->setLocation(ctx->start);
     return loopStmt;
-}
-
-LgsForeachLoop* AntlerConverter::getForeachLoop(LogosParser::LoopStatementContext* ctx) {
-    const auto forLoop = new LgsForeachLoop(getUnaryExpr(ctx->iterableExpr));
-    for (const auto variable : ctx->VARIABLE()) {
-        const auto loopVarName = variable->getText();
-        forLoop->loopVars.emplace_back(new LgsVarDec(loopVarName));
-    }
-    return forLoop;
-}
-
-LgsRangeLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx) {
-    const auto startExpr = getExpr(ctx->iterableRange->start);
-    const auto endExpr = getExpr(ctx->iterableRange->end);
-    const auto forLoop = new LgsRangeLoop(startExpr, endExpr);
-    for (const auto variable : ctx->VARIABLE()) {
-        const auto loopVarName = variable->getText();
-        auto loopVarDec = new LgsVarDec(loopVarName, startExpr->type);
-        forLoop->loopVars.emplace_back(loopVarDec);
-    }
-    return forLoop;
 }
 
 LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
@@ -475,7 +462,7 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     if (const auto constant = ctx->constant()) return getConstant(constant);
     if (const auto array = ctx->array()) return getArray(array);
     if (const auto hashMap = ctx->hashMap()) return getHashMap(hashMap);
-    if (const auto arrayIndex = ctx->arrayIndex()) return getArrayIndex(arrayIndex);
+    if (const auto arrayIndex = ctx->arrayIndex()) return getIterIndex(arrayIndex);
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (ctx->NULL_()) return new LgsNull();
     assert(false);
@@ -562,7 +549,7 @@ LgsUnaryExpr* AntlerConverter::getFirstSelection(LogosParser::SelectionContext* 
         return getFuncCall(funcCall);
     }
     if (const auto arrayIndex = firstExpr->arrayIndex()) {
-        return getArrayIndex(arrayIndex);
+        return getIterIndex(arrayIndex);
     }
     if (const auto selfInstance = firstExpr->SELF_INSTANCE()) {
         currentMethod->funcType.isStatic = true;
@@ -593,7 +580,7 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
             logosMethodCall->args.insert(logosMethodCall->args.begin(), prevExpr);
             exprs.push_back(logosMethodCall);
         } else if (const auto arrayIndex = currentExpr->arrayIndex()) {
-            const auto logosArrayIndex = getArrayIndex(arrayIndex);
+            const auto logosArrayIndex = getIterIndex(arrayIndex);
             exprs.push_back(logosArrayIndex);
         }
     }
@@ -616,7 +603,7 @@ LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) 
     return instance;
 }
 
-LgsIterIndex* AntlerConverter::getArrayIndex(LogosParser::ArrayIndexContext* ctx) {
+LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::ArrayIndexContext* ctx) {
     LgsUnaryExpr* baseExpr;
     if (const auto variable = ctx->VARIABLE()) {
         baseExpr = getVariable(variable->getText(), ctx);
@@ -680,7 +667,7 @@ LgsTypeConst* AntlerConverter::getTypeConstant(antlr4::tree::TerminalNode* type,
     return typeConst;
 }
 
-LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) const {
+LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
     if (!ctx) return nullptr;
     LgsType* result = nullptr;
     if (ctx->key && ctx->value) {
@@ -697,14 +684,13 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) const {
     return result;
 }
 
-LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) const {
-    const auto underlyingType = getTypeFromText(ctx->TYPE(), ctx);
-    const auto arrType = new LgsArray(underlyingType);
-    if (ctx->INTEGER().size() > 0) {
-        arrType->isStatic = true;
-        for (const auto& integer : ctx->INTEGER()) {
-            arrType->sizes.emplace_back(std::stoi(integer->getText()));
-        }
+LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
+    const auto baseType = getTypeFromText(ctx->TYPE(), ctx);
+    const auto arrType = new LgsArray(baseType);
+    if (ctx->expr().size() == 0) return arrType;
+    arrType->isStatic = true;
+    for (const auto expr : ctx->expr()) {
+        arrType->arrSize.emplace_back(getExpr(expr));
     }
     return arrType;
 }
@@ -741,7 +727,7 @@ bool AntlerConverter::isTypePrimitive(antlr4::tree::TerminalNode* typeToken, con
     return true;
 }
 
-LgsType* AntlerConverter::getFuncType(LogosParser::FuncSignatureContext* ctx) const {
+LgsType* AntlerConverter::getFuncType(LogosParser::FuncSignatureContext* ctx) {
     LgsType* result = nullptr;
     if (ctx->type()) {
         result = getType(ctx->type());

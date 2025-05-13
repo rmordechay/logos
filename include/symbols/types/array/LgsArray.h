@@ -13,7 +13,7 @@ public:
     LgsArrayDeleteFunc delete_{this};
     LgsArrayLenFunc len{this};
 
-    explicit LgsArray(LgsType* underlyingType = nullptr): LgsIterable(underlyingType) {
+    explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         addMethod(&add);
     }
     Type* getIRType() override;
@@ -22,7 +22,7 @@ public:
     string prettyName() const override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
-    void setUnderlyingType(const vector<LgsExpr*>& exprs);
+    void setBaseType(const vector<LgsExpr*>& exprs);
     bool isIndexable(LgsType* indexType) override;
     ~LgsArray() override = default;
 };

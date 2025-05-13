@@ -942,8 +942,8 @@ public:
     antlr4::tree::TerminalNode* LBRACK(size_t i);
     std::vector<antlr4::tree::TerminalNode *> RBRACK();
     antlr4::tree::TerminalNode* RBRACK(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> INTEGER();
-    antlr4::tree::TerminalNode* INTEGER(size_t i);
+    std::vector<ExprContext *> expr();
+    ExprContext* expr(size_t i);
     antlr4::tree::TerminalNode *LBRACE();
     antlr4::tree::TerminalNode *COLON();
     antlr4::tree::TerminalNode *RBRACE();
