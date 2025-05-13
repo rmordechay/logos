@@ -42,6 +42,7 @@ public:
     void setupActiveEnv();
     bool validateProject();
     string getFileText(path filePath) const;
+    bool resolveGlobalTypes(const vector<LgsFile*>& files) const;
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
     void parseSrcFile(path entry);
     void parseEnvFile(path fileEntry);

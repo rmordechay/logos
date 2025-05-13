@@ -8,7 +8,7 @@ class LgsIterable : public LgsType {
 public:
     LgsType* baseType;
     bool isStatic = false;
-    vector<LgsExpr*> arrSize;
+    vector<LgsExpr*> sizeExprs;
 
     explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}
     LgsType* inferTypeFromIter(const vector<LgsExpr*>& exprs) const;

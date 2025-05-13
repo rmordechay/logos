@@ -690,7 +690,7 @@ LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
     if (ctx->expr().size() == 0) return arrType;
     arrType->isStatic = true;
     for (const auto expr : ctx->expr()) {
-        arrType->arrSize.emplace_back(getExpr(expr));
+        arrType->sizeExprs.emplace_back(getExpr(expr));
     }
     return arrType;
 }

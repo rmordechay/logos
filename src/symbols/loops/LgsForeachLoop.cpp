@@ -8,7 +8,7 @@ int LgsForeachLoop::loopStart() {
 }
 
 int LgsForeachLoop::loopEnd() {
-    return iterExpr->type->asIterable()->arrSize.size();
+    return iterExpr->type->asIterable()->sizeExprs.size();
 }
 
 void LgsForeachLoop::setIRLoopVariable(CodeGenMetadata* metadata) {

@@ -105,6 +105,29 @@ void LogosProject::setupActiveEnv() {
     checkRequiredEnvVars();
 }
 
+bool LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) const {
+    for (const auto& file : files) {
+        SemaAnalyser semaAnalyser(file);
+        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+            for (const auto& object : mainFile->objects) {
+                semaAnalyser.resolveObjMemberTypes(object);
+            }
+            for (const auto& func : mainFile->getAllFuncs()) {
+                semaAnalyser.resolveFuncTypes(&func->funcType);
+            }
+        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+            semaAnalyser.resolveObjMemberTypes(objFile->obj);
+        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+            auto overloads = interfaceFile->interface->getAllMethods();
+            for (const auto& overload : overloads) {
+                semaAnalyser.resolveFuncTypes(&overload->funcType);
+            }
+        }
+        if (!semaAnalyser.errHandler.successful) return false;
+    }
+    return true;
+}
+
 void LogosProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
     for (const auto& entry : directory_iterator(path)) {
         if (isLogosFile(entry)) {

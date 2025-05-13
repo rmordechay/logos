@@ -10,12 +10,10 @@ void LgsVarDec::createIRStmt(CodeGenMetadata* metadata) {
     assert(expr);
     const auto exprValue = expr->getIRValue(metadata);
     const auto valueType = exprValue->getType();
-    // Pointers don't need to be stored
-    if (!(valueType->isPointerTy() || valueType->isVoidTy())) {
-        const auto ptr = builder.CreateAlloca(valueType);
-        builder.CreateStore(exprValue, ptr);
-    }
     IRValue = exprValue;
+    if (valueType->isPointerTy() || valueType->isVoidTy()) return;
+    const auto ptr = builder.CreateAlloca(valueType);
+    builder.CreateStore(exprValue, ptr);
 }
 
 json LgsVarDec::asJSON() {

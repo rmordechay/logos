@@ -10,7 +10,7 @@ void LgsArray::setBaseType(const vector<LgsExpr*>& exprs) {
 LgsExpr* LgsArray::getZeroValue() {
     if (!isStatic) return new LgsDArray(baseType);
     const auto sArray = new LgsSArray(baseType);
-    sArray->arrType.arrSize = arrSize;
+    sArray->arrType.sizeExprs = sizeExprs;
     return sArray;
 }
 
@@ -28,8 +28,8 @@ Type* LgsArray::getIRType() {
     if (!isStatic) return ptrTy;
     if (IRType) return IRType;
     IRType = baseType->getIRType();
-    for (auto size = arrSize.rbegin(); size != arrSize.rend(); ++size) {
-        IRType = ArrayType::get(IRType, (*size)->asIntConst()->value);
+    for (auto sizeExpr = sizeExprs.rbegin(); sizeExpr != sizeExprs.rend(); ++sizeExpr) {
+        IRType = ArrayType::get(IRType, (*sizeExpr)->asIntConst()->value);
     }
     return IRType;
 }

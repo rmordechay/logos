@@ -713,8 +713,11 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
         if (iterable->baseType->isUnknown()) {
             iterable->baseType = resolveType(iterable->baseType);
         }
-        for (auto arrSize : iterable->arrSize) {
-
+        for (const auto sizeExpr : iterable->sizeExprs) {
+            visitExpr(sizeExpr);
+            if (!sizeExpr->type->isConst || !sizeExpr->type->asInt()) {
+                errHandler.handleError(E10041, &sizeExpr->location, {sizeExpr->type->prettyName()});
+            }
         }
         return type;
     }
@@ -823,25 +826,3 @@ string SemaAnalyser::getOverloadsAsStr(const vector<LgsFunc*>& overloads) const 
     return str.str();
 }
 
-bool resolveGlobalTypes(const vector<LgsFile*>& files) {
-    for (const auto& file : files) {
-        SemaAnalyser semaAnalyser(file);
-        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
-            for (const auto& object : mainFile->objects) {
-                semaAnalyser.resolveObjMemberTypes(object);
-            }
-            for (const auto& func : mainFile->getAllFuncs()) {
-                semaAnalyser.resolveFuncTypes(&func->funcType);
-            }
-        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-            semaAnalyser.resolveObjMemberTypes(objFile->obj);
-        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            auto overloads = interfaceFile->interface->getAllMethods();
-            for (const auto& overload : overloads) {
-                semaAnalyser.resolveFuncTypes(&overload->funcType);
-            }
-        }
-        if (!semaAnalyser.errHandler.successful) return false;
-    }
-    return true;
-}
