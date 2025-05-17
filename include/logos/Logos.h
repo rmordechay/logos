@@ -1,5 +1,5 @@
-#ifndef PROJECT_H
-#define PROJECT_H
+#ifndef LOGOS_H
+#define LOGOS_H
 #include <filesystem>
 #include "SemaAnalyser.h"
 #include "LgsProject.h"
@@ -24,4 +24,4 @@ public:
     ~Logos() = default;
 };
 
-#endif // PROJECT_H
+#endif // LOGOS_H

@@ -40,19 +40,11 @@ public:
 
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
         auto& builder = metadata->builder;
-        const auto map = args[0];
-        const auto key = args[1];
-        const auto value = args[2];
-        const auto keyType = key->type->getIRType();
-        const auto valueType = value->type->getIRType();
-        const auto mapPtr = map->getIRValue(metadata);
-
-        const auto valuePtr = builder.CreateAlloca(valueType);
-        const auto keyIRValue = key->getIRValue(metadata);
-        const auto valueIRValue = value->getIRValue(metadata);
-        builder.CreateStore(valueIRValue, valuePtr);
-        const auto mapPtrLoad = builder.CreateLoad(keyType, mapPtr);
-        return LgsMethodImpl::callIR(metadata, {mapPtrLoad, keyIRValue, valuePtr});
+        const auto mapPtr = args[0]->getIRValue(metadata);
+        const auto key = args[1]->getIRValue(metadata);
+        const auto value = args[2]->getIRValue(metadata);
+        const auto mapPtrLoad = builder.CreateLoad(ptrTy, mapPtr);
+        return LgsMethodImpl::callIR(metadata, {mapPtrLoad, key, value});
     }
 };
 

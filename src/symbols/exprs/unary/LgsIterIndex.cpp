@@ -5,9 +5,9 @@
 
 Value* LgsIterIndex::createIRValue(CodeGenMetadata* metadata) {
     const auto baseExprType = baseExpr->type;
-    if (baseExprType->asArray()) {
+    if (const auto arr = baseExprType->asArray()) {
         if (baseExprType->isConst) return getGEP(metadata);
-        return createIRDynArray(metadata);
+        return createIRDynArray(metadata, arr);
     }
     if (const auto map = baseExprType->asMap()) {
         return createMapIRValue(metadata, map);
@@ -40,18 +40,20 @@ void LgsIterIndex::castExpr(LgsType* other) {
     assert(false);
 }
 
-Value* LgsIterIndex::createIRDynArray(CodeGenMetadata* metadata) const {
-    assert(false);
+Value* LgsIterIndex::createIRDynArray(CodeGenMetadata* metadata, LgsArray* arr) const {
+    const auto mapIRType = baseExpr->type->getIRType();
+    const auto mapPtr = baseExpr->getIRValue(metadata);
+    const auto mapLoaded = metadata->builder.CreateLoad(mapIRType, mapPtr);
+    const auto indexIRValue = indices[0]->from->getIRValue(metadata);
+    return arr->get.callIR(metadata, {mapLoaded, indexIRValue});
 }
 
 Value* LgsIterIndex::createMapIRValue(CodeGenMetadata* metadata, LgsMap* map) const {
     const auto mapIRType = baseExpr->type->getIRType();
-    const auto mapValueIRType = map->kvType.value->getIRType();
     const auto mapPtr = baseExpr->getIRValue(metadata);
     const auto mapLoaded = metadata->builder.CreateLoad(mapIRType, mapPtr);
     const auto indexIRValue = indices[0]->from->getIRValue(metadata);
-    const auto rv = map->get.callIR(metadata, {mapLoaded, indexIRValue});
-    return metadata->builder.CreateLoad(mapValueIRType, rv);
+    return map->get.callIR(metadata, {mapLoaded, indexIRValue});
 }
 
 Value* LgsIterIndex::createStrIRValue(CodeGenMetadata* metadata) const {
@@ -61,17 +63,25 @@ Value* LgsIterIndex::createStrIRValue(CodeGenMetadata* metadata) const {
     return metadata->builder.CreateGEP(ty, ptr, {i32Zero, value});
 }
 
-void LgsIterIndex::storeMapValue(CodeGenMetadata* metadata, const LgsHashMap* map) const {
+void LgsIterIndex::storeHashMap(CodeGenMetadata* metadata, LgsHashMap* hashMap) const {
     assert(false);
 }
 
 void LgsIterIndex::storeScalar(CodeGenMetadata* metadata, LgsExpr* value) {
-    const auto gep = getIRValue(metadata);
-    const auto rValue = value->getIRValue(metadata);
-    metadata->builder.CreateStore(rValue, gep);
+    if (const auto map = baseExpr->type->asMap()) {
+        auto key = indices[0]->from;
+        map->add.call(metadata, {baseExpr, key, value});
+    } else if (baseExpr->type->asArray() && !baseExpr->type->isConst) {
+        assert(false);
+    } else {
+        const auto gep = getIRValue(metadata);
+        const auto rValue = value->getIRValue(metadata);
+        metadata->builder.CreateStore(rValue, gep);
+    }
 }
 
-void LgsIterIndex::storeConstArray(CodeGenMetadata* metadata, const LgsArrayExpr* arr) const {
+void LgsIterIndex::storeArray(CodeGenMetadata* metadata, const LgsArrayExpr* arr) const {
+    if (!arr->type->isConst) assert(false);
     const auto IRType = baseExpr->type->getIRType();
     const auto arrPtr = baseExpr->getIRValue(metadata);
     vector IRIndices = {i32Zero};

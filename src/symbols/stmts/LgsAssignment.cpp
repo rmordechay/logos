@@ -1,11 +1,10 @@
 #include "stmts/LgsAssignment.h"
-
 #include "exprs/unary/LgsArrayExpr.h"
+#include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
-#include "stmts/LgsVarDec.h"
 
 void LgsAssignment::createIRStmt(CodeGenMetadata* metadata) {
     if (const auto selection = lValue->asSelection()) {
@@ -19,13 +18,9 @@ void LgsAssignment::createIRStmt(CodeGenMetadata* metadata) {
 
 void LgsAssignment::assignIRIterIndex(CodeGenMetadata* metadata, LgsIterIndex* iterIndex, LgsExpr* value) const {
     if (iterIndex->type->asMap()) {
-        assert(false);
+        iterIndex->storeHashMap(metadata, value->asHashMap());
     } else if (iterIndex->type->asArray()) {
-        if (iterIndex->type->isConst) {
-            iterIndex->storeConstArray(metadata, value->asArrayExpr());
-        } else {
-            assert(false);
-        }
+        iterIndex->storeArray(metadata, value->asArrayExpr());
     } else {
         iterIndex->storeScalar(metadata, value);
     }
