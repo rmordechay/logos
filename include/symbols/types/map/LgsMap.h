@@ -26,8 +26,8 @@ public:
     int getDims() override;
     Type* getIRType() override;
     string getIRName() override;
-    LgsExpr* getZeroValue() override;
     string prettyName() const override;
+    LgsExpr* getZeroValue() override;
     LgsType* getBaseType() override;
     bool equals(LgsType* other) override;
     bool canIndexTo(LgsType* indexType) override;

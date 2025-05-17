@@ -37,7 +37,7 @@ LgsExpr* LgsMap::getZeroValue() {
 }
 
 string LgsMap::prettyName() const {
-    return name + baseType->prettyName();
+    return '{' + kvType.key->prettyName() + ':' + kvType.value->prettyName() + '}';
 }
 
 bool LgsMap::equals(LgsType* other) {

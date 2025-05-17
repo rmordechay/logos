@@ -15,6 +15,7 @@ public:
 
     explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         addMethod(&add);
+        addMethod(&len);
     }
     void inferArrayType(const vector<LgsExpr*>& exprs);
     int getDims() override;

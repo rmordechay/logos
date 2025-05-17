@@ -12,3 +12,7 @@ Value* LgsHashMap::createIRValue(CodeGenMetadata* metadata) {
     }
     return IRValue;
 }
+
+Value* LgsHashMap::getLength(CodeGenMetadata* metadata) {
+    return mapType.len.call(metadata, {this});
+}

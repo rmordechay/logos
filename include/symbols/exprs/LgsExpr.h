@@ -29,7 +29,7 @@ public:
     Value* getIRValue(CodeGenMetadata* metadata);
     void initIRValue(CodeGenMetadata* metadata);
     void setType(LgsType* type);
-    bool isGEP() const;
+    bool shouldLoadIR() const;
     LgsVariable* asVariable();
     LgsFuncCall* asFuncCall();
     LgsIterIndex* asIterIndex();

@@ -89,7 +89,7 @@ bool LgsFunc::setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argVa
         const auto arg = args[i];
         const auto argIRValue = arg->getIRValue(metadata);
         const auto artIRType = arg->type->getIRType();
-        if (arg->isGEP()) {
+        if (arg->shouldLoadIR()) {
             const auto value = metadata->builder.CreateLoad(artIRType, argIRValue);
             argValues.emplace_back(value);
         } else {

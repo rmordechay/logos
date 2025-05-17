@@ -29,14 +29,15 @@ void LgsExpr::setType(LgsType* type) {
     this->type = type;
 }
 
-bool LgsExpr::isGEP() const {
-    if (!IRValue) return false;
+bool LgsExpr::shouldLoadIR() const {
+    assert(IRValue);
+    if (isa<GlobalVariable>(IRValue)) return false;
     auto isGEP = isa<GetElementPtrInst>(IRValue);
     if (!isGEP && isa<ConstantExpr>(IRValue)) {
         const auto constExpr = cast<ConstantExpr>(IRValue);
         isGEP = constExpr->getOpcode() == Instruction::GetElementPtr;
     }
-    return isGEP;
+    return isGEP || isa<AllocaInst>(IRValue);
 }
 
 LgsExpr* LgsExpr::clone() { assert(false); }
