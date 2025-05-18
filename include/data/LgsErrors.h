@@ -56,5 +56,6 @@ inline LgsError E10038{.msg = "'continue' must be inside a loop statement.", .er
 inline LgsError E10039{.msg = "main() function accepts only one optional parameter of type 'Str[]'.", .errCode = ++errCodeStart};
 inline LgsError E10040{.msg = "The number of variables in the for loop (%s) do not match the number of the iterable's returned values (%s).", .errCode = ++errCodeStart};
 inline LgsError E10041{.msg = "'%s' unpacks %s variables, not %s.", .errCode = ++errCodeStart};
+inline LgsError E10042{.msg = "Left index in slice must be less than the right index. Given: '%s'.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

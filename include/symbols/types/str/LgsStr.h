@@ -22,7 +22,7 @@ public:
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
-    LgsType* createInnerType(size_t indexRange) const override;
+    LgsType* createInnerType(size_t indexRange, LgsIndex* index) const override;
     static uint32_t hashString(const string& str);
     ~LgsStr() override = default;
 };

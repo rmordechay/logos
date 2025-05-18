@@ -48,12 +48,18 @@ void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[0]->type = baseType;
 }
 
-LgsType* LgsArray::createInnerType(const size_t indexRange) const {
+LgsType* LgsArray::createInnerType(const size_t indexRange, LgsIndex* index) const {
     if (!isConst) assert(false);
     const auto innerType = new LgsArray(baseType);
     innerType->isConst = isConst;
     innerType->dimsExprs = dimsExprs;
-    innerType->dimsExprs.erase(innerType->dimsExprs.begin() + (innerType->dimsExprs.size() - 1 - indexRange));
+    if (index->to) {
+        const auto from = getExprConstNumber(index->from);
+        const auto to = getExprConstNumber(index->to);
+    } else {
+        const auto i = innerType->dimsExprs.size() - 1 - indexRange;
+        innerType->dimsExprs.erase(innerType->dimsExprs.begin() + i);
+    }
     return innerType;
 }
 

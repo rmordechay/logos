@@ -25,7 +25,7 @@ public:
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
-    LgsType* createInnerType(size_t indexRange) const override;
+    LgsType* createInnerType(size_t indexRange, LgsIndex* index) const override;
     bool canIndexTo(LgsType* indexType) override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
     ~LgsArray() override;

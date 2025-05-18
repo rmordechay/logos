@@ -527,14 +527,17 @@ void SemaAnalyser::setIterIndexType(LgsIterIndex* iterIndex) {
     if (!iterable) {
         return errHandler.handleError(E10002, &iterIndex->location, {iterIndex->prettyName()});
     }
-    const auto baseDims = iterable->getDims();
-    const auto iterIndexDims = iterIndex->indices.size();
-    const int diff = baseDims - iterIndexDims;
     const auto iterBaseType = iterable->getBaseType();
+    const int diff = iterable->getDims() - iterIndex->indices.size();
+    const auto index = iterIndex->indices[diff];
     if (diff > 0) {
-        iterIndex->type = iterable->createInnerType(diff);
+        iterIndex->type = iterable->createInnerType(diff, index);
     } else if (diff == 0) {
-        iterIndex->type = iterBaseType;
+        if (index->to) {
+            iterIndex->type = iterable->createInnerType(diff, index);
+        } else {
+            iterIndex->type = iterBaseType;
+        }
     } else {
         assert(false);
     }

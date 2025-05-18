@@ -31,7 +31,7 @@ LgsType* LgsStr::inferBinaryType(LgsType* other) {
     return this;
 }
 
-LgsType* LgsStr::createInnerType(size_t indexRange) const {
+LgsType* LgsStr::createInnerType(size_t indexRange, LgsIndex* index) const {
     return baseType;
 }
 

@@ -44,7 +44,7 @@ LgsType* LgsIterable::inferTypeFromIter(const vector<LgsExpr*>& exprs) const {
     return type;
 }
 
-int LgsIterable::getExprConstNumber(LgsExpr* expr) {
+int getExprConstNumber(LgsExpr* expr) {
     if (const auto asInt = expr->asIntConst()) {
         return asInt->value;
     }
