@@ -30,6 +30,7 @@ public:
     void initIRValue(CodeGenMetadata* metadata);
     void setType(LgsType* type);
     bool shouldLoadIR() const;
+
     LgsVariable* asVariable();
     LgsFuncCall* asFuncCall();
     LgsIterIndex* asIterIndex();
@@ -44,6 +45,7 @@ public:
     LgsStrConst* asStrConst();
     LgsEnumField* asEnumField();
     LgsTypeConst* asTypeConst();
+
     virtual string prettyName();
     virtual string getStrFormatPart() const;
     virtual void castExpr(LgsType* other);

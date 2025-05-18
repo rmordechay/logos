@@ -1,8 +1,3 @@
-; ModuleID = 'map/HashMap.c'
-source_filename = "map/HashMap.c"
-target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128-Fn32"
-target triple = "arm64-apple-macosx15.0.0"
-
 %struct.Entry = type { ptr, ptr, ptr }
 %struct.HashMap = type { ptr, i32, i64 }
 

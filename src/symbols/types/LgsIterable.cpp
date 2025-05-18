@@ -1,7 +1,6 @@
 #include "types/LgsIterable.h"
+#include "LgsUtils.h"
 #include "exprs/LgsExpr.h"
-#include "exprs/unary/LgsVariable.h"
-#include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
@@ -42,21 +41,4 @@ LgsType* LgsIterable::inferTypeFromIter(const vector<LgsExpr*>& exprs) const {
         }
     }
     return type;
-}
-
-int getExprConstNumber(LgsExpr* expr) {
-    if (const auto asInt = expr->asIntConst()) {
-        return asInt->value;
-    }
-    if (const auto var = expr->asVariable()) {
-        switch (var->ref->type) {
-        case VAR_DEC:
-            return getExprConstNumber(var->ref->varDec->expr);
-        case FIELD:
-            return getExprConstNumber(var->ref->field->expr);
-        default:
-            break;
-        }
-    }
-    return -1;
 }

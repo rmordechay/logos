@@ -1,8 +1,3 @@
-; ModuleID = 'array/Array.c'
-source_filename = "array/Array.c"
-target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128-Fn32"
-target triple = "arm64-apple-macosx15.0.0"
-
 %struct.Array = type { i64, i32, i32, ptr }
 
 @.str = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1

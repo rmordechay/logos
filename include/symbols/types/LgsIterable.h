@@ -5,8 +5,6 @@
 class LgsIndex;
 struct CodeGenMetadata;
 
-int getExprConstNumber(LgsExpr* expr);
-
 class LgsIterable : public LgsType {
 public:
     LgsType* baseType;

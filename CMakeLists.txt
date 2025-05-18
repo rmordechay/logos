@@ -11,7 +11,9 @@ set(CMAKE_BUILD_PARALLEL_LEVEL ${CPU_COUNT})
 
 file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS include/*.h)
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
-add_library(lib ${HEADER_FILES} ${SOURCE_FILES})
+add_library(lib ${HEADER_FILES} ${SOURCE_FILES}
+    src/utils/LgsUtils.cpp
+    include/utils/LgsUtils.h)
 
 target_include_directories(lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include

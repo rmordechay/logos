@@ -1,4 +1,6 @@
 #include "types/array/LgsArray.h"
+
+#include "LgsUtils.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsVariable.h"

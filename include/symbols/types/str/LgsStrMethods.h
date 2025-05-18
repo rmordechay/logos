@@ -3,8 +3,6 @@
 #include "funcs/LgsMethodImpl.h"
 #include "types/LgsAny.h"
 
-void replaceNextPlaceholder(string& str, const LgsExpr* expr);
-
 class LgsStrFormatFunc final : public LgsMethodImpl {
 public:
     LgsParam self{};
