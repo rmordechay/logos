@@ -290,8 +290,8 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
 
     if (const auto variable = ctx->VARIABLE()) {
         assignment->lValue = getVariable(variable->getText(), ctx);
-    } else if (const auto arrayIndex = ctx->iterIndex()) {
-        assignment->lValue = getIterIndex(arrayIndex);
+    } else if (const auto iterIndex = ctx->iterIndex()) {
+        assignment->lValue = getIterIndex(iterIndex);
     } else if (const auto selection = ctx->selection()) {
         assignment->lValue = getSelection(selection);
     } else {
@@ -481,7 +481,7 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     if (const auto constant = ctx->constant()) return getConstant(constant);
     if (const auto array = ctx->array()) return getArrayExpr(array);
     if (const auto hashMap = ctx->hashMap()) return getHashMap(hashMap);
-    if (const auto arrayIndex = ctx->iterIndex()) return getIterIndex(arrayIndex);
+    if (const auto iterIndex = ctx->iterIndex()) return getIterIndex(iterIndex);
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (ctx->NULL_()) return new LgsNull();
     assert(false);
@@ -567,8 +567,8 @@ LgsUnaryExpr* AntlerConverter::getFirstSelection(LogosParser::SelectionContext* 
     if (const auto funcCall = firstExpr->funcCall()) {
         return getFuncCall(funcCall);
     }
-    if (const auto arrayIndex = firstExpr->iterIndex()) {
-        return getIterIndex(arrayIndex);
+    if (const auto iterIndex = firstExpr->iterIndex()) {
+        return getIterIndex(iterIndex);
     }
     if (const auto selfInstance = firstExpr->SELF_INSTANCE()) {
         currentMethod->funcType.isStatic = true;
@@ -598,9 +598,9 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
             const auto prevExpr = i == 0 ? exprs[0] : exprs[i - 1];
             logosMethodCall->args.insert(logosMethodCall->args.begin(), prevExpr);
             exprs.push_back(logosMethodCall);
-        } else if (const auto arrayIndex = currentExpr->iterIndex()) {
-            const auto logosArrayIndex = getIterIndex(arrayIndex);
-            exprs.push_back(logosArrayIndex);
+        } else if (const auto iterIndex = currentExpr->iterIndex()) {
+            const auto logosIterIndex = getIterIndex(iterIndex);
+            exprs.push_back(logosIterIndex);
         }
     }
     return exprs;
@@ -637,15 +637,15 @@ LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::IterIndexContext* ctx) 
         const auto indexExpr = ctx->index()[i];
         const auto indexExprFrom = indexExpr->from;
         const auto indexExprTo = indexExpr->to;
-        const auto arrayIndexFrom = getExpr(indexExprFrom);
-        const auto arrayIndexTo = getExpr(indexExprTo);
-        arrayIndexFrom->setLocation(indexExprFrom->start);
-        indices.emplace_back(new LgsIndex(arrayIndexFrom, arrayIndexTo));
+        const auto iterIndexFrom = getExpr(indexExprFrom);
+        const auto iterIndexTo = getExpr(indexExprTo);
+        iterIndexFrom->setLocation(indexExprFrom->start);
+        indices.emplace_back(new LgsIndex(iterIndexFrom, iterIndexTo));
     }
 
-    const auto arrayIndex = new LgsIterIndex(baseExpr, indices);
-    arrayIndex->setLocation(ctx->start);
-    return arrayIndex;
+    const auto iterIndex = new LgsIterIndex(baseExpr, indices);
+    iterIndex->setLocation(ctx->start);
+    return iterIndex;
 }
 
 LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) const {
