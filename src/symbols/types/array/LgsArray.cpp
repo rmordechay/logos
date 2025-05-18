@@ -1,8 +1,10 @@
 #include "types/array/LgsArray.h"
 #include "exprs/unary/LgsArrayExpr.h"
+#include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
+#include "stmts/LgsVarDec.h"
 
 void LgsArray::inferArrayType(const vector<LgsExpr*>& exprs) {
     baseType = inferTypeFromIter(exprs);
@@ -40,6 +42,10 @@ LgsType* LgsArray::inferBinaryType(LgsType* other) {
 
 bool LgsArray::canIndexTo(LgsType* indexType) {
     return !!indexType->asInt();
+}
+
+void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
+    varDecs[0]->type = baseType;
 }
 
 LgsType* LgsArray::createInnerType(const size_t indexRange) const {

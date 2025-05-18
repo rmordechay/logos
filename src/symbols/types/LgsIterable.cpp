@@ -28,6 +28,10 @@ Value* LgsIterable::IRLength(CodeGenMetadata* metadata) {
     assert(false);
 }
 
+void LgsIterable::unpackTypes(const vector<LgsVarDec*>& varDecs) {
+    assert(false);
+}
+
 LgsType* LgsIterable::inferTypeFromIter(const vector<LgsExpr*>& exprs) const {
     if (exprs.empty()) return nullptr;
     const auto type = exprs[0]->type;

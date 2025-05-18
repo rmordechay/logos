@@ -61,7 +61,7 @@ void logosParserInitialize() {
       "returnStatement", "enumDeclaration", "enumField", "expr", "unaryExpr", 
       "array", "hashMap", "keyValue", "funcCall", "funcArgList", "funcArg", 
       "constructor", "constructorArgList", "constructorArg", "constant", 
-      "arrayIndex", "index", "selection", "firstSelectionElement", "innerSelectionElement", 
+      "iterIndex", "index", "selection", "firstSelectionElement", "innerSelectionElement", 
       "range", "type", "arrTypeSize", "vector", "requireEnvVars"
     },
     std::vector<std::string>{
@@ -2130,8 +2130,8 @@ tree::TerminalNode* LogosParser::AssignmentContext::VARIABLE() {
   return getToken(LogosParser::VARIABLE, 0);
 }
 
-LogosParser::ArrayIndexContext* LogosParser::AssignmentContext::arrayIndex() {
-  return getRuleContext<LogosParser::ArrayIndexContext>(0);
+LogosParser::IterIndexContext* LogosParser::AssignmentContext::iterIndex() {
+  return getRuleContext<LogosParser::IterIndexContext>(0);
 }
 
 LogosParser::SelectionContext* LogosParser::AssignmentContext::selection() {
@@ -2168,7 +2168,7 @@ LogosParser::AssignmentContext* LogosParser::assignment() {
 
     case 2: {
       setState(297);
-      arrayIndex();
+      iterIndex();
       break;
     }
 
@@ -3542,8 +3542,8 @@ LogosParser::HashMapContext* LogosParser::UnaryExprContext::hashMap() {
   return getRuleContext<LogosParser::HashMapContext>(0);
 }
 
-LogosParser::ArrayIndexContext* LogosParser::UnaryExprContext::arrayIndex() {
-  return getRuleContext<LogosParser::ArrayIndexContext>(0);
+LogosParser::IterIndexContext* LogosParser::UnaryExprContext::iterIndex() {
+  return getRuleContext<LogosParser::IterIndexContext>(0);
 }
 
 LogosParser::SelectionContext* LogosParser::UnaryExprContext::selection() {
@@ -3651,7 +3651,7 @@ LogosParser::UnaryExprContext* LogosParser::unaryExpr() {
     case 12: {
       enterOuterAlt(_localctx, 12);
       setState(472);
-      arrayIndex();
+      iterIndex();
       break;
     }
 
@@ -4397,37 +4397,37 @@ LogosParser::ConstantContext* LogosParser::constant() {
   return _localctx;
 }
 
-//----------------- ArrayIndexContext ------------------------------------------------------------------
+//----------------- IterIndexContext ------------------------------------------------------------------
 
-LogosParser::ArrayIndexContext::ArrayIndexContext(ParserRuleContext *parent, size_t invokingState)
+LogosParser::IterIndexContext::IterIndexContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-LogosParser::FuncCallContext* LogosParser::ArrayIndexContext::funcCall() {
+LogosParser::FuncCallContext* LogosParser::IterIndexContext::funcCall() {
   return getRuleContext<LogosParser::FuncCallContext>(0);
 }
 
-tree::TerminalNode* LogosParser::ArrayIndexContext::VARIABLE() {
+tree::TerminalNode* LogosParser::IterIndexContext::VARIABLE() {
   return getToken(LogosParser::VARIABLE, 0);
 }
 
-std::vector<LogosParser::IndexContext *> LogosParser::ArrayIndexContext::index() {
+std::vector<LogosParser::IndexContext *> LogosParser::IterIndexContext::index() {
   return getRuleContexts<LogosParser::IndexContext>();
 }
 
-LogosParser::IndexContext* LogosParser::ArrayIndexContext::index(size_t i) {
+LogosParser::IndexContext* LogosParser::IterIndexContext::index(size_t i) {
   return getRuleContext<LogosParser::IndexContext>(i);
 }
 
 
-size_t LogosParser::ArrayIndexContext::getRuleIndex() const {
-  return LogosParser::RuleArrayIndex;
+size_t LogosParser::IterIndexContext::getRuleIndex() const {
+  return LogosParser::RuleIterIndex;
 }
 
 
-LogosParser::ArrayIndexContext* LogosParser::arrayIndex() {
-  ArrayIndexContext *_localctx = _tracker.createInstance<ArrayIndexContext>(_ctx, getState());
-  enterRule(_localctx, 94, LogosParser::RuleArrayIndex);
+LogosParser::IterIndexContext* LogosParser::iterIndex() {
+  IterIndexContext *_localctx = _tracker.createInstance<IterIndexContext>(_ctx, getState());
+  enterRule(_localctx, 94, LogosParser::RuleIterIndex);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -4704,8 +4704,8 @@ LogosParser::ConstructorContext* LogosParser::FirstSelectionElementContext::cons
   return getRuleContext<LogosParser::ConstructorContext>(0);
 }
 
-LogosParser::ArrayIndexContext* LogosParser::FirstSelectionElementContext::arrayIndex() {
-  return getRuleContext<LogosParser::ArrayIndexContext>(0);
+LogosParser::IterIndexContext* LogosParser::FirstSelectionElementContext::iterIndex() {
+  return getRuleContext<LogosParser::IterIndexContext>(0);
 }
 
 
@@ -4774,7 +4774,7 @@ LogosParser::FirstSelectionElementContext* LogosParser::firstSelectionElement() 
     case 7: {
       enterOuterAlt(_localctx, 7);
       setState(602);
-      arrayIndex();
+      iterIndex();
       break;
     }
 
@@ -4806,8 +4806,8 @@ LogosParser::FuncCallContext* LogosParser::InnerSelectionElementContext::funcCal
   return getRuleContext<LogosParser::FuncCallContext>(0);
 }
 
-LogosParser::ArrayIndexContext* LogosParser::InnerSelectionElementContext::arrayIndex() {
-  return getRuleContext<LogosParser::ArrayIndexContext>(0);
+LogosParser::IterIndexContext* LogosParser::InnerSelectionElementContext::iterIndex() {
+  return getRuleContext<LogosParser::IterIndexContext>(0);
 }
 
 
@@ -4848,7 +4848,7 @@ LogosParser::InnerSelectionElementContext* LogosParser::innerSelectionElement() 
     case 3: {
       enterOuterAlt(_localctx, 3);
       setState(607);
-      arrayIndex();
+      iterIndex();
       break;
     }
 

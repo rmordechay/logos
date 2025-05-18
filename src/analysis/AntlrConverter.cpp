@@ -290,7 +290,7 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
 
     if (const auto variable = ctx->VARIABLE()) {
         assignment->lValue = getVariable(variable->getText(), ctx);
-    } else if (const auto arrayIndex = ctx->arrayIndex()) {
+    } else if (const auto arrayIndex = ctx->iterIndex()) {
         assignment->lValue = getIterIndex(arrayIndex);
     } else if (const auto selection = ctx->selection()) {
         assignment->lValue = getSelection(selection);
@@ -392,28 +392,29 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
     return loopStmt;
 }
 
+LgsLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx) {
+    const auto startExpr = getExpr(ctx->iterableRange->start);
+    const auto endExpr = getExpr(ctx->iterableRange->end);
+    const auto rangeLoop = new LgsRangeLoop(startExpr, endExpr);
+    // TODO add error for range loop size greater than 1
+    for (const auto variable : ctx->VARIABLE()) {
+        const auto loopVarName = variable->getText();
+        auto varDec = new LgsVarDec(loopVarName, &LGS_INT);
+        varDec->expr = LGS_INT.getZeroValue();
+        rangeLoop->loopVars.emplace_back(varDec);
+    }
+    return rangeLoop;
+}
+
 LgsLoop* AntlerConverter::getForeachLoop(LogosParser::LoopStatementContext* ctx) {
     const auto iterExpr = getUnaryExpr(ctx->iterableExpr);
     const auto foreachLoop = new LgsForeachLoop(iterExpr);
     for (const auto variable : ctx->VARIABLE()) {
         const auto loopVarName = variable->getText();
         auto varDec = new LgsVarDec(loopVarName);
-        varDec->expr = new LgsIterIndex(iterExpr, {new LgsIndex(LGS_INT.getZeroValue())});
         foreachLoop->loopVars.emplace_back(varDec);
     }
     return foreachLoop;
-}
-
-LgsLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx) {
-    const auto startExpr = getExpr(ctx->iterableRange->start);
-    const auto endExpr = getExpr(ctx->iterableRange->end);
-    const auto rangeLoop = new LgsRangeLoop(startExpr, endExpr);
-    for (const auto variable : ctx->VARIABLE()) {
-        const auto loopVarName = variable->getText();
-        auto loopVarDec = new LgsVarDec(loopVarName, &LGS_INT, LGS_INT.getZeroValue());
-        rangeLoop->loopVars.emplace_back(loopVarDec);
-    }
-    return rangeLoop;
 }
 
 LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
@@ -480,7 +481,7 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     if (const auto constant = ctx->constant()) return getConstant(constant);
     if (const auto array = ctx->array()) return getArrayExpr(array);
     if (const auto hashMap = ctx->hashMap()) return getHashMap(hashMap);
-    if (const auto arrayIndex = ctx->arrayIndex()) return getIterIndex(arrayIndex);
+    if (const auto arrayIndex = ctx->iterIndex()) return getIterIndex(arrayIndex);
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (ctx->NULL_()) return new LgsNull();
     assert(false);
@@ -566,7 +567,7 @@ LgsUnaryExpr* AntlerConverter::getFirstSelection(LogosParser::SelectionContext* 
     if (const auto funcCall = firstExpr->funcCall()) {
         return getFuncCall(funcCall);
     }
-    if (const auto arrayIndex = firstExpr->arrayIndex()) {
+    if (const auto arrayIndex = firstExpr->iterIndex()) {
         return getIterIndex(arrayIndex);
     }
     if (const auto selfInstance = firstExpr->SELF_INSTANCE()) {
@@ -597,7 +598,7 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
             const auto prevExpr = i == 0 ? exprs[0] : exprs[i - 1];
             logosMethodCall->args.insert(logosMethodCall->args.begin(), prevExpr);
             exprs.push_back(logosMethodCall);
-        } else if (const auto arrayIndex = currentExpr->arrayIndex()) {
+        } else if (const auto arrayIndex = currentExpr->iterIndex()) {
             const auto logosArrayIndex = getIterIndex(arrayIndex);
             exprs.push_back(logosArrayIndex);
         }
@@ -621,7 +622,7 @@ LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) 
     return instance;
 }
 
-LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::ArrayIndexContext* ctx) {
+LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::IterIndexContext* ctx) {
     LgsUnaryExpr* baseExpr;
     if (const auto variable = ctx->VARIABLE()) {
         baseExpr = getVariable(variable->getText(), ctx);

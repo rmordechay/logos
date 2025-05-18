@@ -11,6 +11,7 @@ public:
     LgsStrFormatFunc format{this};
 
     LgsStr() : LgsIterable(&LGS_CHAR) {
+        unpackLength = 1;
         addMethod(&format);
     }
     int getDims() override;

@@ -8,6 +8,7 @@ class LgsIterable : public LgsType {
 public:
     LgsType* baseType;
     vector<LgsExpr*> dimsExprs;
+    uint16_t unpackLength = 0;
 
     explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}
     Type* getIRType() override;
@@ -16,6 +17,7 @@ public:
     virtual int getDims();
     virtual LgsType* getBaseType();
     virtual Value* IRLength(CodeGenMetadata* metadata);
+    virtual void unpackTypes(const vector<LgsVarDec*>& varDecs);
     virtual LgsType* createInnerType(size_t indexRange) const = 0;
     ~LgsIterable() override = default;
 };

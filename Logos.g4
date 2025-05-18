@@ -99,7 +99,7 @@ statementsBlock:
     ;
 
 assignment:
-        (VARIABLE | arrayIndex | selection) COLON EQUAL expr
+        (VARIABLE | iterIndex | selection) COLON EQUAL expr
     ;
 
 explicitVarDec:
@@ -176,7 +176,7 @@ unaryExpr:
     |   constant
     |   array
     |   hashMap
-    |   arrayIndex
+    |   iterIndex
     |   selection
     ;
 
@@ -223,7 +223,7 @@ constant:
     |   STRING
     ;
 
-arrayIndex:
+iterIndex:
         (funcCall | VARIABLE) (index)+
     ;
 
@@ -244,13 +244,13 @@ firstSelectionElement:
     |   SELF_INSTANCE
     |   funcCall
     |   constructor
-    |   arrayIndex
+    |   iterIndex
     ;
 
 innerSelectionElement:
         VARIABLE
     |   funcCall
-    |   arrayIndex
+    |   iterIndex
     ;
 
 range:

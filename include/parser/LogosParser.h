@@ -40,7 +40,7 @@ public:
     RuleEnumField = 34, RuleExpr = 35, RuleUnaryExpr = 36, RuleArray = 37, 
     RuleHashMap = 38, RuleKeyValue = 39, RuleFuncCall = 40, RuleFuncArgList = 41, 
     RuleFuncArg = 42, RuleConstructor = 43, RuleConstructorArgList = 44, 
-    RuleConstructorArg = 45, RuleConstant = 46, RuleArrayIndex = 47, RuleIndex = 48, 
+    RuleConstructorArg = 45, RuleConstant = 46, RuleIterIndex = 47, RuleIndex = 48, 
     RuleSelection = 49, RuleFirstSelectionElement = 50, RuleInnerSelectionElement = 51, 
     RuleRange = 52, RuleType = 53, RuleArrTypeSize = 54, RuleVector = 55, 
     RuleRequireEnvVars = 56
@@ -110,7 +110,7 @@ public:
   class ConstructorArgListContext;
   class ConstructorArgContext;
   class ConstantContext;
-  class ArrayIndexContext;
+  class IterIndexContext;
   class IndexContext;
   class SelectionContext;
   class FirstSelectionElementContext;
@@ -453,7 +453,7 @@ public:
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
     antlr4::tree::TerminalNode *VARIABLE();
-    ArrayIndexContext *arrayIndex();
+    IterIndexContext *iterIndex();
     SelectionContext *selection();
 
    
@@ -689,7 +689,7 @@ public:
     ConstantContext *constant();
     ArrayContext *array();
     HashMapContext *hashMap();
-    ArrayIndexContext *arrayIndex();
+    IterIndexContext *iterIndex();
     SelectionContext *selection();
 
    
@@ -840,9 +840,9 @@ public:
 
   ConstantContext* constant();
 
-  class  ArrayIndexContext : public antlr4::ParserRuleContext {
+  class  IterIndexContext : public antlr4::ParserRuleContext {
   public:
-    ArrayIndexContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    IterIndexContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     FuncCallContext *funcCall();
     antlr4::tree::TerminalNode *VARIABLE();
@@ -852,7 +852,7 @@ public:
    
   };
 
-  ArrayIndexContext* arrayIndex();
+  IterIndexContext* iterIndex();
 
   class  IndexContext : public antlr4::ParserRuleContext {
   public:
@@ -896,7 +896,7 @@ public:
     antlr4::tree::TerminalNode *SELF_INSTANCE();
     FuncCallContext *funcCall();
     ConstructorContext *constructor();
-    ArrayIndexContext *arrayIndex();
+    IterIndexContext *iterIndex();
 
    
   };
@@ -909,7 +909,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
     FuncCallContext *funcCall();
-    ArrayIndexContext *arrayIndex();
+    IterIndexContext *iterIndex();
 
    
   };

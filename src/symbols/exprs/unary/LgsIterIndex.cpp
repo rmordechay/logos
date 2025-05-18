@@ -30,6 +30,7 @@ Value* LgsIterIndex::getGEP(CodeGenMetadata* metadata) const {
     vector<Value*> IRIndices;
     IRIndices.push_back(i32Zero);
     for (const auto index : indices) {
+        assert(!index->to);
         auto value = index->from->getIRValue(metadata);
         IRIndices.push_back(value);
     }

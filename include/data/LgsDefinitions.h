@@ -22,6 +22,9 @@ using namespace llvm;
 #define LOGOS_OBJECT_FILE "output.o"
 #define LOGOS_EXECUTABLE_FILE "output"
 #define LOGOS_STR_FORMAT_PART "%v"
+#define LOGOS_LOOP_CONDITION "loop_condition"
+#define LOGOS_LOOP_BODY "loop_body"
+#define LOGOS_LOOP_EXIT "loop_exit"
 
 #if defined(__linux__)
 LLD_HAS_DRIVER(elf);

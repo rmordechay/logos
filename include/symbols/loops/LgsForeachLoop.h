@@ -12,9 +12,8 @@ public:
     explicit LgsForeachLoop(LgsUnaryExpr* iterable) : iterExpr(iterable) {}
     Value* loopStart(CodeGenMetadata* metadata) override;
     Value* loopEnd(CodeGenMetadata* metadata) override;
-    void setIRLoopVariable(CodeGenMetadata* metadata) override;
+    void setIRLoopVars(CodeGenMetadata* metadata) override;
     ~LgsForeachLoop() override;
 };
-
 
 #endif //LOGOSFOREACHLOOP_H

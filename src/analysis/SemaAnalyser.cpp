@@ -236,7 +236,6 @@ void SemaAnalyser::visitLoopStmt(LgsLoop* loopStmt) {
 }
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
-    // TODO check all loop vars
     const auto loopVar = rangeLoop->loopVars[0];
     addLocalSymbol(loopVar->name, LgsSymbol(loopVar));
     visitStmtBlock(rangeLoop->stmtBlock);
@@ -249,10 +248,12 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
     if (!iterable) {
         return errHandler.handleError(E10002, &iterExpr->location, {iterExpr->prettyName()});
     }
+    if (iterable->unpackLength != foreachLoop->loopVars.size()) {
+        errHandler.handleError(E10041, &iterExpr->location, {iterExpr->prettyName(), to_string(iterable->unpackLength), to_string(foreachLoop->loopVars.size())});
+        return;
+    }
+    iterable->unpackTypes(foreachLoop->loopVars);
     for (const auto varDec : foreachLoop->loopVars) {
-        const auto iterIndex = varDec->expr->asIterIndex();
-        visitIterIndex(iterIndex);
-        varDec->type = iterIndex->type;
         addLocalSymbol(varDec->name, LgsSymbol(varDec));
     }
     visitStmtBlock(foreachLoop->stmtBlock);

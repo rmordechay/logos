@@ -20,6 +20,7 @@ public:
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&kvType) {
         kvType.key = keyType;
         kvType.value = valueType;
+        unpackLength = 2;
         addMethod(&len);
     }
     void setBaseType(const vector<LgsMapPair*>& exprs);
@@ -34,6 +35,7 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     Value* IRLength(CodeGenMetadata* metadata) override;
     LgsType* createInnerType(size_t indexRange) const override;
+    void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
     ~LgsMap() override = default;
 };
 

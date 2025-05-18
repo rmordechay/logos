@@ -40,7 +40,7 @@ bool LgsLinker::link() const {
 
     for (const auto& [name, module] : IRModules) {
         if (name == LOGOS_MAIN_FILE_NAME) continue;
-        linker.linkInModule(std::unique_ptr<Module>(module));
+        linker.linkInModule(unique_ptr<Module>(module));
     }
 
 
@@ -49,7 +49,7 @@ bool LgsLinker::link() const {
     raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
     const auto addedPassFailed = targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
     if (addedPassFailed) {
-        std::cerr << ec.message() << endl;
+        cerr << ec.message() << endl;
         return false;
     }
     if (verifyModule(*mainModule, &errs())) {

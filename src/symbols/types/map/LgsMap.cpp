@@ -1,5 +1,6 @@
 #include "types/map/LgsMap.h"
 #include "exprs/unary/LgsHashMap.h"
+#include "stmts/LgsVarDec.h"
 
 void LgsMap::setBaseType(const vector<LgsMapPair*>& exprs) {
     vector<LgsExpr*> keyExprs;
@@ -22,6 +23,11 @@ Value* LgsMap::IRLength(CodeGenMetadata* metadata) {
 
 LgsType* LgsMap::createInnerType(size_t indexRange) const {
     assert(false);
+}
+
+void LgsMap::unpackTypes(const vector<LgsVarDec*>& varDecs) {
+    varDecs[0]->type = kvType.key;
+    varDecs[1]->type = kvType.value;
 }
 
 Type* LgsMap::getIRType() {

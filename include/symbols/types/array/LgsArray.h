@@ -16,6 +16,7 @@ public:
     explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         addMethod(&add);
         addMethod(&len);
+        unpackLength = 1;
     }
     void inferArrayType(const vector<LgsExpr*>& exprs);
     int getDims() override;
@@ -26,6 +27,7 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     LgsType* createInnerType(size_t indexRange) const override;
     bool canIndexTo(LgsType* indexType) override;
+    void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
     ~LgsArray() override;
 };
 

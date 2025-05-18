@@ -1,5 +1,5 @@
-#ifndef LOGOSARRAYINDEX_H
-#define LOGOSARRAYINDEX_H
+#ifndef LOGOSITERINDEX_H
+#define LOGOSITERINDEX_H
 #include "LgsUnaryExpr.h"
 #include <LgsValue.h>
 
@@ -35,4 +35,4 @@ public:
     ~LgsIndex() = default;
 };
 
-#endif //LOGOSARRAYINDEX_H
+#endif //LOGOSITERINDEX_H

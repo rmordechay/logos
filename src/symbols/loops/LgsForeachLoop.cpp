@@ -11,11 +11,10 @@ Value* LgsForeachLoop::loopEnd(CodeGenMetadata* metadata) {
     return iterExpr->getLength(metadata);
 }
 
-void LgsForeachLoop::setIRLoopVariable(CodeGenMetadata* metadata) {
+void LgsForeachLoop::setIRLoopVars(CodeGenMetadata* metadata) {
     assert(iterExpr);
     for (const auto loopVar : loopVars) {
-        const auto iterIndex = loopVar->expr->asIterIndex();
-        iterIndex->indices[0]->from->setIRValue(iValue);
+        // loopVar->setIRValue(iValue);
     }
 }
 

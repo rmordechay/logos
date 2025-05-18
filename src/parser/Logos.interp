@@ -188,7 +188,7 @@ constructor
 constructorArgList
 constructorArg
 constant
-arrayIndex
+iterIndex
 index
 selection
 firstSelectionElement
