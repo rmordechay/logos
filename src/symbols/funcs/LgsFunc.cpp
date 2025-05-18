@@ -61,14 +61,14 @@ FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {
         auto paramIRType = paramType->getIRType();
         // TODO make generic
         if (paramType->asInterface()) {
-            paramIRType = paramIRType->getPointerTo();
+            paramIRType = PointerType::get(paramIRType, 0);
         }
         IRParamsTypes.emplace_back(paramIRType);
     }
 
     Type* rt = nullptr;
     if (const auto obj = funcType.rt->asObject()) {
-        IRParamsTypes.insert(IRParamsTypes.begin(), obj->getIRType()->getPointerTo());
+        IRParamsTypes.insert(IRParamsTypes.begin(), PointerType::get(obj->getIRType(), 0));
         rt = voidTy;
     } else {
         rt = funcType.rt->getIRType();

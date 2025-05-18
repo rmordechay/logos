@@ -31,8 +31,8 @@ target_include_directories(lib PUBLIC
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lib PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libLLVM.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldCommon.a
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldMachO.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldCommon.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldMachO.dylib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libantlr.a
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
