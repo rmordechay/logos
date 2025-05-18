@@ -19,7 +19,6 @@ public:
     void storeHashMap(CodeGenMetadata* metadata, LgsHashMap* hashMap) const;
     void storeScalar(CodeGenMetadata* metadata, LgsExpr* value);
     void storeArray(CodeGenMetadata* metadata, const LgsArrayExpr* arr) const;
-    void castExpr(LgsType* other) override;
     Value* getLength(CodeGenMetadata* metadata) override;
     string getName() override;
     string prettyName() override;

@@ -31,3 +31,7 @@ bool LgsInt::equals(LgsType* other) {
     assert(other);
     return name == other->getIRName();
 }
+
+string LgsInt::getStrFormatPart() const {
+    return "%d";
+}

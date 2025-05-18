@@ -33,6 +33,8 @@
 #include <stmts/LgsAssignment.h>
 #include <stmts/LgsIfStmt.h>
 
+inline std::mutex mtx;
+
 void SemaAnalyser::analyseFiles(const LogosProject* project, vector<LgsError>& errors) {
     ThreadPool threadPool;
     threadPool.start();
@@ -182,7 +184,7 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
 
 void SemaAnalyser::visitAssignIterIndex(const LgsIterIndex* iterIndex, LgsExpr* expr) const {
     if (const auto arr = expr->asArrayExpr()) {
-        arr->type->isConst = iterIndex->type->isConst;
+        arr->arrType.isStatic = iterIndex->type->isConst;
     }
 }
 
@@ -408,6 +410,8 @@ void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
         typeConst->type = resolveType(typeConst->type);
     } else if (const auto iterIndex = dynamic_cast<LgsIterIndex*>(firstExpr)) {
         visitIterIndex(iterIndex);
+    } else if (const auto strConst = dynamic_cast<LgsStrConst*>(firstExpr)) {
+        visitStrConst(strConst);
     } else {
         assert(false);
     }
@@ -775,7 +779,7 @@ LgsType* SemaAnalyser::resolveArrayType(LgsArray* array) {
             iterIsConst = false;
         }
     }
-    array->isConst = iterIsConst;
+    array->isStatic = iterIsConst;
     return array;
 }
 

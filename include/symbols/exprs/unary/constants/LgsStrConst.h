@@ -13,9 +13,9 @@ public:
     explicit LgsStrConst(const string& value) : LgsConstExpr(&strType), value(value) {
         setType(&strType);
         strType.isConst = true;
+        strType.isStatic = true;
     }
     Value* getLength(CodeGenMetadata* metadata) override;
-    string getStrFormatPart() const override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;

@@ -1,8 +1,8 @@
 #ifndef LGSC_H
 #define LGSC_H
 
-#include "../../external/include/clang/AST/RecursiveASTVisitor.h"
-#include "../../external/include/clang/Tooling/CommonOptionsParser.h"
+#include "clang/AST/RecursiveASTVisitor.h"
+#include "clang/Tooling/CommonOptionsParser.h"
 
 using namespace clang;
 using namespace clang::tooling;

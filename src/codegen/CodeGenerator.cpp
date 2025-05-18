@@ -32,9 +32,7 @@ void CodeGenerator::generateMainFunc(CodeGenMetadata* metadata, LgsFuncImpl* mai
     }
     metadata->lgsStack.exitScope();
     metadata->builder.CreateRet(metadata->builder.getInt32(EXIT_SUCCESS));
-    if constexpr (DEBUG) {
-        writeIRToFile(metadata->module, LOGOS_MAIN_FILE_NAME);
-    }
+    writeIRToFile(metadata->module, LOGOS_MAIN_FILE_NAME);
 }
 
 void CodeGenerator::generateObjModule(const LgsType* obj) {
@@ -44,9 +42,7 @@ void CodeGenerator::generateObjModule(const LgsType* obj) {
     for (const auto& overload : obj->getAllMethods()) {
         overload->generateIRCode(&metadata);
     }
-    if constexpr (DEBUG) {
-        writeIRToFile(metadata.module, objName);
-    }
+    writeIRToFile(metadata.module, objName);
 }
 
 void CodeGenerator::createIRMainFunc(const CodeGenMetadata* metadata) {
@@ -78,11 +74,15 @@ void CodeGenerator::init() {
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
-void CodeGenerator::writeIRToFile(const Module* module, const path& name){
-    const auto filePath = (paths.buildDir / name).string() + ".ll";
-    std::error_code EC;
-    raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
-    module->print(textFile, nullptr);
-    module->print(outs(), nullptr);
-    std::cout << "\n-----\n\n";
+void CodeGenerator::writeIRToFile(const Module* module, const path& name) {
+    if constexpr (WRITE_IR_TO_FILE) {
+        const auto filePath = (paths.buildDir / name).string() + ".ll";
+        std::error_code EC;
+        raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
+        module->print(textFile, nullptr);
+    }
+    if constexpr (DEBUG) {
+        module->print(outs(), nullptr);
+        std::cout << "\n-----\n\n";
+    }
 }

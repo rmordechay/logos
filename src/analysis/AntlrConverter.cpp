@@ -98,7 +98,7 @@ void AntlerConverter::setMainFunc(LgsMainFile* mainFile, LogosParser::FuncImplem
     bool isValid;
     if (params.size() == 1) {
         const auto arr = params[0]->type->asArray();
-        isValid = arr && !arr->isConst && arr->baseType->asStr();
+        isValid = arr && !arr->isStatic && arr->baseType->asStr();
     } else {
         isValid = params.empty();
     }
@@ -580,7 +580,11 @@ LgsUnaryExpr* AntlerConverter::getFirstSelection(LogosParser::SelectionContext* 
     if (const auto type = firstExpr->TYPE()) {
         return getTypeConstant(type, ctx);
     }
-    return nullptr;
+    if (const auto type = firstExpr->STRING()) {
+        auto value = type->getText();
+        return getStrConst(value);
+    }
+    assert(false);
 }
 
 vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::SelectionContext* ctx) {

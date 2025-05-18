@@ -29,3 +29,7 @@ bool LgsBool::equals(LgsType* other) {
     }
     return name == other->getIRName();
 }
+
+string LgsBool::getStrFormatPart() const {
+    return "%s";
+}

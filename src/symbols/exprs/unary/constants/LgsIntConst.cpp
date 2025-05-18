@@ -2,10 +2,6 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 
-string LgsIntConst::getStrFormatPart() const {
-    return to_string(value);
-}
-
 string LgsIntConst::prettyName() {
     return to_string(value);
 }

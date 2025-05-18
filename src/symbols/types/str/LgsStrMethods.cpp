@@ -2,33 +2,34 @@
 #include "LgsDefinitions.h"
 #include "LgsUtils.h"
 #include "exprs/LgsExpr.h"
-#include "exprs/unary/constants/LgsStrConst.h"
+#define BUFFER_SIZE 1024
 
 FunctionCallee getPrintf(Module* module) {
     const vector<Type*> printfArgsTypes = {ptrTy};
-    FunctionType *printfType = FunctionType::get(Type::getInt32Ty(context), printfArgsTypes, true);
+    FunctionType* printfType = FunctionType::get(Type::getInt32Ty(context), printfArgsTypes, true);
     return module->getOrInsertFunction("printf", printfType);
 }
 
-// int snprintf(char* restrict str, size_t size, const char* restrict format, ...);
 FunctionCallee getSnprintf(Module* module) {
-    const vector<Type*> printfArgsTypes = {ptrTy, i32Ty};
-    FunctionType *printfType = FunctionType::get(Type::getInt32Ty(context), printfArgsTypes, true);
+    const vector<Type*> printfArgsTypes = {ptrTy, i64Ty, ptrTy};
+    FunctionType* printfType = FunctionType::get(Type::getInt32Ty(context), printfArgsTypes, true);
     return module->getOrInsertFunction("snprintf", printfType);
 }
 
 Value* LgsStrFormatFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     auto& builder = metadata->builder;
-    auto baseStr = getBaseStr(args[0]);
-    for (int i = 1; i < args.size(); ++i) {
-        replaceNextPlaceholder(baseStr, args[i]);
-    }
-
-    const auto baseIRStr = getIRStr(metadata->module, baseStr);
-    vector<Value*> IRArgs = {baseIRStr, builder.getInt32(baseStr.size())};
+    const bool isConst = args[0]->type->isConst;
+    if (!isConst) assert(false);
+    const auto formatString = getFormatString(args);
+    const auto baseIRStr = getIRStr(metadata->module, formatString);
+    const auto bufferType = ArrayType::get(i8Ty, BUFFER_SIZE);
+    const auto buffer = builder.CreateAlloca(bufferType);
+    const auto gep = builder.CreateGEP(bufferType, buffer, {i32Zero, i32Zero});
+    vector<Value*> IRArgs = {gep, builder.getInt64(BUFFER_SIZE), baseIRStr};
     for (int i = 1; i < args.size(); ++i) {
         IRArgs.emplace_back(args[i]->getIRValue(metadata));
     }
     const auto printfFunc = getSnprintf(metadata->module);
-    return builder.CreateCall(printfFunc, IRArgs);
+    builder.CreateCall(printfFunc, IRArgs);
+    return gep;
 }

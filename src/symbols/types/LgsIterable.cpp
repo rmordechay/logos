@@ -7,7 +7,7 @@
 
 Type* LgsIterable::getIRType() {
     if (IRType) return IRType;
-    if (!isConst || dimsExprs.empty()) return ptrTy;
+    if (!isStatic || dimsExprs.empty()) return ptrTy;
     IRType = baseType->getIRType();
     for (int i = dimsExprs.size() - 1; i >= 0; i--) {
         IRType = ArrayType::get(IRType, getExprConstNumber(dimsExprs[i]));

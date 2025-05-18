@@ -8,8 +8,9 @@ struct CodeGenMetadata;
 class LgsIterable : public LgsType {
 public:
     LgsType* baseType;
+    bool isStatic = false;
+    uint16_t unpackLength{};
     vector<LgsExpr*> dimsExprs;
-    uint16_t unpackLength = 0;
 
     explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}
     Type* getIRType() override;

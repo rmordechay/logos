@@ -15,6 +15,7 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) override;
+    string getStrFormatPart() const override;
     ~LgsBool() override = default;
 };
 

@@ -29,7 +29,6 @@ public:
     Value* getIRValue(CodeGenMetadata* metadata);
     void initIRValue(CodeGenMetadata* metadata);
     void setType(LgsType* type);
-    bool shouldLoadIR() const;
 
     LgsVariable* asVariable();
     LgsFuncCall* asFuncCall();
@@ -47,8 +46,6 @@ public:
     LgsTypeConst* asTypeConst();
 
     virtual string prettyName();
-    virtual string getStrFormatPart() const;
-    virtual void castExpr(LgsType* other);
     virtual LgsExpr* convertExpr(LgsType* other);
     virtual Value* getLength(CodeGenMetadata* metadata);
     virtual uint32_t hashValue(CodeGenMetadata* metadata);

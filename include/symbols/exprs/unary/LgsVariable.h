@@ -10,7 +10,6 @@ public:
     explicit LgsVariable(const std::string& name) : LgsUnaryExpr(nullptr), name(name) {}
     string getName() override;
     string prettyName() override;
-    string getStrFormatPart() const override;
     uint32_t hashValue(CodeGenMetadata* metadata) override;
     Value* getLength(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;

@@ -26,6 +26,10 @@ json LgsType::asJSON() const {
     assert(false);
 }
 
+string LgsType::getStrFormatPart() const {
+    assert(false);
+}
+
 LgsField* LgsType::getField(const string& name) {
     const auto field = fields.find(name);
     if (field != fields.end()) {

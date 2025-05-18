@@ -13,22 +13,6 @@
 #include <iostream>
 #include <unistd.h>
 
-void generateObjFile(Module* module) {
-    error_code ec;
-    raw_fd_ostream fileStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
-
-    ModuleAnalysisManager analysisManager;
-    PassBuilder passBuilder(targetMachine);
-    ModulePassManager passManager;
-    passBuilder.registerModuleAnalyses(analysisManager);
-    const auto result = passBuilder
-        .buildInlinerPipeline(OptimizationLevel::O2, ThinOrFullLTOPhase::FullLTOPostLink)
-        .run(*module, analysisManager);
-
-    fileStream.flush();
-    fileStream.close();
-}
-
 bool LgsLinker::link() const {
     setPlatform(paths.objFilePath, paths.execFilePath);
     Module* mainModule = IRModules.find(LOGOS_MAIN_FILE_NAME)->second;
@@ -79,4 +63,20 @@ void LgsLinker::linkStdlib(const string& path, Linker* linker) const {
     module->setTargetTriple(targetTriple);
     module->setDataLayout(targetMachine->createDataLayout());
     linker->linkInModule(std::move(module));
+}
+
+void generateObjFile(Module* module) {
+    error_code ec;
+    raw_fd_ostream fileStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
+
+    ModuleAnalysisManager analysisManager;
+    PassBuilder passBuilder(targetMachine);
+    ModulePassManager passManager;
+    passBuilder.registerModuleAnalyses(analysisManager);
+    const auto result = passBuilder
+                        .buildInlinerPipeline(OptimizationLevel::O2, ThinOrFullLTOPhase::FullLTOPostLink)
+                        .run(*module, analysisManager);
+
+    fileStream.flush();
+    fileStream.close();
 }

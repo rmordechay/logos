@@ -35,6 +35,10 @@ LgsType* LgsStr::createInnerType(size_t indexRange, LgsIndex* index) const {
     return baseType;
 }
 
+string LgsStr::getStrFormatPart() const {
+    return "%s";;
+}
+
 bool LgsStr::equals(LgsType* other) {
     assert(other);
     return name == other->getIRName();

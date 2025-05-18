@@ -4,10 +4,6 @@ string LgsBoolConst::getValueAsString() const {
     return value ? LgsBool::trueLiteral : LgsBool::falseLiteral;
 }
 
-string LgsBoolConst::getStrFormatPart() const {
-    return getValueAsString();
-}
-
 Value* LgsBoolConst::createIRValue(CodeGenMetadata* metadata) {
     return metadata->builder.getInt1(value);
 }

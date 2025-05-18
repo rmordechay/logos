@@ -1,11 +1,9 @@
 #ifndef LGSPROJECT_H
 #define LGSPROJECT_H
 #include "AntlrConverter.h"
-#include "LgsActiveEnv.h"
 #include "LgsErrHandler.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
-
 #include <files/LgsFile.h>
 #include <vector>
 

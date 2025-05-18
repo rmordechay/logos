@@ -14,15 +14,6 @@ string LgsVariable::prettyName() {
     return name;
 }
 
-string LgsVariable::getStrFormatPart() const {
-    switch (ref->type) {
-    case VAR_DEC:
-        return ref->varDec->expr->getStrFormatPart();
-    default:
-        assert(false);
-    }
-}
-
 Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
     assert(ref);
     switch (ref->type) {

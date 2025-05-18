@@ -16,7 +16,7 @@ void LgsArray::inferArrayType(const vector<LgsExpr*>& exprs) {
 LgsExpr* LgsArray::getZeroValue() {
     const auto arr = new LgsArrayExpr(baseType);
     arr->arrType.dimsExprs = dimsExprs;
-    arr->arrType.isConst = isConst;
+    arr->arrType.isStatic = isStatic;
     return arr;
 }
 
@@ -51,9 +51,9 @@ void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
 }
 
 LgsType* LgsArray::createInnerType(const size_t indexRange, LgsIndex* index) const {
-    if (!isConst) assert(false);
+    if (!isStatic) assert(false);
     const auto innerType = new LgsArray(baseType);
-    innerType->isConst = isConst;
+    innerType->isStatic = isStatic;
     innerType->dimsExprs = dimsExprs;
     if (index->to) {
         const auto from = getExprConstNumber(index->from);

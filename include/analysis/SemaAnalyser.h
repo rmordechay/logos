@@ -26,7 +26,6 @@ class LgsIfStmt;
 class LgsAssignment;
 class LgsLoop;
 
-inline std::mutex mtx;
 bool resolveGlobalTypes(const vector<LgsFile*>& files);
 
 class SemaAnalyser final {

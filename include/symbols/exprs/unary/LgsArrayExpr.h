@@ -19,7 +19,6 @@ public:
     Value* createNestedConstArray(CodeGenMetadata* metadata, const LgsIterIndex* iterIndex) const;
     Value* createConstArray(CodeGenMetadata* metadata) const;
     Value* createDynArray(CodeGenMetadata* metadata);
-    void castExpr(LgsType* other) override;
     ~LgsArrayExpr() override = default;
 };
 

@@ -9,7 +9,6 @@ public:
 
     explicit LgsBoolConst(const bool value) : LgsConstExpr(&LGS_BOOL), value(value) {}
     string getValueAsString() const;
-    string getStrFormatPart() const override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* andIR(CodeGenMetadata* metadata, LgsExpr* other) override;
     Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;

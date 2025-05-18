@@ -29,21 +29,8 @@ void LgsExpr::setType(LgsType* type) {
     this->type = type;
 }
 
-bool LgsExpr::shouldLoadIR() const {
-    assert(IRValue);
-    if (isa<GlobalVariable>(IRValue)) return false;
-    auto isGEP = isa<GetElementPtrInst>(IRValue);
-    if (!isGEP && isa<ConstantExpr>(IRValue)) {
-        const auto constExpr = cast<ConstantExpr>(IRValue);
-        isGEP = constExpr->getOpcode() == Instruction::GetElementPtr;
-    }
-    return isGEP || isa<AllocaInst>(IRValue);
-}
-
 LgsExpr* LgsExpr::clone() { assert(false); }
 string LgsExpr::prettyName() { assert(false); }
-string LgsExpr::getStrFormatPart() const { assert(false); }
-void LgsExpr::castExpr(LgsType* other) { assert(false); }
 uint32_t LgsExpr::hashValue(CodeGenMetadata* metadata) { assert(false); }
 Value* LgsExpr::getLength(CodeGenMetadata* metadata) { assert(false); }
 LgsExpr* LgsExpr::convertExpr(LgsType* other) { assert(false); }

@@ -240,6 +240,7 @@ selection:
 firstSelectionElement:
         VARIABLE
     |   TYPE
+    |   STRING
     |   SELF_CLASS
     |   SELF_INSTANCE
     |   funcCall

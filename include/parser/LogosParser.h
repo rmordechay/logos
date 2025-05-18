@@ -892,6 +892,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *TYPE();
+    antlr4::tree::TerminalNode *STRING();
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *SELF_INSTANCE();
     FuncCallContext *funcCall();

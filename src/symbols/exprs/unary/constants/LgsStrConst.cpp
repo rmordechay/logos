@@ -7,10 +7,6 @@ Value* LgsStrConst::getLength(CodeGenMetadata* metadata) {
     return metadata->builder.getInt32(value.size());
 }
 
-string LgsStrConst::getStrFormatPart() const {
-    return value;
-}
-
 Value* LgsStrConst::createIRValue(CodeGenMetadata* metadata) {
     return getIRStr(metadata->module, value);
 }

@@ -89,7 +89,7 @@ bool LgsFunc::setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argVa
         const auto arg = args[i];
         const auto argIRValue = arg->getIRValue(metadata);
         const auto artIRType = arg->type->getIRType();
-        if (arg->shouldLoadIR()) {
+        if (shouldLoadIRArg(argIRValue)) {
             const auto value = metadata->builder.CreateLoad(artIRType, argIRValue);
             argValues.emplace_back(value);
         } else {
@@ -117,6 +117,22 @@ string LgsFunc::format(string& tabs) {
     return str.str();
 }
 
+bool LgsFunc::shouldLoadIRArg(Value* value) const {
+    assert(value);
+    if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
+    if (isa<AllocaInst>(value)) return true;
+    if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
+        const auto isArrayTy = gep->getSourceElementType()->isArrayTy();
+        const auto isByteTy = gep->getResultElementType()->isIntegerTy(8);
+        return isArrayTy && !isByteTy;
+    }
+    if (isa<ConstantExpr>(value)) {
+        const auto constExpr = cast<ConstantExpr>(value);
+        return constExpr->getOpcode() == Instruction::GetElementPtr;
+    }
+    return false;
+}
+
 json LgsFunc::asJSON() {
     json tree;
     tree["name"] = funcType.name;
@@ -128,7 +144,6 @@ json LgsFunc::asJSON() {
     tree["stmts"] = stmtBlock->asJSON();
     return tree;
 }
-
 
 LgsFunc::~LgsFunc() {
     // TODO free params
