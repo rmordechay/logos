@@ -42,4 +42,14 @@ struct Location {
     }
 };
 
+inline FunctionCallee getPrintf(Module* module) {
+    const auto printfType = FunctionType::get(i32Ty, {ptrTy}, true);
+    return module->getOrInsertFunction("printf", printfType);
+}
+
+inline FunctionCallee getSnprintf(Module* module) {
+    const auto printfType = FunctionType::get(i32Ty, {ptrTy, i64Ty, ptrTy}, true);
+    return module->getOrInsertFunction("snprintf", printfType);
+}
+
 #endif //CODEGENMETADATA_H

@@ -17,6 +17,8 @@ public:
     void setIRValue(Value* value);
     BasicBlock* createBasicBlock(const char* name) const;
     void startBlock(CodeGenMetadata* metadata, BasicBlock* block) const;
+    void startBlockFunc(CodeGenMetadata* metadata) const;
+    void exitBlockFunc(CodeGenMetadata* metadata) const;
     Value* getIRStr(Module* module, const std::string& value) const;
     Value* hashIRValue(CodeGenMetadata* metadata, Value* value) const;
     virtual string format(string& indentStr);

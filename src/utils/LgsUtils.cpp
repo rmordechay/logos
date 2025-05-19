@@ -1,5 +1,4 @@
 #include "LgsUtils.h"
-
 #include "LgsDefinitions.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsIntConst.h"
@@ -50,9 +49,6 @@ string getFormatString(const vector<LgsExpr*>& args) {
         if (pos != string::npos) {
             result.replace(pos, 2, part);
             searchPos = pos + part.length();
-        } else {
-            result += ' ';
-            result += part;
         }
     }
     return result;

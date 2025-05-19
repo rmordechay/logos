@@ -18,19 +18,16 @@ public:
     bool isPublic = false;
     bool isVirtual = false;
     bool isVariadic = false;
+    bool isAnonymous = false;
     bool hasDefaultParams = false;
 
-    string getAsStr() const;
     Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) override;
-    bool equals(const LgsFuncCall* other) const;
-    bool equalsVariadic(const LgsFuncCall* funcCall) const;
-    bool equalsDefaultParams(const LgsFuncCall* funcCall) const;
-    static string getComposedName(const string& name, const string& parentName, const vector<string>& argTypeNames);
+    LgsType* clone() override;
     ~LgsFuncType() override = default;
 };
 

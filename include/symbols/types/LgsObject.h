@@ -29,7 +29,7 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) override;
-    LgsObject* clone();
+    LgsObject* clone() override;
     ~LgsObject() override = default;
 };
 

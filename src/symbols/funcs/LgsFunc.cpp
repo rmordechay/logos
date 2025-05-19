@@ -5,28 +5,39 @@
 
 void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);
-    startBlock(metadata, entryBlock);
+    startBlockFunc(metadata);
+    IRValue = getIRFunc(metadata);
     stmtBlock->createIRValue(metadata);
     if (funcType.rt->isVoid) {
         metadata->builder.CreateRetVoid();
     }
+    exitBlockFunc(metadata);
     metadata->lgsStack.exitScope();
 }
 
 Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     vector<Value*> argValues;
     const auto isObjReturn = setFuncCallIRArgs(metadata, argValues, args);
-    const auto IRFuncType = getIRFuncType(metadata);
-    const auto IRFunc = IRValue ? IRValue : getIRFunc(metadata);
-    const auto funcCall = metadata->builder.CreateCall(IRFuncType, IRFunc, argValues);
+    Value* rv = nullptr;
+    if (IRValue) {
+        const auto IRFuncType = getIRFuncType(metadata);
+        rv = metadata->builder.CreateCall(IRFuncType, IRValue, argValues);
+    } else {
+        const auto IRFunc = getIRFunc(metadata);
+        rv = metadata->builder.CreateCall(IRFunc, argValues);
+    }
     if (isObjReturn) return argValues[0];
-    return funcCall;
+    return rv;
+}
+
+Value* LgsFunc::createIRValue(CodeGenMetadata* metadata) {
+    generateIRCode(metadata);
+    return IRValue;
 }
 
 Value* LgsFunc::callIR(CodeGenMetadata* metadata, const vector<Value*>& args) {
-    const auto IRFuncType = getIRFuncType(metadata);
     const auto IRFunc = getIRFunc(metadata);
-    return metadata->builder.CreateCall(IRFuncType, IRFunc, args);
+    return metadata->builder.CreateCall(IRFunc, args);
 }
 
 Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
@@ -99,6 +110,22 @@ bool LgsFunc::setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argVa
     return isObjReturn;
 }
 
+bool LgsFunc::shouldLoadIRArg(Value* value) const {
+    assert(value);
+    if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
+    if (isa<AllocaInst>(value)) return true;
+    if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
+        const auto isArrayTy = gep->getSourceElementType()->isArrayTy();
+        const auto isByteTy = gep->getResultElementType()->isIntegerTy(8);
+        return isArrayTy && !isByteTy;
+    }
+    if (isa<ConstantExpr>(value)) {
+        const auto constExpr = cast<ConstantExpr>(value);
+        return constExpr->getOpcode() == Instruction::GetElementPtr;
+    }
+    return false;
+}
+
 string LgsFunc::format(string& tabs) {
     stringstream str;
     str << funcType.name << "(";
@@ -115,22 +142,6 @@ string LgsFunc::format(string& tabs) {
     }
     str << stmtBlock->format(tabs);
     return str.str();
-}
-
-bool LgsFunc::shouldLoadIRArg(Value* value) const {
-    assert(value);
-    if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
-    if (isa<AllocaInst>(value)) return true;
-    if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
-        const auto isArrayTy = gep->getSourceElementType()->isArrayTy();
-        const auto isByteTy = gep->getResultElementType()->isIntegerTy(8);
-        return isArrayTy && !isByteTy;
-    }
-    if (isa<ConstantExpr>(value)) {
-        const auto constExpr = cast<ConstantExpr>(value);
-        return constExpr->getOpcode() == Instruction::GetElementPtr;
-    }
-    return false;
 }
 
 json LgsFunc::asJSON() {

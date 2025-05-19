@@ -22,7 +22,7 @@ struct LgsGlobals {
             errHandler->handleError(E10011, location, {name, location->lineNumberStr()});
             return;
         }
-        lock_guard lock(mtx);
+        std::lock_guard lock(mtx);
         symbols[name] = symbol;
     }
 
@@ -31,9 +31,9 @@ struct LgsGlobals {
         const auto symbol = symbols.find(name);
         std::lock_guard lock(mtx);
         if (symbol == symbols.end()) {
-            const auto funcFamily = new LgsFuncSymbol();
-            funcFamily->overloads.push_back(newFunc);
-            symbols[name] = LgsSymbol(funcFamily);
+            const auto funcSymbol = new LgsFuncSymbol();
+            funcSymbol->overloads.push_back(newFunc);
+            symbols[name] = LgsSymbol(funcSymbol);
         } else {
             symbol->second.func->overloads.emplace_back(newFunc);
         }

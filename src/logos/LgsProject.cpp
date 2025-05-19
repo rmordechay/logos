@@ -209,11 +209,7 @@ string LogosProject::getFileText(path filePath) const {
 }
 
 void LogosProject::loadGlobals() const {
-    globals.addFunc(&lgsPrintInt);
-    globals.addFunc(&lgsPrintFloat);
-    globals.addFunc(&lgsPrintChar);
-    globals.addFunc(&lgsPrintBool);
-    globals.addFunc(&lgsPrintStr);
+    globals.addFunc(&lgsPrint);
 }
 
 void LogosProject::checkRequiredEnvVars() {

@@ -18,12 +18,12 @@ struct LgsStackFrame {
 class LgsStack : public stack<LgsStackFrame> {
 public:
     LgsFunc* currentFunc = nullptr;
+    LgsFunc* returnFunc = nullptr;
     LgsLoop* currentLoop = nullptr;
 
     void enterScope(LgsFunc* func = nullptr);
     void exitScope();
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
-    string getStackString() const;
     void reset();
     ~LgsStack() = default;
 };

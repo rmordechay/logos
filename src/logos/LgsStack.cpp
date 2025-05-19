@@ -4,6 +4,7 @@
 
 void LgsStack::enterScope(LgsFunc* func) {
     if (func) {
+        returnFunc = currentFunc;
         currentFunc = func;
     }
     if (size() > 0) {
@@ -14,16 +15,14 @@ void LgsStack::enterScope(LgsFunc* func) {
 }
 
 void LgsStack::exitScope() {
+    currentFunc = returnFunc;
+    returnFunc = nullptr;
     pop();
 }
 
 void LgsStack::addLocalSymbol(const string& name, const LgsSymbol& symbol) {
     assert(size() > 0);
     top().symbols[name] = symbol;
-}
-
-string LgsStack::getStackString() const {
-    return "";
 }
 
 void LgsStack::reset() {

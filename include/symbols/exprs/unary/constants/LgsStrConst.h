@@ -11,8 +11,6 @@ public:
     vector<LgsExpr*> templateParts;
 
     explicit LgsStrConst(const string& value) : LgsConstExpr(&strType), value(value) {
-        setType(&strType);
-        strType.isConst = true;
         strType.isStatic = true;
     }
     Value* getLength(CodeGenMetadata* metadata) override;

@@ -1,7 +1,7 @@
 #ifndef LOGOSBINARYEXPR_H
 #define LOGOSBINARYEXPR_H
 #include "exprs/LgsExpr.h"
-#include "LgsOperator.h"
+#include "exprs/LgsOperator.h"
 #include <types/LgsType.h>
 
 class LgsBinaryExpr final : public LgsExpr {

@@ -31,19 +31,19 @@ public:
     RuleObjectFile = 4, RuleInterfaceFile = 5, RuleInterface = 6, RuleInterfaceBody = 7, 
     RuleObject = 8, RuleObjectBody = 9, RuleField = 10, RuleObjectDeclaration = 11, 
     RuleInterfaceDeclaration = 12, RuleObjectImplements = 13, RuleFuncSignature = 14, 
-    RuleFuncImplementation = 15, RuleMethodImplementation = 16, RuleFuncBody = 17, 
-    RuleParamList = 18, RuleParam = 19, RuleStatement = 20, RuleStatementsBlock = 21, 
-    RuleAssignment = 22, RuleExplicitVarDec = 23, RuleImplicitVarDec = 24, 
-    RuleIfStatement = 25, RuleElseIfStatement = 26, RuleElseStatement = 27, 
-    RulePatternMatching = 28, RulePattern = 29, RuleLoopStatement = 30, 
-    RuleBreakStmt = 31, RuleReturnStatement = 32, RuleEnumDeclaration = 33, 
-    RuleEnumField = 34, RuleExpr = 35, RuleUnaryExpr = 36, RuleArray = 37, 
-    RuleHashMap = 38, RuleKeyValue = 39, RuleFuncCall = 40, RuleFuncArgList = 41, 
-    RuleFuncArg = 42, RuleConstructor = 43, RuleConstructorArgList = 44, 
-    RuleConstructorArg = 45, RuleConstant = 46, RuleIterIndex = 47, RuleIndex = 48, 
-    RuleSelection = 49, RuleFirstSelectionElement = 50, RuleInnerSelectionElement = 51, 
-    RuleRange = 52, RuleType = 53, RuleArrTypeSize = 54, RuleVector = 55, 
-    RuleRequireEnvVars = 56
+    RuleFuncImpl = 15, RuleAnonnymosfuncSignature = 16, RuleAnonnymosFunc = 17, 
+    RuleMethodImplementation = 18, RuleFuncBody = 19, RuleParam = 20, RuleStatement = 21, 
+    RuleStatementsBlock = 22, RuleAssignment = 23, RuleExplicitVarDec = 24, 
+    RuleImplicitVarDec = 25, RuleIfStatement = 26, RuleElseIfStatement = 27, 
+    RuleElseStatement = 28, RulePatternMatching = 29, RulePattern = 30, 
+    RuleLoopStatement = 31, RuleBreakStmt = 32, RuleReturnStatement = 33, 
+    RuleEnumDeclaration = 34, RuleEnumField = 35, RuleExpr = 36, RuleUnaryExpr = 37, 
+    RuleArray = 38, RuleHashMap = 39, RuleKeyValue = 40, RuleFuncCall = 41, 
+    RuleFuncArgList = 42, RuleFuncArg = 43, RuleConstructor = 44, RuleConstructorArgList = 45, 
+    RuleConstructorArg = 46, RuleConstant = 47, RuleIterIndex = 48, RuleIndex = 49, 
+    RuleSelection = 50, RuleFirstSelectionElement = 51, RuleInnerSelectionElement = 52, 
+    RuleRange = 53, RuleType = 54, RuleMapType = 55, RuleFuncType = 56, 
+    RuleVector = 57, RuleRequireEnvVars = 58
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -78,10 +78,11 @@ public:
   class InterfaceDeclarationContext;
   class ObjectImplementsContext;
   class FuncSignatureContext;
-  class FuncImplementationContext;
+  class FuncImplContext;
+  class AnonnymosfuncSignatureContext;
+  class AnonnymosFuncContext;
   class MethodImplementationContext;
   class FuncBodyContext;
-  class ParamListContext;
   class ParamContext;
   class StatementContext;
   class StatementsBlockContext;
@@ -117,7 +118,8 @@ public:
   class InnerSelectionElementContext;
   class RangeContext;
   class TypeContext;
-  class ArrTypeSizeContext;
+  class MapTypeContext;
+  class FuncTypeContext;
   class VectorContext;
   class RequireEnvVarsContext; 
 
@@ -176,8 +178,8 @@ public:
     EnumDeclarationContext* enumDeclaration(size_t i);
     std::vector<InterfaceContext *> interface();
     InterfaceContext* interface(size_t i);
-    std::vector<FuncImplementationContext *> funcImplementation();
-    FuncImplementationContext* funcImplementation(size_t i);
+    std::vector<FuncImplContext *> funcImpl();
+    FuncImplContext* funcImpl(size_t i);
 
    
   };
@@ -233,8 +235,8 @@ public:
     ExplicitVarDecContext* explicitVarDec(size_t i);
     std::vector<FuncSignatureContext *> funcSignature();
     FuncSignatureContext* funcSignature(size_t i);
-    std::vector<FuncImplementationContext *> funcImplementation();
-    FuncImplementationContext* funcImplementation(size_t i);
+    std::vector<FuncImplContext *> funcImpl();
+    FuncImplContext* funcImpl(size_t i);
 
    
   };
@@ -339,18 +341,21 @@ public:
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
-    ParamListContext *paramList();
+    std::vector<ParamContext *> param();
+    ParamContext* param(size_t i);
     antlr4::tree::TerminalNode *COLON();
     TypeContext *type();
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
 
    
   };
 
   FuncSignatureContext* funcSignature();
 
-  class  FuncImplementationContext : public antlr4::ParserRuleContext {
+  class  FuncImplContext : public antlr4::ParserRuleContext {
   public:
-    FuncImplementationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    FuncImplContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     FuncSignatureContext *funcSignature();
     FuncBodyContext *funcBody();
@@ -358,7 +363,37 @@ public:
    
   };
 
-  FuncImplementationContext* funcImplementation();
+  FuncImplContext* funcImpl();
+
+  class  AnonnymosfuncSignatureContext : public antlr4::ParserRuleContext {
+  public:
+    AnonnymosfuncSignatureContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
+    std::vector<ParamContext *> param();
+    ParamContext* param(size_t i);
+    antlr4::tree::TerminalNode *COLON();
+    TypeContext *type();
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+
+   
+  };
+
+  AnonnymosfuncSignatureContext* anonnymosfuncSignature();
+
+  class  AnonnymosFuncContext : public antlr4::ParserRuleContext {
+  public:
+    AnonnymosFuncContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    AnonnymosfuncSignatureContext *anonnymosfuncSignature();
+    FuncBodyContext *funcBody();
+
+   
+  };
+
+  AnonnymosFuncContext* anonnymosFunc();
 
   class  MethodImplementationContext : public antlr4::ParserRuleContext {
   public:
@@ -384,26 +419,13 @@ public:
 
   FuncBodyContext* funcBody();
 
-  class  ParamListContext : public antlr4::ParserRuleContext {
-  public:
-    ParamListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    std::vector<ParamContext *> param();
-    ParamContext* param(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> COMMA();
-    antlr4::tree::TerminalNode* COMMA(size_t i);
-
-   
-  };
-
-  ParamListContext* paramList();
-
   class  ParamContext : public antlr4::ParserRuleContext {
   public:
     ParamContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     ExplicitVarDecContext *explicitVarDec();
-    FuncSignatureContext *funcSignature();
+    antlr4::tree::TerminalNode *VARIABLE();
+    FuncTypeContext *funcType();
 
    
   };
@@ -684,6 +706,7 @@ public:
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *NULL_();
     FuncCallContext *funcCall();
+    AnonnymosFuncContext *anonnymosFunc();
     VectorContext *vector();
     ConstructorContext *constructor();
     ConstantContext *constant();
@@ -934,15 +957,33 @@ public:
 
   class  TypeContext : public antlr4::ParserRuleContext {
   public:
-    LogosParser::TypeContext *key = nullptr;
-    LogosParser::TypeContext *value = nullptr;
+    LogosParser::TypeContext *baseType = nullptr;
     TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *TYPE();
     antlr4::tree::TerminalNode *QUEST_MARK();
-    std::vector<ArrTypeSizeContext *> arrTypeSize();
-    ArrTypeSizeContext* arrTypeSize(size_t i);
+    antlr4::tree::TerminalNode *SELF_CLASS();
+    MapTypeContext *mapType();
+    FuncTypeContext *funcType();
+    TypeContext *type();
+    std::vector<antlr4::tree::TerminalNode *> LBRACK();
+    antlr4::tree::TerminalNode* LBRACK(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> RBRACK();
+    antlr4::tree::TerminalNode* RBRACK(size_t i);
+    std::vector<ExprContext *> expr();
+    ExprContext* expr(size_t i);
+
+   
+  };
+
+  TypeContext* type();
+  TypeContext* type(int precedence);
+  class  MapTypeContext : public antlr4::ParserRuleContext {
+  public:
+    LogosParser::TypeContext *key = nullptr;
+    LogosParser::TypeContext *value = nullptr;
+    MapTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *LBRACE();
     antlr4::tree::TerminalNode *COLON();
     antlr4::tree::TerminalNode *RBRACE();
@@ -952,20 +993,25 @@ public:
    
   };
 
-  TypeContext* type();
+  MapTypeContext* mapType();
 
-  class  ArrTypeSizeContext : public antlr4::ParserRuleContext {
+  class  FuncTypeContext : public antlr4::ParserRuleContext {
   public:
-    ArrTypeSizeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    LogosParser::TypeContext *rt = nullptr;
+    FuncTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *LBRACK();
-    antlr4::tree::TerminalNode *RBRACK();
-    ExprContext *expr();
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
+    antlr4::tree::TerminalNode *COLON();
+    std::vector<TypeContext *> type();
+    TypeContext* type(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
 
    
   };
 
-  ArrTypeSizeContext* arrTypeSize();
+  FuncTypeContext* funcType();
 
   class  VectorContext : public antlr4::ParserRuleContext {
   public:
@@ -1008,6 +1054,7 @@ public:
   bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
 
   bool exprSempred(ExprContext *_localctx, size_t predicateIndex);
+  bool typeSempred(TypeContext *_localctx, size_t predicateIndex);
 
   // By default the static state used to implement the parser is lazily initialized during the first
   // call to the constructor. You can call this function if you wish to initialize the static state

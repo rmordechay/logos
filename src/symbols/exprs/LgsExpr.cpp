@@ -29,11 +29,12 @@ void LgsExpr::setType(LgsType* type) {
     this->type = type;
 }
 
+
 LgsExpr* LgsExpr::clone() { assert(false); }
 string LgsExpr::prettyName() { assert(false); }
+LgsExpr* LgsExpr::convertExpr(LgsType* type) { assert(false); }
 uint32_t LgsExpr::hashValue(CodeGenMetadata* metadata) { assert(false); }
 Value* LgsExpr::getLength(CodeGenMetadata* metadata) { assert(false); }
-LgsExpr* LgsExpr::convertExpr(LgsType* other) { assert(false); }
 Value* LgsExpr::subIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
 Value* LgsExpr::mulIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
 Value* LgsExpr::divIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
@@ -50,6 +51,8 @@ Value* LgsExpr::bitOrIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(fals
 Value* LgsExpr::bitXorIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
 Value* LgsExpr::rshiftIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
 Value* LgsExpr::lshiftIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+
+LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }
 LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }
 LgsFuncCall* LgsExpr::asFuncCall() { return dynamic_cast<LgsFuncCall*>(this); }
 LgsInstance* LgsExpr::asInstance() { return dynamic_cast<LgsInstance*>(this); }

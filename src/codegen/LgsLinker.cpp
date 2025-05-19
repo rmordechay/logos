@@ -17,16 +17,10 @@ bool LgsLinker::link() const {
     setPlatform(paths.objFilePath, paths.execFilePath);
     Module* mainModule = IRModules.find(LOGOS_MAIN_FILE_NAME)->second;
     Linker linker(*mainModule);
-
-    for (const auto& path : STD_LIBS) {
-        linkStdlib(path, &linker);
-    }
-
     for (const auto& [name, module] : IRModules) {
         if (name == LOGOS_MAIN_FILE_NAME) continue;
         linker.linkInModule(unique_ptr<Module>(module));
     }
-
 
     error_code ec;
     legacy::PassManager pass;
@@ -36,6 +30,7 @@ bool LgsLinker::link() const {
         cerr << ec.message() << endl;
         return false;
     }
+
     if (verifyModule(*mainModule, &errs())) {
         errs().flush();
         return false;
@@ -52,23 +47,9 @@ bool LgsLinker::link() const {
     return true;
 }
 
-void LgsLinker::linkStdlib(const string& path, Linker* linker) const {
-    SMDiagnostic EC;
-    auto module = parseIRFile(path, EC, context);
-    assert(module);
-    if (verifyModule(*module, &errs())) {
-        errs().flush();
-        return;
-    }
-    module->setTargetTriple(targetTriple);
-    module->setDataLayout(targetMachine->createDataLayout());
-    linker->linkInModule(std::move(module));
-}
-
 void generateObjFile(Module* module) {
     error_code ec;
     raw_fd_ostream fileStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
-
     ModuleAnalysisManager analysisManager;
     PassBuilder passBuilder(targetMachine);
     ModulePassManager passManager;
@@ -76,7 +57,6 @@ void generateObjFile(Module* module) {
     const auto result = passBuilder
                         .buildInlinerPipeline(OptimizationLevel::O2, ThinOrFullLTOPhase::FullLTOPostLink)
                         .run(*module, analysisManager);
-
     fileStream.flush();
     fileStream.close();
 }

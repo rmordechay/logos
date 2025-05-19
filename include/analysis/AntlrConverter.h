@@ -7,8 +7,6 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
-#include "loops/LgsForeachLoop.h"
-#include "loops/LgsRangeLoop.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
 
@@ -20,7 +18,6 @@ using namespace filesystem;
 
 class AntlerConverter {
 public:
-    LgsFuncImpl* currentFunc = nullptr;
     LgsMethodImpl* currentMethod = nullptr;
     LgsErrHandler errHandler;
 
@@ -28,14 +25,15 @@ public:
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath);
     LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx, const path& filePath);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const string& filePath);
-    void setMainFunc(LgsMainFile* mainFile, LogosParser::FuncImplementationContext* func);
+    LgsMainFunc* getMainFunc(LogosParser::FuncImplContext* func);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName, const string& filePath);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const string& filePath, bool isSingleton = false);
-    void setParams(LogosParser::FuncSignatureContext* funcSignature, LgsFuncType* funcType);
+    void setParams(const vector<LogosParser::ParamContext*>& params, LgsFuncType* funcType);
     LgsField* getField(LogosParser::FieldContext* ctx);
-    LgsFuncImpl* getFuncImpl(LogosParser::FuncImplementationContext* ctx);
+    LgsFuncImpl* getFuncImpl(LogosParser::FuncImplContext* ctx);
+    LgsFuncImpl* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
     LgsMethodImpl* getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
@@ -43,7 +41,7 @@ public:
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LgsParam* getParam(LogosParser::ExplicitVarDecContext* ctx);
-    LgsParam* getParamFunc(LogosParser::FuncSignatureContext* ctx);
+    LgsFuncType* getFuncType(LogosParser::FuncTypeContext* ctx);
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
@@ -71,9 +69,9 @@ public:
     LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
-    LgsType* getTypeFromText(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const;
+    LgsType* getTypeFromText(antlr4::tree::TerminalNode* typeToken) const;
     bool isTypePrimitive(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const;
-    LgsType* getFuncType(LogosParser::FuncSignatureContext* ctx);
+    LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     LgsExpr* getExpr(const string& codeText) const;
     void parseTemplateStr(LgsStrConst* strConst) const;
     void cleanStr(string& value) const;

@@ -7,7 +7,6 @@ string LgsVarDec::format(string& indentStr) {
 
 void LgsVarDec::createIRStmt(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    assert(expr);
     const auto exprValue = expr->getIRValue(metadata);
     const auto valueType = exprValue->getType();
     IRValue = exprValue;

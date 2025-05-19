@@ -1,4 +1,4 @@
-#include "exprs/binary/LgsBinaryExpr.h"
+#include "../../../include/symbols/exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 
 Value* LgsBinaryExpr::createIRValue(CodeGenMetadata* metadata) {

@@ -1,6 +1,8 @@
 #ifndef LOGOSFUNC_H
 #define LOGOSFUNC_H
 #include "LgsValue.h"
+#include "exprs/LgsExpr.h"
+#include "exprs/unary/LgsUnaryExpr.h"
 #include "stmts/LgsStmtBlock.h"
 #include "types/LgsFuncType.h"
 
@@ -9,7 +11,7 @@ class LgsExpr;
 class LgsStmt;
 class LgsType;
 
-class LgsFunc : public LgsValue {
+class LgsFunc : public LgsUnaryExpr {
 public:
     string path;
     LgsFuncType funcType;
@@ -17,16 +19,21 @@ public:
     LgsStmtBlock* stmtBlock = nullptr;
     FunctionType* IRFuncType = nullptr;
     BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
+    Instruction* returnAddr = nullptr;
 
+    explicit LgsFunc() {
+        type = &funcType;
+    }
     void generateIRCode(CodeGenMetadata* metadata);
-    bool setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) const;
-    json asJSON() override;
-    string format(string& tabs) override;
     bool shouldLoadIRArg(Value* value) const;
     virtual Function* getIRFunc(const CodeGenMetadata* metadata);
     virtual FunctionType* getIRFuncType(const CodeGenMetadata* metadata);
     virtual Value* callIR(CodeGenMetadata* metadata, const vector<Value*>& args);
     virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {});
+    bool setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) const;
+    Value* createIRValue(CodeGenMetadata* metadata) override;
+    string format(string& tabs) override;
+    json asJSON() override;
     ~LgsFunc() override;
 };
 
