@@ -1,5 +1,4 @@
 #include "LgsSymbol.h"
-
 #include "exprs/unary/LgsEnumField.h"
 #include "types/LgsEnum.h"
 #include "funcs/LgsFunc.h"

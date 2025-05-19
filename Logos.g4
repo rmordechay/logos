@@ -57,7 +57,7 @@ objectImplements:
     ;
 
 funcSignature:
-        VARIABLE LPAREN paramList? RPAREN (COLON type)?
+        VARIABLE LPAREN (param (COMMA param)* COMMA?)? RPAREN (COLON type)?
     ;
 
 funcImplementation:
@@ -72,12 +72,8 @@ funcBody:
         statementsBlock
     ;
 
-paramList:
-        param (COMMA param)* COMMA?
-    ;
-
 param:
-        explicitVarDec | funcSignature
+        explicitVarDec | VARIABLE funcType
     ;
 
 statement:
@@ -261,14 +257,19 @@ range:
     ;
 
 type:
-        SELF_CLASS
-   |    TYPE QUEST_MARK?
-   |    TYPE (arrTypeSize)+  // Array
-   |    LBRACE key=type COLON value=type RBRACE // Map
+        TYPE QUEST_MARK?
+   |    SELF_CLASS
+   |    baseType=type (LBRACK expr? RBRACK)+
+   |    mapType
+   |    funcType
    ;
 
-arrTypeSize:
-        LBRACK expr? RBRACK
+mapType:
+        LBRACE key=type COLON value=type RBRACE
+    ;
+
+funcType:
+        LPAREN (type (COMMA type)* COMMA?)? RPAREN COLON rt=type
     ;
 
 vector:

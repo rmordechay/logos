@@ -23,7 +23,6 @@ public:
     void enterScope(LgsFunc* func = nullptr);
     void exitScope();
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
-    string getStackString() const;
     void reset();
     ~LgsStack() = default;
 };

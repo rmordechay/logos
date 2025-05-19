@@ -22,7 +22,7 @@ struct LgsGlobals {
             errHandler->handleError(E10011, location, {name, location->lineNumberStr()});
             return;
         }
-        lock_guard lock(mtx);
+        std::lock_guard lock(mtx);
         symbols[name] = symbol;
     }
 

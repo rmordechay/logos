@@ -22,10 +22,6 @@ void LgsStack::addLocalSymbol(const string& name, const LgsSymbol& symbol) {
     top().symbols[name] = symbol;
 }
 
-string LgsStack::getStackString() const {
-    return "";
-}
-
 void LgsStack::reset() {
     while (size() > 0) {
         pop();

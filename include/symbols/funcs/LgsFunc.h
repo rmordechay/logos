@@ -19,14 +19,14 @@ public:
     BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
 
     void generateIRCode(CodeGenMetadata* metadata);
-    bool setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) const;
-    json asJSON() override;
-    string format(string& tabs) override;
     bool shouldLoadIRArg(Value* value) const;
     virtual Function* getIRFunc(const CodeGenMetadata* metadata);
     virtual FunctionType* getIRFuncType(const CodeGenMetadata* metadata);
     virtual Value* callIR(CodeGenMetadata* metadata, const vector<Value*>& args);
     virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {});
+    bool setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) const;
+    json asJSON() override;
+    string format(string& tabs) override;
     ~LgsFunc() override;
 };
 

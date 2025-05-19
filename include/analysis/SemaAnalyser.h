@@ -50,7 +50,6 @@ public:
     void visitStmt(LgsStmt* stmt);
     void visitStmtBlock(LgsStmtBlock* stmtBlock);
     void visitAssignment(const LgsAssignment* assignment);
-    void visitAssignIterIndex(const LgsIterIndex* iterIndex, LgsExpr* expr) const;
     void visitVarDec(LgsVarDec* varDec);
     void visitIfStmt(LgsIfStmt* ifStmt);
     void visitPatternMatch(const LgsPatternMatch* patternMatching);
@@ -85,9 +84,9 @@ public:
     void setIterIndexType(LgsIterIndex* iterIndex);
 
     LgsFunc* resolveMethodCall(const vector<LgsMethodImpl*>& overloads, LgsFuncCall* methodCall, const string& parentName);
-    bool isFuncCall(const LgsFuncType* funcType, const LgsFuncCall* funcCall) const;
-    bool isFuncCallEqual(const LgsFuncType* funcType, LgsFuncCall* funcCall);
-    bool isFuncCallEqual(LgsFunc* func, LgsFuncCall* funcCall) const;
+    bool isFuncCallEqual(const LgsFuncCall* funcCall, const LgsFuncType* funcType) const;
+    bool resolveCallback(LgsFuncCall* funcCall, const LgsFuncType* funcType);
+    bool resolveFuncCall(LgsFuncCall* funcCall, LgsFunc* func) const;
     bool validateExprType(const LgsExpr* expr, LgsType* type);
     void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     void checkMethodVisibility(const LgsFuncCall* methodCall);

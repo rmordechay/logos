@@ -43,7 +43,7 @@ public:
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LgsParam* getParam(LogosParser::ExplicitVarDecContext* ctx);
-    LgsParam* getParamFunc(LogosParser::FuncSignatureContext* ctx);
+    LgsFuncType* getFuncType(LogosParser::FuncTypeContext* ctx);
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
@@ -71,9 +71,9 @@ public:
     LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
-    LgsType* getTypeFromText(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const;
+    LgsType* getTypeFromText(antlr4::tree::TerminalNode* typeToken) const;
     bool isTypePrimitive(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const;
-    LgsType* getFuncType(LogosParser::FuncSignatureContext* ctx);
+    LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     LgsExpr* getExpr(const string& codeText) const;
     void parseTemplateStr(LgsStrConst* strConst) const;
     void cleanStr(string& value) const;

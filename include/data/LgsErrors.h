@@ -57,5 +57,6 @@ inline LgsError E10039{.msg = "main() function accepts only one optional paramet
 inline LgsError E10040{.msg = "The number of variables in the for loop (%s) do not match the number of the iterable's returned values (%s).", .errCode = ++errCodeStart};
 inline LgsError E10041{.msg = "'%s' unpacks %s variables, not %s.", .errCode = ++errCodeStart};
 inline LgsError E10042{.msg = "Left index in slice must be less than the right index. Given: '%s'.", .errCode = ++errCodeStart};
+inline LgsError E10043{.msg = "Default parameters and variadic arguments are not allowed in the same function.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

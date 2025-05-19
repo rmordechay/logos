@@ -7,6 +7,14 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
+Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
+    return call(metadata);
+}
+
+void LgsFuncCall::createIRStmt(CodeGenMetadata* metadata) {
+    call(metadata);
+}
+
 Value* LgsFuncCall::call(CodeGenMetadata* metadata) const {
     if (func->funcType.isVirtual) {
         const auto virtualFunc = resolveVirtualFunc(metadata);
@@ -23,14 +31,6 @@ string LgsFuncCall::getName() {
 
 string LgsFuncCall::format(string& indentStr) {
     return indentStr + name + "()";
-}
-
-void LgsFuncCall::createIRStmt(CodeGenMetadata* metadata) {
-    call(metadata);
-}
-
-Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
-    return call(metadata);
 }
 
 Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata) const {

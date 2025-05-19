@@ -36,7 +36,7 @@ LgsType* LgsStr::createInnerType(size_t indexRange, LgsIndex* index) const {
 }
 
 string LgsStr::getStrFormatPart() const {
-    return "%s";;
+    return "%s";
 }
 
 bool LgsStr::equals(LgsType* other) {

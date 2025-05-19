@@ -1,28 +1,35 @@
 #ifndef LOGOSPRINT_H
 #define LOGOSPRINT_H
-#include "exprs/unary/constants/LgsCharConst.h"
 #include "funcs/LgsFuncImpl.h"
 #include "types/primitives/LgsBool.h"
-#include "types/primitives/LgsFloat.h"
-#include "types/primitives/LgsInt.h"
 #include "types/str/LgsStr.h"
 #include <types/primitives/LgsVoid.h>
 
 class LgsPrint final : public LgsFuncImpl {
 public:
     static constexpr auto name = "print";
+    LgsParam input{&LGS_ANY};
+    LgsParam args{&LGS_ANY};
 
-    explicit LgsPrint(const vector<LgsParam*>& params): LgsFuncImpl(name, &LGS_VOID) {
-        funcType.params = params;
+    explicit LgsPrint(): LgsFuncImpl(name, &LGS_VOID) {
+        funcType.isVariadic = true;
+        funcType.IRName = "printf";
+        funcType.params = {&input, &args};
     }
-    void setIRFuncType(const CodeGenMetadata* metadata);
+
+    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
+        vector<Value*> IRArgs;
+        for (int i = 0; i < args.size(); ++i) {
+            IRArgs.emplace_back(args[i]->getIRValue(metadata));
+        }
+        const auto printfFunc = getPrintf(metadata->module);
+        metadata->builder.CreateCall(printfFunc, IRArgs);
+        return nullptr;
+    }
+
     ~LgsPrint() override = default;
 };
 
-inline LgsPrint lgsPrintInt({new LgsParam(&LGS_INT)});
-inline LgsPrint lgsPrintFloat({new LgsParam(&LGS_FLOAT)});
-inline LgsPrint lgsPrintChar({new LgsParam(&LGS_CHAR)});
-inline LgsPrint lgsPrintBool({new LgsParam(&LGS_BOOL)});
-inline LgsPrint lgsPrintStr({new LgsParam(new LgsStr())});
+inline LgsPrint lgsPrint;
 
 #endif //LOGOSPRINT_H

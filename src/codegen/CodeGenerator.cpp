@@ -48,7 +48,8 @@ void CodeGenerator::generateObjModule(const LgsType* obj) {
 void CodeGenerator::createIRMainFunc(const CodeGenMetadata* metadata) {
     const auto mainFuncType = FunctionType::get(i32Ty, {i32Ty, ptrTy}, false);
     const auto mainFunc = Function::Create(mainFuncType, Function::ExternalLinkage, LOGOS_MAIN_FUNC, metadata->module);
-    const auto args = mainFunc->arg_begin();
+    auto args = mainFunc->arg_begin();
+    args++->setName("argc");
     args->setName("argv");
 }
 

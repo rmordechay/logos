@@ -24,10 +24,13 @@ bool LgsFuncType::equals(const LgsFuncCall* other) const {
     if (params.size() == 0 && args.size() == 0) return true;
     if (params.size() < args.size()) return false;
     for (size_t i = 0; i < params.size(); ++i) {
-        const auto thisType = params[i]->type;
-        assert(thisType);
-        const auto otherType = args[i]->type;
-        if (!thisType->equals(otherType)) return false;
+        const auto paramType = params[i]->type;
+        const auto argType = args[i]->type;
+        if (const auto ft = paramType->asFuncType()) {
+            if (!ft->rt->equals(argType)) return false;
+        } else {
+            if (!paramType->equals(argType)) return false;
+        }
     }
     return true;
 }
@@ -49,11 +52,15 @@ bool LgsFuncType::equalsDefaultParams(const LgsFuncCall* funcCall) const {
 
 string LgsFuncType::getIRName() {
     if (IRName != "") return IRName;
-    vector<string> paramTypeNames;
-    for (const auto& param : params) {
-        paramTypeNames.emplace_back(param->type->getIRName());
+    stringstream strStream;
+    if (parentName != "") {
+        strStream << parentName << "_";
     }
-    IRName = getComposedName(name, parentName, paramTypeNames);
+    strStream << name;
+    for (const auto& param : params) {
+        strStream << "_" + param->type->getIRName();
+    }
+    IRName = strStream.str();
     return IRName;
 }
 
@@ -84,15 +91,4 @@ string LgsFuncType::getAsStr() const {
     return strStream.str();
 }
 
-string LgsFuncType::getComposedName(const string& name, const string& parentName, const vector<string>& argTypeNames) {
-    stringstream strStream;
-    if (parentName != "") {
-        strStream << parentName << "_";
-    }
-    strStream << name;
-    for (int i = 0; i < argTypeNames.size(); ++i) {
-        strStream << "_" + argTypeNames[i];
-    }
-    return strStream.str();
-}
 
