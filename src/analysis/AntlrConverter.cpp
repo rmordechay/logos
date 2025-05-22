@@ -317,7 +317,7 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
 LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto expr = getExpr(ctx->expr(), !!ctx->QUEST_MARK());
-    const auto varDec = new LgsVarDec(variableName, expr->type, expr);
+    const auto varDec = new LgsVarDec(variableName, expr);
     varDec->setLocation(ctx->start);
     return varDec;
 }
@@ -412,7 +412,8 @@ LgsLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx) {
     // TODO add error for range loop size greater than 1
     for (const auto variable : ctx->VARIABLE()) {
         const auto loopVarName = variable->getText();
-        auto varDec = new LgsVarDec(loopVarName, &LGS_INT);
+        auto varDec = new LgsVarDec(loopVarName);
+        varDec->type = &LGS_INT;
         varDec->expr = LGS_INT.getZeroValue();
         rangeLoop->loopVars.emplace_back(varDec);
     }

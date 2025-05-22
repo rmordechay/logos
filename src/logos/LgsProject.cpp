@@ -19,7 +19,7 @@ std::mutex projectMtx;
 
 bool LogosProject::loadProject(const vector<char*>& args) {
     if (!validateProject()) return false;
-    setupActiveEnv();
+    // setupActiveEnv();
     if (!errHandler.successful) return false;
     loadFiles();
     if (!errors.empty()) return false;
