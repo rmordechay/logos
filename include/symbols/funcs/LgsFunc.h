@@ -32,6 +32,7 @@ public:
     virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {});
     bool setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) const;
     Value* createIRValue(CodeGenMetadata* metadata) override;
+    string prettyName() override;
     string format(string& tabs) override;
     json asJSON() override;
     ~LgsFunc() override;

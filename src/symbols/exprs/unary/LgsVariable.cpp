@@ -24,12 +24,12 @@ Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
         return varDec->expr->getIRValue(metadata);
     }
     case PARAM:
-        assert(ref->param->IRValue);
+        assert(ref->param->IRValue && !ref->param->isVariadic);
         return ref->param->IRValue;
     case ENUM_FIELD:
         return ref->enumField->getGEP(metadata);
     case FUNC:
-        return ref->func->overloads[0]->getIRFunc(metadata);
+        return ref->func->getIRFunc(metadata);
     default:
         assert(false);
     }

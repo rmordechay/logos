@@ -19,7 +19,7 @@ std::mutex projectMtx;
 
 bool LogosProject::loadProject(const vector<char*>& args) {
     if (!validateProject()) return false;
-    setupActiveEnv();
+    // setupActiveEnv();
     if (!errHandler.successful) return false;
     loadFiles();
     if (!errors.empty()) return false;
@@ -113,15 +113,15 @@ bool LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) const {
             for (const auto& object : mainFile->objects) {
                 semaAnalyser.resolveObjMemberTypes(object);
             }
-            for (const auto& func : mainFile->getAllFuncs()) {
+            for (const auto [_, func] : mainFile->funcs) {
                 semaAnalyser.resolveFuncTypes(&func->funcType);
             }
         } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             semaAnalyser.resolveObjMemberTypes(objFile->obj);
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            auto overloads = interfaceFile->interface->getAllMethods();
-            for (const auto& overload : overloads) {
-                semaAnalyser.resolveFuncTypes(&overload->funcType);
+            auto methods = interfaceFile->interface->methods;
+            for (const auto& [_, method] : methods) {
+                semaAnalyser.resolveFuncTypes(&method->funcType);
             }
         }
         if (!semaAnalyser.errHandler.successful) return false;
@@ -208,8 +208,8 @@ string LogosProject::getFileText(path filePath) const {
     return fileContents.str();
 }
 
-void LogosProject::loadGlobals() const {
-    globals.addFunc(&lgsPrint);
+void LogosProject::loadGlobals() {
+    globals.addSymbol(lgsPrint.funcType.name, LgsSymbol(&lgsPrint), &errHandler);
 }
 
 void LogosProject::checkRequiredEnvVars() {

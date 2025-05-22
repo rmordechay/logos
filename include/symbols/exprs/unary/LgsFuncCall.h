@@ -18,11 +18,11 @@ public:
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
     Value* resolveVirtualFunc(CodeGenMetadata* metadata) const;
-    string getAsStr() const;
     void createIRStmt(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     string getName() override;
     string format(string& indentStr) override;
+    string prettyName() override;
     ~LgsFuncCall() override = default;
 };
 

@@ -29,7 +29,7 @@ inline LgsError E10011{.msg = "'%s' is already declared at line %s.", .errCode =
 inline LgsError E10012{.msg = "Function '%s' is not defined.", .errCode = ++errCodeStart};
 inline LgsError E10013{.msg = "Function '%s' is not a member of '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10014{.msg = "Pattern of type '%s' does not match base type '%s'.", .errCode = ++errCodeStart};
-inline LgsError E10015{.msg = "Function with name '%s' was found but it does not match any overload.\n\t   Possible overloads:%s\n\t   Given: %s", .errCode = ++errCodeStart};
+inline LgsError E10015{.msg = "Function with name '%s' was found but it doesn't match the parameters.\n\t   Given:    %s\n\t   Expected: %s", .errCode = ++errCodeStart};
 inline LgsError E10016{.msg = "Object '%s' does not fully implement '%s'. Missing functions:%s", .errCode = ++errCodeStart};
 inline LgsError E10017{.msg = "'break' must be inside a loop statement.", .errCode = ++errCodeStart};
 inline LgsError E10018{.msg = "Expression of type '%s' cannot be casted to type '%s'.", .errCode = ++errCodeStart};
@@ -48,7 +48,7 @@ inline LgsError E10030{.msg = "Non-public field '%s' is used outside its parent 
 inline LgsError E10031{.msg = "Non-public method '%s' is used outside its parent object '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10032{.msg = "Singleton object '%s' cannot be instantiated.", .errCode = ++errCodeStart};
 inline LgsError E10033{.msg = "Function '%s' is declared multiple times.", .errCode = ++errCodeStart};
-inline LgsError E10034{.msg = "Object '%s' has method(s) with name '%s' but it does not match any overload.\n\t   Possible overloads:%s\n\t   Given: %s", .errCode = ++errCodeStart};
+inline LgsError E10034{.msg = "Object '%s' has method with name '%s' but it doesn't match the parameters.\n\t   Given:    %s\n\t   Expected: %s", .errCode = ++errCodeStart};
 inline LgsError E10035{.msg = "Index of %s has %s level which is too deep. Max level: %s.", .errCode = ++errCodeStart};
 inline LgsError E10036{.msg = "'%s' cannot be indexed with type '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10037{.msg = "Left-hand index of slice must be less than right-hand index. Given: %s.", .errCode = ++errCodeStart};
@@ -58,5 +58,7 @@ inline LgsError E10040{.msg = "The number of variables in the for loop (%s) do n
 inline LgsError E10041{.msg = "'%s' unpacks %s variables, not %s.", .errCode = ++errCodeStart};
 inline LgsError E10042{.msg = "Left index in slice must be less than the right index. Given: '%s'.", .errCode = ++errCodeStart};
 inline LgsError E10043{.msg = "Default parameters and variadic arguments are not allowed in the same function.", .errCode = ++errCodeStart};
+inline LgsError E10044{.msg = "Variadic argument must be the last argument.", .errCode = ++errCodeStart};
+inline LgsError E10045{.msg = "Variadic argument cannot have default arguments.", .errCode = ++errCodeStart};
 
 #endif //LOGOSERRORS_H

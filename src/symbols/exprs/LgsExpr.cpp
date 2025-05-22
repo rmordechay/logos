@@ -29,10 +29,10 @@ void LgsExpr::setType(LgsType* type) {
     this->type = type;
 }
 
-
 LgsExpr* LgsExpr::clone() { assert(false); }
 string LgsExpr::prettyName() { assert(false); }
 LgsExpr* LgsExpr::convertExpr(LgsType* type) { assert(false); }
+
 uint32_t LgsExpr::hashValue(CodeGenMetadata* metadata) { assert(false); }
 Value* LgsExpr::getLength(CodeGenMetadata* metadata) { assert(false); }
 Value* LgsExpr::subIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }

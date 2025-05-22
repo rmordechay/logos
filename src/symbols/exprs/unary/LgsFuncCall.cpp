@@ -47,8 +47,8 @@ bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
 
 bool LgsFuncCall::equalsRaw(const LgsFuncType* funcType) const {
     if (!funcType->isAnonymous && name != funcType->name) return false;
+    if (funcType->params.size() != args.size()) return false;
     if (funcType->params.size() == 0 && args.size() == 0) return true;
-    if (funcType->params.size() < args.size()) return false;
     for (size_t i = 0; i < funcType->params.size(); ++i) {
         const auto paramType = funcType->params[i]->type;
         const auto argType = args[i]->type;
@@ -78,8 +78,7 @@ Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata) const {
     const auto type = parent->type;
     const auto interface = type->asInterface();
     const auto parentIRValue = parent->getIRValue(metadata);
-
-    const auto func = callback->func->overloads[0];
+    const auto func = callback->func;
     const auto keyIR = getIRStr(metadata->module, func->funcType.getIRName());
     const auto mapPtr = builder.CreateLoad(ptrTy, parentIRValue);
     const auto rv = interface->vtable.mapType.get.callIR(metadata, {mapPtr, keyIR});
@@ -96,13 +95,13 @@ string LgsFuncCall::format(string& indentStr) {
     return indentStr + name + "()";
 }
 
-string LgsFuncCall::getAsStr() const {
+string LgsFuncCall::prettyName() {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = 0; i < args.size(); ++i) {
         strStream << args[i]->type->prettyName();
         if (i != args.size() - 1) strStream << ", ";
     }
-    strStream << "): " << type->prettyName();
+    strStream << ')';
     return strStream.str();
 }

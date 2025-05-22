@@ -16,7 +16,7 @@ void CodeGenerator::generate(LgsMainFile* mainFile) {
     init();
     const auto module = createEmptyModule(LOGOS_MAIN_FILE_NAME);
     auto metadata = CodeGenMetadata{.module = module};
-    for (const auto& func : mainFile->getAllFuncs()) {
+    for (const auto [_, func] : mainFile->funcs) {
         func->generateIRCode(&metadata);
     }
     generateMainFunc(&metadata, mainFile->mainFunc);
@@ -39,8 +39,8 @@ void CodeGenerator::generateObjModule(const LgsType* obj) {
     const auto objName = obj->prettyName();
     if (IRModules.find(objName) != IRModules.end()) return;
     auto metadata = CodeGenMetadata{.module = createEmptyModule(objName)};
-    for (const auto& overload : obj->getAllMethods()) {
-        overload->generateIRCode(&metadata);
+    for (const auto& [_, method] : obj->methods) {
+        method->generateIRCode(&metadata);
     }
     writeIRToFile(metadata.module, objName);
 }

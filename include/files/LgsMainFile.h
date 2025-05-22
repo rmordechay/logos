@@ -13,13 +13,12 @@ public:
     vector<LgsEnum*> enums;
     vector<LgsObject*> objects;
     vector<LgsInterface*> interfaces;
-    map<string, vector<LgsFuncImpl*>> funcs;
+    map<string, LgsFuncImpl*> funcs;
     LgsMainFunc* mainFunc = nullptr;
 
     explicit LgsMainFile(const string& path) : LgsFile(LOGOS_MAIN_FILE_NAME, path) {}
     void format() override;
     json asJSON() override;
-    vector<LgsFuncImpl*> getAllFuncs();
     ~LgsMainFile() override;
 };
 
@@ -34,7 +33,7 @@ inline json LgsMainFile::asJSON() {
     tree["name"] = name;
     tree["path"] = absPath;
     json jsonFuncs = {};
-    for (const auto& func : getAllFuncs()) {
+    for (const auto [_, func] : funcs) {
         jsonFuncs.emplace_back(func->asJSON());
     }
     jsonFuncs.emplace_back(mainFunc->asJSON());
@@ -56,20 +55,10 @@ inline json LgsMainFile::asJSON() {
     return tree;
 }
 
-inline vector<LgsFuncImpl*> LgsMainFile::getAllFuncs() {
-    vector<LgsFuncImpl*> allFuncs;
-    for (const auto& [_, overloads] : funcs) {
-        for (const auto& func : overloads) {
-            allFuncs.emplace_back(func);
-        }
-    }
-    return allFuncs;
-}
-
 inline LgsMainFile::~LgsMainFile() {
     delete mainFunc;
-    for (const auto& func : getAllFuncs()) {
-        delete func;
+    for (const auto& func : funcs) {
+        delete func.second;
     }
 }
 

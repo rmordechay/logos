@@ -26,19 +26,6 @@ struct LgsGlobals {
         symbols[name] = symbol;
     }
 
-    void addFunc(LgsFuncImpl* newFunc) {
-        const auto name = newFunc->funcType.name;
-        const auto symbol = symbols.find(name);
-        std::lock_guard lock(mtx);
-        if (symbol == symbols.end()) {
-            const auto funcSymbol = new LgsFuncSymbol();
-            funcSymbol->overloads.push_back(newFunc);
-            symbols[name] = LgsSymbol(funcSymbol);
-        } else {
-            symbol->second.func->overloads.emplace_back(newFunc);
-        }
-    }
-
     void addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler = nullptr) {
         if (symbols.find(lgsEnum->name) != symbols.end()) {
             const auto location = lgsEnum->location;

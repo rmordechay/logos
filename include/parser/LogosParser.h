@@ -14,16 +14,17 @@ public:
   enum {
     T__0 = 1, T__1 = 2, DOUBLE_EQUAL = 3, NOT_EQUAL = 4, GE = 5, LE = 6, 
     LPAREN = 7, RPAREN = 8, LBRACE = 9, RBRACE = 10, LBRACK = 11, RBRACK = 12, 
-    CAST = 13, LANGLE = 14, RANGLE = 15, COMMA = 16, DOUBLE_DOT = 17, DOT = 18, 
-    COLON = 19, EQUAL = 20, MINUS = 21, PLUS = 22, STAR = 23, SLASH = 24, 
-    HASH = 25, QUEST_MARK = 26, EXCLA_MARK = 27, PERCENT = 28, DOLLAR = 29, 
-    AMPERSAND = 30, PIPE = 31, CARET = 32, DOUBLE_RANGLE = 33, DOUBLE_LANGLE = 34, 
-    OBJECT = 35, SINGLETON = 36, SELF_INSTANCE = 37, SELF_CLASS = 38, INTERFACE = 39, 
-    ENUM = 40, VEC2 = 41, VEC3 = 42, VEC4 = 43, IMPLEMENTS = 44, IMPORT = 45, 
-    IF = 46, ELSE = 47, FOR = 48, BREAK = 49, CONTINUE = 50, RETURN = 51, 
-    VISIBILITY = 52, CONST = 53, AND = 54, OR = 55, NOT = 56, IN = 57, INTEGER = 58, 
-    FLOAT = 59, BOOL = 60, NULL_ = 61, CONST_NAME = 62, TYPE = 63, VARIABLE = 64, 
-    STRING = 65, LINE_COMMENT = 66, BLOCK_COMMENT = 67, WS = 68
+    CAST = 13, LANGLE = 14, RANGLE = 15, COMMA = 16, TRIPLE_DOT = 17, DOUBLE_DOT = 18, 
+    DOT = 19, COLON = 20, EQUAL = 21, MINUS = 22, PLUS = 23, STAR = 24, 
+    SLASH = 25, HASH = 26, QUEST_MARK = 27, EXCLA_MARK = 28, PERCENT = 29, 
+    DOLLAR = 30, AMPERSAND = 31, PIPE = 32, CARET = 33, DOUBLE_RANGLE = 34, 
+    DOUBLE_LANGLE = 35, OBJECT = 36, SINGLETON = 37, SELF_INSTANCE = 38, 
+    SELF_CLASS = 39, INTERFACE = 40, ENUM = 41, VEC2 = 42, VEC3 = 43, VEC4 = 44, 
+    IMPLEMENTS = 45, IMPORT = 46, IF = 47, ELSE = 48, FOR = 49, BREAK = 50, 
+    CONTINUE = 51, RETURN = 52, VISIBILITY = 53, CONST = 54, AND = 55, OR = 56, 
+    NOT = 57, IN = 58, INTEGER = 59, FLOAT = 60, BOOL = 61, NULL_ = 62, 
+    CONST_NAME = 63, TYPE = 64, VARIABLE = 65, STRING = 66, LINE_COMMENT = 67, 
+    BLOCK_COMMENT = 68, WS = 69
   };
 
   enum {
@@ -423,8 +424,12 @@ public:
   public:
     ParamContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    ExplicitVarDecContext *explicitVarDec();
     antlr4::tree::TerminalNode *VARIABLE();
+    antlr4::tree::TerminalNode *COLON();
+    TypeContext *type();
+    antlr4::tree::TerminalNode *TRIPLE_DOT();
+    antlr4::tree::TerminalNode *EQUAL();
+    ExprContext *expr();
     FuncTypeContext *funcType();
 
    

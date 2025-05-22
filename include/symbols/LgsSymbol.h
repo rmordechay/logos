@@ -16,10 +16,6 @@ class LgsParam;
 class LgsVarDec;
 class Location;
 
-struct LgsFuncSymbol {
-    std::vector<LgsFunc*> overloads;
-};
-
 enum LgsSymbolType {
     VAR_DEC,
     PARAM,
@@ -41,7 +37,7 @@ struct LgsSymbol {
     LgsField* field = nullptr;
     LgsEnum* lgsEnum = nullptr;
     LgsEnumField* enumField = nullptr;
-    LgsFuncSymbol* func = nullptr;
+    LgsFunc* func = nullptr;
 
     explicit LgsSymbol(): type(UNKNOWN) {}
     explicit LgsSymbol(LgsParam* param);
@@ -51,7 +47,7 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsField* field);
     explicit LgsSymbol(LgsEnum* lgsEnum);
     explicit LgsSymbol(LgsEnumField* enumField);
-    explicit LgsSymbol(LgsFuncSymbol* funcSymbol);
+    explicit LgsSymbol(LgsFunc* func);
     LgsSymbol* clone() const;
     Location* getLocation() const;
     json asJSON() const;

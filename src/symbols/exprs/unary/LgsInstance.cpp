@@ -37,15 +37,14 @@ void LgsInstance::setVirtualFuncs(CodeGenMetadata* metadata) const {
     builder.CreateStore(map, vtableGEP);
     auto mapPtr = builder.CreateLoad(ptrTy, vtableGEP);
 
-    for (const auto& method : obj->methods) {
-        for (const auto overload : method.second) {
-            const auto interface = overload->implements;
-            if (!interface) continue;
-            const auto keyIRStr = getIRStr(metadata->module, interface->funcType.getIRName());
-            const auto IRFunc = overload->getIRFunc(metadata);
-            auto valuePtr = builder.CreateAlloca(ptrTy);
-            builder.CreateStore(IRFunc, valuePtr);
-            obj->vtable.mapType.add.callIR(metadata, {mapPtr, keyIRStr, valuePtr});
-        }
+    for (const auto& [name, method] : obj->methods) {
+        const auto interface = method->implements;
+        if (!interface) continue;
+        const auto keyIRStr = getIRStr(metadata->module, interface->funcType.getIRName());
+        const auto IRFunc = method->getIRFunc(metadata);
+        auto valuePtr = builder.CreateAlloca(ptrTy);
+        builder.CreateStore(IRFunc, valuePtr);
+        obj->vtable.mapType.add.callIR(metadata, {mapPtr, keyIRStr, valuePtr});
+
     }
 }

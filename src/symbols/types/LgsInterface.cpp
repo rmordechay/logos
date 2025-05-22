@@ -6,7 +6,7 @@ Type* LgsInterface::getIRType() {
     if (IRType) return IRType;
     IRType = StructType::getTypeByName(context, interfaceName);
     vector<Type*> elementTypes;
-    for (const auto method : getAllMethods()) {
+    for (const auto [_, method] : methods) {
         method->funcType.isVirtual = true;
         elementTypes.emplace_back(ptrTy);
     }

@@ -43,36 +43,15 @@ LgsField* LgsType::getField(const string& name) {
 }
 
 void LgsType::addMethod(LgsMethodImpl* method) {
-    methods[method->funcType.name].push_back(method);
+    methods[method->funcType.name] = method;
 }
 
-LgsMethodImpl* LgsType::findMethod(const LgsFuncCall* funcCall) const {
-    const auto overloads = getMethodOverloads(funcCall->name);
-    for (const auto& overload : overloads) {
-        if (funcCall->equals(&overload->funcType)) {
-            return overload;
-        }
-    }
-    return nullptr;
-}
-
-vector<LgsMethodImpl*> LgsType::getMethodOverloads(const string& funcName) const {
-    const auto method = methods.find(funcName);
+LgsMethodImpl* LgsType::findMethod(const string& name) const {
+    const auto method = methods.find(name);
     if (method != methods.end()) {
         return method->second;
     }
-    return {};
-}
-
-// TODO remove this func due to double iterations
-vector<LgsMethodImpl*> LgsType::getAllMethods() const {
-    vector<LgsMethodImpl*> overloads;
-    for (const auto method : methods) {
-        for (const auto overload : method.second) {
-            overloads.emplace_back(overload);
-        }
-    }
-    return overloads;
+    return nullptr;
 }
 
 void LgsType::setLocation(const antlr4::Token* ctx) {

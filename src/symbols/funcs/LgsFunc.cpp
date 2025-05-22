@@ -35,6 +35,10 @@ Value* LgsFunc::createIRValue(CodeGenMetadata* metadata) {
     return IRValue;
 }
 
+string LgsFunc::prettyName() {
+    return funcType.prettyName();
+}
+
 Value* LgsFunc::callIR(CodeGenMetadata* metadata, const vector<Value*>& args) {
     const auto IRFunc = getIRFunc(metadata);
     return metadata->builder.CreateCall(IRFunc, args);

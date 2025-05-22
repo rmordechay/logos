@@ -26,13 +26,11 @@ public:
     bool isNullable = false;
     Type* IRType = nullptr;
     map<string, LgsField*> fields;
-    map<string, vector<LgsMethodImpl*>> methods;
+    map<string, LgsMethodImpl*> methods;
 
     LgsField* getField(const string& name);
     void addMethod(LgsMethodImpl* method);
-    LgsMethodImpl* findMethod(const LgsFuncCall* funcCall) const;
-    vector<LgsMethodImpl*> getMethodOverloads(const string& funcName) const;
-    vector<LgsMethodImpl*> getAllMethods() const;
+    LgsMethodImpl* findMethod(const string& name) const;
     void setLocation(const antlr4::Token* ctx);
 
     LgsBool* asBool();

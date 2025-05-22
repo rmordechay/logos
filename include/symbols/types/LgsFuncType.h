@@ -31,5 +31,4 @@ public:
     ~LgsFuncType() override = default;
 };
 
-
 #endif //LGSFUNCSIGNATURE_H

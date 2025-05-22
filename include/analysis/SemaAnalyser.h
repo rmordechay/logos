@@ -61,7 +61,7 @@ public:
     void visitBreakStmt(const LgsBreakStmt* breakStmt);
     void visitContinueStmt(const LgsContinueStmt* continueStmt);
     void visitEnum(const LgsEnum* lgsEnum) const;
-    void visitExpr(LgsExpr* expr);
+    void visitExpr(LgsExpr* expr, LgsType* type = nullptr);
     void visitCast(LgsCast* castExpr);
     void visitArrayExpr(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap) const;
@@ -70,6 +70,7 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
     void visitFuncCall(LgsFuncCall* funcCall);
+    void visitAnonymousFunc(LgsFuncCall* funcCall, const LgsFuncType* funcType);
     void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
@@ -81,8 +82,7 @@ public:
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     void setIterIndexType(LgsIterIndex* iterIndex);
-    void validateExprType(LgsExpr* expr, LgsType* type);
-    void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
+    void validateExprType(const LgsExpr* expr, LgsType* type);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 
     LgsSymbol* getSymbol(const string& name, const LgsValue* value = nullptr);
@@ -92,8 +92,7 @@ public:
     void resolveFuncTypes(LgsFuncType* funcType);
     void resolveObjMemberTypes(LgsObject* const& obj);
     void resolveObjectImplements(LgsObject* obj);
-    string getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads) const;
-    string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
+    string getFuncsAsStr(const vector<LgsFunc*>& funcs) const;
     ~SemaAnalyser() = default;
 };
 

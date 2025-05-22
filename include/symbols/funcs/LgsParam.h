@@ -13,6 +13,7 @@ public:
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
     vector<LgsVariable*> refs;
+    bool isVariadic = false;
 
     explicit LgsParam(LgsType* type = nullptr, const string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     string format(string& indentStr) override;

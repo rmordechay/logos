@@ -33,7 +33,7 @@ public:
     bool loadProject(const vector<char*>& args);
     void loadFiles();
     void setEnvVars() const;
-    void loadGlobals() const;
+    void loadGlobals();
     void checkRequiredEnvVars();
     void loadSrcFiles();
     void loadEnvFiles();

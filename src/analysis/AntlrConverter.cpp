@@ -81,8 +81,7 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx, con
         if (funcName == LOGOS_MAIN_FUNC) {
             mainFile->mainFunc = getMainFunc(func);
         } else {
-            auto logosFunc = getFuncImpl(func);
-            mainFile->funcs[funcName].push_back(logosFunc);
+            mainFile->funcs[funcName] = getFuncImpl(func);
         }
     }
     return mainFile;
@@ -198,12 +197,12 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
 LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplContext* ctx) {
     const auto rt = getFuncReturnType(ctx->funcSignature()->type());
     const auto funcSignature = ctx->funcSignature();
-    const auto nameToken = funcSignature->VARIABLE();
-    const auto func = new LgsFuncImpl(nameToken->getText(), rt);
+    const auto tokenName = funcSignature->VARIABLE();
+    const auto func = new LgsFuncImpl(tokenName->getText(), rt);
     setParams(funcSignature->param(), &func->funcType);
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
-    func->setLocation(nameToken->getSymbol());
-    globals.addFunc(func);
+    func->setLocation(tokenName->getSymbol());
+    globals.addSymbol(func->funcType.name, LgsSymbol(func), &errHandler);
     return func;
 }
 
@@ -238,12 +237,20 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
 }
 
 void AntlerConverter::setParams(const vector<LogosParser::ParamContext*>& params, LgsFuncType* funcType) {
-    for (LogosParser::ParamContext* param : params) {
-        if (const auto varDec = param->explicitVarDec()) {
-            const auto lgsParam = getParam(varDec);
-            if (lgsParam->expr) {
+    for (int i = 0; i < params.size(); ++i) {
+        const auto param = params[i];
+        if (const auto type = param->type()) {
+            const auto variableName = param->VARIABLE()->getText();
+            const auto lgsParam = new LgsParam(getType(type), variableName, getExpr(param->expr()));
+            if (param->TRIPLE_DOT()) {
+                if (i != params.size() - 1) errHandler.handleError(E10044, &lgsParam->location);
+                if (lgsParam->expr) errHandler.handleError(E10045, &lgsParam->location);
+                lgsParam->isVariadic = true;
+                funcType->isVariadic = true;
+            } else if (lgsParam->expr) {
                 funcType->hasDefaultParams = true;
             }
+            lgsParam->setLocation(param->start);
             funcType->params.emplace_back(lgsParam);
         } else if (const auto paramFuncType = param->funcType()) {
             const auto lgsParamFuncType = getFuncType(paramFuncType);
@@ -317,7 +324,7 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
 LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto expr = getExpr(ctx->expr(), !!ctx->QUEST_MARK());
-    const auto varDec = new LgsVarDec(variableName, expr->type, expr);
+    const auto varDec = new LgsVarDec(variableName, expr);
     varDec->setLocation(ctx->start);
     return varDec;
 }
@@ -412,7 +419,8 @@ LgsLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx) {
     // TODO add error for range loop size greater than 1
     for (const auto variable : ctx->VARIABLE()) {
         const auto loopVarName = variable->getText();
-        auto varDec = new LgsVarDec(loopVarName, &LGS_INT);
+        auto varDec = new LgsVarDec(loopVarName);
+        varDec->type = &LGS_INT;
         varDec->expr = LGS_INT.getZeroValue();
         rangeLoop->loopVars.emplace_back(varDec);
     }
