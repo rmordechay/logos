@@ -30,6 +30,10 @@ string LgsType::getStrFormatPart() const {
     assert(false);
 }
 
+LgsType* LgsType::clone() {
+    assert(false);
+}
+
 LgsField* LgsType::getField(const string& name) {
     const auto field = fields.find(name);
     if (field != fields.end()) {
@@ -42,10 +46,10 @@ void LgsType::addMethod(LgsMethodImpl* method) {
     methods[method->funcType.name].push_back(method);
 }
 
-LgsMethodImpl* LgsType::findMethod(LgsFuncCall* funcCall) const {
+LgsMethodImpl* LgsType::findMethod(const LgsFuncCall* funcCall) const {
     const auto overloads = getMethodOverloads(funcCall->name);
     for (const auto& overload : overloads) {
-        if (overload->funcType.equals(funcCall)) {
+        if (funcCall->equals(&overload->funcType)) {
             return overload;
         }
     }
@@ -63,8 +67,8 @@ vector<LgsMethodImpl*> LgsType::getMethodOverloads(const string& funcName) const
 // TODO remove this func due to double iterations
 vector<LgsMethodImpl*> LgsType::getAllMethods() const {
     vector<LgsMethodImpl*> overloads;
-    for (const auto& method : methods) {
-        for (const auto& overload : method.second) {
+    for (const auto method : methods) {
+        for (const auto overload : method.second) {
             overloads.emplace_back(overload);
         }
     }

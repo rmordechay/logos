@@ -1,51 +1,18 @@
 #include "types/LgsFuncType.h"
-#include "exprs/unary/LgsFuncCall.h"
 #include "types/LgsInterface.h"
-#include "types/LgsObject.h"
 
 bool LgsFuncType::equals(LgsType* other) {
     const auto otherFuncType = other->asFuncType();
     if (!otherFuncType) return false;
-    if (name != otherFuncType->name) return false;
+    if (!isAnonymous && !otherFuncType->isAnonymous && name != otherFuncType->name) return false;
     const auto otherParams = otherFuncType->params;
+    if (!rt->equals(otherFuncType->rt)) return false;
     if (params.size() != otherParams.size()) return false;
     if (params.size() == 0 && otherParams.size() == 0) return true;
     for (size_t i = 0; i < params.size(); ++i) {
         const auto thisType = params[i]->type;
         const auto otherType = otherFuncType->params[i]->type;
-        if (thisType->equals(otherType)) return false;
-    }
-    return true;
-}
-
-bool LgsFuncType::equals(const LgsFuncCall* other) const {
-    if (name != other->name) return false;
-    const auto args = other->args;
-    if (params.size() == 0 && args.size() == 0) return true;
-    if (params.size() < args.size()) return false;
-    for (size_t i = 0; i < params.size(); ++i) {
-        const auto paramType = params[i]->type;
-        const auto argType = args[i]->type;
-        if (const auto ft = paramType->asFuncType()) {
-            if (!ft->rt->equals(argType)) return false;
-        } else {
-            if (!paramType->equals(argType)) return false;
-        }
-    }
-    return true;
-}
-
-bool LgsFuncType::equalsVariadic(const LgsFuncCall* funcCall) const {
-    return true;
-}
-
-bool LgsFuncType::equalsDefaultParams(const LgsFuncCall* funcCall) const {
-    const auto argsSize = funcCall->args.size();
-    for (size_t i = funcCall->func->funcType.isMethod; i < params.size(); ++i) {
-        const auto param = params[i];
-        if (i >= argsSize) continue;
-        const auto arg = funcCall->args[i];
-        if (!param->type->equals(arg->type)) return false;
+        if (!thisType->equals(otherType)) return false;
     }
     return true;
 }
@@ -73,22 +40,34 @@ LgsExpr* LgsFuncType::getZeroValue() {
 }
 
 string LgsFuncType::prettyName() const {
-    return name;
-}
-
-LgsType* LgsFuncType::inferBinaryType(LgsType* other) {
-    return nullptr;
-}
-
-string LgsFuncType::getAsStr() const {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = 0; i < params.size(); ++i) {
         strStream << params[i]->type->prettyName();
         if (i != params.size() - 1) strStream << ", ";
     }
-    strStream << ")";
+    strStream << "): " << rt->prettyName();
     return strStream.str();
 }
 
+LgsType* LgsFuncType::inferBinaryType(LgsType* other) {
+    return nullptr;
+}
 
+LgsType* LgsFuncType::clone() {
+    auto* newFuncType = new LgsFuncType();
+    newFuncType->name = this->name;
+    newFuncType->parentName = this->parentName;
+    newFuncType->rt = this->rt->clone();
+    for (const auto param : this->params) {
+        newFuncType->params.push_back(new LgsParam(*param));
+    }
+    newFuncType->isMethod = this->isMethod;
+    newFuncType->isStatic = this->isStatic;
+    newFuncType->isPublic = this->isPublic;
+    newFuncType->isVirtual = this->isVirtual;
+    newFuncType->isVariadic = this->isVariadic;
+    newFuncType->isAnonymous = this->isAnonymous;
+    newFuncType->hasDefaultParams = this->hasDefaultParams;
+    return newFuncType;
+}

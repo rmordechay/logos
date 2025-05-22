@@ -30,7 +30,7 @@ public:
 
     LgsField* getField(const string& name);
     void addMethod(LgsMethodImpl* method);
-    LgsMethodImpl* findMethod(LgsFuncCall* funcCall) const;
+    LgsMethodImpl* findMethod(const LgsFuncCall* funcCall) const;
     vector<LgsMethodImpl*> getMethodOverloads(const string& funcName) const;
     vector<LgsMethodImpl*> getAllMethods() const;
     void setLocation(const antlr4::Token* ctx);
@@ -57,6 +57,7 @@ public:
     virtual string prettyName() const = 0;
     virtual bool equals(LgsType* other) = 0;
     virtual LgsType* inferBinaryType(LgsType* other) = 0;
+    virtual LgsType* clone();
     virtual ~LgsType() = default;
 };
 

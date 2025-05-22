@@ -7,8 +7,6 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
-#include "loops/LgsForeachLoop.h"
-#include "loops/LgsRangeLoop.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
 
@@ -20,7 +18,6 @@ using namespace filesystem;
 
 class AntlerConverter {
 public:
-    LgsFuncImpl* currentFunc = nullptr;
     LgsMethodImpl* currentMethod = nullptr;
     LgsErrHandler errHandler;
 
@@ -28,14 +25,15 @@ public:
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath);
     LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx, const path& filePath);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const string& filePath);
-    void setMainFunc(LgsMainFile* mainFile, LogosParser::FuncImplementationContext* func);
+    LgsMainFunc* getMainFunc(LogosParser::FuncImplContext* func);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName, const string& filePath);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const string& filePath, bool isSingleton = false);
-    void setParams(LogosParser::FuncSignatureContext* funcSignature, LgsFuncType* funcType);
+    void setParams(const vector<LogosParser::ParamContext*>& params, LgsFuncType* funcType);
     LgsField* getField(LogosParser::FieldContext* ctx);
-    LgsFuncImpl* getFuncImpl(LogosParser::FuncImplementationContext* ctx);
+    LgsFuncImpl* getFuncImpl(LogosParser::FuncImplContext* ctx);
+    LgsFuncImpl* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
     LgsMethodImpl* getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);

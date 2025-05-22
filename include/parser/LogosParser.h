@@ -31,18 +31,19 @@ public:
     RuleObjectFile = 4, RuleInterfaceFile = 5, RuleInterface = 6, RuleInterfaceBody = 7, 
     RuleObject = 8, RuleObjectBody = 9, RuleField = 10, RuleObjectDeclaration = 11, 
     RuleInterfaceDeclaration = 12, RuleObjectImplements = 13, RuleFuncSignature = 14, 
-    RuleFuncImplementation = 15, RuleMethodImplementation = 16, RuleFuncBody = 17, 
-    RuleParam = 18, RuleStatement = 19, RuleStatementsBlock = 20, RuleAssignment = 21, 
-    RuleExplicitVarDec = 22, RuleImplicitVarDec = 23, RuleIfStatement = 24, 
-    RuleElseIfStatement = 25, RuleElseStatement = 26, RulePatternMatching = 27, 
-    RulePattern = 28, RuleLoopStatement = 29, RuleBreakStmt = 30, RuleReturnStatement = 31, 
-    RuleEnumDeclaration = 32, RuleEnumField = 33, RuleExpr = 34, RuleUnaryExpr = 35, 
-    RuleArray = 36, RuleHashMap = 37, RuleKeyValue = 38, RuleFuncCall = 39, 
-    RuleFuncArgList = 40, RuleFuncArg = 41, RuleConstructor = 42, RuleConstructorArgList = 43, 
-    RuleConstructorArg = 44, RuleConstant = 45, RuleIterIndex = 46, RuleIndex = 47, 
-    RuleSelection = 48, RuleFirstSelectionElement = 49, RuleInnerSelectionElement = 50, 
-    RuleRange = 51, RuleType = 52, RuleMapType = 53, RuleFuncType = 54, 
-    RuleVector = 55, RuleRequireEnvVars = 56
+    RuleFuncImpl = 15, RuleAnonnymosfuncSignature = 16, RuleAnonnymosFunc = 17, 
+    RuleMethodImplementation = 18, RuleFuncBody = 19, RuleParam = 20, RuleStatement = 21, 
+    RuleStatementsBlock = 22, RuleAssignment = 23, RuleExplicitVarDec = 24, 
+    RuleImplicitVarDec = 25, RuleIfStatement = 26, RuleElseIfStatement = 27, 
+    RuleElseStatement = 28, RulePatternMatching = 29, RulePattern = 30, 
+    RuleLoopStatement = 31, RuleBreakStmt = 32, RuleReturnStatement = 33, 
+    RuleEnumDeclaration = 34, RuleEnumField = 35, RuleExpr = 36, RuleUnaryExpr = 37, 
+    RuleArray = 38, RuleHashMap = 39, RuleKeyValue = 40, RuleFuncCall = 41, 
+    RuleFuncArgList = 42, RuleFuncArg = 43, RuleConstructor = 44, RuleConstructorArgList = 45, 
+    RuleConstructorArg = 46, RuleConstant = 47, RuleIterIndex = 48, RuleIndex = 49, 
+    RuleSelection = 50, RuleFirstSelectionElement = 51, RuleInnerSelectionElement = 52, 
+    RuleRange = 53, RuleType = 54, RuleMapType = 55, RuleFuncType = 56, 
+    RuleVector = 57, RuleRequireEnvVars = 58
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -77,7 +78,9 @@ public:
   class InterfaceDeclarationContext;
   class ObjectImplementsContext;
   class FuncSignatureContext;
-  class FuncImplementationContext;
+  class FuncImplContext;
+  class AnonnymosfuncSignatureContext;
+  class AnonnymosFuncContext;
   class MethodImplementationContext;
   class FuncBodyContext;
   class ParamContext;
@@ -175,8 +178,8 @@ public:
     EnumDeclarationContext* enumDeclaration(size_t i);
     std::vector<InterfaceContext *> interface();
     InterfaceContext* interface(size_t i);
-    std::vector<FuncImplementationContext *> funcImplementation();
-    FuncImplementationContext* funcImplementation(size_t i);
+    std::vector<FuncImplContext *> funcImpl();
+    FuncImplContext* funcImpl(size_t i);
 
    
   };
@@ -232,8 +235,8 @@ public:
     ExplicitVarDecContext* explicitVarDec(size_t i);
     std::vector<FuncSignatureContext *> funcSignature();
     FuncSignatureContext* funcSignature(size_t i);
-    std::vector<FuncImplementationContext *> funcImplementation();
-    FuncImplementationContext* funcImplementation(size_t i);
+    std::vector<FuncImplContext *> funcImpl();
+    FuncImplContext* funcImpl(size_t i);
 
    
   };
@@ -350,9 +353,9 @@ public:
 
   FuncSignatureContext* funcSignature();
 
-  class  FuncImplementationContext : public antlr4::ParserRuleContext {
+  class  FuncImplContext : public antlr4::ParserRuleContext {
   public:
-    FuncImplementationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    FuncImplContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     FuncSignatureContext *funcSignature();
     FuncBodyContext *funcBody();
@@ -360,7 +363,37 @@ public:
    
   };
 
-  FuncImplementationContext* funcImplementation();
+  FuncImplContext* funcImpl();
+
+  class  AnonnymosfuncSignatureContext : public antlr4::ParserRuleContext {
+  public:
+    AnonnymosfuncSignatureContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
+    std::vector<ParamContext *> param();
+    ParamContext* param(size_t i);
+    antlr4::tree::TerminalNode *COLON();
+    TypeContext *type();
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+
+   
+  };
+
+  AnonnymosfuncSignatureContext* anonnymosfuncSignature();
+
+  class  AnonnymosFuncContext : public antlr4::ParserRuleContext {
+  public:
+    AnonnymosFuncContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    AnonnymosfuncSignatureContext *anonnymosfuncSignature();
+    FuncBodyContext *funcBody();
+
+   
+  };
+
+  AnonnymosFuncContext* anonnymosFunc();
 
   class  MethodImplementationContext : public antlr4::ParserRuleContext {
   public:
@@ -673,6 +706,7 @@ public:
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *NULL_();
     FuncCallContext *funcCall();
+    AnonnymosFuncContext *anonnymosFunc();
     VectorContext *vector();
     ConstructorContext *constructor();
     ConstantContext *constant();

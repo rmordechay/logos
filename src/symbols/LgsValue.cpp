@@ -13,6 +13,24 @@ void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) co
     metadata->builder.SetInsertPoint(block);
 }
 
+void LgsValue::startBlockFunc(CodeGenMetadata* metadata) const {
+    const auto returnFunc = metadata->lgsStack.returnFunc;
+    if (returnFunc) {
+        const auto instructions = metadata->builder.GetInsertBlock();
+        returnFunc->returnAddr = &instructions->back();
+    }
+    const auto currentFunc = metadata->lgsStack.currentFunc;
+    currentFunc->entryBlock->insertInto(currentFunc->getIRFunc(metadata));
+    metadata->builder.SetInsertPoint(currentFunc->entryBlock);
+}
+
+void LgsValue::exitBlockFunc(CodeGenMetadata* metadata) const {
+    const auto returnFunc = metadata->lgsStack.returnFunc;
+    if (returnFunc) {
+        metadata->builder.SetInsertPoint(returnFunc->entryBlock, returnFunc->returnAddr->getIterator());
+    }
+}
+
 Value* LgsValue::getIRStr(Module* module, const string& value) const {
     for (auto& globals : module->globals()) {
         if (!globals.hasInitializer()) continue;

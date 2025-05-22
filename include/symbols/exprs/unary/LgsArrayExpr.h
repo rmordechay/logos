@@ -16,7 +16,6 @@ public:
     }
     Value* getLength(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* createNestedConstArray(CodeGenMetadata* metadata, const LgsIterIndex* iterIndex) const;
     Value* createConstArray(CodeGenMetadata* metadata) const;
     Value* createDynArray(CodeGenMetadata* metadata);
     ~LgsArrayExpr() override = default;

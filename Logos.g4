@@ -13,7 +13,7 @@ logosAppFile:
     ;
 
 mainFile:
-        (object | enumDeclaration | interface)* funcImplementation+ EOF
+        (object | enumDeclaration | interface)* funcImpl+ EOF
     ;
 
 objectFile:
@@ -29,7 +29,7 @@ interface:
     ;
 
 interfaceBody:
-        explicitVarDec* funcSignature+ funcImplementation*
+        explicitVarDec* funcSignature+ funcImpl*
     ;
 
 object:
@@ -60,8 +60,16 @@ funcSignature:
         VARIABLE LPAREN (param (COMMA param)* COMMA?)? RPAREN (COLON type)?
     ;
 
-funcImplementation:
+funcImpl:
         funcSignature funcBody
+    ;
+
+anonnymosfuncSignature:
+        LPAREN (param (COMMA param)* COMMA?)? RPAREN (COLON type)?
+    ;
+
+anonnymosFunc:
+        anonnymosfuncSignature funcBody
     ;
 
 methodImplementation:
@@ -167,6 +175,7 @@ unaryExpr:
     |   SELF_CLASS
     |   NULL
     |   funcCall
+    |   anonnymosFunc
     |   vector
     |   constructor
     |   constant

@@ -18,6 +18,7 @@ struct LgsStackFrame {
 class LgsStack : public stack<LgsStackFrame> {
 public:
     LgsFunc* currentFunc = nullptr;
+    LgsFunc* returnFunc = nullptr;
     LgsLoop* currentLoop = nullptr;
 
     void enterScope(LgsFunc* func = nullptr);

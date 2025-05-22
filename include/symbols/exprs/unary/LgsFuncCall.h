@@ -7,19 +7,23 @@ class LgsFuncCall final : public LgsStmt, public LgsUnaryExpr {
 public:
     string name;
     vector<LgsExpr*> args;
+    LgsSymbol* callback = nullptr;
     LgsFunc* func = nullptr;
-    LgsSymbol* ref = nullptr;
 
     explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
-    string getAsStr() const;
     Value* call(CodeGenMetadata* metadata) const;
+    Value* getCallback(CodeGenMetadata* metadata) const;
+    bool equalsRaw(const LgsFuncType* funcType) const;
+    bool equals(const LgsFuncType* funcType) const;
+    bool equalsVariadic(const LgsFuncType* funcType) const;
+    bool equalsDefaultParams(const LgsFuncType* funcType) const;
     Value* resolveVirtualFunc(CodeGenMetadata* metadata) const;
-    Value* getRefIRValue() const;
-    string getName() override;
-    string format(string& indentStr) override;
+    string getAsStr() const;
     void createIRStmt(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;
-    ~LgsFuncCall() override;
+    string getName() override;
+    string format(string& indentStr) override;
+    ~LgsFuncCall() override = default;
 };
 
 #endif //LOGOSFUNCCALL_H
