@@ -261,6 +261,9 @@ void AntlerConverter::setParams(const vector<LogosParser::ParamContext*>& params
             funcType->params.emplace_back(lgsParam);
         }
     }
+    if (funcType->isVariadic && funcType->hasDefaultParams) {
+        errHandler.handleError(E10043, &funcType->location);
+    }
 }
 
 LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx) {

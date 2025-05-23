@@ -44,7 +44,7 @@ Value* LgsFunc::callIR(CodeGenMetadata* metadata, const vector<Value*>& args) {
     return metadata->builder.CreateCall(IRFunc, args);
 }
 
-Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
+Function* LgsFunc::getIRFunc(CodeGenMetadata* metadata) {
     const auto funcIRType = getIRFuncType(metadata);
     auto func = metadata->module->getOrInsertFunction(funcType.getIRName(), funcIRType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
@@ -93,7 +93,8 @@ FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {
     return IRFuncType;
 }
 
-bool LgsFunc::setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) const {
+bool LgsFunc::setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues,
+                                const vector<LgsExpr*>& args) const {
     bool isObjReturn = false;
     if (const auto obj = funcType.rt->asObject()) {
         const auto objRtPtr = metadata->builder.CreateAlloca(obj->getIRType(), nullptr);

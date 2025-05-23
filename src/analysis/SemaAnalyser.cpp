@@ -15,7 +15,7 @@
 #include "exprs/unary/LgsInstance.h"
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
-#include "../../include/symbols/exprs/LgsBinaryExpr.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsOperator.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
@@ -96,9 +96,6 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
 void SemaAnalyser::visitFuncType(const LgsFuncType* funcType) {
     for (const auto param : funcType->params) {
         visitParam(param);
-    }
-    if (funcType->isVariadic && funcType->hasDefaultParams) {
-        errHandler.handleError(E10043, &funcType->location);
     }
 }
 
@@ -465,7 +462,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
 }
 
 void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
-    const auto symbol = getSymbol(funcCall->name);
+    const auto symbol = getSymbol(funcCall->name, funcCall);
     if (!symbol) return;
     switch (symbol->type) {
     case VAR_DEC: {

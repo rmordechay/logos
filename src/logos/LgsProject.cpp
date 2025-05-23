@@ -2,6 +2,7 @@
 
 #include "LgsInterfaceFile.h"
 #include "Platform.h"
+#include "SemaAnalyser.h"
 #include "analysis/AntlrConverter.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsAppFile.h"
@@ -21,6 +22,7 @@ bool LogosProject::loadProject(const vector<char*>& args) {
     if (!validateProject()) return false;
     // setupActiveEnv();
     if (!errHandler.successful) return false;
+    // lgsC.parse();
     loadFiles();
     if (!errors.empty()) return false;
     if (!resolveGlobalTypes(files)) return false;
@@ -199,13 +201,6 @@ void LogosProject::parseAppFile(path fileEntry) {
             activeEnv.name = varDec->expr->asStrConst()->value;
         }
     }
-}
-
-string LogosProject::getFileText(path filePath) const {
-    ifstream file(canonical(filePath));
-    stringstream fileContents;
-    fileContents << file.rdbuf();
-    return fileContents.str();
 }
 
 void LogosProject::loadGlobals() {

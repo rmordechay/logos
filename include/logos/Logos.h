@@ -1,7 +1,8 @@
 #ifndef LOGOS_H
 #define LOGOS_H
+#include "LgsC.h"
+
 #include <filesystem>
-#include "SemaAnalyser.h"
 #include "LgsProject.h"
 
 class ThreadPool;

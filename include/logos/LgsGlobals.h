@@ -1,6 +1,5 @@
 #ifndef LGSGLOBALS_H
 #define LGSGLOBALS_H
-#include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
@@ -9,7 +8,6 @@
 #include "types/LgsObject.h"
 #include "types/LgsInterface.h"
 #include "LgsErrHandler.h"
-#include "funcs/LgsFuncImpl.h"
 #include <mutex>
 
 struct LgsGlobals {

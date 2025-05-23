@@ -12,8 +12,8 @@ set(CMAKE_BUILD_PARALLEL_LEVEL ${CPU_COUNT})
 file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS include/*.h)
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
 add_library(lib ${HEADER_FILES} ${SOURCE_FILES}
-    src/utils/LgsUtils.cpp
-    include/utils/LgsUtils.h)
+    src/utils/LgsCInterface.cpp
+    include/utils/LgsCInterface.h)
 
 target_include_directories(lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -33,6 +33,7 @@ target_include_directories(lib PUBLIC
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lib PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libLLVM.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclang-cpp.dylib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldCommon.dylib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldMachO.dylib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libantlr.a
