@@ -2,7 +2,7 @@
 
 #include "funcs/LgsFunc.h"
 
-#include <loops/LgsLoop.h>
+#include <loops/LgsForLoop.h>
 
 void LgsContinueStmt::createIRStmt(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;

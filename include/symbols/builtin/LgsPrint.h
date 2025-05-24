@@ -19,9 +19,13 @@ public:
 
     Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
         vector<Value*> IRArgs;
+        stringstream str;
         for (int i = 0; i < args.size(); ++i) {
-            IRArgs.emplace_back(args[i]->getIRValue(metadata));
+            const auto arg = args[i];
+            addIRArg(metadata, IRArgs, arg);
+            str << arg->type->getStrFormatPart() << ' ';
         }
+        IRArgs.insert(IRArgs.begin(), getIRStr(metadata->module, str.str()));
         const auto printfFunc = getPrintf(metadata->module);
         metadata->builder.CreateCall(printfFunc, IRArgs);
         return nullptr;

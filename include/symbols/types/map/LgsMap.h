@@ -33,7 +33,6 @@ public:
     bool equals(LgsType* other) override;
     bool canIndexTo(LgsType* indexType) override;
     LgsType* inferBinaryType(LgsType* other) override;
-    Value* IRLength(CodeGenMetadata* metadata) override;
     LgsType* createInnerType(size_t indexRange, LgsIndex* index) const override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
     ~LgsMap() override = default;

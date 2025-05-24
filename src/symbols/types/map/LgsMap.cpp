@@ -17,10 +17,6 @@ int LgsMap::getDims() {
     return 1;
 }
 
-Value* LgsMap::IRLength(CodeGenMetadata* metadata) {
-    return len.call(metadata);
-}
-
 LgsType* LgsMap::createInnerType(size_t indexRange, LgsIndex* index) const {
     assert(false);
 }

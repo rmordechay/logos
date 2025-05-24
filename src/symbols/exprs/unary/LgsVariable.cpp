@@ -18,7 +18,7 @@ Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
     assert(ref);
     switch (ref->type) {
     case VAR_DEC:
-        return ref->varDec->getIRValue(metadata);
+        return ref->varDec->IRValue;
     case PARAM:
         return ref->param->getIRValue(metadata);
     case ENUM_FIELD:
@@ -130,10 +130,9 @@ uint32_t LgsVariable::hashValue(CodeGenMetadata* metadata) {
 Value* LgsVariable::getLength(CodeGenMetadata* metadata) {
     switch (ref->type) {
     case VAR_DEC:
-        return ref->varDec->expr->getLength(metadata);
+        return type->asIterable()->getLength(metadata, ref->varDec->IRValue);
     case PARAM: {
-        auto lgsIterable = ref->param->type->asStr();
-        return lgsIterable->len.callIR(metadata, {ref->param->IRValue});
+        return type->asIterable()->getLength(metadata, ref->param->IRValue);
     }
     default:
         assert(false);

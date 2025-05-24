@@ -8,7 +8,7 @@
 
 using namespace std;
 using namespace llvm;
-class LgsLoop;
+class LgsForLoop;
 class LgsFuncType;
 
 struct LgsStackFrame {
@@ -19,7 +19,7 @@ class LgsStack : public stack<LgsStackFrame> {
 public:
     LgsFunc* currentFunc = nullptr;
     LgsFunc* returnFunc = nullptr;
-    LgsLoop* currentLoop = nullptr;
+    LgsForLoop* currentLoop = nullptr;
 
     void enterScope(LgsFunc* func = nullptr);
     void exitScope();

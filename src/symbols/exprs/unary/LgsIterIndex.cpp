@@ -18,12 +18,6 @@ Value* LgsIterIndex::createIRValue(CodeGenMetadata* metadata) {
     assert(false);
 }
 
-Value* LgsIterIndex::getLength(CodeGenMetadata* metadata) {
-    const auto dimsExprs = type->asArray()->dimsExprs;
-    const auto dimsExpr = dimsExprs[indices.size() - 1];
-    return dimsExpr->getIRValue(metadata);
-}
-
 Value* LgsIterIndex::getGEP(CodeGenMetadata* metadata) const {
     const auto ty = baseExpr->type->getIRType();
     const auto ptr = baseExpr->getIRValue(metadata);
@@ -38,11 +32,11 @@ Value* LgsIterIndex::getGEP(CodeGenMetadata* metadata) const {
 }
 
 Value* LgsIterIndex::createIRDynArray(CodeGenMetadata* metadata, LgsArray* arr) const {
-    const auto mapIRType = baseExpr->type->getIRType();
-    const auto mapPtr = baseExpr->getIRValue(metadata);
-    const auto mapLoaded = metadata->builder.CreateLoad(mapIRType, mapPtr);
+    const auto arrIRType = baseExpr->type->getIRType();
+    const auto arrPtr = baseExpr->getIRValue(metadata);
+    const auto arrLoaded = metadata->builder.CreateLoad(arrIRType, arrPtr);
     const auto indexIRValue = indices[0]->from->getIRValue(metadata);
-    return arr->get.callIR(metadata, {mapLoaded, indexIRValue});
+    return arr->get.callIR(metadata, {arrLoaded, indexIRValue});
 }
 
 Value* LgsIterIndex::createMapIRValue(CodeGenMetadata* metadata, LgsMap* map) const {
@@ -76,8 +70,8 @@ void LgsIterIndex::storeScalar(CodeGenMetadata* metadata, LgsExpr* value) {
     if (const auto map = type->asMap()) {
         auto key = indices[0]->from;
         map->add.call(metadata, {baseExpr, key, value});
-    } else if (type->asArray() && !type->asArray()->isStatic) {
-        assert(false);
+    } else if (const auto arr = type->asArray(); arr && !arr->isStatic) {
+        arr->add.call(metadata, {baseExpr, indices[0]->from});
     } else {
         const auto gep = getIRValue(metadata);
         const auto rValue = value->getIRValue(metadata);
@@ -102,6 +96,12 @@ void LgsIterIndex::storeArray(CodeGenMetadata* metadata, const LgsArrayExpr* arr
         metadata->builder.CreateStore(rValue, gep);
         IRIndices.pop_back();
     }
+}
+
+Value* LgsIterIndex::getLength(CodeGenMetadata* metadata) {
+    const auto dimsExprs = type->asArray()->dimsExprs;
+    const auto dimsExpr = dimsExprs[indices.size() - 1];
+    return dimsExpr->getIRValue(metadata);
 }
 
 string LgsIterIndex::getName() {

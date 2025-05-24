@@ -1,18 +1,20 @@
 #ifndef LOGOSFOREACHLOOP_H
 #define LOGOSFOREACHLOOP_H
-#include "LgsLoop.h"
+#include "LgsForLoop.h"
 #include <exprs/unary/LgsUnaryExpr.h>
 
 class LgsDArrayType;
 
-class LgsForeachLoop final : public LgsLoop {
+class LgsForeachLoop final : public LgsForLoop {
 public:
     LgsUnaryExpr* iterExpr = nullptr;
+    Value* iterPtr = nullptr;
 
     explicit LgsForeachLoop(LgsUnaryExpr* iterable) : iterExpr(iterable) {}
+    void setIRLoopVars(CodeGenMetadata* metadata) override;
+    void setIRIterable(CodeGenMetadata* metadata) override;
     Value* loopStart(CodeGenMetadata* metadata) override;
     Value* loopEnd(CodeGenMetadata* metadata) override;
-    void setIRLoopVars(CodeGenMetadata* metadata) override;
     ~LgsForeachLoop() override;
 };
 

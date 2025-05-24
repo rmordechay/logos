@@ -1,6 +1,6 @@
 #include "stmts/LgsBreakStmt.h"
 #include "funcs/LgsFunc.h"
-#include "loops/LgsLoop.h"
+#include "loops/LgsForLoop.h"
 #include "types/LgsFuncType.h"
 
 void LgsBreakStmt::createIRStmt(CodeGenMetadata* metadata) {

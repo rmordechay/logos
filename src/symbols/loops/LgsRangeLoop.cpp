@@ -15,6 +15,10 @@ void LgsRangeLoop::setIRLoopVars(CodeGenMetadata* metadata) {
     loopVar->expr->setIRValue(iValue);
 }
 
+void LgsRangeLoop::setIRIterable(CodeGenMetadata* metadata) {
+    assert(false);
+}
+
 LgsRangeLoop::~LgsRangeLoop() {
     // rangeStart will be freed with varDec freeing
     delete rangeEnd;

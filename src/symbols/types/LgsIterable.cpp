@@ -23,12 +23,16 @@ int LgsIterable::getDims() {
     assert(false);
 }
 
-Value* LgsIterable::IRLength(CodeGenMetadata* metadata) {
+void LgsIterable::unpackTypes(const vector<LgsVarDec*>& varDecs) {
+    varDecs[0]->type = baseType;
+}
+
+Value* LgsIterable::getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr) {
     assert(false);
 }
 
-void LgsIterable::unpackTypes(const vector<LgsVarDec*>& varDecs) {
-    varDecs[0]->type = baseType;
+Value* LgsIterable::getLength(CodeGenMetadata* metadata, Value* arr) {
+    assert(false);
 }
 
 LgsType* LgsIterable::inferTypeFromIter(const vector<LgsExpr*>& exprs) const {

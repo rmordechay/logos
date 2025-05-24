@@ -6,14 +6,14 @@ class LgsVariable;
 class LgsStmtBlock;
 class LgsExpr;
 
-class LgsLoop : public LgsStmt {
+class LgsForLoop : public LgsStmt {
 public:
+    AllocaInst* iPtr = nullptr;
     vector<LgsVarDec*> loopVars;
     LgsStmtBlock* stmtBlock = nullptr;
     BasicBlock* loopCondBlock = nullptr;
     BasicBlock* loopBodyBlock = nullptr;
     BasicBlock* loopExitBlock = nullptr;
-    Value* iPtr = nullptr;
 
     void createIRStmt(CodeGenMetadata* metadata) override;
     void initIRLoop(CodeGenMetadata* metadata);
@@ -21,8 +21,9 @@ public:
     void exitIRLoop(CodeGenMetadata* metadata) const;
     virtual Value* loopStart(CodeGenMetadata* metadata) = 0;
     virtual Value* loopEnd(CodeGenMetadata* metadata) = 0;
+    virtual void setIRIterable(CodeGenMetadata* metadata) = 0;
     virtual void setIRLoopVars(CodeGenMetadata* metadata) = 0;
-    ~LgsLoop() override;
+    ~LgsForLoop() override;
 };
 
 #endif // LOGOSLOOP_H

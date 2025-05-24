@@ -16,7 +16,7 @@ public:
     LgsVarDec* asVarDec();
     LgsIfStmt* asIfStmt();
     LgsAssignment* asAssignment();
-    LgsLoop* asLoop();
+    LgsForLoop* asLoop();
     LgsPatternMatch* asPatternMatch();
     LgsReturn* asReturn();
     LgsContinueStmt* asContinue();

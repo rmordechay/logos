@@ -29,7 +29,7 @@
 #include "types/array/LgsArray.h"
 #include "types/primitives/LgsVoid.h"
 #include <loops/LgsForeachLoop.h>
-#include <loops/LgsLoop.h>
+#include <loops/LgsForLoop.h>
 #include <loops/LgsRangeLoop.h>
 #include <stmts/LgsAssignment.h>
 #include <stmts/LgsIfStmt.h>
@@ -150,6 +150,7 @@ void SemaAnalyser::visitField(const LgsField* field) {
 }
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
+    if (varDec->type) resolveType(varDec->type);
     if (varDec->expr) {
         visitExpr(varDec->expr, varDec->type);
     } else {
@@ -205,7 +206,7 @@ void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
 
 void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const {}
 
-void SemaAnalyser::visitLoopStmt(LgsLoop* loopStmt) {
+void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
     lgsStack.enterScope();
     lgsStack.currentLoop = loopStmt;
     if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {
@@ -236,7 +237,7 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
     }
     iterable->unpackTypes(foreachLoop->loopVars);
     for (const auto varDec : foreachLoop->loopVars) {
-        visitVarDec(varDec);
+        addLocalSymbol(varDec->name, LgsSymbol(varDec));
     }
     visitStmtBlock(foreachLoop->stmtBlock);
 }
@@ -629,7 +630,7 @@ void SemaAnalyser::validateExprType(const LgsExpr* expr, LgsType* type) {
 }
 
 void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
-    const auto method = methodCall->callback->func;
+    const auto method = methodCall->func;
     if (!method->funcType.isPublic && file->absPath != method->path) {
         errHandler.handleError(E10031, &method->location, {method->funcType.name, method->funcType.parentName});
     }
@@ -708,11 +709,11 @@ LgsType* SemaAnalyser::resolveArrayType(LgsArray* array) {
     if (array->baseType->isUnknown()) {
         array->baseType = resolveType(array->baseType);
     }
-    auto iterIsConst = true;
+    auto iterIsConst = false;
     for (const auto sizeExpr : array->dimsExprs) {
         visitExpr(sizeExpr);
-        if (!sizeExpr || !sizeExpr->type->equals(&LGS_INT)) {
-            iterIsConst = false;
+        if (sizeExpr->type->isConst) {
+            iterIsConst = true;
         }
     }
     array->isStatic = iterIsConst;

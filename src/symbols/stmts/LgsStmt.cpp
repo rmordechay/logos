@@ -8,14 +8,14 @@
 #include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsReturn.h"
 #include "stmts/LgsVarDec.h"
-#include <loops/LgsLoop.h>
+#include <loops/LgsForLoop.h>
 
 LgsAssignment* LgsStmt::asAssignment() {
     return dynamic_cast<LgsAssignment*>(this);
 }
 
-LgsLoop* LgsStmt::asLoop() {
-    return dynamic_cast<LgsLoop*>(this);
+LgsForLoop* LgsStmt::asLoop() {
+    return dynamic_cast<LgsForLoop*>(this);
 }
 
 LgsBreakStmt* LgsStmt::asBreakStmt() {

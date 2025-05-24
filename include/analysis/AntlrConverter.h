@@ -11,7 +11,7 @@
 #include "stmts/LgsIfStmt.h"
 
 class LgsAppFile;
-class LgsLoop;
+class LgsForLoop;
 class LgsAssignment;
 using namespace std;
 using namespace filesystem;
@@ -45,9 +45,9 @@ public:
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
-    LgsLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
-    LgsLoop* getRangeLoop(LogosParser::LoopStatementContext* ctx);
-    LgsLoop* getForeachLoop(LogosParser::LoopStatementContext* ctx);
+    LgsForLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
+    LgsForLoop* getRangeLoop(LogosParser::LoopStatementContext* ctx);
+    LgsForLoop* getForeachLoop(LogosParser::LoopStatementContext* ctx);
     LgsEnum* getEnum(LogosParser::EnumDeclarationContext* ctx);
     LgsExpr* getExpr(LogosParser::ExprContext* ctx, bool isNullable = false);
     LgsExpr* getCast(LogosParser::ExprContext* ctx);

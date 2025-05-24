@@ -1,10 +1,10 @@
-#include "loops/LgsLoop.h"
+#include "loops/LgsForLoop.h"
 
 #include "LgsDefinitions.h"
 #include "stmts/LgsStmtBlock.h"
 #include "stmts/LgsVarDec.h"
 
-void LgsLoop::createIRStmt(CodeGenMetadata* metadata) {
+void LgsForLoop::createIRStmt(CodeGenMetadata* metadata) {
     initIRLoop(metadata);
     startBlock(metadata, loopCondBlock);
     setLoopIRCondition(metadata);
@@ -14,7 +14,7 @@ void LgsLoop::createIRStmt(CodeGenMetadata* metadata) {
     exitIRLoop(metadata);
 }
 
-void LgsLoop::initIRLoop(CodeGenMetadata* metadata) {
+void LgsForLoop::initIRLoop(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope();
     metadata->lgsStack.currentLoop = this;
     auto& builder = metadata->builder;
@@ -23,10 +23,11 @@ void LgsLoop::initIRLoop(CodeGenMetadata* metadata) {
     loopExitBlock = createBasicBlock(LOGOS_LOOP_EXIT);
     iPtr = builder.CreateAlloca(i32Ty);
     builder.CreateStore(loopStart(metadata), iPtr);
+    setIRIterable(metadata);
     builder.CreateBr(loopCondBlock);
 }
 
-void LgsLoop::setLoopIRCondition(CodeGenMetadata* metadata) {
+void LgsForLoop::setLoopIRCondition(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto iValue = builder.CreateLoad(i32Ty, iPtr);
     const auto upperBound = loopEnd(metadata);
@@ -34,7 +35,7 @@ void LgsLoop::setLoopIRCondition(CodeGenMetadata* metadata) {
     builder.CreateCondBr(condition, loopBodyBlock, loopExitBlock);
 }
 
-void LgsLoop::exitIRLoop(CodeGenMetadata* metadata) const {
+void LgsForLoop::exitIRLoop(CodeGenMetadata* metadata) const {
     auto& builder = metadata->builder;
     // Increment loop variable
     const auto iValue = builder.CreateLoad(i32Ty, iPtr);
@@ -47,7 +48,7 @@ void LgsLoop::exitIRLoop(CodeGenMetadata* metadata) const {
     metadata->lgsStack.exitScope();
 }
 
-LgsLoop::~LgsLoop() {
+LgsForLoop::~LgsForLoop() {
     for (const auto& loopVar : loopVars) {
         delete loopVar;
     }

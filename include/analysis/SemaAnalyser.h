@@ -24,7 +24,7 @@ class LgsBinaryExpr;
 class LgsArrayExpr;
 class LgsIfStmt;
 class LgsAssignment;
-class LgsLoop;
+class LgsForLoop;
 
 bool resolveGlobalTypes(const vector<LgsFile*>& files);
 
@@ -54,7 +54,7 @@ public:
     void visitIfStmt(LgsIfStmt* ifStmt);
     void visitPatternMatch(const LgsPatternMatch* patternMatching);
     void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const;
-    void visitLoopStmt(LgsLoop* loopStmt);
+    void visitLoopStmt(LgsForLoop* loopStmt);
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);
     void visitForeachLoop(const LgsForeachLoop* foreachLoop);
     void visitReturnStmt(const LgsReturn* returnStmt);

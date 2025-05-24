@@ -7,18 +7,18 @@ string LgsVarDec::format(string& indentStr) {
 
 void LgsVarDec::createIRStmt(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto exprValue = expr->getIRValue(metadata);
-    const auto valueType = exprValue->getType();
-    IRValue = exprValue;
-    if (valueType->isPointerTy() || valueType->isVoidTy()) return;
-    const auto ptr = builder.CreateAlloca(valueType);
-    builder.CreateStore(exprValue, ptr);
-}
-
-Value* LgsVarDec::getIRValue(CodeGenMetadata* metadata) const {
-    if (IRValue) return IRValue;
-    assert(expr);
-    return expr->getIRValue(metadata);
+    const auto IRType = type->getIRType();
+    if (expr) {
+        const auto exprIRValue = expr->getIRValue(metadata);
+        if (IRType->isPointerTy() || IRType->isVoidTy()) {
+            IRValue = exprIRValue;
+        } else {
+            IRValue = builder.CreateAlloca(IRType);
+            builder.CreateStore(exprIRValue, IRValue);
+        }
+    } else {
+        IRValue = builder.CreateAlloca(IRType);
+    }
 }
 
 json LgsVarDec::asJSON() {

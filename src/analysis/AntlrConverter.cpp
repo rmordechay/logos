@@ -401,8 +401,8 @@ LgsStmt* AntlerConverter::getPatternMatching(LogosParser::PatternMatchingContext
     return patternMatching;
 }
 
-LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ctx) {
-    LgsLoop* loopStmt = nullptr;
+LgsForLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ctx) {
+    LgsForLoop* loopStmt = nullptr;
     if (ctx->iterableExpr) {
         loopStmt = getForeachLoop(ctx);
     } else if (ctx->iterableRange) {
@@ -416,7 +416,7 @@ LgsLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext* ct
     return loopStmt;
 }
 
-LgsLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx) {
+LgsForLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx) {
     const auto startExpr = getExpr(ctx->iterableRange->start);
     const auto endExpr = getExpr(ctx->iterableRange->end);
     const auto rangeLoop = new LgsRangeLoop(startExpr, endExpr);
@@ -431,7 +431,7 @@ LgsLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx) {
     return rangeLoop;
 }
 
-LgsLoop* AntlerConverter::getForeachLoop(LogosParser::LoopStatementContext* ctx) {
+LgsForLoop* AntlerConverter::getForeachLoop(LogosParser::LoopStatementContext* ctx) {
     const auto iterExpr = getUnaryExpr(ctx->iterableExpr);
     const auto foreachLoop = new LgsForeachLoop(iterExpr);
     for (const auto variable : ctx->VARIABLE()) {
@@ -722,7 +722,7 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
     LgsType* result = nullptr;
     if (const auto mapType = ctx->mapType()) {
         result = new LgsMap(getType(mapType->key), getType(mapType->value));
-    } else if (!ctx->expr().empty()) {
+    } else if (!ctx->LBRACK().empty()) {
         result = getArrayType(ctx);
     } else if (const auto funcType = ctx->funcType()) {
         result = getFuncType(funcType);

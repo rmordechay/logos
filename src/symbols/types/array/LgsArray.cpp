@@ -12,7 +12,9 @@ void LgsArray::inferArrayType(const vector<LgsExpr*>& exprs) {
 
 LgsExpr* LgsArray::getZeroValue() {
     const auto arr = new LgsArrayExpr(baseType);
-    arr->arrType.dimsExprs = dimsExprs;
+    for (const auto dimsExpr : dimsExprs) {
+        arr->arrType.dimsExprs.emplace_back(dimsExpr->clone());
+    }
     arr->arrType.isStatic = isStatic;
     return arr;
 }
@@ -45,6 +47,21 @@ bool LgsArray::canIndexTo(LgsType* indexType) {
 
 void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[0]->type = baseType;
+}
+
+Value* LgsArray::getLength(CodeGenMetadata* metadata, Value* iter) {
+    if (isStatic) return dimsExprs[0]->getIRValue(metadata);
+    return len.callIR(metadata, {iter});
+}
+
+Value* LgsArray::getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr) {
+    if (isStatic) {
+        const auto i = metadata->builder.CreateLoad(i32Ty, iPtr);
+        return metadata->builder.CreateGEP(getIRType(), iterPtr, {i32Zero, i});
+    }
+    const auto iValue = metadata->builder.CreateLoad(i32Ty, iPtr);
+    const auto v = get.callIR(metadata, {iterPtr, iValue});
+    return metadata->builder.CreateLoad(getIRType(), v);
 }
 
 LgsType* LgsArray::createInnerType(const size_t indexRange, LgsIndex* index) const {

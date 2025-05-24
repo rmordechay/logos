@@ -2,7 +2,7 @@
 #define LGSBREAK_H
 #include "LgsStmt.h"
 
-class LgsLoop;
+class LgsForLoop;
 
 class LgsBreakStmt final : public LgsStmt {
 public:

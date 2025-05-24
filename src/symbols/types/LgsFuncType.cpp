@@ -23,9 +23,6 @@ string LgsFuncType::getIRName() {
         strStream << parentName << "_";
     }
     strStream << name;
-    for (const auto& param : params) {
-        strStream << "_" + param->type->getIRName();
-    }
     IRName = strStream.str();
     return IRName;
 }
