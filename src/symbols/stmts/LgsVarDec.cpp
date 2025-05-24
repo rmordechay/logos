@@ -15,6 +15,12 @@ void LgsVarDec::createIRStmt(CodeGenMetadata* metadata) {
     builder.CreateStore(exprValue, ptr);
 }
 
+Value* LgsVarDec::getIRValue(CodeGenMetadata* metadata) const {
+    if (IRValue) return IRValue;
+    assert(expr);
+    return expr->getIRValue(metadata);
+}
+
 json LgsVarDec::asJSON() {
     json tree;
     tree["name"] = name;

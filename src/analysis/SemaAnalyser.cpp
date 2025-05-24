@@ -15,7 +15,7 @@
 #include "exprs/unary/LgsInstance.h"
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
-#include "../../include/symbols/exprs/LgsBinaryExpr.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "exprs/LgsOperator.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
@@ -67,10 +67,8 @@ void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
     for (const auto& lgsEnum : mainFile->enums) {
         visitEnum(lgsEnum);
     }
-    for (const auto [_, overloads] : mainFile->funcs) {
-        for (const auto func : overloads) {
-            visitFunc(func);
-        }
+    for (const auto [_, func] : mainFile->funcs) {
+        visitFunc(func);
     }
     visitFunc(mainFile->mainFunc);
 }
@@ -79,8 +77,8 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
     for (const auto& [_, field] : obj->fields) {
         visitField(field);
     }
-    for (const auto& overload : obj->getAllMethods()) {
-        visitFunc(overload);
+    for (const auto& [_, method] : obj->methods) {
+        visitFunc(method);
     }
 }
 
@@ -99,14 +97,13 @@ void SemaAnalyser::visitFuncType(const LgsFuncType* funcType) {
     for (const auto param : funcType->params) {
         visitParam(param);
     }
-    if (funcType->isVariadic && funcType->hasDefaultParams) {
-        errHandler.handleError(E10043, &funcType->location);
-    }
 }
 
 void SemaAnalyser::visitParam(LgsParam* param) {
     if (param->expr) {
         visitExpr(param->expr, param->type);
+    } else if (param->isVariadic) {
+        // assert(false);
     }
     addLocalSymbol(param->name, LgsSymbol(param));
 }
@@ -155,15 +152,11 @@ void SemaAnalyser::visitField(const LgsField* field) {
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     if (varDec->expr) {
         visitExpr(varDec->expr, varDec->type);
-        if (varDec->type) {
-            delete varDec->type;
-        }
-        varDec->type = varDec->expr->type;
     } else {
         varDec->expr = varDec->type->getZeroValue();
-        delete varDec->type;
-        varDec->type = varDec->expr->type;
     }
+    if (varDec->type && !varDec->type->isPrimitive) delete varDec->type;
+    varDec->type = varDec->expr->type;
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
     assert(varDec->type && varDec->expr);
 }
@@ -243,7 +236,7 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
     }
     iterable->unpackTypes(foreachLoop->loopVars);
     for (const auto varDec : foreachLoop->loopVars) {
-        addLocalSymbol(varDec->name, LgsSymbol(varDec));
+        visitVarDec(varDec);
     }
     visitStmtBlock(foreachLoop->stmtBlock);
 }
@@ -375,9 +368,7 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
         variable->setType(symbol->enumField->type);
         break;
     case FUNC:
-        if (symbol->func->overloads.size() == 1) {
-            variable->setType(&symbol->func->overloads[0]->funcType);
-        }
+        variable->setType(&symbol->func->funcType);
         break;
     default:
         assert(false);
@@ -392,31 +383,30 @@ void SemaAnalyser::visitSelection(LgsSelection* selection) {
 }
 
 void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
-    if (const auto variable = dynamic_cast<LgsVariable*>(firstExpr)) {
+    if (const auto variable = firstExpr->asVariable()) {
         visitVariable(variable);
-    } else if (const auto funcCall = dynamic_cast<LgsFuncCall*>(firstExpr)) {
+    } else if (const auto funcCall = firstExpr->asFuncCall()) {
         visitFuncCall(funcCall);
-    } else if (const auto typeConst = dynamic_cast<LgsTypeConst*>(firstExpr)) {
-        typeConst->type = resolveType(typeConst->type);
-    } else if (const auto iterIndex = dynamic_cast<LgsIterIndex*>(firstExpr)) {
+    } else if (const auto iterIndex = firstExpr->asIterIndex()) {
         visitIterIndex(iterIndex);
-    } else if (const auto strConst = dynamic_cast<LgsStrConst*>(firstExpr)) {
+    } else if (const auto strConst = firstExpr->asStrConst()) {
         visitStrConst(strConst);
+    } else if (const auto typeConst = firstExpr->asTypeConst()) {
+        typeConst->type = resolveType(typeConst->type);
     } else {
         assert(false);
     }
     assert(firstExpr->type);
 }
 
-
 void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
     const auto exprs = selection->exprs;
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
-        if (const auto var = dynamic_cast<LgsVariable*>(childExpr)) {
+        if (const auto var = childExpr->asVariable()) {
             visitFieldSelection(parentExpr, var);
-        } else if (const auto methodCall = dynamic_cast<LgsFuncCall*>(childExpr)) {
+        } else if (const auto methodCall = childExpr->asFuncCall()) {
             visitMethodCall(methodCall, parentExpr->type);
         }
     }
@@ -469,7 +459,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
 }
 
 void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
-    const auto symbol = getSymbol(funcCall->name);
+    const auto symbol = getSymbol(funcCall->name, funcCall);
     if (!symbol) return;
     switch (symbol->type) {
     case VAR_DEC: {
@@ -485,18 +475,15 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
         break;
     }
     case FUNC: {
-        const auto& overloads = symbol->func->overloads;
+        const auto func = symbol->func;
         for (const auto& arg : funcCall->args) {
             visitExpr(arg);
         }
-        for (const auto overload : overloads) {
-            if (!funcCall->equals(&overload->funcType)) continue;
-            funcCall->func = overload;
-            funcCall->type = overload->funcType.rt;
-            break;
-        }
-        if (!funcCall->func) {
-            errHandler.handleError(E10015, &funcCall->location, {funcCall->name, getOverloadsAsStr(overloads)});
+        if (funcCall->equals(&func->funcType)) {
+            funcCall->func = func;
+            funcCall->type = func->funcType.rt;
+        } else {
+            errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->prettyName(), func->prettyName()});
         }
         break;
     }
@@ -510,7 +497,7 @@ void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, const LgsFuncType* 
         visitExpr(arg);
     }
     if (!funcCall->equals(funcType)) {
-        errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcType->prettyName()});
+        errHandler.handleError(E10006, &funcCall->location, {funcCall->name});
         return;
     }
     funcCall->type = funcType->rt;
@@ -524,18 +511,16 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
         argTypeNames.emplace_back(arg->type->prettyName());
     }
     auto name = methodCall->name;
-    const auto overloads = parentType->getMethodOverloads(name);
-    if (overloads.empty()) {
+    const auto methods = parentType->methods;
+    const auto method = parentType->findMethod(name);
+    if (!method) {
         return errHandler.handleError(E10013, &methodCall->location, {name, parentType->prettyName()});
     }
-    for (const auto overload : overloads) {
-        if (!methodCall->equals(&overload->funcType)) continue;
-        methodCall->func = overload;
-        methodCall->type = overload->funcType.rt;
-        break;
-    }
-    if (!methodCall->func) {
-        errHandler.handleError(E10034, &methodCall->location, {parentType->prettyName(), methodCall->name, getOverloadsAsStr(overloads)});
+    if (methodCall->equals(&method->funcType)) {
+        methodCall->func = method;
+        methodCall->type = method->funcType.rt;
+    } else {
+        errHandler.handleError(E10034, &methodCall->location, {parentType->prettyName(), methodCall->prettyName(), method->prettyName()});
     }
     checkMethodVisibility(methodCall);
 }
@@ -643,22 +628,8 @@ void SemaAnalyser::validateExprType(const LgsExpr* expr, LgsType* type) {
     }
 }
 
-void SemaAnalyser::checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads) {
-    for (size_t i = 0; i < overloads.size(); ++i) {
-        const auto overload1 = overloads[i];
-        const auto funcType1 = &overload1->funcType;
-        for (size_t j = i + 1; j < overloads.size(); ++j) {
-            const auto overload2 = overloads[j];
-            const auto funcType2 = &overload2->funcType;
-            if (funcType1->equals(funcType2)) {
-                return errHandler.handleError(E10033, &overload1->location, {funcType1->prettyName()});
-            }
-        }
-    }
-}
-
 void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
-    const auto method = methodCall->callback->func->overloads[0];
+    const auto method = methodCall->callback->func;
     if (!method->funcType.isPublic && file->absPath != method->path) {
         errHandler.handleError(E10031, &method->location, {method->funcType.name, method->funcType.parentName});
     }
@@ -753,8 +724,8 @@ void SemaAnalyser::resolveObjMemberTypes(LgsObject* const& obj) {
         field->type = resolveType(field->type);
         field->parent = obj;
     }
-    for (const auto& overload : obj->getAllMethods()) {
-        resolveFuncTypes(&overload->funcType);
+    for (const auto& [_, method] : obj->methods) {
+        resolveFuncTypes(&method->funcType);
     }
     for (int i = 0; i < obj->implements.size(); ++i) {
         obj->implements[i] = resolveType(obj->implements[i]);
@@ -780,40 +751,26 @@ void SemaAnalyser::resolveObjectImplements(LgsObject* obj) {
         }
 
         vector<LgsFunc*> missingFuncs;
-        for (const auto& [name, interfaceOverloads] : interface->methods) {
-            const auto& objOverloads = obj->getMethodOverloads(name);
-            for (const auto interfaceOverload : interfaceOverloads) {
-                auto found = false;
-                for (const auto objOverload : objOverloads) {
-                    if (!objOverload->funcType.equals(&interfaceOverload->funcType)) continue;
-                    objOverload->implements = interfaceOverload;
-                    found = true;
-                    break;
-                }
-                if (found) break;
-                missingFuncs.emplace_back(interfaceOverload);
+        for (const auto& [name, interfaceFunc] : interface->methods) {
+            const auto objMethod = obj->findMethod(name);
+            if (objMethod && objMethod->funcType.equals(&interfaceFunc->funcType)) {
+                objMethod->implements = interfaceFunc;
+                continue;
             }
+            missingFuncs.emplace_back(interfaceFunc);
         }
 
         if (!missingFuncs.empty()) {
-            errHandler.handleError(E10016, &obj->location, {obj->name, interface->interfaceName, getOverloadsAsStr(missingFuncs)});
+            errHandler.handleError(E10016, &obj->location, {obj->name, interface->interfaceName, getFuncsAsStr(missingFuncs)});
         }
     }
 }
 
 
-string SemaAnalyser::getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads) const {
+string SemaAnalyser::getFuncsAsStr(const vector<LgsFunc*>& funcs) const {
     stringstream str;
-    for (const auto& overload : overloads) {
-        str << "\n\t     - " << overload->funcType.prettyName();
-    }
-    return str.str();
-}
-
-string SemaAnalyser::getOverloadsAsStr(const vector<LgsFunc*>& overloads) const {
-    stringstream str;
-    for (const auto& overload : overloads) {
-        str << "\n\t     - " << overload->funcType.prettyName();
+    for (const auto& func : funcs) {
+        str << "\n\t     - " << func->funcType.prettyName();
     }
     return str.str();
 }

@@ -54,10 +54,17 @@ Value* LgsIterIndex::createMapIRValue(CodeGenMetadata* metadata, LgsMap* map) co
 }
 
 Value* LgsIterIndex::createStrIRValue(CodeGenMetadata* metadata) const {
-    const auto ptr = baseExpr->getIRValue(metadata);
-    const auto ty = dyn_cast<GlobalVariable>(ptr)->getValueType();
-    const auto value = indices[0]->from->getIRValue(metadata);
-    return metadata->builder.CreateGEP(ty, ptr, {i32Zero, value});
+    const auto baseExprIRValue = baseExpr->getIRValue(metadata);
+    const auto baseExprIRType = baseExpr->type->getIRType();
+    if (const auto global = dyn_cast<GlobalVariable>(baseExprIRValue)) {
+        const auto ty = global->getValueType();
+        const auto value = indices[0]->from->getIRValue(metadata);
+        return metadata->builder.CreateGEP(ty, baseExprIRValue, {i32Zero, value});
+    }
+    const auto p = metadata->builder.CreateAlloca(baseExprIRType);
+    const auto vaArgInst = metadata->builder.CreateVAArg(baseExprIRValue, baseExprIRType);
+    metadata->builder.CreateStore(vaArgInst, p);
+    return metadata->builder.CreateLoad(baseExprIRType, p);
 }
 
 void LgsIterIndex::storeHashMap(CodeGenMetadata* metadata, LgsHashMap* hashMap) const {

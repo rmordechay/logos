@@ -6,6 +6,9 @@ class LgsInt final : public LgsType {
 public:
     static constexpr auto name = "Int";
 
+    LgsInt() {
+        isPrimitive = true;
+    }
     size_t getSize() override;
     Type* getIRType() override;
     string getIRName() override;

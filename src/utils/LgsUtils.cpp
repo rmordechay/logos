@@ -6,6 +6,13 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 
+string getFileText(filesystem::path filePath) {
+    ifstream file(canonical(filePath));
+    stringstream fileContents;
+    fileContents << file.rdbuf();
+    return fileContents.str();
+}
+
 int getExprConstNumber(LgsExpr* expr) {
     if (const auto asInt = expr->asIntConst()) {
         return asInt->value;

@@ -47,26 +47,12 @@ bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
 
 bool LgsFuncCall::equalsRaw(const LgsFuncType* funcType) const {
     if (!funcType->isAnonymous && name != funcType->name) return false;
+    if (funcType->params.size() != args.size()) return false;
     if (funcType->params.size() == 0 && args.size() == 0) return true;
-    if (funcType->params.size() < args.size()) return false;
     for (size_t i = 0; i < funcType->params.size(); ++i) {
         const auto paramType = funcType->params[i]->type;
         const auto argType = args[i]->type;
-        if (!argType) {
-            const auto var = args[i]->asVariable();
-            if (var && var->ref->type == FUNC) {
-                auto found = false;
-                for (const auto& overload : var->ref->func->overloads) {
-                    if (!overload->funcType.equals(paramType)) continue;
-                    var->type = &overload->funcType;
-                    found = true;
-                    break;
-                }
-                if (!found) return false;
-            }
-        } else if (!paramType->equals(argType)) {
-            return false;
-        }
+        if (!paramType->equals(argType)) return false;
     }
     return true;
 }
@@ -92,7 +78,7 @@ Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata) const {
     const auto type = parent->type;
     const auto interface = type->asInterface();
     const auto parentIRValue = parent->getIRValue(metadata);
-    const auto func = callback->func->overloads[0];
+    const auto func = callback->func;
     const auto keyIR = getIRStr(metadata->module, func->funcType.getIRName());
     const auto mapPtr = builder.CreateLoad(ptrTy, parentIRValue);
     const auto rv = interface->vtable.mapType.get.callIR(metadata, {mapPtr, keyIR});

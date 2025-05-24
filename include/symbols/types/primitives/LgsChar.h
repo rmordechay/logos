@@ -6,6 +6,9 @@ class LgsChar final : public LgsType {
 public:
     static constexpr auto name = "Char";
 
+    LgsChar() {
+        isPrimitive = true;
+    }
     string prettyName() const override;
     Type* getIRType() override;
     string getIRName() override;

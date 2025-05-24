@@ -81,7 +81,7 @@ funcBody:
     ;
 
 param:
-        explicitVarDec | VARIABLE funcType
+        VARIABLE COLON type TRIPLE_DOT? (EQUAL expr)? | VARIABLE funcType
     ;
 
 statement:
@@ -305,6 +305,7 @@ LANGLE: '<';
 RANGLE: '>';
 
 COMMA: ',';
+TRIPLE_DOT: '...';
 DOUBLE_DOT: '..';
 DOT: '.';
 COLON: ':';

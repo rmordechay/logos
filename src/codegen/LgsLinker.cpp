@@ -5,9 +5,7 @@
 #include <LgsDefinitions.h>
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
-#include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IRReader/IRReader.h>
-#include <llvm/Support/SourceMgr.h>
 #include <llvm/Support/FileSystem.h>
 #include "llvm/IR/Verifier.h"
 #include <iostream>
@@ -21,24 +19,7 @@ bool LgsLinker::link() const {
         if (name == LOGOS_MAIN_FILE_NAME) continue;
         linker.linkInModule(unique_ptr<Module>(module));
     }
-
-    error_code ec;
-    legacy::PassManager pass;
-    raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
-    const auto addedPassFailed = targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
-    if (addedPassFailed) {
-        cerr << ec.message() << endl;
-        return false;
-    }
-
-    if (verifyModule(*mainModule, &errs())) {
-        errs().flush();
-        return false;
-    }
-    pass.run(*mainModule);
-    outputStream.flush();
-    outputStream.close();
-
+    if (!generateObjFile(mainModule, paths.objFilePath.c_str())) return false;
     const auto linkerOpts = platform.linkerOpts;
     if (!platform.link(linkerOpts, outs(), errs(), false, false)) {
         errs().flush();
@@ -47,16 +28,22 @@ bool LgsLinker::link() const {
     return true;
 }
 
-void generateObjFile(Module* module) {
+bool LgsLinker::generateObjFile(Module* module, const string& path) const {
     error_code ec;
-    raw_fd_ostream fileStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
-    ModuleAnalysisManager analysisManager;
-    PassBuilder passBuilder(targetMachine);
-    ModulePassManager passManager;
-    passBuilder.registerModuleAnalyses(analysisManager);
-    const auto result = passBuilder
-                        .buildInlinerPipeline(OptimizationLevel::O2, ThinOrFullLTOPhase::FullLTOPostLink)
-                        .run(*module, analysisManager);
-    fileStream.flush();
-    fileStream.close();
+    legacy::PassManager pass;
+    raw_fd_ostream outputStream(path, ec, sys::fs::OF_None);
+    const auto addedPassFailed = targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
+    if (addedPassFailed) {
+        cerr << ec.message() << endl;
+        return false;
+    }
+
+    if (verifyModule(*module, &errs())) {
+        errs().flush();
+        return false;
+    }
+    pass.run(*module);
+    outputStream.flush();
+    outputStream.close();
+    return true;
 }

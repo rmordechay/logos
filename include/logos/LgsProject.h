@@ -1,6 +1,7 @@
 #ifndef LGSPROJECT_H
 #define LGSPROJECT_H
 #include "AntlrConverter.h"
+#include "LgsC.h"
 #include "LgsErrHandler.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
@@ -24,22 +25,22 @@ public:
     string version;
     vector<LgsFile*> files;
     vector<LgsError> errors;
-    vector<LgsEnvFile*> envFiles;
     LgsErrHandler errHandler;
+    vector<LgsEnvFile*> envFiles;
     LgsMainFile* mainFile = nullptr;
     const LgsAppFile* appFile = nullptr;
+    LgsC lgsC;
 
     void asJSON() const;
     bool loadProject(const vector<char*>& args);
     void loadFiles();
     void setEnvVars() const;
-    void loadGlobals() const;
+    void loadGlobals();
     void checkRequiredEnvVars();
     void loadSrcFiles();
     void loadEnvFiles();
     void setupActiveEnv();
     bool validateProject();
-    string getFileText(path filePath) const;
     bool resolveGlobalTypes(const vector<LgsFile*>& files) const;
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
     void parseSrcFile(path entry);

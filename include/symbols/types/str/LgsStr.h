@@ -9,6 +9,7 @@ class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
     LgsStrFormatFunc format{this};
+    LgsStrLenFunc len{this};
 
     LgsStr() : LgsIterable(&LGS_CHAR) {
         unpackLength = 1;

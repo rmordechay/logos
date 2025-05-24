@@ -45,8 +45,8 @@ public:
     void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitFuncType(const LgsFuncType* funcType);
-    void validateFuncControlFlow(const LgsFunc* func);
     void visitParam(LgsParam* param);
+    void validateFuncControlFlow(const LgsFunc* func);
     void visitStmt(LgsStmt* stmt);
     void visitStmtBlock(LgsStmtBlock* stmtBlock);
     void visitAssignment(const LgsAssignment* assignment);
@@ -83,7 +83,6 @@ public:
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     void setIterIndexType(LgsIterIndex* iterIndex);
     void validateExprType(const LgsExpr* expr, LgsType* type);
-    void checkDuplicateFuncs(const vector<LgsFuncImpl*>& overloads);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 
     LgsSymbol* getSymbol(const string& name, const LgsValue* value = nullptr);
@@ -93,8 +92,7 @@ public:
     void resolveFuncTypes(LgsFuncType* funcType);
     void resolveObjMemberTypes(LgsObject* const& obj);
     void resolveObjectImplements(LgsObject* obj);
-    string getOverloadsAsStr(const vector<LgsMethodImpl*>& overloads) const;
-    string getOverloadsAsStr(const vector<LgsFunc*>& overloads) const;
+    string getFuncsAsStr(const vector<LgsFunc*>& funcs) const;
     ~SemaAnalyser() = default;
 };
 

@@ -63,6 +63,7 @@ inline void setPlatform(const string& inputFile, const string& outputFile) {
         platform.linker.c_str(),
         platform.inputFile.c_str(),
         "../stdlib/lgslib.a",
+        "../stdlib/output.o",
         "-o", platform.outputFile.c_str(),
         "-lSystem",
         "-syslibroot", platform.libRoot.c_str(),

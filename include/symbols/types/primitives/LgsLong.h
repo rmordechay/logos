@@ -6,6 +6,9 @@ class LgsLong final : public LgsType {
 public:
     static constexpr auto name = "Long";
 
+    LgsLong() {
+        isPrimitive = true;
+    }
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;

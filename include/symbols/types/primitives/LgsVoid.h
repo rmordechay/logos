@@ -10,6 +10,7 @@ public:
 
     LgsVoid() {
         isVoid = true;
+        isPrimitive = true;
     }
     string prettyName() const override;
     Type* getIRType() override;

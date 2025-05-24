@@ -11,6 +11,7 @@ public:
     vector<LgsVariable*> refs;
 
     explicit LgsVarDec(const string& name, LgsExpr* expr = nullptr) : name(name), expr(expr) {}
+    Value* getIRValue(CodeGenMetadata* metadata) const;
     void createIRStmt(CodeGenMetadata* metadata) override;
     string format(string& indentStr) override;
     json asJSON() override;

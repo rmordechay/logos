@@ -1,6 +1,5 @@
 #ifndef LGSGLOBALS_H
 #define LGSGLOBALS_H
-#include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
@@ -9,7 +8,6 @@
 #include "types/LgsObject.h"
 #include "types/LgsInterface.h"
 #include "LgsErrHandler.h"
-#include "funcs/LgsFuncImpl.h"
 #include <mutex>
 
 struct LgsGlobals {
@@ -24,19 +22,6 @@ struct LgsGlobals {
         }
         std::lock_guard lock(mtx);
         symbols[name] = symbol;
-    }
-
-    void addFunc(LgsFuncImpl* newFunc) {
-        const auto name = newFunc->funcType.name;
-        const auto symbol = symbols.find(name);
-        std::lock_guard lock(mtx);
-        if (symbol == symbols.end()) {
-            const auto funcSymbol = new LgsFuncSymbol();
-            funcSymbol->overloads.push_back(newFunc);
-            symbols[name] = LgsSymbol(funcSymbol);
-        } else {
-            symbol->second.func->overloads.emplace_back(newFunc);
-        }
     }
 
     void addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler = nullptr) {

@@ -2,6 +2,7 @@
 
 #include "LgsInterfaceFile.h"
 #include "Platform.h"
+#include "SemaAnalyser.h"
 #include "analysis/AntlrConverter.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsAppFile.h"
@@ -21,6 +22,7 @@ bool LogosProject::loadProject(const vector<char*>& args) {
     if (!validateProject()) return false;
     // setupActiveEnv();
     if (!errHandler.successful) return false;
+    // lgsC.parse();
     loadFiles();
     if (!errors.empty()) return false;
     if (!resolveGlobalTypes(files)) return false;
@@ -113,15 +115,15 @@ bool LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) const {
             for (const auto& object : mainFile->objects) {
                 semaAnalyser.resolveObjMemberTypes(object);
             }
-            for (const auto& func : mainFile->getAllFuncs()) {
+            for (const auto [_, func] : mainFile->funcs) {
                 semaAnalyser.resolveFuncTypes(&func->funcType);
             }
         } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             semaAnalyser.resolveObjMemberTypes(objFile->obj);
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            auto overloads = interfaceFile->interface->getAllMethods();
-            for (const auto& overload : overloads) {
-                semaAnalyser.resolveFuncTypes(&overload->funcType);
+            auto methods = interfaceFile->interface->methods;
+            for (const auto& [_, method] : methods) {
+                semaAnalyser.resolveFuncTypes(&method->funcType);
             }
         }
         if (!semaAnalyser.errHandler.successful) return false;
@@ -201,15 +203,8 @@ void LogosProject::parseAppFile(path fileEntry) {
     }
 }
 
-string LogosProject::getFileText(path filePath) const {
-    ifstream file(canonical(filePath));
-    stringstream fileContents;
-    fileContents << file.rdbuf();
-    return fileContents.str();
-}
-
-void LogosProject::loadGlobals() const {
-    globals.addFunc(&lgsPrint);
+void LogosProject::loadGlobals() {
+    globals.addSymbol(lgsPrint.funcType.name, LgsSymbol(&lgsPrint), &errHandler);
 }
 
 void LogosProject::checkRequiredEnvVars() {
