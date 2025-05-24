@@ -30,7 +30,6 @@ public:
     virtual FunctionType* getIRFuncType(const CodeGenMetadata* metadata);
     virtual Value* callIR(CodeGenMetadata* metadata, const vector<Value*>& args);
     virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {});
-    bool setFuncCallIRArgs(CodeGenMetadata* metadata, vector<Value*>& argValues, const vector<LgsExpr*>& args) const;
     Value* createIRValue(CodeGenMetadata* metadata) override;
     string prettyName() override;
     string format(string& tabs) override;

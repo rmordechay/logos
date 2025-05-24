@@ -17,15 +17,10 @@ string LgsVariable::prettyName() {
 Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
     assert(ref);
     switch (ref->type) {
-    case VAR_DEC: {
-        const auto varDec = ref->varDec;
-        if (varDec->IRValue) return varDec->IRValue;
-        assert(varDec->expr);
-        return varDec->expr->getIRValue(metadata);
-    }
+    case VAR_DEC:
+        return ref->varDec->getIRValue(metadata);
     case PARAM:
-        assert(ref->param->IRValue && !ref->param->isVariadic);
-        return ref->param->IRValue;
+        return ref->param->getIRValue(metadata);
     case ENUM_FIELD:
         return ref->enumField->getGEP(metadata);
     case FUNC:
@@ -136,6 +131,10 @@ Value* LgsVariable::getLength(CodeGenMetadata* metadata) {
     switch (ref->type) {
     case VAR_DEC:
         return ref->varDec->expr->getLength(metadata);
+    case PARAM: {
+        auto lgsIterable = ref->param->type->asStr();
+        return lgsIterable->len.callIR(metadata, {ref->param->IRValue});
+    }
     default:
         assert(false);
     }

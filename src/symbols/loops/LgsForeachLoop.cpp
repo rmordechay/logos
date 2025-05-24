@@ -14,7 +14,7 @@ Value* LgsForeachLoop::loopEnd(CodeGenMetadata* metadata) {
 void LgsForeachLoop::setIRLoopVars(CodeGenMetadata* metadata) {
     assert(iterExpr);
     for (const auto loopVar : loopVars) {
-        // loopVar->setIRValue(iValue);
+        loopVar->setIRValue(iPtr);
     }
 }
 

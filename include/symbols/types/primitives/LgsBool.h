@@ -9,6 +9,9 @@ public:
     static constexpr auto trueLiteral = "true";
     static constexpr auto falseLiteral = "false";
 
+    LgsBool() {
+        isPrimitive = true;
+    }
     string prettyName() const override;
     Type* getIRType() override;
     string getIRName() override;

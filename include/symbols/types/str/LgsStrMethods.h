@@ -3,6 +3,7 @@
 #include "LgsUtils.h"
 #include "funcs/LgsMethodImpl.h"
 #include "types/LgsAny.h"
+#include "types/primitives/LgsInt.h"
 
 #define BUFFER_SIZE 1024
 
@@ -35,6 +36,19 @@ public:
         const auto printfFunc = getSnprintf(metadata->module);
         builder.CreateCall(printfFunc, IRArgs);
         return gep;
+    }
+};
+
+
+class LgsStrLenFunc final : public LgsMethodImpl {
+public:
+    LgsParam self{};
+
+    explicit LgsStrLenFunc(LgsType* parent) : LgsMethodImpl("len", parent->getIRName(), &LGS_INT) {
+        self.type = parent;
+        funcType.IRName = "strlen";
+        funcType.params = {&self};
+        funcType.isPublic = true;
     }
 };
 

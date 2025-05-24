@@ -24,6 +24,7 @@ public:
     bool isVoid = false;
     bool isConst = false;
     bool isNullable = false;
+    bool isPrimitive = false;
     Type* IRType = nullptr;
     map<string, LgsField*> fields;
     map<string, LgsMethodImpl*> methods;

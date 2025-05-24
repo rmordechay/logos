@@ -91,7 +91,7 @@ LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* func) {
     const auto mainFunc = new LgsMainFunc();
     const auto statementsBlock = func->funcBody()->statementsBlock();
     mainFunc->stmtBlock = getStmtBlock(statementsBlock);
-    setParams(func->funcSignature()->param(), &mainFunc->funcType);
+    setParams(&mainFunc->funcType, func->funcSignature()->param());
     const auto params = mainFunc->funcType.params;
     bool isValid;
     if (params.size() == 1) {
@@ -186,7 +186,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
         const auto type = getFuncReturnType(funcSignature->type());
         const auto method = new LgsMethodImpl(funcSignature->VARIABLE()->getText(), interfaceName, type);
         method->funcType.params.emplace_back(self);
-        setParams(funcSignature->param(), &method->funcType);
+        setParams(&method->funcType, funcSignature->param());
         method->path = filePath;
         interface->addMethod(method);
     }
@@ -199,7 +199,7 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplContext* ctx) {
     const auto funcSignature = ctx->funcSignature();
     const auto tokenName = funcSignature->VARIABLE();
     const auto func = new LgsFuncImpl(tokenName->getText(), rt);
-    setParams(funcSignature->param(), &func->funcType);
+    setParams(&func->funcType, funcSignature->param());
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     func->setLocation(tokenName->getSymbol());
     globals.addSymbol(func->funcType.name, LgsSymbol(func), &errHandler);
@@ -211,7 +211,7 @@ LgsFuncImpl* AntlerConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext
     const auto funcSignature = ctx->anonnymosfuncSignature();
     const auto func = new LgsFuncImpl("", rt);
     func->funcType.isAnonymous = true;
-    setParams(funcSignature->param(), &func->funcType);
+    setParams(&func->funcType, funcSignature->param());
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     func->setLocation(funcSignature->LPAREN()->getSymbol());
     return func;
@@ -225,7 +225,7 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
     const auto method = new LgsMethodImpl(nameToken->getText(), obj->name, rt);
     currentMethod = method;
     method->funcType.params.emplace_back(self);
-    setParams(funcSignature->param(), &method->funcType);
+    setParams(&method->funcType, funcSignature->param());
     method->path = obj->path;
     if (ctx->VISIBILITY()) {
         method->funcType.isPublic = true;
@@ -236,12 +236,13 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
     return method;
 }
 
-void AntlerConverter::setParams(const vector<LogosParser::ParamContext*>& params, LgsFuncType* funcType) {
+void AntlerConverter::setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params) {
     for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         if (const auto type = param->type()) {
             const auto variableName = param->VARIABLE()->getText();
-            const auto lgsParam = new LgsParam(getType(type), variableName, getExpr(param->expr()));
+            const auto expr = getExpr(param->expr());
+            const auto lgsParam = new LgsParam(getType(type), variableName, expr);
             if (param->TRIPLE_DOT()) {
                 if (i != params.size() - 1) errHandler.handleError(E10044, &lgsParam->location);
                 if (lgsParam->expr) errHandler.handleError(E10045, &lgsParam->location);

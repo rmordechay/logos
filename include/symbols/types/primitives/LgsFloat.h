@@ -6,6 +6,9 @@ class LgsFloat final : public LgsType {
 public:
     static constexpr auto name = "Float";
 
+    LgsFloat() {
+        isPrimitive = true;
+    }
     Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;

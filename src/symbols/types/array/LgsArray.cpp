@@ -1,11 +1,8 @@
 #include "types/array/LgsArray.h"
-
 #include "LgsUtils.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include "exprs/unary/LgsIterIndex.h"
-#include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsIntConst.h"
-#include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 
 void LgsArray::inferArrayType(const vector<LgsExpr*>& exprs) {

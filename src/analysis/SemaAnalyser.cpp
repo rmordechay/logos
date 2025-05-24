@@ -102,6 +102,8 @@ void SemaAnalyser::visitFuncType(const LgsFuncType* funcType) {
 void SemaAnalyser::visitParam(LgsParam* param) {
     if (param->expr) {
         visitExpr(param->expr, param->type);
+    } else if (param->isVariadic) {
+        // assert(false);
     }
     addLocalSymbol(param->name, LgsSymbol(param));
 }
@@ -150,15 +152,11 @@ void SemaAnalyser::visitField(const LgsField* field) {
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     if (varDec->expr) {
         visitExpr(varDec->expr, varDec->type);
-        if (varDec->type) {
-            delete varDec->type;
-        }
-        varDec->type = varDec->expr->type;
     } else {
         varDec->expr = varDec->type->getZeroValue();
-        delete varDec->type;
-        varDec->type = varDec->expr->type;
     }
+    if (varDec->type && !varDec->type->isPrimitive) delete varDec->type;
+    varDec->type = varDec->expr->type;
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
     assert(varDec->type && varDec->expr);
 }
@@ -238,7 +236,7 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
     }
     iterable->unpackTypes(foreachLoop->loopVars);
     for (const auto varDec : foreachLoop->loopVars) {
-        addLocalSymbol(varDec->name, LgsSymbol(varDec));
+        visitVarDec(varDec);
     }
     visitStmtBlock(foreachLoop->stmtBlock);
 }
@@ -385,31 +383,30 @@ void SemaAnalyser::visitSelection(LgsSelection* selection) {
 }
 
 void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
-    if (const auto variable = dynamic_cast<LgsVariable*>(firstExpr)) {
+    if (const auto variable = firstExpr->asVariable()) {
         visitVariable(variable);
-    } else if (const auto funcCall = dynamic_cast<LgsFuncCall*>(firstExpr)) {
+    } else if (const auto funcCall = firstExpr->asFuncCall()) {
         visitFuncCall(funcCall);
-    } else if (const auto typeConst = dynamic_cast<LgsTypeConst*>(firstExpr)) {
-        typeConst->type = resolveType(typeConst->type);
-    } else if (const auto iterIndex = dynamic_cast<LgsIterIndex*>(firstExpr)) {
+    } else if (const auto iterIndex = firstExpr->asIterIndex()) {
         visitIterIndex(iterIndex);
-    } else if (const auto strConst = dynamic_cast<LgsStrConst*>(firstExpr)) {
+    } else if (const auto strConst = firstExpr->asStrConst()) {
         visitStrConst(strConst);
+    } else if (const auto typeConst = firstExpr->asTypeConst()) {
+        typeConst->type = resolveType(typeConst->type);
     } else {
         assert(false);
     }
     assert(firstExpr->type);
 }
 
-
 void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
     const auto exprs = selection->exprs;
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
-        if (const auto var = dynamic_cast<LgsVariable*>(childExpr)) {
+        if (const auto var = childExpr->asVariable()) {
             visitFieldSelection(parentExpr, var);
-        } else if (const auto methodCall = dynamic_cast<LgsFuncCall*>(childExpr)) {
+        } else if (const auto methodCall = childExpr->asFuncCall()) {
             visitMethodCall(methodCall, parentExpr->type);
         }
     }

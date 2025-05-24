@@ -45,8 +45,8 @@ public:
     void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitFuncType(const LgsFuncType* funcType);
-    void validateFuncControlFlow(const LgsFunc* func);
     void visitParam(LgsParam* param);
+    void validateFuncControlFlow(const LgsFunc* func);
     void visitStmt(LgsStmt* stmt);
     void visitStmtBlock(LgsStmtBlock* stmtBlock);
     void visitAssignment(const LgsAssignment* assignment);

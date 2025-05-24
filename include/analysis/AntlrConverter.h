@@ -30,7 +30,7 @@ public:
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName, const string& filePath);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const string& filePath, bool isSingleton = false);
-    void setParams(const vector<LogosParser::ParamContext*>& params, LgsFuncType* funcType);
+    void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);
     LgsField* getField(LogosParser::FieldContext* ctx);
     LgsFuncImpl* getFuncImpl(LogosParser::FuncImplContext* ctx);
     LgsFuncImpl* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);

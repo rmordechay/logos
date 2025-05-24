@@ -45,7 +45,7 @@ string LgsFuncType::prettyName() const {
         strStream << params[i]->type->prettyName();
         if (i != params.size() - 1) strStream << ", ";
     }
-    strStream << "): " << rt->prettyName();
+    strStream << ')';
     return strStream.str();
 }
 

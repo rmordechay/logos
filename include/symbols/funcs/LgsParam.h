@@ -14,9 +14,11 @@ public:
     LgsExpr* expr = nullptr;
     vector<LgsVariable*> refs;
     bool isVariadic = false;
+    AllocaInst* vaList = nullptr;
 
     explicit LgsParam(LgsType* type = nullptr, const string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     string format(string& indentStr) override;
+    Value* getIRValue(CodeGenMetadata* metadata);
     json asJSON() override;
     string getIRName();
     ~LgsParam() override = default;
