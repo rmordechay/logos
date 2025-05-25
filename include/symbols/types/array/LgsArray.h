@@ -11,6 +11,7 @@ public:
     LgsArrayGetFunc get{this};
     LgsArrayAddFunc add{this};
     LgsArrayLenFunc len{this};
+    LgsArrayFreeFunc free{this};
     LgsArrayDeleteFunc delete_{this};
 
     explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {

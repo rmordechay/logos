@@ -18,6 +18,7 @@ public:
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* createConstArray(CodeGenMetadata* metadata) const;
     Value* createDynArray(CodeGenMetadata* metadata);
+    void free() override;
     ~LgsArrayExpr() override = default;
 };
 

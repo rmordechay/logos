@@ -46,6 +46,8 @@ public:
     LgsEnumField* asEnumField();
     LgsTypeConst* asTypeConst();
 
+    virtual void free();
+    virtual LgsExpr* clone();
     virtual string prettyName();
     virtual LgsExpr* convertExpr(LgsType* type);
     virtual Value* getLength(CodeGenMetadata* metadata);
@@ -68,7 +70,6 @@ public:
     virtual Value* bitXorIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* rshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* lshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual LgsExpr* clone();
     ~LgsExpr() override = default;
 };
 

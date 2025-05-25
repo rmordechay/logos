@@ -74,4 +74,14 @@ public:
     }
 };
 
+class LgsArrayFreeFunc final : public LgsMethodImpl {
+public:
+    LgsParam self{};
+
+    explicit LgsArrayFreeFunc(LgsType* parent) : LgsMethodImpl("free", parent->getIRName(), &LGS_INT) {
+        self.type = parent;
+        funcType.params = {&self};
+    }
+};
+
 #endif //LGSARRAYMETHODS_H

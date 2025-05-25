@@ -34,6 +34,11 @@ Value* LgsArrayExpr::createDynArray(CodeGenMetadata* metadata) {
     return IRValue;
 }
 
+void LgsArrayExpr::free() {
+    if (arrType.isStatic) return;
+
+}
+
 Value* LgsArrayExpr::getLength(CodeGenMetadata* metadata) {
     if (arrType.isStatic) return arrType.dimsExprs[0]->getIRValue(metadata);
     return arrType.len.call(metadata, {this});
