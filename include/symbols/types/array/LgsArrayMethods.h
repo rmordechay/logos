@@ -5,15 +5,16 @@
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsVoid.h"
 #include "funcs/LgsMethodImpl.h"
-#include "exprs/LgsExpr.h"
 
-class LgsArrayNewFunc final : public LgsMethodImpl {
+class LgsArrayInitFunc final : public LgsMethodImpl {
 public:
+    LgsParam self{};
     LgsParam capacityParam{&LGS_INT};
     LgsParam elementSizeParam{&LGS_LONG};
 
-    explicit LgsArrayNewFunc(LgsType* parent) : LgsMethodImpl("new", parent->getIRName(), &LGS_ANY) {
-        funcType.params = {&capacityParam, &elementSizeParam};
+    explicit LgsArrayInitFunc(LgsType* parent) : LgsMethodImpl("init", parent->getIRName(), &LGS_VOID) {
+        self.type = parent;
+        funcType.params = {&self, &capacityParam, &elementSizeParam};
         funcType.isStatic = true;
     }
 };
@@ -47,8 +48,7 @@ public:
         const auto elementType = args[1]->type->getIRType();
         const auto elementPtr = builder.CreateAlloca(elementType);
         builder.CreateStore(elementValue, elementPtr);
-        const auto arrPtrLoad = builder.CreateLoad(ptrTy, arrPtr);
-        return callIR(metadata, {arrPtrLoad, elementPtr});
+        return callIR(metadata, {arrPtr, elementPtr});
     }
 };
 

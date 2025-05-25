@@ -25,7 +25,7 @@ public:
         type = &funcType;
     }
     void generateIRCode(CodeGenMetadata* metadata);
-    bool shouldLoadIRArg(const LgsExpr* expr, Value* value) const;
+    bool shouldLoadIRArg(Value* value) const;
     virtual Function* getIRFunc(CodeGenMetadata* metadata);
     virtual FunctionType* getIRFuncType(const CodeGenMetadata* metadata);
     virtual Value* callIR(CodeGenMetadata* metadata, const vector<Value*>& args = {});

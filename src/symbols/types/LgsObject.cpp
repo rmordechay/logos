@@ -13,13 +13,11 @@ string LgsObject::prettyName() const {
 Type* LgsObject::getIRType() {
     if (IRType) return IRType;
     CodeGenerator::generateObjModule(this);
-
     size_t structPosition = 0;
     vector<Type*> elementTypes;
 
-    // vtable is always first field
+    // First field of any object is a ptr to its vtable
     elementTypes.push_back(ptrTy);;
-
     for (const auto& [_, field] : fields) {
         auto fieldType = field->type->getIRType();
         elementTypes.push_back(fieldType);

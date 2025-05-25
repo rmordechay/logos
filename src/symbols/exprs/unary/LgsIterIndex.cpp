@@ -40,11 +40,9 @@ Value* LgsIterIndex::createIRDynArray(CodeGenMetadata* metadata, LgsArray* arr) 
 }
 
 Value* LgsIterIndex::createMapIRValue(CodeGenMetadata* metadata, LgsMap* map) const {
-    const auto mapIRType = baseExpr->type->getIRType();
     const auto mapPtr = baseExpr->getIRValue(metadata);
-    const auto mapLoaded = metadata->builder.CreateLoad(mapIRType, mapPtr);
     const auto indexIRValue = indices[0]->from->getIRValue(metadata);
-    return map->get.callIR(metadata, {mapLoaded, indexIRValue});
+    return map->get.callIR(metadata, {mapPtr, indexIRValue});
 }
 
 Value* LgsIterIndex::createStrIRValue(CodeGenMetadata* metadata) const {
@@ -67,11 +65,15 @@ void LgsIterIndex::storeHashMap(CodeGenMetadata* metadata, LgsHashMap* hashMap) 
 
 void LgsIterIndex::storeScalar(CodeGenMetadata* metadata, LgsExpr* value) {
     const auto type = baseExpr->type;
+    const auto iterPtr = baseExpr->getIRValue(metadata);
+    const auto valueIR = value->getIRValue(metadata);
     if (const auto map = type->asMap()) {
-        auto key = indices[0]->from;
-        map->add.call(metadata, {baseExpr, key, value});
+        const auto keyIR = indices[0]->from->getIRValue(metadata);
+        const auto valuePtr = metadata->builder.CreateAlloca(value->type->getIRType());
+        metadata->builder.CreateStore(valueIR, valuePtr);
+        map->add.callIR(metadata, {iterPtr, keyIR, valuePtr});
     } else if (const auto arr = type->asArray(); arr && !arr->isStatic) {
-        arr->add.call(metadata, {baseExpr, indices[0]->from});
+        assert(false);
     } else {
         const auto gep = getIRValue(metadata);
         const auto rValue = value->getIRValue(metadata);

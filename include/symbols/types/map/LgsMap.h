@@ -16,6 +16,7 @@ public:
     LgsMapAddFunc add{this};
     LgsMapDeleteFunc delete_{this};
     LgsMapLenFunc len{this};
+    StructType* mapStruct = StructType::create(context, {ptrTy, i64Ty, i32Ty}, name);
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&kvType) {
         kvType.key = keyType;

@@ -8,11 +8,12 @@
 
 class LgsMapNewFunc final : public LgsMethodImpl {
 public:
+    LgsParam self{};
     LgsParam valueSizeParam{&LGS_INT};
 
-    explicit LgsMapNewFunc(LgsType* parent) : LgsMethodImpl("new", parent->getIRName(), &LGS_ANY) {
-        funcType.params = {&valueSizeParam};
-        funcType.isStatic = true;
+    explicit LgsMapNewFunc(LgsType* parent) : LgsMethodImpl("init", parent->getIRName(), &LGS_VOID) {
+        self.type = parent;
+        funcType.params = {&self, &valueSizeParam};
     }
 };
 
@@ -36,15 +37,6 @@ public:
     explicit LgsMapAddFunc(LgsType* parent) : LgsMethodImpl("add", parent->getIRName(), &LGS_VOID) {
         self.type = parent;
         funcType.params = {&self, &keyParam, &valueParam};
-    }
-
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
-        auto& builder = metadata->builder;
-        const auto mapPtr = args[0]->getIRValue(metadata);
-        const auto key = args[1]->getIRValue(metadata);
-        const auto value = args[2]->getIRValue(metadata);
-        const auto mapPtrLoad = builder.CreateLoad(ptrTy, mapPtr);
-        return LgsMethodImpl::callIR(metadata, {mapPtrLoad, key, value});
     }
 };
 

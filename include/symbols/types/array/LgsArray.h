@@ -7,12 +7,13 @@
 class LgsArray final : public LgsIterable {
 public:
     static constexpr auto name = "Array";
-    LgsArrayNewFunc new_{this};
+    LgsArrayInitFunc new_{this};
     LgsArrayGetFunc get{this};
     LgsArrayAddFunc add{this};
     LgsArrayLenFunc len{this};
     LgsArrayFreeFunc free{this};
     LgsArrayDeleteFunc delete_{this};
+    StructType* arrStruct = StructType::create(context, {i64Ty, i32Ty, i32Ty, ptrTy}, name);
 
     explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         addMethod(&add);

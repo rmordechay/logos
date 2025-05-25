@@ -2,7 +2,6 @@
 #include "data/LgsDefinitions.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
-#include "types/array/LgsArray.h"
 
 void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
     metadata->lgsStack.enterScope(this);
@@ -53,7 +52,7 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
 
 void LgsFunc::addIRArg(CodeGenMetadata* metadata, vector<Value*>& IRArgs, LgsExpr* arg) const {
     const auto argIRValue = arg->getIRValue(metadata);
-    if (shouldLoadIRArg(arg, argIRValue)) {
+    if (shouldLoadIRArg(argIRValue)) {
         const auto artIRType = arg->type->getIRType();
         const auto value = metadata->builder.CreateLoad(artIRType, argIRValue);
         IRArgs.emplace_back(value);
@@ -131,11 +130,11 @@ FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {
     return IRFuncType;
 }
 
-bool LgsFunc::shouldLoadIRArg(const LgsExpr* expr, Value* value) const {
-    assert(expr);
-    if (expr->type->asIterable() && expr->type->asIterable()->isStatic) return false;
+bool LgsFunc::shouldLoadIRArg(Value* value) const {
     if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
-    if (isa<AllocaInst>(value)) return true;
+    if (const auto alloca = dyn_cast<AllocaInst>(value)) {
+        return !alloca->getAllocatedType()->isStructTy();
+    }
     if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
         const auto source = gep->getSourceElementType();
         const auto results = gep->getResultElementType();
@@ -147,7 +146,7 @@ bool LgsFunc::shouldLoadIRArg(const LgsExpr* expr, Value* value) const {
         const auto constExpr = cast<ConstantExpr>(value);
         return constExpr->getOpcode() == Instruction::GetElementPtr;
     }
-    return false;
+    return true;
 }
 
 string LgsFunc::format(string& tabs) {
@@ -173,7 +172,7 @@ json LgsFunc::asJSON() {
     tree["name"] = funcType.name;
     tree["type"] = funcType.rt->getIRName();
     tree["params"] = {};
-    for (auto& param : funcType.params) {
+    for (const auto& param : funcType.params) {
         tree["params"].emplace_back(param->asJSON());
     }
     tree["stmts"] = stmtBlock->asJSON();

@@ -25,9 +25,8 @@ Value* LgsArrayExpr::createDynArray(CodeGenMetadata* metadata) {
     const auto capacity = initialElements.empty() ? INITIAL_ARRAY_SIZE : initialElements.size() * 2;
     const auto capacityIR = builder.getInt32(capacity);
     const auto constantInt = builder.getInt64(sizeof(void*));
-    const auto rv = arrType.new_.callIR(metadata, {capacityIR, constantInt});
-    IRValue = builder.CreateAlloca(ptrTy);
-    builder.CreateStore(rv, IRValue);
+    IRValue = builder.CreateAlloca(arrType.arrStruct);
+    arrType.new_.callIR(metadata, {IRValue, capacityIR, constantInt});
     for (const auto element : initialElements) {
         arrType.add.call(metadata, {this, element});
     }
