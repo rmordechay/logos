@@ -1,11 +1,11 @@
 #include "utils/LgsC.h"
 
-#include "LgsCInterface.h"
-#include "LgsGlobals.h"
+#include "utils/LgsCInterface.h"
+#include "logos/LgsGlobals.h"
 
 #include <clang/Basic/Diagnostic.h>
 #include <llvm/Support/raw_ostream.h>
-#include "LgsUtils.h"
+#include "utils/LgsUtils.h"
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Basic/DiagnosticOptions.h>
 #include <clang/CodeGen/CodeGenAction.h>

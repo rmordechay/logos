@@ -1,5 +1,5 @@
 #include "funcs/LgsFunc.h"
-#include "LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/array/LgsArray.h"
@@ -110,10 +110,7 @@ FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {
         const auto param = funcType.params[i];
         const auto paramType = param->type;
         auto paramIRType = paramType->getIRType();
-        // TODO make generic
-        if (paramType->asInterface()) {
-            paramIRType = ptrTy;
-        } else if (paramType->asArray() && paramType->asArray()->isStatic) {
+        if (!paramType->isPrimitive) {
             paramIRType = ptrTy;
         }
         if (param->isVariadic) {
@@ -136,13 +133,15 @@ FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {
 
 bool LgsFunc::shouldLoadIRArg(const LgsExpr* expr, Value* value) const {
     assert(expr);
-    if (expr->type->asIterable()->isStatic) return false;
+    if (expr->type->asIterable() && expr->type->asIterable()->isStatic) return false;
     if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
     if (isa<AllocaInst>(value)) return true;
     if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
-        const auto isArrayTy = gep->getSourceElementType()->isArrayTy();
-        const auto isByteTy = gep->getResultElementType()->isIntegerTy(8);
-        return isArrayTy && !isByteTy;
+        const auto source = gep->getSourceElementType();
+        const auto results = gep->getResultElementType();
+        const auto isArrayTy = source->isArrayTy();
+        const auto isByteTy = results->isIntegerTy(8);
+        return !isArrayTy || !isByteTy;
     }
     if (isa<ConstantExpr>(value)) {
         const auto constExpr = cast<ConstantExpr>(value);

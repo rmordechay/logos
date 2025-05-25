@@ -1,12 +1,11 @@
 #include "logos/Logos.h"
-#include "LgsLinker.h"
-#include "Platform.h"
-#include "SemaAnalyser.h"
+#include "codegen/LgsLinker.h"
+#include "logos/Platform.h"
+#include "analysis/SemaAnalyser.h"
 #include "utils/ThreadPool.h"
-#include <AntlrConverter.h>
-#include <CodeGenerator.h>
+#include <analysis/AntlrConverter.h>
+#include "codegen/CodeGenerator.h"
 #include <unistd.h>
-#include "LgsC.h"
 
 void Logos::run() {
     // Project loading

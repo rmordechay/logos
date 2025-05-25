@@ -1,5 +1,5 @@
-#include "LgsErrHandler.h"
-#include "LgsGlobals.h"
+#include "logos/LgsErrHandler.h"
+#include "logos/LgsGlobals.h"
 #include <iostream>
 
 #define ERROR_STR "\033[1;31mError:\033[0m "

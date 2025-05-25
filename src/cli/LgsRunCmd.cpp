@@ -1,5 +1,5 @@
 #include "cli/LgsRunCmd.h"
-#include "Logos.h"
+#include "logos/Logos.h"
 #include <iostream>
 
 void LgsRunCmd::runCmd() {

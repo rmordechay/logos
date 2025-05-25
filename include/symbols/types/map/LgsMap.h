@@ -35,6 +35,8 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     LgsType* createInnerType(size_t indexRange, LgsIndex* index) const override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
+    Value* getLength(CodeGenMetadata* metadata, Value* iterValue) override;
+    Value* getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr) override;
     ~LgsMap() override = default;
 };
 

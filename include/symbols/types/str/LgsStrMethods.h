@@ -1,6 +1,6 @@
 #ifndef LGSSTRMETHODS_H
 #define LGSSTRMETHODS_H
-#include "LgsUtils.h"
+#include "utils/LgsUtils.h"
 #include "funcs/LgsMethodImpl.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"

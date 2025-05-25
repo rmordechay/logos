@@ -1,5 +1,5 @@
 #include "types/array/LgsArray.h"
-#include "LgsUtils.h"
+#include "utils/LgsUtils.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/constants/LgsIntConst.h"
@@ -49,9 +49,9 @@ void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[0]->type = baseType;
 }
 
-Value* LgsArray::getLength(CodeGenMetadata* metadata, Value* iter) {
+Value* LgsArray::getLength(CodeGenMetadata* metadata, Value* iterValue) {
     if (isStatic) return dimsExprs[0]->getIRValue(metadata);
-    return len.callIR(metadata, {iter});
+    return len.callIR(metadata, {iterValue});
 }
 
 Value* LgsArray::getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr) {

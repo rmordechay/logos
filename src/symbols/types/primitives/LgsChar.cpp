@@ -24,6 +24,10 @@ LgsType* LgsChar::inferBinaryType(LgsType* other) {
     return this;
 }
 
+string LgsChar::getStrFormatPart() const {
+    return "%c";
+}
+
 bool LgsChar::equals(LgsType* other) {
     return name == other->getIRName();
 }

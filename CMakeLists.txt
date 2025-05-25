@@ -17,15 +17,8 @@ add_library(lib ${HEADER_FILES} ${SOURCE_FILES}
 
 target_include_directories(lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/analysis
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/cli
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/codegen
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/data
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/files
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/logos
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/utils
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime
 )

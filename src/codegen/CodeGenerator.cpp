@@ -1,11 +1,11 @@
-#include "CodeGenerator.h"
+#include "codegen/CodeGenerator.h"
 
-#include "LgsConfig.h"
-#include "Logos.h"
-#include "Platform.h"
+#include "logos/LgsConfig.h"
+#include "logos/Logos.h"
+#include "logos/Platform.h"
 #include "funcs/LgsFuncImpl.h"
 #include "funcs/LgsMethodImpl.h"
-#include <LgsMainFile.h>
+#include <files/LgsMainFile.h>
 #include <ranges>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/TargetSelect.h>

@@ -1,6 +1,7 @@
 #ifndef LOGOSSTRINGCONST_H
 #define LOGOSSTRINGCONST_H
 #include "LgsConstExpr.h"
+#include "LgsIntConst.h"
 #include "types/str/LgsStr.h"
 #include <string>
 
@@ -12,6 +13,7 @@ public:
 
     explicit LgsStrConst(const string& value) : LgsConstExpr(&strType), value(value) {
         strType.isStatic = true;
+        strType.dimsExprs.emplace_back(new LgsIntConst(value.size()));
     }
     Value* getLength(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;

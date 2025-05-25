@@ -1,7 +1,7 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
-#include "LgsErrHandler.h"
-#include "LgsStack.h"
+#include "logos/LgsErrHandler.h"
+#include "logos/LgsStack.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "stmts/LgsBreakStmt.h"
@@ -9,7 +9,6 @@
 #include "stmts/LgsReturn.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
-#include <mutex>
 
 class LogosProject;
 class LgsIndex;

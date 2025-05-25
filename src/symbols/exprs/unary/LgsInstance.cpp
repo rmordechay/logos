@@ -1,5 +1,5 @@
 #include "exprs/unary/LgsInstance.h"
-#include "CodeGenerator.h"
+#include "codegen/CodeGenerator.h"
 #include "builtin/LgsPrint.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"

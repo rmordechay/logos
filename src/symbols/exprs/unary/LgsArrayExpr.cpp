@@ -1,5 +1,5 @@
 #include "exprs/unary/LgsArrayExpr.h"
-#include "LgsConfig.h"
+#include "logos/LgsConfig.h"
 #include "exprs/unary/LgsIterIndex.h"
 
 Value* LgsArrayExpr::createIRValue(CodeGenMetadata* metadata) {

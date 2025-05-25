@@ -1,6 +1,6 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
-#include "LgsDefinitions.h"
+#include "data/LgsDefinitions.h"
 #include <string>
 #include <vector>
 #include <lld/Common/Driver.h>

@@ -14,6 +14,7 @@ public:
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
+    string getStrFormatPart() const override;
     bool equals(LgsType* other) override;
     ~LgsChar() override = default;
 };

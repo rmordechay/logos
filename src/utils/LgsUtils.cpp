@@ -1,5 +1,5 @@
-#include "LgsUtils.h"
-#include "LgsDefinitions.h"
+#include "utils/LgsUtils.h"
+#include "data/LgsDefinitions.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"

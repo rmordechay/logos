@@ -1,5 +1,5 @@
-#include "LgsStack.h"
-#include "LgsGlobals.h"
+#include "logos/LgsStack.h"
+#include "logos/LgsGlobals.h"
 #include "funcs/LgsFunc.h"
 
 void LgsStack::enterScope(LgsFunc* func) {

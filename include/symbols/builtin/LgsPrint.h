@@ -23,7 +23,7 @@ public:
         for (int i = 0; i < args.size(); ++i) {
             const auto arg = args[i];
             addIRArg(metadata, IRArgs, arg);
-            str << arg->type->getStrFormatPart() << ' ';
+            str << arg->type->getStrFormatPart() << std::endl;
         }
         IRArgs.insert(IRArgs.begin(), getIRStr(metadata->module, str.str()));
         const auto printfFunc = getPrintf(metadata->module);

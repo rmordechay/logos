@@ -28,7 +28,7 @@ public:
     LgsType* createInnerType(size_t indexRange, LgsIndex* index) const override;
     bool canIndexTo(LgsType* indexType) override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
-    Value* getLength(CodeGenMetadata* metadata, Value* iter) override;
+    Value* getLength(CodeGenMetadata* metadata, Value* iterValue) override;
     Value* getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr) override;
     ~LgsArray() override;
 };

@@ -1,14 +1,13 @@
 #ifndef LOGOS_H
 #define LOGOS_H
-#include "LgsC.h"
-
+#include "utils/LgsC.h"
 #include <filesystem>
 #include "LgsProject.h"
 
+struct LgsError;
 class ThreadPool;
 using namespace filesystem;
 using namespace std;
-using namespace antlr4;
 using namespace llvm;
 
 class Logos {

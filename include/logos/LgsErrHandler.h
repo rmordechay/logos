@@ -1,7 +1,7 @@
 #ifndef LGSERRORHANDLER_H
 #define LGSERRORHANDLER_H
-#include "LgsErrors.h"
-#include "LgsWarnings.h"
+#include "data/LgsErrors.h"
+#include "data/LgsWarnings.h"
 #include <filesystem>
 #include <vector>
 #include <string>

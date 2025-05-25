@@ -1,5 +1,5 @@
 #include "types/LgsIterable.h"
-#include "LgsUtils.h"
+#include "utils/LgsUtils.h"
 #include "exprs/LgsExpr.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
@@ -31,7 +31,7 @@ Value* LgsIterable::getElement(CodeGenMetadata* metadata, Value* iterPtr, Value*
     assert(false);
 }
 
-Value* LgsIterable::getLength(CodeGenMetadata* metadata, Value* arr) {
+Value* LgsIterable::getLength(CodeGenMetadata* metadata, Value* iterValue) {
     assert(false);
 }
 

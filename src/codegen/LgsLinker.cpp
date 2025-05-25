@@ -1,8 +1,8 @@
 #include "codegen/LgsLinker.h"
-#include "CodeGenMetadata.h"
-#include "Logos.h"
-#include "Platform.h"
-#include <LgsDefinitions.h>
+#include "codegen/CodeGenMetadata.h"
+#include "logos/Logos.h"
+#include "logos/Platform.h"
+#include "data/LgsDefinitions.h"
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/IRReader/IRReader.h>

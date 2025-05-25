@@ -3,7 +3,7 @@
 
 #include <Token.h>
 #include <llvm/IR/Value.h>
-#include "CodeGenMetadata.h"
+#include "codegen/CodeGenMetadata.h"
 
 #include <json/json.hpp>
 

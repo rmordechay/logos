@@ -1,7 +1,7 @@
 #ifndef CODEGENMETADATA_H
 #define CODEGENMETADATA_H
 
-#include <LgsStack.h>
+#include <logos/LgsStack.h>
 #include <json/json.hpp>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/MC/TargetRegistry.h>

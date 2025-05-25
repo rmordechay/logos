@@ -19,7 +19,7 @@ public:
     virtual LgsType* getBaseType();
     virtual void unpackTypes(const vector<LgsVarDec*>& varDecs);
     virtual Value* getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr);
-    virtual Value* getLength(CodeGenMetadata* metadata, Value* arr);
+    virtual Value* getLength(CodeGenMetadata* metadata, Value* iterValue);
     virtual LgsType* createInnerType(size_t indexRange, LgsIndex* index) const = 0;
     ~LgsIterable() override = default;
 };

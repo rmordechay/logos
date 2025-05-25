@@ -1,7 +1,7 @@
 #include "cli/LgsCli.h"
 
-#include "LgsGenerateCmd.h"
-#include "LgsRunCmd.h"
+#include "cli/LgsGenerateCmd.h"
+#include "cli/LgsRunCmd.h"
 #include <iostream>
 
 void LgsCli::execute() const {

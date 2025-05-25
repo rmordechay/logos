@@ -35,6 +35,17 @@ LgsType* LgsStr::createInnerType(size_t indexRange, LgsIndex* index) const {
     return baseType;
 }
 
+Value* LgsStr::getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr) {
+    if (isStatic) assert(false);
+    const auto i = metadata->builder.CreateLoad(i32Ty, iPtr);
+    return metadata->builder.CreateInBoundsGEP(baseType->getIRType(), iterPtr, {i});
+}
+
+Value* LgsStr::getLength(CodeGenMetadata* metadata, Value* iterValue) {
+    if (isStatic) dimsExprs[0]->getIRValue(metadata);
+    return len.callIR(metadata, {iterValue});
+}
+
 string LgsStr::getStrFormatPart() const {
     return "%s";
 }

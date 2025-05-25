@@ -12,8 +12,8 @@ public:
     LgsStrLenFunc len{this};
 
     LgsStr() : LgsIterable(&LGS_CHAR) {
-        unpackLength = 1;
         addMethod(&format);
+        unpackLength = 1;
     }
     int getDims() override;
     size_t getSize() override;
@@ -24,6 +24,8 @@ public:
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     LgsType* createInnerType(size_t indexRange, LgsIndex* index) const override;
+    Value* getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr) override;
+    Value* getLength(CodeGenMetadata* metadata, Value* iterValue) override;
     string getStrFormatPart() const override;
     static uint32_t hashString(const string& str);
     ~LgsStr() override = default;

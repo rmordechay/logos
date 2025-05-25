@@ -1,7 +1,7 @@
 #ifndef LGSCINTERFACE_H
 #define LGSCINTERFACE_H
 
-#include "LgsGlobals.h"
+#include "logos/LgsGlobals.h"
 #include <clang/AST/ASTConsumer.h>
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/Tooling/Tooling.h>

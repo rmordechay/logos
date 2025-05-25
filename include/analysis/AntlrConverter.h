@@ -1,8 +1,8 @@
 #ifndef SEMANTICANALYSER_H
 #define SEMANTICANALYSER_H
 
-#include "LgsEnvFile.h"
-#include "LgsErrHandler.h"
+#include "files/LgsEnvFile.h"
+#include "logos/LgsErrHandler.h"
 #include "LogosParser.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
