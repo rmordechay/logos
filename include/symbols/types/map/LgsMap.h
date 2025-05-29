@@ -25,16 +25,13 @@ public:
         addMethod(&len);
     }
     void setBaseType(const vector<LgsMapPair*>& exprs);
-    int getDims() override;
     Type* getIRType() override;
     string getIRName() override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;
     LgsType* getBaseType() override;
     bool equals(LgsType* other) override;
-    bool canIndexTo(LgsType* indexType) override;
     LgsType* inferBinaryType(LgsType* other) override;
-    LgsType* createInnerType(size_t indexRange, LgsIndex* index) const override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
     Value* getLength(CodeGenMetadata* metadata, Value* iterValue) override;
     Value* getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr) override;

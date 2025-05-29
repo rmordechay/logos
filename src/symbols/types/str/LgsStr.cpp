@@ -2,10 +2,6 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 
-int LgsStr::getDims() {
-    return 1;
-}
-
 size_t LgsStr::getSize() {
     return sizeof(void*);
 }
@@ -31,10 +27,6 @@ LgsType* LgsStr::inferBinaryType(LgsType* other) {
     return this;
 }
 
-LgsType* LgsStr::createInnerType(size_t indexRange, LgsIndex* index) const {
-    return baseType;
-}
-
 Value* LgsStr::getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr) {
     if (isStatic) assert(false);
     const auto i = metadata->builder.CreateLoad(i32Ty, iPtr);
@@ -42,7 +34,7 @@ Value* LgsStr::getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr
 }
 
 Value* LgsStr::getLength(CodeGenMetadata* metadata, Value* iterValue) {
-    if (isStatic) dimsExprs[0]->getIRValue(metadata);
+    if (isStatic) dimsExpr->getIRValue(metadata);
     return len.callIR(metadata, {iterValue});
 }
 
@@ -52,6 +44,7 @@ string LgsStr::getStrFormatPart() const {
 
 bool LgsStr::equals(LgsType* other) {
     assert(other);
+    if (other->getIRName() == "Any") return true;
     return name == other->getIRName();
 }
 

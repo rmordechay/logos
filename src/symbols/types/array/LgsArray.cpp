@@ -3,19 +3,24 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/constants/LgsIntConst.h"
+#include "logos/LgsConfig.h"
 #include "stmts/LgsVarDec.h"
 
-void LgsArray::inferArrayType(const vector<LgsExpr*>& exprs) {
-    baseType = inferTypeFromIter(exprs);
-    dimsExprs = {new LgsIntConst(exprs.size())};
+size_t LgsArray::getSize() {
+    if (isStatic) {
+        return baseType->getSize() * getExprConstNumber(dimsExpr);
+    }
+    return sizeof(void*);
 }
 
 LgsExpr* LgsArray::getZeroValue() {
-    const auto arr = new LgsArrayExpr(baseType);
-    for (const auto dimsExpr : dimsExprs) {
-        arr->arrType.dimsExprs.emplace_back(dimsExpr->clone());
+    const auto arr = new LgsArrayExpr(baseType->clone());
+    if (dimsExpr) {
+        arr->arrType.isStatic = dimsExpr->type->isConst;
+        arr->arrType.dimsExpr = dimsExpr->clone();
+    } else {
+        arr->arrType.dimsExpr = new LgsIntConst(INITIAL_ARRAY_CAPACITY);
     }
-    arr->arrType.isStatic = isStatic;
     return arr;
 }
 
@@ -29,20 +34,25 @@ bool LgsArray::equals(LgsType* other) {
     return baseType->equals(otherArr->baseType);
 }
 
-int LgsArray::getDims() {
-    return dimsExprs.size();
-}
-
 string LgsArray::getIRName() {
     return name;
 }
 
-LgsType* LgsArray::inferBinaryType(LgsType* other) {
-    assert(false);
+StructType* LgsArray::getIRStructType() const {
+    const auto arrStruct = StructType::getTypeByName(context, name);
+    if (!arrStruct) {
+        return StructType::create(context, {i64Ty, i32Ty, i32Ty, ptrTy}, name);
+    }
+    return arrStruct;
 }
 
-bool LgsArray::canIndexTo(LgsType* indexType) {
-    return !!indexType->asInt();
+void LgsArray::inferArrayType(const vector<LgsExpr*>& exprs) {
+    baseType = exprs.front()->type;
+    dimsExpr = new LgsIntConst(exprs.size());
+}
+
+LgsType* LgsArray::inferBinaryType(LgsType* other) {
+    assert(false);
 }
 
 void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
@@ -50,37 +60,29 @@ void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
 }
 
 Value* LgsArray::getLength(CodeGenMetadata* metadata, Value* iterValue) {
-    if (isStatic) return dimsExprs[0]->getIRValue(metadata);
+    if (isStatic) return dimsExpr->getIRValue(metadata);
     return len.callIR(metadata, {iterValue});
 }
 
-Value* LgsArray::getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr) {
+Value* LgsArray::getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* indexPtr) {
     if (isStatic) {
-        const auto i = metadata->builder.CreateLoad(i32Ty, iPtr);
+        const auto i = metadata->builder.CreateLoad(i32Ty, indexPtr);
         return metadata->builder.CreateGEP(getIRType(), iterPtr, {i32Zero, i});
     }
-    const auto iValue = metadata->builder.CreateLoad(i32Ty, iPtr);
+    const auto iValue = metadata->builder.CreateLoad(i32Ty, indexPtr);
     const auto v = get.callIR(metadata, {iterPtr, iValue});
     return metadata->builder.CreateLoad(getIRType(), v);
 }
 
-LgsType* LgsArray::createInnerType(const size_t indexRange, LgsIndex* index) const {
-    if (!isStatic) assert(false);
-    const auto innerType = new LgsArray(baseType);
-    innerType->isStatic = isStatic;
-    innerType->dimsExprs = dimsExprs;
-    if (index->to) {
-        const auto from = getExprConstNumber(index->from);
-        const auto to = getExprConstNumber(index->to);
-    } else {
-        const auto i = innerType->dimsExprs.size() - 1 - indexRange;
-        innerType->dimsExprs.erase(innerType->dimsExprs.begin() + i);
+LgsType* LgsArray::clone() {
+    const auto lgsArray = new LgsArray(baseType);
+    if (dimsExpr) {
+        lgsArray->isStatic = dimsExpr->type->isConst;
+        lgsArray->dimsExpr = dimsExpr;
     }
-    return innerType;
+    return lgsArray;
 }
 
 LgsArray::~LgsArray() {
-    for (const auto dimsExpr : dimsExprs) {
-        delete dimsExpr;
-    }
+    delete dimsExpr;
 }

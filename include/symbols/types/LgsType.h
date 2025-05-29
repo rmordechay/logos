@@ -47,7 +47,6 @@ public:
 
     virtual size_t getSize();
     virtual bool equals(LgsType& other);
-    virtual bool canIndexTo(LgsType* indexType);
     virtual json asJSON() const;
     virtual string getStrFormatPart() const;
     virtual Type* getIRType() = 0;

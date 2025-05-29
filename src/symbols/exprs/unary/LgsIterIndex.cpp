@@ -7,50 +7,65 @@ Value* LgsIterIndex::createIRValue(CodeGenMetadata* metadata) {
     const auto baseExprType = baseExpr->type;
     if (const auto arr = baseExprType->asArray()) {
         if (arr->isStatic) return getGEP(metadata);
-        return createIRDynArray(metadata, arr);
+        return getIRFromDynArray(metadata, arr);
     }
     if (const auto map = baseExprType->asMap()) {
-        return createMapIRValue(metadata, map);
+        return getIRFromMap(metadata, map);
     }
     if (baseExprType->asStr()) {
-        return createStrIRValue(metadata);
+        return getIRFromStr(metadata);
     }
     assert(false);
 }
 
-Value* LgsIterIndex::getGEP(CodeGenMetadata* metadata) const {
-    const auto ty = baseExpr->type->getIRType();
-    const auto ptr = baseExpr->getIRValue(metadata);
-    vector<Value*> IRIndices;
-    IRIndices.push_back(i32Zero);
-    for (const auto index : indices) {
-        assert(!index->to);
-        auto value = index->from->getIRValue(metadata);
-        IRIndices.push_back(value);
-    }
-    return metadata->builder.CreateGEP(ty, ptr, IRIndices);
-}
+// ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+// define i32 @main() #0 {
+//   %2 = alloca %struct.Array, align 8
+//   %3 = alloca %struct.Array, align 8
+//   %4 = alloca ptr, align 8
+//   %5 = alloca i32, align 4
+//   %6 = alloca i32, align 4
+//   %7 = alloca ptr, align 8
+//   %8 = alloca ptr, align 8
+//   call void @Array_init(ptr noundef %2, i32 noundef 2, i64 noundef 8)
+//   call void @Array_init(ptr noundef %3, i32 noundef 2, i64 noundef 4)
+//   store ptr %3, ptr %4, align 8
+//   call void @Array_add(ptr noundef %2, ptr noundef %4)
+//   store i32 43, ptr %5, align 4
+//   call void @Array_add(ptr noundef %3, ptr noundef %5)
+//   store i32 234, ptr %6, align 4
+//   call void @Array_add(ptr noundef %3, ptr noundef %6)
+//   %9 = call ptr @Array_get(ptr noundef %2, i32 noundef 0)
+//   store ptr %9, ptr %7, align 8
+//   %10 = load ptr, ptr %7, align 8
+//   %11 = load ptr, ptr %10, align 8
+//   %12 = call ptr @Array_get(ptr noundef %11, i32 noundef 1)
+//   store ptr %12, ptr %8, align 8
+//   %13 = load ptr, ptr %8, align 8
+//   %14 = load i32, ptr %13, align 4
+//   %15 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %14)
+//   ret i32 0
+// }
 
-Value* LgsIterIndex::createIRDynArray(CodeGenMetadata* metadata, LgsArray* arr) const {
-    const auto arrIRType = baseExpr->type->getIRType();
+Value* LgsIterIndex::getIRFromDynArray(CodeGenMetadata* metadata, LgsArray* arr) const {
     const auto arrPtr = baseExpr->getIRValue(metadata);
-    const auto arrLoaded = metadata->builder.CreateLoad(arrIRType, arrPtr);
-    const auto indexIRValue = indices[0]->from->getIRValue(metadata);
-    return arr->get.callIR(metadata, {arrLoaded, indexIRValue});
+    const auto indexIRValue = index->from->getIRValue(metadata);
+    const auto rv = arr->get.callIR(metadata, {arrPtr, indexIRValue});
+    return metadata->builder.CreateLoad(ptrTy, rv);
 }
 
-Value* LgsIterIndex::createMapIRValue(CodeGenMetadata* metadata, LgsMap* map) const {
+Value* LgsIterIndex::getIRFromMap(CodeGenMetadata* metadata, LgsMap* map) const {
     const auto mapPtr = baseExpr->getIRValue(metadata);
-    const auto indexIRValue = indices[0]->from->getIRValue(metadata);
+    const auto indexIRValue = index->from->getIRValue(metadata);
     return map->get.callIR(metadata, {mapPtr, indexIRValue});
 }
 
-Value* LgsIterIndex::createStrIRValue(CodeGenMetadata* metadata) const {
+Value* LgsIterIndex::getIRFromStr(CodeGenMetadata* metadata) const {
     const auto baseExprIRValue = baseExpr->getIRValue(metadata);
     const auto baseExprIRType = baseExpr->type->getIRType();
     if (const auto global = dyn_cast<GlobalVariable>(baseExprIRValue)) {
         const auto ty = global->getValueType();
-        const auto value = indices[0]->from->getIRValue(metadata);
+        const auto value = index->from->getIRValue(metadata);
         return metadata->builder.CreateGEP(ty, baseExprIRValue, {i32Zero, value});
     }
     const auto p = metadata->builder.CreateAlloca(baseExprIRType);
@@ -64,21 +79,17 @@ void LgsIterIndex::storeHashMap(CodeGenMetadata* metadata, LgsHashMap* hashMap) 
 }
 
 void LgsIterIndex::storeScalar(CodeGenMetadata* metadata, LgsExpr* value) {
-    const auto type = baseExpr->type;
-    const auto iterPtr = baseExpr->getIRValue(metadata);
-    const auto valueIR = value->getIRValue(metadata);
-    if (const auto map = type->asMap()) {
-        const auto keyIR = indices[0]->from->getIRValue(metadata);
-        const auto valuePtr = metadata->builder.CreateAlloca(value->type->getIRType());
-        metadata->builder.CreateStore(valueIR, valuePtr);
-        map->add.callIR(metadata, {iterPtr, keyIR, valuePtr});
-    } else if (const auto arr = type->asArray(); arr && !arr->isStatic) {
-        assert(false);
-    } else {
-        const auto gep = getIRValue(metadata);
-        const auto rValue = value->getIRValue(metadata);
-        metadata->builder.CreateStore(rValue, gep);
+    const auto rValue = value->getIRValue(metadata);
+    if (const auto arr = baseExpr->type->asArray()) {
+        if (!arr->isStatic) {
+            const auto ptr = metadata->builder.CreateAlloca(value->type->getIRType());
+            metadata->builder.CreateStore(rValue, ptr);
+            arr->put.callIR(metadata, {baseExpr->getIRValue(metadata), index->from->getIRValue(metadata), ptr});
+            return;
+        }
     }
+    const auto iterPtr = getIRValue(metadata);
+    metadata->builder.CreateStore(rValue, iterPtr);
 }
 
 void LgsIterIndex::storeArray(CodeGenMetadata* metadata, const LgsArrayExpr* arr) const {
@@ -86,6 +97,8 @@ void LgsIterIndex::storeArray(CodeGenMetadata* metadata, const LgsArrayExpr* arr
     const auto IRType = baseExpr->type->getIRType();
     const auto arrPtr = baseExpr->getIRValue(metadata);
     vector IRIndices = {i32Zero};
+    vector<LgsIndex*> indices;
+    setIterIndices(this, indices);
     for (const auto index : indices) {
         IRIndices.emplace_back(index->from->getIRValue(metadata));
     }
@@ -100,10 +113,30 @@ void LgsIterIndex::storeArray(CodeGenMetadata* metadata, const LgsArrayExpr* arr
     }
 }
 
+Value* LgsIterIndex::getGEP(CodeGenMetadata* metadata) const {
+    vector<Value*> IRIndices = {};
+    Type* ty = nullptr;
+    Value* ptr = nullptr;
+    auto iterIndex = this;
+    while (true) {
+        auto irValue = iterIndex->index->from->getIRValue(metadata);
+        IRIndices.push_back(irValue);
+        const auto innerIterIndex = iterIndex->baseExpr->asIterIndex();
+        if (innerIterIndex) {
+            iterIndex = innerIterIndex;
+        } else {
+            ptr = iterIndex->baseExpr->getIRValue(metadata);
+            ty = iterIndex->baseExpr->type->getIRType();
+            IRIndices.push_back(i32Zero);
+            break;
+        }
+    }
+    reverse(IRIndices.begin(), IRIndices.end());
+    return metadata->builder.CreateGEP(ty, ptr, IRIndices);
+}
+
 Value* LgsIterIndex::getLength(CodeGenMetadata* metadata) {
-    const auto dimsExprs = type->asArray()->dimsExprs;
-    const auto dimsExpr = dimsExprs[indices.size() - 1];
-    return dimsExpr->getIRValue(metadata);
+    assert(false);
 }
 
 string LgsIterIndex::getName() {
@@ -113,17 +146,13 @@ string LgsIterIndex::getName() {
 string LgsIterIndex::prettyName() {
     stringstream str;
     str << baseExpr->prettyName();
-    for (const auto index : indices) {
-        str << '[' << index->from->prettyName() << ']';
-    }
+    str << '[' << index->from->prettyName() << ']';
     return str.str();
 }
 
 LgsIterIndex::~LgsIterIndex() {
     delete baseExpr;
-    for (auto const index : indices) {
-        delete index->from;
-        delete index->to;
-        delete index;
-    }
+    delete index->from;
+    delete index->to;
+    delete index;
 }

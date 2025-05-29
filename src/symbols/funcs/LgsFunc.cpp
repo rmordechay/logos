@@ -130,25 +130,6 @@ FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {
     return IRFuncType;
 }
 
-bool LgsFunc::shouldLoadIRArg(Value* value) const {
-    if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
-    if (const auto alloca = dyn_cast<AllocaInst>(value)) {
-        return !alloca->getAllocatedType()->isStructTy();
-    }
-    if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
-        const auto source = gep->getSourceElementType();
-        const auto results = gep->getResultElementType();
-        const auto isArrayTy = source->isArrayTy();
-        const auto isByteTy = results->isIntegerTy(8);
-        return !isArrayTy || !isByteTy;
-    }
-    if (isa<ConstantExpr>(value)) {
-        const auto constExpr = cast<ConstantExpr>(value);
-        return constExpr->getOpcode() == Instruction::GetElementPtr;
-    }
-    return true;
-}
-
 string LgsFunc::format(string& tabs) {
     stringstream str;
     str << funcType.name << "(";

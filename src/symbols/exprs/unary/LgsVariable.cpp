@@ -15,7 +15,6 @@ string LgsVariable::prettyName() {
 }
 
 Value* LgsVariable::createIRValue(CodeGenMetadata* metadata) {
-    assert(ref);
     switch (ref->type) {
     case VAR_DEC:
         return ref->varDec->IRValue;

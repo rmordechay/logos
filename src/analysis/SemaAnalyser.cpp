@@ -36,7 +36,7 @@
 #include <stmts/LgsAssignment.h>
 #include <stmts/LgsIfStmt.h>
 
-inline std::mutex mtx;
+inline mutex mtx;
 
 void SemaAnalyser::analyseFiles(const LogosProject* project, vector<LgsError>& errors) {
     ThreadPool threadPool;
@@ -348,7 +348,7 @@ void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) const {
 
 void SemaAnalyser::visitStrConst(LgsStrConst* strConst) const {
     const auto size = new LgsIntConst(strConst->value.size());
-    strConst->strType.dimsExprs.push_back(size);
+    strConst->strType.dimsExpr = size;
 }
 
 void SemaAnalyser::visitVariable(LgsVariable* variable) {
@@ -376,6 +376,7 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     default:
         assert(false);
     }
+    assert(variable->ref);
 }
 
 void SemaAnalyser::visitSelection(LgsSelection* selection) {
@@ -479,14 +480,18 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     }
     case FUNC: {
         const auto func = symbol->func;
-        for (const auto& arg : funcCall->args) {
-            visitExpr(arg);
-        }
         if (funcCall->equals(&func->funcType)) {
             funcCall->func = func;
             funcCall->type = func->funcType.rt;
         } else {
             errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->prettyName(), func->prettyName()});
+        }
+        const auto& params = funcCall->func->funcType.params;
+        for (int i = 0; i < params.size(); ++i) {
+            if (i == funcCall->args.size()) break;
+            const auto arg = funcCall->args[i];
+            const auto param = params[i];
+            visitExpr(arg, param->type);
         }
         break;
     }
@@ -531,11 +536,10 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
 void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     visitUnaryExpr(baseExpr);
-    for (const auto index : iterIndex->indices) {
-        visitExpr(index->from);
-        visitExpr(index->to);
-    }
-    setIterIndexType(iterIndex);
+    visitExpr(iterIndex->index->from);
+    visitExpr(iterIndex->index->to);
+    const auto type = baseExpr->type->asIterable()->baseType;
+    iterIndex->setType(type);
 }
 
 bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
@@ -547,29 +551,6 @@ bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable
     }
     fieldVariable->setType(field->type);
     return true;
-}
-
-void SemaAnalyser::setIterIndexType(LgsIterIndex* iterIndex) {
-    const auto baseExpr = iterIndex->baseExpr;
-    const auto iterable = baseExpr->type->asIterable();
-    if (!iterable) {
-        return errHandler.handleError(E10002, &iterIndex->location, {iterIndex->prettyName()});
-    }
-    const auto iterBaseType = iterable->getBaseType();
-    const int diff = iterable->getDims() - iterIndex->indices.size();
-    const auto index = iterIndex->indices[diff];
-    if (diff > 0) {
-        iterIndex->type = iterable->createInnerType(diff, index);
-    } else if (diff == 0) {
-        if (index->to) {
-            iterIndex->type = iterable->createInnerType(diff, index);
-        } else {
-            iterIndex->type = iterBaseType;
-        }
-    } else {
-        assert(false);
-    }
-    assert(iterIndex->type);
 }
 
 void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
@@ -626,8 +607,10 @@ void SemaAnalyser::validateExprType(const LgsExpr* expr, LgsType* type) {
         return;
     }
     assert(expr->type);
-    if (type && !expr->type->equals(type)) {
-        errHandler.handleError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
+    if (type) {
+        if (!expr->type->equals(type)) {
+            return errHandler.handleError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
+        }
     }
 }
 
@@ -711,14 +694,11 @@ LgsType* SemaAnalyser::resolveArrayType(LgsArray* array) {
     if (array->baseType->isUnknown()) {
         array->baseType = resolveType(array->baseType);
     }
-    auto iterIsConst = false;
-    for (const auto sizeExpr : array->dimsExprs) {
-        visitExpr(sizeExpr);
-        if (sizeExpr->type->isConst) {
-            iterIsConst = true;
-        }
+    const auto sizeExpr = array->dimsExpr;
+    visitExpr(sizeExpr);
+    if (sizeExpr && sizeExpr->type->isConst) {
+        array->isStatic = true;
     }
-    array->isStatic = iterIsConst;
     return array;
 }
 

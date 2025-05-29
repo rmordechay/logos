@@ -24,9 +24,10 @@ Value* LgsArrayExpr::createDynArray(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
     const auto capacityIR = builder.getInt32(capacity);
-    const auto constantInt = builder.getInt64(sizeof(void*));
-    IRValue = builder.CreateAlloca(arrType.arrStruct);
-    arrType.new_.callIR(metadata, {IRValue, capacityIR, constantInt});
+    const auto elementSize = builder.getInt64(arrType.baseType->getSize());
+    const auto arrStruct = arrType.getIRStructType();
+    IRValue = builder.CreateAlloca(arrStruct);
+    arrType.init.callIR(metadata, {IRValue, capacityIR, elementSize});
     for (const auto element : initialElements) {
         arrType.add.call(metadata, {this, element});
     }
@@ -35,10 +36,9 @@ Value* LgsArrayExpr::createDynArray(CodeGenMetadata* metadata) {
 
 void LgsArrayExpr::free() {
     if (arrType.isStatic) return;
-
 }
 
 Value* LgsArrayExpr::getLength(CodeGenMetadata* metadata) {
-    if (arrType.isStatic) return arrType.dimsExprs[0]->getIRValue(metadata);
+    if (arrType.isStatic) return arrType.dimsExpr->getIRValue(metadata);
     return arrType.len.call(metadata, {this});
 }

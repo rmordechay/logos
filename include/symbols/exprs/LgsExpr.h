@@ -27,7 +27,6 @@ public:
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     Value* getIRValue(CodeGenMetadata* metadata);
-    void initIRValue(CodeGenMetadata* metadata);
     void setType(LgsType* type);
 
     LgsFunc* asFunc();

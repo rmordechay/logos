@@ -2,8 +2,8 @@
 #define LOGOSPRINT_H
 #include "funcs/LgsFuncImpl.h"
 #include "types/primitives/LgsBool.h"
-#include "types/str/LgsStr.h"
 #include <types/primitives/LgsVoid.h>
+#include <types/LgsAny.h>
 
 class LgsPrint final : public LgsFuncImpl {
 public:

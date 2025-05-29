@@ -14,10 +14,6 @@ bool LgsType::equals(LgsType& other) {
     return getIRName() == other.getIRName();
 }
 
-bool LgsType::canIndexTo(LgsType* indexType) {
-    return false;
-}
-
 size_t LgsType::getSize() {
     assert(false);
 }

@@ -1,5 +1,6 @@
 #include "utils/LgsUtils.h"
 #include "data/LgsDefinitions.h"
+#include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
@@ -59,4 +60,34 @@ string getFormatString(const vector<LgsExpr*>& args) {
         }
     }
     return result;
+}
+
+void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices) {
+    while (iterIndex) {
+        if (iterIndex->index) {
+            indices.push_back(iterIndex->index);
+        }
+        iterIndex = iterIndex->baseExpr->asIterIndex();
+    }
+    reverse(indices.begin(), indices.end());
+}
+
+bool shouldLoadIRArg(Value* value) {
+    if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
+    if (const auto alloca = dyn_cast<AllocaInst>(value)) {
+        const auto allocatedType = alloca->getAllocatedType();
+        return !allocatedType->isStructTy() && !allocatedType->isArrayTy();
+    }
+    if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
+        const auto source = gep->getSourceElementType();
+        const auto results = gep->getResultElementType();
+        const auto isArrayTy = source->isArrayTy();
+        const auto isByteTy = results && results->isIntegerTy(8);
+        return !isArrayTy || !isByteTy;
+    }
+    if (isa<ConstantExpr>(value)) {
+        const auto constExpr = cast<ConstantExpr>(value);
+        return constExpr->getOpcode() == Instruction::GetElementPtr;
+    }
+    return true;
 }

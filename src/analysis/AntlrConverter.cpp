@@ -186,7 +186,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
         const auto self = new LgsParam(interface, LOGOS_SELF);
         const auto type = getFuncReturnType(funcSignature->type());
         const auto method = new LgsMethodImpl(funcSignature->VARIABLE()->getText(), interfaceName, type);
-        method->funcType.params.emplace_back(self);
+        method->funcType.params.push_back(self);
         setParams(&method->funcType, funcSignature->param());
         method->path = filePath;
         interface->addMethod(method);
@@ -665,25 +665,23 @@ LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::IterIndexContext* ctx) 
         assert(false);
     }
 
-    vector<LgsIndex*> indices;
     for (int i = 0; i < ctx->index().size(); ++i) {
         const auto indexExpr = ctx->index()[i];
         const auto indexExprFrom = indexExpr->from;
-        const auto indexExprTo = indexExpr->to;
         const auto iterIndexFrom = getExpr(indexExprFrom);
-        const auto iterIndexTo = getExpr(indexExprTo);
+        const auto iterIndexTo = getExpr(indexExpr->to);
         iterIndexFrom->setLocation(indexExprFrom->start);
-        indices.emplace_back(new LgsIndex{.from = iterIndexFrom, .to = iterIndexTo});
+        const auto index = new LgsIndex{.from = iterIndexFrom, .to = iterIndexTo};
+        const auto newIterIndex = new LgsIterIndex(baseExpr, index);
+        newIterIndex->setLocation(ctx->start);
+        baseExpr = newIterIndex;
     }
 
-    const auto iterIndex = new LgsIterIndex(baseExpr, indices);
-    iterIndex->setLocation(ctx->start);
-    return iterIndex;
+    return baseExpr->asIterIndex();
 }
 
 LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) const {
     LgsConstExpr* constant = nullptr;
-    // TODO handle underscore for numbers
     if (const auto intToken = ctx->INTEGER()) {
         const auto value = stoi(intToken->getText());
         constant = new LgsIntConst(value);
@@ -738,18 +736,16 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
 }
 
 LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
-    const auto baseType = getType(ctx->baseType);
-    const auto arrType = new LgsArray(baseType);
-    for (const auto indexType : ctx->arrayIndexType()) {
-        const auto sizeExpr = indexType->expr();
-        if (sizeExpr) {
-            auto expr = getExpr(sizeExpr);
-            arrType->dimsExprs.push_back(expr);
-        } else {
-            arrType->dimsExprs.push_back(new LgsIntConst(INITIAL_ARRAY_CAPACITY));
+    LgsType* type = getType(ctx->baseType);
+    auto dims = ctx->arrayIndexType();
+    for (auto it = dims.rbegin(); it != dims.rend(); ++it) {
+        const auto array = new LgsArray(type);
+        if (const auto sizeExpr = (*it)->expr()) {
+            array->dimsExpr = getExpr(sizeExpr);
         }
+        type = array;
     }
-    return arrType;
+    return type;
 }
 
 LgsType* AntlerConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken) const {

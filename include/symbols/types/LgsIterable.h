@@ -10,17 +10,15 @@ public:
     LgsType* baseType;
     bool isStatic = false;
     uint16_t unpackLength = 0;
-    vector<LgsExpr*> dimsExprs;
+    LgsExpr* dimsExpr = nullptr;
 
     explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}
     Type* getIRType() override;
-    LgsType* inferTypeFromIter(const vector<LgsExpr*>& exprs) const;
-    virtual int getDims();
+    LgsType* getIterType(const LgsIndex* index) const;
     virtual LgsType* getBaseType();
     virtual void unpackTypes(const vector<LgsVarDec*>& varDecs);
     virtual Value* getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr);
     virtual Value* getLength(CodeGenMetadata* metadata, Value* iterValue);
-    virtual LgsType* createInnerType(size_t indexRange, LgsIndex* index) const = 0;
     ~LgsIterable() override = default;
 };
 

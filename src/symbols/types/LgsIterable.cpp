@@ -1,26 +1,22 @@
 #include "types/LgsIterable.h"
 #include "utils/LgsUtils.h"
 #include "exprs/LgsExpr.h"
-#include "stmts/LgsField.h"
+#include "exprs/unary/LgsIterIndex.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
+#include "types/array/LgsArray.h"
 
 Type* LgsIterable::getIRType() {
     if (IRType) return IRType;
-    if (!isStatic || dimsExprs.empty()) return ptrTy;
-    IRType = baseType->getIRType();
-    for (int i = dimsExprs.size() - 1; i >= 0; i--) {
-        IRType = ArrayType::get(IRType, getExprConstNumber(dimsExprs[i]));
-    }
+    if (!isStatic || !dimsExpr) return ptrTy;
+    const auto innerIRType = baseType->getIRType();
+    const auto size = getExprConstNumber(dimsExpr);
+    IRType = ArrayType::get(innerIRType, size);
     return IRType;
 }
 
 LgsType* LgsIterable::getBaseType() {
     return baseType;
-}
-
-int LgsIterable::getDims() {
-    assert(false);
 }
 
 void LgsIterable::unpackTypes(const vector<LgsVarDec*>& varDecs) {
@@ -35,14 +31,11 @@ Value* LgsIterable::getLength(CodeGenMetadata* metadata, Value* iterValue) {
     assert(false);
 }
 
-LgsType* LgsIterable::inferTypeFromIter(const vector<LgsExpr*>& exprs) const {
-    if (exprs.empty()) return nullptr;
-    const auto type = exprs[0]->type;
-    for (int i = 0; i < exprs.size(); ++i) {
-        const auto exprType = exprs[i]->type;
-        if (!type->equals(exprType)) {
-            return &LGS_ANY;
-        }
+LgsType* LgsIterable::getIterType(const LgsIndex* index) const {
+    if (index->to) {
+        const auto sliced = new LgsArray(baseType->clone());
+        sliced->isStatic = isStatic;
+        return sliced;
     }
-    return type;
+    return baseType;
 }

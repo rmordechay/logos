@@ -17,6 +17,7 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) override;
     string getStrFormatPart() const override;
+    LgsType* clone() override;
     ~LgsInt() override = default;
 };
 

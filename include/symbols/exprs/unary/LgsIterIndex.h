@@ -8,14 +8,14 @@ struct LgsIndex;
 class LgsIterIndex final : public LgsUnaryExpr {
 public:
     LgsUnaryExpr* baseExpr;
-    vector<LgsIndex*> indices;
+    LgsIndex* index = nullptr;
 
-    explicit LgsIterIndex(LgsUnaryExpr* baseExpr, const vector<LgsIndex*>& indices = {}) : baseExpr(baseExpr), indices(indices) {}
+    explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {}
     Value* createIRValue(CodeGenMetadata* metadata) override;
     Value* getGEP(CodeGenMetadata* metadata) const;
-    Value* createIRDynArray(CodeGenMetadata* metadata, LgsArray* arr) const;
-    Value* createMapIRValue(CodeGenMetadata* metadata, LgsMap* map) const;
-    Value* createStrIRValue(CodeGenMetadata* metadata) const;
+    Value* getIRFromDynArray(CodeGenMetadata* metadata, LgsArray* arr) const;
+    Value* getIRFromMap(CodeGenMetadata* metadata, LgsMap* map) const;
+    Value* getIRFromStr(CodeGenMetadata* metadata) const;
     void storeHashMap(CodeGenMetadata* metadata, LgsHashMap* hashMap) const;
     void storeScalar(CodeGenMetadata* metadata, LgsExpr* value);
     void storeArray(CodeGenMetadata* metadata, const LgsArrayExpr* arr) const;

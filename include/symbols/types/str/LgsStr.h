@@ -15,7 +15,6 @@ public:
         addMethod(&format);
         unpackLength = 1;
     }
-    int getDims() override;
     size_t getSize() override;
     string getIRName() override;
     Type* getIRType() override;
@@ -23,7 +22,6 @@ public:
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
-    LgsType* createInnerType(size_t indexRange, LgsIndex* index) const override;
     Value* getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr) override;
     Value* getLength(CodeGenMetadata* metadata, Value* iterValue) override;
     string getStrFormatPart() const override;

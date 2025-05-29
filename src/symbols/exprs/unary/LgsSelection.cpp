@@ -38,7 +38,7 @@ LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
                 childExpr->setIRValue(valueLoad);
             }
         } else if (const auto methodCall = childExpr->asFuncCall()) {
-            methodCall->initIRValue(metadata);
+            methodCall->IRValue = methodCall->createIRValue(metadata);
         }
     }
     return lastExpr();

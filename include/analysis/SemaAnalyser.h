@@ -80,7 +80,6 @@ public:
 
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
-    void setIterIndexType(LgsIterIndex* iterIndex);
     void validateExprType(const LgsExpr* expr, LgsType* type);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 

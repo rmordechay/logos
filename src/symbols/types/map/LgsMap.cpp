@@ -3,22 +3,8 @@
 #include "stmts/LgsVarDec.h"
 
 void LgsMap::setBaseType(const vector<LgsMapPair*>& exprs) {
-    vector<LgsExpr*> keyExprs;
-    vector<LgsExpr*> valueExprs;
-    for (const auto expr : exprs) {
-        keyExprs.emplace_back(expr->key);
-        valueExprs.emplace_back(expr->value);
-    }
-    kvType.key = inferTypeFromIter(keyExprs);
-    kvType.value = inferTypeFromIter(valueExprs);
-}
-
-int LgsMap::getDims() {
-    return 1;
-}
-
-LgsType* LgsMap::createInnerType(size_t indexRange, LgsIndex* index) const {
-    assert(false);
+    kvType.key = exprs.front()->key->type;
+    kvType.value = exprs.front()->value->type;
 }
 
 void LgsMap::unpackTypes(const vector<LgsVarDec*>& varDecs) {
@@ -58,10 +44,6 @@ bool LgsMap::equals(LgsType* other) {
 
 LgsType* LgsMap::inferBinaryType(LgsType* other) {
     assert(false);
-}
-
-bool LgsMap::canIndexTo(LgsType* indexType) {
-    return kvType.key->equals(indexType);
 }
 
 LgsType* LgsMap::getBaseType() {

@@ -30,6 +30,18 @@ public:
     }
 };
 
+class LgsArrayPutFunc final : public LgsMethodImpl {
+public:
+    LgsParam self{};
+    LgsParam indexParam{&LGS_INT};
+    LgsParam valueParam{&LGS_ANY};
+
+    explicit LgsArrayPutFunc(LgsType* parent) : LgsMethodImpl("put", parent->getIRName(), &LGS_VOID) {
+        self.type = parent;
+        funcType.params = {&self, &indexParam, &valueParam};
+    }
+};
+
 class LgsArrayAddFunc final : public LgsMethodImpl {
 public:
     LgsParam self{};
