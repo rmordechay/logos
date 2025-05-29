@@ -3,6 +3,6 @@
 
 #define DEBUG true
 #define WRITE_IR_TO_FILE false
-#define INITIAL_ARRAY_SIZE 2
+#define INITIAL_ARRAY_CAPACITY 2
 
 #endif //LGSCONFIG_H

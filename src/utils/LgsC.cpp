@@ -27,7 +27,7 @@ void LgsC::compile() {
     vector args{
         "clang",
         "-c", "../test.c",
-        "-o", "../output.o"
+        "-o", "../c.o"
         "-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
     };
     auto diags = CompilerInstance::createDiagnostics(*fs, new DiagnosticOptions, &dc, false);

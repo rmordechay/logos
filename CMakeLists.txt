@@ -41,6 +41,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 endif()
 
-add_executable(lgs main.cpp)
+add_executable(lgs main.cpp
+    include/symbols/funcs/LgsMainFunc.h)
 target_link_libraries(lgs PRIVATE lib)
 # add_subdirectory(tests)

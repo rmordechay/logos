@@ -121,7 +121,9 @@ string LgsIterIndex::prettyName() {
 
 LgsIterIndex::~LgsIterIndex() {
     delete baseExpr;
-    for (auto const& index : indices) {
+    for (auto const index : indices) {
+        delete index->from;
+        delete index->to;
         delete index;
     }
 }

@@ -3,9 +3,11 @@
 #include "data/LgsDefinitions.h"
 #include "LgsFile.h"
 #include "funcs/LgsFuncImpl.h"
+#include "funcs/LgsMainFunc.h"
 #include "types/LgsEnum.h"
 #include "types/LgsObject.h"
 
+class LgsMainFunc;
 class LgsEnum;
 
 class LgsMainFile final : public LgsFile {
@@ -61,6 +63,5 @@ inline LgsMainFile::~LgsMainFile() {
         delete func.second;
     }
 }
-
 
 #endif //LOGOSMAINFILE_H

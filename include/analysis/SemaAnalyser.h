@@ -10,11 +10,11 @@
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
 
+struct LgsSymbol;
+struct LgsIndex;
 class LogosProject;
-class LgsIndex;
 class LgsCast;
 class LgsVarDec;
-struct LgsSymbol;
 class LgsInstance;
 class LgsIterIndex;
 class LgsSelection;

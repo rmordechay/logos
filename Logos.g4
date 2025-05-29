@@ -268,13 +268,17 @@ range:
 type:
         TYPE QUEST_MARK?
    |    SELF_CLASS
-   |    baseType=type (LBRACK expr? RBRACK)+
+   |    baseType=type arrayIndexType+
    |    mapType
    |    funcType
    ;
 
 mapType:
         LBRACE key=type COLON value=type RBRACE
+    ;
+
+arrayIndexType:
+        LBRACK expr? RBRACK
     ;
 
 funcType:

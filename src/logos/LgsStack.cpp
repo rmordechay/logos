@@ -15,6 +15,10 @@ void LgsStack::enterScope(LgsFunc* func) {
 }
 
 void LgsStack::exitScope() {
+    pop();
+}
+
+void LgsStack::exitFunc() {
     currentFunc = returnFunc;
     returnFunc = nullptr;
     pop();

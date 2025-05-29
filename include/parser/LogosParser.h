@@ -43,8 +43,8 @@ public:
     RuleFuncArgList = 42, RuleFuncArg = 43, RuleConstructor = 44, RuleConstructorArgList = 45, 
     RuleConstructorArg = 46, RuleConstant = 47, RuleIterIndex = 48, RuleIndex = 49, 
     RuleSelection = 50, RuleFirstSelectionElement = 51, RuleInnerSelectionElement = 52, 
-    RuleRange = 53, RuleType = 54, RuleMapType = 55, RuleFuncType = 56, 
-    RuleVector = 57, RuleRequireEnvVars = 58
+    RuleRange = 53, RuleType = 54, RuleMapType = 55, RuleArrayIndexType = 56, 
+    RuleFuncType = 57, RuleVector = 58, RuleRequireEnvVars = 59
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -120,6 +120,7 @@ public:
   class RangeContext;
   class TypeContext;
   class MapTypeContext;
+  class ArrayIndexTypeContext;
   class FuncTypeContext;
   class VectorContext;
   class RequireEnvVarsContext; 
@@ -971,12 +972,8 @@ public:
     MapTypeContext *mapType();
     FuncTypeContext *funcType();
     TypeContext *type();
-    std::vector<antlr4::tree::TerminalNode *> LBRACK();
-    antlr4::tree::TerminalNode* LBRACK(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> RBRACK();
-    antlr4::tree::TerminalNode* RBRACK(size_t i);
-    std::vector<ExprContext *> expr();
-    ExprContext* expr(size_t i);
+    std::vector<ArrayIndexTypeContext *> arrayIndexType();
+    ArrayIndexTypeContext* arrayIndexType(size_t i);
 
    
   };
@@ -999,6 +996,19 @@ public:
   };
 
   MapTypeContext* mapType();
+
+  class  ArrayIndexTypeContext : public antlr4::ParserRuleContext {
+  public:
+    ArrayIndexTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LBRACK();
+    antlr4::tree::TerminalNode *RBRACK();
+    ExprContext *expr();
+
+   
+  };
+
+  ArrayIndexTypeContext* arrayIndexType();
 
   class  FuncTypeContext : public antlr4::ParserRuleContext {
   public:

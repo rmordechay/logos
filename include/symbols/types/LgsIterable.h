@@ -2,14 +2,14 @@
 #define LOGOSITERABLE_H
 #include "LgsType.h"
 
-class LgsIndex;
+struct LgsIndex;
 struct CodeGenMetadata;
 
 class LgsIterable : public LgsType {
 public:
     LgsType* baseType;
     bool isStatic = false;
-    uint16_t unpackLength{};
+    uint16_t unpackLength = 0;
     vector<LgsExpr*> dimsExprs;
 
     explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}

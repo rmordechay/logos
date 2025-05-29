@@ -22,7 +22,7 @@ Value* LgsArrayExpr::createConstArray(CodeGenMetadata* metadata) const {
 
 Value* LgsArrayExpr::createDynArray(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
-    const auto capacity = initialElements.empty() ? INITIAL_ARRAY_SIZE : initialElements.size() * 2;
+    const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
     const auto capacityIR = builder.getInt32(capacity);
     const auto constantInt = builder.getInt64(sizeof(void*));
     IRValue = builder.CreateAlloca(arrType.arrStruct);

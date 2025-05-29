@@ -33,6 +33,7 @@
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsHashMap.h"
+#include "logos/LgsConfig.h"
 #include "stmts/LgsPatternMatch.h"
 #include "types/array/LgsArray.h"
 #include "types/map/LgsMap.h"
@@ -96,7 +97,7 @@ LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* func) {
     bool isValid;
     if (params.size() == 1) {
         const auto arr = params[0]->type->asArray();
-        isValid = arr && !arr->isStatic && arr->baseType->asStr();
+        isValid = arr && arr->baseType->asStr();
     } else {
         isValid = params.empty();
     }
@@ -523,7 +524,7 @@ LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
 
 LgsUnaryExpr* AntlerConverter::getArrayExpr(LogosParser::ArrayContext* ctx) {
     const auto array = new LgsArrayExpr();
-    for (const auto& expr : ctx->expr()) {
+    for (const auto expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }
     array->setLocation(ctx->start);
@@ -672,7 +673,7 @@ LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::IterIndexContext* ctx) 
         const auto iterIndexFrom = getExpr(indexExprFrom);
         const auto iterIndexTo = getExpr(indexExprTo);
         iterIndexFrom->setLocation(indexExprFrom->start);
-        indices.emplace_back(new LgsIndex(iterIndexFrom, iterIndexTo));
+        indices.emplace_back(new LgsIndex{.from = iterIndexFrom, .to = iterIndexTo});
     }
 
     const auto iterIndex = new LgsIterIndex(baseExpr, indices);
@@ -722,7 +723,7 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
     LgsType* result = nullptr;
     if (const auto mapType = ctx->mapType()) {
         result = new LgsMap(getType(mapType->key), getType(mapType->value));
-    } else if (!ctx->LBRACK().empty()) {
+    } else if (!ctx->arrayIndexType().empty()) {
         result = getArrayType(ctx);
     } else if (const auto funcType = ctx->funcType()) {
         result = getFuncType(funcType);
@@ -739,9 +740,14 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
 LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
     const auto baseType = getType(ctx->baseType);
     const auto arrType = new LgsArray(baseType);
-    for (const auto sizeExpr : ctx->expr()) {
-        auto expr = getExpr(sizeExpr);
-        arrType->dimsExprs.push_back(expr);
+    for (const auto indexType : ctx->arrayIndexType()) {
+        const auto sizeExpr = indexType->expr();
+        if (sizeExpr) {
+            auto expr = getExpr(sizeExpr);
+            arrType->dimsExprs.push_back(expr);
+        } else {
+            arrType->dimsExprs.push_back(new LgsIntConst(INITIAL_ARRAY_CAPACITY));
+        }
     }
     return arrType;
 }

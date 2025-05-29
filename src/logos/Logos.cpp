@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 void Logos::run() {
-    // Project loading
+    // Load project and parse files
     if (!project.loadProject(args)) exit(1);
 
     // Semantic analysis

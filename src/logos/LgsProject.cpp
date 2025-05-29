@@ -22,11 +22,10 @@ bool LogosProject::loadProject(const vector<char*>& args) {
     if (!validateProject()) return false;
     // setupActiveEnv();
     if (!errHandler.successful) return false;
-    // lgsC.parse();
+    lgsC.parse();
     loadFiles();
     if (!errors.empty()) return false;
     if (!resolveGlobalTypes(files)) return false;
-    mainFile->mainFunc->setArgs(args);
     return errHandler.successful;
 }
 

@@ -3,7 +3,7 @@
 #include "LgsUnaryExpr.h"
 #include <LgsValue.h>
 
-class LgsIndex;
+struct LgsIndex;
 
 class LgsIterIndex final : public LgsUnaryExpr {
 public:
@@ -25,13 +25,9 @@ public:
     ~LgsIterIndex() override;
 };
 
-class LgsIndex final {
-public:
+struct LgsIndex {
     LgsExpr* from;
     LgsExpr* to;
-
-    explicit LgsIndex(LgsExpr* from, LgsExpr* to = nullptr) : from(from), to(to) {}
-    ~LgsIndex() = default;
 };
 
 #endif //LOGOSITERINDEX_H

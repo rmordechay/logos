@@ -20,13 +20,4 @@ public:
     ~LgsFuncImpl() override = default;
 };
 
-class LgsMainFunc final : public LgsFuncImpl {
-public:
-    vector<char*> args;
-
-    explicit LgsMainFunc() : LgsFuncImpl(LOGOS_MAIN_FUNC, &LGS_INT) {}
-    void setArgs(const vector<char*>& args);
-    ~LgsMainFunc() override = default;
-};
-
 #endif //LOGOSFUNCIMPL_H

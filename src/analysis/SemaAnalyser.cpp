@@ -92,7 +92,7 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
     visitFuncType(&func->funcType);
     visitStmtBlock(func->stmtBlock);
     validateFuncControlFlow(func);
-    lgsStack.exitScope();
+    lgsStack.exitFunc();
 }
 
 void SemaAnalyser::visitFuncType(const LgsFuncType* funcType) {
