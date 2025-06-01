@@ -10,8 +10,6 @@
 class LgsType;
 using namespace clang::tooling;
 
-LgsType* mapCType(const string& cType);
-
 class LgsCVisitor : public clang::RecursiveASTVisitor<LgsCVisitor> {
 public:
     clang::ASTContext* context;
@@ -19,6 +17,7 @@ public:
     explicit LgsCVisitor(clang::ASTContext* context) : context(context) {}
     bool isConstCharPointer(clang::QualType qt) const;
     LgsType* mapCType(clang::QualType type);
+    LgsSymbol* getSymbol(const string& name) const;
     LgsObject* createLgsObj(const clang::RecordDecl* record);
     bool isValid(clang::SourceLocation loc) const;
     bool VisitFunctionDecl(const clang::FunctionDecl* func);
@@ -31,13 +30,17 @@ public:
     LgsCVisitor visitor;
 
     explicit LgsCASTConsumer(clang::ASTContext* context) : visitor(context) {}
-    void HandleTranslationUnit(clang::ASTContext& context) override;
+    void HandleTranslationUnit(clang::ASTContext& context) override {
+        visitor.TraverseDecl(context.getTranslationUnitDecl());
+    }
     ~LgsCASTConsumer() override = default;
 };
 
 class LgsCFrontendAction final : public clang::ASTFrontendAction {
 public:
-    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) override;
+    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) override {
+        return std::make_unique<LgsCASTConsumer>(&compilerInstance.getASTContext());
+    }
     ~LgsCFrontendAction() override = default;
 };
 

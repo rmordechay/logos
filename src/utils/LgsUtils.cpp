@@ -72,26 +72,6 @@ void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices) {
     reverse(indices.begin(), indices.end());
 }
 
-bool shouldLoadIRArg(Value* value) {
-    if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
-    if (const auto alloca = dyn_cast<AllocaInst>(value)) {
-        const auto allocatedType = alloca->getAllocatedType();
-        return !allocatedType->isStructTy() && !allocatedType->isArrayTy();
-    }
-    if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
-        const auto source = gep->getSourceElementType();
-        const auto results = gep->getResultElementType();
-        const auto isArrayTy = source->isArrayTy();
-        const auto isByteTy = results && results->isIntegerTy(8);
-        return !isArrayTy || !isByteTy;
-    }
-    if (isa<ConstantExpr>(value)) {
-        const auto constExpr = cast<ConstantExpr>(value);
-        return constExpr->getOpcode() == Instruction::GetElementPtr;
-    }
-    return true;
-}
-
 StructType* getIRStructType(const string& name, const vector<Type*>& fields) {
     const auto struct_ = StructType::getTypeByName(context, name);
     if (!struct_) {
@@ -111,4 +91,24 @@ Value* getIRStr(Module* module, const string& value) {
     const auto globalVariable = new GlobalVariable(*module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
     globalVariable->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
     return globalVariable;
+}
+
+bool shouldLoadIRArg(Value* value) {
+    if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
+    if (const auto alloca = dyn_cast<AllocaInst>(value)) {
+        const auto allocatedType = alloca->getAllocatedType();
+        return !allocatedType->isStructTy() && !allocatedType->isArrayTy();
+    }
+    if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
+        const auto source = gep->getSourceElementType();
+        const auto results = gep->getResultElementType();
+        const auto isArrayTy = source->isArrayTy();
+        const auto isByteTy = results && results->isIntegerTy(8);
+        return !isArrayTy || !isByteTy;
+    }
+    if (isa<ConstantExpr>(value)) {
+        const auto constExpr = cast<ConstantExpr>(value);
+        return constExpr->getOpcode() == Instruction::GetElementPtr;
+    }
+    return true;
 }

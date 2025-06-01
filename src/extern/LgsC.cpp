@@ -25,6 +25,13 @@
 
 using namespace clang;
 
+void LgsC::parse(const vector<string>& files) const {
+    for (const auto file : files) {
+        const auto code = getFileText(file);
+        tooling::runToolOnCodeWithArgs(std::make_unique<LgsCFrontendAction>(), code, {"-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"});
+    }
+}
+
 void LgsC::compile(const vector<string>& files) {
     if (files.empty()) return;
     vector<string> argStrings{
@@ -78,13 +85,6 @@ void LgsC::compile(const vector<string>& files) {
     }
     break;
     default: assert(false);
-    }
-}
-
-void LgsC::parse(const vector<string>& files) const {
-    for (const auto file : files) {
-        const auto code = getFileText(file);
-        tooling::runToolOnCodeWithArgs(std::make_unique<LgsCFrontendAction>(), code, {"-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"});
     }
 }
 

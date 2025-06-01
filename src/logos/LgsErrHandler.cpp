@@ -13,7 +13,6 @@ void LgsErrHandler::handleError(const LgsError& lgsErr, const Location* location
     errors.emplace_back(LgsError{.msg = errMsg, .errCode = lgsErr.errCode});
     cout <<  ERROR_STR << errMsg << endl;
     if (location) {
-        assert(filePath != "");
         const auto fullPath = location->getFullPath(filePath);
         const auto path = "\t   at " + fullPath;
         cout << path << "\n---" << endl;

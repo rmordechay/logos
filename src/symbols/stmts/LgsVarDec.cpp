@@ -7,12 +7,9 @@ string LgsVarDec::format(string& indentStr) {
 }
 
 void LgsVarDec::createIRStmt(Module* module) {
-
     const auto IRType = type->getIRType();
     const auto exprIRValue = expr->getIRValue(module);
-    if (IRType->isArrayTy() || IRType->isPointerTy() || IRType->isVoidTy()) {
-        IRValue = exprIRValue;
-    } else {
+    if (shouldAllocate(IRType)) {
         IRValue = builder.CreateAlloca(IRType);
         if (shouldLoadIRArg(exprIRValue)) {
             const auto artIRType = expr->type->getIRType();
@@ -21,7 +18,13 @@ void LgsVarDec::createIRStmt(Module* module) {
         } else {
             builder.CreateStore(exprIRValue, IRValue);
         }
+    } else {
+        IRValue = exprIRValue;
     }
+}
+
+bool LgsVarDec::shouldAllocate(const Type* IRType) const {
+    return !expr->asInstance() || IRType->isArrayTy() || IRType->isPointerTy() || IRType->isVoidTy();
 }
 
 json LgsVarDec::asJSON() {

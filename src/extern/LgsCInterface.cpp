@@ -25,17 +25,12 @@ bool LgsCVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
 bool LgsCVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
     if (!isValid(record->getLocation())) return true;
     if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
+    const auto name = record->getNameAsString();
+    const auto objSymbol = getSymbol(name);
+    if (objSymbol) return true;
     const auto obj = createLgsObj(record);
-    globals.addSymbol(record->getNameAsString(), LgsSymbol(obj), nullptr);
+    globals.addSymbol(name, LgsSymbol(obj), nullptr);
     return true;
-}
-
-void LgsCASTConsumer::HandleTranslationUnit(clang::ASTContext& context) {
-    visitor.TraverseDecl(context.getTranslationUnitDecl());
-}
-
-std::unique_ptr<clang::ASTConsumer> LgsCFrontendAction::CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) {
-    return std::make_unique<LgsCASTConsumer>(&compilerInstance.getASTContext());
 }
 
 LgsObject* LgsCVisitor::createLgsObj(const clang::RecordDecl* record) {
@@ -80,12 +75,21 @@ LgsType* LgsCVisitor::mapCType(const clang::QualType type) {
         if (name == "") {
             name = decl->getQualifiedNameAsString();
         }
-        assert(name != "");
+        const auto objSymbol = getSymbol(name);
+        if (objSymbol) return objSymbol->object;
         const auto obj = createLgsObj(decl);
         globals.addSymbol(name, LgsSymbol(obj), nullptr);
         return obj;
     }
     assert(false);
+}
+
+LgsSymbol* LgsCVisitor::getSymbol(const string& name) const {
+    LgsSymbol* symbol = nullptr;
+    if (globals.symbols.find(name) != globals.symbols.end()) {
+        symbol = &globals.symbols[name];
+    }
+    return symbol;
 }
 
 bool LgsCVisitor::isConstCharPointer(const clang::QualType qt) const {

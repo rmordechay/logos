@@ -36,8 +36,6 @@ class LgsForLoop;
 struct LgsSymbol;
 struct LgsIndex;
 
-bool resolveGlobalTypes(const vector<LgsFile*>& files);
-
 class SemaAnalyser final {
 public:
     LgsFile* file = nullptr;

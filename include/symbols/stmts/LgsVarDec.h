@@ -13,6 +13,7 @@ public:
     explicit LgsVarDec(const std::string& name, LgsExpr* expr = nullptr) : name(name), expr(expr) {}
     void createIRStmt(Module* module) override;
     std::string format(std::string& indentStr) override;
+    bool shouldAllocate(const Type* IRType) const;
     nlohmann::json asJSON() override;
     ~LgsVarDec() override;
 };
