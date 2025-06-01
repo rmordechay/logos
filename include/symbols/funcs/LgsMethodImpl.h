@@ -7,10 +7,11 @@ class LgsMethodImpl : public LgsFunc {
 public:
     LgsMethodImpl* implements = nullptr;
 
-    LgsMethodImpl(const string& name, const string& parentName, LgsType* rt) {
+    LgsMethodImpl(const string& name, const string& parentName, LgsType* rt, const vector<LgsParam*>& params = {}) {
         funcType.name = name;
         funcType.parentName = parentName;
         funcType.rt = rt;
+        funcType.params = params;
         funcType.isMethod = true;
     }
     FunctionType* getIRFuncType(const Module* module) override;

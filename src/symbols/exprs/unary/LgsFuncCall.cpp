@@ -2,6 +2,7 @@
 #include "builtin/LgsPrint.h"
 #include "exprs/unary/LgsVariable.h"
 #include "funcs/LgsFunc.h"
+#include "logos/LgsGlobals.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"

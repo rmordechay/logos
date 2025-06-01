@@ -12,6 +12,7 @@ bool LgsCVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     const auto returnType = func->getReturnType();
     const auto lgsType = mapCType(returnType);
     const auto funcImpl = new LgsFuncImpl(name, lgsType);
+    funcImpl->IRGenerated = true;
     for (int i = 0; i < func->getNumParams(); ++i) {
         const auto paramType = func->getParamDecl(i)->getType();
         const auto lgsParam = new LgsParam(mapCType(paramType));

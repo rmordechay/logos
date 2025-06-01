@@ -1,5 +1,6 @@
 #ifndef LOGOSPRINT_H
 #define LOGOSPRINT_H
+#include "LgsBuiltinMethod.h"
 #include "funcs/LgsFuncImpl.h"
 #include "types/primitives/LgsBool.h"
 #include "utils/LgsUtils.h"
@@ -7,17 +8,16 @@
 #include <types/primitives/LgsVoid.h>
 #include <types/LgsAny.h>
 
-class LgsPrint final : public LgsFuncImpl {
+class LgsPrint final : public LgsBuiltinFunc {
 public:
     static constexpr auto name = "print";
     LgsParam input{&LGS_ANY};
     LgsParam args{&LGS_ANY};
 
-    explicit LgsPrint(): LgsFuncImpl(name, &LGS_VOID) {
+    explicit LgsPrint(): LgsBuiltinFunc(name, &LGS_VOID) {
         funcType.isVariadic = true;
         funcType.IRName = "printf";
         funcType.params = {&input, &args};
-        IRGenerated = true;
     }
 
     Value* call(Module* module, const vector<LgsExpr*>& args) override {

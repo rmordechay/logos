@@ -66,6 +66,7 @@ inline void setPlatform(const string& inputFile, const string& outputFile) {
         "-syslibroot", platform.libRoot.c_str(),
         platform.inputFile.c_str(),
         "../stdlib/lgslib.a",
+        "../project/build/c.o",
         "-o", platform.outputFile.c_str(),
         "-platform_version", platform.osName.c_str(), platform.platformVersion.c_str(), platform.platformVersion.c_str(),
         "-arch", platform.arch.c_str()

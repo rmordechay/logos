@@ -183,7 +183,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
         const auto method = new LgsMethodImpl(funcSignature->VARIABLE()->getText(), interfaceName, type);
         method->funcType.params.push_back(self);
         setParams(&method->funcType, funcSignature->param());
-        method->path = filePath;
+        method->filePath = filePath;
         interface->addMethod(method);
     }
     globals.addSymbol(interface->interfaceName, LgsSymbol(interface), &errHandler);
@@ -241,7 +241,7 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
     currentMethod = method;
     method->funcType.params.emplace_back(self);
     setParams(&method->funcType, funcSignature->param());
-    method->path = obj->path;
+    method->filePath = obj->path;
     if (ctx->VISIBILITY()) {
         method->funcType.isPublic = true;
     }

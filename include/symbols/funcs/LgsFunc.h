@@ -17,7 +17,7 @@ public:
     FunctionType* IRFuncType = nullptr;
     IRBuilderBase::InsertPoint savedIP;
     bool IRGenerated = false;
-    string path;
+    string filePath;
 
     explicit LgsFunc(const bool IRGenerated = false): IRGenerated(IRGenerated) {
         type = &funcType;

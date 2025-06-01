@@ -1,23 +1,22 @@
 #ifndef LGSSTRMETHODS_H
 #define LGSSTRMETHODS_H
+#include "LgsBuiltinMethod.h"
 #include "utils/LgsUtils.h"
-#include "funcs/LgsMethodImpl.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 
 #define BUFFER_SIZE 1024
 
-class LgsStrFormatFunc final : public LgsMethodImpl {
+class LgsStrFormatFunc final : public LgsBuiltinMethod {
 public:
     LgsParam self{};
     LgsParam args{&LGS_ANY};
 
-    explicit LgsStrFormatFunc(LgsType* parent) : LgsMethodImpl("format", parent->getIRName(), parent) {
+    explicit LgsStrFormatFunc(LgsType* parent) : LgsBuiltinMethod("format", parent->getIRName(), parent) {
         self.type = parent;
         funcType.isVariadic = true;
         funcType.isPublic = true;
         funcType.params = {&self};
-        IRGenerated = true;
     }
 
     Value* call(Module* module, const vector<LgsExpr*>& args) override {
@@ -39,16 +38,15 @@ public:
 };
 
 
-class LgsStrLenFunc final : public LgsMethodImpl {
+class LgsStrLenFunc final : public LgsBuiltinMethod {
 public:
     LgsParam self{};
 
-    explicit LgsStrLenFunc(LgsType* parent) : LgsMethodImpl("len", parent->getIRName(), &LGS_INT) {
+    explicit LgsStrLenFunc(LgsType* parent) : LgsBuiltinMethod("len", parent->getIRName(), &LGS_INT) {
         self.type = parent;
         funcType.IRName = "strlen";
         funcType.params = {&self};
         funcType.isPublic = true;
-        IRGenerated = true;
     }
 };
 

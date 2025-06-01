@@ -89,7 +89,7 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
 void SemaAnalyser::visitInterface(LgsInterface* interface) const {}
 
 void SemaAnalyser::visitFunc(LgsFunc* func) {
-    func->path = file->absPath;
+    func->filePath = file->absPath;
     runtime.enterFunc(func);
     visitFuncType(&func->funcType);
     visitStmtBlock(func->stmtBlock);
@@ -613,7 +613,7 @@ void SemaAnalyser::validateExprType(const LgsExpr* expr, LgsType* type) {
 
 void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
     const auto method = methodCall->func;
-    if (!method->funcType.isPublic && file->absPath != method->path) {
+    if (!method->funcType.isPublic && file->absPath != method->filePath) {
         errHandler.handleError(E10031, &method->location, {method->funcType.name, method->funcType.parentName});
     }
 }

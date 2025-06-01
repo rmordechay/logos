@@ -10,7 +10,6 @@
 void LgsFunc::generateIRCode(Module* module) {
     runtime.enterFunc(this);
     startBlockFunc(module);
-    runtime.push(module, location.getFullPath(path));
     const auto IRFunc = getIRFunc(module);
     IRValue = IRFunc;
     stmtBlock->createIRValue(module);

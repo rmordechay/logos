@@ -5,7 +5,6 @@ void LgsMainFunc::generateIRCode(Module* module) {
     runtime.enterFunc(this);
     startBlockFunc(module);
     runtime.initRuntime(module);
-    runtime.push(module, location.getFullPath(path));
     stmtBlock->createIRValue(module);
     runtime.freeExprs(module);
     builder.CreateRet(builder.getInt32(EXIT_SUCCESS));
