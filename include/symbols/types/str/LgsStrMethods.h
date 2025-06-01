@@ -20,20 +20,19 @@ public:
         funcType.params = {&self};
     }
 
-    Value* call(CodegenMetadata* metadata, const vector<LgsExpr*>& args) override {
-        auto& builder = metadata->builder;
+    Value* call(Module* module, const vector<LgsExpr*>& args) override {
         const bool isConst = args[0]->type->isConst;
         if (!isConst) assert(false);
         const auto formatString = getFormatString(args);
-        const auto baseIRStr = getIRStr(metadata->module, formatString);
+        const auto baseIRStr = getIRStr(module, formatString);
         const auto bufferType = ArrayType::get(i8Ty, BUFFER_SIZE);
         const auto buffer = builder.CreateAlloca(bufferType);
         const auto gep = builder.CreateGEP(bufferType, buffer, {i32Zero, i32Zero});
         vector<Value*> IRArgs = {gep, builder.getInt64(BUFFER_SIZE), baseIRStr};
         for (int i = 1; i < args.size(); ++i) {
-            IRArgs.emplace_back(args[i]->getIRValue(metadata));
+            IRArgs.emplace_back(args[i]->getIRValue(module));
         }
-        const auto printfFunc = getSnprintf(metadata->module);
+        const auto printfFunc = getSnprintf(module);
         builder.CreateCall(printfFunc, IRArgs);
         return gep;
     }

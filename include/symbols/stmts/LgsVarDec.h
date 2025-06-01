@@ -5,15 +5,15 @@
 
 class LgsVarDec final : public LgsStmt {
 public:
-    string name;
+    std::string name;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
-    vector<LgsVariable*> refs;
+    std::vector<LgsVariable*> refs;
 
-    explicit LgsVarDec(const string& name, LgsExpr* expr = nullptr) : name(name), expr(expr) {}
-    void createIRStmt(CodegenMetadata* metadata) override;
-    string format(string& indentStr) override;
-    json asJSON() override;
+    explicit LgsVarDec(const std::string& name, LgsExpr* expr = nullptr) : name(name), expr(expr) {}
+    void createIRStmt(Module* module) override;
+    std::string format(std::string& indentStr) override;
+    nlohmann::json asJSON() override;
     ~LgsVarDec() override;
 };
 

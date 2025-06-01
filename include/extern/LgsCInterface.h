@@ -7,37 +7,37 @@
 #include <clang/Tooling/Tooling.h>
 #include <memory>
 
-using namespace clang;
+class LgsType;
 using namespace clang::tooling;
 
 LgsType* mapCType(const string& cType);
 
-class LgsCVisitor : public RecursiveASTVisitor<LgsCVisitor> {
+class LgsCVisitor : public clang::RecursiveASTVisitor<LgsCVisitor> {
 public:
-    ASTContext* context;
+    clang::ASTContext* context;
 
-    explicit LgsCVisitor(ASTContext* context) : context(context) {}
-    bool isConstCharPointer(QualType qt) const;
-    LgsType* mapCType(QualType type);
-    LgsObject* createLgsObj(const RecordDecl* record);
-    bool isValid(SourceLocation loc) const;
-    bool VisitFunctionDecl(const FunctionDecl* func);
-    bool VisitRecordDecl(const RecordDecl* record);
+    explicit LgsCVisitor(clang::ASTContext* context) : context(context) {}
+    bool isConstCharPointer(clang::QualType qt) const;
+    LgsType* mapCType(clang::QualType type);
+    LgsObject* createLgsObj(const clang::RecordDecl* record);
+    bool isValid(clang::SourceLocation loc) const;
+    bool VisitFunctionDecl(const clang::FunctionDecl* func);
+    bool VisitRecordDecl(const clang::RecordDecl* record);
     ~LgsCVisitor() = default;
 };
 
-class LgsCASTConsumer final : public ASTConsumer {
+class LgsCASTConsumer final : public clang::ASTConsumer {
 public:
     LgsCVisitor visitor;
 
-    explicit LgsCASTConsumer(ASTContext* context) : visitor(context) {}
-    void HandleTranslationUnit(ASTContext& context) override;
+    explicit LgsCASTConsumer(clang::ASTContext* context) : visitor(context) {}
+    void HandleTranslationUnit(clang::ASTContext& context) override;
     ~LgsCASTConsumer() override = default;
 };
 
-class LgsCFrontendAction final : public ASTFrontendAction {
+class LgsCFrontendAction final : public clang::ASTFrontendAction {
 public:
-    std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance& compilerInstance, StringRef file) override;
+    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) override;
     ~LgsCFrontendAction() override = default;
 };
 

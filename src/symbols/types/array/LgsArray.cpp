@@ -51,19 +51,19 @@ void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[0]->type = baseType;
 }
 
-Value* LgsArray::getLength(CodegenMetadata* metadata, Value* iterValue) {
-    if (isStatic) return sizeExpr->getIRValue(metadata);
-    return len.callIR(metadata, {iterValue});
+Value* LgsArray::getLength(Module* module, Value* iterValue) {
+    if (isStatic) return sizeExpr->getIRValue(module);
+    return len.callIR(module, {iterValue});
 }
 
-Value* LgsArray::getElement(CodegenMetadata* metadata, Value* iterPtr, Value* indexPtr) {
+Value* LgsArray::getElement(Module* module, Value* iterPtr, Value* indexPtr) {
     if (isStatic) {
-        const auto i = metadata->builder.CreateLoad(i32Ty, indexPtr);
-        return metadata->builder.CreateGEP(getIRType(), iterPtr, {i32Zero, i});
+        const auto i = builder.CreateLoad(i32Ty, indexPtr);
+        return builder.CreateGEP(getIRType(), iterPtr, {i32Zero, i});
     }
-    const auto iValue = metadata->builder.CreateLoad(i32Ty, indexPtr);
-    const auto v = get.callIR(metadata, {iterPtr, iValue});
-    return metadata->builder.CreateLoad(getIRType(), v);
+    const auto iValue = builder.CreateLoad(i32Ty, indexPtr);
+    const auto v = get.callIR(module, {iterPtr, iValue});
+    return builder.CreateLoad(getIRType(), v);
 }
 
 LgsType* LgsArray::clone() {

@@ -15,7 +15,7 @@ public:
     BasicBlock* defaultCase = nullptr;
 
     explicit LgsPatternMatch(LgsExpr* expr) : expr(expr) {}
-    void createIRStmt(CodegenMetadata* metadata) override;
+    void createIRStmt(Module* module) override;
     json asJSON() override;
     ~LgsPatternMatch() override = default;
 };

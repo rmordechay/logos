@@ -13,8 +13,8 @@ public:
     LgsExpr* toValue = nullptr;
 
     LgsCast(LgsType* castToType, LgsExpr* castFromValue) : LgsExpr(castToType), toType(castToType), fromValue(castFromValue) {}
-    Value* createIRValue(CodegenMetadata* metadata) override;
-    Value* addIR(CodegenMetadata* metadata, LgsExpr* other) override;
+    Value* createIRValue(Module* module) override;
+    Value* addIR(Module* module, LgsExpr* other) override;
     bool cast();
     ~LgsCast() override;
 };

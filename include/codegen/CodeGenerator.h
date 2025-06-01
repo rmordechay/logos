@@ -15,9 +15,7 @@ using namespace filesystem;
 
 class CodeGenerator {
 public:
-    static void generate(LgsMainFile* mainFile);
-    static void generateMainFunc(CodegenMetadata* metadata, LgsFuncImpl* mainFunc);
-    static void createIRMainFunc(const CodegenMetadata* metadata);
+    static void generate(const LgsMainFile* mainFile);
     static void generateObjModule(const LgsType* obj);
     static Module* createEmptyModule(const std::string& objName);
     static void writeIRToFile(const Module* module, const path& name);

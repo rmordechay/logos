@@ -1,5 +1,7 @@
 #include "types/LgsAny.h"
 
+#include "codegen/CodegenMetadata.h"
+
 size_t LgsAny::getSize() {
     return sizeof(void*);
 }

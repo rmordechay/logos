@@ -10,12 +10,7 @@ public:
         funcType.rt = rt;
         funcType.params = params;
     }
-
-    explicit LgsFuncImpl(const LgsFuncType* funcType) {
-        this->funcType.name = funcType->name;
-        this->funcType.rt = funcType->rt;
-        this->funcType.params = funcType->params;
-    }
+    explicit LgsFuncImpl(const LgsFuncType* funcType) : LgsFuncImpl(funcType->name, funcType->rt, funcType->params){}
     ~LgsFuncImpl() override = default;
 };
 

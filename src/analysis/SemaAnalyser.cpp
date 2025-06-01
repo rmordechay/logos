@@ -26,8 +26,10 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "files/LgsMainFile.h"
 #include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsPatternMatch.h"
+#include "stmts/LgsVarDec.h"
 #include "types/array/LgsArray.h"
 #include "types/primitives/LgsVoid.h"
 #include <loops/LgsForeachLoop.h>
@@ -88,11 +90,11 @@ void SemaAnalyser::visitInterface(LgsInterface* interface) const {}
 
 void SemaAnalyser::visitFunc(LgsFunc* func) {
     func->path = file->absPath;
-    lgsRuntime.enterScope(func);
+    runtime.enterFunc(func);
     visitFuncType(&func->funcType);
     visitStmtBlock(func->stmtBlock);
     validateFuncControlFlow(func);
-    lgsRuntime.exitFunc();
+    runtime.exitFunc();
 }
 
 void SemaAnalyser::visitFuncType(const LgsFuncType* funcType) {
@@ -172,7 +174,7 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
 }
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
-    lgsRuntime.enterScope();
+    runtime.enterScope();
     visitExpr(ifStmt->ifCond);
     visitStmtBlock(ifStmt->ifStmtBlock);
     ifStmt->hasReturn = ifStmt->ifStmtBlock->hasReturn;
@@ -184,7 +186,7 @@ void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
         visitStmtBlock(ifStmt->elseStmtBlock);
         ifStmt->hasReturn = ifStmt->elseStmtBlock->hasReturn;
     }
-    lgsRuntime.exitScope();
+    runtime.exitScope();
 }
 
 void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
@@ -210,15 +212,15 @@ void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
 void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const {}
 
 void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
-    lgsRuntime.enterScope();
-    lgsRuntime.stack.top().currentLoop = loopStmt;
+    runtime.enterScope();
+    runtime.stack.top().currentLoop = loopStmt;
     if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {
         visitRangeLoop(rangeLoop);
     } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loopStmt)) {
         visitForeachLoop(foreachLoop);
     }
-    lgsRuntime.stack.top().currentLoop = nullptr;
-    lgsRuntime.exitScope();
+    runtime.stack.top().currentLoop = nullptr;
+    runtime.exitScope();
 }
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
@@ -246,7 +248,7 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
 }
 
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
-    auto funcType = lgsRuntime.getCurrentFunc()->funcType;
+    auto funcType = runtime.getCurrentFunc()->funcType;
     const auto rt = funcType.rt;
     if (returnStmt->expr) {
         returnStmt->expr->isReturnValue = true;
@@ -268,13 +270,13 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
 }
 
 void SemaAnalyser::visitBreakStmt(const LgsBreakStmt* breakStmt) {
-    if (!lgsRuntime.getCurrentLoop()) {
+    if (!runtime.getCurrentLoop()) {
         return errHandler.handleError(E10017, &breakStmt->location);
     }
 }
 
 void SemaAnalyser::visitContinueStmt(const LgsContinueStmt* continueStmt) {
-    if (!lgsRuntime.getCurrentLoop()) {
+    if (!runtime.getCurrentLoop()) {
         return errHandler.handleError(E10038, &continueStmt->location);
     }
 }
@@ -632,7 +634,7 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
         symbol = &globals.symbols[name];
     } else {
         // Locals
-        auto& symbols = lgsRuntime.stack.top().symbols;
+        auto& symbols = runtime.getSymbols();
         if (symbols.find(name) != symbols.end()) {
             symbol = &symbols[name];
         }
@@ -648,7 +650,7 @@ void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
         const auto location = symbol.getLocation();
         return errHandler.handleError(E10011, location, {name, to_string(location->lineNumber)});
     }
-    lgsRuntime.addLocalSymbol(name, symbol);
+    runtime.addLocalSymbol(name, symbol);
 }
 
 LgsType* SemaAnalyser::resolveType(LgsType* type) {

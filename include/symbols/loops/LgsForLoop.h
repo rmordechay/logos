@@ -1,5 +1,6 @@
 #ifndef LOGOSLOOP_H
 #define LOGOSLOOP_H
+#include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsStmt.h"
 
 class LgsVariable;
@@ -15,14 +16,14 @@ public:
     BasicBlock* loopBodyBlock = nullptr;
     BasicBlock* loopExitBlock = nullptr;
 
-    void createIRStmt(CodegenMetadata* metadata) override;
-    void initIRLoop(CodegenMetadata* metadata);
-    void setLoopIRCondition(CodegenMetadata* metadata);
-    void exitIRLoop(CodegenMetadata* metadata) const;
-    virtual Value* loopStart(CodegenMetadata* metadata) = 0;
-    virtual Value* loopEnd(CodegenMetadata* metadata) = 0;
-    virtual void setIRIterable(CodegenMetadata* metadata) = 0;
-    virtual void setIRLoopVars(CodegenMetadata* metadata) = 0;
+    void createIRStmt(Module* module) override;
+    void initIRLoop(Module* module);
+    void setLoopIRCondition(Module* module);
+    void exitIRLoop(Module* module) const;
+    virtual Value* loopStart(Module* module) = 0;
+    virtual Value* loopEnd(Module* module) = 0;
+    virtual void setIRIterable(Module* module) = 0;
+    virtual void setIRLoopVars(Module* module) = 0;
     ~LgsForLoop() override;
 };
 

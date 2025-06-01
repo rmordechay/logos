@@ -13,7 +13,7 @@ public:
         funcType.rt = rt;
         funcType.isMethod = true;
     }
-    FunctionType* getIRFuncType(const CodegenMetadata* metadata) override;
+    FunctionType* getIRFuncType(const Module* module) override;
     ~LgsMethodImpl() override = default;
 };
 

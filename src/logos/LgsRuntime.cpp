@@ -1,30 +1,37 @@
 #include "logos/LgsRuntime.h"
 #include "logos/LgsGlobals.h"
 #include "funcs/LgsFunc.h"
-#include "funcs/LgsFuncImpl.h"
+#include "stmts/LgsVarDec.h"
+#include "utils/LgsUtils.h"
 
-void LgsRuntime::enterScope(LgsFunc* func) {
-    LgsFunc* currentFunc = nullptr;
-    if (func) {
-        currentFunc = func;
+void LgsRuntime::enterFunc(LgsFunc* func) {
+    if (stack.empty()) {
+        returnFunc = func;
+        stack.push(LgsStackFrame{.currentFunc = func});
     } else {
-        currentFunc = getCurrentFunc();
+        returnFunc = getCurrentFunc();
+        stack.push(LgsStackFrame{.symbols = getSymbols(), .currentFunc = func, .currentLoop = getCurrentLoop()});
     }
     if (stage == LGS_RUNTIME) {
-        std::cout << currentFunc->location.getFullPath(currentFunc->path) << std::endl;
-    }
-    if (stack.empty()) {
-        stack.push(LgsStackFrame{.currentFunc = currentFunc});
-    } else {
-        stack.push(LgsStackFrame{.symbols = stack.top().symbols, .currentFunc = currentFunc, .currentLoop = getCurrentLoop()});
+        returnFunc->savedIP = builder.saveIP();
     }
 }
 
-void LgsRuntime::exitScope() {
-    stack.pop();
+void LgsRuntime::enterScope() {
+    stack.push(LgsStackFrame{
+        .symbols = getSymbols(),
+        .currentFunc = getCurrentFunc(),
+        .currentLoop = getCurrentLoop()
+    });
 }
 
 void LgsRuntime::exitFunc() {
+    stack.pop();
+    if (stage == LGS_RUNTIME && returnFunc) builder.restoreIP(returnFunc->savedIP);
+    returnFunc = nullptr;
+}
+
+void LgsRuntime::exitScope() {
     stack.pop();
 }
 
@@ -32,32 +39,27 @@ void LgsRuntime::reset() {
     while (stack.size() > 0) {
         stack.pop();
     }
+    returnFunc = nullptr;
 }
 
-// %struct.Runtime = type { %struct.Stack }
-// %struct.Stack = type { i32, [512 x %struct.StackStr] }
-// %struct.StackStr = type { [1024 x i8], i32 }
-//
-// @.str = private unnamed_addr constant [2 x i8] c"1\00", align 1
-// @.str.1 = private unnamed_addr constant [2 x i8] c"2\00", align 1
-// @.str.2 = private unnamed_addr constant [2 x i8] c"3\00", align 1
-// @.str.3 = private unnamed_addr constant [2 x i8] c"4\00", align 1
-//
-// ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-// define i32 @main() #0 {
-//   %1 = alloca %struct.Runtime, align 4
-//   call void @init(ptr noundef %1)
-//   call void @push(ptr noundef %1, ptr noundef @.str)
-//   call void @push(ptr noundef %1, ptr noundef @.str.1)
-//   call void @push(ptr noundef %1, ptr noundef @.str.2)
-//   call void @push(ptr noundef %1, ptr noundef @.str.3)
-//   call void @print_stack(ptr noundef %1)
-//   ret i32 0
-// }
+void LgsRuntime::initRuntime(Module* mainModule) {
+    const auto stackStr = getIRStructType("StackStr", {ArrayType::get(i8Ty, 1024), i32Ty});
+    const auto stack = getIRStructType("Stack", {i32Ty, ArrayType::get(stackStr, 512)});
+    const auto runtimeType = getIRStructType("Runtime", {stack});
+    const auto zeroInit = Constant::getNullValue(runtimeType);
+    runtimeStruct = new GlobalVariable(*mainModule, runtimeType, false, GlobalValue::ExternalLinkage, zeroInit);
+    const auto initStackFunc = mainModule->getOrInsertFunction("Runtime_init", FunctionType::get(voidTy, {ptrTy}, false));
+    builder.CreateCall(initStackFunc, {runtimeStruct});
+}
 
-void LgsRuntime::printStack(CodegenMetadata* metadata) const {
-    LgsParam lgsParam(&LGS_INT);
-    auto printStack = LgsFuncImpl("print_stack", &LGS_VOID, {&lgsParam});
+void LgsRuntime::push(Module* module, const string& path) const {
+    const auto pushStackFunc = module->getOrInsertFunction("Runtime_push", FunctionType::get(voidTy, {ptrTy, ptrTy}, false));
+    builder.CreateCall(pushStackFunc, {runtimeStruct, getIRStr(module, path)});
+}
+
+void LgsRuntime::printStack(Module* module) const {
+    const auto printStackFunc = module->getOrInsertFunction("Runtime_print_stack", FunctionType::get(voidTy, {ptrTy}, false));
+    builder.CreateCall(printStackFunc, {runtimeStruct});
 }
 
 LgsFunc* LgsRuntime::getCurrentFunc() {
@@ -70,7 +72,25 @@ LgsForLoop* LgsRuntime::getCurrentLoop() {
     return stack.top().currentLoop;
 }
 
+map<string, LgsSymbol>& LgsRuntime::getSymbols() {
+    assert(stack.size() > 0);
+    return stack.top().symbols;
+}
+
 void LgsRuntime::addLocalSymbol(const string& name, const LgsSymbol& symbol) {
     assert(stack.size() > 0);
     stack.top().symbols[name] = symbol;
+}
+
+void LgsRuntime::addAllocatedExpr(LgsExpr* expr) {
+    assert(stack.size() > 0);
+    stack.top().allocatedExprs.emplace_back(expr);
+}
+
+void LgsRuntime::freeExprs(Module* module) {
+    const auto& exprs = stack.top().allocatedExprs;
+    for (const auto expr : exprs) {
+        expr->free(module);
+    }
+    stack.top().allocatedExprs.clear();
 }

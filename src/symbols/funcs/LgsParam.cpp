@@ -8,13 +8,13 @@ string LgsParam::format(string& indentStr) {
     return name + ": " + type->prettyName();
 }
 
-Value* LgsParam::getIRValue(CodegenMetadata* metadata) {
+Value* LgsParam::getIRValue(Module* module) {
     if (IRValue) return IRValue;
     if (isVariadic) {
         if (vaList) return vaList;
-        vaList = metadata->builder.CreateAlloca(ptrTy);
-        const auto vaStart = getOrInsertDeclaration(metadata->module, Intrinsic::vastart, {ptrTy});
-        metadata->builder.CreateCall(vaStart, {vaList});
+        vaList = builder.CreateAlloca(ptrTy);
+        const auto vaStart = getOrInsertDeclaration(module, Intrinsic::vastart, {ptrTy});
+        builder.CreateCall(vaStart, {vaList});
         return vaList;
     }
     return IRValue;

@@ -1,5 +1,6 @@
 #ifndef LOGOSPARAM_H
 #define LOGOSPARAM_H
+#include "exprs/unary/constants/LgsIntConst.h"
 #include <LgsValue.h>
 
 class LgsFuncImpl;
@@ -9,18 +10,18 @@ class LgsType;
 
 class LgsParam final : public LgsValue {
 public:
-    string name;
+    std::string name;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
-    vector<LgsVariable*> refs;
+    std::vector<LgsVariable*> refs;
     bool isVariadic = false;
     AllocaInst* vaList = nullptr;
 
     explicit LgsParam(LgsType* type = nullptr, const string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
-    string format(string& indentStr) override;
-    Value* getIRValue(CodegenMetadata* metadata);
+    std::string format(std::string& indentStr) override;
+    Value* getIRValue(Module* module);
     json asJSON() override;
-    string getIRName();
+    std::string getIRName();
     ~LgsParam() override = default;
 };
 

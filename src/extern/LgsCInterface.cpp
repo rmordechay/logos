@@ -1,9 +1,12 @@
 #include "extern/LgsCInterface.h"
 #include "funcs/LgsFuncImpl.h"
+#include "types/LgsObject.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsFloat.h"
+#include "types/primitives/LgsVoid.h"
+#include "types/str/LgsStr.h"
 
-bool LgsCVisitor::VisitFunctionDecl(const FunctionDecl* func) {
+bool LgsCVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     if (!isValid(func->getLocation()) || !func->isThisDeclarationADefinition()) return true;
     const auto name = func->getNameAsString();
     const auto returnType = func->getReturnType();
@@ -18,7 +21,7 @@ bool LgsCVisitor::VisitFunctionDecl(const FunctionDecl* func) {
     return true;
 }
 
-bool LgsCVisitor::VisitRecordDecl(const RecordDecl* record) {
+bool LgsCVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
     if (!isValid(record->getLocation())) return true;
     if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
     const auto obj = createLgsObj(record);
@@ -26,18 +29,18 @@ bool LgsCVisitor::VisitRecordDecl(const RecordDecl* record) {
     return true;
 }
 
-void LgsCASTConsumer::HandleTranslationUnit(ASTContext& context) {
+void LgsCASTConsumer::HandleTranslationUnit(clang::ASTContext& context) {
     visitor.TraverseDecl(context.getTranslationUnitDecl());
 }
 
-std::unique_ptr<ASTConsumer> LgsCFrontendAction::CreateASTConsumer(CompilerInstance& compilerInstance, StringRef file) {
+std::unique_ptr<clang::ASTConsumer> LgsCFrontendAction::CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) {
     return std::make_unique<LgsCASTConsumer>(&compilerInstance.getASTContext());
 }
 
-LgsObject* LgsCVisitor::createLgsObj(const RecordDecl* record) {
+LgsObject* LgsCVisitor::createLgsObj(const clang::RecordDecl* record) {
     const auto name = record->getNameAsString();
     auto* obj = new LgsObject(name);
-    for (const FieldDecl* field : record->fields()) {
+    for (const clang::FieldDecl* field : record->fields()) {
         const auto fieldName = field->getNameAsString();
         const auto fieldType = mapCType(field->getType());
         const auto lgsField = new LgsField(fieldName, fieldType);
@@ -47,20 +50,20 @@ LgsObject* LgsCVisitor::createLgsObj(const RecordDecl* record) {
     return obj;
 }
 
-LgsType* LgsCVisitor::mapCType(const QualType type) {
+LgsType* LgsCVisitor::mapCType(const clang::QualType type) {
     if (isConstCharPointer(type)) {
         return new LgsStr();
     }
-    if (type->isSpecificBuiltinType(BuiltinType::Char_S)) {
+    if (type->isSpecificBuiltinType(clang::BuiltinType::Char_S)) {
         return new LgsChar();
     }
-    if (type->isSpecificBuiltinType(BuiltinType::Int)) {
+    if (type->isSpecificBuiltinType(clang::BuiltinType::Int)) {
         return new LgsInt();
     }
-    if (type->isSpecificBuiltinType(BuiltinType::Float)) {
+    if (type->isSpecificBuiltinType(clang::BuiltinType::Float)) {
         return new LgsFloat();
     }
-    if (type->isSpecificBuiltinType(BuiltinType::Bool)) {
+    if (type->isSpecificBuiltinType(clang::BuiltinType::Bool)) {
         return new LgsBool();
     }
     if (type->isVoidType()) {
@@ -70,8 +73,8 @@ LgsType* LgsCVisitor::mapCType(const QualType type) {
         return mapCType(type->getPointeeType());
     }
     if (type->isStructureType()) {
-        const RecordType* recordType = type->getAsStructureType();
-        const RecordDecl* decl = recordType->getDecl();
+        const auto recordType = type->getAsStructureType();
+        const auto decl = recordType->getDecl();
         auto name = decl->getNameAsString();
         if (name == "") {
             name = decl->getQualifiedNameAsString();
@@ -84,12 +87,12 @@ LgsType* LgsCVisitor::mapCType(const QualType type) {
     assert(false);
 }
 
-bool LgsCVisitor::isConstCharPointer(const QualType qt) const {
+bool LgsCVisitor::isConstCharPointer(const clang::QualType qt) const {
     if (!qt->isPointerType()) return false;
     const auto pointeeType = qt->getPointeeType();
     return pointeeType.isConstQualified() && pointeeType->isCharType();
 }
 
-bool LgsCVisitor::isValid(const SourceLocation loc) const {
+bool LgsCVisitor::isValid(const clang::SourceLocation loc) const {
     return context->getSourceManager().isWrittenInMainFile(loc);
 }

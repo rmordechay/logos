@@ -2,12 +2,12 @@
 
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
+#include "logos/LgsGlobals.h"
 #include "stmts/LgsVarDec.h"
 
-void LgsPatternMatch::createIRStmt(CodegenMetadata* metadata) {
-    auto& builder = metadata->builder;
-    const auto func = metadata->runtime.getCurrentFunc()->getIRFunc(metadata);
-    const auto exprIRValue = metadata->builder.getInt32(expr->hashValue(metadata));
+void LgsPatternMatch::createIRStmt(Module* module) {
+    const auto func = runtime.getCurrentFunc()->getIRFunc(module);
+    const auto exprIRValue = builder.getInt32(expr->hashValue(module));
     exitBlock = BasicBlock::Create(context, "exit_pattern_matching");
     defaultCase = BasicBlock::Create(context, "default");
     const auto switchInst = builder.CreateSwitch(exprIRValue, defaultCase);
@@ -15,19 +15,19 @@ void LgsPatternMatch::createIRStmt(CodegenMetadata* metadata) {
     vector<BasicBlock*> blocks;
     for (size_t i = 0; i < patterns.size(); ++i) {
         const auto pattern = patterns[i];
-        const auto patterIRValue = metadata->builder.getInt32(pattern->hashValue(metadata));
+        const auto patterIRValue = builder.getInt32(pattern->hashValue(module));
         const auto patternBlock = BasicBlock::Create(context, "case_" + to_string(i), func);
         switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
         builder.SetInsertPoint(patternBlock);
-        patternsStmtBlocks[i]->createIRValue(metadata);
+        patternsStmtBlocks[i]->createIRValue(module);
         builder.CreateBr(exitBlock);
     }
 
-    startBlock(metadata, defaultCase);
-    elseStmtBlock->createIRValue(metadata);
+    startBlock(module, defaultCase);
+    elseStmtBlock->createIRValue(module);
 
     builder.CreateBr(exitBlock);
-    startBlock(metadata, exitBlock);
+    startBlock(module, exitBlock);
 }
 
 json LgsPatternMatch::asJSON() {

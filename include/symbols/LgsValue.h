@@ -1,10 +1,12 @@
 #ifndef CODEGENERATION_H
 #define CODEGENERATION_H
 
-#include "codegen/CodegenMetadata.h"
+#include "LgsLocation.h"
 #include <Token.h>
-#include <llvm/IR/Value.h>
 #include <json/json.hpp>
+#include <llvm/IR/Value.h>
+
+using namespace llvm;
 
 class LgsValue {
 public:
@@ -13,13 +15,12 @@ public:
 
     void setIRValue(Value* value);
     BasicBlock* createBasicBlock(const char* name) const;
-    void startBlock(CodegenMetadata* metadata, BasicBlock* block) const;
-    void startBlockFunc(CodegenMetadata* metadata) const;
-    Value* getIRStr(Module* module, const std::string& value) const;
-    Value* hashIRValue(CodegenMetadata* metadata, Value* value) const;
-    virtual string format(string& indentStr);
+    void startBlock(Module* module, BasicBlock* block) const;
+    void startBlockFunc(Module* module) const;
+    Value* hashIRValue(Module* module, Value* value) const;
+    virtual std::string format(std::string& indentStr);
     virtual void setLocation(const antlr4::Token* ctx);
-    virtual json asJSON();
+    virtual nlohmann::json asJSON();
     virtual ~LgsValue() = default;
 };
 

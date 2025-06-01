@@ -23,11 +23,11 @@ void LgsIterable::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[0]->type = baseType;
 }
 
-Value* LgsIterable::getElement(CodegenMetadata* metadata, Value* iterPtr, Value* iPtr) {
+Value* LgsIterable::getElement(Module* module, Value* iterPtr, Value* iPtr) {
     assert(false);
 }
 
-Value* LgsIterable::getLength(CodegenMetadata* metadata, Value* iterValue) {
+Value* LgsIterable::getLength(Module* module, Value* iterValue) {
     assert(false);
 }
 

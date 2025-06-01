@@ -30,8 +30,8 @@ public:
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
-    Value* getLength(CodegenMetadata* metadata, Value* iterValue) override;
-    Value* getElement(CodegenMetadata* metadata, Value* iterPtr, Value* indexPtr) override;
+    Value* getLength(Module* module, Value* iterValue) override;
+    Value* getElement(Module* module, Value* iterPtr, Value* indexPtr) override;
     LgsType* clone() override;
     ~LgsArray() override;
 };

@@ -3,9 +3,9 @@
 #include "exprs/unary/LgsSelection.h"
 #include "stmts/LgsReturn.h"
 
-void LgsStmtBlock::createIRValue(CodegenMetadata* metadata) const {
+void LgsStmtBlock::createIRValue(Module* module) const {
     for (const auto& stmt : stmts) {
-        stmt->createIRStmt(metadata);
+        stmt->createIRStmt(module);
     }
 }
 

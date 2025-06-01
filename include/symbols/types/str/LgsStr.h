@@ -22,8 +22,8 @@ public:
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
-    Value* getElement(CodegenMetadata* metadata, Value* iterPtr, Value* iPtr) override;
-    Value* getLength(CodegenMetadata* metadata, Value* iterValue) override;
+    Value* getElement(Module* module, Value* iterPtr, Value* iPtr) override;
+    Value* getLength(Module* module, Value* iterValue) override;
     string getStrFormatPart() const override;
     static uint32_t hashString(const string& str);
     ~LgsStr() override = default;

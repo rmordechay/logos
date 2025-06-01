@@ -1,31 +1,37 @@
 #include "funcs/LgsFunc.h"
 #include "data/LgsDefinitions.h"
+#include "logos/LgsGlobals.h"
 #include "stmts/LgsStmtBlock.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
+#include "exprs/LgsExpr.h"
 
-void LgsFunc::generateIRCode(CodegenMetadata* metadata) {
-    metadata->runtime.enterScope(this);
-    startBlockFunc(metadata);
-    IRValue = getIRFunc(metadata);
-    stmtBlock->createIRValue(metadata);
+void LgsFunc::generateIRCode(Module* module) {
+    runtime.enterFunc(this);
+    startBlockFunc(module);
+    runtime.push(module, location.getFullPath(path));
+    const auto IRFunc = getIRFunc(module);
+    IRValue = IRFunc;
+    stmtBlock->createIRValue(module);
     if (funcType.rt->isVoid) {
-        metadata->builder.CreateRetVoid();
+        runtime.freeExprs(module);
+        builder.CreateRetVoid();
     }
-    metadata->runtime.exitScope();
+    runtime.exitFunc();
+    IRGenerated = true;
 }
 
-Value* LgsFunc::createIRValue(CodegenMetadata* metadata) {
-    generateIRCode(metadata);
+Value* LgsFunc::createIRValue(Module* module) {
+    generateIRCode(module);
     return IRValue;
 }
 
-Value* LgsFunc::call(CodegenMetadata* metadata, const vector<LgsExpr*>& args) {
+Value* LgsFunc::call(Module* module, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
     int iterStart = funcType.isStatic;
     bool isObjReturn = false;
     if (const auto obj = funcType.rt->asObject()) {
-        const auto objRtPtr = metadata->builder.CreateAlloca(obj->getIRType(), nullptr);
+        const auto objRtPtr = builder.CreateAlloca(obj->getIRType(), nullptr);
         IRArgs.push_back(objRtPtr);
         isObjReturn = true;
         iterStart++;
@@ -35,48 +41,48 @@ Value* LgsFunc::call(CodegenMetadata* metadata, const vector<LgsExpr*>& args) {
         auto isInit = false;
         for (int i = iterStart; i < args.size(); ++i) {
             if (!isInit && funcType.params[i]->isVariadic) {
-                IRArgs.emplace_back(metadata->builder.getInt32(3));
+                IRArgs.emplace_back(builder.getInt32(3));
                 isInit = true;
             }
-            addIRArg(metadata, IRArgs, args[i]);
+            addIRArg(module, IRArgs, args[i]);
         }
     } else {
         for (int i = iterStart; i < args.size(); ++i) {
-            addIRArg(metadata, IRArgs, args[i]);
+            addIRArg(module, IRArgs, args[i]);
         }
     }
-    const auto rv = callIR(metadata, IRArgs);
+    const auto rv = callIR(module, IRArgs);
     if (isObjReturn) return IRArgs[0];
     return rv;
 }
 
-void LgsFunc::addIRArg(CodegenMetadata* metadata, vector<Value*>& IRArgs, LgsExpr* arg) const {
-    const auto argIRValue = arg->getIRValue(metadata);
+void LgsFunc::addIRArg(Module* module, vector<Value*>& IRArgs, LgsExpr* arg) const {
+    const auto argIRValue = arg->getIRValue(module);
     if (shouldLoadIRArg(argIRValue)) {
         const auto artIRType = arg->type->getIRType();
-        const auto value = metadata->builder.CreateLoad(artIRType, argIRValue);
+        const auto value = builder.CreateLoad(artIRType, argIRValue);
         IRArgs.emplace_back(value);
     } else {
         IRArgs.emplace_back(argIRValue);
     }
 }
 
-Value* LgsFunc::callIR(CodegenMetadata* metadata, const vector<Value*>& args) {
+Value* LgsFunc::callIR(Module* module, const vector<Value*>& args) {
     if (IRValue) {
-        const auto IRFuncType = getIRFuncType(metadata);
-        return metadata->builder.CreateCall(IRFuncType, IRValue, args);
+        const auto IRFuncType = getIRFuncType(module);
+        return builder.CreateCall(IRFuncType, IRValue, args);
     }
-    const auto IRFunc = getIRFunc(metadata);
-    return metadata->builder.CreateCall(IRFunc, args);
+    const auto IRFunc = getIRFunc(module);
+    return builder.CreateCall(IRFunc, args);
 }
 
 string LgsFunc::prettyName() {
     return funcType.prettyName();
 }
 
-Function* LgsFunc::getIRFunc(CodegenMetadata* metadata) {
-    const auto funcIRType = getIRFuncType(metadata);
-    auto func = metadata->module->getOrInsertFunction(funcType.getIRName(), funcIRType);
+Function* LgsFunc::getIRFunc(Module* module) {
+    const auto funcIRType = getIRFuncType(module);
+    auto func = module->getOrInsertFunction(funcType.getIRName(), funcIRType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
     auto args = IRFunc->arg_begin();
     if (const auto obj = funcType.rt->asObject()) {
@@ -102,7 +108,7 @@ Function* LgsFunc::getIRFunc(CodegenMetadata* metadata) {
     return IRFunc;
 }
 
-FunctionType* LgsFunc::getIRFuncType(const CodegenMetadata* metadata) {
+FunctionType* LgsFunc::getIRFuncType(const Module* module) {
     if (IRFuncType) return IRFuncType;
     vector<Type*> IRParamsTypes;
     for (int i = 0; i < funcType.params.size(); ++i) {

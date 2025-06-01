@@ -8,11 +8,6 @@ using namespace std;
 using namespace nlohmann;
 using namespace llvm;
 
-enum LgsStage {
-    LGS_ANALYSIS,
-    LGS_RUNTIME,
-};
-
 #define LOGOS_FILE_EXTENSION ".lgs"
 #define LOGOS_SRC_DIR "src"
 #define LOGOS_ENVS_DIR "envs"
@@ -28,6 +23,7 @@ enum LgsStage {
 #define LOGOS_LOOP_CONDITION "loop_condition"
 #define LOGOS_LOOP_BODY "loop_body"
 #define LOGOS_LOOP_EXIT "loop_exit"
+#define ERROR_STR "\033[1;31mError:\033[0m "
 
 #if defined(__linux__)
 LLD_HAS_DRIVER(elf);

@@ -2,6 +2,8 @@
 #define LOGOSSTMT_H
 #include <LgsValue.h>
 
+class LgsForLoop;
+class LgsVarDec;
 class LgsSelection;
 class LgsFuncCall;
 class LgsReturn;
@@ -23,7 +25,7 @@ public:
     LgsBreakStmt* asBreakStmt();
     LgsFuncCall* asFuncCall();
     LgsSelection* asSelection();
-    virtual void createIRStmt(CodegenMetadata* metadata) = 0;
+    virtual void createIRStmt(Module* module) = 0;
     ~LgsStmt() override = default;
 };
 

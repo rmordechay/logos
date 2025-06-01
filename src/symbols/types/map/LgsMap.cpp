@@ -12,11 +12,11 @@ void LgsMap::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[1]->type = kvType.value;
 }
 
-Value* LgsMap::getLength(CodegenMetadata* metadata, Value* iterValue) {
-    return len.callIR(metadata);
+Value* LgsMap::getLength(Module* module, Value* iterValue) {
+    return len.callIR(module);
 }
 
-Value* LgsMap::getElement(CodegenMetadata* metadata, Value* iterPtr, Value* iPtr) {
+Value* LgsMap::getElement(Module* module, Value* iterPtr, Value* iPtr) {
     assert(false);
 }
 

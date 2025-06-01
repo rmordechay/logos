@@ -1,14 +1,17 @@
 #ifndef LGSUTILS_H
 #define LGSUTILS_H
 #include "exprs/LgsExpr.h"
+#include <llvm/IR/DerivedTypes.h>
 
 struct LgsIndex;
-string getFileText(filesystem::path filePath);
-string getExprStr(LgsExpr* baseExpr);
+
+std::string getFileText(std::filesystem::path filePath);
+std::string getExprStr(LgsExpr* baseExpr);
 int getExprConstNumber(LgsExpr* expr);
-string getFormatString(const vector<LgsExpr*>& args);
-void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices);
-StructType* getIRStructType(const string& name, const vector<Type*>& fields);
+std::string getFormatString(const std::vector<LgsExpr*>& args);
+void setIterIndices(const LgsIterIndex* iterIndex, std::vector<LgsIndex*>& indices);
+StructType* getIRStructType(const std::string& name, const std::vector<Type*>& fields);
+Value* getIRStr(Module* module, const std::string& value);
 bool shouldLoadIRArg(Value* value);
 
 #endif //LGSUTILS_H

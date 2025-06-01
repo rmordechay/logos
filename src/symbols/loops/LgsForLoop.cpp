@@ -1,50 +1,50 @@
 #include "loops/LgsForLoop.h"
 #include "data/LgsDefinitions.h"
+#include "logos/LgsGlobals.h"
 #include "stmts/LgsStmtBlock.h"
 #include "stmts/LgsVarDec.h"
 
-void LgsForLoop::createIRStmt(CodegenMetadata* metadata) {
-    initIRLoop(metadata);
-    startBlock(metadata, loopCondBlock);
-    setLoopIRCondition(metadata);
-    startBlock(metadata, loopBodyBlock);
-    setIRLoopVars(metadata);
-    stmtBlock->createIRValue(metadata);
-    exitIRLoop(metadata);
+void LgsForLoop::createIRStmt(Module* module) {
+    initIRLoop(module);
+    startBlock(module, loopCondBlock);
+    setLoopIRCondition(module);
+    startBlock(module, loopBodyBlock);
+    setIRLoopVars(module);
+    stmtBlock->createIRValue(module);
+    exitIRLoop(module);
 }
 
-void LgsForLoop::initIRLoop(CodegenMetadata* metadata) {
-    metadata->runtime.enterScope();
-    metadata->runtime.stack.top().currentLoop = this;
-    auto& builder = metadata->builder;
+void LgsForLoop::initIRLoop(Module* module) {
+    runtime.enterScope();
+    runtime.stack.top().currentLoop = this;
     loopCondBlock = createBasicBlock(LOGOS_LOOP_CONDITION);
     loopBodyBlock = createBasicBlock(LOGOS_LOOP_BODY);
     loopExitBlock = createBasicBlock(LOGOS_LOOP_EXIT);
     iPtr = builder.CreateAlloca(i32Ty);
-    builder.CreateStore(loopStart(metadata), iPtr);
-    setIRIterable(metadata);
+    builder.CreateStore(loopStart(module), iPtr);
+    setIRIterable(module);
     builder.CreateBr(loopCondBlock);
 }
 
-void LgsForLoop::setLoopIRCondition(CodegenMetadata* metadata) {
-    auto& builder = metadata->builder;
+void LgsForLoop::setLoopIRCondition(Module* module) {
+
     const auto iValue = builder.CreateLoad(i32Ty, iPtr);
-    const auto upperBound = loopEnd(metadata);
+    const auto upperBound = loopEnd(module);
     const auto condition = builder.CreateICmpSLT(iValue, upperBound);
     builder.CreateCondBr(condition, loopBodyBlock, loopExitBlock);
 }
 
-void LgsForLoop::exitIRLoop(CodegenMetadata* metadata) const {
-    auto& builder = metadata->builder;
+void LgsForLoop::exitIRLoop(Module* module) const {
+
     // Increment loop variable
     const auto iValue = builder.CreateLoad(i32Ty, iPtr);
     const auto inc = builder.CreateAdd(iValue, builder.getInt32(1));
     builder.CreateStore(inc, iPtr);
     builder.CreateBr(loopCondBlock);
     // Loop exit
-    startBlock(metadata, loopExitBlock);
-    metadata->runtime.stack.top().currentLoop = nullptr;
-    metadata->runtime.exitScope();
+    startBlock(module, loopExitBlock);
+    runtime.stack.top().currentLoop = nullptr;
+    runtime.exitScope();
 }
 
 LgsForLoop::~LgsForLoop() {

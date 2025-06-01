@@ -15,22 +15,23 @@ public:
     vector<LgsVariable*> refs;
     LgsStmtBlock* stmtBlock = nullptr;
     FunctionType* IRFuncType = nullptr;
-    BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
+    IRBuilderBase::InsertPoint savedIP;
+    bool IRGenerated = false;
     string path;
 
     explicit LgsFunc() {
         type = &funcType;
     }
-    void generateIRCode(CodegenMetadata* metadata);
-    virtual Function* getIRFunc(CodegenMetadata* metadata);
-    virtual FunctionType* getIRFuncType(const CodegenMetadata* metadata);
-    virtual Value* callIR(CodegenMetadata* metadata, const vector<Value*>& args = {});
-    virtual Value* call(CodegenMetadata* metadata, const vector<LgsExpr*>& args = {});
-    void addIRArg(CodegenMetadata* metadata, vector<Value*>& IRArgs, LgsExpr* arg) const;
-    Value* createIRValue(CodegenMetadata* metadata) override;
+    Value* createIRValue(Module* module) override;
     string prettyName() override;
     string format(string& tabs) override;
     json asJSON() override;
+    void addIRArg(Module* module, vector<Value*>& IRArgs, LgsExpr* arg) const;
+    virtual void generateIRCode(Module* module);
+    virtual Function* getIRFunc(Module* module);
+    virtual FunctionType* getIRFuncType(const Module* module);
+    virtual Value* callIR(Module* module, const vector<Value*>& args = {});
+    virtual Value* call(Module* module, const vector<LgsExpr*>& args = {});
     ~LgsFunc() override;
 };
 

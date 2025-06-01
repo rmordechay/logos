@@ -3,17 +3,17 @@
 #include "types/map/LgsMap.h"
 #include <exprs/unary/LgsArrayExpr.h>
 
-Value* LgsIterIndex::createIRValue(CodegenMetadata* metadata) {
+Value* LgsIterIndex::createIRValue(Module* module) {
     const auto baseExprType = baseExpr->type;
     if (const auto arr = baseExprType->asArray()) {
-        if (arr->isStatic) return getGEP(metadata);
-        return getIRFromDynArray(metadata, arr);
+        if (arr->isStatic) return getGEP(module);
+        return getIRFromDynArray(module, arr);
     }
     if (const auto map = baseExprType->asMap()) {
-        return getIRFromMap(metadata, map);
+        return getIRFromMap(module, map);
     }
     if (baseExprType->asStr()) {
-        return getIRFromStr(metadata);
+        return getIRFromStr(module);
     }
     assert(false);
 }
@@ -47,95 +47,95 @@ Value* LgsIterIndex::createIRValue(CodegenMetadata* metadata) {
 //   ret i32 0
 // }
 
-Value* LgsIterIndex::getIRFromDynArray(CodegenMetadata* metadata, LgsArray* arr) const {
-    const auto arrPtr = baseExpr->getIRValue(metadata);
-    const auto indexIRValue = index->from->getIRValue(metadata);
-    const auto rv = arr->get.callIR(metadata, {arrPtr, indexIRValue});
-    return metadata->builder.CreateLoad(ptrTy, rv);
+Value* LgsIterIndex::getIRFromDynArray(Module* module, LgsArray* arr) const {
+    const auto arrPtr = baseExpr->getIRValue(module);
+    const auto indexIRValue = index->from->getIRValue(module);
+    const auto rv = arr->get.callIR(module, {arrPtr, indexIRValue});
+    return builder.CreateLoad(ptrTy, rv);
 }
 
-Value* LgsIterIndex::getIRFromMap(CodegenMetadata* metadata, LgsMap* map) const {
-    const auto mapPtr = baseExpr->getIRValue(metadata);
-    const auto indexIRValue = index->from->getIRValue(metadata);
-    return map->get.callIR(metadata, {mapPtr, indexIRValue});
+Value* LgsIterIndex::getIRFromMap(Module* module, LgsMap* map) const {
+    const auto mapPtr = baseExpr->getIRValue(module);
+    const auto indexIRValue = index->from->getIRValue(module);
+    return map->get.callIR(module, {mapPtr, indexIRValue});
 }
 
-Value* LgsIterIndex::getIRFromStr(CodegenMetadata* metadata) const {
-    const auto baseExprIRValue = baseExpr->getIRValue(metadata);
+Value* LgsIterIndex::getIRFromStr(Module* module) const {
+    const auto baseExprIRValue = baseExpr->getIRValue(module);
     const auto baseExprIRType = baseExpr->type->getIRType();
     if (const auto global = dyn_cast<GlobalVariable>(baseExprIRValue)) {
         const auto ty = global->getValueType();
-        const auto value = index->from->getIRValue(metadata);
-        return metadata->builder.CreateGEP(ty, baseExprIRValue, {i32Zero, value});
+        const auto value = index->from->getIRValue(module);
+        return builder.CreateGEP(ty, baseExprIRValue, {i32Zero, value});
     }
-    const auto p = metadata->builder.CreateAlloca(baseExprIRType);
-    const auto vaArgInst = metadata->builder.CreateVAArg(baseExprIRValue, baseExprIRType);
-    metadata->builder.CreateStore(vaArgInst, p);
-    return metadata->builder.CreateLoad(baseExprIRType, p);
+    const auto p = builder.CreateAlloca(baseExprIRType);
+    const auto vaArgInst = builder.CreateVAArg(baseExprIRValue, baseExprIRType);
+    builder.CreateStore(vaArgInst, p);
+    return builder.CreateLoad(baseExprIRType, p);
 }
 
-void LgsIterIndex::storeHashMap(CodegenMetadata* metadata, LgsHashMap* hashMap) const {
+void LgsIterIndex::storeHashMap(Module* module, LgsHashMap* hashMap) const {
     assert(false);
 }
 
-void LgsIterIndex::storeScalar(CodegenMetadata* metadata, LgsExpr* value) {
-    const auto rValue = value->getIRValue(metadata);
+void LgsIterIndex::storeScalar(Module* module, LgsExpr* value) {
+    const auto rValue = value->getIRValue(module);
     if (const auto arr = baseExpr->type->asArray()) {
         if (!arr->isStatic) {
-            const auto ptr = metadata->builder.CreateAlloca(value->type->getIRType());
-            metadata->builder.CreateStore(rValue, ptr);
-            arr->put.callIR(metadata, {baseExpr->getIRValue(metadata), index->from->getIRValue(metadata), ptr});
+            const auto ptr = builder.CreateAlloca(value->type->getIRType());
+            builder.CreateStore(rValue, ptr);
+            arr->put.callIR(module, {baseExpr->getIRValue(module), index->from->getIRValue(module), ptr});
             return;
         }
     }
-    const auto iterPtr = getIRValue(metadata);
-    metadata->builder.CreateStore(rValue, iterPtr);
+    const auto iterPtr = getIRValue(module);
+    builder.CreateStore(rValue, iterPtr);
 }
 
-void LgsIterIndex::storeArray(CodegenMetadata* metadata, const LgsArrayExpr* arr) const {
+void LgsIterIndex::storeArray(Module* module, const LgsArrayExpr* arr) const {
     if (!arr->arrType.isStatic) assert(false);
     const auto IRType = baseExpr->type->getIRType();
-    const auto arrPtr = baseExpr->getIRValue(metadata);
+    const auto arrPtr = baseExpr->getIRValue(module);
     vector IRIndices = {i32Zero};
     vector<LgsIndex*> indices;
     setIterIndices(this, indices);
     for (const auto index : indices) {
-        IRIndices.emplace_back(index->from->getIRValue(metadata));
+        IRIndices.emplace_back(index->from->getIRValue(module));
     }
     for (int i = 0; i < arr->initialElements.size(); ++i) {
         const auto element = arr->initialElements[i];
-        const auto IRIndex = metadata->builder.getInt32(i);
+        const auto IRIndex = builder.getInt32(i);
         IRIndices.push_back(IRIndex);
-        const auto gep = metadata->builder.CreateGEP(IRType, arrPtr, IRIndices);
-        const auto rValue = element->getIRValue(metadata);
-        metadata->builder.CreateStore(rValue, gep);
+        const auto gep = builder.CreateGEP(IRType, arrPtr, IRIndices);
+        const auto rValue = element->getIRValue(module);
+        builder.CreateStore(rValue, gep);
         IRIndices.pop_back();
     }
 }
 
-Value* LgsIterIndex::getGEP(CodegenMetadata* metadata) const {
+Value* LgsIterIndex::getGEP(Module* module) const {
     vector<Value*> IRIndices = {};
     Type* ty = nullptr;
     Value* ptr = nullptr;
     auto iterIndex = this;
     while (true) {
-        auto irValue = iterIndex->index->from->getIRValue(metadata);
+        auto irValue = iterIndex->index->from->getIRValue(module);
         IRIndices.push_back(irValue);
         const auto innerIterIndex = iterIndex->baseExpr->asIterIndex();
         if (innerIterIndex) {
             iterIndex = innerIterIndex;
         } else {
-            ptr = iterIndex->baseExpr->getIRValue(metadata);
+            ptr = iterIndex->baseExpr->getIRValue(module);
             ty = iterIndex->baseExpr->type->getIRType();
             IRIndices.push_back(i32Zero);
             break;
         }
     }
     reverse(IRIndices.begin(), IRIndices.end());
-    return metadata->builder.CreateGEP(ty, ptr, IRIndices);
+    return builder.CreateGEP(ty, ptr, IRIndices);
 }
 
-Value* LgsIterIndex::getLength(CodegenMetadata* metadata) {
+Value* LgsIterIndex::getLength(Module* module) {
     assert(false);
 }
 

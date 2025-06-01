@@ -5,6 +5,6 @@ string LgsTypeConst::getName() {
     return type->prettyName();
 }
 
-Value* LgsTypeConst::createIRValue(CodegenMetadata* metadata) {
+Value* LgsTypeConst::createIRValue(Module* module) {
     assert(false);
 }

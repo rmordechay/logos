@@ -1,14 +1,13 @@
 #include "stmts/LgsReturn.h"
-
 #include "exprs/unary/LgsInstance.h"
 
-void LgsReturn::createIRStmt(CodegenMetadata* metadata) {
+void LgsReturn::createIRStmt(Module* module) {
     if (expr->type->asObject()) {
-        expr->IRValue = expr->createIRValue(metadata);
-        metadata->builder.CreateRetVoid();
+        builder.CreateRetVoid();
+    } else {
+        const auto exprIR = expr->getIRValue(module);
+        builder.CreateRet(exprIR);
     }
-    const auto exprIR = expr->getIRValue(metadata);
-    metadata->builder.CreateRet(exprIR);
 }
 
 LgsReturn::~LgsReturn() {

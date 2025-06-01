@@ -8,7 +8,7 @@ public:
     char value;
 
     explicit LgsCharConst(const char value) : LgsConstExpr(&LGS_CHAR), value(value) {}
-    Value* createIRValue(CodegenMetadata* metadata) override;
+    Value* createIRValue(Module* module) override;
 };
 
 #endif //LGSCHARCONST_H

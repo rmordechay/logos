@@ -51,16 +51,16 @@ public:
         self.type = parent;
         funcType.params = {&self, &valueParam};
         funcType.isPublic = true;
+        IRGenerated = true;
     }
 
-    Value* call(CodegenMetadata* metadata, const vector<LgsExpr*>& args) override {
-        auto& builder = metadata->builder;
-        const auto arrPtr = args[0]->getIRValue(metadata);
-        const auto elementValue = args[1]->getIRValue(metadata);
+    Value* call(Module* module, const vector<LgsExpr*>& args) override {
+        const auto arrPtr = args[0]->getIRValue(module);
+        const auto elementValue = args[1]->getIRValue(module);
         const auto elementType = args[1]->type->getIRType();
         const auto elementPtr = builder.CreateAlloca(elementType);
         builder.CreateStore(elementValue, elementPtr);
-        return callIR(metadata, {arrPtr, elementPtr});
+        return callIR(module, {arrPtr, elementPtr});
     }
 };
 
@@ -83,6 +83,7 @@ public:
         self.type = parent;
         funcType.params = {&self};
         funcType.isPublic = true;
+        IRGenerated = true;
     }
 };
 

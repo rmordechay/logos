@@ -6,21 +6,21 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
-
-Value* LgsFuncCall::call(CodegenMetadata* metadata) const {
+Value* LgsFuncCall::call(Module* module) const {
+    if (!func->IRGenerated) func->generateIRCode(module);
     if (callback) {
-        func->setIRValue(getCallback(metadata));
+        func->setIRValue(getCallback(module));
     } else if (func->funcType.isVirtual) {
-        const auto virtualFunc = resolveVirtualFunc(metadata);
+        const auto virtualFunc = resolveVirtualFunc(module);
         func->setIRValue(virtualFunc);
     }
-    return func->call(metadata, args);
+    return func->call(module, args);
 }
 
-Value* LgsFuncCall::getCallback(CodegenMetadata* metadata) const {
+Value* LgsFuncCall::getCallback(Module* module) const {
     switch (callback->type) {
     case VAR_DEC:
-        return callback->varDec->expr->getIRValue(metadata);
+        return callback->varDec->expr->getIRValue(module);
     case PARAM:
         return callback->param->IRValue;
     case FIELD:
@@ -31,12 +31,12 @@ Value* LgsFuncCall::getCallback(CodegenMetadata* metadata) const {
     assert(false);
 }
 
-Value* LgsFuncCall::createIRValue(CodegenMetadata* metadata) {
-    return call(metadata);
+Value* LgsFuncCall::createIRValue(Module* module) {
+    return call(module);
 }
 
-void LgsFuncCall::createIRStmt(CodegenMetadata* metadata) {
-    call(metadata);
+void LgsFuncCall::createIRStmt(Module* module) {
+    call(module);
 }
 
 bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
@@ -72,16 +72,15 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
     return true;
 }
 
-Value* LgsFuncCall::resolveVirtualFunc(CodegenMetadata* metadata) const {
-    auto& builder = metadata->builder;
+Value* LgsFuncCall::resolveVirtualFunc(Module* module) const {
     const auto parent = args[0];
     const auto type = parent->type;
     const auto interface = type->asInterface();
-    const auto parentIRValue = parent->getIRValue(metadata);
+    const auto parentIRValue = parent->getIRValue(module);
     const auto func = callback->func;
-    const auto keyIR = getIRStr(metadata->module, func->funcType.getIRName());
+    const auto keyIR = getIRStr(module, func->funcType.getIRName());
     const auto mapPtr = builder.CreateLoad(ptrTy, parentIRValue);
-    const auto rv = interface->vtable.mapType.get.callIR(metadata, {mapPtr, keyIR});
+    const auto rv = interface->vtable.mapType.get.callIR(module, {mapPtr, keyIR});
     const auto getValuePtr = builder.CreateAlloca(ptrTy);
     builder.CreateStore(rv, getValuePtr);
     return builder.CreateLoad(ptrTy, builder.CreateLoad(ptrTy, getValuePtr));

@@ -1,17 +1,26 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
+#include "files/LgsFile.h"
 #include "logos/LgsErrHandler.h"
 #include "logos/LgsRuntime.h"
-#include "exprs/unary/LgsUnaryExpr.h"
-#include "files/LgsMainFile.h"
-#include "stmts/LgsBreakStmt.h"
-#include "stmts/LgsPatternMatch.h"
-#include "stmts/LgsReturn.h"
-#include <loops/LgsForeachLoop.h>
-#include <loops/LgsRangeLoop.h>
 
-struct LgsSymbol;
-struct LgsIndex;
+class LgsArray;
+class LgsValue;
+class LgsVariable;
+class LgsUnaryExpr;
+class LgsStrConst;
+class LgsHashMap;
+class LgsExpr;
+class LgsType;
+class LgsContinueStmt;
+class LgsBreakStmt;
+class LgsReturn;
+class LgsForeachLoop;
+class LgsRangeLoop;
+class LgsPatternMatch;
+class LgsStmtBlock;
+class LgsStmt;
+class LgsMainFile;
 class LogosProject;
 class LgsCast;
 class LgsVarDec;
@@ -24,12 +33,13 @@ class LgsArrayExpr;
 class LgsIfStmt;
 class LgsAssignment;
 class LgsForLoop;
+struct LgsSymbol;
+struct LgsIndex;
 
 bool resolveGlobalTypes(const vector<LgsFile*>& files);
 
 class SemaAnalyser final {
 public:
-    LgsRuntime lgsRuntime;
     LgsFile* file = nullptr;
     LgsErrHandler errHandler;
 

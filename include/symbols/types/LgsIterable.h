@@ -2,6 +2,7 @@
 #define LOGOSITERABLE_H
 #include "LgsType.h"
 
+class LgsVarDec;
 struct LgsIndex;
 struct CodegenMetadata;
 
@@ -17,8 +18,8 @@ public:
     LgsType* getIterType(const LgsIndex* index) const;
     virtual LgsType* getBaseType();
     virtual void unpackTypes(const vector<LgsVarDec*>& varDecs);
-    virtual Value* getElement(CodegenMetadata* metadata, Value* iterPtr, Value* iPtr);
-    virtual Value* getLength(CodegenMetadata* metadata, Value* iterValue);
+    virtual Value* getElement(Module* module, Value* iterPtr, Value* iPtr);
+    virtual Value* getLength(Module* module, Value* iterValue);
     ~LgsIterable() override = default;
 };
 

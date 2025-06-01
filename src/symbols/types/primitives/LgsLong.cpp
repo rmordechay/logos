@@ -1,5 +1,7 @@
 #include "types/primitives/LgsLong.h"
 
+#include "codegen/CodegenMetadata.h"
+
 string LgsLong::prettyName() const {
     return name;
 }

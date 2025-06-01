@@ -6,17 +6,17 @@ string LgsVarDec::format(string& indentStr) {
     return indentStr + name + " = ";
 }
 
-void LgsVarDec::createIRStmt(CodegenMetadata* metadata) {
-    auto& builder = metadata->builder;
+void LgsVarDec::createIRStmt(Module* module) {
+
     const auto IRType = type->getIRType();
-    const auto exprIRValue = expr->getIRValue(metadata);
+    const auto exprIRValue = expr->getIRValue(module);
     if (IRType->isArrayTy() || IRType->isPointerTy() || IRType->isVoidTy()) {
         IRValue = exprIRValue;
     } else {
         IRValue = builder.CreateAlloca(IRType);
         if (shouldLoadIRArg(exprIRValue)) {
             const auto artIRType = expr->type->getIRType();
-            const auto value = metadata->builder.CreateLoad(artIRType, exprIRValue);
+            const auto value = builder.CreateLoad(artIRType, exprIRValue);
             builder.CreateStore(value, IRValue);
         } else {
             builder.CreateStore(exprIRValue, IRValue);

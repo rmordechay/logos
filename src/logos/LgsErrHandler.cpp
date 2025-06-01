@@ -1,8 +1,7 @@
 #include "logos/LgsErrHandler.h"
-#include "logos/LgsGlobals.h"
+#include "LgsLocation.h"
+#include "codegen/CodegenMetadata.h"
 #include <iostream>
-
-#define ERROR_STR "\033[1;31mError:\033[0m "
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;

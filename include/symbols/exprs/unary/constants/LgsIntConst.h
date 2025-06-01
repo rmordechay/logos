@@ -9,21 +9,21 @@ public:
 
     explicit LgsIntConst(const int value) : LgsConstExpr(&LGS_INT), value(value) {}
     string prettyName() override;
-    Value* createIRValue(CodegenMetadata* metadata) override;
+    Value* createIRValue(Module* module) override;
     LgsExpr* convertExpr(LgsType* other) override;
-    Value* eqIR(CodegenMetadata* metadata, LgsExpr* other) override;
-    Value* neIR(CodegenMetadata* metadata, LgsExpr* other) override;
-    Value* gtIR(CodegenMetadata* metadata, LgsExpr* other) override;
-    Value* ltIR(CodegenMetadata* metadata, LgsExpr* other) override;
-    Value* geIR(CodegenMetadata* metadata, LgsExpr* other) override;
-    Value* leIR(CodegenMetadata* metadata, LgsExpr* other) override;
-    Value* andIR(CodegenMetadata* metadata, LgsExpr* other) override;
-    Value* orIR(CodegenMetadata* metadata, LgsExpr* other) override;
-    Value* bitAndIR(CodegenMetadata* metadata, LgsExpr* other) override;
-    Value* bitOrIR(CodegenMetadata* metadata, LgsExpr* other) override;
-    Value* bitXorIR(CodegenMetadata* metadata, LgsExpr* other) override;
-    Value* rshiftIR(CodegenMetadata* metadata, LgsExpr* other) override;
-    Value* lshiftIR(CodegenMetadata* metadata, LgsExpr* other) override;
+    Value* eqIR(Module* module, LgsExpr* other) override;
+    Value* neIR(Module* module, LgsExpr* other) override;
+    Value* gtIR(Module* module, LgsExpr* other) override;
+    Value* ltIR(Module* module, LgsExpr* other) override;
+    Value* geIR(Module* module, LgsExpr* other) override;
+    Value* leIR(Module* module, LgsExpr* other) override;
+    Value* andIR(Module* module, LgsExpr* other) override;
+    Value* orIR(Module* module, LgsExpr* other) override;
+    Value* bitAndIR(Module* module, LgsExpr* other) override;
+    Value* bitOrIR(Module* module, LgsExpr* other) override;
+    Value* bitXorIR(Module* module, LgsExpr* other) override;
+    Value* rshiftIR(Module* module, LgsExpr* other) override;
+    Value* lshiftIR(Module* module, LgsExpr* other) override;
     LgsExpr* clone() override;
     ~LgsIntConst() override = default;
 };

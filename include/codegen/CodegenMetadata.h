@@ -14,6 +14,7 @@ using namespace nlohmann;
 inline LLVMContext context;
 inline LgsActiveEnv activeEnv;
 inline map<string, Module*> IRModules;
+inline auto builder = IRBuilder(context);
 inline TargetMachine* targetMachine = nullptr;
 inline string targetTriple = sys::getDefaultTargetTriple();
 
@@ -26,25 +27,6 @@ Type* const voidTy = Type::getVoidTy(context);
 Value* const i32Zero = ConstantInt::get(i32Ty, 0);
 PointerType* const ptrTy = PointerType::get(i8Ty, 0);
 Value* const null = ConstantPointerNull::get(ptrTy);
-
-struct CodegenMetadata {
-    LgsRuntime runtime;
-    Module* module;
-    IRBuilder<> builder = IRBuilder(context);
-};
-
-struct Location {
-    size_t lineNumber{};
-    size_t posInLine{};
-
-    string lineNumberStr() const {
-        return to_string(lineNumber);
-    }
-
-    string getFullPath(const filesystem::path& path) const {
-        return path.string() + ":" + lineNumberStr() + ":" + to_string(posInLine);
-    }
-};
 
 inline FunctionCallee getPrintf(Module* module) {
     const auto printfType = FunctionType::get(i32Ty, {ptrTy}, true);

@@ -1,7 +1,7 @@
 #include "exprs/unary/constants/LgsLongConst.h"
 
-Value* LgsLongConst::createIRValue(CodegenMetadata* metadata) {
-    return metadata->builder.getInt64(value);
+Value* LgsLongConst::createIRValue(Module* module) {
+    return builder.getInt64(value);
 }
 
 LgsExpr* LgsLongConst::convertExpr(LgsType* other) {

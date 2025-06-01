@@ -99,3 +99,16 @@ StructType* getIRStructType(const string& name, const vector<Type*>& fields) {
     }
     return struct_;
 }
+
+Value* getIRStr(Module* module, const string& value) {
+    for (auto& globals : module->globals()) {
+        if (!globals.hasInitializer()) continue;
+        const auto dataArray = dyn_cast<ConstantDataArray>(globals.getInitializer());
+        if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
+        return &globals;
+    }
+    const auto strConstant = ConstantDataArray::getString(context, value, true);
+    const auto globalVariable = new GlobalVariable(*module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
+    globalVariable->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
+    return globalVariable;
+}

@@ -1,28 +1,19 @@
 #include "LgsValue.h"
 #include "funcs/LgsFunc.h"
+#include "logos/LgsGlobals.h"
 #include "json/json.hpp"
 
-void LgsValue::startBlock(CodegenMetadata* metadata, BasicBlock* const block) const {
-    const auto IRFunc = metadata->runtime.getCurrentFunc()->getIRFunc(metadata);
+void LgsValue::startBlock(Module* module, BasicBlock* const block) const {
+    const auto IRFunc = runtime.getCurrentFunc()->getIRFunc(module);
     block->insertInto(IRFunc);
-    metadata->builder.SetInsertPoint(block);
+    builder.SetInsertPoint(block);
 }
 
-void LgsValue::startBlockFunc(CodegenMetadata* metadata) const {
-    const auto currentFunc = metadata->runtime.getCurrentFunc();
-    currentFunc->entryBlock->insertInto(currentFunc->getIRFunc(metadata));
-    metadata->builder.SetInsertPoint(currentFunc->entryBlock);
-}
-
-Value* LgsValue::getIRStr(Module* module, const string& value) const {
-    for (auto& globals : module->globals()) {
-        if (!globals.hasInitializer()) continue;
-        const auto dataArray = dyn_cast<ConstantDataArray>(globals.getInitializer());
-        if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
-        return &globals;
-    }
-    const auto strConstant = ConstantDataArray::getString(context, value, true);
-    return new GlobalVariable(*module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
+void LgsValue::startBlockFunc(Module* module) const {
+    const auto currentFunc = runtime.getCurrentFunc();
+    const auto entryBlock = BasicBlock::Create(context, "entry");
+    entryBlock->insertInto(currentFunc->getIRFunc(module));
+    builder.SetInsertPoint(entryBlock);
 }
 
 string LgsValue::format(string& indentStr) {
@@ -33,10 +24,10 @@ BasicBlock* LgsValue::createBasicBlock(const char* name) const {
     return BasicBlock::Create(context, name);
 }
 
-Value* LgsValue::hashIRValue(CodegenMetadata* metadata, Value* value) const {
+Value* LgsValue::hashIRValue(Module* module, Value* value) const {
     const auto hashValueIRFuncType = FunctionType::get(i32Ty, {ptrTy}, false);
-    const auto func = metadata->module->getOrInsertFunction("hash_Str", hashValueIRFuncType);
-    return metadata->builder.CreateCall(func, {value});
+    const auto func = module->getOrInsertFunction("hash_Str", hashValueIRFuncType);
+    return builder.CreateCall(func, {value});
 }
 
 json LgsValue::asJSON() {

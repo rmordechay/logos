@@ -14,11 +14,11 @@ public:
         setType(&arrType);
         arrType.baseType = baseType;
     }
-    Value* getLength(CodegenMetadata* metadata) override;
-    Value* createIRValue(CodegenMetadata* metadata) override;
-    Value* createConstArray(CodegenMetadata* metadata) const;
-    Value* createDynArray(CodegenMetadata* metadata);
-    void free() override;
+    Value* getLength(Module* module) override;
+    Value* createIRValue(Module* module) override;
+    Value* createConstArray(Module* module) const;
+    Value* createDynArray(Module* module);
+    void free(Module* module) override;
     ~LgsArrayExpr() override = default;
 };
 

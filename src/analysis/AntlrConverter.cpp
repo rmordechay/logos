@@ -38,6 +38,7 @@
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsPatternMatch.h"
+#include "stmts/LgsVarDec.h"
 #include "types/array/LgsArray.h"
 #include "types/map/LgsMap.h"
 #include "types/LgsUnknownType.h"

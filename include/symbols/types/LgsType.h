@@ -4,6 +4,9 @@
 #include <string>
 #include <map>
 
+class LgsFuncType;
+class LgsInterface;
+class LgsObject;
 using namespace std;
 using namespace llvm;
 class LgsBool;
@@ -47,7 +50,7 @@ public:
 
     virtual size_t getSize();
     virtual bool equals(LgsType& other);
-    virtual json asJSON() const;
+    virtual nlohmann::json asJSON() const;
     virtual string getStrFormatPart() const;
     virtual Type* getIRType() = 0;
     virtual string getIRName() = 0;
