@@ -5,6 +5,7 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "exprs/LgsExpr.h"
+#include "types/array/LgsArray.h"
 
 void LgsFunc::generateIRCode(Module* module) {
     runtime.enterFunc(this);
@@ -30,8 +31,8 @@ Value* LgsFunc::call(Module* module, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
     int iterStart = funcType.isStatic;
     bool isObjReturn = false;
-    if (const auto obj = funcType.rt->asObject()) {
-        const auto objRtPtr = builder.CreateAlloca(obj->getIRType(), nullptr);
+    if (funcType.rt->asObject() || funcType.rt->asArray()) {
+        const auto objRtPtr = builder.CreateAlloca(funcType.rt->getIRType(), nullptr);
         IRArgs.push_back(objRtPtr);
         isObjReturn = true;
         iterStart++;
@@ -85,9 +86,9 @@ Function* LgsFunc::getIRFunc(Module* module) {
     auto func = module->getOrInsertFunction(funcType.getIRName(), funcIRType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
     auto args = IRFunc->arg_begin();
-    if (const auto obj = funcType.rt->asObject()) {
+    if (funcType.rt->asObject() || funcType.rt->asArray()) {
         AttrBuilder builder(context);
-        builder.addStructRetAttr(obj->getIRType());
+        builder.addStructRetAttr(funcType.rt->getIRType());
         args->addAttrs(builder);
         args->setName("rt");
         args++;
@@ -96,8 +97,7 @@ Function* LgsFunc::getIRFunc(Module* module) {
     for (int i = 0; i < funcType.params.size(); ++i) {
         const auto param = funcType.params[i];
         if (param->isVariadic) {
-            args->setName("argc");
-            args++;
+            args++->setName("argc");
         } else {
             param->setIRValue(args);
         }
@@ -125,8 +125,10 @@ FunctionType* LgsFunc::getIRFuncType(const Module* module) {
     }
 
     Type* rt = nullptr;
-    if (const auto obj = funcType.rt->asObject()) {
-        IRParamsTypes.insert(IRParamsTypes.begin(), PointerType::get(obj->getIRType(), 0));
+    Type* allocatedType = nullptr;
+    if (funcType.rt->asObject() || funcType.rt->asArray()) {
+        allocatedType = funcType.rt->getIRType();
+        IRParamsTypes.insert(IRParamsTypes.begin(), PointerType::get(allocatedType, 0));
         rt = voidTy;
     } else {
         rt = funcType.rt->getIRType();

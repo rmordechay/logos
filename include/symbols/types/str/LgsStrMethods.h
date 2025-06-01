@@ -18,6 +18,7 @@ public:
         funcType.isVariadic = true;
         funcType.isPublic = true;
         funcType.params = {&self};
+        IRGenerated = true;
     }
 
     Value* call(Module* module, const vector<LgsExpr*>& args) override {
@@ -48,6 +49,7 @@ public:
         funcType.IRName = "strlen";
         funcType.params = {&self};
         funcType.isPublic = true;
+        IRGenerated = true;
     }
 };
 

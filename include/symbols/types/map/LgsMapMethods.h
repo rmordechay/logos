@@ -37,6 +37,8 @@ public:
     explicit LgsMapAddFunc(LgsType* parent) : LgsMethodImpl("add", parent->getIRName(), &LGS_VOID) {
         self.type = parent;
         funcType.params = {&self, &keyParam, &valueParam};
+        funcType.isPublic = true;
+        IRGenerated = true;
     }
 };
 
@@ -58,6 +60,7 @@ public:
         self.type = parent;
         funcType.params = {&self};
         funcType.isPublic = true;
+        IRGenerated = true;
     }
 };
 
