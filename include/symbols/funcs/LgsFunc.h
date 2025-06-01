@@ -19,7 +19,7 @@ public:
     bool IRGenerated = false;
     string path;
 
-    explicit LgsFunc() {
+    explicit LgsFunc(const bool IRGenerated = false): IRGenerated(IRGenerated) {
         type = &funcType;
     }
     Value* createIRValue(Module* module) override;

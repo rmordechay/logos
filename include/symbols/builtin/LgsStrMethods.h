@@ -7,7 +7,6 @@
 
 #define BUFFER_SIZE 1024
 
-
 class LgsStrFormatFunc final : public LgsMethodImpl {
 public:
     LgsParam self{};

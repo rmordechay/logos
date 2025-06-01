@@ -2,7 +2,7 @@
 #define LGSMAPMETHODS_H
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
-#include "types/str/LgsStr.h"
+#include "../types/LgsStr.h"
 #include "types/primitives/LgsVoid.h"
 #include "funcs/LgsMethodImpl.h"
 

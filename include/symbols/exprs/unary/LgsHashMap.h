@@ -1,7 +1,7 @@
 #ifndef LGSHASHMAP_H
 #define LGSHASHMAP_H
 #include "LgsUnaryExpr.h"
-#include "types/map/LgsMap.h"
+#include "../../types/LgsMap.h"
 
 class LgsMapPair final {
 public:

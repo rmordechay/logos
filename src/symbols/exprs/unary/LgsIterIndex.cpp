@@ -1,6 +1,6 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
-#include "types/map/LgsMap.h"
+#include "../../../../include/symbols/types/LgsMap.h"
 #include <exprs/unary/LgsArrayExpr.h>
 
 Value* LgsIterIndex::createIRValue(Module* module) {

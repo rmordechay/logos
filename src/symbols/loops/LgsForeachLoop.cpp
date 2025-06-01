@@ -2,7 +2,7 @@
 #include "stmts/LgsVarDec.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "stmts/LgsStmtBlock.h"
-#include "types/array/LgsArray.h"
+#include "../../../include/symbols/types/LgsArray.h"
 
 Value* LgsForeachLoop::loopStart(Module* module) {
     return i32Zero;

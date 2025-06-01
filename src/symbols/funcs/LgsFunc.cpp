@@ -5,7 +5,7 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "exprs/LgsExpr.h"
-#include "types/array/LgsArray.h"
+#include "../../../include/symbols/types/LgsArray.h"
 
 void LgsFunc::generateIRCode(Module* module) {
     runtime.enterFunc(this);

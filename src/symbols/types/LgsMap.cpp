@@ -1,4 +1,4 @@
-#include "types/map/LgsMap.h"
+#include "../../../include/symbols/types/LgsMap.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "stmts/LgsVarDec.h"
 

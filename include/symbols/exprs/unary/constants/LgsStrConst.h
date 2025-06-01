@@ -2,7 +2,7 @@
 #define LOGOSSTRINGCONST_H
 #include "LgsConstExpr.h"
 #include "LgsIntConst.h"
-#include "types/str/LgsStr.h"
+#include "../../../types/LgsStr.h"
 #include <string>
 
 class LgsStrConst final : public LgsConstExpr {

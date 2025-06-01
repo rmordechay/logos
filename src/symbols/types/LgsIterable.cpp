@@ -4,7 +4,7 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
-#include "types/array/LgsArray.h"
+#include "../../../include/symbols/types/LgsArray.h"
 
 Type* LgsIterable::getIRType() {
     if (IRType) return IRType;

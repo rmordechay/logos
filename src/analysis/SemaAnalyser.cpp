@@ -30,7 +30,7 @@
 #include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsVarDec.h"
-#include "types/array/LgsArray.h"
+#include "../../include/symbols/types/LgsArray.h"
 #include "types/primitives/LgsVoid.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsForLoop.h>

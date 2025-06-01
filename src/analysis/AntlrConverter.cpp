@@ -39,12 +39,12 @@
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsVarDec.h"
-#include "types/array/LgsArray.h"
-#include "types/map/LgsMap.h"
+#include "types/LgsArray.h"
+#include "types/LgsMap.h"
 #include "types/LgsUnknownType.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
-#include <types/str/LgsStr.h>
+#include <types/LgsStr.h>
 #include <types/primitives/LgsVoid.h>
 
 LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath) {
