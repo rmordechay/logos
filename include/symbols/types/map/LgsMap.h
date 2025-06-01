@@ -11,12 +11,11 @@ class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "Map";
     LgsPair kvType;
-    LgsMapNewFunc new_{this};
+    LgsMapInitFunc init{this};
     LgsMapGetFunc get{this};
     LgsMapAddFunc add{this};
-    LgsMapDeleteFunc delete_{this};
     LgsMapLenFunc len{this};
-    StructType* mapStruct = StructType::create(context, {ptrTy, i64Ty, i32Ty}, name);
+    LgsMapDeleteFunc delete_{this};
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&kvType) {
         kvType.key = keyType;
@@ -24,6 +23,7 @@ public:
         unpackLength = 2;
         addMethod(&len);
     }
+    StructType* getIRStructType() const;
     void setBaseType(const vector<LgsMapPair*>& exprs);
     Type* getIRType() override;
     string getIRName() override;

@@ -1,11 +1,9 @@
 #ifndef LOGOSFUNC_H
 #define LOGOSFUNC_H
-#include "LgsValue.h"
-#include "exprs/LgsExpr.h"
 #include "exprs/unary/LgsUnaryExpr.h"
-#include "stmts/LgsStmtBlock.h"
 #include "types/LgsFuncType.h"
 
+class LgsStmtBlock;
 class LgsParam;
 class LgsExpr;
 class LgsStmt;
@@ -13,13 +11,12 @@ class LgsType;
 
 class LgsFunc : public LgsUnaryExpr {
 public:
-    string path;
     LgsFuncType funcType;
     vector<LgsVariable*> refs;
     LgsStmtBlock* stmtBlock = nullptr;
     FunctionType* IRFuncType = nullptr;
     BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
-    Instruction* returnAddr = nullptr;
+    string path;
 
     explicit LgsFunc() {
         type = &funcType;

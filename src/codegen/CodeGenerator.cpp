@@ -5,6 +5,8 @@
 #include "logos/Platform.h"
 #include "funcs/LgsFuncImpl.h"
 #include "funcs/LgsMethodImpl.h"
+#include "stmts/LgsStmtBlock.h"
+
 #include <files/LgsMainFile.h>
 #include <ranges>
 #include <llvm/Support/FileSystem.h>
@@ -16,6 +18,7 @@ void CodeGenerator::generate(LgsMainFile* mainFile) {
     init();
     const auto module = createEmptyModule(LOGOS_MAIN_FILE_NAME);
     auto metadata = CodeGenMetadata{.module = module};
+    metadata.runtime.stage = LGS_RUNTIME;
     for (const auto [_, func] : mainFile->funcs) {
         func->generateIRCode(&metadata);
     }
@@ -24,27 +27,28 @@ void CodeGenerator::generate(LgsMainFile* mainFile) {
     generateMainFunc(&metadata, mainFile->mainFunc);
 }
 
+void CodeGenerator::generateObjModule(const LgsType* obj) {
+    const auto objName = obj->prettyName();
+    if (IRModules.find(objName) != IRModules.end()) return;
+    auto metadata = CodeGenMetadata{.module = createEmptyModule(objName)};
+    metadata.runtime.stage = LGS_RUNTIME;
+    for (const auto& [_, method] : obj->methods) {
+        method->generateIRCode(&metadata);
+    }
+    writeIRToFile(metadata.module, objName);
+}
+
 void CodeGenerator::generateMainFunc(CodeGenMetadata* metadata, LgsFuncImpl* mainFunc) {
     createIRMainFunc(metadata);
-    metadata->lgsStack.enterScope(mainFunc);
+    metadata->runtime.enterScope(mainFunc);
     mainFunc->startBlockFunc(metadata);
     mainFunc->stmtBlock->createIRValue(metadata);
     if (mainFunc->funcType.rt->isVoid) {
         metadata->builder.CreateRetVoid();
     }
-    metadata->lgsStack.exitScope();
+    metadata->runtime.exitScope();
     metadata->builder.CreateRet(metadata->builder.getInt32(EXIT_SUCCESS));
     writeIRToFile(metadata->module, LOGOS_MAIN_FILE_NAME);
-}
-
-void CodeGenerator::generateObjModule(const LgsType* obj) {
-    const auto objName = obj->prettyName();
-    if (IRModules.find(objName) != IRModules.end()) return;
-    auto metadata = CodeGenMetadata{.module = createEmptyModule(objName)};
-    for (const auto& [_, method] : obj->methods) {
-        method->generateIRCode(&metadata);
-    }
-    writeIRToFile(metadata.module, objName);
 }
 
 void CodeGenerator::createIRMainFunc(const CodeGenMetadata* metadata) {

@@ -3,6 +3,8 @@
 #include "LgsUnaryExpr.h"
 #include <LgsValue.h>
 
+class LgsMap;
+class LgsArray;
 struct LgsIndex;
 
 class LgsIterIndex final : public LgsUnaryExpr {

@@ -1,10 +1,10 @@
 #ifndef CODEGENMETADATA_H
 #define CODEGENMETADATA_H
 
-#include <logos/LgsStack.h>
+#include "logos/LgsActiveEnv.h"
+#include <logos/LgsRuntime.h>
 #include <json/json.hpp>
 #include <llvm/IR/IRBuilder.h>
-#include <llvm/MC/TargetRegistry.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/TargetParser/Host.h>
 
@@ -28,7 +28,7 @@ PointerType* const ptrTy = PointerType::get(i8Ty, 0);
 Value* const null = ConstantPointerNull::get(ptrTy);
 
 struct CodeGenMetadata {
-    LgsStack lgsStack;
+    LgsRuntime runtime;
     Module* module;
     IRBuilder<> builder = IRBuilder(context);
 };
@@ -39,6 +39,10 @@ struct Location {
 
     string lineNumberStr() const {
         return to_string(lineNumber);
+    }
+
+    string getFullPath(const filesystem::path& path) const {
+        return path.string() + ":" + lineNumberStr() + ":" + to_string(posInLine);
     }
 };
 

@@ -5,13 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
-include(ProcessorCount)
-ProcessorCount(CPU_COUNT)
-set(CMAKE_BUILD_PARALLEL_LEVEL ${CPU_COUNT})
-
 file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS include/*.h)
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
-add_library(lib ${HEADER_FILES} ${SOURCE_FILES})
+add_library(lib ${SOURCE_FILES})
 
 target_include_directories(lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -41,7 +37,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 endif()
 
-add_executable(lgs main.cpp
-    include/symbols/funcs/LgsMainFunc.h)
+add_executable(lgs main.cpp)
 target_link_libraries(lgs PRIVATE lib)
 # add_subdirectory(tests)

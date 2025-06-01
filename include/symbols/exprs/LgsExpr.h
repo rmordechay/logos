@@ -69,7 +69,7 @@ public:
     virtual Value* bitXorIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* rshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
     virtual Value* lshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
-    ~LgsExpr() override = default;
+    virtual ~LgsExpr() override = default;
 };
 
 #endif //LOGOSEXPR_H

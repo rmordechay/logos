@@ -36,6 +36,7 @@ Value* LgsArrayExpr::createDynArray(CodeGenMetadata* metadata) {
 
 void LgsArrayExpr::free() {
     if (arrType.isStatic) return;
+
 }
 
 Value* LgsArrayExpr::getLength(CodeGenMetadata* metadata) {

@@ -12,7 +12,7 @@ string LgsInstance::getName() {
 
 Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
     const auto IRType = obj->getIRType();
-    const auto currentFunc = metadata->lgsStack.currentFunc->getIRFunc(metadata);
+    const auto currentFunc = metadata->runtime.getCurrentFunc()->getIRFunc(metadata);
     auto& builder = metadata->builder;
     // TODO cover all cases
     if (isSelf || isReturnValue) {

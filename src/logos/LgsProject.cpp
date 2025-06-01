@@ -6,6 +6,7 @@
 #include "analysis/AntlrConverter.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsAppFile.h"
+#include "files/LgsObjectFile.h"
 #include "logos/LgsGlobals.h"
 #include "logos/Logos.h"
 #include "parser/LogosLexer.h"
@@ -55,7 +56,7 @@ void LogosProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
 }
 
 void LogosProject::parseSrcFile(path entry) {
-    const auto absFilePath = canonical(entry);
+    const path absFilePath = canonical(entry);
     AntlerConverter antlerConverter;
     antlerConverter.errHandler.filePath = absFilePath;
 
@@ -84,7 +85,7 @@ void LogosProject::parseEnvFile(path fileEntry) {
     LogosLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    auto file = antlerConverter.getEnvFile(parser.logosEnvFile(), absFilePath);
+    auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
     lock_guard lock(projectMtx);
     envFiles.emplace_back(file);
     errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
@@ -124,7 +125,7 @@ void LogosProject::parseAppFile(path fileEntry) {
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
 
-    appFile = antlerConverter.getAppFile(parser.logosAppFile(), absFilePath);
+    appFile = antlerConverter.getAppFile(parser.logosAppFile());
     for (const auto& varDec : appFile->varDecs) {
         if (varDec->name == "name") {
             name = varDec->expr->asStrConst()->value;

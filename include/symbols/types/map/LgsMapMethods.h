@@ -6,12 +6,12 @@
 #include "types/primitives/LgsVoid.h"
 #include "funcs/LgsMethodImpl.h"
 
-class LgsMapNewFunc final : public LgsMethodImpl {
+class LgsMapInitFunc final : public LgsMethodImpl {
 public:
     LgsParam self{};
     LgsParam valueSizeParam{&LGS_INT};
 
-    explicit LgsMapNewFunc(LgsType* parent) : LgsMethodImpl("init", parent->getIRName(), &LGS_VOID) {
+    explicit LgsMapInitFunc(LgsType* parent) : LgsMethodImpl("init", parent->getIRName(), &LGS_VOID) {
         self.type = parent;
         funcType.params = {&self, &valueSizeParam};
     }

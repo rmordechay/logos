@@ -2,13 +2,16 @@
 #define LOGOSMETADATA_H
 #include <json/json.hpp>
 #include <lld/Common/Driver.h>
-
 class CodeGenerator;
-class LgsStack;
-
+class LgsRuntime;
 using namespace std;
 using namespace nlohmann;
 using namespace llvm;
+
+enum LgsStage {
+    LGS_ANALYSIS,
+    LGS_RUNTIME,
+};
 
 #define LOGOS_FILE_EXTENSION ".lgs"
 #define LOGOS_SRC_DIR "src"

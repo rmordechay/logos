@@ -1,13 +1,7 @@
 #ifndef LOGOSUNARYEXPR_H
 #define LOGOSUNARYEXPR_H
 #include "exprs/LgsExpr.h"
-#include <types/LgsType.h>
 #include <string>
-
-enum LgsExprType {
-    INSTANCE,
-    INSTANCE2,
-};
 
 class LgsUnaryExpr : public LgsExpr {
 public:

@@ -1,13 +1,10 @@
 #ifndef CODEGENERATION_H
 #define CODEGENERATION_H
 
+#include "codegen/CodeGenMetadata.h"
 #include <Token.h>
 #include <llvm/IR/Value.h>
-#include "codegen/CodeGenMetadata.h"
-
 #include <json/json.hpp>
-
-struct CodeGenMetadata;
 
 class LgsValue {
 public:
@@ -18,7 +15,6 @@ public:
     BasicBlock* createBasicBlock(const char* name) const;
     void startBlock(CodeGenMetadata* metadata, BasicBlock* block) const;
     void startBlockFunc(CodeGenMetadata* metadata) const;
-    void exitBlockFunc(CodeGenMetadata* metadata) const;
     Value* getIRStr(Module* module, const std::string& value) const;
     Value* hashIRValue(CodeGenMetadata* metadata, Value* value) const;
     virtual string format(string& indentStr);

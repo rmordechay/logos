@@ -1,35 +1,17 @@
 #include "LgsValue.h"
 #include "funcs/LgsFunc.h"
 #include "json/json.hpp"
-#include <TokenSource.h>
-
-void LgsValue::setLocation(const antlr4::Token* ctx) {
-    location.lineNumber = ctx->getLine();
-    location.posInLine = ctx->getCharPositionInLine() + 1;
-}
 
 void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) const {
-    const auto IRFunc = metadata->lgsStack.currentFunc->getIRFunc(metadata);
+    const auto IRFunc = metadata->runtime.getCurrentFunc()->getIRFunc(metadata);
     block->insertInto(IRFunc);
     metadata->builder.SetInsertPoint(block);
 }
 
 void LgsValue::startBlockFunc(CodeGenMetadata* metadata) const {
-    const auto returnFunc = metadata->lgsStack.returnFunc;
-    if (returnFunc) {
-        const auto instructions = metadata->builder.GetInsertBlock();
-        returnFunc->returnAddr = &instructions->back();
-    }
-    const auto currentFunc = metadata->lgsStack.currentFunc;
+    const auto currentFunc = metadata->runtime.getCurrentFunc();
     currentFunc->entryBlock->insertInto(currentFunc->getIRFunc(metadata));
     metadata->builder.SetInsertPoint(currentFunc->entryBlock);
-}
-
-void LgsValue::exitBlockFunc(CodeGenMetadata* metadata) const {
-    const auto returnFunc = metadata->lgsStack.returnFunc;
-    if (returnFunc) {
-        metadata->builder.SetInsertPoint(returnFunc->entryBlock, returnFunc->returnAddr->getIterator());
-    }
 }
 
 Value* LgsValue::getIRStr(Module* module, const string& value) const {
@@ -59,6 +41,11 @@ Value* LgsValue::hashIRValue(CodeGenMetadata* metadata, Value* value) const {
 
 json LgsValue::asJSON() {
     assert(false);
+}
+
+void LgsValue::setLocation(const antlr4::Token* ctx) {
+    location.lineNumber = ctx->getLine();
+    location.posInLine = ctx->getCharPositionInLine() + 1;
 }
 
 void LgsValue::setIRValue(Value* value) {

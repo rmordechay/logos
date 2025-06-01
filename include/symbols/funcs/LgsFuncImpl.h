@@ -1,9 +1,7 @@
 #ifndef LOGOSFUNCIMPL_H
 #define LOGOSFUNCIMPL_H
-#include "data/LgsDefinitions.h"
 #include "LgsFunc.h"
 #include "types/LgsFuncType.h"
-#include "types/primitives/LgsInt.h"
 
 class LgsFuncImpl : public LgsFunc {
 public:

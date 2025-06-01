@@ -5,7 +5,7 @@
 #include <json/json.hpp>
 
 
-class LgsStack;
+class LgsRuntime;
 using namespace std;
 using namespace nlohmann;
 

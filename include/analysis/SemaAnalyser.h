@@ -1,7 +1,7 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
 #include "logos/LgsErrHandler.h"
-#include "logos/LgsStack.h"
+#include "logos/LgsRuntime.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "files/LgsMainFile.h"
 #include "stmts/LgsBreakStmt.h"
@@ -29,7 +29,7 @@ bool resolveGlobalTypes(const vector<LgsFile*>& files);
 
 class SemaAnalyser final {
 public:
-    LgsStack lgsStack;
+    LgsRuntime lgsRuntime;
     LgsFile* file = nullptr;
     LgsErrHandler errHandler;
 

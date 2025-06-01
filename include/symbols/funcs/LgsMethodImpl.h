@@ -1,6 +1,7 @@
 #ifndef LOGOSMETHODIMPL_H
 #define LOGOSMETHODIMPL_H
 #include "LgsFunc.h"
+#include "types/LgsFuncType.h"
 
 class LgsMethodImpl : public LgsFunc {
 public:

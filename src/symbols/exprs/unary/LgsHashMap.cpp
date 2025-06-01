@@ -4,8 +4,9 @@ Value* LgsHashMap::createIRValue(CodeGenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto valueType = mapType.kvType.value;
     const auto elementSize = builder.getInt32(valueType->getSize());
-    IRValue = builder.CreateAlloca(mapType.mapStruct);
-    mapType.new_.callIR(metadata, {IRValue, elementSize});
+    auto mapStruct = mapType.getIRStructType();
+    IRValue = builder.CreateAlloca(mapStruct);
+    mapType.init.callIR(metadata, {IRValue, elementSize});
     for (const auto element : initialElements) {
         mapType.add.call(metadata, {this, element->key, element->value});
     }
@@ -14,4 +15,12 @@ Value* LgsHashMap::createIRValue(CodeGenMetadata* metadata) {
 
 Value* LgsHashMap::getLength(CodeGenMetadata* metadata) {
     return mapType.len.call(metadata, {this});
+}
+
+StructType* LgsMap::getIRStructType() const {
+    const auto arrStruct = StructType::getTypeByName(context, name);
+    if (!arrStruct) {
+        return StructType::create(context, {ptrTy, i64Ty, i32Ty}, name);
+    }
+    return arrStruct;
 }

@@ -1,18 +1,18 @@
 #include "funcs/LgsFunc.h"
 #include "data/LgsDefinitions.h"
+#include "stmts/LgsStmtBlock.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
 void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
-    metadata->lgsStack.enterScope(this);
+    metadata->runtime.enterScope(this);
     startBlockFunc(metadata);
     IRValue = getIRFunc(metadata);
     stmtBlock->createIRValue(metadata);
     if (funcType.rt->isVoid) {
         metadata->builder.CreateRetVoid();
     }
-    exitBlockFunc(metadata);
-    metadata->lgsStack.exitScope();
+    metadata->runtime.exitScope();
 }
 
 Value* LgsFunc::createIRValue(CodeGenMetadata* metadata) {

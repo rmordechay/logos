@@ -1,6 +1,5 @@
 #ifndef LGSGLOBALS_H
 #define LGSGLOBALS_H
-#include "funcs/LgsParam.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "stmts/LgsVarDec.h"

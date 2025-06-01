@@ -1,13 +1,13 @@
 #include "stmts/LgsIfStmt.h"
 
 void LgsIfStmt::createIRStmt(CodeGenMetadata* metadata) {
-    metadata->lgsStack.enterScope();
+    metadata->runtime.enterScope();
     if (elseBlock || elseIfConds.size() > 0) {
         computeComplexIf(metadata);
     } else {
         computeSimpleIf(metadata);
     }
-    metadata->lgsStack.exitScope();
+    metadata->runtime.exitScope();
 }
 
 
