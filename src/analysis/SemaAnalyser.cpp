@@ -348,7 +348,7 @@ void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) const {
 
 void SemaAnalyser::visitStrConst(LgsStrConst* strConst) const {
     const auto size = new LgsIntConst(strConst->value.size());
-    strConst->strType.dimsExpr = size;
+    strConst->strType.sizeExpr = size;
 }
 
 void SemaAnalyser::visitVariable(LgsVariable* variable) {
@@ -463,6 +463,9 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
 }
 
 void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
+    for (const auto arg : funcCall->args) {
+        visitExpr(arg);
+    }
     const auto symbol = getSymbol(funcCall->name, funcCall);
     if (!symbol) return;
     switch (symbol->type) {
@@ -485,13 +488,6 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
             funcCall->type = func->funcType.rt;
         } else {
             errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->prettyName(), func->prettyName()});
-        }
-        const auto& params = funcCall->func->funcType.params;
-        for (int i = 0; i < params.size(); ++i) {
-            if (i == funcCall->args.size()) break;
-            const auto arg = funcCall->args[i];
-            const auto param = params[i];
-            visitExpr(arg, param->type);
         }
         break;
     }
@@ -607,10 +603,8 @@ void SemaAnalyser::validateExprType(const LgsExpr* expr, LgsType* type) {
         return;
     }
     assert(expr->type);
-    if (type) {
-        if (!expr->type->equals(type)) {
-            return errHandler.handleError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
-        }
+    if (type && !expr->type->equals(type)) {
+        return errHandler.handleError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
     }
 }
 
@@ -694,11 +688,8 @@ LgsType* SemaAnalyser::resolveArrayType(LgsArray* array) {
     if (array->baseType->isUnknown()) {
         array->baseType = resolveType(array->baseType);
     }
-    const auto sizeExpr = array->dimsExpr;
+    const auto sizeExpr = array->sizeExpr;
     visitExpr(sizeExpr);
-    if (sizeExpr && sizeExpr->type->isConst) {
-        array->isStatic = true;
-    }
     return array;
 }
 

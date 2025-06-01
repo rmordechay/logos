@@ -13,7 +13,7 @@ public:
 
     explicit LgsStrConst(const string& value) : LgsConstExpr(&strType), value(value) {
         strType.isStatic = true;
-        strType.dimsExpr = new LgsIntConst(value.size());
+        strType.sizeExpr = new LgsIntConst(value.size());
     }
     Value* getLength(CodeGenMetadata* metadata) override;
     Value* createIRValue(CodeGenMetadata* metadata) override;

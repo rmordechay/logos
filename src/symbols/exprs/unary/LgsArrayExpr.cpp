@@ -39,6 +39,6 @@ void LgsArrayExpr::free() {
 }
 
 Value* LgsArrayExpr::getLength(CodeGenMetadata* metadata) {
-    if (arrType.isStatic) return arrType.dimsExpr->getIRValue(metadata);
+    if (arrType.isStatic) return arrType.sizeExpr->getIRValue(metadata);
     return arrType.len.call(metadata, {this});
 }

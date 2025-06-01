@@ -34,7 +34,7 @@ Value* LgsStr::getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr
 }
 
 Value* LgsStr::getLength(CodeGenMetadata* metadata, Value* iterValue) {
-    if (isStatic) dimsExpr->getIRValue(metadata);
+    if (isStatic) sizeExpr->getIRValue(metadata);
     return len.callIR(metadata, {iterValue});
 }
 

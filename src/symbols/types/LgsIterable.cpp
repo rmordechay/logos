@@ -8,9 +8,9 @@
 
 Type* LgsIterable::getIRType() {
     if (IRType) return IRType;
-    if (!isStatic || !dimsExpr) return ptrTy;
+    if (!isStatic || !sizeExpr) return ptrTy;
     const auto innerIRType = baseType->getIRType();
-    const auto size = getExprConstNumber(dimsExpr);
+    const auto size = getExprConstNumber(sizeExpr);
     IRType = ArrayType::get(innerIRType, size);
     return IRType;
 }

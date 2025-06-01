@@ -1,6 +1,6 @@
 #ifndef LOGOS_H
 #define LOGOS_H
-#include "utils/LgsC.h"
+#include "../extern/LgsC.h"
 #include <filesystem>
 #include "LgsProject.h"
 

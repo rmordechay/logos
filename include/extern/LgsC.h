@@ -23,8 +23,8 @@ public:
         fs = vfs::getRealFileSystem();
     }
 
-    void compile();
-    void parse() const;
+    void compile(const std::vector<std::string>& files);
+    void parse(const std::vector<std::string>& files) const;
     ~LgsC() = default;
 };
 

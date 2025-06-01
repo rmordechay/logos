@@ -10,7 +10,7 @@ public:
     LgsType* baseType;
     bool isStatic = false;
     uint16_t unpackLength = 0;
-    LgsExpr* dimsExpr = nullptr;
+    LgsExpr* sizeExpr = nullptr;
 
     explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}
     Type* getIRType() override;

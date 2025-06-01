@@ -8,18 +8,18 @@
 
 size_t LgsArray::getSize() {
     if (isStatic) {
-        return baseType->getSize() * getExprConstNumber(dimsExpr);
+        return baseType->getSize() * getExprConstNumber(sizeExpr);
     }
     return sizeof(void*);
 }
 
 LgsExpr* LgsArray::getZeroValue() {
     const auto arr = new LgsArrayExpr(baseType->clone());
-    if (dimsExpr) {
-        arr->arrType.isStatic = dimsExpr->type->isConst;
-        arr->arrType.dimsExpr = dimsExpr->clone();
+    if (sizeExpr) {
+        arr->arrType.isStatic = sizeExpr->type->isConst;
+        arr->arrType.sizeExpr = sizeExpr->clone();
     } else {
-        arr->arrType.dimsExpr = new LgsIntConst(INITIAL_ARRAY_CAPACITY);
+        arr->arrType.sizeExpr = new LgsIntConst(INITIAL_ARRAY_CAPACITY);
     }
     return arr;
 }
@@ -48,7 +48,7 @@ StructType* LgsArray::getIRStructType() const {
 
 void LgsArray::inferArrayType(const vector<LgsExpr*>& exprs) {
     baseType = exprs.front()->type;
-    dimsExpr = new LgsIntConst(exprs.size());
+    sizeExpr = new LgsIntConst(exprs.size());
 }
 
 LgsType* LgsArray::inferBinaryType(LgsType* other) {
@@ -60,7 +60,7 @@ void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
 }
 
 Value* LgsArray::getLength(CodeGenMetadata* metadata, Value* iterValue) {
-    if (isStatic) return dimsExpr->getIRValue(metadata);
+    if (isStatic) return sizeExpr->getIRValue(metadata);
     return len.callIR(metadata, {iterValue});
 }
 
@@ -76,13 +76,13 @@ Value* LgsArray::getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* in
 
 LgsType* LgsArray::clone() {
     const auto lgsArray = new LgsArray(baseType);
-    if (dimsExpr) {
-        lgsArray->isStatic = dimsExpr->type->isConst;
-        lgsArray->dimsExpr = dimsExpr;
+    if (sizeExpr) {
+        lgsArray->isStatic = sizeExpr->type->isConst;
+        lgsArray->sizeExpr = sizeExpr;
     }
     return lgsArray;
 }
 
 LgsArray::~LgsArray() {
-    delete dimsExpr;
+    delete sizeExpr;
 }

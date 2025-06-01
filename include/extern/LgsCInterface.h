@@ -17,7 +17,13 @@ public:
     ASTContext* context;
 
     explicit LgsCVisitor(ASTContext* context) : context(context) {}
-    bool VisitFunctionDecl(const FunctionDecl* func) const;
+    bool isConstCharPointer(QualType qt) const;
+    LgsType* mapCType(QualType type);
+    LgsObject* createLgsObj(const RecordDecl* record);
+    bool isValid(SourceLocation loc) const;
+    bool VisitFunctionDecl(const FunctionDecl* func);
+    bool VisitRecordDecl(const RecordDecl* record);
+    ~LgsCVisitor() = default;
 };
 
 class LgsCASTConsumer final : public ASTConsumer {
@@ -26,11 +32,13 @@ public:
 
     explicit LgsCASTConsumer(ASTContext* context) : visitor(context) {}
     void HandleTranslationUnit(ASTContext& context) override;
+    ~LgsCASTConsumer() override = default;
 };
 
 class LgsCFrontendAction final : public ASTFrontendAction {
 public:
     std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance& compilerInstance, StringRef file) override;
+    ~LgsCFrontendAction() override = default;
 };
 
 

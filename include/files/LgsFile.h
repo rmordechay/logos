@@ -15,6 +15,7 @@ public:
     string code;
     string absPath;
     string relPath;
+    vector<string> externFiles;
 
     explicit LgsFile(const string& name, const string& path) : name(name), absPath(path) {}
     virtual void format();

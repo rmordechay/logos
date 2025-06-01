@@ -1,7 +1,11 @@
 grammar Logos;
 
 logosFile:
-        mainFile | objectFile | interfaceFile
+        extern? (mainFile | objectFile | interfaceFile)
+    ;
+
+extern:
+        EXTERN 'C' LBRACE STRING* RBRACE
     ;
 
 logosEnvFile:
@@ -341,7 +345,7 @@ VEC3: 'vec3';
 VEC4: 'vec4';
 
 IMPLEMENTS: 'implements';
-IMPORT: 'import';
+EXTERN: 'extern';
 
 IF: 'if';
 ELSE: 'else';

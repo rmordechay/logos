@@ -7,6 +7,7 @@
 
 using namespace std;
 using namespace llvm;
+using namespace filesystem;
 
 struct LgsPaths {
     path rootDir;
@@ -61,17 +62,17 @@ inline void setPlatform(const string& inputFile, const string& outputFile) {
     platform.arch = ARCH_NAME;
     platform.linkerOpts = {
         platform.linker.c_str(),
+        "-lSystem",
+        "-syslibroot", platform.libRoot.c_str(),
         platform.inputFile.c_str(),
         "../stdlib/lgslib.a",
         "-o", platform.outputFile.c_str(),
-        "-lSystem",
-        "-syslibroot", platform.libRoot.c_str(),
         "-platform_version", platform.osName.c_str(), platform.platformVersion.c_str(), platform.platformVersion.c_str(),
         "-arch", platform.arch.c_str()
     };
     platform.link = lld::macho::link;
 #elif defined(_WIN32)
-    platform.osName = "macos";
+    platform.osName = "Windows";
 #endif
 }
 

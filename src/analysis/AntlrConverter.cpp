@@ -33,7 +33,6 @@
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsHashMap.h"
-#include "logos/LgsConfig.h"
 #include "stmts/LgsPatternMatch.h"
 #include "types/array/LgsArray.h"
 #include "types/map/LgsMap.h"
@@ -53,6 +52,13 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
     }
     if (const auto interfaceFileCtx = ctx->interfaceFile()) {
         file = getInterfaceFile(interfaceFileCtx, filePath);
+    }
+    if (ctx->extern_()) {
+        for (const auto string : ctx->extern_()->STRING()) {
+            auto s = string->getText();
+            cleanStr(s);
+            file->externFiles.push_back(s);
+        }
     }
     file->absPath = filePath;
     file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
@@ -741,7 +747,7 @@ LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
     for (auto it = dims.rbegin(); it != dims.rend(); ++it) {
         const auto array = new LgsArray(type);
         if (const auto sizeExpr = (*it)->expr()) {
-            array->dimsExpr = getExpr(sizeExpr);
+            array->sizeExpr = getExpr(sizeExpr);
         }
         type = array;
     }

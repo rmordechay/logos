@@ -19,6 +19,8 @@ void CodeGenerator::generate(LgsMainFile* mainFile) {
     for (const auto [_, func] : mainFile->funcs) {
         func->generateIRCode(&metadata);
     }
+    LgsC lgsC;
+    lgsC.compile(mainFile->externFiles);
     generateMainFunc(&metadata, mainFile->mainFunc);
 }
 

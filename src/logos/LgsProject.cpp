@@ -22,7 +22,6 @@ bool LogosProject::loadProject(const vector<char*>& args) {
     if (!validateProject()) return false;
     // setupActiveEnv();
     if (!errHandler.successful) return false;
-    lgsC.parse();
     loadFiles();
     if (!errors.empty()) return false;
     if (!resolveGlobalTypes(files)) return false;
@@ -39,93 +38,6 @@ bool LogosProject::validateProject() {
     if (!exists(paths.appFilePath)) {
         errHandler.handleError(E10008, nullptr);
         return false;
-    }
-    return true;
-}
-
-void LogosProject::checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile) {
-    auto found = false;
-    for (const auto& varDec : envFile->varDecs) {
-        if (requireEnvVar.name == varDec->name && requireEnvVar.type->equals(varDec->type)) {
-            found = true;
-            break;
-        }
-    }
-    if (!found) {
-        errHandler.handleError(E10020, nullptr, {envFile->name, requireEnvVar.name});
-    }
-}
-
-void LogosProject::checkDuplicateFiles(const vector<LgsFile*>& files) {
-    map<string, vector<LgsFile*>> duplicates;
-    for (const auto& file : files) {
-        duplicates[file->name].emplace_back(file);
-    }
-    if (duplicates.empty()) return;
-    for (const auto& [name, duplicate] : duplicates) {
-        if (duplicate.size() <= 1) continue;
-        ostringstream errMsg;
-        for (const auto &file : duplicate) {
-            errMsg << "\n\t - " + file->absPath;
-        }
-        errHandler.handleError(E10007, nullptr, {name, errMsg.str()});
-    }
-}
-
-void LogosProject::loadFiles() {
-    thread tSrcFiles([this] { loadSrcFiles(); });
-    thread tGlobals([this] { loadGlobals(); });
-    tSrcFiles.join();
-    tGlobals.join();
-}
-
-void LogosProject::loadSrcFiles() {
-    vector<LgsFile*> files;
-    ThreadPool threadPool;
-    threadPool.start();
-    parseSrcFiles(paths.srcDir, threadPool);
-    threadPool.wait();
-}
-
-void LogosProject::loadEnvFiles() {
-    vector<LgsEnvFile*> files;
-    ThreadPool threadPool;
-    threadPool.start();
-    for (const auto& entry : directory_iterator(paths.envsDir)) {
-        if (!isLogosFile(entry)) continue;
-        threadPool.runTask([entry, this] {
-            parseEnvFile(entry);
-        });
-    }
-    threadPool.wait();
-}
-
-void LogosProject::setupActiveEnv() {
-    setEnvVars();
-    parseAppFile(paths.appFilePath);
-    loadEnvFiles();
-    checkRequiredEnvVars();
-}
-
-bool LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) const {
-    for (const auto& file : files) {
-        SemaAnalyser semaAnalyser(file);
-        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
-            for (const auto& object : mainFile->objects) {
-                semaAnalyser.resolveObjMemberTypes(object);
-            }
-            for (const auto [_, func] : mainFile->funcs) {
-                semaAnalyser.resolveFuncTypes(&func->funcType);
-            }
-        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-            semaAnalyser.resolveObjMemberTypes(objFile->obj);
-        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            auto methods = interfaceFile->interface->methods;
-            for (const auto& [_, method] : methods) {
-                semaAnalyser.resolveFuncTypes(&method->funcType);
-            }
-        }
-        if (!semaAnalyser.errHandler.successful) return false;
     }
     return true;
 }
@@ -159,6 +71,7 @@ void LogosProject::parseSrcFile(path entry) {
     if (file->name == LOGOS_MAIN_FILE_NAME) {
         mainFile = dynamic_cast<LgsMainFile*>(file);
     }
+    lgsC.parse(file->externFiles);
 }
 
 void LogosProject::parseEnvFile(path fileEntry) {
@@ -175,6 +88,29 @@ void LogosProject::parseEnvFile(path fileEntry) {
     lock_guard lock(projectMtx);
     envFiles.emplace_back(file);
     errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
+}
+
+bool LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) const {
+    for (const auto& file : files) {
+        SemaAnalyser semaAnalyser(file);
+        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+            for (const auto& object : mainFile->objects) {
+                semaAnalyser.resolveObjMemberTypes(object);
+            }
+            for (const auto [_, func] : mainFile->funcs) {
+                semaAnalyser.resolveFuncTypes(&func->funcType);
+            }
+        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+            semaAnalyser.resolveObjMemberTypes(objFile->obj);
+        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+            auto methods = interfaceFile->interface->methods;
+            for (const auto& [_, method] : methods) {
+                semaAnalyser.resolveFuncTypes(&method->funcType);
+            }
+        }
+        if (!semaAnalyser.errHandler.successful) return false;
+    }
+    return true;
 }
 
 void LogosProject::parseAppFile(path fileEntry) {
@@ -206,11 +142,68 @@ void LogosProject::loadGlobals() {
     globals.addSymbol(lgsPrint.funcType.name, LgsSymbol(&lgsPrint), &errHandler);
 }
 
+void LogosProject::loadFiles() {
+    thread tSrcFiles([this] { loadSrcFiles(); });
+    thread tGlobals([this] { loadGlobals(); });
+    tSrcFiles.join();
+    tGlobals.join();
+}
+
+void LogosProject::loadSrcFiles() {
+    vector<LgsFile*> files;
+    ThreadPool threadPool;
+    threadPool.start();
+    parseSrcFiles(paths.srcDir, threadPool);
+    threadPool.wait();
+}
+
+void LogosProject::loadEnvFiles() {
+    vector<LgsEnvFile*> files;
+    ThreadPool threadPool;
+    threadPool.start();
+    for (const auto& entry : directory_iterator(paths.envsDir)) {
+        if (!isLogosFile(entry)) continue;
+        threadPool.runTask([entry, this] {
+            parseEnvFile(entry);
+        });
+    }
+    threadPool.wait();
+}
+
 void LogosProject::checkRequiredEnvVars() {
     for (const auto& requireEnvVar : appFile->requireEnvVars) {
         for (const auto envFile : envFiles) {
             checkRequiredEnvVar(requireEnvVar, envFile);
         }
+    }
+}
+
+void LogosProject::checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile) {
+    auto found = false;
+    for (const auto& varDec : envFile->varDecs) {
+        if (requireEnvVar.name == varDec->name && requireEnvVar.type->equals(varDec->type)) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        errHandler.handleError(E10020, nullptr, {envFile->name, requireEnvVar.name});
+    }
+}
+
+void LogosProject::checkDuplicateFiles(const vector<LgsFile*>& files) {
+    map<string, vector<LgsFile*>> duplicates;
+    for (const auto& file : files) {
+        duplicates[file->name].emplace_back(file);
+    }
+    if (duplicates.empty()) return;
+    for (const auto& [name, duplicate] : duplicates) {
+        if (duplicate.size() <= 1) continue;
+        ostringstream errMsg;
+        for (const auto &file : duplicate) {
+            errMsg << "\n\t - " + file->absPath;
+        }
+        errHandler.handleError(E10007, nullptr, {name, errMsg.str()});
     }
 }
 
@@ -224,6 +217,13 @@ void LogosProject::setEnvVars() const {
             activeEnv.envVars[key] = value;
         }
     }
+}
+
+void LogosProject::setupActiveEnv() {
+    setEnvVars();
+    parseAppFile(paths.appFilePath);
+    loadEnvFiles();
+    checkRequiredEnvVars();
 }
 
 void LogosProject::asJSON() const {
