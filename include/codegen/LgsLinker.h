@@ -1,6 +1,6 @@
 #ifndef LOGOSLINKER_H
 #define LOGOSLINKER_H
-#include "codegen/CodeGenMetadata.h"
+#include "codegen/CodegenMetadata.h"
 #include <iostream>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Verifier.h>

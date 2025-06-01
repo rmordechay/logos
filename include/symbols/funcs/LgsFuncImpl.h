@@ -5,9 +5,10 @@
 
 class LgsFuncImpl : public LgsFunc {
 public:
-    explicit LgsFuncImpl(const string& name, LgsType* rt) {
+    explicit LgsFuncImpl(const string& name, LgsType* rt, const vector<LgsParam*>& params = {}) {
         funcType.name = name;
         funcType.rt = rt;
+        funcType.params = params;
     }
 
     explicit LgsFuncImpl(const LgsFuncType* funcType) {

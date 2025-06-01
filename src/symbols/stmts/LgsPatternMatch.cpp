@@ -4,7 +4,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsVarDec.h"
 
-void LgsPatternMatch::createIRStmt(CodeGenMetadata* metadata) {
+void LgsPatternMatch::createIRStmt(CodegenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto func = metadata->runtime.getCurrentFunc()->getIRFunc(metadata);
     const auto exprIRValue = metadata->builder.getInt32(expr->hashValue(metadata));

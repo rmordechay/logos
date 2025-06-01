@@ -26,7 +26,7 @@ public:
     bool isNull = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
-    Value* getIRValue(CodeGenMetadata* metadata);
+    Value* getIRValue(CodegenMetadata* metadata);
     void setType(LgsType* type);
 
     LgsFunc* asFunc();
@@ -49,26 +49,26 @@ public:
     virtual LgsExpr* clone();
     virtual string prettyName();
     virtual LgsExpr* convertExpr(LgsType* type);
-    virtual Value* getLength(CodeGenMetadata* metadata);
-    virtual uint32_t hashValue(CodeGenMetadata* metadata);
-    virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
-    virtual Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) = 0;
-    virtual Value* subIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* mulIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* divIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* neIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* ltIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* gtIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* geIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* leIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* andIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* orIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* bitAndIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* bitOrIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* bitXorIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* rshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* lshiftIR(CodeGenMetadata* metadata, LgsExpr* other);
+    virtual Value* getLength(CodegenMetadata* metadata);
+    virtual uint32_t hashValue(CodegenMetadata* metadata);
+    virtual Value* createIRValue(CodegenMetadata* metadata) = 0;
+    virtual Value* addIR(CodegenMetadata* metadata, LgsExpr* other) = 0;
+    virtual Value* subIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* mulIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* divIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* eqIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* neIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* ltIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* gtIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* geIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* leIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* andIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* orIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* bitAndIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* bitOrIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* bitXorIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* rshiftIR(CodegenMetadata* metadata, LgsExpr* other);
+    virtual Value* lshiftIR(CodegenMetadata* metadata, LgsExpr* other);
     virtual ~LgsExpr() override = default;
 };
 

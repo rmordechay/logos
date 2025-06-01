@@ -2,7 +2,7 @@
 
 #include "exprs/unary/LgsInstance.h"
 
-void LgsReturn::createIRStmt(CodeGenMetadata* metadata) {
+void LgsReturn::createIRStmt(CodegenMetadata* metadata) {
     if (expr->type->asObject()) {
         expr->IRValue = expr->createIRValue(metadata);
         metadata->builder.CreateRetVoid();

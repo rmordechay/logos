@@ -8,7 +8,7 @@ public:
     bool hasReturn = false;
 
     explicit LgsStmtBlock(const vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
-    void createIRValue(CodeGenMetadata* metadata) const;
+    void createIRValue(CodegenMetadata* metadata) const;
     LgsStmt* lastStmt() const;
     string format(string& indentStr) override;
     json asJSON() override;

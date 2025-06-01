@@ -9,7 +9,7 @@ public:
     LgsExpr* z;
     LgsExpr* w;
 
-    Value* createIRValue(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodegenMetadata* metadata) override;
     ~LgsVec4() override = default;
 };
 

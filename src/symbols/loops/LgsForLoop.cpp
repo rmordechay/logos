@@ -3,7 +3,7 @@
 #include "stmts/LgsStmtBlock.h"
 #include "stmts/LgsVarDec.h"
 
-void LgsForLoop::createIRStmt(CodeGenMetadata* metadata) {
+void LgsForLoop::createIRStmt(CodegenMetadata* metadata) {
     initIRLoop(metadata);
     startBlock(metadata, loopCondBlock);
     setLoopIRCondition(metadata);
@@ -13,7 +13,7 @@ void LgsForLoop::createIRStmt(CodeGenMetadata* metadata) {
     exitIRLoop(metadata);
 }
 
-void LgsForLoop::initIRLoop(CodeGenMetadata* metadata) {
+void LgsForLoop::initIRLoop(CodegenMetadata* metadata) {
     metadata->runtime.enterScope();
     metadata->runtime.stack.top().currentLoop = this;
     auto& builder = metadata->builder;
@@ -26,7 +26,7 @@ void LgsForLoop::initIRLoop(CodeGenMetadata* metadata) {
     builder.CreateBr(loopCondBlock);
 }
 
-void LgsForLoop::setLoopIRCondition(CodeGenMetadata* metadata) {
+void LgsForLoop::setLoopIRCondition(CodegenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto iValue = builder.CreateLoad(i32Ty, iPtr);
     const auto upperBound = loopEnd(metadata);
@@ -34,7 +34,7 @@ void LgsForLoop::setLoopIRCondition(CodeGenMetadata* metadata) {
     builder.CreateCondBr(condition, loopBodyBlock, loopExitBlock);
 }
 
-void LgsForLoop::exitIRLoop(CodeGenMetadata* metadata) const {
+void LgsForLoop::exitIRLoop(CodegenMetadata* metadata) const {
     auto& builder = metadata->builder;
     // Increment loop variable
     const auto iValue = builder.CreateLoad(i32Ty, iPtr);

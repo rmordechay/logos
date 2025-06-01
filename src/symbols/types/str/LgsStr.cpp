@@ -27,13 +27,13 @@ LgsType* LgsStr::inferBinaryType(LgsType* other) {
     return this;
 }
 
-Value* LgsStr::getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr) {
+Value* LgsStr::getElement(CodegenMetadata* metadata, Value* iterPtr, Value* iPtr) {
     if (isStatic) assert(false);
     const auto i = metadata->builder.CreateLoad(i32Ty, iPtr);
     return metadata->builder.CreateInBoundsGEP(baseType->getIRType(), iterPtr, {i});
 }
 
-Value* LgsStr::getLength(CodeGenMetadata* metadata, Value* iterValue) {
+Value* LgsStr::getLength(CodegenMetadata* metadata, Value* iterValue) {
     if (isStatic) sizeExpr->getIRValue(metadata);
     return len.callIR(metadata, {iterValue});
 }

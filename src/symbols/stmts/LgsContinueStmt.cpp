@@ -4,7 +4,7 @@
 
 #include <loops/LgsForLoop.h>
 
-void LgsContinueStmt::createIRStmt(CodeGenMetadata* metadata) {
+void LgsContinueStmt::createIRStmt(CodegenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto currentLoop = metadata->runtime.getCurrentLoop();
     const auto loopCondition = currentLoop->loopCondBlock;

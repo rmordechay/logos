@@ -27,7 +27,7 @@ Value* const i32Zero = ConstantInt::get(i32Ty, 0);
 PointerType* const ptrTy = PointerType::get(i8Ty, 0);
 Value* const null = ConstantPointerNull::get(ptrTy);
 
-struct CodeGenMetadata {
+struct CodegenMetadata {
     LgsRuntime runtime;
     Module* module;
     IRBuilder<> builder = IRBuilder(context);

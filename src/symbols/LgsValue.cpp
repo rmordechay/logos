@@ -2,13 +2,13 @@
 #include "funcs/LgsFunc.h"
 #include "json/json.hpp"
 
-void LgsValue::startBlock(CodeGenMetadata* metadata, BasicBlock* const block) const {
+void LgsValue::startBlock(CodegenMetadata* metadata, BasicBlock* const block) const {
     const auto IRFunc = metadata->runtime.getCurrentFunc()->getIRFunc(metadata);
     block->insertInto(IRFunc);
     metadata->builder.SetInsertPoint(block);
 }
 
-void LgsValue::startBlockFunc(CodeGenMetadata* metadata) const {
+void LgsValue::startBlockFunc(CodegenMetadata* metadata) const {
     const auto currentFunc = metadata->runtime.getCurrentFunc();
     currentFunc->entryBlock->insertInto(currentFunc->getIRFunc(metadata));
     metadata->builder.SetInsertPoint(currentFunc->entryBlock);
@@ -33,7 +33,7 @@ BasicBlock* LgsValue::createBasicBlock(const char* name) const {
     return BasicBlock::Create(context, name);
 }
 
-Value* LgsValue::hashIRValue(CodeGenMetadata* metadata, Value* value) const {
+Value* LgsValue::hashIRValue(CodegenMetadata* metadata, Value* value) const {
     const auto hashValueIRFuncType = FunctionType::get(i32Ty, {ptrTy}, false);
     const auto func = metadata->module->getOrInsertFunction("hash_Str", hashValueIRFuncType);
     return metadata->builder.CreateCall(func, {value});

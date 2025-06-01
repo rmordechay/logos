@@ -1,6 +1,6 @@
 #include "exprs/unary/constants/LgsLongConst.h"
 
-Value* LgsLongConst::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsLongConst::createIRValue(CodegenMetadata* metadata) {
     return metadata->builder.getInt64(value);
 }
 

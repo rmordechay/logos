@@ -23,7 +23,7 @@ public:
     LgsBreakStmt* asBreakStmt();
     LgsFuncCall* asFuncCall();
     LgsSelection* asSelection();
-    virtual void createIRStmt(CodeGenMetadata* metadata) = 0;
+    virtual void createIRStmt(CodegenMetadata* metadata) = 0;
     ~LgsStmt() override = default;
 };
 

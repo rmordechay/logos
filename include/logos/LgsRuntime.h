@@ -24,12 +24,12 @@ public:
     stack<LgsStackFrame> stack;
     LgsStage stage = LGS_ANALYSIS;
     LgsFunc* returnFunc = nullptr;
-    // LgsFuncImpl a = LgsFuncImpl("print_stack", &LGS_VOID);
 
     void enterScope(LgsFunc* func = nullptr);
     void exitScope();
     void exitFunc();
     void reset();
+    void printStack(CodegenMetadata* metadata) const;
     LgsFunc* getCurrentFunc();
     LgsForLoop* getCurrentLoop();
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);

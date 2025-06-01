@@ -1,6 +1,7 @@
 #include "logos/LgsRuntime.h"
 #include "logos/LgsGlobals.h"
 #include "funcs/LgsFunc.h"
+#include "funcs/LgsFuncImpl.h"
 
 void LgsRuntime::enterScope(LgsFunc* func) {
     LgsFunc* currentFunc = nullptr;
@@ -31,6 +32,32 @@ void LgsRuntime::reset() {
     while (stack.size() > 0) {
         stack.pop();
     }
+}
+
+// %struct.Runtime = type { %struct.Stack }
+// %struct.Stack = type { i32, [512 x %struct.StackStr] }
+// %struct.StackStr = type { [1024 x i8], i32 }
+//
+// @.str = private unnamed_addr constant [2 x i8] c"1\00", align 1
+// @.str.1 = private unnamed_addr constant [2 x i8] c"2\00", align 1
+// @.str.2 = private unnamed_addr constant [2 x i8] c"3\00", align 1
+// @.str.3 = private unnamed_addr constant [2 x i8] c"4\00", align 1
+//
+// ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+// define i32 @main() #0 {
+//   %1 = alloca %struct.Runtime, align 4
+//   call void @init(ptr noundef %1)
+//   call void @push(ptr noundef %1, ptr noundef @.str)
+//   call void @push(ptr noundef %1, ptr noundef @.str.1)
+//   call void @push(ptr noundef %1, ptr noundef @.str.2)
+//   call void @push(ptr noundef %1, ptr noundef @.str.3)
+//   call void @print_stack(ptr noundef %1)
+//   ret i32 0
+// }
+
+void LgsRuntime::printStack(CodegenMetadata* metadata) const {
+    LgsParam lgsParam(&LGS_INT);
+    auto printStack = LgsFuncImpl("print_stack", &LGS_VOID, {&lgsParam});
 }
 
 LgsFunc* LgsRuntime::getCurrentFunc() {

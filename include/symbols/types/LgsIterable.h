@@ -3,7 +3,7 @@
 #include "LgsType.h"
 
 struct LgsIndex;
-struct CodeGenMetadata;
+struct CodegenMetadata;
 
 class LgsIterable : public LgsType {
 public:
@@ -17,8 +17,8 @@ public:
     LgsType* getIterType(const LgsIndex* index) const;
     virtual LgsType* getBaseType();
     virtual void unpackTypes(const vector<LgsVarDec*>& varDecs);
-    virtual Value* getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr);
-    virtual Value* getLength(CodeGenMetadata* metadata, Value* iterValue);
+    virtual Value* getElement(CodegenMetadata* metadata, Value* iterPtr, Value* iPtr);
+    virtual Value* getLength(CodegenMetadata* metadata, Value* iterValue);
     ~LgsIterable() override = default;
 };
 

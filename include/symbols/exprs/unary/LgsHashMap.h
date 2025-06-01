@@ -22,8 +22,8 @@ public:
         mapType.kvType.key = keyType;
         mapType.kvType.value = valueType;
     }
-    Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* getLength(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodegenMetadata* metadata) override;
+    Value* getLength(CodegenMetadata* metadata) override;
     ~LgsHashMap() override = default;
 };
 

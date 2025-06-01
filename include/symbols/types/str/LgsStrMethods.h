@@ -20,7 +20,7 @@ public:
         funcType.params = {&self};
     }
 
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
+    Value* call(CodegenMetadata* metadata, const vector<LgsExpr*>& args) override {
         auto& builder = metadata->builder;
         const bool isConst = args[0]->type->isConst;
         if (!isConst) assert(false);

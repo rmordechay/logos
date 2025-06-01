@@ -8,10 +8,10 @@ public:
     LgsExpr* rangeEnd = nullptr;
 
     LgsRangeLoop(LgsExpr* rangeStart, LgsExpr* rangeEnd) : rangeStart(rangeStart), rangeEnd(rangeEnd) {}
-    void setIRLoopVars(CodeGenMetadata* metadata) override;
-    void setIRIterable(CodeGenMetadata* metadata) override;
-    Value* loopStart(CodeGenMetadata* metadata) override;
-    Value* loopEnd(CodeGenMetadata* metadata) override;
+    void setIRLoopVars(CodegenMetadata* metadata) override;
+    void setIRIterable(CodegenMetadata* metadata) override;
+    Value* loopStart(CodegenMetadata* metadata) override;
+    Value* loopEnd(CodegenMetadata* metadata) override;
     ~LgsRangeLoop() override;
 };
 

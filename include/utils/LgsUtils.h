@@ -8,6 +8,7 @@ string getExprStr(LgsExpr* baseExpr);
 int getExprConstNumber(LgsExpr* expr);
 string getFormatString(const vector<LgsExpr*>& args);
 void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices);
+StructType* getIRStructType(const string& name, const vector<Type*>& fields);
 bool shouldLoadIRArg(Value* value);
 
 #endif //LGSUTILS_H

@@ -14,7 +14,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 
-Value* LgsExpr::getIRValue(CodeGenMetadata* metadata) {
+Value* LgsExpr::getIRValue(CodegenMetadata* metadata) {
     if (IRValue) return IRValue;
     IRValue = createIRValue(metadata);
     assert(IRValue);
@@ -29,26 +29,26 @@ void LgsExpr::free() { assert(false); }
 LgsExpr* LgsExpr::clone() { assert(false); }
 string LgsExpr::prettyName() { assert(false); }
 LgsExpr* LgsExpr::convertExpr(LgsType* type) { assert(false); }
-uint32_t LgsExpr::hashValue(CodeGenMetadata* metadata) { assert(false); }
-Value* LgsExpr::getLength(CodeGenMetadata* metadata) { assert(false); }
+uint32_t LgsExpr::hashValue(CodegenMetadata* metadata) { assert(false); }
+Value* LgsExpr::getLength(CodegenMetadata* metadata) { assert(false); }
 
 // Comparisons
-Value* LgsExpr::subIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::mulIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::divIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::eqIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::neIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::ltIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::gtIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::geIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::leIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::andIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::orIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::bitAndIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::bitOrIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::bitXorIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::rshiftIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
-Value* LgsExpr::lshiftIR(CodeGenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::subIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::mulIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::divIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::eqIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::neIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::ltIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::gtIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::geIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::leIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::andIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::orIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::bitAndIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::bitOrIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::bitXorIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::rshiftIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
+Value* LgsExpr::lshiftIR(CodegenMetadata* metadata, LgsExpr* other) { assert(false); }
 
 // Casting
 LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }

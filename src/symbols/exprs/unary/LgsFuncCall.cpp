@@ -7,7 +7,7 @@
 #include "types/LgsObject.h"
 
 
-Value* LgsFuncCall::call(CodeGenMetadata* metadata) const {
+Value* LgsFuncCall::call(CodegenMetadata* metadata) const {
     if (callback) {
         func->setIRValue(getCallback(metadata));
     } else if (func->funcType.isVirtual) {
@@ -17,7 +17,7 @@ Value* LgsFuncCall::call(CodeGenMetadata* metadata) const {
     return func->call(metadata, args);
 }
 
-Value* LgsFuncCall::getCallback(CodeGenMetadata* metadata) const {
+Value* LgsFuncCall::getCallback(CodegenMetadata* metadata) const {
     switch (callback->type) {
     case VAR_DEC:
         return callback->varDec->expr->getIRValue(metadata);
@@ -31,11 +31,11 @@ Value* LgsFuncCall::getCallback(CodeGenMetadata* metadata) const {
     assert(false);
 }
 
-Value* LgsFuncCall::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsFuncCall::createIRValue(CodegenMetadata* metadata) {
     return call(metadata);
 }
 
-void LgsFuncCall::createIRStmt(CodeGenMetadata* metadata) {
+void LgsFuncCall::createIRStmt(CodegenMetadata* metadata) {
     call(metadata);
 }
 
@@ -72,7 +72,7 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
     return true;
 }
 
-Value* LgsFuncCall::resolveVirtualFunc(CodeGenMetadata* metadata) const {
+Value* LgsFuncCall::resolveVirtualFunc(CodegenMetadata* metadata) const {
     auto& builder = metadata->builder;
     const auto parent = args[0];
     const auto type = parent->type;

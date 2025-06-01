@@ -3,15 +3,15 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 
-Value* LgsStrConst::getLength(CodeGenMetadata* metadata) {
+Value* LgsStrConst::getLength(CodegenMetadata* metadata) {
     return metadata->builder.getInt32(value.size());
 }
 
-Value* LgsStrConst::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsStrConst::createIRValue(CodegenMetadata* metadata) {
     return getIRStr(metadata->module, value);
 }
 
-Value* LgsStrConst::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsStrConst::addIR(CodegenMetadata* metadata, LgsExpr* other) {
     if (const auto otherStrConst = other->asIntConst()) {
         return getIRStr(metadata->module, this->value + to_string(otherStrConst->value));
     }
@@ -27,6 +27,6 @@ Value* LgsStrConst::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsStrConst::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsStrConst::eqIR(CodegenMetadata* metadata, LgsExpr* other) {
     return nullptr;
 }

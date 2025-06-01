@@ -1,10 +1,10 @@
 #include "exprs/unary/LgsHashMap.h"
 
-Value* LgsHashMap::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsHashMap::createIRValue(CodegenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto valueType = mapType.kvType.value;
     const auto elementSize = builder.getInt32(valueType->getSize());
-    auto mapStruct = mapType.getIRStructType();
+    const auto mapStruct = getIRStructType(mapType.name, mapType.structFields);
     IRValue = builder.CreateAlloca(mapStruct);
     mapType.init.callIR(metadata, {IRValue, elementSize});
     for (const auto element : initialElements) {
@@ -13,14 +13,6 @@ Value* LgsHashMap::createIRValue(CodeGenMetadata* metadata) {
     return IRValue;
 }
 
-Value* LgsHashMap::getLength(CodeGenMetadata* metadata) {
+Value* LgsHashMap::getLength(CodegenMetadata* metadata) {
     return mapType.len.call(metadata, {this});
-}
-
-StructType* LgsMap::getIRStructType() const {
-    const auto arrStruct = StructType::getTypeByName(context, name);
-    if (!arrStruct) {
-        return StructType::create(context, {ptrTy, i64Ty, i32Ty}, name);
-    }
-    return arrStruct;
 }

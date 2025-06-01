@@ -17,8 +17,8 @@ public:
     LgsObject* parent = nullptr;
 
     LgsField(const string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), expr(expr), type(type) {}
-    virtual Value* getGEP(CodeGenMetadata* metadata, Value* instance = nullptr);
-    void setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* expr, Value* instance = nullptr);
+    virtual Value* getGEP(CodegenMetadata* metadata, Value* instance = nullptr);
+    void setFieldIRValue(CodegenMetadata* metadata, LgsExpr* expr, Value* instance = nullptr);
     LgsField* clone() const;
     json asJSON() override;
     ~LgsField() override;

@@ -6,7 +6,7 @@ string LgsVarDec::format(string& indentStr) {
     return indentStr + name + " = ";
 }
 
-void LgsVarDec::createIRStmt(CodeGenMetadata* metadata) {
+void LgsVarDec::createIRStmt(CodegenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto IRType = type->getIRType();
     const auto exprIRValue = expr->getIRValue(metadata);

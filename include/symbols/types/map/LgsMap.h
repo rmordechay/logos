@@ -16,6 +16,7 @@ public:
     LgsMapAddFunc add{this};
     LgsMapLenFunc len{this};
     LgsMapDeleteFunc delete_{this};
+    vector<Type*> structFields = {ptrTy, i64Ty, i32Ty};
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&kvType) {
         kvType.key = keyType;
@@ -23,7 +24,7 @@ public:
         unpackLength = 2;
         addMethod(&len);
     }
-    StructType* getIRStructType() const;
+
     void setBaseType(const vector<LgsMapPair*>& exprs);
     Type* getIRType() override;
     string getIRName() override;
@@ -33,8 +34,8 @@ public:
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
-    Value* getLength(CodeGenMetadata* metadata, Value* iterValue) override;
-    Value* getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* iPtr) override;
+    Value* getLength(CodegenMetadata* metadata, Value* iterValue) override;
+    Value* getElement(CodegenMetadata* metadata, Value* iterPtr, Value* iPtr) override;
     ~LgsMap() override = default;
 };
 

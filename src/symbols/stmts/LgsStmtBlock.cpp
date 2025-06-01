@@ -3,7 +3,7 @@
 #include "exprs/unary/LgsSelection.h"
 #include "stmts/LgsReturn.h"
 
-void LgsStmtBlock::createIRValue(CodeGenMetadata* metadata) const {
+void LgsStmtBlock::createIRValue(CodegenMetadata* metadata) const {
     for (const auto& stmt : stmts) {
         stmt->createIRStmt(metadata);
     }

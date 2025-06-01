@@ -1,5 +1,5 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 
-Value* LgsFloatConst::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsFloatConst::createIRValue(CodegenMetadata* metadata) {
     return ConstantFP::get(metadata->builder.getFloatTy(), value);
 }

@@ -1,5 +1,5 @@
 #include "types/LgsObject.h"
-#include "codegen/CodeGenMetadata.h"
+#include "codegen/CodegenMetadata.h"
 #include "codegen/CodeGenerator.h"
 #include "exprs/LgsNull.h"
 #include "funcs/LgsMethodImpl.h"

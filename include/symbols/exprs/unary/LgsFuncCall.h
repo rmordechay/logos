@@ -11,15 +11,15 @@ public:
     LgsFunc* func = nullptr;
 
     explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
-    Value* call(CodeGenMetadata* metadata) const;
-    Value* getCallback(CodeGenMetadata* metadata) const;
+    Value* call(CodegenMetadata* metadata) const;
+    Value* getCallback(CodegenMetadata* metadata) const;
     bool equalsRaw(const LgsFuncType* funcType) const;
     bool equals(const LgsFuncType* funcType) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
-    Value* resolveVirtualFunc(CodeGenMetadata* metadata) const;
-    void createIRStmt(CodeGenMetadata* metadata) override;
-    Value* createIRValue(CodeGenMetadata* metadata) override;
+    Value* resolveVirtualFunc(CodegenMetadata* metadata) const;
+    void createIRStmt(CodegenMetadata* metadata) override;
+    Value* createIRValue(CodegenMetadata* metadata) override;
     string getName() override;
     string format(string& indentStr) override;
     string prettyName() override;

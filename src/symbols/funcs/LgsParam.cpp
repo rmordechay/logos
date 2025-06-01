@@ -8,7 +8,7 @@ string LgsParam::format(string& indentStr) {
     return name + ": " + type->prettyName();
 }
 
-Value* LgsParam::getIRValue(CodeGenMetadata* metadata) {
+Value* LgsParam::getIRValue(CodegenMetadata* metadata) {
     if (IRValue) return IRValue;
     if (isVariadic) {
         if (vaList) return vaList;

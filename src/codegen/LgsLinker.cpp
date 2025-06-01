@@ -1,5 +1,5 @@
 #include "codegen/LgsLinker.h"
-#include "codegen/CodeGenMetadata.h"
+#include "codegen/CodegenMetadata.h"
 #include "logos/Logos.h"
 #include "logos/Platform.h"
 #include "data/LgsDefinitions.h"

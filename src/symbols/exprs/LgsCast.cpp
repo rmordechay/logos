@@ -1,11 +1,11 @@
 #include "exprs/LgsCast.h"
 #include "types/LgsType.h"
 
-Value* LgsCast::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsCast::createIRValue(CodegenMetadata* metadata) {
     return toValue->getIRValue(metadata);
 }
 
-Value* LgsCast::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsCast::addIR(CodegenMetadata* metadata, LgsExpr* other) {
     return toValue->addIR(metadata, other);
 }
 

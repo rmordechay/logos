@@ -1,7 +1,7 @@
 #include "funcs/LgsMethodImpl.h"
 #include "types/LgsObject.h"
 
-FunctionType* LgsMethodImpl::getIRFuncType(const CodeGenMetadata* metadata) {
+FunctionType* LgsMethodImpl::getIRFuncType(const CodegenMetadata* metadata) {
     vector<Type*> IRParamsTypes;
     for (int i = 0; i < funcType.params.size(); ++i) {
         auto paramIRType = funcType.params[i]->type->getIRType();

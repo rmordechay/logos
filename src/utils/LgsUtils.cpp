@@ -91,3 +91,11 @@ bool shouldLoadIRArg(Value* value) {
     }
     return true;
 }
+
+StructType* getIRStructType(const string& name, const vector<Type*>& fields) {
+    const auto struct_ = StructType::getTypeByName(context, name);
+    if (!struct_) {
+        return StructType::create(context, fields, name);
+    }
+    return struct_;
+}

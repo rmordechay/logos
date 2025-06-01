@@ -53,7 +53,7 @@ public:
         funcType.isPublic = true;
     }
 
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
+    Value* call(CodegenMetadata* metadata, const vector<LgsExpr*>& args) override {
         auto& builder = metadata->builder;
         const auto arrPtr = args[0]->getIRValue(metadata);
         const auto elementValue = args[1]->getIRValue(metadata);

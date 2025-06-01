@@ -13,15 +13,15 @@ public:
     LgsIndex* index = nullptr;
 
     explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {}
-    Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* getGEP(CodeGenMetadata* metadata) const;
-    Value* getIRFromDynArray(CodeGenMetadata* metadata, LgsArray* arr) const;
-    Value* getIRFromMap(CodeGenMetadata* metadata, LgsMap* map) const;
-    Value* getIRFromStr(CodeGenMetadata* metadata) const;
-    void storeHashMap(CodeGenMetadata* metadata, LgsHashMap* hashMap) const;
-    void storeScalar(CodeGenMetadata* metadata, LgsExpr* value);
-    void storeArray(CodeGenMetadata* metadata, const LgsArrayExpr* arr) const;
-    Value* getLength(CodeGenMetadata* metadata) override;
+    Value* createIRValue(CodegenMetadata* metadata) override;
+    Value* getGEP(CodegenMetadata* metadata) const;
+    Value* getIRFromDynArray(CodegenMetadata* metadata, LgsArray* arr) const;
+    Value* getIRFromMap(CodegenMetadata* metadata, LgsMap* map) const;
+    Value* getIRFromStr(CodegenMetadata* metadata) const;
+    void storeHashMap(CodegenMetadata* metadata, LgsHashMap* hashMap) const;
+    void storeScalar(CodegenMetadata* metadata, LgsExpr* value);
+    void storeArray(CodegenMetadata* metadata, const LgsArrayExpr* arr) const;
+    Value* getLength(CodegenMetadata* metadata) override;
     string getName() override;
     string prettyName() override;
     ~LgsIterIndex() override;

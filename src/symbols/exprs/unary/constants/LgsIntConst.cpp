@@ -6,7 +6,7 @@ string LgsIntConst::prettyName() {
     return to_string(value);
 }
 
-Value* LgsIntConst::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsIntConst::createIRValue(CodegenMetadata* metadata) {
     return metadata->builder.getInt32(value);
 }
 
@@ -17,7 +17,7 @@ LgsExpr* LgsIntConst::convertExpr(LgsType* other) {
     assert(false);
 }
 
-Value* LgsIntConst::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsIntConst::eqIR(CodegenMetadata* metadata, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(metadata);
     const auto thisIRValue = getIRValue(metadata);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -26,7 +26,7 @@ Value* LgsIntConst::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsIntConst::neIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsIntConst::neIR(CodegenMetadata* metadata, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(metadata);
     const auto thisIRValue = getIRValue(metadata);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -35,7 +35,7 @@ Value* LgsIntConst::neIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsIntConst::gtIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsIntConst::gtIR(CodegenMetadata* metadata, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(metadata);
     const auto thisIRValue = getIRValue(metadata);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -44,7 +44,7 @@ Value* LgsIntConst::gtIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsIntConst::ltIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsIntConst::ltIR(CodegenMetadata* metadata, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(metadata);
     const auto thisIRValue = getIRValue(metadata);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -53,7 +53,7 @@ Value* LgsIntConst::ltIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsIntConst::geIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsIntConst::geIR(CodegenMetadata* metadata, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(metadata);
     const auto thisIRValue = getIRValue(metadata);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -62,7 +62,7 @@ Value* LgsIntConst::geIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsIntConst::leIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsIntConst::leIR(CodegenMetadata* metadata, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(metadata);
     const auto thisIRValue = getIRValue(metadata);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -71,7 +71,7 @@ Value* LgsIntConst::leIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsIntConst::andIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsIntConst::andIR(CodegenMetadata* metadata, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(metadata);
     const auto thisIRValue = getIRValue(metadata);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -80,11 +80,11 @@ Value* LgsIntConst::andIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsIntConst::orIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsIntConst::orIR(CodegenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsIntConst::bitAndIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsIntConst::bitAndIR(CodegenMetadata* metadata, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(metadata);
     const auto thisIRValue = getIRValue(metadata);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -93,7 +93,7 @@ Value* LgsIntConst::bitAndIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsIntConst::bitOrIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsIntConst::bitOrIR(CodegenMetadata* metadata, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(metadata);
     const auto thisIRValue = getIRValue(metadata);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -102,7 +102,7 @@ Value* LgsIntConst::bitOrIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsIntConst::bitXorIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsIntConst::bitXorIR(CodegenMetadata* metadata, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(metadata);
     const auto thisIRValue = getIRValue(metadata);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -111,7 +111,7 @@ Value* LgsIntConst::bitXorIR(CodeGenMetadata* metadata, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsIntConst::lshiftIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsIntConst::lshiftIR(CodegenMetadata* metadata, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(metadata);
     const auto thisIRValue = getIRValue(metadata);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -124,7 +124,7 @@ LgsExpr* LgsIntConst::clone() {
     return new LgsIntConst(value);
 }
 
-Value* LgsIntConst::rshiftIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsIntConst::rshiftIR(CodegenMetadata* metadata, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(metadata);
     const auto thisIRValue = getIRValue(metadata);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {

@@ -11,15 +11,15 @@ string LgsSelection::getName() {
     return "";
 }
 
-void LgsSelection::createIRStmt(CodeGenMetadata* metadata) {
+void LgsSelection::createIRStmt(CodegenMetadata* metadata) {
     resolveSelection(metadata);
 }
 
-Value* LgsSelection::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsSelection::createIRValue(CodegenMetadata* metadata) {
     return resolveSelection(metadata)->IRValue;
 }
 
-LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
+LgsExpr* LgsSelection::resolveSelection(CodegenMetadata* metadata) const {
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
@@ -59,12 +59,12 @@ LgsExpr* LgsSelection::lastExpr() const {
     return exprs[exprs.size() - 1];
 }
 
-uint32_t LgsSelection::hashValue(CodeGenMetadata* metadata) {
+uint32_t LgsSelection::hashValue(CodegenMetadata* metadata) {
     const auto lgsExpr = lastExpr();
     return lgsExpr->hashValue(metadata);
 }
 
-Value* LgsSelection::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsSelection::eqIR(CodegenMetadata* metadata, LgsExpr* other) {
     const auto selection = resolveSelection(metadata);
     if (const auto var = selection->asVariable()) {
         return var->eqIR(metadata, other);

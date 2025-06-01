@@ -17,7 +17,7 @@ public:
         funcType.params = {&input, &args};
     }
 
-    Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) override {
+    Value* call(CodegenMetadata* metadata, const vector<LgsExpr*>& args) override {
         vector<Value*> IRArgs;
         stringstream str;
         for (int i = 0; i < args.size(); ++i) {

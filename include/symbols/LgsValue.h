@@ -1,7 +1,7 @@
 #ifndef CODEGENERATION_H
 #define CODEGENERATION_H
 
-#include "codegen/CodeGenMetadata.h"
+#include "codegen/CodegenMetadata.h"
 #include <Token.h>
 #include <llvm/IR/Value.h>
 #include <json/json.hpp>
@@ -13,10 +13,10 @@ public:
 
     void setIRValue(Value* value);
     BasicBlock* createBasicBlock(const char* name) const;
-    void startBlock(CodeGenMetadata* metadata, BasicBlock* block) const;
-    void startBlockFunc(CodeGenMetadata* metadata) const;
+    void startBlock(CodegenMetadata* metadata, BasicBlock* block) const;
+    void startBlockFunc(CodegenMetadata* metadata) const;
     Value* getIRStr(Module* module, const std::string& value) const;
-    Value* hashIRValue(CodeGenMetadata* metadata, Value* value) const;
+    Value* hashIRValue(CodegenMetadata* metadata, Value* value) const;
     virtual string format(string& indentStr);
     virtual void setLocation(const antlr4::Token* ctx);
     virtual json asJSON();

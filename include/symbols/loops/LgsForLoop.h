@@ -15,14 +15,14 @@ public:
     BasicBlock* loopBodyBlock = nullptr;
     BasicBlock* loopExitBlock = nullptr;
 
-    void createIRStmt(CodeGenMetadata* metadata) override;
-    void initIRLoop(CodeGenMetadata* metadata);
-    void setLoopIRCondition(CodeGenMetadata* metadata);
-    void exitIRLoop(CodeGenMetadata* metadata) const;
-    virtual Value* loopStart(CodeGenMetadata* metadata) = 0;
-    virtual Value* loopEnd(CodeGenMetadata* metadata) = 0;
-    virtual void setIRIterable(CodeGenMetadata* metadata) = 0;
-    virtual void setIRLoopVars(CodeGenMetadata* metadata) = 0;
+    void createIRStmt(CodegenMetadata* metadata) override;
+    void initIRLoop(CodegenMetadata* metadata);
+    void setLoopIRCondition(CodegenMetadata* metadata);
+    void exitIRLoop(CodegenMetadata* metadata) const;
+    virtual Value* loopStart(CodegenMetadata* metadata) = 0;
+    virtual Value* loopEnd(CodegenMetadata* metadata) = 0;
+    virtual void setIRIterable(CodegenMetadata* metadata) = 0;
+    virtual void setIRLoopVars(CodegenMetadata* metadata) = 0;
     ~LgsForLoop() override;
 };
 

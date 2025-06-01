@@ -10,7 +10,7 @@ string LgsInstance::getName() {
     return obj->name;
 }
 
-Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsInstance::createIRValue(CodegenMetadata* metadata) {
     const auto IRType = obj->getIRType();
     const auto currentFunc = metadata->runtime.getCurrentFunc()->getIRFunc(metadata);
     auto& builder = metadata->builder;
@@ -30,7 +30,7 @@ Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
     return IRValue;
 }
 
-void LgsInstance::setVirtualFuncs(CodeGenMetadata* metadata) const {
+void LgsInstance::setVirtualFuncs(CodegenMetadata* metadata) const {
     const auto map = obj->vtable.getIRValue(metadata);
     auto& builder = metadata->builder;
     const auto vtableGEP = builder.CreateStructGEP(obj->getIRType(), IRValue, 0);

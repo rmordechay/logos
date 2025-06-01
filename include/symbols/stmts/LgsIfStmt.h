@@ -26,11 +26,11 @@ public:
     BasicBlock* elseIfCheckBlock = nullptr;
 
     LgsIfStmt(LgsExpr* ifCond, LgsStmtBlock* ifStmtBlock) : ifCond(ifCond), ifStmtBlock(ifStmtBlock) {}
-    void createIRStmt(CodeGenMetadata* metadata) override;
-    void computeSimpleIf(CodeGenMetadata* metadata);
-    void computeComplexIf(CodeGenMetadata* metadata);
-    void createElseIfBlocks(CodeGenMetadata* metadata);
-    void createElseBlock(CodeGenMetadata* metadata, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const;
+    void createIRStmt(CodegenMetadata* metadata) override;
+    void computeSimpleIf(CodegenMetadata* metadata);
+    void computeComplexIf(CodegenMetadata* metadata);
+    void createElseIfBlocks(CodegenMetadata* metadata);
+    void createElseBlock(CodegenMetadata* metadata, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const;
     ~LgsIfStmt() override;
 };
 

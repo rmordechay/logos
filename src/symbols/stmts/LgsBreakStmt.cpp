@@ -3,7 +3,7 @@
 #include "loops/LgsForLoop.h"
 #include "types/LgsFuncType.h"
 
-void LgsBreakStmt::createIRStmt(CodeGenMetadata* metadata) {
+void LgsBreakStmt::createIRStmt(CodegenMetadata* metadata) {
     const auto currentLoop = metadata->runtime.getCurrentLoop();
     const auto currentFunc = metadata->runtime.getCurrentFunc();
     const auto loopExit = currentLoop->loopExitBlock;

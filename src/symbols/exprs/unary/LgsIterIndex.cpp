@@ -3,7 +3,7 @@
 #include "types/map/LgsMap.h"
 #include <exprs/unary/LgsArrayExpr.h>
 
-Value* LgsIterIndex::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsIterIndex::createIRValue(CodegenMetadata* metadata) {
     const auto baseExprType = baseExpr->type;
     if (const auto arr = baseExprType->asArray()) {
         if (arr->isStatic) return getGEP(metadata);
@@ -47,20 +47,20 @@ Value* LgsIterIndex::createIRValue(CodeGenMetadata* metadata) {
 //   ret i32 0
 // }
 
-Value* LgsIterIndex::getIRFromDynArray(CodeGenMetadata* metadata, LgsArray* arr) const {
+Value* LgsIterIndex::getIRFromDynArray(CodegenMetadata* metadata, LgsArray* arr) const {
     const auto arrPtr = baseExpr->getIRValue(metadata);
     const auto indexIRValue = index->from->getIRValue(metadata);
     const auto rv = arr->get.callIR(metadata, {arrPtr, indexIRValue});
     return metadata->builder.CreateLoad(ptrTy, rv);
 }
 
-Value* LgsIterIndex::getIRFromMap(CodeGenMetadata* metadata, LgsMap* map) const {
+Value* LgsIterIndex::getIRFromMap(CodegenMetadata* metadata, LgsMap* map) const {
     const auto mapPtr = baseExpr->getIRValue(metadata);
     const auto indexIRValue = index->from->getIRValue(metadata);
     return map->get.callIR(metadata, {mapPtr, indexIRValue});
 }
 
-Value* LgsIterIndex::getIRFromStr(CodeGenMetadata* metadata) const {
+Value* LgsIterIndex::getIRFromStr(CodegenMetadata* metadata) const {
     const auto baseExprIRValue = baseExpr->getIRValue(metadata);
     const auto baseExprIRType = baseExpr->type->getIRType();
     if (const auto global = dyn_cast<GlobalVariable>(baseExprIRValue)) {
@@ -74,11 +74,11 @@ Value* LgsIterIndex::getIRFromStr(CodeGenMetadata* metadata) const {
     return metadata->builder.CreateLoad(baseExprIRType, p);
 }
 
-void LgsIterIndex::storeHashMap(CodeGenMetadata* metadata, LgsHashMap* hashMap) const {
+void LgsIterIndex::storeHashMap(CodegenMetadata* metadata, LgsHashMap* hashMap) const {
     assert(false);
 }
 
-void LgsIterIndex::storeScalar(CodeGenMetadata* metadata, LgsExpr* value) {
+void LgsIterIndex::storeScalar(CodegenMetadata* metadata, LgsExpr* value) {
     const auto rValue = value->getIRValue(metadata);
     if (const auto arr = baseExpr->type->asArray()) {
         if (!arr->isStatic) {
@@ -92,7 +92,7 @@ void LgsIterIndex::storeScalar(CodeGenMetadata* metadata, LgsExpr* value) {
     metadata->builder.CreateStore(rValue, iterPtr);
 }
 
-void LgsIterIndex::storeArray(CodeGenMetadata* metadata, const LgsArrayExpr* arr) const {
+void LgsIterIndex::storeArray(CodegenMetadata* metadata, const LgsArrayExpr* arr) const {
     if (!arr->arrType.isStatic) assert(false);
     const auto IRType = baseExpr->type->getIRType();
     const auto arrPtr = baseExpr->getIRValue(metadata);
@@ -113,7 +113,7 @@ void LgsIterIndex::storeArray(CodeGenMetadata* metadata, const LgsArrayExpr* arr
     }
 }
 
-Value* LgsIterIndex::getGEP(CodeGenMetadata* metadata) const {
+Value* LgsIterIndex::getGEP(CodegenMetadata* metadata) const {
     vector<Value*> IRIndices = {};
     Type* ty = nullptr;
     Value* ptr = nullptr;
@@ -135,7 +135,7 @@ Value* LgsIterIndex::getGEP(CodeGenMetadata* metadata) const {
     return metadata->builder.CreateGEP(ty, ptr, IRIndices);
 }
 
-Value* LgsIterIndex::getLength(CodeGenMetadata* metadata) {
+Value* LgsIterIndex::getLength(CodegenMetadata* metadata) {
     assert(false);
 }
 

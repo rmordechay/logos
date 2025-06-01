@@ -6,7 +6,7 @@
 using namespace nlohmann;
 
 class LgsField;
-struct CodeGenMetadata;
+struct CodegenMetadata;
 class LgsEnum;
 class LgsEnumField;
 class LgsFunc;

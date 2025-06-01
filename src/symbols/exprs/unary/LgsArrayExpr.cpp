@@ -1,13 +1,14 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "logos/LgsConfig.h"
 #include "exprs/unary/LgsIterIndex.h"
+#include "utils/LgsUtils.h"
 
-Value* LgsArrayExpr::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsArrayExpr::createIRValue(CodegenMetadata* metadata) {
     if (arrType.isStatic) return createConstArray(metadata);
     return createDynArray(metadata);
 }
 
-Value* LgsArrayExpr::createConstArray(CodeGenMetadata* metadata) const {
+Value* LgsArrayExpr::createConstArray(CodegenMetadata* metadata) const {
     const auto IRType = type->getIRType();
     const auto arrPtr = metadata->builder.CreateAlloca(IRType);
     for (int i = 0; i < initialElements.size(); ++i) {
@@ -20,12 +21,12 @@ Value* LgsArrayExpr::createConstArray(CodeGenMetadata* metadata) const {
     return arrPtr;
 }
 
-Value* LgsArrayExpr::createDynArray(CodeGenMetadata* metadata) {
+Value* LgsArrayExpr::createDynArray(CodegenMetadata* metadata) {
     auto& builder = metadata->builder;
     const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
     const auto capacityIR = builder.getInt32(capacity);
     const auto elementSize = builder.getInt64(arrType.baseType->getSize());
-    const auto arrStruct = arrType.getIRStructType();
+    const auto arrStruct = getIRStructType(arrType.name, arrType.structFields);
     IRValue = builder.CreateAlloca(arrStruct);
     arrType.init.callIR(metadata, {IRValue, capacityIR, elementSize});
     for (const auto element : initialElements) {
@@ -39,7 +40,7 @@ void LgsArrayExpr::free() {
 
 }
 
-Value* LgsArrayExpr::getLength(CodeGenMetadata* metadata) {
+Value* LgsArrayExpr::getLength(CodegenMetadata* metadata) {
     if (arrType.isStatic) return arrType.sizeExpr->getIRValue(metadata);
     return arrType.len.call(metadata, {this});
 }

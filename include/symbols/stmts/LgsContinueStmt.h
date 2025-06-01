@@ -4,7 +4,7 @@
 
 class LgsContinueStmt final : public LgsStmt {
 public:
-    void createIRStmt(CodeGenMetadata* metadata) override;
+    void createIRStmt(CodegenMetadata* metadata) override;
     ~LgsContinueStmt() override = default;
 };
 

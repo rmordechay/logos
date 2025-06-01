@@ -6,7 +6,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 
-void LgsAssignment::createIRStmt(CodeGenMetadata* metadata) {
+void LgsAssignment::createIRStmt(CodegenMetadata* metadata) {
     if (const auto selection = lValue->asSelection()) {
         assignIRSelection(metadata, selection, rValue);
     } else if (const auto iterIndex = lValue->asIterIndex()) {
@@ -16,7 +16,7 @@ void LgsAssignment::createIRStmt(CodeGenMetadata* metadata) {
     }
 }
 
-void LgsAssignment::assignIRIterIndex(CodeGenMetadata* metadata, LgsIterIndex* iterIndex, LgsExpr* value) const {
+void LgsAssignment::assignIRIterIndex(CodegenMetadata* metadata, LgsIterIndex* iterIndex, LgsExpr* value) const {
     if (iterIndex->type->asMap()) {
         iterIndex->storeHashMap(metadata, value->asHashMap());
     } else if (iterIndex->type->asArray()) {
@@ -26,7 +26,7 @@ void LgsAssignment::assignIRIterIndex(CodeGenMetadata* metadata, LgsIterIndex* i
     }
 }
 
-void LgsAssignment::assignIRSelection(CodeGenMetadata* metadata, const LgsSelection* selection, LgsExpr* expr) const {
+void LgsAssignment::assignIRSelection(CodegenMetadata* metadata, const LgsSelection* selection, LgsExpr* expr) const {
     const auto beforeLastExpr = selection->exprs[selection->exprs.size() - 2];
     if (const auto var = selection->lastExpr()->asVariable()) {
         assert(var->ref);

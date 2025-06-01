@@ -14,13 +14,14 @@ public:
     LgsArrayLenFunc len{this};
     LgsArrayFreeFunc free{this};
     LgsArrayDeleteFunc delete_{this};
+    vector<Type*> structFields{i64Ty, i32Ty, i32Ty, ptrTy};
 
     explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         addMethod(&add);
         addMethod(&len);
         unpackLength = 1;
     }
-    StructType* getIRStructType() const;
+
     void inferArrayType(const vector<LgsExpr*>& exprs);
     size_t getSize() override;
     string getIRName() override;
@@ -29,8 +30,8 @@ public:
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
-    Value* getLength(CodeGenMetadata* metadata, Value* iterValue) override;
-    Value* getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* indexPtr) override;
+    Value* getLength(CodegenMetadata* metadata, Value* iterValue) override;
+    Value* getElement(CodegenMetadata* metadata, Value* iterPtr, Value* indexPtr) override;
     LgsType* clone() override;
     ~LgsArray() override;
 };

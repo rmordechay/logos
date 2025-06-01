@@ -15,10 +15,10 @@ public:
         strType.isStatic = true;
         strType.sizeExpr = new LgsIntConst(value.size());
     }
-    Value* getLength(CodeGenMetadata* metadata) override;
-    Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
-    Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* getLength(CodegenMetadata* metadata) override;
+    Value* createIRValue(CodegenMetadata* metadata) override;
+    Value* eqIR(CodegenMetadata* metadata, LgsExpr* other) override;
+    Value* addIR(CodegenMetadata* metadata, LgsExpr* other) override;
     ~LgsStrConst() override = default;
 };
 

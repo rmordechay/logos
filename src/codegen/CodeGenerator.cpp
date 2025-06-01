@@ -17,7 +17,7 @@
 void CodeGenerator::generate(LgsMainFile* mainFile) {
     init();
     const auto module = createEmptyModule(LOGOS_MAIN_FILE_NAME);
-    auto metadata = CodeGenMetadata{.module = module};
+    auto metadata = CodegenMetadata{.module = module};
     metadata.runtime.stage = LGS_RUNTIME;
     for (const auto [_, func] : mainFile->funcs) {
         func->generateIRCode(&metadata);
@@ -30,7 +30,7 @@ void CodeGenerator::generate(LgsMainFile* mainFile) {
 void CodeGenerator::generateObjModule(const LgsType* obj) {
     const auto objName = obj->prettyName();
     if (IRModules.find(objName) != IRModules.end()) return;
-    auto metadata = CodeGenMetadata{.module = createEmptyModule(objName)};
+    auto metadata = CodegenMetadata{.module = createEmptyModule(objName)};
     metadata.runtime.stage = LGS_RUNTIME;
     for (const auto& [_, method] : obj->methods) {
         method->generateIRCode(&metadata);
@@ -38,7 +38,7 @@ void CodeGenerator::generateObjModule(const LgsType* obj) {
     writeIRToFile(metadata.module, objName);
 }
 
-void CodeGenerator::generateMainFunc(CodeGenMetadata* metadata, LgsFuncImpl* mainFunc) {
+void CodeGenerator::generateMainFunc(CodegenMetadata* metadata, LgsFuncImpl* mainFunc) {
     createIRMainFunc(metadata);
     metadata->runtime.enterScope(mainFunc);
     mainFunc->startBlockFunc(metadata);
@@ -51,7 +51,7 @@ void CodeGenerator::generateMainFunc(CodeGenMetadata* metadata, LgsFuncImpl* mai
     writeIRToFile(metadata->module, LOGOS_MAIN_FILE_NAME);
 }
 
-void CodeGenerator::createIRMainFunc(const CodeGenMetadata* metadata) {
+void CodeGenerator::createIRMainFunc(const CodegenMetadata* metadata) {
     const auto mainFuncType = FunctionType::get(i32Ty, {i32Ty, ptrTy}, false);
     const auto mainFunc = Function::Create(mainFuncType, Function::ExternalLinkage, LOGOS_MAIN_FUNC, metadata->module);
     auto args = mainFunc->arg_begin();

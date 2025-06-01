@@ -4,7 +4,7 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
-void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
+void LgsFunc::generateIRCode(CodegenMetadata* metadata) {
     metadata->runtime.enterScope(this);
     startBlockFunc(metadata);
     IRValue = getIRFunc(metadata);
@@ -15,12 +15,12 @@ void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
     metadata->runtime.exitScope();
 }
 
-Value* LgsFunc::createIRValue(CodeGenMetadata* metadata) {
+Value* LgsFunc::createIRValue(CodegenMetadata* metadata) {
     generateIRCode(metadata);
     return IRValue;
 }
 
-Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
+Value* LgsFunc::call(CodegenMetadata* metadata, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
     int iterStart = funcType.isStatic;
     bool isObjReturn = false;
@@ -50,7 +50,7 @@ Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
     return rv;
 }
 
-void LgsFunc::addIRArg(CodeGenMetadata* metadata, vector<Value*>& IRArgs, LgsExpr* arg) const {
+void LgsFunc::addIRArg(CodegenMetadata* metadata, vector<Value*>& IRArgs, LgsExpr* arg) const {
     const auto argIRValue = arg->getIRValue(metadata);
     if (shouldLoadIRArg(argIRValue)) {
         const auto artIRType = arg->type->getIRType();
@@ -61,7 +61,7 @@ void LgsFunc::addIRArg(CodeGenMetadata* metadata, vector<Value*>& IRArgs, LgsExp
     }
 }
 
-Value* LgsFunc::callIR(CodeGenMetadata* metadata, const vector<Value*>& args) {
+Value* LgsFunc::callIR(CodegenMetadata* metadata, const vector<Value*>& args) {
     if (IRValue) {
         const auto IRFuncType = getIRFuncType(metadata);
         return metadata->builder.CreateCall(IRFuncType, IRValue, args);
@@ -74,7 +74,7 @@ string LgsFunc::prettyName() {
     return funcType.prettyName();
 }
 
-Function* LgsFunc::getIRFunc(CodeGenMetadata* metadata) {
+Function* LgsFunc::getIRFunc(CodegenMetadata* metadata) {
     const auto funcIRType = getIRFuncType(metadata);
     auto func = metadata->module->getOrInsertFunction(funcType.getIRName(), funcIRType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
@@ -102,7 +102,7 @@ Function* LgsFunc::getIRFunc(CodeGenMetadata* metadata) {
     return IRFunc;
 }
 
-FunctionType* LgsFunc::getIRFuncType(const CodeGenMetadata* metadata) {
+FunctionType* LgsFunc::getIRFuncType(const CodegenMetadata* metadata) {
     if (IRFuncType) return IRFuncType;
     vector<Type*> IRParamsTypes;
     for (int i = 0; i < funcType.params.size(); ++i) {

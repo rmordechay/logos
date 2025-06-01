@@ -1,5 +1,5 @@
 #include "exprs/unary/LgsEnumField.h"
 
-Value* LgsEnumField::getGEP(CodeGenMetadata* metadata, Value* instance) {
+Value* LgsEnumField::getGEP(CodegenMetadata* metadata, Value* instance) {
     return getIRStr(metadata->module, name);
 }

@@ -7,15 +7,15 @@ public:
     explicit LgsNull() : LgsUnaryExpr(nullptr) {
         isNull = true;
     }
-    Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* createIRValue(CodegenMetadata* metadata) override;
+    Value* addIR(CodegenMetadata* metadata, LgsExpr* other) override;
 };
 
-inline Value* LgsNull::createIRValue(CodeGenMetadata* metadata) {
+inline Value* LgsNull::createIRValue(CodegenMetadata* metadata) {
     return ConstantPointerNull::get(PointerType::get(context, 0));
 }
 
-inline Value* LgsNull::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
+inline Value* LgsNull::addIR(CodegenMetadata* metadata, LgsExpr* other) {
     assert(false && "not implemented");
 }
 

@@ -38,14 +38,6 @@ string LgsArray::getIRName() {
     return name;
 }
 
-StructType* LgsArray::getIRStructType() const {
-    const auto arrStruct = StructType::getTypeByName(context, name);
-    if (!arrStruct) {
-        return StructType::create(context, {i64Ty, i32Ty, i32Ty, ptrTy}, name);
-    }
-    return arrStruct;
-}
-
 void LgsArray::inferArrayType(const vector<LgsExpr*>& exprs) {
     baseType = exprs.front()->type;
     sizeExpr = new LgsIntConst(exprs.size());
@@ -59,12 +51,12 @@ void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[0]->type = baseType;
 }
 
-Value* LgsArray::getLength(CodeGenMetadata* metadata, Value* iterValue) {
+Value* LgsArray::getLength(CodegenMetadata* metadata, Value* iterValue) {
     if (isStatic) return sizeExpr->getIRValue(metadata);
     return len.callIR(metadata, {iterValue});
 }
 
-Value* LgsArray::getElement(CodeGenMetadata* metadata, Value* iterPtr, Value* indexPtr) {
+Value* LgsArray::getElement(CodegenMetadata* metadata, Value* iterPtr, Value* indexPtr) {
     if (isStatic) {
         const auto i = metadata->builder.CreateLoad(i32Ty, indexPtr);
         return metadata->builder.CreateGEP(getIRType(), iterPtr, {i32Zero, i});
