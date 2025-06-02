@@ -16,7 +16,7 @@ void LgsForLoop::createIRStmt(Module* module) {
 
 void LgsForLoop::initIRLoop(Module* module) {
     runtime.enterScope();
-    runtime.stack.top().currentLoop = this;
+    runtime.stack.top().loop = this;
     loopCondBlock = createBasicBlock(LOGOS_LOOP_CONDITION);
     loopBodyBlock = createBasicBlock(LOGOS_LOOP_BODY);
     loopExitBlock = createBasicBlock(LOGOS_LOOP_EXIT);
@@ -43,7 +43,7 @@ void LgsForLoop::exitIRLoop(Module* module) const {
     builder.CreateBr(loopCondBlock);
     // Loop exit
     startBlock(module, loopExitBlock);
-    runtime.stack.top().currentLoop = nullptr;
+    runtime.stack.top().loop = nullptr;
     runtime.exitScope();
 }
 

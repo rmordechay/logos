@@ -14,15 +14,19 @@ void LgsMainFunc::generateIRCode(Module* module) {
 
 Function* LgsMainFunc::getIRFunc(Module* module) {
     if (IRFunc) return IRFunc;
-    if (funcType.params.empty()) {
-        const auto mainFuncType = FunctionType::get(i32Ty, {}, false);
-        return Function::Create(mainFuncType, Function::ExternalLinkage, LOGOS_MAIN_FUNC, module);
+    FunctionType* mainFuncType;
+    const auto hasParams = !funcType.params.empty();
+    if (hasParams) {
+        mainFuncType = FunctionType::get(i32Ty, {}, false);
+    } else {
+        mainFuncType = FunctionType::get(i32Ty, {i32Ty, ptrTy}, false);
     }
-    const auto mainFuncType = FunctionType::get(i32Ty, {i32Ty, ptrTy}, false);
     const auto mainFuncIR = Function::Create(mainFuncType, Function::ExternalLinkage, LOGOS_MAIN_FUNC, module);
-    auto args = mainFuncIR->arg_begin();
-    args++->setName("argc");
-    args->setName("argv");
     IRFunc = mainFuncIR;
+    if (hasParams) {
+        auto args = mainFuncIR->arg_begin();
+        args++->setName("argc");
+        args->setName("argv");
+    }
     return mainFuncIR;
 }

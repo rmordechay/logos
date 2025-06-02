@@ -16,8 +16,8 @@ class LgsFuncType;
 
 struct LgsStackFrame {
     map<string, LgsSymbol> symbols;
-    LgsFunc* currentFunc = nullptr;
-    LgsForLoop* currentLoop = nullptr;
+    LgsFunc* func = nullptr;
+    LgsForLoop* loop = nullptr;
     vector<LgsExpr*> allocatedExprs;
 };
 

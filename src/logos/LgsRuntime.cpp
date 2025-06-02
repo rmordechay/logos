@@ -7,14 +7,10 @@
 void LgsRuntime::enterFunc(LgsFunc* func) {
     if (stack.empty()) {
         returnFunc = func;
-        stack.push(LgsStackFrame{.currentFunc = func});
+        stack.push(LgsStackFrame{.func = func});
     } else {
         returnFunc = getCurrentFunc();
-        stack.push(LgsStackFrame{
-            .symbols = getSymbols(),
-            .currentFunc = func,
-            .currentLoop = getCurrentLoop()
-        });
+        stack.push(LgsStackFrame{.symbols = getSymbols(), .func = func, .loop = getCurrentLoop()});
     }
     if (stage == LGS_RUNTIME) {
         returnFunc->savedIP = builder.saveIP();
@@ -24,8 +20,8 @@ void LgsRuntime::enterFunc(LgsFunc* func) {
 void LgsRuntime::enterScope() {
     stack.push(LgsStackFrame{
         .symbols = getSymbols(),
-        .currentFunc = getCurrentFunc(),
-        .currentLoop = getCurrentLoop()
+        .func = getCurrentFunc(),
+        .loop = getCurrentLoop()
     });
 }
 
@@ -68,12 +64,12 @@ void LgsRuntime::printStack(Module* module) const {
 
 LgsFunc* LgsRuntime::getCurrentFunc() {
     assert(stack.size() > 0);
-    return stack.top().currentFunc;
+    return stack.top().func;
 }
 
 LgsForLoop* LgsRuntime::getCurrentLoop() {
     assert(stack.size() > 0);
-    return stack.top().currentLoop;
+    return stack.top().loop;
 }
 
 map<string, LgsSymbol>& LgsRuntime::getSymbols() {

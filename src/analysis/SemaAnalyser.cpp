@@ -213,13 +213,13 @@ void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatch* patternMatchi
 
 void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
     runtime.enterScope();
-    runtime.stack.top().currentLoop = loopStmt;
+    runtime.stack.top().loop = loopStmt;
     if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {
         visitRangeLoop(rangeLoop);
     } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loopStmt)) {
         visitForeachLoop(foreachLoop);
     }
-    runtime.stack.top().currentLoop = nullptr;
+    runtime.stack.top().loop = nullptr;
     runtime.exitScope();
 }
 
