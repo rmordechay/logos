@@ -18,6 +18,7 @@ public:
         funcType.isVariadic = true;
         funcType.IRName = "printf";
         funcType.params = {&input, &args};
+        funcType.isBuiltin = true;
     }
 
     Value* call(Module* module, const vector<LgsExpr*>& args) override {
