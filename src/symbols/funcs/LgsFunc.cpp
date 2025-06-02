@@ -168,10 +168,11 @@ json LgsFunc::asJSON() {
 }
 
 LgsFunc::~LgsFunc() {
-    // TODO free params
-    // for (int i = funcType.isMethod; i < funcType.params.size(); ++i) {
-    //     delete funcType.params[i];
-    // }
+    if (!funcType.isBuiltin) {
+        for (int i = funcType.isMethod; i < funcType.params.size(); ++i) {
+            delete funcType.params[i];
+        }
+    }
     if (stmtBlock) {
         delete stmtBlock;
     }

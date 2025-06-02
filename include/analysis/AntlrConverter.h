@@ -64,7 +64,6 @@ public:
     LgsStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
-    LgsParam* getParam(LogosParser::ExplicitVarDecContext* ctx);
     LgsFuncType* getFuncType(LogosParser::FuncTypeContext* ctx);
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);

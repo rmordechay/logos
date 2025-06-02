@@ -365,15 +365,6 @@ LgsStmt* AntlerConverter::getReturnStmt(LogosParser::ReturnStatementContext* ctx
     return rs;
 }
 
-LgsParam* AntlerConverter::getParam(LogosParser::ExplicitVarDecContext* ctx) {
-    const auto variableName = ctx->VARIABLE()->getText();
-    const auto type = getType(ctx->type());
-    const auto expr = getExpr(ctx->expr());
-    const auto param = new LgsParam(type, variableName, expr);
-    param->setLocation(ctx->start);
-    return param;
-}
-
 LgsFuncType* AntlerConverter::getFuncType(LogosParser::FuncTypeContext* ctx) {
     const auto rt = getType(ctx->rt);
     const auto funcType = new LgsFuncType();
