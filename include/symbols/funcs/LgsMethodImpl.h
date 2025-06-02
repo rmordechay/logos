@@ -15,6 +15,7 @@ public:
         funcType.isMethod = true;
     }
     FunctionType* getIRFuncType(const Module* module) override;
+    Function* getIRFunc(Module* module) override;
     ~LgsMethodImpl() override = default;
 };
 

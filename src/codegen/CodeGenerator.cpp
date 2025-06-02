@@ -21,9 +21,6 @@ void CodeGenerator::generateObjModule(const LgsType* obj) {
     const auto objName = obj->prettyName();
     if (IRModules.find(objName) != IRModules.end()) return;
     const auto module = createEmptyModule(objName);
-    for (const auto& [_, method] : obj->methods) {
-        method->generateIRCode(module);
-    }
     writeIRToFile(module, objName);
 }
 

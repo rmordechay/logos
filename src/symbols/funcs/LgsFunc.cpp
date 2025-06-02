@@ -28,14 +28,7 @@ Value* LgsFunc::createIRValue(Module* module) {
 
 Value* LgsFunc::call(Module* module, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
-    int iterStart = funcType.isStatic;
-    bool isObjReturn = false;
-    if (funcType.rt->asObject() || funcType.rt->asArray()) {
-        const auto objRtPtr = builder.CreateAlloca(funcType.rt->getIRType(), nullptr);
-        IRArgs.push_back(objRtPtr);
-        isObjReturn = true;
-        iterStart++;
-    }
+    const int iterStart = funcType.isStatic;
     if (funcType.hasDefaultParams) assert(false);
     if (funcType.isVariadic) {
         auto isInit = false;
@@ -51,9 +44,7 @@ Value* LgsFunc::call(Module* module, const vector<LgsExpr*>& args) {
             addIRArg(module, IRArgs, args[i]);
         }
     }
-    const auto rv = callIR(module, IRArgs);
-    if (isObjReturn) return IRArgs[0];
-    return rv;
+    return callIR(module, IRArgs);
 }
 
 void LgsFunc::addIRArg(Module* module, vector<Value*>& IRArgs, LgsExpr* arg) const {
@@ -85,14 +76,6 @@ Function* LgsFunc::getIRFunc(Module* module) {
     auto func = module->getOrInsertFunction(funcType.getIRName(), funcIRType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
     auto args = IRFunc->arg_begin();
-    if (funcType.rt->asObject() || funcType.rt->asArray()) {
-        AttrBuilder builder(context);
-        builder.addStructRetAttr(funcType.rt->getIRType());
-        args->addAttrs(builder);
-        args->setName("rv");
-        args++;
-    }
-
     for (int i = 0; i < funcType.params.size(); ++i) {
         const auto param = funcType.params[i];
         if (param->isVariadic) {
