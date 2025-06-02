@@ -1,46 +1,13 @@
 #include "logos/LgsRuntime.h"
-#include "logos/LgsGlobals.h"
+
+#include "data/LgsErrors.h"
+#include "exprs/unary/LgsEnumField.h"
 #include "funcs/LgsFunc.h"
+#include "logos/LgsErrHandler.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsEnum.h"
+#include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
-
-void LgsRuntime::enterFunc(LgsFunc* func) {
-    if (stack.empty()) {
-        returnFunc = func;
-        stack.push(LgsStackFrame{.func = func});
-    } else {
-        returnFunc = getCurrentFunc();
-        stack.push(LgsStackFrame{.symbols = getSymbols(), .func = func, .loop = getCurrentLoop()});
-    }
-    if (stage == LGS_RUNTIME) {
-        returnFunc->savedIP = builder.saveIP();
-    }
-}
-
-void LgsRuntime::enterScope() {
-    stack.push(LgsStackFrame{
-        .symbols = getSymbols(),
-        .func = getCurrentFunc(),
-        .loop = getCurrentLoop()
-    });
-}
-
-void LgsRuntime::exitFunc() {
-    stack.pop();
-    if (stage == LGS_RUNTIME && returnFunc) builder.restoreIP(returnFunc->savedIP);
-    returnFunc = nullptr;
-}
-
-void LgsRuntime::exitScope() {
-    stack.pop();
-}
-
-void LgsRuntime::reset() {
-    while (stack.size() > 0) {
-        stack.pop();
-    }
-    returnFunc = nullptr;
-}
 
 void LgsRuntime::initRuntime(Module* mainModule) {
     const auto stackStr = getIRStructType("StackStr", {ArrayType::get(i8Ty, 1024), i32Ty});
@@ -62,26 +29,6 @@ void LgsRuntime::printStack(Module* module) const {
     builder.CreateCall(printStackFunc, {runtimeStruct});
 }
 
-LgsFunc* LgsRuntime::getCurrentFunc() {
-    assert(stack.size() > 0);
-    return stack.top().func;
-}
-
-LgsForLoop* LgsRuntime::getCurrentLoop() {
-    assert(stack.size() > 0);
-    return stack.top().loop;
-}
-
-map<string, LgsSymbol>& LgsRuntime::getSymbols() {
-    assert(stack.size() > 0);
-    return stack.top().symbols;
-}
-
-void LgsRuntime::addLocalSymbol(const string& name, const LgsSymbol& symbol) {
-    assert(stack.size() > 0);
-    stack.top().symbols[name] = symbol;
-}
-
 void LgsRuntime::addAllocatedExpr(LgsExpr* expr) {
     assert(stack.size() > 0);
     stack.top().allocatedExprs.emplace_back(expr);
@@ -93,4 +40,42 @@ void LgsRuntime::freeExprs(Module* module) {
         expr->free(module);
     }
     stack.top().allocatedExprs.clear();
+}
+
+void LgsGlobals::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
+    if (symbols.find(name) != symbols.end()) {
+        const auto location = symbol.getLocation();
+        errHandler->handleError(E10011, location, {name, location->lineNumberStr()});
+        return;
+    }
+    std::lock_guard lock(mtx);
+    symbols[name] = symbol;
+}
+
+void LgsGlobals::addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler) {
+    if (symbols.find(lgsEnum->name) != symbols.end()) {
+        const auto location = lgsEnum->location;
+        errHandler->handleError(E10011, &location, {lgsEnum->name, location.lineNumberStr()});
+        return;
+    }
+    lock_guard lock(mtx);
+    symbols[lgsEnum->name] = LgsSymbol(lgsEnum);
+    for (const auto& [name, field] : lgsEnum->fields) {
+        symbols[name] = LgsSymbol(dynamic_cast<LgsEnumField*>(field));
+    }
+}
+
+LgsGlobals::~LgsGlobals() {
+    for (const auto& [_, symbol] : symbols) {
+        switch (symbol.type) {
+        case VAR_DEC: delete symbol.varDec; break;
+        case PARAM: delete symbol.param; break;
+        case OBJECT: delete symbol.object; break;
+        case INTERFACE: delete symbol.interface; break;
+        case FUNC: if (!symbol.func->funcType.isBuiltin) delete symbol.func; break;
+        case ENUM: delete symbol.lgsEnum; break;
+        case ENUM_FIELD: delete symbol.enumField; break;
+        default: break;
+        }
+    }
 }

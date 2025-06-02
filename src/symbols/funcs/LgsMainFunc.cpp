@@ -3,13 +3,13 @@
 #include "types/LgsArray.h"
 
 void LgsMainFunc::generateIRCode(Module* module) {
-    runtime.enterFunc(this);
+    runtime.stack.enterFunc(this);
     startBlockFunc(module);
     runtime.initRuntime(module);
     stmtBlock->createIRValue(module);
     runtime.freeExprs(module);
     builder.CreateRet(builder.getInt32(EXIT_SUCCESS));
-    runtime.exitFunc();
+    runtime.stack.exitFunc();
 }
 
 Function* LgsMainFunc::getIRFunc(Module* module) {

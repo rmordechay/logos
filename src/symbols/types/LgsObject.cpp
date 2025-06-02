@@ -12,7 +12,7 @@ string LgsObject::prettyName() const {
 
 Type* LgsObject::getIRType() {
     if (IRType) return IRType;
-    // CodeGenerator::generateObjModule(this);
+    CodeGenerator::generateObjModule(this);
     size_t structPosition = 0;
     vector<Type*> elementTypes;
 

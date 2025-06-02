@@ -1,6 +1,6 @@
 #include "loops/LgsForLoop.h"
 #include "data/LgsDefinitions.h"
-#include "logos/LgsGlobals.h"
+
 #include "stmts/LgsStmtBlock.h"
 #include "stmts/LgsVarDec.h"
 
@@ -15,8 +15,7 @@ void LgsForLoop::createIRStmt(Module* module) {
 }
 
 void LgsForLoop::initIRLoop(Module* module) {
-    runtime.enterScope();
-    runtime.stack.top().loop = this;
+    runtime.stack.enterScope();
     loopCondBlock = createBasicBlock(LOGOS_LOOP_CONDITION);
     loopBodyBlock = createBasicBlock(LOGOS_LOOP_BODY);
     loopExitBlock = createBasicBlock(LOGOS_LOOP_EXIT);
@@ -35,7 +34,6 @@ void LgsForLoop::setLoopIRCondition(Module* module) {
 }
 
 void LgsForLoop::exitIRLoop(Module* module) const {
-
     // Increment loop variable
     const auto iValue = builder.CreateLoad(i32Ty, iPtr);
     const auto inc = builder.CreateAdd(iValue, builder.getInt32(1));
@@ -43,8 +41,7 @@ void LgsForLoop::exitIRLoop(Module* module) const {
     builder.CreateBr(loopCondBlock);
     // Loop exit
     startBlock(module, loopExitBlock);
-    runtime.stack.top().loop = nullptr;
-    runtime.exitScope();
+    runtime.stack.exitScope();
 }
 
 LgsForLoop::~LgsForLoop() {

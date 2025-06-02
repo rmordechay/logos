@@ -38,6 +38,7 @@ struct LgsIndex;
 
 class SemaAnalyser final {
 public:
+    LgsStack stack;
     LgsFile* file = nullptr;
     LgsErrHandler errHandler;
 

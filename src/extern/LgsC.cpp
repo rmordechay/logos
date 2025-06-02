@@ -1,7 +1,7 @@
 #include "extern/LgsC.h"
 #include "extern/LgsCInterface.h"
 #include "codegen/CodegenMetadata.h"
-#include "logos/LgsGlobals.h"
+
 #include "logos/Platform.h"
 
 #include <clang/Basic/Diagnostic.h>

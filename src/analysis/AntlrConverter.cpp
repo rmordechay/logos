@@ -2,7 +2,7 @@
 
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
-#include "logos/LgsGlobals.h"
+
 #include "files/LgsInterfaceFile.h"
 #include "LogosLexer.h"
 #include "logos/Platform.h"

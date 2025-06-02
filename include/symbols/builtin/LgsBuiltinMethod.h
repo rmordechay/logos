@@ -7,7 +7,6 @@
 class LgsBuiltinMethod : public LgsMethodImpl {
 public:
     LgsBuiltinMethod(const string& name, const string& parentName, LgsType* rt, const vector<LgsParam*>& params = {}): LgsMethodImpl(name, parentName, rt, params) {
-        IRGenerated = true;
         funcType.isBuiltin = true;
     }
     ~LgsBuiltinMethod() override = default;
@@ -16,7 +15,6 @@ public:
 class LgsBuiltinFunc : public LgsFuncImpl {
 public:
     LgsBuiltinFunc(const string& name, LgsType* rt, const vector<LgsParam*>& params = {}): LgsFuncImpl(name, rt, params) {
-        IRGenerated = true;
         funcType.isBuiltin = true;
     }
     ~LgsBuiltinFunc() override = default;

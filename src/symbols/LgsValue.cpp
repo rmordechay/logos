@@ -1,16 +1,15 @@
 #include "LgsValue.h"
 #include "funcs/LgsFunc.h"
-#include "logos/LgsGlobals.h"
 #include "json/json.hpp"
 
 void LgsValue::startBlock(Module* module, BasicBlock* const block) const {
-    const auto IRFunc = runtime.getCurrentFunc()->getIRFunc(module);
+    const auto IRFunc = runtime.stack.currentFunc->getIRFunc(module);
     block->insertInto(IRFunc);
     builder.SetInsertPoint(block);
 }
 
 void LgsValue::startBlockFunc(Module* module) const {
-    const auto currentFunc = runtime.getCurrentFunc();
+    const auto currentFunc = runtime.stack.currentFunc;
     const auto entryBlock = BasicBlock::Create(context, "entry");
     entryBlock->insertInto(currentFunc->getIRFunc(module));
     builder.SetInsertPoint(entryBlock);

@@ -8,7 +8,7 @@
 #include "files/LgsAppFile.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
-#include "logos/LgsGlobals.h"
+
 #include "logos/Logos.h"
 #include "parser/LogosLexer.h"
 #include "parser/LogosParser.h"

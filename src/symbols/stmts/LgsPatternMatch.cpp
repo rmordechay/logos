@@ -1,12 +1,10 @@
 #include "stmts/LgsPatternMatch.h"
-
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
-#include "logos/LgsGlobals.h"
 #include "stmts/LgsVarDec.h"
 
 void LgsPatternMatch::createIRStmt(Module* module) {
-    const auto func = runtime.getCurrentFunc()->getIRFunc(module);
+    const auto func = runtime.stack.currentFunc->getIRFunc(module);
     const auto exprIRValue = builder.getInt32(expr->hashValue(module));
     exitBlock = BasicBlock::Create(context, "exit_pattern_matching");
     defaultCase = BasicBlock::Create(context, "default");

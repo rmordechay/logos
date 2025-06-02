@@ -28,14 +28,4 @@ Value* const i32Zero = ConstantInt::get(i32Ty, 0);
 PointerType* const ptrTy = PointerType::get(i8Ty, 0);
 Value* const null = ConstantPointerNull::get(ptrTy);
 
-inline FunctionCallee getPrintf(Module* module) {
-    const auto printfType = FunctionType::get(i32Ty, {ptrTy}, true);
-    return module->getOrInsertFunction("printf", printfType);
-}
-
-inline FunctionCallee getSnprintf(Module* module) {
-    const auto printfType = FunctionType::get(i32Ty, {ptrTy, i64Ty, ptrTy}, true);
-    return module->getOrInsertFunction("snprintf", printfType);
-}
-
 #endif //CODEGENMETADATA_H

@@ -2,13 +2,12 @@
 #include "builtin/LgsPrint.h"
 #include "exprs/unary/LgsVariable.h"
 #include "funcs/LgsFunc.h"
-#include "logos/LgsGlobals.h"
+
 #include "stmts/LgsVarDec.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
 Value* LgsFuncCall::call(Module* module) const {
-    if (!func->IRGenerated) func->generateIRCode(module);
     if (callback) {
         func->setIRValue(getCallback(module));
     } else if (func->funcType.isVirtual) {

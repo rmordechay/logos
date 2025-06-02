@@ -1,16 +1,16 @@
 #include "stmts/LgsIfStmt.h"
 
 #include "codegen/CodegenMetadata.h"
-#include "logos/LgsGlobals.h"
+
 
 void LgsIfStmt::createIRStmt(Module* module) {
-    runtime.enterScope();
+    runtime.stack.enterScope();
     if (elseBlock || elseIfConds.size() > 0) {
         computeComplexIf(module);
     } else {
         computeSimpleIf(module);
     }
-    runtime.exitScope();
+    runtime.stack.exitScope();
 }
 
 

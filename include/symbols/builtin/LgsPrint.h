@@ -8,6 +8,11 @@
 #include <types/primitives/LgsVoid.h>
 #include <types/LgsAny.h>
 
+inline FunctionCallee getPrintf(Module* module) {
+    const auto printfType = FunctionType::get(i32Ty, {ptrTy}, true);
+    return module->getOrInsertFunction("printf", printfType);
+}
+
 class LgsPrint final : public LgsBuiltinFunc {
 public:
     static constexpr auto name = "print";

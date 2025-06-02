@@ -1,6 +1,6 @@
 #include "stmts/LgsReturn.h"
 #include "exprs/unary/LgsInstance.h"
-#include "logos/LgsGlobals.h"
+
 
 void LgsReturn::createIRStmt(Module* module) {
     runtime.freeExprs(module);

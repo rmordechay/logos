@@ -24,7 +24,6 @@ class LgsExpr : virtual public LgsValue {
 public:
     // TODO free type
     LgsType* type = nullptr;
-    bool isReturnValue = false;
     bool isNull = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}

@@ -2,7 +2,7 @@
 
 #include "data/LgsDefinitions.h"
 #include "data/LgsErrors.h"
-#include "logos/LgsGlobals.h"
+
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
 #include "logos/LgsProject.h"
@@ -31,7 +31,6 @@
 #include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsArray.h"
-#include "types/primitives/LgsVoid.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsForLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -90,11 +89,11 @@ void SemaAnalyser::visitInterface(LgsInterface* interface) const {}
 
 void SemaAnalyser::visitFunc(LgsFunc* func) {
     func->filePath = file->absPath;
-    runtime.enterFunc(func);
+    stack.enterFunc(func);
     visitFuncType(&func->funcType);
     visitStmtBlock(func->stmtBlock);
     validateFuncControlFlow(func);
-    runtime.exitFunc();
+    stack.exitFunc();
 }
 
 void SemaAnalyser::visitFuncType(const LgsFuncType* funcType) {
@@ -174,7 +173,7 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
 }
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
-    runtime.enterScope();
+    stack.enterScope();
     visitExpr(ifStmt->ifCond);
     visitStmtBlock(ifStmt->ifStmtBlock);
     ifStmt->hasReturn = ifStmt->ifStmtBlock->hasReturn;
@@ -186,7 +185,7 @@ void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
         visitStmtBlock(ifStmt->elseStmtBlock);
         ifStmt->hasReturn = ifStmt->elseStmtBlock->hasReturn;
     }
-    runtime.exitScope();
+    stack.exitScope();
 }
 
 void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
@@ -212,15 +211,13 @@ void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
 void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const {}
 
 void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
-    runtime.enterScope();
-    runtime.stack.top().loop = loopStmt;
+    stack.enterScope();
     if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {
         visitRangeLoop(rangeLoop);
     } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loopStmt)) {
         visitForeachLoop(foreachLoop);
     }
-    runtime.stack.top().loop = nullptr;
-    runtime.exitScope();
+    stack.exitScope();
 }
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
@@ -248,35 +245,28 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
 }
 
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
-    auto funcType = runtime.getCurrentFunc()->funcType;
+    if (returnStmt->expr) visitExpr(returnStmt->expr);
+    auto funcType = stack.currentFunc->funcType;
     const auto rt = funcType.rt;
-    if (returnStmt->expr) {
-        returnStmt->expr->isReturnValue = true;
-        visitExpr(returnStmt->expr);
-    }
     if (rt->isVoid) {
-        if (returnStmt->expr) {
-            const auto exprType = returnStmt->expr->type;
-            if (!exprType->isVoid) {
-                errHandler.handleError(E10027, &returnStmt->location, {funcType.name, rt->prettyName(), exprType->prettyName()});
-                return;
-            }
+        if (returnStmt->expr && !returnStmt->expr->type->isVoid) {
+            errHandler.handleError(E10027, &returnStmt->location, {funcType.name, rt->prettyName(), returnStmt->expr->type->prettyName()});
         }
     } else if (!returnStmt->expr) {
-        return errHandler.handleError(E10026, &returnStmt->location, {funcType.name, rt->prettyName()});
+        errHandler.handleError(E10026, &returnStmt->location, {funcType.name, rt->prettyName()});
     } else if (!rt->equals(returnStmt->expr->type)) {
-        return errHandler.handleError(E10027, &returnStmt->location, {funcType.name, rt->prettyName(), returnStmt->expr->type->prettyName()});
+        errHandler.handleError(E10027, &returnStmt->location, {funcType.name, rt->prettyName(), returnStmt->expr->type->prettyName()});
     }
 }
 
 void SemaAnalyser::visitBreakStmt(const LgsBreakStmt* breakStmt) {
-    if (!runtime.getCurrentLoop()) {
+    if (!stack.currentLoop) {
         return errHandler.handleError(E10017, &breakStmt->location);
     }
 }
 
 void SemaAnalyser::visitContinueStmt(const LgsContinueStmt* continueStmt) {
-    if (!runtime.getCurrentLoop()) {
+    if (!stack.currentLoop) {
         return errHandler.handleError(E10038, &continueStmt->location);
     }
 }
@@ -642,7 +632,7 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
         symbol = &globals.symbols[name];
     } else {
         // Locals
-        auto& symbols = runtime.getSymbols();
+        auto& symbols = stack.top().symbols;
         if (symbols.find(name) != symbols.end()) {
             symbol = &symbols[name];
         }
@@ -658,7 +648,7 @@ void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
         const auto location = symbol.getLocation();
         return errHandler.handleError(E10011, location, {name, to_string(location->lineNumber)});
     }
-    runtime.addLocalSymbol(name, symbol);
+    stack.addSymbol(name, symbol);
 }
 
 LgsType* SemaAnalyser::resolveType(LgsType* type) {

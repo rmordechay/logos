@@ -2,7 +2,7 @@
 #include "codegen/CodeGenerator.h"
 #include "builtin/LgsPrint.h"
 #include "funcs/LgsFunc.h"
-#include "logos/LgsGlobals.h"
+
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
@@ -13,10 +13,10 @@ string LgsInstance::getName() {
 
 Value* LgsInstance::createIRValue(Module* module) {
     const auto IRType = obj->getIRType();
-    const auto currentFunc = runtime.getCurrentFunc()->getIRFunc(module);
+    const auto currentFunc = runtime.stack.currentFunc->getIRFunc(module);
 
     // TODO cover all cases
-    if (isSelf || isReturnValue) {
+    if (isSelf) {
         IRValue = currentFunc->arg_begin();
     } else {
         IRValue = builder.CreateAlloca(IRType);

@@ -16,10 +16,9 @@ public:
     LgsStmtBlock* stmtBlock = nullptr;
     FunctionType* IRFuncType = nullptr;
     IRBuilderBase::InsertPoint savedIP;
-    bool IRGenerated = false;
     string filePath;
 
-    explicit LgsFunc(const bool IRGenerated = false): IRGenerated(IRGenerated) {
+    explicit LgsFunc() {
         type = &funcType;
     }
     Value* createIRValue(Module* module) override;

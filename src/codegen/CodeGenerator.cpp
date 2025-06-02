@@ -2,8 +2,6 @@
 #include "logos/LgsConfig.h"
 #include "logos/Logos.h"
 #include "logos/Platform.h"
-#include "funcs/LgsMethodImpl.h"
-#include "logos/LgsGlobals.h"
 #include <files/LgsMainFile.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/TargetSelect.h>
@@ -13,6 +11,9 @@
 void CodeGenerator::generate(const LgsMainFile* mainFile) {
     init();
     const auto module = createEmptyModule(LOGOS_MAIN_FILE_NAME);
+    for (const auto [_, func] : mainFile->funcs) {
+        func->generateIRCode(module);
+    }
     mainFile->mainFunc->generateIRCode(module);
     writeIRToFile(module, LOGOS_MAIN_FILE_NAME);
 }
@@ -21,6 +22,9 @@ void CodeGenerator::generateObjModule(const LgsType* obj) {
     const auto objName = obj->prettyName();
     if (IRModules.find(objName) != IRModules.end()) return;
     const auto module = createEmptyModule(objName);
+    for (const auto& [_, method] : obj->methods) {
+        method->generateIRCode(module);
+    }
     writeIRToFile(module, objName);
 }
 
@@ -33,7 +37,6 @@ Module* CodeGenerator::createEmptyModule(const string& objName) {
 }
 
 void CodeGenerator::init() {
-    runtime.stage = LGS_RUNTIME;
     // Build dir
     if (exists(paths.buildDir)) remove_all(paths.buildDir);
     create_directories(paths.buildDir);

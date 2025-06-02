@@ -1,6 +1,6 @@
 #include "funcs/LgsFunc.h"
 #include "data/LgsDefinitions.h"
-#include "logos/LgsGlobals.h"
+
 #include "stmts/LgsStmtBlock.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
@@ -8,7 +8,7 @@
 #include "types/LgsArray.h"
 
 void LgsFunc::generateIRCode(Module* module) {
-    runtime.enterFunc(this);
+    runtime.stack.enterFunc(this);
     startBlockFunc(module);
     const auto IRFunc = getIRFunc(module);
     IRValue = IRFunc;
@@ -17,12 +17,10 @@ void LgsFunc::generateIRCode(Module* module) {
         runtime.freeExprs(module);
         builder.CreateRetVoid();
     }
-    runtime.exitFunc();
-    IRGenerated = true;
+    runtime.stack.exitFunc();
 }
 
 Value* LgsFunc::createIRValue(Module* module) {
-    generateIRCode(module);
     return IRValue;
 }
 
@@ -106,16 +104,7 @@ FunctionType* LgsFunc::getIRFuncType(const Module* module) {
         IRParamsTypes.emplace_back(paramIRType);
     }
 
-    Type* rt = nullptr;
-    Type* allocatedType = nullptr;
-    if (funcType.rt->asObject() || funcType.rt->asArray()) {
-        allocatedType = funcType.rt->getIRType();
-        IRParamsTypes.insert(IRParamsTypes.begin(), PointerType::get(allocatedType, 0));
-        rt = voidTy;
-    } else {
-        rt = funcType.rt->getIRType();
-    }
-
+    const auto rt = funcType.rt->getIRType();
     IRFuncType = FunctionType::get(rt, IRParamsTypes, funcType.isVariadic);
     return IRFuncType;
 }

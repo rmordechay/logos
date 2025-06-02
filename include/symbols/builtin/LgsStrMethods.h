@@ -7,6 +7,11 @@
 
 #define BUFFER_SIZE 1024
 
+inline FunctionCallee getSnprintf(Module* module) {
+    const auto printfType = FunctionType::get(i32Ty, {ptrTy, i64Ty, ptrTy}, true);
+    return module->getOrInsertFunction("snprintf", printfType);
+}
+
 class LgsStrFormatFunc final : public LgsBuiltinMethod {
 public:
     LgsParam self{};
