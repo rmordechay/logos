@@ -5,8 +5,8 @@
 #include "types/primitives/LgsInt.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
-#include "../../../include/symbols/types/LgsArray.h"
-#include "../../../include/symbols/types/LgsMap.h"
+#include "types/LgsArray.h"
+#include "types/LgsMap.h"
 #include "types/LgsUnknownType.h"
 #include "types/primitives/LgsBool.h"
 

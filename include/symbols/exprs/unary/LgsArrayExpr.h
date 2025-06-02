@@ -3,7 +3,7 @@
 
 #include "LgsUnaryExpr.h"
 #include "exprs/LgsExpr.h"
-#include "../../types/LgsArray.h"
+#include "types/LgsArray.h"
 
 class LgsArrayExpr final : public LgsUnaryExpr {
 public:

@@ -5,7 +5,7 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "exprs/LgsExpr.h"
-#include "../../../include/symbols/types/LgsArray.h"
+#include "types/LgsArray.h"
 
 void LgsFunc::generateIRCode(Module* module) {
     runtime.enterFunc(this);
@@ -89,7 +89,7 @@ Function* LgsFunc::getIRFunc(Module* module) {
         AttrBuilder builder(context);
         builder.addStructRetAttr(funcType.rt->getIRType());
         args->addAttrs(builder);
-        args->setName("rt");
+        args->setName("rv");
         args++;
     }
 

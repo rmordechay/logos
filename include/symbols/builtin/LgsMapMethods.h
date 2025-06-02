@@ -3,9 +3,8 @@
 #include "LgsBuiltinMethod.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
-#include "../types/LgsStr.h"
+#include "types/LgsStr.h"
 #include "types/primitives/LgsVoid.h"
-#include "funcs/LgsMethodImpl.h"
 
 class LgsMapInitFunc final : public LgsBuiltinMethod {
 public:

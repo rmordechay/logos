@@ -1,4 +1,4 @@
-#include "../../../include/symbols/types/LgsArray.h"
+#include "types/LgsArray.h"
 #include "utils/LgsUtils.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include "exprs/unary/LgsIterIndex.h"

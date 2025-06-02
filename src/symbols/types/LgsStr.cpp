@@ -1,4 +1,4 @@
-#include "../../../include/symbols/types/LgsStr.h"
+#include "types/LgsStr.h"
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 

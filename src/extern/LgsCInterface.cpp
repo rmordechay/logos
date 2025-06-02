@@ -4,7 +4,7 @@
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsVoid.h"
-#include "../../include/symbols/types/LgsStr.h"
+#include "types/LgsStr.h"
 
 bool LgsCVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     if (!isValid(func->getLocation()) || !func->isThisDeclarationADefinition()) return true;
