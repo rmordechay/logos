@@ -3,7 +3,7 @@
 Value* LgsHashMap::createIRValue(Module* module) {
 
     const auto valueType = mapType.kvType.value;
-    const auto elementSize = builder.getInt32(valueType->getSize());
+    const auto elementSize = builder.getInt32(valueType->getSizeBytes());
     const auto mapStruct = getIRStructType(mapType.name, mapType.structFields);
     IRValue = builder.CreateAlloca(mapStruct);
     mapType.init.callIR(module, {IRValue, elementSize});

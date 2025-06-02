@@ -10,7 +10,11 @@ void LgsRuntime::enterFunc(LgsFunc* func) {
         stack.push(LgsStackFrame{.currentFunc = func});
     } else {
         returnFunc = getCurrentFunc();
-        stack.push(LgsStackFrame{.symbols = getSymbols(), .currentFunc = func, .currentLoop = getCurrentLoop()});
+        stack.push(LgsStackFrame{
+            .symbols = getSymbols(),
+            .currentFunc = func,
+            .currentLoop = getCurrentLoop()
+        });
     }
     if (stage == LGS_RUNTIME) {
         returnFunc->savedIP = builder.saveIP();
@@ -52,7 +56,7 @@ void LgsRuntime::initRuntime(Module* mainModule) {
     builder.CreateCall(initStackFunc, {runtimeStruct});
 }
 
-void LgsRuntime::push(Module* module, const string& path) const {
+void LgsRuntime::pushStackTrace(Module* module, const string& path) const {
     const auto pushStackFunc = module->getOrInsertFunction("Runtime_push", FunctionType::get(voidTy, {ptrTy, ptrTy}, false));
     builder.CreateCall(pushStackFunc, {runtimeStruct, getIRStr(module, path)});
 }

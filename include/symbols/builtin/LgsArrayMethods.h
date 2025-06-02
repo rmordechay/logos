@@ -83,6 +83,10 @@ public:
         funcType.params = {&self};
         funcType.isPublic = true;
     }
+
+    Value* call(Module* module, const vector<LgsExpr*>& args) override {
+        return args.front()->getLength(module);
+    }
 };
 
 class LgsArrayFreeFunc final : public LgsBuiltinMethod {

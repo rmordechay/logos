@@ -69,7 +69,6 @@ void LogosProject::parseSrcFile(path entry) {
     const auto file = antlerConverter.getLogosFile(parser.logosFile(), absFilePath);
     lock_guard lock(projectMtx);
     files.emplace_back(file);
-    lgsC.parse(file->externFiles);
     errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
     if (file->name == LOGOS_MAIN_FILE_NAME) {
         mainFile = dynamic_cast<LgsMainFile*>(file);

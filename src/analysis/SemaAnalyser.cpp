@@ -537,8 +537,16 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     visitUnaryExpr(baseExpr);
     visitExpr(iterIndex->index->from);
     visitExpr(iterIndex->index->to);
-    const auto type = baseExpr->type->asIterable()->baseType;
-    iterIndex->setType(type);
+    const auto iterable = baseExpr->type->asIterable();
+    if (!iterable) {
+        return errHandler.handleError(E10002, &iterIndex->location, {iterIndex->baseExpr->prettyName()});
+    }
+    if (const auto map = iterable->asMap()) {
+        iterIndex->setType(map->kvType.value);
+    } else {
+        iterIndex->setType(iterable->baseType);
+    }
+    assert(iterIndex->type);
 }
 
 bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
@@ -619,7 +627,7 @@ void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
 }
 
 void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
-    if (dynamic_cast<LgsVoid*>(func->funcType.rt)) return;
+    if (func->funcType.rt->isVoid) return;
     const auto stmtBlock = func->stmtBlock;
     const bool isFlowCorrect = func->funcType.name != LOGOS_MAIN_FUNC && !stmtBlock->hasReturn;
     if (isFlowCorrect) {

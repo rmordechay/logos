@@ -33,6 +33,7 @@
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsHashMap.h"
+#include "extern/LgsC.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "stmts/LgsAssignment.h"
@@ -66,6 +67,8 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
             file->externFiles.push_back(s);
         }
     }
+    const LgsC lgsC;
+    lgsC.parse(file->externFiles);
     file->absPath = filePath;
     file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     return file;
@@ -200,7 +203,7 @@ LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
     const auto params = mainFunc->funcType.params;
     bool isValid = false;
     if (params.size() == 1) {
-        const auto arr = params[0]->type->asArray();
+        const auto arr = params.front()->type->asArray();
         isValid = arr && arr->baseType->asStr();
     } else {
         isValid = params.empty();
@@ -547,13 +550,13 @@ LgsUnaryExpr* AntlerConverter::getHashMap(LogosParser::HashMapContext* ctx) {
     return hashMap;
 }
 
-LgsVariable* AntlerConverter::getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) {
+LgsVariable* AntlerConverter::getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) const {
     const auto variable = new LgsVariable(varName);
     variable->setLocation(ctx->start);
     return variable;
 }
 
-LgsUnaryExpr* AntlerConverter::getConst(const string& constName, const antlr4::ParserRuleContext* ctx) {
+LgsUnaryExpr* AntlerConverter::getConst(const string& constName, const antlr4::ParserRuleContext* ctx) const {
     const auto constVariable = new LgsConst(constName);
     constVariable->setLocation(ctx->start);
     return constVariable;
@@ -603,9 +606,6 @@ LgsUnaryExpr* AntlerConverter::getFirstSelection(LogosParser::SelectionContext* 
         return getIterIndex(iterIndex);
     }
     if (const auto selfInstance = firstExpr->SELF_INSTANCE()) {
-        if (currentMethod) {
-            currentMethod->funcType.isStatic = true;
-        }
         return getVariable(selfInstance->getText(), ctx);
     }
     if (const auto selfClass = firstExpr->SELF_CLASS()) {

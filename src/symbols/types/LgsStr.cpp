@@ -2,7 +2,7 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 
-size_t LgsStr::getSize() {
+size_t LgsStr::getSizeBytes() {
     return sizeof(void*);
 }
 
@@ -31,11 +31,6 @@ Value* LgsStr::getElement(Module* module, Value* iterPtr, Value* iPtr) {
     if (isStatic) assert(false);
     const auto i = builder.CreateLoad(i32Ty, iPtr);
     return builder.CreateInBoundsGEP(baseType->getIRType(), iterPtr, {i});
-}
-
-Value* LgsStr::getLength(Module* module, Value* iterValue) {
-    if (isStatic) sizeExpr->getIRValue(module);
-    return len.callIR(module, {iterValue});
 }
 
 string LgsStr::getStrFormatPart() const {

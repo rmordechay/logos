@@ -7,13 +7,13 @@ void LgsMap::setBaseType(const vector<LgsMapPair*>& exprs) {
     kvType.value = exprs.front()->value->type;
 }
 
+size_t LgsMap::getSizeBytes() {
+    return sizeof(void*);
+}
+
 void LgsMap::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[0]->type = kvType.key;
     varDecs[1]->type = kvType.value;
-}
-
-Value* LgsMap::getLength(Module* module, Value* iterValue) {
-    return len.callIR(module);
 }
 
 Value* LgsMap::getElement(Module* module, Value* iterPtr, Value* iPtr) {

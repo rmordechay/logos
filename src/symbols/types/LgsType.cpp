@@ -14,7 +14,7 @@ bool LgsType::equals(LgsType& other) {
     return getIRName() == other.getIRName();
 }
 
-size_t LgsType::getSize() {
+size_t LgsType::getSizeBytes() {
     assert(false);
 }
 

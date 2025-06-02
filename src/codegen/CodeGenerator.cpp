@@ -12,10 +12,7 @@
 
 void CodeGenerator::generate(const LgsMainFile* mainFile) {
     init();
-    runtime.stage = LGS_RUNTIME;
     const auto module = createEmptyModule(LOGOS_MAIN_FILE_NAME);
-    LgsC lgsC;
-    lgsC.compile(mainFile->externFiles);
     mainFile->mainFunc->generateIRCode(module);
     writeIRToFile(module, LOGOS_MAIN_FILE_NAME);
 }
@@ -39,8 +36,11 @@ Module* CodeGenerator::createEmptyModule(const string& objName) {
 }
 
 void CodeGenerator::init() {
+    runtime.stage = LGS_RUNTIME;
+    // Build dir
     if (exists(paths.buildDir)) remove_all(paths.buildDir);
     create_directories(paths.buildDir);
+    // LLVM
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();

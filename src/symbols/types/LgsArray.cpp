@@ -6,9 +6,9 @@
 #include "logos/LgsConfig.h"
 #include "stmts/LgsVarDec.h"
 
-size_t LgsArray::getSize() {
+size_t LgsArray::getSizeBytes() {
     if (isStatic) {
-        return baseType->getSize() * getExprConstNumber(sizeExpr);
+        return baseType->getSizeBytes() * getExprConstNumber(sizeExpr);
     }
     return sizeof(void*);
 }
@@ -39,7 +39,9 @@ string LgsArray::getIRName() {
 }
 
 void LgsArray::inferArrayType(const vector<LgsExpr*>& exprs) {
-    baseType = exprs.front()->type;
+    if (!exprs.empty()) {
+        baseType = exprs.front()->type;
+    }
     sizeExpr = new LgsIntConst(exprs.size());
 }
 
@@ -49,11 +51,6 @@ LgsType* LgsArray::inferBinaryType(LgsType* other) {
 
 void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[0]->type = baseType;
-}
-
-Value* LgsArray::getLength(Module* module, Value* iterValue) {
-    if (isStatic) return sizeExpr->getIRValue(module);
-    return len.callIR(module, {iterValue});
 }
 
 Value* LgsArray::getElement(Module* module, Value* iterPtr, Value* indexPtr) {

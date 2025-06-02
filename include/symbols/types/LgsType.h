@@ -48,7 +48,7 @@ public:
     LgsFuncType* asFuncType();
     bool isUnknown();
 
-    virtual size_t getSize();
+    virtual size_t getSizeBytes();
     virtual bool equals(LgsType& other);
     virtual nlohmann::json asJSON() const;
     virtual string getStrFormatPart() const;

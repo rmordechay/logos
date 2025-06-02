@@ -2,7 +2,7 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 
-size_t LgsInt::getSize() {
+size_t LgsInt::getSizeBytes() {
     return sizeof(int);
 }
 

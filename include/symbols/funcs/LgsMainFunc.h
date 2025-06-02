@@ -7,9 +7,11 @@
 
 class LgsMainFunc final : public LgsFuncImpl {
 public:
+    Function* IRFunc = nullptr;
+
     explicit LgsMainFunc() : LgsFuncImpl(LOGOS_MAIN_FUNC, &LGS_INT) {}
     void generateIRCode(Module* module) override;
-    void setMainIR(Module* module) const;
+    Function* getIRFunc(Module* module) override;
     ~LgsMainFunc() override = default;
 };
 

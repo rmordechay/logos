@@ -12,7 +12,7 @@ Value* LgsArrayExpr::createIRValue(Module* module) {
 Value* LgsArrayExpr::createDynArray(Module* module) {
     const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
     const auto capacityIR = builder.getInt32(capacity);
-    const auto elementSize = builder.getInt64(arrType.baseType->getSize());
+    const auto elementSize = builder.getInt64(arrType.baseType->getSizeBytes());
     const auto arrStruct = getIRStructType(arrType.name, arrType.structFields);
     const auto currentFunc = runtime.getCurrentFunc()->getIRFunc(module);
     if (isReturnValue) {

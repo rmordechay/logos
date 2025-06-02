@@ -2,7 +2,7 @@
 
 #include "codegen/CodegenMetadata.h"
 
-size_t LgsAny::getSize() {
+size_t LgsAny::getSizeBytes() {
     return sizeof(void*);
 }
 

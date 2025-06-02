@@ -39,7 +39,7 @@ public:
     void exitFunc();
     void reset();
     void initRuntime(Module* mainModule);
-    void push(Module* module, const string& path) const;
+    void pushStackTrace(Module* module, const string& path) const;
     void printStack(Module* module) const;
     LgsFunc* getCurrentFunc();
     LgsForLoop* getCurrentLoop();

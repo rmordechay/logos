@@ -15,6 +15,7 @@ public:
     LgsArrayFreeFunc free{this};
     LgsArrayDeleteFunc delete_{this};
     vector<Type*> structFields{i64Ty, i32Ty, i32Ty, ptrTy};
+    Value* argc = nullptr;
 
     explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         addMethod(&add);
@@ -23,14 +24,13 @@ public:
     }
 
     void inferArrayType(const vector<LgsExpr*>& exprs);
-    size_t getSize() override;
+    size_t getSizeBytes() override;
     string getIRName() override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
-    Value* getLength(Module* module, Value* iterValue) override;
     Value* getElement(Module* module, Value* iterPtr, Value* indexPtr) override;
     LgsType* clone() override;
     ~LgsArray() override;

@@ -9,7 +9,7 @@ public:
     LgsInt() {
         isPrimitive = true;
     }
-    size_t getSize() override;
+    size_t getSizeBytes() override;
     Type* getIRType() override;
     string getIRName() override;
     string prettyName() const override;

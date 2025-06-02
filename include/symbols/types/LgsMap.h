@@ -26,6 +26,7 @@ public:
     }
 
     void setBaseType(const vector<LgsMapPair*>& exprs);
+    size_t getSizeBytes() override;
     Type* getIRType() override;
     string getIRName() override;
     string prettyName() const override;
@@ -34,7 +35,6 @@ public:
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
-    Value* getLength(Module* module, Value* iterValue) override;
     Value* getElement(Module* module, Value* iterPtr, Value* iPtr) override;
     ~LgsMap() override = default;
 };

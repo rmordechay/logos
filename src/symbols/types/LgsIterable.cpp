@@ -26,16 +26,3 @@ void LgsIterable::unpackTypes(const vector<LgsVarDec*>& varDecs) {
 Value* LgsIterable::getElement(Module* module, Value* iterPtr, Value* iPtr) {
     assert(false);
 }
-
-Value* LgsIterable::getLength(Module* module, Value* iterValue) {
-    assert(false);
-}
-
-LgsType* LgsIterable::getIterType(const LgsIndex* index) const {
-    if (index->to) {
-        const auto sliced = new LgsArray(baseType->clone());
-        sliced->isStatic = isStatic;
-        return sliced;
-    }
-    return baseType;
-}

@@ -129,11 +129,11 @@ uint32_t LgsVariable::hashValue(Module* module) {
 Value* LgsVariable::getLength(Module* module) {
     switch (ref->type) {
     case VAR_DEC:
-        return type->asIterable()->getLength(module, ref->varDec->IRValue);
-    case PARAM: {
-        return type->asIterable()->getLength(module, ref->param->IRValue);
-    }
+        return ref->varDec->expr->getLength(module);
+    case PARAM:
+        return ref->param->expr->getLength(module);
     default:
-        assert(false);
+        break;
     }
+    assert(false);
 }

@@ -15,7 +15,7 @@ public:
         addMethod(&format);
         unpackLength = 1;
     }
-    size_t getSize() override;
+    size_t getSizeBytes() override;
     string getIRName() override;
     Type* getIRType() override;
     string prettyName() const override;
@@ -23,7 +23,6 @@ public:
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     Value* getElement(Module* module, Value* iterPtr, Value* iPtr) override;
-    Value* getLength(Module* module, Value* iterValue) override;
     string getStrFormatPart() const override;
     static uint32_t hashString(const string& str);
     ~LgsStr() override = default;

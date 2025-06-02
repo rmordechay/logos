@@ -6,7 +6,7 @@ FunctionType* LgsMethodImpl::getIRFuncType(const Module* module) {
     for (int i = 0; i < funcType.params.size(); ++i) {
         auto paramIRType = funcType.params[i]->type->getIRType();
         if (i == 0 && !funcType.isStatic) {
-            IRParamsTypes.emplace_back(PointerType::get(paramIRType, 0));
+            IRParamsTypes.emplace_back(ptrTy);
         } else {
             IRParamsTypes.emplace_back(paramIRType);
         }

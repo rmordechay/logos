@@ -15,11 +15,9 @@ public:
 
     explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}
     Type* getIRType() override;
-    LgsType* getIterType(const LgsIndex* index) const;
     virtual LgsType* getBaseType();
     virtual void unpackTypes(const vector<LgsVarDec*>& varDecs);
     virtual Value* getElement(Module* module, Value* iterPtr, Value* iPtr);
-    virtual Value* getLength(Module* module, Value* iterValue);
     ~LgsIterable() override = default;
 };
 
