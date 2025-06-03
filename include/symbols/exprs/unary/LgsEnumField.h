@@ -10,7 +10,7 @@ public:
     LgsEnum* parent;
 
     LgsEnumField(LgsEnum* parent, const std::string& name, const std::string& text) : LgsField(name, nullptr, nullptr), text(text), parent(parent){}
-    Value* getGEP(Module* module, Value* instance = nullptr) override;
+    Value* getGEP(LgsRuntime* runtime, Value* instance = nullptr) override;
     ~LgsEnumField() override = default;
 };
 

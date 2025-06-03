@@ -16,14 +16,14 @@ public:
     BasicBlock* loopBodyBlock = nullptr;
     BasicBlock* loopExitBlock = nullptr;
 
-    void createIRStmt(Module* module, LgsRuntime* runtime) override;
-    void initIRLoop(Module* module);
-    void setLoopIRCondition(Module* module);
-    void exitIRLoop(Module* module) const;
-    virtual Value* loopStart(Module* module) = 0;
-    virtual Value* loopEnd(Module* module) = 0;
-    virtual void setIRIterable(Module* module) = 0;
-    virtual void setIRLoopVars(Module* module) = 0;
+    void createIRStmt(LgsRuntime* runtime) override;
+    void initIRLoop(LgsRuntime* runtime);
+    void setLoopIRCondition(LgsRuntime* runtime);
+    void exitIRLoop(LgsRuntime* runtime) const;
+    virtual Value* loopStart(LgsRuntime* runtime) = 0;
+    virtual Value* loopEnd(LgsRuntime* runtime) = 0;
+    virtual void setIRIterable(LgsRuntime* runtime) = 0;
+    virtual void setIRLoopVars(LgsRuntime* runtime) = 0;
     ~LgsForLoop() override;
 };
 

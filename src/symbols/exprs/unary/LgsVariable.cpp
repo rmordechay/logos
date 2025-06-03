@@ -14,96 +14,96 @@ string LgsVariable::prettyName() {
     return name;
 }
 
-Value* LgsVariable::createIRValue(Module* module) {
+Value* LgsVariable::createIRValue(LgsRuntime* runtime) {
     switch (ref->type) {
     case VAR_DEC:
         return ref->varDec->IRValue;
     case PARAM:
-        return ref->param->getIRValue(module);
+        return ref->param->getIRValue(runtime);
     case ENUM_FIELD:
-        return ref->enumField->getGEP(module);
+        return ref->enumField->getGEP(runtime);
     case FUNC:
-        return ref->func->getIRFunc(module);
+        return ref->func->getIRFunc(runtime);
     default:
         assert(false);
     }
 }
 
-Value* LgsVariable::eqIR(Module* module, LgsExpr* other) {
+Value* LgsVariable::eqIR(LgsRuntime* runtime, LgsExpr* other) {
     if (ref->type == VAR_DEC) {
-        return ref->varDec->expr->eqIR(module, other);
+        return ref->varDec->expr->eqIR(runtime, other);
     }
-    return LgsUnaryExpr::eqIR(module, other);
+    return LgsUnaryExpr::eqIR(runtime, other);
 }
 
-Value* LgsVariable::neIR(Module* module, LgsExpr* other) {
+Value* LgsVariable::neIR(LgsRuntime* runtime, LgsExpr* other) {
     if (ref->type == VAR_DEC) {
-        return ref->varDec->expr->neIR(module, other);
+        return ref->varDec->expr->neIR(runtime, other);
     }
-    return LgsUnaryExpr::neIR(module, other);
+    return LgsUnaryExpr::neIR(runtime, other);
 }
 
-Value* LgsVariable::gtIR(Module* module, LgsExpr* other) {
+Value* LgsVariable::gtIR(LgsRuntime* runtime, LgsExpr* other) {
     if (ref->type == VAR_DEC) {
-        return ref->varDec->expr->gtIR(module, other);
+        return ref->varDec->expr->gtIR(runtime, other);
     }
-    return LgsUnaryExpr::gtIR(module, other);
+    return LgsUnaryExpr::gtIR(runtime, other);
 }
 
-Value* LgsVariable::ltIR(Module* module, LgsExpr* other) {
+Value* LgsVariable::ltIR(LgsRuntime* runtime, LgsExpr* other) {
     if (ref->type == VAR_DEC) {
-        return ref->varDec->expr->ltIR(module, other);
+        return ref->varDec->expr->ltIR(runtime, other);
     }
-    return LgsUnaryExpr::gtIR(module, other);
+    return LgsUnaryExpr::gtIR(runtime, other);
 }
 
-Value* LgsVariable::geIR(Module* module, LgsExpr* other) {
+Value* LgsVariable::geIR(LgsRuntime* runtime, LgsExpr* other) {
     if (ref->type == VAR_DEC) {
-        return ref->varDec->expr->geIR(module, other);
+        return ref->varDec->expr->geIR(runtime, other);
     }
-    return LgsUnaryExpr::geIR(module, other);
+    return LgsUnaryExpr::geIR(runtime, other);
 }
 
-Value* LgsVariable::leIR(Module* module, LgsExpr* other) {
+Value* LgsVariable::leIR(LgsRuntime* runtime, LgsExpr* other) {
     if (ref->type == VAR_DEC) {
-        return ref->varDec->expr->leIR(module, other);
+        return ref->varDec->expr->leIR(runtime, other);
     }
-    return LgsUnaryExpr::leIR(module, other);
+    return LgsUnaryExpr::leIR(runtime, other);
 }
 
-Value* LgsVariable::bitAndIR(Module* module, LgsExpr* other) {
+Value* LgsVariable::bitAndIR(LgsRuntime* runtime, LgsExpr* other) {
     if (ref->type == VAR_DEC) {
-        return ref->varDec->expr->bitAndIR(module, other);
+        return ref->varDec->expr->bitAndIR(runtime, other);
     }
-    return LgsUnaryExpr::bitAndIR(module, other);
+    return LgsUnaryExpr::bitAndIR(runtime, other);
 }
 
-Value* LgsVariable::bitOrIR(Module* module, LgsExpr* other) {
+Value* LgsVariable::bitOrIR(LgsRuntime* runtime, LgsExpr* other) {
     if (ref->type == VAR_DEC) {
-        return ref->varDec->expr->bitOrIR(module, other);
+        return ref->varDec->expr->bitOrIR(runtime, other);
     }
-    return LgsUnaryExpr::bitOrIR(module, other);
+    return LgsUnaryExpr::bitOrIR(runtime, other);
 }
 
-Value* LgsVariable::bitXorIR(Module* module, LgsExpr* other) {
+Value* LgsVariable::bitXorIR(LgsRuntime* runtime, LgsExpr* other) {
     if (ref->type == VAR_DEC) {
-        return ref->varDec->expr->bitXorIR(module, other);
+        return ref->varDec->expr->bitXorIR(runtime, other);
     }
-    return LgsUnaryExpr::bitXorIR(module, other);
+    return LgsUnaryExpr::bitXorIR(runtime, other);
 }
 
-Value* LgsVariable::rshiftIR(Module* module, LgsExpr* other) {
+Value* LgsVariable::rshiftIR(LgsRuntime* runtime, LgsExpr* other) {
     if (ref->type == VAR_DEC) {
-        return ref->varDec->expr->rshiftIR(module, other);
+        return ref->varDec->expr->rshiftIR(runtime, other);
     }
-    return LgsUnaryExpr::rshiftIR(module, other);
+    return LgsUnaryExpr::rshiftIR(runtime, other);
 }
 
-Value* LgsVariable::lshiftIR(Module* module, LgsExpr* other) {
+Value* LgsVariable::lshiftIR(LgsRuntime* runtime, LgsExpr* other) {
     if (ref->type == VAR_DEC) {
-        return ref->varDec->expr->lshiftIR(module, other);
+        return ref->varDec->expr->lshiftIR(runtime, other);
     }
-    return LgsUnaryExpr::lshiftIR(module, other);
+    return LgsUnaryExpr::lshiftIR(runtime, other);
 }
 
 json LgsVariable::asJSON() {
@@ -114,11 +114,11 @@ json LgsVariable::asJSON() {
     return tree;
 }
 
-uint32_t LgsVariable::hashValue(Module* module) {
+uint32_t LgsVariable::hashValue(LgsRuntime* runtime) {
     string text;
     switch (ref->type) {
     case FIELD:
-        return ref->field->expr->hashValue(module);
+        return ref->field->expr->hashValue(runtime);
     case ENUM_FIELD:
         return LgsStr::hashString(ref->enumField->name);
     default:
@@ -126,12 +126,12 @@ uint32_t LgsVariable::hashValue(Module* module) {
     }
 }
 
-Value* LgsVariable::getLength(Module* module) {
+Value* LgsVariable::getLength(LgsRuntime* runtime) {
     switch (ref->type) {
     case VAR_DEC:
-        return ref->varDec->expr->getLength(module);
+        return ref->varDec->expr->getLength(runtime);
     case PARAM:
-        return ref->param->expr->getLength(module);
+        return ref->param->expr->getLength(runtime);
     default:
         break;
     }

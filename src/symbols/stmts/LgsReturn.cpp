@@ -2,9 +2,9 @@
 #include "exprs/unary/LgsInstance.h"
 
 
-void LgsReturn::createIRStmt(Module* module) {
-    runtime.freeExprs(module);
-    const auto exprIR = expr->getIRValue(module);
+void LgsReturn::createIRStmt(LgsRuntime* runtime) {
+    runtime->freeExprs(runtime);
+    const auto exprIR = expr->getIRValue(runtime);
     builder.CreateRet(exprIR);
 }
 

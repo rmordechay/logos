@@ -3,17 +3,17 @@
 #include "types/LgsMap.h"
 #include <exprs/unary/LgsArrayExpr.h>
 
-Value* LgsIterIndex::createIRValue(Module* module) {
+Value* LgsIterIndex::createIRValue(LgsRuntime* runtime) {
     const auto baseExprType = baseExpr->type;
     if (const auto arr = baseExprType->asArray()) {
-        if (arr->isStatic) return getGEP(module);
-        return getIRFromDynArray(module, arr);
+        if (arr->isStatic) return getGEP(runtime);
+        return getIRFromDynArray(runtime, arr);
     }
     if (const auto map = baseExprType->asMap()) {
-        return getIRFromMap(module, map);
+        return getIRFromMap(runtime, map);
     }
     if (baseExprType->asStr()) {
-        return getIRFromStr(module);
+        return getIRFromStr(runtime);
     }
     assert(false);
 }
@@ -47,25 +47,25 @@ Value* LgsIterIndex::createIRValue(Module* module) {
 //   ret i32 0
 // }
 
-Value* LgsIterIndex::getIRFromDynArray(Module* module, LgsArray* arr) const {
-    const auto arrPtr = baseExpr->getIRValue(module);
-    const auto indexIRValue = index->from->getIRValue(module);
-    const auto rv = arr->get.callIR(module, {arrPtr, indexIRValue});
+Value* LgsIterIndex::getIRFromDynArray(LgsRuntime* runtime, LgsArray* arr) const {
+    const auto arrPtr = baseExpr->getIRValue(runtime);
+    const auto indexIRValue = index->from->getIRValue(runtime);
+    const auto rv = arr->get.callIR(runtime, {arrPtr, indexIRValue});
     return builder.CreateLoad(ptrTy, rv);
 }
 
-Value* LgsIterIndex::getIRFromMap(Module* module, LgsMap* map) const {
-    const auto mapPtr = baseExpr->getIRValue(module);
-    const auto indexIRValue = index->from->getIRValue(module);
-    return map->get.callIR(module, {mapPtr, indexIRValue});
+Value* LgsIterIndex::getIRFromMap(LgsRuntime* runtime, LgsMap* map) const {
+    const auto mapPtr = baseExpr->getIRValue(runtime);
+    const auto indexIRValue = index->from->getIRValue(runtime);
+    return map->get.callIR(runtime, {mapPtr, indexIRValue});
 }
 
-Value* LgsIterIndex::getIRFromStr(Module* module) const {
-    const auto baseExprIRValue = baseExpr->getIRValue(module);
+Value* LgsIterIndex::getIRFromStr(LgsRuntime* runtime) const {
+    const auto baseExprIRValue = baseExpr->getIRValue(runtime);
     const auto baseExprIRType = baseExpr->type->getIRType();
     if (const auto global = dyn_cast<GlobalVariable>(baseExprIRValue)) {
         const auto ty = global->getValueType();
-        const auto value = index->from->getIRValue(module);
+        const auto value = index->from->getIRValue(runtime);
         return builder.CreateGEP(ty, baseExprIRValue, {i32Zero, value});
     }
     const auto p = builder.CreateAlloca(baseExprIRType);
@@ -74,58 +74,58 @@ Value* LgsIterIndex::getIRFromStr(Module* module) const {
     return builder.CreateLoad(baseExprIRType, p);
 }
 
-void LgsIterIndex::storeHashMap(Module* module, LgsHashMap* hashMap) const {
+void LgsIterIndex::storeHashMap(LgsRuntime* runtime, LgsHashMap* hashMap) const {
     assert(false);
 }
 
-void LgsIterIndex::storeScalar(Module* module, LgsExpr* value) {
-    const auto rValue = value->getIRValue(module);
+void LgsIterIndex::storeScalar(LgsRuntime* runtime, LgsExpr* value) {
+    const auto rValue = value->getIRValue(runtime);
     if (const auto arr = baseExpr->type->asArray()) {
         if (!arr->isStatic) {
             const auto ptr = builder.CreateAlloca(value->type->getIRType());
             builder.CreateStore(rValue, ptr);
-            arr->put.callIR(module, {baseExpr->getIRValue(module), index->from->getIRValue(module), ptr});
+            arr->put.callIR(runtime, {baseExpr->getIRValue(runtime), index->from->getIRValue(runtime), ptr});
             return;
         }
     }
-    const auto iterPtr = getIRValue(module);
+    const auto iterPtr = getIRValue(runtime);
     builder.CreateStore(rValue, iterPtr);
 }
 
-void LgsIterIndex::storeArray(Module* module, const LgsArrayExpr* arr) const {
+void LgsIterIndex::storeArray(LgsRuntime* runtime, const LgsArrayExpr* arr) const {
     if (!arr->arrType.isStatic) assert(false);
     const auto IRType = baseExpr->type->getIRType();
-    const auto arrPtr = baseExpr->getIRValue(module);
+    const auto arrPtr = baseExpr->getIRValue(runtime);
     vector IRIndices = {i32Zero};
     vector<LgsIndex*> indices;
     setIterIndices(this, indices);
     for (const auto index : indices) {
-        IRIndices.emplace_back(index->from->getIRValue(module));
+        IRIndices.emplace_back(index->from->getIRValue(runtime));
     }
     for (int i = 0; i < arr->initialElements.size(); ++i) {
         const auto element = arr->initialElements[i];
         const auto IRIndex = builder.getInt32(i);
         IRIndices.push_back(IRIndex);
         const auto gep = builder.CreateGEP(IRType, arrPtr, IRIndices);
-        const auto rValue = element->getIRValue(module);
+        const auto rValue = element->getIRValue(runtime);
         builder.CreateStore(rValue, gep);
         IRIndices.pop_back();
     }
 }
 
-Value* LgsIterIndex::getGEP(Module* module) const {
+Value* LgsIterIndex::getGEP(LgsRuntime* runtime) const {
     vector<Value*> IRIndices = {};
     Type* ty = nullptr;
     Value* ptr = nullptr;
     auto iterIndex = this;
     while (true) {
-        auto irValue = iterIndex->index->from->getIRValue(module);
+        auto irValue = iterIndex->index->from->getIRValue(runtime);
         IRIndices.push_back(irValue);
         const auto innerIterIndex = iterIndex->baseExpr->asIterIndex();
         if (innerIterIndex) {
             iterIndex = innerIterIndex;
         } else {
-            ptr = iterIndex->baseExpr->getIRValue(module);
+            ptr = iterIndex->baseExpr->getIRValue(runtime);
             ty = iterIndex->baseExpr->type->getIRType();
             IRIndices.push_back(i32Zero);
             break;
@@ -135,7 +135,7 @@ Value* LgsIterIndex::getGEP(Module* module) const {
     return builder.CreateGEP(ty, ptr, IRIndices);
 }
 
-Value* LgsIterIndex::getLength(Module* module) {
+Value* LgsIterIndex::getLength(LgsRuntime* runtime) {
     assert(false);
 }
 

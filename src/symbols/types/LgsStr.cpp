@@ -27,7 +27,7 @@ LgsType* LgsStr::inferBinaryType(LgsType* other) {
     return this;
 }
 
-Value* LgsStr::getElement(Module* module, Value* iterPtr, Value* iPtr) {
+Value* LgsStr::getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) {
     if (isStatic) assert(false);
     const auto i = builder.CreateLoad(i32Ty, iPtr);
     return builder.CreateInBoundsGEP(baseType->getIRType(), iterPtr, {i});

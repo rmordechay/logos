@@ -6,9 +6,9 @@ string LgsVarDec::format(string& indentStr) {
     return indentStr + name + " = ";
 }
 
-void LgsVarDec::createIRStmt(Module* module) {
+void LgsVarDec::createIRStmt(LgsRuntime* runtime) {
     const auto IRType = type->getIRType();
-    const auto exprIRValue = expr->getIRValue(module);
+    const auto exprIRValue = expr->getIRValue(runtime);
     if (shouldAllocate(IRType)) {
         IRValue = builder.CreateAlloca(IRType);
         if (shouldLoadIRArg(exprIRValue)) {

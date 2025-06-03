@@ -16,7 +16,7 @@ void LgsMap::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[1]->type = kvType.value;
 }
 
-Value* LgsMap::getElement(Module* module, Value* iterPtr, Value* iPtr) {
+Value* LgsMap::getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) {
     assert(false);
 }
 

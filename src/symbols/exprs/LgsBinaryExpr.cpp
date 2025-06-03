@@ -1,60 +1,60 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 
-Value* LgsBinaryExpr::createIRValue(Module* module) {
+Value* LgsBinaryExpr::createIRValue(LgsRuntime* runtime) {
     switch (op) {
     case ADD:
-        return left->addIR(module, right);
+        return left->addIR(runtime, right);
     case SUB:
-        return left->subIR(module, right);
+        return left->subIR(runtime, right);
     case MUL:
-        return left->mulIR(module, right);
+        return left->mulIR(runtime, right);
     case DIV:
-        return left->divIR(module, right);
+        return left->divIR(runtime, right);
     case EQ:
-        return left->eqIR(module, right);
+        return left->eqIR(runtime, right);
     case NE:
-        return left->neIR(module, right);
+        return left->neIR(runtime, right);
     case AND:
-        return left->andIR(module, right);
+        return left->andIR(runtime, right);
     case OR:
-        return left->orIR(module, right);
+        return left->orIR(runtime, right);
     case LT:
-        return left->ltIR(module, right);
+        return left->ltIR(runtime, right);
     case GT:
-        return left->gtIR(module, right);
+        return left->gtIR(runtime, right);
     case GE:
-        return left->geIR(module, right);
+        return left->geIR(runtime, right);
     case LE:
-        return left->leIR(module, right);
+        return left->leIR(runtime, right);
     case BIT_AND:
-        return left->bitAndIR(module, right);
+        return left->bitAndIR(runtime, right);
     case BIT_OR:
-        return left->bitOrIR(module, right);
+        return left->bitOrIR(runtime, right);
     case BIT_XOR:
-        return left->bitXorIR(module, right);
+        return left->bitXorIR(runtime, right);
     case LSHIFT:
-        return left->rshiftIR(module, right);
+        return left->rshiftIR(runtime, right);
     case RSHIFT:
-        return left->lshiftIR(module, right);
+        return left->lshiftIR(runtime, right);
     case NOOP:
         break;
     }
     return nullptr;
 }
 
-Value* LgsBinaryExpr::addIR(Module* module, LgsExpr* other) {
-    return left->addIR(module, right);
+Value* LgsBinaryExpr::addIR(LgsRuntime* runtime, LgsExpr* other) {
+    return left->addIR(runtime, right);
 }
 
-Value* LgsBinaryExpr::subIR(Module* module, LgsExpr* other) {
-    return left->subIR(module, right);
+Value* LgsBinaryExpr::subIR(LgsRuntime* runtime, LgsExpr* other) {
+    return left->subIR(runtime, right);
 }
 
-Value* LgsBinaryExpr::mulIR(Module* module, LgsExpr* other) {
-    return left->mulIR(module, right);
+Value* LgsBinaryExpr::mulIR(LgsRuntime* runtime, LgsExpr* other) {
+    return left->mulIR(runtime, right);
 }
 
-Value* LgsBinaryExpr::divIR(Module* module, LgsExpr* other) {
-    return left->divIR(module, right);
+Value* LgsBinaryExpr::divIR(LgsRuntime* runtime, LgsExpr* other) {
+    return left->divIR(runtime, right);
 }

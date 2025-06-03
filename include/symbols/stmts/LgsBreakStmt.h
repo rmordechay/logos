@@ -6,7 +6,7 @@ class LgsForLoop;
 
 class LgsBreakStmt final : public LgsStmt {
 public:
-    void createIRStmt(Module* module) override;
+    void createIRStmt(LgsRuntime* runtime) override;
     ~LgsBreakStmt() override = default;
 };
 

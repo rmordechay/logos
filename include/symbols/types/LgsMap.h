@@ -35,7 +35,7 @@ public:
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
-    Value* getElement(Module* module, Value* iterPtr, Value* iPtr) override;
+    Value* getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) override;
     ~LgsMap() override = default;
 };
 

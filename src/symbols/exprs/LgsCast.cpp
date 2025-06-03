@@ -1,12 +1,14 @@
 #include "exprs/LgsCast.h"
 #include "types/LgsType.h"
 
-Value* LgsCast::createIRValue(Module* module) {
-    return toValue->getIRValue(module);
+class LgsRuntime;
+
+Value* LgsCast::createIRValue(LgsRuntime* runtime) {
+    return toValue->getIRValue(runtime);
 }
 
-Value* LgsCast::addIR(Module* module, LgsExpr* other) {
-    return toValue->addIR(module, other);
+Value* LgsCast::addIR(LgsRuntime* runtime, LgsExpr* other) {
+    return toValue->addIR(runtime, other);
 }
 
 bool LgsCast::cast() {

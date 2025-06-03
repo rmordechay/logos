@@ -22,8 +22,8 @@ public:
         mapType.kvType.key = keyType;
         mapType.kvType.value = valueType;
     }
-    Value* createIRValue(Module* module) override;
-    Value* getLength(Module* module) override;
+    Value* createIRValue(LgsRuntime* runtime) override;
+    Value* getLength(LgsRuntime* runtime) override;
     ~LgsHashMap() override = default;
 };
 

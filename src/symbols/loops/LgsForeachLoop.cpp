@@ -4,22 +4,22 @@
 #include "stmts/LgsStmtBlock.h"
 #include "types/LgsArray.h"
 
-Value* LgsForeachLoop::loopStart(Module* module) {
+Value* LgsForeachLoop::loopStart(LgsRuntime* runtime) {
     return i32Zero;
 }
 
-Value* LgsForeachLoop::loopEnd(Module* module) {
-    return iterExpr->getLength(module);
+Value* LgsForeachLoop::loopEnd(LgsRuntime* runtime) {
+    return iterExpr->getLength(runtime);
 }
 
-void LgsForeachLoop::setIRIterable(Module* module) {
-    iterPtr = iterExpr->getIRValue(module);
+void LgsForeachLoop::setIRIterable(LgsRuntime* runtime) {
+    iterPtr = iterExpr->getIRValue(runtime);
 }
 
-void LgsForeachLoop::setIRLoopVars(Module* module) {
+void LgsForeachLoop::setIRLoopVars(LgsRuntime* runtime) {
     const auto iterType = iterExpr->type->asIterable();
     for (const auto loopVar : loopVars) {
-        loopVar->IRValue = iterType->getElement(module, iterPtr, iPtr);
+        loopVar->IRValue = iterType->getElement(runtime, iterPtr, iPtr);
     }
 }
 

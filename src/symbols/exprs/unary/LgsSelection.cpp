@@ -11,34 +11,34 @@ string LgsSelection::getName() {
     return "";
 }
 
-void LgsSelection::createIRStmt(Module* module) {
-    resolveSelection(module);
+void LgsSelection::createIRStmt(LgsRuntime* runtime) {
+    resolveSelection(runtime);
 }
 
-Value* LgsSelection::createIRValue(Module* module) {
-    return resolveSelection(module)->IRValue;
+Value* LgsSelection::createIRValue(LgsRuntime* runtime) {
+    return resolveSelection(runtime)->IRValue;
 }
 
-LgsExpr* LgsSelection::resolveSelection(Module* module) const {
+LgsExpr* LgsSelection::resolveSelection(LgsRuntime* runtime) const {
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
         const auto field = parentExpr->type->getField(childExpr->getName());
         if (field) {
             if (const auto iterIndex = parentExpr->asIterIndex()) {
-                const auto gep = iterIndex->getGEP(module);
+                const auto gep = iterIndex->getGEP(runtime);
                 auto valueLoad = builder.CreateLoad(ptrTy, gep);
-                const auto value = field->getGEP(module, valueLoad);
+                const auto value = field->getGEP(runtime, valueLoad);
                 valueLoad = builder.CreateLoad(field->type->getIRType(), value);
                 childExpr->setIRValue(valueLoad);
             } else {
-                const auto parentIRValue = parentExpr->getIRValue(module);
-                const auto value = field->getGEP(module, parentIRValue);
+                const auto parentIRValue = parentExpr->getIRValue(runtime);
+                const auto value = field->getGEP(runtime, parentIRValue);
                 const auto valueLoad = builder.CreateLoad(field->type->getIRType(), value);
                 childExpr->setIRValue(valueLoad);
             }
         } else if (const auto methodCall = childExpr->asFuncCall()) {
-            methodCall->IRValue = methodCall->createIRValue(module);
+            methodCall->IRValue = methodCall->createIRValue(runtime);
         }
     }
     return lastExpr();
@@ -59,15 +59,15 @@ LgsExpr* LgsSelection::lastExpr() const {
     return exprs[exprs.size() - 1];
 }
 
-uint32_t LgsSelection::hashValue(Module* module) {
+uint32_t LgsSelection::hashValue(LgsRuntime* runtime) {
     const auto lgsExpr = lastExpr();
-    return lgsExpr->hashValue(module);
+    return lgsExpr->hashValue(runtime);
 }
 
-Value* LgsSelection::eqIR(Module* module, LgsExpr* other) {
-    const auto selection = resolveSelection(module);
+Value* LgsSelection::eqIR(LgsRuntime* runtime, LgsExpr* other) {
+    const auto selection = resolveSelection(runtime);
     if (const auto var = selection->asVariable()) {
-        return var->eqIR(module, other);
+        return var->eqIR(runtime, other);
     }
     return nullptr;
 }

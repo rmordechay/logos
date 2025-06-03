@@ -1,5 +1,5 @@
 #include "exprs/unary/constants/LgsCharConst.h"
 
-Value* LgsCharConst::createIRValue(Module* module) {
+Value* LgsCharConst::createIRValue(LgsRuntime* runtime) {
     return builder.getInt8(value);
 }

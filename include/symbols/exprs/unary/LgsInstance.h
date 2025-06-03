@@ -11,8 +11,8 @@ public:
 
     explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), obj(obj), isSelf(true) {}
     explicit LgsInstance(LgsType* type) : LgsUnaryExpr(type), isSelf(false) {}
-    Value* createIRValue(Module* module) override;
-    void setVirtualFuncs(Module* module) const;
+    Value* createIRValue(LgsRuntime* runtime) override;
+    void setVirtualFuncs(LgsRuntime* runtime) const;
     string getName() override;
     ~LgsInstance() override = default;
 };

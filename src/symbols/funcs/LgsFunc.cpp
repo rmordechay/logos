@@ -7,25 +7,24 @@
 #include "exprs/LgsExpr.h"
 #include "types/LgsArray.h"
 
-void LgsFunc::generateIRCode(Module* module) {
-    LgsRuntime runtime;
-    runtime.stack.enterFunc(this);
-    startBlockFunc(module, nullptr);
-    const auto IRFunc = getIRFunc(module);
+void LgsFunc::generateIRCode(LgsRuntime* runtime) {
+    runtime->stack.enterFunc(this);
+    startBlockFunc(runtime, nullptr);
+    const auto IRFunc = getIRFunc(runtime);
     IRValue = IRFunc;
-    stmtBlock->createIRValue(module, runtime);
+    stmtBlock->createIRValue(runtime);
     if (funcType.rt->isVoid) {
-        runtime.freeExprs(module);
+        runtime->freeExprs(runtime);
         builder.CreateRetVoid();
     }
-    runtime.stack.exitFunc();
+    runtime->stack.exitFunc();
 }
 
-Value* LgsFunc::createIRValue(Module* module) {
+Value* LgsFunc::createIRValue(LgsRuntime* runtime) {
     return IRValue;
 }
 
-Value* LgsFunc::call(Module* module, const vector<LgsExpr*>& args) {
+Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
     const int iterStart = funcType.isStatic;
     if (funcType.hasDefaultParams) assert(false);
@@ -36,18 +35,18 @@ Value* LgsFunc::call(Module* module, const vector<LgsExpr*>& args) {
                 IRArgs.emplace_back(builder.getInt32(3));
                 isInit = true;
             }
-            addIRArg(module, IRArgs, args[i]);
+            addIRArg(runtime, IRArgs, args[i]);
         }
     } else {
         for (int i = iterStart; i < args.size(); ++i) {
-            addIRArg(module, IRArgs, args[i]);
+            addIRArg(runtime, IRArgs, args[i]);
         }
     }
-    return callIR(module, IRArgs);
+    return callIR(runtime, IRArgs);
 }
 
-void LgsFunc::addIRArg(Module* module, vector<Value*>& IRArgs, LgsExpr* arg) const {
-    const auto argIRValue = arg->getIRValue(module);
+void LgsFunc::addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const {
+    const auto argIRValue = arg->getIRValue(runtime);
     if (shouldLoadIRArg(argIRValue)) {
         const auto artIRType = arg->type->getIRType();
         const auto value = builder.CreateLoad(artIRType, argIRValue);
@@ -57,12 +56,12 @@ void LgsFunc::addIRArg(Module* module, vector<Value*>& IRArgs, LgsExpr* arg) con
     }
 }
 
-Value* LgsFunc::callIR(Module* module, const vector<Value*>& args) {
+Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
     if (IRValue) {
-        const auto IRFuncType = getIRFuncType(module);
+        const auto IRFuncType = getIRFuncType(runtime);
         return builder.CreateCall(IRFuncType, IRValue, args);
     }
-    const auto IRFunc = getIRFunc(module);
+    const auto IRFunc = getIRFunc(runtime);
     return builder.CreateCall(IRFunc, args);
 }
 
@@ -70,9 +69,9 @@ string LgsFunc::prettyName() {
     return funcType.prettyName();
 }
 
-Function* LgsFunc::getIRFunc(Module* module) {
-    const auto funcIRType = getIRFuncType(module);
-    auto func = module->getOrInsertFunction(funcType.getIRName(), funcIRType);
+Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
+    const auto funcIRType = getIRFuncType(runtime);
+    auto func =runtime->module->getOrInsertFunction(funcType.getIRName(), funcIRType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
     auto args = IRFunc->arg_begin();
     for (int i = 0; i < funcType.params.size(); ++i) {
@@ -89,7 +88,7 @@ Function* LgsFunc::getIRFunc(Module* module) {
     return IRFunc;
 }
 
-FunctionType* LgsFunc::getIRFuncType(const Module* module) {
+FunctionType* LgsFunc::getIRFuncType(const LgsRuntime* runtime) {
     if (IRFuncType) return IRFuncType;
     vector<Type*> IRParamsTypes;
     for (int i = 0; i < funcType.params.size(); ++i) {

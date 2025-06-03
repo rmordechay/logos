@@ -1,6 +1,7 @@
 #include <logos/LgsStack.h>
 #include "codegen/CodegenMetadata.h"
 #include "funcs/LgsFunc.h"
+#include "stmts/LgsStmt.h"
 
 void LgsStack::enterFunc(LgsFunc* func) {
     push(LgsStackFrame{});

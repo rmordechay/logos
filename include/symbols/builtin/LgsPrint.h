@@ -8,9 +8,9 @@
 #include <types/primitives/LgsVoid.h>
 #include <types/LgsAny.h>
 
-inline FunctionCallee getPrintf(Module* module) {
+inline FunctionCallee getPrintf(LgsRuntime* runtime) {
     const auto printfType = FunctionType::get(i32Ty, {ptrTy}, true);
-    return module->getOrInsertFunction("printf", printfType);
+    return runtime->module->getOrInsertFunction("printf", printfType);
 }
 
 class LgsPrint final : public LgsBuiltinFunc {
@@ -25,16 +25,16 @@ public:
         funcType.params = {&input, &args};
     }
 
-    Value* call(Module* module, const vector<LgsExpr*>& args) override {
+    Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
         vector<Value*> IRArgs;
         stringstream str;
         for (int i = 0; i < args.size(); ++i) {
             const auto arg = args[i];
-            addIRArg(module, IRArgs, arg);
+            addIRArg(runtime, IRArgs, arg);
             str << arg->type->getStrFormatPart() << std::endl;
         }
-        IRArgs.insert(IRArgs.begin(), getIRStr(module, str.str()));
-        const auto printfFunc = getPrintf(module);
+        IRArgs.insert(IRArgs.begin(), getIRStr(runtime, str.str()));
+        const auto printfFunc = getPrintf(runtime);
         builder.CreateCall(printfFunc, IRArgs);
         return nullptr;
     }

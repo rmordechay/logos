@@ -4,64 +4,64 @@ string LgsBoolConst::getValueAsString() const {
     return value ? LgsBool::trueLiteral : LgsBool::falseLiteral;
 }
 
-Value* LgsBoolConst::createIRValue(Module* module) {
+Value* LgsBoolConst::createIRValue(LgsRuntime* runtime) {
     return builder.getInt1(value);
 }
 
-Value* LgsBoolConst::eqIR(Module* module, LgsExpr* other) {
+Value* LgsBoolConst::eqIR(LgsRuntime* runtime, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsBoolConst::neIR(Module* module, LgsExpr* other) {
+Value* LgsBoolConst::neIR(LgsRuntime* runtime, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsBoolConst::ltIR(Module* module, LgsExpr* other) {
+Value* LgsBoolConst::ltIR(LgsRuntime* runtime, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsBoolConst::gtIR(Module* module, LgsExpr* other) {
+Value* LgsBoolConst::gtIR(LgsRuntime* runtime, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsBoolConst::geIR(Module* module, LgsExpr* other) {
+Value* LgsBoolConst::geIR(LgsRuntime* runtime, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsBoolConst::leIR(Module* module, LgsExpr* other) {
+Value* LgsBoolConst::leIR(LgsRuntime* runtime, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsBoolConst::andIR(Module* module, LgsExpr* other) {
+Value* LgsBoolConst::andIR(LgsRuntime* runtime, LgsExpr* other) {
     if (const auto otherBool = other->asBoolConst()) {
         return builder.getInt1(value && otherBool->value);
     }
     assert(false);
 }
 
-Value* LgsBoolConst::orIR(Module* module, LgsExpr* other) {
+Value* LgsBoolConst::orIR(LgsRuntime* runtime, LgsExpr* other) {
     if (const auto otherBool = other->asBoolConst()) {
         return builder.getInt1(value || otherBool->value);
     }
     assert(false);
 }
 
-Value* LgsBoolConst::bitAndIR(Module* module, LgsExpr* other) {
+Value* LgsBoolConst::bitAndIR(LgsRuntime* runtime, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsBoolConst::bitOrIR(Module* module, LgsExpr* other) {
+Value* LgsBoolConst::bitOrIR(LgsRuntime* runtime, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsBoolConst::bitXorIR(Module* module, LgsExpr* other) {
+Value* LgsBoolConst::bitXorIR(LgsRuntime* runtime, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsBoolConst::rshiftIR(Module* module, LgsExpr* other) {
+Value* LgsBoolConst::rshiftIR(LgsRuntime* runtime, LgsExpr* other) {
     assert(false);
 }
 
-Value* LgsBoolConst::lshiftIR(Module* module, LgsExpr* other) {
+Value* LgsBoolConst::lshiftIR(LgsRuntime* runtime, LgsExpr* other) {
     assert(false);
 }

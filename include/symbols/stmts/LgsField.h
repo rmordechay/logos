@@ -18,8 +18,8 @@ public:
     LgsObject* parent = nullptr;
 
     LgsField(const std::string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), expr(expr), type(type) {}
-    virtual Value* getGEP(Module* module, Value* instance = nullptr);
-    void setFieldIRValue(Module* module, LgsExpr* expr, Value* instance = nullptr);
+    virtual Value* getGEP(LgsRuntime* runtime, Value* instance = nullptr);
+    void setFieldIRValue(LgsRuntime* runtime, LgsExpr* expr, Value* instance = nullptr);
     LgsField* clone() const;
     nlohmann::json asJSON() override;
     ~LgsField() override;

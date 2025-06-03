@@ -3,30 +3,30 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 
-Value* LgsStrConst::getLength(Module* module) {
+Value* LgsStrConst::getLength(LgsRuntime* runtime) {
     return builder.getInt32(value.size());
 }
 
-Value* LgsStrConst::createIRValue(Module* module) {
-    return getIRStr(module, value);
+Value* LgsStrConst::createIRValue(LgsRuntime* runtime) {
+    return getIRStr(runtime, value);
 }
 
-Value* LgsStrConst::addIR(Module* module, LgsExpr* other) {
+Value* LgsStrConst::addIR(LgsRuntime* runtime, LgsExpr* other) {
     if (const auto otherStrConst = other->asIntConst()) {
-        return getIRStr(module, this->value + to_string(otherStrConst->value));
+        return getIRStr(runtime, this->value + to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asFloatConst()) {
-        return getIRStr(module, this->value + to_string(otherStrConst->value));
+        return getIRStr(runtime, this->value + to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asStrConst()) {
-        return getIRStr(module, this->value + otherStrConst->value);
+        return getIRStr(runtime, this->value + otherStrConst->value);
     }
     if (const auto otherBoolConst = other->asBoolConst()) {
-        return getIRStr(module, this->value + otherBoolConst->getValueAsString());
+        return getIRStr(runtime, this->value + otherBoolConst->getValueAsString());
     }
     assert(false);
 }
 
-Value* LgsStrConst::eqIR(Module* module, LgsExpr* other) {
+Value* LgsStrConst::eqIR(LgsRuntime* runtime, LgsExpr* other) {
     return nullptr;
 }

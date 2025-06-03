@@ -1,7 +1,7 @@
 #ifndef LOGOSPARAM_H
 #define LOGOSPARAM_H
-#include "exprs/unary/constants/LgsIntConst.h"
 #include <LgsValue.h>
+#include <llvm/IR/IRBuilder.h>
 
 class LgsFuncImpl;
 class LgsVariable;
@@ -17,10 +17,10 @@ public:
     bool isVariadic = false;
     AllocaInst* vaList = nullptr;
 
-    explicit LgsParam(LgsType* type = nullptr, const string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
+    explicit LgsParam(LgsType* type = nullptr, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     std::string format(std::string& indentStr) override;
-    Value* getIRValue(Module* module);
-    json asJSON() override;
+    Value* getIRValue(LgsRuntime* runtime);
+    nlohmann::json asJSON() override;
     std::string getIRName();
     ~LgsParam() override = default;
 };

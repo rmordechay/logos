@@ -5,6 +5,6 @@ string LgsTypeConst::getName() {
     return type->prettyName();
 }
 
-Value* LgsTypeConst::createIRValue(Module* module) {
+Value* LgsTypeConst::createIRValue(LgsRuntime* runtime) {
     assert(false);
 }

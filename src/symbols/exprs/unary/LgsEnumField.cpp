@@ -2,6 +2,6 @@
 
 #include "utils/LgsUtils.h"
 
-Value* LgsEnumField::getGEP(Module* module, Value* instance) {
-    return getIRStr(module, name);
+Value* LgsEnumField::getGEP(LgsRuntime* runtime, Value* instance) {
+    return getIRStr(runtime, name);
 }

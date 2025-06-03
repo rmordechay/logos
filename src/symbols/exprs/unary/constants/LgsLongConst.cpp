@@ -1,6 +1,6 @@
 #include "exprs/unary/constants/LgsLongConst.h"
 
-Value* LgsLongConst::createIRValue(Module* module) {
+Value* LgsLongConst::createIRValue(LgsRuntime* runtime) {
     return builder.getInt64(value);
 }
 

@@ -8,7 +8,7 @@ public:
     LgsExpr *expr = nullptr;
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
-    void createIRStmt(Module* module) override;
+    void createIRStmt(LgsRuntime* runtime) override;
     ~LgsReturn() override;
 };
 

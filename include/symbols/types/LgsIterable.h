@@ -17,7 +17,7 @@ public:
     Type* getIRType() override;
     virtual LgsType* getBaseType();
     virtual void unpackTypes(const vector<LgsVarDec*>& varDecs);
-    virtual Value* getElement(Module* module, Value* iterPtr, Value* iPtr);
+    virtual Value* getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr);
     ~LgsIterable() override = default;
 };
 

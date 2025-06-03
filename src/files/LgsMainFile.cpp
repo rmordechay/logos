@@ -1,16 +1,17 @@
 #include "files/LgsMainFile.h"
 
 void LgsMainFile::generateIR() {
+    LgsRuntime runtime;
     const auto module = createEmptyModule(LOGOS_MAIN_FILE_NAME);
     for (const auto [_, func] : funcs) {
-        func->generateIRCode(module);
+        func->generateIRCode(&runtime);
     }
     for (const auto object : objects) {
         for (const auto& [_, method] : object->methods) {
-            method->generateIRCode(module);
+            method->generateIRCode(&runtime);
         }
     }
-    writeIRToFile(module, LOGOS_MAIN_FILE_NAME);
+    writeIRToFile(&runtime, LOGOS_MAIN_FILE_NAME);
 }
 
 void LgsMainFile::format() {

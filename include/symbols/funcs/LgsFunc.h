@@ -21,16 +21,17 @@ public:
     explicit LgsFunc() {
         type = &funcType;
     }
-    Value* createIRValue(Module* module) override;
+
+    Value* createIRValue(LgsRuntime* runtime) override;
     string prettyName() override;
     string format(string& tabs) override;
     json asJSON() override;
-    void addIRArg(Module* module, vector<Value*>& IRArgs, LgsExpr* arg) const;
-    virtual void generateIRCode(Module* module);
-    virtual Function* getIRFunc(Module* module);
-    virtual FunctionType* getIRFuncType(const Module* module);
-    virtual Value* callIR(Module* module, const vector<Value*>& args = {});
-    virtual Value* call(Module* module, const vector<LgsExpr*>& args = {});
+    void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const;
+    virtual void generateIRCode(LgsRuntime* runtime);
+    virtual Function* getIRFunc(LgsRuntime* runtime);
+    virtual FunctionType* getIRFuncType(const LgsRuntime* runtime);
+    virtual Value* callIR(LgsRuntime* runtime, const vector<Value*>& args = {});
+    virtual Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args = {});
     ~LgsFunc() override;
 };
 

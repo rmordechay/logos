@@ -14,11 +14,11 @@ public:
         setType(&arrType);
         arrType.baseType = baseType;
     }
-    Value* getLength(Module* module) override;
-    Value* createIRValue(Module* module) override;
-    Value* createConstArray(Module* module) const;
-    Value* createDynArray(Module* module);
-    void free(Module* module) override;
+    Value* getLength(LgsRuntime* runtime) override;
+    Value* createIRValue(LgsRuntime* runtime) override;
+    Value* createConstArray(LgsRuntime* runtime) const;
+    Value* createDynArray(LgsRuntime* runtime);
+    void free(LgsRuntime* runtime) override;
     ~LgsArrayExpr() override = default;
 };
 

@@ -2,15 +2,15 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/LgsInstance.h"
 
-Value* LgsField::getGEP(Module* module, Value* instance) {
+Value* LgsField::getGEP(LgsRuntime* runtime, Value* instance) {
     assert(instance && parent);
     IRValue = builder.CreateStructGEP(parent->getIRType(), instance, position);
     return IRValue;
 }
 
-void LgsField::setFieldIRValue(Module* module, LgsExpr* expr, Value* instance) {
-    const auto exprIRValue = expr->getIRValue(module);
-    builder.CreateStore(exprIRValue, getGEP(module, instance));
+void LgsField::setFieldIRValue(LgsRuntime* runtime, LgsExpr* expr, Value* instance) {
+    const auto exprIRValue = expr->getIRValue(runtime);
+    builder.CreateStore(exprIRValue, getGEP(runtime, instance));
 }
 
 LgsField* LgsField::clone() const {

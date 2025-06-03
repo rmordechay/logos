@@ -4,36 +4,36 @@
 #include "stmts/LgsStmtBlock.h"
 #include "stmts/LgsVarDec.h"
 
-void LgsForLoop::createIRStmt(Module* module, LgsRuntime* runtime) {
-    runtime.stack.enterScope(this);
-    initIRLoop(module);
+void LgsForLoop::createIRStmt(LgsRuntime* runtime) {
+    runtime->stack.enterScope(this);
+    initIRLoop(runtime);
     startBlock(loopCondBlock, nullptr);
-    setLoopIRCondition(module);
+    setLoopIRCondition(runtime);
     startBlock(loopBodyBlock, nullptr);
-    setIRLoopVars(module);
-    stmtBlock->createIRValue(module, runtime);
-    exitIRLoop(module);
-    runtime.stack.exitScope(IF_STMT);
+    setIRLoopVars(runtime);
+    stmtBlock->createIRValue(runtime);
+    exitIRLoop(runtime);
+    runtime->stack.exitScope(IF_STMT);
 }
 
-void LgsForLoop::initIRLoop(Module* module) {
+void LgsForLoop::initIRLoop(LgsRuntime* runtime) {
     loopCondBlock = createBasicBlock(LOGOS_LOOP_CONDITION);
     loopBodyBlock = createBasicBlock(LOGOS_LOOP_BODY);
     loopExitBlock = createBasicBlock(LOGOS_LOOP_EXIT);
     iPtr = builder.CreateAlloca(i32Ty);
-    builder.CreateStore(loopStart(module), iPtr);
-    setIRIterable(module);
+    builder.CreateStore(loopStart(runtime), iPtr);
+    setIRIterable(runtime);
     builder.CreateBr(loopCondBlock);
 }
 
-void LgsForLoop::setLoopIRCondition(Module* module) {
+void LgsForLoop::setLoopIRCondition(LgsRuntime* runtime) {
     const auto iValue = builder.CreateLoad(i32Ty, iPtr);
-    const auto upperBound = loopEnd(module);
+    const auto upperBound = loopEnd(runtime);
     const auto condition = builder.CreateICmpSLT(iValue, upperBound);
     builder.CreateCondBr(condition, loopBodyBlock, loopExitBlock);
 }
 
-void LgsForLoop::exitIRLoop(Module* module) const {
+void LgsForLoop::exitIRLoop(LgsRuntime* runtime) const {
     // Increment loop variable
     const auto iValue = builder.CreateLoad(i32Ty, iPtr);
     const auto inc = builder.CreateAdd(iValue, builder.getInt32(1));

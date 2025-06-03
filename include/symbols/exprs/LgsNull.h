@@ -7,15 +7,15 @@ public:
     explicit LgsNull() : LgsUnaryExpr(nullptr) {
         isNull = true;
     }
-    Value* createIRValue(Module* module) override;
-    Value* addIR(Module* module, LgsExpr* other) override;
+    Value* createIRValue(LgsRuntime* runtime) override;
+    Value* addIR(LgsRuntime* runtime, LgsExpr* other) override;
 };
 
-inline Value* LgsNull::createIRValue(Module* module) {
+inline Value* LgsNull::createIRValue(LgsRuntime* runtime) {
     return ConstantPointerNull::get(PointerType::get(context, 0));
 }
 
-inline Value* LgsNull::addIR(Module* module, LgsExpr* other) {
+inline Value* LgsNull::addIR(LgsRuntime* runtime, LgsExpr* other) {
     assert(false && "not implemented");
 }
 

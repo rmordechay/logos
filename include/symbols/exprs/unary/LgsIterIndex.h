@@ -13,15 +13,15 @@ public:
     LgsIndex* index = nullptr;
 
     explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {}
-    Value* createIRValue(Module* module) override;
-    Value* getGEP(Module* module) const;
-    Value* getIRFromDynArray(Module* module, LgsArray* arr) const;
-    Value* getIRFromMap(Module* module, LgsMap* map) const;
-    Value* getIRFromStr(Module* module) const;
-    void storeHashMap(Module* module, LgsHashMap* hashMap) const;
-    void storeScalar(Module* module, LgsExpr* value);
-    void storeArray(Module* module, const LgsArrayExpr* arr) const;
-    Value* getLength(Module* module) override;
+    Value* createIRValue(LgsRuntime* runtime) override;
+    Value* getGEP(LgsRuntime* runtime) const;
+    Value* getIRFromDynArray(LgsRuntime* runtime, LgsArray* arr) const;
+    Value* getIRFromMap(LgsRuntime* runtime, LgsMap* map) const;
+    Value* getIRFromStr(LgsRuntime* runtime) const;
+    void storeHashMap(LgsRuntime* runtime, LgsHashMap* hashMap) const;
+    void storeScalar(LgsRuntime* runtime, LgsExpr* value);
+    void storeArray(LgsRuntime* runtime, const LgsArrayExpr* arr) const;
+    Value* getLength(LgsRuntime* runtime) override;
     string getName() override;
     string prettyName() override;
     ~LgsIterIndex() override;

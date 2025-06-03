@@ -1,8 +1,9 @@
 #ifndef LGSSTACK_H
 #define LGSSTACK_H
 #include "LgsSymbol.h"
-#include "stmts/LgsIfStmt.h"
 
+class LgsStmt;
+class LgsIfStmt;
 class LgsExpr;
 class LgsForLoop;
 class LgsFunc;

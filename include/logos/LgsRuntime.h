@@ -3,7 +3,6 @@
 
 #include "LgsStack.h"
 #include "LgsSymbol.h"
-#include "exprs/LgsExpr.h"
 #include <map>
 #include <llvm/IR/Module.h>
 
@@ -16,14 +15,14 @@ class LgsFuncType;
 class LgsRuntime {
 public:
     LgsStack stack;
-    Module* currentModule = nullptr;
+    Module* module = nullptr;
     GlobalVariable* runtimeStruct = nullptr;
 
-    void initRuntime(Module* mainModule);
-    void pushStackTrace(Module* module, const string& path) const;
-    void printStack(Module* module) const;
+    void initRuntime(const LgsRuntime* runtime);
+    void pushStackTrace(LgsRuntime* runtime, const string& path) const;
+    void printStack(LgsRuntime* runtime) const;
     void addAllocatedExpr(LgsExpr* expr);
-    void freeExprs(Module* module);
+    void freeExprs(LgsRuntime* runtime);
     ~LgsRuntime() = default;
 };
 
@@ -37,6 +36,5 @@ struct LgsGlobals {
 };
 
 inline LgsGlobals globals;
-inline LgsRuntime runtime;
 
 #endif //LOGOSSTACK_H

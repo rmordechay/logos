@@ -11,8 +11,8 @@ public:
     Function* IRFunc = nullptr;
 
     explicit LgsMainFunc() : LgsFuncImpl(LOGOS_MAIN_FUNC, &LGS_INT) {}
-    void generateIRCode(Module* module) override;
-    Function* getIRFunc(Module* module) override;
+    void generateIRCode(LgsRuntime* runtime) override;
+    Function* getIRFunc(LgsRuntime* runtime) override;
     ~LgsMainFunc() override = default;
 };
 

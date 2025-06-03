@@ -2,6 +2,7 @@
 #define LOGOSEXPR_H
 #include "LgsValue.h"
 
+class LgsRuntime;
 class LgsEnumField;
 class LgsFunc;
 class LgsHashMap;
@@ -27,7 +28,7 @@ public:
     bool isNull = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
-    Value* getIRValue(Module* module);
+    Value* getIRValue(LgsRuntime* runtime);
     void setType(LgsType* type);
 
     LgsFunc* asFunc();
@@ -46,30 +47,30 @@ public:
     LgsEnumField* asEnumField();
     LgsTypeConst* asTypeConst();
 
-    virtual void free(Module* module);
+    virtual void free(LgsRuntime* runtime);
     virtual LgsExpr* clone();
     virtual std::string prettyName();
     virtual LgsExpr* convertExpr(LgsType* type);
-    virtual Value* getLength(Module* module);
-    virtual uint32_t hashValue(Module* module);
-    virtual Value* createIRValue(Module* module) = 0;
-    virtual Value* addIR(Module* module, LgsExpr* other) = 0;
-    virtual Value* subIR(Module* module, LgsExpr* other);
-    virtual Value* mulIR(Module* module, LgsExpr* other);
-    virtual Value* divIR(Module* module, LgsExpr* other);
-    virtual Value* eqIR(Module* module, LgsExpr* other);
-    virtual Value* neIR(Module* module, LgsExpr* other);
-    virtual Value* ltIR(Module* module, LgsExpr* other);
-    virtual Value* gtIR(Module* module, LgsExpr* other);
-    virtual Value* geIR(Module* module, LgsExpr* other);
-    virtual Value* leIR(Module* module, LgsExpr* other);
-    virtual Value* andIR(Module* module, LgsExpr* other);
-    virtual Value* orIR(Module* module, LgsExpr* other);
-    virtual Value* bitAndIR(Module* module, LgsExpr* other);
-    virtual Value* bitOrIR(Module* module, LgsExpr* other);
-    virtual Value* bitXorIR(Module* module, LgsExpr* other);
-    virtual Value* rshiftIR(Module* module, LgsExpr* other);
-    virtual Value* lshiftIR(Module* module, LgsExpr* other);
+    virtual Value* getLength(LgsRuntime* runtime);
+    virtual uint32_t hashValue(LgsRuntime* runtime);
+    virtual Value* createIRValue(LgsRuntime* runtime) = 0;
+    virtual Value* addIR(LgsRuntime* runtime, LgsExpr* other) = 0;
+    virtual Value* subIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* mulIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* divIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* eqIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* neIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* ltIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* gtIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* geIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* leIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* andIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* orIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* bitAndIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* bitOrIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* bitXorIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* rshiftIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* lshiftIR(LgsRuntime* runtime, LgsExpr* other);
     virtual ~LgsExpr() override = default;
 };
 

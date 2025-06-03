@@ -8,7 +8,7 @@ public:
     LgsExpr* y;
     LgsExpr* z;
 
-    Value* createIRValue(Module* module) override;
+    Value* createIRValue(LgsRuntime* runtime) override;
     ~LgsVec3() override = default;
 };
 

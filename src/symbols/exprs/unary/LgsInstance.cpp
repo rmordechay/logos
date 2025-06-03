@@ -11,9 +11,9 @@ string LgsInstance::getName() {
     return obj->name;
 }
 
-Value* LgsInstance::createIRValue(Module* module) {
+Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
     const auto IRType = obj->getIRType();
-    const auto currentFunc = runtime.stack.currentFunc->getIRFunc(module);
+    const auto currentFunc = runtime->stack.currentFunc->getIRFunc(runtime);
 
     // TODO cover all cases
     if (isSelf) {
@@ -22,17 +22,17 @@ Value* LgsInstance::createIRValue(Module* module) {
         IRValue = builder.CreateAlloca(IRType);
     }
     if (!obj->implements.empty()) {
-        setVirtualFuncs(module);
+        setVirtualFuncs(runtime);
     }
     for (const auto& arg : args) {
         const auto field = obj->getField(arg->name);
-        field->setFieldIRValue(module, arg->expr, IRValue);
+        field->setFieldIRValue(runtime, arg->expr, IRValue);
     }
     return IRValue;
 }
 
-void LgsInstance::setVirtualFuncs(Module* module) const {
-    const auto map = obj->vtable.getIRValue(module);
+void LgsInstance::setVirtualFuncs(LgsRuntime* runtime) const {
+    const auto map = obj->vtable.getIRValue(runtime);
 
     const auto vtableGEP = builder.CreateStructGEP(obj->getIRType(), IRValue, 0);
     builder.CreateStore(map, vtableGEP);
@@ -41,11 +41,11 @@ void LgsInstance::setVirtualFuncs(Module* module) const {
     for (const auto& [name, method] : obj->methods) {
         const auto interface = method->implements;
         if (!interface) continue;
-        const auto keyIRStr = getIRStr(module, interface->funcType.getIRName());
-        const auto IRFunc = method->getIRFunc(module);
+        const auto keyIRStr = getIRStr(runtime, interface->funcType.getIRName());
+        const auto IRFunc = method->getIRFunc(runtime);
         auto valuePtr = builder.CreateAlloca(ptrTy);
         builder.CreateStore(IRFunc, valuePtr);
-        obj->vtable.mapType.add.callIR(module, {mapPtr, keyIRStr, valuePtr});
+        obj->vtable.mapType.add.callIR(runtime, {mapPtr, keyIRStr, valuePtr});
 
     }
 }

@@ -8,12 +8,12 @@ string LgsParam::format(string& indentStr) {
     return name + ": " + type->prettyName();
 }
 
-Value* LgsParam::getIRValue(Module* module) {
+Value* LgsParam::getIRValue(LgsRuntime* runtime) {
     if (IRValue) return IRValue;
     if (isVariadic) {
         if (vaList) return vaList;
         vaList = builder.CreateAlloca(ptrTy);
-        const auto vaStart = getOrInsertDeclaration(module, Intrinsic::vastart, {ptrTy});
+        const auto vaStart = getOrInsertDeclaration(runtime->module, Intrinsic::vastart, {ptrTy});
         builder.CreateCall(vaStart, {vaList});
         return vaList;
     }

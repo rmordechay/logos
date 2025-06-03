@@ -84,15 +84,15 @@ StructType* getIRStructType(const string& name, const vector<Type*>& fields) {
     return struct_;
 }
 
-Value* getIRStr(Module* module, const string& value) {
-    for (auto& globals : module->globals()) {
+Value* getIRStr(const LgsRuntime* runtime, const string& value) {
+    for (auto& globals : runtime->module->globals()) {
         if (!globals.hasInitializer()) continue;
         const auto dataArray = dyn_cast<ConstantDataArray>(globals.getInitializer());
         if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
         return &globals;
     }
     const auto strConstant = ConstantDataArray::getString(context, value, true);
-    const auto globalVariable = new GlobalVariable(*module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
+    const auto globalVariable = new GlobalVariable(*runtime->module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
     globalVariable->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
     return globalVariable;
 }
@@ -105,15 +105,15 @@ Module* createEmptyModule(const string& objName) {
     return module;
 }
 
-void writeIRToFile(const Module* module, const path& name) {
+void writeIRToFile(const LgsRuntime* runtime, const path& name) {
     if constexpr (WRITE_IR_TO_FILE) {
         const auto filePath = (paths.buildDir / name).string() + ".ll";
         std::error_code EC;
         raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
-        module->print(textFile, nullptr);
+       runtime->module->print(textFile, nullptr);
     }
     if constexpr (DEBUG) {
-        module->print(outs(), nullptr);
+       runtime->module->print(outs(), nullptr);
         std::cout << "\n-----\n\n";
     }
 }

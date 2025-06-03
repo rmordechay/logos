@@ -1,21 +1,21 @@
 #include "loops/LgsRangeLoop.h"
 #include "stmts/LgsVarDec.h"
 
-Value* LgsRangeLoop::loopStart(Module* module) {
-    return rangeStart->getIRValue(module);
+Value* LgsRangeLoop::loopStart(LgsRuntime* runtime) {
+    return rangeStart->getIRValue(runtime);
 }
 
-Value* LgsRangeLoop::loopEnd(Module* module) {
-    return rangeEnd->getIRValue(module);
+Value* LgsRangeLoop::loopEnd(LgsRuntime* runtime) {
+    return rangeEnd->getIRValue(runtime);
 }
 
-void LgsRangeLoop::setIRLoopVars(Module* module) {
+void LgsRangeLoop::setIRLoopVars(LgsRuntime* runtime) {
     const auto loopVar = loopVars[0];
     const auto iValue = builder.CreateLoad(i32Ty, iPtr);
     loopVar->expr->setIRValue(iValue);
 }
 
-void LgsRangeLoop::setIRIterable(Module* module) {
+void LgsRangeLoop::setIRIterable(LgsRuntime* runtime) {
     assert(false);
 }
 

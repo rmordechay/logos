@@ -14,8 +14,8 @@ public:
         funcType.params = params;
         funcType.isMethod = true;
     }
-    FunctionType* getIRFuncType(const Module* module) override;
-    Function* getIRFunc(Module* module) override;
+    FunctionType* getIRFuncType(const LgsRuntime* runtime) override;
+    Function* getIRFunc(LgsRuntime* runtime) override;
     ~LgsMethodImpl() override = default;
 };
 

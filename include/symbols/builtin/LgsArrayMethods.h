@@ -53,13 +53,13 @@ public:
         funcType.isPublic = true;
     }
 
-    Value* call(Module* module, const vector<LgsExpr*>& args) override {
-        const auto arrPtr = args[0]->getIRValue(module);
-        const auto elementValue = args[1]->getIRValue(module);
+    Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
+        const auto arrPtr = args[0]->getIRValue(runtime);
+        const auto elementValue = args[1]->getIRValue(runtime);
         const auto elementType = args[1]->type->getIRType();
         const auto elementPtr = builder.CreateAlloca(elementType);
         builder.CreateStore(elementValue, elementPtr);
-        return callIR(module, {arrPtr, elementPtr});
+        return callIR(runtime, {arrPtr, elementPtr});
     }
 };
 
@@ -84,8 +84,8 @@ public:
         funcType.isPublic = true;
     }
 
-    Value* call(Module* module, const vector<LgsExpr*>& args) override {
-        return args.front()->getLength(module);
+    Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
+        return args.front()->getLength(runtime);
     }
 };
 
