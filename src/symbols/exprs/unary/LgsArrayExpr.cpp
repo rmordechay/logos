@@ -1,6 +1,7 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "logos/LgsConfig.h"
 #include "exprs/unary/LgsIterIndex.h"
+#include "logos/LgsRuntime.h"
 
 #include "utils/LgsUtils.h"
 
@@ -11,10 +12,10 @@ Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {
 
 Value* LgsArrayExpr::createDynArray(LgsRuntime* runtime) {
     const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
-    const auto capacityIR = builder.getInt32(capacity);
-    const auto elementSize = builder.getInt64(arrType.baseType->getSizeBytes());
+    const auto capacityIR = runtime->builder.getInt32(capacity);
+    const auto elementSize = runtime->builder.getInt64(arrType.baseType->getSizeBytes());
     const auto arrStruct = getIRStructType(arrType.name, arrType.structFields);
-    IRValue = builder.CreateAlloca(arrStruct);
+    IRValue = runtime->builder.CreateAlloca(arrStruct);
     runtime->addAllocatedExpr(this);
     arrType.init.callIR(runtime, {IRValue, capacityIR, elementSize});
     for (const auto element : initialElements) {
@@ -25,13 +26,13 @@ Value* LgsArrayExpr::createDynArray(LgsRuntime* runtime) {
 
 Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
     const auto IRType = type->getIRType();
-    const auto arrPtr = builder.CreateAlloca(IRType);
+    const auto arrPtr = runtime->builder.CreateAlloca(IRType);
     for (int i = 0; i < initialElements.size(); ++i) {
         const auto initialElement = initialElements[i];
-        auto IRIndex = builder.getInt32(i);
-        const auto gep = builder.CreateGEP(IRType, arrPtr, {i32Zero, IRIndex});
+        auto IRIndex = runtime->builder.getInt32(i);
+        const auto gep = runtime->builder.CreateGEP(IRType, arrPtr, {i32Zero, IRIndex});
         const auto rValue = initialElement->getIRValue(runtime);
-        builder.CreateStore(rValue, gep);
+        runtime->builder.CreateStore(rValue, gep);
     }
     return arrPtr;
 }

@@ -2,6 +2,7 @@
 
 #include "exprs/LgsExpr.h"
 #include "funcs/LgsFunc.h"
+#include "logos/LgsRuntime.h"
 #include "types/LgsFuncType.h"
 
 string LgsParam::format(string& indentStr) {
@@ -12,9 +13,9 @@ Value* LgsParam::getIRValue(LgsRuntime* runtime) {
     if (IRValue) return IRValue;
     if (isVariadic) {
         if (vaList) return vaList;
-        vaList = builder.CreateAlloca(ptrTy);
+        vaList = runtime->builder.CreateAlloca(ptrTy);
         const auto vaStart = getOrInsertDeclaration(runtime->module, Intrinsic::vastart, {ptrTy});
-        builder.CreateCall(vaStart, {vaList});
+        runtime->builder.CreateCall(vaStart, {vaList});
         return vaList;
     }
     return IRValue;

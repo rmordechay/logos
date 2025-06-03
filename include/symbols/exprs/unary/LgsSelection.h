@@ -7,10 +7,10 @@ class LgsUnaryExpr;
 
 class LgsSelection final : public LgsStmt, public LgsUnaryExpr {
 public:
-    vector<LgsUnaryExpr*> exprs;
+    std::vector<LgsUnaryExpr*> exprs;
 
-    explicit LgsSelection(const vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
-    string getName() override;
+    explicit LgsSelection(const std::vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
+    std::string getName() override;
     LgsExpr* lastExpr() const;
     uint32_t hashValue(LgsRuntime* runtime) override;
     Value* eqIR(LgsRuntime* runtime, LgsExpr* other) override;

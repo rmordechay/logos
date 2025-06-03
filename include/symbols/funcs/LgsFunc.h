@@ -29,7 +29,7 @@ public:
     void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const;
     virtual void generateIRCode(LgsRuntime* runtime);
     virtual Function* getIRFunc(LgsRuntime* runtime);
-    virtual FunctionType* getIRFuncType(const LgsRuntime* runtime);
+    virtual FunctionType* getIRFuncType(LgsRuntime* runtime);
     virtual Value* callIR(LgsRuntime* runtime, const vector<Value*>& args = {});
     virtual Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args = {});
     ~LgsFunc() override;

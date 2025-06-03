@@ -9,24 +9,24 @@
 #include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 
-void LgsRuntime::initRuntime(const LgsRuntime* runtime) {
+void LgsRuntime::initRuntime(LgsRuntime* runtime) {
     const auto stackStr = getIRStructType("StackStr", {ArrayType::get(i8Ty, 1024), i32Ty});
     const auto stack = getIRStructType("Stack", {i32Ty, ArrayType::get(stackStr, 512)});
     const auto runtimeType = getIRStructType("Runtime", {stack});
     const auto zeroInit = Constant::getNullValue(runtimeType);
     runtimeStruct = new GlobalVariable(*runtime->module, runtimeType, false, GlobalValue::ExternalLinkage, zeroInit);
     const auto initStackFunc = runtime->module->getOrInsertFunction("Runtime_init", FunctionType::get(voidTy, {ptrTy}, false));
-    builder.CreateCall(initStackFunc, {runtimeStruct});
+    runtime->builder.CreateCall(initStackFunc, {runtimeStruct});
 }
 
 void LgsRuntime::pushStackTrace(LgsRuntime* runtime, const string& path) const {
     const auto pushStackFunc =runtime->module->getOrInsertFunction("Runtime_push", FunctionType::get(voidTy, {ptrTy, ptrTy}, false));
-    builder.CreateCall(pushStackFunc, {runtimeStruct, getIRStr(runtime, path)});
+    runtime->builder.CreateCall(pushStackFunc, {runtimeStruct, getIRStr(runtime, path)});
 }
 
 void LgsRuntime::printStack(LgsRuntime* runtime) const {
     const auto printStackFunc =runtime->module->getOrInsertFunction("Runtime_print_stack", FunctionType::get(voidTy, {ptrTy}, false));
-    builder.CreateCall(printStackFunc, {runtimeStruct});
+    runtime->builder.CreateCall(printStackFunc, {runtimeStruct});
 }
 
 void LgsRuntime::addAllocatedExpr(LgsExpr* expr) {

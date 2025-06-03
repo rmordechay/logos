@@ -22,8 +22,8 @@ public:
     void storeScalar(LgsRuntime* runtime, LgsExpr* value);
     void storeArray(LgsRuntime* runtime, const LgsArrayExpr* arr) const;
     Value* getLength(LgsRuntime* runtime) override;
-    string getName() override;
-    string prettyName() override;
+    std::string getName() override;
+    std::string prettyName() override;
     ~LgsIterIndex() override;
 };
 

@@ -1,4 +1,6 @@
 #include "loops/LgsRangeLoop.h"
+
+#include "logos/LgsRuntime.h"
 #include "stmts/LgsVarDec.h"
 
 Value* LgsRangeLoop::loopStart(LgsRuntime* runtime) {
@@ -11,7 +13,7 @@ Value* LgsRangeLoop::loopEnd(LgsRuntime* runtime) {
 
 void LgsRangeLoop::setIRLoopVars(LgsRuntime* runtime) {
     const auto loopVar = loopVars[0];
-    const auto iValue = builder.CreateLoad(i32Ty, iPtr);
+    const auto iValue = runtime->builder.CreateLoad(i32Ty, iPtr);
     loopVar->expr->setIRValue(iValue);
 }
 

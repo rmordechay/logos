@@ -12,8 +12,8 @@ LgsStmt* LgsStmtBlock::lastStmt() const {
     return stmts[stmts.size() - 1];
 }
 
-string LgsStmtBlock::format(string& indentStr) {
-    stringstream oss;
+std::string LgsStmtBlock::format(std::string& indentStr) {
+    std::stringstream oss;
     oss << " {\n";
     indentStr += '\t';
     for (const auto& stmt : stmts) {

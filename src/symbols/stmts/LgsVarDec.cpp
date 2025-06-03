@@ -1,5 +1,6 @@
 #include "stmts/LgsVarDec.h"
 #include "exprs/unary/LgsArrayExpr.h"
+#include "logos/LgsRuntime.h"
 #include "utils/LgsUtils.h"
 
 string LgsVarDec::format(string& indentStr) {
@@ -10,13 +11,13 @@ void LgsVarDec::createIRStmt(LgsRuntime* runtime) {
     const auto IRType = type->getIRType();
     const auto exprIRValue = expr->getIRValue(runtime);
     if (shouldAllocate(IRType)) {
-        IRValue = builder.CreateAlloca(IRType);
+        IRValue = runtime->builder.CreateAlloca(IRType);
         if (shouldLoadIRArg(exprIRValue)) {
             const auto artIRType = expr->type->getIRType();
-            const auto value = builder.CreateLoad(artIRType, exprIRValue);
-            builder.CreateStore(value, IRValue);
+            const auto value = runtime->builder.CreateLoad(artIRType, exprIRValue);
+            runtime->builder.CreateStore(value, IRValue);
         } else {
-            builder.CreateStore(exprIRValue, IRValue);
+            runtime->builder.CreateStore(exprIRValue, IRValue);
         }
     } else {
         IRValue = exprIRValue;

@@ -8,8 +8,8 @@
 class LgsPatternMatch final : public LgsStmt {
 public:
     LgsExpr* expr;
-    vector<LgsExpr*> patterns;
-    vector<LgsStmtBlock*> patternsStmtBlocks;
+    std::vector<LgsExpr*> patterns;
+    std::vector<LgsStmtBlock*> patternsStmtBlocks;
     LgsStmtBlock* elseStmtBlock = nullptr;
     BasicBlock* exitBlock = nullptr;
     BasicBlock* defaultCase = nullptr;

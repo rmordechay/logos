@@ -1,5 +1,6 @@
 #include "stmts/LgsIfStmt.h"
 #include "codegen/CodegenMetadata.h"
+#include "logos/LgsRuntime.h"
 
 void LgsIfStmt::createIRStmt(LgsRuntime* runtime) {
     runtime->stack.enterScope(this);
@@ -20,20 +21,20 @@ void LgsIfStmt::computeSimpleIf(LgsRuntime* runtime) {
     // if block
     const auto ifCondIR = ifCond->getIRValue(runtime);
     if (!elseStmtBlock) {
-        builder.CreateCondBr(ifCondIR, ifTrueBlock, ifEndBlock);
+        runtime->builder.CreateCondBr(ifCondIR, ifTrueBlock, ifEndBlock);
     } else {
-        builder.CreateCondBr(ifCondIR, ifTrueBlock, elseBlock);
+        runtime->builder.CreateCondBr(ifCondIR, ifTrueBlock, elseBlock);
     }
-    startBlock(ifTrueBlock, nullptr);
+    startBlock(runtime, ifTrueBlock, nullptr);
     ifStmtBlock->createIRValue(runtime);
     if (builder.GetInsertBlock()->getTerminator()) return;
-    builder.CreateBr(ifEndBlock);
+    runtime->builder.CreateBr(ifEndBlock);
 
     // else block
     createElseBlock(runtime, elseBlock, ifEndBlock);
 
     // exit
-    startBlock(ifEndBlock, nullptr);
+    startBlock(runtime, ifEndBlock, nullptr);
 }
 
 void LgsIfStmt::computeComplexIf(LgsRuntime* runtime) {
@@ -44,10 +45,10 @@ void LgsIfStmt::computeComplexIf(LgsRuntime* runtime) {
 
     // if block
     const auto ifCondIR = ifCond->getIRValue(runtime);
-    builder.CreateCondBr(ifCondIR, ifTrueBlock, elseIfCheckBlock);
-    startBlock(ifTrueBlock, nullptr);
+    runtime->builder.CreateCondBr(ifCondIR, ifTrueBlock, elseIfCheckBlock);
+    startBlock(runtime, ifTrueBlock, nullptr);
     ifStmtBlock->createIRValue(runtime);
-    builder.CreateBr(ifEndBlock);
+    runtime->builder.CreateBr(ifEndBlock);
 
     // else if blocks
     createElseIfBlocks(runtime);
@@ -57,38 +58,38 @@ void LgsIfStmt::computeComplexIf(LgsRuntime* runtime) {
 
     // exit
     if (!builder.GetInsertBlock()->getTerminator()) {
-        startBlock(ifEndBlock, nullptr);
+        startBlock(runtime, ifEndBlock, nullptr);
     }
 }
 
 void LgsIfStmt::createElseIfBlocks(LgsRuntime* runtime) {
     for (size_t i = 0; i < elseIfConds.size(); ++i) {
-        startBlock(elseIfCheckBlock, nullptr);
+        startBlock(runtime, elseIfCheckBlock, nullptr);
         const auto elseIfCondIR = elseIfConds[i]->getIRValue(runtime);
         const auto elseIfStartBlock = createBasicBlock(BB_ELSE_IF_START);
         const auto lastIteration = elseIfConds.size() - 1;
         if (i == lastIteration) {
             if (elseStmtBlock) {
-                builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, elseBlock);
+                runtime->builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, elseBlock);
             } else {
-                builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, ifEndBlock);
+                runtime->builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, ifEndBlock);
             }
         } else {
             elseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK);
-            builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, elseIfCheckBlock);
+            runtime->builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, elseIfCheckBlock);
         }
 
-        startBlock(elseIfStartBlock, nullptr);
+        startBlock(runtime, elseIfStartBlock, nullptr);
         elseIfStmtBlocks[i]->createIRValue(runtime);
-        builder.CreateBr(ifEndBlock);
+        runtime->builder.CreateBr(ifEndBlock);
     }
 }
 
 void LgsIfStmt::createElseBlock(LgsRuntime* runtime, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const {
     if (!elseStmtBlock) return;
-    startBlock(elseBlock, nullptr);
+    startBlock(runtime, elseBlock, nullptr);
     elseStmtBlock->createIRValue(runtime);
-    builder.CreateBr(ifEndBlock);
+    runtime->builder.CreateBr(ifEndBlock);
 }
 
 LgsIfStmt::~LgsIfStmt() {

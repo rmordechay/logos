@@ -4,6 +4,7 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "logos/LgsConfig.h"
+#include "logos/LgsRuntime.h"
 #include "stmts/LgsVarDec.h"
 
 size_t LgsArray::getSizeBytes() {
@@ -55,12 +56,12 @@ void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
 
 Value* LgsArray::getElement(LgsRuntime* runtime, Value* iterPtr, Value* indexPtr) {
     if (isStatic) {
-        const auto i = builder.CreateLoad(i32Ty, indexPtr);
-        return builder.CreateGEP(getIRType(), iterPtr, {i32Zero, i});
+        const auto i = runtime->builder.CreateLoad(i32Ty, indexPtr);
+        return runtime->builder.CreateGEP(getIRType(), iterPtr, {i32Zero, i});
     }
-    const auto iValue = builder.CreateLoad(i32Ty, indexPtr);
+    const auto iValue = runtime->builder.CreateLoad(i32Ty, indexPtr);
     const auto v = get.callIR(runtime, {iterPtr, iValue});
-    return builder.CreateLoad(getIRType(), v);
+    return runtime->builder.CreateLoad(getIRType(), v);
 }
 
 LgsType* LgsArray::clone() {

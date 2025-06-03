@@ -4,7 +4,7 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 
 Value* LgsStrConst::getLength(LgsRuntime* runtime) {
-    return builder.getInt32(value.size());
+    return runtime->builder.getInt32(value.size());
 }
 
 Value* LgsStrConst::createIRValue(LgsRuntime* runtime) {

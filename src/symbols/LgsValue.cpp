@@ -1,18 +1,19 @@
 #include "LgsValue.h"
-
 #include "codegen/CodegenMetadata.h"
 #include "funcs/LgsFunc.h"
+#include "logos/LgsRuntime.h"
 #include "json/json.hpp"
 
-void LgsValue::startBlock(BasicBlock* const block, Function* IRFunc) const {
+void LgsValue::startBlock(LgsRuntime* runtime, BasicBlock* const block, Function* IRFunc) const {
     block->insertInto(IRFunc);
-    builder.SetInsertPoint(block);
+    runtime->builder.SetInsertPoint(block);
 }
 
-void LgsValue::startBlockFunc(LgsRuntime* runtime, LgsFunc* currentFunc) const {
+void LgsValue::startBlockFunc(LgsRuntime* runtime) const {
     const auto entryBlock = BasicBlock::Create(context, "entry");
-    entryBlock->insertInto(currentFunc->getIRFunc(runtime));
-    builder.SetInsertPoint(entryBlock);
+    const auto IRFunc = runtime->stack.currentFunc->getIRFunc(runtime);
+    entryBlock->insertInto(IRFunc);
+    runtime->builder.SetInsertPoint(entryBlock);
 }
 
 string LgsValue::format(string& indentStr) {
@@ -26,7 +27,7 @@ BasicBlock* LgsValue::createBasicBlock(const char* name) const {
 Value* LgsValue::hashIRValue(LgsRuntime* runtime, Value* value) const {
     const auto hashValueIRFuncType = FunctionType::get(i32Ty, {ptrTy}, false);
     const auto func =runtime->module->getOrInsertFunction("hash_Str", hashValueIRFuncType);
-    return builder.CreateCall(func, {value});
+    return runtime->builder.CreateCall(func, {value});
 }
 
 json LgsValue::asJSON() {

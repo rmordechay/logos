@@ -2,6 +2,7 @@
 #define LOGOSPRINT_H
 #include "LgsBuiltinMethod.h"
 #include "funcs/LgsFuncImpl.h"
+#include "logos/LgsRuntime.h"
 #include "types/primitives/LgsBool.h"
 #include "utils/LgsUtils.h"
 

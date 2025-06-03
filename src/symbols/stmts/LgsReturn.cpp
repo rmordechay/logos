@@ -5,7 +5,7 @@
 void LgsReturn::createIRStmt(LgsRuntime* runtime) {
     runtime->freeExprs(runtime);
     const auto exprIR = expr->getIRValue(runtime);
-    builder.CreateRet(exprIR);
+    runtime->builder.CreateRet(exprIR);
 }
 
 LgsReturn::~LgsReturn() {

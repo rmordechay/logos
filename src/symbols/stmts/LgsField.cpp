@@ -4,13 +4,13 @@
 
 Value* LgsField::getGEP(LgsRuntime* runtime, Value* instance) {
     assert(instance && parent);
-    IRValue = builder.CreateStructGEP(parent->getIRType(), instance, position);
+    IRValue = runtime->builder.CreateStructGEP(parent->getIRType(), instance, position);
     return IRValue;
 }
 
 void LgsField::setFieldIRValue(LgsRuntime* runtime, LgsExpr* expr, Value* instance) {
     const auto exprIRValue = expr->getIRValue(runtime);
-    builder.CreateStore(exprIRValue, getGEP(runtime, instance));
+    runtime->builder.CreateStore(exprIRValue, getGEP(runtime, instance));
 }
 
 LgsField* LgsField::clone() const {

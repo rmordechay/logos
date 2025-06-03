@@ -1,11 +1,13 @@
 #include "exprs/unary/constants/LgsBoolConst.h"
 
+#include "logos/LgsRuntime.h"
+
 string LgsBoolConst::getValueAsString() const {
     return value ? LgsBool::trueLiteral : LgsBool::falseLiteral;
 }
 
 Value* LgsBoolConst::createIRValue(LgsRuntime* runtime) {
-    return builder.getInt1(value);
+    return runtime->builder.getInt1(value);
 }
 
 Value* LgsBoolConst::eqIR(LgsRuntime* runtime, LgsExpr* other) {
@@ -34,14 +36,14 @@ Value* LgsBoolConst::leIR(LgsRuntime* runtime, LgsExpr* other) {
 
 Value* LgsBoolConst::andIR(LgsRuntime* runtime, LgsExpr* other) {
     if (const auto otherBool = other->asBoolConst()) {
-        return builder.getInt1(value && otherBool->value);
+        return runtime->builder.getInt1(value && otherBool->value);
     }
     assert(false);
 }
 
 Value* LgsBoolConst::orIR(LgsRuntime* runtime, LgsExpr* other) {
     if (const auto otherBool = other->asBoolConst()) {
-        return builder.getInt1(value || otherBool->value);
+        return runtime->builder.getInt1(value || otherBool->value);
     }
     assert(false);
 }

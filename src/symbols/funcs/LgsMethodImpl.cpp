@@ -20,7 +20,7 @@ Function* LgsMethodImpl::getIRFunc(LgsRuntime* runtime) {
     return IRFunc;
 }
 
-FunctionType* LgsMethodImpl::getIRFuncType(const LgsRuntime* runtime) {
+FunctionType* LgsMethodImpl::getIRFuncType(LgsRuntime* runtime) {
     vector<Type*> IRParamsTypes;
     for (int i = 0; i < funcType.params.size(); ++i) {
         auto paramIRType = funcType.params[i]->type->getIRType();

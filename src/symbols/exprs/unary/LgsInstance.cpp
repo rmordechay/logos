@@ -19,7 +19,7 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
     if (isSelf) {
         IRValue = currentFunc->arg_begin();
     } else {
-        IRValue = builder.CreateAlloca(IRType);
+        IRValue = runtime->builder.CreateAlloca(IRType);
     }
     if (!obj->implements.empty()) {
         setVirtualFuncs(runtime);
@@ -34,17 +34,17 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
 void LgsInstance::setVirtualFuncs(LgsRuntime* runtime) const {
     const auto map = obj->vtable.getIRValue(runtime);
 
-    const auto vtableGEP = builder.CreateStructGEP(obj->getIRType(), IRValue, 0);
-    builder.CreateStore(map, vtableGEP);
-    auto mapPtr = builder.CreateLoad(ptrTy, vtableGEP);
+    const auto vtableGEP = runtime->builder.CreateStructGEP(obj->getIRType(), IRValue, 0);
+    runtime->builder.CreateStore(map, vtableGEP);
+    auto mapPtr = runtime->builder.CreateLoad(ptrTy, vtableGEP);
 
     for (const auto& [name, method] : obj->methods) {
         const auto interface = method->implements;
         if (!interface) continue;
         const auto keyIRStr = getIRStr(runtime, interface->funcType.getIRName());
         const auto IRFunc = method->getIRFunc(runtime);
-        auto valuePtr = builder.CreateAlloca(ptrTy);
-        builder.CreateStore(IRFunc, valuePtr);
+        auto valuePtr = runtime->builder.CreateAlloca(ptrTy);
+        runtime->builder.CreateStore(IRFunc, valuePtr);
         obj->vtable.mapType.add.callIR(runtime, {mapPtr, keyIRStr, valuePtr});
 
     }

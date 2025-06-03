@@ -51,7 +51,7 @@ Value* LgsIterIndex::getIRFromDynArray(LgsRuntime* runtime, LgsArray* arr) const
     const auto arrPtr = baseExpr->getIRValue(runtime);
     const auto indexIRValue = index->from->getIRValue(runtime);
     const auto rv = arr->get.callIR(runtime, {arrPtr, indexIRValue});
-    return builder.CreateLoad(ptrTy, rv);
+    return runtime->builder.CreateLoad(ptrTy, rv);
 }
 
 Value* LgsIterIndex::getIRFromMap(LgsRuntime* runtime, LgsMap* map) const {
@@ -66,12 +66,12 @@ Value* LgsIterIndex::getIRFromStr(LgsRuntime* runtime) const {
     if (const auto global = dyn_cast<GlobalVariable>(baseExprIRValue)) {
         const auto ty = global->getValueType();
         const auto value = index->from->getIRValue(runtime);
-        return builder.CreateGEP(ty, baseExprIRValue, {i32Zero, value});
+        return runtime->builder.CreateGEP(ty, baseExprIRValue, {i32Zero, value});
     }
-    const auto p = builder.CreateAlloca(baseExprIRType);
-    const auto vaArgInst = builder.CreateVAArg(baseExprIRValue, baseExprIRType);
-    builder.CreateStore(vaArgInst, p);
-    return builder.CreateLoad(baseExprIRType, p);
+    const auto p = runtime->builder.CreateAlloca(baseExprIRType);
+    const auto vaArgInst = runtime->builder.CreateVAArg(baseExprIRValue, baseExprIRType);
+    runtime->builder.CreateStore(vaArgInst, p);
+    return runtime->builder.CreateLoad(baseExprIRType, p);
 }
 
 void LgsIterIndex::storeHashMap(LgsRuntime* runtime, LgsHashMap* hashMap) const {
@@ -82,14 +82,14 @@ void LgsIterIndex::storeScalar(LgsRuntime* runtime, LgsExpr* value) {
     const auto rValue = value->getIRValue(runtime);
     if (const auto arr = baseExpr->type->asArray()) {
         if (!arr->isStatic) {
-            const auto ptr = builder.CreateAlloca(value->type->getIRType());
-            builder.CreateStore(rValue, ptr);
+            const auto ptr = runtime->builder.CreateAlloca(value->type->getIRType());
+            runtime->builder.CreateStore(rValue, ptr);
             arr->put.callIR(runtime, {baseExpr->getIRValue(runtime), index->from->getIRValue(runtime), ptr});
             return;
         }
     }
     const auto iterPtr = getIRValue(runtime);
-    builder.CreateStore(rValue, iterPtr);
+    runtime->builder.CreateStore(rValue, iterPtr);
 }
 
 void LgsIterIndex::storeArray(LgsRuntime* runtime, const LgsArrayExpr* arr) const {
@@ -104,11 +104,11 @@ void LgsIterIndex::storeArray(LgsRuntime* runtime, const LgsArrayExpr* arr) cons
     }
     for (int i = 0; i < arr->initialElements.size(); ++i) {
         const auto element = arr->initialElements[i];
-        const auto IRIndex = builder.getInt32(i);
+        const auto IRIndex = runtime->builder.getInt32(i);
         IRIndices.push_back(IRIndex);
-        const auto gep = builder.CreateGEP(IRType, arrPtr, IRIndices);
+        const auto gep = runtime->builder.CreateGEP(IRType, arrPtr, IRIndices);
         const auto rValue = element->getIRValue(runtime);
-        builder.CreateStore(rValue, gep);
+        runtime->builder.CreateStore(rValue, gep);
         IRIndices.pop_back();
     }
 }
@@ -132,7 +132,7 @@ Value* LgsIterIndex::getGEP(LgsRuntime* runtime) const {
         }
     }
     reverse(IRIndices.begin(), IRIndices.end());
-    return builder.CreateGEP(ty, ptr, IRIndices);
+    return runtime->builder.CreateGEP(ty, ptr, IRIndices);
 }
 
 Value* LgsIterIndex::getLength(LgsRuntime* runtime) {

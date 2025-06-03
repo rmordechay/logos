@@ -16,8 +16,8 @@ public:
 
     void setIRValue(Value* value);
     BasicBlock* createBasicBlock(const char* name) const;
-    void startBlock(BasicBlock* block, Function* IRFunc) const;
-    void startBlockFunc(LgsRuntime* runtime, LgsFunc* currentFunc) const;
+    void startBlock(LgsRuntime* runtime, BasicBlock* block, Function* IRFunc) const;
+    void startBlockFunc(LgsRuntime* runtime) const;
     Value* hashIRValue(LgsRuntime* runtime, Value* value) const;
     virtual std::string format(std::string& indentStr);
     virtual void setLocation(const antlr4::Token* ctx);

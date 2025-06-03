@@ -7,7 +7,7 @@ string LgsIntConst::prettyName() {
 }
 
 Value* LgsIntConst::createIRValue(LgsRuntime* runtime) {
-    return builder.getInt32(value);
+    return runtime->builder.getInt32(value);
 }
 
 LgsExpr* LgsIntConst::convertExpr(LgsType* other) {
@@ -21,7 +21,7 @@ Value* LgsIntConst::eqIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(runtime);
     const auto thisIRValue = getIRValue(runtime);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return builder.CreateICmpEQ(thisIRValue, otherIRValue);
+        return runtime->builder.CreateICmpEQ(thisIRValue, otherIRValue);
     }
     assert(false);
 }
@@ -30,7 +30,7 @@ Value* LgsIntConst::neIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(runtime);
     const auto thisIRValue = getIRValue(runtime);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return builder.CreateICmpNE(thisIRValue, otherIRValue);
+        return runtime->builder.CreateICmpNE(thisIRValue, otherIRValue);
     }
     assert(false);
 }
@@ -39,7 +39,7 @@ Value* LgsIntConst::gtIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(runtime);
     const auto thisIRValue = getIRValue(runtime);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return builder.CreateICmpSGT(thisIRValue, otherIRValue);
+        return runtime->builder.CreateICmpSGT(thisIRValue, otherIRValue);
     }
     assert(false);
 }
@@ -48,7 +48,7 @@ Value* LgsIntConst::ltIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(runtime);
     const auto thisIRValue = getIRValue(runtime);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return builder.CreateICmpSLT(thisIRValue, otherIRValue);
+        return runtime->builder.CreateICmpSLT(thisIRValue, otherIRValue);
     }
     assert(false);
 }
@@ -57,7 +57,7 @@ Value* LgsIntConst::geIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(runtime);
     const auto thisIRValue = getIRValue(runtime);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return builder.CreateICmpSGE(thisIRValue, otherIRValue);
+        return runtime->builder.CreateICmpSGE(thisIRValue, otherIRValue);
     }
     assert(false);
 }
@@ -66,7 +66,7 @@ Value* LgsIntConst::leIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(runtime);
     const auto thisIRValue = getIRValue(runtime);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return builder.CreateICmpSLE(thisIRValue, otherIRValue);
+        return runtime->builder.CreateICmpSLE(thisIRValue, otherIRValue);
     }
     assert(false);
 }
@@ -88,7 +88,7 @@ Value* LgsIntConst::bitAndIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(runtime);
     const auto thisIRValue = getIRValue(runtime);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return builder.CreateAnd(thisIRValue, otherIRValue);
+        return runtime->builder.CreateAnd(thisIRValue, otherIRValue);
     }
     assert(false);
 }
@@ -97,7 +97,7 @@ Value* LgsIntConst::bitOrIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(runtime);
     const auto thisIRValue = getIRValue(runtime);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return builder.CreateOr(thisIRValue, otherIRValue);
+        return runtime->builder.CreateOr(thisIRValue, otherIRValue);
     }
     assert(false);
 }
@@ -106,7 +106,7 @@ Value* LgsIntConst::bitXorIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(runtime);
     const auto thisIRValue = getIRValue(runtime);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return builder.CreateXor(thisIRValue, otherIRValue);
+        return runtime->builder.CreateXor(thisIRValue, otherIRValue);
     }
     assert(false);
 }
@@ -115,7 +115,7 @@ Value* LgsIntConst::lshiftIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(runtime);
     const auto thisIRValue = getIRValue(runtime);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return builder.CreateShl(thisIRValue, otherIRValue);
+        return runtime->builder.CreateShl(thisIRValue, otherIRValue);
     }
     assert(false);
 }
@@ -128,7 +128,7 @@ Value* LgsIntConst::rshiftIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(runtime);
     const auto thisIRValue = getIRValue(runtime);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return builder.CreateAShr(thisIRValue, otherIRValue);
+        return runtime->builder.CreateAShr(thisIRValue, otherIRValue);
     }
     assert(false);
 }

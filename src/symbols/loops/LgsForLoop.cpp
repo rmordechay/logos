@@ -1,5 +1,6 @@
 #include "loops/LgsForLoop.h"
 #include "data/LgsDefinitions.h"
+#include "logos/LgsRuntime.h"
 
 #include "stmts/LgsStmtBlock.h"
 #include "stmts/LgsVarDec.h"
@@ -7,9 +8,9 @@
 void LgsForLoop::createIRStmt(LgsRuntime* runtime) {
     runtime->stack.enterScope(this);
     initIRLoop(runtime);
-    startBlock(loopCondBlock, nullptr);
+    startBlock(runtime, loopCondBlock, nullptr);
     setLoopIRCondition(runtime);
-    startBlock(loopBodyBlock, nullptr);
+    startBlock(runtime, loopBodyBlock, nullptr);
     setIRLoopVars(runtime);
     stmtBlock->createIRValue(runtime);
     exitIRLoop(runtime);
@@ -20,27 +21,27 @@ void LgsForLoop::initIRLoop(LgsRuntime* runtime) {
     loopCondBlock = createBasicBlock(LOGOS_LOOP_CONDITION);
     loopBodyBlock = createBasicBlock(LOGOS_LOOP_BODY);
     loopExitBlock = createBasicBlock(LOGOS_LOOP_EXIT);
-    iPtr = builder.CreateAlloca(i32Ty);
-    builder.CreateStore(loopStart(runtime), iPtr);
+    iPtr = runtime->builder.CreateAlloca(i32Ty);
+    runtime->builder.CreateStore(loopStart(runtime), iPtr);
     setIRIterable(runtime);
-    builder.CreateBr(loopCondBlock);
+    runtime->builder.CreateBr(loopCondBlock);
 }
 
 void LgsForLoop::setLoopIRCondition(LgsRuntime* runtime) {
-    const auto iValue = builder.CreateLoad(i32Ty, iPtr);
+    const auto iValue = runtime->builder.CreateLoad(i32Ty, iPtr);
     const auto upperBound = loopEnd(runtime);
-    const auto condition = builder.CreateICmpSLT(iValue, upperBound);
-    builder.CreateCondBr(condition, loopBodyBlock, loopExitBlock);
+    const auto condition = runtime->builder.CreateICmpSLT(iValue, upperBound);
+    runtime->builder.CreateCondBr(condition, loopBodyBlock, loopExitBlock);
 }
 
 void LgsForLoop::exitIRLoop(LgsRuntime* runtime) const {
     // Increment loop variable
-    const auto iValue = builder.CreateLoad(i32Ty, iPtr);
-    const auto inc = builder.CreateAdd(iValue, builder.getInt32(1));
-    builder.CreateStore(inc, iPtr);
-    builder.CreateBr(loopCondBlock);
+    const auto iValue = runtime->builder.CreateLoad(i32Ty, iPtr);
+    const auto inc = runtime->builder.CreateAdd(iValue, runtime->builder.getInt32(1));
+    runtime->builder.CreateStore(inc, iPtr);
+    runtime->builder.CreateBr(loopCondBlock);
     // Loop exit
-    startBlock(loopExitBlock, nullptr);
+    startBlock(runtime, loopExitBlock, nullptr);
 }
 
 LgsForLoop::~LgsForLoop() {

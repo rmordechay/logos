@@ -27,14 +27,14 @@ LgsExpr* LgsSelection::resolveSelection(LgsRuntime* runtime) const {
         if (field) {
             if (const auto iterIndex = parentExpr->asIterIndex()) {
                 const auto gep = iterIndex->getGEP(runtime);
-                auto valueLoad = builder.CreateLoad(ptrTy, gep);
+                auto valueLoad = runtime->builder.CreateLoad(ptrTy, gep);
                 const auto value = field->getGEP(runtime, valueLoad);
-                valueLoad = builder.CreateLoad(field->type->getIRType(), value);
+                valueLoad = runtime->builder.CreateLoad(field->type->getIRType(), value);
                 childExpr->setIRValue(valueLoad);
             } else {
                 const auto parentIRValue = parentExpr->getIRValue(runtime);
                 const auto value = field->getGEP(runtime, parentIRValue);
-                const auto valueLoad = builder.CreateLoad(field->type->getIRType(), value);
+                const auto valueLoad = runtime->builder.CreateLoad(field->type->getIRType(), value);
                 childExpr->setIRValue(valueLoad);
             }
         } else if (const auto methodCall = childExpr->asFuncCall()) {

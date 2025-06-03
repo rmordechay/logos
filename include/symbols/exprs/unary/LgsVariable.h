@@ -2,14 +2,16 @@
 #define LOGOSVARIABLEEXPR_H
 #include "LgsUnaryExpr.h"
 
+struct LgsSymbol;
+
 class LgsVariable :  public LgsUnaryExpr {
 public:
     std::string name;
     LgsSymbol* ref = nullptr;
 
     explicit LgsVariable(const std::string& name) : LgsUnaryExpr(nullptr), name(name) {}
-    string getName() override;
-    string prettyName() override;
+    std::string getName() override;
+    std::string prettyName() override;
     uint32_t hashValue(LgsRuntime* runtime) override;
     Value* getLength(LgsRuntime* runtime) override;
     Value* createIRValue(LgsRuntime* runtime) override;

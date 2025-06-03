@@ -3,14 +3,17 @@
 #include "stmts/LgsStmt.h"
 #include "LgsUnaryExpr.h"
 
+class LgsFuncType;
+struct LgsSymbol;
+
 class LgsFuncCall final : public LgsStmt, public LgsUnaryExpr {
 public:
-    string name;
-    vector<LgsExpr*> args;
+    std::string name;
+    std::vector<LgsExpr*> args;
     LgsSymbol* callback = nullptr;
     LgsFunc* func = nullptr;
 
-    explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
+    explicit LgsFuncCall(const std::string& name, const std::vector<LgsExpr*>& args = {}) : name(name), args(args) {}
     Value* call(LgsRuntime* runtime) const;
     Value* getCallback(LgsRuntime* runtime) const;
     bool equalsRaw(const LgsFuncType* funcType) const;
@@ -20,9 +23,9 @@ public:
     Value* resolveVirtualFunc(LgsRuntime* runtime) const;
     void createIRStmt(LgsRuntime* runtime) override;
     Value* createIRValue(LgsRuntime* runtime) override;
-    string getName() override;
-    string format(string& indentStr) override;
-    string prettyName() override;
+    std::string getName() override;
+    std::string format(std::string& indentStr) override;
+    std::string prettyName() override;
     ~LgsFuncCall() override = default;
 };
 

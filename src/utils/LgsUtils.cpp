@@ -84,7 +84,7 @@ StructType* getIRStructType(const string& name, const vector<Type*>& fields) {
     return struct_;
 }
 
-Value* getIRStr(const LgsRuntime* runtime, const string& value) {
+Value* getIRStr(LgsRuntime* runtime, const string& value) {
     for (auto& globals : runtime->module->globals()) {
         if (!globals.hasInitializer()) continue;
         const auto dataArray = dyn_cast<ConstantDataArray>(globals.getInitializer());
@@ -105,7 +105,7 @@ Module* createEmptyModule(const string& objName) {
     return module;
 }
 
-void writeIRToFile(const LgsRuntime* runtime, const path& name) {
+void writeIRToFile(LgsRuntime* runtime, const path& name) {
     if constexpr (WRITE_IR_TO_FILE) {
         const auto filePath = (paths.buildDir / name).string() + ".ll";
         std::error_code EC;

@@ -2,7 +2,6 @@
 #define CODEGENMETADATA_H
 
 #include "logos/LgsActiveEnv.h"
-#include <logos/LgsRuntime.h>
 #include <json/json.hpp>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Target/TargetMachine.h>
@@ -13,10 +12,10 @@ using namespace nlohmann;
 
 inline LLVMContext context;
 inline LgsActiveEnv activeEnv;
-inline map<string, Module*> IRModules;
+inline std::map<std::string, Module*> IRModules;
 inline auto builder = IRBuilder(context);
 inline TargetMachine* targetMachine = nullptr;
-inline string targetTriple = sys::getDefaultTargetTriple();
+inline std::string targetTriple = sys::getDefaultTargetTriple();
 
 Type* const i1Ty = Type::getInt1Ty(context);
 Type* const i8Ty = Type::getInt8Ty(context);

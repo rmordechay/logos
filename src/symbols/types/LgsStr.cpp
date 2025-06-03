@@ -29,8 +29,8 @@ LgsType* LgsStr::inferBinaryType(LgsType* other) {
 
 Value* LgsStr::getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) {
     if (isStatic) assert(false);
-    const auto i = builder.CreateLoad(i32Ty, iPtr);
-    return builder.CreateInBoundsGEP(baseType->getIRType(), iterPtr, {i});
+    const auto i = runtime->builder.CreateLoad(i32Ty, iPtr);
+    return runtime->builder.CreateInBoundsGEP(baseType->getIRType(), iterPtr, {i});
 }
 
 string LgsStr::getStrFormatPart() const {
