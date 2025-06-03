@@ -2,7 +2,6 @@
 
 #include "data/LgsDefinitions.h"
 #include "data/LgsErrors.h"
-
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
 #include "logos/LgsProject.h"
@@ -37,17 +36,15 @@
 #include <stmts/LgsAssignment.h>
 #include <stmts/LgsIfStmt.h>
 
-inline mutex mtx;
-
-void SemaAnalyser::analyseFiles(const vector<LgsFile*>& files, vector<LgsError>& errors) {
+void SemaAnalyser::analyseFiles(LogosProject* project) {
     ThreadPool threadPool;
     threadPool.start();
-    for (const auto file : files) {
-        threadPool.runTask([=, &file, &errors] {
+    for (const auto file : project->files) {
+        threadPool.runTask([file, &project] {
             SemaAnalyser semaAnalyser(file);
             semaAnalyser.analyse();
             lock_guard lock(mtx);
-            errors.insert(errors.end(), semaAnalyser.errHandler.errors.begin(), semaAnalyser.errHandler.errors.end());
+            project->errors.insert(project->errors.end(), semaAnalyser.errHandler.errors.begin(), semaAnalyser.errHandler.errors.end());
         });
     }
     threadPool.wait();
@@ -103,7 +100,8 @@ void SemaAnalyser::visitFuncType(const LgsFuncType* funcType) {
 
 void SemaAnalyser::visitParam(LgsParam* param) {
     if (param->expr) {
-        visitExpr(param->expr, param->type);
+        visitExpr(param->expr);
+        validateExprType(param->expr, param->type);
     } else if (param->isVariadic) {
         // assert(false);
     }
@@ -148,27 +146,33 @@ void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
 }
 
 void SemaAnalyser::visitField(const LgsField* field) {
-    visitExpr(field->expr, field->type);
+    visitExpr(field->expr);
+    validateExprType(field->expr, field->type);
 }
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
-    if (varDec->type) resolveType(varDec->type);
-    if (varDec->expr) {
-        visitExpr(varDec->expr, varDec->type);
-    } else {
+    if (varDec->type && varDec->expr) {
+        varDec->type = resolveType(varDec->type);
+        visitExpr(varDec->expr);
+    } else if (varDec->type) {
+        varDec->type = resolveType(varDec->type);
         varDec->expr = varDec->type->getZeroValue();
+    } else if (varDec->expr) {
+        visitExpr(varDec->expr);
+        varDec->type = varDec->expr->type;
+    } else {
+        assert(false);
     }
-    if (varDec->type && !varDec->type->isPrimitive) delete varDec->type;
-    varDec->type = varDec->expr->type;
+    validateExprType(varDec->expr, varDec->type);
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
-    assert(varDec->type && varDec->expr);
 }
 
 void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
     const auto rightExpr = assignment->rValue;
     const auto leftExpr = assignment->lValue;
     visitExpr(leftExpr);
-    visitExpr(rightExpr, leftExpr->type);
+    visitExpr(rightExpr);
+    validateExprType(rightExpr, leftExpr->type);
 }
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -272,7 +276,7 @@ void SemaAnalyser::visitContinueStmt(const LgsContinueStmt* continueStmt) {
 
 void SemaAnalyser::visitEnum(const LgsEnum* lgsEnum) const {}
 
-void SemaAnalyser::visitExpr(LgsExpr* expr, LgsType* type) {
+void SemaAnalyser::visitExpr(LgsExpr* expr) {
     if (!expr) return;
     if (const auto castExpr = dynamic_cast<LgsCast*>(expr)) {
         visitCast(castExpr);
@@ -280,9 +284,6 @@ void SemaAnalyser::visitExpr(LgsExpr* expr, LgsType* type) {
         visitUnaryExpr(unaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
-    }
-    if (type) {
-        validateExprType(expr, type);
     }
 }
 
@@ -349,11 +350,11 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     variable->ref = symbol->clone();
     switch (symbol->type) {
     case VAR_DEC:
-        symbol->varDec->refs.emplace_back(variable);
+        symbol->varDec->refs.push_back(variable);
         variable->setType(symbol->varDec->type);
         break;
     case PARAM:
-        symbol->param->refs.emplace_back(variable);
+        symbol->param->refs.push_back(variable);
         variable->setType(symbol->param->type);
         break;
     case ENUM:
@@ -422,36 +423,38 @@ void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* c
 }
 
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
-    instance->type = resolveType(instance->type);
-    if (!instance->type) return;
-    const auto symbol = getSymbol(instance->type->prettyName(), instance);
+    const auto symbol = getSymbol(instance->name, instance);
     if (!symbol) return;
     if (symbol->type != OBJECT) {
-        return errHandler.handleError(E10022, &instance->location, {instance->type->prettyName()});
+        return errHandler.handleError(E10022, &instance->location, {instance->name});
     }
     if (symbol->object->isSingleton) {
-        return errHandler.handleError(E10032, &instance->location, {instance->type->prettyName()});
+        return errHandler.handleError(E10032, &instance->location, {instance->name});
     }
 
-    const auto obj = symbol->object->clone();
-    for (const auto& arg : instance->args) {
-        visitExpr(arg->expr);
-        const auto lgsField = obj->getField(arg->name);
-        if (!lgsField) {
-            errHandler.handleError(E10005, &arg->location, {arg->name, obj->name});
-            continue;
-        }
-        lgsField->expr = arg->expr;
+    if (!instance->obj) {
+        instance->obj = symbol->object->clone();
+        instance->type = instance->obj;
     }
 
-    for (const auto [_, field] : obj->fields) {
+    for (const auto [_, field] : instance->obj->fields) {
         if (field->isConst && !field->expr) {
             errHandler.handleError(E10029, &field->location, {field->name});
             continue;
         }
     }
-    instance->obj = obj;
-    instance->type = instance->obj;
+
+    for (const auto& arg : instance->args) {
+        visitExpr(arg->expr);
+        const auto lgsField = instance->obj->getField(arg->name);
+        if (!lgsField) {
+            errHandler.handleError(E10005, &arg->location, {arg->name, instance->obj->name});
+            continue;
+        }
+        lgsField->expr = arg->expr;
+    }
+
+    assert(instance->obj);
 }
 
 void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
@@ -507,7 +510,6 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
         argTypeNames.emplace_back(arg->type->prettyName());
     }
     auto name = methodCall->name;
-    const auto methods = parentType->methods;
     const auto method = parentType->findMethod(name);
     if (!method) {
         return errHandler.handleError(E10013, &methodCall->location, {name, parentType->prettyName()});
@@ -602,8 +604,7 @@ void SemaAnalyser::validateExprType(const LgsExpr* expr, LgsType* type) {
         }
         return;
     }
-    assert(expr->type);
-    if (type && !expr->type->equals(type)) {
+    if (type && expr->type &&  !expr->type->equals(type)) {
         return errHandler.handleError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
     }
 }

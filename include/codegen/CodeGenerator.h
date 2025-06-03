@@ -1,6 +1,6 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
-#include "funcs/LgsFuncImpl.h"
+#include "logos/LgsProject.h"
 #include <filesystem>
 
 class LgsFile;
@@ -14,8 +14,8 @@ using namespace filesystem;
 
 class CodeGenerator {
 public:
-    static void generate(const vector<LgsFile*>& files);
     static void init();
+    static void generate(const LogosProject* project);
     ~CodeGenerator() = default;
 };
 

@@ -2,6 +2,7 @@
 #include "LgsLocation.h"
 #include "codegen/CodegenMetadata.h"
 #include "data/LgsDefinitions.h"
+#include "utils/LgsUtils.h"
 
 #include <iostream>
 
@@ -13,6 +14,7 @@ void LgsErrHandler::handleError(const LgsError& lgsErr, const Location* location
     setUnsuccessful();
     const auto errMsg = formatMsg(lgsErr.msg, args);
     errors.emplace_back(LgsError{.msg = errMsg, .errCode = lgsErr.errCode});
+    lock_guard lock(mtx);
     cout <<  ERROR_STR << errMsg << endl;
     if (location) {
         const auto fullPath = location->getFullPath(filePath);

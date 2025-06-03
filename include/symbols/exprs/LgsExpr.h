@@ -54,6 +54,7 @@ public:
     virtual Value* getLength(LgsRuntime* runtime);
     virtual uint32_t hashValue(LgsRuntime* runtime);
     virtual Value* createIRValue(LgsRuntime* runtime) = 0;
+
     virtual Value* addIR(LgsRuntime* runtime, LgsExpr* other) = 0;
     virtual Value* subIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* mulIR(LgsRuntime* runtime, LgsExpr* other);

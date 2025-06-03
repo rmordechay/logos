@@ -66,7 +66,7 @@ Value* LgsIterIndex::getIRFromStr(LgsRuntime* runtime) const {
     if (const auto global = dyn_cast<GlobalVariable>(baseExprIRValue)) {
         const auto ty = global->getValueType();
         const auto value = index->from->getIRValue(runtime);
-        return runtime->builder.CreateGEP(ty, baseExprIRValue, {i32Zero, value});
+        return runtime->builder.CreateGEP(ty, baseExprIRValue, {runtime->builder.getInt32(0), value});
     }
     const auto p = runtime->builder.CreateAlloca(baseExprIRType);
     const auto vaArgInst = runtime->builder.CreateVAArg(baseExprIRValue, baseExprIRType);
@@ -96,7 +96,7 @@ void LgsIterIndex::storeArray(LgsRuntime* runtime, const LgsArrayExpr* arr) cons
     if (!arr->arrType.isStatic) assert(false);
     const auto IRType = baseExpr->type->getIRType();
     const auto arrPtr = baseExpr->getIRValue(runtime);
-    vector IRIndices = {i32Zero};
+    vector<Value*> IRIndices = {runtime->builder.getInt32(0)};
     vector<LgsIndex*> indices;
     setIterIndices(this, indices);
     for (const auto index : indices) {
@@ -127,7 +127,7 @@ Value* LgsIterIndex::getGEP(LgsRuntime* runtime) const {
         } else {
             ptr = iterIndex->baseExpr->getIRValue(runtime);
             ty = iterIndex->baseExpr->type->getIRType();
-            IRIndices.push_back(i32Zero);
+            IRIndices.push_back(runtime->builder.getInt32(0));
             break;
         }
     }

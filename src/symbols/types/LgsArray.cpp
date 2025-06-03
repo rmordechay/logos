@@ -56,10 +56,10 @@ void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
 
 Value* LgsArray::getElement(LgsRuntime* runtime, Value* iterPtr, Value* indexPtr) {
     if (isStatic) {
-        const auto i = runtime->builder.CreateLoad(i32Ty, indexPtr);
-        return runtime->builder.CreateGEP(getIRType(), iterPtr, {i32Zero, i});
+        const auto i = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), indexPtr);
+        return runtime->builder.CreateGEP(getIRType(), iterPtr, {runtime->builder.getInt32(0), i});
     }
-    const auto iValue = runtime->builder.CreateLoad(i32Ty, indexPtr);
+    const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), indexPtr);
     const auto v = get.callIR(runtime, {iterPtr, iValue});
     return runtime->builder.CreateLoad(getIRType(), v);
 }

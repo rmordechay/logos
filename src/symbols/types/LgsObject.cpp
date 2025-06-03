@@ -30,17 +30,6 @@ Type* LgsObject::getIRType() {
     return IRType;
 }
 
-void LgsObject::setVirtualFuncs(vector<Type*>& elementTypes) const {
-    vector<Type*> vtableTypes;
-    for (const auto [_, method] : methods) {
-        if (!method->implements) continue;
-        method->funcType.isVirtual = true;
-        vtableTypes.push_back(ptrTy);
-    }
-    const auto vtable = StructType::create(context, vtableTypes, name + "_vtable");
-    elementTypes.push_back(vtable);
-}
-
 LgsExpr* LgsObject::getZeroValue() {
     if (isNullable) return new LgsNull();
     // TODO return empty constructor

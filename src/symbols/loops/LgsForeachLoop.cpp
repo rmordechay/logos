@@ -5,7 +5,7 @@
 #include "types/LgsArray.h"
 
 Value* LgsForeachLoop::loopStart(LgsRuntime* runtime) {
-    return i32Zero;
+    return runtime->builder.getInt32(0);
 }
 
 Value* LgsForeachLoop::loopEnd(LgsRuntime* runtime) {

@@ -1,7 +1,6 @@
 #ifndef LOGOSPRINT_H
 #define LOGOSPRINT_H
 #include "LgsBuiltinMethod.h"
-#include "funcs/LgsFuncImpl.h"
 #include "logos/LgsRuntime.h"
 #include "types/primitives/LgsBool.h"
 #include "utils/LgsUtils.h"
@@ -10,8 +9,9 @@
 #include <types/LgsAny.h>
 
 inline FunctionCallee getPrintf(LgsRuntime* runtime) {
-    const auto printfType = FunctionType::get(i32Ty, {ptrTy}, true);
-    return runtime->module->getOrInsertFunction("printf", printfType);
+    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getPtrTy()}, true);
+    auto orInsertFunction = runtime->module->getOrInsertFunction("printf", printfType);
+    return orInsertFunction;
 }
 
 class LgsPrint final : public LgsBuiltinFunc {
@@ -36,7 +36,7 @@ public:
         }
         IRArgs.insert(IRArgs.begin(), getIRStr(runtime, str.str()));
         const auto printfFunc = getPrintf(runtime);
-        builder.CreateCall(printfFunc, IRArgs);
+        runtime->builder.CreateCall(printfFunc, IRArgs);
         return nullptr;
     }
 

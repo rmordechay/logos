@@ -5,12 +5,13 @@
 
 class LgsInstance final : public LgsUnaryExpr {
 public:
+    string name;
     LgsObject* obj = nullptr;
     vector<LgsVarDec*> args;
-    bool isSelf;
+    bool isSelf = false;
 
-    explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), obj(obj), isSelf(true) {}
-    explicit LgsInstance(LgsType* type) : LgsUnaryExpr(type), isSelf(false) {}
+    explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), name(obj->name), obj(obj) {}
+    explicit LgsInstance(const string& name) : name(name) {}
     Value* createIRValue(LgsRuntime* runtime) override;
     void setVirtualFuncs(LgsRuntime* runtime) const;
     string getName() override;

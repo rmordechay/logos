@@ -14,7 +14,6 @@ class Logos {
 public:
     LogosProject project;
     vector<char*> args;
-    vector<LgsError> errors;
 
     explicit Logos(const path& rootDirPath) {
         initPaths(rootDirPath);

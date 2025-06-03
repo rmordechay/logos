@@ -9,7 +9,7 @@
 #define BUFFER_SIZE 1024
 
 inline FunctionCallee getSnprintf(LgsRuntime* runtime) {
-    const auto printfType = FunctionType::get(i32Ty, {ptrTy, i64Ty, ptrTy}, true);
+    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getPtrTy(), runtime->builder.getInt64Ty(), runtime->builder.getPtrTy()}, true);
     return runtime->module->getOrInsertFunction("snprintf", printfType);
 }
 
@@ -30,15 +30,15 @@ public:
         if (!isConst) assert(false);
         const auto formatString = getFormatString(args);
         const auto baseIRStr = getIRStr(runtime, formatString);
-        const auto bufferType = ArrayType::get(i8Ty, BUFFER_SIZE);
-        const auto buffer = builder.CreateAlloca(bufferType);
-        const auto gep = builder.CreateGEP(bufferType, buffer, {i32Zero, i32Zero});
-        vector<Value*> IRArgs = {gep, builder.getInt64(BUFFER_SIZE), baseIRStr};
+        const auto bufferType = ArrayType::get(runtime->builder.getInt8Ty(), BUFFER_SIZE);
+        const auto buffer = runtime->builder.CreateAlloca(bufferType);
+        const auto gep = runtime->builder.CreateGEP(bufferType, buffer, {runtime->builder.getInt32(0), runtime->builder.getInt32(0)});
+        vector<Value*> IRArgs = {gep, runtime->builder.getInt64(BUFFER_SIZE), baseIRStr};
         for (int i = 1; i < args.size(); ++i) {
             IRArgs.emplace_back(args[i]->getIRValue(runtime));
         }
         const auto printfFunc = getSnprintf(runtime);
-        builder.CreateCall(printfFunc, IRArgs);
+        runtime->builder.CreateCall(printfFunc, IRArgs);
         return gep;
     }
 };

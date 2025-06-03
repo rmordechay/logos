@@ -2,6 +2,8 @@
 #define LOGOSUNARYEXPR_H
 #include "codegen/CodegenMetadata.h"
 #include "exprs/LgsExpr.h"
+#include "logos/LgsRuntime.h"
+
 #include <string>
 
 class LgsUnaryExpr : public LgsExpr {
@@ -23,25 +25,25 @@ inline std::string LgsUnaryExpr::getName() {
 inline Value* LgsUnaryExpr::addIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto l = this->getIRValue(runtime);
     const auto r = other->getIRValue(runtime);
-    return builder.CreateAdd(l, r);
+    return runtime->builder.CreateAdd(l, r);
 }
 
 inline Value* LgsUnaryExpr::subIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto l = this->getIRValue(runtime);
     const auto r = other->getIRValue(runtime);
-    return builder.CreateSub(l, r);
+    return runtime->builder.CreateSub(l, r);
 }
 
 inline Value* LgsUnaryExpr::mulIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto l = this->getIRValue(runtime);
     const auto r = other->getIRValue(runtime);
-    return builder.CreateMul(l, r);
+    return runtime->builder.CreateMul(l, r);
 }
 
 inline Value* LgsUnaryExpr::divIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto l = this->getIRValue(runtime);
     const auto r = other->getIRValue(runtime);
-    return builder.CreateSDiv(l, r);
+    return runtime->builder.CreateSDiv(l, r);
 }
 
 #endif //LOGOSUNARYEXPR_H

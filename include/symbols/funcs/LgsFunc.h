@@ -27,7 +27,7 @@ public:
     string format(string& tabs) override;
     json asJSON() override;
     void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const;
-    virtual void generateIRCode(LgsRuntime* runtime);
+    virtual void generateIR(LgsRuntime* runtime);
     virtual Function* getIRFunc(LgsRuntime* runtime);
     virtual FunctionType* getIRFuncType(LgsRuntime* runtime);
     virtual Value* callIR(LgsRuntime* runtime, const vector<Value*>& args = {});

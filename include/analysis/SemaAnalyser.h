@@ -45,7 +45,7 @@ public:
     explicit SemaAnalyser(LgsFile* file) : file(file) {
         errHandler.filePath = file->absPath;
     }
-    static void analyseFiles(const vector<LgsFile*>& files, vector<LgsError>& errors);
+    static void analyseFiles(LogosProject* project);
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
@@ -69,7 +69,7 @@ public:
     void visitBreakStmt(const LgsBreakStmt* breakStmt);
     void visitContinueStmt(const LgsContinueStmt* continueStmt);
     void visitEnum(const LgsEnum* lgsEnum) const;
-    void visitExpr(LgsExpr* expr, LgsType* type = nullptr);
+    void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
     void visitArrayExpr(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap) const;

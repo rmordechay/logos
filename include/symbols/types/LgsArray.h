@@ -14,7 +14,6 @@ public:
     LgsArrayLenFunc len{this};
     LgsArrayFreeFunc free{this};
     LgsArrayDeleteFunc delete_{this};
-    vector<Type*> structFields{i64Ty, i32Ty, i32Ty, ptrTy};
     Value* argc = nullptr;
 
     explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {

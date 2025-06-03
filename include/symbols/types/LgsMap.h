@@ -16,7 +16,6 @@ public:
     LgsMapAddFunc add{this};
     LgsMapLenFunc len{this};
     LgsMapDeleteFunc delete_{this};
-    vector<Type*> structFields = {ptrTy, i64Ty, i32Ty};
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&kvType) {
         kvType.key = keyType;

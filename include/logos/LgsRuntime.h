@@ -1,10 +1,8 @@
 #ifndef LOGOSSTACK_H
 #define LOGOSSTACK_H
-
 #include "LgsStack.h"
 #include "LgsSymbol.h"
 #include "codegen/CodegenMetadata.h"
-
 #include <map>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
@@ -31,7 +29,6 @@ public:
 };
 
 struct LgsGlobals {
-    std::mutex mtx;
     map<string, LgsSymbol> symbols;
 
     void addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler);

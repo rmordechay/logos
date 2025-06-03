@@ -20,12 +20,12 @@ string LgsValue::format(string& indentStr) {
     assert(false);
 }
 
-BasicBlock* LgsValue::createBasicBlock(const char* name) const {
+BasicBlock* LgsValue::createBasicBlock(const char* name, LLVMContext& context) const {
     return BasicBlock::Create(context, name);
 }
 
 Value* LgsValue::hashIRValue(LgsRuntime* runtime, Value* value) const {
-    const auto hashValueIRFuncType = FunctionType::get(i32Ty, {ptrTy}, false);
+    const auto hashValueIRFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {ptrTy}, false);
     const auto func =runtime->module->getOrInsertFunction("hash_Str", hashValueIRFuncType);
     return runtime->builder.CreateCall(func, {value});
 }

@@ -1,13 +1,14 @@
 #include "files/LgsObjectFile.h"
 
 void LgsObjectFile::generateIR() {
-    const auto objName = obj->prettyName();
-    if (IRModules.find(objName) != IRModules.end()) return;
-    LgsRuntime runtime{.module = createEmptyModule(objName)};
+    LgsRuntime runtime;
+    const auto name = obj->name;
+    runtime.module = createEmptyModule(name, context);
     for (const auto& [_, method] : obj->methods) {
-        method->generateIRCode(&runtime);
+        method->generateIR(&runtime);
     }
-    writeIRToFile(&runtime, objName);
+    lock_guard lock(mtx);
+    IRModules[name] = runtime.module;
 }
 
 LgsObjectFile::~LgsObjectFile() {

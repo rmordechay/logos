@@ -1,6 +1,5 @@
 #ifndef LGSPROJECT_H
 #define LGSPROJECT_H
-#include "analysis/AntlrConverter.h"
 #include "extern/LgsC.h"
 #include "LgsErrHandler.h"
 #include "files/LgsAppFile.h"

@@ -4,11 +4,11 @@
 #include <string>
 #include <map>
 
+using namespace std;
+using namespace llvm;
 class LgsFuncType;
 class LgsInterface;
 class LgsObject;
-using namespace std;
-using namespace llvm;
 class LgsBool;
 class LgsMap;
 class LgsInt;

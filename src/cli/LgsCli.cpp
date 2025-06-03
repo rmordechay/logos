@@ -3,6 +3,7 @@
 #include "cli/LgsGenerateCmd.h"
 #include "cli/LgsRunCmd.h"
 #include <iostream>
+#include <sstream>
 
 void LgsCli::execute() const {
     if (argc < 2) {

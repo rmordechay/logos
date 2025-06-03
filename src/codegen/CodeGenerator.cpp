@@ -1,25 +1,22 @@
 #include "codegen/CodeGenerator.h"
 #include "files/LgsInterfaceFile.h"
-#include "files/LgsObjectFile.h"
 #include "logos/Logos.h"
 #include "logos/Platform.h"
 #include "utils/ThreadPool.h"
 
-#include <files/LgsMainFile.h>
 #include <llvm/Support/TargetSelect.h>
-#include <llvm/Target/TargetOptions.h>
-#include <llvm/MC/TargetRegistry.h>
 
-void CodeGenerator::generate(const vector<LgsFile*>& files) {
+void CodeGenerator::generate(const LogosProject* project) {
     init();
     ThreadPool threadPool;
     threadPool.start();
-    for (const auto file : files) {
-        threadPool.runTask([=, &file] {
+    for (const auto file : project->files) {
+        threadPool.runTask([&file] {
             file->generateIR();
         });
     }
     threadPool.wait();
+    writeIRToFile();
 }
 
 void CodeGenerator::init() {
@@ -33,7 +30,4 @@ void CodeGenerator::init() {
     InitializeAllTargetMCs();
     InitializeAllTargets();
     InitializeAllTargetInfos();
-    string error;
-    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }

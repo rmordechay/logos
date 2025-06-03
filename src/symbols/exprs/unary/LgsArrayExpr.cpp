@@ -12,10 +12,12 @@ Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {
 
 Value* LgsArrayExpr::createDynArray(LgsRuntime* runtime) {
     const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
-    const auto capacityIR = runtime->builder.getInt32(capacity);
-    const auto elementSize = runtime->builder.getInt64(arrType.baseType->getSizeBytes());
-    const auto arrStruct = getIRStructType(arrType.name, arrType.structFields);
-    IRValue = runtime->builder.CreateAlloca(arrStruct);
+    auto& builder = runtime->builder;
+    const auto capacityIR = builder.getInt32(capacity);
+    const auto elementSize = builder.getInt64(arrType.baseType->getSizeBytes());
+    const vector<Type*> structFields{builder.getInt64Ty(), builder.getInt32Ty(), builder.getInt32Ty(), builder.getPtrTy()};
+    const auto arrStruct = getIRStructType(context, arrType.name, structFields);
+    IRValue = builder.CreateAlloca(arrStruct);
     runtime->addAllocatedExpr(this);
     arrType.init.callIR(runtime, {IRValue, capacityIR, elementSize});
     for (const auto element : initialElements) {
@@ -30,7 +32,7 @@ Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
     for (int i = 0; i < initialElements.size(); ++i) {
         const auto initialElement = initialElements[i];
         auto IRIndex = runtime->builder.getInt32(i);
-        const auto gep = runtime->builder.CreateGEP(IRType, arrPtr, {i32Zero, IRIndex});
+        const auto gep = runtime->builder.CreateGEP(IRType, arrPtr, {runtime->builder.getInt32(0), IRIndex});
         const auto rValue = initialElement->getIRValue(runtime);
         runtime->builder.CreateStore(rValue, gep);
     }

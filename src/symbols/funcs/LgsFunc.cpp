@@ -7,7 +7,7 @@
 #include "exprs/LgsExpr.h"
 #include "types/LgsArray.h"
 
-void LgsFunc::generateIRCode(LgsRuntime* runtime) {
+void LgsFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.enterFunc(this);
     startBlockFunc(runtime);
     const auto IRFunc = getIRFunc(runtime);
@@ -32,7 +32,7 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
         auto isInit = false;
         for (int i = iterStart; i < args.size(); ++i) {
             if (!isInit && funcType.params[i]->isVariadic) {
-                IRArgs.emplace_back(builder.getInt32(3));
+                IRArgs.emplace_back(runtime->builder.getInt32(3));
                 isInit = true;
             }
             addIRArg(runtime, IRArgs, args[i]);
@@ -99,7 +99,7 @@ FunctionType* LgsFunc::getIRFuncType(LgsRuntime* runtime) {
             paramIRType = ptrTy;
         }
         if (param->isVariadic) {
-            IRParamsTypes.emplace_back(i32Ty);
+            IRParamsTypes.emplace_back(runtime->builder.getInt32Ty());
         }
         IRParamsTypes.emplace_back(paramIRType);
     }

@@ -15,11 +15,9 @@
 #include "stmts/LgsVarDec.h"
 #include "symbols/builtin/LgsPrint.h"
 #include "utils/ThreadPool.h"
-#include <iostream>
 
 using namespace std;
 extern char **environ;
-std::mutex projectMtx;
 
 bool LogosProject::loadProject(const vector<char*>& args) {
     if (!validateProject()) return false;
@@ -67,7 +65,7 @@ void LogosProject::parseSrcFile(path entry) {
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     const auto file = antlerConverter.getLogosFile(parser.logosFile(), absFilePath);
-    lock_guard lock(projectMtx);
+    lock_guard lock(mtx);
     files.emplace_back(file);
     errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
 }
@@ -83,7 +81,7 @@ void LogosProject::parseEnvFile(path fileEntry) {
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
-    lock_guard lock(projectMtx);
+    lock_guard lock(mtx);
     envFiles.emplace_back(file);
     errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
 }

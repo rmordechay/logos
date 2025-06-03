@@ -4,12 +4,12 @@
 #include "stmts/LgsStmt.h"
 
 void LgsStack::enterFunc(LgsFunc* func) {
-    push(LgsStackFrame{});
+    push(LgsStackFrame{.func = func});
     currentFunc = func;
 }
 
 void LgsStack::enterScope(LgsStmt* stmt) {
-    push(LgsStackFrame{.symbols = top().symbols});
+    push(LgsStackFrame{.symbols = top().symbols, .func = currentFunc});
     if (const auto loop = stmt->asLoop()) {
         currentLoop = loop;
     } else if (const auto ifStmt = stmt->asIfStmt()) {

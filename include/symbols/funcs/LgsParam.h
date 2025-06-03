@@ -13,9 +13,9 @@ public:
     std::string name;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
-    std::vector<LgsVariable*> refs;
     bool isVariadic = false;
     AllocaInst* vaList = nullptr;
+    std::vector<LgsVariable*> refs;
 
     explicit LgsParam(LgsType* type = nullptr, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     std::string format(std::string& indentStr) override;

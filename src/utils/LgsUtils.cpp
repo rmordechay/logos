@@ -8,10 +8,11 @@
 #include "logos/Platform.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-
+#include <llvm/MC/TargetRegistry.h>
 #include <llvm/Support/FileSystem.h>
+#include <llvm/Target/TargetMachine.h>
 
-string getFileText(filesystem::path filePath) {
+string getFileText(path filePath) {
     ifstream file(canonical(filePath));
     stringstream fileContents;
     fileContents << file.rdbuf();
@@ -76,7 +77,7 @@ void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices) {
     reverse(indices.begin(), indices.end());
 }
 
-StructType* getIRStructType(const string& name, const vector<Type*>& fields) {
+StructType* getIRStructType(LLVMContext& context, const string& name, const vector<Type*>& fields) {
     const auto struct_ = StructType::getTypeByName(context, name);
     if (!struct_) {
         return StructType::create(context, fields, name);
@@ -97,24 +98,28 @@ Value* getIRStr(LgsRuntime* runtime, const string& value) {
     return globalVariable;
 }
 
-Module* createEmptyModule(const string& objName) {
-    const auto module = new Module(objName, context);
+Module* createEmptyModule(const string& moduleName, LLVMContext& context) {
+    string error;
+    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    const auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
+    const auto module = new Module(moduleName, context);
     module->setTargetTriple(targetTriple);
     module->setDataLayout(targetMachine->createDataLayout());
-    IRModules[objName] = module;
     return module;
 }
 
-void writeIRToFile(LgsRuntime* runtime, const path& name) {
-    if constexpr (WRITE_IR_TO_FILE) {
-        const auto filePath = (paths.buildDir / name).string() + ".ll";
-        std::error_code EC;
-        raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
-       runtime->module->print(textFile, nullptr);
-    }
-    if constexpr (DEBUG) {
-       runtime->module->print(outs(), nullptr);
-        std::cout << "\n-----\n\n";
+void writeIRToFile() {
+    for (const auto [_, module] : IRModules) {
+        if constexpr (WRITE_IR_TO_FILE) {
+            const auto filePath = (paths.buildDir / module->getName().str()).string() + ".ll";
+            std::error_code EC;
+            raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
+            module->print(textFile, nullptr);
+        }
+        if constexpr (DEBUG) {
+            module->print(outs(), nullptr);
+            std::cout << "\n-----\n\n";
+        }
     }
 }
 

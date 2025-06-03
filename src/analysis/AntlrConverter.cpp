@@ -240,7 +240,9 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
     const auto rt = getFuncReturnType(ctx->funcSignature()->type());
     const auto funcSignature = ctx->funcSignature();
     const auto nameToken = funcSignature->VARIABLE();
-    const auto self = new LgsParam(obj, LOGOS_SELF, new LgsInstance(obj));
+    const auto instance = new LgsInstance(obj);
+    instance->isSelf = true;
+    const auto self = new LgsParam(obj, LOGOS_SELF, instance);
     const auto method = new LgsMethodImpl(nameToken->getText(), obj->name, rt);
     currentMethod = method;
     method->funcType.params.emplace_back(self);
@@ -646,9 +648,7 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
 }
 
 LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) {
-    const auto type = getTypeFromText(ctx->TYPE());
-    type->setLocation(ctx->start);
-    const auto instance = new LgsInstance(type);
+    const auto instance = new LgsInstance(ctx->TYPE()->getText());
     instance->setLocation(ctx->start);
     const auto args = ctx->constructorArgList();
     if (!args) return instance;

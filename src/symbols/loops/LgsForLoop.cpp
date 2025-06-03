@@ -18,17 +18,17 @@ void LgsForLoop::createIRStmt(LgsRuntime* runtime) {
 }
 
 void LgsForLoop::initIRLoop(LgsRuntime* runtime) {
-    loopCondBlock = createBasicBlock(LOGOS_LOOP_CONDITION);
-    loopBodyBlock = createBasicBlock(LOGOS_LOOP_BODY);
-    loopExitBlock = createBasicBlock(LOGOS_LOOP_EXIT);
-    iPtr = runtime->builder.CreateAlloca(i32Ty);
+    loopCondBlock = createBasicBlock(LOGOS_LOOP_CONDITION, context);
+    loopBodyBlock = createBasicBlock(LOGOS_LOOP_BODY, context);
+    loopExitBlock = createBasicBlock(LOGOS_LOOP_EXIT, context);
+    iPtr = runtime->builder.CreateAlloca(runtime->builder.getInt32Ty());
     runtime->builder.CreateStore(loopStart(runtime), iPtr);
     setIRIterable(runtime);
     runtime->builder.CreateBr(loopCondBlock);
 }
 
 void LgsForLoop::setLoopIRCondition(LgsRuntime* runtime) {
-    const auto iValue = runtime->builder.CreateLoad(i32Ty, iPtr);
+    const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
     const auto upperBound = loopEnd(runtime);
     const auto condition = runtime->builder.CreateICmpSLT(iValue, upperBound);
     runtime->builder.CreateCondBr(condition, loopBodyBlock, loopExitBlock);
@@ -36,7 +36,7 @@ void LgsForLoop::setLoopIRCondition(LgsRuntime* runtime) {
 
 void LgsForLoop::exitIRLoop(LgsRuntime* runtime) const {
     // Increment loop variable
-    const auto iValue = runtime->builder.CreateLoad(i32Ty, iPtr);
+    const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
     const auto inc = runtime->builder.CreateAdd(iValue, runtime->builder.getInt32(1));
     runtime->builder.CreateStore(inc, iPtr);
     runtime->builder.CreateBr(loopCondBlock);

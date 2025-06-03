@@ -13,7 +13,7 @@ Value* LgsRangeLoop::loopEnd(LgsRuntime* runtime) {
 
 void LgsRangeLoop::setIRLoopVars(LgsRuntime* runtime) {
     const auto loopVar = loopVars[0];
-    const auto iValue = runtime->builder.CreateLoad(i32Ty, iPtr);
+    const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
     loopVar->expr->setIRValue(iValue);
 }
 

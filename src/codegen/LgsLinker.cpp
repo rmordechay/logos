@@ -10,6 +10,8 @@
 #include "llvm/IR/Verifier.h"
 #include <iostream>
 #include <unistd.h>
+#include <llvm/MC/TargetRegistry.h>
+#include <llvm/Target/TargetMachine.h>
 
 bool LgsLinker::link() const {
     setPlatform(paths.objFilePath, paths.execFilePath);
@@ -32,6 +34,9 @@ bool LgsLinker::generateObjFile(Module* module, const string& path) const {
     error_code ec;
     legacy::PassManager pass;
     raw_fd_ostream outputStream(path, ec, sys::fs::OF_None);
+    string error;
+    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    const auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
     const auto addedPassFailed = targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
     if (addedPassFailed) {
         cerr << ec.message() << endl;
