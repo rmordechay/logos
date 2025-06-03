@@ -4,7 +4,7 @@
 
 class LgsContinueStmt final : public LgsStmt {
 public:
-    void createIRStmt(Module* module) override;
+    void createIRStmt(Module* module, LgsRuntime* runtime) override;
     ~LgsContinueStmt() override = default;
 };
 

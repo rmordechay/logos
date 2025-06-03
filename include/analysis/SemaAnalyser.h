@@ -45,7 +45,7 @@ public:
     explicit SemaAnalyser(LgsFile* file) : file(file) {
         errHandler.filePath = file->absPath;
     }
-    static void analyseFiles(const LogosProject* project, vector<LgsError>& errors);
+    static void analyseFiles(const vector<LgsFile*>& files, vector<LgsError>& errors);
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);

@@ -8,11 +8,12 @@
 #include "types/LgsArray.h"
 
 void LgsFunc::generateIRCode(Module* module) {
+    LgsRuntime runtime;
     runtime.stack.enterFunc(this);
-    startBlockFunc(module);
+    startBlockFunc(module, nullptr);
     const auto IRFunc = getIRFunc(module);
     IRValue = IRFunc;
-    stmtBlock->createIRValue(module);
+    stmtBlock->createIRValue(module, runtime);
     if (funcType.rt->isVoid) {
         runtime.freeExprs(module);
         builder.CreateRetVoid();

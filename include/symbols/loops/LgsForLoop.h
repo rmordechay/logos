@@ -16,7 +16,7 @@ public:
     BasicBlock* loopBodyBlock = nullptr;
     BasicBlock* loopExitBlock = nullptr;
 
-    void createIRStmt(Module* module) override;
+    void createIRStmt(Module* module, LgsRuntime* runtime) override;
     void initIRLoop(Module* module);
     void setLoopIRCondition(Module* module);
     void exitIRLoop(Module* module) const;

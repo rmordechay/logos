@@ -12,11 +12,11 @@ void Logos::run() {
     if (!project.loadProject(args)) exit(1);
 
     // Semantic analysis
-    SemaAnalyser::analyseFiles(&project, errors);
+    SemaAnalyser::analyseFiles(project.files, errors);
     if (!errors.empty()) exit(1);
 
     // Code generation
-    CodeGenerator::generate(project.mainFile);
+    CodeGenerator::generate(project.files);
 
     // Linking
     const LgsLinker linker;

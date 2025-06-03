@@ -36,6 +36,7 @@
 #include "extern/LgsC.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
+#include "funcs/LgsMainFunc.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsPatternMatch.h"
@@ -109,7 +110,7 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     for (const auto& func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         if (funcName == LOGOS_MAIN_FUNC) {
-            mainFile->mainFunc = getMainFunc(func);
+            mainFile->funcs[funcName] = getMainFunc(func);
         } else {
             mainFile->funcs[funcName] = getFuncImpl(func);
         }

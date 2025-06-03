@@ -1,12 +1,12 @@
 #include "funcs/LgsMainFunc.h"
-
 #include "types/LgsArray.h"
 
 void LgsMainFunc::generateIRCode(Module* module) {
+    LgsRuntime runtime;
     runtime.stack.enterFunc(this);
-    startBlockFunc(module);
+    startBlockFunc(module, nullptr);
     runtime.initRuntime(module);
-    stmtBlock->createIRValue(module);
+    stmtBlock->createIRValue(module, runtime);
     runtime.freeExprs(module);
     builder.CreateRet(builder.getInt32(EXIT_SUCCESS));
     runtime.stack.exitFunc();

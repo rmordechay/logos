@@ -8,7 +8,7 @@ public:
     bool hasReturn = false;
 
     explicit LgsStmtBlock(const std::vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
-    void createIRValue(Module* module) const;
+    void createIRValue(Module* module, LgsRuntime* runtime) const;
     LgsStmt* lastStmt() const;
     std::string format(std::string& indentStr) override;
     nlohmann::json asJSON() override;

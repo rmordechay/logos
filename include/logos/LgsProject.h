@@ -28,7 +28,6 @@ public:
     vector<LgsError> errors;
     LgsErrHandler errHandler;
     vector<LgsEnvFile*> envFiles;
-    LgsMainFile* mainFile = nullptr;
     const LgsAppFile* appFile = nullptr;
     LgsC lgsC;
 

@@ -4,8 +4,12 @@
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "logos/LgsConfig.h"
+#include "logos/Platform.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+
+#include <llvm/Support/FileSystem.h>
 
 string getFileText(filesystem::path filePath) {
     ifstream file(canonical(filePath));
@@ -91,6 +95,27 @@ Value* getIRStr(Module* module, const string& value) {
     const auto globalVariable = new GlobalVariable(*module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
     globalVariable->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
     return globalVariable;
+}
+
+Module* createEmptyModule(const string& objName) {
+    const auto module = new Module(objName, context);
+    module->setTargetTriple(targetTriple);
+    module->setDataLayout(targetMachine->createDataLayout());
+    IRModules[objName] = module;
+    return module;
+}
+
+void writeIRToFile(const Module* module, const path& name) {
+    if constexpr (WRITE_IR_TO_FILE) {
+        const auto filePath = (paths.buildDir / name).string() + ".ll";
+        std::error_code EC;
+        raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
+        module->print(textFile, nullptr);
+    }
+    if constexpr (DEBUG) {
+        module->print(outs(), nullptr);
+        std::cout << "\n-----\n\n";
+    }
 }
 
 bool shouldLoadIRArg(Value* value) {

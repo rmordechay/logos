@@ -39,10 +39,10 @@
 
 inline mutex mtx;
 
-void SemaAnalyser::analyseFiles(const LogosProject* project, vector<LgsError>& errors) {
+void SemaAnalyser::analyseFiles(const vector<LgsFile*>& files, vector<LgsError>& errors) {
     ThreadPool threadPool;
     threadPool.start();
-    for (const auto& file : project->files) {
+    for (const auto file : files) {
         threadPool.runTask([=, &file, &errors] {
             SemaAnalyser semaAnalyser(file);
             semaAnalyser.analyse();
@@ -73,7 +73,6 @@ void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
     for (const auto [_, func] : mainFile->funcs) {
         visitFunc(func);
     }
-    visitFunc(mainFile->mainFunc);
 }
 
 void SemaAnalyser::visitObject(LgsObject* obj) {

@@ -70,9 +70,6 @@ void LogosProject::parseSrcFile(path entry) {
     lock_guard lock(projectMtx);
     files.emplace_back(file);
     errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
-    if (file->name == LOGOS_MAIN_FILE_NAME) {
-        mainFile = dynamic_cast<LgsMainFile*>(file);
-    }
 }
 
 void LogosProject::parseEnvFile(path fileEntry) {
@@ -228,7 +225,6 @@ void LogosProject::setupActiveEnv() {
 }
 
 void LogosProject::asJSON() const {
-    cout << mainFile->asJSON().dump(2) << '\n';
     return;
 }
 

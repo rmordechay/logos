@@ -3,6 +3,7 @@
 #include <string>
 #include <assert.h>
 #include <json/json.hpp>
+#include <llvm/IR/Module.h>
 
 
 class LgsRuntime;
@@ -18,10 +19,13 @@ public:
     vector<string> externFiles;
 
     explicit LgsFile(const string& name, const string& path) : name(name), absPath(path) {}
+    virtual void generateIR();
     virtual void format();
     virtual json asJSON();
     virtual ~LgsFile() = default;
 };
+
+inline void LgsFile::generateIR() {}
 
 inline void LgsFile::format() {
     assert(false);

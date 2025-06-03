@@ -25,7 +25,7 @@ public:
     LgsBreakStmt* asBreakStmt();
     LgsFuncCall* asFuncCall();
     LgsSelection* asSelection();
-    virtual void createIRStmt(Module* module) = 0;
+    virtual void createIRStmt(Module* module, LgsRuntime* runtime) = 0;
     ~LgsStmt() override = default;
 };
 

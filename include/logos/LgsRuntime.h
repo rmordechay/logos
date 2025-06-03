@@ -22,7 +22,6 @@ public:
     void initRuntime(Module* mainModule);
     void pushStackTrace(Module* module, const string& path) const;
     void printStack(Module* module) const;
-    void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     void addAllocatedExpr(LgsExpr* expr);
     void freeExprs(Module* module);
     ~LgsRuntime() = default;

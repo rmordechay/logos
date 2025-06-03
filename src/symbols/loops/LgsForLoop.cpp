@@ -4,14 +4,14 @@
 #include "stmts/LgsStmtBlock.h"
 #include "stmts/LgsVarDec.h"
 
-void LgsForLoop::createIRStmt(Module* module) {
+void LgsForLoop::createIRStmt(Module* module, LgsRuntime* runtime) {
     runtime.stack.enterScope(this);
     initIRLoop(module);
-    startBlock(module, loopCondBlock);
+    startBlock(loopCondBlock, nullptr);
     setLoopIRCondition(module);
-    startBlock(module, loopBodyBlock);
+    startBlock(loopBodyBlock, nullptr);
     setIRLoopVars(module);
-    stmtBlock->createIRValue(module);
+    stmtBlock->createIRValue(module, runtime);
     exitIRLoop(module);
     runtime.stack.exitScope(IF_STMT);
 }
@@ -40,7 +40,7 @@ void LgsForLoop::exitIRLoop(Module* module) const {
     builder.CreateStore(inc, iPtr);
     builder.CreateBr(loopCondBlock);
     // Loop exit
-    startBlock(module, loopExitBlock);
+    startBlock(loopExitBlock, nullptr);
 }
 
 LgsForLoop::~LgsForLoop() {
