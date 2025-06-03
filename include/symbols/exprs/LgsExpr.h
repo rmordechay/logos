@@ -1,14 +1,19 @@
 #ifndef LOGOSEXPR_H
 #define LOGOSEXPR_H
 #include "LgsValue.h"
-#include <types/LgsType.h>
 
-
+class LgsRuntime;
+class LgsEnumField;
+class LgsFunc;
+class LgsHashMap;
+class LgsFuncCall;
+class LgsType;
 class LgsVariable;
 class LgsSelection;
 class LgsInstance;
-class LgsArrayIndex;
-class LgsArray;
+class LgsIterIndex;
+class LgsArrayExpr;
+class LgsSArray;
 class LgsBoolConst;
 class LgsCharConst;
 class LgsFloatConst;
@@ -20,26 +25,20 @@ class LgsExpr : virtual public LgsValue {
 public:
     // TODO free type
     LgsType* type = nullptr;
-    bool isReturnValue = false;
+    bool isNull = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
-    Value* getIRValue(CodeGenMetadata* metadata);
-    virtual LgsExpr* castStatically(LgsType* other);
-    virtual uint32_t hashValue(CodeGenMetadata* metadata);
-    virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
-    virtual Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) = 0;
-    virtual Value* subIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* mulIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* divIR(CodeGenMetadata* metadata, LgsExpr* other);
-    virtual Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other);
+    Value* getIRValue(LgsRuntime* runtime);
+    void setType(LgsType* type);
 
-    bool isNull();
-    LgsArray* asArray();
-    LgsArrayIndex* asArrayIndex();
+    LgsFunc* asFunc();
+    LgsVariable* asVariable();
     LgsFuncCall* asFuncCall();
+    LgsIterIndex* asIterIndex();
     LgsInstance* asInstance();
     LgsSelection* asSelection();
-    LgsVariable* asVariable();
+    LgsArrayExpr* asArrayExpr();
+    LgsHashMap* asHashMap();
     LgsBoolConst* asBoolConst();
     LgsCharConst* asCharConst();
     LgsFloatConst* asFloatConst();
@@ -47,7 +46,32 @@ public:
     LgsStrConst* asStrConst();
     LgsEnumField* asEnumField();
     LgsTypeConst* asTypeConst();
-    ~LgsExpr() override = default;
+
+    virtual void free(LgsRuntime* runtime);
+    virtual LgsExpr* clone();
+    virtual std::string prettyName();
+    virtual LgsExpr* convertExpr(LgsType* type);
+    virtual Value* getLength(LgsRuntime* runtime);
+    virtual uint32_t hashValue(LgsRuntime* runtime);
+    virtual Value* createIRValue(LgsRuntime* runtime) = 0;
+    virtual Value* addIR(LgsRuntime* runtime, LgsExpr* other) = 0;
+    virtual Value* subIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* mulIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* divIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* eqIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* neIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* ltIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* gtIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* geIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* leIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* andIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* orIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* bitAndIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* bitOrIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* bitXorIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* rshiftIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* lshiftIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual ~LgsExpr() override = default;
 };
 
 #endif //LOGOSEXPR_H

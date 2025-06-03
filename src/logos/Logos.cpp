@@ -1,43 +1,29 @@
 #include "logos/Logos.h"
-#include "LgsLinker.h"
+#include "codegen/LgsLinker.h"
+#include "logos/Platform.h"
+#include "analysis/SemaAnalyser.h"
 #include "utils/ThreadPool.h"
-
-#include <AntlrConverter.h>
-#include <CodeGenerator.h>
-#include <LogosLexer.h>
+#include <analysis/AntlrConverter.h>
+#include "codegen/CodeGenerator.h"
 #include <unistd.h>
 
 void Logos::run() {
-    // Project loading
-    if (!project.loadProject()) return;
+    // Load project and parse files
+    if (!project.loadProject(args)) exit(1);
 
     // Semantic analysis
-    if (!analyse(project.files)) return;
+    SemaAnalyser::analyseFiles(project.files, errors);
+    if (!errors.empty()) exit(1);
 
     // Code generation
-    CodeGenerator::generate(project.mainFile);
+    CodeGenerator::generate(project.files);
 
     // Linking
-    const LgsLinker linker(&paths);
-    if (!linker.link(modules)) return;
+    const LgsLinker linker;
+    if (!linker.link()) exit(1);
 
     // Running
-    execl(paths.execFilePath.c_str(), nullptr);
-}
-
-bool Logos::analyse(const vector<LgsFile*>& files) {
-    ThreadPool threadPool;
-    threadPool.start();
-    for (const auto& file : files) {
-        threadPool.runTask([=, &file] {
-            SemaAnalyser semaAnalyser(file);
-            semaAnalyser.analyse();
-            lock_guard lock(mtx);
-            errors.insert(errors.end(), semaAnalyser.errors.begin(), semaAnalyser.errors.end());
-        });
-    }
-    threadPool.wait();
-    return errors.empty();
+    execv(paths.execFilePath.c_str(), args.data());
 }
 
 void Logos::initPaths(const path& rootDirPath) const {
@@ -47,16 +33,7 @@ void Logos::initPaths(const path& rootDirPath) const {
     paths.srcDir = paths.rootDir / LOGOS_SRC_DIR;
     paths.envsDir = paths.rootDir / LOGOS_ENVS_DIR;
     paths.buildDir = paths.rootDir / LOGOS_BUILD_DIR;
-    paths.objFilePath = paths.buildDir / OBJECT_FILE;
-    paths.execFilePath = paths.buildDir / EXECUTABLE_FILE;
+    paths.objFilePath = paths.buildDir / LOGOS_OBJECT_FILE;
+    paths.execFilePath = paths.buildDir / LOGOS_EXECUTABLE_FILE;
     paths.appFilePath = paths.rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
-}
-
-LgsMainFile* Logos::getMainFile(const vector<LgsFile*>& files) const {
-    for (const auto& file : files) {
-        if (file->name == LOGOS_MAIN_FILE_NAME) {
-            return dynamic_cast<LgsMainFile*>(file);
-        }
-    }
-    return nullptr;
 }

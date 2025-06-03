@@ -1,23 +1,21 @@
 #ifndef LOGOSFOREACHLOOP_H
 #define LOGOSFOREACHLOOP_H
-#include "LgsLoop.h"
-
-#include <exprs/unary/LgsIterable.h>
+#include "LgsForLoop.h"
 #include <exprs/unary/LgsUnaryExpr.h>
 
-class LgsArrayType;
+class LgsDArrayType;
 
-class LgsForeachLoop final : public LgsLoop {
+class LgsForeachLoop final : public LgsForLoop {
 public:
-    LgsUnaryExpr* iterableExpr = nullptr;
+    LgsUnaryExpr* iterExpr = nullptr;
+    Value* iterPtr = nullptr;
 
-    LgsForeachLoop(const vector<LgsVarDec*>& loopVars, LgsUnaryExpr* iterable, LgsStmtBlock* stmtBlock) : LgsLoop(loopVars, stmtBlock), iterableExpr(iterable) {}
-    int loopStart() override;
-    int loopEnd() override;
-    void setIRLoopVariable(CodeGenMetadata* metadata) override;
-    LgsIterable* getExprAsIterable() const;
+    explicit LgsForeachLoop(LgsUnaryExpr* iterable) : iterExpr(iterable) {}
+    void setIRLoopVars(LgsRuntime* runtime) override;
+    void setIRIterable(LgsRuntime* runtime) override;
+    Value* loopStart(LgsRuntime* runtime) override;
+    Value* loopEnd(LgsRuntime* runtime) override;
     ~LgsForeachLoop() override;
 };
-
 
 #endif //LOGOSFOREACHLOOP_H

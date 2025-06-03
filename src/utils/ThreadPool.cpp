@@ -1,4 +1,3 @@
-
 #include "utils/ThreadPool.h"
 
 void ThreadPool::start()

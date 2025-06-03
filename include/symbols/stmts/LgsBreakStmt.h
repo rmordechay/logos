@@ -2,11 +2,11 @@
 #define LGSBREAK_H
 #include "LgsStmt.h"
 
-class LgsLoop;
+class LgsForLoop;
 
 class LgsBreakStmt final : public LgsStmt {
 public:
-    Value* createIRValue(CodeGenMetadata* metadata) override;
+    void createIRStmt(LgsRuntime* runtime) override;
     ~LgsBreakStmt() override = default;
 };
 

@@ -4,14 +4,14 @@
 
 class LgsStmtBlock final : public LgsValue {
 public:
-    vector<LgsStmt*> stmts;
+    std::vector<LgsStmt*> stmts;
     bool hasReturn = false;
 
-    explicit LgsStmtBlock(const vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
-    void createIRValue(CodeGenMetadata* metadata) const;
+    explicit LgsStmtBlock(const std::vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
+    void createIRValue(LgsRuntime* runtime) const;
     LgsStmt* lastStmt() const;
-    string format(string& indentStr) override;
-    json asJSON() override;
+    std::string format(std::string& indentStr) override;
+    nlohmann::json asJSON() override;
     ~LgsStmtBlock() override;
 };
 

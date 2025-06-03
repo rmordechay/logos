@@ -1,24 +1,24 @@
 #ifndef LOGOSSTRINGCONST_H
 #define LOGOSSTRINGCONST_H
 #include "LgsConstExpr.h"
+#include "LgsIntConst.h"
 #include "types/LgsStr.h"
-#include "exprs/unary/LgsIterable.h"
 #include <string>
 
-class LgsStrConst final : public LgsIterable, public LgsConstExpr {
+class LgsStrConst final : public LgsConstExpr {
 public:
+    LgsStr strType;
     string value;
-    FunctionType* const cmpStrIRFuncType = FunctionType::get(i1Ty, {ptrTy, ptrTy}, false);
+    vector<LgsExpr*> templateParts;
 
-    explicit LgsStrConst(const string& value) : LgsConstExpr(new LgsStr()), value(value) {
-        setFields(type);
+    explicit LgsStrConst(const string& value) : LgsConstExpr(&strType), value(value) {
+        strType.isStatic = true;
+        strType.sizeExpr = new LgsIntConst(value.size());
     }
-    size_t length() override;
-    LgsExpr* add(LgsExpr* other) override;
-    Value* createIRValue(CodeGenMetadata* metadata) override;
-    Value* sizeIR(CodeGenMetadata* metadata) override;
-    Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
-    Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;
+    Value* getLength(LgsRuntime* runtime) override;
+    Value* createIRValue(LgsRuntime* runtime) override;
+    Value* eqIR(LgsRuntime* runtime, LgsExpr* other) override;
+    Value* addIR(LgsRuntime* runtime, LgsExpr* other) override;
     ~LgsStrConst() override = default;
 };
 

@@ -3,19 +3,19 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsBreakStmt.h"
-#include "stmts/LgsContinue.h"
+#include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsReturn.h"
 #include "stmts/LgsVarDec.h"
-#include <loops/LgsLoop.h>
+#include <loops/LgsForLoop.h>
 
 LgsAssignment* LgsStmt::asAssignment() {
     return dynamic_cast<LgsAssignment*>(this);
 }
 
-LgsLoop* LgsStmt::asLoop() {
-    return dynamic_cast<LgsLoop*>(this);
+LgsForLoop* LgsStmt::asLoop() {
+    return dynamic_cast<LgsForLoop*>(this);
 }
 
 LgsBreakStmt* LgsStmt::asBreakStmt() {
@@ -30,8 +30,8 @@ LgsSelection* LgsStmt::asSelection() {
     return dynamic_cast<LgsSelection*>(this);
 }
 
-LgsContinue* LgsStmt::asContinue() {
-    return dynamic_cast<LgsContinue*>(this);
+LgsContinueStmt* LgsStmt::asContinue() {
+    return dynamic_cast<LgsContinueStmt*>(this);
 }
 
 LgsIfStmt* LgsStmt::asIfStmt() {

@@ -12,36 +12,39 @@
 class  LogosParser : public antlr4::Parser {
 public:
   enum {
-    T__0 = 1, T__1 = 2, DOUBLE_EQUAL = 3, NOT_EQUAL = 4, GE = 5, LE = 6, 
-    LPAREN = 7, RPAREN = 8, LBRACE = 9, RBRACE = 10, LBRACK = 11, RBRACK = 12, 
-    CAST = 13, LANGLE = 14, RANGLE = 15, COMMA = 16, DOUBLE_DOT = 17, DOT = 18, 
-    COLON = 19, EQUAL = 20, MINUS = 21, PLUS = 22, STAR = 23, SLASH = 24, 
-    HASH = 25, QUEST_MARK = 26, EXCLA_MARK = 27, PERCENT = 28, DOLLAR = 29, 
-    AMPERSAND = 30, OBJECT = 31, SINGLETON = 32, SELF_INSTANCE = 33, SELF_CLASS = 34, 
-    INTERFACE = 35, ENUM = 36, VEC = 37, VEC2 = 38, VEC3 = 39, VEC4 = 40, 
-    IMPLEMENTS = 41, IMPORT = 42, IF = 43, ELSE = 44, FOR = 45, BREAK = 46, 
-    CONTINUE = 47, RETURN = 48, VISIBILITY = 49, CONST = 50, AND = 51, OR = 52, 
-    NOT = 53, IN = 54, INTEGER = 55, FLOAT = 56, BOOL = 57, NULL_ = 58, 
-    CONST_NAME = 59, TYPE = 60, VARIABLE = 61, STRING = 62, LINE_COMMENT = 63, 
-    BLOCK_COMMENT = 64, WS = 65
+    T__0 = 1, T__1 = 2, T__2 = 3, DOUBLE_EQUAL = 4, NOT_EQUAL = 5, GE = 6, 
+    LE = 7, LPAREN = 8, RPAREN = 9, LBRACE = 10, RBRACE = 11, LBRACK = 12, 
+    RBRACK = 13, CAST = 14, LANGLE = 15, RANGLE = 16, COMMA = 17, TRIPLE_DOT = 18, 
+    DOUBLE_DOT = 19, DOT = 20, COLON = 21, EQUAL = 22, MINUS = 23, PLUS = 24, 
+    STAR = 25, SLASH = 26, HASH = 27, QUEST_MARK = 28, EXCLA_MARK = 29, 
+    PERCENT = 30, DOLLAR = 31, AMPERSAND = 32, PIPE = 33, CARET = 34, DOUBLE_RANGLE = 35, 
+    DOUBLE_LANGLE = 36, OBJECT = 37, SINGLETON = 38, SELF_INSTANCE = 39, 
+    SELF_CLASS = 40, INTERFACE = 41, ENUM = 42, VEC2 = 43, VEC3 = 44, VEC4 = 45, 
+    IMPLEMENTS = 46, EXTERN = 47, IF = 48, ELSE = 49, FOR = 50, BREAK = 51, 
+    CONTINUE = 52, RETURN = 53, VISIBILITY = 54, CONST = 55, AND = 56, OR = 57, 
+    NOT = 58, IN = 59, INTEGER = 60, FLOAT = 61, BOOL = 62, NULL_ = 63, 
+    CONST_NAME = 64, TYPE = 65, VARIABLE = 66, STRING = 67, LINE_COMMENT = 68, 
+    BLOCK_COMMENT = 69, WS = 70
   };
 
   enum {
-    RuleLogosFile = 0, RuleLogosEnvFile = 1, RuleLogosAppFile = 2, RuleMainFile = 3, 
-    RuleObjectFile = 4, RuleInterfaceFile = 5, RuleObject = 6, RuleObjectBody = 7, 
-    RuleField = 8, RuleObjectDeclaration = 9, RuleInterfaceDeclaration = 10, 
-    RuleObjectImplements = 11, RuleFuncSignature = 12, RuleFuncImplementation = 13, 
-    RuleFuncBody = 14, RuleParamList = 15, RuleParam = 16, RuleStatement = 17, 
-    RuleStatementsBlock = 18, RuleAssignment = 19, RuleExplicitVarDec = 20, 
-    RuleImplicitVarDec = 21, RuleIfStatement = 22, RuleElseIfStatement = 23, 
-    RuleElseStatement = 24, RulePatternMatching = 25, RulePattern = 26, 
-    RuleLoopStatement = 27, RuleBreakStmt = 28, RuleReturnStatement = 29, 
-    RuleEnumDeclaration = 30, RuleEnumField = 31, RuleExpr = 32, RuleUnaryExpr = 33, 
-    RuleArray = 34, RuleMap = 35, RuleFuncCall = 36, RuleFuncArgList = 37, 
-    RuleFuncArg = 38, RuleConstructor = 39, RuleConstructorArgList = 40, 
-    RuleConstructorArg = 41, RuleConstant = 42, RuleArrayIndex = 43, RuleSelection = 44, 
-    RuleFirstSelectionElement = 45, RuleInnerSelectionElement = 46, RuleRange = 47, 
-    RuleType = 48, RuleVector = 49, RuleRequireEnvVars = 50
+    RuleLogosFile = 0, RuleExtern = 1, RuleLogosEnvFile = 2, RuleLogosAppFile = 3, 
+    RuleMainFile = 4, RuleObjectFile = 5, RuleInterfaceFile = 6, RuleInterface = 7, 
+    RuleInterfaceBody = 8, RuleObject = 9, RuleObjectBody = 10, RuleField = 11, 
+    RuleObjectDeclaration = 12, RuleInterfaceDeclaration = 13, RuleObjectImplements = 14, 
+    RuleFuncSignature = 15, RuleFuncImpl = 16, RuleAnonnymosfuncSignature = 17, 
+    RuleAnonnymosFunc = 18, RuleMethodImplementation = 19, RuleFuncBody = 20, 
+    RuleParam = 21, RuleStatement = 22, RuleStatementsBlock = 23, RuleAssignment = 24, 
+    RuleExplicitVarDec = 25, RuleImplicitVarDec = 26, RuleIfStatement = 27, 
+    RuleElseIfStatement = 28, RuleElseStatement = 29, RulePatternMatching = 30, 
+    RulePattern = 31, RuleLoopStatement = 32, RuleBreakStmt = 33, RuleReturnStatement = 34, 
+    RuleEnumDeclaration = 35, RuleEnumField = 36, RuleExpr = 37, RuleUnaryExpr = 38, 
+    RuleArray = 39, RuleHashMap = 40, RuleKeyValue = 41, RuleFuncCall = 42, 
+    RuleFuncArgList = 43, RuleFuncArg = 44, RuleConstructor = 45, RuleConstructorArgList = 46, 
+    RuleConstructorArg = 47, RuleConstant = 48, RuleIterIndex = 49, RuleIndex = 50, 
+    RuleSelection = 51, RuleFirstSelectionElement = 52, RuleInnerSelectionElement = 53, 
+    RuleRange = 54, RuleType = 55, RuleMapType = 56, RuleArrayIndexType = 57, 
+    RuleFuncType = 58, RuleVector = 59, RuleRequireEnvVars = 60
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -62,11 +65,14 @@ public:
 
 
   class LogosFileContext;
+  class ExternContext;
   class LogosEnvFileContext;
   class LogosAppFileContext;
   class MainFileContext;
   class ObjectFileContext;
   class InterfaceFileContext;
+  class InterfaceContext;
+  class InterfaceBodyContext;
   class ObjectContext;
   class ObjectBodyContext;
   class FieldContext;
@@ -74,9 +80,11 @@ public:
   class InterfaceDeclarationContext;
   class ObjectImplementsContext;
   class FuncSignatureContext;
-  class FuncImplementationContext;
+  class FuncImplContext;
+  class AnonnymosfuncSignatureContext;
+  class AnonnymosFuncContext;
+  class MethodImplementationContext;
   class FuncBodyContext;
-  class ParamListContext;
   class ParamContext;
   class StatementContext;
   class StatementsBlockContext;
@@ -96,7 +104,8 @@ public:
   class ExprContext;
   class UnaryExprContext;
   class ArrayContext;
-  class MapContext;
+  class HashMapContext;
+  class KeyValueContext;
   class FuncCallContext;
   class FuncArgListContext;
   class FuncArgContext;
@@ -104,12 +113,16 @@ public:
   class ConstructorArgListContext;
   class ConstructorArgContext;
   class ConstantContext;
-  class ArrayIndexContext;
+  class IterIndexContext;
+  class IndexContext;
   class SelectionContext;
   class FirstSelectionElementContext;
   class InnerSelectionElementContext;
   class RangeContext;
   class TypeContext;
+  class MapTypeContext;
+  class ArrayIndexTypeContext;
+  class FuncTypeContext;
   class VectorContext;
   class RequireEnvVarsContext; 
 
@@ -120,11 +133,27 @@ public:
     MainFileContext *mainFile();
     ObjectFileContext *objectFile();
     InterfaceFileContext *interfaceFile();
+    ExternContext *extern_();
 
    
   };
 
   LogosFileContext* logosFile();
+
+  class  ExternContext : public antlr4::ParserRuleContext {
+  public:
+    ExternContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *EXTERN();
+    antlr4::tree::TerminalNode *LBRACE();
+    antlr4::tree::TerminalNode *RBRACE();
+    std::vector<antlr4::tree::TerminalNode *> STRING();
+    antlr4::tree::TerminalNode* STRING(size_t i);
+
+   
+  };
+
+  ExternContext* extern_();
 
   class  LogosEnvFileContext : public antlr4::ParserRuleContext {
   public:
@@ -166,8 +195,10 @@ public:
     ObjectContext* object(size_t i);
     std::vector<EnumDeclarationContext *> enumDeclaration();
     EnumDeclarationContext* enumDeclaration(size_t i);
-    std::vector<FuncImplementationContext *> funcImplementation();
-    FuncImplementationContext* funcImplementation(size_t i);
+    std::vector<InterfaceContext *> interface();
+    InterfaceContext* interface(size_t i);
+    std::vector<FuncImplContext *> funcImpl();
+    FuncImplContext* funcImpl(size_t i);
 
    
   };
@@ -192,18 +223,44 @@ public:
     InterfaceFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     InterfaceDeclarationContext *interfaceDeclaration();
+    InterfaceBodyContext *interfaceBody();
     antlr4::tree::TerminalNode *EOF();
-    std::vector<ExplicitVarDecContext *> explicitVarDec();
-    ExplicitVarDecContext* explicitVarDec(size_t i);
-    std::vector<FuncSignatureContext *> funcSignature();
-    FuncSignatureContext* funcSignature(size_t i);
-    std::vector<FuncImplementationContext *> funcImplementation();
-    FuncImplementationContext* funcImplementation(size_t i);
 
    
   };
 
   InterfaceFileContext* interfaceFile();
+
+  class  InterfaceContext : public antlr4::ParserRuleContext {
+  public:
+    InterfaceContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *INTERFACE();
+    antlr4::tree::TerminalNode *TYPE();
+    antlr4::tree::TerminalNode *LBRACE();
+    InterfaceBodyContext *interfaceBody();
+    antlr4::tree::TerminalNode *RBRACE();
+
+   
+  };
+
+  InterfaceContext* interface();
+
+  class  InterfaceBodyContext : public antlr4::ParserRuleContext {
+  public:
+    InterfaceBodyContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<ExplicitVarDecContext *> explicitVarDec();
+    ExplicitVarDecContext* explicitVarDec(size_t i);
+    std::vector<FuncSignatureContext *> funcSignature();
+    FuncSignatureContext* funcSignature(size_t i);
+    std::vector<FuncImplContext *> funcImpl();
+    FuncImplContext* funcImpl(size_t i);
+
+   
+  };
+
+  InterfaceBodyContext* interfaceBody();
 
   class  ObjectContext : public antlr4::ParserRuleContext {
   public:
@@ -228,8 +285,8 @@ public:
     ObjectImplementsContext *objectImplements();
     std::vector<FieldContext *> field();
     FieldContext* field(size_t i);
-    std::vector<FuncImplementationContext *> funcImplementation();
-    FuncImplementationContext* funcImplementation(size_t i);
+    std::vector<MethodImplementationContext *> methodImplementation();
+    MethodImplementationContext* methodImplementation(size_t i);
 
    
   };
@@ -303,18 +360,21 @@ public:
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
-    ParamListContext *paramList();
+    std::vector<ParamContext *> param();
+    ParamContext* param(size_t i);
     antlr4::tree::TerminalNode *COLON();
     TypeContext *type();
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
 
    
   };
 
   FuncSignatureContext* funcSignature();
 
-  class  FuncImplementationContext : public antlr4::ParserRuleContext {
+  class  FuncImplContext : public antlr4::ParserRuleContext {
   public:
-    FuncImplementationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    FuncImplContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     FuncSignatureContext *funcSignature();
     FuncBodyContext *funcBody();
@@ -322,7 +382,50 @@ public:
    
   };
 
-  FuncImplementationContext* funcImplementation();
+  FuncImplContext* funcImpl();
+
+  class  AnonnymosfuncSignatureContext : public antlr4::ParserRuleContext {
+  public:
+    AnonnymosfuncSignatureContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
+    std::vector<ParamContext *> param();
+    ParamContext* param(size_t i);
+    antlr4::tree::TerminalNode *COLON();
+    TypeContext *type();
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+
+   
+  };
+
+  AnonnymosfuncSignatureContext* anonnymosfuncSignature();
+
+  class  AnonnymosFuncContext : public antlr4::ParserRuleContext {
+  public:
+    AnonnymosFuncContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    AnonnymosfuncSignatureContext *anonnymosfuncSignature();
+    FuncBodyContext *funcBody();
+
+   
+  };
+
+  AnonnymosFuncContext* anonnymosFunc();
+
+  class  MethodImplementationContext : public antlr4::ParserRuleContext {
+  public:
+    MethodImplementationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    FuncSignatureContext *funcSignature();
+    FuncBodyContext *funcBody();
+    antlr4::tree::TerminalNode *VISIBILITY();
+
+   
+  };
+
+  MethodImplementationContext* methodImplementation();
 
   class  FuncBodyContext : public antlr4::ParserRuleContext {
   public:
@@ -335,26 +438,17 @@ public:
 
   FuncBodyContext* funcBody();
 
-  class  ParamListContext : public antlr4::ParserRuleContext {
-  public:
-    ParamListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    std::vector<ParamContext *> param();
-    ParamContext* param(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> COMMA();
-    antlr4::tree::TerminalNode* COMMA(size_t i);
-
-   
-  };
-
-  ParamListContext* paramList();
-
   class  ParamContext : public antlr4::ParserRuleContext {
   public:
     ParamContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    ExplicitVarDecContext *explicitVarDec();
-    FuncSignatureContext *funcSignature();
+    antlr4::tree::TerminalNode *VARIABLE();
+    antlr4::tree::TerminalNode *COLON();
+    TypeContext *type();
+    antlr4::tree::TerminalNode *TRIPLE_DOT();
+    antlr4::tree::TerminalNode *EQUAL();
+    ExprContext *expr();
+    FuncTypeContext *funcType();
 
    
   };
@@ -404,7 +498,7 @@ public:
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
     antlr4::tree::TerminalNode *VARIABLE();
-    ArrayIndexContext *arrayIndex();
+    IterIndexContext *iterIndex();
     SelectionContext *selection();
 
    
@@ -595,23 +689,30 @@ public:
     LogosParser::ExprContext *right = nullptr;
     ExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    UnaryExprContext *unaryExpr();
-    antlr4::tree::TerminalNode *CAST();
-    TypeContext *type();
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
     std::vector<ExprContext *> expr();
     ExprContext* expr(size_t i);
+    antlr4::tree::TerminalNode *CAST();
+    TypeContext *type();
+    UnaryExprContext *unaryExpr();
     antlr4::tree::TerminalNode *STAR();
     antlr4::tree::TerminalNode *SLASH();
     antlr4::tree::TerminalNode *PLUS();
     antlr4::tree::TerminalNode *MINUS();
-    antlr4::tree::TerminalNode *DOUBLE_EQUAL();
-    antlr4::tree::TerminalNode *NOT_EQUAL();
     antlr4::tree::TerminalNode *LANGLE();
     antlr4::tree::TerminalNode *RANGLE();
     antlr4::tree::TerminalNode *GE();
     antlr4::tree::TerminalNode *LE();
+    antlr4::tree::TerminalNode *DOUBLE_EQUAL();
+    antlr4::tree::TerminalNode *NOT_EQUAL();
+    antlr4::tree::TerminalNode *AND();
+    antlr4::tree::TerminalNode *OR();
+    antlr4::tree::TerminalNode *AMPERSAND();
+    antlr4::tree::TerminalNode *CARET();
+    antlr4::tree::TerminalNode *PIPE();
+    antlr4::tree::TerminalNode *DOUBLE_LANGLE();
+    antlr4::tree::TerminalNode *DOUBLE_RANGLE();
 
    
   };
@@ -628,11 +729,13 @@ public:
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *NULL_();
     FuncCallContext *funcCall();
+    AnonnymosFuncContext *anonnymosFunc();
+    VectorContext *vector();
     ConstructorContext *constructor();
     ConstantContext *constant();
     ArrayContext *array();
-    MapContext *map();
-    ArrayIndexContext *arrayIndex();
+    HashMapContext *hashMap();
+    IterIndexContext *iterIndex();
     SelectionContext *selection();
 
    
@@ -656,23 +759,36 @@ public:
 
   ArrayContext* array();
 
-  class  MapContext : public antlr4::ParserRuleContext {
+  class  HashMapContext : public antlr4::ParserRuleContext {
   public:
-    MapContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    HashMapContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *LBRACE();
     antlr4::tree::TerminalNode *RBRACE();
-    std::vector<ExprContext *> expr();
-    ExprContext* expr(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> COLON();
-    antlr4::tree::TerminalNode* COLON(size_t i);
+    std::vector<KeyValueContext *> keyValue();
+    KeyValueContext* keyValue(size_t i);
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
    
   };
 
-  MapContext* map();
+  HashMapContext* hashMap();
+
+  class  KeyValueContext : public antlr4::ParserRuleContext {
+  public:
+    LogosParser::ExprContext *key = nullptr;
+    LogosParser::ExprContext *value = nullptr;
+    KeyValueContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *COLON();
+    std::vector<ExprContext *> expr();
+    ExprContext* expr(size_t i);
+
+   
+  };
+
+  KeyValueContext* keyValue();
 
   class  FuncCallContext : public antlr4::ParserRuleContext {
   public:
@@ -770,23 +886,36 @@ public:
 
   ConstantContext* constant();
 
-  class  ArrayIndexContext : public antlr4::ParserRuleContext {
+  class  IterIndexContext : public antlr4::ParserRuleContext {
   public:
-    ArrayIndexContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    IterIndexContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     FuncCallContext *funcCall();
     antlr4::tree::TerminalNode *VARIABLE();
-    std::vector<antlr4::tree::TerminalNode *> LBRACK();
-    antlr4::tree::TerminalNode* LBRACK(size_t i);
-    std::vector<ExprContext *> expr();
-    ExprContext* expr(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> RBRACK();
-    antlr4::tree::TerminalNode* RBRACK(size_t i);
+    std::vector<IndexContext *> index();
+    IndexContext* index(size_t i);
 
    
   };
 
-  ArrayIndexContext* arrayIndex();
+  IterIndexContext* iterIndex();
+
+  class  IndexContext : public antlr4::ParserRuleContext {
+  public:
+    LogosParser::ExprContext *from = nullptr;
+    LogosParser::ExprContext *to = nullptr;
+    IndexContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LBRACK();
+    antlr4::tree::TerminalNode *RBRACK();
+    std::vector<ExprContext *> expr();
+    ExprContext* expr(size_t i);
+    antlr4::tree::TerminalNode *COLON();
+
+   
+  };
+
+  IndexContext* index();
 
   class  SelectionContext : public antlr4::ParserRuleContext {
   public:
@@ -809,11 +938,12 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *TYPE();
+    antlr4::tree::TerminalNode *STRING();
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *SELF_INSTANCE();
     FuncCallContext *funcCall();
     ConstructorContext *constructor();
-    ArrayIndexContext *arrayIndex();
+    IterIndexContext *iterIndex();
 
    
   };
@@ -826,7 +956,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
     FuncCallContext *funcCall();
-    ArrayIndexContext *arrayIndex();
+    IterIndexContext *iterIndex();
 
    
   };
@@ -850,36 +980,84 @@ public:
 
   class  TypeContext : public antlr4::ParserRuleContext {
   public:
+    LogosParser::TypeContext *baseType = nullptr;
     TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *TYPE();
     antlr4::tree::TerminalNode *QUEST_MARK();
-    std::vector<antlr4::tree::TerminalNode *> LBRACK();
-    antlr4::tree::TerminalNode* LBRACK(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> RBRACK();
-    antlr4::tree::TerminalNode* RBRACK(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> INTEGER();
-    antlr4::tree::TerminalNode* INTEGER(size_t i);
-    antlr4::tree::TerminalNode *LBRACE();
-    std::vector<TypeContext *> type();
-    TypeContext* type(size_t i);
-    antlr4::tree::TerminalNode *COLON();
-    antlr4::tree::TerminalNode *RBRACE();
+    antlr4::tree::TerminalNode *SELF_CLASS();
+    MapTypeContext *mapType();
+    FuncTypeContext *funcType();
+    TypeContext *type();
+    std::vector<ArrayIndexTypeContext *> arrayIndexType();
+    ArrayIndexTypeContext* arrayIndexType(size_t i);
 
    
   };
 
   TypeContext* type();
+  TypeContext* type(int precedence);
+  class  MapTypeContext : public antlr4::ParserRuleContext {
+  public:
+    LogosParser::TypeContext *key = nullptr;
+    LogosParser::TypeContext *value = nullptr;
+    MapTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LBRACE();
+    antlr4::tree::TerminalNode *COLON();
+    antlr4::tree::TerminalNode *RBRACE();
+    std::vector<TypeContext *> type();
+    TypeContext* type(size_t i);
+
+   
+  };
+
+  MapTypeContext* mapType();
+
+  class  ArrayIndexTypeContext : public antlr4::ParserRuleContext {
+  public:
+    ArrayIndexTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LBRACK();
+    antlr4::tree::TerminalNode *RBRACK();
+    ExprContext *expr();
+
+   
+  };
+
+  ArrayIndexTypeContext* arrayIndexType();
+
+  class  FuncTypeContext : public antlr4::ParserRuleContext {
+  public:
+    LogosParser::TypeContext *rt = nullptr;
+    FuncTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
+    antlr4::tree::TerminalNode *COLON();
+    std::vector<TypeContext *> type();
+    TypeContext* type(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+
+   
+  };
+
+  FuncTypeContext* funcType();
 
   class  VectorContext : public antlr4::ParserRuleContext {
   public:
     VectorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *VEC();
+    antlr4::tree::TerminalNode *LPAREN();
+    antlr4::tree::TerminalNode *RPAREN();
     antlr4::tree::TerminalNode *VEC2();
     antlr4::tree::TerminalNode *VEC3();
     antlr4::tree::TerminalNode *VEC4();
+    std::vector<ExprContext *> expr();
+    ExprContext* expr(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
 
    
   };
@@ -908,6 +1086,7 @@ public:
   bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
 
   bool exprSempred(ExprContext *_localctx, size_t predicateIndex);
+  bool typeSempred(TypeContext *_localctx, size_t predicateIndex);
 
   // By default the static state used to implement the parser is lazily initialized during the first
   // call to the constructor. You can call this function if you wish to initialize the static state

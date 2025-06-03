@@ -1,6 +1,8 @@
 #include "exprs/unary/LgsInstance.h"
-#include "CodeGenerator.h"
+#include "codegen/CodeGenerator.h"
+#include "builtin/LgsPrint.h"
 #include "funcs/LgsFunc.h"
+
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
@@ -9,22 +11,41 @@ string LgsInstance::getName() {
     return obj->name;
 }
 
-Value* LgsInstance::createIRValue(CodeGenMetadata* metadata) {
-    const auto parentType = obj->getIRType();
-    const auto currentFunc = metadata->lgsStack.currentFunc->getIRFunc(metadata);
-    if (isSelf && isReturnValue) {
-        IRValue = currentFunc->arg_begin();
-    } else if (isSelf) {
-        IRValue = currentFunc->arg_begin();
-    } else if (isReturnValue) {
+Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
+    const auto IRType = obj->getIRType();
+    const auto currentFunc = runtime->stack.currentFunc->getIRFunc(runtime);
+
+    // TODO cover all cases
+    if (isSelf) {
         IRValue = currentFunc->arg_begin();
     } else {
-        IRValue = metadata->builder.CreateAlloca(parentType, nullptr, getName() + "_ptr");
+        IRValue = builder.CreateAlloca(IRType);
+    }
+    if (!obj->implements.empty()) {
+        setVirtualFuncs(runtime);
     }
     for (const auto& arg : args) {
         const auto field = obj->getField(arg->name);
-        field->setFieldIRValue(metadata, arg->expr, IRValue);
+        field->setFieldIRValue(runtime, arg->expr, IRValue);
     }
     return IRValue;
 }
 
+void LgsInstance::setVirtualFuncs(LgsRuntime* runtime) const {
+    const auto map = obj->vtable.getIRValue(runtime);
+
+    const auto vtableGEP = builder.CreateStructGEP(obj->getIRType(), IRValue, 0);
+    builder.CreateStore(map, vtableGEP);
+    auto mapPtr = builder.CreateLoad(ptrTy, vtableGEP);
+
+    for (const auto& [name, method] : obj->methods) {
+        const auto interface = method->implements;
+        if (!interface) continue;
+        const auto keyIRStr = getIRStr(runtime, interface->funcType.getIRName());
+        const auto IRFunc = method->getIRFunc(runtime);
+        auto valuePtr = builder.CreateAlloca(ptrTy);
+        builder.CreateStore(IRFunc, valuePtr);
+        obj->vtable.mapType.add.callIR(runtime, {mapPtr, keyIRStr, valuePtr});
+
+    }
+}

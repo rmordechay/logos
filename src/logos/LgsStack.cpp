@@ -1,54 +1,40 @@
-#include "LgsStack.h"
-#include "LgsGlobals.h"
+#include <logos/LgsStack.h>
+#include "codegen/CodegenMetadata.h"
 #include "funcs/LgsFunc.h"
+#include "stmts/LgsStmt.h"
 
-void LgsStack::enterScope(LgsFunc* func) {
-    if (func) {
-        currentFunc = func;
-    }
-    if (size() > 0) {
-        push(LgsStackFrame{.symbols = top().symbols});
-    } else {
-        push(LgsStackFrame());
+void LgsStack::enterFunc(LgsFunc* func) {
+    push(LgsStackFrame{});
+    currentFunc = func;
+}
+
+void LgsStack::enterScope(LgsStmt* stmt) {
+    push(LgsStackFrame{.symbols = top().symbols});
+    if (const auto loop = stmt->asLoop()) {
+        currentLoop = loop;
+    } else if (const auto ifStmt = stmt->asIfStmt()) {
+        currentIfStmt = ifStmt;
     }
 }
 
-void LgsStack::exitScope() {
+void LgsStack::exitFunc() {
+    pop();
+    returnFunc = nullptr;
+    currentFunc = nullptr;
+    currentLoop = nullptr;
+    currentIfStmt = nullptr;
+}
+
+void LgsStack::exitScope(const ScopeType type) {
+    if (type == IF_STMT) {
+        currentIfStmt = nullptr;
+    } else if (type == LOOP) {
+        currentLoop = nullptr;
+    }
     pop();
 }
 
-LgsSymbol* LgsStack::getSymbol(const string& name) {
-    // Globals symbols
-    if (globals.symbols.find(name) != globals.symbols.end()) {
-        return &globals.symbols[name];
-    }
-    if (size() == 0) return nullptr;
-    // Locals
-    auto& symbols = top().symbols;
-    if (symbols.find(name) != symbols.end()) {
-        return &symbols[name];
-    }
-    return nullptr;
-}
-
-void LgsStack::addLocalSymbol(const string& name, const LgsSymbol& symbol) {
-    assert(size() > 0 && "stack has no frames");
+void LgsStack::addSymbol(const string& name, const LgsSymbol& symbol) {
+    assert(size() > 0);
     top().symbols[name] = symbol;
 }
-
-string LgsStack::getStackString() const {
-    return "";
-}
-
-void LgsStack::freeSymbols(CodeGenMetadata* metadata) {
-    for (const auto& [_, symbol] : top().symbols) {
-        symbol.free(metadata);
-    }
-}
-
-void LgsStack::reset() {
-    while (size() > 0) {
-        pop();
-    }
-}
-

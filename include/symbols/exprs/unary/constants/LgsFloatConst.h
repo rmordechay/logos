@@ -1,14 +1,14 @@
 #ifndef LGSFLOATCONST_H
 #define LGSFLOATCONST_H
 #include "LgsConstExpr.h"
-#include "types/LgsFloat.h"
+#include "types/primitives/LgsFloat.h"
 
 class LgsFloatConst final : public LgsConstExpr {
 public:
     double value;
 
-    explicit LgsFloatConst(const float value) : LgsConstExpr(&LOGOS_FLOAT), value(value) {}
-    Value* createIRValue(CodeGenMetadata* metadata) override;
+    explicit LgsFloatConst(const float value) : LgsConstExpr(&LGS_FLOAT), value(value) {}
+    Value* createIRValue(LgsRuntime* runtime) override;
     ~LgsFloatConst() override = default;
 };
 

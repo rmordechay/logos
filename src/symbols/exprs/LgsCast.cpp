@@ -1,15 +1,18 @@
 #include "exprs/LgsCast.h"
+#include "types/LgsType.h"
 
-Value* LgsCast::createIRValue(CodeGenMetadata* metadata) {
-    return toValue->getIRValue(metadata);
+class LgsRuntime;
+
+Value* LgsCast::createIRValue(LgsRuntime* runtime) {
+    return toValue->getIRValue(runtime);
 }
 
-Value* LgsCast::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    return toValue->addIR(metadata, other);
+Value* LgsCast::addIR(LgsRuntime* runtime, LgsExpr* other) {
+    return toValue->addIR(runtime, other);
 }
 
 bool LgsCast::cast() {
-    if (const auto v = fromValue->castStatically(toType)) {
+    if (const auto v = fromValue->convertExpr(toType)) {
         toValue = v;
         return true;
     }

@@ -1,117 +1,150 @@
 #include "funcs/LgsFunc.h"
-#include "LgsData.h"
-#include "exprs/LgsExpr.h"
-#include "funcs/LgsParam.h"
-#include "types/LgsObject.h"
-#include "types/LgsVoid.h"
+#include "data/LgsDefinitions.h"
 
-void LgsFunc::generateIRCode(CodeGenMetadata* metadata) {
-    metadata->lgsStack.enterScope(this);
-    getIRFunc(metadata);
-    startBlock(metadata, entryBlock);
-    stmtBlock->createIRValue(metadata);
-    if (signature.type->getName() == LgsVoid::name) {
-        metadata->builder.CreateRetVoid();
+#include "stmts/LgsStmtBlock.h"
+#include "types/LgsInterface.h"
+#include "types/LgsObject.h"
+#include "exprs/LgsExpr.h"
+#include "types/LgsArray.h"
+
+void LgsFunc::generateIRCode(LgsRuntime* runtime) {
+    runtime->stack.enterFunc(this);
+    startBlockFunc(runtime, nullptr);
+    const auto IRFunc = getIRFunc(runtime);
+    IRValue = IRFunc;
+    stmtBlock->createIRValue(runtime);
+    if (funcType.rt->isVoid) {
+        runtime->freeExprs(runtime);
+        builder.CreateRetVoid();
     }
-    metadata->lgsStack.exitScope();
+    runtime->stack.exitFunc();
 }
 
-Function* LgsFunc::getIRFunc(const CodeGenMetadata* metadata) {
-    if (!IRFuncType) {
-        auto params = getIRParamTypes(metadata);
-        if (const auto obj = signature.type->asObject()) {
-            params.insert(params.begin(), obj->getIRType()->getPointerTo());
-            IRFuncType = FunctionType::get(voidTy, params, false);
-        } else {
-            IRFuncType = FunctionType::get(signature.type->getIRType(), params, false);
+Value* LgsFunc::createIRValue(LgsRuntime* runtime) {
+    return IRValue;
+}
+
+Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
+    vector<Value*> IRArgs;
+    const int iterStart = funcType.isStatic;
+    if (funcType.hasDefaultParams) assert(false);
+    if (funcType.isVariadic) {
+        auto isInit = false;
+        for (int i = iterStart; i < args.size(); ++i) {
+            if (!isInit && funcType.params[i]->isVariadic) {
+                IRArgs.emplace_back(builder.getInt32(3));
+                isInit = true;
+            }
+            addIRArg(runtime, IRArgs, args[i]);
+        }
+    } else {
+        for (int i = iterStart; i < args.size(); ++i) {
+            addIRArg(runtime, IRArgs, args[i]);
         }
     }
-    auto func = metadata->module->getOrInsertFunction(signature.IRName, IRFuncType);
+    return callIR(runtime, IRArgs);
+}
+
+void LgsFunc::addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const {
+    const auto argIRValue = arg->getIRValue(runtime);
+    if (shouldLoadIRArg(argIRValue)) {
+        const auto artIRType = arg->type->getIRType();
+        const auto value = builder.CreateLoad(artIRType, argIRValue);
+        IRArgs.emplace_back(value);
+    } else {
+        IRArgs.emplace_back(argIRValue);
+    }
+}
+
+Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
+    if (IRValue) {
+        const auto IRFuncType = getIRFuncType(runtime);
+        return builder.CreateCall(IRFuncType, IRValue, args);
+    }
+    const auto IRFunc = getIRFunc(runtime);
+    return builder.CreateCall(IRFunc, args);
+}
+
+string LgsFunc::prettyName() {
+    return funcType.prettyName();
+}
+
+Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
+    const auto funcIRType = getIRFuncType(runtime);
+    auto func =runtime->module->getOrInsertFunction(funcType.getIRName(), funcIRType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
     auto args = IRFunc->arg_begin();
-    AttrBuilder builder(context);
-    if (const auto obj = signature.type->asObject()) {
-        builder.addStructRetAttr(obj->getIRType());
-        args->addAttrs(builder);
-        args->setName("rt");
-        args++;
-    }
-    for (auto& param : signature.params) {
-        param.setIRValue(args);
-        args->setName(param.name);
+    for (int i = 0; i < funcType.params.size(); ++i) {
+        const auto param = funcType.params[i];
+        if (param->isVariadic) {
+            args++->setName("argc");
+        } else {
+            param->setIRValue(args);
+        }
+        if (param->expr) param->expr->setIRValue(args);
+        args->setName(param->name);
         args++;
     }
     return IRFunc;
 }
 
-Value* LgsFunc::call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args) {
-    const auto IRFunc = getIRFunc(metadata);
-    vector<Value*> argValues;
-    Value* objPtr = nullptr;
-    if (const auto obj = signature.type->asObject()) {
-        objPtr = metadata->builder.CreateAlloca(obj->getIRType(), nullptr, obj->name + "_ptr");;
-        argValues.push_back(objPtr);
-    }
-    // Without default params
-    if (signature.params.size() == args.size()) {
-        for (int i = signature.isStatic; i < args.size(); ++i) {
-            const auto arg = args[i];
-            const auto argValue = arg->getIRValue(metadata);
-            argValues.emplace_back(argValue);
+FunctionType* LgsFunc::getIRFuncType(const LgsRuntime* runtime) {
+    if (IRFuncType) return IRFuncType;
+    vector<Type*> IRParamsTypes;
+    for (int i = 0; i < funcType.params.size(); ++i) {
+        const auto param = funcType.params[i];
+        const auto paramType = param->type;
+        auto paramIRType = paramType->getIRType();
+        if (!paramType->isPrimitive) {
+            paramIRType = ptrTy;
         }
-    } else {
-        // With default params
-        for (int i = signature.isStatic; i < signature.params.size(); ++i) {
-            LgsExpr* arg;
-            if (i < args.size()) {
-                arg = args[i];
-            } else {
-                arg = signature.params[i].expr;
-                assert(arg);
-            }
-            const auto argValue = arg->getIRValue(metadata);
-            argValues.emplace_back(argValue);
+        if (param->isVariadic) {
+            IRParamsTypes.emplace_back(i32Ty);
         }
+        IRParamsTypes.emplace_back(paramIRType);
     }
-    const auto funcCall = metadata->builder.CreateCall(IRFunc, argValues);
-    if (objPtr) {
-        return objPtr;
-    }
-    return funcCall;
+
+    const auto rt = funcType.rt->getIRType();
+    IRFuncType = FunctionType::get(rt, IRParamsTypes, funcType.isVariadic);
+    return IRFuncType;
 }
 
-
-string LgsFunc::format(string& indentStr) {
+string LgsFunc::format(string& tabs) {
     stringstream str;
-    str << signature.name << "(";
-    for (int i = 0; i < signature.params.size(); ++i) {
-        auto param = signature.params[i];
-        str << param.format(indentStr);
-        if (i != signature.params.size() - 1) {
+    str << funcType.name << "(";
+    for (int i = 0; i < funcType.params.size(); ++i) {
+        const auto param = funcType.params[i];
+        str << param->format(tabs);
+        if (i != funcType.params.size() - 1) {
             str << ", ";
         }
     }
     str << ")";
-    if (signature.name != LOGOS_MAIN_FUNC) {
-        str << signature.type->getName();
+    if (funcType.name != LOGOS_MAIN_FUNC) {
+        str << funcType.rt->getIRName();
     }
-    str << stmtBlock->format(indentStr);
+    str << stmtBlock->format(tabs);
     return str.str();
 }
 
 json LgsFunc::asJSON() {
     json tree;
-    tree["name"] = signature.name;
-    tree["type"] = signature.type->getName();
+    tree["name"] = funcType.name;
+    tree["type"] = funcType.rt->getIRName();
     tree["params"] = {};
-    for (auto& param : signature.params) {
-        tree["params"].emplace_back(param.asJSON());
+    for (const auto& param : funcType.params) {
+        tree["params"].emplace_back(param->asJSON());
     }
     tree["stmts"] = stmtBlock->asJSON();
     return tree;
 }
 
 LgsFunc::~LgsFunc() {
+    if (!funcType.isBuiltin) {
+        for (int i = funcType.isMethod; i < funcType.params.size(); ++i) {
+            delete funcType.params[i];
+        }
+    }
     if (stmtBlock) {
         delete stmtBlock;
     }

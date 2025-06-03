@@ -1,31 +1,44 @@
 #include "exprs/unary/LgsSelection.h"
-#include "exprs/unary/LgsArrayIndex.h"
+#include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsVariable.h"
+#include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
+#include "types/LgsEnum.h"
+#include "types/LgsInterface.h"
 
 string LgsSelection::getName() {
     return "";
 }
 
-Value* LgsSelection::createIRValue(CodeGenMetadata* metadata) {
-    return resolveSelection(metadata)->IRValue;
+void LgsSelection::createIRStmt(LgsRuntime* runtime) {
+    resolveSelection(runtime);
 }
 
-LgsExpr* LgsSelection::resolveSelection(CodeGenMetadata* metadata) const {
+Value* LgsSelection::createIRValue(LgsRuntime* runtime) {
+    return resolveSelection(runtime)->IRValue;
+}
+
+LgsExpr* LgsSelection::resolveSelection(LgsRuntime* runtime) const {
     for (int i = 0; i < exprs.size() - 1; ++i) {
-        const auto currentExpr = exprs[i];
-        const auto nextExpr = exprs[i + 1];
-        const auto field = currentExpr->type->getField(nextExpr->getName());
+        const auto parentExpr = exprs[i];
+        const auto childExpr = exprs[i + 1];
+        const auto field = parentExpr->type->getField(childExpr->getName());
         if (field) {
-            const auto parentInstance = currentExpr->getIRValue(metadata);
-            const auto value = field->getGEP(metadata, parentInstance);
-            const auto valueLoad = metadata->builder.CreateLoad(field->type->getIRType(), value);
-            nextExpr->setIRValue(valueLoad);
-            continue;
-        }
-        if (const auto methodCall = nextExpr->asFuncCall()) {
-            nextExpr->setIRValue(methodCall->getIRValue(metadata));
+            if (const auto iterIndex = parentExpr->asIterIndex()) {
+                const auto gep = iterIndex->getGEP(runtime);
+                auto valueLoad = builder.CreateLoad(ptrTy, gep);
+                const auto value = field->getGEP(runtime, valueLoad);
+                valueLoad = builder.CreateLoad(field->type->getIRType(), value);
+                childExpr->setIRValue(valueLoad);
+            } else {
+                const auto parentIRValue = parentExpr->getIRValue(runtime);
+                const auto value = field->getGEP(runtime, parentIRValue);
+                const auto valueLoad = builder.CreateLoad(field->type->getIRType(), value);
+                childExpr->setIRValue(valueLoad);
+            }
+        } else if (const auto methodCall = childExpr->asFuncCall()) {
+            methodCall->IRValue = methodCall->createIRValue(runtime);
         }
     }
     return lastExpr();
@@ -46,15 +59,15 @@ LgsExpr* LgsSelection::lastExpr() const {
     return exprs[exprs.size() - 1];
 }
 
-uint32_t LgsSelection::hashValue(CodeGenMetadata* metadata) {
+uint32_t LgsSelection::hashValue(LgsRuntime* runtime) {
     const auto lgsExpr = lastExpr();
-    return lgsExpr->hashValue(metadata);
+    return lgsExpr->hashValue(runtime);
 }
 
-Value* LgsSelection::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto selection = resolveSelection(metadata);
+Value* LgsSelection::eqIR(LgsRuntime* runtime, LgsExpr* other) {
+    const auto selection = resolveSelection(runtime);
     if (const auto var = selection->asVariable()) {
-        return var->eqIR(metadata, other);
+        return var->eqIR(runtime, other);
     }
     return nullptr;
 }

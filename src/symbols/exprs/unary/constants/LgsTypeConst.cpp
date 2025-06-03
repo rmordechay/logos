@@ -1,10 +1,10 @@
 #include "exprs/unary/constants/LgsTypeConst.h"
-#include "AntlrConverter.h"
+#include "analysis/AntlrConverter.h"
 
 string LgsTypeConst::getName() {
-    return type->getName();
+    return type->prettyName();
 }
 
-Value* LgsTypeConst::createIRValue(CodeGenMetadata* metadata) {
-    return nullptr;
+Value* LgsTypeConst::createIRValue(LgsRuntime* runtime) {
+    assert(false);
 }

@@ -2,16 +2,15 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/LgsInstance.h"
 
-Value* LgsField::getGEP(CodeGenMetadata* metadata, Value* instance) {
-    if (IRValue) return IRValue;
-    assert(instance);
-    IRValue = metadata->builder.CreateStructGEP(parent->getIRType(), instance, position, parent->name + "_" + name + "_gep");
+Value* LgsField::getGEP(LgsRuntime* runtime, Value* instance) {
+    assert(instance && parent);
+    IRValue = builder.CreateStructGEP(parent->getIRType(), instance, position);
     return IRValue;
 }
 
-void LgsField::setFieldIRValue(CodeGenMetadata* metadata, LgsExpr* expr, Value* instance) {
-    const auto exprIRValue = expr->getIRValue(metadata);
-    metadata->builder.CreateStore(exprIRValue, getGEP(metadata, instance));
+void LgsField::setFieldIRValue(LgsRuntime* runtime, LgsExpr* expr, Value* instance) {
+    const auto exprIRValue = expr->getIRValue(runtime);
+    builder.CreateStore(exprIRValue, getGEP(runtime, instance));
 }
 
 LgsField* LgsField::clone() const {
@@ -21,7 +20,7 @@ LgsField* LgsField::clone() const {
 json LgsField::asJSON() {
     json tree;
     tree["name"] = name;
-    tree["type"] = type->getName();
+    tree["type"] = type->prettyName();
     tree["parent"] = parent->name;
     return tree;
 }

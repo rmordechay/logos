@@ -1,30 +1,27 @@
 #ifndef CODEGENERATION_H
 #define CODEGENERATION_H
-
+#include "LgsLocation.h"
 #include <Token.h>
-#include <llvm/IR/Value.h>
-#include "CodeGenMetadata.h"
-
 #include <json/json.hpp>
+#include <llvm/IR/Value.h>
 
-struct CodeGenMetadata;
+class LgsRuntime;
+class LgsFunc;
+using namespace llvm;
 
 class LgsValue {
 public:
     Location location;
     Value* IRValue = nullptr;
-    bool isFreed = false;
 
     void setIRValue(Value* value);
-    GlobalVariable* createIRGlobal(Module* module, Constant* strConstant) const;
     BasicBlock* createBasicBlock(const char* name) const;
-    void startBlock(CodeGenMetadata* metadata, BasicBlock* block) const;
-    Value* createIRStr(Module* module, const std::string& value) const;
-    virtual string format(string& indentStr);
+    void startBlock(BasicBlock* block, Function* IRFunc) const;
+    void startBlockFunc(LgsRuntime* runtime, LgsFunc* currentFunc) const;
+    Value* hashIRValue(LgsRuntime* runtime, Value* value) const;
+    virtual std::string format(std::string& indentStr);
     virtual void setLocation(const antlr4::Token* ctx);
-    virtual void free(CodeGenMetadata* metadata);
-    Value* hashIRValue(CodeGenMetadata* metadata, Value* value) const;
-    virtual json asJSON();
+    virtual nlohmann::json asJSON();
     virtual ~LgsValue() = default;
 };
 

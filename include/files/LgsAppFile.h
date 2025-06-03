@@ -1,6 +1,6 @@
 #ifndef LGSAPPFILE_H
 #define LGSAPPFILE_H
-#include "LgsData.h"
+#include "data/LgsDefinitions.h"
 #include "LgsFile.h"
 
 

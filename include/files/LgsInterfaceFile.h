@@ -1,9 +1,9 @@
 #ifndef LGSINTERFACEFILE_H
 #define LGSINTERFACEFILE_H
 #include "types/LgsInterface.h"
-#include <LgsFile.h>
+#include <files/LgsFile.h>
 
-struct LgsFuncSignature;
+struct LgsFuncType;
 
 class LgsInterfaceFile final : public LgsFile {
 public:

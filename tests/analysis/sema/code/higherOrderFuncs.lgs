@@ -1,0 +1,13 @@
+func(f(x: Int): Int) {
+    result = f(2)
+    print(result)
+}
+
+callback(x: Int): Int {
+    return x
+}
+
+main() {
+    func(callback)
+    func((x): { return x })
+}

@@ -1,31 +1,37 @@
 #ifndef LOGOSFUNC_H
 #define LOGOSFUNC_H
-#include "LgsFuncSignature.h"
-#include "LgsValue.h"
-#include "stmts/LgsStmtBlock.h"
+#include "exprs/unary/LgsUnaryExpr.h"
+#include "types/LgsFuncType.h"
 
+class LgsStmtBlock;
 class LgsParam;
 class LgsExpr;
 class LgsStmt;
 class LgsType;
 
-class LgsFunc : public LgsValue {
+class LgsFunc : public LgsUnaryExpr {
 public:
-    string path;
-    LgsFuncSignature signature;
+    LgsFuncType funcType;
+    vector<LgsVariable*> refs;
     LgsStmtBlock* stmtBlock = nullptr;
     FunctionType* IRFuncType = nullptr;
-    BasicBlock* entryBlock = BasicBlock::Create(context, "entry");
+    IRBuilderBase::InsertPoint savedIP;
+    string filePath;
 
-    explicit LgsFunc(const string& name, LgsType* funcType, const vector<LgsParam>& params, const string& parentName = "")
-        : signature(LgsFuncSignature(name, parentName, funcType, params)) {}
+    explicit LgsFunc() {
+        type = &funcType;
+    }
 
-    void generateIRCode(CodeGenMetadata* metadata);
-    Function* getIRFunc(const CodeGenMetadata* metadata);
-    virtual vector<Type*> getIRParamTypes(const CodeGenMetadata* metadata) = 0;
-    virtual Value* call(CodeGenMetadata* metadata, const vector<LgsExpr*>& args = {});
-    string format(string& indentStr) override;
+    Value* createIRValue(LgsRuntime* runtime) override;
+    string prettyName() override;
+    string format(string& tabs) override;
     json asJSON() override;
+    void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const;
+    virtual void generateIRCode(LgsRuntime* runtime);
+    virtual Function* getIRFunc(LgsRuntime* runtime);
+    virtual FunctionType* getIRFuncType(const LgsRuntime* runtime);
+    virtual Value* callIR(LgsRuntime* runtime, const vector<Value*>& args = {});
+    virtual Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args = {});
     ~LgsFunc() override;
 };
 

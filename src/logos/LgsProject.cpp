@@ -1,32 +1,143 @@
 #include "logos/LgsProject.h"
 
+#include "files/LgsInterfaceFile.h"
+#include "logos/Platform.h"
+#include "analysis/SemaAnalyser.h"
 #include "analysis/AntlrConverter.h"
+#include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsAppFile.h"
-#include "logos/LgsGlobals.h"
+#include "files/LgsMainFile.h"
+#include "files/LgsObjectFile.h"
+
 #include "logos/Logos.h"
 #include "parser/LogosLexer.h"
 #include "parser/LogosParser.h"
-#include "symbols/builtin/LgsEnv.h"
-#include "symbols/builtin/LgsSys.h"
+#include "stmts/LgsVarDec.h"
 #include "symbols/builtin/LgsPrint.h"
-#include "symbols/types/LgsBool.h"
-#include "types/LgsChar.h"
 #include "utils/ThreadPool.h"
-
 #include <iostream>
 
 using namespace std;
 extern char **environ;
 std::mutex projectMtx;
 
-bool LogosProject::loadProject() {
-    if (!projectAnalyser.validateProject()) return false;
-    setupActiveEnv();
-    if (!projectAnalyser.successful) return false;
+bool LogosProject::loadProject(const vector<char*>& args) {
+    if (!validateProject()) return false;
+    // setupActiveEnv();
+    if (!errHandler.successful) return false;
     loadFiles();
     if (!errors.empty()) return false;
-    projectAnalyser.resolveGlobalTypes(files);
-    return projectAnalyser.successful;
+    if (!resolveGlobalTypes(files)) return false;
+    return errHandler.successful;
+}
+
+
+bool LogosProject::validateProject() {
+    if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {
+        errHandler.handleError(E10010, nullptr);
+        return false;
+    }
+
+    if (!exists(paths.appFilePath)) {
+        errHandler.handleError(E10008, nullptr);
+        return false;
+    }
+    return true;
+}
+
+void LogosProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
+    for (const auto& entry : directory_iterator(path)) {
+        if (isLogosFile(entry)) {
+            threadPool.runTask([entry, this] {
+                parseSrcFile(entry);
+            });
+        } else if (is_directory(entry.path())) {
+            parseSrcFiles(entry.path(), threadPool);
+        }
+    }
+}
+
+void LogosProject::parseSrcFile(path entry) {
+    const path absFilePath = canonical(entry);
+    AntlerConverter antlerConverter;
+    antlerConverter.errHandler.filePath = absFilePath;
+    const auto codeText = getFileText(entry);
+    antlr4::ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    antlr4::CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+    const auto file = antlerConverter.getLogosFile(parser.logosFile(), absFilePath);
+    lock_guard lock(projectMtx);
+    files.emplace_back(file);
+    errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
+}
+
+void LogosProject::parseEnvFile(path fileEntry) {
+    const auto absFilePath = canonical(fileEntry);
+    AntlerConverter antlerConverter;
+    antlerConverter.errHandler.filePath = absFilePath;
+
+    const auto codeText = getFileText(fileEntry);
+    antlr4::ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    antlr4::CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+    auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
+    lock_guard lock(projectMtx);
+    envFiles.emplace_back(file);
+    errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
+}
+
+bool LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) const {
+    for (const auto& file : files) {
+        SemaAnalyser semaAnalyser(file);
+        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+            for (const auto& object : mainFile->objects) {
+                semaAnalyser.resolveObjMemberTypes(object);
+            }
+            for (const auto [_, func] : mainFile->funcs) {
+                semaAnalyser.resolveFuncTypes(&func->funcType);
+            }
+        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+            semaAnalyser.resolveObjMemberTypes(objFile->obj);
+        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+            auto methods = interfaceFile->interface->methods;
+            for (const auto& [_, method] : methods) {
+                semaAnalyser.resolveFuncTypes(&method->funcType);
+            }
+        }
+        if (!semaAnalyser.errHandler.successful) return false;
+    }
+    return true;
+}
+
+void LogosProject::parseAppFile(path fileEntry) {
+    auto absFilePath = canonical(fileEntry);
+    AntlerConverter antlerConverter;
+    antlerConverter.errHandler.filePath = absFilePath;
+
+    auto codeText = getFileText(fileEntry);
+    antlr4::ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    antlr4::CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+
+    appFile = antlerConverter.getAppFile(parser.logosAppFile());
+    for (const auto& varDec : appFile->varDecs) {
+        if (varDec->name == "name") {
+            name = varDec->expr->asStrConst()->value;
+        }
+        if (varDec->name == "version") {
+            version = varDec->expr->asStrConst()->value;
+        }
+        if (varDec->name == "activeEnv") {
+            activeEnv.name = varDec->expr->asStrConst()->value;
+        }
+    }
+}
+
+void LogosProject::loadGlobals() {
+    globals.addSymbol(lgsPrint.funcType.name, LgsSymbol(&lgsPrint), &errHandler);
 }
 
 void LogosProject::loadFiles() {
@@ -57,101 +168,40 @@ void LogosProject::loadEnvFiles() {
     threadPool.wait();
 }
 
-void LogosProject::setupActiveEnv() {
-    setEnvVars();
-    parseAppFile(paths.appFilePath);
-    loadEnvFiles();
-    checkRequiredEnvVars();
-}
-
-void LogosProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
-    for (const auto& entry : directory_iterator(path)) {
-        if (isLogosFile(entry)) {
-            threadPool.runTask([entry, this] {
-                parseSrcFile(entry);
-            });
-        } else if (is_directory(entry.path())) {
-            parseSrcFiles(entry.path(), threadPool);
-        }
-    }
-}
-
-void LogosProject::parseSrcFile(const directory_entry& entry) {
-    const auto absFilePath = canonical(entry);
-    const auto codeText = getFileText(entry);
-    ANTLRInputStream input(codeText);
-    LogosLexer lexer(&input);
-    CommonTokenStream tokens(&lexer);
-    LogosParser parser(&tokens);
-    AntlerConverter antlerConverter;
-    antlerConverter.filePath = absFilePath;
-    const auto file = antlerConverter.getLogosFile(parser.logosFile(), absFilePath);
-    file->relPath = relative(absFilePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
-    lock_guard lock(projectMtx);
-    files.emplace_back(file);
-    errors.insert(errors.end(), antlerConverter.errors.begin(), antlerConverter.errors.end());
-    if (file->name == LOGOS_MAIN_FILE_NAME) {
-        mainFile = dynamic_cast<LgsMainFile*>(file);
-    }
-}
-
-void LogosProject::parseAppFile(path fileEntry) {
-    auto absFilePath = canonical(fileEntry);
-    auto codeText = getFileText(fileEntry);
-    ANTLRInputStream input(codeText);
-    LogosLexer lexer(&input);
-    CommonTokenStream tokens(&lexer);
-    LogosParser parser(&tokens);
-    AntlerConverter antlerConverter;
-    appFile = antlerConverter.getAppFile(parser.logosAppFile(), absFilePath);
-    for (const auto& varDec : appFile->varDecs) {
-        if (varDec->name == "name") {
-            name = varDec->expr->asStrConst()->value;
-        }
-        if (varDec->name == "version") {
-            version = varDec->expr->asStrConst()->value;
-        }
-        if (varDec->name == "activeEnv") {
-            activeEnv.name = varDec->expr->asStrConst()->value;
-        }
-    }
-}
-
-void LogosProject::parseEnvFile(path fileEntry) {
-    auto absFilePath = canonical(fileEntry);
-    auto codeText = getFileText(fileEntry);
-    ANTLRInputStream input(codeText);
-    LogosLexer lexer(&input);
-    CommonTokenStream tokens(&lexer);
-    LogosParser parser(&tokens);
-    AntlerConverter antlerConverter;
-    auto envFile = antlerConverter.getEnvFile(parser.logosEnvFile(), absFilePath);
-    envFiles.emplace_back(envFile);
-}
-
-string LogosProject::getFileText(path filePath) const {
-    ifstream file(canonical(filePath));
-    stringstream fileContents;
-    fileContents << file.rdbuf();
-    return fileContents.str();
-}
-
-void LogosProject::loadGlobals() const {
-    globals.addFunc(new LgsPrint({LgsParam(new LgsInt())}));
-    globals.addFunc(new LgsPrint({LgsParam(new LgsFloat())}));
-    globals.addFunc(new LgsPrint({LgsParam(new LgsStr())}));
-    globals.addFunc(new LgsPrint({LgsParam(new LgsChar())}));
-    globals.addFunc(new LgsPrint({LgsParam(new LgsBool())}));
-    globals.addSymbol(LgsSys::name, LgsSymbol(new LgsSys()));
-    globals.addSymbol(LgsEnv::name, LgsSymbol(new LgsEnv()));
-    globals.addSymbol("ROOT_PATH", LgsSymbol(new LgsVarDec("ROOT_PATH", new LgsStr(), new LgsStrConst(paths.rootDirAbs))));
-}
-
 void LogosProject::checkRequiredEnvVars() {
     for (const auto& requireEnvVar : appFile->requireEnvVars) {
         for (const auto envFile : envFiles) {
-            projectAnalyser.checkRequiredEnvVar(requireEnvVar, envFile);
+            checkRequiredEnvVar(requireEnvVar, envFile);
         }
+    }
+}
+
+void LogosProject::checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile) {
+    auto found = false;
+    for (const auto& varDec : envFile->varDecs) {
+        if (requireEnvVar.name == varDec->name && requireEnvVar.type->equals(varDec->type)) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        errHandler.handleError(E10020, nullptr, {envFile->name, requireEnvVar.name});
+    }
+}
+
+void LogosProject::checkDuplicateFiles(const vector<LgsFile*>& files) {
+    map<string, vector<LgsFile*>> duplicates;
+    for (const auto& file : files) {
+        duplicates[file->name].emplace_back(file);
+    }
+    if (duplicates.empty()) return;
+    for (const auto& [name, duplicate] : duplicates) {
+        if (duplicate.size() <= 1) continue;
+        ostringstream errMsg;
+        for (const auto &file : duplicate) {
+            errMsg << "\n\t - " + file->absPath;
+        }
+        errHandler.handleError(E10007, nullptr, {name, errMsg.str()});
     }
 }
 
@@ -167,8 +217,14 @@ void LogosProject::setEnvVars() const {
     }
 }
 
+void LogosProject::setupActiveEnv() {
+    setEnvVars();
+    parseAppFile(paths.appFilePath);
+    loadEnvFiles();
+    checkRequiredEnvVars();
+}
+
 void LogosProject::asJSON() const {
-    std::cout << mainFile->asJSON().dump(2) << '\n';
     return;
 }
 

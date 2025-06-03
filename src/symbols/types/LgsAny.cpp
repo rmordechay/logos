@@ -1,6 +1,8 @@
 #include "types/LgsAny.h"
 
-size_t LgsAny::size() {
+#include "codegen/CodegenMetadata.h"
+
+size_t LgsAny::getSizeBytes() {
     return sizeof(void*);
 }
 
@@ -8,16 +10,21 @@ Type* LgsAny::getIRType() {
     return ptrTy;
 }
 
+string LgsAny::getIRName() {
+    return name;
+}
+
 LgsExpr* LgsAny::getZeroValue() {
     assert(false);
 }
 
-const string LgsAny::getName() const {
+string LgsAny::prettyName() const {
     return name;
 }
 
-bool LgsAny::equals(LgsType* other) const {
-    assert(false);
+bool LgsAny::equals(LgsType* other) {
+    // TODO should everything equals Any?
+    return true;
 }
 
 LgsType* LgsAny::inferBinaryType(LgsType* other) {

@@ -1,11 +1,12 @@
 #include "cli/LgsRunCmd.h"
-#include "Logos.h"
+#include "logos/Logos.h"
 #include <iostream>
 
 void LgsRunCmd::runCmd() {
     validate();
-    Logos project(rootPath);
-    project.run();
+    Logos logos(rootPath);
+    setArgs(&logos);
+    logos.run();
 }
 
 void LgsRunCmd::validate() {
@@ -16,6 +17,13 @@ void LgsRunCmd::validate() {
         rootPath = current_path().string();
     } else {
         rootPath = firstArg;
+    }
+}
+
+void LgsRunCmd::setArgs(Logos* logos) const {
+    vector<char*> args;
+    for (int i = 0; i < argc; ++i) {
+        logos->args.emplace_back(argv[i]);
     }
 }
 

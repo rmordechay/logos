@@ -1,0 +1,26 @@
+#ifndef LOGOSINT_H
+#define LOGOSINT_H
+#include "types/LgsType.h"
+
+class LgsInt final : public LgsType {
+public:
+    static constexpr auto name = "Int";
+
+    LgsInt() {
+        isPrimitive = true;
+    }
+    size_t getSizeBytes() override;
+    Type* getIRType() override;
+    string getIRName() override;
+    string prettyName() const override;
+    LgsExpr* getZeroValue() override;
+    LgsType* inferBinaryType(LgsType* other) override;
+    bool equals(LgsType* other) override;
+    string getStrFormatPart() const override;
+    LgsType* clone() override;
+    ~LgsInt() override = default;
+};
+
+inline LgsInt LGS_INT;
+
+#endif //LOGOSINT_H

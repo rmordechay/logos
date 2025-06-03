@@ -1,7 +1,11 @@
 grammar Logos;
 
 logosFile:
-        mainFile | objectFile | interfaceFile
+        extern? (mainFile | objectFile | interfaceFile)
+    ;
+
+extern:
+        EXTERN 'C' LBRACE STRING* RBRACE
     ;
 
 logosEnvFile:
@@ -13,7 +17,7 @@ logosAppFile:
     ;
 
 mainFile:
-        (object | enumDeclaration)* funcImplementation+ EOF
+        (object | enumDeclaration | interface)* funcImpl+ EOF
     ;
 
 objectFile:
@@ -21,7 +25,15 @@ objectFile:
     ;
 
 interfaceFile:
-        interfaceDeclaration explicitVarDec* funcSignature+ funcImplementation* EOF
+        interfaceDeclaration interfaceBody EOF
+    ;
+
+interface:
+        INTERFACE TYPE LBRACE interfaceBody RBRACE
+    ;
+
+interfaceBody:
+        explicitVarDec* funcSignature+ funcImpl*
     ;
 
 object:
@@ -29,7 +41,7 @@ object:
     ;
 
 objectBody:
-        objectImplements? field* funcImplementation*
+        objectImplements? field* methodImplementation*
     ;
 
 field:
@@ -49,23 +61,31 @@ objectImplements:
     ;
 
 funcSignature:
-        VARIABLE LPAREN paramList? RPAREN (COLON type)?
+        VARIABLE LPAREN (param (COMMA param)* COMMA?)? RPAREN (COLON type)?
     ;
 
-funcImplementation:
+funcImpl:
         funcSignature funcBody
+    ;
+
+anonnymosfuncSignature:
+        LPAREN (param (COMMA param)* COMMA?)? RPAREN (COLON type)?
+    ;
+
+anonnymosFunc:
+        anonnymosfuncSignature funcBody
+    ;
+
+methodImplementation:
+        VISIBILITY? funcSignature funcBody
     ;
 
 funcBody:
         statementsBlock
     ;
 
-paramList:
-        param (COMMA param)* COMMA?
-    ;
-
 param:
-        explicitVarDec | funcSignature
+        VARIABLE COLON type TRIPLE_DOT? (EQUAL expr)? | VARIABLE funcType
     ;
 
 statement:
@@ -87,7 +107,7 @@ statementsBlock:
     ;
 
 assignment:
-        (VARIABLE | arrayIndex | selection) COLON EQUAL expr
+        (VARIABLE | iterIndex | selection) COLON EQUAL expr
     ;
 
 explicitVarDec:
@@ -119,8 +139,8 @@ pattern:
     ;
 
 loopStatement:
-        FOR VARIABLE (COMMA VARIABLE)* IN iterableRange=range statementsBlock
-    |   FOR VARIABLE (COMMA VARIABLE)* IN iterableExpr=unaryExpr statementsBlock
+        FOR VARIABLE (COMMA VARIABLE)* COMMA? IN iterableRange=range statementsBlock
+    |   FOR VARIABLE (COMMA VARIABLE)* COMMA? IN iterableExpr=unaryExpr statementsBlock
     |   FOR VARIABLE? statementsBlock
     ;
 
@@ -141,11 +161,15 @@ enumField:
     ;
 
 expr:
-        left=expr op=(STAR | SLASH) right=expr
-    |   left=expr op=(PLUS | MINUS) right=expr
-    |   left=expr op=(DOUBLE_EQUAL | NOT_EQUAL | LANGLE | RANGLE | GE | LE) right=expr
+        LPAREN left=expr RPAREN (CAST type)?
     |   unaryExpr (CAST cast=type)?
-    |   LPAREN left=expr RPAREN (CAST type)?
+    |   left=expr op=(STAR | SLASH) right=expr
+    |   left=expr op=(PLUS | MINUS) right=expr
+    |   left=expr op=(LANGLE | RANGLE | GE | LE) right=expr
+    |   left=expr op=(DOUBLE_EQUAL | NOT_EQUAL) right=expr
+    |   left=expr op=(AND | OR) right=expr
+    |   left=expr op=(AMPERSAND | CARET | PIPE) right=expr
+    |   left=expr op=(DOUBLE_LANGLE | DOUBLE_RANGLE) right=expr
     ;
 
 unaryExpr:
@@ -155,11 +179,13 @@ unaryExpr:
     |   SELF_CLASS
     |   NULL
     |   funcCall
+    |   anonnymosFunc
+    |   vector
     |   constructor
     |   constant
     |   array
-    |   map
-    |   arrayIndex
+    |   hashMap
+    |   iterIndex
     |   selection
     ;
 
@@ -167,8 +193,12 @@ array:
         LBRACK (expr (COMMA expr)* COMMA?)? RBRACK
     ;
 
-map:
-        LBRACE (expr COLON expr COMMA?)* RBRACE
+hashMap:
+        LBRACE (keyValue (COMMA keyValue)* COMMA?)? RBRACE
+    ;
+
+keyValue:
+        key=expr COLON value=expr
     ;
 
 funcCall:
@@ -202,8 +232,14 @@ constant:
     |   STRING
     ;
 
-arrayIndex:
-        (funcCall | VARIABLE) (LBRACK expr RBRACK)+
+iterIndex:
+        (funcCall | VARIABLE) (index)+
+    ;
+
+index:
+        LBRACK from=expr COLON? RBRACK
+    |   LBRACK COLON to=expr RBRACK
+    |   LBRACK from=expr COLON to=expr RBRACK
     ;
 
 selection:
@@ -213,32 +249,48 @@ selection:
 firstSelectionElement:
         VARIABLE
     |   TYPE
+    |   STRING
     |   SELF_CLASS
     |   SELF_INSTANCE
     |   funcCall
     |   constructor
-    |   arrayIndex
+    |   iterIndex
     ;
 
 innerSelectionElement:
         VARIABLE
     |   funcCall
-    |   arrayIndex
+    |   iterIndex
     ;
 
 range:
-        start=expr? DOUBLE_DOT end=expr
+        start=expr DOUBLE_DOT end=expr
+    |   DOUBLE_DOT end=expr
+    |   start=expr DOUBLE_DOT
     ;
 
 type:
-        SELF_CLASS
-   |    TYPE QUEST_MARK?
-   |    TYPE (LBRACK INTEGER? RBRACK)+
-   |    LBRACE type COLON type RBRACE
+        TYPE QUEST_MARK?
+   |    SELF_CLASS
+   |    baseType=type arrayIndexType+
+   |    mapType
+   |    funcType
    ;
 
+mapType:
+        LBRACE key=type COLON value=type RBRACE
+    ;
+
+arrayIndexType:
+        LBRACK expr? RBRACK
+    ;
+
+funcType:
+        LPAREN (type (COMMA type)* COMMA?)? RPAREN COLON rt=type
+    ;
+
 vector:
-        VEC | VEC2 | VEC3 | VEC4
+        (VEC2 | VEC3 | VEC4) LPAREN (expr (COMMA expr)* COMMA?)? RPAREN
     ;
 
 requireEnvVars:
@@ -261,6 +313,7 @@ LANGLE: '<';
 RANGLE: '>';
 
 COMMA: ',';
+TRIPLE_DOT: '...';
 DOUBLE_DOT: '..';
 DOT: '.';
 COLON: ':';
@@ -275,6 +328,10 @@ EXCLA_MARK: '!';
 PERCENT: '%';
 DOLLAR: '$';
 AMPERSAND: '&';
+PIPE: '|';
+CARET: '^';
+DOUBLE_RANGLE: '<<';
+DOUBLE_LANGLE: '>>';
 
 OBJECT: 'object';
 SINGLETON: 'singleton';
@@ -283,13 +340,12 @@ SELF_CLASS: 'Self';
 INTERFACE: 'interface';
 ENUM: 'enum';
 
-VEC: 'vec';
 VEC2: 'vec2';
 VEC3: 'vec3';
 VEC4: 'vec4';
 
 IMPLEMENTS: 'implements';
-IMPORT: 'import';
+EXTERN: 'extern';
 
 IF: 'if';
 ELSE: 'else';
@@ -312,7 +368,7 @@ NULL: 'null';
 CONST_NAME: [A-Z0-9_]+;
 TYPE: [A-Z][a-zA-Z0-9_]*;
 VARIABLE: [a-z_][a-zA-Z0-9_]*;
-STRING: '"' ( ~["\\] | '\\' . )* '"';
+STRING: '"' ( ~["\\] | '\\'.)* '"';
 LINE_COMMENT: '//' ~( '\r' | '\n' )* -> skip;
 BLOCK_COMMENT: '///' .*? '///' -> skip;
 WS: [ \t\r\n]+ -> skip;

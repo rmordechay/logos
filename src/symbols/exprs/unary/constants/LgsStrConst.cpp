@@ -1,48 +1,32 @@
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 
-Value* LgsStrConst::createIRValue(CodeGenMetadata* metadata) {
-    return createIRStr(metadata->module, value);
+Value* LgsStrConst::getLength(LgsRuntime* runtime) {
+    return builder.getInt32(value.size());
 }
 
-size_t LgsStrConst::length() {
-    return value.size();
+Value* LgsStrConst::createIRValue(LgsRuntime* runtime) {
+    return getIRStr(runtime, value);
 }
 
-LgsExpr* LgsStrConst::add(LgsExpr* other) {
-    string otherValue;
-    if (const auto intConst = other->asIntConst()) {
-        otherValue = to_string(intConst->value);
-    } else if (const auto floatConst = other->asFloatConst()) {
-        otherValue = to_string(floatConst->value);
-    } else if (const auto strConst = other->asStrConst()) {
-        otherValue = this->value + strConst->value;
-    }
-    return new LgsStrConst(value + otherValue);
-}
-
-Value* LgsStrConst::sizeIR(CodeGenMetadata* metadata) {
-    return metadata->builder.getInt32(value.size());
-}
-
-Value* LgsStrConst::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
+Value* LgsStrConst::addIR(LgsRuntime* runtime, LgsExpr* other) {
     if (const auto otherStrConst = other->asIntConst()) {
-        return createIRStr(metadata->module, this->value + to_string(otherStrConst->value));
+        return getIRStr(runtime, this->value + to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asFloatConst()) {
-        return createIRStr(metadata->module, this->value + to_string(otherStrConst->value));
+        return getIRStr(runtime, this->value + to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asStrConst()) {
-        return createIRStr(metadata->module, this->value + otherStrConst->value);
+        return getIRStr(runtime, this->value + otherStrConst->value);
     }
-    return nullptr;
+    if (const auto otherBoolConst = other->asBoolConst()) {
+        return getIRStr(runtime, this->value + otherBoolConst->getValueAsString());
+    }
+    assert(false);
 }
 
-Value* LgsStrConst::eqIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    if (const auto otherStrConst = other->asStrConst()) {
-        const auto func = metadata->module->getOrInsertFunction("Str_compare_Str_Str", cmpStrIRFuncType);
-        return metadata->builder.CreateCall(func, {getIRValue(metadata), otherStrConst->getIRValue(metadata)});
-    }
+Value* LgsStrConst::eqIR(LgsRuntime* runtime, LgsExpr* other) {
     return nullptr;
 }

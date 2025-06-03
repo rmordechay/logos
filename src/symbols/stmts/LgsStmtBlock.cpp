@@ -1,11 +1,9 @@
 #include "stmts/LgsStmtBlock.h"
-
 #include "exprs/unary/LgsSelection.h"
-#include "stmts/LgsReturn.h"
 
-void LgsStmtBlock::createIRValue(CodeGenMetadata* metadata) const {
+void LgsStmtBlock::createIRValue(LgsRuntime* runtime) const {
     for (const auto& stmt : stmts) {
-        stmt->createIRValue(metadata);
+        stmt->createIRStmt(runtime);
     }
 }
 

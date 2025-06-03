@@ -1,0 +1,9 @@
+object Obj {
+    a: Str
+    b: Int
+}
+
+main() {
+    obj = Obj()
+    fields = Reflect.getFields(obj)
+}

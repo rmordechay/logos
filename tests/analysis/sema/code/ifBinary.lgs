@@ -1,0 +1,35 @@
+eq(x: Int) {
+    for i in 0..10 {
+        if i == x {
+            print(i)
+        }
+    }
+}
+
+ne(x: Int) {
+    for i in 0..10 {
+        if i != x {
+            print(i)
+        }
+    }
+}
+
+gt(x: Int) {
+    for i in 0..10 {
+        if i > x {
+            print(i)
+        }
+    }
+}
+
+lt(x: Int) {
+    for i in 0..10 {
+        if i < x {
+            print(i)
+        }
+    }
+}
+
+main() {
+
+}

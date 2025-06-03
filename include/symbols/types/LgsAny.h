@@ -4,16 +4,18 @@
 
 class LgsAny final : public LgsType {
 public:
-    string name;
+    static constexpr auto name = "Any";
 
-    explicit LgsAny(const string& name) : name(name) {}
-    size_t size() override;
+    size_t getSizeBytes() override;
     Type* getIRType() override;
+    string getIRName() override;
     LgsExpr* getZeroValue() override;
-    const string getName() const override;
-    bool equals(LgsType* other) const override;
+    string prettyName() const override;
+    bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     ~LgsAny() override = default;
 };
+
+inline LgsAny LGS_ANY;
 
 #endif //LGSANY_H

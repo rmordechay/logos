@@ -8,11 +8,8 @@ public:
     LgsObject *obj = nullptr;
 
     explicit LgsObjectFile(const string& name, const string& path) : LgsFile(name, path) {}
+    void generateIR() override;
     ~LgsObjectFile() override;
 };
-
-inline LgsObjectFile::~LgsObjectFile() {
-    delete obj;
-}
 
 #endif //LOGOSOBJFILE_H

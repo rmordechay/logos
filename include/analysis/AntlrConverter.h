@@ -1,64 +1,103 @@
 #ifndef SEMANTICANALYSER_H
 #define SEMANTICANALYSER_H
 
-#include "LgsAnalyser.h"
-#include "LgsEnvFile.h"
+#include "logos/LgsErrHandler.h"
 #include "LogosParser.h"
-#include "exprs/unary/LgsUnaryExpr.h"
-#include "files/LgsMainFile.h"
-#include "files/LgsObjectFile.h"
-#include "stmts/LgsAssignment.h"
-#include "stmts/LgsIfStmt.h"
 
-class LgsAppFile;
-class LgsLoop;
-class LgsAssignment;
 using namespace std;
+using namespace filesystem;
 
-class AntlerConverter : public LgsAnalyser {
+class LgsStrConst;
+class LgsType;
+class LgsTypeConst;
+class LgsIterIndex;
+class LgsInstance;
+class LgsSelection;
+class LgsFuncCall;
+class LgsVariable;
+class LgsUnaryExpr;
+class LgsExpr;
+class LgsEnum;
+class LgsIfStmt;
+class LgsParam;
+class LgsVarDec;
+class LgsStmtBlock;
+class LgsStmt;
+class LgsField;
+class LgsFuncType;
+class LgsObject;
+class LgsInterface;
+class LgsConstExpr;
+class LgsFuncImpl;
+class LgsObjectFile;
+class LgsMainFunc;
+class LgsMainFile;
+class LgsFile;
+class LgsMethodImpl;
+class LgsEnvFile;
+class LgsAppFile;
+class LgsForLoop;
+class LgsAssignment;
+
+class AntlerConverter {
 public:
+    LgsMethodImpl* currentMethod = nullptr;
+    LgsErrHandler errHandler;
+    string filePath;
+
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath);
-    LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx, const path& filePath);
-    LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx, const path& filePath);
-    LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const string& filePath);
-    LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const string& filePath);
-    LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const path& filePath);
-    LgsInterface* getInterface(LogosParser::InterfaceFileContext* ctx, const string& parentName);
+    LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx);
+    LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx);
+    LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx);
+    LgsMainFunc* getMainFunc(LogosParser::FuncImplContext* ctx);
+    LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx);
+    LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx);
+    LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, bool isSingleton = false);
-    void setParams(LogosParser::FuncSignatureContext* funcSignature, vector<LgsParam>& params);
-    LgsField* getField(LogosParser::FieldContext* ctx, size_t position);
-    LgsFuncImpl* getFuncImpl(LogosParser::FuncImplementationContext* ctx);
-    LgsMethodImpl* getMethodImpl(LogosParser::FuncImplementationContext* ctx, LgsObject* obj);
+    void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);
+    LgsField* getField(LogosParser::FieldContext* ctx);
+    LgsFuncImpl* getFuncImpl(LogosParser::FuncImplContext* ctx);
+    LgsFuncImpl* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
+    LgsMethodImpl* getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     LgsStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
-    LgsParam* getParam(LogosParser::ExplicitVarDecContext* ctx);
-    LgsParam* getParam(LogosParser::FuncSignatureContext* ctx);
+    LgsFuncType* getFuncType(LogosParser::FuncTypeContext* ctx);
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
-    LgsLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
+    LgsForLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
+    LgsForLoop* getRangeLoop(LogosParser::LoopStatementContext* ctx);
+    LgsForLoop* getForeachLoop(LogosParser::LoopStatementContext* ctx);
     LgsEnum* getEnum(LogosParser::EnumDeclarationContext* ctx);
     LgsExpr* getExpr(LogosParser::ExprContext* ctx, bool isNullable = false);
     LgsExpr* getCast(LogosParser::ExprContext* ctx);
     LgsUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
-    LgsUnaryExpr* getArray(LogosParser::ArrayContext* ctx);
+    LgsUnaryExpr* getArrayExpr(LogosParser::ArrayContext* ctx);
+    LgsUnaryExpr* getHashMap(LogosParser::HashMapContext* ctx);
     LgsVariable* getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) const;
     LgsUnaryExpr* getConst(const string& constName, const antlr4::ParserRuleContext* ctx) const;
     LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
+    LgsUnaryExpr* getVector(LogosParser::VectorContext* vector);
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
     LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
     vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
     LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
-    LgsArrayIndex* getArrayIndex(LogosParser::ArrayIndexContext* ctx);
-    LgsConstExpr* getConstant(LogosParser::ConstantContext* ctx) const;
-    LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
-    LgsType* getType(LogosParser::TypeContext* ctx) const;
-    LgsType* getTypeFromText(const string& typeText, const antlr4::ParserRuleContext* ctx) const;
-    LgsType* getFuncType(LogosParser::FuncImplementationContext* ctx) const;
+    LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
+    LgsConstExpr* getConstant(LogosParser::ConstantContext* ctx);
+    LgsConstExpr* getStrConst(string& value) const;
+    LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx);
+    LgsType* getType(LogosParser::TypeContext* ctx);
+    LgsType* getArrayType(LogosParser::TypeContext* ctx);
+    LgsType* getTypeFromText(antlr4::tree::TerminalNode* typeToken) const;
+    bool isTypePrimitive(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const;
+    LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
+    LgsExpr* getExpr(const string& codeText) const;
+    void parseTemplateStr(LgsStrConst* strConst) const;
+    void cleanStr(string& value) const;
     ~AntlerConverter() = default;
 };
 

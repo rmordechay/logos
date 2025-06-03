@@ -9,12 +9,12 @@ LgsExpr* LgsEnum::getZeroValue() {
     assert(false);
 }
 
-size_t LgsEnum::size() {
-    return sizeof(void*);
-}
-
 Type* LgsEnum::getIRType() {
     return ptrTy;
+}
+
+string LgsEnum::getIRName() {
+    return name;
 }
 
 json LgsEnum::asJSON() const {
@@ -27,12 +27,12 @@ json LgsEnum::asJSON() const {
     return tree;
 }
 
-const string LgsEnum::getName() const {
+string LgsEnum::prettyName() const {
     return name;
 }
 
-bool LgsEnum::equals(LgsType* other) const {
-    return name == other->getName();
+bool LgsEnum::equals(LgsType* other) {
+    return name == other->getIRName();
 }
 
 LgsType* LgsEnum::inferBinaryType(LgsType* other) {

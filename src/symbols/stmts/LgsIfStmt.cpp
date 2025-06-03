@@ -1,71 +1,70 @@
 #include "stmts/LgsIfStmt.h"
+#include "codegen/CodegenMetadata.h"
 
-Value* LgsIfStmt::createIRValue(CodeGenMetadata* metadata) {
-    metadata->lgsStack.enterScope();
-    if (elseIfConds.size() > 0) {
-        computeComplexIf(metadata);
+void LgsIfStmt::createIRStmt(LgsRuntime* runtime) {
+    runtime->stack.enterScope(this);
+    if (elseBlock || elseIfConds.size() > 0) {
+        computeComplexIf(runtime);
     } else {
-        computeSimpleIf(metadata);
+        computeSimpleIf(runtime);
     }
-    metadata->lgsStack.exitScope();
-    return nullptr;
+    runtime->stack.exitScope(IF_STMT);
 }
 
 
-void LgsIfStmt::computeSimpleIf(CodeGenMetadata* metadata) {
-    auto& builder = metadata->builder;
+void LgsIfStmt::computeSimpleIf(LgsRuntime* runtime) {
     ifTrueBlock = createBasicBlock(BB_IF_TRUE);
     ifEndBlock = createBasicBlock(BB_IF_END);
     elseBlock = createBasicBlock(BB_ELSE);
 
-    const auto ifCondIR = ifCond->getIRValue(metadata);
+    // if block
+    const auto ifCondIR = ifCond->getIRValue(runtime);
     if (!elseStmtBlock) {
         builder.CreateCondBr(ifCondIR, ifTrueBlock, ifEndBlock);
     } else {
         builder.CreateCondBr(ifCondIR, ifTrueBlock, elseBlock);
     }
+    startBlock(ifTrueBlock, nullptr);
+    ifStmtBlock->createIRValue(runtime);
+    if (builder.GetInsertBlock()->getTerminator()) return;
+    builder.CreateBr(ifEndBlock);
 
-    startBlock(metadata, ifTrueBlock);
-    ifStmtBlock->createIRValue(metadata);
-    if (!builder.GetInsertBlock()->getTerminator()) {
-        builder.CreateBr(ifEndBlock);
-    }
+    // else block
+    createElseBlock(runtime, elseBlock, ifEndBlock);
 
-    if (elseStmtBlock) {
-        createElseBlock(metadata, elseBlock, ifEndBlock);
-    }
-
-    startBlock(metadata, ifEndBlock);
+    // exit
+    startBlock(ifEndBlock, nullptr);
 }
 
-void LgsIfStmt::computeComplexIf(CodeGenMetadata* metadata) {
-    auto& builder = metadata->builder;
+void LgsIfStmt::computeComplexIf(LgsRuntime* runtime) {
     ifTrueBlock = createBasicBlock(BB_IF_TRUE);
     elseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK);
     ifEndBlock = createBasicBlock(BB_IF_END);
     elseBlock = createBasicBlock(BB_ELSE);
 
     // if block
-    const auto ifCondIR = ifCond->getIRValue(metadata);
+    const auto ifCondIR = ifCond->getIRValue(runtime);
     builder.CreateCondBr(ifCondIR, ifTrueBlock, elseIfCheckBlock);
-    startBlock(metadata, ifTrueBlock);
-    ifStmtBlock->createIRValue(metadata);
+    startBlock(ifTrueBlock, nullptr);
+    ifStmtBlock->createIRValue(runtime);
     builder.CreateBr(ifEndBlock);
 
-    createElseIfBlocks(metadata);
-    if (elseStmtBlock) {
-        createElseBlock(metadata, elseBlock, ifEndBlock);
-    }
+    // else if blocks
+    createElseIfBlocks(runtime);
+
+    // else block
+    createElseBlock(runtime, elseBlock, ifEndBlock);
+
+    // exit
     if (!builder.GetInsertBlock()->getTerminator()) {
-        startBlock(metadata, ifEndBlock);
+        startBlock(ifEndBlock, nullptr);
     }
 }
 
-void LgsIfStmt::createElseIfBlocks(CodeGenMetadata* metadata) {
-    auto& builder = metadata->builder;
+void LgsIfStmt::createElseIfBlocks(LgsRuntime* runtime) {
     for (size_t i = 0; i < elseIfConds.size(); ++i) {
-        startBlock(metadata, elseIfCheckBlock);
-        const auto elseIfCondIR = elseIfConds[i]->getIRValue(metadata);
+        startBlock(elseIfCheckBlock, nullptr);
+        const auto elseIfCondIR = elseIfConds[i]->getIRValue(runtime);
         const auto elseIfStartBlock = createBasicBlock(BB_ELSE_IF_START);
         const auto lastIteration = elseIfConds.size() - 1;
         if (i == lastIteration) {
@@ -79,16 +78,17 @@ void LgsIfStmt::createElseIfBlocks(CodeGenMetadata* metadata) {
             builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, elseIfCheckBlock);
         }
 
-        startBlock(metadata, elseIfStartBlock);
-        elseIfStmtBlocks[i]->createIRValue(metadata);
+        startBlock(elseIfStartBlock, nullptr);
+        elseIfStmtBlocks[i]->createIRValue(runtime);
         builder.CreateBr(ifEndBlock);
     }
 }
 
-void LgsIfStmt::createElseBlock(CodeGenMetadata* metadata, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const {
-    startBlock(metadata, elseBlock);
-    elseStmtBlock->createIRValue(metadata);
-    metadata->builder.CreateBr(ifEndBlock);
+void LgsIfStmt::createElseBlock(LgsRuntime* runtime, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const {
+    if (!elseStmtBlock) return;
+    startBlock(elseBlock, nullptr);
+    elseStmtBlock->createIRValue(runtime);
+    builder.CreateBr(ifEndBlock);
 }
 
 LgsIfStmt::~LgsIfStmt() {

@@ -1,35 +1,38 @@
 #include "stmts/LgsVarDec.h"
-#include "exprs/unary/LgsArray.h"
+#include "exprs/unary/LgsArrayExpr.h"
+#include "utils/LgsUtils.h"
 
 string LgsVarDec::format(string& indentStr) {
     return indentStr + name + " = ";
 }
 
-Value* LgsVarDec::createIRValue(CodeGenMetadata* metadata) {
-    auto& builder = metadata->builder;
-    if (!expr) return builder.CreateAlloca(type->getIRType());
-
-    const auto exprValue = expr->getIRValue(metadata);
-    const auto valueType = exprValue->getType();
-    // Pointers don't need to be stored
-    if (!(valueType->isPointerTy() || valueType->isVoidTy())) {
-        const auto ptr = builder.CreateAlloca(valueType);
-        builder.CreateStore(exprValue, ptr);
+void LgsVarDec::createIRStmt(LgsRuntime* runtime) {
+    const auto IRType = type->getIRType();
+    const auto exprIRValue = expr->getIRValue(runtime);
+    if (shouldAllocate(IRType)) {
+        IRValue = builder.CreateAlloca(IRType);
+        if (shouldLoadIRArg(exprIRValue)) {
+            const auto artIRType = expr->type->getIRType();
+            const auto value = builder.CreateLoad(artIRType, exprIRValue);
+            builder.CreateStore(value, IRValue);
+        } else {
+            builder.CreateStore(exprIRValue, IRValue);
+        }
+    } else {
+        IRValue = exprIRValue;
     }
-    IRValue = exprValue;
-    return exprValue;
+}
+
+bool LgsVarDec::shouldAllocate(const Type* IRType) const {
+    return !expr->asInstance() || IRType->isArrayTy() || IRType->isPointerTy() || IRType->isVoidTy();
 }
 
 json LgsVarDec::asJSON() {
     json tree;
     tree["name"] = name;
-    tree["type"] = type->getName();
+    tree["type"] = type->prettyName();
     tree["stmtType"] = "VAR_DEC";
     return tree;
-}
-
-void LgsVarDec::free(CodeGenMetadata* metadata) {
-    expr->free(metadata);
 }
 
 LgsVarDec::~LgsVarDec() {

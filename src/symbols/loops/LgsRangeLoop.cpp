@@ -1,26 +1,25 @@
 #include "loops/LgsRangeLoop.h"
-
-#include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsVarDec.h"
 
-#include <LgsStack.h>
-#include <types/LgsInt.h>
-
-int LgsRangeLoop::loopStart() {
-    return rangeStart->asIntConst()->value;
+Value* LgsRangeLoop::loopStart(LgsRuntime* runtime) {
+    return rangeStart->getIRValue(runtime);
 }
 
-int LgsRangeLoop::loopEnd() {
-    return rangeEnd->asIntConst()->value;
+Value* LgsRangeLoop::loopEnd(LgsRuntime* runtime) {
+    return rangeEnd->getIRValue(runtime);
+}
+
+void LgsRangeLoop::setIRLoopVars(LgsRuntime* runtime) {
+    const auto loopVar = loopVars[0];
+    const auto iValue = builder.CreateLoad(i32Ty, iPtr);
+    loopVar->expr->setIRValue(iValue);
+}
+
+void LgsRangeLoop::setIRIterable(LgsRuntime* runtime) {
+    assert(false);
 }
 
 LgsRangeLoop::~LgsRangeLoop() {
     // rangeStart will be freed with varDec freeing
     delete rangeEnd;
-}
-
-void LgsRangeLoop::setIRLoopVariable(CodeGenMetadata* metadata) {
-    const auto loopVar = loopVars[0];
-    loopVar->setIRValue(iValue);
-    metadata->lgsStack.addLocalSymbol(loopVar->name, LgsSymbol(loopVar));
 }

@@ -12,10 +12,11 @@ public:
     explicit LgsSelection(const vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
     string getName() override;
     LgsExpr* lastExpr() const;
-    uint32_t hashValue(CodeGenMetadata* metadata) override;
-    Value* eqIR(CodeGenMetadata* metadata, LgsExpr* other) override;
-    Value* createIRValue(CodeGenMetadata* metadata) override;
-    LgsExpr* resolveSelection(CodeGenMetadata* metadata) const;
+    uint32_t hashValue(LgsRuntime* runtime) override;
+    Value* eqIR(LgsRuntime* runtime, LgsExpr* other) override;
+    void createIRStmt(LgsRuntime* runtime) override;
+    Value* createIRValue(LgsRuntime* runtime) override;
+    LgsExpr* resolveSelection(LgsRuntime* runtime) const;
     json asJSON() override;
     ~LgsSelection() override;
 };

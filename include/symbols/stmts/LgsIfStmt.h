@@ -14,8 +14,8 @@ class LgsIfStmt final : public LgsStmt {
 public:
     LgsExpr* ifCond;
     LgsStmtBlock* ifStmtBlock;
-    vector<LgsExpr*> elseIfConds;
-    vector<LgsStmtBlock*> elseIfStmtBlocks;
+    std::vector<LgsExpr*> elseIfConds;
+    std::vector<LgsStmtBlock*> elseIfStmtBlocks;
     LgsStmtBlock* elseStmtBlock = nullptr;
     bool hasReturn = false;
 
@@ -26,11 +26,11 @@ public:
     BasicBlock* elseIfCheckBlock = nullptr;
 
     LgsIfStmt(LgsExpr* ifCond, LgsStmtBlock* ifStmtBlock) : ifCond(ifCond), ifStmtBlock(ifStmtBlock) {}
-    Value* createIRValue(CodeGenMetadata* metadata) override;
-    void computeSimpleIf(CodeGenMetadata* metadata);
-    void computeComplexIf(CodeGenMetadata* metadata);
-    void createElseIfBlocks(CodeGenMetadata* metadata);
-    void createElseBlock(CodeGenMetadata* metadata, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const;
+    void createIRStmt(LgsRuntime* runtime) override;
+    void computeSimpleIf(LgsRuntime* runtime);
+    void computeComplexIf(LgsRuntime* runtime);
+    void createElseIfBlocks(LgsRuntime* runtime);
+    void createElseBlock(LgsRuntime* runtime, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const;
     ~LgsIfStmt() override;
 };
 

@@ -1,0 +1,49 @@
+interface Implement {
+    doWork()
+    doWork3()
+}
+
+interface Implement2 {
+    doWork2()
+}
+
+object Obj1 {
+    implements: Implement, Implement2
+
+    doWork() {
+        print("FromObj1 doWork")
+    }
+
+    doWork3() {
+        print("FromObj1 doWork3")
+    }
+
+    doWork2() {
+        print("FromObj1 doWork2")
+    }
+}
+
+object Obj2 {
+    implements: Implement
+
+    doWork() {
+        print("FromObj2")
+    }
+
+    doWork3() {
+        print("FromObj3 doWork3")
+    }
+}
+
+checkInterface(obj: Implement) {
+    obj.doWork3()
+}
+
+checkInterface2(obj: Implement2) {
+    obj.doWork2()
+}
+
+main() {
+    obj1 = Obj1()
+    checkInterface(obj1)
+}

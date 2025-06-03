@@ -8,11 +8,12 @@ class LgsType;
 
 class LgsAssignment final : public LgsStmt {
 public:
-    LgsExpr* lvalue;
-    LgsExpr* rvalue;
+    LgsExpr* lValue;
+    LgsExpr* rValue;
 
-    Value* createIRValue(CodeGenMetadata* metadata) override;
-    void createIRFromSelection(CodeGenMetadata* metadata, const LgsSelection* selection) const;
+    void createIRStmt(LgsRuntime* runtime) override;
+    void assignIRIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* value) const;
+    void assignIRSelection(LgsRuntime* runtime, const LgsSelection* selection, LgsExpr* expr) const;
     ~LgsAssignment() override;
 };
 

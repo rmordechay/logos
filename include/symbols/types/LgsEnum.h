@@ -11,12 +11,12 @@ public:
 
     LgsEnum() = default;
     explicit LgsEnum(const string& name) : name(name) {}
-    size_t size() override;
     Type* getIRType() override;
+    string getIRName() override;
     json asJSON() const override;
-    const string getName() const override;
+    string prettyName() const override;
     LgsExpr* getZeroValue() override;
-    bool equals(LgsType* other) const override;
+    bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     ~LgsEnum() override = default;
 };

@@ -1,7 +1,9 @@
 #ifndef LOGOSOBJECT_H
 #define LOGOSOBJECT_H
-#include "LgsStr.h"
+#include "LgsAny.h"
+#include "data/LgsDefinitions.h"
 #include "LgsType.h"
+#include "exprs/unary/LgsHashMap.h"
 #include "stmts/LgsField.h"
 
 class LgsField;
@@ -9,19 +11,24 @@ class LgsField;
 class LgsObject : public LgsType {
 public:
     string name;
-    Type* IRType = nullptr;
+    string path;
     bool isSingleton = false;
     vector<LgsType*> implements;
+    LgsHashMap vtable = LgsHashMap(new LgsStr(), &LGS_ANY);
 
-    explicit LgsObject(const string& typeName) : name(typeName) {}
-    const string getName() const override;
-    size_t size() override;
+    explicit LgsObject() : name(LOGOS_PARENT_OBJ), path("") {}
+    explicit LgsObject(const string& name) : name(name), path("") {}
+    explicit LgsObject(const string& name, const string& path) : name(name), path(path) {}
+    void setVirtualFuncs(vector<Type*>& elementTypes) const;
+    string prettyName() const override;
     Type* getIRType() override;
+    string getIRName() override;
     json asJSON() const override;
+    LgsInterface* getInterface(const string& interfaceName) const;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
-    bool equals(LgsType* other) const override;
-    LgsObject* clone();
+    bool equals(LgsType* other) override;
+    LgsObject* clone() override;
     ~LgsObject() override = default;
 };
 

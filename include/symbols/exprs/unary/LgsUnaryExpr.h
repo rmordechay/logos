@@ -1,52 +1,47 @@
 #ifndef LOGOSUNARYEXPR_H
 #define LOGOSUNARYEXPR_H
+#include "codegen/CodegenMetadata.h"
 #include "exprs/LgsExpr.h"
 #include <string>
-#include <types/LgsType.h>
 
 class LgsUnaryExpr : public LgsExpr {
 public:
     explicit LgsUnaryExpr() : LgsExpr(nullptr) {}
     explicit LgsUnaryExpr(LgsType* type) : LgsExpr(type) {}
-    virtual string getName();
-    Value* addIR(CodeGenMetadata* metadata, LgsExpr* other) override;
-    Value* subIR(CodeGenMetadata* metadata, LgsExpr* other) override;
-    Value* mulIR(CodeGenMetadata* metadata, LgsExpr* other) override;
-    Value* divIR(CodeGenMetadata* metadata, LgsExpr* other) override;
-    virtual LgsExpr* add(LgsExpr* other);
+    Value* addIR(LgsRuntime* runtime, LgsExpr* other) override;
+    Value* subIR(LgsRuntime* runtime, LgsExpr* other) override;
+    Value* mulIR(LgsRuntime* runtime, LgsExpr* other) override;
+    Value* divIR(LgsRuntime* runtime, LgsExpr* other) override;
+    virtual std::string getName();
     ~LgsUnaryExpr() override = default;
 };
 
-inline string LgsUnaryExpr::getName() {
-    return "";
+inline std::string LgsUnaryExpr::getName() {
+    assert(false);
 }
 
-inline Value* LgsUnaryExpr::addIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto l = this->getIRValue(metadata);
-    const auto r = other->getIRValue(metadata);
-    return metadata->builder.CreateAdd(l, r);
+inline Value* LgsUnaryExpr::addIR(LgsRuntime* runtime, LgsExpr* other) {
+    const auto l = this->getIRValue(runtime);
+    const auto r = other->getIRValue(runtime);
+    return builder.CreateAdd(l, r);
 }
 
-inline Value* LgsUnaryExpr::subIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto l = this->getIRValue(metadata);
-    const auto r = other->getIRValue(metadata);
-    return metadata->builder.CreateSub(l, r);
+inline Value* LgsUnaryExpr::subIR(LgsRuntime* runtime, LgsExpr* other) {
+    const auto l = this->getIRValue(runtime);
+    const auto r = other->getIRValue(runtime);
+    return builder.CreateSub(l, r);
 }
 
-inline Value* LgsUnaryExpr::mulIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto l = this->getIRValue(metadata);
-    const auto r = other->getIRValue(metadata);
-    return metadata->builder.CreateMul(l, r);
+inline Value* LgsUnaryExpr::mulIR(LgsRuntime* runtime, LgsExpr* other) {
+    const auto l = this->getIRValue(runtime);
+    const auto r = other->getIRValue(runtime);
+    return builder.CreateMul(l, r);
 }
 
-inline Value* LgsUnaryExpr::divIR(CodeGenMetadata* metadata, LgsExpr* other) {
-    const auto l = this->getIRValue(metadata);
-    const auto r = other->getIRValue(metadata);
-    return metadata->builder.CreateSDiv(l, r);
-}
-
-inline LgsExpr* LgsUnaryExpr::add(LgsExpr* other) {
-    return nullptr;
+inline Value* LgsUnaryExpr::divIR(LgsRuntime* runtime, LgsExpr* other) {
+    const auto l = this->getIRValue(runtime);
+    const auto r = other->getIRValue(runtime);
+    return builder.CreateSDiv(l, r);
 }
 
 #endif //LOGOSUNARYEXPR_H

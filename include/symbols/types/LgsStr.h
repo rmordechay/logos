@@ -1,40 +1,31 @@
 #ifndef LOGOSSTRING_H
 #define LOGOSSTRING_H
-#include "LgsType.h"
-#include "stmts/LgsField.h"
+#include "builtin/LgsStrMethods.h"
 #include <string>
+#include "exprs/unary/constants/LgsCharConst.h"
+#include "types/LgsIterable.h"
 
-class LgsStr final : public LgsType {
+class LgsStr final : public LgsIterable {
 public:
-
     static constexpr auto name = "Str";
+    LgsStrFormatFunc format{this};
+    LgsStrLenFunc len{this};
 
-    const string getName() const override;
-    size_t size() override;
+    LgsStr() : LgsIterable(&LGS_CHAR) {
+        addMethod(&format);
+        unpackLength = 1;
+    }
+    size_t getSizeBytes() override;
+    string getIRName() override;
     Type* getIRType() override;
+    string prettyName() const override;
     LgsExpr* getZeroValue() override;
+    bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
-    bool equals(LgsType* other) const override;
-    static void cleanStr(string& value);
+    Value* getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) override;
+    string getStrFormatPart() const override;
     static uint32_t hashString(const string& str);
     ~LgsStr() override = default;
 };
-
-inline void LgsStr::cleanStr(string& value) {
-    value.erase(0, 1);
-    value.pop_back();
-}
-
-/**
- * FNV-1a 32-bit hash
- */
-inline uint32_t LgsStr::hashString(const string& str) {
-    uint32_t hash = 2166136261u;
-    for (const auto c : str) {
-        hash ^= static_cast<uint8_t>(c);
-        hash *= 16777619u;
-    }
-    return hash;
-}
 
 #endif // LOGOSSTRING_H

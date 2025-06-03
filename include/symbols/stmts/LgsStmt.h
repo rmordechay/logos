@@ -2,12 +2,15 @@
 #define LOGOSSTMT_H
 #include <LgsValue.h>
 
+class LgsRuntime;
+class LgsForLoop;
+class LgsVarDec;
 class LgsSelection;
 class LgsFuncCall;
 class LgsReturn;
 class LgsPatternMatch;
 class LgsIfStmt;
-class LgsContinue;
+class LgsContinueStmt;
 class LgsBreakStmt;
 class LgsAssignment;
 
@@ -16,14 +19,14 @@ public:
     LgsVarDec* asVarDec();
     LgsIfStmt* asIfStmt();
     LgsAssignment* asAssignment();
-    LgsLoop* asLoop();
+    LgsForLoop* asLoop();
     LgsPatternMatch* asPatternMatch();
     LgsReturn* asReturn();
-    LgsContinue* asContinue();
+    LgsContinueStmt* asContinue();
     LgsBreakStmt* asBreakStmt();
     LgsFuncCall* asFuncCall();
     LgsSelection* asSelection();
-    virtual Value* createIRValue(CodeGenMetadata* metadata) = 0;
+    virtual void createIRStmt(LgsRuntime* runtime) = 0;
     ~LgsStmt() override = default;
 };
 

@@ -1,35 +1,37 @@
-#ifndef LOGOSSTACK_H
-#define LOGOSSTACK_H
-#include "LgsActiveEnv.h"
-#include "symbols/LgsSymbol.h"
-#include <stack>
-#include <map>
-#include <mutex>
-#include <llvm/IR/Module.h>
+#ifndef LGSSTACK_H
+#define LGSSTACK_H
+#include "LgsSymbol.h"
 
-using namespace std;
-using namespace llvm;
-class LgsLoop;
-class LgsFuncSignature;
+class LgsStmt;
+class LgsIfStmt;
+class LgsExpr;
+class LgsForLoop;
+class LgsFunc;
 
-struct LgsStackFrame {
-    map<string, LgsSymbol> symbols;
+enum ScopeType {
+    LOOP,
+    IF_STMT,
 };
 
-class LgsStack : stack<LgsStackFrame> {
-public:
-    std::mutex mtx;
-    LgsFunc* currentFunc = nullptr;
-    LgsLoop* currentLoop = nullptr;
+struct LgsStackFrame {
+    std::map<std::string, LgsSymbol> symbols;
+    LgsFunc* func = nullptr;
+    std::vector<LgsExpr*> allocatedExprs;
+};
 
-    void enterScope(LgsFunc* func = nullptr);
-    void exitScope();
-    LgsSymbol* getSymbol(const string& name);
-    void addLocalSymbol(const string& name, const LgsSymbol& symbol);
-    string getStackString() const;
-    void freeSymbols(CodeGenMetadata* metadata);
-    void reset();
+class LgsStack final : public std::stack<LgsStackFrame> {
+public:
+    LgsFunc* returnFunc = nullptr;
+    LgsFunc* currentFunc = nullptr;
+    LgsForLoop* currentLoop = nullptr;
+    LgsIfStmt* currentIfStmt = nullptr;
+
+    void enterFunc(LgsFunc* func);
+    void enterScope(LgsStmt* stmt);
+    void exitFunc();
+    void exitScope(ScopeType type);
+    void addSymbol(const std::string& name, const LgsSymbol& symbol);
     ~LgsStack() = default;
 };
 
-#endif //LOGOSSTACK_H
+#endif //LGSSTACK_H

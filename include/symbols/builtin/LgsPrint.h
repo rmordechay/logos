@@ -1,15 +1,47 @@
 #ifndef LOGOSPRINT_H
 #define LOGOSPRINT_H
-#include "types/LgsFloat.h"
-#include <types/LgsVoid.h>
+#include "LgsBuiltinMethod.h"
+#include "funcs/LgsFuncImpl.h"
+#include "types/primitives/LgsBool.h"
+#include "utils/LgsUtils.h"
 
-class LgsPrint final : public LgsFunc {
+#include <types/primitives/LgsVoid.h>
+#include <types/LgsAny.h>
+
+inline FunctionCallee getPrintf(LgsRuntime* runtime) {
+    const auto printfType = FunctionType::get(i32Ty, {ptrTy}, true);
+    return runtime->module->getOrInsertFunction("printf", printfType);
+}
+
+class LgsPrint final : public LgsBuiltinFunc {
 public:
     static constexpr auto name = "print";
-    explicit LgsPrint(const vector<LgsParam>& params) : LgsFunc(name, new LgsVoid(), params) {}
+    LgsParam input{&LGS_ANY};
+    LgsParam args{&LGS_ANY};
 
-    vector<Type*> getIRParamTypes(const CodeGenMetadata* metadata) override;
+    explicit LgsPrint(): LgsBuiltinFunc(name, &LGS_VOID) {
+        funcType.isVariadic = true;
+        funcType.IRName = "printf";
+        funcType.params = {&input, &args};
+    }
+
+    Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
+        vector<Value*> IRArgs;
+        stringstream str;
+        for (int i = 0; i < args.size(); ++i) {
+            const auto arg = args[i];
+            addIRArg(runtime, IRArgs, arg);
+            str << arg->type->getStrFormatPart() << std::endl;
+        }
+        IRArgs.insert(IRArgs.begin(), getIRStr(runtime, str.str()));
+        const auto printfFunc = getPrintf(runtime);
+        builder.CreateCall(printfFunc, IRArgs);
+        return nullptr;
+    }
+
     ~LgsPrint() override = default;
 };
+
+inline LgsPrint lgsPrint;
 
 #endif //LOGOSPRINT_H
