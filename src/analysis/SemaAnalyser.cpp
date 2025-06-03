@@ -173,7 +173,7 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
 }
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
-    stack.enterScope();
+    stack.enterScope(ifStmt);
     visitExpr(ifStmt->ifCond);
     visitStmtBlock(ifStmt->ifStmtBlock);
     ifStmt->hasReturn = ifStmt->ifStmtBlock->hasReturn;
@@ -185,7 +185,7 @@ void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
         visitStmtBlock(ifStmt->elseStmtBlock);
         ifStmt->hasReturn = ifStmt->elseStmtBlock->hasReturn;
     }
-    stack.exitScope();
+    stack.exitScope(IF_STMT);
 }
 
 void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
@@ -211,13 +211,13 @@ void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
 void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const {}
 
 void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
-    stack.enterScope();
+    stack.enterScope(loopStmt);
     if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {
         visitRangeLoop(rangeLoop);
     } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loopStmt)) {
         visitForeachLoop(foreachLoop);
     }
-    stack.exitScope();
+    stack.exitScope(LOOP);
 }
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {

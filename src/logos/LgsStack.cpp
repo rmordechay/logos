@@ -3,25 +3,33 @@
 #include "funcs/LgsFunc.h"
 
 void LgsStack::enterFunc(LgsFunc* func) {
-    push(LgsStackFrame{.func = func});
+    push(LgsStackFrame{});
     currentFunc = func;
 }
 
-void LgsStack::enterScope() {
-    push(LgsStackFrame{
-        .symbols = top().symbols,
-        .func = top().func,
-        .loop = top().loop
-    });
+void LgsStack::enterScope(LgsStmt* stmt) {
+    push(LgsStackFrame{.symbols = top().symbols});
+    if (const auto loop = stmt->asLoop()) {
+        currentLoop = loop;
+    } else if (const auto ifStmt = stmt->asIfStmt()) {
+        currentIfStmt = ifStmt;
+    }
 }
 
 void LgsStack::exitFunc() {
     pop();
     returnFunc = nullptr;
     currentFunc = nullptr;
+    currentLoop = nullptr;
+    currentIfStmt = nullptr;
 }
 
-void LgsStack::exitScope() {
+void LgsStack::exitScope(const ScopeType type) {
+    if (type == IF_STMT) {
+        currentIfStmt = nullptr;
+    } else if (type == LOOP) {
+        currentLoop = nullptr;
+    }
     pop();
 }
 

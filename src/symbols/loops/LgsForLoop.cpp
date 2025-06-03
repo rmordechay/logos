@@ -5,6 +5,7 @@
 #include "stmts/LgsVarDec.h"
 
 void LgsForLoop::createIRStmt(Module* module) {
+    runtime.stack.enterScope(this);
     initIRLoop(module);
     startBlock(module, loopCondBlock);
     setLoopIRCondition(module);
@@ -12,10 +13,10 @@ void LgsForLoop::createIRStmt(Module* module) {
     setIRLoopVars(module);
     stmtBlock->createIRValue(module);
     exitIRLoop(module);
+    runtime.stack.exitScope(IF_STMT);
 }
 
 void LgsForLoop::initIRLoop(Module* module) {
-    runtime.stack.enterScope();
     loopCondBlock = createBasicBlock(LOGOS_LOOP_CONDITION);
     loopBodyBlock = createBasicBlock(LOGOS_LOOP_BODY);
     loopExitBlock = createBasicBlock(LOGOS_LOOP_EXIT);
@@ -26,7 +27,6 @@ void LgsForLoop::initIRLoop(Module* module) {
 }
 
 void LgsForLoop::setLoopIRCondition(Module* module) {
-
     const auto iValue = builder.CreateLoad(i32Ty, iPtr);
     const auto upperBound = loopEnd(module);
     const auto condition = builder.CreateICmpSLT(iValue, upperBound);
@@ -41,7 +41,6 @@ void LgsForLoop::exitIRLoop(Module* module) const {
     builder.CreateBr(loopCondBlock);
     // Loop exit
     startBlock(module, loopExitBlock);
-    runtime.stack.exitScope();
 }
 
 LgsForLoop::~LgsForLoop() {

@@ -1,21 +1,18 @@
 #include "stmts/LgsIfStmt.h"
-
 #include "codegen/CodegenMetadata.h"
 
-
 void LgsIfStmt::createIRStmt(Module* module) {
-    runtime.stack.enterScope();
+    runtime.stack.enterScope(this);
     if (elseBlock || elseIfConds.size() > 0) {
         computeComplexIf(module);
     } else {
         computeSimpleIf(module);
     }
-    runtime.stack.exitScope();
+    runtime.stack.exitScope(IF_STMT);
 }
 
 
 void LgsIfStmt::computeSimpleIf(Module* module) {
-
     ifTrueBlock = createBasicBlock(BB_IF_TRUE);
     ifEndBlock = createBasicBlock(BB_IF_END);
     elseBlock = createBasicBlock(BB_ELSE);
@@ -40,7 +37,6 @@ void LgsIfStmt::computeSimpleIf(Module* module) {
 }
 
 void LgsIfStmt::computeComplexIf(Module* module) {
-
     ifTrueBlock = createBasicBlock(BB_IF_TRUE);
     elseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK);
     ifEndBlock = createBasicBlock(BB_IF_END);
@@ -66,7 +62,6 @@ void LgsIfStmt::computeComplexIf(Module* module) {
 }
 
 void LgsIfStmt::createElseIfBlocks(Module* module) {
-
     for (size_t i = 0; i < elseIfConds.size(); ++i) {
         startBlock(module, elseIfCheckBlock);
         const auto elseIfCondIR = elseIfConds[i]->getIRValue(module);
