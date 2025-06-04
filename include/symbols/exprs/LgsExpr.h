@@ -28,8 +28,10 @@ public:
     bool isNull = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
-    Value* getIRValue(LgsRuntime* runtime);
     void setType(LgsType* type);
+    Value* getIRValue(LgsRuntime* runtime);
+    static int getExprConstNumber(LgsExpr* expr);
+    static std::string getExprStr(LgsExpr* baseExpr);
 
     LgsFunc* asFunc();
     LgsVariable* asVariable();
@@ -72,7 +74,7 @@ public:
     virtual Value* bitXorIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* rshiftIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* lshiftIR(LgsRuntime* runtime, LgsExpr* other);
-    virtual ~LgsExpr() override = default;
+    ~LgsExpr() override;
 };
 
 #endif //LOGOSEXPR_H

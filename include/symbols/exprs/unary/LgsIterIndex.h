@@ -24,6 +24,7 @@ public:
     Value* getLength(LgsRuntime* runtime) override;
     std::string getName() override;
     std::string prettyName() override;
+    static void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices);
     ~LgsIterIndex() override;
 };
 

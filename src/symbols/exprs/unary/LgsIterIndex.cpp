@@ -135,6 +135,16 @@ Value* LgsIterIndex::getGEP(LgsRuntime* runtime) const {
     return runtime->builder.CreateGEP(ty, ptr, IRIndices);
 }
 
+void LgsIterIndex::setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices) {
+    while (iterIndex) {
+        if (iterIndex->index) {
+            indices.push_back(iterIndex->index);
+        }
+        iterIndex = iterIndex->baseExpr->asIterIndex();
+    }
+    reverse(indices.begin(), indices.end());
+}
+
 Value* LgsIterIndex::getLength(LgsRuntime* runtime) {
     assert(false);
 }

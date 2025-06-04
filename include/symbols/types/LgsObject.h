@@ -22,6 +22,7 @@ public:
     string prettyName() const override;
     Type* getIRType() override;
     string getIRName() override;
+    size_t getSizeBytes() override;
     json asJSON() const override;
     LgsInterface* getInterface(const string& interfaceName) const;
     LgsExpr* getZeroValue() override;

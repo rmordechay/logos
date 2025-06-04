@@ -80,3 +80,11 @@ LgsObject* LgsObject::clone() {
 string LgsObject::getIRName() {
     return name;
 }
+
+size_t LgsObject::getSizeBytes() {
+    size_t sum = 0;
+    for (const auto& [name, field] : fields) {
+        sum += field->type->getSizeBytes();
+    }
+    return sum;
+}

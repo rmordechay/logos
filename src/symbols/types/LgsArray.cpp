@@ -9,7 +9,7 @@
 
 size_t LgsArray::getSizeBytes() {
     if (isStatic) {
-        return baseType->getSizeBytes() * getExprConstNumber(sizeExpr);
+        return baseType->getSizeBytes() * LgsExpr::getExprConstNumber(sizeExpr);
     }
     return sizeof(void*);
 }

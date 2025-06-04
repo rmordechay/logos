@@ -9,10 +9,7 @@ struct LgsIndex;
 inline std::mutex mtx;
 
 std::string getFileText(std::filesystem::path filePath);
-std::string getExprStr(LgsExpr* baseExpr);
-int getExprConstNumber(LgsExpr* expr);
 std::string getFormatString(const std::vector<LgsExpr*>& args);
-void setIterIndices(const LgsIterIndex* iterIndex, std::vector<LgsIndex*>& indices);
 Value* getIRStr(const LgsRuntime* runtime, const std::string& value);
 StructType* getIRStructType(LLVMContext& context, const std::string& name, const std::vector<Type*>& fields);
 Module* createIRModule(const std::string& moduleName, LLVMContext& context);

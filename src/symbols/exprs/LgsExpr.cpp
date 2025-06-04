@@ -13,6 +13,7 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
+#include "stmts/LgsVarDec.h"
 
 Value* LgsExpr::getIRValue(LgsRuntime* runtime) {
     if (IRValue) return IRValue;
@@ -23,6 +24,41 @@ Value* LgsExpr::getIRValue(LgsRuntime* runtime) {
 
 void LgsExpr::setType(LgsType* type) {
     this->type = type;
+}
+
+
+int LgsExpr::getExprConstNumber(LgsExpr* expr) {
+    if (const auto asInt = expr->asIntConst()) {
+        return asInt->value;
+    }
+    if (const auto var = expr->asVariable()) {
+        switch (var->ref->type) {
+        case VAR_DEC:
+            return getExprConstNumber(var->ref->varDec->expr);
+        case FIELD:
+            return getExprConstNumber(var->ref->field->expr);
+        default:
+            break;
+        }
+    }
+    return -1;
+}
+
+string LgsExpr::getExprStr(LgsExpr* baseExpr) {
+    if (const auto strConst = baseExpr->asStrConst()) {
+        return strConst->value;
+    }
+    if (const auto var = baseExpr->asVariable()) {
+        const auto ref = var->ref;
+        switch (ref->type) {
+        case VAR_DEC: {
+            return getExprStr(ref->varDec->expr);
+        }
+        default:
+            break;
+        }
+    }
+    assert(false);
 }
 
 void LgsExpr::free(LgsRuntime* runtime) { assert(false); }
@@ -49,6 +85,9 @@ Value* LgsExpr::bitOrIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
 Value* LgsExpr::bitXorIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
 Value* LgsExpr::rshiftIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
 Value* LgsExpr::lshiftIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
+
+LgsExpr::~LgsExpr() {
+}
 
 // Casting
 LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }
