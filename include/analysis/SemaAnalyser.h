@@ -1,6 +1,7 @@
 #ifndef SEMAANALYSER_H
 #define SEMAANALYSER_H
 #include "files/LgsFile.h"
+#include "logos/LgsASTVisitor.h"
 #include "logos/LgsErrHandler.h"
 #include "logos/LgsRuntime.h"
 
@@ -36,7 +37,7 @@ class LgsForLoop;
 struct LgsSymbol;
 struct LgsIndex;
 
-class SemaAnalyser final {
+class SemaAnalyser final : public LgsAstVisitor {
 public:
     LgsStack stack;
     LgsFile* file = nullptr;
@@ -46,50 +47,51 @@ public:
         errHandler.filePath = file->absPath;
     }
     static void analyseFiles(LogosProject& project);
-    void analyse();
-    void visitMainFile(LgsMainFile* mainFile);
-    void visitObject(LgsObject* obj);
-    void visitInterface(LgsInterface* interface) const;
-    void visitField(const LgsField* field);
-    void visitFunc(LgsFunc* func);
-    void visitFuncType(const LgsFuncType* funcType);
-    void visitParam(LgsParam* param);
-    void validateFuncControlFlow(const LgsFunc* func);
-    void visitStmt(LgsStmt* stmt);
-    void visitStmtBlock(LgsStmtBlock* stmtBlock);
-    void visitAssignment(const LgsAssignment* assignment);
-    void visitVarDec(LgsVarDec* varDec);
-    void visitIfStmt(LgsIfStmt* ifStmt);
-    void visitPatternMatch(const LgsPatternMatch* patternMatching);
-    void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const;
-    void visitLoopStmt(LgsForLoop* loopStmt);
-    void visitRangeLoop(const LgsRangeLoop* rangeLoop);
-    void visitForeachLoop(const LgsForeachLoop* foreachLoop);
-    void visitReturnStmt(const LgsReturn* returnStmt);
-    void visitBreakStmt(const LgsBreakStmt* breakStmt);
-    void visitContinueStmt(const LgsContinueStmt* continueStmt);
-    void visitEnum(const LgsEnum* lgsEnum) const;
-    void visitExpr(LgsExpr* expr);
-    void visitCast(LgsCast* castExpr);
-    void visitArrayExpr(LgsArrayExpr* array);
-    void visitHashMap(LgsHashMap* hashMap) const;
-    void visitStrConst(LgsStrConst* strConst) const;
-    void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
-    void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
-    void visitVariable(LgsVariable* variable);
-    void visitFuncCall(LgsFuncCall* funcCall);
-    void visitAnonymousFunc(LgsFuncCall* funcCall, const LgsFuncType* funcType);
-    void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType);
-    void visitSelection(LgsSelection* selection);
-    void visitInnerSelections(const LgsSelection* selection);
-    void visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* childField);
-    void visitFirstSelection(LgsExpr* firstExpr);
-    void visitInstance(LgsInstance* instance);
-    void visitIterIndex(LgsIterIndex* iterIndex);
+
+    void start() override;
+    void visitMainFile(LgsMainFile* mainFile) override;
+    void visitObject(LgsObject* obj) override;
+    void visitInterface(LgsInterface* interface) const override;
+    void visitField(const LgsField* field) override;
+    void visitFunc(LgsFunc* func) override;
+    void visitFuncType(const LgsFuncType* funcType) override;
+    void visitParam(LgsParam* param) override;
+    void visitStmt(LgsStmt* stmt) override;
+    void visitStmtBlock(LgsStmtBlock* stmtBlock) override;
+    void visitAssignment(const LgsAssignment* assignment) override;
+    void visitVarDec(LgsVarDec* varDec) override;
+    void visitIfStmt(LgsIfStmt* ifStmt) override;
+    void visitPatternMatch(const LgsPatternMatch* patternMatching) override;
+    void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const override;
+    void visitLoopStmt(LgsForLoop* loopStmt) override;
+    void visitRangeLoop(const LgsRangeLoop* rangeLoop) override;
+    void visitForeachLoop(const LgsForeachLoop* foreachLoop) override;
+    void visitReturnStmt(const LgsReturn* returnStmt) override;
+    void visitBreakStmt(const LgsBreakStmt* breakStmt) override;
+    void visitContinueStmt(const LgsContinueStmt* continueStmt) override;
+    void visitEnum(const LgsEnum* lgsEnum) const override;
+    void visitExpr(LgsExpr* expr) override;
+    void visitCast(LgsCast* castExpr) override;
+    void visitArrayExpr(LgsArrayExpr* array) override;
+    void visitHashMap(LgsHashMap* hashMap) const override;
+    void visitStrConst(LgsStrConst* strConst) const override;
+    void visitUnaryExpr(LgsUnaryExpr* unaryExpr) override;
+    void visitBinaryExpr(LgsBinaryExpr* binaryExpr) override;
+    void visitVariable(LgsVariable* variable) override;
+    void visitFuncCall(LgsFuncCall* funcCall) override;
+    void visitAnonymousFunc(LgsFuncCall* funcCall, const LgsFuncType* funcType) override;
+    void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) override;
+    void visitSelection(LgsSelection* selection) override;
+    void visitInnerSelections(const LgsSelection* selection) override;
+    void visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* childField) override;
+    void visitFirstSelection(LgsExpr* firstExpr) override;
+    void visitInstance(LgsInstance* instance) override;
+    void visitIterIndex(LgsIterIndex* iterIndex) override;
 
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     void validateExprType(const LgsExpr* expr, LgsType* type);
+    void validateFuncControlFlow(const LgsFunc* func);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 
     LgsSymbol* getSymbol(const string& name, const LgsValue* value = nullptr);
@@ -100,7 +102,7 @@ public:
     void resolveObjMemberTypes(LgsObject* const& obj);
     void resolveObjectImplements(LgsObject* obj);
     string getFuncsAsStr(const vector<LgsFunc*>& funcs) const;
-    ~SemaAnalyser() = default;
+    ~SemaAnalyser() override = default;
 };
 
 #endif //SEMAANALYSER_H

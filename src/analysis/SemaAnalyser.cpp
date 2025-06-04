@@ -42,7 +42,7 @@ void SemaAnalyser::analyseFiles(LogosProject& project) {
     for (const auto file : project.files) {
         threadPool.runTask([file, &project] {
             SemaAnalyser semaAnalyser(file);
-            semaAnalyser.analyse();
+            semaAnalyser.start();
             lock_guard lock(mtx);
             project.errors.insert(project.errors.end(), semaAnalyser.errHandler.errors.begin(), semaAnalyser.errHandler.errors.end());
         });
@@ -50,7 +50,7 @@ void SemaAnalyser::analyseFiles(LogosProject& project) {
     threadPool.wait();
 }
 
-void SemaAnalyser::analyse() {
+void SemaAnalyser::start() {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
