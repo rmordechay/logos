@@ -1,17 +1,26 @@
 #include "codegen/CodeGenerator.h"
 #include "files/LgsInterfaceFile.h"
+#include "logos/LgsConfig.h"
 #include "logos/Logos.h"
 #include "logos/Platform.h"
+#include "utils/ThreadPool.h"
+
 #include <llvm/Support/TargetSelect.h>
 
 void CodeGenerator::generate(LogosProject& project) {
     init();
+    ThreadPool threadPool;
+    threadPool.start();
+    // TODO there are still race conditions with LLVM
     for (const auto file : project.files) {
-        const auto runtime = file->generateIR(project);
-        if (!runtime) continue;
-        // lock_guard lock(mtx);
-        project.runtimes[file->name] = runtime;
+        threadPool.runTask([file, &project] {
+            const auto module = file->generateIR(project);
+            if (!module) return;
+            lock_guard lock(mtx);
+            project.IRModules[file->name] = module;
+        });
     }
+    threadPool.wait();
     writeIRToFile(project);
 }
 
@@ -26,4 +35,19 @@ void CodeGenerator::init() {
     InitializeAllTargetMCs();
     InitializeAllTargets();
     InitializeAllTargetInfos();
+}
+
+void CodeGenerator::writeIRToFile(LogosProject& project) {
+    for (const auto [_, module] : project.IRModules) {
+        if constexpr (WRITE_IR_TO_FILE) {
+            const auto filePath = (paths.buildDir / module->getName().str()).string() + ".ll";
+            std::error_code EC;
+            raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
+            module->print(textFile, nullptr);
+        }
+        if constexpr (DEBUG) {
+            module->print(outs(), nullptr);
+            std::cout << "\n-----\n\n";
+        }
+    }
 }

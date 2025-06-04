@@ -13,10 +13,8 @@ std::string getExprStr(LgsExpr* baseExpr);
 int getExprConstNumber(LgsExpr* expr);
 std::string getFormatString(const std::vector<LgsExpr*>& args);
 void setIterIndices(const LgsIterIndex* iterIndex, std::vector<LgsIndex*>& indices);
+Value* getIRStr(const LgsRuntime* runtime, const std::string& value);
 StructType* getIRStructType(LLVMContext& context, const std::string& name, const std::vector<Type*>& fields);
-Value* getIRStr(LgsRuntime* runtime, const std::string& value);
-Module* createEmptyModule(const std::string& moduleName, LLVMContext& context);
-void writeIRToFile(LogosProject& project);
-bool shouldLoadIRArg(Value* value);
+Module* createIRModule(const std::string& moduleName, LLVMContext& context);
 
 #endif //LGSUTILS_H

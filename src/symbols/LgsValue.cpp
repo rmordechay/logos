@@ -10,14 +10,9 @@ void LgsValue::startBlock(LgsRuntime* runtime, BasicBlock* const block, Function
 }
 
 void LgsValue::startBlockFunc(LgsRuntime* runtime) const {
-    const auto entryBlock = BasicBlock::Create(runtime->context, "entry");
     const auto IRFunc = runtime->stack.currentFunc->getIRFunc(runtime);
-    entryBlock->insertInto(IRFunc);
+    const auto entryBlock = BasicBlock::Create(runtime->module->getContext(), "entry", IRFunc);
     runtime->builder.SetInsertPoint(entryBlock);
-}
-
-string LgsValue::format(string& indentStr) {
-    assert(false);
 }
 
 BasicBlock* LgsValue::createBasicBlock(const char* name, LLVMContext& context) const {
@@ -30,10 +25,6 @@ Value* LgsValue::hashIRValue(LgsRuntime* runtime, Value* value) const {
     return runtime->builder.CreateCall(func, {value});
 }
 
-json LgsValue::asJSON() {
-    assert(false);
-}
-
 void LgsValue::setLocation(const antlr4::Token* ctx) {
     location.lineNumber = ctx->getLine();
     location.posInLine = ctx->getCharPositionInLine() + 1;
@@ -41,4 +32,12 @@ void LgsValue::setLocation(const antlr4::Token* ctx) {
 
 void LgsValue::setIRValue(Value* value) {
     IRValue = value;
+}
+
+string LgsValue::format(string& indentStr) {
+    assert(false);
+}
+
+json LgsValue::asJSON() {
+    assert(false);
 }

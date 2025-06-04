@@ -12,7 +12,7 @@ public:
 };
 
 inline Value* LgsNull::createIRValue(LgsRuntime* runtime) {
-    return ConstantPointerNull::get(PointerType::get(runtime->context, 0));
+    return ConstantPointerNull::get(PointerType::get(context, 0));
 }
 
 inline Value* LgsNull::addIR(LgsRuntime* runtime, LgsExpr* other) {

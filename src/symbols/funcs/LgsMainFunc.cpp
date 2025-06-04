@@ -22,12 +22,12 @@ Function* LgsMainFunc::getIRFunc(LgsRuntime* runtime) {
     } else {
         mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getInt32Ty(), runtime->builder.getPtrTy()}, false);
     }
-    const auto mainFuncIR = Function::Create(mainFuncType, Function::ExternalLinkage, LOGOS_MAIN_FUNC, runtime->module);
-    IRFunc = mainFuncIR;
+    auto func = runtime->module->getOrInsertFunction(LOGOS_MAIN_FUNC, mainFuncType);
+    IRFunc = dyn_cast<Function>(func.getCallee());
     if (hasParams) {
-        auto args = mainFuncIR->arg_begin();
+        auto args = IRFunc->arg_begin();
         args++->setName("argc");
         args->setName("argv");
     }
-    return mainFuncIR;
+    return IRFunc;
 }

@@ -16,7 +16,7 @@ Value* LgsArrayExpr::createDynArray(LgsRuntime* runtime) {
     const auto capacityIR = builder.getInt32(capacity);
     const auto elementSize = builder.getInt64(arrType.baseType->getSizeBytes());
     const vector<Type*> structFields{builder.getInt64Ty(), builder.getInt32Ty(), builder.getInt32Ty(), builder.getPtrTy()};
-    const auto arrStruct = getIRStructType(runtime->context, arrType.name, structFields);
+    const auto arrStruct = getIRStructType(context, arrType.name, structFields);
     IRValue = builder.CreateAlloca(arrStruct);
     runtime->addAllocatedExpr(this);
     arrType.init.callIR(runtime, {IRValue, capacityIR, elementSize});

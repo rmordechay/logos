@@ -1,8 +1,6 @@
 #include "types/LgsObject.h"
-
 #include "codegen/CodeGenerator.h"
 #include "exprs/LgsNull.h"
-#include "funcs/LgsMethodImpl.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 
@@ -23,9 +21,9 @@ Type* LgsObject::getIRType(LgsRuntime* runtime) {
         field->position = structPosition++;
     }
 
-    IRType = StructType::getTypeByName(runtime->context, name);
+    IRType = StructType::getTypeByName(context, name);
     if (!IRType) {
-        IRType = StructType::create(runtime->context, elementTypes, name);
+        IRType = StructType::create(context, elementTypes, name);
     }
     return IRType;
 }
@@ -33,7 +31,7 @@ Type* LgsObject::getIRType(LgsRuntime* runtime) {
 LgsExpr* LgsObject::getZeroValue() {
     if (isNullable) return new LgsNull();
     // TODO return empty constructor
-    return nullptr;
+    assert(false);
 }
 
 LgsType* LgsObject::inferBinaryType(LgsType* other) {

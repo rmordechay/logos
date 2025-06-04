@@ -10,7 +10,7 @@ void LgsBreakStmt::createIRStmt(LgsRuntime* runtime) {
     const auto loopExit = currentLoop->loopExitBlock;
     runtime->builder.CreateBr(loopExit);
     const auto IRFunc = currentFunc->getIRFunc(runtime);
-    const auto breakExtBlock = createBasicBlock("break_ext", runtime->context);
+    const auto breakExtBlock = createBasicBlock("break_ext", context);
     breakExtBlock->insertInto(IRFunc);
     runtime->builder.SetInsertPoint(breakExtBlock);
 }

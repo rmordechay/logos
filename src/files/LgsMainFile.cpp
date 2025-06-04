@@ -2,18 +2,18 @@
 
 #include "logos/LgsProject.h"
 
-LgsRuntime* LgsMainFile::generateIR(LogosProject& project) {
-    const auto runtime = new LgsRuntime();
-    runtime->module = createEmptyModule(LOGOS_MAIN_FILE_NAME, runtime->context);
+Module* LgsMainFile::generateIR(LogosProject& project) {
+    LgsRuntime runtime;
+    runtime.module = createIRModule(LOGOS_MAIN_FILE_NAME, context);
     for (const auto [_, func] : funcs) {
-        func->generateIR(runtime);
+        func->generateIR(&runtime);
     }
     for (const auto object : objects) {
         for (const auto& [_, method] : object->methods) {
-            method->generateIR(runtime);
+            method->generateIR(&runtime);
         }
     }
-    return runtime;
+    return runtime.module;
 }
 
 void LgsMainFile::format() {

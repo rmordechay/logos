@@ -36,8 +36,7 @@
 #include <stmts/LgsAssignment.h>
 #include <stmts/LgsIfStmt.h>
 
-void SemaAnalyser::
-analyseFiles(LogosProject& project) {
+void SemaAnalyser::analyseFiles(LogosProject& project) {
     ThreadPool threadPool;
     threadPool.start();
     for (const auto file : project.files) {

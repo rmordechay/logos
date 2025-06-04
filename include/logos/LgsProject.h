@@ -30,7 +30,6 @@ public:
     LgsErrHandler errHandler;
     vector<LgsEnvFile*> envFiles;
     map<string, Module*> IRModules;
-    map<string, LgsRuntime*> runtimes;
     const LgsAppFile* appFile = nullptr;
     LgsC lgsC;
 

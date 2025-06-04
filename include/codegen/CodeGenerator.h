@@ -16,6 +16,7 @@ class CodeGenerator {
 public:
     static void init();
     static void generate(LogosProject& project);
+    static void writeIRToFile(LogosProject& project);
     ~CodeGenerator() = default;
 };
 

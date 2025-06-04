@@ -2,14 +2,13 @@
 
 #include "logos/LgsProject.h"
 
-LgsRuntime* LgsObjectFile::generateIR(LogosProject& project) {
-    const auto runtime = new LgsRuntime();
-    const auto name = obj->name;
-    runtime->module = createEmptyModule(name, runtime->context);
+Module* LgsObjectFile::generateIR(LogosProject& project) {
+    LgsRuntime runtime;
+    runtime.module = createIRModule(name, context);
     for (const auto& [_, method] : obj->methods) {
-        method->generateIR(runtime);
+        method->generateIR(&runtime);
     }
-    return runtime;
+    return runtime.module;
 }
 
 LgsObjectFile::~LgsObjectFile() {

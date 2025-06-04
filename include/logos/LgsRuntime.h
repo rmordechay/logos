@@ -12,10 +12,11 @@ class LgsErrHandler;
 class LgsForLoop;
 class LgsFuncType;
 
+inline LLVMContext context;
+
 class LgsRuntime {
 public:
     LgsStack stack;
-    LLVMContext context;
     Module* module = nullptr;
     IRBuilder<> builder = IRBuilder(context);
     GlobalVariable* runtimeStruct = nullptr;

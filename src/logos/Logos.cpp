@@ -24,7 +24,7 @@ void Logos::run() {
     if (!linker.link(project)) exit(1);
 
     // Running
-    // execv(paths.execFilePath.c_str(), args.data());
+    execv(paths.execFilePath.c_str(), args.data());
 }
 
 void Logos::initPaths(const path& rootDirPath) const {

@@ -30,6 +30,7 @@ public:
     virtual void generateIR(LgsRuntime* runtime);
     virtual Function* getIRFunc(LgsRuntime* runtime);
     virtual FunctionType* getIRFuncType(LgsRuntime* runtime);
+    bool shouldLoadIRArg(Value* value) const;
     virtual Value* callIR(LgsRuntime* runtime, const vector<Value*>& args = {});
     virtual Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args = {});
     ~LgsFunc() override;

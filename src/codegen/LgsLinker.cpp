@@ -20,12 +20,12 @@
 
 bool LgsLinker::link(LogosProject& project) const {
     setPlatform(paths.objFilePath, paths.execFilePath);
-    Module* mainModule = project.runtimes.find(LOGOS_MAIN_FILE_NAME)->second->module;
+    Module* mainModule = project.IRModules.find(LOGOS_MAIN_FILE_NAME)->second;
     assert(mainModule);
     Linker linker(*mainModule);
-    for (const auto& [name, runtime] : project.runtimes) {
+    for (const auto& [name, module] : project.IRModules) {
         if (name == LOGOS_MAIN_FILE_NAME) continue;
-        linker.linkInModule(unique_ptr<Module>(runtime->module));
+        linker.linkInModule(unique_ptr<Module>(module));
     }
     if (!generateObjFile(mainModule, paths.objFilePath.c_str())) return false;
     const auto linkerOpts = platform.linkerOpts;
