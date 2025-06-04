@@ -27,7 +27,7 @@ Value* LgsArrayExpr::createDynArray(LgsRuntime* runtime) {
 }
 
 Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
-    const auto IRType = type->getIRType(runtime);
+    const auto IRType = type->getIRType();
     const auto arrPtr = runtime->builder.CreateAlloca(IRType);
     for (int i = 0; i < initialElements.size(); ++i) {
         const auto initialElement = initialElements[i];

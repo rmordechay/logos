@@ -9,7 +9,7 @@ public:
     LgsType* value;
 
     explicit LgsPair(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : key(keyType), value(valueType) {}
-    Type* getIRType(LgsRuntime* runtime) override;
+    Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;
@@ -17,7 +17,7 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
 };
 
-inline Type* LgsPair::getIRType(LgsRuntime* runtime) {
+inline Type* LgsPair::getIRType() {
     assert(false);
 }
 

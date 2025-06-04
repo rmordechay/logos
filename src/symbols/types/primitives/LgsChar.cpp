@@ -7,8 +7,8 @@ string LgsChar::prettyName() const {
     return name;
 }
 
-Type* LgsChar::getIRType(LgsRuntime* runtime) {
-    return runtime->builder.getInt8Ty();
+Type* LgsChar::getIRType() {
+    return Type::getInt8Ty(context);
 }
 
 string LgsChar::getIRName() {

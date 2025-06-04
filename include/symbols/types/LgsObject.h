@@ -20,7 +20,7 @@ public:
     explicit LgsObject(const string& name) : name(name), path("") {}
     explicit LgsObject(const string& name, const string& path) : name(name), path(path) {}
     string prettyName() const override;
-    Type* getIRType(LgsRuntime* runtime) override;
+    Type* getIRType() override;
     string getIRName() override;
     json asJSON() const override;
     LgsInterface* getInterface(const string& interfaceName) const;

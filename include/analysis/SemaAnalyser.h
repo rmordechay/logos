@@ -47,7 +47,6 @@ public:
         errHandler.filePath = file->absPath;
     }
     static void analyseFiles(LogosProject& project);
-
     void start() override;
     void visitMainFile(LgsMainFile* mainFile) override;
     void visitObject(LgsObject* obj) override;

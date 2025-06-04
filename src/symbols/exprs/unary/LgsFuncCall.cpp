@@ -79,11 +79,11 @@ Value* LgsFuncCall::resolveVirtualFunc(LgsRuntime* runtime) const {
     const auto parentIRValue = parent->getIRValue(runtime);
     const auto func = callback->func;
     const auto keyIR = getIRStr(runtime, func->funcType.getIRName());
-    const auto mapPtr = runtime->builder.CreateLoad(runtime->builder.getPtrTy(), parentIRValue);
+    const auto mapPtr = runtime->builder.CreateLoad(PointerType::getUnqual(context), parentIRValue);
     const auto rv = interface->vtable.mapType.get.callIR(runtime, {mapPtr, keyIR});
-    const auto getValuePtr = runtime->builder.CreateAlloca(runtime->builder.getPtrTy());
+    const auto getValuePtr = runtime->builder.CreateAlloca(PointerType::getUnqual(context));
     runtime->builder.CreateStore(rv, getValuePtr);
-    return runtime->builder.CreateLoad(runtime->builder.getPtrTy(), runtime->builder.CreateLoad(runtime->builder.getPtrTy(), getValuePtr));
+    return runtime->builder.CreateLoad(PointerType::getUnqual(context), runtime->builder.CreateLoad(PointerType::getUnqual(context), getValuePtr));
 }
 
 string LgsFuncCall::getName() {

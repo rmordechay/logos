@@ -26,7 +26,7 @@ public:
 
     void setBaseType(const vector<LgsMapPair*>& exprs);
     size_t getSizeBytes() override;
-    Type* getIRType(LgsRuntime* runtime) override;
+    Type* getIRType() override;
     string getIRName() override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;

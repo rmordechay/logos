@@ -9,7 +9,7 @@
 #include <types/LgsAny.h>
 
 inline FunctionCallee getPrintf(LgsRuntime* runtime) {
-    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getPtrTy()}, true);
+    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context)}, true);
     auto orInsertFunction = runtime->module->getOrInsertFunction("printf", printfType);
     return orInsertFunction;
 }

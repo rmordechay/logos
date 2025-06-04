@@ -8,15 +8,15 @@ string LgsObject::prettyName() const {
     return name;
 }
 
-Type* LgsObject::getIRType(LgsRuntime* runtime) {
+Type* LgsObject::getIRType() {
     if (IRType) return IRType;
     size_t structPosition = 0;
     vector<Type*> elementTypes;
 
     // First field of any object is a ptr to its vtable
-    elementTypes.push_back(runtime->builder.getPtrTy());;
+    elementTypes.push_back(PointerType::getUnqual(context));;
     for (const auto& [_, field] : fields) {
-        auto fieldType = field->type->getIRType(runtime);
+        auto fieldType = field->type->getIRType();
         elementTypes.push_back(fieldType);
         field->position = structPosition++;
     }

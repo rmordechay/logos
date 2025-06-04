@@ -15,7 +15,6 @@ public:
         funcType.isMethod = true;
     }
     FunctionType* getIRFuncType(LgsRuntime* runtime) override;
-    Function* getIRFunc(LgsRuntime* runtime) override;
     ~LgsMethodImpl() override = default;
 };
 

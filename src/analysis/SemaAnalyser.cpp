@@ -96,6 +96,7 @@ void SemaAnalyser::visitFuncType(const LgsFuncType* funcType) {
     for (const auto param : funcType->params) {
         visitParam(param);
     }
+    std::cout << funcType->rt->getSizeBytes() << std::endl;
 }
 
 void SemaAnalyser::visitParam(LgsParam* param) {

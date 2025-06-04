@@ -10,8 +10,8 @@ string LgsInt::prettyName() const {
     return name;
 }
 
-Type* LgsInt::getIRType(LgsRuntime* runtime) {
-    return runtime->builder.getInt32Ty();
+Type* LgsInt::getIRType() {
+    return Type::getInt32Ty(context);
 }
 
 string LgsInt::getIRName() {

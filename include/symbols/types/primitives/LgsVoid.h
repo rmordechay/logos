@@ -13,7 +13,7 @@ public:
         isPrimitive = true;
     }
     string prettyName() const override;
-    Type* getIRType(LgsRuntime* runtime) override;
+    Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;

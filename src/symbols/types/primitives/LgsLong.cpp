@@ -11,8 +11,8 @@ bool LgsLong::equals(LgsType* other) {
     assert(false);
 }
 
-Type* LgsLong::getIRType(LgsRuntime* runtime) {
-    return runtime->builder.getInt64Ty();
+Type* LgsLong::getIRType() {
+    return Type::getInt64Ty(context);
 }
 
 LgsExpr* LgsLong::getZeroValue() {

@@ -11,7 +11,7 @@ public:
 
     LgsEnum() = default;
     explicit LgsEnum(const string& name) : name(name) {}
-    Type* getIRType(LgsRuntime* runtime) override;
+    Type* getIRType() override;
     string getIRName() override;
     json asJSON() const override;
     string prettyName() const override;
