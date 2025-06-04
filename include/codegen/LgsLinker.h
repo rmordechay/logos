@@ -1,6 +1,8 @@
 #ifndef LOGOSLINKER_H
 #define LOGOSLINKER_H
 #include "codegen/CodegenMetadata.h"
+#include "logos/LgsProject.h"
+
 #include <iostream>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Verifier.h>
@@ -12,7 +14,7 @@ using namespace std;
 
 class LgsLinker {
 public:
-    bool link() const;
+    bool link(LogosProject& project) const;
     bool generateObjFile(Module* module, const string& path) const;
     ~LgsLinker() = default;
 };

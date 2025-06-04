@@ -12,7 +12,7 @@ string LgsInstance::getName() {
 }
 
 Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
-    const auto IRType = obj->getIRType();
+    const auto IRType = obj->getIRType(runtime);
     const auto currentFunc = runtime->stack.currentFunc->getIRFunc(runtime);
 
     // TODO cover all cases
@@ -34,16 +34,16 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
 void LgsInstance::setVirtualFuncs(LgsRuntime* runtime) const {
     const auto map = obj->vtable.getIRValue(runtime);
 
-    const auto vtableGEP = runtime->builder.CreateStructGEP(obj->getIRType(), IRValue, 0);
+    const auto vtableGEP = runtime->builder.CreateStructGEP(obj->getIRType(runtime), IRValue, 0);
     runtime->builder.CreateStore(map, vtableGEP);
-    auto mapPtr = runtime->builder.CreateLoad(ptrTy, vtableGEP);
+    auto mapPtr = runtime->builder.CreateLoad(runtime->builder.getPtrTy(), vtableGEP);
 
     for (const auto& [name, method] : obj->methods) {
         const auto interface = method->implements;
         if (!interface) continue;
         const auto keyIRStr = getIRStr(runtime, interface->funcType.getIRName());
         const auto IRFunc = method->getIRFunc(runtime);
-        auto valuePtr = runtime->builder.CreateAlloca(ptrTy);
+        auto valuePtr = runtime->builder.CreateAlloca(runtime->builder.getPtrTy());
         runtime->builder.CreateStore(IRFunc, valuePtr);
         obj->vtable.mapType.add.callIR(runtime, {mapPtr, keyIRStr, valuePtr});
 

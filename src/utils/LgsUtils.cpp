@@ -5,6 +5,7 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "logos/LgsConfig.h"
+#include "logos/LgsProject.h"
 #include "logos/Platform.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
@@ -92,7 +93,7 @@ Value* getIRStr(LgsRuntime* runtime, const string& value) {
         if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
         return &globals;
     }
-    const auto strConstant = ConstantDataArray::getString(context, value, true);
+    const auto strConstant = ConstantDataArray::getString(runtime->context, value, true);
     const auto globalVariable = new GlobalVariable(*runtime->module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
     globalVariable->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
     return globalVariable;
@@ -108,8 +109,8 @@ Module* createEmptyModule(const string& moduleName, LLVMContext& context) {
     return module;
 }
 
-void writeIRToFile() {
-    for (const auto [_, module] : IRModules) {
+void writeIRToFile(LogosProject& project) {
+    for (const auto [_, module] : project.IRModules) {
         if constexpr (WRITE_IR_TO_FILE) {
             const auto filePath = (paths.buildDir / module->getName().str()).string() + ".ll";
             std::error_code EC;

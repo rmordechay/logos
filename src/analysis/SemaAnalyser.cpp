@@ -36,15 +36,16 @@
 #include <stmts/LgsAssignment.h>
 #include <stmts/LgsIfStmt.h>
 
-void SemaAnalyser::analyseFiles(LogosProject* project) {
+void SemaAnalyser::
+analyseFiles(LogosProject& project) {
     ThreadPool threadPool;
     threadPool.start();
-    for (const auto file : project->files) {
+    for (const auto file : project.files) {
         threadPool.runTask([file, &project] {
             SemaAnalyser semaAnalyser(file);
             semaAnalyser.analyse();
             lock_guard lock(mtx);
-            project->errors.insert(project->errors.end(), semaAnalyser.errHandler.errors.begin(), semaAnalyser.errHandler.errors.end());
+            project.errors.insert(project.errors.end(), semaAnalyser.errHandler.errors.begin(), semaAnalyser.errHandler.errors.end());
         });
     }
     threadPool.wait();

@@ -19,7 +19,7 @@ public:
     explicit LgsMainFile(const string& path) : LgsFile(LOGOS_MAIN_FILE_NAME, path) {}
     void format() override;
     json asJSON() override;
-    void generateIR() override;
+    void generateIR(LogosProject& project) override;
     ~LgsMainFile() override;
 };
 

@@ -6,6 +6,7 @@
 #include <llvm/IR/Module.h>
 
 
+class LogosProject;
 class LgsRuntime;
 using namespace std;
 using namespace nlohmann;
@@ -19,13 +20,13 @@ public:
     vector<string> externFiles;
 
     explicit LgsFile(const string& name, const string& path) : name(name), absPath(path) {}
-    virtual void generateIR();
+    virtual void generateIR(LogosProject& project);
     virtual void format();
     virtual json asJSON();
     virtual ~LgsFile() = default;
 };
 
-inline void LgsFile::generateIR() {}
+inline void LgsFile::generateIR(LogosProject& project) {}
 
 inline void LgsFile::format() {
     assert(false);

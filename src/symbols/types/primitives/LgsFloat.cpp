@@ -7,8 +7,8 @@ string LgsFloat::prettyName() const {
     return name;
 }
 
-Type* LgsFloat::getIRType() {
-    return floatTy;
+Type* LgsFloat::getIRType(LgsRuntime* runtime) {
+    return runtime->builder.getFloatTy();
 }
 
 string LgsFloat::getIRName() {

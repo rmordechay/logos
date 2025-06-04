@@ -1,14 +1,14 @@
 #include "files/LgsObjectFile.h"
 
-void LgsObjectFile::generateIR() {
+#include "logos/LgsProject.h"
+
+void LgsObjectFile::generateIR(LogosProject& project) {
     LgsRuntime runtime;
     const auto name = obj->name;
-    runtime.module = createEmptyModule(name, context);
+    runtime.module = createEmptyModule(name, runtime.context);
     for (const auto& [_, method] : obj->methods) {
         method->generateIR(&runtime);
     }
-    lock_guard lock(mtx);
-    IRModules[name] = runtime.module;
 }
 
 LgsObjectFile::~LgsObjectFile() {

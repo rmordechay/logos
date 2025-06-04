@@ -13,8 +13,8 @@ Value* LgsParam::getIRValue(LgsRuntime* runtime) {
     if (IRValue) return IRValue;
     if (isVariadic) {
         if (vaList) return vaList;
-        vaList = runtime->builder.CreateAlloca(ptrTy);
-        const auto vaStart = getOrInsertDeclaration(runtime->module, Intrinsic::vastart, {ptrTy});
+        vaList = runtime->builder.CreateAlloca(runtime->builder.getPtrTy());
+        const auto vaStart = getOrInsertDeclaration(runtime->module, Intrinsic::vastart, {runtime->builder.getPtrTy()});
         runtime->builder.CreateCall(vaStart, {vaList});
         return vaList;
     }

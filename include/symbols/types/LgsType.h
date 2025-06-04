@@ -52,7 +52,7 @@ public:
     virtual bool equals(LgsType& other);
     virtual nlohmann::json asJSON() const;
     virtual string getStrFormatPart() const;
-    virtual Type* getIRType() = 0;
+    virtual Type* getIRType(LgsRuntime* runtime) = 0;
     virtual string getIRName() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual string prettyName() const = 0;

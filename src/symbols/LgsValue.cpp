@@ -10,7 +10,7 @@ void LgsValue::startBlock(LgsRuntime* runtime, BasicBlock* const block, Function
 }
 
 void LgsValue::startBlockFunc(LgsRuntime* runtime) const {
-    const auto entryBlock = BasicBlock::Create(context, "entry");
+    const auto entryBlock = BasicBlock::Create(runtime->context, "entry");
     const auto IRFunc = runtime->stack.currentFunc->getIRFunc(runtime);
     entryBlock->insertInto(IRFunc);
     runtime->builder.SetInsertPoint(entryBlock);
@@ -25,7 +25,7 @@ BasicBlock* LgsValue::createBasicBlock(const char* name, LLVMContext& context) c
 }
 
 Value* LgsValue::hashIRValue(LgsRuntime* runtime, Value* value) const {
-    const auto hashValueIRFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {ptrTy}, false);
+    const auto hashValueIRFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getPtrTy()}, false);
     const auto func =runtime->module->getOrInsertFunction("hash_Str", hashValueIRFuncType);
     return runtime->builder.CreateCall(func, {value});
 }

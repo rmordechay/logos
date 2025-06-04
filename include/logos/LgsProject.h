@@ -27,6 +27,7 @@ public:
     vector<LgsError> errors;
     LgsErrHandler errHandler;
     vector<LgsEnvFile*> envFiles;
+    map<string, Module*> IRModules;
     const LgsAppFile* appFile = nullptr;
     LgsC lgsC;
 

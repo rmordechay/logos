@@ -7,8 +7,8 @@ size_t LgsAny::getSizeBytes() {
     return sizeof(void*);
 }
 
-Type* LgsAny::getIRType() {
-    return ptrTy;
+Type* LgsAny::getIRType(LgsRuntime* runtime) {
+    return runtime->builder.getPtrTy();
 }
 
 string LgsAny::getIRName() {

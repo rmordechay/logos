@@ -6,8 +6,8 @@ string LgsBool::prettyName() const {
     return name;
 }
 
-Type* LgsBool::getIRType() {
-    return i1Ty;
+Type* LgsBool::getIRType(LgsRuntime* runtime) {
+    return runtime->builder.getInt1Ty();
 }
 
 string LgsBool::getIRName() {

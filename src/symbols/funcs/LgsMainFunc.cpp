@@ -6,7 +6,7 @@
 void LgsMainFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.enterFunc(this);
     startBlockFunc(runtime);
-    runtime->initRuntime(runtime);
+    runtime->initRuntime();
     stmtBlock->createIRValue(runtime);
     runtime->freeExprs(runtime);
     runtime->builder.CreateRet(runtime->builder.getInt32(EXIT_SUCCESS));
@@ -20,7 +20,7 @@ Function* LgsMainFunc::getIRFunc(LgsRuntime* runtime) {
     if (hasParams) {
         mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {}, false);
     } else {
-        mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getInt32Ty(), ptrTy}, false);
+        mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getInt32Ty(), runtime->builder.getPtrTy()}, false);
     }
     const auto mainFuncIR = Function::Create(mainFuncType, Function::ExternalLinkage, LOGOS_MAIN_FUNC, runtime->module);
     IRFunc = mainFuncIR;

@@ -22,7 +22,7 @@ public:
     bool isAnonymous = false;
     bool hasDefaultParams = false;
 
-    Type* getIRType() override;
+    Type* getIRType(LgsRuntime* runtime) override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;

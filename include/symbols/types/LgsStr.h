@@ -17,7 +17,7 @@ public:
     }
     size_t getSizeBytes() override;
     string getIRName() override;
-    Type* getIRType() override;
+    Type* getIRType(LgsRuntime* runtime) override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;

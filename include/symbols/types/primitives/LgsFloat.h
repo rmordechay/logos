@@ -9,7 +9,7 @@ public:
     LgsFloat() {
         isPrimitive = true;
     }
-    llvm::Type* getIRType() override;
+    llvm::Type* getIRType(LgsRuntime* runtime) override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;

@@ -1,8 +1,10 @@
 #include "files/LgsMainFile.h"
 
-void LgsMainFile::generateIR() {
+#include "logos/LgsProject.h"
+
+void LgsMainFile::generateIR(LogosProject& project) {
     LgsRuntime runtime;
-    runtime.module = createEmptyModule(LOGOS_MAIN_FILE_NAME, context);
+    runtime.module = createEmptyModule(LOGOS_MAIN_FILE_NAME, runtime.context);
     for (const auto [_, func] : funcs) {
         func->generateIR(&runtime);
     }
@@ -12,7 +14,7 @@ void LgsMainFile::generateIR() {
         }
     }
     lock_guard lock(mtx);
-    IRModules[name] = runtime.module;
+
 }
 
 void LgsMainFile::format() {

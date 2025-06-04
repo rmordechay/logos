@@ -10,8 +10,8 @@ string LgsStr::getIRName() {
     return name;
 }
 
-Type* LgsStr::getIRType() {
-    return ptrTy;
+Type* LgsStr::getIRType(LgsRuntime* runtime) {
+    return runtime->builder.getPtrTy();
 }
 
 string LgsStr::prettyName() const {
@@ -30,7 +30,7 @@ LgsType* LgsStr::inferBinaryType(LgsType* other) {
 Value* LgsStr::getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) {
     if (isStatic) assert(false);
     const auto i = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
-    return runtime->builder.CreateInBoundsGEP(baseType->getIRType(), iterPtr, {i});
+    return runtime->builder.CreateInBoundsGEP(baseType->getIRType(runtime), iterPtr, {i});
 }
 
 string LgsStr::getStrFormatPart() const {

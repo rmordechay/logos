@@ -14,7 +14,7 @@ public:
     LgsExpr* sizeExpr = nullptr;
 
     explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}
-    Type* getIRType() override;
+    Type* getIRType(LgsRuntime* runtime) override;
     virtual LgsType* getBaseType();
     virtual void unpackTypes(const vector<LgsVarDec*>& varDecs);
     virtual Value* getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr);

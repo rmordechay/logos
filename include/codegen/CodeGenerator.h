@@ -15,7 +15,7 @@ using namespace filesystem;
 class CodeGenerator {
 public:
     static void init();
-    static void generate(const LogosProject* project);
+    static void generate(LogosProject& project);
     ~CodeGenerator() = default;
 };
 

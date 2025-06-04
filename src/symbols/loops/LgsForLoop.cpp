@@ -18,9 +18,9 @@ void LgsForLoop::createIRStmt(LgsRuntime* runtime) {
 }
 
 void LgsForLoop::initIRLoop(LgsRuntime* runtime) {
-    loopCondBlock = createBasicBlock(LOGOS_LOOP_CONDITION, context);
-    loopBodyBlock = createBasicBlock(LOGOS_LOOP_BODY, context);
-    loopExitBlock = createBasicBlock(LOGOS_LOOP_EXIT, context);
+    loopCondBlock = createBasicBlock(LOGOS_LOOP_CONDITION, runtime->context);
+    loopBodyBlock = createBasicBlock(LOGOS_LOOP_BODY, runtime->context);
+    loopExitBlock = createBasicBlock(LOGOS_LOOP_EXIT, runtime->context);
     iPtr = runtime->builder.CreateAlloca(runtime->builder.getInt32Ty());
     runtime->builder.CreateStore(loopStart(runtime), iPtr);
     setIRIterable(runtime);

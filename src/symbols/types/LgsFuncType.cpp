@@ -27,8 +27,8 @@ string LgsFuncType::getIRName() {
     return IRName;
 }
 
-Type* LgsFuncType::getIRType() {
-    return ptrTy;
+Type* LgsFuncType::getIRType(LgsRuntime* runtime) {
+    return runtime->builder.getPtrTy();
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {

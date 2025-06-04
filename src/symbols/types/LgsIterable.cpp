@@ -6,10 +6,10 @@
 #include "types/LgsAny.h"
 #include "types/LgsArray.h"
 
-Type* LgsIterable::getIRType() {
+Type* LgsIterable::getIRType(LgsRuntime* runtime) {
     if (IRType) return IRType;
-    if (!isStatic || !sizeExpr) return ptrTy;
-    const auto innerIRType = baseType->getIRType();
+    if (!isStatic || !sizeExpr) return runtime->builder.getPtrTy();
+    const auto innerIRType = baseType->getIRType(runtime);
     const auto size = getExprConstNumber(sizeExpr);
     IRType = ArrayType::get(innerIRType, size);
     return IRType;

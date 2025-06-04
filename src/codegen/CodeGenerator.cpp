@@ -2,21 +2,14 @@
 #include "files/LgsInterfaceFile.h"
 #include "logos/Logos.h"
 #include "logos/Platform.h"
-#include "utils/ThreadPool.h"
-
 #include <llvm/Support/TargetSelect.h>
 
-void CodeGenerator::generate(const LogosProject* project) {
+void CodeGenerator::generate(LogosProject& project) {
     init();
-    ThreadPool threadPool;
-    threadPool.start();
-    for (const auto file : project->files) {
-        threadPool.runTask([&file] {
-            file->generateIR();
-        });
+    for (const auto file : project.files) {
+        file->generateIR(project);
     }
-    threadPool.wait();
-    writeIRToFile();
+    writeIRToFile(project);
 }
 
 void CodeGenerator::init() {

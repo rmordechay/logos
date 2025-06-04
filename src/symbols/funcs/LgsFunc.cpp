@@ -48,7 +48,7 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
 void LgsFunc::addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const {
     const auto argIRValue = arg->getIRValue(runtime);
     if (shouldLoadIRArg(argIRValue)) {
-        const auto artIRType = arg->type->getIRType();
+        const auto artIRType = arg->type->getIRType(runtime);
         const auto value = runtime->builder.CreateLoad(artIRType, argIRValue);
         IRArgs.emplace_back(value);
     } else {
@@ -94,9 +94,9 @@ FunctionType* LgsFunc::getIRFuncType(LgsRuntime* runtime) {
     for (int i = 0; i < funcType.params.size(); ++i) {
         const auto param = funcType.params[i];
         const auto paramType = param->type;
-        auto paramIRType = paramType->getIRType();
+        auto paramIRType = paramType->getIRType(runtime);
         if (!paramType->isPrimitive) {
-            paramIRType = ptrTy;
+            paramIRType = runtime->builder.getPtrTy();
         }
         if (param->isVariadic) {
             IRParamsTypes.emplace_back(runtime->builder.getInt32Ty());
@@ -104,7 +104,7 @@ FunctionType* LgsFunc::getIRFuncType(LgsRuntime* runtime) {
         IRParamsTypes.emplace_back(paramIRType);
     }
 
-    const auto rt = funcType.rt->getIRType();
+    const auto rt = funcType.rt->getIRType(runtime);
     IRFuncType = FunctionType::get(rt, IRParamsTypes, funcType.isVariadic);
     return IRFuncType;
 }

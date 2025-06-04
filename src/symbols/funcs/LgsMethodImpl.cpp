@@ -23,13 +23,13 @@ Function* LgsMethodImpl::getIRFunc(LgsRuntime* runtime) {
 FunctionType* LgsMethodImpl::getIRFuncType(LgsRuntime* runtime) {
     vector<Type*> IRParamsTypes;
     for (int i = 0; i < funcType.params.size(); ++i) {
-        auto paramIRType = funcType.params[i]->type->getIRType();
+        auto paramIRType = funcType.params[i]->type->getIRType(runtime);
         if (i == 0 && !funcType.isStatic) {
-            IRParamsTypes.emplace_back(ptrTy);
+            IRParamsTypes.emplace_back(runtime->builder.getPtrTy());
         } else {
             IRParamsTypes.emplace_back(paramIRType);
         }
     }
-    IRFuncType = FunctionType::get(funcType.rt->getIRType(), IRParamsTypes, funcType.isVariadic);
+    IRFuncType = FunctionType::get(funcType.rt->getIRType(runtime), IRParamsTypes, funcType.isVariadic);
     return IRFuncType;
 }

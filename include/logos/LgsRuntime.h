@@ -2,7 +2,6 @@
 #define LOGOSSTACK_H
 #include "LgsStack.h"
 #include "LgsSymbol.h"
-#include "codegen/CodegenMetadata.h"
 #include <map>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
@@ -16,13 +15,14 @@ class LgsFuncType;
 class LgsRuntime {
 public:
     LgsStack stack;
+    LLVMContext context;
     Module* module = nullptr;
     IRBuilder<> builder = IRBuilder(context);
     GlobalVariable* runtimeStruct = nullptr;
 
-    void initRuntime(LgsRuntime* runtime);
-    void pushStackTrace(LgsRuntime* runtime, const string& path) const;
-    void printStack(LgsRuntime* runtime) const;
+    void initRuntime();
+    void pushStackTrace(const string& path);
+    void printStack();
     void addAllocatedExpr(LgsExpr* expr);
     void freeExprs(LgsRuntime* runtime);
     ~LgsRuntime() = default;

@@ -13,11 +13,11 @@
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Target/TargetMachine.h>
 
-bool LgsLinker::link() const {
+bool LgsLinker::link(LogosProject& project) const {
     setPlatform(paths.objFilePath, paths.execFilePath);
-    Module* mainModule = IRModules.find(LOGOS_MAIN_FILE_NAME)->second;
+    Module* mainModule = project.IRModules.find(LOGOS_MAIN_FILE_NAME)->second;
     Linker linker(*mainModule);
-    for (const auto& [name, module] : IRModules) {
+    for (const auto& [name, module] : project.IRModules) {
         if (name == LOGOS_MAIN_FILE_NAME) continue;
         linker.linkInModule(unique_ptr<Module>(module));
     }

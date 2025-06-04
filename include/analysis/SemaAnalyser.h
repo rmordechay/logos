@@ -45,7 +45,7 @@ public:
     explicit SemaAnalyser(LgsFile* file) : file(file) {
         errHandler.filePath = file->absPath;
     }
-    static void analyseFiles(LogosProject* project);
+    static void analyseFiles(LogosProject& project);
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);

@@ -3,6 +3,7 @@
 #include "exprs/LgsExpr.h"
 #include <llvm/IR/DerivedTypes.h>
 
+class LogosProject;
 struct LgsIndex;
 
 inline std::mutex mtx;
@@ -15,7 +16,7 @@ void setIterIndices(const LgsIterIndex* iterIndex, std::vector<LgsIndex*>& indic
 StructType* getIRStructType(LLVMContext& context, const std::string& name, const std::vector<Type*>& fields);
 Value* getIRStr(LgsRuntime* runtime, const std::string& value);
 Module* createEmptyModule(const std::string& moduleName, LLVMContext& context);
-void writeIRToFile();
+void writeIRToFile(LogosProject& project);
 bool shouldLoadIRArg(Value* value);
 
 #endif //LGSUTILS_H

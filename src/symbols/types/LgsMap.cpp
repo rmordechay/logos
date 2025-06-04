@@ -20,8 +20,8 @@ Value* LgsMap::getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) {
     assert(false);
 }
 
-Type* LgsMap::getIRType() {
-    return ptrTy;
+Type* LgsMap::getIRType(LgsRuntime* runtime) {
+    return runtime->builder.getPtrTy();
 }
 
 string LgsMap::getIRName() {
