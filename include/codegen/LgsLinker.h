@@ -1,12 +1,8 @@
 #ifndef LOGOSLINKER_H
 #define LOGOSLINKER_H
-#include "codegen/CodegenMetadata.h"
-#include "logos/LgsProject.h"
 
-#include <iostream>
-#include <llvm/IR/LegacyPassManager.h>
+#include "logos/LgsProject.h"
 #include <llvm/IR/Verifier.h>
-#include <llvm/Support/FileSystem.h>
 
 struct LgsPaths;
 using namespace llvm;

@@ -1,5 +1,6 @@
 #ifndef LGSPROJECT_H
 #define LGSPROJECT_H
+#include "LgsActiveEnv.h"
 #include "extern/LgsC.h"
 #include "LgsErrHandler.h"
 #include "files/LgsAppFile.h"
@@ -24,17 +25,19 @@ public:
     string name;
     string version;
     vector<LgsFile*> files;
+    LgsActiveEnv activeEnv;
     vector<LgsError> errors;
     LgsErrHandler errHandler;
     vector<LgsEnvFile*> envFiles;
     map<string, Module*> IRModules;
+    map<string, LgsRuntime*> runtimes;
     const LgsAppFile* appFile = nullptr;
     LgsC lgsC;
 
     void asJSON() const;
     bool loadProject(const vector<char*>& args);
     void loadFiles();
-    void setEnvVars() const;
+    void setEnvVars();
     void loadGlobals();
     void checkRequiredEnvVars();
     void loadSrcFiles();

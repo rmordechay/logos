@@ -1,6 +1,6 @@
 #include "types/primitives/LgsLong.h"
 
-#include "codegen/CodegenMetadata.h"
+
 #include "logos/LgsRuntime.h"
 
 string LgsLong::prettyName() const {

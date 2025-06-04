@@ -20,13 +20,15 @@ public:
     vector<string> externFiles;
 
     explicit LgsFile(const string& name, const string& path) : name(name), absPath(path) {}
-    virtual void generateIR(LogosProject& project);
+    virtual LgsRuntime* generateIR(LogosProject& project);
     virtual void format();
     virtual json asJSON();
     virtual ~LgsFile() = default;
 };
 
-inline void LgsFile::generateIR(LogosProject& project) {}
+inline LgsRuntime* LgsFile::generateIR(LogosProject& project) {
+    return nullptr;
+}
 
 inline void LgsFile::format() {
     assert(false);

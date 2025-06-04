@@ -1,5 +1,5 @@
 #include "stmts/LgsIfStmt.h"
-#include "codegen/CodegenMetadata.h"
+
 #include "logos/LgsRuntime.h"
 
 void LgsIfStmt::createIRStmt(LgsRuntime* runtime) {

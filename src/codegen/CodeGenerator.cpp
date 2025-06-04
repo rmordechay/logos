@@ -7,7 +7,10 @@
 void CodeGenerator::generate(LogosProject& project) {
     init();
     for (const auto file : project.files) {
-        file->generateIR(project);
+        const auto runtime = file->generateIR(project);
+        if (!runtime) continue;
+        // lock_guard lock(mtx);
+        project.runtimes[file->name] = runtime;
     }
     writeIRToFile(project);
 }

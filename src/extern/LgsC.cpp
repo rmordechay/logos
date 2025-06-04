@@ -1,9 +1,7 @@
 #include "extern/LgsC.h"
+
 #include "extern/LgsCInterface.h"
-#include "codegen/CodegenMetadata.h"
-
 #include "logos/Platform.h"
-
 #include <clang/Basic/Diagnostic.h>
 #include <llvm/Support/raw_ostream.h>
 #include "utils/LgsUtils.h"
@@ -16,11 +14,12 @@
 #include <clang/Driver/Driver.h>
 #include <clang/Frontend/FrontendOptions.h>
 #include <clang/Tooling/Tooling.h>
+#include <llvm/Target/TargetMachine.h>
 
 #include <memory>
 #include <string>
 #include <vector>
-#include <iostream>
+#include <llvm/TargetParser/Host.h>
 
 using namespace clang;
 
@@ -49,6 +48,7 @@ void LgsC::compile(const vector<string>& files) {
         args.push_back(argStr.c_str());
     }
 
+    const auto targetTriple = sys::getDefaultTargetTriple();
     auto diags = CompilerInstance::createDiagnostics(*fs, new DiagnosticOptions, &dc, false);
     clang::driver::Driver driver(args[0], targetTriple, *diags, "cc", fs);
     driver.setCheckInputsExist(false);

@@ -1,6 +1,5 @@
 #include "logos/LgsErrHandler.h"
 #include "LgsLocation.h"
-#include "codegen/CodegenMetadata.h"
 #include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
 

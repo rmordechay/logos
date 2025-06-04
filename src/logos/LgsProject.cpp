@@ -203,7 +203,7 @@ void LogosProject::checkDuplicateFiles(const vector<LgsFile*>& files) {
     }
 }
 
-void LogosProject::setEnvVars() const {
+void LogosProject::setEnvVars() {
     for (char **env = environ; *env != nullptr; ++env) {
         string entry(*env);
         const auto pos = entry.find('=');

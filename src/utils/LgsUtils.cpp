@@ -12,6 +12,7 @@
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Target/TargetMachine.h>
+#include <llvm/TargetParser/Host.h>
 
 string getFileText(path filePath) {
     ifstream file(canonical(filePath));
@@ -100,6 +101,7 @@ Value* getIRStr(LgsRuntime* runtime, const string& value) {
 }
 
 Module* createEmptyModule(const string& moduleName, LLVMContext& context) {
+    const auto targetTriple = sys::getDefaultTargetTriple();
     string error;
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
     const auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
@@ -110,15 +112,15 @@ Module* createEmptyModule(const string& moduleName, LLVMContext& context) {
 }
 
 void writeIRToFile(LogosProject& project) {
-    for (const auto [_, module] : project.IRModules) {
+    for (const auto [_, module] : project.runtimes) {
         if constexpr (WRITE_IR_TO_FILE) {
-            const auto filePath = (paths.buildDir / module->getName().str()).string() + ".ll";
+            const auto filePath = (paths.buildDir / module->module->getName().str()).string() + ".ll";
             std::error_code EC;
             raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
-            module->print(textFile, nullptr);
+            module->module->print(textFile, nullptr);
         }
         if constexpr (DEBUG) {
-            module->print(outs(), nullptr);
+            module->module->print(outs(), nullptr);
             std::cout << "\n-----\n\n";
         }
     }
