@@ -8,7 +8,6 @@ public:
     string name;
     LgsObject* obj = nullptr;
     vector<LgsVarDec*> args;
-    bool isSelf = false;
 
     explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), name(obj->name), obj(obj) {}
     explicit LgsInstance(const string& name) : name(name) {}

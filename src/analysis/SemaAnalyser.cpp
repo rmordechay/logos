@@ -26,6 +26,7 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
+#include "logos/LgsConfig.h"
 #include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsVarDec.h"
@@ -96,7 +97,17 @@ void SemaAnalyser::visitFuncType(const LgsFuncType* funcType) {
     for (const auto param : funcType->params) {
         visitParam(param);
     }
-    std::cout << funcType->rt->getSizeBytes() << std::endl;
+    if (funcType->isMethod) {
+        visitMethodType(funcType);
+        return;
+    }
+    if (funcType->rt->getSizeBytes() >= OBJECT_SIZE_THRESHOLD) {
+        assert(false);
+    }
+}
+
+void SemaAnalyser::visitMethodType(const LgsFuncType* funcType) {
+    auto self = funcType->params.front();
 }
 
 void SemaAnalyser::visitParam(LgsParam* param) {

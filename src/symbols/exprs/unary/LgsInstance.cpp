@@ -13,14 +13,7 @@ string LgsInstance::getName() {
 
 Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
     const auto IRType = obj->getIRType();
-    const auto currentFunc = runtime->stack.currentFunc->getIRFunc(runtime);
-
-    // TODO cover all cases
-    if (isSelf) {
-        IRValue = currentFunc->arg_begin();
-    } else {
-        IRValue = runtime->builder.CreateAlloca(IRType);
-    }
+    IRValue = runtime->builder.CreateAlloca(IRType);
     if (!obj->implements.empty()) {
         setVirtualFuncs(runtime);
     }

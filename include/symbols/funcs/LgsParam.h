@@ -14,6 +14,7 @@ public:
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
     bool isVariadic = false;
+    bool isReturnSwapped = false;
     AllocaInst* vaList = nullptr;
     std::vector<LgsVariable*> refs;
 

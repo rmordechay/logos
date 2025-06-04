@@ -225,24 +225,11 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplContext* ctx) {
     return func;
 }
 
-LgsFuncImpl* AntlerConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx) {
-    const auto rt = getFuncReturnType(ctx->anonnymosfuncSignature()->type());
-    const auto funcSignature = ctx->anonnymosfuncSignature();
-    const auto func = new LgsFuncImpl("", rt);
-    func->funcType.isAnonymous = true;
-    setParams(&func->funcType, funcSignature->param());
-    func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
-    func->setLocation(funcSignature->LPAREN()->getSymbol());
-    return func;
-}
-
 LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj) {
     const auto rt = getFuncReturnType(ctx->funcSignature()->type());
     const auto funcSignature = ctx->funcSignature();
     const auto nameToken = funcSignature->VARIABLE();
-    const auto instance = new LgsInstance(obj);
-    instance->isSelf = true;
-    const auto self = new LgsParam(obj, LOGOS_SELF, instance);
+    const auto self = new LgsParam(obj, LOGOS_SELF);
     const auto method = new LgsMethodImpl(nameToken->getText(), obj->name, rt);
     currentMethod = method;
     method->funcType.params.emplace_back(self);
@@ -255,6 +242,17 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
     method->setLocation(nameToken->getSymbol());
     currentMethod = nullptr;
     return method;
+}
+
+LgsFuncImpl* AntlerConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx) {
+    const auto rt = getFuncReturnType(ctx->anonnymosfuncSignature()->type());
+    const auto funcSignature = ctx->anonnymosfuncSignature();
+    const auto func = new LgsFuncImpl("", rt);
+    func->funcType.isAnonymous = true;
+    setParams(&func->funcType, funcSignature->param());
+    func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
+    func->setLocation(funcSignature->LPAREN()->getSymbol());
+    return func;
 }
 
 void AntlerConverter::setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params) {

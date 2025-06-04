@@ -27,6 +27,7 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
         auto isInit = false;
         for (int i = iterStart; i < args.size(); ++i) {
             if (!isInit && funcType.params[i]->isVariadic) {
+                // TODO make dynamic
                 IRArgs.emplace_back(runtime->builder.getInt32(3));
                 isInit = true;
             }
@@ -74,6 +75,7 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
     const auto funcIRType = getIRFuncType(runtime);
     auto func = runtime->module->getOrInsertFunction(funcType.getIRName(), funcIRType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
+
     auto args = IRFunc->arg_begin();
     for (int i = 0; i < funcType.params.size(); ++i) {
         const auto param = funcType.params[i];
