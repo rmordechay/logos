@@ -60,5 +60,6 @@ inline LgsError E10042{.msg = "Left index in slice must be less than the right i
 inline LgsError E10043{.msg = "Default parameters and variadic arguments are not allowed in the same function.", .errCode = errCodeStart++};
 inline LgsError E10044{.msg = "Variadic argument must be the last argument.", .errCode = errCodeStart++};
 inline LgsError E10045{.msg = "Variadic argument cannot have default arguments.", .errCode = errCodeStart++};
+inline LgsError E10046{.msg = "'%s' is not callable.", .errCode = errCodeStart++};
 
 #endif //LOGOSERRORS_H

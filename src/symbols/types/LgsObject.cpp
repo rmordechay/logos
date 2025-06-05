@@ -13,7 +13,7 @@ Type* LgsObject::getIRType() {
     vector<Type*> elementTypes;
 
     // First field of any object is a ptr to its vtable
-    elementTypes.push_back(PointerType::getUnqual(context));;
+    elementTypes.push_back(PointerType::getUnqual(context));
     for (const auto& [_, field] : fields) {
         auto fieldType = field->type->getIRType();
         elementTypes.push_back(fieldType);

@@ -40,7 +40,12 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
 FunctionType* LgsFunc::getIRFuncType(LgsRuntime* runtime) {
     if (IRFuncType) return IRFuncType;
     vector<Type*> IRParamsTypes;
-    const auto rt = funcType.rt->getIRType();
+    Type* rt;
+    if (funcType.isRvBig && !funcType.swapReturn) {
+        rt = PointerType::getUnqual(context);
+    } else {
+        rt = funcType.rt->getIRType();
+    }
     for (int i = 0; i < funcType.params.size(); ++i) {
         const auto param = funcType.params[i];
         const auto paramType = param->type;
@@ -96,9 +101,9 @@ void LgsFunc::addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg
 
 void LgsFunc::setBigObjAttrs(Function& IRFunc) const {
     const auto paramIRType = getReturnParam()->type->getIRType();
-    IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(context, Attribute::StructRet, paramIRType));
-    IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(context, Attribute::Writable));
-    IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(context, Attribute::NoAlias));
+    IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::StructRet, paramIRType));
+    IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::Writable));
+    IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
 }
 
 bool LgsFunc::shouldLoadIRArg(Value* value) const {
@@ -131,8 +136,9 @@ LgsParam* LgsFunc::getReturnParam() const {
 }
 
 void LgsFunc::swapReturnIfNeeded() {
-    funcType.swapReturn = funcType.isRtBig && returnExprs.size() == 1;
+    funcType.swapReturn = funcType.isRvBig && returnExprs.size() == 1;
     if (funcType.swapReturn) {
+        funcType.returnParamIndex = funcType.isMethod && !funcType.isStatic;
         funcType.params.insert(funcType.params.begin(), new LgsParam(funcType.rt));
         funcType.rt = &LGS_VOID;
     }

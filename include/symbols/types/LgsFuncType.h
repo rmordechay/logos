@@ -10,7 +10,7 @@ public:
     string name;
     string IRName;
     string parentName;
-    LgsType* rt;
+    LgsType* rt = nullptr;
     vector<LgsParam*> params;
     FunctionType* IRFuncType = nullptr;
     bool isMethod = false;
@@ -20,10 +20,14 @@ public:
     bool isBuiltin = false;
     bool isVariadic = false;
     bool isAnonymous = false;
-    bool isRtBig = false;
+    bool isRvBig = false;
     bool swapReturn = false;
     bool hasDefaultParams = false;
-    int returnParamIndex = isMethod && !isStatic;
+    int returnParamIndex = -1;
+
+    LgsFuncType() {
+        isCallable = true;
+    }
 
     Type* getIRType() override;
     string getIRName() override;

@@ -28,6 +28,7 @@ public:
     bool isConst = false;
     bool isNullable = false;
     bool isPrimitive = false;
+    bool isCallable = false;
     Type* IRType = nullptr;
     map<string, LgsField*> fields;
     map<string, LgsMethodImpl*> methods;

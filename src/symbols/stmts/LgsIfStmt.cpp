@@ -4,7 +4,7 @@
 
 void LgsIfStmt::createIRStmt(LgsRuntime* runtime) {
     runtime->stack.enterScope(this);
-    if (elseBlock || elseIfConds.size() > 0) {
+    if (elseStmtBlock || !elseIfStmtBlocks.empty()) {
         computeComplexIf(runtime);
     } else {
         computeSimpleIf(runtime);
@@ -14,74 +14,75 @@ void LgsIfStmt::createIRStmt(LgsRuntime* runtime) {
 
 
 void LgsIfStmt::computeSimpleIf(LgsRuntime* runtime) {
-    ifTrueBlock = createBasicBlock(BB_IF_TRUE, context);
-    ifEndBlock = createBasicBlock(BB_IF_END, context);
-    elseBlock = createBasicBlock(BB_ELSE, context);
+    IRIfTrueBlock = createBasicBlock(BB_IF_TRUE, context);
+    IRIfEndBlock = createBasicBlock(BB_IF_END, context);
+    IRElseBlock = createBasicBlock(BB_ELSE, context);
 
     // if block
     const auto ifCondIR = ifCond->getIRValue(runtime);
-    if (!elseStmtBlock) {
-        runtime->builder.CreateCondBr(ifCondIR, ifTrueBlock, ifEndBlock);
-    } else {
-        runtime->builder.CreateCondBr(ifCondIR, ifTrueBlock, elseBlock);
+    if (!ifStmtBlock->lastStmt()->asReturn()) {
+        if (elseStmtBlock) {
+            runtime->builder.CreateCondBr(ifCondIR, IRIfTrueBlock, IRElseBlock);
+        } else {
+            runtime->builder.CreateCondBr(ifCondIR, IRIfTrueBlock, IRIfEndBlock);
+        }
     }
-    startBlock(runtime, ifTrueBlock);
+    startBlock(runtime, IRIfTrueBlock);
     ifStmtBlock->createIRValue(runtime);
     if (runtime->builder.GetInsertBlock()->getTerminator()) return;
-    runtime->builder.CreateBr(ifEndBlock);
+    runtime->builder.CreateBr(IRIfEndBlock);
 
     // else block
-    createElseBlock(runtime, elseBlock, ifEndBlock);
+    createElseBlock(runtime, IRElseBlock, IRIfEndBlock);
 
     // exit
-    startBlock(runtime, ifEndBlock);
+    startBlock(runtime, IRIfEndBlock);
 }
 
 void LgsIfStmt::computeComplexIf(LgsRuntime* runtime) {
-    ifTrueBlock = createBasicBlock(BB_IF_TRUE, context);
-    elseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK, context);
-    ifEndBlock = createBasicBlock(BB_IF_END, context);
-    elseBlock = createBasicBlock(BB_ELSE, context);
+    auto& ctx = runtime->module->getContext();
+    IRIfTrueBlock = createBasicBlock(BB_IF_TRUE, ctx);
+    IRElseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK, ctx);
+    IRIfEndBlock = createBasicBlock(BB_IF_END, ctx);
+    IRElseBlock = createBasicBlock(BB_ELSE, ctx);
 
     // if block
     const auto ifCondIR = ifCond->getIRValue(runtime);
-    runtime->builder.CreateCondBr(ifCondIR, ifTrueBlock, elseIfCheckBlock);
-    startBlock(runtime, ifTrueBlock);
+    if (!ifStmtBlock->lastStmt()->asReturn()) {
+        runtime->builder.CreateCondBr(ifCondIR, IRIfTrueBlock, IRElseIfCheckBlock);
+    }
+    startBlock(runtime, IRIfTrueBlock);
     ifStmtBlock->createIRValue(runtime);
-    runtime->builder.CreateBr(ifEndBlock);
+    runtime->builder.CreateBr(IRIfEndBlock);
 
-    // else if blocks
     createElseIfBlocks(runtime);
-
-    // else block
-    createElseBlock(runtime, elseBlock, ifEndBlock);
-
-    // exit
+    createElseBlock(runtime, IRElseBlock, IRIfEndBlock);
     if (!runtime->builder.GetInsertBlock()->getTerminator()) {
-        startBlock(runtime, ifEndBlock);
+        startBlock(runtime, IRIfEndBlock);
     }
 }
 
 void LgsIfStmt::createElseIfBlocks(LgsRuntime* runtime) {
+    auto& ctx = runtime->module->getContext();
     for (size_t i = 0; i < elseIfConds.size(); ++i) {
-        startBlock(runtime, elseIfCheckBlock);
+        startBlock(runtime, IRElseIfCheckBlock);
         const auto elseIfCondIR = elseIfConds[i]->getIRValue(runtime);
-        const auto elseIfStartBlock = createBasicBlock(BB_ELSE_IF_START, context);
+        const auto elseIfStartBlock = createBasicBlock(BB_ELSE_IF_START, ctx);
         const auto lastIteration = elseIfConds.size() - 1;
         if (i == lastIteration) {
             if (elseStmtBlock) {
-                runtime->builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, elseBlock);
+                runtime->builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, IRElseBlock);
             } else {
-                runtime->builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, ifEndBlock);
+                runtime->builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, IRIfEndBlock);
             }
         } else {
-            elseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK, context);
-            runtime->builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, elseIfCheckBlock);
+            IRElseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK, ctx);
+            runtime->builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, IRElseIfCheckBlock);
         }
 
         startBlock(runtime, elseIfStartBlock);
         elseIfStmtBlocks[i]->createIRValue(runtime);
-        runtime->builder.CreateBr(ifEndBlock);
+        runtime->builder.CreateBr(IRIfEndBlock);
     }
 }
 

@@ -18,12 +18,11 @@ public:
     std::vector<LgsStmtBlock*> elseIfStmtBlocks;
     LgsStmtBlock* elseStmtBlock = nullptr;
     bool hasReturn = false;
-
-    BasicBlock* ifTrueBlock = nullptr;
-    BasicBlock* ifEndBlock = nullptr;
-    BasicBlock* elseBlock = nullptr;
-    BasicBlock* elseIfStartBlock = nullptr;
-    BasicBlock* elseIfCheckBlock = nullptr;
+    BasicBlock* IRIfTrueBlock = nullptr;
+    BasicBlock* IRIfEndBlock = nullptr;
+    BasicBlock* IRElseBlock = nullptr;
+    BasicBlock* IRElseIfStartBlock = nullptr;
+    BasicBlock* IRElseIfCheckBlock = nullptr;
 
     LgsIfStmt(LgsExpr* ifCond, LgsStmtBlock* ifStmtBlock) : ifCond(ifCond), ifStmtBlock(ifStmtBlock) {}
     void createIRStmt(LgsRuntime* runtime) override;
