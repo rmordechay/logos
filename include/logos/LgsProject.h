@@ -34,15 +34,15 @@ public:
     LgsC lgsC;
 
     void asJSON() const;
-    bool loadProject(const vector<char*>& args);
+    bool loadProject();
     void loadFiles();
     void setEnvVars();
     void loadGlobals();
-    void checkRequiredEnvVars();
     void loadSrcFiles();
     void loadEnvFiles();
     void setupActiveEnv();
     bool validateProject();
+    void checkRequiredEnvVars();
     bool resolveGlobalTypes(const vector<LgsFile*>& files) const;
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
     void parseSrcFile(path entry);

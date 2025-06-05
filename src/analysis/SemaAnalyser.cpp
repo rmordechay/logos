@@ -49,6 +49,7 @@ void SemaAnalyser::analyseFiles(LogosProject& project) {
         });
     }
     threadPool.wait();
+    reprocessFuncs(project);
 }
 
 void SemaAnalyser::start() {
@@ -87,27 +88,11 @@ void SemaAnalyser::visitInterface(LgsInterface* interface) const {}
 void SemaAnalyser::visitFunc(LgsFunc* func) {
     func->filePath = file->absPath;
     stack.enterFunc(func);
-    visitFuncType(&func->funcType);
-    visitStmtBlock(func->stmtBlock);
-    auto& funcType = func->funcType;
-    if (funcType.rt->getSizeBytes() > OBJECT_SIZE_THRESHOLD) {
-        const auto returnParam = new LgsParam(funcType.rt, "rv");
-        funcType.isReturnSwapped = true;
-        returnParam->isReturnSwapped = true;
-        // if (funcType.isMethod && !funcType.isStatic) {
-        //     funcType.params.insert(funcType.params.begin() + 1, returnParam);
-        // } else {
-        //     funcType.params.insert(funcType.params.begin(), returnParam);
-        // }
-        // funcType.rt = &LGS_VOID;
-    }
-    stack.exitFunc();
-}
-
-void SemaAnalyser::visitFuncType(LgsFuncType* funcType) {
-    for (const auto param : funcType->params) {
+    for (const auto param : func->funcType.params) {
         visitParam(param);
     }
+    visitStmtBlock(func->stmtBlock);
+    stack.exitFunc();
 }
 
 void SemaAnalyser::visitParam(LgsParam* param) {
@@ -260,8 +245,13 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
 }
 
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
-    if (returnStmt->expr) visitExpr(returnStmt->expr);
-    auto& funcType = stack.currentFunc->funcType;
+    const auto currentFunc = stack.currentFunc;
+    auto& funcType = currentFunc->funcType;
+    if (returnStmt->expr) {
+        returnStmt->expr->isReturnExpr = true;
+        currentFunc->returnExprs.push_back(returnStmt->expr);
+        visitExpr(returnStmt->expr);
+    }
     const auto rt = funcType.rt;
     if (rt->isVoid && returnStmt->expr) {
         errHandler.handleError(E10027, &returnStmt->location, {returnStmt->expr->type->prettyName()});
@@ -361,6 +351,7 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     switch (symbol->type) {
     case VAR_DEC:
         symbol->varDec->refs.push_back(variable);
+        symbol->varDec->expr->isReturnExpr = variable->isReturnExpr;
         variable->setType(symbol->varDec->type);
         break;
     case PARAM:
@@ -720,10 +711,11 @@ void SemaAnalyser::resolveObjMemberTypes(LgsObject* const& obj) {
 }
 
 void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
-    funcType->rt = resolveType(funcType->rt);
     for (int i = 0; i < funcType->params.size(); ++i) {
         funcType->params[i]->type = resolveType(funcType->params[i]->type);
     }
+    funcType->rt = resolveType(funcType->rt);
+    funcType->isRtBig = funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD;
 }
 
 void SemaAnalyser::resolveObjectImplements(LgsObject* obj) {
@@ -759,4 +751,35 @@ string SemaAnalyser::getFuncsAsStr(const vector<LgsFunc*>& funcs) const {
         str << "\n\t     - " << func->funcType.prettyName();
     }
     return str.str();
+}
+
+void SemaAnalyser::reprocessFuncs(const LogosProject& project) {
+    for (const auto& file : project.files) {
+        SemaAnalyser semaAnalyser(file);
+        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+            for (const auto& obj : mainFile->objects) {
+                for (const auto& [_, method] : obj->methods) {
+                    method->swapReturnIfNeeded();
+                }
+                for (const auto implement : obj->implements) {
+                    assert(false);
+                }
+            }
+            for (const auto [_, func] : mainFile->funcs) {
+                func->swapReturnIfNeeded();
+            }
+        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+            const auto obj = objFile->obj;
+            for (const auto& [_, method] : obj->methods) {
+                method->swapReturnIfNeeded();
+            }
+            for (const auto implement : obj->implements) {
+                assert(false);
+            }
+        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+            for (const auto& [_, method] : interfaceFile->interface->methods) {
+                method->swapReturnIfNeeded();
+            }
+        }
+    }
 }

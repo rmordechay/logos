@@ -18,7 +18,7 @@ void LgsVarDec::createIRStmt(LgsRuntime* runtime) {
 }
 
 bool LgsVarDec::shouldAllocate(const Type* IRType) const {
-    return !expr->asInstance() || IRType->isArrayTy() || IRType->isPointerTy() || IRType->isVoidTy();
+    return IRType->isArrayTy() || IRType->isPointerTy() || IRType->isVoidTy();
 }
 
 json LgsVarDec::asJSON() {

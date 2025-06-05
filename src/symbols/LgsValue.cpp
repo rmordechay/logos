@@ -4,8 +4,8 @@
 #include "logos/LgsRuntime.h"
 #include "json/json.hpp"
 
-void LgsValue::startBlock(LgsRuntime* runtime, BasicBlock* const block, Function* IRFunc) const {
-    block->insertInto(IRFunc);
+void LgsValue::startBlock(LgsRuntime* runtime, BasicBlock* const block) const {
+    block->insertInto(runtime->stack.currentFunc->getIRFunc(runtime));
     runtime->builder.SetInsertPoint(block);
 }
 

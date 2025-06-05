@@ -9,7 +9,7 @@
 
 void Logos::run() {
     // Load project and parse files
-    if (!project.loadProject(args)) exit(1);
+    if (!project.loadProject()) exit(1);
 
     // Semantic analysis
     SemaAnalyser::analyseFiles(project);

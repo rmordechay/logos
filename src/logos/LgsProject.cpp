@@ -19,7 +19,7 @@
 using namespace std;
 extern char **environ;
 
-bool LogosProject::loadProject(const vector<char*>& args) {
+bool LogosProject::loadProject() {
     if (!validateProject()) return false;
     // setupActiveEnv();
     if (!errHandler.successful) return false;
@@ -28,7 +28,6 @@ bool LogosProject::loadProject(const vector<char*>& args) {
     if (!resolveGlobalTypes(files)) return false;
     return errHandler.successful;
 }
-
 
 bool LogosProject::validateProject() {
     if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {

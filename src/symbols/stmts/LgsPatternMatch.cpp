@@ -21,11 +21,11 @@ void LgsPatternMatch::createIRStmt(LgsRuntime* runtime) {
         runtime->builder.CreateBr(exitBlock);
     }
 
-    startBlock(runtime, defaultCase, nullptr);
+    startBlock(runtime, defaultCase);
     elseStmtBlock->createIRValue(runtime);
 
     runtime->builder.CreateBr(exitBlock);
-    startBlock(runtime, exitBlock, nullptr);
+    startBlock(runtime, exitBlock);
 }
 
 json LgsPatternMatch::asJSON() {

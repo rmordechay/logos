@@ -8,9 +8,9 @@
 void LgsForLoop::createIRStmt(LgsRuntime* runtime) {
     runtime->stack.enterScope(this);
     initIRLoop(runtime);
-    startBlock(runtime, loopCondBlock, nullptr);
+    startBlock(runtime, loopCondBlock);
     setLoopIRCondition(runtime);
-    startBlock(runtime, loopBodyBlock, nullptr);
+    startBlock(runtime, loopBodyBlock);
     setIRLoopVars(runtime);
     stmtBlock->createIRValue(runtime);
     exitIRLoop(runtime);
@@ -41,7 +41,7 @@ void LgsForLoop::exitIRLoop(LgsRuntime* runtime) const {
     runtime->builder.CreateStore(inc, iPtr);
     runtime->builder.CreateBr(loopCondBlock);
     // Loop exit
-    startBlock(runtime, loopExitBlock, nullptr);
+    startBlock(runtime, loopExitBlock);
 }
 
 LgsForLoop::~LgsForLoop() {

@@ -13,6 +13,7 @@ class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType funcType;
     vector<LgsVariable*> refs;
+    vector<LgsExpr*> returnExprs;
     LgsStmtBlock* stmtBlock = nullptr;
     FunctionType* IRFuncType = nullptr;
     IRBuilderBase::InsertPoint savedIP;
@@ -24,6 +25,7 @@ public:
 
     Value* createIRValue(LgsRuntime* runtime) override;
     string prettyName() override;
+    void setBigObjAttrs(Function& IRFunc) const;
     string format(string& tabs) override;
     json asJSON() override;
     void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const;
@@ -31,6 +33,8 @@ public:
     virtual Function* getIRFunc(LgsRuntime* runtime);
     virtual FunctionType* getIRFuncType(LgsRuntime* runtime);
     bool shouldLoadIRArg(Value* value) const;
+    LgsParam* getReturnParam() const;
+    void swapReturnIfNeeded();
     virtual Value* callIR(LgsRuntime* runtime, const vector<Value*>& args = {});
     virtual Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args = {});
     ~LgsFunc() override;

@@ -10,7 +10,6 @@ string LgsObject::prettyName() const {
 
 Type* LgsObject::getIRType() {
     if (IRType) return IRType;
-    size_t structPosition = 0;
     vector<Type*> elementTypes;
 
     // First field of any object is a ptr to its vtable
@@ -18,7 +17,6 @@ Type* LgsObject::getIRType() {
     for (const auto& [_, field] : fields) {
         auto fieldType = field->type->getIRType();
         elementTypes.push_back(fieldType);
-        field->position = structPosition++;
     }
 
     IRType = StructType::getTypeByName(context, name);

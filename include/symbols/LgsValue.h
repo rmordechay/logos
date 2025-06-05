@@ -16,7 +16,7 @@ public:
 
     void setIRValue(Value* value);
     BasicBlock* createBasicBlock(const char* name, LLVMContext& context) const;
-    void startBlock(LgsRuntime* runtime, BasicBlock* block, Function* IRFunc) const;
+    void startBlock(LgsRuntime* runtime, BasicBlock* block) const;
     void startBlockFunc(LgsRuntime* runtime) const;
     Value* hashIRValue(LgsRuntime* runtime, Value* value) const;
     virtual std::string format(std::string& indentStr);

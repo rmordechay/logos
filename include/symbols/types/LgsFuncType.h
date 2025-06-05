@@ -20,8 +20,10 @@ public:
     bool isBuiltin = false;
     bool isVariadic = false;
     bool isAnonymous = false;
-    bool isReturnSwapped = false;
+    bool isRtBig = false;
+    bool swapReturn = false;
     bool hasDefaultParams = false;
+    int returnParamIndex = isMethod && !isStatic;
 
     Type* getIRType() override;
     string getIRName() override;

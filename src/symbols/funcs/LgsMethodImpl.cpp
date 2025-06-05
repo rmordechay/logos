@@ -11,6 +11,13 @@ FunctionType* LgsMethodImpl::getIRFuncType(LgsRuntime* runtime) {
             IRParamsTypes.emplace_back(paramIRType);
         }
     }
-    IRFuncType = FunctionType::get(funcType.rt->getIRType(), IRParamsTypes, funcType.isVariadic);
+    Type* rt;
+    if (funcType.swapReturn) {
+        rt = runtime->builder.getVoidTy();
+        IRParamsTypes.insert(IRParamsTypes.begin() + funcType.returnParamIndex, PointerType::getUnqual(context));
+    } else {
+        rt = funcType.rt->getIRType();
+    }
+    IRFuncType = FunctionType::get(rt, IRParamsTypes, funcType.isVariadic);
     return IRFuncType;
 }

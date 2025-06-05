@@ -47,13 +47,13 @@ public:
         errHandler.filePath = file->absPath;
     }
     static void analyseFiles(LogosProject& project);
+    static void reprocessFuncs(const LogosProject& project);
     void start() override;
     void visitMainFile(LgsMainFile* mainFile) override;
     void visitObject(LgsObject* obj) override;
     void visitInterface(LgsInterface* interface) const override;
     void visitField(const LgsField* field) override;
     void visitFunc(LgsFunc* func) override;
-    void visitFuncType(LgsFuncType* funcType) override;
     void visitParam(LgsParam* param) override;
     void visitStmt(LgsStmt* stmt) override;
     void visitStmtBlock(LgsStmtBlock* stmtBlock) override;

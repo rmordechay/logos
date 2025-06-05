@@ -26,6 +26,7 @@ public:
     // TODO free type
     LgsType* type = nullptr;
     bool isNull = false;
+    bool isReturnExpr = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     void setType(LgsType* type);

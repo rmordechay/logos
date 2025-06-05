@@ -15,7 +15,6 @@ enum ScopeType {
 
 struct LgsStackFrame {
     std::map<std::string, LgsSymbol> symbols;
-    LgsFunc* func = nullptr;
     std::vector<LgsExpr*> allocatedExprs;
 };
 

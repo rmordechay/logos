@@ -4,13 +4,13 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "exprs/LgsExpr.h"
+#include "logos/LgsConfig.h"
 #include "types/LgsArray.h"
 
 void LgsFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.enterFunc(this);
     startBlockFunc(runtime);
-    const auto IRFunc = getIRFunc(runtime);
-    IRValue = IRFunc;
+    getIRFunc(runtime);
     stmtBlock->createIRValue(runtime);
     if (funcType.rt->isVoid) {
         runtime->freeExprs(runtime);
@@ -19,24 +19,47 @@ void LgsFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.exitFunc();
 }
 
+Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
+    const auto f = runtime->module->getFunction(funcType.getIRName());
+    if (f) return f;
+    const auto funcIRType = getIRFuncType(runtime);
+    auto func = runtime->module->getOrInsertFunction(funcType.getIRName(), funcIRType);
+    const auto IRFunc = dyn_cast<Function>(func.getCallee());
+    if (funcType.swapReturn) {
+        setBigObjAttrs(*IRFunc);
+    }
+    auto args = IRFunc->arg_begin();
+    for (int i = 0; i < funcType.params.size(); ++i) {
+        const auto param = funcType.params[i];
+        param->setIRValue(args);
+        args++->setName(param->name);
+    }
+    return IRFunc;
+}
+
+FunctionType* LgsFunc::getIRFuncType(LgsRuntime* runtime) {
+    if (IRFuncType) return IRFuncType;
+    vector<Type*> IRParamsTypes;
+    const auto rt = funcType.rt->getIRType();
+    for (int i = 0; i < funcType.params.size(); ++i) {
+        const auto param = funcType.params[i];
+        const auto paramType = param->type;
+        auto paramIRType = paramType->getIRType();
+        if (!paramType->isPrimitive) {
+            paramIRType = PointerType::getUnqual(context);
+        }
+        IRParamsTypes.emplace_back(paramIRType);
+    }
+    IRFuncType = FunctionType::get(rt, IRParamsTypes, funcType.isVariadic);
+    return IRFuncType;
+}
+
 Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
-    const int iterStart = funcType.isStatic;
     if (funcType.hasDefaultParams) assert(false);
-    if (funcType.isVariadic) {
-        auto isInit = false;
-        for (int i = iterStart; i < args.size(); ++i) {
-            if (!isInit && funcType.params[i]->isVariadic) {
-                // TODO make dynamic
-                IRArgs.emplace_back(runtime->builder.getInt32(3));
-                isInit = true;
-            }
-            addIRArg(runtime, IRArgs, args[i]);
-        }
-    } else {
-        for (int i = iterStart; i < args.size(); ++i) {
-            addIRArg(runtime, IRArgs, args[i]);
-        }
+    if (funcType.isVariadic) assert(false);
+    for (int i = funcType.isStatic; i < args.size(); ++i) {
+        addIRArg(runtime, IRArgs, args[i]);
     }
     return callIR(runtime, IRArgs);
 }
@@ -47,7 +70,17 @@ Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
         return runtime->builder.CreateCall(IRFuncType, IRValue, args);
     }
     const auto IRFunc = getIRFunc(runtime);
-    return runtime->builder.CreateCall(IRFunc, args);
+    Value* rv;
+    if (funcType.swapReturn) {
+        const auto paramIRType = getReturnParam()->type->getIRType();
+        rv = runtime->builder.CreateAlloca(paramIRType);
+        vector finalArgs(args.begin(), args.end());
+        finalArgs.insert(finalArgs.begin() + funcType.returnParamIndex, rv);
+        runtime->builder.CreateCall(IRFunc, finalArgs);
+    } else {
+        rv = runtime->builder.CreateCall(IRFunc, args);
+    }
+    return rv;
 }
 
 void LgsFunc::addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const {
@@ -61,55 +94,11 @@ void LgsFunc::addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg
     }
 }
 
-Value* LgsFunc::createIRValue(LgsRuntime* runtime) {
-    return IRValue;
-}
-
-string LgsFunc::prettyName() {
-    return funcType.prettyName();
-}
-
-Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
-    const auto f = runtime->module->getFunction(funcType.getIRName());
-    if (f) return f;
-    const auto funcIRType = getIRFuncType(runtime);
-    auto func = runtime->module->getOrInsertFunction(funcType.getIRName(), funcIRType);
-    const auto IRFunc = dyn_cast<Function>(func.getCallee());
-
-    auto args = IRFunc->arg_begin();
-    for (int i = 0; i < funcType.params.size(); ++i) {
-        const auto param = funcType.params[i];
-        if (param->isVariadic) {
-            args++->setName("argc");
-        } else {
-            param->setIRValue(args);
-        }
-        if (param->expr) param->expr->setIRValue(args);
-        args->setName(param->name);
-        args++;
-    }
-    return IRFunc;
-}
-
-FunctionType* LgsFunc::getIRFuncType(LgsRuntime* runtime) {
-    if (IRFuncType) return IRFuncType;
-    vector<Type*> IRParamsTypes;
-    for (int i = 0; i < funcType.params.size(); ++i) {
-        const auto param = funcType.params[i];
-        const auto paramType = param->type;
-        auto paramIRType = paramType->getIRType();
-        if (!paramType->isPrimitive) {
-            paramIRType = PointerType::getUnqual(context);
-        }
-        if (param->isVariadic) {
-            IRParamsTypes.emplace_back(runtime->builder.getInt32Ty());
-        }
-        IRParamsTypes.emplace_back(paramIRType);
-    }
-
-    const auto rt = funcType.rt->getIRType();
-    IRFuncType = FunctionType::get(rt, IRParamsTypes, funcType.isVariadic);
-    return IRFuncType;
+void LgsFunc::setBigObjAttrs(Function& IRFunc) const {
+    const auto paramIRType = getReturnParam()->type->getIRType();
+    IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(context, Attribute::StructRet, paramIRType));
+    IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(context, Attribute::Writable));
+    IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(context, Attribute::NoAlias));
 }
 
 bool LgsFunc::shouldLoadIRArg(Value* value) const {
@@ -133,6 +122,28 @@ bool LgsFunc::shouldLoadIRArg(Value* value) const {
         return constExpr->getOpcode() == Instruction::GetElementPtr;
     }
     return true;
+}
+
+LgsParam* LgsFunc::getReturnParam() const {
+    if (!funcType.swapReturn) assert(false);
+    if (funcType.returnParamIndex > funcType.params.size()) assert(false);
+    return funcType.params[funcType.returnParamIndex];
+}
+
+void LgsFunc::swapReturnIfNeeded() {
+    funcType.swapReturn = funcType.isRtBig && returnExprs.size() == 1;
+    if (funcType.swapReturn) {
+        funcType.params.insert(funcType.params.begin(), new LgsParam(funcType.rt));
+        funcType.rt = &LGS_VOID;
+    }
+}
+
+Value* LgsFunc::createIRValue(LgsRuntime* runtime) {
+    return IRValue;
+}
+
+string LgsFunc::prettyName() {
+    return funcType.prettyName();
 }
 
 string LgsFunc::format(string& tabs) {
