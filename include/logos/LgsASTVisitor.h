@@ -45,7 +45,7 @@ public:
     virtual void visitInterface(LgsInterface* interface) const = 0;
     virtual void visitField(const LgsField* field) = 0;
     virtual void visitFunc(LgsFunc* func) = 0;
-    virtual void visitFuncType(const LgsFuncType* funcType) = 0;
+    virtual void visitFuncType(LgsFuncType* funcType) = 0;
     virtual void visitParam(LgsParam* param) = 0;
     virtual void visitStmt(LgsStmt* stmt) = 0;
     virtual void visitStmtBlock(LgsStmtBlock* stmtBlock) = 0;

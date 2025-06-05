@@ -16,7 +16,6 @@ public:
     explicit LgsFuncCall(const std::string& name, const std::vector<LgsExpr*>& args = {}) : name(name), args(args) {}
     Value* call(LgsRuntime* runtime) const;
     Value* getCallback(LgsRuntime* runtime) const;
-    bool equalsRaw(const LgsFuncType* funcType) const;
     bool equals(const LgsFuncType* funcType) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;

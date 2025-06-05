@@ -20,6 +20,7 @@ public:
     bool isBuiltin = false;
     bool isVariadic = false;
     bool isAnonymous = false;
+    bool isReturnSwapped = false;
     bool hasDefaultParams = false;
 
     Type* getIRType() override;

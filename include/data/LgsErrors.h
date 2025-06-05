@@ -18,7 +18,7 @@ inline LgsError E10000{.msg = "main() function is not defined in Main.lgs file."
 inline LgsError E10001{.msg = "Left type '%s' does not match the right type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10002{.msg = "'%s' must be an iterable.", .errCode = errCodeStart++};
 inline LgsError E10003{.msg = "Array index '%s' is out of bounds.", .errCode = errCodeStart++};
-inline LgsError E10004{.msg = "Function '%s' must return '%s'.", .errCode = errCodeStart++};
+inline LgsError E10004{.msg = "Function '%s' must return expression of type '%s'. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10005{.msg = "Field '%s' is not a member of '%s'.", .errCode = errCodeStart++};
 inline LgsError E10006{.msg = "'%s' is not defined.", .errCode = errCodeStart++};
 inline LgsError E10007{.msg = "File name '%s.lgs' is duplicate. All files in a project must be unique. Locations:%s", .errCode = errCodeStart++};
@@ -40,15 +40,15 @@ inline LgsError E10022{.msg = "'%s' cannot be instantiated.", .errCode = errCode
 inline LgsError E10023{.msg = "Type '%s' must be nullable. Change the type to %s? or set a value.", .errCode = errCodeStart++};
 inline LgsError E10024{.msg = "Declaration of null value must have an explict nullable type.", .errCode = errCodeStart++};
 inline LgsError E10025{.msg = "'%s' must be an interface.", .errCode = errCodeStart++};
-inline LgsError E10026{.msg = "Function '%s' must return an expression of type '%s'. None was given.", .errCode = errCodeStart++};
-inline LgsError E10027{.msg = "Function '%s' must return '%s'. Given: '%s'.", .errCode = errCodeStart++};
+inline LgsError E10026{.msg = "Function '%s' must return expression of type '%s'. None was given.", .errCode = errCodeStart++};
+inline LgsError E10027{.msg = "Void function must not return a value. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10028{.msg = "Default parameters must be defined lastly.", .errCode = errCodeStart++};
 inline LgsError E10029{.msg = "const field '%s' must be initialized in the constructor.", .errCode = errCodeStart++};
 inline LgsError E10030{.msg = "Non-public field '%s' is used outside its parent object '%s'.", .errCode = errCodeStart++};
 inline LgsError E10031{.msg = "Non-public method '%s' is used outside its parent object '%s'.", .errCode = errCodeStart++};
 inline LgsError E10032{.msg = "Singleton object '%s' cannot be instantiated.", .errCode = errCodeStart++};
 inline LgsError E10033{.msg = "Function '%s' is declared multiple times.", .errCode = errCodeStart++};
-inline LgsError E10034{.msg = "Object '%s' has method with name '%s' but it doesn't match the parameters.\n\t   Given:    %s\n\t   Expected: %s", .errCode = errCodeStart++};
+inline LgsError E10034{.msg = "Object '%s' has a method with name '%s' but it doesn't match the parameters.\n\t   Given:    %s\n\t   Expected: %s", .errCode = errCodeStart++};
 inline LgsError E10035{.msg = "Index of %s has %s level which is too deep. Max level: %s.", .errCode = errCodeStart++};
 inline LgsError E10036{.msg = "'%s' cannot be indexed with type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10037{.msg = "Left-hand index of slice must be less than right-hand index. Given: %s.", .errCode = errCodeStart++};

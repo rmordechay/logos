@@ -42,10 +42,6 @@ void LgsFuncCall::createIRStmt(LgsRuntime* runtime) {
 bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
     if (funcType->hasDefaultParams) return equalsDefaultParams(funcType);
     if (funcType->isVariadic) return equalsVariadic(funcType);
-    return equalsRaw(funcType);
-}
-
-bool LgsFuncCall::equalsRaw(const LgsFuncType* funcType) const {
     if (!funcType->isAnonymous && name != funcType->name) return false;
     if (funcType->params.size() != args.size()) return false;
     if (funcType->params.size() == 0 && args.size() == 0) return true;

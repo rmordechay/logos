@@ -89,25 +89,25 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
     stack.enterFunc(func);
     visitFuncType(&func->funcType);
     visitStmtBlock(func->stmtBlock);
-    validateFuncControlFlow(func);
+    auto& funcType = func->funcType;
+    if (funcType.rt->getSizeBytes() > OBJECT_SIZE_THRESHOLD) {
+        const auto returnParam = new LgsParam(funcType.rt, "rv");
+        funcType.isReturnSwapped = true;
+        returnParam->isReturnSwapped = true;
+        // if (funcType.isMethod && !funcType.isStatic) {
+        //     funcType.params.insert(funcType.params.begin() + 1, returnParam);
+        // } else {
+        //     funcType.params.insert(funcType.params.begin(), returnParam);
+        // }
+        // funcType.rt = &LGS_VOID;
+    }
     stack.exitFunc();
 }
 
-void SemaAnalyser::visitFuncType(const LgsFuncType* funcType) {
+void SemaAnalyser::visitFuncType(LgsFuncType* funcType) {
     for (const auto param : funcType->params) {
         visitParam(param);
     }
-    if (funcType->isMethod) {
-        visitMethodType(funcType);
-        return;
-    }
-    if (funcType->rt->getSizeBytes() >= OBJECT_SIZE_THRESHOLD) {
-        assert(false);
-    }
-}
-
-void SemaAnalyser::visitMethodType(const LgsFuncType* funcType) {
-    auto self = funcType->params.front();
 }
 
 void SemaAnalyser::visitParam(LgsParam* param) {
@@ -261,16 +261,14 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
 
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
     if (returnStmt->expr) visitExpr(returnStmt->expr);
-    auto funcType = stack.currentFunc->funcType;
+    auto& funcType = stack.currentFunc->funcType;
     const auto rt = funcType.rt;
-    if (rt->isVoid) {
-        if (returnStmt->expr && !returnStmt->expr->type->isVoid) {
-            errHandler.handleError(E10027, &returnStmt->location, {funcType.name, rt->prettyName(), returnStmt->expr->type->prettyName()});
-        }
+    if (rt->isVoid && returnStmt->expr) {
+        errHandler.handleError(E10027, &returnStmt->location, {returnStmt->expr->type->prettyName()});
     } else if (!returnStmt->expr) {
         errHandler.handleError(E10026, &returnStmt->location, {funcType.name, rt->prettyName()});
     } else if (!rt->equals(returnStmt->expr->type)) {
-        errHandler.handleError(E10027, &returnStmt->location, {funcType.name, rt->prettyName(), returnStmt->expr->type->prettyName()});
+        errHandler.handleError(E10004, &returnStmt->location, {funcType.name, rt->prettyName(), returnStmt->expr->type->prettyName()});
     }
 }
 
@@ -530,7 +528,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
         methodCall->func = method;
         methodCall->type = method->funcType.rt;
     } else {
-        errHandler.handleError(E10034, &methodCall->location, {parentType->prettyName(), methodCall->prettyName(), method->prettyName()});
+        errHandler.handleError(E10034, &methodCall->location, {parentType->prettyName(), name, method->prettyName(), method->funcType.prettyName()});
     }
     checkMethodVisibility(methodCall);
 }
@@ -623,6 +621,7 @@ void SemaAnalyser::validateExprType(const LgsExpr* expr, LgsType* type) {
 
 void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
     const auto method = methodCall->func;
+    if (!method) return;
     if (!method->funcType.isPublic && file->absPath != method->filePath) {
         errHandler.handleError(E10031, &method->location, {method->funcType.name, method->funcType.parentName});
     }

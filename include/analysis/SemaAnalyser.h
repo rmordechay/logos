@@ -53,8 +53,7 @@ public:
     void visitInterface(LgsInterface* interface) const override;
     void visitField(const LgsField* field) override;
     void visitFunc(LgsFunc* func) override;
-    void visitFuncType(const LgsFuncType* funcType) override;
-    void visitMethodType(const LgsFuncType* funcType);
+    void visitFuncType(LgsFuncType* funcType) override;
     void visitParam(LgsParam* param) override;
     void visitStmt(LgsStmt* stmt) override;
     void visitStmtBlock(LgsStmtBlock* stmtBlock) override;
