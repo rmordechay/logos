@@ -2,6 +2,7 @@
 #define LGSARRAYMETHODS_H
 #include "LgsBuiltinMethod.h"
 #include "types/LgsAny.h"
+#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsVoid.h"
@@ -83,9 +84,29 @@ public:
         funcType.params = {&self};
         funcType.isPublic = true;
     }
+};
 
-    Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
-        return args.front()->getLength(runtime);
+class LgsArrayIsEmptyFunc final : public LgsBuiltinMethod {
+public:
+    LgsParam self{};
+
+    explicit LgsArrayIsEmptyFunc(LgsType* parent) : LgsBuiltinMethod("isEmpty", parent->getIRName(), &LGS_INT) {
+        self.type = parent;
+        funcType.params = {&self};
+        funcType.isPublic = true;
+        funcType.IRName = parent->getIRName() + "_is_empty";
+    }
+};
+
+class LgsArrayIsNotEmptyFunc final : public LgsBuiltinMethod {
+public:
+    LgsParam self{};
+
+    explicit LgsArrayIsNotEmptyFunc(LgsType* parent) : LgsBuiltinMethod("isNotEmpty", parent->getIRName(), &LGS_INT) {
+        self.type = parent;
+        funcType.params = {&self};
+        funcType.isPublic = true;
+        funcType.IRName = parent->getIRName() + "_is_not_empty";
     }
 };
 

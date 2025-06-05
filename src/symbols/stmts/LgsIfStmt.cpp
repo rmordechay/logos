@@ -12,7 +12,6 @@ void LgsIfStmt::createIRStmt(LgsRuntime* runtime) {
     runtime->stack.exitScope(IF_STMT);
 }
 
-
 void LgsIfStmt::computeSimpleIf(LgsRuntime* runtime) {
     IRIfTrueBlock = createBasicBlock(BB_IF_TRUE, context);
     IRIfEndBlock = createBasicBlock(BB_IF_END, context);

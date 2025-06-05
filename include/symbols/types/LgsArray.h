@@ -12,14 +12,18 @@ public:
     LgsArrayPutFunc put{this};
     LgsArrayAddFunc add{this};
     LgsArrayLenFunc len{this};
+    LgsArrayIsEmptyFunc isEmpty{this};
+    LgsArrayIsNotEmptyFunc isNotEmpty{this};
     LgsArrayFreeFunc free{this};
     LgsArrayDeleteFunc delete_{this};
     Value* argc = nullptr;
 
     explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
+        unpackLength = 1;
         addMethod(&add);
         addMethod(&len);
-        unpackLength = 1;
+        addMethod(&isEmpty);
+        addMethod(&isNotEmpty);
     }
 
     void inferArrayType(const vector<LgsExpr*>& exprs);
