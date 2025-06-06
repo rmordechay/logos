@@ -11,7 +11,6 @@ void CodeGenerator::generate(LogosProject& project) {
     init();
     ThreadPool threadPool;
     threadPool.start();
-    // TODO there are still race conditions with LLVM
     for (const auto file : project.files) {
         threadPool.runTask([file, &project] {
             const auto module = file->generateIR(project);

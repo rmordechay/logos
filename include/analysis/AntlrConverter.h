@@ -40,7 +40,6 @@ class LgsAssignment;
 
 class AntlerConverter {
 public:
-    LgsFunc* currentFunc = nullptr;
     LgsErrHandler errHandler;
     string filePath;
 

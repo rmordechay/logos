@@ -233,19 +233,18 @@ LgsFunc* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext
     const auto funcSignature = ctx->funcSignature();
     const auto nameToken = funcSignature->VARIABLE();
     const auto self = new LgsParam(obj, LOGOS_SELF);
+    self->isSelf = true;
     const auto method = new LgsFunc(nameToken->getText(), rt);
+    method->filePath = obj->path;
     method->funcType.isMethod = true;
     method->funcType.parentName = obj->name;
-    currentFunc = method;
     method->funcType.params.emplace_back(self);
     setParams(&method->funcType, funcSignature->param());
-    method->filePath = obj->path;
     if (ctx->VISIBILITY()) {
         method->funcType.isPublic = true;
     }
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     method->setLocation(nameToken->getSymbol());
-    currentFunc = nullptr;
     return method;
 }
 

@@ -1,6 +1,4 @@
 #include "types/LgsFuncType.h"
-
-#include "logos/LgsConfig.h"
 #include "types/LgsInterface.h"
 
 bool LgsFuncType::equals(LgsType* other) {
@@ -31,23 +29,24 @@ string LgsFuncType::getIRName() {
 
 Type* LgsFuncType::getIRType() {
     if (IRType) return IRType;
-    Type* type;
+    Type* returnType;
     if (isRvBig && !swapReturn) {
-        type = PointerType::getUnqual(context);
+        returnType = PointerType::getUnqual(context);
     } else {
-        type = rt->getIRType();
+        returnType = rt->getIRType();
     }
     vector<Type*> IRParamsTypes;
     for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param->type;
-        auto paramIRType = paramType->getIRType();
-        if (!paramType->isPrimitive) {
-            paramIRType = PointerType::getUnqual(context);
+        if (!paramType->isPrimitive || param->isSelf) {
+            IRParamsTypes.emplace_back(PointerType::getUnqual(context));
+        } else {
+            auto irType = paramType->getIRType();
+            IRParamsTypes.emplace_back(irType);
         }
-        IRParamsTypes.emplace_back(paramIRType);
     }
-    IRType = FunctionType::get(type, IRParamsTypes, isVariadic);
+    IRType = FunctionType::get(returnType, IRParamsTypes, isVariadic);
     return IRType;
 }
 

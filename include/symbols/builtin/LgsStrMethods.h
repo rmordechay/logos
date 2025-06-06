@@ -1,6 +1,6 @@
 #ifndef LGSSTRMETHODS_H
 #define LGSSTRMETHODS_H
-#include "LgsBuiltinMethod.h"
+#include "LgsBuiltinFunc.h"
 #include "logos/LgsRuntime.h"
 #include "utils/LgsUtils.h"
 #include "types/LgsAny.h"
@@ -13,12 +13,12 @@ inline FunctionCallee getSnprintf(LgsRuntime* runtime) {
     return runtime->module->getOrInsertFunction("snprintf", printfType);
 }
 
-class LgsStrFormatFunc final : public LgsBuiltinMethod {
+class LgsStrFormatFunc final : public LgsBuiltinFunc {
 public:
     LgsParam self{};
     LgsParam args{&LGS_ANY};
 
-    explicit LgsStrFormatFunc(LgsType* parent) : LgsBuiltinMethod("format", parent->getIRName(), parent) {
+    explicit LgsStrFormatFunc(LgsType* parent) : LgsBuiltinFunc("format", parent, parent->getIRName()) {
         self.type = parent;
         funcType.isVariadic = true;
         funcType.isPublic = true;
@@ -44,11 +44,11 @@ public:
 };
 
 
-class LgsStrLenFunc final : public LgsBuiltinMethod {
+class LgsStrLenFunc final : public LgsBuiltinFunc {
 public:
     LgsParam self{};
 
-    explicit LgsStrLenFunc(LgsType* parent) : LgsBuiltinMethod("len", parent->getIRName(), &LGS_INT) {
+    explicit LgsStrLenFunc(LgsType* parent) : LgsBuiltinFunc("len", &LGS_INT, parent->getIRName()) {
         self.type = parent;
         funcType.IRName = "strlen";
         funcType.params = {&self};

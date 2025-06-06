@@ -13,7 +13,7 @@ string LgsInstance::getName() {
 Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
     const auto currentFunc = runtime->stack.currentFunc;
     if (currentFunc->funcType.swapReturn && isReturnExpr) {
-        IRValue = currentFunc->getReturnParam()->IRValue;
+        IRValue = currentFunc->getReturnSwapParam()->IRValue;
     } else {
         IRValue = runtime->builder.CreateAlloca(obj->getIRType());
     }

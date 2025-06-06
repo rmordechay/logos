@@ -26,15 +26,15 @@ public:
         funcType.params = params;
     }
 
-    Value* createIRValue(LgsRuntime* runtime) override;
-    string prettyName() override;
-    void setBigObjAttrs(Function& IRFunc) const;
-    string format(string& tabs) override;
-    json asJSON() override;
-    void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const;
-    bool shouldLoadIRArg(Value* value) const;
-    LgsParam* getReturnParam() const;
     void swapReturnIfNeeded();
+    LgsParam* getReturnSwapParam() const;
+    bool shouldLoadIRArg(Value* value) const;
+    void setBigObjAttrs(Function& IRFunc) const;
+    void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const;
+    Value* createIRValue(LgsRuntime* runtime) override;
+    string format(string& tabs) override;
+    string prettyName() override;
+    json asJSON() override;
     virtual void generateIR(LgsRuntime* runtime);
     virtual Function* getIRFunc(LgsRuntime* runtime);
     virtual Value* callIR(LgsRuntime* runtime, const vector<Value*>& args = {});

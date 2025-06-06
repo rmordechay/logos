@@ -11,6 +11,10 @@ Type* LgsVoid::getIRType() {
     return Type::getVoidTy(context);
 }
 
+size_t LgsVoid::getSizeBytes() {
+    return 0;
+}
+
 string LgsVoid::getIRName() {
     return name;
 }

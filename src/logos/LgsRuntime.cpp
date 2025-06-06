@@ -37,10 +37,10 @@ void LgsRuntime::addAllocatedExpr(LgsExpr* expr) {
     stack.top().allocatedExprs.emplace_back(expr);
 }
 
-void LgsRuntime::freeExprs(LgsRuntime* runtime) {
+void LgsRuntime::freeExprs() {
     const auto& exprs = stack.top().allocatedExprs;
     for (const auto expr : exprs) {
-        expr->free(runtime);
+        expr->free(this);
     }
     stack.top().allocatedExprs.clear();
 }

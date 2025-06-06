@@ -12,6 +12,7 @@ public:
     std::string name;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
+    bool isSelf = false;
     bool isVariadic = false;
     AllocaInst* vaList = nullptr;
     std::vector<LgsVariable*> refs;

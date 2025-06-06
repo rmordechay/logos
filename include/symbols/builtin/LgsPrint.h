@@ -1,6 +1,6 @@
 #ifndef LOGOSPRINT_H
 #define LOGOSPRINT_H
-#include "LgsBuiltinMethod.h"
+#include "LgsBuiltinFunc.h"
 #include "logos/LgsRuntime.h"
 #include "types/primitives/LgsBool.h"
 #include "utils/LgsUtils.h"
@@ -20,7 +20,7 @@ public:
     LgsParam input{&LGS_ANY};
     LgsParam args{&LGS_ANY};
 
-    explicit LgsPrint(): LgsBuiltinFunc(name, &LGS_VOID) {
+    explicit LgsPrint(): LgsBuiltinFunc(name, &LGS_VOID, "") {
         funcType.isVariadic = true;
         funcType.IRName = "printf";
         funcType.params = {&input, &args};

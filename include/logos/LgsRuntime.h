@@ -25,7 +25,7 @@ public:
     void pushStackTrace(const string& path);
     void printStack();
     void addAllocatedExpr(LgsExpr* expr);
-    void freeExprs(LgsRuntime* runtime);
+    void freeExprs();
     ~LgsRuntime() = default;
 };
 

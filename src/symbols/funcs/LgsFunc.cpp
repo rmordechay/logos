@@ -4,35 +4,35 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "exprs/LgsExpr.h"
-#include "logos/LgsConfig.h"
 #include "types/LgsArray.h"
 
 void LgsFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.enterFunc(this);
     startBlockFunc(runtime);
-    getIRFunc(runtime);
     stmtBlock->createIRValue(runtime);
     if (funcType.rt->isVoid) {
-        runtime->freeExprs(runtime);
+        runtime->freeExprs();
         runtime->builder.CreateRetVoid();
     }
     runtime->stack.exitFunc();
 }
 
 Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
-    const auto f = runtime->module->getFunction(funcType.getIRName());
-    if (f) return f;
-    const auto funcIRType = funcType.getIRType();
-    auto func = runtime->module->getOrInsertFunction(funcType.getIRName(), funcIRType);
-    const auto IRFunc = dyn_cast<Function>(func.getCallee());
+    const auto funcIRName = funcType.getIRName();
+    auto IRFunc = runtime->module->getFunction(funcIRName);
+    if (IRFunc) return IRFunc;
+    const auto funcTy = dyn_cast<FunctionType>(funcType.getIRType());
+    auto func = runtime->module->getOrInsertFunction(funcIRName, funcTy);
+    IRFunc = dyn_cast<Function>(func.getCallee());
     if (funcType.swapReturn) {
         setBigObjAttrs(*IRFunc);
     }
+    if (funcType.params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
-    for (int i = 0; i < funcType.params.size(); ++i) {
-        const auto param = funcType.params[i];
+    for (const auto param : funcType.params) {
         param->setIRValue(args);
-        args++->setName(param->name);
+        args->setName(param->name);
+        args++;
     }
     return IRFunc;
 }
@@ -49,13 +49,13 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
 
 Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
     if (IRValue) {
-        const auto IRFuncType = funcType.IRType(runtime);
+        const auto IRFuncType = dyn_cast<FunctionType>(funcType.getIRType());
         return runtime->builder.CreateCall(IRFuncType, IRValue, args);
     }
     const auto IRFunc = getIRFunc(runtime);
     Value* rv;
     if (funcType.swapReturn) {
-        const auto paramIRType = getReturnParam()->type->getIRType();
+        const auto paramIRType = getReturnSwapParam()->type->getIRType();
         rv = runtime->builder.CreateAlloca(paramIRType);
         vector finalArgs(args.begin(), args.end());
         finalArgs.insert(finalArgs.begin() + funcType.returnParamIndex, rv);
@@ -78,7 +78,7 @@ void LgsFunc::addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg
 }
 
 void LgsFunc::setBigObjAttrs(Function& IRFunc) const {
-    const auto paramIRType = getReturnParam()->type->getIRType();
+    const auto paramIRType = getReturnSwapParam()->type->getIRType();
     IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::StructRet, paramIRType));
     IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::Writable));
     IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
@@ -107,7 +107,7 @@ bool LgsFunc::shouldLoadIRArg(Value* value) const {
     return true;
 }
 
-LgsParam* LgsFunc::getReturnParam() const {
+LgsParam* LgsFunc::getReturnSwapParam() const {
     if (!funcType.swapReturn) assert(false);
     if (funcType.returnParamIndex > funcType.params.size()) assert(false);
     return funcType.params[funcType.returnParamIndex];

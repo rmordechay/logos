@@ -9,7 +9,7 @@ void LgsMainFunc::generateIR(LgsRuntime* runtime) {
     startBlockFunc(runtime);
     runtime->initRuntime();
     stmtBlock->createIRValue(runtime);
-    runtime->freeExprs(runtime);
+    runtime->freeExprs();
     runtime->builder.CreateRet(runtime->builder.getInt32(EXIT_SUCCESS));
     runtime->stack.exitFunc();
 }
@@ -26,7 +26,7 @@ Function* LgsMainFunc::getIRFunc(LgsRuntime* runtime) {
     auto func = runtime->module->getOrInsertFunction(LOGOS_MAIN_FUNC, mainFuncType);
     IRFunc = dyn_cast<Function>(func.getCallee());
     if (hasParams) {
-        auto args = IRFunc->arg_begin();
+            auto args = IRFunc->arg_begin();
         args++->setName("argc");
         args->setName("argv");
     }

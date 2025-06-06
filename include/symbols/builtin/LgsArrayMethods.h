@@ -1,54 +1,52 @@
 #ifndef LGSARRAYMETHODS_H
 #define LGSARRAYMETHODS_H
-#include "LgsBuiltinMethod.h"
+#include "LgsBuiltinFunc.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsVoid.h"
-#include "utils/LgsUtils.h"
 
-class LgsArrayInitFunc final : public LgsBuiltinMethod {
+class LgsArrayInitFunc final : public LgsBuiltinFunc {
 public:
     LgsParam self{};
     LgsParam capacityParam{&LGS_INT};
     LgsParam elementSizeParam{&LGS_LONG};
 
-    explicit LgsArrayInitFunc(LgsType* parent) : LgsBuiltinMethod("init", parent->getIRName(), &LGS_VOID) {
+    explicit LgsArrayInitFunc(LgsType* parent) : LgsBuiltinFunc("init", &LGS_VOID, parent->getIRName()) {
         self.type = parent;
         funcType.params = {&self, &capacityParam, &elementSizeParam};
-        funcType.isStatic = true;
     }
 };
 
-class LgsArrayGetFunc final : public LgsBuiltinMethod {
+class LgsArrayGetFunc final : public LgsBuiltinFunc {
 public:
     LgsParam self{};
     LgsParam indexParam{&LGS_INT};
 
-    explicit LgsArrayGetFunc(LgsType* parent) : LgsBuiltinMethod("get", parent->getIRName(), &LGS_ANY) {
+    explicit LgsArrayGetFunc(LgsType* parent) : LgsBuiltinFunc("get", &LGS_ANY, parent->getIRName()) {
         self.type = parent;
         funcType.params = {&self, &indexParam};
     }
 };
 
-class LgsArrayPutFunc final : public LgsBuiltinMethod {
+class LgsArrayPutFunc final : public LgsBuiltinFunc {
 public:
     LgsParam self{};
     LgsParam indexParam{&LGS_INT};
     LgsParam valueParam{&LGS_ANY};
 
-    explicit LgsArrayPutFunc(LgsType* parent) : LgsBuiltinMethod("put", parent->getIRName(), &LGS_VOID) {
+    explicit LgsArrayPutFunc(LgsType* parent) : LgsBuiltinFunc("put", &LGS_VOID, parent->getIRName()) {
         self.type = parent;
         funcType.params = {&self, &indexParam, &valueParam};
     }
 };
 
-class LgsArrayAddFunc final : public LgsBuiltinMethod {
+class LgsArrayAddFunc final : public LgsBuiltinFunc {
 public:
     LgsParam self{};
     LgsParam valueParam{&LGS_ANY};
 
-    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinMethod("add", parent->getIRName(), &LGS_VOID) {
+    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName()) {
         self.type = parent;
         funcType.params = {&self, &valueParam};
         funcType.isPublic = true;
@@ -64,55 +62,55 @@ public:
     }
 };
 
-class LgsArrayDeleteFunc final : public LgsBuiltinMethod {
+class LgsArrayDeleteFunc final : public LgsBuiltinFunc {
 public:
     LgsParam self{};
     LgsParam indexParam{&LGS_INT};
 
-    explicit LgsArrayDeleteFunc(LgsType* parent) : LgsBuiltinMethod("delete", parent->getIRName(), &LGS_VOID) {
+    explicit LgsArrayDeleteFunc(LgsType* parent) : LgsBuiltinFunc("delete", &LGS_VOID, parent->getIRName()) {
         self.type = parent;
         funcType.params = {&self, &indexParam};
     }
 };
 
-class LgsArrayLenFunc final : public LgsBuiltinMethod {
+class LgsArrayLenFunc final : public LgsBuiltinFunc {
 public:
     LgsParam self{};
 
-    explicit LgsArrayLenFunc(LgsType* parent) : LgsBuiltinMethod("len", parent->getIRName(), &LGS_INT) {
+    explicit LgsArrayLenFunc(LgsType* parent) : LgsBuiltinFunc("len", &LGS_INT, parent->getIRName()) {
         self.type = parent;
         funcType.params = {&self};
         funcType.isPublic = true;
     }
 };
 
-class LgsArrayIsEmptyFunc final : public LgsBuiltinMethod {
+class LgsArrayIsEmptyFunc final : public LgsBuiltinFunc {
 public:
     LgsParam self{};
 
-    explicit LgsArrayIsEmptyFunc(LgsType* parent) : LgsBuiltinMethod("isEmpty", parent->getIRName(), &LGS_INT) {
+    explicit LgsArrayIsEmptyFunc(LgsType* parent) : LgsBuiltinFunc("isEmpty", &LGS_INT, parent->getIRName()) {
         self.type = parent;
         funcType.params = {&self};
         funcType.isPublic = true;
     }
 };
 
-class LgsArrayIsNotEmptyFunc final : public LgsBuiltinMethod {
+class LgsArrayIsNotEmptyFunc final : public LgsBuiltinFunc {
 public:
     LgsParam self{};
 
-    explicit LgsArrayIsNotEmptyFunc(LgsType* parent) : LgsBuiltinMethod("isNotEmpty", parent->getIRName(), &LGS_INT) {
+    explicit LgsArrayIsNotEmptyFunc(LgsType* parent) : LgsBuiltinFunc("isNotEmpty", &LGS_INT, parent->getIRName()) {
         self.type = parent;
         funcType.params = {&self};
         funcType.isPublic = true;
     }
 };
 
-class LgsArrayFreeFunc final : public LgsBuiltinMethod {
+class LgsArrayFreeFunc final : public LgsBuiltinFunc {
 public:
     LgsParam self{};
 
-    explicit LgsArrayFreeFunc(LgsType* parent) : LgsBuiltinMethod("free", parent->getIRName(), &LGS_INT) {
+    explicit LgsArrayFreeFunc(LgsType* parent) : LgsBuiltinFunc("free", &LGS_INT, parent->getIRName()) {
         self.type = parent;
         funcType.params = {&self};
     }

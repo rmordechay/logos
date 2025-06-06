@@ -49,7 +49,7 @@ void SemaAnalyser::analyseFiles(LogosProject& project) {
         });
     }
     threadPool.wait();
-    reprocessFuncs(project);
+    // reprocessFuncs(project);
 }
 
 void SemaAnalyser::start() {
@@ -714,7 +714,9 @@ void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
         funcType->params[i]->type = resolveType(funcType->params[i]->type);
     }
     funcType->rt = resolveType(funcType->rt);
-    funcType->isRvBig = funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD;
+    if (!funcType->rt->isVoid) {
+        funcType->isRvBig = funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD;
+    }
 }
 
 void SemaAnalyser::resolveObjectImplements(LgsObject* obj) {
