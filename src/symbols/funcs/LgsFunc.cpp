@@ -38,7 +38,7 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
 }
 
 FunctionType* LgsFunc::getIRFuncType(LgsRuntime* runtime) {
-    if (IRFuncType) return IRFuncType;
+    if (funcType.IRType) return funcType.IRType;
     vector<Type*> IRParamsTypes;
     Type* rt;
     if (funcType.isRvBig && !funcType.swapReturn) {
@@ -55,8 +55,8 @@ FunctionType* LgsFunc::getIRFuncType(LgsRuntime* runtime) {
         }
         IRParamsTypes.emplace_back(paramIRType);
     }
-    IRFuncType = FunctionType::get(rt, IRParamsTypes, funcType.isVariadic);
-    return IRFuncType;
+    funcType.IRType = FunctionType::get(rt, IRParamsTypes, funcType.isVariadic);
+    return funcType.IRType;
 }
 
 Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {

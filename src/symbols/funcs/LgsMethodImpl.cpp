@@ -2,6 +2,7 @@
 #include "types/LgsObject.h"
 
 FunctionType* LgsMethodImpl::getIRFuncType(LgsRuntime* runtime) {
+    if (funcType.IRType) return funcType.IRType;
     vector<Type*> IRParamsTypes;
     for (int i = 0; i < funcType.params.size(); ++i) {
         auto paramIRType = funcType.params[i]->type->getIRType();
@@ -18,6 +19,6 @@ FunctionType* LgsMethodImpl::getIRFuncType(LgsRuntime* runtime) {
     } else {
         rt = funcType.rt->getIRType();
     }
-    IRFuncType = FunctionType::get(rt, IRParamsTypes, funcType.isVariadic);
-    return IRFuncType;
+    funcType.IRType = FunctionType::get(rt, IRParamsTypes, funcType.isVariadic);
+    return funcType.IRType;
 }

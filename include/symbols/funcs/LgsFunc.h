@@ -11,13 +11,12 @@ class LgsType;
 
 class LgsFunc : public LgsUnaryExpr {
 public:
+    string filePath;
     LgsFuncType funcType;
     vector<LgsVariable*> refs;
     vector<LgsExpr*> returnExprs;
     LgsStmtBlock* stmtBlock = nullptr;
-    FunctionType* IRFuncType = nullptr;
     IRBuilderBase::InsertPoint savedIP;
-    string filePath;
 
     explicit LgsFunc() {
         type = &funcType;

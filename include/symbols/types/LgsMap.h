@@ -15,6 +15,8 @@ public:
     LgsMapGetFunc get{this};
     LgsMapAddFunc add{this};
     LgsMapLenFunc len{this};
+    LgsMapIsEmptyFunc isEmpty{this};
+    LgsMapIsNotEmptyFunc isNotEmpty{this};
     LgsMapDeleteFunc delete_{this};
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&kvType) {
@@ -22,6 +24,8 @@ public:
         kvType.value = valueType;
         unpackLength = 2;
         addMethod(&len);
+        addMethod(&isEmpty);
+        addMethod(&isNotEmpty);
     }
 
     void setBaseType(const vector<LgsMapPair*>& exprs);

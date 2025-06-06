@@ -12,7 +12,7 @@ public:
     string parentName;
     LgsType* rt = nullptr;
     vector<LgsParam*> params;
-    FunctionType* IRFuncType = nullptr;
+    FunctionType* IRType = nullptr;
     bool isMethod = false;
     bool isStatic = false;
     bool isPublic = false;

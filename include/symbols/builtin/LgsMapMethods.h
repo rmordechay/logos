@@ -62,4 +62,26 @@ public:
     }
 };
 
+class LgsMapIsEmptyFunc final : public LgsBuiltinMethod {
+public:
+    LgsParam self{};
+
+    explicit LgsMapIsEmptyFunc(LgsType* parent) : LgsBuiltinMethod("isEmpty", parent->getIRName(), &LGS_INT) {
+        self.type = parent;
+        funcType.params = {&self};
+        funcType.isPublic = true;
+    }
+};
+
+class LgsMapIsNotEmptyFunc final : public LgsBuiltinMethod {
+public:
+    LgsParam self{};
+
+    explicit LgsMapIsNotEmptyFunc(LgsType* parent) : LgsBuiltinMethod("isNotEmpty", parent->getIRName(), &LGS_INT) {
+        self.type = parent;
+        funcType.params = {&self};
+        funcType.isPublic = true;
+    }
+};
+
 #endif //LGSMAPMETHODS_H

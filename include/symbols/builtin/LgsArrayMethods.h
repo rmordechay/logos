@@ -2,10 +2,10 @@
 #define LGSARRAYMETHODS_H
 #include "LgsBuiltinMethod.h"
 #include "types/LgsAny.h"
-#include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsVoid.h"
+#include "utils/LgsUtils.h"
 
 class LgsArrayInitFunc final : public LgsBuiltinMethod {
 public:
@@ -94,7 +94,6 @@ public:
         self.type = parent;
         funcType.params = {&self};
         funcType.isPublic = true;
-        funcType.IRName = parent->getIRName() + "_is_empty";
     }
 };
 
@@ -106,7 +105,6 @@ public:
         self.type = parent;
         funcType.params = {&self};
         funcType.isPublic = true;
-        funcType.IRName = parent->getIRName() + "_is_not_empty";
     }
 };
 

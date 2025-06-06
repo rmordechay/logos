@@ -60,7 +60,7 @@ Module* createIRModule(const string& moduleName, LLVMContext& context) {
     const auto targetTriple = sys::getDefaultTargetTriple();
     string error;
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    const auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
+    const auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), nullopt);
     const auto module = new Module(moduleName, context);
     module->setTargetTriple(targetTriple);
     module->setDataLayout(targetMachine->createDataLayout());
