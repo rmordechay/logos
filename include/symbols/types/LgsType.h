@@ -19,7 +19,7 @@ class LgsExpr;
 class LgsFuncCall;
 class LgsConstExpr;
 class LgsField;
-class LgsMethodImpl;
+class LgsFunc;
 
 class LgsType {
 public:
@@ -31,11 +31,11 @@ public:
     bool isCallable = false;
     Type* IRType = nullptr;
     map<string, LgsField*> fields;
-    map<string, LgsMethodImpl*> methods;
+    map<string, LgsFunc*> methods;
 
     LgsField* getField(const string& name);
-    void addMethod(LgsMethodImpl* method);
-    LgsMethodImpl* findMethod(const string& name) const;
+    void addMethod(LgsFunc* method);
+    LgsFunc* findMethod(const string& name) const;
     void setLocation(const antlr4::Token* ctx);
 
     LgsBool* asBool();

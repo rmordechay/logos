@@ -1,5 +1,4 @@
 #include "extern/LgsCInterface.h"
-#include "funcs/LgsFuncImpl.h"
 #include "types/LgsObject.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsFloat.h"
@@ -11,7 +10,7 @@ bool LgsCVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     const auto name = func->getNameAsString();
     const auto returnType = func->getReturnType();
     const auto lgsType = mapCType(returnType);
-    const auto funcImpl = new LgsFuncImpl(name, lgsType);
+    const auto funcImpl = new LgsFunc(name, lgsType);
     for (int i = 0; i < func->getNumParams(); ++i) {
         const auto paramType = func->getParamDecl(i)->getType();
         const auto lgsParam = new LgsParam(mapCType(paramType));

@@ -3,7 +3,6 @@
 #include <LgsValue.h>
 #include <llvm/IR/IRBuilder.h>
 
-class LgsFuncImpl;
 class LgsVariable;
 class LgsExpr;
 class LgsType;

@@ -78,7 +78,7 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr) override;
     void visitVariable(LgsVariable* variable) override;
     void visitFuncCall(LgsFuncCall* funcCall) override;
-    void visitAnonymousFunc(LgsFuncCall* funcCall, const LgsFuncType* funcType) override;
+    void visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType) override;
     void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) override;
     void visitSelection(LgsSelection* selection) override;
     void visitInnerSelections(const LgsSelection* selection) override;

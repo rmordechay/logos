@@ -3,6 +3,7 @@
 
 #include "logos/LgsErrHandler.h"
 #include "LogosParser.h"
+#include "funcs/LgsFunc.h"
 
 using namespace std;
 using namespace filesystem;
@@ -28,12 +29,10 @@ class LgsFuncType;
 class LgsObject;
 class LgsInterface;
 class LgsConstExpr;
-class LgsFuncImpl;
 class LgsObjectFile;
 class LgsMainFunc;
 class LgsMainFile;
 class LgsFile;
-class LgsMethodImpl;
 class LgsEnvFile;
 class LgsAppFile;
 class LgsForLoop;
@@ -41,7 +40,7 @@ class LgsAssignment;
 
 class AntlerConverter {
 public:
-    LgsMethodImpl* currentMethod = nullptr;
+    LgsFunc* currentFunc = nullptr;
     LgsErrHandler errHandler;
     string filePath;
 
@@ -56,9 +55,9 @@ public:
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, bool isSingleton = false);
     void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);
     LgsField* getField(LogosParser::FieldContext* ctx);
-    LgsFuncImpl* getFuncImpl(LogosParser::FuncImplContext* ctx);
-    LgsFuncImpl* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
-    LgsMethodImpl* getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
+    LgsFunc* getFuncImpl(LogosParser::FuncImplContext* ctx);
+    LgsFunc* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
+    LgsFunc* getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     LgsStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);

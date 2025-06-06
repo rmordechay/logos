@@ -1,6 +1,7 @@
 #include "funcs/LgsMainFunc.h"
 
 #include "logos/LgsRuntime.h"
+#include "stmts/LgsStmtBlock.h"
 #include "types/LgsArray.h"
 
 void LgsMainFunc::generateIR(LgsRuntime* runtime) {

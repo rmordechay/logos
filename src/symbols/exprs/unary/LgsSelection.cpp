@@ -2,7 +2,7 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsVariable.h"
-#include "funcs/LgsMethodImpl.h"
+
 #include "stmts/LgsField.h"
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"

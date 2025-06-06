@@ -2,7 +2,6 @@
 
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
-
 #include "files/LgsInterfaceFile.h"
 #include "LogosLexer.h"
 #include "logos/Platform.h"
@@ -186,11 +185,13 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
     for (const auto& funcSignature : ctx->funcSignature()) {
         const auto self = new LgsParam(interface, LOGOS_SELF);
         const auto type = getFuncReturnType(funcSignature->type());
-        const auto method = new LgsMethodImpl(funcSignature->VARIABLE()->getText(), interfaceName, type);
-        method->funcType.params.push_back(self);
-        setParams(&method->funcType, funcSignature->param());
-        method->filePath = filePath;
-        interface->addMethod(method);
+        const auto func = new LgsFunc(funcSignature->VARIABLE()->getText(), type);
+        func->funcType.parentName = interfaceName;
+        func->funcType.isMethod = true;
+        func->funcType.params.push_back(self);
+        setParams(&func->funcType, funcSignature->param());
+        func->filePath = filePath;
+        interface->addMethod(func);
     }
     globals.addSymbol(interface->interfaceName, LgsSymbol(interface), &errHandler);
     return interface;
@@ -215,11 +216,11 @@ LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
     return mainFunc;
 }
 
-LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplContext* ctx) {
+LgsFunc* AntlerConverter::getFuncImpl(LogosParser::FuncImplContext* ctx) {
     const auto rt = getFuncReturnType(ctx->funcSignature()->type());
     const auto funcSignature = ctx->funcSignature();
     const auto tokenName = funcSignature->VARIABLE();
-    const auto func = new LgsFuncImpl(tokenName->getText(), rt);
+    const auto func = new LgsFunc(tokenName->getText(), rt);
     setParams(&func->funcType, funcSignature->param());
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     func->setLocation(tokenName->getSymbol());
@@ -227,13 +228,15 @@ LgsFuncImpl* AntlerConverter::getFuncImpl(LogosParser::FuncImplContext* ctx) {
     return func;
 }
 
-LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj) {
+LgsFunc* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj) {
     const auto rt = getFuncReturnType(ctx->funcSignature()->type());
     const auto funcSignature = ctx->funcSignature();
     const auto nameToken = funcSignature->VARIABLE();
     const auto self = new LgsParam(obj, LOGOS_SELF);
-    const auto method = new LgsMethodImpl(nameToken->getText(), obj->name, rt);
-    currentMethod = method;
+    const auto method = new LgsFunc(nameToken->getText(), rt);
+    method->funcType.isMethod = true;
+    method->funcType.parentName = obj->name;
+    currentFunc = method;
     method->funcType.params.emplace_back(self);
     setParams(&method->funcType, funcSignature->param());
     method->filePath = obj->path;
@@ -242,14 +245,14 @@ LgsMethodImpl* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationC
     }
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     method->setLocation(nameToken->getSymbol());
-    currentMethod = nullptr;
+    currentFunc = nullptr;
     return method;
 }
 
-LgsFuncImpl* AntlerConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx) {
+LgsFunc* AntlerConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx) {
     const auto rt = getFuncReturnType(ctx->anonnymosfuncSignature()->type());
     const auto funcSignature = ctx->anonnymosfuncSignature();
-    const auto func = new LgsFuncImpl("", rt);
+    const auto func = new LgsFunc("", rt);
     func->funcType.isAnonymous = true;
     setParams(&func->funcType, funcSignature->param());
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());

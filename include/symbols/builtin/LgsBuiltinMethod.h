@@ -1,20 +1,20 @@
 #ifndef LGSBUILTINFUNC_H
 #define LGSBUILTINFUNC_H
 #include "funcs/LgsFunc.h"
-#include "funcs/LgsFuncImpl.h"
-#include "funcs/LgsMethodImpl.h"
 
-class LgsBuiltinMethod : public LgsMethodImpl {
+
+class LgsBuiltinMethod : public LgsFunc {
 public:
-    LgsBuiltinMethod(const string& name, const string& parentName, LgsType* rt, const vector<LgsParam*>& params = {}): LgsMethodImpl(name, parentName, rt, params) {
+    LgsBuiltinMethod(const string& name, const string& parentName, LgsType* rt, const vector<LgsParam*>& params = {}): LgsFunc(name, rt, params) {
+        funcType.parentName = parentName;
         funcType.isBuiltin = true;
     }
     ~LgsBuiltinMethod() override = default;
 };
 
-class LgsBuiltinFunc : public LgsFuncImpl {
+class LgsBuiltinFunc : public LgsFunc {
 public:
-    LgsBuiltinFunc(const string& name, LgsType* rt, const vector<LgsParam*>& params = {}): LgsFuncImpl(name, rt, params) {
+    LgsBuiltinFunc(const string& name, LgsType* rt, const vector<LgsParam*>& params = {}): LgsFunc(name, rt, params) {
         funcType.isBuiltin = true;
     }
     ~LgsBuiltinFunc() override = default;

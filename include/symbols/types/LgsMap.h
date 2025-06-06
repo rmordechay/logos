@@ -3,7 +3,7 @@
 #include "types/LgsIterable.h"
 #include "types/LgsPair.h"
 #include "builtin/LgsMapMethods.h"
-#include "funcs/LgsMethodImpl.h"
+
 
 class LgsMapPair;
 

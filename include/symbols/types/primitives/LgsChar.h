@@ -1,6 +1,7 @@
 #ifndef LGSCHAR_H
 #define LGSCHAR_H
-#include "funcs/LgsMethodImpl.h"
+#include "types/LgsType.h"
+
 
 class LgsChar final : public LgsType {
 public:

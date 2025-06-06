@@ -21,7 +21,7 @@ bool LgsFuncType::equals(LgsType* other) {
 string LgsFuncType::getIRName() {
     if (IRName != "") return IRName;
     stringstream strStream;
-    if (parentName != "") {
+    if (isMethod) {
         strStream << parentName << "_";
     }
     strStream << name;
@@ -30,7 +30,25 @@ string LgsFuncType::getIRName() {
 }
 
 Type* LgsFuncType::getIRType() {
-    return PointerType::getUnqual(context);
+    if (IRType) return IRType;
+    Type* type;
+    if (isRvBig && !swapReturn) {
+        type = PointerType::getUnqual(context);
+    } else {
+        type = rt->getIRType();
+    }
+    vector<Type*> IRParamsTypes;
+    for (int i = 0; i < params.size(); ++i) {
+        const auto param = params[i];
+        const auto paramType = param->type;
+        auto paramIRType = paramType->getIRType();
+        if (!paramType->isPrimitive) {
+            paramIRType = PointerType::getUnqual(context);
+        }
+        IRParamsTypes.emplace_back(paramIRType);
+    }
+    IRType = FunctionType::get(type, IRParamsTypes, isVariadic);
+    return IRType;
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {

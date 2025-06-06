@@ -1,5 +1,5 @@
 #include "types/LgsInterface.h"
-#include "funcs/LgsMethodImpl.h"
+
 #include "types/LgsObject.h"
 
 Type* LgsInterface::getIRType() {

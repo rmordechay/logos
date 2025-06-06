@@ -1,6 +1,6 @@
 #include "types/LgsType.h"
 #include "exprs/unary/LgsFuncCall.h"
-#include "funcs/LgsMethodImpl.h"
+
 #include "stmts/LgsField.h"
 #include "types/primitives/LgsInt.h"
 #include "types/LgsInterface.h"
@@ -38,11 +38,11 @@ LgsField* LgsType::getField(const string& name) {
     return nullptr;
 }
 
-void LgsType::addMethod(LgsMethodImpl* method) {
+void LgsType::addMethod(LgsFunc* method) {
     methods[method->funcType.name] = method;
 }
 
-LgsMethodImpl* LgsType::findMethod(const string& name) const {
+LgsFunc* LgsType::findMethod(const string& name) const {
     const auto method = methods.find(name);
     if (method != methods.end()) {
         return method->second;

@@ -22,7 +22,7 @@ void LgsFunc::generateIR(LgsRuntime* runtime) {
 Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
     const auto f = runtime->module->getFunction(funcType.getIRName());
     if (f) return f;
-    const auto funcIRType = getIRFuncType(runtime);
+    const auto funcIRType = funcType.getIRType();
     auto func = runtime->module->getOrInsertFunction(funcType.getIRName(), funcIRType);
     const auto IRFunc = dyn_cast<Function>(func.getCallee());
     if (funcType.swapReturn) {
@@ -37,28 +37,6 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
     return IRFunc;
 }
 
-FunctionType* LgsFunc::getIRFuncType(LgsRuntime* runtime) {
-    if (funcType.IRType) return funcType.IRType;
-    vector<Type*> IRParamsTypes;
-    Type* rt;
-    if (funcType.isRvBig && !funcType.swapReturn) {
-        rt = PointerType::getUnqual(context);
-    } else {
-        rt = funcType.rt->getIRType();
-    }
-    for (int i = 0; i < funcType.params.size(); ++i) {
-        const auto param = funcType.params[i];
-        const auto paramType = param->type;
-        auto paramIRType = paramType->getIRType();
-        if (!paramType->isPrimitive) {
-            paramIRType = PointerType::getUnqual(context);
-        }
-        IRParamsTypes.emplace_back(paramIRType);
-    }
-    funcType.IRType = FunctionType::get(rt, IRParamsTypes, funcType.isVariadic);
-    return funcType.IRType;
-}
-
 Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
     if (funcType.hasDefaultParams) assert(false);
@@ -71,7 +49,7 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
 
 Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
     if (IRValue) {
-        const auto IRFuncType = getIRFuncType(runtime);
+        const auto IRFuncType = funcType.IRType(runtime);
         return runtime->builder.CreateCall(IRFuncType, IRValue, args);
     }
     const auto IRFunc = getIRFunc(runtime);

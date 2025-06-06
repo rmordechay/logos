@@ -2,7 +2,6 @@
 #define LOGOSMAINFILE_H
 #include "data/LgsDefinitions.h"
 #include "LgsFile.h"
-#include "funcs/LgsFuncImpl.h"
 #include "types/LgsEnum.h"
 #include "types/LgsObject.h"
 
@@ -14,7 +13,7 @@ public:
     vector<LgsEnum*> enums;
     vector<LgsObject*> objects;
     vector<LgsInterface*> interfaces;
-    map<string, LgsFuncImpl*> funcs;
+    map<string, LgsFunc*> funcs;
 
     explicit LgsMainFile(const string& path) : LgsFile(LOGOS_MAIN_FILE_NAME, path) {}
     void format() override;

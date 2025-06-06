@@ -511,7 +511,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
     checkMethodVisibility(methodCall);
 }
 
-void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, const LgsFuncType* funcType) {
+void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType) {
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
     }
@@ -520,7 +520,7 @@ void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, const LgsFuncType* 
         return;
     }
     funcCall->type = funcType->rt;
-    funcCall->func = new LgsFuncImpl(funcType);
+    funcCall->func = new LgsFunc("", funcType);
 }
 
 void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {

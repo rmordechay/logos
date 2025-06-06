@@ -37,6 +37,7 @@ public:
     bool equals(LgsType* other) override;
     LgsType* clone() override;
     ~LgsFuncType() override = default;
+    FunctionType* getIRType();
 };
 
 #endif //LGSFUNCSIGNATURE_H

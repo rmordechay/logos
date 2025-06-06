@@ -17,9 +17,13 @@ public:
     vector<LgsExpr*> returnExprs;
     LgsStmtBlock* stmtBlock = nullptr;
     IRBuilderBase::InsertPoint savedIP;
+    LgsFunc* implements = nullptr;
 
-    explicit LgsFunc() {
+    explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam*>& params = {}) {
         type = &funcType;
+        funcType.name = name;
+        funcType.rt = rt;
+        funcType.params = params;
     }
 
     Value* createIRValue(LgsRuntime* runtime) override;
@@ -28,12 +32,11 @@ public:
     string format(string& tabs) override;
     json asJSON() override;
     void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const;
-    virtual void generateIR(LgsRuntime* runtime);
-    virtual Function* getIRFunc(LgsRuntime* runtime);
-    virtual FunctionType* getIRFuncType(LgsRuntime* runtime);
     bool shouldLoadIRArg(Value* value) const;
     LgsParam* getReturnParam() const;
     void swapReturnIfNeeded();
+    virtual void generateIR(LgsRuntime* runtime);
+    virtual Function* getIRFunc(LgsRuntime* runtime);
     virtual Value* callIR(LgsRuntime* runtime, const vector<Value*>& args = {});
     virtual Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args = {});
     ~LgsFunc() override;
