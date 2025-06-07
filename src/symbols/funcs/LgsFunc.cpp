@@ -114,7 +114,17 @@ LgsParam* LgsFunc::getReturnSwapParam() const {
 }
 
 void LgsFunc::swapReturnIfNeeded() {
-    funcType.swapReturn = funcType.isRvBig && returnExprs.size() == 1;
+    bool isEqual = true;
+    for (const auto expr1 : returnExprs) {
+        for (const auto expr2 : returnExprs) {
+            if (expr1 == expr2) continue;
+            if (!expr1->equals(expr2)) {
+                isEqual = false;
+                break;
+            }
+        }
+    }
+    funcType.swapReturn = funcType.isRvBig && isEqual;
     if (funcType.swapReturn) {
         funcType.returnParamIndex = funcType.isMethod && !funcType.isStatic;
         funcType.params.insert(funcType.params.begin(), new LgsParam(funcType.rt));

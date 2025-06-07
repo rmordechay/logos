@@ -50,6 +50,7 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsFunc* func);
     LgsSymbol* clone() const;
     Location* getLocation() const;
+    void* getPtr() const;
     json asJSON() const;
     ~LgsSymbol() = default;
 };

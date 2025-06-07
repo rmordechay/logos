@@ -19,17 +19,12 @@ void LgsIfStmt::computeSimpleIf(LgsRuntime* runtime) {
 
     // if block
     const auto ifCondIR = ifCond->getIRValue(runtime);
-    if (!ifStmtBlock->lastStmt()->asReturn()) {
-        if (elseStmtBlock) {
-            runtime->builder.CreateCondBr(ifCondIR, IRIfTrueBlock, IRElseBlock);
-        } else {
-            runtime->builder.CreateCondBr(ifCondIR, IRIfTrueBlock, IRIfEndBlock);
-        }
-    }
+    runtime->builder.CreateCondBr(ifCondIR, IRIfTrueBlock, IRIfEndBlock);
     startBlock(runtime, IRIfTrueBlock);
     ifStmtBlock->createIRValue(runtime);
-    if (runtime->builder.GetInsertBlock()->getTerminator()) return;
-    runtime->builder.CreateBr(IRIfEndBlock);
+    if (!runtime->builder.GetInsertBlock()->getTerminator()) {
+        runtime->builder.CreateBr(IRIfEndBlock);
+    }
 
     // else block
     createElseBlock(runtime, IRElseBlock, IRIfEndBlock);

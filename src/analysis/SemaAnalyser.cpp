@@ -49,7 +49,7 @@ void SemaAnalyser::analyseFiles(LogosProject& project) {
         });
     }
     threadPool.wait();
-    // reprocessFuncs(project);
+    reprocessFuncs(project);
 }
 
 void SemaAnalyser::start() {

@@ -62,6 +62,11 @@ string LgsExpr::getExprStr(LgsExpr* baseExpr) {
 }
 
 void LgsExpr::free(LgsRuntime* runtime) { assert(false); }
+
+bool LgsExpr::equals(LgsExpr* other) {
+    assert(false);
+}
+
 LgsExpr* LgsExpr::clone() { assert(false); }
 string LgsExpr::prettyName() { assert(false); }
 LgsExpr* LgsExpr::convertExpr(LgsType* type) { assert(false); }
@@ -85,9 +90,6 @@ Value* LgsExpr::bitOrIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
 Value* LgsExpr::bitXorIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
 Value* LgsExpr::rshiftIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
 Value* LgsExpr::lshiftIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-
-LgsExpr::~LgsExpr() {
-}
 
 // Casting
 LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }

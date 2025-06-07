@@ -51,6 +51,7 @@ public:
     LgsTypeConst* asTypeConst();
 
     virtual void free(LgsRuntime* runtime);
+    virtual bool equals(LgsExpr* other);
     virtual LgsExpr* clone();
     virtual std::string prettyName();
     virtual LgsExpr* convertExpr(LgsType* type);
@@ -75,7 +76,7 @@ public:
     virtual Value* bitXorIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* rshiftIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* lshiftIR(LgsRuntime* runtime, LgsExpr* other);
-    ~LgsExpr() override;
+    ~LgsExpr() override = default;
 };
 
 #endif //LOGOSEXPR_H

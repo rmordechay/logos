@@ -20,6 +20,30 @@ LgsSymbol* LgsSymbol::clone() const {
     return new LgsSymbol(*this);
 }
 
+void* LgsSymbol::getPtr() const {
+    switch (type) {
+    case VAR_DEC:
+        return varDec;
+    case PARAM:
+        return param;
+    case FUNC:
+        return func;
+    case OBJECT:
+        return object;
+    case INTERFACE:
+        return interface;
+    case FIELD:
+        return field;
+    case ENUM:
+        return lgsEnum;
+    case ENUM_FIELD:
+        return enumField;
+    case UNKNOWN:
+        break;
+    }
+    assert(false);
+}
+
 Location* LgsSymbol::getLocation() const {
     switch (type) {
     case VAR_DEC:

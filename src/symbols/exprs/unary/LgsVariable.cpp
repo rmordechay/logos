@@ -29,6 +29,13 @@ Value* LgsVariable::createIRValue(LgsRuntime* runtime) {
     }
 }
 
+bool LgsVariable::equals(LgsExpr* other) {
+    if (const auto otherVar = other->asVariable()) {
+        return ref->getPtr() == otherVar->ref->getPtr();
+    }
+    assert(false);
+}
+
 Value* LgsVariable::eqIR(LgsRuntime* runtime, LgsExpr* other) {
     if (ref->type == VAR_DEC) {
         return ref->varDec->expr->eqIR(runtime, other);
