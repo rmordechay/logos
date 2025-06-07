@@ -4,9 +4,7 @@
 
 void LgsIfStmt::createIRStmt(LgsRuntime* runtime) {
     runtime->stack.enterScope(IF_SCOPE, this);
-    if (elseStmtBlock || !elseIfStmtBlocks.empty()) {
-        computeComplexIf(runtime);
-    } else {
+    if (!elseStmtBlock && elseIfConds.empty()) {
         computeSimpleIf(runtime);
     }
     runtime->stack.exitScope(IF_SCOPE);
@@ -25,35 +23,12 @@ void LgsIfStmt::computeSimpleIf(LgsRuntime* runtime) {
     if (!runtime->builder.GetInsertBlock()->getTerminator()) {
         runtime->builder.CreateBr(IRIfEndBlock);
     }
-
-    // else block
-    createElseBlock(runtime, IRElseBlock, IRIfEndBlock);
-
     // exit
     startBlock(runtime, IRIfEndBlock);
 }
 
 void LgsIfStmt::computeComplexIf(LgsRuntime* runtime) {
-    auto& ctx = runtime->module->getContext();
-    IRIfTrueBlock = createBasicBlock(BB_IF_TRUE, ctx);
-    IRElseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK, ctx);
-    IRIfEndBlock = createBasicBlock(BB_IF_END, ctx);
-    IRElseBlock = createBasicBlock(BB_ELSE, ctx);
 
-    // if block
-    const auto ifCondIR = ifCond->getIRValue(runtime);
-    if (!ifStmtBlock->lastStmt()->asReturn()) {
-        runtime->builder.CreateCondBr(ifCondIR, IRIfTrueBlock, IRElseIfCheckBlock);
-    }
-    startBlock(runtime, IRIfTrueBlock);
-    ifStmtBlock->createIRValue(runtime);
-    runtime->builder.CreateBr(IRIfEndBlock);
-
-    createElseIfBlocks(runtime);
-    createElseBlock(runtime, IRElseBlock, IRIfEndBlock);
-    if (!runtime->builder.GetInsertBlock()->getTerminator()) {
-        startBlock(runtime, IRIfEndBlock);
-    }
 }
 
 void LgsIfStmt::createElseIfBlocks(LgsRuntime* runtime) {

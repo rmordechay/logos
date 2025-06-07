@@ -138,7 +138,6 @@ void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
     if (lastStmt->asReturn()) {
         stmtBlock->hasReturn = true;
     } else if (const auto ifStmt = lastStmt->asIfStmt()) {
-        stmtBlock->hasReturn = ifStmt->hasReturn;
     }
 }
 
@@ -176,14 +175,11 @@ void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
     stack.enterScope(IF_SCOPE, ifStmt);
     visitExpr(ifStmt->ifCond);
     visitStmtBlock(ifStmt->ifStmtBlock);
-    ifStmt->hasReturn = ifStmt->ifStmtBlock->hasReturn;
     for (const auto& elseIfStmtBlock : ifStmt->elseIfStmtBlocks) {
         visitStmtBlock(elseIfStmtBlock);
-        ifStmt->hasReturn = ifStmt->hasReturn && elseIfStmtBlock->hasReturn;
     }
     if (ifStmt->elseStmtBlock) {
         visitStmtBlock(ifStmt->elseStmtBlock);
-        ifStmt->hasReturn = ifStmt->elseStmtBlock->hasReturn;
     }
     stack.exitScope(IF_SCOPE);
 }

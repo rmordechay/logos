@@ -1,16 +1,20 @@
 #include "stmts/LgsBreakStmt.h"
 #include "funcs/LgsFunc.h"
 #include "logos/LgsRuntime.h"
-
 #include "loops/LgsForLoop.h"
+#include "stmts/LgsIfStmt.h"
 
 void LgsBreakStmt::createIRStmt(LgsRuntime* runtime) {
-    const auto currentLoop = runtime->stack.getLoop();
-    const auto currentFunc = runtime->stack.currentFunc;
-    const auto loopExit = currentLoop->loopExitBlock;
+    BasicBlock* loopExit = nullptr;
+    if (breakIfStmt) {
+        const auto ifStmt = runtime->stack.getIfStmt();
+        loopExit = ifStmt->IRIfEndBlock;
+    } else {
+        const auto loop = runtime->stack.getLoop();
+        loopExit = loop->loopExitBlock;
+    }
     runtime->builder.CreateBr(loopExit);
-    const auto IRFunc = currentFunc->getIRFunc(runtime);
-    const auto breakExtBlock = createBasicBlock("break_ext", context);
-    breakExtBlock->insertInto(IRFunc);
-    runtime->builder.SetInsertPoint(breakExtBlock);
+    breakBlock = createBasicBlock("break", context);
+    startBlock(runtime, breakBlock);
+    runtime->builder.SetInsertPoint(breakBlock);
 }
