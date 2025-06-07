@@ -54,6 +54,7 @@ public:
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, bool isSingleton = false);
     void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);
+    bool setMainArgsParam(LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature);
     LgsField* getField(LogosParser::FieldContext* ctx);
     LgsFunc* getFuncImpl(LogosParser::FuncImplContext* ctx);
     LgsFunc* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);

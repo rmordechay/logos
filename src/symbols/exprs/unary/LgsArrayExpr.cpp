@@ -1,5 +1,6 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "exprs/unary/LgsIterIndex.h"
+#include "logos/LgsConfig.h"
 #include "logos/LgsRuntime.h"
 
 #include "utils/LgsUtils.h"
@@ -11,16 +12,16 @@ Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {
 
 Value* LgsArrayExpr::createDynArray(LgsRuntime* runtime) {
     auto& builder = runtime->builder;
-    const auto capacityIR = builder.getInt32(capacity);
-    const auto elementSizeIR = builder.getInt64(arrType.elementSize);
+    const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
+    const auto elementSize = arrType.baseType->getSizeBytes();
     const vector<Type*> structFields{builder.getInt64Ty(), builder.getInt32Ty(), builder.getInt32Ty(), builder.getPtrTy()};
-    const auto arrStruct = getIRStructType(context, arrType.name, structFields);
+    const auto arrStruct = getArrStruct(context, arrType.name, structFields);
     IRValue = builder.CreateAlloca(arrStruct);
-    runtime->addAllocatedExpr(this);
-    arrType.init.callIR(runtime, {IRValue, capacityIR, elementSizeIR});
+    arrType.init.callIR(runtime, {IRValue, builder.getInt32(capacity), builder.getInt64(elementSize)});
     for (const auto element : initialElements) {
         arrType.add.call(runtime, {this, element});
     }
+    runtime->addAllocatedExpr(this);
     return IRValue;
 }
 
@@ -36,6 +37,7 @@ Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
     }
     return arrPtr;
 }
+
 
 void LgsArrayExpr::free(LgsRuntime* runtime) {
     if (arrType.isStatic) return;

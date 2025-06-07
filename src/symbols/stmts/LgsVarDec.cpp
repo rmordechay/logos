@@ -18,6 +18,7 @@ void LgsVarDec::createIRStmt(LgsRuntime* runtime) {
 }
 
 bool LgsVarDec::shouldAllocate(const Type* IRType) const {
+    if (type->asMap() || type->asArray()) return false;
     return IRType->isArrayTy() || IRType->isPointerTy() || IRType->isVoidTy();
 }
 

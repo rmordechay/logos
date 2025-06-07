@@ -27,6 +27,7 @@ public:
     LgsType* type = nullptr;
     bool isNull = false;
     bool isReturnExpr = false;
+    bool isZeroValue = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     void setType(LgsType* type);

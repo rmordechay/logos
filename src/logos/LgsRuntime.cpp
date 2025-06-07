@@ -11,9 +11,9 @@
 
 void LgsRuntime::initRuntime() {
     const auto voidTy = builder.getVoidTy();
-    const auto stackStr = getIRStructType(context, "StackStr", {ArrayType::get(builder.getInt8Ty(), 1024), builder.getInt32Ty()});
-    const auto stack = getIRStructType(context, "Stack", {builder.getInt32Ty(), ArrayType::get(stackStr, 512)});
-    const auto runtimeType = getIRStructType(context, "Runtime", {stack});
+    const auto stackStr = getArrStruct(context, "StackStr", {ArrayType::get(builder.getInt8Ty(), 1024), builder.getInt32Ty()});
+    const auto stack = getArrStruct(context, "Stack", {builder.getInt32Ty(), ArrayType::get(stackStr, 512)});
+    const auto runtimeType = getArrStruct(context, "Runtime", {stack});
     const auto zeroInit = Constant::getNullValue(runtimeType);
     runtimeStruct = new GlobalVariable(*module, runtimeType, false, GlobalValue::ExternalLinkage, zeroInit);
     const auto initStackFunc = module->getOrInsertFunction("Runtime_init", FunctionType::get(voidTy, {builder.getPtrTy()}, false));
@@ -41,7 +41,7 @@ void LgsRuntime::freeExprs() {
     auto& exprs = stack.allocatedExprs;
     exprs.erase(std::remove_if(exprs.begin(), exprs.end(), [this](LgsExpr* expr) {
         if (!expr->isReturnExpr) {
-            expr->free(this);
+            // expr->free(this);
             return true;
         }
         return false;

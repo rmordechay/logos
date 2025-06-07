@@ -7,7 +7,6 @@
 class LgsArray final : public LgsIterable {
 public:
     static constexpr auto name = "Array";
-    uint64_t elementSize;
     LgsArrayInitFunc init{this};
     LgsArrayGetFunc get{this};
     LgsArrayPutFunc put{this};

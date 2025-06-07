@@ -208,18 +208,32 @@ LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
     if (paramSize > 1) {
         isValid = false;
     } else if (paramSize == 1) {
-        const auto param = funcSignature->param().front();
-        const auto type = param->type();
-        const auto variableName = param->VARIABLE()->getText();
-        const auto expr = getExpr(param->expr());
-        const auto lgsParam = new LgsParam(getType(type), variableName, expr);
-        lgsParam->setLocation(param->start);
-        const auto arr = lgsParam->type->asArray();
-        isValid = arr && arr->baseType->asStr();
-        mainFunc->funcType.params.emplace_back(lgsParam);
+        isValid = setMainArgsParam(mainFunc, funcSignature);
+        if (isValid) {
+            mainFunc->args = new LgsArrayExpr(new LgsStr());
+            mainFunc->args->initArgsFunc = new LgsFunc("initArgs", &LGS_VOID, {
+                new LgsParam(mainFunc->args->type),
+                new LgsParam(&LGS_INT),
+                new LgsParam(new LgsStr())
+            });
+        }
     }
-    if (!isValid) errHandler.handleError(E10039, &mainFunc->location);
+    if (!isValid) {
+        errHandler.handleError(E10039, &mainFunc->location);
+    }
     return mainFunc;
+}
+
+bool AntlerConverter::setMainArgsParam(LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature) {
+    const auto param = funcSignature->param().front();
+    const auto type = param->type();
+    const auto variableName = param->VARIABLE()->getText();
+    const auto expr = getExpr(param->expr());
+    const auto lgsParam = new LgsParam(getType(type), variableName, expr);
+    lgsParam->setLocation(param->start);
+    const auto arr = lgsParam->type->asArray();
+    mainFunc->funcType.params.emplace_back(lgsParam);
+    return arr && arr->baseType->asStr();
 }
 
 LgsFunc* AntlerConverter::getFuncImpl(LogosParser::FuncImplContext* ctx) {

@@ -227,7 +227,11 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
     visitUnaryExpr(iterExpr);
     const auto iterable = iterExpr->type->asIterable();
     if (!iterable) {
-        return errHandler.handleError(E10002, &iterExpr->location, {iterExpr->prettyName()});
+        // If type is not defined an error was already thrown
+        if (iterExpr->type) {
+            errHandler.handleError(E10002, &iterExpr->location, {iterExpr->prettyName()});
+        }
+        return;
     }
     if (iterable->unpackLength != foreachLoop->loopVars.size()) {
         errHandler.handleError(E10041, &iterExpr->location, {iterExpr->prettyName(), to_string(iterable->unpackLength), to_string(foreachLoop->loopVars.size())});
@@ -330,8 +334,6 @@ void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
         visitExpr(element);
     }
     array->arrType.inferArrayType(initialElements);
-    array->capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
-    array->arrType.elementSize = array->arrType.baseType->getSizeBytes();
 }
 
 void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) const {
@@ -350,7 +352,9 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     switch (symbol->type) {
     case VAR_DEC:
         symbol->varDec->refs.push_back(variable);
-        symbol->varDec->expr->isReturnExpr = variable->isReturnExpr;
+        if (symbol->varDec->expr) {
+            symbol->varDec->expr->isReturnExpr = variable->isReturnExpr;
+        }
         variable->setType(symbol->varDec->type);
         break;
     case PARAM:

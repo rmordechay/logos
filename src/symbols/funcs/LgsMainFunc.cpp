@@ -7,12 +7,10 @@
 
 void LgsMainFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.enterFunc(this);
-    if (!funcType.params.empty()) {
-        const auto args = new LgsArrayExpr(new LgsStr());
-
-        const auto func = getIRFunc(runtime);
-    }
     startBlockFunc(runtime);
+    if (!funcType.params.empty()) {
+        initArgs(runtime);
+    }
     runtime->initRuntime();
     stmtBlock->createIRValue(runtime);
     runtime->freeExprs();
@@ -23,21 +21,28 @@ void LgsMainFunc::generateIR(LgsRuntime* runtime) {
 Function* LgsMainFunc::getIRFunc(LgsRuntime* runtime) {
     if (IRFunc) return IRFunc;
     FunctionType* mainFuncType;
-    const auto arg = funcType.params.front();
-    if (arg) {
-        mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getInt32Ty(), PointerType::getUnqual(context)}, false);
-    } else {
+    if (funcType.params.empty()) {
         mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {}, false);
+    } else {
+        mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getInt32Ty(), PointerType::getUnqual(context)}, false);
     }
     auto func = runtime->module->getOrInsertFunction(LOGOS_MAIN_FUNC, mainFuncType);
     IRFunc = dyn_cast<Function>(func.getCallee());
-    if (arg) {
-        auto IRArgs = IRFunc->arg_begin();
-        argc = IRArgs;
-        IRArgs->setName("argc");
-        IRArgs++;
-        argv = IRArgs;
-        IRArgs->setName("argv");
-    }
+    if (funcType.params.empty()) return IRFunc;
+    auto IRArgs = IRFunc->arg_begin();
+    argc = IRArgs;
+    IRArgs->setName("argc");
+    IRArgs++;
+    argv = IRArgs;
+    IRArgs->setName("argv");
     return IRFunc;
+}
+
+void LgsMainFunc::initArgs(LgsRuntime* runtime) {
+    auto& builder = runtime->builder;
+    const vector<Type*> structFields{builder.getInt64Ty(), builder.getInt32Ty(), builder.getInt32Ty(), builder.getPtrTy()};
+    const auto arrStruct = getArrStruct(runtime->module->getContext(), args->arrType.name, structFields);
+    args->IRValue = builder.CreateAlloca(arrStruct);
+    args->initArgsFunc->callIR(runtime, {args->IRValue, argc, argv});
+    funcType.params[0]->setIRValue(args->IRValue);
 }

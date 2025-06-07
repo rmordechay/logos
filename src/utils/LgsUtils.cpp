@@ -48,7 +48,7 @@ Value* getIRStr(const LgsRuntime* runtime, const string& value) {
     return globalVariable;
 }
 
-StructType* getIRStructType(LLVMContext& context, const string& name, const vector<Type*>& fields) {
+StructType* getArrStruct(LLVMContext& context, const string& name, const vector<Type*>& fields) {
     const auto struct_ = StructType::getTypeByName(context, name);
     if (!struct_) {
         return StructType::create(context, fields, name);
