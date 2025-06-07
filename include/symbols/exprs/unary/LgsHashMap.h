@@ -23,7 +23,6 @@ public:
         mapType.kvType.value = valueType;
     }
     Value* createIRValue(LgsRuntime* runtime) override;
-    Value* getLength(LgsRuntime* runtime) override;
     ~LgsHashMap() override = default;
 };
 

@@ -21,7 +21,6 @@ public:
     void storeHashMap(LgsRuntime* runtime, LgsHashMap* hashMap) const;
     void storeScalar(LgsRuntime* runtime, LgsExpr* value);
     void storeArray(LgsRuntime* runtime, const LgsArrayExpr* arr) const;
-    Value* getLength(LgsRuntime* runtime) override;
     std::string getName() override;
     std::string prettyName() override;
     static void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices);

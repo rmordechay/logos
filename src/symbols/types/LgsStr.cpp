@@ -37,6 +37,18 @@ string LgsStr::getStrFormatPart() const {
     return "%s";
 }
 
+Value* LgsStr::getLength(LgsRuntime* runtime, LgsExpr* expr) {
+    return len.call(runtime, {expr});
+}
+
+Value* LgsStr::callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+    return isEmpty.call(runtime, {expr});
+}
+
+Value* LgsStr::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+    return isNotEmpty.call(runtime, {expr});
+}
+
 bool LgsStr::equals(LgsType* other) {
     assert(other);
     if (other->getIRName() == "Any") return true;

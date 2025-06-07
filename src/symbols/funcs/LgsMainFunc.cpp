@@ -18,9 +18,9 @@ Function* LgsMainFunc::getIRFunc(LgsRuntime* runtime) {
     FunctionType* mainFuncType;
     const auto hasParams = !funcType.params.empty();
     if (hasParams) {
-        mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {}, false);
-    } else {
         mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getInt32Ty(), PointerType::getUnqual(context)}, false);
+    } else {
+        mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {}, false);
     }
     auto func = runtime->module->getOrInsertFunction(LOGOS_MAIN_FUNC, mainFuncType);
     IRFunc = dyn_cast<Function>(func.getCallee());

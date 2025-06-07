@@ -36,6 +36,10 @@ public:
     LgsForLoop* getLoop();
     LgsIfStmt* getIfStmt();
     void addSymbol(const std::string& name, const LgsSymbol& symbol);
+    auto begin() { return c.begin(); }
+    auto end() { return c.end(); }
+    auto rbegin() { return c.rbegin(); }
+    auto rend() { return c.rend(); }
     ~LgsStack() = default;
 };
 

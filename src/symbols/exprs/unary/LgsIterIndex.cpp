@@ -145,10 +145,6 @@ void LgsIterIndex::setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex
     reverse(indices.begin(), indices.end());
 }
 
-Value* LgsIterIndex::getLength(LgsRuntime* runtime) {
-    assert(false);
-}
-
 string LgsIterIndex::getName() {
     return baseExpr->getName();
 }

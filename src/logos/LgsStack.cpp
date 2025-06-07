@@ -52,6 +52,7 @@ LgsIfStmt* LgsStack::getIfStmt() {
     return top().ifStmt;
 }
 
+
 void LgsStack::addSymbol(const string& name, const LgsSymbol& symbol) {
     assert(size() > 0);
     top().symbols[name] = symbol;

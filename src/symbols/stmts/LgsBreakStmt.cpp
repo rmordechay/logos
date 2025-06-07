@@ -5,16 +5,20 @@
 #include "stmts/LgsIfStmt.h"
 
 void LgsBreakStmt::createIRStmt(LgsRuntime* runtime) {
-    BasicBlock* loopExit = nullptr;
-    if (breakIfStmt) {
-        const auto ifStmt = runtime->stack.getIfStmt();
-        loopExit = ifStmt->IRIfEndBlock;
+    if (tag != "") {
+        for (auto it = runtime->stack.begin(); it != runtime->stack.end(); ++it) {
+            const auto outerIfStmt = it->ifStmt;
+            if (!outerIfStmt || outerIfStmt->tag != tag) continue;
+            runtime->builder.CreateBr(outerIfStmt->IRIfEndBlock);
+            runtime->builder.SetInsertPoint(outerIfStmt->IRIfEndBlock);
+            break;
+        }
     } else {
         const auto loop = runtime->stack.getLoop();
-        loopExit = loop->loopExitBlock;
+        const auto loopExit = loop->loopExitBlock;
+        runtime->builder.CreateBr(loopExit);
+        breakBlock = createBasicBlock("break", context);
+        startBlock(runtime, breakBlock);
+        runtime->builder.SetInsertPoint(breakBlock);
     }
-    runtime->builder.CreateBr(loopExit);
-    breakBlock = createBasicBlock("break", context);
-    startBlock(runtime, breakBlock);
-    runtime->builder.SetInsertPoint(breakBlock);
 }

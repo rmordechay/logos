@@ -325,7 +325,7 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (const auto returnStmt = ctx->returnStatement()) return getReturnStmt(returnStmt);
-    if (ctx->breakStmt()) return new LgsBreakStmt(!!ctx->breakStmt()->IF());
+    if (ctx->breakStmt()) return getBreakStmt(ctx);
     if (ctx->CONTINUE()) return new LgsContinueStmt();
     return nullptr;
 }
@@ -390,6 +390,9 @@ LgsIfStmt* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx)
     const auto expr = getExpr(ctx->expr());
     const auto stmts = getStmtBlock(ctx->statementsBlock());
     const auto ifStmt = new LgsIfStmt(expr, stmts);
+    if (const auto tag = ctx->TAG()) {
+        ifStmt->tag = tag->getText().substr(1);
+    }
     for (const auto &elseIfStmt : ctx->elseIfStatement()) {
         auto elseIfExpr = getExpr(elseIfStmt->expr());
         auto elseIfStmtBlock = getStmtBlock(elseIfStmt->statementsBlock());
@@ -401,6 +404,12 @@ LgsIfStmt* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx)
     }
     ifStmt->setLocation(ctx->start);
     return ifStmt;
+}
+
+LgsBreakStmt* AntlerConverter::getBreakStmt(LogosParser::StatementContext* ctx) const {
+    const auto tag = ctx->breakStmt()->TAG();
+    if (tag) return new LgsBreakStmt(tag->getText().substr(1));
+    return new LgsBreakStmt();
 }
 
 LgsStmt* AntlerConverter::getPatternMatching(LogosParser::PatternMatchingContext* ctx) {

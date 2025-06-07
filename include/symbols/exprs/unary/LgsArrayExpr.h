@@ -14,7 +14,6 @@ public:
         setType(&arrType);
         arrType.baseType = baseType;
     }
-    Value* getLength(LgsRuntime* runtime) override;
     Value* createIRValue(LgsRuntime* runtime) override;
     Value* createConstArray(LgsRuntime* runtime) const;
     Value* createDynArray(LgsRuntime* runtime);

@@ -119,7 +119,7 @@ implicitVarDec:
     ;
 
 ifStatement:
-        IF expr statementsBlock elseIfStatement* elseStatement?
+        IF expr TAG? statementsBlock elseIfStatement* elseStatement?
     ;
 
 elseIfStatement:
@@ -145,7 +145,7 @@ loopStatement:
     ;
 
 breakStmt:
-        BREAK IF?
+        BREAK TAG?
     ;
 
 returnStatement:
@@ -369,6 +369,7 @@ CONST_NAME: [A-Z0-9_]+;
 TYPE: [A-Z][a-zA-Z0-9_]*;
 VARIABLE: [a-z_][a-zA-Z0-9_]*;
 STRING: '"' ( ~["\\] | '\\'.)* '"';
+TAG: '@'[a-zA-Z0-9_]+;
 LINE_COMMENT: '//' ~( '\r' | '\n' )* -> skip;
 BLOCK_COMMENT: '///' .*? '///' -> skip;
 WS: [ \t\r\n]+ -> skip;

@@ -6,10 +6,10 @@ class LgsForLoop;
 
 class LgsBreakStmt final : public LgsStmt {
 public:
-    bool breakIfStmt = false;
+    std::string tag;
     BasicBlock* breakBlock = nullptr;
 
-    explicit LgsBreakStmt(const bool breakIfStmt) : breakIfStmt(breakIfStmt) {}
+    explicit LgsBreakStmt(const std::string& tag = "") : tag(tag) {}
     void createIRStmt(LgsRuntime* runtime) override;
     ~LgsBreakStmt() override = default;
 };

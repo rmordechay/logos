@@ -23,8 +23,8 @@ public:
     IMPLEMENTS = 46, EXTERN = 47, IF = 48, ELSE = 49, FOR = 50, BREAK = 51, 
     CONTINUE = 52, RETURN = 53, VISIBILITY = 54, CONST = 55, AND = 56, OR = 57, 
     NOT = 58, IN = 59, INTEGER = 60, FLOAT = 61, BOOL = 62, NULL_ = 63, 
-    CONST_NAME = 64, TYPE = 65, VARIABLE = 66, STRING = 67, LINE_COMMENT = 68, 
-    BLOCK_COMMENT = 69, WS = 70
+    CONST_NAME = 64, TYPE = 65, VARIABLE = 66, STRING = 67, TAG = 68, LINE_COMMENT = 69, 
+    BLOCK_COMMENT = 70, WS = 71
   };
 
   enum {
@@ -542,6 +542,7 @@ public:
     antlr4::tree::TerminalNode *IF();
     ExprContext *expr();
     StatementsBlockContext *statementsBlock();
+    antlr4::tree::TerminalNode *TAG();
     std::vector<ElseIfStatementContext *> elseIfStatement();
     ElseIfStatementContext* elseIfStatement(size_t i);
     ElseStatementContext *elseStatement();
@@ -634,7 +635,7 @@ public:
     BreakStmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *BREAK();
-    antlr4::tree::TerminalNode *IF();
+    antlr4::tree::TerminalNode *TAG();
 
    
   };

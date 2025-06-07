@@ -4,6 +4,7 @@
 #include "logos/LgsErrHandler.h"
 #include "LogosParser.h"
 #include "funcs/LgsFunc.h"
+#include "stmts/LgsBreakStmt.h"
 
 using namespace std;
 using namespace filesystem;
@@ -60,6 +61,7 @@ public:
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     LgsStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
+    LgsBreakStmt* getBreakStmt(LogosParser::StatementContext* ctx) const;
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LgsFuncType* getFuncType(LogosParser::FuncTypeContext* ctx);

@@ -44,7 +44,3 @@ void LgsArrayExpr::free(LgsRuntime* runtime) {
     arrType.free.call(runtime, {this});
 }
 
-Value* LgsArrayExpr::getLength(LgsRuntime* runtime) {
-    if (arrType.isStatic) return arrType.sizeExpr->getIRValue(runtime);
-    return arrType.len.call(runtime, {this});
-}

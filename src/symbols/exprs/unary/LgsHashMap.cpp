@@ -14,7 +14,3 @@ Value* LgsHashMap::createIRValue(LgsRuntime* runtime) {
     }
     return IRValue;
 }
-
-Value* LgsHashMap::getLength(LgsRuntime* runtime) {
-    return mapType.len.call(runtime, {this});
-}

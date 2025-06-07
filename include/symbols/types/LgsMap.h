@@ -4,7 +4,6 @@
 #include "types/LgsPair.h"
 #include "builtin/LgsMapMethods.h"
 
-
 class LgsMapPair;
 
 class LgsMap final : public LgsIterable {
@@ -40,6 +39,9 @@ public:
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
     Value* getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) override;
     ~LgsMap() override = default;
+    Value* getLength(LgsRuntime* runtime, LgsExpr* expr) override;
+    Value* callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
+    Value* callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
 };
 
 #endif //LGSMAP_H

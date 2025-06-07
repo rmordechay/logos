@@ -50,7 +50,28 @@ public:
 
     explicit LgsStrLenFunc(LgsType* parent) : LgsBuiltinFunc("len", &LGS_INT, parent->getIRName()) {
         self.type = parent;
-        funcType.IRName = "strlen";
+        funcType.params = {&self};
+        funcType.isPublic = true;
+    }
+};
+
+class LgsStrIsEmptyFunc final : public LgsBuiltinFunc {
+public:
+    LgsParam self{};
+
+    explicit LgsStrIsEmptyFunc(LgsType* parent) : LgsBuiltinFunc("isEmpty", &LGS_INT, parent->getIRName()) {
+        self.type = parent;
+        funcType.params = {&self};
+        funcType.isPublic = true;
+    }
+};
+
+class LgsStrIsNotEmptyFunc final : public LgsBuiltinFunc {
+public:
+    LgsParam self{};
+
+    explicit LgsStrIsNotEmptyFunc(LgsType* parent) : LgsBuiltinFunc("isNotEmpty", &LGS_INT, parent->getIRName()) {
+        self.type = parent;
         funcType.params = {&self};
         funcType.isPublic = true;
     }

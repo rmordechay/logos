@@ -64,6 +64,19 @@ Value* LgsArray::getElement(LgsRuntime* runtime, Value* iterPtr, Value* indexPtr
     return runtime->builder.CreateLoad(getIRType(), v);
 }
 
+Value* LgsArray::getLength(LgsRuntime* runtime, LgsExpr* expr) {
+    if (isStatic) return sizeExpr->getIRValue(runtime);
+    return len.call(runtime, {expr});
+}
+
+Value* LgsArray::callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+    return isEmpty.call(runtime, {expr});
+}
+
+Value* LgsArray::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+    return isNotEmpty.call(runtime, {expr});
+}
+
 LgsType* LgsArray::clone() {
     const auto lgsArray = new LgsArray(baseType);
     if (sizeExpr) {

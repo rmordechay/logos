@@ -20,6 +20,18 @@ Value* LgsMap::getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) {
     assert(false);
 }
 
+Value* LgsMap::getLength(LgsRuntime* runtime, LgsExpr* expr) {
+    return len.call(runtime, {expr});
+}
+
+Value* LgsMap::callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+    return isEmpty.call(runtime, {expr});
+}
+
+Value* LgsMap::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+    return isNotEmpty.call(runtime, {expr});
+}
+
 Type* LgsMap::getIRType() {
     return PointerType::getUnqual(context);
 }
