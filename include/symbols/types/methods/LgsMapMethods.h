@@ -1,6 +1,6 @@
 #ifndef LGSMAPMETHODS_H
 #define LGSMAPMETHODS_H
-#include "LgsBuiltinFunc.h"
+#include "funcs/LgsBuiltinFunc.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 #include "types/LgsStr.h"

@@ -4,6 +4,7 @@
 #include "data/LgsDefinitions.h"
 #include "LgsType.h"
 #include "exprs/unary/LgsHashMap.h"
+#include "methods/LgsObjMethods.h"
 #include "stmts/LgsField.h"
 
 class LgsField;
@@ -14,6 +15,7 @@ public:
     string path;
     bool isSingleton = false;
     vector<LgsType*> implements;
+    LgsObjFieldsFunc fieldsF{this};
     LgsHashMap vtable = LgsHashMap(new LgsStr(), &LGS_ANY);
 
     explicit LgsObject() : name(LOGOS_PARENT_OBJ), path("") {}

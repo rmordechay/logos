@@ -1,6 +1,6 @@
 #ifndef LOGOSSTRING_H
 #define LOGOSSTRING_H
-#include "builtin/LgsStrMethods.h"
+#include "methods/LgsStrMethods.h"
 #include <string>
 #include "exprs/unary/constants/LgsCharConst.h"
 #include "types/LgsIterable.h"

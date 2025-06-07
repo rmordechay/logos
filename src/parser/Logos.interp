@@ -204,7 +204,7 @@ innerSelectionElement
 range
 type
 mapType
-arrayIndexType
+arraySize
 funcType
 vector
 requireEnvVars

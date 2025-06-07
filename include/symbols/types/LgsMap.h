@@ -2,7 +2,7 @@
 #define LGSMAP_H
 #include "types/LgsIterable.h"
 #include "types/LgsPair.h"
-#include "builtin/LgsMapMethods.h"
+#include "methods/LgsMapMethods.h"
 
 class LgsMapPair;
 

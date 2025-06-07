@@ -62,7 +62,7 @@ void logosParserInitialize() {
       "enumField", "expr", "unaryExpr", "array", "hashMap", "keyValue", 
       "funcCall", "funcArgList", "funcArg", "constructor", "constructorArgList", 
       "constructorArg", "constant", "iterIndex", "index", "selection", "firstSelectionElement", 
-      "innerSelectionElement", "range", "type", "mapType", "arrayIndexType", 
+      "innerSelectionElement", "range", "type", "mapType", "arraySize", 
       "funcType", "vector", "requireEnvVars"
     },
     std::vector<std::string>{
@@ -5295,12 +5295,12 @@ LogosParser::TypeContext* LogosParser::TypeContext::type() {
   return getRuleContext<LogosParser::TypeContext>(0);
 }
 
-std::vector<LogosParser::ArrayIndexTypeContext *> LogosParser::TypeContext::arrayIndexType() {
-  return getRuleContexts<LogosParser::ArrayIndexTypeContext>();
+std::vector<LogosParser::ArraySizeContext *> LogosParser::TypeContext::arraySize() {
+  return getRuleContexts<LogosParser::ArraySizeContext>();
 }
 
-LogosParser::ArrayIndexTypeContext* LogosParser::TypeContext::arrayIndexType(size_t i) {
-  return getRuleContext<LogosParser::ArrayIndexTypeContext>(i);
+LogosParser::ArraySizeContext* LogosParser::TypeContext::arraySize(size_t i) {
+  return getRuleContext<LogosParser::ArraySizeContext>(i);
 }
 
 
@@ -5400,7 +5400,7 @@ LogosParser::TypeContext* LogosParser::type(int precedence) {
           switch (alt) {
             case 1: {
                   setState(692);
-                  arrayIndexType();
+                  arraySize();
                   break;
                 }
 
@@ -5491,33 +5491,33 @@ LogosParser::MapTypeContext* LogosParser::mapType() {
   return _localctx;
 }
 
-//----------------- ArrayIndexTypeContext ------------------------------------------------------------------
+//----------------- ArraySizeContext ------------------------------------------------------------------
 
-LogosParser::ArrayIndexTypeContext::ArrayIndexTypeContext(ParserRuleContext *parent, size_t invokingState)
+LogosParser::ArraySizeContext::ArraySizeContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* LogosParser::ArrayIndexTypeContext::LBRACK() {
+tree::TerminalNode* LogosParser::ArraySizeContext::LBRACK() {
   return getToken(LogosParser::LBRACK, 0);
 }
 
-tree::TerminalNode* LogosParser::ArrayIndexTypeContext::RBRACK() {
+tree::TerminalNode* LogosParser::ArraySizeContext::RBRACK() {
   return getToken(LogosParser::RBRACK, 0);
 }
 
-LogosParser::ExprContext* LogosParser::ArrayIndexTypeContext::expr() {
+LogosParser::ExprContext* LogosParser::ArraySizeContext::expr() {
   return getRuleContext<LogosParser::ExprContext>(0);
 }
 
 
-size_t LogosParser::ArrayIndexTypeContext::getRuleIndex() const {
-  return LogosParser::RuleArrayIndexType;
+size_t LogosParser::ArraySizeContext::getRuleIndex() const {
+  return LogosParser::RuleArraySize;
 }
 
 
-LogosParser::ArrayIndexTypeContext* LogosParser::arrayIndexType() {
-  ArrayIndexTypeContext *_localctx = _tracker.createInstance<ArrayIndexTypeContext>(_ctx, getState());
-  enterRule(_localctx, 114, LogosParser::RuleArrayIndexType);
+LogosParser::ArraySizeContext* LogosParser::arraySize() {
+  ArraySizeContext *_localctx = _tracker.createInstance<ArraySizeContext>(_ctx, getState());
+  enterRule(_localctx, 114, LogosParser::RuleArraySize);
   size_t _la = 0;
 
 #if __cplusplus > 201703L

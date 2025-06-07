@@ -1,6 +1,6 @@
 #ifndef LGSSARRAYTYPE_H
 #define LGSSARRAYTYPE_H
-#include "builtin/LgsArrayMethods.h"
+#include "methods/LgsArrayMethods.h"
 #include "types/LgsType.h"
 #include "types/LgsIterable.h"
 

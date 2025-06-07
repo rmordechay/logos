@@ -36,7 +36,7 @@ void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsMap* map) const {
     const auto bucketsValue = builder.CreateLoad(builder.getPtrTy(), bucketsGep);
     const auto isNull = builder.CreateICmpEQ(bucketsValue, Constant::getNullValue(builder.getPtrTy()));
     const auto notNullBlock = BasicBlock::Create(context, "notnull");
-    builder.CreateCondBr(isNull, notNullBlock, IRCondBlock);
+    builder.CreateCondBr(isNull, IRCondBlock, notNullBlock);
 
     startBlock(runtime, notNullBlock);
     const auto keyGEP = runtime->builder.CreateStructGEP(map->mapStruct, bucketsValue, 0);

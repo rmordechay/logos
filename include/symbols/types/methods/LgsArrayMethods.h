@@ -1,6 +1,6 @@
 #ifndef LGSARRAYMETHODS_H
 #define LGSARRAYMETHODS_H
-#include "LgsBuiltinFunc.h"
+#include "funcs/LgsBuiltinFunc.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsLong.h"

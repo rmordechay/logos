@@ -758,7 +758,7 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
     LgsType* result = nullptr;
     if (const auto mapType = ctx->mapType()) {
         result = new LgsMap(getType(mapType->key), getType(mapType->value));
-    } else if (!ctx->arrayIndexType().empty()) {
+    } else if (!ctx->arraySize().empty()) {
         result = getArrayType(ctx);
     } else if (const auto funcType = ctx->funcType()) {
         result = getFuncType(funcType);
@@ -774,7 +774,7 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
 
 LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
     LgsType* type = getType(ctx->baseType);
-    auto dims = ctx->arrayIndexType();
+    auto dims = ctx->arraySize();
     for (auto it = dims.rbegin(); it != dims.rend(); ++it) {
         const auto array = new LgsArray(type);
         if (const auto sizeExpr = (*it)->expr()) {

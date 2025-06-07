@@ -43,7 +43,7 @@ public:
     RuleFuncArgList = 43, RuleFuncArg = 44, RuleConstructor = 45, RuleConstructorArgList = 46, 
     RuleConstructorArg = 47, RuleConstant = 48, RuleIterIndex = 49, RuleIndex = 50, 
     RuleSelection = 51, RuleFirstSelectionElement = 52, RuleInnerSelectionElement = 53, 
-    RuleRange = 54, RuleType = 55, RuleMapType = 56, RuleArrayIndexType = 57, 
+    RuleRange = 54, RuleType = 55, RuleMapType = 56, RuleArraySize = 57, 
     RuleFuncType = 58, RuleVector = 59, RuleRequireEnvVars = 60
   };
 
@@ -121,7 +121,7 @@ public:
   class RangeContext;
   class TypeContext;
   class MapTypeContext;
-  class ArrayIndexTypeContext;
+  class ArraySizeContext;
   class FuncTypeContext;
   class VectorContext;
   class RequireEnvVarsContext; 
@@ -991,8 +991,8 @@ public:
     MapTypeContext *mapType();
     FuncTypeContext *funcType();
     TypeContext *type();
-    std::vector<ArrayIndexTypeContext *> arrayIndexType();
-    ArrayIndexTypeContext* arrayIndexType(size_t i);
+    std::vector<ArraySizeContext *> arraySize();
+    ArraySizeContext* arraySize(size_t i);
 
    
   };
@@ -1016,9 +1016,9 @@ public:
 
   MapTypeContext* mapType();
 
-  class  ArrayIndexTypeContext : public antlr4::ParserRuleContext {
+  class  ArraySizeContext : public antlr4::ParserRuleContext {
   public:
-    ArrayIndexTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    ArraySizeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *LBRACK();
     antlr4::tree::TerminalNode *RBRACK();
@@ -1027,7 +1027,7 @@ public:
    
   };
 
-  ArrayIndexTypeContext* arrayIndexType();
+  ArraySizeContext* arraySize();
 
   class  FuncTypeContext : public antlr4::ParserRuleContext {
   public:
