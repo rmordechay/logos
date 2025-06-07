@@ -17,6 +17,10 @@ LgsExpr* LgsIntConst::convertExpr(LgsType* other) {
     assert(false);
 }
 
+LgsExpr* LgsIntConst::clone() {
+    return new LgsIntConst(value);
+}
+
 Value* LgsIntConst::eqIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(runtime);
     const auto thisIRValue = getIRValue(runtime);
@@ -118,10 +122,6 @@ Value* LgsIntConst::lshiftIR(LgsRuntime* runtime, LgsExpr* other) {
         return runtime->builder.CreateShl(thisIRValue, otherIRValue);
     }
     assert(false);
-}
-
-LgsExpr* LgsIntConst::clone() {
-    return new LgsIntConst(value);
 }
 
 Value* LgsIntConst::rshiftIR(LgsRuntime* runtime, LgsExpr* other) {

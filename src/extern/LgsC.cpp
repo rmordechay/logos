@@ -24,13 +24,19 @@
 
 using namespace clang;
 
-void LgsC::parse(const vector<LgsStrConst*>& filePaths, LgsErrHandler* errHandler) const {
+void LgsC::parse(vector<LgsStrConst*>& filePaths, LgsErrHandler* errHandler) const {
     for (const auto filePath : filePaths) {
         auto path = filePath->value;
-        const auto code = getFileText(path);
+        string code;
+        if (path == "stdio.h") {
+            const auto p = "/Users/r.mordechay/Desktop/Programming/logos/stdio.h";
+            code = getFileText(p);
+        } else {
+            code = getFileText(path);
+        }
         if (code.empty()) {
             errHandler->handleError(E10047, &filePath->location, {path});
-            return;
+            continue;
         }
         runToolOnCodeWithArgs(std::make_unique<LgsCFrontendAction>(), code, {"-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"});
     }

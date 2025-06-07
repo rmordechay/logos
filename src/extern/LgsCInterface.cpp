@@ -4,6 +4,7 @@
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsVoid.h"
 #include "types/LgsStr.h"
+#include "types/primitives/LgsShort.h"
 
 bool LgsCVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     if (!isValid(func->getLocation()) || !func->isThisDeclarationADefinition()) return true;
@@ -60,6 +61,12 @@ LgsType* LgsCVisitor::mapCType(const clang::QualType type) {
     if (type->isSpecificBuiltinType(clang::BuiltinType::Bool)) {
         return new LgsBool();
     }
+    if (type->isSpecificBuiltinType(clang::BuiltinType::UChar)) {
+        return new LgsChar();
+    }
+    if (type->isSpecificBuiltinType(clang::BuiltinType::Short)) {
+        return new LgsShort();
+    }
     if (type->isVoidType()) {
         return new LgsVoid();
     }
@@ -79,6 +86,21 @@ LgsType* LgsCVisitor::mapCType(const clang::QualType type) {
         globals.addSymbol(name, LgsSymbol(obj), nullptr);
         return obj;
     }
+    if (type->isFunctionProtoType()) {
+        const auto ft = new LgsFuncType();
+        const auto funcType = type->getAs<clang::FunctionProtoType>();
+        ft->rt = mapCType(funcType->getReturnType());
+        for (const clang::QualType param : funcType->getParamTypes()) {
+            auto lgsParam = new LgsParam(mapCType(param));
+            ft->params.emplace_back(lgsParam);
+        }
+        return ft;
+    }
+    const auto typeStr = type.getAsString();
+    if (typeStr == "fpos_t") {
+        return nullptr;
+    }
+    errs() << "Unhandled type: " << typeStr << "\n";
     assert(false);
 }
 

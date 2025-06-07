@@ -27,7 +27,7 @@ public:
     }
 
     void compile(const std::vector<std::string>& files);
-    void parse(const vector<LgsStrConst*>& filePaths, LgsErrHandler* errHandler) const;
+    void parse(vector<LgsStrConst*>& filePaths, LgsErrHandler* errHandler) const;
     ~LgsC() = default;
 };
 
