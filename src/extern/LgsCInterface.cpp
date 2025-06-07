@@ -1,4 +1,6 @@
 #include "extern/LgsCInterface.h"
+
+#include "stmts/LgsField.h"
 #include "types/LgsObject.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsFloat.h"

@@ -15,8 +15,8 @@ public:
     LogosProject project;
     vector<char*> args;
 
-    explicit Logos(const path& rootDirPath) {
-        initPaths(rootDirPath);
+    explicit Logos(const path& rootDirPath = "") {
+        if (rootDirPath != "") initPaths(rootDirPath);
     }
     void run();
     void initPaths(const path& rootDirPath) const;

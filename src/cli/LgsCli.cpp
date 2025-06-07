@@ -1,5 +1,6 @@
 #include "cli/LgsCli.h"
 
+#include "cli/LgsFormatCmd.h"
 #include "cli/LgsGenerateCmd.h"
 #include "cli/LgsRunCmd.h"
 #include <iostream>
@@ -15,9 +16,15 @@ void LgsCli::execute() const {
     const string cmd = argv[1];
     if (cmd == "run") {
         LgsRunCmd command(argc, argv);
+        command.validate();
+        command.runCmd();
+    } else if (cmd == "format") {
+        LgsFormatCmd command(argc, argv);
+        command.validate();
         command.runCmd();
     } else if (cmd == "generate") {
         LgsGenerateCmd command(argc, argv);
+        command.validate();
         command.runCmd();
     } else if (cmd == "version" || cmd == "-v" || cmd == "--version") {
         printVersion();

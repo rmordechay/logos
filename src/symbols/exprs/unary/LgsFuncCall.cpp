@@ -2,6 +2,7 @@
 #include "builtin/LgsPrint.h"
 #include "exprs/unary/LgsVariable.h"
 #include "funcs/LgsFunc.h"
+#include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
@@ -73,8 +74,9 @@ Value* LgsFuncCall::resolveVirtualFunc(LgsRuntime* runtime) const {
     const auto func = callback->func;
     const auto parentIRValue = parent->getIRValue(runtime);
     if (const auto group = type->asGroup()) {
-
-    } else if (const auto interface = type->asInterface()) {
+        assert(false);
+    }
+    if (const auto interface = type->asInterface()) {
         const auto keyIR = getIRStr(runtime, func->funcType.getIRName());
         const auto mapPtr = runtime->builder.CreateLoad(PointerType::getUnqual(context), parentIRValue);
         const auto rv = interface->vtable.mapType.get.callIR(runtime, {mapPtr, keyIR});

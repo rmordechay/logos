@@ -5,7 +5,6 @@
 #include "LgsType.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "methods/LgsObjMethods.h"
-#include "stmts/LgsField.h"
 
 class LgsField;
 

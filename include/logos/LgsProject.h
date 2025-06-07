@@ -42,14 +42,14 @@ public:
     void loadEnvFiles();
     void setupActiveEnv();
     bool validateProject();
-    void checkRequiredEnvVars();
-    bool resolveGlobalTypes(const vector<LgsFile*>& files) const;
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
     void parseSrcFile(path entry);
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
+    bool resolveGlobalTypes(const vector<LgsFile*>& files) const;
     void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
     void checkDuplicateFiles(const vector<LgsFile*>& files);
+    void checkRequiredEnvVars();
     bool isLogosFile(const directory_entry& entry) const;
     ~LogosProject() = default;
 };

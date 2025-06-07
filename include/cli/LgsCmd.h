@@ -1,6 +1,5 @@
 #ifndef LGSCMD_H
 #define LGSCMD_H
-#include <cstdlib>
 #include <iostream>
 #include <string>
 

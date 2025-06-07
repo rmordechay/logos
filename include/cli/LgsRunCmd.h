@@ -1,7 +1,6 @@
 #ifndef LOGOSCMDRUN_H
 #define LOGOSCMDRUN_H
 #include "LgsCmd.h"
-
 #include <string>
 
 class Logos;
