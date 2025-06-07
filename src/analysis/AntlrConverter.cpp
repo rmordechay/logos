@@ -203,14 +203,19 @@ LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
     mainFunc->setLocation(funcSignature->VARIABLE()->getSymbol());
     const auto statementsBlock = ctx->funcBody()->statementsBlock();
     mainFunc->stmtBlock = getStmtBlock(statementsBlock);
-    setParams(&mainFunc->funcType, funcSignature->param());
-    const auto params = mainFunc->funcType.params;
-    bool isValid = false;
-    if (params.size() == 1) {
-        const auto arr = params.front()->type->asArray();
+    bool isValid = true;
+    const auto paramSize = funcSignature->param().size();
+    if (paramSize > 1) {
+        isValid = false;
+    } else if (paramSize == 1) {
+        const auto param = funcSignature->param().front();
+        const auto type = param->type();
+        const auto variableName = param->VARIABLE()->getText();
+        const auto expr = getExpr(param->expr());
+        const auto lgsParam = new LgsParam(getType(type), variableName, expr);
+        lgsParam->setLocation(param->start);
+        const auto arr = lgsParam->type->asArray();
         isValid = arr && arr->baseType->asStr();
-    } else {
-        isValid = params.empty();
     }
     if (!isValid) errHandler.handleError(E10039, &mainFunc->location);
     return mainFunc;
