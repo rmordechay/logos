@@ -12,7 +12,9 @@ void LgsFunc::generateIR(LgsRuntime* runtime) {
     stmtBlock->createIRValue(runtime);
     if (funcType.rt->isVoid) {
         runtime->freeExprs();
-        runtime->builder.CreateRetVoid();
+        if (!runtime->builder.GetInsertBlock()->getTerminator()) {
+            runtime->builder.CreateRetVoid();
+        }
     }
     runtime->stack.exitFunc();
 }

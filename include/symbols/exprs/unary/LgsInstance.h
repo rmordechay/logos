@@ -13,7 +13,9 @@ public:
     explicit LgsInstance(const string& name) : name(name) {}
     Value* createIRValue(LgsRuntime* runtime) override;
     void setVirtualFuncs(LgsRuntime* runtime) const;
+    void free(LgsRuntime* runtime) override;
     string getName() override;
+    void setReturnExpr(LgsRuntime* runtime, Type* objIRType);
     ~LgsInstance() override = default;
 };
 

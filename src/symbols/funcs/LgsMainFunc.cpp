@@ -1,5 +1,4 @@
 #include "funcs/LgsMainFunc.h"
-
 #include "logos/LgsRuntime.h"
 #include "stmts/LgsStmtBlock.h"
 #include "types/LgsArray.h"
@@ -26,7 +25,7 @@ Function* LgsMainFunc::getIRFunc(LgsRuntime* runtime) {
     auto func = runtime->module->getOrInsertFunction(LOGOS_MAIN_FUNC, mainFuncType);
     IRFunc = dyn_cast<Function>(func.getCallee());
     if (hasParams) {
-            auto args = IRFunc->arg_begin();
+        auto args = IRFunc->arg_begin();
         args++->setName("argc");
         args->setName("argv");
     }

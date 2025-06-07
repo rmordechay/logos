@@ -2,13 +2,17 @@
 #include "exprs/unary/LgsInstance.h"
 
 void LgsReturn::createIRStmt(LgsRuntime* runtime) {
-    runtime->freeExprs();
     const auto currentFunc = runtime->stack.currentFunc;
     if (expr) {
         const auto exprIR = expr->getIRValue(runtime);
+        runtime->freeExprs();
         if (!currentFunc->funcType.swapReturn) {
             runtime->builder.CreateRet(exprIR);
+        } else {
+            runtime->builder.CreateRetVoid();
         }
+    } else {
+        runtime->freeExprs();
     }
 }
 

@@ -7,6 +7,7 @@ Value* LgsHashMap::createIRValue(LgsRuntime* runtime) {
     const vector<Type*> structFields = {builder.getPtrTy(), builder.getInt64Ty(), builder.getInt32Ty()};
     const auto mapStruct = getIRStructType(context, mapType.name, structFields);
     IRValue = runtime->builder.CreateAlloca(mapStruct);
+    runtime->addAllocatedExpr(this);
     mapType.init.callIR(runtime, {IRValue, elementSize});
     for (const auto element : initialElements) {
         mapType.add.call(runtime, {this, element->key, element->value});

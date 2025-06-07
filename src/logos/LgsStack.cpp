@@ -10,7 +10,7 @@ void LgsStack::enterFunc(LgsFunc* func) {
 
 void LgsStack::enterScope(LgsStmt* stmt) {
     assert(currentFunc);
-    push(LgsStackFrame{.symbols = top().symbols});
+    push(LgsStackFrame{.symbols = top().symbols, .allocatedExprs = top().allocatedExprs});
     if (const auto loop = stmt->asLoop()) {
         currentLoop = loop;
     } else if (const auto ifStmt = stmt->asIfStmt()) {

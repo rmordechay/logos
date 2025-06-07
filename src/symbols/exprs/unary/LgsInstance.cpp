@@ -11,11 +11,11 @@ string LgsInstance::getName() {
 }
 
 Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
-    const auto currentFunc = runtime->stack.currentFunc;
-    if (currentFunc->funcType.swapReturn && isReturnExpr) {
-        IRValue = currentFunc->getReturnSwapParam()->IRValue;
+    const auto objIRType = obj->getIRType();
+    if (isReturnExpr) {
+        setReturnExpr(runtime, objIRType);
     } else {
-        IRValue = runtime->builder.CreateAlloca(obj->getIRType());
+        IRValue = runtime->builder.CreateAlloca(objIRType);
     }
     if (!obj->implements.empty()) {
         setVirtualFuncs(runtime);
@@ -25,6 +25,21 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
         field->setFieldIRValue(runtime, arg->expr, IRValue);
     }
     return IRValue;
+}
+
+void LgsInstance::setReturnExpr(LgsRuntime* runtime, Type* objIRType) {
+    const auto currentFunc = runtime->stack.currentFunc;
+    if (currentFunc->funcType.swapReturn) {
+        IRValue = currentFunc->getReturnSwapParam()->IRValue;
+    } else {
+        IRValue = runtime->builder.CreateMalloc(
+            Type::getInt64Ty(context),
+            objIRType,
+            ConstantExpr::getSizeOf(objIRType),
+            ConstantInt::get(Type::getInt64Ty(context), 1)
+            );
+        runtime->addAllocatedExpr(this);
+    }
 }
 
 void LgsInstance::setVirtualFuncs(LgsRuntime* runtime) const {
@@ -40,5 +55,11 @@ void LgsInstance::setVirtualFuncs(LgsRuntime* runtime) const {
         auto valuePtr = runtime->builder.CreateAlloca(PointerType::getUnqual(context));
         runtime->builder.CreateStore(IRFunc, valuePtr);
         obj->vtable.mapType.add.callIR(runtime, {mapPtr, keyIRStr, valuePtr});
+    }
+}
+
+void LgsInstance::free(LgsRuntime* runtime) {
+    if (!isReturnExpr) {
+        runtime->builder.CreateFree(IRValue);
     }
 }

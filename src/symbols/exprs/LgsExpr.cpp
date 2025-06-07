@@ -62,11 +62,7 @@ string LgsExpr::getExprStr(LgsExpr* baseExpr) {
 }
 
 void LgsExpr::free(LgsRuntime* runtime) { assert(false); }
-
-bool LgsExpr::equals(LgsExpr* other) {
-    assert(false);
-}
-
+bool LgsExpr::equals(LgsExpr* other) { assert(false); }
 LgsExpr* LgsExpr::clone() { assert(false); }
 string LgsExpr::prettyName() { assert(false); }
 LgsExpr* LgsExpr::convertExpr(LgsType* type) { assert(false); }
