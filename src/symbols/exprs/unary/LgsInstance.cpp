@@ -37,7 +37,7 @@ void LgsInstance::setReturnExpr(LgsRuntime* runtime, Type* objIRType) {
             objIRType,
             ConstantExpr::getSizeOf(objIRType),
             ConstantInt::get(Type::getInt64Ty(context), 1)
-            );
+        );
         runtime->addAllocatedExpr(this);
     }
 }

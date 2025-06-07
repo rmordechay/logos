@@ -8,27 +8,33 @@ class LgsExpr;
 class LgsForLoop;
 class LgsFunc;
 
-enum ScopeType {
-    LOOP,
-    IF_STMT,
+enum LgsScope {
+    FUNC_SCOPE,
+    LOOP_SCOPE,
+    IF_SCOPE,
 };
 
 struct LgsStackFrame {
+    LgsScope scopeType;
+    LgsFunc* func = nullptr;
+    union {
+        LgsForLoop* loop;
+        LgsIfStmt* ifStmt;
+    };
     std::map<std::string, LgsSymbol> symbols;
-    std::vector<LgsExpr*> allocatedExprs;
 };
 
 class LgsStack final : public std::stack<LgsStackFrame> {
 public:
-    LgsFunc* returnFunc = nullptr;
     LgsFunc* currentFunc = nullptr;
-    LgsForLoop* currentLoop = nullptr;
-    LgsIfStmt* currentIfStmt = nullptr;
+    std::vector<LgsExpr*> allocatedExprs;
 
     void enterFunc(LgsFunc* func);
-    void enterScope(LgsStmt* stmt);
+    void enterScope(LgsScope scope, LgsStmt* stmt);
     void exitFunc();
-    void exitScope(ScopeType type);
+    void exitScope(LgsScope scope);
+    LgsForLoop* getLoop();
+    LgsIfStmt* getIfStmt();
     void addSymbol(const std::string& name, const LgsSymbol& symbol);
     ~LgsStack() = default;
 };

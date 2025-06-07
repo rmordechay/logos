@@ -3,13 +3,13 @@
 #include "logos/LgsRuntime.h"
 
 void LgsIfStmt::createIRStmt(LgsRuntime* runtime) {
-    runtime->stack.enterScope(this);
+    runtime->stack.enterScope(IF_SCOPE, this);
     if (elseStmtBlock || !elseIfStmtBlocks.empty()) {
         computeComplexIf(runtime);
     } else {
         computeSimpleIf(runtime);
     }
-    runtime->stack.exitScope(IF_STMT);
+    runtime->stack.exitScope(IF_SCOPE);
 }
 
 void LgsIfStmt::computeSimpleIf(LgsRuntime* runtime) {

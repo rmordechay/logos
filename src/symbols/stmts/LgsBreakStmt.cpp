@@ -5,7 +5,7 @@
 #include "loops/LgsForLoop.h"
 
 void LgsBreakStmt::createIRStmt(LgsRuntime* runtime) {
-    const auto currentLoop = runtime->stack.currentLoop;
+    const auto currentLoop = runtime->stack.getLoop();
     const auto currentFunc = runtime->stack.currentFunc;
     const auto loopExit = currentLoop->loopExitBlock;
     runtime->builder.CreateBr(loopExit);

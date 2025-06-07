@@ -34,20 +34,18 @@ void LgsRuntime::printStack() {
 
 void LgsRuntime::addAllocatedExpr(LgsExpr* expr) {
     assert(stack.size() > 0);
-    stack.top().allocatedExprs.push_back(expr);
+    stack.allocatedExprs.push_back(expr);
 }
 
 void LgsRuntime::freeExprs() {
-    vector<LgsExpr*> newAllocated;
-    const auto& exprs = stack.top().allocatedExprs;
-    for (const auto expr : exprs) {
-        if (expr->isReturnExpr) {
-            newAllocated.push_back(expr);
-        } else {
+    auto& exprs = stack.allocatedExprs;
+    exprs.erase(std::remove_if(exprs.begin(), exprs.end(), [this](LgsExpr* expr) {
+        if (!expr->isReturnExpr) {
             expr->free(this);
+            return true;
         }
-    }
-    stack.top().allocatedExprs = newAllocated;
+        return false;
+    }), exprs.end());
 }
 
 void LgsGlobals::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {

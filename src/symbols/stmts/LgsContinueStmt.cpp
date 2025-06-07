@@ -5,7 +5,7 @@
 #include <loops/LgsForLoop.h>
 
 void LgsContinueStmt::createIRStmt(LgsRuntime* runtime) {
-    const auto currentLoop = runtime->stack.currentLoop;
+    const auto currentLoop = runtime->stack.getLoop();
     const auto loopCondition = currentLoop->loopCondBlock;
     const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), currentLoop->iPtr);
     const auto inc = runtime->builder.CreateAdd(iValue, runtime->builder.getInt32(1));

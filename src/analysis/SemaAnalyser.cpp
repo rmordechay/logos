@@ -86,8 +86,8 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
 void SemaAnalyser::visitInterface(LgsInterface* interface) const {}
 
 void SemaAnalyser::visitFunc(LgsFunc* func) {
-    func->filePath = file->absPath;
     stack.enterFunc(func);
+    func->filePath = file->absPath;
     for (const auto param : func->funcType.params) {
         visitParam(param);
     }
@@ -173,7 +173,7 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
 }
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
-    stack.enterScope(ifStmt);
+    stack.enterScope(IF_SCOPE, ifStmt);
     visitExpr(ifStmt->ifCond);
     visitStmtBlock(ifStmt->ifStmtBlock);
     ifStmt->hasReturn = ifStmt->ifStmtBlock->hasReturn;
@@ -185,7 +185,7 @@ void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
         visitStmtBlock(ifStmt->elseStmtBlock);
         ifStmt->hasReturn = ifStmt->elseStmtBlock->hasReturn;
     }
-    stack.exitScope(IF_STMT);
+    stack.exitScope(IF_SCOPE);
 }
 
 void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
@@ -211,13 +211,13 @@ void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
 void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const {}
 
 void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
-    stack.enterScope(loopStmt);
+    stack.enterScope(LOOP_SCOPE, loopStmt);
     if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {
         visitRangeLoop(rangeLoop);
     } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loopStmt)) {
         visitForeachLoop(foreachLoop);
     }
-    stack.exitScope(LOOP);
+    stack.exitScope(LOOP_SCOPE);
 }
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
@@ -263,13 +263,13 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
 }
 
 void SemaAnalyser::visitBreakStmt(const LgsBreakStmt* breakStmt) {
-    if (!stack.currentLoop) {
+    if (!stack.getLoop()) {
         return errHandler.handleError(E10017, &breakStmt->location);
     }
 }
 
 void SemaAnalyser::visitContinueStmt(const LgsContinueStmt* continueStmt) {
-    if (!stack.currentLoop) {
+    if (!stack.getLoop()) {
         return errHandler.handleError(E10038, &continueStmt->location);
     }
 }

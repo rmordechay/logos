@@ -6,7 +6,7 @@
 #include "stmts/LgsVarDec.h"
 
 void LgsForLoop::createIRStmt(LgsRuntime* runtime) {
-    runtime->stack.enterScope(this);
+    runtime->stack.enterScope(LOOP_SCOPE, this);
     initIRLoop(runtime);
     startBlock(runtime, loopCondBlock);
     setLoopIRCondition(runtime);
@@ -14,7 +14,7 @@ void LgsForLoop::createIRStmt(LgsRuntime* runtime) {
     setIRLoopVars(runtime);
     stmtBlock->createIRValue(runtime);
     exitIRLoop(runtime);
-    runtime->stack.exitScope(IF_STMT);
+    runtime->stack.exitScope(LOOP_SCOPE);
 }
 
 void LgsForLoop::initIRLoop(LgsRuntime* runtime) {
