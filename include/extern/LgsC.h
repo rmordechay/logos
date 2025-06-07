@@ -1,6 +1,9 @@
 #ifndef LGSC_H
 #define LGSC_H
 
+#include "exprs/unary/constants/LgsStrConst.h"
+#include "logos/LgsErrHandler.h"
+
 #include <clang/Basic/Diagnostic.h>
 #include <llvm/Support/raw_ostream.h>
 #include <clang/Frontend/CompilerInstance.h>
@@ -24,7 +27,7 @@ public:
     }
 
     void compile(const std::vector<std::string>& files);
-    void parse(const std::vector<std::string>& files) const;
+    void parse(const vector<LgsStrConst*>& filePaths, LgsErrHandler* errHandler) const;
     ~LgsC() = default;
 };
 

@@ -6,6 +6,7 @@
 #include <llvm/IR/Module.h>
 
 
+class LgsStrConst;
 class LogosProject;
 class LgsRuntime;
 using namespace std;
@@ -17,7 +18,7 @@ public:
     string code;
     string absPath;
     string relPath;
-    vector<string> externFiles;
+    vector<LgsStrConst*> externFiles;
 
     explicit LgsFile(const string& name, const string& path) : name(name), absPath(path) {}
     virtual llvm::Module* generateIR(LogosProject& project);

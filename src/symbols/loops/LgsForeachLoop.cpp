@@ -43,7 +43,6 @@ void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsArray* arr) const {
     }
 }
 
-
 void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsMap* map) const {
     auto& builder = runtime->builder;
     const vector<Type*> structFields = {builder.getPtrTy(), builder.getInt64Ty(), builder.getInt32Ty()};

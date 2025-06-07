@@ -1,5 +1,6 @@
 #include "extern/LgsC.h"
 
+#include "data/LgsErrors.h"
 #include "extern/LgsCInterface.h"
 #include "logos/Platform.h"
 #include <clang/Basic/Diagnostic.h>
@@ -23,10 +24,15 @@
 
 using namespace clang;
 
-void LgsC::parse(const vector<string>& files) const {
-    for (const auto file : files) {
-        const auto code = getFileText(file);
-        tooling::runToolOnCodeWithArgs(std::make_unique<LgsCFrontendAction>(), code, {"-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"});
+void LgsC::parse(const vector<LgsStrConst*>& filePaths, LgsErrHandler* errHandler) const {
+    for (const auto filePath : filePaths) {
+        auto path = filePath->value;
+        const auto code = getFileText(path);
+        if (code.empty()) {
+            errHandler->handleError(E10047, &filePath->location, {path});
+            return;
+        }
+        runToolOnCodeWithArgs(std::make_unique<LgsCFrontendAction>(), code, {"-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"});
     }
 }
 

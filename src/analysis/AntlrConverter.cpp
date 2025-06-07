@@ -61,14 +61,14 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
         file = getInterfaceFile(interfaceFileCtx);
     }
     if (ctx->extern_()) {
-        for (const auto string : ctx->extern_()->STRING()) {
-            auto s = string->getText();
-            cleanStr(s);
-            file->externFiles.push_back(s);
+        for (const auto importPath : ctx->extern_()->STRING()) {
+            auto basicString = importPath->getText();
+            auto str = getStrConst(importPath);
+            file->externFiles.push_back(str);
         }
     }
     const LgsC lgsC;
-    lgsC.parse(file->externFiles);
+    lgsC.parse(file->externFiles, &errHandler);
     file->absPath = filePath;
     file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     return file;
@@ -610,7 +610,7 @@ LgsFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
     return funcCall;
 }
 
-LgsUnaryExpr* AntlerConverter::getVector(LogosParser::VectorContext* vector) {
+LgsUnaryExpr* AntlerConverter::getVector(LogosParser::VectorContext* vector) const {
     if (vector->VEC2()) {
 
     } else if (vector->VEC3()) {
@@ -649,8 +649,7 @@ LgsUnaryExpr* AntlerConverter::getFirstSelection(LogosParser::SelectionContext* 
         return getTypeConstant(type, ctx);
     }
     if (const auto type = firstExpr->STRING()) {
-        auto value = type->getText();
-        return getStrConst(value);
+        return getStrConst(type);
     }
     assert(false);
 }
@@ -717,7 +716,7 @@ LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::IterIndexContext* ctx) 
     return baseExpr->asIterIndex();
 }
 
-LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
+LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) const {
     LgsConstExpr* constant = nullptr;
     if (const auto intToken = ctx->INTEGER()) {
         const auto value = stoi(intToken->getText());
@@ -729,25 +728,27 @@ LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
         const auto value = boolToken->getText() == LgsBool::trueLiteral;
         constant = new LgsBoolConst(value);
     } else if (const auto stringToken = ctx->STRING()) {
-        auto value = stringToken->getText();
+        const auto value = stringToken->getText();
         if (value.size() == 1) {
             constant = new LgsCharConst(value[0]);
         } else {
-            constant = getStrConst(value);
+            constant = getStrConst(stringToken);
         }
     }
     constant->setLocation(ctx->start);
     return constant;
 }
 
-LgsConstExpr* AntlerConverter::getStrConst(string& value) const {
-    cleanStr(value);
-    const auto strConst = new LgsStrConst(value);
+LgsStrConst* AntlerConverter::getStrConst(antlr4::tree::TerminalNode* type) const {
+    auto a = type->getText();
+    cleanStr(a);
+    const auto strConst = new LgsStrConst(a);
     parseTemplateStr(strConst);
+    strConst->setLocation(type->getSymbol());
     return strConst;
 }
 
-LgsTypeConst* AntlerConverter::getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) {
+LgsTypeConst* AntlerConverter::getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const {
     const auto typeConst = new LgsTypeConst(getTypeFromText(type));
     typeConst->setLocation(ctx->start);
     return typeConst;

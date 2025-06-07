@@ -1,21 +1,18 @@
 #include "utils/LgsUtils.h"
 #include "data/LgsDefinitions.h"
 #include "exprs/unary/LgsIterIndex.h"
-#include "exprs/unary/LgsVariable.h"
-#include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "logos/LgsConfig.h"
 #include "logos/LgsProject.h"
 #include "logos/Platform.h"
-#include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include <llvm/MC/TargetRegistry.h>
-#include <llvm/Support/FileSystem.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/TargetParser/Host.h>
 
 string getFileText(path filePath) {
-    ifstream file(canonical(filePath));
+    if (!exists(filePath)) return "";
+    ifstream file(filePath);
+    if (!file.is_open()) return "";
     stringstream fileContents;
     fileContents << file.rdbuf();
     return fileContents.str();
