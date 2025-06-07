@@ -6,6 +6,9 @@ class LgsForLoop;
 
 class LgsBreakStmt final : public LgsStmt {
 public:
+    bool breakIfStmt = false;
+
+    explicit LgsBreakStmt(const bool breakIfStmt) : breakIfStmt(breakIfStmt) {}
     void createIRStmt(LgsRuntime* runtime) override;
     ~LgsBreakStmt() override = default;
 };

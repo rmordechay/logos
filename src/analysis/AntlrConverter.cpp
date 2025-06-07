@@ -325,7 +325,7 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (const auto returnStmt = ctx->returnStatement()) return getReturnStmt(returnStmt);
-    if (ctx->breakStmt()) return new LgsBreakStmt();
+    if (ctx->breakStmt()) return new LgsBreakStmt(!!ctx->breakStmt()->IF());
     if (ctx->CONTINUE()) return new LgsContinueStmt();
     return nullptr;
 }
