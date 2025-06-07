@@ -67,7 +67,6 @@ LgsExpr* LgsExpr::clone() { assert(false); }
 string LgsExpr::prettyName() { assert(false); }
 LgsExpr* LgsExpr::convertExpr(LgsType* type) { assert(false); }
 uint32_t LgsExpr::hashValue(LgsRuntime* runtime) { assert(false); }
-Value* LgsExpr::getLength(LgsRuntime* runtime) { assert(false); }
 
 // Comparisons
 Value* LgsExpr::subIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }

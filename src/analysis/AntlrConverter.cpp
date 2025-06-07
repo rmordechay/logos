@@ -216,6 +216,7 @@ LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
         lgsParam->setLocation(param->start);
         const auto arr = lgsParam->type->asArray();
         isValid = arr && arr->baseType->asStr();
+        mainFunc->funcType.params.emplace_back(lgsParam);
     }
     if (!isValid) errHandler.handleError(E10039, &mainFunc->location);
     return mainFunc;

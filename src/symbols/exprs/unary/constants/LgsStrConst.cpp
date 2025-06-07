@@ -3,10 +3,6 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 
-Value* LgsStrConst::getLength(LgsRuntime* runtime) {
-    return runtime->builder.getInt32(value.size());
-}
-
 Value* LgsStrConst::createIRValue(LgsRuntime* runtime) {
     return getIRStr(runtime, value);
 }

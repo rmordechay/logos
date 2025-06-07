@@ -55,7 +55,6 @@ public:
     virtual LgsExpr* clone();
     virtual std::string prettyName();
     virtual LgsExpr* convertExpr(LgsType* type);
-    virtual Value* getLength(LgsRuntime* runtime);
     virtual uint32_t hashValue(LgsRuntime* runtime);
     virtual Value* createIRValue(LgsRuntime* runtime) = 0;
 

@@ -9,7 +9,7 @@ Value* LgsForeachLoop::loopStart(LgsRuntime* runtime) {
 }
 
 Value* LgsForeachLoop::loopEnd(LgsRuntime* runtime) {
-    return iterExpr->getLength(runtime);
+    return iterExpr->type->asIterable()->getLength(runtime, iterExpr);
 }
 
 void LgsForeachLoop::setIRIterable(LgsRuntime* runtime) {

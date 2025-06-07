@@ -13,7 +13,6 @@ public:
     std::string getName() override;
     std::string prettyName() override;
     uint32_t hashValue(LgsRuntime* runtime) override;
-    Value* getLength(LgsRuntime* runtime) override;
     Value* createIRValue(LgsRuntime* runtime) override;
     bool equals(LgsExpr* other) override;
     Value* eqIR(LgsRuntime* runtime, LgsExpr* other) override;

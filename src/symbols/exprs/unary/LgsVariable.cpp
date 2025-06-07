@@ -132,15 +132,3 @@ uint32_t LgsVariable::hashValue(LgsRuntime* runtime) {
         assert(false);
     }
 }
-
-Value* LgsVariable::getLength(LgsRuntime* runtime) {
-    switch (ref->type) {
-    case VAR_DEC:
-        return ref->varDec->expr->getLength(runtime);
-    case PARAM:
-        return ref->param->expr->getLength(runtime);
-    default:
-        break;
-    }
-    assert(false);
-}
