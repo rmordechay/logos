@@ -54,19 +54,13 @@ void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[0]->type = baseType;
 }
 
-Value* LgsArray::getElement(LgsRuntime* runtime, Value* iterPtr, Value* indexPtr) {
-    if (isStatic) {
-        const auto i = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), indexPtr);
-        return runtime->builder.CreateGEP(getIRType(), iterPtr, {runtime->builder.getInt32(0), i});
-    }
-    const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), indexPtr);
-    const auto v = get.callIR(runtime, {iterPtr, iValue});
-    return runtime->builder.CreateLoad(getIRType(), v);
-}
-
 Value* LgsArray::getLength(LgsRuntime* runtime, LgsExpr* expr) {
     if (isStatic) return sizeExpr->getIRValue(runtime);
     return len.call(runtime, {expr});
+}
+
+Value* LgsArray::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
+    return getLength(runtime, expr);
 }
 
 Value* LgsArray::callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) {

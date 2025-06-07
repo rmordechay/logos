@@ -1,6 +1,7 @@
 #include "types/LgsStr.h"
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "stmts/LgsVarDec.h"
 
 size_t LgsStr::getSizeBytes() {
     return sizeof(void*);
@@ -27,18 +28,16 @@ LgsType* LgsStr::inferBinaryType(LgsType* other) {
     return this;
 }
 
-Value* LgsStr::getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) {
-    if (isStatic) assert(false);
-    const auto i = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
-    return runtime->builder.CreateInBoundsGEP(baseType->getIRType(), iterPtr, {i});
-}
-
 string LgsStr::getStrFormatPart() const {
     return "%s";
 }
 
 Value* LgsStr::getLength(LgsRuntime* runtime, LgsExpr* expr) {
     return len.call(runtime, {expr});
+}
+
+Value* LgsStr::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
+    return getLength(runtime, expr);
 }
 
 Value* LgsStr::callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) {

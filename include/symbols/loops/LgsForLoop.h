@@ -12,9 +12,9 @@ public:
     AllocaInst* iPtr = nullptr;
     vector<LgsVarDec*> loopVars;
     LgsStmtBlock* stmtBlock = nullptr;
-    BasicBlock* loopCondBlock = nullptr;
-    BasicBlock* loopBodyBlock = nullptr;
-    BasicBlock* loopExitBlock = nullptr;
+    BasicBlock* IRCondBlock = nullptr;
+    BasicBlock* IRBodyBlock = nullptr;
+    BasicBlock* IRExitBlock = nullptr;
 
     void createIRStmt(LgsRuntime* runtime) override;
     void initIRLoop(LgsRuntime* runtime);

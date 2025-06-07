@@ -10,6 +10,7 @@ class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "Map";
     LgsPair kvType;
+    StructType* mapStruct = nullptr;
     LgsMapInitFunc init{this};
     LgsMapGetFunc get{this};
     LgsMapAddFunc add{this};
@@ -37,11 +38,11 @@ public:
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
-    Value* getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) override;
-    ~LgsMap() override = default;
     Value* getLength(LgsRuntime* runtime, LgsExpr* expr) override;
+    Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
+    ~LgsMap() override = default;
 };
 
 #endif //LGSMAP_H

@@ -16,12 +16,12 @@ void LgsMap::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[1]->type = kvType.value;
 }
 
-Value* LgsMap::getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) {
-    assert(false);
-}
-
 Value* LgsMap::getLength(LgsRuntime* runtime, LgsExpr* expr) {
     return len.call(runtime, {expr});
+}
+
+Value* LgsMap::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
+    return runtime->builder.getInt32(1024);
 }
 
 Value* LgsMap::callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) {

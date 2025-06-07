@@ -3,15 +3,6 @@
 #include "LgsUnaryExpr.h"
 #include "types/LgsMap.h"
 
-class LgsMapPair final {
-public:
-    LgsExpr* key;
-    LgsExpr* value;
-
-    LgsMapPair(LgsExpr* key, LgsExpr* value) : key(key), value(value) {}
-    ~LgsMapPair() = default;
-};
-
 class LgsHashMap final : public LgsUnaryExpr {
 public:
     LgsMap mapType;
@@ -24,6 +15,15 @@ public:
     }
     Value* createIRValue(LgsRuntime* runtime) override;
     ~LgsHashMap() override = default;
+};
+
+class LgsMapPair final {
+public:
+    LgsExpr* key;
+    LgsExpr* value;
+
+    LgsMapPair(LgsExpr* key, LgsExpr* value) : key(key), value(value) {}
+    ~LgsMapPair() = default;
 };
 
 #endif //LGSHASHMAP_H

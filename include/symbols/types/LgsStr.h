@@ -28,9 +28,9 @@ public:
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
-    Value* getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) override;
     string getStrFormatPart() const override;
     Value* getLength(LgsRuntime* runtime, LgsExpr* expr) override;
+    Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
     ~LgsStr() override = default;

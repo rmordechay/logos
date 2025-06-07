@@ -355,7 +355,7 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
         if (symbol->varDec->expr) {
             symbol->varDec->expr->isReturnExpr = variable->isReturnExpr;
         }
-        variable->setType(symbol->varDec->type);
+        variable->setType(variable->ref->varDec->type);
         break;
     case PARAM:
         symbol->param->refs.push_back(variable);

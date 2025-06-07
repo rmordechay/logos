@@ -17,10 +17,10 @@ public:
     Type* getIRType() override;
     virtual LgsType* getBaseType();
     virtual Value* getLength(LgsRuntime* runtime, LgsExpr* expr) = 0;
+    virtual Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) = 0;
     virtual Value* callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) = 0;
     virtual Value* callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) = 0;
     virtual void unpackTypes(const vector<LgsVarDec*>& varDecs);
-    virtual Value* getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr);
     ~LgsIterable() override = default;
 };
 

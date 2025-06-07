@@ -15,7 +15,7 @@ void LgsBreakStmt::createIRStmt(LgsRuntime* runtime) {
         }
     } else {
         const auto loop = runtime->stack.getLoop();
-        const auto loopExit = loop->loopExitBlock;
+        const auto loopExit = loop->IRExitBlock;
         runtime->builder.CreateBr(loopExit);
         breakBlock = createBasicBlock("break", context);
         startBlock(runtime, breakBlock);

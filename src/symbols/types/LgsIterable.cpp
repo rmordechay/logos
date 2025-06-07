@@ -1,7 +1,5 @@
 #include "types/LgsIterable.h"
-#include "utils/LgsUtils.h"
 #include "exprs/LgsExpr.h"
-#include "exprs/unary/LgsIterIndex.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
 #include "types/LgsArray.h"
@@ -21,8 +19,4 @@ LgsType* LgsIterable::getBaseType() {
 
 void LgsIterable::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[0]->type = baseType;
-}
-
-Value* LgsIterable::getElement(LgsRuntime* runtime, Value* iterPtr, Value* iPtr) {
-    assert(false);
 }
