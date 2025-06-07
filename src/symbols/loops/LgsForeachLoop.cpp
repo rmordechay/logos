@@ -1,4 +1,6 @@
 #include "loops/LgsForeachLoop.h"
+
+#include "exprs/unary/LgsIterIndex.h"
 #include "stmts/LgsVarDec.h"
 #include "stmts/LgsStmtBlock.h"
 #include "types/LgsArray.h"
@@ -22,10 +24,25 @@ void LgsForeachLoop::setIRLoopVars(LgsRuntime* runtime) {
     const auto iterable = iterExpr->type->asIterable();
     if (const auto map = iterable->asMap()) {
         setIterVars(runtime, map);
+    } if (const auto arr = iterable->asArray()) {
+        setIterVars(runtime, arr);
     } else {
         assert(false);
     }
 }
+
+void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsArray* arr) const {
+    if (arr->isStatic) {
+        const auto i = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
+        const auto gep = runtime->builder.CreateGEP(arr->getIRType(), iterPtr, {runtime->builder.getInt32(0), i});
+        loopVars[0]->setIRValue(gep);
+    } else {
+        const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
+        const auto v = arr->get.callIR(runtime, {iterPtr, iValue});
+        loopVars[0]->setIRValue(runtime->builder.CreateLoad(arr->getIRType(), v));
+    }
+}
+
 
 void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsMap* map) const {
     auto& builder = runtime->builder;

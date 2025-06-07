@@ -57,9 +57,10 @@ void LgsIterIndex::storeScalar(LgsRuntime* runtime, LgsExpr* value) {
             const auto ptr = runtime->builder.CreateAlloca(value->type->getIRType());
             runtime->builder.CreateStore(rValue, ptr);
             arr->put.callIR(runtime, {baseIRValue, index->from->getIRValue(runtime), ptr});
-            return;
+        } else {
+            runtime->builder.CreateStore(rValue, getGEP(runtime));
         }
-        assert(false);
+        return;
     }
     if (const auto map = baseExpr->type->asMap()) {
         map->add.callIR(runtime, {baseIRValue, index->from->getIRValue(runtime), rValue});

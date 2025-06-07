@@ -15,14 +15,10 @@ size_t LgsArray::getSizeBytes() {
 }
 
 LgsExpr* LgsArray::getZeroValue() {
-    const auto arr = new LgsArrayExpr(baseType->clone());
-    if (sizeExpr) {
-        arr->arrType.isStatic = sizeExpr->type->isConst;
-        arr->arrType.sizeExpr = sizeExpr->clone();
-    } else {
-        arr->arrType.sizeExpr = new LgsIntConst(INITIAL_ARRAY_CAPACITY);
-    }
-    return arr;
+    const auto arrExpr = new LgsArrayExpr(baseType->clone());
+    arrExpr->arrType.isStatic = isStatic;
+    arrExpr->arrType.sizeExpr = sizeExpr;
+    return arrExpr;
 }
 
 string LgsArray::prettyName() const {
@@ -72,12 +68,12 @@ Value* LgsArray::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
 }
 
 LgsType* LgsArray::clone() {
-    const auto lgsArray = new LgsArray(baseType);
+    const auto arr = new LgsArray(baseType);
     if (sizeExpr) {
-        lgsArray->isStatic = sizeExpr->type->isConst;
-        lgsArray->sizeExpr = sizeExpr;
+        arr->isStatic = isStatic;
+        arr->sizeExpr = sizeExpr;
     }
-    return lgsArray;
+    return arr;
 }
 
 LgsArray::~LgsArray() {

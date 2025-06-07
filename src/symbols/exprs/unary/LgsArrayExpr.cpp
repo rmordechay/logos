@@ -12,12 +12,22 @@ Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {
 
 Value* LgsArrayExpr::createDynArray(LgsRuntime* runtime) {
     auto& builder = runtime->builder;
-    const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
-    const auto elementSize = arrType.baseType->getSizeBytes();
-    const vector<Type*> structFields{builder.getInt64Ty(), builder.getInt32Ty(), builder.getInt32Ty(), builder.getPtrTy()};
-    const auto arrStruct = getArrStruct(context, arrType.name, structFields);
+    const auto int32Ty = builder.getInt32Ty();
+    const auto int64Ty = builder.getInt64Ty();
+    const auto ptrTy = builder.getPtrTy();
+    const auto arrStruct = getArrStruct(context, arrType.name, {int64Ty, int32Ty, int32Ty, ptrTy});
+    const auto elementSize = builder.getInt64(arrType.baseType->getSizeBytes());
     IRValue = builder.CreateAlloca(arrStruct);
-    arrType.init.callIR(runtime, {IRValue, builder.getInt32(capacity), builder.getInt64(elementSize)});
+
+    Value* capacityIR = nullptr;
+    if (arrType.sizeExpr) {
+        capacityIR = arrType.sizeExpr->getIRValue(runtime);
+    } else {
+        const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
+        capacityIR = builder.getInt32(capacity);
+    }
+
+    arrType.init.callIR(runtime, {IRValue, capacityIR, elementSize});
     for (const auto element : initialElements) {
         arrType.add.call(runtime, {this, element});
     }
@@ -40,7 +50,8 @@ Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
 
 
 void LgsArrayExpr::free(LgsRuntime* runtime) {
-    if (arrType.isStatic) return;
-    arrType.free.call(runtime, {this});
+    if (!arrType.isStatic) {
+        arrType.free.call(runtime, {this});
+    }
 }
 

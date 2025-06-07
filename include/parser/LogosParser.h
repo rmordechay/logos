@@ -991,6 +991,7 @@ public:
     MapTypeContext *mapType();
     FuncTypeContext *funcType();
     TypeContext *type();
+    antlr4::tree::TerminalNode *EXCLA_MARK();
     std::vector<ArraySizeContext *> arraySize();
     ArraySizeContext* arraySize(size_t i);
 

@@ -777,6 +777,7 @@ LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
     auto dims = ctx->arraySize();
     for (auto it = dims.rbegin(); it != dims.rend(); ++it) {
         const auto array = new LgsArray(type);
+        array->isStatic = !!ctx->EXCLA_MARK();
         if (const auto sizeExpr = (*it)->expr()) {
             array->sizeExpr = getExpr(sizeExpr);
         }

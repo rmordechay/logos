@@ -12,6 +12,7 @@ public:
 
     explicit LgsForeachLoop(LgsUnaryExpr* iterable) : iterExpr(iterable) {}
     void setIRLoopVars(LgsRuntime* runtime) override;
+    void setIterVars(LgsRuntime* runtime, LgsArray* arr) const;
     void setIterVars(LgsRuntime* runtime, LgsMap* map) const;
     void setIRIterable(LgsRuntime* runtime) override;
     Value* loopStart(LgsRuntime* runtime) override;

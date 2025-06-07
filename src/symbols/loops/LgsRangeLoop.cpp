@@ -11,14 +11,13 @@ Value* LgsRangeLoop::loopEnd(LgsRuntime* runtime) {
     return rangeEnd->getIRValue(runtime);
 }
 
-void LgsRangeLoop::setIRLoopVars(LgsRuntime* runtime) {
-    const auto loopVar = loopVars[0];
-    const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
-    loopVar->expr->setIRValue(iValue);
+void LgsRangeLoop::setIRIterable(LgsRuntime* runtime) {
+
 }
 
-void LgsRangeLoop::setIRIterable(LgsRuntime* runtime) {
-    assert(false);
+void LgsRangeLoop::setIRLoopVars(LgsRuntime* runtime) {
+    const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
+    loopVars[0]->setIRValue(iValue);
 }
 
 LgsRangeLoop::~LgsRangeLoop() {
