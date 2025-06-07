@@ -8,6 +8,8 @@
 class LgsMainFunc final : public LgsFunc {
 public:
     Function* IRFunc = nullptr;
+    Value* argc = nullptr;
+    Value* argv = nullptr;
 
     explicit LgsMainFunc() : LgsFunc(LOGOS_MAIN_FUNC, &LGS_INT) {}
     void generateIR(LgsRuntime* runtime) override;

@@ -31,7 +31,9 @@ public:
         stringstream str;
         for (int i = 0; i < args.size(); ++i) {
             const auto arg = args[i];
-            addIRArg(runtime, IRArgs, arg);
+            const auto argType = arg->type->getIRType();
+            const auto argValue = arg->getIRValue(runtime);
+            addIRArg(runtime, IRArgs, argType, argValue);
             str << arg->type->getStrFormatPart() << std::endl;
         }
         IRArgs.insert(IRArgs.begin(), getIRStr(runtime, str.str()));

@@ -325,10 +325,13 @@ void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
 }
 
 void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
-    for (const auto element : array->initialElements) {
+    const auto& initialElements = array->initialElements;
+    for (const auto element : initialElements) {
         visitExpr(element);
     }
-    array->arrType.inferArrayType(array->initialElements);
+    array->arrType.inferArrayType(initialElements);
+    array->capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
+    array->arrType.elementSize = array->arrType.baseType->getSizeBytes();
 }
 
 void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) const {

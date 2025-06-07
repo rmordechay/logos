@@ -1,5 +1,4 @@
 #include "exprs/unary/LgsArrayExpr.h"
-#include "logos/LgsConfig.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "logos/LgsRuntime.h"
 
@@ -11,15 +10,14 @@ Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {
 }
 
 Value* LgsArrayExpr::createDynArray(LgsRuntime* runtime) {
-    const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
     auto& builder = runtime->builder;
     const auto capacityIR = builder.getInt32(capacity);
-    const auto elementSize = builder.getInt64(arrType.baseType->getSizeBytes());
+    const auto elementSizeIR = builder.getInt64(arrType.elementSize);
     const vector<Type*> structFields{builder.getInt64Ty(), builder.getInt32Ty(), builder.getInt32Ty(), builder.getPtrTy()};
     const auto arrStruct = getIRStructType(context, arrType.name, structFields);
     IRValue = builder.CreateAlloca(arrStruct);
     runtime->addAllocatedExpr(this);
-    arrType.init.callIR(runtime, {IRValue, capacityIR, elementSize});
+    arrType.init.callIR(runtime, {IRValue, capacityIR, elementSizeIR});
     for (const auto element : initialElements) {
         arrType.add.call(runtime, {this, element});
     }

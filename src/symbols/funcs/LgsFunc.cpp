@@ -44,7 +44,10 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     if (funcType.hasDefaultParams) assert(false);
     if (funcType.isVariadic) assert(false);
     for (int i = funcType.isStatic; i < args.size(); ++i) {
-        addIRArg(runtime, IRArgs, args[i]);
+        const auto arg = args[i];
+        const auto argType = arg->type->getIRType();
+        const auto argValue = arg->getIRValue(runtime);
+        addIRArg(runtime, IRArgs, argType, argValue);
     }
     return callIR(runtime, IRArgs);
 }
@@ -68,14 +71,11 @@ Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
     return rv;
 }
 
-void LgsFunc::addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const {
-    const auto argIRValue = arg->getIRValue(runtime);
-    if (shouldLoadIRArg(argIRValue)) {
-        const auto artIRType = arg->type->getIRType();
-        const auto value = runtime->builder.CreateLoad(artIRType, argIRValue);
-        IRArgs.emplace_back(value);
+void LgsFunc::addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, Type* type, Value* value) {
+    if (shouldLoadIRArg(value)) {
+        IRArgs.emplace_back(runtime->builder.CreateLoad(type, value));
     } else {
-        IRArgs.emplace_back(argIRValue);
+        IRArgs.emplace_back(value);
     }
 }
 
@@ -86,7 +86,7 @@ void LgsFunc::setBigObjAttrs(Function& IRFunc) const {
     IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
 }
 
-bool LgsFunc::shouldLoadIRArg(Value* value) const {
+bool LgsFunc::shouldLoadIRArg(Value* value) {
     if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
     if (const auto alloca = dyn_cast<AllocaInst>(value)) {
         const auto allocatedType = alloca->getAllocatedType();

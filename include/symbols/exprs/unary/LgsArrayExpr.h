@@ -9,6 +9,8 @@ class LgsArrayExpr final : public LgsUnaryExpr {
 public:
     LgsArray arrType;
     vector<LgsExpr*> initialElements;
+    size_t capacity;
+    uint64_t elementSize;
 
     explicit LgsArrayExpr(LgsType* baseType = nullptr) {
         setType(&arrType);

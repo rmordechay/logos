@@ -26,11 +26,11 @@ public:
         funcType.params = params;
     }
 
+    static bool shouldLoadIRArg(Value* value);
+    void setBigObjAttrs(Function& IRFunc) const;
     void swapReturnIfNeeded();
     LgsParam* getReturnSwapParam() const;
-    bool shouldLoadIRArg(Value* value) const;
-    void setBigObjAttrs(Function& IRFunc) const;
-    void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, LgsExpr* arg) const;
+    static void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, Type* type, Value* value);
     Value* createIRValue(LgsRuntime* runtime) override;
     string format(string& tabs) override;
     string prettyName() override;
