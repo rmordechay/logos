@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 
+class LgsGroup;
 using namespace std;
 using namespace llvm;
 class LgsFuncType;
@@ -34,6 +35,7 @@ public:
     map<string, LgsFunc*> methods;
 
     LgsField* getField(const string& name);
+    LgsFunc* getMethod(const string& name);
     void addMethod(LgsFunc* method);
     LgsFunc* findMethod(const string& name) const;
     void setLocation(const antlr4::Token* ctx);
@@ -47,6 +49,7 @@ public:
     LgsIterable* asIterable();
     LgsArray* asArray();
     LgsFuncType* asFuncType();
+    LgsGroup* asGroup();
     bool isUnknown();
 
     virtual size_t getSizeBytes();

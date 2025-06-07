@@ -17,7 +17,7 @@ logosAppFile:
     ;
 
 mainFile:
-        (object | enumDeclaration | interface)* funcImpl+ EOF
+        (object | enumDeclaration | interface | group)* funcImpl+ EOF
     ;
 
 objectFile:
@@ -30,6 +30,18 @@ interfaceFile:
 
 interface:
         INTERFACE TYPE LBRACE interfaceBody RBRACE
+    ;
+
+group:
+        TYPE EQUAL LBRACE groupTypesList RBRACE ARROW LBRACE groupTargetList RBRACE
+    ;
+
+groupTypesList:
+        type (COMMA type)* COMMA?
+    ;
+
+groupTargetList:
+        VARIABLE (COMMA VARIABLE)* COMMA?
     ;
 
 interfaceBody:
@@ -161,8 +173,8 @@ enumField:
     ;
 
 expr:
-        LPAREN left=expr RPAREN (CAST type)?
-    |   unaryExpr (CAST cast=type)?
+        LPAREN left=expr RPAREN (ARROW type)?
+    |   unaryExpr (ARROW cast=type)?
     |   left=expr op=(STAR | SLASH) right=expr
     |   left=expr op=(PLUS | MINUS) right=expr
     |   left=expr op=(LANGLE | RANGLE | GE | LE) right=expr
@@ -308,7 +320,7 @@ LBRACE: '{';
 RBRACE: '}';
 LBRACK: '[';
 RBRACK: ']';
-CAST: '->';
+ARROW: '->';
 LANGLE: '<';
 RANGLE: '>';
 

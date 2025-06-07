@@ -4,6 +4,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
@@ -15,6 +16,7 @@ LgsSymbol::LgsSymbol(LgsField* field): type(FIELD), field(field) {}
 LgsSymbol::LgsSymbol(LgsEnum* lgsEnum): type(ENUM), lgsEnum(lgsEnum) {}
 LgsSymbol::LgsSymbol(LgsEnumField* enumField): type(ENUM_FIELD), enumField(enumField) {}
 LgsSymbol::LgsSymbol(LgsFunc* func): type(FUNC), func(func) {}
+LgsSymbol::LgsSymbol(LgsGroup* group): type(GROUP), group(group) {}
 
 LgsSymbol* LgsSymbol::clone() const {
     return new LgsSymbol(*this);
@@ -38,6 +40,8 @@ void* LgsSymbol::getPtr() const {
         return lgsEnum;
     case ENUM_FIELD:
         return enumField;
+    case GROUP:
+        return group;
     case UNKNOWN:
         break;
     }
@@ -62,10 +66,12 @@ Location* LgsSymbol::getLocation() const {
         return &lgsEnum->location;
     case ENUM_FIELD:
         return &enumField->location;
+    case GROUP:
+        return &group->location;
     case UNKNOWN:
-    default:
-        assert(false);
+        break;
     }
+    assert(false);
 }
 
 json LgsSymbol::asJSON() const {
@@ -94,6 +100,9 @@ json LgsSymbol::asJSON() const {
         break;
     case ENUM_FIELD:
         tree["type"] = "ENUM_FIELD";
+        break;
+    case GROUP:
+        tree["type"] = "GROUP";
         break;
     case UNKNOWN:
         tree["type"] = "UNKNOWN";

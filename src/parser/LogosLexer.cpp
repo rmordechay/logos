@@ -58,7 +58,7 @@ void logoslexerLexerInitialize() {
   auto staticData = std::make_unique<LogosLexerStaticData>(
     std::vector<std::string>{
       "T__0", "T__1", "T__2", "DOUBLE_EQUAL", "NOT_EQUAL", "GE", "LE", "LPAREN", 
-      "RPAREN", "LBRACE", "RBRACE", "LBRACK", "RBRACK", "CAST", "LANGLE", 
+      "RPAREN", "LBRACE", "RBRACE", "LBRACK", "RBRACK", "ARROW", "LANGLE", 
       "RANGLE", "COMMA", "TRIPLE_DOT", "DOUBLE_DOT", "DOT", "COLON", "EQUAL", 
       "MINUS", "PLUS", "STAR", "SLASH", "HASH", "QUEST_MARK", "EXCLA_MARK", 
       "PERCENT", "DOLLAR", "AMPERSAND", "PIPE", "CARET", "DOUBLE_RANGLE", 
@@ -87,7 +87,7 @@ void logoslexerLexerInitialize() {
     },
     std::vector<std::string>{
       "", "", "", "", "DOUBLE_EQUAL", "NOT_EQUAL", "GE", "LE", "LPAREN", 
-      "RPAREN", "LBRACE", "RBRACE", "LBRACK", "RBRACK", "CAST", "LANGLE", 
+      "RPAREN", "LBRACE", "RBRACE", "LBRACK", "RBRACK", "ARROW", "LANGLE", 
       "RANGLE", "COMMA", "TRIPLE_DOT", "DOUBLE_DOT", "DOT", "COLON", "EQUAL", 
       "MINUS", "PLUS", "STAR", "SLASH", "HASH", "QUEST_MARK", "EXCLA_MARK", 
       "PERCENT", "DOLLAR", "AMPERSAND", "PIPE", "CARET", "DOUBLE_RANGLE", 

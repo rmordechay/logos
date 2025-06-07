@@ -18,7 +18,7 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
         IRValue = runtime->builder.CreateAlloca(objIRType);
     }
     if (!obj->implements.empty()) {
-        setVirtualFuncs(runtime);
+        setImplementsVFuncs(runtime);
     }
     for (const auto arg : args) {
         const auto field = obj->getField(arg->name);
@@ -42,7 +42,7 @@ void LgsInstance::setReturnExpr(LgsRuntime* runtime, Type* objIRType) {
     }
 }
 
-void LgsInstance::setVirtualFuncs(LgsRuntime* runtime) const {
+void LgsInstance::setImplementsVFuncs(LgsRuntime* runtime) const {
     const auto map = obj->vtable.getIRValue(runtime);
     const auto vtableGEP = runtime->builder.CreateStructGEP(obj->getIRType(), IRValue, 0);
     runtime->builder.CreateStore(map, vtableGEP);

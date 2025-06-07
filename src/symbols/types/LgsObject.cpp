@@ -2,6 +2,7 @@
 #include "codegen/CodeGenerator.h"
 #include "exprs/LgsNull.h"
 #include "stmts/LgsField.h"
+#include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 
 string LgsObject::prettyName() const {
@@ -39,6 +40,14 @@ LgsType* LgsObject::inferBinaryType(LgsType* other) {
 bool LgsObject::equals(LgsType* other) {
     // TODO make Object object
     if (name == LOGOS_PARENT_OBJ) return true;
+    if (const auto group = other->asGroup()) {
+        for (const auto groupType : group->types) {
+            if (name == groupType->getIRName()) {
+                return true;
+            }
+        }
+        return false;
+    }
     return name == other->getIRName();
 }
 

@@ -63,11 +63,14 @@ void SemaAnalyser::start() {
 }
 
 void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
-    for (const auto& obj : mainFile->objects) {
+    for (const auto obj : mainFile->objects) {
         visitObject(obj);
     }
-    for (const auto& lgsEnum : mainFile->enums) {
+    for (const auto lgsEnum : mainFile->enums) {
         visitEnum(lgsEnum);
+    }
+    for (const auto group : mainFile->groups) {
+        visitGroup(group);
     }
     for (const auto [_, func] : mainFile->funcs) {
         visitFunc(func);
@@ -507,7 +510,6 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
     }
     if (methodCall->equals(&method->funcType)) {
         methodCall->func = method;
-        methodCall->type = method->funcType.rt;
     } else {
         errHandler.handleError(E10034, &methodCall->location, {parentType->prettyName(), name, method->prettyName(), method->funcType.prettyName()});
     }
@@ -541,6 +543,17 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
         iterIndex->setType(iterable->baseType);
     }
     assert(iterIndex->type);
+}
+
+void SemaAnalyser::visitGroup(LgsGroup* group) const {
+    for (const auto targetSymbol : group->targetSymbols) {
+        for (const auto type : group->types) {
+            const auto method = type->getMethod(targetSymbol->name);
+            if (!method) continue;
+            method->funcType.isVirtual = true;
+            group->addMethod(method);
+        }
+    }
 }
 
 bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
@@ -669,21 +682,35 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     const auto symbol = &globals.symbols[typeName];
     delete type;
     LgsType* newType = nullptr;
-    if (symbol->type == OBJECT) {
-        symbol->object->isNullable = nullable;
-        newType = symbol->object;
-    }
-    if (symbol->type == INTERFACE) {
-        symbol->interface->isNullable = nullable;
-        newType = symbol->interface;
-    }
-    if (symbol->type == ENUM) {
-        symbol->lgsEnum->isNullable = nullable;
-        newType = symbol->lgsEnum;
-    }
-    if (symbol->type == ENUM_FIELD) {
+    switch (symbol->type) {
+    case ENUM_FIELD:
         symbol->enumField->parent->isNullable = nullable;
         newType = symbol->enumField->parent;
+        break;
+    case FUNC:
+        newType = &symbol->func->funcType;
+        break;
+    case OBJECT:
+        symbol->object->isNullable = nullable;
+        newType = symbol->object;
+        break;
+    case INTERFACE:
+        symbol->interface->isNullable = nullable;
+        newType = symbol->interface;
+        break;
+    case GROUP:
+        symbol->group->isNullable = nullable;
+        newType = symbol->group;
+        break;
+    case ENUM:
+        symbol->lgsEnum->isNullable = nullable;
+        newType = symbol->lgsEnum;
+        break;
+    case VAR_DEC:
+    case PARAM:
+    case FIELD:
+    case UNKNOWN:
+        break;
     }
     assert(newType);
     return newType;
@@ -748,6 +775,11 @@ void SemaAnalyser::resolveObjectImplements(LgsObject* obj) {
     }
 }
 
+void SemaAnalyser::resolveGroupTypes(LgsGroup* group) {
+    for (int i = 0; i < group->types.size(); ++i) {
+        group->types[i] = resolveType(group->types[i]);
+    }
+}
 
 string SemaAnalyser::getFuncsAsStr(const vector<LgsFunc*>& funcs) const {
     stringstream str;

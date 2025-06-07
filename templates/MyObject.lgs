@@ -1,0 +1,17 @@
+object: MyObject
+//implements: MyInterface
+
+pub x: Int
+pub y: Int
+
+pub add(): Int {
+    return 1
+}
+
+mul(a: Int, b: Int): Int {
+    return 1
+}
+
+bla(): Str {
+    return "fd1"
+}

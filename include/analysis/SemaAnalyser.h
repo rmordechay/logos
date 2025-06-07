@@ -4,6 +4,7 @@
 #include "logos/LgsASTVisitor.h"
 #include "logos/LgsErrHandler.h"
 #include "logos/LgsRuntime.h"
+#include "types/LgsGroup.h"
 
 class LgsArray;
 class LgsValue;
@@ -86,6 +87,7 @@ public:
     void visitFirstSelection(LgsExpr* firstExpr) override;
     void visitInstance(LgsInstance* instance) override;
     void visitIterIndex(LgsIterIndex* iterIndex) override;
+    void visitGroup(LgsGroup* group) const;
 
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
@@ -100,6 +102,7 @@ public:
     void resolveFuncTypes(LgsFuncType* funcType);
     void resolveObjMemberTypes(LgsObject* const& obj);
     void resolveObjectImplements(LgsObject* obj);
+    void resolveGroupTypes(LgsGroup* group);
     string getFuncsAsStr(const vector<LgsFunc*>& funcs) const;
     ~SemaAnalyser() override = default;
 };

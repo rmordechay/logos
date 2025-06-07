@@ -89,8 +89,11 @@ bool LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) const {
     for (const auto& file : files) {
         SemaAnalyser semaAnalyser(file);
         if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
-            for (const auto& object : mainFile->objects) {
+            for (const auto object : mainFile->objects) {
                 semaAnalyser.resolveObjMemberTypes(object);
+            }
+            for (const auto group : mainFile->groups) {
+                semaAnalyser.resolveGroupTypes(group);
             }
             for (const auto [_, func] : mainFile->funcs) {
                 semaAnalyser.resolveFuncTypes(&func->funcType);

@@ -12,7 +12,7 @@ public:
     explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), name(obj->name), obj(obj) {}
     explicit LgsInstance(const string& name) : name(name) {}
     Value* createIRValue(LgsRuntime* runtime) override;
-    void setVirtualFuncs(LgsRuntime* runtime) const;
+    void setImplementsVFuncs(LgsRuntime* runtime) const;
     void free(LgsRuntime* runtime) override;
     string getName() override;
     void setReturnExpr(LgsRuntime* runtime, Type* objIRType);

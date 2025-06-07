@@ -41,6 +41,7 @@
 #include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsArray.h"
+#include "types/LgsGroup.h"
 #include "types/LgsMap.h"
 #include "types/LgsUnknownType.h"
 #include <loops/LgsForeachLoop.h>
@@ -92,21 +93,21 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     const auto funcImplementations = ctx->funcImpl();
     const auto mainFile = new LgsMainFile(filePath);
 
-    for (const auto& lgsEnum : ctx->enumDeclaration()) {
+    for (const auto lgsEnum : ctx->enumDeclaration()) {
         mainFile->enums.emplace_back(getEnum(lgsEnum));
     }
 
-    for (const auto& object : ctx->object()) {
+    for (const auto object : ctx->object()) {
         auto lgsObject = getObject(object->objectBody(), object->TYPE()->getText(), !!object->SINGLETON());
         mainFile->objects.emplace_back(lgsObject);
     }
 
-    for (const auto& interface : ctx->interface()) {
+    for (const auto interface : ctx->interface()) {
         auto lgsInterface = getInterface(interface->interfaceBody(), interface->TYPE()->getText());
         mainFile->interfaces.push_back(lgsInterface);
     }
 
-    for (const auto& func : funcImplementations) {
+    for (const auto func : funcImplementations) {
         auto funcName = func->funcSignature()->VARIABLE()->getText();
         if (funcName == LOGOS_MAIN_FUNC) {
             mainFile->funcs[funcName] = getMainFunc(func);
@@ -114,6 +115,12 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
             mainFile->funcs[funcName] = getFuncImpl(func);
         }
     }
+
+    for (const auto group : ctx->group()) {
+        const auto lgsGroup = getGroup(group);
+        mainFile->groups.push_back(lgsGroup);
+    }
+
     return mainFile;
 }
 
@@ -771,6 +778,21 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
     }
     result->setLocation(ctx->start);
     return result;
+}
+
+LgsGroup* AntlerConverter::getGroup(LogosParser::GroupContext* ctx) {
+    const auto group = new LgsGroup(ctx->TYPE()->getText());
+    group->setLocation(ctx->start);
+    for (const auto type : ctx->groupTypesList()->type()) {
+        const auto lgsType = getType(type);
+        group->types.push_back(lgsType);
+    }
+    for (const auto target : ctx->groupTargetList()->VARIABLE()) {
+        const auto var = getVariable(target->getText(), ctx);
+        group->targetSymbols.push_back(var);
+    }
+    globals.addSymbol(group->name, LgsSymbol(group), &errHandler);
+    return group;
 }
 
 LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {

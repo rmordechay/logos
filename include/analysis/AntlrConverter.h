@@ -5,6 +5,7 @@
 #include "LogosParser.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsBreakStmt.h"
+#include "types/LgsGroup.h"
 
 using namespace std;
 using namespace filesystem;
@@ -92,6 +93,7 @@ public:
     LgsStrConst* getStrConst(antlr4::tree::TerminalNode* type) const;
     LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx);
+    LgsGroup* getGroup(LogosParser::GroupContext* ctx);
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
     LgsType* getTypeFromText(antlr4::tree::TerminalNode* typeToken) const;
     bool isTypePrimitive(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const;

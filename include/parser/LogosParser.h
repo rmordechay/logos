@@ -14,7 +14,7 @@ public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, DOUBLE_EQUAL = 4, NOT_EQUAL = 5, GE = 6, 
     LE = 7, LPAREN = 8, RPAREN = 9, LBRACE = 10, RBRACE = 11, LBRACK = 12, 
-    RBRACK = 13, CAST = 14, LANGLE = 15, RANGLE = 16, COMMA = 17, TRIPLE_DOT = 18, 
+    RBRACK = 13, ARROW = 14, LANGLE = 15, RANGLE = 16, COMMA = 17, TRIPLE_DOT = 18, 
     DOUBLE_DOT = 19, DOT = 20, COLON = 21, EQUAL = 22, MINUS = 23, PLUS = 24, 
     STAR = 25, SLASH = 26, HASH = 27, QUEST_MARK = 28, EXCLA_MARK = 29, 
     PERCENT = 30, DOLLAR = 31, AMPERSAND = 32, PIPE = 33, CARET = 34, DOUBLE_RANGLE = 35, 
@@ -30,21 +30,22 @@ public:
   enum {
     RuleLogosFile = 0, RuleExtern = 1, RuleLogosEnvFile = 2, RuleLogosAppFile = 3, 
     RuleMainFile = 4, RuleObjectFile = 5, RuleInterfaceFile = 6, RuleInterface = 7, 
-    RuleInterfaceBody = 8, RuleObject = 9, RuleObjectBody = 10, RuleField = 11, 
-    RuleObjectDeclaration = 12, RuleInterfaceDeclaration = 13, RuleObjectImplements = 14, 
-    RuleFuncSignature = 15, RuleFuncImpl = 16, RuleAnonnymosfuncSignature = 17, 
-    RuleAnonnymosFunc = 18, RuleMethodImplementation = 19, RuleFuncBody = 20, 
-    RuleParam = 21, RuleStatement = 22, RuleStatementsBlock = 23, RuleAssignment = 24, 
-    RuleExplicitVarDec = 25, RuleImplicitVarDec = 26, RuleIfStatement = 27, 
-    RuleElseIfStatement = 28, RuleElseStatement = 29, RulePatternMatching = 30, 
-    RulePattern = 31, RuleLoopStatement = 32, RuleBreakStmt = 33, RuleReturnStatement = 34, 
-    RuleEnumDeclaration = 35, RuleEnumField = 36, RuleExpr = 37, RuleUnaryExpr = 38, 
-    RuleArray = 39, RuleHashMap = 40, RuleKeyValue = 41, RuleFuncCall = 42, 
-    RuleFuncArgList = 43, RuleFuncArg = 44, RuleConstructor = 45, RuleConstructorArgList = 46, 
-    RuleConstructorArg = 47, RuleConstant = 48, RuleIterIndex = 49, RuleIndex = 50, 
-    RuleSelection = 51, RuleFirstSelectionElement = 52, RuleInnerSelectionElement = 53, 
-    RuleRange = 54, RuleType = 55, RuleMapType = 56, RuleArraySize = 57, 
-    RuleFuncType = 58, RuleVector = 59, RuleRequireEnvVars = 60
+    RuleGroup = 8, RuleGroupTypesList = 9, RuleGroupTargetList = 10, RuleInterfaceBody = 11, 
+    RuleObject = 12, RuleObjectBody = 13, RuleField = 14, RuleObjectDeclaration = 15, 
+    RuleInterfaceDeclaration = 16, RuleObjectImplements = 17, RuleFuncSignature = 18, 
+    RuleFuncImpl = 19, RuleAnonnymosfuncSignature = 20, RuleAnonnymosFunc = 21, 
+    RuleMethodImplementation = 22, RuleFuncBody = 23, RuleParam = 24, RuleStatement = 25, 
+    RuleStatementsBlock = 26, RuleAssignment = 27, RuleExplicitVarDec = 28, 
+    RuleImplicitVarDec = 29, RuleIfStatement = 30, RuleElseIfStatement = 31, 
+    RuleElseStatement = 32, RulePatternMatching = 33, RulePattern = 34, 
+    RuleLoopStatement = 35, RuleBreakStmt = 36, RuleReturnStatement = 37, 
+    RuleEnumDeclaration = 38, RuleEnumField = 39, RuleExpr = 40, RuleUnaryExpr = 41, 
+    RuleArray = 42, RuleHashMap = 43, RuleKeyValue = 44, RuleFuncCall = 45, 
+    RuleFuncArgList = 46, RuleFuncArg = 47, RuleConstructor = 48, RuleConstructorArgList = 49, 
+    RuleConstructorArg = 50, RuleConstant = 51, RuleIterIndex = 52, RuleIndex = 53, 
+    RuleSelection = 54, RuleFirstSelectionElement = 55, RuleInnerSelectionElement = 56, 
+    RuleRange = 57, RuleType = 58, RuleMapType = 59, RuleArraySize = 60, 
+    RuleFuncType = 61, RuleVector = 62, RuleRequireEnvVars = 63
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -72,6 +73,9 @@ public:
   class ObjectFileContext;
   class InterfaceFileContext;
   class InterfaceContext;
+  class GroupContext;
+  class GroupTypesListContext;
+  class GroupTargetListContext;
   class InterfaceBodyContext;
   class ObjectContext;
   class ObjectBodyContext;
@@ -197,6 +201,8 @@ public:
     EnumDeclarationContext* enumDeclaration(size_t i);
     std::vector<InterfaceContext *> interface();
     InterfaceContext* interface(size_t i);
+    std::vector<GroupContext *> group();
+    GroupContext* group(size_t i);
     std::vector<FuncImplContext *> funcImpl();
     FuncImplContext* funcImpl(size_t i);
 
@@ -245,6 +251,53 @@ public:
   };
 
   InterfaceContext* interface();
+
+  class  GroupContext : public antlr4::ParserRuleContext {
+  public:
+    GroupContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *TYPE();
+    antlr4::tree::TerminalNode *EQUAL();
+    std::vector<antlr4::tree::TerminalNode *> LBRACE();
+    antlr4::tree::TerminalNode* LBRACE(size_t i);
+    GroupTypesListContext *groupTypesList();
+    std::vector<antlr4::tree::TerminalNode *> RBRACE();
+    antlr4::tree::TerminalNode* RBRACE(size_t i);
+    antlr4::tree::TerminalNode *ARROW();
+    GroupTargetListContext *groupTargetList();
+
+   
+  };
+
+  GroupContext* group();
+
+  class  GroupTypesListContext : public antlr4::ParserRuleContext {
+  public:
+    GroupTypesListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<TypeContext *> type();
+    TypeContext* type(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+
+   
+  };
+
+  GroupTypesListContext* groupTypesList();
+
+  class  GroupTargetListContext : public antlr4::ParserRuleContext {
+  public:
+    GroupTargetListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<antlr4::tree::TerminalNode *> VARIABLE();
+    antlr4::tree::TerminalNode* VARIABLE(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+
+   
+  };
+
+  GroupTargetListContext* groupTargetList();
 
   class  InterfaceBodyContext : public antlr4::ParserRuleContext {
   public:
@@ -695,7 +748,7 @@ public:
     antlr4::tree::TerminalNode *RPAREN();
     std::vector<ExprContext *> expr();
     ExprContext* expr(size_t i);
-    antlr4::tree::TerminalNode *CAST();
+    antlr4::tree::TerminalNode *ARROW();
     TypeContext *type();
     UnaryExprContext *unaryExpr();
     antlr4::tree::TerminalNode *STAR();

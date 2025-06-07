@@ -3,6 +3,7 @@
 #include <json/json.hpp>
 #include <llvm/IR/Value.h>
 
+class LgsGroup;
 using namespace nlohmann;
 
 class LgsField;
@@ -19,12 +20,13 @@ class Location;
 enum LgsSymbolType {
     VAR_DEC,
     PARAM,
-    OBJECT,
-    INTERFACE,
+    ENUM_FIELD,
     FIELD,
     FUNC,
+    OBJECT,
+    INTERFACE,
+    GROUP,
     ENUM,
-    ENUM_FIELD,
     UNKNOWN,
 };
 
@@ -38,6 +40,7 @@ struct LgsSymbol {
     LgsEnum* lgsEnum = nullptr;
     LgsEnumField* enumField = nullptr;
     LgsFunc* func = nullptr;
+    LgsGroup* group = nullptr;
 
     explicit LgsSymbol(): type(UNKNOWN) {}
     explicit LgsSymbol(LgsParam* param);
@@ -48,6 +51,7 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsEnum* lgsEnum);
     explicit LgsSymbol(LgsEnumField* enumField);
     explicit LgsSymbol(LgsFunc* func);
+    explicit LgsSymbol(LgsGroup* group);
     LgsSymbol* clone() const;
     Location* getLocation() const;
     void* getPtr() const;

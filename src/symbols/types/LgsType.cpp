@@ -6,6 +6,7 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsArray.h"
+#include "types/LgsGroup.h"
 #include "types/LgsMap.h"
 #include "types/LgsUnknownType.h"
 #include "types/primitives/LgsBool.h"
@@ -38,6 +39,14 @@ LgsField* LgsType::getField(const string& name) {
     return nullptr;
 }
 
+LgsFunc* LgsType::getMethod(const string& name) {
+    const auto method = methods.find(name);
+    if (method != methods.end()) {
+        return method->second;
+    }
+    return nullptr;
+}
+
 void LgsType::addMethod(LgsFunc* method) {
     methods[method->funcType.name] = method;
 }
@@ -61,6 +70,7 @@ LgsInterface* LgsType::asInterface() { return dynamic_cast<LgsInterface*>(this);
 LgsIterable* LgsType::asIterable() { return dynamic_cast<LgsIterable*>(this); }
 LgsArray* LgsType::asArray() { return dynamic_cast<LgsArray*>(this); }
 LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
+LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }
 LgsStr* LgsType::asStr() { return dynamic_cast<LgsStr*>(this); }
 LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }
 LgsMap* LgsType::asMap() { return dynamic_cast<LgsMap*>(this); }
