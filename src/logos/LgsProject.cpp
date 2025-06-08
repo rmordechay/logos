@@ -89,7 +89,7 @@ bool LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) const {
         SemaAnalyser semaAnalyser(file);
         if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
             for (const auto object : mainFile->objects) {
-                semaAnalyser.resolveObjMemberTypes(object);
+                semaAnalyser.resolveObjTypes(object);
             }
             for (const auto group : mainFile->groups) {
                 semaAnalyser.resolveGroupTypes(group);
@@ -98,7 +98,7 @@ bool LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) const {
                 semaAnalyser.resolveFuncTypes(&func->funcType);
             }
         } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-            semaAnalyser.resolveObjMemberTypes(objFile->obj);
+            semaAnalyser.resolveObjTypes(objFile->obj);
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
             auto methods = interfaceFile->interface->methods;
             for (const auto& [_, method] : methods) {

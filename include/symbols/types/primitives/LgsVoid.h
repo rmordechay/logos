@@ -12,7 +12,7 @@ public:
         isPrimitive = true;
     }
     string prettyName() const override;
-    Type* getIRType(LgsRuntime* runtime) override;
+    Type* getIRType() override;
     size_t getSizeBytes() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;

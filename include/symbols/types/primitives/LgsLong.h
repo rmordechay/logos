@@ -8,7 +8,7 @@ public:
     LgsLong() {
         isPrimitive = true;
     }
-    Type* getIRType(LgsRuntime* runtime) override;
+    Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
     string getIRName() override;

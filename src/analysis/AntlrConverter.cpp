@@ -168,7 +168,6 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
     for (int i = 0; i < ctx->field().size(); ++i) {
         const auto field = ctx->field(i);
         const auto lgsField = getField(field);
-        lgsField->position = i;
         obj->fields[lgsField->name] = lgsField;
     }
     for (const auto& func : ctx->methodImplementation()) {

@@ -9,8 +9,8 @@ LgsExpr* LgsEnum::getZeroValue() {
     assert(false);
 }
 
-Type* LgsEnum::getIRType(LgsRuntime* runtime) {
-    return runtime->builder.getPtrTy();
+Type* LgsEnum::getIRType() {
+    return PointerType::getUnqual(context);
 }
 
 string LgsEnum::getIRName() {

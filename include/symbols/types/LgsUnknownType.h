@@ -8,7 +8,7 @@ public:
 
     LgsUnknownType() = default;
     explicit LgsUnknownType(const string& name) : name(name) {}
-    Type* getIRType(LgsRuntime* runtime) override;
+    Type* getIRType() override;
     string getIRName() override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;

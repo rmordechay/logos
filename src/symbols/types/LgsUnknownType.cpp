@@ -16,7 +16,7 @@ LgsType* LgsUnknownType::inferBinaryType(LgsType* other) {
     assert(false);
 }
 
-Type* LgsUnknownType::getIRType(LgsRuntime* runtime) {
+Type* LgsUnknownType::getIRType() {
     assert(false);
 }
 

@@ -727,7 +727,7 @@ LgsType* SemaAnalyser::resolveArrayType(LgsArray* array) {
     return array;
 }
 
-void SemaAnalyser::resolveObjMemberTypes(LgsObject* const& obj) {
+void SemaAnalyser::resolveObjTypes(LgsObject* obj) {
     for (const auto& [_, field] : obj->fields) {
         field->type = resolveType(field->type);
         field->parent = obj;

@@ -28,7 +28,7 @@ public:
         isCallable = true;
     }
 
-    Type* getIRType(LgsRuntime* runtime) override;
+    Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;

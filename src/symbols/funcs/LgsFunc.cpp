@@ -23,7 +23,7 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
     const auto funcIRName = funcType.getIRName();
     auto IRFunc = runtime->module->getFunction(funcIRName);
     if (IRFunc) return IRFunc;
-    const auto funcTy = dyn_cast<FunctionType>(funcType.getIRType(runtime));
+    const auto funcTy = dyn_cast<FunctionType>(funcType.getIRType());
     auto func = runtime->module->getOrInsertFunction(funcIRName, funcTy);
     IRFunc = dyn_cast<Function>(func.getCallee());
     if (funcType.swapReturn) {
@@ -45,7 +45,7 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     if (funcType.isVariadic) assert(false);
     for (int i = funcType.isStatic; i < args.size(); ++i) {
         const auto arg = args[i];
-        const auto argType = arg->type->getIRType(runtime);
+        const auto argType = arg->type->getIRType();
         const auto argValue = arg->getIRValue(runtime);
         addIRArg(runtime, IRArgs, argType, argValue);
     }
@@ -54,13 +54,13 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
 
 Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
     if (IRValue) {
-        const auto IRFuncType = dyn_cast<FunctionType>(funcType.getIRType(runtime));
+        const auto IRFuncType = dyn_cast<FunctionType>(funcType.getIRType());
         return runtime->builder.CreateCall(IRFuncType, IRValue, args);
     }
     const auto IRFunc = getIRFunc(runtime);
     Value* rv;
     if (funcType.swapReturn) {
-        const auto paramIRType = getReturnSwapParam()->type->getIRType(runtime);
+        const auto paramIRType = getReturnSwapParam()->type->getIRType();
         rv = runtime->builder.CreateAlloca(paramIRType);
         vector finalArgs(args.begin(), args.end());
         finalArgs.insert(finalArgs.begin() + funcType.returnParamIndex, rv);
@@ -80,7 +80,7 @@ void LgsFunc::addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, Type* type, 
 }
 
 void LgsFunc::setBigObjAttrs(LgsRuntime* runtime, Function& IRFunc) const {
-    const auto paramIRType = getReturnSwapParam()->type->getIRType(runtime);
+    const auto paramIRType = getReturnSwapParam()->type->getIRType();
     IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::StructRet, paramIRType));
     IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::Writable));
     IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));

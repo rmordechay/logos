@@ -7,7 +7,7 @@ string LgsFloat::prettyName() const {
     return name;
 }
 
-Type* LgsFloat::getIRType(LgsRuntime* runtime) {
+Type* LgsFloat::getIRType() {
     return Type::getFloatTy(context);
 }
 

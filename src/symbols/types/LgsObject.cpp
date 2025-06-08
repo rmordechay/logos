@@ -9,20 +9,23 @@ string LgsObject::prettyName() const {
     return name;
 }
 
-Type* LgsObject::getIRType(LgsRuntime* runtime) {
+Type* LgsObject::getIRType() {
     if (IRType) return IRType;
     vector<Type*> elementTypes;
-    // First field of any object is a ptr to its vtable
-    elementTypes.push_back(runtime->builder.getPtrTy());
+    auto fieldPos = 0;
+    if (vtable) {
+        elementTypes.push_back(PointerType::getUnqual(context));
+        fieldPos++;
+    }
     for (const auto& [_, field] : fields) {
-        auto fieldType = field->type->getIRType(runtime);
+        auto fieldType = field->type->getIRType();
+        field->position = fieldPos++;
         elementTypes.push_back(fieldType);
     }
     IRType = StructType::getTypeByName(context, name);
     if (!IRType) {
         IRType = StructType::create(context, elementTypes, name);
     }
-    setVFuncs(runtime);
     return IRType;
 }
 
@@ -89,7 +92,7 @@ void LgsObject::setVFuncs(LgsRuntime* runtime) const {
     for (const auto [_, method] : methods) {
         const auto keyIRStr = getIRStr(runtime, method->funcType.getIRName());
         const auto IRFunc = method->getIRFunc(runtime);
-        auto valuePtr = runtime->builder.CreateAlloca(runtime->builder.getPtrTy());
+        auto valuePtr = runtime->builder.CreateAlloca(PointerType::getUnqual(context));
         runtime->builder.CreateStore(IRFunc, valuePtr);
         vtable->mapType.add.callIR(runtime, {vtablePtr, keyIRStr, valuePtr});
     }

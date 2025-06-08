@@ -11,8 +11,8 @@ string LgsStr::getIRName() {
     return name;
 }
 
-Type* LgsStr::getIRType(LgsRuntime* runtime) {
-    return runtime->builder.getPtrTy();
+Type* LgsStr::getIRType() {
+    return PointerType::getUnqual(context);
 }
 
 string LgsStr::prettyName() const {

@@ -1,7 +1,7 @@
 #include "types/LgsGroup.h"
 
-Type* LgsGroup::getIRType(LgsRuntime* runtime) {
-    return runtime->builder.getPtrTy();
+Type* LgsGroup::getIRType() {
+    return PointerType::getUnqual(context);
 }
 
 LgsExpr* LgsGroup::getZeroValue() {

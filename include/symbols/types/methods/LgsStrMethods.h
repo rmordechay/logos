@@ -8,7 +8,7 @@
 #define BUFFER_SIZE 1024
 
 inline FunctionCallee getSnprintf(LgsRuntime* runtime) {
-    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getPtrTy(), runtime->builder.getInt64Ty(), runtime->builder.getPtrTy()}, true);
+    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context), runtime->builder.getInt64Ty(), PointerType::getUnqual(context)}, true);
     return runtime->module->getOrInsertFunction("snprintf", printfType);
 }
 

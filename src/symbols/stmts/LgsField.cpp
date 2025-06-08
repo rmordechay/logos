@@ -4,7 +4,7 @@
 
 Value* LgsField::getGEP(LgsRuntime* runtime, Value* instance) {
     assert(instance && parent);
-    IRValue = runtime->builder.CreateStructGEP(parent->getIRType(runtime), instance, position);
+    IRValue = runtime->builder.CreateStructGEP(parent->getIRType(), instance, position);
     return IRValue;
 }
 

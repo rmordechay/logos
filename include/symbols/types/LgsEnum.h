@@ -9,7 +9,7 @@ public:
 
     LgsEnum() = default;
     explicit LgsEnum(const string& name) : name(name) {}
-    Type* getIRType(LgsRuntime* runtime) override;
+    Type* getIRType() override;
     string getIRName() override;
     nlohmann::json asJSON() const override;
     string prettyName() const override;

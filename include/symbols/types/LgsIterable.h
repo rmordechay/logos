@@ -12,7 +12,7 @@ public:
     LgsExpr* sizeExpr = nullptr;
 
     explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}
-    Type* getIRType(LgsRuntime* runtime) override;
+    Type* getIRType() override;
     virtual LgsType* getBaseType();
     virtual Value* getLength(LgsRuntime* runtime, LgsExpr* expr) = 0;
     virtual Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) = 0;

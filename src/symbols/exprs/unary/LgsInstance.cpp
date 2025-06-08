@@ -10,7 +10,7 @@ string LgsInstance::getName() {
 }
 
 Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
-    const auto objIRType = obj->getIRType(runtime);
+    const auto objIRType = obj->getIRType();
     if (isReturnExpr) {
         setReturnExpr(runtime, objIRType);
     } else {

@@ -22,7 +22,7 @@ Value* LgsIterIndex::getIRFromDynArray(LgsRuntime* runtime, LgsArray* arr) const
     const auto arrPtr = baseExpr->getIRValue(runtime);
     const auto indexIRValue = index->from->getIRValue(runtime);
     const auto rv = arr->get.callIR(runtime, {arrPtr, indexIRValue});
-    return runtime->builder.CreateLoad(runtime->builder.getPtrTy(), rv);
+    return runtime->builder.CreateLoad(PointerType::getUnqual(context), rv);
 }
 
 Value* LgsIterIndex::getIRFromMap(LgsRuntime* runtime, LgsMap* map) const {
@@ -33,7 +33,7 @@ Value* LgsIterIndex::getIRFromMap(LgsRuntime* runtime, LgsMap* map) const {
 
 Value* LgsIterIndex::getIRFromStr(LgsRuntime* runtime) const {
     const auto baseExprIRValue = baseExpr->getIRValue(runtime);
-    const auto baseExprIRType = baseExpr->type->getIRType(runtime);
+    const auto baseExprIRType = baseExpr->type->getIRType();
     if (const auto global = dyn_cast<GlobalVariable>(baseExprIRValue)) {
         const auto ty = global->getValueType();
         const auto value = index->from->getIRValue(runtime);
@@ -54,7 +54,7 @@ void LgsIterIndex::storeScalar(LgsRuntime* runtime, LgsExpr* value) {
     const auto baseIRValue = baseExpr->getIRValue(runtime);
     if (const auto arr = baseExpr->type->asArray()) {
         if (!arr->isStatic) {
-            const auto ptr = runtime->builder.CreateAlloca(value->type->getIRType(runtime));
+            const auto ptr = runtime->builder.CreateAlloca(value->type->getIRType());
             runtime->builder.CreateStore(rValue, ptr);
             arr->put.callIR(runtime, {baseIRValue, index->from->getIRValue(runtime), ptr});
         } else {
@@ -72,7 +72,7 @@ void LgsIterIndex::storeScalar(LgsRuntime* runtime, LgsExpr* value) {
 
 void LgsIterIndex::storeArray(LgsRuntime* runtime, const LgsArrayExpr* arr) const {
     if (!arr->arrType.isStatic) assert(false);
-    const auto IRType = baseExpr->type->getIRType(runtime);
+    const auto IRType = baseExpr->type->getIRType();
     const auto arrPtr = baseExpr->getIRValue(runtime);
     vector<Value*> IRIndices = {runtime->builder.getInt32(0)};
     vector<LgsIndex*> indices;
@@ -104,7 +104,7 @@ Value* LgsIterIndex::getGEP(LgsRuntime* runtime) const {
             iterIndex = innerIterIndex;
         } else {
             ptr = iterIndex->baseExpr->getIRValue(runtime);
-            ty = iterIndex->baseExpr->type->getIRType(runtime);
+            ty = iterIndex->baseExpr->type->getIRType();
             IRIndices.push_back(runtime->builder.getInt32(0));
             break;
         }

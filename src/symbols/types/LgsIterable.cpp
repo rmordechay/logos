@@ -2,10 +2,10 @@
 #include "exprs/LgsExpr.h"
 #include "stmts/LgsVarDec.h"
 
-Type* LgsIterable::getIRType(LgsRuntime* runtime) {
+Type* LgsIterable::getIRType() {
     if (IRType) return IRType;
-    if (!isStatic || !sizeExpr) return runtime->builder.getPtrTy();
-    const auto innerIRType = baseType->getIRType(runtime);
+    if (!isStatic || !sizeExpr) return PointerType::getUnqual(context);
+    const auto innerIRType = baseType->getIRType();
     const auto size = LgsExpr::getExprConstNumber(sizeExpr);
     IRType = ArrayType::get(innerIRType, size);
     return IRType;
