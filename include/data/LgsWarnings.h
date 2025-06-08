@@ -1,6 +1,6 @@
 #ifndef LGSWARNINGS_H
 #define LGSWARNINGS_H
-#include <string>
+
 
 using namespace std;
 

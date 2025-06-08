@@ -1,7 +1,7 @@
 #ifndef LOGOSPRINT_H
 #define LOGOSPRINT_H
 #include "funcs/LgsBuiltinFunc.h"
-#include "logos/LgsRuntime.h"
+
 #include "types/primitives/LgsBool.h"
 #include "utils/LgsUtils.h"
 

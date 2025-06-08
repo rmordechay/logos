@@ -1,6 +1,6 @@
 #ifndef LOGOSFLOAT_H
 #define LOGOSFLOAT_H
-#include "types/LgsType.h"
+
 
 class LgsFloat final : public LgsType {
 public:

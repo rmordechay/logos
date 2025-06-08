@@ -1,6 +1,6 @@
 #ifndef LGSSHORT_H
 #define LGSSHORT_H
-#include "types/LgsType.h"
+
 
 class LgsShort final : public LgsType {
 public:

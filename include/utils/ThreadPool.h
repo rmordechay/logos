@@ -3,7 +3,7 @@
 
 #include <queue>
 #include <thread>
-#include <vector>
+
 #include <condition_variable>
 #include <functional>
 

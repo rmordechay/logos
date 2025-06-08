@@ -1,6 +1,6 @@
 #include "cli/LgsGenerateCmd.h"
 
-#include <iostream>
+
 
 void LgsGenerateCmd::validate() {
 }

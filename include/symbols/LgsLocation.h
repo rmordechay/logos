@@ -1,7 +1,7 @@
 #ifndef LGSLOCATION_H
 #define LGSLOCATION_H
 #include <filesystem>
-#include <string>
+
 
 struct Location {
     size_t lineNumber{};

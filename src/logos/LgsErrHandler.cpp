@@ -3,7 +3,7 @@
 #include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
 
-#include <iostream>
+
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;

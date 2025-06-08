@@ -1,7 +1,7 @@
 #ifndef LGSCMD_H
 #define LGSCMD_H
-#include <iostream>
-#include <string>
+
+
 
 class LgsCmd {
 public:

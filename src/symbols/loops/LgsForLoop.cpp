@@ -1,6 +1,6 @@
 #include "loops/LgsForLoop.h"
 #include "data/LgsDefinitions.h"
-#include "logos/LgsRuntime.h"
+
 #include "stmts/LgsStmtBlock.h"
 #include "stmts/LgsVarDec.h"
 

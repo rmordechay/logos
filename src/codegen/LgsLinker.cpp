@@ -3,20 +3,13 @@
 #include "logos/Logos.h"
 #include "logos/Platform.h"
 #include "data/LgsDefinitions.h"
-#include "logos/LgsRuntime.h"
-
-#include <llvm/TargetParser/Host.h>
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/IRReader/IRReader.h>
 #include <llvm/Support/FileSystem.h>
 #include "llvm/IR/Verifier.h"
 #include <llvm/MC/TargetRegistry.h>
-#include <llvm/Target/TargetMachine.h>
 #include <llvm/IR/LegacyPassManager.h>
-
-#include <iostream>
-#include <unistd.h>
 
 bool LgsLinker::link(LogosProject& project) const {
     setPlatform(paths.objFilePath, paths.execFilePath);

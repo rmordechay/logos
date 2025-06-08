@@ -1,5 +1,6 @@
 #ifndef LGSMAP_H
 #define LGSMAP_H
+
 #include "types/LgsIterable.h"
 #include "types/LgsPair.h"
 #include "methods/LgsMapMethods.h"

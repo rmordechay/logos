@@ -1,6 +1,6 @@
 #ifndef LOGOSERRORS_H
 #define LOGOSERRORS_H
-#include <string>
+
 
 using namespace std;
 

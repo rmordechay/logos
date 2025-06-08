@@ -1,7 +1,7 @@
 #include "LgsValue.h"
 
 #include "funcs/LgsFunc.h"
-#include "logos/LgsRuntime.h"
+
 #include "json/json.hpp"
 
 void LgsValue::startBlock(LgsRuntime* runtime, BasicBlock* const block) const {

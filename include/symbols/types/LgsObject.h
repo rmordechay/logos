@@ -1,6 +1,5 @@
 #ifndef LOGOSOBJECT_H
 #define LOGOSOBJECT_H
-#include "LgsAny.h"
 #include "data/LgsDefinitions.h"
 #include "LgsType.h"
 #include "LgsVTable.h"

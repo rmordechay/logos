@@ -1,10 +1,5 @@
 #ifndef LOGOSFILE_H
 #define LOGOSFILE_H
-#include <string>
-#include <assert.h>
-#include <json/json.hpp>
-#include <llvm/IR/Module.h>
-
 
 class LgsStrConst;
 class LogosProject;

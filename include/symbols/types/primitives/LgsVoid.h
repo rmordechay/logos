@@ -1,6 +1,6 @@
 #ifndef LOGOSVOID_H
 #define LOGOSVOID_H
-#include "types/LgsType.h"
+
 
 using namespace std;
 

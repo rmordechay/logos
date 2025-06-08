@@ -2,8 +2,6 @@
 #define LOGOSTYPE_H
 #include "LgsValue.h"
 
-#include <string>
-#include <map>
 using namespace std;
 using namespace llvm;
 

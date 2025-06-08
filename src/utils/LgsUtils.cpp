@@ -6,8 +6,6 @@
 #include "logos/Platform.h"
 #include "stmts/LgsVarDec.h"
 #include <llvm/MC/TargetRegistry.h>
-#include <llvm/Target/TargetMachine.h>
-#include <llvm/TargetParser/Host.h>
 
 string getFileText(path filePath) {
     if (!exists(filePath)) return "";

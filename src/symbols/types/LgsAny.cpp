@@ -1,7 +1,7 @@
 #include "types/LgsAny.h"
 
 
-#include "logos/LgsRuntime.h"
+
 
 size_t LgsAny::getSizeBytes() {
     return sizeof(void*);

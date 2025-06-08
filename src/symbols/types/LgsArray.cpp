@@ -4,7 +4,7 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "logos/LgsConfig.h"
-#include "logos/LgsRuntime.h"
+
 #include "stmts/LgsVarDec.h"
 
 size_t LgsArray::getSizeBytes() {

@@ -3,7 +3,8 @@
 #include "cli/LgsFormatCmd.h"
 #include "cli/LgsGenerateCmd.h"
 #include "cli/LgsRunCmd.h"
-#include <iostream>
+#include "data/LgsDefinitions.h"
+
 #include <sstream>
 
 void LgsCli::execute() const {

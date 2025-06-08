@@ -1,6 +1,6 @@
 #ifndef LOGOSINT_H
 #define LOGOSINT_H
-#include "types/LgsType.h"
+
 
 class LgsInt final : public LgsType {
 public:

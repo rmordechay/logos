@@ -9,6 +9,8 @@ file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS include/*.h)
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
 add_library(lib ${SOURCE_FILES})
 
+target_precompile_headers(lib PRIVATE include/pch.h)
+
 target_include_directories(lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols

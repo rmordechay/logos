@@ -1,6 +1,6 @@
 #include "cli/LgsRunCmd.h"
 #include "logos/Logos.h"
-#include <iostream>
+
 
 void LgsRunCmd::runCmd() {
     const auto firstArg = argv[2];

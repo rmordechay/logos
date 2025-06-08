@@ -1,6 +1,6 @@
 #include "loops/LgsRangeLoop.h"
 
-#include "logos/LgsRuntime.h"
+
 #include "stmts/LgsVarDec.h"
 
 Value* LgsRangeLoop::loopStart(LgsRuntime* runtime) {

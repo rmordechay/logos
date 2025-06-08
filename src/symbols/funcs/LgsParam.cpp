@@ -2,7 +2,7 @@
 
 #include "exprs/LgsExpr.h"
 #include "funcs/LgsFunc.h"
-#include "logos/LgsRuntime.h"
+
 #include "types/LgsFuncType.h"
 
 string LgsParam::format(string& indentStr) {

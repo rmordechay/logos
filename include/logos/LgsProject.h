@@ -6,7 +6,7 @@
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include <files/LgsFile.h>
-#include <vector>
+
 
 struct LgsError;
 class LgsObject;

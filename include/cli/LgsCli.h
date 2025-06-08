@@ -1,8 +1,6 @@
 #ifndef COMMANDLINE_H
 #define COMMANDLINE_H
-#include "logos/Logos.h"
-
-using namespace std;
+#include <pch.h>
 
 class LgsCli {
 public:
@@ -13,7 +11,7 @@ public:
     static void printVersion();
     void execute() const;
     static void printHelp();
-    static void exitWithMsg(const string& errorMsg);
+    static void exitWithMsg(const std::string& errorMsg);
     ~LgsCli() = default;
 };
 

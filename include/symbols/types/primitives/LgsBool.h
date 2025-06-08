@@ -1,6 +1,6 @@
 #ifndef LOGOSBOOL_H
 #define LOGOSBOOL_H
-#include "types/LgsType.h"
+
 #include "exprs/unary/constants/LgsConstExpr.h"
 
 class LgsBool final : public LgsType {

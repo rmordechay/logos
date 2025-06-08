@@ -1,7 +1,7 @@
 #ifndef LGSSTRMETHODS_H
 #define LGSSTRMETHODS_H
 #include "funcs/LgsBuiltinFunc.h"
-#include "logos/LgsRuntime.h"
+
 #include "utils/LgsUtils.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"

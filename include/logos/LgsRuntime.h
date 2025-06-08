@@ -2,9 +2,6 @@
 #define LOGOSSTACK_H
 #include "LgsStack.h"
 #include "LgsSymbol.h"
-#include <map>
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/Module.h>
 
 using namespace std;
 using namespace llvm;

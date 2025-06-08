@@ -1,11 +1,10 @@
 #ifndef CODEGENERATION_H
 #define CODEGENERATION_H
+
 #include "LgsLocation.h"
 #include <Token.h>
-#include <json/json.hpp>
-#include <llvm/IR/Value.h>
 
-class LgsRuntime;
+
 class LgsFunc;
 using namespace llvm;
 

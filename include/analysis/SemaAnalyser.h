@@ -3,7 +3,7 @@
 #include "files/LgsFile.h"
 #include "logos/LgsASTVisitor.h"
 #include "logos/LgsErrHandler.h"
-#include "logos/LgsRuntime.h"
+
 #include "types/LgsGroup.h"
 
 class LgsArray;

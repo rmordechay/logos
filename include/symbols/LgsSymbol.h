@@ -1,7 +1,6 @@
 #ifndef LOGOSSYMBOL_H
 #define LOGOSSYMBOL_H
-#include <json/json.hpp>
-#include <llvm/IR/Value.h>
+
 
 class LgsGroup;
 using namespace nlohmann;

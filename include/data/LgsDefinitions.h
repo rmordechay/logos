@@ -1,6 +1,6 @@
 #ifndef LOGOSMETADATA_H
 #define LOGOSMETADATA_H
-#include <json/json.hpp>
+
 #include <lld/Common/Driver.h>
 class CodeGenerator;
 class LgsRuntime;

@@ -2,7 +2,7 @@
 
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsShortConst.h"
-#include "logos/LgsRuntime.h"
+
 
 size_t LgsShort::getSizeBytes() {
     return sizeof(short);

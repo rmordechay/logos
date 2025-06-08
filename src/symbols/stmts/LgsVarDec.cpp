@@ -1,6 +1,6 @@
 #include "stmts/LgsVarDec.h"
 #include "exprs/unary/LgsArrayExpr.h"
-#include "logos/LgsRuntime.h"
+
 
 string LgsVarDec::format(string& indentStr) {
     return indentStr + name + " = ";
