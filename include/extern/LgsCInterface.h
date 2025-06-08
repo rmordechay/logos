@@ -19,7 +19,6 @@ public:
     explicit LgsCVisitor(clang::ASTContext* context, LgsErrHandler& errHandler) : context(context), errHandler(errHandler) {}
     bool isConstCharPointer(clang::QualType qt) const;
     LgsType* mapCType(clang::QualType type);
-    LgsSymbol* getSymbol(const std::string& name) const;
     LgsObject* mapCRecord(const clang::RecordDecl* record);
     LgsType* mapCArray(clang::QualType type);
     LgsType* mapCStruct(clang::QualType type);

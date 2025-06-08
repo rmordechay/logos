@@ -12,6 +12,7 @@ public:
     string code;
     string absPath;
     string relPath;
+    LgsSymbolTable symbolTable;
     vector<LgsStrConst*> externFiles;
 
     explicit LgsFile(const string& name, const string& path) : name(name), absPath(path) {}

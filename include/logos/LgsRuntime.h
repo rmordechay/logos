@@ -25,14 +25,13 @@ public:
     ~LgsRuntime() = default;
 };
 
-struct LgsGlobals {
+struct LgsSymbolTable {
     map<string, LgsSymbol> symbols;
 
+    LgsSymbol* getSymbol(const string& name);
     void addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler);
     void addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler = nullptr);
-    ~LgsGlobals();
+    ~LgsSymbolTable();
 };
 
-inline LgsGlobals globals;
-
-
+inline LgsSymbolTable globals;

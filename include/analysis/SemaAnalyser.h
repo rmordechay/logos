@@ -93,6 +93,7 @@ public:
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 
     LgsSymbol* getSymbol(const string& name, const LgsValue* value = nullptr);
+    bool symbolExists(const string& name);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     LgsType* resolveType(LgsType* type);
     LgsType* resolveArrayType(LgsArray* array);

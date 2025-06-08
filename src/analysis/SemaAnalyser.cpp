@@ -645,29 +645,32 @@ void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
 }
 
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
-    LgsSymbol* symbol = nullptr;
-    // Globals symbols
-    if (globals.symbols.find(name) != globals.symbols.end()) {
-        symbol = &globals.symbols[name];
-    } else {
-        // Locals
-        auto& symbols = stack.top().symbols;
-        if (symbols.find(name) != symbols.end()) {
-            symbol = &symbols[name];
-        }
+    if (const auto globalSymbol = globals.getSymbol(name)) {
+        return globalSymbol;
     }
-    if (!symbol && value) {
-        errHandler.handleError(E10006, &value->location, {name});
+    if (const auto localSymbol = stack.getSymbol(name)) {
+        return localSymbol;
     }
-    return symbol;
+    errHandler.handleError(E10006, &value->location, {name});
+    return nullptr;
 }
 
 void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
-    if (getSymbol(name)) {
+    if (symbolExists(name)) {
         const auto location = symbol.getLocation();
         return errHandler.handleError(E10011, location, {name, to_string(location->lineNumber)});
     }
     stack.addSymbol(name, symbol);
+}
+
+bool SemaAnalyser::symbolExists(const string& name) {
+    if (globals.getSymbol(name)) {
+        return true;
+    }
+    if (stack.getSymbol(name)) {
+        return true;
+    }
+    return false;
 }
 
 LgsType* SemaAnalyser::resolveType(LgsType* type) {
@@ -677,7 +680,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     if (!type->isUnknown()) return type;
     auto typeName = type->prettyName();
     const auto nullable = type->isNullable;
-    if (globals.symbols.find(typeName) == globals.symbols.end()) {
+    if (!globals.getSymbol(typeName)) {
         errHandler.handleError(E10006, &type->location, {typeName});
         return nullptr;
     }

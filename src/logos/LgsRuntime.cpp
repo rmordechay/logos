@@ -46,7 +46,7 @@ void LgsRuntime::freeExprs() {
     }), exprs.end());
 }
 
-void LgsGlobals::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
+void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
     if (symbols.find(name) != symbols.end()) {
         const auto location = symbol.getLocation();
         errHandler->handleError(E10011, location, {name, location->lineNumberStr()});
@@ -56,7 +56,14 @@ void LgsGlobals::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHa
     symbols[name] = symbol;
 }
 
-void LgsGlobals::addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler) {
+LgsSymbol* LgsSymbolTable::getSymbol(const string& name) {
+    if (symbols.find(name) != symbols.end()) {
+        return &symbols[name];
+    }
+    return nullptr;
+}
+
+void LgsSymbolTable::addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler) {
     if (symbols.find(lgsEnum->name) != symbols.end()) {
         const auto location = lgsEnum->location;
         errHandler->handleError(E10011, &location, {lgsEnum->name, location.lineNumberStr()});
@@ -69,7 +76,7 @@ void LgsGlobals::addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler) {
     }
 }
 
-LgsGlobals::~LgsGlobals() {
+LgsSymbolTable::~LgsSymbolTable() {
     for (const auto& [_, symbol] : symbols) {
         switch (symbol.type) {
         case VAR_DEC: delete symbol.varDec; break;

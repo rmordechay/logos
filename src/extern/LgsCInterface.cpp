@@ -26,7 +26,7 @@ bool LgsCVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
     if (!isValid(record->getLocation())) return true;
     if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
     const auto name = record->getNameAsString();
-    const auto objSymbol = getSymbol(name);
+    const auto objSymbol = globals.getSymbol(name);
     if (objSymbol) return true;
     const auto obj = mapCRecord(record);
     globals.addSymbol(name, LgsSymbol(obj), &errHandler);
@@ -114,7 +114,7 @@ LgsType* LgsCVisitor::mapCStruct(const clang::QualType type) {
     if (name == "") {
         name = decl->getQualifiedNameAsString();
     }
-    const auto objSymbol = getSymbol(name);
+    const auto objSymbol = globals.getSymbol(name);
     if (objSymbol) return objSymbol->object;
     const auto obj = mapCRecord(decl);
     globals.addSymbol(name, LgsSymbol(obj), &errHandler);
@@ -146,14 +146,6 @@ bool LgsCVisitor::isConstCharPointer(const clang::QualType qt) const {
     if (!qt->isPointerType()) return false;
     const auto pointeeType = qt->getPointeeType();
     return pointeeType.isConstQualified() && pointeeType->isCharType();
-}
-
-LgsSymbol* LgsCVisitor::getSymbol(const string& name) const {
-    LgsSymbol* symbol = nullptr;
-    if (globals.symbols.find(name) != globals.symbols.end()) {
-        symbol = &globals.symbols[name];
-    }
-    return symbol;
 }
 
 bool LgsCVisitor::isValid(const clang::SourceLocation loc) const {

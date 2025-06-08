@@ -34,6 +34,7 @@ public:
     void exitScope(LgsScope scope);
     LgsForLoop* getLoop();
     LgsIfStmt* getIfStmt();
+    LgsSymbol* getSymbol(const string& name);
     void addSymbol(const std::string& name, const LgsSymbol& symbol);
     auto begin() { return c.begin(); }
     auto end() { return c.end(); }

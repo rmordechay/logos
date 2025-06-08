@@ -95,8 +95,10 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     const auto funcImplementations = ctx->funcImpl();
     const auto mainFile = new LgsMainFile(filePath);
 
-    for (const auto lgsEnum : ctx->enumDeclaration()) {
-        mainFile->enums.emplace_back(getEnum(lgsEnum));
+    for (const auto enumDeclaration : ctx->enumDeclaration()) {
+        auto lgsEnum = getEnum(enumDeclaration);
+        mainFile->enums.emplace_back(lgsEnum);
+        mainFile->symbolTable.addEnum(lgsEnum);
     }
 
     for (const auto object : ctx->object()) {
@@ -514,7 +516,6 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
         field->setLocation(ctx->start);
         lgsEnum->fields[enumName] = field;
     }
-    globals.addEnum(lgsEnum, &errHandler);
     return lgsEnum;
 }
 
