@@ -11,6 +11,7 @@ public:
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
+    string getStrFormatPart() const override;
     string getIRName() override;
     string prettyName() const override;
     bool equals(LgsType* other) override;

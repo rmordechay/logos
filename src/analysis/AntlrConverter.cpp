@@ -32,6 +32,7 @@
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsHashMap.h"
+#include "exprs/unary/constants/LgsLongConst.h"
 #include "extern/LgsC.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
@@ -735,8 +736,15 @@ LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::IterIndexContext* ctx) 
 LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) const {
     LgsConstExpr* constant = nullptr;
     if (const auto intToken = ctx->INTEGER()) {
-        const auto value = stoi(removeUnderscores(intToken->getText()));
-        constant = new LgsIntConst(value);
+        const auto input = removeUnderscores(intToken->getText());
+        char* end;
+        const auto longValue = std::strtol(input.c_str(), &end, 10);
+        if (longValue >= INT_MIN && longValue <= INT_MAX) {
+            const auto intValue = static_cast<int>(longValue);
+            constant = new LgsIntConst(intValue);
+        } else {
+            constant = new LgsLongConst(longValue);
+        }
     } else if (const auto floatToken = ctx->FLOAT()) {
         const auto value = stof(floatToken->getText());
         constant = new LgsFloatConst(value);

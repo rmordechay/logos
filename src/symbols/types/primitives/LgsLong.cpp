@@ -1,8 +1,5 @@
 #include "types/primitives/LgsLong.h"
 
-
-
-
 string LgsLong::prettyName() const {
     return name;
 }
@@ -22,6 +19,10 @@ LgsExpr* LgsLong::getZeroValue() {
 
 LgsType* LgsLong::inferBinaryType(LgsType* other) {
     assert(false);
+}
+
+string LgsLong::getStrFormatPart() const {
+    return "%lu";
 }
 
 string LgsLong::getIRName() {
