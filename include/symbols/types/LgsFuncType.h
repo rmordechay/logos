@@ -1,4 +1,5 @@
 #pragma once
+#include "LgsType.h"
 #include "funcs/LgsParam.h"
 
 

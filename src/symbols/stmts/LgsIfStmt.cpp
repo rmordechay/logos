@@ -1,5 +1,6 @@
 #include "stmts/LgsIfStmt.h"
 
+#include "logos/LgsRuntime.h"
 
 
 void LgsIfStmt::createIRStmt(LgsRuntime* runtime) {

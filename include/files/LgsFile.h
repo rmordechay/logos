@@ -1,4 +1,5 @@
 #pragma once
+#include "logos/LgsRuntime.h"
 
 class LgsStrConst;
 class LogosProject;

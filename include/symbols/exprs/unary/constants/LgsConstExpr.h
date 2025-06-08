@@ -1,5 +1,6 @@
 #pragma once
 #include "exprs/unary/LgsUnaryExpr.h"
+#include "types/LgsType.h"
 
 
 class LgsFloatConst;

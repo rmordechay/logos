@@ -1,4 +1,5 @@
 #pragma once
+#include "types/LgsType.h"
 
 
 class LgsInt final : public LgsType {

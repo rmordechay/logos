@@ -1,5 +1,7 @@
 #include "types/LgsFuncType.h"
 
+#include "logos/LgsRuntime.h"
+
 bool LgsFuncType::equals(LgsType* other) {
     const auto otherFuncType = other->asFuncType();
     if (!otherFuncType) return false;

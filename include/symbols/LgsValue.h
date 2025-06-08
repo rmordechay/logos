@@ -1,5 +1,6 @@
 #pragma once
 
+class LgsRuntime;
 class LgsFunc;
 using namespace llvm;
 
@@ -15,7 +16,7 @@ public:
     Value* hashIRValue(LgsRuntime* runtime, Value* value) const;
     virtual std::string format(std::string& indentStr);
     virtual void setLocation(const antlr4::Token* ctx);
-    virtual nlohmann::json asJSON();
+    virtual json asJSON();
     virtual ~LgsValue() = default;
 };
 

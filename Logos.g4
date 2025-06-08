@@ -373,7 +373,7 @@ OR: 'or';
 NOT: 'not';
 IN: 'in';
 
-INTEGER: [0-9][0-9_]+;
+INTEGER: [0-9][0-9_]*;
 FLOAT: [0-9]+ '.' [0-9]+;
 BOOL: 'true' | 'false';
 NULL: 'null';

@@ -1,8 +1,7 @@
 #pragma once
 
 #include "exprs/LgsExpr.h"
-
-
+#include "logos/LgsRuntime.h"
 
 
 class LgsUnaryExpr : public LgsExpr {

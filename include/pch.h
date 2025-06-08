@@ -28,11 +28,10 @@ using namespace filesystem;
 using namespace nlohmann;
 using namespace llvm;
 
-#include "logos/LgsRuntime.h"
 #include "LgsLocation.h"
 #include "data/LgsErrors.h"
 #include "data/LgsWarnings.h"
 #include "data/LgsDefinitions.h"
-#include "utils/LgsUtils.h"
 #include "logos/LgsErrHandler.h"
-#include "types/LgsType.h"
+#include "utils/LgsUtils.h"
+#include "parser/LogosParser.h"

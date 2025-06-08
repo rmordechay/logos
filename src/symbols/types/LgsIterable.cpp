@@ -1,5 +1,6 @@
 #include "types/LgsIterable.h"
 #include "exprs/LgsExpr.h"
+#include "logos/LgsRuntime.h"
 #include "stmts/LgsVarDec.h"
 
 Type* LgsIterable::getIRType() {

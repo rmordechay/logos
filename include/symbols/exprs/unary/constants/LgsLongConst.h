@@ -2,7 +2,6 @@
 #include "LgsConstExpr.h"
 #include "types/primitives/LgsLong.h"
 
-
 class LgsLongConst final : public LgsConstExpr {
 public:
     long value;

@@ -1,6 +1,5 @@
 #pragma once
-
-
+#include "types/LgsType.h"
 
 
 class LgsVoid final : public LgsType {

@@ -1,5 +1,4 @@
 #pragma once
-#include "parser/LogosParser.h"
 
 enum LgsOperator {
     ADD,
