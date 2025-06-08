@@ -1,8 +1,5 @@
 #include "funcs/LgsFunc.h"
-
 #include "stmts/LgsStmtBlock.h"
-#include "types/LgsInterface.h"
-#include "types/LgsObject.h"
 #include "exprs/LgsExpr.h"
 #include "types/LgsArray.h"
 
@@ -16,18 +13,27 @@ void LgsFunc::generateIR(LgsRuntime* runtime) {
             runtime->builder.CreateRetVoid();
         }
     }
+    runtime->builder.restoreIP(runtime->savedIP);
     runtime->stack.exitFunc();
+}
+
+Value* LgsFunc::createIRValue(LgsRuntime* runtime) {
+    runtime->savedIP = runtime->builder.saveIP();
+    generateIR(runtime);
+    runtime->builder.restoreIP(runtime->savedIP);
+    return getIRFunc(runtime);
 }
 
 Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
     const auto funcIRName = funcType.getIRName();
     auto IRFunc = runtime->module->getFunction(funcIRName);
     if (IRFunc) return IRFunc;
-    const auto funcTy = dyn_cast<FunctionType>(funcType.getIRType());
+    const auto IRFuncType = funcType.getIRType();
+    const auto funcTy = dyn_cast<FunctionType>(IRFuncType);
     auto func = runtime->module->getOrInsertFunction(funcIRName, funcTy);
     IRFunc = dyn_cast<Function>(func.getCallee());
     if (funcType.swapReturn) {
-        setBigObjAttrs(runtime, *IRFunc);
+        setBigObjAttrs(*IRFunc);
     }
     if (funcType.params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
@@ -54,7 +60,7 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
 
 Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
     if (IRValue) {
-        const auto IRFuncType = dyn_cast<FunctionType>(funcType.getIRType());
+        const auto IRFuncType = cast<FunctionType>(funcType.rt->getIRType());
         return runtime->builder.CreateCall(IRFuncType, IRValue, args);
     }
     const auto IRFunc = getIRFunc(runtime);
@@ -79,7 +85,7 @@ void LgsFunc::addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, Type* type, 
     }
 }
 
-void LgsFunc::setBigObjAttrs(LgsRuntime* runtime, Function& IRFunc) const {
+void LgsFunc::setBigObjAttrs(Function& IRFunc) const {
     const auto paramIRType = getReturnSwapParam()->type->getIRType();
     IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::StructRet, paramIRType));
     IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::Writable));
@@ -106,6 +112,7 @@ bool LgsFunc::shouldLoadIRArg(Value* value) {
         const auto constExpr = cast<ConstantExpr>(value);
         return constExpr->getOpcode() == Instruction::GetElementPtr;
     }
+    if (isa<Function>(value)) return false;
     return true;
 }
 
@@ -132,10 +139,6 @@ void LgsFunc::swapReturnIfNeeded() {
         funcType.params.insert(funcType.params.begin(), new LgsParam(funcType.rt));
         funcType.rt = &LGS_VOID;
     }
-}
-
-Value* LgsFunc::createIRValue(LgsRuntime* runtime) {
-    return IRValue;
 }
 
 string LgsFunc::prettyName() {

@@ -1,8 +1,6 @@
 #pragma once
 
-
 using namespace std;
-
 inline string ERROR_PLACEHOLDER = "%s";
 
 struct LgsError {

@@ -1,7 +1,5 @@
 #include "LgsValue.h"
-
 #include "funcs/LgsFunc.h"
-
 #include "json/json.hpp"
 
 void LgsValue::startBlock(LgsRuntime* runtime, BasicBlock* const block) const {
@@ -10,7 +8,8 @@ void LgsValue::startBlock(LgsRuntime* runtime, BasicBlock* const block) const {
 }
 
 void LgsValue::startBlockFunc(LgsRuntime* runtime) const {
-    const auto IRFunc = runtime->stack.currentFunc->getIRFunc(runtime);
+    const auto currentFunc = runtime->stack.currentFunc;
+    const auto IRFunc = currentFunc->getIRFunc(runtime);
     const auto entryBlock = BasicBlock::Create(runtime->module->getContext(), "entry", IRFunc);
     runtime->builder.SetInsertPoint(entryBlock);
 }

@@ -1,5 +1,4 @@
 #include "types/LgsFuncType.h"
-#include "types/LgsInterface.h"
 
 bool LgsFuncType::equals(LgsType* other) {
     const auto otherFuncType = other->asFuncType();
@@ -21,6 +20,8 @@ string LgsFuncType::getIRName() {
     stringstream strStream;
     if (isMethod) {
         strStream << parentName << "_";
+    } else if (isAnonymous) {
+        strStream << "Anonymous";
     }
     strStream << name;
     IRName = strStream.str();
@@ -61,7 +62,11 @@ string LgsFuncType::prettyName() const {
         strStream << params[i]->type->prettyName();
         if (i != params.size() - 1) strStream << ", ";
     }
-    strStream << ')';
+    if (rt) {
+        strStream << "): " << rt->prettyName();
+    } else {
+        strStream << ')';
+    }
     return strStream.str();
 }
 

@@ -15,7 +15,6 @@ public:
     vector<LgsVariable*> refs;
     vector<LgsExpr*> returnExprs;
     LgsStmtBlock* stmtBlock = nullptr;
-    IRBuilderBase::InsertPoint savedIP;
     LgsFunc* implementsFunc = nullptr;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam*>& params = {}) {
@@ -25,19 +24,19 @@ public:
         funcType.params = params;
     }
     explicit LgsFunc(const LgsFuncType* funcType) : LgsFunc(funcType->name, funcType->rt, funcType->params) {}
-    static bool shouldLoadIRArg(Value* value);
-    void setBigObjAttrs(LgsRuntime* runtime, Function& IRFunc) const;
     void swapReturnIfNeeded();
     LgsParam* getReturnSwapParam() const;
-    static void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, Type* type, Value* value);
-    Value* createIRValue(LgsRuntime* runtime) override;
-    string format(string& tabs) override;
-    string prettyName() override;
+    void setBigObjAttrs(Function& IRFunc) const;
     json asJSON() override;
+    string prettyName() override;
+    string format(string& tabs) override;
+    Value* createIRValue(LgsRuntime* runtime) override;
     virtual void generateIR(LgsRuntime* runtime);
     virtual Function* getIRFunc(LgsRuntime* runtime);
     virtual Value* callIR(LgsRuntime* runtime, const vector<Value*>& args = {});
     virtual Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args = {});
+    static bool shouldLoadIRArg(Value* value);
+    static void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, Type* type, Value* value);
     ~LgsFunc() override;
 };
 

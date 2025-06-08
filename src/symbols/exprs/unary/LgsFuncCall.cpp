@@ -1,10 +1,8 @@
 #include "exprs/unary/LgsFuncCall.h"
-
 #include "exprs/unary/LgsHashMap.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 
 Value* LgsFuncCall::call(LgsRuntime* runtime) const {
@@ -38,14 +36,14 @@ void LgsFuncCall::createIRStmt(LgsRuntime* runtime) {
     call(runtime);
 }
 
-bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
-    if (funcType->hasDefaultParams) return equalsDefaultParams(funcType);
-    if (funcType->isVariadic) return equalsVariadic(funcType);
-    if (!funcType->isAnonymous && name != funcType->name) return false;
-    if (funcType->params.size() != args.size()) return false;
-    if (funcType->params.size() == 0 && args.size() == 0) return true;
-    for (size_t i = 0; i < funcType->params.size(); ++i) {
-        const auto paramType = funcType->params[i]->type;
+bool LgsFuncCall::equals(const LgsFuncType* other) const {
+    if (other->hasDefaultParams) return equalsDefaultParams(other);
+    if (other->isVariadic) return equalsVariadic(other);
+    if (!other->isAnonymous && name != other->name) return false;
+    if (other->params.size() != args.size()) return false;
+    if (other->params.size() == 0 && args.size() == 0) return true;
+    for (size_t i = 0; i < other->params.size(); ++i) {
+        const auto paramType = other->params[i]->type;
         const auto argType = args[i]->type;
         if (!paramType->equals(argType)) return false;
     }
@@ -97,6 +95,10 @@ string LgsFuncCall::prettyName() {
         strStream << args[i]->type->prettyName();
         if (i != args.size() - 1) strStream << ", ";
     }
-    strStream << ')';
+    if (type) {
+        strStream << "): " << type->prettyName();
+    } else {
+        strStream << ')';
+    }
     return strStream.str();
 }

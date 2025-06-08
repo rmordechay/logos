@@ -70,8 +70,10 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
             file->externFiles.push_back(str);
         }
     }
-    const LgsC lgsC(errHandler);
-    lgsC.parse(file->externFiles);
+    if (!file->externFiles.empty()) {
+        const LgsC lgsC(errHandler);
+        lgsC.parse(file->externFiles);
+    }
     file->absPath = filePath;
     file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     return file;
@@ -293,31 +295,35 @@ void AntlerConverter::setParams(LgsFuncType* funcType, const vector<LogosParser:
     for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         if (const auto type = param->type()) {
-            const auto variableName = param->VARIABLE()->getText();
-            const auto expr = getExpr(param->expr());
-            const auto lgsParam = new LgsParam(getType(type), variableName, expr);
-            if (param->TRIPLE_DOT()) {
-                if (i != params.size() - 1) errHandler.handleError(E10044, &lgsParam->location);
-                if (lgsParam->expr) errHandler.handleError(E10045, &lgsParam->location);
-                lgsParam->isVariadic = true;
-                funcType->isVariadic = true;
-            } else if (lgsParam->expr) {
-                funcType->hasDefaultParams = true;
-            }
-            lgsParam->setLocation(param->start);
+            auto lgsParam = getParam(funcType, param, type);
             funcType->params.emplace_back(lgsParam);
         } else if (const auto paramFuncType = param->funcType()) {
             const auto lgsParamFuncType = getFuncType(paramFuncType);
+            lgsParamFuncType->name = param->VARIABLE()->getText();
             const auto lgsParam = new LgsParam(lgsParamFuncType);
-            lgsParam->name = param->VARIABLE()->getText();
+            lgsParam->name = lgsParamFuncType->name;
             lgsParam->setLocation(param->start);
-            lgsParamFuncType->name = lgsParam->name;
             funcType->params.emplace_back(lgsParam);
         }
     }
     if (funcType->isVariadic && funcType->hasDefaultParams) {
         errHandler.handleError(E10043, &funcType->location);
     }
+}
+
+LgsParam* AntlerConverter::getParam(LgsFuncType* funcType, LogosParser::ParamContext* param, LogosParser::TypeContext* type) {
+    const auto variableName = param->VARIABLE()->getText();
+    const auto expr = getExpr(param->expr());
+    const auto lgsParam = new LgsParam(getType(type), variableName, expr);
+    if (param->TRIPLE_DOT()) {
+        if (lgsParam->expr) errHandler.handleError(E10045, &lgsParam->location);
+        lgsParam->isVariadic = true;
+        funcType->isVariadic = true;
+    } else if (lgsParam->expr) {
+        funcType->hasDefaultParams = true;
+    }
+    lgsParam->setLocation(param->start);
+    return lgsParam;
 }
 
 LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx) {
