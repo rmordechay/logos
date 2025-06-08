@@ -20,5 +20,3 @@ public:
     void free(LgsRuntime* runtime) override;
     ~LgsArrayExpr() override = default;
 };
-
-

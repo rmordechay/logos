@@ -197,7 +197,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
     const auto interface = new LgsInterface(interfaceName);
     interface->setLocation(ctx->start);
     for (const auto& funcSignature : ctx->funcSignature()) {
-        const auto self = new LgsParam(interface, LOGOS_SELF);
+        const auto self = LgsParam(interface, LOGOS_SELF);
         const auto type = getFuncReturnType(funcSignature->type());
         const auto func = new LgsFunc(funcSignature->VARIABLE()->getText(), type);
         func->funcType.parentName = interfaceName;
@@ -226,9 +226,9 @@ LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
         if (isValid) {
             mainFunc->args = new LgsArrayExpr(new LgsStr());
             mainFunc->args->initArgsFunc = new LgsFunc("initArgs", &LGS_VOID, {
-                new LgsParam(mainFunc->args->type),
-                new LgsParam(&LGS_INT),
-                new LgsParam(new LgsStr())
+                LgsParam(mainFunc->args->type),
+                LgsParam(&LGS_INT),
+                LgsParam(new LgsStr())
             });
         }
     }
@@ -243,9 +243,9 @@ bool AntlerConverter::setMainArgsParam(LgsMainFunc* mainFunc, LogosParser::FuncS
     const auto type = param->type();
     const auto variableName = param->VARIABLE()->getText();
     const auto expr = getExpr(param->expr());
-    const auto lgsParam = new LgsParam(getType(type), variableName, expr);
-    lgsParam->setLocation(param->start);
-    const auto arr = lgsParam->type->asArray();
+    auto lgsParam = LgsParam(getType(type), variableName, expr);
+    lgsParam.setLocation(param->start);
+    const auto arr = lgsParam.type->asArray();
     mainFunc->funcType.params.emplace_back(lgsParam);
     return arr && arr->baseType->asStr();
 }
@@ -266,8 +266,8 @@ LgsFunc* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext
     const auto rt = getFuncReturnType(ctx->funcSignature()->type());
     const auto funcSignature = ctx->funcSignature();
     const auto nameToken = funcSignature->VARIABLE();
-    const auto self = new LgsParam(obj, LOGOS_SELF);
-    self->isSelf = true;
+    auto self = LgsParam(obj, LOGOS_SELF);
+    self.isSelf = true;
     const auto method = new LgsFunc(nameToken->getText(), rt);
     method->filePath = obj->path;
     method->funcType.isMethod = true;
@@ -302,9 +302,9 @@ void AntlerConverter::setParams(LgsFuncType* funcType, const vector<LogosParser:
         } else if (const auto paramFuncType = param->funcType()) {
             const auto lgsParamFuncType = getFuncType(paramFuncType);
             lgsParamFuncType->name = param->VARIABLE()->getText();
-            const auto lgsParam = new LgsParam(lgsParamFuncType);
-            lgsParam->name = lgsParamFuncType->name;
-            lgsParam->setLocation(param->start);
+            auto lgsParam = LgsParam(lgsParamFuncType);
+            lgsParam.name = lgsParamFuncType->name;
+            lgsParam.setLocation(param->start);
             funcType->params.emplace_back(lgsParam);
         }
     }
@@ -313,18 +313,18 @@ void AntlerConverter::setParams(LgsFuncType* funcType, const vector<LogosParser:
     }
 }
 
-LgsParam* AntlerConverter::getParam(LgsFuncType* funcType, LogosParser::ParamContext* param, LogosParser::TypeContext* type) {
+LgsParam AntlerConverter::getParam(LgsFuncType* funcType, LogosParser::ParamContext* param, LogosParser::TypeContext* type) {
     const auto variableName = param->VARIABLE()->getText();
     const auto expr = getExpr(param->expr());
-    const auto lgsParam = new LgsParam(getType(type), variableName, expr);
+    auto lgsParam = LgsParam(getType(type), variableName, expr);
     if (param->TRIPLE_DOT()) {
-        if (lgsParam->expr) errHandler.handleError(E10045, &lgsParam->location);
-        lgsParam->isVariadic = true;
+        if (lgsParam.expr) errHandler.handleError(E10045, &lgsParam.location);
+        lgsParam.isVariadic = true;
         funcType->isVariadic = true;
-    } else if (lgsParam->expr) {
+    } else if (lgsParam.expr) {
         funcType->hasDefaultParams = true;
     }
-    lgsParam->setLocation(param->start);
+    lgsParam.setLocation(param->start);
     return lgsParam;
 }
 
@@ -419,7 +419,7 @@ LgsFuncType* AntlerConverter::getFuncType(LogosParser::FuncTypeContext* ctx) {
     for (const auto paramType : ctx->type()) {
         if (paramType == ctx->rt) continue;
         const auto type = getType(paramType);
-        funcType->params.emplace_back(new LgsParam(type));
+        funcType->params.emplace_back(LgsParam(type));
     }
     return funcType;
 }

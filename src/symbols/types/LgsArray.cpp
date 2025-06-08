@@ -1,10 +1,7 @@
 #include "types/LgsArray.h"
-
 #include "exprs/unary/LgsArrayExpr.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/constants/LgsIntConst.h"
-#include "logos/LgsConfig.h"
-
 #include "stmts/LgsVarDec.h"
 
 size_t LgsArray::getSizeBytes() {
@@ -35,13 +32,6 @@ string LgsArray::getIRName() {
     return name;
 }
 
-void LgsArray::inferArrayType(const vector<LgsExpr*>& exprs) {
-    if (!exprs.empty()) {
-        baseType = exprs.front()->type;
-    }
-    sizeExpr = new LgsIntConst(exprs.size());
-}
-
 LgsType* LgsArray::inferBinaryType(LgsType* other) {
     assert(false);
 }
@@ -65,6 +55,16 @@ Value* LgsArray::callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) {
 
 Value* LgsArray::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
     return isNotEmpty.call(runtime, {expr});
+}
+
+StructType* LgsArray::getArrStruct(LgsRuntime* runtime) {
+    if (arrStruct) return arrStruct;
+    auto& builder = runtime->builder;
+    const auto int32Ty = builder.getInt32Ty();
+    const auto int64Ty = builder.getInt64Ty();
+    const auto ptrTy = builder.getPtrTy();
+    arrStruct = getIRStructType(context, name, {int64Ty, int32Ty, int32Ty, ptrTy});
+    return arrStruct;
 }
 
 LgsType* LgsArray::clone() {

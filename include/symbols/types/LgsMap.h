@@ -9,13 +9,13 @@ public:
     static constexpr auto name = "Map";
     LgsPair kvType;
     StructType* mapStruct = nullptr;
-    LgsMapInitFunc init{this};
-    LgsMapGetFunc get{this};
-    LgsMapAddFunc add{this};
-    LgsMapLenFunc len{this};
-    LgsMapIsEmptyFunc isEmpty{this};
-    LgsMapIsNotEmptyFunc isNotEmpty{this};
-    LgsMapDeleteFunc delete_{this};
+    LgsBuiltinFunc init{"init", &LGS_VOID, name, {LgsParam{this}, LgsParam{&LGS_INT}}};
+    LgsBuiltinFunc get{"get", &LGS_ANY, name, {LgsParam{this}, LgsParam{new LgsStr()}}};
+    LgsBuiltinFunc add{"add", &LGS_VOID, name, {LgsParam{this}, LgsParam{new LgsStr()}, LgsParam{&LGS_ANY}}};
+    LgsBuiltinFunc delete_{"delete", &LGS_VOID, name, {LgsParam{this}}};
+    LgsBuiltinFunc len{"len", &LGS_INT, name, {LgsParam{this}}};
+    LgsBuiltinFunc isEmpty{"isEmpty", &LGS_INT, name, {LgsParam{this}}};
+    LgsBuiltinFunc isNotEmpty{"isNotEmpty", &LGS_INT, name, {LgsParam{this}}};
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&kvType) {
         kvType.key = keyType;
@@ -41,6 +41,7 @@ public:
     Value* callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
     ~LgsMap() override = default;
+    StructType* getMapStruct(LgsRuntime* runtime);
 };
 
 

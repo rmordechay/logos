@@ -43,7 +43,7 @@ Value* getIRStr(const LgsRuntime* runtime, const string& value) {
     return globalVariable;
 }
 
-StructType* getArrStruct(LLVMContext& context, const string& name, const vector<Type*>& fields) {
+StructType* getIRStructType(LLVMContext& context, const string& name, const vector<Type*>& fields) {
     const auto struct_ = StructType::getTypeByName(context, name);
     if (!struct_) {
         return StructType::create(context, fields, name);
@@ -60,4 +60,14 @@ Module* createIRModule(const string& moduleName, LLVMContext& context) {
     module->setTargetTriple(targetTriple);
     module->setDataLayout(targetMachine->createDataLayout());
     return module;
+}
+
+FunctionCallee getPrintf(LgsRuntime* runtime) {
+    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context)}, true);
+    return runtime->module->getOrInsertFunction("printf", printfType);
+}
+
+FunctionCallee getSnprintf(LgsRuntime* runtime) {
+    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context), runtime->builder.getInt64Ty(), PointerType::getUnqual(context)}, true);
+    return runtime->module->getOrInsertFunction("snprintf", printfType);
 }

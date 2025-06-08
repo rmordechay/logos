@@ -43,7 +43,7 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
     if (other->params.size() != args.size()) return false;
     if (other->params.size() == 0 && args.size() == 0) return true;
     for (size_t i = 0; i < other->params.size(); ++i) {
-        const auto paramType = other->params[i]->type;
+        const auto paramType = other->params[i].type;
         const auto argType = args[i]->type;
         if (!paramType->equals(argType)) return false;
     }
@@ -56,7 +56,7 @@ bool LgsFuncCall::equalsDefaultParams(const LgsFuncType* funcType) const {
         const auto param = funcType->params[i];
         if (i >= argsSize) continue;
         const auto arg = args[i];
-        if (!param->type->equals(arg->type)) return false;
+        if (!param.type->equals(arg->type)) return false;
     }
     return true;
 }

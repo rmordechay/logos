@@ -9,8 +9,8 @@ bool LgsFuncType::equals(LgsType* other) {
     if (params.size() != otherParams.size()) return false;
     if (params.size() == 0 && otherParams.size() == 0) return true;
     for (size_t i = 0; i < params.size(); ++i) {
-        const auto thisType = params[i]->type;
-        const auto otherType = otherFuncType->params[i]->type;
+        const auto thisType = params[i].type;
+        const auto otherType = otherFuncType->params[i].type;
         if (!thisType->equals(otherType)) return false;
     }
     return true;
@@ -40,8 +40,8 @@ Type* LgsFuncType::getIRType() {
     vector<Type*> IRParamsTypes;
     for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
-        const auto paramType = param->type;
-        if (!paramType->isPrimitive || param->isSelf) {
+        const auto paramType = param.type;
+        if (!paramType->isPrimitive || param.isSelf) {
             IRParamsTypes.emplace_back(PointerType::getUnqual(context));
         } else {
             auto irType = paramType->getIRType();
@@ -60,7 +60,7 @@ string LgsFuncType::prettyName() const {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = 0; i < params.size(); ++i) {
-        strStream << params[i]->type->prettyName();
+        strStream << params[i].type->prettyName();
         if (i != params.size() - 1) strStream << ", ";
     }
     if (rt) {
@@ -80,8 +80,8 @@ LgsType* LgsFuncType::clone() {
     newFuncType->name = this->name;
     newFuncType->parentName = this->parentName;
     newFuncType->rt = this->rt->clone();
-    for (const auto param : this->params) {
-        newFuncType->params.push_back(new LgsParam(*param));
+    for (auto& param : this->params) {
+        newFuncType->params.push_back(param);
     }
     newFuncType->isMethod = this->isMethod;
     newFuncType->isStatic = this->isStatic;

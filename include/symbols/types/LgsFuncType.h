@@ -11,8 +11,7 @@ public:
     string IRName;
     string parentName;
     LgsType* rt = nullptr;
-    vector<LgsParam*> params;
-    FunctionType* IRType = nullptr;
+    vector<LgsParam> params;
     bool isMethod = false;
     bool isStatic = false;
     bool isPublic = false;
@@ -24,6 +23,7 @@ public:
     bool swapReturn = false;
     bool hasDefaultParams = false;
     int returnParamIndex = -1;
+    FunctionType* IRType = nullptr;
 
     LgsFuncType() {
         isCallable = true;

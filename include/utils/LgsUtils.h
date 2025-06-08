@@ -10,7 +10,9 @@ std::string getFileText(path filePath);
 std::string getFormatString(const std::vector<LgsExpr*>& args);
 std::string removeUnderscores(const std::string& input);
 Value* getIRStr(const LgsRuntime* runtime, const std::string& value);
-StructType* getArrStruct(LLVMContext& context, const std::string& name, const std::vector<Type*>& fields);
+StructType* getIRStructType(LLVMContext& context, const std::string& name, const std::vector<Type*>& fields);
 Module* createIRModule(const std::string& moduleName, LLVMContext& context);
+FunctionCallee getPrintf(LgsRuntime* runtime);
+FunctionCallee getSnprintf(LgsRuntime* runtime);
 
 

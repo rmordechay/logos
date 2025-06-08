@@ -34,4 +34,6 @@ using namespace llvm;
 #include "data/LgsDefinitions.h"
 #include "logos/LgsErrHandler.h"
 #include "utils/LgsUtils.h"
+#include "utils/ThreadPool.h"
 #include "parser/LogosParser.h"
+#include "parser/LogosLexer.h"

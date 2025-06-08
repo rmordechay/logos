@@ -17,7 +17,7 @@ public:
     LgsStmtBlock* stmtBlock = nullptr;
     LgsFunc* implementsFunc = nullptr;
 
-    explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam*>& params = {}) {
+    explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {
         type = &funcType;
         funcType.name = name;
         funcType.rt = rt;

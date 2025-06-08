@@ -24,7 +24,7 @@ Function* LgsMainFunc::getIRFunc(LgsRuntime* runtime) {
     if (funcType.params.empty()) {
         mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {}, false);
     } else {
-        mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getInt32Ty(), PointerType::getUnqual(context)}, false);
+        mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getInt32Ty(), runtime->builder.getPtrTy()}, false);
     }
     auto func = runtime->module->getOrInsertFunction(LOGOS_MAIN_FUNC, mainFuncType);
     IRFunc = dyn_cast<Function>(func.getCallee());
@@ -41,7 +41,7 @@ Function* LgsMainFunc::getIRFunc(LgsRuntime* runtime) {
 void LgsMainFunc::initArgs(LgsRuntime* runtime) {
     auto& builder = runtime->builder;
     const vector<Type*> structFields{builder.getInt64Ty(), builder.getInt32Ty(), builder.getInt32Ty(), builder.getPtrTy()};
-    const auto arrStruct = getArrStruct(runtime->module->getContext(), args->arrType.name, structFields);
+    const auto arrStruct = getIRStructType(runtime->module->getContext(), args->arrType.name, structFields);
     args->IRValue = builder.CreateAlloca(arrStruct);
     args->initArgsFunc->callIR(runtime, {args->IRValue, argc, argv});
     funcType.params[0]->setIRValue(args->IRValue);

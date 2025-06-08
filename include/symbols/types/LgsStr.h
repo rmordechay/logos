@@ -6,10 +6,10 @@
 class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
-    LgsStrFormatFunc format{this};
-    LgsStrLenFunc len{this};
-    LgsStrIsEmptyFunc isEmpty{this};
-    LgsStrIsNotEmptyFunc isNotEmpty{this};
+    LgsBuiltinFunc format{"format", this, name, {LgsParam{this}, LgsParam{&LGS_ANY}}};
+    LgsBuiltinFunc len{"len", &LGS_INT, name, {LgsParam{this}}};
+    LgsBuiltinFunc isEmpty{"isEmpty", &LGS_INT, name, {LgsParam{this}}};
+    LgsBuiltinFunc isNotEmpty{"isNotEmpty", &LGS_INT, name, {LgsParam{this}}};
 
     LgsStr() : LgsIterable(&LGS_CHAR) {
         addMethod(&format);

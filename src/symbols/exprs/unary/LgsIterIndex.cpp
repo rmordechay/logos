@@ -22,13 +22,16 @@ Value* LgsIterIndex::getIRFromDynArray(LgsRuntime* runtime, LgsArray* arr) const
     const auto arrPtr = baseExpr->getIRValue(runtime);
     const auto indexIRValue = index->from->getIRValue(runtime);
     const auto rv = arr->get.callIR(runtime, {arrPtr, indexIRValue});
-    return runtime->builder.CreateLoad(PointerType::getUnqual(context), rv);
+    return runtime->builder.CreateLoad(runtime->builder.getPtrTy(), rv);
 }
 
 Value* LgsIterIndex::getIRFromMap(LgsRuntime* runtime, LgsMap* map) const {
     const auto mapPtr = baseExpr->getIRValue(runtime);
     const auto indexIRValue = index->from->getIRValue(runtime);
-    return map->get.callIR(runtime, {mapPtr, indexIRValue});
+    const auto rvPtr = map->get.callIR(runtime, {mapPtr, indexIRValue});
+    auto value = map->kvType.value;
+    auto lgsArray = value->asArray();
+    return runtime->builder.CreateLoad(lgsArray->getArrStruct(runtime), rvPtr);
 }
 
 Value* LgsIterIndex::getIRFromStr(LgsRuntime* runtime) const {
@@ -50,24 +53,25 @@ void LgsIterIndex::storeHashMap(LgsRuntime* runtime, LgsHashMap* hashMap) const 
 }
 
 void LgsIterIndex::storeScalar(LgsRuntime* runtime, LgsExpr* value) {
-    const auto rValue = value->getIRValue(runtime);
+    const auto rIRValue = value->getIRValue(runtime);
     const auto baseIRValue = baseExpr->getIRValue(runtime);
     if (const auto arr = baseExpr->type->asArray()) {
         if (!arr->isStatic) {
             const auto ptr = runtime->builder.CreateAlloca(value->type->getIRType());
-            runtime->builder.CreateStore(rValue, ptr);
+            runtime->builder.CreateStore(rIRValue, ptr);
             arr->put.callIR(runtime, {baseIRValue, index->from->getIRValue(runtime), ptr});
         } else {
-            runtime->builder.CreateStore(rValue, getGEP(runtime));
+            runtime->builder.CreateStore(rIRValue, getGEP(runtime));
         }
         return;
     }
     if (const auto map = baseExpr->type->asMap()) {
-        map->add.callIR(runtime, {baseIRValue, index->from->getIRValue(runtime), rValue});
+        const auto key = index->from->getIRValue(runtime);
+        map->add.callIR(runtime, {baseIRValue, key, rIRValue});
         return;
     }
     const auto iterPtr = getIRValue(runtime);
-    runtime->builder.CreateStore(rValue, iterPtr);
+    runtime->builder.CreateStore(rIRValue, iterPtr);
 }
 
 void LgsIterIndex::storeArray(LgsRuntime* runtime, const LgsArrayExpr* arr) const {

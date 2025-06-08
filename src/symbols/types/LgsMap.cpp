@@ -61,3 +61,11 @@ LgsType* LgsMap::inferBinaryType(LgsType* other) {
 LgsType* LgsMap::getBaseType() {
     return kvType.value;
 }
+
+StructType* LgsMap::getMapStruct(LgsRuntime* runtime) {
+    if (mapStruct) return mapStruct;
+    auto& builder = runtime->builder;
+    const vector<Type*> mapStructFields = {builder.getPtrTy(), builder.getInt64Ty(), builder.getInt32Ty()};
+    mapStruct = getIRStructType(context, name, mapStructFields);
+    return mapStruct;
+}

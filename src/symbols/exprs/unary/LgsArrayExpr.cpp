@@ -2,9 +2,6 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "logos/LgsConfig.h"
 
-
-
-
 Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {
     if (arrType.isStatic) return createConstArray(runtime);
     return createDynArray(runtime);
@@ -12,12 +9,8 @@ Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {
 
 Value* LgsArrayExpr::createDynArray(LgsRuntime* runtime) {
     auto& builder = runtime->builder;
-    const auto int32Ty = builder.getInt32Ty();
-    const auto int64Ty = builder.getInt64Ty();
-    const auto ptrTy = builder.getPtrTy();
-    const auto arrStruct = getArrStruct(context, arrType.name, {int64Ty, int32Ty, int32Ty, ptrTy});
     const auto elementSize = builder.getInt64(arrType.baseType->getSizeBytes());
-    IRValue = builder.CreateAlloca(arrStruct);
+    IRValue = builder.CreateAlloca(arrType.getArrStruct(runtime));
 
     Value* capacityIR = nullptr;
     if (arrType.sizeExpr) {

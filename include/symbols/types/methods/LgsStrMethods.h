@@ -1,16 +1,7 @@
 #pragma once
 #include "funcs/LgsBuiltinFunc.h"
-
-
 #include "types/LgsAny.h"
-#include "types/primitives/LgsInt.h"
-
-#define BUFFER_SIZE 1024
-
-inline FunctionCallee getSnprintf(LgsRuntime* runtime) {
-    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context), runtime->builder.getInt64Ty(), PointerType::getUnqual(context)}, true);
-    return runtime->module->getOrInsertFunction("snprintf", printfType);
-}
+#include "utils/LgsUtils.h"
 
 class LgsStrFormatFunc final : public LgsBuiltinFunc {
 public:
@@ -21,18 +12,18 @@ public:
         self.type = parent;
         funcType.isVariadic = true;
         funcType.isPublic = true;
-        funcType.params = {&self};
     }
 
     Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
         const bool isConst = args[0]->type->isConst;
         if (!isConst) assert(false);
+        constexpr auto bufferSize = 1024;
         const auto formatString = getFormatString(args);
         const auto baseIRStr = getIRStr(runtime, formatString);
-        const auto bufferType = ArrayType::get(runtime->builder.getInt8Ty(), BUFFER_SIZE);
+        const auto bufferType = ArrayType::get(runtime->builder.getInt8Ty(), bufferSize);
         const auto buffer = runtime->builder.CreateAlloca(bufferType);
         const auto gep = runtime->builder.CreateGEP(bufferType, buffer, {runtime->builder.getInt32(0), runtime->builder.getInt32(0)});
-        vector<Value*> IRArgs = {gep, runtime->builder.getInt64(BUFFER_SIZE), baseIRStr};
+        vector<Value*> IRArgs = {gep, runtime->builder.getInt64(bufferSize), baseIRStr};
         for (int i = 1; i < args.size(); ++i) {
             IRArgs.emplace_back(args[i]->getIRValue(runtime));
         }
@@ -41,39 +32,3 @@ public:
         return gep;
     }
 };
-
-
-class LgsStrLenFunc final : public LgsBuiltinFunc {
-public:
-    LgsParam self{};
-
-    explicit LgsStrLenFunc(LgsType* parent) : LgsBuiltinFunc("len", &LGS_INT, parent->getIRName()) {
-        self.type = parent;
-        funcType.params = {&self};
-        funcType.isPublic = true;
-    }
-};
-
-class LgsStrIsEmptyFunc final : public LgsBuiltinFunc {
-public:
-    LgsParam self{};
-
-    explicit LgsStrIsEmptyFunc(LgsType* parent) : LgsBuiltinFunc("isEmpty", &LGS_INT, parent->getIRName()) {
-        self.type = parent;
-        funcType.params = {&self};
-        funcType.isPublic = true;
-    }
-};
-
-class LgsStrIsNotEmptyFunc final : public LgsBuiltinFunc {
-public:
-    LgsParam self{};
-
-    explicit LgsStrIsNotEmptyFunc(LgsType* parent) : LgsBuiltinFunc("isNotEmpty", &LGS_INT, parent->getIRName()) {
-        self.type = parent;
-        funcType.params = {&self};
-        funcType.isPublic = true;
-    }
-};
-
-

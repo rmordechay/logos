@@ -46,7 +46,7 @@ void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsArray* arr) const {
 void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsMap* map) const {
     auto& builder = runtime->builder;
     const vector<Type*> structFields = {builder.getPtrTy(), builder.getInt64Ty(), builder.getInt32Ty()};
-    map->mapStruct = getArrStruct(context, map->name, structFields);
+    map->mapStruct = getIRStructType(context, map->name, structFields);
     const auto bucketsGep = runtime->builder.CreateStructGEP(map->mapStruct, iterPtr, 0);
     const vector<Type*> entryStructFields = {builder.getPtrTy(), builder.getPtrTy(), builder.getPtrTy()};
     const auto bucketsValue = builder.CreateLoad(builder.getPtrTy(), bucketsGep);

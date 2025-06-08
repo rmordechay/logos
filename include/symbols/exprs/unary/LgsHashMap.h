@@ -15,7 +15,6 @@ public:
 
     void initIRMap(LgsRuntime* runtime);
     Value* createIRValue(LgsRuntime* runtime) override;
-    StructType* getMapStruct(LgsRuntime* runtime);
     ~LgsHashMap() override = default;
 };
 

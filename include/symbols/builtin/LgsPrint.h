@@ -2,15 +2,11 @@
 #include "funcs/LgsBuiltinFunc.h"
 
 #include "types/primitives/LgsBool.h"
+#include "utils/LgsUtils.h"
 
 
 #include <types/primitives/LgsVoid.h>
 #include <types/LgsAny.h>
-
-inline FunctionCallee getPrintf(LgsRuntime* runtime) {
-    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context)}, true);
-    return runtime->module->getOrInsertFunction("printf", printfType);
-}
 
 class LgsPrint final : public LgsBuiltinFunc {
 public:

@@ -85,6 +85,7 @@ public:
     void visitInstance(LgsInstance* instance) override;
     void visitIterIndex(LgsIterIndex* iterIndex) override;
     void visitGroup(LgsGroup* group) const;
+    void inferArrayType(LgsArrayExpr* arr, const vector<LgsExpr*>& exprs) const;
 
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);

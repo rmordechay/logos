@@ -90,8 +90,8 @@ void SemaAnalyser::visitInterface(LgsInterface* interface) const {}
 void SemaAnalyser::visitFunc(LgsFunc* func) {
     stack.enterFunc(func);
     func->filePath = file->absPath;
-    for (const auto param : func->funcType.params) {
-        visitParam(param);
+    for (auto& param : func->funcType.params) {
+        visitParam(&param);
     }
     visitStmtBlock(func->stmtBlock);
     stack.exitFunc();
@@ -336,7 +336,7 @@ void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
     for (const auto element : initialElements) {
         visitExpr(element);
     }
-    array->arrType.inferArrayType(initialElements);
+    inferArrayType(array, initialElements);
 }
 
 void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) const {
@@ -558,6 +558,13 @@ void SemaAnalyser::visitGroup(LgsGroup* group) const {
     }
 }
 
+void SemaAnalyser::inferArrayType(LgsArrayExpr* arr, const vector<LgsExpr*>& exprs) const {
+    if (!exprs.empty()) {
+        arr->arrType.baseType = exprs.front()->type;
+    }
+    arr->arrType.sizeExpr = new LgsIntConst(exprs.size());
+}
+
 bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
     const auto type = parent->type;
     const auto field = type ? type->getField(fieldVariable->name) : nullptr;
@@ -746,7 +753,7 @@ void SemaAnalyser::resolveObjTypes(LgsObject* obj) {
 
 void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
     for (int i = 0; i < funcType->params.size(); ++i) {
-        funcType->params[i]->type = resolveType(funcType->params[i]->type);
+        funcType->params[i].type = resolveType(funcType->params[i].type);
     }
     funcType->rt = resolveType(funcType->rt);
     if (!funcType->rt->isVoid) {

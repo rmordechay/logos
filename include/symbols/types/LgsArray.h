@@ -1,20 +1,24 @@
 #pragma once
-#include "methods/LgsArrayMethods.h"
-
+#include "LgsAny.h"
+#include "funcs/LgsBuiltinFunc.h"
+#include "primitives/LgsInt.h"
+#include "primitives/LgsLong.h"
+#include "primitives/LgsVoid.h"
 #include "types/LgsIterable.h"
 
 class LgsArray final : public LgsIterable {
 public:
     static constexpr auto name = "Array";
-    LgsArrayInitFunc init{this};
-    LgsArrayGetFunc get{this};
-    LgsArrayPutFunc put{this};
-    LgsArrayAddFunc add{this};
-    LgsArrayLenFunc len{this};
-    LgsArrayIsEmptyFunc isEmpty{this};
-    LgsArrayIsNotEmptyFunc isNotEmpty{this};
-    LgsArrayFreeFunc free{this};
-    LgsArrayDeleteFunc delete_{this};
+    StructType* arrStruct = nullptr;
+    LgsBuiltinFunc init{"init", &LGS_VOID, name, {LgsParam{this}, LgsParam{&LGS_INT}, LgsParam{&LGS_LONG}}};
+    LgsBuiltinFunc get{"get", &LGS_ANY, name, {LgsParam{this}, LgsParam {&LGS_INT}}};
+    LgsBuiltinFunc put{"put", &LGS_VOID, name, {LgsParam{this}, LgsParam{&LGS_INT}, LgsParam{&LGS_ANY}}};
+    LgsBuiltinFunc add{"add", &LGS_VOID, name, {LgsParam{this}, LgsParam{&LGS_ANY}}};
+    LgsBuiltinFunc delete_{"delete", &LGS_VOID, name, {LgsParam{this}, LgsParam{&LGS_INT}}};
+    LgsBuiltinFunc len{"len", &LGS_INT, name, {LgsParam{this}}};
+    LgsBuiltinFunc isEmpty{"isEmpty", &LGS_INT, name, {LgsParam{this}}};
+    LgsBuiltinFunc isNotEmpty{"isNotEmpty", &LGS_INT, name, {LgsParam{this}}};
+    LgsBuiltinFunc free{"free", &LGS_INT, name, {LgsParam{this}}};
 
     explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         unpackLength = 1;
@@ -23,8 +27,6 @@ public:
         addMethod(&isEmpty);
         addMethod(&isNotEmpty);
     }
-
-    void inferArrayType(const vector<LgsExpr*>& exprs);
     size_t getSizeBytes() override;
     string getIRName() override;
     string prettyName() const override;
@@ -36,8 +38,7 @@ public:
     Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
+    StructType* getArrStruct(LgsRuntime* runtime);
     LgsType* clone() override;
     ~LgsArray() override;
 };
-
-

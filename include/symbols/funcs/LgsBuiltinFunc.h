@@ -3,7 +3,7 @@
 
 class LgsBuiltinFunc : public LgsFunc {
 public:
-    LgsBuiltinFunc(const string& name, LgsType* rt, const string& parentName, const vector<LgsParam*>& params = {}): LgsFunc(name, rt, params) {
+    LgsBuiltinFunc(const string& name, LgsType* rt, const string& parentName, const vector<LgsParam>& params = {}): LgsFunc(name, rt, params) {
         funcType.isBuiltin = true;
         if (parentName != "") {
             funcType.parentName = parentName;

@@ -28,7 +28,7 @@ LgsExpr* LgsSelection::resolveSelection(LgsRuntime* runtime) const {
             const auto fieldIRType = field->type->getIRType();
             if (const auto iterIndex = parentExpr->asIterIndex()) {
                 const auto gep = iterIndex->getGEP(runtime);
-                auto valueLoad = runtime->builder.CreateLoad(PointerType::getUnqual(context), gep);
+                auto valueLoad = runtime->builder.CreateLoad(runtime->builder.getPtrTy(), gep);
                 const auto value = field->getGEP(runtime, valueLoad);
                 valueLoad = runtime->builder.CreateLoad(fieldIRType, value);
                 childExpr->setIRValue(valueLoad);

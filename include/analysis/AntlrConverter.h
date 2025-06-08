@@ -58,7 +58,7 @@ public:
     LgsField* getField(LogosParser::FieldContext* ctx);
     LgsFunc* getFuncImpl(LogosParser::FuncImplContext* ctx);
     LgsFunc* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
-    LgsParam* getParam(LgsFuncType* funcType, LogosParser::ParamContext* param, LogosParser::TypeContext* type);
+    LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param, LogosParser::TypeContext* type);
     LgsFunc* getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
