@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsValue.h"
 
+class LgsHashMap;
 using namespace std;
 using namespace llvm;
 
@@ -30,9 +31,9 @@ public:
     bool isPrimitive = false;
     bool isCallable = false;
     Type* IRType = nullptr;
+    LgsHashMap* vtable = nullptr;
     map<string, LgsField*> fields;
     map<string, LgsFunc*> methods;
-    LgsVTable* vtable = nullptr;
 
     LgsField* getField(const string& name);
     LgsFunc* getMethod(const string& name);

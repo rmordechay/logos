@@ -1,4 +1,3 @@
-#include "LgsVTable.h"
 #include "stmts/LgsField.h"
 #include "types/primitives/LgsInt.h"
 #include "types/LgsInterface.h"
@@ -19,7 +18,7 @@ size_t LgsType::getSizeBytes() {
 
 void LgsType::setVTable() {
     assert(!vtable);
-    vtable = new LgsVTable();
+    vtable = new LgsHashMap();
 }
 
 json LgsType::asJSON() const {

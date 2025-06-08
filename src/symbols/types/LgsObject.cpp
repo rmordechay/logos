@@ -62,7 +62,7 @@ json LgsObject::asJSON() const {
 }
 
 LgsInterface* LgsObject::getInterface(const string& interfaceName) const {
-    for (const auto implement : implements) {
+    for (const auto implement : interfaces) {
         const auto interface = implement->asInterface();
         if (interface->interfaceName == interfaceName) {
             return interface;
@@ -77,11 +77,23 @@ LgsObject* LgsObject::clone() {
     for (const auto& [name, field] : fields) {
         newObj->fields[name] = new LgsField(*field);
     }
-    for (const auto interface : implements) {
-        newObj->implements.emplace_back(new LgsInterface(*interface->asInterface()));
+    for (const auto interface : interfaces) {
+        newObj->interfaces.emplace_back(new LgsInterface(*interface->asInterface()));
     }
     newObj->methods = methods;
     return newObj;
+}
+
+void LgsObject::setVFuncs(LgsRuntime* runtime) const {
+    auto& builder = runtime->builder;
+    const auto vtablePtr = vtable->getIRValue(runtime);
+    for (const auto [_, method] : methods) {
+        const auto keyIRStr = getIRStr(runtime, method->funcType.getIRName());
+        const auto IRFunc = method->getIRFunc(runtime);
+        auto valuePtr = builder.CreateAlloca(PointerType::getUnqual(context));
+        builder.CreateStore(IRFunc, valuePtr);
+        vtable->mapType.add.callIR(runtime, {vtablePtr, keyIRStr, valuePtr});
+    }
 }
 
 string LgsObject::getIRName() {

@@ -1,13 +1,9 @@
 #include "exprs/unary/LgsInstance.h"
-
-#include "LgsVTable.h"
 #include "codegen/CodeGenerator.h"
-#include "builtin/LgsPrint.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
-
 
 string LgsInstance::getName() {
     return obj->name;
@@ -15,13 +11,11 @@ string LgsInstance::getName() {
 
 Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
     const auto objIRType = obj->getIRType();
+    obj->setVFuncs(runtime);
     if (isReturnExpr) {
         setReturnExpr(runtime, objIRType);
     } else {
         IRValue = runtime->builder.CreateAlloca(objIRType);
-    }
-    if (!obj->implements.empty()) {
-        obj->vtable->setImplementsVFuncs(runtime, obj, IRValue);
     }
     for (const auto arg : args) {
         const auto field = obj->getField(arg->name);

@@ -179,7 +179,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
     if (ctx->objectImplements()) {
         for (const auto& type : ctx->objectImplements()->TYPE()) {
             auto implementType = getTypeFromText(type);
-            obj->implements.push_back(implementType);
+            obj->interfaces.push_back(implementType);
         }
     }
     globals.addSymbol(obj->name, LgsSymbol(obj), &errHandler);

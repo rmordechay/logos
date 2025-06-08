@@ -8,7 +8,7 @@ public:
     string name;
     string path;
     bool isSingleton = false;
-    vector<LgsType*> implements;
+    vector<LgsType*> interfaces;
     LgsObjFieldsFunc fieldsF{this};
 
     explicit LgsObject(const string& name, const string& path) : name(name), path(path) {
@@ -26,6 +26,7 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) override;
     LgsObject* clone() override;
+    void setVFuncs(LgsRuntime* runtime) const;
     ~LgsObject() override = default;
 };
 

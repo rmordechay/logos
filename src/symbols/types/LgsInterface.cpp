@@ -29,7 +29,7 @@ bool LgsInterface::equals(LgsType* other) {
     if (const auto interface = other->asInterface()) {
         if (interface->getIRName() == getIRName()) return true;
     } else if (const auto obj = other->asObject()) {
-        for (const auto& implement : obj->implements) {
+        for (const auto& implement : obj->interfaces) {
             if (implement->getIRName() == getIRName()) return true;
         }
     }

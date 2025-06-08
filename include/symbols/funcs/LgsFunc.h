@@ -16,7 +16,7 @@ public:
     vector<LgsExpr*> returnExprs;
     LgsStmtBlock* stmtBlock = nullptr;
     IRBuilderBase::InsertPoint savedIP;
-    LgsFunc* implements = nullptr;
+    LgsFunc* implementsFunc = nullptr;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam*>& params = {}) {
         type = &funcType;

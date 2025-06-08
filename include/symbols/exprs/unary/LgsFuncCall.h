@@ -13,6 +13,7 @@ public:
     LgsFunc* func = nullptr;
 
     explicit LgsFuncCall(const std::string& name, const std::vector<LgsExpr*>& args = {}) : name(name), args(args) {}
+    Value* resolveVirtualFunc(LgsRuntime* runtime, LgsExpr* parent) const;
     Value* call(LgsRuntime* runtime) const;
     Value* getCallback(LgsRuntime* runtime) const;
     bool equals(const LgsFuncType* funcType) const;

@@ -482,17 +482,17 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
         return;
     }
 
-    LgsType* type;
+    LgsType* symbolType;
     if (symbol->type == VAR_DEC) {
-        type = symbol->varDec->type;
+        symbolType = symbol->varDec->type;
     } else if (symbol->type == PARAM) {
-        type = symbol->param->type;
+        symbolType = symbol->param->type;
     } else {
         assert(false);
     }
 
-    if (!type->isCallable) return errHandler.handleError(E10046, &funcCall->location, {funcCall->name});
-    const auto funcType = type->asFuncType();
+    if (!symbolType->isCallable) return errHandler.handleError(E10046, &funcCall->location, {funcCall->name});
+    const auto funcType = symbolType->asFuncType();
     visitAnonymousFunc(funcCall, funcType);
     funcCall->callback = symbol->clone();
 }
@@ -510,10 +510,12 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
     }
     if (methodCall->equals(&method->funcType)) {
         methodCall->func = method;
+        methodCall->type = method->funcType.rt;
     } else {
-        errHandler.handleError(E10034, &methodCall->location, {parentType->prettyName(), name, method->prettyName(), method->funcType.prettyName()});
+        return errHandler.handleError(E10034, &methodCall->location, {parentType->prettyName(), name, method->prettyName(), method->funcType.prettyName()});
     }
     checkMethodVisibility(methodCall);
+    assert(methodCall->type);
 }
 
 void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType) {
@@ -733,8 +735,8 @@ void SemaAnalyser::resolveObjMemberTypes(LgsObject* const& obj) {
     for (const auto& [_, method] : obj->methods) {
         resolveFuncTypes(&method->funcType);
     }
-    for (int i = 0; i < obj->implements.size(); ++i) {
-        obj->implements[i] = resolveType(obj->implements[i]);
+    for (int i = 0; i < obj->interfaces.size(); ++i) {
+        obj->interfaces[i] = resolveType(obj->interfaces[i]);
     }
     resolveObjectImplements(obj);
 }
@@ -750,8 +752,8 @@ void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
 }
 
 void SemaAnalyser::resolveObjectImplements(LgsObject* obj) {
-    for (int i = 0; i < obj->implements.size(); ++i) {
-        const auto implement = obj->implements[i];
+    for (int i = 0; i < obj->interfaces.size(); ++i) {
+        const auto implement = obj->interfaces[i];
         if (!implement) continue;
         const auto interface = implement->asInterface();
         if (!interface) {
@@ -763,7 +765,7 @@ void SemaAnalyser::resolveObjectImplements(LgsObject* obj) {
         for (const auto& [name, interfaceFunc] : interface->methods) {
             const auto objMethod = obj->findMethod(name);
             if (objMethod && objMethod->funcType.equals(&interfaceFunc->funcType)) {
-                objMethod->implements = interfaceFunc;
+                objMethod->implementsFunc = interfaceFunc;
                 continue;
             }
             missingFuncs.emplace_back(interfaceFunc);
@@ -797,7 +799,7 @@ void SemaAnalyser::reprocessFuncs(const LogosProject& project) {
                 for (const auto& [_, method] : obj->methods) {
                     method->swapReturnIfNeeded();
                 }
-                for (const auto implement : obj->implements) {
+                for (const auto implement : obj->interfaces) {
                     assert(false);
                 }
             }
@@ -809,7 +811,7 @@ void SemaAnalyser::reprocessFuncs(const LogosProject& project) {
             for (const auto& [_, method] : obj->methods) {
                 method->swapReturnIfNeeded();
             }
-            for (const auto implement : obj->implements) {
+            for (const auto implement : obj->interfaces) {
                 assert(false);
             }
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
