@@ -14,6 +14,7 @@ public:
     uint32_t hashValue(LgsRuntime* runtime) override;
     Value* createIRValue(LgsRuntime* runtime) override;
     bool equals(LgsExpr* other) override;
+    LgsExpr* convertExpr(LgsType* type) override;
     Value* eqIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* neIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* gtIR(LgsRuntime* runtime, LgsExpr* other) override;

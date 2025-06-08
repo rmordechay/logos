@@ -54,7 +54,7 @@ public:
     virtual bool equals(LgsExpr* other);
     virtual LgsExpr* clone();
     virtual std::string prettyName();
-    virtual LgsExpr* convertExpr(LgsType* type);
+    virtual LgsExpr* convertExpr(LgsType* toType);
     virtual uint32_t hashValue(LgsRuntime* runtime);
     virtual Value* createIRValue(LgsRuntime* runtime) = 0;
 

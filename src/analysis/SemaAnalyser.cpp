@@ -1,6 +1,5 @@
 #include "analysis/SemaAnalyser.h"
 
-
 #include "data/LgsErrors.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
@@ -298,7 +297,8 @@ void SemaAnalyser::visitCast(LgsCast* castExpr) {
         visitBinaryExpr(binaryExpr);
     }
     castExpr->toType = resolveType(castExpr->toType);
-    if (!castExpr->cast()) {
+    castExpr->toValue = fromValue->convertExpr(castExpr->toType);
+    if (!castExpr->toValue) {
         errHandler.handleError(E10018, &castExpr->location, {fromValue->type->prettyName(), castExpr->toType->prettyName()});
     }
 }

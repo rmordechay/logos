@@ -17,10 +17,10 @@ void LgsAssignment::createIRStmt(LgsRuntime* runtime) {
 }
 
 void LgsAssignment::assignIRIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* value) const {
-    if (iterIndex->type->asMap()) {
-        iterIndex->storeHashMap(runtime, value->asHashMap());
-    } else if (iterIndex->type->asArray()) {
-        iterIndex->storeArray(runtime, value->asArrayExpr());
+    if (const auto map = value->asHashMap()) {
+        iterIndex->storeHashMap(runtime, map);
+    } else if (const auto arr = value->asArrayExpr()) {
+        iterIndex->storeArray(runtime, arr);
     } else {
         iterIndex->storeScalar(runtime, value);
     }

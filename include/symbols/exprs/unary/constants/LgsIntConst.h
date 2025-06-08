@@ -9,7 +9,7 @@ public:
     explicit LgsIntConst(const int value) : LgsConstExpr(&LGS_INT), value(value) {}
     string prettyName() override;
     Value* createIRValue(LgsRuntime* runtime) override;
-    LgsExpr* convertExpr(LgsType* other) override;
+    LgsExpr* convertExpr(LgsType* toType) override;
     Value* eqIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* neIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* gtIR(LgsRuntime* runtime, LgsExpr* other) override;

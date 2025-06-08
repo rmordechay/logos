@@ -1,7 +1,5 @@
 #include "exprs/LgsCast.h"
-
-
-class LgsRuntime;
+#include "types/LgsType.h"
 
 Value* LgsCast::createIRValue(LgsRuntime* runtime) {
     return toValue->getIRValue(runtime);
@@ -9,14 +7,6 @@ Value* LgsCast::createIRValue(LgsRuntime* runtime) {
 
 Value* LgsCast::addIR(LgsRuntime* runtime, LgsExpr* other) {
     return toValue->addIR(runtime, other);
-}
-
-bool LgsCast::cast() {
-    if (const auto v = fromValue->convertExpr(toType)) {
-        toValue = v;
-        return true;
-    }
-    return false;
 }
 
 LgsCast::~LgsCast() {

@@ -10,8 +10,8 @@ Value* LgsIntConst::createIRValue(LgsRuntime* runtime) {
     return runtime->builder.getInt32(value);
 }
 
-LgsExpr* LgsIntConst::convertExpr(LgsType* other) {
-    if (dynamic_cast<LgsStr*>(other)) {
+LgsExpr* LgsIntConst::convertExpr(LgsType* toType) {
+    if (toType->asStr()) {
         return new LgsStrConst(to_string(value));
     }
     assert(false);

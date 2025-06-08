@@ -1,7 +1,6 @@
 #pragma once
 #include "types/LgsType.h"
 
-
 class LgsShort final : public LgsType {
 public:
     static constexpr auto name = "Int";

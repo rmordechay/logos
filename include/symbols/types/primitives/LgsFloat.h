@@ -1,7 +1,6 @@
 #pragma once
 #include "types/LgsType.h"
 
-
 class LgsFloat final : public LgsType {
 public:
     static constexpr auto name = "Float";
@@ -9,7 +8,7 @@ public:
     LgsFloat() {
         isPrimitive = true;
     }
-    llvm::Type* getIRType() override;
+    Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;

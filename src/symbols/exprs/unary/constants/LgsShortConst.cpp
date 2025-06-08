@@ -11,7 +11,7 @@ Value* LgsShortConst::createIRValue(LgsRuntime* runtime) {
 }
 
 LgsExpr* LgsShortConst::convertExpr(LgsType* other) {
-    if (dynamic_cast<LgsStr*>(other)) {
+    if (other->asStr()) {
         return new LgsStrConst(to_string(value));
     }
     assert(false);

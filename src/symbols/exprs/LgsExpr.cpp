@@ -65,7 +65,7 @@ void LgsExpr::free(LgsRuntime* runtime) { assert(false); }
 bool LgsExpr::equals(LgsExpr* other) { assert(false); }
 LgsExpr* LgsExpr::clone() { assert(false); }
 string LgsExpr::prettyName() { assert(false); }
-LgsExpr* LgsExpr::convertExpr(LgsType* type) { assert(false); }
+LgsExpr* LgsExpr::convertExpr(LgsType* toType) { assert(false); }
 uint32_t LgsExpr::hashValue(LgsRuntime* runtime) { assert(false); }
 
 // Comparisons
