@@ -1,5 +1,4 @@
-#ifndef LGSCAST_H
-#define LGSCAST_H
+#pragma once
 #include "LgsExpr.h"
 #include "LgsValue.h"
 
@@ -19,4 +18,4 @@ public:
     ~LgsCast() override;
 };
 
-#endif //LGSCAST_H
+

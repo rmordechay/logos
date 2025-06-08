@@ -1,5 +1,4 @@
-#ifndef LOGOSLOOP_H
-#define LOGOSLOOP_H
+#pragma once
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsStmt.h"
 
@@ -27,4 +26,4 @@ public:
     ~LgsForLoop() override;
 };
 
-#endif // LOGOSLOOP_H
+

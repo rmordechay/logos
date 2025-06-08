@@ -1,5 +1,4 @@
-#ifndef LGSCONTINUE_H
-#define LGSCONTINUE_H
+#pragma once
 #include "LgsStmt.h"
 
 class LgsContinueStmt final : public LgsStmt {
@@ -9,4 +8,4 @@ public:
 };
 
 
-#endif //LGSCONTINUE_H
+

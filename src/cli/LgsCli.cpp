@@ -3,7 +3,7 @@
 #include "cli/LgsFormatCmd.h"
 #include "cli/LgsGenerateCmd.h"
 #include "cli/LgsRunCmd.h"
-#include "data/LgsDefinitions.h"
+
 
 #include <sstream>
 

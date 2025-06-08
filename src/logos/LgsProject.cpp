@@ -1,7 +1,6 @@
 #include "logos/LgsProject.h"
 
 #include "files/LgsInterfaceFile.h"
-#include "logos/Platform.h"
 #include "analysis/SemaAnalyser.h"
 #include "analysis/AntlrConverter.h"
 #include "exprs/unary/constants/LgsStrConst.h"

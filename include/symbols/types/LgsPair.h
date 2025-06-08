@@ -1,6 +1,5 @@
-#ifndef LGSPAIR_H
-#define LGSPAIR_H
-#include "LgsType.h"
+#pragma once
+
 
 class LgsPair final : public LgsType {
 public:
@@ -43,4 +42,4 @@ inline LgsType* LgsPair::inferBinaryType(LgsType* other) {
     assert(false);
 }
 
-#endif //LGSPAIR_H
+

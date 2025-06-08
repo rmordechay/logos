@@ -1,5 +1,4 @@
-#ifndef LOGOSFUNC_H
-#define LOGOSFUNC_H
+#pragma once
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "types/LgsFuncType.h"
 
@@ -42,4 +41,4 @@ public:
     ~LgsFunc() override;
 };
 
-#endif //LOGOSFUNC_H
+

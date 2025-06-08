@@ -1,5 +1,4 @@
-#ifndef SELECTION_H
-#define SELECTION_H
+#pragma once
 #include "exprs/unary/LgsUnaryExpr.h"
 #include <stmts/LgsStmt.h>
 
@@ -21,4 +20,4 @@ public:
     ~LgsSelection() override;
 };
 
-#endif //SELECTION_H
+

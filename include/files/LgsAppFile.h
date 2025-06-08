@@ -1,6 +1,5 @@
-#ifndef LGSAPPFILE_H
-#define LGSAPPFILE_H
-#include "data/LgsDefinitions.h"
+#pragma once
+
 #include "LgsFile.h"
 
 
@@ -20,4 +19,4 @@ public:
     explicit LgsAppFile(const string& path, const vector<LgsVarDec*>& varDecs) : LgsFile(LOGOS_APP_FILE_NAME, path), varDecs(varDecs) {}
 };
 
-#endif //LGSAPPFILE_H
+

@@ -1,5 +1,4 @@
-#ifndef THREADPOOL_H
-#define THREADPOOL_H
+#pragma once
 
 #include <queue>
 #include <thread>
@@ -24,4 +23,4 @@ public:
     ~ThreadPool() = default;
 };
 
-#endif //THREADPOOL_H
+

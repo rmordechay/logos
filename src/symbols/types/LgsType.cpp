@@ -1,6 +1,4 @@
-
-#include "exprs/unary/LgsFuncCall.h"
-
+#include "LgsVTable.h"
 #include "stmts/LgsField.h"
 #include "types/primitives/LgsInt.h"
 #include "types/LgsInterface.h"
@@ -17,6 +15,11 @@ bool LgsType::equals(LgsType& other) {
 
 size_t LgsType::getSizeBytes() {
     assert(false);
+}
+
+void LgsType::setVTable() {
+    assert(!vtable);
+    vtable = new LgsVTable();
 }
 
 json LgsType::asJSON() const {
@@ -75,3 +78,7 @@ LgsStr* LgsType::asStr() { return dynamic_cast<LgsStr*>(this); }
 LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }
 LgsMap* LgsType::asMap() { return dynamic_cast<LgsMap*>(this); }
 bool LgsType::isUnknown() { return dynamic_cast<LgsUnknownType*>(this); }
+
+LgsType::~LgsType() {
+    if (vtable) delete vtable;
+}

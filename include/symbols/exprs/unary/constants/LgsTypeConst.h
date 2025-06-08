@@ -1,5 +1,4 @@
-#ifndef LOGOSTYPECONST_H
-#define LOGOSTYPECONST_H
+#pragma once
 #include "LgsConstExpr.h"
 
 #include <exprs/unary/LgsUnaryExpr.h>
@@ -12,4 +11,4 @@ public:
     ~LgsTypeConst() override = default;
 };
 
-#endif //LOGOSTYPECONST_H
+

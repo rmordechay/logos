@@ -1,9 +1,6 @@
-#ifndef LGSMAP_H
-#define LGSMAP_H
-
-#include "types/LgsIterable.h"
-#include "types/LgsPair.h"
+#pragma once
 #include "methods/LgsMapMethods.h"
+#include "types/LgsPair.h"
 
 class LgsMapPair;
 
@@ -46,4 +43,4 @@ public:
     ~LgsMap() override = default;
 };
 
-#endif //LGSMAP_H
+

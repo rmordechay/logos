@@ -1,5 +1,4 @@
-#ifndef LOGOSRETURNSTMT_H
-#define LOGOSRETURNSTMT_H
+#pragma once
 #include "LgsStmt.h"
 #include "exprs/LgsExpr.h"
 
@@ -14,4 +13,4 @@ public:
 
 
 
-#endif //LOGOSRETURNSTMT_H
+

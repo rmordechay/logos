@@ -1,5 +1,4 @@
-#ifndef LOGOSOBJFILE_H
-#define LOGOSOBJFILE_H
+#pragma once
 #include "LgsFile.h"
 #include "types/LgsObject.h"
 
@@ -12,4 +11,4 @@ public:
     ~LgsObjectFile() override;
 };
 
-#endif //LOGOSOBJFILE_H
+

@@ -1,5 +1,4 @@
-#ifndef CODEGENERATION_H
-#define CODEGENERATION_H
+#pragma once
 
 #include "LgsLocation.h"
 #include <Token.h>
@@ -24,4 +23,4 @@ public:
     virtual ~LgsValue() = default;
 };
 
-#endif //CODEGENERATION_H
+

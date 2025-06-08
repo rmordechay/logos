@@ -1,6 +1,6 @@
 #include "analysis/SemaAnalyser.h"
 
-#include "data/LgsDefinitions.h"
+
 #include "data/LgsErrors.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"

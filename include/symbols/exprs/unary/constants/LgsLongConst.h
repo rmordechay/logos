@@ -1,5 +1,4 @@
-#ifndef LGSLONGCONST_H
-#define LGSLONGCONST_H
+#pragma once
 #include "LgsConstExpr.h"
 #include "types/primitives/LgsLong.h"
 
@@ -16,4 +15,4 @@ public:
 
 
 
-#endif //LGSLONGCONST_H
+

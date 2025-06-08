@@ -1,11 +1,10 @@
 #include "utils/LgsUtils.h"
-#include "data/LgsDefinitions.h"
+
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "logos/LgsProject.h"
-#include "logos/Platform.h"
+
 #include "stmts/LgsVarDec.h"
-#include <llvm/MC/TargetRegistry.h>
 
 string getFileText(path filePath) {
     if (!exists(filePath)) return "";

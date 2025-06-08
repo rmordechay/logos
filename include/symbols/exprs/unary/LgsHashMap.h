@@ -1,5 +1,4 @@
-#ifndef LGSHASHMAP_H
-#define LGSHASHMAP_H
+#pragma once
 #include "LgsUnaryExpr.h"
 #include "types/LgsMap.h"
 
@@ -27,4 +26,4 @@ public:
     ~LgsMapPair() = default;
 };
 
-#endif //LGSHASHMAP_H
+

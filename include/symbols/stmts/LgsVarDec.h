@@ -1,5 +1,4 @@
-#ifndef LOGOSVARDEFINITION_H
-#define LOGOSVARDEFINITION_H
+#pragma once
 #include "LgsStmt.h"
 #include "exprs/LgsExpr.h"
 
@@ -18,4 +17,4 @@ public:
     ~LgsVarDec() override;
 };
 
-#endif //LOGOSVARDEFINITION_H
+

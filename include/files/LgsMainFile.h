@@ -1,6 +1,5 @@
-#ifndef LOGOSMAINFILE_H
-#define LOGOSMAINFILE_H
-#include "data/LgsDefinitions.h"
+#pragma once
+
 #include "LgsFile.h"
 #include "types/LgsEnum.h"
 #include "types/LgsObject.h"
@@ -24,4 +23,4 @@ public:
     ~LgsMainFile() override;
 };
 
-#endif //LOGOSMAINFILE_H
+

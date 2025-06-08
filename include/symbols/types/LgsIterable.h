@@ -1,6 +1,4 @@
-#ifndef LOGOSITERABLE_H
-#define LOGOSITERABLE_H
-#include "LgsType.h"
+#pragma once
 
 class LgsVarDec;
 struct LgsIndex;
@@ -24,4 +22,4 @@ public:
     ~LgsIterable() override = default;
 };
 
-#endif //LOGOSITERABLE_H
+

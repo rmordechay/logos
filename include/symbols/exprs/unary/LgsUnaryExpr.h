@@ -1,5 +1,4 @@
-#ifndef LOGOSUNARYEXPR_H
-#define LOGOSUNARYEXPR_H
+#pragma once
 
 #include "exprs/LgsExpr.h"
 
@@ -46,4 +45,4 @@ inline Value* LgsUnaryExpr::divIR(LgsRuntime* runtime, LgsExpr* other) {
     return runtime->builder.CreateSDiv(l, r);
 }
 
-#endif //LOGOSUNARYEXPR_H
+

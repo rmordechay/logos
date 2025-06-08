@@ -1,5 +1,4 @@
-#ifndef LGSBREAK_H
-#define LGSBREAK_H
+#pragma once
 #include "LgsStmt.h"
 
 class LgsForLoop;
@@ -15,4 +14,4 @@ public:
 };
 
 
-#endif //LGSBREAK_H
+

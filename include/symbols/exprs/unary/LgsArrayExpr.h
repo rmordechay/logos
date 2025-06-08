@@ -1,5 +1,4 @@
-#ifndef LOGOSARRAY_H
-#define LOGOSARRAY_H
+#pragma once
 
 #include "LgsUnaryExpr.h"
 #include "exprs/LgsExpr.h"
@@ -22,4 +21,4 @@ public:
     ~LgsArrayExpr() override = default;
 };
 
-#endif //LOGOSARRAY_H
+

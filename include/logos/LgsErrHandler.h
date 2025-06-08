@@ -1,5 +1,4 @@
-#ifndef LGSERRORHANDLER_H
-#define LGSERRORHANDLER_H
+#pragma once
 #include "data/LgsErrors.h"
 #include "data/LgsWarnings.h"
 #include <filesystem>
@@ -21,4 +20,4 @@ public:
     ~LgsErrHandler() = default;
 };
 
-#endif //LGSERRORHANDLER_H
+

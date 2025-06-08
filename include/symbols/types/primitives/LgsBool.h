@@ -1,5 +1,4 @@
-#ifndef LOGOSBOOL_H
-#define LOGOSBOOL_H
+#pragma once
 
 #include "exprs/unary/constants/LgsConstExpr.h"
 
@@ -24,4 +23,4 @@ public:
 
 inline LgsBool LGS_BOOL;
 
-#endif // LOGOSBOOL_H
+

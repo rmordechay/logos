@@ -1,5 +1,4 @@
-#ifndef LGSBUILTINFUNC_H
-#define LGSBUILTINFUNC_H
+#pragma once
 #include "funcs/LgsFunc.h"
 
 class LgsBuiltinFunc : public LgsFunc {
@@ -14,4 +13,4 @@ public:
     ~LgsBuiltinFunc() override = default;
 };
 
-#endif //LGSBUILTINFUNC_H
+

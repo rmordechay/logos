@@ -4,7 +4,7 @@
 #include "files/LgsEnvFile.h"
 #include "files/LgsInterfaceFile.h"
 #include "LogosLexer.h"
-#include "logos/Platform.h"
+
 #include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsBinaryExpr.h"

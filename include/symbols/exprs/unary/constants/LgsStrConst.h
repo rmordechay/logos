@@ -1,5 +1,4 @@
-#ifndef LOGOSSTRINGCONST_H
-#define LOGOSSTRINGCONST_H
+#pragma once
 #include "LgsConstExpr.h"
 #include "LgsIntConst.h"
 #include "types/LgsStr.h"
@@ -22,4 +21,4 @@ public:
     ~LgsStrConst() override = default;
 };
 
-#endif //LOGOSSTRINGCONST_H
+

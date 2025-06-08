@@ -1,5 +1,4 @@
-#ifndef LGSCHARCONST_H
-#define LGSCHARCONST_H
+#pragma once
 #include "LgsConstExpr.h"
 #include "types/primitives/LgsChar.h"
 
@@ -11,4 +10,4 @@ public:
     Value* createIRValue(LgsRuntime* runtime) override;
 };
 
-#endif //LGSCHARCONST_H
+

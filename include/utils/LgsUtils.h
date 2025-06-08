@@ -1,5 +1,4 @@
-#ifndef LGSUTILS_H
-#define LGSUTILS_H
+#pragma once
 #include "exprs/LgsExpr.h"
 #include <llvm/IR/DerivedTypes.h>
 
@@ -14,4 +13,4 @@ Value* getIRStr(const LgsRuntime* runtime, const std::string& value);
 StructType* getArrStruct(LLVMContext& context, const std::string& name, const std::vector<Type*>& fields);
 Module* createIRModule(const std::string& moduleName, LLVMContext& context);
 
-#endif //LGSUTILS_H
+

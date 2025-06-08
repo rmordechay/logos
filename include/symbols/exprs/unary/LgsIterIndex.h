@@ -1,5 +1,4 @@
-#ifndef LOGOSITERINDEX_H
-#define LOGOSITERINDEX_H
+#pragma once
 #include "LgsUnaryExpr.h"
 #include <LgsValue.h>
 
@@ -32,4 +31,4 @@ struct LgsIndex {
     LgsExpr* to;
 };
 
-#endif //LOGOSITERINDEX_H
+

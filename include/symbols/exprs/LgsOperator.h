@@ -1,5 +1,4 @@
-#ifndef LOGOSOPERATOR_H
-#define LOGOSOPERATOR_H
+#pragma once
 #include "parser/LogosParser.h"
 
 enum LgsOperator {
@@ -53,4 +52,4 @@ inline LgsOperator mapOperator(LogosParser::ExprContext* expr) {
 //     return NOOP;
 // }
 
-#endif //LOGOSOPERATOR_H
+

@@ -1,5 +1,4 @@
-#ifndef LOGOSSTACK_H
-#define LOGOSSTACK_H
+#pragma once
 #include "LgsStack.h"
 #include "LgsSymbol.h"
 
@@ -36,4 +35,4 @@ struct LgsGlobals {
 
 inline LgsGlobals globals;
 
-#endif //LOGOSSTACK_H
+

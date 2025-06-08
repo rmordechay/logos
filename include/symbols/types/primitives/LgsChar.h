@@ -1,5 +1,4 @@
-#ifndef LGSCHAR_H
-#define LGSCHAR_H
+#pragma once
 
 
 
@@ -22,4 +21,4 @@ public:
 
 inline LgsChar LGS_CHAR;
 
-#endif //LGSCHAR_H
+

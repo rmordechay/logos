@@ -1,5 +1,4 @@
-#ifndef LOGOSCONSTANTEXPR_H
-#define LOGOSCONSTANTEXPR_H
+#pragma once
 #include "exprs/unary/LgsUnaryExpr.h"
 
 
@@ -17,4 +16,4 @@ public:
     ~LgsConstExpr() override = default;
 };
 
-#endif //LOGOSCONSTANTEXPR_H
+

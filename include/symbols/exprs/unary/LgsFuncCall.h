@@ -1,5 +1,4 @@
-#ifndef LOGOSFUNCCALL_H
-#define LOGOSFUNCCALL_H
+#pragma once
 #include "stmts/LgsStmt.h"
 #include "LgsUnaryExpr.h"
 
@@ -27,4 +26,3 @@ public:
     ~LgsFuncCall() override = default;
 };
 
-#endif //LOGOSFUNCCALL_H

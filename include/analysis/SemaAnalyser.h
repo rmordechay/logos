@@ -1,9 +1,6 @@
-#ifndef SEMAANALYSER_H
-#define SEMAANALYSER_H
+#pragma once
 #include "files/LgsFile.h"
 #include "logos/LgsASTVisitor.h"
-#include "logos/LgsErrHandler.h"
-
 #include "types/LgsGroup.h"
 
 class LgsArray;
@@ -107,4 +104,4 @@ public:
     ~SemaAnalyser() override = default;
 };
 
-#endif //SEMAANALYSER_H
+

@@ -1,6 +1,5 @@
-#ifndef LGSENUM_H
-#define LGSENUM_H
-#include "LgsType.h"
+#pragma once
+
 
 class LgsEnumField;
 
@@ -20,4 +19,4 @@ public:
     ~LgsEnum() override = default;
 };
 
-#endif //LGSENUM_H
+

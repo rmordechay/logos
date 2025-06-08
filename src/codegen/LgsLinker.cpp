@@ -1,14 +1,11 @@
 #include "codegen/LgsLinker.h"
 
 #include "logos/Logos.h"
-#include "logos/Platform.h"
-#include "data/LgsDefinitions.h"
+
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/IRReader/IRReader.h>
 #include <llvm/Support/FileSystem.h>
-#include "llvm/IR/Verifier.h"
-#include <llvm/MC/TargetRegistry.h>
 #include <llvm/IR/LegacyPassManager.h>
 
 bool LgsLinker::link(LogosProject& project) const {

@@ -1,5 +1,4 @@
-#ifndef LGSOBJMETHODS_H
-#define LGSOBJMETHODS_H
+#pragma once
 #include "funcs/LgsBuiltinFunc.h"
 #include "types/LgsArray.h"
 
@@ -13,4 +12,4 @@ public:
     }
 };
 
-#endif //LGSOBJMETHODS_H
+

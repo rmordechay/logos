@@ -1,5 +1,4 @@
-#ifndef LGSSARRAYTYPE_H
-#define LGSSARRAYTYPE_H
+#pragma once
 #include "methods/LgsArrayMethods.h"
 
 #include "types/LgsIterable.h"
@@ -42,4 +41,4 @@ public:
     ~LgsArray() override;
 };
 
-#endif //LGSSARRAYTYPE_H
+

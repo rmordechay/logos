@@ -1,5 +1,4 @@
-#ifndef LGSCINTERFACE_H
-#define LGSCINTERFACE_H
+#pragma once
 
 
 #include <clang/AST/ASTConsumer.h>
@@ -47,4 +46,4 @@ public:
 };
 
 
-#endif //LGSCINTERFACE_H
+

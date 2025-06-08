@@ -1,5 +1,4 @@
-#ifndef LGSBOOL_H
-#define LGSBOOL_H
+#pragma once
 #include "LgsConstExpr.h"
 #include "types/primitives/LgsBool.h"
 
@@ -26,4 +25,4 @@ public:
     ~LgsBoolConst() override = default;
 };
 
-#endif //LGSBOOL_H
+

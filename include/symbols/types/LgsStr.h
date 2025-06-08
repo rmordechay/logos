@@ -1,5 +1,4 @@
-#ifndef LOGOSSTRING_H
-#define LOGOSSTRING_H
+#pragma once
 #include "methods/LgsStrMethods.h"
 
 #include "exprs/unary/constants/LgsCharConst.h"
@@ -36,4 +35,4 @@ public:
     ~LgsStr() override = default;
 };
 
-#endif // LOGOSSTRING_H
+

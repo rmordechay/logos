@@ -1,5 +1,4 @@
-#ifndef LGSPATTERNMATCHING_H
-#define LGSPATTERNMATCHING_H
+#pragma once
 #include "LgsStmt.h"
 #include "LgsStmtBlock.h"
 
@@ -20,4 +19,4 @@ public:
     ~LgsPatternMatch() override = default;
 };
 
-#endif //LGSPATTERNMATCHING_H
+

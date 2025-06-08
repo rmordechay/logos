@@ -1,5 +1,4 @@
-#ifndef LGSLONG_H
-#define LGSLONG_H
+#pragma once
 
 
 class LgsLong final : public LgsType {
@@ -20,4 +19,4 @@ public:
 
 inline LgsLong LGS_LONG;
 
-#endif //LGSLONG_H
+

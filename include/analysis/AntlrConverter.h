@@ -1,7 +1,6 @@
-#ifndef SEMANTICANALYSER_H
-#define SEMANTICANALYSER_H
+#pragma once
 
-#include "logos/LgsErrHandler.h"
+
 #include "LogosParser.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsBreakStmt.h"
@@ -103,6 +102,3 @@ public:
     void cleanStr(string& value) const;
     ~AntlerConverter() = default;
 };
-
-
-#endif //SEMANTICANALYSER_H

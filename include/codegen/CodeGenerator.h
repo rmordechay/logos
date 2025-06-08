@@ -1,5 +1,4 @@
-#ifndef CODEGENERATOR_H
-#define CODEGENERATOR_H
+#pragma once
 #include "logos/LgsProject.h"
 #include <filesystem>
 
@@ -20,4 +19,4 @@ public:
     ~CodeGenerator() = default;
 };
 
-#endif //CODEGENERATOR_H
+

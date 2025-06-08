@@ -1,5 +1,4 @@
-#ifndef LOGOSPRINT_H
-#define LOGOSPRINT_H
+#pragma once
 #include "funcs/LgsBuiltinFunc.h"
 
 #include "types/primitives/LgsBool.h"
@@ -46,4 +45,4 @@ public:
 
 inline LgsPrint lgsPrint;
 
-#endif //LOGOSPRINT_H
+

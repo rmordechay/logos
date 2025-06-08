@@ -1,5 +1,4 @@
-#ifndef LGSENVFILE_H
-#define LGSENVFILE_H
+#pragma once
 #include "LgsFile.h"
 
 class LgsEnv;
@@ -12,4 +11,4 @@ public:
     LgsEnvFile(const filesystem::path& path, const vector<LgsVarDec*>& varDecs) : LgsFile(path.filename(), path), varDecs(varDecs) {}
 };
 
-#endif //LGSENVFILE_H
+

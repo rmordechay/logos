@@ -1,5 +1,4 @@
-#ifndef LGSENUMFIELD_H
-#define LGSENUMFIELD_H
+#pragma once
 #include "stmts/LgsField.h"
 
 class LgsEnum;
@@ -14,4 +13,4 @@ public:
     ~LgsEnumField() override = default;
 };
 
-#endif //LGSENUMFIELD_H
+

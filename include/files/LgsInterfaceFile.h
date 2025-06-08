@@ -1,5 +1,4 @@
-#ifndef LGSINTERFACEFILE_H
-#define LGSINTERFACEFILE_H
+#pragma once
 #include "types/LgsInterface.h"
 #include <files/LgsFile.h>
 
@@ -13,4 +12,4 @@ public:
     ~LgsInterfaceFile() override = default;
 };
 
-#endif //LGSINTERFACEFILE_H
+

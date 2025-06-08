@@ -1,7 +1,6 @@
-#ifndef LGSFUNCSIGNATURE_H
-#define LGSFUNCSIGNATURE_H
+#pragma once
 #include "funcs/LgsParam.h"
-#include "LgsType.h"
+
 
 class LgsParam;
 
@@ -39,4 +38,4 @@ public:
     ~LgsFuncType() override = default;
 };
 
-#endif //LGSFUNCSIGNATURE_H
+

@@ -1,5 +1,4 @@
-#ifndef LOGOSGENERATECMD_H
-#define LOGOSGENERATECMD_H
+#pragma once
 #include "LgsCmd.h"
 
 class LgsGenerateCmd final : public LgsCmd {
@@ -14,4 +13,4 @@ public:
 
 
 
-#endif //LOGOSGENERATECMD_H
+

@@ -1,5 +1,4 @@
-#ifndef LOGOSFIELDDEC_H
-#define LOGOSFIELDDEC_H
+#pragma once
 #include "LgsStmt.h"
 #include "exprs/unary/LgsSelection.h"
 
@@ -17,4 +16,4 @@ public:
     ~LgsAssignment() override;
 };
 
-#endif //LOGOSFIELDDEC_H
+

@@ -1,5 +1,4 @@
-#ifndef LGSINTCONST_H
-#define LGSINTCONST_H
+#pragma once
 #include "LgsConstExpr.h"
 #include "types/primitives/LgsInt.h"
 
@@ -28,4 +27,4 @@ public:
     ~LgsIntConst() override = default;
 };
 
-#endif //LGSINTCONST_H
+

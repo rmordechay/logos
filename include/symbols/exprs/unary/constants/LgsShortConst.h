@@ -1,5 +1,4 @@
-#ifndef LGSSHORTCONST_H
-#define LGSSHORTCONST_H
+#pragma once
 #include "LgsConstExpr.h"
 #include "types/primitives/LgsShort.h"
 
@@ -16,4 +15,4 @@ public:
 };
 
 
-#endif //LGSSHORTCONST_H
+

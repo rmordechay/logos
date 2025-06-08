@@ -1,8 +1,6 @@
-#ifndef LOGOSLINKER_H
-#define LOGOSLINKER_H
+#pragma once
 
 #include "logos/LgsProject.h"
-#include <llvm/IR/Verifier.h>
 
 struct LgsPaths;
 using namespace llvm;
@@ -15,4 +13,4 @@ public:
     ~LgsLinker() = default;
 };
 
-#endif //LOGOSLINKER_H
+

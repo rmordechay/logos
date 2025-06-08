@@ -1,5 +1,4 @@
-#ifndef LOGOS_H
-#define LOGOS_H
+#pragma once
 #include "extern/LgsC.h"
 #include <filesystem>
 #include "LgsProject.h"
@@ -23,4 +22,4 @@ public:
     ~Logos() = default;
 };
 
-#endif // LOGOS_H
+

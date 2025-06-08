@@ -1,17 +1,15 @@
 #include "exprs/unary/LgsFuncCall.h"
-#include "builtin/LgsPrint.h"
-#include "exprs/unary/LgsVariable.h"
+#include "LgsVTable.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
 Value* LgsFuncCall::call(LgsRuntime* runtime) const {
     if (callback) {
         func->setIRValue(getCallback(runtime));
     } else if (func->funcType.isVirtual) {
-        const auto virtualFunc = type->asObject()->vtable.resolveVirtualFunc(runtime, args[0], func);
+        const auto virtualFunc = type->asObject()->vtable->resolveVirtualFunc(runtime, args[0], func);
         func->setIRValue(virtualFunc);
     }
     return func->call(runtime, args);

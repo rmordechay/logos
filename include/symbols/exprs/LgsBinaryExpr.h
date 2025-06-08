@@ -1,5 +1,4 @@
-#ifndef LOGOSBINARYEXPR_H
-#define LOGOSBINARYEXPR_H
+#pragma once
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsOperator.h"
 
@@ -19,4 +18,4 @@ public:
     ~LgsBinaryExpr() override = default;
 };
 
-#endif //LOGOSBINARYEXPR_H
+

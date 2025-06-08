@@ -1,4 +1,6 @@
 #include "exprs/unary/LgsInstance.h"
+
+#include "LgsVTable.h"
 #include "codegen/CodeGenerator.h"
 #include "builtin/LgsPrint.h"
 #include "funcs/LgsFunc.h"
@@ -19,7 +21,7 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
         IRValue = runtime->builder.CreateAlloca(objIRType);
     }
     if (!obj->implements.empty()) {
-        obj->vtable.setImplementsVFuncs(runtime, obj, IRValue);
+        obj->vtable->setImplementsVFuncs(runtime, obj, IRValue);
     }
     for (const auto arg : args) {
         const auto field = obj->getField(arg->name);

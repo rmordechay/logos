@@ -1,5 +1,4 @@
-#ifndef LGSWARNINGS_H
-#define LGSWARNINGS_H
+#pragma once
 
 
 using namespace std;
@@ -14,4 +13,4 @@ struct LgsWarning {
 /** Templates warnings. Should not be returned directly, but formatted and returned as a new LgsWarning */
 inline int warningCodeStart = 10000;
 inline LgsWarning W10000{.msg = "Variable '%s' is not used.", .warningCode = warningCodeStart};
-#endif //LGSWARNINGS_H
+

@@ -1,5 +1,4 @@
-#ifndef LGSFORMATCMD_H
-#define LGSFORMATCMD_H
+#pragma once
 #include "LgsCmd.h"
 #include <filesystem>
 
@@ -15,4 +14,4 @@ public:
 };
 
 
-#endif //LGSFORMATCMD_H
+

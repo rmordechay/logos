@@ -1,9 +1,5 @@
-#include "logos/LgsErrHandler.h"
 #include "LgsLocation.h"
-#include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
-
-
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;

@@ -1,5 +1,4 @@
-#ifndef LOGOSINSTANCE_H
-#define LOGOSINSTANCE_H
+#pragma once
 #include "LgsUnaryExpr.h"
 #include "types/LgsObject.h"
 
@@ -18,4 +17,4 @@ public:
     ~LgsInstance() override = default;
 };
 
-#endif //LOGOSINSTANCE_H
+

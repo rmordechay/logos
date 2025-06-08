@@ -1,5 +1,4 @@
-#ifndef LOGOSPARAM_H
-#define LOGOSPARAM_H
+#pragma once
 #include <LgsValue.h>
 
 
@@ -25,4 +24,4 @@ public:
     ~LgsParam() override = default;
 };
 
-#endif //LOGOSPARAM_H
+

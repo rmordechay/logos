@@ -1,5 +1,4 @@
-#ifndef COMMANDLINE_H
-#define COMMANDLINE_H
+#pragma once
 #include <pch.h>
 
 class LgsCli {
@@ -15,4 +14,4 @@ public:
     ~LgsCli() = default;
 };
 
-#endif //COMMANDLINE_H
+

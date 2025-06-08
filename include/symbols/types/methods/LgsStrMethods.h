@@ -1,5 +1,4 @@
-#ifndef LGSSTRMETHODS_H
-#define LGSSTRMETHODS_H
+#pragma once
 #include "funcs/LgsBuiltinFunc.h"
 
 #include "utils/LgsUtils.h"
@@ -77,4 +76,4 @@ public:
     }
 };
 
-#endif //LGSSTRMETHODS_H
+

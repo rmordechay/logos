@@ -1,9 +1,4 @@
-#ifndef LOGOSOBJECT_H
-#define LOGOSOBJECT_H
-#include "data/LgsDefinitions.h"
-#include "LgsType.h"
-#include "LgsVTable.h"
-#include "exprs/unary/LgsHashMap.h"
+#pragma once
 #include "methods/LgsObjMethods.h"
 
 class LgsField;
@@ -15,11 +10,12 @@ public:
     bool isSingleton = false;
     vector<LgsType*> implements;
     LgsObjFieldsFunc fieldsF{this};
-    LgsVTable vtable;
 
-    explicit LgsObject() : name(LOGOS_PARENT_OBJ), path("") {}
-    explicit LgsObject(const string& name) : name(name), path("") {}
-    explicit LgsObject(const string& name, const string& path) : name(name), path(path) {}
+    explicit LgsObject(const string& name, const string& path) : name(name), path(path) {
+        setVTable();
+    }
+    explicit LgsObject(const string& name) : LgsObject(name, "") {}
+    explicit LgsObject() : LgsObject(LOGOS_PARENT_OBJ, "") {}
     string prettyName() const override;
     Type* getIRType() override;
     string getIRName() override;
@@ -33,4 +29,4 @@ public:
     ~LgsObject() override = default;
 };
 
-#endif //LOGOSOBJECT_H
+

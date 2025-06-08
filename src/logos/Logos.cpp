@@ -1,6 +1,6 @@
 #include "logos/Logos.h"
 #include "codegen/LgsLinker.h"
-#include "logos/Platform.h"
+
 #include "analysis/SemaAnalyser.h"
 #include "utils/ThreadPool.h"
 #include <analysis/AntlrConverter.h>

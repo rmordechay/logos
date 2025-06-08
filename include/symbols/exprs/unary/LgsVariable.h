@@ -1,5 +1,4 @@
-#ifndef LOGOSVARIABLEEXPR_H
-#define LOGOSVARIABLEEXPR_H
+#pragma once
 #include "LgsUnaryExpr.h"
 
 struct LgsSymbol;
@@ -35,4 +34,4 @@ public:
     explicit LgsConst(const std::string& name) : LgsVariable(name) {}
 };
 
-#endif //LOGOSVARIABLEEXPR_H
+

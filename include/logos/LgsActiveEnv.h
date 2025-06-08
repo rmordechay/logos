@@ -1,5 +1,4 @@
-#ifndef LGSENV_H
-#define LGSENV_H
+#pragma once
 
 
 
@@ -9,4 +8,4 @@ public:
     std::map<std::string, std::string> envVars;
 };
 
-#endif //LGSENV_H
+

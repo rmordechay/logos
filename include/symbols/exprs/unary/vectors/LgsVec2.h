@@ -1,5 +1,4 @@
-#ifndef LGSVEC2_H
-#define LGSVEC2_H
+#pragma once
 #include "exprs/unary/LgsUnaryExpr.h"
 
 class LgsVec2 final : public LgsUnaryExpr {
@@ -12,4 +11,4 @@ public:
     ~LgsVec2() override = default;
 };
 
-#endif //LGSVEC2_H
+

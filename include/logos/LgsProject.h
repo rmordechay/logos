@@ -1,5 +1,4 @@
-#ifndef LGSPROJECT_H
-#define LGSPROJECT_H
+#pragma once
 #include "LgsActiveEnv.h"
 #include "extern/LgsC.h"
 #include "LgsErrHandler.h"
@@ -54,4 +53,4 @@ public:
     ~LogosProject() = default;
 };
 
-#endif // LGSPROJECT_H
+

@@ -1,5 +1,4 @@
-#ifndef LOGOSVOID_H
-#define LOGOSVOID_H
+#pragma once
 
 
 using namespace std;
@@ -24,4 +23,4 @@ public:
 
 inline LgsVoid LGS_VOID;
 
-#endif //LOGOSVOID_H
+

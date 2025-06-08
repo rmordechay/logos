@@ -1,7 +1,7 @@
-#ifndef PLATFORM_H
-#define PLATFORM_H
-#include "data/LgsDefinitions.h"
+#pragma once
 
+
+#include "data/LgsDefinitions.h"
 
 #include <lld/Common/Driver.h>
 
@@ -76,4 +76,4 @@ inline void setPlatform(const string& inputFile, const string& outputFile) {
 #endif
 }
 
-#endif //PLATFORM_H
+

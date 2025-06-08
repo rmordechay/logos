@@ -1,5 +1,4 @@
-#ifndef LOGOSERRORS_H
-#define LOGOSERRORS_H
+#pragma once
 
 
 using namespace std;
@@ -62,4 +61,4 @@ inline LgsError E10045{.msg = "Variadic argument cannot have default arguments."
 inline LgsError E10046{.msg = "'%s' is not callable.", .errCode = errCodeStart++};
 inline LgsError E10047{.msg = "External file '%s' was not found.", .errCode = errCodeStart++};
 
-#endif //LOGOSERRORS_H
+

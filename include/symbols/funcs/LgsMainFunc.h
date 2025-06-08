@@ -1,7 +1,6 @@
-#ifndef LGSMAINFUNC_H
-#define LGSMAINFUNC_H
+#pragma once
 #include "LgsFunc.h"
-#include "data/LgsDefinitions.h"
+
 #include "types/primitives/LgsInt.h"
 
 
@@ -19,4 +18,4 @@ public:
     ~LgsMainFunc() override = default;
 };
 
-#endif //LGSMAINFUNC_H
+

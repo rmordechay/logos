@@ -1,5 +1,4 @@
-#ifndef LOGOSSYMBOL_H
-#define LOGOSSYMBOL_H
+#pragma once
 
 
 class LgsGroup;
@@ -58,4 +57,4 @@ struct LgsSymbol {
     ~LgsSymbol() = default;
 };
 
-#endif //LOGOSSYMBOL_H
+

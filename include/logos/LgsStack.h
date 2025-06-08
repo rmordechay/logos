@@ -1,5 +1,4 @@
-#ifndef LGSSTACK_H
-#define LGSSTACK_H
+#pragma once
 #include "LgsSymbol.h"
 
 class LgsStmt;
@@ -43,4 +42,4 @@ public:
     ~LgsStack() = default;
 };
 
-#endif //LGSSTACK_H
+

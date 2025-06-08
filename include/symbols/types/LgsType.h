@@ -1,5 +1,4 @@
-#ifndef LOGOSTYPE_H
-#define LOGOSTYPE_H
+#pragma once
 #include "LgsValue.h"
 
 using namespace std;
@@ -33,12 +32,14 @@ public:
     Type* IRType = nullptr;
     map<string, LgsField*> fields;
     map<string, LgsFunc*> methods;
+    LgsVTable* vtable = nullptr;
 
     LgsField* getField(const string& name);
     LgsFunc* getMethod(const string& name);
     void addMethod(LgsFunc* method);
     LgsFunc* findMethod(const string& name) const;
     void setLocation(const antlr4::Token* ctx);
+    void setVTable();
 
     LgsBool* asBool();
     LgsStr* asStr();
@@ -54,7 +55,7 @@ public:
 
     virtual size_t getSizeBytes();
     virtual bool equals(LgsType& other);
-    virtual nlohmann::json asJSON() const;
+    virtual json asJSON() const;
     virtual string getStrFormatPart() const;
     virtual Type* getIRType() = 0;
     virtual string getIRName() = 0;
@@ -63,7 +64,7 @@ public:
     virtual bool equals(LgsType* other) = 0;
     virtual LgsType* inferBinaryType(LgsType* other) = 0;
     virtual LgsType* clone();
-    virtual ~LgsType() = default;
+    virtual ~LgsType();
 };
 
-#endif //LOGOSTYPE_H
+

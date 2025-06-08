@@ -1,5 +1,4 @@
-#ifndef LOGOSIFSTMT_H
-#define LOGOSIFSTMT_H
+#pragma once
 #include "LgsStmt.h"
 #include "LgsStmtBlock.h"
 #include "exprs/LgsExpr.h"
@@ -35,4 +34,4 @@ public:
 
 
 
-#endif //LOGOSIFSTMT_H
+

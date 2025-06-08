@@ -1,5 +1,4 @@
-#ifndef LGSMAPMETHODS_H
-#define LGSMAPMETHODS_H
+#pragma once
 #include "funcs/LgsBuiltinFunc.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
@@ -84,4 +83,3 @@ public:
     }
 };
 
-#endif //LGSMAPMETHODS_H

@@ -1,5 +1,4 @@
-#ifndef LGSFLOATCONST_H
-#define LGSFLOATCONST_H
+#pragma once
 #include "LgsConstExpr.h"
 #include "types/primitives/LgsFloat.h"
 
@@ -12,4 +11,4 @@ public:
     ~LgsFloatConst() override = default;
 };
 
-#endif //LGSFLOATCONST_H
+

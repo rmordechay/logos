@@ -1,5 +1,4 @@
-#ifndef LOGOSFIELD_H
-#define LOGOSFIELD_H
+#pragma once
 #include "LgsValue.h"
 
 class LgsObject;
@@ -27,4 +26,4 @@ public:
 
 
 
-#endif //LOGOSFIELD_H
+

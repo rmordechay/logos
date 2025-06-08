@@ -1,5 +1,4 @@
-#ifndef LOGOSINT_H
-#define LOGOSINT_H
+#pragma once
 
 
 class LgsInt final : public LgsType {
@@ -23,4 +22,4 @@ public:
 
 inline LgsInt LGS_INT;
 
-#endif //LOGOSINT_H
+

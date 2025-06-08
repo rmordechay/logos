@@ -1,7 +1,6 @@
-#ifndef LGSINTERFACE_H
-#define LGSINTERFACE_H
+#pragma once
 #include "LgsObject.h"
-#include "LgsType.h"
+
 
 struct LgsFuncType;
 
@@ -19,4 +18,4 @@ public:
     ~LgsInterface() override = default;
 };
 
-#endif //LGSINTERFACE_H
+

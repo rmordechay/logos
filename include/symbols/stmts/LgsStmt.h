@@ -1,5 +1,4 @@
-#ifndef LOGOSSTMT_H
-#define LOGOSSTMT_H
+#pragma once
 #include <LgsValue.h>
 
 class LgsRuntime;
@@ -30,4 +29,4 @@ public:
     ~LgsStmt() override = default;
 };
 
-#endif //LOGOSSTMT_H
+

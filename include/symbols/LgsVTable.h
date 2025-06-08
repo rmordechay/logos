@@ -1,5 +1,4 @@
-#ifndef LGSVTABLE_H
-#define LGSVTABLE_H
+#pragma once
 #include "exprs/unary/LgsHashMap.h"
 
 class LgsVTable final : public LgsHashMap {
@@ -10,4 +9,4 @@ public:
     ~LgsVTable() override = default;
 };
 
-#endif //LGSVTABLE_H
+

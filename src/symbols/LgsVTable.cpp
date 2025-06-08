@@ -5,7 +5,7 @@
 
 void LgsVTable::setImplementsVFuncs(LgsRuntime* runtime, LgsObject* obj, Value* IRValue) const {
     auto& builder = runtime->builder;
-    const auto map = obj->vtable.getIRValue(runtime);
+    const auto map = obj->vtable->getIRValue(runtime);
     const auto vtableGEP = builder.CreateStructGEP(obj->getIRType(), IRValue, 0);
     builder.CreateStore(map, vtableGEP);
     auto mapPtr = builder.CreateLoad(PointerType::getUnqual(context), vtableGEP);
@@ -16,7 +16,7 @@ void LgsVTable::setImplementsVFuncs(LgsRuntime* runtime, LgsObject* obj, Value* 
         const auto IRFunc = method->getIRFunc(runtime);
         auto valuePtr = builder.CreateAlloca(PointerType::getUnqual(context));
         builder.CreateStore(IRFunc, valuePtr);
-        obj->vtable.mapType.add.callIR(runtime, {mapPtr, keyIRStr, valuePtr});
+        obj->vtable->mapType.add.callIR(runtime, {mapPtr, keyIRStr, valuePtr});
     }
 }
 
@@ -30,7 +30,7 @@ Value* LgsVTable::resolveVirtualFunc(LgsRuntime* runtime, LgsExpr* parent, LgsFu
     if (const auto interface = type->asInterface()) {
         const auto keyIR = getIRStr(runtime, func->funcType.getIRName());
         const auto mapPtr = builder.CreateLoad(PointerType::getUnqual(context), parentIRValue);
-        const auto rv = interface->vtable.mapType.get.callIR(runtime, {mapPtr, keyIR});
+        const auto rv = interface->vtable->mapType.get.callIR(runtime, {mapPtr, keyIR});
         const auto getValuePtr = builder.CreateAlloca(PointerType::getUnqual(context));
         builder.CreateStore(rv, getValuePtr);
         return builder.CreateLoad(PointerType::getUnqual(context), builder.CreateLoad(PointerType::getUnqual(context), getValuePtr));

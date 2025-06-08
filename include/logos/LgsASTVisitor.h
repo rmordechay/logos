@@ -1,5 +1,4 @@
-#ifndef LGSASTVISITOR_H
-#define LGSASTVISITOR_H
+#pragma once
 #include "LgsErrHandler.h"
 #include "LgsStack.h"
 #include "files/LgsFile.h"
@@ -80,4 +79,4 @@ public:
     virtual ~LgsAstVisitor() = default;
 };
 
-#endif //LGSASTVISITOR_H
+

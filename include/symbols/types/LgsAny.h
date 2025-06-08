@@ -1,6 +1,5 @@
-#ifndef LGSANY_H
-#define LGSANY_H
-#include "LgsType.h"
+#pragma once
+
 
 class LgsAny final : public LgsType {
 public:
@@ -18,4 +17,4 @@ public:
 
 inline LgsAny LGS_ANY;
 
-#endif //LGSANY_H
+

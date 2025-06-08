@@ -1,5 +1,4 @@
-#ifndef LOGOSEXPR_H
-#define LOGOSEXPR_H
+#pragma once
 #include "LgsValue.h"
 
 class LgsRuntime;
@@ -79,4 +78,3 @@ public:
     ~LgsExpr() override = default;
 };
 
-#endif //LOGOSEXPR_H

@@ -1,6 +1,5 @@
-#ifndef LGSUNKNOWNTYPE_H
-#define LGSUNKNOWNTYPE_H
-#include "LgsType.h"
+#pragma once
+
 
 class LgsUnknownType final : public LgsType {
 public:
@@ -18,4 +17,4 @@ public:
     ~LgsUnknownType() override = default;
 };
 
-#endif //LGSUNKNOWNTYPE_H
+

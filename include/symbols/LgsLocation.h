@@ -1,5 +1,4 @@
-#ifndef LGSLOCATION_H
-#define LGSLOCATION_H
+#pragma once
 #include <filesystem>
 
 
@@ -16,4 +15,4 @@ struct Location {
     }
 };
 
-#endif //LGSLOCATION_H
+

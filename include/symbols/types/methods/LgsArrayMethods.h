@@ -1,5 +1,4 @@
-#ifndef LGSARRAYMETHODS_H
-#define LGSARRAYMETHODS_H
+#pragma once
 #include "funcs/LgsBuiltinFunc.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
@@ -116,4 +115,4 @@ public:
     }
 };
 
-#endif //LGSARRAYMETHODS_H
+

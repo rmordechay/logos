@@ -1,5 +1,4 @@
-#ifndef LOGOSFILE_H
-#define LOGOSFILE_H
+#pragma once
 
 class LgsStrConst;
 class LogosProject;
@@ -34,4 +33,4 @@ inline json LgsFile::asJSON() {
     assert(false);
 }
 
-#endif //LOGOSFILE_H
+

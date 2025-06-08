@@ -1,5 +1,4 @@
-#ifndef LOGOSSTMTBLOCK_H
-#define LOGOSSTMTBLOCK_H
+#pragma once
 #include "stmts/LgsStmt.h"
 
 class LgsStmtBlock final : public LgsValue {
@@ -16,4 +15,4 @@ public:
 };
 
 
-#endif //LOGOSSTMTBLOCK_H
+

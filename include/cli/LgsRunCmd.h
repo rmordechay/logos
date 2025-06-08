@@ -1,5 +1,4 @@
-#ifndef LOGOSCMDRUN_H
-#define LOGOSCMDRUN_H
+#pragma once
 #include "LgsCmd.h"
 
 class Logos;
@@ -14,4 +13,4 @@ public:
     ~LgsRunCmd() override = default;
 };
 
-#endif //LOGOSCMDRUN_H
+

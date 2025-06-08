@@ -1,5 +1,4 @@
-#ifndef LOGOSFLOAT_H
-#define LOGOSFLOAT_H
+#pragma once
 
 
 class LgsFloat final : public LgsType {
@@ -20,4 +19,4 @@ public:
 
 inline LgsFloat LGS_FLOAT;
 
-#endif // LOGOSFLOAT_H
+

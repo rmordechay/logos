@@ -1,5 +1,4 @@
-#ifndef LGSSHORT_H
-#define LGSSHORT_H
+#pragma once
 
 
 class LgsShort final : public LgsType {
@@ -23,4 +22,4 @@ public:
 
 inline LgsShort LGS_SHORT;
 
-#endif //LGSSHORT_H
+

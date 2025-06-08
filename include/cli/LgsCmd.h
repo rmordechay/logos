@@ -1,5 +1,4 @@
-#ifndef LGSCMD_H
-#define LGSCMD_H
+#pragma once
 
 
 
@@ -27,4 +26,4 @@ inline void LgsCmd::printInfoAndExit(const std::string& msg) {
     printInfoAndExit();
 }
 
-#endif //LGSCMD_H
+

@@ -1,5 +1,4 @@
-#ifndef LOGOSFOREACHLOOP_H
-#define LOGOSFOREACHLOOP_H
+#pragma once
 #include "LgsForLoop.h"
 #include <exprs/unary/LgsUnaryExpr.h>
 
@@ -20,4 +19,4 @@ public:
     ~LgsForeachLoop() override;
 };
 
-#endif //LOGOSFOREACHLOOP_H
+

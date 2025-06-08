@@ -1,5 +1,4 @@
-#ifndef LOGOSMETADATA_H
-#define LOGOSMETADATA_H
+#pragma once
 
 #include <lld/Common/Driver.h>
 class CodeGenerator;
@@ -45,4 +44,4 @@ LLD_HAS_DRIVER(coff);
 #define ARCH_NAME "Unknown Architecture"
 #endif
 
-#endif //LOGOSMETADATA_H
+

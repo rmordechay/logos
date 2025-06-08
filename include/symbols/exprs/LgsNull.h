@@ -1,5 +1,4 @@
-#ifndef LGSNULL_H
-#define LGSNULL_H
+#pragma once
 #include "exprs/unary/LgsUnaryExpr.h"
 
 class LgsNull final : public LgsUnaryExpr {
@@ -14,4 +13,4 @@ inline Value* LgsNull::createIRValue(LgsRuntime* runtime) {
     return ConstantPointerNull::get(PointerType::get(context, 0));
 }
 
-#endif //LGSNULL_H
+
