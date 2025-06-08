@@ -5,7 +5,7 @@
 #include "stmts/LgsStmtBlock.h"
 #include "types/LgsArray.h"
 #include "types/LgsMap.h"
-#include "utils/LgsUtils.h"
+
 
 Value* LgsForeachLoop::loopStart(LgsRuntime* runtime) {
     return runtime->builder.getInt32(0);

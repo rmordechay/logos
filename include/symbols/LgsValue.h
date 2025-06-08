@@ -1,9 +1,5 @@
 #pragma once
 
-#include "LgsLocation.h"
-#include <Token.h>
-
-
 class LgsFunc;
 using namespace llvm;
 

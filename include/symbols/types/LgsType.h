@@ -1,10 +1,6 @@
 #pragma once
-#include "LgsValue.h"
 
 class LgsHashMap;
-
-using namespace llvm;
-
 class LgsVTable;
 class LgsGroup;
 class LgsFuncType;

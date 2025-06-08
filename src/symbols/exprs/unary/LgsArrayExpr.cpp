@@ -3,7 +3,7 @@
 #include "logos/LgsConfig.h"
 
 
-#include "utils/LgsUtils.h"
+
 
 Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {
     if (arrType.isStatic) return createConstArray(runtime);

@@ -1,9 +1,4 @@
-#include "utils/LgsUtils.h"
-
-#include "exprs/unary/LgsIterIndex.h"
-#include "exprs/unary/constants/LgsStrConst.h"
 #include "logos/LgsProject.h"
-
 #include "stmts/LgsVarDec.h"
 
 string getFileText(path filePath) {
@@ -29,7 +24,13 @@ string getFormatString(const vector<LgsExpr*>& args) {
     return result;
 }
 
-Value* getIRStr(LgsRuntime* runtime, const string& value) {
+string removeUnderscores(const string& input) {
+    string result = input;
+    result.erase(remove(result.begin(), result.end(), '_'), result.end());
+    return result;
+}
+
+Value* getIRStr(const LgsRuntime* runtime, const string& value) {
     for (auto& globals : runtime->module->globals()) {
         if (!globals.hasInitializer()) continue;
         const auto dataArray = dyn_cast<ConstantDataArray>(globals.getInitializer());

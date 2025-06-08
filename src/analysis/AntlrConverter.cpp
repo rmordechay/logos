@@ -735,7 +735,7 @@ LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::IterIndexContext* ctx) 
 LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) const {
     LgsConstExpr* constant = nullptr;
     if (const auto intToken = ctx->INTEGER()) {
-        const auto value = stoi(intToken->getText());
+        const auto value = stoi(removeUnderscores(intToken->getText()));
         constant = new LgsIntConst(value);
     } else if (const auto floatToken = ctx->FLOAT()) {
         const auto value = stof(floatToken->getText());
@@ -756,9 +756,9 @@ LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) co
 }
 
 LgsStrConst* AntlerConverter::getStrConst(antlr4::tree::TerminalNode* type) const {
-    auto a = type->getText();
-    cleanStr(a);
-    const auto strConst = new LgsStrConst(a);
+    auto typeText = type->getText();
+    cleanStr(typeText);
+    const auto strConst = new LgsStrConst(typeText);
     parseTemplateStr(strConst);
     strConst->setLocation(type->getSymbol());
     return strConst;

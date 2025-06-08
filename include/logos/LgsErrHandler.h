@@ -1,9 +1,4 @@
 #pragma once
-#include "data/LgsErrors.h"
-#include "data/LgsWarnings.h"
-#include <filesystem>
-
-
 
 struct Location;
 
@@ -12,7 +7,7 @@ public:
     bool successful = true;
     vector<LgsError> errors;
     vector<LgsWarning> warnings;
-    filesystem::path filePath;
+    path filePath;
 
     void setUnsuccessful();
     void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});

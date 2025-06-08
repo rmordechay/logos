@@ -373,13 +373,13 @@ OR: 'or';
 NOT: 'not';
 IN: 'in';
 
-INTEGER: [0-9]+;
+INTEGER: [0-9][0-9_]+;
 FLOAT: [0-9]+ '.' [0-9]+;
 BOOL: 'true' | 'false';
 NULL: 'null';
-CONST_NAME: [A-Z0-9_]+;
-TYPE: [A-Z][a-zA-Z0-9_]*;
-VARIABLE: [a-z_][a-zA-Z0-9_]*;
+CONST_NAME: [A-Z]+ ('_' [A-Z]+)* ;
+TYPE: ([A-Z] [a-zA-Z0-9]*)+ ;
+VARIABLE: [a-z] [a-zA-Z0-9]* ([A-Z] [a-zA-Z0-9]*)*;
 STRING: '"' ( ~["\\] | '\\'.)* '"';
 TAG: '@'[a-zA-Z0-9_]+;
 LINE_COMMENT: '//' ~( '\r' | '\n' )* -> skip;

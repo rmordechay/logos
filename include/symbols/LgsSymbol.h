@@ -1,11 +1,7 @@
 #pragma once
 
-
 class LgsGroup;
-using namespace nlohmann;
-
 class LgsField;
-struct CodegenMetadata;
 class LgsEnum;
 class LgsEnumField;
 class LgsFunc;

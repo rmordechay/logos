@@ -1,7 +1,5 @@
 #pragma once
 #include "LgsStack.h"
-#include "LgsSymbol.h"
-
 
 using namespace llvm;
 class LgsErrHandler;

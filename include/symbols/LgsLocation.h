@@ -1,6 +1,4 @@
 #pragma once
-#include <filesystem>
-
 
 struct Location {
     size_t lineNumber{};
@@ -10,7 +8,7 @@ struct Location {
         return std::to_string(lineNumber);
     }
 
-    std::string getFullPath(const std::filesystem::path& path) const {
+    std::string getFullPath(const path& path) const {
         return path.string() + ":" + lineNumberStr() + ":" + std::to_string(posInLine);
     }
 };

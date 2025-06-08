@@ -1,7 +1,5 @@
 #pragma once
-#include "LgsErrHandler.h"
 #include "LgsStack.h"
-#include "files/LgsFile.h"
 
 class LgsFuncType;
 class LgsArray;
