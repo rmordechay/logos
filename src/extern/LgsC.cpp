@@ -2,8 +2,7 @@
 
 #include "data/LgsErrors.h"
 #include "extern/LgsCInterface.h"
-
-
+#include "logos/Platform.h"
 #include "utils/LgsUtils.h"
 #include <clang/Basic/Diagnostic.h>
 #include <clang/Frontend/CompilerInstance.h>

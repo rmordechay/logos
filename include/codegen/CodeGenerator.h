@@ -8,7 +8,7 @@ class LgsMainFile;
 class LgsObject;
 
 using namespace llvm;
-using namespace std;
+
 using namespace filesystem;
 
 class CodeGenerator {

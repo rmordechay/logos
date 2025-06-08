@@ -2,6 +2,7 @@
 #include "files/LgsInterfaceFile.h"
 #include "logos/LgsConfig.h"
 #include "logos/Logos.h"
+#include "logos/Platform.h"
 #include "utils/ThreadPool.h"
 
 void CodeGenerator::generate(LogosProject& project) {

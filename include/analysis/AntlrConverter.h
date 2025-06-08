@@ -6,7 +6,7 @@
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsGroup.h"
 
-using namespace std;
+
 using namespace filesystem;
 
 class LgsStrConst;

@@ -4,7 +4,7 @@
 
 struct LgsPaths;
 using namespace llvm;
-using namespace std;
+
 
 class LgsLinker {
 public:

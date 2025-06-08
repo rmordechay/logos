@@ -2,7 +2,7 @@
 #include "LgsStack.h"
 #include "LgsSymbol.h"
 
-using namespace std;
+
 using namespace llvm;
 class LgsErrHandler;
 class LgsForLoop;

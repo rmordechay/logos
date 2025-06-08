@@ -1,7 +1,7 @@
 #pragma once
 
 
-using namespace std;
+
 
 inline string WARNING_PLACEHOLDER = "%s";
 

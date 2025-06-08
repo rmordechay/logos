@@ -7,7 +7,9 @@
 #include <memory>
 #include <cassert>
 #include <unistd.h>
+#include <thread>
 
+#include <json/json.hpp>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Value.h>
@@ -17,12 +19,14 @@
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/TargetParser/Host.h>
 #include <llvm/MC/TargetRegistry.h>
-#include <json/json.hpp>
+#include <lld/Common/Driver.h>
 
-#include "logos/Platform.h"
-#include <logos/LgsRuntime.h>
+using namespace std;
+using namespace filesystem;
+using namespace nlohmann;
+using namespace llvm;
+
+#include "data/LgsDefinitions.h"
+#include "logos/LgsRuntime.h"
 #include "logos/LgsErrHandler.h"
 #include "types/LgsType.h"
-#include "data/LgsDefinitions.h"
-
-

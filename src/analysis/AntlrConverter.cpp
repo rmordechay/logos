@@ -36,6 +36,7 @@
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "funcs/LgsMainFunc.h"
+#include "logos/Platform.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsPatternMatch.h"

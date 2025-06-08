@@ -1,6 +1,7 @@
 #include "codegen/LgsLinker.h"
 
 #include "logos/Logos.h"
+#include "logos/Platform.h"
 
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>

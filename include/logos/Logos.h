@@ -6,7 +6,7 @@
 struct LgsError;
 class ThreadPool;
 using namespace filesystem;
-using namespace std;
+
 using namespace llvm;
 
 class Logos {

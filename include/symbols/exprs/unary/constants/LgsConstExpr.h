@@ -6,7 +6,7 @@ class LgsFloatConst;
 class LgsBool;
 class LgsIntConst;
 class LgsStrConst;
-using namespace std;
+
 
 class LgsConstExpr : public LgsUnaryExpr {
 public:

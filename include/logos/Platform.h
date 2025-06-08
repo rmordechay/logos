@@ -1,13 +1,5 @@
 #pragma once
-
-
-#include "data/LgsDefinitions.h"
-
-#include <lld/Common/Driver.h>
-
-using namespace std;
-using namespace llvm;
-using namespace filesystem;
+#include <pch.h>
 
 struct LgsPaths {
     path rootDir;

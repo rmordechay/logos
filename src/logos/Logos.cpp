@@ -5,6 +5,8 @@
 #include "utils/ThreadPool.h"
 #include <analysis/AntlrConverter.h>
 #include "codegen/CodeGenerator.h"
+#include "logos/Platform.h"
+
 #include <unistd.h>
 
 void Logos::run() {

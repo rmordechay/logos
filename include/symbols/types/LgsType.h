@@ -2,7 +2,7 @@
 #include "LgsValue.h"
 
 class LgsHashMap;
-using namespace std;
+
 using namespace llvm;
 
 class LgsVTable;

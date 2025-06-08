@@ -1,21 +1,16 @@
 #include "logos/LgsProject.h"
-
-#include "files/LgsInterfaceFile.h"
-#include "analysis/SemaAnalyser.h"
+#include "pch.h"
+#include "LogosLexer.h"
 #include "analysis/AntlrConverter.h"
-#include "exprs/unary/constants/LgsStrConst.h"
-#include "files/LgsAppFile.h"
+#include "analysis/SemaAnalyser.h"
+#include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
-
-#include "logos/Logos.h"
-#include "parser/LogosLexer.h"
-#include "parser/LogosParser.h"
+#include "logos/Platform.h"
 #include "stmts/LgsVarDec.h"
-#include "symbols/builtin/LgsPrint.h"
 #include "utils/ThreadPool.h"
+#include "builtin/LgsPrint.h"
 
-using namespace std;
 extern char **environ;
 
 bool LogosProject::loadProject() {

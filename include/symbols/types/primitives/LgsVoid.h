@@ -1,7 +1,7 @@
 #pragma once
 
 
-using namespace std;
+
 
 class LgsVoid final : public LgsType {
 public:

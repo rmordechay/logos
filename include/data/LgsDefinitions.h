@@ -1,12 +1,5 @@
 #pragma once
 
-#include <lld/Common/Driver.h>
-class CodeGenerator;
-class LgsRuntime;
-using namespace std;
-using namespace nlohmann;
-using namespace llvm;
-
 #define LOGOS_FILE_EXTENSION ".lgs"
 #define LOGOS_SRC_DIR "src"
 #define LOGOS_ENVS_DIR "envs"
