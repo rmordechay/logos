@@ -6,6 +6,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
+
 string LgsInstance::getName() {
     return obj->name;
 }
@@ -18,7 +19,7 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
         IRValue = runtime->builder.CreateAlloca(objIRType);
     }
     if (!obj->implements.empty()) {
-        setImplementsVFuncs(runtime);
+        obj->vtable.setImplementsVFuncs(runtime, obj, IRValue);
     }
     for (const auto arg : args) {
         const auto field = obj->getField(arg->name);
@@ -39,22 +40,6 @@ void LgsInstance::setReturnExpr(LgsRuntime* runtime, Type* objIRType) {
             ConstantInt::get(Type::getInt64Ty(context), 1)
         );
         runtime->addAllocatedExpr(this);
-    }
-}
-
-void LgsInstance::setImplementsVFuncs(LgsRuntime* runtime) const {
-    const auto map = obj->vtable.getIRValue(runtime);
-    const auto vtableGEP = runtime->builder.CreateStructGEP(obj->getIRType(), IRValue, 0);
-    runtime->builder.CreateStore(map, vtableGEP);
-    auto mapPtr = runtime->builder.CreateLoad(PointerType::getUnqual(context), vtableGEP);
-    for (const auto& [name, method] : obj->methods) {
-        const auto interface = method->implements;
-        if (!interface) continue;
-        const auto keyIRStr = getIRStr(runtime, interface->funcType.getIRName());
-        const auto IRFunc = method->getIRFunc(runtime);
-        auto valuePtr = runtime->builder.CreateAlloca(PointerType::getUnqual(context));
-        runtime->builder.CreateStore(IRFunc, valuePtr);
-        obj->vtable.mapType.add.callIR(runtime, {mapPtr, keyIRStr, valuePtr});
     }
 }
 

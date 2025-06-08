@@ -19,7 +19,6 @@ public:
     bool equals(const LgsFuncType* funcType) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
-    Value* resolveVirtualFunc(LgsRuntime* runtime) const;
     void createIRStmt(LgsRuntime* runtime) override;
     Value* createIRValue(LgsRuntime* runtime) override;
     std::string getName() override;

@@ -4,8 +4,8 @@
 
 void LgsRunCmd::runCmd() {
     const auto firstArg = argv[2];
-    const auto isCurrentDirOrEmpty = std::strcmp(firstArg, ".") == 0 || argc == 3;
-    rootPath = isCurrentDirOrEmpty ? current_path().string() : firstArg;
+    const auto isCurrentDirOrEmpty = strcmp(firstArg, ".") == 0 || argc == 2;
+    const auto rootPath = isCurrentDirOrEmpty ? current_path().string() : firstArg;
     Logos logos(rootPath);
     setArgs(&logos);
     logos.run();

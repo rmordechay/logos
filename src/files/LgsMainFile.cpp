@@ -17,7 +17,7 @@ Module* LgsMainFile::generateIR(LogosProject& project) {
 
 void LgsMainFile::format() {
     string indentStr = "";
-    ofstream outFile(absPath, ios::trunc);
+    // ofstream outFile(absPath, ios::trunc);
 }
 
 json LgsMainFile::asJSON() {

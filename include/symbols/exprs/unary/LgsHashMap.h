@@ -3,7 +3,7 @@
 #include "LgsUnaryExpr.h"
 #include "types/LgsMap.h"
 
-class LgsHashMap final : public LgsUnaryExpr {
+class LgsHashMap : public LgsUnaryExpr {
 public:
     LgsMap mapType;
     vector<LgsMapPair*> initialElements;
@@ -13,6 +13,7 @@ public:
         mapType.kvType.key = keyType;
         mapType.kvType.value = valueType;
     }
+
     Value* createIRValue(LgsRuntime* runtime) override;
     ~LgsHashMap() override = default;
 };

@@ -1,12 +1,14 @@
 #ifndef LOGOSTYPE_H
 #define LOGOSTYPE_H
 #include "LgsValue.h"
+
 #include <string>
 #include <map>
-
-class LgsGroup;
 using namespace std;
 using namespace llvm;
+
+class LgsVTable;
+class LgsGroup;
 class LgsFuncType;
 class LgsInterface;
 class LgsObject;

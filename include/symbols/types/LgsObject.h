@@ -3,6 +3,7 @@
 #include "LgsAny.h"
 #include "data/LgsDefinitions.h"
 #include "LgsType.h"
+#include "LgsVTable.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "methods/LgsObjMethods.h"
 
@@ -15,7 +16,7 @@ public:
     bool isSingleton = false;
     vector<LgsType*> implements;
     LgsObjFieldsFunc fieldsF{this};
-    LgsHashMap vtable = LgsHashMap(new LgsStr(), &LGS_ANY);
+    LgsVTable vtable;
 
     explicit LgsObject() : name(LOGOS_PARENT_OBJ), path("") {}
     explicit LgsObject(const string& name) : name(name), path("") {}

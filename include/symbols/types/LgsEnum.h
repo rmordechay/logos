@@ -1,7 +1,6 @@
 #ifndef LGSENUM_H
 #define LGSENUM_H
 #include "LgsType.h"
-#include "exprs/unary/LgsUnaryExpr.h"
 
 class LgsEnumField;
 
@@ -13,7 +12,7 @@ public:
     explicit LgsEnum(const string& name) : name(name) {}
     Type* getIRType() override;
     string getIRName() override;
-    json asJSON() const override;
+    nlohmann::json asJSON() const override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;

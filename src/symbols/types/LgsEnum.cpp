@@ -1,5 +1,6 @@
 #include "types/LgsEnum.h"
 
+#include "logos/LgsRuntime.h"
 #include "stmts/LgsField.h"
 
 LgsExpr* LgsEnum::getZeroValue() {

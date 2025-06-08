@@ -1,6 +1,7 @@
 #ifndef LGSGROUP_H
 #define LGSGROUP_H
 #include "LgsType.h"
+#include "exprs/unary/LgsHashMap.h"
 
 class LgsVariable;
 
@@ -9,6 +10,7 @@ public:
     string name;
     vector<LgsType*> types;
     vector<LgsVariable*> targetSymbols;
+    LgsHashMap vtable = LgsHashMap(new LgsStr(), &LGS_ANY);
 
     explicit LgsGroup(const string& name) : name(name) {}
     Type* getIRType() override;

@@ -11,7 +11,7 @@ Value* LgsFuncCall::call(LgsRuntime* runtime) const {
     if (callback) {
         func->setIRValue(getCallback(runtime));
     } else if (func->funcType.isVirtual) {
-        const auto virtualFunc = resolveVirtualFunc(runtime);
+        const auto virtualFunc = type->asObject()->vtable.resolveVirtualFunc(runtime, args[0], func);
         func->setIRValue(virtualFunc);
     }
     return func->call(runtime, args);
@@ -66,25 +66,6 @@ bool LgsFuncCall::equalsDefaultParams(const LgsFuncType* funcType) const {
 
 bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
     return true;
-}
-
-Value* LgsFuncCall::resolveVirtualFunc(LgsRuntime* runtime) const {
-    const auto parent = args[0];
-    const auto type = parent->type;
-    const auto func = callback->func;
-    const auto parentIRValue = parent->getIRValue(runtime);
-    if (const auto group = type->asGroup()) {
-        assert(false);
-    }
-    if (const auto interface = type->asInterface()) {
-        const auto keyIR = getIRStr(runtime, func->funcType.getIRName());
-        const auto mapPtr = runtime->builder.CreateLoad(PointerType::getUnqual(context), parentIRValue);
-        const auto rv = interface->vtable.mapType.get.callIR(runtime, {mapPtr, keyIR});
-        const auto getValuePtr = runtime->builder.CreateAlloca(PointerType::getUnqual(context));
-        runtime->builder.CreateStore(rv, getValuePtr);
-        return runtime->builder.CreateLoad(PointerType::getUnqual(context), runtime->builder.CreateLoad(PointerType::getUnqual(context), getValuePtr));
-    }
-    assert(false);
 }
 
 string LgsFuncCall::getName() {

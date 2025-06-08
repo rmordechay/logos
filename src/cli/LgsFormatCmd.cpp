@@ -1,12 +1,11 @@
-#include "cli/LgsFormatCmd.h""
-
+#include "cli/LgsFormatCmd.h"
 #include "logos/Logos.h"
 
 void LgsFormatCmd::runCmd() {
     filePath = argv[2];
     Logos logos;
     logos.project.parseSrcFile(filePath);
-    std::cout << logos.project.files.size() << std::endl;
+    logos.project.files.front()->format();
 }
 
 void LgsFormatCmd::validate() {
