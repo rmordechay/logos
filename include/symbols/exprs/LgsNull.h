@@ -10,7 +10,7 @@ public:
 };
 
 inline Value* LgsNull::createIRValue(LgsRuntime* runtime) {
-    return ConstantPointerNull::get(PointerType::get(context, 0));
+    return ConstantPointerNull::get(runtime->builder.getPtrTy());
 }
 
 

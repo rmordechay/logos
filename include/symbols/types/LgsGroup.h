@@ -13,7 +13,7 @@ public:
     explicit LgsGroup(const string& name) : name(name) {
         setVTable();
     }
-    Type* getIRType() override;
+    Type* getIRType(LgsRuntime* runtime) override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;

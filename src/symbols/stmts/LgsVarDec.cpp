@@ -7,7 +7,7 @@ string LgsVarDec::format(string& indentStr) {
 }
 
 void LgsVarDec::createIRStmt(LgsRuntime* runtime) {
-    const auto IRType = type->getIRType();
+    const auto IRType = type->getIRType(runtime);
     const auto exprIRValue = expr->getIRValue(runtime);
     if (shouldAllocate(IRType)) {
         IRValue = runtime->builder.CreateAlloca(IRType);

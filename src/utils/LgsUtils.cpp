@@ -29,7 +29,7 @@ string getFormatString(const vector<LgsExpr*>& args) {
     return result;
 }
 
-Value* getIRStr(const LgsRuntime* runtime, const string& value) {
+Value* getIRStr(LgsRuntime* runtime, const string& value) {
     for (auto& globals : runtime->module->globals()) {
         if (!globals.hasInitializer()) continue;
         const auto dataArray = dyn_cast<ConstantDataArray>(globals.getInitializer());

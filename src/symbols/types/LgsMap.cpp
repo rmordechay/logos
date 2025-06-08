@@ -32,8 +32,8 @@ Value* LgsMap::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
     return isNotEmpty.call(runtime, {expr});
 }
 
-Type* LgsMap::getIRType() {
-    return PointerType::getUnqual(context);
+Type* LgsMap::getIRType(LgsRuntime* runtime) {
+    return runtime->builder.getPtrTy();
 }
 
 string LgsMap::getIRName() {

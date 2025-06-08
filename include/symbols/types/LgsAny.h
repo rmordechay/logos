@@ -6,7 +6,7 @@ public:
     static constexpr auto name = "Any";
 
     size_t getSizeBytes() override;
-    Type* getIRType() override;
+    Type* getIRType(LgsRuntime* runtime) override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;

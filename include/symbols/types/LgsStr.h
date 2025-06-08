@@ -1,6 +1,5 @@
 #pragma once
 #include "methods/LgsStrMethods.h"
-
 #include "exprs/unary/constants/LgsCharConst.h"
 #include "types/LgsIterable.h"
 
@@ -22,7 +21,7 @@ public:
     static uint32_t hashString(const string& str);
     size_t getSizeBytes() override;
     string getIRName() override;
-    Type* getIRType() override;
+    Type* getIRType(LgsRuntime* runtime) override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
@@ -35,4 +34,4 @@ public:
     ~LgsStr() override = default;
 };
 
-
+inline LgsStr LGS_STR;

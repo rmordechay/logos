@@ -8,7 +8,7 @@
 #include <types/LgsAny.h>
 
 inline FunctionCallee getPrintf(LgsRuntime* runtime) {
-    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context)}, true);
+    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getPtrTy()}, true);
     return runtime->module->getOrInsertFunction("printf", printfType);
 }
 
@@ -29,7 +29,7 @@ public:
         stringstream str;
         for (int i = 0; i < args.size(); ++i) {
             const auto arg = args[i];
-            const auto argType = arg->type->getIRType();
+            const auto argType = arg->type->getIRType(runtime);
             const auto argValue = arg->getIRValue(runtime);
             addIRArg(runtime, IRArgs, argType, argValue);
             str << arg->type->getStrFormatPart() << std::endl;

@@ -1,7 +1,7 @@
 #include "types/LgsGroup.h"
 
-Type* LgsGroup::getIRType() {
-    assert(false);
+Type* LgsGroup::getIRType(LgsRuntime* runtime) {
+    return runtime->builder.getPtrTy();
 }
 
 LgsExpr* LgsGroup::getZeroValue() {
@@ -17,7 +17,10 @@ string LgsGroup::prettyName() const {
 }
 
 bool LgsGroup::equals(LgsType* other) {
-    assert(false);
+    for (const auto type : types) {
+        if (type->equals(other)) return true;
+    }
+    return false;
 }
 
 LgsType* LgsGroup::inferBinaryType(LgsType* other) {

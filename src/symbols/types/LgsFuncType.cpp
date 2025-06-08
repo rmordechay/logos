@@ -27,22 +27,22 @@ string LgsFuncType::getIRName() {
     return IRName;
 }
 
-Type* LgsFuncType::getIRType() {
+Type* LgsFuncType::getIRType(LgsRuntime* runtime) {
     if (IRType) return IRType;
     Type* returnType;
     if (isRvBig && !swapReturn) {
-        returnType = PointerType::getUnqual(context);
+        returnType = runtime->builder.getPtrTy();
     } else {
-        returnType = rt->getIRType();
+        returnType = rt->getIRType(runtime);
     }
     vector<Type*> IRParamsTypes;
     for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param->type;
         if (!paramType->isPrimitive || param->isSelf) {
-            IRParamsTypes.emplace_back(PointerType::getUnqual(context));
+            IRParamsTypes.emplace_back(runtime->builder.getPtrTy());
         } else {
-            auto irType = paramType->getIRType();
+            auto irType = paramType->getIRType(runtime);
             IRParamsTypes.emplace_back(irType);
         }
     }

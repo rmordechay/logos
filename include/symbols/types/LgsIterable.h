@@ -12,7 +12,7 @@ public:
     LgsExpr* sizeExpr = nullptr;
 
     explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}
-    Type* getIRType() override;
+    Type* getIRType(LgsRuntime* runtime) override;
     virtual LgsType* getBaseType();
     virtual Value* getLength(LgsRuntime* runtime, LgsExpr* expr) = 0;
     virtual Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) = 0;
@@ -21,5 +21,3 @@ public:
     virtual void unpackTypes(const vector<LgsVarDec*>& varDecs);
     ~LgsIterable() override = default;
 };
-
-

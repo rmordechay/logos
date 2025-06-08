@@ -26,7 +26,7 @@ public:
     }
 
     static bool shouldLoadIRArg(Value* value);
-    void setBigObjAttrs(Function& IRFunc) const;
+    void setBigObjAttrs(LgsRuntime* runtime, Function& IRFunc) const;
     void swapReturnIfNeeded();
     LgsParam* getReturnSwapParam() const;
     static void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, Type* type, Value* value);

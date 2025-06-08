@@ -18,7 +18,7 @@ size_t LgsType::getSizeBytes() {
 
 void LgsType::setVTable() {
     assert(!vtable);
-    vtable = new LgsHashMap();
+    vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
 }
 
 json LgsType::asJSON() const {
