@@ -7,6 +7,10 @@ string LgsChar::prettyName() const {
     return name;
 }
 
+size_t LgsChar::getSizeBytes() {
+    return sizeof(char);
+}
+
 Type* LgsChar::getIRType() {
     return Type::getInt8Ty(context);
 }
@@ -30,4 +34,8 @@ string LgsChar::getStrFormatPart() const {
 
 bool LgsChar::equals(LgsType* other) {
     return name == other->getIRName();
+}
+
+LgsType* LgsChar::clone() {
+    return this;
 }

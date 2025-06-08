@@ -18,7 +18,7 @@
 
 using namespace clang;
 
-void LgsC::parse(vector<LgsStrConst*>& filePaths, LgsErrHandler* errHandler) const {
+void LgsC::parse(const vector<LgsStrConst*>& filePaths) const {
     for (const auto filePath : filePaths) {
         auto path = filePath->value;
         string code;
@@ -29,10 +29,10 @@ void LgsC::parse(vector<LgsStrConst*>& filePaths, LgsErrHandler* errHandler) con
             code = getFileText(path);
         }
         if (code.empty()) {
-            errHandler->handleError(E10047, &filePath->location, {path});
+            errHandler.handleError(E10047, &filePath->location, {path});
             continue;
         }
-        runToolOnCodeWithArgs(std::make_unique<LgsCFrontendAction>(), code, {"-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"});
+        runToolOnCodeWithArgs(std::make_unique<LgsCFrontendAction>(errHandler), code, {"-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"});
     }
 }
 

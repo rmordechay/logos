@@ -44,6 +44,8 @@
 #include "types/LgsGroup.h"
 #include "types/LgsMap.h"
 #include "types/LgsUnknownType.h"
+#include "types/primitives/LgsShort.h"
+
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
 #include <types/LgsStr.h>
@@ -68,8 +70,8 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
             file->externFiles.push_back(str);
         }
     }
-    const LgsC lgsC;
-    lgsC.parse(file->externFiles, &errHandler);
+    const LgsC lgsC(errHandler);
+    lgsC.parse(file->externFiles);
     file->absPath = filePath;
     file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     return file;
@@ -811,16 +813,22 @@ LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
 LgsType* AntlerConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken) const {
     const auto typeText = typeToken->getText();
     LgsType* type = nullptr;
-    if (typeText == LgsInt::name) {
+    if (typeText == LgsBool::name) {
+        type = &LGS_BOOL;
+    } else if (typeText == LgsChar::name) {
+        type = &LGS_CHAR;
+    } else if (typeText == LgsInt::name) {
         type = &LGS_INT;
+    } else if (typeText == LgsShort::name) {
+        type = &LGS_SHORT;
+    } else if (typeText == LgsLong::name) {
+        type = &LGS_LONG;
     } else if (typeText == LgsFloat::name) {
         type = &LGS_FLOAT;
-    } else if (typeText == LgsBool::name) {
-        type = &LGS_BOOL;
-    } else if (typeText == LgsStr::name) {
-        type = new LgsStr();
     } else if (typeText == LgsVoid::name) {
         type = &LGS_VOID;
+    } else if (typeText == LgsStr::name) {
+        type = new LgsStr();
     } else {
         type = new LgsUnknownType(typeText);
     }

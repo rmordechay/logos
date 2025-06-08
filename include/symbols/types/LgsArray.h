@@ -15,7 +15,6 @@ public:
     LgsArrayIsNotEmptyFunc isNotEmpty{this};
     LgsArrayFreeFunc free{this};
     LgsArrayDeleteFunc delete_{this};
-    Value* argc = nullptr;
 
     explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         unpackLength = 1;

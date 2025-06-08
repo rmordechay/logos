@@ -8,7 +8,8 @@ string LgsLong::prettyName() const {
 }
 
 bool LgsLong::equals(LgsType* other) {
-    assert(false);
+    if (other->getIRName() == "Any") return true;
+    return name == other->getIRName();
 }
 
 Type* LgsLong::getIRType() {

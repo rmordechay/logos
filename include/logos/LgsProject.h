@@ -30,7 +30,6 @@ public:
     vector<LgsEnvFile*> envFiles;
     map<string, Module*> IRModules;
     const LgsAppFile* appFile = nullptr;
-    LgsC lgsC;
 
     void asJSON() const;
     bool loadProject();

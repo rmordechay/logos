@@ -24,7 +24,7 @@ public:
         funcType.rt = rt;
         funcType.params = params;
     }
-
+    explicit LgsFunc(const LgsFuncType* funcType) : LgsFunc(funcType->name, funcType->rt, funcType->params) {}
     static bool shouldLoadIRArg(Value* value);
     void setBigObjAttrs(LgsRuntime* runtime, Function& IRFunc) const;
     void swapReturnIfNeeded();

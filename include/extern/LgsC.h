@@ -13,15 +13,13 @@ struct LgsDiagnosticsConsumer final : clang::DiagnosticConsumer {
 
 class LgsC {
 public:
+    LgsErrHandler& errHandler;
     LgsDiagnosticsConsumer dc;
     IntrusiveRefCntPtr<vfs::FileSystem> fs;
 
-    LgsC() {
-        fs = vfs::getRealFileSystem();
-    }
-
+    explicit LgsC(LgsErrHandler& errHandler) : errHandler(errHandler) {}
     void compile(const std::vector<std::string>& files);
-    void parse(vector<LgsStrConst*>& filePaths, LgsErrHandler* errHandler) const;
+    void parse(const vector<LgsStrConst*>& filePaths) const;
     ~LgsC() = default;
 };
 

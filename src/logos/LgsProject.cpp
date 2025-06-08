@@ -72,7 +72,6 @@ void LogosProject::parseEnvFile(path fileEntry) {
     const auto absFilePath = canonical(fileEntry);
     AntlerConverter antlerConverter;
     antlerConverter.errHandler.filePath = absFilePath;
-
     const auto codeText = getFileText(fileEntry);
     antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
