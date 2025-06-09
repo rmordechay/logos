@@ -46,7 +46,6 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsEnumField* enumField);
     explicit LgsSymbol(LgsFunc* func);
     explicit LgsSymbol(LgsGroup* group);
-    LgsSymbol* clone() const;
     Location* getLocation() const;
     void* getPtr() const;
     json asJSON() const;

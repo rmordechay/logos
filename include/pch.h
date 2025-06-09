@@ -43,5 +43,3 @@ using namespace llvm;
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsShort.h"
-#include "types/LgsAny.h"
-#include "types/LgsStr.h"

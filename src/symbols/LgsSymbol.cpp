@@ -19,10 +19,6 @@ LgsSymbol::LgsSymbol(LgsEnumField* enumField): symbolType(ENUM_FIELD), enumField
 LgsSymbol::LgsSymbol(LgsFunc* func): symbolType(FUNC), func(func) {}
 LgsSymbol::LgsSymbol(LgsGroup* group): symbolType(GROUP), group(group) {}
 
-LgsSymbol* LgsSymbol::clone() const {
-    return new LgsSymbol(*this);
-}
-
 void* LgsSymbol::getPtr() const {
     switch (symbolType) {
     case VAR_DEC:

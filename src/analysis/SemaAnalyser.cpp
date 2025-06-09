@@ -517,17 +517,20 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
 
     LgsType* symbolType;
     if (symbol->symbolType == VAR_DEC) {
+        funcCall->callback = new LgsSymbol(symbol->varDec);
         symbolType = symbol->varDec->type;
     } else if (symbol->symbolType == PARAM) {
+        funcCall->callback = new LgsSymbol(symbol->param);
         symbolType = symbol->param->type;
     } else {
         assert(false);
     }
 
-    if (!symbolType->isCallable) return errHandler.handleError(E10046, &funcCall->location, {funcCall->name});
     const auto funcType = symbolType->asFuncType();
+    if (!funcType) {
+        return errHandler.handleError(E10046, &funcCall->location, {funcCall->name});
+    }
     visitAnonymousFunc(funcCall, funcType);
-    funcCall->callback = symbol->clone();
 }
 
 void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {

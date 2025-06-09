@@ -25,10 +25,6 @@ public:
     int returnParamIndex = -1;
     FunctionType* IRType = nullptr;
 
-    LgsFuncType() {
-        isCallable = true;
-    }
-
     Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;

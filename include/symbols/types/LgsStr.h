@@ -1,4 +1,5 @@
 #pragma once
+#include "LgsAny.h"
 #include "funcs/LgsBuiltinFunc.h"
 #include "types/LgsIterable.h"
 

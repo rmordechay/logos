@@ -13,6 +13,7 @@ LgsExpr* LgsArray::getZeroValue() {
     const auto arrExpr = new LgsArrayExpr(baseType);
     arrExpr->arrType.isStatic = isStatic;
     arrExpr->arrType.sizeExpr = sizeExpr;
+    arrExpr->location = location;
     return arrExpr;
 }
 
