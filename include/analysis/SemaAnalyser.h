@@ -70,6 +70,8 @@ public:
     void visitExpr(LgsExpr* expr) override;
     void visitCast(LgsCast* castExpr) override;
     void visitArrayExpr(LgsArrayExpr* array) override;
+    void visitStaticArray(LgsArrayExpr* array);
+    void visitDynamicArray(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap) const override;
     void visitStrConst(LgsStrConst* strConst) const override;
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr) override;
@@ -85,7 +87,6 @@ public:
     void visitInstance(LgsInstance* instance) override;
     void visitIterIndex(LgsIterIndex* iterIndex) override;
     void visitGroup(LgsGroup* group) const;
-    void inferArrayType(LgsArrayExpr* arr, const vector<LgsExpr*>& exprs) const;
 
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);

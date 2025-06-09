@@ -23,6 +23,7 @@ public:
     Location location;
     bool isVoid = false;
     bool isConst = false;
+    bool isInt = false;
     bool isNullable = false;
     bool isPrimitive = false;
     bool isCallable = false;

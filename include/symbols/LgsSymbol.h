@@ -25,7 +25,7 @@ enum LgsSymbolType {
 };
 
 struct LgsSymbol {
-    LgsSymbolType type;
+    LgsSymbolType symbolType;
     LgsVarDec* varDec = nullptr;
     LgsParam* param = nullptr;
     LgsObject* object = nullptr;
@@ -36,7 +36,7 @@ struct LgsSymbol {
     LgsFunc* func = nullptr;
     LgsGroup* group = nullptr;
 
-    explicit LgsSymbol(): type(UNKNOWN) {}
+    explicit LgsSymbol();
     explicit LgsSymbol(LgsParam* param);
     explicit LgsSymbol(LgsVarDec* varDec);
     explicit LgsSymbol(LgsObject* object);

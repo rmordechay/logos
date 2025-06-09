@@ -1,18 +1,16 @@
 #include "types/LgsArray.h"
 #include "exprs/unary/LgsArrayExpr.h"
-#include "exprs/unary/LgsIterIndex.h"
-#include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsVarDec.h"
 
 size_t LgsArray::getSizeBytes() {
     if (isStatic) {
-        return baseType->getSizeBytes() * LgsExpr::getExprConstNumber(sizeExpr);
+        return baseType->getSizeBytes() * getExprConstNumber(sizeExpr);
     }
     return sizeof(void*);
 }
 
 LgsExpr* LgsArray::getZeroValue() {
-    const auto arrExpr = new LgsArrayExpr(baseType->clone());
+    const auto arrExpr = new LgsArrayExpr(baseType);
     arrExpr->arrType.isStatic = isStatic;
     arrExpr->arrType.sizeExpr = sizeExpr;
     return arrExpr;

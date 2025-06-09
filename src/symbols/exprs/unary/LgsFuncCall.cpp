@@ -15,7 +15,7 @@ Value* LgsFuncCall::call(LgsRuntime* runtime) const {
 }
 
 Value* LgsFuncCall::getCallback(LgsRuntime* runtime) const {
-    switch (callback->type) {
+    switch (callback->symbolType) {
     case VAR_DEC:
         return callback->varDec->expr->getIRValue(runtime);
     case PARAM:

@@ -4,10 +4,10 @@
 
 Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {
     if (arrType.isStatic) return createConstArray(runtime);
-    return createDynArray(runtime);
+    return createDynamicArray(runtime);
 }
 
-Value* LgsArrayExpr::createDynArray(LgsRuntime* runtime) {
+Value* LgsArrayExpr::createDynamicArray(LgsRuntime* runtime) {
     auto& builder = runtime->builder;
     const auto elementSize = builder.getInt64(arrType.baseType->getSizeBytes());
     IRValue = builder.CreateAlloca(arrType.getArrStruct(runtime));
@@ -47,4 +47,3 @@ void LgsArrayExpr::free(LgsRuntime* runtime) {
         arrType.free.call(runtime, {this});
     }
 }
-

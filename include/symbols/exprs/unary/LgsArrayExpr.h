@@ -16,7 +16,7 @@ public:
     }
     Value* createIRValue(LgsRuntime* runtime) override;
     Value* createConstArray(LgsRuntime* runtime) const;
-    Value* createDynArray(LgsRuntime* runtime);
+    Value* createDynamicArray(LgsRuntime* runtime);
     void free(LgsRuntime* runtime) override;
     ~LgsArrayExpr() override = default;
 };

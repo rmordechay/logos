@@ -25,14 +25,13 @@ public:
     // TODO free type
     LgsType* type = nullptr;
     bool isNull = false;
+    // TODO removed visitVariable should be inferred from refs
     bool isReturnExpr = false;
     bool isZeroValue = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     void setType(LgsType* type);
     Value* getIRValue(LgsRuntime* runtime);
-    static int getExprConstNumber(LgsExpr* expr);
-    static std::string getExprStr(LgsExpr* baseExpr);
 
     LgsFunc* asFunc();
     LgsVariable* asVariable();

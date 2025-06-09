@@ -157,6 +157,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     } else if (varDec->type) {
         varDec->type = resolveType(varDec->type);
         varDec->expr = varDec->type->getZeroValue();
+        visitExpr(varDec->expr);
     } else if (varDec->expr) {
         visitExpr(varDec->expr);
         varDec->type = varDec->expr->type;
@@ -334,11 +335,43 @@ void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
 }
 
 void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
-    const auto& initialElements = array->initialElements;
-    for (const auto element : initialElements) {
+    for (const auto element : array->initialElements) {
         visitExpr(element);
     }
-    inferArrayType(array, initialElements);
+    if (array->arrType.isStatic) {
+        visitStaticArray(array);
+    } else {
+        visitDynamicArray(array);
+    }
+}
+
+void SemaAnalyser::visitDynamicArray(LgsArrayExpr* array) {
+    const auto& initialElements = array->initialElements;
+    const auto& arrType = array->arrType;
+    if (initialElements.empty()) {
+        if (!arrType.baseType) return errHandler.handleError(E10049, &array->location);
+    } else {
+        array->arrType.baseType = initialElements.front()->type;
+    }
+    const auto sizeExpr = arrType.sizeExpr;
+    if (!sizeExpr) {
+        array->arrType.sizeExpr = new LgsIntConst(initialElements.size());
+    }
+}
+
+void SemaAnalyser::visitStaticArray(LgsArrayExpr* array) {
+    const auto& initialElements = array->initialElements;
+    const auto& arrType = array->arrType;
+    if (initialElements.empty() && !arrType.baseType) {
+        return errHandler.handleError(E10049, &array->location);
+    }
+    if (!array->arrType.baseType) {
+        array->arrType.baseType = initialElements.front()->type;
+    }
+    const auto sizeExpr = arrType.sizeExpr;
+    visitExpr(sizeExpr);
+    if (sizeExpr && sizeExpr->type->isConst && sizeExpr->type->isInt) return;
+    errHandler.handleError(E10048, &array->location);
 }
 
 void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) const {
@@ -353,32 +386,30 @@ void SemaAnalyser::visitStrConst(LgsStrConst* strConst) const {
 void SemaAnalyser::visitVariable(LgsVariable* variable) {
     const auto symbol = getSymbol(variable->name, variable);
     if (!symbol) return;
-    variable->ref = symbol->clone();
-    switch (symbol->type) {
+    variable->ref.symbolType = symbol->symbolType;
+    switch (symbol->symbolType) {
     case VAR_DEC:
+        variable->ref.varDec = symbol->varDec;
         symbol->varDec->refs.push_back(variable);
-        if (symbol->varDec->expr) {
-            symbol->varDec->expr->isReturnExpr = variable->isReturnExpr;
-        }
-        variable->setType(variable->ref->varDec->type);
+        variable->setType(symbol->varDec->type);
         break;
     case PARAM:
+        variable->ref.param = symbol->param;
         symbol->param->refs.push_back(variable);
         variable->setType(symbol->param->type);
         break;
-    case ENUM:
-        variable->setType(symbol->lgsEnum);
-        break;
     case ENUM_FIELD:
+        variable->ref.enumField = symbol->enumField;
         variable->setType(symbol->enumField->type);
         break;
     case FUNC:
+        variable->ref.func = symbol->func;
         variable->setType(&symbol->func->funcType);
         break;
     default:
-        assert(false);
+        break;
     }
-    assert(variable->ref);
+    assert(variable->ref.symbolType != UNKNOWN);
 }
 
 void SemaAnalyser::visitSelection(LgsSelection* selection) {
@@ -425,7 +456,7 @@ void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* c
         return errHandler.handleError(E10005, &childField->location, {childField->getName(), parentType->prettyName()});
     }
     childField->setType(field->type);
-    childField->ref = new LgsSymbol(field->clone());
+    childField->ref = LgsSymbol(field->clone());
     if (!field->isPublic && file->absPath != field->parent->path) {
         errHandler.handleError(E10030, &childField->location, {childField->getName(), field->parent->name});
     }
@@ -434,7 +465,7 @@ void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* c
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
     const auto symbol = getSymbol(instance->name, instance);
     if (!symbol) return;
-    if (symbol->type != OBJECT) {
+    if (symbol->symbolType != OBJECT) {
         return errHandler.handleError(E10022, &instance->location, {instance->name});
     }
     if (symbol->object->isSingleton) {
@@ -473,7 +504,7 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     const auto symbol = getSymbol(funcCall->name, funcCall);
     if (!symbol) return;
 
-    if (symbol->type == FUNC) {
+    if (symbol->symbolType == FUNC) {
         const auto func = symbol->func;
         if (funcCall->equals(&func->funcType)) {
             funcCall->func = func;
@@ -485,9 +516,9 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     }
 
     LgsType* symbolType;
-    if (symbol->type == VAR_DEC) {
+    if (symbol->symbolType == VAR_DEC) {
         symbolType = symbol->varDec->type;
-    } else if (symbol->type == PARAM) {
+    } else if (symbol->symbolType == PARAM) {
         symbolType = symbol->param->type;
     } else {
         assert(false);
@@ -556,13 +587,6 @@ void SemaAnalyser::visitGroup(LgsGroup* group) const {
             group->addMethod(method);
         }
     }
-}
-
-void SemaAnalyser::inferArrayType(LgsArrayExpr* arr, const vector<LgsExpr*>& exprs) const {
-    if (!exprs.empty()) {
-        arr->arrType.baseType = exprs.front()->type;
-    }
-    arr->arrType.sizeExpr = new LgsIntConst(exprs.size());
 }
 
 bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
@@ -694,7 +718,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     const auto symbol = &globals.symbols[typeName];
     delete type;
     LgsType* newType = nullptr;
-    switch (symbol->type) {
+    switch (symbol->symbolType) {
     case ENUM_FIELD:
         symbol->enumField->parent->isNullable = nullable;
         newType = symbol->enumField->parent;

@@ -29,10 +29,10 @@ void LgsAssignment::assignIRIterIndex(LgsRuntime* runtime, LgsIterIndex* iterInd
 void LgsAssignment::assignIRSelection(LgsRuntime* runtime, const LgsSelection* selection, LgsExpr* expr) const {
     const auto beforeLastExpr = selection->exprs[selection->exprs.size() - 2];
     if (const auto var = selection->lastExpr()->asVariable()) {
-        assert(var->ref);
-        switch (var->ref->type) {
+        assert(var->ref.symbolType != UNKNOWN);
+        switch (var->ref.symbolType) {
         case FIELD:
-            var->ref->field->setFieldIRValue(runtime, expr, beforeLastExpr->getIRValue(runtime));
+            var->ref.field->setFieldIRValue(runtime, expr, beforeLastExpr->getIRValue(runtime));
             return;
         case UNKNOWN:
         default:

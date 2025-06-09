@@ -10,6 +10,7 @@ public:
 
     LgsBool() {
         isPrimitive = true;
+        isInt = true;
     }
     string prettyName() const override;
     llvm::Type* getIRType() override;

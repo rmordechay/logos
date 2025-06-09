@@ -8,6 +8,7 @@ public:
 
     LgsInt() {
         isPrimitive = true;
+        isInt = true;
     }
     size_t getSizeBytes() override;
     Type* getIRType() override;

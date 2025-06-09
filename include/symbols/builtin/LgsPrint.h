@@ -11,13 +11,11 @@
 class LgsPrint final : public LgsBuiltinFunc {
 public:
     static constexpr auto name = "print";
-    LgsParam input{&LGS_ANY};
-    LgsParam args{&LGS_ANY};
 
     explicit LgsPrint(): LgsBuiltinFunc(name, &LGS_VOID, "") {
         funcType.isVariadic = true;
         funcType.IRName = "printf";
-        funcType.params = {&input, &args};
+        funcType.params = {LgsParam{&LGS_ANY}, LgsParam{&LGS_ANY}};
     }
 
     Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
@@ -40,6 +38,20 @@ public:
     ~LgsPrint() override = default;
 };
 
+class LgsSizeOf final : public LgsBuiltinFunc {
+public:
+    static constexpr auto name = "sizeof";
+
+    LgsSizeOf(): LgsBuiltinFunc(name, &LGS_LONG, "") {
+        funcType.params = {LgsParam{&LGS_ANY}};
+    }
+
+    Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
+        return runtime->builder.getInt64(args.front()->type->getSizeBytes());
+    }
+};
+
 inline LgsPrint lgsPrint;
+inline LgsSizeOf lgsSizeof;
 
 

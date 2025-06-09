@@ -6,7 +6,7 @@ struct LgsSymbol;
 class LgsVariable :  public LgsUnaryExpr {
 public:
     std::string name;
-    LgsSymbol* ref = nullptr;
+    LgsSymbol ref;
 
     explicit LgsVariable(const std::string& name) : LgsUnaryExpr(nullptr), name(name) {}
     std::string getName() override;

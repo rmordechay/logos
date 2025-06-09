@@ -8,6 +8,7 @@ public:
 
     LgsLong() {
         isPrimitive = true;
+        isInt = true;
     }
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;

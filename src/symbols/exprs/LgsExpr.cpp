@@ -26,41 +26,6 @@ void LgsExpr::setType(LgsType* type) {
     this->type = type;
 }
 
-
-int LgsExpr::getExprConstNumber(LgsExpr* expr) {
-    if (const auto asInt = expr->asIntConst()) {
-        return asInt->value;
-    }
-    if (const auto var = expr->asVariable()) {
-        switch (var->ref->type) {
-        case VAR_DEC:
-            return getExprConstNumber(var->ref->varDec->expr);
-        case FIELD:
-            return getExprConstNumber(var->ref->field->expr);
-        default:
-            break;
-        }
-    }
-    return -1;
-}
-
-string LgsExpr::getExprStr(LgsExpr* baseExpr) {
-    if (const auto strConst = baseExpr->asStrConst()) {
-        return strConst->value;
-    }
-    if (const auto var = baseExpr->asVariable()) {
-        const auto ref = var->ref;
-        switch (ref->type) {
-        case VAR_DEC: {
-            return getExprStr(ref->varDec->expr);
-        }
-        default:
-            break;
-        }
-    }
-    assert(false);
-}
-
 void LgsExpr::free(LgsRuntime* runtime) { assert(false); }
 bool LgsExpr::equals(LgsExpr* other) { assert(false); }
 LgsExpr* LgsExpr::clone() { assert(false); }

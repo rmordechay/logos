@@ -131,6 +131,7 @@ void LogosProject::parseAppFile(path fileEntry) {
 
 void LogosProject::loadGlobals() {
     globals.addSymbol(lgsPrint.name, LgsSymbol(&lgsPrint), &errHandler);
+    globals.addSymbol(lgsSizeof.name, LgsSymbol(&lgsSizeof), &errHandler);
 }
 
 void LogosProject::loadFiles() {

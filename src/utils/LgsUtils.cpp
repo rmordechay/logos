@@ -1,4 +1,6 @@
+#include "exprs/unary/LgsVariable.h"
 #include "logos/LgsProject.h"
+#include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 
 string getFileText(path filePath) {
@@ -11,7 +13,7 @@ string getFileText(path filePath) {
 }
 
 string getFormatString(const vector<LgsExpr*>& args) {
-    auto result = LgsExpr::getExprStr(args[0]);
+    auto result = getExprStr(args[0]);
     auto searchPos = 0;
     for (size_t i = 1; i < args.size(); ++i) {
         const auto pos = result.find(LOGOS_STR_FORMAT_PART, searchPos);
@@ -29,6 +31,41 @@ string removeUnderscores(const string& input) {
     result.erase(remove(result.begin(), result.end(), '_'), result.end());
     return result;
 }
+
+int getExprConstNumber(LgsExpr* expr) {
+    if (const auto asInt = expr->asIntConst()) {
+        return asInt->value;
+    }
+    if (const auto var = expr->asVariable()) {
+        switch (var->ref.symbolType) {
+        case VAR_DEC:
+            return getExprConstNumber(var->ref.varDec->expr);
+        case FIELD:
+            return getExprConstNumber(var->ref.field->expr);
+        default:
+            break;
+        }
+    }
+    return -1;
+}
+
+string getExprStr(LgsExpr* baseExpr) {
+    if (const auto strConst = baseExpr->asStrConst()) {
+        return strConst->value;
+    }
+    if (const auto var = baseExpr->asVariable()) {
+        const auto ref = var->ref;
+        switch (ref.symbolType) {
+        case VAR_DEC: {
+            return getExprStr(ref.varDec->expr);
+        }
+        default:
+            break;
+        }
+    }
+    assert(false);
+}
+
 
 Value* getIRStr(const LgsRuntime* runtime, const string& value) {
     for (auto& globals : runtime->module->globals()) {

@@ -8,22 +8,23 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
-LgsSymbol::LgsSymbol(LgsParam* param): type(PARAM), param(param) {}
-LgsSymbol::LgsSymbol(LgsVarDec* varDec): type(VAR_DEC), varDec(varDec) {}
-LgsSymbol::LgsSymbol(LgsObject* object): type(OBJECT), object(object) {}
-LgsSymbol::LgsSymbol(LgsInterface* interface): type(INTERFACE), interface(interface) {}
-LgsSymbol::LgsSymbol(LgsField* field): type(FIELD), field(field) {}
-LgsSymbol::LgsSymbol(LgsEnum* lgsEnum): type(ENUM), lgsEnum(lgsEnum) {}
-LgsSymbol::LgsSymbol(LgsEnumField* enumField): type(ENUM_FIELD), enumField(enumField) {}
-LgsSymbol::LgsSymbol(LgsFunc* func): type(FUNC), func(func) {}
-LgsSymbol::LgsSymbol(LgsGroup* group): type(GROUP), group(group) {}
+LgsSymbol::LgsSymbol(): symbolType(UNKNOWN) {}
+LgsSymbol::LgsSymbol(LgsParam* param): symbolType(PARAM), param(param) {}
+LgsSymbol::LgsSymbol(LgsVarDec* varDec): symbolType(VAR_DEC), varDec(varDec) {}
+LgsSymbol::LgsSymbol(LgsObject* object): symbolType(OBJECT), object(object) {}
+LgsSymbol::LgsSymbol(LgsInterface* interface): symbolType(INTERFACE), interface(interface) {}
+LgsSymbol::LgsSymbol(LgsField* field): symbolType(FIELD), field(field) {}
+LgsSymbol::LgsSymbol(LgsEnum* lgsEnum): symbolType(ENUM), lgsEnum(lgsEnum) {}
+LgsSymbol::LgsSymbol(LgsEnumField* enumField): symbolType(ENUM_FIELD), enumField(enumField) {}
+LgsSymbol::LgsSymbol(LgsFunc* func): symbolType(FUNC), func(func) {}
+LgsSymbol::LgsSymbol(LgsGroup* group): symbolType(GROUP), group(group) {}
 
 LgsSymbol* LgsSymbol::clone() const {
     return new LgsSymbol(*this);
 }
 
 void* LgsSymbol::getPtr() const {
-    switch (type) {
+    switch (symbolType) {
     case VAR_DEC:
         return varDec;
     case PARAM:
@@ -49,7 +50,7 @@ void* LgsSymbol::getPtr() const {
 }
 
 Location* LgsSymbol::getLocation() const {
-    switch (type) {
+    switch (symbolType) {
     case VAR_DEC:
         return &varDec->location;
     case PARAM:
@@ -76,7 +77,7 @@ Location* LgsSymbol::getLocation() const {
 
 json LgsSymbol::asJSON() const {
     json tree;
-    switch (type) {
+    switch (symbolType) {
     case VAR_DEC:
         tree["type"] = "VAR_DEC";
         break;

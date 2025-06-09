@@ -78,7 +78,7 @@ void LgsSymbolTable::addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler) {
 
 LgsSymbolTable::~LgsSymbolTable() {
     for (const auto& [_, symbol] : symbols) {
-        switch (symbol.type) {
+        switch (symbol.symbolType) {
         case VAR_DEC: delete symbol.varDec; break;
         case PARAM: delete symbol.param; break;
         case OBJECT: delete symbol.object; break;
