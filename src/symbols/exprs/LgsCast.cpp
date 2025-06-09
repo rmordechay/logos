@@ -1,5 +1,5 @@
 #include "exprs/LgsCast.h"
-#include "types/LgsType.h"
+#include "utils/LgsUtils.h"
 
 Value* LgsCast::createIRValue(LgsRuntime* runtime) {
     return toValue->getIRValue(runtime);
@@ -10,7 +10,7 @@ Value* LgsCast::addIR(LgsRuntime* runtime, LgsExpr* other) {
 }
 
 LgsCast::~LgsCast() {
-    delete toType;
+    freeType(toType);
     delete fromValue;
     if (toValue) {
         delete toValue;

@@ -2,6 +2,7 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsUtils.h"
 
 size_t LgsStr::getSizeBytes() {
     return sizeof(void*);
@@ -50,7 +51,7 @@ Value* LgsStr::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
 
 bool LgsStr::equals(LgsType* other) {
     assert(other);
-    if (other->getIRName() == "Any") return true;
+    if (other->getIRName() == LgsAny::name) return true;
     return name == other->getIRName();
 }
 

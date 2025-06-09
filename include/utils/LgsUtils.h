@@ -5,6 +5,7 @@ class LogosProject;
 struct LgsIndex;
 
 inline std::mutex mtx;
+inline TargetMachine* targetMachine = nullptr;
 
 std::string getFileText(path filePath);
 std::string getFormatString(const std::vector<LgsExpr*>& args);
@@ -16,4 +17,5 @@ StructType* getIRStructType(LLVMContext& context, const std::string& name, const
 Module* createIRModule(const std::string& moduleName, LLVMContext& context);
 FunctionCallee getPrintf(LgsRuntime* runtime);
 FunctionCallee getSnprintf(LgsRuntime* runtime);
+TargetMachine* getTargetMachine();
 void freeType(LgsType* type);

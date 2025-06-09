@@ -1,6 +1,7 @@
 #include "types/LgsMap.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsUtils.h"
 
 void LgsMap::setBaseType(const vector<LgsMapPair*>& exprs) {
     if (exprs.empty()) return;

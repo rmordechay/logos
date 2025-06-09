@@ -1,5 +1,6 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
+#include "exprs/unary/constants/LgsLongConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 
 string LgsIntConst::prettyName() {
@@ -13,6 +14,9 @@ Value* LgsIntConst::createIRValue(LgsRuntime* runtime) {
 LgsExpr* LgsIntConst::convertExpr(LgsType* toType) {
     if (toType->asStr()) {
         return new LgsStrConst(to_string(value));
+    }
+    if (toType->asLong()) {
+        return new LgsLongConst(value);
     }
     assert(false);
 }

@@ -1,13 +1,5 @@
 #pragma once
 
-#include <queue>
-#include <thread>
-
-#include <condition_variable>
-#include <functional>
-
-
-
 class ThreadPool {
 public:
     std::mutex mtx;

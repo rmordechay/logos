@@ -3,6 +3,7 @@
 #include "exprs/unary/LgsArrayExpr.h"
 
 #include "stmts/LgsStmtBlock.h"
+#include "utils/LgsUtils.h"
 
 
 void LgsMainFunc::generateIR(LgsRuntime* runtime) {

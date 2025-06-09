@@ -2,6 +2,7 @@
 #include "exprs/LgsExpr.h"
 #include "logos/LgsRuntime.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsUtils.h"
 
 Type* LgsIterable::getIRType() {
     if (IRType) return IRType;

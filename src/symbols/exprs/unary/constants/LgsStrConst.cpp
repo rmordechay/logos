@@ -2,6 +2,7 @@
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
+#include "utils/LgsUtils.h"
 
 Value* LgsStrConst::createIRValue(LgsRuntime* runtime) {
     return getIRStr(runtime, value);

@@ -1,5 +1,6 @@
 #pragma once
-
+#include "pch.h"
+class LgsLong;
 class LgsHashMap;
 class LgsVTable;
 class LgsGroup;
@@ -42,6 +43,7 @@ public:
     LgsBool* asBool();
     LgsStr* asStr();
     LgsInt* asInt();
+    LgsLong* asLong();
     LgsMap* asMap();
     LgsObject* asObject();
     LgsInterface* asInterface();

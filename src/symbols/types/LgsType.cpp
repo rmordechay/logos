@@ -75,6 +75,7 @@ LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
 LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }
 LgsStr* LgsType::asStr() { return dynamic_cast<LgsStr*>(this); }
 LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }
+LgsLong* LgsType::asLong() { return dynamic_cast<LgsLong*>(this); }
 LgsMap* LgsType::asMap() { return dynamic_cast<LgsMap*>(this); }
 bool LgsType::isUnknown() { return dynamic_cast<LgsUnknownType*>(this); }
 

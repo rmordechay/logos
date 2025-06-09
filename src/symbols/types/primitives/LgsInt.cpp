@@ -1,6 +1,8 @@
 
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsIntConst.h"
+#include "types/LgsAny.h"
+#include "types/primitives/LgsSize.h"
 
 size_t LgsInt::getSizeBytes() {
     return sizeof(int);
@@ -28,7 +30,8 @@ LgsType* LgsInt::inferBinaryType(LgsType* other) {
 }
 
 bool LgsInt::equals(LgsType* other) {
-    if (other->getIRName() == "Any") return true;
+    if (other->getIRName() == LgsAny::name) return true;
+    if (other->getIRName() == LgsSize::name) return true;
     return name == other->getIRName();
 }
 

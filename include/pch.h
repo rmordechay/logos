@@ -9,6 +9,9 @@
 #include <unistd.h>
 #include <thread>
 #include <filesystem>
+#include <queue>
+#include <condition_variable>
+#include <functional>
 
 #include <Token.h>
 #include <json/json.hpp>
@@ -33,13 +36,10 @@ using namespace llvm;
 #include "data/LgsWarnings.h"
 #include "data/LgsDefinitions.h"
 #include "logos/LgsErrHandler.h"
-#include "utils/LgsUtils.h"
+#include "logos/LgsConfig.h"
 #include "utils/ThreadPool.h"
 #include "parser/LogosParser.h"
 #include "parser/LogosLexer.h"
-#include "types/primitives/LgsBool.h"
-#include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsLong.h"
-#include "types/primitives/LgsShort.h"

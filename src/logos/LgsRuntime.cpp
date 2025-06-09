@@ -5,6 +5,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
+#include "utils/LgsUtils.h"
 
 
 void LgsRuntime::initRuntime() {

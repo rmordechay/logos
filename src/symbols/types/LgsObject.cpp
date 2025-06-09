@@ -4,6 +4,7 @@
 #include "stmts/LgsField.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
+#include "utils/LgsUtils.h"
 
 string LgsObject::prettyName() const {
     return name;

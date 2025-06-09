@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsConstExpr.h"
+#include "types/primitives/LgsChar.h"
 
 
 class LgsCharConst final : public LgsConstExpr {

@@ -24,7 +24,6 @@ string LgsAny::prettyName() const {
 }
 
 bool LgsAny::equals(LgsType* other) {
-    // TODO should everything equals Any?
     return true;
 }
 

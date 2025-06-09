@@ -1,6 +1,7 @@
 #include "types/LgsArray.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsUtils.h"
 
 size_t LgsArray::getSizeBytes() {
     if (isStatic) {

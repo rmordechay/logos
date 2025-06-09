@@ -8,7 +8,6 @@
 #include "exprs/LgsCast.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
-
 #include "exprs/unary/LgsArrayExpr.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
@@ -31,6 +30,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsArray.h"
 #include "types/LgsGroup.h"
+#include "utils/LgsUtils.h"
 
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsForLoop.h>
@@ -654,7 +654,7 @@ void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
 }
 
 void SemaAnalyser::validateExprType(LgsValue* value) {
-    const LgsExpr* expr = nullptr;
+    LgsExpr* expr = nullptr;
     LgsType* type = nullptr;
     if (const auto varDec = dynamic_cast<LgsVarDec*>(value)) {
         expr = varDec->expr;
@@ -684,20 +684,20 @@ void SemaAnalyser::validateExprType(LgsValue* value) {
         return;
     }
 
-    if (type && expr->type &&  !expr->type->equals(type)) {
+    if (!type || !expr->type || !expr->type->equals(type)) {
         if (dynamic_cast<LgsParam*>(value)) {
             return errHandler.handleError(E10050, &expr->location, {type->prettyName(), expr->type->prettyName()});
         }
         return errHandler.handleError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
     }
 
-    freeType(type);
+    freeType(expr->type);
     if (const auto varDec = dynamic_cast<LgsVarDec*>(value)) {
-        varDec->type = expr->type;
+        expr->type = varDec->type;
     } else if (const auto field = dynamic_cast<LgsField*>(value)) {
-        field->type = expr->type;
+        expr->type = field->type;
     } else if (const auto param = dynamic_cast<LgsParam*>(value)) {
-        param->type = expr->type;
+        expr->type = param->type;
     }
 }
 

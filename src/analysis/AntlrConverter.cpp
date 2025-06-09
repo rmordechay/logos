@@ -46,6 +46,9 @@
 #include "types/LgsGroup.h"
 #include "types/LgsMap.h"
 #include "types/LgsUnknownType.h"
+#include "types/primitives/LgsShort.h"
+#include "types/primitives/LgsSize.h"
+#include "utils/LgsUtils.h"
 
 
 #include <loops/LgsForeachLoop.h>
@@ -839,6 +842,8 @@ LgsType* AntlerConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken)
         type = &LGS_SHORT;
     } else if (typeText == LgsLong::name) {
         type = &LGS_LONG;
+    } else if (typeText == LgsSize::name) {
+        type = &LGS_SIZE;
     } else if (typeText == LgsFloat::name) {
         type = &LGS_FLOAT;
     } else if (typeText == LgsVoid::name) {
@@ -850,18 +855,6 @@ LgsType* AntlerConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken)
     }
     type->setLocation(typeToken->getSymbol());
     return type;
-}
-
-bool AntlerConverter::isTypePrimitive(antlr4::tree::TerminalNode* typeToken, const antlr4::ParserRuleContext* ctx) const {
-    const auto typeText = typeToken->getText();
-    if (typeText == LgsInt::name) return false;
-    if (typeText == LgsFloat::name) return false;
-    if (typeText == LgsChar::name) return false;
-    if (typeText == LgsAny::name) return false;
-    if (typeText == LgsBool::name) return false;
-    if (typeText == LgsStr::name) return false;
-    if (typeText == LgsVoid::name) return false;
-    return true;
 }
 
 LgsType* AntlerConverter::getFuncReturnType(LogosParser::TypeContext* ctx) {

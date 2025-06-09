@@ -1,8 +1,6 @@
-
-
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsShortConst.h"
-
+#include "types/LgsAny.h"
 
 size_t LgsShort::getSizeBytes() {
     return sizeof(short);
@@ -26,12 +24,11 @@ LgsExpr* LgsShort::getZeroValue() {
 }
 
 LgsType* LgsShort::inferBinaryType(LgsType* other) {
-    return this;
+    assert(false);
 }
 
 bool LgsShort::equals(LgsType* other) {
-    assert(other);
-    if (other->getIRName() == "Any") return true;
+    if (other->getIRName() == LgsAny::name) return true;
     return name == other->getIRName();
 }
 

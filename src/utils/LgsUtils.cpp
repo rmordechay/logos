@@ -1,3 +1,4 @@
+#include "utils/LgsUtils.h"
 #include "exprs/unary/LgsVariable.h"
 #include "logos/LgsProject.h"
 #include "stmts/LgsField.h"
@@ -89,13 +90,9 @@ StructType* getIRStructType(LLVMContext& context, const string& name, const vect
 }
 
 Module* createIRModule(const string& moduleName, LLVMContext& context) {
-    const auto targetTriple = sys::getDefaultTargetTriple();
-    string error;
-    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    const auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), nullopt);
     const auto module = new Module(moduleName, context);
-    module->setTargetTriple(targetTriple);
-    module->setDataLayout(targetMachine->createDataLayout());
+    module->setTargetTriple(sys::getDefaultTargetTriple());
+    module->setDataLayout(getTargetMachine()->createDataLayout());
     return module;
 }
 
@@ -109,7 +106,18 @@ FunctionCallee getSnprintf(LgsRuntime* runtime) {
     return runtime->module->getOrInsertFunction("snprintf", printfType);
 }
 
+TargetMachine* getTargetMachine() {
+    if (targetMachine) return targetMachine;
+    const auto targetTriple = sys::getDefaultTargetTriple();
+    string error;
+    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    lock_guard lock(mtx);
+    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), nullopt);
+    return targetMachine;
+}
+
 void freeType(LgsType* type) {
+    if (!type) return;
     if (type->isPrimitive || type->isBuiltin || type->asArray() || type->asMap()) return;
     delete type;
 }

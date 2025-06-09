@@ -1,6 +1,7 @@
 #include "files/LgsObjectFile.h"
 
 #include "logos/LgsProject.h"
+#include "utils/LgsUtils.h"
 
 Module* LgsObjectFile::generateIR(LogosProject& project) {
     LgsRuntime runtime;

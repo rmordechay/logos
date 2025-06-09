@@ -1,13 +1,12 @@
-
-
 #include "logos/LgsRuntime.h"
+#include "types/LgsAny.h"
 
 string LgsLong::prettyName() const {
     return name;
 }
 
 bool LgsLong::equals(LgsType* other) {
-    if (other->getIRName() == "Any") return true;
+    if (other->getIRName() == LgsAny::name) return true;
     return name == other->getIRName();
 }
 

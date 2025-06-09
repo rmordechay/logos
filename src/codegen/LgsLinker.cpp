@@ -1,6 +1,8 @@
 #include "codegen/LgsLinker.h"
 #include "logos/Logos.h"
 #include "logos/Platform.h"
+#include "utils/LgsUtils.h"
+
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/IRReader/IRReader.h>
@@ -29,11 +31,7 @@ bool LgsLinker::generateObjFile(Module* module, const string& path) const {
     error_code ec;
     legacy::PassManager pass;
     raw_fd_ostream outputStream(path, ec, sys::fs::OF_None);
-    string error;
-    const auto targetTriple = sys::getDefaultTargetTriple();
-    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    const auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
-    const auto addedPassFailed = targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
+    const auto addedPassFailed = getTargetMachine()->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
     if (addedPassFailed) {
         cerr << ec.message() << endl;
         return false;

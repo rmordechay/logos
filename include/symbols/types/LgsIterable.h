@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsType.h"
 
+class LgsRuntime;
 class LgsVarDec;
 struct LgsIndex;
 struct CodegenMetadata;

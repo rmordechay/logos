@@ -3,6 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsUtils.h"
 
 
 Value* LgsFuncCall::call(LgsRuntime* runtime) const {

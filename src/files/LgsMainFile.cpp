@@ -1,5 +1,6 @@
 #include "files/LgsMainFile.h"
 #include "logos/LgsProject.h"
+#include "utils/LgsUtils.h"
 
 Module* LgsMainFile::generateIR(LogosProject& project) {
     LgsRuntime runtime;
