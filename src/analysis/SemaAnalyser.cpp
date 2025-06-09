@@ -691,7 +691,6 @@ void SemaAnalyser::validateExprType(LgsValue* value) {
         return errHandler.handleError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
     }
 
-    if (type->isPrimitive) return;
     freeType(type);
     if (const auto varDec = dynamic_cast<LgsVarDec*>(value)) {
         varDec->type = expr->type;

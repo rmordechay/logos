@@ -26,6 +26,7 @@ public:
     bool isInt = false;
     bool isNullable = false;
     bool isPrimitive = false;
+    bool isBuiltin = false;
     Type* IRType = nullptr;
     LgsHashMap* vtable = nullptr;
     map<string, LgsField*> fields;

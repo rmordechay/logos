@@ -110,6 +110,6 @@ FunctionCallee getSnprintf(LgsRuntime* runtime) {
 }
 
 void freeType(LgsType* type) {
-    if (type->isPrimitive || type->asArray() || type->asMap()) return;
+    if (type->isPrimitive || type->isBuiltin || type->asArray() || type->asMap()) return;
     delete type;
 }

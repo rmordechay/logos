@@ -16,7 +16,6 @@ public:
     bool isStatic = false;
     bool isPublic = false;
     bool isVirtual = false;
-    bool isBuiltin = false;
     bool isVariadic = false;
     bool isAnonymous = false;
     bool isRvBig = false;
