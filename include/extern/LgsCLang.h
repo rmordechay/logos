@@ -3,25 +3,21 @@
 #include <clang/Basic/Diagnostic.h>
 #include <clang/Frontend/CompilerInstance.h>
 
-using namespace llvm;
-
 struct LgsDiagnosticsConsumer final : clang::DiagnosticConsumer {
-    std::string message;
+    string message;
     raw_string_ostream os{message};
     void HandleDiagnostic(clang::DiagnosticsEngine::Level diagLevel, const clang::Diagnostic& info) override;
 };
 
-class LgsC {
+class LgsCLang {
 public:
     LgsErrHandler& errHandler;
     LgsDiagnosticsConsumer dc;
     IntrusiveRefCntPtr<vfs::FileSystem> fs;
 
-    explicit LgsC(LgsErrHandler& errHandler) : errHandler(errHandler) {}
-    void compile(const std::vector<std::string>& files);
+    explicit LgsCLang(LgsErrHandler& errHandler) : errHandler(errHandler) {}
+    void compile(const vector<string>& files);
+    void getClibRoot() const;
     void parse(const vector<LgsStrConst*>& filePaths) const;
-    ~LgsC() = default;
+    ~LgsCLang() = default;
 };
-
-
-

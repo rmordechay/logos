@@ -1,7 +1,6 @@
 #pragma once
 #include "LgsFunc.h"
-
-
+#include "types/primitives/LgsInt.h"
 
 
 class LgsMainFunc final : public LgsFunc {

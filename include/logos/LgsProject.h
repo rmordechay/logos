@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsActiveEnv.h"
-#include "extern/LgsC.h"
+#include "extern/LgsCLang.h"
 #include "LgsErrHandler.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
@@ -40,6 +40,7 @@ public:
     void loadEnvFiles();
     void setupActiveEnv();
     bool validateProject();
+    void setPlatform(const string& inputFile, const string& outputFile) const;
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
     void parseSrcFile(path entry);
     void parseEnvFile(path fileEntry);

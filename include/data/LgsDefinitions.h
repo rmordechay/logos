@@ -33,7 +33,7 @@
     LLD_HAS_DRIVER(elf);
     #define OS_NAME "Linux"
     #define LINKER "ld"
-    #define LIB_ROOT "/usr/lib/aarch64-linux-gnu/"
+    #define CLIB_ROOT "/usr/lib/aarch64-linux-gnu/"
     #define PLATFORM_VERSION "15.0"
     #define LINK_FUNC lld::elf::link
     #define LINKER_OPTS { \
@@ -49,13 +49,13 @@
     LLD_HAS_DRIVER(macho);
     #define OS_NAME "macOS"
     #define LINKER "ld.lld"
-    #define LIB_ROOT "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+    #define CLIB_ROOT "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
     #define PLATFORM_VERSION "15.0"
     #define LINK_FUNC lld::macho::link
     #define LINKER_OPTS { \
         LINKER, \
         "-lSystem", \
-        "-syslibroot", LIB_ROOT, \
+        "-syslibroot", CLIB_ROOT, \
         "../stdlib/lgslib.a", \
         "-platform_version", OS_NAME, PLATFORM_VERSION, PLATFORM_VERSION, \
         "-arch", ARCH_NAME, \
@@ -64,7 +64,7 @@
     LLD_HAS_DRIVER(coff);
     #define OS_NAME "Win"
     #define LINKER ""
-    #define LIB_ROOT ""
+    #define CLIB_ROOT ""
     #define PLATFORM_VERSION ""
     #define LINK_FUNC lld::coff::link
 #endif

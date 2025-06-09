@@ -1,3 +1,5 @@
+#include "types/primitives/LgsLong.h"
+
 #include "logos/LgsRuntime.h"
 #include "types/LgsAny.h"
 

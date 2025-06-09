@@ -15,6 +15,7 @@ extern char **environ;
 
 bool LogosProject::loadProject() {
     if (!validateProject()) return false;
+    setPlatform(paths.objFilePath, paths.execFilePath);
     // setupActiveEnv();
     if (!errHandler.successful) return false;
     loadFiles();
@@ -36,6 +37,22 @@ bool LogosProject::validateProject() {
     return true;
 }
 
+void LogosProject::setPlatform(const string& inputFile, const string& outputFile) const {
+    platform.inputFile = inputFile;
+    platform.outputFile = outputFile;
+    platform.osName = OS_NAME;
+    platform.linker = LINKER;
+    platform.clibRoot = CLIB_ROOT;
+    platform.platformVersion = PLATFORM_VERSION;
+    platform.arch = ARCH_NAME;
+    platform.linkerOpts = LINKER_OPTS;
+    platform.linkerOpts.push_back(platform.inputFile.c_str());
+    platform.linkerOpts.push_back("-o");
+    platform.linkerOpts.push_back(platform.outputFile.c_str());
+    platform.link = LINK_FUNC;
+}
+
+
 void LogosProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
     for (const auto& entry : directory_iterator(path)) {
         if (isLogosFile(entry)) {
@@ -53,14 +70,20 @@ void LogosProject::parseSrcFile(path entry) {
     AntlerConverter antlerConverter;
     antlerConverter.errHandler.filePath = absFilePath;
     const auto codeText = getFileText(entry);
-    antlr4::ANTLRInputStream input(codeText);
+    ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
+    CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    const auto file = antlerConverter.getLogosFile(parser.logosFile(), absFilePath);
-    lock_guard lock(mtx);
-    files.emplace_back(file);
-    errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
+    const auto lgsFile = parser.logosFile();
+    if (parser.getNumberOfSyntaxErrors() == 0) {
+        const auto file = antlerConverter.getLogosFile(lgsFile, absFilePath);
+        lock_guard lock(mtx);
+        files.emplace_back(file);
+        errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
+    } else {
+        lock_guard lock(mtx);
+        errHandler.setUnsuccessful();
+    }
 }
 
 void LogosProject::parseEnvFile(path fileEntry) {
@@ -68,9 +91,9 @@ void LogosProject::parseEnvFile(path fileEntry) {
     AntlerConverter antlerConverter;
     antlerConverter.errHandler.filePath = absFilePath;
     const auto codeText = getFileText(fileEntry);
-    antlr4::ANTLRInputStream input(codeText);
+    ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
+    CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
     lock_guard lock(mtx);
@@ -110,9 +133,9 @@ void LogosProject::parseAppFile(path fileEntry) {
     antlerConverter.errHandler.filePath = absFilePath;
 
     auto codeText = getFileText(fileEntry);
-    antlr4::ANTLRInputStream input(codeText);
+    ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
+    CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
 
     appFile = antlerConverter.getAppFile(parser.logosAppFile());

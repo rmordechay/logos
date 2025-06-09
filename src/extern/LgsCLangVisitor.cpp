@@ -1,16 +1,14 @@
-#include "extern/LgsCInterface.h"
+#include "extern/LgsCLangVisitor.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
 #include "types/LgsStr.h"
+#include "types/primitives/LgsFloat.h"
+#include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsShort.h"
-
-
 #include "types/primitives/LgsVoid.h"
 
-
-
-bool LgsCVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
+bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     const auto name = func->getNameAsString();
     const auto returnType = func->getReturnType();
     const auto lgsType = mapCType(returnType);
@@ -24,7 +22,7 @@ bool LgsCVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     return true;
 }
 
-bool LgsCVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
+bool LgsCLangVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
     if (!isValid(record->getLocation())) return true;
     if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
     const auto name = record->getNameAsString();
@@ -35,7 +33,7 @@ bool LgsCVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
     return true;
 }
 
-LgsType* LgsCVisitor::mapCType(const clang::QualType type) {
+LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
     if (isConstCharPointer(type)) {
         return new LgsStr();
     }
@@ -96,7 +94,7 @@ LgsType* LgsCVisitor::mapCType(const clang::QualType type) {
     assert(false);
 }
 
-LgsObject* LgsCVisitor::mapCRecord(const clang::RecordDecl* record) {
+LgsObject* LgsCLangVisitor::mapCRecord(const clang::RecordDecl* record) {
     const auto name = record->getNameAsString();
     auto* obj = new LgsObject(name);
     for (const clang::FieldDecl* field : record->fields()) {
@@ -109,7 +107,7 @@ LgsObject* LgsCVisitor::mapCRecord(const clang::RecordDecl* record) {
     return obj;
 }
 
-LgsType* LgsCVisitor::mapCStruct(const clang::QualType type) {
+LgsType* LgsCLangVisitor::mapCStruct(const clang::QualType type) {
     const auto recordType = type->getAsStructureType();
     const auto decl = recordType->getDecl();
     auto name = decl->getNameAsString();
@@ -123,7 +121,7 @@ LgsType* LgsCVisitor::mapCStruct(const clang::QualType type) {
     return obj;
 }
 
-LgsType* LgsCVisitor::mapCFunc(const clang::QualType type) {
+LgsType* LgsCLangVisitor::mapCFunc(const clang::QualType type) {
     const auto lgsFuncType = new LgsFuncType();
     const auto cFuncType = type->getAs<clang::FunctionProtoType>();
     lgsFuncType->rt = mapCType(cFuncType->getReturnType());
@@ -134,7 +132,7 @@ LgsType* LgsCVisitor::mapCFunc(const clang::QualType type) {
     return lgsFuncType;
 }
 
-LgsType* LgsCVisitor::mapCArray(const clang::QualType type) {
+LgsType* LgsCLangVisitor::mapCArray(const clang::QualType type) {
     const auto arrayType = cast<clang::ConstantArrayType>(type.getTypePtr());
     const auto baseType = mapCType(arrayType->getElementType());
     const auto size = arrayType->getSize().getZExtValue();
@@ -144,12 +142,12 @@ LgsType* LgsCVisitor::mapCArray(const clang::QualType type) {
     return arr;
 }
 
-bool LgsCVisitor::isConstCharPointer(const clang::QualType qt) const {
+bool LgsCLangVisitor::isConstCharPointer(const clang::QualType qt) const {
     if (!qt->isPointerType()) return false;
     const auto pointeeType = qt->getPointeeType();
     return pointeeType.isConstQualified() && pointeeType->isCharType();
 }
 
-bool LgsCVisitor::isValid(const clang::SourceLocation loc) const {
+bool LgsCLangVisitor::isValid(const clang::SourceLocation loc) const {
     return context->getSourceManager().isWrittenInMainFile(loc);
 }

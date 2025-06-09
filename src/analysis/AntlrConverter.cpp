@@ -33,7 +33,7 @@
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/constants/LgsLongConst.h"
-#include "extern/LgsC.h"
+#include "extern/LgsCLang.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "funcs/LgsMainFunc.h"
@@ -76,8 +76,8 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
         }
     }
     if (!file->externFiles.empty()) {
-        const LgsC lgsC(errHandler);
-        lgsC.parse(file->externFiles);
+        const LgsCLang lgsClang(errHandler);
+        lgsClang.parse(file->externFiles);
     }
     file->absPath = filePath;
     file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
@@ -481,17 +481,17 @@ LgsForLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext*
 }
 
 LgsForLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx) {
-    const auto startExpr = getExpr(ctx->iterableRange->start);
+    auto startExpr = getExpr(ctx->iterableRange->start);
+    if (!startExpr) {
+        startExpr = LGS_INT.getZeroValue();
+    }
     const auto endExpr = getExpr(ctx->iterableRange->end);
     const auto rangeLoop = new LgsRangeLoop(startExpr, endExpr);
-    // TODO add error for range loop size greater than 1
-    for (const auto variable : ctx->VARIABLE()) {
-        const auto loopVarName = variable->getText();
-        auto varDec = new LgsVarDec(loopVarName);
-        varDec->type = &LGS_INT;
-        varDec->expr = LGS_INT.getZeroValue();
-        rangeLoop->loopVars.emplace_back(varDec);
-    }
+    const auto loopVarName = ctx->VARIABLE().front()->getText();
+    auto varDec = new LgsVarDec(loopVarName);
+    varDec->type = &LGS_INT;
+    varDec->expr = LGS_INT.getZeroValue();
+    rangeLoop->loopVars.emplace_back(varDec);
     return rangeLoop;
 }
 

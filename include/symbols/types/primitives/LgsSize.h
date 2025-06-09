@@ -10,13 +10,13 @@ public:
         isInt = true;
     }
     size_t getSizeBytes() override;
-    llvm::Type* getIRType() override;
-    std::string getIRName() override;
-    std::string prettyName() const override;
+    Type* getIRType() override;
+    string getIRName() override;
+    string prettyName() const override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) override;
-    std::string getStrFormatPart() const override;
+    string getStrFormatPart() const override;
     LgsType* clone() override;
     ~LgsSize() override = default;
 };

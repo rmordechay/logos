@@ -151,7 +151,7 @@ pattern:
     ;
 
 loopStatement:
-        FOR VARIABLE (COMMA VARIABLE)* COMMA? IN iterableRange=range statementsBlock
+        FOR VARIABLE COMMA? IN iterableRange=range statementsBlock
     |   FOR VARIABLE (COMMA VARIABLE)* COMMA? IN iterableExpr=unaryExpr statementsBlock
     |   FOR VARIABLE? statementsBlock
     ;

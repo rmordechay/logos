@@ -1,5 +1,5 @@
 #pragma once
-#include "extern/LgsC.h"
+#include "extern/LgsCLang.h"
 #include <filesystem>
 #include "LgsProject.h"
 

@@ -1,7 +1,7 @@
-#include "extern/LgsC.h"
+#include "extern/LgsCLang.h"
 
 #include "data/LgsErrors.h"
-#include "extern/LgsCInterface.h"
+#include "extern/LgsCLangVisitor.h"
 #include "logos/Platform.h"
 #include "utils/LgsUtils.h"
 
@@ -17,32 +17,39 @@
 #include <clang/Tooling/Tooling.h>
 
 using namespace clang;
+using namespace clang::driver;
 
-void LgsC::parse(const vector<LgsStrConst*>& filePaths) const {
+void LgsCLang::getClibRoot() const {
+    const IntrusiveRefCntPtr diagOpts = new DiagnosticOptions();
+    const auto diags = new DiagnosticsEngine(new DiagnosticIDs(), diagOpts.get(), new DiagnosticConsumer());
+    const auto clangBinary = "clang";
+    Driver driver(clangBinary, sys::getDefaultTargetTriple(), *diags);
+    const char* args[] = {clangBinary, "-x", "c", "-"};
+    const auto compilation = driver.BuildCompilation(ArrayRef(args));
+    const auto& toolChain = compilation->getDefaultToolChain();
+}
+
+void LgsCLang::parse(const vector<LgsStrConst*>& filePaths) const {
     for (const auto filePath : filePaths) {
         auto path = filePath->value;
         string code;
-        if (path == "stdio.h") {
-            const auto p = "/Users/r.mordechay/Desktop/Programming/logos/stdio.h";
-            code = getFileText(p);
+        auto cLibPath = platform.clibRoot / "usr/include" / path;
+        if (exists(cLibPath)) {
+            code = getFileText(cLibPath);
         } else {
-            code = getFileText(path);
+            assert(false);
         }
         if (code.empty()) {
             errHandler.handleError(E10047, &filePath->location, {path});
             continue;
         }
-        runToolOnCodeWithArgs(std::make_unique<LgsCFrontendAction>(errHandler), code, {"-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"});
+        runToolOnCodeWithArgs(std::make_unique<LgsCLangFeAction>(errHandler), code, {"-isysroot", platform.clibRoot});
     }
 }
 
-void LgsC::compile(const vector<string>& files) {
+void LgsCLang::compile(const vector<string>& files) {
     if (files.empty()) return;
-    vector<string> argStrings{
-        "clang",
-        "-c",
-        "-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
-    };
+    vector<string> argStrings{"clang", "-c", "-isysroot", platform.clibRoot};
     for (const auto& file : files) {
         argStrings.push_back(file);
     }

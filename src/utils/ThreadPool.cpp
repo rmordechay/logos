@@ -1,8 +1,9 @@
 #include "utils/ThreadPool.h"
+#include "logos/LgsConfig.h"
 
 void ThreadPool::start()
 {
-    for(size_t i = 0; i < threadsNumber; ++i) {
+    for(size_t i = 0; i < WORKERS_NUMBER; ++i) {
         workers.emplace_back([this] {
             while(true) {
                 function<void()> task;

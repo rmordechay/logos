@@ -30,16 +30,13 @@ using namespace std;
 using namespace filesystem;
 using namespace nlohmann;
 using namespace llvm;
+using namespace antlr4;
 
 #include "LgsLocation.h"
 #include "data/LgsErrors.h"
 #include "data/LgsWarnings.h"
 #include "data/LgsDefinitions.h"
 #include "logos/LgsErrHandler.h"
-#include "logos/LgsConfig.h"
 #include "utils/ThreadPool.h"
 #include "parser/LogosParser.h"
 #include "parser/LogosLexer.h"
-#include "types/primitives/LgsFloat.h"
-#include "types/primitives/LgsInt.h"
-#include "types/primitives/LgsLong.h"

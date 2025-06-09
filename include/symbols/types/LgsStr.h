@@ -3,6 +3,7 @@
 #include "funcs/LgsBuiltinFunc.h"
 #include "primitives/LgsBool.h"
 #include "primitives/LgsChar.h"
+#include "primitives/LgsLong.h"
 #include "types/LgsIterable.h"
 
 class LgsStrFormatFunc final : public LgsBuiltinFunc {

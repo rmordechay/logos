@@ -15,11 +15,11 @@ struct LgsPaths {
 struct Platform {
     string osName;
     string linker;
-    string libRoot;
     string arch;
     string platformVersion;
-    string inputFile;
-    string outputFile;
+    path clibRoot;
+    path inputFile;
+    path outputFile;
     vector<const char*> linkerOpts;
     bool (*link)(ArrayRef<const char*>, raw_ostream&, raw_ostream&, bool, bool);
 };

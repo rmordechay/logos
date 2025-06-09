@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsConstExpr.h"
+#include "types/primitives/LgsFloat.h"
 
 
 class LgsFloatConst final : public LgsConstExpr {

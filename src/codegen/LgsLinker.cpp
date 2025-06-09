@@ -10,7 +10,6 @@
 #include <llvm/IR/LegacyPassManager.h>
 
 bool LgsLinker::link(LogosProject& project) const {
-    setPlatform(paths.objFilePath, paths.execFilePath);
     Module* mainModule = project.IRModules.find(LOGOS_MAIN_FILE_NAME)->second;
     assert(mainModule);
     Linker linker(*mainModule);
@@ -46,19 +45,4 @@ bool LgsLinker::generateObjFile(Module* module, const string& path) const {
     outputStream.flush();
     outputStream.close();
     return true;
-}
-
-void LgsLinker::setPlatform(const string& inputFile, const string& outputFile) const {
-    platform.inputFile = inputFile;
-    platform.outputFile = outputFile;
-    platform.osName = OS_NAME;
-    platform.linker = LINKER;
-    platform.libRoot = LIB_ROOT;
-    platform.platformVersion = PLATFORM_VERSION;
-    platform.arch = ARCH_NAME;
-    platform.linkerOpts = LINKER_OPTS;
-    platform.linkerOpts.push_back(platform.inputFile.c_str());
-    platform.linkerOpts.push_back("-o");
-    platform.linkerOpts.push_back(platform.outputFile.c_str());
-    platform.link = LINK_FUNC;
 }
