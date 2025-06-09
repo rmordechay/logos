@@ -1,5 +1,6 @@
 #include "extern/LgsCLangVisitor.h"
 #include "exprs/unary/constants/LgsIntConst.h"
+#include "files/LgsFile.h"
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
 #include "types/LgsStr.h"
@@ -18,7 +19,7 @@ bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
         const auto lgsParam = LgsParam(mapCType(paramType));
         funcImpl->funcType.params.push_back(lgsParam);
     }
-    globals.addSymbol(name, LgsSymbol(funcImpl), &errHandler);
+    lgsFile.symbolTable.addSymbol(name, LgsSymbol(funcImpl), &errHandler);
     return true;
 }
 
@@ -26,10 +27,10 @@ bool LgsCLangVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
     if (!isValid(record->getLocation())) return true;
     if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
     const auto name = record->getNameAsString();
-    const auto objSymbol = globals.getSymbol(name);
+    const auto objSymbol = lgsFile.symbolTable.getSymbol(name);
     if (objSymbol) return true;
     const auto obj = mapCRecord(record);
-    globals.addSymbol(name, LgsSymbol(obj), &errHandler);
+    lgsFile.symbolTable.addSymbol(name, LgsSymbol(obj), &errHandler);
     return true;
 }
 
@@ -113,10 +114,10 @@ LgsType* LgsCLangVisitor::mapCStruct(const clang::QualType type) {
     if (name == "") {
         name = decl->getQualifiedNameAsString();
     }
-    const auto objSymbol = globals.getSymbol(name);
+    const auto objSymbol = lgsFile.symbolTable.getSymbol(name);
     if (objSymbol) return objSymbol->object;
     const auto obj = mapCRecord(decl);
-    globals.addSymbol(name, LgsSymbol(obj), &errHandler);
+    lgsFile.symbolTable.addSymbol(name, LgsSymbol(obj), &errHandler);
     return obj;
 }
 

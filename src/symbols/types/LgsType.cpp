@@ -1,5 +1,4 @@
 #include "stmts/LgsField.h"
-
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsArray.h"
@@ -7,30 +6,8 @@
 #include "types/LgsMap.h"
 #include "types/LgsUnknownType.h"
 
-
 bool LgsType::equals(LgsType& other) {
     return getIRName() == other.getIRName();
-}
-
-size_t LgsType::getSizeBytes() {
-    assert(false);
-}
-
-void LgsType::setVTable() {
-    assert(!vtable);
-    vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
-}
-
-json LgsType::asJSON() const {
-    assert(false);
-}
-
-string LgsType::getStrFormatPart() const {
-    assert(false);
-}
-
-LgsType* LgsType::clone() {
-    assert(false);
 }
 
 LgsField* LgsType::getField(const string& name) {
@@ -61,10 +38,19 @@ LgsFunc* LgsType::findMethod(const string& name) const {
     return nullptr;
 }
 
-void LgsType::setLocation(const antlr4::Token* ctx) {
+void LgsType::setLocation(const Token* ctx) {
     location.lineNumber = ctx->getLine();
     location.posInLine = ctx->getCharPositionInLine() + 1;
 }
+
+LgsType::~LgsType() {
+    if (vtable) delete vtable;
+}
+
+size_t LgsType::getSizeBytes() { assert(false); }
+json LgsType::asJSON() const { assert(false); }
+string LgsType::getStrFormatPart() const { assert(false); }
+LgsType* LgsType::clone() { assert(false); }
 
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
 LgsObject* LgsType::asObject() { return dynamic_cast<LgsObject*>(this); }
@@ -78,7 +64,3 @@ LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }
 LgsLong* LgsType::asLong() { return dynamic_cast<LgsLong*>(this); }
 LgsMap* LgsType::asMap() { return dynamic_cast<LgsMap*>(this); }
 bool LgsType::isUnknown() { return dynamic_cast<LgsUnknownType*>(this); }
-
-LgsType::~LgsType() {
-    if (vtable) delete vtable;
-}

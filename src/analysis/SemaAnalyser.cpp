@@ -682,6 +682,7 @@ void SemaAnalyser::validateExprType(LgsValue* value) {
         }
         return;
     }
+
     if (!type) return;
     if (!expr->type || !expr->type->equals(type)) {
         if (dynamic_cast<LgsParam*>(value)) {
@@ -712,6 +713,9 @@ void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
     if (const auto globalSymbol = globals.getSymbol(name)) {
         return globalSymbol;
+    }
+    if (const auto fileSymbol = file->symbolTable.getSymbol(name)) {
+        return fileSymbol;
     }
     if (const auto localSymbol = stack.getSymbol(name)) {
         return localSymbol;

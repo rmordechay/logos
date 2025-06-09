@@ -38,7 +38,6 @@ public:
     void addMethod(LgsFunc* method);
     LgsFunc* findMethod(const string& name) const;
     void setLocation(const antlr4::Token* ctx);
-    void setVTable();
 
     LgsBool* asBool();
     LgsStr* asStr();
