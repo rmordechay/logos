@@ -13,6 +13,7 @@ public:
     static constexpr auto name = "Map";
     LgsPair kvType;
     StructType* mapStruct = nullptr;
+
     LgsBuiltinFunc getFunc{"get", &LGS_ANY, name, {this, new LgsStr()}, true};
     LgsBuiltinFunc addFunc{"add", &LGS_VOID, name, {this, new LgsStr(), &LGS_ANY}, true};
     LgsBuiltinFunc lenFunc{"len", &LGS_LONG, name, {this}, true};

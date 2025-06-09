@@ -24,7 +24,7 @@ public:
         addMethod(&isNotEmptyFunc);
         unpackLength = 1;
     }
-    static uint32_t hashString(const string& str);
+    static size_t hashString(const string& str);
     size_t getSizeBytes() override;
     string getIRName() override;
     Type* getIRType() override;

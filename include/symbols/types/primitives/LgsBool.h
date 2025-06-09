@@ -13,7 +13,7 @@ public:
         isInt = true;
     }
     string prettyName() const override;
-    llvm::Type* getIRType() override;
+    Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;

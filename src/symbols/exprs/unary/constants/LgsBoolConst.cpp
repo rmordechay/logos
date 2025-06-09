@@ -1,7 +1,5 @@
 #include "exprs/unary/constants/LgsBoolConst.h"
 
-
-
 string LgsBoolConst::getValueAsString() const {
     return value ? LgsBool::trueLiteral : LgsBool::falseLiteral;
 }

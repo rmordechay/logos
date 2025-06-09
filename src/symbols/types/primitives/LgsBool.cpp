@@ -31,5 +31,5 @@ bool LgsBool::equals(LgsType* other) {
 }
 
 string LgsBool::getStrFormatPart() const {
-    return "%s";
+    return "%d";
 }

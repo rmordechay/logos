@@ -23,7 +23,7 @@ Value* LgsArrayExpr::createDynamicArray(LgsRuntime* runtime) {
 
     arrType.initFunc.callIR(runtime, {IRValue, capacityIR, elementSize});
     for (const auto element : initialElements) {
-        arrType.add.call(runtime, {this, element});
+        arrType.addFunc.call(runtime, {this, element});
     }
     runtime->addAllocatedExpr(this);
     return IRValue;

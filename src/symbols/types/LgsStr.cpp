@@ -57,8 +57,8 @@ bool LgsStr::equals(LgsType* other) {
 /**
  * FNV-1a 32-bit hash
  */
-uint32_t LgsStr::hashString(const string& str) {
-    uint32_t hash = 2166136261u;
+size_t LgsStr::hashString(const string& str) {
+    size_t hash = 2166136261u;
     for (const auto c : str) {
         hash ^= static_cast<uint8_t>(c);
         hash *= 16777619u;
