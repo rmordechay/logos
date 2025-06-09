@@ -670,7 +670,6 @@ void SemaAnalyser::validateExprType(LgsValue* value) {
         type = param->type;
     }
 
-    if (!expr) return;
     if (expr->isNull) {
         // null must have a type
         if (!type) {
@@ -683,8 +682,8 @@ void SemaAnalyser::validateExprType(LgsValue* value) {
         }
         return;
     }
-
-    if (!type || !expr->type || !expr->type->equals(type)) {
+    if (!type) return;
+    if (!expr->type || !expr->type->equals(type)) {
         if (dynamic_cast<LgsParam*>(value)) {
             return errHandler.handleError(E10050, &expr->location, {type->prettyName(), expr->type->prettyName()});
         }

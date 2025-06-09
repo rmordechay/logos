@@ -1,8 +1,6 @@
 #pragma once
-#include <clang/AST/ASTConsumer.h>
-#include <clang/AST/RecursiveASTVisitor.h>
-#include <clang/Tooling/Tooling.h>
 
+class LgsFile;
 class LgsObject;
 class LgsType;
 struct LgsSymbol;
@@ -10,10 +8,11 @@ using namespace clang::tooling;
 
 class LgsCLangVisitor : public clang::RecursiveASTVisitor<LgsCLangVisitor> {
 public:
-    clang::ASTContext* context;
+    LgsFile& lgsFile;
     LgsErrHandler& errHandler;
+    clang::ASTContext* context;
 
-    explicit LgsCLangVisitor(clang::ASTContext* context, LgsErrHandler& errHandler) : context(context), errHandler(errHandler) {}
+    explicit LgsCLangVisitor(clang::ASTContext* context, LgsFile& lgsFile, LgsErrHandler& errHandler) : lgsFile(lgsFile), errHandler(errHandler), context(context) {}
     bool VisitFunctionDecl(const clang::FunctionDecl* func);
     bool VisitRecordDecl(const clang::RecordDecl* record);
     LgsType* mapCType(clang::QualType type);
@@ -30,20 +29,7 @@ class LgsCLangASTConsumer final : public clang::ASTConsumer {
 public:
     LgsCLangVisitor visitor;
 
-    explicit LgsCLangASTConsumer(clang::ASTContext* context, LgsErrHandler& errHandler) : visitor(context, errHandler) {}
-    void HandleTranslationUnit(clang::ASTContext& context) override {
-        visitor.TraverseDecl(context.getTranslationUnitDecl());
-    }
+    explicit LgsCLangASTConsumer(clang::ASTContext* context, LgsFile& lgsFile, LgsErrHandler& errHandler) : visitor(context, lgsFile, errHandler) {}
+    void HandleTranslationUnit(clang::ASTContext& context) override;
     ~LgsCLangASTConsumer() override = default;
-};
-
-class LgsCLangFeAction final : public clang::ASTFrontendAction {
-public:
-    LgsErrHandler& errHandler;
-
-    explicit LgsCLangFeAction(LgsErrHandler& errHandler) : errHandler(errHandler) {}
-    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) override {
-        return std::make_unique<LgsCLangASTConsumer>(&compilerInstance.getASTContext(), errHandler);
-    }
-    ~LgsCLangFeAction() override = default;
 };

@@ -39,6 +39,7 @@ public:
     void loadSrcFiles();
     void loadEnvFiles();
     void setupActiveEnv();
+    void getClibRoot() const;
     bool validateProject();
     void setPlatform(const string& inputFile, const string& outputFile) const;
     void parseSrcFiles(const string& path, ThreadPool& threadPool);

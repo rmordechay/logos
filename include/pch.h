@@ -24,6 +24,13 @@
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/TargetParser/Host.h>
 #include <llvm/MC/TargetRegistry.h>
+#include <clang/Driver/Compilation.h>
+#include <clang/Driver/Driver.h>
+#include <clang/AST/ASTConsumer.h>
+#include <clang/AST/RecursiveASTVisitor.h>
+#include <clang/Tooling/Tooling.h>
+#include <clang/CodeGen/CodeGenAction.h>
+#include <clang/Basic/Diagnostic.h>
 #include <lld/Common/Driver.h>
 
 using namespace std;
@@ -37,6 +44,7 @@ using namespace antlr4;
 #include "data/LgsWarnings.h"
 #include "data/LgsDefinitions.h"
 #include "logos/LgsErrHandler.h"
+#include "logos/Platform.h"
 #include "utils/ThreadPool.h"
 #include "parser/LogosParser.h"
 #include "parser/LogosLexer.h"

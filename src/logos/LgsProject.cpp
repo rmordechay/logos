@@ -241,6 +241,16 @@ void LogosProject::setupActiveEnv() {
     checkRequiredEnvVars();
 }
 
+void LogosProject::getClibRoot() const {
+    const IntrusiveRefCntPtr diagOpts = new clang::DiagnosticOptions();
+    const auto diags = new clang::DiagnosticsEngine(new clang::DiagnosticIDs(), diagOpts.get(), new clang::DiagnosticConsumer());
+    const auto clangBinary = "clang";
+    clang::driver::Driver driver(clangBinary, sys::getDefaultTargetTriple(), *diags);
+    const char* args[] = {clangBinary, "-x", "c", "-"};
+    const auto compilation = driver.BuildCompilation(ArrayRef(args));
+    const auto& toolChain = compilation->getDefaultToolChain();
+}
+
 void LogosProject::asJSON() const {
     return;
 }

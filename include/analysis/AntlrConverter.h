@@ -80,8 +80,8 @@ public:
     LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     LgsUnaryExpr* getArrayExpr(LogosParser::ArrayContext* ctx);
     LgsUnaryExpr* getHashMap(LogosParser::HashMapContext* ctx);
-    LgsVariable* getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) const;
-    LgsUnaryExpr* getConst(const string& constName, const antlr4::ParserRuleContext* ctx) const;
+    LgsVariable* getVariable(const string& varName, const ParserRuleContext* ctx) const;
+    LgsUnaryExpr* getConst(const string& constName, const ParserRuleContext* ctx) const;
     LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     LgsUnaryExpr* getVector(LogosParser::VectorContext* vector) const;
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
@@ -90,12 +90,12 @@ public:
     LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
     LgsConstExpr* getConstant(LogosParser::ConstantContext* ctx) const;
-    LgsStrConst* getStrConst(antlr4::tree::TerminalNode* type) const;
-    LgsTypeConst* getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
+    LgsStrConst* getStrConst(tree::TerminalNode* type) const;
+    LgsTypeConst* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsGroup* getGroup(LogosParser::GroupContext* ctx);
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
-    LgsType* getTypeFromText(antlr4::tree::TerminalNode* typeToken) const;
+    LgsType* getTypeFromText(tree::TerminalNode* typeToken) const;
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     LgsExpr* getExpr(const string& codeText) const;
     void parseTemplateStr(LgsStrConst* strConst) const;

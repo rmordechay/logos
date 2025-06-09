@@ -1,36 +1,13 @@
 #include "extern/LgsCLang.h"
-
 #include "data/LgsErrors.h"
 #include "extern/LgsCLangVisitor.h"
 #include "logos/Platform.h"
 #include "utils/LgsUtils.h"
 
-#include <clang/Basic/Diagnostic.h>
-#include <clang/Frontend/CompilerInstance.h>
-#include <clang/Basic/DiagnosticOptions.h>
-#include <clang/CodeGen/CodeGenAction.h>
-#include <clang/Basic/SourceManager.h>
-#include <clang/Frontend/CompilerInvocation.h>
-#include <clang/Driver/Compilation.h>
-#include <clang/Driver/Driver.h>
-#include <clang/Frontend/FrontendOptions.h>
-#include <clang/Tooling/Tooling.h>
-
 using namespace clang;
-using namespace clang::driver;
 
-void LgsCLang::getClibRoot() const {
-    const IntrusiveRefCntPtr diagOpts = new DiagnosticOptions();
-    const auto diags = new DiagnosticsEngine(new DiagnosticIDs(), diagOpts.get(), new DiagnosticConsumer());
-    const auto clangBinary = "clang";
-    Driver driver(clangBinary, sys::getDefaultTargetTriple(), *diags);
-    const char* args[] = {clangBinary, "-x", "c", "-"};
-    const auto compilation = driver.BuildCompilation(ArrayRef(args));
-    const auto& toolChain = compilation->getDefaultToolChain();
-}
-
-void LgsCLang::parse(const vector<LgsStrConst*>& filePaths) const {
-    for (const auto filePath : filePaths) {
+void LgsCLang::parse() const {
+    for (const auto filePath : lgsFile.externFiles) {
         auto path = filePath->value;
         string code;
         auto cLibPath = platform.clibRoot / "usr/include" / path;
@@ -43,30 +20,29 @@ void LgsCLang::parse(const vector<LgsStrConst*>& filePaths) const {
             errHandler.handleError(E10047, &filePath->location, {path});
             continue;
         }
-        runToolOnCodeWithArgs(std::make_unique<LgsCLangFeAction>(errHandler), code, {"-isysroot", platform.clibRoot});
+        runToolOnCodeWithArgs(std::make_unique<LgsCLangFeAction>(lgsFile, errHandler), code, {"-isysroot", platform.clibRoot});
     }
 }
 
 void LgsCLang::compile(const vector<string>& files) {
     if (files.empty()) return;
-    vector<string> argStrings{"clang", "-c", "-isysroot", platform.clibRoot};
     for (const auto& file : files) {
-        argStrings.push_back(file);
+        compileArgs.push_back(file);
     }
-    argStrings.push_back("-o");
-    argStrings.push_back((paths.buildDir / "c.o").string());
+    compileArgs.push_back("-o");
+    compileArgs.push_back(outputFilePath.string());
 
     vector<const char*> args;
-    for (const auto& argStr : argStrings) {
+    for (const auto& argStr : compileArgs) {
         args.push_back(argStr.c_str());
     }
 
     const auto targetTriple = sys::getDefaultTargetTriple();
     auto diags = CompilerInstance::createDiagnostics(*fs, new DiagnosticOptions, &dc, false);
-    clang::driver::Driver driver(args[0], targetTriple, *diags, "cc", fs);
+    Driver driver(args[0], targetTriple, *diags, "cc", fs);
     driver.setCheckInputsExist(false);
 
-    unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(args));
+    unique_ptr<Compilation> compilation(driver.BuildCompilation(args));
     const auto& jobs = compilation->getJobs();
     if (jobs.empty()) {
         return;
@@ -134,4 +110,8 @@ void LgsDiagnosticsConsumer::HandleDiagnostic(const DiagnosticsEngine::Level dia
     } else {
         os << "<no source>: " << level << ": " << msg << '\n';
     }
+}
+
+unique_ptr<ASTConsumer> LgsCLangFeAction::CreateASTConsumer(CompilerInstance& compilerInstance, StringRef file) {
+    return make_unique<LgsCLangASTConsumer>(&compilerInstance.getASTContext(), lgsFile, errHandler);
 }

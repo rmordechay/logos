@@ -727,7 +727,7 @@ public:
   public:
     EnumFieldContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *CONST_NAME();
+    antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *EQUAL();
     antlr4::tree::TerminalNode *STRING();
 
@@ -779,7 +779,6 @@ public:
     UnaryExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VARIABLE();
-    antlr4::tree::TerminalNode *CONST_NAME();
     antlr4::tree::TerminalNode *SELF_INSTANCE();
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *NULL_();
@@ -890,9 +889,10 @@ public:
   public:
     ConstructorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *TYPE();
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
+    antlr4::tree::TerminalNode *TYPE();
+    antlr4::tree::TerminalNode *VARIABLE();
     ConstructorArgListContext *constructorArgList();
 
    
@@ -1039,6 +1039,7 @@ public:
     TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *TYPE();
+    antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *QUEST_MARK();
     antlr4::tree::TerminalNode *SELF_CLASS();
     MapTypeContext *mapType();

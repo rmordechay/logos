@@ -169,7 +169,7 @@ enumDeclaration:
     ;
 
 enumField:
-        CONST_NAME (EQUAL STRING)?
+        VARIABLE (EQUAL STRING)?
     ;
 
 expr:
@@ -186,7 +186,6 @@ expr:
 
 unaryExpr:
         VARIABLE
-    |   CONST_NAME
     |   SELF_INSTANCE
     |   SELF_CLASS
     |   NULL
@@ -226,7 +225,7 @@ funcArg:
     ;
 
 constructor:
-        TYPE LPAREN constructorArgList? RPAREN
+        (TYPE | VARIABLE) LPAREN constructorArgList? RPAREN
     ;
 
 constructorArgList:
@@ -282,7 +281,7 @@ range:
     ;
 
 type:
-        TYPE QUEST_MARK?
+        (TYPE | VARIABLE) QUEST_MARK?
    |    SELF_CLASS
    |    baseType=type EXCLA_MARK? arraySize+
    |    mapType
@@ -379,7 +378,7 @@ BOOL: 'true' | 'false';
 NULL: 'null';
 CONST_NAME: [A-Z]+ ('_' [A-Z]+)* ;
 TYPE: ([A-Z] [a-zA-Z0-9]*)+ ;
-VARIABLE: [a-z] [a-zA-Z0-9]* ([A-Z] [a-zA-Z0-9]*)*;
+VARIABLE: [a-zA-Z] [a-zA-Z0-9_]*;
 STRING: '"' ( ~["\\] | '\\'.)* '"';
 TAG: '@'[a-zA-Z0-9_]+;
 LINE_COMMENT: '//' ~( '\r' | '\n' )* -> skip;

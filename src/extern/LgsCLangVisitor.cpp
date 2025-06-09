@@ -73,9 +73,6 @@ LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
     if (type->isConstantSizeType()) {
         return new LgsLong();
     }
-    if (type->isConstantArrayType()) {
-        return mapCArray(type);
-    }
     if (type->isPointerType()) {
         return mapCType(type->getPointeeType());
     }
@@ -83,8 +80,10 @@ LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
         return mapCStruct(type);
     }
     if (type->isFunctionProtoType()) {
-        const auto funcType = mapCFunc(type)->asFuncType();
-        return funcType;
+        return mapCFunc(type)->asFuncType();
+    }
+    if (type->isConstantArrayType()) {
+        return mapCArray(type);
     }
     const auto typeStr = type.getAsString();
     if (typeStr == "fpos_t") {
@@ -146,6 +145,10 @@ bool LgsCLangVisitor::isConstCharPointer(const clang::QualType qt) const {
     if (!qt->isPointerType()) return false;
     const auto pointeeType = qt->getPointeeType();
     return pointeeType.isConstQualified() && pointeeType->isCharType();
+}
+
+void LgsCLangASTConsumer::HandleTranslationUnit(clang::ASTContext& context) {
+    visitor.TraverseDecl(context.getTranslationUnitDecl());
 }
 
 bool LgsCLangVisitor::isValid(const clang::SourceLocation loc) const {

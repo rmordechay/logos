@@ -76,8 +76,8 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
         }
     }
     if (!file->externFiles.empty()) {
-        const LgsCLang lgsClang(errHandler);
-        lgsClang.parse(file->externFiles);
+        const LgsCLang lgsClang(*file, errHandler);
+        lgsClang.parse();
     }
     file->absPath = filePath;
     file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
@@ -512,7 +512,7 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
     unordered_set<string> seenNames;
     for (size_t i = 0; i < ctx->enumField().size(); ++i) {
         const auto enumField = ctx->enumField()[i];
-        const auto enumName = enumField->CONST_NAME()->getText();
+        const auto enumName = enumField->VARIABLE()->getText();
         if (!seenNames.insert(enumName).second) {
             errHandler.handleError(E10011, &lgsEnum->location, {enumName, to_string(lgsEnum->location.lineNumber)});
             break;
@@ -562,7 +562,6 @@ LgsExpr* AntlerConverter::getCast(LogosParser::ExprContext* ctx) {
 
 LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto variable = ctx->VARIABLE()) return getVariable(variable->getText(), ctx);
-    if (const auto constExpr = ctx->CONST_NAME()) return getConst(constExpr->getText(), ctx);
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
     if (const auto vector = ctx->vector()) return getVector(vector);
     if (const auto constructor = ctx->constructor()) return getInstance(constructor);
