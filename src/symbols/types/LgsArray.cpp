@@ -60,10 +60,9 @@ Value* LgsArray::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
 StructType* LgsArray::getArrStruct(LgsRuntime* runtime) {
     if (arrStruct) return arrStruct;
     auto& builder = runtime->builder;
-    const auto int32Ty = builder.getInt32Ty();
     const auto int64Ty = builder.getInt64Ty();
     const auto ptrTy = builder.getPtrTy();
-    arrStruct = getIRStructType(context, name, {int64Ty, int32Ty, int32Ty, ptrTy});
+    arrStruct = getIRStructType(context, name, {int64Ty, int64Ty, int64Ty, ptrTy});
     return arrStruct;
 }
 

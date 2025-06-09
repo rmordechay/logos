@@ -1,7 +1,6 @@
 #include "exprs/unary/LgsIterIndex.h"
-#include "exprs/unary/LgsFuncCall.h"
-#include "types/LgsMap.h"
 #include <exprs/unary/LgsArrayExpr.h>
+#include "types/LgsMap.h"
 
 Value* LgsIterIndex::createIRValue(LgsRuntime* runtime) {
     const auto baseExprType = baseExpr->type;
@@ -19,20 +18,25 @@ Value* LgsIterIndex::createIRValue(LgsRuntime* runtime) {
 }
 
 Value* LgsIterIndex::getIRFromDynArray(LgsRuntime* runtime, LgsArray* arr) const {
+    auto& builder = runtime->builder;
     const auto arrPtr = baseExpr->getIRValue(runtime);
     auto indexIRValue = index->from->getIRValue(runtime);
-    indexIRValue = runtime->builder.CreateZExt(indexIRValue, runtime->builder.getInt64Ty());
-    const auto rv = arr->getFunc.callIR(runtime, {arrPtr, indexIRValue});
-    return runtime->builder.CreateLoad(runtime->builder.getPtrTy(), rv);
+    indexIRValue = builder.CreateZExt(indexIRValue, builder.getInt64Ty());
+    const auto ptrTy = builder.getPtrTy();
+    const auto ptr = builder.CreateAlloca(ptrTy);
+    builder.CreateStore(arrPtr, ptr);
+    const auto load = builder.CreateLoad(ptrTy, ptr);
+    return arr->getFunc.callIR(runtime, {load, indexIRValue});
 }
 
 Value* LgsIterIndex::getIRFromMap(LgsRuntime* runtime, LgsMap* map) const {
     const auto mapPtr = baseExpr->getIRValue(runtime);
-    const auto indexIRValue = index->from->getIRValue(runtime);
-    const auto rvPtr = map->getFunc.callIR(runtime, {mapPtr, indexIRValue});
-    auto value = map->kvType.value;
-    auto lgsArray = value->asArray();
-    return runtime->builder.CreateLoad(lgsArray->getArrStruct(runtime), rvPtr);
+    const auto key = index->from->getIRValue(runtime);
+    const auto keyIRType = key->getType();
+    const auto keyPtr = runtime->builder.CreateAlloca(keyIRType);
+    runtime->builder.CreateStore(key, keyPtr);
+    const auto keyLoad = runtime->builder.CreateLoad(keyIRType, keyPtr);
+    return map->getFunc.callIR(runtime, {mapPtr, keyLoad});
 }
 
 Value* LgsIterIndex::getIRFromStr(LgsRuntime* runtime) const {
@@ -43,10 +47,10 @@ Value* LgsIterIndex::getIRFromStr(LgsRuntime* runtime) const {
         const auto value = index->from->getIRValue(runtime);
         return runtime->builder.CreateGEP(ty, baseExprIRValue, {runtime->builder.getInt32(0), value});
     }
-    const auto p = runtime->builder.CreateAlloca(baseExprIRType);
+    const auto ptr = runtime->builder.CreateAlloca(baseExprIRType);
     const auto vaArgInst = runtime->builder.CreateVAArg(baseExprIRValue, baseExprIRType);
-    runtime->builder.CreateStore(vaArgInst, p);
-    return runtime->builder.CreateLoad(baseExprIRType, p);
+    runtime->builder.CreateStore(vaArgInst, ptr);
+    return runtime->builder.CreateLoad(baseExprIRType, ptr);
 }
 
 void LgsIterIndex::storeHashMap(LgsRuntime* runtime, LgsHashMap* hashMap) const {
@@ -68,11 +72,15 @@ void LgsIterIndex::storeScalar(LgsRuntime* runtime, LgsExpr* value) {
     }
     if (const auto map = baseExpr->type->asMap()) {
         const auto key = index->from->getIRValue(runtime);
-        map->addFunc.callIR(runtime, {baseIRValue, key, rIRValue});
-        return;
+        const auto keyIRType = key->getType();
+        const auto keyPtr = runtime->builder.CreateAlloca(keyIRType);
+        runtime->builder.CreateStore(key, keyPtr);
+        const auto keyLoad = runtime->builder.CreateLoad(keyIRType, keyPtr);
+        map->addFunc.callIR(runtime, {baseIRValue, keyLoad, rIRValue});
+    } else {
+        const auto iterPtr = getIRValue(runtime);
+        runtime->builder.CreateStore(rIRValue, iterPtr);
     }
-    const auto iterPtr = getIRValue(runtime);
-    runtime->builder.CreateStore(rIRValue, iterPtr);
 }
 
 void LgsIterIndex::storeArray(LgsRuntime* runtime, const LgsArrayExpr* arr) const {
