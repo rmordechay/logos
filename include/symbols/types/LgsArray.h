@@ -1,7 +1,6 @@
 #pragma once
 #include "LgsAny.h"
 #include "funcs/LgsBuiltinFunc.h"
-#include "primitives/LgsInt.h"
 #include "primitives/LgsLong.h"
 #include "primitives/LgsVoid.h"
 #include "types/LgsIterable.h"
@@ -18,21 +17,21 @@ public:
     StructType* arrStruct = nullptr;
 
     LgsArrayAddFunc add{this};
-    LgsBuiltinFunc len{"len", &LGS_INT, name, {this}, true};
-    LgsBuiltinFunc get{"get", &LGS_ANY, name, {this, &LGS_INT}, true};
-    LgsBuiltinFunc isEmpty{"isEmpty", &LGS_INT, name, {this}, true};
-    LgsBuiltinFunc isNotEmpty{"isNotEmpty", &LGS_INT, name, {this}, true};
-    LgsBuiltinFunc init{"init", &LGS_VOID, name, {this, &LGS_INT, &LGS_LONG}};
-    LgsBuiltinFunc put{"put", &LGS_VOID, name, {this, &LGS_INT, &LGS_ANY}};
-    LgsBuiltinFunc delete_{"delete", &LGS_VOID, name, {this, &LGS_INT}};
-    LgsBuiltinFunc free{"free", &LGS_VOID, name, {this}};
+    LgsBuiltinFunc lenFunc{"len", &LGS_LONG, name, {this}, true};
+    LgsBuiltinFunc getFunc{"get", &LGS_ANY, name, {this, &LGS_LONG}, true};
+    LgsBuiltinFunc isEmptyFunc{"isEmpty", &LGS_BOOL, name, {this}, true};
+    LgsBuiltinFunc isNotEmptyFunc{"isNotEmpty", &LGS_BOOL, name, {this}, true};
+    LgsBuiltinFunc initFunc{"init", &LGS_VOID, name, {this, &LGS_LONG, &LGS_LONG}};
+    LgsBuiltinFunc putFunc{"put", &LGS_VOID, name, {this, &LGS_LONG, &LGS_ANY}};
+    LgsBuiltinFunc deleteFunc{"delete", &LGS_VOID, name, {this, &LGS_LONG}};
+    LgsBuiltinFunc freeFunc{"free", &LGS_VOID, name, {this}};
 
     explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         unpackLength = 1;
         addMethod(&add);
-        addMethod(&len);
-        addMethod(&isEmpty);
-        addMethod(&isNotEmpty);
+        addMethod(&lenFunc);
+        addMethod(&isEmptyFunc);
+        addMethod(&isNotEmptyFunc);
     }
     size_t getSizeBytes() override;
     string getIRName() override;

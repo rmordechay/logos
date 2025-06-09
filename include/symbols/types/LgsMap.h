@@ -13,22 +13,22 @@ public:
     static constexpr auto name = "Map";
     LgsPair kvType;
     StructType* mapStruct = nullptr;
-    LgsBuiltinFunc get{"get", &LGS_ANY, name, {this, new LgsStr()}, true};
-    LgsBuiltinFunc add{"add", &LGS_VOID, name, {this, new LgsStr(), &LGS_ANY}, true};
-    LgsBuiltinFunc len{"len", &LGS_INT, name, {this}, true};
-    LgsBuiltinFunc isEmpty{"isEmpty", &LGS_INT, name, {this}, true};
-    LgsBuiltinFunc isNotEmpty{"isNotEmpty", &LGS_INT, name, {this}, true};
-    LgsBuiltinFunc init{"init", &LGS_VOID, name, {this, &LGS_INT}};
-    LgsBuiltinFunc delete_{"delete", &LGS_VOID, name, {this, &LGS_ANY}};
-    LgsBuiltinFunc free{"free", &LGS_VOID, name, {this}};
+    LgsBuiltinFunc getFunc{"get", &LGS_ANY, name, {this, new LgsStr()}, true};
+    LgsBuiltinFunc addFunc{"add", &LGS_VOID, name, {this, new LgsStr(), &LGS_ANY}, true};
+    LgsBuiltinFunc lenFunc{"len", &LGS_LONG, name, {this}, true};
+    LgsBuiltinFunc isEmptyFunc{"isEmpty", &LGS_BOOL, name, {this}, true};
+    LgsBuiltinFunc isNotEmptyFunc{"isNotEmpty", &LGS_BOOL, name, {this}, true};
+    LgsBuiltinFunc initFunc{"init", &LGS_VOID, name, {this, &LGS_LONG}};
+    LgsBuiltinFunc deleteFunc{"delete", &LGS_VOID, name, {this, &LGS_ANY}};
+    LgsBuiltinFunc freeFunc{"free", &LGS_VOID, name, {this}};
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&kvType) {
         kvType.key = keyType;
         kvType.value = valueType;
         unpackLength = 2;
-        addMethod(&len);
-        addMethod(&isEmpty);
-        addMethod(&isNotEmpty);
+        addMethod(&lenFunc);
+        addMethod(&isEmptyFunc);
+        addMethod(&isNotEmptyFunc);
     }
 
     void setBaseType(const vector<LgsMapPair*>& exprs);

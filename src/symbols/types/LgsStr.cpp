@@ -33,7 +33,7 @@ string LgsStr::getStrFormatPart() const {
 }
 
 Value* LgsStr::getLength(LgsRuntime* runtime, LgsExpr* expr) {
-    return len.call(runtime, {expr});
+    return lenFunc.call(runtime, {expr});
 }
 
 Value* LgsStr::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
@@ -41,11 +41,11 @@ Value* LgsStr::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
 }
 
 Value* LgsStr::callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) {
-    return isEmpty.call(runtime, {expr});
+    return isEmptyFunc.call(runtime, {expr});
 }
 
 Value* LgsStr::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
-    return isNotEmpty.call(runtime, {expr});
+    return isNotEmptyFunc.call(runtime, {expr});
 }
 
 bool LgsStr::equals(LgsType* other) {

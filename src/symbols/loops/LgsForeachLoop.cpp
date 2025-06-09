@@ -33,12 +33,12 @@ void LgsForeachLoop::setIRLoopVars(LgsRuntime* runtime) {
 
 void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsArray* arr) const {
     if (arr->isStatic) {
-        const auto i = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
-        const auto gep = runtime->builder.CreateGEP(arr->getIRType(), iterPtr, {runtime->builder.getInt32(0), i});
+        const auto i = runtime->builder.CreateLoad(runtime->builder.getInt64Ty(), iPtr);
+        const auto gep = runtime->builder.CreateGEP(arr->getIRType(), iterPtr, {runtime->builder.getInt64(0), i});
         loopVars[0]->setIRValue(gep);
     } else {
-        const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
-        const auto v = arr->get.callIR(runtime, {iterPtr, iValue});
+        const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt64Ty(), iPtr);
+        const auto v = arr->getFunc.callIR(runtime, {iterPtr, iValue});
         loopVars[0]->setIRValue(runtime->builder.CreateLoad(arr->getIRType(), v));
     }
 }

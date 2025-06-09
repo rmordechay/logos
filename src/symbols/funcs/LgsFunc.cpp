@@ -64,17 +64,15 @@ Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
         return runtime->builder.CreateCall(IRFuncType, IRValue, args);
     }
     const auto IRFunc = getIRFunc(runtime);
-    Value* rv;
     if (funcType.swapReturn) {
         const auto paramIRType = getReturnSwapParam().type->getIRType();
-        rv = runtime->builder.CreateAlloca(paramIRType);
+        const auto rv = runtime->builder.CreateAlloca(paramIRType);
         vector finalArgs(args.begin(), args.end());
         finalArgs.insert(finalArgs.begin() + funcType.returnParamIndex, rv);
         runtime->builder.CreateCall(IRFunc, finalArgs);
-    } else {
-        rv = runtime->builder.CreateCall(IRFunc, args);
+        return rv;
     }
-    return rv;
+    return runtime->builder.CreateCall(IRFunc, args);;
 }
 
 Value* LgsFunc::addIRArg(LgsRuntime* runtime, Type* type, Value* value) {

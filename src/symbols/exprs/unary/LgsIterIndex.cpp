@@ -20,15 +20,16 @@ Value* LgsIterIndex::createIRValue(LgsRuntime* runtime) {
 
 Value* LgsIterIndex::getIRFromDynArray(LgsRuntime* runtime, LgsArray* arr) const {
     const auto arrPtr = baseExpr->getIRValue(runtime);
-    const auto indexIRValue = index->from->getIRValue(runtime);
-    const auto rv = arr->get.callIR(runtime, {arrPtr, indexIRValue});
+    auto indexIRValue = index->from->getIRValue(runtime);
+    indexIRValue = runtime->builder.CreateZExt(indexIRValue, runtime->builder.getInt64Ty());
+    const auto rv = arr->getFunc.callIR(runtime, {arrPtr, indexIRValue});
     return runtime->builder.CreateLoad(runtime->builder.getPtrTy(), rv);
 }
 
 Value* LgsIterIndex::getIRFromMap(LgsRuntime* runtime, LgsMap* map) const {
     const auto mapPtr = baseExpr->getIRValue(runtime);
     const auto indexIRValue = index->from->getIRValue(runtime);
-    const auto rvPtr = map->get.callIR(runtime, {mapPtr, indexIRValue});
+    const auto rvPtr = map->getFunc.callIR(runtime, {mapPtr, indexIRValue});
     auto value = map->kvType.value;
     auto lgsArray = value->asArray();
     return runtime->builder.CreateLoad(lgsArray->getArrStruct(runtime), rvPtr);
@@ -59,7 +60,7 @@ void LgsIterIndex::storeScalar(LgsRuntime* runtime, LgsExpr* value) {
         if (!arr->isStatic) {
             const auto ptr = runtime->builder.CreateAlloca(value->type->getIRType());
             runtime->builder.CreateStore(rIRValue, ptr);
-            arr->put.callIR(runtime, {baseIRValue, index->from->getIRValue(runtime), ptr});
+            arr->putFunc.callIR(runtime, {baseIRValue, index->from->getIRValue(runtime), ptr});
         } else {
             runtime->builder.CreateStore(rIRValue, getGEP(runtime));
         }
@@ -67,7 +68,7 @@ void LgsIterIndex::storeScalar(LgsRuntime* runtime, LgsExpr* value) {
     }
     if (const auto map = baseExpr->type->asMap()) {
         const auto key = index->from->getIRValue(runtime);
-        map->add.callIR(runtime, {baseIRValue, key, rIRValue});
+        map->addFunc.callIR(runtime, {baseIRValue, key, rIRValue});
         return;
     }
     const auto iterPtr = getIRValue(runtime);

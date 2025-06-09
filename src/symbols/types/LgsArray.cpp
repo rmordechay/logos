@@ -7,7 +7,7 @@ size_t LgsArray::getSizeBytes() {
         assert(constSize > 0);
         return baseType->getSizeBytes() * constSize;
     }
-    return sizeof(void*);
+    return sizeof(size_t) + sizeof(int) + sizeof(int) + sizeof(void*);
 }
 
 LgsExpr* LgsArray::getZeroValue() {
@@ -42,7 +42,7 @@ void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
 
 Value* LgsArray::getLength(LgsRuntime* runtime, LgsExpr* expr) {
     if (isStatic) return sizeExpr->getIRValue(runtime);
-    return len.call(runtime, {expr});
+    return lenFunc.call(runtime, {expr});
 }
 
 Value* LgsArray::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
@@ -50,11 +50,11 @@ Value* LgsArray::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
 }
 
 Value* LgsArray::callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) {
-    return isEmpty.call(runtime, {expr});
+    return isEmptyFunc.call(runtime, {expr});
 }
 
 Value* LgsArray::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
-    return isNotEmpty.call(runtime, {expr});
+    return isNotEmptyFunc.call(runtime, {expr});
 }
 
 StructType* LgsArray::getArrStruct(LgsRuntime* runtime) {

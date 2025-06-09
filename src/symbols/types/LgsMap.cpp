@@ -3,6 +3,7 @@
 #include "stmts/LgsVarDec.h"
 
 void LgsMap::setBaseType(const vector<LgsMapPair*>& exprs) {
+    if (exprs.empty()) return;
     kvType.key = exprs.front()->key->type;
     kvType.value = exprs.front()->value->type;
 }
@@ -17,7 +18,7 @@ void LgsMap::unpackTypes(const vector<LgsVarDec*>& varDecs) {
 }
 
 Value* LgsMap::getLength(LgsRuntime* runtime, LgsExpr* expr) {
-    return len.call(runtime, {expr});
+    return lenFunc.call(runtime, {expr});
 }
 
 Value* LgsMap::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
@@ -25,11 +26,11 @@ Value* LgsMap::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
 }
 
 Value* LgsMap::callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) {
-    return isEmpty.call(runtime, {expr});
+    return isEmptyFunc.call(runtime, {expr});
 }
 
 Value* LgsMap::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
-    return isNotEmpty.call(runtime, {expr});
+    return isNotEmptyFunc.call(runtime, {expr});
 }
 
 Type* LgsMap::getIRType() {

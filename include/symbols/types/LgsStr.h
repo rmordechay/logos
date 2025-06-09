@@ -12,16 +12,16 @@ public:
 class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
-    LgsStrFormatFunc format{this};
-    LgsBuiltinFunc len{"len", &LGS_INT, name, {this}};
-    LgsBuiltinFunc isEmpty{"isEmpty", &LGS_INT, name, {this}};
-    LgsBuiltinFunc isNotEmpty{"isNotEmpty", &LGS_INT, name, {this}};
+    LgsStrFormatFunc formatFunc{this};
+    LgsBuiltinFunc lenFunc{"len", &LGS_LONG, name, {this}};
+    LgsBuiltinFunc isEmptyFunc{"isEmpty", &LGS_BOOL, name, {this}};
+    LgsBuiltinFunc isNotEmptyFunc{"isNotEmpty", &LGS_BOOL, name, {this}};
 
     LgsStr() : LgsIterable(&LGS_CHAR) {
-        addMethod(&format);
-        addMethod(&len);
-        addMethod(&isEmpty);
-        addMethod(&isNotEmpty);
+        addMethod(&formatFunc);
+        addMethod(&lenFunc);
+        addMethod(&isEmptyFunc);
+        addMethod(&isNotEmptyFunc);
         unpackLength = 1;
     }
     static uint32_t hashString(const string& str);
