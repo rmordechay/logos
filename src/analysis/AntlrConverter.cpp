@@ -24,8 +24,8 @@
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
-#include "types/primitives/LgsBool.h"
-#include "types/primitives/LgsFloat.h"
+
+
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
 #include "stmts/LgsContinueStmt.h"
@@ -46,7 +46,7 @@
 #include "types/LgsGroup.h"
 #include "types/LgsMap.h"
 #include "types/LgsUnknownType.h"
-#include "types/primitives/LgsShort.h"
+
 
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>

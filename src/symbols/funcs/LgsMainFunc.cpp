@@ -3,7 +3,7 @@
 #include "exprs/unary/LgsArrayExpr.h"
 
 #include "stmts/LgsStmtBlock.h"
-#include "types/LgsStr.h"
+
 
 void LgsMainFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.enterFunc(this);
@@ -44,5 +44,5 @@ void LgsMainFunc::initArgs(LgsRuntime* runtime) {
     const auto arrStruct = getIRStructType(runtime->module->getContext(), args->arrType.name, structFields);
     args->IRValue = builder.CreateAlloca(arrStruct);
     args->initArgsFunc->callIR(runtime, {args->IRValue, argc, argv});
-    funcType.params[0]->setIRValue(args->IRValue);
+    funcType.params[0].setIRValue(args->IRValue);
 }

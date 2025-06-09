@@ -13,7 +13,6 @@ void LgsFunc::generateIR(LgsRuntime* runtime) {
             runtime->builder.CreateRetVoid();
         }
     }
-    runtime->builder.restoreIP(runtime->savedIP);
     runtime->stack.exitFunc();
 }
 
@@ -37,9 +36,9 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
     }
     if (funcType.params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
-    for (const auto param : funcType.params) {
-        param->setIRValue(args);
-        args->setName(param->name);
+    for (auto& param : funcType.params) {
+        param.setIRValue(args);
+        args->setName(param.name);
         args++;
     }
     return IRFunc;
@@ -53,7 +52,8 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
         const auto arg = args[i];
         const auto argType = arg->type->getIRType();
         const auto argValue = arg->getIRValue(runtime);
-        addIRArg(runtime, IRArgs, argType, argValue);
+        const auto IRArg = addIRArg(runtime, argType, argValue);
+        IRArgs.push_back(IRArg);
     }
     return callIR(runtime, IRArgs);
 }
@@ -66,7 +66,7 @@ Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
     const auto IRFunc = getIRFunc(runtime);
     Value* rv;
     if (funcType.swapReturn) {
-        const auto paramIRType = getReturnSwapParam()->type->getIRType();
+        const auto paramIRType = getReturnSwapParam().type->getIRType();
         rv = runtime->builder.CreateAlloca(paramIRType);
         vector finalArgs(args.begin(), args.end());
         finalArgs.insert(finalArgs.begin() + funcType.returnParamIndex, rv);
@@ -77,16 +77,15 @@ Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
     return rv;
 }
 
-void LgsFunc::addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, Type* type, Value* value) {
+Value* LgsFunc::addIRArg(LgsRuntime* runtime, Type* type, Value* value) {
     if (shouldLoadIRArg(value)) {
-        IRArgs.emplace_back(runtime->builder.CreateLoad(type, value));
-    } else {
-        IRArgs.emplace_back(value);
+        return runtime->builder.CreateLoad(type, value);
     }
+    return value;
 }
 
 void LgsFunc::setBigObjAttrs(Function& IRFunc) const {
-    const auto paramIRType = getReturnSwapParam()->type->getIRType();
+    const auto paramIRType = getReturnSwapParam().type->getIRType();
     IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::StructRet, paramIRType));
     IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::Writable));
     IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
@@ -116,7 +115,7 @@ bool LgsFunc::shouldLoadIRArg(Value* value) {
     return true;
 }
 
-LgsParam* LgsFunc::getReturnSwapParam() const {
+LgsParam LgsFunc::getReturnSwapParam() const {
     if (!funcType.swapReturn) assert(false);
     if (funcType.returnParamIndex > funcType.params.size()) assert(false);
     return funcType.params[funcType.returnParamIndex];
@@ -136,7 +135,7 @@ void LgsFunc::swapReturnIfNeeded() {
     funcType.swapReturn = funcType.isRvBig && isEqual;
     if (funcType.swapReturn) {
         funcType.returnParamIndex = funcType.isMethod && !funcType.isStatic;
-        funcType.params.insert(funcType.params.begin(), new LgsParam(funcType.rt));
+        funcType.params.insert(funcType.params.begin(), LgsParam(funcType.rt));
         funcType.rt = &LGS_VOID;
     }
 }
@@ -149,8 +148,8 @@ string LgsFunc::format(string& tabs) {
     stringstream str;
     str << funcType.name << "(";
     for (int i = 0; i < funcType.params.size(); ++i) {
-        const auto param = funcType.params[i];
-        str << param->format(tabs);
+        auto param = funcType.params[i];
+        str << param.format(tabs);
         if (i != funcType.params.size() - 1) {
             str << ", ";
         }
@@ -168,19 +167,14 @@ json LgsFunc::asJSON() {
     tree["name"] = funcType.name;
     tree["type"] = funcType.rt->getIRName();
     tree["params"] = {};
-    for (const auto& param : funcType.params) {
-        tree["params"].emplace_back(param->asJSON());
+    for (auto& param : funcType.params) {
+        tree["params"].emplace_back(param.asJSON());
     }
     tree["stmts"] = stmtBlock->asJSON();
     return tree;
 }
 
 LgsFunc::~LgsFunc() {
-    if (!funcType.isBuiltin) {
-        for (int i = funcType.isMethod; i < funcType.params.size(); ++i) {
-            delete funcType.params[i];
-        }
-    }
     if (stmtBlock) {
         delete stmtBlock;
     }

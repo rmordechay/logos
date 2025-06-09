@@ -4,7 +4,7 @@
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsStr.h"
+
 #include <logos/LgsRuntime.h>
 
 string LgsVariable::getName() {

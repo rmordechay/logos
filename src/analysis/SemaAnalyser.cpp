@@ -8,7 +8,7 @@
 #include "exprs/LgsCast.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
-#include "types/primitives/LgsBool.h"
+
 #include "exprs/unary/LgsArrayExpr.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
@@ -30,6 +30,8 @@
 #include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsArray.h"
+#include "types/LgsGroup.h"
+
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsForLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -498,10 +500,8 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
 }
 
 void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {
-    vector<string> argTypeNames;
     for (const auto& arg : methodCall->args) {
         visitExpr(arg);
-        argTypeNames.emplace_back(arg->type->prettyName());
     }
     auto name = methodCall->name;
     const auto method = parentType->findMethod(name);

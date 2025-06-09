@@ -1,7 +1,7 @@
 #pragma once
 #include "funcs/LgsBuiltinFunc.h"
 
-#include "types/primitives/LgsBool.h"
+
 #include "utils/LgsUtils.h"
 
 
@@ -27,7 +27,8 @@ public:
             const auto arg = args[i];
             const auto argType = arg->type->getIRType();
             const auto argValue = arg->getIRValue(runtime);
-            addIRArg(runtime, IRArgs, argType, argValue);
+            const auto IRArg = addIRArg(runtime, argType, argValue);
+            IRArgs.push_back(IRArg);
             str << arg->type->getStrFormatPart() << std::endl;
         }
         IRArgs.insert(IRArgs.begin(), getIRStr(runtime, str.str()));

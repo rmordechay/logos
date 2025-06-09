@@ -1,5 +1,9 @@
 #pragma once
-#include "methods/LgsMapMethods.h"
+#include "LgsAny.h"
+#include "LgsStr.h"
+#include "funcs/LgsBuiltinFunc.h"
+#include "primitives/LgsInt.h"
+#include "primitives/LgsVoid.h"
 #include "types/LgsPair.h"
 
 class LgsMapPair;
@@ -9,13 +13,14 @@ public:
     static constexpr auto name = "Map";
     LgsPair kvType;
     StructType* mapStruct = nullptr;
-    LgsBuiltinFunc init{"init", &LGS_VOID, name, {LgsParam{this}, LgsParam{&LGS_INT}}};
-    LgsBuiltinFunc get{"get", &LGS_ANY, name, {LgsParam{this}, LgsParam{new LgsStr()}}};
-    LgsBuiltinFunc add{"add", &LGS_VOID, name, {LgsParam{this}, LgsParam{new LgsStr()}, LgsParam{&LGS_ANY}}};
-    LgsBuiltinFunc delete_{"delete", &LGS_VOID, name, {LgsParam{this}}};
-    LgsBuiltinFunc len{"len", &LGS_INT, name, {LgsParam{this}}};
-    LgsBuiltinFunc isEmpty{"isEmpty", &LGS_INT, name, {LgsParam{this}}};
-    LgsBuiltinFunc isNotEmpty{"isNotEmpty", &LGS_INT, name, {LgsParam{this}}};
+    LgsBuiltinFunc get{"get", &LGS_ANY, name, {this, new LgsStr()}, true};
+    LgsBuiltinFunc add{"add", &LGS_VOID, name, {this, new LgsStr(), &LGS_ANY}, true};
+    LgsBuiltinFunc len{"len", &LGS_INT, name, {this}, true};
+    LgsBuiltinFunc isEmpty{"isEmpty", &LGS_INT, name, {this}, true};
+    LgsBuiltinFunc isNotEmpty{"isNotEmpty", &LGS_INT, name, {this}, true};
+    LgsBuiltinFunc init{"init", &LGS_VOID, name, {this, &LGS_INT}};
+    LgsBuiltinFunc delete_{"delete", &LGS_VOID, name, {this, &LGS_ANY}};
+    LgsBuiltinFunc free{"free", &LGS_VOID, name, {this}};
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&kvType) {
         kvType.key = keyType;

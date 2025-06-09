@@ -25,7 +25,7 @@ public:
     }
     explicit LgsFunc(const LgsFuncType* funcType) : LgsFunc(funcType->name, funcType->rt, funcType->params) {}
     void swapReturnIfNeeded();
-    LgsParam* getReturnSwapParam() const;
+    LgsParam getReturnSwapParam() const;
     void setBigObjAttrs(Function& IRFunc) const;
     json asJSON() override;
     string prettyName() override;
@@ -36,7 +36,7 @@ public:
     virtual Value* callIR(LgsRuntime* runtime, const vector<Value*>& args = {});
     virtual Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args = {});
     static bool shouldLoadIRArg(Value* value);
-    static void addIRArg(LgsRuntime* runtime, vector<Value*>& IRArgs, Type* type, Value* value);
+    static Value* addIRArg(LgsRuntime* runtime, Type* type, Value* value);
     ~LgsFunc() override;
 };
 

@@ -1,9 +1,9 @@
 #pragma once
 #include "files/LgsFile.h"
 #include "logos/LgsASTVisitor.h"
-#include "types/LgsGroup.h"
 
 class LgsArray;
+class LgsGroup;
 class LgsValue;
 class LgsVariable;
 class LgsUnaryExpr;

@@ -1,5 +1,5 @@
 #pragma once
-#include "methods/LgsObjMethods.h"
+#include "LgsArray.h"
 
 class LgsField;
 
@@ -9,7 +9,7 @@ public:
     string path;
     bool isSingleton = false;
     vector<LgsType*> interfaces;
-    LgsObjFieldsFunc fieldsFunc{this};
+    LgsBuiltinFunc fieldsFunc{"fields", new LgsArray(&LGS_ANY), name, {this}};
 
     explicit LgsObject(const string& name, const string& path) : name(name), path(path) {}
     explicit LgsObject(const string& name) : LgsObject(name, "") {}

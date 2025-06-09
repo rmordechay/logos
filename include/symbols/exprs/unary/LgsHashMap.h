@@ -2,7 +2,7 @@
 #include "LgsUnaryExpr.h"
 #include "types/LgsMap.h"
 
-class LgsHashMap : public LgsUnaryExpr {
+class LgsHashMap final : public LgsUnaryExpr {
 public:
     LgsMap mapType;
     vector<LgsMapPair*> initialElements;

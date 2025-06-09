@@ -1,6 +1,6 @@
 #include "exprs/unary/constants/LgsShortConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "types/LgsStr.h"
+
 
 string LgsShortConst::prettyName() {
     return to_string(value);

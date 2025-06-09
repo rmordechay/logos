@@ -2,11 +2,11 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/LgsObject.h"
-#include "types/primitives/LgsBool.h"
-#include "types/primitives/LgsFloat.h"
+
+
 #include "types/primitives/LgsVoid.h"
-#include "types/LgsStr.h"
-#include "types/primitives/LgsShort.h"
+
+
 
 bool LgsCVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     const auto name = func->getNameAsString();
@@ -15,7 +15,7 @@ bool LgsCVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     const auto funcImpl = new LgsFunc(name, lgsType);
     for (int i = 0; i < func->getNumParams(); ++i) {
         const auto paramType = func->getParamDecl(i)->getType();
-        const auto lgsParam = new LgsParam(mapCType(paramType));
+        const auto lgsParam = LgsParam(mapCType(paramType));
         funcImpl->funcType.params.push_back(lgsParam);
     }
     globals.addSymbol(name, LgsSymbol(funcImpl), &errHandler);
@@ -126,7 +126,7 @@ LgsType* LgsCVisitor::mapCFunc(const clang::QualType type) {
     const auto cFuncType = type->getAs<clang::FunctionProtoType>();
     lgsFuncType->rt = mapCType(cFuncType->getReturnType());
     for (const clang::QualType param : cFuncType->getParamTypes()) {
-        auto lgsParam = new LgsParam(mapCType(param));
+        auto lgsParam = LgsParam(mapCType(param));
         lgsFuncType->params.emplace_back(lgsParam);
     }
     return lgsFuncType;

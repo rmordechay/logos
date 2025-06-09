@@ -6,19 +6,36 @@
 #include "primitives/LgsVoid.h"
 #include "types/LgsIterable.h"
 
+class LgsArrayAddFunc final : public LgsBuiltinFunc {
+public:
+    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName()) {
+        funcType.isPublic = true;
+        funcType.params = {LgsParam{parent}, LgsParam{&LGS_ANY}};
+    }
+
+    Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
+        const auto arrPtr = args[0]->getIRValue(runtime);
+        const auto elementValue = args[1]->getIRValue(runtime);
+        const auto elementType = args[1]->type->getIRType();
+        const auto elementPtr = runtime->builder.CreateAlloca(elementType);
+        runtime->builder.CreateStore(elementValue, elementPtr);
+        return callIR(runtime, {arrPtr, elementPtr});
+    }
+};
+
 class LgsArray final : public LgsIterable {
 public:
     static constexpr auto name = "Array";
     StructType* arrStruct = nullptr;
-    LgsBuiltinFunc init{"init", &LGS_VOID, name, {LgsParam{this}, LgsParam{&LGS_INT}, LgsParam{&LGS_LONG}}};
-    LgsBuiltinFunc get{"get", &LGS_ANY, name, {LgsParam{this}, LgsParam {&LGS_INT}}};
-    LgsBuiltinFunc put{"put", &LGS_VOID, name, {LgsParam{this}, LgsParam{&LGS_INT}, LgsParam{&LGS_ANY}}};
-    LgsBuiltinFunc add{"add", &LGS_VOID, name, {LgsParam{this}, LgsParam{&LGS_ANY}}};
-    LgsBuiltinFunc delete_{"delete", &LGS_VOID, name, {LgsParam{this}, LgsParam{&LGS_INT}}};
-    LgsBuiltinFunc len{"len", &LGS_INT, name, {LgsParam{this}}};
-    LgsBuiltinFunc isEmpty{"isEmpty", &LGS_INT, name, {LgsParam{this}}};
-    LgsBuiltinFunc isNotEmpty{"isNotEmpty", &LGS_INT, name, {LgsParam{this}}};
-    LgsBuiltinFunc free{"free", &LGS_INT, name, {LgsParam{this}}};
+    LgsBuiltinFunc get{"get", &LGS_ANY, name, {this, &LGS_INT}, true};
+    LgsArrayAddFunc add{this};
+    LgsBuiltinFunc len{"len", &LGS_INT, name, {this}, true};
+    LgsBuiltinFunc isEmpty{"isEmpty", &LGS_INT, name, {this}, true};
+    LgsBuiltinFunc isNotEmpty{"isNotEmpty", &LGS_INT, name, {this}, true};
+    LgsBuiltinFunc init{"init", &LGS_VOID, name, {this, &LGS_INT, &LGS_LONG}};
+    LgsBuiltinFunc put{"put", &LGS_VOID, name, {this, &LGS_INT, &LGS_ANY}};
+    LgsBuiltinFunc delete_{"delete", &LGS_VOID, name, {this, &LGS_INT}};
+    LgsBuiltinFunc free{"free", &LGS_VOID, name, {this}};
 
     explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         unpackLength = 1;

@@ -22,5 +22,3 @@ public:
 };
 
 inline LgsInt LGS_INT;
-
-

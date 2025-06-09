@@ -1,7 +1,7 @@
 #pragma once
 #include "LgsConstExpr.h"
 #include "LgsIntConst.h"
-#include "types/LgsStr.h"
+
 
 
 class LgsStrConst final : public LgsConstExpr {

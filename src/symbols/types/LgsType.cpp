@@ -1,12 +1,12 @@
 #include "stmts/LgsField.h"
-#include "types/primitives/LgsInt.h"
+
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsArray.h"
 #include "types/LgsGroup.h"
 #include "types/LgsMap.h"
 #include "types/LgsUnknownType.h"
-#include "types/primitives/LgsBool.h"
+
 
 bool LgsType::equals(LgsType& other) {
     return getIRName() == other.getIRName();

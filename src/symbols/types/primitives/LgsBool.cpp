@@ -1,4 +1,4 @@
-#include "types/primitives/LgsBool.h"
+
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/LgsNull.h"
 
