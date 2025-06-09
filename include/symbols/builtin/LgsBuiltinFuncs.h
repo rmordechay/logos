@@ -1,10 +1,6 @@
 #pragma once
 #include "funcs/LgsBuiltinFunc.h"
-
-
 #include "utils/LgsUtils.h"
-
-
 #include <types/primitives/LgsVoid.h>
 #include <types/LgsAny.h>
 
@@ -12,10 +8,8 @@ class LgsPrint final : public LgsBuiltinFunc {
 public:
     static constexpr auto name = "print";
 
-    explicit LgsPrint(): LgsBuiltinFunc(name, &LGS_VOID, "") {
-        funcType.isVariadic = true;
+    explicit LgsPrint(): LgsBuiltinFunc(name, &LGS_VOID, "", {&LGS_ANY, &LGS_ANY}, false, true) {
         funcType.IRName = "printf";
-        funcType.params = {LgsParam{&LGS_ANY}, LgsParam{&LGS_ANY}};
     }
 
     Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
@@ -42,10 +36,7 @@ class LgsSizeOf final : public LgsBuiltinFunc {
 public:
     static constexpr auto name = "sizeof";
 
-    LgsSizeOf(): LgsBuiltinFunc(name, &LGS_LONG, "") {
-        funcType.params = {LgsParam{&LGS_ANY}};
-    }
-
+    LgsSizeOf(): LgsBuiltinFunc(name, &LGS_LONG, "", {&LGS_ANY}) {}
     Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
         return runtime->builder.getInt64(args.front()->type->getSizeBytes());
     }
@@ -53,5 +44,3 @@ public:
 
 inline LgsPrint lgsPrint;
 inline LgsSizeOf lgsSizeof;
-
-

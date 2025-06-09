@@ -50,12 +50,12 @@ public:
     void visitMainFile(LgsMainFile* mainFile) override;
     void visitObject(LgsObject* obj) override;
     void visitInterface(LgsInterface* interface) const override;
-    void visitField(const LgsField* field) override;
+    void visitField(LgsField* field) override;
     void visitFunc(LgsFunc* func) override;
     void visitParam(LgsParam* param) override;
     void visitStmt(LgsStmt* stmt) override;
     void visitStmtBlock(LgsStmtBlock* stmtBlock) override;
-    void visitAssignment(const LgsAssignment* assignment) override;
+    void visitAssignment(LgsAssignment* assignment) override;
     void visitVarDec(LgsVarDec* varDec) override;
     void visitIfStmt(LgsIfStmt* ifStmt) override;
     void visitPatternMatch(const LgsPatternMatch* patternMatching) override;
@@ -90,7 +90,7 @@ public:
 
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
-    void validateExprType(const LgsExpr* expr, LgsType* type);
+    void validateExprType(LgsValue* value);
     void validateFuncControlFlow(const LgsFunc* func);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 

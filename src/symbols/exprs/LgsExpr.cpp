@@ -13,7 +13,6 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
-#include "stmts/LgsVarDec.h"
 
 Value* LgsExpr::getIRValue(LgsRuntime* runtime) {
     if (IRValue) return IRValue;
@@ -24,6 +23,10 @@ Value* LgsExpr::getIRValue(LgsRuntime* runtime) {
 
 void LgsExpr::setType(LgsType* type) {
     this->type = type;
+}
+
+LgsExpr::~LgsExpr() {
+    freeType(type);
 }
 
 void LgsExpr::free(LgsRuntime* runtime) { assert(false); }

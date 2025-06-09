@@ -102,7 +102,7 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
 void SemaAnalyser::visitParam(LgsParam* param) {
     if (param->expr) {
         visitExpr(param->expr);
-        validateExprType(param->expr, param->type);
+        validateExprType(param);
     } else if (param->isVariadic) {
         // assert(false);
     }
@@ -145,9 +145,9 @@ void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
     }
 }
 
-void SemaAnalyser::visitField(const LgsField* field) {
+void SemaAnalyser::visitField(LgsField* field) {
     visitExpr(field->expr);
-    validateExprType(field->expr, field->type);
+    validateExprType(field);
 }
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
@@ -164,16 +164,16 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     } else {
         assert(false);
     }
-    validateExprType(varDec->expr, varDec->type);
+    validateExprType(varDec);
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
 }
 
-void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
+void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
     const auto rightExpr = assignment->rValue;
     const auto leftExpr = assignment->lValue;
     visitExpr(leftExpr);
     visitExpr(rightExpr);
-    validateExprType(rightExpr, leftExpr->type);
+    validateExprType(assignment);
 }
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -370,7 +370,10 @@ void SemaAnalyser::visitStaticArray(LgsArrayExpr* array) {
     }
     const auto sizeExpr = arrType.sizeExpr;
     visitExpr(sizeExpr);
-    if (sizeExpr && sizeExpr->type->isConst && sizeExpr->type->isInt) return;
+    if (sizeExpr && sizeExpr->type->isConst && sizeExpr->type->isInt) {
+        array->arrType.constSize = getExprConstNumber(sizeExpr);
+        return;
+    }
     errHandler.handleError(E10048, &array->location);
 }
 
@@ -642,7 +645,31 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     binaryExpr->setType(type);
 }
 
-void SemaAnalyser::validateExprType(const LgsExpr* expr, LgsType* type) {
+void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
+    const auto method = methodCall->func;
+    if (!method) return;
+    if (!method->funcType.isPublic && file->absPath != method->filePath) {
+        errHandler.handleError(E10031, &method->location, {method->funcType.name, method->funcType.parentName});
+    }
+}
+
+void SemaAnalyser::validateExprType(LgsValue* value) {
+    const LgsExpr* expr = nullptr;
+    LgsType* type = nullptr;
+    if (const auto varDec = dynamic_cast<LgsVarDec*>(value)) {
+        expr = varDec->expr;
+        type = varDec->type;
+    } else if (const auto assignment = dynamic_cast<LgsAssignment*>(value)) {
+        expr = assignment->rValue;
+        type = assignment->lValue->type;
+    } else if (const auto field = dynamic_cast<LgsField*>(value)) {
+        expr = field->expr;
+        type = field->type;
+    } else if (const auto param = dynamic_cast<LgsParam*>(value)) {
+        expr = param->expr;
+        type = param->type;
+    }
+
     if (!expr) return;
     if (expr->isNull) {
         // null must have a type
@@ -656,16 +683,22 @@ void SemaAnalyser::validateExprType(const LgsExpr* expr, LgsType* type) {
         }
         return;
     }
+
     if (type && expr->type &&  !expr->type->equals(type)) {
+        if (dynamic_cast<LgsParam*>(value)) {
+            return errHandler.handleError(E10050, &expr->location, {type->prettyName(), expr->type->prettyName()});
+        }
         return errHandler.handleError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
     }
-}
 
-void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
-    const auto method = methodCall->func;
-    if (!method) return;
-    if (!method->funcType.isPublic && file->absPath != method->filePath) {
-        errHandler.handleError(E10031, &method->location, {method->funcType.name, method->funcType.parentName});
+    if (type->isPrimitive) return;
+    freeType(type);
+    if (const auto varDec = dynamic_cast<LgsVarDec*>(value)) {
+        varDec->type = expr->type;
+    } else if (const auto field = dynamic_cast<LgsField*>(value)) {
+        field->type = expr->type;
+    } else if (const auto param = dynamic_cast<LgsParam*>(value)) {
+        param->type = expr->type;
     }
 }
 
@@ -719,7 +752,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
         return nullptr;
     }
     const auto symbol = &globals.symbols[typeName];
-    delete type;
+    freeType(type);
     LgsType* newType = nullptr;
     switch (symbol->symbolType) {
     case ENUM_FIELD:

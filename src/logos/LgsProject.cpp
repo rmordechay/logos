@@ -9,7 +9,7 @@
 #include "logos/Platform.h"
 #include "stmts/LgsVarDec.h"
 #include "utils/ThreadPool.h"
-#include "builtin/LgsPrint.h"
+#include "builtin/LgsBuiltinFuncs.h"
 
 extern char **environ;
 

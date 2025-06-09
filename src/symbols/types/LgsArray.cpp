@@ -4,7 +4,8 @@
 
 size_t LgsArray::getSizeBytes() {
     if (isStatic) {
-        return baseType->getSizeBytes() * getExprConstNumber(sizeExpr);
+        assert(constSize > 0);
+        return baseType->getSizeBytes() * constSize;
     }
     return sizeof(void*);
 }
@@ -77,4 +78,13 @@ LgsType* LgsArray::clone() {
 
 LgsArray::~LgsArray() {
     delete sizeExpr;
+}
+
+Value* LgsArrayAddFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
+    const auto arrPtr = args[0]->getIRValue(runtime);
+    const auto elementValue = args[1]->getIRValue(runtime);
+    const auto elementType = args[1]->type->getIRType();
+    const auto elementPtr = runtime->builder.CreateAlloca(elementType);
+    runtime->builder.CreateStore(elementValue, elementPtr);
+    return callIR(runtime, {arrPtr, elementPtr});
 }

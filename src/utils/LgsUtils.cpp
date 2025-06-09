@@ -108,3 +108,8 @@ FunctionCallee getSnprintf(LgsRuntime* runtime) {
     const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context), runtime->builder.getInt64Ty(), PointerType::getUnqual(context)}, true);
     return runtime->module->getOrInsertFunction("snprintf", printfType);
 }
+
+void freeType(LgsType* type) {
+    if (type->isPrimitive || type->asArray() || type->asMap()) return;
+    delete type;
+}

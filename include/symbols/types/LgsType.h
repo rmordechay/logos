@@ -63,5 +63,3 @@ public:
     virtual LgsType* clone();
     virtual ~LgsType();
 };
-
-

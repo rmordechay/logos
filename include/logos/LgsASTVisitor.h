@@ -40,12 +40,12 @@ public:
     virtual void visitMainFile(LgsMainFile* mainFile) = 0;
     virtual void visitObject(LgsObject* obj) = 0;
     virtual void visitInterface(LgsInterface* interface) const = 0;
-    virtual void visitField(const LgsField* field) = 0;
+    virtual void visitField(LgsField* field) = 0;
     virtual void visitFunc(LgsFunc* func) = 0;
     virtual void visitParam(LgsParam* param) = 0;
     virtual void visitStmt(LgsStmt* stmt) = 0;
     virtual void visitStmtBlock(LgsStmtBlock* stmtBlock) = 0;
-    virtual void visitAssignment(const LgsAssignment* assignment) = 0;
+    virtual void visitAssignment(LgsAssignment* assignment) = 0;
     virtual void visitVarDec(LgsVarDec* varDec) = 0;
     virtual void visitIfStmt(LgsIfStmt* ifStmt) = 0;
     virtual void visitPatternMatch(const LgsPatternMatch* patternMatching) = 0;

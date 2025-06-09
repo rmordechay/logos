@@ -58,3 +58,4 @@ inline LgsError E10046{.msg = "'%s' is not callable.", .errCode = errCodeStart++
 inline LgsError E10047{.msg = "External file '%s' was not found.", .errCode = errCodeStart++};
 inline LgsError E10048{.msg = "Static array must have a constant size.", .errCode = errCodeStart++};
 inline LgsError E10049{.msg = "Not enough information to infer type of array. Specify an explicit type or initialize with element(s).", .errCode = errCodeStart++};
+inline LgsError E10050{.msg = "Parameter expects type '%s'. Given: '%'.", .errCode = errCodeStart++};

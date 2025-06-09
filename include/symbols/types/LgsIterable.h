@@ -10,7 +10,7 @@ public:
     LgsType* baseType;
     bool isStatic = false;
     uint16_t unpackLength = 0;
-    size_t sizeBytes = 0;
+    size_t constSize = 0;
     LgsExpr* sizeExpr = nullptr;
 
     explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}

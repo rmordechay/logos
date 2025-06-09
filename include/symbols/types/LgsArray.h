@@ -8,28 +8,18 @@
 
 class LgsArrayAddFunc final : public LgsBuiltinFunc {
 public:
-    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName()) {
-        funcType.isPublic = true;
-        funcType.params = {LgsParam{parent}, LgsParam{&LGS_ANY}};
-    }
-
-    Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
-        const auto arrPtr = args[0]->getIRValue(runtime);
-        const auto elementValue = args[1]->getIRValue(runtime);
-        const auto elementType = args[1]->type->getIRType();
-        const auto elementPtr = runtime->builder.CreateAlloca(elementType);
-        runtime->builder.CreateStore(elementValue, elementPtr);
-        return callIR(runtime, {arrPtr, elementPtr});
-    }
+    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName(), {parent, &LGS_ANY}, true) {}
+    Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override;
 };
 
 class LgsArray final : public LgsIterable {
 public:
     static constexpr auto name = "Array";
     StructType* arrStruct = nullptr;
-    LgsBuiltinFunc get{"get", &LGS_ANY, name, {this, &LGS_INT}, true};
+
     LgsArrayAddFunc add{this};
     LgsBuiltinFunc len{"len", &LGS_INT, name, {this}, true};
+    LgsBuiltinFunc get{"get", &LGS_ANY, name, {this, &LGS_INT}, true};
     LgsBuiltinFunc isEmpty{"isEmpty", &LGS_INT, name, {this}, true};
     LgsBuiltinFunc isNotEmpty{"isNotEmpty", &LGS_INT, name, {this}, true};
     LgsBuiltinFunc init{"init", &LGS_VOID, name, {this, &LGS_INT, &LGS_LONG}};
