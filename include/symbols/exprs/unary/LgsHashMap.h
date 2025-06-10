@@ -11,7 +11,7 @@ public:
         map = new LgsMap(keyType, valueType);
         type = map;
     }
-    explicit LgsHashMap(LgsMap* mapType) : LgsUnaryExpr(mapType) {}
+    explicit LgsHashMap(LgsMap* mapType) : LgsUnaryExpr(mapType), map(mapType) {}
     void initIRMap(LgsRuntime* runtime);
     Value* createIRValue(LgsRuntime* runtime) override;
     ~LgsHashMap() override = default;

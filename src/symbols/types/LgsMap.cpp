@@ -7,6 +7,10 @@ size_t LgsMap::getSizeBytes() {
     return sizeof(void*);
 }
 
+LgsExpr* LgsMap::getZeroValue() {
+    return new LgsHashMap(this);
+}
+
 void LgsMap::unpackTypes(const vector<LgsVarDec*>& varDecs) {
     varDecs[0]->type = typePair->key;
     varDecs[1]->type = typePair->value;
@@ -34,10 +38,6 @@ Type* LgsMap::getIRType() {
 
 string LgsMap::getIRName() {
     return name;
-}
-
-LgsExpr* LgsMap::getZeroValue() {
-    return new LgsHashMap(this);
 }
 
 string LgsMap::prettyName() const {

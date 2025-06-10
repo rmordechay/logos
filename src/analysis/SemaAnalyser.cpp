@@ -346,7 +346,7 @@ void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
     for (const auto element : array->initialElements) {
         visitExpr(element);
     }
-    if (array->type->asArray()->isStatic) {
+    if (array->arrType->isStatic) {
         visitStaticArray(array);
     } else {
         visitDynamicArray(array);
@@ -355,7 +355,7 @@ void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
 
 void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
     const auto& initialElements = array->initialElements;
-    const auto arr = array->type->asArray();
+    const auto arr = array->arrType;
     const auto& arrType = arr;
     if (initialElements.empty()) {
         if (!arrType->baseType) return errHandler.handleError(E10049, &array->location);
@@ -369,7 +369,7 @@ void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
 
 void SemaAnalyser::visitStaticArray(const LgsArrayExpr* array) {
     const auto& initialElements = array->initialElements;
-    const auto arr = array->type->asArray();
+    const auto arr = array->arrType;
     if (initialElements.empty() && !arr->baseType) {
         return errHandler.handleError(E10049, &array->location);
     }

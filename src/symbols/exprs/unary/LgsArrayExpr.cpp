@@ -3,28 +3,27 @@
 #include "logos/LgsConfig.h"
 
 Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {
-    if (type->asArray()->isStatic) return createConstArray(runtime);
+    if (arrType->isStatic) return createConstArray(runtime);
     return createDynamicArray(runtime);
 }
 
 Value* LgsArrayExpr::createDynamicArray(LgsRuntime* runtime) {
     auto& builder = runtime->builder;
-    const auto arr = type->asArray();
-    const auto elementSize = builder.getInt64(arr->baseType->getSizeBytes());
-    IRValue = builder.CreateAlloca(arr->getArrStruct(runtime));
+    const auto elementSize = builder.getInt64(arrType->baseType->getSizeBytes());
+    IRValue = builder.CreateAlloca(arrType->getArrStruct(runtime));
 
     Value* capacityIR = nullptr;
-    if (arr->sizeExpr) {
-        capacityIR = arr->sizeExpr->getIRValue(runtime);
+    if (arrType->sizeExpr) {
+        capacityIR = arrType->sizeExpr->getIRValue(runtime);
         capacityIR = builder.CreateZExt(capacityIR, builder.getInt64Ty());
     } else {
         const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
         capacityIR = builder.getInt64(capacity);
     }
 
-    arr->initFunc.callIR(runtime, {IRValue, capacityIR, elementSize});
+    arrType->initFunc.callIR(runtime, {IRValue, capacityIR, elementSize});
     for (const auto element : initialElements) {
-        arr->addFunc.call(runtime, {this, element});
+        arrType->addFunc.call(runtime, {this, element});
     }
     runtime->addAllocatedExpr(this);
     return IRValue;
@@ -45,7 +44,7 @@ Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
 
 
 void LgsArrayExpr::free(LgsRuntime* runtime) {
-    if (!type->asArray()->isStatic) {
-        type->asArray()->freeFunc.call(runtime, {this});
+    if (!arrType->isStatic) {
+        arrType->freeFunc.call(runtime, {this});
     }
 }
