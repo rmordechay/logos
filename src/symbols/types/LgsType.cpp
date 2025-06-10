@@ -48,7 +48,7 @@ LgsType::~LgsType() {
 }
 
 size_t LgsType::getSizeBytes() { assert(0); }
-void LgsType::castImplicitly(LgsType& toType) { assert(0); }
+void LgsType::castImplicitly(LgsType& toType) { }
 json LgsType::asJSON() const { assert(0); }
 string LgsType::getStrFormatPart() const { assert(0); }
 LgsType* LgsType::clone() { assert(0); }

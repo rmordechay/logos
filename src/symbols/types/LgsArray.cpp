@@ -7,14 +7,14 @@ Type* LgsArray::getIRType() {
     if (IRType) return IRType;
     if (!isStatic) return PointerType::getUnqual(context);
     const auto innerIRType = baseType->getIRType();
-    IRType = ArrayType::get(innerIRType, constSize);
+    IRType = ArrayType::get(innerIRType, iterLen);
     return IRType;
 }
 
 size_t LgsArray::getSizeBytes() {
     if (isStatic) {
-        assert(constSize > 0);
-        return baseType->getSizeBytes() * constSize;
+        assert(iterLen > 0);
+        return baseType->getSizeBytes() * iterLen;
     }
     return sizeof(size_t) + sizeof(int) + sizeof(int) + sizeof(void*);
 }
@@ -24,27 +24,17 @@ LgsExpr* LgsArray::getZeroValue() {
 }
 
 string LgsArray::prettyName() const {
-    return name;
+    if (!isStatic) return baseType->prettyName() + "[]";
+    return baseType->prettyName() + '[' + to_string(iterLen) + ']';
 }
 
 bool LgsArray::equals(LgsType* other) {
     const auto otherArr = other->asArray();
     if (!otherArr) return false;
     if (!baseType->equals(otherArr->baseType)) return false;
-    if (isStatic && otherArr->isStatic) {
-        return sizeExpr->type->equals(otherArr->sizeExpr->type);
-    }
+    if (isStatic != otherArr->isStatic) return false;
+    if (isStatic) return sizeExpr->type->equals(otherArr->sizeExpr->type);
     return true;
-}
-
-void LgsArray::castImplicitly(LgsType& toType) {
-    const auto otherArr = toType.asArray();
-    if (!otherArr) assert(0);
-    if (otherArr->isStatic) {
-        isStatic = true;
-        sizeExpr = otherArr->sizeExpr->clone();
-        constSize = otherArr->constSize;
-    }
 }
 
 string LgsArray::getIRName() {

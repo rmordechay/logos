@@ -331,8 +331,6 @@ void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
         visitIterIndex(iterIndex);
     } else if (const auto variable = unaryExpr->asVariable()) {
         visitVariable(variable);
-    } else {
-        assert(0);
     }
 }
 
@@ -779,7 +777,7 @@ void SemaAnalyser::resolveIterable(LgsIterable* iterable) {
         if (exprConstNumber <= 0) {
             return errHandler.handleError(E10048, &iterable->location, {iterable->prettyName()});
         }
-        iterable->constSize = exprConstNumber;
+        iterable->iterLen = exprConstNumber;
     }
 }
 

@@ -23,7 +23,6 @@ public:
         funcType.rt = rt;
         funcType.params = params;
     }
-    explicit LgsFunc(const LgsFuncType* funcType) : LgsFunc(funcType->name, funcType->rt, funcType->params) {}
     void swapReturnIfNeeded();
     LgsParam getReturnSwapParam() const;
     void setBigObjAttrs(Function& IRFunc) const;

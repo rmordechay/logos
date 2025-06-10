@@ -147,8 +147,8 @@ void logosParserInitialize() {
   	1,54,1,54,4,54,685,8,54,11,54,12,54,686,1,55,1,55,1,55,1,55,1,55,1,55,
   	1,55,1,55,3,55,697,8,55,1,56,1,56,1,56,3,56,702,8,56,1,57,1,57,1,57,1,
   	57,1,57,1,57,1,57,1,57,1,57,3,57,713,8,57,1,58,1,58,1,58,3,58,718,8,58,
-  	1,58,1,58,1,58,3,58,723,8,58,1,58,1,58,3,58,727,8,58,1,58,4,58,730,8,
-  	58,11,58,12,58,731,5,58,734,8,58,10,58,12,58,737,9,58,1,59,1,59,1,59,
+  	1,58,1,58,1,58,3,58,723,8,58,1,58,1,58,4,58,727,8,58,11,58,12,58,728,
+  	1,58,3,58,732,8,58,5,58,734,8,58,10,58,12,58,737,9,58,1,59,1,59,1,59,
   	1,59,1,59,1,59,1,60,1,60,3,60,747,8,60,1,60,1,60,1,61,1,61,1,61,1,61,
   	5,61,755,8,61,10,61,12,61,758,9,61,1,61,3,61,761,8,61,3,61,763,8,61,1,
   	61,1,61,1,61,1,61,1,62,1,62,1,62,1,62,1,62,5,62,774,8,62,10,62,12,62,
@@ -344,8 +344,8 @@ void logosParserInitialize() {
   	716,718,5,28,0,0,717,716,1,0,0,0,717,718,1,0,0,0,718,723,1,0,0,0,719,
   	723,5,40,0,0,720,723,3,118,59,0,721,723,3,122,61,0,722,714,1,0,0,0,722,
   	719,1,0,0,0,722,720,1,0,0,0,722,721,1,0,0,0,723,735,1,0,0,0,724,726,10,
-  	3,0,0,725,727,5,29,0,0,726,725,1,0,0,0,726,727,1,0,0,0,727,729,1,0,0,
-  	0,728,730,3,120,60,0,729,728,1,0,0,0,730,731,1,0,0,0,731,729,1,0,0,0,
+  	3,0,0,725,727,3,120,60,0,726,725,1,0,0,0,727,728,1,0,0,0,728,726,1,0,
+  	0,0,728,729,1,0,0,0,729,731,1,0,0,0,730,732,5,29,0,0,731,730,1,0,0,0,
   	731,732,1,0,0,0,732,734,1,0,0,0,733,724,1,0,0,0,734,737,1,0,0,0,735,733,
   	1,0,0,0,735,736,1,0,0,0,736,117,1,0,0,0,737,735,1,0,0,0,738,739,5,10,
   	0,0,739,740,3,116,58,0,740,741,5,21,0,0,741,742,3,116,58,0,742,743,5,
@@ -368,7 +368,7 @@ void logosParserInitialize() {
   	259,265,269,272,279,294,297,306,310,312,317,328,332,334,339,345,356,360,
   	364,377,383,391,402,406,414,420,424,435,441,447,458,470,474,482,485,489,
   	500,508,516,521,523,546,548,564,572,576,578,582,590,594,596,607,616,620,
-  	624,631,640,644,654,659,664,679,686,696,701,712,717,722,726,731,735,746,
+  	624,631,640,644,654,659,664,679,686,696,701,712,717,722,728,731,735,746,
   	756,760,762,775,779,781,793
   };
   staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
@@ -5577,16 +5577,16 @@ LogosParser::TypeContext* LogosParser::TypeContext::type() {
   return getRuleContext<LogosParser::TypeContext>(0);
 }
 
-tree::TerminalNode* LogosParser::TypeContext::EXCLA_MARK() {
-  return getToken(LogosParser::EXCLA_MARK, 0);
-}
-
 std::vector<LogosParser::ArraySizeContext *> LogosParser::TypeContext::arraySize() {
   return getRuleContexts<LogosParser::ArraySizeContext>();
 }
 
 LogosParser::ArraySizeContext* LogosParser::TypeContext::arraySize(size_t i) {
   return getRuleContext<LogosParser::ArraySizeContext>(i);
+}
+
+tree::TerminalNode* LogosParser::TypeContext::EXCLA_MARK() {
+  return getToken(LogosParser::EXCLA_MARK, 0);
 }
 
 
@@ -5689,21 +5689,13 @@ LogosParser::TypeContext* LogosParser::type(int precedence) {
         setState(724);
 
         if (!(precpred(_ctx, 3))) throw FailedPredicateException(this, "precpred(_ctx, 3)");
-        setState(726);
-        _errHandler->sync(this);
-
-        _la = _input->LA(1);
-        if (_la == LogosParser::EXCLA_MARK) {
-          setState(725);
-          match(LogosParser::EXCLA_MARK);
-        }
-        setState(729); 
+        setState(726); 
         _errHandler->sync(this);
         alt = 1;
         do {
           switch (alt) {
             case 1: {
-                  setState(728);
+                  setState(725);
                   arraySize();
                   break;
                 }
@@ -5711,10 +5703,23 @@ LogosParser::TypeContext* LogosParser::type(int precedence) {
           default:
             throw NoViableAltException(this);
           }
-          setState(731); 
+          setState(728); 
           _errHandler->sync(this);
-          alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 88, _ctx);
-        } while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER); 
+          alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 87, _ctx);
+        } while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER);
+        setState(731);
+        _errHandler->sync(this);
+
+        switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 88, _ctx)) {
+        case 1: {
+          setState(730);
+          match(LogosParser::EXCLA_MARK);
+          break;
+        }
+
+        default:
+          break;
+        } 
       }
       setState(737);
       _errHandler->sync(this);

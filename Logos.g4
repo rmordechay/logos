@@ -283,7 +283,7 @@ range:
 type:
         (TYPE | VARIABLE) QUEST_MARK?
    |    SELF_CLASS
-   |    baseType=type EXCLA_MARK? arraySize+
+   |    baseType=type arraySize+ EXCLA_MARK?
    |    mapType
    |    funcType
    ;

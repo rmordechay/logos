@@ -585,6 +585,8 @@ LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
 LgsUnaryExpr* AntlerConverter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {
     const auto array = new LgsArrayExpr();
     array->arrType->isStatic = !!ctx->EXCLA_MARK();
+    array->arrType->iterLen = ctx->expr().size();
+    array->arrType->sizeExpr = new LgsIntConst(array->arrType->iterLen);
     for (const auto expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }
