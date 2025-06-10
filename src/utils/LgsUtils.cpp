@@ -72,6 +72,11 @@ string getExprStr(LgsExpr* baseExpr) {
     assert(false);
 }
 
+void freeType(const LgsType* type) {
+    if (type->isPrimitive) return;
+    delete type;
+}
+
 void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices) {
     while (iterIndex) {
         if (iterIndex->index) {
@@ -128,10 +133,4 @@ TargetMachine* getTargetMachine() {
     lock_guard lock(mtx);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), nullopt);
     return targetMachine;
-}
-
-void freeType(const LgsType* type) {
-    if (!type) return;
-    if (type->isPrimitive || type->isBuiltin) return;
-    delete type;
 }

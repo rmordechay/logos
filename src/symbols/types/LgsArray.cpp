@@ -30,7 +30,12 @@ string LgsArray::prettyName() const {
 bool LgsArray::equals(LgsType* other) {
     const auto otherArr = other->asArray();
     if (!otherArr) return false;
-    return baseType->equals(otherArr->baseType);
+    const auto isEqual = otherArr->isStatic == isStatic && baseType->equals(otherArr->baseType);
+    if (!isEqual) return false;
+    if (isStatic) {
+        return sizeExpr->type->equals(otherArr->sizeExpr->type);
+    }
+    return true;
 }
 
 string LgsArray::getIRName() {

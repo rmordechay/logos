@@ -14,7 +14,7 @@ public:
     LgsExpr* sizeExpr = nullptr;
     bool isStatic = false;
 
-    explicit LgsIterable(LgsType* baseType) : baseType(baseType) {}
+    explicit LgsIterable(LgsType* baseType = nullptr) : baseType(baseType) {}
     virtual Value* getLength(LgsRuntime* runtime, LgsExpr* expr) = 0;
     virtual Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) = 0;
     virtual Value* callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) = 0;

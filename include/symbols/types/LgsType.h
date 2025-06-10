@@ -38,7 +38,7 @@ public:
     LgsFunc* getMethod(const string& name);
     void addMethod(LgsFunc* method);
     LgsFunc* findMethod(const string& name) const;
-    void setLocation(const antlr4::Token* ctx);
+    void setLocation(const Token* ctx);
 
     LgsBool* asBool();
     LgsStr* asStr();

@@ -145,8 +145,10 @@ void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
 }
 
 void SemaAnalyser::visitField(LgsField* field) {
-    visitExpr(field->expr);
-    validateExprType(field->expr, field->type);
+    if (field->expr) {
+        visitExpr(field->expr);
+        validateExprType(field->expr, field->type);
+    }
 }
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
@@ -168,8 +170,18 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
 }
 
 void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
-    visitExpr(assignment->lValue);
-    visitExpr(assignment->rValue);
+    const auto lValue = assignment->lValue;
+    const auto rValue = assignment->rValue;
+    visitExpr(lValue);
+    visitExpr(rValue);
+    const auto lType = lValue->type;
+    const auto rType = rValue->type;
+    if (lType && rType && lType->equals(rType)) {
+
+        return;
+    }
+    return errHandler.handleError(E10001, &assignment->location, {lType->prettyName(), rType->prettyName()});
+
 }
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -365,12 +377,12 @@ void SemaAnalyser::visitStaticArray(const LgsArrayExpr* array) {
 }
 
 void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) {
-    const auto kvType = hashMap->getTypePair();
-    if (kvType->key && kvType->value) return;
+    const auto typePair = hashMap->map->typePair;
+    if (typePair->key && typePair->value) return;
     if (hashMap->initialElements.empty()) return errHandler.handleError(E10049, &hashMap->location);
     const auto firstElement = hashMap->initialElements.front();
-    kvType->key = firstElement->key->type;
-    kvType->value = firstElement->value->type;
+    typePair->key = firstElement->key->type;
+    typePair->value = firstElement->value->type;
 }
 
 void SemaAnalyser::visitStrConst(LgsStrConst* strConst) const {
@@ -569,7 +581,7 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
         return errHandler.handleError(E10002, &iterIndex->location, {iterIndex->baseExpr->prettyName()});
     }
     if (const auto map = iterable->asMap()) {
-        iterIndex->setType(map->getTypePair()->value);
+        iterIndex->setType(map->typePair->value);
     } else {
         iterIndex->setType(iterable->baseType);
     }
@@ -646,7 +658,7 @@ void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
 }
 
 void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
-    if (!expr) return;
+    assert(expr);
     if (expr->isNull) {
         // null must have a type
         if (!type) {
@@ -666,7 +678,6 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
     }
 
     if (expr->type != type) {
-        freeType(expr->type);
         expr->type = type;
     }
 }
@@ -731,7 +742,6 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     }
 
     const auto symbol = &globals.symbols[typeName];
-    freeType(type);
     LgsType* newType = nullptr;
     switch (symbol->symbolType) {
     case ENUM_FIELD:
@@ -764,6 +774,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
         break;
     }
     assert(newType);
+    freeType(type);
     return newType;
 }
 

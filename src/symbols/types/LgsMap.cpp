@@ -8,13 +8,8 @@ size_t LgsMap::getSizeBytes() {
 }
 
 void LgsMap::unpackTypes(const vector<LgsVarDec*>& varDecs) {
-    const auto kvType = getTypePair();
-    varDecs[0]->type = kvType->key;
-    varDecs[1]->type = kvType->value;
-}
-
-LgsTypePair* LgsMap::getTypePair() const {
-    return baseType->asPair();
+    varDecs[0]->type = typePair->key;
+    varDecs[1]->type = typePair->value;
 }
 
 Value* LgsMap::getLength(LgsRuntime* runtime, LgsExpr* expr) {
@@ -46,17 +41,15 @@ LgsExpr* LgsMap::getZeroValue() {
 }
 
 string LgsMap::prettyName() const {
-    const auto kvType = getTypePair();
-    return '{' + kvType->key->prettyName() + ':' + kvType->value->prettyName() + '}';
+    return '{' + typePair->key->prettyName() + ':' + typePair->value->prettyName() + '}';
 }
 
 bool LgsMap::equals(LgsType* other) {
-    const auto kvType = getTypePair();
     const auto otherMap = other->asMap();
     if (!otherMap) return false;
-    const auto otherKvType = otherMap->getTypePair();
-    const auto keyEqual = kvType->key->equals(otherKvType->key);
-    return keyEqual && kvType->value->equals(otherKvType->value);
+    const auto otherKvType = otherMap->typePair;
+    const auto keyEqual = typePair->key->equals(otherKvType->key);
+    return keyEqual && typePair->value->equals(otherKvType->value);
 }
 
 LgsType* LgsMap::inferBinaryType(LgsType* other) {

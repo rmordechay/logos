@@ -25,7 +25,7 @@ public:
     LgsType* type = nullptr;
     bool isNull = false;
     bool isZeroValue = false;
-    // TODO removed visitVariable should be inferred from refs
+    // TODO removed from visitVariable. Should be inferred from some refs.
     bool isReturnExpr = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
@@ -73,6 +73,6 @@ public:
     virtual Value* bitXorIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* rshiftIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* lshiftIR(LgsRuntime* runtime, LgsExpr* other);
-    ~LgsExpr() override;
+    ~LgsExpr() override = default;
 };
 

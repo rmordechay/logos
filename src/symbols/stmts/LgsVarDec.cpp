@@ -1,11 +1,5 @@
 #include "stmts/LgsVarDec.h"
 #include "exprs/unary/LgsArrayExpr.h"
-#include "utils/LgsUtils.h"
-
-
-string LgsVarDec::format(string& indentStr) {
-    return indentStr + name + " = ";
-}
 
 void LgsVarDec::createIRStmt(LgsRuntime* runtime) {
     const auto IRType = type->getIRType();
@@ -23,6 +17,10 @@ bool LgsVarDec::shouldAllocate(const Type* IRType) const {
     return IRType->isArrayTy() || IRType->isPointerTy() || IRType->isVoidTy();
 }
 
+string LgsVarDec::format(string& indentStr) {
+    return indentStr + name + " = ";
+}
+
 json LgsVarDec::asJSON() {
     json tree;
     tree["name"] = name;
@@ -33,5 +31,4 @@ json LgsVarDec::asJSON() {
 
 LgsVarDec::~LgsVarDec() {
     delete expr;
-    freeType(type);
 }

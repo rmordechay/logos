@@ -4,15 +4,16 @@
 
 class LgsHashMap final : public LgsUnaryExpr {
 public:
+    LgsMap* map = nullptr;
     vector<LgsMapEntry*> initialElements;
 
     explicit LgsHashMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {
-        type = new LgsMap(keyType, valueType);
+        map = new LgsMap(keyType, valueType);
+        type = map;
     }
     explicit LgsHashMap(LgsMap* mapType) : LgsUnaryExpr(mapType) {}
     void initIRMap(LgsRuntime* runtime);
     Value* createIRValue(LgsRuntime* runtime) override;
-    LgsTypePair* getTypePair() const;
     ~LgsHashMap() override = default;
 };
 

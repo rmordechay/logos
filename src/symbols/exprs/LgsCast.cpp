@@ -10,7 +10,6 @@ Value* LgsCast::addIR(LgsRuntime* runtime, LgsExpr* other) {
 }
 
 LgsCast::~LgsCast() {
-    freeType(toType);
     delete fromValue;
     if (toValue) {
         delete toValue;
