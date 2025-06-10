@@ -41,8 +41,8 @@ class LgsAssignment;
 
 class AntlerConverter {
 public:
-    LgsErrHandler errHandler;
     string filePath;
+    LgsErrHandler errHandler;
 
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath);
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx);

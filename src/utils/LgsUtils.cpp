@@ -1,8 +1,11 @@
 #include "utils/LgsUtils.h"
 #include "exprs/unary/LgsVariable.h"
+#include "exprs/unary/constants/LgsIntConst.h"
+#include "exprs/unary/constants/LgsStrConst.h"
 #include "logos/LgsProject.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsType.h"
 
 string getFileText(path filePath) {
     if (!exists(filePath)) return "";
@@ -119,5 +122,5 @@ TargetMachine* getTargetMachine() {
 void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive || type->isBuiltin || type->asArray() || type->asMap()) return;
-    delete type;
+    // delete type;
 }

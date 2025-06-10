@@ -1,11 +1,8 @@
 #pragma once
-
-
+#include <string>
 
 class LgsActiveEnv {
 public:
-    std::string name;
-    std::map<std::string, std::string> envVars;
+    string name;
+    map<string, string> envVars;
 };
-
-

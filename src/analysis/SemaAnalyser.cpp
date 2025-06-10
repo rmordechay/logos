@@ -753,6 +753,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
         errHandler.handleError(E10006, &type->location, {typeName});
         return nullptr;
     }
+
     const auto symbol = &globals.symbols[typeName];
     freeType(type);
     LgsType* newType = nullptr;

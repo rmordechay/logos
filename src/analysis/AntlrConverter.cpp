@@ -76,8 +76,8 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
         }
     }
     if (!file->externFiles.empty()) {
-        const LgsCLang lgsClang(*file, errHandler);
-        lgsClang.parse();
+        const LgsCLang lgsClang;
+        lgsClang.parse(*file, errHandler);
     }
     file->absPath = filePath;
     file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);

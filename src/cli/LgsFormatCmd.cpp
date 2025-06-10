@@ -1,4 +1,6 @@
 #include "cli/LgsFormatCmd.h"
+
+#include "files/LgsFile.h"
 #include "logos/Logos.h"
 
 void LgsFormatCmd::runCmd() {

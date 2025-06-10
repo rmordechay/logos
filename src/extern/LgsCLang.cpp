@@ -1,12 +1,13 @@
 #include "extern/LgsCLang.h"
 #include "data/LgsErrors.h"
+#include "exprs/unary/constants/LgsStrConst.h"
 #include "extern/LgsCLangVisitor.h"
+#include "files/LgsFile.h"
 #include "logos/Platform.h"
 #include "utils/LgsUtils.h"
-
 using namespace clang;
 
-void LgsCLang::parse() const {
+void LgsCLang::parse(LgsFile& lgsFile, LgsErrHandler& errHandler) const {
     for (const auto filePath : lgsFile.externFiles) {
         auto path = filePath->value;
         string code;
@@ -24,10 +25,10 @@ void LgsCLang::parse() const {
     }
 }
 
-void LgsCLang::compile(const vector<string>& files) {
+void LgsCLang::compile(const vector<LgsStrConst*>& files) {
     if (files.empty()) return;
     for (const auto& file : files) {
-        compileArgs.push_back(file);
+        compileArgs.push_back(file->value);
     }
     compileArgs.push_back("-o");
     compileArgs.push_back(outputFilePath.string());
@@ -38,8 +39,8 @@ void LgsCLang::compile(const vector<string>& files) {
     }
 
     const auto targetTriple = sys::getDefaultTargetTriple();
-    auto diags = CompilerInstance::createDiagnostics(*fs, new DiagnosticOptions, &dc, false);
-    Driver driver(args[0], targetTriple, *diags, "cc", fs);
+    DiagnosticsEngine diags(new DiagnosticIDs(), new DiagnosticOptions(), new DiagnosticConsumer());
+    Driver driver(args[0], targetTriple, diags, "cc", fs);
     driver.setCheckInputsExist(false);
 
     unique_ptr<Compilation> compilation(driver.BuildCompilation(args));
@@ -50,16 +51,11 @@ void LgsCLang::compile(const vector<string>& files) {
 
     const auto& ccArgs = jobs.begin()->getArguments();
     auto invocation = make_unique<CompilerInvocation>();
-    CompilerInvocation::CreateFromArgs(*invocation, ccArgs, *diags);
-    LgsDiagnosticsConsumer diagnosticsConsumer;
+    CompilerInvocation::CreateFromArgs(*invocation, ccArgs, diags);
     auto compilerInstance = make_unique<CompilerInstance>();
     compilerInstance->setInvocation(std::move(invocation));
-    compilerInstance->createDiagnostics(*fs, &diagnosticsConsumer, false);
-    compilerInstance->getDiagnostics().getDiagnosticOptions().ShowCarets = false;
     compilerInstance->createFileManager(fs);
     compilerInstance->createSourceManager(compilerInstance->getFileManager());
-    compilerInstance->getCodeGenOpts().DisableFree = false;
-    compilerInstance->getFrontendOpts().DisableFree = false;
 
     switch (compilerInstance->getFrontendOpts().ProgramAction) {
     case frontend::ActionKind::EmitObj: {
@@ -76,42 +72,10 @@ void LgsCLang::compile(const vector<string>& files) {
     }
 }
 
-void LgsDiagnosticsConsumer::HandleDiagnostic(const DiagnosticsEngine::Level diagLevel, const Diagnostic& info) {
-    DiagnosticConsumer::HandleDiagnostic(diagLevel, info);
-    const char* level;
-    switch (diagLevel) {
-    default:
-        return;
-    case DiagnosticsEngine::Note:
-        level = "note";
-        break;
-    case DiagnosticsEngine::Warning:
-        level = "warning";
-        break;
-    case DiagnosticsEngine::Error:
-    case DiagnosticsEngine::Fatal:
-        level = "error";
-        break;
-    }
-
-    SmallString<256> msg;
-    info.FormatDiagnostic(msg);
-    if (info.hasSourceManager()) {
-        const auto& sm = info.getSourceManager();
-        auto loc = info.getLocation();
-        const auto fileLoc = sm.getFileLoc(loc);
-        os << sm.getFilename(fileLoc) << ':' << sm.getSpellingLineNumber(fileLoc) << ':' << sm.
-            getSpellingColumnNumber(fileLoc) << ": " << level << ": " << msg << '\n';
-
-        if (loc.isMacroID()) {
-            loc = sm.getSpellingLoc(loc);
-            os << sm.getFilename(loc) << ':' << sm.getSpellingLineNumber(loc) << ':' << sm.getSpellingColumnNumber(loc) << ": note: expanded from macro\n";
-        }
-    } else {
-        os << "<no source>: " << level << ": " << msg << '\n';
-    }
-}
-
-unique_ptr<ASTConsumer> LgsCLangFeAction::CreateASTConsumer(CompilerInstance& compilerInstance, StringRef file) {
-    return make_unique<LgsCLangASTConsumer>(&compilerInstance.getASTContext(), lgsFile, errHandler);
+void LgsCLang::getClibRoot() const {
+    DiagnosticsEngine diags(new DiagnosticIDs(), new DiagnosticOptions(), new DiagnosticConsumer());
+    Driver driver(CLANG_BINARY, sys::getDefaultTargetTriple(), diags);
+    const char* args[] = {CLANG_BINARY, "-x", "c", "-E"};
+    const auto compilation = driver.BuildCompilation(ArrayRef(args));
+    const auto& toolChain = compilation->getDefaultToolChain();
 }

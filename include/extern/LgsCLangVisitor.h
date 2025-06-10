@@ -33,3 +33,13 @@ public:
     void HandleTranslationUnit(clang::ASTContext& context) override;
     ~LgsCLangASTConsumer() override = default;
 };
+
+class LgsCLangFeAction final : public clang::ASTFrontendAction {
+public:
+    LgsFile& lgsFile;
+    LgsErrHandler& errHandler;
+
+    explicit LgsCLangFeAction(LgsFile& lgsFile, LgsErrHandler& errHandler) : lgsFile(lgsFile), errHandler(errHandler) {}
+    unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) override;
+    ~LgsCLangFeAction() override = default;
+};

@@ -26,6 +26,11 @@ void LgsExpr::setType(LgsType* type) {
     this->type = type;
 }
 
+LgsExpr::~LgsExpr() {
+    if (type->isConst) return;
+    freeType(type);
+}
+
 void LgsExpr::free(LgsRuntime* runtime) { assert(false); }
 bool LgsExpr::equals(LgsExpr* other) { assert(false); }
 LgsExpr* LgsExpr::clone() { assert(false); }

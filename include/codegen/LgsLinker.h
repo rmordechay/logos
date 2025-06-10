@@ -2,10 +2,6 @@
 
 #include "logos/LgsProject.h"
 
-struct LgsPaths;
-using namespace llvm;
-
-
 class LgsLinker {
 public:
     bool link(LogosProject& project) const;

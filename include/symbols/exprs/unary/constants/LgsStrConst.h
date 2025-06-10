@@ -3,11 +3,10 @@
 #include "LgsIntConst.h"
 #include "types/LgsStr.h"
 
-
 class LgsStrConst final : public LgsConstExpr {
 public:
-    LgsStr strType;
     string value;
+    LgsStr strType;
     vector<LgsExpr*> templateParts;
 
     explicit LgsStrConst(const string& value) : LgsConstExpr(&strType), value(value) {
@@ -20,5 +19,3 @@ public:
     Value* addIR(LgsRuntime* runtime, LgsExpr* other) override;
     ~LgsStrConst() override = default;
 };
-
-

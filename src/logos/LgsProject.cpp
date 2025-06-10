@@ -1,5 +1,4 @@
 #include "logos/LgsProject.h"
-#include "pch.h"
 #include "LogosLexer.h"
 #include "analysis/AntlrConverter.h"
 #include "analysis/SemaAnalyser.h"
@@ -7,15 +6,19 @@
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "logos/Platform.h"
-#include "stmts/LgsVarDec.h"
 #include "utils/ThreadPool.h"
 #include "builtin/LgsBuiltinFuncs.h"
+#include "exprs/unary/constants/LgsStrConst.h"
+#include "files/LgsAppFile.h"
+#include "files/LgsEnvFile.h"
+#include "stmts/LgsVarDec.h"
 
 extern char **environ;
 
 bool LogosProject::loadProject() {
     if (!validateProject()) return false;
     setPlatform(paths.objFilePath, paths.execFilePath);
+    // getClibRoot();
     // setupActiveEnv();
     if (!errHandler.successful) return false;
     loadFiles();
@@ -239,16 +242,6 @@ void LogosProject::setupActiveEnv() {
     parseAppFile(paths.appFilePath);
     loadEnvFiles();
     checkRequiredEnvVars();
-}
-
-void LogosProject::getClibRoot() const {
-    const IntrusiveRefCntPtr diagOpts = new clang::DiagnosticOptions();
-    const auto diags = new clang::DiagnosticsEngine(new clang::DiagnosticIDs(), diagOpts.get(), new clang::DiagnosticConsumer());
-    const auto clangBinary = "clang";
-    clang::driver::Driver driver(clangBinary, sys::getDefaultTargetTriple(), *diags);
-    const char* args[] = {clangBinary, "-x", "c", "-"};
-    const auto compilation = driver.BuildCompilation(ArrayRef(args));
-    const auto& toolChain = compilation->getDefaultToolChain();
 }
 
 void LogosProject::asJSON() const {

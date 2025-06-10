@@ -1,13 +1,8 @@
 #pragma once
 #include "LgsActiveEnv.h"
-#include "extern/LgsCLang.h"
-#include "LgsErrHandler.h"
-#include "files/LgsAppFile.h"
-#include "files/LgsEnvFile.h"
-#include <files/LgsFile.h>
 
-
-struct LgsError;
+class LgsFile;
+class LgsEnvFile;
 class LgsObject;
 class LgsFuncType;
 class ThreadPool;
@@ -15,7 +10,9 @@ class LgsActiveEnv;
 class LgsAppFile;
 class LgsMainFile;
 class LgsEnv;
+struct LgsError;
 struct LgsPaths;
+struct RequireEnvVar;
 
 using namespace filesystem;
 
@@ -39,7 +36,6 @@ public:
     void loadSrcFiles();
     void loadEnvFiles();
     void setupActiveEnv();
-    void getClibRoot() const;
     bool validateProject();
     void setPlatform(const string& inputFile, const string& outputFile) const;
     void parseSrcFiles(const string& path, ThreadPool& threadPool);

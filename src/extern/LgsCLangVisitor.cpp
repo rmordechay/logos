@@ -155,3 +155,7 @@ void LgsCLangASTConsumer::HandleTranslationUnit(clang::ASTContext& context) {
 bool LgsCLangVisitor::isValid(const clang::SourceLocation loc) const {
     return context->getSourceManager().isWrittenInMainFile(loc);
 }
+
+unique_ptr<clang::ASTConsumer> LgsCLangFeAction::CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) {
+    return make_unique<LgsCLangASTConsumer>(&compilerInstance.getASTContext(), lgsFile, errHandler);
+}

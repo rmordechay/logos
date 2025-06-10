@@ -15,6 +15,7 @@
 #define LOGOS_LOOP_CONDITION "loop_condition"
 #define LOGOS_LOOP_BODY "loop_body"
 #define LOGOS_LOOP_EXIT "loop_exit"
+#define CLANG_BINARY "clang"
 #define ERROR_STR "\033[1;31mError:\033[0m "
 
 #if defined(__x86_64__) || defined(_M_X64)
