@@ -3,6 +3,14 @@
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
 
+Type* LgsArray::getIRType() {
+    if (IRType) return IRType;
+    if (!isStatic) return PointerType::getUnqual(context);
+    const auto innerIRType = baseType->getIRType();
+    IRType = ArrayType::get(innerIRType, constSize);
+    return IRType;
+}
+
 size_t LgsArray::getSizeBytes() {
     if (isStatic) {
         assert(constSize > 0);
@@ -12,11 +20,7 @@ size_t LgsArray::getSizeBytes() {
 }
 
 LgsExpr* LgsArray::getZeroValue() {
-    const auto arrExpr = new LgsArrayExpr(baseType);
-    arrExpr->arrType.isStatic = isStatic;
-    arrExpr->arrType.sizeExpr = sizeExpr;
-    arrExpr->location = location;
-    return arrExpr;
+    return new LgsArrayExpr(this);
 }
 
 string LgsArray::prettyName() const {

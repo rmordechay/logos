@@ -3,19 +3,18 @@
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
 
-void LgsMap::setBaseType(const vector<LgsMapPair*>& exprs) {
-    if (exprs.empty()) return;
-    kvType.key = exprs.front()->key->type;
-    kvType.value = exprs.front()->value->type;
-}
-
 size_t LgsMap::getSizeBytes() {
     return sizeof(void*);
 }
 
 void LgsMap::unpackTypes(const vector<LgsVarDec*>& varDecs) {
-    varDecs[0]->type = kvType.key;
-    varDecs[1]->type = kvType.value;
+    const auto kvType = getTypePair();
+    varDecs[0]->type = kvType->key;
+    varDecs[1]->type = kvType->value;
+}
+
+LgsTypePair* LgsMap::getTypePair() const {
+    return baseType->asPair();
 }
 
 Value* LgsMap::getLength(LgsRuntime* runtime, LgsExpr* expr) {
@@ -43,25 +42,25 @@ string LgsMap::getIRName() {
 }
 
 LgsExpr* LgsMap::getZeroValue() {
-    return new LgsHashMap(kvType.key, kvType.value);
+    return new LgsHashMap(this);
 }
 
 string LgsMap::prettyName() const {
-    return '{' + kvType.key->prettyName() + ':' + kvType.value->prettyName() + '}';
+    const auto kvType = getTypePair();
+    return '{' + kvType->key->prettyName() + ':' + kvType->value->prettyName() + '}';
 }
 
 bool LgsMap::equals(LgsType* other) {
+    const auto kvType = getTypePair();
     const auto otherMap = other->asMap();
-    const auto keyEqual = otherMap && kvType.key->equals(otherMap->kvType.key);
-    return keyEqual && kvType.value->equals(otherMap->kvType.value);
+    if (!otherMap) return false;
+    const auto otherKvType = otherMap->getTypePair();
+    const auto keyEqual = kvType->key->equals(otherKvType->key);
+    return keyEqual && kvType->value->equals(otherKvType->value);
 }
 
 LgsType* LgsMap::inferBinaryType(LgsType* other) {
     assert(false);
-}
-
-LgsType* LgsMap::getBaseType() {
-    return kvType.value;
 }
 
 StructType* LgsMap::getMapStruct(LgsRuntime* runtime) {

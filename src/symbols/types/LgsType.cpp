@@ -59,6 +59,7 @@ LgsIterable* LgsType::asIterable() { return dynamic_cast<LgsIterable*>(this); }
 LgsArray* LgsType::asArray() { return dynamic_cast<LgsArray*>(this); }
 LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
 LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }
+LgsTypePair* LgsType::asPair() { return dynamic_cast<LgsTypePair*>(this); }
 LgsStr* LgsType::asStr() { return dynamic_cast<LgsStr*>(this); }
 LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }
 LgsLong* LgsType::asLong() { return dynamic_cast<LgsLong*>(this); }

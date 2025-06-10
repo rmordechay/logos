@@ -8,7 +8,7 @@ class LgsExpr;
 
 class LgsField : public LgsValue {
 public:
-    std::string name;
+    string name;
     size_t position = 0;
     bool isPublic = false;
     bool isConst = false;
@@ -16,7 +16,7 @@ public:
     LgsType* type = nullptr;
     LgsObject* parent = nullptr;
 
-    LgsField(const std::string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), expr(expr), type(type) {}
+    LgsField(const string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), expr(expr), type(type) {}
     virtual Value* getGEP(LgsRuntime* runtime, Value* instance = nullptr);
     void setFieldIRValue(LgsRuntime* runtime, LgsExpr* expr, Value* instance = nullptr);
     LgsField* clone() const;

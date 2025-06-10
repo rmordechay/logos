@@ -1,4 +1,6 @@
 #pragma once
+#include "data/LgsErrors.h"
+#include "data/LgsWarnings.h"
 
 struct Location;
 

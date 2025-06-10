@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsFunc.h"
 #include "types/primitives/LgsInt.h"
+#include "data/LgsDefinitions.h"
 
 
 class LgsMainFunc final : public LgsFunc {
@@ -9,6 +10,7 @@ public:
     Value* argc = nullptr;
     Value* argv = nullptr;
     LgsArrayExpr* args = nullptr;
+    LgsFunc* initArgsFunc = nullptr;
 
     explicit LgsMainFunc() : LgsFunc(LOGOS_MAIN_FUNC, &LGS_INT) {}
     void initArgs(LgsRuntime* runtime);

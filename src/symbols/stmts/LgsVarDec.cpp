@@ -1,5 +1,6 @@
 #include "stmts/LgsVarDec.h"
 #include "exprs/unary/LgsArrayExpr.h"
+#include "utils/LgsUtils.h"
 
 
 string LgsVarDec::format(string& indentStr) {
@@ -32,4 +33,5 @@ json LgsVarDec::asJSON() {
 
 LgsVarDec::~LgsVarDec() {
     delete expr;
+    freeType(type);
 }

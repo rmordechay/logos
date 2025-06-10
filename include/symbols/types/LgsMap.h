@@ -4,14 +4,13 @@
 #include "funcs/LgsBuiltinFunc.h"
 #include "primitives/LgsInt.h"
 #include "primitives/LgsVoid.h"
-#include "types/LgsPair.h"
+#include "types/LgsTypePair.h"
 
-class LgsMapPair;
+class LgsMapEntry;
 
 class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "Map";
-    LgsPair kvType;
     StructType* mapStruct = nullptr;
 
     LgsBuiltinFunc getFunc{"get", &LGS_ANY, name, {this, new LgsStr()}, true};
@@ -23,22 +22,19 @@ public:
     LgsBuiltinFunc deleteFunc{"delete", &LGS_VOID, name, {this, &LGS_ANY}};
     LgsBuiltinFunc freeFunc{"free", &LGS_VOID, name, {this}};
 
-    explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(&kvType) {
-        kvType.key = keyType;
-        kvType.value = valueType;
+    explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsIterable(new LgsTypePair(keyType, valueType)) {
         unpackLength = 2;
         addMethod(&lenFunc);
         addMethod(&isEmptyFunc);
         addMethod(&isNotEmptyFunc);
     }
 
-    void setBaseType(const vector<LgsMapPair*>& exprs);
     size_t getSizeBytes() override;
+    LgsTypePair* getTypePair() const;
     Type* getIRType() override;
     string getIRName() override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;
-    LgsType* getBaseType() override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
@@ -49,5 +45,3 @@ public:
     ~LgsMap() override = default;
     StructType* getMapStruct(LgsRuntime* runtime);
 };
-
-

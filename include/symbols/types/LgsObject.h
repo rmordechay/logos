@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsArray.h"
+#include "data/LgsDefinitions.h"
 
 class LgsField;
 

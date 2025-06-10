@@ -1,4 +1,6 @@
 #include "utils/LgsUtils.h"
+#include "data/LgsDefinitions.h"
+#include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
@@ -70,6 +72,15 @@ string getExprStr(LgsExpr* baseExpr) {
     assert(false);
 }
 
+void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices) {
+    while (iterIndex) {
+        if (iterIndex->index) {
+            indices.push_back(iterIndex->index);
+        }
+        iterIndex = iterIndex->baseExpr->asIterIndex();
+    }
+    reverse(indices.begin(), indices.end());
+}
 
 Value* getIRStr(const LgsRuntime* runtime, const string& value) {
     for (auto& globals : runtime->module->globals()) {
@@ -119,8 +130,8 @@ TargetMachine* getTargetMachine() {
     return targetMachine;
 }
 
-void freeType(LgsType* type) {
+void freeType(const LgsType* type) {
     if (!type) return;
-    if (type->isPrimitive || type->isBuiltin || type->asArray() || type->asMap()) return;
-    // delete type;
+    if (type->isPrimitive || type->isBuiltin) return;
+    delete type;
 }

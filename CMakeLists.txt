@@ -77,7 +77,6 @@ set(SOURCE_FILES
     src/symbols/types/LgsFuncType.cpp
     src/symbols/types/LgsGroup.cpp
     src/symbols/types/LgsInterface.cpp
-    src/symbols/types/LgsIterable.cpp
     src/symbols/types/LgsMap.cpp
     src/symbols/types/LgsObject.cpp
     src/symbols/types/LgsStr.cpp

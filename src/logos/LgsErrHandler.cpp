@@ -1,4 +1,5 @@
 #include "LgsLocation.h"
+#include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
 
 

@@ -60,7 +60,7 @@ public:
     virtual void visitExpr(LgsExpr* expr) = 0;
     virtual void visitCast(LgsCast* castExpr) = 0;
     virtual void visitArrayExpr(LgsArrayExpr* array) = 0;
-    virtual void visitHashMap(LgsHashMap* hashMap) const = 0;
+    virtual void visitHashMap(LgsHashMap* hashMap) = 0;
     virtual void visitStrConst(LgsStrConst* strConst) const = 0;
     virtual void visitUnaryExpr(LgsUnaryExpr* unaryExpr) = 0;
     virtual void visitBinaryExpr(LgsBinaryExpr* binaryExpr) = 0;

@@ -22,12 +22,11 @@ class LgsTypeConst;
 
 class LgsExpr : virtual public LgsValue {
 public:
-    // TODO free type
     LgsType* type = nullptr;
     bool isNull = false;
+    bool isZeroValue = false;
     // TODO removed visitVariable should be inferred from refs
     bool isReturnExpr = false;
-    bool isZeroValue = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     void setType(LgsType* type);

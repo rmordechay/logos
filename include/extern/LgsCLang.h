@@ -1,4 +1,5 @@
 #pragma once
+#include "data/LgsDefinitions.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 
 class LgsFile;

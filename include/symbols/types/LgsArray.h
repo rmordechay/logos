@@ -29,6 +29,8 @@ public:
         addMethod(&isNotEmptyFunc);
     }
 
+
+    Type* getIRType() override;
     size_t getSizeBytes() override;
     string getIRName() override;
     string prettyName() const override;

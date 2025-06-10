@@ -6,12 +6,11 @@
 class LgsStrConst final : public LgsConstExpr {
 public:
     string value;
-    LgsStr strType;
     vector<LgsExpr*> templateParts;
 
-    explicit LgsStrConst(const string& value) : LgsConstExpr(&strType), value(value) {
-        strType.isStatic = true;
-        strType.sizeExpr = new LgsIntConst(value.size());
+    explicit LgsStrConst(const string& value) : LgsConstExpr(new LgsStr()), value(value) {
+        type->asStr()->isStatic = true;
+        type->asStr()->sizeExpr = new LgsIntConst(value.size());
     }
 
     Value* createIRValue(LgsRuntime* runtime) override;

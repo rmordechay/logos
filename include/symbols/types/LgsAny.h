@@ -6,6 +6,9 @@ class LgsAny final : public LgsType {
 public:
     static constexpr auto name = "Any";
 
+    LgsAny() {
+        isPrimitive = true;
+    }
     size_t getSizeBytes() override;
     Type* getIRType() override;
     string getIRName() override;

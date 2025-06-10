@@ -95,7 +95,7 @@ void LgsObject::setVFuncs(LgsRuntime* runtime) const {
         const auto IRFunc = method->getIRFunc(runtime);
         auto valuePtr = runtime->builder.CreateAlloca(runtime->builder.getPtrTy());
         runtime->builder.CreateStore(IRFunc, valuePtr);
-        vtable->mapType.addFunc.callIR(runtime, {vtablePtr, keyIRStr, valuePtr});
+        vtable->type->asMap()->addFunc.callIR(runtime, {vtablePtr, keyIRStr, valuePtr});
     }
 }
 

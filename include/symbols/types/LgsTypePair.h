@@ -1,13 +1,12 @@
 #pragma once
 
-
-class LgsPair final : public LgsType {
+class LgsTypePair final : public LgsType {
 public:
     static constexpr auto name = "Pair";
     LgsType* key;
     LgsType* value;
 
-    explicit LgsPair(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : key(keyType), value(valueType) {}
+    explicit LgsTypePair(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : key(keyType), value(valueType) {}
     Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
@@ -16,29 +15,29 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
 };
 
-inline Type* LgsPair::getIRType() {
+inline Type* LgsTypePair::getIRType() {
     assert(false);
 }
 
-inline string LgsPair::getIRName() {
+inline string LgsTypePair::getIRName() {
     return name;
 }
 
-inline LgsExpr* LgsPair::getZeroValue() {
+inline LgsExpr* LgsTypePair::getZeroValue() {
     assert(false);
 }
 
-inline string LgsPair::prettyName() const {
+inline string LgsTypePair::prettyName() const {
     return '<' + key->prettyName() + "," + value->prettyName() + '>';
 }
 
-inline bool LgsPair::equals(LgsType* other) {
-    const auto otherPair = dynamic_cast<LgsPair*>(other);
+inline bool LgsTypePair::equals(LgsType* other) {
+    const auto otherPair = dynamic_cast<LgsTypePair*>(other);
     if (!otherPair) return false;
     return key->equals(otherPair->key) && value->equals(otherPair->value);
 }
 
-inline LgsType* LgsPair::inferBinaryType(LgsType* other) {
+inline LgsType* LgsTypePair::inferBinaryType(LgsType* other) {
     assert(false);
 }
 

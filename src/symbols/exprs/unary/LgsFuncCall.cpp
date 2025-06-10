@@ -75,7 +75,7 @@ void LgsFuncCall::resolveVirtualFunc(LgsRuntime* runtime) const {
     const auto keyIR = getIRStr(runtime, func->funcType.getIRName());
     const auto mapPtr = builder.CreateLoad(ptrTy, parentIRValue);
     const auto valuePtr = builder.CreateAlloca(ptrTy);
-    const auto rv = type->vtable->mapType.getFunc.callIR(runtime, {mapPtr, keyIR});
+    const auto rv = type->vtable->type->asMap()->getFunc.callIR(runtime, {mapPtr, keyIR});
     builder.CreateStore(rv, valuePtr);
     const auto vfunc = builder.CreateLoad(ptrTy, builder.CreateLoad(ptrTy, valuePtr));
     func->setIRValue(vfunc);

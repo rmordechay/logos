@@ -1,8 +1,6 @@
 #include "funcs/LgsParam.h"
-
 #include "exprs/LgsExpr.h"
 #include "funcs/LgsFunc.h"
-
 #include "types/LgsFuncType.h"
 
 string LgsParam::format(string& indentStr) {
@@ -32,4 +30,9 @@ string LgsParam::getIRName() {
         return funcType->IRName;
     }
     return name;
+}
+
+LgsParam::~LgsParam() {
+    if (expr) delete expr;
+    // freeType(type);
 }

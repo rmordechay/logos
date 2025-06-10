@@ -11,6 +11,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
+#include "funcs/LgsMainFunc.h"
 #include "stmts/LgsVarDec.h"
 
 extern char **environ;
@@ -115,6 +116,7 @@ bool LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) const {
                 semaAnalyser.resolveGroupTypes(group);
             }
             for (const auto [_, func] : mainFile->funcs) {
+                if (dynamic_cast<LgsMainFunc*>(func)) continue;
                 semaAnalyser.resolveFuncTypes(&func->funcType);
             }
         } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {

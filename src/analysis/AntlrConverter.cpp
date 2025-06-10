@@ -228,7 +228,7 @@ LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
         isValid = setMainArgsParam(mainFunc, funcSignature);
         if (isValid) {
             mainFunc->args = new LgsArrayExpr(new LgsStr());
-            mainFunc->args->initArgsFunc = new LgsFunc("initArgs", &LGS_VOID, {
+            mainFunc->initArgsFunc = new LgsFunc("initArgs", &LGS_VOID, {
                 LgsParam(mainFunc->args->type),
                 LgsParam(&LGS_INT),
                 LgsParam(new LgsStr())
@@ -597,19 +597,19 @@ LgsUnaryExpr* AntlerConverter::getHashMap(LogosParser::HashMapContext* ctx) {
     for (const auto keyValue : ctx->keyValue()) {
         const auto kExpr = getExpr(keyValue->key);
         const auto vExpr = getExpr(keyValue->value);
-        const auto mapEntry = new LgsMapPair(kExpr, vExpr);
+        const auto mapEntry = new LgsMapEntry(kExpr, vExpr);
         hashMap->initialElements.emplace_back(mapEntry);
     }
     return hashMap;
 }
 
-LgsVariable* AntlerConverter::getVariable(const string& varName, const antlr4::ParserRuleContext* ctx) const {
+LgsVariable* AntlerConverter::getVariable(const string& varName, const ParserRuleContext* ctx) const {
     const auto variable = new LgsVariable(varName);
     variable->setLocation(ctx->start);
     return variable;
 }
 
-LgsUnaryExpr* AntlerConverter::getConst(const string& constName, const antlr4::ParserRuleContext* ctx) const {
+LgsUnaryExpr* AntlerConverter::getConst(const string& constName, const ParserRuleContext* ctx) const {
     const auto constVariable = new LgsConst(constName);
     constVariable->setLocation(ctx->start);
     return constVariable;
@@ -765,16 +765,15 @@ LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) co
     return constant;
 }
 
-LgsStrConst* AntlerConverter::getStrConst(antlr4::tree::TerminalNode* type) const {
+LgsStrConst* AntlerConverter::getStrConst(tree::TerminalNode* type) const {
     auto typeText = type->getText();
     cleanStr(typeText);
     const auto strConst = new LgsStrConst(typeText);
-    parseTemplateStr(strConst);
     strConst->setLocation(type->getSymbol());
     return strConst;
 }
 
-LgsTypeConst* AntlerConverter::getTypeConstant(antlr4::tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const {
+LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const {
     const auto typeConst = new LgsTypeConst(getTypeFromText(type));
     typeConst->setLocation(ctx->start);
     return typeConst;
@@ -828,7 +827,7 @@ LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
     return type;
 }
 
-LgsType* AntlerConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken) const {
+LgsType* AntlerConverter::getTypeFromText(tree::TerminalNode* typeToken) const {
     const auto typeText = typeToken->getText();
     LgsType* type = nullptr;
     if (typeText == LgsBool::name) {
@@ -865,43 +864,6 @@ LgsType* AntlerConverter::getFuncReturnType(LogosParser::TypeContext* ctx) {
         result->setLocation(ctx->start);
     }
     return result;
-}
-
-void AntlerConverter::parseTemplateStr(LgsStrConst* strConst) const {
-    if (strConst->value.find('{') == string::npos) return;
-    string templateStr;
-    string newStr = strConst->value;
-    auto bracesCount = 0;
-    for (size_t i = 0; i < strConst->value.length(); ++i) {
-        const auto currentChar = strConst->value[i];
-        if (currentChar == '{') {
-            bracesCount++;
-        } else if (currentChar == '}' && bracesCount > 0) {
-            bracesCount--;
-            const auto expr = getExpr(templateStr);
-            if (!expr) { // If any error occur, then return the string as is
-                strConst->templateParts.clear();
-                return;
-            }
-            strConst->templateParts.push_back(expr);
-            templateStr.clear();
-        } else if (bracesCount > 0) {
-            templateStr += currentChar;
-        }
-    }
-    assert(bracesCount == 0);
-}
-
-LgsExpr* AntlerConverter::getExpr(const string& codeText) const {
-    antlr4::ANTLRInputStream input(codeText);
-    LogosLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
-    LogosParser parser(&tokens);
-    lexer.removeErrorListeners();
-    parser.removeErrorListeners();
-    auto exprContext = parser.expr();
-    AntlerConverter antlerConverter;
-    return antlerConverter.getExpr(exprContext);
 }
 
 void AntlerConverter::cleanStr(string& value) const {

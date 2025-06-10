@@ -1,19 +1,16 @@
 #pragma once
-
 #include "LgsUnaryExpr.h"
 #include "exprs/LgsExpr.h"
 #include "types/LgsArray.h"
 
 class LgsArrayExpr final : public LgsUnaryExpr {
 public:
-    LgsArray arrType;
     vector<LgsExpr*> initialElements;
-    LgsFunc* initArgsFunc = nullptr;
 
     explicit LgsArrayExpr(LgsType* baseType = nullptr) {
-        setType(&arrType);
-        arrType.baseType = baseType;
+        type = new LgsArray(baseType);
     }
+    explicit LgsArrayExpr(LgsArray* arrType) : LgsUnaryExpr(arrType) {}
     Value* createIRValue(LgsRuntime* runtime) override;
     Value* createConstArray(LgsRuntime* runtime) const;
     Value* createDynamicArray(LgsRuntime* runtime);

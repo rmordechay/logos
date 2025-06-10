@@ -11,8 +11,11 @@ public:
     LgsExpr* rValue;
 
     void createIRStmt(LgsRuntime* runtime) override;
-    void assignIRIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* value) const;
-    void assignIRSelection(LgsRuntime* runtime, const LgsSelection* selection, LgsExpr* expr) const;
+    void assignToIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* value) const;
+    void assignToSelection(LgsRuntime* runtime, const LgsSelection* selection, LgsExpr* expr) const;
+    void storeScalarInIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* value) const;
+    void storeArrayInIterIndex(LgsRuntime* runtime, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) const;
+    void storeHashMapInIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsHashMap* map) const;
     ~LgsAssignment() override;
 };
 

@@ -40,5 +40,6 @@ public:
     Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
+    void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
     ~LgsStr() override = default;
 };

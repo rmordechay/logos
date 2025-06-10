@@ -27,7 +27,6 @@ void LgsExpr::setType(LgsType* type) {
 }
 
 LgsExpr::~LgsExpr() {
-    if (type->isConst) return;
     freeType(type);
 }
 

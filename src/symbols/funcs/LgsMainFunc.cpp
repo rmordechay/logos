@@ -42,8 +42,8 @@ Function* LgsMainFunc::getIRFunc(LgsRuntime* runtime) {
 void LgsMainFunc::initArgs(LgsRuntime* runtime) {
     auto& builder = runtime->builder;
     const vector<Type*> structFields{builder.getInt64Ty(), builder.getInt32Ty(), builder.getInt32Ty(), builder.getPtrTy()};
-    const auto arrStruct = getIRStructType(runtime->module->getContext(), args->arrType.name, structFields);
+    const auto arrStruct = getIRStructType(runtime->module->getContext(), args->type->asArray()->name, structFields);
     args->IRValue = builder.CreateAlloca(arrStruct);
-    args->initArgsFunc->callIR(runtime, {args->IRValue, argc, argv});
+    initArgsFunc->callIR(runtime, {args->IRValue, argc, argv});
     funcType.params[0].setIRValue(args->IRValue);
 }

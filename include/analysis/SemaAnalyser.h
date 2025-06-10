@@ -1,6 +1,7 @@
 #pragma once
 #include "files/LgsFile.h"
 #include "logos/LgsASTVisitor.h"
+#include "types/LgsIterable.h"
 
 class LgsArray;
 class LgsGroup;
@@ -70,9 +71,9 @@ public:
     void visitExpr(LgsExpr* expr) override;
     void visitCast(LgsCast* castExpr) override;
     void visitArrayExpr(LgsArrayExpr* array) override;
-    void visitStaticArray(LgsArrayExpr* array);
-    void visitDynamicArray(LgsArrayExpr* array);
-    void visitHashMap(LgsHashMap* hashMap) const override;
+    void visitStaticArray(const LgsArrayExpr* array);
+    void visitDynamicArray(const LgsArrayExpr* array);
+    void visitHashMap(LgsHashMap* hashMap) override;
     void visitStrConst(LgsStrConst* strConst) const override;
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr) override;
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr) override;
@@ -90,7 +91,7 @@ public:
 
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
-    void validateExprType(LgsValue* value);
+    void validateExprType(LgsExpr* expr, LgsType* type);
     void validateFuncControlFlow(const LgsFunc* func);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 
@@ -98,7 +99,7 @@ public:
     bool symbolExists(const string& name);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
     LgsType* resolveType(LgsType* type);
-    LgsType* resolveArrayType(LgsArray* array);
+    void resolveIterable(LgsIterable* iterable);
     void resolveFuncTypes(LgsFuncType* funcType);
     void resolveObjTypes(LgsObject* obj);
     void resolveObjectImplements(LgsObject* obj);

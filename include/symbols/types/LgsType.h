@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+class LgsTypePair;
 class LgsLong;
 class LgsHashMap;
 class LgsVTable;
@@ -50,6 +51,7 @@ public:
     LgsArray* asArray();
     LgsFuncType* asFuncType();
     LgsGroup* asGroup();
+    LgsTypePair* asPair();
     bool isUnknown();
 
     virtual size_t getSizeBytes();

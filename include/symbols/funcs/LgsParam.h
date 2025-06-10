@@ -8,20 +8,20 @@ class LgsType;
 
 class LgsParam final : public LgsValue {
 public:
-    std::string name;
+    string name;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
     bool isSelf = false;
     bool isVariadic = false;
     AllocaInst* vaList = nullptr;
-    std::vector<LgsVariable*> refs;
+    vector<LgsVariable*> refs;
 
-    explicit LgsParam(LgsType* type = nullptr, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
-    std::string format(std::string& indentStr) override;
+    explicit LgsParam(LgsType* type = nullptr, const string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
+    string format(string& indentStr) override;
     Value* getIRValue(LgsRuntime* runtime);
-    nlohmann::json asJSON() override;
-    std::string getIRName();
-    ~LgsParam() override = default;
+    json asJSON() override;
+    string getIRName();
+    ~LgsParam() override;
 };
 
 

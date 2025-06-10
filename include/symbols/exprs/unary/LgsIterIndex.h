@@ -17,12 +17,8 @@ public:
     Value* getIRFromDynArray(LgsRuntime* runtime, LgsArray* arr) const;
     Value* getIRFromMap(LgsRuntime* runtime, LgsMap* map) const;
     Value* getIRFromStr(LgsRuntime* runtime) const;
-    void storeHashMap(LgsRuntime* runtime, LgsHashMap* hashMap) const;
-    void storeScalar(LgsRuntime* runtime, LgsExpr* value);
-    void storeArray(LgsRuntime* runtime, const LgsArrayExpr* arr) const;
-    std::string getName() override;
-    std::string prettyName() override;
-    static void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices);
+    string getName() override;
+    string prettyName() override;
     ~LgsIterIndex() override;
 };
 

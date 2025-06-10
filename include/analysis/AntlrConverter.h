@@ -97,8 +97,6 @@ public:
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
     LgsType* getTypeFromText(tree::TerminalNode* typeToken) const;
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
-    LgsExpr* getExpr(const string& codeText) const;
-    void parseTemplateStr(LgsStrConst* strConst) const;
     void cleanStr(string& value) const;
     ~AntlerConverter() = default;
 };
