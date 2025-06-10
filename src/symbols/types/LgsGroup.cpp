@@ -5,7 +5,7 @@ Type* LgsGroup::getIRType() {
 }
 
 LgsExpr* LgsGroup::getZeroValue() {
-    assert(false);
+    assert(0);
 }
 
 string LgsGroup::getIRName() {
@@ -24,5 +24,5 @@ bool LgsGroup::equals(LgsType* other) {
 }
 
 LgsType* LgsGroup::inferBinaryType(LgsType* other) {
-    assert(false);
+    assert(0);
 }

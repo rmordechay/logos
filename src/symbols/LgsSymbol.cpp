@@ -42,7 +42,7 @@ void* LgsSymbol::getPtr() const {
     case UNKNOWN:
         break;
     }
-    assert(false);
+    assert(0);
 }
 
 Location* LgsSymbol::getLocation() const {
@@ -68,7 +68,7 @@ Location* LgsSymbol::getLocation() const {
     case UNKNOWN:
         break;
     }
-    assert(false);
+    assert(0);
 }
 
 json LgsSymbol::asJSON() const {

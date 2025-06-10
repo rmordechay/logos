@@ -53,7 +53,7 @@ bool LgsMap::equals(LgsType* other) {
 }
 
 LgsType* LgsMap::inferBinaryType(LgsType* other) {
-    assert(false);
+    assert(0);
 }
 
 StructType* LgsMap::getMapStruct(LgsRuntime* runtime) {

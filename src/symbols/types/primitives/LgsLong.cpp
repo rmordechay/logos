@@ -17,11 +17,11 @@ Type* LgsLong::getIRType() {
 }
 
 LgsExpr* LgsLong::getZeroValue() {
-    assert(false);
+    assert(0);
 }
 
 LgsType* LgsLong::inferBinaryType(LgsType* other) {
-    assert(false);
+    assert(0);
 }
 
 string LgsLong::getStrFormatPart() const {

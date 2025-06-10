@@ -5,19 +5,19 @@ string LgsUnknownType::prettyName() const {
 }
 
 LgsExpr* LgsUnknownType::getZeroValue() {
-    assert(false);
+    assert(0);
 }
 
 bool LgsUnknownType::equals(LgsType* other) {
-    assert(false);
+    assert(0);
 }
 
 LgsType* LgsUnknownType::inferBinaryType(LgsType* other) {
-    assert(false);
+    assert(0);
 }
 
 Type* LgsUnknownType::getIRType() {
-    assert(false);
+    assert(0);
 }
 
 string LgsUnknownType::getIRName() {

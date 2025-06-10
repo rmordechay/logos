@@ -104,7 +104,7 @@ void SemaAnalyser::visitParam(LgsParam* param) {
         visitExpr(param->expr);
         validateExprType(param->expr, param->type);
     } else if (param->isVariadic) {
-        // assert(false);
+        // assert(0);
     }
     addLocalSymbol(param->name, LgsSymbol(param));
 }
@@ -164,7 +164,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
         visitExpr(varDec->expr);
         varDec->type = varDec->expr->type;
     } else {
-        assert(false);
+        assert(0);
     }
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
 }
@@ -177,10 +177,10 @@ void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
     const auto lType = lValue->type;
     const auto rType = rValue->type;
     if (lType && rType && lType->equals(rType)) {
-
-        return;
+        rType->castImplicitly(*lType);
+    } else {
+        return errHandler.handleError(E10001, &assignment->location, {lType->prettyName(), rType->prettyName()});
     }
-    return errHandler.handleError(E10001, &assignment->location, {lType->prettyName(), rType->prettyName()});
 
 }
 
@@ -438,7 +438,7 @@ void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
     } else if (const auto typeConst = firstExpr->asTypeConst()) {
         typeConst->type = resolveType(typeConst->type);
     } else {
-        assert(false);
+        assert(0);
     }
     assert(firstExpr->type);
 }
@@ -530,7 +530,7 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
         funcCall->callback = new LgsSymbol(symbol->param);
         symbolType = symbol->param->type;
     } else {
-        assert(false);
+        assert(0);
     }
 
     const auto funcType = symbolType->asFuncType();
@@ -863,7 +863,7 @@ void SemaAnalyser::reprocessFuncs(const LogosProject& project) {
                     method->swapReturnIfNeeded();
                 }
                 for (const auto implement : obj->interfaces) {
-                    assert(false);
+                    assert(0);
                 }
             }
             for (const auto [_, func] : mainFile->funcs) {
@@ -875,7 +875,7 @@ void SemaAnalyser::reprocessFuncs(const LogosProject& project) {
                 method->swapReturnIfNeeded();
             }
             for (const auto implement : obj->interfaces) {
-                assert(false);
+                assert(0);
             }
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
             for (const auto& [_, method] : interfaceFile->interface->methods) {

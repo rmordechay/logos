@@ -47,10 +47,11 @@ LgsType::~LgsType() {
     if (vtable) delete vtable;
 }
 
-size_t LgsType::getSizeBytes() { assert(false); }
-json LgsType::asJSON() const { assert(false); }
-string LgsType::getStrFormatPart() const { assert(false); }
-LgsType* LgsType::clone() { assert(false); }
+size_t LgsType::getSizeBytes() { assert(0); }
+void LgsType::castImplicitly(LgsType& toType) { assert(0); }
+json LgsType::asJSON() const { assert(0); }
+string LgsType::getStrFormatPart() const { assert(0); }
+LgsType* LgsType::clone() { assert(0); }
 
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
 LgsObject* LgsType::asObject() { return dynamic_cast<LgsObject*>(this); }

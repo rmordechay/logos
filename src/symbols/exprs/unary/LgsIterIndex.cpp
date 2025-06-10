@@ -14,7 +14,7 @@ Value* LgsIterIndex::createIRValue(LgsRuntime* runtime) {
     if (baseExprType->asStr()) {
         return getIRFromStr(runtime);
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsIterIndex::getIRFromDynArray(LgsRuntime* runtime, LgsArray* arr) const {

@@ -16,7 +16,7 @@ string LgsAny::getIRName() {
 }
 
 LgsExpr* LgsAny::getZeroValue() {
-    assert(false);
+    assert(0);
 }
 
 string LgsAny::prettyName() const {
@@ -28,5 +28,5 @@ bool LgsAny::equals(LgsType* other) {
 }
 
 LgsType* LgsAny::inferBinaryType(LgsType* other) {
-    assert(false);
+    assert(0);
 }

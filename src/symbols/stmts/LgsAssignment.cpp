@@ -13,7 +13,7 @@ void LgsAssignment::createIRStmt(LgsRuntime* runtime) {
     } else if (const auto iterIndex = lValue->asIterIndex()) {
         assignToIterIndex(runtime, iterIndex, rValue);
     } else {
-        assert(false);
+        assert(0);
     }
 }
 
@@ -40,11 +40,11 @@ void LgsAssignment::assignToSelection(LgsRuntime* runtime, const LgsSelection* s
             break;
         }
     }
-    assert(false);
+    assert(0);
 }
 
 void LgsAssignment::storeHashMapInIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsHashMap* map) const {
-    assert(false);
+    assert(0);
 }
 
 void LgsAssignment::storeScalarInIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* value) const {

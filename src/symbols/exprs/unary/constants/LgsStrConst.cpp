@@ -21,7 +21,7 @@ Value* LgsStrConst::addIR(LgsRuntime* runtime, LgsExpr* other) {
     if (const auto otherBoolConst = other->asBoolConst()) {
         return getIRStr(runtime, this->value + otherBoolConst->getValueAsString());
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsStrConst::eqIR(LgsRuntime* runtime, LgsExpr* other) {

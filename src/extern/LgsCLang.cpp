@@ -15,7 +15,7 @@ void LgsCLang::parse(LgsFile& lgsFile, LgsErrHandler& errHandler) const {
         if (exists(cLibPath)) {
             code = getFileText(cLibPath);
         } else {
-            assert(false);
+            assert(0);
         }
         if (code.empty()) {
             errHandler.handleError(E10047, &filePath->location, {path});
@@ -68,7 +68,7 @@ void LgsCLang::compile(const vector<LgsStrConst*>& files) {
         compilerInstance->ExecuteAction(action);
     }
     break;
-    default: assert(false);
+    default: assert(0);
     }
 }
 

@@ -6,5 +6,5 @@ string LgsTypeConst::getName() {
 }
 
 Value* LgsTypeConst::createIRValue(LgsRuntime* runtime) {
-    assert(false);
+    assert(0);
 }

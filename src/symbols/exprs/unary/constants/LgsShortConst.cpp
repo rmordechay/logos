@@ -14,7 +14,7 @@ LgsExpr* LgsShortConst::convertExpr(LgsType* other) {
     if (other->asStr()) {
         return new LgsStrConst(to_string(value));
     }
-    assert(false);
+    assert(0);
 }
 
 LgsExpr* LgsShortConst::clone() {

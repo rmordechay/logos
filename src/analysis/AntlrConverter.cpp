@@ -382,7 +382,7 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
     } else if (const auto selection = ctx->selection()) {
         assignment->lValue = getSelection(selection);
     } else {
-        assert(false);
+        assert(0);
     }
 
     assignment->setLocation(ctx->start);
@@ -572,7 +572,7 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (const auto func = ctx->anonnymosFunc()) return getAnonymousFunc(func);
     if (ctx->NULL_()) return new LgsNull();
-    assert(false);
+    assert(0);
 }
 
 LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
@@ -637,7 +637,7 @@ LgsUnaryExpr* AntlerConverter::getVector(LogosParser::VectorContext* vector) con
     } else if (vector->VEC4()) {
 
     }
-    assert(false);
+    assert(0);
 }
 
 LgsSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) {
@@ -670,7 +670,7 @@ LgsUnaryExpr* AntlerConverter::getFirstSelection(LogosParser::SelectionContext* 
     if (const auto type = firstExpr->STRING()) {
         return getStrConst(type);
     }
-    assert(false);
+    assert(0);
 }
 
 vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::SelectionContext* ctx) {
@@ -717,7 +717,7 @@ LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::IterIndexContext* ctx) 
     } else if (const auto funcCall = ctx->funcCall()) {
         baseExpr = getFuncCall(funcCall);
     } else {
-        assert(false);
+        assert(0);
     }
 
     for (int i = 0; i < ctx->index().size(); ++i) {

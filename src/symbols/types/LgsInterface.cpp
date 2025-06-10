@@ -21,7 +21,7 @@ string LgsInterface::getIRName() {
 }
 
 LgsExpr* LgsInterface::getZeroValue() {
-    assert(false);
+    assert(0);
 }
 
 bool LgsInterface::equals(LgsType* other) {
@@ -37,7 +37,7 @@ bool LgsInterface::equals(LgsType* other) {
 }
 
 LgsType* LgsInterface::inferBinaryType(LgsType* other) {
-    assert(false);
+    assert(0);
 }
 
 string LgsInterface::prettyName() const {

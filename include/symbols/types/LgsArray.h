@@ -29,13 +29,13 @@ public:
         addMethod(&isNotEmptyFunc);
     }
 
-
     Type* getIRType() override;
     size_t getSizeBytes() override;
     string getIRName() override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
+    void castImplicitly(LgsType& toType) override;
     LgsType* inferBinaryType(LgsType* other) override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
     Value* getLength(LgsRuntime* runtime, LgsExpr* expr) override;

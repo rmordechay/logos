@@ -28,7 +28,7 @@ void LgsForeachLoop::setIRLoopVars(LgsRuntime* runtime) {
     } if (const auto arr = iterable->asArray()) {
         setIterVars(runtime, arr);
     } else {
-        assert(false);
+        assert(0);
     }
 }
 

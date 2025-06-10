@@ -69,7 +69,7 @@ string getExprStr(LgsExpr* baseExpr) {
             break;
         }
     }
-    assert(false);
+    assert(0);
 }
 
 void freeType(const LgsType* type) {

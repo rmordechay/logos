@@ -20,11 +20,11 @@ std::string LgsSize::prettyName() const {
 }
 
 LgsExpr* LgsSize::getZeroValue() {
-    assert(false);
+    assert(0);
 }
 
 bool LgsSize::equals(LgsType* other) {
-    assert(false);
+    assert(0);
 }
 
 std::string LgsSize::getStrFormatPart() const {
@@ -36,5 +36,5 @@ LgsType* LgsSize::clone() {
 }
 
 LgsType* LgsSize::inferBinaryType(LgsType* other) {
-    assert(false);
+    assert(0);
 }

@@ -26,7 +26,7 @@ Value* LgsVariable::createIRValue(LgsRuntime* runtime) {
     case FUNC:
         return ref.func->getIRFunc(runtime);
     default:
-        assert(false);
+        assert(0);
     }
 }
 
@@ -34,7 +34,7 @@ bool LgsVariable::equals(LgsExpr* other) {
     if (const auto otherVar = other->asVariable()) {
         return ref.getPtr() == otherVar->ref.getPtr();
     }
-    assert(false);
+    assert(0);
 }
 
 LgsExpr* LgsVariable::convertExpr(LgsType* type) {
@@ -52,7 +52,7 @@ LgsExpr* LgsVariable::convertExpr(LgsType* type) {
     case UNKNOWN:
         break;
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsVariable::eqIR(LgsRuntime* runtime, LgsExpr* other) {
@@ -148,6 +148,6 @@ uint32_t LgsVariable::hashValue(LgsRuntime* runtime) {
     case ENUM_FIELD:
         return LgsStr::hashString(ref.enumField->name);
     default:
-        assert(false);
+        assert(0);
     }
 }

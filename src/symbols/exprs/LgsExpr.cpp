@@ -26,30 +26,30 @@ void LgsExpr::setType(LgsType* type) {
     this->type = type;
 }
 
-void LgsExpr::free(LgsRuntime* runtime) { assert(false); }
-bool LgsExpr::equals(LgsExpr* other) { assert(false); }
-LgsExpr* LgsExpr::clone() { assert(false); }
-string LgsExpr::prettyName() { assert(false); }
-LgsExpr* LgsExpr::convertExpr(LgsType* toType) { assert(false); }
-uint32_t LgsExpr::hashValue(LgsRuntime* runtime) { assert(false); }
+void LgsExpr::free(LgsRuntime* runtime) { assert(0); }
+bool LgsExpr::equals(LgsExpr* other) { assert(0); }
+LgsExpr* LgsExpr::clone() { assert(0); }
+string LgsExpr::prettyName() { assert(0); }
+LgsExpr* LgsExpr::convertExpr(LgsType* toType) { assert(0); }
+uint32_t LgsExpr::hashValue(LgsRuntime* runtime) { assert(0); }
 
 // Comparisons
-Value* LgsExpr::subIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::mulIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::divIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::eqIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::neIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::ltIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::gtIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::geIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::leIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::andIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::orIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::bitAndIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::bitOrIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::bitXorIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::rshiftIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
-Value* LgsExpr::lshiftIR(LgsRuntime* runtime, LgsExpr* other) { assert(false); }
+Value* LgsExpr::subIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::mulIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::divIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::eqIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::neIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::ltIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::gtIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::geIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::leIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::andIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::orIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::bitAndIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::bitOrIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::bitXorIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::rshiftIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::lshiftIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
 
 // Casting
 LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }

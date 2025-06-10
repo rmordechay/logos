@@ -53,7 +53,7 @@ Type* LgsFuncType::getIRType() {
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {
-    assert(false);
+    assert(0);
 }
 
 string LgsFuncType::prettyName() const {

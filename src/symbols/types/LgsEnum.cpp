@@ -7,7 +7,7 @@ LgsExpr* LgsEnum::getZeroValue() {
     for (const auto& [_, field] : fields) {
         return field->expr;
     }
-    assert(false);
+    assert(0);
 }
 
 Type* LgsEnum::getIRType() {
@@ -37,5 +37,5 @@ bool LgsEnum::equals(LgsType* other) {
 }
 
 LgsType* LgsEnum::inferBinaryType(LgsType* other) {
-    assert(false);
+    assert(0);
 }

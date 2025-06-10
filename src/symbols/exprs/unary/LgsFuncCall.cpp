@@ -26,7 +26,7 @@ Value* LgsFuncCall::getCallback(LgsRuntime* runtime) const {
     default:
         break;
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsFuncCall::createIRValue(LgsRuntime* runtime) {

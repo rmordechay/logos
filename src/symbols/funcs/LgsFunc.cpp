@@ -48,8 +48,8 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
 
 Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
-    if (funcType.hasDefaultParams) assert(false);
-    if (funcType.isVariadic) assert(false);
+    if (funcType.hasDefaultParams) assert(0);
+    if (funcType.isVariadic) assert(0);
     for (int i = funcType.isStatic; i < args.size(); ++i) {
         const auto arg = args[i];
         const auto argType = arg->type->getIRType();
@@ -116,8 +116,8 @@ bool LgsFunc::shouldLoadIRArg(Value* value) {
 }
 
 LgsParam LgsFunc::getReturnSwapParam() const {
-    if (!funcType.swapReturn) assert(false);
-    if (funcType.returnParamIndex > funcType.params.size()) assert(false);
+    if (!funcType.swapReturn) assert(0);
+    if (funcType.returnParamIndex > funcType.params.size()) assert(0);
     return funcType.params[funcType.returnParamIndex];
 }
 

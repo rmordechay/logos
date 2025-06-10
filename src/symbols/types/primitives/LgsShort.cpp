@@ -24,7 +24,7 @@ LgsExpr* LgsShort::getZeroValue() {
 }
 
 LgsType* LgsShort::inferBinaryType(LgsType* other) {
-    assert(false);
+    assert(0);
 }
 
 bool LgsShort::equals(LgsType* other) {

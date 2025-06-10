@@ -73,7 +73,7 @@ size_t LgsStr::hashString(const string& str) {
 
 Value* LgsStrFormatFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     const bool isConst = args[0]->type->isConst;
-    if (!isConst) assert(false);
+    if (!isConst) assert(0);
     constexpr auto bufferSize = 1024;
     const auto formatString = getFormatString(args);
     const auto baseIRStr = getIRStr(runtime, formatString);

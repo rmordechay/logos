@@ -37,12 +37,18 @@ bool LgsArray::equals(LgsType* other) {
     return true;
 }
 
+void LgsArray::castImplicitly(LgsType& toType) {
+    const auto otherArr = toType.asArray();
+    if (!otherArr) assert(0);
+    LgsIterable::castImplicitly(toType);
+}
+
 string LgsArray::getIRName() {
     return name;
 }
 
 LgsType* LgsArray::inferBinaryType(LgsType* other) {
-    assert(false);
+    assert(0);
 }
 
 void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {

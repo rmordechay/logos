@@ -33,7 +33,7 @@ Type* LgsObject::getIRType() {
 LgsExpr* LgsObject::getZeroValue() {
     if (isNullable) return new LgsNull();
     // TODO return empty constructor
-    assert(false);
+    assert(0);
 }
 
 LgsType* LgsObject::inferBinaryType(LgsType* other) {

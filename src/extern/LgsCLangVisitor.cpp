@@ -91,7 +91,7 @@ LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
         return new LgsLong();
     }
     errs() << "Unhandled type: " << typeStr << "\n";
-    assert(false);
+    assert(0);
 }
 
 LgsObject* LgsCLangVisitor::mapCRecord(const clang::RecordDecl* record) {

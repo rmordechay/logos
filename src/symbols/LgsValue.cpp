@@ -34,9 +34,9 @@ void LgsValue::setIRValue(Value* value) {
 }
 
 string LgsValue::format(string& indentStr) {
-    assert(false);
+    assert(0);
 }
 
 json LgsValue::asJSON() {
-    assert(false);
+    assert(0);
 }

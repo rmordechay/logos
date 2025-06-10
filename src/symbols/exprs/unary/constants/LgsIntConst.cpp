@@ -18,7 +18,7 @@ LgsExpr* LgsIntConst::convertExpr(LgsType* toType) {
     if (toType->asLong()) {
         return new LgsLongConst(value);
     }
-    assert(false);
+    assert(0);
 }
 
 LgsExpr* LgsIntConst::clone() {
@@ -31,7 +31,7 @@ Value* LgsIntConst::eqIR(LgsRuntime* runtime, LgsExpr* other) {
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
         return runtime->builder.CreateICmpEQ(thisIRValue, otherIRValue);
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsIntConst::neIR(LgsRuntime* runtime, LgsExpr* other) {
@@ -40,7 +40,7 @@ Value* LgsIntConst::neIR(LgsRuntime* runtime, LgsExpr* other) {
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
         return runtime->builder.CreateICmpNE(thisIRValue, otherIRValue);
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsIntConst::gtIR(LgsRuntime* runtime, LgsExpr* other) {
@@ -49,7 +49,7 @@ Value* LgsIntConst::gtIR(LgsRuntime* runtime, LgsExpr* other) {
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
         return runtime->builder.CreateICmpSGT(thisIRValue, otherIRValue);
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsIntConst::ltIR(LgsRuntime* runtime, LgsExpr* other) {
@@ -58,7 +58,7 @@ Value* LgsIntConst::ltIR(LgsRuntime* runtime, LgsExpr* other) {
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
         return runtime->builder.CreateICmpSLT(thisIRValue, otherIRValue);
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsIntConst::geIR(LgsRuntime* runtime, LgsExpr* other) {
@@ -67,7 +67,7 @@ Value* LgsIntConst::geIR(LgsRuntime* runtime, LgsExpr* other) {
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
         return runtime->builder.CreateICmpSGE(thisIRValue, otherIRValue);
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsIntConst::leIR(LgsRuntime* runtime, LgsExpr* other) {
@@ -76,7 +76,7 @@ Value* LgsIntConst::leIR(LgsRuntime* runtime, LgsExpr* other) {
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
         return runtime->builder.CreateICmpSLE(thisIRValue, otherIRValue);
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsIntConst::andIR(LgsRuntime* runtime, LgsExpr* other) {
@@ -85,11 +85,11 @@ Value* LgsIntConst::andIR(LgsRuntime* runtime, LgsExpr* other) {
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
 
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsIntConst::orIR(LgsRuntime* runtime, LgsExpr* other) {
-    assert(false);
+    assert(0);
 }
 
 Value* LgsIntConst::bitAndIR(LgsRuntime* runtime, LgsExpr* other) {
@@ -98,7 +98,7 @@ Value* LgsIntConst::bitAndIR(LgsRuntime* runtime, LgsExpr* other) {
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
         return runtime->builder.CreateAnd(thisIRValue, otherIRValue);
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsIntConst::bitOrIR(LgsRuntime* runtime, LgsExpr* other) {
@@ -107,7 +107,7 @@ Value* LgsIntConst::bitOrIR(LgsRuntime* runtime, LgsExpr* other) {
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
         return runtime->builder.CreateOr(thisIRValue, otherIRValue);
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsIntConst::bitXorIR(LgsRuntime* runtime, LgsExpr* other) {
@@ -116,7 +116,7 @@ Value* LgsIntConst::bitXorIR(LgsRuntime* runtime, LgsExpr* other) {
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
         return runtime->builder.CreateXor(thisIRValue, otherIRValue);
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsIntConst::lshiftIR(LgsRuntime* runtime, LgsExpr* other) {
@@ -125,7 +125,7 @@ Value* LgsIntConst::lshiftIR(LgsRuntime* runtime, LgsExpr* other) {
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
         return runtime->builder.CreateShl(thisIRValue, otherIRValue);
     }
-    assert(false);
+    assert(0);
 }
 
 Value* LgsIntConst::rshiftIR(LgsRuntime* runtime, LgsExpr* other) {
@@ -134,5 +134,5 @@ Value* LgsIntConst::rshiftIR(LgsRuntime* runtime, LgsExpr* other) {
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
         return runtime->builder.CreateAShr(thisIRValue, otherIRValue);
     }
-    assert(false);
+    assert(0);
 }
