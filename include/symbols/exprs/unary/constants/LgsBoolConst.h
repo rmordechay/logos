@@ -1,13 +1,15 @@
 #pragma once
-#include "LgsConstExpr.h"
+#include "exprs/unary/LgsUnaryExpr.h"
 #include "types/primitives/LgsBool.h"
 
 
-class LgsBoolConst final : public LgsConstExpr {
+class LgsBoolConst final : public LgsUnaryExpr {
 public:
     bool value;
 
-    explicit LgsBoolConst(const bool value) : LgsConstExpr(&LGS_BOOL), value(value) {}
+    explicit LgsBoolConst(const bool value) : LgsUnaryExpr(&LGS_BOOL), value(value) {
+        type->isConst = true;
+    }
     string getValueAsString() const;
     Value* createIRValue(LgsRuntime* runtime) override;
     Value* andIR(LgsRuntime* runtime, LgsExpr* other) override;

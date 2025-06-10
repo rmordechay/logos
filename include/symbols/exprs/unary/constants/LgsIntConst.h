@@ -1,13 +1,14 @@
 #pragma once
-#include "LgsConstExpr.h"
+#include "exprs/unary/LgsUnaryExpr.h"
 #include "types/primitives/LgsInt.h"
 
-
-class LgsIntConst final : public LgsConstExpr {
+class LgsIntConst final : public LgsUnaryExpr {
 public:
     int value;
 
-    explicit LgsIntConst(const int value) : LgsConstExpr(&LGS_INT), value(value) {}
+    explicit LgsIntConst(const int value) : LgsUnaryExpr(&LGS_INT), value(value) {
+        type->isConst = true;
+    }
     string prettyName() override;
     Value* createIRValue(LgsRuntime* runtime) override;
     LgsExpr* convertExpr(LgsType* toType) override;

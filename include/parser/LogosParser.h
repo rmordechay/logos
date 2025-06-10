@@ -40,7 +40,7 @@ public:
     RuleElseStatement = 32, RulePatternMatching = 33, RulePattern = 34, 
     RuleLoopStatement = 35, RuleBreakStmt = 36, RuleReturnStatement = 37, 
     RuleEnumDeclaration = 38, RuleEnumField = 39, RuleExpr = 40, RuleUnaryExpr = 41, 
-    RuleArray = 42, RuleHashMap = 43, RuleKeyValue = 44, RuleFuncCall = 45, 
+    RuleArrayExpr = 42, RuleHashMap = 43, RuleKeyValue = 44, RuleFuncCall = 45, 
     RuleFuncArgList = 46, RuleFuncArg = 47, RuleConstructor = 48, RuleConstructorArgList = 49, 
     RuleConstructorArg = 50, RuleConstant = 51, RuleIterIndex = 52, RuleIndex = 53, 
     RuleSelection = 54, RuleFirstSelectionElement = 55, RuleInnerSelectionElement = 56, 
@@ -107,7 +107,7 @@ public:
   class EnumFieldContext;
   class ExprContext;
   class UnaryExprContext;
-  class ArrayContext;
+  class ArrayExprContext;
   class HashMapContext;
   class KeyValueContext;
   class FuncCallContext;
@@ -787,7 +787,7 @@ public:
     VectorContext *vector();
     ConstructorContext *constructor();
     ConstantContext *constant();
-    ArrayContext *array();
+    ArrayExprContext *arrayExpr();
     HashMapContext *hashMap();
     IterIndexContext *iterIndex();
     SelectionContext *selection();
@@ -797,21 +797,22 @@ public:
 
   UnaryExprContext* unaryExpr();
 
-  class  ArrayContext : public antlr4::ParserRuleContext {
+  class  ArrayExprContext : public antlr4::ParserRuleContext {
   public:
-    ArrayContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    ArrayExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *LBRACK();
     antlr4::tree::TerminalNode *RBRACK();
     std::vector<ExprContext *> expr();
     ExprContext* expr(size_t i);
+    antlr4::tree::TerminalNode *EXCLA_MARK();
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
    
   };
 
-  ArrayContext* array();
+  ArrayExprContext* arrayExpr();
 
   class  HashMapContext : public antlr4::ParserRuleContext {
   public:

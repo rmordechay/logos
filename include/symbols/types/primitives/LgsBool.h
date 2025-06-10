@@ -1,6 +1,5 @@
 #pragma once
-
-#include "exprs/unary/constants/LgsConstExpr.h"
+#include "types/LgsType.h"
 
 class LgsBool final : public LgsType {
 public:

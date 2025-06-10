@@ -40,7 +40,11 @@ bool LgsArray::equals(LgsType* other) {
 void LgsArray::castImplicitly(LgsType& toType) {
     const auto otherArr = toType.asArray();
     if (!otherArr) assert(0);
-    LgsIterable::castImplicitly(toType);
+    if (otherArr->isStatic) {
+        isStatic = true;
+        sizeExpr = otherArr->sizeExpr->clone();
+        constSize = otherArr->constSize;
+    }
 }
 
 string LgsArray::getIRName() {

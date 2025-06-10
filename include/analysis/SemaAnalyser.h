@@ -74,7 +74,6 @@ public:
     void visitStaticArray(const LgsArrayExpr* array);
     void visitDynamicArray(const LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap) override;
-    void visitStrConst(LgsStrConst* strConst) const override;
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr) override;
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr) override;
     void visitVariable(LgsVariable* variable) override;

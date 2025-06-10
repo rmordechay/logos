@@ -29,7 +29,6 @@ class LgsField;
 class LgsFuncType;
 class LgsObject;
 class LgsInterface;
-class LgsConstExpr;
 class LgsObjectFile;
 class LgsMainFunc;
 class LgsMainFile;
@@ -78,7 +77,7 @@ public:
     LgsExpr* getCast(LogosParser::ExprContext* ctx);
     LgsUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
-    LgsUnaryExpr* getArrayExpr(LogosParser::ArrayContext* ctx);
+    LgsUnaryExpr* getArrayExpr(LogosParser::ArrayExprContext* ctx);
     LgsUnaryExpr* getHashMap(LogosParser::HashMapContext* ctx);
     LgsVariable* getVariable(const string& varName, const ParserRuleContext* ctx) const;
     LgsUnaryExpr* getConst(const string& constName, const ParserRuleContext* ctx) const;
@@ -89,7 +88,7 @@ public:
     vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
     LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
-    LgsConstExpr* getConstant(LogosParser::ConstantContext* ctx) const;
+    LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx) const;
     LgsStrConst* getStrConst(tree::TerminalNode* type) const;
     LgsTypeConst* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx);

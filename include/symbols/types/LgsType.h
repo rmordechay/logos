@@ -16,7 +16,6 @@ class LgsIterable;
 class LgsStr;
 class LgsExpr;
 class LgsFuncCall;
-class LgsConstExpr;
 class LgsField;
 class LgsFunc;
 

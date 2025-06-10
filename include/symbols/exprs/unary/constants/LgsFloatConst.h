@@ -1,13 +1,14 @@
 #pragma once
-#include "LgsConstExpr.h"
+#include "exprs/unary/LgsUnaryExpr.h"
 #include "types/primitives/LgsFloat.h"
 
-
-class LgsFloatConst final : public LgsConstExpr {
+class LgsFloatConst final : public LgsUnaryExpr {
 public:
     double value;
 
-    explicit LgsFloatConst(const float value) : LgsConstExpr(&LGS_FLOAT), value(value) {}
+    explicit LgsFloatConst(const float value) : LgsUnaryExpr(&LGS_FLOAT), value(value) {
+        type->isConst = true;
+    }
     Value* createIRValue(LgsRuntime* runtime) override;
     ~LgsFloatConst() override = default;
 };

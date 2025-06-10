@@ -5,8 +5,8 @@
 
 class LgsArrayExpr final : public LgsUnaryExpr {
 public:
-    vector<LgsExpr*> initialElements;
     LgsArray* arrType = nullptr;
+    vector<LgsExpr*> initialElements;
 
     explicit LgsArrayExpr(LgsType* baseType = nullptr) {
         arrType = new LgsArray(baseType);

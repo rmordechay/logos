@@ -1,13 +1,15 @@
 #pragma once
-#include "LgsConstExpr.h"
+#include "exprs/unary/LgsUnaryExpr.h"
 #include "types/primitives/LgsLong.h"
 
 
-class LgsLongConst final : public LgsConstExpr {
+class LgsLongConst final : public LgsUnaryExpr {
 public:
     long value;
 
-    explicit LgsLongConst(const int value) : LgsConstExpr(&LGS_LONG), value(value) {}
+    explicit LgsLongConst(const int value) : LgsUnaryExpr(&LGS_LONG), value(value) {
+        type->isConst = true;
+    }
     Value* createIRValue(LgsRuntime* runtime) override;
     ~LgsLongConst() override = default;
 };

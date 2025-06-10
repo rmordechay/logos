@@ -194,14 +194,14 @@ unaryExpr:
     |   vector
     |   constructor
     |   constant
-    |   array
+    |   arrayExpr
     |   hashMap
     |   iterIndex
     |   selection
     ;
 
-array:
-        LBRACK (expr (COMMA expr)* COMMA?)? RBRACK
+arrayExpr:
+        LBRACK (expr (COMMA expr)* COMMA?)? RBRACK EXCLA_MARK?
     ;
 
 hashMap:

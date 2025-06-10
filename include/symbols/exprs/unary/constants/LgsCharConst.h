@@ -1,13 +1,13 @@
 #pragma once
-#include "LgsConstExpr.h"
+#include "exprs/unary/LgsUnaryExpr.h"
 #include "types/primitives/LgsChar.h"
 
-
-class LgsCharConst final : public LgsConstExpr {
+class LgsCharConst final : public LgsUnaryExpr {
 public:
     char value;
-
-    explicit LgsCharConst(const char value) : LgsConstExpr(&LGS_CHAR), value(value) {}
+    explicit LgsCharConst(const char value) : LgsUnaryExpr(&LGS_CHAR), value(value) {
+        type->isConst = true;
+    }
     Value* createIRValue(LgsRuntime* runtime) override;
 };
 

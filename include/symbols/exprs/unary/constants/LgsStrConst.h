@@ -1,16 +1,18 @@
 #pragma once
-#include "LgsConstExpr.h"
 #include "LgsIntConst.h"
 #include "types/LgsStr.h"
 
-class LgsStrConst final : public LgsConstExpr {
+class LgsStrConst final : public LgsUnaryExpr {
 public:
     string value;
+    LgsStr* strType = new LgsStr();
     vector<LgsExpr*> templateParts;
 
-    explicit LgsStrConst(const string& value) : LgsConstExpr(new LgsStr()), value(value) {
-        type->asStr()->isStatic = true;
-        type->asStr()->sizeExpr = new LgsIntConst(value.size());
+    explicit LgsStrConst(const string& value) : value(value) {
+        strType->isConst = true;
+        strType->isStatic = true;
+        strType->sizeExpr = new LgsIntConst(value.size());
+        type = strType;
     }
 
     Value* createIRValue(LgsRuntime* runtime) override;

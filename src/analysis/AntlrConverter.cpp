@@ -11,7 +11,6 @@
 #include "exprs/LgsOperator.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsCharConst.h"
-#include "exprs/unary/constants/LgsConstExpr.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
@@ -566,7 +565,7 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     if (const auto vector = ctx->vector()) return getVector(vector);
     if (const auto constructor = ctx->constructor()) return getInstance(constructor);
     if (const auto constant = ctx->constant()) return getConstant(constant);
-    if (const auto array = ctx->array()) return getArrayExpr(array);
+    if (const auto array = ctx->arrayExpr()) return getArrayExpr(array);
     if (const auto hashMap = ctx->hashMap()) return getHashMap(hashMap);
     if (const auto iterIndex = ctx->iterIndex()) return getIterIndex(iterIndex);
     if (const auto selection = ctx->selection()) return getSelection(selection);
@@ -583,8 +582,9 @@ LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     return logosBinaryExpr;
 }
 
-LgsUnaryExpr* AntlerConverter::getArrayExpr(LogosParser::ArrayContext* ctx) {
+LgsUnaryExpr* AntlerConverter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {
     const auto array = new LgsArrayExpr();
+    array->arrType->isStatic = !!ctx->EXCLA_MARK();
     for (const auto expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }
@@ -735,8 +735,8 @@ LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::IterIndexContext* ctx) 
     return baseExpr->asIterIndex();
 }
 
-LgsConstExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) const {
-    LgsConstExpr* constant = nullptr;
+LgsUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) const {
+    LgsUnaryExpr* constant = nullptr;
     if (const auto intToken = ctx->INTEGER()) {
         const auto input = removeUnderscores(intToken->getText());
         char* end;

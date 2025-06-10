@@ -331,8 +331,8 @@ void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
         visitIterIndex(iterIndex);
     } else if (const auto variable = unaryExpr->asVariable()) {
         visitVariable(variable);
-    } else if (const auto strConst = unaryExpr->asStrConst()) {
-        visitStrConst(strConst);
+    } else {
+        assert(0);
     }
 }
 
@@ -385,11 +385,6 @@ void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) {
     typePair->value = firstElement->value->type;
 }
 
-void SemaAnalyser::visitStrConst(LgsStrConst* strConst) const {
-    const auto size = new LgsIntConst(strConst->value.size());
-    strConst->type->asStr()->sizeExpr = size;
-}
-
 void SemaAnalyser::visitVariable(LgsVariable* variable) {
     const auto symbol = getSymbol(variable->name, variable);
     if (!symbol) return;
@@ -433,8 +428,6 @@ void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
         visitFuncCall(funcCall);
     } else if (const auto iterIndex = firstExpr->asIterIndex()) {
         visitIterIndex(iterIndex);
-    } else if (const auto strConst = firstExpr->asStrConst()) {
-        visitStrConst(strConst);
     } else if (const auto typeConst = firstExpr->asTypeConst()) {
         typeConst->type = resolveType(typeConst->type);
     } else {
