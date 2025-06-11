@@ -20,6 +20,7 @@
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsHashMap.h"
+#include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
@@ -30,6 +31,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsArray.h"
 #include "types/LgsGroup.h"
+#include "types/primitives/LgsSize.h"
 #include "utils/LgsUtils.h"
 
 #include <loops/LgsForeachLoop.h>
@@ -149,6 +151,8 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
         visitAssignment(assignment);
     } else if (const auto funcCall = stmt->asFuncCall()) {
         visitFuncCall(funcCall);
+    } else if (const auto postfixExpr = stmt->asPostfixExpr()) {
+        visitPostfixExpr(postfixExpr);
     } else if (const auto selection = stmt->asSelection()) {
         visitSelection(selection);
     } else if (const auto returnStmt = stmt->asReturn()) {
@@ -366,6 +370,8 @@ void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
         visitIterIndex(iterIndex);
     } else if (const auto variable = unaryExpr->asVariable()) {
         visitVariable(variable);
+    } else if (const auto postfixExpr = unaryExpr->asPostfixExpr()) {
+        visitPostfixExpr(postfixExpr);
     }
 }
 
@@ -566,6 +572,14 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
         return errHandler.handleError(E10046, &funcCall->location, {funcCall->name});
     }
     visitAnonymousFunc(funcCall, funcType);
+}
+
+void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
+    visitUnaryExpr(postfixExpr->expr);
+    if (!postfixExpr->expr->type->asInt()) {
+        return errHandler.handleError(E10050, &postfixExpr->location);
+    }
+    postfixExpr->type = postfixExpr->expr->type;
 }
 
 void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {

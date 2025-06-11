@@ -112,6 +112,7 @@ statement:
     |   returnStatement
     |   funcCall
     |   selection
+    |   postfixExpr
     ;
 
 statementsBlock:
@@ -189,6 +190,7 @@ unaryExpr:
     |   SELF_INSTANCE
     |   SELF_CLASS
     |   NULL
+    |   postfixExpr
     |   funcCall
     |   anonnymosFunc
     |   vector
@@ -198,6 +200,10 @@ unaryExpr:
     |   hashMap
     |   iterIndex
     |   selection
+    ;
+
+postfixExpr:
+        (VARIABLE |  iterIndex | selection) (INC | DEC)
     ;
 
 arrayExpr:
@@ -326,6 +332,8 @@ RANGLE: '>';
 COMMA: ',';
 TRIPLE_DOT: '...';
 DOUBLE_DOT: '..';
+INC: '++';
+DEC: '--';
 DOT: '.';
 COLON: ':';
 EQUAL: '=';

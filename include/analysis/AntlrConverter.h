@@ -2,6 +2,7 @@
 
 
 #include "LogosParser.h"
+#include "exprs/unary/LgsPostfixExpr.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsGroup.h"
@@ -78,6 +79,7 @@ public:
     LgsExpr* getCast(LogosParser::ExprContext* ctx);
     LgsUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
+    LgsPostfixExpr* getPostfixExpr(LogosParser::PostfixExprContext* ctx);
     LgsUnaryExpr* getArrayExpr(LogosParser::ArrayExprContext* ctx);
     LgsUnaryExpr* getHashMap(LogosParser::HashMapContext* ctx);
     LgsVariable* getVariable(tree::TerminalNode* ctx) const;

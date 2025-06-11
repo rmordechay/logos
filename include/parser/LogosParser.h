@@ -15,16 +15,16 @@ public:
     T__0 = 1, T__1 = 2, T__2 = 3, DOUBLE_EQUAL = 4, NOT_EQUAL = 5, GE = 6, 
     LE = 7, LPAREN = 8, RPAREN = 9, LBRACE = 10, RBRACE = 11, LBRACK = 12, 
     RBRACK = 13, ARROW = 14, LANGLE = 15, RANGLE = 16, COMMA = 17, TRIPLE_DOT = 18, 
-    DOUBLE_DOT = 19, DOT = 20, COLON = 21, EQUAL = 22, MINUS = 23, PLUS = 24, 
-    STAR = 25, SLASH = 26, HASH = 27, QUEST_MARK = 28, EXCLA_MARK = 29, 
-    PERCENT = 30, DOLLAR = 31, AMPERSAND = 32, PIPE = 33, CARET = 34, DOUBLE_RANGLE = 35, 
-    DOUBLE_LANGLE = 36, OBJECT = 37, SINGLETON = 38, SELF_INSTANCE = 39, 
-    SELF_CLASS = 40, INTERFACE = 41, ENUM = 42, VEC2 = 43, VEC3 = 44, VEC4 = 45, 
-    IMPLEMENTS = 46, EXTERN = 47, IF = 48, ELSE = 49, FOR = 50, BREAK = 51, 
-    CONTINUE = 52, RETURN = 53, VISIBILITY = 54, CONST = 55, AND = 56, OR = 57, 
-    NOT = 58, IN = 59, INTEGER = 60, FLOAT = 61, BOOL = 62, NULL_ = 63, 
-    CONST_NAME = 64, TYPE = 65, VARIABLE = 66, STRING = 67, TAG = 68, LINE_COMMENT = 69, 
-    BLOCK_COMMENT = 70, WS = 71
+    DOUBLE_DOT = 19, INC = 20, DEC = 21, DOT = 22, COLON = 23, EQUAL = 24, 
+    MINUS = 25, PLUS = 26, STAR = 27, SLASH = 28, HASH = 29, QUEST_MARK = 30, 
+    EXCLA_MARK = 31, PERCENT = 32, DOLLAR = 33, AMPERSAND = 34, PIPE = 35, 
+    CARET = 36, DOUBLE_RANGLE = 37, DOUBLE_LANGLE = 38, OBJECT = 39, SINGLETON = 40, 
+    SELF_INSTANCE = 41, SELF_CLASS = 42, INTERFACE = 43, ENUM = 44, VEC2 = 45, 
+    VEC3 = 46, VEC4 = 47, IMPLEMENTS = 48, EXTERN = 49, IF = 50, ELSE = 51, 
+    FOR = 52, BREAK = 53, CONTINUE = 54, RETURN = 55, VISIBILITY = 56, CONST = 57, 
+    AND = 58, OR = 59, NOT = 60, IN = 61, INTEGER = 62, FLOAT = 63, BOOL = 64, 
+    NULL_ = 65, CONST_NAME = 66, TYPE = 67, VARIABLE = 68, STRING = 69, 
+    TAG = 70, LINE_COMMENT = 71, BLOCK_COMMENT = 72, WS = 73
   };
 
   enum {
@@ -40,12 +40,12 @@ public:
     RuleElseStatement = 32, RulePatternMatching = 33, RulePattern = 34, 
     RuleLoopStatement = 35, RuleBreakStmt = 36, RuleReturnStatement = 37, 
     RuleEnumDeclaration = 38, RuleEnumField = 39, RuleExpr = 40, RuleUnaryExpr = 41, 
-    RuleArrayExpr = 42, RuleHashMap = 43, RuleKeyValue = 44, RuleFuncCall = 45, 
-    RuleFuncArgList = 46, RuleFuncArg = 47, RuleConstructor = 48, RuleConstructorArgList = 49, 
-    RuleConstructorArg = 50, RuleConstant = 51, RuleIterIndex = 52, RuleIndex = 53, 
-    RuleSelection = 54, RuleFirstSelectionElement = 55, RuleInnerSelectionElement = 56, 
-    RuleRange = 57, RuleType = 58, RuleMapType = 59, RuleArraySize = 60, 
-    RuleFuncType = 61, RuleVector = 62, RuleRequireEnvVars = 63
+    RulePostfixExpr = 42, RuleArrayExpr = 43, RuleHashMap = 44, RuleKeyValue = 45, 
+    RuleFuncCall = 46, RuleFuncArgList = 47, RuleFuncArg = 48, RuleConstructor = 49, 
+    RuleConstructorArgList = 50, RuleConstructorArg = 51, RuleConstant = 52, 
+    RuleIterIndex = 53, RuleIndex = 54, RuleSelection = 55, RuleFirstSelectionElement = 56, 
+    RuleInnerSelectionElement = 57, RuleRange = 58, RuleType = 59, RuleMapType = 60, 
+    RuleArraySize = 61, RuleFuncType = 62, RuleVector = 63, RuleRequireEnvVars = 64
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -107,6 +107,7 @@ public:
   class EnumFieldContext;
   class ExprContext;
   class UnaryExprContext;
+  class PostfixExprContext;
   class ArrayExprContext;
   class HashMapContext;
   class KeyValueContext;
@@ -521,6 +522,7 @@ public:
     ReturnStatementContext *returnStatement();
     FuncCallContext *funcCall();
     SelectionContext *selection();
+    PostfixExprContext *postfixExpr();
 
    
   };
@@ -780,6 +782,7 @@ public:
     antlr4::tree::TerminalNode *SELF_INSTANCE();
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *NULL_();
+    PostfixExprContext *postfixExpr();
     FuncCallContext *funcCall();
     AnonnymosFuncContext *anonnymosFunc();
     VectorContext *vector();
@@ -794,6 +797,21 @@ public:
   };
 
   UnaryExprContext* unaryExpr();
+
+  class  PostfixExprContext : public antlr4::ParserRuleContext {
+  public:
+    PostfixExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *INC();
+    antlr4::tree::TerminalNode *DEC();
+    antlr4::tree::TerminalNode *VARIABLE();
+    IterIndexContext *iterIndex();
+    SelectionContext *selection();
+
+   
+  };
+
+  PostfixExprContext* postfixExpr();
 
   class  ArrayExprContext : public antlr4::ParserRuleContext {
   public:

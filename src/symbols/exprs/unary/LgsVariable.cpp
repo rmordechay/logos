@@ -20,10 +20,10 @@ Value* LgsVariable::createIRValue(LgsRuntime* runtime) {
         return ref.varDec->IRValue;
     case PARAM:
         return ref.param->getIRValue(runtime);
-    case ENUM_FIELD:
-        return getIRStr(runtime, ref.enumField->name);
     case FUNC:
         return ref.func->getIRFunc(runtime);
+    case ENUM_FIELD:
+        return getIRStr(runtime, ref.enumField->name);
     default:
         assert(0);
     }

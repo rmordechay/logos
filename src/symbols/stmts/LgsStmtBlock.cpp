@@ -2,7 +2,7 @@
 #include "exprs/unary/LgsSelection.h"
 
 void LgsStmtBlock::createIRValue(LgsRuntime* runtime) const {
-    for (const auto& stmt : stmts) {
+    for (const auto stmt : stmts) {
         stmt->createIRStmt(runtime);
     }
 }

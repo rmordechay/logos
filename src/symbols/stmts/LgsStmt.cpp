@@ -1,6 +1,7 @@
 #include "stmts/LgsStmt.h"
 
 #include "exprs/unary/LgsFuncCall.h"
+#include "exprs/unary/LgsPostfixExpr.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsBreakStmt.h"
 #include "stmts/LgsContinueStmt.h"
@@ -28,6 +29,10 @@ LgsFuncCall* LgsStmt::asFuncCall() {
 
 LgsSelection* LgsStmt::asSelection() {
     return dynamic_cast<LgsSelection*>(this);
+}
+
+LgsPostfixExpr* LgsStmt::asPostfixExpr() {
+    return dynamic_cast<LgsPostfixExpr*>(this);
 }
 
 LgsContinueStmt* LgsStmt::asContinue() {

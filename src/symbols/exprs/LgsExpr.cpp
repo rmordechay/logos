@@ -4,6 +4,7 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsInstance.h"
+#include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
@@ -54,6 +55,7 @@ Value* LgsExpr::lshiftIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
 LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }
 LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }
 LgsFuncCall* LgsExpr::asFuncCall() { return dynamic_cast<LgsFuncCall*>(this); }
+LgsPostfixExpr* LgsExpr::asPostfixExpr() { return dynamic_cast<LgsPostfixExpr*>(this); }
 LgsInstance* LgsExpr::asInstance() { return dynamic_cast<LgsInstance*>(this); }
 LgsSelection* LgsExpr::asSelection() { return dynamic_cast<LgsSelection*>(this); }
 LgsArrayExpr* LgsExpr::asArrayExpr() { return dynamic_cast<LgsArrayExpr*>(this); }

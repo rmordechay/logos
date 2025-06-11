@@ -7,12 +7,12 @@ struct LgsSymbol;
 
 class LgsFuncCall final : public LgsStmt, public LgsUnaryExpr {
 public:
-    std::string name;
-    std::vector<LgsExpr*> args;
+    string name;
+    vector<LgsExpr*> args;
     LgsSymbol* callback = nullptr;
     LgsFunc* func = nullptr;
 
-    explicit LgsFuncCall(const std::string& name, const std::vector<LgsExpr*>& args = {}) : name(name), args(args) {}
+    explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
     void resolveVirtualFunc(LgsRuntime* runtime) const;
     Value* call(LgsRuntime* runtime) const;
     Value* getCallback(LgsRuntime* runtime) const;
@@ -21,9 +21,9 @@ public:
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
     void createIRStmt(LgsRuntime* runtime) override;
     Value* createIRValue(LgsRuntime* runtime) override;
-    std::string getName() override;
-    std::string format(std::string& indentStr) override;
-    std::string prettyName() override;
+    string getName() override;
+    string format(string& indentStr) override;
+    string prettyName() override;
     ~LgsFuncCall() override = default;
 };
 

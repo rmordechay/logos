@@ -27,6 +27,7 @@
 #include "stmts/LgsContinueStmt.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsHashMap.h"
+#include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/constants/LgsLongConst.h"
 #include "extern/LgsCLang.h"
 #include "files/LgsMainFile.h"
@@ -365,9 +366,10 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (const auto returnStmt = ctx->returnStatement()) return getReturnStmt(returnStmt);
+    if (const auto postfixExpr = ctx->postfixExpr()) return getPostfixExpr(postfixExpr);
     if (ctx->breakStmt()) return getBreakStmt(ctx);
     if (ctx->CONTINUE()) return new LgsContinueStmt();
-    return nullptr;
+    assert(0);
 }
 
 LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ctx) {
@@ -573,6 +575,7 @@ LgsExpr* AntlerConverter::getCast(LogosParser::ExprContext* ctx) {
 LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto variable = ctx->VARIABLE()) return getVariable(variable);
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
+    if (const auto postfixExpr = ctx->postfixExpr()) return getPostfixExpr(postfixExpr);
     if (const auto vector = ctx->vector()) return getVector(vector);
     if (const auto constructor = ctx->constructor()) return getInstance(constructor);
     if (const auto constant = ctx->constant()) return getConstant(constant);
@@ -591,6 +594,30 @@ LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     const auto logosBinaryExpr = new LgsBinaryExpr(l->type, l, r, mapOperator(ctx));
     logosBinaryExpr->setLocation(ctx->start);
     return logosBinaryExpr;
+}
+
+LgsPostfixExpr* AntlerConverter::getPostfixExpr(LogosParser::PostfixExprContext* ctx) {
+    LgsPostfixOperator op;
+    if (ctx->INC()) {
+        op = INC;
+    } else if (ctx->DEC()) {
+        op = DEC;
+    } else {
+        assert(0);
+    }
+    LgsUnaryExpr* expr = nullptr;
+    if (const auto var = ctx->VARIABLE()) {
+        expr = getVariable(var);
+    } else if (const auto selection = ctx->selection()) {
+        expr = getSelection(selection);
+    } else if (const auto iterIndex = ctx->iterIndex()) {
+        expr = getIterIndex(iterIndex);
+    } else {
+        assert(0);
+    }
+    const auto postfixExpr = new LgsPostfixExpr(expr, op);
+    postfixExpr->setLocation(ctx->start);
+    return postfixExpr;
 }
 
 LgsUnaryExpr* AntlerConverter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {

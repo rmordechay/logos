@@ -3,7 +3,7 @@
 
 void LgsVarDec::createIRStmt(LgsRuntime* runtime) {
     const auto IRType = type->getIRType();
-    const auto exprIRValue = expr->getIRValue(runtime);
+    const auto exprIRValue = expr-> getIRValue(runtime);
     if (shouldAllocate(IRType)) {
         IRValue = runtime->builder.CreateAlloca(IRType);
         runtime->builder.CreateStore(exprIRValue, IRValue);
@@ -14,7 +14,7 @@ void LgsVarDec::createIRStmt(LgsRuntime* runtime) {
 
 bool LgsVarDec::shouldAllocate(const Type* IRType) const {
     if (type->asMap() || type->asArray()) return false;
-    return IRType->isArrayTy() || IRType->isPointerTy() || IRType->isVoidTy();
+    return !IRType->isArrayTy() && !IRType->isPointerTy() && !IRType->isVoidTy();
 }
 
 string LgsVarDec::format(string& indentStr) {
