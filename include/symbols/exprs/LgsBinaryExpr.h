@@ -2,6 +2,26 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/LgsOperator.h"
 
+enum LgsOperator {
+    ADD,
+    SUB,
+    MUL,
+    DIV,
+    NE,
+    EQ,
+    LT,
+    GT,
+    GE,
+    LE,
+    AND,
+    OR,
+    BIT_AND,
+    BIT_OR,
+    BIT_XOR,
+    LSHIFT,
+    RSHIFT,
+    NOOP,
+};
 
 class LgsBinaryExpr final : public LgsExpr {
 public:

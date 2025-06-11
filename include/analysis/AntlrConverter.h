@@ -2,6 +2,7 @@
 
 
 #include "LogosParser.h"
+#include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsBreakStmt.h"
@@ -99,5 +100,6 @@ public:
     LgsType* getTypeFromText(tree::TerminalNode* typeToken) const;
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     void cleanStr(string& value) const;
+    LgsOperator mapOperator(LogosParser::ExprContext* expr) const;
     ~AntlerConverter() = default;
 };

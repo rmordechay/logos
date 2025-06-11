@@ -904,3 +904,24 @@ void AntlerConverter::cleanStr(string& value) const {
     value.erase(0, 1);
     value.pop_back();
 }
+
+LgsOperator AntlerConverter::mapOperator(LogosParser::ExprContext* expr) const {
+    if (expr->PLUS()) return ADD;
+    if (expr->MINUS()) return SUB;
+    if (expr->STAR()) return MUL;
+    if (expr->SLASH()) return DIV;
+    if (expr->NOT_EQUAL()) return NE;
+    if (expr->DOUBLE_EQUAL()) return EQ;
+    if (expr->RANGLE()) return GT;
+    if (expr->LANGLE()) return LT;
+    if (expr->GE()) return GE;
+    if (expr->LE()) return LE;
+    if (expr->AND()) return AND;
+    if (expr->OR()) return OR;
+    if (expr->AMPERSAND()) return BIT_AND;
+    if (expr->PIPE()) return BIT_OR;
+    if (expr->DOUBLE_LANGLE()) return LSHIFT;
+    if (expr->DOUBLE_RANGLE()) return RSHIFT;
+    if (expr->CARET()) return BIT_XOR;
+    return NOOP;
+}
