@@ -24,10 +24,25 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
     }
     for (const auto& [name, field] : obj->fields) {
         if (initializedFields.count(name)) continue;
-        const auto zeroValue = field->type->getZeroValue();
-        field->storeIRValue(runtime, IRValue, zeroValue);
+        if (const auto fieldObj = field->type->asObject()) {
+            setZeroFields(runtime, fieldObj, IRValue);
+        } else {
+            const auto zeroValue = field->type->getZeroValue();
+            field->storeIRValue(runtime, IRValue, zeroValue);
+        }
     }
     return IRValue;
+}
+
+void LgsInstance::setZeroFields(LgsRuntime* runtime, LgsObject* object, Value* parentIRValue) const {
+    for (const auto& [name, field] : object->fields) {
+        if (const auto fieldObj = field->type->asObject()) {
+            setZeroFields(runtime, fieldObj, parentIRValue);
+        } else {
+            const auto zeroValue = field->type->getZeroValue();
+            field->storeIRValue(runtime, parentIRValue, zeroValue);
+        }
+    }
 }
 
 void LgsInstance::setReturnExpr(LgsRuntime* runtime, Type* objIRType) {
