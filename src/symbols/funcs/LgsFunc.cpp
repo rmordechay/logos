@@ -33,7 +33,7 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
     const auto funcTy = dyn_cast<FunctionType>(IRFuncType);
     auto func = runtime->module->getOrInsertFunction(funcIRName, funcTy);
     IRFunc = dyn_cast<Function>(func.getCallee());
-    if (funcType->swapReturn) {
+    if (funcType->is(SWAP_RETURN)) {
         setBigObjAttrs(*IRFunc);
     }
     if (funcType->params.empty()) return IRFunc;
@@ -48,9 +48,9 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
 
 Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
-    if (funcType->hasDefaultParams) assert(0);
-    if (funcType->isVariadic) assert(0);
-    for (int i = funcType->isStatic; i < args.size(); ++i) {
+    if (funcType->is(HAS_DEFAULTS)) assert(0);
+    if (funcType->is(VARIADIC)) assert(0);
+    for (int i = funcType->is(STATIC); i < args.size(); ++i) {
         const auto arg = args[i];
         const auto argType = arg->type->getIRType();
         const auto argValue = arg->getIRValue(runtime);
@@ -66,7 +66,7 @@ Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
         return runtime->builder.CreateCall(IRFuncType, IRValue, args);
     }
     const auto IRFunc = getIRFunc(runtime);
-    if (funcType->swapReturn) {
+    if (funcType->is(SWAP_RETURN)) {
         const auto paramIRType = getReturnSwapParam().type->getIRType();
         const auto rv = runtime->builder.CreateAlloca(paramIRType);
         vector finalArgs(args.begin(), args.end());
@@ -116,12 +116,12 @@ bool LgsFunc::shouldLoadIRArg(Value* value) {
 }
 
 LgsParam LgsFunc::getReturnSwapParam() const {
-    if (!funcType->swapReturn) assert(0);
+    if (!funcType->is(SWAP_RETURN)) assert(0);
     if (funcType->returnParamIndex > funcType->params.size()) assert(0);
     return funcType->params[funcType->returnParamIndex];
 }
 
-void LgsFunc::swapReturnIfNeeded() {
+void LgsFunc::swapReturnIfNeeded() const {
     bool isEqual = true;
     for (const auto expr1 : returnExprs) {
         for (const auto expr2 : returnExprs) {
@@ -132,9 +132,9 @@ void LgsFunc::swapReturnIfNeeded() {
             }
         }
     }
-    funcType->swapReturn = funcType->isRvBig && isEqual;
-    if (funcType->swapReturn) {
-        funcType->returnParamIndex = funcType->isMethod && !funcType->isStatic;
+    if (funcType->is(RV_BIG) && isEqual) {
+        funcType->setFlag(SWAP_RETURN);
+        funcType->returnParamIndex = funcType->is(METHOD) && !funcType->is(STATIC);
         funcType->params.insert(funcType->params.begin(), LgsParam(funcType->rt));
         funcType->rt = &LGS_VOID;
     }

@@ -609,7 +609,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
 }
 
 void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType) {
-    assert(funcType->isAnonymous);
+    assert(funcType->is(ANONYMOUS));
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
     }
@@ -643,7 +643,7 @@ void SemaAnalyser::visitGroup(LgsGroup* group) const {
         for (const auto type : group->types) {
             const auto method = type->getMethod(targetSymbol->name);
             if (!method) continue;
-            method->funcType->isVirtual = true;
+            method->funcType->setFlag(VIRTUAL);
             group->addMethod(method);
         }
     }
@@ -702,7 +702,7 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
 void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
     const auto method = methodCall->func;
     if (!method) return;
-    if (!method->funcType->isPublic && file->absPath != method->filePath) {
+    if (!method->funcType->is(PUBLIC) && file->absPath != method->filePath) {
         errHandler.handleError(E10031, &method->location, {method->funcType->name, method->funcType->parentName});
     }
 }
@@ -863,7 +863,9 @@ void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
     }
     funcType->rt = resolveType(funcType->rt);
     if (!funcType->rt->isVoid) {
-        funcType->isRvBig = funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD;
+        if (funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD) {
+            funcType->setFlag(RV_BIG);
+        }
     }
 }
 

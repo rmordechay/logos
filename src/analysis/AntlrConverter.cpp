@@ -205,7 +205,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
         const auto type = getFuncReturnType(funcSignature->type());
         const auto func = new LgsFunc(funcSignature->VARIABLE()->getText(), type);
         func->funcType->parentName = interfaceName;
-        func->funcType->isMethod = true;
+        func->funcType->setFlag(METHOD);
         func->funcType->params.push_back(self);
         setParams(func->funcType, funcSignature->param());
         func->filePath = filePath;
@@ -272,12 +272,12 @@ LgsFunc* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext
     self.isSelf = true;
     const auto method = new LgsFunc(nameToken->getText(), rt);
     method->filePath = obj->path;
-    method->funcType->isMethod = true;
+    method->funcType->setFlag(METHOD);
     method->funcType->parentName = obj->name;
     method->funcType->params.emplace_back(self);
     setParams(method->funcType, funcSignature->param());
     if (ctx->VISIBILITY()) {
-        method->funcType->isPublic = true;
+        method->funcType->setFlag(PUBLIC);
     }
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     method->setLocation(nameToken->getSymbol());
@@ -288,7 +288,7 @@ LgsFunc* AntlerConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ct
     const auto rt = getFuncReturnType(ctx->anonnymosfuncSignature()->type());
     const auto funcSignature = ctx->anonnymosfuncSignature();
     const auto func = new LgsFunc("", rt);
-    func->funcType->isAnonymous = true;
+    func->funcType->setFlag(ANONYMOUS);
     setParams(func->funcType, funcSignature->param());
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     func->setLocation(funcSignature->LPAREN()->getSymbol());
@@ -310,7 +310,7 @@ void AntlerConverter::setParams(LgsFuncType* funcType, const vector<LogosParser:
             funcType->params.emplace_back(lgsParam);
         }
     }
-    if (funcType->isVariadic && funcType->hasDefaultParams) {
+    if (funcType->is(VARIADIC) && funcType->is(HAS_DEFAULTS)) {
         errHandler.handleError(E10043, &funcType->location);
     }
 }
@@ -322,9 +322,9 @@ LgsParam AntlerConverter::getParam(LgsFuncType* funcType, LogosParser::ParamCont
     if (param->TRIPLE_DOT()) {
         if (lgsParam.expr) errHandler.handleError(E10045, &lgsParam.location);
         lgsParam.isVariadic = true;
-        funcType->isVariadic = true;
+        funcType->setFlag(VARIADIC);
     } else if (lgsParam.expr) {
-        funcType->hasDefaultParams = true;
+        funcType->setFlag(HAS_DEFAULTS);
     }
     lgsParam.setLocation(param->start);
     return lgsParam;

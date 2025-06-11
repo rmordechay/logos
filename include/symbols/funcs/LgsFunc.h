@@ -24,10 +24,11 @@ public:
         funcType->params = params;
         type = funcType;
     }
+
     explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {
         type = funcType;
     }
-    void swapReturnIfNeeded();
+    void swapReturnIfNeeded() const;
     LgsParam getReturnSwapParam() const;
     void setBigObjAttrs(Function& IRFunc) const;
     json asJSON() override;

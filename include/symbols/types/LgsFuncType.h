@@ -2,6 +2,18 @@
 #include "LgsType.h"
 #include "funcs/LgsParam.h"
 
+enum Flags : uint16_t {
+    METHOD = 1 << 0,
+    STATIC = 1 << 1,
+    PUBLIC = 1 << 2,
+    VIRTUAL = 1 << 3,
+    VARIADIC = 1 << 4,
+    ANONYMOUS = 1 << 5,
+    RV_BIG = 1 << 6,
+    SWAP_RETURN = 1 << 7,
+    HAS_DEFAULTS = 1 << 8
+};
+
 class LgsFuncType final : public LgsType {
 public:
     string name;
@@ -9,18 +21,12 @@ public:
     string parentName;
     LgsType* rt = nullptr;
     vector<LgsParam> params;
-    bool isMethod = false;
-    bool isStatic = false;
-    bool isPublic = false;
-    bool isVirtual = false;
-    bool isVariadic = false;
-    bool isAnonymous = false;
-    bool isRvBig = false;
-    bool swapReturn = false;
-    bool hasDefaultParams = false;
+    uint16_t flags = 0;
     int returnParamIndex = -1;
     FunctionType* IRType = nullptr;
 
+    LgsFuncType() = default;
+    LgsFuncType(const string& name, LgsType* rt, const vector<LgsParam>& params, const uint16_t flags = 0) : name(name), rt(rt), params(params), flags(flags) {}
     Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
@@ -28,7 +34,8 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) override;
     LgsType* clone() override;
+    bool is(Flags f) const;
+    void setFlag(Flags f);
+    void clearFlag(Flags f);
     ~LgsFuncType() override = default;
 };
-
-

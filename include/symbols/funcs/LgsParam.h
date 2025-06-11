@@ -1,4 +1,6 @@
 #pragma once
+#include "exprs/LgsExpr.h"
+
 #include <LgsValue.h>
 
 class LgsVariable;
@@ -16,7 +18,9 @@ public:
     AllocaInst* vaList = nullptr;
     vector<LgsVariable*> refs;
 
-    explicit LgsParam(LgsType* type = nullptr, const string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
+    explicit LgsParam(LgsType* type = nullptr, const string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {
+        isConst = true;
+    }
     string format(string& indentStr) override;
     Value* getIRValue(LgsRuntime* runtime);
     json asJSON() override;

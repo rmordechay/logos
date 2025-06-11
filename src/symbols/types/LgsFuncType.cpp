@@ -19,9 +19,9 @@ bool LgsFuncType::equals(LgsType* other) {
 string LgsFuncType::getIRName() {
     if (IRName != "") return IRName;
     stringstream strStream;
-    if (isMethod) {
+    if (is(METHOD)) {
         strStream << parentName << "_";
-    } else if (isAnonymous) {
+    } else if (this->is(ANONYMOUS)) {
         strStream << "Anonymous";
     }
     strStream << name;
@@ -32,7 +32,7 @@ string LgsFuncType::getIRName() {
 Type* LgsFuncType::getIRType() {
     if (IRType) return IRType;
     Type* returnType;
-    if (isRvBig && !swapReturn) {
+    if (this->is(RV_BIG) && !is(SWAP_RETURN)) {
         returnType = PointerType::getUnqual(context);
     } else {
         returnType = rt->getIRType();
@@ -48,7 +48,7 @@ Type* LgsFuncType::getIRType() {
             IRParamsTypes.emplace_back(irType);
         }
     }
-    IRType = FunctionType::get(returnType, IRParamsTypes, isVariadic);
+    IRType = FunctionType::get(returnType, IRParamsTypes, this->is(VARIADIC));
     return IRType;
 }
 
@@ -80,15 +80,21 @@ LgsType* LgsFuncType::clone() {
     newFuncType->name = this->name;
     newFuncType->parentName = this->parentName;
     newFuncType->rt = this->rt->clone();
+    newFuncType->flags = flags;
     for (auto& param : this->params) {
         newFuncType->params.push_back(param);
     }
-    newFuncType->isMethod = this->isMethod;
-    newFuncType->isStatic = this->isStatic;
-    newFuncType->isPublic = this->isPublic;
-    newFuncType->isVirtual = this->isVirtual;
-    newFuncType->isVariadic = this->isVariadic;
-    newFuncType->isAnonymous = this->isAnonymous;
-    newFuncType->hasDefaultParams = this->hasDefaultParams;
     return newFuncType;
+}
+
+bool LgsFuncType::is(const Flags f) const {
+    return flags & f;
+}
+
+void LgsFuncType::setFlag(const Flags f) {
+    flags |= f;
+}
+
+void LgsFuncType::clearFlag(const Flags f) {
+    flags &= ~f;
 }

@@ -8,7 +8,7 @@
 
 class LgsStrFormatFunc final : public LgsBuiltinFunc {
 public:
-    explicit LgsStrFormatFunc(LgsType* parent) : LgsBuiltinFunc("format", parent, parent->getIRName(), {parent, &LGS_ANY}, true, true) {}
+    explicit LgsStrFormatFunc(LgsType* parent) : LgsBuiltinFunc("format", parent, parent->getIRName(), {parent, &LGS_ANY}, PUBLIC | VARIADIC) {}
     Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override;
 };
 
