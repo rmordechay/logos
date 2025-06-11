@@ -5,7 +5,7 @@
 class LgsExpr;
 class LgsType;
 
-enum AssignmentType {
+enum LgsAssignType {
     ASSIGN,
     ASSIGN_ADD,
     ASSIGN_SUB,
@@ -15,10 +15,13 @@ enum AssignmentType {
 
 class LgsAssignment final : public LgsStmt {
 public:
-    LgsExpr* lValue;
-    LgsExpr* rValue;
+    LgsExpr* lValue = nullptr;
+    LgsExpr* rValue = nullptr;
+    LgsAssignType assignmentType;
 
+    LgsAssignment(const LgsAssignType assignmentType, LgsExpr* lValue, LgsExpr* rValue) : lValue(lValue), rValue(rValue), assignmentType(assignmentType) {}
     void createIRStmt(LgsRuntime* runtime) override;
+    void createIRAssignment(LgsRuntime* runtime) const;
     void assignToIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* value) const;
     void assignToSelection(LgsRuntime* runtime, const LgsSelection* selection, LgsExpr* value) const;
     void assignToVariable(LgsRuntime* runtime, LgsVariable* var, LgsExpr* value) const;

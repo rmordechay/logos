@@ -1,6 +1,5 @@
 #pragma once
 #include "exprs/LgsExpr.h"
-#include "exprs/LgsOperator.h"
 
 enum LgsOperator {
     ADD,

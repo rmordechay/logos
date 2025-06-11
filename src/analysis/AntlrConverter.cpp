@@ -7,7 +7,6 @@
 #include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsBinaryExpr.h"
-#include "exprs/LgsOperator.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsCharConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
@@ -373,17 +372,17 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
 }
 
 LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ctx) {
-    const auto assignment = new LgsAssignment();
-    assignment->rValue = getExpr(ctx->expr());
+    LgsExpr* lValue = nullptr;
     if (const auto variable = ctx->VARIABLE()) {
-        assignment->lValue = getVariable(variable);
+        lValue = getVariable(variable);
     } else if (const auto iterIndex = ctx->iterIndex()) {
-        assignment->lValue = getIterIndex(iterIndex);
+        lValue = getIterIndex(iterIndex);
     } else if (const auto selection = ctx->selection()) {
-        assignment->lValue = getSelection(selection);
+        lValue = getSelection(selection);
     } else {
         assert(0);
     }
+    const auto assignment = new LgsAssignment(mapAssignType(ctx), getExpr(ctx->expr()), lValue);
     assignment->setLocation(ctx->start);
     return assignment;
 }
@@ -905,6 +904,15 @@ void AntlerConverter::cleanStr(string& value) const {
     value.pop_back();
 }
 
+LgsAssignType AntlerConverter::mapAssignType(LogosParser::AssignmentContext* assignment) const {
+    if (assignment->WALRUS()) return ASSIGN;
+    if (assignment->EQUAL_ADD()) return ASSIGN_ADD;
+    if (assignment->EQUAL_SUB()) return ASSIGN_SUB;
+    if (assignment->EQUAL_MUL()) return ASSIGN_MUL;
+    if (assignment->EQUAL_DIV()) return ASSIGN_DIV;
+    assert(false);
+}
+
 LgsOperator AntlerConverter::mapOperator(LogosParser::ExprContext* expr) const {
     if (expr->PLUS()) return ADD;
     if (expr->MINUS()) return SUB;
@@ -923,5 +931,5 @@ LgsOperator AntlerConverter::mapOperator(LogosParser::ExprContext* expr) const {
     if (expr->DOUBLE_LANGLE()) return LSHIFT;
     if (expr->DOUBLE_RANGLE()) return RSHIFT;
     if (expr->CARET()) return BIT_XOR;
-    return NOOP;
+    assert(false);
 }

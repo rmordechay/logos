@@ -8,6 +8,19 @@
 #include "utils/LgsUtils.h"
 
 void LgsAssignment::createIRStmt(LgsRuntime* runtime) {
+    switch (assignmentType) {
+    case ASSIGN:
+        createIRAssignment(runtime);
+        break;
+    case ASSIGN_ADD:
+    case ASSIGN_SUB:
+    case ASSIGN_MUL:
+    case ASSIGN_DIV:
+        assert(0);
+    }
+}
+
+void LgsAssignment::createIRAssignment(LgsRuntime* runtime) const {
     if (const auto selection = lValue->asSelection()) {
         assignToSelection(runtime, selection, rValue);
     } else if (const auto iterIndex = lValue->asIterIndex()) {
