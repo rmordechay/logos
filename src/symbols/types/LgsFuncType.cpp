@@ -32,7 +32,7 @@ string LgsFuncType::getIRName() {
 Type* LgsFuncType::getIRType() {
     if (IRType) return IRType;
     Type* returnType;
-    if (this->is(RV_BIG) && !is(SWAP_RETURN)) {
+    if (this->isBig && !is(SWAP_RETURN)) {
         returnType = PointerType::getUnqual(context);
     } else {
         returnType = rt->getIRType();

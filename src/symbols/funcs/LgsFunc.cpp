@@ -126,13 +126,12 @@ void LgsFunc::swapReturnIfNeeded() const {
     for (const auto expr1 : returnExprs) {
         for (const auto expr2 : returnExprs) {
             if (expr1 == expr2) continue;
-            if (!expr1->equals(expr2)) {
-                isEqual = false;
-                break;
-            }
+            if (expr1->equals(expr2)) continue;
+            isEqual = false;
+            break;
         }
     }
-    if (funcType->is(RV_BIG) && isEqual) {
+    if (funcType->isBig && isEqual) {
         funcType->setFlag(SWAP_RETURN);
         funcType->returnParamIndex = funcType->is(METHOD) && !funcType->is(STATIC);
         funcType->params.insert(funcType->params.begin(), LgsParam(funcType->rt));

@@ -9,9 +9,8 @@ enum Flags : uint16_t {
     VIRTUAL = 1 << 3,
     VARIADIC = 1 << 4,
     ANONYMOUS = 1 << 5,
-    RV_BIG = 1 << 6,
-    SWAP_RETURN = 1 << 7,
-    HAS_DEFAULTS = 1 << 8
+    SWAP_RETURN = 1 << 6,
+    HAS_DEFAULTS = 1 << 7,
 };
 
 class LgsFuncType final : public LgsType {

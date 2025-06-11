@@ -879,11 +879,7 @@ void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
         funcType->params[i].type = resolveType(funcType->params[i].type);
     }
     funcType->rt = resolveType(funcType->rt);
-    if (!funcType->rt->isVoid) {
-        if (funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD) {
-            funcType->setFlag(RV_BIG);
-        }
-    }
+    funcType->isBig = !funcType->rt->isVoid && funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD;
 }
 
 void SemaAnalyser::resolveGroupTypes(LgsGroup* group) {

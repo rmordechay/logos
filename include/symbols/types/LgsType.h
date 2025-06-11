@@ -22,6 +22,7 @@ class LgsFunc;
 class LgsType {
 public:
     Location location;
+    bool isBig = false;
     bool isVoid = false;
     bool isConst = false;
     bool isInt = false;
