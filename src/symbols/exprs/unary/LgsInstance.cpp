@@ -16,10 +16,20 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
     } else {
         IRValue = runtime->builder.CreateAlloca(objIRType);
     }
+    unordered_set<string> initializedFields;
     for (const auto arg : args) {
         const auto field = obj->getField(arg->name);
         field->storeIRValue(runtime, IRValue, arg->expr);
+        initializedFields.insert(field->name);
     }
+
+    for (const auto& [name, field] : obj->fields) {
+        if (initializedFields.count(name)) continue;
+        if (field->type->asObject()) continue;
+        field->expr = field->type->getZeroValue();
+        field->storeIRValue(runtime, IRValue, field->expr);
+    }
+
     return IRValue;
 }
 

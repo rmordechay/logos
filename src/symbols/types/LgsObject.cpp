@@ -1,6 +1,7 @@
 #include "types/LgsObject.h"
 #include "codegen/CodeGenerator.h"
 #include "exprs/LgsNull.h"
+#include "exprs/unary/LgsInstance.h"
 #include "stmts/LgsField.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
@@ -32,8 +33,7 @@ Type* LgsObject::getIRType() {
 
 LgsExpr* LgsObject::getZeroValue() {
     if (isNullable) return new LgsNull();
-    // TODO return empty constructor
-    assert(0);
+    return new LgsInstance(this);
 }
 
 LgsType* LgsObject::inferBinaryType(LgsType* other) {

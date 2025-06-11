@@ -508,6 +508,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
         }
     }
 
+    unordered_set<string> initializedFields;
     for (const auto& arg : instance->args) {
         visitExpr(arg->expr);
         const auto lgsField = instance->obj->getField(arg->name);
