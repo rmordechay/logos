@@ -23,13 +23,6 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
         initializedFields.insert(field->name);
     }
 
-    for (const auto& [name, field] : obj->fields) {
-        if (initializedFields.count(name)) continue;
-        if (field->type->asObject()) continue;
-        field->expr = field->type->getZeroValue();
-        field->storeIRValue(runtime, IRValue, field->expr);
-    }
-
     return IRValue;
 }
 

@@ -52,6 +52,7 @@ set(SOURCE_FILES
     src/symbols/loops/LgsForLoop.cpp
     src/symbols/loops/LgsForeachLoop.cpp
     src/symbols/loops/LgsRangeLoop.cpp
+    src/symbols/loops/LgsInfiniteLoop.cpp
     src/symbols/stmts/LgsAssignment.cpp
     src/symbols/stmts/LgsBreakStmt.cpp
     src/symbols/stmts/LgsContinueStmt.cpp

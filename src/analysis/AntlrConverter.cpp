@@ -33,6 +33,7 @@
 #include "files/LgsObjectFile.h"
 #include "funcs/LgsMainFunc.h"
 #include "logos/Platform.h"
+#include "loops/LgsInfiniteLoop.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsPatternMatch.h"
@@ -470,7 +471,7 @@ LgsForLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext*
     } else if (ctx->iterableRange) {
         loopStmt = getRangeLoop(ctx);
     } else {
-        assert(false && "No loop statements found");
+        loopStmt = getInfiniteLoop(ctx);
     }
 
     loopStmt->stmtBlock = getStmtBlock(ctx->statementsBlock());
@@ -502,6 +503,18 @@ LgsForLoop* AntlerConverter::getForeachLoop(LogosParser::LoopStatementContext* c
         foreachLoop->loopVars.emplace_back(varDec);
     }
     return foreachLoop;
+}
+
+LgsForLoop* AntlerConverter::getInfiniteLoop(LogosParser::LoopStatementContext* ctx) const {
+    const auto rangeLoop = new LgsInfiniteLoop();
+    if (!ctx->VARIABLE().empty()) {
+        const auto loopVarName = ctx->VARIABLE()[0]->getText();
+        auto varDec = new LgsVarDec(loopVarName);
+        varDec->type = &LGS_INT;
+        varDec->expr = LGS_INT.getZeroValue();
+        rangeLoop->loopVars.emplace_back(varDec);
+    }
+    return rangeLoop;
 }
 
 LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
