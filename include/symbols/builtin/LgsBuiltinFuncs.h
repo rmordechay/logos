@@ -9,7 +9,7 @@ public:
     static constexpr auto name = "print";
 
     explicit LgsPrint(): LgsBuiltinFunc(name, &LGS_VOID, "", {&LGS_ANY, &LGS_ANY}, false, true) {
-        funcType.IRName = "printf";
+        funcType->IRName = "printf";
     }
 
     Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {

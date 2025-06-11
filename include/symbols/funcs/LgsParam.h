@@ -1,7 +1,6 @@
 #pragma once
 #include <LgsValue.h>
 
-
 class LgsVariable;
 class LgsExpr;
 class LgsType;
@@ -9,6 +8,7 @@ class LgsType;
 class LgsParam final : public LgsValue {
 public:
     string name;
+    uint32_t position = 0;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
     bool isSelf = false;
@@ -23,5 +23,3 @@ public:
     string getIRName();
     ~LgsParam() override;
 };
-
-

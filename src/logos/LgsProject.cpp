@@ -117,14 +117,14 @@ bool LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) const {
             }
             for (const auto [_, func] : mainFile->funcs) {
                 if (dynamic_cast<LgsMainFunc*>(func)) continue;
-                semaAnalyser.resolveFuncTypes(&func->funcType);
+                semaAnalyser.resolveFuncTypes(func->funcType);
             }
         } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             semaAnalyser.resolveObjTypes(objFile->obj);
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
             auto methods = interfaceFile->interface->methods;
             for (const auto& [_, method] : methods) {
-                semaAnalyser.resolveFuncTypes(&method->funcType);
+                semaAnalyser.resolveFuncTypes(method->funcType);
             }
         }
         if (!semaAnalyser.errHandler.successful) return false;

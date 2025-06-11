@@ -9,7 +9,7 @@
 Value* LgsFuncCall::call(LgsRuntime* runtime) const {
     if (callback) {
         func->setIRValue(getCallback(runtime));
-    } else if (func->funcType.isVirtual) {
+    } else if (func->funcType->isVirtual) {
         resolveVirtualFunc(runtime);
     }
     return func->call(runtime, args);
@@ -72,7 +72,7 @@ void LgsFuncCall::resolveVirtualFunc(LgsRuntime* runtime) const {
     const auto type = parent->type;
     const auto ptrTy = builder.getPtrTy();
     const auto parentIRValue = parent->getIRValue(runtime);
-    const auto keyIR = getIRStr(runtime, func->funcType.getIRName());
+    const auto keyIR = getIRStr(runtime, func->funcType->getIRName());
     const auto mapPtr = builder.CreateLoad(ptrTy, parentIRValue);
     const auto valuePtr = builder.CreateAlloca(ptrTy);
     const auto rv = type->vtable->type->asMap()->getFunc.callIR(runtime, {mapPtr, keyIR});

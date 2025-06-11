@@ -11,17 +11,17 @@ class LgsType;
 class LgsFunc : public LgsUnaryExpr {
 public:
     string filePath;
-    LgsFuncType funcType;
+    LgsFuncType* funcType = new LgsFuncType();
     vector<LgsVariable*> refs;
     vector<LgsExpr*> returnExprs;
     LgsStmtBlock* stmtBlock = nullptr;
     LgsFunc* implementsFunc = nullptr;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {
-        type = &funcType;
-        funcType.name = name;
-        funcType.rt = rt;
-        funcType.params = params;
+        type = funcType;
+        funcType->name = name;
+        funcType->rt = rt;
+        funcType->params = params;
     }
     void swapReturnIfNeeded();
     LgsParam getReturnSwapParam() const;

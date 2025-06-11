@@ -9,7 +9,7 @@ void LgsFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.enterFunc(this);
     startBlockFunc(runtime);
     stmtBlock->createIRValue(runtime);
-    if (funcType.rt->isVoid) {
+    if (funcType->rt->isVoid) {
         runtime->freeExprs();
         if (!runtime->builder.GetInsertBlock()->getTerminator()) {
             runtime->builder.CreateRetVoid();
@@ -26,19 +26,19 @@ Value* LgsFunc::createIRValue(LgsRuntime* runtime) {
 }
 
 Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
-    const auto funcIRName = funcType.getIRName();
+    const auto funcIRName = funcType->getIRName();
     auto IRFunc = runtime->module->getFunction(funcIRName);
     if (IRFunc) return IRFunc;
-    const auto IRFuncType = funcType.getIRType();
+    const auto IRFuncType = funcType->getIRType();
     const auto funcTy = dyn_cast<FunctionType>(IRFuncType);
     auto func = runtime->module->getOrInsertFunction(funcIRName, funcTy);
     IRFunc = dyn_cast<Function>(func.getCallee());
-    if (funcType.swapReturn) {
+    if (funcType->swapReturn) {
         setBigObjAttrs(*IRFunc);
     }
-    if (funcType.params.empty()) return IRFunc;
+    if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
-    for (auto& param : funcType.params) {
+    for (auto& param : funcType->params) {
         param.setIRValue(args);
         args->setName(param.name);
         args++;
@@ -48,9 +48,9 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
 
 Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
-    if (funcType.hasDefaultParams) assert(0);
-    if (funcType.isVariadic) assert(0);
-    for (int i = funcType.isStatic; i < args.size(); ++i) {
+    if (funcType->hasDefaultParams) assert(0);
+    if (funcType->isVariadic) assert(0);
+    for (int i = funcType->isStatic; i < args.size(); ++i) {
         const auto arg = args[i];
         const auto argType = arg->type->getIRType();
         const auto argValue = arg->getIRValue(runtime);
@@ -62,15 +62,15 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
 
 Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
     if (IRValue) {
-        const auto IRFuncType = cast<FunctionType>(funcType.rt->getIRType());
+        const auto IRFuncType = cast<FunctionType>(funcType->rt->getIRType());
         return runtime->builder.CreateCall(IRFuncType, IRValue, args);
     }
     const auto IRFunc = getIRFunc(runtime);
-    if (funcType.swapReturn) {
+    if (funcType->swapReturn) {
         const auto paramIRType = getReturnSwapParam().type->getIRType();
         const auto rv = runtime->builder.CreateAlloca(paramIRType);
         vector finalArgs(args.begin(), args.end());
-        finalArgs.insert(finalArgs.begin() + funcType.returnParamIndex, rv);
+        finalArgs.insert(finalArgs.begin() + funcType->returnParamIndex, rv);
         runtime->builder.CreateCall(IRFunc, finalArgs);
         return rv;
     }
@@ -86,9 +86,9 @@ Value* LgsFunc::addIRArg(LgsRuntime* runtime, Type* type, Value* value) {
 
 void LgsFunc::setBigObjAttrs(Function& IRFunc) const {
     const auto paramIRType = getReturnSwapParam().type->getIRType();
-    IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::StructRet, paramIRType));
-    IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::Writable));
-    IRFunc.addParamAttr(funcType.returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
+    IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::StructRet, paramIRType));
+    IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::Writable));
+    IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
 }
 
 bool LgsFunc::shouldLoadIRArg(Value* value) {
@@ -116,9 +116,9 @@ bool LgsFunc::shouldLoadIRArg(Value* value) {
 }
 
 LgsParam LgsFunc::getReturnSwapParam() const {
-    if (!funcType.swapReturn) assert(0);
-    if (funcType.returnParamIndex > funcType.params.size()) assert(0);
-    return funcType.params[funcType.returnParamIndex];
+    if (!funcType->swapReturn) assert(0);
+    if (funcType->returnParamIndex > funcType->params.size()) assert(0);
+    return funcType->params[funcType->returnParamIndex];
 }
 
 void LgsFunc::swapReturnIfNeeded() {
@@ -132,31 +132,31 @@ void LgsFunc::swapReturnIfNeeded() {
             }
         }
     }
-    funcType.swapReturn = funcType.isRvBig && isEqual;
-    if (funcType.swapReturn) {
-        funcType.returnParamIndex = funcType.isMethod && !funcType.isStatic;
-        funcType.params.insert(funcType.params.begin(), LgsParam(funcType.rt));
-        funcType.rt = &LGS_VOID;
+    funcType->swapReturn = funcType->isRvBig && isEqual;
+    if (funcType->swapReturn) {
+        funcType->returnParamIndex = funcType->isMethod && !funcType->isStatic;
+        funcType->params.insert(funcType->params.begin(), LgsParam(funcType->rt));
+        funcType->rt = &LGS_VOID;
     }
 }
 
 string LgsFunc::prettyName() {
-    return funcType.prettyName();
+    return funcType->prettyName();
 }
 
 string LgsFunc::format(string& tabs) {
     stringstream str;
-    str << funcType.name << "(";
-    for (int i = 0; i < funcType.params.size(); ++i) {
-        auto param = funcType.params[i];
+    str << funcType->name << "(";
+    for (int i = 0; i < funcType->params.size(); ++i) {
+        auto param = funcType->params[i];
         str << param.format(tabs);
-        if (i != funcType.params.size() - 1) {
+        if (i != funcType->params.size() - 1) {
             str << ", ";
         }
     }
     str << ")";
-    if (funcType.name != LOGOS_MAIN_FUNC) {
-        str << funcType.rt->getIRName();
+    if (funcType->name != LOGOS_MAIN_FUNC) {
+        str << funcType->rt->getIRName();
     }
     str << stmtBlock->format(tabs);
     return str.str();
@@ -164,10 +164,10 @@ string LgsFunc::format(string& tabs) {
 
 json LgsFunc::asJSON() {
     json tree;
-    tree["name"] = funcType.name;
-    tree["type"] = funcType.rt->getIRName();
+    tree["name"] = funcType->name;
+    tree["type"] = funcType->rt->getIRName();
     tree["params"] = {};
-    for (auto& param : funcType.params) {
+    for (auto& param : funcType->params) {
         tree["params"].emplace_back(param.asJSON());
     }
     tree["stmts"] = stmtBlock->asJSON();

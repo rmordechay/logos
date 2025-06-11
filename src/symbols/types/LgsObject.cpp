@@ -91,7 +91,7 @@ void LgsObject::setVFuncs(LgsRuntime* runtime) const {
     assert(runtime);
     const auto vtablePtr = vtable->getIRValue(runtime);
     for (const auto [_, method] : methods) {
-        const auto keyIRStr = getIRStr(runtime, method->funcType.getIRName());
+        const auto keyIRStr = getIRStr(runtime, method->funcType->getIRName());
         const auto IRFunc = method->getIRFunc(runtime);
         auto valuePtr = runtime->builder.CreateAlloca(runtime->builder.getPtrTy());
         runtime->builder.CreateStore(IRFunc, valuePtr);

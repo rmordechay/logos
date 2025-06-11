@@ -27,7 +27,7 @@ LgsFunc* LgsType::getMethod(const string& name) {
 }
 
 void LgsType::addMethod(LgsFunc* method) {
-    methods[method->funcType.name] = method;
+    methods[method->funcType->name] = method;
 }
 
 LgsFunc* LgsType::findMethod(const string& name) const {

@@ -1,4 +1,4 @@
-#include "types/LgsFuncType.h"
+#include "types/LgsfuncType.h"
 #include "logos/LgsRuntime.h"
 
 bool LgsFuncType::equals(LgsType* other) {

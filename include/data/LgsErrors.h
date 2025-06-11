@@ -3,11 +3,11 @@ inline string ERROR_PLACEHOLDER = "%s";
 
 struct LgsError {
     string msg;
-    int errCode;
+    size_t errCode;
 };
 
 /** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */
-inline int errCodeStart = 10000;
+inline size_t errCodeStart = 10000;
 inline LgsError E10000{.msg = "main() function is not defined in Main.lgs file.", .errCode = errCodeStart++};
 inline LgsError E10001{.msg = "Left type '%s' does not match the right type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10002{.msg = "'%s' must be an iterable.", .errCode = errCodeStart++};

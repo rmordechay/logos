@@ -9,7 +9,7 @@
 void LgsMainFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.enterFunc(this);
     startBlockFunc(runtime);
-    if (!funcType.params.empty()) {
+    if (!funcType->params.empty()) {
         initArgs(runtime);
     }
     runtime->initRuntime();
@@ -22,14 +22,14 @@ void LgsMainFunc::generateIR(LgsRuntime* runtime) {
 Function* LgsMainFunc::getIRFunc(LgsRuntime* runtime) {
     if (IRFunc) return IRFunc;
     FunctionType* mainFuncType;
-    if (funcType.params.empty()) {
+    if (funcType->params.empty()) {
         mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {}, false);
     } else {
         mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getInt32Ty(), runtime->builder.getPtrTy()}, false);
     }
     auto func = runtime->module->getOrInsertFunction(LOGOS_MAIN_FUNC, mainFuncType);
     IRFunc = dyn_cast<Function>(func.getCallee());
-    if (funcType.params.empty()) return IRFunc;
+    if (funcType->params.empty()) return IRFunc;
     auto IRArgs = IRFunc->arg_begin();
     argc = IRArgs;
     IRArgs->setName("argc");
@@ -45,5 +45,5 @@ void LgsMainFunc::initArgs(LgsRuntime* runtime) {
     const auto arrStruct = getIRStructType(runtime->module->getContext(), args->arrType->name, structFields);
     args->IRValue = builder.CreateAlloca(arrStruct);
     initArgsFunc->callIR(runtime, {args->IRValue, argc, argv});
-    funcType.params[0].setIRValue(args->IRValue);
+    funcType->params[0].setIRValue(args->IRValue);
 }

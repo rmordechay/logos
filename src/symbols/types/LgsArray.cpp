@@ -48,7 +48,7 @@ LgsExpr* LgsArray::getZeroValue() {
 
 string LgsArray::prettyName() const {
     if (!isStatic) return baseType->prettyName() + "[]";
-    return baseType->prettyName() + '[' + to_string(iterLen) + "]!";
+    return baseType->prettyName() + '[' + (iterLen == 0 ? "" : to_string(iterLen)) + "]!";
 }
 
 bool LgsArray::equals(LgsType* other) {
@@ -56,6 +56,7 @@ bool LgsArray::equals(LgsType* other) {
     if (!otherArr) return false;
     if (!baseType->equals(otherArr->baseType)) return false;
     if (isStatic != otherArr->isStatic) return false;
+    if (!sizeExpr || otherArr->sizeExpr->type) return false;
     if (isStatic) return sizeExpr->type->equals(otherArr->sizeExpr->type);
     return true;
 }

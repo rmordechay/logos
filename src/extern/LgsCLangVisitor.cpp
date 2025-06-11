@@ -17,7 +17,7 @@ bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     for (int i = 0; i < func->getNumParams(); ++i) {
         const auto paramType = func->getParamDecl(i)->getType();
         const auto lgsParam = LgsParam(mapCType(paramType));
-        funcImpl->funcType.params.push_back(lgsParam);
+        funcImpl->funcType->params.push_back(lgsParam);
     }
     lgsFile.symbolTable.addSymbol(name, LgsSymbol(funcImpl), &errHandler);
     return true;

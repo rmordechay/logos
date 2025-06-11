@@ -85,7 +85,7 @@ LgsSymbolTable::~LgsSymbolTable() {
         case PARAM: delete symbol.param; break;
         case OBJECT: delete symbol.object; break;
         case INTERFACE: delete symbol.interface; break;
-        case FUNC: if (!symbol.func->funcType.isBuiltin) delete symbol.func; break;
+        case FUNC: if (!symbol.func->funcType->isBuiltin) delete symbol.func; break;
         case ENUM: delete symbol.lgsEnum; break;
         case ENUM_FIELD: delete symbol.enumField; break;
         default: break;

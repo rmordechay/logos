@@ -25,7 +25,7 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
 
 void LgsInstance::setReturnExpr(LgsRuntime* runtime, Type* objIRType) {
     const auto currentFunc = runtime->stack.currentFunc;
-    if (currentFunc->funcType.swapReturn) {
+    if (currentFunc->funcType->swapReturn) {
         IRValue = currentFunc->getReturnSwapParam().IRValue;
     } else {
         IRValue = runtime->builder.CreateMalloc(
