@@ -8,7 +8,6 @@
 #define LOGOS_APP_FILE_NAME "App"
 #define LOGOS_MAIN_FUNC "main"
 #define LOGOS_SELF "self"
-#define LOGOS_PARENT_OBJ "Object"
 #define LOGOS_OBJECT_FILE "main.o"
 #define LOGOS_EXECUTABLE_FILE "output"
 #define LOGOS_STR_FORMAT_PART "%v"

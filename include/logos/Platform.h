@@ -26,10 +26,10 @@ struct LgsPaths {
     path srcDir;
     path envsDir;
     path buildDir;
+    path clibRoot;
     path appFilePath;
     path objFilePath;
     path execFilePath;
-    path clibRoot;
 
     void initPaths(const path& rootDirPath) {
         if (rootDirPath == "") return;

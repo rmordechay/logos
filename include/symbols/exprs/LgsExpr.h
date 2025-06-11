@@ -31,6 +31,7 @@ public:
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     void setType(LgsType* type);
+    string getExprStr();
     Value* getIRValue(LgsRuntime* runtime);
 
     LgsFunc* asFunc();

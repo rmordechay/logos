@@ -14,6 +14,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsField.h"
+#include "stmts/LgsVarDec.h"
 
 Value* LgsExpr::getIRValue(LgsRuntime* runtime) {
     if (IRValue) return IRValue;
@@ -24,6 +25,23 @@ Value* LgsExpr::getIRValue(LgsRuntime* runtime) {
 
 void LgsExpr::setType(LgsType* type) {
     this->type = type;
+}
+
+string LgsExpr::getExprStr() {
+    if (const auto strConst = asStrConst()) {
+        return strConst->value;
+    }
+    if (const auto var = asVariable()) {
+        const auto ref = var->ref;
+        switch (ref.symbolType) {
+        case VAR_DEC: {
+            return getExprStr();
+        }
+        default:
+            break;
+        }
+    }
+    assert(0);
 }
 
 void LgsExpr::free(LgsRuntime* runtime) { assert(0); }

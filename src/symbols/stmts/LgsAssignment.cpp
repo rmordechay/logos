@@ -121,6 +121,16 @@ void LgsAssignment::storeArrayInIterIndex(LgsRuntime* runtime, const LgsIterInde
     }
 }
 
+void LgsAssignment::setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices) const {
+    while (iterIndex) {
+        if (iterIndex->index) {
+            indices.push_back(iterIndex->index);
+        }
+        iterIndex = iterIndex->baseExpr->asIterIndex();
+    }
+    reverse(indices.begin(), indices.end());
+}
+
 LgsAssignment::~LgsAssignment() {
     delete lValue;
     delete rValue;

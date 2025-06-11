@@ -33,7 +33,7 @@ Type* LgsObject::getIRType() {
 
 LgsExpr* LgsObject::getZeroValue() {
     if (isNullable) return new LgsNull();
-    return new LgsInstance(this);
+    assert(0);
 }
 
 LgsType* LgsObject::inferBinaryType(LgsType* other) {
@@ -41,8 +41,6 @@ LgsType* LgsObject::inferBinaryType(LgsType* other) {
 }
 
 bool LgsObject::equals(LgsType* other) {
-    // TODO make Object object
-    if (name == LOGOS_PARENT_OBJ) return true;
     if (const auto group = other->asGroup()) {
         for (const auto groupType : group->types) {
             if (name == groupType->getIRName()) {

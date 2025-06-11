@@ -1,5 +1,6 @@
 
 #include "exprs/LgsNull.h"
+#include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
@@ -75,8 +76,17 @@ Value* LgsStrFormatFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args)
     const bool isConst = args[0]->type->isConst;
     if (!isConst) assert(0);
     constexpr auto bufferSize = 1024;
-    const auto formatString = getFormatString(args);
-    const auto baseIRStr = getIRStr(runtime, formatString);
+    auto exprStr = args[0]->getExprStr();
+    auto searchPos = 0;
+    for (size_t i = 1; i < args.size(); ++i) {
+        const auto pos = exprStr.find(LOGOS_STR_FORMAT_PART, searchPos);
+        const auto part = args[i]->type->getStrFormatPart();
+        if (pos != string::npos) {
+            exprStr.replace(pos, 2, part);
+            searchPos = pos + part.length();
+        }
+    }
+    const auto baseIRStr = getIRStr(runtime, exprStr);
     const auto bufferType = ArrayType::get(runtime->builder.getInt8Ty(), bufferSize);
     const auto buffer = runtime->builder.CreateAlloca(bufferType);
     const auto gep = runtime->builder.CreateGEP(bufferType, buffer, {runtime->builder.getInt32(0), runtime->builder.getInt32(0)});
@@ -88,4 +98,3 @@ Value* LgsStrFormatFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args)
     runtime->builder.CreateCall(printfFunc, IRArgs);
     return gep;
 }
-

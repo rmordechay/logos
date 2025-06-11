@@ -18,73 +18,15 @@ string getFileText(path filePath) {
     return fileContents.str();
 }
 
-string getFormatString(const vector<LgsExpr*>& args) {
-    auto result = getExprStr(args[0]);
-    auto searchPos = 0;
-    for (size_t i = 1; i < args.size(); ++i) {
-        const auto pos = result.find(LOGOS_STR_FORMAT_PART, searchPos);
-        const auto part = args[i]->type->getStrFormatPart();
-        if (pos != string::npos) {
-            result.replace(pos, 2, part);
-            searchPos = pos + part.length();
-        }
-    }
-    return result;
-}
-
 string removeUnderscores(const string& input) {
     string result = input;
     result.erase(remove(result.begin(), result.end(), '_'), result.end());
     return result;
 }
 
-int getExprConstNumber(LgsExpr* expr) {
-    if (const auto asInt = expr->asIntConst()) {
-        return asInt->value;
-    }
-    if (const auto var = expr->asVariable()) {
-        switch (var->ref.symbolType) {
-        case VAR_DEC:
-            return getExprConstNumber(var->ref.varDec->expr);
-        case FIELD:
-            return getExprConstNumber(var->ref.field->expr);
-        default:
-            break;
-        }
-    }
-    return -1;
-}
-
-string getExprStr(LgsExpr* baseExpr) {
-    if (const auto strConst = baseExpr->asStrConst()) {
-        return strConst->value;
-    }
-    if (const auto var = baseExpr->asVariable()) {
-        const auto ref = var->ref;
-        switch (ref.symbolType) {
-        case VAR_DEC: {
-            return getExprStr(ref.varDec->expr);
-        }
-        default:
-            break;
-        }
-    }
-    assert(0);
-}
-
 void freeType(const LgsType* type) {
     if (type->isPrimitive) return;
     delete type;
-}
-
-void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices) {
-    while (iterIndex) {
-        if (iterIndex->index) {
-            indices.push_back(iterIndex->index);
-        }
-        iterIndex = iterIndex->baseExpr->asIterIndex();
-    }
-    reverse(indices.begin(), indices.end());
 }
 
 Value* getIRStr(const LgsRuntime* runtime, const string& value) {

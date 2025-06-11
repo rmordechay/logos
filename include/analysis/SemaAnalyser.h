@@ -95,6 +95,7 @@ public:
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     void validateExprType(LgsExpr* expr, LgsType* type);
     void validateFuncControlFlow(const LgsFunc* func);
+    int getExprConstNumber(LgsExpr* expr);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
 
     LgsSymbol* getSymbol(const string& name, const LgsValue* value = nullptr);
