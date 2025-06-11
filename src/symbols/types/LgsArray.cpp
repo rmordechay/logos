@@ -3,6 +3,29 @@
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
 
+// define i32 @main() #0 {
+//   %2 = alloca %struct.HashMap, align 8
+//   %3 = alloca %struct.Array, align 8
+//   %4 = alloca i32, align 4
+//   %5 = alloca ptr, align 8
+//   %6 = alloca ptr, align 8
+//   call void @Map_init(ptr noundef %2, i64 noundef 32)
+//   call void @Array_init(ptr noundef %3, i64 noundef 10, i64 noundef 4)
+//   store i32 7346, ptr %4, align 4
+//   call void @Array_add(ptr noundef %3, ptr noundef %4)
+//   store ptr @.str, ptr %5, align 8
+//   %7 = load ptr, ptr %5, align 8
+//   call void @Map_add(ptr noundef %2, ptr noundef %7, ptr noundef %3)
+//   %8 = load ptr, ptr %5, align 8
+//   %9 = call ptr @Map_get(ptr noundef %2, ptr noundef %8)
+//   store ptr %9, ptr %6, align 8
+//   %10 = load ptr, ptr %6, align 8
+//   %11 = call ptr @Array_get(ptr noundef %10, i64 noundef 0)
+//   %12 = load i32, ptr %11, align 4
+//   %13 = call i32 (ptr, ...) @printf(ptr noundef @.str.1, i32 noundef %12)
+//   ret i32 0
+// }
+
 Type* LgsArray::getIRType() {
     if (IRType) return IRType;
     if (!isStatic) return PointerType::getUnqual(context);
@@ -16,7 +39,7 @@ size_t LgsArray::getSizeBytes() {
         assert(iterLen > 0);
         return baseType->getSizeBytes() * iterLen;
     }
-    return sizeof(size_t) + sizeof(int) + sizeof(int) + sizeof(void*);
+    return sizeof(size_t) + sizeof(size_t) + sizeof(size_t) + sizeof(void*);
 }
 
 LgsExpr* LgsArray::getZeroValue() {
@@ -25,7 +48,7 @@ LgsExpr* LgsArray::getZeroValue() {
 
 string LgsArray::prettyName() const {
     if (!isStatic) return baseType->prettyName() + "[]";
-    return baseType->prettyName() + '[' + to_string(iterLen) + ']';
+    return baseType->prettyName() + '[' + to_string(iterLen) + "]!";
 }
 
 bool LgsArray::equals(LgsType* other) {
@@ -82,6 +105,15 @@ LgsType* LgsArray::clone() {
         arr->sizeExpr = sizeExpr;
     }
     return arr;
+}
+
+Value* LgsArrayAddFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
+    const auto arrPtr = args[0]->getIRValue(runtime);
+    const auto value = args[1];
+    const auto valueIR = value->getIRValue(runtime);
+    const auto valuePtr = runtime->builder.CreateAlloca(value->type->getIRType());
+    runtime->builder.CreateStore(valueIR, valuePtr);
+    return callIR(runtime, {arrPtr, valuePtr});
 }
 
 LgsArray::~LgsArray() {

@@ -6,12 +6,19 @@
 #include "primitives/LgsVoid.h"
 #include "types/LgsIterable.h"
 
+class LgsArrayAddFunc final : public LgsBuiltinFunc {
+public:
+    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName(), {parent, &LGS_ANY}, true) {}
+    Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override;
+    ~LgsArrayAddFunc() override = default;
+};
+
 class LgsArray final : public LgsIterable {
 public:
     static constexpr auto name = "Array";
     StructType* arrStruct = nullptr;
 
-    LgsBuiltinFunc addFunc{"add", &LGS_VOID, name, {this, &LGS_ANY}, true};
+    LgsArrayAddFunc addFunc{this};
     LgsBuiltinFunc lenFunc{"len", &LGS_LONG, name, {this}, true};
     LgsBuiltinFunc getFunc{"get", &LGS_ANY, name, {this, &LGS_LONG}, true};
     LgsBuiltinFunc isEmptyFunc{"isEmpty", &LGS_BOOL, name, {this}, true};

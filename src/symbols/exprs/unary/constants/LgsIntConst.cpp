@@ -3,6 +3,31 @@
 #include "exprs/unary/constants/LgsLongConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 
+// define i32 @main() {
+//     entry:
+//       %0 = alloca %Map, align 8
+//       %1 = alloca %Array, align 8
+//       call void @Map_init(ptr %0, i64 24)
+//       call void @Array_init(ptr %1, i64 1, i64 4)
+//       %2 = alloca i32, align 4
+//       store i32 7346, ptr %2, align 4
+//       call void @Array_add(ptr %1, ptr %2)
+//       %3 = alloca ptr, align 8
+//       store ptr @1, ptr %3, align 8
+//       %4 = load ptr, ptr %3, align 8
+//       call void @Map_add(ptr %0, ptr %4, ptr %1)
+//       %5 = alloca ptr, align 8
+//       store ptr @1, ptr %5, align 8
+//       %6 = load ptr, ptr %5, align 8
+//       %7 = call ptr @Map_get(ptr %0, ptr %6)
+//       %8 = alloca ptr, align 8
+//       store ptr %7, ptr %8, align 8
+//       %9 = load ptr, ptr %8, align 8
+//       %10 = call ptr @Array_get(ptr %9, i64 0)
+//       %11 = load i32, ptr %10, align 4
+//       %12 = call i32 (ptr, ...) @printf(ptr @2, i32 %11)
+//       ret i32 0
+//     }
 string LgsIntConst::prettyName() {
     return to_string(value);
 }
