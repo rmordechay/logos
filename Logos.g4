@@ -61,11 +61,11 @@ field:
     ;
 
 objectDeclaration:
-        (OBJECT | SINGLETON) COLON TYPE
+        (OBJECT | SINGLETON) TYPE
     ;
 
 interfaceDeclaration:
-        INTERFACE COLON TYPE
+        INTERFACE TYPE
     ;
 
 objectImplements:

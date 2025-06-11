@@ -1,4 +1,4 @@
-object: MyObject
+object MyObject
 //implements: MyInterface
 
 pub x: Int

@@ -1,10 +1,9 @@
 #include "exprs/unary/LgsVariable.h"
-#include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
+#include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-
 #include <logos/LgsRuntime.h>
 
 string LgsVariable::getName() {
@@ -22,14 +21,16 @@ Value* LgsVariable::createIRValue(LgsRuntime* runtime) {
     case PARAM:
         return ref.param->getIRValue(runtime);
     case ENUM_FIELD:
-        return ref.enumField->getGEP(runtime);
+        return getIRStr(runtime, ref.enumField->name);
     case FUNC:
         return ref.func->getIRFunc(runtime);
+    case FIELD:
+        return ref.field->getGEP(runtime, TODO);
     default:
         assert(0);
     }
-}
 
+}
 bool LgsVariable::equals(LgsExpr* other) {
     if (const auto otherVar = other->asVariable()) {
         return ref.getPtr() == otherVar->ref.getPtr();

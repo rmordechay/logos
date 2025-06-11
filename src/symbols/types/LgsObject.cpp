@@ -75,15 +75,14 @@ LgsInterface* LgsObject::getInterface(const string& interfaceName) const {
 }
 
 LgsObject* LgsObject::clone() {
-    const auto newObj = new LgsObject(*this);
-    newObj->name = name;
+    const auto newObj = new LgsObject(name, path);
     for (const auto& [name, field] : fields) {
-        newObj->fields[name] = new LgsField(*field);
-    }
-    for (const auto interface : interfaces) {
-        newObj->interfaces.emplace_back(new LgsInterface(*interface->asInterface()));
+        const auto newField = field->clone();
+        newField->parent = newObj;
+        newObj->fields[name] = newField;
     }
     newObj->methods = methods;
+    newObj->interfaces = interfaces;
     return newObj;
 }
 

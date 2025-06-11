@@ -19,7 +19,6 @@
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsEnum.h"
-#include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
@@ -85,9 +84,36 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
     for (const auto& [_, method] : obj->methods) {
         visitFunc(method);
     }
+    visitObjectImplements(obj);
 }
 
 void SemaAnalyser::visitInterface(LgsInterface* interface) const {}
+
+void SemaAnalyser::visitObjectImplements(LgsObject* obj) {
+    for (int i = 0; i < obj->interfaces.size(); ++i) {
+        const auto implement = obj->interfaces[i];
+        if (!implement) continue;
+        const auto interface = implement->asInterface();
+        if (!interface) {
+            errHandler.handleError(E10025, &implement->location, {implement->prettyName()});
+            continue;
+        }
+
+        vector<LgsFunc*> missingFuncs;
+        for (const auto& [name, interfaceFunc] : interface->methods) {
+            const auto objMethod = obj->findMethod(name);
+            if (objMethod && objMethod->funcType->equals(interfaceFunc->funcType)) {
+                objMethod->implementsFunc = interfaceFunc;
+                continue;
+            }
+            missingFuncs.emplace_back(interfaceFunc);
+        }
+
+        if (!missingFuncs.empty()) {
+            errHandler.handleError(E10016, &obj->location, {obj->name, interface->interfaceName, getFuncsAsStr(missingFuncs)});
+        }
+    }
+}
 
 void SemaAnalyser::visitFunc(LgsFunc* func) {
     stack.enterFunc(func);
@@ -454,7 +480,7 @@ void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* c
         return errHandler.handleError(E10005, &childField->location, {childField->getName(), parentType->prettyName()});
     }
     childField->setType(field->type);
-    childField->ref = LgsSymbol(field->clone());
+    childField->ref = LgsSymbol(field);
     if (!field->isPublic && file->absPath != field->parent->path) {
         errHandler.handleError(E10030, &childField->location, {childField->getName(), field->parent->name});
     }
@@ -471,7 +497,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     }
 
     if (!instance->obj) {
-        instance->obj = symbol->object;
+        instance->obj = symbol->object->clone();
         instance->type = instance->obj;
     }
 
@@ -551,6 +577,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
 }
 
 void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType) {
+    assert(funcType->isAnonymous);
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
     }
@@ -559,7 +586,7 @@ void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcTy
         return;
     }
     funcCall->type = funcType->rt;
-    funcCall->func = new LgsFunc("", funcType);
+    funcCall->func = new LgsFunc(funcType);
 }
 
 void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
@@ -727,12 +754,16 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     if (!type->isUnknown()) return type;
     auto typeName = type->prettyName();
     const auto nullable = type->isNullable;
-    if (!globals.getSymbol(typeName)) {
+
+    auto symbol = globals.getSymbol(typeName);
+    if (!symbol) {
+        symbol = file->symbolTable.getSymbol(typeName);
+    }
+    if (!symbol) {
         errHandler.handleError(E10006, &type->location, {typeName});
         return nullptr;
     }
 
-    const auto symbol = &globals.symbols[typeName];
     LgsType* newType = nullptr;
     switch (symbol->symbolType) {
     case ENUM_FIELD:
@@ -792,7 +823,6 @@ void SemaAnalyser::resolveObjTypes(LgsObject* obj) {
     for (int i = 0; i < obj->interfaces.size(); ++i) {
         obj->interfaces[i] = resolveType(obj->interfaces[i]);
     }
-    resolveObjectImplements(obj);
 }
 
 void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
@@ -802,32 +832,6 @@ void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
     funcType->rt = resolveType(funcType->rt);
     if (!funcType->rt->isVoid) {
         funcType->isRvBig = funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD;
-    }
-}
-
-void SemaAnalyser::resolveObjectImplements(LgsObject* obj) {
-    for (int i = 0; i < obj->interfaces.size(); ++i) {
-        const auto implement = obj->interfaces[i];
-        if (!implement) continue;
-        const auto interface = implement->asInterface();
-        if (!interface) {
-            errHandler.handleError(E10025, &implement->location, {implement->prettyName()});
-            continue;
-        }
-
-        vector<LgsFunc*> missingFuncs;
-        for (const auto& [name, interfaceFunc] : interface->methods) {
-            const auto objMethod = obj->findMethod(name);
-            if (objMethod && objMethod->funcType->equals(interfaceFunc->funcType)) {
-                objMethod->implementsFunc = interfaceFunc;
-                continue;
-            }
-            missingFuncs.emplace_back(interfaceFunc);
-        }
-
-        if (!missingFuncs.empty()) {
-            errHandler.handleError(E10016, &obj->location, {obj->name, interface->interfaceName, getFuncsAsStr(missingFuncs)});
-        }
     }
 }
 

@@ -37,7 +37,6 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
     src/symbols/exprs/unary/constants/LgsTypeConst.cpp
     src/symbols/exprs/unary/LgsArrayExpr.cpp
-    src/symbols/exprs/unary/LgsEnumField.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
     src/symbols/exprs/unary/LgsHashMap.cpp
     src/symbols/exprs/unary/LgsInstance.cpp

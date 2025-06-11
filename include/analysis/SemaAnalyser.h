@@ -101,7 +101,7 @@ public:
     void resolveIterable(LgsIterable* iterable);
     void resolveFuncTypes(LgsFuncType* funcType);
     void resolveObjTypes(LgsObject* obj);
-    void resolveObjectImplements(LgsObject* obj);
+    void visitObjectImplements(LgsObject* obj);
     void resolveGroupTypes(LgsGroup* group);
     string getFuncsAsStr(const vector<LgsFunc*>& funcs) const;
     ~SemaAnalyser() override = default;

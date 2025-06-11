@@ -79,8 +79,7 @@ public:
     LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     LgsUnaryExpr* getArrayExpr(LogosParser::ArrayExprContext* ctx);
     LgsUnaryExpr* getHashMap(LogosParser::HashMapContext* ctx);
-    LgsVariable* getVariable(const string& varName, const ParserRuleContext* ctx) const;
-    LgsUnaryExpr* getConst(const string& constName, const ParserRuleContext* ctx) const;
+    LgsVariable* getVariable(tree::TerminalNode* ctx) const;
     LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     LgsUnaryExpr* getVector(LogosParser::VectorContext* vector) const;
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
@@ -90,7 +89,7 @@ public:
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
     LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx) const;
     LgsStrConst* getStrConst(tree::TerminalNode* type) const;
-    LgsTypeConst* getTypeConstant(tree::TerminalNode* type, const LogosParser::SelectionContext* ctx) const;
+    LgsTypeConst* getTypeConstant(tree::TerminalNode* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsGroup* getGroup(LogosParser::GroupContext* ctx);
     LgsType* getArrayType(LogosParser::TypeContext* ctx);

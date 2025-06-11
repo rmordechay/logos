@@ -1,7 +1,6 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include "exprs/unary/LgsIterIndex.h"
-#include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsInstance.h"
@@ -13,7 +12,7 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
-#include "utils/LgsUtils.h"
+#include "stmts/LgsField.h"
 
 Value* LgsExpr::getIRValue(LgsRuntime* runtime) {
     if (IRValue) return IRValue;

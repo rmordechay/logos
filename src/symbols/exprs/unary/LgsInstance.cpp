@@ -18,7 +18,7 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
     }
     for (const auto arg : args) {
         const auto field = obj->getField(arg->name);
-        field->setFieldIRValue(runtime, arg->expr, IRValue);
+        field->storeIRValue(runtime, IRValue, arg->expr);
     }
     return IRValue;
 }

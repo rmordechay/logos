@@ -1,14 +1,11 @@
 #pragma once
 #include "LgsObject.h"
 
-
-struct LgsFuncType;
-
 class LgsInterface final : public LgsObject {
 public:
     string interfaceName;
 
-    explicit LgsInterface(const string& name) : interfaceName(name) {}
+    explicit LgsInterface(const string& name) : LgsObject(name), interfaceName(name) {}
     string prettyName() const override;
     Type* getIRType() override;
     string getIRName() override;
@@ -17,5 +14,3 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     ~LgsInterface() override = default;
 };
-
-

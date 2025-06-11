@@ -1,6 +1,8 @@
 #pragma once
 #include "LgsValue.h"
+#include "utils/LgsUtils.h"
 
+class LgsEnum;
 class LgsObject;
 class LgsInstance;
 class LgsType;
@@ -17,13 +19,22 @@ public:
     LgsObject* parent = nullptr;
 
     LgsField(const string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), expr(expr), type(type) {}
-    virtual Value* getGEP(LgsRuntime* runtime, Value* instance = nullptr);
-    void setFieldIRValue(LgsRuntime* runtime, LgsExpr* expr, Value* instance = nullptr);
+    virtual Value* getGEP(LgsRuntime* runtime, Value* instance);
+    void storeIRValue(LgsRuntime* runtime, Value* instance, LgsExpr* expr);
     LgsField* clone() const;
-    nlohmann::json asJSON() override;
+    json asJSON() override;
     ~LgsField() override;
 };
 
+class LgsEnumField final : public LgsField {
+public:
+    string text;
+    LgsEnum* parent;
 
+    LgsEnumField(LgsEnum* parent, const string& name, const string& text) : LgsField(name, nullptr, nullptr), text(text), parent(parent){}
+    Value* getGEP(LgsRuntime* runtime, Value* instance) override {
+        return getIRStr(runtime, name);
+    }
 
-
+    ~LgsEnumField() override = default;
+};

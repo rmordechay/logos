@@ -13,7 +13,6 @@ public:
 
     explicit LgsObject(const string& name, const string& path) : name(name), path(path) {}
     explicit LgsObject(const string& name) : LgsObject(name, "") {}
-    explicit LgsObject() : LgsObject(LOGOS_PARENT_OBJ, "") {}
     string prettyName() const override;
     Type* getIRType() override;
     string getIRName() override;

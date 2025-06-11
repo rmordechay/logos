@@ -367,7 +367,6 @@ public:
   public:
     ObjectDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *COLON();
     antlr4::tree::TerminalNode *TYPE();
     antlr4::tree::TerminalNode *OBJECT();
     antlr4::tree::TerminalNode *SINGLETON();
@@ -382,7 +381,6 @@ public:
     InterfaceDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *INTERFACE();
-    antlr4::tree::TerminalNode *COLON();
     antlr4::tree::TerminalNode *TYPE();
 
    

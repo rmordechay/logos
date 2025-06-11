@@ -2,14 +2,8 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsVariable.h"
-
 #include "stmts/LgsField.h"
-#include "types/LgsEnum.h"
 #include "types/LgsInterface.h"
-
-string LgsSelection::getName() {
-    return "";
-}
 
 void LgsSelection::createIRStmt(LgsRuntime* runtime) {
     resolveSelection(runtime);
@@ -23,36 +17,23 @@ LgsExpr* LgsSelection::resolveSelection(LgsRuntime* runtime) const {
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
-        const auto field = parentExpr->type->getField(childExpr->getName());
-        if (field) {
-            const auto fieldIRType = field->type->getIRType();
-            if (const auto iterIndex = parentExpr->asIterIndex()) {
-                const auto gep = iterIndex->getGEP(runtime);
-                auto valueLoad = runtime->builder.CreateLoad(runtime->builder.getPtrTy(), gep);
-                const auto value = field->getGEP(runtime, valueLoad);
-                valueLoad = runtime->builder.CreateLoad(fieldIRType, value);
-                childExpr->setIRValue(valueLoad);
-            } else {
-                const auto parentIRValue = parentExpr->getIRValue(runtime);
-                const auto value = field->getGEP(runtime, parentIRValue);
-                const auto valueLoad = runtime->builder.CreateLoad(fieldIRType, value);
-                childExpr->setIRValue(valueLoad);
-            }
-        } else if (const auto methodCall = childExpr->asFuncCall()) {
+        if (const auto methodCall = childExpr->asFuncCall()) {
             methodCall->IRValue = methodCall->createIRValue(runtime);
+        } else if (const auto field = parentExpr->type->getField(childExpr->getName())) {
+            const auto parentIRValue = parentExpr->getIRValue(runtime);
+            const auto gep = field->getGEP(runtime, parentIRValue);
+            childExpr->setIRValue(gep);
         }
     }
     return lastExpr();
 }
 
-json LgsSelection::asJSON() {
-    json tree;
-    tree["exprs"] = {};
-    tree["exprType"] = "SELECTION";
-    for (const auto& expr : exprs) {
-        tree["exprs"].emplace_back(expr->asJSON());
+string LgsSelection::prettyName() {
+    stringstream str;
+    for (const auto expr : exprs) {
+        str << '.' << expr->getName();
     }
-    return tree;
+    return str.str();
 }
 
 LgsExpr* LgsSelection::lastExpr() const {
@@ -71,6 +52,16 @@ Value* LgsSelection::eqIR(LgsRuntime* runtime, LgsExpr* other) {
         return var->eqIR(runtime, other);
     }
     return nullptr;
+}
+
+json LgsSelection::asJSON() {
+    json tree;
+    tree["exprs"] = {};
+    tree["exprType"] = "SELECTION";
+    for (const auto& expr : exprs) {
+        tree["exprs"].emplace_back(expr->asJSON());
+    }
+    return tree;
 }
 
 LgsSelection::~LgsSelection() {

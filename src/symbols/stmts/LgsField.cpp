@@ -3,25 +3,27 @@
 #include "exprs/unary/LgsInstance.h"
 
 Value* LgsField::getGEP(LgsRuntime* runtime, Value* instance) {
-    assert(instance && parent);
     IRValue = runtime->builder.CreateStructGEP(parent->getIRType(), instance, position);
     return IRValue;
 }
 
-void LgsField::setFieldIRValue(LgsRuntime* runtime, LgsExpr* expr, Value* instance) {
+void LgsField::storeIRValue(LgsRuntime* runtime, Value* instance, LgsExpr* expr) {
     const auto exprIRValue = expr->getIRValue(runtime);
     runtime->builder.CreateStore(exprIRValue, getGEP(runtime, instance));
 }
 
 LgsField* LgsField::clone() const {
-    return new LgsField(*this);
+    const auto newField = new LgsField(name, type, expr);
+    newField->position = position;
+    newField->isConst = isConst;
+    newField->isPublic = isPublic;
+    return newField;
 }
 
 json LgsField::asJSON() {
     json tree;
     tree["name"] = name;
     tree["type"] = type->prettyName();
-    tree["parent"] = parent->name;
     return tree;
 }
 
