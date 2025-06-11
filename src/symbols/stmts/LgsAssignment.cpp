@@ -28,12 +28,15 @@ void LgsAssignment::assignToIterIndex(LgsRuntime* runtime, LgsIterIndex* iterInd
 }
 
 void LgsAssignment::assignToSelection(LgsRuntime* runtime, const LgsSelection* selection, LgsExpr* expr) const {
-    if (const auto var = selection->lastExpr()->asVariable()) {
+    selection->resolveSelection(runtime);
+    const auto lastExpr = selection->lastExpr();
+    const auto parentExpr = selection->exprs[selection->exprs.size() - 2];
+    if (const auto var = lastExpr->asVariable()) {
         assert(var->ref.symbolType != UNKNOWN);
         switch (var->ref.symbolType) {
         case FIELD: {
-            const auto parentValue = selection->lastExpr()->getIRValue(runtime);
-            var->ref.field->storeIRValue(runtime, parentValue, expr);
+            const auto parentIRValue = parentExpr->getIRValue(runtime);
+            var->ref.field->storeIRValue(runtime, parentIRValue, expr);
             return;
         }
         case UNKNOWN:

@@ -497,7 +497,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     }
 
     if (!instance->obj) {
-        instance->obj = symbol->object->clone();
+        instance->obj = symbol->object;
         instance->type = instance->obj;
     }
 

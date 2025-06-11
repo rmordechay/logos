@@ -10,10 +10,11 @@ void LgsSelection::createIRStmt(LgsRuntime* runtime) {
 }
 
 Value* LgsSelection::createIRValue(LgsRuntime* runtime) {
-    return resolveSelection(runtime)->IRValue;
+    resolveSelection(runtime);
+    return lastExpr()->IRValue;
 }
 
-LgsExpr* LgsSelection::resolveSelection(LgsRuntime* runtime) const {
+void LgsSelection::resolveSelection(LgsRuntime* runtime) const {
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
@@ -25,7 +26,6 @@ LgsExpr* LgsSelection::resolveSelection(LgsRuntime* runtime) const {
             childExpr->setIRValue(gep);
         }
     }
-    return lastExpr();
 }
 
 string LgsSelection::prettyName() {
@@ -47,7 +47,8 @@ uint32_t LgsSelection::hashValue(LgsRuntime* runtime) {
 }
 
 Value* LgsSelection::eqIR(LgsRuntime* runtime, LgsExpr* other) {
-    const auto selection = resolveSelection(runtime);
+    resolveSelection(runtime);
+    const auto selection = lastExpr();
     if (const auto var = selection->asVariable()) {
         return var->eqIR(runtime, other);
     }

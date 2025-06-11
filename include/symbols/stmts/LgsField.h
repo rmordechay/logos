@@ -20,7 +20,7 @@ public:
 
     LgsField(const string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), expr(expr), type(type) {}
     virtual Value* getGEP(LgsRuntime* runtime, Value* instance);
-    void storeIRValue(LgsRuntime* runtime, Value* instance, LgsExpr* expr);
+    void storeIRValue(LgsRuntime* runtime, Value* parentIRValue, LgsExpr* expr);
     LgsField* clone() const;
     json asJSON() override;
     ~LgsField() override;

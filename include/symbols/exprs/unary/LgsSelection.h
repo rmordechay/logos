@@ -15,7 +15,7 @@ public:
     Value* eqIR(LgsRuntime* runtime, LgsExpr* other) override;
     void createIRStmt(LgsRuntime* runtime) override;
     Value* createIRValue(LgsRuntime* runtime) override;
-    LgsExpr* resolveSelection(LgsRuntime* runtime) const;
+    void resolveSelection(LgsRuntime* runtime) const;
     json asJSON() override;
     ~LgsSelection() override;
 };

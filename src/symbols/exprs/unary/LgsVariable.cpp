@@ -24,13 +24,11 @@ Value* LgsVariable::createIRValue(LgsRuntime* runtime) {
         return getIRStr(runtime, ref.enumField->name);
     case FUNC:
         return ref.func->getIRFunc(runtime);
-    case FIELD:
-        return ref.field->getGEP(runtime, TODO);
     default:
         assert(0);
     }
-
 }
+
 bool LgsVariable::equals(LgsExpr* other) {
     if (const auto otherVar = other->asVariable()) {
         return ref.getPtr() == otherVar->ref.getPtr();

@@ -3,13 +3,12 @@
 #include "exprs/unary/LgsInstance.h"
 
 Value* LgsField::getGEP(LgsRuntime* runtime, Value* instance) {
-    IRValue = runtime->builder.CreateStructGEP(parent->getIRType(), instance, position);
-    return IRValue;
+    return runtime->builder.CreateStructGEP(parent->getIRType(), instance, position);
 }
 
-void LgsField::storeIRValue(LgsRuntime* runtime, Value* instance, LgsExpr* expr) {
+void LgsField::storeIRValue(LgsRuntime* runtime, Value* parentIRValue, LgsExpr* expr) {
     const auto exprIRValue = expr->getIRValue(runtime);
-    runtime->builder.CreateStore(exprIRValue, getGEP(runtime, instance));
+    runtime->builder.CreateStore(exprIRValue, getGEP(runtime, parentIRValue));
 }
 
 LgsField* LgsField::clone() const {
