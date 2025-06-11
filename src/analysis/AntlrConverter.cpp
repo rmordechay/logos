@@ -375,7 +375,6 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
 LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ctx) {
     const auto assignment = new LgsAssignment();
     assignment->rValue = getExpr(ctx->expr());
-
     if (const auto variable = ctx->VARIABLE()) {
         assignment->lValue = getVariable(variable);
     } else if (const auto iterIndex = ctx->iterIndex()) {
@@ -385,7 +384,6 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
     } else {
         assert(0);
     }
-
     assignment->setLocation(ctx->start);
     return assignment;
 }
@@ -394,6 +392,7 @@ LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext
     const auto variableName = ctx->VARIABLE()->getText();
     const auto expr = getExpr(ctx->expr(), !!ctx->QUEST_MARK());
     const auto varDec = new LgsVarDec(variableName, expr);
+    varDec->isConst = !!ctx->CONST();
     varDec->setLocation(ctx->start);
     return varDec;
 }
@@ -401,6 +400,7 @@ LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext
 LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->VARIABLE()->getText();
     const auto varDec = new LgsVarDec(variableName);
+    varDec->isConst = !!ctx->CONST();
     if (ctx->expr()) {
         varDec->expr = getExpr(ctx->expr());
     }

@@ -120,15 +120,15 @@ statementsBlock:
     ;
 
 assignment:
-        (VARIABLE | iterIndex | selection) COLON EQUAL expr
+        (VARIABLE | iterIndex | selection) (WALRUS | EQUAL_ADD | EQUAL_SUB | EQUAL_MUL | EQUAL_DIV) expr
     ;
 
 explicitVarDec:
-        VARIABLE COLON type (EQUAL expr)?
+        CONST? VARIABLE COLON type (EQUAL expr)?
     ;
 
 implicitVarDec:
-        VARIABLE (QUEST_MARK)? EQUAL expr
+        CONST? VARIABLE (QUEST_MARK)? EQUAL expr
     ;
 
 ifStatement:
@@ -332,6 +332,11 @@ RANGLE: '>';
 COMMA: ',';
 TRIPLE_DOT: '...';
 DOUBLE_DOT: '..';
+WALRUS: ':=';
+EQUAL_ADD: '+=';
+EQUAL_SUB: '-=';
+EQUAL_MUL: '*=';
+EQUAL_DIV: '/=';
 INC: '++';
 DEC: '--';
 DOT: '.';

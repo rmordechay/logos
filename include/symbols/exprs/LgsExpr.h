@@ -25,7 +25,7 @@ class LgsExpr : virtual public LgsValue {
 public:
     LgsType* type = nullptr;
     bool isNull = false;
-    bool isZeroValue = false;
+    bool isConst = false;
     // TODO removed from visitVariable. Should be inferred from some refs.
     bool isReturnExpr = false;
 

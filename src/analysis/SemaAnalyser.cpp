@@ -31,9 +31,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsArray.h"
 #include "types/LgsGroup.h"
-#include "types/primitives/LgsSize.h"
 #include "utils/LgsUtils.h"
-
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsForLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -197,6 +195,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     } else {
         assert(0);
     }
+    varDec->expr->isConst = varDec->isConst;
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
 }
 
@@ -204,6 +203,9 @@ void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
     const auto lValue = assignment->lValue;
     const auto rValue = assignment->rValue;
     visitExpr(lValue);
+    if (lValue->isConst) {
+        return errHandler.handleError(E10051, &lValue->location, {lValue->prettyName()});
+    }
     visitExpr(rValue);
     const auto lType = lValue->type;
     const auto rType = rValue->type;
@@ -212,7 +214,6 @@ void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
     } else {
         return errHandler.handleError(E10001, &assignment->location, {lType->prettyName(), rType->prettyName()});
     }
-
 }
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -430,13 +431,15 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     variable->ref.symbolType = symbol->symbolType;
     switch (symbol->symbolType) {
     case VAR_DEC:
-        variable->ref.varDec = symbol->varDec;
         symbol->varDec->refs.push_back(variable);
+        variable->ref.varDec = symbol->varDec;
+        variable->isConst = symbol->varDec->isConst;
         variable->setType(symbol->varDec->type);
         break;
     case PARAM:
-        variable->ref.param = symbol->param;
         symbol->param->refs.push_back(variable);
+        variable->ref.param = symbol->param;
+        variable->isConst = symbol->param->isConst;
         variable->setType(symbol->param->type);
         break;
     case ENUM_FIELD:
@@ -575,11 +578,16 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
 }
 
 void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
-    visitUnaryExpr(postfixExpr->expr);
-    if (!postfixExpr->expr->type->asInt()) {
-        return errHandler.handleError(E10050, &postfixExpr->location);
+    const auto baseExpr = postfixExpr->expr;
+    visitUnaryExpr(baseExpr);
+    const auto type = baseExpr->type;
+    if (!type->asInt()) {
+        return errHandler.handleError(E10050, &postfixExpr->location, {type->prettyName()});
     }
-    postfixExpr->type = postfixExpr->expr->type;
+    if (baseExpr->isConst) {
+        return errHandler.handleError(E10051, &postfixExpr->location, {baseExpr->prettyName()});
+    }
+    postfixExpr->type = type;
 }
 
 void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {

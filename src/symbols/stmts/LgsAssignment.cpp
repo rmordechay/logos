@@ -12,6 +12,8 @@ void LgsAssignment::createIRStmt(LgsRuntime* runtime) {
         assignToSelection(runtime, selection, rValue);
     } else if (const auto iterIndex = lValue->asIterIndex()) {
         assignToIterIndex(runtime, iterIndex, rValue);
+    } else if (const auto var = lValue->asVariable()) {
+        assignToVariable(runtime, var, rValue);
     } else {
         assert(0);
     }
@@ -27,7 +29,7 @@ void LgsAssignment::assignToIterIndex(LgsRuntime* runtime, LgsIterIndex* iterInd
     }
 }
 
-void LgsAssignment::assignToSelection(LgsRuntime* runtime, const LgsSelection* selection, LgsExpr* expr) const {
+void LgsAssignment::assignToSelection(LgsRuntime* runtime, const LgsSelection* selection, LgsExpr* value) const {
     selection->resolveSelection(runtime);
     const auto lastExpr = selection->lastExpr();
     const auto parentExpr = selection->exprs[selection->exprs.size() - 2];
@@ -36,7 +38,7 @@ void LgsAssignment::assignToSelection(LgsRuntime* runtime, const LgsSelection* s
         switch (var->ref.symbolType) {
         case FIELD: {
             const auto parentIRValue = parentExpr->getIRValue(runtime);
-            var->ref.field->storeIRValue(runtime, parentIRValue, expr);
+            var->ref.field->storeIRValue(runtime, parentIRValue, value);
             return;
         }
         case UNKNOWN:
@@ -45,6 +47,10 @@ void LgsAssignment::assignToSelection(LgsRuntime* runtime, const LgsSelection* s
         }
     }
     assert(0);
+}
+
+void LgsAssignment::assignToVariable(LgsRuntime* runtime, LgsVariable* var, LgsExpr* value) const {
+    runtime->builder.CreateStore(value->getIRValue(runtime), var->getIRValue(runtime));
 }
 
 void LgsAssignment::storeHashMapInIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsHashMap* map) const {

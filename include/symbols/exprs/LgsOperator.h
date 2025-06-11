@@ -42,14 +42,3 @@ inline LgsOperator mapOperator(LogosParser::ExprContext* expr) {
     if (expr->CARET()) return BIT_XOR;
     return NOOP;
 }
-
-// inline Value * getLLVMCmp(LogosOperator expr, IRBuilder<>* builder) {
-//     if (expr == DOUBLE_EQUAL) return DOUBLE_EQUAL;
-//     if (expr == RANGLE) return LANGLE;
-//     if (expr == LANGLE) return RANGLE;
-//     if (expr == GE) return GE;
-//     if (expr == LE) return LE;
-//     return NOOP;
-// }
-
-

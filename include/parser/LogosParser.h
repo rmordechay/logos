@@ -15,16 +15,17 @@ public:
     T__0 = 1, T__1 = 2, T__2 = 3, DOUBLE_EQUAL = 4, NOT_EQUAL = 5, GE = 6, 
     LE = 7, LPAREN = 8, RPAREN = 9, LBRACE = 10, RBRACE = 11, LBRACK = 12, 
     RBRACK = 13, ARROW = 14, LANGLE = 15, RANGLE = 16, COMMA = 17, TRIPLE_DOT = 18, 
-    DOUBLE_DOT = 19, INC = 20, DEC = 21, DOT = 22, COLON = 23, EQUAL = 24, 
-    MINUS = 25, PLUS = 26, STAR = 27, SLASH = 28, HASH = 29, QUEST_MARK = 30, 
-    EXCLA_MARK = 31, PERCENT = 32, DOLLAR = 33, AMPERSAND = 34, PIPE = 35, 
-    CARET = 36, DOUBLE_RANGLE = 37, DOUBLE_LANGLE = 38, OBJECT = 39, SINGLETON = 40, 
-    SELF_INSTANCE = 41, SELF_CLASS = 42, INTERFACE = 43, ENUM = 44, VEC2 = 45, 
-    VEC3 = 46, VEC4 = 47, IMPLEMENTS = 48, EXTERN = 49, IF = 50, ELSE = 51, 
-    FOR = 52, BREAK = 53, CONTINUE = 54, RETURN = 55, VISIBILITY = 56, CONST = 57, 
-    AND = 58, OR = 59, NOT = 60, IN = 61, INTEGER = 62, FLOAT = 63, BOOL = 64, 
-    NULL_ = 65, CONST_NAME = 66, TYPE = 67, VARIABLE = 68, STRING = 69, 
-    TAG = 70, LINE_COMMENT = 71, BLOCK_COMMENT = 72, WS = 73
+    DOUBLE_DOT = 19, WALRUS = 20, EQUAL_ADD = 21, EQUAL_SUB = 22, EQUAL_MUL = 23, 
+    EQUAL_DIV = 24, INC = 25, DEC = 26, DOT = 27, COLON = 28, EQUAL = 29, 
+    MINUS = 30, PLUS = 31, STAR = 32, SLASH = 33, HASH = 34, QUEST_MARK = 35, 
+    EXCLA_MARK = 36, PERCENT = 37, DOLLAR = 38, AMPERSAND = 39, PIPE = 40, 
+    CARET = 41, DOUBLE_RANGLE = 42, DOUBLE_LANGLE = 43, OBJECT = 44, SINGLETON = 45, 
+    SELF_INSTANCE = 46, SELF_CLASS = 47, INTERFACE = 48, ENUM = 49, VEC2 = 50, 
+    VEC3 = 51, VEC4 = 52, IMPLEMENTS = 53, EXTERN = 54, IF = 55, ELSE = 56, 
+    FOR = 57, BREAK = 58, CONTINUE = 59, RETURN = 60, VISIBILITY = 61, CONST = 62, 
+    AND = 63, OR = 64, NOT = 65, IN = 66, INTEGER = 67, FLOAT = 68, BOOL = 69, 
+    NULL_ = 70, CONST_NAME = 71, TYPE = 72, VARIABLE = 73, STRING = 74, 
+    TAG = 75, LINE_COMMENT = 76, BLOCK_COMMENT = 77, WS = 78
   };
 
   enum {
@@ -547,9 +548,12 @@ public:
   public:
     AssignmentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *COLON();
-    antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
+    antlr4::tree::TerminalNode *WALRUS();
+    antlr4::tree::TerminalNode *EQUAL_ADD();
+    antlr4::tree::TerminalNode *EQUAL_SUB();
+    antlr4::tree::TerminalNode *EQUAL_MUL();
+    antlr4::tree::TerminalNode *EQUAL_DIV();
     antlr4::tree::TerminalNode *VARIABLE();
     IterIndexContext *iterIndex();
     SelectionContext *selection();
@@ -566,6 +570,7 @@ public:
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *COLON();
     TypeContext *type();
+    antlr4::tree::TerminalNode *CONST();
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
 
@@ -581,6 +586,7 @@ public:
     antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *EQUAL();
     ExprContext *expr();
+    antlr4::tree::TerminalNode *CONST();
     antlr4::tree::TerminalNode *QUEST_MARK();
 
    
