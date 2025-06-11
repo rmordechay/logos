@@ -2,8 +2,6 @@
 #include "LgsType.h"
 #include "funcs/LgsParam.h"
 
-class LgsParam;
-
 class LgsFuncType final : public LgsType {
 public:
     string name;

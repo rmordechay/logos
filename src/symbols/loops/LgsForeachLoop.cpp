@@ -17,11 +17,8 @@ Value* LgsForeachLoop::loopEnd(LgsRuntime* runtime) {
     return iterable->getLoopLength(runtime, iterExpr);
 }
 
-void LgsForeachLoop::setIRIterable(LgsRuntime* runtime) {
-    iterPtr = iterExpr->getIRValue(runtime);
-}
-
 void LgsForeachLoop::setIRLoopVars(LgsRuntime* runtime) {
+    startBlock(runtime, IRBodyBlock);
     const auto iterable = iterExpr->type->asIterable();
     if (const auto map = iterable->asMap()) {
         setIterVars(runtime, map);

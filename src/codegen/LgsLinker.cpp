@@ -18,7 +18,10 @@ bool LgsLinker::link(LogosProject& project) const {
         linker.linkInModule(unique_ptr<Module>(module));
     }
     if (!generateObjFile(mainModule, paths.objFilePath.c_str())) return false;
-    const auto linkerOpts = platform.linkerOpts;
+    auto linkerOpts = platform.linkerOpts;
+    linkerOpts.push_back(paths.objFilePath.c_str());
+    linkerOpts.push_back("-o");
+    linkerOpts.push_back(paths.execFilePath.c_str());
     if (!platform.link(linkerOpts, outs(), errs(), false, false)) {
         errs().flush();
         return false;

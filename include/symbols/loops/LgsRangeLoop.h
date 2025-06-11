@@ -8,7 +8,6 @@ public:
 
     LgsRangeLoop(LgsExpr* rangeStart, LgsExpr* rangeEnd) : rangeStart(rangeStart), rangeEnd(rangeEnd) {}
     void setIRLoopVars(LgsRuntime* runtime) override;
-    void setIRIterable(LgsRuntime* runtime) override;
     Value* loopStart(LgsRuntime* runtime) override;
     Value* loopEnd(LgsRuntime* runtime) override;
     ~LgsRangeLoop() override;

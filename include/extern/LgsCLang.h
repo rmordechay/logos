@@ -9,7 +9,7 @@ class LgsCLang {
 public:
     IntrusiveRefCntPtr<vfs::FileSystem> fs;
     path outputFilePath = paths.buildDir / "c.o";
-    vector<string> compileArgs{CLANG_BINARY, "-c", "-isysroot", platform.clibRoot};
+    vector<string> compileArgs{CLANG_BINARY, "-c", "-isysroot", paths.clibRoot};
 
     void getClibRoot() const;
     void parse(LgsFile& lgsFile, LgsErrHandler& errHandler) const;

@@ -473,7 +473,6 @@ LgsForLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext*
     } else {
         loopStmt = getInfiniteLoop(ctx);
     }
-
     loopStmt->stmtBlock = getStmtBlock(ctx->statementsBlock());
     loopStmt->setLocation(ctx->start);
     return loopStmt;

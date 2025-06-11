@@ -33,6 +33,7 @@ void CodeGenerator::init() {
     InitializeAllTargetMCs();
     InitializeAllTargets();
     InitializeAllTargetInfos();
+    platform.dataLayout = getTargetMachine()->createDataLayout();
 }
 
 void CodeGenerator::writeIRToFile(LogosProject& project) {

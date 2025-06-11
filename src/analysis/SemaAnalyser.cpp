@@ -24,6 +24,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
 #include "logos/LgsConfig.h"
+#include "loops/LgsInfiniteLoop.h"
 #include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsVarDec.h"
@@ -251,6 +252,10 @@ void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
         visitRangeLoop(rangeLoop);
     } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loopStmt)) {
         visitForeachLoop(foreachLoop);
+    } else if (const auto infiniteLoop = dynamic_cast<LgsInfiniteLoop*>(loopStmt)) {
+        visitInfiniteLoop(infiniteLoop);
+    } else {
+        assert(0);
     }
     stack.exitScope(LOOP_SCOPE);
 }
@@ -283,9 +288,13 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
     visitStmtBlock(foreachLoop->stmtBlock);
 }
 
+void SemaAnalyser::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
+    visitStmtBlock(infiniteLoop->stmtBlock);
+}
+
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
     const auto currentFunc = stack.currentFunc;
-    auto& funcType = currentFunc->funcType;
+    const auto funcType = currentFunc->funcType;
     if (returnStmt->expr) {
         returnStmt->expr->isReturnExpr = true;
         currentFunc->returnExprs.push_back(returnStmt->expr);
@@ -535,8 +544,9 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
             funcCall->func = func;
             funcCall->type = func->funcType->rt;
         } else {
-            errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->prettyName(), func->prettyName()});
+            return errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->prettyName(), func->prettyName()});
         }
+        assert(funcCall->func);
         return;
     }
 

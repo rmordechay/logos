@@ -13,7 +13,6 @@ public:
     void setIRLoopVars(LgsRuntime* runtime) override;
     void setIterVars(LgsRuntime* runtime, LgsArray* arr) const;
     void setIterVars(LgsRuntime* runtime, LgsMap* map) const;
-    void setIRIterable(LgsRuntime* runtime) override;
     Value* loopStart(LgsRuntime* runtime) override;
     Value* loopEnd(LgsRuntime* runtime) override;
     ~LgsForeachLoop() override;

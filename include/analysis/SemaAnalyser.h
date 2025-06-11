@@ -1,6 +1,7 @@
 #pragma once
 #include "files/LgsFile.h"
 #include "logos/LgsASTVisitor.h"
+#include "loops/LgsInfiniteLoop.h"
 #include "types/LgsIterable.h"
 
 class LgsArray;
@@ -64,6 +65,7 @@ public:
     void visitLoopStmt(LgsForLoop* loopStmt) override;
     void visitRangeLoop(const LgsRangeLoop* rangeLoop) override;
     void visitForeachLoop(const LgsForeachLoop* foreachLoop) override;
+    void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
     void visitReturnStmt(const LgsReturn* returnStmt) override;
     void visitBreakStmt(const LgsBreakStmt* breakStmt) override;
     void visitContinueStmt(const LgsContinueStmt* continueStmt) override;

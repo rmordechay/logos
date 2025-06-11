@@ -15,10 +15,10 @@ public:
     vector<char*> args;
 
     explicit Logos(const path& rootDirPath = "") {
-        if (rootDirPath != "") initPaths(rootDirPath);
+        paths.initPaths(rootDirPath);
+        platform.setPlatform();
     }
     void run();
-    void initPaths(const path& rootDirPath) const;
     ~Logos() = default;
 };
 

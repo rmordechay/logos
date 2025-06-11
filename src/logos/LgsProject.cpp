@@ -18,7 +18,6 @@ extern char **environ;
 
 bool LogosProject::loadProject() {
     if (!validateProject()) return false;
-    setPlatform(paths.objFilePath, paths.execFilePath);
     // getClibRoot();
     // setupActiveEnv();
     if (!errHandler.successful) return false;
@@ -40,22 +39,6 @@ bool LogosProject::validateProject() {
     }
     return true;
 }
-
-void LogosProject::setPlatform(const string& inputFile, const string& outputFile) const {
-    platform.inputFile = inputFile;
-    platform.outputFile = outputFile;
-    platform.osName = OS_NAME;
-    platform.linker = LINKER;
-    platform.clibRoot = CLIB_ROOT;
-    platform.platformVersion = PLATFORM_VERSION;
-    platform.arch = ARCH_NAME;
-    platform.linkerOpts = LINKER_OPTS;
-    platform.linkerOpts.push_back(platform.inputFile.c_str());
-    platform.linkerOpts.push_back("-o");
-    platform.linkerOpts.push_back(platform.outputFile.c_str());
-    platform.link = LINK_FUNC;
-}
-
 
 void LogosProject::parseSrcFiles(const string& path, ThreadPool& threadPool) {
     for (const auto& entry : directory_iterator(path)) {
