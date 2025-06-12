@@ -5,14 +5,15 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
-#include "utils/LgsUtils.h"
 
 void LgsAssignment::createIRStmt(LgsRuntime* runtime) {
     switch (assignmentType) {
     case ASSIGN:
-        createIRAssignment(runtime);
+        createIRAssign(runtime);
         break;
     case ASSIGN_ADD:
+        createIRAddAssign(runtime);
+        break;
     case ASSIGN_SUB:
     case ASSIGN_MUL:
     case ASSIGN_DIV:
@@ -20,7 +21,7 @@ void LgsAssignment::createIRStmt(LgsRuntime* runtime) {
     }
 }
 
-void LgsAssignment::createIRAssignment(LgsRuntime* runtime) const {
+void LgsAssignment::createIRAssign(LgsRuntime* runtime) const {
     if (const auto selection = lValue->asSelection()) {
         assignToSelection(runtime, selection, rValue);
     } else if (const auto iterIndex = lValue->asIterIndex()) {
@@ -30,6 +31,17 @@ void LgsAssignment::createIRAssignment(LgsRuntime* runtime) const {
     } else {
         assert(0);
     }
+}
+
+void LgsAssignment::createIRAddAssign(LgsRuntime* runtime) const {
+    const auto leftIRValue = lValue->getIRValue(runtime);
+    auto rightIRValue = rValue->getIRValue(runtime);
+    if (rightIRValue->getType()->isPointerTy()) {
+        rightIRValue = runtime->builder.CreateLoad(rValue->type->getIRType(), rightIRValue);
+    }
+    const auto leftIRValueLoad = runtime->builder.CreateLoad(lValue->type->getIRType(), leftIRValue);
+    const auto results = runtime->builder.CreateAdd(leftIRValueLoad, rightIRValue);
+    runtime->builder.CreateStore(results, leftIRValue);
 }
 
 void LgsAssignment::assignToIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* value) const {

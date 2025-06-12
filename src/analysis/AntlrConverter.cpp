@@ -383,7 +383,7 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
     } else {
         assert(0);
     }
-    const auto assignment = new LgsAssignment(mapAssignType(ctx), getExpr(ctx->expr()), lValue);
+    const auto assignment = new LgsAssignment(mapAssignType(ctx), lValue, getExpr(ctx->expr()));
     assignment->setLocation(ctx->start);
     return assignment;
 }

@@ -24,7 +24,8 @@ public:
 
     LgsAssignment(const LgsAssignType assignmentType, LgsExpr* lValue, LgsExpr* rValue) : lValue(lValue), rValue(rValue), assignmentType(assignmentType) {}
     void createIRStmt(LgsRuntime* runtime) override;
-    void createIRAssignment(LgsRuntime* runtime) const;
+    void createIRAssign(LgsRuntime* runtime) const;
+    void createIRAddAssign(LgsRuntime* runtime) const;
     void assignToIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* value) const;
     void assignToSelection(LgsRuntime* runtime, const LgsSelection* selection, LgsExpr* value) const;
     void assignToVariable(LgsRuntime* runtime, LgsVariable* var, LgsExpr* value) const;
