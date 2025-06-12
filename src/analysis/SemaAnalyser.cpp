@@ -45,8 +45,10 @@ void SemaAnalyser::analyseFiles(LogosProject& project) {
         threadPool.runTask([file, &project] {
             SemaAnalyser semaAnalyser(file);
             semaAnalyser.start();
-            lock_guard lock(mtx);
-            project.errors.insert(project.errors.end(), semaAnalyser.errHandler.errors.begin(), semaAnalyser.errHandler.errors.end());
+            const auto& errHandler = semaAnalyser.errHandler;
+            if (!errHandler.successful) {
+                project.addErrors(errHandler.errors);
+            }
         });
     }
     threadPool.wait();

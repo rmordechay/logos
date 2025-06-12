@@ -44,9 +44,9 @@ void CodeGenerator::writeIRToFile(LogosProject& project) {
             raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
             module->print(textFile, nullptr);
         }
-        if constexpr (application.logLevel == DEBUG) {
+        if (application.logLevel == DEBUG) {
             module->print(outs(), nullptr);
-            std::cout << "\n-----\n\n";
+            lgsLog("\n-----\n\n");
         }
     }
 }

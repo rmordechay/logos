@@ -47,6 +47,7 @@ public:
     void checkDuplicateFiles(const vector<LgsFile*>& files);
     void checkRequiredEnvVars();
     bool isLogosFile(const directory_entry& entry) const;
+    void addErrors(vector<LgsError> newErrors);
     ~LogosProject() = default;
 };
 

@@ -47,9 +47,10 @@ struct LgsPaths {
 };
 
 struct LgsApp {
-    LogLevel logLevel = INFO;
-    Platform platform;
+    string name;
     LgsPaths paths;
+    Platform platform;
+    LogLevel logLevel = INFO;
 };
 
 inline LgsApp application;

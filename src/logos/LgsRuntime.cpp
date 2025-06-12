@@ -50,7 +50,6 @@ void LgsRuntime::freeExprs() {
 
 void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
     if (symbols.find(name) != symbols.end()) {
-    std::cout << name << '+' << std::endl;
         const auto location = symbol.getLocation();
         errHandler->handleError(E10011, location, {name, location->lineNumberStr()});
         return;

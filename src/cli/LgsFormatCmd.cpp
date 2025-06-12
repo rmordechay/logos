@@ -15,5 +15,5 @@ void LgsFormatCmd::validate() {
 }
 
 void LgsFormatCmd::printHelp() {
-    std::cout << "Usage: lgs format <path>" << "\n\n";
+    lgsLog("Usage: lgs format <path>\n\n");
 }

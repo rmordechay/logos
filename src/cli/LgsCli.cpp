@@ -10,7 +10,7 @@
 
 void LgsCli::execute() const {
     if (argc < 2) {
-        cout << "Error: not enough arguments." << "\n\n";
+        lgsLog("Error: not enough arguments.\n\n");
         printHelp();
         exit(0);
     }
@@ -38,8 +38,7 @@ void LgsCli::printVersion() {
     txt << "Logos version: " + string(LOGOS_VERSION) << endl;
     txt << "Architecture: " + string(ARCH_NAME) << endl;
     txt << "Operation System: " + string("macOS") << endl;
-    cout << txt.str();
-
+    lgsLog(txt.str());
 }
 
 void LgsCli::printHelp() {
@@ -52,10 +51,10 @@ void LgsCli::printHelp() {
     txt << "version, -v, --version    print logos version" << endl;
 
     txt << endl << "For more information: lgs [command] help" << endl;
-    cout << txt.str();
+    lgsLog(txt.str());
 }
 
 void LgsCli::exitWithMsg(const string& errorMsg) {
-    cout << errorMsg << "\n\n";
+    lgsLog(errorMsg + "\n\n");
     exit(0);
 }

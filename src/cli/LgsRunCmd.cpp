@@ -23,5 +23,5 @@ void LgsRunCmd::setArgs(Logos* logos) const {
 }
 
 void LgsRunCmd::printHelp() {
-    std::cout << "Usage: lgs run <path> <options>" << "\n\n";
+    lgsLog("Usage: lgs run <path> <options>\n");
 }

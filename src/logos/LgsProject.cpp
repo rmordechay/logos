@@ -19,7 +19,6 @@ extern char **environ;
 
 bool LogosProject::loadProject() {
     if (!validateProject()) return false;
-    // getClibRoot();
     // setupActiveEnv();
     if (!errHandler.successful) return false;
     loadFiles();
@@ -67,7 +66,7 @@ void LogosProject::parseSrcFile(path entry) {
         const auto file = antlerConverter.getLogosFile(lgsFile, absFilePath);
         lock_guard lock(mtx);
         files.emplace_back(file);
-        errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
+        addErrors(antlerConverter.errHandler.errors);
     } else {
         lock_guard lock(mtx);
         errHandler.setUnsuccessful();
@@ -86,7 +85,7 @@ void LogosProject::parseEnvFile(path fileEntry) {
     auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
     lock_guard lock(mtx);
     envFiles.emplace_back(file);
-    errors.insert(errors.end(), antlerConverter.errHandler.errors.begin(), antlerConverter.errHandler.errors.end());
+    addErrors(antlerConverter.errHandler.errors);
 }
 
 bool LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) const {
@@ -236,4 +235,9 @@ void LogosProject::asJSON() const {
 
 bool LogosProject::isLogosFile(const directory_entry& entry) const {
     return entry.is_regular_file() && entry.path().extension().string() == LOGOS_FILE_EXTENSION;
+}
+
+void LogosProject::addErrors(vector<LgsError> newErrors) {
+    lock_guard lock(mtx);
+    errors.insert(errors.end(), newErrors.begin(), newErrors.end());
 }

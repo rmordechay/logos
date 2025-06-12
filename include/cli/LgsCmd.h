@@ -1,5 +1,5 @@
 #pragma once
-
+#include "utils/LgsLogger.h"
 
 
 class LgsCmd {
@@ -22,7 +22,7 @@ inline void LgsCmd::printInfoAndExit() {
 }
 
 inline void LgsCmd::printInfoAndExit(const std::string& msg) {
-    std::cout << msg << '\n';
+    lgsLog(msg);
     printInfoAndExit();
 }
 
