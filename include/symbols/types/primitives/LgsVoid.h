@@ -7,8 +7,8 @@ public:
     static constexpr auto name = "Void";
 
     LgsVoid() {
-        isVoid = true;
-        isPrimitive = true;
+        setFlag(VOID);
+        setFlag(PRIMITIVE);
     }
     string prettyName() const override;
     Type* getIRType() override;

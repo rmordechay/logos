@@ -32,7 +32,7 @@ Type* LgsObject::getIRType() {
 }
 
 LgsExpr* LgsObject::getZeroValue() {
-    if (isNullable) return new LgsNull();
+    if (hasFlag(NULLABLE)) return new LgsNull();
     assert(0);
 }
 

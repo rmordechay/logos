@@ -6,8 +6,8 @@ public:
     static constexpr auto name = "Size";
 
     LgsSize() {
-        isPrimitive = true;
-        isInt = true;
+        setFlag(PRIMITIVE);
+        setFlag(INT);
     }
     size_t getSizeBytes() override;
     Type* getIRType() override;

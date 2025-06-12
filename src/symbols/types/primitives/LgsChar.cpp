@@ -20,7 +20,7 @@ string LgsChar::getIRName() {
 }
 
 LgsExpr* LgsChar::getZeroValue() {
-    if (isNullable) return new LgsNull();
+    if (hasFlag(NULLABLE)) return new LgsNull();
     return new LgsCharConst('0');
 }
 

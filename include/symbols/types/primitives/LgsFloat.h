@@ -6,7 +6,7 @@ public:
     static constexpr auto name = "Float";
 
     LgsFloat() {
-        isPrimitive = true;
+        setFlag(PRIMITIVE);
     }
     Type* getIRType() override;
     string getIRName() override;

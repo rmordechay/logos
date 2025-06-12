@@ -9,7 +9,7 @@ void LgsFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.enterFunc(this);
     startBlockFunc(runtime);
     stmtBlock->createIRValue(runtime);
-    if (funcType->rt->isVoid) {
+    if (funcType->rt->hasFlag(VOID)) {
         runtime->freeExprs();
         if (!runtime->builder.GetInsertBlock()->getTerminator()) {
             runtime->builder.CreateRetVoid();
@@ -131,7 +131,7 @@ void LgsFunc::swapReturnIfNeeded() const {
             break;
         }
     }
-    if (funcType->isBig && isEqual) {
+    if (funcType->hasFlag(BIG_TYPE) && isEqual) {
         funcType->setFlag(SWAP_RETURN);
         funcType->returnParamIndex = funcType->hasFlag(METHOD) && !funcType->hasFlag(STATIC);
         funcType->params.insert(funcType->params.begin(), LgsParam(funcType->rt));

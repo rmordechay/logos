@@ -305,7 +305,7 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
         visitExpr(returnStmt->expr);
     }
     const auto rt = funcType->rt;
-    if (rt->isVoid && returnStmt->expr) {
+    if (rt->hasFlag(VOID) && returnStmt->expr) {
         errHandler.handleError(E10027, &returnStmt->location, {returnStmt->expr->type->prettyName()});
     } else if (!returnStmt->expr) {
         errHandler.handleError(E10026, &returnStmt->location, {funcType->name, rt->prettyName()});
@@ -474,7 +474,6 @@ void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
     } else {
         assert(0);
     }
-    assert(firstExpr->type);
 }
 
 void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
@@ -593,6 +592,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
     for (const auto& arg : methodCall->args) {
         visitExpr(arg);
     }
+    if (!parentType) return;
     auto name = methodCall->name;
     const auto method = parentType->findMethod(name);
     if (!method) {
@@ -716,7 +716,7 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
             return;
         }
         // type must be nullable
-        if (!type->isNullable) {
+        if (!type->hasFlag(NULLABLE)) {
             errHandler.handleError(E10023, &type->location, {type->prettyName(), type->prettyName()});
         }
         return;
@@ -733,7 +733,7 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
 }
 
 void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
-    if (func->funcType->rt->isVoid) return;
+    if (func->funcType->rt->hasFlag(VOID)) return;
     const auto stmtBlock = func->stmtBlock;
     const bool isFlowCorrect = func->funcType->name != LOGOS_MAIN_FUNC && !stmtBlock->hasReturn;
     if (isFlowCorrect) {
@@ -802,8 +802,6 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     }
     if (!type->isUnknown()) return type;
     auto typeName = type->prettyName();
-    const auto nullable = type->isNullable;
-
     auto symbol = globals.getSymbol(typeName);
     if (!symbol) {
         symbol = file->symbolTable.getSymbol(typeName);
@@ -816,26 +814,26 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     LgsType* newType = nullptr;
     switch (symbol->symbolType) {
     case ENUM_FIELD:
-        symbol->enumField->parent->isNullable = nullable;
+        symbol->enumField->parent->setFlag(NULLABLE);
         newType = symbol->enumField->parent;
         break;
     case FUNC:
         newType = symbol->func->funcType;
         break;
     case OBJECT:
-        symbol->object->isNullable = nullable;
+        symbol->object->setFlag(NULLABLE);
         newType = symbol->object;
         break;
     case INTERFACE:
-        symbol->interface->isNullable = nullable;
+        symbol->interface->setFlag(NULLABLE);
         newType = symbol->interface;
         break;
     case GROUP:
-        symbol->group->isNullable = nullable;
+        symbol->group->setFlag(NULLABLE);
         newType = symbol->group;
         break;
     case ENUM:
-        symbol->lgsEnum->isNullable = nullable;
+        symbol->lgsEnum->setFlag(NULLABLE);
         newType = symbol->lgsEnum;
         break;
     case VAR_DEC:
@@ -879,7 +877,9 @@ void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
         funcType->params[i].type = resolveType(funcType->params[i].type);
     }
     funcType->rt = resolveType(funcType->rt);
-    funcType->isBig = !funcType->rt->isVoid && funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD;
+    if (!funcType->rt->hasFlag(VOID) && funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD) {
+        funcType->setFlag(BIG_TYPE);
+    }
 }
 
 void SemaAnalyser::resolveGroupTypes(LgsGroup* group) {

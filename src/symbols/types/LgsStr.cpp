@@ -22,7 +22,7 @@ string LgsStr::prettyName() const {
 }
 
 LgsExpr* LgsStr::getZeroValue() {
-    if (isNullable) return new LgsNull();
+    if (hasFlag(NULLABLE)) return new LgsNull();
     return new LgsStrConst("");
 }
 
@@ -73,7 +73,7 @@ size_t LgsStr::hashString(const string& str) {
 }
 
 Value* LgsStrFormatFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
-    const bool isConst = args[0]->type->isConst;
+    const bool isConst = args[0]->type->hasFlag(CONST);
     if (!isConst) assert(0);
     constexpr auto bufferSize = 1024;
     auto exprStr = args[0]->getExprStr();

@@ -7,7 +7,7 @@ public:
     int value;
 
     explicit LgsShortConst(const int value) : LgsUnaryExpr(&LGS_SHORT), value(value) {
-        type->isConst = true;
+        type->setFlag(CONST);
     }
     string prettyName() override;
     Value* createIRValue(LgsRuntime* runtime) override;

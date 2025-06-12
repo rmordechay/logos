@@ -21,7 +21,7 @@ string LgsInt::getIRName() {
 }
 
 LgsExpr* LgsInt::getZeroValue() {
-    if (isNullable) return new LgsNull();
+    if (hasFlag(NULLABLE)) return new LgsNull();
     return new LgsIntConst(0);
 }
 

@@ -8,7 +8,7 @@ public:
     bool value;
 
     explicit LgsBoolConst(const bool value) : LgsUnaryExpr(&LGS_BOOL), value(value) {
-        type->isConst = true;
+        type->setFlag(CONST);
     }
     string getValueAsString() const;
     Value* createIRValue(LgsRuntime* runtime) override;

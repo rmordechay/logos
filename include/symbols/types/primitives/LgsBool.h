@@ -8,8 +8,8 @@ public:
     static constexpr auto falseLiteral = "false";
 
     LgsBool() {
-        isPrimitive = true;
-        isInt = true;
+        setFlag(PRIMITIVE);
+        setFlag(INT);
     }
     string prettyName() const override;
     Type* getIRType() override;

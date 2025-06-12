@@ -32,7 +32,7 @@ string LgsFuncType::getIRName() {
 Type* LgsFuncType::getIRType() {
     if (IRType) return IRType;
     Type* returnType;
-    if (this->isBig && !hasFlag(SWAP_RETURN)) {
+    if (hasFlag(BIG_TYPE) && !hasFlag(SWAP_RETURN)) {
         returnType = PointerType::getUnqual(context);
     } else {
         returnType = rt->getIRType();
@@ -41,7 +41,7 @@ Type* LgsFuncType::getIRType() {
     for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
-        if (!paramType->isPrimitive || param.isSelf) {
+        if (!paramType->hasFlag(PRIMITIVE) || param.isSelf) {
             IRParamsTypes.emplace_back(PointerType::getUnqual(context));
         } else {
             auto irType = paramType->getIRType();
@@ -85,12 +85,4 @@ LgsType* LgsFuncType::clone() {
         newFuncType->params.push_back(param);
     }
     return newFuncType;
-}
-
-bool LgsFuncType::hasFlag(const LgsFuncOpts f) const {
-    return flags & f;
-}
-
-void LgsFuncType::setFlag(const LgsFuncOpts f) {
-    flags |= f;
 }

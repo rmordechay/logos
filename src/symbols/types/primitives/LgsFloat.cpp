@@ -14,7 +14,7 @@ string LgsFloat::getIRName() {
 }
 
 LgsExpr* LgsFloat::getZeroValue() {
-    if (isNullable) return new LgsNull();
+    if (hasFlag(NULLABLE)) return new LgsNull();
     return new LgsFloatConst(0.0);
 }
 

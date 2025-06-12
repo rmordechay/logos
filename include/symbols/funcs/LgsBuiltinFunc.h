@@ -4,8 +4,8 @@
 class LgsBuiltinFunc : public LgsFunc {
 public:
     LgsBuiltinFunc(const string& name, LgsType* rt, const string& parentName, const vector<LgsType*>& paramsTypes, const uint16_t flags = 0): LgsFunc(name, rt) {
-        funcType->isBuiltin = true;
         funcType->flags = flags;
+        funcType->setFlag(BUILTIN);
         if (parentName != "") {
             funcType->parentName = parentName;
             funcType->setFlag(METHOD);

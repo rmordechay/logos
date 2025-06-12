@@ -555,7 +555,7 @@ LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx, const bool isNu
     }
     if (isNullable) {
         assert(expr && expr->type);
-        expr->type->isNullable = true;
+        expr->type->setFlag(NULLABLE);
     }
     return expr;
 }
@@ -824,7 +824,7 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
     } else {
         result = getTypeFromText(ctx->TYPE());
         if (ctx->QUEST_MARK()) {
-            result->isNullable = true;
+            result->setFlag(NULLABLE);
         }
     }
     result->setLocation(ctx->start);

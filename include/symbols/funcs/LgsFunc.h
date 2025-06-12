@@ -24,7 +24,6 @@ public:
         funcType->params = params;
         type = funcType;
     }
-
     explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {
         type = funcType;
     }

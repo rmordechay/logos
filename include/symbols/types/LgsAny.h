@@ -7,7 +7,7 @@ public:
     static constexpr auto name = "Any";
 
     LgsAny() {
-        isPrimitive = true;
+        setFlag(PRIMITIVE);
     }
     size_t getSizeBytes() override;
     Type* getIRType() override;

@@ -6,8 +6,8 @@ public:
     static constexpr auto name = "Int";
 
     LgsInt() {
-        isPrimitive = true;
-        isInt = true;
+        setFlag(PRIMITIVE);
+        setFlag(INT);
     }
     size_t getSizeBytes() override;
     Type* getIRType() override;
