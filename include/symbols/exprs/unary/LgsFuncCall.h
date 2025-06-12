@@ -11,6 +11,7 @@ public:
     vector<LgsExpr*> args;
     LgsSymbol* callback = nullptr;
     LgsFunc* func = nullptr;
+    bool isSpread = false;
 
     explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
     void resolveVirtualFunc(LgsRuntime* runtime) const;

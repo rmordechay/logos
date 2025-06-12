@@ -875,6 +875,7 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
     FuncArgListContext *funcArgList();
+    antlr4::tree::TerminalNode *TRIPLE_DOT();
 
    
   };

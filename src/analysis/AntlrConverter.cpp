@@ -658,6 +658,7 @@ LgsFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
         }
     }
     const auto funcCall = new LgsFuncCall(name, args);
+    funcCall->isSpread = !!ctx->TRIPLE_DOT();
     funcCall->setLocation(ctx->start);
     return funcCall;
 }

@@ -219,7 +219,7 @@ keyValue:
     ;
 
 funcCall:
-        VARIABLE LPAREN funcArgList? RPAREN
+        VARIABLE LPAREN funcArgList? TRIPLE_DOT? RPAREN
     ;
 
 funcArgList:
