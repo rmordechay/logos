@@ -589,10 +589,10 @@ void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
 }
 
 void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {
+    if (!parentType) return;
     for (const auto& arg : methodCall->args) {
         visitExpr(arg);
     }
-    if (!parentType) return;
     auto name = methodCall->name;
     const auto method = parentType->findMethod(name);
     if (!method) {
@@ -628,14 +628,14 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     visitExpr(iterIndex->index->to);
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable) {
-        return errHandler.handleError(E10002, &iterIndex->location, {iterIndex->baseExpr->prettyName()});
-    }
-    if (const auto map = iterable->asMap()) {
+        if (baseExpr->type) {
+            errHandler.handleError(E10002, &iterIndex->location, {iterIndex->baseExpr->prettyName()});
+        }
+    } else if (const auto map = iterable->asMap()) {
         iterIndex->setType(map->typePair->value);
     } else {
         iterIndex->setType(iterable->baseType);
     }
-    assert(iterIndex->type);
 }
 
 void SemaAnalyser::visitGroup(LgsGroup* group) const {
