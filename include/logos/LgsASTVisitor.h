@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsStack.h"
+#include "files/LgsInterfaceFile.h"
 
 class LgsFuncType;
 class LgsArray;
@@ -34,8 +35,11 @@ class LgsForLoop;
 struct LgsSymbol;
 struct LgsIndex;
 
-class LgsAstVisitor {
+class LgsASTVisitor {
 public:
+    LgsFile* file = nullptr;
+
+    explicit LgsASTVisitor(LgsFile* file) : file(file) {}
     virtual void start() = 0;
     virtual void visitMainFile(LgsMainFile* mainFile) = 0;
     virtual void visitObject(LgsObject* obj) = 0;
@@ -73,7 +77,5 @@ public:
     virtual void visitFirstSelection(LgsExpr* firstExpr) = 0;
     virtual void visitInstance(LgsInstance* instance) = 0;
     virtual void visitIterIndex(LgsIterIndex* iterIndex) = 0;
-    virtual ~LgsAstVisitor() = default;
+    virtual ~LgsASTVisitor() = default;
 };
-
-

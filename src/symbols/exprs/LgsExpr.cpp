@@ -55,6 +55,7 @@ uint32_t LgsExpr::hashValue(LgsRuntime* runtime) { assert(0); }
 Value* LgsExpr::subIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
 Value* LgsExpr::mulIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
 Value* LgsExpr::divIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
+Value* LgsExpr::modIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
 Value* LgsExpr::eqIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
 Value* LgsExpr::neIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }
 Value* LgsExpr::ltIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }

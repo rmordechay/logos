@@ -1,5 +1,4 @@
 #include "analysis/SemaAnalyser.h"
-
 #include "data/LgsErrors.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
@@ -635,6 +634,7 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     case SUB:
     case MUL:
     case DIV:
+    case MOD:
     case BIT_AND:
     case BIT_OR:
     case BIT_XOR:
@@ -658,8 +658,6 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
         break;
     }
     case NOOP:
-        break;
-    default:
         break;
     }
     binaryExpr->setType(type);
@@ -920,9 +918,6 @@ void SemaAnalyser::reprocessFuncs(const LogosProject& project) {
                 for (const auto& [_, method] : obj->methods) {
                     method->swapReturnIfNeeded();
                 }
-                for (const auto implement : obj->interfaces) {
-                    assert(0);
-                }
             }
             for (const auto [_, func] : mainFile->funcs) {
                 func->swapReturnIfNeeded();
@@ -931,9 +926,6 @@ void SemaAnalyser::reprocessFuncs(const LogosProject& project) {
             const auto obj = objFile->obj;
             for (const auto& [_, method] : obj->methods) {
                 method->swapReturnIfNeeded();
-            }
-            for (const auto implement : obj->interfaces) {
-                assert(0);
             }
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
             for (const auto& [_, method] : interfaceFile->interface->methods) {

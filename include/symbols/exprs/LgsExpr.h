@@ -64,6 +64,7 @@ public:
     virtual Value* subIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* mulIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* divIR(LgsRuntime* runtime, LgsExpr* other);
+    virtual Value* modIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* eqIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* neIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* ltIR(LgsRuntime* runtime, LgsExpr* other);

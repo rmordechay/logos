@@ -922,6 +922,7 @@ LgsOperator AntlerConverter::mapOperator(LogosParser::ExprContext* expr) const {
     if (expr->MINUS()) return SUB;
     if (expr->STAR()) return MUL;
     if (expr->SLASH()) return DIV;
+    if (expr->PERCENT()) return MOD;
     if (expr->NOT_EQUAL()) return NE;
     if (expr->DOUBLE_EQUAL()) return EQ;
     if (expr->RANGLE()) return GT;

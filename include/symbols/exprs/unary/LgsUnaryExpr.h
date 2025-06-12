@@ -1,8 +1,6 @@
 #pragma once
-
 #include "exprs/LgsExpr.h"
 #include "logos/LgsRuntime.h"
-
 
 class LgsUnaryExpr : public LgsExpr {
 public:
@@ -12,6 +10,7 @@ public:
     Value* subIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* mulIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* divIR(LgsRuntime* runtime, LgsExpr* other) override;
+    Value* modIR(LgsRuntime* runtime, LgsExpr* other) override;
     virtual std::string getName();
     ~LgsUnaryExpr() override = default;
 };
@@ -44,4 +43,8 @@ inline Value* LgsUnaryExpr::divIR(LgsRuntime* runtime, LgsExpr* other) {
     return runtime->builder.CreateSDiv(l, r);
 }
 
-
+inline Value* LgsUnaryExpr::modIR(LgsRuntime* runtime, LgsExpr* other) {
+    const auto l = this->getIRValue(runtime);
+    const auto r = other->getIRValue(runtime);
+    return runtime->builder.CreateSRem(l, r);
+}

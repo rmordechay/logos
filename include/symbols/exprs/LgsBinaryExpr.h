@@ -6,6 +6,7 @@ enum LgsOperator {
     SUB,
     MUL,
     DIV,
+    MOD,
     NE,
     EQ,
     LT,

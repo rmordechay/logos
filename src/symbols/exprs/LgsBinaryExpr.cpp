@@ -11,6 +11,8 @@ Value* LgsBinaryExpr::createIRValue(LgsRuntime* runtime) {
         return left->mulIR(runtime, right);
     case DIV:
         return left->divIR(runtime, right);
+    case MOD:
+        return left->modIR(runtime, right);
     case EQ:
         return left->eqIR(runtime, right);
     case NE:
@@ -40,7 +42,7 @@ Value* LgsBinaryExpr::createIRValue(LgsRuntime* runtime) {
     case NOOP:
         break;
     }
-    return nullptr;
+    assert(0);
 }
 
 Value* LgsBinaryExpr::addIR(LgsRuntime* runtime, LgsExpr* other) {

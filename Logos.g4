@@ -176,7 +176,7 @@ enumField:
 expr:
         LPAREN left=expr RPAREN (ARROW type)?
     |   unaryExpr (ARROW cast=type)?
-    |   left=expr op=(STAR | SLASH) right=expr
+    |   left=expr op=(STAR | SLASH | PERCENT) right=expr
     |   left=expr op=(PLUS | MINUS) right=expr
     |   left=expr op=(LANGLE | RANGLE | GE | LE) right=expr
     |   left=expr op=(DOUBLE_EQUAL | NOT_EQUAL) right=expr

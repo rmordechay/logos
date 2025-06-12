@@ -759,6 +759,7 @@ public:
     UnaryExprContext *unaryExpr();
     antlr4::tree::TerminalNode *STAR();
     antlr4::tree::TerminalNode *SLASH();
+    antlr4::tree::TerminalNode *PERCENT();
     antlr4::tree::TerminalNode *PLUS();
     antlr4::tree::TerminalNode *MINUS();
     antlr4::tree::TerminalNode *LANGLE();

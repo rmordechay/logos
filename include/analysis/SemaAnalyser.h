@@ -38,13 +38,12 @@ class LgsForLoop;
 struct LgsSymbol;
 struct LgsIndex;
 
-class SemaAnalyser final : public LgsAstVisitor {
+class SemaAnalyser final : public LgsASTVisitor {
 public:
     LgsStack stack;
-    LgsFile* file = nullptr;
     LgsErrHandler errHandler;
 
-    explicit SemaAnalyser(LgsFile* file) : file(file) {
+    explicit SemaAnalyser(LgsFile* file) : LgsASTVisitor(file) {
         errHandler.filePath = file->absPath;
     }
     static void analyseFiles(LogosProject& project);
