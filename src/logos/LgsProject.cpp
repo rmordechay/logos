@@ -17,16 +17,6 @@
 
 extern char **environ;
 
-bool LogosProject::loadProject() {
-    if (!validateProject()) return false;
-    // setupActiveEnv();
-    if (!errHandler.successful) return false;
-    loadFiles();
-    if (!errors.empty()) return false;
-    if (!resolveGlobalTypes(files)) return false;
-    return errHandler.successful;
-}
-
 bool LogosProject::validateProject() {
     if (!is_directory(application.paths.rootDir) || !is_directory(application.paths.srcDir)) {
         errHandler.handleError(E10010, nullptr);
@@ -65,10 +55,12 @@ void LogosProject::parseSrcFile(path entry) {
     if (parser.getNumberOfSyntaxErrors() == 0) {
         const auto file = antlerConverter.getLogosFile(lgsFile, absFilePath);
         lock_guard lock(mtx);
-        files.emplace_back(file);
-        addErrors(antlerConverter.errHandler.errors);
+        files.push_back(file);
+        if (!antlerConverter.errHandler.successful) {
+            addErrors(antlerConverter.errHandler.errors);
+            errHandler.setUnsuccessful();
+        }
     } else {
-        lock_guard lock(mtx);
         errHandler.setUnsuccessful();
     }
 }
@@ -88,7 +80,7 @@ void LogosProject::parseEnvFile(path fileEntry) {
     addErrors(antlerConverter.errHandler.errors);
 }
 
-bool LogosProject::resolveGlobalTypes(const vector<LgsFile*>& files) const {
+bool LogosProject::resolveGlobalTypes() const {
     for (const auto& file : files) {
         SemaAnalyser semaAnalyser(file);
         if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
@@ -140,24 +132,42 @@ void LogosProject::parseAppFile(path fileEntry) {
     }
 }
 
+bool LogosProject::analyse() {
+    ThreadPool threadPool;
+    threadPool.start();
+    for (const auto file : files) {
+        threadPool.runTask([=, &file] {
+            SemaAnalyser semaAnalyser(file);
+            semaAnalyser.start();
+            if (!semaAnalyser.errHandler.successful) {
+                lock_guard lock(mtx);
+                addErrors(semaAnalyser.errHandler.errors);
+                errHandler.setUnsuccessful();
+            }
+        });
+    }
+    threadPool.wait();
+    reprocessFuncs();
+    return errHandler.successful;
+}
+
 void LogosProject::loadGlobals() {
     globals.addSymbol(lgsPrint.name, LgsSymbol(&lgsPrint), &errHandler);
     globals.addSymbol(lgsSizeof.name, LgsSymbol(&lgsSizeof), &errHandler);
 }
 
-void LogosProject::loadFiles() {
-    thread tSrcFiles([this] { loadSrcFiles(); });
+bool LogosProject::parseFiles() {
+    thread tSrcFiles([this] {
+        vector<LgsFile*> files;
+        ThreadPool threadPool;
+        threadPool.start();
+        parseSrcFiles(application.paths.srcDir, threadPool);
+        threadPool.wait();
+    });
     thread tGlobals([this] { loadGlobals(); });
     tSrcFiles.join();
     tGlobals.join();
-}
-
-void LogosProject::loadSrcFiles() {
-    vector<LgsFile*> files;
-    ThreadPool threadPool;
-    threadPool.start();
-    parseSrcFiles(application.paths.srcDir, threadPool);
-    threadPool.wait();
+    return resolveGlobalTypes();
 }
 
 void LogosProject::loadEnvFiles() {
@@ -229,6 +239,31 @@ void LogosProject::setupActiveEnv() {
     checkRequiredEnvVars();
 }
 
+void LogosProject::reprocessFuncs() const {
+    for (const auto& file : files) {
+        SemaAnalyser semaAnalyser(file);
+        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+            for (const auto& obj : mainFile->objects) {
+                for (const auto& [_, method] : obj->methods) {
+                    method->swapReturnIfNeeded();
+                }
+            }
+            for (const auto [_, func] : mainFile->funcs) {
+                func->swapReturnIfNeeded();
+            }
+        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+            const auto obj = objFile->obj;
+            for (const auto& [_, method] : obj->methods) {
+                method->swapReturnIfNeeded();
+            }
+        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+            for (const auto& [_, method] : interfaceFile->interface->methods) {
+                method->swapReturnIfNeeded();
+            }
+        }
+    }
+}
+
 void LogosProject::asJSON() const {
     return;
 }
@@ -238,6 +273,5 @@ bool LogosProject::isLogosFile(const directory_entry& entry) const {
 }
 
 void LogosProject::addErrors(vector<LgsError> newErrors) {
-    lock_guard lock(mtx);
-    errors.insert(errors.end(), newErrors.begin(), newErrors.end());
+    errHandler.errors.insert(errHandler.errors.end(), newErrors.begin(), newErrors.end());
 }

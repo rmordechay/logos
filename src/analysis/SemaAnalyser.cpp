@@ -38,23 +38,6 @@
 #include <stmts/LgsAssignment.h>
 #include <stmts/LgsIfStmt.h>
 
-void SemaAnalyser::analyseFiles(LogosProject& project) {
-    ThreadPool threadPool;
-    threadPool.start();
-    for (const auto file : project.files) {
-        threadPool.runTask([file, &project] {
-            SemaAnalyser semaAnalyser(file);
-            semaAnalyser.start();
-            const auto& errHandler = semaAnalyser.errHandler;
-            if (!errHandler.successful) {
-                project.addErrors(errHandler.errors);
-            }
-        });
-    }
-    threadPool.wait();
-    reprocessFuncs(project);
-}
-
 void SemaAnalyser::start() {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
         visitMainFile(mainFile);
@@ -916,29 +899,4 @@ string SemaAnalyser::getFuncsAsStr(const vector<LgsFunc*>& funcs) const {
         str << "\n\t     - " << func->funcType->prettyName();
     }
     return str.str();
-}
-
-void SemaAnalyser::reprocessFuncs(const LogosProject& project) {
-    for (const auto& file : project.files) {
-        SemaAnalyser semaAnalyser(file);
-        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
-            for (const auto& obj : mainFile->objects) {
-                for (const auto& [_, method] : obj->methods) {
-                    method->swapReturnIfNeeded();
-                }
-            }
-            for (const auto [_, func] : mainFile->funcs) {
-                func->swapReturnIfNeeded();
-            }
-        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-            const auto obj = objFile->obj;
-            for (const auto& [_, method] : obj->methods) {
-                method->swapReturnIfNeeded();
-            }
-        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            for (const auto& [_, method] : interfaceFile->interface->methods) {
-                method->swapReturnIfNeeded();
-            }
-        }
-    }
 }

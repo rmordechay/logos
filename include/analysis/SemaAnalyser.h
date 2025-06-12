@@ -46,8 +46,6 @@ public:
     explicit SemaAnalyser(LgsFile* file) : LgsASTVisitor(file) {
         errHandler.filePath = file->absPath;
     }
-    static void analyseFiles(LogosProject& project);
-    static void reprocessFuncs(const LogosProject& project);
     void start() override;
     void visitMainFile(LgsMainFile* mainFile) override;
     void visitObject(LgsObject* obj) override;

@@ -6,16 +6,18 @@
 #include "logos/Platform.h"
 
 void Logos::run() {
-    // Load project and parse files
-    if (!project.loadProject()) exit(1);
+    // Validation
+    if (!project.validateProject()) exit(1);
+
+    // Lexing and Parsing
+    if (!project.parseFiles()) exit(1);
 
     // Semantic analysis
-    SemaAnalyser::analyseFiles(project);
-    if (!project.errors.empty()) exit(1);
+    if (!project.analyse()) exit(1);
 
     // Code generation
     CodeGenerator::generate(project);
-    if (!project.errors.empty()) exit(1);
+    if (!project.errHandler.successful) exit(1);
 
     // Linking
     const LgsLinker linker;

@@ -23,18 +23,16 @@ public:
     string version;
     vector<LgsFile*> files;
     LgsActiveEnv activeEnv;
-    vector<LgsError> errors;
     LgsErrHandler errHandler;
     vector<LgsEnvFile*> envFiles;
     map<string, Module*> IRModules;
     const LgsAppFile* appFile = nullptr;
 
     void asJSON() const;
-    bool loadProject();
-    void loadFiles();
+    bool parseFiles();
     void setEnvVars();
+    void reprocessFuncs() const;
     void loadGlobals();
-    void loadSrcFiles();
     void loadEnvFiles();
     void setupActiveEnv();
     bool validateProject();
@@ -42,7 +40,8 @@ public:
     void parseSrcFile(path entry);
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
-    bool resolveGlobalTypes(const vector<LgsFile*>& files) const;
+    bool analyse();
+    bool resolveGlobalTypes() const;
     void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
     void checkDuplicateFiles(const vector<LgsFile*>& files);
     void checkRequiredEnvVars();
