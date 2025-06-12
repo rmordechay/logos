@@ -8,7 +8,7 @@ class LgsPrint final : public LgsBuiltinFunc {
 public:
     static constexpr auto name = "print";
 
-    explicit LgsPrint(): LgsBuiltinFunc(name, &LGS_VOID, "", {&LGS_ANY, &LGS_ANY}, VARIADIC) {
+    explicit LgsPrint(): LgsBuiltinFunc(name, &LGS_VOID, "", {&LGS_ANY, &LGS_ANY}, true, true) {
         funcType->IRName = "printf";
     }
 

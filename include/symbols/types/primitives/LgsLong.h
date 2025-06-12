@@ -7,8 +7,8 @@ public:
     static constexpr auto name = "Long";
 
     LgsLong() {
-        setFlag(PRIMITIVE);
-        setFlag(INT);
+        isPrimitive = true;
+        isInt = true;
     }
     Type* getIRType() override;
     LgsExpr* getZeroValue() override;

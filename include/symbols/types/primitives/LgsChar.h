@@ -6,7 +6,7 @@ public:
     static constexpr auto name = "Char";
 
     LgsChar() {
-        setFlag(PRIMITIVE);
+        isPrimitive = true;
     }
     string prettyName() const override;
     size_t getSizeBytes() override;

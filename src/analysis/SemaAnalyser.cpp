@@ -306,7 +306,7 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
         visitExpr(returnStmt->expr);
     }
     const auto rt = funcType->rt;
-    if (rt->hasFlag(VOID) && returnStmt->expr) {
+    if (rt->isVoid && returnStmt->expr) {
         errHandler.handleError(E10027, &returnStmt->location, {returnStmt->expr->type->prettyName()});
     } else if (!returnStmt->expr) {
         errHandler.handleError(E10026, &returnStmt->location, {funcType->name, rt->prettyName()});
@@ -574,7 +574,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
 }
 
 void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType) {
-    assert(funcType->hasFlag(ANONYMOUS));
+    assert(funcType->isAnonymous);
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
     }
@@ -608,7 +608,7 @@ void SemaAnalyser::visitGroup(LgsGroup* group) const {
         for (const auto type : group->types) {
             const auto method = type->getMethod(targetSymbol->name);
             if (!method) continue;
-            method->funcType->setFlag(VIRTUAL);
+            method->funcType->isVirtual = true;
             group->addMethod(method);
         }
     }
@@ -666,7 +666,7 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
 void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
     const auto method = methodCall->func;
     if (!method) return;
-    if (!method->funcType->hasFlag(PUBLIC) && file->absPath != method->filePath) {
+    if (!method->funcType->isPublic && file->absPath != method->filePath) {
         errHandler.handleError(E10031, &method->location, {method->funcType->name, method->funcType->parentName});
     }
 }
@@ -680,7 +680,7 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
             return;
         }
         // type must be nullable
-        if (!type->hasFlag(NULLABLE)) {
+        if (!type->isNullable) {
             errHandler.handleError(E10023, &type->location, {type->prettyName(), type->prettyName()});
         }
         return;
@@ -697,7 +697,7 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
 }
 
 void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
-    if (func->funcType->rt->hasFlag(VOID)) return;
+    if (func->funcType->rt->isVoid) return;
     const auto stmtBlock = func->stmtBlock;
     const bool isFlowCorrect = func->funcType->name != LOGOS_MAIN_FUNC && !stmtBlock->hasReturn;
     if (isFlowCorrect) {
@@ -828,26 +828,26 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     LgsType* newType = nullptr;
     switch (symbol->symbolType) {
     case ENUM_FIELD:
-        symbol->enumField->parent->setFlag(NULLABLE);
+        symbol->enumField->parent->isNullable = true;
         newType = symbol->enumField->parent;
         break;
     case FUNC:
         newType = symbol->func->funcType;
         break;
     case OBJECT:
-        symbol->object->setFlag(NULLABLE);
+        symbol->object->isNullable = true;
         newType = symbol->object;
         break;
     case INTERFACE:
-        symbol->interface->setFlag(NULLABLE);
+        symbol->interface->isNullable = true;
         newType = symbol->interface;
         break;
     case GROUP:
-        symbol->group->setFlag(NULLABLE);
+        symbol->group->isNullable = true;
         newType = symbol->group;
         break;
     case ENUM:
-        symbol->lgsEnum->setFlag(NULLABLE);
+        symbol->lgsEnum->isNullable = true;
         newType = symbol->lgsEnum;
         break;
     case VAR_DEC:
@@ -891,8 +891,8 @@ void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
         funcType->params[i].type = resolveType(funcType->params[i].type);
     }
     funcType->rt = resolveType(funcType->rt);
-    if (!funcType->rt->hasFlag(VOID) && funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD) {
-        funcType->setFlag(BIG_TYPE);
+    if (!funcType->rt->isVoid && funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD) {
+        funcType->isBigType = true;
     }
 }
 

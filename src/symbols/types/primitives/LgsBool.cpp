@@ -15,7 +15,7 @@ string LgsBool::getIRName() {
 }
 
 LgsExpr* LgsBool::getZeroValue() {
-    if (hasFlag(NULLABLE)) return new LgsNull();
+    if (isNullable) return new LgsNull();
     return new LgsBoolConst(false);
 }
 
@@ -24,7 +24,7 @@ LgsType* LgsBool::inferBinaryType(LgsType* other) {
 }
 
 bool LgsBool::equals(LgsType* other) {
-    if (hasFlag(NULLABLE)) {
+    if (isNullable) {
         return name == other->getIRName();
     }
     return name == other->getIRName();

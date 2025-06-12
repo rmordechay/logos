@@ -9,6 +9,14 @@ public:
     string parentName;
     LgsType* rt = nullptr;
     vector<LgsParam> params;
+    bool isMethod = false;
+    bool isStatic = false;
+    bool isPublic = false;
+    bool isVirtual = false;
+    bool isVariadic = false;
+    bool isAnonymous = false;
+    bool isSwapReturn = false;
+    bool hasDefaults = false;
     int returnParamIndex = -1;
     FunctionType* IRType = nullptr;
 

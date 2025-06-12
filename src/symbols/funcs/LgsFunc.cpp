@@ -9,7 +9,7 @@ void LgsFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.enterFunc(this);
     startBlockFunc(runtime);
     stmtBlock->createIRValue(runtime);
-    if (funcType->rt->hasFlag(VOID)) {
+    if (funcType->rt->isVoid) {
         runtime->freeExprs();
         if (!runtime->builder.GetInsertBlock()->getTerminator()) {
             runtime->builder.CreateRetVoid();
@@ -33,7 +33,7 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
     const auto funcTy = dyn_cast<FunctionType>(IRFuncType);
     auto func = runtime->module->getOrInsertFunction(funcIRName, funcTy);
     IRFunc = dyn_cast<Function>(func.getCallee());
-    if (funcType->hasFlag(SWAP_RETURN)) {
+    if (funcType->isSwapReturn) {
         setBigObjAttrs(*IRFunc);
     }
     if (funcType->params.empty()) return IRFunc;
@@ -48,9 +48,9 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
 
 Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
-    if (funcType->hasFlag(HAS_DEFAULTS)) assert(0);
-    if (funcType->hasFlag(VARIADIC)) assert(0);
-    for (int i = funcType->hasFlag(STATIC); i < args.size(); ++i) {
+    if (funcType->hasDefaults) assert(0);
+    if (funcType->isVariadic) assert(0);
+    for (int i = funcType->isStatic; i < args.size(); ++i) {
         const auto arg = args[i];
         const auto argType = arg->type->getIRType();
         const auto argValue = arg->getIRValue(runtime);
@@ -66,7 +66,7 @@ Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
         return runtime->builder.CreateCall(IRFuncType, IRValue, args);
     }
     const auto IRFunc = getIRFunc(runtime);
-    if (funcType->hasFlag(SWAP_RETURN)) {
+    if (funcType->isSwapReturn) {
         const auto paramIRType = getReturnSwapParam().type->getIRType();
         const auto rv = runtime->builder.CreateAlloca(paramIRType);
         vector finalArgs(args.begin(), args.end());
@@ -116,7 +116,7 @@ bool LgsFunc::shouldLoadIRArg(Value* value) {
 }
 
 LgsParam LgsFunc::getReturnSwapParam() const {
-    if (!funcType->hasFlag(SWAP_RETURN)) assert(0);
+    if (!funcType->isSwapReturn) assert(0);
     if (funcType->returnParamIndex > funcType->params.size()) assert(0);
     return funcType->params[funcType->returnParamIndex];
 }
@@ -131,9 +131,9 @@ void LgsFunc::swapReturnIfNeeded() const {
             break;
         }
     }
-    if (funcType->hasFlag(BIG_TYPE) && isEqual) {
-        funcType->setFlag(SWAP_RETURN);
-        funcType->returnParamIndex = funcType->hasFlag(METHOD) && !funcType->hasFlag(STATIC);
+    if (funcType->isBigType && isEqual) {
+        funcType->isSwapReturn = true;
+        funcType->returnParamIndex = funcType->isMethod && !funcType->isStatic;
         funcType->params.insert(funcType->params.begin(), LgsParam(funcType->rt));
         funcType->rt = &LGS_VOID;
     }

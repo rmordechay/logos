@@ -9,7 +9,7 @@ public:
     vector<LgsExpr*> templateParts;
 
     explicit LgsStrConst(const string& value) : value(value) {
-        strType->setFlag(CONST);
+        strType->isConst = true;
         strType->isStatic = true;
         strType->sizeExpr = new LgsIntConst(value.size());
         type = strType;

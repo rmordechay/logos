@@ -7,7 +7,7 @@ void LgsReturn::createIRStmt(LgsRuntime* runtime) {
     if (expr) {
         const auto exprIR = expr->getIRValue(runtime);
         runtime->freeExprs();
-        if (!currentFunc->funcType->hasFlag(SWAP_RETURN)) {
+        if (!currentFunc->funcType->isSwapReturn) {
             runtime->builder.CreateRet(exprIR);
         } else {
             runtime->builder.CreateRetVoid();

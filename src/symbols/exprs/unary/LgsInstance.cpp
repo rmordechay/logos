@@ -46,7 +46,7 @@ string LgsInstance::prettyName() {
 
 void LgsInstance::setReturnExpr(LgsRuntime* runtime, Type* objIRType) {
     const auto currentFunc = runtime->stack.currentFunc;
-    if (currentFunc->funcType->hasFlag(SWAP_RETURN)) {
+    if (currentFunc->funcType->isSwapReturn) {
         IRValue = currentFunc->getReturnSwapParam().IRValue;
     } else {
         IRValue = runtime->builder.CreateMalloc(

@@ -19,7 +19,7 @@ string LgsShort::getIRName() {
 }
 
 LgsExpr* LgsShort::getZeroValue() {
-    if (hasFlag(NULLABLE)) return new LgsNull();
+    if (isNullable) return new LgsNull();
     return new LgsShortConst(0);
 }
 

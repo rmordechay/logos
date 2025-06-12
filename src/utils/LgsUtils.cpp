@@ -25,7 +25,7 @@ string removeUnderscores(const string& input) {
 }
 
 void freeType(const LgsType* type) {
-    if (type->hasFlag(PRIMITIVE)) return;
+    if (type->isPrimitive) return;
     delete type;
 }
 

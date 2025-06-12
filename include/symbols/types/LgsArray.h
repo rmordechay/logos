@@ -8,7 +8,7 @@
 
 class LgsArrayAddFunc final : public LgsBuiltinFunc {
 public:
-    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName(), {parent, &LGS_ANY}, PUBLIC | VARIADIC) {}
+    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName(), {parent, &LGS_ANY}, true, true) {}
     Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override;
     ~LgsArrayAddFunc() override = default;
 };
@@ -19,10 +19,10 @@ public:
 
     StructType* arrStruct = nullptr;
     LgsArrayAddFunc addFunc{this};
-    LgsBuiltinFunc lenFunc{"len", &LGS_LONG, name, {this}, PUBLIC};
-    LgsBuiltinFunc getFunc{"get", &LGS_ANY, name, {this, &LGS_LONG}, PUBLIC};
-    LgsBuiltinFunc isEmptyFunc{"isEmpty", &LGS_BOOL, name, {this}, PUBLIC};
-    LgsBuiltinFunc isNotEmptyFunc{"isNotEmpty", &LGS_BOOL, name, {this}, PUBLIC};
+    LgsBuiltinFunc lenFunc{"len", &LGS_LONG, name, {this}, true};
+    LgsBuiltinFunc getFunc{"get", &LGS_ANY, name, {this, &LGS_LONG}, true};
+    LgsBuiltinFunc isEmptyFunc{"isEmpty", &LGS_BOOL, name, {this}, true};
+    LgsBuiltinFunc isNotEmptyFunc{"isNotEmpty", &LGS_BOOL, name, {this}, true};
     LgsBuiltinFunc initFunc{"init", &LGS_VOID, name, {this, &LGS_LONG, &LGS_LONG}};
     LgsBuiltinFunc putFunc{"put", &LGS_VOID, name, {this, &LGS_LONG, &LGS_ANY}};
     LgsBuiltinFunc deleteFunc{"delete", &LGS_VOID, name, {this, &LGS_LONG}};

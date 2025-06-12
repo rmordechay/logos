@@ -6,7 +6,7 @@ class LgsCharConst final : public LgsUnaryExpr {
 public:
     char value;
     explicit LgsCharConst(const char value) : LgsUnaryExpr(&LGS_CHAR), value(value) {
-        type->setFlag(CONST);
+        type->isConst = true;
     }
     Value* createIRValue(LgsRuntime* runtime) override;
 };

@@ -87,7 +87,7 @@ LgsSymbolTable::~LgsSymbolTable() {
         case OBJECT: delete symbol.object; break;
         case INTERFACE: delete symbol.interface; break;
         case FUNC: {
-            if (!symbol.func->type->hasFlag(BUILTIN)) {
+            if (!symbol.func->type->isBuiltin) {
                 delete symbol.func;
             }
             break;

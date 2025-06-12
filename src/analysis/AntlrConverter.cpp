@@ -206,7 +206,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
         const auto type = getFuncReturnType(funcSignature->type());
         const auto func = new LgsFunc(funcSignature->VARIABLE()->getText(), type);
         func->funcType->parentName = interfaceName;
-        func->funcType->setFlag(METHOD);
+        func->funcType->isMethod = true;
         func->funcType->params.push_back(self);
         setParams(func->funcType, funcSignature->param());
         func->filePath = filePath;
@@ -273,12 +273,12 @@ LgsFunc* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext
     self.isSelf = true;
     const auto method = new LgsFunc(nameToken->getText(), rt);
     method->filePath = obj->path;
-    method->funcType->setFlag(METHOD);
+    method->funcType->isMethod = true;
     method->funcType->parentName = obj->name;
     method->funcType->params.emplace_back(self);
     setParams(method->funcType, funcSignature->param());
     if (ctx->VISIBILITY()) {
-        method->funcType->setFlag(PUBLIC);
+        method->funcType->isPublic = true;
     }
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     method->setLocation(nameToken->getSymbol());
@@ -289,7 +289,7 @@ LgsFunc* AntlerConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ct
     const auto rt = getFuncReturnType(ctx->anonnymosfuncSignature()->type());
     const auto funcSignature = ctx->anonnymosfuncSignature();
     const auto func = new LgsFunc("", rt);
-    func->funcType->setFlag(ANONYMOUS);
+    func->funcType->isAnonymous = true;
     setParams(func->funcType, funcSignature->param());
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     func->setLocation(funcSignature->LPAREN()->getSymbol());
@@ -311,7 +311,7 @@ void AntlerConverter::setParams(LgsFuncType* funcType, const vector<LogosParser:
             funcType->params.emplace_back(lgsParam);
         }
     }
-    if (funcType->hasFlag(VARIADIC) && funcType->hasFlag(HAS_DEFAULTS)) {
+    if (funcType->isVariadic && funcType->hasDefaults) {
         errHandler.handleError(E10043, &funcType->location);
     }
 }
@@ -323,9 +323,9 @@ LgsParam AntlerConverter::getParam(LgsFuncType* funcType, LogosParser::ParamCont
     if (param->TRIPLE_DOT()) {
         if (lgsParam.expr) errHandler.handleError(E10045, &lgsParam.location);
         lgsParam.isVariadic = true;
-        funcType->setFlag(VARIADIC);
+        funcType->isVariadic = true;
     } else if (lgsParam.expr) {
-        funcType->setFlag(HAS_DEFAULTS);
+        funcType->hasDefaults = true;
     }
     lgsParam.setLocation(param->start);
     return lgsParam;
@@ -556,7 +556,7 @@ LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx, const bool isNu
     }
     if (isNullable) {
         assert(expr && expr->type);
-        expr->type->setFlag(NULLABLE);
+        expr->type->isNullable = true;
     }
     return expr;
 }
@@ -828,7 +828,7 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
     } else {
         result = getTypeFromText(ctx->TYPE());
         if (ctx->QUEST_MARK()) {
-            result->setFlag(NULLABLE);
+            result->isNullable = true;
         }
     }
     result->setLocation(ctx->start);

@@ -3,12 +3,13 @@
 
 class LgsBuiltinFunc : public LgsFunc {
 public:
-    LgsBuiltinFunc(const string& name, LgsType* rt, const string& parentName, const vector<LgsType*>& paramsTypes, const uint16_t flags = 0): LgsFunc(name, rt) {
-        funcType->flags = flags;
-        funcType->setFlag(BUILTIN);
+    LgsBuiltinFunc(const string& name, LgsType* rt, const string& parentName, const vector<LgsType*>& paramsTypes, bool isPublic = false, bool isVariadic = false): LgsFunc(name, rt) {
+        funcType->isBuiltin = true;
+        funcType->isPublic = isPublic;
+        funcType->isVariadic = isVariadic;
         if (parentName != "") {
             funcType->parentName = parentName;
-            funcType->setFlag(METHOD);
+            funcType->isMethod = true;
         }
         for (const auto paramsType : paramsTypes) {
             funcType->params.emplace_back(LgsParam(paramsType));

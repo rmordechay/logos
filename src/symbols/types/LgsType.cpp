@@ -47,14 +47,6 @@ LgsType::~LgsType() {
     if (vtable) delete vtable;
 }
 
-bool LgsType::hasFlag(const LgsTypeOpts opt) const {
-    return flags & opt;
-}
-
-void LgsType::setFlag(const LgsTypeOpts opt) {
-    flags |= opt;
-}
-
 size_t LgsType::getSizeBytes() { assert(0); }
 void LgsType::castImplicitly(LgsType& toType) { }
 json LgsType::asJSON() const { assert(0); }

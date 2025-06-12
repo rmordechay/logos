@@ -14,7 +14,6 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsField.h"
-#include "stmts/LgsVarDec.h"
 
 Value* LgsExpr::getIRValue(LgsRuntime* runtime) {
     if (IRValue) return IRValue;

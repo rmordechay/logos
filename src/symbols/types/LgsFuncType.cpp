@@ -19,9 +19,9 @@ bool LgsFuncType::equals(LgsType* other) {
 string LgsFuncType::getIRName() {
     if (IRName != "") return IRName;
     stringstream strStream;
-    if (hasFlag(METHOD)) {
+    if (isMethod) {
         strStream << parentName << "_";
-    } else if (this->hasFlag(ANONYMOUS)) {
+    } else if (this->isAnonymous) {
         strStream << "Anonymous";
     }
     strStream << name;
@@ -32,7 +32,7 @@ string LgsFuncType::getIRName() {
 Type* LgsFuncType::getIRType() {
     if (IRType) return IRType;
     Type* returnType;
-    if (hasFlag(BIG_TYPE) && !hasFlag(SWAP_RETURN)) {
+    if (isBigType && !isSwapReturn) {
         returnType = PointerType::getUnqual(context);
     } else {
         returnType = rt->getIRType();
@@ -41,14 +41,14 @@ Type* LgsFuncType::getIRType() {
     for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
-        if (!paramType->hasFlag(PRIMITIVE) || param.isSelf) {
+        if (!paramType->isPrimitive || param.isSelf) {
             IRParamsTypes.emplace_back(PointerType::getUnqual(context));
         } else {
             auto irType = paramType->getIRType();
             IRParamsTypes.emplace_back(irType);
         }
     }
-    IRType = FunctionType::get(returnType, IRParamsTypes, this->hasFlag(VARIADIC));
+    IRType = FunctionType::get(returnType, IRParamsTypes, this->isVariadic);
     return IRType;
 }
 
@@ -80,7 +80,6 @@ LgsType* LgsFuncType::clone() {
     newFuncType->name = this->name;
     newFuncType->parentName = this->parentName;
     newFuncType->rt = this->rt->clone();
-    newFuncType->flags = flags;
     for (auto& param : this->params) {
         newFuncType->params.push_back(param);
     }

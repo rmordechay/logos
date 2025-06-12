@@ -21,29 +21,16 @@ class LgsFuncCall;
 class LgsField;
 class LgsFunc;
 
-enum LgsTypeOpts : uint16_t {
-    BIG_TYPE = 1 << 0,
-    VOID = 1 << 1,
-    CONST = 1 << 2,
-    INT = 1 << 3,
-    NULLABLE = 1 << 4,
-    PRIMITIVE = 1 << 5,
-    BUILTIN = 1 << 6,
-    // Func opts
-    METHOD = 1 << 8,
-    STATIC = 1 << 9,
-    PUBLIC = 1 << 10,
-    VIRTUAL = 1 << 11,
-    VARIADIC = 1 << 12,
-    ANONYMOUS = 1 << 13,
-    SWAP_RETURN = 1 << 14,
-    HAS_DEFAULTS = 1 << 15,
-};
-
 class LgsType {
 public:
     Location location;
-    uint32_t flags = 0;
+    bool isBigType = false;
+    bool isVoid = false;
+    bool isConst = false;
+    bool isInt = false;
+    bool isNullable = false;
+    bool isPrimitive = false;
+    bool isBuiltin = false;
     Type* IRType = nullptr;
     LgsHashMap* vtable = nullptr;
     map<string, LgsField*> fields;
@@ -54,8 +41,6 @@ public:
     void addMethod(LgsFunc* method);
     LgsFunc* findMethod(const string& name) const;
     void setLocation(const Token* ctx);
-    bool hasFlag(LgsTypeOpts opt) const;
-    void setFlag(LgsTypeOpts opt);
 
     LgsBool* asBool();
     LgsStr* asStr();
