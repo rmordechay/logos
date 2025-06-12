@@ -47,7 +47,7 @@ void LgsInstance::setZeroFields(LgsRuntime* runtime, LgsObject* object, Value* p
 
 void LgsInstance::setReturnExpr(LgsRuntime* runtime, Type* objIRType) {
     const auto currentFunc = runtime->stack.currentFunc;
-    if (currentFunc->funcType->is(SWAP_RETURN)) {
+    if (currentFunc->funcType->hasFlag(SWAP_RETURN)) {
         IRValue = currentFunc->getReturnSwapParam().IRValue;
     } else {
         IRValue = runtime->builder.CreateMalloc(

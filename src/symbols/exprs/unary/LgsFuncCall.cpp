@@ -9,7 +9,7 @@
 Value* LgsFuncCall::call(LgsRuntime* runtime) const {
     if (callback) {
         func->setIRValue(getCallback(runtime));
-    } else if (func->funcType->is(VIRTUAL)) {
+    } else if (func->funcType->hasFlag(VIRTUAL)) {
         resolveVirtualFunc(runtime);
     }
     return func->call(runtime, args);
@@ -38,9 +38,9 @@ void LgsFuncCall::createIRStmt(LgsRuntime* runtime) {
 }
 
 bool LgsFuncCall::equals(const LgsFuncType* other) const {
-    if (other->is(HAS_DEFAULTS)) return equalsDefaultParams(other);
-    if (other->is(VARIADIC)) return equalsVariadic(other);
-    if (!other->is(ANONYMOUS) && name != other->name) return false;
+    if (other->hasFlag(HAS_DEFAULTS)) return equalsDefaultParams(other);
+    if (other->hasFlag(VARIADIC)) return equalsVariadic(other);
+    if (!other->hasFlag(ANONYMOUS) && name != other->name) return false;
     if (other->params.size() != args.size()) return false;
     if (other->params.size() == 0 && args.size() == 0) return true;
     for (size_t i = 0; i < other->params.size(); ++i) {
@@ -53,7 +53,7 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
 
 bool LgsFuncCall::equalsDefaultParams(const LgsFuncType* funcType) const {
     const auto argsSize = args.size();
-    for (size_t i = funcType->is(METHOD); i < funcType->params.size(); ++i) {
+    for (size_t i = funcType->hasFlag(METHOD); i < funcType->params.size(); ++i) {
         const auto param = funcType->params[i];
         if (i >= argsSize) continue;
         const auto arg = args[i];

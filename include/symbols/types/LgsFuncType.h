@@ -2,7 +2,7 @@
 #include "LgsType.h"
 #include "funcs/LgsParam.h"
 
-enum Flags : uint16_t {
+enum LgsFuncOpts : uint16_t {
     METHOD = 1 << 0,
     STATIC = 1 << 1,
     PUBLIC = 1 << 2,
@@ -31,8 +31,7 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) override;
     LgsType* clone() override;
-    bool is(Flags f) const;
-    void setFlag(Flags f);
-    void clearFlag(Flags f);
+    bool hasFlag(LgsFuncOpts f) const;
+    void setFlag(LgsFuncOpts f);
     ~LgsFuncType() override = default;
 };

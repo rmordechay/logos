@@ -19,9 +19,9 @@ bool LgsFuncType::equals(LgsType* other) {
 string LgsFuncType::getIRName() {
     if (IRName != "") return IRName;
     stringstream strStream;
-    if (is(METHOD)) {
+    if (hasFlag(METHOD)) {
         strStream << parentName << "_";
-    } else if (this->is(ANONYMOUS)) {
+    } else if (this->hasFlag(ANONYMOUS)) {
         strStream << "Anonymous";
     }
     strStream << name;
@@ -32,7 +32,7 @@ string LgsFuncType::getIRName() {
 Type* LgsFuncType::getIRType() {
     if (IRType) return IRType;
     Type* returnType;
-    if (this->isBig && !is(SWAP_RETURN)) {
+    if (this->isBig && !hasFlag(SWAP_RETURN)) {
         returnType = PointerType::getUnqual(context);
     } else {
         returnType = rt->getIRType();
@@ -48,7 +48,7 @@ Type* LgsFuncType::getIRType() {
             IRParamsTypes.emplace_back(irType);
         }
     }
-    IRType = FunctionType::get(returnType, IRParamsTypes, this->is(VARIADIC));
+    IRType = FunctionType::get(returnType, IRParamsTypes, this->hasFlag(VARIADIC));
     return IRType;
 }
 
@@ -87,14 +87,10 @@ LgsType* LgsFuncType::clone() {
     return newFuncType;
 }
 
-bool LgsFuncType::is(const Flags f) const {
+bool LgsFuncType::hasFlag(const LgsFuncOpts f) const {
     return flags & f;
 }
 
-void LgsFuncType::setFlag(const Flags f) {
+void LgsFuncType::setFlag(const LgsFuncOpts f) {
     flags |= f;
-}
-
-void LgsFuncType::clearFlag(const Flags f) {
-    flags &= ~f;
 }

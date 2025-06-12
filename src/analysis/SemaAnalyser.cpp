@@ -609,7 +609,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
 }
 
 void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType) {
-    assert(funcType->is(ANONYMOUS));
+    assert(funcType->hasFlag(ANONYMOUS));
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
     }
@@ -702,7 +702,7 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
 void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
     const auto method = methodCall->func;
     if (!method) return;
-    if (!method->funcType->is(PUBLIC) && file->absPath != method->filePath) {
+    if (!method->funcType->hasFlag(PUBLIC) && file->absPath != method->filePath) {
         errHandler.handleError(E10031, &method->location, {method->funcType->name, method->funcType->parentName});
     }
 }

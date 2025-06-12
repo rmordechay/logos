@@ -310,7 +310,7 @@ void AntlerConverter::setParams(LgsFuncType* funcType, const vector<LogosParser:
             funcType->params.emplace_back(lgsParam);
         }
     }
-    if (funcType->is(VARIADIC) && funcType->is(HAS_DEFAULTS)) {
+    if (funcType->hasFlag(VARIADIC) && funcType->hasFlag(HAS_DEFAULTS)) {
         errHandler.handleError(E10043, &funcType->location);
     }
 }

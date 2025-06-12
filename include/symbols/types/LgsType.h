@@ -20,6 +20,16 @@ class LgsFuncCall;
 class LgsField;
 class LgsFunc;
 
+enum LgsTypeOpts : uint16_t {
+    BIG_TYPE = 1 << 0,
+    VOID = 1 << 1,
+    CONST = 1 << 2,
+    INT = 1 << 3,
+    NULLABLE = 1 << 4,
+    PRIMITIVE = 1 << 5,
+    BUILTIN = 1 << 6,
+};
+
 class LgsType {
 public:
     Location location;
@@ -40,6 +50,8 @@ public:
     void addMethod(LgsFunc* method);
     LgsFunc* findMethod(const string& name) const;
     void setLocation(const Token* ctx);
+    bool hasFlag(LgsTypeOpts f) const;
+    void setFlag(LgsTypeOpts f);
 
     LgsBool* asBool();
     LgsStr* asStr();
