@@ -15,17 +15,19 @@ public:
     T__0 = 1, T__1 = 2, T__2 = 3, DOUBLE_EQUAL = 4, NOT_EQUAL = 5, GE = 6, 
     LE = 7, LPAREN = 8, RPAREN = 9, LBRACE = 10, RBRACE = 11, LBRACK = 12, 
     RBRACK = 13, ARROW = 14, LANGLE = 15, RANGLE = 16, COMMA = 17, TRIPLE_DOT = 18, 
-    DOUBLE_DOT = 19, WALRUS = 20, EQUAL_ADD = 21, EQUAL_SUB = 22, EQUAL_MUL = 23, 
-    EQUAL_DIV = 24, INC = 25, DEC = 26, DOT = 27, COLON = 28, EQUAL = 29, 
-    MINUS = 30, PLUS = 31, STAR = 32, SLASH = 33, HASH = 34, QUEST_MARK = 35, 
-    EXCLA_MARK = 36, PERCENT = 37, DOLLAR = 38, AMPERSAND = 39, PIPE = 40, 
-    CARET = 41, DOUBLE_RANGLE = 42, DOUBLE_LANGLE = 43, OBJECT = 44, SINGLETON = 45, 
-    SELF_INSTANCE = 46, SELF_CLASS = 47, INTERFACE = 48, ENUM = 49, VEC2 = 50, 
-    VEC3 = 51, VEC4 = 52, IMPLEMENTS = 53, EXTERN = 54, IF = 55, ELSE = 56, 
-    FOR = 57, BREAK = 58, CONTINUE = 59, RETURN = 60, VISIBILITY = 61, CONST = 62, 
-    AND = 63, OR = 64, NOT = 65, IN = 66, INTEGER = 67, FLOAT = 68, BOOL = 69, 
-    NULL_ = 70, CONST_NAME = 71, TYPE = 72, VARIABLE = 73, STRING = 74, 
-    TAG = 75, LINE_COMMENT = 76, BLOCK_COMMENT = 77, WS = 78
+    DOUBLE_DOT = 19, WALRUS = 20, EQUAL_PLUS = 21, EQUAL_MINUS = 22, EQUAL_STAR = 23, 
+    EQUAL_SLASH = 24, EQUAL_PERCENT = 25, EQUAL_AMPERSAND = 26, EQUAL_PIPE = 27, 
+    EQUAL_CARET = 28, EQUAL_DOUBLE_RANGLE = 29, EQUAL_DOUBLE_LANGLE = 30, 
+    INC = 31, DEC = 32, DOT = 33, COLON = 34, EQUAL = 35, PLUS = 36, MINUS = 37, 
+    STAR = 38, SLASH = 39, HASH = 40, QUEST_MARK = 41, EXCLA_MARK = 42, 
+    PERCENT = 43, DOLLAR = 44, AMPERSAND = 45, PIPE = 46, CARET = 47, DOUBLE_RANGLE = 48, 
+    DOUBLE_LANGLE = 49, OBJECT = 50, SINGLETON = 51, SELF_INSTANCE = 52, 
+    SELF_CLASS = 53, INTERFACE = 54, ENUM = 55, VEC2 = 56, VEC3 = 57, VEC4 = 58, 
+    IMPLEMENTS = 59, EXTERN = 60, IF = 61, ELSE = 62, FOR = 63, BREAK = 64, 
+    CONTINUE = 65, RETURN = 66, VISIBILITY = 67, CONST = 68, AND = 69, OR = 70, 
+    NOT = 71, IN = 72, INTEGER = 73, FLOAT = 74, BOOL = 75, NULL_ = 76, 
+    CONST_NAME = 77, TYPE = 78, VARIABLE = 79, STRING = 80, TAG = 81, LINE_COMMENT = 82, 
+    BLOCK_COMMENT = 83, WS = 84
   };
 
   enum {
@@ -550,10 +552,16 @@ public:
     virtual size_t getRuleIndex() const override;
     ExprContext *expr();
     antlr4::tree::TerminalNode *WALRUS();
-    antlr4::tree::TerminalNode *EQUAL_ADD();
-    antlr4::tree::TerminalNode *EQUAL_SUB();
-    antlr4::tree::TerminalNode *EQUAL_MUL();
-    antlr4::tree::TerminalNode *EQUAL_DIV();
+    antlr4::tree::TerminalNode *EQUAL_PLUS();
+    antlr4::tree::TerminalNode *EQUAL_MINUS();
+    antlr4::tree::TerminalNode *EQUAL_STAR();
+    antlr4::tree::TerminalNode *EQUAL_SLASH();
+    antlr4::tree::TerminalNode *EQUAL_PERCENT();
+    antlr4::tree::TerminalNode *EQUAL_AMPERSAND();
+    antlr4::tree::TerminalNode *EQUAL_PIPE();
+    antlr4::tree::TerminalNode *EQUAL_CARET();
+    antlr4::tree::TerminalNode *EQUAL_DOUBLE_RANGLE();
+    antlr4::tree::TerminalNode *EQUAL_DOUBLE_LANGLE();
     antlr4::tree::TerminalNode *VARIABLE();
     IterIndexContext *iterIndex();
     SelectionContext *selection();

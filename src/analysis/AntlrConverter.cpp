@@ -910,10 +910,16 @@ void AntlerConverter::cleanStr(string& value) const {
 
 LgsAssignType AntlerConverter::mapAssignType(LogosParser::AssignmentContext* assignment) const {
     if (assignment->WALRUS()) return ASSIGN;
-    if (assignment->EQUAL_ADD()) return ASSIGN_ADD;
-    if (assignment->EQUAL_SUB()) return ASSIGN_SUB;
-    if (assignment->EQUAL_MUL()) return ASSIGN_MUL;
-    if (assignment->EQUAL_DIV()) return ASSIGN_DIV;
+    if (assignment->EQUAL_PLUS()) return ASSIGN_ADD;
+    if (assignment->EQUAL_MINUS()) return ASSIGN_SUB;
+    if (assignment->EQUAL_STAR()) return ASSIGN_MUL;
+    if (assignment->EQUAL_SLASH()) return ASSIGN_DIV;
+    if (assignment->EQUAL_PERCENT()) return ASSIGN_MOD;
+    if (assignment->EQUAL_DOUBLE_LANGLE()) return ASSIGN_LSHIFT;
+    if (assignment->EQUAL_DOUBLE_RANGLE()) return ASSIGN_RSHIFT;
+    if (assignment->EQUAL_AMPERSAND()) return ASSIGN_AND;
+    if (assignment->EQUAL_PIPE()) return ASSIGN_OR;
+    if (assignment->EQUAL_CARET()) return ASSIGN_XOR;
     assert(false);
 }
 

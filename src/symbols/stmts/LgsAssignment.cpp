@@ -7,18 +7,44 @@
 #include "stmts/LgsField.h"
 
 void LgsAssignment::createIRStmt(LgsRuntime* runtime) {
+    Value* results = nullptr;
     switch (assignmentType) {
     case ASSIGN:
         createIRAssign(runtime);
-        break;
+        return;
     case ASSIGN_ADD:
-        createIRAddAssign(runtime);
+        results = lValue->addIR(runtime, rValue);
         break;
     case ASSIGN_SUB:
+        results = lValue->subIR(runtime, rValue);
+        break;
     case ASSIGN_MUL:
+        results = lValue->mulIR(runtime, rValue);
+        break;
     case ASSIGN_DIV:
-        assert(0);
+        results = lValue->divIR(runtime, rValue);
+        break;
+    case ASSIGN_MOD:
+        results = lValue->modIR(runtime, rValue);
+        break;
+    case ASSIGN_AND:
+        results = lValue->bitAndIR(runtime, rValue);
+        break;
+    case ASSIGN_OR:
+        results = lValue->bitOrIR(runtime, rValue);
+        break;
+    case ASSIGN_XOR:
+        results = lValue->bitXorIR(runtime, rValue);
+        break;
+    case ASSIGN_LSHIFT:
+        results = lValue->lshiftIR(runtime, rValue);
+        break;
+    case ASSIGN_RSHIFT:
+        results = lValue->rshiftIR(runtime, rValue);
+        break;
     }
+    assert(results);
+    runtime->builder.CreateStore(results, lValue->getIRValue(runtime));
 }
 
 void LgsAssignment::createIRAssign(LgsRuntime* runtime) const {
@@ -31,17 +57,6 @@ void LgsAssignment::createIRAssign(LgsRuntime* runtime) const {
     } else {
         assert(0);
     }
-}
-
-void LgsAssignment::createIRAddAssign(LgsRuntime* runtime) const {
-    const auto leftIRValue = lValue->getIRValue(runtime);
-    auto rightIRValue = rValue->getIRValue(runtime);
-    if (rightIRValue->getType()->isPointerTy()) {
-        rightIRValue = runtime->builder.CreateLoad(rValue->type->getIRType(), rightIRValue);
-    }
-    const auto leftIRValueLoad = runtime->builder.CreateLoad(lValue->type->getIRType(), leftIRValue);
-    const auto results = runtime->builder.CreateAdd(leftIRValueLoad, rightIRValue);
-    runtime->builder.CreateStore(results, leftIRValue);
 }
 
 void LgsAssignment::assignToIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* value) const {
@@ -66,8 +81,7 @@ void LgsAssignment::assignToSelection(LgsRuntime* runtime, const LgsSelection* s
             var->ref.field->storeIRValue(runtime, parentIRValue, value);
             return;
         }
-        case UNKNOWN:
-        default:
+        case UNKNOWN: default:
             break;
         }
     }
@@ -109,7 +123,8 @@ void LgsAssignment::storeScalarInIterIndex(LgsRuntime* runtime, LgsIterIndex* it
     }
 }
 
-void LgsAssignment::storeArrayInIterIndex(LgsRuntime* runtime, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) const {
+void LgsAssignment::storeArrayInIterIndex(LgsRuntime* runtime, const LgsIterIndex* iterIndex,
+                                          const LgsArrayExpr* arr) const {
     if (!arr->arrType->isStatic) {
         return;
     }

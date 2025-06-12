@@ -120,7 +120,9 @@ statementsBlock:
     ;
 
 assignment:
-        (VARIABLE | iterIndex | selection) (WALRUS | EQUAL_ADD | EQUAL_SUB | EQUAL_MUL | EQUAL_DIV) expr
+        (VARIABLE | iterIndex | selection) (WALRUS | EQUAL_PLUS | EQUAL_MINUS | EQUAL_STAR | EQUAL_SLASH |
+                                            EQUAL_PERCENT | EQUAL_AMPERSAND | EQUAL_PIPE | EQUAL_CARET |
+                                            EQUAL_DOUBLE_RANGLE | EQUAL_DOUBLE_LANGLE) expr
     ;
 
 explicitVarDec:
@@ -333,17 +335,23 @@ COMMA: ',';
 TRIPLE_DOT: '...';
 DOUBLE_DOT: '..';
 WALRUS: ':=';
-EQUAL_ADD: '+=';
-EQUAL_SUB: '-=';
-EQUAL_MUL: '*=';
-EQUAL_DIV: '/=';
+EQUAL_PLUS: '+=';
+EQUAL_MINUS: '-=';
+EQUAL_STAR: '*=';
+EQUAL_SLASH: '/=';
+EQUAL_PERCENT: '%=';
+EQUAL_AMPERSAND: '&=';
+EQUAL_PIPE: '|=';
+EQUAL_CARET: '^=';
+EQUAL_DOUBLE_RANGLE: '<<=';
+EQUAL_DOUBLE_LANGLE: '>>=';
 INC: '++';
 DEC: '--';
 DOT: '.';
 COLON: ':';
 EQUAL: '=';
-MINUS: '-';
 PLUS: '+';
+MINUS: '-';
 STAR: '*';
 SLASH: '/';
 HASH: '#';
