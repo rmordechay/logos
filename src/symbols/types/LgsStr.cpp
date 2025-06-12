@@ -6,6 +6,7 @@
 #include "utils/LgsUtils.h"
 
 size_t LgsStr::getSizeBytes() {
+    if (isConst) return iterLen + 1;
     return sizeof(void*);
 }
 

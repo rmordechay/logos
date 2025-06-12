@@ -12,6 +12,7 @@ public:
         strType->isConst = true;
         strType->isStatic = true;
         strType->sizeExpr = new LgsIntConst(value.size());
+        strType->iterLen = value.size();
         type = strType;
     }
 

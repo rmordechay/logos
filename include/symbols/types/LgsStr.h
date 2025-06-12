@@ -30,8 +30,8 @@ public:
     static size_t hashString(const string& str);
     size_t getSizeBytes() override;
     string getIRName() override;
-    Type* getIRType() override;
     string prettyName() const override;
+    Type* getIRType() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
