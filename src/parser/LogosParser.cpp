@@ -353,7 +353,7 @@ void logosParserInitialize() {
   	0,0,722,723,3,80,40,0,723,724,5,19,0,0,724,725,3,80,40,0,725,732,1,0,
   	0,0,726,727,5,19,0,0,727,732,3,80,40,0,728,729,3,80,40,0,729,730,5,19,
   	0,0,730,732,1,0,0,0,731,722,1,0,0,0,731,726,1,0,0,0,731,728,1,0,0,0,732,
-  	117,1,0,0,0,733,734,6,59,-1,0,734,736,7,9,0,0,735,737,5,41,0,0,736,735,
+  	117,1,0,0,0,733,734,6,59,-1,0,734,736,5,78,0,0,735,737,5,41,0,0,736,735,
   	1,0,0,0,736,737,1,0,0,0,737,742,1,0,0,0,738,742,5,53,0,0,739,742,3,120,
   	60,0,740,742,3,124,62,0,741,733,1,0,0,0,741,738,1,0,0,0,741,739,1,0,0,
   	0,741,740,1,0,0,0,742,754,1,0,0,0,743,745,10,3,0,0,744,746,3,122,61,0,
@@ -5712,10 +5712,6 @@ tree::TerminalNode* LogosParser::TypeContext::TYPE() {
   return getToken(LogosParser::TYPE, 0);
 }
 
-tree::TerminalNode* LogosParser::TypeContext::VARIABLE() {
-  return getToken(LogosParser::VARIABLE, 0);
-}
-
 tree::TerminalNode* LogosParser::TypeContext::QUEST_MARK() {
   return getToken(LogosParser::QUEST_MARK, 0);
 }
@@ -5768,7 +5764,7 @@ LogosParser::TypeContext* LogosParser::type(int precedence) {
   size_t startState = 118;
   enterRecursionRule(_localctx, 118, LogosParser::RuleType, precedence);
 
-    size_t _la = 0;
+    
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -5783,19 +5779,9 @@ LogosParser::TypeContext* LogosParser::type(int precedence) {
     setState(741);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case LogosParser::TYPE:
-      case LogosParser::VARIABLE: {
+      case LogosParser::TYPE: {
         setState(734);
-        _la = _input->LA(1);
-        if (!(_la == LogosParser::TYPE
-
-        || _la == LogosParser::VARIABLE)) {
-        _errHandler->recoverInline(this);
-        }
-        else {
-          _errHandler->reportMatch(this);
-          consume();
-        }
+        match(LogosParser::TYPE);
         setState(736);
         _errHandler->sync(this);
 
@@ -6084,9 +6070,7 @@ LogosParser::FuncTypeContext* LogosParser::funcType() {
 
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & 9007199254742272) != 0) || _la == LogosParser::TYPE
-
-    || _la == LogosParser::VARIABLE) {
+      ((1ULL << _la) & 9007199254742272) != 0) || _la == LogosParser::TYPE) {
       setState(770);
       type(0);
       setState(775);

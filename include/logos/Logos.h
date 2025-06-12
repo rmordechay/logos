@@ -15,8 +15,8 @@ public:
     vector<char*> args;
 
     explicit Logos(const path& rootDirPath = "") {
-        paths.initPaths(rootDirPath);
-        platform.setPlatform();
+        application.paths.initPaths(rootDirPath);
+        application.platform.setPlatform();
     }
     void run();
     ~Logos() = default;

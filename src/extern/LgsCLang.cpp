@@ -12,7 +12,7 @@ void LgsCLang::parse(LgsFile& lgsFile, LgsErrHandler& errHandler) const {
     for (const auto filePath : lgsFile.externFiles) {
         auto path = filePath->value;
         string code;
-        auto cLibPath = paths.clibRoot / "usr/include" / path;
+        auto cLibPath = application.paths.clibRoot / "usr/include" / path;
         if (exists(cLibPath)) {
             code = getFileText(cLibPath);
         } else {
@@ -22,7 +22,7 @@ void LgsCLang::parse(LgsFile& lgsFile, LgsErrHandler& errHandler) const {
             errHandler.handleError(E10047, &filePath->location, {path});
             continue;
         }
-        runToolOnCodeWithArgs(std::make_unique<LgsCLangFeAction>(lgsFile, errHandler), code, {"-isysroot", paths.clibRoot});
+        runToolOnCodeWithArgs(std::make_unique<LgsCLangFeAction>(lgsFile, errHandler), code, {"-isysroot", application.paths.clibRoot});
     }
 }
 

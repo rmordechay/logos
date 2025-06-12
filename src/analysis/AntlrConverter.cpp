@@ -75,7 +75,7 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
         lgsClang.parse(*file, errHandler);
     }
     file->absPath = filePath;
-    file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
+    file->relPath = relative(filePath, application.paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     return file;
 }
 
@@ -158,7 +158,7 @@ LgsAppFile* AntlerConverter::getAppFile(LogosParser::LogosAppFileContext* ctx) {
         requireEnvVars.push_back(requireEnvVar);
     }
     file->requireEnvVars = requireEnvVars;
-    file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
+    file->relPath = relative(filePath, application.paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     return file;
 }
 
@@ -171,7 +171,7 @@ LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx) {
         varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
     }
     const auto file = new LgsEnvFile(filePath, varDecs);
-    file->relPath = relative(filePath, paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
+    file->relPath = relative(filePath, application.paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     return file;
 }
 

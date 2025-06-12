@@ -24,8 +24,8 @@ void CodeGenerator::generate(LogosProject& project) {
 
 void CodeGenerator::init() {
     // Build dir
-    if (exists(paths.buildDir)) remove_all(paths.buildDir);
-    create_directories(paths.buildDir);
+    if (exists(application.paths.buildDir)) remove_all(application.paths.buildDir);
+    create_directories(application.paths.buildDir);
     // LLVM
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
@@ -33,18 +33,18 @@ void CodeGenerator::init() {
     InitializeAllTargetMCs();
     InitializeAllTargets();
     InitializeAllTargetInfos();
-    platform.dataLayout = getTargetMachine()->createDataLayout();
+    application.platform.dataLayout = getTargetMachine()->createDataLayout();
 }
 
 void CodeGenerator::writeIRToFile(LogosProject& project) {
     for (const auto [_, module] : project.IRModules) {
         if constexpr (WRITE_IR_TO_FILE) {
-            const auto filePath = (paths.buildDir / module->getName().str()).string() + ".ll";
+            const auto filePath = (application.paths.buildDir / module->getName().str()).string() + ".ll";
             std::error_code EC;
             raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
             module->print(textFile, nullptr);
         }
-        if constexpr (DEBUG) {
+        if constexpr (application.logLevel == DEBUG) {
             module->print(outs(), nullptr);
             std::cout << "\n-----\n\n";
         }

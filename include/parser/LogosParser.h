@@ -1065,7 +1065,6 @@ public:
     TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *TYPE();
-    antlr4::tree::TerminalNode *VARIABLE();
     antlr4::tree::TerminalNode *QUEST_MARK();
     antlr4::tree::TerminalNode *SELF_CLASS();
     MapTypeContext *mapType();

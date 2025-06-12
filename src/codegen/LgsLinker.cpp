@@ -17,12 +17,12 @@ bool LgsLinker::link(LogosProject& project) const {
         if (name == LOGOS_MAIN_FILE_NAME) continue;
         linker.linkInModule(unique_ptr<Module>(module));
     }
-    if (!generateObjFile(mainModule, paths.objFilePath.c_str())) return false;
-    auto linkerOpts = platform.linkerOpts;
-    linkerOpts.push_back(paths.objFilePath.c_str());
+    if (!generateObjFile(mainModule, application.paths.objFilePath.c_str())) return false;
+    auto linkerOpts = application.platform.linkerOpts;
+    linkerOpts.push_back(application.paths.objFilePath.c_str());
     linkerOpts.push_back("-o");
-    linkerOpts.push_back(paths.execFilePath.c_str());
-    if (!platform.link(linkerOpts, outs(), errs(), false, false)) {
+    linkerOpts.push_back(application.paths.execFilePath.c_str());
+    if (!application.platform.link(linkerOpts, outs(), errs(), false, false)) {
         errs().flush();
         return false;
     }

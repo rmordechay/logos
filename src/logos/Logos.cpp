@@ -22,5 +22,5 @@ void Logos::run() {
     if (!linker.link(project)) exit(1);
 
     // Running
-    execv(paths.execFilePath.c_str(), args.data());
+    execv(application.paths.execFilePath.c_str(), args.data());
 }

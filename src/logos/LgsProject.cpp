@@ -29,12 +29,12 @@ bool LogosProject::loadProject() {
 }
 
 bool LogosProject::validateProject() {
-    if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {
+    if (!is_directory(application.paths.rootDir) || !is_directory(application.paths.srcDir)) {
         errHandler.handleError(E10010, nullptr);
         return false;
     }
 
-    if (!exists(paths.appFilePath)) {
+    if (!exists(application.paths.appFilePath)) {
         errHandler.handleError(E10008, nullptr);
         return false;
     }
@@ -157,7 +157,7 @@ void LogosProject::loadSrcFiles() {
     vector<LgsFile*> files;
     ThreadPool threadPool;
     threadPool.start();
-    parseSrcFiles(paths.srcDir, threadPool);
+    parseSrcFiles(application.paths.srcDir, threadPool);
     threadPool.wait();
 }
 
@@ -165,7 +165,7 @@ void LogosProject::loadEnvFiles() {
     vector<LgsEnvFile*> files;
     ThreadPool threadPool;
     threadPool.start();
-    for (const auto& entry : directory_iterator(paths.envsDir)) {
+    for (const auto& entry : directory_iterator(application.paths.envsDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
             parseEnvFile(entry);
@@ -225,7 +225,7 @@ void LogosProject::setEnvVars() {
 
 void LogosProject::setupActiveEnv() {
     setEnvVars();
-    parseAppFile(paths.appFilePath);
+    parseAppFile(application.paths.appFilePath);
     loadEnvFiles();
     checkRequiredEnvVars();
 }

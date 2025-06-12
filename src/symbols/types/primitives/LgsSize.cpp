@@ -7,7 +7,7 @@ size_t LgsSize::getSizeBytes() {
 }
 
 Type* LgsSize::getIRType() {
-    return platform.dataLayout.getIntPtrType(context);
+    return application.platform.dataLayout.getIntPtrType(context);
 }
 
 std::string LgsSize::getIRName() {

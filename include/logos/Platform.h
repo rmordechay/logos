@@ -1,5 +1,6 @@
 #pragma once
 #include "data/LgsDefinitions.h"
+#include "utils/LgsLogger.h"
 
 struct Platform {
     string osName;
@@ -45,5 +46,10 @@ struct LgsPaths {
     }
 };
 
-inline Platform platform;
-inline LgsPaths paths;
+struct LgsApp {
+    LogLevel logLevel = INFO;
+    Platform platform;
+    LgsPaths paths;
+};
+
+inline LgsApp application;
