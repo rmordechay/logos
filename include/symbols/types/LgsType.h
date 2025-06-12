@@ -31,6 +31,7 @@ public:
     bool isNullable = false;
     bool isPrimitive = false;
     bool isBuiltin = false;
+    bool canSlice = false;
     Type* IRType = nullptr;
     LgsHashMap* vtable = nullptr;
     map<string, LgsField*> fields;

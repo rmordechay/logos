@@ -26,6 +26,7 @@ public:
         addMethod(&isEmptyFunc);
         addMethod(&isNotEmptyFunc);
         unpackLength = 1;
+        canSlice = true;
     }
     static size_t hashString(const string& str);
     size_t getSizeBytes() override;

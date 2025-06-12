@@ -120,9 +120,7 @@ statementsBlock:
     ;
 
 assignment:
-        (VARIABLE | iterIndex | selection) (WALRUS | EQUAL_PLUS | EQUAL_MINUS | EQUAL_STAR | EQUAL_SLASH |
-                                            EQUAL_PERCENT | EQUAL_AMPERSAND | EQUAL_PIPE | EQUAL_CARET |
-                                            EQUAL_DOUBLE_RANGLE | EQUAL_DOUBLE_LANGLE) expr
+        (VARIABLE | iterIndex | selection) assignemntOp expr
     ;
 
 explicitVarDec:
@@ -314,6 +312,20 @@ vector:
 
 requireEnvVars:
         'require' 'envs' LBRACE (VARIABLE COLON type)* RBRACE
+    ;
+
+assignemntOp:
+        WALRUS
+    |   EQUAL_PLUS
+    |   EQUAL_MINUS
+    |   EQUAL_STAR
+    |   EQUAL_SLASH
+    |   EQUAL_PERCENT
+    |   EQUAL_AMPERSAND
+    |   EQUAL_PIPE
+    |   EQUAL_CARET
+    |   EQUAL_DOUBLE_RANGLE
+    |   EQUAL_DOUBLE_LANGLE
     ;
 
 DOUBLE_EQUAL: '==';

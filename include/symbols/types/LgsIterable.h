@@ -10,9 +10,9 @@ class LgsIterable : public LgsType {
 public:
     LgsType* baseType;
     size_t iterLen = 0;
+    bool isStatic = false;
     uint8_t unpackLength = 0;
     LgsExpr* sizeExpr = nullptr;
-    bool isStatic = false;
 
     explicit LgsIterable(LgsType* baseType = nullptr) : baseType(baseType) {}
     virtual Value* getLength(LgsRuntime* runtime, LgsExpr* expr) = 0;

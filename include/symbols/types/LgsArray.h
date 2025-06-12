@@ -34,6 +34,7 @@ public:
         addMethod(&lenFunc);
         addMethod(&isEmptyFunc);
         addMethod(&isNotEmptyFunc);
+        canSlice = true;
     }
 
     Type* getIRType() override;

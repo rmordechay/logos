@@ -189,11 +189,9 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
         varDec->type = resolveType(varDec->type);
         varDec->expr = varDec->type->getZeroValue();
         visitExpr(varDec->expr);
-    } else if (varDec->expr) {
+    } else {
         visitExpr(varDec->expr);
         varDec->type = varDec->expr->type;
-    } else {
-        assert(0);
     }
     varDec->expr->isConst = varDec->isConst;
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
@@ -413,7 +411,9 @@ void SemaAnalyser::visitStaticArray(const LgsArrayExpr* array) {
     if (initialElements.empty() && !arr->baseType) {
         return errHandler.handleError(E10049, &array->location);
     }
-    arr->baseType = initialElements.front()->type;
+    if (!arr->baseType) {
+        arr->baseType = initialElements.front()->type;
+    }
 }
 
 void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) {
@@ -588,9 +588,12 @@ void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcTy
 
 void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
+    const auto exprFrom = iterIndex->index->from;
+    const auto exprTo = iterIndex->index->to;
     visitUnaryExpr(baseExpr);
-    visitExpr(iterIndex->index->from);
-    visitExpr(iterIndex->index->to);
+    if (!baseExpr->type) return;
+    visitExpr(exprFrom);
+    visitExpr(exprTo);
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable) {
         if (baseExpr->type) {
@@ -600,6 +603,9 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
         iterIndex->setType(map->typePair->value);
     } else {
         iterIndex->setType(iterable->baseType);
+    }
+    if (!iterIndex->baseExpr->type->canSlice) {
+        errHandler.handleError(E10042, &iterIndex->location, {iterIndex->prettyName(), baseExpr->type->prettyName()});
     }
 }
 

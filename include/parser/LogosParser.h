@@ -48,7 +48,8 @@ public:
     RuleConstructorArgList = 50, RuleConstructorArg = 51, RuleConstant = 52, 
     RuleIterIndex = 53, RuleIndex = 54, RuleSelection = 55, RuleFirstSelectionElement = 56, 
     RuleInnerSelectionElement = 57, RuleRange = 58, RuleType = 59, RuleMapType = 60, 
-    RuleArraySize = 61, RuleFuncType = 62, RuleVector = 63, RuleRequireEnvVars = 64
+    RuleArraySize = 61, RuleFuncType = 62, RuleVector = 63, RuleRequireEnvVars = 64, 
+    RuleAssignemntOp = 65
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -132,7 +133,8 @@ public:
   class ArraySizeContext;
   class FuncTypeContext;
   class VectorContext;
-  class RequireEnvVarsContext; 
+  class RequireEnvVarsContext;
+  class AssignemntOpContext; 
 
   class  LogosFileContext : public antlr4::ParserRuleContext {
   public:
@@ -550,18 +552,8 @@ public:
   public:
     AssignmentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    AssignemntOpContext *assignemntOp();
     ExprContext *expr();
-    antlr4::tree::TerminalNode *WALRUS();
-    antlr4::tree::TerminalNode *EQUAL_PLUS();
-    antlr4::tree::TerminalNode *EQUAL_MINUS();
-    antlr4::tree::TerminalNode *EQUAL_STAR();
-    antlr4::tree::TerminalNode *EQUAL_SLASH();
-    antlr4::tree::TerminalNode *EQUAL_PERCENT();
-    antlr4::tree::TerminalNode *EQUAL_AMPERSAND();
-    antlr4::tree::TerminalNode *EQUAL_PIPE();
-    antlr4::tree::TerminalNode *EQUAL_CARET();
-    antlr4::tree::TerminalNode *EQUAL_DOUBLE_RANGLE();
-    antlr4::tree::TerminalNode *EQUAL_DOUBLE_LANGLE();
     antlr4::tree::TerminalNode *VARIABLE();
     IterIndexContext *iterIndex();
     SelectionContext *selection();
@@ -1172,6 +1164,27 @@ public:
   };
 
   RequireEnvVarsContext* requireEnvVars();
+
+  class  AssignemntOpContext : public antlr4::ParserRuleContext {
+  public:
+    AssignemntOpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *WALRUS();
+    antlr4::tree::TerminalNode *EQUAL_PLUS();
+    antlr4::tree::TerminalNode *EQUAL_MINUS();
+    antlr4::tree::TerminalNode *EQUAL_STAR();
+    antlr4::tree::TerminalNode *EQUAL_SLASH();
+    antlr4::tree::TerminalNode *EQUAL_PERCENT();
+    antlr4::tree::TerminalNode *EQUAL_AMPERSAND();
+    antlr4::tree::TerminalNode *EQUAL_PIPE();
+    antlr4::tree::TerminalNode *EQUAL_CARET();
+    antlr4::tree::TerminalNode *EQUAL_DOUBLE_RANGLE();
+    antlr4::tree::TerminalNode *EQUAL_DOUBLE_LANGLE();
+
+   
+  };
+
+  AssignemntOpContext* assignemntOp();
 
 
   bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
