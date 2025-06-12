@@ -13,7 +13,6 @@ public:
     static constexpr auto name = "Map";
     StructType* mapStruct = nullptr;
     LgsTypePair* typePair = nullptr;
-
     LgsBuiltinFunc getFunc{"get", &LGS_ANY, name, {this, new LgsStr()}, PUBLIC};
     LgsBuiltinFunc addFunc{"add", &LGS_VOID, name, {this, new LgsStr(), &LGS_ANY}, PUBLIC};
     LgsBuiltinFunc lenFunc{"len", &LGS_LONG, name, {this}, PUBLIC};

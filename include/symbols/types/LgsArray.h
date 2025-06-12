@@ -8,7 +8,7 @@
 
 class LgsArrayAddFunc final : public LgsBuiltinFunc {
 public:
-    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName(), {parent, &LGS_ANY}, PUBLIC) {}
+    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName(), {parent, &LGS_ANY}, PUBLIC | VARIADIC) {}
     Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override;
     ~LgsArrayAddFunc() override = default;
 };
@@ -17,7 +17,6 @@ class LgsArray final : public LgsIterable {
 public:
     static constexpr auto name = "Array";
     StructType* arrStruct = nullptr;
-
     LgsArrayAddFunc addFunc{this};
     LgsBuiltinFunc lenFunc{"len", &LGS_LONG, name, {this}, PUBLIC};
     LgsBuiltinFunc getFunc{"get", &LGS_ANY, name, {this, &LGS_LONG}, PUBLIC};

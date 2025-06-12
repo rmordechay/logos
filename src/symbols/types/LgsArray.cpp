@@ -56,7 +56,6 @@ bool LgsArray::equals(LgsType* other) {
     if (!otherArr) return false;
     if (!baseType->equals(otherArr->baseType)) return false;
     if (isStatic != otherArr->isStatic) return false;
-    if (!sizeExpr || otherArr->sizeExpr->type) return false;
     if (isStatic) return sizeExpr->type->equals(otherArr->sizeExpr->type);
     return true;
 }
@@ -110,11 +109,14 @@ LgsType* LgsArray::clone() {
 
 Value* LgsArrayAddFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     const auto arrPtr = args[0]->getIRValue(runtime);
-    const auto value = args[1];
-    const auto valueIR = value->getIRValue(runtime);
-    const auto valuePtr = runtime->builder.CreateAlloca(value->type->getIRType());
-    runtime->builder.CreateStore(valueIR, valuePtr);
-    return callIR(runtime, {arrPtr, valuePtr});
+    for (int i = 1; i < args.size(); ++i) {
+        const auto value = args[i];
+        const auto valueIR = value->getIRValue(runtime);
+        const auto valuePtr = runtime->builder.CreateAlloca(value->type->getIRType());
+        runtime->builder.CreateStore(valueIR, valuePtr);
+        callIR(runtime, {arrPtr, valuePtr});
+    }
+    return nullptr;
 }
 
 LgsArray::~LgsArray() {

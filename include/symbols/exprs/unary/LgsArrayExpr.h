@@ -12,7 +12,7 @@ public:
         arrType = new LgsArray(baseType);
         type = arrType;
     }
-    explicit LgsArrayExpr(LgsArray* arrType) : LgsUnaryExpr(arrType) {}
+    explicit LgsArrayExpr(LgsArray* arrType) : LgsUnaryExpr(arrType), arrType(arrType) {}
     Value* createIRValue(LgsRuntime* runtime) override;
     Value* createConstArray(LgsRuntime* runtime) const;
     Value* createDynamicArray(LgsRuntime* runtime);

@@ -24,8 +24,6 @@ public:
     int returnParamIndex = -1;
     FunctionType* IRType = nullptr;
 
-    LgsFuncType() = default;
-    LgsFuncType(const string& name, LgsType* rt, const vector<LgsParam>& params, const uint16_t flags = 0) : name(name), rt(rt), params(params), flags(flags) {}
     Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
