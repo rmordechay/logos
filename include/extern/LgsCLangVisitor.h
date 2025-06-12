@@ -1,5 +1,6 @@
 #pragma once
 
+class LgsErrHandler;
 class LgsFile;
 class LgsObject;
 class LgsType;

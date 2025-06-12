@@ -219,11 +219,11 @@ keyValue:
     ;
 
 funcCall:
-        VARIABLE LPAREN funcArgList? TRIPLE_DOT? RPAREN
+        VARIABLE LPAREN funcArgList? TRIPLE_DOT? COMMA? RPAREN
     ;
 
 funcArgList:
-        funcArg (COMMA funcArg)* COMMA?
+        funcArg (COMMA funcArg)*
     ;
 
 funcArg:

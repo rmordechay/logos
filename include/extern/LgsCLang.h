@@ -1,6 +1,7 @@
 #pragma once
 #include "data/LgsDefinitions.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "logos/Platform.h"
 
 class LgsFile;
 using namespace clang::driver;

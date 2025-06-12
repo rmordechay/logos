@@ -5,7 +5,6 @@
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
 
-
 Value* LgsFuncCall::call(LgsRuntime* runtime) const {
     if (callback) {
         func->setIRValue(getCallback(runtime));

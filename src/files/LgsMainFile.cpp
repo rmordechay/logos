@@ -1,5 +1,9 @@
 #include "files/LgsMainFile.h"
+
+#include "funcs/LgsFunc.h"
 #include "logos/LgsProject.h"
+#include "types/LgsEnum.h"
+#include "types/LgsObject.h"
 #include "utils/LgsUtils.h"
 
 Module* LgsMainFile::generateIR(LogosProject& project) {

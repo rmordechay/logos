@@ -1,5 +1,6 @@
 #pragma once
-#include "pch.h"
+
+#include "LgsLocation.h"
 
 class LgsTypePair;
 class LgsLong;
@@ -28,7 +29,7 @@ enum LgsTypeOpts : uint16_t {
     NULLABLE = 1 << 4,
     PRIMITIVE = 1 << 5,
     BUILTIN = 1 << 6,
-
+    // Func opts
     METHOD = 1 << 8,
     STATIC = 1 << 9,
     PUBLIC = 1 << 10,

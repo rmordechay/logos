@@ -1,7 +1,6 @@
 #pragma once
 #include "LgsType.h"
 
-
 class LgsAny final : public LgsType {
 public:
     static constexpr auto name = "Any";

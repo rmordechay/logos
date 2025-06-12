@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsFile.h"
-#include "types/LgsObject.h"
 
 class LgsObjectFile final : public LgsFile {
 public:

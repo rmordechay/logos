@@ -1,5 +1,6 @@
 #include "types/primitives/LgsSize.h"
 #include "logos/LgsRuntime.h"
+#include "logos/Platform.h"
 
 size_t LgsSize::getSizeBytes() {
     return sizeof(size_t);

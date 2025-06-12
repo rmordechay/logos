@@ -2,6 +2,7 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "files/LgsFile.h"
 #include "stmts/LgsField.h"
+#include "types/LgsArray.h"
 #include "types/LgsObject.h"
 #include "types/LgsStr.h"
 #include "types/primitives/LgsFloat.h"

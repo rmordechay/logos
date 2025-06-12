@@ -1,30 +1,9 @@
 #include "types/LgsArray.h"
+
+#include "builtin/LgsBuiltinFuncs.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
-
-// define i32 @main() #0 {
-//   %2 = alloca %struct.HashMap, align 8
-//   %3 = alloca %struct.Array, align 8
-//   %4 = alloca i32, align 4
-//   %5 = alloca ptr, align 8
-//   %6 = alloca ptr, align 8
-//   call void @Map_init(ptr noundef %2, i64 noundef 32)
-//   call void @Array_init(ptr noundef %3, i64 noundef 10, i64 noundef 4)
-//   store i32 7346, ptr %4, align 4
-//   call void @Array_add(ptr noundef %3, ptr noundef %4)
-//   store ptr @.str, ptr %5, align 8
-//   %7 = load ptr, ptr %5, align 8
-//   call void @Map_add(ptr noundef %2, ptr noundef %7, ptr noundef %3)
-//   %8 = load ptr, ptr %5, align 8
-//   %9 = call ptr @Map_get(ptr noundef %2, ptr noundef %8)
-//   store ptr %9, ptr %6, align 8
-//   %10 = load ptr, ptr %6, align 8
-//   %11 = call ptr @Array_get(ptr noundef %10, i64 noundef 0)
-//   %12 = load i32, ptr %11, align 4
-//   %13 = call i32 (ptr, ...) @printf(ptr noundef @.str.1, i32 noundef %12)
-//   ret i32 0
-// }
 
 Type* LgsArray::getIRType() {
     if (IRType) return IRType;
@@ -110,11 +89,11 @@ LgsType* LgsArray::clone() {
 Value* LgsArrayAddFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     const auto arrPtr = args[0]->getIRValue(runtime);
     for (int i = 1; i < args.size(); ++i) {
-        const auto value = args[i];
-        const auto valueIR = value->getIRValue(runtime);
-        const auto valuePtr = runtime->builder.CreateAlloca(value->type->getIRType());
-        runtime->builder.CreateStore(valueIR, valuePtr);
-        callIR(runtime, {arrPtr, valuePtr});
+        const auto arg = args[i];
+        const auto argValueIR = arg->getIRValue(runtime);
+        const auto argValuePtr = runtime->builder.CreateAlloca(arg->type->getIRType());
+        runtime->builder.CreateStore(argValueIR, argValuePtr);
+        callIR(runtime, {arrPtr, argValuePtr});
     }
     return nullptr;
 }

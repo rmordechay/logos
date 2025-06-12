@@ -24,12 +24,14 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
 #include "logos/LgsConfig.h"
+#include "logos/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsArray.h"
 #include "types/LgsGroup.h"
+#include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsForLoop.h>
@@ -534,45 +536,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
         }
         lgsField->expr = arg->expr;
     }
-
     assert(instance->obj);
-}
-
-void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
-    for (const auto arg : funcCall->args) {
-        visitExpr(arg);
-    }
-    const auto symbol = getSymbol(funcCall->name, funcCall);
-    if (!symbol) return;
-
-    if (symbol->symbolType == FUNC) {
-        const auto func = symbol->func;
-        if (funcCall->equals(func->funcType)) {
-            funcCall->func = func;
-            funcCall->type = func->funcType->rt;
-        } else {
-            return errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->prettyName(), func->prettyName()});
-        }
-        assert(funcCall->func);
-        return;
-    }
-
-    LgsType* symbolType;
-    if (symbol->symbolType == VAR_DEC) {
-        funcCall->callback = new LgsSymbol(symbol->varDec);
-        symbolType = symbol->varDec->type;
-    } else if (symbol->symbolType == PARAM) {
-        funcCall->callback = new LgsSymbol(symbol->param);
-        symbolType = symbol->param->type;
-    } else {
-        assert(0);
-    }
-
-    const auto funcType = symbolType->asFuncType();
-    if (!funcType) {
-        return errHandler.handleError(E10046, &funcCall->location, {funcCall->name});
-    }
-    visitAnonymousFunc(funcCall, funcType);
 }
 
 void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
@@ -588,24 +552,26 @@ void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     postfixExpr->type = type;
 }
 
+void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
+    for (const auto arg : funcCall->args) {
+        visitExpr(arg);
+    }
+    resolveFuncCall(funcCall);
+}
+
 void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {
     if (!parentType) return;
     for (const auto& arg : methodCall->args) {
         visitExpr(arg);
     }
-    auto name = methodCall->name;
-    const auto method = parentType->findMethod(name);
-    if (!method) {
-        return errHandler.handleError(E10013, &methodCall->location, {name, parentType->prettyName()});
-    }
-    if (methodCall->equals(method->funcType)) {
-        methodCall->func = method;
-        methodCall->type = method->funcType->rt;
-    } else {
-        return errHandler.handleError(E10034, &methodCall->location, {parentType->prettyName(), name, method->prettyName(), method->funcType->prettyName()});
-    }
+    if (resolveMethodCall(methodCall, parentType)) return;
     checkMethodVisibility(methodCall);
-    assert(methodCall->type);
+    if (methodCall->isSpread) {
+        const auto lastArg = methodCall->args[methodCall->args.size() - 1];
+        if (!lastArg->type->asIterable()) {
+            return errHandler.handleError(E10052, &methodCall->location, {lastArg->prettyName(), lastArg->type->prettyName()});
+        }
+    }
 }
 
 void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType) {
@@ -785,6 +751,56 @@ bool SemaAnalyser::symbolExists(const string& name) {
         return true;
     }
     if (stack.getSymbol(name)) {
+        return true;
+    }
+    return false;
+}
+
+void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
+    const auto symbol = getSymbol(funcCall->name, funcCall);
+    if (!symbol) return;
+    if (symbol->symbolType == FUNC) {
+        const auto func = symbol->func;
+        if (funcCall->equals(func->funcType)) {
+            funcCall->func = func;
+            funcCall->type = func->funcType->rt;
+        } else {
+            errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->prettyName(), func->prettyName()});
+            return;
+        }
+        assert(funcCall->func);
+        return;
+    }
+
+    LgsType* symbolType = nullptr;
+    if (symbol->symbolType == VAR_DEC) {
+        funcCall->callback = new LgsSymbol(symbol->varDec);
+        symbolType = symbol->varDec->type;
+    } else if (symbol->symbolType == PARAM) {
+        funcCall->callback = new LgsSymbol(symbol->param);
+        symbolType = symbol->param->type;
+    }
+
+    const auto anonymousFuncType = symbolType->asFuncType();
+    if (anonymousFuncType) {
+        visitAnonymousFunc(funcCall, anonymousFuncType);
+    } else {
+        errHandler.handleError(E10046, &funcCall->location, {funcCall->name});
+    }
+}
+
+bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {
+    auto name = methodCall->name;
+    const auto method = parentType->findMethod(name);
+    if (!method) {
+        errHandler.handleError(E10013, &methodCall->location, {name, parentType->prettyName()});
+        return true;
+    }
+    if (methodCall->equals(method->funcType)) {
+        methodCall->func = method;
+        methodCall->type = method->funcType->rt;
+    } else {
+        errHandler.handleError(E10034, &methodCall->location, {parentType->prettyName(), name, method->prettyName(), method->funcType->prettyName()});
         return true;
     }
     return false;

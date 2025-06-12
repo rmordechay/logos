@@ -1,7 +1,7 @@
 #pragma once
-#include "LgsArray.h"
-#include "data/LgsDefinitions.h"
+#include "LgsType.h"
 
+class LgsRuntime;
 class LgsField;
 
 class LgsObject : public LgsType {

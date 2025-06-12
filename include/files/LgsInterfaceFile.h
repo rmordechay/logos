@@ -1,5 +1,4 @@
 #pragma once
-#include "types/LgsInterface.h"
 #include <files/LgsFile.h>
 
 struct LgsFuncType;

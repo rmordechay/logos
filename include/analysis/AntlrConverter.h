@@ -5,6 +5,7 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "funcs/LgsFunc.h"
+#include "logos/LgsErrHandler.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsGroup.h"

@@ -1,6 +1,7 @@
 #include "logos/LgsRuntime.h"
 #include "data/LgsErrors.h"
 #include "funcs/LgsFunc.h"
+#include "logos/LgsErrHandler.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"

@@ -50,7 +50,7 @@ inline LgsError E10038{.msg = "'continue' must be inside a loop statement.", .er
 inline LgsError E10039{.msg = "main() function accepts only one optional parameter of type 'Str[]'.", .errCode = errCodeStart++};
 inline LgsError E10040{.msg = "The number of variables in the for loop (%s) do not match the number of the iterable's returned values (%s).", .errCode = errCodeStart++};
 inline LgsError E10041{.msg = "'%s' unpacks %s variables, not %s.", .errCode = errCodeStart++};
-inline LgsError E10042{.msg = "Left index in slice must be less than the right index. Given: '%s'.", .errCode = errCodeStart++};
+inline LgsError E10042{.msg = "", .errCode = errCodeStart++};
 inline LgsError E10043{.msg = "Default parameters and variadic arguments are not allowed in the same function.", .errCode = errCodeStart++};
 inline LgsError E10044{.msg = "Variadic argument must be the last argument.", .errCode = errCodeStart++};
 inline LgsError E10045{.msg = "Variadic argument cannot have default arguments.", .errCode = errCodeStart++};
@@ -60,3 +60,4 @@ inline LgsError E10048{.msg = "Static iterable '%s' must have a constant size.",
 inline LgsError E10049{.msg = "Not enough information to infer type of iterable. Specify an explicit type or initialize with element(s).", .errCode = errCodeStart++};
 inline LgsError E10050{.msg = "Only integer values can be incremented (++) or decremented (--). Given: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10051{.msg = "Constant expression '%s' cannot be overwritten.", .errCode = errCodeStart++};
+inline LgsError E10052{.msg = "Spread operator in '%s...' must only be used with iterables. Given type: '%s'.", .errCode = errCodeStart++};

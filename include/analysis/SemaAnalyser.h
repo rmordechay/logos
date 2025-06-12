@@ -1,6 +1,7 @@
 #pragma once
 #include "files/LgsFile.h"
 #include "logos/LgsASTVisitor.h"
+#include "logos/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "types/LgsIterable.h"
 
@@ -95,12 +96,14 @@ public:
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     void validateExprType(LgsExpr* expr, LgsType* type);
     void validateFuncControlFlow(const LgsFunc* func);
-    int getExprConstNumber(LgsExpr* expr);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
+    int getExprConstNumber(LgsExpr* expr);
 
     LgsSymbol* getSymbol(const string& name, const LgsValue* value = nullptr);
     bool symbolExists(const string& name);
     void addLocalSymbol(const string& name, const LgsSymbol& symbol);
+    void resolveFuncCall(LgsFuncCall* funcCall);
+    bool resolveMethodCall(LgsFuncCall* methodCall, const LgsType* parentType);
     LgsType* resolveType(LgsType* type);
     void resolveIterable(LgsIterable* iterable);
     void resolveFuncTypes(LgsFuncType* funcType);

@@ -1,4 +1,5 @@
 #pragma once
+#include "LgsLocation.h"
 
 class LgsRuntime;
 class LgsFunc;

@@ -40,6 +40,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsArray.h"
 #include "types/LgsGroup.h"
+#include "types/LgsInterface.h"
 #include "types/LgsMap.h"
 #include "types/LgsUnknownType.h"
 #include "types/primitives/LgsShort.h"
@@ -657,8 +658,10 @@ LgsFuncCall* AntlerConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
             args.push_back(argExpr);
         }
     }
+    if (!args.empty() && ctx->TRIPLE_DOT()) {
+        args[args.size() - 1]->isSpread = true;
+    }
     const auto funcCall = new LgsFuncCall(name, args);
-    funcCall->isSpread = !!ctx->TRIPLE_DOT();
     funcCall->setLocation(ctx->start);
     return funcCall;
 }

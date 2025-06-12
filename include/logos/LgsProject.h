@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsActiveEnv.h"
+#include "LgsErrHandler.h"
 
 class LgsFile;
 class LgsEnvFile;

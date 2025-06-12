@@ -1,5 +1,6 @@
 #include "stmts/LgsReturn.h"
 #include "exprs/unary/LgsInstance.h"
+#include "funcs/LgsFunc.h"
 
 void LgsReturn::createIRStmt(LgsRuntime* runtime) {
     const auto currentFunc = runtime->stack.currentFunc;

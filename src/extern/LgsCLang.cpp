@@ -3,6 +3,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "extern/LgsCLangVisitor.h"
 #include "files/LgsFile.h"
+#include "logos/LgsErrHandler.h"
 #include "logos/Platform.h"
 #include "utils/LgsUtils.h"
 using namespace clang;

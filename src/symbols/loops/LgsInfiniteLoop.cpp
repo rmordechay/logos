@@ -1,4 +1,7 @@
 #include "loops/LgsInfiniteLoop.h"
+
+#include "data/LgsDefinitions.h"
+#include "logos/Platform.h"
 #include "stmts/LgsVarDec.h"
 
 void LgsInfiniteLoop::initIRLoop(LgsRuntime* runtime) {

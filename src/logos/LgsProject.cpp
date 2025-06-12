@@ -13,6 +13,7 @@
 #include "files/LgsEnvFile.h"
 #include "funcs/LgsMainFunc.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsInterface.h"
 
 extern char **environ;
 
