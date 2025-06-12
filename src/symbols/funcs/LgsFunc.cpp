@@ -49,7 +49,6 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
 Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
     if (funcType->hasDefaults) assert(0);
-    if (funcType->isVariadic) assert(0);
     for (int i = funcType->isStatic; i < args.size(); ++i) {
         const auto arg = args[i];
         const auto argType = arg->type->getIRType();

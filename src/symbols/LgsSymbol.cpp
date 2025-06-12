@@ -10,12 +10,12 @@
 LgsSymbol::LgsSymbol(): symbolType(UNKNOWN) {}
 LgsSymbol::LgsSymbol(LgsParam* param): symbolType(PARAM), param(param) {}
 LgsSymbol::LgsSymbol(LgsVarDec* varDec): symbolType(VAR_DEC), varDec(varDec) {}
-LgsSymbol::LgsSymbol(LgsObject* object): symbolType(OBJECT), object(object) {}
+LgsSymbol::LgsSymbol(LgsObject* object, const bool isExternal): symbolType(OBJECT), object(object), isExternal(isExternal) {}
 LgsSymbol::LgsSymbol(LgsInterface* interface): symbolType(INTERFACE), interface(interface) {}
 LgsSymbol::LgsSymbol(LgsField* field): symbolType(FIELD), field(field) {}
-LgsSymbol::LgsSymbol(LgsEnum* lgsEnum): symbolType(ENUM), lgsEnum(lgsEnum) {}
+LgsSymbol::LgsSymbol(LgsEnum* lgsEnum, const bool isExternal): symbolType(ENUM), lgsEnum(lgsEnum), isExternal(isExternal) {}
 LgsSymbol::LgsSymbol(LgsEnumField* enumField): symbolType(ENUM_FIELD), enumField(enumField) {}
-LgsSymbol::LgsSymbol(LgsFunc* func): symbolType(FUNC), func(func) {}
+LgsSymbol::LgsSymbol(LgsFunc* func, const bool isExternal): symbolType(FUNC), func(func), isExternal(isExternal) {}
 LgsSymbol::LgsSymbol(LgsGroup* group): symbolType(GROUP), group(group) {}
 
 void* LgsSymbol::getPtr() const {

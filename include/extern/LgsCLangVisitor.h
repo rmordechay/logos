@@ -21,7 +21,6 @@ public:
     LgsType* mapCArray(clang::QualType type);
     LgsType* mapCStruct(clang::QualType type);
     LgsType* mapCFunc(clang::QualType type);
-    bool isValid(clang::SourceLocation loc) const;
     bool isConstCharPointer(clang::QualType qt) const;
     ~LgsCLangVisitor() = default;
 };

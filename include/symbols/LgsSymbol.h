@@ -35,16 +35,17 @@ struct LgsSymbol {
     LgsEnumField* enumField = nullptr;
     LgsFunc* func = nullptr;
     LgsGroup* group = nullptr;
+    bool isExternal = false;
 
     explicit LgsSymbol();
     explicit LgsSymbol(LgsParam* param);
     explicit LgsSymbol(LgsVarDec* varDec);
-    explicit LgsSymbol(LgsObject* object);
+    explicit LgsSymbol(LgsObject* object, bool isExternal = false);
     explicit LgsSymbol(LgsInterface* interface);
     explicit LgsSymbol(LgsField* field);
-    explicit LgsSymbol(LgsEnum* lgsEnum);
+    explicit LgsSymbol(LgsEnum* lgsEnum, bool isExternal = false);
     explicit LgsSymbol(LgsEnumField* enumField);
-    explicit LgsSymbol(LgsFunc* func);
+    explicit LgsSymbol(LgsFunc* func, bool isExternal = false);
     explicit LgsSymbol(LgsGroup* group);
     Location* getLocation() const;
     void* getPtr() const;

@@ -20,18 +20,19 @@ bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
         const auto lgsParam = LgsParam(mapCType(paramType));
         funcImpl->funcType->params.push_back(lgsParam);
     }
-    lgsFile.symbolTable.addSymbol(name, LgsSymbol(funcImpl), &errHandler);
+    funcImpl->funcType->isVariadic = func->isVariadic();
+    lgsFile.symbolTable.addSymbol(name, LgsSymbol(funcImpl, true), &errHandler);
     return true;
 }
 
 bool LgsCLangVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
-    if (!isValid(record->getLocation())) return true;
-    if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
     const auto name = record->getNameAsString();
+    if (!name.empty() && name[0] == '_') return true;
+    if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
     const auto objSymbol = lgsFile.symbolTable.getSymbol(name);
     if (objSymbol) return true;
     const auto obj = mapCRecord(record);
-    lgsFile.symbolTable.addSymbol(name, LgsSymbol(obj), &errHandler);
+    lgsFile.symbolTable.addSymbol(name, LgsSymbol(obj, true), &errHandler);
     return true;
 }
 
@@ -117,7 +118,7 @@ LgsType* LgsCLangVisitor::mapCStruct(const clang::QualType type) {
     const auto objSymbol = lgsFile.symbolTable.getSymbol(name);
     if (objSymbol) return objSymbol->object;
     const auto obj = mapCRecord(decl);
-    lgsFile.symbolTable.addSymbol(name, LgsSymbol(obj), &errHandler);
+    lgsFile.symbolTable.addSymbol(name, LgsSymbol(obj, true), &errHandler);
     return obj;
 }
 
@@ -150,10 +151,6 @@ bool LgsCLangVisitor::isConstCharPointer(const clang::QualType qt) const {
 
 void LgsCLangASTConsumer::HandleTranslationUnit(clang::ASTContext& context) {
     visitor.TraverseDecl(context.getTranslationUnitDecl());
-}
-
-bool LgsCLangVisitor::isValid(const clang::SourceLocation loc) const {
-    return context->getSourceManager().isWrittenInMainFile(loc);
 }
 
 unique_ptr<clang::ASTConsumer> LgsCLangFeAction::CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) {
