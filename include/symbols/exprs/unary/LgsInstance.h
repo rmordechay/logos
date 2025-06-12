@@ -11,9 +11,10 @@ public:
     explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), name(obj->name), obj(obj) {}
     explicit LgsInstance(const string& name) : name(name) {}
     Value* createIRValue(LgsRuntime* runtime) override;
-    void setZeroFields(LgsRuntime* runtime, LgsObject* object, Value* parentIRValue) const;
+    void setZeroField(LgsRuntime* runtime, LgsField* field, Value* parentIRValue) const;
     void free(LgsRuntime* runtime) override;
     string getName() override;
+    string prettyName() override;
     void setReturnExpr(LgsRuntime* runtime, Type* objIRType);
     ~LgsInstance() override = default;
 };

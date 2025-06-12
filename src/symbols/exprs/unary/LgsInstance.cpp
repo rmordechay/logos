@@ -5,10 +5,6 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
-string LgsInstance::getName() {
-    return obj->name;
-}
-
 Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
     const auto objIRType = obj->getIRType();
     if (isReturnExpr) {
@@ -24,25 +20,28 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
     }
     for (const auto& [name, field] : obj->fields) {
         if (initializedFields.count(name)) continue;
-        if (const auto fieldObj = field->type->asObject()) {
-            setZeroFields(runtime, fieldObj, IRValue);
-        } else {
-            const auto zeroValue = field->type->getZeroValue();
-            field->storeIRValue(runtime, IRValue, zeroValue);
-        }
+        setZeroField(runtime, field, IRValue);
     }
     return IRValue;
 }
 
-void LgsInstance::setZeroFields(LgsRuntime* runtime, LgsObject* object, Value* parentIRValue) const {
-    for (const auto& [name, field] : object->fields) {
-        if (const auto fieldObj = field->type->asObject()) {
-            setZeroFields(runtime, fieldObj, parentIRValue);
-        } else {
-            const auto zeroValue = field->type->getZeroValue();
-            field->storeIRValue(runtime, parentIRValue, zeroValue);
+void LgsInstance::setZeroField(LgsRuntime* runtime, LgsField* field, Value* parentIRValue) const {
+    if (const auto fieldObj = field->type->asObject()) {
+        for (const auto& [name, field] : fieldObj->fields) {
+            setZeroField(runtime, field, parentIRValue);
         }
+    } else {
+        const auto zeroValue = field->type->getZeroValue();
+        field->storeIRValue(runtime, parentIRValue, zeroValue);
     }
+}
+
+string LgsInstance::getName() {
+    return obj->name;
+}
+
+string LgsInstance::prettyName() {
+    return obj->name;
 }
 
 void LgsInstance::setReturnExpr(LgsRuntime* runtime, Type* objIRType) {

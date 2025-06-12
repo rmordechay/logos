@@ -1,4 +1,3 @@
-
 #include "exprs/LgsNull.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsStrConst.h"
