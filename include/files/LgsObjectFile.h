@@ -5,7 +5,7 @@ class LgsObjectFile final : public LgsFile {
 public:
     LgsObject *obj = nullptr;
 
-    explicit LgsObjectFile(const string& name, const string& path) : LgsFile(name, path) {}
+    explicit LgsObjectFile(const string& name, path& path) : LgsFile(name, path) {}
     Module* generateIR() override;
     ~LgsObjectFile() override;
 };

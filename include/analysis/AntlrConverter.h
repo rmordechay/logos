@@ -44,10 +44,11 @@ class LgsAssignment;
 
 class AntlerConverter {
 public:
-    string filePath;
+    path& filePath;
     LgsErrHandler errHandler;
 
-    LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const path& filePath);
+    explicit AntlerConverter(path& filePath) : filePath(filePath) {}
+    LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx);
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx);
     LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx);
@@ -85,7 +86,7 @@ public:
     LgsPostfixExpr* getPostfixExpr(LogosParser::PostfixExprContext* ctx);
     LgsUnaryExpr* getArrayExpr(LogosParser::ArrayExprContext* ctx);
     LgsUnaryExpr* getHashMap(LogosParser::HashMapContext* ctx);
-    LgsVariable* getVariable(tree::TerminalNode* ctx) const;
+    LgsVariable* getVariable(tree::TerminalNode* ctx);
     LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     LgsUnaryExpr* getVector(LogosParser::VectorContext* vector) const;
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
@@ -93,8 +94,8 @@ public:
     vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
     LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
-    LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx) const;
-    LgsStrConst* getStrConst(tree::TerminalNode* type) const;
+    LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
+    LgsStrConst* getStrConst(tree::TerminalNode* type);
     LgsTypeConst* getTypeConstant(tree::TerminalNode* ctx);
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsGroup* getGroup(LogosParser::GroupContext* ctx);

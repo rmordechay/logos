@@ -10,10 +10,10 @@ using namespace clang;
 
 void LgsCLang::parseFile(const LgsStrConst* filePaths) {
     const auto pathStr = filePaths->value;
-    const auto cLibPath = paths.clibInclude / pathStr;
-    if (isCHeader(cLibPath)) {
-        const auto code = getFileText(cLibPath);
-        runToolOnCodeWithArgs(make_unique<LgsCLangFeAction>(), code, {"-isysroot", paths.clibRoot});
+    auto headerPath = paths.clibInclude / pathStr;
+    if (isCLibHeader(headerPath)) {
+        const auto code = getFileText(headerPath);
+        runToolOnCodeWithArgs(make_unique<LgsCLangFeAction>(headerPath), code, {"-isysroot", paths.clibRoot});
     } else {
         return errHandler.handleError(E10047, &filePaths->location, {pathStr});
     }
@@ -79,7 +79,8 @@ string LgsCLang::getCode(const LgsStrConst* filePath) {
     return "";
 }
 
-vector<string> LgsCLang::setCHeaderPaths() {
+void LgsCLang::setCHeaderPaths() {
+    assert(paths.clibInclude != "");
     for (const auto& entry : directory_iterator(paths.clibInclude)) {
         if (!entry.is_regular_file()) continue;
         auto ext = entry.path().extension();
@@ -87,9 +88,8 @@ vector<string> LgsCLang::setCHeaderPaths() {
             headers.push_back(entry.path().string());
         }
     }
-    return headers;
 }
 
-bool LgsCLang::isCHeader(const path& cLibPath) {
+bool LgsCLang::isCLibHeader(const path& cLibPath) {
     return std::find(headers.begin(), headers.end(), cLibPath) != headers.end();
 }

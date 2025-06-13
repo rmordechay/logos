@@ -40,7 +40,7 @@ public:
     LgsFunc* getMethod(const string& name);
     void addMethod(LgsFunc* method);
     LgsFunc* findMethod(const string& name) const;
-    void setLocation(const Token* ctx, string* filePath = nullptr);
+    void setLocation(const Token* ctx, path* filePath);
 
     LgsBool* asBool();
     LgsStr* asStr();

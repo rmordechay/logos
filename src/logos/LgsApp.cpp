@@ -116,10 +116,9 @@ void LgsApp::parseSrcFiles(const std::string& path, ThreadPool& threadPool) {
     }
 }
 
-void LgsApp::parseSrcFile(path entry) {
-    const path absFilePath = canonical(entry);
-    AntlerConverter antlerConverter;
-    const auto codeText = getFileText(entry);
+void LgsApp::parseSrcFile(path fileEntry) {
+    const auto absFilePath = new path(canonical(fileEntry));
+    const auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
@@ -129,7 +128,8 @@ void LgsApp::parseSrcFile(path entry) {
         errHandler.setUnsuccessful();
         return;
     }
-    const auto file = antlerConverter.getLogosFile(lgsFile, absFilePath);
+    AntlerConverter antlerConverter(*absFilePath);
+    const auto file = antlerConverter.getLogosFile(lgsFile);
     lock_guard lock(mtx);
     files.push_back(file);
     if (!antlerConverter.errHandler.successful) {
@@ -143,8 +143,8 @@ void LgsApp::parseSrcFile(path entry) {
 }
 
 void LgsApp::parseEnvFile(path fileEntry) {
-    const auto absFilePath = canonical(fileEntry);
-    AntlerConverter antlerConverter;
+    const auto absFilePath = new path(canonical(fileEntry));
+    AntlerConverter antlerConverter(*absFilePath);
     const auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
@@ -154,6 +154,29 @@ void LgsApp::parseEnvFile(path fileEntry) {
     lock_guard lock(mtx);
     envFiles.emplace_back(file);
     addErrors(antlerConverter.errHandler.errors);
+}
+
+void LgsApp::parseAppFile(path fileEntry) {
+    const auto absFilePath = new path(canonical(fileEntry));
+    AntlerConverter antlerConverter(*absFilePath);
+    auto codeText = getFileText(fileEntry);
+    ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+
+    appFile = antlerConverter.getAppFile(parser.logosAppFile());
+    for (const auto& varDec : appFile->varDecs) {
+        if (varDec->name == "name") {
+            name = varDec->expr->asStrConst()->value;
+        }
+        if (varDec->name == "version") {
+            version = varDec->expr->asStrConst()->value;
+        }
+        if (varDec->name == "activeEnv") {
+            activeEnv.name = varDec->expr->asStrConst()->value;
+        }
+    }
 }
 
 bool LgsApp::resolveGlobalTypes() const {
@@ -183,30 +206,6 @@ bool LgsApp::resolveGlobalTypes() const {
     return true;
 }
 
-void LgsApp::parseAppFile(path fileEntry) {
-    auto absFilePath = canonical(fileEntry);
-    AntlerConverter antlerConverter;
-
-    auto codeText = getFileText(fileEntry);
-    ANTLRInputStream input(codeText);
-    LogosLexer lexer(&input);
-    CommonTokenStream tokens(&lexer);
-    LogosParser parser(&tokens);
-
-    appFile = antlerConverter.getAppFile(parser.logosAppFile());
-    for (const auto& varDec : appFile->varDecs) {
-        if (varDec->name == "name") {
-            name = varDec->expr->asStrConst()->value;
-        }
-        if (varDec->name == "version") {
-            version = varDec->expr->asStrConst()->value;
-        }
-        if (varDec->name == "activeEnv") {
-            activeEnv.name = varDec->expr->asStrConst()->value;
-        }
-    }
-}
-
 bool LgsApp::generateObjFile(Module* module) const {
     error_code ec;
     legacy::PassManager pass;
@@ -234,7 +233,7 @@ bool LgsApp::resolveExternalFiles() {
     for (const auto externFile : externFiles) {
         lgsCLang.parseFile(externFile);
     }
-    return true;
+    return lgsCLang.errHandler.successful;
 }
 
 void LgsApp::loadGlobals() {
@@ -273,22 +272,6 @@ void LgsApp::checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile*
     }
     if (!found) {
         errHandler.handleError(E10020, nullptr, {envFile->name, requireEnvVar.name});
-    }
-}
-
-void LgsApp::checkDuplicateFiles(const vector<LgsFile*>& files) {
-    map<string, vector<LgsFile*>> duplicates;
-    for (const auto& file : files) {
-        duplicates[file->name].emplace_back(file);
-    }
-    if (duplicates.empty()) return;
-    for (const auto& [name, duplicate] : duplicates) {
-        if (duplicate.size() <= 1) continue;
-        ostringstream errMsg;
-        for (const auto &file : duplicate) {
-            errMsg << "\n\t - " + file->absPath;
-        }
-        errHandler.handleError(E10007, nullptr, {name, errMsg.str()});
     }
 }
 

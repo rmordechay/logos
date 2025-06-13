@@ -1,4 +1,6 @@
 #pragma once
+#include "files/LgsFile.h"
+#include "utils/LgsUtils.h"
 
 class LgsErrHandler;
 class LgsFile;
@@ -9,6 +11,9 @@ using namespace clang::tooling;
 
 class LgsCLangVisitor : public clang::RecursiveASTVisitor<LgsCLangVisitor> {
 public:
+    LgsFile* cFile;
+
+    explicit LgsCLangVisitor(path& filePath) : cFile(new LgsFile(filePath.filename(), filePath)) {}
     bool VisitFunctionDecl(const clang::FunctionDecl* func);
     bool VisitRecordDecl(const clang::RecordDecl* record);
     LgsType* mapCType(clang::QualType type);
@@ -24,16 +29,22 @@ class LgsCLangASTConsumer final : public clang::ASTConsumer {
 public:
     LgsCLangVisitor visitor;
 
+    explicit LgsCLangASTConsumer(path& filePath) : visitor(filePath) {}
     void HandleTranslationUnit(clang::ASTContext& context) override {
         visitor.TraverseDecl(context.getTranslationUnitDecl());
+        lock_guard lock(mtx);
+        externalFiles[visitor.cFile->name] = visitor.cFile;
     }
     ~LgsCLangASTConsumer() override = default;
 };
 
 class LgsCLangFeAction final : public clang::ASTFrontendAction {
 public:
+    path& filePath;
+
+    explicit LgsCLangFeAction(path& filePath) : filePath(filePath) {}
     unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) override {
-        return make_unique<LgsCLangASTConsumer>();
+        return make_unique<LgsCLangASTConsumer>(filePath);
     }
     ~LgsCLangFeAction() override = default;
 };

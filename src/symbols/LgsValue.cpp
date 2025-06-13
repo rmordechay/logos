@@ -23,9 +23,10 @@ Value* LgsValue::hashIRValue(LgsRuntime* runtime, Value* value) const {
     return runtime->builder.CreateCall(func, {value});
 }
 
-void LgsValue::setLocation(const antlr4::Token* ctx) {
+void LgsValue::setLocation(const Token* ctx, path* filePath) {
     location.lineNumber = ctx->getLine();
     location.posInLine = ctx->getCharPositionInLine() + 1;
+    location.filePath = filePath;
 }
 
 void LgsValue::setIRValue(Value* value) {

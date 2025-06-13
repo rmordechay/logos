@@ -1,6 +1,8 @@
 #pragma once
 #include "LgsStack.h"
+#include "LgsSymbolTable.h"
 
+class LgsFile;
 using namespace llvm;
 class LgsErrHandler;
 class LgsForLoop;
@@ -24,15 +26,5 @@ public:
     ~LgsRuntime() = default;
 };
 
-struct LgsSymbolTable {
-    map<string, LgsSymbol> symbols;
-
-    LgsSymbol* getSymbol(const string& name);
-    void addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler);
-    void addSymbol(const string& name, const LgsSymbol& symbol);
-    void addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler = nullptr);
-    ~LgsSymbolTable();
-};
-
 inline LgsSymbolTable globals;
-inline LgsSymbolTable externalSymbols;
+inline map<string, LgsFile*> externalFiles;

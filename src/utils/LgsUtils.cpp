@@ -1,13 +1,7 @@
 #include "utils/LgsUtils.h"
-#include "data/LgsDefinitions.h"
-#include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsVariable.h"
-#include "exprs/unary/constants/LgsIntConst.h"
-#include "exprs/unary/constants/LgsStrConst.h"
 #include "logos/LgsApp.h"
-#include "stmts/LgsField.h"
-#include "stmts/LgsVarDec.h"
-#include "../../include/symbols/LgsType.h"
+#include "LgsType.h"
 
 string getFileText(path filePath) {
     if (!exists(filePath)) return "";

@@ -11,13 +11,15 @@ public:
     vector<string> headers;
     LgsErrHandler errHandler;
 
-    explicit LgsCLang(LgsPaths& paths) : paths(paths) {}
+    explicit LgsCLang(LgsPaths& paths) : paths(paths) {
+        setCHeaderPaths();
+    }
     string getCode(const LgsStrConst* filePath);
-    bool isCHeader(const path& cLibPath);
+    bool isCLibHeader(const path& cLibPath);
     void parseFile(const LgsStrConst* filePaths);
     void compile(const vector<LgsStrConst*>& files) const;
     vector<const char*> getCompileArgs(const vector<LgsStrConst*>& files) const;
-    vector<string> setCHeaderPaths();
+    void setCHeaderPaths();
     void getClibRoot() const;
     ~LgsCLang() = default;
 };

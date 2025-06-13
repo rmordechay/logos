@@ -10,7 +10,6 @@ class LgsType;
 
 class LgsFunc : public LgsUnaryExpr {
 public:
-    string filePath;
     LgsFuncType* funcType;
     vector<LgsVariable*> refs;
     vector<LgsExpr*> returnExprs;

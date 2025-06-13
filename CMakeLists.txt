@@ -86,7 +86,7 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/LgsPostfixExpr.cpp
     include/symbols/exprs/unary/LgsPostfixExpr.h
     src/utils/LgsLogger.cpp
-    include/utils/LgsLogger.h
+    src/symbols/LgsSymbolTable.cpp
 )
 
 add_library(lib ${SOURCE_FILES})

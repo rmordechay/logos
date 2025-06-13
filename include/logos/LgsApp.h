@@ -39,7 +39,7 @@ public:
     bool link() const;
     void run() const;
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
-    void parseSrcFile(path entry);
+    void parseSrcFile(path fileEntry);
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
     bool generateObjFile(Module* module) const;
@@ -50,7 +50,6 @@ public:
     void loadGlobals();
     void loadEnvFiles();
     void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
-    void checkDuplicateFiles(const vector<LgsFile*>& files);
     void checkRequiredEnvVars();
     bool isLogosFile(const directory_entry& entry) const;
     void addErrors(vector<LgsError> newErrors);

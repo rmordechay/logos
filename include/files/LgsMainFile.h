@@ -11,14 +11,12 @@ class LgsMainFile final : public LgsFile {
 public:
     vector<LgsEnum*> enums;
     vector<LgsObject*> objects;
+    map<string, LgsFunc*> funcs;
     vector<LgsInterface*> interfaces;
     vector<LgsGroup*> groups;
-    map<string, LgsFunc*> funcs;
 
-    explicit LgsMainFile(const string& path) : LgsFile(LOGOS_MAIN_FILE_NAME, path) {}
+    explicit LgsMainFile(path& path) : LgsFile(LOGOS_MAIN_FILE_NAME, path) {}
     void format() override;
     Module* generateIR() override;
     ~LgsMainFile() override;
 };
-
-

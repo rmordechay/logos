@@ -102,7 +102,6 @@ void SemaAnalyser::visitObjectImplements(LgsObject* obj) {
 
 void SemaAnalyser::visitFunc(LgsFunc* func) {
     stack.enterFunc(func);
-    func->filePath = file->absPath;
     for (auto& param : func->funcType->params) {
         visitParam(&param);
     }
@@ -651,7 +650,7 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
 void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
     const auto method = methodCall->func;
     if (!method) return;
-    if (!method->funcType->isPublic && file->absPath != method->filePath) {
+    if (!method->funcType->isPublic && file->absPath != *method->location.filePath) {
         errHandler.handleError(E10031, &method->location, {method->funcType->name, method->funcType->parentName});
     }
 }

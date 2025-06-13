@@ -21,7 +21,7 @@ bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
         funcImpl->funcType->params.push_back(lgsParam);
     }
     funcImpl->funcType->isVariadic = func->isVariadic();
-    externalSymbols.addSymbol(name, LgsSymbol(funcImpl, true));
+    cFile->symbolTable.addSymbol(name, LgsSymbol(funcImpl, true));
     return true;
 }
 
@@ -29,10 +29,10 @@ bool LgsCLangVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
     const auto name = record->getNameAsString();
     if (!name.empty() && name[0] == '_') return true;
     if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
-    const auto objSymbol = externalSymbols.getSymbol(name);
+    const auto objSymbol = cFile->symbolTable.getSymbol(name);
     if (objSymbol) return true;
     const auto obj = mapCRecord(record);
-    externalSymbols.addSymbol(name, LgsSymbol(obj, true));
+    cFile->symbolTable.addSymbol(name, LgsSymbol(obj, true));
     return true;
 }
 
@@ -115,10 +115,10 @@ LgsType* LgsCLangVisitor::mapCStruct(const clang::QualType type) {
     if (name == "") {
         name = decl->getQualifiedNameAsString();
     }
-    const auto objSymbol = externalSymbols.getSymbol(name);
+    const auto objSymbol = cFile->symbolTable.getSymbol(name);
     if (objSymbol) return objSymbol->object;
     const auto obj = mapCRecord(decl);
-    externalSymbols.addSymbol(name, LgsSymbol(obj, true));
+    cFile->symbolTable.addSymbol(name, LgsSymbol(obj, true));
     return obj;
 }
 
