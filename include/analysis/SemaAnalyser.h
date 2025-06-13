@@ -23,7 +23,7 @@ class LgsPatternMatch;
 class LgsStmtBlock;
 class LgsStmt;
 class LgsMainFile;
-class LgsProject;
+class LgsApp;
 class LgsCast;
 class LgsVarDec;
 class LgsInstance;
@@ -50,6 +50,7 @@ public:
     void visitMainFile(LgsMainFile* mainFile) override;
     void visitObject(LgsObject* obj) override;
     void visitInterface(LgsInterface* interface) const override;
+    void visitObjectImplements(LgsObject* obj);
     void visitField(LgsField* field) override;
     void visitFunc(LgsFunc* func) override;
     void visitParam(LgsParam* param) override;
@@ -105,8 +106,8 @@ public:
     void resolveIterable(LgsIterable* iterable);
     void resolveFuncTypes(LgsFuncType* funcType);
     void resolveObjTypes(LgsObject* obj);
-    void visitObjectImplements(LgsObject* obj);
     void resolveGroupTypes(LgsGroup* group);
+    static void reprocessFuncs(const vector<LgsFile*>& files);
     string getFuncsAsStr(const vector<LgsFunc*>& funcs) const;
     ~SemaAnalyser() override = default;
 };

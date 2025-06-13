@@ -6,8 +6,8 @@
 void LgsFormatCmd::runCmd() {
     filePath = argv[2];
     Logos logos;
-    logos.project.parseSrcFile(filePath);
-    logos.project.files.front()->format();
+    logos.app.parseSrcFile(filePath);
+    logos.app.files.front()->format();
 }
 
 void LgsFormatCmd::validate() {

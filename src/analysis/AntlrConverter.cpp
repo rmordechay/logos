@@ -32,7 +32,6 @@
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "funcs/LgsMainFunc.h"
-#include "logos/Platform.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
@@ -71,11 +70,10 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
         }
     }
     if (!file->externFiles.empty()) {
-        const LgsCLang lgsClang;
+        const LgsCLang lgsClang(paths.buildDir, paths.clibRoot);
         lgsClang.parse(*file, errHandler);
     }
     file->absPath = filePath;
-    file->relPath = relative(filePath, application.paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     return file;
 }
 
@@ -158,7 +156,6 @@ LgsAppFile* AntlerConverter::getAppFile(LogosParser::LogosAppFileContext* ctx) {
         requireEnvVars.push_back(requireEnvVar);
     }
     file->requireEnvVars = requireEnvVars;
-    file->relPath = relative(filePath, application.paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
     return file;
 }
 
@@ -170,9 +167,7 @@ LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx) {
     for (const auto& implicitVarDec : ctx->implicitVarDec()) {
         varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
     }
-    const auto file = new LgsEnvFile(filePath, varDecs);
-    file->relPath = relative(filePath, application.paths.rootDir).lexically_relative(LOGOS_SRC_DIR);
-    return file;
+    return new LgsEnvFile(filePath, varDecs);
 }
 
 LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const bool isSingleton) {

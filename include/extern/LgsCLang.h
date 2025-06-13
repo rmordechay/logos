@@ -9,9 +9,12 @@ using namespace clang::driver;
 class LgsCLang {
 public:
     IntrusiveRefCntPtr<vfs::FileSystem> fs;
-    path outputFilePath = application.paths.buildDir / "c.o";
-    vector<string> compileArgs{CLANG_BINARY, "-c", "-isysroot", application.paths.clibRoot};
+    path clibRoot;
+    path buildDir;
+    path outputFilePath = buildDir / "c.o";
+    vector<string> compileArgs{CLANG_BINARY, "-c", "-isysroot", clibRoot};
 
+    LgsCLang(const path& clibRoot, const path& buildDir) : clibRoot(clibRoot), buildDir(buildDir) {}
     void getClibRoot() const;
     void parse(LgsFile& lgsFile, LgsErrHandler& errHandler) const;
     void compile(const vector<LgsStrConst*>& files);

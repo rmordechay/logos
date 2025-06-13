@@ -1,18 +1,14 @@
 #pragma once
-#include "LgsProject.h"
-#include "Platform.h"
+#include "LgsApp.h"
 
 class Logos {
 public:
-    LgsProject project;
+    LgsApp app;
     vector<char*> args;
 
     explicit Logos(const path& rootDirPath = "") {
-        application.paths.initPaths(rootDirPath);
-        application.platform.setPlatform();
+        app.initPaths(rootDirPath);
     }
     void run();
     ~Logos() = default;
 };
-
-

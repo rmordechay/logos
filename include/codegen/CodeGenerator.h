@@ -1,11 +1,11 @@
 #pragma once
 
-class LgsProject;
+class LgsApp;
 
 class CodeGenerator {
 public:
     static void init();
-    static void writeIRToFile(LgsProject& project);
+    static void writeIRToFile(LgsApp& project);
     ~CodeGenerator() = default;
 };
 

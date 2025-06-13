@@ -12,7 +12,7 @@ void LgsCLang::parse(LgsFile& lgsFile, LgsErrHandler& errHandler) const {
     for (const auto filePath : lgsFile.externFiles) {
         auto path = filePath->value;
         string code;
-        auto cLibPath = application.paths.clibRoot / "usr/include" / path;
+        auto cLibPath = clibRoot / "usr/include" / path;
         if (exists(cLibPath)) {
             code = getFileText(cLibPath);
         } else {
@@ -22,7 +22,7 @@ void LgsCLang::parse(LgsFile& lgsFile, LgsErrHandler& errHandler) const {
             errHandler.handleError(E10047, &filePath->location, {path});
             continue;
         }
-        runToolOnCodeWithArgs(std::make_unique<LgsCLangFeAction>(lgsFile, errHandler), code, {"-isysroot", application.paths.clibRoot});
+        runToolOnCodeWithArgs(std::make_unique<LgsCLangFeAction>(lgsFile, errHandler), code, {"-isysroot", clibRoot});
     }
 }
 
@@ -41,7 +41,7 @@ void LgsCLang::compile(const vector<LgsStrConst*>& files) {
 
     const auto targetTriple = sys::getDefaultTargetTriple();
     DiagnosticsEngine diags(new DiagnosticIDs(), new DiagnosticOptions(), new DiagnosticConsumer());
-    Driver driver(args[0], targetTriple, diags, "cc", fs);
+    Driver driver(args[0], targetTriple, diags, CLANG_BINARY, fs);
     driver.setCheckInputsExist(false);
 
     unique_ptr<Compilation> compilation(driver.BuildCompilation(args));

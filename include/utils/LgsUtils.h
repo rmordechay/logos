@@ -1,7 +1,7 @@
 #pragma once
 #include "exprs/LgsExpr.h"
 
-class LgsProject;
+class LgsApp;
 struct LgsIndex;
 
 inline std::mutex mtx;

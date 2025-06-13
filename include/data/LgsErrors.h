@@ -18,7 +18,7 @@ inline LgsError E10006{.msg = "'%s' is not defined.", .errCode = errCodeStart++}
 inline LgsError E10007{.msg = "File name '%s.lgs' is duplicate. All files in a project must be unique. Locations:%s", .errCode = errCodeStart++};
 inline LgsError E10008{.msg = "'Main.lgs' could not be found in 'src' directory.", .errCode = errCodeStart++};
 inline LgsError E10009{.msg = "Duplicate Main files were found in the project. Locations:%s", .errCode = errCodeStart++};
-inline LgsError E10010{.msg = "Current path is not a root path of a logos project.", .errCode = errCodeStart++};
+inline LgsError E10010{.msg = "Path is not a root path of a logos project.", .errCode = errCodeStart++};
 inline LgsError E10011{.msg = "'%s' is already declared at line %s.", .errCode = errCodeStart++};
 inline LgsError E10012{.msg = "Function '%s' is not defined.", .errCode = errCodeStart++};
 inline LgsError E10013{.msg = "Function '%s' is not a member of '%s'.", .errCode = errCodeStart++};

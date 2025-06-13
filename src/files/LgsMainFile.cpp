@@ -1,12 +1,12 @@
 #include "files/LgsMainFile.h"
 
 #include "funcs/LgsFunc.h"
-#include "logos/LgsProject.h"
+#include "logos/LgsApp.h"
 #include "types/LgsEnum.h"
 #include "types/LgsObject.h"
 #include "utils/LgsUtils.h"
 
-Module* LgsMainFile::generateIR(LgsProject& project) {
+Module* LgsMainFile::generateIR(LgsApp& project) {
     LgsRuntime runtime;
     runtime.module = createIRModule(LOGOS_MAIN_FILE_NAME, context);
     for (const auto [_, func] : funcs) {

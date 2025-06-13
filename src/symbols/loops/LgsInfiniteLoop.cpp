@@ -15,7 +15,7 @@ void LgsInfiniteLoop::exitIRLoop(LgsRuntime* runtime) const {
 }
 
 Value* LgsInfiniteLoop::loopStart(LgsRuntime* runtime) {
-    const auto type = runtime->builder.getIntPtrTy(application.platform.dataLayout);
+    const auto type = runtime->builder.getIntPtrTy(platform.dataLayout);
     return ConstantInt::get(type, 0);
 }
 

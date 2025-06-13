@@ -4,7 +4,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "logos/LgsProject.h"
+#include "logos/LgsApp.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsType.h"

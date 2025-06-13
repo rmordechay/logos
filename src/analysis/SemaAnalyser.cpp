@@ -2,7 +2,7 @@
 #include "data/LgsErrors.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
-#include "logos/LgsProject.h"
+#include "logos/LgsApp.h"
 #include "utils/ThreadPool.h"
 #include "exprs/LgsCast.h"
 #include "stmts/LgsField.h"
@@ -890,6 +890,31 @@ void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
 void SemaAnalyser::resolveGroupTypes(LgsGroup* group) {
     for (int i = 0; i < group->types.size(); ++i) {
         group->types[i] = resolveType(group->types[i]);
+    }
+}
+
+void SemaAnalyser::reprocessFuncs(const vector<LgsFile*>& files) {
+    for (const auto& file : files) {
+        SemaAnalyser semaAnalyser(file);
+        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+            for (const auto& obj : mainFile->objects) {
+                for (const auto& [_, method] : obj->methods) {
+                    method->swapReturnIfNeeded();
+                }
+            }
+            for (const auto [_, func] : mainFile->funcs) {
+                func->swapReturnIfNeeded();
+            }
+        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+            const auto obj = objFile->obj;
+            for (const auto& [_, method] : obj->methods) {
+                method->swapReturnIfNeeded();
+            }
+        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+            for (const auto& [_, method] : interfaceFile->interface->methods) {
+                method->swapReturnIfNeeded();
+            }
+        }
     }
 }
 

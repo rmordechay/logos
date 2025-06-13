@@ -1,7 +1,7 @@
 #pragma once
 #include "LgsActiveEnv.h"
 #include "LgsErrHandler.h"
-#include "codegen/LgsLinker.h"
+#include "Platform.h"
 
 class LgsFile;
 class LgsEnvFile;
@@ -16,42 +16,38 @@ struct LgsError;
 struct LgsPaths;
 struct RequireEnvVar;
 
-using namespace filesystem;
-
-class LgsProject final {
+class LgsApp final {
 public:
     string name;
     string version;
-    vector<LgsFile*> files;
+    LgsPaths paths;
     LgsActiveEnv activeEnv;
+    vector<LgsFile*> files;
     LgsErrHandler errHandler;
     vector<LgsEnvFile*> envFiles;
     map<string, Module*> IRModules;
-    const LgsLinker linker;
     const LgsAppFile* appFile = nullptr;
 
-    void asJSON() const;
-    bool parseFiles();
+    void initPaths(const path& rootDirPath);
+    bool validateProject();
+    bool parse();
+    bool analyse();
+    bool generate();
+    bool link() const;
     void setEnvVars();
-    void reprocessFuncs() const;
     void loadGlobals();
     void loadEnvFiles();
     void setupActiveEnv();
-    bool validateProject();
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
     void parseSrcFile(path entry);
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
-    bool analyse();
-    bool generate();
-    bool link() const;
+    bool generateObjFile(Module* module) const;
     bool resolveGlobalTypes() const;
     void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
     void checkDuplicateFiles(const vector<LgsFile*>& files);
     void checkRequiredEnvVars();
     bool isLogosFile(const directory_entry& entry) const;
     void addErrors(vector<LgsError> newErrors);
-    ~LgsProject() = default;
+    ~LgsApp() = default;
 };
-
-

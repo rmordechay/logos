@@ -1,24 +1,14 @@
 #pragma once
 #include "data/LgsDefinitions.h"
-#include "utils/LgsLogger.h"
 
 struct Platform {
-    string osName;
-    string linker;
-    string arch;
-    string platformVersion;
+    string osName = OS_NAME;
+    string linker = LINKER;
+    string arch = ARCH_NAME;
+    string platformVersion = PLATFORM_VERSION;
+    vector<const char*> linkerOpts = LINKER_OPTS;
+    bool (*link)(ArrayRef<const char*>, raw_ostream&, raw_ostream&, bool, bool) = LINK_FUNC;
     DataLayout dataLayout;
-    vector<const char*> linkerOpts;
-    bool (*link)(ArrayRef<const char*>, raw_ostream&, raw_ostream&, bool, bool);
-
-    void setPlatform() {
-        osName = OS_NAME;
-        linker = LINKER;
-        platformVersion = PLATFORM_VERSION;
-        arch = ARCH_NAME;
-        linkerOpts = LINKER_OPTS;
-        link = LINK_FUNC;
-    }
 };
 
 struct LgsPaths {
@@ -31,26 +21,7 @@ struct LgsPaths {
     path appFilePath;
     path objFilePath;
     path execFilePath;
-
-    void initPaths(const path& rootDirPath) {
-        if (rootDirPath == "") return;
-        rootDir = rootDirPath;
-        rootDirAbs = canonical(rootDir);
-        srcDir = rootDir / LOGOS_SRC_DIR;
-        envsDir = rootDir / LOGOS_ENVS_DIR;
-        buildDir = rootDir / LOGOS_BUILD_DIR;
-        objFilePath = buildDir / LOGOS_OBJECT_FILE;
-        execFilePath = buildDir / LOGOS_EXECUTABLE_FILE;
-        appFilePath = rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
-        clibRoot = CLIB_ROOT;
-    }
 };
 
-struct LgsApp {
-    string name;
-    LgsPaths paths;
-    Platform platform;
-    LogLevel logLevel = INFO;
-};
-
-inline LgsApp application;
+inline LgsPaths paths;
+inline Platform platform;
