@@ -3,7 +3,7 @@
 #include "types/LgsObject.h"
 #include "utils/LgsUtils.h"
 
-Module* LgsObjectFile::generateIR(LgsApp& project) {
+Module* LgsObjectFile::generateIR() {
     LgsRuntime runtime;
     runtime.module = createIRModule(name, context);
     for (const auto& [_, method] : obj->methods) {

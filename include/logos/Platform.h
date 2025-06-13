@@ -23,5 +23,4 @@ struct LgsPaths {
     path execFilePath;
 };
 
-inline LgsPaths paths;
 inline Platform platform;

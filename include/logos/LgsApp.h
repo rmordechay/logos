@@ -21,6 +21,7 @@ public:
     string name;
     string version;
     LgsPaths paths;
+    vector<char*> args;
     LgsActiveEnv activeEnv;
     vector<LgsFile*> files;
     LgsErrHandler errHandler;
@@ -29,11 +30,12 @@ public:
     const LgsAppFile* appFile = nullptr;
 
     void initPaths(const path& rootDirPath);
-    bool validateProject();
+    bool validate();
     bool parse();
     bool analyse();
     bool generate();
     bool link() const;
+    void run() const;
     void setEnvVars();
     void loadGlobals();
     void loadEnvFiles();

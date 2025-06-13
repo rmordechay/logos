@@ -6,6 +6,7 @@
 #include "logos/LgsErrHandler.h"
 #include "logos/Platform.h"
 #include "utils/LgsUtils.h"
+
 using namespace clang;
 
 void LgsCLang::parse(LgsFile& lgsFile, LgsErrHandler& errHandler) const {

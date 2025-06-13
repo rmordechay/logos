@@ -4,7 +4,7 @@
 #include "logos/Platform.h"
 #include "utils/LgsUtils.h"
 
-void CodeGenerator::init() {
+void CodeGenerator::init(const LgsPaths& paths) {
     // Build dir
     if (exists(paths.buildDir)) remove_all(paths.buildDir);
     create_directories(paths.buildDir);
@@ -18,8 +18,8 @@ void CodeGenerator::init() {
     platform.dataLayout = getTargetMachine()->createDataLayout();
 }
 
-void CodeGenerator::writeIRToFile(LgsApp& project) {
-    for (const auto [_, module] : project.IRModules) {
+void CodeGenerator::writeIRToFile(map<string, Module*>& IRModules, LgsPaths& paths) {
+    for (const auto [_, module] : IRModules) {
         if constexpr (WRITE_IR_TO_FILE) {
             const auto filePath = (paths.buildDir / module->getName().str()).string() + ".ll";
             std::error_code EC;

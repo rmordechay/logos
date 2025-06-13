@@ -18,8 +18,7 @@
 
 extern char **environ;
 
-
-bool LgsApp::validateProject() {
+bool LgsApp::validate() {
     if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {
         errHandler.handleError(E10010, nullptr);
         return false;
@@ -66,19 +65,19 @@ bool LgsApp::analyse() {
 }
 
 bool LgsApp::generate() {
-    CodeGenerator::init();
+    CodeGenerator::init(paths);
     ThreadPool threadPool;
     threadPool.start();
     for (const auto file : files) {
         threadPool.runTask([=, &file] {
-            const auto module = file->generateIR(*this);
+            const auto module = file->generateIR();
             if (!module) return;
             lock_guard lock(mtx);
             IRModules[file->name] = module;
         });
     }
     threadPool.wait();
-    CodeGenerator::writeIRToFile(*this);
+    CodeGenerator::writeIRToFile(IRModules, paths);
     return errHandler.successful;
 }
 
@@ -100,6 +99,10 @@ bool LgsApp::link() const {
         return false;
     }
     return true;
+}
+
+void LgsApp::run() const {
+    execv(paths.execFilePath.c_str(), args.data());
 }
 
 void LgsApp::parseSrcFiles(const string& path, ThreadPool& threadPool) {

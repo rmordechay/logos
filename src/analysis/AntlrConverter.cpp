@@ -69,10 +69,6 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx, const
             file->externFiles.push_back(str);
         }
     }
-    if (!file->externFiles.empty()) {
-        const LgsCLang lgsClang(paths.buildDir, paths.clibRoot);
-        lgsClang.parse(*file, errHandler);
-    }
     file->absPath = filePath;
     return file;
 }

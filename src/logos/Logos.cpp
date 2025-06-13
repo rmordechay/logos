@@ -1,10 +1,8 @@
 #include "logos/Logos.h"
-#include <analysis/AntlrConverter.h>
-#include "logos/Platform.h"
 
 void Logos::run() {
     // Validation
-    if (!app.validateProject()) exit(1);
+    if (!app.validate()) exit(1);
 
     // Lexing and Parsing
     if (!app.parse()) exit(1);
@@ -19,5 +17,5 @@ void Logos::run() {
     if (!app.link()) exit(1);
 
     // Running
-    execv(app.paths.execFilePath.c_str(), args.data());
+    app.run();
 }

@@ -15,12 +15,12 @@ public:
     vector<LgsStrConst*> externFiles;
 
     explicit LgsFile(const string& name, const string& path) : name(name), absPath(path) {}
-    virtual Module* generateIR(LgsApp& project);
+    virtual Module* generateIR();
     virtual void format();
     virtual ~LgsFile() = default;
 };
 
-inline Module* LgsFile::generateIR(LgsApp& project) {
+inline Module* LgsFile::generateIR() {
     return nullptr;
 }
 
