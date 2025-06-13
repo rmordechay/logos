@@ -479,8 +479,8 @@ void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* c
     }
     childField->setType(field->type);
     childField->ref = LgsSymbol(field);
-    if (!field->isPublic && file->absPath != field->parent->path) {
-        errHandler.handleError(E10030, &childField->location, {childField->getName(), field->parent->name});
+    if (!field->isPublic && file->absPath != *field->location.filePath) {
+        errHandler.handleError(E10030, &childField->location, {childField->getName(), *field->parentName});
     }
 }
 
@@ -713,6 +713,12 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const Location* location)
     if (const auto fileSymbol = file->symbolTable.getSymbol(name)) {
         return fileSymbol;
     }
+    for (const auto externFilePath : file->externFiles) {
+        auto externalFile = externalFiles.find(externFilePath->value);
+        if (externalFile == externalFiles.end()) continue;
+        const auto symbol = externalFile->second->symbolTable.getSymbol(name);
+        if (symbol) return symbol;
+    }
     if (const auto localSymbol = stack.getSymbol(name)) {
         return localSymbol;
     }
@@ -851,7 +857,7 @@ void SemaAnalyser::resolveIterable(LgsIterable* iterable) {
 void SemaAnalyser::resolveObjTypes(LgsObject* obj) {
     for (const auto& [_, field] : obj->fields) {
         field->type = resolveType(field->type);
-        field->parent = obj;
+        field->parentName = &obj->name;
     }
     for (const auto& [_, method] : obj->methods) {
         resolveFuncTypes(method->funcType);

@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsValue.h"
+#include "types/LgsEnum.h"
 #include "utils/LgsUtils.h"
 
 class LgsEnum;
@@ -12,15 +13,15 @@ class LgsField : public LgsValue {
 public:
     string name;
     size_t position = 0;
+    string* parentName;
     bool isConst = false;
     bool isPublic = false;
     LgsExpr* expr = nullptr;
     LgsType* type = nullptr;
-    LgsObject* parent = nullptr;
 
-    LgsField(const string& name, LgsType* type, LgsExpr* expr = nullptr) : name(name), expr(expr), type(type) {}
-    virtual Value* getGEP(LgsRuntime* runtime, Value* instance);
-    void storeIRValue(LgsRuntime* runtime, Value* parentIRValue, LgsExpr* expr);
+    LgsField(const string& name, string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(name), parentName(parentName), expr(expr), type(type) {}
+    virtual Value* getGEP(LgsRuntime* runtime, Type* parentType, Value* instance);
+    void storeIRValue(LgsRuntime* runtime, Type* parentType, Value* parentIRValue, LgsExpr* expr);
     LgsField* clone() const;
     ~LgsField() override;
 };
@@ -30,8 +31,8 @@ public:
     string text;
     LgsEnum* parent;
 
-    LgsEnumField(LgsEnum* parent, const string& name, const string& text) : LgsField(name, nullptr, nullptr), text(text), parent(parent){}
-    Value* getGEP(LgsRuntime* runtime, Value* instance) override {
+    LgsEnumField(LgsEnum* parent, const string& name, const string& text) : LgsField(name, &parent->name, parent, nullptr), text(text), parent(parent){}
+    Value* getGEP(LgsRuntime* runtime, Type* parentType, Value* instance) override {
         return getIRStr(runtime, name);
     }
 

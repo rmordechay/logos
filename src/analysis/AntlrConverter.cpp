@@ -171,7 +171,8 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
     obj->isSingleton = isSingleton;
     for (int i = 0; i < ctx->field().size(); ++i) {
         const auto field = ctx->field(i);
-        const auto lgsField = getField(field);
+        const auto lgsField = getField(field, obj->name);
+        lgsField->position = i;
         obj->fields[lgsField->name] = lgsField;
     }
     for (const auto& func : ctx->methodImplementation()) {
@@ -319,11 +320,11 @@ LgsParam AntlerConverter::getParam(LgsFuncType* funcType, LogosParser::ParamCont
     return lgsParam;
 }
 
-LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx) {
+LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx, string& parentName) {
     const auto name = ctx->IDENTIFIER()->getText();
     const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
-    const auto field = new LgsField(name, type, expr);
+    const auto field = new LgsField(name, &parentName, type, expr);
     field->isPublic = !!ctx->VISIBILITY();
     field->isConst = !!ctx->CONST();
     field->setLocation(ctx->start, &filePath);

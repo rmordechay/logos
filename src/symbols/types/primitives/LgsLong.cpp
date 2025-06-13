@@ -1,5 +1,6 @@
 #include "types/primitives/LgsLong.h"
 
+#include "exprs/unary/constants/LgsLongConst.h"
 #include "logos/LgsRuntime.h"
 #include "types/LgsAny.h"
 
@@ -16,8 +17,12 @@ Type* LgsLong::getIRType() {
     return Type::getInt64Ty(context);
 }
 
+size_t LgsLong::getSizeBytes() {
+    return sizeof(long);
+}
+
 LgsExpr* LgsLong::getZeroValue() {
-    assert(0);
+    return new LgsLongConst(0);
 }
 
 LgsType* LgsLong::inferBinaryType(LgsType* other) {

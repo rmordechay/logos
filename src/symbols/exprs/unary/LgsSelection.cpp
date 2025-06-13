@@ -22,7 +22,7 @@ void LgsSelection::resolveSelection(LgsRuntime* runtime) const {
             methodCall->IRValue = methodCall->createIRValue(runtime);
         } else if (const auto field = parentExpr->type->getField(childExpr->getName())) {
             const auto parentIRValue = parentExpr->getIRValue(runtime);
-            const auto gep = field->getGEP(runtime, parentIRValue);
+            const auto gep = field->getGEP(runtime, parentExpr->type->getIRType(), parentIRValue);
             childExpr->setIRValue(gep);
         }
     }

@@ -13,16 +13,15 @@ string LgsObject::prettyName() const {
 
 Type* LgsObject::getIRType() {
     if (IRType) return IRType;
-    vector<Type*> elementTypes;
-    auto fieldPos = 0;
+    // Add one or zero if table exists
+    size_t offset = !!vtable;
+    vector<Type*> elementTypes(fields.size() + offset);
     if (vtable) {
-        elementTypes.push_back(PointerType::getUnqual(context));
-        fieldPos++;
+        elementTypes[0] = PointerType::getUnqual(context);
     }
-    for (const auto& [_, field] : fields) {
-        auto fieldType = field->type->getIRType();
-        field->position = fieldPos++;
-        elementTypes.push_back(fieldType);
+    for (const auto [_, field] : fields) {
+        const auto fieldType = field->type->getIRType();
+        elementTypes[field->position + offset] = fieldType;
     }
     IRType = StructType::getTypeByName(context, name);
     if (!IRType) {
@@ -64,10 +63,10 @@ LgsInterface* LgsObject::getInterface(const string& interfaceName) const {
 
 LgsObject* LgsObject::clone() {
     const auto newObj = new LgsObject(name, path);
-    for (const auto& [name, field] : fields) {
+    for (const auto& [fieldName, field] : fields) {
         const auto newField = field->clone();
-        newField->parent = newObj;
-        newObj->fields[name] = newField;
+        newField->parentName = &name;
+        newObj->fields[fieldName] = newField;
     }
     newObj->methods = methods;
     newObj->interfaces = interfaces;

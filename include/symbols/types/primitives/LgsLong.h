@@ -11,6 +11,7 @@ public:
         isInt = true;
     }
     Type* getIRType() override;
+    size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* inferBinaryType(LgsType* other) override;
     string getStrFormatPart() const override;

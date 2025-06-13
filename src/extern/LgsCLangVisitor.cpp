@@ -102,7 +102,7 @@ LgsObject* LgsCLangVisitor::mapCRecord(const clang::RecordDecl* record) {
     for (const clang::FieldDecl* field : record->fields()) {
         const auto fieldName = field->getNameAsString();
         const auto fieldType = mapCType(field->getType());
-        const auto lgsField = new LgsField(fieldName, fieldType);
+        const auto lgsField = new LgsField(fieldName, &obj->name, fieldType);
         obj->fields[fieldName] = lgsField;
     }
     return obj;

@@ -59,7 +59,7 @@ public:
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, bool isSingleton = false);
     void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);
     bool setMainArgsParam(LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature);
-    LgsField* getField(LogosParser::FieldContext* ctx);
+    LgsField* getField(LogosParser::FieldContext* ctx, string& parentName);
     LgsFunc* getFuncImpl(LogosParser::FuncImplContext* ctx);
     LgsFunc* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param, LogosParser::TypeContext* type);
