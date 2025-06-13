@@ -8,24 +8,24 @@
 
 using namespace clang;
 
-void LgsCLang::parseFile(const LgsStrConst* filePath, const LgsPaths& paths, LgsErrHandler& errHandler) const {
-    const auto pathStr = filePath->value;
-    const auto cLibPath = paths.clibRootInclude / pathStr;
-    if (exists(cLibPath)) {
+void LgsCLang::parseFile(const LgsStrConst* filePaths) {
+    const auto pathStr = filePaths->value;
+    const auto cLibPath = paths.clibInclude / pathStr;
+    if (isCHeader(cLibPath)) {
         const auto code = getFileText(cLibPath);
         runToolOnCodeWithArgs(make_unique<LgsCLangFeAction>(), code, {"-isysroot", paths.clibRoot});
     } else {
-        return errHandler.handleError(E10047, &filePath->location, {pathStr});
+        return errHandler.handleError(E10047, &filePaths->location, {pathStr});
     }
 }
 
-void LgsCLang::compile(const vector<LgsStrConst*>& files, const LgsPaths& paths) const {
+void LgsCLang::compile(const vector<LgsStrConst*>& files) const {
     const auto targetTriple = sys::getDefaultTargetTriple();
     DiagnosticsEngine diags(new DiagnosticIDs(), new DiagnosticOptions(), new DiagnosticConsumer());
     Driver driver(CLANG_BINARY, targetTriple, diags);
 
     auto invocation = make_unique<CompilerInvocation>();
-    CompilerInvocation::CreateFromArgs(*invocation, getCompileArgs(files, paths), diags);
+    CompilerInvocation::CreateFromArgs(*invocation, getCompileArgs(files), diags);
     auto compilerInstance = make_unique<CompilerInstance>();
     compilerInstance->setInvocation(std::move(invocation));
     compilerInstance->createFileManager();
@@ -46,7 +46,7 @@ void LgsCLang::compile(const vector<LgsStrConst*>& files, const LgsPaths& paths)
     }
 }
 
-vector<const char*> LgsCLang::getCompileArgs(const vector<LgsStrConst*>& files, const LgsPaths& paths) const {
+vector<const char*> LgsCLang::getCompileArgs(const vector<LgsStrConst*>& files) const {
     vector<const char*> args;
     vector<string> compileArgs{CLANG_BINARY, "-c", "-isysroot", paths.clibRoot};
     for (const auto& file : files) {
@@ -68,13 +68,28 @@ void LgsCLang::getClibRoot() const {
     const auto& toolChain = compilation->getDefaultToolChain();
 }
 
-string LgsCLang::getCode(const LgsStrConst* filePath, const LgsPaths& paths, LgsErrHandler& errHandler) const {
+string LgsCLang::getCode(const LgsStrConst* filePath) {
     string code;
     const auto pathStr = filePath->value;
-    const auto cLibPath = paths.clibRootInclude / pathStr;
+    const auto cLibPath = paths.clibInclude / pathStr;
     if (exists(cLibPath)) {
         return getFileText(cLibPath);
     }
     errHandler.handleError(E10047, &filePath->location, {pathStr});
     return "";
+}
+
+vector<string> LgsCLang::setCHeaderPaths() {
+    for (const auto& entry : directory_iterator(paths.clibInclude)) {
+        if (!entry.is_regular_file()) continue;
+        auto ext = entry.path().extension();
+        if (ext == ".h" || ext == ".hpp" || ext == ".hh" || ext == ".hxx") {
+            headers.push_back(entry.path().string());
+        }
+    }
+    return headers;
+}
+
+bool LgsCLang::isCHeader(const path& cLibPath) {
+    return std::find(headers.begin(), headers.end(), cLibPath) != headers.end();
 }

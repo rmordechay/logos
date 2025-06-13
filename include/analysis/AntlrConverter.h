@@ -95,11 +95,11 @@ public:
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
     LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx) const;
     LgsStrConst* getStrConst(tree::TerminalNode* type) const;
-    LgsTypeConst* getTypeConstant(tree::TerminalNode* ctx) const;
+    LgsTypeConst* getTypeConstant(tree::TerminalNode* ctx);
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsGroup* getGroup(LogosParser::GroupContext* ctx);
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
-    LgsType* getTypeFromText(tree::TerminalNode* typeToken) const;
+    LgsType* getTypeFromText(tree::TerminalNode* typeToken);
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     void cleanStr(string& value) const;
     LgsAssignType mapAssignType(LogosParser::AssignmentContext* assignment) const;

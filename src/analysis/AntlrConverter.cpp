@@ -168,7 +168,7 @@ LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx) {
 
 LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const bool isSingleton) {
     const auto obj = new LgsObject(objName, filePath);
-    obj->setLocation(ctx->start);
+    obj->setLocation(ctx->start, &filePath);
     obj->isSingleton = isSingleton;
     for (int i = 0; i < ctx->field().size(); ++i) {
         const auto field = ctx->field(i);
@@ -191,7 +191,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
 
 LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName) {
     const auto interface = new LgsInterface(interfaceName);
-    interface->setLocation(ctx->start);
+    interface->setLocation(ctx->start, &filePath);
     for (const auto& funcSignature : ctx->funcSignature()) {
         const auto self = LgsParam(interface, LOGOS_SELF);
         const auto type = getFuncReturnType(funcSignature->type());
@@ -405,7 +405,7 @@ LgsStmt* AntlerConverter::getReturnStmt(LogosParser::ReturnStatementContext* ctx
 LgsFuncType* AntlerConverter::getFuncType(LogosParser::FuncTypeContext* ctx) {
     const auto rt = getType(ctx->rt);
     const auto funcType = new LgsFuncType();
-    funcType->setLocation(ctx->start);
+    funcType->setLocation(ctx->start, &filePath);
     funcType->rt = rt;
     for (const auto paramType : ctx->type()) {
         if (paramType == ctx->rt) continue;
@@ -507,7 +507,7 @@ LgsForLoop* AntlerConverter::getInfiniteLoop(LogosParser::LoopStatementContext* 
 
 LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
     const auto lgsEnum = new LgsEnum(ctx->IDENTIFIER()->getText());
-    lgsEnum->setLocation(ctx->start);
+    lgsEnum->setLocation(ctx->start, &filePath);
     unordered_set<string> seenNames;
     for (size_t i = 0; i < ctx->enumField().size(); ++i) {
         const auto enumField = ctx->enumField()[i];
@@ -794,7 +794,7 @@ LgsStrConst* AntlerConverter::getStrConst(tree::TerminalNode* type) const {
     return strConst;
 }
 
-LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* ctx) const {
+LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* ctx) {
     const auto typeConst = new LgsTypeConst(getTypeFromText(ctx));
     typeConst->setLocation(ctx->getSymbol());
     return typeConst;
@@ -815,13 +815,13 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
             result->isNullable = true;
         }
     }
-    result->setLocation(ctx->start);
+    result->setLocation(ctx->start, &filePath);
     return result;
 }
 
 LgsGroup* AntlerConverter::getGroup(LogosParser::GroupContext* ctx) {
     const auto group = new LgsGroup(ctx->IDENTIFIER()->getText());
-    group->setLocation(ctx->start);
+    group->setLocation(ctx->start, &filePath);
     for (const auto type : ctx->groupTypesList()->type()) {
         const auto lgsType = getType(type);
         group->types.push_back(lgsType);
@@ -848,7 +848,7 @@ LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
     return type;
 }
 
-LgsType* AntlerConverter::getTypeFromText(tree::TerminalNode* typeToken) const {
+LgsType* AntlerConverter::getTypeFromText(tree::TerminalNode* typeToken) {
     const auto typeText = typeToken->getText();
     LgsType* type = nullptr;
     if (typeText == LgsBool::name) {
@@ -872,7 +872,7 @@ LgsType* AntlerConverter::getTypeFromText(tree::TerminalNode* typeToken) const {
     } else {
         type = new LgsUnknownType(typeText);
     }
-    type->setLocation(typeToken->getSymbol());
+    type->setLocation(typeToken->getSymbol(), &filePath);
     return type;
 }
 
@@ -882,7 +882,7 @@ LgsType* AntlerConverter::getFuncReturnType(LogosParser::TypeContext* ctx) {
         result = &LGS_VOID;
     } else {
         result = getType(ctx);
-        result->setLocation(ctx->start);
+        result->setLocation(ctx->start, &filePath);
     }
     return result;
 }

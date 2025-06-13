@@ -43,9 +43,7 @@ public:
     LgsStack stack;
     LgsErrHandler errHandler;
 
-    explicit SemaAnalyser(LgsFile* file) : LgsASTVisitor(file) {
-        errHandler.filePath = file->absPath;
-    }
+    explicit SemaAnalyser(LgsFile* file) : LgsASTVisitor(file) {}
     void start() override;
     void visitMainFile(LgsMainFile* mainFile) override;
     void visitObject(LgsObject* obj) override;

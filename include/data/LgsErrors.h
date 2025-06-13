@@ -55,7 +55,7 @@ inline LgsError E10043{.msg = "Default parameters and variadic arguments are not
 inline LgsError E10044{.msg = "Variadic argument must be the last argument.", .errCode = errCodeStart++};
 inline LgsError E10045{.msg = "Variadic argument can not have default arguments.", .errCode = errCodeStart++};
 inline LgsError E10046{.msg = "'%s' is not callable.", .errCode = errCodeStart++};
-inline LgsError E10047{.msg = "External file was not found at %s.", .errCode = errCodeStart++};
+inline LgsError E10047{.msg = "External file '%s' was not found.", .errCode = errCodeStart++};
 inline LgsError E10048{.msg = "Static iterable '%s' must have a constant size.", .errCode = errCodeStart++};
 inline LgsError E10049{.msg = "Not enough information to infer type of iterable. Specify an explicit type or initialize with element(s).", .errCode = errCodeStart++};
 inline LgsError E10050{.msg = "Only integer values can be incremented (++) or decremented (--). Given: '%s'.", .errCode = errCodeStart++};

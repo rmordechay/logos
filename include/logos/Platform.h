@@ -18,7 +18,7 @@ struct LgsPaths {
     path envsDir;
     path buildDir;
     path clibRoot;
-    path clibRootInclude;
+    path clibInclude;
     path appFilePath;
     path objFilePath;
     path execFilePath;

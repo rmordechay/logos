@@ -3,6 +3,7 @@
 struct Location {
     size_t lineNumber{};
     size_t posInLine{};
+    string* filePath = nullptr;
 
     string lineNumberStr() const {
         return to_string(lineNumber);

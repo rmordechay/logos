@@ -9,7 +9,6 @@ public:
     bool successful = true;
     vector<LgsError> errors;
     vector<LgsWarning> warnings;
-    path filePath;
 
     void setUnsuccessful();
     void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});

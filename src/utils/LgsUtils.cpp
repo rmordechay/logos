@@ -29,6 +29,7 @@ void freeType(const LgsType* type) {
     delete type;
 }
 
+
 Value* getIRStr(const LgsRuntime* runtime, const string& value) {
     for (auto& globals : runtime->module->globals()) {
         if (!globals.hasInitializer()) continue;

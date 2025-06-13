@@ -106,14 +106,12 @@ void LgsApp::run() const {
     execv(paths.execFilePath.c_str(), args.data());
 }
 
-void LgsApp::parseSrcFiles(const string& path, ThreadPool& threadPool) {
-    for (const auto& entry : directory_iterator(path)) {
+void LgsApp::parseSrcFiles(const std::string& path, ThreadPool& threadPool) {
+    for (const auto& entry : recursive_directory_iterator(path)) {
         if (isLogosFile(entry)) {
             threadPool.runTask([entry, this] {
                 parseSrcFile(entry);
             });
-        } else if (is_directory(entry.path())) {
-            parseSrcFiles(entry.path(), threadPool);
         }
     }
 }
@@ -121,7 +119,6 @@ void LgsApp::parseSrcFiles(const string& path, ThreadPool& threadPool) {
 void LgsApp::parseSrcFile(path entry) {
     const path absFilePath = canonical(entry);
     AntlerConverter antlerConverter;
-    antlerConverter.errHandler.filePath = absFilePath;
     const auto codeText = getFileText(entry);
     ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
@@ -148,7 +145,6 @@ void LgsApp::parseSrcFile(path entry) {
 void LgsApp::parseEnvFile(path fileEntry) {
     const auto absFilePath = canonical(fileEntry);
     AntlerConverter antlerConverter;
-    antlerConverter.errHandler.filePath = absFilePath;
     const auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
@@ -190,7 +186,6 @@ bool LgsApp::resolveGlobalTypes() const {
 void LgsApp::parseAppFile(path fileEntry) {
     auto absFilePath = canonical(fileEntry);
     AntlerConverter antlerConverter;
-    antlerConverter.errHandler.filePath = absFilePath;
 
     auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
@@ -235,9 +230,9 @@ bool LgsApp::generateObjFile(Module* module) const {
 
 bool LgsApp::resolveExternalFiles() {
     if (externFiles.empty()) return true;
-    const LgsCLang lgsCLang;
+    LgsCLang lgsCLang(paths);
     for (const auto externFile : externFiles) {
-        lgsCLang.parseFile(externFile, paths, errHandler);
+        lgsCLang.parseFile(externFile);
     }
     return true;
 }
@@ -327,7 +322,7 @@ void LgsApp::initPaths(const path& rootDirPath) {
     paths.execFilePath = paths.buildDir / LOGOS_EXECUTABLE_FILE;
     paths.appFilePath = paths.rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
     paths.clibRoot = CLIB_ROOT;
-    paths.clibRootInclude = paths.clibRoot / "usr/include";
+    paths.clibInclude = paths.clibRoot / "usr/include";
 }
 
 bool LgsApp::isLogosFile(const directory_entry& entry) const {
