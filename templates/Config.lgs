@@ -3,5 +3,5 @@ app {
 }
 
 logger {
-    logger-prefix: "$timedate $thread $msg"
+    prefix: "$timedate $thread $msg"
 }

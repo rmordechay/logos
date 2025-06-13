@@ -41,7 +41,7 @@ string LgsMap::getIRName() {
 }
 
 string LgsMap::prettyName() const {
-    return '{' + typePair->key->prettyName() + " : " + typePair->value->prettyName() + '}';
+    return '{' + typePair->key->prettyName() + ": " + typePair->value->prettyName() + '}';
 }
 
 bool LgsMap::equals(LgsType* other) {

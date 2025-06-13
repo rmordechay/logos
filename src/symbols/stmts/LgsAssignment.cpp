@@ -59,17 +59,17 @@ void LgsAssignment::createIRAssign(LgsRuntime* runtime) const {
     }
 }
 
-void LgsAssignment::assignToIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* value) const {
-    if (const auto map = value->asHashMap()) {
+void LgsAssignment::assignToIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* expr) const {
+    if (const auto map = expr->asHashMap()) {
         storeHashMapInIterIndex(runtime, iterIndex, map);
-    } else if (const auto arr = value->asArrayExpr()) {
+    } else if (const auto arr = expr->asArrayExpr()) {
         storeArrayInIterIndex(runtime, iterIndex, arr);
     } else {
-        storeScalarInIterIndex(runtime, iterIndex, value);
+        storeScalarInIterIndex(runtime, iterIndex, expr);
     }
 }
 
-void LgsAssignment::assignToSelection(LgsRuntime* runtime, const LgsSelection* selection, LgsExpr* value) const {
+void LgsAssignment::assignToSelection(LgsRuntime* runtime, const LgsSelection* selection, LgsExpr* expr) const {
     selection->resolveSelection(runtime);
     const auto lastExpr = selection->lastExpr();
     const auto parentExpr = selection->exprs[selection->exprs.size() - 2];
@@ -78,7 +78,7 @@ void LgsAssignment::assignToSelection(LgsRuntime* runtime, const LgsSelection* s
         switch (var->ref.symbolType) {
         case FIELD: {
             const auto parentIRValue = parentExpr->getIRValue(runtime);
-            var->ref.field->storeIRValue(runtime, parentIRValue, value);
+            var->ref.field->storeIRValue(runtime, parentIRValue, expr);
             return;
         }
         case UNKNOWN: default:
@@ -88,21 +88,23 @@ void LgsAssignment::assignToSelection(LgsRuntime* runtime, const LgsSelection* s
     assert(0);
 }
 
-void LgsAssignment::assignToVariable(LgsRuntime* runtime, LgsVariable* var, LgsExpr* value) const {
-    runtime->builder.CreateStore(value->getIRValue(runtime), var->getIRValue(runtime));
+void LgsAssignment::assignToVariable(LgsRuntime* runtime, LgsVariable* variable, LgsExpr* expr) const {
+    const auto variablePtr = variable->getIRValue(runtime);
+    const auto exprIRValue = expr->getIRValue(runtime);
+    runtime->builder.CreateStore(exprIRValue, variablePtr);
 }
 
 void LgsAssignment::storeHashMapInIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsHashMap* map) const {
     assert(0);
 }
 
-void LgsAssignment::storeScalarInIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* value) const {
+void LgsAssignment::storeScalarInIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* expr) const {
     const auto baseExpr = iterIndex->baseExpr;
-    const auto rIRValue = value->getIRValue(runtime);
+    const auto rIRValue = expr->getIRValue(runtime);
     const auto baseIRValue = baseExpr->getIRValue(runtime);
     if (const auto arr = baseExpr->type->asArray()) {
         if (!arr->isStatic) {
-            const auto ptr = runtime->builder.CreateAlloca(value->type->getIRType());
+            const auto ptr = runtime->builder.CreateAlloca(expr->type->getIRType());
             runtime->builder.CreateStore(rIRValue, ptr);
             arr->putFunc.callIR(runtime, {baseIRValue, iterIndex->index->from->getIRValue(runtime), ptr});
         } else {
@@ -123,8 +125,7 @@ void LgsAssignment::storeScalarInIterIndex(LgsRuntime* runtime, LgsIterIndex* it
     }
 }
 
-void LgsAssignment::storeArrayInIterIndex(LgsRuntime* runtime, const LgsIterIndex* iterIndex,
-                                          const LgsArrayExpr* arr) const {
+void LgsAssignment::storeArrayInIterIndex(LgsRuntime* runtime, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) const {
     if (!arr->arrType->isStatic) {
         return;
     }
