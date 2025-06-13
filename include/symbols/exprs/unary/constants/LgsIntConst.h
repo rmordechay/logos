@@ -7,7 +7,7 @@ public:
     int value;
 
     explicit LgsIntConst(const int value) : LgsUnaryExpr(&LGS_INT), value(value) {
-        type->isConst = true;
+
     }
     string prettyName() override;
     Value* createIRValue(LgsRuntime* runtime) override;

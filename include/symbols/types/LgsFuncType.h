@@ -27,5 +27,5 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     bool equals(LgsType* other) override;
     LgsType* clone() override;
-    ~LgsFuncType() override = default;
+    ~LgsFuncType() override;
 };

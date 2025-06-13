@@ -8,7 +8,6 @@ using namespace llvm;
 class LgsValue {
 public:
     Location location;
-    bool isConst = false;
     Value* IRValue = nullptr;
 
     void setIRValue(Value* value);

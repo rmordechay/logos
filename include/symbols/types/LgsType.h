@@ -24,12 +24,11 @@ class LgsFunc;
 class LgsType {
 public:
     Location location;
-    bool isBigType = false;
-    bool isVoid = false;
-    bool isConst = false;
     bool isInt = false;
+    bool isVoid = false;
     bool isNullable = false;
     bool isPrimitive = false;
+    bool isBigType = false;
     bool isBuiltin = false;
     bool canSlice = false;
     Type* IRType = nullptr;

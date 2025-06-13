@@ -9,11 +9,11 @@ public:
     vector<LgsExpr*> templateParts;
 
     explicit LgsStrConst(const string& value) : value(value) {
-        strType->isConst = true;
+        type = strType;
+
         strType->isStatic = true;
         strType->sizeExpr = new LgsIntConst(value.size());
         strType->iterLen = value.size();
-        type = strType;
     }
 
     Value* createIRValue(LgsRuntime* runtime) override;

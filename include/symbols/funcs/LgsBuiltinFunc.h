@@ -3,7 +3,7 @@
 
 class LgsBuiltinFunc : public LgsFunc {
 public:
-    LgsBuiltinFunc(const string& name, LgsType* rt, const string& parentName, const vector<LgsType*>& paramsTypes, bool isPublic = false, bool isVariadic = false): LgsFunc(name, rt) {
+    LgsBuiltinFunc(const string& name, LgsType* rt, const string& parentName, const vector<LgsType*>& paramsTypes, const bool isPublic = false, const bool isVariadic = false): LgsFunc(name, rt) {
         funcType->isBuiltin = true;
         funcType->isPublic = isPublic;
         funcType->isVariadic = isVariadic;
@@ -12,7 +12,7 @@ public:
             funcType->isMethod = true;
         }
         for (const auto paramsType : paramsTypes) {
-            funcType->params.emplace_back(LgsParam(paramsType));
+            funcType->params.emplace_back(paramsType);
         }
     }
     ~LgsBuiltinFunc() override = default;

@@ -12,8 +12,8 @@ class LgsField : public LgsValue {
 public:
     string name;
     size_t position = 0;
-    bool isPublic = false;
     bool isConst = false;
+    bool isPublic = false;
     LgsExpr* expr = nullptr;
     LgsType* type = nullptr;
     LgsObject* parent = nullptr;

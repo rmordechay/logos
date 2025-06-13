@@ -1,5 +1,6 @@
 #include "types/LgsFuncType.h"
 #include "logos/LgsRuntime.h"
+#include "utils/LgsUtils.h"
 
 bool LgsFuncType::equals(LgsType* other) {
     const auto otherFuncType = other->asFuncType();
@@ -84,4 +85,18 @@ LgsType* LgsFuncType::clone() {
         newFuncType->params.push_back(param);
     }
     return newFuncType;
+}
+
+LgsFuncType::~LgsFuncType() {
+    for (const auto param : params) {
+        if (param.isSelf) continue;
+        if (!param.expr) {
+            freeType(param.type);
+        } else {
+            if (param.expr->type != param.type) {
+                freeType(param.type);
+            }
+            delete param.expr;
+        }
+    }
 }

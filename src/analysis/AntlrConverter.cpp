@@ -327,12 +327,8 @@ LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx) {
     const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
     const auto field = new LgsField(name, type, expr);
-    if (ctx->VISIBILITY()) {
-        field->isPublic = true;
-    }
-    if (ctx->CONST()) {
-        field->isConst = true;
-    }
+    field->isPublic = !!ctx->VISIBILITY();
+    field->isConst = !!ctx->CONST();
     field->setLocation(ctx->start);
     return field;
 }

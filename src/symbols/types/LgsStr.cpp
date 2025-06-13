@@ -6,7 +6,7 @@
 #include "utils/LgsUtils.h"
 
 size_t LgsStr::getSizeBytes() {
-    if (isConst) return iterLen + 1;
+    if (isStatic) return iterLen + 1;
     return sizeof(void*);
 }
 
@@ -74,8 +74,6 @@ size_t LgsStr::hashString(const string& str) {
 }
 
 Value* LgsStrFormatFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
-    const bool isConst = args[0]->type->isConst;
-    if (!isConst) assert(0);
     constexpr auto bufferSize = 1024;
     auto exprStr = args[0]->getExprStr();
     auto searchPos = 0;

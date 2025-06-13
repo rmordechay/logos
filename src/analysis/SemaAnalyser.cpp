@@ -178,7 +178,6 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
         visitExpr(varDec->expr);
         varDec->type = varDec->expr->type;
     }
-    varDec->expr->isConst = varDec->isConst;
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
 }
 
@@ -186,9 +185,6 @@ void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
     const auto lValue = assignment->lValue;
     const auto rValue = assignment->rValue;
     visitExpr(lValue);
-    if (lValue->isConst) {
-        return errHandler.handleError(E10051, &lValue->location, {lValue->prettyName()});
-    }
     visitExpr(rValue);
     const auto lType = lValue->type;
     const auto rType = rValue->type;
@@ -424,15 +420,17 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     case PARAM:
         symbol->param->refs.push_back(variable);
         variable->ref.param = symbol->param;
-        variable->isConst = symbol->param->isConst;
+        variable->isConst = true;
         variable->setType(symbol->param->type);
         break;
     case ENUM_FIELD:
         variable->ref.enumField = symbol->enumField;
+        variable->isConst = true;
         variable->setType(symbol->enumField->type);
         break;
     case FUNC:
         variable->ref.func = symbol->func;
+        variable->isConst = true;
         variable->setType(symbol->func->funcType);
         break;
     default:
@@ -529,9 +527,6 @@ void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     const auto type = baseExpr->type;
     if (!type->asInt()) {
         return errHandler.handleError(E10050, &postfixExpr->location, {type->prettyName()});
-    }
-    if (baseExpr->isConst) {
-        return errHandler.handleError(E10051, &postfixExpr->location, {baseExpr->prettyName()});
     }
     postfixExpr->type = type;
 }

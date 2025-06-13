@@ -5,12 +5,13 @@ struct LgsSymbol;
 
 class LgsVariable :  public LgsUnaryExpr {
 public:
-    std::string name;
+    string name;
     LgsSymbol ref;
+    bool isConst = false;
 
-    explicit LgsVariable(const std::string& name) : LgsUnaryExpr(nullptr), name(name) {}
-    std::string getName() override;
-    std::string prettyName() override;
+    explicit LgsVariable(const string& name) : LgsUnaryExpr(nullptr), name(name) {}
+    string getName() override;
+    string prettyName() override;
     uint32_t hashValue(LgsRuntime* runtime) override;
     Value* createIRValue(LgsRuntime* runtime) override;
     bool equals(LgsExpr* other) override;
@@ -31,7 +32,7 @@ public:
 
 class LgsConst final :  public LgsVariable {
 public:
-    explicit LgsConst(const std::string& name) : LgsVariable(name) {}
+    explicit LgsConst(const string& name) : LgsVariable(name) {}
 };
 
 

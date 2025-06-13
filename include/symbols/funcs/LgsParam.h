@@ -19,10 +19,10 @@ public:
     vector<LgsVariable*> refs;
 
     explicit LgsParam(LgsType* type = nullptr, const string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {
-        isConst = true;
+
     }
     string format(string& indentStr) override;
     Value* getIRValue(LgsRuntime* runtime);
     string getIRName();
-    ~LgsParam() override;
+    ~LgsParam() override = default;
 };

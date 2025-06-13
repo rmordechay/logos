@@ -43,6 +43,10 @@ string LgsExpr::getExprStr() {
     assert(0);
 }
 
+LgsExpr::~LgsExpr() {
+    freeType(type);
+}
+
 void LgsExpr::free(LgsRuntime* runtime) { assert(0); }
 bool LgsExpr::equals(LgsExpr* other) { assert(0); }
 LgsExpr* LgsExpr::clone() { assert(0); }

@@ -25,7 +25,6 @@ class LgsExpr : virtual public LgsValue {
 public:
     LgsType* type = nullptr;
     bool isNull = false;
-    bool isConst = false;
     bool isSpread = false;
     // TODO removed from visitVariable. Should be inferred from some refs.
     bool isReturnExpr = false;
@@ -78,6 +77,6 @@ public:
     virtual Value* bitXorIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* rshiftIR(LgsRuntime* runtime, LgsExpr* other);
     virtual Value* lshiftIR(LgsRuntime* runtime, LgsExpr* other);
-    ~LgsExpr() override = default;
+    ~LgsExpr() override;
 };
 
