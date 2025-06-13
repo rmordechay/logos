@@ -26,7 +26,6 @@ public:
     Value* bitXorIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* rshiftIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* lshiftIR(LgsRuntime* runtime, LgsExpr* other) override;
-    json asJSON() override;
     ~LgsVariable() override = default;
 };
 

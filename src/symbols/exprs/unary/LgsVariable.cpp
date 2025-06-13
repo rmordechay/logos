@@ -131,14 +131,6 @@ Value* LgsVariable::lshiftIR(LgsRuntime* runtime, LgsExpr* other) {
     return LgsUnaryExpr::lshiftIR(runtime, other);
 }
 
-json LgsVariable::asJSON() {
-    json tree;
-    tree["name"] = name;
-    tree["exprType"] = "VARIABLE";
-    tree["type"] = type->prettyName();
-    return tree;
-}
-
 uint32_t LgsVariable::hashValue(LgsRuntime* runtime) {
     string text;
     switch (ref.symbolType) {

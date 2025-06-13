@@ -10,6 +10,5 @@ public:
     void createIRValue(LgsRuntime* runtime) const;
     LgsStmt* lastStmt() const;
     std::string format(std::string& indentStr) override;
-    json asJSON() override;
     ~LgsStmtBlock() override;
 };

@@ -16,7 +16,6 @@ public:
     void createIRStmt(LgsRuntime* runtime) override;
     Value* createIRValue(LgsRuntime* runtime) override;
     void resolveSelection(LgsRuntime* runtime) const;
-    json asJSON() override;
     ~LgsSelection() override;
 };
 

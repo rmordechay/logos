@@ -21,14 +21,6 @@ string LgsVarDec::format(string& indentStr) {
     return indentStr + name + " = ";
 }
 
-json LgsVarDec::asJSON() {
-    json tree;
-    tree["name"] = name;
-    tree["type"] = type->prettyName();
-    tree["stmtType"] = "VAR_DEC";
-    return tree;
-}
-
 LgsVarDec::~LgsVarDec() {
     delete expr;
 }

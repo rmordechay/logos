@@ -19,13 +19,6 @@ LgsField* LgsField::clone() const {
     return newField;
 }
 
-json LgsField::asJSON() {
-    json tree;
-    tree["name"] = name;
-    tree["type"] = type->prettyName();
-    return tree;
-}
-
 LgsField::~LgsField() {
     if (expr) delete expr;
 }

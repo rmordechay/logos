@@ -13,7 +13,6 @@ public:
     void createIRStmt(LgsRuntime* runtime) override;
     string format(string& indentStr) override;
     bool shouldAllocate(const Type* IRType) const;
-    json asJSON() override;
     ~LgsVarDec() override;
 };
 

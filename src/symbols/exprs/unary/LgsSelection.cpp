@@ -55,16 +55,6 @@ Value* LgsSelection::eqIR(LgsRuntime* runtime, LgsExpr* other) {
     return nullptr;
 }
 
-json LgsSelection::asJSON() {
-    json tree;
-    tree["exprs"] = {};
-    tree["exprType"] = "SELECTION";
-    for (const auto& expr : exprs) {
-        tree["exprs"].emplace_back(expr->asJSON());
-    }
-    return tree;
-}
-
 LgsSelection::~LgsSelection() {
     for (const auto& expr : exprs) {
         delete expr;

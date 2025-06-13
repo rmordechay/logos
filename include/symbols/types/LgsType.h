@@ -60,7 +60,6 @@ public:
     virtual size_t getSizeBytes();
     virtual void castImplicitly(LgsType& toType);
     virtual bool equals(LgsType& other);
-    virtual json asJSON() const;
     virtual string getStrFormatPart() const;
     virtual Type* getIRType() = 0;
     virtual string getIRName() = 0;

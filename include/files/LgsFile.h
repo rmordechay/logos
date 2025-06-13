@@ -5,8 +5,6 @@ class LgsStrConst;
 class LgsProject;
 class LgsRuntime;
 
-using namespace nlohmann;
-
 class LgsFile {
 public:
     string name;
@@ -19,7 +17,6 @@ public:
     explicit LgsFile(const string& name, const string& path) : name(name), absPath(path) {}
     virtual Module* generateIR(LgsProject& project);
     virtual void format();
-    virtual json asJSON();
     virtual ~LgsFile() = default;
 };
 
@@ -30,9 +27,3 @@ inline Module* LgsFile::generateIR(LgsProject& project) {
 inline void LgsFile::format() {
     assert(false);
 }
-
-inline json LgsFile::asJSON() {
-    assert(false);
-}
-
-

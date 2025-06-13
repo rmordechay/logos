@@ -160,18 +160,6 @@ string LgsFunc::format(string& tabs) {
     return str.str();
 }
 
-json LgsFunc::asJSON() {
-    json tree;
-    tree["name"] = funcType->name;
-    tree["type"] = funcType->rt->getIRName();
-    tree["params"] = {};
-    for (auto& param : funcType->params) {
-        tree["params"].emplace_back(param.asJSON());
-    }
-    tree["stmts"] = stmtBlock->asJSON();
-    return tree;
-}
-
 LgsFunc::~LgsFunc() {
     if (stmtBlock) {
         delete stmtBlock;

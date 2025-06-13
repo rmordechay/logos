@@ -18,16 +18,6 @@ string LgsEnum::getIRName() {
     return name;
 }
 
-json LgsEnum::asJSON() const {
-    json tree;
-    tree["name"] = name;
-    tree["fields"] = {};
-    for (const auto& field : fields) {
-        tree["fields"].emplace_back(field.second->asJSON());
-    }
-    return tree;
-}
-
 string LgsEnum::prettyName() const {
     return name;
 }

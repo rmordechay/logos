@@ -23,7 +23,6 @@ public:
     }
     string format(string& indentStr) override;
     Value* getIRValue(LgsRuntime* runtime);
-    json asJSON() override;
     string getIRName();
     ~LgsParam() override;
 };

@@ -22,7 +22,6 @@ public:
     virtual Value* getGEP(LgsRuntime* runtime, Value* instance);
     void storeIRValue(LgsRuntime* runtime, Value* parentIRValue, LgsExpr* expr);
     LgsField* clone() const;
-    json asJSON() override;
     ~LgsField() override;
 };
 

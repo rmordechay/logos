@@ -17,7 +17,6 @@ public:
 
     explicit LgsMainFile(const string& path) : LgsFile(LOGOS_MAIN_FILE_NAME, path) {}
     void format() override;
-    json asJSON() override;
     Module* generateIR(LgsProject& project) override;
     ~LgsMainFile() override;
 };

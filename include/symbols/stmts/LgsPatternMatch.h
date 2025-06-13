@@ -15,7 +15,6 @@ public:
 
     explicit LgsPatternMatch(LgsExpr* expr) : expr(expr) {}
     void createIRStmt(LgsRuntime* runtime) override;
-    json asJSON() override;
     ~LgsPatternMatch() override = default;
 };
 

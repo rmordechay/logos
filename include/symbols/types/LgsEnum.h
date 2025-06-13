@@ -11,7 +11,6 @@ public:
     explicit LgsEnum(const string& name) : name(name) {}
     Type* getIRType() override;
     string getIRName() override;
-    nlohmann::json asJSON() const override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;

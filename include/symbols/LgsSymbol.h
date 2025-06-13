@@ -49,7 +49,6 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsGroup* group);
     Location* getLocation() const;
     void* getPtr() const;
-    json asJSON() const;
     ~LgsSymbol() = default;
 };
 

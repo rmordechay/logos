@@ -23,14 +23,6 @@ std::string LgsStmtBlock::format(std::string& indentStr) {
     return oss.str();
 }
 
-json LgsStmtBlock::asJSON() {
-    json tree;
-    for (const auto& stmt : stmts) {
-        tree["stmts"].emplace_back(stmt->asJSON());
-    }
-    return tree;
-}
-
 LgsStmtBlock::~LgsStmtBlock() {
     for (const auto& stmt : stmts) {
         delete stmt;

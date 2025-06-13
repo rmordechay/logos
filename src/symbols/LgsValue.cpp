@@ -1,6 +1,5 @@
 #include "LgsValue.h"
 #include "funcs/LgsFunc.h"
-#include "json/json.hpp"
 
 void LgsValue::startBlock(LgsRuntime* runtime, BasicBlock* const block) const {
     block->insertInto(runtime->stack.currentFunc->getIRFunc(runtime));
@@ -34,9 +33,5 @@ void LgsValue::setIRValue(Value* value) {
 }
 
 string LgsValue::format(string& indentStr) {
-    assert(0);
-}
-
-json LgsValue::asJSON() {
     assert(0);
 }

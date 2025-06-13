@@ -18,7 +18,6 @@ public:
     Value* hashIRValue(LgsRuntime* runtime, Value* value) const;
     virtual std::string format(std::string& indentStr);
     virtual void setLocation(const antlr4::Token* ctx);
-    virtual json asJSON();
     virtual ~LgsValue() = default;
 };
 

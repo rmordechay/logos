@@ -1,10 +1,8 @@
 #include "codegen/CodeGenerator.h"
-#include "files/LgsInterfaceFile.h"
 #include "logos/LgsConfig.h"
 #include "logos/Logos.h"
 #include "logos/Platform.h"
 #include "utils/LgsUtils.h"
-#include "utils/ThreadPool.h"
 
 void CodeGenerator::init() {
     // Build dir

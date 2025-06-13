@@ -1,13 +1,6 @@
 #pragma once
-#include "extern/LgsCLang.h"
-#include <filesystem>
 #include "LgsProject.h"
-
-struct LgsError;
-class ThreadPool;
-using namespace filesystem;
-
-using namespace llvm;
+#include "Platform.h"
 
 class Logos {
 public:

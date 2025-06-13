@@ -18,12 +18,6 @@ Value* LgsParam::getIRValue(LgsRuntime* runtime) {
     return IRValue;
 }
 
-json LgsParam::asJSON() {
-    json tree;
-    tree["name"] = name;
-    return tree;
-}
-
 string LgsParam::getIRName() {
     if (const auto funcType = dynamic_cast<LgsFuncType*>(type)) {
         return funcType->IRName;

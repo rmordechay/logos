@@ -52,16 +52,6 @@ bool LgsObject::equals(LgsType* other) {
     return name == other->getIRName();
 }
 
-json LgsObject::asJSON() const {
-    json tree;
-    tree["name"] = name;
-    tree["fields"] = {};
-    for (const auto& field : fields) {
-        tree["fields"].emplace_back(field.second->asJSON());
-    }
-    return tree;
-}
-
 LgsInterface* LgsObject::getInterface(const string& interfaceName) const {
     for (const auto implement : interfaces) {
         const auto interface = implement->asInterface();

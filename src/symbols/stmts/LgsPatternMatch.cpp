@@ -27,10 +27,3 @@ void LgsPatternMatch::createIRStmt(LgsRuntime* runtime) {
     runtime->builder.CreateBr(exitBlock);
     startBlock(runtime, exitBlock);
 }
-
-json LgsPatternMatch::asJSON() {
-    json tree;
-    tree["expr"] = expr->asJSON();
-    tree["stmtType"] = "patternMatch";
-    return tree;
-}
