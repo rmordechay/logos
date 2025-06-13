@@ -10,7 +10,6 @@ public:
     string name;
     string code;
     string absPath;
-    string relPath;
     LgsSymbolTable symbolTable;
     vector<LgsStrConst*> externFiles;
 

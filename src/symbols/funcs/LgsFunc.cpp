@@ -4,6 +4,7 @@
 #include "stmts/LgsStmtBlock.h"
 #include "exprs/LgsExpr.h"
 #include "types/LgsArray.h"
+#include "utils/LgsUtils.h"
 
 void LgsFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.enterFunc(this);
@@ -161,6 +162,7 @@ string LgsFunc::format(string& tabs) {
 }
 
 LgsFunc::~LgsFunc() {
+    freeType(type);
     if (stmtBlock) {
         delete stmtBlock;
     }

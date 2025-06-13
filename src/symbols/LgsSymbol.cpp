@@ -7,16 +7,16 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
-LgsSymbol::LgsSymbol(): symbolType(UNKNOWN) {}
-LgsSymbol::LgsSymbol(LgsParam* param): symbolType(PARAM), param(param) {}
-LgsSymbol::LgsSymbol(LgsVarDec* varDec): symbolType(VAR_DEC), varDec(varDec) {}
-LgsSymbol::LgsSymbol(LgsObject* object, const bool isExternal): symbolType(OBJECT), object(object), isExternal(isExternal) {}
-LgsSymbol::LgsSymbol(LgsInterface* interface): symbolType(INTERFACE), interface(interface) {}
-LgsSymbol::LgsSymbol(LgsField* field): symbolType(FIELD), field(field) {}
-LgsSymbol::LgsSymbol(LgsEnum* lgsEnum, const bool isExternal): symbolType(ENUM), lgsEnum(lgsEnum), isExternal(isExternal) {}
-LgsSymbol::LgsSymbol(LgsEnumField* enumField): symbolType(ENUM_FIELD), enumField(enumField) {}
-LgsSymbol::LgsSymbol(LgsFunc* func, const bool isExternal): symbolType(FUNC), func(func), isExternal(isExternal) {}
-LgsSymbol::LgsSymbol(LgsGroup* group): symbolType(GROUP), group(group) {}
+LgsSymbol::LgsSymbol(): symbolType(UNKNOWN), location(nullptr) {}
+LgsSymbol::LgsSymbol(LgsParam* param): symbolType(PARAM), location(&param->location), param(param) {}
+LgsSymbol::LgsSymbol(LgsVarDec* varDec): symbolType(VAR_DEC), location(&varDec->location), varDec(varDec) {}
+LgsSymbol::LgsSymbol(LgsObject* object, const bool isExternal): symbolType(OBJECT), location(&object->location), object(object), isExternal(isExternal) {}
+LgsSymbol::LgsSymbol(LgsInterface* interface): symbolType(INTERFACE), location(&interface->location), interface(interface) {}
+LgsSymbol::LgsSymbol(LgsField* field): symbolType(FIELD), location(&field->location), field(field) {}
+LgsSymbol::LgsSymbol(LgsEnum* lgsEnum, const bool isExternal): symbolType(ENUM), location(&lgsEnum->location), lgsEnum(lgsEnum), isExternal(isExternal) {}
+LgsSymbol::LgsSymbol(LgsEnumField* enumField): symbolType(ENUM_FIELD), location(&enumField->location), enumField(enumField) {}
+LgsSymbol::LgsSymbol(LgsFunc* func, const bool isExternal): symbolType(FUNC), location(&func->location), func(func), isExternal(isExternal) {}
+LgsSymbol::LgsSymbol(LgsGroup* group): symbolType(GROUP), location(&group->location), group(group) {}
 
 void* LgsSymbol::getPtr() const {
     switch (symbolType) {
@@ -38,32 +38,6 @@ void* LgsSymbol::getPtr() const {
         return enumField;
     case GROUP:
         return group;
-    case UNKNOWN:
-        break;
-    }
-    assert(0);
-}
-
-Location* LgsSymbol::getLocation() const {
-    switch (symbolType) {
-    case VAR_DEC:
-        return &varDec->location;
-    case PARAM:
-        return &param->location;
-    case FUNC:
-        return &func->location;
-    case OBJECT:
-        return &object->location;
-    case INTERFACE:
-        return &interface->location;
-    case FIELD:
-        return &field->location;
-    case ENUM:
-        return &lgsEnum->location;
-    case ENUM_FIELD:
-        return &enumField->location;
-    case GROUP:
-        return &group->location;
     case UNKNOWN:
         break;
     }

@@ -97,9 +97,8 @@ public:
     void checkMethodVisibility(const LgsFuncCall* methodCall);
     int getExprConstNumber(LgsExpr* expr);
 
-    LgsSymbol* getSymbol(const string& name, const LgsValue* value = nullptr);
-    bool symbolExists(const string& name);
-    void addLocalSymbol(const string& name, const LgsSymbol& symbol);
+    LgsSymbol* getSymbol(const string& name, const Location* location);
+    void addLocalSymbol(const string& name, const LgsSymbol& newSymbol);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, const LgsType* parentType);
     LgsType* resolveType(LgsType* type);

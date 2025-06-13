@@ -3,7 +3,6 @@
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
 #include "logos/LgsApp.h"
-#include "utils/ThreadPool.h"
 #include "exprs/LgsCast.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
@@ -407,7 +406,7 @@ void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) {
 }
 
 void SemaAnalyser::visitVariable(LgsVariable* variable) {
-    const auto symbol = getSymbol(variable->name, variable);
+    const auto symbol = getSymbol(variable->name, &variable->location);
     if (!symbol) return;
     variable->ref.symbolType = symbol->symbolType;
     switch (symbol->symbolType) {
@@ -487,7 +486,7 @@ void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* c
 }
 
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
-    const auto symbol = getSymbol(instance->name, instance);
+    const auto symbol = getSymbol(instance->name, &instance->location);
     if (!symbol) return;
     if (symbol->symbolType != OBJECT) {
         return errHandler.handleError(E10022, &instance->location, {instance->name});
@@ -708,7 +707,7 @@ int SemaAnalyser::getExprConstNumber(LgsExpr* expr) {
     return -1;
 }
 
-LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
+LgsSymbol* SemaAnalyser::getSymbol(const string& name, const Location* location) {
     if (const auto globalSymbol = globals.getSymbol(name)) {
         return globalSymbol;
     }
@@ -718,30 +717,21 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsValue* value) {
     if (const auto localSymbol = stack.getSymbol(name)) {
         return localSymbol;
     }
-    errHandler.handleError(E10006, &value->location, {name});
+    if (location) {
+        errHandler.handleError(E10006, location, {name});
+    }
     return nullptr;
 }
 
-void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& symbol) {
-    if (symbolExists(name)) {
-        const auto location = symbol.getLocation();
-        return errHandler.handleError(E10011, location, {name, to_string(location->lineNumber)});
+void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& newSymbol) {
+    if (const auto symbol = getSymbol(name, nullptr)) {
+        return errHandler.handleError(E10011, newSymbol.location, {name, symbol->location->lineNumberStr()});
     }
-    stack.addSymbol(name, symbol);
-}
-
-bool SemaAnalyser::symbolExists(const string& name) {
-    if (globals.getSymbol(name)) {
-        return true;
-    }
-    if (stack.getSymbol(name)) {
-        return true;
-    }
-    return false;
+    stack.addSymbol(name, newSymbol);
 }
 
 void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
-    const auto symbol = getSymbol(funcCall->name, funcCall);
+    const auto symbol = getSymbol(funcCall->name, &funcCall->location);
     if (!symbol) return;
     if (symbol->symbolType == FUNC) {
         const auto func = symbol->func;

@@ -5,6 +5,7 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
+#include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 
@@ -50,8 +51,7 @@ void LgsRuntime::freeExprs() {
 
 void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
     if (symbols.find(name) != symbols.end()) {
-        const auto location = symbol.getLocation();
-        errHandler->handleError(E10011, location, {name, location->lineNumberStr()});
+        errHandler->handleError(E10011, symbol.location, {name, symbol.location->lineNumberStr()});
         return;
     }
     std::lock_guard lock(mtx);
@@ -85,15 +85,12 @@ LgsSymbolTable::~LgsSymbolTable() {
         case PARAM: delete symbol.param; break;
         case OBJECT: delete symbol.object; break;
         case INTERFACE: delete symbol.interface; break;
-        case FUNC: {
-            if (!symbol.func->type->isBuiltin) {
-                delete symbol.func;
-            }
-            break;
-        }
         case ENUM: delete symbol.lgsEnum; break;
         case ENUM_FIELD: delete symbol.enumField; break;
-        default: break;
+        case FUNC: break;
+        case GROUP: break;
+        case FIELD: break;
+        case UNKNOWN: break;
         }
     }
 }
