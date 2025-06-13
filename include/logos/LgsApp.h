@@ -3,6 +3,7 @@
 #include "LgsErrHandler.h"
 #include "Platform.h"
 
+class LgsStrConst;
 class LgsFile;
 class LgsEnvFile;
 class LgsObject;
@@ -24,6 +25,7 @@ public:
     vector<char*> args;
     LgsActiveEnv activeEnv;
     vector<LgsFile*> files;
+    vector<LgsStrConst*> externFiles;
     LgsErrHandler errHandler;
     vector<LgsEnvFile*> envFiles;
     map<string, Module*> IRModules;
@@ -36,16 +38,17 @@ public:
     bool generate();
     bool link() const;
     void run() const;
-    void setEnvVars();
-    void loadGlobals();
-    void loadEnvFiles();
-    void setupActiveEnv();
     void parseSrcFiles(const string& path, ThreadPool& threadPool);
     void parseSrcFile(path entry);
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
     bool generateObjFile(Module* module) const;
+    bool resolveExternalFiles();
     bool resolveGlobalTypes() const;
+    void setEnvVars();
+    void setupActiveEnv();
+    void loadGlobals();
+    void loadEnvFiles();
     void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
     void checkDuplicateFiles(const vector<LgsFile*>& files);
     void checkRequiredEnvVars();

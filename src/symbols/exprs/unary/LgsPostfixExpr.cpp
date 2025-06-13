@@ -1,6 +1,6 @@
 #include "exprs/unary/LgsPostfixExpr.h"
 
-#include "types/LgsType.h"
+#include "../../../../include/symbols/LgsType.h"
 
 Value* LgsPostfixExpr::createIRValue(LgsRuntime* runtime) {
     return IncOrDec(runtime);

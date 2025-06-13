@@ -1,5 +1,5 @@
 #pragma once
-#include "types/LgsType.h"
+#include "LgsType.h"
 
 
 class LgsLong final : public LgsType {

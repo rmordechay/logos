@@ -58,6 +58,14 @@ void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol, LgsE
     symbols[name] = symbol;
 }
 
+void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol) {
+    if (symbols.find(name) != symbols.end()) {
+        return;
+    }
+    std::lock_guard lock(mtx);
+    symbols[name] = symbol;
+}
+
 LgsSymbol* LgsSymbolTable::getSymbol(const string& name) {
     if (symbols.find(name) != symbols.end()) {
         return &symbols[name];

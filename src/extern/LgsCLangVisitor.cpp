@@ -21,7 +21,7 @@ bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
         funcImpl->funcType->params.push_back(lgsParam);
     }
     funcImpl->funcType->isVariadic = func->isVariadic();
-    lgsFile.symbolTable.addSymbol(name, LgsSymbol(funcImpl, true), &errHandler);
+    externalSymbols.addSymbol(name, LgsSymbol(funcImpl, true));
     return true;
 }
 
@@ -29,10 +29,10 @@ bool LgsCLangVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
     const auto name = record->getNameAsString();
     if (!name.empty() && name[0] == '_') return true;
     if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
-    const auto objSymbol = lgsFile.symbolTable.getSymbol(name);
+    const auto objSymbol = externalSymbols.getSymbol(name);
     if (objSymbol) return true;
     const auto obj = mapCRecord(record);
-    lgsFile.symbolTable.addSymbol(name, LgsSymbol(obj, true), &errHandler);
+    externalSymbols.addSymbol(name, LgsSymbol(obj, true));
     return true;
 }
 
@@ -115,10 +115,10 @@ LgsType* LgsCLangVisitor::mapCStruct(const clang::QualType type) {
     if (name == "") {
         name = decl->getQualifiedNameAsString();
     }
-    const auto objSymbol = lgsFile.symbolTable.getSymbol(name);
+    const auto objSymbol = externalSymbols.getSymbol(name);
     if (objSymbol) return objSymbol->object;
     const auto obj = mapCRecord(decl);
-    lgsFile.symbolTable.addSymbol(name, LgsSymbol(obj, true), &errHandler);
+    externalSymbols.addSymbol(name, LgsSymbol(obj, true));
     return obj;
 }
 
@@ -147,12 +147,4 @@ bool LgsCLangVisitor::isConstCharPointer(const clang::QualType qt) const {
     if (!qt->isPointerType()) return false;
     const auto pointeeType = qt->getPointeeType();
     return pointeeType.isConstQualified() && pointeeType->isCharType();
-}
-
-void LgsCLangASTConsumer::HandleTranslationUnit(clang::ASTContext& context) {
-    visitor.TraverseDecl(context.getTranslationUnitDecl());
-}
-
-unique_ptr<clang::ASTConsumer> LgsCLangFeAction::CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) {
-    return make_unique<LgsCLangASTConsumer>(&compilerInstance.getASTContext(), lgsFile, errHandler);
 }

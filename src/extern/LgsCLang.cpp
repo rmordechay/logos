@@ -2,76 +2,62 @@
 #include "data/LgsErrors.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "extern/LgsCLangVisitor.h"
-#include "files/LgsFile.h"
 #include "logos/LgsErrHandler.h"
 #include "logos/Platform.h"
 #include "utils/LgsUtils.h"
 
 using namespace clang;
 
-void LgsCLang::parse(LgsFile& lgsFile, LgsErrHandler& errHandler) const {
-    for (const auto filePath : lgsFile.externFiles) {
-        auto path = filePath->value;
-        string code;
-        auto cLibPath = clibRoot / "usr/include" / path;
-        if (exists(cLibPath)) {
-            code = getFileText(cLibPath);
-        } else {
-            assert(0);
-        }
-        if (code.empty()) {
-            errHandler.handleError(E10047, &filePath->location, {path});
-            continue;
-        }
-        runToolOnCodeWithArgs(std::make_unique<LgsCLangFeAction>(lgsFile, errHandler), code, {"-isysroot", clibRoot});
+void LgsCLang::parseFile(const LgsStrConst* filePath, const LgsPaths& paths, LgsErrHandler& errHandler) const {
+    const auto pathStr = filePath->value;
+    const auto cLibPath = paths.clibRootInclude / pathStr;
+    if (exists(cLibPath)) {
+        const auto code = getFileText(cLibPath);
+        runToolOnCodeWithArgs(make_unique<LgsCLangFeAction>(), code, {"-isysroot", paths.clibRoot});
+    } else {
+        return errHandler.handleError(E10047, &filePath->location, {pathStr});
     }
 }
 
-void LgsCLang::compile(const vector<LgsStrConst*>& files) {
-    if (files.empty()) return;
-    for (const auto& file : files) {
-        compileArgs.push_back(file->value);
-    }
-    compileArgs.push_back("-o");
-    compileArgs.push_back(outputFilePath.string());
-
-    vector<const char*> args;
-    for (const auto& argStr : compileArgs) {
-        args.push_back(argStr.c_str());
-    }
-
+void LgsCLang::compile(const vector<LgsStrConst*>& files, const LgsPaths& paths) const {
     const auto targetTriple = sys::getDefaultTargetTriple();
     DiagnosticsEngine diags(new DiagnosticIDs(), new DiagnosticOptions(), new DiagnosticConsumer());
-    Driver driver(args[0], targetTriple, diags, CLANG_BINARY, fs);
-    driver.setCheckInputsExist(false);
+    Driver driver(CLANG_BINARY, targetTriple, diags);
 
-    unique_ptr<Compilation> compilation(driver.BuildCompilation(args));
-    const auto& jobs = compilation->getJobs();
-    if (jobs.empty()) {
-        return;
-    }
-
-    const auto& ccArgs = jobs.begin()->getArguments();
     auto invocation = make_unique<CompilerInvocation>();
-    CompilerInvocation::CreateFromArgs(*invocation, ccArgs, diags);
+    CompilerInvocation::CreateFromArgs(*invocation, getCompileArgs(files, paths), diags);
     auto compilerInstance = make_unique<CompilerInstance>();
     compilerInstance->setInvocation(std::move(invocation));
-    compilerInstance->createFileManager(fs);
+    compilerInstance->createFileManager();
     compilerInstance->createSourceManager(compilerInstance->getFileManager());
 
     switch (compilerInstance->getFrontendOpts().ProgramAction) {
     case frontend::ActionKind::EmitObj: {
         EmitObjAction action;
         compilerInstance->ExecuteAction(action);
+        break;
     }
-    break;
     case frontend::ActionKind::EmitAssembly: {
         EmitAssemblyAction action;
         compilerInstance->ExecuteAction(action);
+        break;
     }
-    break;
-    default: assert(0);
+    default: break;
     }
+}
+
+vector<const char*> LgsCLang::getCompileArgs(const vector<LgsStrConst*>& files, const LgsPaths& paths) const {
+    vector<const char*> args;
+    vector<string> compileArgs{CLANG_BINARY, "-c", "-isysroot", paths.clibRoot};
+    for (const auto& file : files) {
+        compileArgs.push_back(file->value);
+    }
+    compileArgs.push_back("-o");
+    compileArgs.push_back((paths.buildDir / "external_c.o").string());
+    for (const auto& argStr : compileArgs) {
+        args.push_back(argStr.c_str());
+    }
+    return args;
 }
 
 void LgsCLang::getClibRoot() const {
@@ -80,4 +66,15 @@ void LgsCLang::getClibRoot() const {
     const char* args[] = {CLANG_BINARY, "-x", "c", "-E"};
     const auto compilation = driver.BuildCompilation(ArrayRef(args));
     const auto& toolChain = compilation->getDefaultToolChain();
+}
+
+string LgsCLang::getCode(const LgsStrConst* filePath, const LgsPaths& paths, LgsErrHandler& errHandler) const {
+    string code;
+    const auto pathStr = filePath->value;
+    const auto cLibPath = paths.clibRootInclude / pathStr;
+    if (exists(cLibPath)) {
+        return getFileText(cLibPath);
+    }
+    errHandler.handleError(E10047, &filePath->location, {pathStr});
+    return "";
 }

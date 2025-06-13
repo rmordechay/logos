@@ -7,7 +7,7 @@
 #include "logos/LgsApp.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsType.h"
+#include "../../include/symbols/LgsType.h"
 
 string getFileText(path filePath) {
     if (!exists(filePath)) return "";

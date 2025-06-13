@@ -9,11 +9,6 @@ using namespace clang::tooling;
 
 class LgsCLangVisitor : public clang::RecursiveASTVisitor<LgsCLangVisitor> {
 public:
-    LgsFile& lgsFile;
-    LgsErrHandler& errHandler;
-    clang::ASTContext* context;
-
-    explicit LgsCLangVisitor(clang::ASTContext* context, LgsFile& lgsFile, LgsErrHandler& errHandler) : lgsFile(lgsFile), errHandler(errHandler), context(context) {}
     bool VisitFunctionDecl(const clang::FunctionDecl* func);
     bool VisitRecordDecl(const clang::RecordDecl* record);
     LgsType* mapCType(clang::QualType type);
@@ -29,17 +24,16 @@ class LgsCLangASTConsumer final : public clang::ASTConsumer {
 public:
     LgsCLangVisitor visitor;
 
-    explicit LgsCLangASTConsumer(clang::ASTContext* context, LgsFile& lgsFile, LgsErrHandler& errHandler) : visitor(context, lgsFile, errHandler) {}
-    void HandleTranslationUnit(clang::ASTContext& context) override;
+    void HandleTranslationUnit(clang::ASTContext& context) override {
+        visitor.TraverseDecl(context.getTranslationUnitDecl());
+    }
     ~LgsCLangASTConsumer() override = default;
 };
 
 class LgsCLangFeAction final : public clang::ASTFrontendAction {
 public:
-    LgsFile& lgsFile;
-    LgsErrHandler& errHandler;
-
-    explicit LgsCLangFeAction(LgsFile& lgsFile, LgsErrHandler& errHandler) : lgsFile(lgsFile), errHandler(errHandler) {}
-    unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) override;
+    unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) override {
+        return make_unique<LgsCLangASTConsumer>();
+    }
     ~LgsCLangFeAction() override = default;
 };

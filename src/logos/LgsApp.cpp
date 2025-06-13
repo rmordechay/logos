@@ -10,6 +10,7 @@
 #include "builtin/LgsBuiltinFuncs.h"
 #include "codegen/CodeGenerator.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "extern/LgsCLang.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "funcs/LgsMainFunc.h"
@@ -42,7 +43,7 @@ bool LgsApp::parse() {
     thread tGlobals([this] { loadGlobals(); });
     tSrcFiles.join();
     tGlobals.join();
-    return resolveGlobalTypes();
+    return resolveExternalFiles() && resolveGlobalTypes();
 }
 
 bool LgsApp::analyse() {
@@ -127,16 +128,20 @@ void LgsApp::parseSrcFile(path entry) {
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     const auto lgsFile = parser.logosFile();
-    if (parser.getNumberOfSyntaxErrors() == 0) {
-        const auto file = antlerConverter.getLogosFile(lgsFile, absFilePath);
-        lock_guard lock(mtx);
-        files.push_back(file);
-        if (!antlerConverter.errHandler.successful) {
-            addErrors(antlerConverter.errHandler.errors);
-            errHandler.setUnsuccessful();
-        }
-    } else {
+    if (parser.getNumberOfSyntaxErrors() != 0) {
         errHandler.setUnsuccessful();
+        return;
+    }
+    const auto file = antlerConverter.getLogosFile(lgsFile, absFilePath);
+    lock_guard lock(mtx);
+    files.push_back(file);
+    if (!antlerConverter.errHandler.successful) {
+        addErrors(antlerConverter.errHandler.errors);
+        errHandler.setUnsuccessful();
+        return;
+    }
+    for (const auto externFile : file->externFiles) {
+        externFiles.push_back(externFile);
     }
 }
 
@@ -228,6 +233,15 @@ bool LgsApp::generateObjFile(Module* module) const {
     return true;
 }
 
+bool LgsApp::resolveExternalFiles() {
+    if (externFiles.empty()) return true;
+    const LgsCLang lgsCLang;
+    for (const auto externFile : externFiles) {
+        lgsCLang.parseFile(externFile, paths, errHandler);
+    }
+    return true;
+}
+
 void LgsApp::loadGlobals() {
     globals.addSymbol(lgsPrint.name, LgsSymbol(&lgsPrint), &errHandler);
     globals.addSymbol(lgsSizeof.name, LgsSymbol(&lgsSizeof), &errHandler);
@@ -313,6 +327,7 @@ void LgsApp::initPaths(const path& rootDirPath) {
     paths.execFilePath = paths.buildDir / LOGOS_EXECUTABLE_FILE;
     paths.appFilePath = paths.rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
     paths.clibRoot = CLIB_ROOT;
+    paths.clibRootInclude = paths.clibRoot / "usr/include";
 }
 
 bool LgsApp::isLogosFile(const directory_entry& entry) const {

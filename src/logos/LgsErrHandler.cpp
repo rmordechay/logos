@@ -15,6 +15,7 @@ void LgsErrHandler::handleError(const LgsError& lgsErr, const Location* location
     lock_guard lock(mtx);
     lgsLog(ERROR_STR + errMsg);
     if (location) {
+        assert(filePath != "");
         lgsLog("\t   at " + location->getFullPath(filePath) + "\n---");
     }
 }

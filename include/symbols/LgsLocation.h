@@ -12,5 +12,3 @@ struct Location {
         return path.string() + ":" + lineNumberStr() + ":" + to_string(posInLine);
     }
 };
-
-
