@@ -26,7 +26,8 @@ enum LgsSymbolType {
 
 struct LgsSymbol {
     LgsSymbolType symbolType;
-    Location* location;
+    bool isExternal = false;
+
     LgsVarDec* varDec = nullptr;
     LgsParam* param = nullptr;
     LgsObject* object = nullptr;
@@ -36,7 +37,7 @@ struct LgsSymbol {
     LgsEnumField* enumField = nullptr;
     LgsFunc* func = nullptr;
     LgsGroup* group = nullptr;
-    bool isExternal = false;
+    Location* location;
 
     explicit LgsSymbol();
     explicit LgsSymbol(LgsParam* param);
@@ -51,5 +52,3 @@ struct LgsSymbol {
     void* getPtr() const;
     ~LgsSymbol() = default;
 };
-
-

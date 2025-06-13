@@ -29,11 +29,11 @@ interfaceFile:
     ;
 
 interface:
-        INTERFACE TYPE LBRACE interfaceBody RBRACE
+        INTERFACE IDENTIFIER LBRACE interfaceBody RBRACE
     ;
 
 group:
-        TYPE EQUAL LBRACE groupTypesList RBRACE ARROW LBRACE groupTargetList RBRACE
+        IDENTIFIER EQUAL LBRACE groupTypesList RBRACE ARROW LBRACE groupTargetList RBRACE
     ;
 
 groupTypesList:
@@ -41,7 +41,7 @@ groupTypesList:
     ;
 
 groupTargetList:
-        VARIABLE (COMMA VARIABLE)* COMMA?
+        IDENTIFIER (COMMA IDENTIFIER)* COMMA?
     ;
 
 interfaceBody:
@@ -49,7 +49,7 @@ interfaceBody:
     ;
 
 object:
-        (OBJECT | SINGLETON) TYPE LBRACE objectBody RBRACE
+        (OBJECT | SINGLETON) IDENTIFIER LBRACE objectBody RBRACE
     ;
 
 objectBody:
@@ -57,23 +57,23 @@ objectBody:
     ;
 
 field:
-        VISIBILITY? CONST? VARIABLE COLON type (EQUAL expr)?
+        VISIBILITY? CONST? IDENTIFIER COLON type (EQUAL expr)?
     ;
 
 objectDeclaration:
-        (OBJECT | SINGLETON) TYPE
+        (OBJECT | SINGLETON) IDENTIFIER
     ;
 
 interfaceDeclaration:
-        INTERFACE TYPE
+        INTERFACE IDENTIFIER
     ;
 
 objectImplements:
-        IMPLEMENTS COLON TYPE (COMMA TYPE)? COMMA?
+        IMPLEMENTS COLON IDENTIFIER (COMMA IDENTIFIER)? COMMA?
     ;
 
 funcSignature:
-        VARIABLE LPAREN (param (COMMA param)* COMMA?)? RPAREN (COLON type)?
+        IDENTIFIER LPAREN (param (COMMA param)* COMMA?)? RPAREN (COLON type)?
     ;
 
 funcImpl:
@@ -97,7 +97,7 @@ funcBody:
     ;
 
 param:
-        VARIABLE COLON type TRIPLE_DOT? (EQUAL expr)? | VARIABLE funcType
+        IDENTIFIER COLON type TRIPLE_DOT? (EQUAL expr)? | IDENTIFIER funcType
     ;
 
 statement:
@@ -120,15 +120,15 @@ statementsBlock:
     ;
 
 assignment:
-        (VARIABLE | iterIndex | selection) assignemntOp expr
+        (IDENTIFIER | iterIndex | selection) assignemntOp expr
     ;
 
 explicitVarDec:
-        CONST? VARIABLE COLON type (EQUAL expr)?
+        CONST? IDENTIFIER COLON type (EQUAL expr)?
     ;
 
 implicitVarDec:
-        CONST? VARIABLE (QUEST_MARK)? EQUAL expr
+        CONST? IDENTIFIER (QUEST_MARK)? EQUAL expr
     ;
 
 ifStatement:
@@ -152,9 +152,9 @@ pattern:
     ;
 
 loopStatement:
-        FOR VARIABLE COMMA? IN iterableRange=range statementsBlock
-    |   FOR VARIABLE (COMMA VARIABLE)* COMMA? IN iterableExpr=unaryExpr statementsBlock
-    |   FOR VARIABLE? statementsBlock
+        FOR IDENTIFIER COMMA? IN iterableRange=range statementsBlock
+    |   FOR IDENTIFIER (COMMA IDENTIFIER)* COMMA? IN iterableExpr=unaryExpr statementsBlock
+    |   FOR IDENTIFIER? statementsBlock
     ;
 
 breakStmt:
@@ -166,11 +166,11 @@ returnStatement:
     ;
 
 enumDeclaration:
-        ENUM TYPE LBRACE enumField* RBRACE
+        ENUM IDENTIFIER LBRACE enumField* RBRACE
     ;
 
 enumField:
-        VARIABLE (EQUAL STRING)?
+        IDENTIFIER (EQUAL STRING)?
     ;
 
 expr:
@@ -186,7 +186,7 @@ expr:
     ;
 
 unaryExpr:
-        VARIABLE
+        IDENTIFIER
     |   SELF_INSTANCE
     |   SELF_CLASS
     |   NULL
@@ -203,7 +203,7 @@ unaryExpr:
     ;
 
 postfixExpr:
-        (VARIABLE |  iterIndex | selection) (INC | DEC)
+        (IDENTIFIER |  iterIndex | selection) (INC | DEC)
     ;
 
 arrayExpr:
@@ -219,7 +219,7 @@ keyValue:
     ;
 
 funcCall:
-        VARIABLE LPAREN funcArgList? TRIPLE_DOT? COMMA? RPAREN
+        IDENTIFIER LPAREN funcArgList? TRIPLE_DOT? COMMA? RPAREN
     ;
 
 funcArgList:
@@ -227,11 +227,11 @@ funcArgList:
     ;
 
 funcArg:
-        (VARIABLE EQUAL)? expr
+        (IDENTIFIER EQUAL)? expr
     ;
 
 constructor:
-        (TYPE | VARIABLE) LPAREN constructorArgList? RPAREN
+        IDENTIFIER LBRACE constructorArgList? RBRACE
     ;
 
 constructorArgList:
@@ -239,7 +239,7 @@ constructorArgList:
     ;
 
 constructorArg:
-        VARIABLE EQUAL expr
+        IDENTIFIER EQUAL expr
     ;
 
 constant:
@@ -250,7 +250,7 @@ constant:
     ;
 
 iterIndex:
-        (funcCall | VARIABLE) (index)+
+        (funcCall | IDENTIFIER) (index)+
     ;
 
 index:
@@ -264,8 +264,7 @@ selection:
     ;
 
 firstSelectionElement:
-        VARIABLE
-    |   TYPE
+        IDENTIFIER
     |   STRING
     |   SELF_CLASS
     |   SELF_INSTANCE
@@ -275,7 +274,7 @@ firstSelectionElement:
     ;
 
 innerSelectionElement:
-        VARIABLE
+        IDENTIFIER
     |   funcCall
     |   iterIndex
     ;
@@ -287,7 +286,7 @@ range:
     ;
 
 type:
-        TYPE QUEST_MARK?
+        IDENTIFIER QUEST_MARK?
    |    SELF_CLASS
    |    baseType=type arraySize+ EXCLA_MARK?
    |    mapType
@@ -311,7 +310,7 @@ vector:
     ;
 
 requireEnvVars:
-        'require' 'envs' LBRACE (VARIABLE COLON type)* RBRACE
+        'require' 'envs' LBRACE (IDENTIFIER COLON type)* RBRACE
     ;
 
 assignemntOp:
@@ -409,9 +408,8 @@ INTEGER: [0-9][0-9_]*;
 FLOAT: [0-9]+ '.' [0-9]+;
 BOOL: 'true' | 'false';
 NULL: 'null';
-CONST_NAME: [A-Z]+ ('_' [A-Z]+)* ;
-TYPE: ([A-Z] [a-zA-Z0-9]*)+ ;
-VARIABLE: [a-zA-Z] [a-zA-Z0-9_]*;
+CONST_NAME: [A-Z]+ ('_' [A-Z]+)*;
+IDENTIFIER: [a-zA-Z] [a-zA-Z0-9_]*;
 STRING: '"' ( ~["\\] | '\\'.)* '"';
 TAG: '@'[a-zA-Z0-9_]+;
 LINE_COMMENT: '//' ~( '\r' | '\n' )* -> skip;

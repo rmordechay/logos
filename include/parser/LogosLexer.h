@@ -26,8 +26,8 @@ public:
     IMPLEMENTS = 59, EXTERN = 60, IF = 61, ELSE = 62, FOR = 63, BREAK = 64, 
     CONTINUE = 65, RETURN = 66, VISIBILITY = 67, CONST = 68, AND = 69, OR = 70, 
     NOT = 71, IN = 72, INTEGER = 73, FLOAT = 74, BOOL = 75, NULL_ = 76, 
-    CONST_NAME = 77, TYPE = 78, VARIABLE = 79, STRING = 80, TAG = 81, LINE_COMMENT = 82, 
-    BLOCK_COMMENT = 83, WS = 84
+    CONST_NAME = 77, IDENTIFIER = 78, STRING = 79, TAG = 80, LINE_COMMENT = 81, 
+    BLOCK_COMMENT = 82, WS = 83
   };
 
   explicit LogosLexer(antlr4::CharStream *input);

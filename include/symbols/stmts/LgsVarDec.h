@@ -6,8 +6,8 @@ class LgsVarDec final : public LgsStmt {
 public:
     string name;
     LgsType* type = nullptr;
-    bool isConst = false;
     LgsExpr* expr = nullptr;
+    bool isConst = false;
     vector<LgsVariable*> refs;
 
     explicit LgsVarDec(const string& name, LgsExpr* expr = nullptr) : name(name), expr(expr) {}
