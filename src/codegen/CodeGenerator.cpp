@@ -6,22 +6,6 @@
 #include "utils/LgsUtils.h"
 #include "utils/ThreadPool.h"
 
-void CodeGenerator::generate(LogosProject& project) {
-    init();
-    ThreadPool threadPool;
-    threadPool.start();
-    for (const auto file : project.files) {
-        threadPool.runTask([file, &project] {
-            const auto module = file->generateIR(project);
-            if (!module) return;
-            lock_guard lock(mtx);
-            project.IRModules[file->name] = module;
-        });
-    }
-    threadPool.wait();
-    writeIRToFile(project);
-}
-
 void CodeGenerator::init() {
     // Build dir
     if (exists(application.paths.buildDir)) remove_all(application.paths.buildDir);
@@ -36,7 +20,7 @@ void CodeGenerator::init() {
     application.platform.dataLayout = getTargetMachine()->createDataLayout();
 }
 
-void CodeGenerator::writeIRToFile(LogosProject& project) {
+void CodeGenerator::writeIRToFile(LgsProject& project) {
     for (const auto [_, module] : project.IRModules) {
         if constexpr (WRITE_IR_TO_FILE) {
             const auto filePath = (application.paths.buildDir / module->getName().str()).string() + ".ll";

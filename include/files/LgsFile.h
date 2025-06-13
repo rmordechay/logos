@@ -2,7 +2,7 @@
 #include "logos/LgsRuntime.h"
 
 class LgsStrConst;
-class LogosProject;
+class LgsProject;
 class LgsRuntime;
 
 using namespace nlohmann;
@@ -17,13 +17,13 @@ public:
     vector<LgsStrConst*> externFiles;
 
     explicit LgsFile(const string& name, const string& path) : name(name), absPath(path) {}
-    virtual Module* generateIR(LogosProject& project);
+    virtual Module* generateIR(LgsProject& project);
     virtual void format();
     virtual json asJSON();
     virtual ~LgsFile() = default;
 };
 
-inline Module* LgsFile::generateIR(LogosProject& project) {
+inline Module* LgsFile::generateIR(LgsProject& project) {
     return nullptr;
 }
 

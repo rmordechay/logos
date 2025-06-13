@@ -20,7 +20,7 @@ class LgsPatternMatch;
 class LgsStmtBlock;
 class LgsStmt;
 class LgsMainFile;
-class LogosProject;
+class LgsProject;
 class LgsCast;
 class LgsVarDec;
 class LgsInstance;

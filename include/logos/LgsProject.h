@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsActiveEnv.h"
 #include "LgsErrHandler.h"
+#include "codegen/LgsLinker.h"
 
 class LgsFile;
 class LgsEnvFile;
@@ -17,7 +18,7 @@ struct RequireEnvVar;
 
 using namespace filesystem;
 
-class LogosProject final {
+class LgsProject final {
 public:
     string name;
     string version;
@@ -26,6 +27,7 @@ public:
     LgsErrHandler errHandler;
     vector<LgsEnvFile*> envFiles;
     map<string, Module*> IRModules;
+    const LgsLinker linker;
     const LgsAppFile* appFile = nullptr;
 
     void asJSON() const;
@@ -41,13 +43,15 @@ public:
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
     bool analyse();
+    bool generate();
+    bool link() const;
     bool resolveGlobalTypes() const;
     void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
     void checkDuplicateFiles(const vector<LgsFile*>& files);
     void checkRequiredEnvVars();
     bool isLogosFile(const directory_entry& entry) const;
     void addErrors(vector<LgsError> newErrors);
-    ~LogosProject() = default;
+    ~LgsProject() = default;
 };
 
 

@@ -6,7 +6,7 @@ public:
     LgsObject *obj = nullptr;
 
     explicit LgsObjectFile(const string& name, const string& path) : LgsFile(name, path) {}
-    Module* generateIR(LogosProject& project) override;
+    Module* generateIR(LgsProject& project) override;
     ~LgsObjectFile() override;
 };
 

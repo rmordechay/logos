@@ -1,6 +1,4 @@
 #include "codegen/LgsLinker.h"
-#include "logos/Logos.h"
-#include "logos/Platform.h"
 #include "utils/LgsUtils.h"
 
 #include "llvm/Linker/Linker.h"
@@ -8,26 +6,6 @@
 #include <llvm/IRReader/IRReader.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/IR/LegacyPassManager.h>
-
-bool LgsLinker::link(LogosProject& project) const {
-    Module* mainModule = project.IRModules.find(LOGOS_MAIN_FILE_NAME)->second;
-    assert(mainModule);
-    Linker linker(*mainModule);
-    for (const auto& [name, module] : project.IRModules) {
-        if (name == LOGOS_MAIN_FILE_NAME) continue;
-        linker.linkInModule(unique_ptr<Module>(module));
-    }
-    if (!generateObjFile(mainModule, application.paths.objFilePath.c_str())) return false;
-    auto linkerOpts = application.platform.linkerOpts;
-    linkerOpts.push_back(application.paths.objFilePath.c_str());
-    linkerOpts.push_back("-o");
-    linkerOpts.push_back(application.paths.execFilePath.c_str());
-    if (!application.platform.link(linkerOpts, outs(), errs(), false, false)) {
-        errs().flush();
-        return false;
-    }
-    return true;
-}
 
 bool LgsLinker::generateObjFile(Module* module, const string& path) const {
     error_code ec;

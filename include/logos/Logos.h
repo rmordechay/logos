@@ -11,7 +11,7 @@ using namespace llvm;
 
 class Logos {
 public:
-    LogosProject project;
+    LgsProject project;
     vector<char*> args;
 
     explicit Logos(const path& rootDirPath = "") {

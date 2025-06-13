@@ -6,7 +6,7 @@
 #include "types/LgsObject.h"
 #include "utils/LgsUtils.h"
 
-Module* LgsMainFile::generateIR(LogosProject& project) {
+Module* LgsMainFile::generateIR(LgsProject& project) {
     LgsRuntime runtime;
     runtime.module = createIRModule(LOGOS_MAIN_FILE_NAME, context);
     for (const auto [_, func] : funcs) {
