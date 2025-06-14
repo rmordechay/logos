@@ -1,5 +1,6 @@
 #pragma once
 
+class LgsVariable;
 class LgsGroup;
 class LgsField;
 class LgsEnum;
@@ -27,6 +28,7 @@ enum LgsSymbolType {
 struct LgsSymbol {
     LgsSymbolType symbolType;
     bool isExternal = false;
+    vector<LgsVariable*> refs;
 
     LgsVarDec* varDec = nullptr;
     LgsParam* param = nullptr;

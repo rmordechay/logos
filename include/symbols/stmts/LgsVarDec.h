@@ -8,7 +8,6 @@ public:
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
     bool isConst = false;
-    vector<LgsVariable*> refs;
 
     explicit LgsVarDec(const string& name, LgsExpr* expr = nullptr) : name(name), expr(expr) {}
     void createIRStmt(LgsRuntime* runtime) override;

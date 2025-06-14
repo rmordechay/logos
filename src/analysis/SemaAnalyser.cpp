@@ -186,6 +186,7 @@ void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
     visitExpr(rValue);
     const auto lType = lValue->type;
     const auto rType = rValue->type;
+    if (lValue->isConst) return errHandler.handleError(E10051, &lValue->location, {lValue->prettyName()});
     if (lType && rType && lType->equals(rType)) return;
     return errHandler.handleError(E10001, &assignment->location, {lType->prettyName(), rType->prettyName()});
 }
@@ -405,15 +406,19 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     const auto symbol = getSymbol(variable->name, &variable->location);
     if (!symbol) return;
     variable->ref.symbolType = symbol->symbolType;
+    symbol->refs.push_back(variable);
     switch (symbol->symbolType) {
     case VAR_DEC:
-        symbol->varDec->refs.push_back(variable);
         variable->ref.varDec = symbol->varDec;
         variable->isConst = symbol->varDec->isConst;
         variable->setType(symbol->varDec->type);
         break;
+    case FIELD:
+        variable->ref.field = symbol->field;
+        variable->isConst = symbol->field->isConst;
+        variable->setType(symbol->field->type);
+        break;
     case PARAM:
-        symbol->param->refs.push_back(variable);
         variable->ref.param = symbol->param;
         variable->isConst = true;
         variable->setType(symbol->param->type);

@@ -7,7 +7,6 @@ class LgsVariable :  public LgsUnaryExpr {
 public:
     string name;
     LgsSymbol ref;
-    bool isConst = false;
 
     explicit LgsVariable(const string& name) : LgsUnaryExpr(nullptr), name(name) {}
     string getName() override;

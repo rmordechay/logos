@@ -381,14 +381,15 @@ SINGLETON: 'singleton';
 SELF_INSTANCE: 'self';
 SELF_CLASS: 'Self';
 INTERFACE: 'interface';
+EXTERN: 'extern';
+VISIBILITY: 'pub';
+IMPLEMENTS: 'implements';
+CONST: 'const';
 ENUM: 'enum';
 
 VEC2: 'vec2';
 VEC3: 'vec3';
 VEC4: 'vec4';
-
-IMPLEMENTS: 'implements';
-EXTERN: 'extern';
 
 IF: 'if';
 ELSE: 'else';
@@ -396,8 +397,6 @@ FOR: 'for';
 BREAK: 'break';
 CONTINUE: 'continue';
 RETURN: 'return';
-VISIBILITY: 'pub';
-CONST: 'const';
 
 AND: 'and';
 OR: 'or';
