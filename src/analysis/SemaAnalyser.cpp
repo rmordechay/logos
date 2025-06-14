@@ -119,6 +119,13 @@ void SemaAnalyser::visitParam(LgsParam* param) {
     addLocalSymbol(param->name, LgsSymbol(param));
 }
 
+void SemaAnalyser::visitField(LgsField* field) {
+    if (field->expr) {
+        visitExpr(field->expr);
+        validateExprType(field->expr, field->type);
+    }
+}
+
 void SemaAnalyser::visitStmt(LgsStmt* stmt) {
     if (const auto varDec = stmt->asVarDec()) {
         visitVarDec(varDec);
@@ -156,13 +163,6 @@ void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
     }
 }
 
-void SemaAnalyser::visitField(LgsField* field) {
-    if (field->expr) {
-        visitExpr(field->expr);
-        validateExprType(field->expr, field->type);
-    }
-}
-
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     if (varDec->type && varDec->expr) {
         varDec->type = resolveType(varDec->type);
@@ -186,11 +186,8 @@ void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
     visitExpr(rValue);
     const auto lType = lValue->type;
     const auto rType = rValue->type;
-    if (lType && rType && lType->equals(rType)) {
-        rType->castImplicitly(*lType);
-    } else {
-        return errHandler.handleError(E10001, &assignment->location, {lType->prettyName(), rType->prettyName()});
-    }
+    if (lType && rType && lType->equals(rType)) return;
+    return errHandler.handleError(E10001, &assignment->location, {lType->prettyName(), rType->prettyName()});
 }
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
@@ -678,6 +675,7 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
     }
 
     if (expr->type != type) {
+        freeType(expr->type);
         expr->type = type;
     }
 }

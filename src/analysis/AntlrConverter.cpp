@@ -44,6 +44,7 @@
 #include "types/LgsUnknownType.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
+#include "types/primitives/LgsUInt.h"
 #include "utils/LgsUtils.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
@@ -846,6 +847,17 @@ LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
     return type;
 }
 
+LgsType* AntlerConverter::getFuncReturnType(LogosParser::TypeContext* ctx) {
+    LgsType* result = nullptr;
+    if (!ctx) {
+        result = &LGS_VOID;
+    } else {
+        result = getType(ctx);
+        result->setLocation(ctx->start, &filePath);
+    }
+    return result;
+}
+
 LgsType* AntlerConverter::getTypeFromText(tree::TerminalNode* typeToken) const {
     const auto typeText = typeToken->getText();
     LgsType* type = nullptr;
@@ -855,6 +867,8 @@ LgsType* AntlerConverter::getTypeFromText(tree::TerminalNode* typeToken) const {
         type = &LGS_CHAR;
     } else if (typeText == LgsInt::name) {
         type = &LGS_INT;
+    } else if (typeText == LgsUInt::name) {
+        type = &LGS_UINT;
     } else if (typeText == LgsShort::name) {
         type = &LGS_SHORT;
     } else if (typeText == LgsLong::name) {
@@ -872,22 +886,6 @@ LgsType* AntlerConverter::getTypeFromText(tree::TerminalNode* typeToken) const {
     }
     type->setLocation(typeToken->getSymbol(), &filePath);
     return type;
-}
-
-LgsType* AntlerConverter::getFuncReturnType(LogosParser::TypeContext* ctx) {
-    LgsType* result = nullptr;
-    if (!ctx) {
-        result = &LGS_VOID;
-    } else {
-        result = getType(ctx);
-        result->setLocation(ctx->start, &filePath);
-    }
-    return result;
-}
-
-void AntlerConverter::cleanStr(string& value) const {
-    value.erase(0, 1);
-    value.pop_back();
 }
 
 LgsAssignType AntlerConverter::mapAssignType(LogosParser::AssignmentContext* assignment) const {
@@ -926,4 +924,9 @@ LgsOperator AntlerConverter::mapOperator(LogosParser::ExprContext* expr) const {
     if (expr->DOUBLE_RANGLE()) return RSHIFT;
     if (expr->CARET()) return BIT_XOR;
     assert(false);
+}
+
+void AntlerConverter::cleanStr(string& value) const {
+    value.erase(0, 1);
+    value.pop_back();
 }

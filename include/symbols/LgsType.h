@@ -2,6 +2,8 @@
 
 #include "LgsLocation.h"
 
+class LgsUInt;
+class LgsShort;
 class LgsTypePair;
 class LgsLong;
 class LgsHashMap;
@@ -45,7 +47,9 @@ public:
     LgsBool* asBool();
     LgsStr* asStr();
     LgsInt* asInt();
+    LgsShort* asShort();
     LgsLong* asLong();
+    LgsUInt* asUInt();
     LgsMap* asMap();
     LgsObject* asObject();
     LgsInterface* asInterface();
@@ -57,7 +61,6 @@ public:
     bool isUnknown();
 
     virtual size_t getSizeBytes();
-    virtual void castImplicitly(LgsType& toType);
     virtual bool equals(LgsType& other);
     virtual string getStrFormatPart() const;
     virtual Type* getIRType() = 0;

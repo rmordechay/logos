@@ -5,6 +5,10 @@
 #include "types/LgsGroup.h"
 #include "types/LgsMap.h"
 #include "types/LgsUnknownType.h"
+#include "types/primitives/LgsShort.h"
+#include "types/primitives/LgsUInt.h"
+
+class LgsShort;
 
 bool LgsType::equals(LgsType& other) {
     return getIRName() == other.getIRName();
@@ -50,20 +54,21 @@ LgsType::~LgsType() {
 }
 
 size_t LgsType::getSizeBytes() { assert(0); }
-void LgsType::castImplicitly(LgsType& toType) { }
 string LgsType::getStrFormatPart() const { assert(0); }
 LgsType* LgsType::clone() { assert(0); }
 
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
+LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }
+LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }
+LgsLong* LgsType::asLong() { return dynamic_cast<LgsLong*>(this); }
+LgsUInt* LgsType::asUInt() { return dynamic_cast<LgsUInt*>(this); }
+LgsStr* LgsType::asStr() { return dynamic_cast<LgsStr*>(this); }
 LgsObject* LgsType::asObject() { return dynamic_cast<LgsObject*>(this); }
 LgsInterface* LgsType::asInterface() { return dynamic_cast<LgsInterface*>(this); }
 LgsIterable* LgsType::asIterable() { return dynamic_cast<LgsIterable*>(this); }
 LgsArray* LgsType::asArray() { return dynamic_cast<LgsArray*>(this); }
+LgsMap* LgsType::asMap() { return dynamic_cast<LgsMap*>(this); }
 LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
 LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }
 LgsTypePair* LgsType::asPair() { return dynamic_cast<LgsTypePair*>(this); }
-LgsStr* LgsType::asStr() { return dynamic_cast<LgsStr*>(this); }
-LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }
-LgsLong* LgsType::asLong() { return dynamic_cast<LgsLong*>(this); }
-LgsMap* LgsType::asMap() { return dynamic_cast<LgsMap*>(this); }
 bool LgsType::isUnknown() { return dynamic_cast<LgsUnknownType*>(this); }

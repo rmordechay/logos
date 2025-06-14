@@ -11,7 +11,7 @@ public:
     }
     string prettyName() override;
     Value* createIRValue(LgsRuntime* runtime) override;
-    LgsExpr* convertExpr(LgsType* other) override;
+    LgsExpr* convertExpr(LgsType* toType) override;
     LgsExpr* clone() override;
     ~LgsShortConst() override = default;
 };

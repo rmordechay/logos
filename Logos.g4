@@ -404,11 +404,10 @@ OR: 'or';
 NOT: 'not';
 IN: 'in';
 
-INTEGER: [0-9][0-9_]*;
-FLOAT: [0-9]+ '.' [0-9]+;
+INTEGER: '-'?[0-9][0-9_]*;
+FLOAT: '-'?[0-9]+'.'[0-9]+;
 BOOL: 'true' | 'false';
 NULL: 'null';
-CONST_NAME: [A-Z]+ ('_' [A-Z]+)*;
 IDENTIFIER: [a-zA-Z] [a-zA-Z0-9_]*;
 STRING: '"' ( ~["\\] | '\\'.)* '"';
 TAG: '@'[a-zA-Z0-9_]+;

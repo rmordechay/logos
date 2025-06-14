@@ -40,9 +40,10 @@ LgsExpr* LgsVariable::convertExpr(LgsType* type) {
     switch (ref.symbolType) {
     case VAR_DEC:
         return ref.varDec->expr->convertExpr(type);
+    case FIELD:
+        return ref.field->expr->convertExpr(type);
     case PARAM:
     case ENUM_FIELD:
-    case FIELD:
     case FUNC:
     case OBJECT:
     case INTERFACE:

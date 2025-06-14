@@ -1,28 +1,32 @@
 #pragma once
 #include "exprs/unary/LgsUnaryExpr.h"
-#include "types/primitives/LgsBool.h"
+#include "types/primitives/LgsUInt.h"
 
-class LgsBoolConst final : public LgsUnaryExpr {
+class LgsUIntConst final : public LgsUnaryExpr {
 public:
-    bool value;
+    int value;
 
-    explicit LgsBoolConst(const bool value) : LgsUnaryExpr(&LGS_BOOL), value(value) {
+    explicit LgsUIntConst(const int value) : LgsUnaryExpr(&LGS_UINT), value(value) {
         isConst = true;
     }
-    string getValueAsString() const;
+    string prettyName() override;
     Value* createIRValue(LgsRuntime* runtime) override;
-    Value* andIR(LgsRuntime* runtime, LgsExpr* other) override;
+    LgsExpr* convertExpr(LgsType* toType) override;
     Value* eqIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* neIR(LgsRuntime* runtime, LgsExpr* other) override;
-    Value* ltIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* gtIR(LgsRuntime* runtime, LgsExpr* other) override;
+    Value* ltIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* geIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* leIR(LgsRuntime* runtime, LgsExpr* other) override;
+    Value* andIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* orIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* bitAndIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* bitOrIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* bitXorIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* rshiftIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* lshiftIR(LgsRuntime* runtime, LgsExpr* other) override;
-    ~LgsBoolConst() override = default;
+    LgsExpr* clone() override;
+    ~LgsUIntConst() override = default;
 };
+
+

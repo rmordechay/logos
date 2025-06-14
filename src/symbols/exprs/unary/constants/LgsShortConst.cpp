@@ -10,8 +10,11 @@ Value* LgsShortConst::createIRValue(LgsRuntime* runtime) {
     return runtime->builder.getInt16(value);
 }
 
-LgsExpr* LgsShortConst::convertExpr(LgsType* other) {
-    if (other->asStr()) {
+LgsExpr* LgsShortConst::convertExpr(LgsType* toType) {
+    if (toType->asShort()) {
+        return this;
+    }
+    if (toType->asStr()) {
         return new LgsStrConst(to_string(value));
     }
     assert(0);
