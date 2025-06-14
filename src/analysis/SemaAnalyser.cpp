@@ -569,14 +569,16 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     const auto exprFrom = iterIndex->index->from;
     const auto exprTo = iterIndex->index->to;
     visitUnaryExpr(baseExpr);
-    if (!baseExpr->type) return;
     visitExpr(exprFrom);
     visitExpr(exprTo);
+    if (!baseExpr->type) return;
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable) {
         if (baseExpr->type) {
             errHandler.handleError(E10002, &iterIndex->location, {iterIndex->baseExpr->prettyName()});
         }
+    } else if (exprTo) {
+        iterIndex->setType(iterable);
     } else if (const auto map = iterable->asMap()) {
         iterIndex->setType(map->typePair->value);
     } else {

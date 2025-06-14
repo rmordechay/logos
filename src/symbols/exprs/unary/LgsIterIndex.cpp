@@ -5,19 +5,19 @@
 Value* LgsIterIndex::createIRValue(LgsRuntime* runtime) {
     const auto baseExprType = baseExpr->type;
     if (const auto arr = baseExprType->asArray()) {
-        if (arr->isStatic) return getGEP(runtime);
-        return getIRFromDynArray(runtime, arr);
+        return getIRFromArray(runtime, arr);
     }
     if (const auto map = baseExprType->asMap()) {
         return getIRFromMap(runtime, map);
     }
-    if (baseExprType->asStr()) {
-        return getIRFromStr(runtime);
+    if (const auto str = baseExprType->asStr()) {
+        return getIRFromStr(runtime, str);
     }
     assert(0);
 }
 
-Value* LgsIterIndex::getIRFromDynArray(LgsRuntime* runtime, LgsArray* arr) const {
+Value* LgsIterIndex::getIRFromArray(LgsRuntime* runtime, LgsArray* arr) const {
+    if (arr->isStatic) return getGEP(runtime);
     auto& builder = runtime->builder;
     const auto arrPtr = baseExpr->getIRValue(runtime);
     auto indexIRValue = index->from->getIRValue(runtime);
@@ -39,12 +39,13 @@ Value* LgsIterIndex::getIRFromMap(LgsRuntime* runtime, LgsMap* map) const {
     return map->getFunc.callIR(runtime, {mapPtr, keyLoad});
 }
 
-Value* LgsIterIndex::getIRFromStr(LgsRuntime* runtime) const {
+Value* LgsIterIndex::getIRFromStr(LgsRuntime* runtime, LgsStr* str) const {
     const auto baseExprIRValue = baseExpr->getIRValue(runtime);
     const auto baseExprIRType = baseExpr->type->getIRType();
-    if (const auto global = dyn_cast<GlobalVariable>(baseExprIRValue)) {
-        const auto ty = global->getValueType();
+    if (str->isStatic) {
+        const auto ty = str->getIRType();
         const auto value = index->from->getIRValue(runtime);
+        if (index->to) assert(0);
         return runtime->builder.CreateGEP(ty, baseExprIRValue, {runtime->builder.getInt32(0), value});
     }
     const auto ptr = runtime->builder.CreateAlloca(baseExprIRType);

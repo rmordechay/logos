@@ -10,7 +10,6 @@ public:
 
     explicit LgsStrConst(const string& value) : value(value) {
         type = strType;
-
         strType->isStatic = true;
         strType->sizeExpr = new LgsIntConst(value.size());
         strType->iterLen = value.size();
