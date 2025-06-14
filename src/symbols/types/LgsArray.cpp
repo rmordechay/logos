@@ -26,7 +26,7 @@ LgsExpr* LgsArray::getZeroValue() {
 }
 
 string LgsArray::getStrFormatPart() const {
-    assert(0);
+    return "%p";
 }
 
 string LgsArray::prettyName() const {
