@@ -26,13 +26,15 @@ public:
     LgsType* type = nullptr;
     bool isNull = false;
     bool isSpread = false;
+    bool isConst = false;
     // TODO removed from visitVariable. Should be inferred from some refs.
     bool isReturnExpr = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
-    void setType(LgsType* type);
-    string getExprStr();
     Value* getIRValue(LgsRuntime* runtime);
+    void setType(LgsType* type);
+    int getConstInt();
+    string getConstStr();
 
     LgsFunc* asFunc();
     LgsVariable* asVariable();

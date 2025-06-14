@@ -14,6 +14,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsField.h"
+#include "stmts/LgsVarDec.h"
 
 Value* LgsExpr::getIRValue(LgsRuntime* runtime) {
     if (IRValue) return IRValue;
@@ -26,16 +27,33 @@ void LgsExpr::setType(LgsType* type) {
     this->type = type;
 }
 
-string LgsExpr::getExprStr() {
+int LgsExpr::getConstInt() {
+    if (const auto intConst = asIntConst()) {
+        return intConst->value;
+    }
+    if (const auto var = asVariable()) {
+        switch (var->ref.symbolType) {
+        case VAR_DEC:
+            return var->ref.varDec->expr->getConstInt();
+        case FIELD:
+            return var->ref.field->expr->getConstInt();
+        default:
+            break;
+        }
+    }
+    return -1;
+}
+
+string LgsExpr::getConstStr() {
     if (const auto strConst = asStrConst()) {
         return strConst->value;
     }
     if (const auto var = asVariable()) {
-        const auto ref = var->ref;
-        switch (ref.symbolType) {
-        case VAR_DEC: {
-            return getExprStr();
-        }
+        switch (var->ref.symbolType) {
+        case VAR_DEC:
+            return var->ref.varDec->expr->getConstStr();
+        case FIELD:
+            return var->ref.field->expr->getConstStr();
         default:
             break;
         }

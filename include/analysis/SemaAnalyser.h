@@ -93,7 +93,6 @@ public:
     void validateExprType(LgsExpr* expr, LgsType* type);
     void validateFuncControlFlow(const LgsFunc* func);
     void checkMethodVisibility(const LgsFuncCall* methodCall);
-    int getExprConstNumber(LgsExpr* expr);
 
     LgsSymbol* getSymbol(const string& name, const Location* location);
     void addLocalSymbol(const string& name, const LgsSymbol& newSymbol);

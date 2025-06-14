@@ -108,7 +108,7 @@ void LgsAssignment::storeScalarInIterIndex(LgsRuntime* runtime, LgsIterIndex* it
             runtime->builder.CreateStore(rIRValue, ptr);
             arr->putFunc.callIR(runtime, {baseIRValue, iterIndex->index->from->getIRValue(runtime), ptr});
         } else {
-            runtime->builder.CreateStore(rIRValue, iterIndex->getGEP(runtime));
+            runtime->builder.CreateStore(rIRValue, iterIndex->getArrGEP(runtime));
         }
         return;
     }

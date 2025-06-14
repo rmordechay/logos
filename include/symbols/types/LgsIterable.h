@@ -17,8 +17,8 @@ public:
     explicit LgsIterable(LgsType* baseType = nullptr) : baseType(baseType) {}
     virtual Value* getLength(LgsRuntime* runtime, LgsExpr* expr) = 0;
     virtual Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) = 0;
-    virtual Value* callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) = 0;
-    virtual Value* callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) = 0;
+    virtual Value* isEmpty(LgsRuntime* runtime, LgsExpr* expr) = 0;
+    virtual Value* isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) = 0;
     virtual void unpackTypes(const vector<LgsVarDec*>& varDecs) = 0;
     ~LgsIterable() override = default;
 };

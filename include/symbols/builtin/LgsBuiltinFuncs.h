@@ -25,8 +25,7 @@ public:
         }
         IRArgs.insert(IRArgs.begin(), getIRStr(runtime, str.str()));
         const auto printfFunc = getPrintf(runtime);
-        runtime->builder.CreateCall(printfFunc, IRArgs);
-        return nullptr;
+        return runtime->builder.CreateCall(printfFunc, IRArgs);;
     }
 
     ~LgsPrint() override = default;

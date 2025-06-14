@@ -24,11 +24,11 @@ Value* LgsMap::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
     return runtime->builder.getInt32(1024);
 }
 
-Value* LgsMap::callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsMap::isEmpty(LgsRuntime* runtime, LgsExpr* expr) {
     return isEmptyFunc.call(runtime, {expr});
 }
 
-Value* LgsMap::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsMap::isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
     return isNotEmptyFunc.call(runtime, {expr});
 }
 

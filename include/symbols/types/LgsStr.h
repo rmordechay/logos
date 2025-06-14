@@ -39,8 +39,8 @@ public:
     string getStrFormatPart() const override;
     Value* getLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) override;
-    Value* callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
-    Value* callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
+    Value* isEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
+    Value* isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
     ~LgsStr() override = default;
 };

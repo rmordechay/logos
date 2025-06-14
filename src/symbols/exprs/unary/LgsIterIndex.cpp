@@ -1,6 +1,10 @@
 #include "exprs/unary/LgsIterIndex.h"
+#include "exprs/unary/LgsVariable.h"
+#include "exprs/unary/constants/LgsStrConst.h"
+#include "stmts/LgsVarDec.h"
 #include <exprs/unary/LgsArrayExpr.h>
 #include "types/LgsMap.h"
+#include "utils/LgsUtils.h"
 
 Value* LgsIterIndex::createIRValue(LgsRuntime* runtime) {
     const auto baseExprType = baseExpr->type;
@@ -16,8 +20,24 @@ Value* LgsIterIndex::createIRValue(LgsRuntime* runtime) {
     assert(0);
 }
 
+Value* LgsIterIndex::getIRFromStr(LgsRuntime* runtime, LgsStr* str) const {
+    if (index->to) return getStrSlice(runtime, str);
+    if (str->isStatic) return getStrGEP(runtime);
+    const auto baseExprIRValue = baseExpr->getIRValue(runtime);
+    const auto baseExprIRType = baseExpr->type->getIRType();
+    if (str->isStatic) {
+        const auto ty = str->getIRType();
+        const auto valueFrom = index->from->getIRValue(runtime);
+        return runtime->builder.CreateGEP(ty, baseExprIRValue, {runtime->builder.getInt32(0), valueFrom});
+    }
+    const auto ptr = runtime->builder.CreateAlloca(baseExprIRType);
+    const auto vaArgInst = runtime->builder.CreateVAArg(baseExprIRValue, baseExprIRType);
+    runtime->builder.CreateStore(vaArgInst, ptr);
+    return runtime->builder.CreateLoad(baseExprIRType, ptr);
+}
+
 Value* LgsIterIndex::getIRFromArray(LgsRuntime* runtime, LgsArray* arr) const {
-    if (arr->isStatic) return getGEP(runtime);
+    if (arr->isStatic) return getArrGEP(runtime);
     auto& builder = runtime->builder;
     const auto arrPtr = baseExpr->getIRValue(runtime);
     auto indexIRValue = index->from->getIRValue(runtime);
@@ -39,22 +59,24 @@ Value* LgsIterIndex::getIRFromMap(LgsRuntime* runtime, LgsMap* map) const {
     return map->getFunc.callIR(runtime, {mapPtr, keyLoad});
 }
 
-Value* LgsIterIndex::getIRFromStr(LgsRuntime* runtime, LgsStr* str) const {
-    const auto baseExprIRValue = baseExpr->getIRValue(runtime);
-    const auto baseExprIRType = baseExpr->type->getIRType();
+Value* LgsIterIndex::getStrSlice(const LgsRuntime* runtime, LgsStr* str) const {
     if (str->isStatic) {
-        const auto ty = str->getIRType();
-        const auto value = index->from->getIRValue(runtime);
-        if (index->to) assert(0);
-        return runtime->builder.CreateGEP(ty, baseExprIRValue, {runtime->builder.getInt32(0), value});
+        const auto intFrom = index->from->asIntConst();
+        const auto intTo = index->to->asIntConst();
+        const auto strConst = baseExpr->getConstStr();
+        return getIRStr(runtime, strConst.substr(intFrom->value, intTo->value));
     }
-    const auto ptr = runtime->builder.CreateAlloca(baseExprIRType);
-    const auto vaArgInst = runtime->builder.CreateVAArg(baseExprIRValue, baseExprIRType);
-    runtime->builder.CreateStore(vaArgInst, ptr);
-    return runtime->builder.CreateLoad(baseExprIRType, ptr);
+    assert(0);
 }
 
-Value* LgsIterIndex::getGEP(LgsRuntime* runtime) const {
+Value* LgsIterIndex::getStrGEP(LgsRuntime* runtime) const {
+    const auto ty = baseExpr->type->getIRType();
+    const auto value = baseExpr->getIRValue(runtime);
+    const auto iValue = index->from->getIRValue(runtime);
+    return runtime->builder.CreateGEP(ty, value, {runtime->builder.getInt32(0), iValue});
+}
+
+Value* LgsIterIndex::getArrGEP(LgsRuntime* runtime) const {
     vector<Value*> IRIndices = {};
     Type* ty = nullptr;
     Value* ptr = nullptr;

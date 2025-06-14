@@ -86,7 +86,7 @@ public:
     LgsPostfixExpr* getPostfixExpr(LogosParser::PostfixExprContext* ctx);
     LgsUnaryExpr* getArrayExpr(LogosParser::ArrayExprContext* ctx);
     LgsUnaryExpr* getHashMap(LogosParser::HashMapContext* ctx);
-    LgsVariable* getVariable(tree::TerminalNode* ctx);
+    LgsVariable* getVariable(tree::TerminalNode* ctx) const;
     LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     LgsUnaryExpr* getVector(LogosParser::VectorContext* vector) const;
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
@@ -94,13 +94,13 @@ public:
     vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
     LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
-    LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
-    LgsStrConst* getStrConst(tree::TerminalNode* type);
-    LgsTypeConst* getTypeConstant(tree::TerminalNode* ctx);
+    LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx) const;
+    LgsStrConst* getStrConst(tree::TerminalNode* type) const;
+    LgsTypeConst* getTypeConstant(tree::TerminalNode* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsGroup* getGroup(LogosParser::GroupContext* ctx);
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
-    LgsType* getTypeFromText(tree::TerminalNode* typeToken);
+    LgsType* getTypeFromText(tree::TerminalNode* typeToken) const;
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     void cleanStr(string& value) const;
     LgsAssignType mapAssignType(LogosParser::AssignmentContext* assignment) const;

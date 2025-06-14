@@ -628,7 +628,7 @@ LgsUnaryExpr* AntlerConverter::getHashMap(LogosParser::HashMapContext* ctx) {
     return hashMap;
 }
 
-LgsVariable* AntlerConverter::getVariable(tree::TerminalNode* ctx) {
+LgsVariable* AntlerConverter::getVariable(tree::TerminalNode* ctx) const {
     const auto variable = new LgsVariable(ctx->getText());
     variable->setLocation(ctx->getSymbol(), &filePath);
     return variable;
@@ -754,7 +754,7 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::Selec
     return exprs;
 }
 
-LgsUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
+LgsUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) const {
     LgsUnaryExpr* constant = nullptr;
     if (const auto intToken = ctx->INTEGER()) {
         const auto input = removeUnderscores(intToken->getText());
@@ -784,7 +784,7 @@ LgsUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) {
     return constant;
 }
 
-LgsStrConst* AntlerConverter::getStrConst(tree::TerminalNode* type) {
+LgsStrConst* AntlerConverter::getStrConst(tree::TerminalNode* type) const {
     auto typeText = type->getText();
     cleanStr(typeText);
     const auto strConst = new LgsStrConst(typeText);
@@ -792,7 +792,7 @@ LgsStrConst* AntlerConverter::getStrConst(tree::TerminalNode* type) {
     return strConst;
 }
 
-LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* ctx) {
+LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* ctx) const {
     const auto typeConst = new LgsTypeConst(getTypeFromText(ctx));
     typeConst->setLocation(ctx->getSymbol(), &filePath);
     return typeConst;
@@ -846,7 +846,7 @@ LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
     return type;
 }
 
-LgsType* AntlerConverter::getTypeFromText(tree::TerminalNode* typeToken) {
+LgsType* AntlerConverter::getTypeFromText(tree::TerminalNode* typeToken) const {
     const auto typeText = typeToken->getText();
     LgsType* type = nullptr;
     if (typeText == LgsBool::name) {

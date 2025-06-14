@@ -691,23 +691,6 @@ void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
     }
 }
 
-int SemaAnalyser::getExprConstNumber(LgsExpr* expr) {
-    if (const auto asInt = expr->asIntConst()) {
-        return asInt->value;
-    }
-    if (const auto var = expr->asVariable()) {
-        switch (var->ref.symbolType) {
-        case VAR_DEC:
-            return getExprConstNumber(var->ref.varDec->expr);
-        case FIELD:
-            return getExprConstNumber(var->ref.field->expr);
-        default:
-            break;
-        }
-    }
-    return -1;
-}
-
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const Location* location) {
     if (const auto globalSymbol = globals.getSymbol(name)) {
         return globalSymbol;
@@ -848,7 +831,7 @@ void SemaAnalyser::resolveIterable(LgsIterable* iterable) {
     iterable->baseType = resolveType(iterable->baseType);
     visitExpr(iterable->sizeExpr);
     if (iterable->isStatic) {
-        const auto exprConstNumber = getExprConstNumber(iterable->sizeExpr);
+        const auto exprConstNumber = iterable->sizeExpr->getConstInt();
         if (exprConstNumber <= 0) {
             return errHandler.handleError(E10048, &iterable->location, {iterable->prettyName()});
         }

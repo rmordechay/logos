@@ -60,11 +60,11 @@ Value* LgsArray::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
     return getLength(runtime, expr);
 }
 
-Value* LgsArray::callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsArray::isEmpty(LgsRuntime* runtime, LgsExpr* expr) {
     return isEmptyFunc.call(runtime, {expr});
 }
 
-Value* LgsArray::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsArray::isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
     return isNotEmptyFunc.call(runtime, {expr});
 }
 

@@ -15,6 +15,7 @@ string LgsStr::getIRName() {
 }
 
 Type* LgsStr::getIRType() {
+    if (isStatic) return ArrayType::get(baseType->getIRType(), iterLen);
     return PointerType::getUnqual(context);
 }
 
@@ -43,11 +44,11 @@ Value* LgsStr::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
     return getLength(runtime, expr);
 }
 
-Value* LgsStr::callIsEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsStr::isEmpty(LgsRuntime* runtime, LgsExpr* expr) {
     return isEmptyFunc.call(runtime, {expr});
 }
 
-Value* LgsStr::callIsNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsStr::isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
     return isNotEmptyFunc.call(runtime, {expr});
 }
 
@@ -75,7 +76,7 @@ size_t LgsStr::hashString(const string& str) {
 
 Value* LgsStrFormatFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     constexpr auto bufferSize = 1024;
-    auto exprStr = args[0]->getExprStr();
+    auto exprStr = args[0]->getConstStr();
     auto searchPos = 0;
     for (size_t i = 1; i < args.size(); ++i) {
         const auto pos = exprStr.find(LOGOS_STR_FORMAT_PART, searchPos);
