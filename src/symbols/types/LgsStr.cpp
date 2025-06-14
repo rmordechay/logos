@@ -41,7 +41,10 @@ Value* LgsStr::getLength(LgsRuntime* runtime, LgsExpr* expr) {
 }
 
 Value* LgsStr::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
-    return getLength(runtime, expr);
+    const auto i32Ty = runtime->builder.getInt64Ty();
+    const auto lenPtr = runtime->builder.CreateAlloca(i32Ty);
+    runtime->builder.CreateStore(getLength(runtime, expr), lenPtr);
+    return runtime->builder.CreateLoad(i32Ty, lenPtr);
 }
 
 Value* LgsStr::isEmpty(LgsRuntime* runtime, LgsExpr* expr) {
@@ -72,29 +75,4 @@ size_t LgsStr::hashString(const string& str) {
         hash *= 16777619u;
     }
     return hash;
-}
-
-Value* LgsStrFormatFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
-    constexpr auto bufferSize = 1024;
-    auto exprStr = args[0]->getConstStr();
-    auto searchPos = 0;
-    for (size_t i = 1; i < args.size(); ++i) {
-        const auto pos = exprStr.find(LOGOS_STR_FORMAT_PART, searchPos);
-        const auto part = args[i]->type->getStrFormatPart();
-        if (pos != string::npos) {
-            exprStr.replace(pos, 2, part);
-            searchPos = pos + part.length();
-        }
-    }
-    const auto baseIRStr = getIRStr(runtime, exprStr);
-    const auto bufferType = ArrayType::get(runtime->builder.getInt8Ty(), bufferSize);
-    const auto buffer = runtime->builder.CreateAlloca(bufferType);
-    const auto gep = runtime->builder.CreateGEP(bufferType, buffer, {runtime->builder.getInt32(0), runtime->builder.getInt32(0)});
-    vector<Value*> IRArgs = {gep, runtime->builder.getInt64(bufferSize), baseIRStr};
-    for (int i = 1; i < args.size(); ++i) {
-        IRArgs.emplace_back(args[i]->getIRValue(runtime));
-    }
-    const auto printfFunc = getSnprintf(runtime);
-    runtime->builder.CreateCall(printfFunc, IRArgs);
-    return gep;
 }

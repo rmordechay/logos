@@ -25,6 +25,10 @@ LgsExpr* LgsArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
+string LgsArray::getStrFormatPart() const {
+    assert(0);
+}
+
 string LgsArray::prettyName() const {
     if (!isStatic) return baseType->prettyName() + "[]";
     return baseType->prettyName() + '[' + (iterLen == 0 ? "" : to_string(iterLen)) + "]!";

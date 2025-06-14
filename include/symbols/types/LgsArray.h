@@ -42,6 +42,7 @@ public:
     string prettyName() const override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
+    string getStrFormatPart() const override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     void unpackTypes(const vector<LgsVarDec*>& varDecs) override;

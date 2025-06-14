@@ -16,11 +16,10 @@ public:
     BasicBlock* IRExitBlock = nullptr;
 
     void createIRStmt(LgsRuntime* runtime) override;
-    virtual void initIRLoop(LgsRuntime* runtime);
-    virtual void exitIRLoop(LgsRuntime* runtime) const;
     virtual Value* loopStart(LgsRuntime* runtime) = 0;
     virtual Value* loopEnd(LgsRuntime* runtime) = 0;
-    virtual void setIRLoopVars(LgsRuntime* runtime) = 0;
+    virtual void initIRLoop(LgsRuntime* runtime) = 0;
+    virtual void exitIRLoop(LgsRuntime* runtime) const = 0;
     ~LgsForLoop() override;
 };
 
