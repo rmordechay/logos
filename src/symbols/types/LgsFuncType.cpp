@@ -39,7 +39,7 @@ Type* LgsFuncType::getIRType() {
         returnType = rt->getIRType();
     }
     vector<Type*> IRParamsTypes;
-    for (int i = 0; i < params.size(); ++i) {
+    for (int i = isStatic; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
         if (!paramType->isPrimitive || param.isSelf) {

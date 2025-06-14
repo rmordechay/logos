@@ -68,6 +68,7 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
     }
     for (const auto& [_, method] : obj->methods) {
         visitFunc(method);
+        method->funcType->isStatic = obj->isSingleton;
     }
     visitObjectImplements(obj);
 }
@@ -246,7 +247,7 @@ void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
     visitStmtBlock(rangeLoop->stmtBlock);
 }
 
-void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
+void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     const auto iterExpr = foreachLoop->iterExpr;
     visitUnaryExpr(iterExpr);
     const auto iterable = iterExpr->type->asIterable();
@@ -257,11 +258,16 @@ void SemaAnalyser::visitForeachLoop(const LgsForeachLoop* foreachLoop) {
         }
         return;
     }
-    if (iterable->unpackLength != foreachLoop->loopVars.size()) {
-        errHandler.handleError(E10041, &iterExpr->location, {iterExpr->prettyName(), to_string(iterable->unpackLength), to_string(foreachLoop->loopVars.size())});
+    const auto varDecSize = foreachLoop->loopVars.size();
+    foreachLoop->withIndex = iterable->unpackLength + 1 == varDecSize;
+    if (foreachLoop->withIndex) {
+        foreachLoop->loopVars[0]->type = &LGS_INT;
+        foreachLoop->loopVars[0]->expr = LGS_INT.getZeroValue();
+    } else if (iterable->unpackLength != varDecSize) {
+        errHandler.handleError(E10041, &iterExpr->location, {iterExpr->prettyName(), to_string(iterable->unpackLength), to_string(iterable->unpackLength + 1), to_string(varDecSize)});
         return;
     }
-    iterable->unpackTypes(foreachLoop->loopVars);
+    foreachLoop->loopVars[0 + foreachLoop->withIndex]->type = iterable->baseType;
     for (const auto varDec : foreachLoop->loopVars) {
         addLocalSymbol(varDec->name, LgsSymbol(varDec));
     }
@@ -433,8 +439,13 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
         variable->isConst = true;
         variable->setType(symbol->func->funcType);
         break;
-    default:
+    case OBJECT:
+        variable->ref.object = symbol->object;
+        variable->isConst = true;
+        variable->setType(symbol->object);
         break;
+    default:
+        assert(false);
     }
     assert(variable->ref.symbolType != UNKNOWN);
 }
@@ -539,7 +550,7 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
 }
 
 void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {
-    if (!parentType) return;
+    if (!parentType) assert(0);
     for (const auto& arg : methodCall->args) {
         visitExpr(arg);
     }

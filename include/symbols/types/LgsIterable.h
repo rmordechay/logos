@@ -19,6 +19,5 @@ public:
     virtual Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) = 0;
     virtual Value* isEmpty(LgsRuntime* runtime, LgsExpr* expr) = 0;
     virtual Value* isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) = 0;
-    virtual void unpackTypes(const vector<LgsVarDec*>& varDecs) = 0;
     ~LgsIterable() override = default;
 };

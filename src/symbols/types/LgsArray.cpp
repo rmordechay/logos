@@ -51,10 +51,6 @@ LgsType* LgsArray::inferBinaryType(LgsType* other) {
     assert(0);
 }
 
-void LgsArray::unpackTypes(const vector<LgsVarDec*>& varDecs) {
-    varDecs[0]->type = baseType;
-}
-
 Value* LgsArray::getLength(LgsRuntime* runtime, LgsExpr* expr) {
     if (isStatic) return sizeExpr->getIRValue(runtime);
     return lenFunc.call(runtime, {expr});

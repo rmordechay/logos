@@ -38,7 +38,6 @@ public:
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
-    void unpackTypes(const vector<LgsVarDec*>& varDecs) override;
     Value* getLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* isEmpty(LgsRuntime* runtime, LgsExpr* expr) override;

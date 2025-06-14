@@ -61,7 +61,7 @@ public:
     void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const override;
     void visitLoopStmt(LgsForLoop* loopStmt) override;
     void visitRangeLoop(const LgsRangeLoop* rangeLoop) override;
-    void visitForeachLoop(const LgsForeachLoop* foreachLoop) override;
+    void visitForeachLoop(LgsForeachLoop* foreachLoop) override;
     void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
     void visitReturnStmt(const LgsReturn* returnStmt) override;
     void visitBreakStmt(const LgsBreakStmt* breakStmt) override;

@@ -7,6 +7,7 @@ class LgsDArrayType;
 class LgsForeachLoop final : public LgsForLoop {
 public:
     Value* iterPtr = nullptr;
+    bool withIndex = false;
     LgsUnaryExpr* iterExpr = nullptr;
 
     explicit LgsForeachLoop(LgsUnaryExpr* iterable) : iterExpr(iterable) {}

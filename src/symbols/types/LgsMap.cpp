@@ -11,11 +11,6 @@ LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
 }
 
-void LgsMap::unpackTypes(const vector<LgsVarDec*>& varDecs) {
-    varDecs[0]->type = typePair->key;
-    varDecs[1]->type = typePair->value;
-}
-
 Value* LgsMap::getLength(LgsRuntime* runtime, LgsExpr* expr) {
     return lenFunc.call(runtime, {expr});
 }

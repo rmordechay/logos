@@ -61,7 +61,11 @@ void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsStr* str) const {
         const auto i = runtime->builder.CreateLoad(runtime->builder.getInt64Ty(), iPtr);
         const auto gep = runtime->builder.CreateGEP(str->getIRType(), iterPtr, {runtime->builder.getInt32(0), i});
         const auto load = runtime->builder.CreateLoad(runtime->builder.getInt8Ty(), gep);
-        loopVars[0]->setIRValue(load);
+        if (withIndex) {
+            const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
+            loopVars[0]->setIRValue(iValue);
+        }
+        loopVars[0 + withIndex]->setIRValue(load);
     } else {
         assert(0);
     }
@@ -71,11 +75,18 @@ void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsArray* arr) const {
     if (arr->isStatic) {
         const auto i = runtime->builder.CreateLoad(runtime->builder.getInt64Ty(), iPtr);
         const auto gep = runtime->builder.CreateGEP(arr->getIRType(), iterPtr, {runtime->builder.getInt32(0), i});
-        loopVars[0]->setIRValue(gep);
+        if (withIndex) {
+            const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
+            loopVars[0]->setIRValue(iValue);
+        }
+        loopVars[0 + withIndex]->setIRValue(gep);
     } else {
         const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt64Ty(), iPtr);
         const auto v = arr->getFunc.callIR(runtime, {iterPtr, iValue});
-        loopVars[0]->setIRValue(runtime->builder.CreateLoad(arr->getIRType(), v));
+        if (withIndex) {
+            loopVars[0]->setIRValue(iValue);
+        }
+        loopVars[0 + withIndex]->setIRValue(runtime->builder.CreateLoad(arr->getIRType(), v));
     }
 }
 
@@ -93,7 +104,11 @@ void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsMap* map) const {
     startBlock(runtime, notNullBlock);
     const auto keyGEP = runtime->builder.CreateStructGEP(map->mapStruct, bucketsValue, 0);
     const auto valueGEP = runtime->builder.CreateStructGEP(map->mapStruct, bucketsValue, 1);
-    loopVars[0]->IRValue = builder.CreateLoad(builder.getPtrTy(), keyGEP);
+    if (withIndex) {
+        const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
+        loopVars[0]->setIRValue(iValue);
+    }
+    loopVars[0 + withIndex]->IRValue = builder.CreateLoad(builder.getPtrTy(), keyGEP);
     loopVars[1]->IRValue = builder.CreateLoad(builder.getPtrTy(), valueGEP);
 }
 

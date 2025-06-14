@@ -260,17 +260,17 @@ LgsFunc* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext
     const auto rt = getFuncReturnType(ctx->funcSignature()->type());
     const auto funcSignature = ctx->funcSignature();
     const auto nameToken = funcSignature->IDENTIFIER();
-    auto self = LgsParam(obj, LOGOS_SELF);
-    self.isSelf = true;
     const auto method = new LgsFunc(nameToken->getText(), rt);
     method->funcType->isMethod = true;
     method->funcType->parentName = obj->name;
+    auto self = LgsParam(obj, LOGOS_SELF);
+    self.isSelf = true;
     method->funcType->params.emplace_back(self);
     setParams(method->funcType, funcSignature->param());
+    method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     if (ctx->VISIBILITY()) {
         method->funcType->isPublic = true;
     }
-    method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     method->setLocation(nameToken->getSymbol(), &filePath);
     return method;
 }

@@ -377,7 +377,7 @@ DOUBLE_RANGLE: '<<';
 DOUBLE_LANGLE: '>>';
 
 OBJECT: 'object';
-SINGLETON: 'singleton';
+SINGLETON: 'single';
 SELF_INSTANCE: 'self';
 SELF_CLASS: 'Self';
 INTERFACE: 'interface';

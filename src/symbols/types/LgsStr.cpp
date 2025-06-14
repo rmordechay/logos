@@ -55,10 +55,6 @@ Value* LgsStr::isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
     return isNotEmptyFunc.call(runtime, {expr});
 }
 
-void LgsStr::unpackTypes(const vector<LgsVarDec*>& varDecs) {
-    varDecs[0]->type = baseType;
-}
-
 bool LgsStr::equals(LgsType* other) {
     assert(other);
     if (other->getIRName() == LgsAny::name) return true;

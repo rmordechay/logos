@@ -39,7 +39,8 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
     }
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
-    for (auto& param : funcType->params) {
+    for (int i = funcType->isStatic; i < funcType->params.size(); ++i) {
+        auto param = funcType->params[i];
         param.setIRValue(args);
         args->setName(param.name);
         args++;

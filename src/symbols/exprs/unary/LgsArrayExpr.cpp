@@ -2,6 +2,10 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "logos/LgsConfig.h"
 
+string LgsArrayExpr::prettyName() {
+    return type->prettyName();
+}
+
 Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {
     if (arrType->isStatic) return createConstArray(runtime);
     return createDynamicArray(runtime);

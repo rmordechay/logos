@@ -56,7 +56,7 @@ public:
     virtual void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const = 0;
     virtual void visitLoopStmt(LgsForLoop* loopStmt) = 0;
     virtual void visitRangeLoop(const LgsRangeLoop* rangeLoop) = 0;
-    virtual void visitForeachLoop(const LgsForeachLoop* foreachLoop) = 0;
+    virtual void visitForeachLoop(LgsForeachLoop* foreachLoop) = 0;
     virtual void visitReturnStmt(const LgsReturn* returnStmt) = 0;
     virtual void visitBreakStmt(const LgsBreakStmt* breakStmt) = 0;
     virtual void visitContinueStmt(const LgsContinueStmt* continueStmt) = 0;
