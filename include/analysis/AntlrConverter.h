@@ -62,6 +62,7 @@ public:
     LgsField* getField(LogosParser::FieldContext* ctx, string& parentName);
     LgsFunc* getFuncImpl(LogosParser::FuncImplContext* ctx);
     LgsFunc* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
+    bool isNameBuiltin(const string& name, const Location* location);
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param, LogosParser::TypeContext* type);
     LgsFunc* getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
@@ -77,7 +78,7 @@ public:
     LgsForLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getRangeLoop(LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getForeachLoop(LogosParser::LoopStatementContext* ctx);
-    LgsForLoop* getInfiniteLoop(LogosParser::LoopStatementContext* ctx) const;
+    LgsForLoop* getInfiniteLoop(LogosParser::LoopStatementContext* ctx);
     LgsEnum* getEnum(LogosParser::EnumDeclarationContext* ctx);
     LgsExpr* getExpr(LogosParser::ExprContext* ctx, bool isNullable = false);
     LgsExpr* getCast(LogosParser::ExprContext* ctx);

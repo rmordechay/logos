@@ -2,6 +2,7 @@
 #include "funcs/LgsBuiltinFunc.h"
 #include "utils/LgsUtils.h"
 #include <types/primitives/LgsVoid.h>
+#include <types/primitives/LgsLong.h>
 #include <types/LgsAny.h>
 
 class LgsPrint final : public LgsBuiltinFunc {

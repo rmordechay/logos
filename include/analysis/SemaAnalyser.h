@@ -89,9 +89,10 @@ public:
 
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
+    bool setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
     void validateExprType(LgsExpr* expr, LgsType* type);
     void validateFuncControlFlow(const LgsFunc* func);
-    void checkMethodVisibility(const LgsFuncCall* methodCall);
+    void validateMethodVisibility(const LgsFuncCall* methodCall);
 
     LgsSymbol* getSymbol(const string& name, const Location* location);
     void addLocalSymbol(const string& name, const LgsSymbol& newSymbol);

@@ -10,7 +10,6 @@ void LgsErrHandler::setUnsuccessful() {
 
 void LgsErrHandler::handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args) {
     setUnsuccessful();
-
     auto pos = 0;
     auto argIndex = 0;
     auto result = lgsErr.msg;
@@ -19,7 +18,6 @@ void LgsErrHandler::handleError(const LgsError& lgsErr, const Location* location
         pos += args[argIndex].length();
         argIndex++;
     }
-
     errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.errCode});
     lock_guard lock(mtx);
     lgsLog(ERROR_STR + result);
@@ -27,4 +25,3 @@ void LgsErrHandler::handleError(const LgsError& lgsErr, const Location* location
         lgsLog("\t   at " + location->getFullPath(*location->filePath) + "\n---");
     }
 }
-

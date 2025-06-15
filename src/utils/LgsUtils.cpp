@@ -2,6 +2,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "logos/LgsApp.h"
 #include "LgsType.h"
+#include "builtin/LgsBuiltinFuncs.h"
 
 string getFileText(path filePath) {
     if (!exists(filePath)) return "";
@@ -21,10 +22,6 @@ string removeUnderscores(const string& input) {
 void freeType(const LgsType* type) {
     if (type->isPrimitive) return;
     delete type;
-}
-
-bool isLgsBuiltin(const LgsType* type) {
-    return type->isBuiltin;
 }
 
 Value* getIRStr(const LgsRuntime* runtime, const string& value) {

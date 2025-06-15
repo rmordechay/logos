@@ -4,6 +4,7 @@
 #include "files/LgsEnvFile.h"
 #include "files/LgsInterfaceFile.h"
 #include "LogosLexer.h"
+#include "builtin/LgsBuiltinFuncs.h"
 #include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsBinaryExpr.h"
@@ -77,6 +78,7 @@ LgsObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ct
     const auto objName = ctx->objectDeclaration()->IDENTIFIER()->getText();
     const auto objFile = new LgsObjectFile(objName, filePath);
     objFile->obj = getObject(ctx->objectBody(), objName, !!ctx->objectDeclaration()->SINGLETON());
+    if (!objFile->obj) return nullptr;
     globals.addSymbol(objName, LgsSymbol(objFile->obj), &errHandler);
     return objFile;
 }
@@ -102,6 +104,7 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
 
     for (const auto object : ctx->object()) {
         auto lgsObject = getObject(object->objectBody(), object->IDENTIFIER()->getText(), !!object->SINGLETON());
+        if (!lgsObject) continue;
         mainFile->objects.emplace_back(lgsObject);
         mainFile->symbolTable.addSymbol(lgsObject->name, LgsSymbol(lgsObject), &errHandler);
     }
@@ -169,6 +172,7 @@ LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx) {
 LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const bool isSingleton) {
     const auto obj = new LgsObject(objName, filePath);
     obj->setLocation(ctx->start, &filePath);
+    if (isNameBuiltin(obj->name, &obj->location)) return nullptr;
     obj->isSingleton = isSingleton;
     for (int i = 0; i < ctx->field().size(); ++i) {
         const auto field = ctx->field(i);
@@ -193,6 +197,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
 LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName) {
     const auto interface = new LgsInterface(interfaceName);
     interface->setLocation(ctx->start, &filePath);
+    if (isNameBuiltin(interface->name, &interface->location)) return nullptr;
     for (const auto& funcSignature : ctx->funcSignature()) {
         const auto self = LgsParam(interface, LOGOS_SELF);
         const auto type = getFuncReturnType(funcSignature->type());
@@ -291,6 +296,7 @@ void AntlerConverter::setParams(LgsFuncType* funcType, const vector<LogosParser:
         const auto param = params[i];
         if (const auto type = param->type()) {
             auto lgsParam = getParam(funcType, param, type);
+            if (isNameBuiltin(lgsParam.name, &lgsParam.location)) return;
             funcType->params.emplace_back(lgsParam);
         } else if (const auto paramFuncType = param->funcType()) {
             const auto lgsParamFuncType = getFuncType(paramFuncType);
@@ -376,22 +382,24 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
 
 LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx) {
     const auto variableName = ctx->IDENTIFIER()->getText();
-    const auto expr = getExpr(ctx->expr(), !!ctx->QUEST_MARK());
-    const auto varDec = new LgsVarDec(variableName, expr);
-    varDec->isConst = !!ctx->CONST();
+    const auto varDec = new LgsVarDec(variableName);
     varDec->setLocation(ctx->start, &filePath);
+    if (isNameBuiltin(varDec->name, &varDec->location)) return nullptr;
+    varDec->expr = getExpr(ctx->expr(), !!ctx->QUEST_MARK());
+    varDec->isConst = !!ctx->CONST();
     return varDec;
 }
 
 LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx) {
     const auto variableName = ctx->IDENTIFIER()->getText();
     const auto varDec = new LgsVarDec(variableName);
+    varDec->setLocation(ctx->start, &filePath);
+    if (isNameBuiltin(varDec->name, &varDec->location)) return nullptr;
     varDec->isConst = !!ctx->CONST();
     if (ctx->expr()) {
         varDec->expr = getExpr(ctx->expr());
     }
     varDec->type = getType(ctx->type());
-    varDec->setLocation(ctx->start, &filePath);
     return varDec;
 }
 
@@ -473,8 +481,11 @@ LgsForLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx
     }
     const auto endExpr = getExpr(ctx->iterableRange->end);
     const auto rangeLoop = new LgsRangeLoop(startExpr, endExpr);
-    const auto loopVarName = ctx->IDENTIFIER().front()->getText();
+    const auto loopVarToken = ctx->IDENTIFIER().front();
+    const auto loopVarName = loopVarToken->getText();
     auto varDec = new LgsVarDec(loopVarName);
+    varDec->setLocation(loopVarToken->getSymbol(), &filePath);
+    if (isNameBuiltin(varDec->name, &varDec->location)) return nullptr;
     varDec->type = &LGS_INT;
     varDec->expr = LGS_INT.getZeroValue();
     rangeLoop->loopVars.emplace_back(varDec);
@@ -487,16 +498,21 @@ LgsForLoop* AntlerConverter::getForeachLoop(LogosParser::LoopStatementContext* c
     for (const auto variable : ctx->IDENTIFIER()) {
         const auto loopVarName = variable->getText();
         auto varDec = new LgsVarDec(loopVarName);
+        varDec->setLocation(variable->getSymbol(), &filePath);
+        if (isNameBuiltin(varDec->name, &varDec->location)) return nullptr;
         foreachLoop->loopVars.emplace_back(varDec);
     }
     return foreachLoop;
 }
 
-LgsForLoop* AntlerConverter::getInfiniteLoop(LogosParser::LoopStatementContext* ctx) const {
+LgsForLoop* AntlerConverter::getInfiniteLoop(LogosParser::LoopStatementContext* ctx) {
     const auto rangeLoop = new LgsInfiniteLoop();
     if (!ctx->IDENTIFIER().empty()) {
-        const auto loopVarName = ctx->IDENTIFIER()[0]->getText();
+        const auto idToken = ctx->IDENTIFIER()[0];
+        const auto loopVarName = idToken->getText();
         auto varDec = new LgsVarDec(loopVarName);
+        varDec->setLocation(idToken->getSymbol(), &filePath);
+        if (isNameBuiltin(varDec->name, &varDec->location)) return nullptr;
         varDec->type = &LGS_INT;
         varDec->expr = LGS_INT.getZeroValue();
         rangeLoop->loopVars.emplace_back(varDec);
@@ -670,8 +686,10 @@ LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) 
     if (!args) return instance;
     for (const auto& arg : args->constructorArg()) {
         const auto argExpr = getExpr(arg->expr());
-        auto varDec = new LgsVarDec(arg->IDENTIFIER()->getText(), argExpr);
+        const auto idToken = arg->IDENTIFIER();
+        auto varDec = new LgsVarDec(idToken->getText(), argExpr);
         varDec->setLocation(arg->start, &filePath);
+        if (isNameBuiltin(varDec->name, &varDec->location)) return nullptr;
         instance->args.push_back(varDec);
     }
     return instance;
@@ -924,6 +942,15 @@ LgsOperator AntlerConverter::mapOperator(LogosParser::ExprContext* expr) const {
     if (expr->DOUBLE_RANGLE()) return RSHIFT;
     if (expr->CARET()) return BIT_XOR;
     assert(false);
+}
+
+bool AntlerConverter::isNameBuiltin(const string& name, const Location* location) {
+    const auto isLgsBuiltin = name == LgsSizeOf::name || name == LgsPrint::name;;
+    if (isLgsBuiltin) {
+        errHandler.handleError(E10053, location, {name});
+        return true;
+    }
+    return false;
 }
 
 void AntlerConverter::cleanStr(string& value) const {

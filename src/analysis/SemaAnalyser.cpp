@@ -253,27 +253,10 @@ void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     const auto iterable = iterExpr->type->asIterable();
     if (!iterable) {
         // If type is not defined an error was already thrown
-        if (iterExpr->type) {
-            errHandler.handleError(E10002, &iterExpr->location, {iterExpr->prettyName()});
-        }
+        if (iterExpr->type) errHandler.handleError(E10002, &iterExpr->location, {iterExpr->prettyName()});
         return;
     }
-    const auto varDecSize = foreachLoop->loopVars.size();
-    foreachLoop->withIndex = iterable->unpackLength + 1 == varDecSize;
-    const bool withIndex = foreachLoop->withIndex;
-    if (withIndex) {
-        foreachLoop->loopVars[0]->type = &LGS_INT;
-        foreachLoop->loopVars[0]->expr = LGS_INT.getZeroValue();
-    } else if (iterable->unpackLength != varDecSize) {
-        errHandler.handleError(E10041, &iterExpr->location, {iterExpr->prettyName(), to_string(iterable->unpackLength), to_string(iterable->unpackLength + 1), to_string(varDecSize)});
-        return;
-    }
-    if (const auto pair = iterable->baseType->asPair()) {
-        foreachLoop->loopVars[0 + withIndex]->type = pair->key;
-        foreachLoop->loopVars[1 + withIndex]->type = pair->value;
-    } else {
-        foreachLoop->loopVars[0 + withIndex]->type = iterable->baseType;
-    }
+    if (setLoopVars(foreachLoop, iterExpr, iterable)) return;
     for (const auto varDec : foreachLoop->loopVars) {
         addLocalSymbol(varDec->name, LgsSymbol(varDec));
     }
@@ -561,7 +544,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
         visitExpr(arg);
     }
     if (resolveMethodCall(methodCall, parentType)) return;
-    checkMethodVisibility(methodCall);
+    validateMethodVisibility(methodCall);
     if (methodCall->isSpread) {
         const auto lastArg = methodCall->args[methodCall->args.size() - 1];
         if (!lastArg->type->asIterable()) {
@@ -680,7 +663,28 @@ void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
     binaryExpr->setType(type);
 }
 
-void SemaAnalyser::checkMethodVisibility(const LgsFuncCall* methodCall) {
+bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable) {
+    const auto varDecSize = foreachLoop->loopVars.size();
+    foreachLoop->withIndex = iterable->unpackLength + 1 == varDecSize;
+    const bool withIndex = foreachLoop->withIndex;
+    if (withIndex) {
+        foreachLoop->loopVars[0]->type = &LGS_INT;
+        foreachLoop->loopVars[0]->expr = LGS_INT.getZeroValue();
+    } else if (iterable->unpackLength != varDecSize) {
+        errHandler.handleError(E10041, &iterExpr->location, {iterExpr->prettyName(), to_string(iterable->unpackLength), to_string(iterable->unpackLength + 1), to_string(varDecSize)});
+        return true;
+    }
+
+    if (const auto pair = iterable->baseType->asPair()) {
+        foreachLoop->loopVars[0 + withIndex]->type = pair->key;
+        foreachLoop->loopVars[1 + withIndex]->type = pair->value;
+    } else {
+        foreachLoop->loopVars[0 + withIndex]->type = iterable->baseType;
+    }
+    return false;
+}
+
+void SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall) {
     const auto method = methodCall->func;
     if (!method) return;
     if (!method->funcType->isPublic && file->absPath != *method->location.filePath) {
