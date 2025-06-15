@@ -19,9 +19,11 @@ public:
         for (int i = 0; i < args.size(); ++i) {
             const auto arg = args[i];
             const auto argType = arg->type->getIRType();
-            const auto argValue = arg->getIRValue(runtime);
-            const auto IRArg = addIRArg(runtime, argType, argValue);
-            IRArgs.push_back(IRArg);
+            auto argValue = arg->getIRValue(runtime);
+            if (shouldLoadIRArg(argValue)) {
+                argValue = runtime->builder.CreateLoad(argType, argValue);
+            }
+            IRArgs.push_back(argValue);
             str << arg->type->getStrFormatPart() << std::endl;
         }
         IRArgs.insert(IRArgs.begin(), getIRStr(runtime, str.str()));

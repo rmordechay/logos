@@ -38,6 +38,5 @@ public:
     virtual Value* callIR(LgsRuntime* runtime, const vector<Value*>& args = {});
     virtual Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args = {});
     static bool shouldLoadIRArg(Value* value);
-    static Value* addIRArg(LgsRuntime* runtime, Type* type, Value* value);
     ~LgsFunc() override;
 };

@@ -1,8 +1,7 @@
 #include "utils/LgsUtils.h"
-#include "exprs/unary/LgsVariable.h"
 #include "logos/LgsApp.h"
 #include "LgsType.h"
-#include "builtin/LgsBuiltinFuncs.h"
+#include "builtin/LgsBuiltins.h"
 
 string getFileText(path filePath) {
     if (!exists(filePath)) return "";

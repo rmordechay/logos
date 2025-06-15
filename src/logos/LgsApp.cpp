@@ -7,7 +7,7 @@
 #include "files/LgsObjectFile.h"
 #include "logos/Platform.h"
 #include "utils/ThreadPool.h"
-#include "builtin/LgsBuiltinFuncs.h"
+#include "builtin/LgsBuiltins.h"
 #include "codegen/CodeGenerator.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "extern/LgsCLang.h"

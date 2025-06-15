@@ -1,6 +1,6 @@
 #include "types/LgsArray.h"
 
-#include "builtin/LgsBuiltinFuncs.h"
+#include "builtin/LgsBuiltins.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include "types/primitives/LgsInt.h"
 #include "utils/LgsUtils.h"
@@ -85,9 +85,8 @@ Value* LgsArrayAddFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) 
     const auto arrPtr = args[0]->getIRValue(runtime);
     for (int i = 1; i < args.size(); ++i) {
         const auto arg = args[i];
-        const auto argValueIR = arg->getIRValue(runtime);
         const auto argValuePtr = runtime->builder.CreateAlloca(arg->type->getIRType());
-        runtime->builder.CreateStore(argValueIR, argValuePtr);
+        runtime->builder.CreateStore(arg->getIRValue(runtime), argValuePtr);
         callIR(runtime, {arrPtr, argValuePtr});
     }
     return nullptr;

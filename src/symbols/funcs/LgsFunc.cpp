@@ -55,8 +55,10 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
         const auto arg = args[i];
         const auto argType = arg->type->getIRType();
         const auto argValue = arg->getIRValue(runtime);
-        const auto IRArg = addIRArg(runtime, argType, argValue);
-        IRArgs.push_back(IRArg);
+        if (shouldLoadIRArg(argValue)) {
+            return runtime->builder.CreateLoad(argType, argValue);
+        }
+        IRArgs.push_back(argValue);
     }
     return callIR(runtime, IRArgs);
 }
@@ -76,13 +78,6 @@ Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
         return rv;
     }
     return runtime->builder.CreateCall(IRFunc, args);;
-}
-
-Value* LgsFunc::addIRArg(LgsRuntime* runtime, Type* type, Value* value) {
-    if (shouldLoadIRArg(value)) {
-        return runtime->builder.CreateLoad(type, value);
-    }
-    return value;
 }
 
 void LgsFunc::setBigObjAttrs(Function& IRFunc) const {
