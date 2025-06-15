@@ -42,7 +42,7 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
     if (!other->isAnonymous && name != other->name) return false;
     if (other->params.size() != args.size()) return false;
     if (other->params.size() == 0 && args.size() == 0) return true;
-    for (size_t i = other->isStatic; i < other->params.size(); ++i) {
+    for (size_t i = other->isStaticMethod; i < other->params.size(); ++i) {
         const auto paramType = other->params[i].type;
         const auto argType = args[i]->type;
         if (!paramType->equals(argType)) return false;

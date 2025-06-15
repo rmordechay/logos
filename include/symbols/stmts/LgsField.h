@@ -14,7 +14,7 @@ public:
     string name;
     size_t position = 0;
     string* parentName;
-    bool isConst = false;
+    bool isImmutable = false;
     bool isPublic = false;
     LgsExpr* expr = nullptr;
     LgsType* type = nullptr;

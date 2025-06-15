@@ -27,7 +27,7 @@ public:
     LgsType* type = nullptr;
     bool isNull = false;
     bool isSpread = false;
-    bool isConst = false;
+    bool isImmutable = false;
     // TODO removed from visitVariable. Should be inferred from some refs.
     bool isReturnExpr = false;
 

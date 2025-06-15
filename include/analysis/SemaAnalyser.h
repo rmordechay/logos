@@ -85,6 +85,7 @@ public:
     void visitFirstSelection(LgsExpr* firstExpr) override;
     void visitInstance(LgsInstance* instance) override;
     void visitIterIndex(LgsIterIndex* iterIndex) override;
+    void visitSlice(LgsIterIndex* iterIndex);
     void visitGroup(LgsGroup* group) const;
 
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);

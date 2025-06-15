@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsType.h"
-#include "primitives/LgsVoid.h"
 
 class LgsRuntime;
 class LgsVarDec;
@@ -11,7 +10,6 @@ class LgsIterable : public LgsType {
 public:
     LgsType* baseType;
     size_t iterLen = 0;
-    bool isStatic = false;
     uint8_t unpackLength = 0;
     LgsExpr* sizeExpr = nullptr;
 

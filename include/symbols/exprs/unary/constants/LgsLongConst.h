@@ -8,7 +8,7 @@ public:
     long value;
 
     explicit LgsLongConst(const int value) : LgsUnaryExpr(&LGS_LONG), value(value) {
-        isConst = true;
+        type->isStatic = true;
     }
     Value* createIRValue(LgsRuntime* runtime) override;
     ~LgsLongConst() override = default;

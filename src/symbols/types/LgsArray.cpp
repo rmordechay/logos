@@ -2,7 +2,6 @@
 
 #include "builtin/LgsBuiltinFuncs.h"
 #include "exprs/unary/LgsArrayExpr.h"
-#include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
 
 Type* LgsArray::getIRType() {

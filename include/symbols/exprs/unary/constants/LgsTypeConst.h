@@ -5,7 +5,7 @@
 class LgsTypeConst final : public LgsUnaryExpr {
 public:
     explicit LgsTypeConst(LgsType* type) : LgsUnaryExpr(type) {
-        isConst = true;
+        type->isStatic = true;
     }
     inline string getName() override;
     Value* createIRValue(LgsRuntime* runtime) override;

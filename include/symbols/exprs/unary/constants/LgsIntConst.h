@@ -2,12 +2,18 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "types/primitives/LgsInt.h"
 
+class LgsConstNumber : public LgsUnaryExpr {
+public:
+    explicit LgsConstNumber(LgsType* type) : LgsUnaryExpr(type) {}
+};
+
+
 class LgsIntConst final : public LgsUnaryExpr {
 public:
     int value;
 
     explicit LgsIntConst(const int value) : LgsUnaryExpr(&LGS_INT), value(value) {
-        isConst = true;
+        type->isStatic = true;
     }
     string prettyName() override;
     Value* createIRValue(LgsRuntime* runtime) override;

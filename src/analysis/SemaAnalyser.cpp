@@ -68,7 +68,7 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
     }
     for (const auto& [_, method] : obj->methods) {
         visitFunc(method);
-        method->funcType->isStatic = obj->isSingleton;
+        method->funcType->isStaticMethod = obj->isSingleton;
     }
     visitObjectImplements(obj);
 }
@@ -187,7 +187,7 @@ void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
     visitExpr(rValue);
     const auto lType = lValue->type;
     const auto rType = rValue->type;
-    if (lValue->isConst) return errHandler.handleError(E10051, &lValue->location, {lValue->prettyName()});
+    if (lValue->isImmutable) return errHandler.handleError(E10051, &lValue->location, {lValue->prettyName()});
     if (lType && rType && lType->equals(rType)) return;
     return errHandler.handleError(E10001, &assignment->location, {lType->prettyName(), rType->prettyName()});
 }
@@ -405,32 +405,32 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     switch (symbol->symbolType) {
     case VAR_DEC:
         variable->ref.varDec = symbol->varDec;
-        variable->isConst = symbol->varDec->isConst;
+        variable->isImmutable = symbol->varDec->isImmutable;
         variable->setType(symbol->varDec->type);
         break;
     case FIELD:
         variable->ref.field = symbol->field;
-        variable->isConst = symbol->field->isConst;
+        variable->isImmutable = symbol->field->isImmutable;
         variable->setType(symbol->field->type);
         break;
     case PARAM:
         variable->ref.param = symbol->param;
-        variable->isConst = true;
+        variable->isImmutable = true;
         variable->setType(symbol->param->type);
         break;
     case ENUM_FIELD:
         variable->ref.enumField = symbol->enumField;
-        variable->isConst = true;
+        variable->isImmutable = true;
         variable->setType(symbol->enumField->type);
         break;
     case FUNC:
         variable->ref.func = symbol->func;
-        variable->isConst = true;
+        variable->isImmutable = true;
         variable->setType(symbol->func->funcType);
         break;
     case OBJECT:
         variable->ref.object = symbol->object;
-        variable->isConst = true;
+        variable->isImmutable = true;
         variable->setType(symbol->object);
         break;
     default:
@@ -502,7 +502,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     }
 
     for (const auto [_, field] : instance->obj->fields) {
-        if (field->isConst && !field->expr) {
+        if (field->isImmutable && !field->expr) {
             errHandler.handleError(E10029, &field->location, {field->name});
             continue;
         }
@@ -575,12 +575,18 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     visitExpr(exprTo);
     if (!baseExpr->type) return;
     const auto iterable = baseExpr->type->asIterable();
-    if (!iterable) {
-        if (baseExpr->type) {
-            errHandler.handleError(E10002, &iterIndex->location, {iterIndex->baseExpr->prettyName()});
+    if (!iterable && baseExpr->type) {
+        return errHandler.handleError(E10002, &iterIndex->location, {iterIndex->baseExpr->prettyName()});
+    }
+    if (!exprFrom->type->isInt) {
+        return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->prettyName()});
+    }
+    if (exprTo) {
+        if (!exprTo->type->isInt) {
+            return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->prettyName()});
         }
-    } else if (exprTo) {
         iterIndex->setType(iterable);
+        visitSlice(iterIndex);
     } else if (const auto map = iterable->asMap()) {
         iterIndex->setType(map->typePair->value);
     } else {
@@ -591,17 +597,17 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     }
 }
 
-// define i32 @main() #0 {
-//   %1 = alloca %struct.HashMap, align 8
-//   %2 = alloca i32, align 4
-//   %3 = alloca %struct.Iterator, align 8
-//   call void @Map_init(ptr noundef %1, i64 noundef 4)
-//   store i32 4, ptr %2, align 4
-//   call void @Map_add(ptr noundef %1, ptr noundef @.str, ptr noundef %2)
-//   call void @Iterator_Map_init(ptr noundef %3, ptr noundef %1)
-//   ret i32 0
-// }
-//
+void SemaAnalyser::visitSlice(LgsIterIndex* iterIndex) {
+    const auto exprFrom = iterIndex->index->from;
+    const auto exprTo = iterIndex->index->to;
+    const auto isStatic = exprFrom->type->isStatic && exprTo->type->isStatic;
+    if (isStatic && exprFrom->type->isInt && exprTo->type->isInt) {
+        if (exprFrom->getConstInt() > exprTo->getConstInt()) {
+            return errHandler.handleError(E10037, &iterIndex->location, {iterIndex->prettyName()});
+        }
+    }
+    assert(0);
+}
 
 void SemaAnalyser::visitGroup(LgsGroup* group) const {
     for (const auto targetSymbol : group->targetSymbols) {

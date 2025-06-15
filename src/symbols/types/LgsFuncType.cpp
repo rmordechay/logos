@@ -39,7 +39,7 @@ Type* LgsFuncType::getIRType() {
         returnType = rt->getIRType();
     }
     vector<Type*> IRParamsTypes;
-    for (int i = isStatic; i < params.size(); ++i) {
+    for (int i = isStaticMethod; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
         if (!paramType->isPrimitive || param.isSelf) {
@@ -88,7 +88,7 @@ LgsType* LgsFuncType::clone() {
 }
 
 LgsFuncType::~LgsFuncType() {
-    for (int i = isMethod && !isStatic; i < params.size(); ++i) {
+    for (int i = isMethod && !isStaticMethod; i < params.size(); ++i) {
         const auto param = params[i];
         if (param.isSelf) continue;
         if (!param.expr) {

@@ -39,7 +39,7 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
     }
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
-    for (int i = funcType->isStatic; i < funcType->params.size(); ++i) {
+    for (int i = funcType->isStaticMethod; i < funcType->params.size(); ++i) {
         auto param = funcType->params[i];
         param.setIRValue(args);
         args->setName(param.name);
@@ -51,7 +51,7 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
 Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
     if (funcType->hasDefaults) assert(0);
-    for (int i = funcType->isStatic; i < args.size(); ++i) {
+    for (int i = funcType->isStaticMethod; i < args.size(); ++i) {
         const auto arg = args[i];
         const auto argType = arg->type->getIRType();
         const auto argValue = arg->getIRValue(runtime);
@@ -134,7 +134,7 @@ void LgsFunc::swapReturnIfNeeded() const {
     }
     if (funcType->isBigType && isEqual) {
         funcType->isSwapReturn = true;
-        funcType->returnParamIndex = funcType->isMethod && !funcType->isStatic;
+        funcType->returnParamIndex = funcType->isMethod && !funcType->isStaticMethod;
         funcType->params.insert(funcType->params.begin(), LgsParam(funcType->rt));
         funcType->rt = &LGS_VOID;
     }

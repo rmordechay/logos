@@ -333,7 +333,7 @@ LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx, string& pare
     const auto expr = getExpr(ctx->expr());
     const auto field = new LgsField(name, &parentName, type, expr);
     field->isPublic = !!ctx->VISIBILITY();
-    field->isConst = !!ctx->CONST();
+    field->isImmutable = !!ctx->CONST();
     field->setLocation(ctx->start, &filePath);
     return field;
 }
@@ -386,7 +386,7 @@ LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext
     varDec->setLocation(ctx->start, &filePath);
     if (isNameBuiltin(varDec->name, &varDec->location)) return nullptr;
     varDec->expr = getExpr(ctx->expr(), !!ctx->QUEST_MARK());
-    varDec->isConst = !!ctx->CONST();
+    varDec->isImmutable = !!ctx->CONST();
     return varDec;
 }
 
@@ -395,7 +395,7 @@ LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext
     const auto varDec = new LgsVarDec(variableName);
     varDec->setLocation(ctx->start, &filePath);
     if (isNameBuiltin(varDec->name, &varDec->location)) return nullptr;
-    varDec->isConst = !!ctx->CONST();
+    varDec->isImmutable = !!ctx->CONST();
     if (ctx->expr()) {
         varDec->expr = getExpr(ctx->expr());
     }

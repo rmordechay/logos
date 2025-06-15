@@ -14,7 +14,7 @@ void LgsField::storeIRValue(LgsRuntime* runtime, Type* parentType, Value* parent
 LgsField* LgsField::clone() const {
     const auto newField = new LgsField(name, parentName, type, expr);
     newField->position = position;
-    newField->isConst = isConst;
+    newField->isImmutable = isImmutable;
     newField->isPublic = isPublic;
     return newField;
 }

@@ -105,7 +105,11 @@ string LgsIterIndex::getName() {
 string LgsIterIndex::prettyName() {
     stringstream str;
     str << baseExpr->prettyName();
-    str << '[' << index->from->prettyName() << ']';
+    if (index->to) {
+        str << '[' << index->from->prettyName() << ':' << index->to->prettyName() << ']';
+    } else {
+        str << '[' << index->from->prettyName() << ']';
+    }
     return str.str();
 }
 
