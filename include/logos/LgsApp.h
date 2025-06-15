@@ -2,6 +2,7 @@
 #include "LgsActiveEnv.h"
 #include "LgsErrHandler.h"
 #include "Platform.h"
+#include "extern/LgsCLang.h"
 
 class LgsStrConst;
 class LgsFile;
@@ -22,6 +23,7 @@ public:
     string name;
     string version;
     LgsPaths paths;
+    LgsCLang lgsCLang;
     vector<char*> args;
     LgsActiveEnv activeEnv;
     vector<LgsFile*> files;
@@ -31,6 +33,7 @@ public:
     map<string, Module*> IRModules;
     const LgsAppFile* appFile = nullptr;
 
+    explicit LgsApp() : lgsCLang(paths) {}
     void initPaths(const path& rootDirPath);
     bool validate();
     bool parse();

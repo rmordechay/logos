@@ -11,9 +11,7 @@ public:
     vector<string> headers;
     LgsErrHandler errHandler;
 
-    explicit LgsCLang(LgsPaths& paths) : paths(paths) {
-        setCHeaderPaths();
-    }
+    explicit LgsCLang(LgsPaths& paths) : paths(paths) {}
     string getCode(const LgsStrConst* filePath);
     bool isCLibHeader(const path& cLibPath);
     void parseFile(const LgsStrConst* filePaths);

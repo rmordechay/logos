@@ -60,14 +60,6 @@ vector<const char*> LgsCLang::getCompileArgs(const vector<LgsStrConst*>& files) 
     return args;
 }
 
-void LgsCLang::getClibRoot() const {
-    DiagnosticsEngine diags(new DiagnosticIDs(), new DiagnosticOptions(), new DiagnosticConsumer());
-    Driver driver(CLANG_BINARY, sys::getDefaultTargetTriple(), diags);
-    const char* args[] = {CLANG_BINARY, "-x", "c", "-E"};
-    const auto compilation = driver.BuildCompilation(ArrayRef(args));
-    const auto& toolChain = compilation->getDefaultToolChain();
-}
-
 string LgsCLang::getCode(const LgsStrConst* filePath) {
     string code;
     const auto pathStr = filePath->value;
@@ -88,6 +80,14 @@ void LgsCLang::setCHeaderPaths() {
             headers.push_back(entry.path().string());
         }
     }
+}
+
+void LgsCLang::getClibRoot() const {
+    DiagnosticsEngine diags(new DiagnosticIDs(), new DiagnosticOptions(), new DiagnosticConsumer());
+    auto invocation = make_unique<CompilerInvocation>();
+    CompilerInvocation::CreateFromArgs(*invocation, {CLANG_BINARY, "-x", "c", "-E", "-"}, diags);
+    auto compilerInstance = make_unique<CompilerInstance>();
+    compilerInstance->setInvocation(std::move(invocation));
 }
 
 bool LgsCLang::isCLibHeader(const path& cLibPath) {

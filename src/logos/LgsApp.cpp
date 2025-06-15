@@ -228,8 +228,8 @@ bool LgsApp::resolveGlobalTypes() const {
 }
 
 bool LgsApp::resolveExternalFiles() {
+    lgsCLang.setCHeaderPaths();
     if (externFiles.empty()) return true;
-    LgsCLang lgsCLang(paths);
     for (const auto externFile : externFiles) {
         lgsCLang.parseFile(externFile);
     }

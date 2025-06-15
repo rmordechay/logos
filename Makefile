@@ -7,7 +7,7 @@ configure:
 	@cd build && cmake ..
 
 build:
-	@cd build && make -j16
+	@cd build && make -j10
 
 clean:
 	rm -rf build
@@ -27,3 +27,12 @@ run_llvm:
 run_linux_docker tests/platforms/Dockerfile:
 	docker build -f tests/platforms/Dockerfile -t linux . && docker run -it -v $(pwd):/app linux /bin/bash && cmake .. && make -j 5
 
+run_qemu:
+	qemu-img create -f qcow2 linux-x86.qcow2 5G
+	qemu-system-x86_64 \
+      -machine accel=tcg \
+      -cpu max \
+      -m 2G \
+      -drive file=linux-x86.qcow2,format=qcow2 \
+      -net nic -net user \
+      -nographic
