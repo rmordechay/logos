@@ -1,13 +1,10 @@
 #include "exprs/unary/LgsVariable.h"
-
 #include "exprs/unary/LgsEnumField.h"
-#include "exprs/unary/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
-
 #include <logos/LgsRuntime.h>
 
 string LgsVariable::getExprName() {

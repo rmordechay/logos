@@ -25,3 +25,7 @@ bool LgsEnum::equals(LgsType* other) {
 LgsType* LgsEnum::inferBinaryType(LgsType* other) {
     assert(0);
 }
+
+string LgsEnum::getStrFormatPart() const {
+    return "%s";
+}

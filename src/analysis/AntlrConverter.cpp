@@ -683,12 +683,15 @@ LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) 
     instance->setLocation(ctx->start, &filePath);
     const auto args = ctx->constructorArgList();
     if (!args) return instance;
+    unordered_set<string> initializedArgs;
     for (const auto& arg : args->constructorArg()) {
         const auto argExpr = getExpr(arg->expr());
         const auto idToken = arg->IDENTIFIER();
         auto varDec = new LgsVarDec(idToken->getText(), argExpr);
         varDec->setLocation(arg->start, &filePath);
-        if (isNameBuiltin(varDec->name, &varDec->location)) return nullptr;
+        if (isNameBuiltin(varDec->name, &varDec->location)) return instance;
+        if (isArgsDuplicate(initializedArgs, varDec)) return instance;
+        initializedArgs.insert(varDec->name);
         instance->args.push_back(varDec);
     }
     return instance;
@@ -946,6 +949,14 @@ bool AntlerConverter::isNameBuiltin(const string& name, const Location* location
     const auto isLgsBuiltin = name == LgsSizeOf::name || name == LgsPrint::name;;
     if (isLgsBuiltin) {
         errHandler.handleError(E10053, location, {name});
+        return true;
+    }
+    return false;
+}
+
+bool AntlerConverter::isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec) {
+    if (initializedArgs.count(varDec->name)) {
+        errHandler.handleError(E10054, &varDec->location, {varDec->name});
         return true;
     }
     return false;

@@ -90,6 +90,7 @@ public:
     LgsVariable* getVariable(tree::TerminalNode* ctx) const;
     LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     LgsUnaryExpr* getVector(LogosParser::VectorContext* vector) const;
+    bool isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec);
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
     LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
     vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);

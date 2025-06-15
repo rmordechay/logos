@@ -10,7 +10,6 @@ class LgsType;
 class LgsParam final : public LgsValue {
 public:
     string name;
-    uint32_t position = 0;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
     bool isSelf = false;
@@ -18,9 +17,8 @@ public:
     AllocaInst* vaList = nullptr;
     vector<LgsVariable*> refs;
 
-    explicit LgsParam(LgsType* type = nullptr, const string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {
-
-    }
+    explicit LgsParam(LgsType* type = nullptr, const string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
+    LgsParam(const string& name, LgsExpr* expr) : name(name), expr(expr) {}
     string format(string& indentStr) override;
     Value* getIRValue(LgsRuntime* runtime);
     string getIRName();
