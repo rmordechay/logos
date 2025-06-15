@@ -9,7 +9,7 @@ public:
     std::vector<LgsUnaryExpr*> exprs;
 
     explicit LgsSelection(const std::vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
-    string prettyName() override;
+    string pName() override;
     LgsExpr* lastExpr() const;
     uint32_t hashValue(LgsRuntime* runtime) override;
     Value* eqIR(LgsRuntime* runtime, LgsExpr* other) override;

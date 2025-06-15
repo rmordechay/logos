@@ -3,7 +3,7 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsCharConst.h"
 
-string LgsChar::prettyName() const {
+string LgsChar::pName() const {
     return name;
 }
 
@@ -34,8 +34,4 @@ string LgsChar::getStrFormatPart() const {
 
 bool LgsChar::equals(LgsType* other) {
     return name == other->getIRName();
-}
-
-LgsType* LgsChar::clone() {
-    return this;
 }

@@ -8,7 +8,7 @@ size_t LgsUInt::getSizeBytes() {
     return sizeof(unsigned int);
 }
 
-string LgsUInt::prettyName() const {
+string LgsUInt::pName() const {
     return name;
 }
 
@@ -37,8 +37,4 @@ bool LgsUInt::equals(LgsType* other) {
 
 string LgsUInt::getStrFormatPart() const {
     return "%d";
-}
-
-LgsType* LgsUInt::clone() {
-    return this;
 }

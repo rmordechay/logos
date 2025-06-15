@@ -68,7 +68,7 @@ string LgsExpr::getConstStr() {
 void LgsExpr::free(LgsRuntime* runtime) { assert(0); }
 bool LgsExpr::equals(LgsExpr* other) { assert(0); }
 LgsExpr* LgsExpr::clone() { assert(0); }
-string LgsExpr::prettyName() { assert(0); }
+string LgsExpr::pName() { assert(0); }
 LgsExpr* LgsExpr::convertExpr(LgsType* toType) { assert(0); }
 uint32_t LgsExpr::hashValue(LgsRuntime* runtime) { assert(0); }
 

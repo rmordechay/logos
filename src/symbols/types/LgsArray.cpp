@@ -2,6 +2,7 @@
 
 #include "builtin/LgsBuiltinFuncs.h"
 #include "exprs/unary/LgsArrayExpr.h"
+#include "types/primitives/LgsInt.h"
 #include "utils/LgsUtils.h"
 
 Type* LgsArray::getIRType() {
@@ -24,13 +25,17 @@ LgsExpr* LgsArray::getZeroValue() {
     return new LgsArrayExpr(this);
 }
 
+LgsType* LgsArray::getIndexType() {
+    return &LGS_INT;
+}
+
 string LgsArray::getStrFormatPart() const {
     return "%p";
 }
 
-string LgsArray::prettyName() const {
-    if (!isStatic) return baseType->prettyName() + "[]";
-    return baseType->prettyName() + '[' + (iterLen == 0 ? "" : to_string(iterLen)) + "]!";
+string LgsArray::pName() const {
+    if (!isStatic) return baseType->pName() + "[]";
+    return baseType->pName() + '[' + (iterLen == 0 ? "" : to_string(iterLen)) + "]!";
 }
 
 bool LgsArray::equals(LgsType* other) {
@@ -74,15 +79,6 @@ StructType* LgsArray::getArrStruct(LgsRuntime* runtime) {
     const auto ptrTy = builder.getPtrTy();
     arrStruct = getIRStructType(name, {int64Ty, int64Ty, int64Ty, ptrTy});
     return arrStruct;
-}
-
-LgsType* LgsArray::clone() {
-    const auto arr = new LgsArray(baseType);
-    if (sizeExpr) {
-        arr->isStatic = isStatic;
-        arr->sizeExpr = sizeExpr;
-    }
-    return arr;
 }
 
 Value* LgsArrayAddFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {

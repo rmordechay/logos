@@ -15,7 +15,7 @@ public:
     string getStrFormatPart() const override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
-    string prettyName() const override;
+    string pName() const override;
     ~LgsFloat() override = default;
 };
 

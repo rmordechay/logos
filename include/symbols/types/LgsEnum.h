@@ -11,7 +11,7 @@ public:
     explicit LgsEnum(const string& name) : name(name) {}
     Type* getIRType() override;
     string getIRName() override;
-    string prettyName() const override;
+    string pName() const override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;

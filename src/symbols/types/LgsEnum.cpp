@@ -18,7 +18,7 @@ string LgsEnum::getIRName() {
     return name;
 }
 
-string LgsEnum::prettyName() const {
+string LgsEnum::pName() const {
     return name;
 }
 

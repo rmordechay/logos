@@ -55,7 +55,6 @@ LgsType::~LgsType() {
 
 size_t LgsType::getSizeBytes() { assert(0); }
 string LgsType::getStrFormatPart() const { assert(0); }
-LgsType* LgsType::clone() { assert(0); }
 
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
 LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }

@@ -30,7 +30,7 @@ public:
     void swapReturnIfNeeded() const;
     LgsParam getReturnSwapParam() const;
     void setBigObjAttrs(Function& IRFunc) const;
-    string prettyName() override;
+    string pName() override;
     string format(string& tabs) override;
     Value* createIRValue(LgsRuntime* runtime) override;
     virtual void generateIR(LgsRuntime* runtime);

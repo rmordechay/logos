@@ -2,7 +2,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 
 
-string LgsShortConst::prettyName() {
+string LgsShortConst::pName() {
     return to_string(value);
 }
 

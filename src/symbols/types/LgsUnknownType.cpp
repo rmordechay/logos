@@ -1,6 +1,6 @@
 #include "types/LgsUnknownType.h"
 
-string LgsUnknownType::prettyName() const {
+string LgsUnknownType::pName() const {
     return name == "" ? typeName : name;
 }
 

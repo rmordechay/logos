@@ -140,8 +140,8 @@ void LgsFunc::swapReturnIfNeeded() const {
     }
 }
 
-string LgsFunc::prettyName() {
-    return funcType->prettyName();
+string LgsFunc::pName() {
+    return funcType->pName();
 }
 
 string LgsFunc::format(string& tabs) {

@@ -7,7 +7,7 @@
 #include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 
-string LgsObject::prettyName() const {
+string LgsObject::pName() const {
     return name;
 }
 
@@ -69,18 +69,6 @@ LgsInterface* LgsObject::getInterface(const string& interfaceName) const {
         }
     }
     return nullptr;
-}
-
-LgsObject* LgsObject::clone() {
-    const auto newObj = new LgsObject(name, path);
-    for (const auto& [fieldName, field] : fields) {
-        const auto newField = field->clone();
-        newField->parentName = &name;
-        newObj->fields[fieldName] = newField;
-    }
-    newObj->methods = methods;
-    newObj->interfaces = interfaces;
-    return newObj;
 }
 
 void LgsObject::setVFuncs(LgsRuntime* runtime) const {

@@ -67,9 +67,8 @@ public:
     virtual Type* getIRType() = 0;
     virtual string getIRName() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual string prettyName() const = 0;
+    virtual string pName() const = 0;
     virtual bool equals(LgsType* other) = 0;
     virtual LgsType* inferBinaryType(LgsType* other) = 0;
-    virtual LgsType* clone();
     virtual ~LgsType();
 };

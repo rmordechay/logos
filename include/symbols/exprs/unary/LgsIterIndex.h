@@ -19,8 +19,8 @@ public:
     Value* getIRFromStr(LgsRuntime* runtime, LgsStr* str) const;
     Value* getStrSlice(const LgsRuntime* runtime, LgsStr* str) const;
     Value* getStrGEP(LgsRuntime* runtime) const;
-    string getName() override;
-    string prettyName() override;
+    string getExprName() override;
+    string pName() override;
     ~LgsIterIndex() override;
 };
 

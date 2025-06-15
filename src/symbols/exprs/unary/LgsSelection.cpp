@@ -20,7 +20,7 @@ void LgsSelection::resolveSelection(LgsRuntime* runtime) const {
         const auto childExpr = exprs[i + 1];
         if (const auto methodCall = childExpr->asFuncCall()) {
             methodCall->IRValue = methodCall->createIRValue(runtime);
-        } else if (const auto field = parentExpr->type->getField(childExpr->getName())) {
+        } else if (const auto field = parentExpr->type->getField(childExpr->getExprName())) {
             const auto parentIRValue = parentExpr->getIRValue(runtime);
             const auto gep = field->getGEP(runtime, parentExpr->type->getIRType(), parentIRValue);
             childExpr->setIRValue(gep);
@@ -28,10 +28,10 @@ void LgsSelection::resolveSelection(LgsRuntime* runtime) const {
     }
 }
 
-string LgsSelection::prettyName() {
+string LgsSelection::pName() {
     stringstream str;
     for (const auto expr : exprs) {
-        str << '.' << expr->getName();
+        str << '.' << expr->pName();
     }
     return str.str();
 }

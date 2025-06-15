@@ -3,7 +3,7 @@
 #include "exprs/LgsNull.h"
 
 
-string LgsVoid::prettyName() const {
+string LgsVoid::pName() const {
     return name;
 }
 

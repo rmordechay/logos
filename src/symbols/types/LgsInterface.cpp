@@ -42,6 +42,6 @@ LgsType* LgsInterface::inferBinaryType(LgsType* other) {
     assert(0);
 }
 
-string LgsInterface::prettyName() const {
+string LgsInterface::pName() const {
     return interfaceName;
 }

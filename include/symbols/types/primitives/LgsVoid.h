@@ -10,7 +10,7 @@ public:
         isVoid = true;
         isPrimitive = true;
     }
-    string prettyName() const override;
+    string pName() const override;
     Type* getIRType() override;
     size_t getSizeBytes() override;
     string getIRName() override;

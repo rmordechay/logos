@@ -35,14 +35,15 @@ public:
     size_t getSizeBytes() override;
     Type* getIRType() override;
     string getIRName() override;
-    string prettyName() const override;
+    string pName() const override;
     LgsExpr* getZeroValue() override;
-    bool equals(LgsType* other) override;
+    LgsType* getIndexType() override;
     LgsType* inferBinaryType(LgsType* other) override;
     Value* getLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* isEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
-    ~LgsMap() override = default;
     StructType* getMapStruct(LgsRuntime* runtime);
+    bool equals(LgsType* other) override;
+    ~LgsMap() override = default;
 };

@@ -57,15 +57,15 @@ LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
 
-string LgsFuncType::prettyName() const {
+string LgsFuncType::pName() const {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = 0; i < params.size(); ++i) {
-        strStream << params[i].type->prettyName();
+        strStream << params[i].type->pName();
         if (i != params.size() - 1) strStream << ", ";
     }
     if (rt) {
-        strStream << "): " << rt->prettyName();
+        strStream << "): " << rt->pName();
     } else {
         strStream << ')';
     }
@@ -74,17 +74,6 @@ string LgsFuncType::prettyName() const {
 
 LgsType* LgsFuncType::inferBinaryType(LgsType* other) {
     return nullptr;
-}
-
-LgsType* LgsFuncType::clone() {
-    auto* newFuncType = new LgsFuncType();
-    newFuncType->name = this->name;
-    newFuncType->parentName = this->parentName;
-    newFuncType->rt = this->rt->clone();
-    for (auto& param : this->params) {
-        newFuncType->params.push_back(param);
-    }
-    return newFuncType;
 }
 
 LgsFuncType::~LgsFuncType() {

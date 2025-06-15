@@ -21,8 +21,8 @@ public:
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
     void createIRStmt(LgsRuntime* runtime) override;
     Value* createIRValue(LgsRuntime* runtime) override;
-    string getName() override;
+    string getExprName() override;
     string format(string& indentStr) override;
-    string prettyName() override;
+    string pName() override;
     ~LgsFuncCall() override = default;
 };

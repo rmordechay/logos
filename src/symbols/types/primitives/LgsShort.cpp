@@ -10,7 +10,7 @@ Type* LgsShort::getIRType() {
     return Type::getInt16Ty(context);
 }
 
-string LgsShort::prettyName() const {
+string LgsShort::pName() const {
     return name;
 }
 
@@ -35,8 +35,3 @@ bool LgsShort::equals(LgsType* other) {
 string LgsShort::getStrFormatPart() const {
     return "%d";
 }
-
-LgsType* LgsShort::clone() {
-    return this;
-}
-

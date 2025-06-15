@@ -6,11 +6,11 @@
 #include "stmts/LgsVarDec.h"
 #include <logos/LgsRuntime.h>
 
-string LgsVariable::getName() {
+string LgsVariable::getExprName() {
     return name;
 }
 
-string LgsVariable::prettyName() {
+string LgsVariable::pName() {
     return name;
 }
 

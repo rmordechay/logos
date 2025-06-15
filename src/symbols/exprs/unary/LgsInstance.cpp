@@ -36,11 +36,11 @@ void LgsInstance::setZeroField(LgsRuntime* runtime, LgsField* field, Value* pare
     }
 }
 
-string LgsInstance::getName() {
+string LgsInstance::getExprName() {
     return obj->name;
 }
 
-string LgsInstance::prettyName() {
+string LgsInstance::pName() {
     return obj->name;
 }
 

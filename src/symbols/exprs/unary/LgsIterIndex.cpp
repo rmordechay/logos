@@ -98,17 +98,17 @@ Value* LgsIterIndex::getArrGEP(LgsRuntime* runtime) const {
     return runtime->builder.CreateGEP(ty, ptr, IRIndices);
 }
 
-string LgsIterIndex::getName() {
-    return baseExpr->getName();
+string LgsIterIndex::getExprName() {
+    return baseExpr->getExprName();
 }
 
-string LgsIterIndex::prettyName() {
+string LgsIterIndex::pName() {
     stringstream str;
-    str << baseExpr->prettyName();
+    str << baseExpr->pName();
     if (index->to) {
-        str << '[' << index->from->prettyName() << ':' << index->to->prettyName() << ']';
+        str << '[' << index->from->pName() << ':' << index->to->pName() << ']';
     } else {
-        str << '[' << index->from->prettyName() << ']';
+        str << '[' << index->from->pName() << ']';
     }
     return str.str();
 }

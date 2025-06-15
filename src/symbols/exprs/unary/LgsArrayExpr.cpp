@@ -2,8 +2,8 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "logos/LgsConfig.h"
 
-string LgsArrayExpr::prettyName() {
-    return type->prettyName();
+string LgsArrayExpr::pName() {
+    return type->pName();
 }
 
 Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {

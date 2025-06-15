@@ -3,7 +3,7 @@
 #include "exprs/unary/constants/LgsLongConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 
-string LgsIntConst::prettyName() {
+string LgsIntConst::pName() {
     return to_string(value);
 }
 

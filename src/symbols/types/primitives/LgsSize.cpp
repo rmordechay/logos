@@ -14,7 +14,7 @@ std::string LgsSize::getIRName() {
     return name;
 }
 
-std::string LgsSize::prettyName() const {
+std::string LgsSize::pName() const {
     return name;
 }
 
@@ -28,10 +28,6 @@ bool LgsSize::equals(LgsType* other) {
 
 std::string LgsSize::getStrFormatPart() const {
     return "%zu";
-}
-
-LgsType* LgsSize::clone() {
-    return LgsType::clone();
 }
 
 LgsType* LgsSize::inferBinaryType(LgsType* other) {

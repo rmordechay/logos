@@ -4,7 +4,7 @@
 #include "utils/LgsUtils.h"
 
 string LgsParam::format(string& indentStr) {
-    return name + ": " + type->prettyName();
+    return name + ": " + type->pName();
 }
 
 Value* LgsParam::getIRValue(LgsRuntime* runtime) {

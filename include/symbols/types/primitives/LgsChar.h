@@ -8,7 +8,7 @@ public:
     LgsChar() {
         isPrimitive = true;
     }
-    string prettyName() const override;
+    string pName() const override;
     size_t getSizeBytes() override;
     Type* getIRType() override;
     string getIRName() override;
@@ -16,7 +16,6 @@ public:
     LgsType* inferBinaryType(LgsType* other) override;
     string getStrFormatPart() const override;
     bool equals(LgsType* other) override;
-    LgsType* clone() override;
     ~LgsChar() override = default;
 };
 

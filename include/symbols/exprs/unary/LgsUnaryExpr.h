@@ -13,11 +13,11 @@ public:
     Value* divIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* modIR(LgsRuntime* runtime, LgsExpr* other) override;
     tuple<Value*, Value*> loadExprs(LgsRuntime* runtime, LgsExpr* rExpr);
-    virtual std::string getName();
+    virtual std::string getExprName();
     ~LgsUnaryExpr() override = default;
 };
 
-inline std::string LgsUnaryExpr::getName() {
+inline std::string LgsUnaryExpr::getExprName() {
     assert(false);
 }
 

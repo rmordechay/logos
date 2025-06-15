@@ -2,7 +2,7 @@
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/LgsNull.h"
 
-string LgsBool::prettyName() const {
+string LgsBool::pName() const {
     return name;
 }
 

@@ -710,7 +710,6 @@ LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::IterIndexContext* ctx) 
         const auto indexExprFrom = indexExpr->from;
         const auto iterIndexFrom = getExpr(indexExprFrom);
         const auto iterIndexTo = getExpr(indexExpr->to);
-        iterIndexFrom->setLocation(indexExprFrom->start, &filePath);
         const auto index = new LgsIndex{.from = iterIndexFrom, .to = iterIndexTo};
         const auto newIterIndex = new LgsIterIndex(baseExpr, index);
         newIterIndex->setLocation(ctx->start, &filePath);

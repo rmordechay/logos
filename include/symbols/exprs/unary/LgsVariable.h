@@ -9,8 +9,8 @@ public:
     LgsSymbol ref;
 
     explicit LgsVariable(const string& name) : LgsUnaryExpr(nullptr), name(name) {}
-    string getName() override;
-    string prettyName() override;
+    string getExprName() override;
+    string pName() override;
     uint32_t hashValue(LgsRuntime* runtime) override;
     Value* createIRValue(LgsRuntime* runtime) override;
     bool equals(LgsExpr* other) override;

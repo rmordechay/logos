@@ -19,7 +19,7 @@ LgsExpr* LgsAny::getZeroValue() {
     assert(0);
 }
 
-string LgsAny::prettyName() const {
+string LgsAny::pName() const {
     return name;
 }
 

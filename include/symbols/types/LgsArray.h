@@ -39,17 +39,17 @@ public:
 
     Type* getIRType() override;
     string getIRName() override;
-    string prettyName() const override;
+    string pName() const override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
+    LgsType* getIndexType() override;
     string getStrFormatPart() const override;
-    bool equals(LgsType* other) override;
     LgsType* inferBinaryType(LgsType* other) override;
     Value* getLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* isEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
     StructType* getArrStruct(LgsRuntime* runtime);
-    LgsType* clone() override;
+    bool equals(LgsType* other) override;
     ~LgsArray() override;
 };

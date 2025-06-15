@@ -13,10 +13,8 @@ public:
     Value* createIRValue(LgsRuntime* runtime) override;
     void setZeroField(LgsRuntime* runtime, LgsField* field, Value* parentIRValue) const;
     void free(LgsRuntime* runtime) override;
-    string getName() override;
-    string prettyName() override;
+    string getExprName() override;
+    string pName() override;
     void setReturnExpr(LgsRuntime* runtime, Type* objIRType);
     ~LgsInstance() override = default;
 };
-
-

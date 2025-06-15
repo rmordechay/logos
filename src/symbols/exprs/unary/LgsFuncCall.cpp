@@ -80,25 +80,25 @@ void LgsFuncCall::resolveVirtualFunc(LgsRuntime* runtime) const {
     func->setIRValue(vfunc);
 }
 
-string LgsFuncCall::getName() {
+string LgsFuncCall::getExprName() {
     return name;
 }
 
-string LgsFuncCall::format(string& indentStr) {
-    return indentStr + name + "()";
-}
-
-string LgsFuncCall::prettyName() {
+string LgsFuncCall::pName() {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = 0; i < args.size(); ++i) {
-        strStream << args[i]->type->prettyName();
+        strStream << args[i]->type->pName();
         if (i != args.size() - 1) strStream << ", ";
     }
     if (type) {
-        strStream << "): " << type->prettyName();
+        strStream << "): " << type->pName();
     } else {
         strStream << ')';
     }
     return strStream.str();
+}
+
+string LgsFuncCall::format(string& indentStr) {
+    return indentStr + name + "()";
 }

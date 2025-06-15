@@ -11,6 +11,10 @@ LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
 }
 
+LgsType* LgsMap::getIndexType() {
+    return typePair->key;
+}
+
 Value* LgsMap::getLength(LgsRuntime* runtime, LgsExpr* expr) {
     return lenFunc.call(runtime, {expr});
 }
@@ -35,8 +39,8 @@ string LgsMap::getIRName() {
     return name;
 }
 
-string LgsMap::prettyName() const {
-    return '{' + typePair->key->prettyName() + ": " + typePair->value->prettyName() + '}';
+string LgsMap::pName() const {
+    return '{' + typePair->key->pName() + ": " + typePair->value->pName() + '}';
 }
 
 bool LgsMap::equals(LgsType* other) {

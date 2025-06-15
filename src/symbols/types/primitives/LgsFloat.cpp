@@ -1,7 +1,7 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 
-string LgsFloat::prettyName() const {
+string LgsFloat::pName() const {
     return name;
 }
 

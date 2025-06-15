@@ -19,7 +19,7 @@ Type* LgsStr::getIRType() {
     return PointerType::getUnqual(context);
 }
 
-string LgsStr::prettyName() const {
+string LgsStr::pName() const {
     return name;
 }
 
@@ -34,6 +34,10 @@ LgsType* LgsStr::inferBinaryType(LgsType* other) {
 
 string LgsStr::getStrFormatPart() const {
     return "%s";
+}
+
+LgsType* LgsStr::getIndexType() {
+    return &LGS_INT;
 }
 
 Value* LgsStr::getLength(LgsRuntime* runtime, LgsExpr* expr) {

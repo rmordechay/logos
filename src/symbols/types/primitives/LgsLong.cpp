@@ -4,7 +4,7 @@
 #include "logos/LgsRuntime.h"
 #include "types/LgsAny.h"
 
-string LgsLong::prettyName() const {
+string LgsLong::pName() const {
     return name;
 }
 

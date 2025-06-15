@@ -12,7 +12,7 @@ string LgsGroup::getIRName() {
     return name;
 }
 
-string LgsGroup::prettyName() const {
+string LgsGroup::pName() const {
     return name;
 }
 
