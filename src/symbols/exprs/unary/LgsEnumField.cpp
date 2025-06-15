@@ -4,3 +4,7 @@
 Value* LgsEnumField::createIRValue(LgsRuntime* runtime) {
     return getIRStr(runtime, name);
 }
+
+uint32_t LgsDefaultEnumField::hashValue(LgsRuntime* runtime) {
+    return hashedValue;
+}

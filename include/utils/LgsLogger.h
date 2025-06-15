@@ -3,8 +3,7 @@
 enum LogLevel {
     INFO,
     DEBUG,
+    ERROR,
 };
 
-inline void lgsLog(const string& text, LogLevel level = INFO) {
-    cout << text << std::endl;
-}
+void lgsLog(const string& text, LogLevel level = INFO);

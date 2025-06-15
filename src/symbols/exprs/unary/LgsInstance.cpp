@@ -18,7 +18,7 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
         initializedFields.insert(field->name);
     }
     for (const auto& [name, field] : obj->fields) {
-        if (initializedFields.count(name)) continue;
+        if (initializedFields.count(name) == 1) continue;
         setZeroField(runtime, field, IRValue);
     }
     return IRValue;
@@ -30,8 +30,7 @@ void LgsInstance::setZeroField(LgsRuntime* runtime, LgsField* field, Value* pare
             setZeroField(runtime, field, parentIRValue);
         }
     } else {
-        const auto zeroValue = field->type->getZeroValue();
-        field->storeIRValue(runtime, obj->getIRType(), parentIRValue, zeroValue);
+        field->storeIRValue(runtime, obj->getIRType(), parentIRValue, field->expr);
     }
 }
 

@@ -6,6 +6,8 @@
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsUtils.h"
+
 #include <logos/LgsRuntime.h>
 
 string LgsVariable::getExprName() {
@@ -140,7 +142,7 @@ uint32_t LgsVariable::hashValue(LgsRuntime* runtime) {
     case FIELD:
         return ref.field->expr->hashValue(runtime);
     case ENUM_FIELD:
-        return LgsStr::hashString(ref.enumField->name);
+        return hashString(ref.enumField->name);
     default:
         assert(0);
     }

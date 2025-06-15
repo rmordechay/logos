@@ -512,13 +512,22 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     unordered_set<string> initializedFields;
     for (const auto& arg : instance->args) {
         visitExpr(arg->expr);
-        const auto lgsField = instance->obj->getField(arg->name);
-        if (!lgsField) {
+        const auto field = instance->obj->getField(arg->name);
+        if (!field) {
             errHandler.handleError(E10005, &arg->location, {arg->name, instance->obj->name});
             continue;
         }
-        lgsField->expr = arg->expr;
+        field->expr = arg->expr;
+        initializedFields.insert(field->name);
     }
+
+    for (const auto& [name, field] : instance->obj->fields) {
+        if (initializedFields.count(name)) continue;
+        if (!field->expr) {
+            setZeroField(field);
+        }
+    }
+
     assert(instance->obj);
 }
 
@@ -632,6 +641,16 @@ bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable
     }
     fieldVariable->setType(field->type);
     return true;
+}
+
+void SemaAnalyser::setZeroField(LgsField* field) const {
+    if (const auto fieldObj = field->type->asObject()) {
+        for (const auto& [name, field] : fieldObj->fields) {
+            setZeroField(field);
+        }
+    } else {
+        field->expr = field->type->getZeroValue();
+    }
 }
 
 void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {

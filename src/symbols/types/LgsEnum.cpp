@@ -1,11 +1,9 @@
 #include "types/LgsEnum.h"
-
 #include "exprs/unary/LgsEnumField.h"
 #include "logos/LgsRuntime.h"
-#include "stmts/LgsField.h"
 
 LgsExpr* LgsEnum::getZeroValue() {
-    return new LgsDefaultEnumField(this);
+    return getField(LOGOS_DEFAULT_ENUM)->expr;
 }
 
 Type* LgsEnum::getIRType() {

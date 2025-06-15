@@ -1,6 +1,7 @@
 #pragma once
 #include "data/LgsDefinitions.h"
 #include "exprs/unary/LgsUnaryExpr.h"
+#include "utils/LgsUtils.h"
 
 class LgsEnumField : public LgsUnaryExpr {
 public:
@@ -14,6 +15,11 @@ public:
 
 class LgsDefaultEnumField final : public LgsEnumField {
 public:
-    explicit LgsDefaultEnumField(LgsType* type) : LgsEnumField(type, LOGOS_DEFAULT_ENUM, "") {}
+    uint32_t hashedValue;
+
+    explicit LgsDefaultEnumField(LgsType* type) : LgsEnumField(type, LOGOS_DEFAULT_ENUM, "") {
+        hashedValue = hashString(LOGOS_DEFAULT_ENUM);
+    }
+    uint32_t hashValue(LgsRuntime* runtime) override;
     ~LgsDefaultEnumField() override = default;
 };
