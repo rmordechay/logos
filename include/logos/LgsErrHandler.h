@@ -1,6 +1,7 @@
 #pragma once
 #include "data/LgsErrors.h"
 #include "data/LgsWarnings.h"
+#include "utils/LgsUtils.h"
 
 struct Location;
 
@@ -12,8 +13,5 @@ public:
 
     void setUnsuccessful();
     void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});
-    string formatMsg(const string& errMsg, const vector<string>& args = {}) const;
     ~LgsErrHandler() = default;
 };
-
-

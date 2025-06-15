@@ -35,6 +35,16 @@ LgsExpr* LgsObject::getZeroValue() {
     assert(0);
 }
 
+string LgsObject::getStrFormatPart() const {
+    stringstream str;
+    str << '{';
+    for (const auto [name, field] : fields) {
+        str << name << " = " << field->type->getStrFormatPart();
+    }
+    str << '}';
+    return str.str();
+}
+
 LgsType* LgsObject::inferBinaryType(LgsType* other) {
     return this;
 }

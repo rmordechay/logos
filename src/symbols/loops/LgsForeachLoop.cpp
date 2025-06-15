@@ -37,11 +37,11 @@ void LgsForeachLoop::initIRLoop(LgsRuntime* runtime) {
     iterPtr = iterExpr->getIRValue(runtime);
     const auto iterable = iterExpr->type->asIterable();
     if (const auto str = iterable->asStr()) {
-        setIterVars(runtime, str);
+        setStrIterVars(runtime, str);
     } else if (const auto arr = iterable->asArray()) {
-        setIterVars(runtime, arr);
+        setArrIterVars(runtime, arr);
     } else if (const auto map = iterable->asMap()) {
-        setIterVars(runtime, map);
+        setMapIterVars(runtime, map);
     } else {
         assert(0);
     }
@@ -56,7 +56,7 @@ void LgsForeachLoop::exitIRLoop(LgsRuntime* runtime) const {
     startBlock(runtime, IRExitBlock);
 }
 
-void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsStr* str) const {
+void LgsForeachLoop::setStrIterVars(LgsRuntime* runtime, LgsStr* str) const {
     if (str->isStatic) {
         const auto i = runtime->builder.CreateLoad(runtime->builder.getInt64Ty(), iPtr);
         const auto gep = runtime->builder.CreateGEP(str->getIRType(), iterPtr, {runtime->builder.getInt32(0), i});
@@ -71,7 +71,7 @@ void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsStr* str) const {
     }
 }
 
-void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsArray* arr) const {
+void LgsForeachLoop::setArrIterVars(LgsRuntime* runtime, LgsArray* arr) const {
     if (arr->isStatic) {
         const auto i = runtime->builder.CreateLoad(runtime->builder.getInt64Ty(), iPtr);
         const auto gep = runtime->builder.CreateGEP(arr->getIRType(), iterPtr, {runtime->builder.getInt32(0), i});
@@ -90,7 +90,7 @@ void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsArray* arr) const {
     }
 }
 
-void LgsForeachLoop::setIterVars(LgsRuntime* runtime, LgsMap* map) const {
+void LgsForeachLoop::setMapIterVars(LgsRuntime* runtime, LgsMap* map) const {
     auto& builder = runtime->builder;
     const vector<Type*> structFields = {builder.getPtrTy(), builder.getInt64Ty(), builder.getInt64Ty()};
     map->mapStruct = getIRStructType(context, map->name, structFields);
