@@ -14,7 +14,7 @@ string LgsObject::prettyName() const {
 Type* LgsObject::getIRType() {
     if (IRType) return IRType;
     // Add one or zero if table exists
-    size_t offset = !!vtable;
+    const size_t offset = !!vtable;
     vector<Type*> elementTypes(fields.size() + offset);
     if (vtable) {
         elementTypes[0] = PointerType::getUnqual(context);

@@ -88,7 +88,8 @@ LgsType* LgsFuncType::clone() {
 }
 
 LgsFuncType::~LgsFuncType() {
-    for (const auto param : params) {
+    for (int i = isMethod && !isStatic; i < params.size(); ++i) {
+        const auto param = params[i];
         if (param.isSelf) continue;
         if (!param.expr) {
             freeType(param.type);

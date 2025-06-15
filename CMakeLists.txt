@@ -88,6 +88,8 @@ set(SOURCE_FILES
     src/symbols/LgsSymbolTable.cpp
     src/symbols/types/primitives/LgsUInt.cpp
     src/symbols/exprs/unary/constants/LgsUIntConst.cpp
+    src/symbols/types/LgsIterator.cpp
+    include/symbols/types/LgsIterator.h
 )
 
 add_library(lib ${SOURCE_FILES})

@@ -23,6 +23,9 @@ void freeType(const LgsType* type) {
     delete type;
 }
 
+bool isLgsBuiltin(const LgsType* type) {
+    return type->isBuiltin;
+}
 
 Value* getIRStr(const LgsRuntime* runtime, const string& value) {
     for (auto& globals : runtime->module->globals()) {
@@ -37,12 +40,12 @@ Value* getIRStr(const LgsRuntime* runtime, const string& value) {
     return globalVariable;
 }
 
-StructType* getIRStructType(LLVMContext& context, const string& name, const vector<Type*>& fields) {
-    const auto struct_ = StructType::getTypeByName(context, name);
-    if (!struct_) {
+StructType* getIRStructType(const string& name, const vector<Type*>& fields) {
+    const auto structType = StructType::getTypeByName(context, name);
+    if (!structType) {
         return StructType::create(context, fields, name);
     }
-    return struct_;
+    return structType;
 }
 
 Module* createIRModule(const string& moduleName, LLVMContext& context) {

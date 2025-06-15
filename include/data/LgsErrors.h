@@ -61,3 +61,4 @@ inline LgsError E10049{.msg = "Not enough information to infer type of iterable.
 inline LgsError E10050{.msg = "Only integer values can be incremented (++) or decremented (--). Given: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10051{.msg = "Constant expression '%s' can not be overwritten.", .errCode = errCodeStart++};
 inline LgsError E10052{.msg = "Spread operator in '%s...' must only be used with iterables. Given type: '%s'.", .errCode = errCodeStart++};
+inline LgsError E10053{.msg = "'%s' is a Logos global name and can not be redefined.", .errCode = errCodeStart++};

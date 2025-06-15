@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsType.h"
+#include "primitives/LgsVoid.h"
 
 class LgsRuntime;
 class LgsVarDec;

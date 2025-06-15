@@ -27,6 +27,10 @@ void LgsExpr::setType(LgsType* type) {
     this->type = type;
 }
 
+LgsIterator LgsExpr::toIterator() {
+    return LgsIterator(this);
+}
+
 int LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
         return intConst->value;

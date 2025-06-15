@@ -1,11 +1,12 @@
 #include "loops/LgsForeachLoop.h"
 #include "data/LgsDefinitions.h"
+#include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "stmts/LgsVarDec.h"
 #include "stmts/LgsStmtBlock.h"
 #include "types/LgsArray.h"
+#include "types/LgsIterator.h"
 #include "types/LgsMap.h"
-#include "utils/LgsUtils.h"
 
 Value* LgsForeachLoop::loopStart(LgsRuntime* runtime) {
     return runtime->builder.getInt64(0);
@@ -16,32 +17,40 @@ Value* LgsForeachLoop::loopEnd(LgsRuntime* runtime) {
     return iterable->getLoopLength(runtime, iterExpr);
 }
 
+void LgsForeachLoop::initIPtr(LgsRuntime* runtime)
+{
+    iPtr = runtime->builder.CreateAlloca(runtime->builder.getInt64Ty(), nullptr);
+    runtime->builder.CreateStore(loopStart(runtime), iPtr);
+    runtime->builder.CreateBr(IRCondBlock);
+    startBlock(runtime, IRCondBlock);
+}
+
 void LgsForeachLoop::initIRLoop(LgsRuntime* runtime) {
     IRCondBlock = createBasicBlock(LOGOS_LOOP_CONDITION, context);
     IRBodyBlock = createBasicBlock(LOGOS_LOOP_BODY, context);
     IRExitBlock = createBasicBlock(LOGOS_LOOP_EXIT, context);
 
-    iPtr = runtime->builder.CreateAlloca(runtime->builder.getInt64Ty(), nullptr);
-    runtime->builder.CreateStore(loopStart(runtime), iPtr);
-    runtime->builder.CreateBr(IRCondBlock);
+    const auto iterable = iterExpr->type->asIterable();
+    // With iterator
+    if (iterable->asMap()) {
+        LgsIterator iterator = iterExpr->toIterator();
+        iterator.initIterator(runtime);
+        initIPtr(runtime);
+        runtime->builder.CreateCondBr(iterator.hasNext(runtime), IRBodyBlock, IRExitBlock);
+        startBlock(runtime, IRBodyBlock);
+        iterPtr = iterExpr->getIRValue(runtime);
+        setMapIterVars(runtime, iterator);
+        return;
+    }
 
-    // Condition
-    startBlock(runtime, IRCondBlock);
-    const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt64Ty(), iPtr);
-    const auto upperBound = runtime->builder.CreateZExt(loopEnd(runtime), runtime->builder.getInt64Ty());
-    const auto condition = runtime->builder.CreateICmpSLT(iValue, upperBound);
-    runtime->builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
-
-    // Body
+    // Without iterator
+    setLoopCondition(runtime);
     startBlock(runtime, IRBodyBlock);
     iterPtr = iterExpr->getIRValue(runtime);
-    const auto iterable = iterExpr->type->asIterable();
     if (const auto str = iterable->asStr()) {
         setStrIterVars(runtime, str);
     } else if (const auto arr = iterable->asArray()) {
         setArrIterVars(runtime, arr);
-    } else if (const auto map = iterable->asMap()) {
-        setMapIterVars(runtime, map);
     } else {
         assert(0);
     }
@@ -62,8 +71,7 @@ void LgsForeachLoop::setStrIterVars(LgsRuntime* runtime, LgsStr* str) const {
         const auto gep = runtime->builder.CreateGEP(str->getIRType(), iterPtr, {runtime->builder.getInt32(0), i});
         const auto load = runtime->builder.CreateLoad(runtime->builder.getInt8Ty(), gep);
         if (withIndex) {
-            const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
-            loopVars[0]->setIRValue(iValue);
+            loopVars[0]->setIRValue(loadIPtr(runtime));
         }
         loopVars[0 + withIndex]->setIRValue(load);
     } else {
@@ -76,40 +84,41 @@ void LgsForeachLoop::setArrIterVars(LgsRuntime* runtime, LgsArray* arr) const {
         const auto i = runtime->builder.CreateLoad(runtime->builder.getInt64Ty(), iPtr);
         const auto gep = runtime->builder.CreateGEP(arr->getIRType(), iterPtr, {runtime->builder.getInt32(0), i});
         if (withIndex) {
-            const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
-            loopVars[0]->setIRValue(iValue);
+            loopVars[0]->setIRValue(loadIPtr(runtime));
         }
         loopVars[0 + withIndex]->setIRValue(gep);
     } else {
-        const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt64Ty(), iPtr);
-        const auto v = arr->getFunc.callIR(runtime, {iterPtr, iValue});
+        const auto iValue = loadIPtr(runtime);
         if (withIndex) {
             loopVars[0]->setIRValue(iValue);
         }
+        const auto v = arr->getFunc.callIR(runtime, {iterPtr, iValue});
         loopVars[0 + withIndex]->setIRValue(runtime->builder.CreateLoad(arr->getIRType(), v));
     }
 }
 
-void LgsForeachLoop::setMapIterVars(LgsRuntime* runtime, LgsMap* map) const {
-    auto& builder = runtime->builder;
-    const vector<Type*> structFields = {builder.getPtrTy(), builder.getInt64Ty(), builder.getInt64Ty()};
-    map->mapStruct = getIRStructType(context, map->name, structFields);
-    const auto bucketsGEP = runtime->builder.CreateStructGEP(map->mapStruct, iterPtr, 0);
-    const vector<Type*> entryStructFields = {builder.getPtrTy(), builder.getPtrTy(), builder.getPtrTy()};
-    const auto bucketsValue = builder.CreateLoad(builder.getPtrTy(), bucketsGEP);
-    const auto isNull = builder.CreateICmpEQ(bucketsValue, Constant::getNullValue(builder.getPtrTy()));
-    const auto notNullBlock = BasicBlock::Create(context, "notnull");
-    builder.CreateCondBr(isNull, IRCondBlock, notNullBlock);
-
-    startBlock(runtime, notNullBlock);
-    const auto keyGEP = runtime->builder.CreateStructGEP(map->mapStruct, bucketsValue, 0);
-    const auto valueGEP = runtime->builder.CreateStructGEP(map->mapStruct, bucketsValue, 1);
+void LgsForeachLoop::setMapIterVars(LgsRuntime* runtime, const LgsIterator& iterator) const {
+    const auto next = iterator.next(runtime);
+    const auto entryType = LgsMapEntry::getStructType();
+    const auto keyGEP = runtime->builder.CreateStructGEP(entryType, next, 0);
+    const auto valueGEP = runtime->builder.CreateStructGEP(entryType, next, 1);
     if (withIndex) {
-        const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt32Ty(), iPtr);
-        loopVars[0]->setIRValue(iValue);
+        loopVars[0]->setIRValue(loadIPtr(runtime));
     }
-    loopVars[0 + withIndex]->IRValue = builder.CreateLoad(builder.getPtrTy(), keyGEP);
-    loopVars[1]->IRValue = builder.CreateLoad(builder.getPtrTy(), valueGEP);
+    loopVars[0 + withIndex]->setIRValue(keyGEP);
+    loopVars[1 + withIndex]->setIRValue(valueGEP);
+}
+
+void LgsForeachLoop::setLoopCondition(LgsRuntime* runtime) {
+    initIPtr(runtime);
+    const auto iValue = runtime->builder.CreateLoad(runtime->builder.getInt64Ty(), iPtr);
+    const auto upperBound = runtime->builder.CreateZExt(loopEnd(runtime), runtime->builder.getInt64Ty());
+    const auto condition = runtime->builder.CreateICmpSLT(iValue, upperBound);
+    runtime->builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
+}
+
+LoadInst* LgsForeachLoop::loadIPtr(LgsRuntime* runtime) const {
+    return runtime->builder.CreateLoad(runtime->builder.getInt64Ty(), iPtr);
 }
 
 LgsForeachLoop::~LgsForeachLoop() {

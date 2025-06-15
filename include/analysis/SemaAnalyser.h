@@ -3,7 +3,6 @@
 #include "logos/LgsASTVisitor.h"
 #include "logos/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
-#include "types/LgsIterable.h"
 
 class LgsArray;
 class LgsGroup;

@@ -55,6 +55,6 @@ StructType* LgsMap::getMapStruct(LgsRuntime* runtime) {
     if (mapStruct) return mapStruct;
     auto& builder = runtime->builder;
     const vector<Type*> mapStructFields = {builder.getPtrTy(), builder.getInt64Ty(), builder.getInt64Ty()};
-    mapStruct = getIRStructType(context, name, mapStructFields);
+    mapStruct = getIRStructType(name, mapStructFields);
     return mapStruct;
 }

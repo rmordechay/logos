@@ -73,7 +73,7 @@ StructType* LgsArray::getArrStruct(LgsRuntime* runtime) {
     auto& builder = runtime->builder;
     const auto int64Ty = builder.getInt64Ty();
     const auto ptrTy = builder.getPtrTy();
-    arrStruct = getIRStructType(context, name, {int64Ty, int64Ty, int64Ty, ptrTy});
+    arrStruct = getIRStructType(name, {int64Ty, int64Ty, int64Ty, ptrTy});
     return arrStruct;
 }
 

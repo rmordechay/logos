@@ -1,10 +1,12 @@
 #pragma once
+#include "utils/LgsUtils.h"
 
 class LgsTypePair final : public LgsType {
 public:
     static constexpr auto name = "Pair";
     LgsType* key;
     LgsType* value;
+    StructType* pairIRType = nullptr;
 
     explicit LgsTypePair(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : key(keyType), value(valueType) {}
     Type* getIRType() override;
@@ -16,7 +18,7 @@ public:
 };
 
 inline Type* LgsTypePair::getIRType() {
-    assert(false);
+    assert(0);
 }
 
 inline string LgsTypePair::getIRName() {

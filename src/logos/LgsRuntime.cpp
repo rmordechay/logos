@@ -4,9 +4,9 @@
 
 void LgsRuntime::initRuntime() {
     const auto voidTy = builder.getVoidTy();
-    const auto stackStr = getIRStructType(context, "StackStr", {ArrayType::get(builder.getInt8Ty(), 1024), builder.getInt32Ty()});
-    const auto stack = getIRStructType(context, "Stack", {builder.getInt32Ty(), ArrayType::get(stackStr, 512)});
-    const auto runtimeType = getIRStructType(context, "Runtime", {stack});
+    const auto stackStr = getIRStructType("StackStr", {ArrayType::get(builder.getInt8Ty(), 1024), builder.getInt32Ty()});
+    const auto stack = getIRStructType("Stack", {builder.getInt32Ty(), ArrayType::get(stackStr, 512)});
+    const auto runtimeType = getIRStructType("Runtime", {stack});
     const auto zeroInit = Constant::getNullValue(runtimeType);
     runtimeStruct = new GlobalVariable(*module, runtimeType, false, GlobalValue::ExternalLinkage, zeroInit);
     const auto initStackFunc = module->getOrInsertFunction("Runtime_init", FunctionType::get(voidTy, {builder.getPtrTy()}, false));

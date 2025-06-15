@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsValue.h"
 
+class LgsIterator;
 class LgsPostfixExpr;
 class LgsRuntime;
 class LgsEnumField;
@@ -35,6 +36,7 @@ public:
     void setType(LgsType* type);
     int getConstInt();
     string getConstStr();
+    LgsIterator toIterator();
 
     LgsFunc* asFunc();
     LgsVariable* asVariable();

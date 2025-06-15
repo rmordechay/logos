@@ -260,14 +260,20 @@ void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     }
     const auto varDecSize = foreachLoop->loopVars.size();
     foreachLoop->withIndex = iterable->unpackLength + 1 == varDecSize;
-    if (foreachLoop->withIndex) {
+    const bool withIndex = foreachLoop->withIndex;
+    if (withIndex) {
         foreachLoop->loopVars[0]->type = &LGS_INT;
         foreachLoop->loopVars[0]->expr = LGS_INT.getZeroValue();
     } else if (iterable->unpackLength != varDecSize) {
         errHandler.handleError(E10041, &iterExpr->location, {iterExpr->prettyName(), to_string(iterable->unpackLength), to_string(iterable->unpackLength + 1), to_string(varDecSize)});
         return;
     }
-    foreachLoop->loopVars[0 + foreachLoop->withIndex]->type = iterable->baseType;
+    if (const auto pair = iterable->baseType->asPair()) {
+        foreachLoop->loopVars[0 + withIndex]->type = pair->key;
+        foreachLoop->loopVars[1 + withIndex]->type = pair->value;
+    } else {
+        foreachLoop->loopVars[0 + withIndex]->type = iterable->baseType;
+    }
     for (const auto varDec : foreachLoop->loopVars) {
         addLocalSymbol(varDec->name, LgsSymbol(varDec));
     }
@@ -400,7 +406,7 @@ void SemaAnalyser::visitStaticArray(const LgsArrayExpr* array) {
 }
 
 void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) {
-    const auto typePair = hashMap->map->typePair;
+    const auto typePair = hashMap->mapType->typePair;
     if (typePair->key && typePair->value) return;
     if (hashMap->initialElements.empty()) return errHandler.handleError(E10049, &hashMap->location);
     const auto firstElement = hashMap->initialElements.front();
@@ -597,10 +603,22 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     } else {
         iterIndex->setType(iterable->baseType);
     }
-    if (!iterIndex->baseExpr->type->canSlice) {
+    if (exprTo && !iterIndex->baseExpr->type->canSlice) {
         errHandler.handleError(E10042, &iterIndex->location, {iterIndex->prettyName(), baseExpr->type->prettyName()});
     }
 }
+
+// define i32 @main() #0 {
+//   %1 = alloca %struct.HashMap, align 8
+//   %2 = alloca i32, align 4
+//   %3 = alloca %struct.Iterator, align 8
+//   call void @Map_init(ptr noundef %1, i64 noundef 4)
+//   store i32 4, ptr %2, align 4
+//   call void @Map_add(ptr noundef %1, ptr noundef @.str, ptr noundef %2)
+//   call void @Iterator_Map_init(ptr noundef %3, ptr noundef %1)
+//   ret i32 0
+// }
+//
 
 void SemaAnalyser::visitGroup(LgsGroup* group) const {
     for (const auto targetSymbol : group->targetSymbols) {
