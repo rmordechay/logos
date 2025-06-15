@@ -1,5 +1,6 @@
 #include "LgsSymbolTable.h"
 #include "data/LgsErrors.h"
+#include "exprs/unary/LgsEnumField.h"
 #include "funcs/LgsParam.h"
 #include "logos/LgsErrHandler.h"
 #include "stmts/LgsField.h"
@@ -11,8 +12,7 @@
 
 void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
     if (symbols.find(name) != symbols.end()) {
-        errHandler->handleError(E10011, symbol.location, {name, symbol.location->lineNumberStr()});
-        return;
+        return errHandler->handleError(E10011, symbol.location, {name, symbol.location->lineNumberStr()});
     }
     std::lock_guard lock(mtx);
     symbols[name] = symbol;
@@ -40,7 +40,7 @@ void LgsSymbolTable::addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler) {
     lock_guard lock(mtx);
     symbols[lgsEnum->name] = LgsSymbol(lgsEnum);
     for (const auto& [name, field] : lgsEnum->fields) {
-        symbols[name] = LgsSymbol(dynamic_cast<LgsEnumField*>(field));
+        symbols[name] = LgsSymbol(field->expr->asEnumField());
     }
 }
 
@@ -60,4 +60,3 @@ LgsSymbolTable::~LgsSymbolTable() {
         }
     }
 }
-

@@ -90,6 +90,8 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/constants/LgsUIntConst.cpp
     src/symbols/types/LgsIterator.cpp
     include/symbols/types/LgsIterator.h
+    src/symbols/exprs/unary/LgsEnumField.cpp
+    include/symbols/exprs/unary/LgsEnumField.h
 )
 
 add_library(lib ${SOURCE_FILES})

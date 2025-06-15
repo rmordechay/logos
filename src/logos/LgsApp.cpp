@@ -179,6 +179,27 @@ void LgsApp::parseAppFile(path fileEntry) {
     }
 }
 
+bool LgsApp::generateObjFile(Module* module) const {
+    error_code ec;
+    legacy::PassManager pass;
+    raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
+    const auto addedPassFailed = getTargetMachine()->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
+    if (addedPassFailed) {
+        cerr << ec.message() << endl;
+        return false;
+    }
+
+    if (verifyModule(*module, &errs())) {
+        errs().flush();
+        return false;
+    }
+
+    pass.run(*module);
+    outputStream.flush();
+    outputStream.close();
+    return true;
+}
+
 bool LgsApp::resolveGlobalTypes() const {
     for (const auto& file : files) {
         SemaAnalyser semaAnalyser(file);
@@ -203,27 +224,6 @@ bool LgsApp::resolveGlobalTypes() const {
         }
         if (!semaAnalyser.errHandler.successful) return false;
     }
-    return true;
-}
-
-bool LgsApp::generateObjFile(Module* module) const {
-    error_code ec;
-    legacy::PassManager pass;
-    raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
-    const auto addedPassFailed = getTargetMachine()->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
-    if (addedPassFailed) {
-        cerr << ec.message() << endl;
-        return false;
-    }
-
-    if (verifyModule(*module, &errs())) {
-        errs().flush();
-        return false;
-    }
-
-    pass.run(*module);
-    outputStream.flush();
-    outputStream.close();
     return true;
 }
 

@@ -1,5 +1,8 @@
 #pragma once
 #include "LgsType.h"
+#include "data/LgsDefinitions.h"
+#include "exprs/unary/LgsEnumField.h"
+#include "stmts/LgsField.h"
 
 class LgsEnumField;
 
@@ -7,8 +10,9 @@ class LgsEnum final : public LgsType {
 public:
     string name;
 
-    LgsEnum() = default;
-    explicit LgsEnum(const string& name) : name(name) {}
+    explicit LgsEnum(const string& enumName) : name(enumName) {
+        fields[LOGOS_DEFAULT_ENUM] = new LgsField(LOGOS_DEFAULT_ENUM, &name, this, new LgsDefaultEnumField(this));
+    }
     Type* getIRType() override;
     string getIRName() override;
     string pName() const override;

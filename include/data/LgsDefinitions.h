@@ -11,9 +11,7 @@
 #define LOGOS_OBJECT_FILE "main.o"
 #define LOGOS_EXECUTABLE_FILE "output"
 #define LOGOS_STR_FORMAT_PART "%v"
-#define LOGOS_LOOP_CONDITION "loop_condition"
-#define LOGOS_LOOP_BODY "loop_body"
-#define LOGOS_LOOP_EXIT "loop_exit"
+#define LOGOS_DEFAULT_ENUM "DEFAULT"
 #define CLANG_BINARY "clang"
 #define ERROR_STR "\033[1;31mError:\033[0m "
 

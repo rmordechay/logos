@@ -13,6 +13,7 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/LgsBinaryExpr.h"
+#include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsEnum.h"
@@ -838,8 +839,8 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     LgsType* newType = nullptr;
     switch (symbol->symbolType) {
     case ENUM_FIELD:
-        symbol->enumField->parent->isNullable = true;
-        newType = symbol->enumField->parent;
+        symbol->enumField->type->isNullable = true;
+        newType = symbol->enumField->type;
         break;
     case FUNC:
         newType = symbol->func->funcType;

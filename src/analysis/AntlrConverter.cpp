@@ -8,6 +8,7 @@
 #include "exprs/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsBinaryExpr.h"
+#include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsCharConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
@@ -99,7 +100,6 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
         auto lgsEnum = getEnum(enumDeclaration);
         mainFile->enums.emplace_back(lgsEnum);
         mainFile->symbolTable.addEnum(lgsEnum);
-        mainFile->symbolTable.addSymbol(lgsEnum->name, LgsSymbol(lgsEnum), &errHandler);
     }
 
     for (const auto object : ctx->object()) {
@@ -537,9 +537,8 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
             cleanStr(enumText);
         }
         const auto field = new LgsEnumField(lgsEnum, enumName, enumText);
-        field->type = lgsEnum;
         field->setLocation(ctx->start, &filePath);
-        lgsEnum->fields[enumName] = field;
+        lgsEnum->fields[enumName] = new LgsField(field->name, &lgsEnum->name, lgsEnum, field);
     }
     return lgsEnum;
 }

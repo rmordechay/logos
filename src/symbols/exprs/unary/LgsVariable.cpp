@@ -1,4 +1,6 @@
 #include "exprs/unary/LgsVariable.h"
+
+#include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
