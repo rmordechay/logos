@@ -4,6 +4,7 @@
 #include "cli/LgsGenerateCmd.h"
 #include "cli/LgsRunCmd.h"
 #include "data/LgsDefinitions.h"
+#include "data/PlatformData.h"
 
 
 #include <sstream>

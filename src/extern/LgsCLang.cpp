@@ -8,6 +8,8 @@
 
 using namespace clang;
 
+#define CLANG_BINARY "clang"
+
 void LgsCLang::parseFile(const LgsStrConst* filePaths) {
     const auto pathStr = filePaths->value;
     auto headerPath = paths.clibInclude / pathStr;

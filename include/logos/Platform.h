@@ -1,5 +1,5 @@
 #pragma once
-#include "data/LgsDefinitions.h"
+#include "data/PlatformData.h"
 
 struct Platform {
     string osName = OS_NAME;

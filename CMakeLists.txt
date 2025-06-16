@@ -92,6 +92,7 @@ set(SOURCE_FILES
     include/symbols/types/LgsIterator.h
     src/symbols/exprs/unary/LgsEnumField.cpp
     include/symbols/exprs/unary/LgsEnumField.h
+    include/data/PlatformData.h
 )
 
 add_library(lib ${SOURCE_FILES})

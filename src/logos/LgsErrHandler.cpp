@@ -20,7 +20,7 @@ void LgsErrHandler::handleError(const LgsError& lgsErr, const Location* location
     }
     errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.errCode});
     lock_guard lock(mtx);
-    lgsLog(ERROR_STR + result);
+    lgsLog(LOGOS_ERROR_STR + result);
     if (location->filePath) {
         lgsLog("\t   at " + location->getFullPath(*location->filePath) + "\n---");
     }
