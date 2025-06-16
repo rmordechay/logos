@@ -29,6 +29,10 @@ LgsType* LgsArray::getIndexType() {
     return &LGS_INT;
 }
 
+LgsType* LgsArray::getValueType() {
+    return baseType;
+}
+
 string LgsArray::getStrFormatPart() const {
     return "%p";
 }

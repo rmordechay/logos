@@ -596,10 +596,9 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     if (exprTo) {
         visitSlice(iterIndex);
         iterIndex->setType(iterable);
-    } else if (const auto map = iterable->asMap()) {
-        iterIndex->setType(map->typePair->value);
     } else {
-        iterIndex->setType(iterable->baseType);
+        validateIndexBounds(iterIndex);
+        iterIndex->setType(iterable->getValueType());
     }
 }
 
@@ -614,13 +613,7 @@ void SemaAnalyser::visitSlice(LgsIterIndex* iterIndex) {
     if (!iterable->getIndexType()->equals(exprFrom->type)) {
         return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->pName(), exprFrom->type->pName()});
     }
-    if (exprFrom->type->isStatic && exprTo->type->isStatic) {
-        if (exprFrom->getConstInt() > exprTo->getConstInt()) {
-            return errHandler.handleError(E10037, &iterIndex->location, {iterIndex->pName()});
-        }
-    } else {
-        assert(0);
-    }
+    validateSliceBounds(iterIndex);
 }
 
 void SemaAnalyser::visitGroup(LgsGroup* group) const {
@@ -712,6 +705,37 @@ bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterEx
         foreachLoop->loopVars[0 + withIndex]->type = iterable->baseType;
     }
     return false;
+}
+
+void SemaAnalyser::validateIndexBounds(LgsIterIndex* iterIndex) {
+    const auto baseExpr = iterIndex->baseExpr;
+    const auto exprFrom = iterIndex->index->from;
+    const auto iterable = baseExpr->type->asIterable();
+    if (baseExpr->type->isStatic) {
+        const auto i = exprFrom->getConstInt();
+        const auto bound = iterable->iterLen;
+        if (i >= bound) {
+            return errHandler.handleError(E10003, &iterIndex->location, {iterIndex->pName(), to_string(bound)});
+        }
+    }
+}
+
+void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
+    const auto baseExpr = iterIndex->baseExpr;
+    const auto exprFrom = iterIndex->index->from;
+    const auto exprTo = iterIndex->index->to;
+    const auto iterable = baseExpr->type->asIterable();
+    if (baseExpr->type->isStatic) {
+        if (exprFrom->getConstInt() > exprTo->getConstInt()) {
+            return errHandler.handleError(E10037, &iterIndex->location, {iterIndex->pName()});
+        }
+        const auto i = exprFrom->getConstInt();
+        const auto j = exprTo->getConstInt();
+        const auto bound = iterable->iterLen;
+        if (i >= bound || j >= bound) {
+            return errHandler.handleError(E10003, &iterIndex->location, {iterIndex->pName(), to_string(bound)});
+        }
+    }
 }
 
 void SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall) {

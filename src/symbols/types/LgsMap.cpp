@@ -15,6 +15,10 @@ LgsType* LgsMap::getIndexType() {
     return typePair->key;
 }
 
+LgsType* LgsMap::getValueType() {
+    return typePair->key;
+}
+
 Value* LgsMap::getLength(LgsRuntime* runtime, LgsExpr* expr) {
     return lenFunc.call(runtime, {expr});
 }

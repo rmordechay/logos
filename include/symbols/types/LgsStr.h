@@ -27,6 +27,7 @@ public:
     LgsExpr* getZeroValue() override;
     string getStrFormatPart() const override;
     LgsType* getIndexType() override;
+    LgsType* getValueType() override;
     LgsType* inferBinaryType(LgsType* other) override;
     Value* getLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) override;

@@ -43,6 +43,7 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
+    LgsType* getValueType() override;
     string getStrFormatPart() const override;
     LgsType* inferBinaryType(LgsType* other) override;
     Value* getLength(LgsRuntime* runtime, LgsExpr* expr) override;

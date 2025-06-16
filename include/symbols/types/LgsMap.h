@@ -37,6 +37,7 @@ public:
     string pName() const override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
+    LgsType* getValueType() override;
     LgsType* inferBinaryType(LgsType* other) override;
     Value* getLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) override;

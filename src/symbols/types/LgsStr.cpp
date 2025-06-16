@@ -40,6 +40,10 @@ LgsType* LgsStr::getIndexType() {
     return &LGS_INT;
 }
 
+LgsType* LgsStr::getValueType() {
+    return baseType;
+}
+
 Value* LgsStr::getLength(LgsRuntime* runtime, LgsExpr* expr) {
     return lenFunc.call(runtime, {expr});
 }

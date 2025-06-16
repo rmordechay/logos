@@ -11,7 +11,7 @@ inline size_t errCodeStart = 10000;
 inline LgsError E10000{.msg = "main() function is not defined in Main.lgs file.", .errCode = errCodeStart++};
 inline LgsError E10001{.msg = "Left type '%s' does not match the right type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10002{.msg = "'%s' must be an iterable.", .errCode = errCodeStart++};
-inline LgsError E10003{.msg = "Array index '%s' is out of bounds.", .errCode = errCodeStart++};
+inline LgsError E10003{.msg = "Index '%s' is out of bounds. Max expected size: %s.", .errCode = errCodeStart++};
 inline LgsError E10004{.msg = "Function '%s' must return expression of type '%s'. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10005{.msg = "Field '%s' is not a member of '%s'.", .errCode = errCodeStart++};
 inline LgsError E10006{.msg = "'%s' is not defined.", .errCode = errCodeStart++};
