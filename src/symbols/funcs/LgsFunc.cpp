@@ -54,9 +54,9 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     for (int i = funcType->isStaticMethod; i < args.size(); ++i) {
         const auto arg = args[i];
         const auto argType = arg->type->getIRType();
-        const auto argValue = arg->getIRValue(runtime);
+        auto argValue = arg->getIRValue(runtime);
         if (shouldLoadIRArg(argValue)) {
-            return runtime->builder.CreateLoad(argType, argValue);
+            argValue = runtime->builder.CreateLoad(argType, argValue);
         }
         IRArgs.push_back(argValue);
     }
@@ -85,30 +85,6 @@ void LgsFunc::setBigObjAttrs(Function& IRFunc) const {
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::StructRet, paramIRType));
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::Writable));
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
-}
-
-bool LgsFunc::shouldLoadIRArg(Value* value) {
-    if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
-    if (const auto alloca = dyn_cast<AllocaInst>(value)) {
-        const auto allocatedType = alloca->getAllocatedType();
-        return !allocatedType->isStructTy() && !allocatedType->isArrayTy();
-    }
-    if (value->getType()->isIntegerTy() || value->getType()->isFloatingPointTy()) {
-        return false;
-    }
-    if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
-        const auto source = gep->getSourceElementType();
-        const auto results = gep->getResultElementType();
-        const auto isArrayTy = source->isArrayTy();
-        const auto isByteTy = results && results->isIntegerTy(8);
-        return !isArrayTy || !isByteTy;
-    }
-    if (isa<ConstantExpr>(value)) {
-        const auto constExpr = cast<ConstantExpr>(value);
-        return constExpr->getOpcode() == Instruction::GetElementPtr;
-    }
-    if (isa<Function>(value)) return false;
-    return true;
 }
 
 LgsParam LgsFunc::getReturnSwapParam() const {

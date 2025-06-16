@@ -33,6 +33,30 @@ void LgsValue::setIRValue(Value* value) {
     IRValue = value;
 }
 
+bool LgsValue::shouldLoadIRArg(Value* value) const {
+    if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
+    if (const auto alloca = dyn_cast<AllocaInst>(value)) {
+        const auto allocatedType = alloca->getAllocatedType();
+        return !allocatedType->isStructTy() && !allocatedType->isArrayTy();
+    }
+    if (value->getType()->isIntegerTy() || value->getType()->isFloatingPointTy()) {
+        return false;
+    }
+    if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
+        const auto source = gep->getSourceElementType();
+        const auto results = gep->getResultElementType();
+        const auto isArrayTy = source->isArrayTy();
+        const auto isByteTy = results && results->isIntegerTy(8);
+        return !isArrayTy || !isByteTy;
+    }
+    if (isa<ConstantExpr>(value)) {
+        const auto constExpr = cast<ConstantExpr>(value);
+        return constExpr->getOpcode() == Instruction::GetElementPtr;
+    }
+    if (isa<Function>(value)) return false;
+    return true;
+}
+
 string LgsValue::format(string& indentStr) {
     assert(0);
 }

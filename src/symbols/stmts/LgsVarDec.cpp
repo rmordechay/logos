@@ -3,7 +3,10 @@
 
 void LgsVarDec::createIRStmt(LgsRuntime* runtime) {
     const auto IRType = type->getIRType();
-    const auto exprIRValue = expr->getIRValue(runtime);
+    auto exprIRValue = expr->getIRValue(runtime);
+    if (shouldLoadIRArg(exprIRValue)) {
+        exprIRValue = runtime->builder.CreateLoad(IRType, exprIRValue);
+    }
     if (shouldAllocate(IRType)) {
         IRValue = runtime->builder.CreateAlloca(IRType);
         runtime->builder.CreateStore(exprIRValue, IRValue);

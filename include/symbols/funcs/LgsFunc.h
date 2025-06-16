@@ -37,6 +37,5 @@ public:
     virtual Function* getIRFunc(LgsRuntime* runtime);
     virtual Value* callIR(LgsRuntime* runtime, const vector<Value*>& args = {});
     virtual Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args = {});
-    static bool shouldLoadIRArg(Value* value);
     ~LgsFunc() override;
 };

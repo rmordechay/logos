@@ -1,5 +1,4 @@
 #include "exprs/unary/LgsArrayExpr.h"
-
 #include "cli/LgsCli.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "logos/LgsConfig.h"
@@ -46,14 +45,14 @@ Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
         const auto rValue = element->getIRValue(runtime);
         values.push_back(dyn_cast<Constant>(rValue));
     }
-    const auto arrSize = arr->iterLen;
+    const auto arrSize = initialElements.size();
     const auto baseIRType = arr->baseType->getIRType();
-    const auto arrIRType = ArrayType::get(baseIRType, initialElements.size());
+    const auto arrIRType = ArrayType::get(baseIRType, arrSize);
     const auto valueIR = ConstantArray::get(arrIRType, values);
     const auto globalVarIR = new GlobalVariable(*runtime->module, arrIRType, true, GlobalValue::PrivateLinkage, valueIR);
-    const auto arrIRPtr = builder.CreateAlloca(arrIRType);
+    const auto arrIRPtr = builder.CreateAlloca(ArrayType::get(baseIRType, arr->iterLen));
     const auto n = dataLayout.getTypeAllocSize(baseIRType).getFixedValue() * arrSize;
-    builder.CreateCall(getMemcpy(runtime), {arrIRPtr, globalVarIR, builder.getInt64(n), builder.getTrue()});
+    builder.CreateCall(getMemcpy(runtime), {arrIRPtr, globalVarIR, builder.getInt64(n), builder.getFalse()});
     return arrIRPtr;
 }
 
