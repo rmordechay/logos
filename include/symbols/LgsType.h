@@ -40,9 +40,8 @@ public:
     map<string, LgsFunc*> methods;
 
     LgsField* getField(const string& name);
-    LgsFunc* getMethod(const string& name);
+    LgsFunc* getMethod(const string& name) const;
     void addMethod(LgsFunc* method);
-    LgsFunc* findMethod(const string& name) const;
     void setLocation(const Token* ctx, path* filePath);
 
     LgsBool* asBool();

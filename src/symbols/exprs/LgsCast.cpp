@@ -1,4 +1,6 @@
 #include "exprs/LgsCast.h"
+
+#include "LgsType.h"
 #include "utils/LgsUtils.h"
 
 Value* LgsCast::createIRValue(LgsRuntime* runtime) {
@@ -7,6 +9,10 @@ Value* LgsCast::createIRValue(LgsRuntime* runtime) {
 
 Value* LgsCast::addIR(LgsRuntime* runtime, LgsExpr* other) {
     return toValue->addIR(runtime, other);
+}
+
+std::string LgsCast::pName() {
+    return fromValue->pName() + "->" + toType->pName();
 }
 
 LgsCast::~LgsCast() {

@@ -1,10 +1,8 @@
 #include "loops/LgsInfiniteLoop.h"
-#include "data/LgsDefinitions.h"
-#include "logos/Platform.h"
 #include "stmts/LgsVarDec.h"
 
 Value* LgsInfiniteLoop::loopStart(LgsRuntime* runtime) {
-    const auto type = runtime->builder.getIntPtrTy(platform.dataLayout);
+    const auto type = runtime->builder.getIntPtrTy(dataLayout);
     return ConstantInt::get(type, 0);
 }
 

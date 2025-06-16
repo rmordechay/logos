@@ -16,6 +16,7 @@
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsIterator.h"
 
 Value* LgsExpr::getIRValue(LgsRuntime* runtime) {
     if (IRValue) return IRValue;
@@ -68,10 +69,9 @@ string LgsExpr::getConstStr() {
 
 void LgsExpr::free(LgsRuntime* runtime) { assert(0); }
 bool LgsExpr::equals(LgsExpr* other) { assert(0); }
-LgsExpr* LgsExpr::clone() { assert(0); }
-string LgsExpr::pName() { assert(0); }
 LgsExpr* LgsExpr::convertExpr(LgsType* toType) { assert(0); }
 uint32_t LgsExpr::hashValue(LgsRuntime* runtime) { assert(0); }
+LgsExpr* LgsExpr::clone() { assert(0); }
 
 // Comparisons
 Value* LgsExpr::subIR(LgsRuntime* runtime, LgsExpr* other) { assert(0); }

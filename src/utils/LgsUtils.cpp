@@ -70,6 +70,12 @@ FunctionCallee getSnprintf(LgsRuntime* runtime) {
     return runtime->module->getOrInsertFunction("snprintf", printfType);
 }
 
+Function* getMemcpy(LgsRuntime* runtime) {
+    const auto int64Ty = runtime->builder.getInt64Ty();
+    const auto ptrTy = runtime->builder.getPtrTy();
+    return getOrInsertDeclaration(runtime->module, Intrinsic::memcpy, {ptrTy, ptrTy, int64Ty});
+}
+
 TargetMachine* getTargetMachine() {
     if (targetMachine) return targetMachine;
     const auto targetTriple = sys::getDefaultTargetTriple();

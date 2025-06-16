@@ -8,7 +8,6 @@ struct Platform {
     string platformVersion = PLATFORM_VERSION;
     vector<const char*> linkerOpts = LINKER_OPTS;
     bool (*link)(ArrayRef<const char*>, raw_ostream&, raw_ostream&, bool, bool) = LINK_FUNC;
-    DataLayout dataLayout;
 };
 
 struct LgsPaths {

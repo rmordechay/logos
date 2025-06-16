@@ -5,14 +5,12 @@
 
 class LgsArrayExpr final : public LgsUnaryExpr {
 public:
-    LgsArray* arrType = nullptr;
     vector<LgsExpr*> initialElements;
 
     explicit LgsArrayExpr(LgsType* baseType = nullptr) {
-        arrType = new LgsArray(baseType);
-        type = arrType;
+        type = new LgsArray(baseType);
     }
-    explicit LgsArrayExpr(LgsArray* arrType) : LgsUnaryExpr(arrType), arrType(arrType) {}
+    explicit LgsArrayExpr(LgsArray* arrType) : LgsUnaryExpr(arrType) {}
     string pName() override;
     Value* createIRValue(LgsRuntime* runtime) override;
     Value* createConstArray(LgsRuntime* runtime) const;

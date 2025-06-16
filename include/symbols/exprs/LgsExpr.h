@@ -55,12 +55,12 @@ public:
     LgsEnumField* asEnumField();
     LgsTypeConst* asTypeConst();
 
-    virtual void free(LgsRuntime* runtime);
-    virtual bool equals(LgsExpr* other);
     virtual LgsExpr* clone();
-    virtual std::string pName();
+    virtual bool equals(LgsExpr* other);
     virtual LgsExpr* convertExpr(LgsType* toType);
+    virtual void free(LgsRuntime* runtime);
     virtual uint32_t hashValue(LgsRuntime* runtime);
+    virtual std::string pName() = 0;
     virtual Value* createIRValue(LgsRuntime* runtime) = 0;
 
     virtual Value* addIR(LgsRuntime* runtime, LgsExpr* other) = 0;

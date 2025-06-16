@@ -2,7 +2,6 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "types/primitives/LgsLong.h"
 
-
 class LgsLongConst final : public LgsUnaryExpr {
 public:
     long value;

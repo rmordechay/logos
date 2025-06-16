@@ -2,17 +2,19 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "logos/LgsConfig.h"
 
+
 string LgsArrayExpr::pName() {
     return type->pName();
 }
 
 Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {
-    if (arrType->isStatic) return createConstArray(runtime);
+    if (type->asArray()->isStatic) return createConstArray(runtime);
     return createDynamicArray(runtime);
 }
 
 Value* LgsArrayExpr::createDynamicArray(LgsRuntime* runtime) {
     auto& builder = runtime->builder;
+    const auto arrType = type->asArray();
     const auto elementSize = builder.getInt64(arrType->baseType->getSizeBytes());
     IRValue = builder.CreateAlloca(arrType->getArrStruct(runtime));
 
@@ -36,19 +38,16 @@ Value* LgsArrayExpr::createDynamicArray(LgsRuntime* runtime) {
 Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
     const auto IRType = type->getIRType();
     const auto arrPtr = runtime->builder.CreateAlloca(IRType);
-    for (int i = 0; i < initialElements.size(); ++i) {
-        const auto initialElement = initialElements[i];
-        auto IRIndex = runtime->builder.getInt64(i);
-        const auto gep = runtime->builder.CreateGEP(IRType, arrPtr, {runtime->builder.getInt64(0), IRIndex});
-        const auto rValue = initialElement->getIRValue(runtime);
-        runtime->builder.CreateStore(rValue, gep);
+    vector<Value*> values;
+    for (const auto element : initialElements) {
+        const auto rValue = element->getIRValue(runtime);
+        values.push_back(rValue);
     }
     return arrPtr;
 }
 
-
 void LgsArrayExpr::free(LgsRuntime* runtime) {
-    if (!arrType->isStatic) {
-        arrType->freeFunc.call(runtime, {this});
+    if (!type->asArray()->isStatic) {
+        type->asArray()->freeFunc.call(runtime, {this});
     }
 }

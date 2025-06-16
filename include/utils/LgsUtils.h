@@ -16,4 +16,5 @@ StructType* getIRStructType(const std::string& name, const std::vector<Type*>& f
 Module* createIRModule(const std::string& moduleName, LLVMContext& context);
 FunctionCallee getPrintf(LgsRuntime* runtime);
 FunctionCallee getSnprintf(LgsRuntime* runtime);
+Function* getMemcpy(LgsRuntime* runtime);
 TargetMachine* getTargetMachine();

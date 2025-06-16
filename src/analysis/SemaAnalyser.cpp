@@ -88,7 +88,7 @@ void SemaAnalyser::visitObjectImplements(LgsObject* obj) {
 
         vector<LgsFunc*> missingFuncs;
         for (const auto& [name, interfaceFunc] : interface->methods) {
-            const auto objMethod = obj->findMethod(name);
+            const auto objMethod = obj->getMethod(name);
             if (objMethod && objMethod->funcType->equals(interfaceFunc->funcType)) {
                 objMethod->implementsFunc = interfaceFunc;
                 continue;
@@ -359,7 +359,7 @@ void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
     for (const auto element : array->initialElements) {
         visitExpr(element);
     }
-    if (array->arrType->isStatic) {
+    if (array->type->asArray()->isStatic) {
         visitStaticArray(array);
     } else {
         visitDynamicArray(array);
@@ -368,7 +368,7 @@ void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
 
 void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
     const auto& initialElements = array->initialElements;
-    const auto arr = array->arrType;
+    const auto arr = array->type->asArray();
     const auto& arrType = arr;
     if (initialElements.empty()) {
         if (!arrType->baseType) return errHandler.handleError(E10049, &array->location);
@@ -382,7 +382,7 @@ void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
 
 void SemaAnalyser::visitStaticArray(const LgsArrayExpr* array) {
     const auto& initialElements = array->initialElements;
-    const auto arr = array->arrType;
+    const auto arr = array->type->asArray();
     if (initialElements.empty() && !arr->baseType) {
         return errHandler.handleError(E10049, &array->location);
     }
@@ -392,7 +392,7 @@ void SemaAnalyser::visitStaticArray(const LgsArrayExpr* array) {
 }
 
 void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) {
-    const auto typePair = hashMap->mapType->typePair;
+    const auto typePair = hashMap->type->asMap()->typePair;
     if (typePair->key && typePair->value) return;
     if (hashMap->initialElements.empty()) return errHandler.handleError(E10049, &hashMap->location);
     const auto firstElement = hashMap->initialElements.front();
@@ -742,10 +742,9 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
         return errHandler.handleError(E10001, &expr->location, {type->pName(), expr->type->pName()});
     }
 
-    if (expr->type != type) {
-        freeType(expr->type);
-        expr->type = type;
-    }
+    if (expr->type == type) return;
+    freeType(expr->type);
+    expr->type = type;
 }
 
 void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
@@ -821,7 +820,7 @@ void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
 
 bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {
     auto name = methodCall->name;
-    const auto method = parentType->findMethod(name);
+    const auto method = parentType->getMethod(name);
     if (!method) {
         errHandler.handleError(E10013, &methodCall->location, {name, parentType->pName()});
         return true;

@@ -593,6 +593,7 @@ LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     const auto l = getExpr(ctx->left);
     const auto r = getExpr(ctx->right);
     const auto logosBinaryExpr = new LgsBinaryExpr(l->type, l, r, mapOperator(ctx));
+    logosBinaryExpr->opStr = ctx->getText();
     logosBinaryExpr->setLocation(ctx->start, &filePath);
     return logosBinaryExpr;
 }
@@ -623,9 +624,9 @@ LgsPostfixExpr* AntlerConverter::getPostfixExpr(LogosParser::PostfixExprContext*
 
 LgsUnaryExpr* AntlerConverter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {
     const auto array = new LgsArrayExpr();
-    array->arrType->isStatic = !!ctx->EXCLA_MARK();
-    array->arrType->iterLen = ctx->expr().size();
-    array->arrType->sizeExpr = new LgsIntConst(array->arrType->iterLen);
+    array->type->asArray()->isStatic = !!ctx->EXCLA_MARK();
+    array->type->asArray()->iterLen = ctx->expr().size();
+    array->type->asArray()->sizeExpr = new LgsIntConst(array->type->asArray()->iterLen);
     for (const auto expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }

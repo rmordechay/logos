@@ -3,12 +3,12 @@
 #include "LgsSymbolTable.h"
 
 class LgsFile;
-using namespace llvm;
 class LgsErrHandler;
 class LgsForLoop;
 class LgsFuncType;
 
 inline LLVMContext context;
+inline DataLayout dataLayout;
 
 class LgsRuntime {
 public:

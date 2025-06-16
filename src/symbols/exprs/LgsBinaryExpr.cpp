@@ -1,6 +1,10 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 
+string LgsBinaryExpr::pName() {
+    return left->pName() + ' ' + opStr + ' ' + right->pName();
+}
+
 Value* LgsBinaryExpr::createIRValue(LgsRuntime* runtime) {
     switch (op) {
     case ADD:

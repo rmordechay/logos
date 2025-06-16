@@ -126,7 +126,7 @@ void LgsAssignment::storeScalarInIterIndex(LgsRuntime* runtime, LgsIterIndex* it
 }
 
 void LgsAssignment::storeArrayInIterIndex(LgsRuntime* runtime, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) const {
-    if (!arr->arrType->isStatic) {
+    if (!arr->type->asArray()->isStatic) {
         return;
     }
     const auto baseExpr = iterIndex->baseExpr;

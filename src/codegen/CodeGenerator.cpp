@@ -1,5 +1,6 @@
 #include "codegen/CodeGenerator.h"
 #include "logos/LgsConfig.h"
+#include "logos/LgsRuntime.h"
 #include "logos/Logos.h"
 #include "logos/Platform.h"
 #include "utils/LgsUtils.h"
@@ -15,7 +16,7 @@ void CodeGenerator::init(const LgsPaths& paths) {
     InitializeAllTargetMCs();
     InitializeAllTargets();
     InitializeAllTargetInfos();
-    platform.dataLayout = getTargetMachine()->createDataLayout();
+    dataLayout = getTargetMachine()->createDataLayout();
 }
 
 void CodeGenerator::writeIRToFile(map<string, Module*>& IRModules, LgsPaths& paths) {

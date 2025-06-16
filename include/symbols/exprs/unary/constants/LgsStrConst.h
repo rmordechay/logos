@@ -5,15 +5,15 @@
 class LgsStrConst final : public LgsUnaryExpr {
 public:
     string value;
-    LgsStr* strType = new LgsStr();
     vector<LgsExpr*> templateParts;
 
     explicit LgsStrConst(const string& value) : value(value) {
-        type = strType;
-        type->isStatic = true;
-        strType->isStatic = true;
-        strType->sizeExpr = new LgsIntConst(value.size());
-        strType->iterLen = value.size();
+        const auto lgsStr = new LgsStr();
+        lgsStr->isStatic = true;
+        lgsStr->sizeExpr = new LgsIntConst(value.size());
+        lgsStr->iterLen = value.size();
+        lgsStr->isStatic = true;
+        type = lgsStr;
     }
 
     Value* createIRValue(LgsRuntime* runtime) override;

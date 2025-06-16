@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsAny.h"
-#include "LgsIterator.h"
 #include "LgsStr.h"
 #include "funcs/LgsBuiltinFunc.h"
 #include "primitives/LgsInt.h"

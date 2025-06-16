@@ -7,7 +7,7 @@ public:
     explicit LgsTypeConst(LgsType* type) : LgsUnaryExpr(type) {
         type->isStatic = true;
     }
-    inline string getExprName() override;
+    string getExprName() override;
     Value* createIRValue(LgsRuntime* runtime) override;
     ~LgsTypeConst() override = default;
 };

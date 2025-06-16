@@ -30,7 +30,6 @@ public:
         const auto printfFunc = getPrintf(runtime);
         return runtime->builder.CreateCall(printfFunc, IRArgs);;
     }
-
     ~LgsPrint() override = default;
 };
 
