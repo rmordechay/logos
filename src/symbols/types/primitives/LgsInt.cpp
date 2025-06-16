@@ -28,6 +28,7 @@ LgsExpr* LgsInt::getZeroValue() {
 bool LgsInt::equals(LgsType* other) {
     const auto IRName = other->getIRName();
     if (IRName == LgsAny::name) return true;
+    if (IRName == LgsUInt::name) return true;
     if (IRName == LgsSize::name) return true;
     return name == IRName;
 }

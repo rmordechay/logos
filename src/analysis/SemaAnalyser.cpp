@@ -601,14 +601,11 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     if (!iterable && baseExpr->type) {
         return errHandler.handleError(E10002, &iterIndex->location, {iterIndex->baseExpr->pName()});
     }
-    if (!iterable->getIndexType()->equals(exprFrom->type)) {
-        return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->pName(), exprFrom->type->prettyName()});
-    }
     if (exprTo) {
         visitSlice(iterIndex);
         iterIndex->setType(iterable);
     } else {
-        validateIndexBounds(iterIndex);
+        validateIndex(iterIndex);
         iterIndex->setType(iterable->getValueType());
     }
 }
@@ -622,6 +619,9 @@ void SemaAnalyser::visitSlice(LgsIterIndex* iterIndex) {
         return errHandler.handleError(E10042, &iterIndex->location, {iterIndex->pName(), baseExpr->type->prettyName()});
     }
     if (!iterable->getIndexType()->equals(exprFrom->type)) {
+        return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->pName(), exprFrom->type->prettyName()});
+    }
+    if (!iterable->getIndexType()->equals(exprTo->type)) {
         return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->pName(), exprFrom->type->prettyName()});
     }
     validateSliceBounds(iterIndex);
@@ -724,10 +724,13 @@ bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterEx
     return false;
 }
 
-void SemaAnalyser::validateIndexBounds(LgsIterIndex* iterIndex) {
+void SemaAnalyser::validateIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto exprFrom = iterIndex->index->from;
     const auto iterable = baseExpr->type->asIterable();
+    if (!iterable->getIndexType()->equals(exprFrom->type)) {
+        return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->pName(), exprFrom->type->prettyName()});
+    }
     if (baseExpr->type->isStatic) {
         const auto i = exprFrom->getConstInt();
         const auto bound = iterable->iterLen;
@@ -767,19 +770,11 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
     assert(expr);
     if (expr->isNull) {
         // null must have a type
-        if (!type) {
-            errHandler.handleError(E10024, &expr->location);
-            return;
-        }
+        if (!type) return errHandler.handleError(E10024, &expr->location);
         // type must be nullable
-        if (!type->isNullable) {
-            errHandler.handleError(E10023, &type->location, {type->prettyName(), type->prettyName()});
-        }
-        return;
+        if (!type->isNullable) return errHandler.handleError(E10023, &type->location, {type->prettyName(), type->prettyName()});
     }
-
     if (!type || !expr->type) return;
-
     if (!expr->type->equals(type)) {
         return errHandler.handleError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
     }

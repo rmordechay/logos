@@ -96,7 +96,7 @@ public:
     void setZeroField(LgsField* field) const;
     bool setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
     void validateExprType(LgsExpr* expr, LgsType* type);
-    void validateIndexBounds(LgsIterIndex* iterIndex);
+    void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
     void validateFuncControlFlow(const LgsFunc* func);
     void validateMethodVisibility(const LgsFuncCall* methodCall);
