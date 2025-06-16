@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsValue.h"
 
+class LgsPrefixExpr;
 class LgsIterator;
 class LgsPostfixExpr;
 class LgsRuntime;
@@ -41,6 +42,7 @@ public:
     LgsFunc* asFunc();
     LgsVariable* asVariable();
     LgsFuncCall* asFuncCall();
+    LgsPrefixExpr* asPrefixExpr();
     LgsPostfixExpr* asPostfixExpr();
     LgsIterIndex* asIterIndex();
     LgsInstance* asInstance();

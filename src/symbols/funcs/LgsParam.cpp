@@ -16,7 +16,7 @@ Value* LgsParam::getIRValue(LgsRuntime* runtime) {
         runtime->builder.CreateCall(vaStart, {vaList});
         return vaList;
     }
-    return IRValue;
+    assert(0);
 }
 
 string LgsParam::getIRName() {

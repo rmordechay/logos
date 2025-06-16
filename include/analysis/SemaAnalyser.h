@@ -4,6 +4,7 @@
 #include "logos/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
 
+class LgsPrefixExpr;
 class LgsArray;
 class LgsGroup;
 class LgsValue;
@@ -76,6 +77,7 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr) override;
     void visitVariable(LgsVariable* variable) override;
     void visitFuncCall(LgsFuncCall* funcCall) override;
+    void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType) override;
     void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) override;

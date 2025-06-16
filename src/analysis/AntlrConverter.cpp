@@ -29,6 +29,7 @@
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsPostfixExpr.h"
+#include "exprs/unary/LgsPrefixExpr.h"
 #include "exprs/unary/constants/LgsLongConst.h"
 #include "extern/LgsCLang.h"
 #include "files/LgsMainFile.h"
@@ -580,6 +581,7 @@ LgsExpr* AntlerConverter::getCast(LogosParser::ExprContext* ctx) {
 LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto variable = ctx->IDENTIFIER()) return getVariable(variable);
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
+    if (const auto prefixExpr = ctx->prefixExpr()) return getPrefixExpr(prefixExpr);
     if (const auto postfixExpr = ctx->postfixExpr()) return getPostfixExpr(postfixExpr);
     if (const auto vector = ctx->vector()) return getVector(vector);
     if (const auto constructor = ctx->constructor()) return getInstance(constructor);
@@ -602,6 +604,32 @@ LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     return logosBinaryExpr;
 }
 
+LgsUnaryExpr* AntlerConverter::getPrefixExpr(LogosParser::PrefixExprContext* ctx) {
+    LgsPrefixOperator op;
+    if (ctx->NOT()) {
+        op = NOT_PREFIX;
+    } else if (ctx->MINUS()) {
+        op = MINUS_PREFIX;
+    } else {
+        assert(0);
+    }
+    LgsUnaryExpr* expr = nullptr;
+    if (const auto var = ctx->IDENTIFIER()) {
+        expr = getVariable(var);
+    } else if (const auto selection = ctx->selection()) {
+        expr = getSelection(selection);
+    } else if (const auto iterIndex = ctx->iterIndex()) {
+        expr = getIterIndex(iterIndex);
+    } else if (const auto funcCall = ctx->funcCall()) {
+        expr = getFuncCall(funcCall);
+    } else {
+        assert(0);
+    }
+    const auto prefixExpr = new LgsPrefixExpr(expr, op);
+    prefixExpr->setLocation(ctx->start, &filePath);
+    return prefixExpr;
+}
+
 LgsPostfixExpr* AntlerConverter::getPostfixExpr(LogosParser::PostfixExprContext* ctx) {
     LgsPostfixOperator op;
     if (ctx->INC()) {
@@ -618,6 +646,8 @@ LgsPostfixExpr* AntlerConverter::getPostfixExpr(LogosParser::PostfixExprContext*
         expr = getSelection(selection);
     } else if (const auto iterIndex = ctx->iterIndex()) {
         expr = getIterIndex(iterIndex);
+    } else if (const auto funcCall = ctx->funcCall()) {
+        expr = getFuncCall(funcCall);
     } else {
         assert(0);
     }

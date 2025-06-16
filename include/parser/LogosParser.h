@@ -43,13 +43,13 @@ public:
     RuleElseStatement = 32, RulePatternMatching = 33, RulePattern = 34, 
     RuleLoopStatement = 35, RuleBreakStmt = 36, RuleReturnStatement = 37, 
     RuleEnumDeclaration = 38, RuleEnumField = 39, RuleExpr = 40, RuleUnaryExpr = 41, 
-    RulePostfixExpr = 42, RuleArrayExpr = 43, RuleHashMap = 44, RuleKeyValue = 45, 
-    RuleFuncCall = 46, RuleFuncArgList = 47, RuleFuncArg = 48, RuleConstructor = 49, 
-    RuleConstructorArgList = 50, RuleConstructorArg = 51, RuleConstant = 52, 
-    RuleIterIndex = 53, RuleIndex = 54, RuleSelection = 55, RuleFirstSelectionElement = 56, 
-    RuleInnerSelectionElement = 57, RuleRange = 58, RuleType = 59, RuleMapType = 60, 
-    RuleArraySize = 61, RuleFuncType = 62, RuleVector = 63, RuleRequireEnvVars = 64, 
-    RuleAssignemntOp = 65
+    RulePrefixExpr = 42, RulePostfixExpr = 43, RuleArrayExpr = 44, RuleHashMap = 45, 
+    RuleKeyValue = 46, RuleFuncCall = 47, RuleFuncArgList = 48, RuleFuncArg = 49, 
+    RuleConstructor = 50, RuleConstructorArgList = 51, RuleConstructorArg = 52, 
+    RuleConstant = 53, RuleIterIndex = 54, RuleIndex = 55, RuleSelection = 56, 
+    RuleFirstSelectionElement = 57, RuleInnerSelectionElement = 58, RuleRange = 59, 
+    RuleType = 60, RuleMapType = 61, RuleArraySize = 62, RuleFuncType = 63, 
+    RuleVector = 64, RuleRequireEnvVars = 65, RuleAssignemntOp = 66
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -111,6 +111,7 @@ public:
   class EnumFieldContext;
   class ExprContext;
   class UnaryExprContext;
+  class PrefixExprContext;
   class PostfixExprContext;
   class ArrayExprContext;
   class HashMapContext;
@@ -789,21 +790,39 @@ public:
     antlr4::tree::TerminalNode *SELF_INSTANCE();
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *NULL_();
+    PrefixExprContext *prefixExpr();
     PostfixExprContext *postfixExpr();
     FuncCallContext *funcCall();
     AnonnymosFuncContext *anonnymosFunc();
     VectorContext *vector();
     ConstructorContext *constructor();
     ConstantContext *constant();
-    ArrayExprContext *arrayExpr();
-    HashMapContext *hashMap();
     IterIndexContext *iterIndex();
     SelectionContext *selection();
+    ArrayExprContext *arrayExpr();
+    HashMapContext *hashMap();
 
    
   };
 
   UnaryExprContext* unaryExpr();
+
+  class  PrefixExprContext : public antlr4::ParserRuleContext {
+  public:
+    PrefixExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *NOT();
+    antlr4::tree::TerminalNode *MINUS();
+    antlr4::tree::TerminalNode *IDENTIFIER();
+    IterIndexContext *iterIndex();
+    SelectionContext *selection();
+    FuncCallContext *funcCall();
+    ConstantContext *constant();
+
+   
+  };
+
+  PrefixExprContext* prefixExpr();
 
   class  PostfixExprContext : public antlr4::ParserRuleContext {
   public:
@@ -814,6 +833,8 @@ public:
     antlr4::tree::TerminalNode *IDENTIFIER();
     IterIndexContext *iterIndex();
     SelectionContext *selection();
+    FuncCallContext *funcCall();
+    ConstantContext *constant();
 
    
   };

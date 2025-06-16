@@ -3,14 +3,14 @@
 #include "../../../../include/symbols/LgsType.h"
 
 Value* LgsPostfixExpr::createIRValue(LgsRuntime* runtime) {
-    return IncOrDec(runtime);
+    return IncOrDecValue(runtime);
 }
 
 void LgsPostfixExpr::createIRStmt(LgsRuntime* runtime) {
-    IncOrDec(runtime);
+    IncOrDecValue(runtime);
 }
 
-Value* LgsPostfixExpr::IncOrDec(LgsRuntime* runtime) const {
+Value* LgsPostfixExpr::IncOrDecValue(LgsRuntime* runtime) const {
     const auto exprIRValue = expr->createIRValue(runtime);
     const auto exprIRType = expr->type->getIRType();
     const auto exprLoad = runtime->builder.CreateLoad(exprIRType, exprIRValue);

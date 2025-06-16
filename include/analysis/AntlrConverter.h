@@ -84,6 +84,7 @@ public:
     LgsExpr* getCast(LogosParser::ExprContext* ctx);
     LgsUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
+    LgsUnaryExpr* getPrefixExpr(LogosParser::PrefixExprContext* ctx);
     LgsPostfixExpr* getPostfixExpr(LogosParser::PostfixExprContext* ctx);
     LgsUnaryExpr* getArrayExpr(LogosParser::ArrayExprContext* ctx);
     LgsUnaryExpr* getHashMap(LogosParser::HashMapContext* ctx);

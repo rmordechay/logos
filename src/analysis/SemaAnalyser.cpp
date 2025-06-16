@@ -19,6 +19,7 @@
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsPostfixExpr.h"
+#include "exprs/unary/LgsPrefixExpr.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
@@ -328,25 +329,16 @@ void SemaAnalyser::visitCast(LgsCast* castExpr) {
 }
 
 void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
-    if (const auto instance = unaryExpr->asInstance()) {
-        visitInstance(instance);
-    } else if (const auto funcCall = unaryExpr->asFuncCall()) {
-        visitFuncCall(funcCall);
-    } else if (const auto func = unaryExpr->asFunc()) {
-        visitFunc(func);
-    } else if (const auto selection = unaryExpr->asSelection()) {
-        visitSelection(selection);
-    } else if (const auto arrayExpr = unaryExpr->asArrayExpr()) {
-        visitArrayExpr(arrayExpr);
-    } else if (const auto hashMap = unaryExpr->asHashMap()) {
-        visitHashMap(hashMap);
-    } else if (const auto iterIndex = unaryExpr->asIterIndex()) {
-        visitIterIndex(iterIndex);
-    } else if (const auto variable = unaryExpr->asVariable()) {
-        visitVariable(variable);
-    } else if (const auto postfixExpr = unaryExpr->asPostfixExpr()) {
-        visitPostfixExpr(postfixExpr);
-    }
+    if (const auto instance = unaryExpr->asInstance()) visitInstance(instance);
+    else if (const auto funcCall = unaryExpr->asFuncCall()) visitFuncCall(funcCall);
+    else if (const auto func = unaryExpr->asFunc()) visitFunc(func);
+    else if (const auto selection = unaryExpr->asSelection()) visitSelection(selection);
+    else if (const auto arrayExpr = unaryExpr->asArrayExpr()) visitArrayExpr(arrayExpr);
+    else if (const auto hashMap = unaryExpr->asHashMap()) visitHashMap(hashMap);
+    else if (const auto iterIndex = unaryExpr->asIterIndex()) visitIterIndex(iterIndex);
+    else if (const auto variable = unaryExpr->asVariable()) visitVariable(variable);
+    else if (const auto postfixExpr = unaryExpr->asPostfixExpr()) visitPostfixExpr(postfixExpr);
+    else if (const auto prefixExpr = unaryExpr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
 }
 
 void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
@@ -493,6 +485,13 @@ void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* c
     }
 }
 
+void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
+    for (const auto arg : funcCall->args) {
+        visitExpr(arg);
+    }
+    resolveFuncCall(funcCall);
+}
+
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
     const auto symbol = getSymbol(instance->name, &instance->location);
     if (!symbol) return;
@@ -544,14 +543,14 @@ void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     if (!type->asInt()) {
         return errHandler.handleError(E10050, &postfixExpr->location, {type->pName()});
     }
-    postfixExpr->type = type;
+    postfixExpr->setType(type);
 }
 
-void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
-    for (const auto arg : funcCall->args) {
-        visitExpr(arg);
-    }
-    resolveFuncCall(funcCall);
+void SemaAnalyser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
+    const auto baseExpr = prefixExpr->expr;
+    visitUnaryExpr(baseExpr);
+    const auto type = baseExpr->type;
+    prefixExpr->setType(type);
 }
 
 void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {

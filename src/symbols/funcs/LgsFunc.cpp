@@ -1,5 +1,4 @@
 #include "funcs/LgsFunc.h"
-
 #include "data/LgsDefinitions.h"
 #include "stmts/LgsStmtBlock.h"
 #include "exprs/LgsExpr.h"
@@ -40,7 +39,7 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
     for (int i = funcType->isStaticMethod; i < funcType->params.size(); ++i) {
-        auto param = funcType->params[i];
+        auto& param = funcType->params[i];
         param.setIRValue(args);
         args->setName(param.name);
         args++;

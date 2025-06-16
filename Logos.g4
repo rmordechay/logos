@@ -190,20 +190,25 @@ unaryExpr:
     |   SELF_INSTANCE
     |   SELF_CLASS
     |   NULL
+    |   prefixExpr
     |   postfixExpr
     |   funcCall
     |   anonnymosFunc
     |   vector
     |   constructor
     |   constant
-    |   arrayExpr
-    |   hashMap
     |   iterIndex
     |   selection
+    |   arrayExpr
+    |   hashMap
+    ;
+
+prefixExpr:
+        (NOT | MINUS) (IDENTIFIER |  iterIndex | selection | funcCall | constant)
     ;
 
 postfixExpr:
-        (IDENTIFIER |  iterIndex | selection) (INC | DEC)
+        (IDENTIFIER |  iterIndex | selection | funcCall | constant) (INC | DEC)
     ;
 
 arrayExpr:
