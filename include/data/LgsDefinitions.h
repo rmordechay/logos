@@ -13,4 +13,4 @@
 #define LOGOS_STR_FORMAT_PART "%v"
 #define LOGOS_DEFAULT_ENUM "DEFAULT"
 #define LOGOS_ERROR_STR "\033[1;31mError:\033[0m "
-#define LOGOS_KEYWORDS {"object", "single", "self", "Self", "interface", "extern", "pub", "implements", "const", "enum",  "vec2", "vec3", "vec4", "if", "else", "for", "break", "continue", "return", "and", "or", "not", "in"}
+static const unordered_set<string> LOGOS_KEYWORDS = {"object", "single", "self", "Self", "interface", "extern", "pub", "implements", "const", "enum",  "vec2", "vec3", "vec4", "if", "else", "for", "break", "continue", "return", "and", "or", "not", "in"};

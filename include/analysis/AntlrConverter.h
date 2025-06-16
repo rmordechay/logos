@@ -53,16 +53,15 @@ public:
     LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx);
     LgsMainFunc* getMainFunc(LogosParser::FuncImplContext* ctx);
+    bool setMainArgsParam(LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, bool isSingleton = false);
-    void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);
-    bool setMainArgsParam(LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature);
     LgsField* getField(LogosParser::FieldContext* ctx, string& parentName);
     LgsFunc* getFuncImpl(LogosParser::FuncImplContext* ctx);
+    void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);
     LgsFunc* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
-    bool isNameBuiltin(const string& name, const Location* location);
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param, LogosParser::TypeContext* type);
     LgsFunc* getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
@@ -91,7 +90,6 @@ public:
     LgsVariable* getVariable(tree::TerminalNode* ctx) const;
     LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
     LgsUnaryExpr* getVector(LogosParser::VectorContext* vector) const;
-    bool isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec);
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
     LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
     vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
@@ -105,8 +103,10 @@ public:
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
     LgsType* getTypeFromText(tree::TerminalNode* typeToken) const;
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
-    void cleanStr(string& value) const;
     LgsAssignType mapAssignType(LogosParser::AssignmentContext* assignment) const;
     LgsOperator mapOperator(LogosParser::ExprContext* expr) const;
+    bool isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec);
+    bool isNameBuiltin(const string& name, const Location* location);
+    void cleanStr(string& value) const;
     ~AntlerConverter() = default;
 };

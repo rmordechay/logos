@@ -1,4 +1,6 @@
 #include "extern/LgsCLangVisitor.h"
+
+#include "data/LgsDefinitions.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "files/LgsFile.h"
 #include "stmts/LgsField.h"
@@ -147,4 +149,8 @@ bool LgsCLangVisitor::isConstCharPointer(const clang::QualType qt) const {
     if (!qt->isPointerType()) return false;
     const auto pointeeType = qt->getPointeeType();
     return pointeeType.isConstQualified() && pointeeType->isCharType();
+}
+
+bool LgsCLangVisitor::isLgsKeyword(const string& s) const {
+    return LOGOS_KEYWORDS.find(s) != LOGOS_KEYWORDS.end();
 }
