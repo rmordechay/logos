@@ -255,9 +255,10 @@ LgsFunc* AntlerConverter::getFuncImpl(LogosParser::FuncImplContext* ctx) {
     const auto funcSignature = ctx->funcSignature();
     const auto tokenName = funcSignature->IDENTIFIER();
     const auto func = new LgsFunc(tokenName->getText(), rt);
+    func->setLocation(tokenName->getSymbol(), &filePath);
+    if (isNameBuiltin(func->funcType->name, &func->location)) return nullptr;
     setParams(func->funcType, funcSignature->param());
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
-    func->setLocation(tokenName->getSymbol(), &filePath);
     return func;
 }
 
@@ -266,6 +267,8 @@ LgsFunc* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext
     const auto funcSignature = ctx->funcSignature();
     const auto nameToken = funcSignature->IDENTIFIER();
     const auto method = new LgsFunc(nameToken->getText(), rt);
+    method->setLocation(nameToken->getSymbol(), &filePath);
+    if (isNameBuiltin(method->funcType->name, &method->location)) return nullptr;
     method->funcType->isMethod = true;
     method->funcType->parentName = obj->name;
     auto self = LgsParam(obj, LOGOS_SELF);
@@ -276,7 +279,6 @@ LgsFunc* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext
     if (ctx->VISIBILITY()) {
         method->funcType->isPublic = true;
     }
-    method->setLocation(nameToken->getSymbol(), &filePath);
     return method;
 }
 
@@ -301,8 +303,10 @@ void AntlerConverter::setParams(LgsFuncType* funcType, const vector<LogosParser:
         } else if (const auto paramFuncType = param->funcType()) {
             const auto lgsParamFuncType = getFuncType(paramFuncType);
             lgsParamFuncType->name = param->IDENTIFIER()->getText();
+            if (isNameBuiltin(lgsParamFuncType->name, &lgsParamFuncType->location)) return;
             auto lgsParam = LgsParam(lgsParamFuncType);
             lgsParam.name = lgsParamFuncType->name;
+            if (isNameBuiltin(lgsParam.name, &lgsParam.location)) return;
             lgsParam.setLocation(param->start, &filePath);
             funcType->params.emplace_back(lgsParam);
         }
@@ -316,6 +320,7 @@ LgsParam AntlerConverter::getParam(LgsFuncType* funcType, LogosParser::ParamCont
     const auto variableName = param->IDENTIFIER()->getText();
     const auto expr = getExpr(param->expr());
     auto lgsParam = LgsParam(getType(type), variableName, expr);
+    lgsParam.setLocation(param->start, &filePath);
     if (param->TRIPLE_DOT()) {
         if (lgsParam.expr) errHandler.handleError(E10045, &lgsParam.location);
         lgsParam.isVariadic = true;
@@ -323,7 +328,6 @@ LgsParam AntlerConverter::getParam(LgsFuncType* funcType, LogosParser::ParamCont
     } else if (lgsParam.expr) {
         funcType->hasDefaults = true;
     }
-    lgsParam.setLocation(param->start, &filePath);
     return lgsParam;
 }
 

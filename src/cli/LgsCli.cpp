@@ -45,12 +45,10 @@ void LgsCli::printVersion() {
 void LgsCli::printHelp() {
     ostringstream txt;
     txt << "Usage: lgs <command> <options>" << "\n\n";
-
     txt << "Commands:" << endl;
     txt << "run                       execute a logos script or run application" << endl;
     txt << "help                      print logos help" << endl;
     txt << "version, -v, --version    print logos version" << endl;
-
     txt << endl << "For more information: lgs [command] help" << endl;
     lgsLog(txt.str());
 }
