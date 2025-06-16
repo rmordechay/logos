@@ -1,6 +1,9 @@
 #include "exprs/unary/LgsArrayExpr.h"
+
+#include "cli/LgsCli.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "logos/LgsConfig.h"
+#include "utils/LgsUtils.h"
 
 
 string LgsArrayExpr::pName() {
@@ -36,14 +39,22 @@ Value* LgsArrayExpr::createDynamicArray(LgsRuntime* runtime) {
 }
 
 Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
-    const auto IRType = type->getIRType();
-    const auto arrPtr = runtime->builder.CreateAlloca(IRType);
-    vector<Value*> values;
+    auto& builder = runtime->builder;
+    const auto arr = type->asArray();
+    vector<Constant*> values;
     for (const auto element : initialElements) {
         const auto rValue = element->getIRValue(runtime);
-        values.push_back(rValue);
+        values.push_back(dyn_cast<Constant>(rValue));
     }
-    return arrPtr;
+    const auto arrSize = arr->iterLen;
+    const auto baseIRType = arr->baseType->getIRType();
+    const auto arrIRType = ArrayType::get(baseIRType, initialElements.size());
+    const auto valueIR = ConstantArray::get(arrIRType, values);
+    const auto globalVarIR = new GlobalVariable(*runtime->module, arrIRType, true, GlobalValue::PrivateLinkage, valueIR);
+    const auto arrIRPtr = builder.CreateAlloca(arrIRType);
+    const auto n = dataLayout.getTypeAllocSize(baseIRType).getFixedValue() * arrSize;
+    builder.CreateCall(getMemcpy(runtime), {arrIRPtr, globalVarIR, builder.getInt64(n), builder.getTrue()});
+    return arrIRPtr;
 }
 
 void LgsArrayExpr::free(LgsRuntime* runtime) {
