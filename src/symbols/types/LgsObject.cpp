@@ -7,7 +7,7 @@
 #include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 
-string LgsObject::pName() const {
+string LgsObject::prettyName() const {
     return name;
 }
 
@@ -43,10 +43,6 @@ string LgsObject::getStrFormatPart() const {
     }
     str << '}';
     return str.str();
-}
-
-LgsType* LgsObject::inferBinaryType(LgsType* other) {
-    return this;
 }
 
 bool LgsObject::equals(LgsType* other) {

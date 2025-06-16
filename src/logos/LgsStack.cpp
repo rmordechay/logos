@@ -10,7 +10,7 @@ void LgsStack::enterFunc(LgsFunc* func) {
 void LgsStack::enterScope(const LgsScope scope, LgsStmt* stmt) {
     LgsStackFrame stackFrame{
         .scopeType = scope,
-        .symbols = top().symbols,
+        .symbolTable = top().symbolTable,
     };
     switch (scope) {
     case LOOP_SCOPE:
@@ -50,17 +50,4 @@ LgsForLoop* LgsStack::getLoop() {
 
 LgsIfStmt* LgsStack::getIfStmt() {
     return top().ifStmt;
-}
-
-LgsSymbol* LgsStack::getSymbol(const string& name) {
-    auto& symbols = top().symbols;
-    if (symbols.find(name) != symbols.end()) {
-        return &symbols[name];
-    }
-    return nullptr;
-}
-
-void LgsStack::addSymbol(const string& name, const LgsSymbol& symbol) {
-    assert(size() > 0);
-    top().symbols[name] = symbol;
 }

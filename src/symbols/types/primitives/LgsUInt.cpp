@@ -9,7 +9,7 @@ size_t LgsUInt::getSizeBytes() {
     return sizeof(unsigned int);
 }
 
-string LgsUInt::pName() const {
+string LgsUInt::prettyName() const {
     return name;
 }
 
@@ -26,15 +26,12 @@ LgsExpr* LgsUInt::getZeroValue() {
     return new LgsUIntConst(0);
 }
 
-LgsType* LgsUInt::inferBinaryType(LgsType* other) {
-    return this;
-}
-
 bool LgsUInt::equals(LgsType* other) {
-    if (other->getIRName() == LgsAny::name) return true;
-    if (other->getIRName() == LgsInt::name) return true;
-    if (other->getIRName() == LgsSize::name) return true;
-    return name == other->getIRName();
+    const auto IRName = other->getIRName();
+    if (IRName == LgsAny::name) return true;
+    if (IRName == LgsInt::name) return true;
+    if (IRName == LgsSize::name) return true;
+    return name == IRName;
 }
 
 string LgsUInt::getStrFormatPart() const {

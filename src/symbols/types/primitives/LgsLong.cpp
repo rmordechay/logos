@@ -4,7 +4,7 @@
 #include "logos/LgsRuntime.h"
 #include "types/LgsAny.h"
 
-string LgsLong::pName() const {
+string LgsLong::prettyName() const {
     return name;
 }
 
@@ -23,10 +23,6 @@ size_t LgsLong::getSizeBytes() {
 
 LgsExpr* LgsLong::getZeroValue() {
     return new LgsLongConst(0);
-}
-
-LgsType* LgsLong::inferBinaryType(LgsType* other) {
-    assert(0);
 }
 
 string LgsLong::getStrFormatPart() const {

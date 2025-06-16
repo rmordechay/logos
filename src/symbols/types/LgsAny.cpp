@@ -19,14 +19,10 @@ LgsExpr* LgsAny::getZeroValue() {
     assert(0);
 }
 
-string LgsAny::pName() const {
+string LgsAny::prettyName() const {
     return name;
 }
 
 bool LgsAny::equals(LgsType* other) {
     return true;
-}
-
-LgsType* LgsAny::inferBinaryType(LgsType* other) {
-    assert(0);
 }

@@ -1,6 +1,6 @@
 #include "types/LgsUnknownType.h"
 
-string LgsUnknownType::pName() const {
+string LgsUnknownType::prettyName() const {
     return name == "" ? typeName : name;
 }
 
@@ -9,10 +9,6 @@ LgsExpr* LgsUnknownType::getZeroValue() {
 }
 
 bool LgsUnknownType::equals(LgsType* other) {
-    assert(0);
-}
-
-LgsType* LgsUnknownType::inferBinaryType(LgsType* other) {
     assert(0);
 }
 

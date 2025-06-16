@@ -3,7 +3,7 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsCharConst.h"
 
-string LgsChar::pName() const {
+string LgsChar::prettyName() const {
     return name;
 }
 
@@ -22,10 +22,6 @@ string LgsChar::getIRName() {
 LgsExpr* LgsChar::getZeroValue() {
     if (isNullable) return new LgsNull();
     return new LgsCharConst('0');
-}
-
-LgsType* LgsChar::inferBinaryType(LgsType* other) {
-    return this;
 }
 
 string LgsChar::getStrFormatPart() const {

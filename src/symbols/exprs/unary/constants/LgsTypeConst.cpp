@@ -2,7 +2,7 @@
 #include "analysis/AntlrConverter.h"
 
 string LgsTypeConst::getExprName() {
-    return type->pName();
+    return type->prettyName();
 }
 
 Value* LgsTypeConst::createIRValue(LgsRuntime* runtime) {

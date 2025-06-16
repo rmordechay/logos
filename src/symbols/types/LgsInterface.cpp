@@ -38,10 +38,6 @@ bool LgsInterface::equals(LgsType* other) {
     return false;
 }
 
-LgsType* LgsInterface::inferBinaryType(LgsType* other) {
-    assert(0);
-}
-
-string LgsInterface::pName() const {
+string LgsInterface::prettyName() const {
     return interfaceName;
 }

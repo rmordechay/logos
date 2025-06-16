@@ -2,7 +2,7 @@
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/LgsNull.h"
 
-string LgsBool::pName() const {
+string LgsBool::prettyName() const {
     return name;
 }
 
@@ -17,10 +17,6 @@ string LgsBool::getIRName() {
 LgsExpr* LgsBool::getZeroValue() {
     if (isNullable) return new LgsNull();
     return new LgsBoolConst(false);
-}
-
-LgsType* LgsBool::inferBinaryType(LgsType* other) {
-    return this;
 }
 
 bool LgsBool::equals(LgsType* other) {

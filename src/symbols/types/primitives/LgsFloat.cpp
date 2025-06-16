@@ -1,7 +1,7 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 
-string LgsFloat::pName() const {
+string LgsFloat::prettyName() const {
     return name;
 }
 
@@ -28,8 +28,4 @@ string LgsFloat::getStrFormatPart() const {
 
 bool LgsFloat::equals(LgsType* other) {
     return name == other->getIRName();
-}
-
-LgsType* LgsFloat::inferBinaryType(LgsType* other) {
-    return this;
 }

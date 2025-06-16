@@ -37,9 +37,9 @@ string LgsArray::getStrFormatPart() const {
     return "%p";
 }
 
-string LgsArray::pName() const {
-    if (!isStatic) return baseType->pName() + "[]";
-    return baseType->pName() + '[' + (iterLen == 0 ? "" : to_string(iterLen)) + "]!";
+string LgsArray::prettyName() const {
+    if (!isStatic) return baseType->prettyName() + "[]";
+    return baseType->prettyName() + '[' + (iterLen == 0 ? "" : to_string(iterLen)) + "]!";
 }
 
 bool LgsArray::equals(LgsType* other) {
@@ -53,10 +53,6 @@ bool LgsArray::equals(LgsType* other) {
 
 string LgsArray::getIRName() {
     return name;
-}
-
-LgsType* LgsArray::inferBinaryType(LgsType* other) {
-    assert(0);
 }
 
 Value* LgsArray::getLength(LgsRuntime* runtime, LgsExpr* expr) {

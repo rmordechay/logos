@@ -10,7 +10,7 @@ Type* LgsShort::getIRType() {
     return Type::getInt16Ty(context);
 }
 
-string LgsShort::pName() const {
+string LgsShort::prettyName() const {
     return name;
 }
 
@@ -21,10 +21,6 @@ string LgsShort::getIRName() {
 LgsExpr* LgsShort::getZeroValue() {
     if (isNullable) return new LgsNull();
     return new LgsShortConst(0);
-}
-
-LgsType* LgsShort::inferBinaryType(LgsType* other) {
-    assert(0);
 }
 
 bool LgsShort::equals(LgsType* other) {

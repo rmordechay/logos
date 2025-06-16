@@ -34,11 +34,10 @@ public:
     size_t getSizeBytes() override;
     Type* getIRType() override;
     string getIRName() override;
-    string pName() const override;
+    string prettyName() const override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
-    LgsType* inferBinaryType(LgsType* other) override;
     Value* getLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* isEmpty(LgsRuntime* runtime, LgsExpr* expr) override;

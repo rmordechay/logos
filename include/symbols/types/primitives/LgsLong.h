@@ -13,10 +13,9 @@ public:
     Type* getIRType() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    LgsType* inferBinaryType(LgsType* other) override;
     string getStrFormatPart() const override;
     string getIRName() override;
-    string pName() const override;
+    string prettyName() const override;
     bool equals(LgsType* other) override;
     ~LgsLong() override = default;
 };

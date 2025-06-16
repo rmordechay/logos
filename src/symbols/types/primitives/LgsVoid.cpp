@@ -3,7 +3,7 @@
 #include "exprs/LgsNull.h"
 
 
-string LgsVoid::pName() const {
+string LgsVoid::prettyName() const {
     return name;
 }
 
@@ -21,10 +21,6 @@ string LgsVoid::getIRName() {
 
 LgsExpr* LgsVoid::getZeroValue() {
     return new LgsNull();
-}
-
-LgsType* LgsVoid::inferBinaryType(LgsType* other) {
-    return this;
 }
 
 bool LgsVoid::equals(LgsType* other) {

@@ -1,4 +1,3 @@
-
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
@@ -9,7 +8,7 @@ size_t LgsInt::getSizeBytes() {
     return sizeof(int);
 }
 
-string LgsInt::pName() const {
+string LgsInt::prettyName() const {
     return name;
 }
 
@@ -26,14 +25,11 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(0);
 }
 
-LgsType* LgsInt::inferBinaryType(LgsType* other) {
-    return this;
-}
-
 bool LgsInt::equals(LgsType* other) {
-    if (other->getIRName() == LgsAny::name) return true;
-    if (other->getIRName() == LgsSize::name) return true;
-    return name == other->getIRName();
+    const auto IRName = other->getIRName();
+    if (IRName == LgsAny::name) return true;
+    if (IRName == LgsSize::name) return true;
+    return name == IRName;
 }
 
 string LgsInt::getStrFormatPart() const {

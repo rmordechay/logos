@@ -12,9 +12,8 @@ public:
     Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
-    string pName() const override;
+    string prettyName() const override;
     bool equals(LgsType* other) override;
-    LgsType* inferBinaryType(LgsType* other) override;
 };
 
 inline Type* LgsTypePair::getIRType() {
@@ -29,8 +28,8 @@ inline LgsExpr* LgsTypePair::getZeroValue() {
     assert(false);
 }
 
-inline string LgsTypePair::pName() const {
-    return '<' + key->pName() + "," + value->pName() + '>';
+inline string LgsTypePair::prettyName() const {
+    return '<' + key->prettyName() + "," + value->prettyName() + '>';
 }
 
 inline bool LgsTypePair::equals(LgsType* other) {
@@ -38,9 +37,3 @@ inline bool LgsTypePair::equals(LgsType* other) {
     if (!otherPair) return false;
     return key->equals(otherPair->key) && value->equals(otherPair->value);
 }
-
-inline LgsType* LgsTypePair::inferBinaryType(LgsType* other) {
-    assert(false);
-}
-
-

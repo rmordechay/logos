@@ -111,7 +111,7 @@ void LgsFunc::swapReturnIfNeeded() const {
 }
 
 string LgsFunc::pName() {
-    return funcType->pName();
+    return funcType->prettyName();
 }
 
 string LgsFunc::format(string& tabs) {

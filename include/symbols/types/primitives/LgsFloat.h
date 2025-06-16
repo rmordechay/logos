@@ -14,8 +14,7 @@ public:
     size_t getSizeBytes() override;
     string getStrFormatPart() const override;
     bool equals(LgsType* other) override;
-    LgsType* inferBinaryType(LgsType* other) override;
-    string pName() const override;
+    string prettyName() const override;
     ~LgsFloat() override = default;
 };
 

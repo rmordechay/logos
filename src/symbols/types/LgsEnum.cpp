@@ -14,16 +14,12 @@ string LgsEnum::getIRName() {
     return name;
 }
 
-string LgsEnum::pName() const {
+string LgsEnum::prettyName() const {
     return name;
 }
 
 bool LgsEnum::equals(LgsType* other) {
     return name == other->getIRName();
-}
-
-LgsType* LgsEnum::inferBinaryType(LgsType* other) {
-    assert(0);
 }
 
 string LgsEnum::getStrFormatPart() const {

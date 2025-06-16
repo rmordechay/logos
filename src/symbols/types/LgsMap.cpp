@@ -43,8 +43,8 @@ string LgsMap::getIRName() {
     return name;
 }
 
-string LgsMap::pName() const {
-    return '{' + typePair->key->pName() + ": " + typePair->value->pName() + '}';
+string LgsMap::prettyName() const {
+    return '{' + typePair->key->prettyName() + ": " + typePair->value->prettyName() + '}';
 }
 
 bool LgsMap::equals(LgsType* other) {
@@ -53,10 +53,6 @@ bool LgsMap::equals(LgsType* other) {
     const auto otherKvType = otherMap->typePair;
     const auto keyEqual = typePair->key->equals(otherKvType->key);
     return keyEqual && typePair->value->equals(otherKvType->value);
-}
-
-LgsType* LgsMap::inferBinaryType(LgsType* other) {
-    assert(0);
 }
 
 StructType* LgsMap::getMapStruct(LgsRuntime* runtime) {

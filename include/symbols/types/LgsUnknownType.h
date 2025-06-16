@@ -11,10 +11,9 @@ public:
     explicit LgsUnknownType(const string& name) : name(name) {}
     Type* getIRType() override;
     string getIRName() override;
-    string pName() const override;
+    string prettyName() const override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
-    LgsType* inferBinaryType(LgsType* other) override;
     ~LgsUnknownType() override = default;
 };
 

@@ -6,7 +6,7 @@
 
 
 string LgsArrayExpr::pName() {
-    return type->pName();
+    return type->prettyName();
 }
 
 Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {

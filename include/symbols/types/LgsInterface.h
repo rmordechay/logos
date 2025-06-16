@@ -6,11 +6,10 @@ public:
     string interfaceName;
 
     explicit LgsInterface(const string& name) : LgsObject(name), interfaceName(name) {}
-    string pName() const override;
+    string prettyName() const override;
     Type* getIRType() override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
-    LgsType* inferBinaryType(LgsType* other) override;
     ~LgsInterface() override = default;
 };

@@ -10,6 +10,7 @@
 
 class LgsShort;
 
+
 bool LgsType::equals(LgsType& other) {
     return getIRName() == other.getIRName();
 }

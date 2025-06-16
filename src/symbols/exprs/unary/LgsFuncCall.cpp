@@ -88,11 +88,11 @@ string LgsFuncCall::pName() {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = 0; i < args.size(); ++i) {
-        strStream << args[i]->type->pName();
+        strStream << args[i]->type->prettyName();
         if (i != args.size() - 1) strStream << ", ";
     }
     if (type) {
-        strStream << "): " << type->pName();
+        strStream << "): " << type->prettyName();
     } else {
         strStream << ')';
     }

@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsSymbol.h"
+#include "LgsSymbolTable.h"
 
 class LgsStmt;
 class LgsIfStmt;
@@ -14,19 +15,19 @@ enum LgsScope {
 };
 
 struct LgsStackFrame {
-    LgsScope scopeType;
+    LgsSymbolTable symbolTable;
     LgsFunc* func = nullptr;
+    LgsScope scopeType;
     union {
         LgsForLoop* loop;
         LgsIfStmt* ifStmt;
     };
-    std::map<std::string, LgsSymbol> symbols;
 };
 
-class LgsStack final : public std::stack<LgsStackFrame> {
+class LgsStack final : public stack<LgsStackFrame> {
 public:
     LgsFunc* currentFunc = nullptr;
-    std::vector<LgsExpr*> allocatedExprs;
+    vector<LgsExpr*> allocatedExprs;
 
     void enterFunc(LgsFunc* func);
     void enterScope(LgsScope scope, LgsStmt* stmt);
@@ -34,13 +35,9 @@ public:
     void exitScope(LgsScope scope);
     LgsForLoop* getLoop();
     LgsIfStmt* getIfStmt();
-    LgsSymbol* getSymbol(const string& name);
-    void addSymbol(const std::string& name, const LgsSymbol& symbol);
     auto begin() { return c.begin(); }
     auto end() { return c.end(); }
     auto rbegin() { return c.rbegin(); }
     auto rend() { return c.rend(); }
     ~LgsStack() = default;
 };
-
-

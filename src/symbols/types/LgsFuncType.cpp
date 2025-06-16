@@ -57,23 +57,19 @@ LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
 
-string LgsFuncType::pName() const {
+string LgsFuncType::prettyName() const {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = 0; i < params.size(); ++i) {
-        strStream << params[i].type->pName();
+        strStream << params[i].type->prettyName();
         if (i != params.size() - 1) strStream << ", ";
     }
     if (rt) {
-        strStream << "): " << rt->pName();
+        strStream << "): " << rt->prettyName();
     } else {
         strStream << ')';
     }
     return strStream.str();
-}
-
-LgsType* LgsFuncType::inferBinaryType(LgsType* other) {
-    return nullptr;
 }
 
 LgsFuncType::~LgsFuncType() {

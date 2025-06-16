@@ -19,17 +19,13 @@ Type* LgsStr::getIRType() {
     return PointerType::getUnqual(context);
 }
 
-string LgsStr::pName() const {
+string LgsStr::prettyName() const {
     return name;
 }
 
 LgsExpr* LgsStr::getZeroValue() {
     if (isNullable) return new LgsNull();
     return new LgsStrConst("");
-}
-
-LgsType* LgsStr::inferBinaryType(LgsType* other) {
-    return this;
 }
 
 string LgsStr::getStrFormatPart() const {

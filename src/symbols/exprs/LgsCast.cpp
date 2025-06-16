@@ -12,7 +12,7 @@ Value* LgsCast::addIR(LgsRuntime* runtime, LgsExpr* other) {
 }
 
 std::string LgsCast::pName() {
-    return fromValue->pName() + "->" + toType->pName();
+    return fromValue->pName() + "->" + toType->prettyName();
 }
 
 LgsCast::~LgsCast() {
