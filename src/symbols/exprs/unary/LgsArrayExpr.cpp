@@ -40,20 +40,35 @@ Value* LgsArrayExpr::createDynamicArray(LgsRuntime* runtime) {
 Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
     auto& builder = runtime->builder;
     const auto arr = type->asArray();
-    vector<Constant*> values;
-    for (const auto element : initialElements) {
-        const auto rValue = element->getIRValue(runtime);
-        values.push_back(dyn_cast<Constant>(rValue));
-    }
+    const auto baseType = arr->baseType;
     const auto arrSize = initialElements.size();
-    const auto baseIRType = arr->baseType->getIRType();
+    const auto baseIRType = baseType->getIRType();
     const auto arrIRType = ArrayType::get(baseIRType, arrSize);
-    const auto valueIR = ConstantArray::get(arrIRType, values);
+    const auto valueIR = createInnerConstArray(runtime);
     const auto globalVarIR = new GlobalVariable(*runtime->module, arrIRType, true, GlobalValue::PrivateLinkage, valueIR);
     const auto arrIRPtr = builder.CreateAlloca(ArrayType::get(baseIRType, arr->iterLen));
     const auto n = dataLayout.getTypeAllocSize(baseIRType).getFixedValue() * arrSize;
     builder.CreateCall(getMemcpy(runtime), {arrIRPtr, globalVarIR, builder.getInt64(n), builder.getFalse()});
     return arrIRPtr;
+}
+
+Constant* LgsArrayExpr::createInnerConstArray(LgsRuntime* runtime) const {
+    const auto arr = type->asArray();
+    const auto baseType = arr->baseType;
+    const auto arrSize = initialElements.size();
+    const auto baseIRType = baseType->getIRType();
+    const auto arrIRType = ArrayType::get(baseIRType, arrSize);
+    vector<Constant*> values;
+    for (const auto element : initialElements) {
+        if (const auto subArray = element->asArrayExpr()) {
+            auto nested = subArray->createInnerConstArray(runtime);
+            values.push_back(nested);
+        } else {
+            const auto val = element->getIRValue(runtime);
+            values.push_back(cast<Constant>(val));
+        }
+    }
+    return ConstantArray::get(arrIRType, values);
 }
 
 void LgsArrayExpr::free(LgsRuntime* runtime) {

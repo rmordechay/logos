@@ -386,6 +386,10 @@ void SemaAnalyser::visitStaticArray(const LgsArrayExpr* array) {
     if (initialElements.empty() && !arr->baseType) {
         return errHandler.handleError(E10049, &array->location);
     }
+    for (const auto element : initialElements) {
+        element->type->isStatic = true;
+        visitExpr(element);
+    }
     if (!arr->baseType) {
         arr->baseType = initialElements.front()->type;
     }
