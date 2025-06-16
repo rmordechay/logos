@@ -6,8 +6,9 @@ public:
     static constexpr auto name = "UInt";
 
     LgsUInt() {
-        isPrimitive = true;
         isInt = true;
+        isUnsigned = true;
+        isPrimitive = true;
     }
     size_t getSizeBytes() override;
     Type* getIRType() override;

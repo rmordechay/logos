@@ -32,7 +32,6 @@ LgsType* LgsInt::inferBinaryType(LgsType* other) {
 
 bool LgsInt::equals(LgsType* other) {
     if (other->getIRName() == LgsAny::name) return true;
-    if (other->getIRName() == LgsUInt::name) return true;
     if (other->getIRName() == LgsSize::name) return true;
     return name == other->getIRName();
 }

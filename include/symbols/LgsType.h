@@ -26,8 +26,9 @@ class LgsFunc;
 class LgsType {
 public:
     Location location;
-    bool isInt = false;
     bool isVoid = false;
+    bool isInt = false;
+    bool isUnsigned = false;
     bool isNullable = false;
     bool isPrimitive = false;
     bool isBigType = false;

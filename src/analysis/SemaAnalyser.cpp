@@ -117,7 +117,7 @@ void SemaAnalyser::visitParam(LgsParam* param) {
         visitExpr(param->expr);
         validateExprType(param->expr, param->type);
     } else if (param->isVariadic) {
-        // assert(0);
+        assert(0);
     }
     addLocalSymbol(param->name, LgsSymbol(param));
 }
@@ -490,6 +490,14 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
         visitExpr(arg);
     }
     resolveFuncCall(funcCall);
+    if (!funcCall->func) return;
+    const auto& funcType = funcCall->func->funcType;
+    if (funcType->isVariadic) return;
+    for (int i = 0; i < funcType->params.size(); ++i) {
+        const auto param = funcType->params[i];
+        const auto arg = funcCall->args[i];
+        castImplicitly(arg, param.type);
+    }
 }
 
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
@@ -630,6 +638,12 @@ void SemaAnalyser::visitGroup(LgsGroup* group) const {
     }
 }
 
+void SemaAnalyser::castImplicitly(LgsExpr* expr, LgsType* type) const {
+    if (expr->type == type) return;
+    freeType(expr->type);
+    expr->type = type;
+}
+
 bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
     const auto type = parent->type;
     const auto field = type ? type->getField(fieldVariable->name) : nullptr;
@@ -768,10 +782,7 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
     if (!expr->type || !expr->type->equals(type)) {
         return errHandler.handleError(E10001, &expr->location, {type->pName(), expr->type->pName()});
     }
-
-    if (expr->type == type) return;
-    freeType(expr->type);
-    expr->type = type;
+    castImplicitly(expr, type);
 }
 
 void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {

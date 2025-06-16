@@ -622,6 +622,8 @@ LgsUnaryExpr* AntlerConverter::getPrefixExpr(LogosParser::PrefixExprContext* ctx
         expr = getIterIndex(iterIndex);
     } else if (const auto funcCall = ctx->funcCall()) {
         expr = getFuncCall(funcCall);
+    } else if (const auto constant = ctx->constant()) {
+        expr = getConstant(constant);
     } else {
         assert(0);
     }

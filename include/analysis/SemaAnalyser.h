@@ -90,6 +90,7 @@ public:
     void visitSlice(LgsIterIndex* iterIndex);
     void visitGroup(LgsGroup* group) const;
 
+    void castImplicitly(LgsExpr* expr, LgsType* type) const;
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     void setZeroField(LgsField* field) const;
