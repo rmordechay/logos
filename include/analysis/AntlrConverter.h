@@ -53,7 +53,7 @@ public:
     LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx);
     LgsMainFunc* getMainFunc(LogosParser::FuncImplContext* ctx);
-    bool setMainArgsParam(LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature);
+    bool setMainArgsParam(const LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName);

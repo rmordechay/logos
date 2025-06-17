@@ -61,6 +61,10 @@ Module* createIRModule(const string& moduleName, LLVMContext& context) {
     return module;
 }
 
+bool hasTerminator(const LgsRuntime* runtime) {
+    return runtime->builder.GetInsertBlock()->getTerminator();
+}
+
 FunctionCallee getPrintf(LgsRuntime* runtime) {
     const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context)}, true);
     return runtime->module->getOrInsertFunction("printf", printfType);

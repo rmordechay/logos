@@ -40,4 +40,3 @@ void LgsRuntime::freeExprs() {
         return false;
     }), exprs.end());
 }
-

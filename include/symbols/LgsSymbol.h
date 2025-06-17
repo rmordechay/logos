@@ -51,6 +51,6 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsEnumField* enumField);
     explicit LgsSymbol(LgsFunc* func, bool isExternal = false);
     explicit LgsSymbol(LgsGroup* group);
-    void* getPtr() const;
+    void* getSymbol() const;
     ~LgsSymbol() = default;
 };

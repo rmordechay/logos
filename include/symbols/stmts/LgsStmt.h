@@ -17,8 +17,8 @@ class LgsAssignment;
 class LgsStmt : virtual public LgsValue {
 public:
     LgsVarDec* asVarDec();
-    LgsIfStmt* asIfStmt();
     LgsAssignment* asAssignment();
+    LgsIfStmt* asIfStmt();
     LgsForLoop* asLoop();
     LgsPatternMatch* asPatternMatch();
     LgsReturn* asReturn();

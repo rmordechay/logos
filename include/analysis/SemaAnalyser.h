@@ -99,6 +99,7 @@ public:
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
     void validateFuncControlFlow(const LgsFunc* func);
+    bool validateBlockControlFlow(const LgsStmtBlock* stmtBlock, const LgsFunc* func);
     void validateMethodVisibility(const LgsFuncCall* methodCall);
 
     LgsSymbol* getSymbol(const string& name, const Location* location);

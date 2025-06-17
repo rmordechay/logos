@@ -249,18 +249,19 @@ void SemaAnalyser::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
     const auto currentFunc = stack.currentFunc;
     const auto funcType = currentFunc->funcType;
-    if (returnStmt->expr) {
-        returnStmt->expr->isReturnExpr = true;
-        currentFunc->returnExprs.push_back(returnStmt->expr);
-        visitExpr(returnStmt->expr);
+    const auto retExpr = returnStmt->expr;
+    if (retExpr) {
+        retExpr->isReturnExpr = true;
+        currentFunc->returnExprs.push_back(retExpr);
+        visitExpr(retExpr);
     }
     const auto rt = funcType->rt;
-    if (rt->isVoid && returnStmt->expr) {
-        errHandler.handleError(E10027, &returnStmt->location, {returnStmt->expr->type->prettyName()});
-    } else if (!returnStmt->expr) {
+    if (rt->isVoid && retExpr) {
+        errHandler.handleError(E10027, &returnStmt->location, {retExpr->type->prettyName()});
+    } else if (!rt->isVoid && !retExpr) {
         errHandler.handleError(E10026, &returnStmt->location, {funcType->name, rt->prettyName()});
-    } else if (returnStmt->expr->type && !rt->equals(returnStmt->expr->type)) {
-        errHandler.handleError(E10004, &returnStmt->location, {funcType->name, rt->prettyName(), returnStmt->expr->type->prettyName()});
+    } else if (retExpr && retExpr->type && !rt->equals(retExpr->type)) {
+        errHandler.handleError(E10004, &returnStmt->location, {funcType->name, rt->prettyName(), retExpr->type->prettyName()});
     }
 }
 
@@ -784,11 +785,34 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
 
 void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
     if (func->funcType->rt->isVoid) return;
-    const auto stmtBlock = func->stmtBlock;
-    const bool isFlowCorrect = func->funcType->name != LOGOS_MAIN_FUNC && !stmtBlock->hasReturn;
-    if (isFlowCorrect) {
-        errHandler.handleError(E10004, &func->location, {func->funcType->name, func->funcType->rt->prettyName()});
+    if (!validateBlockControlFlow(func->stmtBlock, func)) {
+        errHandler.handleError(E10055, &func->location, {func->funcType->name});
     }
+}
+
+bool SemaAnalyser::validateBlockControlFlow(const LgsStmtBlock* stmtBlock, const LgsFunc* func) {
+    if (!stmtBlock) return true;
+    if (stmtBlock->hasReturn) return true;
+    auto isValid = false;
+    for (const auto stmt : stmtBlock->stmts) {
+        if (const auto ifStmt = stmt->asIfStmt()) {
+            isValid = validateBlockControlFlow(ifStmt->ifStmtBlock, func);
+            for (const auto elseIfStmtBlock : ifStmt->elseIfStmtBlocks) {
+                isValid = isValid && validateBlockControlFlow(elseIfStmtBlock, func);
+            }
+            isValid = isValid && validateBlockControlFlow(ifStmt->elseStmtBlock, func);
+        }
+        if (const auto loop = stmt->asLoop()) {
+            isValid = isValid && validateBlockControlFlow(loop->stmtBlock, func);
+        }
+        if (const auto patternMatch = stmt->asPatternMatch()) {
+            for (const auto patternsStmtBlock : patternMatch->patternsStmtBlocks) {
+                isValid = isValid && validateBlockControlFlow(patternsStmtBlock, func);
+            }
+            isValid = isValid && validateBlockControlFlow(patternMatch->elseStmtBlock, func);
+        }
+    }
+    return isValid;
 }
 
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const Location* location) {

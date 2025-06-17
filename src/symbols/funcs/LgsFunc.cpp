@@ -10,8 +10,7 @@ void LgsFunc::generateIR(LgsRuntime* runtime) {
     startBlockFunc(runtime);
     stmtBlock->createIRValue(runtime);
     if (funcType->rt->isVoid) {
-        runtime->freeExprs();
-        if (!runtime->builder.GetInsertBlock()->getTerminator()) {
+        if (!hasTerminator(runtime)) {
             runtime->builder.CreateRetVoid();
         }
     }
@@ -93,7 +92,9 @@ LgsParam LgsFunc::getReturnSwapParam() const {
 }
 
 void LgsFunc::swapReturnIfNeeded() const {
-    bool isEqual = true;
+    if (funcType->rt->isPrimitive) return;
+    auto isEqual = true;
+    // Check if there are different return expressions to check if a swap is possible
     for (const auto expr1 : returnExprs) {
         for (const auto expr2 : returnExprs) {
             if (expr1 == expr2) continue;

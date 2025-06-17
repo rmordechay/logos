@@ -32,7 +32,7 @@ Value* LgsVariable::createIRValue(LgsRuntime* runtime) {
 
 bool LgsVariable::equals(LgsExpr* other) {
     if (const auto otherVar = other->asVariable()) {
-        return ref.getPtr() == otherVar->ref.getPtr();
+        return ref.getSymbol() == otherVar->ref.getSymbol();
     }
     assert(0);
 }

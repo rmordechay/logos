@@ -29,7 +29,7 @@ LgsSymbol::LgsSymbol(LgsFunc* func, const bool isExternal): symbolType(FUNC), is
 
 LgsSymbol::LgsSymbol(LgsGroup* group): symbolType(GROUP), group(group), location(&group->location) {}
 
-void* LgsSymbol::getPtr() const {
+void* LgsSymbol::getSymbol() const {
     switch (symbolType) {
     case VAR_DEC:
         return varDec;

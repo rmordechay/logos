@@ -12,7 +12,7 @@ inline LgsError E10000{.msg = "main() function is not defined in Main.lgs file."
 inline LgsError E10001{.msg = "Left type '%s' does not match the right type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10002{.msg = "'%s' must be an iterable.", .errCode = errCodeStart++};
 inline LgsError E10003{.msg = "Index '%s' is out of bounds. Max expected size: %s.", .errCode = errCodeStart++};
-inline LgsError E10004{.msg = "Function '%s' must return expression of type '%s'. Given: '%s'.", .errCode = errCodeStart++};
+inline LgsError E10004{.msg = "Function '%s' must return an expression of type '%s'. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10005{.msg = "Field '%s' is not a member of '%s'.", .errCode = errCodeStart++};
 inline LgsError E10006{.msg = "'%s' is not defined.", .errCode = errCodeStart++};
 inline LgsError E10007{.msg = "File name '%s.lgs' is duplicate. All files in a project must be unique. Locations:%s", .errCode = errCodeStart++};
@@ -63,3 +63,4 @@ inline LgsError E10051{.msg = "Constant expression '%s' can not be overwritten."
 inline LgsError E10052{.msg = "Spread operator in '%s...' must only be used with iterables. Given type: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10053{.msg = "'%s' is a Logos global name and can not be redefined.", .errCode = errCodeStart++};
 inline LgsError E10054{.msg = "Field '%s' is set more than one time.", .errCode = errCodeStart++};
+inline LgsError E10055{.msg = "Function '%s' must return from all its paths.", .errCode = errCodeStart++};

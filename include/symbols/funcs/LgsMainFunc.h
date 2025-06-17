@@ -1,8 +1,7 @@
 #pragma once
 #include "LgsFunc.h"
-#include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsVoid.h"
 #include "data/LgsDefinitions.h"
-
 
 class LgsMainFunc final : public LgsFunc {
 public:
@@ -12,7 +11,7 @@ public:
     LgsArrayExpr* args = nullptr;
     LgsFunc* initArgsFunc = nullptr;
 
-    explicit LgsMainFunc() : LgsFunc(LOGOS_MAIN_FUNC, &LGS_INT) {}
+    explicit LgsMainFunc() : LgsFunc(LOGOS_MAIN_FUNC, &LGS_VOID) {}
     void initArgs(LgsRuntime* runtime);
     void generateIR(LgsRuntime* runtime) override;
     Function* getIRFunc(LgsRuntime* runtime) override;

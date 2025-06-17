@@ -239,7 +239,7 @@ LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
     return mainFunc;
 }
 
-bool AntlerConverter::setMainArgsParam(LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature) {
+bool AntlerConverter::setMainArgsParam(const LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature) {
     const auto param = funcSignature->param().front();
     const auto type = param->type();
     const auto variableName = param->IDENTIFIER()->getText();

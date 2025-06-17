@@ -11,7 +11,6 @@ void LgsMainFunc::generateIR(LgsRuntime* runtime) {
     }
     runtime->initRuntime();
     stmtBlock->createIRValue(runtime);
-    runtime->freeExprs();
     runtime->builder.CreateRet(runtime->builder.getInt32(EXIT_SUCCESS));
     runtime->stack.exitFunc();
 }

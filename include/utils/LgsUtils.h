@@ -14,6 +14,7 @@ void freeType(const LgsType* type);
 Value* getIRStr(const LgsRuntime* runtime, const std::string& value);
 StructType* getIRStructType(const std::string& name, const std::vector<Type*>& fields);
 Module* createIRModule(const std::string& moduleName, LLVMContext& context);
+bool hasTerminator(const LgsRuntime* runtime);
 FunctionCallee getPrintf(LgsRuntime* runtime);
 FunctionCallee getSnprintf(LgsRuntime* runtime);
 Function* getMemcpy(LgsRuntime* runtime);

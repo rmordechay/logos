@@ -19,10 +19,10 @@ public:
     GlobalVariable* runtimeStruct = nullptr;
 
     void initRuntime();
+    void freeExprs();
+    void addAllocatedExpr(LgsExpr* expr);
     void pushStackTrace(const string& path);
     void printStack();
-    void addAllocatedExpr(LgsExpr* expr);
-    void freeExprs();
     ~LgsRuntime() = default;
 };
 

@@ -162,7 +162,7 @@ breakStmt:
     ;
 
 returnStatement:
-        RETURN expr
+        RETURN expr?
     ;
 
 enumDeclaration:

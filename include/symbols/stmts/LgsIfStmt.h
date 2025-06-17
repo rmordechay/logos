@@ -11,12 +11,13 @@
 
 class LgsIfStmt final : public LgsStmt {
 public:
-    std::string tag;
     LgsExpr* ifCond;
-    std::vector<LgsExpr*> elseIfConds;
+    vector<LgsExpr*> elseIfConds;
     LgsStmtBlock* ifStmtBlock;
-    std::vector<LgsStmtBlock*> elseIfStmtBlocks;
+    vector<LgsStmtBlock*> elseIfStmtBlocks;
     LgsStmtBlock* elseStmtBlock = nullptr;
+    string tag;
+
     BasicBlock* IRIfTrueBlock = nullptr;
     BasicBlock* IRIfEndBlock = nullptr;
     BasicBlock* IRElseBlock = nullptr;

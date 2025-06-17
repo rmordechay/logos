@@ -13,11 +13,3 @@ struct Location {
         return path.string() + ":" + lineNumberStr() + ":" + to_string(posInLine);
     }
 };
-
-inline Location getLocation(const Token* ctx, path* filePath) {
-    Location location;
-    location.lineNumber = ctx->getLine();
-    location.posInLine = ctx->getCharPositionInLine() + 1;
-    location.filePath = filePath;
-    return location;
-}
