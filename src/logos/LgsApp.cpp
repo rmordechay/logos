@@ -231,7 +231,7 @@ bool LgsApp::resolveExternalFiles() {
     lgsCLang.setCHeaderPaths();
     if (externFiles.empty()) return true;
     for (const auto externFile : externFiles) {
-        lgsCLang.parseFile(externFile);
+        lgsCLang.parseFile(externFile->value);
     }
     return lgsCLang.errHandler.successful;
 }

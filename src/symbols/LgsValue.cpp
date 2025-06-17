@@ -33,7 +33,8 @@ void LgsValue::setIRValue(Value* value) {
     IRValue = value;
 }
 
-bool LgsValue::shouldLoadIRArg(Value* value) const {
+bool LgsValue::shouldLoadIRArg(Value* value, const LgsExpr* expr) const {
+    if (expr->isNull) return false;
     if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
     if (const auto alloca = dyn_cast<AllocaInst>(value)) {
         const auto allocatedType = alloca->getAllocatedType();

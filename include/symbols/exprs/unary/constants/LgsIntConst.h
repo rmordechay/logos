@@ -15,7 +15,7 @@ public:
     explicit LgsIntConst(const int value) : LgsUnaryExpr(&LGS_INT), value(value) {
         type->isStatic = true;
     }
-    string pName() override;
+    string prettyName() override;
     Value* createIRValue(LgsRuntime* runtime) override;
     LgsExpr* convertExpr(LgsType* toType) override;
     Value* eqIR(LgsRuntime* runtime, LgsExpr* other) override;

@@ -14,11 +14,11 @@ public:
     explicit LgsCLang(LgsPaths& paths) : paths(paths) {}
     void setCHeaderPaths();
     string getCode(const LgsStrConst* filePath);
-    void parseFile(const LgsStrConst* filePaths);
+    void parseFile(const string& filePath);
     void compile(const vector<LgsStrConst*>& files) const;
     void getClibRoot() const;
-    void setCompileArgs(const vector<LgsStrConst*>& files, vector<const char*>& args) const;
     bool isCLibHeader(const path& cLibPath);
+    void setCompileArgs(const vector<LgsStrConst*>& files, vector<const char*>& args) const;
     ~LgsCLang() = default;
 };
 

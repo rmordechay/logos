@@ -1,8 +1,8 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 
-string LgsBinaryExpr::pName() {
-    return left->pName() + ' ' + opStr + ' ' + right->pName();
+string LgsBinaryExpr::prettyName() {
+    return left->prettyName() + ' ' + opStr + ' ' + right->prettyName();
 }
 
 Value* LgsBinaryExpr::createIRValue(LgsRuntime* runtime) {

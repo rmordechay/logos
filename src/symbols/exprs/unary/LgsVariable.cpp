@@ -11,7 +11,7 @@ string LgsVariable::getExprName() {
     return name;
 }
 
-string LgsVariable::pName() {
+string LgsVariable::prettyName() {
     return name;
 }
 

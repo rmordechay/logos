@@ -7,7 +7,7 @@ class LgsUnaryExpr : public LgsExpr {
 public:
     explicit LgsUnaryExpr() : LgsExpr(nullptr) {}
     explicit LgsUnaryExpr(LgsType* type) : LgsExpr(type) {}
-    string pName() override;
+    string prettyName() override;
     Value* addIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* subIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* mulIR(LgsRuntime* runtime, LgsExpr* other) override;
@@ -22,7 +22,7 @@ inline std::string LgsUnaryExpr::getExprName() {
     assert(false);
 }
 
-inline string LgsUnaryExpr::pName() {
+inline string LgsUnaryExpr::prettyName() {
     return getExprName();
 }
 

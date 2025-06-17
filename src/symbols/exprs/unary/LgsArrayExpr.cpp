@@ -5,7 +5,7 @@
 #include "utils/LgsUtils.h"
 
 
-string LgsArrayExpr::pName() {
+string LgsArrayExpr::prettyName() {
     return type->prettyName();
 }
 

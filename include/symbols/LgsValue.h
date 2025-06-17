@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsLocation.h"
 
+class LgsExpr;
 class LgsRuntime;
 class LgsFunc;
 using namespace llvm;
@@ -11,7 +12,7 @@ public:
     Value* IRValue = nullptr;
 
     void setIRValue(Value* value);
-    bool shouldLoadIRArg(Value* value) const;
+    bool shouldLoadIRArg(Value* value, const LgsExpr* expr = nullptr) const;
     BasicBlock* createBasicBlock(const char* name, LLVMContext& context) const;
     void startBlock(LgsRuntime* runtime, BasicBlock* block) const;
     void startBlockFunc(LgsRuntime* runtime) const;

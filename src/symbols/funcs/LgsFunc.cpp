@@ -54,7 +54,7 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
         const auto arg = args[i];
         const auto argType = arg->type->getIRType();
         auto argValue = arg->getIRValue(runtime);
-        if (shouldLoadIRArg(argValue)) {
+        if (shouldLoadIRArg(argValue, arg)) {
             argValue = runtime->builder.CreateLoad(argType, argValue);
         }
         IRArgs.push_back(argValue);
@@ -110,7 +110,7 @@ void LgsFunc::swapReturnIfNeeded() const {
     }
 }
 
-string LgsFunc::pName() {
+string LgsFunc::prettyName() {
     return funcType->prettyName();
 }
 

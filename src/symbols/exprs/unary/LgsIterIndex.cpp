@@ -102,13 +102,13 @@ string LgsIterIndex::getExprName() {
     return baseExpr->getExprName();
 }
 
-string LgsIterIndex::pName() {
+string LgsIterIndex::prettyName() {
     stringstream str;
-    str << baseExpr->pName();
+    str << baseExpr->prettyName();
     if (index->to) {
-        str << '[' << index->from->pName() << ':' << index->to->pName() << ']';
+        str << '[' << index->from->prettyName() << ':' << index->to->prettyName() << ']';
     } else {
-        str << '[' << index->from->pName() << ']';
+        str << '[' << index->from->prettyName() << ']';
     }
     return str.str();
 }

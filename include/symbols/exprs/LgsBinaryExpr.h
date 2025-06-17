@@ -31,7 +31,7 @@ public:
     LgsOperator op;
 
     explicit LgsBinaryExpr(LgsType* type, LgsExpr* left, LgsExpr* right, const LgsOperator op) : LgsExpr(type), left(left), right(right), op(op) {}
-    string pName() override;
+    string prettyName() override;
     Value* createIRValue(LgsRuntime* runtime) override;
     Value* addIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* mulIR(LgsRuntime* runtime, LgsExpr* other) override;

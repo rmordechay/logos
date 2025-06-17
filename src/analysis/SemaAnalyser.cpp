@@ -3,7 +3,7 @@
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
 #include "logos/LgsApp.h"
-#include "exprs/LgsCast.h"
+#include "../../include/symbols/exprs/unary/LgsCast.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
 #include "exprs/unary/LgsArrayExpr.h"
@@ -191,7 +191,7 @@ void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
     visitExpr(rValue);
     const auto lType = lValue->type;
     const auto rType = rValue->type;
-    if (lValue->isImmutable) return errHandler.handleError(E10051, &lValue->location, {lValue->pName()});
+    if (lValue->isImmutable) return errHandler.handleError(E10051, &lValue->location, {lValue->prettyName()});
     if (lType && rType && lType->equals(rType)) return;
     return errHandler.handleError(E10001, &assignment->location, {lType->prettyName(), rType->prettyName()});
 }
@@ -257,7 +257,7 @@ void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     const auto iterable = iterExpr->type->asIterable();
     if (!iterable) {
         // If type is not defined an error was already thrown
-        if (iterExpr->type) errHandler.handleError(E10002, &iterExpr->location, {iterExpr->pName()});
+        if (iterExpr->type) errHandler.handleError(E10002, &iterExpr->location, {iterExpr->prettyName()});
         return;
     }
     if (setLoopVars(foreachLoop, iterExpr, iterable)) return;
@@ -571,7 +571,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* paren
     if (methodCall->isSpread) {
         const auto lastArg = methodCall->args[methodCall->args.size() - 1];
         if (!lastArg->type->asIterable()) {
-            return errHandler.handleError(E10052, &methodCall->location, {lastArg->pName(), lastArg->type->prettyName()});
+            return errHandler.handleError(E10052, &methodCall->location, {lastArg->prettyName(), lastArg->type->prettyName()});
         }
     }
 }
@@ -599,7 +599,7 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     if (!baseExpr->type) return;
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable && baseExpr->type) {
-        return errHandler.handleError(E10002, &iterIndex->location, {iterIndex->baseExpr->pName()});
+        return errHandler.handleError(E10002, &iterIndex->location, {iterIndex->baseExpr->prettyName()});
     }
     if (exprTo) {
         visitSlice(iterIndex);
@@ -616,13 +616,13 @@ void SemaAnalyser::visitSlice(LgsIterIndex* iterIndex) {
     const auto exprTo = iterIndex->index->to;
     const auto iterable = baseExpr->type->asIterable();
     if (!baseExpr->type->canSlice) {
-        return errHandler.handleError(E10042, &iterIndex->location, {iterIndex->pName(), baseExpr->type->prettyName()});
+        return errHandler.handleError(E10042, &iterIndex->location, {iterIndex->prettyName(), baseExpr->type->prettyName()});
     }
     if (!iterable->getIndexType()->equals(exprFrom->type)) {
-        return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->pName(), exprFrom->type->prettyName()});
+        return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->prettyName(), exprFrom->type->prettyName()});
     }
     if (!iterable->getIndexType()->equals(exprTo->type)) {
-        return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->pName(), exprFrom->type->prettyName()});
+        return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->prettyName(), exprFrom->type->prettyName()});
     }
     validateSliceBounds(iterIndex);
 }
@@ -648,7 +648,7 @@ bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable
     const auto type = parent->type;
     const auto field = type ? type->getField(fieldVariable->name) : nullptr;
     if (!type || !field) {
-        errHandler.handleError(E10005, &fieldVariable->location, {fieldVariable->pName(), type->prettyName()});
+        errHandler.handleError(E10005, &fieldVariable->location, {fieldVariable->prettyName(), type->prettyName()});
         return false;
     }
     fieldVariable->setType(field->type);
@@ -711,7 +711,7 @@ bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterEx
         foreachLoop->loopVars[0]->type = &LGS_INT;
         foreachLoop->loopVars[0]->expr = LGS_INT.getZeroValue();
     } else if (iterable->unpackLength != varDecSize) {
-        errHandler.handleError(E10041, &iterExpr->location, {iterExpr->pName(), to_string(iterable->unpackLength), to_string(iterable->unpackLength + 1), to_string(varDecSize)});
+        errHandler.handleError(E10041, &iterExpr->location, {iterExpr->prettyName(), to_string(iterable->unpackLength), to_string(iterable->unpackLength + 1), to_string(varDecSize)});
         return true;
     }
 
@@ -729,13 +729,13 @@ void SemaAnalyser::validateIndex(LgsIterIndex* iterIndex) {
     const auto exprFrom = iterIndex->index->from;
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable->getIndexType()->equals(exprFrom->type)) {
-        return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->pName(), exprFrom->type->prettyName()});
+        return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->prettyName(), exprFrom->type->prettyName()});
     }
     if (baseExpr->type->isStatic) {
         const auto i = exprFrom->getConstInt();
         const auto bound = iterable->iterLen;
         if (i >= bound) {
-            return errHandler.handleError(E10003, &iterIndex->location, {iterIndex->pName(), to_string(bound)});
+            return errHandler.handleError(E10003, &iterIndex->location, {iterIndex->prettyName(), to_string(bound)});
         }
     }
 }
@@ -747,13 +747,13 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
     const auto iterable = baseExpr->type->asIterable();
     if (baseExpr->type->isStatic) {
         if (exprFrom->getConstInt() > exprTo->getConstInt()) {
-            return errHandler.handleError(E10037, &iterIndex->location, {iterIndex->pName()});
+            return errHandler.handleError(E10037, &iterIndex->location, {iterIndex->prettyName()});
         }
         const auto i = exprFrom->getConstInt();
         const auto j = exprTo->getConstInt();
         const auto bound = iterable->iterLen;
         if (i >= bound || j >= bound) {
-            return errHandler.handleError(E10003, &iterIndex->location, {iterIndex->pName(), to_string(bound)});
+            return errHandler.handleError(E10003, &iterIndex->location, {iterIndex->prettyName(), to_string(bound)});
         }
     }
 }
@@ -828,7 +828,7 @@ void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
             funcCall->func = func;
             funcCall->type = func->funcType->rt;
         } else {
-            errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->pName(), func->pName()});
+            errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->prettyName(), func->prettyName()});
             return;
         }
         assert(funcCall->func);
@@ -863,7 +863,7 @@ bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, const LgsType* par
         methodCall->func = method;
         methodCall->type = method->funcType->rt;
     } else {
-        errHandler.handleError(E10034, &methodCall->location, {parentType->prettyName(), name, method->pName(), method->funcType->prettyName()});
+        errHandler.handleError(E10034, &methodCall->location, {parentType->prettyName(), name, method->prettyName(), method->funcType->prettyName()});
         return true;
     }
     return false;

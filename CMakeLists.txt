@@ -43,7 +43,7 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
     src/symbols/exprs/LgsBinaryExpr.cpp
-    src/symbols/exprs/LgsCast.cpp
+    src/symbols/exprs/unary/LgsCast.cpp
     src/symbols/exprs/LgsExpr.cpp
     src/symbols/funcs/LgsFunc.cpp
     src/symbols/funcs/LgsMainFunc.cpp

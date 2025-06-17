@@ -81,11 +81,12 @@ LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
     if (type->isVoidType()) {
         return new LgsVoid();
     }
+    if (type->isPointerType()) {
+        assert(type->getPointeeType()->isIntegerType());
+        return mapCType(type->getPointeeType());
+    }
     if (type->isConstantSizeType()) {
         return new LgsLong();
-    }
-    if (type->isPointerType()) {
-        return mapCType(type->getPointeeType());
     }
     if (type->isStructureType()) {
         return mapCStruct(type);

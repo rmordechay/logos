@@ -1,4 +1,4 @@
-#include "exprs/LgsCast.h"
+#include "../../../../include/symbols/exprs/unary/LgsCast.h"
 
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
@@ -11,8 +11,8 @@ Value* LgsCast::addIR(LgsRuntime* runtime, LgsExpr* other) {
     return toValue->addIR(runtime, other);
 }
 
-std::string LgsCast::pName() {
-    return fromValue->pName() + "->" + toType->prettyName();
+std::string LgsCast::prettyName() {
+    return fromValue->prettyName() + "->" + toType->prettyName();
 }
 
 LgsCast::~LgsCast() {

@@ -5,7 +5,7 @@ Value* LgsEnumField::createIRValue(LgsRuntime* runtime) {
     return getIRStr(runtime, name);
 }
 
-string LgsEnumField::pName() {
+string LgsEnumField::prettyName() {
     return name;
 }
 

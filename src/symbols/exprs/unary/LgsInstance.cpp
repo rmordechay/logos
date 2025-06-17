@@ -38,7 +38,7 @@ string LgsInstance::getExprName() {
     return obj->name;
 }
 
-string LgsInstance::pName() {
+string LgsInstance::prettyName() {
     return obj->name;
 }
 

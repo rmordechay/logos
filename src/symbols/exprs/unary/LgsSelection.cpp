@@ -28,10 +28,10 @@ void LgsSelection::resolveSelection(LgsRuntime* runtime) const {
     }
 }
 
-string LgsSelection::pName() {
+string LgsSelection::prettyName() {
     stringstream str;
     for (const auto expr : exprs) {
-        str << '.' << expr->pName();
+        str << '.' << expr->prettyName();
     }
     return str.str();
 }

@@ -23,6 +23,6 @@ public:
     Value* createIRValue(LgsRuntime* runtime) override;
     string getExprName() override;
     string format(string& indentStr) override;
-    string pName() override;
+    string prettyName() override;
     ~LgsFuncCall() override = default;
 };

@@ -1,7 +1,7 @@
 #pragma once
-#include "LgsExpr.h"
+#include "exprs/LgsExpr.h"
 #include "LgsValue.h"
-#include "unary/LgsUnaryExpr.h"
+#include "LgsUnaryExpr.h"
 
 class LgsType;
 class LgsExpr;
@@ -15,7 +15,7 @@ public:
     LgsCast(LgsType* castToType, LgsExpr* castFromValue) : LgsUnaryExpr(castToType), toType(castToType), fromValue(castFromValue) {}
     Value* createIRValue(LgsRuntime* runtime) override;
     Value* addIR(LgsRuntime* runtime, LgsExpr* other) override;
-    std::string pName() override;
+    std::string prettyName() override;
     ~LgsCast() override;
 };
 

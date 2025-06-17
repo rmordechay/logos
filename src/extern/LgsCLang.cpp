@@ -10,14 +10,11 @@ using namespace clang;
 
 #define CLANG_BINARY "clang"
 
-void LgsCLang::parseFile(const LgsStrConst* filePaths) {
-    const auto pathStr = filePaths->value;
-    auto headerPath = paths.clibInclude / pathStr;
+void LgsCLang::parseFile(const string& filePath) {
+    auto headerPath = paths.clibInclude / filePath;
     if (isCLibHeader(headerPath)) {
         const auto code = getFileText(headerPath);
         runToolOnCodeWithArgs(make_unique<LgsCLangFeAction>(headerPath), code, {"-isysroot", paths.clibRoot});
-    } else {
-        return errHandler.handleError(E10047, &filePaths->location, {pathStr});
     }
 }
 
@@ -81,6 +78,12 @@ void LgsCLang::setCHeaderPaths() {
         if (ext == ".h" || ext == ".hpp" || ext == ".hh" || ext == ".hxx") {
             headers.push_back(entry.path().string());
         }
+    }
+
+    for (const auto& entry : directory_iterator(paths.clibInclude / "sys/_types")) {
+        if (!entry.is_regular_file()) continue;
+        parseFile(entry.path().string());
+        time_t now = time(nullptr);
     }
 }
 

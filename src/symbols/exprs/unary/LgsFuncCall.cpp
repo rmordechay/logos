@@ -45,6 +45,7 @@ bool LgsFuncCall::equals(const LgsFuncType* other) const {
     for (size_t i = other->isStaticMethod; i < other->params.size(); ++i) {
         const auto paramType = other->params[i].type;
         const auto argType = args[i]->type;
+        if (args[i]->isNull) continue;
         if (!paramType->equals(argType)) return false;
     }
     return true;
@@ -84,7 +85,7 @@ string LgsFuncCall::getExprName() {
     return name;
 }
 
-string LgsFuncCall::pName() {
+string LgsFuncCall::prettyName() {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = 0; i < args.size(); ++i) {

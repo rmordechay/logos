@@ -14,7 +14,7 @@ public:
     void setZeroField(LgsRuntime* runtime, LgsField* field, Value* parentIRValue) const;
     void free(LgsRuntime* runtime) override;
     string getExprName() override;
-    string pName() override;
+    string prettyName() override;
     void setReturnExpr(LgsRuntime* runtime, Type* objIRType);
     ~LgsInstance() override = default;
 };

@@ -20,7 +20,7 @@ public:
     Value* getStrSlice(const LgsRuntime* runtime, LgsStr* str) const;
     Value* getStrGEP(LgsRuntime* runtime) const;
     string getExprName() override;
-    string pName() override;
+    string prettyName() override;
     ~LgsIterIndex() override;
 };
 
