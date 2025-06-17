@@ -11,9 +11,9 @@ Value* LgsRangeLoop::loopEnd(LgsRuntime* runtime) {
 }
 
 void LgsRangeLoop::initIRLoop(LgsRuntime* runtime) {
-    IRCondBlock = createBasicBlock(LOGOS_LOOP_CONDITION, context);
-    IRBodyBlock = createBasicBlock(LOGOS_LOOP_BODY, context);
-    IRExitBlock = createBasicBlock(LOGOS_LOOP_EXIT, context);
+    IRCondBlock = BasicBlock::Create(context, LOGOS_LOOP_CONDITION);
+    IRBodyBlock = BasicBlock::Create(context, LOGOS_LOOP_BODY);
+    IRExitBlock = BasicBlock::Create(context, LOGOS_LOOP_EXIT);
     iPtr = runtime->builder.CreateAlloca(runtime->builder.getInt32Ty());
     runtime->builder.CreateStore(loopStart(runtime), iPtr);
     runtime->builder.CreateBr(IRCondBlock);

@@ -13,9 +13,8 @@ public:
 
     void setIRValue(Value* value);
     bool shouldLoadIRArg(Value* value, const LgsExpr* expr = nullptr) const;
-    BasicBlock* createBasicBlock(const char* name, LLVMContext& context) const;
     void startBlock(LgsRuntime* runtime, BasicBlock* block) const;
-    void startBlockFunc(LgsRuntime* runtime) const;
+    void startFuncBlock(LgsRuntime* runtime) const;
     Value* hashIRValue(LgsRuntime* runtime, Value* value) const;
     virtual std::string format(std::string& indentStr);
     virtual void setLocation(const Token* ctx, path* filePath);

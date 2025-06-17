@@ -26,9 +26,9 @@ void LgsForeachLoop::initIPtr(LgsRuntime* runtime)
 }
 
 void LgsForeachLoop::initIRLoop(LgsRuntime* runtime) {
-    IRCondBlock = createBasicBlock(LOGOS_LOOP_CONDITION, context);
-    IRBodyBlock = createBasicBlock(LOGOS_LOOP_BODY, context);
-    IRExitBlock = createBasicBlock(LOGOS_LOOP_EXIT, context);
+    IRCondBlock = BasicBlock::Create(context, LOGOS_LOOP_CONDITION);
+    IRBodyBlock = BasicBlock::Create(context, LOGOS_LOOP_BODY);
+    IRExitBlock = BasicBlock::Create(context, LOGOS_LOOP_EXIT);
 
     const auto iterable = iterExpr->type->asIterable();
     // With iterator

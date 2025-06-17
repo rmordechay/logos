@@ -11,8 +11,8 @@ Value* LgsInfiniteLoop::loopEnd(LgsRuntime* runtime) {
 }
 
 void LgsInfiniteLoop::initIRLoop(LgsRuntime* runtime) {
-    IRBodyBlock = createBasicBlock(LOGOS_LOOP_BODY, context);
-    IRExitBlock = createBasicBlock(LOGOS_LOOP_EXIT, context);
+    IRBodyBlock = BasicBlock::Create(context, LOGOS_LOOP_BODY);
+    IRExitBlock = BasicBlock::Create(context, LOGOS_LOOP_EXIT);
     runtime->builder.CreateBr(IRBodyBlock);
 
     startBlock(runtime, IRBodyBlock);

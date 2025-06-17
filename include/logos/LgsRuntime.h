@@ -14,6 +14,7 @@ class LgsRuntime {
 public:
     LgsStack stack;
     Module* module = nullptr;
+    Function* IRFunc = nullptr;
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
     GlobalVariable* runtimeStruct = nullptr;

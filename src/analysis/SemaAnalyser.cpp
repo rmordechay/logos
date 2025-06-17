@@ -3,7 +3,7 @@
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
 #include "logos/LgsApp.h"
-#include "../../include/symbols/exprs/unary/LgsCast.h"
+#include "exprs/unary/LgsCast.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
 #include "exprs/unary/LgsArrayExpr.h"
@@ -175,6 +175,9 @@ void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
     stack.enterScope(IF_SCOPE, ifStmt);
     visitExpr(ifStmt->ifCond);
     visitStmtBlock(ifStmt->ifStmtBlock);
+    for (const auto& elseIfCond : ifStmt->elseIfConds) {
+        visitExpr(elseIfCond);
+    }
     for (const auto& elseIfStmtBlock : ifStmt->elseIfStmtBlocks) {
         visitStmtBlock(elseIfStmtBlock);
     }

@@ -1,5 +1,4 @@
 #include "files/LgsMainFile.h"
-
 #include "funcs/LgsFunc.h"
 #include "logos/LgsApp.h"
 #include "types/LgsEnum.h"

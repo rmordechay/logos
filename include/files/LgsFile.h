@@ -19,6 +19,7 @@ public:
     virtual ~LgsFile();
 };
 
+// Only files that need generation implement this func.
 inline Module* LgsFile::generateIR() {
     return nullptr;
 }

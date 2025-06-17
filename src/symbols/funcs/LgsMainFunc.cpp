@@ -5,12 +5,14 @@
 
 void LgsMainFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.enterFunc(this);
-    startBlockFunc(runtime);
+    runtime->IRFunc = getIRFunc(runtime);
+    startFuncBlock(runtime);
     if (!funcType->params.empty()) {
         initArgs(runtime);
     }
     runtime->initRuntime();
     stmtBlock->createIRValue(runtime);
+    runtime->IRFunc = nullptr;
     runtime->builder.CreateRet(runtime->builder.getInt32(EXIT_SUCCESS));
     runtime->stack.exitFunc();
 }

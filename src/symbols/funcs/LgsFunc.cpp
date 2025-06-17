@@ -7,13 +7,15 @@
 
 void LgsFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.enterFunc(this);
-    startBlockFunc(runtime);
+    runtime->IRFunc = getIRFunc(runtime);
+    startFuncBlock(runtime);
     stmtBlock->createIRValue(runtime);
     if (funcType->rt->isVoid) {
         if (!hasTerminator(runtime)) {
             runtime->builder.CreateRetVoid();
         }
     }
+    runtime->IRFunc = nullptr;
     runtime->stack.exitFunc();
 }
 
