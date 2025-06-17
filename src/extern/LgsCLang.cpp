@@ -27,7 +27,9 @@ void LgsCLang::compile(const vector<LgsStrConst*>& files) const {
     Driver driver(CLANG_BINARY, targetTriple, diags);
 
     auto invocation = make_unique<CompilerInvocation>();
-    CompilerInvocation::CreateFromArgs(*invocation, getCompileArgs(files), diags);
+    vector<const char*> args;
+    setCompileArgs(files, args);
+    CompilerInvocation::CreateFromArgs(*invocation, args, diags);
     auto compilerInstance = make_unique<CompilerInstance>();
     compilerInstance->setInvocation(std::move(invocation));
     compilerInstance->createFileManager();
@@ -48,8 +50,7 @@ void LgsCLang::compile(const vector<LgsStrConst*>& files) const {
     }
 }
 
-vector<const char*> LgsCLang::getCompileArgs(const vector<LgsStrConst*>& files) const {
-    vector<const char*> args;
+void LgsCLang::setCompileArgs(const vector<LgsStrConst*>& files, vector<const char*>& args) const {
     vector<string> compileArgs{CLANG_BINARY, "-c", "-isysroot", paths.clibRoot};
     for (const auto& file : files) {
         compileArgs.push_back(file->value);
@@ -59,7 +60,6 @@ vector<const char*> LgsCLang::getCompileArgs(const vector<LgsStrConst*>& files) 
     for (const auto& argStr : compileArgs) {
         args.push_back(argStr.c_str());
     }
-    return args;
 }
 
 string LgsCLang::getCode(const LgsStrConst* filePath) {

@@ -31,11 +31,7 @@ public:
     LgsCLangVisitor visitor;
 
     explicit LgsCLangASTConsumer(path& filePath) : visitor(filePath) {}
-    void HandleTranslationUnit(clang::ASTContext& context) override {
-        visitor.TraverseDecl(context.getTranslationUnitDecl());
-        lock_guard lock(mtx);
-        externalFiles[visitor.cFile->name] = visitor.cFile;
-    }
+    void HandleTranslationUnit(clang::ASTContext& context) override;
     ~LgsCLangASTConsumer() override = default;
 };
 

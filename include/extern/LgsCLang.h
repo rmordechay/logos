@@ -12,13 +12,13 @@ public:
     LgsErrHandler errHandler;
 
     explicit LgsCLang(LgsPaths& paths) : paths(paths) {}
+    void setCHeaderPaths();
     string getCode(const LgsStrConst* filePath);
-    bool isCLibHeader(const path& cLibPath);
     void parseFile(const LgsStrConst* filePaths);
     void compile(const vector<LgsStrConst*>& files) const;
-    vector<const char*> getCompileArgs(const vector<LgsStrConst*>& files) const;
-    void setCHeaderPaths();
     void getClibRoot() const;
+    void setCompileArgs(const vector<LgsStrConst*>& files, vector<const char*>& args) const;
+    bool isCLibHeader(const path& cLibPath);
     ~LgsCLang() = default;
 };
 

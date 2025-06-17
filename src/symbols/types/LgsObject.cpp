@@ -16,11 +16,14 @@ Type* LgsObject::getIRType() {
     // Add one or zero if table exists
     const size_t offset = !!vtable;
     vector<Type*> elementTypes(fields.size() + offset);
+    size_t position = 0;
+    time_t a;
     if (vtable) {
-        elementTypes[0] = PointerType::getUnqual(context);
+        elementTypes[position++] = PointerType::getUnqual(context);
     }
     for (const auto [_, field] : fields) {
         const auto fieldType = field->type->getIRType();
+        field->position = position++;
         elementTypes[field->position + offset] = fieldType;
     }
     IRType = StructType::getTypeByName(context, name);

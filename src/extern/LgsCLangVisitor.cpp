@@ -160,3 +160,9 @@ bool LgsCLangVisitor::isConstCharPointer(const clang::QualType qt) const {
 bool LgsCLangVisitor::isLgsKeyword(const string& s) const {
     return LOGOS_KEYWORDS.find(s) != LOGOS_KEYWORDS.end();
 }
+
+void LgsCLangASTConsumer::HandleTranslationUnit(clang::ASTContext& context) {
+    visitor.TraverseDecl(context.getTranslationUnitDecl());
+    lock_guard lock(mtx);
+    externalFiles[visitor.cFile->name] = visitor.cFile;
+}
