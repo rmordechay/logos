@@ -493,6 +493,7 @@ LgsForLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx
     if (isNameBuiltin(varDec->name, &varDec->location)) return nullptr;
     varDec->type = &LGS_INT;
     varDec->expr = LGS_INT.getZeroValue();
+    varDec->expr->location = varDec->location;
     rangeLoop->loopVars.emplace_back(varDec);
     return rangeLoop;
 }
@@ -583,7 +584,6 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
     if (const auto prefixExpr = ctx->prefixExpr()) return getPrefixExpr(prefixExpr);
     if (const auto postfixExpr = ctx->postfixExpr()) return getPostfixExpr(postfixExpr);
-    if (const auto vector = ctx->vector()) return getVector(vector);
     if (const auto constructor = ctx->constructor()) return getInstance(constructor);
     if (const auto constant = ctx->constant()) return getConstant(constant);
     if (const auto array = ctx->arrayExpr()) return getArrayExpr(array);
@@ -591,6 +591,7 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     if (const auto iterIndex = ctx->iterIndex()) return getIterIndex(iterIndex);
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (const auto func = ctx->anonnymosFunc()) return getAnonymousFunc(func);
+    if (const auto vector = ctx->vector()) return getVector(vector);
     if (ctx->NULL_()) return &LGS_NULL;
     assert(0);
 }

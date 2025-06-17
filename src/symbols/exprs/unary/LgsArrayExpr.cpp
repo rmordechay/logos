@@ -43,10 +43,12 @@ Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
     const auto baseType = arr->baseType;
     const auto arrSize = initialElements.size();
     const auto baseIRType = baseType->getIRType();
-    const auto arrIRType = ArrayType::get(baseIRType, arrSize);
+    const auto arrIRType = ArrayType::get(baseIRType, arr->iterLen);
+    if (arrSize == 0) return runtime->builder.CreateAlloca(arrIRType);
+    const auto arrIRPtr = builder.CreateAlloca(arrIRType);
+    const auto initialArrIRType = ArrayType::get(baseIRType, arrSize);
     const auto valueIR = createInnerConstArray(runtime);
-    const auto globalVarIR = new GlobalVariable(*runtime->module, arrIRType, true, GlobalValue::PrivateLinkage, valueIR);
-    const auto arrIRPtr = builder.CreateAlloca(ArrayType::get(baseIRType, arr->iterLen));
+    const auto globalVarIR = new GlobalVariable(*runtime->module, initialArrIRType, true, GlobalValue::PrivateLinkage, valueIR);
     const auto n = dataLayout.getTypeAllocSize(baseIRType).getFixedValue() * arrSize;
     builder.CreateCall(getMemcpy(runtime), {arrIRPtr, globalVarIR, builder.getInt64(n), builder.getFalse()});
     return arrIRPtr;

@@ -70,7 +70,7 @@ public:
     void visitExpr(LgsExpr* expr) override;
     void visitCast(LgsCast* castExpr) override;
     void visitArrayExpr(LgsArrayExpr* array) override;
-    void visitStaticArray(const LgsArrayExpr* array);
+    void visitStaticArray(const LgsArrayExpr* arrayExpr);
     void visitDynamicArray(const LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap) override;
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr) override;

@@ -77,38 +77,13 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
 
 void SemaAnalyser::visitInterface(LgsInterface* interface) const {}
 
-void SemaAnalyser::visitObjectImplements(LgsObject* obj) {
-    for (int i = 0; i < obj->interfaces.size(); ++i) {
-        const auto implement = obj->interfaces[i];
-        if (!implement) continue;
-        const auto interface = implement->asInterface();
-        if (!interface) {
-            errHandler.handleError(E10025, &implement->location, {implement->prettyName()});
-            continue;
-        }
-
-        vector<LgsFunc*> missingFuncs;
-        for (const auto& [name, interfaceFunc] : interface->methods) {
-            const auto objMethod = obj->getMethod(name);
-            if (objMethod && objMethod->funcType->equals(interfaceFunc->funcType)) {
-                objMethod->implementsFunc = interfaceFunc;
-                continue;
-            }
-            missingFuncs.emplace_back(interfaceFunc);
-        }
-
-        if (!missingFuncs.empty()) {
-            errHandler.handleError(E10016, &obj->location, {obj->name, interface->interfaceName, getFuncsAsStr(missingFuncs)});
-        }
-    }
-}
-
 void SemaAnalyser::visitFunc(LgsFunc* func) {
     stack.enterFunc(func);
     for (auto& param : func->funcType->params) {
         visitParam(&param);
     }
     visitStmtBlock(func->stmtBlock);
+    validateFuncControlFlow(func);
     stack.exitFunc();
 }
 
@@ -372,11 +347,11 @@ void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
     }
 }
 
-void SemaAnalyser::visitStaticArray(const LgsArrayExpr* array) {
-    const auto& initialElements = array->initialElements;
-    const auto arr = array->type->asArray();
+void SemaAnalyser::visitStaticArray(const LgsArrayExpr* arrayExpr) {
+    const auto& initialElements = arrayExpr->initialElements;
+    const auto arr = arrayExpr->type->asArray();
     if (initialElements.empty() && !arr->baseType) {
-        return errHandler.handleError(E10049, &array->location);
+        return errHandler.handleError(E10049, &arrayExpr->location);
     }
     for (const auto element : initialElements) {
         element->type->isStatic = true;
@@ -634,6 +609,32 @@ void SemaAnalyser::visitGroup(LgsGroup* group) const {
             if (!method) continue;
             method->funcType->isVirtual = true;
             group->addMethod(method);
+        }
+    }
+}
+
+void SemaAnalyser::visitObjectImplements(LgsObject* obj) {
+    for (int i = 0; i < obj->interfaces.size(); ++i) {
+        const auto implement = obj->interfaces[i];
+        if (!implement) continue;
+        const auto interface = implement->asInterface();
+        if (!interface) {
+            errHandler.handleError(E10025, &implement->location, {implement->prettyName()});
+            continue;
+        }
+
+        vector<LgsFunc*> missingFuncs;
+        for (const auto& [name, interfaceFunc] : interface->methods) {
+            const auto objMethod = obj->getMethod(name);
+            if (objMethod && objMethod->funcType->equals(interfaceFunc->funcType)) {
+                objMethod->implementsFunc = interfaceFunc;
+                continue;
+            }
+            missingFuncs.emplace_back(interfaceFunc);
+        }
+
+        if (!missingFuncs.empty()) {
+            errHandler.handleError(E10016, &obj->location, {obj->name, interface->interfaceName, getFuncsAsStr(missingFuncs)});
         }
     }
 }
