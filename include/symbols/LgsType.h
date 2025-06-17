@@ -2,6 +2,7 @@
 
 #include "LgsLocation.h"
 
+class LgsPtr;
 class LgsUInt;
 class LgsShort;
 class LgsTypePair;
@@ -45,6 +46,7 @@ public:
     void addMethod(LgsFunc* method);
     void setLocation(const Token* ctx, path* filePath);
 
+    LgsPtr* asPtr();
     LgsBool* asBool();
     LgsStr* asStr();
     LgsInt* asInt();

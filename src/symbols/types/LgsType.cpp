@@ -4,6 +4,7 @@
 #include "types/LgsArray.h"
 #include "types/LgsGroup.h"
 #include "types/LgsMap.h"
+#include "types/LgsPtr.h"
 #include "types/LgsUnknownType.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsUInt.h"
@@ -48,6 +49,7 @@ LgsType::~LgsType() {
 size_t LgsType::getSizeBytes() { assert(0); }
 string LgsType::getStrFormatPart() const { assert(0); }
 
+LgsPtr* LgsType::asPtr() { return dynamic_cast<LgsPtr*>(this); }
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
 LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }
 LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }

@@ -591,7 +591,7 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     if (const auto iterIndex = ctx->iterIndex()) return getIterIndex(iterIndex);
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (const auto func = ctx->anonnymosFunc()) return getAnonymousFunc(func);
-    if (ctx->NULL_()) return new LgsNull();
+    if (ctx->NULL_()) return &LGS_NULL;
     assert(0);
 }
 

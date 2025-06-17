@@ -6,19 +6,32 @@
 #include "stmts/LgsField.h"
 #include "types/LgsArray.h"
 #include "types/LgsObject.h"
+#include "types/LgsPtr.h"
 #include "types/LgsStr.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsShort.h"
+#include "types/primitives/LgsUInt.h"
 #include "types/primitives/LgsVoid.h"
+
+// define i32 @main() #0 {
+//   %2 = alloca i64, align 8
+//   %3 = call i64 @time(ptr noundef null)
+//   store i64 %3, ptr %2, align 8
+//   %4 = call ptr @ctime(ptr noundef %2)
+//   %5 = call i32 (ptr, ...) @printf(ptr noundef @.str, ptr noundef %4)
+//   ret i32 0
+// }
 
 bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     auto name = func->getNameAsString();
+    if (name == "ctime") {
+        std::cout << "" << std::endl;
+    }
     if (isLgsKeyword(name)) {
         name = name + '_';
     }
-    const auto returnType = func->getReturnType();
-    const auto lgsType = mapCType(returnType);
+    const auto lgsType = mapCType(func->getReturnType());
     const auto funcImpl = new LgsFunc(name, lgsType);
     for (int i = 0; i < func->getNumParams(); ++i) {
         const auto paramType = func->getParamDecl(i)->getType();
@@ -45,8 +58,11 @@ bool LgsCLangVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
 }
 
 LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
-    if (isConstCharPointer(type)) {
+    if (isCharPointer(type)) {
         return new LgsStr();
+    }
+    if (type->isPointerType()) {
+        return new LgsPtr(mapCType(type->getPointeeType()));
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::Bool)) {
         return new LgsBool();
@@ -67,7 +83,7 @@ LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
         return new LgsInt();
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::UInt)) {
-        return new LgsInt();
+        return new LgsUInt();
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::Long)) {
         return new LgsLong();
@@ -81,13 +97,6 @@ LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
     if (type->isVoidType()) {
         return new LgsVoid();
     }
-    if (type->isPointerType()) {
-        assert(type->getPointeeType()->isIntegerType());
-        return mapCType(type->getPointeeType());
-    }
-    if (type->isConstantSizeType()) {
-        return new LgsLong();
-    }
     if (type->isStructureType()) {
         return mapCStruct(type);
     }
@@ -96,6 +105,9 @@ LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
     }
     if (type->isConstantArrayType()) {
         return mapCArray(type);
+    }
+    if (type->isConstantSizeType()) {
+        return new LgsLong();
     }
     const auto typeStr = type.getAsString();
     if (typeStr == "fpos_t") {
@@ -152,10 +164,10 @@ LgsType* LgsCLangVisitor::mapCArray(const clang::QualType type) {
     return arr;
 }
 
-bool LgsCLangVisitor::isConstCharPointer(const clang::QualType qt) const {
+bool LgsCLangVisitor::isCharPointer(const clang::QualType qt) const {
     if (!qt->isPointerType()) return false;
     const auto pointeeType = qt->getPointeeType();
-    return pointeeType.isConstQualified() && pointeeType->isCharType();
+    return pointeeType->isCharType();
 }
 
 bool LgsCLangVisitor::isLgsKeyword(const string& s) const {

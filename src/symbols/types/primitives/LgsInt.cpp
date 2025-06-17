@@ -2,6 +2,7 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
+#include "types/LgsPtr.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
@@ -23,12 +24,13 @@ string LgsInt::getIRName() {
 }
 
 LgsExpr* LgsInt::getZeroValue() {
-    if (isNullable) return new LgsNull();
+    if (isNullable) return &LGS_NULL;
     return new LgsIntConst(0);
 }
 
 bool LgsInt::equals(LgsType* other) {
     const auto IRName = other->getIRName();
+    if (IRName == LgsPtr::name) return true;
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsFloat::name) return true;
     if (IRName == LgsUInt::name) return true;

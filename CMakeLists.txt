@@ -94,6 +94,8 @@ set(SOURCE_FILES
     include/symbols/exprs/unary/LgsEnumField.h
     include/data/PlatformData.h
     src/symbols/exprs/unary/LgsPrefixExpr.cpp
+    include/symbols/types/LgsPtr.h
+    src/symbols/types/LgsPtr.cpp
 )
 
 add_library(lib ${SOURCE_FILES})
