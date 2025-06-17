@@ -1,7 +1,5 @@
 #include "funcs/LgsParam.h"
-#include "exprs/LgsExpr.h"
 #include "funcs/LgsFunc.h"
-#include "utils/LgsUtils.h"
 
 string LgsParam::format(string& indentStr) {
     return name + ": " + type->prettyName();

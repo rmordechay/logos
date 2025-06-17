@@ -130,7 +130,7 @@ LgsType* LgsCLangVisitor::mapCFunc(const clang::QualType type) {
     lgsFuncType->rt = mapCType(cFuncType->getReturnType());
     for (const clang::QualType param : cFuncType->getParamTypes()) {
         auto lgsParam = LgsParam(mapCType(param));
-        lgsFuncType->params.emplace_back(lgsParam);
+        lgsFuncType->params.push_back(lgsParam);
     }
     return lgsFuncType;
 }

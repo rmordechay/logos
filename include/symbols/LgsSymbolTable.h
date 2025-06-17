@@ -10,5 +10,5 @@ struct LgsSymbolTable {
     void addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler);
     void addSymbol(const string& name, const LgsSymbol& symbol);
     void addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler = nullptr);
-    ~LgsSymbolTable();
+    ~LgsSymbolTable() = default;
 };

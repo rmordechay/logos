@@ -43,20 +43,3 @@ void LgsSymbolTable::addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler) {
         symbols[name] = LgsSymbol(field->expr->asEnumField());
     }
 }
-
-LgsSymbolTable::~LgsSymbolTable() {
-    for (const auto& [_, symbol] : symbols) {
-        switch (symbol.symbolType) {
-        case VAR_DEC: delete symbol.varDec; break;
-        case PARAM: delete symbol.param; break;
-        case OBJECT: delete symbol.object; break;
-        case INTERFACE: delete symbol.interface; break;
-        case ENUM: delete symbol.lgsEnum; break;
-        case ENUM_FIELD: delete symbol.enumField; break;
-        case FUNC: break;
-        case GROUP: break;
-        case FIELD: break;
-        case UNKNOWN: break;
-        }
-    }
-}

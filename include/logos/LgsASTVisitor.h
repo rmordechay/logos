@@ -77,5 +77,7 @@ public:
     virtual void visitFirstSelection(LgsExpr* firstExpr) = 0;
     virtual void visitInstance(LgsInstance* instance) = 0;
     virtual void visitIterIndex(LgsIterIndex* iterIndex) = 0;
+    virtual void visitSlice(LgsIterIndex* iterIndex) = 0;
+    virtual void visitGroup(LgsGroup* group) const = 0;
     virtual ~LgsASTVisitor() = default;
 };
