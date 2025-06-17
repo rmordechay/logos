@@ -811,13 +811,9 @@ public:
   public:
     PrefixExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    ExprContext *expr();
     antlr4::tree::TerminalNode *NOT();
     antlr4::tree::TerminalNode *MINUS();
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    IterIndexContext *iterIndex();
-    SelectionContext *selection();
-    FuncCallContext *funcCall();
-    ConstantContext *constant();
 
    
   };

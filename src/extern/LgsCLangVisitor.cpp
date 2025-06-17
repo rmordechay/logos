@@ -13,7 +13,10 @@
 #include "types/primitives/LgsVoid.h"
 
 bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
-    const auto name = func->getNameAsString();
+    auto name = func->getNameAsString();
+    if (isLgsKeyword(name)) {
+        name = name + '_';
+    }
     const auto returnType = func->getReturnType();
     const auto lgsType = mapCType(returnType);
     const auto funcImpl = new LgsFunc(name, lgsType);
@@ -28,8 +31,11 @@ bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
 }
 
 bool LgsCLangVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
-    const auto name = record->getNameAsString();
+    auto name = record->getNameAsString();
     if (!name.empty() && name[0] == '_') return true;
+    if (isLgsKeyword(name)) {
+        name = name + '_';
+    }
     if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
     const auto objSymbol = cFile->symbolTable.getSymbol(name);
     if (objSymbol) return true;

@@ -9,10 +9,10 @@ enum LgsPrefixOperator {
 
 class LgsPrefixExpr final : public LgsUnaryExpr {
 public:
-    LgsUnaryExpr* expr;
+    LgsExpr* expr;
     LgsPrefixOperator op;
 
-    LgsPrefixExpr(LgsUnaryExpr* baseExpr, const LgsPrefixOperator op) : expr(baseExpr), op(op) {}
+    LgsPrefixExpr(LgsExpr* baseExpr, const LgsPrefixOperator op) : expr(baseExpr), op(op) {}
     Value* createIRValue(LgsRuntime* runtime) override;
     ~LgsPrefixExpr() override = default;
 };

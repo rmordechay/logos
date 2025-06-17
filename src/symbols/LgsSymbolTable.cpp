@@ -4,10 +4,7 @@
 #include "funcs/LgsParam.h"
 #include "logos/LgsErrHandler.h"
 #include "stmts/LgsField.h"
-#include "stmts/LgsVarDec.h"
 #include "types/LgsEnum.h"
-#include "types/LgsInterface.h"
-#include "types/LgsObject.h"
 #include "utils/LgsUtils.h"
 
 void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {

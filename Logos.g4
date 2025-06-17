@@ -204,7 +204,7 @@ unaryExpr:
     ;
 
 prefixExpr:
-        (NOT | MINUS) (IDENTIFIER |  iterIndex | selection | funcCall | constant)
+        (NOT | MINUS) expr
     ;
 
 postfixExpr:

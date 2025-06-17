@@ -556,7 +556,7 @@ void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
 
 void SemaAnalyser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
     const auto baseExpr = prefixExpr->expr;
-    visitUnaryExpr(baseExpr);
+    visitExpr(baseExpr);
     const auto type = baseExpr->type;
     prefixExpr->setType(type);
 }

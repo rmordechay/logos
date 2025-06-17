@@ -1,5 +1,7 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
+#include "types/LgsAny.h"
+#include "types/primitives/LgsInt.h"
 
 string LgsFloat::prettyName() const {
     return name;
@@ -27,5 +29,8 @@ string LgsFloat::getStrFormatPart() const {
 }
 
 bool LgsFloat::equals(LgsType* other) {
-    return name == other->getIRName();
+    const auto IRName = other->getIRName();
+    if (IRName == LgsAny::name) return true;
+    if (IRName == LgsInt::name) return true;
+    return name == IRName;
 }

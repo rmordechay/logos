@@ -10,12 +10,18 @@ void LgsIfStmt::createIRStmt(LgsRuntime* runtime) {
 }
 
 void LgsIfStmt::computeSimpleIf(LgsRuntime* runtime) {
+    const auto ifCondIR = ifCond->getIRValue(runtime);
+    if (const auto* constBool = dyn_cast<ConstantInt>(ifCondIR)) {
+        if (!constBool->isOne()) return;
+        ifStmtBlock->createIRValue(runtime);
+        return;
+    }
+
     IRIfTrueBlock = createBasicBlock(BB_IF_TRUE, context);
     IRIfEndBlock = createBasicBlock(BB_IF_END, context);
     IRElseBlock = createBasicBlock(BB_ELSE, context);
 
     // if block
-    const auto ifCondIR = ifCond->getIRValue(runtime);
     runtime->builder.CreateCondBr(ifCondIR, IRIfTrueBlock, IRIfEndBlock);
     startBlock(runtime, IRIfTrueBlock);
     ifStmtBlock->createIRValue(runtime);

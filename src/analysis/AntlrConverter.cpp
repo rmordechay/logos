@@ -613,20 +613,7 @@ LgsUnaryExpr* AntlerConverter::getPrefixExpr(LogosParser::PrefixExprContext* ctx
     } else {
         assert(0);
     }
-    LgsUnaryExpr* expr = nullptr;
-    if (const auto var = ctx->IDENTIFIER()) {
-        expr = getVariable(var);
-    } else if (const auto selection = ctx->selection()) {
-        expr = getSelection(selection);
-    } else if (const auto iterIndex = ctx->iterIndex()) {
-        expr = getIterIndex(iterIndex);
-    } else if (const auto funcCall = ctx->funcCall()) {
-        expr = getFuncCall(funcCall);
-    } else if (const auto constant = ctx->constant()) {
-        expr = getConstant(constant);
-    } else {
-        assert(0);
-    }
+    const auto expr = getExpr(ctx->expr());
     const auto prefixExpr = new LgsPrefixExpr(expr, op);
     prefixExpr->setLocation(ctx->start, &filePath);
     return prefixExpr;
