@@ -1,70 +1,63 @@
 #include "stmts/LgsIfStmt.h"
 #include "logos/LgsRuntime.h"
+#include "utils/LgsUtils.h"
 
 void LgsIfStmt::createIRStmt(LgsRuntime* runtime) {
     runtime->stack.enterScope(IF_SCOPE, this);
-    if (!elseStmtBlock && elseIfConds.empty()) {
-        computeSimpleIf(runtime);
+    if (elseIfConds.empty()) {
+        if (elseStmtBlock) {
+            generateIfElse(runtime);
+        } else {
+            generateSimpleIf(runtime);
+        }
+    } else {
+        generateComplexIf(runtime);
     }
     runtime->stack.exitScope(IF_SCOPE);
 }
 
-void LgsIfStmt::computeSimpleIf(LgsRuntime* runtime) {
+void LgsIfStmt::generateSimpleIf(LgsRuntime* runtime) const {
     const auto ifCondIR = ifCond->getIRValue(runtime);
-    if (const auto* constBool = dyn_cast<ConstantInt>(ifCondIR)) {
-        if (!constBool->isOne()) return;
-        ifStmtBlock->createIRValue(runtime);
-        return;
-    }
-
-    IRIfTrueBlock = createBasicBlock(BB_IF_TRUE, context);
-    IRIfEndBlock = createBasicBlock(BB_IF_END, context);
-    IRElseBlock = createBasicBlock(BB_ELSE, context);
-
+    if (!isBranchingNeeded(runtime, ifCondIR)) return;
+    const auto trueBlock = createBasicBlock(BB_IF_TRUE, context);
+    const auto endBlock = createBasicBlock(BB_IF_END, context);
     // if block
-    runtime->builder.CreateCondBr(ifCondIR, IRIfTrueBlock, IRIfEndBlock);
-    startBlock(runtime, IRIfTrueBlock);
+    runtime->builder.CreateCondBr(ifCondIR, trueBlock, endBlock);
+    startBlock(runtime, trueBlock);
     ifStmtBlock->createIRValue(runtime);
-    if (!runtime->builder.GetInsertBlock()->getTerminator()) {
-        runtime->builder.CreateBr(IRIfEndBlock);
-    }
+    runtime->builder.CreateBr(endBlock);
     // exit
-    startBlock(runtime, IRIfEndBlock);
+    startBlock(runtime, endBlock);
 }
 
-void LgsIfStmt::computeComplexIf(LgsRuntime* runtime) {
-
-}
-
-void LgsIfStmt::createElseIfBlocks(LgsRuntime* runtime) {
-    auto& ctx = runtime->module->getContext();
-    for (size_t i = 0; i < elseIfConds.size(); ++i) {
-        startBlock(runtime, IRElseIfCheckBlock);
-        const auto elseIfCondIR = elseIfConds[i]->getIRValue(runtime);
-        const auto elseIfStartBlock = createBasicBlock(BB_ELSE_IF_START, ctx);
-        const auto lastIteration = elseIfConds.size() - 1;
-        if (i == lastIteration) {
-            if (elseStmtBlock) {
-                runtime->builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, IRElseBlock);
-            } else {
-                runtime->builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, IRIfEndBlock);
-            }
-        } else {
-            IRElseIfCheckBlock = createBasicBlock(BB_ELSE_IF_CHECK, ctx);
-            runtime->builder.CreateCondBr(elseIfCondIR, elseIfStartBlock, IRElseIfCheckBlock);
-        }
-
-        startBlock(runtime, elseIfStartBlock);
-        elseIfStmtBlocks[i]->createIRValue(runtime);
-        runtime->builder.CreateBr(IRIfEndBlock);
-    }
-}
-
-void LgsIfStmt::createElseBlock(LgsRuntime* runtime, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const {
-    if (!elseStmtBlock) return;
+void LgsIfStmt::generateIfElse(LgsRuntime* runtime) {
+    const auto ifCondIR = ifCond->getIRValue(runtime);
+    if (!isBranchingNeeded(runtime, ifCondIR)) return;
+    const auto trueBlock = createBasicBlock(BB_IF_TRUE, context);
+    const auto elseBlock = createBasicBlock(BB_ELSE, context);
+    endBlock = createBasicBlock(BB_IF_END, context);
+    runtime->builder.CreateCondBr(ifCondIR, trueBlock, elseBlock);
+    startBlock(runtime, trueBlock);
+    ifStmtBlock->createIRValue(runtime);
+    runtime->builder.CreateBr(endBlock);
     startBlock(runtime, elseBlock);
     elseStmtBlock->createIRValue(runtime);
-    runtime->builder.CreateBr(ifEndBlock);
+    runtime->builder.CreateBr(endBlock);
+    startBlock(runtime, endBlock);
+}
+
+void LgsIfStmt::generateComplexIf(LgsRuntime* runtime) {
+
+}
+
+bool LgsIfStmt::isBranchingNeeded(LgsRuntime* runtime, Value* ifCondIR) const {
+    if (const auto* constBool = dyn_cast<ConstantInt>(ifCondIR)) {
+        if (constBool->isOne()) {
+            ifStmtBlock->createIRValue(runtime);
+        }
+        return false;
+    }
+    return true;
 }
 
 LgsIfStmt::~LgsIfStmt() {

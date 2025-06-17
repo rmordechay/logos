@@ -7,8 +7,8 @@ void LgsBreakStmt::createIRStmt(LgsRuntime* runtime) {
         for (auto it = runtime->stack.begin(); it != runtime->stack.end(); ++it) {
             const auto outerIfStmt = it->ifStmt;
             if (!outerIfStmt || outerIfStmt->tag != tag) continue;
-            runtime->builder.CreateBr(outerIfStmt->IRIfEndBlock);
-            runtime->builder.SetInsertPoint(outerIfStmt->IRIfEndBlock);
+            runtime->builder.CreateBr(outerIfStmt->endBlock);
+            runtime->builder.SetInsertPoint(outerIfStmt->endBlock);
             break;
         }
     } else {

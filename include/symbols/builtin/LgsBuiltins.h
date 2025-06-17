@@ -20,6 +20,7 @@ public:
             const auto arg = args[i];
             const auto argType = arg->type->getIRType();
             auto argValue = arg->getIRValue(runtime);
+            const auto isNull = runtime->builder.CreateIsNotNull(argValue);
             if (shouldLoadIRArg(argValue, arg)) {
                 argValue = runtime->builder.CreateLoad(argType, argValue);
             }
@@ -28,7 +29,8 @@ public:
         }
         IRArgs.insert(IRArgs.begin(), getIRStr(runtime, str.str()));
         const auto printfFunc = getPrintf(runtime);
-        return runtime->builder.CreateCall(printfFunc, IRArgs);;
+        const auto callInst = runtime->builder.CreateCall(printfFunc, IRArgs);
+        return callInst;
     }
     ~LgsPrint() override = default;
 };

@@ -16,20 +16,15 @@ public:
     LgsStmtBlock* ifStmtBlock;
     vector<LgsStmtBlock*> elseIfStmtBlocks;
     LgsStmtBlock* elseStmtBlock = nullptr;
+    BasicBlock* endBlock = nullptr;
     string tag;
 
-    BasicBlock* IRIfTrueBlock = nullptr;
-    BasicBlock* IRIfEndBlock = nullptr;
-    BasicBlock* IRElseBlock = nullptr;
-    BasicBlock* IRElseIfStartBlock = nullptr;
-    BasicBlock* IRElseIfCheckBlock = nullptr;
-
     LgsIfStmt(LgsExpr* ifCond, LgsStmtBlock* ifStmtBlock) : ifCond(ifCond), ifStmtBlock(ifStmtBlock) {}
+    void generateIfElse(LgsRuntime* runtime);
     void createIRStmt(LgsRuntime* runtime) override;
-    void computeSimpleIf(LgsRuntime* runtime);
-    void computeComplexIf(LgsRuntime* runtime);
-    void createElseIfBlocks(LgsRuntime* runtime);
-    void createElseBlock(LgsRuntime* runtime, BasicBlock* elseBlock, BasicBlock* ifEndBlock) const;
+    void generateSimpleIf(LgsRuntime* runtime) const;
+    void generateComplexIf(LgsRuntime* runtime);
+    bool isBranchingNeeded(LgsRuntime* runtime, Value* ifCondIR) const;
     ~LgsIfStmt() override;
 };
 
