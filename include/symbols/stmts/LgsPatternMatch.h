@@ -11,7 +11,7 @@ public:
     std::vector<LgsStmtBlock*> patternsStmtBlocks;
     LgsStmtBlock* elseStmtBlock = nullptr;
     BasicBlock* exitBlock = nullptr;
-    BasicBlock* defaultCase = nullptr;
+    BasicBlock* elseCase = nullptr;
 
     explicit LgsPatternMatch(LgsExpr* expr) : expr(expr) {}
     void createIRStmt(LgsRuntime* runtime) override;

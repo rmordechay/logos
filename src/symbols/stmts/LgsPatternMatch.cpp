@@ -5,8 +5,8 @@
 void LgsPatternMatch::createIRStmt(LgsRuntime* runtime) {
     const auto exprIRValue = runtime->builder.getInt32(expr->hashValue(runtime));
     exitBlock = BasicBlock::Create(context, "exit_pattern_matching");
-    defaultCase = BasicBlock::Create(context, "default");
-    const auto switchInst = runtime->builder.CreateSwitch(exprIRValue, defaultCase);
+    elseCase = BasicBlock::Create(context, "default");
+    const auto switchInst = runtime->builder.CreateSwitch(exprIRValue, elseCase);
 
     vector<BasicBlock*> blocks;
     for (size_t i = 0; i < patterns.size(); ++i) {
@@ -19,7 +19,7 @@ void LgsPatternMatch::createIRStmt(LgsRuntime* runtime) {
         runtime->builder.CreateBr(exitBlock);
     }
 
-    startBlock(runtime, defaultCase);
+    startBlock(runtime, elseCase);
     elseStmtBlock->createIRValue(runtime);
 
     runtime->builder.CreateBr(exitBlock);

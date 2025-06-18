@@ -8,7 +8,3 @@ Value* LgsEnumField::createIRValue(LgsRuntime* runtime) {
 string LgsEnumField::prettyName() {
     return name;
 }
-
-uint32_t LgsDefaultEnumField::hashValue(LgsRuntime* runtime) {
-    return hashedValue;
-}

@@ -412,7 +412,7 @@ INTEGER: [0-9][0-9_]*;
 FLOAT: '-'?[0-9]+'.'[0-9]+;
 BOOL: 'true' | 'false';
 NULL: 'null';
-IDENTIFIER: [a-zA-Z] [a-zA-Z0-9_]*;
+IDENTIFIER: [a-zA-Z][a-zA-Z0-9_]*;
 STRING: '"' ( ~["\\] | '\\'.)* '"';
 TAG: '@'[a-zA-Z0-9_]+;
 LINE_COMMENT: '//' ~( '\r' | '\n' )* -> skip;

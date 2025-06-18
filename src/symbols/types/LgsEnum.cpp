@@ -3,7 +3,7 @@
 #include "logos/LgsRuntime.h"
 
 LgsExpr* LgsEnum::getZeroValue() {
-    return getField(LOGOS_DEFAULT_ENUM)->expr;
+    return nullptr;
 }
 
 Type* LgsEnum::getIRType() {

@@ -10,9 +10,7 @@ class LgsEnum final : public LgsType {
 public:
     string name;
 
-    explicit LgsEnum(const string& enumName) : name(enumName) {
-        fields[LOGOS_DEFAULT_ENUM] = new LgsField(LOGOS_DEFAULT_ENUM, &name, this, new LgsDefaultEnumField(this));
-    }
+    explicit LgsEnum(const string& enumName) : name(enumName) {}
     Type* getIRType() override;
     string getIRName() override;
     string prettyName() const override;

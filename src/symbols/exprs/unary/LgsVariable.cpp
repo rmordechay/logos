@@ -63,6 +63,8 @@ uint32_t LgsVariable::hashValue(LgsRuntime* runtime) {
         return ref.field->expr->hashValue(runtime);
     case ENUM_FIELD:
         return hashString(ref.enumField->name);
+    case VAR_DEC:
+        return ref.varDec->expr->hashValue(runtime);;
     default:
         assert(0);
     }
