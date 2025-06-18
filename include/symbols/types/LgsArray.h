@@ -16,6 +16,10 @@ public:
 class LgsArray final : public LgsIterable {
 public:
     static constexpr auto name = "Array";
+    const auto ptrTy = PointerType::get(context, 0);
+    const auto i32Ty = Type::getInt64Ty(context);
+    const auto i64Ty = Type::getInt32Ty(context);
+    const auto funcTy = FunctionType::get(StructType::get(ptrTy, i32Ty), { ptrTy, i64Ty }, false);
 
     StructType* arrStruct = nullptr;
     LgsArrayAddFunc addFunc{this};

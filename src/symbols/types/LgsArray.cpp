@@ -5,6 +5,7 @@
 #include "types/primitives/LgsInt.h"
 #include "utils/LgsUtils.h"
 
+
 Type* LgsArray::getIRType() {
     if (IRType) return IRType;
     if (!isStatic) return PointerType::getUnqual(context);
@@ -56,6 +57,7 @@ string LgsArray::getIRName() {
 }
 
 Value* LgsArray::getLength(LgsRuntime* runtime, LgsExpr* expr) {
+
     if (isStatic) return sizeExpr->getIRValue(runtime);
     return lenFunc.call(runtime, {expr});
 }

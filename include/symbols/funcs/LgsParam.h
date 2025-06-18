@@ -1,6 +1,5 @@
 #pragma once
 #include "exprs/LgsExpr.h"
-
 #include <LgsValue.h>
 
 class LgsVariable;
@@ -14,8 +13,7 @@ public:
     LgsExpr* expr = nullptr;
     bool isSelf = false;
     bool isVariadic = false;
-    AllocaInst* vaList = nullptr;
-    vector<LgsVariable*> refs;
+    Value* vaList = nullptr;
 
     explicit LgsParam(LgsType* type = nullptr, const string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     LgsParam(const string& name, LgsExpr* expr) : name(name), expr(expr) {}

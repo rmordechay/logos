@@ -11,7 +11,6 @@ class LgsType;
 class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
-    vector<LgsVariable*> refs;
     vector<LgsExpr*> returnExprs;
     LgsStmtBlock* stmtBlock = nullptr;
     LgsFunc* implementsFunc = nullptr;

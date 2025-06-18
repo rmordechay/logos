@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsLocation.h"
 
+class LgsVariable;
 class LgsExpr;
 class LgsRuntime;
 class LgsFunc;
@@ -10,6 +11,7 @@ class LgsValue {
 public:
     Location location;
     Value* IRValue = nullptr;
+    vector<LgsVariable*> refs;
 
     void setIRValue(Value* value);
     bool shouldLoadIRArg(Value* value, const LgsExpr* expr = nullptr) const;

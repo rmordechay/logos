@@ -42,7 +42,7 @@ Type* LgsFuncType::getIRType() {
     for (int i = isStaticMethod; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
-        if (!paramType->isPrimitive || param.isSelf) {
+        if (param.isSelf || !paramType->isPrimitive) {
             IRParamsTypes.emplace_back(PointerType::getUnqual(context));
         } else {
             auto irType = paramType->getIRType();

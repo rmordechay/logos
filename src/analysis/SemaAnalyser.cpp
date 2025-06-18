@@ -379,37 +379,36 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     const auto symbol = getSymbol(variable->name, &variable->location);
     if (!symbol) return;
     variable->ref.symbolType = symbol->symbolType;
-    symbol->refs.push_back(variable);
     switch (symbol->symbolType) {
     case VAR_DEC:
         variable->ref.varDec = symbol->varDec;
         variable->isImmutable = symbol->varDec->isImmutable;
         variable->setType(symbol->varDec->type);
+        symbol->varDec->refs.push_back(variable);
         break;
     case FIELD:
         variable->ref.field = symbol->field;
         variable->isImmutable = symbol->field->isImmutable;
         variable->setType(symbol->field->type);
+        symbol->field->refs.push_back(variable);
         break;
     case PARAM:
         variable->ref.param = symbol->param;
         variable->isImmutable = true;
         variable->setType(symbol->param->type);
+        symbol->param->refs.push_back(variable);
         break;
     case ENUM_FIELD:
         variable->ref.enumField = symbol->enumField;
         variable->isImmutable = true;
         variable->setType(symbol->enumField->type);
+        symbol->enumField->refs.push_back(variable);
         break;
     case FUNC:
         variable->ref.func = symbol->func;
         variable->isImmutable = true;
         variable->setType(symbol->func->funcType);
-        break;
-    case OBJECT:
-        variable->ref.object = symbol->object;
-        variable->isImmutable = true;
-        variable->setType(symbol->object);
+        symbol->func->refs.push_back(variable);
         break;
     default:
         assert(false);
