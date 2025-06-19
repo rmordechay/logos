@@ -1,6 +1,6 @@
 
 #include "exprs/unary/constants/LgsBoolConst.h"
-#include "exprs/LgsNull.h"
+#include "exprs/LgsNullValue.h"
 
 string LgsBool::prettyName() const {
     return name;
@@ -15,12 +15,11 @@ string LgsBool::getIRName() {
 }
 
 LgsExpr* LgsBool::getZeroValue() {
-
     return new LgsBoolConst(false);
 }
 
 bool LgsBool::equals(LgsType* other) {
-    if (isNullable) {
+    if (asNullable()) {
         return name == other->getIRName();
     }
     return name == other->getIRName();

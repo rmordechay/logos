@@ -32,6 +32,7 @@
 #include "types/LgsArray.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
+#include "types/LgsNullable.h"
 #include "utils/LgsUtils.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsForLoop.h>
@@ -152,9 +153,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
         visitExpr(varDec->expr);
     } else if (varDec->expr) {
         visitExpr(varDec->expr);
-        validateExprType(varDec->expr, varDec->type);
-    } else {
-        assert(0);
+        varDec->type = varDec->expr->type;
     }
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
 }
@@ -510,16 +509,15 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     }
 
     for (const auto& [_, arg] : instance->args) {
-        visitExpr(arg->expr);
         const auto field = instance->obj->getField(arg->name);
         if (!field) {
             errHandler.handleError(E10005, &arg->location, {arg->name, instance->obj->name});
             continue;
         }
+        visitExpr(arg->expr);
+        validateExprType(arg->expr, field->type);
         field->expr = arg->expr;
     }
-
-    assert(instance->obj);
 }
 
 void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
@@ -777,7 +775,7 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
         // null must have a type
         if (!type) return errHandler.handleError(E10024, &expr->location);
         // type must be nullable
-        if (!type->isNullable) return errHandler.handleError(E10023, &type->location, {type->prettyName(), type->prettyName()});
+        if (!type->asNullable()) return errHandler.handleError(E10023, &type->location, {type->prettyName(), type->prettyName()});
     }
     if (!type || !expr->type) return;
     if (!expr->type->equals(type)) {
@@ -898,6 +896,10 @@ bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, const LgsType* par
 }
 
 LgsType* SemaAnalyser::resolveType(LgsType* type) {
+    if (const auto nullable = type->asNullable()) {
+        nullable->baseType = resolveType(nullable->baseType);
+        return nullable;
+    }
     if (const auto iter = type->asIterable()) {
         resolveIterable(iter);
         return iter;
@@ -921,26 +923,21 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     LgsType* newType = nullptr;
     switch (symbol->symbolType) {
     case ENUM_FIELD:
-        symbol->enumField->type->isNullable = true;
         newType = symbol->enumField->type;
         break;
     case FUNC:
         newType = symbol->func->funcType;
         break;
     case OBJECT:
-        symbol->object->isNullable = true;
         newType = symbol->object;
         break;
     case INTERFACE:
-        symbol->interface->isNullable = true;
         newType = symbol->interface;
         break;
     case GROUP:
-        symbol->group->isNullable = true;
         newType = symbol->group;
         break;
     case ENUM:
-        symbol->lgsEnum->isNullable = true;
         newType = symbol->lgsEnum;
         break;
     case VAR_DEC:

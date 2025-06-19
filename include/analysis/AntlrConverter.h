@@ -79,7 +79,7 @@ public:
     LgsForLoop* getForeachLoop(LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getInfiniteLoop(LogosParser::LoopStatementContext* ctx);
     LgsEnum* getEnum(LogosParser::EnumDeclarationContext* ctx);
-    LgsExpr* getExpr(LogosParser::ExprContext* ctx, bool isNullable = false);
+    LgsExpr* getExpr(LogosParser::ExprContext* ctx);
     LgsExpr* getCast(LogosParser::ExprContext* ctx);
     LgsUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);

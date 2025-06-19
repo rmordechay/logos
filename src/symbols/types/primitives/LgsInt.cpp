@@ -1,4 +1,4 @@
-#include "exprs/LgsNull.h"
+#include "exprs/LgsNullValue.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
@@ -24,7 +24,6 @@ string LgsInt::getIRName() {
 }
 
 LgsExpr* LgsInt::getZeroValue() {
-
     return new LgsIntConst(0);
 }
 

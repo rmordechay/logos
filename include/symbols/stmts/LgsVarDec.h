@@ -7,6 +7,7 @@ public:
     string name;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
+    bool isNullable = false;
 
     explicit LgsVarDec(const string& name, LgsExpr* expr = nullptr) : name(name), expr(expr) {}
     void createIRStmt(LgsRuntime* runtime) override;

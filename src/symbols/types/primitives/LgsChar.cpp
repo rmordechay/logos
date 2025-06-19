@@ -1,6 +1,6 @@
 
 
-#include "exprs/LgsNull.h"
+#include "exprs/LgsNullValue.h"
 #include "exprs/unary/constants/LgsCharConst.h"
 
 string LgsChar::prettyName() const {
@@ -20,7 +20,6 @@ string LgsChar::getIRName() {
 }
 
 LgsExpr* LgsChar::getZeroValue() {
-
     return new LgsCharConst('0');
 }
 

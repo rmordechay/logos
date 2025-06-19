@@ -1,14 +1,14 @@
 #pragma once
 #include "exprs/unary/LgsUnaryExpr.h"
 
-class LgsNull final : public LgsUnaryExpr {
+class LgsNullValue final : public LgsUnaryExpr {
 public:
-    explicit LgsNull() : LgsUnaryExpr(nullptr) {
+    explicit LgsNullValue() : LgsUnaryExpr(nullptr) {
         isNull = true;
     }
     Value* createIRValue(LgsRuntime* runtime) override;
 };
 
-inline Value* LgsNull::createIRValue(LgsRuntime* runtime) {
+inline Value* LgsNullValue::createIRValue(LgsRuntime* runtime) {
     return ConstantPointerNull::get(PointerType::getUnqual(context));
 }

@@ -1,4 +1,4 @@
-#include "exprs/LgsNull.h"
+#include "exprs/LgsNullValue.h"
 #include "exprs/unary/constants/LgsShortConst.h"
 #include "types/LgsAny.h"
 
@@ -19,7 +19,6 @@ string LgsShort::getIRName() {
 }
 
 LgsExpr* LgsShort::getZeroValue() {
-
     return new LgsShortConst(0);
 }
 

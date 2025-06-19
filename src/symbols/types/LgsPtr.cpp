@@ -1,6 +1,6 @@
 #include "types/LgsPtr.h"
 
-#include "exprs/LgsNull.h"
+#include "exprs/LgsNullValue.h"
 #include "logos/LgsRuntime.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsLong.h"
@@ -22,7 +22,7 @@ size_t LgsPtr::getSizeBytes() {
 }
 
 LgsExpr* LgsPtr::getZeroValue() {
-    return new LgsNull();
+    return new LgsNullValue();
 }
 
 bool LgsPtr::equals(LgsType* other) {

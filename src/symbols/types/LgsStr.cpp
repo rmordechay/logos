@@ -1,4 +1,4 @@
-#include "exprs/LgsNull.h"
+#include "exprs/LgsNullValue.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
@@ -22,7 +22,6 @@ string LgsStr::prettyName() const {
 }
 
 LgsExpr* LgsStr::getZeroValue() {
-
     return new LgsStrConst("");
 }
 

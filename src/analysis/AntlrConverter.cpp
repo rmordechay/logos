@@ -6,7 +6,7 @@
 #include "LogosLexer.h"
 #include "builtin/LgsBuiltins.h"
 #include "exprs/unary/LgsCast.h"
-#include "exprs/LgsNull.h"
+#include "exprs/LgsNullValue.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
@@ -44,6 +44,7 @@
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsMap.h"
+#include "types/LgsNullable.h"
 #include "types/LgsUnknownType.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
@@ -171,7 +172,7 @@ LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx) {
 }
 
 LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const bool isSingleton) {
-    const auto obj = new LgsObject(objName, filePath);
+    const auto obj = new LgsObject(objName);
     obj->setLocation(ctx->start, ctx->stop, &filePath);
     if (isNameBuiltin(obj->name, &obj->location)) return nullptr;
     obj->isSingleton = isSingleton;
@@ -386,7 +387,8 @@ LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext
     const auto varDec = new LgsVarDec(variableName);
     varDec->setLocation(ctx->start, ctx->stop, &filePath);
     if (isNameBuiltin(varDec->name, &varDec->location)) return nullptr;
-    varDec->expr = getExpr(ctx->expr(), !!ctx->QUEST_MARK());
+    varDec->expr = getExpr(ctx->expr());
+    varDec->isNullable = !!ctx->QUEST_MARK();
     varDec->isMutable = !ctx->CONST();
     return varDec;
 }
@@ -545,7 +547,7 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
     return lgsEnum;
 }
 
-LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx, const bool isNullable) {
+LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
     if (!ctx) return nullptr;
     LgsExpr* expr = nullptr;
     if (ctx->cast) {
@@ -556,10 +558,6 @@ LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx, const bool isNu
         expr = getUnaryExpr(unary);
     } else if (ctx->right){
         expr = getBinaryExpr(ctx);
-    }
-    if (isNullable) {
-        assert(expr && expr->type);
-        expr->type->isNullable = true;
     }
     return expr;
 }
@@ -840,7 +838,7 @@ LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* ctx) const {
 }
 
 LgsUnaryExpr* AntlerConverter::getNullValue(const tree::TerminalNode* ctx) const {
-    const auto lgsNull = new LgsNull();
+    const auto lgsNull = new LgsNullValue();
     lgsNull->setLocation(ctx->getSymbol(), nullptr, &filePath);
     return lgsNull;
 }
@@ -857,7 +855,7 @@ LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {
     } else {
         result = getTypeFromText(ctx->IDENTIFIER());
         if (ctx->QUEST_MARK()) {
-            result->isNullable = true;
+            result = new LgsNullable(result);
         }
     }
     result->setLocation(ctx->start, ctx->stop, &filePath);

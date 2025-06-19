@@ -1,4 +1,4 @@
-#include "exprs/LgsNull.h"
+#include "exprs/LgsNullValue.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
@@ -16,7 +16,6 @@ string LgsFloat::getIRName() {
 }
 
 LgsExpr* LgsFloat::getZeroValue() {
-
     return new LgsFloatConst(0.0);
 }
 

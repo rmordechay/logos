@@ -7,11 +7,10 @@ class LgsField;
 class LgsObject : public LgsType {
 public:
     string name;
-    string path;
     bool isSingleton = false;
     vector<LgsType*> interfaces;
 
-    explicit LgsObject(const string& name, const string& path = "") : name(name), path(path) {}
+    explicit LgsObject(const string& name) : name(name) {}
     LgsInterface* getInterface(const string& interfaceName) const;
     string prettyName() const override;
     Type* getIRType() override;

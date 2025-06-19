@@ -265,7 +265,7 @@ index:
     ;
 
 selection:
-        firstSelectionElement (DOT innerSelectionElement)+
+        firstSelectionElement QUEST_MARK? (DOT innerSelectionElement QUEST_MARK?)+
     ;
 
 firstSelectionElement:

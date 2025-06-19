@@ -4,6 +4,7 @@
 #include "types/LgsArray.h"
 #include "types/LgsGroup.h"
 #include "types/LgsMap.h"
+#include "types/LgsNullable.h"
 #include "types/LgsPtr.h"
 #include "types/LgsUnknownType.h"
 #include "types/primitives/LgsShort.h"
@@ -61,6 +62,7 @@ LgsLong* LgsType::asLong() { return dynamic_cast<LgsLong*>(this); }
 LgsUInt* LgsType::asUInt() { return dynamic_cast<LgsUInt*>(this); }
 LgsStr* LgsType::asStr() { return dynamic_cast<LgsStr*>(this); }
 LgsObject* LgsType::asObject() { return dynamic_cast<LgsObject*>(this); }
+LgsNullable* LgsType::asNullable() { return dynamic_cast<LgsNullable*>(this); }
 LgsInterface* LgsType::asInterface() { return dynamic_cast<LgsInterface*>(this); }
 LgsIterable* LgsType::asIterable() { return dynamic_cast<LgsIterable*>(this); }
 LgsArray* LgsType::asArray() { return dynamic_cast<LgsArray*>(this); }

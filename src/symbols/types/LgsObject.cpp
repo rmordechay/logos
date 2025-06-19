@@ -1,6 +1,6 @@
 #include "types/LgsObject.h"
 #include "codegen/CodeGenerator.h"
-#include "exprs/LgsNull.h"
+#include "exprs/LgsNullValue.h"
 #include "exprs/unary/LgsInstance.h"
 #include "stmts/LgsField.h"
 #include "types/LgsGroup.h"
@@ -17,7 +17,6 @@ Type* LgsObject::getIRType() {
     const size_t offset = !!vtable;
     vector<Type*> elementTypes(fields.size() + offset);
     size_t position = 0;
-    time_t a;
     if (vtable) {
         elementTypes[position++] = PointerType::getUnqual(context);
     }
@@ -34,8 +33,7 @@ Type* LgsObject::getIRType() {
 }
 
 LgsExpr* LgsObject::getZeroValue() {
-
-    assert(0);
+    return new LgsInstance(this);
 }
 
 string LgsObject::getStrFormatPart() const {

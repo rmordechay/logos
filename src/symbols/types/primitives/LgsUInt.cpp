@@ -1,5 +1,5 @@
 #include "types/primitives/LgsUInt.h"
-#include "exprs/LgsNull.h"
+#include "exprs/LgsNullValue.h"
 #include "exprs/unary/constants/LgsUIntConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
@@ -22,7 +22,6 @@ string LgsUInt::getIRName() {
 }
 
 LgsExpr* LgsUInt::getZeroValue() {
-
     return new LgsUIntConst(0);
 }
 

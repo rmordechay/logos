@@ -1019,6 +1019,8 @@ public:
     SelectionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     FirstSelectionElementContext *firstSelectionElement();
+    std::vector<antlr4::tree::TerminalNode *> QUEST_MARK();
+    antlr4::tree::TerminalNode* QUEST_MARK(size_t i);
     std::vector<antlr4::tree::TerminalNode *> DOT();
     antlr4::tree::TerminalNode* DOT(size_t i);
     std::vector<InnerSelectionElementContext *> innerSelectionElement();

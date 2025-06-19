@@ -1,6 +1,6 @@
 #include "types/primitives/LgsVoid.h"
 
-#include "exprs/LgsNull.h"
+#include "exprs/LgsNullValue.h"
 
 
 string LgsVoid::prettyName() const {

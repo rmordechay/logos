@@ -2,6 +2,7 @@
 
 #include "LgsLocation.h"
 
+class LgsNullable;
 class LgsPtr;
 class LgsUInt;
 class LgsShort;
@@ -30,7 +31,6 @@ public:
     bool isVoid = false;
     bool isInt = false;
     bool isUnsigned = false;
-    bool isNullable = false;
     bool isPrimitive = false;
     bool isBigType = false;
     bool isBuiltin = false;
@@ -53,6 +53,7 @@ public:
     LgsLong* asLong();
     LgsUInt* asUInt();
     LgsMap* asMap();
+    LgsNullable* asNullable();
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsIterable* asIterable();

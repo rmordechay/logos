@@ -31,7 +31,7 @@ inline LgsError E10019{.msg = "activeEnv '%s' could not be found in the envs dir
 inline LgsError E10020{.msg = "Environment '%s' does not define the required field '%s'.", .errCode = errCodeStart++};
 inline LgsError E10021{.msg = "Duplicate fields were found in enum '%'.", .errCode = errCodeStart++};
 inline LgsError E10022{.msg = "'%s' can not be instantiated.", .errCode = errCodeStart++};
-inline LgsError E10023{.msg = "Type '%s' must be nullable. Change the type to %s? or set a value.", .errCode = errCodeStart++};
+inline LgsError E10023{.msg = "Type '%s' must be nullable. Change the type to '%s?' or set a value.", .errCode = errCodeStart++};
 inline LgsError E10024{.msg = "Declaration of null value must have an explict nullable type.", .errCode = errCodeStart++};
 inline LgsError E10025{.msg = "'%s' must be an interface.", .errCode = errCodeStart++};
 inline LgsError E10026{.msg = "Function '%s' must return expression of type '%s'. None was given.", .errCode = errCodeStart++};

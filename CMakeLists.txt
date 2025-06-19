@@ -96,6 +96,8 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/LgsPrefixExpr.cpp
     include/symbols/types/LgsPtr.h
     src/symbols/types/LgsPtr.cpp
+    src/symbols/types/LgsNullable.cpp
+    include/symbols/types/LgsNullable.h
 )
 
 add_library(lib ${SOURCE_FILES})
