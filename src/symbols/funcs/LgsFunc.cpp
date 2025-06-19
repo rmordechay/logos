@@ -116,6 +116,37 @@ void LgsFunc::swapReturnIfNeeded() const {
     }
 }
 
+void LgsFunc::setExceptionFuncs(LgsRuntime* runtime) const {
+    auto& builder = runtime->builder;
+    auto ptrTy = builder.getPtrTy();
+    const auto voidTy = builder.getVoidTy();
+    const auto persFnType = FunctionType::get(builder.getInt32Ty(), true);
+    const auto module = runtime->module;
+    auto personalityFunc = module->getOrInsertFunction("__gxx_personality_v0", persFnType);
+    const auto cxaAlloc = module->getOrInsertFunction("__cxa_allocate_exception", FunctionType::get(ptrTy, { builder.getInt64Ty() }, false));
+    const auto cxaThrow = module->getOrInsertFunction("__cxa_throw", FunctionType::get(voidTy, { ptrTy, ptrTy, ptrTy }, false));
+    const auto cxaBeginCatch = module->getOrInsertFunction("__cxa_begin_catch", FunctionType::get(voidTy, { ptrTy }, false));
+    const auto cxaEndCatch = module->getOrInsertFunction( "__cxa_end_catch", FunctionType::get(voidTy, {}, false));
+
+    const auto normalBlock = BasicBlock::Create(context, "normal");
+    const auto catchBlock = BasicBlock::Create(context, "catch");
+
+    const auto alloc = builder.CreateCall(cxaAlloc, {builder.getInt64(4)});
+    builder.CreateInvoke(cxaThrow, normalBlock, catchBlock, {alloc, Constant::getNullValue(ptrTy), Constant::getNullValue(ptrTy)});
+    startBlock(runtime, normalBlock);
+    builder.CreateRetVoid();
+
+    startBlock(runtime, catchBlock);
+    const auto landingPad = builder.CreateLandingPad(StructType::get(ptrTy, builder.getInt32Ty()), 1, "lpad");
+    runtime->IRFunc->setPersonalityFn(cast<Function>(personalityFunc.getCallee()));
+    landingPad->addClause(ConstantPointerNull::get(ptrTy));
+
+    const auto exnPtr = builder.CreateExtractValue(landingPad, {0}, "exn_ptr");
+    builder.CreateCall(cxaBeginCatch, exnPtr);
+    builder.CreateCall(cxaEndCatch);
+    builder.CreateRetVoid();
+}
+
 string LgsFunc::prettyName() {
     return funcType->prettyName();
 }

@@ -30,6 +30,7 @@ public:
     void setBigObjAttrs(Function& IRFunc) const;
     void swapReturnIfNeeded() const;
     LgsParam& getReturnSwapParam() const;
+    void setExceptionFuncs(LgsRuntime* runtime) const;
     string format(string& tabs) override;
     Value* createIRValue(LgsRuntime* runtime) override;
     virtual void generateIR(LgsRuntime* runtime);
