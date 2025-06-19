@@ -22,7 +22,7 @@ size_t LgsPtr::getSizeBytes() {
 }
 
 LgsExpr* LgsPtr::getZeroValue() {
-    return &LGS_NULL;
+    return new LgsNull();
 }
 
 bool LgsPtr::equals(LgsType* other) {

@@ -15,7 +15,7 @@ string LgsBool::getIRName() {
 }
 
 LgsExpr* LgsBool::getZeroValue() {
-    if (isNullable) return &LGS_NULL;
+
     return new LgsBoolConst(false);
 }
 

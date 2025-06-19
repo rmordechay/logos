@@ -22,7 +22,7 @@ string LgsUInt::getIRName() {
 }
 
 LgsExpr* LgsUInt::getZeroValue() {
-    if (isNullable) return &LGS_NULL;
+
     return new LgsUIntConst(0);
 }
 

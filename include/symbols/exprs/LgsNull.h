@@ -12,5 +12,3 @@ public:
 inline Value* LgsNull::createIRValue(LgsRuntime* runtime) {
     return ConstantPointerNull::get(PointerType::getUnqual(context));
 }
-
-inline LgsNull LGS_NULL;

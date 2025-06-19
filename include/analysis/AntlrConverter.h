@@ -98,6 +98,7 @@ public:
     LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx) const;
     LgsStrConst* getStrConst(tree::TerminalNode* type) const;
     LgsTypeConst* getTypeConstant(tree::TerminalNode* ctx) const;
+    LgsUnaryExpr* getNullValue(const tree::TerminalNode* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsGroup* getGroup(LogosParser::GroupContext* ctx);
     LgsType* getArrayType(LogosParser::TypeContext* ctx);

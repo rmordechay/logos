@@ -152,7 +152,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
         visitExpr(varDec->expr);
     } else if (varDec->expr) {
         visitExpr(varDec->expr);
-        varDec->type = varDec->expr->type;
+        validateExprType(varDec->expr, varDec->type);
     } else {
         assert(0);
     }

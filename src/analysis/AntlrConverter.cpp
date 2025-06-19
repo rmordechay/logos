@@ -588,7 +588,7 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (const auto func = ctx->anonnymosFunc()) return getAnonymousFunc(func);
     if (const auto vector = ctx->vector()) return getVector(vector);
-    if (ctx->NULL_()) return &LGS_NULL;
+    if (const auto null = ctx->NULL_()) return getNullValue(null);
     assert(0);
 }
 
@@ -837,6 +837,12 @@ LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* ctx) const {
     const auto typeConst = new LgsTypeConst(getTypeFromText(ctx));
     typeConst->setLocation(ctx->getSymbol(), nullptr, &filePath);
     return typeConst;
+}
+
+LgsUnaryExpr* AntlerConverter::getNullValue(const tree::TerminalNode* ctx) const {
+    const auto lgsNull = new LgsNull();
+    lgsNull->setLocation(ctx->getSymbol(), nullptr, &filePath);
+    return lgsNull;
 }
 
 LgsType* AntlerConverter::getType(LogosParser::TypeContext* ctx) {

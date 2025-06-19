@@ -20,7 +20,7 @@ string LgsVoid::getIRName() {
 }
 
 LgsExpr* LgsVoid::getZeroValue() {
-    return &LGS_NULL;
+    return nullptr;
 }
 
 bool LgsVoid::equals(LgsType* other) {
