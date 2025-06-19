@@ -502,14 +502,14 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
         instance->type = instance->obj;
     }
 
-    for (const auto [_, field] : instance->obj->fields) {
-        if (!field->isMutable && !field->expr) {
+    for (const auto [name, field] : instance->obj->fields) {
+        if (!field->isMutable && instance->args.find(name) == instance->args.end()) {
             errHandler.handleError(E10029, &field->location, {field->name});
             continue;
         }
     }
 
-    for (const auto& arg : instance->args) {
+    for (const auto& [_, arg] : instance->args) {
         visitExpr(arg->expr);
         const auto field = instance->obj->getField(arg->name);
         if (!field) {

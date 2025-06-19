@@ -714,7 +714,7 @@ LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) 
         if (isNameBuiltin(varDec->name, &varDec->location)) return instance;
         if (isArgsDuplicate(initializedArgs, varDec)) return instance;
         initializedArgs.insert(varDec->name);
-        instance->args.push_back(varDec);
+        instance->args[varDec->name] = varDec;
     }
     return instance;
 }
