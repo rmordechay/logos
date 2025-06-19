@@ -55,7 +55,6 @@ string LgsArray::getIRName() {
 }
 
 Value* LgsArray::getLength(LgsRuntime* runtime, LgsExpr* expr) {
-
     if (isStatic) return sizeExpr->getIRValue(runtime);
     return lenFunc.call(runtime, {expr});
 }

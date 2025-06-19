@@ -12,6 +12,7 @@ public:
     Location location;
     Value* IRValue = nullptr;
     vector<LgsVariable*> refs;
+    bool isMutable = false;
 
     void setIRValue(Value* value);
     GlobalVariable* createIRGlobal(const LgsRuntime* runtime, Type* type, Constant* value) const;

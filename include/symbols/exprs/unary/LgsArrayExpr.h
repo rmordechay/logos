@@ -5,7 +5,8 @@
 
 class LgsArrayExpr final : public LgsUnaryExpr {
 public:
-    vector<LgsExpr*> initialElements;
+    vector<LgsExpr*> elements;
+    bool elementsAreStatic = false;
 
     explicit LgsArrayExpr(LgsType* baseType = nullptr) {
         type = new LgsArray(baseType);
@@ -14,7 +15,7 @@ public:
     string prettyName() override;
     Value* createIRValue(LgsRuntime* runtime) override;
     Value* createConstArray(LgsRuntime* runtime) const;
-    Constant* createIRConstArray(LgsRuntime* runtime) const;
+    Constant* createIRConstArray(LgsRuntime* runtime, const vector<LgsExpr*>& elements) const;
     Value* createDynamicArray(LgsRuntime* runtime);
     void free(LgsRuntime* runtime) override;
     ~LgsArrayExpr() override = default;

@@ -6,9 +6,7 @@ class LgsLongConst final : public LgsUnaryExpr {
 public:
     long value;
 
-    explicit LgsLongConst(const int value) : LgsUnaryExpr(&LGS_LONG), value(value) {
-        type->isStatic = true;
-    }
+    explicit LgsLongConst(const int value) : LgsUnaryExpr(&LGS_LONG), value(value) {}
     Value* createIRValue(LgsRuntime* runtime) override;
     ~LgsLongConst() override = default;
 };

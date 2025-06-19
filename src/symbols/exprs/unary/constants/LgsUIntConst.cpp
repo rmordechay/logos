@@ -85,9 +85,7 @@ Value* LgsUIntConst::leIR(LgsRuntime* runtime, LgsExpr* other) {
 Value* LgsUIntConst::andIR(LgsRuntime* runtime, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(runtime);
     const auto thisIRValue = getIRValue(runtime);
-    if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-
-    }
+    if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {}
     assert(0);
 }
 

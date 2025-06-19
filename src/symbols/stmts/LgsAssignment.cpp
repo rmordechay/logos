@@ -138,8 +138,8 @@ void LgsAssignment::storeArrayInIterIndex(LgsRuntime* runtime, const LgsIterInde
     for (const auto index : indices) {
         IRIndices.emplace_back(index->from->getIRValue(runtime));
     }
-    for (int i = 0; i < arr->initialElements.size(); ++i) {
-        const auto element = arr->initialElements[i];
+    for (int i = 0; i < arr->elements.size(); ++i) {
+        const auto element = arr->elements[i];
         const auto IRIndex = runtime->builder.getInt32(i);
         IRIndices.push_back(IRIndex);
         const auto gep = runtime->builder.CreateGEP(IRType, arrPtr, IRIndices);

@@ -17,9 +17,7 @@ protected:
         logos.analyse(logos.project.files);
     }
 
-    void TearDown() override {
-
-    }
+    void TearDown() override {}
 };
 
 TEST_F(SemaLoopTest, TestForeachLoopWorks) {

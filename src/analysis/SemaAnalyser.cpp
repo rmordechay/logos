@@ -166,7 +166,7 @@ void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
     visitExpr(rValue);
     const auto lType = lValue->type;
     const auto rType = rValue->type;
-    if (lValue->isImmutable) return errHandler.handleError(E10051, &lValue->location, {lValue->prettyName()});
+    if (!lValue->isMutable) return errHandler.handleError(E10051, &lValue->location, {lValue->prettyName()});
     if (lType && rType && lType->equals(rType)) return;
     return errHandler.handleError(E10001, &assignment->location, {lType->prettyName(), rType->prettyName()});
 }
@@ -327,9 +327,12 @@ void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
 }
 
 void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
-    for (const auto element : array->initialElements) {
+    auto allElementsAreStatic = true;
+    for (const auto element : array->elements) {
         visitExpr(element);
+        allElementsAreStatic = allElementsAreStatic && element->isStatic;
     }
+    array->elementsAreStatic = allElementsAreStatic;
     if (array->type->asArray()->isStatic) {
         visitStaticArray(array);
     } else {
@@ -338,7 +341,7 @@ void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
 }
 
 void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
-    const auto& initialElements = array->initialElements;
+    const auto& initialElements = array->elements;
     const auto arr = array->type->asArray();
     const auto& arrType = arr;
     if (initialElements.empty()) {
@@ -352,14 +355,16 @@ void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
 }
 
 void SemaAnalyser::visitStaticArray(const LgsArrayExpr* arrayExpr) {
-    const auto& initialElements = arrayExpr->initialElements;
+    const auto& initialElements = arrayExpr->elements;
     const auto arr = arrayExpr->type->asArray();
     if (initialElements.empty() && !arr->baseType) {
         return errHandler.handleError(E10049, &arrayExpr->location);
     }
     for (const auto element : initialElements) {
-        element->type->isStatic = true;
         visitExpr(element);
+        if (element->type->asArray()) {
+            element->type->asArray()->isStatic = true;
+        }
     }
     if (!arr->baseType) {
         arr->baseType = initialElements.front()->type;
@@ -382,31 +387,33 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     switch (symbol->symbolType) {
     case VAR_DEC:
         variable->ref.varDec = symbol->varDec;
-        variable->isImmutable = symbol->varDec->isImmutable;
+        variable->isStatic = symbol->varDec->expr->isStatic;
+        variable->isMutable = symbol->varDec->isMutable;
         variable->setType(symbol->varDec->type);
         symbol->varDec->refs.push_back(variable);
         break;
     case FIELD:
         variable->ref.field = symbol->field;
-        variable->isImmutable = symbol->field->isImmutable;
+        variable->isStatic = false;
+        variable->isMutable = symbol->field->isMutable;
         variable->setType(symbol->field->type);
         symbol->field->refs.push_back(variable);
         break;
     case PARAM:
         variable->ref.param = symbol->param;
-        variable->isImmutable = true;
+        variable->isStatic = false;
         variable->setType(symbol->param->type);
         symbol->param->refs.push_back(variable);
         break;
     case ENUM_FIELD:
         variable->ref.enumField = symbol->enumField;
-        variable->isImmutable = true;
+        variable->isStatic = false;
         variable->setType(symbol->enumField->type);
         symbol->enumField->refs.push_back(variable);
         break;
     case FUNC:
         variable->ref.func = symbol->func;
-        variable->isImmutable = true;
+        variable->isStatic = false;
         variable->setType(symbol->func->funcType);
         symbol->func->refs.push_back(variable);
         break;
@@ -421,6 +428,7 @@ void SemaAnalyser::visitSelection(LgsSelection* selection) {
     visitFirstSelection(exprs[0]);
     visitInnerSelections(selection);
     selection->setType(selection->lastExpr()->type);
+    selection->isMutable = selection->lastExpr()->isMutable;
 }
 
 void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
@@ -457,6 +465,7 @@ void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* c
         return errHandler.handleError(E10005, &childField->location, {childField->getExprName(), parentType->prettyName()});
     }
     childField->setType(field->type);
+    childField->isMutable = field->isMutable;
     childField->ref = LgsSymbol(field);
     if (!field->isPublic && file->absPath != *field->location.filePath) {
         errHandler.handleError(E10030, &childField->location, {childField->getExprName(), *field->parentName});
@@ -494,7 +503,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     }
 
     for (const auto [_, field] : instance->obj->fields) {
-        if (field->isImmutable && !field->expr) {
+        if (!field->isMutable && !field->expr) {
             errHandler.handleError(E10029, &field->location, {field->name});
             continue;
         }
@@ -532,7 +541,8 @@ void SemaAnalyser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
 
 void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {
     if (!parentType) assert(0);
-    for (const auto& arg : methodCall->args) {
+    for (int i = 1; i < methodCall->args.size(); ++i) {
+        const auto arg = methodCall->args[i];
         visitExpr(arg);
     }
     if (resolveMethodCall(methodCall, parentType)) return;
@@ -726,7 +736,7 @@ void SemaAnalyser::validateIndex(LgsIterIndex* iterIndex) {
     if (!iterable->getIndexType()->equals(exprFrom->type)) {
         return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->prettyName(), exprFrom->type->prettyName()});
     }
-    if (baseExpr->type->isStatic) {
+    if (iterable->isStatic) {
         const auto i = exprFrom->getConstInt();
         const auto bound = iterable->iterLen;
         if (i >= bound) {
@@ -740,7 +750,7 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
     const auto exprFrom = iterIndex->index->from;
     const auto exprTo = iterIndex->index->to;
     const auto iterable = baseExpr->type->asIterable();
-    if (baseExpr->type->isStatic) {
+    if (iterable->isStatic) {
         if (exprFrom->getConstInt() > exprTo->getConstInt()) {
             return errHandler.handleError(E10037, &iterIndex->location, {iterIndex->prettyName()});
         }

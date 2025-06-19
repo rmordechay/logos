@@ -42,11 +42,7 @@ Value* LgsIterIndex::getIRFromArray(LgsRuntime* runtime, LgsArray* arr) const {
     const auto arrPtr = baseExpr->getIRValue(runtime);
     auto indexIRValue = index->from->getIRValue(runtime);
     indexIRValue = builder.CreateZExt(indexIRValue, builder.getInt64Ty());
-    const auto ptrTy = builder.getPtrTy();
-    const auto ptr = builder.CreateAlloca(ptrTy);
-    builder.CreateStore(arrPtr, ptr);
-    const auto load = builder.CreateLoad(ptrTy, ptr);
-    return arr->getFunc.callIR(runtime, {load, indexIRValue});
+    return arr->getFunc.callIR(runtime, {arrPtr, indexIRValue});
 }
 
 Value* LgsIterIndex::getIRFromMap(LgsRuntime* runtime, LgsMap* map) const {

@@ -9,10 +9,9 @@ public:
 
     explicit LgsStrConst(const string& value) : value(value) {
         const auto lgsStr = new LgsStr();
-        lgsStr->isStatic = true;
         lgsStr->sizeExpr = new LgsIntConst(value.size());
         lgsStr->iterLen = value.size();
-        lgsStr->isStatic = true;
+
         type = lgsStr;
     }
 

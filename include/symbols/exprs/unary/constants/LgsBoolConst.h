@@ -6,9 +6,7 @@ class LgsBoolConst final : public LgsUnaryExpr {
 public:
     bool value;
 
-    explicit LgsBoolConst(const bool value) : LgsUnaryExpr(&LGS_BOOL), value(value) {
-        type->isStatic = true;
-    }
+    explicit LgsBoolConst(const bool value) : LgsUnaryExpr(&LGS_BOOL), value(value) {}
     string getValueAsString() const;
     Value* createIRValue(LgsRuntime* runtime) override;
     Value* andIR(LgsRuntime* runtime, LgsExpr* other) override;

@@ -5,7 +5,7 @@
 #include "files/LgsInterfaceFile.h"
 #include "LogosLexer.h"
 #include "builtin/LgsBuiltins.h"
-#include "../../include/symbols/exprs/unary/LgsCast.h"
+#include "exprs/unary/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsEnumField.h"
@@ -227,14 +227,7 @@ LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
         isValid = false;
     } else if (paramSize == 1) {
         isValid = setMainArgsParam(mainFunc, funcSignature);
-        if (isValid) {
-            mainFunc->args = new LgsArrayExpr(new LgsStr());
-            mainFunc->initArgsFunc = new LgsFunc("initArgs", &LGS_VOID, {
-                LgsParam(mainFunc->args->type),
-                LgsParam(&LGS_INT),
-                LgsParam(new LgsStr())
-            });
-        }
+        if (isValid) mainFunc->setArgs();
     }
     if (!isValid) {
         errHandler.handleError(E10039, &mainFunc->location);
@@ -341,7 +334,7 @@ LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx, string& pare
     const auto expr = getExpr(ctx->expr());
     const auto field = new LgsField(name, &parentName, type, expr);
     field->isPublic = !!ctx->VISIBILITY();
-    field->isImmutable = !!ctx->CONST();
+    field->isMutable = ctx->CONST() == nullptr;
     field->setLocation(ctx->start, &filePath);
     return field;
 }
@@ -394,7 +387,7 @@ LgsVarDec* AntlerConverter::getImplicitVarDec(LogosParser::ImplicitVarDecContext
     varDec->setLocation(ctx->start, &filePath);
     if (isNameBuiltin(varDec->name, &varDec->location)) return nullptr;
     varDec->expr = getExpr(ctx->expr(), !!ctx->QUEST_MARK());
-    varDec->isImmutable = !!ctx->CONST();
+    varDec->isMutable = !ctx->CONST();
     return varDec;
 }
 
@@ -403,7 +396,7 @@ LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext
     const auto varDec = new LgsVarDec(variableName);
     varDec->setLocation(ctx->start, &filePath);
     if (isNameBuiltin(varDec->name, &varDec->location)) return nullptr;
-    varDec->isImmutable = !!ctx->CONST();
+    varDec->isMutable = !ctx->CONST();
     if (ctx->expr()) {
         varDec->expr = getExpr(ctx->expr());
     }
@@ -651,11 +644,12 @@ LgsPostfixExpr* AntlerConverter::getPostfixExpr(LogosParser::PostfixExprContext*
 
 LgsUnaryExpr* AntlerConverter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {
     const auto array = new LgsArrayExpr();
-    array->type->asArray()->isStatic = !!ctx->EXCLA_MARK();
-    array->type->asArray()->iterLen = ctx->expr().size();
-    array->type->asArray()->sizeExpr = new LgsIntConst(array->type->asArray()->iterLen);
+    const auto arrType = array->type->asArray();
+    arrType->isStatic = !!ctx->EXCLA_MARK();
+    arrType->iterLen = ctx->expr().size();
+    arrType->sizeExpr = new LgsIntConst(arrType->iterLen);
     for (const auto expr : ctx->expr()) {
-        array->initialElements.emplace_back(getExpr(expr));
+        array->elements.emplace_back(getExpr(expr));
     }
     array->setLocation(ctx->start, &filePath);
     return array;
@@ -759,7 +753,6 @@ LgsSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) 
 vector<LgsUnaryExpr*> AntlerConverter::getSelectionExprs(LogosParser::SelectionContext* ctx) {
     vector exprs = {getFirstSelection(ctx)};
     const auto innerSelections = ctx->innerSelectionElement();
-    exprs.reserve(innerSelections.size());
     for (int i = 0; i < innerSelections.size(); ++i) {
         const auto& currentExpr = innerSelections[i];
         if (const auto field = currentExpr->IDENTIFIER()) {
@@ -768,7 +761,7 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionExprs(LogosParser::SelectionC
         } else if (const auto funcCall = currentExpr->funcCall()) {
             const auto logosMethodCall = getFuncCall(funcCall);
             // First inner expr takes firstExpr as parent
-            const auto prevExpr = i == 0 ? exprs[0] : exprs[i - 1];
+            const auto prevExpr = exprs[i];
             logosMethodCall->args.insert(logosMethodCall->args.begin(), prevExpr);
             exprs.push_back(logosMethodCall);
         } else if (const auto iterIndex = currentExpr->iterIndex()) {

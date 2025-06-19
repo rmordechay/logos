@@ -34,7 +34,6 @@ public:
     bool isPrimitive = false;
     bool isBigType = false;
     bool isBuiltin = false;
-    bool isStatic = false;
     bool canSlice = false;
     Type* IRType = nullptr;
     LgsHashMap* vtable = nullptr;

@@ -1,6 +1,7 @@
 #include "funcs/LgsMainFunc.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include "stmts/LgsStmtBlock.h"
+#include "types/LgsStr.h"
 #include "utils/LgsUtils.h"
 
 void LgsMainFunc::generateIR(LgsRuntime* runtime) {
@@ -37,6 +38,11 @@ Function* LgsMainFunc::getIRFunc(LgsRuntime* runtime) {
     return IRFunc;
 }
 
+void LgsMainFunc::setArgs() {
+    args = new LgsArrayExpr(new LgsStr());
+    initArgsFunc = new LgsFunc("initArgs", &LGS_VOID, {LgsParam(args->type), LgsParam(&LGS_INT), LgsParam(new LgsStr())});
+}
+
 void LgsMainFunc::initArgs(LgsRuntime* runtime) {
     auto& builder = runtime->builder;
     const vector<Type*> structFields{builder.getInt64Ty(), builder.getInt32Ty(), builder.getInt32Ty(), builder.getPtrTy()};
@@ -44,4 +50,9 @@ void LgsMainFunc::initArgs(LgsRuntime* runtime) {
     args->IRValue = builder.CreateAlloca(arrStruct);
     initArgsFunc->callIR(runtime, {args->IRValue, argc, argv});
     funcType->params[0].setIRValue(args->IRValue);
+}
+
+LgsMainFunc::~LgsMainFunc() {
+    if (initArgsFunc) delete initArgsFunc;
+    if (args) delete args;
 }

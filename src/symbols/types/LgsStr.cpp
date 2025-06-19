@@ -1,9 +1,7 @@
-#include "data/LgsDefinitions.h"
 #include "exprs/LgsNull.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
-#include "utils/LgsUtils.h"
 
 size_t LgsStr::getSizeBytes() {
     if (isStatic) return iterLen + 1;

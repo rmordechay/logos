@@ -13,7 +13,6 @@ public:
     size_t position = 0;
     string* parentName;
     bool isPublic = false;
-    bool isImmutable = false;
     LgsExpr* expr = nullptr;
     LgsType* type = nullptr;
 
@@ -21,7 +20,6 @@ public:
     Value* getGEP(LgsRuntime* runtime, Type* parentType, Value* instance) const;
     void storeIRValue(LgsRuntime* runtime, Type* parentType, Value* parentIRValue, LgsExpr* expr) const;
     void setZeroValue(LgsRuntime* runtime, Type* parentType, Value* parentIRValue) const;
-    LgsField* clone() const;
     ~LgsField() override;
 };
 

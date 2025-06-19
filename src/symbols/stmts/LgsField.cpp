@@ -17,14 +17,6 @@ void LgsField::setZeroValue(LgsRuntime* runtime, Type* parentType, Value* parent
     runtime->builder.CreateStore(exprIRValue, getGEP(runtime, parentType, parentIRValue));
 }
 
-LgsField* LgsField::clone() const {
-    const auto newField = new LgsField(name, parentName, type, expr);
-    newField->position = position;
-    newField->isImmutable = isImmutable;
-    newField->isPublic = isPublic;
-    return newField;
-}
-
 LgsField::~LgsField() {
     if (expr) delete expr;
 }

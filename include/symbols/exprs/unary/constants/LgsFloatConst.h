@@ -6,9 +6,7 @@ class LgsFloatConst final : public LgsUnaryExpr {
 public:
     double value;
 
-    explicit LgsFloatConst(const float value) : LgsUnaryExpr(&LGS_FLOAT), value(value) {
-        type->isStatic = true;
-    }
+    explicit LgsFloatConst(const float value) : LgsUnaryExpr(&LGS_FLOAT), value(value) {}
     Value* createIRValue(LgsRuntime* runtime) override;
     ~LgsFloatConst() override = default;
 };
