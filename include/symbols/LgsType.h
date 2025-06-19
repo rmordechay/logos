@@ -43,7 +43,7 @@ public:
 
     LgsField* getField(const string& name);
     LgsFunc* getMethod(const string& name) const;
-    void addMethod(LgsFunc* method);
+    bool addMethod(LgsFunc* method);
     void setLocation(const Token* ctx, path* filePath);
 
     LgsPtr* asPtr();

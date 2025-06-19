@@ -19,6 +19,10 @@ void LgsFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.exitFunc();
 }
 
+Type* LgsFunc::getIRFuncType() {
+    return funcType->getIRType();
+}
+
 Value* LgsFunc::createIRValue(LgsRuntime* runtime) {
     runtime->savedIP = runtime->builder.saveIP();
     generateIR(runtime);
@@ -30,8 +34,7 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
     const auto funcIRName = funcType->getIRName();
     auto IRFunc = runtime->module->getFunction(funcIRName);
     if (IRFunc) return IRFunc;
-    const auto IRFuncType = funcType->getIRType();
-    const auto funcTy = dyn_cast<FunctionType>(IRFuncType);
+    const auto funcTy = dyn_cast<FunctionType>(getIRFuncType());
     auto func = runtime->module->getOrInsertFunction(funcIRName, funcTy);
     IRFunc = dyn_cast<Function>(func.getCallee());
     if (funcType->isSwapReturn) {
@@ -87,7 +90,7 @@ void LgsFunc::setBigObjAttrs(Function& IRFunc) const {
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
 }
 
-LgsParam LgsFunc::getReturnSwapParam() const {
+LgsParam& LgsFunc::getReturnSwapParam() const {
     if (!funcType->isSwapReturn) assert(0);
     if (funcType->returnParamIndex > funcType->params.size()) assert(0);
     return funcType->params[funcType->returnParamIndex];

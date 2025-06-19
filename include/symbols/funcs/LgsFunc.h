@@ -26,13 +26,14 @@ public:
     explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {
         type = funcType;
     }
-    void swapReturnIfNeeded() const;
-    LgsParam getReturnSwapParam() const;
-    void setBigObjAttrs(Function& IRFunc) const;
     string prettyName() override;
+    void setBigObjAttrs(Function& IRFunc) const;
+    void swapReturnIfNeeded() const;
+    LgsParam& getReturnSwapParam() const;
     string format(string& tabs) override;
     Value* createIRValue(LgsRuntime* runtime) override;
     virtual void generateIR(LgsRuntime* runtime);
+    virtual Type* getIRFuncType();
     virtual Function* getIRFunc(LgsRuntime* runtime);
     virtual Value* callIR(LgsRuntime* runtime, const vector<Value*>& args = {});
     virtual Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args = {});

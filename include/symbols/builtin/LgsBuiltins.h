@@ -20,7 +20,6 @@ public:
             const auto arg = args[i];
             const auto argType = arg->type->getIRType();
             auto argValue = arg->getIRValue(runtime);
-            const auto isNull = runtime->builder.CreateIsNotNull(argValue);
             if (shouldLoadIRArg(argValue, arg)) {
                 argValue = runtime->builder.CreateLoad(argType, argValue);
             }

@@ -18,7 +18,7 @@ Value* LgsArrayExpr::createDynamicArray(LgsRuntime* runtime) {
     auto& builder = runtime->builder;
     const auto arrType = type->asArray();
     const auto elementSize = builder.getInt64(arrType->baseType->getSizeBytes());
-    IRValue = builder.CreateAlloca(arrType->getArrStruct(runtime));
+    IRValue = builder.CreateAlloca(arrType->getArrStruct());
 
     Value* capacityIR = nullptr;
     if (arrType->sizeExpr) {
@@ -44,26 +44,23 @@ Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
     const auto arrSize = initialElements.size();
     const auto baseIRType = baseType->getIRType();
     const auto arrIRType = ArrayType::get(baseIRType, arr->iterLen);
-    if (arrSize == 0) return runtime->builder.CreateAlloca(arrIRType);
     const auto arrIRPtr = builder.CreateAlloca(arrIRType);
-    const auto initialArrIRType = ArrayType::get(baseIRType, arrSize);
-    const auto valueIR = createInnerConstArray(runtime);
-    const auto globalVarIR = new GlobalVariable(*runtime->module, initialArrIRType, true, GlobalValue::PrivateLinkage, valueIR);
-    const auto n = dataLayout.getTypeAllocSize(baseIRType).getFixedValue() * arrSize;
-    builder.CreateCall(getMemcpy(runtime), {arrIRPtr, globalVarIR, builder.getInt64(n), builder.getFalse()});
+    if (arrSize > 0) {
+        const auto type = ArrayType::get(baseIRType, arrSize);
+        const auto value = createIRConstArray(runtime);
+        const auto globalVarIR = createIRGlobal(runtime, type, value);
+        copyMem(runtime, globalVarIR, arrIRPtr, arr->getIterBytesSize(arrSize));
+    }
     return arrIRPtr;
 }
 
-Constant* LgsArrayExpr::createInnerConstArray(LgsRuntime* runtime) const {
-    const auto arr = type->asArray();
-    const auto baseType = arr->baseType;
-    const auto arrSize = initialElements.size();
-    const auto baseIRType = baseType->getIRType();
-    const auto arrIRType = ArrayType::get(baseIRType, arrSize);
+Constant* LgsArrayExpr::createIRConstArray(LgsRuntime* runtime) const {
+    const auto baseType = type->asArray()->baseType;
+    const auto arrIRType = ArrayType::get(baseType->getIRType(), initialElements.size());
     vector<Constant*> values;
     for (const auto element : initialElements) {
         if (const auto subArray = element->asArrayExpr()) {
-            auto nested = subArray->createInnerConstArray(runtime);
+            auto nested = subArray->createIRConstArray(runtime);
             values.push_back(nested);
         } else {
             const auto val = element->getIRValue(runtime);

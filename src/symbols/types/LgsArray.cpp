@@ -1,14 +1,12 @@
 #include "types/LgsArray.h"
-
 #include "builtin/LgsBuiltins.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include "types/primitives/LgsInt.h"
 #include "utils/LgsUtils.h"
 
-
 Type* LgsArray::getIRType() {
     if (IRType) return IRType;
-    if (!isStatic) return PointerType::getUnqual(context);
+    if (!isStatic) return getArrStruct();
     const auto innerIRType = baseType->getIRType();
     IRType = ArrayType::get(innerIRType, iterLen);
     return IRType;
@@ -74,24 +72,39 @@ Value* LgsArray::isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
     return isNotEmptyFunc.call(runtime, {expr});
 }
 
-StructType* LgsArray::getArrStruct(LgsRuntime* runtime) {
+StructType* LgsArray::getArrStruct() {
     if (arrStruct) return arrStruct;
-    auto& builder = runtime->builder;
-    const auto int64Ty = builder.getInt64Ty();
-    const auto ptrTy = builder.getPtrTy();
+    const auto int64Ty = Type::getInt32Ty(context);
+    const auto ptrTy = PointerType::getUnqual(context);
     arrStruct = getIRStructType(name, {int64Ty, int64Ty, int64Ty, ptrTy});
     return arrStruct;
 }
 
 Value* LgsArrayAddFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
-    const auto arrPtr = args[0]->getIRValue(runtime);
-    for (int i = 1; i < args.size(); ++i) {
+    vector<Value*> values;
+    const auto arr = args[0];
+    const auto arrSize = args.size() - 1;
+    const auto baseType = arr->type->asIterable()->baseType;
+    const auto arrIRType = ArrayType::get(baseType->getIRType(), arrSize);
+    const auto arrIRPtr = runtime->builder.CreateAlloca(arrIRType);
+    const auto zero = runtime->builder.getInt32(0);
+    for (int i = 1; i < arrSize; ++i) {
         const auto arg = args[i];
-        const auto argValuePtr = runtime->builder.CreateAlloca(arg->type->getIRType());
+        const auto argValuePtr = runtime->builder.CreateGEP(arrIRType, arrIRPtr, {zero, runtime->builder.getInt32(i)});
         runtime->builder.CreateStore(arg->getIRValue(runtime), argValuePtr);
-        callIR(runtime, {arrPtr, argValuePtr});
     }
+    callIR(runtime, {arr->getIRValue(runtime), runtime->builder.getInt64(arrSize), arrIRPtr});
     return nullptr;
+}
+
+Type* LgsArrayAddFunc::getIRFuncType() {
+    const auto& params = funcType->params;
+    const vector<Type*> IRParamsTypes = {
+        PointerType::getUnqual(context),
+        Type::getInt64Ty(context),
+        params[1].type->getIRType()
+    };
+    return FunctionType::get(funcType->rt->getIRType(), IRParamsTypes, false);
 }
 
 LgsArray::~LgsArray() {

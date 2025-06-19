@@ -92,7 +92,7 @@ public:
     LgsUnaryExpr* getVector(LogosParser::VectorContext* vector) const;
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
     LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
-    vector<LgsUnaryExpr*> getSelectionInnerExprs(LogosParser::SelectionContext* ctx);
+    vector<LgsUnaryExpr*> getSelectionExprs(LogosParser::SelectionContext* ctx);
     LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
     LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx) const;

@@ -2,6 +2,7 @@
 #include "LgsAny.h"
 #include "funcs/LgsBuiltinFunc.h"
 #include "primitives/LgsBool.h"
+#include "primitives/LgsInt.h"
 #include "primitives/LgsLong.h"
 #include "primitives/LgsVoid.h"
 #include "types/LgsIterable.h"
@@ -10,20 +11,17 @@ class LgsArrayAddFunc final : public LgsBuiltinFunc {
 public:
     explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName(), {parent, &LGS_ANY}, true, true) {}
     Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override;
+    Type* getIRFuncType() override;
     ~LgsArrayAddFunc() override = default;
 };
 
 class LgsArray final : public LgsIterable {
 public:
     static constexpr auto name = "Array";
-    const auto ptrTy = PointerType::get(context, 0);
-    const auto i32Ty = Type::getInt64Ty(context);
-    const auto i64Ty = Type::getInt32Ty(context);
-    const auto funcTy = FunctionType::get(StructType::get(ptrTy, i32Ty), { ptrTy, i64Ty }, false);
 
     StructType* arrStruct = nullptr;
     LgsArrayAddFunc addFunc{this};
-    LgsBuiltinFunc lenFunc{"len", &LGS_LONG, name, {this}, true};
+    LgsBuiltinFunc lenFunc{"len", &LGS_INT, name, {this}, true};
     LgsBuiltinFunc getFunc{"get", &LGS_ANY, name, {this, &LGS_LONG}, true};
     LgsBuiltinFunc isEmptyFunc{"isEmpty", &LGS_BOOL, name, {this}, true};
     LgsBuiltinFunc isNotEmptyFunc{"isNotEmpty", &LGS_BOOL, name, {this}, true};
@@ -53,7 +51,7 @@ public:
     Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* isEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
     Value* isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
-    StructType* getArrStruct(LgsRuntime* runtime);
+    StructType* getArrStruct();
     bool equals(LgsType* other) override;
     ~LgsArray() override;
 };

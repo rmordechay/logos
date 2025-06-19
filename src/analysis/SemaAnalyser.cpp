@@ -500,7 +500,6 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
         }
     }
 
-    unordered_set<string> initializedFields;
     for (const auto& arg : instance->args) {
         visitExpr(arg->expr);
         const auto field = instance->obj->getField(arg->name);
@@ -509,14 +508,6 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
             continue;
         }
         field->expr = arg->expr;
-        initializedFields.insert(field->name);
-    }
-
-    for (const auto& [name, field] : instance->obj->fields) {
-        if (initializedFields.count(name)) continue;
-        if (!field->expr) {
-            setZeroField(field);
-        }
     }
 
     assert(instance->obj);

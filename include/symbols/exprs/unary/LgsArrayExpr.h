@@ -14,7 +14,7 @@ public:
     string prettyName() override;
     Value* createIRValue(LgsRuntime* runtime) override;
     Value* createConstArray(LgsRuntime* runtime) const;
-    Constant* createInnerConstArray(LgsRuntime* runtime) const;
+    Constant* createIRConstArray(LgsRuntime* runtime) const;
     Value* createDynamicArray(LgsRuntime* runtime);
     void free(LgsRuntime* runtime) override;
     ~LgsArrayExpr() override = default;

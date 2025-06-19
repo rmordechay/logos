@@ -176,15 +176,18 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
     if (isNameBuiltin(obj->name, &obj->location)) return nullptr;
     obj->isSingleton = isSingleton;
     for (int i = 0; i < ctx->field().size(); ++i) {
-        const auto field = ctx->field(i);
-        const auto lgsField = getField(field, obj->name);
+        const auto lgsField = getField(ctx->field(i), obj->name);
         lgsField->position = i;
         obj->fields[lgsField->name] = lgsField;
     }
     for (const auto& func : ctx->methodImplementation()) {
-        auto funcName = func->funcSignature()->IDENTIFIER()->getText();
+        const auto methodName = func->funcSignature()->IDENTIFIER()->getText();
         const auto method = getMethodImpl(func, obj);
-        obj->addMethod(method);
+        const auto methodAdded = obj->addMethod(method);
+        if (!methodAdded) {
+            errHandler.handleError(E10056, &obj->location, {obj->name, methodName});
+            return nullptr;
+        }
     }
     if (ctx->objectImplements()) {
         for (const auto& type : ctx->objectImplements()->IDENTIFIER()) {
@@ -747,10 +750,33 @@ LgsIterIndex* AntlerConverter::getIterIndex(LogosParser::IterIndexContext* ctx) 
 }
 
 LgsSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) {
-    const auto exprs = getSelectionInnerExprs(ctx);
+    const auto exprs = getSelectionExprs(ctx);
     const auto selection = new LgsSelection(exprs);
     selection->setLocation(ctx->start, &filePath);
     return selection;
+}
+
+vector<LgsUnaryExpr*> AntlerConverter::getSelectionExprs(LogosParser::SelectionContext* ctx) {
+    vector exprs = {getFirstSelection(ctx)};
+    const auto innerSelections = ctx->innerSelectionElement();
+    exprs.reserve(innerSelections.size());
+    for (int i = 0; i < innerSelections.size(); ++i) {
+        const auto& currentExpr = innerSelections[i];
+        if (const auto field = currentExpr->IDENTIFIER()) {
+            const auto logosField = getVariable(field);
+            exprs.push_back(logosField);
+        } else if (const auto funcCall = currentExpr->funcCall()) {
+            const auto logosMethodCall = getFuncCall(funcCall);
+            // First inner expr takes firstExpr as parent
+            const auto prevExpr = i == 0 ? exprs[0] : exprs[i - 1];
+            logosMethodCall->args.insert(logosMethodCall->args.begin(), prevExpr);
+            exprs.push_back(logosMethodCall);
+        } else if (const auto iterIndex = currentExpr->iterIndex()) {
+            const auto logosIterIndex = getIterIndex(iterIndex);
+            exprs.push_back(logosIterIndex);
+        }
+    }
+    return exprs;
 }
 
 LgsUnaryExpr* AntlerConverter::getFirstSelection(LogosParser::SelectionContext* ctx) {
@@ -774,29 +800,6 @@ LgsUnaryExpr* AntlerConverter::getFirstSelection(LogosParser::SelectionContext* 
         return getStrConst(type);
     }
     assert(0);
-}
-
-vector<LgsUnaryExpr*> AntlerConverter::getSelectionInnerExprs(LogosParser::SelectionContext* ctx) {
-    vector exprs = {getFirstSelection(ctx)};
-    const auto innerSelections = ctx->innerSelectionElement();
-    exprs.reserve(innerSelections.size());
-    for (int i = 0; i < innerSelections.size(); ++i) {
-        const auto& currentExpr = innerSelections[i];
-        if (const auto field = currentExpr->IDENTIFIER()) {
-            const auto logosField = getVariable(field);
-            exprs.push_back(logosField);
-        } else if (const auto funcCall = currentExpr->funcCall()) {
-            const auto logosMethodCall = getFuncCall(funcCall);
-            // First inner expr takes firstExpr as parent
-            const auto prevExpr = i == 0 ? exprs[0] : exprs[i - 1];
-            logosMethodCall->args.insert(logosMethodCall->args.begin(), prevExpr);
-            exprs.push_back(logosMethodCall);
-        } else if (const auto iterIndex = currentExpr->iterIndex()) {
-            const auto logosIterIndex = getIterIndex(iterIndex);
-            exprs.push_back(logosIterIndex);
-        }
-    }
-    return exprs;
 }
 
 LgsUnaryExpr* AntlerConverter::getConstant(LogosParser::ConstantContext* ctx) const {

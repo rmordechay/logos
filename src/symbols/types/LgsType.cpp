@@ -23,8 +23,12 @@ LgsField* LgsType::getField(const string& name) {
     return nullptr;
 }
 
-void LgsType::addMethod(LgsFunc* method) {
-    methods[method->funcType->name] = method;
+bool LgsType::addMethod(LgsFunc* method) {
+    if (methods.find(method->funcType->name) == methods.end()) {
+        methods[method->funcType->name] = method;
+        return true;
+    }
+    return false;
 }
 
 LgsFunc* LgsType::getMethod(const string& name) const {

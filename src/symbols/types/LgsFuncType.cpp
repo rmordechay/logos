@@ -9,7 +9,7 @@ bool LgsFuncType::equals(LgsType* other) {
     if (!rt->equals(otherFuncType->rt)) return false;
     if (params.size() != otherParams.size()) return false;
     if (params.size() == 0 && otherParams.size() == 0) return true;
-    for (size_t i = 0; i < params.size(); ++i) {
+    for (size_t i = isMethod; i < params.size(); ++i) {
         const auto thisType = params[i].type;
         const auto otherType = otherFuncType->params[i].type;
         if (!thisType->equals(otherType)) return false;

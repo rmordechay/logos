@@ -1,5 +1,6 @@
 #include "LgsValue.h"
 #include "funcs/LgsFunc.h"
+#include "utils/LgsUtils.h"
 
 void LgsValue::startBlock(LgsRuntime* runtime, BasicBlock* const block) const {
     block->insertInto(runtime->IRFunc);
@@ -17,6 +18,11 @@ Value* LgsValue::hashIRValue(LgsRuntime* runtime, Value* value) const {
     return runtime->builder.CreateCall(func, {value});
 }
 
+void LgsValue::copyMem(LgsRuntime* runtime, Value* src, Value* dest, const size_t n) const {
+    auto& builder = runtime->builder;
+    builder.CreateCall(getMemcpy(runtime), {dest, src, builder.getInt64(n), builder.getFalse()});
+}
+
 void LgsValue::setLocation(const Token* ctx, path* filePath) {
     location.lineNumber = ctx->getLine();
     location.posInLine = ctx->getCharPositionInLine() + 1;
@@ -25,6 +31,10 @@ void LgsValue::setLocation(const Token* ctx, path* filePath) {
 
 void LgsValue::setIRValue(Value* value) {
     IRValue = value;
+}
+
+GlobalVariable* LgsValue::createIRGlobal(const LgsRuntime* runtime, Type* type, Constant* value) const {
+    return new GlobalVariable(*runtime->module, type, true, GlobalValue::PrivateLinkage, value);
 }
 
 bool LgsValue::shouldLoadIRArg(Value* value, const LgsExpr* expr) const {
