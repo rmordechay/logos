@@ -87,7 +87,7 @@ Value* LgsArrayAddFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) 
     const auto arrIRType = ArrayType::get(baseType->getIRType(), arrSize);
     const auto arrIRPtr = runtime->builder.CreateAlloca(arrIRType);
     const auto zero = runtime->builder.getInt32(0);
-    for (int i = 1; i < arrSize; ++i) {
+    for (int i = 1; i < args.size(); ++i) {
         const auto arg = args[i];
         const auto argValuePtr = runtime->builder.CreateGEP(arrIRType, arrIRPtr, {zero, runtime->builder.getInt32(i)});
         runtime->builder.CreateStore(arg->getIRValue(runtime), argValuePtr);

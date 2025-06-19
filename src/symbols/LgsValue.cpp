@@ -23,9 +23,13 @@ void LgsValue::copyMem(LgsRuntime* runtime, Value* src, Value* dest, const size_
     builder.CreateCall(getMemcpy(runtime), {dest, src, builder.getInt64(n), builder.getFalse()});
 }
 
-void LgsValue::setLocation(const Token* ctx, path* filePath) {
-    location.lineNumber = ctx->getLine();
-    location.posInLine = ctx->getCharPositionInLine() + 1;
+void LgsValue::setLocation(const Token* start, const Token* end, path* filePath) {
+    location.lineNumberStart = start->getLine();
+    location.posInLineStart = start->getCharPositionInLine() + 1;
+    if (!end) {
+        location.lineNumberEnd = start->getLine();
+        location.posInLineEnd = start->getCharPositionInLine() + start->getText().length();
+    }
     location.filePath = filePath;
 }
 
@@ -38,8 +42,8 @@ GlobalVariable* LgsValue::createIRGlobal(const LgsRuntime* runtime, Type* type, 
 }
 
 bool LgsValue::shouldLoadIRArg(Value* value, const LgsExpr* expr) const {
-    if (expr->isNull || expr->type->asPtr() || expr->type->asStr()) return false;
     if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
+    if (expr->isNull || expr->type->asPtr() || expr->type->asStr()) return false;
     if (const auto alloca = dyn_cast<AllocaInst>(value)) {
         const auto allocatedType = alloca->getAllocatedType();
         return !allocatedType->isStructTy() && !allocatedType->isArrayTy();

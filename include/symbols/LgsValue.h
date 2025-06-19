@@ -22,7 +22,7 @@ public:
     Value* hashIRValue(LgsRuntime* runtime, Value* value) const;
     void copyMem(LgsRuntime* runtime, Value* src, Value* dest, size_t n) const;
     virtual std::string format(std::string& indentStr);
-    virtual void setLocation(const Token* ctx, path* filePath);
+    virtual void setLocation(const Token* start, const Token* end, path* filePath);
     virtual ~LgsValue() = default;
 };
 
