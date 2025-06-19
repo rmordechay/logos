@@ -17,5 +17,6 @@ Module* createIRModule(const std::string& moduleName, LLVMContext& context);
 bool hasTerminator(const LgsRuntime* runtime);
 FunctionCallee getPrintf(LgsRuntime* runtime);
 FunctionCallee getSnprintf(LgsRuntime* runtime);
+FunctionCallee getStrHash(LgsRuntime* runtime);
 Function* getMemcpy(LgsRuntime* runtime);
 TargetMachine* getTargetMachine();

@@ -3,7 +3,7 @@
 #include "stmts/LgsVarDec.h"
 
 void LgsPatternMatch::createIRStmt(LgsRuntime* runtime) {
-    const auto exprIRValue = runtime->builder.getInt32(expr->hashValue(runtime));
+    const auto exprIRValue = expr->hashValue(runtime);
     exitBlock = BasicBlock::Create(context, "exit_pattern_matching");
     defaultCase = BasicBlock::Create(context, "default");
     const auto switchInst = runtime->builder.CreateSwitch(exprIRValue, defaultCase);
@@ -11,7 +11,7 @@ void LgsPatternMatch::createIRStmt(LgsRuntime* runtime) {
     vector<BasicBlock*> blocks;
     for (size_t i = 0; i < patterns.size(); ++i) {
         const auto pattern = patterns[i];
-        const auto patterIRValue = runtime->builder.getInt32(pattern->hashValue(runtime));
+        const auto patterIRValue = pattern->hashValue(runtime);
         const auto patternBlock = BasicBlock::Create(context, "case_" + to_string(i), runtime->IRFunc);
         switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
         runtime->builder.SetInsertPoint(patternBlock);

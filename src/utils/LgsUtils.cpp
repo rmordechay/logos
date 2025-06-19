@@ -66,13 +66,18 @@ bool hasTerminator(const LgsRuntime* runtime) {
 }
 
 FunctionCallee getPrintf(LgsRuntime* runtime) {
-    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context)}, true);
-    return runtime->module->getOrInsertFunction("printf", printfType);
+    const auto funcType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context)}, true);
+    return runtime->module->getOrInsertFunction("printf", funcType);
 }
 
 FunctionCallee getSnprintf(LgsRuntime* runtime) {
-    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context), runtime->builder.getInt64Ty(), PointerType::getUnqual(context)}, true);
-    return runtime->module->getOrInsertFunction("snprintf", printfType);
+    const auto funcType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context), runtime->builder.getInt64Ty(), PointerType::getUnqual(context)}, true);
+    return runtime->module->getOrInsertFunction("snprintf", funcType);
+}
+
+FunctionCallee getStrHash(LgsRuntime* runtime) {
+    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context)}, false);
+    return runtime->module->getOrInsertFunction("Str_hash", printfType);
 }
 
 Function* getMemcpy(LgsRuntime* runtime) {

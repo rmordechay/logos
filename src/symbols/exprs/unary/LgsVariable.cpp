@@ -56,15 +56,17 @@ LgsExpr* LgsVariable::convertExpr(LgsType* type) {
     assert(0);
 }
 
-uint32_t LgsVariable::hashValue(LgsRuntime* runtime) {
+Value* LgsVariable::hashValue(LgsRuntime* runtime) {
     string text;
     switch (ref.symbolType) {
+    case PARAM:
+        return runtime->builder.CreateCall(getStrHash(runtime), {ref.param->getIRValue(runtime)});
+    case VAR_DEC:
+        return ref.varDec->expr->hashValue(runtime);
     case FIELD:
         return ref.field->expr->hashValue(runtime);
     case ENUM_FIELD:
-        return hashString(ref.enumField->name);
-    case VAR_DEC:
-        return ref.varDec->expr->hashValue(runtime);;
+        return runtime->builder.getInt32(hashString(ref.enumField->name));
     default:
         assert(0);
     }

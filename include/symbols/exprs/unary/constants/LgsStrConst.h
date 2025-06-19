@@ -11,10 +11,10 @@ public:
         const auto lgsStr = new LgsStr();
         lgsStr->sizeExpr = new LgsIntConst(value.size());
         lgsStr->iterLen = value.size();
-
         type = lgsStr;
     }
 
+    Value* hashValue(LgsRuntime* runtime) override;
     Value* createIRValue(LgsRuntime* runtime) override;
     Value* eqIR(LgsRuntime* runtime, LgsExpr* other) override;
     Value* addIR(LgsRuntime* runtime, LgsExpr* other) override;

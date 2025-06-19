@@ -4,6 +4,10 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "utils/LgsUtils.h"
 
+Value* LgsStrConst::hashValue(LgsRuntime* runtime) {
+    return runtime->builder.getInt32(hashString(value));
+}
+
 Value* LgsStrConst::createIRValue(LgsRuntime* runtime) {
     return getIRStr(runtime, value);
 }

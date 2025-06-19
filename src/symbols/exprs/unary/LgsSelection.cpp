@@ -42,7 +42,7 @@ LgsExpr* LgsSelection::lastExpr() const {
     return exprs[exprs.size() - 1];
 }
 
-uint32_t LgsSelection::hashValue(LgsRuntime* runtime) {
+Value* LgsSelection::hashValue(LgsRuntime* runtime) {
     const auto lgsExpr = lastExpr();
     return lgsExpr->hashValue(runtime);
 }
