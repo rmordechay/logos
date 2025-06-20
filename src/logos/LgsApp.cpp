@@ -14,6 +14,7 @@
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "funcs/LgsMainFunc.h"
+#include "logos/LgsLinker.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsInterface.h"
 
@@ -37,7 +38,7 @@ bool LgsApp::parse() {
         vector<LgsFile*> files;
         ThreadPool threadPool;
         threadPool.start();
-        parseSrcFiles(paths.srcDir, threadPool);
+        parseSrcFiles(threadPool);
         threadPool.wait();
     });
     thread tGlobals([this] { loadGlobals(); });
@@ -72,9 +73,10 @@ bool LgsApp::generate() {
     for (const auto file : files) {
         threadPool.runTask([=, &file] {
             const auto module = file->generateIR();
-            if (!module) return;
-            lock_guard lock(mtx);
-            IRModules[file->name] = module;
+            if (module) {
+                lock_guard lock(mtx);
+                IRModules[file->name] = module;
+            }
         });
     }
     threadPool.wait();
@@ -83,31 +85,16 @@ bool LgsApp::generate() {
 }
 
 bool LgsApp::link() const {
-    Module* mainModule = IRModules.find(LOGOS_MAIN_FILE_NAME)->second;
-    assert(mainModule);
-    Linker llvmLinker(*mainModule);
-    for (const auto& [name, module] : IRModules) {
-        if (name == LOGOS_MAIN_FILE_NAME) continue;
-        llvmLinker.linkInModule(unique_ptr<Module>(module));
-    }
-    if (!generateObjFile(mainModule)) return false;
-    auto linkerOpts = platform.linkerOpts;
-    linkerOpts.push_back(paths.objFilePath.c_str());
-    linkerOpts.push_back("-o");
-    linkerOpts.push_back(paths.execFilePath.c_str());
-    if (!platform.link(linkerOpts, outs(), errs(), false, false)) {
-        errs().flush();
-        return false;
-    }
-    return true;
+    const LgsLinker linker;
+    return linker.link(paths, IRModules);
 }
 
 void LgsApp::run() const {
     execv(paths.execFilePath.c_str(), args.data());
 }
 
-void LgsApp::parseSrcFiles(const std::string& path, ThreadPool& threadPool) {
-    for (const auto& entry : recursive_directory_iterator(path)) {
+void LgsApp::parseSrcFiles(ThreadPool& threadPool) {
+    for (const auto& entry : recursive_directory_iterator(paths.srcDir)) {
         if (isLogosFile(entry)) {
             threadPool.runTask([entry, this] {
                 parseSrcFile(entry);
@@ -177,27 +164,6 @@ void LgsApp::parseAppFile(path fileEntry) {
             activeEnv.name = varDec->expr->asStrConst()->value;
         }
     }
-}
-
-bool LgsApp::generateObjFile(Module* module) const {
-    error_code ec;
-    legacy::PassManager pass;
-    raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
-    const auto addedPassFailed = getTargetMachine()->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
-    if (addedPassFailed) {
-        cerr << ec.message() << endl;
-        return false;
-    }
-
-    if (verifyModule(*module, &errs())) {
-        errs().flush();
-        return false;
-    }
-
-    pass.run(*module);
-    outputStream.flush();
-    outputStream.close();
-    return true;
 }
 
 bool LgsApp::resolveGlobalTypes() const {

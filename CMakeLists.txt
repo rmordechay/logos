@@ -11,6 +11,7 @@ set(SOURCE_FILES
     src/logos/LgsApp.cpp
     src/logos/LgsRuntime.cpp
     src/logos/LgsStack.cpp
+    src/logos/LgsLinker.cpp
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
     src/cli/LgsCli.cpp
@@ -26,6 +27,7 @@ set(SOURCE_FILES
     src/parser/LogosParser.cpp
     src/utils/LgsUtils.cpp
     src/utils/ThreadPool.cpp
+    src/utils/LgsLogger.cpp
 
     src/symbols/exprs/unary/constants/LgsBoolConst.cpp
     src/symbols/exprs/unary/constants/LgsCharConst.cpp
@@ -84,20 +86,14 @@ set(SOURCE_FILES
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsValue.cpp
     src/symbols/exprs/unary/LgsPostfixExpr.cpp
-    src/utils/LgsLogger.cpp
     src/symbols/LgsSymbolTable.cpp
     src/symbols/types/primitives/LgsUInt.cpp
     src/symbols/exprs/unary/constants/LgsUIntConst.cpp
     src/symbols/types/LgsIterator.cpp
-    include/symbols/types/LgsIterator.h
     src/symbols/exprs/unary/LgsEnumField.cpp
-    include/symbols/exprs/unary/LgsEnumField.h
-    include/data/PlatformData.h
     src/symbols/exprs/unary/LgsPrefixExpr.cpp
-    include/symbols/types/LgsPtr.h
     src/symbols/types/LgsPtr.cpp
     src/symbols/types/LgsNullable.cpp
-    include/symbols/types/LgsNullable.h
 )
 
 add_library(lib ${SOURCE_FILES})

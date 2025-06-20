@@ -40,11 +40,10 @@ public:
     bool generate();
     bool link() const;
     void run() const;
-    void parseSrcFiles(const string& path, ThreadPool& threadPool);
+    void parseSrcFiles(ThreadPool& threadPool);
     void parseSrcFile(path fileEntry);
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
-    bool generateObjFile(Module* module) const;
     bool resolveExternalFiles();
     bool resolveGlobalTypes() const;
     void setEnvVars();
