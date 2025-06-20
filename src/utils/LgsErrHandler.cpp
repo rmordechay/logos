@@ -1,4 +1,4 @@
-#include "logos/LgsErrHandler.h"
+#include "utils/LgsErrHandler.h"
 #include "LgsLocation.h"
 #include "data/LgsDefinitions.h"
 #include "utils/LgsLogger.h"

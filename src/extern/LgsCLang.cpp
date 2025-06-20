@@ -2,7 +2,7 @@
 #include "data/LgsErrors.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "extern/LgsCLangVisitor.h"
-#include "logos/LgsErrHandler.h"
+#include "../../include/utils/LgsErrHandler.h"
 #include "logos/Platform.h"
 #include "utils/LgsUtils.h"
 

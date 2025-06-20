@@ -1,7 +1,6 @@
 #pragma once
 #include "LgsFile.h"
 
-class LgsEnv;
 class LgsVarDec;
 
 class LgsEnvFile final : public LgsFile {

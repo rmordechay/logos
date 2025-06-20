@@ -1,6 +1,6 @@
 #pragma once
-#include "LgsActiveEnv.h"
-#include "LgsErrHandler.h"
+#include "LgsEnv.h"
+#include "utils/LgsErrHandler.h"
 #include "Platform.h"
 #include "extern/LgsCLang.h"
 
@@ -10,10 +10,9 @@ class LgsEnvFile;
 class LgsObject;
 class LgsFuncType;
 class ThreadPool;
-class LgsActiveEnv;
+class LgsEnv;
 class LgsAppFile;
 class LgsMainFile;
-class LgsEnv;
 struct LgsError;
 struct LgsPaths;
 struct RequireEnvVar;
@@ -25,7 +24,7 @@ public:
     LgsPaths paths;
     LgsCLang lgsCLang;
     vector<char*> args;
-    LgsActiveEnv activeEnv;
+    LgsEnv activeEnv;
     vector<LgsFile*> files;
     vector<LgsStrConst*> externFiles;
     LgsErrHandler errHandler;

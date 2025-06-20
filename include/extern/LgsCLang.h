@@ -1,5 +1,5 @@
 #pragma once
-#include "logos/LgsErrHandler.h"
+#include "utils/LgsErrHandler.h"
 #include "logos/Platform.h"
 
 class LgsStrConst;

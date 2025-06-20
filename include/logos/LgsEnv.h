@@ -1,7 +1,6 @@
 #pragma once
-#include <string>
 
-class LgsActiveEnv {
+class LgsEnv {
 public:
     string name;
     map<string, string> envVars;

@@ -1,7 +1,7 @@
 #pragma once
 #include "files/LgsFile.h"
-#include "logos/LgsASTVisitor.h"
-#include "logos/LgsErrHandler.h"
+#include "utils/LgsASTVisitor.h"
+#include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
 
 class LgsPrefixExpr;

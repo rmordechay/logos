@@ -2,7 +2,7 @@
 #include "data/LgsErrors.h"
 #include "exprs/unary/LgsEnumField.h"
 #include "funcs/LgsParam.h"
-#include "logos/LgsErrHandler.h"
+#include "../../include/utils/LgsErrHandler.h"
 #include "stmts/LgsField.h"
 #include "types/LgsEnum.h"
 #include "utils/LgsUtils.h"

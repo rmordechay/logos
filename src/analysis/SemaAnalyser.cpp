@@ -24,7 +24,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
 #include "logos/LgsConfig.h"
-#include "logos/LgsErrHandler.h"
+#include "../../include/utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsPatternMatch.h"
