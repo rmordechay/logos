@@ -1,5 +1,4 @@
 #include "types/primitives/LgsUInt.h"
-#include "exprs/LgsNullValue.h"
 #include "exprs/unary/constants/LgsUIntConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
@@ -13,7 +12,7 @@ string LgsUInt::prettyName() const {
     return name;
 }
 
-Type* LgsUInt::getIRType() {
+Type* LgsUInt::getIRType(LLVMContext& context) {
     return Type::getInt32Ty(context);
 }
 

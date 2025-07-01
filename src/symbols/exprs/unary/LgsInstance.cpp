@@ -3,9 +3,10 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
+#include "utils/LgsUtils.h"
 
-Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
-    const auto objIRType = obj->getIRType();
+Value* LgsInstance::createIRValue(LgsModule* runtime) {
+    const auto objIRType = obj->getIRType(runtime->context);
     if (isReturnExpr) {
         setReturnExpr(runtime, objIRType);
     } else {
@@ -15,22 +16,22 @@ Value* LgsInstance::createIRValue(LgsRuntime* runtime) {
     for (const auto& [fieldName, field] : obj->fields) {
         auto arg = args.find(fieldName);
         if (arg != args.end()) {
-            field->storeIRValue(runtime, obj->getIRType(), IRValue, arg->second->expr);
+            field->storeIRValue(runtime, obj->getIRType(runtime->context), IRValue, arg->second->expr);
         } else {
-            field->setZeroValue(runtime, obj->getIRType(), IRValue);
+            field->setZeroValue(runtime, obj->getIRType(runtime->context), IRValue);
         }
     }
 
     return IRValue;
 }
 
-void LgsInstance::setZeroField(LgsRuntime* runtime, LgsField* field, Value* parentIRValue) const {
+void LgsInstance::setZeroField(LgsModule* runtime, const LgsField* field, Value* parentIRValue) const {
     if (const auto fieldObj = field->type->asObject()) {
         for (const auto& [name, field] : fieldObj->fields) {
             setZeroField(runtime, field, parentIRValue);
         }
     } else {
-        field->storeIRValue(runtime, obj->getIRType(), parentIRValue, field->expr);
+        field->storeIRValue(runtime, obj->getIRType(runtime->context), parentIRValue, field->expr);
     }
 }
 
@@ -42,22 +43,22 @@ string LgsInstance::prettyName() {
     return obj->name;
 }
 
-void LgsInstance::setReturnExpr(LgsRuntime* runtime, Type* objIRType) {
+void LgsInstance::setReturnExpr(LgsModule* runtime, Type* objIRType) {
     const auto currentFunc = runtime->stack.currentFunc;
     if (currentFunc->funcType->isSwapReturn) {
         IRValue = currentFunc->getReturnSwapParam().IRValue;
     } else {
         IRValue = runtime->builder.CreateMalloc(
-            Type::getInt64Ty(context),
+            i64Ty(runtime->context),
             objIRType,
             ConstantExpr::getSizeOf(objIRType),
-            ConstantInt::get(Type::getInt64Ty(context), 1)
+            runtime->builder.getInt64(1)
         );
         runtime->addAllocatedExpr(this);
     }
 }
 
-void LgsInstance::free(LgsRuntime* runtime) {
+void LgsInstance::free(LgsModule* runtime) {
     if (!isReturnExpr) {
         runtime->builder.CreateFree(IRValue);
     }

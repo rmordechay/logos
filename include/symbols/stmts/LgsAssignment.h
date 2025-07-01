@@ -29,15 +29,15 @@ public:
     LgsAssignType assignmentType;
 
     LgsAssignment(const LgsAssignType assignmentType, LgsExpr* lValue, LgsExpr* rValue) : lValue(lValue), rValue(rValue), assignmentType(assignmentType) {}
-    void createIRStmt(LgsRuntime* runtime) override;
-    void createIRAssign(LgsRuntime* runtime) const;
-    void assignToIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* expr) const;
-    void assignToSelection(LgsRuntime* runtime, const LgsSelection* selection, LgsExpr* expr) const;
-    void assignToVariable(LgsRuntime* runtime, LgsVariable* variable, LgsExpr* expr) const;
-    void storeScalarInIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsExpr* expr) const;
-    void storeArrayInIterIndex(LgsRuntime* runtime, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) const;
+    void createIRStmt(LgsModule* runtime) override;
+    void createIRAssign(LgsModule* runtime) const;
+    void assignToIterIndex(LgsModule* runtime, LgsIterIndex* iterIndex, LgsExpr* expr) const;
+    void assignToSelection(LgsModule* runtime, const LgsSelection* selection, LgsExpr* expr) const;
+    void assignToVariable(LgsModule* runtime, LgsVariable* variable, LgsExpr* expr) const;
+    void storeScalarInIterIndex(LgsModule* runtime, LgsIterIndex* iterIndex, LgsExpr* expr) const;
+    void storeArrayInIterIndex(LgsModule* runtime, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) const;
     void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices) const;
-    void storeHashMapInIterIndex(LgsRuntime* runtime, LgsIterIndex* iterIndex, LgsHashMap* map) const;
+    void storeHashMapInIterIndex(LgsModule* runtime, LgsIterIndex* iterIndex, LgsHashMap* map) const;
     ~LgsAssignment() override;
 };
 

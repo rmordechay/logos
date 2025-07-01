@@ -6,7 +6,7 @@ string LgsShortConst::prettyName() {
     return to_string(value);
 }
 
-Value* LgsShortConst::createIRValue(LgsRuntime* runtime) {
+Value* LgsShortConst::createIRValue(LgsModule* runtime) {
     return runtime->builder.getInt16(value);
 }
 

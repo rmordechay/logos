@@ -11,7 +11,7 @@ public:
     vector<LgsVariable*> targetSymbols;
 
     explicit LgsGroup(const string& name) : name(name) {}
-    Type* getIRType() override;
+    Type* getIRType(LLVMContext& context) override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;

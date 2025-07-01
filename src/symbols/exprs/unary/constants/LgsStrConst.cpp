@@ -4,15 +4,15 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "utils/LgsUtils.h"
 
-Value* LgsStrConst::hashValue(LgsRuntime* runtime) {
+Value* LgsStrConst::hashValue(LgsModule* runtime) {
     return runtime->builder.getInt32(hashString(value));
 }
 
-Value* LgsStrConst::createIRValue(LgsRuntime* runtime) {
+Value* LgsStrConst::createIRValue(LgsModule* runtime) {
     return getIRStr(runtime, value);
 }
 
-Value* LgsStrConst::addIR(LgsRuntime* runtime, LgsExpr* other) {
+Value* LgsStrConst::addIR(LgsModule* runtime, LgsExpr* other) {
     if (const auto otherStrConst = other->asIntConst()) {
         return getIRStr(runtime, this->value + to_string(otherStrConst->value));
     }
@@ -28,6 +28,6 @@ Value* LgsStrConst::addIR(LgsRuntime* runtime, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsStrConst::eqIR(LgsRuntime* runtime, LgsExpr* other) {
+Value* LgsStrConst::eqIR(LgsModule* runtime, LgsExpr* other) {
     return nullptr;
 }

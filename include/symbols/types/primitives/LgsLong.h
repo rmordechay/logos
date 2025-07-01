@@ -10,7 +10,7 @@ public:
         isPrimitive = true;
         isInt = true;
     }
-    Type* getIRType() override;
+    Type* getIRType(LLVMContext& context) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     string getStrFormatPart() const override;

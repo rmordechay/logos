@@ -1,16 +1,17 @@
 #include "types/LgsInterface.h"
 
 #include "funcs/LgsFunc.h"
-#include "logos/LgsRuntime.h"
+#include "logos/LgsModule.h"
 #include "types/LgsObject.h"
+#include "utils/LgsUtils.h"
 
-Type* LgsInterface::getIRType() {
+Type* LgsInterface::getIRType(LLVMContext& context) {
     if (IRType) return IRType;
     IRType = StructType::getTypeByName(context, interfaceName);
     vector<Type*> elementTypes;
     for (const auto [_, method] : methods) {
         method->funcType->isVirtual = true;
-        elementTypes.emplace_back(PointerType::getUnqual(context));
+        elementTypes.emplace_back(ptrTy(context));
     }
     if (!IRType) {
         IRType = StructType::create(context, elementTypes, interfaceName);

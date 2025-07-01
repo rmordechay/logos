@@ -1,5 +1,4 @@
 #include "utils/LgsUtils.h"
-#include "logos/LgsApp.h"
 #include "LgsType.h"
 #include "builtin/LgsBuiltins.h"
 
@@ -33,20 +32,20 @@ void freeType(const LgsType* type) {
     delete type;
 }
 
-Value* getIRStr(const LgsRuntime* runtime, const string& value) {
-    for (auto& globals : runtime->module->globals()) {
+Value* getIRStr(LgsModule* runtime, const string& value) {
+    for (auto& globals : runtime->IRModule->globals()) {
         if (!globals.hasInitializer()) continue;
         const auto dataArray = dyn_cast<ConstantDataArray>(globals.getInitializer());
         if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
         return &globals;
     }
-    const auto strConstant = ConstantDataArray::getString(context, value, true);
-    const auto globalVariable = new GlobalVariable(*runtime->module, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
+    const auto strConstant = ConstantDataArray::getString(runtime->context, value, true);
+    const auto globalVariable = new GlobalVariable(*runtime->IRModule, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
     globalVariable->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
     return globalVariable;
 }
 
-StructType* getIRStructType(const string& name, const vector<Type*>& fields) {
+StructType* getIRStructType(LLVMContext& context, const string& name, const vector<Type*>& fields) {
     const auto structType = StructType::getTypeByName(context, name);
     if (!structType) {
         return StructType::create(context, fields, name);
@@ -61,29 +60,53 @@ Module* createIRModule(const string& moduleName, LLVMContext& context) {
     return module;
 }
 
-bool hasTerminator(const LgsRuntime* runtime) {
+bool hasTerminator(const LgsModule* runtime) {
     return runtime->builder.GetInsertBlock()->getTerminator();
 }
 
-FunctionCallee getPrintf(LgsRuntime* runtime) {
-    const auto funcType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context)}, true);
-    return runtime->module->getOrInsertFunction("printf", funcType);
+PointerType* ptrTy(LLVMContext& context) {
+    return PointerType::getUnqual(context);
 }
 
-FunctionCallee getSnprintf(LgsRuntime* runtime) {
-    const auto funcType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context), runtime->builder.getInt64Ty(), PointerType::getUnqual(context)}, true);
-    return runtime->module->getOrInsertFunction("snprintf", funcType);
+Type* i1Ty(LLVMContext& context) {
+    return IntegerType::getInt32Ty(context);
 }
 
-FunctionCallee getStrHash(LgsRuntime* runtime) {
-    const auto printfType = FunctionType::get(runtime->builder.getInt32Ty(), {PointerType::getUnqual(context)}, false);
-    return runtime->module->getOrInsertFunction("Str_hash", printfType);
+Type* i8Ty(LLVMContext& context) {
+    return IntegerType::getInt32Ty(context);
 }
 
-Function* getMemcpy(LgsRuntime* runtime) {
+Type* i16Ty(LLVMContext& context) {
+    return IntegerType::getInt32Ty(context);
+}
+
+Type* i32Ty(LLVMContext& context) {
+    return IntegerType::getInt32Ty(context);
+}
+
+Type* i64Ty(LLVMContext& context) {
+    return IntegerType::getInt32Ty(context);
+}
+
+FunctionCallee getPrintf(LgsModule* runtime) {
+    const auto funcType = FunctionType::get(i32Ty(runtime->context), {ptrTy(runtime->context)}, true);
+    return runtime->IRModule->getOrInsertFunction("printf", funcType);
+}
+
+FunctionCallee getSnprintf(LgsModule* runtime) {
+    const auto funcType = FunctionType::get(i32Ty(runtime->context), {ptrTy(runtime->context), runtime->builder.getInt64Ty(), ptrTy(runtime->context)}, true);
+    return runtime->IRModule->getOrInsertFunction("snprintf", funcType);
+}
+
+FunctionCallee getStrHash(LgsModule* runtime) {
+    const auto printfType = FunctionType::get(i32Ty(runtime->context), {ptrTy(runtime->context)}, false);
+    return runtime->IRModule->getOrInsertFunction("Str_hash", printfType);
+}
+
+Function* getMemcpy(LgsModule* runtime) {
     const auto int64Ty = runtime->builder.getInt64Ty();
     const auto ptrTy = runtime->builder.getPtrTy();
-    return getOrInsertDeclaration(runtime->module, Intrinsic::memcpy, {ptrTy, ptrTy, int64Ty});
+    return getOrInsertDeclaration(runtime->IRModule, Intrinsic::memcpy, {ptrTy, ptrTy, int64Ty});
 }
 
 TargetMachine* getTargetMachine() {

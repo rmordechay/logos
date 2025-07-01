@@ -5,16 +5,16 @@
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 
-void LgsSelection::createIRStmt(LgsRuntime* runtime) {
+void LgsSelection::createIRStmt(LgsModule* runtime) {
     resolveSelection(runtime);
 }
 
-Value* LgsSelection::createIRValue(LgsRuntime* runtime) {
+Value* LgsSelection::createIRValue(LgsModule* runtime) {
     resolveSelection(runtime);
     return lastExpr()->IRValue;
 }
 
-void LgsSelection::resolveSelection(LgsRuntime* runtime) const {
+void LgsSelection::resolveSelection(LgsModule* runtime) const {
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
@@ -22,7 +22,7 @@ void LgsSelection::resolveSelection(LgsRuntime* runtime) const {
             methodCall->IRValue = methodCall->createIRValue(runtime);
         } else if (const auto field = parentExpr->type->getField(childExpr->getExprName())) {
             const auto parentIRValue = parentExpr->getIRValue(runtime);
-            const auto gep = field->getGEP(runtime, parentExpr->type->getIRType(), parentIRValue);
+            const auto gep = field->getGEP(runtime, parentExpr->type->getIRType(runtime->context), parentIRValue);
             childExpr->setIRValue(gep);
         }
     }
@@ -42,12 +42,12 @@ LgsExpr* LgsSelection::lastExpr() const {
     return exprs[exprs.size() - 1];
 }
 
-Value* LgsSelection::hashValue(LgsRuntime* runtime) {
+Value* LgsSelection::hashValue(LgsModule* runtime) {
     const auto lgsExpr = lastExpr();
     return lgsExpr->hashValue(runtime);
 }
 
-Value* LgsSelection::eqIR(LgsRuntime* runtime, LgsExpr* other) {
+Value* LgsSelection::eqIR(LgsModule* runtime, LgsExpr* other) {
     resolveSelection(runtime);
     const auto selection = lastExpr();
     if (const auto var = selection->asVariable()) {

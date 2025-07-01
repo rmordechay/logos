@@ -13,12 +13,12 @@ public:
         funcType->IRName = "printf";
     }
 
-    Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
+    Value* call(LgsModule* runtime, const vector<LgsExpr*>& args) override {
         vector<Value*> IRArgs;
         stringstream str;
         for (int i = 0; i < args.size(); ++i) {
             const auto arg = args[i];
-            const auto argType = arg->type->getIRType();
+            const auto argType = arg->type->getIRType(runtime->context);
             auto argValue = arg->getIRValue(runtime);
             if (shouldLoadIRArg(argValue, arg)) {
                 argValue = runtime->builder.CreateLoad(argType, argValue);
@@ -39,7 +39,7 @@ public:
     static constexpr auto name = "sizeof";
 
     LgsSizeOf(): LgsBuiltinFunc(name, &LGS_LONG, "", {&LGS_ANY}) {}
-    Value* call(LgsRuntime* runtime, const vector<LgsExpr*>& args) override {
+    Value* call(LgsModule* runtime, const vector<LgsExpr*>& args) override {
         return runtime->builder.getInt64(args.front()->type->getSizeBytes());
     }
 };

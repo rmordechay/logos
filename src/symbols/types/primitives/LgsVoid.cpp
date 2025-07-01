@@ -7,7 +7,7 @@ string LgsVoid::prettyName() const {
     return name;
 }
 
-Type* LgsVoid::getIRType() {
+Type* LgsVoid::getIRType(LLVMContext& context) {
     return Type::getVoidTy(context);
 }
 

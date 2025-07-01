@@ -2,7 +2,7 @@
 
 #include "utils/LgsUtils.h"
 
-Value* LgsHashMap::createIRValue(LgsRuntime* runtime) {
+Value* LgsHashMap::createIRValue(LgsModule* runtime) {
     initIRMap(runtime);
     runtime->addAllocatedExpr(this);
     for (const auto element : initialElements) {
@@ -11,12 +11,7 @@ Value* LgsHashMap::createIRValue(LgsRuntime* runtime) {
     return IRValue;
 }
 
-StructType* LgsMapEntry::getStructType() {
-    auto ptrTy = PointerType::getUnqual(context);
-    return getIRStructType("MapEntry", {ptrTy, ptrTy});
-}
-
-void LgsHashMap::initIRMap(LgsRuntime* runtime) {
+void LgsHashMap::initIRMap(LgsModule* runtime) {
     const auto valueType = type->asMap()->typePair->value;
     const auto elementSize = runtime->builder.getInt64(valueType->getSizeBytes());
     IRValue = runtime->builder.CreateAlloca(type->asMap()->getMapStruct(runtime));

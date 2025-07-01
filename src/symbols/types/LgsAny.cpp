@@ -1,14 +1,15 @@
 #include "types/LgsAny.h"
 
-#include "logos/LgsRuntime.h"
+#include "logos/LgsModule.h"
+#include "utils/LgsUtils.h"
 
 
 size_t LgsAny::getSizeBytes() {
     return sizeof(void*);
 }
 
-Type* LgsAny::getIRType() {
-    return PointerType::getUnqual(context);
+Type* LgsAny::getIRType(LLVMContext& context) {
+    return ptrTy(context);
 }
 
 string LgsAny::getIRName() {

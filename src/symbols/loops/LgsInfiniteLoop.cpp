@@ -1,18 +1,18 @@
 #include "loops/LgsInfiniteLoop.h"
 #include "stmts/LgsVarDec.h"
 
-Value* LgsInfiniteLoop::loopStart(LgsRuntime* runtime) {
+Value* LgsInfiniteLoop::loopStart(LgsModule* runtime) {
     const auto type = runtime->builder.getIntPtrTy(dataLayout);
     return ConstantInt::get(type, 0);
 }
 
-Value* LgsInfiniteLoop::loopEnd(LgsRuntime* runtime) {
-    return ConstantInt::getTrue(context);
+Value* LgsInfiniteLoop::loopEnd(LgsModule* runtime) {
+    return ConstantInt::getTrue(runtime->context);
 }
 
-void LgsInfiniteLoop::initIRLoop(LgsRuntime* runtime) {
-    IRBodyBlock = BasicBlock::Create(context, LOGOS_LOOP_BODY);
-    IRExitBlock = BasicBlock::Create(context, LOGOS_LOOP_EXIT);
+void LgsInfiniteLoop::initIRLoop(LgsModule* runtime) {
+    IRBodyBlock = BasicBlock::Create(runtime->context, LOGOS_LOOP_BODY);
+    IRExitBlock = BasicBlock::Create(runtime->context, LOGOS_LOOP_EXIT);
     runtime->builder.CreateBr(IRBodyBlock);
 
     startBlock(runtime, IRBodyBlock);
@@ -21,7 +21,7 @@ void LgsInfiniteLoop::initIRLoop(LgsRuntime* runtime) {
     loopVars[0]->setIRValue(iValue);
 }
 
-void LgsInfiniteLoop::exitIRLoop(LgsRuntime* runtime) const {
+void LgsInfiniteLoop::exitIRLoop(LgsModule* runtime) const {
     runtime->builder.CreateBr(IRBodyBlock);
     startBlock(runtime, IRExitBlock);
 }

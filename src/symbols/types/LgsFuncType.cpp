@@ -1,5 +1,5 @@
 #include "types/LgsFuncType.h"
-#include "logos/LgsRuntime.h"
+#include "logos/LgsModule.h"
 #include "utils/LgsUtils.h"
 
 bool LgsFuncType::equals(LgsType* other) {
@@ -30,22 +30,22 @@ string LgsFuncType::getIRName() {
     return IRName;
 }
 
-Type* LgsFuncType::getIRType() {
+Type* LgsFuncType::getIRType(LLVMContext& context) {
     if (IRType) return IRType;
     Type* returnType;
     if (isBigType && !isSwapReturn) {
-        returnType = PointerType::getUnqual(context);
+        returnType = ptrTy(context);
     } else {
-        returnType = rt->getIRType();
+        returnType = rt->getIRType(context);
     }
     vector<Type*> IRParamsTypes;
     for (int i = isStaticMethod; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
         if (param.isSelf || !paramType->isPrimitive) {
-            IRParamsTypes.emplace_back(PointerType::getUnqual(context));
+            IRParamsTypes.emplace_back(ptrTy(context));
         } else {
-            auto irType = paramType->getIRType();
+            auto irType = paramType->getIRType(context);
             IRParamsTypes.emplace_back(irType);
         }
     }

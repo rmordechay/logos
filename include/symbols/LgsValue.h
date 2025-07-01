@@ -3,7 +3,7 @@
 
 class LgsVariable;
 class LgsExpr;
-class LgsRuntime;
+class LgsModule;
 class LgsFunc;
 using namespace llvm;
 
@@ -15,12 +15,12 @@ public:
     bool isMutable = false;
 
     void setIRValue(Value* value);
-    GlobalVariable* createIRGlobal(const LgsRuntime* runtime, Type* type, Constant* value) const;
+    GlobalVariable* createIRGlobal(const LgsModule* runtime, Type* type, Constant* value) const;
     bool shouldLoadIRArg(Value* value, const LgsExpr* expr = nullptr) const;
-    void startBlock(LgsRuntime* runtime, BasicBlock* block) const;
-    void startFuncBlock(LgsRuntime* runtime) const;
-    Value* hashIRValue(LgsRuntime* runtime, Value* value) const;
-    void copyMem(LgsRuntime* runtime, Value* src, Value* dest, size_t n) const;
+    void startBlock(LgsModule* runtime, BasicBlock* block) const;
+    void startFuncBlock(LgsModule* runtime) const;
+    Value* hashIRValue(LgsModule* runtime, Value* value) const;
+    void copyMem(LgsModule* runtime, Value* src, Value* dest, size_t n) const;
     virtual std::string format(std::string& indentStr);
     virtual void setLocation(const Token* start, const Token* end, path* filePath);
     virtual ~LgsValue() = default;

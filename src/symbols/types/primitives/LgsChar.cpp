@@ -11,7 +11,7 @@ size_t LgsChar::getSizeBytes() {
     return sizeof(char);
 }
 
-Type* LgsChar::getIRType() {
+Type* LgsChar::getIRType(LLVMContext& context) {
     return Type::getInt8Ty(context);
 }
 

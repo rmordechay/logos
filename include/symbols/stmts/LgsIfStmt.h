@@ -14,11 +14,11 @@ public:
     string tag;
 
     LgsIfStmt(LgsExpr* ifCond, LgsStmtBlock* ifStmtBlock) : ifCond(ifCond), ifStmtBlock(ifStmtBlock) {}
-    void generateIfElse(LgsRuntime* runtime);
-    void createIRStmt(LgsRuntime* runtime) override;
-    void generateSimpleIf(LgsRuntime* runtime);
-    void generateComplexIf(LgsRuntime* runtime);
-    bool isBranchingNeeded(LgsRuntime* runtime, Value* ifCondIR) const;
+    void generateIfElse(LgsModule* runtime);
+    void createIRStmt(LgsModule* runtime) override;
+    void generateSimpleIf(LgsModule* runtime);
+    void generateComplexIf(LgsModule* runtime);
+    bool isBranchingNeeded(LgsModule* runtime, Value* ifCondIR) const;
     ~LgsIfStmt() override;
 };
 

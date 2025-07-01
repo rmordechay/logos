@@ -14,9 +14,9 @@ public:
         type = lgsStr;
     }
 
-    Value* hashValue(LgsRuntime* runtime) override;
-    Value* createIRValue(LgsRuntime* runtime) override;
-    Value* eqIR(LgsRuntime* runtime, LgsExpr* other) override;
-    Value* addIR(LgsRuntime* runtime, LgsExpr* other) override;
+    Value* hashValue(LgsModule* runtime) override;
+    Value* createIRValue(LgsModule* runtime) override;
+    Value* eqIR(LgsModule* runtime, LgsExpr* other) override;
+    Value* addIR(LgsModule* runtime, LgsExpr* other) override;
     ~LgsStrConst() override = default;
 };

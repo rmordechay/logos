@@ -6,7 +6,7 @@ size_t LgsShort::getSizeBytes() {
     return sizeof(short);
 }
 
-Type* LgsShort::getIRType() {
+Type* LgsShort::getIRType(LLVMContext& context) {
     return Type::getInt16Ty(context);
 }
 

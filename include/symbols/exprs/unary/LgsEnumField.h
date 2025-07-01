@@ -9,7 +9,7 @@ public:
     string text;
 
     LgsEnumField(LgsType* type, const string& name, const string& text) : LgsUnaryExpr(type), name(name), text(text) {}
-    Value* createIRValue(LgsRuntime* runtime) override;
+    Value* createIRValue(LgsModule* runtime) override;
     string prettyName() override;
     ~LgsEnumField() override = default;
 };

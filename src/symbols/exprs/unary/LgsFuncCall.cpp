@@ -5,7 +5,7 @@
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
 
-Value* LgsFuncCall::call(LgsRuntime* runtime) const {
+Value* LgsFuncCall::call(LgsModule* runtime) const {
     if (callback) {
         func->setIRValue(getCallback(runtime));
     } else if (func->funcType->isVirtual) {
@@ -14,7 +14,7 @@ Value* LgsFuncCall::call(LgsRuntime* runtime) const {
     return func->call(runtime, args);
 }
 
-Value* LgsFuncCall::getCallback(LgsRuntime* runtime) const {
+Value* LgsFuncCall::getCallback(LgsModule* runtime) const {
     switch (callback->symbolType) {
     case VAR_DEC:
         return callback->varDec->expr->getIRValue(runtime);
@@ -28,11 +28,11 @@ Value* LgsFuncCall::getCallback(LgsRuntime* runtime) const {
     assert(0);
 }
 
-Value* LgsFuncCall::createIRValue(LgsRuntime* runtime) {
+Value* LgsFuncCall::createIRValue(LgsModule* runtime) {
     return call(runtime);
 }
 
-void LgsFuncCall::createIRStmt(LgsRuntime* runtime) {
+void LgsFuncCall::createIRStmt(LgsModule* runtime) {
     call(runtime);
 }
 
@@ -66,7 +66,7 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
     return true;
 }
 
-void LgsFuncCall::resolveVirtualFunc(LgsRuntime* runtime) const {
+void LgsFuncCall::resolveVirtualFunc(LgsModule* runtime) const {
     auto& builder = runtime->builder;
     const auto parent = args[0];
     const auto type = parent->type;

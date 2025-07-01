@@ -11,11 +11,11 @@ public:
     explicit LgsSelection(const std::vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
     string prettyName() override;
     LgsExpr* lastExpr() const;
-    Value* hashValue(LgsRuntime* runtime) override;
-    Value* eqIR(LgsRuntime* runtime, LgsExpr* other) override;
-    void createIRStmt(LgsRuntime* runtime) override;
-    Value* createIRValue(LgsRuntime* runtime) override;
-    void resolveSelection(LgsRuntime* runtime) const;
+    Value* hashValue(LgsModule* runtime) override;
+    Value* eqIR(LgsModule* runtime, LgsExpr* other) override;
+    void createIRStmt(LgsModule* runtime) override;
+    Value* createIRValue(LgsModule* runtime) override;
+    void resolveSelection(LgsModule* runtime) const;
     ~LgsSelection() override;
 };
 

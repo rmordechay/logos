@@ -1,9 +1,9 @@
 #include "types/LgsNullable.h"
+#include "logos/LgsModule.h"
+#include "utils/LgsUtils.h"
 
-#include "logos/LgsRuntime.h"
-
-Type* LgsNullable::getIRType() {
-    return PointerType::getUnqual(context);
+Type* LgsNullable::getIRType(LLVMContext& context) {
+    return ptrTy(context);
 }
 
 string LgsNullable::getIRName() {

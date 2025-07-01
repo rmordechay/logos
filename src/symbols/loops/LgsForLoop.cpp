@@ -2,7 +2,7 @@
 #include "stmts/LgsStmtBlock.h"
 #include "stmts/LgsVarDec.h"
 
-void LgsForLoop::createIRStmt(LgsRuntime* runtime) {
+void LgsForLoop::createIRStmt(LgsModule* runtime) {
     runtime->stack.enterScope(LOOP_SCOPE, this);
     initIRLoop(runtime);
     stmtBlock->createIRValue(runtime);

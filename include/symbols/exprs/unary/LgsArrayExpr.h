@@ -13,10 +13,10 @@ public:
     }
     explicit LgsArrayExpr(LgsArray* arrType) : LgsUnaryExpr(arrType) {}
     string prettyName() override;
-    Value* createIRValue(LgsRuntime* runtime) override;
-    Value* createConstArray(LgsRuntime* runtime) const;
-    Constant* createIRConstArray(LgsRuntime* runtime, const vector<LgsExpr*>& elements) const;
-    Value* createDynamicArray(LgsRuntime* runtime);
-    void free(LgsRuntime* runtime) override;
+    Value* createIRValue(LgsModule* runtime) override;
+    Value* createConstArray(LgsModule* runtime) const;
+    Constant* createIRConstArray(LgsModule* runtime, const vector<LgsExpr*>& elements) const;
+    Value* createDynamicArray(LgsModule* runtime);
+    void free(LgsModule* runtime) override;
     ~LgsArrayExpr() override = default;
 };

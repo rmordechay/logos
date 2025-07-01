@@ -66,7 +66,7 @@ public:
     virtual size_t getSizeBytes();
     virtual bool equals(LgsType& other);
     virtual string getStrFormatPart() const;
-    virtual Type* getIRType() = 0;
+    virtual Type* getIRType(LLVMContext& context) = 0;
     virtual string getIRName() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual string prettyName() const = 0;

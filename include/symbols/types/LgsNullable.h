@@ -6,7 +6,7 @@ public:
     LgsType* baseType;
 
     explicit LgsNullable(LgsType* baseType) : baseType(baseType) {}
-    Type* getIRType() override;
+    Type* getIRType(LLVMContext& context) override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;

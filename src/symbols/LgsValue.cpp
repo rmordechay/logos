@@ -2,23 +2,23 @@
 #include "funcs/LgsFunc.h"
 #include "utils/LgsUtils.h"
 
-void LgsValue::startBlock(LgsRuntime* runtime, BasicBlock* const block) const {
+void LgsValue::startBlock(LgsModule* runtime, BasicBlock* const block) const {
     block->insertInto(runtime->IRFunc);
     runtime->builder.SetInsertPoint(block);
 }
 
-void LgsValue::startFuncBlock(LgsRuntime* runtime) const {
-    const auto entryBlock = BasicBlock::Create(runtime->module->getContext(), "entry", runtime->IRFunc);
+void LgsValue::startFuncBlock(LgsModule* runtime) const {
+    const auto entryBlock = BasicBlock::Create(runtime->IRModule->getContext(), "entry", runtime->IRFunc);
     runtime->builder.SetInsertPoint(entryBlock);
 }
 
-Value* LgsValue::hashIRValue(LgsRuntime* runtime, Value* value) const {
+Value* LgsValue::hashIRValue(LgsModule* runtime, Value* value) const {
     const auto hashValueIRFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getPtrTy()}, false);
-    const auto func =runtime->module->getOrInsertFunction("hash_Str", hashValueIRFuncType);
+    const auto func =runtime->IRModule->getOrInsertFunction("hash_Str", hashValueIRFuncType);
     return runtime->builder.CreateCall(func, {value});
 }
 
-void LgsValue::copyMem(LgsRuntime* runtime, Value* src, Value* dest, const size_t n) const {
+void LgsValue::copyMem(LgsModule* runtime, Value* src, Value* dest, const size_t n) const {
     auto& builder = runtime->builder;
     builder.CreateCall(getMemcpy(runtime), {dest, src, builder.getInt64(n), builder.getFalse()});
 }
@@ -37,8 +37,8 @@ void LgsValue::setIRValue(Value* value) {
     IRValue = value;
 }
 
-GlobalVariable* LgsValue::createIRGlobal(const LgsRuntime* runtime, Type* type, Constant* value) const {
-    return new GlobalVariable(*runtime->module, type, true, GlobalValue::PrivateLinkage, value);
+GlobalVariable* LgsValue::createIRGlobal(const LgsModule* runtime, Type* type, Constant* value) const {
+    return new GlobalVariable(*runtime->IRModule, type, true, GlobalValue::PrivateLinkage, value);
 }
 
 bool LgsValue::shouldLoadIRArg(Value* value, const LgsExpr* expr) const {

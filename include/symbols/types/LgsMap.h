@@ -32,17 +32,17 @@ public:
     }
 
     size_t getSizeBytes() override;
-    Type* getIRType() override;
+    Type* getIRType(LLVMContext& context) override;
     string getIRName() override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
-    Value* getLength(LgsRuntime* runtime, LgsExpr* expr) override;
-    Value* getLoopLength(LgsRuntime* runtime, LgsExpr* expr) override;
-    Value* isEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
-    Value* isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) override;
-    StructType* getMapStruct(LgsRuntime* runtime);
+    Value* getLength(LgsModule* runtime, LgsExpr* expr) override;
+    Value* getLoopLength(LgsModule* runtime, LgsExpr* expr) override;
+    Value* isEmpty(LgsModule* runtime, LgsExpr* expr) override;
+    Value* isNotEmpty(LgsModule* runtime, LgsExpr* expr) override;
+    StructType* getMapStruct(LgsModule* runtime);
     bool equals(LgsType* other) override;
     ~LgsMap() override = default;
 };

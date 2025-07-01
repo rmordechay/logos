@@ -1,7 +1,7 @@
 #include "types/primitives/LgsLong.h"
 
 #include "exprs/unary/constants/LgsLongConst.h"
-#include "logos/LgsRuntime.h"
+#include "logos/LgsModule.h"
 #include "types/LgsAny.h"
 #include "types/LgsPtr.h"
 #include "types/primitives/LgsFloat.h"
@@ -11,7 +11,7 @@ string LgsLong::prettyName() const {
     return name;
 }
 
-Type* LgsLong::getIRType() {
+Type* LgsLong::getIRType(LLVMContext& context) {
     return Type::getInt64Ty(context);
 }
 

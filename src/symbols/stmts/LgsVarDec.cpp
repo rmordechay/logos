@@ -1,8 +1,8 @@
 #include "stmts/LgsVarDec.h"
 #include "exprs/unary/LgsArrayExpr.h"
 
-void LgsVarDec::createIRStmt(LgsRuntime* runtime) {
-    const auto IRType = type->getIRType();
+void LgsVarDec::createIRStmt(LgsModule* runtime) {
+    const auto IRType = type->getIRType(runtime->context);
     auto exprIRValue = expr->getIRValue(runtime);
     if (shouldLoadIRArg(exprIRValue, expr)) {
         exprIRValue = runtime->builder.CreateLoad(IRType, exprIRValue);

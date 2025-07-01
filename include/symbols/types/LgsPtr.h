@@ -9,7 +9,7 @@ public:
     explicit LgsPtr(LgsType* baseType) : baseType(baseType) {}
     string getIRName() override;
     string prettyName() const override;
-    Type* getIRType() override;
+    Type* getIRType(LLVMContext& context) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;

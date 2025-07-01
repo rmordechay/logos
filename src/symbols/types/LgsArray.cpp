@@ -4,10 +4,10 @@
 #include "types/primitives/LgsInt.h"
 #include "utils/LgsUtils.h"
 
-Type* LgsArray::getIRType() {
+Type* LgsArray::getIRType(LLVMContext& context) {
     if (IRType) return IRType;
-    if (!isStatic) return getArrStruct();
-    const auto innerIRType = baseType->getIRType();
+    if (!isStatic) return getArrStruct(context);
+    const auto innerIRType = baseType->getIRType(context);
     IRType = ArrayType::get(innerIRType, iterLen);
     return IRType;
 }
@@ -54,37 +54,35 @@ string LgsArray::getIRName() {
     return name;
 }
 
-Value* LgsArray::getLength(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsArray::getLength(LgsModule* runtime, LgsExpr* expr) {
     if (isStatic) return sizeExpr->getIRValue(runtime);
     return lenFunc.call(runtime, {expr});
 }
 
-Value* LgsArray::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsArray::getLoopLength(LgsModule* runtime, LgsExpr* expr) {
     return getLength(runtime, expr);
 }
 
-Value* LgsArray::isEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsArray::isEmpty(LgsModule* runtime, LgsExpr* expr) {
     return isEmptyFunc.call(runtime, {expr});
 }
 
-Value* LgsArray::isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsArray::isNotEmpty(LgsModule* runtime, LgsExpr* expr) {
     return isNotEmptyFunc.call(runtime, {expr});
 }
 
-StructType* LgsArray::getArrStruct() {
+StructType* LgsArray::getArrStruct(LLVMContext& context) {
     if (arrStruct) return arrStruct;
-    const auto int64Ty = Type::getInt32Ty(context);
-    const auto ptrTy = PointerType::getUnqual(context);
-    arrStruct = getIRStructType(name, {int64Ty, int64Ty, int64Ty, ptrTy});
+    arrStruct = getIRStructType(context, name, {i64Ty(context), i64Ty(context), i64Ty(context), ptrTy(context)});
     return arrStruct;
 }
 
-Value* LgsArrayAddFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
+Value* LgsArrayAddFunc::call(LgsModule* runtime, const vector<LgsExpr*>& args) {
     vector<Value*> values;
     const auto arr = args[0];
     const auto arrSize = args.size() - 1;
     const auto baseType = arr->type->asIterable()->baseType;
-    const auto arrIRType = ArrayType::get(baseType->getIRType(), arrSize);
+    const auto arrIRType = ArrayType::get(baseType->getIRType(runtime->context), arrSize);
     const auto arrIRPtr = runtime->builder.CreateAlloca(arrIRType);
     const auto zero = runtime->builder.getInt32(0);
     for (int i = 1; i < args.size(); ++i) {
@@ -96,14 +94,14 @@ Value* LgsArrayAddFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) 
     return nullptr;
 }
 
-Type* LgsArrayAddFunc::getIRFuncType() {
+Type* LgsArrayAddFunc::getIRFuncType(LLVMContext& context) {
     const auto& params = funcType->params;
     const vector<Type*> IRParamsTypes = {
-        PointerType::getUnqual(context),
-        Type::getInt64Ty(context),
-        params[1].type->getIRType()
+        ptrTy(context),
+        i64Ty(context),
+        params[1].type->getIRType(context)
     };
-    return FunctionType::get(funcType->rt->getIRType(), IRParamsTypes, false);
+    return FunctionType::get(funcType->rt->getIRType(context), IRParamsTypes, false);
 }
 
 LgsArray::~LgsArray() {

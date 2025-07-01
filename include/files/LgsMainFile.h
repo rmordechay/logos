@@ -17,6 +17,6 @@ public:
 
     explicit LgsMainFile(path& path) : LgsFile(LOGOS_MAIN_FILE_NAME, path) {}
     void format() override;
-    Module* generateIR() override;
+    LgsModule* generateIR() override;
     ~LgsMainFile() override;
 };

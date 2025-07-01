@@ -8,7 +8,7 @@ public:
     LgsFloat() {
         isPrimitive = true;
     }
-    Type* getIRType() override;
+    Type* getIRType(LLVMContext& context) override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;

@@ -1,7 +1,5 @@
 #include "types/LgsPtr.h"
-
 #include "exprs/LgsNullValue.h"
-#include "logos/LgsRuntime.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsLong.h"
 
@@ -13,8 +11,8 @@ string LgsPtr::prettyName() const {
     return name;
 }
 
-Type* LgsPtr::getIRType() {
-    return PointerType::getUnqual(context);
+Type* LgsPtr::getIRType(LLVMContext& context) {
+    return ptrTy(context);
 }
 
 size_t LgsPtr::getSizeBytes() {

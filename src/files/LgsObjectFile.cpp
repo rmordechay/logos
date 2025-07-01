@@ -3,13 +3,13 @@
 #include "types/LgsObject.h"
 #include "utils/LgsUtils.h"
 
-Module* LgsObjectFile::generateIR() {
-    LgsRuntime runtime;
-    runtime.module = createIRModule(name, context);
+LgsModule* LgsObjectFile::generateIR() {
+    const auto runtime = new LgsModule();
+    runtime->IRModule = createIRModule(name, runtime->context);
     for (const auto& [_, method] : obj->methods) {
-        method->generateIR(&runtime);
+        method->generateIR(runtime);
     }
-    return runtime.module;
+    return runtime;
 }
 
 LgsObjectFile::~LgsObjectFile() {

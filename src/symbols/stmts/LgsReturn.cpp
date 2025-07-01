@@ -2,7 +2,7 @@
 #include "funcs/LgsFunc.h"
 #include "utils/LgsUtils.h"
 
-void LgsReturn::createIRStmt(LgsRuntime* runtime) {
+void LgsReturn::createIRStmt(LgsModule* runtime) {
     if (hasTerminator(runtime)) return;
     const auto currentFunc = runtime->stack.currentFunc;
     if (expr) {

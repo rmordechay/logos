@@ -1,16 +1,22 @@
 #include "logos/LgsLinker.h"
 #include "data/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
+#include <llvm/Transforms/Utils/Cloning.h>
 
-bool LgsLinker::link(const LgsPaths& paths, const map<string, Module*>& IRModules) const {
-    Module* mainModule = IRModules.find(LOGOS_MAIN_FILE_NAME)->second;
-    assert(mainModule);
-    Linker llvmLinker(*mainModule);
-    for (const auto& [name, module] : IRModules) {
+bool LgsLinker::link(const LgsPaths& paths, const map<string, LgsModule*>& modules) const {
+    const auto mainModule = modules.find(LOGOS_MAIN_FILE_NAME);
+    assert(mainModule != modules.end());
+    const auto mainCloned = CloneModule(*mainModule->second->IRModule);
+    Linker llvmLinker(*mainCloned.get());
+    for (const auto& [name, module] : modules) {
         if (name == LOGOS_MAIN_FILE_NAME) continue;
-        llvmLinker.linkInModule(unique_ptr<Module>(module));
+        llvmLinker.linkInModule(unique_ptr<Module>(module->IRModule));
     }
-    if (!generateObjFile(paths, mainModule)) return false;
+
+    if (!generateObjFile(paths, mainModule->second->IRModule)) {
+        return false;
+    }
+
     auto linkerOpts = platform.linkerOpts;
     linkerOpts.push_back(paths.objFilePath.c_str());
     linkerOpts.push_back("-o");

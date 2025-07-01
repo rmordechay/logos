@@ -29,7 +29,7 @@ public:
     vector<LgsStrConst*> externFiles;
     LgsErrHandler errHandler;
     vector<LgsEnvFile*> envFiles;
-    map<string, Module*> IRModules;
+    map<string, LgsModule*> modules;
     const LgsAppFile* appFile = nullptr;
 
     explicit LgsApp() : lgsCLang(paths) {}

@@ -6,7 +6,7 @@ string LgsBool::prettyName() const {
     return name;
 }
 
-Type* LgsBool::getIRType() {
+Type* LgsBool::getIRType(LLVMContext& context) {
     return Type::getInt1Ty(context);
 }
 

@@ -1,9 +1,9 @@
 #pragma once
-#include "logos/LgsRuntime.h"
+#include "logos/LgsModule.h"
 
 class LgsStrConst;
 class LgsApp;
-class LgsRuntime;
+class LgsModule;
 
 class LgsFile {
 public:
@@ -14,13 +14,13 @@ public:
     vector<LgsStrConst*> externFiles;
 
     explicit LgsFile(const string& name, path& path) : name(name), absPath(path) {}
-    virtual Module* generateIR();
+    virtual LgsModule* generateIR();
     virtual void format();
     virtual ~LgsFile();
 };
 
 // Only files that need generation implement this func.
-inline Module* LgsFile::generateIR() {
+inline LgsModule* LgsFile::generateIR() {
     return nullptr;
 }
 

@@ -1,8 +1,8 @@
 #include "analysis/SemaAnalyser.h"
+
 #include "data/LgsErrors.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
-#include "logos/LgsApp.h"
 #include "exprs/unary/LgsCast.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
@@ -249,12 +249,11 @@ void SemaAnalyser::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
 }
 
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
-    const auto currentFunc = stack.currentFunc;
-    const auto funcType = currentFunc->funcType;
+    const auto funcType = stack.currentFunc->funcType;
     const auto retExpr = returnStmt->expr;
     if (retExpr) {
         retExpr->isReturnExpr = true;
-        currentFunc->returnExprs.push_back(retExpr);
+        stack.currentFunc->returnExprs.push_back(retExpr);
         visitExpr(retExpr);
     }
     const auto rt = funcType->rt;
@@ -802,11 +801,9 @@ bool SemaAnalyser::validateBlockControlFlow(const LgsStmtBlock* stmtBlock, const
                 isValid = isValid && validateBlockControlFlow(elseIfStmtBlock, func);
             }
             isValid = isValid && validateBlockControlFlow(ifStmt->elseStmtBlock, func);
-        }
-        if (const auto loop = stmt->asLoop()) {
+        } else if (const auto loop = stmt->asLoop()) {
             isValid = isValid && validateBlockControlFlow(loop->stmtBlock, func);
-        }
-        if (const auto patternMatch = stmt->asPatternMatch()) {
+        } else if (const auto patternMatch = stmt->asPatternMatch()) {
             for (const auto patternsStmtBlock : patternMatch->patternsStmtBlocks) {
                 isValid = isValid && validateBlockControlFlow(patternsStmtBlock, func);
             }

@@ -5,7 +5,7 @@
 #include "types/LgsArray.h"
 #include "utils/LgsUtils.h"
 
-void LgsFunc::generateIR(LgsRuntime* runtime) {
+void LgsFunc::generateIR(LgsModule* runtime) {
     runtime->stack.enterFunc(this);
     runtime->IRFunc = getIRFunc(runtime);
     startFuncBlock(runtime);
@@ -19,23 +19,23 @@ void LgsFunc::generateIR(LgsRuntime* runtime) {
     runtime->stack.exitFunc();
 }
 
-Type* LgsFunc::getIRFuncType() {
-    return funcType->getIRType();
+Type* LgsFunc::getIRFuncType(LLVMContext& context) {
+    return funcType->getIRType(context);
 }
 
-Value* LgsFunc::createIRValue(LgsRuntime* runtime) {
+Value* LgsFunc::createIRValue(LgsModule* runtime) {
     runtime->savedIP = runtime->builder.saveIP();
     generateIR(runtime);
     runtime->builder.restoreIP(runtime->savedIP);
     return getIRFunc(runtime);
 }
 
-Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
+Function* LgsFunc::getIRFunc(LgsModule* runtime) {
     const auto funcIRName = funcType->getIRName();
-    auto IRFunc = runtime->module->getFunction(funcIRName);
+    auto IRFunc = runtime->IRModule->getFunction(funcIRName);
     if (IRFunc) return IRFunc;
-    const auto funcTy = dyn_cast<FunctionType>(getIRFuncType());
-    auto func = runtime->module->getOrInsertFunction(funcIRName, funcTy);
+    const auto funcTy = dyn_cast<FunctionType>(getIRFuncType(runtime->context));
+    auto func = runtime->IRModule->getOrInsertFunction(funcIRName, funcTy);
     IRFunc = dyn_cast<Function>(func.getCallee());
     if (funcType->isSwapReturn) {
         setBigObjAttrs(*IRFunc);
@@ -51,12 +51,12 @@ Function* LgsFunc::getIRFunc(LgsRuntime* runtime) {
     return IRFunc;
 }
 
-Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
+Value* LgsFunc::call(LgsModule* runtime, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
     if (funcType->hasDefaults) assert(0);
     for (int i = funcType->isStaticMethod; i < args.size(); ++i) {
         const auto arg = args[i];
-        const auto argType = arg->type->getIRType();
+        const auto argType = arg->type->getIRType(runtime->context);
         auto argValue = arg->getIRValue(runtime);
         if (shouldLoadIRArg(argValue, arg)) {
             argValue = runtime->builder.CreateLoad(argType, argValue);
@@ -66,14 +66,14 @@ Value* LgsFunc::call(LgsRuntime* runtime, const vector<LgsExpr*>& args) {
     return callIR(runtime, IRArgs);
 }
 
-Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
+Value* LgsFunc::callIR(LgsModule* runtime, const vector<Value*>& args) {
     if (IRValue) {
-        const auto IRFuncType = cast<FunctionType>(funcType->rt->getIRType());
+        const auto IRFuncType = cast<FunctionType>(funcType->rt->getIRType(runtime->context));
         return runtime->builder.CreateCall(IRFuncType, IRValue, args);
     }
     const auto IRFunc = getIRFunc(runtime);
     if (funcType->isSwapReturn) {
-        const auto paramIRType = getReturnSwapParam().type->getIRType();
+        const auto paramIRType = getReturnSwapParam().type->getIRType(runtime->context);
         const auto rv = runtime->builder.CreateAlloca(paramIRType);
         vector finalArgs(args.begin(), args.end());
         finalArgs.insert(finalArgs.begin() + funcType->returnParamIndex, rv);
@@ -84,7 +84,7 @@ Value* LgsFunc::callIR(LgsRuntime* runtime, const vector<Value*>& args) {
 }
 
 void LgsFunc::setBigObjAttrs(Function& IRFunc) const {
-    const auto paramIRType = getReturnSwapParam().type->getIRType();
+    const auto paramIRType = getReturnSwapParam().type->getIRType(IRFunc.getContext());
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::StructRet, paramIRType));
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::Writable));
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
@@ -116,20 +116,20 @@ void LgsFunc::swapReturnIfNeeded() const {
     }
 }
 
-void LgsFunc::setExceptionFuncs(LgsRuntime* runtime) const {
+void LgsFunc::setExceptionFuncs(LgsModule* runtime) const {
     auto& builder = runtime->builder;
     auto ptrTy = builder.getPtrTy();
     const auto voidTy = builder.getVoidTy();
     const auto persFnType = FunctionType::get(builder.getInt32Ty(), true);
-    const auto module = runtime->module;
+    const auto module = runtime->IRModule;
     auto personalityFunc = module->getOrInsertFunction("__gxx_personality_v0", persFnType);
     const auto cxaAlloc = module->getOrInsertFunction("__cxa_allocate_exception", FunctionType::get(ptrTy, { builder.getInt64Ty() }, false));
     const auto cxaThrow = module->getOrInsertFunction("__cxa_throw", FunctionType::get(voidTy, { ptrTy, ptrTy, ptrTy }, false));
     const auto cxaBeginCatch = module->getOrInsertFunction("__cxa_begin_catch", FunctionType::get(voidTy, { ptrTy }, false));
     const auto cxaEndCatch = module->getOrInsertFunction( "__cxa_end_catch", FunctionType::get(voidTy, {}, false));
 
-    const auto normalBlock = BasicBlock::Create(context, "normal");
-    const auto catchBlock = BasicBlock::Create(context, "catch");
+    const auto normalBlock = BasicBlock::Create(runtime->context, "normal");
+    const auto catchBlock = BasicBlock::Create(runtime->context, "catch");
 
     const auto alloc = builder.CreateCall(cxaAlloc, {builder.getInt64(4)});
     builder.CreateInvoke(cxaThrow, normalBlock, catchBlock, {alloc, Constant::getNullValue(ptrTy), Constant::getNullValue(ptrTy)});

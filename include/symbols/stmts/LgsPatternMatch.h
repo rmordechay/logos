@@ -14,7 +14,7 @@ public:
     BasicBlock* defaultCase = nullptr;
 
     explicit LgsPatternMatch(LgsExpr* expr) : expr(expr) {}
-    void createIRStmt(LgsRuntime* runtime) override;
+    void createIRStmt(LgsModule* runtime) override;
     ~LgsPatternMatch() override = default;
 };
 

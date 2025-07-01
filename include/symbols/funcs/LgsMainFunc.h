@@ -13,9 +13,9 @@ public:
 
     explicit LgsMainFunc() : LgsFunc(LOGOS_MAIN_FUNC, &LGS_VOID) {}
     void setArgs();
-    void initArgs(LgsRuntime* runtime);
-    void generateIR(LgsRuntime* runtime) override;
-    Function* getIRFunc(LgsRuntime* runtime) override;
+    void initArgs(LgsModule* runtime);
+    void generateIR(LgsModule* runtime) override;
+    Function* getIRFunc(LgsModule* runtime) override;
     ~LgsMainFunc() override;
 };
 

@@ -1,13 +1,13 @@
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsEnumField.h"
-#include "logos/LgsRuntime.h"
+#include "logos/LgsModule.h"
 
 LgsExpr* LgsEnum::getZeroValue() {
     return nullptr;
 }
 
-Type* LgsEnum::getIRType() {
-    return PointerType::getUnqual(context);
+Type* LgsEnum::getIRType(LLVMContext& context) {
+    return ptrTy(context);
 }
 
 string LgsEnum::getIRName() {

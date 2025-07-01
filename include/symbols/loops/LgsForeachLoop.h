@@ -11,16 +11,16 @@ public:
     LgsUnaryExpr* iterExpr = nullptr;
 
     explicit LgsForeachLoop(LgsUnaryExpr* iterable) : iterExpr(iterable) {}
-    void setArrIterVars(LgsRuntime* runtime, LgsArray* arr) const;
-    void setMapIterVars(LgsRuntime* runtime, const LgsIterator& iterator) const;
-    void setStrIterVars(LgsRuntime* runtime, LgsStr* str) const;
-    void setLoopCondition(LgsRuntime* runtime);
-    LoadInst* loadIPtr(LgsRuntime* runtime) const;
-    Value* loopStart(LgsRuntime* runtime) override;
-    Value* loopEnd(LgsRuntime* runtime) override;
-    void initIPtr(LgsRuntime* runtime);
-    void initIRLoop(LgsRuntime* runtime) override;
-    void exitIRLoop(LgsRuntime* runtime) const override;
+    void setArrIterVars(LgsModule* runtime, LgsArray* arr) const;
+    void setMapIterVars(LgsModule* runtime, const LgsIterator& iterator) const;
+    void setStrIterVars(LgsModule* runtime, LgsStr* str) const;
+    void setLoopCondition(LgsModule* runtime);
+    LoadInst* loadIPtr(LgsModule* runtime) const;
+    Value* loopStart(LgsModule* runtime) override;
+    Value* loopEnd(LgsModule* runtime) override;
+    void initIPtr(LgsModule* runtime);
+    void initIRLoop(LgsModule* runtime) override;
+    void exitIRLoop(LgsModule* runtime) const override;
     ~LgsForeachLoop() override;
 };
 

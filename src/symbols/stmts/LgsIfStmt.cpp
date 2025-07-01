@@ -1,7 +1,7 @@
 #include "stmts/LgsIfStmt.h"
 
 #include "funcs/LgsFunc.h"
-#include "logos/LgsRuntime.h"
+#include "logos/LgsModule.h"
 #include "utils/LgsUtils.h"
 
 #define BB_IF_TRUE "if_true"
@@ -10,7 +10,7 @@
 #define BB_ELSE_IF "else_if"
 #define BB_ELSE_IF_CHECK "else_if_check"
 
-void LgsIfStmt::createIRStmt(LgsRuntime* runtime) {
+void LgsIfStmt::createIRStmt(LgsModule* runtime) {
     runtime->stack.enterScope(IF_SCOPE, this);
     if (elseIfConds.empty()) {
         if (elseStmtBlock) {
@@ -24,11 +24,11 @@ void LgsIfStmt::createIRStmt(LgsRuntime* runtime) {
     runtime->stack.exitScope(IF_SCOPE);
 }
 
-void LgsIfStmt::generateSimpleIf(LgsRuntime* runtime) {
+void LgsIfStmt::generateSimpleIf(LgsModule* runtime) {
     const auto ifCondIR = ifCond->getIRValue(runtime);
     if (!isBranchingNeeded(runtime, ifCondIR)) return;
-    const auto trueBlock = BasicBlock::Create(context, BB_IF_TRUE);
-    endBlock = BasicBlock::Create(context, BB_IF_END);
+    const auto trueBlock = BasicBlock::Create(runtime->context, BB_IF_TRUE);
+    endBlock = BasicBlock::Create(runtime->context, BB_IF_END);
     runtime->builder.CreateCondBr(ifCondIR, trueBlock, endBlock);
     startBlock(runtime, trueBlock);
     ifStmtBlock->createIRValue(runtime);
@@ -36,12 +36,12 @@ void LgsIfStmt::generateSimpleIf(LgsRuntime* runtime) {
     startBlock(runtime, endBlock);
 }
 
-void LgsIfStmt::generateIfElse(LgsRuntime* runtime) {
+void LgsIfStmt::generateIfElse(LgsModule* runtime) {
     const auto ifCondIR = ifCond->getIRValue(runtime);
     if (!isBranchingNeeded(runtime, ifCondIR)) return;
-    const auto trueBlock = BasicBlock::Create(context, BB_IF_TRUE);
-    const auto elseBlock = BasicBlock::Create(context, BB_ELSE);
-    endBlock = BasicBlock::Create(context, BB_IF_END);
+    const auto trueBlock = BasicBlock::Create(runtime->context, BB_IF_TRUE);
+    const auto elseBlock = BasicBlock::Create(runtime->context, BB_ELSE);
+    endBlock = BasicBlock::Create(runtime->context, BB_IF_END);
     // if block
     runtime->builder.CreateCondBr(ifCondIR, trueBlock, elseBlock);
     startBlock(runtime, trueBlock);
@@ -54,13 +54,13 @@ void LgsIfStmt::generateIfElse(LgsRuntime* runtime) {
     startBlock(runtime, endBlock);
 }
 
-void LgsIfStmt::generateComplexIf(LgsRuntime* runtime) {
+void LgsIfStmt::generateComplexIf(LgsModule* runtime) {
     const auto ifCondIR = ifCond->getIRValue(runtime);
     if (!isBranchingNeeded(runtime, ifCondIR)) return;
-    auto trueBlock = BasicBlock::Create(context, BB_IF_TRUE);
-    auto elseIfCheckBlock = BasicBlock::Create(context, BB_ELSE_IF_CHECK);
-    const auto elseBlock = BasicBlock::Create(context, BB_ELSE);
-    endBlock = BasicBlock::Create(context, BB_IF_END);
+    auto trueBlock = BasicBlock::Create(runtime->context, BB_IF_TRUE);
+    auto elseIfCheckBlock = BasicBlock::Create(runtime->context, BB_ELSE_IF_CHECK);
+    const auto elseBlock = BasicBlock::Create(runtime->context, BB_ELSE);
+    endBlock = BasicBlock::Create(runtime->context, BB_IF_END);
 
     // if block
     runtime->builder.CreateCondBr(ifCondIR, trueBlock, elseIfCheckBlock);
@@ -73,7 +73,7 @@ void LgsIfStmt::generateComplexIf(LgsRuntime* runtime) {
         const auto elseIfCond = elseIfConds[i];
         const auto stmtBlock = elseIfStmtBlocks[i];
         const auto elseIfCondIR = elseIfCond->createIRValue(runtime);
-        trueBlock = BasicBlock::Create(context, BB_IF_TRUE);
+        trueBlock = BasicBlock::Create(runtime->context, BB_IF_TRUE);
         const auto lastIter = i == elseIfConds.size() - 1;
         if (lastIter) {
             if (elseStmtBlock) {
@@ -82,7 +82,7 @@ void LgsIfStmt::generateComplexIf(LgsRuntime* runtime) {
                 runtime->builder.CreateCondBr(elseIfCondIR, trueBlock, endBlock);
             }
         } else {
-            elseIfCheckBlock = BasicBlock::Create(context, BB_ELSE_IF_CHECK);
+            elseIfCheckBlock = BasicBlock::Create(runtime->context, BB_ELSE_IF_CHECK);
             runtime->builder.CreateCondBr(elseIfCondIR, trueBlock, elseIfCheckBlock);
         }
         startBlock(runtime, trueBlock);
@@ -98,7 +98,7 @@ void LgsIfStmt::generateComplexIf(LgsRuntime* runtime) {
     startBlock(runtime, endBlock);
 }
 
-bool LgsIfStmt::isBranchingNeeded(LgsRuntime* runtime, Value* ifCondIR) const {
+bool LgsIfStmt::isBranchingNeeded(LgsModule* runtime, Value* ifCondIR) const {
     if (const auto* constBool = dyn_cast<ConstantInt>(ifCondIR)) {
         if (constBool->isOne()) {
             ifStmtBlock->createIRValue(runtime);

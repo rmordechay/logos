@@ -4,6 +4,7 @@
 #include "funcs/LgsBuiltinFunc.h"
 #include "primitives/LgsBool.h"
 #include "primitives/LgsVoid.h"
+#include "utils/LgsUtils.h"
 
 class LgsIterator final : public LgsUnaryExpr {
 public:
@@ -13,27 +14,28 @@ public:
     explicit LgsIterator(LgsExpr* baseExpr) : baseExpr(baseExpr) {
         type = baseExpr->type;
     }
-    static StructType* getStructType();
-    Value* createIRValue(LgsRuntime* runtime) override;
-    void initIterator(LgsRuntime* runtime);
-    Value* next(LgsRuntime* runtime) const;
-    Value* hasNext(LgsRuntime* runtime) const;
+
+    Value* createIRValue(LgsModule* runtime) override;
+    void initIterator(LgsModule* runtime);
+    Value* next(LgsModule* runtime) const;
+    Value* hasNext(LgsModule* runtime) const;
     ~LgsIterator() override = default;
 };
 
 
-inline void LgsIterator::initIterator(LgsRuntime* runtime) {
+inline void LgsIterator::initIterator(LgsModule* runtime) {
     LgsBuiltinFunc iterInitFunc{"initIter", &LGS_VOID, type->getIRName(), {type, &LGS_ANY}};
-    IRValue = runtime->builder.CreateAlloca(getStructType());
+    const auto structType = getIRStructType(runtime->context, name, {ptrTy(runtime->context), i64Ty(runtime->context), ptrTy(runtime->context), ptrTy(runtime->context), ptrTy(runtime->context), ptrTy(runtime->context)});
+    IRValue = runtime->builder.CreateAlloca(structType);
     iterInitFunc.callIR(runtime, {baseExpr->getIRValue(runtime), IRValue});
 }
 
-inline Value* LgsIterator::next(LgsRuntime* runtime) const {
+inline Value* LgsIterator::next(LgsModule* runtime) const {
     LgsBuiltinFunc iterInitFunc{"next", &LGS_ANY, type->getIRName(), {&LGS_ANY}};
     return iterInitFunc.callIR(runtime, {IRValue});
 }
 
-inline Value* LgsIterator::hasNext(LgsRuntime* runtime) const {
+inline Value* LgsIterator::hasNext(LgsModule* runtime) const {
     LgsBuiltinFunc iterInitFunc{"hasNext", &LGS_BOOL, type->getIRName(), {&LGS_ANY}};
     return iterInitFunc.callIR(runtime, {IRValue});
 }

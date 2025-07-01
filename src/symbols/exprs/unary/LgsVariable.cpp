@@ -5,7 +5,7 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
-#include <logos/LgsRuntime.h>
+#include <logos/LgsModule.h>
 
 string LgsVariable::getExprName() {
     return name;
@@ -15,7 +15,7 @@ string LgsVariable::prettyName() {
     return name;
 }
 
-Value* LgsVariable::createIRValue(LgsRuntime* runtime) {
+Value* LgsVariable::createIRValue(LgsModule* runtime) {
     switch (ref.symbolType) {
     case VAR_DEC:
         return ref.varDec->IRValue;
@@ -56,7 +56,7 @@ LgsExpr* LgsVariable::convertExpr(LgsType* type) {
     assert(0);
 }
 
-Value* LgsVariable::hashValue(LgsRuntime* runtime) {
+Value* LgsVariable::hashValue(LgsModule* runtime) {
     string text;
     switch (ref.symbolType) {
     case PARAM:

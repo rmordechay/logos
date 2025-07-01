@@ -1,22 +1,21 @@
 #include "files/LgsMainFile.h"
 #include "funcs/LgsFunc.h"
-#include "logos/LgsApp.h"
 #include "types/LgsEnum.h"
 #include "types/LgsObject.h"
 #include "utils/LgsUtils.h"
 
-Module* LgsMainFile::generateIR() {
-    LgsRuntime runtime;
-    runtime.module = createIRModule(LOGOS_MAIN_FILE_NAME, context);
+LgsModule* LgsMainFile::generateIR() {
+    const auto runtime = new LgsModule();
+    runtime->IRModule = createIRModule(LOGOS_MAIN_FILE_NAME, runtime->context);
     for (const auto [_, func] : funcs) {
-        func->generateIR(&runtime);
+        func->generateIR(runtime);
     }
     for (const auto object : objects) {
         for (const auto& [_, method] : object->methods) {
-            method->generateIR(&runtime);
+            method->generateIR(runtime);
         }
     }
-    return runtime.module;
+    return runtime;
 }
 
 void LgsMainFile::format() {

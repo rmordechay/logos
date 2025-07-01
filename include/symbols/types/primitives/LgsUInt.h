@@ -11,7 +11,7 @@ public:
         isPrimitive = true;
     }
     size_t getSizeBytes() override;
-    Type* getIRType() override;
+    Type* getIRType(LLVMContext& context) override;
     string getIRName() override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;

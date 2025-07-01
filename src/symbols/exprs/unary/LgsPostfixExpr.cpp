@@ -2,17 +2,17 @@
 
 #include "../../../../include/symbols/LgsType.h"
 
-Value* LgsPostfixExpr::createIRValue(LgsRuntime* runtime) {
+Value* LgsPostfixExpr::createIRValue(LgsModule* runtime) {
     return IncOrDecValue(runtime);
 }
 
-void LgsPostfixExpr::createIRStmt(LgsRuntime* runtime) {
+void LgsPostfixExpr::createIRStmt(LgsModule* runtime) {
     IncOrDecValue(runtime);
 }
 
-Value* LgsPostfixExpr::IncOrDecValue(LgsRuntime* runtime) const {
+Value* LgsPostfixExpr::IncOrDecValue(LgsModule* runtime) const {
     const auto exprIRValue = expr->createIRValue(runtime);
-    const auto exprIRType = expr->type->getIRType();
+    const auto exprIRType = expr->type->getIRType(runtime->context);
     const auto exprLoad = runtime->builder.CreateLoad(exprIRType, exprIRValue);
     const auto oneConst = ConstantInt::get(exprIRType, 1);
     Value* updatedValue = nullptr;

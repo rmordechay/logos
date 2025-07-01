@@ -7,24 +7,24 @@ class LgsErrHandler;
 class LgsForLoop;
 class LgsFuncType;
 
-inline LLVMContext context;
 inline DataLayout dataLayout;
+inline GlobalVariable* runtimeStruct = nullptr;
 
-class LgsRuntime {
+class LgsModule {
 public:
     LgsStack stack;
-    Module* module = nullptr;
+    LLVMContext context;
+    Module* IRModule = nullptr;
     Function* IRFunc = nullptr;
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
-    GlobalVariable* runtimeStruct = nullptr;
 
     void initRuntime();
     void freeExprs();
     void addAllocatedExpr(LgsExpr* expr);
     void pushStackTrace(const string& path);
     void printStack();
-    ~LgsRuntime() = default;
+    ~LgsModule() = default;
 };
 
 inline LgsSymbolTable globals;

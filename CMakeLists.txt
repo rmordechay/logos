@@ -9,7 +9,7 @@ set(SOURCE_FILES
     src/logos/Logos.cpp
     src/utils/LgsErrHandler.cpp
     src/logos/LgsApp.cpp
-    src/logos/LgsRuntime.cpp
+    src/logos/LgsModule.cpp
     src/logos/LgsStack.cpp
     src/logos/LgsLinker.cpp
     src/analysis/AntlrConverter.cpp

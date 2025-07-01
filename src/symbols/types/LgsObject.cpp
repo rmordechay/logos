@@ -11,17 +11,17 @@ string LgsObject::prettyName() const {
     return name;
 }
 
-Type* LgsObject::getIRType() {
+Type* LgsObject::getIRType(LLVMContext& context) {
     if (IRType) return IRType;
     // Add one or zero if table exists
     const size_t offset = !!vtable;
     vector<Type*> elementTypes(fields.size() + offset);
     size_t position = 0;
     if (vtable) {
-        elementTypes[position++] = PointerType::getUnqual(context);
+        elementTypes[position++] = ptrTy(context);
     }
     for (const auto [_, field] : fields) {
-        const auto fieldType = field->type->getIRType();
+        const auto fieldType = field->type->getIRType(context);
         field->position = position++;
         elementTypes[field->position + offset] = fieldType;
     }
@@ -68,7 +68,7 @@ LgsInterface* LgsObject::getInterface(const string& interfaceName) const {
     return nullptr;
 }
 
-void LgsObject::setVFuncs(LgsRuntime* runtime) const {
+void LgsObject::setVFuncs(LgsModule* runtime) const {
     assert(runtime);
     const auto vtablePtr = vtable->getIRValue(runtime);
     for (const auto [_, method] : methods) {

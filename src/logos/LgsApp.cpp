@@ -34,29 +34,25 @@ bool LgsApp::validate() {
 }
 
 bool LgsApp::parse() {
-    thread tSrcFiles([this] {
-        vector<LgsFile*> files;
-        ThreadPool threadPool;
-        threadPool.start();
-        parseSrcFiles(threadPool);
-        threadPool.wait();
-    });
-    thread tGlobals([this] { loadGlobals(); });
-    tSrcFiles.join();
-    tGlobals.join();
+    loadGlobals();
+    ThreadPool threadPool;
+    threadPool.start();
+    parseSrcFiles(threadPool);
+    threadPool.wait();
     return resolveExternalFiles() && resolveGlobalTypes();
 }
 
 bool LgsApp::analyse() {
     ThreadPool threadPool;
     threadPool.start();
-    for (const auto file : files) {
-        threadPool.runTask([=, &file] {
+    for (const auto& file : files) {
+        threadPool.runTask([file, this] {
             SemaAnalyser semaAnalyser(file);
             semaAnalyser.start();
             if (!semaAnalyser.errHandler.successful) {
+                const auto errors = semaAnalyser.errHandler.errors;
                 lock_guard lock(mtx);
-                addErrors(semaAnalyser.errHandler.errors);
+                addErrors(errors);
                 errHandler.setUnsuccessful();
             }
         });
@@ -70,23 +66,24 @@ bool LgsApp::generate() {
     CodeGenerator::init(paths);
     ThreadPool threadPool;
     threadPool.start();
-    for (const auto file : files) {
-        threadPool.runTask([=, &file] {
+    for (const auto& file : files) {
+        threadPool.runTask([file, this] {
             const auto module = file->generateIR();
             if (module) {
+                const auto name = file->name;
                 lock_guard lock(mtx);
-                IRModules[file->name] = module;
+                modules[name] = module;
             }
         });
     }
     threadPool.wait();
-    CodeGenerator::writeIRToFile(IRModules, paths);
+    CodeGenerator::writeIRToFile(modules, paths);
     return errHandler.successful;
 }
 
 bool LgsApp::link() const {
     const LgsLinker linker;
-    return linker.link(paths, IRModules);
+    return linker.link(paths, modules);
 }
 
 void LgsApp::run() const {

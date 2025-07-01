@@ -3,11 +3,11 @@
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
-Value* LgsCast::createIRValue(LgsRuntime* runtime) {
+Value* LgsCast::createIRValue(LgsModule* runtime) {
     return toValue->getIRValue(runtime);
 }
 
-Value* LgsCast::addIR(LgsRuntime* runtime, LgsExpr* other) {
+Value* LgsCast::addIR(LgsModule* runtime, LgsExpr* other) {
     return toValue->addIR(runtime, other);
 }
 

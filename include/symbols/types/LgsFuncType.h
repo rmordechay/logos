@@ -20,7 +20,7 @@ public:
     int returnParamIndex = -1;
     FunctionType* IRType = nullptr;
 
-    Type* getIRType() override;
+    Type* getIRType(LLVMContext& context) override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;

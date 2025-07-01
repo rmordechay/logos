@@ -2,7 +2,7 @@
 #include <LgsValue.h>
 
 class LgsPostfixExpr;
-class LgsRuntime;
+class LgsModule;
 class LgsForLoop;
 class LgsVarDec;
 class LgsSelection;
@@ -27,7 +27,7 @@ public:
     LgsFuncCall* asFuncCall();
     LgsSelection* asSelection();
     LgsPostfixExpr* asPostfixExpr();
-    virtual void createIRStmt(LgsRuntime* runtime) = 0;
+    virtual void createIRStmt(LgsModule* runtime) = 0;
     ~LgsStmt() override = default;
 };
 

@@ -19,24 +19,24 @@ LgsType* LgsMap::getValueType() {
     return typePair->key;
 }
 
-Value* LgsMap::getLength(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsMap::getLength(LgsModule* runtime, LgsExpr* expr) {
     return lenFunc.call(runtime, {expr});
 }
 
-Value* LgsMap::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsMap::getLoopLength(LgsModule* runtime, LgsExpr* expr) {
     return runtime->builder.getInt32(1024);
 }
 
-Value* LgsMap::isEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsMap::isEmpty(LgsModule* runtime, LgsExpr* expr) {
     return isEmptyFunc.call(runtime, {expr});
 }
 
-Value* LgsMap::isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsMap::isNotEmpty(LgsModule* runtime, LgsExpr* expr) {
     return isNotEmptyFunc.call(runtime, {expr});
 }
 
-Type* LgsMap::getIRType() {
-    return PointerType::getUnqual(context);
+Type* LgsMap::getIRType(LLVMContext& context) {
+    return ptrTy(context);
 }
 
 string LgsMap::getIRName() {
@@ -55,10 +55,10 @@ bool LgsMap::equals(LgsType* other) {
     return keyEqual && typePair->value->equals(otherKvType->value);
 }
 
-StructType* LgsMap::getMapStruct(LgsRuntime* runtime) {
+StructType* LgsMap::getMapStruct(LgsModule* runtime) {
     if (mapStruct) return mapStruct;
     auto& builder = runtime->builder;
     const vector<Type*> mapStructFields = {builder.getPtrTy(), builder.getInt64Ty(), builder.getInt64Ty()};
-    mapStruct = getIRStructType(name, mapStructFields);
+    mapStruct = getIRStructType(runtime->context, name, mapStructFields);
     return mapStruct;
 }

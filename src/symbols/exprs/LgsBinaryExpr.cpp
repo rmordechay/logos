@@ -5,7 +5,7 @@ string LgsBinaryExpr::prettyName() {
     return left->prettyName() + ' ' + opStr + ' ' + right->prettyName();
 }
 
-Value* LgsBinaryExpr::createIRValue(LgsRuntime* runtime) {
+Value* LgsBinaryExpr::createIRValue(LgsModule* runtime) {
     switch (op) {
     case ADD:
         return left->addIR(runtime, right);
@@ -49,18 +49,18 @@ Value* LgsBinaryExpr::createIRValue(LgsRuntime* runtime) {
     assert(0);
 }
 
-Value* LgsBinaryExpr::addIR(LgsRuntime* runtime, LgsExpr* other) {
+Value* LgsBinaryExpr::addIR(LgsModule* runtime, LgsExpr* other) {
     return left->addIR(runtime, right);
 }
 
-Value* LgsBinaryExpr::subIR(LgsRuntime* runtime, LgsExpr* other) {
+Value* LgsBinaryExpr::subIR(LgsModule* runtime, LgsExpr* other) {
     return left->subIR(runtime, right);
 }
 
-Value* LgsBinaryExpr::mulIR(LgsRuntime* runtime, LgsExpr* other) {
+Value* LgsBinaryExpr::mulIR(LgsModule* runtime, LgsExpr* other) {
     return left->mulIR(runtime, right);
 }
 
-Value* LgsBinaryExpr::divIR(LgsRuntime* runtime, LgsExpr* other) {
+Value* LgsBinaryExpr::divIR(LgsModule* runtime, LgsExpr* other) {
     return left->divIR(runtime, right);
 }

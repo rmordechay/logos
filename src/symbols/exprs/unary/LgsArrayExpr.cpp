@@ -7,16 +7,16 @@ string LgsArrayExpr::prettyName() {
     return type->prettyName();
 }
 
-Value* LgsArrayExpr::createIRValue(LgsRuntime* runtime) {
+Value* LgsArrayExpr::createIRValue(LgsModule* runtime) {
     if (type->asArray()->isStatic) return createConstArray(runtime);
     return createDynamicArray(runtime);
 }
 
-Value* LgsArrayExpr::createDynamicArray(LgsRuntime* runtime) {
+Value* LgsArrayExpr::createDynamicArray(LgsModule* runtime) {
     auto& builder = runtime->builder;
     const auto arrType = type->asArray();
     const auto elementSize = builder.getInt64(arrType->baseType->getSizeBytes());
-    IRValue = builder.CreateAlloca(arrType->getArrStruct());
+    IRValue = builder.CreateAlloca(arrType->getArrStruct(runtime->context));
 
     Value* capacityIR = nullptr;
     if (arrType->sizeExpr) {
@@ -35,11 +35,11 @@ Value* LgsArrayExpr::createDynamicArray(LgsRuntime* runtime) {
     return IRValue;
 }
 
-Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
+Value* LgsArrayExpr::createConstArray(LgsModule* runtime) const {
     auto& builder = runtime->builder;
     const auto arr = type->asArray();
     const auto baseType = arr->baseType;
-    const auto baseIRType = baseType->getIRType();
+    const auto baseIRType = baseType->getIRType(runtime->context);
     const auto arrIRType = ArrayType::get(baseIRType, arr->iterLen);
     const auto arrIRPtr = builder.CreateAlloca(arrIRType);
     if (elements.empty()) return arrIRPtr;
@@ -48,7 +48,8 @@ Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
     if (elementsAreStatic) {
         const auto value = createIRConstArray(runtime, elements);
         const auto globalVarIR = createIRGlobal(runtime, type, value);
-        copyMem(runtime, globalVarIR, arrIRPtr, arr->getIterBytesSize(arrSize));
+        const auto iterBytesSize = dataLayout.getTypeAllocSize(baseType->getIRType(runtime->context)).getFixedValue() * arrSize;
+        copyMem(runtime, globalVarIR, arrIRPtr, iterBytesSize);
     } else {
         for (int i = 0; i < elements.size(); ++i) {
             const auto gep = builder.CreateGEP(arrIRType, arrIRPtr, {builder.getInt32(0), builder.getInt32(i)});
@@ -59,9 +60,9 @@ Value* LgsArrayExpr::createConstArray(LgsRuntime* runtime) const {
     return arrIRPtr;
 }
 
-Constant* LgsArrayExpr::createIRConstArray(LgsRuntime* runtime, const vector<LgsExpr*>& elements) const {
+Constant* LgsArrayExpr::createIRConstArray(LgsModule* runtime, const vector<LgsExpr*>& elements) const {
     const auto baseType = type->asArray()->baseType;
-    const auto arrIRType = ArrayType::get(baseType->getIRType(), elements.size());
+    const auto arrIRType = ArrayType::get(baseType->getIRType(runtime->context), elements.size());
     vector<Constant*> values;
     for (const auto element : elements) {
         if (const auto subArray = element->asArrayExpr()) {
@@ -76,7 +77,7 @@ Constant* LgsArrayExpr::createIRConstArray(LgsRuntime* runtime, const vector<Lgs
     return ConstantArray::get(arrIRType, values);
 }
 
-void LgsArrayExpr::free(LgsRuntime* runtime) {
+void LgsArrayExpr::free(LgsModule* runtime) {
     if (!type->asArray()->isStatic) {
         type->asArray()->freeFunc.call(runtime, {this});
     }

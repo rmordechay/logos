@@ -12,7 +12,7 @@ public:
         isInt = true;
     }
     string prettyName() const override;
-    Type* getIRType() override;
+    Type* getIRType(LLVMContext& context) override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;

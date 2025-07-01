@@ -12,9 +12,9 @@ string LgsStr::getIRName() {
     return name;
 }
 
-Type* LgsStr::getIRType() {
-    if (isStatic) return ArrayType::get(baseType->getIRType(), iterLen);
-    return PointerType::getUnqual(context);
+Type* LgsStr::getIRType(LLVMContext& context) {
+    if (isStatic) return ArrayType::get(baseType->getIRType(context), iterLen);
+    return ptrTy(context);
 }
 
 string LgsStr::prettyName() const {
@@ -37,22 +37,22 @@ LgsType* LgsStr::getValueType() {
     return baseType;
 }
 
-Value* LgsStr::getLength(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsStr::getLength(LgsModule* runtime, LgsExpr* expr) {
     return lenFunc.call(runtime, {expr});
 }
 
-Value* LgsStr::getLoopLength(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsStr::getLoopLength(LgsModule* runtime, LgsExpr* expr) {
     const auto i32Ty = runtime->builder.getInt64Ty();
     const auto lenPtr = runtime->builder.CreateAlloca(i32Ty);
     runtime->builder.CreateStore(getLength(runtime, expr), lenPtr);
     return runtime->builder.CreateLoad(i32Ty, lenPtr);
 }
 
-Value* LgsStr::isEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsStr::isEmpty(LgsModule* runtime, LgsExpr* expr) {
     return isEmptyFunc.call(runtime, {expr});
 }
 
-Value* LgsStr::isNotEmpty(LgsRuntime* runtime, LgsExpr* expr) {
+Value* LgsStr::isNotEmpty(LgsModule* runtime, LgsExpr* expr) {
     return isNotEmptyFunc.call(runtime, {expr});
 }
 

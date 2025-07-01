@@ -15,7 +15,7 @@ string LgsInt::prettyName() const {
     return name;
 }
 
-Type* LgsInt::getIRType() {
+Type* LgsInt::getIRType(LLVMContext& context) {
     return Type::getInt32Ty(context);
 }
 
