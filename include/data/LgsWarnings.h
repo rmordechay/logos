@@ -1,8 +1,5 @@
 #pragma once
 
-
-
-
 inline string WARNING_PLACEHOLDER = "%s";
 
 struct LgsWarning {

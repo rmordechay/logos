@@ -41,7 +41,7 @@ public:
     bool link() const;
     void run() const;
     void parseSrcFiles(ThreadPool& threadPool);
-    void parseSrcFile(path fileEntry);
+    void parseSrcFile(const string& codeText, path filePath);
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
     bool resolveExternalFiles();

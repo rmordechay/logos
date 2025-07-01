@@ -128,4 +128,4 @@ endif()
 
 add_executable(lgs main.cpp)
 target_link_libraries(lgs PRIVATE lib)
-# add_subdirectory(tests)
+add_subdirectory(tests)

@@ -92,17 +92,16 @@ void LgsApp::run() const {
 
 void LgsApp::parseSrcFiles(ThreadPool& threadPool) {
     for (const auto& entry : recursive_directory_iterator(paths.srcDir)) {
-        if (isLogosFile(entry)) {
-            threadPool.runTask([entry, this] {
-                parseSrcFile(entry);
-            });
-        }
+        if (!isLogosFile(entry)) continue;
+        threadPool.runTask([entry, this] {
+            const auto absFilePath = path(canonical(entry));
+            const auto codeText = getFileText(absFilePath);
+            parseSrcFile(codeText, absFilePath);
+        });
     }
 }
 
-void LgsApp::parseSrcFile(path fileEntry) {
-    const auto absFilePath = new path(canonical(fileEntry));
-    const auto codeText = getFileText(fileEntry);
+void LgsApp::parseSrcFile(const string& codeText, path filePath) {
     ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
@@ -112,7 +111,7 @@ void LgsApp::parseSrcFile(path fileEntry) {
         errHandler.setUnsuccessful();
         return;
     }
-    AntlerConverter antlerConverter(*absFilePath);
+    AntlerConverter antlerConverter(filePath);
     const auto file = antlerConverter.getLogosFile(lgsFile);
     lock_guard lock(mtx);
     files.push_back(file);
