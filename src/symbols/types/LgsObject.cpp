@@ -68,15 +68,15 @@ LgsInterface* LgsObject::getInterface(const string& interfaceName) const {
     return nullptr;
 }
 
-void LgsObject::setVFuncs(LgsModule* runtime) const {
-    assert(runtime);
-    const auto vtablePtr = vtable->getIRValue(runtime);
+void LgsObject::setVFuncs(LgsModule* module) const {
+    assert(module);
+    const auto vtablePtr = vtable->getIRValue(module);
     for (const auto [_, method] : methods) {
-        const auto keyIRStr = getIRStr(runtime, method->funcType->getIRName());
-        const auto IRFunc = method->getIRFunc(runtime);
-        auto valuePtr = runtime->builder.CreateAlloca(runtime->builder.getPtrTy());
-        runtime->builder.CreateStore(IRFunc, valuePtr);
-        vtable->type->asMap()->addFunc.callIR(runtime, {vtablePtr, keyIRStr, valuePtr});
+        const auto keyIRStr = getIRStr(module, method->funcType->getIRName());
+        const auto IRFunc = method->getIRFunc(module);
+        auto valuePtr = module->builder.CreateAlloca(module->builder.getPtrTy());
+        module->builder.CreateStore(IRFunc, valuePtr);
+        vtable->type->asMap()->addFunc.callIR(module, {vtablePtr, keyIRStr, valuePtr});
     }
 }
 

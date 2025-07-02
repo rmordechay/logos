@@ -3,23 +3,26 @@
 #include "logos/LgsModule.h"
 #include "LgsType.h"
 
+#include <tuple>
+#include <tuple>
+
 class LgsUnaryExpr : public LgsExpr {
 public:
     explicit LgsUnaryExpr() : LgsExpr(nullptr) {}
     explicit LgsUnaryExpr(LgsType* type) : LgsExpr(type) {}
     string prettyName() override;
-    Value* addIR(LgsModule* runtime, LgsExpr* other) override;
-    Value* subIR(LgsModule* runtime, LgsExpr* other) override;
-    Value* mulIR(LgsModule* runtime, LgsExpr* other) override;
-    Value* divIR(LgsModule* runtime, LgsExpr* other) override;
-    Value* modIR(LgsModule* runtime, LgsExpr* other) override;
-    Value* eqIR(LgsModule* runtime, LgsExpr* other) override;
-    Value* neIR(LgsModule* runtime, LgsExpr* other) override;
-    Value* ltIR(LgsModule* runtime, LgsExpr* other) override;
-    Value* gtIR(LgsModule* runtime, LgsExpr* other) override;
-    Value* geIR(LgsModule* runtime, LgsExpr* other) override;
-    Value* leIR(LgsModule* runtime, LgsExpr* other) override;
-    tuple<Value*, Value*> loadExprs(LgsModule* runtime, LgsExpr* rExpr);
+    Value* addIR(LgsModule* module, LgsExpr* other) override;
+    Value* subIR(LgsModule* module, LgsExpr* other) override;
+    Value* mulIR(LgsModule* module, LgsExpr* other) override;
+    Value* divIR(LgsModule* module, LgsExpr* other) override;
+    Value* modIR(LgsModule* module, LgsExpr* other) override;
+    Value* eqIR(LgsModule* module, LgsExpr* other) override;
+    Value* neIR(LgsModule* module, LgsExpr* other) override;
+    Value* ltIR(LgsModule* module, LgsExpr* other) override;
+    Value* gtIR(LgsModule* module, LgsExpr* other) override;
+    Value* geIR(LgsModule* module, LgsExpr* other) override;
+    Value* leIR(LgsModule* module, LgsExpr* other) override;
+    tuple<Value*, Value*> loadExprs(LgsModule* module, LgsExpr* rExpr);
     virtual std::string getExprName();
     ~LgsUnaryExpr() override = default;
 };
@@ -32,69 +35,69 @@ inline string LgsUnaryExpr::prettyName() {
     return getExprName();
 }
 
-inline Value* LgsUnaryExpr::addIR(LgsModule* runtime, LgsExpr* other) {
-    auto [l, r] = loadExprs(runtime, other);
-    return runtime->builder.CreateAdd(l, r);
+inline Value* LgsUnaryExpr::addIR(LgsModule* module, LgsExpr* other) {
+    auto [l, r] = loadExprs(module, other);
+    return module->builder.CreateAdd(l, r);
 }
 
-inline Value* LgsUnaryExpr::subIR(LgsModule* runtime, LgsExpr* other) {
-    auto [l, r] = loadExprs(runtime, other);
-    return runtime->builder.CreateSub(l, r);
+inline Value* LgsUnaryExpr::subIR(LgsModule* module, LgsExpr* other) {
+    auto [l, r] = loadExprs(module, other);
+    return module->builder.CreateSub(l, r);
 }
 
-inline Value* LgsUnaryExpr::mulIR(LgsModule* runtime, LgsExpr* other) {
-    auto [l, r] = loadExprs(runtime, other);
-    return runtime->builder.CreateMul(l, r);
+inline Value* LgsUnaryExpr::mulIR(LgsModule* module, LgsExpr* other) {
+    auto [l, r] = loadExprs(module, other);
+    return module->builder.CreateMul(l, r);
 }
 
-inline Value* LgsUnaryExpr::divIR(LgsModule* runtime, LgsExpr* other) {
-    auto [l, r] = loadExprs(runtime, other);
-    return runtime->builder.CreateSDiv(l, r);
+inline Value* LgsUnaryExpr::divIR(LgsModule* module, LgsExpr* other) {
+    auto [l, r] = loadExprs(module, other);
+    return module->builder.CreateSDiv(l, r);
 }
 
-inline Value* LgsUnaryExpr::modIR(LgsModule* runtime, LgsExpr* other) {
-    auto [l, r] = loadExprs(runtime, other);
-    return runtime->builder.CreateSRem(l, r);
+inline Value* LgsUnaryExpr::modIR(LgsModule* module, LgsExpr* other) {
+    auto [l, r] = loadExprs(module, other);
+    return module->builder.CreateSRem(l, r);
 }
 
-inline Value* LgsUnaryExpr::eqIR(LgsModule* runtime, LgsExpr* other) {
-    auto [l, r] = loadExprs(runtime, other);
-    return runtime->builder.CreateICmpEQ(l, r);
+inline Value* LgsUnaryExpr::eqIR(LgsModule* module, LgsExpr* other) {
+    auto [l, r] = loadExprs(module, other);
+    return module->builder.CreateICmpEQ(l, r);
 }
 
-inline Value* LgsUnaryExpr::neIR(LgsModule* runtime, LgsExpr* other) {
-    auto [l, r] = loadExprs(runtime, other);
-    return runtime->builder.CreateICmpNE(l, r);
+inline Value* LgsUnaryExpr::neIR(LgsModule* module, LgsExpr* other) {
+    auto [l, r] = loadExprs(module, other);
+    return module->builder.CreateICmpNE(l, r);
 }
 
-inline Value* LgsUnaryExpr::ltIR(LgsModule* runtime, LgsExpr* other) {
-    auto [l, r] = loadExprs(runtime, other);
-    return runtime->builder.CreateICmpSLT(l, r);
+inline Value* LgsUnaryExpr::ltIR(LgsModule* module, LgsExpr* other) {
+    auto [l, r] = loadExprs(module, other);
+    return module->builder.CreateICmpSLT(l, r);
 }
 
-inline Value* LgsUnaryExpr::gtIR(LgsModule* runtime, LgsExpr* other) {
-    auto [l, r] = loadExprs(runtime, other);
-    return runtime->builder.CreateICmpSGT(l, r);
+inline Value* LgsUnaryExpr::gtIR(LgsModule* module, LgsExpr* other) {
+    auto [l, r] = loadExprs(module, other);
+    return module->builder.CreateICmpSGT(l, r);
 }
 
-inline Value* LgsUnaryExpr::geIR(LgsModule* runtime, LgsExpr* other) {
-    auto [l, r] = loadExprs(runtime, other);
-    return runtime->builder.CreateICmpSGE(l, r);
+inline Value* LgsUnaryExpr::geIR(LgsModule* module, LgsExpr* other) {
+    auto [l, r] = loadExprs(module, other);
+    return module->builder.CreateICmpSGE(l, r);
 }
 
-inline Value* LgsUnaryExpr::leIR(LgsModule* runtime, LgsExpr* other) {
-    auto [l, r] = loadExprs(runtime, other);
-    return runtime->builder.CreateICmpSLE(l, r);
+inline Value* LgsUnaryExpr::leIR(LgsModule* module, LgsExpr* other) {
+    auto [l, r] = loadExprs(module, other);
+    return module->builder.CreateICmpSLE(l, r);
 }
 
-inline tuple<Value*, Value*> LgsUnaryExpr::loadExprs(LgsModule* runtime, LgsExpr* rExpr) {
-    auto l = this->getIRValue(runtime);
-    auto r = rExpr->getIRValue(runtime);
+inline tuple<Value*, Value*> LgsUnaryExpr::loadExprs(LgsModule* module, LgsExpr* rExpr) {
+    auto l = this->getIRValue(module);
+    auto r = rExpr->getIRValue(module);
     if (l->getType()->isPointerTy()) {
-        l = runtime->builder.CreateLoad(this->type->getIRType(runtime->context), l);
+        l = module->builder.CreateLoad(this->type->getIRType(module->context), l);
     }
     if (r->getType()->isPointerTy()) {
-        r = runtime->builder.CreateLoad(rExpr->type->getIRType(runtime->context), r);
+        r = module->builder.CreateLoad(rExpr->type->getIRType(module->context), r);
     }
     return tuple(l, r);
 }

@@ -7,8 +7,8 @@ string LgsIntConst::prettyName() {
     return to_string(value);
 }
 
-Value* LgsIntConst::createIRValue(LgsModule* runtime) {
-    return runtime->builder.getInt32(value);
+Value* LgsIntConst::createIRValue(LgsModule* module) {
+    return module->builder.getInt32(value);
 }
 
 LgsExpr* LgsIntConst::convertExpr(LgsType* toType) {
@@ -28,42 +28,42 @@ LgsExpr* LgsIntConst::clone() {
     return new LgsIntConst(value);
 }
 
-Value* LgsIntConst::andIR(LgsModule* runtime, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(runtime);
-    const auto thisIRValue = getIRValue(runtime);
-    return runtime->builder.CreateAnd(thisIRValue, otherIRValue);
+Value* LgsIntConst::andIR(LgsModule* module, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(module);
+    const auto thisIRValue = getIRValue(module);
+    return module->builder.CreateAnd(thisIRValue, otherIRValue);
 }
 
-Value* LgsIntConst::orIR(LgsModule* runtime, LgsExpr* other) {
+Value* LgsIntConst::orIR(LgsModule* module, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsIntConst::bitAndIR(LgsModule* runtime, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(runtime);
-    const auto thisIRValue = getIRValue(runtime);
-    return runtime->builder.CreateAnd(thisIRValue, otherIRValue);
+Value* LgsIntConst::bitAndIR(LgsModule* module, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(module);
+    const auto thisIRValue = getIRValue(module);
+    return module->builder.CreateAnd(thisIRValue, otherIRValue);
 }
 
-Value* LgsIntConst::bitOrIR(LgsModule* runtime, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(runtime);
-    const auto thisIRValue = getIRValue(runtime);
-    return runtime->builder.CreateOr(thisIRValue, otherIRValue);
+Value* LgsIntConst::bitOrIR(LgsModule* module, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(module);
+    const auto thisIRValue = getIRValue(module);
+    return module->builder.CreateOr(thisIRValue, otherIRValue);
 }
 
-Value* LgsIntConst::bitXorIR(LgsModule* runtime, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(runtime);
-    const auto thisIRValue = getIRValue(runtime);
-    return runtime->builder.CreateXor(thisIRValue, otherIRValue);
+Value* LgsIntConst::bitXorIR(LgsModule* module, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(module);
+    const auto thisIRValue = getIRValue(module);
+    return module->builder.CreateXor(thisIRValue, otherIRValue);
 }
 
-Value* LgsIntConst::lshiftIR(LgsModule* runtime, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(runtime);
-    const auto thisIRValue = getIRValue(runtime);
-    return runtime->builder.CreateShl(thisIRValue, otherIRValue);
+Value* LgsIntConst::lshiftIR(LgsModule* module, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(module);
+    const auto thisIRValue = getIRValue(module);
+    return module->builder.CreateShl(thisIRValue, otherIRValue);
 }
 
-Value* LgsIntConst::rshiftIR(LgsModule* runtime, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(runtime);
-    const auto thisIRValue = getIRValue(runtime);
-    return runtime->builder.CreateAShr(thisIRValue, otherIRValue);
+Value* LgsIntConst::rshiftIR(LgsModule* module, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(module);
+    const auto thisIRValue = getIRValue(module);
+    return module->builder.CreateAShr(thisIRValue, otherIRValue);
 }

@@ -10,7 +10,7 @@
 class LgsArrayAddFunc final : public LgsBuiltinFunc {
 public:
     explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName(), {parent, &LGS_ANY}, true, true) {}
-    Value* call(LgsModule* runtime, const vector<LgsExpr*>& args) override;
+    Value* call(LgsModule* module, const vector<LgsExpr*>& args) override;
     Type* getIRFuncType(LLVMContext& context) override;
     ~LgsArrayAddFunc() override = default;
 };
@@ -47,10 +47,10 @@ public:
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
     string getStrFormatPart() const override;
-    Value* getLength(LgsModule* runtime, LgsExpr* expr) override;
-    Value* getLoopLength(LgsModule* runtime, LgsExpr* expr) override;
-    Value* isEmpty(LgsModule* runtime, LgsExpr* expr) override;
-    Value* isNotEmpty(LgsModule* runtime, LgsExpr* expr) override;
+    Value* getLength(LgsModule* module, LgsExpr* expr) override;
+    Value* getLoopLength(LgsModule* module, LgsExpr* expr) override;
+    Value* isEmpty(LgsModule* module, LgsExpr* expr) override;
+    Value* isNotEmpty(LgsModule* module, LgsExpr* expr) override;
     StructType* getArrStruct(LLVMContext& context);
     bool equals(LgsType* other) override;
     ~LgsArray() override;

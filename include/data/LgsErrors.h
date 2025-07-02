@@ -65,3 +65,4 @@ inline LgsError E10053{.msg = "'%s' is a Logos global name and can not be redefi
 inline LgsError E10054{.msg = "Field '%s' is set more than one time.", .errCode = errCodeStart++};
 inline LgsError E10055{.msg = "Function '%s' must return from all its paths.", .errCode = errCodeStart++};
 inline LgsError E10056{.msg = "Object '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
+inline LgsError E10057{.msg = "Pattern matching expression '%s' must be of type Bool.", .errCode = errCodeStart++};

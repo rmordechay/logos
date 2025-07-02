@@ -37,23 +37,23 @@ LgsType* LgsStr::getValueType() {
     return baseType;
 }
 
-Value* LgsStr::getLength(LgsModule* runtime, LgsExpr* expr) {
-    return lenFunc.call(runtime, {expr});
+Value* LgsStr::getLength(LgsModule* module, LgsExpr* expr) {
+    return lenFunc.call(module, {expr});
 }
 
-Value* LgsStr::getLoopLength(LgsModule* runtime, LgsExpr* expr) {
-    const auto i32Ty = runtime->builder.getInt64Ty();
-    const auto lenPtr = runtime->builder.CreateAlloca(i32Ty);
-    runtime->builder.CreateStore(getLength(runtime, expr), lenPtr);
-    return runtime->builder.CreateLoad(i32Ty, lenPtr);
+Value* LgsStr::getLoopLength(LgsModule* module, LgsExpr* expr) {
+    const auto i32Ty = module->builder.getInt64Ty();
+    const auto lenPtr = module->builder.CreateAlloca(i32Ty);
+    module->builder.CreateStore(getLength(module, expr), lenPtr);
+    return module->builder.CreateLoad(i32Ty, lenPtr);
 }
 
-Value* LgsStr::isEmpty(LgsModule* runtime, LgsExpr* expr) {
-    return isEmptyFunc.call(runtime, {expr});
+Value* LgsStr::isEmpty(LgsModule* module, LgsExpr* expr) {
+    return isEmptyFunc.call(module, {expr});
 }
 
-Value* LgsStr::isNotEmpty(LgsModule* runtime, LgsExpr* expr) {
-    return isNotEmptyFunc.call(runtime, {expr});
+Value* LgsStr::isNotEmpty(LgsModule* module, LgsExpr* expr) {
+    return isNotEmptyFunc.call(module, {expr});
 }
 
 bool LgsStr::equals(LgsType* other) {

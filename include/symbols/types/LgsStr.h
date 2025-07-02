@@ -28,10 +28,10 @@ public:
     string getStrFormatPart() const override;
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
-    Value* getLength(LgsModule* runtime, LgsExpr* expr) override;
-    Value* getLoopLength(LgsModule* runtime, LgsExpr* expr) override;
-    Value* isEmpty(LgsModule* runtime, LgsExpr* expr) override;
-    Value* isNotEmpty(LgsModule* runtime, LgsExpr* expr) override;
+    Value* getLength(LgsModule* module, LgsExpr* expr) override;
+    Value* getLoopLength(LgsModule* module, LgsExpr* expr) override;
+    Value* isEmpty(LgsModule* module, LgsExpr* expr) override;
+    Value* isNotEmpty(LgsModule* module, LgsExpr* expr) override;
     bool equals(LgsType* other) override;
     ~LgsStr() override = default;
 };

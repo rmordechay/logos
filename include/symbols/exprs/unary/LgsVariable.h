@@ -11,8 +11,8 @@ public:
     explicit LgsVariable(const string& name) : LgsUnaryExpr(nullptr), name(name) {}
     string getExprName() override;
     string prettyName() override;
-    Value* hashValue(LgsModule* runtime) override;
-    Value* createIRValue(LgsModule* runtime) override;
+    Value* hashValue(LgsModule* module) override;
+    Value* createIRValue(LgsModule* module) override;
     LgsExpr* convertExpr(LgsType* type) override;
     bool equals(LgsExpr* other) override;
     ~LgsVariable() override = default;

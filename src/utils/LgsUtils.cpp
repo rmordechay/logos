@@ -32,15 +32,15 @@ void freeType(const LgsType* type) {
     delete type;
 }
 
-Value* getIRStr(LgsModule* runtime, const string& value) {
-    for (auto& globals : runtime->IRModule->globals()) {
+Value* getIRStr(LgsModule* module, const string& value) {
+    for (auto& globals : module->IRModule->globals()) {
         if (!globals.hasInitializer()) continue;
         const auto dataArray = dyn_cast<ConstantDataArray>(globals.getInitializer());
         if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
         return &globals;
     }
-    const auto strConstant = ConstantDataArray::getString(runtime->context, value, true);
-    const auto globalVariable = new GlobalVariable(*runtime->IRModule, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
+    const auto strConstant = ConstantDataArray::getString(module->context, value, true);
+    const auto globalVariable = new GlobalVariable(*module->IRModule, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
     globalVariable->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
     return globalVariable;
 }
@@ -60,8 +60,8 @@ Module* createIRModule(const string& moduleName, LLVMContext& context) {
     return module;
 }
 
-bool hasTerminator(const LgsModule* runtime) {
-    return runtime->builder.GetInsertBlock()->getTerminator();
+bool hasTerminator(const LgsModule* module) {
+    return module->builder.GetInsertBlock()->getTerminator();
 }
 
 PointerType* ptrTy(LLVMContext& context) {
@@ -88,25 +88,25 @@ Type* i64Ty(LLVMContext& context) {
     return IntegerType::getInt32Ty(context);
 }
 
-FunctionCallee getPrintf(LgsModule* runtime) {
-    const auto funcType = FunctionType::get(i32Ty(runtime->context), {ptrTy(runtime->context)}, true);
-    return runtime->IRModule->getOrInsertFunction("printf", funcType);
+FunctionCallee getPrintf(LgsModule* module) {
+    const auto funcType = FunctionType::get(i32Ty(module->context), {ptrTy(module->context)}, true);
+    return module->IRModule->getOrInsertFunction("printf", funcType);
 }
 
-FunctionCallee getSnprintf(LgsModule* runtime) {
-    const auto funcType = FunctionType::get(i32Ty(runtime->context), {ptrTy(runtime->context), runtime->builder.getInt64Ty(), ptrTy(runtime->context)}, true);
-    return runtime->IRModule->getOrInsertFunction("snprintf", funcType);
+FunctionCallee getSnprintf(LgsModule* module) {
+    const auto funcType = FunctionType::get(i32Ty(module->context), {ptrTy(module->context), module->builder.getInt64Ty(), ptrTy(module->context)}, true);
+    return module->IRModule->getOrInsertFunction("snprintf", funcType);
 }
 
-FunctionCallee getStrHash(LgsModule* runtime) {
-    const auto printfType = FunctionType::get(i32Ty(runtime->context), {ptrTy(runtime->context)}, false);
-    return runtime->IRModule->getOrInsertFunction("Str_hash", printfType);
+FunctionCallee getStrHash(LgsModule* module) {
+    const auto printfType = FunctionType::get(i32Ty(module->context), {ptrTy(module->context)}, false);
+    return module->IRModule->getOrInsertFunction("Str_hash", printfType);
 }
 
-Function* getMemcpy(LgsModule* runtime) {
-    const auto int64Ty = runtime->builder.getInt64Ty();
-    const auto ptrTy = runtime->builder.getPtrTy();
-    return getOrInsertDeclaration(runtime->IRModule, Intrinsic::memcpy, {ptrTy, ptrTy, int64Ty});
+Function* getMemcpy(LgsModule* module) {
+    const auto int64Ty = module->builder.getInt64Ty();
+    const auto ptrTy = module->builder.getPtrTy();
+    return getOrInsertDeclaration(module->IRModule, Intrinsic::memcpy, {ptrTy, ptrTy, int64Ty});
 }
 
 TargetMachine* getTargetMachine() {

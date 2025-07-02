@@ -2,19 +2,19 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/LgsInstance.h"
 
-Value* LgsField::getGEP(LgsModule* runtime, Type* parentType, Value* instance) const {
-    return runtime->builder.CreateStructGEP(parentType, instance, position);
+Value* LgsField::getGEP(LgsModule* module, Type* parentType, Value* instance) const {
+    return module->builder.CreateStructGEP(parentType, instance, position);
 }
 
-void LgsField::storeIRValue(LgsModule* runtime, Type* parentType, Value* parentIRValue, LgsExpr* expr) const {
-    const auto exprIRValue = expr->getIRValue(runtime);
-    runtime->builder.CreateStore(exprIRValue, getGEP(runtime, parentType, parentIRValue));
+void LgsField::storeIRValue(LgsModule* module, Type* parentType, Value* parentIRValue, LgsExpr* expr) const {
+    const auto exprIRValue = expr->getIRValue(module);
+    module->builder.CreateStore(exprIRValue, getGEP(module, parentType, parentIRValue));
 }
 
-void LgsField::setZeroValue(LgsModule* runtime, Type* parentType, Value* parentIRValue) const {
+void LgsField::setZeroValue(LgsModule* module, Type* parentType, Value* parentIRValue) const {
     if (type->asObject() || type->asArray() || type->asMap()) return;
-    const auto exprIRValue = type->getZeroValue()->getIRValue(runtime);
-    runtime->builder.CreateStore(exprIRValue, getGEP(runtime, parentType, parentIRValue));
+    const auto exprIRValue = type->getZeroValue()->getIRValue(module);
+    module->builder.CreateStore(exprIRValue, getGEP(module, parentType, parentIRValue));
 }
 
 LgsField::~LgsField() {

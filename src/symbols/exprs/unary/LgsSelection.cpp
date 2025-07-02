@@ -5,12 +5,12 @@
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 
-void LgsSelection::createIRStmt(LgsModule* runtime) {
-    resolveSelection(runtime);
+void LgsSelection::createIRStmt(LgsModule* module) {
+    resolveSelection(module);
 }
 
-Value* LgsSelection::createIRValue(LgsModule* runtime) {
-    resolveSelection(runtime);
+Value* LgsSelection::createIRValue(LgsModule* module) {
+    resolveSelection(module);
     return lastExpr()->IRValue;
 }
 
@@ -42,16 +42,16 @@ LgsExpr* LgsSelection::lastExpr() const {
     return exprs[exprs.size() - 1];
 }
 
-Value* LgsSelection::hashValue(LgsModule* runtime) {
+Value* LgsSelection::hashValue(LgsModule* module) {
     const auto lgsExpr = lastExpr();
-    return lgsExpr->hashValue(runtime);
+    return lgsExpr->hashValue(module);
 }
 
-Value* LgsSelection::eqIR(LgsModule* runtime, LgsExpr* other) {
-    resolveSelection(runtime);
+Value* LgsSelection::eqIR(LgsModule* module, LgsExpr* other) {
+    resolveSelection(module);
     const auto selection = lastExpr();
     if (const auto var = selection->asVariable()) {
-        return var->eqIR(runtime, other);
+        return var->eqIR(module, other);
     }
     return nullptr;
 }

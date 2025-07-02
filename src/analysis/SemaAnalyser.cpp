@@ -206,7 +206,18 @@ void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
     visitStmtBlock(patternMatching->elseStmtBlock);
 }
 
-void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const {}
+void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatch* patternMatching) {
+    for (const auto patternExpr : patternMatching->patterns) {
+        visitExpr(patternExpr);
+        if (!patternExpr->type->asBool()) {
+            return errHandler.handleError(E10057, &patternExpr->location, {patternExpr->prettyName()});
+        }
+    }
+    for (const auto& patternsStmtBlock : patternMatching->patternsStmtBlocks) {
+        visitStmtBlock(patternsStmtBlock);
+    }
+    visitStmtBlock(patternMatching->elseStmtBlock);
+}
 
 void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
     stack.enterScope(LOOP_SCOPE, loopStmt);

@@ -13,14 +13,14 @@ public:
     LgsFunc* func = nullptr;
 
     explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
-    void resolveVirtualFunc(LgsModule* runtime) const;
-    Value* call(LgsModule* runtime) const;
-    Value* getCallback(LgsModule* runtime) const;
-    bool equals(const LgsFuncType* other) const;
+    void resolveVirtualFunc(LgsModule* module) const;
+    Value* call(LgsModule* module) const;
+    Value* getCallback(LgsModule* module) const;
+    bool equals(const LgsFuncType* module) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
-    void createIRStmt(LgsModule* runtime) override;
-    Value* createIRValue(LgsModule* runtime) override;
+    void createIRStmt(LgsModule* module) override;
+    Value* createIRValue(LgsModule* module) override;
     string getExprName() override;
     string format(string& indentStr) override;
     string prettyName() override;

@@ -3,12 +3,12 @@
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
-Value* LgsCast::createIRValue(LgsModule* runtime) {
-    return toValue->getIRValue(runtime);
+Value* LgsCast::createIRValue(LgsModule* module) {
+    return toValue->getIRValue(module);
 }
 
-Value* LgsCast::addIR(LgsModule* runtime, LgsExpr* other) {
-    return toValue->addIR(runtime, other);
+Value* LgsCast::addIR(LgsModule* module, LgsExpr* other) {
+    return toValue->addIR(module, other);
 }
 
 std::string LgsCast::prettyName() {

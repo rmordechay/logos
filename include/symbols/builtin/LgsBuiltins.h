@@ -13,22 +13,22 @@ public:
         funcType->IRName = "printf";
     }
 
-    Value* call(LgsModule* runtime, const vector<LgsExpr*>& args) override {
+    Value* call(LgsModule* module, const vector<LgsExpr*>& args) override {
         vector<Value*> IRArgs;
         stringstream str;
         for (int i = 0; i < args.size(); ++i) {
             const auto arg = args[i];
-            const auto argType = arg->type->getIRType(runtime->context);
-            auto argValue = arg->getIRValue(runtime);
+            const auto argType = arg->type->getIRType(module->context);
+            auto argValue = arg->getIRValue(module);
             if (shouldLoadIRArg(argValue, arg)) {
-                argValue = runtime->builder.CreateLoad(argType, argValue);
+                argValue = module->builder.CreateLoad(argType, argValue);
             }
             IRArgs.push_back(argValue);
             str << arg->type->getStrFormatPart() << std::endl;
         }
-        IRArgs.insert(IRArgs.begin(), getIRStr(runtime, str.str()));
-        const auto printfFunc = getPrintf(runtime);
-        const auto callInst = runtime->builder.CreateCall(printfFunc, IRArgs);
+        IRArgs.insert(IRArgs.begin(), getIRStr(module, str.str()));
+        const auto printfFunc = getPrintf(module);
+        const auto callInst = module->builder.CreateCall(printfFunc, IRArgs);
         return callInst;
     }
     ~LgsPrint() override = default;
@@ -39,8 +39,8 @@ public:
     static constexpr auto name = "sizeof";
 
     LgsSizeOf(): LgsBuiltinFunc(name, &LGS_LONG, "", {&LGS_ANY}) {}
-    Value* call(LgsModule* runtime, const vector<LgsExpr*>& args) override {
-        return runtime->builder.getInt64(args.front()->type->getSizeBytes());
+    Value* call(LgsModule* module, const vector<LgsExpr*>& args) override {
+        return module->builder.getInt64(args.front()->type->getSizeBytes());
     }
 };
 

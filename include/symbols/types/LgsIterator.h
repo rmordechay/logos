@@ -15,27 +15,27 @@ public:
         type = baseExpr->type;
     }
 
-    Value* createIRValue(LgsModule* runtime) override;
-    void initIterator(LgsModule* runtime);
-    Value* next(LgsModule* runtime) const;
-    Value* hasNext(LgsModule* runtime) const;
+    Value* createIRValue(LgsModule* module) override;
+    void initIterator(LgsModule* module);
+    Value* next(LgsModule* module) const;
+    Value* hasNext(LgsModule* module) const;
     ~LgsIterator() override = default;
 };
 
 
-inline void LgsIterator::initIterator(LgsModule* runtime) {
+inline void LgsIterator::initIterator(LgsModule* module) {
     LgsBuiltinFunc iterInitFunc{"initIter", &LGS_VOID, type->getIRName(), {type, &LGS_ANY}};
-    const auto structType = getIRStructType(runtime->context, name, {ptrTy(runtime->context), i64Ty(runtime->context), ptrTy(runtime->context), ptrTy(runtime->context), ptrTy(runtime->context), ptrTy(runtime->context)});
-    IRValue = runtime->builder.CreateAlloca(structType);
-    iterInitFunc.callIR(runtime, {baseExpr->getIRValue(runtime), IRValue});
+    const auto structType = getIRStructType(module->context, name, {ptrTy(module->context), i64Ty(module->context), ptrTy(module->context), ptrTy(module->context), ptrTy(module->context), ptrTy(module->context)});
+    IRValue = module->builder.CreateAlloca(structType);
+    iterInitFunc.callIR(module, {baseExpr->getIRValue(module), IRValue});
 }
 
-inline Value* LgsIterator::next(LgsModule* runtime) const {
+inline Value* LgsIterator::next(LgsModule* module) const {
     LgsBuiltinFunc iterInitFunc{"next", &LGS_ANY, type->getIRName(), {&LGS_ANY}};
-    return iterInitFunc.callIR(runtime, {IRValue});
+    return iterInitFunc.callIR(module, {IRValue});
 }
 
-inline Value* LgsIterator::hasNext(LgsModule* runtime) const {
+inline Value* LgsIterator::hasNext(LgsModule* module) const {
     LgsBuiltinFunc iterInitFunc{"hasNext", &LGS_BOOL, type->getIRName(), {&LGS_ANY}};
-    return iterInitFunc.callIR(runtime, {IRValue});
+    return iterInitFunc.callIR(module, {IRValue});
 }

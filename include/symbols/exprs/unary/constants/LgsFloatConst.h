@@ -7,7 +7,7 @@ public:
     double value;
 
     explicit LgsFloatConst(const float value) : LgsUnaryExpr(&LGS_FLOAT), value(value) {}
-    Value* createIRValue(LgsModule* runtime) override;
+    Value* createIRValue(LgsModule* module) override;
     ~LgsFloatConst() override = default;
 };
 

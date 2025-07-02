@@ -58,7 +58,7 @@ public:
     void visitVarDec(LgsVarDec* varDec) override;
     void visitIfStmt(LgsIfStmt* ifStmt) override;
     void visitPatternMatch(const LgsPatternMatch* patternMatching) override;
-    void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const override;
+    void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) override;
     void visitLoopStmt(LgsForLoop* loopStmt) override;
     void visitRangeLoop(const LgsRangeLoop* rangeLoop) override;
     void visitForeachLoop(LgsForeachLoop* foreachLoop) override;

@@ -3,9 +3,9 @@
 
 class LgsInfiniteLoop final : public LgsForLoop {
 public:
-    Value* loopStart(LgsModule* runtime) override;
-    Value* loopEnd(LgsModule* runtime) override;
-    void initIRLoop(LgsModule* runtime) override;
-    void exitIRLoop(LgsModule* runtime) const override;
+    Value* loopStart(LgsModule* module) override;
+    Value* loopEnd(LgsModule* module) override;
+    void initIRLoop(LgsModule* module) override;
+    void exitIRLoop(LgsModule* module) const override;
     ~LgsInfiniteLoop() override = default;
 };

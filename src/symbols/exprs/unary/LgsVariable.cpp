@@ -15,16 +15,16 @@ string LgsVariable::prettyName() {
     return name;
 }
 
-Value* LgsVariable::createIRValue(LgsModule* runtime) {
+Value* LgsVariable::createIRValue(LgsModule* module) {
     switch (ref.symbolType) {
     case VAR_DEC:
         return ref.varDec->IRValue;
     case PARAM:
-        return ref.param->getIRValue(runtime);
+        return ref.param->getIRValue(module);
     case FUNC:
-        return ref.func->getIRFunc(runtime);
+        return ref.func->getIRFunc(module);
     case ENUM_FIELD:
-        return getIRStr(runtime, ref.enumField->name);
+        return getIRStr(module, ref.enumField->name);
     default:
         assert(0);
     }
@@ -56,17 +56,17 @@ LgsExpr* LgsVariable::convertExpr(LgsType* type) {
     assert(0);
 }
 
-Value* LgsVariable::hashValue(LgsModule* runtime) {
+Value* LgsVariable::hashValue(LgsModule* module) {
     string text;
     switch (ref.symbolType) {
     case PARAM:
-        return runtime->builder.CreateCall(getStrHash(runtime), {ref.param->getIRValue(runtime)});
+        return module->builder.CreateCall(getStrHash(module), {ref.param->getIRValue(module)});
     case VAR_DEC:
-        return ref.varDec->expr->hashValue(runtime);
+        return ref.varDec->expr->hashValue(module);
     case FIELD:
-        return ref.field->expr->hashValue(runtime);
+        return ref.field->expr->hashValue(module);
     case ENUM_FIELD:
-        return runtime->builder.getInt32(hashString(ref.enumField->name));
+        return module->builder.getInt32(hashString(ref.enumField->name));
     default:
         assert(0);
     }

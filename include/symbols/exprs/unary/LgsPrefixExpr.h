@@ -13,6 +13,6 @@ public:
     LgsPrefixOperator op;
 
     LgsPrefixExpr(LgsExpr* baseExpr, const LgsPrefixOperator op) : expr(baseExpr), op(op) {}
-    Value* createIRValue(LgsModule* runtime) override;
+    Value* createIRValue(LgsModule* module) override;
     ~LgsPrefixExpr() override = default;
 };

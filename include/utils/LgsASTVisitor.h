@@ -53,7 +53,7 @@ public:
     virtual void visitVarDec(LgsVarDec* varDec) = 0;
     virtual void visitIfStmt(LgsIfStmt* ifStmt) = 0;
     virtual void visitPatternMatch(const LgsPatternMatch* patternMatching) = 0;
-    virtual void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) const = 0;
+    virtual void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) = 0;
     virtual void visitLoopStmt(LgsForLoop* loopStmt) = 0;
     virtual void visitRangeLoop(const LgsRangeLoop* rangeLoop) = 0;
     virtual void visitForeachLoop(LgsForeachLoop* foreachLoop) = 0;

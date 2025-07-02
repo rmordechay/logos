@@ -17,9 +17,9 @@ public:
     LgsType* type = nullptr;
 
     LgsField(const string& name, string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(name), parentName(parentName), expr(expr), type(type) {}
-    Value* getGEP(LgsModule* runtime, Type* parentType, Value* instance) const;
-    void storeIRValue(LgsModule* runtime, Type* parentType, Value* parentIRValue, LgsExpr* expr) const;
-    void setZeroValue(LgsModule* runtime, Type* parentType, Value* parentIRValue) const;
+    Value* getGEP(LgsModule* module, Type* parentType, Value* instance) const;
+    void storeIRValue(LgsModule* module, Type* parentType, Value* parentIRValue, LgsExpr* expr) const;
+    void setZeroValue(LgsModule* module, Type* parentType, Value* parentIRValue) const;
     ~LgsField() override;
 };
 

@@ -54,21 +54,21 @@ string LgsArray::getIRName() {
     return name;
 }
 
-Value* LgsArray::getLength(LgsModule* runtime, LgsExpr* expr) {
-    if (isStatic) return sizeExpr->getIRValue(runtime);
-    return lenFunc.call(runtime, {expr});
+Value* LgsArray::getLength(LgsModule* module, LgsExpr* expr) {
+    if (isStatic) return sizeExpr->getIRValue(module);
+    return lenFunc.call(module, {expr});
 }
 
-Value* LgsArray::getLoopLength(LgsModule* runtime, LgsExpr* expr) {
-    return getLength(runtime, expr);
+Value* LgsArray::getLoopLength(LgsModule* module, LgsExpr* expr) {
+    return getLength(module, expr);
 }
 
-Value* LgsArray::isEmpty(LgsModule* runtime, LgsExpr* expr) {
-    return isEmptyFunc.call(runtime, {expr});
+Value* LgsArray::isEmpty(LgsModule* module, LgsExpr* expr) {
+    return isEmptyFunc.call(module, {expr});
 }
 
-Value* LgsArray::isNotEmpty(LgsModule* runtime, LgsExpr* expr) {
-    return isNotEmptyFunc.call(runtime, {expr});
+Value* LgsArray::isNotEmpty(LgsModule* module, LgsExpr* expr) {
+    return isNotEmptyFunc.call(module, {expr});
 }
 
 StructType* LgsArray::getArrStruct(LLVMContext& context) {
@@ -77,20 +77,20 @@ StructType* LgsArray::getArrStruct(LLVMContext& context) {
     return arrStruct;
 }
 
-Value* LgsArrayAddFunc::call(LgsModule* runtime, const vector<LgsExpr*>& args) {
+Value* LgsArrayAddFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
     vector<Value*> values;
     const auto arr = args[0];
     const auto arrSize = args.size() - 1;
     const auto baseType = arr->type->asIterable()->baseType;
-    const auto arrIRType = ArrayType::get(baseType->getIRType(runtime->context), arrSize);
-    const auto arrIRPtr = runtime->builder.CreateAlloca(arrIRType);
-    const auto zero = runtime->builder.getInt32(0);
+    const auto arrIRType = ArrayType::get(baseType->getIRType(module->context), arrSize);
+    const auto arrIRPtr = module->builder.CreateAlloca(arrIRType);
+    const auto zero = module->builder.getInt32(0);
     for (int i = 1; i < args.size(); ++i) {
         const auto arg = args[i];
-        const auto argValuePtr = runtime->builder.CreateGEP(arrIRType, arrIRPtr, {zero, runtime->builder.getInt32(i)});
-        runtime->builder.CreateStore(arg->getIRValue(runtime), argValuePtr);
+        const auto argValuePtr = module->builder.CreateGEP(arrIRType, arrIRPtr, {zero, module->builder.getInt32(i)});
+        module->builder.CreateStore(arg->getIRValue(module), argValuePtr);
     }
-    callIR(runtime, {arr->getIRValue(runtime), runtime->builder.getInt64(arrSize), arrIRPtr});
+    callIR(module, {arr->getIRValue(module), module->builder.getInt64(arrSize), arrIRPtr});
     return nullptr;
 }
 

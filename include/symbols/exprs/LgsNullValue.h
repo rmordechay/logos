@@ -7,9 +7,9 @@ public:
     explicit LgsNullValue() : LgsUnaryExpr(nullptr) {
         isNull = true;
     }
-    Value* createIRValue(LgsModule* runtime) override;
+    Value* createIRValue(LgsModule* module) override;
 };
 
-inline Value* LgsNullValue::createIRValue(LgsModule* runtime) {
-    return ConstantPointerNull::get(ptrTy(runtime->context));
+inline Value* LgsNullValue::createIRValue(LgsModule* module) {
+    return ConstantPointerNull::get(ptrTy(module->context));
 }

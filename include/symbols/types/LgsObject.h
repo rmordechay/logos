@@ -18,7 +18,7 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     string getStrFormatPart() const override;
-    void setVFuncs(LgsModule* runtime) const;
+    void setVFuncs(LgsModule* module) const;
     bool equals(LgsType* other) override;
     ~LgsObject() override = default;
 };

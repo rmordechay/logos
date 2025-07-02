@@ -6,79 +6,79 @@
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 
-void LgsAssignment::createIRStmt(LgsModule* runtime) {
+void LgsAssignment::createIRStmt(LgsModule* module) {
     Value* results = nullptr;
     switch (assignmentType) {
     case ASSIGN:
-        createIRAssign(runtime);
+        createIRAssign(module);
         return;
     case ASSIGN_ADD:
-        results = lValue->addIR(runtime, rValue);
+        results = lValue->addIR(module, rValue);
         break;
     case ASSIGN_SUB:
-        results = lValue->subIR(runtime, rValue);
+        results = lValue->subIR(module, rValue);
         break;
     case ASSIGN_MUL:
-        results = lValue->mulIR(runtime, rValue);
+        results = lValue->mulIR(module, rValue);
         break;
     case ASSIGN_DIV:
-        results = lValue->divIR(runtime, rValue);
+        results = lValue->divIR(module, rValue);
         break;
     case ASSIGN_MOD:
-        results = lValue->modIR(runtime, rValue);
+        results = lValue->modIR(module, rValue);
         break;
     case ASSIGN_AND:
-        results = lValue->bitAndIR(runtime, rValue);
+        results = lValue->bitAndIR(module, rValue);
         break;
     case ASSIGN_OR:
-        results = lValue->bitOrIR(runtime, rValue);
+        results = lValue->bitOrIR(module, rValue);
         break;
     case ASSIGN_XOR:
-        results = lValue->bitXorIR(runtime, rValue);
+        results = lValue->bitXorIR(module, rValue);
         break;
     case ASSIGN_LSHIFT:
-        results = lValue->lshiftIR(runtime, rValue);
+        results = lValue->lshiftIR(module, rValue);
         break;
     case ASSIGN_RSHIFT:
-        results = lValue->rshiftIR(runtime, rValue);
+        results = lValue->rshiftIR(module, rValue);
         break;
     }
     assert(results);
-    runtime->builder.CreateStore(results, lValue->getIRValue(runtime));
+    module->builder.CreateStore(results, lValue->getIRValue(module));
 }
 
-void LgsAssignment::createIRAssign(LgsModule* runtime) const {
+void LgsAssignment::createIRAssign(LgsModule* module) const {
     if (const auto selection = lValue->asSelection()) {
-        assignToSelection(runtime, selection, rValue);
+        assignToSelection(module, selection, rValue);
     } else if (const auto iterIndex = lValue->asIterIndex()) {
-        assignToIterIndex(runtime, iterIndex, rValue);
+        assignToIterIndex(module, iterIndex, rValue);
     } else if (const auto var = lValue->asVariable()) {
-        assignToVariable(runtime, var, rValue);
+        assignToVariable(module, var, rValue);
     } else {
         assert(0);
     }
 }
 
-void LgsAssignment::assignToIterIndex(LgsModule* runtime, LgsIterIndex* iterIndex, LgsExpr* expr) const {
+void LgsAssignment::assignToIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr) const {
     if (const auto map = expr->asHashMap()) {
-        storeHashMapInIterIndex(runtime, iterIndex, map);
+        storeHashMapInIterIndex(module, iterIndex, map);
     } else if (const auto arr = expr->asArrayExpr()) {
-        storeArrayInIterIndex(runtime, iterIndex, arr);
+        storeArrayInIterIndex(module, iterIndex, arr);
     } else {
-        storeScalarInIterIndex(runtime, iterIndex, expr);
+        storeScalarInIterIndex(module, iterIndex, expr);
     }
 }
 
-void LgsAssignment::assignToSelection(LgsModule* runtime, const LgsSelection* selection, LgsExpr* expr) const {
-    selection->resolveSelection(runtime);
+void LgsAssignment::assignToSelection(LgsModule* module, const LgsSelection* selection, LgsExpr* expr) const {
+    selection->resolveSelection(module);
     const auto lastExpr = selection->lastExpr();
     const auto parentExpr = selection->exprs[selection->exprs.size() - 2];
     if (const auto var = lastExpr->asVariable()) {
         assert(var->ref.symbolType != UNKNOWN);
         switch (var->ref.symbolType) {
         case FIELD: {
-            const auto parentIRValue = parentExpr->getIRValue(runtime);
-            var->ref.field->storeIRValue(runtime, parentExpr->type->getIRType(runtime->context), parentIRValue, expr);
+            const auto parentIRValue = parentExpr->getIRValue(module);
+            var->ref.field->storeIRValue(module, parentExpr->type->getIRType(module->context), parentIRValue, expr);
             return;
         }
         case UNKNOWN: default:
@@ -88,63 +88,63 @@ void LgsAssignment::assignToSelection(LgsModule* runtime, const LgsSelection* se
     assert(0);
 }
 
-void LgsAssignment::assignToVariable(LgsModule* runtime, LgsVariable* variable, LgsExpr* expr) const {
-    const auto variablePtr = variable->getIRValue(runtime);
-    const auto exprIRValue = expr->getIRValue(runtime);
-    runtime->builder.CreateStore(exprIRValue, variablePtr);
+void LgsAssignment::assignToVariable(LgsModule* module, LgsVariable* variable, LgsExpr* expr) const {
+    const auto variablePtr = variable->getIRValue(module);
+    const auto exprIRValue = expr->getIRValue(module);
+    module->builder.CreateStore(exprIRValue, variablePtr);
 }
 
-void LgsAssignment::storeHashMapInIterIndex(LgsModule* runtime, LgsIterIndex* iterIndex, LgsHashMap* map) const {
+void LgsAssignment::storeHashMapInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsHashMap* map) const {
     assert(0);
 }
 
-void LgsAssignment::storeScalarInIterIndex(LgsModule* runtime, LgsIterIndex* iterIndex, LgsExpr* expr) const {
+void LgsAssignment::storeScalarInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr) const {
     const auto baseExpr = iterIndex->baseExpr;
-    const auto rIRValue = expr->getIRValue(runtime);
-    const auto baseIRValue = baseExpr->getIRValue(runtime);
+    const auto rIRValue = expr->getIRValue(module);
+    const auto baseIRValue = baseExpr->getIRValue(module);
     if (const auto arr = baseExpr->type->asArray()) {
         if (!arr->isStatic) {
-            const auto ptr = runtime->builder.CreateAlloca(expr->type->getIRType(runtime->context));
-            runtime->builder.CreateStore(rIRValue, ptr);
-            arr->putFunc.callIR(runtime, {baseIRValue, iterIndex->index->from->getIRValue(runtime), ptr});
+            const auto ptr = module->builder.CreateAlloca(expr->type->getIRType(module->context));
+            module->builder.CreateStore(rIRValue, ptr);
+            arr->putFunc.callIR(module, {baseIRValue, iterIndex->index->from->getIRValue(module), ptr});
         } else {
-            runtime->builder.CreateStore(rIRValue, iterIndex->getArrGEP(runtime));
+            module->builder.CreateStore(rIRValue, iterIndex->getArrGEP(module));
         }
         return;
     }
     if (const auto map = baseExpr->type->asMap()) {
-        const auto key = iterIndex->index->from->getIRValue(runtime);
+        const auto key = iterIndex->index->from->getIRValue(module);
         const auto keyIRType = key->getType();
-        const auto keyPtr = runtime->builder.CreateAlloca(keyIRType);
-        runtime->builder.CreateStore(key, keyPtr);
-        const auto keyLoad = runtime->builder.CreateLoad(keyIRType, keyPtr);
-        map->addFunc.callIR(runtime, {baseIRValue, keyLoad, rIRValue});
+        const auto keyPtr = module->builder.CreateAlloca(keyIRType);
+        module->builder.CreateStore(key, keyPtr);
+        const auto keyLoad = module->builder.CreateLoad(keyIRType, keyPtr);
+        map->addFunc.callIR(module, {baseIRValue, keyLoad, rIRValue});
     } else {
-        const auto iterPtr = iterIndex->getIRValue(runtime);
-        runtime->builder.CreateStore(rIRValue, iterPtr);
+        const auto iterPtr = iterIndex->getIRValue(module);
+        module->builder.CreateStore(rIRValue, iterPtr);
     }
 }
 
-void LgsAssignment::storeArrayInIterIndex(LgsModule* runtime, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) const {
+void LgsAssignment::storeArrayInIterIndex(LgsModule* module, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) const {
     if (!arr->type->asArray()->isStatic) {
         return;
     }
     const auto baseExpr = iterIndex->baseExpr;
-    const auto IRType = baseExpr->type->getIRType(runtime->context);
-    const auto arrPtr = baseExpr->getIRValue(runtime);
-    vector<Value*> IRIndices = {runtime->builder.getInt32(0)};
+    const auto IRType = baseExpr->type->getIRType(module->context);
+    const auto arrPtr = baseExpr->getIRValue(module);
+    vector<Value*> IRIndices = {module->builder.getInt32(0)};
     vector<LgsIndex*> indices;
     setIterIndices(iterIndex, indices);
     for (const auto index : indices) {
-        IRIndices.emplace_back(index->from->getIRValue(runtime));
+        IRIndices.emplace_back(index->from->getIRValue(module));
     }
     for (int i = 0; i < arr->elements.size(); ++i) {
         const auto element = arr->elements[i];
-        const auto IRIndex = runtime->builder.getInt32(i);
+        const auto IRIndex = module->builder.getInt32(i);
         IRIndices.push_back(IRIndex);
-        const auto gep = runtime->builder.CreateGEP(IRType, arrPtr, IRIndices);
-        const auto rValue = element->getIRValue(runtime);
-        runtime->builder.CreateStore(rValue, gep);
+        const auto gep = module->builder.CreateGEP(IRType, arrPtr, IRIndices);
+        const auto rValue = element->getIRValue(module);
+        module->builder.CreateStore(rValue, gep);
         IRIndices.pop_back();
     }
 }

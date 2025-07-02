@@ -5,19 +5,19 @@
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
 
-Value* LgsFuncCall::call(LgsModule* runtime) const {
+Value* LgsFuncCall::call(LgsModule* module) const {
     if (callback) {
-        func->setIRValue(getCallback(runtime));
+        func->setIRValue(getCallback(module));
     } else if (func->funcType->isVirtual) {
-        resolveVirtualFunc(runtime);
+        resolveVirtualFunc(module);
     }
-    return func->call(runtime, args);
+    return func->call(module, args);
 }
 
-Value* LgsFuncCall::getCallback(LgsModule* runtime) const {
+Value* LgsFuncCall::getCallback(LgsModule* module) const {
     switch (callback->symbolType) {
     case VAR_DEC:
-        return callback->varDec->expr->getIRValue(runtime);
+        return callback->varDec->expr->getIRValue(module);
     case PARAM:
         return callback->param->IRValue;
     case FIELD:
@@ -28,22 +28,22 @@ Value* LgsFuncCall::getCallback(LgsModule* runtime) const {
     assert(0);
 }
 
-Value* LgsFuncCall::createIRValue(LgsModule* runtime) {
-    return call(runtime);
+Value* LgsFuncCall::createIRValue(LgsModule* module) {
+    return call(module);
 }
 
-void LgsFuncCall::createIRStmt(LgsModule* runtime) {
-    call(runtime);
+void LgsFuncCall::createIRStmt(LgsModule* module) {
+    call(module);
 }
 
-bool LgsFuncCall::equals(const LgsFuncType* other) const {
-    if (other->hasDefaults) return equalsDefaultParams(other);
-    if (other->isVariadic) return equalsVariadic(other);
-    if (!other->isAnonymous && name != other->name) return false;
-    if (other->params.size() != args.size()) return false;
-    if (other->params.size() == 0 && args.size() == 0) return true;
-    for (size_t i = other->isStaticMethod; i < other->params.size(); ++i) {
-        const auto paramType = other->params[i].type;
+bool LgsFuncCall::equals(const LgsFuncType* module) const {
+    if (module->hasDefaults) return equalsDefaultParams(module);
+    if (module->isVariadic) return equalsVariadic(module);
+    if (!module->isAnonymous && name != module->name) return false;
+    if (module->params.size() != args.size()) return false;
+    if (module->params.size() == 0 && args.size() == 0) return true;
+    for (size_t i = module->isStaticMethod; i < module->params.size(); ++i) {
+        const auto paramType = module->params[i].type;
         const auto argType = args[i]->type;
         if (args[i]->isNull) continue;
         if (!paramType->equals(argType)) return false;
@@ -66,16 +66,16 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
     return true;
 }
 
-void LgsFuncCall::resolveVirtualFunc(LgsModule* runtime) const {
-    auto& builder = runtime->builder;
+void LgsFuncCall::resolveVirtualFunc(LgsModule* module) const {
+    auto& builder = module->builder;
     const auto parent = args[0];
     const auto type = parent->type;
     const auto ptrTy = builder.getPtrTy();
-    const auto parentIRValue = parent->getIRValue(runtime);
-    const auto keyIR = getIRStr(runtime, func->funcType->getIRName());
+    const auto parentIRValue = parent->getIRValue(module);
+    const auto keyIR = getIRStr(module, func->funcType->getIRName());
     const auto mapPtr = builder.CreateLoad(ptrTy, parentIRValue);
     const auto valuePtr = builder.CreateAlloca(ptrTy);
-    const auto rv = type->vtable->type->asMap()->getFunc.callIR(runtime, {mapPtr, keyIR});
+    const auto rv = type->vtable->type->asMap()->getFunc.callIR(module, {mapPtr, keyIR});
     builder.CreateStore(rv, valuePtr);
     const auto vfunc = builder.CreateLoad(ptrTy, builder.CreateLoad(ptrTy, valuePtr));
     func->setIRValue(vfunc);

@@ -2,6 +2,6 @@
 
 
 
-Value* LgsCharConst::createIRValue(LgsModule* runtime) {
-    return runtime->builder.getInt8(value);
+Value* LgsCharConst::createIRValue(LgsModule* module) {
+    return module->builder.getInt8(value);
 }

@@ -13,8 +13,8 @@ public:
     LgsExpr* toValue = nullptr;
 
     LgsCast(LgsType* castToType, LgsExpr* castFromValue) : LgsUnaryExpr(castToType), toType(castToType), fromValue(castFromValue) {}
-    Value* createIRValue(LgsModule* runtime) override;
-    Value* addIR(LgsModule* runtime, LgsExpr* other) override;
+    Value* createIRValue(LgsModule* module) override;
+    Value* addIR(LgsModule* module, LgsExpr* other) override;
     std::string prettyName() override;
     ~LgsCast() override;
 };

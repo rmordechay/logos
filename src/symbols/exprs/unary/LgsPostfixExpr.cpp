@@ -2,12 +2,12 @@
 
 #include "../../../../include/symbols/LgsType.h"
 
-Value* LgsPostfixExpr::createIRValue(LgsModule* runtime) {
-    return IncOrDecValue(runtime);
+Value* LgsPostfixExpr::createIRValue(LgsModule* module) {
+    return IncOrDecValue(module);
 }
 
-void LgsPostfixExpr::createIRStmt(LgsModule* runtime) {
-    IncOrDecValue(runtime);
+void LgsPostfixExpr::createIRStmt(LgsModule* module) {
+    IncOrDecValue(module);
 }
 
 Value* LgsPostfixExpr::IncOrDecValue(LgsModule* runtime) const {

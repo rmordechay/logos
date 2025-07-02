@@ -10,8 +10,8 @@ public:
         type = new LgsMap(keyType, valueType);
     }
     explicit LgsHashMap(LgsMap* mapType) : LgsUnaryExpr(mapType) {}
-    void initIRMap(LgsModule* runtime);
-    Value* createIRValue(LgsModule* runtime) override;
+    void initIRMap(LgsModule* module);
+    Value* createIRValue(LgsModule* module) override;
     ~LgsHashMap() override = default;
 };
 

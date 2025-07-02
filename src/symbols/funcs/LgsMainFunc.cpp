@@ -4,29 +4,29 @@
 #include "types/LgsStr.h"
 #include "utils/LgsUtils.h"
 
-void LgsMainFunc::generateIR(LgsModule* runtime) {
-    runtime->stack.enterFunc(this);
-    runtime->IRFunc = getIRFunc(runtime);
-    startFuncBlock(runtime);
+void LgsMainFunc::generateIR(LgsModule* module) {
+    module->stack.enterFunc(this);
+    module->IRFunc = getIRFunc(module);
+    startFuncBlock(module);
     if (!funcType->params.empty()) {
-        initArgs(runtime);
+        initArgs(module);
     }
-    runtime->initRuntime();
-    stmtBlock->createIRValue(runtime);
-    runtime->IRFunc = nullptr;
-    runtime->builder.CreateRet(runtime->builder.getInt32(EXIT_SUCCESS));
-    runtime->stack.exitFunc();
+    module->initRuntime();
+    stmtBlock->createIRValue(module);
+    module->IRFunc = nullptr;
+    module->builder.CreateRet(module->builder.getInt32(EXIT_SUCCESS));
+    module->stack.exitFunc();
 }
 
-Function* LgsMainFunc::getIRFunc(LgsModule* runtime) {
+Function* LgsMainFunc::getIRFunc(LgsModule* module) {
     if (IRFunc) return IRFunc;
     FunctionType* mainFuncType;
     if (funcType->params.empty()) {
-        mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {}, false);
+        mainFuncType = FunctionType::get(module->builder.getInt32Ty(), {}, false);
     } else {
-        mainFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getInt32Ty(), runtime->builder.getPtrTy()}, false);
+        mainFuncType = FunctionType::get(module->builder.getInt32Ty(), {module->builder.getInt32Ty(), module->builder.getPtrTy()}, false);
     }
-    auto func = runtime->IRModule->getOrInsertFunction(LOGOS_MAIN_FUNC, mainFuncType);
+    auto func = module->IRModule->getOrInsertFunction(LOGOS_MAIN_FUNC, mainFuncType);
     IRFunc = dyn_cast<Function>(func.getCallee());
     if (funcType->params.empty()) return IRFunc;
     auto IRArgs = IRFunc->arg_begin();

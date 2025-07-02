@@ -7,10 +7,10 @@ public:
     LgsExpr* rangeEnd = nullptr;
 
     LgsRangeLoop(LgsExpr* rangeStart, LgsExpr* rangeEnd) : rangeStart(rangeStart), rangeEnd(rangeEnd) {}
-    Value* loopStart(LgsModule* runtime) override;
-    Value* loopEnd(LgsModule* runtime) override;
-    void initIRLoop(LgsModule* runtime) override;
-    void exitIRLoop(LgsModule* runtime) const override;
+    Value* loopStart(LgsModule* module) override;
+    Value* loopEnd(LgsModule* module) override;
+    void initIRLoop(LgsModule* module) override;
+    void exitIRLoop(LgsModule* module) const override;
     ~LgsRangeLoop() override;
 };
 

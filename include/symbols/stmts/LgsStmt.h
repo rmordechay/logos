@@ -27,7 +27,7 @@ public:
     LgsFuncCall* asFuncCall();
     LgsSelection* asSelection();
     LgsPostfixExpr* asPostfixExpr();
-    virtual void createIRStmt(LgsModule* runtime) = 0;
+    virtual void createIRStmt(LgsModule* module) = 0;
     ~LgsStmt() override = default;
 };
 

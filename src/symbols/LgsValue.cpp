@@ -2,25 +2,25 @@
 #include "funcs/LgsFunc.h"
 #include "utils/LgsUtils.h"
 
-void LgsValue::startBlock(LgsModule* runtime, BasicBlock* const block) const {
-    block->insertInto(runtime->IRFunc);
-    runtime->builder.SetInsertPoint(block);
+void LgsValue::startBlock(LgsModule* module, BasicBlock* const block) const {
+    block->insertInto(module->IRFunc);
+    module->builder.SetInsertPoint(block);
 }
 
-void LgsValue::startFuncBlock(LgsModule* runtime) const {
-    const auto entryBlock = BasicBlock::Create(runtime->IRModule->getContext(), "entry", runtime->IRFunc);
-    runtime->builder.SetInsertPoint(entryBlock);
+void LgsValue::startFuncBlock(LgsModule* module) const {
+    const auto entryBlock = BasicBlock::Create(module->IRModule->getContext(), "entry", module->IRFunc);
+    module->builder.SetInsertPoint(entryBlock);
 }
 
-Value* LgsValue::hashIRValue(LgsModule* runtime, Value* value) const {
-    const auto hashValueIRFuncType = FunctionType::get(runtime->builder.getInt32Ty(), {runtime->builder.getPtrTy()}, false);
-    const auto func =runtime->IRModule->getOrInsertFunction("hash_Str", hashValueIRFuncType);
-    return runtime->builder.CreateCall(func, {value});
+Value* LgsValue::hashIRValue(LgsModule* module, Value* value) const {
+    const auto hashValueIRFuncType = FunctionType::get(module->builder.getInt32Ty(), {module->builder.getPtrTy()}, false);
+    const auto func =module->IRModule->getOrInsertFunction("hash_Str", hashValueIRFuncType);
+    return module->builder.CreateCall(func, {value});
 }
 
-void LgsValue::copyMem(LgsModule* runtime, Value* src, Value* dest, const size_t n) const {
-    auto& builder = runtime->builder;
-    builder.CreateCall(getMemcpy(runtime), {dest, src, builder.getInt64(n), builder.getFalse()});
+void LgsValue::copyMem(LgsModule* module, Value* src, Value* dest, const size_t n) const {
+    auto& builder = module->builder;
+    builder.CreateCall(getMemcpy(module), {dest, src, builder.getInt64(n), builder.getFalse()});
 }
 
 void LgsValue::setLocation(const Token* start, const Token* end, path* filePath) {
@@ -37,8 +37,8 @@ void LgsValue::setIRValue(Value* value) {
     IRValue = value;
 }
 
-GlobalVariable* LgsValue::createIRGlobal(const LgsModule* runtime, Type* type, Constant* value) const {
-    return new GlobalVariable(*runtime->IRModule, type, true, GlobalValue::PrivateLinkage, value);
+GlobalVariable* LgsValue::createIRGlobal(const LgsModule* module, Type* type, Constant* value) const {
+    return new GlobalVariable(*module->IRModule, type, true, GlobalValue::PrivateLinkage, value);
 }
 
 bool LgsValue::shouldLoadIRArg(Value* value, const LgsExpr* expr) const {

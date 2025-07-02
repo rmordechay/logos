@@ -19,20 +19,20 @@ LgsType* LgsMap::getValueType() {
     return typePair->key;
 }
 
-Value* LgsMap::getLength(LgsModule* runtime, LgsExpr* expr) {
-    return lenFunc.call(runtime, {expr});
+Value* LgsMap::getLength(LgsModule* module, LgsExpr* expr) {
+    return lenFunc.call(module, {expr});
 }
 
-Value* LgsMap::getLoopLength(LgsModule* runtime, LgsExpr* expr) {
-    return runtime->builder.getInt32(1024);
+Value* LgsMap::getLoopLength(LgsModule* module, LgsExpr* expr) {
+    return module->builder.getInt32(1024);
 }
 
-Value* LgsMap::isEmpty(LgsModule* runtime, LgsExpr* expr) {
-    return isEmptyFunc.call(runtime, {expr});
+Value* LgsMap::isEmpty(LgsModule* module, LgsExpr* expr) {
+    return isEmptyFunc.call(module, {expr});
 }
 
-Value* LgsMap::isNotEmpty(LgsModule* runtime, LgsExpr* expr) {
-    return isNotEmptyFunc.call(runtime, {expr});
+Value* LgsMap::isNotEmpty(LgsModule* module, LgsExpr* expr) {
+    return isNotEmptyFunc.call(module, {expr});
 }
 
 Type* LgsMap::getIRType(LLVMContext& context) {

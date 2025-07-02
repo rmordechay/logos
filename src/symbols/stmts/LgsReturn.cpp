@@ -2,18 +2,18 @@
 #include "funcs/LgsFunc.h"
 #include "utils/LgsUtils.h"
 
-void LgsReturn::createIRStmt(LgsModule* runtime) {
-    if (hasTerminator(runtime)) return;
-    const auto currentFunc = runtime->stack.currentFunc;
+void LgsReturn::createIRStmt(LgsModule* module) {
+    if (hasTerminator(module)) return;
+    const auto currentFunc = module->stack.currentFunc;
     if (expr) {
-        const auto exprIR = expr->getIRValue(runtime);
+        const auto exprIR = expr->getIRValue(module);
         if (!currentFunc->funcType->isSwapReturn) {
-            runtime->builder.CreateRet(exprIR);
+            module->builder.CreateRet(exprIR);
         } else {
-            runtime->builder.CreateRetVoid();
+            module->builder.CreateRetVoid();
         }
     } else {
-        runtime->builder.CreateRetVoid();
+        module->builder.CreateRetVoid();
     }
 }
 
