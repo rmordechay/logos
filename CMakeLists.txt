@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
 set(SOURCE_FILES
-    src/logos/Logos.cpp
     src/utils/LgsErrHandler.cpp
     src/logos/LgsApp.cpp
     src/logos/LgsModule.cpp

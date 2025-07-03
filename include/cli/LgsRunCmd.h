@@ -1,12 +1,11 @@
 #pragma once
 #include "LgsCmd.h"
-
-class Logos;
+#include "logos/LgsApp.h"
 
 class LgsRunCmd final : public LgsCmd {
 public:
     LgsRunCmd(const int argc, char** argv) : LgsCmd(argc, argv) {}
-    void setArgs(Logos* logos) const;
+    void setArgs(LgsApp* app) const;
     void runCmd() override;
     void validate() override;
     void printHelp() override;

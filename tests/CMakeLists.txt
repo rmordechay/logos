@@ -2,7 +2,7 @@ enable_testing()
 
 add_executable(lgs_tests
     main.cpp
-    analysis/sema/SemaLoopTest.cpp
+    analysis/sema/SemaTest.cpp
 )
 
 target_precompile_headers(lgs_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include/pch.h)

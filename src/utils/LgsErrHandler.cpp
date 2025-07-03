@@ -2,7 +2,6 @@
 #include "LgsLocation.h"
 #include "data/LgsDefinitions.h"
 #include "utils/LgsLogger.h"
-#include "utils/LgsUtils.h"
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;
@@ -19,7 +18,9 @@ void LgsErrHandler::handleError(const LgsError& lgsErr, const Location* location
         argIndex++;
     }
     errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.errCode});
-    lock_guard lock(mtx);
+}
+
+void LgsErrHandler::logError(const Location* location, const string& result) const {
     lgsLog(LOGOS_ERROR_STR + result);
     if (location->filePath) {
         lgsLog("\t   at " + location->getFullPath(*location->filePath) + "\n---");

@@ -24,7 +24,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
 #include "logos/LgsConfig.h"
-#include "../../include/utils/LgsErrHandler.h"
+#include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsPatternMatch.h"
@@ -469,15 +469,19 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
 
 void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* childField) {
     const auto parentType = parentExpr->type;
-    const auto field = parentType->getField(childField->name);
-    if (!field) {
-        return errHandler.handleError(E10005, &childField->location, {childField->getExprName(), parentType->prettyName()});
-    }
-    childField->setType(field->type);
-    childField->isMutable = field->isMutable;
-    childField->ref = LgsSymbol(field);
-    if (!field->isPublic && file->absPath != *field->location.filePath) {
-        errHandler.handleError(E10030, &childField->location, {childField->getExprName(), *field->parentName});
+    if (parentType) {
+        const auto field = parentType->getField(childField->name);
+        if (!field) {
+            return errHandler.handleError(E10005, &childField->location, {childField->getExprName(), parentType->prettyName()});
+        }
+        childField->setType(field->type);
+        childField->isMutable = field->isMutable;
+        childField->ref = LgsSymbol(field);
+        if (!field->isPublic && file->absPath != *field->location.filePath) {
+            errHandler.handleError(E10030, &childField->location, {childField->getExprName(), *field->parentName});
+        }
+    } else {
+        return errHandler.handleError(E10058, &childField->location, {childField->getExprName()});
     }
 }
 

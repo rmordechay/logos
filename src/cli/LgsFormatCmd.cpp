@@ -1,11 +1,7 @@
 #include "cli/LgsFormatCmd.h"
 
-#include "files/LgsFile.h"
-#include "logos/Logos.h"
-
 void LgsFormatCmd::runCmd() {
     filePath = argv[2];
-    Logos logos;
 }
 
 void LgsFormatCmd::validate() {

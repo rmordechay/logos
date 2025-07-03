@@ -13,5 +13,6 @@ public:
 
     void setUnsuccessful();
     void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});
+    void logError(const Location* location, const string& result) const;
     ~LgsErrHandler() = default;
 };

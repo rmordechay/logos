@@ -20,6 +20,26 @@
 
 extern char **environ;
 
+void LgsApp::run() {
+    // Validation
+    if (!validate()) exit(1);
+
+    // Lexing and Parsing
+    if (!parse()) exit(1);
+
+    // Semantic analysis
+    if (!analyse()) exit(1);
+
+    // Code generation
+    if (!generate()) exit(1);
+
+    // Linking
+    if (!link()) exit(1);
+
+    // Running
+    execv(paths.execFilePath.c_str(), args.data());
+}
+
 bool LgsApp::validate() {
     if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {
         errHandler.handleError(E10010, nullptr);
@@ -84,10 +104,6 @@ bool LgsApp::generate() {
 bool LgsApp::link() const {
     const LgsLinker linker;
     return linker.link(paths, modules);
-}
-
-void LgsApp::run() const {
-    execv(paths.execFilePath.c_str(), args.data());
 }
 
 void LgsApp::parseSrcFiles(ThreadPool& threadPool) {
@@ -257,7 +273,6 @@ void LgsApp::setupActiveEnv() {
 }
 
 void LgsApp::initPaths(const path& rootDirPath) {
-    if (rootDirPath == "") return;
     paths.rootDir = rootDirPath;
     paths.rootDirAbs = canonical(paths.rootDir);
     paths.srcDir = paths.rootDir / LOGOS_SRC_DIR;

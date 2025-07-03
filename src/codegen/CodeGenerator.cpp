@@ -1,7 +1,6 @@
 #include "codegen/CodeGenerator.h"
 #include "logos/LgsConfig.h"
 #include "logos/LgsModule.h"
-#include "logos/Logos.h"
 #include "logos/Platform.h"
 #include "utils/LgsUtils.h"
 

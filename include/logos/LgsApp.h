@@ -32,16 +32,18 @@ public:
     map<string, LgsModule*> modules;
     const LgsAppFile* appFile = nullptr;
 
-    explicit LgsApp() : lgsCLang(paths) {}
+    explicit LgsApp(const path& rootDirPath = "") : lgsCLang(paths) {
+        initPaths(rootDirPath);
+    }
+    void run();
     void initPaths(const path& rootDirPath);
     bool validate();
     bool parse();
     bool analyse();
     bool generate();
     bool link() const;
-    void run() const;
     void parseSrcFiles(ThreadPool& threadPool);
-    void parseSrcFile(const string& codeText, path filePath);
+    void parseSrcFile(const string& codeText, path filePath = "");
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
     bool resolveExternalFiles();

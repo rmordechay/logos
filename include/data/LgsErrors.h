@@ -66,3 +66,4 @@ inline LgsError E10054{.msg = "Field '%s' is set more than one time.", .errCode 
 inline LgsError E10055{.msg = "Function '%s' must return from all its paths.", .errCode = errCodeStart++};
 inline LgsError E10056{.msg = "Object '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
 inline LgsError E10057{.msg = "Pattern matching expression '%s' must be of type Bool.", .errCode = errCodeStart++};
+inline LgsError E10058{.msg = "'%s' has no type.", .errCode = errCodeStart++};

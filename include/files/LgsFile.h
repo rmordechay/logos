@@ -8,7 +8,6 @@ class LgsModule;
 class LgsFile {
 public:
     string name;
-    string code;
     path& absPath;
     LgsSymbolTable symbolTable;
     vector<LgsStrConst*> externFiles;
