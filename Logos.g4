@@ -45,7 +45,7 @@ groupTargetList:
     ;
 
 interfaceBody:
-        explicitVarDec* funcSignature+ funcImpl*
+        interfaceField* interfaceFuncSignature* funcImpl*
     ;
 
 object:
@@ -56,8 +56,13 @@ objectBody:
         objectImplements? field* methodImplementation*
     ;
 
+
 field:
         VISIBILITY? CONST? IDENTIFIER COLON type (EQUAL expr)?
+    ;
+
+interfaceField:
+        CONST? IDENTIFIER QUEST_MARK? COLON type (EQUAL expr)?
     ;
 
 objectDeclaration:
@@ -74,6 +79,10 @@ objectImplements:
 
 funcSignature:
         IDENTIFIER LPAREN (param (COMMA param)* COMMA?)? RPAREN (COLON type)?
+    ;
+
+interfaceFuncSignature:
+        IDENTIFIER LPAREN (param (COMMA param)* COMMA?)? RPAREN QUEST_MARK? (COLON type)?
     ;
 
 funcImpl:

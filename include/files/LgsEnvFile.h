@@ -9,6 +9,3 @@ public:
     LgsEnvFile(const string& fileName, const path& path, const vector<LgsVarDec*>& varDecs) : LgsFile(fileName, path), varDecs(varDecs) {}
     ~LgsEnvFile() override = default;
 };
-
-
-

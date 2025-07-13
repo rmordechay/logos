@@ -60,6 +60,7 @@ public:
     void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);
     LgsFunc* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param, LogosParser::TypeContext* type);
+    LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName);
     LgsFunc* getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);

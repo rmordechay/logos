@@ -73,7 +73,7 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
         visitFunc(method);
         method->funcType->isStaticMethod = obj->isSingleton;
     }
-    visitObjectImplements(obj);
+    validateObjImplements(obj);
 }
 
 void SemaAnalyser::visitInterface(LgsInterface* interface) const {}
@@ -629,32 +629,6 @@ void SemaAnalyser::visitGroup(LgsGroup* group) const {
     }
 }
 
-void SemaAnalyser::visitObjectImplements(LgsObject* obj) {
-    for (int i = 0; i < obj->interfaces.size(); ++i) {
-        const auto implement = obj->interfaces[i];
-        if (!implement) continue;
-        const auto interface = implement->asInterface();
-        if (!interface) {
-            errHandler.handleError(E10025, &implement->location, {implement->prettyName()});
-            continue;
-        }
-
-        vector<LgsFunc*> missingFuncs;
-        for (const auto& [name, interfaceFunc] : interface->methods) {
-            const auto objMethod = obj->getMethod(name);
-            if (objMethod && objMethod->funcType->equals(interfaceFunc->funcType)) {
-                objMethod->implementsFunc = interfaceFunc;
-                continue;
-            }
-            missingFuncs.emplace_back(interfaceFunc);
-        }
-
-        if (!missingFuncs.empty()) {
-            errHandler.handleError(E10016, &obj->location, {obj->name, interface->interfaceName, getFuncsAsStr(missingFuncs)});
-        }
-    }
-}
-
 void SemaAnalyser::castImplicitly(LgsExpr* expr, LgsType* type) const {
     if (expr->type == type) return;
     freeType(expr->type);
@@ -739,6 +713,55 @@ bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterEx
         foreachLoop->loopVars[0 + withIndex]->type = iterable->baseType;
     }
     return false;
+}
+
+void SemaAnalyser::validateObjImplements(LgsObject* obj) {
+    for (int i = 0; i < obj->interfaces.size(); ++i) {
+        const auto objImplements = obj->interfaces[i];
+        if (!objImplements) continue;
+        const auto interface = objImplements->asInterface();
+        if (!interface) {
+            errHandler.handleError(E10025, &objImplements->location, {objImplements->prettyName()});
+            continue;
+        }
+        validateFieldsImplements(obj, interface);
+        validateMethodImplements(obj, interface);
+    }
+}
+
+void SemaAnalyser::validateFieldsImplements(LgsObject* obj, LgsInterface* interface) {
+    vector<LgsField*> missingFields;
+    for (const auto& [name, interfaceField] : interface->fields) {
+        const auto objField = obj->getField(name);
+        if (objField && objField->type->equals(interfaceField->type)) {
+            objField->implementsField = interfaceField;
+            continue;
+        }
+        if (!interfaceField->isOptional) {
+            missingFields.emplace_back(interfaceField);
+        }
+    }
+    if (!missingFields.empty()) {
+        errHandler.handleError(E10059, &obj->location, {obj->name, interface->interfaceName, getFieldsAsStr(missingFields)});
+    }
+}
+
+void SemaAnalyser::validateMethodImplements(LgsObject* obj, LgsInterface* interface) {
+    vector<LgsFunc*> missingFuncs;
+    for (const auto& [name, interfaceFunc] : interface->methods) {
+        const auto objMethod = obj->getMethod(name);
+        if (objMethod && objMethod->funcType->equals(interfaceFunc->funcType)) {
+            objMethod->implementsFunc = interfaceFunc;
+            continue;
+        }
+        if (!interfaceFunc->funcType->isOptional) {
+            missingFuncs.emplace_back(interfaceFunc);
+        }
+    }
+
+    if (!missingFuncs.empty()) {
+        errHandler.handleError(E10016, &obj->location, {obj->name, interface->interfaceName, getFuncsAsStr(missingFuncs)});
+    }
 }
 
 void SemaAnalyser::validateIndex(LgsIterIndex* iterIndex) {
@@ -1033,6 +1056,14 @@ string SemaAnalyser::getFuncsAsStr(const vector<LgsFunc*>& funcs) const {
     stringstream str;
     for (const auto& func : funcs) {
         str << "\n\t     - " << func->funcType->prettyName();
+    }
+    return str.str();
+}
+
+string SemaAnalyser::getFieldsAsStr(const vector<LgsField*>& fields) const {
+    stringstream str;
+    for (const auto& field : fields) {
+        str << "\n\t     - " << field->name << ": " <<  field->type->prettyName();
     }
     return str.str();
 }

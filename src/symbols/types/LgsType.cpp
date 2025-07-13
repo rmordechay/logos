@@ -32,6 +32,14 @@ bool LgsType::addMethod(LgsFunc* method) {
     return false;
 }
 
+bool LgsType::addField(LgsField* field) {
+    if (fields.find(field->name) == fields.end()) {
+        fields[field->name] = field;
+        return true;
+    }
+    return false;
+}
+
 LgsFunc* LgsType::getMethod(const string& name) const {
     const auto method = methods.find(name);
     if (method != methods.end()) {

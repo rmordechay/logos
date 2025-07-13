@@ -203,15 +203,21 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
     const auto interface = new LgsInterface(interfaceName);
     interface->setLocation(ctx->start, ctx->stop, filePath);
     if (isNameBuiltin(interface->name, &interface->location)) return nullptr;
-    for (const auto& funcSignature : ctx->funcSignature()) {
+    for (const auto& interfaceFunction : ctx->interfaceFuncSignature()) {
         const auto self = LgsParam(interface, LOGOS_SELF);
-        const auto type = getFuncReturnType(funcSignature->type());
-        const auto func = new LgsFunc(funcSignature->IDENTIFIER()->getText(), type);
+        const auto type = getFuncReturnType(interfaceFunction->type());
+        const auto func = new LgsFunc(interfaceFunction->IDENTIFIER()->getText(), type);
         func->funcType->parentName = interfaceName;
         func->funcType->isMethod = true;
         func->funcType->params.push_back(self);
-        setParams(func->funcType, funcSignature->param());
+        func->funcType->isOptional = !!interfaceFunction->QUEST_MARK();
+        setParams(func->funcType, interfaceFunction->param());
         interface->addMethod(func);
+    }
+    for (const auto interfaceField : ctx->interfaceField()) {
+        const auto field = getInterfaceField(interfaceField, interface->name);
+        field->isOptional = !!interfaceField->QUEST_MARK();
+        interface->addField(field);
     }
     return interface;
 }
@@ -327,6 +333,16 @@ LgsParam AntlerConverter::getParam(LgsFuncType* funcType, LogosParser::ParamCont
         funcType->hasDefaults = true;
     }
     return lgsParam;
+}
+
+LgsField* AntlerConverter::getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName) {
+    const auto name = ctx->IDENTIFIER()->getText();
+    const auto type = getType(ctx->type());
+    const auto expr = getExpr(ctx->expr());
+    const auto field = new LgsField(name, &parentName, type, expr);
+    field->isMutable = ctx->CONST() == nullptr;
+    field->setLocation(ctx->start, ctx->stop, filePath);
+    return field;
 }
 
 LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx, string& parentName) {

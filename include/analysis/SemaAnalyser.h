@@ -46,9 +46,9 @@ public:
     explicit SemaAnalyser(LgsFile* file) : LgsASTVisitor(file) {}
     void start() override;
     void visitMainFile(LgsMainFile* mainFile) override;
+    void validateObjImplements(LgsObject* obj);
     void visitObject(LgsObject* obj) override;
     void visitInterface(LgsInterface* interface) const override;
-    void visitObjectImplements(LgsObject* obj);
     void visitField(LgsField* field) override;
     void visitFunc(LgsFunc* func) override;
     void visitParam(LgsParam* param) override;
@@ -95,6 +95,8 @@ public:
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     void setZeroField(LgsField* field) const;
     bool setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
+    void validateFieldsImplements(LgsObject* obj, LgsInterface* interface);
+    void validateMethodImplements(LgsObject* obj, LgsInterface* interface);
     void validateExprType(LgsExpr* expr, LgsType* type);
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
@@ -113,6 +115,7 @@ public:
     void resolveGroupTypes(LgsGroup* group);
     static void reprocessFuncs(const vector<LgsFile*>& files);
     string getFuncsAsStr(const vector<LgsFunc*>& funcs) const;
+    string getFieldsAsStr(const vector<LgsField*>& fields) const;
     ~SemaAnalyser() override = default;
 };
 

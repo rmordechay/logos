@@ -16,6 +16,7 @@ public:
     bool isAnonymous = false;
     bool isSwapReturn = false;
     bool isStaticMethod = false;
+    bool isOptional = false;
     bool hasDefaults = false;
     int returnParamIndex = -1;
     FunctionType* IRType = nullptr;
