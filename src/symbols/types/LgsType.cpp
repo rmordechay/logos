@@ -40,11 +40,11 @@ LgsFunc* LgsType::getMethod(const string& name) const {
     return nullptr;
 }
 
-void LgsType::setLocation(const Token* ctx, const Token* end, path* filePath) {
+void LgsType::setLocation(const Token* ctx, const Token* end, const path& filePath) {
     location.lineNumberStart = ctx->getLine();
     location.posInLineStart = ctx->getCharPositionInLine() + 1;
     location.filePath = filePath;
-    assert(location.filePath);
+    assert(location.filePath != "");
 }
 
 LgsType::~LgsType() {

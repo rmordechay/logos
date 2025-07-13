@@ -25,9 +25,6 @@
 
 bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     auto name = func->getNameAsString();
-    if (name == "ctime") {
-        std::cout << "" << std::endl;
-    }
     if (isLgsKeyword(name)) {
         name = name + '_';
     }

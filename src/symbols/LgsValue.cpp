@@ -23,7 +23,7 @@ void LgsValue::copyMem(LgsModule* module, Value* src, Value* dest, const size_t 
     builder.CreateCall(getMemcpy(module), {dest, src, builder.getInt64(n), builder.getFalse()});
 }
 
-void LgsValue::setLocation(const Token* start, const Token* end, path* filePath) {
+void LgsValue::setLocation(const Token* start, const Token* end, const path filePath) {
     location.lineNumberStart = start->getLine();
     location.posInLineStart = start->getCharPositionInLine() + 1;
     if (!end) {

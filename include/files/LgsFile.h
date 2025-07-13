@@ -8,11 +8,11 @@ class LgsModule;
 class LgsFile {
 public:
     string name;
-    path& absPath;
+    path absPath;
     LgsSymbolTable symbolTable;
     vector<LgsStrConst*> externFiles;
 
-    explicit LgsFile(const string& name, path& path) : name(name), absPath(path) {}
+    explicit LgsFile(const string& name, const path& path) : name(name), absPath(path) {}
     virtual LgsModule* generateIR();
     virtual void format();
     virtual ~LgsFile();

@@ -35,6 +35,8 @@ public:
     explicit LgsApp(const path& rootDirPath = "") : lgsCLang(paths) {
         initPaths(rootDirPath);
     }
+
+    void handleExitWithErrors() const;
     void run();
     void initPaths(const path& rootDirPath);
     bool validate();

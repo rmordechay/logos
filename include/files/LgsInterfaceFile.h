@@ -7,7 +7,7 @@ class LgsInterfaceFile final : public LgsFile {
 public:
     LgsInterface* interface = nullptr;
 
-    LgsInterfaceFile(const string& name, path& path) : LgsFile(name, path) {}
+    LgsInterfaceFile(const string& name, const path& path) : LgsFile(name, path) {}
     ~LgsInterfaceFile() override = default;
 };
 

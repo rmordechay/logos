@@ -477,7 +477,7 @@ void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* c
         childField->setType(field->type);
         childField->isMutable = field->isMutable;
         childField->ref = LgsSymbol(field);
-        if (!field->isPublic && file->absPath != *field->location.filePath) {
+        if (!field->isPublic && file->absPath != field->location.filePath) {
             errHandler.handleError(E10030, &childField->location, {childField->getExprName(), *field->parentName});
         }
     } else {
@@ -778,7 +778,7 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
 void SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall) {
     const auto method = methodCall->func;
     if (!method) return;
-    if (!method->funcType->isPublic && file->absPath != *method->location.filePath) {
+    if (!method->funcType->isPublic && file->absPath != method->location.filePath) {
         errHandler.handleError(E10031, &method->location, {method->funcType->name, method->funcType->parentName});
     }
 }

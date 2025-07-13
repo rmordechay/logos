@@ -5,7 +5,7 @@ struct Location {
     size_t lineNumberEnd{};
     size_t posInLineStart{};
     size_t posInLineEnd{};
-    path* filePath = nullptr;
+    path filePath;
 
     string lineNumberStr() const {
         return to_string(lineNumberStart);

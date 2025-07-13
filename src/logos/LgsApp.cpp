@@ -17,24 +17,25 @@
 #include "logos/LgsLinker.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsInterface.h"
+#include "utils/LgsLogger.h"
 
 extern char **environ;
 
 void LgsApp::run() {
     // Validation
-    if (!validate()) exit(1);
+    if (!validate()) handleExitWithErrors();
 
     // Lexing and Parsing
-    if (!parse()) exit(1);
+    if (!parse()) handleExitWithErrors();
 
     // Semantic analysis
-    if (!analyse()) exit(1);
+    if (!analyse()) handleExitWithErrors();
 
     // Code generation
-    if (!generate()) exit(1);
+    if (!generate()) handleExitWithErrors();
 
     // Linking
-    if (!link()) exit(1);
+    if (!link()) handleExitWithErrors();
 
     // Running
     execv(paths.execFilePath.c_str(), args.data());
@@ -122,13 +123,13 @@ void LgsApp::parseSrcFile(const string& codeText, path filePath) {
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    const auto lgsFile = parser.logosFile();
+    const auto ast = parser.logosFile();
     if (parser.getNumberOfSyntaxErrors() != 0) {
         errHandler.setUnsuccessful();
         return;
     }
     AntlerConverter antlerConverter(filePath);
-    const auto file = antlerConverter.getLogosFile(lgsFile);
+    const auto file = antlerConverter.getLogosFile(ast);
     lock_guard lock(mtx);
     files.push_back(file);
     if (!antlerConverter.errHandler.successful) {
@@ -283,6 +284,13 @@ void LgsApp::initPaths(const path& rootDirPath) {
     paths.appFilePath = paths.rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
     paths.clibRoot = CLIB_ROOT;
     paths.clibInclude = paths.clibRoot / "usr/include";
+}
+
+void LgsApp::handleExitWithErrors() const {
+    for (auto error : errHandler.errors) {
+        lgsLog(error.msg);
+    }
+    return exit(1);
 }
 
 bool LgsApp::isLogosFile(const directory_entry& entry) const {
