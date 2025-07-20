@@ -166,6 +166,19 @@ TEST_F(SemaTest, TestSema10017) {
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10017);
 }
 
+TEST_F(SemaTest, TestSema10022) {
+    const auto code = R"(
+    interface A {}
+    main() {
+        a = A{}
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 1);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, 10022);
+}
+
 TEST_F(SemaTest, TestSema10046) {
     const auto code = R"(
     object Obj {
