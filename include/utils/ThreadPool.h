@@ -8,7 +8,7 @@ public:
     std::condition_variable condition;
     bool stop = false;
 
-    void start();
+    ThreadPool();
     void runTask(function<void()> task);
     void wait();
     ~ThreadPool() = default;

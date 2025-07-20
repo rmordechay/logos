@@ -18,7 +18,6 @@ public:
 class LgsArray final : public LgsIterable {
 public:
     static constexpr auto name = "Array";
-
     StructType* arrStruct = nullptr;
     LgsArrayAddFunc addFunc{this};
     LgsBuiltinFunc lenFunc{"len", &LGS_INT, name, {this}, true};
@@ -38,7 +37,6 @@ public:
         addMethod(&isNotEmptyFunc);
         canSlice = true;
     }
-
     Type* getIRType(LLVMContext& context) override;
     string getIRName() override;
     string prettyName() const override;

@@ -55,17 +55,22 @@ bool LgsApp::validate() {
 }
 
 bool LgsApp::parse() {
-    loadGlobals();
     ThreadPool threadPool;
-    threadPool.start();
-    parseSrcFiles(threadPool);
+    for (const auto& entry : recursive_directory_iterator(paths.srcDir)) {
+        if (!isLogosFile(entry)) continue;
+        threadPool.runTask([entry, this] {
+            const auto absFilePath = path(canonical(entry));
+            const auto codeText = getFileText(absFilePath);
+            parseSrcFile(codeText, absFilePath);
+        });
+    }
     threadPool.wait();
-    return resolveExternalFiles() && resolveGlobalTypes();
+    return resolveExternalFiles();
 }
 
 bool LgsApp::analyse() {
+    if (!resolveGlobalTypes()) handleExitWithErrors();
     ThreadPool threadPool;
-    threadPool.start();
     for (const auto& file : files) {
         threadPool.runTask([file, this] {
             SemaAnalyser semaAnalyser(file);
@@ -86,7 +91,6 @@ bool LgsApp::analyse() {
 bool LgsApp::generate() {
     CodeGenerator::init(paths);
     ThreadPool threadPool;
-    threadPool.start();
     for (const auto& file : files) {
         threadPool.runTask([file, this] {
             const auto module = file->generateIR();
@@ -105,17 +109,6 @@ bool LgsApp::generate() {
 bool LgsApp::link() const {
     const LgsLinker linker;
     return linker.link(paths, modules);
-}
-
-void LgsApp::parseSrcFiles(ThreadPool& threadPool) {
-    for (const auto& entry : recursive_directory_iterator(paths.srcDir)) {
-        if (!isLogosFile(entry)) continue;
-        threadPool.runTask([entry, this] {
-            const auto absFilePath = path(canonical(entry));
-            const auto codeText = getFileText(absFilePath);
-            parseSrcFile(codeText, absFilePath);
-        });
-    }
 }
 
 void LgsApp::parseSrcFile(const string& codeText, path filePath) {
@@ -215,15 +208,14 @@ bool LgsApp::resolveExternalFiles() {
     return lgsCLang.errHandler.successful;
 }
 
-void LgsApp::loadGlobals() {
-    globals.addSymbol(lgsPrint.name, LgsSymbol(&lgsPrint), &errHandler);
-    globals.addSymbol(lgsSizeof.name, LgsSymbol(&lgsSizeof), &errHandler);
+void LgsApp::loadBuiltins() const {
+    globals.addSymbol(lgsPrint.name, LgsSymbol(&lgsPrint), nullptr);
+    globals.addSymbol(lgsSizeof.name, LgsSymbol(&lgsSizeof), nullptr);
 }
 
 void LgsApp::loadEnvFiles() {
     vector<LgsEnvFile*> files;
     ThreadPool threadPool;
-    threadPool.start();
     for (const auto& entry : directory_iterator(paths.envsDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
@@ -274,6 +266,7 @@ void LgsApp::setupActiveEnv() {
 }
 
 void LgsApp::initPaths(const path& rootDirPath) {
+    if (rootDirPath == "") return;
     paths.rootDir = rootDirPath;
     paths.rootDirAbs = canonical(paths.rootDir);
     paths.srcDir = paths.rootDir / LOGOS_SRC_DIR;

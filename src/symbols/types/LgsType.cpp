@@ -52,7 +52,6 @@ void LgsType::setLocation(const Token* ctx, const Token* end, const path& filePa
     location.lineNumberStart = ctx->getLine();
     location.posInLineStart = ctx->getCharPositionInLine() + 1;
     location.filePath = filePath;
-    assert(location.filePath != "");
 }
 
 LgsType::~LgsType() {

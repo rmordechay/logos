@@ -85,7 +85,7 @@ Type* i32Ty(LLVMContext& context) {
 }
 
 Type* i64Ty(LLVMContext& context) {
-    return IntegerType::getInt32Ty(context);
+    return IntegerType::getInt64Ty(context);
 }
 
 FunctionCallee getPrintf(LgsModule* module) {
