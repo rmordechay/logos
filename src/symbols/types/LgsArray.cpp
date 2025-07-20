@@ -94,16 +94,6 @@ Value* LgsArrayAddFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
     return nullptr;
 }
 
-Type* LgsArrayAddFunc::getIRFuncType(LLVMContext& context) {
-    const auto& params = funcType->params;
-    const vector<Type*> IRParamsTypes = {
-        ptrTy(context),
-        i64Ty(context),
-        params[1].type->getIRType(context)
-    };
-    return FunctionType::get(funcType->rt->getIRType(context), IRParamsTypes, false);
-}
-
 LgsArray::~LgsArray() {
     delete sizeExpr;
 }

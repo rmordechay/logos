@@ -11,7 +11,6 @@ class LgsArrayAddFunc final : public LgsBuiltinFunc {
 public:
     explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName(), {parent, &LGS_ANY}, true, true) {}
     Value* call(LgsModule* module, const vector<LgsExpr*>& args) override;
-    Type* getIRFuncType(LLVMContext& context) override;
     ~LgsArrayAddFunc() override = default;
 };
 

@@ -417,6 +417,7 @@ LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext
     varDec->isMutable = !ctx->CONST();
     if (ctx->expr()) {
         varDec->expr = getExpr(ctx->expr());
+        varDec->expr->isMutable = varDec->isMutable;
     }
     varDec->type = getType(ctx->type());
     return varDec;

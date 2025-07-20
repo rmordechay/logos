@@ -588,6 +588,7 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     const auto exprFrom = iterIndex->index->from;
     const auto exprTo = iterIndex->index->to;
     visitUnaryExpr(baseExpr);
+    iterIndex->isMutable = baseExpr->isMutable;
     visitExpr(exprFrom);
     visitExpr(exprTo);
     if (!baseExpr->type) return;

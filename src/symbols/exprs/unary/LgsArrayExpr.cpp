@@ -12,27 +12,8 @@ Value* LgsArrayExpr::createIRValue(LgsModule* module) {
     return createDynamicArray(module);
 }
 
-Value* LgsArrayExpr::createDynamicArray(LgsModule* module) {
-    auto& builder = module->builder;
-    const auto arrType = type->asArray();
-    const auto elementSize = builder.getInt64(arrType->baseType->getSizeBytes());
-    IRValue = builder.CreateAlloca(arrType->getArrStruct(module->context));
-
-    Value* capacityIR = nullptr;
-    if (arrType->sizeExpr) {
-        capacityIR = arrType->sizeExpr->getIRValue(module);
-        capacityIR = builder.CreateZExt(capacityIR, builder.getInt64Ty());
-    } else {
-        const auto capacity = elements.empty() ? INITIAL_ARRAY_CAPACITY : elements.size() * 2;
-        capacityIR = builder.getInt64(capacity);
-    }
-
-    arrType->initFunc.callIR(module, {IRValue, capacityIR, elementSize});
-    for (const auto element : elements) {
-        arrType->addFunc.call(module, {this, element});
-    }
-    module->addAllocatedExpr(this);
-    return IRValue;
+Value* LgsArrayExpr::createDynamicArray(LgsModule* module) const {
+    assert(0);
 }
 
 Value* LgsArrayExpr::createConstArray(LgsModule* module) const {

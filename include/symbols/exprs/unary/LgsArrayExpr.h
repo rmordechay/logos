@@ -16,7 +16,7 @@ public:
     Value* createIRValue(LgsModule* module) override;
     Value* createConstArray(LgsModule* module) const;
     Constant* createIRConstArray(LgsModule* module, const vector<LgsExpr*>& elements) const;
-    Value* createDynamicArray(LgsModule* module);
+    Value* createDynamicArray(LgsModule* module) const;
     void free(LgsModule* module) override;
     ~LgsArrayExpr() override = default;
 };
