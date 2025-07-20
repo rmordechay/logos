@@ -173,7 +173,8 @@ void LgsApp::parseAppFile(path fileEntry) {
     }
 }
 
-bool LgsApp::resolveGlobalTypes() const {
+bool LgsApp::resolveGlobalTypes() {
+    bool successful = true;
     for (const auto& file : files) {
         SemaAnalyser semaAnalyser(file);
         if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
@@ -195,9 +196,12 @@ bool LgsApp::resolveGlobalTypes() const {
                 semaAnalyser.resolveFuncTypes(method->funcType);
             }
         }
-        if (!semaAnalyser.errHandler.successful) return false;
+        if (!semaAnalyser.errHandler.successful) {
+            addErrors(semaAnalyser.errHandler.errors);
+        }
+        successful = successful && semaAnalyser.errHandler.successful;
     }
-    return true;
+    return successful;
 }
 
 bool LgsApp::resolveExternalFiles() {

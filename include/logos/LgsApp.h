@@ -48,7 +48,7 @@ public:
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
     bool resolveExternalFiles();
-    bool resolveGlobalTypes() const;
+    bool resolveGlobalTypes();
     void setEnvVars();
     void setupActiveEnv();
     void loadBuiltins() const;

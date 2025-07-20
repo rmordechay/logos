@@ -95,6 +95,7 @@ public:
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     void setZeroField(LgsField* field) const;
     bool setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
+
     void validateFieldsImplements(LgsObject* obj, LgsInterface* interface);
     void validateMethodImplements(LgsObject* obj, LgsInterface* interface);
     void validateExprType(LgsExpr* expr, LgsType* type);

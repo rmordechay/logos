@@ -503,6 +503,9 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
     const auto symbol = getSymbol(instance->name, &instance->location);
     if (!symbol) return;
+    if (symbol->symbolType == INTERFACE) {
+        return errHandler.handleError(E10022, &instance->location, {instance->name});
+    }
     if (symbol->symbolType != OBJECT) {
         return errHandler.handleError(E10022, &instance->location, {instance->name});
     }
