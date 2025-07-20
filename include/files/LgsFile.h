@@ -15,7 +15,7 @@ public:
     explicit LgsFile(const string& name, const path& path) : name(name), absPath(path) {}
     virtual LgsModule* generateIR();
     virtual void format();
-    virtual ~LgsFile();
+    virtual ~LgsFile() = default;
 };
 
 // Only files that need generation implement this func.
@@ -25,8 +25,4 @@ inline LgsModule* LgsFile::generateIR() {
 
 inline void LgsFile::format() {
     assert(false);
-}
-
-inline LgsFile::~LgsFile() {
-    delete &absPath;
 }

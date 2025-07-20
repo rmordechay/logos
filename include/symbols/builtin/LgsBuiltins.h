@@ -31,6 +31,7 @@ public:
         const auto callInst = module->builder.CreateCall(printfFunc, IRArgs);
         return callInst;
     }
+
     ~LgsPrint() override = default;
 };
 

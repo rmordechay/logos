@@ -34,7 +34,6 @@ public:
 
     explicit LgsApp(const path& rootDirPath = "") : lgsCLang(paths) {
         initPaths(rootDirPath);
-        loadBuiltins();
     }
 
     void handleExitWithErrors() const;
@@ -58,5 +57,5 @@ public:
     void checkRequiredEnvVars();
     bool isLogosFile(const directory_entry& entry) const;
     void addErrors(vector<LgsError> newErrors);
-    ~LgsApp() = default;
+    ~LgsApp();
 };

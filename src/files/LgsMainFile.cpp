@@ -27,4 +27,10 @@ LgsMainFile::~LgsMainFile() {
     for (const auto& func : funcs) {
         delete func.second;
     }
+    for (const auto& object : objects) {
+        delete object;
+    }
+    for (const auto lgsEnum : enums) {
+        delete lgsEnum;
+    }
 }

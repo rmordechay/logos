@@ -1,4 +1,5 @@
 #include "logos/LgsApp.h"
+#include "logos/LgsModule.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -8,6 +9,14 @@ using testing::StartsWith;
 class SemaTest : public testing::Test {
 public:
     LgsApp app;
+
+    void SetUp() override {
+        app.loadBuiltins();
+    }
+
+    void TearDown() override {
+        globals.freeSymbols();
+    }
 };
 
 TEST_F(SemaTest, TestSema10001) {

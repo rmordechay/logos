@@ -17,6 +17,7 @@ public:
     vector<RequireEnvVar> requireEnvVars;
 
     explicit LgsAppFile(const path& path, const vector<LgsVarDec*>& varDecs) : LgsFile(LOGOS_APP_FILE_NAME, path), varDecs(varDecs) {}
+    ~LgsAppFile() override = default;
 };
 
 

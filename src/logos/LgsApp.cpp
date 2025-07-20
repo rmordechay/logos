@@ -55,6 +55,7 @@ bool LgsApp::validate() {
 }
 
 bool LgsApp::parse() {
+    loadBuiltins();
     ThreadPool threadPool;
     for (const auto& entry : recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
@@ -209,8 +210,8 @@ bool LgsApp::resolveExternalFiles() {
 }
 
 void LgsApp::loadBuiltins() const {
-    globals.addSymbol(lgsPrint.name, LgsSymbol(&lgsPrint), nullptr);
-    globals.addSymbol(lgsSizeof.name, LgsSymbol(&lgsSizeof), nullptr);
+    globals.addSymbol(lgsPrint.name, LgsSymbol(new LgsPrint()), nullptr);
+    globals.addSymbol(lgsSizeof.name, LgsSymbol(new LgsSizeOf()), nullptr);
 }
 
 void LgsApp::loadEnvFiles() {
@@ -292,4 +293,10 @@ bool LgsApp::isLogosFile(const directory_entry& entry) const {
 
 void LgsApp::addErrors(vector<LgsError> newErrors) {
     errHandler.errors.insert(errHandler.errors.end(), newErrors.begin(), newErrors.end());
+}
+
+LgsApp::~LgsApp() {
+    for (const auto file : files) {
+        delete file;
+    }
 }
