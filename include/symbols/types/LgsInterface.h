@@ -4,6 +4,7 @@
 class LgsInterface final : public LgsObject {
 public:
     string interfaceName;
+    vector<LgsType*> interfaces;
 
     explicit LgsInterface(const string& name) : LgsObject(name), interfaceName(name) {}
     string prettyName() const override;
@@ -11,5 +12,5 @@ public:
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
-    ~LgsInterface() override = default;
+    ~LgsInterface() override;
 };

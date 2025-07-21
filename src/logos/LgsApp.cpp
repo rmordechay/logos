@@ -181,6 +181,9 @@ bool LgsApp::resolveGlobalTypes() {
             for (const auto object : mainFile->objects) {
                 semaAnalyser.resolveObjTypes(object);
             }
+            for (const auto interface : mainFile->interfaces) {
+                semaAnalyser.resolveInterfaceTypes(interface);
+            }
             for (const auto group : mainFile->groups) {
                 semaAnalyser.resolveGroupTypes(group);
             }

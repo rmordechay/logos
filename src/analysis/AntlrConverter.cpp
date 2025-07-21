@@ -87,7 +87,7 @@ LgsObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ct
 }
 
 LgsFile* AntlerConverter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx) {
-    const auto interfaceName = ctx->interfaceDeclaration()->IDENTIFIER()->getText();
+    const auto interfaceName = ctx->IDENTIFIER()->getText();
     const auto interfaceFile = new LgsInterfaceFile(interfaceName, filePath);
     interfaceFile->interface = getInterface(ctx->interfaceBody(), interfaceName);
     globals.addSymbol(interfaceName, LgsSymbol(interfaceFile->interface), &errHandler);
@@ -190,8 +190,8 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
             return nullptr;
         }
     }
-    if (ctx->objectImplements()) {
-        for (const auto& type : ctx->objectImplements()->IDENTIFIER()) {
+    if (ctx->implements()) {
+        for (const auto& type : ctx->implements()->IDENTIFIER()) {
             auto implementType = getTypeFromText(type);
             obj->interfaces.push_back(implementType);
         }
@@ -218,6 +218,12 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
         const auto field = getInterfaceField(interfaceField, interface->name);
         field->isOptional = !!interfaceField->QUEST_MARK();
         interface->addField(field);
+    }
+    if (ctx->implements()) {
+        for (const auto& type : ctx->implements()->IDENTIFIER()) {
+            auto implementType = getTypeFromText(type);
+            interface->interfaces.push_back(implementType);
+        }
     }
     return interface;
 }

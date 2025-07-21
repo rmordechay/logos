@@ -96,8 +96,7 @@ public:
     void setZeroField(LgsField* field) const;
     bool setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
 
-    void validateFieldsImplements(LgsObject* obj, LgsInterface* interface);
-    void validateMethodImplements(LgsObject* obj, LgsInterface* interface);
+    void validateImplements(LgsObject* obj, LgsInterface* interface);
     void validateExprType(LgsExpr* expr, LgsType* type);
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
@@ -113,10 +112,10 @@ public:
     void resolveIterable(LgsIterable* iterable);
     void resolveFuncTypes(LgsFuncType* funcType);
     void resolveObjTypes(LgsObject* obj);
+    void resolveInterfaceTypes(LgsInterface* interface);
     void resolveGroupTypes(LgsGroup* group);
     static void reprocessFuncs(const vector<LgsFile*>& files);
-    string getFuncsAsStr(const vector<LgsFunc*>& funcs) const;
-    string getFieldsAsStr(const vector<LgsField*>& fields) const;
+    string getMissingImplementsStr(const vector<LgsField*>& fields, const vector<LgsFunc*>& methods) const;
     ~SemaAnalyser() override = default;
 };
 

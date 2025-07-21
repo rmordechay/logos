@@ -133,7 +133,7 @@ TEST_F(SemaTest, TestSema10015) {
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10015);
 }
 
-TEST_F(SemaTest, TestSema10016) {
+TEST_F(SemaTest, TestSema10016A) {
     const auto code = R"(
     interface Interface {
         func()
@@ -152,6 +152,27 @@ TEST_F(SemaTest, TestSema10016) {
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10016);
+}
+
+TEST_F(SemaTest, TestSema10016B) {
+    const auto code = R"(
+    interface Interface {
+        a: Int
+    }
+    interface Type {
+        implements: Interface
+        b: Int
+    }
+    object Object {
+        implements: Type
+    }
+    main() {}
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 2);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, 10016);
+    ASSERT_EQ(app.errHandler.errors[1].errCode, 10016);
 }
 
 TEST_F(SemaTest, TestSema10017) {

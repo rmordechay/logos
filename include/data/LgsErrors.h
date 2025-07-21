@@ -24,7 +24,7 @@ inline LgsError E10012{.msg = "", .errCode = errCodeStart++};
 inline LgsError E10013{.msg = "Function '%s' is not a member of '%s'.", .errCode = errCodeStart++};
 inline LgsError E10014{.msg = "Expression of type '%s' does not match base type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10015{.msg = "Function with name '%s' was found but it doesn't match the parameters.\n\t   Given:    %s\n\t   Expected: %s", .errCode = errCodeStart++};
-inline LgsError E10016{.msg = "Object '%s' does not fully implement '%s'. Missing functions:%s", .errCode = errCodeStart++};
+inline LgsError E10016{.msg = "Object '%s' does not fully implement '%s'. Missing fields/methods:%s", .errCode = errCodeStart++};
 inline LgsError E10017{.msg = "'break' must be inside a loop statement.", .errCode = errCodeStart++};
 inline LgsError E10018{.msg = "Expression of type '%s' cannot be casted to type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10019{.msg = "activeEnv '%s' could not be found in the envs directory.", .errCode = errCodeStart++};
@@ -67,4 +67,3 @@ inline LgsError E10055{.msg = "Function '%s' must return from all its paths.", .
 inline LgsError E10056{.msg = "Object '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
 inline LgsError E10057{.msg = "Pattern matching expression '%s' must be of type Bool.", .errCode = errCodeStart++};
 inline LgsError E10058{.msg = "'%s' has no type.", .errCode = errCodeStart++};
-inline LgsError E10059{.msg = "Object '%s' does not fully implement '%s'. Missing fields:%s", .errCode = errCodeStart++};

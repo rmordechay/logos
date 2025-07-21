@@ -42,3 +42,9 @@ bool LgsInterface::equals(LgsType* other) {
 string LgsInterface::prettyName() const {
     return interfaceName;
 }
+
+LgsInterface::~LgsInterface() {
+    for (const auto interface : interfaces) {
+        delete interface;
+    }
+}

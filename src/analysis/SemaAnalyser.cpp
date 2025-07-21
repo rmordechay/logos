@@ -728,12 +728,15 @@ void SemaAnalyser::validateObjImplements(LgsObject* obj) {
             errHandler.handleError(E10025, &objImplements->location, {objImplements->prettyName()});
             continue;
         }
-        validateFieldsImplements(obj, interface);
-        validateMethodImplements(obj, interface);
+        validateImplements(obj, interface);
+        for (const auto parentInterface: interface->interfaces) {
+            validateImplements(obj, parentInterface->asInterface());
+        }
     }
 }
 
-void SemaAnalyser::validateFieldsImplements(LgsObject* obj, LgsInterface* interface) {
+void SemaAnalyser::validateImplements(LgsObject* obj, LgsInterface* interface) {
+    // Fields
     vector<LgsField*> missingFields;
     for (const auto& [name, interfaceField] : interface->fields) {
         const auto objField = obj->getField(name);
@@ -745,26 +748,22 @@ void SemaAnalyser::validateFieldsImplements(LgsObject* obj, LgsInterface* interf
             missingFields.emplace_back(interfaceField);
         }
     }
-    if (!missingFields.empty()) {
-        errHandler.handleError(E10059, &obj->location, {obj->name, interface->interfaceName, getFieldsAsStr(missingFields)});
-    }
-}
 
-void SemaAnalyser::validateMethodImplements(LgsObject* obj, LgsInterface* interface) {
-    vector<LgsFunc*> missingFuncs;
-    for (const auto& [name, interfaceFunc] : interface->methods) {
+    // Methods
+    vector<LgsFunc*> missingMethods;
+    for (const auto& [name, interfaceMethod] : interface->methods) {
         const auto objMethod = obj->getMethod(name);
-        if (objMethod && objMethod->funcType->equals(interfaceFunc->funcType)) {
-            objMethod->implementsFunc = interfaceFunc;
+        if (objMethod && objMethod->funcType->equals(interfaceMethod->funcType)) {
+            objMethod->implementsFunc = interfaceMethod;
             continue;
         }
-        if (!interfaceFunc->funcType->isOptional) {
-            missingFuncs.emplace_back(interfaceFunc);
+        if (!interfaceMethod->funcType->isOptional) {
+            missingMethods.emplace_back(interfaceMethod);
         }
     }
 
-    if (!missingFuncs.empty()) {
-        errHandler.handleError(E10016, &obj->location, {obj->name, interface->interfaceName, getFuncsAsStr(missingFuncs)});
+    if (!missingMethods.empty() || !missingFields.empty()) {
+        errHandler.handleError(E10016, &obj->location, {obj->name, interface->interfaceName, getMissingImplementsStr(missingFields, missingMethods)});
     }
 }
 
@@ -1015,6 +1014,19 @@ void SemaAnalyser::resolveObjTypes(LgsObject* obj) {
     }
 }
 
+void SemaAnalyser::resolveInterfaceTypes(LgsInterface* interface) {
+    for (const auto& [_, field] : interface->fields) {
+        field->type = resolveType(field->type);
+        field->parentName = &interface->name;
+    }
+    for (const auto& [_, method] : interface->methods) {
+        resolveFuncTypes(method->funcType);
+    }
+    for (int i = 0; i < interface->interfaces.size(); ++i) {
+        interface->interfaces[i] = resolveType(interface->interfaces[i]);
+    }
+}
+
 void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
     for (int i = 0; i < funcType->params.size(); ++i) {
         funcType->params[i].type = resolveType(funcType->params[i].type);
@@ -1056,18 +1068,15 @@ void SemaAnalyser::reprocessFuncs(const vector<LgsFile*>& files) {
     }
 }
 
-string SemaAnalyser::getFuncsAsStr(const vector<LgsFunc*>& funcs) const {
+string SemaAnalyser::getMissingImplementsStr(const vector<LgsField*>& fields, const vector<LgsFunc*>& methods) const {
     stringstream str;
-    for (const auto& func : funcs) {
-        str << "\n\t     - " << func->funcType->prettyName();
-    }
-    return str.str();
-}
-
-string SemaAnalyser::getFieldsAsStr(const vector<LgsField*>& fields) const {
-    stringstream str;
+    str << "\n\t\tFields:";
     for (const auto& field : fields) {
-        str << "\n\t     - " << field->name << ": " <<  field->type->prettyName();
+        str << "\n\t\t     - " << field->name << ": " <<  field->type->prettyName();
+    }
+    str << "\n\t\tMethods:";
+    for (const auto& method : methods) {
+        str << "\n\t\t     - " << method->funcType->prettyName();
     }
     return str.str();
 }

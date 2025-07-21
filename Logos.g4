@@ -25,7 +25,7 @@ objectFile:
     ;
 
 interfaceFile:
-        interfaceDeclaration interfaceBody EOF
+        INTERFACE IDENTIFIER interfaceBody EOF
     ;
 
 interface:
@@ -45,7 +45,7 @@ groupTargetList:
     ;
 
 interfaceBody:
-        interfaceField* interfaceFuncSignature* funcImpl*
+            implements? interfaceField* interfaceFuncSignature* funcImpl*
     ;
 
 object:
@@ -53,7 +53,7 @@ object:
     ;
 
 objectBody:
-        objectImplements? field* methodImplementation*
+        implements? field* methodImplementation*
     ;
 
 
@@ -69,11 +69,7 @@ objectDeclaration:
         (OBJECT | SINGLETON) IDENTIFIER
     ;
 
-interfaceDeclaration:
-        INTERFACE IDENTIFIER
-    ;
-
-objectImplements:
+implements:
         IMPLEMENTS COLON IDENTIFIER (COMMA IDENTIFIER)? COMMA?
     ;
 
