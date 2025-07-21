@@ -194,10 +194,7 @@ bool LgsApp::resolveGlobalTypes() {
         } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             semaAnalyser.resolveObjTypes(objFile->obj);
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            auto methods = interfaceFile->interface->methods;
-            for (const auto& [_, method] : methods) {
-                semaAnalyser.resolveFuncTypes(method->funcType);
-            }
+            semaAnalyser.resolveInterfaceTypes(interfaceFile->interface);
         }
         if (!semaAnalyser.errHandler.successful) {
             addErrors(semaAnalyser.errHandler.errors);

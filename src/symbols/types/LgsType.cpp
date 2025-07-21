@@ -25,19 +25,17 @@ LgsField* LgsType::getField(const string& name) {
 }
 
 bool LgsType::addMethod(LgsFunc* method) {
-    if (methods.find(method->funcType->name) == methods.end()) {
-        methods[method->funcType->name] = method;
-        return true;
-    }
-    return false;
+    if (methods.find(method->funcType->name) != methods.end()) return false;
+    if (fields.find(method->funcType->name) != fields.end()) return false;
+    methods[method->funcType->name] = method;
+    return true;
 }
 
 bool LgsType::addField(LgsField* field) {
-    if (fields.find(field->name) == fields.end()) {
-        fields[field->name] = field;
-        return true;
-    }
-    return false;
+    if (fields.find(field->name) != fields.end()) return false;
+    if (methods.find(field->name) != methods.end()) return false;
+    fields[field->name] = field;
+    return true;
 }
 
 LgsFunc* LgsType::getMethod(const string& name) const {

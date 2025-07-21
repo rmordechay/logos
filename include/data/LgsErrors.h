@@ -64,7 +64,7 @@ inline LgsError E10052{.msg = "Spread operator in '%s...' must only be used with
 inline LgsError E10053{.msg = "'%s' is a Logos global name and cannot be redefined.", .errCode = errCodeStart++};
 inline LgsError E10054{.msg = "Field '%s' is set more than one time.", .errCode = errCodeStart++};
 inline LgsError E10055{.msg = "Function '%s' must return from all its paths.", .errCode = errCodeStart++};
-inline LgsError E10056{.msg = "Object '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
+inline LgsError E10056{.msg = "Type '%s' has multiple fields/methods with the same name '%s'.", .errCode = errCodeStart++};
 inline LgsError E10057{.msg = "Pattern matching expression '%s' must be of type Bool.", .errCode = errCodeStart++};
 inline LgsError E10058{.msg = "'%s' has no type.", .errCode = errCodeStart++};
 inline LgsError E10059{.msg = "Field '%s' is defined in multiple interfaces: '%s'.", .errCode = errCodeStart++};

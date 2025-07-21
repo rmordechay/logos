@@ -156,15 +156,15 @@ TEST_F(SemaTest, TestSema10016A) {
 
 TEST_F(SemaTest, TestSema10016B) {
     const auto code = R"(
-    interface Interface {
+    interface Type1 {
         a: Int
     }
-    interface Type {
-        implements: Interface
+    interface Type2 {
+        implements: Type1
         b: Int
     }
     object Object {
-        implements: Type
+        implements: Type2
     }
     main() {}
     )";
@@ -173,6 +173,22 @@ TEST_F(SemaTest, TestSema10016B) {
     ASSERT_EQ(app.errHandler.errors.size(), 2);
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10016);
     ASSERT_EQ(app.errHandler.errors[1].errCode, 10016);
+}
+
+TEST_F(SemaTest, TestSema10016C) {
+    const auto code = R"(
+    interface Type1 {
+        a: Int
+    }
+    interface Type2 {
+        implements: Type1
+        b: Int
+    }
+    main() {}
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 0);
 }
 
 TEST_F(SemaTest, TestSema10017) {
@@ -200,23 +216,6 @@ TEST_F(SemaTest, TestSema10022) {
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10022);
 }
 
-TEST_F(SemaTest, TestSema10059) {
-    const auto code = R"(
-    interface Type1 {
-        a: Int
-    }
-    interface Type2 {
-        implements: Type1
-        a: Int
-    }
-    main() {}
-    )";
-    app.parseSrcFile(code);
-    app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10059);
-}
-
 TEST_F(SemaTest, TestSema10046) {
     const auto code = R"(
     object Obj {
@@ -240,4 +239,32 @@ TEST_F(SemaTest, TestSema10055) {
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10055);
+}
+
+TEST_F(SemaTest, TestSema10056A) {
+    const auto code = R"(
+    object Obj {
+        a: Int
+        a: Int
+    }
+    main() {}
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 1);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, 10056);
+}
+
+TEST_F(SemaTest, TestSema10056B) {
+    const auto code = R"(
+    object Obj {
+        a: Int
+        a() {}
+    }
+    main() {}
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 1);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, 10056);
 }

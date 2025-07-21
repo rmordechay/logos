@@ -179,7 +179,11 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
     for (int i = 0; i < ctx->field().size(); ++i) {
         const auto lgsField = getField(ctx->field(i), obj->name);
         lgsField->position = i;
-        obj->fields[lgsField->name] = lgsField;
+        const auto fieldAdded = obj->addField(lgsField);
+        if (!fieldAdded) {
+            errHandler.handleError(E10056, &obj->location, {obj->name, lgsField->name});
+            continue;
+        }
     }
     for (const auto& func : ctx->methodImplementation()) {
         const auto methodName = func->funcSignature()->IDENTIFIER()->getText();
@@ -187,7 +191,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
         const auto methodAdded = obj->addMethod(method);
         if (!methodAdded) {
             errHandler.handleError(E10056, &obj->location, {obj->name, methodName});
-            return nullptr;
+            continue;
         }
     }
     if (ctx->implements()) {
