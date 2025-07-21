@@ -4,10 +4,7 @@
 #include "logos/Platform.h"
 #include "utils/LgsUtils.h"
 
-void CodeGenerator::init(const LgsPaths& paths) {
-    // build dir
-    if (exists(paths.buildDir)) remove_all(paths.buildDir);
-    create_directories(paths.buildDir);
+void CodeGenerator::initLLVM() {
     // LLVM
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();

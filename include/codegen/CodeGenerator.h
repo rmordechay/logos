@@ -6,7 +6,7 @@ class LgsApp;
 
 class CodeGenerator {
 public:
-    static void init(const LgsPaths& paths);
+    static void initLLVM();
     static void writeIRToFile(map<string, LgsModule*>& modules, LgsPaths& paths);
     ~CodeGenerator() = default;
 };

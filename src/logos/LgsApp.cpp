@@ -90,7 +90,10 @@ bool LgsApp::analyse() {
 }
 
 bool LgsApp::generate() {
-    CodeGenerator::init(paths);
+    // build dir
+    if (exists(paths.buildDir)) remove_all(paths.buildDir);
+    create_directories(paths.buildDir);
+    CodeGenerator::initLLVM();
     ThreadPool threadPool;
     for (const auto& file : files) {
         threadPool.runTask([file, this] {
