@@ -98,17 +98,17 @@ LgsParam& LgsFunc::getReturnSwapParam() const {
 
 void LgsFunc::swapReturnIfNeeded() const {
     if (funcType->rt->isPrimitive) return;
-    auto isEqual = true;
-    // Check if there are different return expressions to check if a swap is possible
+    // Check if there are different return expressions in order to check whether a swap is possible
+    auto sameReturnExprs = true;
     for (const auto expr1 : returnExprs) {
         for (const auto expr2 : returnExprs) {
             if (expr1 == expr2) continue;
             if (expr1->equals(expr2)) continue;
-            isEqual = false;
+            sameReturnExprs = false;
             break;
         }
     }
-    if (funcType->isBigType && isEqual) {
+    if (funcType->isBigType && sameReturnExprs) {
         funcType->isSwapReturn = true;
         funcType->returnParamIndex = funcType->isMethod && !funcType->isStaticMethod;
         funcType->params.insert(funcType->params.begin(), LgsParam(funcType->rt));

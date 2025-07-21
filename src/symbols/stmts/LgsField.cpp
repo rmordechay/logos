@@ -6,9 +6,9 @@ Value* LgsField::getGEP(LgsModule* module, Type* parentType, Value* instance) co
     return module->builder.CreateStructGEP(parentType, instance, position);
 }
 
-void LgsField::storeIRValue(LgsModule* module, Type* parentType, Value* parentIRValue, LgsExpr* expr) const {
-    const auto exprIRValue = expr->getIRValue(module);
-    module->builder.CreateStore(exprIRValue, getGEP(module, parentType, parentIRValue));
+void LgsField::storeIRValue(LgsModule* module, Value* parentIRValue, LgsExpr* value) const {
+    const auto exprIRValue = value->getIRValue(module);
+    module->builder.CreateStore(exprIRValue, parentIRValue);
 }
 
 void LgsField::setZeroValue(LgsModule* module, Type* parentType, Value* parentIRValue) const {

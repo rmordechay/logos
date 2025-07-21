@@ -40,7 +40,7 @@ public:
     LgsFile* file = nullptr;
 
     explicit LgsASTVisitor(LgsFile* file) : file(file) {}
-    virtual void start() = 0;
+    virtual void analyse() = 0;
     virtual void visitMainFile(LgsMainFile* mainFile) = 0;
     virtual void visitObject(LgsObject* obj) = 0;
     virtual void visitInterface(LgsInterface* interface) = 0;

@@ -42,6 +42,7 @@ public:
     bool validate();
     bool parse();
     bool analyse();
+    void createBuildDir() const;
     bool generate();
     bool link() const;
     void parseSrcFile(const string& codeText, path filePath = "");

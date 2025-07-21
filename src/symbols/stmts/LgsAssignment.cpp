@@ -78,7 +78,7 @@ void LgsAssignment::assignToSelection(LgsModule* module, const LgsSelection* sel
         switch (var->ref.symbolType) {
         case FIELD: {
             const auto parentIRValue = parentExpr->getIRValue(module);
-            var->ref.field->storeIRValue(module, parentExpr->type->getIRType(module->context), parentIRValue, expr);
+            var->ref.field->storeIRValue(module, parentIRValue, expr);
             return;
         }
         case UNKNOWN: default:

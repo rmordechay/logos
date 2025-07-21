@@ -44,7 +44,7 @@ public:
     LgsErrHandler errHandler;
 
     explicit SemaAnalyser(LgsFile* file) : LgsASTVisitor(file) {}
-    void start() override;
+    void analyse() override;
     void visitMainFile(LgsMainFile* mainFile) override;
     void visitObject(LgsObject* obj) override;
     void visitInterface(LgsInterface* interface) override;

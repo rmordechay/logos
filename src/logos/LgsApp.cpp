@@ -72,10 +72,10 @@ bool LgsApp::parse() {
 bool LgsApp::analyse() {
     if (!resolveGlobalTypes()) handleExitWithErrors();
     ThreadPool threadPool;
-    for (const auto& file : files) {
+    for (const auto file : files) {
         threadPool.runTask([file, this] {
             SemaAnalyser semaAnalyser(file);
-            semaAnalyser.start();
+            semaAnalyser.analyse();
             if (!semaAnalyser.errHandler.successful) {
                 const auto errors = semaAnalyser.errHandler.errors;
                 lock_guard lock(mtx);
@@ -91,8 +91,7 @@ bool LgsApp::analyse() {
 
 bool LgsApp::generate() {
     // build dir
-    if (exists(paths.buildDir)) remove_all(paths.buildDir);
-    create_directories(paths.buildDir);
+    createBuildDir();
     CodeGenerator::initLLVM();
     ThreadPool threadPool;
     for (const auto& file : files) {
@@ -296,6 +295,11 @@ void LgsApp::handleExitWithErrors() const {
 
 bool LgsApp::isLogosFile(const directory_entry& entry) const {
     return entry.is_regular_file() && entry.path().extension().string() == LOGOS_FILE_EXTENSION;
+}
+
+void LgsApp::createBuildDir() const {
+    if (exists(paths.buildDir)) remove_all(paths.buildDir);
+    create_directories(paths.buildDir);
 }
 
 void LgsApp::addErrors(vector<LgsError> newErrors) {

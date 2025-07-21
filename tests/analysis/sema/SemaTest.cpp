@@ -51,7 +51,7 @@ TEST_F(SemaTest, TestSema10004) {
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10004);
 }
 
-TEST_F(SemaTest, TestSema10005) {
+TEST_F(SemaTest, TestSema10005A) {
     const auto code = R"(
     object Obj {
         b: Int
@@ -59,6 +59,21 @@ TEST_F(SemaTest, TestSema10005) {
     main() {
         obj = Obj{}
         a = obj.a
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 1);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, 10005);
+}
+
+TEST_F(SemaTest, TestSema10005B) {
+    const auto code = R"(
+    object Obj {
+        a: Int
+    }
+    main() {
+        obj = Obj{a = 3487, b = 234}
     }
     )";
     app.parseSrcFile(code);

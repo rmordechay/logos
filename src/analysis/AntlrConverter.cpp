@@ -176,6 +176,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
     obj->setLocation(ctx->start, ctx->stop, filePath);
     if (isNameBuiltin(obj->name, &obj->location)) return nullptr;
     obj->isSingleton = isSingleton;
+    // Fields
     for (int i = 0; i < ctx->field().size(); ++i) {
         const auto lgsField = getField(ctx->field(i), obj->name);
         lgsField->position = i;
@@ -185,6 +186,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
             continue;
         }
     }
+    // Methods
     for (const auto& func : ctx->methodImplementation()) {
         const auto methodName = func->funcSignature()->IDENTIFIER()->getText();
         const auto method = getMethodImpl(func, obj);
@@ -194,6 +196,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
             continue;
         }
     }
+    // Interfaces
     if (ctx->implements()) {
         for (const auto& type : ctx->implements()->IDENTIFIER()) {
             auto implementType = getTypeFromText(type);

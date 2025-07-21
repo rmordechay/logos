@@ -16,7 +16,7 @@ Value* LgsInstance::createIRValue(LgsModule* module) {
     for (const auto& [fieldName, field] : obj->fields) {
         auto arg = args.find(fieldName);
         if (arg != args.end()) {
-            field->storeIRValue(module, obj->getIRType(module->context), IRValue, arg->second->expr);
+            field->storeIRValue(module, IRValue, arg->second->expr);
         } else {
             field->setZeroValue(module, obj->getIRType(module->context), IRValue);
         }
@@ -31,7 +31,7 @@ void LgsInstance::setZeroField(LgsModule* module, const LgsField* field, Value* 
             setZeroField(module, field, parentIRValue);
         }
     } else {
-        field->storeIRValue(module, obj->getIRType(module->context), parentIRValue, field->expr);
+        field->storeIRValue(module, parentIRValue, field->expr);
     }
 }
 

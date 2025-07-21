@@ -40,7 +40,7 @@
 #include <stmts/LgsAssignment.h>
 #include <stmts/LgsIfStmt.h>
 
-void SemaAnalyser::start() {
+void SemaAnalyser::analyse() {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
@@ -1058,11 +1058,11 @@ void SemaAnalyser::resolveGroupTypes(LgsGroup* group) {
 }
 
 void SemaAnalyser::reprocessFuncs(const vector<LgsFile*>& files) {
-    for (const auto& file : files) {
+    for (const auto file : files) {
         SemaAnalyser semaAnalyser(file);
         if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
-            for (const auto& obj : mainFile->objects) {
-                for (const auto& [_, method] : obj->methods) {
+            for (const auto obj : mainFile->objects) {
+                for (const auto [_, method] : obj->methods) {
                     method->swapReturnIfNeeded();
                 }
             }
@@ -1071,11 +1071,11 @@ void SemaAnalyser::reprocessFuncs(const vector<LgsFile*>& files) {
             }
         } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
             const auto obj = objFile->obj;
-            for (const auto& [_, method] : obj->methods) {
+            for (const auto [_, method] : obj->methods) {
                 method->swapReturnIfNeeded();
             }
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            for (const auto& [_, method] : interfaceFile->interface->methods) {
+            for (const auto [_, method] : interfaceFile->interface->methods) {
                 method->swapReturnIfNeeded();
             }
         }
