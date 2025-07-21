@@ -200,6 +200,23 @@ TEST_F(SemaTest, TestSema10022) {
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10022);
 }
 
+TEST_F(SemaTest, TestSema10059) {
+    const auto code = R"(
+    interface Type1 {
+        a: Int
+    }
+    interface Type2 {
+        implements: Type1
+        a: Int
+    }
+    main() {}
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 1);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, 10059);
+}
+
 TEST_F(SemaTest, TestSema10046) {
     const auto code = R"(
     object Obj {

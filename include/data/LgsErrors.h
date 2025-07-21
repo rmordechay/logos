@@ -33,7 +33,7 @@ inline LgsError E10021{.msg = "", .errCode = errCodeStart++};
 inline LgsError E10022{.msg = "'%s' cannot be instantiated.", .errCode = errCodeStart++};
 inline LgsError E10023{.msg = "Type '%s' must be nullable. Change the type to '%s?' or set a value.", .errCode = errCodeStart++};
 inline LgsError E10024{.msg = "Declaration of null value must have an explict nullable type.", .errCode = errCodeStart++};
-inline LgsError E10025{.msg = "Object can only implements interface. Given: '%s'.", .errCode = errCodeStart++};
+inline LgsError E10025{.msg = "Only interfaces are allowed in 'implements'. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10026{.msg = "Function '%s' must return expression of type '%s'. None was given.", .errCode = errCodeStart++};
 inline LgsError E10027{.msg = "Void function must not return a value. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10028{.msg = "Default parameters must be defined lastly.", .errCode = errCodeStart++};
@@ -67,3 +67,4 @@ inline LgsError E10055{.msg = "Function '%s' must return from all its paths.", .
 inline LgsError E10056{.msg = "Object '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
 inline LgsError E10057{.msg = "Pattern matching expression '%s' must be of type Bool.", .errCode = errCodeStart++};
 inline LgsError E10058{.msg = "'%s' has no type.", .errCode = errCodeStart++};
+inline LgsError E10059{.msg = "Field '%s' is defined in multiple interfaces: '%s'.", .errCode = errCodeStart++};

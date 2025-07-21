@@ -43,7 +43,7 @@ public:
     virtual void start() = 0;
     virtual void visitMainFile(LgsMainFile* mainFile) = 0;
     virtual void visitObject(LgsObject* obj) = 0;
-    virtual void visitInterface(LgsInterface* interface) const = 0;
+    virtual void visitInterface(LgsInterface* interface) = 0;
     virtual void visitField(LgsField* field) = 0;
     virtual void visitFunc(LgsFunc* func) = 0;
     virtual void visitParam(LgsParam* param) = 0;

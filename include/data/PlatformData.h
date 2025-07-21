@@ -39,7 +39,7 @@
         LINKER, \
         "-lSystem", \
         "-syslibroot", CLIB_ROOT, \
-        "../stdlib/lgslib.a", \
+        "stdlib/liblgslib.a", \
         "-platform_version", OS_NAME, PLATFORM_VERSION, PLATFORM_VERSION, \
         "-arch", ARCH_NAME, \
     }

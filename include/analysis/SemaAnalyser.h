@@ -46,9 +46,9 @@ public:
     explicit SemaAnalyser(LgsFile* file) : LgsASTVisitor(file) {}
     void start() override;
     void visitMainFile(LgsMainFile* mainFile) override;
-    void validateObjImplements(LgsObject* obj);
+    void validateSomething(LgsType* obj, const vector<LgsType*>& interfaces);
     void visitObject(LgsObject* obj) override;
-    void visitInterface(LgsInterface* interface) const override;
+    void visitInterface(LgsInterface* interface) override;
     void visitField(LgsField* field) override;
     void visitFunc(LgsFunc* func) override;
     void visitParam(LgsParam* param) override;
@@ -96,7 +96,7 @@ public:
     void setZeroField(LgsField* field) const;
     bool setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
 
-    void validateImplements(LgsObject* obj, LgsInterface* interface);
+    void validateImplements(LgsType* obj, LgsInterface* interface);
     void validateExprType(LgsExpr* expr, LgsType* type);
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
@@ -118,5 +118,3 @@ public:
     string getMissingImplementsStr(const vector<LgsField*>& fields, const vector<LgsFunc*>& methods) const;
     ~SemaAnalyser() override = default;
 };
-
-

@@ -65,6 +65,21 @@ void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
     }
 }
 
+void SemaAnalyser::validateSomething(LgsType* obj, const vector<LgsType*>& interfaces) {
+    for (int i = 0; i < interfaces.size(); ++i) {
+        const auto implementsInterface = interfaces[i];
+        const auto interface = implementsInterface->asInterface();
+        if (!interface) {
+            errHandler.handleError(E10025, &implementsInterface->location, {implementsInterface->prettyName()});
+            continue;
+        }
+        validateImplements(obj, interface);
+        for (const auto parentInterface: interface->interfaces) {
+            validateImplements(obj, parentInterface->asInterface());
+        }
+    }
+}
+
 void SemaAnalyser::visitObject(LgsObject* obj) {
     for (const auto& [_, field] : obj->fields) {
         visitField(field);
@@ -73,10 +88,29 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
         visitFunc(method);
         method->funcType->isStaticMethod = obj->isSingleton;
     }
-    validateObjImplements(obj);
+    for (const auto interface : obj->interfaces) {
+        visitInterface(interface->asInterface());
+    }
+    validateSomething(obj, obj->interfaces);
 }
 
-void SemaAnalyser::visitInterface(LgsInterface* interface) const {}
+void SemaAnalyser::visitInterface(LgsInterface* interface) {
+    // unordered_set<string> sameNames;
+    // for (auto [name, _] : interface->fields) {
+    //     sameNames.insert(name);
+    //     if (sameNames.count(name)) {
+    //         return errHandler.handleError(E10059, &interface->location, {name});
+    //     }
+    // }
+    // for (const auto parentInterface : interface->interfaces) {
+    //     for (auto [name, _] : parentInterface->fields) {
+    //         sameNames.insert(name);
+    //         if (sameNames.count(name)) {
+    //             return errHandler.handleError(E10059, &interface->location, {name});
+    //         }
+    //     }
+    // }
+}
 
 void SemaAnalyser::visitFunc(LgsFunc* func) {
     stack.enterFunc(func);
@@ -719,23 +753,7 @@ bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterEx
     return false;
 }
 
-void SemaAnalyser::validateObjImplements(LgsObject* obj) {
-    for (int i = 0; i < obj->interfaces.size(); ++i) {
-        const auto objImplements = obj->interfaces[i];
-        if (!objImplements) continue;
-        const auto interface = objImplements->asInterface();
-        if (!interface) {
-            errHandler.handleError(E10025, &objImplements->location, {objImplements->prettyName()});
-            continue;
-        }
-        validateImplements(obj, interface);
-        for (const auto parentInterface: interface->interfaces) {
-            validateImplements(obj, parentInterface->asInterface());
-        }
-    }
-}
-
-void SemaAnalyser::validateImplements(LgsObject* obj, LgsInterface* interface) {
+void SemaAnalyser::validateImplements(LgsType* obj, LgsInterface* interface) {
     // Fields
     vector<LgsField*> missingFields;
     for (const auto& [name, interfaceField] : interface->fields) {
@@ -763,7 +781,7 @@ void SemaAnalyser::validateImplements(LgsObject* obj, LgsInterface* interface) {
     }
 
     if (!missingMethods.empty() || !missingFields.empty()) {
-        errHandler.handleError(E10016, &obj->location, {obj->name, interface->interfaceName, getMissingImplementsStr(missingFields, missingMethods)});
+        errHandler.handleError(E10016, &obj->location, {obj->prettyName(), interface->interfaceName, getMissingImplementsStr(missingFields, missingMethods)});
     }
 }
 
