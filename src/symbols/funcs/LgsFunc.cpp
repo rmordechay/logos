@@ -2,7 +2,7 @@
 #include "data/LgsDefinitions.h"
 #include "stmts/LgsStmtBlock.h"
 #include "exprs/LgsExpr.h"
-#include "types/LgsArray.h"
+#include "types/LgsDArray.h"
 #include "utils/LgsUtils.h"
 
 void LgsFunc::generateIR(LgsModule* module) {

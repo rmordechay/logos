@@ -4,16 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void resize(Array* arr, const size_t new_size) {
-    if (arr->capacity >= new_size) return;
-    size_t new_capacity = arr->capacity ? arr->capacity : 1;
-    while (new_capacity < new_size) {
-        new_capacity *= 2;
-    }
-    void* new_data = realloc(arr->data, new_capacity * arr->element_size);
+static void resize(Array* arr) {
+    arr->capacity *= 2;
+    void* new_data = realloc(arr->data, arr->capacity * arr->element_size);
     if (!new_data) return;
     arr->data = new_data;
-    arr->capacity = new_capacity;
 }
 
 void Array_init(Array* arr, const size_t capacity, const size_t element_size) {
@@ -24,12 +19,13 @@ void Array_init(Array* arr, const size_t capacity, const size_t element_size) {
     if (!arr->data) exit(1);
 }
 
-void Array_add(Array* arr, const size_t values_count, const void* values) {
-    const size_t required = arr->size + values_count;
-    resize(arr, required);
+void Array_add(Array* arr, const void* value) {
+    if (arr->size == arr->capacity) {
+        resize(arr);
+    }
     void* target = (char*)arr->data + arr->size * arr->element_size;
-    memcpy(target, values, values_count * arr->element_size);
-    arr->size += values_count;
+    memcpy(target, value, arr->element_size);
+    arr->size++;
 }
 
 void* Array_get(const Array* arr, const size_t index) {

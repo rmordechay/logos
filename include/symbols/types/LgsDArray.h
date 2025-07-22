@@ -9,12 +9,12 @@
 
 class LgsArrayAddFunc final : public LgsBuiltinFunc {
 public:
-    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName(), {parent, &LGS_ANY}, true, true) {}
+    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName(), {parent, &LGS_ANY}, true) {}
     Value* call(LgsModule* module, const vector<LgsExpr*>& args) override;
     ~LgsArrayAddFunc() override = default;
 };
 
-class LgsArray final : public LgsIterable {
+class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "Array";
     StructType* arrStruct = nullptr;
@@ -28,7 +28,7 @@ public:
     LgsBuiltinFunc deleteFunc{"delete", &LGS_VOID, name, {this, &LGS_LONG}};
     LgsBuiltinFunc freeFunc{"free", &LGS_VOID, name, {this}};
 
-    explicit LgsArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
+    explicit LgsDArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         unpackLength = 1;
         addMethod(&addFunc);
         addMethod(&lenFunc);
@@ -50,5 +50,5 @@ public:
     Value* isNotEmpty(LgsModule* module, LgsExpr* expr) override;
     StructType* getArrStruct(LLVMContext& context);
     bool equals(LgsType* other) override;
-    ~LgsArray() override;
+    ~LgsDArray() override;
 };

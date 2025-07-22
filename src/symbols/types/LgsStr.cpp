@@ -4,8 +4,7 @@
 #include "stmts/LgsVarDec.h"
 
 size_t LgsStr::getSizeBytes() {
-    if (isStatic) return iterLen + 1;
-    return sizeof(void*);
+    return iterLen + 1;
 }
 
 string LgsStr::getIRName() {
@@ -13,8 +12,7 @@ string LgsStr::getIRName() {
 }
 
 Type* LgsStr::getIRType(LLVMContext& context) {
-    if (isStatic) return ArrayType::get(baseType->getIRType(context), iterLen);
-    return ptrTy(context);
+    return ArrayType::get(baseType->getIRType(context), iterLen);
 }
 
 string LgsStr::prettyName() const {

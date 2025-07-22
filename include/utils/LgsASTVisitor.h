@@ -3,7 +3,7 @@
 #include "files/LgsInterfaceFile.h"
 
 class LgsFuncType;
-class LgsArray;
+class LgsDArray;
 class LgsValue;
 class LgsVariable;
 class LgsUnaryExpr;

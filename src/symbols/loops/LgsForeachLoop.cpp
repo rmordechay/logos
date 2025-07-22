@@ -4,7 +4,7 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "stmts/LgsVarDec.h"
 #include "stmts/LgsStmtBlock.h"
-#include "types/LgsArray.h"
+#include "types/LgsDArray.h"
 #include "types/LgsIterator.h"
 #include "types/LgsMap.h"
 
@@ -49,7 +49,7 @@ void LgsForeachLoop::initIRLoop(LgsModule* module) {
     iterPtr = iterExpr->getIRValue(module);
     if (const auto str = iterable->asStr()) {
         setStrIterVars(module, str);
-    } else if (const auto arr = iterable->asArray()) {
+    } else if (const auto arr = iterable->asDArray()) {
         setArrIterVars(module, arr);
     } else {
         assert(0);
@@ -66,21 +66,17 @@ void LgsForeachLoop::exitIRLoop(LgsModule* module) const {
 }
 
 void LgsForeachLoop::setStrIterVars(LgsModule* module, LgsStr* str) const {
-    if (str->isStatic) {
-        const auto i = module->builder.CreateLoad(module->builder.getInt64Ty(), iPtr);
-        const auto gep = module->builder.CreateGEP(str->getIRType(module->context), iterPtr, {module->builder.getInt32(0), i});
-        const auto load = module->builder.CreateLoad(module->builder.getInt8Ty(), gep);
-        if (withIndex) {
-            loopVars[0]->setIRValue(loadIPtr(module));
-        }
-        loopVars[0 + withIndex]->setIRValue(load);
-    } else {
-        assert(0);
+    const auto i = module->builder.CreateLoad(module->builder.getInt64Ty(), iPtr);
+    const auto gep = module->builder.CreateGEP(str->getIRType(module->context), iterPtr, {module->builder.getInt32(0), i});
+    const auto load = module->builder.CreateLoad(module->builder.getInt8Ty(), gep);
+    if (withIndex) {
+        loopVars[0]->setIRValue(loadIPtr(module));
     }
+    loopVars[0 + withIndex]->setIRValue(load);
 }
 
-void LgsForeachLoop::setArrIterVars(LgsModule* module, LgsArray* arr) const {
-    if (arr->isStatic) {
+void LgsForeachLoop::setArrIterVars(LgsModule* module, LgsDArray* arr) const {
+    if (arr->asSArray()) {
         const auto i = module->builder.CreateLoad(module->builder.getInt64Ty(), iPtr);
         const auto gep = module->builder.CreateGEP(arr->getIRType(module->context), iterPtr, {module->builder.getInt32(0), i});
         if (withIndex) {

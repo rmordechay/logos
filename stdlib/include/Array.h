@@ -11,7 +11,7 @@ typedef struct {
 } Array;
 
 void Array_init(Array* arr, size_t capacity, size_t element_size);
-void Array_add(Array* arr, size_t values_count, const void* values);
+void Array_add(Array* arr, const void* value);
 void* Array_get(const Array* arr, size_t index);
 size_t Array_len(const Array* arr);
 bool Array_isEmpty(const Array* arr);

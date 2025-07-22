@@ -2,6 +2,7 @@
 
 #include "LgsLocation.h"
 
+class LgsSArray;
 class LgsNullable;
 class LgsPtr;
 class LgsUInt;
@@ -17,7 +18,7 @@ class LgsObject;
 class LgsBool;
 class LgsMap;
 class LgsInt;
-class LgsArray;
+class LgsDArray;
 class LgsIterable;
 class LgsStr;
 class LgsExpr;
@@ -58,7 +59,8 @@ public:
     LgsObject* asObject();
     LgsInterface* asInterface();
     LgsIterable* asIterable();
-    LgsArray* asArray();
+    LgsDArray* asDArray();
+    LgsSArray* asSArray();
     LgsFuncType* asFuncType();
     LgsGroup* asGroup();
     LgsTypePair* asPair();

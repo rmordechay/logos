@@ -1,11 +1,12 @@
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
-#include "types/LgsArray.h"
+#include "types/LgsDArray.h"
 #include "types/LgsGroup.h"
 #include "types/LgsMap.h"
 #include "types/LgsNullable.h"
 #include "types/LgsPtr.h"
+#include "types/LgsSArray.h"
 #include "types/LgsUnknownType.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsUInt.h"
@@ -70,7 +71,8 @@ LgsObject* LgsType::asObject() { return dynamic_cast<LgsObject*>(this); }
 LgsNullable* LgsType::asNullable() { return dynamic_cast<LgsNullable*>(this); }
 LgsInterface* LgsType::asInterface() { return dynamic_cast<LgsInterface*>(this); }
 LgsIterable* LgsType::asIterable() { return dynamic_cast<LgsIterable*>(this); }
-LgsArray* LgsType::asArray() { return dynamic_cast<LgsArray*>(this); }
+LgsDArray* LgsType::asDArray() { return dynamic_cast<LgsDArray*>(this); }
+LgsSArray* LgsType::asSArray() { return dynamic_cast<LgsSArray*>(this); }
 LgsMap* LgsType::asMap() { return dynamic_cast<LgsMap*>(this); }
 LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
 LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }

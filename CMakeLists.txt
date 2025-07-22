@@ -13,6 +13,7 @@ set(SOURCE_FILES
     src/logos/LgsLinker.cpp
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
+    src/analysis/PostAnalyser.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsFormatCmd.cpp
     src/cli/LgsGenerateCmd.cpp
@@ -27,6 +28,12 @@ set(SOURCE_FILES
     src/utils/ThreadPool.cpp
     src/utils/LgsLogger.cpp
 
+    src/symbols/LgsSymbol.cpp
+    src/symbols/LgsValue.cpp
+    src/symbols/LgsSymbolTable.cpp
+    src/symbols/exprs/LgsBinaryExpr.cpp
+    src/symbols/exprs/unary/LgsCast.cpp
+    src/symbols/exprs/LgsExpr.cpp
     src/symbols/exprs/unary/constants/LgsBoolConst.cpp
     src/symbols/exprs/unary/constants/LgsCharConst.cpp
     src/symbols/exprs/unary/constants/LgsFloatConst.cpp
@@ -35,6 +42,7 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/constants/LgsShortConst.cpp
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
     src/symbols/exprs/unary/constants/LgsTypeConst.cpp
+    src/symbols/exprs/unary/constants/LgsUIntConst.cpp
     src/symbols/exprs/unary/LgsArrayExpr.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
     src/symbols/exprs/unary/LgsHashMap.cpp
@@ -42,9 +50,9 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/LgsIterIndex.cpp
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
-    src/symbols/exprs/LgsBinaryExpr.cpp
-    src/symbols/exprs/unary/LgsCast.cpp
-    src/symbols/exprs/LgsExpr.cpp
+    src/symbols/exprs/unary/LgsEnumField.cpp
+    src/symbols/exprs/unary/LgsPostfixExpr.cpp
+    src/symbols/exprs/unary/LgsPrefixExpr.cpp
     src/symbols/funcs/LgsFunc.cpp
     src/symbols/funcs/LgsMainFunc.cpp
     src/symbols/funcs/LgsParam.cpp
@@ -71,7 +79,8 @@ set(SOURCE_FILES
     src/symbols/types/primitives/LgsSize.cpp
     src/symbols/types/primitives/LgsVoid.cpp
     src/symbols/types/LgsAny.cpp
-    src/symbols/types/LgsArray.cpp
+    src/symbols/types/LgsDArray.cpp
+    src/symbols/types/LgsSArray.cpp
     src/symbols/types/LgsEnum.cpp
     src/symbols/types/LgsFuncType.cpp
     src/symbols/types/LgsGroup.cpp
@@ -81,24 +90,16 @@ set(SOURCE_FILES
     src/symbols/types/LgsStr.cpp
     src/symbols/types/LgsType.cpp
     src/symbols/types/LgsUnknownType.cpp
-    src/symbols/LgsSymbol.cpp
-    src/symbols/LgsValue.cpp
-    src/symbols/exprs/unary/LgsPostfixExpr.cpp
-    src/symbols/LgsSymbolTable.cpp
     src/symbols/types/primitives/LgsUInt.cpp
-    src/symbols/exprs/unary/constants/LgsUIntConst.cpp
     src/symbols/types/LgsIterator.cpp
-    src/symbols/exprs/unary/LgsEnumField.cpp
-    src/symbols/exprs/unary/LgsPrefixExpr.cpp
     src/symbols/types/LgsPtr.cpp
     src/symbols/types/LgsNullable.cpp
-    src/analysis/PostAnalyser.cpp
-    include/analysis/PostAnalyser.h
 )
 
 add_subdirectory(stdlib)
 add_library(lib ${SOURCE_FILES})
 target_precompile_headers(lib PRIVATE include/pch.h)
+target_link_libraries(lib PRIVATE lgslib)
 
 target_include_directories(lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include

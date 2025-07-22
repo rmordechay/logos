@@ -34,5 +34,4 @@ void Runtime_print_stack(const Runtime* runtime) {
 
 void initArgs(Array* arr, const int argc, char** argv) {
     Array_init(arr, argc, sizeof(char*));
-    Array_add(arr, argc, argv);
 }

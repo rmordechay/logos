@@ -8,7 +8,10 @@
 
 Value* LgsIterIndex::createIRValue(LgsModule* module) {
     const auto baseExprType = baseExpr->type;
-    if (const auto arr = baseExprType->asArray()) {
+    if (baseExprType->asSArray()) {
+        return getArrGEP(module);
+    }
+    if (const auto arr = baseExprType->asDArray()) {
         return getIRFromArray(module, arr);
     }
     if (const auto map = baseExprType->asMap()) {
@@ -22,22 +25,15 @@ Value* LgsIterIndex::createIRValue(LgsModule* module) {
 
 Value* LgsIterIndex::getIRFromStr(LgsModule* module, LgsStr* str) const {
     if (index->to) return getStrSlice(module, str);
-    if (str->isStatic) return getStrGEP(module);
     const auto baseExprIRValue = baseExpr->getIRValue(module);
     const auto baseExprIRType = baseExpr->type->getIRType(module->context);
-    if (str->isStatic) {
-        const auto ty = str->getIRType(module->context);
-        const auto valueFrom = index->from->getIRValue(module);
-        return module->builder.CreateGEP(ty, baseExprIRValue, {module->builder.getInt32(0), valueFrom});
-    }
     const auto ptr = module->builder.CreateAlloca(baseExprIRType);
     const auto vaArgInst = module->builder.CreateVAArg(baseExprIRValue, baseExprIRType);
     module->builder.CreateStore(vaArgInst, ptr);
     return module->builder.CreateLoad(baseExprIRType, ptr);
 }
 
-Value* LgsIterIndex::getIRFromArray(LgsModule* module, LgsArray* arr) const {
-    if (arr->isStatic) return getArrGEP(module);
+Value* LgsIterIndex::getIRFromArray(LgsModule* module, LgsDArray* arr) const {
     auto& builder = module->builder;
     const auto arrPtr = baseExpr->getIRValue(module);
     auto indexIRValue = index->from->getIRValue(module);
@@ -56,13 +52,10 @@ Value* LgsIterIndex::getIRFromMap(LgsModule* module, LgsMap* map) const {
 }
 
 Value* LgsIterIndex::getStrSlice(LgsModule* module, const LgsStr* str) const {
-    if (str->isStatic) {
-        const auto intFrom = index->from->asIntConst();
-        const auto intTo = index->to->asIntConst();
-        const auto strConst = baseExpr->getConstStr();
-        return getIRStr(module, strConst.substr(intFrom->value, intTo->value));
-    }
-    assert(0);
+    const auto intFrom = index->from->asIntConst();
+    const auto intTo = index->to->asIntConst();
+    const auto strConst = baseExpr->getConstStr();
+    return getIRStr(module, strConst.substr(intFrom->value, intTo->value));
 }
 
 Value* LgsIterIndex::getStrGEP(LgsModule* module) const {

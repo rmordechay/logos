@@ -3,7 +3,7 @@
 #include <LgsValue.h>
 
 class LgsMap;
-class LgsArray;
+class LgsDArray;
 struct LgsIndex;
 
 class LgsIterIndex final : public LgsUnaryExpr {
@@ -14,7 +14,7 @@ public:
     explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {}
     Value* createIRValue(LgsModule* module) override;
     Value* getArrGEP(LgsModule* module) const;
-    Value* getIRFromArray(LgsModule* module, LgsArray* arr) const;
+    Value* getIRFromArray(LgsModule* module, LgsDArray* arr) const;
     Value* getIRFromMap(LgsModule* module, LgsMap* map) const;
     Value* getIRFromStr(LgsModule* module, LgsStr* str) const;
     Value* getStrSlice(LgsModule* module, const LgsStr* str) const;

@@ -5,7 +5,7 @@
 #include "loops/LgsInfiniteLoop.h"
 
 class LgsPrefixExpr;
-class LgsArray;
+class LgsDArray;
 class LgsGroup;
 class LgsValue;
 class LgsVariable;

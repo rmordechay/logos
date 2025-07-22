@@ -11,7 +11,7 @@ public:
     LgsUnaryExpr* iterExpr = nullptr;
 
     explicit LgsForeachLoop(LgsUnaryExpr* iterable) : iterExpr(iterable) {}
-    void setArrIterVars(LgsModule* module, LgsArray* arr) const;
+    void setArrIterVars(LgsModule* module, LgsDArray* arr) const;
     void setMapIterVars(LgsModule* module, const LgsIterator& iterator) const;
     void setStrIterVars(LgsModule* module, LgsStr* str) const;
     void setLoopCondition(LgsModule* module);

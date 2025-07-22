@@ -40,7 +40,7 @@
 #include "stmts/LgsIfStmt.h"
 #include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsArray.h"
+#include "types/LgsDArray.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsMap.h"
@@ -262,7 +262,7 @@ bool AntlerConverter::setMainArgsParam(const LgsMainFunc* mainFunc, LogosParser:
     const auto expr = getExpr(param->expr());
     auto lgsParam = LgsParam(getType(type), variableName, expr);
     lgsParam.setLocation(param->start, param->stop, filePath);
-    const auto arr = lgsParam.type->asArray();
+    const auto arr = lgsParam.type->asDArray();
     mainFunc->funcType->params.push_back(lgsParam);
     return arr && arr->baseType->asStr();
 }
@@ -672,8 +672,12 @@ LgsPostfixExpr* AntlerConverter::getPostfixExpr(LogosParser::PostfixExprContext*
 
 LgsUnaryExpr* AntlerConverter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {
     const auto array = new LgsArrayExpr();
-    const auto arrType = array->type->asArray();
-    arrType->isStatic = !!ctx->EXCLA_MARK();
+    LgsIterable* arrType;
+    if (ctx->EXCLA_MARK()) {
+        arrType = array->type->asSArray();
+    } else {
+        arrType = array->type->asDArray();
+    }
     arrType->iterLen = ctx->expr().size();
     arrType->sizeExpr = new LgsIntConst(arrType->iterLen);
     for (const auto expr : ctx->expr()) {
@@ -911,8 +915,12 @@ LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
     LgsType* type = getType(ctx->baseType);
     auto dims = ctx->arraySize();
     for (auto it = dims.rbegin(); it != dims.rend(); ++it) {
-        const auto array = new LgsArray(type);
-        array->isStatic = !!ctx->EXCLA_MARK();
+        LgsIterable* array;
+        if (ctx->EXCLA_MARK()) {
+            array = new LgsSArray(type);
+        } else {
+            array = new LgsDArray(type);
+        }
         if (const auto sizeExpr = (*it)->expr()) {
             array->sizeExpr = getExpr(sizeExpr);
         }

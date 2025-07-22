@@ -29,7 +29,7 @@
 #include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsVarDec.h"
-#include "types/LgsArray.h"
+#include "types/LgsDArray.h"
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsNullable.h"
@@ -350,22 +350,18 @@ void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
 }
 
 void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
-    auto allElementsAreStatic = true;
-    for (const auto element : array->elements) {
-        visitExpr(element);
-        allElementsAreStatic = allElementsAreStatic && element->isStatic;
-    }
-    array->elementsAreStatic = allElementsAreStatic;
-    if (array->type->asArray()->isStatic) {
+    if (array->type->asSArray()) {
         visitStaticArray(array);
-    } else {
+    } else if (array->type->asDArray()) {
         visitDynamicArray(array);
+    } else {
+        assert(0);
     }
 }
 
 void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
     const auto& initialElements = array->elements;
-    const auto arr = array->type->asArray();
+    const auto arr = array->type->asDArray();
     const auto& arrType = arr;
     if (initialElements.empty()) {
         if (!arrType->baseType) return errHandler.handleError(E10049, &array->location);
@@ -379,15 +375,12 @@ void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
 
 void SemaAnalyser::visitStaticArray(const LgsArrayExpr* arrayExpr) {
     const auto& initialElements = arrayExpr->elements;
-    const auto arr = arrayExpr->type->asArray();
+    const auto arr = arrayExpr->type->asSArray();
     if (initialElements.empty() && !arr->baseType) {
         return errHandler.handleError(E10049, &arrayExpr->location);
     }
     for (const auto element : initialElements) {
         visitExpr(element);
-        if (element->type->asArray()) {
-            element->type->asArray()->isStatic = true;
-        }
     }
     if (!arr->baseType) {
         arr->baseType = initialElements.front()->type;
@@ -788,7 +781,7 @@ void SemaAnalyser::validateIndex(LgsIterIndex* iterIndex) {
     if (!iterable->getIndexType()->equals(exprFrom->type)) {
         return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->prettyName(), exprFrom->type->prettyName()});
     }
-    if (iterable->isStatic) {
+    if (iterable->asSArray()) {
         const auto i = exprFrom->getConstInt();
         const auto bound = iterable->iterLen;
         if (i >= bound) {
@@ -802,7 +795,7 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
     const auto exprFrom = iterIndex->index->from;
     const auto exprTo = iterIndex->index->to;
     const auto iterable = baseExpr->type->asIterable();
-    if (iterable->isStatic) {
+    if (iterable->asSArray()) {
         if (exprFrom->getConstInt() > exprTo->getConstInt()) {
             return errHandler.handleError(E10037, &iterIndex->location, {iterIndex->prettyName()});
         }
@@ -1007,7 +1000,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
 void SemaAnalyser::resolveIterable(LgsIterable* iterable) {
     iterable->baseType = resolveType(iterable->baseType);
     visitExpr(iterable->sizeExpr);
-    if (iterable->isStatic) {
+    if (iterable->asSArray()) {
         const auto exprConstNumber = iterable->sizeExpr->getConstInt();
         if (exprConstNumber <= 0) {
             return errHandler.handleError(E10048, &iterable->location, {iterable->prettyName()});

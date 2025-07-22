@@ -43,7 +43,7 @@ TEST_F(SemaTest, TestSema10001) {
     app.parseSrcFile("main() {a: Str = 34}");
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10001);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10001.errCode);
 }
 
 TEST_F(SemaTest, TestSema10002A) {
@@ -56,7 +56,7 @@ TEST_F(SemaTest, TestSema10002A) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10002);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10002.errCode);
 }
 
 TEST_F(SemaTest, TestSema10002B) {
@@ -69,7 +69,7 @@ TEST_F(SemaTest, TestSema10002B) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10002);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10002.errCode);
 }
 
 TEST_F(SemaTest, TestSema10003) {
@@ -82,7 +82,7 @@ TEST_F(SemaTest, TestSema10003) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10003);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10003.errCode);
 }
 
 TEST_F(SemaTest, TestSema10004) {
@@ -94,7 +94,7 @@ TEST_F(SemaTest, TestSema10004) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10004);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10004.errCode);
 }
 
 TEST_F(SemaTest, TestSema10005A) {
@@ -110,7 +110,7 @@ TEST_F(SemaTest, TestSema10005A) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10005);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
 }
 
 TEST_F(SemaTest, TestSema10005B) {
@@ -125,7 +125,7 @@ TEST_F(SemaTest, TestSema10005B) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10005);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
 }
 
 TEST_F(SemaTest, TestSema10006) {
@@ -137,7 +137,7 @@ TEST_F(SemaTest, TestSema10006) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10006);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10006.errCode);
 }
 
 TEST_F(SemaTest, TestSema10011) {
@@ -150,10 +150,10 @@ TEST_F(SemaTest, TestSema10011) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10011);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
 }
 
-TEST_F(SemaTest, TestSema10013) {
+TEST_F(SemaTest, TestSema10013A) {
     const auto code = R"(
     object Obj {a: Int}
     main() {
@@ -164,7 +164,20 @@ TEST_F(SemaTest, TestSema10013) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10013);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10013.errCode);
+}
+
+TEST_F(SemaTest, TestSema10013B) {
+    const auto code = R"(
+    main() {
+        arr: Int[34]!
+        arr.add(2)
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 1);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10013.errCode);
 }
 
 TEST_F(SemaTest, TestSema10014) {
@@ -178,7 +191,7 @@ TEST_F(SemaTest, TestSema10014) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10014);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10014.errCode);
 }
 
 TEST_F(SemaTest, TestSema10015) {
@@ -191,7 +204,7 @@ TEST_F(SemaTest, TestSema10015) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10015);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10015.errCode);
 }
 
 TEST_F(SemaTest, TestSema10016A) {
@@ -212,7 +225,7 @@ TEST_F(SemaTest, TestSema10016A) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10016);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10016.errCode);
 }
 
 TEST_F(SemaTest, TestSema10016B) {
@@ -232,8 +245,8 @@ TEST_F(SemaTest, TestSema10016B) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 2);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10016);
-    ASSERT_EQ(app.errHandler.errors[1].errCode, 10016);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10016.errCode);
+    ASSERT_EQ(app.errHandler.errors[1].errCode, E10016.errCode);
 }
 
 TEST_F(SemaTest, TestSema10017) {
@@ -245,7 +258,7 @@ TEST_F(SemaTest, TestSema10017) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10017);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10017.errCode);
 }
 
 TEST_F(SemaTest, TestSema10022) {
@@ -258,7 +271,7 @@ TEST_F(SemaTest, TestSema10022) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10022);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10022.errCode);
 }
 
 TEST_F(SemaTest, TestSema10042) {
@@ -271,7 +284,7 @@ TEST_F(SemaTest, TestSema10042) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10042);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10042.errCode);
 }
 
 TEST_F(SemaTest, TestSema10046) {
@@ -286,7 +299,7 @@ TEST_F(SemaTest, TestSema10046) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10046);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10046.errCode);
 }
 
 TEST_F(SemaTest, TestSema10048A) {
@@ -301,7 +314,7 @@ TEST_F(SemaTest, TestSema10048A) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10048);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10048.errCode);
 }
 
 TEST_F(SemaTest, TestSema10048B) {
@@ -313,7 +326,7 @@ TEST_F(SemaTest, TestSema10048B) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10048);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10048.errCode);
 }
 
 TEST_F(SemaTest, TestSema10055) {
@@ -323,7 +336,7 @@ TEST_F(SemaTest, TestSema10055) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10055);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10055.errCode);
 }
 
 TEST_F(SemaTest, TestSema10056A) {
@@ -337,7 +350,7 @@ TEST_F(SemaTest, TestSema10056A) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10056);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10056.errCode);
 }
 
 TEST_F(SemaTest, TestSema10056B) {
@@ -351,5 +364,5 @@ TEST_F(SemaTest, TestSema10056B) {
     app.parseSrcFile(code);
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10056);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10056.errCode);
 }

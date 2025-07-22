@@ -4,7 +4,7 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "files/LgsFile.h"
 #include "stmts/LgsField.h"
-#include "types/LgsArray.h"
+#include "types/LgsDArray.h"
 #include "types/LgsObject.h"
 #include "types/LgsPtr.h"
 #include "types/LgsStr.h"
@@ -155,9 +155,8 @@ LgsType* LgsCLangVisitor::mapCArray(const clang::QualType type) {
     const auto arrayType = cast<clang::ConstantArrayType>(type.getTypePtr());
     const auto baseType = mapCType(arrayType->getElementType());
     const auto size = arrayType->getSize().getZExtValue();
-    const auto arr = new LgsArray(baseType);
+    const auto arr = new LgsDArray(baseType);
     arr->sizeExpr = new LgsIntConst(size);
-    arr->isStatic = true;
     return arr;
 }
 

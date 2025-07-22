@@ -21,7 +21,7 @@ inline LgsError E10009{.msg = "Duplicate Main files were found in the project. L
 inline LgsError E10010{.msg = "Path is not a root path of a logos project.", .errCode = errCodeStart++};
 inline LgsError E10011{.msg = "'%s' is already declared at line %s.", .errCode = errCodeStart++};
 inline LgsError E10012{.msg = "", .errCode = errCodeStart++};
-inline LgsError E10013{.msg = "Function '%s' is not a member of '%s'.", .errCode = errCodeStart++};
+inline LgsError E10013{.msg = "Method '%s' is not a member of '%s'.", .errCode = errCodeStart++};
 inline LgsError E10014{.msg = "Expression of type '%s' does not match base type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10015{.msg = "Function with name '%s' was found but it doesn't match the parameters.\n\t   Given:    %s\n\t   Expected: %s", .errCode = errCodeStart++};
 inline LgsError E10016{.msg = "Object '%s' does not fully implement '%s'. Missing fields/methods:%s", .errCode = errCodeStart++};

@@ -102,14 +102,14 @@ void LgsAssignment::storeScalarInIterIndex(LgsModule* module, LgsIterIndex* iter
     const auto baseExpr = iterIndex->baseExpr;
     const auto rIRValue = expr->getIRValue(module);
     const auto baseIRValue = baseExpr->getIRValue(module);
-    if (const auto arr = baseExpr->type->asArray()) {
-        if (!arr->isStatic) {
-            const auto ptr = module->builder.CreateAlloca(expr->type->getIRType(module->context));
-            module->builder.CreateStore(rIRValue, ptr);
-            arr->putFunc.callIR(module, {baseIRValue, iterIndex->index->from->getIRValue(module), ptr});
-        } else {
-            module->builder.CreateStore(rIRValue, iterIndex->getArrGEP(module));
-        }
+    if (const auto arr = baseExpr->type->asDArray()) {
+        const auto ptr = module->builder.CreateAlloca(expr->type->getIRType(module->context));
+        module->builder.CreateStore(rIRValue, ptr);
+        arr->putFunc.callIR(module, {baseIRValue, iterIndex->index->from->getIRValue(module), ptr});
+        return;
+    }
+    if (baseExpr->type->asSArray()) {
+        module->builder.CreateStore(rIRValue, iterIndex->getArrGEP(module));
         return;
     }
     if (const auto map = baseExpr->type->asMap()) {
@@ -126,9 +126,6 @@ void LgsAssignment::storeScalarInIterIndex(LgsModule* module, LgsIterIndex* iter
 }
 
 void LgsAssignment::storeArrayInIterIndex(LgsModule* module, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) const {
-    if (!arr->type->asArray()->isStatic) {
-        return;
-    }
     const auto baseExpr = iterIndex->baseExpr;
     const auto IRType = baseExpr->type->getIRType(module->context);
     const auto arrPtr = baseExpr->getIRValue(module);
