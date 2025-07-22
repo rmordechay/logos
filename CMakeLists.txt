@@ -93,6 +93,8 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/LgsPrefixExpr.cpp
     src/symbols/types/LgsPtr.cpp
     src/symbols/types/LgsNullable.cpp
+    src/analysis/PostAnalyser.cpp
+    include/analysis/PostAnalyser.h
 )
 
 add_subdirectory(stdlib)

@@ -28,7 +28,6 @@ public:
     }
     string prettyName() override;
     void setBigObjAttrs(Function& IRFunc) const;
-    void swapReturnIfNeeded() const;
     LgsParam& getReturnSwapParam() const;
     void setExceptionFuncs(LgsModule* module) const;
     string format(string& tabs) override;

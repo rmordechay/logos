@@ -114,7 +114,6 @@ public:
     void resolveObjTypes(LgsObject* obj);
     void resolveInterfaceTypes(LgsInterface* interface);
     void resolveGroupTypes(LgsGroup* group);
-    static void reprocessFuncs(const vector<LgsFile*>& files);
     string getMissingImplementsStr(const vector<LgsField*>& fields, const vector<LgsFunc*>& methods) const;
     ~SemaAnalyser() override = default;
 };

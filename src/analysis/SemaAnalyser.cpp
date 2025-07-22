@@ -649,8 +649,8 @@ void SemaAnalyser::visitGroup(LgsGroup* group) const {
 
 void SemaAnalyser::castImplicitly(LgsExpr* expr, LgsType* type) const {
     if (expr->type == type) return;
-    freeType(expr->type);
-    expr->type = type;
+    // freeType(expr->type);
+    // expr->type = type;
 }
 
 bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
@@ -961,6 +961,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
         pair->value = resolveType(pair->value);
         return pair;
     }
+
     if (!type->isUnknown()) return type;
     auto typeName = type->prettyName();
     auto symbol = globals.getSymbol(typeName);
@@ -1054,31 +1055,6 @@ void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
 void SemaAnalyser::resolveGroupTypes(LgsGroup* group) {
     for (int i = 0; i < group->types.size(); ++i) {
         group->types[i] = resolveType(group->types[i]);
-    }
-}
-
-void SemaAnalyser::reprocessFuncs(const vector<LgsFile*>& files) {
-    for (const auto file : files) {
-        SemaAnalyser semaAnalyser(file);
-        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
-            for (const auto obj : mainFile->objects) {
-                for (const auto [_, method] : obj->methods) {
-                    method->swapReturnIfNeeded();
-                }
-            }
-            for (const auto [_, func] : mainFile->funcs) {
-                func->swapReturnIfNeeded();
-            }
-        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-            const auto obj = objFile->obj;
-            for (const auto [_, method] : obj->methods) {
-                method->swapReturnIfNeeded();
-            }
-        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            for (const auto [_, method] : interfaceFile->interface->methods) {
-                method->swapReturnIfNeeded();
-            }
-        }
     }
 }
 
