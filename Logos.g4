@@ -73,12 +73,16 @@ implements:
         IMPLEMENTS COLON IDENTIFIER (COMMA IDENTIFIER)? COMMA?
     ;
 
+funcSignatureHeader:
+        IDENTIFIER LPAREN (param (COMMA param)* COMMA?)? RPAREN
+    ;
+
 funcSignature:
-        IDENTIFIER LPAREN (param (COMMA param)* COMMA?)? RPAREN (COLON type)?
+        funcSignatureHeader (COLON type)?
     ;
 
 interfaceFuncSignature:
-        IDENTIFIER LPAREN (param (COMMA param)* COMMA?)? RPAREN QUEST_MARK? (COLON type)?
+        funcSignatureHeader QUEST_MARK? (COLON type)?
     ;
 
 funcImpl:

@@ -6,9 +6,7 @@ class LgsIntConst final : public LgsUnaryExpr {
 public:
     int value;
 
-    explicit LgsIntConst(const int value) : LgsUnaryExpr(&LGS_INT), value(value) {
-        isStatic = true;
-    }
+    explicit LgsIntConst(const int value) : LgsUnaryExpr(&LGS_INT), value(value) {}
     string prettyName() override;
     Value* createIRValue(LgsModule* module) override;
     LgsExpr* convertExpr(LgsType* toType) override;

@@ -1,15 +1,15 @@
-object: MyObject
+object MyObject
 //implements: MyInterface
 
-x: Int
+pub x: Int
 pub y: Int
 
 pub add(): Int {
-    return self.x + self.y
+    return 1
 }
 
 mul(a: Int, b: Int): Int {
-    return a * b
+    return 1
 }
 
 bla(): Str {

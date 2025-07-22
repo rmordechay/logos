@@ -70,7 +70,7 @@ public:
     void visitCast(LgsCast* castExpr) override;
     void visitArrayExpr(LgsArrayExpr* array) override;
     void visitStaticArray(const LgsArrayExpr* arrayExpr);
-    void visitDynamicArray(const LgsArrayExpr* array);
+    void visitDynamicArray(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap) override;
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr) override;
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr) override;
@@ -108,6 +108,7 @@ public:
     void addLocalSymbol(const string& name, const LgsSymbol& newSymbol);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, const LgsType* parentType);
+    void inferBaseType(LgsArrayExpr* array) const;
     LgsType* resolveType(LgsType* type);
     void resolveIterable(LgsIterable* iterable);
     void resolveFuncTypes(LgsFuncType* funcType);

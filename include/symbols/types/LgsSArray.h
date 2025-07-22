@@ -7,6 +7,7 @@
 class LgsSArray final : public LgsIterable {
 public:
     static constexpr auto name = "SArray";
+    size_t initialLength = 0;
     LgsBuiltinFunc lenFunc{"len", &LGS_INT, name, {this}, true};
 
     explicit LgsSArray(LgsType* baseType = nullptr): LgsIterable(baseType) {

@@ -350,6 +350,9 @@ void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
 }
 
 void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
+    for (const auto element : array->initialElements) {
+        visitExpr(element);
+    }
     if (array->type->asSArray()) {
         visitStaticArray(array);
     } else if (array->type->asDArray()) {
@@ -359,22 +362,22 @@ void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
     }
 }
 
-void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
-    const auto& initialElements = array->elements;
-    const auto arr = array->type->asDArray();
-    const auto& arrType = arr;
-    if (initialElements.empty()) {
-        if (!arrType->baseType) return errHandler.handleError(E10049, &array->location);
-    } else {
-        arr->baseType = initialElements.front()->type;
+void SemaAnalyser::visitDynamicArray(LgsArrayExpr* array) {
+    const auto dArr = array->type->asDArray();
+    if (!dArr->sizeExpr) {
+        dArr->sizeExpr = new LgsIntConst(array->initialElements.size());
     }
-    if (!arrType->sizeExpr) {
-        arr->sizeExpr = new LgsIntConst(initialElements.size());
+    if (array->initialElements.empty()) {
+        if (!dArr->baseType) {
+            errHandler.handleError(E10049, &array->location);
+        }
+        return;
     }
+    inferBaseType(array);
 }
 
 void SemaAnalyser::visitStaticArray(const LgsArrayExpr* arrayExpr) {
-    const auto& initialElements = arrayExpr->elements;
+    const auto& initialElements = arrayExpr->initialElements;
     const auto arr = arrayExpr->type->asSArray();
     if (initialElements.empty() && !arr->baseType) {
         return errHandler.handleError(E10049, &arrayExpr->location);
@@ -403,33 +406,28 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     switch (symbol->symbolType) {
     case VAR_DEC:
         variable->ref.varDec = symbol->varDec;
-        variable->isStatic = symbol->varDec->expr->isStatic;
         variable->isMutable = symbol->varDec->isMutable;
         variable->setType(symbol->varDec->type);
         symbol->varDec->refs.push_back(variable);
         break;
     case FIELD:
         variable->ref.field = symbol->field;
-        variable->isStatic = false;
         variable->isMutable = symbol->field->isMutable;
         variable->setType(symbol->field->type);
         symbol->field->refs.push_back(variable);
         break;
     case PARAM:
         variable->ref.param = symbol->param;
-        variable->isStatic = false;
         variable->setType(symbol->param->type);
         symbol->param->refs.push_back(variable);
         break;
     case ENUM_FIELD:
         variable->ref.enumField = symbol->enumField;
-        variable->isStatic = false;
         variable->setType(symbol->enumField->type);
         symbol->enumField->refs.push_back(variable);
         break;
     case FUNC:
         variable->ref.func = symbol->func;
-        variable->isStatic = false;
         variable->setType(symbol->func->funcType);
         symbol->func->refs.push_back(variable);
         break;
@@ -781,9 +779,9 @@ void SemaAnalyser::validateIndex(LgsIterIndex* iterIndex) {
     if (!iterable->getIndexType()->equals(exprFrom->type)) {
         return errHandler.handleError(E10036, &iterIndex->location, {iterIndex->prettyName(), exprFrom->type->prettyName()});
     }
-    if (iterable->asSArray()) {
+    if (const auto sArr = iterable->asSArray()) {
         const auto i = exprFrom->getConstInt();
-        const auto bound = iterable->iterLen;
+        const auto bound = sArr->initialLength;
         if (i >= bound) {
             return errHandler.handleError(E10003, &iterIndex->location, {iterIndex->prettyName(), to_string(bound)});
         }
@@ -795,13 +793,13 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
     const auto exprFrom = iterIndex->index->from;
     const auto exprTo = iterIndex->index->to;
     const auto iterable = baseExpr->type->asIterable();
-    if (iterable->asSArray()) {
+    if (const auto sArr = iterable->asSArray()) {
         if (exprFrom->getConstInt() > exprTo->getConstInt()) {
             return errHandler.handleError(E10037, &iterIndex->location, {iterIndex->prettyName()});
         }
         const auto i = exprFrom->getConstInt();
         const auto j = exprTo->getConstInt();
-        const auto bound = iterable->iterLen;
+        const auto bound = sArr->initialLength;
         if (i >= bound || j >= bound) {
             return errHandler.handleError(E10003, &iterIndex->location, {iterIndex->prettyName(), to_string(bound)});
         }
@@ -940,6 +938,17 @@ bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, const LgsType* par
     return false;
 }
 
+void SemaAnalyser::inferBaseType(LgsArrayExpr* array) const {
+    LgsType* baseType = nullptr;
+    const auto first = array->initialElements.front();
+    if (const auto innerArr = first->asArrayExpr()) {
+        baseType = innerArr->type;
+    } else {
+        baseType = first->type;
+    }
+    array->type->asIterable()->baseType = baseType;
+}
+
 LgsType* SemaAnalyser::resolveType(LgsType* type) {
     if (const auto nullable = type->asNullable()) {
         nullable->baseType = resolveType(nullable->baseType);
@@ -1000,12 +1009,12 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
 void SemaAnalyser::resolveIterable(LgsIterable* iterable) {
     iterable->baseType = resolveType(iterable->baseType);
     visitExpr(iterable->sizeExpr);
-    if (iterable->asSArray()) {
+    if (const auto sArr = iterable->asSArray()) {
         const auto exprConstNumber = iterable->sizeExpr->getConstInt();
         if (exprConstNumber <= 0) {
             return errHandler.handleError(E10048, &iterable->location, {iterable->prettyName()});
         }
-        iterable->iterLen = exprConstNumber;
+        sArr->initialLength = exprConstNumber;
     }
 }
 

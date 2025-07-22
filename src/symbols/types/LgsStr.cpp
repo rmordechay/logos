@@ -1,10 +1,8 @@
-#include "exprs/LgsNullValue.h"
-#include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
 
 size_t LgsStr::getSizeBytes() {
-    return iterLen + 1;
+    return initialLength + 1;
 }
 
 string LgsStr::getIRName() {
@@ -12,7 +10,7 @@ string LgsStr::getIRName() {
 }
 
 Type* LgsStr::getIRType(LgsModule* module) {
-    return ArrayType::get(baseType->getIRType(module), iterLen);
+    return ArrayType::get(baseType->getIRType(module), initialLength);
 }
 
 string LgsStr::prettyName() const {

@@ -6,12 +6,12 @@
 Type* LgsSArray::getIRType(LgsModule* module) {
     if (IRType) return IRType;
     const auto innerIRType = baseType->getIRType(module);
-    IRType = ArrayType::get(innerIRType, iterLen);
+    IRType = ArrayType::get(innerIRType, initialLength);
     return IRType;
 }
 
 size_t LgsSArray::getSizeBytes() {
-    return baseType->getSizeBytes() * iterLen;
+    return baseType->getSizeBytes() * initialLength;
 }
 
 LgsExpr* LgsSArray::getZeroValue() {
@@ -31,7 +31,7 @@ string LgsSArray::getStrFormatPart() const {
 }
 
 string LgsSArray::prettyName() const {
-    return baseType->prettyName() + '[' + (iterLen == 0 ? "" : to_string(iterLen)) + "]!";
+    return baseType->prettyName() + '[' + (initialLength == 0 ? "" : to_string(initialLength)) + "]!";
 }
 
 bool LgsSArray::equals(LgsType* other) {

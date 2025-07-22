@@ -6,7 +6,7 @@
 
 class LgsArrayExpr final : public LgsUnaryExpr {
 public:
-    vector<LgsExpr*> elements;
+    vector<LgsExpr*> initialElements;
 
     LgsArrayExpr() = default;
     explicit LgsArrayExpr(LgsDArray* arrType) : LgsUnaryExpr(arrType) {}

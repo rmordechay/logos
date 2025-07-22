@@ -118,7 +118,7 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     }
 
     for (const auto func : funcImplementations) {
-        auto funcName = func->funcSignature()->IDENTIFIER()->getText();
+        auto funcName = func->funcSignature()->funcSignatureHeader()->IDENTIFIER()->getText();
         if (funcName == LOGOS_MAIN_FUNC) {
             mainFile->funcs[funcName] = getMainFunc(func);
         } else {
@@ -188,11 +188,10 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
     }
     // Methods
     for (const auto& func : ctx->methodImplementation()) {
-        const auto methodName = func->funcSignature()->IDENTIFIER()->getText();
         const auto method = getMethodImpl(func, obj);
         const auto methodAdded = obj->addMethod(method);
         if (!methodAdded) {
-            errHandler.handleError(E10056, &obj->location, {obj->name, methodName});
+            errHandler.handleError(E10056, &obj->location, {obj->name, method->funcType->prettyName()});
             continue;
         }
     }
@@ -213,12 +212,12 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
     for (const auto& interfaceFunction : ctx->interfaceFuncSignature()) {
         const auto self = LgsParam(interface, LOGOS_SELF);
         const auto type = getFuncReturnType(interfaceFunction->type());
-        const auto func = new LgsFunc(interfaceFunction->IDENTIFIER()->getText(), type);
+        const auto func = new LgsFunc(interfaceFunction->funcSignatureHeader()->IDENTIFIER()->getText(), type);
         func->funcType->parentName = interfaceName;
         func->funcType->isMethod = true;
         func->funcType->params.push_back(self);
         func->funcType->isOptional = !!interfaceFunction->QUEST_MARK();
-        setParams(func->funcType, interfaceFunction->param());
+        setParams(func->funcType, interfaceFunction->funcSignatureHeader()->param());
         interface->addMethod(func);
     }
     for (const auto interfaceField : ctx->interfaceField()) {
@@ -238,11 +237,11 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
 LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
     const auto mainFunc = new LgsMainFunc();
     const auto funcSignature = ctx->funcSignature();
-    mainFunc->setLocation(funcSignature->IDENTIFIER()->getSymbol(), nullptr, filePath);
+    mainFunc->setLocation(funcSignature->funcSignatureHeader()->IDENTIFIER()->getSymbol(), nullptr, filePath);
     const auto statementsBlock = ctx->funcBody()->statementsBlock();
     mainFunc->stmtBlock = getStmtBlock(statementsBlock);
     bool isValid = true;
-    const auto paramSize = funcSignature->param().size();
+    const auto paramSize = funcSignature->funcSignatureHeader()->param().size();
     if (paramSize > 1) {
         isValid = false;
     } else if (paramSize == 1) {
@@ -256,7 +255,7 @@ LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
 }
 
 bool AntlerConverter::setMainArgsParam(const LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature) {
-    const auto param = funcSignature->param().front();
+    const auto param = funcSignature->funcSignatureHeader()->param().front();
     const auto type = param->type();
     const auto variableName = param->IDENTIFIER()->getText();
     const auto expr = getExpr(param->expr());
@@ -270,11 +269,11 @@ bool AntlerConverter::setMainArgsParam(const LgsMainFunc* mainFunc, LogosParser:
 LgsFunc* AntlerConverter::getFuncImpl(LogosParser::FuncImplContext* ctx) {
     const auto rt = getFuncReturnType(ctx->funcSignature()->type());
     const auto funcSignature = ctx->funcSignature();
-    const auto tokenName = funcSignature->IDENTIFIER();
+    const auto tokenName = funcSignature->funcSignatureHeader()->IDENTIFIER();
     const auto func = new LgsFunc(tokenName->getText(), rt);
     func->setLocation(tokenName->getSymbol(), nullptr, filePath);
     if (isNameBuiltin(func->funcType->name, &func->location)) return nullptr;
-    setParams(func->funcType, funcSignature->param());
+    setParams(func->funcType, funcSignature->funcSignatureHeader()->param());
     func->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     return func;
 }
@@ -282,7 +281,7 @@ LgsFunc* AntlerConverter::getFuncImpl(LogosParser::FuncImplContext* ctx) {
 LgsFunc* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj) {
     const auto rt = getFuncReturnType(ctx->funcSignature()->type());
     const auto funcSignature = ctx->funcSignature();
-    const auto nameToken = funcSignature->IDENTIFIER();
+    const auto nameToken = funcSignature->funcSignatureHeader()->IDENTIFIER();
     const auto method = new LgsFunc(nameToken->getText(), rt);
     method->setLocation(nameToken->getSymbol(), nullptr, filePath);
     if (isNameBuiltin(method->funcType->name, &method->location)) return nullptr;
@@ -291,7 +290,7 @@ LgsFunc* AntlerConverter::getMethodImpl(LogosParser::MethodImplementationContext
     auto self = LgsParam(obj, LOGOS_SELF);
     self.isSelf = true;
     method->funcType->params.push_back(self);
-    setParams(method->funcType, funcSignature->param());
+    setParams(method->funcType, funcSignature->funcSignatureHeader()->param());
     method->stmtBlock = getStmtBlock(ctx->funcBody()->statementsBlock());
     if (ctx->VISIBILITY()) {
         method->funcType->isPublic = true;
@@ -674,14 +673,14 @@ LgsUnaryExpr* AntlerConverter::getArrayExpr(LogosParser::ArrayExprContext* ctx) 
     const auto array = new LgsArrayExpr();
     LgsIterable* arrType;
     if (ctx->EXCLA_MARK()) {
-        arrType = array->type->asSArray();
+        arrType = new LgsSArray();
     } else {
-        arrType = array->type->asDArray();
+        arrType = new LgsDArray();
     }
-    arrType->iterLen = ctx->expr().size();
-    arrType->sizeExpr = new LgsIntConst(arrType->iterLen);
+    arrType->sizeExpr = new LgsIntConst(ctx->expr().size());
+    array->type = arrType;
     for (const auto expr : ctx->expr()) {
-        array->elements.emplace_back(getExpr(expr));
+        array->initialElements.emplace_back(getExpr(expr));
     }
     array->setLocation(ctx->start, ctx->stop, filePath);
     return array;

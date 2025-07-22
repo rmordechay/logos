@@ -9,6 +9,7 @@
 class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
+    size_t initialLength = 0;
     LgsBuiltinFunc lenFunc{"len", &LGS_LONG, name, {this}};
     LgsBuiltinFunc isEmptyFunc{"isEmpty", &LGS_BOOL, name, {this}};
     LgsBuiltinFunc isNotEmptyFunc{"isNotEmpty", &LGS_BOOL, name, {this}};

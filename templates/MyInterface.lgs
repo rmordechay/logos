@@ -1,0 +1,4 @@
+interface MyInterface
+
+bla(): Int
+bla2(a: Int): Str

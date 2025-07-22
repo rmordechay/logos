@@ -9,7 +9,6 @@ struct CodegenMetadata;
 class LgsIterable : public LgsType {
 public:
     LgsType* baseType;
-    size_t iterLen = 0;
     uint8_t unpackLength = 0;
     LgsExpr* sizeExpr = nullptr;
 

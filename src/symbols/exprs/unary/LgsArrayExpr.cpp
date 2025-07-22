@@ -24,12 +24,12 @@ Value* LgsArrayExpr::createDynamicArray(LgsModule* module) {
         capacityIR = arrType->sizeExpr->getIRValue(module);
         capacityIR = builder.CreateZExt(capacityIR, builder.getInt64Ty());
     } else {
-        const auto capacity = elements.empty() ? INITIAL_ARRAY_CAPACITY : elements.size() * 2;
+        const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
         capacityIR = builder.getInt64(capacity);
     }
 
     arrType->initFunc.callIR(module, {IRValue, capacityIR, elementSize});
-    for (const auto element : elements) {
+    for (const auto element : initialElements) {
         arrType->addFunc.call(module, {this, element});
     }
     module->addAllocatedExpr(this);
@@ -41,12 +41,12 @@ Value* LgsArrayExpr::createConstArray(LgsModule* module) const {
     const auto arr = type->asSArray();
     const auto baseType = arr->baseType;
     const auto baseIRType = baseType->getIRType(module);
-    const auto arrIRType = ArrayType::get(baseIRType, arr->iterLen);
+    const auto arrIRType = ArrayType::get(baseIRType, arr->initialLength);
     const auto arrIRPtr = builder.CreateAlloca(arrIRType);
-    if (elements.empty()) return arrIRPtr;
-    for (int i = 0; i < elements.size(); ++i) {
+    if (initialElements.empty()) return arrIRPtr;
+    for (int i = 0; i < initialElements.size(); ++i) {
         const auto gep = builder.CreateGEP(arrIRType, arrIRPtr, {builder.getInt32(0), builder.getInt32(i)});
-        const auto val = elements[i]->getIRValue(module);
+        const auto val = initialElements[i]->getIRValue(module);
         builder.CreateStore(val, gep);
     }
     return arrIRPtr;
