@@ -9,12 +9,12 @@
 #include "logos/Platform.h"
 #include "utils/ThreadPool.h"
 #include "builtin/LgsBuiltins.h"
-#include "codegen/CodeGenerator.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "extern/LgsCLang.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "funcs/LgsMainFunc.h"
+#include "logos/LgsConfig.h"
 #include "logos/LgsLinker.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsInterface.h"
@@ -80,7 +80,7 @@ bool LgsApp::analyse() {
             if (!semaAnalyser.errHandler.successful) {
                 const auto errors = semaAnalyser.errHandler.errors;
                 lock_guard lock(mtx);
-                addErrors(errors);
+                errHandler.addErrors(errors);
                 errHandler.setUnsuccessful();
             }
         });
@@ -91,9 +91,7 @@ bool LgsApp::analyse() {
 }
 
 bool LgsApp::generate() {
-    // build dir
-    createBuildDir();
-    CodeGenerator::initLLVM();
+    initLLVM();
     ThreadPool threadPool;
     for (const auto& file : files) {
         threadPool.runTask([file, this] {
@@ -106,7 +104,7 @@ bool LgsApp::generate() {
         });
     }
     threadPool.wait();
-    CodeGenerator::writeIRToFile(modules, paths);
+    writeIRToFile();
     return errHandler.successful;
 }
 
@@ -130,7 +128,7 @@ void LgsApp::parseSrcFile(const string& codeText, path filePath) {
     lock_guard lock(mtx);
     files.push_back(file);
     if (!antlerConverter.errHandler.successful) {
-        addErrors(antlerConverter.errHandler.errors);
+        errHandler.addErrors(antlerConverter.errHandler.errors);
         errHandler.setUnsuccessful();
         return;
     }
@@ -150,7 +148,7 @@ void LgsApp::parseEnvFile(path fileEntry) {
     auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
     lock_guard lock(mtx);
     envFiles.emplace_back(file);
-    addErrors(antlerConverter.errHandler.errors);
+    errHandler.addErrors(antlerConverter.errHandler.errors);
 }
 
 void LgsApp::parseAppFile(path fileEntry) {
@@ -200,7 +198,7 @@ bool LgsApp::resolveGlobalTypes() {
             semaAnalyser.resolveInterfaceTypes(interfaceFile->interface);
         }
         if (!semaAnalyser.errHandler.successful) {
-            addErrors(semaAnalyser.errHandler.errors);
+            errHandler.addErrors(semaAnalyser.errHandler.errors);
         }
         successful = successful && semaAnalyser.errHandler.successful;
     }
@@ -303,8 +301,30 @@ void LgsApp::createBuildDir() const {
     create_directories(paths.buildDir);
 }
 
-void LgsApp::addErrors(vector<LgsError> newErrors) {
-    errHandler.errors.insert(errHandler.errors.end(), newErrors.begin(), newErrors.end());
+void LgsApp::initLLVM() const {
+    // LLVM
+    InitializeNativeTarget();
+    InitializeNativeTargetAsmPrinter();
+    InitializeNativeTargetAsmParser();
+    InitializeAllTargetMCs();
+    InitializeAllTargets();
+    InitializeAllTargetInfos();
+    dataLayout = getTargetMachine()->createDataLayout();
+}
+
+void LgsApp::writeIRToFile() {
+    for (const auto [_, module] : modules) {
+        if constexpr (WRITE_IR_TO_FILE) {
+            const auto filePath = (paths.buildDir / module->IRModule->getName().str()).string() + ".ll";
+            std::error_code EC;
+            raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
+            module->IRModule->print(textFile, nullptr);
+        }
+        if (logLevel == DEBUG) {
+            module->IRModule->print(outs(), nullptr);
+            lgsLog("\n-----\n\n");
+        }
+    }
 }
 
 LgsApp::~LgsApp() {

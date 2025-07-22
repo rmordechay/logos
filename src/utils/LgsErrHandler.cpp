@@ -19,3 +19,7 @@ void LgsErrHandler::handleError(const LgsError& lgsErr, const Location* location
     const auto finalResult = LOGOS_ERROR_STR + result + "\n\t   at " + location->getFullPath(location->filePath) + "\n---";
     errors.emplace_back(LgsError{.msg = finalResult, .errCode = lgsErr.errCode});
 }
+
+void LgsErrHandler::addErrors(vector<LgsError> newErrors) {
+    errors.insert(errors.end(), newErrors.begin(), newErrors.end());
+}

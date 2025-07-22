@@ -1,6 +1,4 @@
 #include "types/LgsObject.h"
-#include "codegen/CodeGenerator.h"
-#include "exprs/LgsNullValue.h"
 #include "exprs/unary/LgsInstance.h"
 #include "stmts/LgsField.h"
 #include "types/LgsGroup.h"

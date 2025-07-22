@@ -17,7 +17,6 @@ set(SOURCE_FILES
     src/cli/LgsFormatCmd.cpp
     src/cli/LgsGenerateCmd.cpp
     src/cli/LgsRunCmd.cpp
-    src/codegen/CodeGenerator.cpp
     src/extern/LgsCLang.cpp
     src/extern/LgsCLangVisitor.cpp
     src/files/LgsMainFile.cpp

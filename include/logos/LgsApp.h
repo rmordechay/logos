@@ -57,6 +57,7 @@ public:
     void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
     void checkRequiredEnvVars();
     bool isLogosFile(const directory_entry& entry) const;
-    void addErrors(vector<LgsError> newErrors);
+    void initLLVM() const;
+    void writeIRToFile();
     ~LgsApp();
 };

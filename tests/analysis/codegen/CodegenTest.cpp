@@ -1,4 +1,3 @@
-#include "codegen/CodeGenerator.h"
 #include "files/LgsFile.h"
 #include "logos/LgsApp.h"
 #include "logos/LgsModule.h"
@@ -18,7 +17,7 @@ public:
 };
 
 TEST_F(CodegenTest, CodegenTest1) {
-    CodeGenerator::initLLVM();
+    app.initLLVM();
     app.parseSrcFile("main() {}");
     app.analyse();
     const auto module = app.files[0]->generateIR();

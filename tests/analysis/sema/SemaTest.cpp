@@ -19,6 +19,26 @@ public:
     }
 };
 
+TEST_F(SemaTest, TestSema) {
+    const auto code = R"(
+    interface Type1 {
+        a: Int
+    }
+    interface Type2 {
+        implements: Type1
+        b: Int
+    }
+    main() {
+        a = 2
+        arr: Int[a]!
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 0);
+}
+
+
 TEST_F(SemaTest, TestSema10001) {
     app.parseSrcFile("main() {a: Str = 34}");
     app.analyse();
@@ -37,6 +57,31 @@ TEST_F(SemaTest, TestSema10002) {
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10002);
+}
+
+TEST_F(SemaTest, TestSema10003) {
+    const auto code = R"(
+    main() {
+        arr: Int[2]!
+        arr[3] := 2
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 1);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, 10003);
+}
+
+TEST_F(SemaTest, TestSema10003345) {
+    const auto code = R"(
+    main() {
+        arr: Int[]!
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 1);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, 10048);
 }
 
 TEST_F(SemaTest, TestSema10004) {
@@ -190,22 +235,6 @@ TEST_F(SemaTest, TestSema10016B) {
     ASSERT_EQ(app.errHandler.errors[1].errCode, 10016);
 }
 
-TEST_F(SemaTest, TestSema10016C) {
-    const auto code = R"(
-    interface Type1 {
-        a: Int
-    }
-    interface Type2 {
-        implements: Type1
-        b: Int
-    }
-    main() {}
-    )";
-    app.parseSrcFile(code);
-    app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 0);
-}
-
 TEST_F(SemaTest, TestSema10017) {
     const auto code = R"(
     main() {
@@ -244,6 +273,21 @@ TEST_F(SemaTest, TestSema10046) {
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10046);
+}
+
+TEST_F(SemaTest, TestSema10048) {
+    const auto code = R"(
+    func(): Int {
+        return 2
+    }
+    main() {
+        arr: Int[func()]!
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 1);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, 10048);
 }
 
 TEST_F(SemaTest, TestSema10055) {
