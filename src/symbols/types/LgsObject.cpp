@@ -2,10 +2,13 @@
 #include "exprs/unary/LgsInstance.h"
 #include "stmts/LgsField.h"
 #include "types/LgsGroup.h"
-#include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 
 string LgsObject::prettyName() const {
+    return name;
+}
+
+string LgsObject::getIRName() {
     return name;
 }
 
@@ -16,6 +19,7 @@ Type* LgsObject::getIRType(LgsModule* module) {
     vector<Type*> elementTypes(fields.size() + offset);
     size_t position = 0;
     if (vtable) {
+        setVirtualFuncs(module);
         elementTypes[position++] = ptrTy(module);
     }
     for (const auto [_, field] : fields) {
@@ -56,20 +60,18 @@ bool LgsObject::equals(LgsType* other) {
     return name == other->getIRName();
 }
 
-LgsInterface* LgsObject::getInterface(const string& interfaceName) const {
-    for (const auto implement : interfaces) {
-        const auto interface = implement->asInterface();
-        if (interface->interfaceName == interfaceName) {
-            return interface;
-        }
+size_t LgsObject::getSizeBytes() {
+    size_t sum = 0;
+    for (const auto& [name, field] : fields) {
+        sum += field->type->getSizeBytes();
     }
-    return nullptr;
+    return sum;
 }
 
-void LgsObject::setVFuncs(LgsModule* module) const {
-    assert(module);
+void LgsObject::setVirtualFuncs(LgsModule* module) {
     const auto vtablePtr = vtable->getIRValue(module);
     for (const auto [_, method] : methods) {
+        if (!method->funcType->isVirtual) continue;
         const auto keyIRStr = getIRStr(module, method->funcType->getIRName());
         const auto IRFunc = method->getIRFunc(module);
         auto valuePtr = module->builder.CreateAlloca(module->builder.getPtrTy());
@@ -78,14 +80,8 @@ void LgsObject::setVFuncs(LgsModule* module) const {
     }
 }
 
-string LgsObject::getIRName() {
-    return name;
-}
-
-size_t LgsObject::getSizeBytes() {
-    size_t sum = 0;
-    for (const auto& [name, field] : fields) {
-        sum += field->type->getSizeBytes();
+LgsObject::~LgsObject() {
+    for (const auto interface : interfaces) {
+        delete interface;
     }
-    return sum;
 }

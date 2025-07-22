@@ -53,6 +53,7 @@ Value* LgsFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
         const auto arg = args[i];
         const auto argType = arg->type->getIRType(module);
         auto argValue = arg->getIRValue(module);
+        // TODO refactor should load
         if (shouldLoadIRArg(argValue, arg)) {
             argValue = module->builder.CreateLoad(argType, argValue);
         }
@@ -63,7 +64,8 @@ Value* LgsFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
 
 Value* LgsFunc::callIR(LgsModule* module, const vector<Value*>& args) {
     if (IRValue) {
-        const auto IRFuncType = cast<FunctionType>(funcType->rt->getIRType(module));
+        const auto funcTypeIR = funcType->getIRType(module);
+        const auto IRFuncType = cast<FunctionType>(funcTypeIR);
         return module->builder.CreateCall(IRFuncType, IRValue, args);
     }
     const auto IRFunc = getIRFunc(module);

@@ -86,27 +86,27 @@ interfaceFuncSignature:
     ;
 
 funcImpl:
-        funcSignature funcBody
+        funcSignature statementsBlock
     ;
 
-anonnymosfuncSignature:
-        LPAREN (param (COMMA param)* COMMA?)? RPAREN (COLON type)?
+anonymosFuncSignature:
+        LPAREN (anonymousParam (COMMA anonymousParam)* COMMA?)? RPAREN (COLON type)?
     ;
 
 anonnymosFunc:
-        anonnymosfuncSignature funcBody
+        anonymosFuncSignature statementsBlock
     ;
 
 methodImplementation:
-        VISIBILITY? funcSignature funcBody
-    ;
-
-funcBody:
-        statementsBlock
+        VISIBILITY? funcSignature statementsBlock
     ;
 
 param:
-        IDENTIFIER COLON type TRIPLE_DOT? (EQUAL expr)? | IDENTIFIER funcType
+        IDENTIFIER COLON (funcType | (type TRIPLE_DOT? (EQUAL expr)?))
+    ;
+
+anonymousParam:
+        IDENTIFIER (COLON type)?
     ;
 
 statement:

@@ -70,7 +70,7 @@ public:
     virtual void visitVariable(LgsVariable* variable) = 0;
     virtual void visitFuncCall(LgsFuncCall* funcCall) = 0;
     virtual void visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType) = 0;
-    virtual void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) = 0;
+    virtual void visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType) = 0;
     virtual void visitSelection(LgsSelection* selection) = 0;
     virtual void visitInnerSelections(const LgsSelection* selection) = 0;
     virtual void visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* childField) = 0;

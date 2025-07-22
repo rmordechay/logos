@@ -42,10 +42,10 @@ public:
     map<string, LgsField*> fields;
     map<string, LgsFunc*> methods;
 
+    bool addField(LgsField* field);
+    bool addMethod(LgsFunc* method);
     LgsField* getField(const string& name);
     LgsFunc* getMethod(const string& name) const;
-    bool addMethod(LgsFunc* method);
-    bool addField(LgsField* field);
     void setLocation(const Token* ctx, const Token* end, const path& filePath);
 
     LgsPtr* asPtr();

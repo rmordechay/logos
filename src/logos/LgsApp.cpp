@@ -78,10 +78,8 @@ bool LgsApp::analyse() {
             SemaAnalyser semaAnalyser(file);
             semaAnalyser.analyse();
             if (!semaAnalyser.errHandler.successful) {
-                const auto errors = semaAnalyser.errHandler.errors;
                 lock_guard lock(mtx);
-                errHandler.addErrors(errors);
-                errHandler.setUnsuccessful();
+                errHandler.addErrors(semaAnalyser.errHandler.errors);
             }
         });
     }
@@ -129,7 +127,6 @@ void LgsApp::parseSrcFile(const string& codeText, path filePath) {
     files.push_back(file);
     if (!antlerConverter.errHandler.successful) {
         errHandler.addErrors(antlerConverter.errHandler.errors);
-        errHandler.setUnsuccessful();
         return;
     }
     for (const auto externFile : file->externFiles) {

@@ -16,7 +16,7 @@ public:
     void resolveVirtualFunc(LgsModule* module) const;
     Value* call(LgsModule* module) const;
     Value* getCallback(LgsModule* module) const;
-    bool equals(const LgsFuncType* module) const;
+    bool equals(const LgsFuncType* funcType) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
     void createIRStmt(LgsModule* module) override;

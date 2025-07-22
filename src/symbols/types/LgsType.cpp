@@ -53,10 +53,6 @@ void LgsType::setLocation(const Token* ctx, const Token* end, const path& filePa
     location.filePath = filePath;
 }
 
-LgsType::~LgsType() {
-    if (vtable) delete vtable;
-}
-
 size_t LgsType::getSizeBytes() { assert(0); }
 string LgsType::getStrFormatPart() const { assert(0); }
 
@@ -78,3 +74,7 @@ LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
 LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }
 LgsTypePair* LgsType::asPair() { return dynamic_cast<LgsTypePair*>(this); }
 bool LgsType::isUnknown() { return dynamic_cast<LgsUnknownType*>(this); }
+
+LgsType::~LgsType() {
+    if (vtable) delete vtable;
+}

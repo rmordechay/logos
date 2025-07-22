@@ -59,7 +59,7 @@ public:
     LgsFunc* getFuncImpl(LogosParser::FuncImplContext* ctx);
     void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);
     LgsFunc* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
-    LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param, LogosParser::TypeContext* type);
+    LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param);
     LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName);
     LgsFunc* getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
@@ -105,7 +105,7 @@ public:
     LgsAssignType mapAssignType(LogosParser::AssignmentContext* assignment) const;
     LgsOperator mapOperator(LogosParser::ExprContext* expr) const;
     bool isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec);
-    bool isNameBuiltin(const string& name, const Location* location);
+    bool isBuiltinName(const string& name, const Location* location);
     void cleanStr(string& value) const;
     ~AntlerConverter() = default;
 };

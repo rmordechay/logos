@@ -7,20 +7,19 @@
 
 Type* LgsInterface::getIRType(LgsModule* module) {
     if (IRType) return IRType;
-    IRType = StructType::getTypeByName(module->context, interfaceName);
+    IRType = StructType::getTypeByName(module->context, name);
     vector<Type*> elementTypes;
-    for (const auto [_, method] : methods) {
-        method->funcType->isVirtual = true;
+    for (int i = 0; i < methods.size(); ++i) {
         elementTypes.emplace_back(ptrTy(module));
     }
     if (!IRType) {
-        IRType = StructType::create(module->context, elementTypes, interfaceName);
+        IRType = StructType::create(module->context, elementTypes, name);
     }
     return IRType;
 }
 
 string LgsInterface::getIRName() {
-    return interfaceName;
+    return name;
 }
 
 LgsExpr* LgsInterface::getZeroValue() {
@@ -40,7 +39,7 @@ bool LgsInterface::equals(LgsType* other) {
 }
 
 string LgsInterface::prettyName() const {
-    return interfaceName;
+    return name;
 }
 
 LgsInterface::~LgsInterface() {

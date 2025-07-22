@@ -3,17 +3,15 @@
 #include "utils/LgsUtils.h"
 
 Value* LgsHashMap::createIRValue(LgsModule* module) {
-    initIRMap(module);
+    const auto mapType = type->asMap();
+    const auto valueType = mapType->typePair->value;
+    const auto elementSize = module->builder.getInt64(valueType->getSizeBytes());
+    IRValue = module->builder.CreateAlloca(mapType->getMapStruct(module));
+    mapType->initFunc.callIR(module, {IRValue, elementSize});
+
     module->addAllocatedExpr(this);
     for (const auto element : initialElements) {
-        type->asMap()->addFunc.call(module, {this, element->key, element->value});
+        mapType->addFunc.call(module, {this, element->key, element->value});
     }
     return IRValue;
-}
-
-void LgsHashMap::initIRMap(LgsModule* module) {
-    const auto valueType = type->asMap()->typePair->value;
-    const auto elementSize = module->builder.getInt64(valueType->getSizeBytes());
-    IRValue = module->builder.CreateAlloca(type->asMap()->getMapStruct(module));
-    type->asMap()->initFunc.callIR(module, {IRValue, elementSize});
 }

@@ -1,12 +1,17 @@
 #pragma once
+#include "LgsAny.h"
 #include "LgsObject.h"
+#include "LgsStr.h"
+#include "exprs/unary/LgsHashMap.h"
 
-class LgsInterface final : public LgsObject {
+class LgsInterface final : public LgsType {
 public:
-    string interfaceName;
+    string name;
     vector<LgsType*> interfaces;
 
-    explicit LgsInterface(const string& name) : LgsObject(name), interfaceName(name) {}
+    explicit LgsInterface(const string& name) : name(name) {
+        vtable = new LgsHashMap(new LgsStr(), new LgsAny());
+    }
     string prettyName() const override;
     Type* getIRType(LgsModule* module) override;
     string getIRName() override;

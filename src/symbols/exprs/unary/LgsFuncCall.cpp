@@ -36,14 +36,14 @@ void LgsFuncCall::createIRStmt(LgsModule* module) {
     call(module);
 }
 
-bool LgsFuncCall::equals(const LgsFuncType* module) const {
-    if (module->hasDefaults) return equalsDefaultParams(module);
-    if (module->isVariadic) return equalsVariadic(module);
-    if (!module->isAnonymous && name != module->name) return false;
-    if (module->params.size() != args.size()) return false;
-    if (module->params.size() == 0 && args.size() == 0) return true;
-    for (size_t i = module->isStaticMethod; i < module->params.size(); ++i) {
-        const auto paramType = module->params[i].type;
+bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
+    if (funcType->hasDefaults) return equalsDefaultParams(funcType);
+    if (funcType->isVariadic) return equalsVariadic(funcType);
+    if (!funcType->isAnonymous && name != funcType->name) return false;
+    if (funcType->params.size() != args.size()) return false;
+    if (funcType->params.size() == 0 && args.size() == 0) return true;
+    for (size_t i = funcType->isStaticMethod; i < funcType->params.size(); ++i) {
+        const auto paramType = funcType->params[i].type;
         const auto argType = args[i]->type;
         if (args[i]->isNull) continue;
         if (!paramType->equals(argType)) return false;
@@ -68,17 +68,15 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
 
 void LgsFuncCall::resolveVirtualFunc(LgsModule* module) const {
     auto& builder = module->builder;
-    const auto parent = args[0];
-    const auto type = parent->type;
-    const auto ptrTy = builder.getPtrTy();
-    const auto parentIRValue = parent->getIRValue(module);
+    const auto self = args[0];
     const auto keyIR = getIRStr(module, func->funcType->getIRName());
-    const auto mapPtr = builder.CreateLoad(ptrTy, parentIRValue);
-    const auto valuePtr = builder.CreateAlloca(ptrTy);
-    const auto rv = type->vtable->type->asMap()->getFunc.callIR(module, {mapPtr, keyIR});
-    builder.CreateStore(rv, valuePtr);
-    const auto vfunc = builder.CreateLoad(ptrTy, builder.CreateLoad(ptrTy, valuePtr));
-    func->setIRValue(vfunc);
+    const auto vtablePtr = self->getIRValue(module);
+    const auto vtable = self->type->vtable;
+    const auto vtableIRType = vtable->type->getIRType(module);
+    const auto gep = builder.CreateStructGEP(vtableIRType, vtablePtr, 0);
+    const auto mapValue = builder.CreateLoad(ptrTy(module), gep);
+    const auto rv = vtable->type->asMap()->getFunc.callIR(module, {mapValue, keyIR});
+    func->setIRValue(rv);
 }
 
 string LgsFuncCall::getExprName() {

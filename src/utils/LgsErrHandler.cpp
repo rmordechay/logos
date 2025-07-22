@@ -21,5 +21,6 @@ void LgsErrHandler::handleError(const LgsError& lgsErr, const Location* location
 }
 
 void LgsErrHandler::addErrors(vector<LgsError> newErrors) {
+    setUnsuccessful();
     errors.insert(errors.end(), newErrors.begin(), newErrors.end());
 }

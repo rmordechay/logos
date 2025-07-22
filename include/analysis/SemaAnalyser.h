@@ -79,7 +79,7 @@ public:
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType) override;
-    void visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) override;
+    void visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType) override;
     void visitSelection(LgsSelection* selection) override;
     void visitInnerSelections(const LgsSelection* selection) override;
     void visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* childField) override;
@@ -108,7 +108,7 @@ public:
     void addLocalSymbol(const string& name, const LgsSymbol& newSymbol);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, const LgsType* parentType);
-    void inferBaseType(LgsArrayExpr* array) const;
+    void inferBaseType(const LgsArrayExpr* array) const;
     LgsType* resolveType(LgsType* type);
     void resolveIterable(LgsIterable* iterable);
     void resolveFuncTypes(LgsFuncType* funcType);

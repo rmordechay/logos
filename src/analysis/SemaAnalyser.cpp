@@ -66,15 +66,17 @@ void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
 }
 
 void SemaAnalyser::visitObject(LgsObject* obj) {
+    if (!obj->interfaces.empty()) {
+        obj->vtable = new LgsHashMap(new LgsStr(), new LgsAny());
+    }
+    for (const auto interface : obj->interfaces) {
+        visitInterface(interface->asInterface());
+    }
     for (const auto& [_, field] : obj->fields) {
         visitField(field);
     }
     for (const auto& [_, method] : obj->methods) {
         visitFunc(method);
-        method->funcType->isStaticMethod = obj->isSingleton;
-    }
-    for (const auto interface : obj->interfaces) {
-        visitInterface(interface->asInterface());
     }
     validateInterfaces(obj, obj->interfaces);
 }
@@ -85,7 +87,6 @@ void SemaAnalyser::visitInterface(LgsInterface* interface) {
     }
     for (const auto& [_, method] : interface->methods) {
         visitFunc(method);
-        method->funcType->isStaticMethod = interface->isSingleton;
     }
     for (const auto parentInterface : interface->interfaces) {
         visitInterface(parentInterface->asInterface());
@@ -490,11 +491,30 @@ void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* c
     }
 }
 
-void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
-    for (const auto arg : funcCall->args) {
+void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
+    for (int i = 1; i < methodCall->args.size(); ++i) {
+        const auto arg = methodCall->args[i];
         visitExpr(arg);
     }
+    if (resolveMethodCall(methodCall, parentType)) return;
+    validateMethodVisibility(methodCall);
+    if (methodCall->isSpread) {
+        const auto lastArg = methodCall->args[methodCall->args.size() - 1];
+        if (!lastArg->type->asIterable()) {
+            return errHandler.handleError(E10052, &methodCall->location, {lastArg->prettyName(), lastArg->type->prettyName()});
+        }
+    }
+}
+
+void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     resolveFuncCall(funcCall);
+    if (!funcCall->func) return;
+    for (const auto arg : funcCall->args) {
+        if (const auto anonymousFunc = arg->asFunc()) {
+            visitAnonymousFunc(funcCall, anonymousFunc->funcType);
+        }
+        visitExpr(arg);
+    }
     if (!funcCall->func) return;
     const auto& funcType = funcCall->func->funcType;
     if (funcType->isVariadic) return;
@@ -559,24 +579,7 @@ void SemaAnalyser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
     prefixExpr->setType(type);
 }
 
-void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {
-    if (!parentType) assert(0);
-    for (int i = 1; i < methodCall->args.size(); ++i) {
-        const auto arg = methodCall->args[i];
-        visitExpr(arg);
-    }
-    if (resolveMethodCall(methodCall, parentType)) return;
-    validateMethodVisibility(methodCall);
-    if (methodCall->isSpread) {
-        const auto lastArg = methodCall->args[methodCall->args.size() - 1];
-        if (!lastArg->type->asIterable()) {
-            return errHandler.handleError(E10052, &methodCall->location, {lastArg->prettyName(), lastArg->type->prettyName()});
-        }
-    }
-}
-
 void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType) {
-    assert(funcType->isAnonymous);
     for (const auto& arg : funcCall->args) {
         visitExpr(arg);
     }
@@ -768,7 +771,7 @@ void SemaAnalyser::validateImplements(LgsType* type, LgsInterface* interface) {
     }
 
     if (!missingMethods.empty() || !missingFields.empty()) {
-        errHandler.handleError(E10016, &type->location, {type->prettyName(), interface->interfaceName, getMissingImplementsStr(missingFields, missingMethods)});
+        errHandler.handleError(E10016, &type->location, {type->prettyName(), interface->name, getMissingImplementsStr(missingFields, missingMethods)});
     }
 }
 
@@ -808,7 +811,7 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
 
 void SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall) {
     const auto method = methodCall->func;
-    if (!method) return;
+    if (!method || method->funcType->isVirtual) return;
     if (!method->funcType->isPublic && file->absPath != method->location.filePath) {
         errHandler.handleError(E10031, &method->location, {method->funcType->name, method->funcType->parentName});
     }
@@ -913,10 +916,7 @@ void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
         symbolType = symbol->param->type;
     }
 
-    const auto anonymousFuncType = symbolType->asFuncType();
-    if (anonymousFuncType) {
-        visitAnonymousFunc(funcCall, anonymousFuncType);
-    } else {
+    if (!symbolType->asFuncType()) {
         errHandler.handleError(E10046, &funcCall->location, {funcCall->name});
     }
 }
@@ -938,7 +938,7 @@ bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, const LgsType* par
     return false;
 }
 
-void SemaAnalyser::inferBaseType(LgsArrayExpr* array) const {
+void SemaAnalyser::inferBaseType(const LgsArrayExpr* array) const {
     LgsType* baseType = nullptr;
     const auto first = array->initialElements.front();
     if (const auto innerArr = first->asArrayExpr()) {
@@ -963,9 +963,13 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
         pair->value = resolveType(pair->value);
         return pair;
     }
-
+    if (const auto funcType = type->asFuncType()) {
+        resolveFuncTypes(funcType);
+        return funcType;
+    }
     if (!type->isUnknown()) return type;
-    auto typeName = type->prettyName();
+
+    auto typeName = type->getIRName();
     auto symbol = globals.getSymbol(typeName);
     if (!symbol) {
         symbol = file->symbolTable.getSymbol(typeName);
@@ -1009,12 +1013,12 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
 void SemaAnalyser::resolveIterable(LgsIterable* iterable) {
     iterable->baseType = resolveType(iterable->baseType);
     visitExpr(iterable->sizeExpr);
-    if (const auto sArr = iterable->asSArray()) {
+    if (const auto staticArr = iterable->asSArray()) {
         const auto exprConstNumber = iterable->sizeExpr->getConstInt();
         if (exprConstNumber <= 0) {
             return errHandler.handleError(E10048, &iterable->location, {iterable->prettyName()});
         }
-        sArr->initialLength = exprConstNumber;
+        staticArr->initialLength = exprConstNumber;
     }
 }
 

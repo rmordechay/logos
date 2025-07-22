@@ -36,7 +36,7 @@ Value* LgsMap::isNotEmpty(LgsModule* module, LgsExpr* expr) {
 }
 
 Type* LgsMap::getIRType(LgsModule* module) {
-    return ptrTy(module);
+    return getMapStruct(module);
 }
 
 string LgsMap::getIRName() {
