@@ -46,11 +46,24 @@ TEST_F(SemaTest, TestSema10001) {
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10001);
 }
 
-TEST_F(SemaTest, TestSema10002) {
+TEST_F(SemaTest, TestSema10002A) {
     const auto code = R"(
     main() {
         a = 34
         for i in a {}
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 1);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, 10002);
+}
+
+TEST_F(SemaTest, TestSema10002B) {
+    const auto code = R"(
+    main() {
+        num = 1
+        a = num[1:3]
     }
     )";
     app.parseSrcFile(code);
@@ -70,18 +83,6 @@ TEST_F(SemaTest, TestSema10003) {
     app.analyse();
     ASSERT_EQ(app.errHandler.errors.size(), 1);
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10003);
-}
-
-TEST_F(SemaTest, TestSema10003345) {
-    const auto code = R"(
-    main() {
-        arr: Int[]!
-    }
-    )";
-    app.parseSrcFile(code);
-    app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, 10048);
 }
 
 TEST_F(SemaTest, TestSema10004) {
@@ -260,6 +261,19 @@ TEST_F(SemaTest, TestSema10022) {
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10022);
 }
 
+TEST_F(SemaTest, TestSema10042) {
+    const auto code = R"(
+    main() {
+        map: {Str: Str}
+        a = map[1:3]
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 1);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, 10042);
+}
+
 TEST_F(SemaTest, TestSema10046) {
     const auto code = R"(
     object Obj {
@@ -275,13 +289,25 @@ TEST_F(SemaTest, TestSema10046) {
     ASSERT_EQ(app.errHandler.errors[0].errCode, 10046);
 }
 
-TEST_F(SemaTest, TestSema10048) {
+TEST_F(SemaTest, TestSema10048A) {
     const auto code = R"(
     func(): Int {
         return 2
     }
     main() {
         arr: Int[func()]!
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 1);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, 10048);
+}
+
+TEST_F(SemaTest, TestSema10048B) {
+    const auto code = R"(
+    main() {
+        arr: Int[]!
     }
     )";
     app.parseSrcFile(code);
