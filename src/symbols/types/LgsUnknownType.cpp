@@ -12,7 +12,7 @@ bool LgsUnknownType::equals(LgsType* other) {
     assert(0);
 }
 
-Type* LgsUnknownType::getIRType(LLVMContext& context) {
+Type* LgsUnknownType::getIRType(LgsModule* module) {
     assert(0);
 }
 

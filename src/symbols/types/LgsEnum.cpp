@@ -6,8 +6,8 @@ LgsExpr* LgsEnum::getZeroValue() {
     return nullptr;
 }
 
-Type* LgsEnum::getIRType(LLVMContext& context) {
-    return ptrTy(context);
+Type* LgsEnum::getIRType(LgsModule* module) {
+    return ptrTy(module);
 }
 
 string LgsEnum::getIRName() {

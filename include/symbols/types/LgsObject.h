@@ -13,7 +13,7 @@ public:
     explicit LgsObject(const string& name) : name(name) {}
     LgsInterface* getInterface(const string& interfaceName) const;
     string prettyName() const override;
-    Type* getIRType(LLVMContext& context) override;
+    Type* getIRType(LgsModule* module) override;
     string getIRName() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;

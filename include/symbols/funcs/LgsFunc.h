@@ -27,13 +27,12 @@ public:
         type = funcType;
     }
     string prettyName() override;
-    void setBigObjAttrs(Function& IRFunc) const;
+    void setBigObjAttrs(LgsModule* module, Function& IRFunc) const;
     LgsParam& getReturnSwapParam() const;
     void setExceptionFuncs(LgsModule* module) const;
     string format(string& tabs) override;
     Value* createIRValue(LgsModule* module) override;
     virtual void generateIR(LgsModule* module);
-    virtual Type* getIRFuncType(LLVMContext& context);
     virtual Function* getIRFunc(LgsModule* module);
     virtual Value* callIR(LgsModule* module, const vector<Value*>& args = {});
     virtual Value* call(LgsModule* module, const vector<LgsExpr*>& args = {});

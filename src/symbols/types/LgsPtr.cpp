@@ -11,8 +11,8 @@ string LgsPtr::prettyName() const {
     return name;
 }
 
-Type* LgsPtr::getIRType(LLVMContext& context) {
-    return ptrTy(context);
+Type* LgsPtr::getIRType(LgsModule* module) {
+    return ptrTy(module);
 }
 
 size_t LgsPtr::getSizeBytes() {

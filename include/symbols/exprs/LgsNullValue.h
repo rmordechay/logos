@@ -11,5 +11,5 @@ public:
 };
 
 inline Value* LgsNullValue::createIRValue(LgsModule* module) {
-    return ConstantPointerNull::get(ptrTy(module->context));
+    return ConstantPointerNull::get(ptrTy(module));
 }

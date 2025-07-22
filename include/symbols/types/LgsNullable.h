@@ -1,12 +1,13 @@
 #pragma once
 #include "LgsType.h"
+#include "logos/LgsModule.h"
 
 class LgsNullable final : public LgsType {
 public:
     LgsType* baseType;
 
     explicit LgsNullable(LgsType* baseType) : baseType(baseType) {}
-    Type* getIRType(LLVMContext& context) override;
+    Type* getIRType(LgsModule* module) override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;

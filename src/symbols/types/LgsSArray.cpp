@@ -3,9 +3,9 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "types/primitives/LgsInt.h"
 
-Type* LgsSArray::getIRType(LLVMContext& context) {
+Type* LgsSArray::getIRType(LgsModule* module) {
     if (IRType) return IRType;
-    const auto innerIRType = baseType->getIRType(context);
+    const auto innerIRType = baseType->getIRType(module);
     IRType = ArrayType::get(innerIRType, iterLen);
     return IRType;
 }

@@ -35,8 +35,8 @@ Value* LgsMap::isNotEmpty(LgsModule* module, LgsExpr* expr) {
     return isNotEmptyFunc.call(module, {expr});
 }
 
-Type* LgsMap::getIRType(LLVMContext& context) {
-    return ptrTy(context);
+Type* LgsMap::getIRType(LgsModule* module) {
+    return ptrTy(module);
 }
 
 string LgsMap::getIRName() {

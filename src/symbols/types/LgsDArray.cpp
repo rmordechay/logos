@@ -4,9 +4,9 @@
 #include "types/primitives/LgsInt.h"
 #include "utils/LgsUtils.h"
 
-Type* LgsDArray::getIRType(LLVMContext& context) {
+Type* LgsDArray::getIRType(LgsModule* module) {
     if (IRType) return IRType;
-    return getArrStruct(context);
+    return getArrStruct(module);
 }
 
 size_t LgsDArray::getSizeBytes() {
@@ -59,9 +59,10 @@ Value* LgsDArray::isNotEmpty(LgsModule* module, LgsExpr* expr) {
     return isNotEmptyFunc.call(module, {expr});
 }
 
-StructType* LgsDArray::getArrStruct(LLVMContext& context) {
+StructType* LgsDArray::getArrStruct(LgsModule* module) {
+    auto& context = module->context;
     if (arrStruct) return arrStruct;
-    arrStruct = getIRStructType(context, name, {i64Ty(context), i64Ty(context), i64Ty(context), ptrTy(context)});
+    arrStruct = getIRStructType(context, name, {i64Ty(module), i64Ty(module), i64Ty(module), ptrTy(module)});
     return arrStruct;
 }
 
@@ -71,7 +72,7 @@ Value* LgsArrayAddFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
     const auto arrPtr = arr->getIRValue(module);
     const auto value = args[1]->getIRValue(module);
     const auto baseType = arr->type->asIterable()->baseType;
-    const auto baseTypeIR = baseType->getIRType(module->context);
+    const auto baseTypeIR = baseType->getIRType(module);
     const auto valuePtr = module->builder.CreateAlloca(baseTypeIR);
     module->builder.CreateStore(value, valuePtr);
     callIR(module, {arrPtr, valuePtr});

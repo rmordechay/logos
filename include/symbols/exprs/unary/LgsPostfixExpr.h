@@ -13,7 +13,7 @@ public:
     LgsPostfixOperator op;
 
     LgsPostfixExpr(LgsUnaryExpr* baseExpr, const LgsPostfixOperator op) : expr(baseExpr), op(op) {}
-    Value* IncOrDecValue(LgsModule* runtime) const;
+    Value* IncOrDecValue(LgsModule* module) const;
     Value* createIRValue(LgsModule* module) override;
     void createIRStmt(LgsModule* module) override;
     ~LgsPostfixExpr() override = default;

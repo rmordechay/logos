@@ -11,7 +11,7 @@ public:
     string name;
 
     explicit LgsEnum(const string& enumName) : name(enumName) {}
-    Type* getIRType(LLVMContext& context) override;
+    Type* getIRType(LgsModule* module) override;
     string getIRName() override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;

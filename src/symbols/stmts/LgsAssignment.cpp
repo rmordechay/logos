@@ -103,7 +103,7 @@ void LgsAssignment::storeScalarInIterIndex(LgsModule* module, LgsIterIndex* iter
     const auto rIRValue = expr->getIRValue(module);
     const auto baseIRValue = baseExpr->getIRValue(module);
     if (const auto arr = baseExpr->type->asDArray()) {
-        const auto ptr = module->builder.CreateAlloca(expr->type->getIRType(module->context));
+        const auto ptr = module->builder.CreateAlloca(expr->type->getIRType(module));
         module->builder.CreateStore(rIRValue, ptr);
         arr->putFunc.callIR(module, {baseIRValue, iterIndex->index->from->getIRValue(module), ptr});
         return;
@@ -127,7 +127,7 @@ void LgsAssignment::storeScalarInIterIndex(LgsModule* module, LgsIterIndex* iter
 
 void LgsAssignment::storeArrayInIterIndex(LgsModule* module, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) const {
     const auto baseExpr = iterIndex->baseExpr;
-    const auto IRType = baseExpr->type->getIRType(module->context);
+    const auto IRType = baseExpr->type->getIRType(module);
     const auto arrPtr = baseExpr->getIRValue(module);
     vector<Value*> IRIndices = {module->builder.getInt32(0)};
     vector<LgsIndex*> indices;

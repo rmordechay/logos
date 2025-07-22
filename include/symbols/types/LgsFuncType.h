@@ -21,7 +21,7 @@ public:
     int returnParamIndex = -1;
     FunctionType* IRType = nullptr;
 
-    Type* getIRType(LLVMContext& context) override;
+    Type* getIRType(LgsModule* module) override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;

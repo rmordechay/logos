@@ -5,8 +5,8 @@ size_t LgsSize::getSizeBytes() {
     return sizeof(size_t);
 }
 
-Type* LgsSize::getIRType(LLVMContext& context) {
-    return dataLayout.getIntPtrType(context);
+Type* LgsSize::getIRType(LgsModule* module) {
+    return dataLayout.getIntPtrType(module->context);
 }
 
 std::string LgsSize::getIRName() {

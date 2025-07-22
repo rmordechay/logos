@@ -1041,7 +1041,7 @@ void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
     }
     funcType->rt = resolveType(funcType->rt);
     if (!funcType->rt->isVoid && funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD) {
-        funcType->isBigType = true;
+        funcType->isSizeBig = true;
     }
 }
 

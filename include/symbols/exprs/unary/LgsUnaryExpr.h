@@ -94,10 +94,10 @@ inline tuple<Value*, Value*> LgsUnaryExpr::loadExprs(LgsModule* module, LgsExpr*
     auto l = this->getIRValue(module);
     auto r = rExpr->getIRValue(module);
     if (l->getType()->isPointerTy()) {
-        l = module->builder.CreateLoad(this->type->getIRType(module->context), l);
+        l = module->builder.CreateLoad(this->type->getIRType(module), l);
     }
     if (r->getType()->isPointerTy()) {
-        r = module->builder.CreateLoad(rExpr->type->getIRType(module->context), r);
+        r = module->builder.CreateLoad(rExpr->type->getIRType(module), r);
     }
     return tuple(l, r);
 }

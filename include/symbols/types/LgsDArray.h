@@ -36,7 +36,7 @@ public:
         addMethod(&isNotEmptyFunc);
         canSlice = true;
     }
-    Type* getIRType(LLVMContext& context) override;
+    Type* getIRType(LgsModule* module) override;
     string getIRName() override;
     string prettyName() const override;
     size_t getSizeBytes() override;
@@ -48,7 +48,7 @@ public:
     Value* getLoopLength(LgsModule* module, LgsExpr* expr) override;
     Value* isEmpty(LgsModule* module, LgsExpr* expr) override;
     Value* isNotEmpty(LgsModule* module, LgsExpr* expr) override;
-    StructType* getArrStruct(LLVMContext& context);
+    StructType* getArrStruct(LgsModule* module);
     bool equals(LgsType* other) override;
     ~LgsDArray() override;
 };

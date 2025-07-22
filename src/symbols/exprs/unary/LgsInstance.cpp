@@ -6,7 +6,7 @@
 #include "utils/LgsUtils.h"
 
 Value* LgsInstance::createIRValue(LgsModule* module) {
-    const auto objIRType = obj->getIRType(module->context);
+    const auto objIRType = obj->getIRType(module);
     if (isReturnExpr) {
         setReturnExpr(module, objIRType);
     } else {
@@ -18,7 +18,7 @@ Value* LgsInstance::createIRValue(LgsModule* module) {
         if (arg != args.end()) {
             field->storeIRValue(module, IRValue, arg->second->expr);
         } else {
-            field->setZeroValue(module, obj->getIRType(module->context), IRValue);
+            field->setZeroValue(module, obj->getIRType(module), IRValue);
         }
     }
 
@@ -49,7 +49,7 @@ void LgsInstance::setReturnExpr(LgsModule* module, Type* objIRType) {
         IRValue = currentFunc->getReturnSwapParam().IRValue;
     } else {
         IRValue = module->builder.CreateMalloc(
-            i64Ty(module->context),
+            i64Ty(module),
             objIRType,
             ConstantExpr::getSizeOf(objIRType),
             module->builder.getInt64(1)

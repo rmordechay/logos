@@ -10,7 +10,7 @@ public:
     }
     string prettyName() const override;
     size_t getSizeBytes() override;
-    Type* getIRType(LLVMContext& context) override;
+    Type* getIRType(LgsModule* module) override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string getStrFormatPart() const override;

@@ -50,7 +50,7 @@ void PostAnalyser::swapReturn(const LgsFunc* func) {
             break;
         }
     }
-    if (funcType->isBigType && sameReturnExprs) {
+    if (funcType->isSizeBig && sameReturnExprs) {
         funcType->isSwapReturn = true;
         funcType->returnParamIndex = funcType->isMethod && !funcType->isStaticMethod;
         funcType->params.insert(funcType->params.begin(), LgsParam(funcType->rt));

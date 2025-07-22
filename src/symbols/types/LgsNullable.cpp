@@ -2,8 +2,8 @@
 #include "logos/LgsModule.h"
 #include "utils/LgsUtils.h"
 
-Type* LgsNullable::getIRType(LLVMContext& context) {
-    return ptrTy(context);
+Type* LgsNullable::getIRType(LgsModule* module) {
+    return ptrTy(module);
 }
 
 string LgsNullable::getIRName() {

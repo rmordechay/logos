@@ -11,8 +11,8 @@ string LgsLong::prettyName() const {
     return name;
 }
 
-Type* LgsLong::getIRType(LLVMContext& context) {
-    return Type::getInt64Ty(context);
+Type* LgsLong::getIRType(LgsModule* module) {
+    return Type::getInt64Ty(module->context);
 }
 
 size_t LgsLong::getSizeBytes() {

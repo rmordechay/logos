@@ -9,14 +9,14 @@ public:
     StructType* pairIRType = nullptr;
 
     explicit LgsTypePair(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : key(keyType), value(valueType) {}
-    Type* getIRType(LLVMContext& context) override;
+    Type* getIRType(LgsModule* module) override;
     string getIRName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() const override;
     bool equals(LgsType* other) override;
 };
 
-inline Type* LgsTypePair::getIRType(LLVMContext& context) {
+inline Type* LgsTypePair::getIRType(LgsModule* module) {
     assert(0);
 }
 

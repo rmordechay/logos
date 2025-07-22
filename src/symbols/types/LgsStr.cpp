@@ -11,8 +11,8 @@ string LgsStr::getIRName() {
     return name;
 }
 
-Type* LgsStr::getIRType(LLVMContext& context) {
-    return ArrayType::get(baseType->getIRType(context), iterLen);
+Type* LgsStr::getIRType(LgsModule* module) {
+    return ArrayType::get(baseType->getIRType(module), iterLen);
 }
 
 string LgsStr::prettyName() const {

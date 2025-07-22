@@ -26,19 +26,21 @@ void LgsIfStmt::createIRStmt(LgsModule* module) {
 
 void LgsIfStmt::generateSimpleIf(LgsModule* module) {
     const auto ifCondIR = ifCond->getIRValue(module);
-    if (!isBranchingNeeded(module, ifCondIR)) return;
+    if (!needsBranching(module, ifCondIR)) return;
     const auto trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
     endBlock = BasicBlock::Create(module->context, BB_IF_END);
     module->builder.CreateCondBr(ifCondIR, trueBlock, endBlock);
     startBlock(module, trueBlock);
     ifStmtBlock->createIRValue(module);
-    module->builder.CreateBr(endBlock);
+    if (!isLastInstTerminate(module)) {
+        module->builder.CreateBr(endBlock);
+    }
     startBlock(module, endBlock);
 }
 
 void LgsIfStmt::generateIfElse(LgsModule* module) {
     const auto ifCondIR = ifCond->getIRValue(module);
-    if (!isBranchingNeeded(module, ifCondIR)) return;
+    if (!needsBranching(module, ifCondIR)) return;
     const auto trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
     const auto elseBlock = BasicBlock::Create(module->context, BB_ELSE);
     endBlock = BasicBlock::Create(module->context, BB_IF_END);
@@ -56,7 +58,7 @@ void LgsIfStmt::generateIfElse(LgsModule* module) {
 
 void LgsIfStmt::generateComplexIf(LgsModule* module) {
     const auto ifCondIR = ifCond->getIRValue(module);
-    if (!isBranchingNeeded(module, ifCondIR)) return;
+    if (!needsBranching(module, ifCondIR)) return;
     auto trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
     auto elseIfCheckBlock = BasicBlock::Create(module->context, BB_ELSE_IF_CHECK);
     const auto elseBlock = BasicBlock::Create(module->context, BB_ELSE);
@@ -98,7 +100,7 @@ void LgsIfStmt::generateComplexIf(LgsModule* module) {
     startBlock(module, endBlock);
 }
 
-bool LgsIfStmt::isBranchingNeeded(LgsModule* module, Value* ifCondIR) const {
+bool LgsIfStmt::needsBranching(LgsModule* module, Value* ifCondIR) const {
     if (const auto* constBool = dyn_cast<ConstantInt>(ifCondIR)) {
         if (constBool->isOne()) {
             ifStmtBlock->createIRValue(module);

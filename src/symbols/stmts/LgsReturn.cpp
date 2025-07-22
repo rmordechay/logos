@@ -3,18 +3,17 @@
 #include "utils/LgsUtils.h"
 
 void LgsReturn::createIRStmt(LgsModule* module) {
-    if (hasTerminator(module)) return;
+    if (isLastInstTerminate(module)) assert(0);
     const auto currentFunc = module->stack.currentFunc;
-    if (expr) {
-        const auto exprIR = expr->getIRValue(module);
-        if (!currentFunc->funcType->isSwapReturn) {
-            module->builder.CreateRet(exprIR);
-        } else {
-            module->builder.CreateRetVoid();
-        }
-    } else {
+    if (!expr || currentFunc->funcType->isSwapReturn) {
         module->builder.CreateRetVoid();
+        return;
     }
+    auto exprIR = expr->getIRValue(module);
+    if (exprIR->getType()->isPointerTy()) {
+        exprIR = module->builder.CreateLoad(expr->type->getIRType(module), exprIR);
+    }
+    module->builder.CreateRet(exprIR);
 }
 
 LgsReturn::~LgsReturn() {

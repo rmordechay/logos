@@ -17,7 +17,7 @@ Value* LgsArrayExpr::createDynamicArray(LgsModule* module) {
     auto& builder = module->builder;
     const auto arrType = type->asDArray();
     const auto elementSize = builder.getInt64(arrType->baseType->getSizeBytes());
-    IRValue = builder.CreateAlloca(arrType->getArrStruct(module->context));
+    IRValue = builder.CreateAlloca(arrType->getArrStruct(module));
 
     Value* capacityIR = nullptr;
     if (arrType->sizeExpr) {
@@ -40,7 +40,7 @@ Value* LgsArrayExpr::createConstArray(LgsModule* module) const {
     auto& builder = module->builder;
     const auto arr = type->asSArray();
     const auto baseType = arr->baseType;
-    const auto baseIRType = baseType->getIRType(module->context);
+    const auto baseIRType = baseType->getIRType(module);
     const auto arrIRType = ArrayType::get(baseIRType, arr->iterLen);
     const auto arrIRPtr = builder.CreateAlloca(arrIRType);
     if (elements.empty()) return arrIRPtr;

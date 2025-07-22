@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsType.h"
+#include "logos/LgsModule.h"
 
 
 class LgsLong final : public LgsType {
@@ -10,7 +11,7 @@ public:
         isPrimitive = true;
         isInt = true;
     }
-    Type* getIRType(LLVMContext& context) override;
+    Type* getIRType(LgsModule* module) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     string getStrFormatPart() const override;

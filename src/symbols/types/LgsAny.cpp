@@ -8,8 +8,8 @@ size_t LgsAny::getSizeBytes() {
     return sizeof(void*);
 }
 
-Type* LgsAny::getIRType(LLVMContext& context) {
-    return ptrTy(context);
+Type* LgsAny::getIRType(LgsModule* module) {
+    return ptrTy(module);
 }
 
 string LgsAny::getIRName() {

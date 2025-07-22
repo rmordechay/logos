@@ -11,16 +11,12 @@ void LgsFunc::generateIR(LgsModule* module) {
     startFuncBlock(module);
     stmtBlock->createIRValue(module);
     if (funcType->rt->isVoid) {
-        if (!hasTerminator(module)) {
+        if (!isLastInstTerminate(module)) {
             module->builder.CreateRetVoid();
         }
     }
     module->IRFunc = nullptr;
     module->stack.exitFunc();
-}
-
-Type* LgsFunc::getIRFuncType(LLVMContext& context) {
-    return funcType->getIRType(context);
 }
 
 Value* LgsFunc::createIRValue(LgsModule* module) {
@@ -34,12 +30,11 @@ Function* LgsFunc::getIRFunc(LgsModule* module) {
     const auto funcIRName = funcType->getIRName();
     auto IRFunc = module->IRModule->getFunction(funcIRName);
     if (IRFunc) return IRFunc;
-    const auto funcTy = dyn_cast<FunctionType>(getIRFuncType(module->context));
+    const auto type = funcType->getIRType(module);
+    const auto funcTy = dyn_cast<FunctionType>(type);
     auto func = module->IRModule->getOrInsertFunction(funcIRName, funcTy);
     IRFunc = dyn_cast<Function>(func.getCallee());
-    if (funcType->isSwapReturn) {
-        setBigObjAttrs(*IRFunc);
-    }
+    if (funcType->isSwapReturn) setBigObjAttrs(module, *IRFunc);
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
     for (int i = funcType->isStaticMethod; i < funcType->params.size(); ++i) {
@@ -56,7 +51,7 @@ Value* LgsFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
     if (funcType->hasDefaults) assert(0);
     for (int i = funcType->isStaticMethod; i < args.size(); ++i) {
         const auto arg = args[i];
-        const auto argType = arg->type->getIRType(module->context);
+        const auto argType = arg->type->getIRType(module);
         auto argValue = arg->getIRValue(module);
         if (shouldLoadIRArg(argValue, arg)) {
             argValue = module->builder.CreateLoad(argType, argValue);
@@ -68,12 +63,12 @@ Value* LgsFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
 
 Value* LgsFunc::callIR(LgsModule* module, const vector<Value*>& args) {
     if (IRValue) {
-        const auto IRFuncType = cast<FunctionType>(funcType->rt->getIRType(module->context));
+        const auto IRFuncType = cast<FunctionType>(funcType->rt->getIRType(module));
         return module->builder.CreateCall(IRFuncType, IRValue, args);
     }
     const auto IRFunc = getIRFunc(module);
     if (funcType->isSwapReturn) {
-        const auto paramIRType = getReturnSwapParam().type->getIRType(module->context);
+        const auto paramIRType = getReturnSwapParam().type->getIRType(module);
         const auto rv = module->builder.CreateAlloca(paramIRType);
         vector finalArgs(args.begin(), args.end());
         finalArgs.insert(finalArgs.begin() + funcType->returnParamIndex, rv);
@@ -83,8 +78,8 @@ Value* LgsFunc::callIR(LgsModule* module, const vector<Value*>& args) {
     return module->builder.CreateCall(IRFunc, args);;
 }
 
-void LgsFunc::setBigObjAttrs(Function& IRFunc) const {
-    const auto paramIRType = getReturnSwapParam().type->getIRType(IRFunc.getContext());
+void LgsFunc::setBigObjAttrs(LgsModule* module, Function& IRFunc) const {
+    const auto paramIRType = getReturnSwapParam().type->getIRType(module);
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::StructRet, paramIRType));
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::Writable));
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
@@ -94,37 +89,6 @@ LgsParam& LgsFunc::getReturnSwapParam() const {
     if (!funcType->isSwapReturn) assert(0);
     if (funcType->returnParamIndex > funcType->params.size()) assert(0);
     return funcType->params[funcType->returnParamIndex];
-}
-
-void LgsFunc::setExceptionFuncs(LgsModule* module) const {
-    auto& builder = module->builder;
-    auto ptrTy = builder.getPtrTy();
-    const auto voidTy = builder.getVoidTy();
-    const auto persFnType = FunctionType::get(builder.getInt32Ty(), true);
-    const auto IRModule = module->IRModule;
-    auto personalityFunc = IRModule->getOrInsertFunction("__gxx_personality_v0", persFnType);
-    const auto cxaAlloc = IRModule->getOrInsertFunction("__cxa_allocate_exception", FunctionType::get(ptrTy, { builder.getInt64Ty() }, false));
-    const auto cxaThrow = IRModule->getOrInsertFunction("__cxa_throw", FunctionType::get(voidTy, { ptrTy, ptrTy, ptrTy }, false));
-    const auto cxaBeginCatch = IRModule->getOrInsertFunction("__cxa_begin_catch", FunctionType::get(voidTy, { ptrTy }, false));
-    const auto cxaEndCatch = IRModule->getOrInsertFunction( "__cxa_end_catch", FunctionType::get(voidTy, {}, false));
-
-    const auto normalBlock = BasicBlock::Create(module->context, "normal");
-    const auto catchBlock = BasicBlock::Create(module->context, "catch");
-
-    const auto alloc = builder.CreateCall(cxaAlloc, {builder.getInt64(4)});
-    builder.CreateInvoke(cxaThrow, normalBlock, catchBlock, {alloc, Constant::getNullValue(ptrTy), Constant::getNullValue(ptrTy)});
-    startBlock(module, normalBlock);
-    builder.CreateRetVoid();
-
-    startBlock(module, catchBlock);
-    const auto landingPad = builder.CreateLandingPad(StructType::get(ptrTy, builder.getInt32Ty()), 1, "lpad");
-    module->IRFunc->setPersonalityFn(cast<Function>(personalityFunc.getCallee()));
-    landingPad->addClause(ConstantPointerNull::get(ptrTy));
-
-    const auto exnPtr = builder.CreateExtractValue(landingPad, {0}, "exn_ptr");
-    builder.CreateCall(cxaBeginCatch, exnPtr);
-    builder.CreateCall(cxaEndCatch);
-    builder.CreateRetVoid();
 }
 
 string LgsFunc::prettyName() {

@@ -25,7 +25,7 @@ public:
 
 inline void LgsIterator::initIterator(LgsModule* module) {
     LgsBuiltinFunc iterInitFunc{"initIter", &LGS_VOID, type->getIRName(), {type, &LGS_ANY}};
-    const auto structType = getIRStructType(module->context, name, {ptrTy(module->context), i64Ty(module->context), ptrTy(module->context), ptrTy(module->context), ptrTy(module->context), ptrTy(module->context)});
+    const auto structType = getIRStructType(module->context, name, {ptrTy(module), i64Ty(module), ptrTy(module), ptrTy(module), ptrTy(module), ptrTy(module)});
     IRValue = module->builder.CreateAlloca(structType);
     iterInitFunc.callIR(module, {baseExpr->getIRValue(module), IRValue});
 }

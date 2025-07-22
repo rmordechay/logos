@@ -7,7 +7,7 @@ Value* LgsPrefixExpr::createIRValue(LgsModule* module) {
         return module->builder.CreateNot(exprValue);
     }
     case MINUS_PREFIX:
-        const auto zero = ConstantInt::get(type->getIRType(module->context), 0);
+        const auto zero = ConstantInt::get(type->getIRType(module), 0);
         return module->builder.CreateSub(zero, exprValue);
     }
     assert(false);

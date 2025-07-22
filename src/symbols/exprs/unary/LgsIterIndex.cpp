@@ -26,7 +26,7 @@ Value* LgsIterIndex::createIRValue(LgsModule* module) {
 Value* LgsIterIndex::getIRFromStr(LgsModule* module, LgsStr* str) const {
     if (index->to) return getStrSlice(module, str);
     const auto baseExprIRValue = baseExpr->getIRValue(module);
-    const auto baseExprIRType = baseExpr->type->getIRType(module->context);
+    const auto baseExprIRType = baseExpr->type->getIRType(module);
     const auto ptr = module->builder.CreateAlloca(baseExprIRType);
     const auto vaArgInst = module->builder.CreateVAArg(baseExprIRValue, baseExprIRType);
     module->builder.CreateStore(vaArgInst, ptr);
@@ -59,7 +59,7 @@ Value* LgsIterIndex::getStrSlice(LgsModule* module, const LgsStr* str) const {
 }
 
 Value* LgsIterIndex::getStrGEP(LgsModule* module) const {
-    const auto ty = baseExpr->type->getIRType(module->context);
+    const auto ty = baseExpr->type->getIRType(module);
     const auto value = baseExpr->getIRValue(module);
     const auto iValue = index->from->getIRValue(module);
     return module->builder.CreateGEP(ty, value, {module->builder.getInt32(0), iValue});
@@ -78,7 +78,7 @@ Value* LgsIterIndex::getArrGEP(LgsModule* module) const {
             iterIndex = innerIterIndex;
         } else {
             ptr = iterIndex->baseExpr->getIRValue(module);
-            ty = iterIndex->baseExpr->type->getIRType(module->context);
+            ty = iterIndex->baseExpr->type->getIRType(module);
             IRIndices.push_back(module->builder.getInt32(0));
             break;
         }

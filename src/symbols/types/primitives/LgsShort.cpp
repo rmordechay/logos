@@ -6,8 +6,8 @@ size_t LgsShort::getSizeBytes() {
     return sizeof(short);
 }
 
-Type* LgsShort::getIRType(LLVMContext& context) {
-    return Type::getInt16Ty(context);
+Type* LgsShort::getIRType(LgsModule* module) {
+    return Type::getInt16Ty(module->context);
 }
 
 string LgsShort::prettyName() const {

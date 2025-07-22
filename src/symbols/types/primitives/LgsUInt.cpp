@@ -12,8 +12,8 @@ string LgsUInt::prettyName() const {
     return name;
 }
 
-Type* LgsUInt::getIRType(LLVMContext& context) {
-    return Type::getInt32Ty(context);
+Type* LgsUInt::getIRType(LgsModule* module) {
+    return Type::getInt32Ty(module->context);
 }
 
 string LgsUInt::getIRName() {

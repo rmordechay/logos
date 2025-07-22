@@ -60,46 +60,46 @@ Module* createIRModule(const string& moduleName, LLVMContext& context) {
     return module;
 }
 
-bool hasTerminator(const LgsModule* module) {
+bool isLastInstTerminate(const LgsModule* module) {
     return module->builder.GetInsertBlock()->getTerminator();
 }
 
-PointerType* ptrTy(LLVMContext& context) {
-    return PointerType::getUnqual(context);
+PointerType* ptrTy(LgsModule* module) {
+    return PointerType::getUnqual(module->context);
 }
 
-Type* i1Ty(LLVMContext& context) {
-    return IntegerType::getInt32Ty(context);
+Type* i1Ty(LgsModule* module) {
+    return IntegerType::getInt32Ty(module->context);
 }
 
-Type* i8Ty(LLVMContext& context) {
-    return IntegerType::getInt32Ty(context);
+Type* i8Ty(LgsModule* module) {
+    return IntegerType::getInt32Ty(module->context);
 }
 
-Type* i16Ty(LLVMContext& context) {
-    return IntegerType::getInt32Ty(context);
+Type* i16Ty(LgsModule* module) {
+    return IntegerType::getInt32Ty(module->context);
 }
 
-Type* i32Ty(LLVMContext& context) {
-    return IntegerType::getInt32Ty(context);
+Type* i32Ty(LgsModule* module) {
+    return IntegerType::getInt32Ty(module->context);
 }
 
-Type* i64Ty(LLVMContext& context) {
-    return IntegerType::getInt64Ty(context);
+Type* i64Ty(LgsModule* module) {
+    return IntegerType::getInt64Ty(module->context);
 }
 
 FunctionCallee getPrintf(LgsModule* module) {
-    const auto funcType = FunctionType::get(i32Ty(module->context), {ptrTy(module->context)}, true);
+    const auto funcType = FunctionType::get(i32Ty(module), {ptrTy(module)}, true);
     return module->IRModule->getOrInsertFunction("printf", funcType);
 }
 
 FunctionCallee getSnprintf(LgsModule* module) {
-    const auto funcType = FunctionType::get(i32Ty(module->context), {ptrTy(module->context), module->builder.getInt64Ty(), ptrTy(module->context)}, true);
+    const auto funcType = FunctionType::get(i32Ty(module), {ptrTy(module), module->builder.getInt64Ty(), ptrTy(module)}, true);
     return module->IRModule->getOrInsertFunction("snprintf", funcType);
 }
 
 FunctionCallee getStrHash(LgsModule* module) {
-    const auto printfType = FunctionType::get(i32Ty(module->context), {ptrTy(module->context)}, false);
+    const auto printfType = FunctionType::get(i32Ty(module), {ptrTy(module)}, false);
     return module->IRModule->getOrInsertFunction("Str_hash", printfType);
 }
 

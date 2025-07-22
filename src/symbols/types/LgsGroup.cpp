@@ -1,7 +1,7 @@
 #include "types/LgsGroup.h"
 
-Type* LgsGroup::getIRType(LLVMContext& context) {
-    return ptrTy(context);
+Type* LgsGroup::getIRType(LgsModule* module) {
+    return ptrTy(module);
 }
 
 LgsExpr* LgsGroup::getZeroValue() {

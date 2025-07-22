@@ -67,7 +67,7 @@ void LgsForeachLoop::exitIRLoop(LgsModule* module) const {
 
 void LgsForeachLoop::setStrIterVars(LgsModule* module, LgsStr* str) const {
     const auto i = module->builder.CreateLoad(module->builder.getInt64Ty(), iPtr);
-    const auto gep = module->builder.CreateGEP(str->getIRType(module->context), iterPtr, {module->builder.getInt32(0), i});
+    const auto gep = module->builder.CreateGEP(str->getIRType(module), iterPtr, {module->builder.getInt32(0), i});
     const auto load = module->builder.CreateLoad(module->builder.getInt8Ty(), gep);
     if (withIndex) {
         loopVars[0]->setIRValue(loadIPtr(module));
@@ -78,7 +78,7 @@ void LgsForeachLoop::setStrIterVars(LgsModule* module, LgsStr* str) const {
 void LgsForeachLoop::setArrIterVars(LgsModule* module, LgsDArray* arr) const {
     if (arr->asSArray()) {
         const auto i = module->builder.CreateLoad(module->builder.getInt64Ty(), iPtr);
-        const auto gep = module->builder.CreateGEP(arr->getIRType(module->context), iterPtr, {module->builder.getInt32(0), i});
+        const auto gep = module->builder.CreateGEP(arr->getIRType(module), iterPtr, {module->builder.getInt32(0), i});
         if (withIndex) {
             loopVars[0]->setIRValue(loadIPtr(module));
         }
@@ -89,13 +89,13 @@ void LgsForeachLoop::setArrIterVars(LgsModule* module, LgsDArray* arr) const {
             loopVars[0]->setIRValue(iValue);
         }
         const auto v = arr->getFunc.callIR(module, {iterPtr, iValue});
-        loopVars[0 + withIndex]->setIRValue(module->builder.CreateLoad(arr->getIRType(module->context), v));
+        loopVars[0 + withIndex]->setIRValue(module->builder.CreateLoad(arr->getIRType(module), v));
     }
 }
 
 void LgsForeachLoop::setMapIterVars(LgsModule* module, const LgsIterator& iterator) const {
     const auto next = iterator.next(module);
-    const auto entryType = getIRStructType(module->context, "MapEntry", {ptrTy(module->context), ptrTy(module->context)});
+    const auto entryType = getIRStructType(module->context, "MapEntry", {ptrTy(module), ptrTy(module)});
     const auto keyGEP = module->builder.CreateStructGEP(entryType, next, 0);
     const auto valueGEP = module->builder.CreateStructGEP(entryType, next, 1);
     if (withIndex) {

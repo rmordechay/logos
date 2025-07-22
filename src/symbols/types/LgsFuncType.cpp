@@ -30,22 +30,22 @@ string LgsFuncType::getIRName() {
     return IRName;
 }
 
-Type* LgsFuncType::getIRType(LLVMContext& context) {
+Type* LgsFuncType::getIRType(LgsModule* module) {
     if (IRType) return IRType;
     Type* returnType;
-    if (isBigType && !isSwapReturn) {
-        returnType = ptrTy(context);
+    if (isSizeBig && !isSwapReturn) {
+        returnType = ptrTy(module);
     } else {
-        returnType = rt->getIRType(context);
+        returnType = rt->getIRType(module);
     }
     vector<Type*> IRParamsTypes;
     for (int i = isStaticMethod; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
         if (param.isSelf || !paramType->isPrimitive) {
-            IRParamsTypes.emplace_back(ptrTy(context));
+            IRParamsTypes.emplace_back(ptrTy(module));
         } else {
-            auto irType = paramType->getIRType(context);
+            auto irType = paramType->getIRType(module);
             IRParamsTypes.emplace_back(irType);
         }
     }

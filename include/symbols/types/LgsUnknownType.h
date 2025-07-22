@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsType.h"
+#include "logos/LgsModule.h"
 
 
 class LgsUnknownType final : public LgsType {
@@ -9,7 +10,7 @@ public:
 
     LgsUnknownType() = default;
     explicit LgsUnknownType(const string& name) : name(name) {}
-    Type* getIRType(LLVMContext& context) override;
+    Type* getIRType(LgsModule* module) override;
     string getIRName() override;
     string prettyName() const override;
     LgsExpr* getZeroValue() override;

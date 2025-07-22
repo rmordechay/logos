@@ -25,6 +25,7 @@ class LgsExpr;
 class LgsFuncCall;
 class LgsField;
 class LgsFunc;
+class LgsModule;
 
 class LgsType {
 public:
@@ -33,7 +34,7 @@ public:
     bool isInt = false;
     bool isUnsigned = false;
     bool isPrimitive = false;
-    bool isBigType = false;
+    bool isSizeBig = false;
     bool isBuiltin = false;
     bool canSlice = false;
     Type* IRType = nullptr;
@@ -69,7 +70,7 @@ public:
     virtual size_t getSizeBytes();
     virtual bool equals(LgsType& other);
     virtual string getStrFormatPart() const;
-    virtual Type* getIRType(LLVMContext& context) = 0;
+    virtual Type* getIRType(LgsModule* module) = 0;
     virtual string getIRName() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual string prettyName() const = 0;

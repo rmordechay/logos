@@ -18,7 +18,7 @@ public:
         stringstream str;
         for (int i = 0; i < args.size(); ++i) {
             const auto arg = args[i];
-            const auto argType = arg->type->getIRType(module->context);
+            const auto argType = arg->type->getIRType(module);
             auto argValue = arg->getIRValue(module);
             if (shouldLoadIRArg(argValue, arg)) {
                 argValue = module->builder.CreateLoad(argType, argValue);

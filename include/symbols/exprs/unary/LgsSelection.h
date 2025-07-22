@@ -15,7 +15,7 @@ public:
     Value* eqIR(LgsModule* module, LgsExpr* other) override;
     void createIRStmt(LgsModule* module) override;
     Value* createIRValue(LgsModule* module) override;
-    void resolveSelection(LgsModule* runtime) const;
+    void resolveSelection(LgsModule* module) const;
     ~LgsSelection() override;
 };
 

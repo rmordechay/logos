@@ -14,15 +14,15 @@ Value* LgsSelection::createIRValue(LgsModule* module) {
     return lastExpr()->IRValue;
 }
 
-void LgsSelection::resolveSelection(LgsModule* runtime) const {
+void LgsSelection::resolveSelection(LgsModule* module) const {
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
         if (const auto methodCall = childExpr->asFuncCall()) {
-            methodCall->IRValue = methodCall->createIRValue(runtime);
+            methodCall->IRValue = methodCall->createIRValue(module);
         } else if (const auto field = parentExpr->type->getField(childExpr->getExprName())) {
-            const auto parentIRValue = parentExpr->getIRValue(runtime);
-            const auto gep = field->getGEP(runtime, parentExpr->type->getIRType(runtime->context), parentIRValue);
+            const auto parentIRValue = parentExpr->getIRValue(module);
+            const auto gep = field->getGEP(module, parentExpr->type->getIRType(module), parentIRValue);
             childExpr->setIRValue(gep);
         }
     }

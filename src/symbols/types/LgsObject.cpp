@@ -9,23 +9,23 @@ string LgsObject::prettyName() const {
     return name;
 }
 
-Type* LgsObject::getIRType(LLVMContext& context) {
+Type* LgsObject::getIRType(LgsModule* module) {
     if (IRType) return IRType;
     // Add one or zero if table exists
     const size_t offset = !!vtable;
     vector<Type*> elementTypes(fields.size() + offset);
     size_t position = 0;
     if (vtable) {
-        elementTypes[position++] = ptrTy(context);
+        elementTypes[position++] = ptrTy(module);
     }
     for (const auto [_, field] : fields) {
-        const auto fieldType = field->type->getIRType(context);
+        const auto fieldType = field->type->getIRType(module);
         field->position = position++;
         elementTypes[field->position + offset] = fieldType;
     }
-    IRType = StructType::getTypeByName(context, name);
+    IRType = StructType::getTypeByName(module->context, name);
     if (!IRType) {
-        IRType = StructType::create(context, elementTypes, name);
+        IRType = StructType::create(module->context, elementTypes, name);
     }
     return IRType;
 }
