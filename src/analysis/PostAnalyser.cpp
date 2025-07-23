@@ -10,9 +10,9 @@
 
 class LgsFile;
 
-void PostAnalyser::analyse(const vector<LgsFile*>& files) {
+void PostAnalyser::analyse(const vector<LgsFile*>& files, LgsSymbolTable& globals) {
     for (const auto file : files) {
-        SemaAnalyser semaAnalyser(file);
+        SemaAnalyser semaAnalyser(file, globals);
         if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
             for (const auto obj : mainFile->objects) {
                 for (const auto [_, method] : obj->methods) {

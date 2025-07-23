@@ -75,7 +75,7 @@ bool LgsApp::analyse() {
     ThreadPool threadPool;
     for (const auto file : files) {
         threadPool.runTask([file, this] {
-            SemaAnalyser semaAnalyser(file);
+            SemaAnalyser semaAnalyser(file, globals);
             semaAnalyser.analyse();
             if (!semaAnalyser.errHandler.successful) {
                 lock_guard lock(mtx);
@@ -84,7 +84,7 @@ bool LgsApp::analyse() {
         });
     }
     threadPool.wait();
-    PostAnalyser::analyse(files);
+    PostAnalyser::analyse(files, globals);
     return errHandler.successful;
 }
 
@@ -121,7 +121,7 @@ void LgsApp::parseSrcFile(const string& codeText, path filePath) {
         errHandler.setUnsuccessful();
         return;
     }
-    AntlerConverter antlerConverter(filePath);
+    AntlerConverter antlerConverter(filePath, globals);
     const auto file = antlerConverter.getLogosFile(ast);
     lock_guard lock(mtx);
     files.push_back(file);
@@ -136,7 +136,7 @@ void LgsApp::parseSrcFile(const string& codeText, path filePath) {
 
 void LgsApp::parseEnvFile(path fileEntry) {
     const auto absFilePath = new path(canonical(fileEntry));
-    AntlerConverter antlerConverter(*absFilePath);
+    AntlerConverter antlerConverter(*absFilePath, globals);
     const auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
@@ -150,7 +150,7 @@ void LgsApp::parseEnvFile(path fileEntry) {
 
 void LgsApp::parseAppFile(path fileEntry) {
     const auto absFilePath = new path(canonical(fileEntry));
-    AntlerConverter antlerConverter(*absFilePath);
+    AntlerConverter antlerConverter(*absFilePath, globals);
     auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
@@ -174,7 +174,7 @@ void LgsApp::parseAppFile(path fileEntry) {
 bool LgsApp::resolveGlobalTypes() {
     bool successful = true;
     for (const auto& file : files) {
-        SemaAnalyser semaAnalyser(file);
+        SemaAnalyser semaAnalyser(file, globals);
         if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
             for (const auto object : mainFile->objects) {
                 semaAnalyser.resolveObjTypes(object);
@@ -211,7 +211,7 @@ bool LgsApp::resolveExternalFiles() {
     return lgsCLang.errHandler.successful;
 }
 
-void LgsApp::loadBuiltins() const {
+void LgsApp::loadBuiltins() {
     globals.addSymbol(lgsPrint.name, LgsSymbol(new LgsPrint()), nullptr);
     globals.addSymbol(lgsSizeof.name, LgsSymbol(new LgsSizeOf()), nullptr);
 }

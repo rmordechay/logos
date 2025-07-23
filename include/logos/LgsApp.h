@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsEnv.h"
+#include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
 #include "Platform.h"
 #include "extern/LgsCLang.h"
@@ -25,6 +26,7 @@ public:
     LgsCLang lgsCLang;
     vector<char*> args;
     LgsEnv activeEnv;
+    LgsSymbolTable globals;
     vector<LgsFile*> files;
     vector<LgsStrConst*> externFiles;
     LgsErrHandler errHandler;
@@ -52,7 +54,7 @@ public:
     bool resolveGlobalTypes();
     void setEnvVars();
     void setupActiveEnv();
-    void loadBuiltins() const;
+    void loadBuiltins();
     void loadEnvFiles();
     void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
     void checkRequiredEnvVars();

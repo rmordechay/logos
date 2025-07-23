@@ -43,8 +43,9 @@ class AntlerConverter {
 public:
     path filePath;
     LgsErrHandler errHandler;
+    LgsSymbolTable& globals;
 
-    explicit AntlerConverter(const path& filePath) : filePath(filePath) {}
+    explicit AntlerConverter(const path& filePath, LgsSymbolTable& globals) : filePath(filePath), globals(globals) {}
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx);
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx);
     LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx);

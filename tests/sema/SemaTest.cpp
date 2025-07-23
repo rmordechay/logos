@@ -1,27 +1,10 @@
 #include "logos/LgsApp.h"
-#include "logos/LgsModule.h"
-
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
 using testing::StartsWith;
 
-class SemaTest : public testing::Test {
-public:
-
-
-    // void SetUp() override {
-    //     std::cout << "Setup" << std::endl;
-    //     std::cout << app.files.size() << std::endl;
-    //     app.loadBuiltins();
-    // }
-    //
-    // void TearDown() override {
-    //     std::cout << app.files.size() << std::endl;
-    //     std::cout << "Tear down" << std::endl;
-    //     globals.freeSymbols();
-    // }
-};
+class SemaTest : public testing::Test {};
 
 TEST_F(SemaTest, TestSemaHappy) {
     LgsApp app;
@@ -42,7 +25,6 @@ TEST_F(SemaTest, TestSemaHappy) {
     app.analyse();
     EXPECT_EQ(app.errHandler.errors.size(), 0);
 }
-
 
 TEST_F(SemaTest, TestSema10001) {
     LgsApp app;
@@ -296,6 +278,32 @@ TEST_F(SemaTest, TestSema10022) {
     EXPECT_EQ(app.errHandler.errors[0].errCode, E10022.errCode);
 }
 
+TEST_F(SemaTest, TestSema10023) {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        a: Int = null
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    EXPECT_EQ(app.errHandler.errors.size(), 1);
+    EXPECT_EQ(app.errHandler.errors[0].errCode, E10023.errCode);
+}
+
+TEST_F(SemaTest, TestSema10024) {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        a = null
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    EXPECT_EQ(app.errHandler.errors.size(), 1);
+    EXPECT_EQ(app.errHandler.errors[0].errCode, E10024.errCode);
+}
+
 TEST_F(SemaTest, TestSema10030A) {
     LgsApp app;
     const auto code1 = R"(
@@ -305,7 +313,7 @@ TEST_F(SemaTest, TestSema10030A) {
     const auto code2 = R"(
     main() {
         a = Obj{}
-        print(a.x)
+        b = a.x
     }
     )";
     app.parseSrcFile(code1, "code1.lgs");

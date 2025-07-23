@@ -27,5 +27,4 @@ public:
     ~LgsModule() = default;
 };
 
-inline LgsSymbolTable globals;
 inline map<string, LgsFile*> externalFiles;

@@ -42,8 +42,9 @@ class SemaAnalyser final : public LgsASTVisitor {
 public:
     LgsStack stack;
     LgsErrHandler errHandler;
+    LgsSymbolTable& globals;
 
-    explicit SemaAnalyser(LgsFile* file) : LgsASTVisitor(file) {}
+    explicit SemaAnalyser(LgsFile* file, LgsSymbolTable& globals) : LgsASTVisitor(file), globals(globals) {}
     void analyse() override;
     void visitMainFile(LgsMainFile* mainFile) override;
     void visitObject(LgsObject* obj) override;

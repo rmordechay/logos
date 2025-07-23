@@ -169,6 +169,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     } else if (varDec->expr) {
         visitExpr(varDec->expr);
         varDec->type = varDec->expr->type;
+        validateExprType(varDec->expr, varDec->type);
     }
     addLocalSymbol(varDec->name, LgsSymbol(varDec));
 }
