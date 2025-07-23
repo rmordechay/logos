@@ -11,6 +11,7 @@ std::string getFileText(path filePath);
 std::string removeUnderscores(const std::string& input);
 size_t hashString(const string& str); // FNV-1a 32-bit hash
 void freeType(const LgsType* type);
+void initLLVM();
 Value* getIRStr(LgsModule* module, const std::string& value);
 StructType* getIRStructType(LLVMContext& context, const std::string& name, const std::vector<Type*>& fields);
 Module* createIRModule(const std::string& moduleName, LLVMContext& context);

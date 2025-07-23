@@ -1,14 +1,11 @@
 #pragma once
 #include "LgsType.h"
-#include "logos/LgsModule.h"
-
 
 class LgsUnknownType final : public LgsType {
 public:
     static constexpr auto typeName = "Unknown";
     string name;
 
-    LgsUnknownType() = default;
     explicit LgsUnknownType(const string& name) : name(name) {}
     Type* getIRType(LgsModule* module) override;
     string getIRName() override;
@@ -17,5 +14,3 @@ public:
     bool equals(LgsType* other) override;
     ~LgsUnknownType() override = default;
 };
-
-

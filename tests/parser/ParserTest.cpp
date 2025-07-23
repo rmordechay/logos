@@ -7,5 +7,5 @@ class ParserTest : public testing::Test {};
 TEST_F(ParserTest, TestParser) {
     LgsApp app;
     app.parseSrcFile("main() {a: Str = 34}");
-    EXPECT_TRUE(app.errHandler.errors.empty());
+    ASSERT_TRUE(app.errHandler.errors.empty());
 }

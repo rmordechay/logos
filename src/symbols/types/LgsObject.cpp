@@ -82,6 +82,6 @@ void LgsObject::setVirtualFuncs(LgsModule* module) {
 
 LgsObject::~LgsObject() {
     for (const auto interface : interfaces) {
-        delete interface;
+        freeType(interface);
     }
 }

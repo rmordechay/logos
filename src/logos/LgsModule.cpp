@@ -30,13 +30,3 @@ void LgsModule::addAllocatedExpr(LgsExpr* expr) {
     stack.allocatedExprs.push_back(expr);
 }
 
-void LgsModule::freeExprs() {
-    auto& exprs = stack.allocatedExprs;
-    exprs.erase(std::remove_if(exprs.begin(), exprs.end(), [this](LgsExpr* expr) {
-        if (!expr->isReturnExpr) {
-            // expr->free(this);
-            return true;
-        }
-        return false;
-    }), exprs.end());
-}

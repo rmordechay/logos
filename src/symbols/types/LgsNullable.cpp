@@ -19,5 +19,7 @@ string LgsNullable::prettyName() const {
 }
 
 bool LgsNullable::equals(LgsType* other) {
-    assert(0);
+    const auto otherNullable = other->asNullable();
+    if (!otherNullable) return false;
+    return baseType->equals(otherNullable->baseType);
 }

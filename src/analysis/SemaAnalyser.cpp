@@ -69,9 +69,6 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
     if (!obj->interfaces.empty()) {
         obj->vtable = new LgsHashMap(new LgsStr(), new LgsAny());
     }
-    for (const auto interface : obj->interfaces) {
-        visitInterface(interface->asInterface());
-    }
     for (const auto& [_, field] : obj->fields) {
         visitField(field);
     }

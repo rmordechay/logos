@@ -20,7 +20,6 @@ public:
     IRBuilder<> builder = IRBuilder(context);
 
     void initRuntime();
-    void freeExprs();
     void addAllocatedExpr(LgsExpr* expr);
     void pushStackTrace(const string& path);
     void printStack();

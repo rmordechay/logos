@@ -298,17 +298,6 @@ void LgsApp::createBuildDir() const {
     create_directories(paths.buildDir);
 }
 
-void LgsApp::initLLVM() const {
-    // LLVM
-    InitializeNativeTarget();
-    InitializeNativeTargetAsmPrinter();
-    InitializeNativeTargetAsmParser();
-    InitializeAllTargetMCs();
-    InitializeAllTargets();
-    InitializeAllTargetInfos();
-    dataLayout = getTargetMachine()->createDataLayout();
-}
-
 void LgsApp::writeIRToFile() {
     for (const auto [_, module] : modules) {
         if constexpr (WRITE_IR_TO_FILE) {

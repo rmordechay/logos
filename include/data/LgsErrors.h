@@ -34,14 +34,14 @@ inline LgsError E10022{.msg = "'%s' cannot be instantiated.", .errCode = errCode
 inline LgsError E10023{.msg = "Type '%s' must be nullable.", .errCode = errCodeStart++};
 inline LgsError E10024{.msg = "Declaration of null value must have an explict nullable type.", .errCode = errCodeStart++};
 inline LgsError E10025{.msg = "Only interfaces are allowed in 'implements'. Given: '%s'.", .errCode = errCodeStart++};
-inline LgsError E10026{.msg = "Function '%s' must return expression of type '%s'. None was given.", .errCode = errCodeStart++};
+inline LgsError E10026{.msg = "Function '%s' must return an expression of type '%s'. None was given.", .errCode = errCodeStart++};
 inline LgsError E10027{.msg = "Void function must not return a value. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10028{.msg = "Default parameters must be defined lastly.", .errCode = errCodeStart++};
-inline LgsError E10029{.msg = "Constant field '%s' must be initialized in the constructor.", .errCode = errCodeStart++};
+inline LgsError E10029{.msg = "Constant field '%s' must be initialized in the class or in the constructor.", .errCode = errCodeStart++};
 inline LgsError E10030{.msg = "Non-public field '%s' is used outside its parent object '%s'.", .errCode = errCodeStart++};
 inline LgsError E10031{.msg = "Non-public method '%s' is used outside its parent object '%s'.", .errCode = errCodeStart++};
 inline LgsError E10032{.msg = "Singleton object '%s' cannot be instantiated.", .errCode = errCodeStart++};
-inline LgsError E10033{.msg = "Function '%s' is declared multiple times.", .errCode = errCodeStart++};
+inline LgsError E10033{.msg = "", .errCode = errCodeStart++};
 inline LgsError E10034{.msg = "Object '%s' has a method with name '%s' but it doesn't match the parameters.\n\t   Given:    %s\n\t   Expected: %s", .errCode = errCodeStart++};
 inline LgsError E10035{.msg = "Index of %s has %s level which is too deep. Max level: %s.", .errCode = errCodeStart++};
 inline LgsError E10036{.msg = "'%s' cannot be indexed with type '%s'.", .errCode = errCodeStart++};

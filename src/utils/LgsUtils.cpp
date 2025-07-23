@@ -32,6 +32,16 @@ void freeType(const LgsType* type) {
     delete type;
 }
 
+void initLLVM() {
+    InitializeNativeTarget();
+    InitializeNativeTargetAsmPrinter();
+    InitializeNativeTargetAsmParser();
+    InitializeAllTargetMCs();
+    InitializeAllTargets();
+    InitializeAllTargetInfos();
+    dataLayout = getTargetMachine()->createDataLayout();
+}
+
 Value* getIRStr(LgsModule* module, const string& value) {
     for (auto& globals : module->IRModule->globals()) {
         if (!globals.hasInitializer()) continue;

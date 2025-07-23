@@ -4,33 +4,106 @@
 #include <gtest/gtest.h>
 #include <regex>
 
-string normalizeIR(const string& s) {
-    const auto result = regex_replace(s, regex(R"(\s+)"), " ");
-    return regex_replace(result, regex(R"(^\s+|\s+$)"), "");
+typedef map<string, map<string, vector<string>>> ExpectedInstructions;
+
+string normalize(const string& str) {
+    const auto newStr = regex_replace(str, regex(R"(, align \d+)"), "");
+    const auto start = find_if_not(newStr.begin(), newStr.end(), ::isspace);
+    const auto end = find_if_not(newStr.rbegin(), newStr.rend(), ::isspace).base();
+    if (start >= end) return "";
+    return string(start, end);
 }
 
-class CodegenTest : public testing::Test {};
-
-TEST_F(CodegenTest, CodegenTest1) {
+void compareCode(const string& codeText, ExpectedInstructions expected) {
     LgsApp app;
-    const auto expectedCode = R"(
-    define i32 @main() {
-    entry:
-      call void @Runtime_init(ptr @0)
-      %0 = alloca i32, align 4
-      store i32 2, ptr %0, align 4
-      ret i32 0
-    })";
-    app.initLLVM();
-    app.parseSrcFile("main() {a = 2}");
-    app.analyse();
-
-    string irString;
-    raw_string_ostream stream(irString);
+    app.parseSrcFile(codeText);
+    ASSERT_TRUE(app.analyse());
     const auto module = app.files[0]->generateIR();
     const auto IRModule = module->IRModule;
-    const auto func = IRModule->getFunction("main");
-    func->print(stream);
+    for (auto& func : IRModule->functions()) {
+        auto expectedBlocks = expected[func.getName().str()];
+        ASSERT_EQ(func.size(), expectedBlocks.size());
+        for (auto& bb : func) {
+            const auto expectedInsts = expectedBlocks[bb.getName().str()];
+            ASSERT_EQ(bb.size(), expectedInsts.size());
+            auto i = 0;
+            for (auto& inst : bb) {
+                string irString;
+                raw_string_ostream stream(irString);
+                inst.print(stream);
+                stream.flush();
+                const auto actualInst = normalize(irString);
+                EXPECT_EQ(expectedInsts[i], actualInst);
+                i++;
+            }
+        }
+    }
+}
 
-    EXPECT_EQ(normalizeIR(stream.str()), normalizeIR(expectedCode));
+class CodegenTest : public testing::Test {
+};
+
+TEST_F(CodegenTest, CodegenTestAddition) {
+    const auto codeText = R"(
+        main() {
+            a = 2
+            b = 4
+            c = a + b
+        }
+    )";
+    const map<string, map<string, vector<string>>> expectedInts = {
+        {"main", {
+            {"entry", {
+                "call void @Runtime_init(ptr @0)",
+                "%0 = alloca i32",
+                "store i32 2, ptr %0",
+                "%1 = alloca i32",
+                "store i32 4, ptr %1",
+                "%2 = load i32, ptr %0",
+                "%3 = load i32, ptr %1",
+                "%4 = add i32 %2, %3",
+                "%5 = alloca i32",
+                "store i32 %4, ptr %5",
+                "ret i32 0",
+            }}
+        }}
+    };
+    compareCode(codeText, expectedInts);
+}
+
+TEST_F(CodegenTest, CodegenTestIfStmt) {
+    const auto codeText = R"(
+    func(x: Int) {
+        if x > 0 {
+            a = 2
+        }
+    }
+
+    main() {
+        func(10)
+    }
+    )";
+    const map<string, map<string, vector<string>>> expectedInts = {
+        {"main", {
+            {"entry", {
+                "call void @Runtime_init(ptr @0)",
+                "call void @func(i32 10)",
+                "ret i32 0",
+            }}}
+        },
+        {"func", {
+            {"entry", {
+                "%0 = icmp sgt i32 %x, 0",
+                "br i1 %0, label %if_true, label %if_end",
+            }},
+            {"if_true", {
+                "%1 = alloca i32",
+                "store i32 2, ptr %1", "br label %if_end",
+            }},
+            {"if_end", {
+                "ret void",
+            }},
+        },
+    }};
+    compareCode(codeText, expectedInts);
 }
