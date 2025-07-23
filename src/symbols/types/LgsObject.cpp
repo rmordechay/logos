@@ -20,7 +20,7 @@ Type* LgsObject::getIRType(LgsModule* module) {
     size_t position = 0;
     if (vtable) {
         setVirtualFuncs(module);
-        elementTypes[position++] = ptrTy(module);
+        elementTypes[position++] = vtable->type->getIRType(module);
     }
     for (const auto [_, field] : fields) {
         const auto fieldType = field->type->getIRType(module);
@@ -70,14 +70,14 @@ size_t LgsObject::getSizeBytes() {
 
 void LgsObject::setVirtualFuncs(LgsModule* module) {
     const auto vtablePtr = vtable->getIRValue(module);
-    for (const auto [_, method] : methods) {
-        if (!method->funcType->isVirtual) continue;
-        const auto keyIRStr = getIRStr(module, method->funcType->getIRName());
-        const auto IRFunc = method->getIRFunc(module);
-        auto valuePtr = module->builder.CreateAlloca(module->builder.getPtrTy());
-        module->builder.CreateStore(IRFunc, valuePtr);
-        vtable->type->asMap()->addFunc.callIR(module, {vtablePtr, keyIRStr, valuePtr});
-    }
+    // for (const auto [_, method] : methods) {
+    //     if (!method->funcType->isVirtual) continue;
+    //     const auto keyIRStr = getIRStr(module, method->funcType->getIRName());
+    //     const auto IRFunc = method->getIRFunc(module);
+    //     auto valuePtr = module->builder.CreateAlloca(module->builder.getPtrTy());
+    //     module->builder.CreateStore(IRFunc, valuePtr);
+    //     vtable->type->asMap()->addFunc.callIR(module, {vtablePtr, keyIRStr, valuePtr});
+    // }
 }
 
 LgsObject::~LgsObject() {

@@ -100,9 +100,10 @@ public:
     void validateExprType(LgsExpr* expr, LgsType* type);
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
+    bool validateFieldVisibility(LgsField* field);
+    void validateMethodVisibility(const LgsFuncCall* methodCall);
     void validateFuncControlFlow(const LgsFunc* func);
     bool validateBlockControlFlow(const LgsStmtBlock* stmtBlock, const LgsFunc* func);
-    void validateMethodVisibility(const LgsFuncCall* methodCall);
 
     LgsSymbol* getSymbol(const string& name, const Location* location);
     void addLocalSymbol(const string& name, const LgsSymbol& newSymbol);

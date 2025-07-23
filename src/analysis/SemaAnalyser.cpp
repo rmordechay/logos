@@ -483,9 +483,7 @@ void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* c
         childField->setType(field->type);
         childField->isMutable = field->isMutable;
         childField->ref = LgsSymbol(field);
-        if (!field->isPublic && file->absPath != field->location.filePath) {
-            errHandler.handleError(E10030, &childField->location, {childField->getExprName(), *field->parentName});
-        }
+        validateFieldVisibility(field);
     } else {
         return errHandler.handleError(E10058, &childField->location, {childField->getExprName()});
     }
@@ -507,14 +505,10 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType)
 }
 
 void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
-    resolveFuncCall(funcCall);
-    if (!funcCall->func) return;
     for (const auto arg : funcCall->args) {
-        if (const auto anonymousFunc = arg->asFunc()) {
-            visitAnonymousFunc(funcCall, anonymousFunc->funcType);
-        }
         visitExpr(arg);
     }
+    resolveFuncCall(funcCall);
     if (!funcCall->func) return;
     const auto& funcType = funcCall->func->funcType;
     if (funcType->isVariadic) return;
@@ -556,6 +550,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
             errHandler.handleError(E10005, &arg->location, {arg->name, instance->obj->name});
             continue;
         }
+        if (validateFieldVisibility(field)) continue;
         visitExpr(arg->expr);
         validateExprType(arg->expr, field->type);
         field->expr = arg->expr;
@@ -807,6 +802,14 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
             return errHandler.handleError(E10003, &iterIndex->location, {iterIndex->prettyName(), to_string(bound)});
         }
     }
+}
+
+bool SemaAnalyser::validateFieldVisibility(LgsField* field) {
+    if (!field->isPublic && file->absPath != field->location.filePath) {
+        errHandler.handleError(E10030, &field->location, {field->name, *field->parentName});
+        return false;
+    }
+    return true;
 }
 
 void SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall) {

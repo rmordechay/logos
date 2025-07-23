@@ -75,7 +75,8 @@ void LgsFuncCall::resolveVirtualFunc(LgsModule* module) const {
     const auto vtableIRType = vtable->type->getIRType(module);
     const auto gep = builder.CreateStructGEP(vtableIRType, vtablePtr, 0);
     const auto mapValue = builder.CreateLoad(ptrTy(module), gep);
-    const auto rv = vtable->type->asMap()->getFunc.callIR(module, {mapValue, keyIR});
+    const auto lgsMap = vtable->type->asMap();
+    const auto rv = lgsMap->getFunc.callIR(module, {mapValue, keyIR});
     func->setIRValue(rv);
 }
 

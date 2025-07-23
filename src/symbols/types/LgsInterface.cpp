@@ -27,7 +27,6 @@ LgsExpr* LgsInterface::getZeroValue() {
 }
 
 bool LgsInterface::equals(LgsType* other) {
-    // Interface must be checked first
     if (const auto interface = other->asInterface()) {
         if (interface->getIRName() == getIRName()) return true;
     } else if (const auto obj = other->asObject()) {

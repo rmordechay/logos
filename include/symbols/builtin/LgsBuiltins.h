@@ -20,9 +20,6 @@ public:
             const auto arg = args[i];
             const auto argType = arg->type->getIRType(module);
             auto argValue = arg->getIRValue(module);
-            if (shouldLoadIRArg(argValue, arg)) {
-                argValue = module->builder.CreateLoad(argType, argValue);
-            }
             IRArgs.push_back(argValue);
             str << arg->type->getStrFormatPart() << std::endl;
         }

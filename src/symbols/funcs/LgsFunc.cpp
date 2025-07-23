@@ -51,12 +51,7 @@ Value* LgsFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
     if (funcType->hasDefaults) assert(0);
     for (int i = funcType->isStaticMethod; i < args.size(); ++i) {
         const auto arg = args[i];
-        const auto argType = arg->type->getIRType(module);
         auto argValue = arg->getIRValue(module);
-        // TODO refactor should load
-        if (shouldLoadIRArg(argValue, arg)) {
-            argValue = module->builder.CreateLoad(argType, argValue);
-        }
         IRArgs.push_back(argValue);
     }
     return callIR(module, IRArgs);

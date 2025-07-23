@@ -2,9 +2,9 @@ enable_testing()
 
 add_executable(lgs_tests
     main.cpp
-    analysis/sema/SemaTest.cpp
-    analysis/parser/ParserTest.cpp
-    analysis/codegen/CodegenTest.cpp
+    sema/SemaTest.cpp
+    parser/ParserTest.cpp
+    codegen/CodegenTest.cpp
 )
 
 target_precompile_headers(lgs_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include/pch.h)
