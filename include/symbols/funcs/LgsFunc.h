@@ -14,6 +14,8 @@ public:
     vector<LgsExpr*> returnExprs;
     LgsStmtsBlock* stmtBlock = nullptr;
     LgsFunc* implementsFunc = nullptr;
+    Value* returnValue = nullptr;
+    BasicBlock* cleanupBlock = nullptr;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {
         funcType = new LgsFuncType();
@@ -31,6 +33,7 @@ public:
     LgsParam& getReturnSwapParam() const;
     string format(string& tabs) override;
     Value* createIRValue(LgsModule* module) override;
+    void createCleanupBlock(LgsModule* module) const;
     virtual void generateIR(LgsModule* module);
     virtual Function* getIRFunc(LgsModule* module);
     virtual Value* callIR(LgsModule* module, const vector<Value*>& args = {});

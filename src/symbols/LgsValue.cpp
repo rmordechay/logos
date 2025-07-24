@@ -8,14 +8,16 @@ void LgsValue::startBlock(LgsModule* module, BasicBlock* const block) const {
 }
 
 void LgsValue::startFuncBlock(LgsModule* module) const {
-    const auto IRFunc = module->stack.currentFunc->getIRFunc(module);
-    const auto entryBlock = BasicBlock::Create(module->IRModule->getContext(), "entry", IRFunc);
+    const auto currentFunc = module->stack.currentFunc;
+    const auto IRFunc = currentFunc->getIRFunc(module);
+    currentFunc->cleanupBlock = BasicBlock::Create(module->context, "cleanup");
+    const auto entryBlock = BasicBlock::Create(module->context, "entry", IRFunc);
     module->builder.SetInsertPoint(entryBlock);
 }
 
 Value* LgsValue::hashIRValue(LgsModule* module, Value* value) const {
-    const auto hashValueIRFuncType = FunctionType::get(module->builder.getInt32Ty(), {module->builder.getPtrTy()}, false);
-    const auto func =module->IRModule->getOrInsertFunction("hash_Str", hashValueIRFuncType);
+    const auto hashValueIRFuncType = FunctionType::get(i32Ty(module), {ptrTy(module)}, false);
+    const auto func = module->IRModule->getOrInsertFunction("hash_Str", hashValueIRFuncType);
     return module->builder.CreateCall(func, {value});
 }
 

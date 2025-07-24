@@ -9,7 +9,10 @@ void LgsFunc::generateIR(LgsModule* module) {
     module->stack.enterScope(FUNC_SCOPE, this);
     startFuncBlock(module);
     stmtBlock->createIRValue(module);
-    if (funcType->rt->isVoid && !lastInstTerminator(module)) {
+    createCleanupBlock(module);
+    if (returnValue) {
+        module->builder.CreateRet(returnValue);
+    } else if (funcType->rt->isVoid) {
         module->builder.CreateRetVoid();
     }
     module->stack.exitScope(true);
@@ -20,6 +23,14 @@ Value* LgsFunc::createIRValue(LgsModule* module) {
     generateIR(module);
     module->builder.restoreIP(module->savedIP);
     return getIRFunc(module);
+}
+
+void LgsFunc::createCleanupBlock(LgsModule* module) const {
+    if (!lastInstTerminator(module)) {
+        module->builder.CreateBr(cleanupBlock);
+    }
+    startBlock(module, cleanupBlock);
+    module->builder.CreateAlloca(i32Ty(module));
 }
 
 Function* LgsFunc::getIRFunc(LgsModule* module) {

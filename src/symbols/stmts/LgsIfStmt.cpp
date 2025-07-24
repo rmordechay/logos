@@ -13,10 +13,10 @@
 void LgsIfStmt::createIRStmt(LgsModule* module) {
     module->stack.enterScope(IF_SCOPE, this);
     if (elseIfConds.empty()) {
-        if (elseStmtBlock) {
-            generateIfElse(module);
-        } else {
+        if (!elseStmtBlock) {
             generateSimpleIf(module);
+        } else {
+            generateIfElse(module);
         }
     } else {
         generateComplexIf(module);
