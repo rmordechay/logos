@@ -25,6 +25,5 @@ void LgsModule::printStack() {
 }
 
 void LgsModule::addAllocatedExpr(LgsExpr* expr) {
-    assert(stack.size() > 0);
     stack.allocatedExprs.push_back(expr);
 }

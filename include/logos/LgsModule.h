@@ -14,7 +14,6 @@ public:
     LgsStack stack;
     LLVMContext context;
     Module* IRModule = nullptr;
-    Function* IRFunc = nullptr;
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
 

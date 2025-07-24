@@ -70,7 +70,7 @@ Module* createIRModule(const string& moduleName, LLVMContext& context) {
     return module;
 }
 
-bool isLastInstTerminate(const LgsModule* module) {
+bool lastInstTerminator(const LgsModule* module) {
     return module->builder.GetInsertBlock()->getTerminator();
 }
 

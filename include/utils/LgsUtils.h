@@ -15,7 +15,7 @@ void initLLVM();
 Value* getIRStr(LgsModule* module, const std::string& value);
 StructType* getIRStructType(LLVMContext& context, const std::string& name, const std::vector<Type*>& fields);
 Module* createIRModule(const std::string& moduleName, LLVMContext& context);
-bool isLastInstTerminate(const LgsModule* module);
+bool lastInstTerminator(const LgsModule* module);
 PointerType* ptrTy(LgsModule* module);
 Type* i1Ty(LgsModule* module);
 Type* i8Ty(LgsModule* module);

@@ -32,7 +32,7 @@ void LgsIfStmt::generateSimpleIf(LgsModule* module) {
     module->builder.CreateCondBr(ifCondIR, trueBlock, endBlock);
     startBlock(module, trueBlock);
     ifStmtBlock->createIRValue(module);
-    if (!isLastInstTerminate(module)) {
+    if (!lastInstTerminator(module)) {
         module->builder.CreateBr(endBlock);
     }
     startBlock(module, endBlock);

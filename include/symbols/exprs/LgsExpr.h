@@ -32,7 +32,7 @@ public:
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     Value* getIRValue(LgsModule* module);
-    void setType(LgsType* type);
+    void setType(LgsType* newType);
     int getConstInt();
     string getConstStr();
     LgsIterator toIterator();

@@ -33,10 +33,8 @@ public:
     LgsFunc* currentFunc = nullptr;
     vector<LgsExpr*> allocatedExprs;
 
-    void enterFunc(LgsFunc* func);
-    void enterScope(LgsScope scope, LgsStmt* stmt);
-    void exitFunc();
-    void exitScope();
+    void enterScope(LgsScope scope, LgsValue* value);
+    void exitScope(bool isFunc = false);
     LgsForLoop* getLoop();
     LgsIfStmt* getIfStmt();
     auto begin() { return c.begin(); }

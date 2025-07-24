@@ -3,7 +3,7 @@
 #include "utils/LgsUtils.h"
 
 void LgsReturn::createIRStmt(LgsModule* module) {
-    if (isLastInstTerminate(module)) assert(0);
+    if (lastInstTerminator(module)) assert(0);
     const auto currentFunc = module->stack.currentFunc;
     if (!expr || currentFunc->funcType->isSwapReturn) {
         module->builder.CreateRetVoid();

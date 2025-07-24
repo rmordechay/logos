@@ -5,17 +5,15 @@
 #include "utils/LgsUtils.h"
 
 void LgsMainFunc::generateIR(LgsModule* module) {
-    module->stack.enterFunc(this);
-    module->IRFunc = getIRFunc(module);
+    module->stack.enterScope(FUNC_SCOPE, this);
     startFuncBlock(module);
     if (!funcType->params.empty()) {
         initArgs(module);
     }
     module->initRuntime();
     stmtBlock->createIRValue(module);
-    module->IRFunc = nullptr;
     module->builder.CreateRet(module->builder.getInt32(EXIT_SUCCESS));
-    module->stack.exitFunc();
+    module->stack.exitScope(true);
 }
 
 Function* LgsMainFunc::getIRFunc(LgsModule* module) {

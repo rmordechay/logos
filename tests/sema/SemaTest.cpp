@@ -122,11 +122,33 @@ TEST_F(SemaTest, TestSema10005B) {
     ASSERT_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
 }
 
-TEST_F(SemaTest, TestSema10006) {
+TEST_F(SemaTest, TestSema10006A) {
     LgsApp app;
     const auto code = R"(
     main() {
         a = b
+    }
+    )";
+    app.parseSrcFile(code);
+    app.analyse();
+    ASSERT_EQ(app.errHandler.errors.size(), 1);
+    ASSERT_EQ(app.errHandler.errors[0].errCode, E10006.errCode);
+}
+
+TEST_F(SemaTest, TestSema10006B) {
+    LgsApp app;
+    const auto code = R"(
+    enum Enum {
+        ENUM1
+    }
+    func(x: Int, e: Enum) {
+        if e {
+            ENUM1: {}
+        }
+        a = ENUM1
+    }
+    main() {
+        func(10, Enum.ROI)
     }
     )";
     app.parseSrcFile(code);

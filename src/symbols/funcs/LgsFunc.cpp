@@ -6,17 +6,15 @@
 #include "utils/LgsUtils.h"
 
 void LgsFunc::generateIR(LgsModule* module) {
-    module->stack.enterFunc(this);
-    module->IRFunc = getIRFunc(module);
+    module->stack.enterScope(FUNC_SCOPE, this);
     startFuncBlock(module);
     stmtBlock->createIRValue(module);
     if (funcType->rt->isVoid) {
-        if (!isLastInstTerminate(module)) {
+        if (!lastInstTerminator(module)) {
             module->builder.CreateRetVoid();
         }
     }
-    module->IRFunc = nullptr;
-    module->stack.exitFunc();
+    module->stack.exitScope(true);
 }
 
 Value* LgsFunc::createIRValue(LgsModule* module) {
@@ -33,7 +31,7 @@ Function* LgsFunc::getIRFunc(LgsModule* module) {
     const auto type = funcType->getIRType(module);
     const auto funcTy = dyn_cast<FunctionType>(type);
     auto func = module->IRModule->getOrInsertFunction(funcIRName, funcTy);
-    IRFunc = dyn_cast<Function>(func.getCallee());
+    IRFunc = cast<Function>(func.getCallee());
     if (funcType->isSwapReturn) setBigObjAttrs(module, *IRFunc);
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();

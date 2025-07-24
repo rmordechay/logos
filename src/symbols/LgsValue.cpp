@@ -3,12 +3,13 @@
 #include "utils/LgsUtils.h"
 
 void LgsValue::startBlock(LgsModule* module, BasicBlock* const block) const {
-    block->insertInto(module->IRFunc);
+    block->insertInto(module->stack.currentFunc->getIRFunc(module));
     module->builder.SetInsertPoint(block);
 }
 
 void LgsValue::startFuncBlock(LgsModule* module) const {
-    const auto entryBlock = BasicBlock::Create(module->IRModule->getContext(), "entry", module->IRFunc);
+    const auto IRFunc = module->stack.currentFunc->getIRFunc(module);
+    const auto entryBlock = BasicBlock::Create(module->IRModule->getContext(), "entry", IRFunc);
     module->builder.SetInsertPoint(entryBlock);
 }
 

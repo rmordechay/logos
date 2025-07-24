@@ -91,13 +91,13 @@ void SemaAnalyser::visitInterface(LgsInterface* interface) {
 }
 
 void SemaAnalyser::visitFunc(LgsFunc* func) {
-    stack.enterFunc(func);
+    stack.enterScope(FUNC_SCOPE, func);
     for (auto& param : func->funcType->params) {
         visitParam(&param);
     }
     visitStmtBlock(func->stmtBlock);
     validateFuncControlFlow(func);
-    stack.exitFunc();
+    stack.exitScope(true);
 }
 
 void SemaAnalyser::visitParam(LgsParam* param) {
@@ -459,7 +459,7 @@ void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
     } else if (const auto iterIndex = firstExpr->asIterIndex()) {
         visitIterIndex(iterIndex);
     } else if (const auto typeConst = firstExpr->asTypeConst()) {
-        typeConst->type = resolveType(typeConst->type);
+        typeConst->setType(resolveType(typeConst->type));
     } else {
         assert(0);
     }
@@ -527,7 +527,7 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
     const auto symbol = getSymbol(instance->name, &instance->location);
     if (!symbol) return;
-    if (symbol->symbolType != OBJECT || symbol->symbolType != INTERFACE) {
+    if (symbol->symbolType != OBJECT && symbol->symbolType != INTERFACE) {
         return errHandler.handleError(E10022, &instance->location, {instance->name});
     }
     if (symbol->object->isSingleton) {
@@ -536,7 +536,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
 
     if (!instance->obj) {
         instance->obj = symbol->object;
-        instance->type = instance->obj;
+        instance->setType(instance->obj);
     }
 
     for (const auto [name, field] : instance->obj->fields) {
@@ -584,7 +584,7 @@ void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcTy
         errHandler.handleError(E10006, &funcCall->location, {funcCall->name});
         return;
     }
-    funcCall->type = funcType->rt;
+    funcCall->setType(funcType->rt);
     funcCall->func = new LgsFunc(funcType);
 }
 
@@ -596,9 +596,9 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     iterIndex->isMutable = baseExpr->isMutable;
     visitExpr(exprFrom);
     visitExpr(exprTo);
-    if (!baseExpr->type) return;
+    if (baseExpr->type->isUnknown()) return;
     const auto iterable = baseExpr->type->asIterable();
-    if (!iterable && baseExpr->type) {
+    if (!iterable) {
         return errHandler.handleError(E10002, &iterIndex->location, {iterIndex->baseExpr->prettyName()});
     }
     if (exprTo) {
@@ -641,7 +641,6 @@ void SemaAnalyser::visitGroup(LgsGroup* group) const {
 void SemaAnalyser::castImplicitly(LgsExpr* expr, LgsType* type) const {
     if (expr->type == type) return;
     // freeType(expr->type);
-    // expr->type = type;
 }
 
 bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
@@ -830,7 +829,7 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
         // type must be nullable
         if (!type->asNullable()) return errHandler.handleError(E10023, &type->location, {type->prettyName(), type->prettyName()});
     }
-    if (!type || !expr->type) return;
+    if (type->isUnknown() || expr->type->isUnknown()) return;
     if (!expr->type->equals(type)) {
         return errHandler.handleError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
     }
@@ -900,7 +899,7 @@ void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
         const auto func = symbol->func;
         if (funcCall->equals(func->funcType)) {
             funcCall->func = func;
-            funcCall->type = func->funcType->rt;
+            funcCall->setType(func->funcType->rt);
         } else {
             errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->prettyName(), func->prettyName()});
             return;
@@ -932,7 +931,7 @@ bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentTyp
     }
     if (methodCall->equals(method->funcType)) {
         methodCall->func = method;
-        methodCall->type = method->funcType->rt;
+        methodCall->setType(method->funcType->rt);
     } else {
         errHandler.handleError(E10034, &methodCall->location, {parentType->prettyName(), name, method->prettyName(), method->funcType->prettyName()});
         return true;

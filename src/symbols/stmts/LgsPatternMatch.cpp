@@ -12,7 +12,8 @@ void LgsPatternMatch::createIRStmt(LgsModule* module) {
     for (size_t i = 0; i < patterns.size(); ++i) {
         const auto pattern = patterns[i];
         const auto patterIRValue = pattern->hashValue(module);
-        const auto patternBlock = BasicBlock::Create(module->context, "case_" + to_string(i), module->IRFunc);
+        const auto IRFunc = module->stack.currentFunc->getIRFunc(module);
+        const auto patternBlock = BasicBlock::Create(module->context, "case_" + to_string(i), IRFunc);
         switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
         module->builder.SetInsertPoint(patternBlock);
         patternsStmtBlocks[i]->createIRValue(module);

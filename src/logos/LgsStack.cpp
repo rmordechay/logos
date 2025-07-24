@@ -1,41 +1,41 @@
 #include <logos/LgsStack.h>
 #include "funcs/LgsFunc.h"
-#include "stmts/LgsStmt.h"
+#include "loops/LgsForLoop.h"
+#include "stmts/LgsIfStmt.h"
 
-void LgsStack::enterFunc(LgsFunc* func) {
-    push(LgsStackFrame{.scopeType = FUNC_SCOPE, .func = func});
-    currentFunc = func;
-}
-
-void LgsStack::enterScope(const LgsScope scope, LgsStmt* stmt) {
+void LgsStack::enterScope(const LgsScope scope, LgsValue* value) {
+    if (scope == FUNC_SCOPE) {
+        const auto func = dynamic_cast<LgsFunc*>(value);
+        push(LgsStackFrame{.scopeType = FUNC_SCOPE, .func = func});
+        currentFunc = func;
+        return;
+    }
     LgsStackFrame stackFrame{
         .scopeType = scope,
         .symbolTable = top().symbolTable,
     };
     switch (scope) {
     case LOOP_SCOPE:
-        stackFrame.loop = stmt->asLoop();
-        stackFrame.func = currentFunc;
+        stackFrame.loop = dynamic_cast<LgsForLoop*>(value);
         break;
     case IF_SCOPE:
-        stackFrame.ifStmt = stmt->asIfStmt();
-        stackFrame.func = currentFunc;
+        stackFrame.ifStmt = dynamic_cast<LgsIfStmt*>(value);
         break;
     case BLOCK_SCOPE:
+        stackFrame.stmtsBlock = dynamic_cast<LgsStmtsBlock*>(value);
         break;
-    case FUNC_SCOPE:
-        break;
+    default:
+        assert(0);
     }
+    stackFrame.func = currentFunc;
     push(stackFrame);
 }
 
-void LgsStack::exitFunc() {
+void LgsStack::exitScope(const bool isFunc) {
     pop();
-    currentFunc = nullptr;
-}
-
-void LgsStack::exitScope() {
-    pop();
+    if (isFunc) {
+        currentFunc = nullptr;
+    }
 }
 
 LgsForLoop* LgsStack::getLoop() {

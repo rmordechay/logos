@@ -796,16 +796,17 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionExprs(LogosParser::SelectionC
     for (int i = 0; i < innerSelections.size(); ++i) {
         const auto& currentExpr = innerSelections[i];
         if (const auto field = currentExpr->IDENTIFIER()) {
-            const auto logosField = getVariable(field);
-            exprs.push_back(logosField);
+            const auto lgsField = getVariable(field);
+            lgsField->type = new LgsUnknownType();
+            exprs.push_back(lgsField);
         } else if (const auto funcCall = currentExpr->funcCall()) {
             const auto logosMethodCall = getFuncCall(funcCall);
-            // First inner expr takes firstExpr as parent
             const auto prevExpr = exprs[i];
             logosMethodCall->args.insert(logosMethodCall->args.begin(), prevExpr);
             exprs.push_back(logosMethodCall);
         } else if (const auto iterIndex = currentExpr->iterIndex()) {
             const auto logosIterIndex = getIterIndex(iterIndex);
+            logosIterIndex->type = new LgsUnknownType();
             exprs.push_back(logosIterIndex);
         }
     }

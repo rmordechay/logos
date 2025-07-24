@@ -26,8 +26,11 @@ Value* LgsExpr::getIRValue(LgsModule* module) {
     return IRValue;
 }
 
-void LgsExpr::setType(LgsType* type) {
-    this->type = type;
+void LgsExpr::setType(LgsType* newType) {
+    if (type->isUnknown()) {
+        freeType(type);
+    }
+    type = newType;
 }
 
 LgsIterator LgsExpr::toIterator() {
