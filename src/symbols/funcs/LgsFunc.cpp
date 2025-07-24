@@ -9,10 +9,8 @@ void LgsFunc::generateIR(LgsModule* module) {
     module->stack.enterScope(FUNC_SCOPE, this);
     startFuncBlock(module);
     stmtBlock->createIRValue(module);
-    if (funcType->rt->isVoid) {
-        if (!lastInstTerminator(module)) {
-            module->builder.CreateRetVoid();
-        }
+    if (funcType->rt->isVoid && !lastInstTerminator(module)) {
+        module->builder.CreateRetVoid();
     }
     module->stack.exitScope(true);
 }

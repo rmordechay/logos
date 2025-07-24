@@ -24,58 +24,56 @@ void LgsIfStmt::createIRStmt(LgsModule* module) {
     module->stack.exitScope();
 }
 
-void LgsIfStmt::generateSimpleIf(LgsModule* module) {
+void LgsIfStmt::generateSimpleIf(LgsModule* module) const {
     const auto ifCondIR = ifCond->getIRValue(module);
     if (!needsBranching(module, ifCondIR)) return;
     const auto trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
-    endBlock = BasicBlock::Create(module->context, BB_IF_END);
+    const auto endBlock = BasicBlock::Create(module->context, BB_IF_END);
     module->builder.CreateCondBr(ifCondIR, trueBlock, endBlock);
     startBlock(module, trueBlock);
     ifStmtBlock->createIRValue(module);
-    if (!lastInstTerminator(module)) {
-        module->builder.CreateBr(endBlock);
-    }
+    branchIfNeeded(module, endBlock);
     startBlock(module, endBlock);
 }
 
-void LgsIfStmt::generateIfElse(LgsModule* module) {
+void LgsIfStmt::generateIfElse(LgsModule* module) const {
     const auto ifCondIR = ifCond->getIRValue(module);
     if (!needsBranching(module, ifCondIR)) return;
     const auto trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
     const auto elseBlock = BasicBlock::Create(module->context, BB_ELSE);
-    endBlock = BasicBlock::Create(module->context, BB_IF_END);
+    const auto endBlock = BasicBlock::Create(module->context, BB_IF_END);
     // if block
     module->builder.CreateCondBr(ifCondIR, trueBlock, elseBlock);
     startBlock(module, trueBlock);
     ifStmtBlock->createIRValue(module);
-    module->builder.CreateBr(endBlock);
+    branchIfNeeded(module, endBlock);
     // else block
     startBlock(module, elseBlock);
     elseStmtBlock->createIRValue(module);
-    module->builder.CreateBr(endBlock);
+    branchIfNeeded(module, endBlock);
     startBlock(module, endBlock);
 }
 
-void LgsIfStmt::generateComplexIf(LgsModule* module) {
+void LgsIfStmt::generateComplexIf(LgsModule* module) const {
     const auto ifCondIR = ifCond->getIRValue(module);
     if (!needsBranching(module, ifCondIR)) return;
     auto trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
     auto elseIfCheckBlock = BasicBlock::Create(module->context, BB_ELSE_IF_CHECK);
     const auto elseBlock = BasicBlock::Create(module->context, BB_ELSE);
-    endBlock = BasicBlock::Create(module->context, BB_IF_END);
+    const auto endBlock = BasicBlock::Create(module->context, BB_IF_END);
 
     // if block
     module->builder.CreateCondBr(ifCondIR, trueBlock, elseIfCheckBlock);
     startBlock(module, trueBlock);
     ifStmtBlock->createIRValue(module);
-    module->builder.CreateBr(endBlock);
+    branchIfNeeded(module, endBlock);
 
     for (int i = 0; i < elseIfConds.size(); ++i) {
         startBlock(module, elseIfCheckBlock);
         const auto elseIfCond = elseIfConds[i];
         const auto stmtBlock = elseIfStmtBlocks[i];
         const auto elseIfCondIR = elseIfCond->getIRValue(module);
-        trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
+        trueBlock = BasicBlock::Create(module->context, BB_ELSE_IF);
         const auto lastIter = i == elseIfConds.size() - 1;
         if (lastIter) {
             if (elseStmtBlock) {
@@ -89,13 +87,13 @@ void LgsIfStmt::generateComplexIf(LgsModule* module) {
         }
         startBlock(module, trueBlock);
         stmtBlock->createIRValue(module);
-        module->builder.CreateBr(endBlock);
+        branchIfNeeded(module, endBlock);
     }
 
     if (elseStmtBlock) {
         startBlock(module, elseBlock);
         elseStmtBlock->createIRValue(module);
-        module->builder.CreateBr(endBlock);
+        branchIfNeeded(module, endBlock);
     }
     startBlock(module, endBlock);
 }

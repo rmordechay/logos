@@ -9,7 +9,15 @@
 #include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsReturn.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsUtils.h"
+
 #include <loops/LgsForLoop.h>
+
+void LgsStmt::branchIfNeeded(LgsModule* module, BasicBlock* block) const {
+    if (!lastInstTerminator(module)) {
+        module->builder.CreateBr(block);
+    }
+}
 
 LgsAssignment* LgsStmt::asAssignment() { return dynamic_cast<LgsAssignment*>(this); }
 

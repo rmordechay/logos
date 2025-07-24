@@ -52,7 +52,6 @@ TEST_CASE("CodegenTestAddition") {
     const map<string, map<string, vector<string>>> expectedInts = {
         {"main", {
             {"entry", {
-                "call void @Runtime_init(ptr @0)",
                 "%0 = alloca i32",
                 "store i32 2, ptr %0",
                 "%1 = alloca i32",
@@ -84,7 +83,6 @@ TEST_CASE("CodegenTestIfStmt") {
     const map<string, map<string, vector<string>>> expectedInts = {
         {"main", {
             {"entry", {
-                "call void @Runtime_init(ptr @0)",
                 "call void @func(i32 10)",
                 "ret i32 0",
             }}}

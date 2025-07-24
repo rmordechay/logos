@@ -5,7 +5,9 @@ class LgsUnknownType final : public LgsType {
 public:
     string name;
 
-    explicit LgsUnknownType(const string& name = "") : name(name) {}
+    explicit LgsUnknownType(const string& name = "") : name(name) {
+        isUnknown = true;
+    }
     Type* getIRType(LgsModule* module) override;
     string getName() override;
     string prettyName() override;

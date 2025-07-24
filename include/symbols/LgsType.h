@@ -38,6 +38,7 @@ public:
     bool isPrimitive = false;
     bool isSizeBig = false;
     bool isBuiltin = false;
+    bool isUnknown = false;
     bool canSlice = false;
     Type* IRType = nullptr;
     LgsHashMap* vtable = nullptr;
@@ -69,7 +70,6 @@ public:
     LgsFuncType* asFuncType();
     LgsGroup* asGroup();
     LgsTypePair* asPair();
-    bool isUnknown();
 
     virtual size_t getSizeBytes();
     virtual bool equals(LgsType& other);

@@ -75,7 +75,6 @@ LgsEnum* LgsType::asEnum() { return dynamic_cast<LgsEnum*>(this); }
 LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
 LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }
 LgsTypePair* LgsType::asPair() { return dynamic_cast<LgsTypePair*>(this); }
-bool LgsType::isUnknown() { return dynamic_cast<LgsUnknownType*>(this); }
 
 LgsType::~LgsType() {
     if (vtable) delete vtable;

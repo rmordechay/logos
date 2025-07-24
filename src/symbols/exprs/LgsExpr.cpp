@@ -27,7 +27,7 @@ Value* LgsExpr::getIRValue(LgsModule* module) {
 }
 
 void LgsExpr::setType(LgsType* newType) {
-    if (type->isUnknown()) freeType(type);
+    if (type && type->isUnknown) freeType(type);
     type = newType;
 }
 

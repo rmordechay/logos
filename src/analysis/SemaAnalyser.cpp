@@ -214,7 +214,7 @@ void SemaAnalyser::visitPatternMatch(LgsPatternMatch* patternMatching) {
     }
     for (const auto patternExpr : patternMatching->patterns) {
         visitExpr(patternExpr);
-        if (patternExpr->type->isUnknown()) continue;
+        if (patternExpr->type->isUnknown) continue;
         if (!patternExpr->type->equals(baseExprType)) {
             return errHandler.handleError(E10014, &patternExpr->location, {patternExpr->type->prettyName(), baseExprType->prettyName()});
         }
@@ -596,7 +596,7 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     iterIndex->isMutable = baseExpr->isMutable;
     visitExpr(exprFrom);
     visitExpr(exprTo);
-    if (baseExpr->type->isUnknown()) return;
+    if (baseExpr->type->isUnknown) return;
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable) {
         return errHandler.handleError(E10002, &iterIndex->location, {iterIndex->baseExpr->prettyName()});
@@ -825,11 +825,11 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
     assert(expr);
     if (expr->isNull) {
         // null must have a type
-        if (type->isUnknown()) return errHandler.handleError(E10024, &expr->location);
+        if (type->isUnknown) return errHandler.handleError(E10024, &expr->location);
         // type must be nullable
         if (!type->asNullable()) return errHandler.handleError(E10023, &type->location, {type->prettyName(), type->prettyName()});
     }
-    if (type->isUnknown() || expr->type->isUnknown()) return;
+    if (type->isUnknown || expr->type->isUnknown) return;
     if (!expr->type->equals(type)) {
         return errHandler.handleError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
     }
@@ -968,7 +968,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
         resolveFuncTypes(funcType);
         return funcType;
     }
-    if (!type->isUnknown()) return type;
+    if (!type->isUnknown) return type;
 
     auto typeName = type->getName();
     auto symbol = globals.getSymbol(typeName);
