@@ -11,9 +11,9 @@ public:
     vector<LgsType*> interfaces;
 
     explicit LgsObject(const string& name) : name(name) {}
-    string prettyName() const override;
+    string prettyName() override;
     Type* getIRType(LgsModule* module) override;
-    string getIRName() override;
+    string getName() override;
     size_t getSizeBytes() override;
     void setVirtualFuncs(LgsModule* module);
     LgsExpr* getZeroValue() override;

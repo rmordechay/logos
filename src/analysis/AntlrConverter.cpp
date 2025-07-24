@@ -8,7 +8,7 @@
 #include "exprs/unary/LgsCast.h"
 #include "exprs/LgsNullValue.h"
 #include "exprs/LgsBinaryExpr.h"
-#include "exprs/unary/LgsEnumField.h"
+
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsCharConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
@@ -376,8 +376,8 @@ LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx, string& pare
     return field;
 }
 
-LgsStmtBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
-    const auto stmtBlock = new LgsStmtBlock();
+LgsStmtsBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
+    const auto stmtBlock = new LgsStmtsBlock();
     if (!ctx) return stmtBlock;
     for (const auto& statement : ctx->statement()) {
         auto stmt = getStmt(statement);
@@ -572,14 +572,12 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
             errHandler.handleError(E10011, &lgsEnum->location, {enumName, to_string(lgsEnum->location.lineNumberStart)});
             break;
         }
-        string enumText = "";
+        const auto field = new LgsField(enumName, &lgsEnum->name, lgsEnum);
         if (enumField->STRING()) {
-            enumText = enumField->STRING()->getText();
-            cleanStr(enumText);
+            field->expr = getStrConst(enumField->STRING());
         }
-        const auto field = new LgsEnumField(lgsEnum, enumName, enumText);
         field->setLocation(ctx->start, ctx->stop, filePath);
-        lgsEnum->fields[enumName] = new LgsField(field->name, &lgsEnum->name, lgsEnum, field);
+        lgsEnum->fields[enumName] = field;
     }
     return lgsEnum;
 }
@@ -587,14 +585,17 @@ LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
 LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
     if (!ctx) return nullptr;
     LgsExpr* expr = nullptr;
-    if (ctx->cast) {
-        expr = getCast(ctx);
-    } else if (ctx->LPAREN() && ctx->RPAREN()) {
-        expr = getExpr(ctx->left);
-    }  else if (const auto unary = ctx->unaryExpr()) {
+    if (const auto unary = ctx->unaryExpr()) {
         expr = getUnaryExpr(unary);
     } else if (ctx->right){
         expr = getBinaryExpr(ctx);
+    }else if (ctx->cast) {
+        expr = getCast(ctx);
+    } else if (ctx->LPAREN() && ctx->RPAREN()) {
+        expr = getExpr(ctx->left);
+    }
+    if (!expr->type) {
+        expr->type = new LgsUnknownType();
     }
     return expr;
 }

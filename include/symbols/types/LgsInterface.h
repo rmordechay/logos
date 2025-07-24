@@ -12,9 +12,9 @@ public:
     explicit LgsInterface(const string& name) : name(name) {
         vtable = new LgsHashMap(new LgsStr(), new LgsAny());
     }
-    string prettyName() const override;
+    string prettyName() override;
     Type* getIRType(LgsModule* module) override;
-    string getIRName() override;
+    string getName() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     ~LgsInterface() override;

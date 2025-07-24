@@ -8,10 +8,10 @@ public:
     LgsChar() {
         isPrimitive = true;
     }
-    string prettyName() const override;
+    string prettyName() override;
     size_t getSizeBytes() override;
     Type* getIRType(LgsModule* module) override;
-    string getIRName() override;
+    string getName() override;
     LgsExpr* getZeroValue() override;
     string getStrFormatPart() const override;
     bool equals(LgsType* other) override;

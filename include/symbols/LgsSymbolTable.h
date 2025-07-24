@@ -8,7 +8,6 @@ struct LgsSymbolTable {
 
     LgsSymbol* getSymbol(const string& name);
     void addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler);
-    void addSymbol(const string& name, const LgsSymbol& symbol);
     void addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler = nullptr);
     void freeSymbols();
     ~LgsSymbolTable() = default;

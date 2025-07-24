@@ -3,13 +3,12 @@
 
 class LgsUnknownType final : public LgsType {
 public:
-    static constexpr auto typeName = "Unknown";
     string name;
 
-    explicit LgsUnknownType(const string& name) : name(name) {}
+    explicit LgsUnknownType(const string& name = "") : name(name) {}
     Type* getIRType(LgsModule* module) override;
-    string getIRName() override;
-    string prettyName() const override;
+    string getName() override;
+    string prettyName() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     ~LgsUnknownType() override = default;

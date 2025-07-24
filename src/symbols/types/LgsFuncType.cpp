@@ -17,7 +17,7 @@ bool LgsFuncType::equals(LgsType* other) {
     return true;
 }
 
-string LgsFuncType::getIRName() {
+string LgsFuncType::getName() {
     if (IRName != "") return IRName;
     stringstream strStream;
     if (isMethod) {
@@ -57,7 +57,7 @@ LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
 
-string LgsFuncType::prettyName() const {
+string LgsFuncType::prettyName() {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = 0; i < params.size(); ++i) {

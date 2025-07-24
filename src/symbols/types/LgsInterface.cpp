@@ -18,7 +18,7 @@ Type* LgsInterface::getIRType(LgsModule* module) {
     return IRType;
 }
 
-string LgsInterface::getIRName() {
+string LgsInterface::getName() {
     return name;
 }
 
@@ -28,16 +28,16 @@ LgsExpr* LgsInterface::getZeroValue() {
 
 bool LgsInterface::equals(LgsType* other) {
     if (const auto interface = other->asInterface()) {
-        if (interface->getIRName() == getIRName()) return true;
+        if (interface->getName() == getName()) return true;
     } else if (const auto obj = other->asObject()) {
         for (const auto& implement : obj->interfaces) {
-            if (implement->getIRName() == getIRName()) return true;
+            if (implement->getName() == getName()) return true;
         }
     }
     return false;
 }
 
-string LgsInterface::prettyName() const {
+string LgsInterface::prettyName() {
     return name;
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsStmt.h"
-#include "LgsStmtBlock.h"
+#include "LgsStmtsBlock.h"
 
 #include <exprs/unary/LgsUnaryExpr.h>
 
@@ -8,8 +8,8 @@ class LgsPatternMatch final : public LgsStmt {
 public:
     LgsExpr* expr;
     std::vector<LgsExpr*> patterns;
-    std::vector<LgsStmtBlock*> patternsStmtBlocks;
-    LgsStmtBlock* elseStmtBlock = nullptr;
+    std::vector<LgsStmtsBlock*> patternsStmtBlocks;
+    LgsStmtsBlock* elseStmtBlock = nullptr;
     BasicBlock* exitBlock = nullptr;
     BasicBlock* defaultCase = nullptr;
 

@@ -8,11 +8,11 @@ LgsExpr* LgsGroup::getZeroValue() {
     assert(0);
 }
 
-string LgsGroup::getIRName() {
+string LgsGroup::getName() {
     return name;
 }
 
-string LgsGroup::prettyName() const {
+string LgsGroup::prettyName() {
     return name;
 }
 

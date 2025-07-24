@@ -1,7 +1,6 @@
 #include "logos/LgsModule.h"
 #include "utils/LgsUtils.h"
 
-
 void LgsModule::initRuntime() {
     const auto voidTy = builder.getVoidTy();
     const auto stackStr = getIRStructType(context, "StackStr", {ArrayType::get(builder.getInt8Ty(), 1024), builder.getInt32Ty()});
@@ -29,4 +28,3 @@ void LgsModule::addAllocatedExpr(LgsExpr* expr) {
     assert(stack.size() > 0);
     stack.allocatedExprs.push_back(expr);
 }
-

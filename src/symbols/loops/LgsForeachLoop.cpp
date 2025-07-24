@@ -3,7 +3,7 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "stmts/LgsVarDec.h"
-#include "stmts/LgsStmtBlock.h"
+#include "stmts/LgsStmtsBlock.h"
 #include "types/LgsDArray.h"
 #include "types/LgsIterator.h"
 #include "types/LgsMap.h"

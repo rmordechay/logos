@@ -21,6 +21,8 @@ void LgsStack::enterScope(const LgsScope scope, LgsStmt* stmt) {
         stackFrame.ifStmt = stmt->asIfStmt();
         stackFrame.func = currentFunc;
         break;
+    case BLOCK_SCOPE:
+        break;
     case FUNC_SCOPE:
         break;
     }
@@ -32,15 +34,7 @@ void LgsStack::exitFunc() {
     currentFunc = nullptr;
 }
 
-void LgsStack::exitScope(const LgsScope scope) {
-    switch (scope) {
-    case FUNC_SCOPE:
-        break;
-    case LOOP_SCOPE:
-        break;
-    case IF_SCOPE:
-        break;
-    }
+void LgsStack::exitScope() {
     pop();
 }
 

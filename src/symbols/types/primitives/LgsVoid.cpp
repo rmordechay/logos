@@ -3,7 +3,7 @@
 #include "exprs/LgsNullValue.h"
 
 
-string LgsVoid::prettyName() const {
+string LgsVoid::prettyName() {
     return name;
 }
 
@@ -15,7 +15,7 @@ size_t LgsVoid::getSizeBytes() {
     return 0;
 }
 
-string LgsVoid::getIRName() {
+string LgsVoid::getName() {
     return name;
 }
 
@@ -24,5 +24,5 @@ LgsExpr* LgsVoid::getZeroValue() {
 }
 
 bool LgsVoid::equals(LgsType* other) {
-    return name == other->getIRName();
+    return name == other->getName();
 }

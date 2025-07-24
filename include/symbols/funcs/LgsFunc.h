@@ -2,7 +2,7 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "types/LgsFuncType.h"
 
-class LgsStmtBlock;
+class LgsStmtsBlock;
 class LgsParam;
 class LgsExpr;
 class LgsStmt;
@@ -12,7 +12,7 @@ class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
     vector<LgsExpr*> returnExprs;
-    LgsStmtBlock* stmtBlock = nullptr;
+    LgsStmtsBlock* stmtBlock = nullptr;
     LgsFunc* implementsFunc = nullptr;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {
@@ -29,7 +29,6 @@ public:
     string prettyName() override;
     void setBigObjAttrs(LgsModule* module, Function& IRFunc) const;
     LgsParam& getReturnSwapParam() const;
-    void setExceptionFuncs(LgsModule* module) const;
     string format(string& tabs) override;
     Value* createIRValue(LgsModule* module) override;
     virtual void generateIR(LgsModule* module);

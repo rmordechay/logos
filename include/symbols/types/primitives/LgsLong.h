@@ -15,8 +15,8 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     string getStrFormatPart() const override;
-    string getIRName() override;
-    string prettyName() const override;
+    string getName() override;
+    string prettyName() override;
     bool equals(LgsType* other) override;
     ~LgsLong() override = default;
 };

@@ -3,7 +3,7 @@
 #include "stmts/LgsStmt.h"
 
 class LgsVariable;
-class LgsStmtBlock;
+class LgsStmtsBlock;
 class LgsExpr;
 
 #define LOGOS_LOOP_CONDITION "loop_condition"
@@ -14,7 +14,7 @@ class LgsForLoop : public LgsStmt {
 public:
     AllocaInst* iPtr = nullptr;
     vector<LgsVarDec*> loopVars;
-    LgsStmtBlock* stmtBlock = nullptr;
+    LgsStmtsBlock* stmtBlock = nullptr;
     BasicBlock* IRCondBlock = nullptr;
     BasicBlock* IRBodyBlock = nullptr;
     BasicBlock* IRExitBlock = nullptr;

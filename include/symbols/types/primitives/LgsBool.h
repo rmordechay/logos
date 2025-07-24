@@ -11,9 +11,9 @@ public:
         isPrimitive = true;
         isInt = true;
     }
-    string prettyName() const override;
+    string prettyName() override;
     Type* getIRType(LgsModule* module) override;
-    string getIRName() override;
+    string getName() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     string getStrFormatPart() const override;

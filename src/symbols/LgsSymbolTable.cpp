@@ -1,8 +1,7 @@
 #include "LgsSymbolTable.h"
 #include "data/LgsErrors.h"
-#include "exprs/unary/LgsEnumField.h"
 #include "funcs/LgsParam.h"
-#include "../../include/utils/LgsErrHandler.h"
+#include "utils/LgsErrHandler.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
@@ -16,12 +15,6 @@ void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol, LgsE
     if (symbols.find(name) != symbols.end()) {
         return errHandler->handleError(E10011, symbol.location, {name, symbol.location->lineNumberStr()});
     }
-    std::lock_guard lock(mtx);
-    symbols[name] = symbol;
-}
-
-void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol) {
-    if (symbols.find(name) != symbols.end()) return;
     std::lock_guard lock(mtx);
     symbols[name] = symbol;
 }
@@ -41,9 +34,9 @@ void LgsSymbolTable::addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler) {
     }
     lock_guard lock(mtx);
     symbols[lgsEnum->name] = LgsSymbol(lgsEnum);
-    for (const auto& [name, field] : lgsEnum->fields) {
-        symbols[name] = LgsSymbol(field->expr->asEnumField());
-    }
+    // for (const auto& [name, field] : lgsEnum->fields) {
+    //     symbols[name] = LgsSymbol(field);
+    // }
 }
 
 void LgsSymbolTable::freeSymbols() {
@@ -54,9 +47,6 @@ void LgsSymbolTable::freeSymbols() {
             break;
         case PARAM:
             delete symbol.second.param;
-            break;
-        case ENUM_FIELD:
-            delete symbol.second.enumField;
             break;
         case FIELD:
             delete symbol.second.field;

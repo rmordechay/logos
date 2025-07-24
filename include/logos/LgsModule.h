@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsStack.h"
-#include "LgsSymbolTable.h"
 
 class LgsFile;
 class LgsErrHandler;

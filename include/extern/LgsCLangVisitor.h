@@ -1,5 +1,6 @@
 #pragma once
 #include "files/LgsFile.h"
+#include "utils/LgsErrHandler.h"
 #include "utils/LgsUtils.h"
 
 class LgsErrHandler;
@@ -13,7 +14,7 @@ class LgsCLangVisitor : public clang::RecursiveASTVisitor<LgsCLangVisitor> {
 public:
     LgsFile* cFile;
 
-    explicit LgsCLangVisitor(path& filePath) : cFile(new LgsFile(filePath.filename(), filePath)) {}
+    explicit LgsCLangVisitor(const path& filePath) : cFile(new LgsFile(filePath.filename(), filePath)) {}
     bool VisitFunctionDecl(const clang::FunctionDecl* func);
     bool VisitRecordDecl(const clang::RecordDecl* record);
     LgsType* mapCType(clang::QualType type);
@@ -30,7 +31,7 @@ class LgsCLangASTConsumer final : public clang::ASTConsumer {
 public:
     LgsCLangVisitor visitor;
 
-    explicit LgsCLangASTConsumer(path& filePath) : visitor(filePath) {}
+    explicit LgsCLangASTConsumer(const path& filePath) : visitor(filePath) {}
     void HandleTranslationUnit(clang::ASTContext& context) override;
     ~LgsCLangASTConsumer() override = default;
 };

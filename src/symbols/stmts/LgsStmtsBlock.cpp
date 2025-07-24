@@ -1,18 +1,18 @@
-#include "stmts/LgsStmtBlock.h"
+#include "stmts/LgsStmtsBlock.h"
 #include "exprs/unary/LgsSelection.h"
 
-void LgsStmtBlock::createIRValue(LgsModule* runtime) const {
+void LgsStmtsBlock::createIRValue(LgsModule* runtime) const {
     for (const auto stmt : stmts) {
         stmt->createIRStmt(runtime);
     }
 }
 
-LgsStmt* LgsStmtBlock::lastStmt() const {
+LgsStmt* LgsStmtsBlock::lastStmt() const {
     if (stmts.empty()) return nullptr;
     return stmts[stmts.size() - 1];
 }
 
-std::string LgsStmtBlock::format(std::string& indentStr) {
+std::string LgsStmtsBlock::format(std::string& indentStr) {
     std::stringstream oss;
     oss << " {\n";
     indentStr += '\t';
@@ -23,7 +23,7 @@ std::string LgsStmtBlock::format(std::string& indentStr) {
     return oss.str();
 }
 
-LgsStmtBlock::~LgsStmtBlock() {
+LgsStmtsBlock::~LgsStmtsBlock() {
     for (const auto& stmt : stmts) {
         delete stmt;
     }

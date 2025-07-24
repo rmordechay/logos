@@ -24,7 +24,7 @@ class LgsEnum;
 class LgsIfStmt;
 class LgsParam;
 class LgsVarDec;
-class LgsStmtBlock;
+class LgsStmtsBlock;
 class LgsStmt;
 class LgsField;
 class LgsFuncType;
@@ -65,7 +65,7 @@ public:
     LgsFunc* getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
-    LgsStmtBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
+    LgsStmtsBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
     LgsBreakStmt* getBreakStmt(LogosParser::StatementContext* ctx) const;
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);

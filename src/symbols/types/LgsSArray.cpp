@@ -30,7 +30,7 @@ string LgsSArray::getStrFormatPart() const {
     return "%p";
 }
 
-string LgsSArray::prettyName() const {
+string LgsSArray::prettyName() {
     return baseType->prettyName() + '[' + (initialLength == 0 ? "" : to_string(initialLength)) + "]!";
 }
 
@@ -41,7 +41,7 @@ bool LgsSArray::equals(LgsType* other) {
     return sizeExpr->type->equals(otherArr->sizeExpr->type);;
 }
 
-string LgsSArray::getIRName() {
+string LgsSArray::getName() {
     return name;
 }
 

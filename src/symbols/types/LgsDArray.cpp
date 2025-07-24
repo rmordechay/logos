@@ -29,7 +29,7 @@ string LgsDArray::getStrFormatPart() const {
     return "%p";
 }
 
-string LgsDArray::prettyName() const {
+string LgsDArray::prettyName() {
     return baseType->prettyName() + "[]";
 }
 
@@ -39,7 +39,7 @@ bool LgsDArray::equals(LgsType* other) {
     return baseType->equals(otherArr->baseType);
 }
 
-string LgsDArray::getIRName() {
+string LgsDArray::getName() {
     return name;
 }
 

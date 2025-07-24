@@ -22,8 +22,8 @@ public:
         canSlice = true;
     }
     size_t getSizeBytes() override;
-    string getIRName() override;
-    string prettyName() const override;
+    string getName() override;
+    string prettyName() override;
     Type* getIRType(LgsModule* module) override;
     LgsExpr* getZeroValue() override;
     string getStrFormatPart() const override;

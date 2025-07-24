@@ -39,11 +39,11 @@ Type* LgsMap::getIRType(LgsModule* module) {
     return getMapStruct(module);
 }
 
-string LgsMap::getIRName() {
+string LgsMap::getName() {
     return name;
 }
 
-string LgsMap::prettyName() const {
+string LgsMap::prettyName() {
     return '{' + typePair->key->prettyName() + ": " + typePair->value->prettyName() + '}';
 }
 

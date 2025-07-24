@@ -10,9 +10,9 @@ using namespace llvm;
 class LgsValue {
 public:
     Location location;
-    vector<LgsVariable*> refs;
     bool isMutable = false;
     Value* IRValue = nullptr;
+    vector<LgsVariable*> refs;
 
     void setIRValue(Value* value);
     GlobalVariable* createIRGlobal(const LgsModule* module, Type* type, Constant* value) const;

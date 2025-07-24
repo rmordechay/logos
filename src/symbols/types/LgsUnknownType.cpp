@@ -1,7 +1,11 @@
 #include "types/LgsUnknownType.h"
 
-string LgsUnknownType::prettyName() const {
-    return name == "" ? typeName : name;
+string LgsUnknownType::prettyName() {
+    return getName();
+}
+
+string LgsUnknownType::getName() {
+    return name == "" ? "<Unknown>" : name;
 }
 
 LgsExpr* LgsUnknownType::getZeroValue() {
@@ -9,13 +13,9 @@ LgsExpr* LgsUnknownType::getZeroValue() {
 }
 
 bool LgsUnknownType::equals(LgsType* other) {
-    assert(0);
+    return false;
 }
 
 Type* LgsUnknownType::getIRType(LgsModule* module) {
     assert(0);
-}
-
-string LgsUnknownType::getIRName() {
-    return name;
 }

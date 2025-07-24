@@ -50,7 +50,6 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/LgsIterIndex.cpp
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
-    src/symbols/exprs/unary/LgsEnumField.cpp
     src/symbols/exprs/unary/LgsPostfixExpr.cpp
     src/symbols/exprs/unary/LgsPrefixExpr.cpp
     src/symbols/funcs/LgsFunc.cpp
@@ -68,7 +67,7 @@ set(SOURCE_FILES
     src/symbols/stmts/LgsPatternMatch.cpp
     src/symbols/stmts/LgsReturn.cpp
     src/symbols/stmts/LgsStmt.cpp
-    src/symbols/stmts/LgsStmtBlock.cpp
+    src/symbols/stmts/LgsStmtsBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
     src/symbols/types/primitives/LgsBool.cpp
     src/symbols/types/primitives/LgsChar.cpp

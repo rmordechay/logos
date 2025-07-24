@@ -9,11 +9,11 @@ Type* LgsSize::getIRType(LgsModule* module) {
     return dataLayout.getIntPtrType(module->context);
 }
 
-std::string LgsSize::getIRName() {
+std::string LgsSize::getName() {
     return name;
 }
 
-std::string LgsSize::prettyName() const {
+std::string LgsSize::prettyName() {
     return name;
 }
 

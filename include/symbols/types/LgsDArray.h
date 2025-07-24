@@ -9,7 +9,7 @@
 
 class LgsArrayAddFunc final : public LgsBuiltinFunc {
 public:
-    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getIRName(), {parent, &LGS_ANY}, true) {}
+    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getName(), {parent, &LGS_ANY}, true) {}
     Value* call(LgsModule* module, const vector<LgsExpr*>& args) override;
     ~LgsArrayAddFunc() override = default;
 };
@@ -37,8 +37,8 @@ public:
         canSlice = true;
     }
     Type* getIRType(LgsModule* module) override;
-    string getIRName() override;
-    string prettyName() const override;
+    string getName() override;
+    string prettyName() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;

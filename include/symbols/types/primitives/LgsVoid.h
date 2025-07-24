@@ -11,10 +11,10 @@ public:
         isVoid = true;
         isPrimitive = true;
     }
-    string prettyName() const override;
+    string prettyName() override;
     Type* getIRType(LgsModule* module) override;
     size_t getSizeBytes() override;
-    string getIRName() override;
+    string getName() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     ~LgsVoid() override = default;

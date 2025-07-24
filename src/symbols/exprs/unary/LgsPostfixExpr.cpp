@@ -11,7 +11,7 @@ void LgsPostfixExpr::createIRStmt(LgsModule* module) {
 }
 
 Value* LgsPostfixExpr::IncOrDecValue(LgsModule* module) const {
-    const auto exprIRValue = expr->createIRValue(module);
+    const auto exprIRValue = expr->getIRValue(module);
     const auto exprIRType = expr->type->getIRType(module);
     const auto exprLoad = module->builder.CreateLoad(exprIRType, exprIRValue);
     const auto oneConst = ConstantInt::get(exprIRType, 1);

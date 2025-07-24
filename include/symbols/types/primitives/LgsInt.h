@@ -11,8 +11,8 @@ public:
     }
     size_t getSizeBytes() override;
     Type* getIRType(LgsModule* module) override;
-    string getIRName() override;
-    string prettyName() const override;
+    string getName() override;
+    string prettyName() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     string getStrFormatPart() const override;

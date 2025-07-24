@@ -5,7 +5,7 @@ size_t LgsStr::getSizeBytes() {
     return initialLength + 1;
 }
 
-string LgsStr::getIRName() {
+string LgsStr::getName() {
     return name;
 }
 
@@ -13,7 +13,7 @@ Type* LgsStr::getIRType(LgsModule* module) {
     return ArrayType::get(baseType->getIRType(module), initialLength);
 }
 
-string LgsStr::prettyName() const {
+string LgsStr::prettyName() {
     return name;
 }
 
@@ -54,6 +54,6 @@ Value* LgsStr::isNotEmpty(LgsModule* module, LgsExpr* expr) {
 
 bool LgsStr::equals(LgsType* other) {
     assert(other);
-    if (other->getIRName() == LgsAny::name) return true;
-    return name == other->getIRName();
+    if (other->getName() == LgsAny::name) return true;
+    return name == other->getName();
 }

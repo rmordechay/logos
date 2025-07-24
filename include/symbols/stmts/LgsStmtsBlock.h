@@ -1,14 +1,14 @@
 #pragma once
 #include "stmts/LgsStmt.h"
 
-class LgsStmtBlock final : public LgsValue {
+class LgsStmtsBlock final : public LgsValue {
 public:
     std::vector<LgsStmt*> stmts;
     bool hasReturn = false;
 
-    explicit LgsStmtBlock(const std::vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
+    explicit LgsStmtsBlock(const std::vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
     void createIRValue(LgsModule* runtime) const;
     LgsStmt* lastStmt() const;
     std::string format(std::string& indentStr) override;
-    ~LgsStmtBlock() override;
+    ~LgsStmtsBlock() override;
 };

@@ -11,7 +11,7 @@ size_t LgsInt::getSizeBytes() {
     return sizeof(int);
 }
 
-string LgsInt::prettyName() const {
+string LgsInt::prettyName() {
     return name;
 }
 
@@ -19,7 +19,7 @@ Type* LgsInt::getIRType(LgsModule* module) {
     return Type::getInt32Ty(module->context);
 }
 
-string LgsInt::getIRName() {
+string LgsInt::getName() {
     return name;
 }
 
@@ -28,7 +28,7 @@ LgsExpr* LgsInt::getZeroValue() {
 }
 
 bool LgsInt::equals(LgsType* other) {
-    const auto IRName = other->getIRName();
+    const auto IRName = other->getName();
     if (IRName == LgsPtr::name) return true;
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsFloat::name) return true;

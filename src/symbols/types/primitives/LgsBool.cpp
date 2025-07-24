@@ -2,7 +2,7 @@
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/LgsNullValue.h"
 
-string LgsBool::prettyName() const {
+string LgsBool::prettyName() {
     return name;
 }
 
@@ -10,7 +10,7 @@ Type* LgsBool::getIRType(LgsModule* module) {
     return Type::getInt1Ty(module->context);
 }
 
-string LgsBool::getIRName() {
+string LgsBool::getName() {
     return name;
 }
 
@@ -20,9 +20,9 @@ LgsExpr* LgsBool::getZeroValue() {
 
 bool LgsBool::equals(LgsType* other) {
     if (asNullable()) {
-        return name == other->getIRName();
+        return name == other->getName();
     }
-    return name == other->getIRName();
+    return name == other->getName();
 }
 
 string LgsBool::getStrFormatPart() const {

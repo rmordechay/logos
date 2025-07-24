@@ -21,7 +21,7 @@ void LgsIfStmt::createIRStmt(LgsModule* module) {
     } else {
         generateComplexIf(module);
     }
-    module->stack.exitScope(IF_SCOPE);
+    module->stack.exitScope();
 }
 
 void LgsIfStmt::generateSimpleIf(LgsModule* module) {
@@ -74,7 +74,7 @@ void LgsIfStmt::generateComplexIf(LgsModule* module) {
         startBlock(module, elseIfCheckBlock);
         const auto elseIfCond = elseIfConds[i];
         const auto stmtBlock = elseIfStmtBlocks[i];
-        const auto elseIfCondIR = elseIfCond->createIRValue(module);
+        const auto elseIfCondIR = elseIfCond->getIRValue(module);
         trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
         const auto lastIter = i == elseIfConds.size() - 1;
         if (lastIter) {

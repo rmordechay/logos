@@ -3,11 +3,11 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsLong.h"
 
-string LgsPtr::getIRName() {
+string LgsPtr::getName() {
     return name;
 }
 
-string LgsPtr::prettyName() const {
+string LgsPtr::prettyName() {
     return name;
 }
 
@@ -24,7 +24,7 @@ LgsExpr* LgsPtr::getZeroValue() {
 }
 
 bool LgsPtr::equals(LgsType* other) {
-    const auto IRName = other->getIRName();
+    const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsLong::name) return true;
     return name == IRName;

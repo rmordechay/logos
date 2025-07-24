@@ -6,7 +6,7 @@ Type* LgsNullable::getIRType(LgsModule* module) {
     return ptrTy(module);
 }
 
-string LgsNullable::getIRName() {
+string LgsNullable::getName() {
     assert(0);
 }
 
@@ -14,7 +14,7 @@ LgsExpr* LgsNullable::getZeroValue() {
     return baseType->getZeroValue();
 }
 
-string LgsNullable::prettyName() const {
+string LgsNullable::prettyName() {
     return baseType->prettyName() + '?';
 }
 

@@ -22,9 +22,9 @@ public:
     FunctionType* IRType = nullptr;
 
     Type* getIRType(LgsModule* module) override;
-    string getIRName() override;
+    string getName() override;
     LgsExpr* getZeroValue() override;
-    string prettyName() const override;
+    string prettyName() override;
     bool equals(LgsType* other) override;
     ~LgsFuncType() override;
 };

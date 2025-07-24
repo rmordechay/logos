@@ -4,11 +4,11 @@
 #include "types/LgsGroup.h"
 #include "utils/LgsUtils.h"
 
-string LgsObject::prettyName() const {
+string LgsObject::prettyName() {
     return name;
 }
 
-string LgsObject::getIRName() {
+string LgsObject::getName() {
     return name;
 }
 
@@ -51,13 +51,13 @@ string LgsObject::getStrFormatPart() const {
 bool LgsObject::equals(LgsType* other) {
     if (const auto group = other->asGroup()) {
         for (const auto groupType : group->types) {
-            if (name == groupType->getIRName()) {
+            if (name == groupType->getName()) {
                 return true;
             }
         }
         return false;
     }
-    return name == other->getIRName();
+    return name == other->getName();
 }
 
 size_t LgsObject::getSizeBytes() {

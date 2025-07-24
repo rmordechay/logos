@@ -3,7 +3,7 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 
-string LgsFloat::prettyName() const {
+string LgsFloat::prettyName() {
     return name;
 }
 
@@ -11,7 +11,7 @@ Type* LgsFloat::getIRType(LgsModule* module) {
     return Type::getFloatTy(module->context);
 }
 
-string LgsFloat::getIRName() {
+string LgsFloat::getName() {
     return name;
 }
 
@@ -28,7 +28,7 @@ string LgsFloat::getStrFormatPart() const {
 }
 
 bool LgsFloat::equals(LgsType* other) {
-    const auto IRName = other->getIRName();
+    const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsInt::name) return true;
     return name == IRName;

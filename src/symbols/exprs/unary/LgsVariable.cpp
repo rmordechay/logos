@@ -1,5 +1,5 @@
 #include "exprs/unary/LgsVariable.h"
-#include "exprs/unary/LgsEnumField.h"
+
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
@@ -23,8 +23,10 @@ Value* LgsVariable::createIRValue(LgsModule* module) {
         return ref.param->getIRValue(module);
     case FUNC:
         return ref.func->getIRFunc(module);
-    case ENUM_FIELD:
-        return getIRStr(module, ref.enumField->name);
+    case ENUM:
+        return getIRStr(module, name);
+    case FIELD:
+        return getIRStr(module, name);
     default:
         assert(0);
     }
@@ -44,7 +46,6 @@ LgsExpr* LgsVariable::convertExpr(LgsType* type) {
     case FIELD:
         return ref.field->expr->convertExpr(type);
     case PARAM:
-    case ENUM_FIELD:
     case FUNC:
     case OBJECT:
     case INTERFACE:
@@ -57,16 +58,13 @@ LgsExpr* LgsVariable::convertExpr(LgsType* type) {
 }
 
 Value* LgsVariable::hashValue(LgsModule* module) {
-    string text;
     switch (ref.symbolType) {
     case PARAM:
         return module->builder.CreateCall(getStrHash(module), {ref.param->getIRValue(module)});
     case VAR_DEC:
         return ref.varDec->expr->hashValue(module);
     case FIELD:
-        return ref.field->expr->hashValue(module);
-    case ENUM_FIELD:
-        return module->builder.getInt32(hashString(ref.enumField->name));
+        return module->builder.getInt32(hashString(ref.field->name));
     default:
         assert(0);
     }

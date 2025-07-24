@@ -10,9 +10,9 @@ public:
 
     explicit LgsTypePair(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : key(keyType), value(valueType) {}
     Type* getIRType(LgsModule* module) override;
-    string getIRName() override;
+    string getName() override;
     LgsExpr* getZeroValue() override;
-    string prettyName() const override;
+    string prettyName() override;
     bool equals(LgsType* other) override;
 };
 
@@ -20,7 +20,7 @@ inline Type* LgsTypePair::getIRType(LgsModule* module) {
     assert(0);
 }
 
-inline string LgsTypePair::getIRName() {
+inline string LgsTypePair::getName() {
     return name;
 }
 
@@ -28,7 +28,7 @@ inline LgsExpr* LgsTypePair::getZeroValue() {
     assert(false);
 }
 
-inline string LgsTypePair::prettyName() const {
+inline string LgsTypePair::prettyName() {
     return '<' + key->prettyName() + "," + value->prettyName() + '>';
 }
 

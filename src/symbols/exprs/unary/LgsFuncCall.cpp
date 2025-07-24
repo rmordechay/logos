@@ -69,7 +69,7 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
 void LgsFuncCall::resolveVirtualFunc(LgsModule* module) const {
     auto& builder = module->builder;
     const auto self = args[0];
-    const auto keyIR = getIRStr(module, func->funcType->getIRName());
+    const auto keyIR = getIRStr(module, func->funcType->getName());
     const auto vtablePtr = self->getIRValue(module);
     const auto vtable = self->type->vtable;
     const auto vtableIRType = vtable->type->getIRType(module);

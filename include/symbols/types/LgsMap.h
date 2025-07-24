@@ -33,8 +33,8 @@ public:
 
     size_t getSizeBytes() override;
     Type* getIRType(LgsModule* module) override;
-    string getIRName() override;
-    string prettyName() const override;
+    string getName() override;
+    string prettyName() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
     LgsType* getValueType() override;

@@ -12,7 +12,7 @@ Type* LgsAny::getIRType(LgsModule* module) {
     return ptrTy(module);
 }
 
-string LgsAny::getIRName() {
+string LgsAny::getName() {
     return name;
 }
 
@@ -20,7 +20,7 @@ LgsExpr* LgsAny::getZeroValue() {
     assert(0);
 }
 
-string LgsAny::prettyName() const {
+string LgsAny::prettyName() {
     return name;
 }
 

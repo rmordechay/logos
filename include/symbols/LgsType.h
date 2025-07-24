@@ -2,6 +2,7 @@
 
 #include "LgsLocation.h"
 
+class LgsVariable;
 class LgsSArray;
 class LgsNullable;
 class LgsPtr;
@@ -17,6 +18,7 @@ class LgsInterface;
 class LgsObject;
 class LgsBool;
 class LgsMap;
+class LgsEnum;
 class LgsInt;
 class LgsDArray;
 class LgsIterable;
@@ -39,6 +41,7 @@ public:
     bool canSlice = false;
     Type* IRType = nullptr;
     LgsHashMap* vtable = nullptr;
+    vector<LgsVariable*> refs;
     map<string, LgsField*> fields;
     map<string, LgsFunc*> methods;
 
@@ -56,6 +59,7 @@ public:
     LgsLong* asLong();
     LgsUInt* asUInt();
     LgsMap* asMap();
+    LgsEnum* asEnum();
     LgsNullable* asNullable();
     LgsObject* asObject();
     LgsInterface* asInterface();
@@ -70,10 +74,10 @@ public:
     virtual size_t getSizeBytes();
     virtual bool equals(LgsType& other);
     virtual string getStrFormatPart() const;
-    virtual Type* getIRType(LgsModule* module) = 0;
-    virtual string getIRName() = 0;
+    virtual string getName() = 0;
+    virtual string prettyName() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual string prettyName() const = 0;
+    virtual Type* getIRType(LgsModule* module) = 0;
     virtual bool equals(LgsType* other) = 0;
     virtual ~LgsType();
 };

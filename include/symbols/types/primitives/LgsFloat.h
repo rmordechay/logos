@@ -9,12 +9,12 @@ public:
         isPrimitive = true;
     }
     Type* getIRType(LgsModule* module) override;
-    string getIRName() override;
+    string getName() override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;
     string getStrFormatPart() const override;
     bool equals(LgsType* other) override;
-    string prettyName() const override;
+    string prettyName() override;
     ~LgsFloat() override = default;
 };
 

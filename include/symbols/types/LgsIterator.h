@@ -24,18 +24,18 @@ public:
 
 
 inline void LgsIterator::initIterator(LgsModule* module) {
-    LgsBuiltinFunc iterInitFunc{"initIter", &LGS_VOID, type->getIRName(), {type, &LGS_ANY}};
+    LgsBuiltinFunc iterInitFunc{"initIter", &LGS_VOID, type->getName(), {type, &LGS_ANY}};
     const auto structType = getIRStructType(module->context, name, {ptrTy(module), i64Ty(module), ptrTy(module), ptrTy(module), ptrTy(module), ptrTy(module)});
     IRValue = module->builder.CreateAlloca(structType);
     iterInitFunc.callIR(module, {baseExpr->getIRValue(module), IRValue});
 }
 
 inline Value* LgsIterator::next(LgsModule* module) const {
-    LgsBuiltinFunc iterInitFunc{"next", &LGS_ANY, type->getIRName(), {&LGS_ANY}};
+    LgsBuiltinFunc iterInitFunc{"next", &LGS_ANY, type->getName(), {&LGS_ANY}};
     return iterInitFunc.callIR(module, {IRValue});
 }
 
 inline Value* LgsIterator::hasNext(LgsModule* module) const {
-    LgsBuiltinFunc iterInitFunc{"hasNext", &LGS_BOOL, type->getIRName(), {&LGS_ANY}};
+    LgsBuiltinFunc iterInitFunc{"hasNext", &LGS_BOOL, type->getName(), {&LGS_ANY}};
     return iterInitFunc.callIR(module, {IRValue});
 }

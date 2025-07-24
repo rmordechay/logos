@@ -12,9 +12,9 @@ public:
 
     explicit LgsGroup(const string& name) : name(name) {}
     Type* getIRType(LgsModule* module) override;
-    string getIRName() override;
+    string getName() override;
     LgsExpr* getZeroValue() override;
-    string prettyName() const override;
+    string prettyName() override;
     bool equals(LgsType* other) override;
 
 };

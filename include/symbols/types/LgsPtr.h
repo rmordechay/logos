@@ -8,8 +8,8 @@ public:
     LgsType* baseType;
 
     explicit LgsPtr(LgsType* baseType) : baseType(baseType) {}
-    string getIRName() override;
-    string prettyName() const override;
+    string getName() override;
+    string prettyName() override;
     Type* getIRType(LgsModule* module) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;

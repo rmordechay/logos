@@ -13,7 +13,7 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/LgsBinaryExpr.h"
-#include "exprs/unary/LgsEnumField.h"
+
 #include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsEnum.h"
@@ -143,7 +143,7 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
     }
 }
 
-void SemaAnalyser::visitStmtBlock(LgsStmtBlock* stmtBlock) {
+void SemaAnalyser::visitStmtBlock(LgsStmtsBlock* stmtBlock) {
     if (!stmtBlock) return;
     for (const auto& stmt : stmtBlock->stmts) {
         visitStmt(stmt);
@@ -196,19 +196,25 @@ void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
     if (ifStmt->elseStmtBlock) {
         visitStmtBlock(ifStmt->elseStmtBlock);
     }
-    stack.exitScope(IF_SCOPE);
+    stack.exitScope();
 }
 
-void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
+void SemaAnalyser::visitPatternMatch(LgsPatternMatch* patternMatching) {
+    stack.enterScope(IF_SCOPE, patternMatching);
     const auto baseExpr = patternMatching->expr;
     if (!baseExpr) {
         return visitBoolPatternMatching(patternMatching);
     }
     visitExpr(baseExpr);
     const auto baseExprType = baseExpr->type;
+    if (baseExprType->asEnum()) {
+        for (auto [name, field] : baseExprType->fields) {
+            addLocalSymbol(name, LgsSymbol(field));
+        }
+    }
     for (const auto patternExpr : patternMatching->patterns) {
         visitExpr(patternExpr);
-        if (!patternExpr->type) continue;
+        if (patternExpr->type->isUnknown()) continue;
         if (!patternExpr->type->equals(baseExprType)) {
             return errHandler.handleError(E10014, &patternExpr->location, {patternExpr->type->prettyName(), baseExprType->prettyName()});
         }
@@ -217,6 +223,7 @@ void SemaAnalyser::visitPatternMatch(const LgsPatternMatch* patternMatching) {
         visitStmtBlock(patternsStmtBlock);
     }
     visitStmtBlock(patternMatching->elseStmtBlock);
+    stack.exitScope();
 }
 
 void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatch* patternMatching) {
@@ -243,7 +250,7 @@ void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
     } else {
         assert(0);
     }
-    stack.exitScope(LOOP_SCOPE);
+    stack.exitScope();
 }
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
@@ -420,10 +427,10 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
         variable->setType(symbol->param->type);
         symbol->param->refs.push_back(variable);
         break;
-    case ENUM_FIELD:
-        variable->ref.enumField = symbol->enumField;
-        variable->setType(symbol->enumField->type);
-        symbol->enumField->refs.push_back(variable);
+    case ENUM:
+        variable->ref.lgsEnum = symbol->lgsEnum;
+        variable->setType(symbol->lgsEnum);
+        symbol->lgsEnum->refs.push_back(variable);
         break;
     case FUNC:
         variable->ref.func = symbol->func;
@@ -520,10 +527,7 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
     const auto symbol = getSymbol(instance->name, &instance->location);
     if (!symbol) return;
-    if (symbol->symbolType == INTERFACE) {
-        return errHandler.handleError(E10022, &instance->location, {instance->name});
-    }
-    if (symbol->symbolType != OBJECT) {
+    if (symbol->symbolType != OBJECT || symbol->symbolType != INTERFACE) {
         return errHandler.handleError(E10022, &instance->location, {instance->name});
     }
     if (symbol->object->isSingleton) {
@@ -840,7 +844,7 @@ void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
     }
 }
 
-bool SemaAnalyser::validateBlockControlFlow(const LgsStmtBlock* stmtBlock, const LgsFunc* func) {
+bool SemaAnalyser::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func) {
     if (!stmtBlock) return true;
     if (stmtBlock->hasReturn) return true;
     auto isValid = false;
@@ -886,10 +890,7 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const Location* location)
 }
 
 void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& newSymbol) {
-    if (const auto symbol = getSymbol(name, nullptr)) {
-        return errHandler.handleError(E10011, newSymbol.location, {name, symbol->location->lineNumberStr()});
-    }
-    stack.top().symbolTable.addSymbol(name, newSymbol);
+    stack.top().symbolTable.addSymbol(name, newSymbol, &errHandler);
 }
 
 void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
@@ -922,7 +923,7 @@ void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
     }
 }
 
-bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, const LgsType* parentType) {
+bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
     auto name = methodCall->name;
     const auto method = parentType->getMethod(name);
     if (!method) {
@@ -970,7 +971,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     }
     if (!type->isUnknown()) return type;
 
-    auto typeName = type->getIRName();
+    auto typeName = type->getName();
     auto symbol = globals.getSymbol(typeName);
     if (!symbol) {
         symbol = file->symbolTable.getSymbol(typeName);
@@ -982,9 +983,6 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
 
     LgsType* newType = nullptr;
     switch (symbol->symbolType) {
-    case ENUM_FIELD:
-        newType = symbol->enumField->type;
-        break;
     case FUNC:
         newType = symbol->func->funcType;
         break;

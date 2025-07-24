@@ -4,7 +4,6 @@ class LgsVariable;
 class LgsGroup;
 class LgsField;
 class LgsEnum;
-class LgsEnumField;
 class LgsFunc;
 class LgsInterface;
 class LgsObject;
@@ -15,7 +14,6 @@ class Location;
 enum LgsSymbolType {
     VAR_DEC,
     PARAM,
-    ENUM_FIELD,
     FIELD,
     FUNC,
     OBJECT,
@@ -35,7 +33,6 @@ struct LgsSymbol {
     LgsInterface* interface = nullptr;
     LgsField* field = nullptr;
     LgsEnum* lgsEnum = nullptr;
-    LgsEnumField* enumField = nullptr;
     LgsFunc* func = nullptr;
     LgsGroup* group = nullptr;
     Location* location;
@@ -47,7 +44,6 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsInterface* interface);
     explicit LgsSymbol(LgsField* field);
     explicit LgsSymbol(LgsEnum* lgsEnum, bool isExternal = false);
-    explicit LgsSymbol(LgsEnumField* enumField);
     explicit LgsSymbol(LgsFunc* func, bool isExternal = false);
     explicit LgsSymbol(LgsGroup* group);
     void* getSymbol() const;

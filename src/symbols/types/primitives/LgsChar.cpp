@@ -3,7 +3,7 @@
 #include "exprs/LgsNullValue.h"
 #include "exprs/unary/constants/LgsCharConst.h"
 
-string LgsChar::prettyName() const {
+string LgsChar::prettyName() {
     return name;
 }
 
@@ -15,7 +15,7 @@ Type* LgsChar::getIRType(LgsModule* module) {
     return Type::getInt8Ty(module->context);
 }
 
-string LgsChar::getIRName() {
+string LgsChar::getName() {
     return name;
 }
 
@@ -28,5 +28,5 @@ string LgsChar::getStrFormatPart() const {
 }
 
 bool LgsChar::equals(LgsType* other) {
-    return name == other->getIRName();
+    return name == other->getName();
 }

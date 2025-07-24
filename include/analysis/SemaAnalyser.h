@@ -1,5 +1,4 @@
 #pragma once
-#include "files/LgsFile.h"
 #include "utils/LgsASTVisitor.h"
 #include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
@@ -20,7 +19,7 @@ class LgsReturn;
 class LgsForeachLoop;
 class LgsRangeLoop;
 class LgsPatternMatch;
-class LgsStmtBlock;
+class LgsStmtsBlock;
 class LgsStmt;
 class LgsMainFile;
 class LgsApp;
@@ -53,11 +52,11 @@ public:
     void visitFunc(LgsFunc* func) override;
     void visitParam(LgsParam* param) override;
     void visitStmt(LgsStmt* stmt) override;
-    void visitStmtBlock(LgsStmtBlock* stmtBlock) override;
+    void visitStmtBlock(LgsStmtsBlock* stmtBlock) override;
     void visitAssignment(LgsAssignment* assignment) override;
     void visitVarDec(LgsVarDec* varDec) override;
     void visitIfStmt(LgsIfStmt* ifStmt) override;
-    void visitPatternMatch(const LgsPatternMatch* patternMatching) override;
+    void visitPatternMatch(LgsPatternMatch* patternMatching) override;
     void visitBoolPatternMatching(const LgsPatternMatch* patternMatching) override;
     void visitLoopStmt(LgsForLoop* loopStmt) override;
     void visitRangeLoop(const LgsRangeLoop* rangeLoop) override;
@@ -104,12 +103,12 @@ public:
     bool validateFieldVisibility(LgsField* field);
     void validateMethodVisibility(const LgsFuncCall* methodCall);
     void validateFuncControlFlow(const LgsFunc* func);
-    bool validateBlockControlFlow(const LgsStmtBlock* stmtBlock, const LgsFunc* func);
+    bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     LgsSymbol* getSymbol(const string& name, const Location* location);
     void addLocalSymbol(const string& name, const LgsSymbol& newSymbol);
     void resolveFuncCall(LgsFuncCall* funcCall);
-    bool resolveMethodCall(LgsFuncCall* methodCall, const LgsType* parentType);
+    bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     void inferBaseType(const LgsArrayExpr* array) const;
     LgsType* resolveType(LgsType* type);
     void resolveIterable(LgsIterable* iterable);

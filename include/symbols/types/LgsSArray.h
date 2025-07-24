@@ -17,8 +17,8 @@ public:
     }
 
     Type* getIRType(LgsModule* module) override;
-    string getIRName() override;
-    string prettyName() const override;
+    string getName() override;
+    string prettyName() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;

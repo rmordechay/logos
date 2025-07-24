@@ -14,15 +14,6 @@
 #include "types/primitives/LgsUInt.h"
 #include "types/primitives/LgsVoid.h"
 
-// define i32 @main() #0 {
-//   %2 = alloca i64, align 8
-//   %3 = call i64 @time(ptr noundef null)
-//   store i64 %3, ptr %2, align 8
-//   %4 = call ptr @ctime(ptr noundef %2)
-//   %5 = call i32 (ptr, ...) @printf(ptr noundef @.str, ptr noundef %4)
-//   ret i32 0
-// }
-
 bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     auto name = func->getNameAsString();
     if (isLgsKeyword(name)) {
@@ -36,7 +27,7 @@ bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
         funcImpl->funcType->params.push_back(lgsParam);
     }
     funcImpl->funcType->isVariadic = func->isVariadic();
-    cFile->symbolTable.addSymbol(name, LgsSymbol(funcImpl, true));
+    cFile->symbolTable.addSymbol(name, LgsSymbol(funcImpl, true), nullptr);
     return true;
 }
 
@@ -50,7 +41,7 @@ bool LgsCLangVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
     const auto objSymbol = cFile->symbolTable.getSymbol(name);
     if (objSymbol) return true;
     const auto obj = mapCRecord(record);
-    cFile->symbolTable.addSymbol(name, LgsSymbol(obj, true));
+    cFile->symbolTable.addSymbol(name, LgsSymbol(obj, true), nullptr);
     return true;
 }
 
@@ -136,7 +127,7 @@ LgsType* LgsCLangVisitor::mapCStruct(const clang::QualType type) {
     const auto objSymbol = cFile->symbolTable.getSymbol(name);
     if (objSymbol) return objSymbol->object;
     const auto obj = mapCRecord(decl);
-    cFile->symbolTable.addSymbol(name, LgsSymbol(obj, true));
+    cFile->symbolTable.addSymbol(name, LgsSymbol(obj, true), nullptr);
     return obj;
 }
 

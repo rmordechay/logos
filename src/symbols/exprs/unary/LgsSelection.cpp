@@ -19,11 +19,22 @@ void LgsSelection::resolveSelection(LgsModule* module) const {
         const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
         if (const auto methodCall = childExpr->asFuncCall()) {
-            methodCall->IRValue = methodCall->createIRValue(module);
-        } else if (const auto field = parentExpr->type->getField(childExpr->getExprName())) {
-            const auto parentIRValue = parentExpr->getIRValue(module);
-            const auto gep = field->getGEP(module, parentExpr->type->getIRType(module), parentIRValue);
-            childExpr->setIRValue(gep);
+            methodCall->IRValue = methodCall->getIRValue(module);
+        } else {
+            const auto field = parentExpr->type->getField(childExpr->getExprName());
+            Value* v = nullptr;
+            if (field->type->asEnum()) {
+                if (field->expr) {
+                    v = field->expr->getIRValue(module);
+                } else {
+                    v = getIRStr(module, field->name);
+                }
+            } else {
+                const auto parentIRValue = parentExpr->getIRValue(module);
+                const auto parentIRType = parentExpr->type->getIRType(module);
+                v = field->getGEP(module, parentIRType, parentIRValue);
+            }
+            childExpr->setIRValue(v);
         }
     }
 }

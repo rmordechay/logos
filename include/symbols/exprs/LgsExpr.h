@@ -5,7 +5,6 @@ class LgsPrefixExpr;
 class LgsIterator;
 class LgsPostfixExpr;
 class LgsModule;
-class LgsEnumField;
 class LgsFunc;
 class LgsHashMap;
 class LgsFuncCall;
@@ -53,7 +52,6 @@ public:
     LgsFloatConst* asFloatConst();
     LgsIntConst* asIntConst();
     LgsStrConst* asStrConst();
-    LgsEnumField* asEnumField();
     LgsTypeConst* asTypeConst();
 
     virtual LgsExpr* clone();

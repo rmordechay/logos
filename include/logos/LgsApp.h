@@ -5,6 +5,7 @@
 #include "Platform.h"
 #include "extern/LgsCLang.h"
 
+class LgsModule;
 class LgsStrConst;
 class LgsFile;
 class LgsEnvFile;
@@ -30,9 +31,9 @@ public:
     vector<LgsFile*> files;
     vector<LgsStrConst*> externFiles;
     LgsErrHandler errHandler;
+    LgsAppFile* appFile = nullptr;
     vector<LgsEnvFile*> envFiles;
     map<string, LgsModule*> modules;
-    const LgsAppFile* appFile = nullptr;
 
     explicit LgsApp(const path& rootDirPath = "") : lgsCLang(paths) {
         initPaths(rootDirPath);

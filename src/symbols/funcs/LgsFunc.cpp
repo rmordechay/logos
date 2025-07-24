@@ -1,6 +1,6 @@
 #include "funcs/LgsFunc.h"
 #include "data/LgsDefinitions.h"
-#include "stmts/LgsStmtBlock.h"
+#include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "types/LgsDArray.h"
 #include "utils/LgsUtils.h"
@@ -27,7 +27,7 @@ Value* LgsFunc::createIRValue(LgsModule* module) {
 }
 
 Function* LgsFunc::getIRFunc(LgsModule* module) {
-    const auto funcIRName = funcType->getIRName();
+    const auto funcIRName = funcType->getName();
     auto IRFunc = module->IRModule->getFunction(funcIRName);
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(module);
@@ -104,7 +104,7 @@ string LgsFunc::format(string& tabs) {
     }
     str << ")";
     if (funcType->name != LOGOS_MAIN_FUNC) {
-        str << funcType->rt->getIRName();
+        str << funcType->rt->getName();
     }
     str << stmtBlock->format(tabs);
     return str.str();

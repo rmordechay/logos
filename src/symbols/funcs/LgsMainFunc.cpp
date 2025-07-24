@@ -1,6 +1,6 @@
 #include "funcs/LgsMainFunc.h"
 #include "exprs/unary/LgsArrayExpr.h"
-#include "stmts/LgsStmtBlock.h"
+#include "stmts/LgsStmtsBlock.h"
 #include "types/LgsStr.h"
 #include "utils/LgsUtils.h"
 

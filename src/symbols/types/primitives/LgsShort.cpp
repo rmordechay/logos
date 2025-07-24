@@ -10,11 +10,11 @@ Type* LgsShort::getIRType(LgsModule* module) {
     return Type::getInt16Ty(module->context);
 }
 
-string LgsShort::prettyName() const {
+string LgsShort::prettyName() {
     return name;
 }
 
-string LgsShort::getIRName() {
+string LgsShort::getName() {
     return name;
 }
 
@@ -23,8 +23,8 @@ LgsExpr* LgsShort::getZeroValue() {
 }
 
 bool LgsShort::equals(LgsType* other) {
-    if (other->getIRName() == LgsAny::name) return true;
-    return name == other->getIRName();
+    if (other->getName() == LgsAny::name) return true;
+    return name == other->getName();
 }
 
 string LgsShort::getStrFormatPart() const {

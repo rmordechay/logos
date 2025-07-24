@@ -2,6 +2,7 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsDArray.h"
+#include "types/LgsEnum.h"
 #include "types/LgsGroup.h"
 #include "types/LgsMap.h"
 #include "types/LgsNullable.h"
@@ -14,7 +15,7 @@
 class LgsShort;
 
 bool LgsType::equals(LgsType& other) {
-    return getIRName() == other.getIRName();
+    return getName() == other.getName();
 }
 
 LgsField* LgsType::getField(const string& name) {
@@ -70,6 +71,7 @@ LgsIterable* LgsType::asIterable() { return dynamic_cast<LgsIterable*>(this); }
 LgsDArray* LgsType::asDArray() { return dynamic_cast<LgsDArray*>(this); }
 LgsSArray* LgsType::asSArray() { return dynamic_cast<LgsSArray*>(this); }
 LgsMap* LgsType::asMap() { return dynamic_cast<LgsMap*>(this); }
+LgsEnum* LgsType::asEnum() { return dynamic_cast<LgsEnum*>(this); }
 LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
 LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }
 LgsTypePair* LgsType::asPair() { return dynamic_cast<LgsTypePair*>(this); }

@@ -1,5 +1,5 @@
 #include "loops/LgsForLoop.h"
-#include "stmts/LgsStmtBlock.h"
+#include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
 
 void LgsForLoop::createIRStmt(LgsModule* module) {
@@ -7,7 +7,7 @@ void LgsForLoop::createIRStmt(LgsModule* module) {
     initIRLoop(module);
     stmtBlock->createIRValue(module);
     exitIRLoop(module);
-    module->stack.exitScope(LOOP_SCOPE);
+    module->stack.exitScope();
 }
 
 LgsForLoop::~LgsForLoop() {
