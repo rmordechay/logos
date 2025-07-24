@@ -1,9 +1,8 @@
 #include "utils/LgsUtils.h"
 
-#include <gtest/gtest.h>
+#include <doctest.h>
 
-int main(int argc, char** argv) {
+int main(const int argc, char** argv) {
     initLLVM();
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    return doctest::Context(argc, argv).run();
 }

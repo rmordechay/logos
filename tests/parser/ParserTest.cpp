@@ -1,11 +1,8 @@
 #include "logos/LgsApp.h"
-#include "logos/LgsModule.h"
-#include <gtest/gtest.h>
+#include <doctest.h>
 
-class ParserTest : public testing::Test {};
-
-TEST_F(ParserTest, TestParser) {
+TEST_CASE("TestParser") {
     LgsApp app;
     app.parseSrcFile("main() {a: Str = 34}");
-    ASSERT_TRUE(app.errHandler.errors.empty());
+    CHECK(app.errHandler.errors.empty());
 }

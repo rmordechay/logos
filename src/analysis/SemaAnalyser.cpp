@@ -825,7 +825,7 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
     assert(expr);
     if (expr->isNull) {
         // null must have a type
-        if (!type) return errHandler.handleError(E10024, &expr->location);
+        if (type->isUnknown()) return errHandler.handleError(E10024, &expr->location);
         // type must be nullable
         if (!type->asNullable()) return errHandler.handleError(E10023, &type->location, {type->prettyName(), type->prettyName()});
     }

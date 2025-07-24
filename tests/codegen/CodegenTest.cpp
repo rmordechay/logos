@@ -1,7 +1,8 @@
 #include "files/LgsFile.h"
 #include "logos/LgsApp.h"
 #include "logos/LgsModule.h"
-#include <gtest/gtest.h>
+
+#include <doctest.h>
 #include <regex>
 
 typedef map<string, map<string, vector<string>>> ExpectedInstructions;
@@ -17,15 +18,15 @@ string normalize(const string& str) {
 void compareCode(const string& codeText, ExpectedInstructions expected) {
     LgsApp app;
     app.parseSrcFile(codeText);
-    ASSERT_TRUE(app.analyse());
+    CHECK(app.analyse());
     const auto module = app.files[0]->generateIR();
     const auto IRModule = module->IRModule;
     for (auto& func : IRModule->functions()) {
         auto expectedBlocks = expected[func.getName().str()];
-        ASSERT_EQ(func.size(), expectedBlocks.size());
+        CHECK_EQ(func.size(), expectedBlocks.size());
         for (auto& bb : func) {
             const auto expectedInsts = expectedBlocks[bb.getName().str()];
-            ASSERT_EQ(bb.size(), expectedInsts.size());
+            CHECK_EQ(bb.size(), expectedInsts.size());
             auto i = 0;
             for (auto& inst : bb) {
                 string irString;
@@ -33,17 +34,14 @@ void compareCode(const string& codeText, ExpectedInstructions expected) {
                 inst.print(stream);
                 stream.flush();
                 const auto actualInst = normalize(irString);
-                EXPECT_EQ(expectedInsts[i], actualInst);
+                CHECK_EQ(expectedInsts[i], actualInst);
                 i++;
             }
         }
     }
 }
 
-class CodegenTest : public testing::Test {
-};
-
-TEST_F(CodegenTest, CodegenTestAddition) {
+TEST_CASE("CodegenTestAddition") {
     const auto codeText = R"(
         main() {
             a = 2
@@ -71,7 +69,7 @@ TEST_F(CodegenTest, CodegenTestAddition) {
     compareCode(codeText, expectedInts);
 }
 
-TEST_F(CodegenTest, CodegenTestIfStmt) {
+TEST_CASE("CodegenTestIfStmt") {
     const auto codeText = R"(
     func(x: Int) {
         if x > 0 {

@@ -29,7 +29,7 @@ size_t hashString(const string& str) {
 void freeType(const LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
-    delete type;
+    // delete type;
 }
 
 void initLLVM() {

@@ -1,12 +1,8 @@
+#define DOCTEST_CONFIG_IMPLEMENT
+#include "doctest.h"
 #include "logos/LgsApp.h"
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
-using testing::StartsWith;
-
-class SemaTest : public testing::Test {};
-
-TEST_F(SemaTest, TestSemaHappy) {
+TEST_CASE("TestSemaHappy") {
     LgsApp app;
     const auto code = R"(
     interface Type1 {
@@ -23,18 +19,18 @@ TEST_F(SemaTest, TestSemaHappy) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 0);
+    CHECK_EQ(app.errHandler.errors.size(), 0);
 }
 
-TEST_F(SemaTest, TestSema10001) {
+TEST_CASE("TestSema10001") {
     LgsApp app;
     app.parseSrcFile("main() {a: Str = 34}");
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10001.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10001.errCode);
 }
 
-TEST_F(SemaTest, TestSema10002A) {
+TEST_CASE("TestSema10002A") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -44,11 +40,11 @@ TEST_F(SemaTest, TestSema10002A) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10002.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10002.errCode);
 }
 
-TEST_F(SemaTest, TestSema10002B) {
+TEST_CASE("TestSema10002B") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -58,11 +54,11 @@ TEST_F(SemaTest, TestSema10002B) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10002.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10002.errCode);
 }
 
-TEST_F(SemaTest, TestSema10003) {
+TEST_CASE("TestSema10003") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -72,11 +68,11 @@ TEST_F(SemaTest, TestSema10003) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10003.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10003.errCode);
 }
 
-TEST_F(SemaTest, TestSema10004) {
+TEST_CASE("TestSema10004") {
     LgsApp app;
     const auto code = R"(
     f(): Int {
@@ -85,11 +81,11 @@ TEST_F(SemaTest, TestSema10004) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10004.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10004.errCode);
 }
 
-TEST_F(SemaTest, TestSema10005A) {
+TEST_CASE("TestSema10005A") {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -102,11 +98,11 @@ TEST_F(SemaTest, TestSema10005A) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
 }
 
-TEST_F(SemaTest, TestSema10005B) {
+TEST_CASE("TestSema10005B") {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -118,11 +114,11 @@ TEST_F(SemaTest, TestSema10005B) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
 }
 
-TEST_F(SemaTest, TestSema10006A) {
+TEST_CASE("TestSema10006A") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -131,33 +127,35 @@ TEST_F(SemaTest, TestSema10006A) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10006.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10006.errCode);
 }
 
-TEST_F(SemaTest, TestSema10006B) {
+TEST_CASE("TestSema10006B") {
     LgsApp app;
     const auto code = R"(
     enum Enum {
         ENUM1
     }
+
     func(x: Int, e: Enum) {
         if e {
             ENUM1: {}
         }
         a = ENUM1
     }
+
     main() {
-        func(10, Enum.ROI)
+        func(10, Enum.ENUM1)
     }
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10006.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10006.errCode);
 }
 
-TEST_F(SemaTest, TestSema10011A) {
+TEST_CASE("TestSema10011A") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -167,11 +165,11 @@ TEST_F(SemaTest, TestSema10011A) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
 }
 
-TEST_F(SemaTest, TestSema10011B) {
+TEST_CASE("TestSema10011B") {
     LgsApp app;
     const auto code = R"(
     func() {}
@@ -180,11 +178,11 @@ TEST_F(SemaTest, TestSema10011B) {
     )";
     app.parseSrcFile(code, "code.lgs");
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
 }
 
-TEST_F(SemaTest, TestSema10013A) {
+TEST_CASE("TestSema10013A") {
     LgsApp app;
     const auto code = R"(
     object Obj {a: Int}
@@ -195,11 +193,11 @@ TEST_F(SemaTest, TestSema10013A) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10013.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10013.errCode);
 }
 
-TEST_F(SemaTest, TestSema10013B) {
+TEST_CASE("TestSema10013B") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -209,11 +207,11 @@ TEST_F(SemaTest, TestSema10013B) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10013.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10013.errCode);
 }
 
-TEST_F(SemaTest, TestSema10014) {
+TEST_CASE("TestSema10014") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -224,11 +222,11 @@ TEST_F(SemaTest, TestSema10014) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10014.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10014.errCode);
 }
 
-TEST_F(SemaTest, TestSema10015) {
+TEST_CASE("TestSema10015") {
     LgsApp app;
     const auto code = R"(
     func(a: Int) { }
@@ -238,11 +236,11 @@ TEST_F(SemaTest, TestSema10015) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10015.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10015.errCode);
 }
 
-TEST_F(SemaTest, TestSema10016A) {
+TEST_CASE("TestSema10016A") {
     LgsApp app;
     const auto code = R"(
     interface Interface {
@@ -260,11 +258,11 @@ TEST_F(SemaTest, TestSema10016A) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10016.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10016.errCode);
 }
 
-TEST_F(SemaTest, TestSema10016B) {
+TEST_CASE("TestSema10016B") {
     LgsApp app;
     const auto code = R"(
     interface Type1 {
@@ -281,12 +279,12 @@ TEST_F(SemaTest, TestSema10016B) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 2);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10016.errCode);
-    ASSERT_EQ(app.errHandler.errors[1].errCode, E10016.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 2);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10016.errCode);
+    CHECK_EQ(app.errHandler.errors[1].errCode, E10016.errCode);
 }
 
-TEST_F(SemaTest, TestSema10017) {
+TEST_CASE("TestSema10017") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -295,25 +293,25 @@ TEST_F(SemaTest, TestSema10017) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10017.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10017.errCode);
 }
 
-TEST_F(SemaTest, TestSema10022) {
+TEST_CASE("TestSema10022") {
     LgsApp app;
     const auto code = R"(
-    interface A {}
     main() {
-        a = A{}
+        var = 2
+        a = var{}
     }
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10022.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10022.errCode);
 }
 
-TEST_F(SemaTest, TestSema10023) {
+TEST_CASE("TestSema10023") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -322,11 +320,11 @@ TEST_F(SemaTest, TestSema10023) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10023.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10023.errCode);
 }
 
-TEST_F(SemaTest, TestSema10024) {
+TEST_CASE("TestSema10024") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -335,11 +333,11 @@ TEST_F(SemaTest, TestSema10024) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10024.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10024.errCode);
 }
 
-TEST_F(SemaTest, TestSema10025) {
+TEST_CASE("TestSema10025") {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -349,11 +347,11 @@ TEST_F(SemaTest, TestSema10025) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10025.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10025.errCode);
 }
 
-TEST_F(SemaTest, TestSema10026) {
+TEST_CASE("TestSema10026") {
     LgsApp app;
     const auto code = R"(
     func(): Int { return }
@@ -361,11 +359,11 @@ TEST_F(SemaTest, TestSema10026) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10026.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10026.errCode);
 }
 
-TEST_F(SemaTest, TestSema10027) {
+TEST_CASE("TestSema10027") {
     LgsApp app;
     const auto code = R"(
     func() { return 2 }
@@ -373,11 +371,11 @@ TEST_F(SemaTest, TestSema10027) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10027.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10027.errCode);
 }
 
-TEST_F(SemaTest, TestSema10028) {
+TEST_CASE("TestSema10028") {
     LgsApp app;
     const auto code = R"(
     func(x: Int = 23, y: Str) { }
@@ -385,11 +383,11 @@ TEST_F(SemaTest, TestSema10028) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    // ASSERT_EQ(app.errHandler.errors.size(), 1);
-    // ASSERT_EQ(app.errHandler.errors[0].errCode, E10028.errCode);
+    // CHECK_EQ(app.errHandler.errors.size(), 1);
+    // CHECK_EQ(app.errHandler.errors[0].errCode, E10028.errCode);
 }
 
-TEST_F(SemaTest, TestSema10030A) {
+TEST_CASE("TestSema10030A") {
     LgsApp app;
     const auto code1 = R"(
     object Obj
@@ -404,11 +402,11 @@ TEST_F(SemaTest, TestSema10030A) {
     app.parseSrcFile(code1, "code1.lgs");
     app.parseSrcFile(code2, "code2.lgs");
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10030.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10030.errCode);
 }
 
-TEST_F(SemaTest, TestSema10030B) {
+TEST_CASE("TestSema10030B") {
     LgsApp app;
     const auto code1 = R"(
     object Obj
@@ -422,11 +420,11 @@ TEST_F(SemaTest, TestSema10030B) {
     app.parseSrcFile(code1, "code1.lgs");
     app.parseSrcFile(code2, "code2.lgs");
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10030.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10030.errCode);
 }
 
-TEST_F(SemaTest, TestSema10031) {
+TEST_CASE("TestSema10031") {
     LgsApp app;
     const auto code1 = R"(
     object Obj
@@ -441,11 +439,11 @@ TEST_F(SemaTest, TestSema10031) {
     app.parseSrcFile(code1, "code1.lgs");
     app.parseSrcFile(code2, "code2.lgs");
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10031.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10031.errCode);
 }
 
-TEST_F(SemaTest, TestSema10032) {
+TEST_CASE("TestSema10032") {
     LgsApp app;
     const auto code = R"(
     single Obj {
@@ -457,11 +455,11 @@ TEST_F(SemaTest, TestSema10032) {
     )";
     app.parseSrcFile(code, "code.lgs");
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10032.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10032.errCode);
 }
 
-TEST_F(SemaTest, TestSema10042) {
+TEST_CASE("TestSema10042") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -471,11 +469,11 @@ TEST_F(SemaTest, TestSema10042) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10042.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10042.errCode);
 }
 
-TEST_F(SemaTest, TestSema10046) {
+TEST_CASE("TestSema10046") {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -487,11 +485,11 @@ TEST_F(SemaTest, TestSema10046) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10046.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10046.errCode);
 }
 
-TEST_F(SemaTest, TestSema10048A) {
+TEST_CASE("TestSema10048A") {
     LgsApp app;
     const auto code = R"(
     func(): Int {
@@ -503,11 +501,11 @@ TEST_F(SemaTest, TestSema10048A) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10048.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10048.errCode);
 }
 
-TEST_F(SemaTest, TestSema10048B) {
+TEST_CASE("TestSema10048B") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -516,22 +514,22 @@ TEST_F(SemaTest, TestSema10048B) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10048.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10048.errCode);
 }
 
-TEST_F(SemaTest, TestSema10055) {
+TEST_CASE("TestSema10055") {
     LgsApp app;
     const auto code = R"(
     f(): Int {}
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10055.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10055.errCode);
 }
 
-TEST_F(SemaTest, TestSema10056A) {
+TEST_CASE("TestSema10056A") {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -542,11 +540,11 @@ TEST_F(SemaTest, TestSema10056A) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10056.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10056.errCode);
 }
 
-TEST_F(SemaTest, TestSema10056B) {
+TEST_CASE("TestSema10056B") {
     LgsApp app;
     const auto code = R"(
     object Obj {
@@ -557,6 +555,6 @@ TEST_F(SemaTest, TestSema10056B) {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    ASSERT_EQ(app.errHandler.errors.size(), 1);
-    ASSERT_EQ(app.errHandler.errors[0].errCode, E10056.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10056.errCode);
 }
