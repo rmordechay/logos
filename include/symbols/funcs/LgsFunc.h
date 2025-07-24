@@ -33,6 +33,7 @@ public:
     LgsParam& getReturnSwapParam() const;
     string format(string& tabs) override;
     Value* createIRValue(LgsModule* module) override;
+    void branchToCleanup(LgsModule* module) const;
     void createCleanupBlock(LgsModule* module) const;
     virtual void generateIR(LgsModule* module);
     virtual Function* getIRFunc(LgsModule* module);

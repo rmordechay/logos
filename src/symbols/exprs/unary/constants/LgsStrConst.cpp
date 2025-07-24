@@ -4,8 +4,12 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "utils/LgsUtils.h"
 
+extern "C" {
+    size_t Str_hash(const char* key);
+}
+
 Value* LgsStrConst::hashValue(LgsModule* module) {
-    return module->builder.getInt32(hashString(value));
+    return module->builder.getInt32(Str_hash(value.c_str()));
 }
 
 Value* LgsStrConst::createIRValue(LgsModule* module) {

@@ -15,7 +15,6 @@ public:
     Type* getIRType(LgsModule* module) override;
     string getName() override;
     size_t getSizeBytes() override;
-    void setVirtualFuncs(LgsModule* module);
     LgsExpr* getZeroValue() override;
     string getStrFormatPart() const override;
     bool equals(LgsType* other) override;

@@ -10,6 +10,7 @@ size_t Str_hash(const char* key) {
     while (*key) {
         h ^= (unsigned char)*key++;
         h *= FNV_PRIME;
+        h %= MAX_STR_LEN;
     }
     return h;
 }

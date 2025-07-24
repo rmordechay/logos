@@ -13,6 +13,7 @@ public:
     void setReturnExpr(LgsModule* module, Type* objIRType);
     void setZeroField(LgsModule* module, const LgsField* field, Value* parentIRValue) const;
     Value* createIRValue(LgsModule* module) override;
+    void setVirtualFuncs(LgsModule* module) const;
     string getExprName() override;
     string prettyName() override;
     void free(LgsModule* module) override;

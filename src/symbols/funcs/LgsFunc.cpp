@@ -1,7 +1,10 @@
 #include "funcs/LgsFunc.h"
+
+#include "builtin/LgsBuiltins.h"
 #include "data/LgsDefinitions.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
+#include "exprs/unary/constants/LgsStrConst.h"
 #include "types/LgsDArray.h"
 #include "utils/LgsUtils.h"
 
@@ -26,11 +29,11 @@ Value* LgsFunc::createIRValue(LgsModule* module) {
 }
 
 void LgsFunc::createCleanupBlock(LgsModule* module) const {
-    if (!lastInstTerminator(module)) {
-        module->builder.CreateBr(cleanupBlock);
-    }
-    startBlock(module, cleanupBlock);
-    module->builder.CreateAlloca(i32Ty(module));
+    // if (!lastInstTerminator(module)) {
+    //     branchToCleanup(module);
+    // }
+    // startBlock(module, cleanupBlock);
+    // lgsPrint.call(module, {new LgsStrConst("cleanup: " + module->stack.currentFunc->funcType->name)});
 }
 
 Function* LgsFunc::getIRFunc(LgsModule* module) {
@@ -87,6 +90,10 @@ void LgsFunc::setBigObjAttrs(LgsModule* module, Function& IRFunc) const {
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::StructRet, paramIRType));
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::Writable));
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
+}
+
+void LgsFunc::branchToCleanup(LgsModule* module) const {
+    // module->builder.CreateBr(cleanupBlock);
 }
 
 LgsParam& LgsFunc::getReturnSwapParam() const {

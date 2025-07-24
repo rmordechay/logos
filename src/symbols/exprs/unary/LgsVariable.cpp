@@ -7,6 +7,10 @@
 #include "utils/LgsUtils.h"
 #include <logos/LgsModule.h>
 
+extern "C" {
+    size_t Str_hash(const char* key);
+}
+
 string LgsVariable::getExprName() {
     return name;
 }
@@ -64,7 +68,7 @@ Value* LgsVariable::hashValue(LgsModule* module) {
     case VAR_DEC:
         return ref.varDec->expr->hashValue(module);
     case FIELD:
-        return module->builder.getInt32(hashString(ref.field->name));
+        return module->builder.getInt32(Str_hash(ref.field->name.c_str()));
     default:
         assert(0);
     }

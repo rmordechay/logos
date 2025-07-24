@@ -17,15 +17,6 @@ string removeUnderscores(const string& input) {
     return result;
 }
 
-size_t hashString(const string& str) {
-    size_t hash = 2166136261u;
-    for (const auto c : str) {
-        hash ^= static_cast<uint8_t>(c);
-        hash *= 16777619u;
-    }
-    return hash;
-}
-
 void freeType(const LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;

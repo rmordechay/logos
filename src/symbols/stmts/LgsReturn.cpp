@@ -5,7 +5,7 @@
 void LgsReturn::createIRStmt(LgsModule* module) {
     const auto currentFunc = module->stack.currentFunc;
     if (!expr || currentFunc->funcType->isSwapReturn) {
-        module->builder.CreateBr(currentFunc->cleanupBlock);
+        currentFunc->branchToCleanup(module);
         return;
     }
     auto exprIR = expr->getIRValue(module);
@@ -13,7 +13,7 @@ void LgsReturn::createIRStmt(LgsModule* module) {
         exprIR = module->builder.CreateLoad(expr->type->getIRType(module), exprIR);
     }
     module->stack.currentFunc->returnValue = exprIR;
-    module->builder.CreateBr(currentFunc->cleanupBlock);
+    currentFunc->branchToCleanup(module);
 }
 
 LgsReturn::~LgsReturn() {

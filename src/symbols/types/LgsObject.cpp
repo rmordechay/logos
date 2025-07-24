@@ -19,7 +19,6 @@ Type* LgsObject::getIRType(LgsModule* module) {
     vector<Type*> elementTypes(fields.size() + offset);
     size_t position = 0;
     if (vtable) {
-        setVirtualFuncs(module);
         elementTypes[position++] = vtable->type->getIRType(module);
     }
     for (const auto [_, field] : fields) {
@@ -66,18 +65,6 @@ size_t LgsObject::getSizeBytes() {
         sum += field->type->getSizeBytes();
     }
     return sum;
-}
-
-void LgsObject::setVirtualFuncs(LgsModule* module) {
-    const auto vtablePtr = vtable->getIRValue(module);
-    // for (const auto [_, method] : methods) {
-    //     if (!method->funcType->isVirtual) continue;
-    //     const auto keyIRStr = getIRStr(module, method->funcType->getIRName());
-    //     const auto IRFunc = method->getIRFunc(module);
-    //     auto valuePtr = module->builder.CreateAlloca(module->builder.getPtrTy());
-    //     module->builder.CreateStore(IRFunc, valuePtr);
-    //     vtable->type->asMap()->addFunc.callIR(module, {vtablePtr, keyIRStr, valuePtr});
-    // }
 }
 
 LgsObject::~LgsObject() {
