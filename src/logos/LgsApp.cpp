@@ -107,8 +107,7 @@ bool LgsApp::generate() {
 }
 
 bool LgsApp::link() const {
-    const LgsLinker linker;
-    return linker.link(paths, modules);
+    return LgsLinker::link(paths, modules);
 }
 
 void LgsApp::parseSrcFile(const string& codeText, path filePath) {

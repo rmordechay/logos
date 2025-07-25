@@ -3,7 +3,7 @@
 #include "utils/LgsUtils.h"
 #include <llvm/Transforms/Utils/Cloning.h>
 
-bool LgsLinker::link(const LgsPaths& paths, const map<string, LgsModule*>& modules) const {
+bool LgsLinker::link(const LgsPaths& paths, const map<string, LgsModule*>& modules) {
     const auto mainModule = modules.find(LOGOS_MAIN_FILE_NAME);
     assert(mainModule != modules.end());
     const auto mainCloned = CloneModule(*mainModule->second->IRModule);
@@ -28,7 +28,7 @@ bool LgsLinker::link(const LgsPaths& paths, const map<string, LgsModule*>& modul
     return true;
 }
 
-bool LgsLinker::generateObjFile(const LgsPaths& paths, Module* module) const {
+bool LgsLinker::generateObjFile(const LgsPaths& paths, Module* module) {
     error_code ec;
     legacy::PassManager pass;
     raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);

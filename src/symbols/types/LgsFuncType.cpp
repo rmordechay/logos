@@ -25,7 +25,11 @@ string LgsFuncType::getName() {
     if (IRName != "") return IRName;
     stringstream strStream;
     if (isMethod) {
-        strStream << parentName << "_";
+        if (implementsName) {
+            strStream << *implementsName << "_";
+        } else {
+            strStream << parentName << "_";
+        }
     } else if (this->isAnonymous) {
         strStream << "Anonymous";
     }

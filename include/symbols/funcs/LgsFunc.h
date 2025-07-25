@@ -12,7 +12,6 @@ class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
     vector<LgsExpr*> returnExprs;
-    Value* returnValue = nullptr;
     LgsStmtsBlock* stmtBlock = nullptr;
     BasicBlock* cleanupBlock = nullptr;
 
@@ -22,18 +21,14 @@ public:
         funcType->rt = rt;
         funcType->params = params;
         type = funcType;
-
     }
-    explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {
-        type = funcType;
-    }
+    explicit LgsFunc(LgsFuncType* funcType) : LgsUnaryExpr(funcType), funcType(funcType) {}
     string prettyName() override;
     void setBigObjAttrs(LgsModule* module, Function& IRFunc) const;
+    void createCleanupBlock(LgsModule* module) const;
     LgsParam& getReturnSwapParam() const;
     string format(string& tabs) override;
     Value* createIRValue(LgsModule* module) override;
-    void branchToCleanup(LgsModule* module) const;
-    void createCleanupBlock(LgsModule* module) const;
     virtual void generateIR(LgsModule* module);
     virtual Function* getIRFunc(LgsModule* module);
     virtual Value* callIR(LgsModule* module, const vector<Value*>& args = {});

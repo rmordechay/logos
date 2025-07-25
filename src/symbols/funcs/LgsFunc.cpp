@@ -9,10 +9,7 @@ void LgsFunc::generateIR(LgsModule* module) {
     module->stack.enterScope(FUNC_SCOPE, this);
     startFuncBlock(module);
     stmtBlock->createIRValue(module);
-    createCleanupBlock(module);
-    if (returnValue) {
-        module->builder.CreateRet(returnValue);
-    } else if (funcType->rt->isVoid) {
+    if (funcType->rt->isVoid && !lastInstTerminator(module)) {
         module->builder.CreateRetVoid();
     }
     module->stack.exitScope(true);
@@ -85,10 +82,6 @@ void LgsFunc::createCleanupBlock(LgsModule* module) const {
     // if (!lastInstTerminator(module)) branchToCleanup(module);
     // startBlock(module, cleanupBlock);
     // lgsPrint.call(module, {new LgsStrConst("cleanup: " + module->stack.currentFunc->funcType->name)});
-}
-
-void LgsFunc::branchToCleanup(LgsModule* module) const {
-    // module->builder.CreateBr(cleanupBlock);
 }
 
 LgsParam& LgsFunc::getReturnSwapParam() const {

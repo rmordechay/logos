@@ -219,6 +219,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
         func->funcType->parentName = interfaceName;
         func->funcType->isMethod = true;
         func->funcType->isVirtual = true;
+        func->funcType->implementsName = &interface->name;
         func->funcType->params.push_back(self);
         func->funcType->isOptional = !!interfaceFunction->QUEST_MARK();
         setParams(func->funcType, interfaceFunction->funcSignatureHeader()->param());

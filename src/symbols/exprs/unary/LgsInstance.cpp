@@ -1,6 +1,4 @@
 #include "exprs/unary/LgsInstance.h"
-
-#include "builtin/LgsBuiltins.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
@@ -44,7 +42,7 @@ void LgsInstance::setVirtualFuncs(LgsModule* module) const {
         const auto IRFunc = method->getIRFunc(module);
         const auto valuePtr = module->builder.CreateAlloca(ptrTy(module));
         module->builder.CreateStore(IRFunc, valuePtr);
-        vtable->addFunc.callIR(module, {vtableGEP, keyIRStr, IRFunc});
+        vtable->addFunc.callIR(module, {vtableGEP, keyIRStr, valuePtr});
     }
     for (const auto& [name, field] : fields) {
         if (!field->isVirtual) continue;

@@ -6,7 +6,7 @@
 
 class LgsLinker {
 public:
-    bool link(const LgsPaths& paths, const map<string, LgsModule*>& modules) const;
-    bool generateObjFile(const LgsPaths& paths, Module* module) const;
+    static bool link(const LgsPaths& paths, const map<string, LgsModule*>& modules);
+    static bool generateObjFile(const LgsPaths& paths, Module* module);
     ~LgsLinker() = default;
 };

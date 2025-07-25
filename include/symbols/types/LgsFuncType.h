@@ -20,6 +20,7 @@ public:
     bool hasDefaults = false;
     int returnParamIndex = -1;
     FunctionType* IRType = nullptr;
+    string* implementsName = nullptr;
 
     Type* getIRType(LgsModule* module) override;
     string getName() override;

@@ -9,7 +9,6 @@ void LgsMainFunc::generateIR(LgsModule* module) {
     startFuncBlock(module);
     if (!funcType->params.empty()) initArgs(module);
     stmtBlock->createIRValue(module);
-    createCleanupBlock(module);
     module->builder.CreateRet(i32(module, EXIT_SUCCESS));
     module->stack.exitScope(true);
 }

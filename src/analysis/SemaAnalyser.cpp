@@ -762,6 +762,7 @@ void SemaAnalyser::validateImplements(LgsType* type, LgsInterface* interface) {
         const auto objMethod = type->getMethod(name);
         if (objMethod && objMethod->funcType->equals(interfaceMethod->funcType)) {
             objMethod->funcType->isVirtual = true;
+            objMethod->funcType->implementsName = &interface->name;
             continue;
         }
         if (!interfaceMethod->funcType->isOptional) {
