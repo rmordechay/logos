@@ -30,7 +30,6 @@ void initLLVM() {
     InitializeAllTargetMCs();
     InitializeAllTargets();
     InitializeAllTargetInfos();
-    dataLayout = getTargetMachine()->createDataLayout();
 }
 
 Value* getIRStr(LgsModule* module, const string& value) {
@@ -61,52 +60,36 @@ Module* createIRModule(const string& moduleName, LLVMContext& context) {
     return module;
 }
 
+GlobalVariable* createIRGlobal(const LgsModule* module, Type* type, Constant* value) {
+    return new GlobalVariable(*module->IRModule, type, true, GlobalValue::PrivateLinkage, value);
+}
+
+void branchToBlock(LgsModule* module, BasicBlock* block) {
+    if (!lastInstTerminator(module)) {
+        module->builder.CreateBr(block);
+    }
+}
+
+void startBlock(LgsModule* module, BasicBlock* block) {
+    block->insertInto(module->stack.currentFunc->getIRFunc(module));
+    module->builder.SetInsertPoint(block);
+}
+
+void startFuncBlock(LgsModule* module) {
+    const auto currentFunc = module->stack.currentFunc;
+    const auto IRFunc = currentFunc->getIRFunc(module);
+    currentFunc->cleanupBlock = BasicBlock::Create(module->context, "cleanup");
+    const auto entryBlock = BasicBlock::Create(module->context, "entry", IRFunc);
+    module->builder.SetInsertPoint(entryBlock);
+}
+
+void copyMem(LgsModule* module, Value* src, Value* dest, const size_t n) {
+    auto& builder = module->builder;
+    builder.CreateCall(getMemcpy(module), {dest, src, i64(module, n), builder.getFalse()});
+}
+
 bool lastInstTerminator(const LgsModule* module) {
     return module->builder.GetInsertBlock()->getTerminator();
-}
-
-PointerType* ptrTy(LgsModule* module) {
-    return PointerType::getUnqual(module->context);
-}
-
-Type* i1Ty(LgsModule* module) {
-    return IntegerType::getInt32Ty(module->context);
-}
-
-Type* i8Ty(LgsModule* module) {
-    return IntegerType::getInt32Ty(module->context);
-}
-
-Type* i16Ty(LgsModule* module) {
-    return IntegerType::getInt32Ty(module->context);
-}
-
-Type* i32Ty(LgsModule* module) {
-    return IntegerType::getInt32Ty(module->context);
-}
-
-Type* i64Ty(LgsModule* module) {
-    return IntegerType::getInt64Ty(module->context);
-}
-
-Value* i1(LgsModule* module, const bool v) {
-    return module->builder.getInt1(v);
-}
-
-Value* i8(LgsModule* module, const int8_t v) {
-    return module->builder.getInt8(v);
-}
-
-Value* i16(LgsModule* module, const int16_t v) {
-    return module->builder.getInt16(v);
-}
-
-Value* i32(LgsModule* module, const int32_t v) {
-    return module->builder.getInt32(v);
-}
-
-Value* i64(LgsModule* module, const int64_t v) {
-    return module->builder.getInt64(v);
 }
 
 FunctionCallee getPrintf(LgsModule* module) {
@@ -115,7 +98,7 @@ FunctionCallee getPrintf(LgsModule* module) {
 }
 
 FunctionCallee getSnprintf(LgsModule* module) {
-    const auto funcType = FunctionType::get(i32Ty(module), {ptrTy(module), module->builder.getInt64Ty(), ptrTy(module)}, true);
+    const auto funcType = FunctionType::get(i32Ty(module), {ptrTy(module), i64Ty(module), ptrTy(module)}, true);
     return module->IRModule->getOrInsertFunction("snprintf", funcType);
 }
 

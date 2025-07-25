@@ -1,29 +1,29 @@
-#include "types/LgsPtr.h"
+#include "types/LgsCPtr.h"
 #include "exprs/LgsNullValue.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsLong.h"
 
-string LgsPtr::getName() {
+string LgsCPtr::getName() {
     return name;
 }
 
-string LgsPtr::prettyName() {
+string LgsCPtr::prettyName() {
     return name;
 }
 
-Type* LgsPtr::getIRType(LgsModule* module) {
+Type* LgsCPtr::getIRType(LgsModule* module) {
     return ptrTy(module);
 }
 
-size_t LgsPtr::getSizeBytes() {
+size_t LgsCPtr::getSizeBytes() {
     return sizeof(void*);
 }
 
-LgsExpr* LgsPtr::getZeroValue() {
+LgsExpr* LgsCPtr::getZeroValue() {
     return new LgsNullValue();
 }
 
-bool LgsPtr::equals(LgsType* other) {
+bool LgsCPtr::equals(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsLong::name) return true;

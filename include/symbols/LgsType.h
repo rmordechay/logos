@@ -5,7 +5,7 @@
 class LgsVariable;
 class LgsSArray;
 class LgsNullable;
-class LgsPtr;
+class LgsCPtr;
 class LgsUInt;
 class LgsShort;
 class LgsTypePair;
@@ -51,9 +51,8 @@ public:
     bool addMethod(LgsFunc* method);
     LgsField* getField(const string& name);
     LgsFunc* getMethod(const string& name) const;
-    void setLocation(const Token* ctx, const Token* end, const path& filePath);
+    void setLocation(const Token* begin, const Token* end, const path& filePath);
 
-    LgsPtr* asPtr();
     LgsBool* asBool();
     LgsStr* asStr();
     LgsInt* asInt();

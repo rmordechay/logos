@@ -2,7 +2,7 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
-#include "types/LgsPtr.h"
+#include "types/LgsCPtr.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
@@ -16,7 +16,7 @@ string LgsInt::prettyName() {
 }
 
 Type* LgsInt::getIRType(LgsModule* module) {
-    return Type::getInt32Ty(module->context);
+    return i32Ty(module);
 }
 
 string LgsInt::getName() {
@@ -29,7 +29,6 @@ LgsExpr* LgsInt::getZeroValue() {
 
 bool LgsInt::equals(LgsType* other) {
     const auto IRName = other->getName();
-    if (IRName == LgsPtr::name) return true;
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsFloat::name) return true;
     if (IRName == LgsUInt::name) return true;

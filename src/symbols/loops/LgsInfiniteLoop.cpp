@@ -1,9 +1,9 @@
 #include "loops/LgsInfiniteLoop.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsUtils.h"
 
 Value* LgsInfiniteLoop::loopStart(LgsModule* module) {
-    const auto type = module->builder.getIntPtrTy(dataLayout);
-    return ConstantInt::get(type, 0);
+    return ConstantInt::get(sizeTy(module), 0);
 }
 
 Value* LgsInfiniteLoop::loopEnd(LgsModule* module) {
@@ -15,13 +15,11 @@ void LgsInfiniteLoop::initIRLoop(LgsModule* module) {
     IRExitBlock = BasicBlock::Create(module->context, LOGOS_LOOP_EXIT);
     module->builder.CreateBr(IRBodyBlock);
 
-    startBlock(module, IRBodyBlock);
     if (loopVars.empty()) return;
-    const auto iValue = module->builder.CreateLoad(module->builder.getInt64Ty(), iPtr);
+    const auto iValue = module->builder.CreateLoad(i64Ty(module), iPtr);
     loopVars[0]->setIRValue(iValue);
 }
 
 void LgsInfiniteLoop::exitIRLoop(LgsModule* module) const {
     module->builder.CreateBr(IRBodyBlock);
-    startBlock(module, IRExitBlock);
 }

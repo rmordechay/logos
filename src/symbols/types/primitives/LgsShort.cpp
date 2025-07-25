@@ -7,7 +7,7 @@ size_t LgsShort::getSizeBytes() {
 }
 
 Type* LgsShort::getIRType(LgsModule* module) {
-    return Type::getInt16Ty(module->context);
+    return i16Ty(module);
 }
 
 string LgsShort::prettyName() {

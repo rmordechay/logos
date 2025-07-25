@@ -26,19 +26,19 @@ void LgsIfStmt::createIRStmt(LgsModule* module) {
 
 void LgsIfStmt::generateSimpleIf(LgsModule* module) const {
     const auto ifCondIR = ifCond->getIRValue(module);
-    if (!needsBranching(module, ifCondIR)) return;
+    if (!shouldBranch(module, ifCondIR)) return;
     const auto trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
     const auto endBlock = BasicBlock::Create(module->context, BB_IF_END);
     module->builder.CreateCondBr(ifCondIR, trueBlock, endBlock);
     startBlock(module, trueBlock);
     ifStmtBlock->createIRValue(module);
-    branchIfNeeded(module, endBlock);
+    branchToBlock(module, endBlock);
     startBlock(module, endBlock);
 }
 
 void LgsIfStmt::generateIfElse(LgsModule* module) const {
     const auto ifCondIR = ifCond->getIRValue(module);
-    if (!needsBranching(module, ifCondIR)) return;
+    if (!shouldBranch(module, ifCondIR)) return;
     const auto trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
     const auto elseBlock = BasicBlock::Create(module->context, BB_ELSE);
     const auto endBlock = BasicBlock::Create(module->context, BB_IF_END);
@@ -46,17 +46,17 @@ void LgsIfStmt::generateIfElse(LgsModule* module) const {
     module->builder.CreateCondBr(ifCondIR, trueBlock, elseBlock);
     startBlock(module, trueBlock);
     ifStmtBlock->createIRValue(module);
-    branchIfNeeded(module, endBlock);
+    branchToBlock(module, endBlock);
     // else block
     startBlock(module, elseBlock);
     elseStmtBlock->createIRValue(module);
-    branchIfNeeded(module, endBlock);
+    branchToBlock(module, endBlock);
     startBlock(module, endBlock);
 }
 
 void LgsIfStmt::generateComplexIf(LgsModule* module) const {
     const auto ifCondIR = ifCond->getIRValue(module);
-    if (!needsBranching(module, ifCondIR)) return;
+    if (!shouldBranch(module, ifCondIR)) return;
     auto trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
     auto elseIfCheckBlock = BasicBlock::Create(module->context, BB_ELSE_IF_CHECK);
     const auto elseBlock = BasicBlock::Create(module->context, BB_ELSE);
@@ -66,7 +66,7 @@ void LgsIfStmt::generateComplexIf(LgsModule* module) const {
     module->builder.CreateCondBr(ifCondIR, trueBlock, elseIfCheckBlock);
     startBlock(module, trueBlock);
     ifStmtBlock->createIRValue(module);
-    branchIfNeeded(module, endBlock);
+    branchToBlock(module, endBlock);
 
     for (int i = 0; i < elseIfConds.size(); ++i) {
         startBlock(module, elseIfCheckBlock);
@@ -87,18 +87,18 @@ void LgsIfStmt::generateComplexIf(LgsModule* module) const {
         }
         startBlock(module, trueBlock);
         stmtBlock->createIRValue(module);
-        branchIfNeeded(module, endBlock);
+        branchToBlock(module, endBlock);
     }
 
     if (elseStmtBlock) {
         startBlock(module, elseBlock);
         elseStmtBlock->createIRValue(module);
-        branchIfNeeded(module, endBlock);
+        branchToBlock(module, endBlock);
     }
     startBlock(module, endBlock);
 }
 
-bool LgsIfStmt::needsBranching(LgsModule* module, Value* ifCondIR) const {
+bool LgsIfStmt::shouldBranch(LgsModule* module, Value* ifCondIR) const {
     if (const auto* constBool = dyn_cast<ConstantInt>(ifCondIR)) {
         if (constBool->isOne()) {
             ifStmtBlock->createIRValue(module);

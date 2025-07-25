@@ -45,3 +45,7 @@ LgsForLoop* LgsStack::getLoop() {
 LgsIfStmt* LgsStack::getIfStmt() {
     return top().ifStmt;
 }
+
+void LgsStack::addAllocatedExpr(LgsExpr* expr) {
+    allocatedExprs.push_back(expr);
+}

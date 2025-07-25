@@ -16,7 +16,6 @@ class LgsAssignment;
 
 class LgsStmt : virtual public LgsValue {
 public:
-    void branchIfNeeded(LgsModule* module, BasicBlock* block) const;
     LgsVarDec* asVarDec();
     LgsAssignment* asAssignment();
     LgsIfStmt* asIfStmt();

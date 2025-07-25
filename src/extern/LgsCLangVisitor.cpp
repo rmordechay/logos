@@ -6,7 +6,7 @@
 #include "stmts/LgsField.h"
 #include "types/LgsDArray.h"
 #include "types/LgsObject.h"
-#include "types/LgsPtr.h"
+#include "types/LgsCPtr.h"
 #include "types/LgsStr.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
@@ -50,7 +50,7 @@ LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
         return new LgsStr();
     }
     if (type->isPointerType()) {
-        return new LgsPtr(mapCType(type->getPointeeType()));
+        return new LgsCPtr(mapCType(type->getPointeeType()));
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::Bool)) {
         return new LgsBool();

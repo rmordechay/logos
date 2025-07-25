@@ -1,11 +1,8 @@
 #include "funcs/LgsFunc.h"
-
-#include "builtin/LgsBuiltins.h"
 #include "data/LgsDefinitions.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "types/LgsDArray.h"
 #include "utils/LgsUtils.h"
 
 void LgsFunc::generateIR(LgsModule* module) {
@@ -28,20 +25,12 @@ Value* LgsFunc::createIRValue(LgsModule* module) {
     return getIRFunc(module);
 }
 
-void LgsFunc::createCleanupBlock(LgsModule* module) const {
-    // if (!lastInstTerminator(module)) {
-    //     branchToCleanup(module);
-    // }
-    // startBlock(module, cleanupBlock);
-    // lgsPrint.call(module, {new LgsStrConst("cleanup: " + module->stack.currentFunc->funcType->name)});
-}
-
 Function* LgsFunc::getIRFunc(LgsModule* module) {
     const auto funcIRName = funcType->getName();
     auto IRFunc = module->IRModule->getFunction(funcIRName);
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(module);
-    const auto funcTy = dyn_cast<FunctionType>(type);
+    const auto funcTy = cast<FunctionType>(type);
     auto func = module->IRModule->getOrInsertFunction(funcIRName, funcTy);
     IRFunc = cast<Function>(func.getCallee());
     if (funcType->isSwapReturn) setBigObjAttrs(module, *IRFunc);
@@ -90,6 +79,13 @@ void LgsFunc::setBigObjAttrs(LgsModule* module, Function& IRFunc) const {
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::StructRet, paramIRType));
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::Writable));
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
+}
+
+void LgsFunc::createCleanupBlock(LgsModule* module) const {
+    // if (!lastInstTerminator(module)) {
+    //     branchToCleanup(module);
+    // }
+    // lgsPrint.call(module, {new LgsStrConst("cleanup: " + module->stack.currentFunc->funcType->name)});
 }
 
 void LgsFunc::branchToCleanup(LgsModule* module) const {

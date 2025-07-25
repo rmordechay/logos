@@ -17,7 +17,7 @@ public:
     void createIRStmt(LgsModule* module) override;
     void generateSimpleIf(LgsModule* module) const;
     void generateComplexIf(LgsModule* module) const;
-    bool needsBranching(LgsModule* module, Value* ifCondIR) const;
+    bool shouldBranch(LgsModule* module, Value* ifCondIR) const;
     ~LgsIfStmt() override;
 };
 

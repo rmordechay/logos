@@ -12,7 +12,7 @@ size_t LgsChar::getSizeBytes() {
 }
 
 Type* LgsChar::getIRType(LgsModule* module) {
-    return Type::getInt8Ty(module->context);
+    return i8Ty(module);
 }
 
 string LgsChar::getName() {

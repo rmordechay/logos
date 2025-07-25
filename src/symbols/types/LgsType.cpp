@@ -6,7 +6,7 @@
 #include "types/LgsGroup.h"
 #include "types/LgsMap.h"
 #include "types/LgsNullable.h"
-#include "types/LgsPtr.h"
+#include "types/LgsCPtr.h"
 #include "types/LgsSArray.h"
 #include "types/LgsUnknownType.h"
 #include "types/primitives/LgsShort.h"
@@ -48,16 +48,18 @@ LgsFunc* LgsType::getMethod(const string& name) const {
     return nullptr;
 }
 
-void LgsType::setLocation(const Token* ctx, const Token* end, const path& filePath) {
-    location.lineNumberStart = ctx->getLine();
-    location.posInLineStart = ctx->getCharPositionInLine() + 1;
+void LgsType::setLocation(const Token* begin, const Token* end, const path& filePath) {
+    location.lineNumberStart = begin->getLine();
+    location.posInLineStart = begin->getCharPositionInLine() + 1;
+    if (end) {
+        location.posInLineEnd = end->getCharPositionInLine() + 1;
+    }
     location.filePath = filePath;
 }
 
 size_t LgsType::getSizeBytes() { assert(0); }
 string LgsType::getStrFormatPart() const { assert(0); }
 
-LgsPtr* LgsType::asPtr() { return dynamic_cast<LgsPtr*>(this); }
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
 LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }
 LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }

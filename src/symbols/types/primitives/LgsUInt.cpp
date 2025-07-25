@@ -3,6 +3,7 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
+#include "utils/LgsUtils.h"
 
 size_t LgsUInt::getSizeBytes() {
     return sizeof(unsigned int);
@@ -13,7 +14,7 @@ string LgsUInt::prettyName() {
 }
 
 Type* LgsUInt::getIRType(LgsModule* module) {
-    return Type::getInt32Ty(module->context);
+    return i32Ty(module);
 }
 
 string LgsUInt::getName() {

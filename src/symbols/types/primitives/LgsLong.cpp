@@ -1,18 +1,18 @@
 #include "types/primitives/LgsLong.h"
 
 #include "exprs/unary/constants/LgsLongConst.h"
-#include "logos/LgsModule.h"
 #include "types/LgsAny.h"
-#include "types/LgsPtr.h"
+#include "types/LgsCPtr.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsSize.h"
+#include "utils/LgsUtils.h"
 
 string LgsLong::prettyName() {
     return name;
 }
 
 Type* LgsLong::getIRType(LgsModule* module) {
-    return Type::getInt64Ty(module->context);
+    return i64Ty(module);
 }
 
 size_t LgsLong::getSizeBytes() {
@@ -29,7 +29,6 @@ string LgsLong::getName() {
 
 bool LgsLong::equals(LgsType* other) {
     const auto IRName = other->getName();
-    if (IRName == LgsPtr::name) return true;
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsFloat::name) return true;
     if (IRName == LgsSize::name) return true;

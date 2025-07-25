@@ -15,15 +15,7 @@ public:
     vector<LgsVariable*> refs;
 
     void setIRValue(Value* value);
-    GlobalVariable* createIRGlobal(const LgsModule* module, Type* type, Constant* value) const;
-    bool shouldLoadIRArg(Value* value, const LgsExpr* expr = nullptr) const;
-    void startBlock(LgsModule* module, BasicBlock* block) const;
-    void startFuncBlock(LgsModule* module) const;
-    Value* hashIRValue(LgsModule* module, Value* value) const;
-    void copyMem(LgsModule* module, Value* src, Value* dest, size_t n) const;
-    virtual std::string format(std::string& indentStr);
-    virtual void setLocation(const Token* start, const Token* end, path filePath);
+    void setLocation(const Token* start, const Token* end, const path& filePath);
+    virtual string format(string& indentStr);
     virtual ~LgsValue() = default;
 };
-
-

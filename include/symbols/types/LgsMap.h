@@ -42,7 +42,7 @@ public:
     Value* getLoopLength(LgsModule* module, LgsExpr* expr) override;
     Value* isEmpty(LgsModule* module, LgsExpr* expr) override;
     Value* isNotEmpty(LgsModule* module, LgsExpr* expr) override;
-    StructType* getMapStruct(LgsModule* runtime);
+    StructType* getMapStruct(LgsModule* module);
     bool equals(LgsType* other) override;
     ~LgsMap() override = default;
 };

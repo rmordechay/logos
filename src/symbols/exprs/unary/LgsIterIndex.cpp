@@ -37,7 +37,7 @@ Value* LgsIterIndex::getIRFromArray(LgsModule* module, LgsDArray* arr) const {
     auto& builder = module->builder;
     const auto arrPtr = baseExpr->getIRValue(module);
     auto indexIRValue = index->from->getIRValue(module);
-    indexIRValue = builder.CreateZExt(indexIRValue, builder.getInt64Ty());
+    indexIRValue = builder.CreateZExt(indexIRValue, i64Ty(module));
     return arr->getFunc.callIR(module, {arrPtr, indexIRValue});
 }
 

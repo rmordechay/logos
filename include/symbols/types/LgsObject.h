@@ -20,5 +20,3 @@ public:
     bool equals(LgsType* other) override;
     ~LgsObject() override;
 };
-
-

@@ -17,12 +17,8 @@ void LgsPatternMatch::createIRStmt(LgsModule* module) {
         switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
         module->builder.SetInsertPoint(patternBlock);
         patternsStmtBlocks[i]->createIRValue(module);
-        branchIfNeeded(module, exitBlock);
     }
 
-    startBlock(module, defaultCase);
     elseStmtBlock->createIRValue(module);
 
-    branchIfNeeded(module, exitBlock);
-    startBlock(module, exitBlock);
 }

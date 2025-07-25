@@ -6,9 +6,6 @@ class LgsErrHandler;
 class LgsForLoop;
 class LgsFuncType;
 
-inline DataLayout dataLayout;
-inline GlobalVariable* runtimeStruct = nullptr;
-
 class LgsModule {
 public:
     LgsStack stack;
@@ -17,10 +14,6 @@ public:
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
 
-    void initRuntime();
-    void addAllocatedExpr(LgsExpr* expr);
-    void pushStackTrace(const string& path);
-    void printStack();
     ~LgsModule() = default;
 };
 

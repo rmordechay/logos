@@ -31,9 +31,8 @@ Value* LgsInstance::createIRValue(LgsModule* module) {
 
 void LgsInstance::setVirtualFuncs(LgsModule* module) {
     const auto vtable = obj->vtable->type->asMap();
-    const auto vtableGEP = cast<GetElementPtrInst>(module->builder.CreateStructGEP(obj->getIRType(module), IRValue, 0));
-    const auto elementSize = i64(module, 8);
-    vtable->initFunc.callIR(module, {vtableGEP, elementSize});
+    const auto vtableGEP = module->builder.CreateGEP(vtable->getIRType(module), IRValue, {i32(module, 0)});
+    vtable->initFunc.callIR(module, {vtableGEP, i64(module, sizeof(void*))});
     for (const auto& [name, method] : obj->methods) {
         const auto implementFunc = method->implementsFunc;
         if (!implementFunc) continue;
@@ -47,9 +46,10 @@ void LgsInstance::setVirtualFuncs(LgsModule* module) {
         const auto implementField = field->implementsField;
         if (!implementField) continue;
         const auto keyIRStr = getIRStr(module, implementField->name);
-        const auto positionPtr = module->builder.CreateAlloca(i64Ty(module));
-        module->builder.CreateStore(i64(module, field->position), positionPtr);
-        vtable->addFunc.callIR(module, {vtableGEP, keyIRStr, positionPtr});
+        const auto valuePtr = module->builder.CreateAlloca(ptrTy(module));
+        const auto gep = field->getGEP(module, obj->getIRType(module), IRValue);
+        module->builder.CreateStore(gep, valuePtr);
+        vtable->addFunc.callIR(module, {vtableGEP, keyIRStr, valuePtr});
     }
 }
 
@@ -82,7 +82,7 @@ void LgsInstance::setReturnExpr(LgsModule* module, Type* objIRType) {
             ConstantExpr::getSizeOf(objIRType),
             i64(module, 1)
         );
-        module->addAllocatedExpr(this);
+        module->stack.addAllocatedExpr(this);
     }
 }
 

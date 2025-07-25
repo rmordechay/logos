@@ -28,13 +28,20 @@ void LgsSelection::resolveSelection(LgsModule* module) const {
 
 void LgsSelection::resolveFieldSelection(LgsModule* module, LgsExpr* parentExpr, LgsUnaryExpr* childExpr) const {
     const auto field = parentExpr->type->getField(childExpr->getExprName());
+    const auto fieldIRType = field->type->getIRType(module);
     Value* value = nullptr;
     if (field->type->asEnum()) {
-        if (field->expr) {
-            value = field->expr->getIRValue(module);
-        } else {
-            value = getIRStr(module, field->name);
-        }
+        value = field->expr ? field->expr->getIRValue(module) : getIRStr(module, field->name);
+    } else if (field->isVirtual) {
+        const auto vtable = parentExpr->type->vtable;
+        const auto vtableMap = vtable->type->asMap();
+        const auto keyIR = getIRStr(module, field->name);
+        const auto parentIRValue = parentExpr->getIRValue(module);
+        const auto vtableIRType = vtable->type->getIRType(module);
+        const auto mapPtr = module->builder.CreateGEP(vtableIRType, parentIRValue, {i64(module, 0)});
+        auto rv = vtableMap->getFunc.callIR(module, {mapPtr, keyIR});
+        rv = module->builder.CreateLoad(fieldIRType, rv);
+        value = rv;
     } else {
         const auto parentIRValue = parentExpr->getIRValue(module);
         const auto parentIRType = parentExpr->type->getIRType(module);

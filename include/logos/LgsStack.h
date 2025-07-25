@@ -37,6 +37,7 @@ public:
     void exitScope(bool isFunc = false);
     LgsForLoop* getLoop();
     LgsIfStmt* getIfStmt();
+    void addAllocatedExpr(LgsExpr* expr);
     auto begin() { return c.begin(); }
     auto end() { return c.end(); }
     auto rbegin() { return c.rbegin(); }

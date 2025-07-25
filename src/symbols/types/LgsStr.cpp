@@ -1,5 +1,6 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsUtils.h"
 
 size_t LgsStr::getSizeBytes() {
     return initialLength + 1;
@@ -38,10 +39,9 @@ Value* LgsStr::getLength(LgsModule* module, LgsExpr* expr) {
 }
 
 Value* LgsStr::getLoopLength(LgsModule* module, LgsExpr* expr) {
-    const auto i32Ty = module->builder.getInt64Ty();
-    const auto lenPtr = module->builder.CreateAlloca(i32Ty);
+    const auto lenPtr = module->builder.CreateAlloca(i64Ty(module));
     module->builder.CreateStore(getLength(module, expr), lenPtr);
-    return module->builder.CreateLoad(i32Ty, lenPtr);
+    return module->builder.CreateLoad(i64Ty(module), lenPtr);
 }
 
 Value* LgsStr::isEmpty(LgsModule* module, LgsExpr* expr) {

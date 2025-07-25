@@ -55,10 +55,9 @@ bool LgsMap::equals(LgsType* other) {
     return keyEqual && typePair->value->equals(otherKvType->value);
 }
 
-StructType* LgsMap::getMapStruct(LgsModule* runtime) {
+StructType* LgsMap::getMapStruct(LgsModule* module) {
     if (mapStruct) return mapStruct;
-    auto& builder = runtime->builder;
-    const vector<Type*> mapStructFields = {builder.getPtrTy(), builder.getInt64Ty(), builder.getInt64Ty()};
-    mapStruct = getIRStructType(runtime->context, name, mapStructFields);
+    const vector<Type*> mapStructFields = {ptrTy(module), i64Ty(module), i64Ty(module)};
+    mapStruct = getIRStructType(module->context, name, mapStructFields);
     return mapStruct;
 }

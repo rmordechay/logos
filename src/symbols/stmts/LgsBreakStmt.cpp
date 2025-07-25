@@ -7,5 +7,4 @@ void LgsBreakStmt::createIRStmt(LgsModule* module) {
     const auto loopExit = loop->IRExitBlock;
     module->builder.CreateBr(loopExit);
     const auto breakBlock = BasicBlock::Create(module->context, "break");
-    startBlock(module, breakBlock);
 }

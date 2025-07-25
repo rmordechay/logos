@@ -8,7 +8,6 @@ add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 set(SOURCE_FILES
     src/utils/LgsErrHandler.cpp
     src/logos/LgsApp.cpp
-    src/logos/LgsModule.cpp
     src/logos/LgsStack.cpp
     src/logos/LgsLinker.cpp
     src/analysis/AntlrConverter.cpp
@@ -91,7 +90,7 @@ set(SOURCE_FILES
     src/symbols/types/LgsUnknownType.cpp
     src/symbols/types/primitives/LgsUInt.cpp
     src/symbols/types/LgsIterator.cpp
-    src/symbols/types/LgsPtr.cpp
+    src/symbols/types/LgsCPtr.cpp
     src/symbols/types/LgsNullable.cpp
 )
 
