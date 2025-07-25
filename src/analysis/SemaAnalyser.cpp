@@ -745,7 +745,7 @@ void SemaAnalyser::validateImplements(LgsType* type, LgsInterface* interface) {
     for (const auto& [name, interfaceField] : interface->fields) {
         const auto objField = type->getField(name);
         if (objField && objField->type->equals(interfaceField->type)) {
-            objField->implementsField = interfaceField;
+            objField->isVirtual = true;
             continue;
         }
         if (!interfaceField->isOptional) {
@@ -758,7 +758,7 @@ void SemaAnalyser::validateImplements(LgsType* type, LgsInterface* interface) {
     for (const auto& [name, interfaceMethod] : interface->methods) {
         const auto objMethod = type->getMethod(name);
         if (objMethod && objMethod->funcType->equals(interfaceMethod->funcType)) {
-            objMethod->implementsFunc = interfaceMethod;
+            objMethod->funcType->isVirtual = true;
             continue;
         }
         if (!interfaceMethod->funcType->isOptional) {

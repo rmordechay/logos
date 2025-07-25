@@ -84,15 +84,13 @@ void LgsFunc::setBigObjAttrs(LgsModule* module, Function& IRFunc) const {
 }
 
 void LgsFunc::createCleanupBlock(LgsModule* module) const {
-    if (!lastInstTerminator(module)) {
-        branchToCleanup(module);
-    }
-    module->builder.SetInsertPoint(cleanupBlock);
-    lgsPrint.call(module, {new LgsStrConst("cleanup: " + module->stack.currentFunc->funcType->name)});
+    // if (!lastInstTerminator(module)) branchToCleanup(module);
+    // startBlock(module, cleanupBlock);
+    // lgsPrint.call(module, {new LgsStrConst("cleanup: " + module->stack.currentFunc->funcType->name)});
 }
 
 void LgsFunc::branchToCleanup(LgsModule* module) const {
-    module->builder.CreateBr(cleanupBlock);
+    // module->builder.CreateBr(cleanupBlock);
 }
 
 LgsParam& LgsFunc::getReturnSwapParam() const {

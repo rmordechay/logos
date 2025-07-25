@@ -17,11 +17,10 @@ public:
     bool isOptional = false;
     LgsExpr* expr = nullptr;
     LgsType* type = nullptr;
-    LgsField* implementsField = nullptr;
 
     LgsField(const string& name, string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(name), parentName(parentName), expr(expr), type(type) {}
-    Value* getGEP(LgsModule* module, Type* parentType, Value* instance) const;
-    void storeIRValue(LgsModule* module, Value* parentIRValue, LgsExpr* value) const;
+    Value* getGEP(LgsModule* module, Type* parentIRType, Value* instance) const;
+    void storeIRValue(LgsModule* module, Type* parentIRType, Value* parentIRValue, LgsExpr* value) const;
     void setZeroValue(LgsModule* module, Type* parentType, Value* parentIRValue) const;
     ~LgsField() override;
 };

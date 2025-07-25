@@ -14,7 +14,6 @@ public:
     vector<LgsExpr*> returnExprs;
     Value* returnValue = nullptr;
     LgsStmtsBlock* stmtBlock = nullptr;
-    LgsFunc* implementsFunc = nullptr;
     BasicBlock* cleanupBlock = nullptr;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {

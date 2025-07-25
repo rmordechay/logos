@@ -93,8 +93,8 @@ void startBlock(LgsModule* module, BasicBlock* block) {
 void startFuncBlock(LgsModule* module) {
     const auto currentFunc = module->stack.currentFunc;
     const auto IRFunc = currentFunc->getIRFunc(module);
+    currentFunc->cleanupBlock = BasicBlock::Create(module->context, BLOCK_NAME_CLEANUP);
     const auto entryBlock = BasicBlock::Create(module->context, BLOCK_NAME_ENTRY, IRFunc);
-    currentFunc->cleanupBlock = BasicBlock::Create(module->context, BLOCK_NAME_CLEANUP, IRFunc);
     module->builder.SetInsertPoint(entryBlock);
 }
 
