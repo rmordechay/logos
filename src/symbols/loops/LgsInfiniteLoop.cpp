@@ -1,4 +1,6 @@
 #include "loops/LgsInfiniteLoop.h"
+
+#include "data/LgsDefinitions.h"
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
 
@@ -11,8 +13,8 @@ Value* LgsInfiniteLoop::loopEnd(LgsModule* module) {
 }
 
 void LgsInfiniteLoop::initIRLoop(LgsModule* module) {
-    IRBodyBlock = BasicBlock::Create(module->context, LOGOS_LOOP_BODY);
-    IRExitBlock = BasicBlock::Create(module->context, LOGOS_LOOP_EXIT);
+    IRBodyBlock = BasicBlock::Create(module->context, BLOCK_NAME_LOOP_BODY);
+    IRExitBlock = BasicBlock::Create(module->context, BLOCK_NAME_LOOP_EXIT);
     module->builder.CreateBr(IRBodyBlock);
 
     startBlock(module, IRBodyBlock);

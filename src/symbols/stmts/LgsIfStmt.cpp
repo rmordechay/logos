@@ -1,14 +1,8 @@
 #include "stmts/LgsIfStmt.h"
 
-#include "funcs/LgsFunc.h"
+#include "data/LgsDefinitions.h"
 #include "logos/LgsModule.h"
 #include "utils/LgsUtils.h"
-
-#define BB_IF_TRUE "if_true"
-#define BB_IF_END "if_end"
-#define BB_ELSE "else"
-#define BB_ELSE_IF "else_if"
-#define BB_ELSE_IF_CHECK "else_if_check"
 
 void LgsIfStmt::createIRStmt(LgsModule* module) {
     module->stack.enterScope(IF_SCOPE, this);
@@ -27,8 +21,8 @@ void LgsIfStmt::createIRStmt(LgsModule* module) {
 void LgsIfStmt::generateSimpleIf(LgsModule* module) const {
     const auto ifCondIR = ifCond->getIRValue(module);
     if (!shouldBranch(module, ifCondIR)) return;
-    const auto trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
-    const auto endBlock = BasicBlock::Create(module->context, BB_IF_END);
+    const auto trueBlock = BasicBlock::Create(module->context, BLOCK_NAME_IF_TRUE);
+    const auto endBlock = BasicBlock::Create(module->context, BLOCK_NAME_IF_END);
     module->builder.CreateCondBr(ifCondIR, trueBlock, endBlock);
     startBlock(module, trueBlock);
     ifStmtBlock->createIRValue(module);
@@ -39,9 +33,9 @@ void LgsIfStmt::generateSimpleIf(LgsModule* module) const {
 void LgsIfStmt::generateIfElse(LgsModule* module) const {
     const auto ifCondIR = ifCond->getIRValue(module);
     if (!shouldBranch(module, ifCondIR)) return;
-    const auto trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
-    const auto elseBlock = BasicBlock::Create(module->context, BB_ELSE);
-    const auto endBlock = BasicBlock::Create(module->context, BB_IF_END);
+    const auto trueBlock = BasicBlock::Create(module->context, BLOCK_NAME_IF_TRUE);
+    const auto elseBlock = BasicBlock::Create(module->context, BLOCK_NAME_ELSE);
+    const auto endBlock = BasicBlock::Create(module->context, BLOCK_NAME_IF_END);
     // if block
     module->builder.CreateCondBr(ifCondIR, trueBlock, elseBlock);
     startBlock(module, trueBlock);
@@ -57,10 +51,10 @@ void LgsIfStmt::generateIfElse(LgsModule* module) const {
 void LgsIfStmt::generateComplexIf(LgsModule* module) const {
     const auto ifCondIR = ifCond->getIRValue(module);
     if (!shouldBranch(module, ifCondIR)) return;
-    auto trueBlock = BasicBlock::Create(module->context, BB_IF_TRUE);
-    auto elseIfCheckBlock = BasicBlock::Create(module->context, BB_ELSE_IF_CHECK);
-    const auto elseBlock = BasicBlock::Create(module->context, BB_ELSE);
-    const auto endBlock = BasicBlock::Create(module->context, BB_IF_END);
+    auto trueBlock = BasicBlock::Create(module->context, BLOCK_NAME_IF_TRUE);
+    auto elseIfCheckBlock = BasicBlock::Create(module->context, BLOCK_NAME_ELSE_IF_CHECK);
+    const auto elseBlock = BasicBlock::Create(module->context, BLOCK_NAME_ELSE);
+    const auto endBlock = BasicBlock::Create(module->context, BLOCK_NAME_IF_END);
 
     // if block
     module->builder.CreateCondBr(ifCondIR, trueBlock, elseIfCheckBlock);
@@ -73,7 +67,7 @@ void LgsIfStmt::generateComplexIf(LgsModule* module) const {
         const auto elseIfCond = elseIfConds[i];
         const auto stmtBlock = elseIfStmtBlocks[i];
         const auto elseIfCondIR = elseIfCond->getIRValue(module);
-        trueBlock = BasicBlock::Create(module->context, BB_ELSE_IF);
+        trueBlock = BasicBlock::Create(module->context, BLOCK_NAME_ELSE_IF);
         const auto lastIter = i == elseIfConds.size() - 1;
         if (lastIter) {
             if (elseStmtBlock) {
@@ -82,7 +76,7 @@ void LgsIfStmt::generateComplexIf(LgsModule* module) const {
                 module->builder.CreateCondBr(elseIfCondIR, trueBlock, endBlock);
             }
         } else {
-            elseIfCheckBlock = BasicBlock::Create(module->context, BB_ELSE_IF_CHECK);
+            elseIfCheckBlock = BasicBlock::Create(module->context, BLOCK_NAME_ELSE_IF_CHECK);
             module->builder.CreateCondBr(elseIfCondIR, trueBlock, elseIfCheckBlock);
         }
         startBlock(module, trueBlock);

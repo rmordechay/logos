@@ -6,10 +6,6 @@ class LgsVariable;
 class LgsStmtsBlock;
 class LgsExpr;
 
-#define LOGOS_LOOP_CONDITION "loop_condition"
-#define LOGOS_LOOP_BODY "loop_body"
-#define LOGOS_LOOP_EXIT "loop_exit"
-
 class LgsForLoop : public LgsStmt {
 public:
     AllocaInst* iPtr = nullptr;

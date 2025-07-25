@@ -12,9 +12,9 @@ Value* LgsRangeLoop::loopEnd(LgsModule* module) {
 }
 
 void LgsRangeLoop::initIRLoop(LgsModule* module) {
-    IRCondBlock = BasicBlock::Create(module->context, LOGOS_LOOP_CONDITION);
-    IRBodyBlock = BasicBlock::Create(module->context, LOGOS_LOOP_BODY);
-    IRExitBlock = BasicBlock::Create(module->context, LOGOS_LOOP_EXIT);
+    IRCondBlock = BasicBlock::Create(module->context, BLOCK_NAME_LOOP_COND);
+    IRBodyBlock = BasicBlock::Create(module->context, BLOCK_NAME_LOOP_BODY);
+    IRExitBlock = BasicBlock::Create(module->context, BLOCK_NAME_LOOP_EXIT);
     iPtr = module->builder.CreateAlloca(i32Ty(module));
     module->builder.CreateStore(loopStart(module), iPtr);
     module->builder.CreateBr(IRCondBlock);
@@ -33,20 +33,13 @@ void LgsRangeLoop::initIRLoop(LgsModule* module) {
 }
 
 void LgsRangeLoop::exitIRLoop(LgsModule* module) const {
-    const auto terminator = module->builder.GetInsertBlock()->getTerminator();
-    if (terminator) {
-        const auto branch = dyn_cast<BranchInst>(terminator);
-        if (branch && !branch->isConditional()) {
-            const auto labelName = branch->getSuccessor(0)->getName().str();
-            if (labelName == "cleanup")
-            std::cout << labelName << std::endl;
-        }
+    if (!lastInstTerminator(module)) {
+        // Increment loop variable
+        const auto iValue = module->builder.CreateLoad(i32Ty(module), iPtr);
+        const auto inc = module->builder.CreateAdd(iValue, i32(module, 1));
+        module->builder.CreateStore(inc, iPtr);
+        module->builder.CreateBr(IRCondBlock);
     }
-    // Increment loop variable
-    const auto iValue = module->builder.CreateLoad(i32Ty(module), iPtr);
-    const auto inc = module->builder.CreateAdd(iValue, i32(module, 1));
-    module->builder.CreateStore(inc, iPtr);
-    module->builder.CreateBr(IRCondBlock);
     startBlock(module, IRExitBlock);
 }
 

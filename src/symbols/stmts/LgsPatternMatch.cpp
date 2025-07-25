@@ -1,12 +1,14 @@
 #include "stmts/LgsPatternMatch.h"
+
+#include "data/LgsDefinitions.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsUtils.h"
 
 void LgsPatternMatch::createIRStmt(LgsModule* module) {
     const auto exprIRValue = expr->hashValue(module);
-    exitBlock = BasicBlock::Create(module->context, "exit_pattern_matching");
-    defaultCase = BasicBlock::Create(module->context, "default");
+    exitBlock = BasicBlock::Create(module->context, BLOCK_NAME_EXIT_PATTERN);
+    defaultCase = BasicBlock::Create(module->context, BLOCK_NAME_DEFAULT_CASE);
     const auto switchInst = module->builder.CreateSwitch(exprIRValue, defaultCase);
 
     vector<BasicBlock*> blocks;
@@ -14,7 +16,7 @@ void LgsPatternMatch::createIRStmt(LgsModule* module) {
         const auto pattern = patterns[i];
         const auto patterIRValue = pattern->hashValue(module);
         const auto IRFunc = module->stack.currentFunc->getIRFunc(module);
-        const auto patternBlock = BasicBlock::Create(module->context, "case_" + to_string(i), IRFunc);
+        const auto patternBlock = BasicBlock::Create(module->context, BLOCK_NAME_CASE_PREFIX + to_string(i), IRFunc);
         switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
         module->builder.SetInsertPoint(patternBlock);
         patternsStmtBlocks[i]->createIRValue(module);

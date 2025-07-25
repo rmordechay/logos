@@ -1,5 +1,6 @@
 #pragma once
 
+static const unordered_set<string> LOGOS_KEYWORDS = {"object", "single", "self", "Self", "interface", "extern", "pub", "implements", "const", "enum",  "vec2", "vec3", "vec4", "if", "else", "for", "break", "continue", "return", "and", "or", "not", "in"};
 #define LOGOS_FILE_EXTENSION ".lgs"
 #define LOGOS_SRC_DIR "src"
 #define LOGOS_ENVS_DIR "envs"
@@ -11,6 +12,19 @@
 #define LOGOS_OBJECT_FILE "main.o"
 #define LOGOS_EXECUTABLE_FILE "output"
 #define LOGOS_STR_FORMAT_PART "%v"
-#define LOGOS_CLEANUP_BLOCK_NAME "cleanup"
 #define LOGOS_ERROR_STR "\033[1;31mError:\033[0m "
-static const unordered_set<string> LOGOS_KEYWORDS = {"object", "single", "self", "Self", "interface", "extern", "pub", "implements", "const", "enum",  "vec2", "vec3", "vec4", "if", "else", "for", "break", "continue", "return", "and", "or", "not", "in"};
+
+#define BLOCK_NAME_CLEANUP "cleanup"
+#define BLOCK_NAME_IF_TRUE "if_true"
+#define BLOCK_NAME_DEFAULT_CASE "default"
+#define BLOCK_NAME_EXIT_PATTERN "exit_pattern_matching"
+#define BLOCK_NAME_CASE_PREFIX "case_"
+#define BLOCK_NAME_ENTRY "entry"
+#define BLOCK_NAME_IF_END "if_end"
+#define BLOCK_NAME_ELSE "else"
+#define BLOCK_NAME_ELSE_IF "else_if"
+#define BLOCK_NAME_ELSE_IF_CHECK "else_if_check"
+#define BLOCK_NAME_LOOP_COND "loop_cond"
+#define BLOCK_NAME_LOOP_BODY "loop_body"
+#define BLOCK_NAME_LOOP_EXIT "loop_exit"
+#define BLOCK_NAME_BREAK "break"

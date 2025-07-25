@@ -18,9 +18,9 @@ Value* LgsForeachLoop::loopEnd(LgsModule* module) {
 }
 
 void LgsForeachLoop::initIRLoop(LgsModule* module) {
-    IRCondBlock = BasicBlock::Create(module->context, LOGOS_LOOP_CONDITION);
-    IRBodyBlock = BasicBlock::Create(module->context, LOGOS_LOOP_BODY);
-    IRExitBlock = BasicBlock::Create(module->context, LOGOS_LOOP_EXIT);
+    IRCondBlock = BasicBlock::Create(module->context, BLOCK_NAME_LOOP_COND);
+    IRBodyBlock = BasicBlock::Create(module->context, BLOCK_NAME_LOOP_BODY);
+    IRExitBlock = BasicBlock::Create(module->context, BLOCK_NAME_LOOP_EXIT);
 
     const auto iterable = iterExpr->type->asIterable();
     // With iterator
