@@ -1,6 +1,7 @@
 #include "stmts/LgsPatternMatch.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsUtils.h"
 
 void LgsPatternMatch::createIRStmt(LgsModule* module) {
     const auto exprIRValue = expr->hashValue(module);
@@ -17,8 +18,12 @@ void LgsPatternMatch::createIRStmt(LgsModule* module) {
         switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
         module->builder.SetInsertPoint(patternBlock);
         patternsStmtBlocks[i]->createIRValue(module);
+        module->builder.CreateBr(exitBlock);
     }
 
+    startBlock(module, defaultCase);
     elseStmtBlock->createIRValue(module);
 
+    module->builder.CreateBr(exitBlock);
+    startBlock(module, exitBlock);
 }

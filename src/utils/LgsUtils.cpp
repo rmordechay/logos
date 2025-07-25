@@ -1,6 +1,21 @@
 #include "utils/LgsUtils.h"
 #include "LgsType.h"
 #include "builtin/LgsBuiltins.h"
+#include "data/LgsDefinitions.h"
+
+bool isLogosFile(const directory_entry& entry) {
+    return entry.is_regular_file() && entry.path().extension().string() == LOGOS_FILE_EXTENSION;
+}
+
+bool isCharPointer(const clang::QualType qt) {
+    if (!qt->isPointerType()) return false;
+    const auto pointeeType = qt->getPointeeType();
+    return pointeeType->isCharType();
+}
+
+bool isLgsKeyword(const string& s) {
+    return LOGOS_KEYWORDS.find(s) != LOGOS_KEYWORDS.end();
+}
 
 string getFileText(path filePath) {
     if (!exists(filePath)) return "";
@@ -78,8 +93,8 @@ void startBlock(LgsModule* module, BasicBlock* block) {
 void startFuncBlock(LgsModule* module) {
     const auto currentFunc = module->stack.currentFunc;
     const auto IRFunc = currentFunc->getIRFunc(module);
-    currentFunc->cleanupBlock = BasicBlock::Create(module->context, "cleanup");
     const auto entryBlock = BasicBlock::Create(module->context, "entry", IRFunc);
+    currentFunc->cleanupBlock = BasicBlock::Create(module->context, "cleanup", IRFunc);
     module->builder.SetInsertPoint(entryBlock);
 }
 

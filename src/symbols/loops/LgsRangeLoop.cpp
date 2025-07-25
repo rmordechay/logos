@@ -19,21 +19,35 @@ void LgsRangeLoop::initIRLoop(LgsModule* module) {
     module->builder.CreateStore(loopStart(module), iPtr);
     module->builder.CreateBr(IRCondBlock);
 
+    // Condition
+    startBlock(module, IRCondBlock);
     auto iValue = module->builder.CreateLoad(i32Ty(module), iPtr);
     const auto upperBound = module->builder.CreateZExt(loopEnd(module), i32Ty(module));
     const auto condition = module->builder.CreateICmpSLT(iValue, upperBound);
     module->builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
 
+    // Body
+    startBlock(module, IRBodyBlock);
     iValue = module->builder.CreateLoad(i32Ty(module), iPtr);
     loopVars[0]->setIRValue(iValue);
 }
 
 void LgsRangeLoop::exitIRLoop(LgsModule* module) const {
+    const auto terminator = module->builder.GetInsertBlock()->getTerminator();
+    if (terminator) {
+        const auto branch = dyn_cast<BranchInst>(terminator);
+        if (branch && !branch->isConditional()) {
+            const auto labelName = branch->getSuccessor(0)->getName().str();
+            if (labelName == "cleanup")
+            std::cout << labelName << std::endl;
+        }
+    }
     // Increment loop variable
     const auto iValue = module->builder.CreateLoad(i32Ty(module), iPtr);
     const auto inc = module->builder.CreateAdd(iValue, i32(module, 1));
     module->builder.CreateStore(inc, iPtr);
     module->builder.CreateBr(IRCondBlock);
+    startBlock(module, IRExitBlock);
 }
 
 LgsRangeLoop::~LgsRangeLoop() {

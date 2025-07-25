@@ -284,13 +284,9 @@ void LgsApp::initPaths(const path& rootDirPath) {
 
 void LgsApp::handleExitWithErrors() const {
     for (auto error : errHandler.errors) {
-        lgsLog(error.msg);
+        lgsLog(LOGOS_ERROR_STR + error.msg);
     }
     return exit(1);
-}
-
-bool LgsApp::isLogosFile(const directory_entry& entry) const {
-    return entry.is_regular_file() && entry.path().extension().string() == LOGOS_FILE_EXTENSION;
 }
 
 void LgsApp::createBuildDir() const {

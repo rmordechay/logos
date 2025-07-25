@@ -15,6 +15,7 @@ void LgsInfiniteLoop::initIRLoop(LgsModule* module) {
     IRExitBlock = BasicBlock::Create(module->context, LOGOS_LOOP_EXIT);
     module->builder.CreateBr(IRBodyBlock);
 
+    startBlock(module, IRBodyBlock);
     if (loopVars.empty()) return;
     const auto iValue = module->builder.CreateLoad(i64Ty(module), iPtr);
     loopVars[0]->setIRValue(iValue);
@@ -22,4 +23,5 @@ void LgsInfiniteLoop::initIRLoop(LgsModule* module) {
 
 void LgsInfiniteLoop::exitIRLoop(LgsModule* module) const {
     module->builder.CreateBr(IRBodyBlock);
+    startBlock(module, IRExitBlock);
 }

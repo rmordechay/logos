@@ -8,6 +8,9 @@ struct LgsIndex;
 inline mutex mtx;
 inline TargetMachine* targetMachine = nullptr;
 
+bool isLogosFile(const directory_entry& entry);
+bool isCharPointer(clang::QualType qt);
+bool isLgsKeyword(const string& s);
 string getFileText(path filePath);
 string removeUnderscores(const string& input);
 void freeType(const LgsType* type);

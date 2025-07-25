@@ -16,7 +16,7 @@ void LgsErrHandler::handleError(const LgsError& lgsErr, const Location* location
         pos += args[argIndex].length();
         argIndex++;
     }
-    const auto finalResult = LOGOS_ERROR_STR + result + "\n\t   at " + location->getFullPath(location->filePath) + "\n---";
+    const auto finalResult = result + "\n\t   at " + location->getFullPath(location->filePath) + "\n---";
     errors.emplace_back(LgsError{.msg = finalResult, .errCode = lgsErr.errCode});
 }
 

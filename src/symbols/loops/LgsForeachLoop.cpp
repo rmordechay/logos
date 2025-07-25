@@ -17,13 +17,6 @@ Value* LgsForeachLoop::loopEnd(LgsModule* module) {
     return iterable->getLoopLength(module, iterExpr);
 }
 
-void LgsForeachLoop::initIPtr(LgsModule* module)
-{
-    iPtr = module->builder.CreateAlloca(i64Ty(module), nullptr);
-    module->builder.CreateStore(loopStart(module), iPtr);
-    module->builder.CreateBr(IRCondBlock);
-}
-
 void LgsForeachLoop::initIRLoop(LgsModule* module) {
     IRCondBlock = BasicBlock::Create(module->context, LOGOS_LOOP_CONDITION);
     IRBodyBlock = BasicBlock::Create(module->context, LOGOS_LOOP_BODY);
@@ -36,6 +29,7 @@ void LgsForeachLoop::initIRLoop(LgsModule* module) {
         iterator.initIterator(module);
         initIPtr(module);
         module->builder.CreateCondBr(iterator.hasNext(module), IRBodyBlock, IRExitBlock);
+        startBlock(module, IRBodyBlock);
         iterPtr = iterExpr->getIRValue(module);
         setMapIterVars(module, iterator);
         return;
@@ -43,6 +37,7 @@ void LgsForeachLoop::initIRLoop(LgsModule* module) {
 
     // Without iterator
     setLoopCondition(module);
+    startBlock(module, IRBodyBlock);
     iterPtr = iterExpr->getIRValue(module);
     if (const auto str = iterable->asStr()) {
         setStrIterVars(module, str);
@@ -59,6 +54,14 @@ void LgsForeachLoop::exitIRLoop(LgsModule* module) const {
     const auto inc = module->builder.CreateAdd(iValue, i64(module, 1));
     module->builder.CreateStore(inc, iPtr);
     module->builder.CreateBr(IRCondBlock);
+    startBlock(module, IRBodyBlock);
+}
+
+void LgsForeachLoop::initIPtr(LgsModule* module) {
+    iPtr = module->builder.CreateAlloca(i64Ty(module), nullptr);
+    module->builder.CreateStore(loopStart(module), iPtr);
+    module->builder.CreateBr(IRCondBlock);
+    startBlock(module, IRCondBlock);
 }
 
 void LgsForeachLoop::setStrIterVars(LgsModule* module, LgsStr* str) const {

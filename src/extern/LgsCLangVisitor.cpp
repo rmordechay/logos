@@ -151,16 +151,6 @@ LgsType* LgsCLangVisitor::mapCArray(const clang::QualType type) {
     return arr;
 }
 
-bool LgsCLangVisitor::isCharPointer(const clang::QualType qt) const {
-    if (!qt->isPointerType()) return false;
-    const auto pointeeType = qt->getPointeeType();
-    return pointeeType->isCharType();
-}
-
-bool LgsCLangVisitor::isLgsKeyword(const string& s) const {
-    return LOGOS_KEYWORDS.find(s) != LOGOS_KEYWORDS.end();
-}
-
 void LgsCLangASTConsumer::HandleTranslationUnit(clang::ASTContext& context) {
     visitor.TraverseDecl(context.getTranslationUnitDecl());
     lock_guard lock(mtx);
