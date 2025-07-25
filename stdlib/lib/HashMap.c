@@ -41,12 +41,12 @@ void Map_add(HashMap* map, const char* key, const void* value) {
 
 void* Map_get(const HashMap* map, const char* key) {
     const size_t index = Str_hash(key);
-    const Entry* current = map->buckets[index];
-    while (current) {
-        if (strcmp(current->key, key) == 0) {
-            return current->value;
+    const Entry* entry = map->buckets[index];
+    while (entry) {
+        if (strcmp(entry->key, key) == 0) {
+            return entry->value;
         }
-        current = current->next;
+        entry = entry->next;
     }
     return NULL;
 }

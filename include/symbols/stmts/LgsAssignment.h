@@ -1,10 +1,10 @@
 #pragma once
 #include "LgsStmt.h"
-#include "exprs/unary/LgsIterIndex.h"
-#include "exprs/unary/LgsSelection.h"
 
-#include <vector>
-
+class LgsArrayExpr;
+class LgsHashMap;
+struct LgsIndex;
+class LgsIterIndex;
 class LgsExpr;
 class LgsType;
 
@@ -32,13 +32,11 @@ public:
     void createIRStmt(LgsModule* module) override;
     void createIRAssign(LgsModule* module) const;
     void assignToIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr) const;
-    void assignToSelection(LgsModule* module, const LgsSelection* selection, LgsExpr* expr) const;
-    void assignToVariable(LgsModule* module, LgsVariable* variable, LgsExpr* expr) const;
-    void storeScalarInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr) const;
     void storeArrayInIterIndex(LgsModule* module, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) const;
     void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices) const;
-    void storeHashMapInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsHashMap* map) const;
+    static void assignToSelection(LgsModule* module, const LgsSelection* selection, LgsExpr* expr);
+    static void assignToVariable(LgsModule* module, LgsVariable* variable, LgsExpr* expr);
+    static void storeScalarInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr);
+    static void storeHashMapInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsHashMap* map);
     ~LgsAssignment() override;
 };
-
-

@@ -6,6 +6,7 @@ class LgsInstance final : public LgsUnaryExpr {
 public:
     string name;
     LgsObject* obj = nullptr;
+    map<string, LgsField*> fields;
     map<string, LgsVarDec*> args;
 
     explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), name(obj->name), obj(obj) {}
@@ -16,5 +17,5 @@ public:
     string getExprName() override;
     string prettyName() override;
     void free(LgsModule* module) override;
-    ~LgsInstance() override = default;
+    ~LgsInstance() override;
 };

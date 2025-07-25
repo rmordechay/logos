@@ -26,5 +26,6 @@ public:
     LgsExpr* getZeroValue() override;
     string prettyName() override;
     bool equals(LgsType* other) override;
+    string getStrFormatPart() const override;
     ~LgsFuncType() override;
 };

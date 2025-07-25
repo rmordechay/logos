@@ -17,6 +17,10 @@ bool LgsFuncType::equals(LgsType* other) {
     return true;
 }
 
+string LgsFuncType::getStrFormatPart() const {
+    return "%p";
+}
+
 string LgsFuncType::getName() {
     if (IRName != "") return IRName;
     stringstream strStream;

@@ -69,17 +69,14 @@ void LgsAssignment::assignToIterIndex(LgsModule* module, LgsIterIndex* iterIndex
     }
 }
 
-void LgsAssignment::assignToSelection(LgsModule* module, const LgsSelection* selection, LgsExpr* expr) const {
+void LgsAssignment::assignToSelection(LgsModule* module, const LgsSelection* selection, LgsExpr* expr) {
     selection->resolveSelection(module);
     const auto lastExpr = selection->lastExpr();
-    const auto parentExpr = selection->exprs[selection->exprs.size() - 2];
     if (const auto var = lastExpr->asVariable()) {
         assert(var->ref.symbolType != UNKNOWN);
         switch (var->ref.symbolType) {
         case FIELD: {
-            const auto parentIRType = parentExpr->type->getIRType(module);
-            const auto parentIRValue = parentExpr->getIRValue(module);
-            var->ref.field->storeIRValue(module, parentIRType, parentIRValue, expr);
+            var->ref.field->storeIRValue(module, expr);
             return;
         }
         case UNKNOWN: default:
@@ -89,17 +86,17 @@ void LgsAssignment::assignToSelection(LgsModule* module, const LgsSelection* sel
     assert(0);
 }
 
-void LgsAssignment::assignToVariable(LgsModule* module, LgsVariable* variable, LgsExpr* expr) const {
+void LgsAssignment::assignToVariable(LgsModule* module, LgsVariable* variable, LgsExpr* expr) {
     const auto variablePtr = variable->getIRValue(module);
     const auto exprIRValue = expr->getIRValue(module);
     module->builder.CreateStore(exprIRValue, variablePtr);
 }
 
-void LgsAssignment::storeHashMapInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsHashMap* map) const {
+void LgsAssignment::storeHashMapInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsHashMap* map) {
     assert(0);
 }
 
-void LgsAssignment::storeScalarInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr) const {
+void LgsAssignment::storeScalarInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto rIRValue = expr->getIRValue(module);
     const auto baseIRValue = baseExpr->getIRValue(module);

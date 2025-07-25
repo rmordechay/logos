@@ -26,7 +26,7 @@ void LgsSelection::resolveSelection(LgsModule* module) const {
     }
 }
 
-void LgsSelection::resolveFieldSelection(LgsModule* module, LgsExpr* parentExpr, LgsUnaryExpr* childExpr) const {
+void LgsSelection::resolveFieldSelection(LgsModule* module, LgsExpr* parentExpr, LgsUnaryExpr* childExpr) {
     const auto field = parentExpr->type->getField(childExpr->getExprName());
     const auto fieldIRType = field->type->getIRType(module);
     Value* value = nullptr;
@@ -43,9 +43,7 @@ void LgsSelection::resolveFieldSelection(LgsModule* module, LgsExpr* parentExpr,
         rv = module->builder.CreateLoad(fieldIRType, rv);
         value = rv;
     } else {
-        const auto parentIRValue = parentExpr->getIRValue(module);
-        const auto parentIRType = parentExpr->type->getIRType(module);
-        value = field->getGEP(module, parentIRType, parentIRValue);
+        value = field->getGEP(module);
         // value = module->builder.CreateLoad(field->type->getIRType(module), value);
     }
     childExpr->setIRValue(value);

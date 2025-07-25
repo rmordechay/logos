@@ -1,4 +1,6 @@
 #include "exprs/unary/LgsInstance.h"
+
+#include "builtin/LgsBuiltins.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
@@ -15,12 +17,14 @@ Value* LgsInstance::createIRValue(LgsModule* module) {
         IRValue = module->builder.CreateAlloca(objIRType);
     }
 
-    for (const auto& [fieldName, field] : obj->fields) {
+    for (const auto& [fieldName, field] : fields) {
+        field->parentIRType = parentIRType;
+        field->parentIRValue = IRValue;
         auto arg = args.find(fieldName);
         if (arg != args.end()) {
-            field->storeIRValue(module, parentIRType, IRValue, arg->second->expr);
+            field->storeIRValue(module, arg->second->expr);
         } else {
-            field->setZeroValue(module, parentIRType, IRValue);
+            field->setZeroValue(module);
         }
     }
 
@@ -40,12 +44,12 @@ void LgsInstance::setVirtualFuncs(LgsModule* module) const {
         const auto IRFunc = method->getIRFunc(module);
         const auto valuePtr = module->builder.CreateAlloca(ptrTy(module));
         module->builder.CreateStore(IRFunc, valuePtr);
-        vtable->addFunc.callIR(module, {vtableGEP, keyIRStr, valuePtr});
+        vtable->addFunc.callIR(module, {vtableGEP, keyIRStr, IRFunc});
     }
-    for (const auto& [name, field] : obj->fields) {
+    for (const auto& [name, field] : fields) {
         if (!field->isVirtual) continue;
         const auto keyIRStr = getIRStr(module, field->name);
-        const auto gep = field->getGEP(module, obj->getIRType(module), IRValue);
+        const auto gep = field->getGEP(module);
         const auto ty = field->type->getIRType(module);
         const auto v = module->builder.CreateLoad(ty, gep);
         const auto valuePtr = module->builder.CreateAlloca(ty);
@@ -80,5 +84,14 @@ void LgsInstance::setReturnExpr(LgsModule* module, Type* objIRType) {
 void LgsInstance::free(LgsModule* module) {
     if (!isReturnExpr) {
         module->builder.CreateFree(IRValue);
+    }
+}
+
+LgsInstance::~LgsInstance() {
+    for (const auto field : fields) {
+        delete field.second;
+    }
+    for (const auto arg : args) {
+        delete arg.second;
     }
 }

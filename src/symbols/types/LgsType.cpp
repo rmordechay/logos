@@ -6,9 +6,7 @@
 #include "types/LgsGroup.h"
 #include "types/LgsMap.h"
 #include "types/LgsNullable.h"
-#include "types/LgsCPtr.h"
 #include "types/LgsSArray.h"
-#include "types/LgsUnknownType.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsUInt.h"
 

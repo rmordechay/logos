@@ -536,6 +536,9 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
 
     if (!instance->obj) {
         instance->obj = symbol->object;
+        for (auto [name, field] : symbol->object->fields) {
+            instance->fields[name] = field;
+        }
         instance->setType(instance->obj);
     }
 
