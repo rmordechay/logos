@@ -9,7 +9,7 @@
 #include "types/LgsMap.h"
 
 Value* LgsForeachLoop::loopStart(LgsModule* module) {
-    return module->builder.getInt64(0);
+    return i64(module, 0);
 }
 
 Value* LgsForeachLoop::loopEnd(LgsModule* module) {
@@ -59,7 +59,7 @@ void LgsForeachLoop::initIRLoop(LgsModule* module) {
 void LgsForeachLoop::exitIRLoop(LgsModule* module) const {
     // Increment loop variable
     const auto iValue = module->builder.CreateLoad(module->builder.getInt64Ty(), iPtr);
-    const auto inc = module->builder.CreateAdd(iValue, module->builder.getInt64(1));
+    const auto inc = module->builder.CreateAdd(iValue, i64(module, 1));
     module->builder.CreateStore(inc, iPtr);
     module->builder.CreateBr(IRCondBlock);
     startBlock(module, IRExitBlock);
@@ -67,7 +67,7 @@ void LgsForeachLoop::exitIRLoop(LgsModule* module) const {
 
 void LgsForeachLoop::setStrIterVars(LgsModule* module, LgsStr* str) const {
     const auto i = module->builder.CreateLoad(module->builder.getInt64Ty(), iPtr);
-    const auto gep = module->builder.CreateGEP(str->getIRType(module), iterPtr, {module->builder.getInt32(0), i});
+    const auto gep = module->builder.CreateGEP(str->getIRType(module), iterPtr, {i32(module, 0), i});
     const auto load = module->builder.CreateLoad(module->builder.getInt8Ty(), gep);
     if (withIndex) {
         loopVars[0]->setIRValue(loadIPtr(module));
@@ -78,7 +78,7 @@ void LgsForeachLoop::setStrIterVars(LgsModule* module, LgsStr* str) const {
 void LgsForeachLoop::setArrIterVars(LgsModule* module, LgsDArray* arr) const {
     if (arr->asSArray()) {
         const auto i = module->builder.CreateLoad(module->builder.getInt64Ty(), iPtr);
-        const auto gep = module->builder.CreateGEP(arr->getIRType(module), iterPtr, {module->builder.getInt32(0), i});
+        const auto gep = module->builder.CreateGEP(arr->getIRType(module), iterPtr, {i32(module, 0), i});
         if (withIndex) {
             loopVars[0]->setIRValue(loadIPtr(module));
         }

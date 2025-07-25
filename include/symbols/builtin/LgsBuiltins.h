@@ -38,7 +38,7 @@ public:
 
     LgsSizeOf(): LgsBuiltinFunc(name, &LGS_LONG, "", {&LGS_ANY}) {}
     Value* call(LgsModule* module, const vector<LgsExpr*>& args) override {
-        return module->builder.getInt64(args.front()->type->getSizeBytes());
+        return i64(module, args.front()->type->getSizeBytes());
     }
 };
 

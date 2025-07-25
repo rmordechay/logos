@@ -44,11 +44,7 @@ Value* LgsIterIndex::getIRFromArray(LgsModule* module, LgsDArray* arr) const {
 Value* LgsIterIndex::getIRFromMap(LgsModule* module, LgsMap* map) const {
     const auto mapPtr = baseExpr->getIRValue(module);
     const auto key = index->from->getIRValue(module);
-    const auto keyIRType = key->getType();
-    const auto keyPtr = module->builder.CreateAlloca(keyIRType);
-    module->builder.CreateStore(key, keyPtr);
-    const auto keyLoad = module->builder.CreateLoad(keyIRType, keyPtr);
-    return map->getFunc.callIR(module, {mapPtr, keyLoad});
+    return map->getFunc.callIR(module, {mapPtr, key});
 }
 
 Value* LgsIterIndex::getStrSlice(LgsModule* module, const LgsStr* str) const {
@@ -62,7 +58,7 @@ Value* LgsIterIndex::getStrGEP(LgsModule* module) const {
     const auto ty = baseExpr->type->getIRType(module);
     const auto value = baseExpr->getIRValue(module);
     const auto iValue = index->from->getIRValue(module);
-    return module->builder.CreateGEP(ty, value, {module->builder.getInt32(0), iValue});
+    return module->builder.CreateGEP(ty, value, {i32(module, 0), iValue});
 }
 
 Value* LgsIterIndex::getArrGEP(LgsModule* module) const {
@@ -79,7 +75,7 @@ Value* LgsIterIndex::getArrGEP(LgsModule* module) const {
         } else {
             ptr = iterIndex->baseExpr->getIRValue(module);
             ty = iterIndex->baseExpr->type->getIRType(module);
-            IRIndices.push_back(module->builder.getInt32(0));
+            IRIndices.push_back(i32(module, 0));
             break;
         }
     }

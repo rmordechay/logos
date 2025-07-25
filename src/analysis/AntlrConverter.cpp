@@ -227,6 +227,7 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
     for (const auto interfaceField : ctx->interfaceField()) {
         const auto field = getInterfaceField(interfaceField, interface->name);
         field->isOptional = !!interfaceField->QUEST_MARK();
+        field->isVirtual = true;
         interface->addField(field);
     }
     if (ctx->implements()) {

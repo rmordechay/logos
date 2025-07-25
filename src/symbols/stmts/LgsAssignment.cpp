@@ -129,7 +129,7 @@ void LgsAssignment::storeArrayInIterIndex(LgsModule* module, const LgsIterIndex*
     const auto baseExpr = iterIndex->baseExpr;
     const auto IRType = baseExpr->type->getIRType(module);
     const auto arrPtr = baseExpr->getIRValue(module);
-    vector<Value*> IRIndices = {module->builder.getInt32(0)};
+    vector<Value*> IRIndices = {i32(module, 0)};
     vector<LgsIndex*> indices;
     setIterIndices(iterIndex, indices);
     for (const auto index : indices) {
@@ -137,7 +137,7 @@ void LgsAssignment::storeArrayInIterIndex(LgsModule* module, const LgsIterIndex*
     }
     for (int i = 0; i < arr->initialElements.size(); ++i) {
         const auto element = arr->initialElements[i];
-        const auto IRIndex = module->builder.getInt32(i);
+        const auto IRIndex = i32(module, i);
         IRIndices.push_back(IRIndex);
         const auto gep = module->builder.CreateGEP(IRType, arrPtr, IRIndices);
         const auto rValue = element->getIRValue(module);

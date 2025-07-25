@@ -101,7 +101,7 @@ public:
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field);
-    void validateMethodVisibility(const LgsFuncCall* methodCall);
+    bool validateMethodVisibility(const LgsFuncCall* methodCall);
     void validateFuncControlFlow(const LgsFunc* func);
     bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 

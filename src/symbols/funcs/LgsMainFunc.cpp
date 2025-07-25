@@ -12,7 +12,7 @@ void LgsMainFunc::generateIR(LgsModule* module) {
     }
     stmtBlock->createIRValue(module);
     createCleanupBlock(module);
-    module->builder.CreateRet(module->builder.getInt32(EXIT_SUCCESS));
+    module->builder.CreateRet(i32(module, EXIT_SUCCESS));
     module->stack.exitScope(true);
 }
 

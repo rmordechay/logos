@@ -13,6 +13,7 @@ public:
     size_t position = 0;
     string* parentName;
     bool isPublic = false;
+    bool isVirtual = false;
     bool isOptional = false;
     LgsExpr* expr = nullptr;
     LgsType* type = nullptr;

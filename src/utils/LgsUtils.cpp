@@ -89,6 +89,26 @@ Type* i64Ty(LgsModule* module) {
     return IntegerType::getInt64Ty(module->context);
 }
 
+Value* i1(LgsModule* module, const bool v) {
+    return module->builder.getInt1(v);
+}
+
+Value* i8(LgsModule* module, const int8_t v) {
+    return module->builder.getInt8(v);
+}
+
+Value* i16(LgsModule* module, const int16_t v) {
+    return module->builder.getInt16(v);
+}
+
+Value* i32(LgsModule* module, const int32_t v) {
+    return module->builder.getInt32(v);
+}
+
+Value* i64(LgsModule* module, const int64_t v) {
+    return module->builder.getInt64(v);
+}
+
 FunctionCallee getPrintf(LgsModule* module) {
     const auto funcType = FunctionType::get(i32Ty(module), {ptrTy(module)}, true);
     return module->IRModule->getOrInsertFunction("printf", funcType);

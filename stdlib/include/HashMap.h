@@ -3,7 +3,7 @@
 #include "Iterator.h"
 #include <stdbool.h>
 
-#define MAP_CAPACITY 1028
+#define MAP_CAPACITY 1024
 
 typedef struct Entry {
     char* key;

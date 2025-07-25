@@ -1,6 +1,7 @@
 #include "loops/LgsRangeLoop.h"
 #include "data/LgsDefinitions.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsUtils.h"
 
 Value* LgsRangeLoop::loopStart(LgsModule* module) {
     return rangeStart->getIRValue(module);
@@ -34,7 +35,7 @@ void LgsRangeLoop::initIRLoop(LgsModule* module) {
 void LgsRangeLoop::exitIRLoop(LgsModule* module) const {
     // Increment loop variable
     const auto iValue = module->builder.CreateLoad(module->builder.getInt32Ty(), iPtr);
-    const auto inc = module->builder.CreateAdd(iValue, module->builder.getInt32(1));
+    const auto inc = module->builder.CreateAdd(iValue, i32(module, 1));
     module->builder.CreateStore(inc, iPtr);
     module->builder.CreateBr(IRCondBlock);
     startBlock(module, IRExitBlock);

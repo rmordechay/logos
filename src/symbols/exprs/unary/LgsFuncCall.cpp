@@ -36,6 +36,20 @@ void LgsFuncCall::createIRStmt(LgsModule* module) {
     call(module);
 }
 
+void LgsFuncCall::resolveVirtualFunc(LgsModule* module) const {
+    auto& builder = module->builder;
+    const auto self = args[0];
+    const auto keyIR = getIRStr(module, func->funcType->getName());
+    const auto selfPtr = self->getIRValue(module);
+    const auto vtable = self->type->vtable;
+    const auto lgsMap = vtable->type->asMap();
+    const auto mapType = vtable->type->getIRType(module);
+    auto gep = builder.CreateGEP(mapType, selfPtr, {i32(module, 0)});
+    auto rv = lgsMap->getFunc.callIR(module, {gep, keyIR});
+    rv = builder.CreateLoad(ptrTy(module), rv);
+    func->setIRValue(rv);
+}
+
 bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
     if (funcType->hasDefaults) return equalsDefaultParams(funcType);
     if (funcType->isVariadic) return equalsVariadic(funcType);
@@ -64,20 +78,6 @@ bool LgsFuncCall::equalsDefaultParams(const LgsFuncType* funcType) const {
 
 bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
     return true;
-}
-
-void LgsFuncCall::resolveVirtualFunc(LgsModule* module) const {
-    auto& builder = module->builder;
-    const auto self = args[0];
-    const auto keyIR = getIRStr(module, func->funcType->getName());
-    const auto vtablePtr = self->getIRValue(module);
-    const auto vtable = self->type->vtable;
-    const auto vtableIRType = vtable->type->getIRType(module);
-    const auto gep = builder.CreateStructGEP(vtableIRType, vtablePtr, 0);
-    const auto mapValue = builder.CreateLoad(ptrTy(module), gep);
-    const auto lgsMap = vtable->type->asMap();
-    const auto rv = lgsMap->getFunc.callIR(module, {mapValue, keyIR});
-    func->setIRValue(rv);
 }
 
 string LgsFuncCall::getExprName() {

@@ -23,7 +23,7 @@ Value* LgsValue::hashIRValue(LgsModule* module, Value* value) const {
 
 void LgsValue::copyMem(LgsModule* module, Value* src, Value* dest, const size_t n) const {
     auto& builder = module->builder;
-    builder.CreateCall(getMemcpy(module), {dest, src, builder.getInt64(n), builder.getFalse()});
+    builder.CreateCall(getMemcpy(module), {dest, src, i64(module, n), builder.getFalse()});
 }
 
 void LgsValue::setLocation(const Token* start, const Token* end, const path filePath) {

@@ -68,7 +68,7 @@ Value* LgsVariable::hashValue(LgsModule* module) {
     case VAR_DEC:
         return ref.varDec->expr->hashValue(module);
     case FIELD:
-        return module->builder.getInt32(Str_hash(ref.field->name.c_str()));
+        return i32(module, Str_hash(ref.field->name.c_str()));
     default:
         assert(0);
     }

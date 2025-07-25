@@ -12,9 +12,9 @@ class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
     vector<LgsExpr*> returnExprs;
+    Value* returnValue = nullptr;
     LgsStmtsBlock* stmtBlock = nullptr;
     LgsFunc* implementsFunc = nullptr;
-    Value* returnValue = nullptr;
     BasicBlock* cleanupBlock = nullptr;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {

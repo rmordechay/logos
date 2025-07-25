@@ -9,7 +9,7 @@ extern "C" {
 }
 
 Value* LgsStrConst::hashValue(LgsModule* module) {
-    return module->builder.getInt32(Str_hash(value.c_str()));
+    return i32(module, Str_hash(value.c_str()));
 }
 
 Value* LgsStrConst::createIRValue(LgsModule* module) {

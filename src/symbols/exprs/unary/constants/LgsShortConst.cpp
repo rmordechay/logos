@@ -1,5 +1,6 @@
 #include "exprs/unary/constants/LgsShortConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "utils/LgsUtils.h"
 
 
 string LgsShortConst::prettyName() {
@@ -7,7 +8,7 @@ string LgsShortConst::prettyName() {
 }
 
 Value* LgsShortConst::createIRValue(LgsModule* module) {
-    return module->builder.getInt16(value);
+    return i16(module, value);
 }
 
 LgsExpr* LgsShortConst::convertExpr(LgsType* toType) {

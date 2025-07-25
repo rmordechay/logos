@@ -2,13 +2,14 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsLongConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "utils/LgsUtils.h"
 
 string LgsIntConst::prettyName() {
     return to_string(value);
 }
 
 Value* LgsIntConst::createIRValue(LgsModule* module) {
-    return module->builder.getInt32(value);
+    return i32(module, value);
 }
 
 LgsExpr* LgsIntConst::convertExpr(LgsType* toType) {

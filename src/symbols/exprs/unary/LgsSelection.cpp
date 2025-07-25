@@ -21,22 +21,27 @@ void LgsSelection::resolveSelection(LgsModule* module) const {
         if (const auto methodCall = childExpr->asFuncCall()) {
             methodCall->IRValue = methodCall->getIRValue(module);
         } else {
-            const auto field = parentExpr->type->getField(childExpr->getExprName());
-            Value* v = nullptr;
-            if (field->type->asEnum()) {
-                if (field->expr) {
-                    v = field->expr->getIRValue(module);
-                } else {
-                    v = getIRStr(module, field->name);
-                }
-            } else {
-                const auto parentIRValue = parentExpr->getIRValue(module);
-                const auto parentIRType = parentExpr->type->getIRType(module);
-                v = field->getGEP(module, parentIRType, parentIRValue);
-            }
-            childExpr->setIRValue(v);
+            resolveFieldSelection(module, parentExpr, childExpr);
         }
     }
+}
+
+void LgsSelection::resolveFieldSelection(LgsModule* module, LgsExpr* parentExpr, LgsUnaryExpr* childExpr) const {
+    const auto field = parentExpr->type->getField(childExpr->getExprName());
+    Value* value = nullptr;
+    if (field->type->asEnum()) {
+        if (field->expr) {
+            value = field->expr->getIRValue(module);
+        } else {
+            value = getIRStr(module, field->name);
+        }
+    } else {
+        const auto parentIRValue = parentExpr->getIRValue(module);
+        const auto parentIRType = parentExpr->type->getIRType(module);
+        value = field->getGEP(module, parentIRType, parentIRValue);
+        // value = module->builder.CreateLoad(field->type->getIRType(module), value);
+    }
+    childExpr->setIRValue(value);
 }
 
 string LgsSelection::prettyName() {

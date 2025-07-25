@@ -14,10 +14,6 @@ Value* LgsInstance::createIRValue(LgsModule* module) {
         IRValue = module->builder.CreateAlloca(objIRType);
     }
 
-    if (!obj->hasVirtual) {
-        setVirtualFuncs(module);
-    }
-
     for (const auto& [fieldName, field] : obj->fields) {
         auto arg = args.find(fieldName);
         if (arg != args.end()) {
@@ -27,23 +23,33 @@ Value* LgsInstance::createIRValue(LgsModule* module) {
         }
     }
 
+    if (!obj->hasVirtual) {
+        setVirtualFuncs(module);
+    }
     return IRValue;
 }
 
-void LgsInstance::setVirtualFuncs(LgsModule* module) const {
+void LgsInstance::setVirtualFuncs(LgsModule* module) {
     const auto vtable = obj->vtable->type->asMap();
-    const auto vtableGEP = module->builder.CreateStructGEP(vtable->getIRType(module), IRValue, 0);
-    const auto elementSize = module->builder.getInt64(8);
+    const auto vtableGEP = cast<GetElementPtrInst>(module->builder.CreateStructGEP(obj->getIRType(module), IRValue, 0));
+    const auto elementSize = i64(module, 8);
     vtable->initFunc.callIR(module, {vtableGEP, elementSize});
-    auto mapPtr = module->builder.CreateLoad(PointerType::getUnqual(module->context), vtableGEP);
     for (const auto& [name, method] : obj->methods) {
-        const auto interface = method->implementsFunc;
-        if (!interface) continue;
-        const auto keyIRStr = getIRStr(module, interface->funcType->getName());
+        const auto implementFunc = method->implementsFunc;
+        if (!implementFunc) continue;
+        const auto keyIRStr = getIRStr(module, implementFunc->funcType->getName());
         const auto IRFunc = method->getIRFunc(module);
-        auto valuePtr = module->builder.CreateAlloca(PointerType::getUnqual(module->context));
+        const auto valuePtr = module->builder.CreateAlloca(ptrTy(module));
         module->builder.CreateStore(IRFunc, valuePtr);
-        vtable->addFunc.callIR(module, {mapPtr, keyIRStr, valuePtr});
+        vtable->addFunc.callIR(module, {vtableGEP, keyIRStr, valuePtr});
+    }
+    for (const auto& [name, field] : obj->fields) {
+        const auto implementField = field->implementsField;
+        if (!implementField) continue;
+        const auto keyIRStr = getIRStr(module, implementField->name);
+        const auto positionPtr = module->builder.CreateAlloca(i64Ty(module));
+        module->builder.CreateStore(i64(module, field->position), positionPtr);
+        vtable->addFunc.callIR(module, {vtableGEP, keyIRStr, positionPtr});
     }
 }
 
@@ -74,7 +80,7 @@ void LgsInstance::setReturnExpr(LgsModule* module, Type* objIRType) {
             i64Ty(module),
             objIRType,
             ConstantExpr::getSizeOf(objIRType),
-            module->builder.getInt64(1)
+            i64(module, 1)
         );
         module->addAllocatedExpr(this);
     }

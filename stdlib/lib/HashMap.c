@@ -1,9 +1,6 @@
 #include "HashMap.h"
-
 #include "Str.h"
-
 #include <assert.h>
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -24,26 +21,27 @@ static void free_entry(Entry* current) {
 void Map_init(HashMap* map, const size_t value_size) {
     map->size = 0;
     map->value_size = value_size;
-    map->buckets = calloc(MAP_CAPACITY, sizeof(Entry*));
+    map->buckets = calloc(MAP_CAPACITY, sizeof(void*));
 }
 
 void Map_add(HashMap* map, const char* key, const void* value) {
     const size_t index = Str_hash(key);
-    const Entry* current = map->buckets[index];
-    while (current) {
-        if (strcmp(current->key, key) == 0) {
-            memcpy(current->value, value, map->value_size);
+    Entry* entry = map->buckets[index];
+    while (entry) {
+        if (strcmp(entry->key, key) == 0) {
+            memcpy(entry->value, value, map->value_size);
             return;
         }
-        current = current->next;
+        entry = entry->next;
     }
-    Entry* entry = new_entry(map, key, value);
+    entry = new_entry(map, key, value);
     map->buckets[index] = entry;
     map->size++;
 }
 
 void* Map_get(const HashMap* map, const char* key) {
-    const Entry* current = map->buckets[Str_hash(key)];
+    const size_t index = Str_hash(key);
+    const Entry* current = map->buckets[index];
     while (current) {
         if (strcmp(current->key, key) == 0) {
             return current->value;

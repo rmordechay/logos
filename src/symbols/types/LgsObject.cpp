@@ -23,8 +23,8 @@ Type* LgsObject::getIRType(LgsModule* module) {
     }
     for (const auto [_, field] : fields) {
         const auto fieldType = field->type->getIRType(module);
-        field->position = position++;
         elementTypes[field->position + offset] = fieldType;
+        field->position = position++;
     }
     IRType = StructType::getTypeByName(module->context, name);
     if (!IRType) {

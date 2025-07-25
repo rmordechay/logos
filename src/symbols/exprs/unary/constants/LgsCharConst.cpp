@@ -1,7 +1,8 @@
 #include "exprs/unary/constants/LgsCharConst.h"
 
+#include "utils/LgsUtils.h"
 
 
 Value* LgsCharConst::createIRValue(LgsModule* module) {
-    return module->builder.getInt8(value);
+    return i8(module, value);
 }

@@ -24,7 +24,7 @@ Value* LgsMap::getLength(LgsModule* module, LgsExpr* expr) {
 }
 
 Value* LgsMap::getLoopLength(LgsModule* module, LgsExpr* expr) {
-    return module->builder.getInt32(1024);
+    return i32(module, 1024);
 }
 
 Value* LgsMap::isEmpty(LgsModule* module, LgsExpr* expr) {

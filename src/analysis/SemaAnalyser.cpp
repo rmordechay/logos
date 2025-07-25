@@ -500,7 +500,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType)
         visitExpr(arg);
     }
     if (resolveMethodCall(methodCall, parentType)) return;
-    validateMethodVisibility(methodCall);
+    if (validateMethodVisibility(methodCall)) return;
     if (methodCall->isSpread) {
         const auto lastArg = methodCall->args[methodCall->args.size() - 1];
         if (!lastArg->type->asIterable()) {
@@ -806,6 +806,7 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
 }
 
 bool SemaAnalyser::validateFieldVisibility(LgsField* field) {
+    if (!field || field->isVirtual) return false;
     if (!field->isPublic && file->absPath != field->location.filePath) {
         errHandler.handleError(E10030, &field->location, {field->name, *field->parentName});
         return false;
@@ -813,12 +814,14 @@ bool SemaAnalyser::validateFieldVisibility(LgsField* field) {
     return true;
 }
 
-void SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall) {
+bool SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall) {
     const auto method = methodCall->func;
-    if (!method || method->funcType->isVirtual) return;
+    if (!method || method->funcType->isVirtual) return false;
     if (!method->funcType->isPublic && file->absPath != method->location.filePath) {
         errHandler.handleError(E10031, &method->location, {method->funcType->name, method->funcType->parentName});
+        return false;
     }
+    return true;
 }
 
 void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
