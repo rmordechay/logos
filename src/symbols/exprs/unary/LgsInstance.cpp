@@ -65,7 +65,7 @@ string LgsInstance::prettyName() {
 }
 
 void LgsInstance::setReturnExpr(LgsModule* module, Type* objIRType) {
-    const auto currentFunc = module->stack.currentFunc;
+    const auto currentFunc = module->stack.currentFunc();
     if (currentFunc->funcType->isSwapReturn) {
         IRValue = currentFunc->getReturnSwapParam().IRValue;
     } else {
@@ -75,7 +75,7 @@ void LgsInstance::setReturnExpr(LgsModule* module, Type* objIRType) {
             ConstantExpr::getSizeOf(objIRType),
             i64(module, 1)
         );
-        module->stack.addAllocatedExpr(this);
+        module->stack.currentFunc()->allocatedExprs.push_back(this);
     }
 }
 

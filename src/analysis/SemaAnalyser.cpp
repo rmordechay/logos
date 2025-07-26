@@ -97,7 +97,7 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
     }
     visitStmtBlock(func->stmtBlock);
     validateFuncControlFlow(func);
-    stack.exitScope(true);
+    stack.exitScope();
 }
 
 void SemaAnalyser::visitParam(LgsParam* param) {
@@ -280,11 +280,11 @@ void SemaAnalyser::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
 }
 
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
-    const auto funcType = stack.currentFunc->funcType;
+    const auto funcType = stack.currentFunc()->funcType;
     const auto retExpr = returnStmt->expr;
     if (retExpr) {
         retExpr->isReturnExpr = true;
-        stack.currentFunc->returnExprs.push_back(retExpr);
+        stack.currentFunc()->returnExprs.push_back(retExpr);
         visitExpr(retExpr);
     }
     const auto rt = funcType->rt;
@@ -298,13 +298,13 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
 }
 
 void SemaAnalyser::visitBreakStmt(const LgsBreakStmt* breakStmt) {
-    if (!stack.getLoop()) {
+    if (!stack.currentLoop()) {
         return errHandler.handleError(E10017, &breakStmt->location);
     }
 }
 
 void SemaAnalyser::visitContinueStmt(const LgsContinueStmt* continueStmt) {
-    if (!stack.getLoop()) {
+    if (!stack.currentLoop()) {
         return errHandler.handleError(E10038, &continueStmt->location);
     }
 }

@@ -5,43 +5,52 @@
 
 void LgsStack::enterScope(const LgsScope scope, LgsValue* value) {
     if (scope == FUNC_SCOPE) {
-        const auto func = dynamic_cast<LgsFunc*>(value);
-        push(LgsStackFrame{.scopeType = FUNC_SCOPE, .func = func});
-        currentFunc = func;
-        return;
+        push(LgsStackFrame{.scopeType = FUNC_SCOPE, .func = dynamic_cast<LgsFunc*>(value)});
+    } else {
+        LgsStackFrame stackFrame{.scopeType = scope, .symbolTable = top().symbolTable};
+        switch (scope) {
+        case LOOP_SCOPE:
+            stackFrame.loop = dynamic_cast<LgsForLoop*>(value);
+            break;
+        case IF_SCOPE:
+            stackFrame.ifStmt = dynamic_cast<LgsIfStmt*>(value);
+            break;
+        case BLOCK_SCOPE:
+            stackFrame.stmtsBlock = dynamic_cast<LgsStmtsBlock*>(value);
+            break;
+        default:
+            assert(0);
+        }
+        stackFrame.func = currentFunc();
+        push(stackFrame);
     }
-    LgsStackFrame stackFrame{
-        .scopeType = scope,
-        .symbolTable = top().symbolTable,
-    };
-    switch (scope) {
-    case LOOP_SCOPE:
-        stackFrame.loop = dynamic_cast<LgsForLoop*>(value);
-        break;
-    case IF_SCOPE:
-        stackFrame.ifStmt = dynamic_cast<LgsIfStmt*>(value);
-        break;
-    case BLOCK_SCOPE:
-        stackFrame.stmtsBlock = dynamic_cast<LgsStmtsBlock*>(value);
-        break;
-    default:
-        assert(0);
-    }
-    stackFrame.func = currentFunc;
-    push(stackFrame);
 }
 
-void LgsStack::exitScope(const bool isFunc) {
+void LgsStack::exitScope() {
     pop();
-    if (isFunc) {
-        currentFunc = nullptr;
-    }
 }
 
-LgsForLoop* LgsStack::getLoop() {
+LgsFunc* LgsStack::currentFunc() {
+    return top().func;
+}
+
+LgsForLoop* LgsStack::currentLoop() {
     return top().loop;
 }
 
-void LgsStack::addAllocatedExpr(LgsExpr* expr) {
-    allocatedExprs.push_back(expr);
+auto LgsStack::begin() {
+    return c.begin();
 }
+
+auto LgsStack::end() {
+    return c.end();
+}
+
+auto LgsStack::rbegin() {
+    return c.rbegin();
+}
+
+auto LgsStack::rend() {
+    return c.rend();
+}
+

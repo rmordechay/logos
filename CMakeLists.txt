@@ -25,7 +25,6 @@ set(SOURCE_FILES
     src/parser/LogosParser.cpp
     src/utils/LgsUtils.cpp
     src/utils/ThreadPool.cpp
-    src/utils/LgsLogger.cpp
 
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsValue.cpp

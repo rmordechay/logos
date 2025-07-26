@@ -1,6 +1,5 @@
 #pragma once
-#include "utils/LgsLogger.h"
-
+#include "utils/LgsUtils.h"
 
 class LgsCmd {
 public:

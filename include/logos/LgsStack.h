@@ -30,16 +30,13 @@ struct LgsStackFrame {
 
 class LgsStack final : public stack<LgsStackFrame> {
 public:
-    LgsFunc* currentFunc = nullptr;
-    vector<LgsExpr*> allocatedExprs;
-
     void enterScope(LgsScope scope, LgsValue* value);
-    void exitScope(bool isFunc = false);
-    LgsForLoop* getLoop();
-    void addAllocatedExpr(LgsExpr* expr);
-    auto begin() { return c.begin(); }
-    auto end() { return c.end(); }
-    auto rbegin() { return c.rbegin(); }
-    auto rend() { return c.rend(); }
+    void exitScope();
+    LgsFunc* currentFunc();
+    LgsForLoop* currentLoop();
+    auto begin();
+    auto end();
+    auto rbegin();
+    auto rend();
     ~LgsStack() = default;
 };

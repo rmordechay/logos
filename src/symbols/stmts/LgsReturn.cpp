@@ -3,7 +3,7 @@
 #include "utils/LgsUtils.h"
 
 void LgsReturn::createIRStmt(LgsModule* module) {
-    const auto currentFunc = module->stack.currentFunc;
+    const auto currentFunc = module->stack.currentFunc();
     if (!expr || currentFunc->funcType->isSwapReturn) {
         currentFunc->addReturnExpr(module, nullptr);
         return;

@@ -9,7 +9,7 @@ Value* LgsHashMap::createIRValue(LgsModule* module) {
     IRValue = module->builder.CreateAlloca(mapType->getMapStruct(module));
     mapType->initFunc.callIR(module, {IRValue, elementSize});
 
-    module->stack.addAllocatedExpr(this);
+    module->stack.currentFunc()->allocatedExprs.push_back(this);
     for (const auto element : initialElements) {
         mapType->addFunc.call(module, {this, element->key, element->value});
     }

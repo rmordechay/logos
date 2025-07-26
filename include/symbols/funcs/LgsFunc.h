@@ -11,6 +11,7 @@ class LgsType;
 class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
+    vector<LgsExpr*> allocatedExprs;
     vector<LgsExpr*> returnExprs;
     LgsStmtsBlock* stmtBlock = nullptr;
     BasicBlock* cleanupBlock = nullptr;
@@ -27,6 +28,7 @@ public:
     string prettyName() override;
     void setBigObjAttrs(LgsModule* module, Function& IRFunc) const;
     void addReturnExpr(LgsModule* module, Value* rv);
+    Value* freeFunc(LgsModule* module) const;
     void createCleanupBlock(LgsModule* module);
     LgsParam& getReturnSwapParam() const;
     string format(string& tabs) override;

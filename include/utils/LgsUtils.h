@@ -8,6 +8,13 @@ struct LgsIndex;
 inline mutex mtx;
 inline TargetMachine* targetMachine = nullptr;
 
+enum LogLevel {
+    INFO,
+    DEBUG,
+    ERROR,
+};
+
+void lgsLog(const string& text, LogLevel level = INFO);
 bool isLogosFile(const directory_entry& entry);
 bool isCharPointer(clang::QualType qt);
 bool isLgsKeyword(const string& s);

@@ -12,10 +12,7 @@ void LgsFunc::generateIR(LgsModule* module) {
     startFuncBlock(module);
     stmtBlock->createIRValue(module);
     createCleanupBlock(module);
-    if (funcType->rt->isVoid && !lastInstTerminator(module)) {
-        module->builder.CreateRetVoid();
-    }
-    module->stack.exitScope(true);
+    module->stack.exitScope();
 }
 
 Value* LgsFunc::createIRValue(LgsModule* module) {
@@ -103,12 +100,17 @@ void LgsFunc::createCleanupBlock(LgsModule* module) {
         }
         rv = phiNode;
     }
-    lgsPrint.call(module, {new LgsStrConst("cleanup: " + module->stack.currentFunc->funcType->name)});
+    freeFunc(module);
     if (rv) {
         module->builder.CreateRet(rv);
     } else {
         module->builder.CreateRetVoid();
     }
+}
+
+Value* LgsFunc::freeFunc(LgsModule* module) const {
+    for (auto _ : allocatedExprs) {}
+    return lgsPrint.call(module, {new LgsStrConst("cleanup: " + module->stack.currentFunc()->funcType->name)});
 }
 
 LgsParam& LgsFunc::getReturnSwapParam() const {

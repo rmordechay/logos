@@ -1,8 +1,5 @@
 #include "cli/LgsGenerateCmd.h"
 
-#include "utils/LgsLogger.h"
-
-
 void LgsGenerateCmd::validate() {
 }
 

@@ -10,7 +10,7 @@ void LgsMainFunc::generateIR(LgsModule* module) {
     if (!funcType->params.empty()) initArgs(module);
     stmtBlock->createIRValue(module);
     module->builder.CreateRet(i32(module, EXIT_SUCCESS));
-    module->stack.exitScope(true);
+    module->stack.exitScope();
 }
 
 Function* LgsMainFunc::getIRFunc(LgsModule* module) {

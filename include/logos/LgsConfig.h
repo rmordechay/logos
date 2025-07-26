@@ -1,5 +1,5 @@
 #pragma once
-#include "utils/LgsLogger.h"
+#include "utils/LgsUtils.h"
 
 inline LogLevel logLevel = DEBUG;
 #define WRITE_IR_TO_FILE false

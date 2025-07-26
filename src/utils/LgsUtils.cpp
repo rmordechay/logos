@@ -3,6 +3,14 @@
 #include "builtin/LgsBuiltins.h"
 #include "data/LgsDefinitions.h"
 
+void lgsLog(const string& text, const LogLevel level) {
+    if (level == ERROR) {
+        cerr << text << std::endl;
+    } else {
+        cout << text << std::endl;
+    }
+}
+
 bool isLogosFile(const directory_entry& entry) {
     return entry.is_regular_file() && entry.path().extension().string() == LOGOS_FILE_EXTENSION;
 }
@@ -86,12 +94,12 @@ void branchToBlock(LgsModule* module, BasicBlock* block) {
 }
 
 void startBlock(LgsModule* module, BasicBlock* block) {
-    block->insertInto(module->stack.currentFunc->getIRFunc(module));
+    block->insertInto(module->stack.currentFunc()->getIRFunc(module));
     module->builder.SetInsertPoint(block);
 }
 
 void startFuncBlock(LgsModule* module) {
-    const auto currentFunc = module->stack.currentFunc;
+    const auto currentFunc = module->stack.currentFunc();
     const auto IRFunc = currentFunc->getIRFunc(module);
     currentFunc->cleanupBlock = BasicBlock::Create(module->context, BLOCK_NAME_CLEANUP);
     const auto entryBlock = BasicBlock::Create(module->context, BLOCK_NAME_ENTRY, IRFunc);
