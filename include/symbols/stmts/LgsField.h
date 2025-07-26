@@ -23,7 +23,7 @@ public:
     LgsField(const string& name, string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(name), parentName(parentName), expr(expr), type(type) {}
     Value* getGEP(LgsModule* module) const;
     void storeIRValue(LgsModule* module, LgsExpr* value) const;
-    void setZeroValue(LgsModule* module) const;
+    void storeIRZeroValue(LgsModule* module) const;
     LgsField* clone() const;
     ~LgsField() override;
 };

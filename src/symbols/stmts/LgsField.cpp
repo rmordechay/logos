@@ -11,7 +11,7 @@ void LgsField::storeIRValue(LgsModule* module, LgsExpr* value) const {
     module->builder.CreateStore(exprIRValue, getGEP(module));
 }
 
-void LgsField::setZeroValue(LgsModule* module) const {
+void LgsField::storeIRZeroValue(LgsModule* module) const {
     if (type->asObject() || type->asDArray() || type->asMap()) return;
     const auto exprIRValue = type->getZeroValue()->getIRValue(module);
     module->builder.CreateStore(exprIRValue, getGEP(module));

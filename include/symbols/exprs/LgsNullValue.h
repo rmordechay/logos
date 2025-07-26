@@ -8,8 +8,14 @@ public:
         isNull = true;
     }
     Value* createIRValue(LgsModule* module) override;
+    string prettyName() override;
+    ~LgsNullValue() override = default;
 };
 
 inline Value* LgsNullValue::createIRValue(LgsModule* module) {
     return ConstantPointerNull::get(ptrTy(module));
+}
+
+inline string LgsNullValue::prettyName() {
+    return "null";
 }

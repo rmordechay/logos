@@ -1,5 +1,6 @@
 #include "LgsSymbolTable.h"
 #include "data/LgsErrors.h"
+#include "exprs/unary/LgsInstance.h"
 #include "funcs/LgsParam.h"
 #include "utils/LgsErrHandler.h"
 #include "funcs/LgsFunc.h"
@@ -34,9 +35,6 @@ void LgsSymbolTable::addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler) {
     }
     lock_guard lock(mtx);
     symbols[lgsEnum->name] = LgsSymbol(lgsEnum);
-    // for (const auto& [name, field] : lgsEnum->fields) {
-    //     symbols[name] = LgsSymbol(field);
-    // }
 }
 
 void LgsSymbolTable::freeSymbols() {
@@ -66,6 +64,8 @@ void LgsSymbolTable::freeSymbols() {
         case ENUM:
             delete symbol.second.lgsEnum;
             break;
+        case SINGLETON:
+            delete symbol.second.singleton;
         case UNKNOWN:
             break;
         }

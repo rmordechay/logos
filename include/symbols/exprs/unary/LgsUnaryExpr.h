@@ -8,7 +8,6 @@ class LgsUnaryExpr : public LgsExpr {
 public:
     explicit LgsUnaryExpr() : LgsExpr(nullptr) {}
     explicit LgsUnaryExpr(LgsType* type) : LgsExpr(type) {}
-    string prettyName() override;
     Value* addIR(LgsModule* module, LgsExpr* other) override;
     Value* subIR(LgsModule* module, LgsExpr* other) override;
     Value* mulIR(LgsModule* module, LgsExpr* other) override;
@@ -21,17 +20,9 @@ public:
     Value* geIR(LgsModule* module, LgsExpr* other) override;
     Value* leIR(LgsModule* module, LgsExpr* other) override;
     tuple<Value*, Value*> loadExprs(LgsModule* module, LgsExpr* rExpr);
-    virtual std::string getExprName();
+    virtual std::string getName();
     ~LgsUnaryExpr() override = default;
 };
-
-inline std::string LgsUnaryExpr::getExprName() {
-    assert(false);
-}
-
-inline string LgsUnaryExpr::prettyName() {
-    return getExprName();
-}
 
 inline Value* LgsUnaryExpr::addIR(LgsModule* module, LgsExpr* other) {
     auto [l, r] = loadExprs(module, other);

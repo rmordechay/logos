@@ -1,6 +1,10 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "utils/LgsUtils.h"
 
+string LgsHashMap::prettyName() {
+    return "{}";
+}
+
 Value* LgsHashMap::createIRValue(LgsModule* module) {
     const auto mapType = type->asMap();
     const auto valueType = mapType->typePair->value;

@@ -1,6 +1,8 @@
 #include "funcs/LgsMainFunc.h"
 #include "exprs/unary/LgsArrayExpr.h"
+#include "exprs/unary/LgsInstance.h"
 #include "stmts/LgsStmtsBlock.h"
+#include "types/LgsObject.h"
 #include "types/LgsStr.h"
 #include "utils/LgsUtils.h"
 
@@ -8,6 +10,15 @@ void LgsMainFunc::generateIR(LgsModule* module) {
     module->stack.enterScope(FUNC_SCOPE, this);
     startFuncBlock(module);
     if (!funcType->params.empty()) initArgs(module);
+    for (auto [_, symbol] : module->globals.symbols) {
+        if (symbol.symbolType != OBJECT) continue;
+        const auto obj = symbol.object;
+        if (obj->isSingleton) {
+            const auto instance = new LgsInstance(obj);
+            const auto a = instance->createSingletonIRValue(module);
+            module->globals.addSymbol("", LgsSymbol(instance), nullptr);
+        }
+    }
     stmtBlock->createIRValue(module);
     module->builder.CreateRet(i32(module, EXIT_SUCCESS));
     module->stack.exitScope();

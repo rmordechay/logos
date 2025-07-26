@@ -8,6 +8,7 @@ class LgsObject final : public LgsType {
 public:
     string name;
     bool isSingleton = false;
+    bool hasVirtuals = false;
     vector<LgsType*> interfaces;
 
     explicit LgsObject(const string& name) : name(name) {}

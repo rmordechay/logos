@@ -69,6 +69,9 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
     if (!obj->interfaces.empty()) {
         obj->vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
     }
+    if (obj->isSingleton) {
+        visitSingleton(obj);
+    }
     for (const auto& [_, field] : obj->fields) {
         visitField(field);
     }
@@ -76,6 +79,13 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
         visitFunc(method);
     }
     validateInterfaces(obj, obj->interfaces);
+}
+
+void SemaAnalyser::visitSingleton(LgsObject* obj) {
+    auto symbolName = obj->name;
+    symbolName[0] = tolower(symbolName[0]);
+    const auto singleInstance = new LgsInstance(obj);
+    globals.addSymbol(symbolName, LgsSymbol(singleInstance), &errHandler);
 }
 
 void SemaAnalyser::visitInterface(LgsInterface* interface) {
@@ -367,7 +377,7 @@ void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
     }
 }
 
-void SemaAnalyser::visitDynamicArray(LgsArrayExpr* array) {
+void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
     const auto dArr = array->type->asDArray();
     if (!dArr->sizeExpr) {
         dArr->sizeExpr = new LgsIntConst(array->initialElements.size());
@@ -481,14 +491,14 @@ void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* c
     if (parentType) {
         const auto field = parentType->getField(childField->name);
         if (!field) {
-            return errHandler.handleError(E10005, &childField->location, {childField->getExprName(), parentType->prettyName()});
+            return errHandler.handleError(E10005, &childField->location, {childField->name, parentType->prettyName()});
         }
         childField->setType(field->type);
         childField->isMutable = field->isMutable;
         childField->ref = LgsSymbol(field);
-        validateFieldVisibility(field);
+        validateFieldVisibility(field, parentType->asObject());
     } else {
-        return errHandler.handleError(E10058, &childField->location, {childField->getExprName()});
+        return errHandler.handleError(E10058, &childField->location, {childField->name});
     }
 }
 
@@ -498,7 +508,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType)
         visitExpr(arg);
     }
     if (resolveMethodCall(methodCall, parentType)) return;
-    if (validateMethodVisibility(methodCall)) return;
+    if (!validateMethodVisibility(methodCall, parentType->asObject())) return;
     if (methodCall->isSpread) {
         const auto lastArg = methodCall->args[methodCall->args.size() - 1];
         if (!lastArg->type->asIterable()) {
@@ -515,29 +525,23 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     if (!funcCall->func) return;
     const auto& funcType = funcCall->func->funcType;
     if (funcType->isVariadic) return;
-    for (int i = 0; i < funcType->params.size(); ++i) {
-        const auto param = funcType->params[i];
-        const auto arg = funcCall->args[i];
-        castImplicitly(arg, param.type);
-    }
 }
 
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
-    const auto symbol = getSymbol(instance->name, &instance->location);
+    const auto objName = instance->obj->name;
+    const auto symbol = getSymbol(objName, &instance->location);
     if (!symbol) return;
     if (symbol->symbolType != OBJECT && symbol->symbolType != INTERFACE) {
-        return errHandler.handleError(E10022, &instance->location, {instance->name});
+        return errHandler.handleError(E10022, &instance->location, {objName});
     }
     if (symbol->object->isSingleton) {
-        return errHandler.handleError(E10032, &instance->location, {instance->name});
+        return errHandler.handleError(E10032, &instance->location, {objName});
     }
 
     if (!instance->obj) {
         instance->obj = symbol->object;
-        for (auto [name, field] : symbol->object->fields) {
-            instance->fields[name] = field;
-        }
         instance->setType(instance->obj);
+        instance->copyFields();
     }
 
     for (const auto [name, field] : instance->obj->fields) {
@@ -550,10 +554,10 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     for (const auto& [_, arg] : instance->args) {
         const auto field = instance->obj->getField(arg->name);
         if (!field) {
-            errHandler.handleError(E10005, &arg->location, {arg->name, instance->obj->name});
+            errHandler.handleError(E10005, &arg->location, {arg->name, objName});
             continue;
         }
-        if (validateFieldVisibility(field)) continue;
+        if (validateFieldVisibility(field, instance->obj)) continue;
         visitExpr(arg->expr);
         validateExprType(arg->expr, field->type);
         field->expr = arg->expr;
@@ -639,11 +643,6 @@ void SemaAnalyser::visitGroup(LgsGroup* group) const {
     }
 }
 
-void SemaAnalyser::castImplicitly(LgsExpr* expr, LgsType* type) const {
-    if (expr->type == type) return;
-    // freeType(expr->type);
-}
-
 bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
     const auto type = parent->type;
     const auto field = type ? type->getField(fieldVariable->name) : nullptr;
@@ -653,16 +652,6 @@ bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable
     }
     fieldVariable->setType(field->type);
     return true;
-}
-
-void SemaAnalyser::setZeroField(LgsField* field) const {
-    if (const auto fieldObj = field->type->asObject()) {
-        for (const auto& [name, field] : fieldObj->fields) {
-            setZeroField(field);
-        }
-    } else {
-        field->expr = field->type->getZeroValue();
-    }
 }
 
 void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
@@ -724,8 +713,9 @@ bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterEx
     return false;
 }
 
-void SemaAnalyser::validateInterfaces(LgsType* obj, const vector<LgsType*>& interfaces) {
+void SemaAnalyser::validateInterfaces(LgsObject* obj, const vector<LgsType*>& interfaces) {
     unordered_set<string> interfacesNames;
+    obj->hasVirtuals = !interfaces.empty();
     for (int i = 0; i < interfaces.size(); ++i) {
         const auto implementsInterface = interfaces[i];
         const auto interface = implementsInterface->asInterface();
@@ -740,7 +730,7 @@ void SemaAnalyser::validateInterfaces(LgsType* obj, const vector<LgsType*>& inte
     }
 }
 
-void SemaAnalyser::validateImplements(LgsType* type, LgsInterface* interface) {
+void SemaAnalyser::validateImplements(LgsObject* type, LgsInterface* interface) {
     // Fields
     vector<LgsField*> missingFields;
     for (const auto& [name, interfaceField] : interface->fields) {
@@ -807,7 +797,8 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
     }
 }
 
-bool SemaAnalyser::validateFieldVisibility(LgsField* field) {
+bool SemaAnalyser::validateFieldVisibility(LgsField* field, const LgsObject* parent) {
+    if (parent && parent->isSingleton) return true;
     if (!field || field->isVirtual) return false;
     if (!field->isPublic && file->absPath != field->location.filePath) {
         errHandler.handleError(E10030, &field->location, {field->name, *field->parentName});
@@ -816,7 +807,8 @@ bool SemaAnalyser::validateFieldVisibility(LgsField* field) {
     return true;
 }
 
-bool SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall) {
+bool SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall, const LgsObject* parent) {
+    if (parent && parent->isSingleton) return true;
     const auto method = methodCall->func;
     if (!method || method->funcType->isVirtual) return false;
     if (!method->funcType->isPublic && file->absPath != method->location.filePath) {
@@ -826,7 +818,7 @@ bool SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall) {
     return true;
 }
 
-void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
+void SemaAnalyser::validateExprType(const LgsExpr* expr, LgsType* type) {
     assert(expr);
     if (expr->isNull) {
         // null must have a type
@@ -838,7 +830,6 @@ void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
     if (!expr->type->equals(type)) {
         return errHandler.handleError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
     }
-    castImplicitly(expr, type);
 }
 
 void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
@@ -944,7 +935,7 @@ bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentTyp
     return false;
 }
 
-void SemaAnalyser::inferBaseType(const LgsArrayExpr* array) const {
+void SemaAnalyser::inferBaseType(const LgsArrayExpr* array) {
     LgsType* baseType = nullptr;
     const auto first = array->initialElements.front();
     if (const auto innerArr = first->asArrayExpr()) {
@@ -1002,6 +993,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     case ENUM:
         newType = symbol->lgsEnum;
         break;
+    case SINGLETON:
     case VAR_DEC:
     case PARAM:
     case FIELD:
@@ -1067,7 +1059,7 @@ void SemaAnalyser::resolveGroupTypes(LgsGroup* group) {
     }
 }
 
-string SemaAnalyser::getMissingImplementsStr(const vector<LgsField*>& fields, const vector<LgsFunc*>& methods) const {
+string SemaAnalyser::getMissingImplementsStr(const vector<LgsField*>& fields, const vector<LgsFunc*>& methods) {
     stringstream str;
     str << "\n\t\tFields:";
     for (const auto& field : fields) {

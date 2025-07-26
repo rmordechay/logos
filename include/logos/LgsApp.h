@@ -29,8 +29,8 @@ public:
     LgsEnv activeEnv;
     LgsSymbolTable globals;
     vector<LgsFile*> files;
-    vector<LgsStrConst*> externFiles;
     LgsErrHandler errHandler;
+    vector<LgsStrConst*> externFiles;
     LgsAppFile* appFile = nullptr;
     vector<LgsEnvFile*> envFiles;
     map<string, LgsModule*> modules;

@@ -13,13 +13,13 @@ public:
     vector<LgsStrConst*> externFiles;
 
     explicit LgsFile(const string& name, const path& path) : name(name), absPath(path) {}
-    virtual LgsModule* generateIR();
+    virtual LgsModule* generateIR(LgsSymbolTable& globals);
     virtual void format();
     virtual ~LgsFile() = default;
 };
 
 // Only files that need generation implement this func.
-inline LgsModule* LgsFile::generateIR() {
+inline LgsModule* LgsFile::generateIR(LgsSymbolTable& globals) {
     return nullptr;
 }
 

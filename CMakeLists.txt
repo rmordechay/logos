@@ -38,7 +38,6 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/constants/LgsLongConst.cpp
     src/symbols/exprs/unary/constants/LgsShortConst.cpp
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
-    src/symbols/exprs/unary/constants/LgsTypeConst.cpp
     src/symbols/exprs/unary/constants/LgsUIntConst.cpp
     src/symbols/exprs/unary/LgsArrayExpr.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
@@ -49,6 +48,7 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/LgsVariable.cpp
     src/symbols/exprs/unary/LgsPostfixExpr.cpp
     src/symbols/exprs/unary/LgsPrefixExpr.cpp
+    src/symbols/exprs/unary/LgsSingleton.cpp
     src/symbols/funcs/LgsFunc.cpp
     src/symbols/funcs/LgsMainFunc.cpp
     src/symbols/funcs/LgsParam.cpp

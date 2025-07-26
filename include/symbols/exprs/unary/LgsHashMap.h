@@ -10,6 +10,7 @@ public:
         isHeapAlloc = true;
     }
     explicit LgsHashMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsHashMap(new LgsMap(keyType, valueType)) {}
+    string prettyName() override;
     Value* createIRValue(LgsModule* module) override;
     void free(LgsModule* module) override;
     ~LgsHashMap() override = default;

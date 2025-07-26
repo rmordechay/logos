@@ -189,9 +189,6 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
     // Methods
     for (const auto& func : ctx->methodImplementation()) {
         const auto method = getMethodImpl(func, obj);
-        if (obj->isSingleton) {
-            method->funcType->isStaticMethod = true;
-        }
         const auto methodAdded = obj->addMethod(method);
         if (!methodAdded) {
             errHandler.handleError(E10056, &obj->location, {obj->name, method->funcType->prettyName()});
@@ -743,7 +740,7 @@ LgsUnaryExpr* AntlerConverter::getVector(LogosParser::VectorContext* vector) con
 }
 
 LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) {
-    const auto instance = new LgsInstance(ctx->IDENTIFIER()->getText());
+    const auto instance = new LgsInstance();
     instance->setLocation(ctx->start, ctx->stop, filePath);
     const auto args = ctx->constructorArgList();
     if (!args) return instance;
@@ -830,7 +827,7 @@ LgsUnaryExpr* AntlerConverter::getFirstSelection(LogosParser::SelectionContext* 
         return getVariable(selfInstance);
     }
     if (const auto selfClass = firstExpr->SELF_CLASS()) {
-        return getTypeConstant(selfClass);
+        assert(0);
     }
     if (const auto type = firstExpr->STRING()) {
         return getStrConst(type);
@@ -874,12 +871,6 @@ LgsStrConst* AntlerConverter::getStrConst(tree::TerminalNode* type) const {
     const auto strConst = new LgsStrConst(typeText);
     strConst->setLocation(type->getSymbol(), nullptr, filePath);
     return strConst;
-}
-
-LgsTypeConst* AntlerConverter::getTypeConstant(tree::TerminalNode* ctx) const {
-    const auto typeConst = new LgsTypeConst(getTypeFromText(ctx));
-    typeConst->setLocation(ctx->getSymbol(), nullptr, filePath);
-    return typeConst;
 }
 
 LgsUnaryExpr* AntlerConverter::getNullValue(const tree::TerminalNode* ctx) const {

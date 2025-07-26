@@ -1,6 +1,7 @@
 #include "LgsSymbol.h"
 
 
+#include "exprs/unary/LgsInstance.h"
 #include "types/LgsEnum.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
@@ -16,6 +17,8 @@ LgsSymbol::LgsSymbol(LgsParam* param): symbolType(PARAM), param(param), location
 LgsSymbol::LgsSymbol(LgsVarDec* varDec): symbolType(VAR_DEC), varDec(varDec), location(&varDec->location) {}
 
 LgsSymbol::LgsSymbol(LgsObject* object, const bool isExternal): symbolType(OBJECT), isExternal(isExternal), object(object), location(&object->location) {}
+
+LgsSymbol::LgsSymbol(LgsInstance* singleton): symbolType(SINGLETON), singleton(singleton), location(&singleton->location) {}
 
 LgsSymbol::LgsSymbol(LgsInterface* interface): symbolType(INTERFACE), interface(interface), location(&interface->location) {}
 
@@ -45,6 +48,8 @@ void* LgsSymbol::getSymbol() const {
         return lgsEnum;
     case GROUP:
         return group;
+    case SINGLETON:
+        return singleton;
     case UNKNOWN:
         break;
     }

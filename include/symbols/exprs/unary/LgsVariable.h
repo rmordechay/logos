@@ -9,7 +9,7 @@ public:
     LgsSymbol ref;
 
     explicit LgsVariable(const string& name) : LgsUnaryExpr(nullptr), name(name) {}
-    string getExprName() override;
+    string getName() override;
     string prettyName() override;
     Value* hashValue(LgsModule* module) override;
     Value* createIRValue(LgsModule* module) override;

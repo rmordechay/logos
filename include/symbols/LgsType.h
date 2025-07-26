@@ -39,7 +39,6 @@ public:
     bool isSizeBig = false;
     bool isBuiltin = false;
     bool isUnknown = false;
-    bool hasVirtual = false;
     bool canSlice = false;
     Type* IRType = nullptr;
     LgsHashMap* vtable = nullptr;

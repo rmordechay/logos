@@ -83,8 +83,8 @@ Value* LgsIterIndex::getArrGEP(LgsModule* module) const {
     return module->builder.CreateGEP(ty, ptr, IRIndices);
 }
 
-string LgsIterIndex::getExprName() {
-    return baseExpr->getExprName();
+string LgsIterIndex::getName() {
+    return baseExpr->getName();
 }
 
 string LgsIterIndex::prettyName() {

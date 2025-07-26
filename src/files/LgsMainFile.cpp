@@ -4,18 +4,18 @@
 #include "types/LgsObject.h"
 #include "utils/LgsUtils.h"
 
-LgsModule* LgsMainFile::generateIR() {
-    const auto runtime = new LgsModule();
-    runtime->IRModule = createIRModule(LOGOS_MAIN_FILE_NAME, runtime->context);
-    for (const auto [_, func] : funcs) {
-        func->generateIR(runtime);
-    }
+LgsModule* LgsMainFile::generateIR(LgsSymbolTable& globals) {
+    const auto module = new LgsModule(globals);
+    module->IRModule = createIRModule(LOGOS_MAIN_FILE_NAME, module->context);
     for (const auto object : objects) {
         for (const auto& [_, method] : object->methods) {
-            method->generateIR(runtime);
+            method->generateIR(module);
         }
     }
-    return runtime;
+    for (const auto [_, func] : funcs) {
+        func->generateIR(module);
+    }
+    return module;
 }
 
 void LgsMainFile::format() {

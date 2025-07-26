@@ -11,7 +11,7 @@ extern "C" {
     size_t Str_hash(const char* key);
 }
 
-string LgsVariable::getExprName() {
+string LgsVariable::getName() {
     return name;
 }
 
@@ -55,6 +55,7 @@ LgsExpr* LgsVariable::convertExpr(LgsType* type) {
     case INTERFACE:
     case GROUP:
     case ENUM:
+    case SINGLETON:
     case UNKNOWN:
         break;
     }

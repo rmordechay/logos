@@ -3,13 +3,13 @@
 #include "types/LgsObject.h"
 #include "utils/LgsUtils.h"
 
-LgsModule* LgsObjectFile::generateIR() {
-    const auto runtime = new LgsModule();
-    runtime->IRModule = createIRModule(name, runtime->context);
+LgsModule* LgsObjectFile::generateIR(LgsSymbolTable& globals) {
+    const auto module = new LgsModule(globals);
+    module->IRModule = createIRModule(name, module->context);
     for (const auto& [_, method] : obj->methods) {
-        method->generateIR(runtime);
+        method->generateIR(module);
     }
-    return runtime;
+    return module;
 }
 
 LgsObjectFile::~LgsObjectFile() {

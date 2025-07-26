@@ -13,8 +13,8 @@ public:
         vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
     }
     string prettyName() override;
-    Type* getIRType(LgsModule* module) override;
     string getName() override;
+    Type* getIRType(LgsModule* module) override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     ~LgsInterface() override;

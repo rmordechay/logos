@@ -46,6 +46,7 @@ public:
     explicit SemaAnalyser(LgsFile* file, LgsSymbolTable& globals) : LgsASTVisitor(file), globals(globals) {}
     void analyse() override;
     void visitMainFile(LgsMainFile* mainFile) override;
+    void visitSingleton(LgsObject* obj);
     void visitObject(LgsObject* obj) override;
     void visitInterface(LgsInterface* interface) override;
     void visitField(LgsField* field) override;
@@ -70,7 +71,7 @@ public:
     void visitCast(LgsCast* castExpr) override;
     void visitArrayExpr(LgsArrayExpr* array) override;
     void visitStaticArray(const LgsArrayExpr* arrayExpr);
-    void visitDynamicArray(LgsArrayExpr* array);
+    void visitDynamicArray(const LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap) override;
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr) override;
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr) override;
@@ -89,33 +90,31 @@ public:
     void visitSlice(LgsIterIndex* iterIndex) override;
     void visitGroup(LgsGroup* group) const override;
 
-    void castImplicitly(LgsExpr* expr, LgsType* type) const;
     void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
-    void setZeroField(LgsField* field) const;
     bool setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
 
-    void validateInterfaces(LgsType* obj, const vector<LgsType*>& interfaces);
-    void validateImplements(LgsType* type, LgsInterface* interface);
-    void validateExprType(LgsExpr* expr, LgsType* type);
+    void validateInterfaces(LgsObject* obj, const vector<LgsType*>& interfaces);
+    void validateImplements(LgsObject* type, LgsInterface* interface);
+    void validateExprType(const LgsExpr* expr, LgsType* type);
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
-    bool validateFieldVisibility(LgsField* field);
-    bool validateMethodVisibility(const LgsFuncCall* methodCall);
+    bool validateFieldVisibility(LgsField* field, const LgsObject* parent);
+    bool validateMethodVisibility(const LgsFuncCall* methodCall, const LgsObject* parent);
     void validateFuncControlFlow(const LgsFunc* func);
-    bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
+    static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     LgsSymbol* getSymbol(const string& name, const Location* location);
     void addLocalSymbol(const string& name, const LgsSymbol& newSymbol);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
-    void inferBaseType(const LgsArrayExpr* array) const;
+    static void inferBaseType(const LgsArrayExpr* array);
     LgsType* resolveType(LgsType* type);
     void resolveIterable(LgsIterable* iterable);
     void resolveFuncTypes(LgsFuncType* funcType);
     void resolveObjTypes(LgsObject* obj);
     void resolveInterfaceTypes(LgsInterface* interface);
     void resolveGroupTypes(LgsGroup* group);
-    string getMissingImplementsStr(const vector<LgsField*>& fields, const vector<LgsFunc*>& methods) const;
+    static string getMissingImplementsStr(const vector<LgsField*>& fields, const vector<LgsFunc*>& methods);
     ~SemaAnalyser() override = default;
 };

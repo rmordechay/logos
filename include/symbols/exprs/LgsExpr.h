@@ -52,7 +52,6 @@ public:
     LgsFloatConst* asFloatConst();
     LgsIntConst* asIntConst();
     LgsStrConst* asStrConst();
-    LgsTypeConst* asTypeConst();
 
     virtual LgsExpr* clone();
     virtual bool equals(LgsExpr* other);

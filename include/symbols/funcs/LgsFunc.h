@@ -24,10 +24,10 @@ public:
         type = funcType;
     }
     explicit LgsFunc(LgsFuncType* funcType) : LgsUnaryExpr(funcType), funcType(funcType) {}
+    void freeFunc(LgsModule* module) const;
     string prettyName() override;
     string format(string& tabs) override;
     Value* createIRValue(LgsModule* module) override;
-    void freeFunc(LgsModule* module) const;
     void createCleanupBlock(LgsModule* module) const;
     virtual void generateIR(LgsModule* module);
     virtual Function* getIRFunc(LgsModule* module);

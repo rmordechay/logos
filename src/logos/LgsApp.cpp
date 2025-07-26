@@ -82,7 +82,6 @@ bool LgsApp::analyse() {
         });
     }
     threadPool.wait();
-    // PostAnalyser::analyse(files, globals);
     return errHandler.successful;
 }
 
@@ -91,12 +90,11 @@ bool LgsApp::generate() {
     ThreadPool threadPool;
     for (const auto& file : files) {
         threadPool.runTask([file, this] {
-            const auto module = file->generateIR();
-            if (module) {
-                const auto name = file->name;
-                lock_guard lock(mtx);
-                modules[name] = module;
-            }
+            const auto module = file->generateIR(globals);
+            if (!module) return;
+            const auto name = file->name;
+            lock_guard lock(mtx);
+            modules[name] = module;
         });
     }
     threadPool.wait();

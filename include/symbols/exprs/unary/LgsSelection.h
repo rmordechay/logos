@@ -16,7 +16,8 @@ public:
     void createIRStmt(LgsModule* module) override;
     Value* createIRValue(LgsModule* module) override;
     void resolveSelection(LgsModule* module) const;
-    static void resolveFieldSelection(LgsModule* module, LgsExpr* parentExpr, LgsUnaryExpr* childExpr);
+    static void resolveFieldSelection(LgsModule* module, LgsExpr* parentExpr, LgsVariable* fieldVar);
+    static Value* resolveVirtualField(LgsModule* module, LgsExpr* parentExpr, const LgsField* field);
     ~LgsSelection() override;
 };
 

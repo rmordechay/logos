@@ -6,6 +6,14 @@
 #include "types/LgsObject.h"
 #include "utils/LgsUtils.h"
 
+string LgsInstance::getName() {
+    return obj->name;
+}
+
+string LgsInstance::prettyName() {
+    return obj->name;
+}
+
 Value* LgsInstance::createIRValue(LgsModule* module) {
     const auto parentIRType = obj->getIRType(module);
     const auto objIRType = parentIRType;
@@ -18,14 +26,20 @@ Value* LgsInstance::createIRValue(LgsModule* module) {
         if (arg != args.end()) {
             field->storeIRValue(module, arg->second->expr);
         } else {
-            field->setZeroValue(module);
+            field->storeIRZeroValue(module);
         }
     }
 
-    if (!obj->hasVirtual) {
+    if (obj->hasVirtuals) {
         setVirtualFuncs(module);
     }
     return IRValue;
+}
+
+Value* LgsInstance::createSingletonIRValue(LgsModule* module) const {
+    const auto objIRType = obj->getIRType(module);
+    const auto initializer = ConstantAggregateZero::get(objIRType);
+    return new GlobalVariable(*module->IRModule, objIRType, false, GlobalValue::ExternalLinkage, initializer);
 }
 
 void LgsInstance::setVirtualFuncs(LgsModule* module) const {
@@ -52,12 +66,11 @@ void LgsInstance::setVirtualFuncs(LgsModule* module) const {
     }
 }
 
-string LgsInstance::getExprName() {
-    return obj->name;
-}
-
-string LgsInstance::prettyName() {
-    return obj->name;
+void LgsInstance::copyFields() {
+    assert(fields.empty());
+    for (auto [name, field] : obj->fields) {
+        fields[name] = field->clone();
+    }
 }
 
 void LgsInstance::free(LgsModule* module) {

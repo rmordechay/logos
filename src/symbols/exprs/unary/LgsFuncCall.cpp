@@ -80,7 +80,7 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
     return true;
 }
 
-string LgsFuncCall::getExprName() {
+string LgsFuncCall::getName() {
     return name;
 }
 
