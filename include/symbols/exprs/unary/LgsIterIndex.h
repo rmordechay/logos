@@ -19,7 +19,6 @@ public:
     Value* getIRFromStr(LgsModule* module, LgsStr* str) const;
     Value* getStrSlice(LgsModule* module, const LgsStr* str) const;
     Value* getStrGEP(LgsModule* module) const;
-    string getName() override;
     string prettyName() override;
     ~LgsIterIndex() override;
 };

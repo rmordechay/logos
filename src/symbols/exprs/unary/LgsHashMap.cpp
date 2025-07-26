@@ -1,8 +1,10 @@
 #include "exprs/unary/LgsHashMap.h"
+
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 string LgsHashMap::prettyName() {
-    return "{}";
+    assert(0);
 }
 
 Value* LgsHashMap::createIRValue(LgsModule* module) {

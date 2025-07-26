@@ -2,6 +2,7 @@
 
 #include "data/LgsDefinitions.h"
 #include "logos/LgsModule.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 void LgsIfStmt::createIRStmt(LgsModule* module) {

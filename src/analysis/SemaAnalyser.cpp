@@ -14,12 +14,12 @@
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/LgsBinaryExpr.h"
 
-#include "exprs/unary/constants/LgsTypeConst.h"
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
+#include "exprs/unary/LgsSingleton.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
@@ -82,10 +82,8 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
 }
 
 void SemaAnalyser::visitSingleton(LgsObject* obj) {
-    auto symbolName = obj->name;
-    symbolName[0] = tolower(symbolName[0]);
-    const auto singleInstance = new LgsInstance(obj);
-    globals.addSymbol(symbolName, LgsSymbol(singleInstance), &errHandler);
+    const auto singleton = new LgsSingleton(obj);
+    globals.addSymbol(singleton->name, LgsSymbol(singleton), &errHandler);
 }
 
 void SemaAnalyser::visitInterface(LgsInterface* interface) {
@@ -466,8 +464,6 @@ void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
         visitFuncCall(funcCall);
     } else if (const auto iterIndex = firstExpr->asIterIndex()) {
         visitIterIndex(iterIndex);
-    } else if (const auto typeConst = firstExpr->asTypeConst()) {
-        typeConst->setType(resolveType(typeConst->type));
     } else {
         assert(0);
     }

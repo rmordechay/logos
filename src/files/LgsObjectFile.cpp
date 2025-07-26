@@ -1,6 +1,7 @@
 #include "files/LgsObjectFile.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsObject.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 LgsModule* LgsObjectFile::generateIR(LgsSymbolTable& globals) {

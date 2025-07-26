@@ -13,10 +13,11 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsUInt.h"
 #include "types/primitives/LgsVoid.h"
+#include "utils/LgsIRUtils.h"
 
 bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     auto name = func->getNameAsString();
-    if (isLgsKeyword(name)) {
+    if (isLogosKeyword(name)) {
         name = name + '_';
     }
     const auto lgsType = mapCType(func->getReturnType());
@@ -34,7 +35,7 @@ bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
 bool LgsCLangVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
     auto name = record->getNameAsString();
     if (!name.empty() && name[0] == '_') return true;
-    if (isLgsKeyword(name)) {
+    if (isLogosKeyword(name)) {
         name = name + '_';
     }
     if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;

@@ -2,6 +2,7 @@
 
 #include "data/LgsDefinitions.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 Value* LgsInfiniteLoop::loopStart(LgsModule* module) {

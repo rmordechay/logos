@@ -1,5 +1,9 @@
 #include "exprs/unary/LgsPrefixExpr.h"
 
+string LgsPrefixExpr::prettyName() {
+    assert(0);
+}
+
 Value* LgsPrefixExpr::createIRValue(LgsModule* module) {
     const auto exprValue = expr->getIRValue(module);
     switch (op) {

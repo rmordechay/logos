@@ -1,5 +1,6 @@
 #include "types/LgsFuncType.h"
 #include "logos/LgsModule.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 bool LgsFuncType::equals(LgsType* other) {

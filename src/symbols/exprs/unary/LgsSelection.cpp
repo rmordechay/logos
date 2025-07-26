@@ -4,6 +4,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
+#include "utils/LgsIRUtils.h"
 
 void LgsSelection::createIRStmt(LgsModule* module) {
     resolveSelection(module);

@@ -1,6 +1,6 @@
 #pragma once
 #include "exprs/unary/LgsUnaryExpr.h"
-#include "utils/LgsUtils.h"
+#include "utils/LgsIRUtils.h"
 
 class LgsNullValue final : public LgsUnaryExpr {
 public:

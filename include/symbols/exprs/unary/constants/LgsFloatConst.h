@@ -8,6 +8,7 @@ public:
 
     explicit LgsFloatConst(const float value) : LgsUnaryExpr(&LGS_FLOAT), value(value) {}
     Value* createIRValue(LgsModule* module) override;
+    string prettyName() override;
     ~LgsFloatConst() override = default;
 };
 

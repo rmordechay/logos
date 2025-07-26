@@ -15,5 +15,6 @@ public:
             funcType->params.emplace_back(paramsType);
         }
     }
+
     ~LgsBuiltinFunc() override = default;
 };

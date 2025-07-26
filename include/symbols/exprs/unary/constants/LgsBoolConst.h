@@ -8,6 +8,7 @@ public:
 
     explicit LgsBoolConst(const bool value) : LgsUnaryExpr(&LGS_BOOL), value(value) {}
     string getValueAsString() const;
+    string prettyName() override;
     Value* createIRValue(LgsModule* module) override;
     Value* andIR(LgsModule* module, LgsExpr* other) override;
     Value* eqIR(LgsModule* module, LgsExpr* other) override;

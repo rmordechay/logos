@@ -2,10 +2,15 @@
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 extern "C" {
     size_t Str_hash(const char* key);
+}
+
+string LgsStrConst::prettyName() {
+    return type->prettyName();
 }
 
 Value* LgsStrConst::hashValue(LgsModule* module) {

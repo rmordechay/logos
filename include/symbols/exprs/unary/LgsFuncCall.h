@@ -21,7 +21,6 @@ public:
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
     void createIRStmt(LgsModule* module) override;
     Value* createIRValue(LgsModule* module) override;
-    string getName() override;
     string format(string& indentStr) override;
     string prettyName() override;
     ~LgsFuncCall() override = default;

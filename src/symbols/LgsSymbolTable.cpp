@@ -1,6 +1,7 @@
 #include "LgsSymbolTable.h"
 #include "data/LgsErrors.h"
 #include "exprs/unary/LgsInstance.h"
+#include "exprs/unary/LgsSingleton.h"
 #include "funcs/LgsParam.h"
 #include "utils/LgsErrHandler.h"
 #include "funcs/LgsFunc.h"
@@ -10,13 +11,14 @@
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
+    std::lock_guard lock(mtx);
     if (symbols.find(name) != symbols.end()) {
         return errHandler->handleError(E10011, symbol.location, {name, symbol.location->lineNumberStr()});
     }
-    std::lock_guard lock(mtx);
     symbols[name] = symbol;
 }
 
@@ -25,16 +27,6 @@ LgsSymbol* LgsSymbolTable::getSymbol(const string& name) {
         return &symbols[name];
     }
     return nullptr;
-}
-
-void LgsSymbolTable::addEnum(LgsEnum* lgsEnum, LgsErrHandler* errHandler) {
-    if (symbols.find(lgsEnum->name) != symbols.end()) {
-        const auto location = lgsEnum->location;
-        errHandler->handleError(E10011, &location, {lgsEnum->name, location.lineNumberStr()});
-        return;
-    }
-    lock_guard lock(mtx);
-    symbols[lgsEnum->name] = LgsSymbol(lgsEnum);
 }
 
 void LgsSymbolTable::freeSymbols() {

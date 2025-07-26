@@ -1,5 +1,6 @@
 #include "logos/LgsLinker.h"
 #include "data/LgsDefinitions.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 #include <llvm/Transforms/Utils/Cloning.h>
 

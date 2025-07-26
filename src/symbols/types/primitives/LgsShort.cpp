@@ -1,6 +1,7 @@
 #include "exprs/LgsNullValue.h"
 #include "exprs/unary/constants/LgsShortConst.h"
 #include "types/LgsAny.h"
+#include "utils/LgsIRUtils.h"
 
 size_t LgsShort::getSizeBytes() {
     return sizeof(short);

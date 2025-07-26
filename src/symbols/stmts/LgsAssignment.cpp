@@ -5,6 +5,7 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
+#include "utils/LgsIRUtils.h"
 
 void LgsAssignment::createIRStmt(LgsModule* module) {
     Value* results = nullptr;

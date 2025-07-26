@@ -4,10 +4,12 @@
 #include "funcs/LgsBuiltinFunc.h"
 #include "primitives/LgsBool.h"
 #include "primitives/LgsVoid.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 class LgsIterator final : public LgsUnaryExpr {
 public:
+
     LgsExpr* baseExpr;
     static constexpr auto name = "Iterator";
 
@@ -15,6 +17,7 @@ public:
         type = baseExpr->type;
     }
 
+    string prettyName() override;
     Value* createIRValue(LgsModule* module) override;
     void initIterator(LgsModule* module);
     Value* next(LgsModule* module) const;

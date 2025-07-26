@@ -3,6 +3,7 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 void LgsFunc::generateIR(LgsModule* module) {

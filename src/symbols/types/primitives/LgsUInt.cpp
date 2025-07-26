@@ -3,6 +3,7 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 size_t LgsUInt::getSizeBytes() {

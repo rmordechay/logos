@@ -2,6 +2,7 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsLongConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 string LgsIntConst::prettyName() {

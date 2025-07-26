@@ -14,6 +14,7 @@ public:
         type = lgsStr;
     }
 
+    string prettyName() override;
     Value* hashValue(LgsModule* module) override;
     Value* createIRValue(LgsModule* module) override;
     Value* eqIR(LgsModule* module, LgsExpr* other) override;

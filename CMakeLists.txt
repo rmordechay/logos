@@ -90,6 +90,8 @@ set(SOURCE_FILES
     src/symbols/types/LgsIterator.cpp
     src/symbols/types/LgsCPtr.cpp
     src/symbols/types/LgsNullable.cpp
+    src/utils/LgsIRUtils.cpp
+    include/utils/LgsIRUtils.h
 )
 
 add_subdirectory(stdlib)

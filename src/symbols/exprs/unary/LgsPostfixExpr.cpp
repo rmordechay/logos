@@ -6,6 +6,10 @@ Value* LgsPostfixExpr::createIRValue(LgsModule* module) {
     return IncOrDecValue(module);
 }
 
+string LgsPostfixExpr::prettyName() {
+    assert(0);
+}
+
 void LgsPostfixExpr::createIRStmt(LgsModule* module) {
     IncOrDecValue(module);
 }

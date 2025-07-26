@@ -9,10 +9,12 @@ enum LgsPrefixOperator {
 
 class LgsPrefixExpr final : public LgsUnaryExpr {
 public:
+
     LgsExpr* expr;
     LgsPrefixOperator op;
 
     LgsPrefixExpr(LgsExpr* baseExpr, const LgsPrefixOperator op) : expr(baseExpr), op(op) {}
+    string prettyName() override;
     Value* createIRValue(LgsModule* module) override;
     ~LgsPrefixExpr() override = default;
 };

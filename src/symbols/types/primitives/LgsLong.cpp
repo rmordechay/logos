@@ -5,6 +5,7 @@
 #include "types/LgsCPtr.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsSize.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 string LgsLong::prettyName() {

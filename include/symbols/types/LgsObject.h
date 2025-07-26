@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsType.h"
 
+class LgsSingleton;
 class LgsModule;
 class LgsField;
 
@@ -10,6 +11,7 @@ public:
     bool isSingleton = false;
     bool hasVirtuals = false;
     vector<LgsType*> interfaces;
+    LgsSingleton* singleton = nullptr;
 
     explicit LgsObject(const string& name) : name(name) {}
     string prettyName() override;

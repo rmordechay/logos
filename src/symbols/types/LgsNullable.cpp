@@ -1,5 +1,6 @@
 #include "types/LgsNullable.h"
 #include "logos/LgsModule.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 Type* LgsNullable::getIRType(LgsModule* module) {

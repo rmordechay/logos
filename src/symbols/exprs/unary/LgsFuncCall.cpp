@@ -3,6 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 Value* LgsFuncCall::call(LgsModule* module) const {
@@ -78,10 +79,6 @@ bool LgsFuncCall::equalsDefaultParams(const LgsFuncType* funcType) const {
 
 bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
     return true;
-}
-
-string LgsFuncCall::getName() {
-    return name;
 }
 
 string LgsFuncCall::prettyName() {

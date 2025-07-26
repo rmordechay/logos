@@ -20,7 +20,6 @@ public:
     Value* geIR(LgsModule* module, LgsExpr* other) override;
     Value* leIR(LgsModule* module, LgsExpr* other) override;
     tuple<Value*, Value*> loadExprs(LgsModule* module, LgsExpr* rExpr);
-    virtual std::string getName();
     ~LgsUnaryExpr() override = default;
 };
 

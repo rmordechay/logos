@@ -17,6 +17,7 @@
 #include "logos/LgsLinker.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsInterface.h"
+#include "utils/LgsIRUtils.h"
 
 extern char **environ;
 

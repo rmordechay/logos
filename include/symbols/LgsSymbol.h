@@ -1,6 +1,6 @@
 #pragma once
 
-class LgsInstance;
+class LgsSingleton;
 class LgsVariable;
 class LgsGroup;
 class LgsField;
@@ -32,7 +32,7 @@ struct LgsSymbol {
     LgsVarDec* varDec = nullptr;
     LgsParam* param = nullptr;
     LgsObject* object = nullptr;
-    LgsInstance* singleton = nullptr;
+    LgsSingleton* singleton = nullptr;
     LgsInterface* interface = nullptr;
     LgsField* field = nullptr;
     LgsEnum* lgsEnum = nullptr;
@@ -43,13 +43,13 @@ struct LgsSymbol {
     explicit LgsSymbol();
     explicit LgsSymbol(LgsParam* param);
     explicit LgsSymbol(LgsVarDec* varDec);
-    explicit LgsSymbol(LgsObject* object, bool isExternal = false);
-    explicit LgsSymbol(LgsInstance* singleton);
-    explicit LgsSymbol(LgsInterface* interface);
     explicit LgsSymbol(LgsField* field);
+    explicit LgsSymbol(LgsSingleton* singleton);
+    explicit LgsSymbol(LgsGroup* group);
+    explicit LgsSymbol(LgsInterface* interface);
+    explicit LgsSymbol(LgsObject* object, bool isExternal = false);
     explicit LgsSymbol(LgsEnum* lgsEnum, bool isExternal = false);
     explicit LgsSymbol(LgsFunc* func, bool isExternal = false);
-    explicit LgsSymbol(LgsGroup* group);
     void* getSymbol() const;
     ~LgsSymbol() = default;
 };

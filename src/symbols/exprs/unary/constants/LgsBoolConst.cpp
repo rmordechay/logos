@@ -1,9 +1,14 @@
 #include "exprs/unary/constants/LgsBoolConst.h"
 
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 string LgsBoolConst::getValueAsString() const {
     return value ? LgsBool::trueLiteral : LgsBool::falseLiteral;
+}
+
+string LgsBoolConst::prettyName() {
+    return type->prettyName();
 }
 
 Value* LgsBoolConst::createIRValue(LgsModule* module) {

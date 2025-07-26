@@ -9,12 +9,14 @@ enum LgsPostfixOperator {
 
 class LgsPostfixExpr final : public LgsStmt, public LgsUnaryExpr {
 public:
+
     LgsUnaryExpr* expr;
     LgsPostfixOperator op;
 
     LgsPostfixExpr(LgsUnaryExpr* baseExpr, const LgsPostfixOperator op) : expr(baseExpr), op(op) {}
     Value* IncOrDecValue(LgsModule* module) const;
     Value* createIRValue(LgsModule* module) override;
+    string prettyName() override;
     void createIRStmt(LgsModule* module) override;
     ~LgsPostfixExpr() override = default;
 };

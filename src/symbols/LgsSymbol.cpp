@@ -1,7 +1,5 @@
 #include "LgsSymbol.h"
-
-
-#include "exprs/unary/LgsInstance.h"
+#include "exprs/unary/LgsSingleton.h"
 #include "types/LgsEnum.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
@@ -11,24 +9,16 @@
 #include "types/LgsObject.h"
 
 LgsSymbol::LgsSymbol(): symbolType(UNKNOWN), location(nullptr) {}
-
 LgsSymbol::LgsSymbol(LgsParam* param): symbolType(PARAM), param(param), location(&param->location) {}
-
 LgsSymbol::LgsSymbol(LgsVarDec* varDec): symbolType(VAR_DEC), varDec(varDec), location(&varDec->location) {}
-
-LgsSymbol::LgsSymbol(LgsObject* object, const bool isExternal): symbolType(OBJECT), isExternal(isExternal), object(object), location(&object->location) {}
-
-LgsSymbol::LgsSymbol(LgsInstance* singleton): symbolType(SINGLETON), singleton(singleton), location(&singleton->location) {}
-
-LgsSymbol::LgsSymbol(LgsInterface* interface): symbolType(INTERFACE), interface(interface), location(&interface->location) {}
-
 LgsSymbol::LgsSymbol(LgsField* field): symbolType(FIELD), field(field), location(&field->location) {}
-
-LgsSymbol::LgsSymbol(LgsEnum* lgsEnum, const bool isExternal): symbolType(ENUM), isExternal(isExternal), lgsEnum(lgsEnum), location(&lgsEnum->location) {}
-
-LgsSymbol::LgsSymbol(LgsFunc* func, const bool isExternal): symbolType(FUNC), isExternal(isExternal), func(func), location(&func->location) {}
-
+LgsSymbol::LgsSymbol(LgsSingleton* singleton): symbolType(SINGLETON), singleton(singleton), location(&singleton->location) {}
 LgsSymbol::LgsSymbol(LgsGroup* group): symbolType(GROUP), group(group), location(&group->location) {}
+LgsSymbol::LgsSymbol(LgsInterface* interface): symbolType(INTERFACE), interface(interface), location(&interface->location) {}
+LgsSymbol::LgsSymbol(LgsObject* object, bool isExternal): symbolType(OBJECT), isExternal(isExternal), object(object), location(&object->location) {}
+LgsSymbol::LgsSymbol(LgsEnum* lgsEnum, bool isExternal): symbolType(ENUM), isExternal(isExternal), lgsEnum(lgsEnum), location(&lgsEnum->location) {}
+LgsSymbol::LgsSymbol(LgsFunc* func, bool isExternal): symbolType(FUNC), isExternal(isExternal), func(func), location(&func->location) {}
+
 
 void* LgsSymbol::getSymbol() const {
     switch (symbolType) {

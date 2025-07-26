@@ -3,7 +3,6 @@ add_library(lgslib STATIC
     lib/Array.c
     lib/Str.c
     lib/Runtime.c
-    lib/Print.c
 )
 
 target_include_directories(lgslib PUBLIC

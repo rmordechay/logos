@@ -1,6 +1,7 @@
 #include "types/LgsAny.h"
 
 #include "logos/LgsModule.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 

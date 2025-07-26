@@ -1,4 +1,6 @@
 #include "types/primitives/LgsSize.h"
+
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 size_t LgsSize::getSizeBytes() {

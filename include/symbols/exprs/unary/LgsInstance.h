@@ -13,9 +13,7 @@ public:
         copyFields();
     }
     Value* createIRValue(LgsModule* module) override;
-    Value* createSingletonIRValue(LgsModule* module) const;
     void setVirtualFuncs(LgsModule* module) const;
-    string getName() override;
     string prettyName() override;
     void copyFields();
     void free(LgsModule* module) override;

@@ -2,6 +2,7 @@
 
 #include "exprs/LgsNullValue.h"
 #include "exprs/unary/constants/LgsCharConst.h"
+#include "utils/LgsIRUtils.h"
 
 string LgsChar::prettyName() {
     return name;

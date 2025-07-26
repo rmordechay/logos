@@ -106,6 +106,5 @@ public:
     LgsOperator mapOperator(LogosParser::ExprContext* expr) const;
     bool isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec);
     bool isBuiltinName(const string& name, const Location* location);
-    void cleanStr(string& value) const;
     ~AntlerConverter() = default;
 };

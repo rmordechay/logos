@@ -1,5 +1,7 @@
 #include "types/LgsGroup.h"
 
+#include "utils/LgsIRUtils.h"
+
 Type* LgsGroup::getIRType(LgsModule* module) {
     return ptrTy(module);
 }

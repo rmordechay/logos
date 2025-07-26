@@ -3,6 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "logos/LgsModule.h"
 #include "types/LgsObject.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 Type* LgsInterface::getIRType(LgsModule* module) {

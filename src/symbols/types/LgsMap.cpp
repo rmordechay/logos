@@ -1,6 +1,7 @@
 #include "types/LgsMap.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 size_t LgsMap::getSizeBytes() {

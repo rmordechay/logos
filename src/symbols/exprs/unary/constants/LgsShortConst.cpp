@@ -1,5 +1,6 @@
 #include "exprs/unary/constants/LgsShortConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 

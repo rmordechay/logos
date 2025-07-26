@@ -1,6 +1,7 @@
 
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/LgsNullValue.h"
+#include "utils/LgsIRUtils.h"
 
 string LgsBool::prettyName() {
     return name;

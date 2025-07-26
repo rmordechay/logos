@@ -3,6 +3,7 @@
 #include "data/LgsDefinitions.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 void LgsPatternMatch::createIRStmt(LgsModule* module) {

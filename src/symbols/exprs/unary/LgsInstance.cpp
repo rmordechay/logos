@@ -4,11 +4,8 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
-
-string LgsInstance::getName() {
-    return obj->name;
-}
 
 string LgsInstance::prettyName() {
     return obj->name;
@@ -34,12 +31,6 @@ Value* LgsInstance::createIRValue(LgsModule* module) {
         setVirtualFuncs(module);
     }
     return IRValue;
-}
-
-Value* LgsInstance::createSingletonIRValue(LgsModule* module) const {
-    const auto objIRType = obj->getIRType(module);
-    const auto initializer = ConstantAggregateZero::get(objIRType);
-    return new GlobalVariable(*module->IRModule, objIRType, false, GlobalValue::ExternalLinkage, initializer);
 }
 
 void LgsInstance::setVirtualFuncs(LgsModule* module) const {

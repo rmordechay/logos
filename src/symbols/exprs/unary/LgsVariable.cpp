@@ -4,15 +4,12 @@
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 #include <logos/LgsModule.h>
 
 extern "C" {
     size_t Str_hash(const char* key);
-}
-
-string LgsVariable::getName() {
-    return name;
 }
 
 string LgsVariable::prettyName() {

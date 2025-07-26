@@ -1,5 +1,6 @@
 #pragma once
 #include "funcs/LgsBuiltinFunc.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 #include <types/primitives/LgsVoid.h>
 #include <types/primitives/LgsLong.h>

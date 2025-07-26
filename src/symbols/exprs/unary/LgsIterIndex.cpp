@@ -4,6 +4,7 @@
 #include "stmts/LgsVarDec.h"
 #include <exprs/unary/LgsArrayExpr.h>
 #include "types/LgsMap.h"
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 Value* LgsIterIndex::createIRValue(LgsModule* module) {
@@ -81,10 +82,6 @@ Value* LgsIterIndex::getArrGEP(LgsModule* module) const {
     }
     reverse(IRIndices.begin(), IRIndices.end());
     return module->builder.CreateGEP(ty, ptr, IRIndices);
-}
-
-string LgsIterIndex::getName() {
-    return baseExpr->getName();
 }
 
 string LgsIterIndex::prettyName() {
