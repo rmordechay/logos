@@ -4,16 +4,11 @@
 
 void LgsReturn::createIRStmt(LgsModule* module) {
     const auto currentFunc = module->stack.currentFunc();
-    if (!expr || currentFunc->funcType->isSwapReturn) {
+    if (expr) {
+        currentFunc->addReturnExpr(module, expr);
+    } else {
         currentFunc->addReturnExpr(module, nullptr);
-        return;
     }
-    auto exprIR = expr->getIRValue(module);
-    if (exprIR->getType()->isPointerTy()) {
-        const auto ty = expr->type->getIRType(module);
-        exprIR = module->builder.CreateLoad(ty, exprIR);
-    }
-    currentFunc->addReturnExpr(module, exprIR);
 }
 
 LgsReturn::~LgsReturn() {

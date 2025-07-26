@@ -1,5 +1,5 @@
 #pragma once
-#include "../logos/LgsStack.h"
+#include "logos/LgsStack.h"
 #include "files/LgsInterfaceFile.h"
 
 class LgsFuncType;

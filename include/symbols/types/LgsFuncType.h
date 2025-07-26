@@ -14,7 +14,6 @@ public:
     bool isVirtual = false;
     bool isVariadic = false;
     bool isAnonymous = false;
-    bool isSwapReturn = false;
     bool isStaticMethod = false;
     bool isOptional = false;
     bool hasDefaults = false;

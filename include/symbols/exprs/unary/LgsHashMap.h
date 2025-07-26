@@ -8,6 +8,7 @@ public:
 
     explicit LgsHashMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {
         type = new LgsMap(keyType, valueType);
+        isHeapAlloc = true;
     }
     explicit LgsHashMap(LgsMap* mapType) : LgsUnaryExpr(mapType) {}
     Value* createIRValue(LgsModule* module) override;

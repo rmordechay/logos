@@ -40,12 +40,7 @@ string LgsFuncType::getName() {
 
 Type* LgsFuncType::getIRType(LgsModule* module) {
     if (IRType) return IRType;
-    Type* returnType;
-    if (isSizeBig && !isSwapReturn) {
-        returnType = ptrTy(module);
-    } else {
-        returnType = rt->getIRType(module);
-    }
+    const auto returnType = rt->getIRType(module);
     vector<Type*> IRParamsTypes;
     for (int i = isStaticMethod; i < params.size(); ++i) {
         const auto param = params[i];

@@ -9,11 +9,7 @@
 Value* LgsInstance::createIRValue(LgsModule* module) {
     const auto parentIRType = obj->getIRType(module);
     const auto objIRType = parentIRType;
-    if (isReturnExpr) {
-        setReturnExpr(module, objIRType);
-    } else {
-        IRValue = module->builder.CreateAlloca(objIRType);
-    }
+    IRValue = module->builder.CreateAlloca(objIRType);
 
     for (const auto& [fieldName, field] : fields) {
         field->parentIRType = parentIRType;
@@ -64,23 +60,8 @@ string LgsInstance::prettyName() {
     return obj->name;
 }
 
-void LgsInstance::setReturnExpr(LgsModule* module, Type* objIRType) {
-    const auto currentFunc = module->stack.currentFunc();
-    if (currentFunc->funcType->isSwapReturn) {
-        IRValue = currentFunc->getReturnSwapParam().IRValue;
-    } else {
-        IRValue = module->builder.CreateMalloc(
-            i64Ty(module),
-            objIRType,
-            ConstantExpr::getSizeOf(objIRType),
-            i64(module, 1)
-        );
-        module->stack.currentFunc()->allocatedExprs.push_back(this);
-    }
-}
-
 void LgsInstance::free(LgsModule* module) {
-    if (!isReturnExpr) {
+    if (!isHeapAlloc) {
         module->builder.CreateFree(IRValue);
     }
 }

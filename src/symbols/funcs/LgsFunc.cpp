@@ -30,7 +30,6 @@ Function* LgsFunc::getIRFunc(LgsModule* module) {
     const auto funcTy = cast<FunctionType>(type);
     auto func = module->IRModule->getOrInsertFunction(funcIRName, funcTy);
     IRFunc = cast<Function>(func.getCallee());
-    if (funcType->isSwapReturn) setBigObjAttrs(module, *IRFunc);
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
     for (int i = funcType->isStaticMethod; i < funcType->params.size(); ++i) {
@@ -60,26 +59,14 @@ Value* LgsFunc::callIR(LgsModule* module, const vector<Value*>& args) {
         return module->builder.CreateCall(IRFuncType, IRValue, args);
     }
     const auto IRFunc = getIRFunc(module);
-    if (funcType->isSwapReturn) {
-        const auto paramIRType = getReturnSwapParam().type->getIRType(module);
-        const auto rv = module->builder.CreateAlloca(paramIRType);
-        vector finalArgs(args.begin(), args.end());
-        finalArgs.insert(finalArgs.begin() + funcType->returnParamIndex, rv);
-        module->builder.CreateCall(IRFunc, finalArgs);
-        return rv;
+    return module->builder.CreateCall(IRFunc, args);
+}
+
+void LgsFunc::addReturnExpr(LgsModule* module, LgsExpr* rv) {
+    if (rv) {
+        auto pair = make_pair(module->builder.GetInsertBlock(), rv);
+        returnExprs.emplace_back(pair);
     }
-    return module->builder.CreateCall(IRFunc, args);;
-}
-
-void LgsFunc::setBigObjAttrs(LgsModule* module, Function& IRFunc) const {
-    const auto paramIRType = getReturnSwapParam().type->getIRType(module);
-    IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::StructRet, paramIRType));
-    IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::Writable));
-    IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
-}
-
-void LgsFunc::addReturnExpr(LgsModule* module, Value* rv) {
-    returnValues.emplace_back(make_pair(module->builder.GetInsertBlock(), rv));
     module->builder.CreateBr(cleanupBlock);
 }
 
@@ -90,33 +77,23 @@ void LgsFunc::createCleanupBlock(LgsModule* module) {
     startBlock(module, cleanupBlock);
     const auto IRReturnType = funcType->rt->getIRType(module);
     Value* rv = nullptr;
-    if (returnValues.size() == 1) {
-        rv = returnValues.front().second;
-    } else {
-        const auto phiNode = module->builder.CreatePHI(IRReturnType, returnValues.size());
-        for (auto [block, value] : returnValues) {
-            if (!value) continue;
-            phiNode->addIncoming(value, block);
+    if (returnExprs.size() == 1) {
+        rv = returnExprs.front().second->getIRValue(module);
+    } else if (returnExprs.size() > 1) {
+        const auto phiNode = module->builder.CreatePHI(IRReturnType, returnExprs.size());
+        for (auto [block, returnExpr] : returnExprs) {
+            phiNode->addIncoming(returnExpr->getIRValue(module), block);
         }
         rv = phiNode;
     }
     freeFunc(module);
-    if (rv) {
-        module->builder.CreateRet(rv);
-    } else {
-        module->builder.CreateRetVoid();
-    }
+    if (rv) module->builder.CreateRet(rv);
+    else module->builder.CreateRetVoid();
 }
 
 Value* LgsFunc::freeFunc(LgsModule* module) const {
     for (auto _ : allocatedExprs) {}
     return lgsPrint.call(module, {new LgsStrConst("cleanup: " + module->stack.currentFunc()->funcType->name)});
-}
-
-LgsParam& LgsFunc::getReturnSwapParam() const {
-    if (!funcType->isSwapReturn) assert(0);
-    if (funcType->returnParamIndex > funcType->params.size()) assert(0);
-    return funcType->params[funcType->returnParamIndex];
 }
 
 string LgsFunc::prettyName() {

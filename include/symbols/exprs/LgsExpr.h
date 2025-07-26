@@ -27,8 +27,7 @@ public:
     LgsType* type = nullptr;
     bool isNull = false;
     bool isSpread = false;
-    // TODO removed from visitVariable. Should be inferred from some refs.
-    bool isReturnExpr = false;
+    bool isHeapAlloc = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     Value* getIRValue(LgsModule* module);

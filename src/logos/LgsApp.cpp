@@ -1,7 +1,6 @@
 #include "logos/LgsApp.h"
 #include "LogosLexer.h"
 #include "analysis/AntlrConverter.h"
-#include "analysis/PostAnalyser.h"
 #include "analysis/SemaAnalyser.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
@@ -83,7 +82,7 @@ bool LgsApp::analyse() {
         });
     }
     threadPool.wait();
-    PostAnalyser::analyse(files, globals);
+    // PostAnalyser::analyse(files, globals);
     return errHandler.successful;
 }
 

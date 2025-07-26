@@ -8,7 +8,9 @@ class LgsArrayExpr final : public LgsUnaryExpr {
 public:
     vector<LgsExpr*> initialElements;
 
-    LgsArrayExpr() = default;
+    LgsArrayExpr() {
+        isHeapAlloc = true;
+    }
     explicit LgsArrayExpr(LgsDArray* arrType) : LgsUnaryExpr(arrType) {}
     explicit LgsArrayExpr(LgsSArray* arrType) : LgsUnaryExpr(arrType) {}
     string prettyName() override;

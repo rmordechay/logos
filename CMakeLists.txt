@@ -12,7 +12,6 @@ set(SOURCE_FILES
     src/logos/LgsLinker.cpp
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
-    src/analysis/PostAnalyser.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsFormatCmd.cpp
     src/cli/LgsGenerateCmd.cpp

@@ -283,8 +283,6 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
     const auto funcType = stack.currentFunc()->funcType;
     const auto retExpr = returnStmt->expr;
     if (retExpr) {
-        retExpr->isReturnExpr = true;
-        stack.currentFunc()->returnExprs.push_back(retExpr);
         visitExpr(retExpr);
     }
     const auto rt = funcType->rt;
@@ -1058,7 +1056,7 @@ void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
         funcType->params[i].type = resolveType(funcType->params[i].type);
     }
     funcType->rt = resolveType(funcType->rt);
-    if (!funcType->rt->isVoid && funcType->rt->getSizeBytes() > PARAM_SWAP_SIZE_THRESHOLD) {
+    if (!funcType->rt->isVoid && funcType->rt->getSizeBytes() > BIG_SIZE_THRESHOLD) {
         funcType->isSizeBig = true;
     }
 }

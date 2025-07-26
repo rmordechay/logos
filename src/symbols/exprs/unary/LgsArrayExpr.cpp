@@ -33,7 +33,6 @@ Value* LgsArrayExpr::createDynamicArray(LgsModule* module) {
     for (const auto element : initialElements) {
         arrType->addFunc.call(module, {this, element});
     }
-    module->stack.currentFunc()->allocatedExprs.push_back(this);
     return IRValue;
 }
 
