@@ -1,6 +1,4 @@
 #include "funcs/LgsFunc.h"
-
-#include "builtin/LgsBuiltins.h"
 #include "data/LgsDefinitions.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
@@ -62,15 +60,7 @@ Value* LgsFunc::callIR(LgsModule* module, const vector<Value*>& args) {
     return module->builder.CreateCall(IRFunc, args);
 }
 
-void LgsFunc::addReturnExpr(LgsModule* module, LgsExpr* rv) {
-    if (rv) {
-        auto pair = make_pair(module->builder.GetInsertBlock(), rv);
-        returnExprs.emplace_back(pair);
-    }
-    module->builder.CreateBr(cleanupBlock);
-}
-
-void LgsFunc::createCleanupBlock(LgsModule* module) {
+void LgsFunc::createCleanupBlock(LgsModule* module) const {
     if (!lastInstTerminator(module)) {
         module->builder.CreateBr(cleanupBlock);
     }
@@ -78,11 +68,11 @@ void LgsFunc::createCleanupBlock(LgsModule* module) {
     const auto IRReturnType = funcType->rt->getIRType(module);
     Value* rv = nullptr;
     if (returnExprs.size() == 1) {
-        rv = returnExprs.front().second->getIRValue(module);
+        rv = returnExprs.front()->getIRValue(module);
     } else if (returnExprs.size() > 1) {
         const auto phiNode = module->builder.CreatePHI(IRReturnType, returnExprs.size());
-        for (auto [block, returnExpr] : returnExprs) {
-            phiNode->addIncoming(returnExpr->getIRValue(module), block);
+        for (const auto expr : returnExprs) {
+            phiNode->addIncoming(expr->getIRValue(module), expr->parentBlock);
         }
         rv = phiNode;
     }
@@ -91,9 +81,10 @@ void LgsFunc::createCleanupBlock(LgsModule* module) {
     else module->builder.CreateRetVoid();
 }
 
-Value* LgsFunc::freeFunc(LgsModule* module) const {
-    for (auto _ : allocatedExprs) {}
-    return lgsPrint.call(module, {new LgsStrConst("cleanup: " + module->stack.currentFunc()->funcType->name)});
+void LgsFunc::freeFunc(LgsModule* module) const {
+    for (const auto expr : allocatedExprs) {
+        expr->free(module);
+    }
 }
 
 string LgsFunc::prettyName() {

@@ -65,7 +65,7 @@ bool LgsApp::parse() {
         });
     }
     threadPool.wait();
-    return resolveExternalFiles();
+    return errHandler.successful && resolveExternalFiles();
 }
 
 bool LgsApp::analyse() {
@@ -115,6 +115,7 @@ void LgsApp::parseSrcFile(const string& codeText, path filePath) {
     LogosParser parser(&tokens);
     const auto ast = parser.logosFile();
     if (parser.getNumberOfSyntaxErrors() != 0) {
+        lock_guard lock(mtx);
         errHandler.setUnsuccessful();
         return;
     }

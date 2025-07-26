@@ -6,12 +6,12 @@ class LgsHashMap final : public LgsUnaryExpr {
 public:
     vector<LgsMapEntry*> initialElements;
 
-    explicit LgsHashMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {
-        type = new LgsMap(keyType, valueType);
+    explicit LgsHashMap(LgsMap* mapType) : LgsUnaryExpr(mapType) {
         isHeapAlloc = true;
     }
-    explicit LgsHashMap(LgsMap* mapType) : LgsUnaryExpr(mapType) {}
+    explicit LgsHashMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsHashMap(new LgsMap(keyType, valueType)) {}
     Value* createIRValue(LgsModule* module) override;
+    void free(LgsModule* module) override;
     ~LgsHashMap() override = default;
 };
 

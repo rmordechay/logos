@@ -11,10 +11,10 @@ class LgsType;
 class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
+    vector<LgsExpr*> returnExprs;
     vector<LgsExpr*> allocatedExprs;
     LgsStmtsBlock* stmtBlock = nullptr;
     BasicBlock* cleanupBlock = nullptr;
-    vector<pair<BasicBlock*, LgsExpr*>> returnExprs;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {
         funcType = new LgsFuncType();
@@ -27,9 +27,8 @@ public:
     string prettyName() override;
     string format(string& tabs) override;
     Value* createIRValue(LgsModule* module) override;
-    Value* freeFunc(LgsModule* module) const;
-    void addReturnExpr(LgsModule* module, LgsExpr* rv);
-    void createCleanupBlock(LgsModule* module);
+    void freeFunc(LgsModule* module) const;
+    void createCleanupBlock(LgsModule* module) const;
     virtual void generateIR(LgsModule* module);
     virtual Function* getIRFunc(LgsModule* module);
     virtual Value* callIR(LgsModule* module, const vector<Value*>& args = {});

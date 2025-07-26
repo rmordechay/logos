@@ -10,7 +10,7 @@ public:
     vector<LgsType*> interfaces;
 
     explicit LgsInterface(const string& name) : name(name) {
-        vtable = new LgsHashMap(new LgsStr(), new LgsAny());
+        vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
     }
     string prettyName() override;
     Type* getIRType(LgsModule* module) override;

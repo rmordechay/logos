@@ -119,7 +119,7 @@ statement:
     |   CONTINUE
     |   breakStmt
     |   returnStatement
-    |   funcCall
+    |   GO? funcCall
     |   selection
     |   postfixExpr
     ;
@@ -400,6 +400,7 @@ VISIBILITY: 'pub';
 IMPLEMENTS: 'implements';
 CONST: 'const';
 ENUM: 'enum';
+GO: 'go';
 
 VEC2: 'vec2';
 VEC3: 'vec3';

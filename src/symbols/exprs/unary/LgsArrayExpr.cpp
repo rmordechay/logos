@@ -53,7 +53,6 @@ Value* LgsArrayExpr::createConstArray(LgsModule* module) const {
 }
 
 void LgsArrayExpr::free(LgsModule* module) {
-    if (type->asDArray()) {
-        type->asDArray()->freeFunc.call(module, {this});
-    }
+    if (!type->asDArray()) return;
+    type->asDArray()->freeFunc.call(module, {this});
 }

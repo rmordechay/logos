@@ -22,6 +22,9 @@
 Value* LgsExpr::getIRValue(LgsModule* module) {
     if (IRValue) return IRValue;
     IRValue = createIRValue(module);
+    if (isHeapAlloc) {
+        module->stack.addHeapExpr(this);
+    }
     assert(IRValue);
     return IRValue;
 }

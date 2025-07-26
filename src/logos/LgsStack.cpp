@@ -38,6 +38,10 @@ LgsForLoop* LgsStack::currentLoop() {
     return top().loop;
 }
 
+void LgsStack::addHeapExpr(LgsExpr* expr) {
+    currentFunc()->allocatedExprs.push_back(expr);
+}
+
 auto LgsStack::begin() {
     return c.begin();
 }
@@ -53,4 +57,3 @@ auto LgsStack::rbegin() {
 auto LgsStack::rend() {
     return c.rend();
 }
-

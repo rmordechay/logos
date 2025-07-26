@@ -8,6 +8,7 @@ public:
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
     void createIRStmt(LgsModule* module) override;
+    void addReturnExpr(LgsModule* module) const;
     ~LgsReturn() override;
 };
 

@@ -8,11 +8,11 @@ class LgsArrayExpr final : public LgsUnaryExpr {
 public:
     vector<LgsExpr*> initialElements;
 
-    LgsArrayExpr() {
+    LgsArrayExpr() = default;
+    explicit LgsArrayExpr(LgsSArray* arrType) : LgsUnaryExpr(arrType) {}
+    explicit LgsArrayExpr(LgsDArray* arrType) : LgsUnaryExpr(arrType) {
         isHeapAlloc = true;
     }
-    explicit LgsArrayExpr(LgsDArray* arrType) : LgsUnaryExpr(arrType) {}
-    explicit LgsArrayExpr(LgsSArray* arrType) : LgsUnaryExpr(arrType) {}
     string prettyName() override;
     Value* createIRValue(LgsModule* module) override;
     Value* createConstArray(LgsModule* module) const;

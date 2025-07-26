@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsType.h"
-#include "logos/LgsModule.h"
 
 class LgsUInt final : public LgsType {
 public:

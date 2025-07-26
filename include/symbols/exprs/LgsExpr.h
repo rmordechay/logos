@@ -28,6 +28,7 @@ public:
     bool isNull = false;
     bool isSpread = false;
     bool isHeapAlloc = false;
+    BasicBlock* parentBlock = nullptr;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     Value* getIRValue(LgsModule* module);

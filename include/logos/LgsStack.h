@@ -34,6 +34,7 @@ public:
     void exitScope();
     LgsFunc* currentFunc();
     LgsForLoop* currentLoop();
+    void addHeapExpr(LgsExpr* expr);
     auto begin();
     auto end();
     auto rbegin();

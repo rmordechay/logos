@@ -67,7 +67,7 @@ void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
 
 void SemaAnalyser::visitObject(LgsObject* obj) {
     if (!obj->interfaces.empty()) {
-        obj->vtable = new LgsHashMap(new LgsStr(), new LgsAny());
+        obj->vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
     }
     for (const auto& [_, field] : obj->fields) {
         visitField(field);
@@ -283,6 +283,7 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
     const auto funcType = stack.currentFunc()->funcType;
     const auto retExpr = returnStmt->expr;
     if (retExpr) {
+        stack.currentFunc()->returnExprs.push_back(retExpr);
         visitExpr(retExpr);
     }
     const auto rt = funcType->rt;
@@ -412,28 +413,27 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
         variable->ref.varDec = symbol->varDec;
         variable->isMutable = symbol->varDec->isMutable;
         variable->setType(symbol->varDec->type);
-        symbol->varDec->refs.push_back(variable);
         break;
     case FIELD:
         variable->ref.field = symbol->field;
         variable->isMutable = symbol->field->isMutable;
         variable->setType(symbol->field->type);
-        symbol->field->refs.push_back(variable);
         break;
     case PARAM:
         variable->ref.param = symbol->param;
         variable->setType(symbol->param->type);
-        symbol->param->refs.push_back(variable);
         break;
     case ENUM:
         variable->ref.lgsEnum = symbol->lgsEnum;
         variable->setType(symbol->lgsEnum);
-        symbol->lgsEnum->refs.push_back(variable);
         break;
     case FUNC:
         variable->ref.func = symbol->func;
         variable->setType(symbol->func->funcType);
-        symbol->func->refs.push_back(variable);
+        break;
+    case OBJECT:
+        variable->ref.object = symbol->object;
+        variable->setType(symbol->object);
         break;
     default:
         assert(false);

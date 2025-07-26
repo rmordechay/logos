@@ -12,3 +12,7 @@ Value* LgsHashMap::createIRValue(LgsModule* module) {
     }
     return IRValue;
 }
+
+void LgsHashMap::free(LgsModule* module) {
+    type->asMap()->freeFunc.call(module, {this});
+}

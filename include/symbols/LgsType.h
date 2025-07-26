@@ -43,7 +43,6 @@ public:
     bool canSlice = false;
     Type* IRType = nullptr;
     LgsHashMap* vtable = nullptr;
-    vector<LgsVariable*> refs;
     map<string, LgsField*> fields;
     map<string, LgsFunc*> methods;
 

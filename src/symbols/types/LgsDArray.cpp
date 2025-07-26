@@ -75,8 +75,7 @@ Value* LgsArrayAddFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
     const auto baseTypeIR = baseType->getIRType(module);
     const auto valuePtr = module->builder.CreateAlloca(baseTypeIR);
     module->builder.CreateStore(value, valuePtr);
-    callIR(module, {arrPtr, valuePtr});
-    return nullptr;
+    return callIR(module, {arrPtr, valuePtr});
 }
 
 LgsDArray::~LgsDArray() {
