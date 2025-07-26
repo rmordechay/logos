@@ -1,4 +1,6 @@
 #include "funcs/LgsFunc.h"
+
+#include "builtin/LgsBuiltins.h"
 #include "data/LgsDefinitions.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
@@ -9,6 +11,7 @@ void LgsFunc::generateIR(LgsModule* module) {
     module->stack.enterScope(FUNC_SCOPE, this);
     startFuncBlock(module);
     stmtBlock->createIRValue(module);
+    createCleanupBlock(module);
     if (funcType->rt->isVoid && !lastInstTerminator(module)) {
         module->builder.CreateRetVoid();
     }
@@ -78,10 +81,34 @@ void LgsFunc::setBigObjAttrs(LgsModule* module, Function& IRFunc) const {
     IRFunc.addParamAttr(funcType->returnParamIndex, Attribute::get(IRFunc.getContext(), Attribute::NoAlias));
 }
 
-void LgsFunc::createCleanupBlock(LgsModule* module) const {
-    // if (!lastInstTerminator(module)) branchToCleanup(module);
-    // startBlock(module, cleanupBlock);
-    // lgsPrint.call(module, {new LgsStrConst("cleanup: " + module->stack.currentFunc->funcType->name)});
+void LgsFunc::addReturnExpr(LgsModule* module, Value* rv) {
+    returnValues.emplace_back(make_pair(module->builder.GetInsertBlock(), rv));
+    module->builder.CreateBr(cleanupBlock);
+}
+
+void LgsFunc::createCleanupBlock(LgsModule* module) {
+    if (!lastInstTerminator(module)) {
+        module->builder.CreateBr(cleanupBlock);
+    }
+    startBlock(module, cleanupBlock);
+    const auto IRReturnType = funcType->rt->getIRType(module);
+    Value* rv = nullptr;
+    if (returnValues.size() == 1) {
+        rv = returnValues.front().second;
+    } else {
+        const auto phiNode = module->builder.CreatePHI(IRReturnType, returnValues.size());
+        for (auto [block, value] : returnValues) {
+            if (!value) continue;
+            phiNode->addIncoming(value, block);
+        }
+        rv = phiNode;
+    }
+    lgsPrint.call(module, {new LgsStrConst("cleanup: " + module->stack.currentFunc->funcType->name)});
+    if (rv) {
+        module->builder.CreateRet(rv);
+    } else {
+        module->builder.CreateRetVoid();
+    }
 }
 
 LgsParam& LgsFunc::getReturnSwapParam() const {

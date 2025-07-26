@@ -14,6 +14,7 @@ public:
     vector<LgsExpr*> returnExprs;
     LgsStmtsBlock* stmtBlock = nullptr;
     BasicBlock* cleanupBlock = nullptr;
+    vector<pair<BasicBlock*, Value*>> returnValues;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {
         funcType = new LgsFuncType();
@@ -25,7 +26,8 @@ public:
     explicit LgsFunc(LgsFuncType* funcType) : LgsUnaryExpr(funcType), funcType(funcType) {}
     string prettyName() override;
     void setBigObjAttrs(LgsModule* module, Function& IRFunc) const;
-    void createCleanupBlock(LgsModule* module) const;
+    void addReturnExpr(LgsModule* module, Value* rv);
+    void createCleanupBlock(LgsModule* module);
     LgsParam& getReturnSwapParam() const;
     string format(string& tabs) override;
     Value* createIRValue(LgsModule* module) override;

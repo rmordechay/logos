@@ -5,14 +5,15 @@
 void LgsReturn::createIRStmt(LgsModule* module) {
     const auto currentFunc = module->stack.currentFunc;
     if (!expr || currentFunc->funcType->isSwapReturn) {
-        module->builder.CreateRetVoid();
+        currentFunc->addReturnExpr(module, nullptr);
         return;
     }
     auto exprIR = expr->getIRValue(module);
     if (exprIR->getType()->isPointerTy()) {
-        exprIR = module->builder.CreateLoad(expr->type->getIRType(module), exprIR);
+        const auto ty = expr->type->getIRType(module);
+        exprIR = module->builder.CreateLoad(ty, exprIR);
     }
-    module->builder.CreateRet(exprIR);
+    currentFunc->addReturnExpr(module, exprIR);
 }
 
 LgsReturn::~LgsReturn() {
