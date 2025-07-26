@@ -12,18 +12,18 @@ public:
     string name;
     string* parentName;
     size_t position = 0;
+    LgsType* type = nullptr;
+    LgsExpr* expr = nullptr;
+    Type* parentIRType = nullptr;
     bool isPublic = false;
     bool isVirtual = false;
     bool isOptional = false;
-    LgsExpr* expr = nullptr;
-    LgsType* type = nullptr;
-    Type* parentIRType = nullptr;
-    Value* parentIRValue = nullptr;
 
-    LgsField(const string& name, string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(name), parentName(parentName), expr(expr), type(type) {}
-    Value* getGEP(LgsModule* module) const;
-    void storeIRValue(LgsModule* module, LgsExpr* value) const;
-    void storeIRZeroValue(LgsModule* module) const;
+    LgsField(const string& name, string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(name), parentName(parentName), type(type), expr(expr) {}
+    Value* getGEP(LgsModule* module, Value* instance) const;
+    Value* getIRValue(LgsModule* module, LgsExpr* parentInstance) const;
     LgsField* clone() const;
+    static void storeIRValue(LgsModule* module, Value* instance, LgsExpr* value);
+    Value* resolveVirtualField(LgsModule* module, LgsExpr* parentExpr) const;
     ~LgsField() override;
 };

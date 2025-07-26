@@ -1,58 +1,46 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
+#include "exprs/unary/LgsInstance.h"
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 #include "utils/LgsIRUtils.h"
 
-void LgsSelection::createIRStmt(LgsModule* module) {
-    resolveSelection(module);
+LgsInstance* getSingleton(LgsExpr* expr) {
+    const auto parentAsVar = expr->asVariable();
+    if (parentAsVar->ref.symbolType == OBJECT && parentAsVar->ref.object->singleton) {
+        return parentAsVar->ref.object->singleton;
+    }
+    return nullptr;
 }
 
 Value* LgsSelection::createIRValue(LgsModule* module) {
     resolveSelection(module);
-    return lastExpr()->IRValue;
+    return module->builder.CreateLoad(type->getIRType(module), lastExpr()->IRValue);
+}
+
+void LgsSelection::createIRStmt(LgsModule* module) {
+    resolveSelection(module);
 }
 
 void LgsSelection::resolveSelection(LgsModule* module) const {
     for (int i = 0; i < exprs.size() - 1; ++i) {
-        const auto parentExpr = exprs[i];
+        auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
-        if (i == 0) {
-
+        const auto singleton = getSingleton(parentExpr);
+        if (i == 0 && singleton) {
+            parentExpr = singleton;
         }
         if (const auto methodCall = childExpr->asFuncCall()) {
-            methodCall->IRValue = methodCall->getIRValue(module);
+            methodCall->setIRValue(methodCall->getIRValue(module));
+        } else if (const auto fieldVar = childExpr->asVariable()){
+            const auto fieldIR = fieldVar->ref.field->getIRValue(module, parentExpr);
+            childExpr->setIRValue(fieldIR);
         } else {
-            resolveFieldSelection(module, parentExpr, childExpr->asVariable());
+            assert(0);
         }
     }
-}
-
-void LgsSelection::resolveFieldSelection(LgsModule* module, LgsExpr* parentExpr, LgsVariable* fieldVar) {
-    const auto field = parentExpr->type->getField(fieldVar->name);
-    Value* value = nullptr;
-    if (field->type->asEnum()) {
-        value = field->expr ? field->expr->getIRValue(module) : getIRStr(module, field->name);
-    } else if (field->isVirtual) {
-        value = resolveVirtualField(module, parentExpr, field);
-    } else {
-        value = field->getGEP(module);
-    }
-    fieldVar->setIRValue(value);
-}
-
-Value* LgsSelection::resolveVirtualField(LgsModule* module, LgsExpr* parentExpr, const LgsField* field) {
-    const auto vtable = parentExpr->type->vtable;
-    const auto fieldIRType = field->type->getIRType(module);
-    const auto vtableMap = vtable->type->asMap();
-    const auto keyIR = getIRStr(module, field->name);
-    const auto parentIRValue = parentExpr->getIRValue(module);
-    const auto vtableIRType = vtable->type->getIRType(module);
-    const auto mapPtr = module->builder.CreateGEP(vtableIRType, parentIRValue, {i64(module, 0)});
-    const auto rv = vtableMap->getFunc.callIR(module, {mapPtr, keyIR});
-    return module->builder.CreateLoad(fieldIRType, rv);
 }
 
 string LgsSelection::prettyName() {
@@ -65,8 +53,13 @@ string LgsSelection::prettyName() {
 }
 
 LgsExpr* LgsSelection::lastExpr() const {
-    if (exprs.empty()) return nullptr;
+    assert(exprs.size() > 1);
     return exprs[exprs.size() - 1];
+}
+
+LgsExpr* LgsSelection::LastExprParent() const {
+    assert(exprs.size() > 1);
+    return exprs[exprs.size() - 2];
 }
 
 Value* LgsSelection::hashValue(LgsModule* module) {

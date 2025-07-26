@@ -19,7 +19,6 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
-#include "exprs/unary/LgsSingleton.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
@@ -69,9 +68,6 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
     if (!obj->interfaces.empty()) {
         obj->vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
     }
-    if (obj->isSingleton) {
-        visitSingleton(obj);
-    }
     for (const auto& [_, field] : obj->fields) {
         visitField(field);
     }
@@ -79,11 +75,6 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
         visitFunc(method);
     }
     validateInterfaces(obj, obj->interfaces);
-}
-
-void SemaAnalyser::visitSingleton(LgsObject* obj) {
-    const auto singleton = new LgsSingleton(obj);
-    globals.addSymbol(singleton->name, LgsSymbol(singleton), &errHandler);
 }
 
 void SemaAnalyser::visitInterface(LgsInterface* interface) {
@@ -484,18 +475,15 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
 
 void SemaAnalyser::visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* childField) {
     const auto parentType = parentExpr->type;
-    if (parentType) {
-        const auto field = parentType->getField(childField->name);
-        if (!field) {
-            return errHandler.handleError(E10005, &childField->location, {childField->name, parentType->prettyName()});
-        }
-        childField->setType(field->type);
-        childField->isMutable = field->isMutable;
-        childField->ref = LgsSymbol(field);
-        validateFieldVisibility(field, parentType->asObject());
-    } else {
-        return errHandler.handleError(E10058, &childField->location, {childField->name});
+    if (!parentType) return;
+    const auto field = parentType->getField(childField->name);
+    if (!field) {
+        return errHandler.handleError(E10005, &childField->location, {childField->name, parentType->prettyName()});
     }
+    childField->setType(field->type);
+    childField->isMutable = field->isMutable;
+    childField->ref = LgsSymbol(field);
+    validateFieldVisibility(field, parentType->asObject());
 }
 
 void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
@@ -524,20 +512,19 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
 }
 
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
-    const auto objName = instance->obj->name;
+    const auto objName = instance->name;
     const auto symbol = getSymbol(objName, &instance->location);
     if (!symbol) return;
     if (symbol->symbolType != OBJECT && symbol->symbolType != INTERFACE) {
         return errHandler.handleError(E10022, &instance->location, {objName});
     }
-    if (symbol->object->isSingleton) {
+    if (symbol->object->singleton) {
         return errHandler.handleError(E10032, &instance->location, {objName});
     }
 
     if (!instance->obj) {
         instance->obj = symbol->object;
         instance->setType(instance->obj);
-        instance->copyFields();
     }
 
     for (const auto [name, field] : instance->obj->fields) {
@@ -794,7 +781,7 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
 }
 
 bool SemaAnalyser::validateFieldVisibility(LgsField* field, const LgsObject* parent) {
-    if (parent && parent->isSingleton) return true;
+    if (parent && parent->singleton) return true;
     if (!field || field->isVirtual) return false;
     if (!field->isPublic && file->absPath != field->location.filePath) {
         errHandler.handleError(E10030, &field->location, {field->name, *field->parentName});
@@ -804,7 +791,7 @@ bool SemaAnalyser::validateFieldVisibility(LgsField* field, const LgsObject* par
 }
 
 bool SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall, const LgsObject* parent) {
-    if (parent && parent->isSingleton) return true;
+    if (parent && parent->singleton) return true;
     const auto method = methodCall->func;
     if (!method || method->funcType->isVirtual) return false;
     if (!method->funcType->isPublic && file->absPath != method->location.filePath) {
@@ -989,7 +976,6 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     case ENUM:
         newType = symbol->lgsEnum;
         break;
-    case SINGLETON:
     case VAR_DEC:
     case PARAM:
     case FIELD:

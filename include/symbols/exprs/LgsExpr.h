@@ -58,7 +58,7 @@ public:
     virtual LgsExpr* convertExpr(LgsType* toType);
     virtual void free(LgsModule* module);
     virtual Value* hashValue(LgsModule* module);
-    virtual std::string prettyName() = 0;
+    virtual string prettyName() = 0;
     virtual Value* createIRValue(LgsModule* module) = 0;
 
     virtual Value* addIR(LgsModule* module, LgsExpr* other) = 0;

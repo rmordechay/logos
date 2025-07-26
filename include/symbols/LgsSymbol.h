@@ -1,6 +1,5 @@
 #pragma once
 
-class LgsSingleton;
 class LgsVariable;
 class LgsGroup;
 class LgsField;
@@ -18,7 +17,6 @@ enum LgsSymbolType {
     FIELD,
     FUNC,
     OBJECT,
-    SINGLETON,
     INTERFACE,
     GROUP,
     ENUM,
@@ -32,7 +30,6 @@ struct LgsSymbol {
     LgsVarDec* varDec = nullptr;
     LgsParam* param = nullptr;
     LgsObject* object = nullptr;
-    LgsSingleton* singleton = nullptr;
     LgsInterface* interface = nullptr;
     LgsField* field = nullptr;
     LgsEnum* lgsEnum = nullptr;
@@ -44,7 +41,6 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsParam* param);
     explicit LgsSymbol(LgsVarDec* varDec);
     explicit LgsSymbol(LgsField* field);
-    explicit LgsSymbol(LgsSingleton* singleton);
     explicit LgsSymbol(LgsGroup* group);
     explicit LgsSymbol(LgsInterface* interface);
     explicit LgsSymbol(LgsObject* object, bool isExternal = false);

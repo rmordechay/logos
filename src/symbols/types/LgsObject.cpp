@@ -30,6 +30,9 @@ Type* LgsObject::getIRType(LgsModule* module) {
     if (!IRType) {
         IRType = StructType::create(module->context, elementTypes, name);
     }
+    for (const auto field : fields) {
+        field.second->parentIRType = IRType;
+    }
     return IRType;
 }
 

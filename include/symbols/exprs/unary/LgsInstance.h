@@ -4,18 +4,15 @@
 
 class LgsInstance final : public LgsUnaryExpr {
 public:
+    string name;
     LgsObject* obj = nullptr;
-    map<string, LgsField*> fields;
     map<string, LgsVarDec*> args;
-
-    LgsInstance() = default;
-    explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), obj(obj) {
-        copyFields();
-    }
+    explicit LgsInstance(const string& name): name(name) {}
+    explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), name(obj->name), obj(obj) {}
     Value* createIRValue(LgsModule* module) override;
-    void setVirtualFuncs(LgsModule* module) const;
+    void setVirtuals(LgsModule* module) const;
     string prettyName() override;
-    void copyFields();
+    void initFields(LgsModule* module);
     void free(LgsModule* module) override;
     ~LgsInstance() override;
 };

@@ -173,7 +173,6 @@ LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx) {
 LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const bool isSingleton) {
     const auto obj = new LgsObject(objName);
     obj->setLocation(ctx->start, ctx->stop, filePath);
-    obj->isSingleton = isSingleton;
     // Fields
     for (int i = 0; i < ctx->field().size(); ++i) {
         const auto lgsField = getField(ctx->field(i), obj->name);
@@ -199,6 +198,9 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
             auto implementType = getTypeFromText(type);
             obj->interfaces.push_back(implementType);
         }
+    }
+    if (isSingleton) {
+        obj->singleton = new LgsInstance(obj);
     }
     return obj;
 }
@@ -727,7 +729,7 @@ LgsUnaryExpr* AntlerConverter::getVector(LogosParser::VectorContext* vector) con
 }
 
 LgsInstance* AntlerConverter::getInstance(LogosParser::ConstructorContext* ctx) {
-    const auto instance = new LgsInstance();
+    const auto instance = new LgsInstance(ctx->IDENTIFIER()->getText());
     instance->setLocation(ctx->start, ctx->stop, filePath);
     const auto args = ctx->constructorArgList();
     if (!args) return instance;

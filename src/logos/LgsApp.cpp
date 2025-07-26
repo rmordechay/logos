@@ -35,7 +35,7 @@ void LgsApp::run() {
     if (!generate()) handleExitWithErrors();
 
     // Linking
-    if (!link()) handleExitWithErrors();
+    if (!link(paths, modules)) handleExitWithErrors();
 
     // Running
     execv(paths.execFilePath.c_str(), args.data());
@@ -101,10 +101,6 @@ bool LgsApp::generate() {
     threadPool.wait();
     writeIRToFile();
     return errHandler.successful;
-}
-
-bool LgsApp::link() const {
-    return LgsLinker::link(paths, modules);
 }
 
 void LgsApp::parseSrcFile(const string& codeText, path filePath) {

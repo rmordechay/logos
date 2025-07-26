@@ -3,12 +3,12 @@
 #include "types/LgsEnum.h"
 #include "types/LgsObject.h"
 #include "utils/LgsIRUtils.h"
-#include "utils/LgsUtils.h"
 
 LgsModule* LgsMainFile::generateIR(LgsSymbolTable& globals) {
     const auto module = new LgsModule(globals);
     module->IRModule = createIRModule(LOGOS_MAIN_FILE_NAME, module->context);
     for (const auto object : objects) {
+        object->getIRType(module);
         for (const auto& [_, method] : object->methods) {
             method->generateIR(module);
         }

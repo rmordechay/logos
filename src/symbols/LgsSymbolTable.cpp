@@ -1,7 +1,5 @@
 #include "LgsSymbolTable.h"
 #include "data/LgsErrors.h"
-#include "exprs/unary/LgsInstance.h"
-#include "exprs/unary/LgsSingleton.h"
 #include "funcs/LgsParam.h"
 #include "utils/LgsErrHandler.h"
 #include "funcs/LgsFunc.h"
@@ -12,7 +10,6 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "utils/LgsIRUtils.h"
-#include "utils/LgsUtils.h"
 
 void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
     std::lock_guard lock(mtx);
@@ -56,8 +53,6 @@ void LgsSymbolTable::freeSymbols() {
         case ENUM:
             delete symbol.second.lgsEnum;
             break;
-        case SINGLETON:
-            delete symbol.second.singleton;
         case UNKNOWN:
             break;
         }

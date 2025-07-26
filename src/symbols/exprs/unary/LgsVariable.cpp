@@ -1,9 +1,11 @@
 #include "exprs/unary/LgsVariable.h"
 
+#include "exprs/unary/LgsInstance.h"
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsObject.h"
 #include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 #include <logos/LgsModule.h>
@@ -24,6 +26,9 @@ Value* LgsVariable::createIRValue(LgsModule* module) {
         return ref.param->getIRValue(module);
     case FUNC:
         return ref.func->getIRFunc(module);
+    case OBJECT:
+        assert(ref.object->singleton);
+        return ref.object->singleton->getIRValue(module);
     case ENUM:
         return getIRStr(module, name);
     case FIELD:
@@ -52,7 +57,6 @@ LgsExpr* LgsVariable::convertExpr(LgsType* type) {
     case INTERFACE:
     case GROUP:
     case ENUM:
-    case SINGLETON:
     case UNKNOWN:
         break;
     }

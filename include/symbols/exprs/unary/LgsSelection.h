@@ -11,13 +11,12 @@ public:
     explicit LgsSelection(const std::vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
     string prettyName() override;
     LgsExpr* lastExpr() const;
+    LgsExpr* LastExprParent() const;
+    void resolveSelection(LgsModule* module) const;
     Value* hashValue(LgsModule* module) override;
     Value* eqIR(LgsModule* module, LgsExpr* other) override;
     void createIRStmt(LgsModule* module) override;
     Value* createIRValue(LgsModule* module) override;
-    void resolveSelection(LgsModule* module) const;
-    static void resolveFieldSelection(LgsModule* module, LgsExpr* parentExpr, LgsVariable* fieldVar);
-    static Value* resolveVirtualField(LgsModule* module, LgsExpr* parentExpr, const LgsField* field);
     ~LgsSelection() override;
 };
 

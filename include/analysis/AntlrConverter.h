@@ -55,7 +55,7 @@ public:
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName);
-    LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, bool isSingleton = false);
+    LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, bool isSingleton);
     LgsField* getField(LogosParser::FieldContext* ctx, string& parentName);
     LgsFunc* getFuncImpl(LogosParser::FuncImplContext* ctx);
     void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);

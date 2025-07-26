@@ -73,18 +73,11 @@ void LgsAssignment::assignToIterIndex(LgsModule* module, LgsIterIndex* iterIndex
 void LgsAssignment::assignToSelection(LgsModule* module, const LgsSelection* selection, LgsExpr* expr) {
     selection->resolveSelection(module);
     const auto lastExpr = selection->lastExpr();
-    if (const auto var = lastExpr->asVariable()) {
-        assert(var->ref.symbolType != UNKNOWN);
-        switch (var->ref.symbolType) {
-        case FIELD: {
-            var->ref.field->storeIRValue(module, expr);
-            return;
-        }
-        case UNKNOWN: default:
-            break;
-        }
-    }
-    assert(0);
+    const auto lastExprParent = selection->LastExprParent();
+    const auto var = lastExpr->asVariable();
+    assert(var && var->ref.symbolType == FIELD);
+    const auto instance = lastExprParent->getIRValue(module);
+    var->ref.field->storeIRValue(module, instance, expr);
 }
 
 void LgsAssignment::assignToVariable(LgsModule* module, LgsVariable* variable, LgsExpr* expr) {
@@ -128,7 +121,7 @@ void LgsAssignment::storeArrayInIterIndex(LgsModule* module, const LgsIterIndex*
     const auto baseExpr = iterIndex->baseExpr;
     const auto IRType = baseExpr->type->getIRType(module);
     const auto arrPtr = baseExpr->getIRValue(module);
-    vector<Value*> IRIndices = {i32(module, 0)};
+    vector IRIndices = {i32(module, 0)};
     vector<LgsIndex*> indices;
     setIterIndices(iterIndex, indices);
     for (const auto index : indices) {
@@ -145,7 +138,7 @@ void LgsAssignment::storeArrayInIterIndex(LgsModule* module, const LgsIterIndex*
     }
 }
 
-void LgsAssignment::setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices) const {
+void LgsAssignment::setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices) {
     while (iterIndex) {
         if (iterIndex->index) {
             indices.push_back(iterIndex->index);

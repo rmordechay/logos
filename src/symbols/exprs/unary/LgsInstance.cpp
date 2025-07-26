@@ -5,35 +5,36 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 #include "utils/LgsIRUtils.h"
-#include "utils/LgsUtils.h"
 
 string LgsInstance::prettyName() {
     return obj->name;
 }
 
 Value* LgsInstance::createIRValue(LgsModule* module) {
-    const auto parentIRType = obj->getIRType(module);
-    const auto objIRType = parentIRType;
-    IRValue = module->builder.CreateAlloca(objIRType);
-
-    for (const auto& [fieldName, field] : fields) {
-        field->parentIRType = parentIRType;
-        field->parentIRValue = IRValue;
-        auto arg = args.find(fieldName);
-        if (arg != args.end()) {
-            field->storeIRValue(module, arg->second->expr);
-        } else {
-            field->storeIRZeroValue(module);
-        }
+    const auto objIRType = obj->getIRType(module);
+    if(obj->singleton) {
+        const auto zeroInitializer = ConstantAggregateZero::get(objIRType);
+        IRValue = new GlobalVariable(*module->IRModule, objIRType, false, GlobalValue::ExternalLinkage, zeroInitializer);
+    } else {
+        IRValue = module->builder.CreateAlloca(objIRType);
     }
-
+    initFields(module);
     if (obj->hasVirtuals) {
-        setVirtualFuncs(module);
+        setVirtuals(module);
     }
     return IRValue;
 }
 
-void LgsInstance::setVirtualFuncs(LgsModule* module) const {
+void LgsInstance::initFields(LgsModule* module) {
+    for (const auto& [fieldName, field] : obj->fields) {
+        auto arg = args.find(fieldName);
+        if (arg != args.end()) {
+            field->storeIRValue(module, IRValue, arg->second->expr);
+        }
+    }
+}
+
+void LgsInstance::setVirtuals(LgsModule* module) const {
     const auto vtable = obj->vtable->type->asMap();
     const auto vtableGEP = module->builder.CreateGEP(vtable->getIRType(module), IRValue, {i32(module, 0)});
     vtable->initFunc.callIR(module, {vtableGEP, i64(module, sizeof(void*))});
@@ -45,22 +46,15 @@ void LgsInstance::setVirtualFuncs(LgsModule* module) const {
         module->builder.CreateStore(IRFunc, valuePtr);
         vtable->addFunc.callIR(module, {vtableGEP, keyIRStr, valuePtr});
     }
-    for (const auto& [name, field] : fields) {
+    for (const auto& [name, field] : obj->fields) {
         if (!field->isVirtual) continue;
         const auto keyIRStr = getIRStr(module, field->name);
-        const auto gep = field->getGEP(module);
-        const auto ty = field->type->getIRType(module);
-        const auto v = module->builder.CreateLoad(ty, gep);
-        const auto valuePtr = module->builder.CreateAlloca(ty);
-        module->builder.CreateStore(v, valuePtr);
+        const auto fieldGEP = field->getGEP(module, IRValue);
+        const auto fieldIRType = field->type->getIRType(module);
+        const auto loadGEP = module->builder.CreateLoad(fieldIRType, fieldGEP);
+        const auto valuePtr = module->builder.CreateAlloca(fieldIRType);
+        module->builder.CreateStore(loadGEP, valuePtr);
         vtable->addFunc.callIR(module, {vtableGEP, keyIRStr, valuePtr});
-    }
-}
-
-void LgsInstance::copyFields() {
-    assert(fields.empty());
-    for (auto [name, field] : obj->fields) {
-        fields[name] = field->clone();
     }
 }
 
@@ -71,9 +65,6 @@ void LgsInstance::free(LgsModule* module) {
 }
 
 LgsInstance::~LgsInstance() {
-    for (const auto field : fields) {
-        delete field.second;
-    }
     for (const auto arg : args) {
         delete arg.second;
     }

@@ -46,7 +46,6 @@ public:
     explicit SemaAnalyser(LgsFile* file, LgsSymbolTable& globals) : LgsASTVisitor(file), globals(globals) {}
     void analyse() override;
     void visitMainFile(LgsMainFile* mainFile) override;
-    void visitSingleton(LgsObject* obj);
     void visitObject(LgsObject* obj) override;
     void visitInterface(LgsInterface* interface) override;
     void visitField(LgsField* field) override;

@@ -48,7 +48,6 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/LgsVariable.cpp
     src/symbols/exprs/unary/LgsPostfixExpr.cpp
     src/symbols/exprs/unary/LgsPrefixExpr.cpp
-    src/symbols/exprs/unary/LgsSingleton.cpp
     src/symbols/funcs/LgsFunc.cpp
     src/symbols/funcs/LgsMainFunc.cpp
     src/symbols/funcs/LgsParam.cpp
