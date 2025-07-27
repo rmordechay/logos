@@ -24,6 +24,10 @@ inline PointerType* ptrTy(LgsModule* module) {
     return PointerType::getUnqual(module->context);
 }
 
+inline Value* null(LgsModule* module) {
+    return ConstantPointerNull::get(ptrTy(module));
+}
+
 inline Type* sizeTy(LgsModule* module) {
     return module->IRModule->getDataLayout().getIntPtrType(module->context);
 }
@@ -66,4 +70,12 @@ inline Value* i32(LgsModule* module, const int32_t v) {
 
 inline Value* i64(LgsModule* module, const int64_t v) {
     return module->builder.getInt64(v);
+}
+
+inline Value* i32Zero(LgsModule* module) {
+    return module->builder.getInt32(0);
+}
+
+inline Value* i64Zero(LgsModule* module) {
+    return module->builder.getInt64(0);
 }

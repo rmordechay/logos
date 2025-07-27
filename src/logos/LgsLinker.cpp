@@ -10,7 +10,7 @@ bool generateObjFile(const LgsPaths& paths, Module* module) {
     raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
     const auto addedPassFailed = getTargetMachine()->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
     if (addedPassFailed) {
-        cerr << ec.message() << endl;
+        cerr << ec.message() << NEW_LINE;
         return false;
     }
 
@@ -18,7 +18,6 @@ bool generateObjFile(const LgsPaths& paths, Module* module) {
         errs().flush();
         return false;
     }
-
     pass.run(*module);
     outputStream.flush();
     outputStream.close();
@@ -42,7 +41,8 @@ unique_ptr<Module> cloneModuleToContext(const Module &src, LLVMContext &targetCt
 bool link(const LgsPaths& paths, const map<string, LgsModule*>& modules) {
     const auto mainModule = modules.find(LOGOS_MAIN_FILE_NAME);
     assert(mainModule != modules.end());
-    const auto mainCloned = cloneModuleToContext(*mainModule->second->IRModule, mainModule->second->context);
+    const auto mainIRModule = mainModule->second->IRModule;
+    const auto mainCloned = cloneModuleToContext(*mainIRModule, mainModule->second->context);
     Linker llvmLinker(*mainCloned);
     for (const auto& [name, module] : modules) {
         if (name == LOGOS_MAIN_FILE_NAME) continue;

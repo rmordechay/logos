@@ -36,7 +36,7 @@ void LgsInstance::initFields(LgsModule* module) {
 
 void LgsInstance::setVirtuals(LgsModule* module) const {
     const auto vtable = obj->vtable->type->asMap();
-    const auto vtableGEP = module->builder.CreateGEP(vtable->getIRType(module), IRValue, {i32(module, 0)});
+    const auto vtableGEP = module->builder.CreateGEP(vtable->getIRType(module), IRValue, {i32Zero(module)});
     vtable->initFunc.callIR(module, {vtableGEP, i64(module, sizeof(void*))});
     for (const auto& [name, method] : obj->methods) {
         if (!method->funcType->isVirtual) continue;

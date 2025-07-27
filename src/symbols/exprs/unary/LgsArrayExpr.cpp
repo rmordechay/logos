@@ -46,7 +46,7 @@ Value* LgsArrayExpr::createConstArray(LgsModule* module) const {
     const auto arrIRPtr = builder.CreateAlloca(arrIRType);
     if (initialElements.empty()) return arrIRPtr;
     for (int i = 0; i < initialElements.size(); ++i) {
-        const auto gep = builder.CreateGEP(arrIRType, arrIRPtr, {i32(module, 0), i32(module, i)});
+        const auto gep = builder.CreateGEP(arrIRType, arrIRPtr, {i32Zero(module), i32(module, i)});
         const auto val = initialElements[i]->getIRValue(module);
         builder.CreateStore(val, gep);
     }

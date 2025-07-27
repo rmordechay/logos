@@ -15,8 +15,8 @@ public:
 
     Value* call(LgsModule* module, const vector<LgsExpr*>& args) override {
         const auto arg = args.front();
-        const auto formatStr = arg->type->getStrFormatPart();
-        const auto IRArgs = {getIRArg(module, arg), getIRStr(module, formatStr)};
+        const auto formatStr = arg->type->getStrFormatPart() + '\n';
+        const auto IRArgs = {getIRStr(module, formatStr), getIRArg(module, arg)};
         return module->builder.CreateCall(getPrintf(module), IRArgs);
     }
 

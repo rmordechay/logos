@@ -28,7 +28,7 @@ Value* LgsField::resolveVirtualField(LgsModule* module, LgsExpr* parentExpr) con
     const auto keyIR = getIRStr(module, name);
     const auto parentIRValue = parentExpr->getIRValue(module);
     const auto vtableIRType = vtable->type->getIRType(module);
-    const auto mapPtr = module->builder.CreateGEP(vtableIRType, parentIRValue, {i64(module, 0)});
+    const auto mapPtr = module->builder.CreateGEP(vtableIRType, parentIRValue, {i64Zero(module)});
     const auto rv = vtableMap->getFunc.callIR(module, {mapPtr, keyIR});
     return module->builder.CreateLoad(fieldIRType, rv);
 }

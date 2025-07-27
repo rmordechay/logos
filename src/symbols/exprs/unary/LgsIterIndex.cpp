@@ -59,7 +59,7 @@ Value* LgsIterIndex::getStrGEP(LgsModule* module) const {
     const auto ty = baseExpr->type->getIRType(module);
     const auto value = baseExpr->getIRValue(module);
     const auto iValue = index->from->getIRValue(module);
-    return module->builder.CreateGEP(ty, value, {i32(module, 0), iValue});
+    return module->builder.CreateGEP(ty, value, {i32Zero(module), iValue});
 }
 
 Value* LgsIterIndex::getArrGEP(LgsModule* module) const {
@@ -76,7 +76,7 @@ Value* LgsIterIndex::getArrGEP(LgsModule* module) const {
         } else {
             ptr = iterIndex->baseExpr->getIRValue(module);
             ty = iterIndex->baseExpr->type->getIRType(module);
-            IRIndices.push_back(i32(module, 0));
+            IRIndices.push_back(i32Zero(module));
             break;
         }
     }

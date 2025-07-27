@@ -1,5 +1,7 @@
 #pragma once
 
+#define NEW_LINE "\n"
+
 #if defined(__x86_64__) || defined(_M_X64)
     #define ARCH_NAME "x86_64 (64-bit)"
 #elif defined(__i386__) || defined(_M_IX86)

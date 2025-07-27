@@ -2,14 +2,14 @@
 #include "LgsType.h"
 #include "builtin/LgsBuiltins.h"
 #include "data/LgsDefinitions.h"
+#include "data/PlatformData.h"
 #include "utils/LgsErrHandler.h"
-#include "utils/LgsIRUtils.h"
 
 void lgsLog(const string& text, const LogLevel level) {
     if (level == ERROR) {
-        cerr << text << std::endl;
+        cerr << text << NEW_LINE;
     } else {
-        cout << text << std::endl;
+        cout << text << NEW_LINE;
     }
 }
 

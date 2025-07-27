@@ -60,13 +60,35 @@ Value* LgsFunc::callIR(LgsModule* module, const vector<Value*>& args) {
     return module->builder.CreateCall(IRFunc, args);
 }
 
-Value* LgsFunc::getIRArg(LgsModule* module, LgsExpr* arg) {
-    const auto argValue = arg->getIRValue(module);
-    const auto argType = arg->type->getIRType(module);
-    if (arg->type->isPrimitive) {
-        return module->builder.CreateLoad(argType, argValue);
+
+bool shouldLoadIRArg(Value* value) {
+    if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
+    if (const auto alloca = dyn_cast<AllocaInst>(value)) {
+        const auto allocatedType = alloca->getAllocatedType();
+        return !allocatedType->isStructTy() && !allocatedType->isArrayTy();
     }
-    return argValue;
+    if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
+        const auto source = gep->getSourceElementType();
+        const auto results = gep->getResultElementType();
+        const auto isArrayTy = source->isArrayTy();
+        const auto isByteTy = results && results->isIntegerTy(8);
+        return !isArrayTy || !isByteTy;
+    }
+    if (isa<ConstantExpr>(value)) {
+        const auto constExpr = cast<ConstantExpr>(value);
+        return constExpr->getOpcode() == Instruction::GetElementPtr;
+    }
+    return true;
+}
+
+Value* LgsFunc::getIRArg(LgsModule* module, LgsExpr* arg) {
+    const auto v = arg->getIRValue(module);
+    if (isa<GlobalVariable>(v) || isa<LoadInst>(v)) return v;
+    const auto ty = arg->type->getIRType(module);
+    if (arg->type->isPrimitive) {
+        return module->builder.CreateLoad(ty, v);
+    }
+    return v;
 }
 
 Value* loadIfNeeded(LgsModule* module, LgsExpr* value, const bool shouldLoad) {
