@@ -14,18 +14,10 @@ public:
     }
 
     Value* call(LgsModule* module, const vector<LgsExpr*>& args) override {
-        vector<Value*> IRArgs;
-        stringstream str;
-        for (int i = 0; i < args.size(); ++i) {
-            const auto arg = args[i];
-            auto argValue = arg->getIRValue(module);
-            IRArgs.push_back(argValue);
-            str << arg->type->getStrFormatPart() << std::endl;
-        }
-        IRArgs.insert(IRArgs.begin(), getIRStr(module, str.str()));
-        const auto printfFunc = getPrintf(module);
-        const auto callInst = module->builder.CreateCall(printfFunc, IRArgs);
-        return callInst;
+        const auto arg = args.front();
+        const auto formatStr = arg->type->getStrFormatPart();
+        const auto IRArgs = {arg->getIRValue(module), getIRStr(module, formatStr)};
+        return module->builder.CreateCall(getPrintf(module), IRArgs);
     }
 
     ~LgsPrint() override = default;

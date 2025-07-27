@@ -31,7 +31,7 @@ Function* LgsFunc::getIRFunc(LgsModule* module) {
     IRFunc = cast<Function>(func.getCallee());
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
-    for (int i = funcType->isStaticMethod; i < funcType->params.size(); ++i) {
+    for (int i = funcType->isStatic; i < funcType->params.size(); ++i) {
         auto& param = funcType->params[i];
         param.setIRValue(args);
         args->setName(param.name);
@@ -40,13 +40,21 @@ Function* LgsFunc::getIRFunc(LgsModule* module) {
     return IRFunc;
 }
 
+Value* getIRArg(LgsModule* module, LgsExpr* arg) {
+    const auto argValue = arg->getIRValue(module);
+    const auto argType = arg->type->getIRType(module);
+    if (arg->type->isPrimitive) {
+        module->builder.CreateLoad(argType, argValue);
+    }
+    return argValue;
+}
+
 Value* LgsFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
     if (funcType->hasDefaults) assert(0);
-    for (int i = funcType->isStaticMethod; i < args.size(); ++i) {
-        const auto arg = args[i];
-        auto argValue = arg->getIRValue(module);
-        IRArgs.push_back(argValue);
+    for (int i = funcType->isStatic; i < args.size(); ++i) {
+        auto arg = getIRArg(module, args[i]);
+        IRArgs.push_back(arg);
     }
     return callIR(module, IRArgs);
 }
@@ -59,6 +67,13 @@ Value* LgsFunc::callIR(LgsModule* module, const vector<Value*>& args) {
     }
     const auto IRFunc = getIRFunc(module);
     return module->builder.CreateCall(IRFunc, args);
+}
+
+Value* loadIfNeeded(LgsModule* module, LgsExpr* value, const bool shouldLoad) {
+    if (shouldLoad) {
+        return module->builder.CreateLoad(value->type->getIRType(module), value->getIRValue(module));
+    }
+    return value->getIRValue(module);
 }
 
 void LgsFunc::createCleanupBlock(LgsModule* module) const {

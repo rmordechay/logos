@@ -14,7 +14,7 @@ public:
     bool isVirtual = false;
     bool isVariadic = false;
     bool isAnonymous = false;
-    bool isStaticMethod = false;
+    bool isStatic = false;
     bool isOptional = false;
     bool hasDefaults = false;
     int returnParamIndex = -1;

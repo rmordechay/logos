@@ -4,7 +4,6 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsIRUtils.h"
-#include "utils/LgsUtils.h"
 
 Value* LgsFuncCall::call(LgsModule* module) const {
     if (callback) {
@@ -13,6 +12,14 @@ Value* LgsFuncCall::call(LgsModule* module) const {
         resolveVirtualFunc(module);
     }
     return func->call(module, args);
+}
+
+Value* LgsFuncCall::createIRValue(LgsModule* module) {
+    return call(module);
+}
+
+void LgsFuncCall::createIRStmt(LgsModule* module) {
+    call(module);
 }
 
 Value* LgsFuncCall::getCallback(LgsModule* module) const {
@@ -27,14 +34,6 @@ Value* LgsFuncCall::getCallback(LgsModule* module) const {
         break;
     }
     assert(0);
-}
-
-Value* LgsFuncCall::createIRValue(LgsModule* module) {
-    return call(module);
-}
-
-void LgsFuncCall::createIRStmt(LgsModule* module) {
-    call(module);
 }
 
 void LgsFuncCall::resolveVirtualFunc(LgsModule* module) const {
@@ -57,7 +56,7 @@ bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
     if (!funcType->isAnonymous && name != funcType->name) return false;
     if (funcType->params.size() != args.size()) return false;
     if (funcType->params.size() == 0 && args.size() == 0) return true;
-    for (size_t i = funcType->isStaticMethod; i < funcType->params.size(); ++i) {
+    for (size_t i = funcType->isStatic; i < funcType->params.size(); ++i) {
         const auto paramType = funcType->params[i].type;
         const auto argType = args[i]->type;
         if (args[i]->isNull) continue;
