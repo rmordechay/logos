@@ -53,6 +53,7 @@
 #include <types/LgsStr.h>
 #include <types/primitives/LgsVoid.h>
 
+
 LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx) {
     LgsFile* file = nullptr;
     if (const auto mainFileCtx = ctx->mainFile()) {
@@ -370,8 +371,8 @@ LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx, string& pare
 
 LgsStmtsBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
     const auto stmtBlock = new LgsStmtsBlock();
-    stmtBlock->setLocation(ctx->start, ctx->stop, filePath);
     if (!ctx) return stmtBlock;
+    stmtBlock->setLocation(ctx->start, ctx->stop, filePath);
     for (const auto& statement : ctx->statement()) {
         auto stmt = getStmt(statement);
         stmtBlock->stmts.emplace_back(stmt);
@@ -396,6 +397,23 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     assert(0);
 }
 
+LgsAssignType mapAssignType(LogosParser::AssignmentContext* assignment) {
+    const auto op = assignment->assignemntOp();
+    if (op->WALRUS()) return ASSIGN;
+    if (op->EQUAL_PLUS()) return ASSIGN_ADD;
+    if (op->EQUAL_MINUS()) return ASSIGN_SUB;
+    if (op->EQUAL_STAR()) return ASSIGN_MUL;
+    if (op->EQUAL_SLASH()) return ASSIGN_DIV;
+    if (op->EQUAL_PERCENT()) return ASSIGN_MOD;
+    if (op->EQUAL_DOUBLE_LANGLE()) return ASSIGN_LSHIFT;
+    if (op->EQUAL_DOUBLE_RANGLE()) return ASSIGN_RSHIFT;
+    if (op->EQUAL_AMPERSAND()) return ASSIGN_AND;
+    if (op->EQUAL_PIPE()) return ASSIGN_OR;
+    if (op->EQUAL_CARET()) return ASSIGN_XOR;
+    assert(false);
+}
+
+
 LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ctx) {
     LgsExpr* lValue = nullptr;
     if (const auto variable = ctx->IDENTIFIER()) {
@@ -403,7 +421,11 @@ LgsAssignment* AntlerConverter::getAssignment(LogosParser::AssignmentContext* ct
     } else if (const auto iterIndex = ctx->iterIndex()) {
         lValue = getIterIndex(iterIndex);
     } else if (const auto selection = ctx->selection()) {
-        lValue = getSelection(selection);
+        const auto lgsSelection = getSelection(selection);
+        if (lgsSelection->selectionType == SELECTION_FUNC_CALL) {
+            errHandler.handleError(E10012, &lgsSelection->location);
+        }
+        lValue = lgsSelection;
     } else {
         assert(0);
     }
@@ -439,8 +461,16 @@ LgsCoroutine* AntlerConverter::getCoroutine(LogosParser::CoroutineContext* ctx) 
     const auto coroutine = new LgsCoroutine();
     if (const auto funcCall = ctx->funcCall()) {
         coroutine->funcCall = getFuncCall(funcCall);
+    } else if (const auto selection = ctx->selection()) {
+        const auto lgsSelection = getSelection(selection);
+        if (lgsSelection->selectionType != SELECTION_FUNC_CALL) {
+            errHandler.handleError(E10021, &lgsSelection->location);
+        }
+        coroutine->selection = lgsSelection;
     } else if (const auto stmtsBlock = ctx->statementsBlock()) {
         coroutine->stmtsBlock = getStmtBlock(stmtsBlock);
+    } else {
+        assert(0);
     }
     return coroutine;
 }
@@ -614,6 +644,28 @@ LgsUnaryExpr* AntlerConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) 
     assert(0);
 }
 
+LgsOperator mapOperator(LogosParser::ExprContext* expr) {
+    if (expr->PLUS()) return ADD;
+    if (expr->MINUS()) return SUB;
+    if (expr->STAR()) return MUL;
+    if (expr->SLASH()) return DIV;
+    if (expr->PERCENT()) return MOD;
+    if (expr->NOT_EQUAL()) return NE;
+    if (expr->DOUBLE_EQUAL()) return EQ;
+    if (expr->RANGLE()) return GT;
+    if (expr->LANGLE()) return LT;
+    if (expr->GE()) return GE;
+    if (expr->LE()) return LE;
+    if (expr->AND()) return AND;
+    if (expr->OR()) return OR;
+    if (expr->AMPERSAND()) return BIT_AND;
+    if (expr->PIPE()) return BIT_OR;
+    if (expr->DOUBLE_LANGLE()) return LSHIFT;
+    if (expr->DOUBLE_RANGLE()) return RSHIFT;
+    if (expr->CARET()) return BIT_XOR;
+    assert(false);
+}
+
 LgsExpr* AntlerConverter::getBinaryExpr(LogosParser::ExprContext* ctx) {
     const auto l = getExpr(ctx->left);
     const auto r = getExpr(ctx->right);
@@ -772,6 +824,14 @@ LgsSelection* AntlerConverter::getSelection(LogosParser::SelectionContext* ctx) 
     const auto exprs = getSelectionExprs(ctx);
     const auto selection = new LgsSelection(exprs);
     selection->setLocation(ctx->start, ctx->stop, filePath);
+    const auto lastExpr = exprs[exprs.size() - 1];
+    if (lastExpr->asFuncCall()) {
+        selection->selectionType = SELECTION_FUNC_CALL;
+    } else if (lastExpr->asVariable()) {
+        selection->selectionType = SELECTION_FIELD;
+    } else if (lastExpr->asIterIndex()) {
+        selection->selectionType = SELECTION_ITER_INDEX;
+    }
     return selection;
 }
 
@@ -969,44 +1029,6 @@ LgsType* AntlerConverter::getTypeFromText(tree::TerminalNode* typeToken) const {
     }
     type->setLocation(typeToken->getSymbol(), nullptr, filePath);
     return type;
-}
-
-LgsAssignType AntlerConverter::mapAssignType(LogosParser::AssignmentContext* assignment) const {
-    const auto op = assignment->assignemntOp();
-    if (op->WALRUS()) return ASSIGN;
-    if (op->EQUAL_PLUS()) return ASSIGN_ADD;
-    if (op->EQUAL_MINUS()) return ASSIGN_SUB;
-    if (op->EQUAL_STAR()) return ASSIGN_MUL;
-    if (op->EQUAL_SLASH()) return ASSIGN_DIV;
-    if (op->EQUAL_PERCENT()) return ASSIGN_MOD;
-    if (op->EQUAL_DOUBLE_LANGLE()) return ASSIGN_LSHIFT;
-    if (op->EQUAL_DOUBLE_RANGLE()) return ASSIGN_RSHIFT;
-    if (op->EQUAL_AMPERSAND()) return ASSIGN_AND;
-    if (op->EQUAL_PIPE()) return ASSIGN_OR;
-    if (op->EQUAL_CARET()) return ASSIGN_XOR;
-    assert(false);
-}
-
-LgsOperator AntlerConverter::mapOperator(LogosParser::ExprContext* expr) const {
-    if (expr->PLUS()) return ADD;
-    if (expr->MINUS()) return SUB;
-    if (expr->STAR()) return MUL;
-    if (expr->SLASH()) return DIV;
-    if (expr->PERCENT()) return MOD;
-    if (expr->NOT_EQUAL()) return NE;
-    if (expr->DOUBLE_EQUAL()) return EQ;
-    if (expr->RANGLE()) return GT;
-    if (expr->LANGLE()) return LT;
-    if (expr->GE()) return GE;
-    if (expr->LE()) return LE;
-    if (expr->AND()) return AND;
-    if (expr->OR()) return OR;
-    if (expr->AMPERSAND()) return BIT_AND;
-    if (expr->PIPE()) return BIT_OR;
-    if (expr->DOUBLE_LANGLE()) return LSHIFT;
-    if (expr->DOUBLE_RANGLE()) return RSHIFT;
-    if (expr->CARET()) return BIT_XOR;
-    assert(false);
 }
 
 bool AntlerConverter::isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec) {

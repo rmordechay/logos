@@ -1,4 +1,6 @@
 #include "stmts/LgsStmt.h"
+
+#include "LgsCoroutine.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsSelection.h"
@@ -18,6 +20,7 @@ LgsFuncCall* LgsStmt::asFuncCall() { return dynamic_cast<LgsFuncCall*>(this); }
 LgsSelection* LgsStmt::asSelection() { return dynamic_cast<LgsSelection*>(this); }
 LgsPostfixExpr* LgsStmt::asPostfixExpr() { return dynamic_cast<LgsPostfixExpr*>(this); }
 LgsContinueStmt* LgsStmt::asContinue() { return dynamic_cast<LgsContinueStmt*>(this); }
+LgsCoroutine* LgsStmt::asCoroutine() { return dynamic_cast<LgsCoroutine*>(this); }
 LgsIfStmt* LgsStmt::asIfStmt() { return dynamic_cast<LgsIfStmt*>(this); }
 LgsPatternMatch* LgsStmt::asPatternMatch() { return dynamic_cast<LgsPatternMatch*>(this); }
 LgsReturn* LgsStmt::asReturn() { return dynamic_cast<LgsReturn*>(this); }

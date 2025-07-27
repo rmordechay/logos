@@ -35,6 +35,9 @@ Value* LgsField::resolveVirtualField(LgsModule* module, LgsExpr* parentExpr) con
 
 void LgsField::storeIRValue(LgsModule* module, Value* instance, LgsExpr* value) {
     const auto exprIRValue = value->getIRValue(module);
+    // if (value->type->isPrimitive) {
+    //     exprIRValue = module->builder.CreateLoad(value->type->getIRType(module), exprIRValue);
+    // }
     module->builder.CreateStore(exprIRValue, instance);
 }
 

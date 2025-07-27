@@ -16,15 +16,14 @@ LgsInstance* getSingleton(LgsExpr* expr) {
 }
 
 Value* LgsSelection::createIRValue(LgsModule* module) {
-    resolveSelection(module);
-    return module->builder.CreateLoad(type->getIRType(module), lastExpr()->IRValue);
+    return resolveSelection(module);
 }
 
 void LgsSelection::createIRStmt(LgsModule* module) {
     resolveSelection(module);
 }
 
-void LgsSelection::resolveSelection(LgsModule* module) const {
+Value* LgsSelection::resolveSelection(LgsModule* module) {
     for (int i = 0; i < exprs.size() - 1; ++i) {
         auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
@@ -41,6 +40,8 @@ void LgsSelection::resolveSelection(LgsModule* module) const {
             assert(0);
         }
     }
+    IRValue = lastExpr()->getIRValue(module);
+    return IRValue;
 }
 
 string LgsSelection::prettyName() {
@@ -65,15 +66,6 @@ LgsExpr* LgsSelection::LastExprParent() const {
 Value* LgsSelection::hashValue(LgsModule* module) {
     const auto lgsExpr = lastExpr();
     return lgsExpr->hashValue(module);
-}
-
-Value* LgsSelection::eqIR(LgsModule* module, LgsExpr* other) {
-    resolveSelection(module);
-    const auto selection = lastExpr();
-    if (const auto var = selection->asVariable()) {
-        return var->eqIR(module, other);
-    }
-    return nullptr;
 }
 
 LgsSelection::~LgsSelection() {

@@ -70,14 +70,10 @@ void LgsAssignment::assignToIterIndex(LgsModule* module, LgsIterIndex* iterIndex
     }
 }
 
-void LgsAssignment::assignToSelection(LgsModule* module, const LgsSelection* selection, LgsExpr* expr) {
-    selection->resolveSelection(module);
-    const auto lastExpr = selection->lastExpr();
-    const auto lastExprParent = selection->LastExprParent();
-    const auto var = lastExpr->asVariable();
-    assert(var && var->ref.symbolType == FIELD);
-    const auto instance = lastExprParent->getIRValue(module);
-    var->ref.field->storeIRValue(module, instance, expr);
+void LgsAssignment::assignToSelection(LgsModule* module, LgsSelection* selection, LgsExpr* expr) {
+    const auto selectionIRValue = selection->resolveSelection(module);
+    const auto var = selection->lastExpr()->asVariable();
+    var->ref.field->storeIRValue(module, selectionIRValue, expr);
 }
 
 void LgsAssignment::assignToVariable(LgsModule* module, LgsVariable* variable, LgsExpr* expr) {

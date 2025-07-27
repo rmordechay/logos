@@ -69,13 +69,11 @@ StructType* LgsDArray::getArrStruct(LgsModule* module) {
 Value* LgsArrayAddFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
     vector<Value*> values;
     const auto arr = args[0];
-    const auto arrPtr = arr->getIRValue(module);
-    const auto value = args[1]->getIRValue(module);
     const auto baseType = arr->type->asIterable()->baseType;
     const auto baseTypeIR = baseType->getIRType(module);
     const auto valuePtr = module->builder.CreateAlloca(baseTypeIR);
-    module->builder.CreateStore(value, valuePtr);
-    return callIR(module, {arrPtr, valuePtr});
+    module->builder.CreateStore(args[1]->getIRValue(module), valuePtr);
+    return callIR(module, {arr->getIRValue(module), valuePtr});
 }
 
 LgsDArray::~LgsDArray() {

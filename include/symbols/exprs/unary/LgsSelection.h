@@ -4,17 +4,24 @@
 
 class LgsUnaryExpr;
 
+enum LgsSelectionType {
+    SELECTION_FUNC_CALL,
+    SELECTION_FIELD,
+    SELECTION_ITER_INDEX,
+    SELECTION_UNKNOWN,
+};
+
 class LgsSelection final : public LgsStmt, public LgsUnaryExpr {
 public:
+    LgsSelectionType selectionType = SELECTION_UNKNOWN;
     std::vector<LgsUnaryExpr*> exprs;
 
     explicit LgsSelection(const std::vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
     string prettyName() override;
     LgsExpr* lastExpr() const;
     LgsExpr* LastExprParent() const;
-    void resolveSelection(LgsModule* module) const;
+    Value* resolveSelection(LgsModule* module);
     Value* hashValue(LgsModule* module) override;
-    Value* eqIR(LgsModule* module, LgsExpr* other) override;
     void createIRStmt(LgsModule* module) override;
     Value* createIRValue(LgsModule* module) override;
     ~LgsSelection() override;

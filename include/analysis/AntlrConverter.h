@@ -104,8 +104,6 @@ public:
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
     LgsType* getTypeFromText(tree::TerminalNode* typeToken) const;
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
-    LgsAssignType mapAssignType(LogosParser::AssignmentContext* assignment) const;
-    LgsOperator mapOperator(LogosParser::ExprContext* expr) const;
     bool isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec);
     ~AntlerConverter() = default;
 };

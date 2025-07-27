@@ -788,6 +788,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *GO();
     FuncCallContext *funcCall();
+    SelectionContext *selection();
     StatementsBlockContext *statementsBlock();
 
    

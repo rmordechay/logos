@@ -34,7 +34,7 @@ public:
     void assignToIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr) const;
     void storeArrayInIterIndex(LgsModule* module, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) const;
     static void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices);
-    static void assignToSelection(LgsModule* module, const LgsSelection* selection, LgsExpr* expr);
+    static void assignToSelection(LgsModule* module, LgsSelection* selection, LgsExpr* expr);
     static void assignToVariable(LgsModule* module, LgsVariable* variable, LgsExpr* expr);
     static void storeScalarInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr);
     static void storeHashMapInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsHashMap* map);

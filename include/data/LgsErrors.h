@@ -20,7 +20,7 @@ inline LgsError E10008{.msg = "'Main.lgs' could not be found in 'src' directory.
 inline LgsError E10009{.msg = "Duplicate Main files were found in the project. Locations:%s", .errCode = errCodeStart++};
 inline LgsError E10010{.msg = "Path is not a root path of a logos project.", .errCode = errCodeStart++};
 inline LgsError E10011{.msg = "'%s' is already declared at line %s.", .errCode = errCodeStart++};
-inline LgsError E10012{.msg = "", .errCode = errCodeStart++};
+inline LgsError E10012{.msg = "Function call cannot be assigned to a value.", .errCode = errCodeStart++};
 inline LgsError E10013{.msg = "Method '%s' is not a member of '%s'.", .errCode = errCodeStart++};
 inline LgsError E10014{.msg = "Expression of type '%s' does not match base type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10015{.msg = "Function with name '%s' was found but it doesn't match the parameters.\n\t   Given:    %s\n\t   Expected: %s", .errCode = errCodeStart++};
@@ -29,7 +29,7 @@ inline LgsError E10017{.msg = "'break' must be inside a loop statement.", .errCo
 inline LgsError E10018{.msg = "Expression of type '%s' cannot be casted to type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10019{.msg = "activeEnv '%s' could not be found in the envs directory.", .errCode = errCodeStart++};
 inline LgsError E10020{.msg = "Environment '%s' does not define the required field '%s'.", .errCode = errCodeStart++};
-inline LgsError E10021{.msg = "", .errCode = errCodeStart++};
+inline LgsError E10021{.msg = "Only function call or block is allowed to run as coroutine.", .errCode = errCodeStart++};
 inline LgsError E10022{.msg = "'%s' cannot be instantiated.", .errCode = errCodeStart++};
 inline LgsError E10023{.msg = "Type '%s' must be nullable.", .errCode = errCodeStart++};
 inline LgsError E10024{.msg = "Declaration of null value must have an explict nullable type.", .errCode = errCodeStart++};

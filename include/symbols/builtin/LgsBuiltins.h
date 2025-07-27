@@ -1,7 +1,6 @@
 #pragma once
 #include "funcs/LgsBuiltinFunc.h"
 #include "utils/LgsIRUtils.h"
-#include "utils/LgsUtils.h"
 #include <types/primitives/LgsVoid.h>
 #include <types/primitives/LgsLong.h>
 #include <types/LgsAny.h>
@@ -19,7 +18,6 @@ public:
         stringstream str;
         for (int i = 0; i < args.size(); ++i) {
             const auto arg = args[i];
-            const auto argType = arg->type->getIRType(module);
             auto argValue = arg->getIRValue(module);
             IRArgs.push_back(argValue);
             str << arg->type->getStrFormatPart() << std::endl;

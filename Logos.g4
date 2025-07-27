@@ -184,7 +184,7 @@ enumField:
     ;
 
 coroutine:
-        GO (funcCall | statementsBlock)
+        GO (funcCall | selection | statementsBlock)
     ;
 
 expr:

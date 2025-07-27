@@ -1,6 +1,7 @@
 #pragma once
 #include <LgsValue.h>
 
+class LgsCoroutine;
 class LgsPostfixExpr;
 class LgsModule;
 class LgsForLoop;
@@ -23,6 +24,7 @@ public:
     LgsPatternMatch* asPatternMatch();
     LgsReturn* asReturn();
     LgsContinueStmt* asContinue();
+    LgsCoroutine* asCoroutine();
     LgsBreakStmt* asBreakStmt();
     LgsFuncCall* asFuncCall();
     LgsSelection* asSelection();

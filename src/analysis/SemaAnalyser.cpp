@@ -1,5 +1,6 @@
 #include "analysis/SemaAnalyser.h"
 
+#include "LgsCoroutine.h"
 #include "data/LgsErrors.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
@@ -117,29 +118,18 @@ void SemaAnalyser::visitField(LgsField* field) {
 }
 
 void SemaAnalyser::visitStmt(LgsStmt* stmt) {
-    if (const auto varDec = stmt->asVarDec()) {
-        visitVarDec(varDec);
-    } else if (const auto ifStmt = stmt->asIfStmt()) {
-        visitIfStmt(ifStmt);
-    } else if (const auto patternMatch = stmt->asPatternMatch()) {
-        visitPatternMatch(patternMatch);
-    } else if (const auto loopStmt = stmt->asLoop()) {
-        visitLoopStmt(loopStmt);
-    } else if (const auto assignment = stmt->asAssignment()) {
-        visitAssignment(assignment);
-    } else if (const auto funcCall = stmt->asFuncCall()) {
-        visitFuncCall(funcCall);
-    } else if (const auto postfixExpr = stmt->asPostfixExpr()) {
-        visitPostfixExpr(postfixExpr);
-    } else if (const auto selection = stmt->asSelection()) {
-        visitSelection(selection);
-    } else if (const auto returnStmt = stmt->asReturn()) {
-        visitReturnStmt(returnStmt);
-    } else if (const auto breakStmt = stmt->asBreakStmt()) {
-        visitBreakStmt(breakStmt);
-    } else if (const auto continueStmt = stmt->asContinue()) {
-        visitContinueStmt(continueStmt);
-    }
+    if (const auto varDec = stmt->asVarDec()) visitVarDec(varDec);
+    else if (const auto ifStmt = stmt->asIfStmt()) visitIfStmt(ifStmt);
+    else if (const auto patternMatch = stmt->asPatternMatch()) visitPatternMatch(patternMatch);
+    else if (const auto loopStmt = stmt->asLoop()) visitLoopStmt(loopStmt);
+    else if (const auto assignment = stmt->asAssignment()) visitAssignment(assignment);
+    else if (const auto funcCall = stmt->asFuncCall()) visitFuncCall(funcCall);
+    else if (const auto postfixExpr = stmt->asPostfixExpr()) visitPostfixExpr(postfixExpr);
+    else if (const auto selection = stmt->asSelection()) visitSelection(selection);
+    else if (const auto returnStmt = stmt->asReturn()) visitReturnStmt(returnStmt);
+    else if (const auto breakStmt = stmt->asBreakStmt()) visitBreakStmt(breakStmt);
+    else if (const auto continueStmt = stmt->asContinue()) visitContinueStmt(continueStmt);
+    else if (const auto coroutine = stmt->asCoroutine()) visitCoroutine(coroutine);
 }
 
 void SemaAnalyser::visitStmtBlock(LgsStmtsBlock* stmtBlock) {
@@ -278,6 +268,18 @@ void SemaAnalyser::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
     visitStmtBlock(infiniteLoop->stmtBlock);
 }
 
+void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
+    if (coroutine->stmtsBlock) {
+        visitStmtBlock(coroutine->stmtsBlock);
+    } else if (coroutine->funcCall) {
+        visitFuncCall(coroutine->funcCall);
+    } else if (coroutine->selection) {
+        visitSelection(coroutine->selection);
+    } else {
+        assert(0);
+    }
+}
+
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
     const auto funcType = stack.currentFunc()->funcType;
     const auto retExpr = returnStmt->expr;
@@ -364,6 +366,17 @@ void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
     } else {
         assert(0);
     }
+}
+
+void inferBaseType(const LgsArrayExpr* array) {
+    LgsType* baseType = nullptr;
+    const auto first = array->initialElements.front();
+    if (const auto innerArr = first->asArrayExpr()) {
+        baseType = innerArr->type;
+    } else {
+        baseType = first->type;
+    }
+    array->type->asIterable()->baseType = baseType;
 }
 
 void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
@@ -713,6 +726,19 @@ void SemaAnalyser::validateInterfaces(LgsObject* obj, const vector<LgsType*>& in
     }
 }
 
+string getMissingImplementsStr(const vector<LgsField*>& fields, const vector<LgsFunc*>& methods) {
+    stringstream str;
+    str << "\n\t\tFields:";
+    for (const auto& field : fields) {
+        str << "\n\t\t     - " << field->name << ": " <<  field->type->prettyName();
+    }
+    str << "\n\t\tMethods:";
+    for (const auto& method : methods) {
+        str << "\n\t\t     - " << method->funcType->prettyName();
+    }
+    return str.str();
+}
+
 void SemaAnalyser::validateImplements(LgsObject* type, LgsInterface* interface) {
     // Fields
     vector<LgsField*> missingFields;
@@ -918,17 +944,6 @@ bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentTyp
     return false;
 }
 
-void SemaAnalyser::inferBaseType(const LgsArrayExpr* array) {
-    LgsType* baseType = nullptr;
-    const auto first = array->initialElements.front();
-    if (const auto innerArr = first->asArrayExpr()) {
-        baseType = innerArr->type;
-    } else {
-        baseType = first->type;
-    }
-    array->type->asIterable()->baseType = baseType;
-}
-
 LgsType* SemaAnalyser::resolveType(LgsType* type) {
     if (const auto nullable = type->asNullable()) {
         nullable->baseType = resolveType(nullable->baseType);
@@ -1041,15 +1056,3 @@ void SemaAnalyser::resolveGroupTypes(LgsGroup* group) {
     }
 }
 
-string SemaAnalyser::getMissingImplementsStr(const vector<LgsField*>& fields, const vector<LgsFunc*>& methods) {
-    stringstream str;
-    str << "\n\t\tFields:";
-    for (const auto& field : fields) {
-        str << "\n\t\t     - " << field->name << ": " <<  field->type->prettyName();
-    }
-    str << "\n\t\tMethods:";
-    for (const auto& method : methods) {
-        str << "\n\t\t     - " << method->funcType->prettyName();
-    }
-    return str.str();
-}

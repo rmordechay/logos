@@ -1,3 +1,4 @@
+#include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 
 #include <doctest.h>
