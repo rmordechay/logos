@@ -30,6 +30,7 @@ public:
     Value* createIRValue(LgsModule* module) override;
     Value* callIR(LgsModule* module, const vector<Value*>& args = {});
     void createCleanupBlock(LgsModule* module) const;
+    static Value* getIRArg(LgsModule* module, LgsExpr* arg);
     virtual Value* call(LgsModule* module, const vector<LgsExpr*>& args = {});
     virtual void generateIR(LgsModule* module);
     virtual Function* getIRFunc(LgsModule* module);

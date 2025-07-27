@@ -12,7 +12,7 @@
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsUInt.h"
-#include "types/primitives/LgsVoid.h"
+#include "../../include/symbols/types/LgsVoid.h"
 #include "utils/LgsIRUtils.h"
 
 bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {

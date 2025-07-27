@@ -1,4 +1,4 @@
-#include "types/primitives/LgsVoid.h"
+#include "../../../include/symbols/types/LgsVoid.h"
 
 #include "exprs/LgsNullValue.h"
 

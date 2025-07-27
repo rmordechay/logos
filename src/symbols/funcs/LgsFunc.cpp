@@ -40,15 +40,6 @@ Function* LgsFunc::getIRFunc(LgsModule* module) {
     return IRFunc;
 }
 
-Value* getIRArg(LgsModule* module, LgsExpr* arg) {
-    const auto argValue = arg->getIRValue(module);
-    const auto argType = arg->type->getIRType(module);
-    if (arg->type->isPrimitive) {
-        module->builder.CreateLoad(argType, argValue);
-    }
-    return argValue;
-}
-
 Value* LgsFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
     if (funcType->hasDefaults) assert(0);
@@ -67,6 +58,15 @@ Value* LgsFunc::callIR(LgsModule* module, const vector<Value*>& args) {
     }
     const auto IRFunc = getIRFunc(module);
     return module->builder.CreateCall(IRFunc, args);
+}
+
+Value* LgsFunc::getIRArg(LgsModule* module, LgsExpr* arg) {
+    const auto argValue = arg->getIRValue(module);
+    const auto argType = arg->type->getIRType(module);
+    if (arg->type->isPrimitive) {
+        return module->builder.CreateLoad(argType, argValue);
+    }
+    return argValue;
 }
 
 Value* loadIfNeeded(LgsModule* module, LgsExpr* value, const bool shouldLoad) {

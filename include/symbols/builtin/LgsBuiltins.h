@@ -1,7 +1,7 @@
 #pragma once
 #include "funcs/LgsBuiltinFunc.h"
 #include "utils/LgsIRUtils.h"
-#include <types/primitives/LgsVoid.h>
+#include <types/LgsVoid.h>
 #include <types/primitives/LgsLong.h>
 #include <types/LgsAny.h>
 
@@ -16,7 +16,7 @@ public:
     Value* call(LgsModule* module, const vector<LgsExpr*>& args) override {
         const auto arg = args.front();
         const auto formatStr = arg->type->getStrFormatPart();
-        const auto IRArgs = {arg->getIRValue(module), getIRStr(module, formatStr)};
+        const auto IRArgs = {getIRArg(module, arg), getIRStr(module, formatStr)};
         return module->builder.CreateCall(getPrintf(module), IRArgs);
     }
 

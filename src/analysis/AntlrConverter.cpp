@@ -51,7 +51,7 @@
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
 #include <types/LgsStr.h>
-#include <types/primitives/LgsVoid.h>
+#include <types/LgsVoid.h>
 
 
 LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx) {

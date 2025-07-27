@@ -75,7 +75,7 @@ set(SOURCE_FILES
     src/symbols/types/primitives/LgsLong.cpp
     src/symbols/types/primitives/LgsShort.cpp
     src/symbols/types/primitives/LgsSize.cpp
-    src/symbols/types/primitives/LgsVoid.cpp
+    src/symbols/types/LgsVoid.cpp
     src/symbols/types/LgsAny.cpp
     src/symbols/types/LgsDArray.cpp
     src/symbols/types/LgsSArray.cpp

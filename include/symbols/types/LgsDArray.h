@@ -4,7 +4,7 @@
 #include "primitives/LgsBool.h"
 #include "primitives/LgsInt.h"
 #include "primitives/LgsLong.h"
-#include "primitives/LgsVoid.h"
+#include "LgsVoid.h"
 #include "types/LgsIterable.h"
 
 class LgsArrayAddFunc final : public LgsBuiltinFunc {

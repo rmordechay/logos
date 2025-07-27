@@ -3,7 +3,7 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "funcs/LgsBuiltinFunc.h"
 #include "primitives/LgsBool.h"
-#include "primitives/LgsVoid.h"
+#include "LgsVoid.h"
 #include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 

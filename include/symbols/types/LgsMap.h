@@ -3,7 +3,7 @@
 #include "LgsStr.h"
 #include "funcs/LgsBuiltinFunc.h"
 #include "primitives/LgsInt.h"
-#include "primitives/LgsVoid.h"
+#include "LgsVoid.h"
 #include "types/LgsTypePair.h"
 
 class LgsMapEntry;

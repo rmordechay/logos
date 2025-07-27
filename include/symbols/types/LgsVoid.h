@@ -1,7 +1,5 @@
 #pragma once
 #include "LgsType.h"
-#include "logos/LgsModule.h"
-
 
 class LgsVoid final : public LgsType {
 public:
@@ -9,7 +7,6 @@ public:
 
     LgsVoid() {
         isVoid = true;
-        isPrimitive = true;
     }
     string prettyName() override;
     Type* getIRType(LgsModule* module) override;
