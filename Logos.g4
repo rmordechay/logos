@@ -119,8 +119,9 @@ statement:
     |   CONTINUE
     |   breakStmt
     |   returnStatement
-    |   GO? funcCall
+    |   funcCall
     |   selection
+    |   coroutine
     |   postfixExpr
     ;
 
@@ -180,6 +181,10 @@ enumDeclaration:
 
 enumField:
         IDENTIFIER (EQUAL STRING)?
+    ;
+
+coroutine:
+        GO (funcCall | statementsBlock)
     ;
 
 expr:

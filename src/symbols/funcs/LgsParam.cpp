@@ -5,13 +5,13 @@ string LgsParam::format(string& indentStr) {
     return name + ": " + type->prettyName();
 }
 
-Value* LgsParam::getIRValue(LgsModule* runtime) {
+Value* LgsParam::getIRValue(LgsModule* module) {
     if (IRValue) return IRValue;
     if (isVariadic) {
         if (vaList) return vaList;
-        vaList = runtime->builder.CreateAlloca(runtime->builder.getPtrTy());
-        const auto vaStart = getOrInsertDeclaration(runtime->IRModule, Intrinsic::vastart, {runtime->builder.getPtrTy()});
-        runtime->builder.CreateCall(vaStart, {vaList});
+        vaList = module->builder.CreateAlloca(module->builder.getPtrTy());
+        const auto vaStart = getOrInsertDeclaration(module->IRModule, Intrinsic::vastart, {module->builder.getPtrTy()});
+        module->builder.CreateCall(vaStart, {vaList});
         return vaList;
     }
     assert(0);

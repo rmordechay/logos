@@ -43,14 +43,14 @@ public:
     RuleIfStatement = 32, RuleElseIfStatement = 33, RuleElseStatement = 34, 
     RulePatternMatching = 35, RulePattern = 36, RuleLoopStatement = 37, 
     RuleBreakStmt = 38, RuleReturnStatement = 39, RuleEnumDeclaration = 40, 
-    RuleEnumField = 41, RuleExpr = 42, RuleUnaryExpr = 43, RulePrefixExpr = 44, 
-    RulePostfixExpr = 45, RuleArrayExpr = 46, RuleHashMap = 47, RuleKeyValue = 48, 
-    RuleFuncCall = 49, RuleFuncArgList = 50, RuleFuncArg = 51, RuleConstructor = 52, 
-    RuleConstructorArgList = 53, RuleConstructorArg = 54, RuleConstant = 55, 
-    RuleIterIndex = 56, RuleIndex = 57, RuleSelection = 58, RuleFirstSelectionElement = 59, 
-    RuleInnerSelectionElement = 60, RuleRange = 61, RuleType = 62, RuleMapType = 63, 
-    RuleArraySize = 64, RuleFuncType = 65, RuleVector = 66, RuleRequireEnvVars = 67, 
-    RuleAssignemntOp = 68
+    RuleEnumField = 41, RuleCoroutine = 42, RuleExpr = 43, RuleUnaryExpr = 44, 
+    RulePrefixExpr = 45, RulePostfixExpr = 46, RuleArrayExpr = 47, RuleHashMap = 48, 
+    RuleKeyValue = 49, RuleFuncCall = 50, RuleFuncArgList = 51, RuleFuncArg = 52, 
+    RuleConstructor = 53, RuleConstructorArgList = 54, RuleConstructorArg = 55, 
+    RuleConstant = 56, RuleIterIndex = 57, RuleIndex = 58, RuleSelection = 59, 
+    RuleFirstSelectionElement = 60, RuleInnerSelectionElement = 61, RuleRange = 62, 
+    RuleType = 63, RuleMapType = 64, RuleArraySize = 65, RuleFuncType = 66, 
+    RuleVector = 67, RuleRequireEnvVars = 68, RuleAssignemntOp = 69
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -112,6 +112,7 @@ public:
   class ReturnStatementContext;
   class EnumDeclarationContext;
   class EnumFieldContext;
+  class CoroutineContext;
   class ExprContext;
   class UnaryExprContext;
   class PrefixExprContext;
@@ -564,8 +565,8 @@ public:
     BreakStmtContext *breakStmt();
     ReturnStatementContext *returnStatement();
     FuncCallContext *funcCall();
-    antlr4::tree::TerminalNode *GO();
     SelectionContext *selection();
+    CoroutineContext *coroutine();
     PostfixExprContext *postfixExpr();
 
    
@@ -780,6 +781,19 @@ public:
   };
 
   EnumFieldContext* enumField();
+
+  class  CoroutineContext : public antlr4::ParserRuleContext {
+  public:
+    CoroutineContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *GO();
+    FuncCallContext *funcCall();
+    StatementsBlockContext *statementsBlock();
+
+   
+  };
+
+  CoroutineContext* coroutine();
 
   class  ExprContext : public antlr4::ParserRuleContext {
   public:

@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "LgsCoroutine.h"
 #include "LogosParser.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "funcs/LgsFunc.h"
@@ -66,17 +67,17 @@ public:
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     LgsStmtsBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
+    LgsCoroutine* getCoroutine(LogosParser::CoroutineContext* ctx);
+    LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
+    LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LgsBreakStmt* getBreakStmt(LogosParser::StatementContext* ctx) const;
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
-    LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
-    LgsFuncType* getFuncType(LogosParser::FuncTypeContext* ctx);
-    LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
     LgsForLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getRangeLoop(LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getForeachLoop(LogosParser::LoopStatementContext* ctx);
-    LgsForLoop* getInfiniteLoop(LogosParser::LoopStatementContext* ctx);
+    LgsForLoop* getInfiniteLoop(LogosParser::LoopStatementContext* ctx) const;
     LgsEnum* getEnum(LogosParser::EnumDeclarationContext* ctx);
     LgsExpr* getExpr(LogosParser::ExprContext* ctx);
     LgsExpr* getCast(LogosParser::ExprContext* ctx);
@@ -99,12 +100,12 @@ public:
     LgsUnaryExpr* getNullValue(const tree::TerminalNode* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsGroup* getGroup(LogosParser::GroupContext* ctx);
+    LgsFuncType* getFuncType(LogosParser::FuncTypeContext* ctx);
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
     LgsType* getTypeFromText(tree::TerminalNode* typeToken) const;
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     LgsAssignType mapAssignType(LogosParser::AssignmentContext* assignment) const;
     LgsOperator mapOperator(LogosParser::ExprContext* expr) const;
     bool isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec);
-    bool isBuiltinName(const string& name, const Location* location);
     ~AntlerConverter() = default;
 };

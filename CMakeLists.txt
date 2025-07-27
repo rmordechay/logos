@@ -10,6 +10,7 @@ set(SOURCE_FILES
     src/logos/LgsApp.cpp
     src/logos/LgsStack.cpp
     src/logos/LgsLinker.cpp
+    src/logos/LgsScheduler.cpp
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
     src/cli/LgsCli.cpp
@@ -24,10 +25,12 @@ set(SOURCE_FILES
     src/parser/LogosParser.cpp
     src/utils/LgsUtils.cpp
     src/utils/ThreadPool.cpp
+    src/utils/LgsIRUtils.cpp
 
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsValue.cpp
     src/symbols/LgsSymbolTable.cpp
+    src/symbols/LgsCoroutine.cpp
     src/symbols/exprs/LgsBinaryExpr.cpp
     src/symbols/exprs/unary/LgsCast.cpp
     src/symbols/exprs/LgsExpr.cpp
@@ -89,15 +92,13 @@ set(SOURCE_FILES
     src/symbols/types/LgsIterator.cpp
     src/symbols/types/LgsCPtr.cpp
     src/symbols/types/LgsNullable.cpp
-    src/utils/LgsIRUtils.cpp
-    include/utils/LgsIRUtils.h
 )
 
 add_subdirectory(stdlib)
 add_library(lib ${SOURCE_FILES})
 target_precompile_headers(lib PRIVATE include/pch.h)
-target_link_libraries(lib PRIVATE lgslib)
 
+target_link_libraries(lib PRIVATE lgslib)
 target_include_directories(lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/stdlib/include

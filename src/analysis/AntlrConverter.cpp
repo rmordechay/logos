@@ -1,14 +1,13 @@
 #include "analysis/AntlrConverter.h"
 
+#include "LgsCoroutine.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "files/LgsInterfaceFile.h"
 #include "LogosLexer.h"
-#include "builtin/LgsBuiltins.h"
 #include "exprs/unary/LgsCast.h"
 #include "exprs/LgsNullValue.h"
 #include "exprs/LgsBinaryExpr.h"
-
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsCharConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
@@ -371,6 +370,7 @@ LgsField* AntlerConverter::getField(LogosParser::FieldContext* ctx, string& pare
 
 LgsStmtsBlock* AntlerConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
     const auto stmtBlock = new LgsStmtsBlock();
+    stmtBlock->setLocation(ctx->start, ctx->stop, filePath);
     if (!ctx) return stmtBlock;
     for (const auto& statement : ctx->statement()) {
         auto stmt = getStmt(statement);
@@ -383,6 +383,7 @@ LgsStmt* AntlerConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto fieldDef = ctx->assignment()) return getAssignment(fieldDef);
     if (const auto implicitVarDec = ctx->implicitVarDec()) return getImplicitVarDec(implicitVarDec);
     if (const auto explicitVarDec = ctx->explicitVarDec()) return getExplicitVarDec(explicitVarDec);
+    if (const auto coroutine = ctx->coroutine()) return getCoroutine(coroutine);
     if (const auto ifStmt = ctx->ifStatement()) return getIfStatement(ifStmt);
     if (const auto patternMatching = ctx->patternMatching()) return getPatternMatching(patternMatching);
     if (const auto loopStmt = ctx->loopStatement()) return getLoopStatement(loopStmt);
@@ -434,23 +435,20 @@ LgsVarDec* AntlerConverter::getExplicitVarDec(LogosParser::ExplicitVarDecContext
     return varDec;
 }
 
+LgsCoroutine* AntlerConverter::getCoroutine(LogosParser::CoroutineContext* ctx) {
+    const auto coroutine = new LgsCoroutine();
+    if (const auto funcCall = ctx->funcCall()) {
+        coroutine->funcCall = getFuncCall(funcCall);
+    } else if (const auto stmtsBlock = ctx->statementsBlock()) {
+        coroutine->stmtsBlock = getStmtBlock(stmtsBlock);
+    }
+    return coroutine;
+}
+
 LgsStmt* AntlerConverter::getReturnStmt(LogosParser::ReturnStatementContext* ctx) {
     const auto rs = new LgsReturn(getExpr(ctx->expr()));
     rs->setLocation(ctx->start, ctx->stop, filePath);
     return rs;
-}
-
-LgsFuncType* AntlerConverter::getFuncType(LogosParser::FuncTypeContext* ctx) {
-    const auto rt = getType(ctx->rt);
-    const auto funcType = new LgsFuncType();
-    funcType->setLocation(ctx->start, ctx->stop, filePath);
-    funcType->rt = rt;
-    for (const auto paramType : ctx->type()) {
-        if (paramType == ctx->rt) continue;
-        const auto type = getType(paramType);
-        funcType->params.emplace_back(LgsParam(type));
-    }
-    return funcType;
 }
 
 LgsIfStmt* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
@@ -535,7 +533,7 @@ LgsForLoop* AntlerConverter::getForeachLoop(LogosParser::LoopStatementContext* c
     return foreachLoop;
 }
 
-LgsForLoop* AntlerConverter::getInfiniteLoop(LogosParser::LoopStatementContext* ctx) {
+LgsForLoop* AntlerConverter::getInfiniteLoop(LogosParser::LoopStatementContext* ctx) const {
     const auto rangeLoop = new LgsInfiniteLoop();
     if (!ctx->IDENTIFIER().empty()) {
         const auto idToken = ctx->IDENTIFIER()[0];
@@ -899,6 +897,19 @@ LgsGroup* AntlerConverter::getGroup(LogosParser::GroupContext* ctx) {
     }
     globals.addSymbol(group->name, LgsSymbol(group), &errHandler);
     return group;
+}
+
+LgsFuncType* AntlerConverter::getFuncType(LogosParser::FuncTypeContext* ctx) {
+    const auto rt = getType(ctx->rt);
+    const auto funcType = new LgsFuncType();
+    funcType->setLocation(ctx->start, ctx->stop, filePath);
+    funcType->rt = rt;
+    for (const auto paramType : ctx->type()) {
+        if (paramType == ctx->rt) continue;
+        const auto type = getType(paramType);
+        funcType->params.emplace_back(LgsParam(type));
+    }
+    return funcType;
 }
 
 LgsType* AntlerConverter::getArrayType(LogosParser::TypeContext* ctx) {
