@@ -1,5 +1,4 @@
 #include "utils/LgsIRUtils.h"
-
 #include "data/LgsDefinitions.h"
 #include "funcs/LgsFunc.h"
 

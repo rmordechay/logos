@@ -2,11 +2,6 @@
 #include "data/PlatformData.h"
 
 struct Platform {
-    string osName = OS_NAME;
-    string linker = LINKER;
-    string arch = ARCH_NAME;
-    string platformVersion = PLATFORM_VERSION;
-    vector<const char*> linkerOpts = LINKER_OPTS;
     bool (*link)(ArrayRef<const char*>, raw_ostream&, raw_ostream&, bool, bool) = LINK_FUNC;
 };
 
@@ -16,6 +11,7 @@ struct LgsPaths {
     path srcDir;
     path envsDir;
     path buildDir;
+    path buildIR;
     path clibRoot;
     path clibInclude;
     path appFilePath;

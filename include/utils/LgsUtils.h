@@ -1,9 +1,8 @@
 #pragma once
-#include "exprs/LgsExpr.h"
-#include "logos/LgsModule.h"
 
-class LgsApp;
-struct LgsIndex;
+class LgsErrHandler;
+struct Location;
+class LgsType;
 
 enum LogLevel {
     INFO,
@@ -13,6 +12,7 @@ enum LogLevel {
 
 void lgsLog(const string& text, LogLevel level = INFO);
 bool isLogosFile(const directory_entry& entry);
+bool isLLVMFile(const directory_entry& entry);
 bool isCharPointer(clang::QualType qt);
 bool isLogosKeyword(const string& s);
 void cleanStr(string& value);

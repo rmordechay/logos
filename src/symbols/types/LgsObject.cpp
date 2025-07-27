@@ -13,7 +13,6 @@ string LgsObject::getName() {
 }
 
 Type* LgsObject::getIRType(LgsModule* module) {
-    if (IRType) return IRType;
     // Add one or zero if table exists
     const size_t offset = !!vtable;
     vector<Type*> elementTypes(fields.size() + offset);

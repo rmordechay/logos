@@ -31,11 +31,10 @@ Value* LgsSelection::resolveSelection(LgsModule* module) {
         if (i == 0 && singleton) {
             parentExpr = singleton;
         }
-        if (const auto methodCall = childExpr->asFuncCall()) {
-            methodCall->setIRValue(methodCall->getIRValue(module));
+        if (childExpr->asFuncCall()) {
+            childExpr->getIRValue(module);
         } else if (const auto fieldVar = childExpr->asVariable()){
-            const auto fieldIR = fieldVar->ref.field->getIRValue(module, parentExpr);
-            childExpr->setIRValue(fieldIR);
+            fieldVar->ref.field->getIRValue(module, parentExpr);
         } else {
             assert(0);
         }

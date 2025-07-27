@@ -35,7 +35,7 @@ void LgsApp::run() {
     if (!generate()) handleExitWithErrors();
 
     // Linking
-    if (!link(paths, modules)) handleExitWithErrors();
+    if (!link(paths)) handleExitWithErrors();
 
     // Running
     execv(paths.execFilePath.c_str(), args.data());
@@ -268,6 +268,7 @@ void LgsApp::initPaths(const path& rootDirPath) {
     paths.srcDir = paths.rootDir / LOGOS_SRC_DIR;
     paths.envsDir = paths.rootDir / LOGOS_ENVS_DIR;
     paths.buildDir = paths.rootDir / LOGOS_BUILD_DIR;
+    paths.buildIR = paths.buildDir / LOGOS_BUILD_IR;
     paths.objFilePath = paths.buildDir / LOGOS_OBJECT_FILE;
     paths.execFilePath = paths.buildDir / LOGOS_EXECUTABLE_FILE;
     paths.appFilePath = paths.rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
@@ -285,12 +286,13 @@ void LgsApp::handleExitWithErrors() const {
 void LgsApp::createBuildDir() const {
     if (exists(paths.buildDir)) remove_all(paths.buildDir);
     create_directories(paths.buildDir);
+    create_directories(paths.buildIR);
 }
 
 void LgsApp::writeIRToFile() {
     for (const auto [_, module] : modules) {
         if constexpr (WRITE_IR_TO_FILE) {
-            const auto filePath = (paths.buildDir / module->IRModule->getName().str()).string() + ".ll";
+            const auto filePath = (paths.buildIR / module->IRModule->getName().str()).string() + ".ll";
             std::error_code EC;
             raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
             module->IRModule->print(textFile, nullptr);

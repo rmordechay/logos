@@ -5,6 +5,7 @@ static const unordered_set<string> LOGOS_KEYWORDS = {"object", "single", "self",
 #define LOGOS_SRC_DIR "src"
 #define LOGOS_ENVS_DIR "envs"
 #define LOGOS_BUILD_DIR "build"
+#define LOGOS_BUILD_IR "IR"
 #define LOGOS_MAIN_FILE_NAME "Main"
 #define LOGOS_APP_FILE_NAME "App"
 #define LOGOS_MAIN_FUNC "main"

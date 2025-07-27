@@ -40,7 +40,6 @@ string LgsFuncType::getName() {
 }
 
 Type* LgsFuncType::getIRType(LgsModule* module) {
-    if (IRType) return IRType;
     const auto returnType = rt->getIRType(module);
     vector<Type*> IRParamsTypes;
     for (int i = isStatic; i < params.size(); ++i) {

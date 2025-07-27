@@ -17,6 +17,10 @@ bool isLogosFile(const directory_entry& entry) {
     return entry.is_regular_file() && entry.path().extension().string() == LOGOS_FILE_EXTENSION;
 }
 
+bool isLLVMFile(const directory_entry& entry) {
+    return entry.is_regular_file() && entry.path().extension().string() == ".ll";
+}
+
 bool isCharPointer(const clang::QualType qt) {
     if (!qt->isPointerType()) return false;
     const auto pointeeType = qt->getPointeeType();
