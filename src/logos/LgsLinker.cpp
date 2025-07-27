@@ -2,7 +2,6 @@
 #include "data/LgsDefinitions.h"
 #include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
-
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include <llvm/Transforms/Utils/Cloning.h>
 

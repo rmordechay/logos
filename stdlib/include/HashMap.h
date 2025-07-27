@@ -1,5 +1,4 @@
-#ifndef HASHMAP_H
-#define HASHMAP_H
+#pragma once
 #include "Iterator.h"
 #include <stdbool.h>
 
@@ -28,5 +27,3 @@ void Map_free(const HashMap* map);
 bool Map_hasNext(Iterator* iter);
 void* Map_next(Iterator* iter);
 void Map_initIter(HashMap* map, Iterator* iter);
-
-#endif //HASHMAP_H

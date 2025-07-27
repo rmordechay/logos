@@ -1,5 +1,4 @@
-#ifndef ITERATOR_H
-#define ITERATOR_H
+#pragma once
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -19,5 +18,3 @@ struct Iterator {
 static void Iter_reset(Iterator* iter) {
     iter->current = 0;
 }
-
-#endif //ITERATOR_H

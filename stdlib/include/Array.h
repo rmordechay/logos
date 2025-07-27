@@ -1,5 +1,4 @@
-#ifndef DYNARRAY_H
-#define DYNARRAY_H
+#pragma once
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -17,5 +16,3 @@ size_t Array_len(const Array* arr);
 bool Array_isEmpty(const Array* arr);
 bool Array_isNotEmpty(const Array* arr);
 void Array_free(const Array* arr);
-
-#endif //DYNARRAY_H
