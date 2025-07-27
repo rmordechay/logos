@@ -88,6 +88,7 @@ bool LgsApp::analyse() {
 
 bool LgsApp::generate() {
     initLLVM();
+    initBuildDir();
     ThreadPool threadPool;
     for (const auto& file : files) {
         threadPool.runTask([file, this] {
@@ -283,7 +284,7 @@ void LgsApp::handleExitWithErrors() const {
     return exit(1);
 }
 
-void LgsApp::createBuildDir() const {
+void LgsApp::initBuildDir() const {
     if (exists(paths.buildDir)) remove_all(paths.buildDir);
     create_directories(paths.buildDir);
     create_directories(paths.buildIR);

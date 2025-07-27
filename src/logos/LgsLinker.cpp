@@ -36,22 +36,24 @@ bool generateObjFile(const LgsPaths& paths, Module* module) {
 bool link(const LgsPaths& paths) {
     LLVMContext context;
     unique_ptr<Module> mainModule = nullptr;
+    vector<unique_ptr<Module>> modules;
     for (const auto& entry : directory_iterator(paths.buildIR)) {
         if (!isLLVMFile(entry)) continue;
-        if (entry.path().filename() == LOGOS_MAIN_FILE_NAME) {
-
-        }
         SMDiagnostic err;
-        // auto module = parseIRFile(entry.path().string(), err, context);
+        if (entry.path().filename().stem() == LOGOS_MAIN_FILE_NAME) {
+            mainModule = parseIRFile(entry.path().string(), err, context);
+        } else {
+            auto module = parseIRFile(entry.path().string(), err, context);
+            modules.push_back(std::move(module));
+        }
     }
-    // Linker llvmLinker(*mainIRModule);
-    // for (const auto [name, module] : modules) {
-    //     if (name == LOGOS_MAIN_FILE_NAME) continue;
-    //     llvmLinker.linkInModule(CloneModule(*module->IRModule));
-    // }
-    // if (!generateObjFile(paths, mainIRModule.get())) {
-    //     return false;
-    // }
+    Linker llvmLinker(*mainModule);
+    for (auto& module : modules) {
+        llvmLinker.linkInModule(std::move(module));
+    }
+    if (!generateObjFile(paths, mainModule.get())) {
+        return false;
+    }
 
     vector linkerOpts = LINKER_OPTS;
     linkerOpts.push_back(paths.objFilePath.c_str());
