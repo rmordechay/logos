@@ -21,6 +21,8 @@ static const unordered_set<string> LOGOS_KEYWORDS = {"object", "single", "self",
 #define BLOCK_NAME_EXIT_PATTERN "exit_pattern_matching"
 #define BLOCK_NAME_CASE_PREFIX "case_"
 #define BLOCK_NAME_ENTRY "entry"
+#define BLOCK_NAME_SUSPEND "suspend"
+#define BLOCK_NAME_RESUME "resume"
 #define BLOCK_NAME_IF_END "if_end"
 #define BLOCK_NAME_ELSE "else"
 #define BLOCK_NAME_ELSE_IF "else_if"

@@ -5,6 +5,30 @@
 #include "data/PlatformData.h"
 #include "utils/LgsErrHandler.h"
 
+
+void a() {
+    vector<string> strings = {
+        "apple", "banana", "cherry", "date", "elderberry"
+    };
+
+    unordered_map<string, streampos> stringOffsets;
+
+    ofstream out("strings.dat", ios::binary);
+    for (const auto& str : strings) {
+        const auto pos = out.tellp();
+        auto len = str.size();
+        out.write(reinterpret_cast<const char*>(&len), sizeof(len));
+        out.write(str.data(), len);
+        stringOffsets[str] = pos;
+    }
+    out.close();
+
+    // Debug: print offsets
+    for (const auto& [s, offset] : stringOffsets) {
+        cout << s << " at " << offset << "\n";
+    }
+}
+
 void logInfo(const string& text) {
     cout << text << NEW_LINE;
 }

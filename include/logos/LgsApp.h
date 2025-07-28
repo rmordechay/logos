@@ -39,7 +39,6 @@ public:
         initPaths(rootDirPath);
     }
 
-    void handleExitWithErrors() const;
     void run();
     void initPaths(const path& rootDirPath);
     bool validate();
@@ -47,6 +46,7 @@ public:
     bool analyse();
     void initBuildDir() const;
     bool generate();
+    bool link() const;
     void parseSrcFile(const string& codeText, path filePath = "");
     void parseEnvFile(path fileEntry);
     void parseAppFile(path fileEntry);
@@ -56,8 +56,7 @@ public:
     void setupActiveEnv();
     void loadBuiltins();
     void loadEnvFiles();
-    void checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile);
     void checkRequiredEnvVars();
-    void writeIRToFile();
+    void handleExitWithErrors() const;
     ~LgsApp();
 };

@@ -35,7 +35,7 @@ void LgsApp::run() {
     if (!generate()) handleExitWithErrors();
 
     // Linking
-    if (!link(paths)) handleExitWithErrors();
+    if (!link()) handleExitWithErrors();
 
     // Running
     execv(paths.execFilePath.c_str(), args.data());
@@ -100,8 +100,12 @@ bool LgsApp::generate() {
         });
     }
     threadPool.wait();
-    writeIRToFile();
     return errHandler.successful;
+}
+
+bool LgsApp::link() const {
+    LgsLinker linker(paths, modules);
+    return linker.link();
 }
 
 void LgsApp::parseSrcFile(const string& codeText, path filePath) {
@@ -225,21 +229,17 @@ void LgsApp::loadEnvFiles() {
 void LgsApp::checkRequiredEnvVars() {
     for (const auto& requireEnvVar : appFile->requireEnvVars) {
         for (const auto envFile : envFiles) {
-            checkRequiredEnvVar(requireEnvVar, envFile);
+            auto found = false;
+            for (const auto& varDec : envFile->varDecs) {
+                if (requireEnvVar.name == varDec->name && requireEnvVar.type->equals(varDec->type)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                errHandler.handleError(E10020, nullptr, {envFile->name, requireEnvVar.name});
+            }
         }
-    }
-}
-
-void LgsApp::checkRequiredEnvVar(const RequireEnvVar& requireEnvVar, LgsEnvFile* envFile) {
-    auto found = false;
-    for (const auto& varDec : envFile->varDecs) {
-        if (requireEnvVar.name == varDec->name && requireEnvVar.type->equals(varDec->type)) {
-            found = true;
-            break;
-        }
-    }
-    if (!found) {
-        errHandler.handleError(E10020, nullptr, {envFile->name, requireEnvVar.name});
     }
 }
 
@@ -288,21 +288,6 @@ void LgsApp::initBuildDir() const {
     if (exists(paths.buildDir)) remove_all(paths.buildDir);
     create_directories(paths.buildDir);
     create_directories(paths.buildIR);
-}
-
-void LgsApp::writeIRToFile() {
-    for (const auto [_, module] : modules) {
-        if constexpr (WRITE_IR_TO_FILE) {
-            const auto filePath = (paths.buildIR / module->IRModule->getName().str()).string() + ".ll";
-            std::error_code EC;
-            raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
-            module->IRModule->print(textFile, nullptr);
-        }
-        if (logLevel == DEBUG) {
-            module->IRModule->print(outs(), nullptr);
-            logInfo("\n-----\n\n");
-        }
-    }
 }
 
 LgsApp::~LgsApp() {

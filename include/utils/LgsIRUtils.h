@@ -52,30 +52,30 @@ inline Type* i64Ty(LgsModule* module) {
     return IntegerType::getInt64Ty(module->context);
 }
 
-inline Value* i1(LgsModule* module, const bool v) {
+inline ConstantInt* i1(LgsModule* module, const bool v) {
     return module->builder.getInt1(v);
 }
 
-inline Value* i8(LgsModule* module, const int8_t v) {
+inline ConstantInt* i8(LgsModule* module, const int8_t v) {
     return module->builder.getInt8(v);
 }
 
-inline Value* i16(LgsModule* module, const int16_t v) {
+inline ConstantInt* i16(LgsModule* module, const int16_t v) {
     return module->builder.getInt16(v);
 }
 
-inline Value* i32(LgsModule* module, const int32_t v) {
+inline ConstantInt* i32(LgsModule* module, const int32_t v) {
     return module->builder.getInt32(v);
 }
 
-inline Value* i64(LgsModule* module, const int64_t v) {
+inline ConstantInt* i64(LgsModule* module, const int64_t v) {
     return module->builder.getInt64(v);
 }
 
-inline Value* i32Zero(LgsModule* module) {
+inline ConstantInt* i32Zero(LgsModule* module) {
     return module->builder.getInt32(0);
 }
 
-inline Value* i64Zero(LgsModule* module) {
+inline ConstantInt* i64Zero(LgsModule* module) {
     return module->builder.getInt64(0);
 }

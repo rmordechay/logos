@@ -32,7 +32,7 @@ public:
     void createIRStmt(LgsModule* module) override;
     void createIRAssign(LgsModule* module) const;
     void assignToIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr) const;
-    void storeArrayInIterIndex(LgsModule* module, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) const;
+    static void storeArrayInIterIndex(LgsModule* module, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr);
     static void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices);
     static void assignToSelection(LgsModule* module, LgsSelection* selection, LgsExpr* expr);
     static void assignToVariable(LgsModule* module, LgsVariable* variable, LgsExpr* expr);
