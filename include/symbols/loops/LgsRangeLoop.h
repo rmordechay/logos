@@ -3,10 +3,10 @@
 
 class LgsRangeLoop final : public LgsForLoop {
 public:
-    LgsExpr* rangeStart = nullptr;
-    LgsExpr* rangeEnd = nullptr;
+    LgsExpr* startRange = nullptr;
+    LgsExpr* endRange = nullptr;
 
-    LgsRangeLoop(LgsExpr* rangeStart, LgsExpr* rangeEnd) : rangeStart(rangeStart), rangeEnd(rangeEnd) {}
+    LgsRangeLoop(LgsExpr* rangeStart, LgsExpr* rangeEnd) : startRange(rangeStart), endRange(rangeEnd) {}
     Value* loopStart(LgsModule* module) override;
     Value* loopEnd(LgsModule* module) override;
     void initIRLoop(LgsModule* module) override;

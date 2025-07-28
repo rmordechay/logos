@@ -20,6 +20,10 @@ public:
         return module->builder.CreateCall(getPrintf(module), IRArgs);
     }
 
+    static Value* call(LgsModule* module, const LgsType* type, Value* value) {
+        return module->builder.CreateCall(getPrintf(module), {getIRStr(module, type->getStrFormatPart()), value});
+    }
+
     ~LgsPrint() override = default;
 };
 

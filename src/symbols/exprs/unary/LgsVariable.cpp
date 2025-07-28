@@ -27,15 +27,17 @@ Value* LgsVariable::createIRValue(LgsModule* module) {
     case FUNC:
         return ref.func->getIRFunc(module);
     case OBJECT:
-        assert(ref.object->singleton);
         return ref.object->singleton->getIRValue(module);
     case ENUM:
         return getIRStr(module, name);
     case FIELD:
         return getIRStr(module, name);
-    default:
-        assert(0);
+    case INTERFACE:
+    case GROUP:
+    case UNKNOWN:
+        break;
     }
+    assert(0);
 }
 
 bool LgsVariable::equals(LgsExpr* other) {

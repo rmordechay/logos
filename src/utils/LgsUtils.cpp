@@ -5,12 +5,12 @@
 #include "data/PlatformData.h"
 #include "utils/LgsErrHandler.h"
 
-void lgsLog(const string& text, const LogLevel level) {
-    if (level == ERROR) {
-        cerr << text << NEW_LINE;
-    } else {
-        cout << text << NEW_LINE;
-    }
+void logInfo(const string& text) {
+    cout << text << NEW_LINE;
+}
+
+void logErr(const string& text) {
+    cerr << text << NEW_LINE;
 }
 
 bool isLogosFile(const directory_entry& entry) {

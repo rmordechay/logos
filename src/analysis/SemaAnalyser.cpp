@@ -243,7 +243,9 @@ void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
 }
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
-    const auto loopVar = rangeLoop->loopVars[0];
+    const auto loopVar = rangeLoop->loopVars.front();
+    visitExpr(rangeLoop->startRange);
+    visitExpr(rangeLoop->endRange);
     addLocalSymbol(loopVar->name, LgsSymbol(loopVar));
     visitStmtBlock(rangeLoop->stmtBlock);
 }

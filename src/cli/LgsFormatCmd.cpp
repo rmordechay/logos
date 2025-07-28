@@ -9,5 +9,5 @@ void LgsFormatCmd::validate() {
 }
 
 void LgsFormatCmd::printHelp() {
-    lgsLog("Usage: lgs format <path>\n\n");
+    logInfo("Usage: lgs format <path>\n\n");
 }

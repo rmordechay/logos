@@ -10,7 +10,8 @@ enum LogLevel {
     ERROR,
 };
 
-void lgsLog(const string& text, LogLevel level = INFO);
+void logInfo(const string& text);
+void logErr(const string& text);
 bool isLogosFile(const directory_entry& entry);
 bool isLLVMFile(const directory_entry& entry);
 bool isCharPointer(clang::QualType qt);

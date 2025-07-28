@@ -4,26 +4,28 @@
 #include "utils/LgsUtils.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include <llvm/Transforms/Utils/Cloning.h>
+#include <llvm/Transforms/Coroutines/CoroSplit.h>
+#include <llvm/Transforms/Coroutines/CoroElide.h>
+#include <llvm/Transforms/Coroutines/CoroCleanup.h>
 
 bool validateModule(const Module* module) {
     string err;
     raw_string_ostream s(err);
     if (verifyModule(*module, &s)) {
-        lgsLog(err, ERROR);
+        logErr(err);
         return false;
     }
     return true;
 }
 
 bool generateObjFile(const LgsPaths& paths, Module* module) {
-    // if (!validateModule(module)) return false;
+    if (!validateModule(module)) return false;
     error_code ec;
     legacy::PassManager pass;
     raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
     const auto addedPassFailed = getTargetMachine()->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
-
     if (addedPassFailed) {
-        cerr << ec.message() << NEW_LINE;
+        logErr(ec.message() + NEW_LINE);
         return false;
     }
     pass.run(*module);
@@ -39,13 +41,22 @@ bool link(const LgsPaths& paths) {
     for (const auto& entry : directory_iterator(paths.buildIR)) {
         if (!isLLVMFile(entry)) continue;
         SMDiagnostic err;
+        auto parsedModule = parseIRFile(entry.path().string(), err, context);
+        if (!parsedModule) {
+            logErr(err.getMessage().str());
+            logErr(err.getLineContents().str());
+            for (auto fixIt : err.getFixIts()) {
+                logErr(fixIt.getText().str());
+            }
+            return false;
+        }
         if (entry.path().filename().stem() == LOGOS_MAIN_FILE_NAME) {
-            mainModule = parseIRFile(entry.path().string(), err, context);
+            mainModule = std::move(parsedModule);
         } else {
-            auto module = parseIRFile(entry.path().string(), err, context);
-            modules.push_back(std::move(module));
+            modules.push_back(std::move(parsedModule));
         }
     }
+
     Linker llvmLinker(*mainModule);
     for (auto& module : modules) {
         llvmLinker.linkInModule(std::move(module));

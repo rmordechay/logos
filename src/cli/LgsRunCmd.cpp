@@ -21,5 +21,5 @@ void LgsRunCmd::setArgs(LgsApp* app) const {
 }
 
 void LgsRunCmd::printHelp() {
-    lgsLog("Usage: lgs run <path> <options>\n");
+    logInfo("Usage: lgs run <path> <options>\n");
 }

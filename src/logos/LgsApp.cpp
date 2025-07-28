@@ -279,7 +279,7 @@ void LgsApp::initPaths(const path& rootDirPath) {
 
 void LgsApp::handleExitWithErrors() const {
     for (auto error : errHandler.errors) {
-        lgsLog(LOGOS_ERROR_STR + error.msg);
+        logInfo(LOGOS_ERROR_STR + error.msg);
     }
     return exit(1);
 }
@@ -300,7 +300,7 @@ void LgsApp::writeIRToFile() {
         }
         if (logLevel == DEBUG) {
             module->IRModule->print(outs(), nullptr);
-            lgsLog("\n-----\n\n");
+            logInfo("\n-----\n\n");
         }
     }
 }

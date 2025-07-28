@@ -5,11 +5,11 @@
 #include "utils/LgsUtils.h"
 
 Value* LgsRangeLoop::loopStart(LgsModule* module) {
-    return rangeStart->getIRValue(module);
+    return startRange->getIRValue(module);
 }
 
 Value* LgsRangeLoop::loopEnd(LgsModule* module) {
-    return rangeEnd->getIRValue(module);
+    return endRange->getIRValue(module);
 }
 
 void LgsRangeLoop::initIRLoop(LgsModule* module) {
@@ -46,5 +46,5 @@ void LgsRangeLoop::exitIRLoop(LgsModule* module) const {
 
 LgsRangeLoop::~LgsRangeLoop() {
     // rangeStart will be freed with varDec freeing
-    delete rangeEnd;
+    delete endRange;
 }

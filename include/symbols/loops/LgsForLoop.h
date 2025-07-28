@@ -8,8 +8,8 @@ class LgsExpr;
 
 class LgsForLoop : public LgsStmt {
 public:
-    AllocaInst* iPtr = nullptr;
     vector<LgsVarDec*> loopVars;
+    AllocaInst* iPtr = nullptr;
     LgsStmtsBlock* stmtBlock = nullptr;
     BasicBlock* IRCondBlock = nullptr;
     BasicBlock* IRBodyBlock = nullptr;

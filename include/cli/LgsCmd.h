@@ -21,7 +21,7 @@ inline void LgsCmd::printInfoAndExit() {
 }
 
 inline void LgsCmd::printInfoAndExit(const std::string& msg) {
-    lgsLog(msg);
+    logInfo(msg);
     printInfoAndExit();
 }
 

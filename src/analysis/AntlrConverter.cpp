@@ -534,10 +534,7 @@ LgsForLoop* AntlerConverter::getLoopStatement(LogosParser::LoopStatementContext*
 }
 
 LgsForLoop* AntlerConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx) {
-    auto startExpr = getExpr(ctx->iterableRange->start);
-    if (!startExpr) {
-        startExpr = LGS_INT.getZeroValue();
-    }
+    const auto startExpr = getExpr(ctx->iterableRange->start);
     const auto endExpr = getExpr(ctx->iterableRange->end);
     const auto rangeLoop = new LgsRangeLoop(startExpr, endExpr);
     const auto loopVarToken = ctx->IDENTIFIER().front();

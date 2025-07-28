@@ -7,6 +7,6 @@ void LgsGenerateCmd::runCmd() {
 }
 
 void LgsGenerateCmd::printHelp() {
-    lgsLog("Usage: lgs generate <path> <options>");
+    logInfo("Usage: lgs generate <path> <options>");
 }
 

@@ -21,7 +21,7 @@ generate_grammar:
 	mv src/parser/*.h include/parser/
 
 run_llvm:
-	cd project/build && clang Main.ll ../../stdlib/lgslib.a -o output
+	cd project/build && clang IR/Main.ll ../../cmake-build-debug/stdlib/liblgslib.a -o output
 	cd project/build && ./output
 
 run_linux_docker tests/platforms/Dockerfile:
