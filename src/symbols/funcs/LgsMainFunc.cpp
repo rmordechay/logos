@@ -9,12 +9,19 @@
 void LgsMainFunc::generateIR(LgsModule* module) {
     module->stack.enterScope(FUNC_SCOPE, this);
     startFuncBlock(module);
-    if (!funcType->params.empty()) initArgs(module);
-    for (auto [_, symbol] : module->globals.symbols) {
-        if (symbol.symbolType != OBJECT || !symbol.object->singleton) continue;
-        symbol.object->singleton->getIRValue(module);
+    if (!stmtBlock->stmts.empty()) {
+        const auto firstStmt = stmtBlock->stmts.front();
+        callPushStack(module, firstStmt->location, LOGOS_MAIN_FUNC_NAME);
+        if (!funcType->params.empty()) {
+            initArgs(module);
+        }
+        for (auto [_, symbol] : module->globals.symbols) {
+            if (symbol.symbolType != OBJECT || !symbol.object->singleton) continue;
+            symbol.object->singleton->getIRValue(module);
+        }
+        stmtBlock->createIRValue(module);
+        createCleanupBlock(module);
     }
-    stmtBlock->createIRValue(module);
     module->builder.CreateRet(i32(module, EXIT_SUCCESS));
     module->stack.exitScope();
 }
@@ -27,7 +34,7 @@ Function* LgsMainFunc::getIRFunc(LgsModule* module) {
     } else {
         mainFuncType = FunctionType::get(i32Ty(module), {i32Ty(module), module->builder.getPtrTy()}, false);
     }
-    auto func = module->IRModule->getOrInsertFunction(LOGOS_MAIN_FUNC, mainFuncType);
+    auto func = module->IRModule->getOrInsertFunction(LOGOS_MAIN_FUNC_NAME, mainFuncType);
     IRFunc = dyn_cast<Function>(func.getCallee());
     if (funcType->params.empty()) return IRFunc;
     auto IRArgs = IRFunc->arg_begin();

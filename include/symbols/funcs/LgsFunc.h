@@ -24,7 +24,7 @@ public:
         type = funcType;
     }
     explicit LgsFunc(LgsFuncType* funcType) : LgsUnaryExpr(funcType), funcType(funcType) {}
-    void freeFunc(LgsModule* module) const;
+    void freeAllocations(LgsModule* module) const;
     string prettyName() override;
     string format(string& tabs) override;
     Value* createIRValue(LgsModule* module) override;

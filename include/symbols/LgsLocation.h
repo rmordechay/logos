@@ -1,6 +1,6 @@
 #pragma once
 
-struct Location {
+struct LgsLocation {
     size_t lineNumberStart{};
     size_t lineNumberEnd{};
     size_t posInLineStart{};
@@ -11,7 +11,7 @@ struct Location {
         return to_string(lineNumberStart);
     }
 
-    string getFullPath(const path& path) const {
-        return path.string() + ":" + lineNumberStr() + ":" + to_string(posInLineStart);
+    string getFullPath() const {
+        return filePath.string() + ":" + lineNumberStr() + ":" + to_string(posInLineStart);
     }
 };

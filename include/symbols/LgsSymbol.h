@@ -9,7 +9,7 @@ class LgsInterface;
 class LgsObject;
 class LgsParam;
 class LgsVarDec;
-class Location;
+class LgsLocation;
 
 enum LgsSymbolType {
     VAR_DEC,
@@ -35,7 +35,7 @@ struct LgsSymbol {
     LgsEnum* lgsEnum = nullptr;
     LgsFunc* func = nullptr;
     LgsGroup* group = nullptr;
-    Location* location;
+    LgsLocation* location;
 
     explicit LgsSymbol();
     explicit LgsSymbol(LgsParam* param);

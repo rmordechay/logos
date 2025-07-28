@@ -1,11 +1,10 @@
 #include "stmts/LgsIfStmt.h"
-
 #include "data/LgsDefinitions.h"
 #include "logos/LgsModule.h"
 #include "utils/LgsIRUtils.h"
-#include "utils/LgsUtils.h"
 
 void LgsIfStmt::createIRStmt(LgsModule* module) {
+    callPrintError(module, "Something went wrong");
     module->stack.enterScope(IF_SCOPE, this);
     if (elseIfConds.empty()) {
         if (!elseStmtBlock) {

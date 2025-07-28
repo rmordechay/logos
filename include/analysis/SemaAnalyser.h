@@ -49,13 +49,13 @@ public:
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
-    void visitField(LgsField* field);
+    void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
     void visitStmtBlock(LgsStmtsBlock* stmtBlock);
     void visitVarDec(LgsVarDec* varDec);
-    void visitAssignment(LgsAssignment* assignment);
+    void visitAssignment(const LgsAssignment* assignment);
     void visitIfStmt(LgsIfStmt* ifStmt);
     void visitPatternMatch(LgsPatternMatch* patternMatching);
     void visitBoolPatternMatching(const LgsPatternMatch* patternMatching);
@@ -70,10 +70,10 @@ public:
     void visitEnum(const LgsEnum* lgsEnum) const;
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
-    void visitArrayExpr(LgsArrayExpr* array);
+    void visitArrayExpr(const LgsArrayExpr* array);
     void visitStaticArray(const LgsArrayExpr* arrayExpr);
     void visitDynamicArray(const LgsArrayExpr* array);
-    void visitHashMap(LgsHashMap* hashMap);
+    void visitHashMap(const LgsHashMap* hashMap);
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
@@ -84,7 +84,7 @@ public:
     void visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
-    void visitFieldSelection(const LgsExpr* parentExpr, LgsVariable* childField);
+    void visitFieldSelection(LgsVariable* childField, LgsType* parentType);
     void visitFirstSelection(LgsExpr* firstExpr);
     void visitInstance(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex);
@@ -105,7 +105,7 @@ public:
     void validateFuncControlFlow(const LgsFunc* func);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
-    LgsSymbol* getSymbol(const string& name, const Location* location);
+    LgsSymbol* getSymbol(const string& name, const LgsLocation* location);
     void addLocalSymbol(const string& name, const LgsSymbol& newSymbol);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);

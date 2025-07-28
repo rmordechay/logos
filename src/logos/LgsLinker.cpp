@@ -10,28 +10,33 @@
 #include <llvm/Transforms/Coroutines/CoroCleanup.h>
 #include <llvm/Transforms/Coroutines/CoroElide.h>
 
+unique_ptr<Module> parseModule(LLVMContext& context, const string& path) {
+    SMDiagnostic diag;
+    auto parsedModule = parseIRFile(path, diag, context);
+    if (!parsedModule) {
+        logErr(diag.getMessage().str());
+        logErr(diag.getLineContents().str());
+        for (auto fixIt : diag.getFixIts()) {
+            logErr(fixIt.getText().str());
+        }
+        return nullptr;
+    }
+    return parsedModule;
+}
 
 bool LgsLinker::link() const {
-    if (!writeIRFiles()) return false;
+    writeIRFiles();
     LLVMContext context;
     unique_ptr<Module> mainModule = nullptr;
     vector<unique_ptr<Module>> modules;
     for (const auto& entry : directory_iterator(paths.buildIR)) {
         if (!isLLVMFile(entry)) continue;
-        SMDiagnostic err;
-        auto parsedModule = parseIRFile(entry.path().string(), err, context);
-        if (!parsedModule) {
-            logErr(err.getMessage().str());
-            logErr(err.getLineContents().str());
-            for (auto fixIt : err.getFixIts()) {
-                logErr(fixIt.getText().str());
-            }
-            return false;
-        }
+        auto module = parseModule(context, entry.path());
+        if (!module) return false;
         if (entry.path().filename().stem() == LOGOS_MAIN_FILE_NAME) {
-            mainModule = std::move(parsedModule);
+            mainModule = std::move(module);
         } else {
-            modules.push_back(std::move(parsedModule));
+            modules.push_back(std::move(module));
         }
     }
 
@@ -88,8 +93,7 @@ bool LgsLinker::generateObjFile(unique_ptr<Module> mainModule) const {
     return true;
 }
 
-bool LgsLinker::writeIRFiles() const {
-    auto valid = true;
+void LgsLinker::writeIRFiles() const {
     for (const auto module : modules) {
         const auto IRModule = module.second->IRModule;
         if constexpr (WRITE_IR_TO_FILE) {
@@ -102,18 +106,7 @@ bool LgsLinker::writeIRFiles() const {
             IRModule->print(outs(), nullptr);
             logInfo("\n-----\n\n");
         }
-        valid = validateModule(IRModule) && valid;
     }
-    return valid;
 }
 
-bool LgsLinker::validateModule(const Module* module) {
-    string err;
-    raw_string_ostream s(err);
-    if (verifyModule(*module, &s)) {
-        logErr(err);
-        return false;
-    }
-    return true;
-}
 

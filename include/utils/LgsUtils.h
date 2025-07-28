@@ -1,7 +1,7 @@
 #pragma once
 
 class LgsErrHandler;
-struct Location;
+struct LgsLocation;
 class LgsType;
 
 enum LogLevel {
@@ -20,4 +20,4 @@ void cleanStr(string& value);
 string getFileText(path filePath);
 string removeUnderscores(const string& input);
 void freeType(const LgsType* type);
-bool isBuiltinName(const string& name, const Location* location, LgsErrHandler& errHandler);
+bool isBuiltinName(const string& name, const LgsLocation* location, LgsErrHandler& errHandler);

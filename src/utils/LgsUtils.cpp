@@ -6,29 +6,6 @@
 #include "utils/LgsErrHandler.h"
 
 
-void a() {
-    vector<string> strings = {
-        "apple", "banana", "cherry", "date", "elderberry"
-    };
-
-    unordered_map<string, streampos> stringOffsets;
-
-    ofstream out("strings.dat", ios::binary);
-    for (const auto& str : strings) {
-        const auto pos = out.tellp();
-        auto len = str.size();
-        out.write(reinterpret_cast<const char*>(&len), sizeof(len));
-        out.write(str.data(), len);
-        stringOffsets[str] = pos;
-    }
-    out.close();
-
-    // Debug: print offsets
-    for (const auto& [s, offset] : stringOffsets) {
-        cout << s << " at " << offset << "\n";
-    }
-}
-
 void logInfo(const string& text) {
     cout << text << NEW_LINE;
 }
@@ -81,7 +58,7 @@ void freeType(const LgsType* type) {
     // delete type;
 }
 
-bool isBuiltinName(const string& name, const Location* location, LgsErrHandler& errHandler) {
+bool isBuiltinName(const string& name, const LgsLocation* location, LgsErrHandler& errHandler) {
     const auto isLgsBuiltin = name == LgsSizeOf::name || name == LgsPrint::name;
     if (isLgsBuiltin) {
         errHandler.handleError(E10053, location, {name});

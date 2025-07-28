@@ -4,6 +4,7 @@
 #include "utils/LgsErrHandler.h"
 #include "Platform.h"
 #include "extern/LgsCLang.h"
+#include "types/LgsAny.h"
 
 class LgsModule;
 class LgsStrConst;
@@ -24,9 +25,8 @@ public:
     string name;
     string version;
     LgsPaths paths;
-    LgsCLang lgsCLang;
-    vector<char*> args;
     LgsEnv activeEnv;
+    vector<char*> args;
     LgsSymbolTable globals;
     vector<LgsFile*> files;
     LgsErrHandler errHandler;
@@ -34,6 +34,7 @@ public:
     LgsAppFile* appFile = nullptr;
     vector<LgsEnvFile*> envFiles;
     map<string, LgsModule*> modules;
+    LgsCLang lgsCLang;
 
     explicit LgsApp(const path& rootDirPath = "") : lgsCLang(paths) {
         initPaths(rootDirPath);

@@ -118,7 +118,7 @@ LgsMainFile* AntlerConverter::getMainFile(LogosParser::MainFileContext* ctx) {
 
     for (const auto func : funcImplementations) {
         auto funcName = func->funcSignature()->funcSignatureHeader()->IDENTIFIER()->getText();
-        if (funcName == LOGOS_MAIN_FUNC) {
+        if (funcName == LOGOS_MAIN_FUNC_NAME) {
             mainFile->funcs[funcName] = getMainFunc(func);
         } else {
             const auto funcImpl = getFuncImpl(func);
@@ -843,6 +843,7 @@ vector<LgsUnaryExpr*> AntlerConverter::getSelectionExprs(LogosParser::SelectionC
             exprs.push_back(lgsField);
         } else if (const auto funcCall = currentExpr->funcCall()) {
             const auto logosMethodCall = getFuncCall(funcCall);
+            logosMethodCall->isMethodCall = true;
             const auto prevExpr = exprs[i];
             logosMethodCall->args.insert(logosMethodCall->args.begin(), prevExpr);
             exprs.push_back(logosMethodCall);

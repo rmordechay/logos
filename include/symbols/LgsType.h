@@ -31,7 +31,7 @@ class LgsModule;
 
 class LgsType {
 public:
-    Location location;
+    LgsLocation location;
     bool isVoid = false;
     bool isInt = false;
     bool isUnsigned = false;

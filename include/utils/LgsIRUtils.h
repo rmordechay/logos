@@ -19,6 +19,11 @@ FunctionCallee getSnprintf(LgsModule* module);
 FunctionCallee getStrHash(LgsModule* module);
 Function* getMemcpy(LgsModule* module);
 TargetMachine* getTargetMachine();
+void writeStringsToFile(const vector<LgsFile*>& files);
+void readStringsFromFile(const streampos& pos);
+void callPushStack(LgsModule* module, const LgsLocation& location, const string& funcName);
+void callPopStack(LgsModule* module);
+void callPrintError(LgsModule* module, const string& msg);
 
 inline PointerType* ptrTy(LgsModule* module) {
     return PointerType::getUnqual(module->context);

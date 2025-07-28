@@ -9,11 +9,11 @@ class LgsFuncCall final : public LgsStmt, public LgsUnaryExpr {
 public:
     string name;
     vector<LgsExpr*> args;
-    LgsSymbol* callback = nullptr;
     LgsFunc* func = nullptr;
+    bool isMethodCall = false;
+    LgsSymbol* callback = nullptr;
 
     explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
-    Value* call(LgsModule* module) const;
     Value* getCallback(LgsModule* module) const;
     void createIRStmt(LgsModule* module) override;
     Value* createIRValue(LgsModule* module) override;

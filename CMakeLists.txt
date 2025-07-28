@@ -10,7 +10,6 @@ set(SOURCE_FILES
     src/logos/LgsApp.cpp
     src/logos/LgsStack.cpp
     src/logos/LgsLinker.cpp
-    src/logos/LgsScheduler.cpp
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
     src/cli/LgsCli.cpp

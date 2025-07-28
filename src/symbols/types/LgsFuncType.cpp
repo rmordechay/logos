@@ -63,7 +63,7 @@ LgsExpr* LgsFuncType::getZeroValue() {
 string LgsFuncType::prettyName() {
     stringstream strStream;
     strStream << name << '(';
-    for (size_t i = 0; i < params.size(); ++i) {
+    for (size_t i = isMethod; i < params.size(); ++i) {
         strStream << params[i].type->prettyName();
         if (i != params.size() - 1) strStream << ", ";
     }

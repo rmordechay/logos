@@ -9,6 +9,8 @@ class LgsFile {
 public:
     string name;
     path absPath;
+    streampos pos = 0;
+    streampos pathIndex = 0;
     LgsSymbolTable symbolTable;
     vector<LgsStrConst*> externFiles;
 

@@ -89,6 +89,7 @@ bool LgsApp::analyse() {
 bool LgsApp::generate() {
     initLLVM();
     initBuildDir();
+    writeStringsToFile(files);
     ThreadPool threadPool;
     for (const auto& file : files) {
         threadPool.runTask([file, this] {
@@ -104,7 +105,7 @@ bool LgsApp::generate() {
 }
 
 bool LgsApp::link() const {
-    LgsLinker linker(paths, modules);
+    const LgsLinker linker(paths, modules);
     return linker.link();
 }
 

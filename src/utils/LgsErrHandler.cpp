@@ -5,7 +5,7 @@ void LgsErrHandler::setUnsuccessful() {
     successful = false;
 }
 
-void LgsErrHandler::handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args) {
+void LgsErrHandler::handleError(const LgsError& lgsErr, const LgsLocation* location, const vector<string>& args) {
     setUnsuccessful();
     auto pos = 0;
     auto argIndex = 0;
@@ -15,7 +15,7 @@ void LgsErrHandler::handleError(const LgsError& lgsErr, const Location* location
         pos += args[argIndex].length();
         argIndex++;
     }
-    const auto finalResult = result + "\n\t   at " + location->getFullPath(location->filePath) + "\n---";
+    const auto finalResult = result + "\n\t   at " + location->getFullPath() + "\n---";
     errors.emplace_back(LgsError{.msg = finalResult, .errCode = lgsErr.errCode});
 }
 

@@ -5,7 +5,8 @@
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsIRUtils.h"
 
-Value* LgsFuncCall::call(LgsModule* module) const {
+Value* LgsFuncCall::createIRValue(LgsModule* module) {
+    callPushStack(module, location, name);
     if (callback) {
         func->setIRValue(getCallback(module));
     } else if (func->funcType->isVirtual) {
@@ -14,12 +15,8 @@ Value* LgsFuncCall::call(LgsModule* module) const {
     return func->call(module, args);
 }
 
-Value* LgsFuncCall::createIRValue(LgsModule* module) {
-    return call(module);
-}
-
 void LgsFuncCall::createIRStmt(LgsModule* module) {
-    call(module);
+    createIRValue(module);
 }
 
 Value* LgsFuncCall::getCallback(LgsModule* module) const {
@@ -83,7 +80,7 @@ bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
 string LgsFuncCall::prettyName() {
     stringstream strStream;
     strStream << name << '(';
-    for (size_t i = 0; i < args.size(); ++i) {
+    for (size_t i = isMethodCall; i < args.size(); ++i) {
         strStream << args[i]->type->prettyName();
         if (i != args.size() - 1) strStream << ", ";
     }

@@ -5,7 +5,7 @@
 #include "utils/LgsIRUtils.h"
 
 LgsModule* LgsMainFile::generateIR(LgsSymbolTable& globals) {
-    const auto module = new LgsModule(globals);
+    const auto module = new LgsModule(*this, globals);
     module->IRModule = createIRModule(LOGOS_MAIN_FILE_NAME, module->context);
     for (const auto object : objects) {
         object->getIRType(module);

@@ -9,7 +9,7 @@ using namespace llvm;
 
 class LgsValue {
 public:
-    Location location;
+    LgsLocation location;
     bool isMutable = false;
     Value* IRValue = nullptr;
 

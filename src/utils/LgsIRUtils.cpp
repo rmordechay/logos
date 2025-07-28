@@ -1,6 +1,8 @@
 #include "utils/LgsIRUtils.h"
 #include "data/LgsDefinitions.h"
+#include "files/LgsFile.h"
 #include "funcs/LgsFunc.h"
+#include "types/LgsVoid.h"
 
 void initLLVM() {
     InitializeNativeTarget();
@@ -100,4 +102,46 @@ TargetMachine* getTargetMachine() {
     lock_guard lock(mtx);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), nullopt);
     return targetMachine;
+}
+
+void writeStringsToFile(const vector<LgsFile*>& files) {
+    ofstream ofs("paths.dat", ios::binary);
+    for (const auto file : files) {
+        const auto s = file->absPath.string();
+        file->pos = ofs.tellp();
+        uint32_t len = static_cast<uint32_t>(s.size());
+        ofs.write(reinterpret_cast<const char*>(&len), sizeof(len));
+        ofs.write(s.data(), s.size());
+    }
+}
+
+void readStringsFromFile(const streampos& pos) {
+    ifstream ifs("paths.dat", ios::binary);
+    ifs.seekg(pos);
+
+    int32_t len = 0;
+    ifs.read(reinterpret_cast<char*>(&len), sizeof(len));
+
+    string path(len, '\0');
+    ifs.read(&path[0], len);
+}
+
+void callPushStack(LgsModule* module, const LgsLocation& location, const string& funcName) {
+    const auto ft = FunctionType::get(LGS_VOID.getIRType(module), {ptrTy(module), ptrTy(module)}, false);
+    const auto func = module->IRModule->getOrInsertFunction("push_stack_frame", ft);
+    const auto funcNameIR = getIRStr(module, funcName);
+    const auto pathIR = getIRStr(module, location.getFullPath());
+    module->builder.CreateCall(func, {funcNameIR, pathIR});
+}
+
+void callPopStack(LgsModule* module) {
+    const auto ft = FunctionType::get(LGS_VOID.getIRType(module), false);
+    const auto func = module->IRModule->getOrInsertFunction("pop_stack_frame", ft);
+    module->builder.CreateCall(func);
+}
+
+void callPrintError(LgsModule* module, const string& msg) {
+    const auto ft = FunctionType::get(LGS_VOID.getIRType(module), {ptrTy(module)}, false);
+    const auto func = module->IRModule->getOrInsertFunction("print_error", ft);
+    module->builder.CreateCall(func, {getIRStr(module, msg)});
 }

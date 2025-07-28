@@ -2,7 +2,7 @@
 #include "data/LgsErrors.h"
 #include "data/LgsWarnings.h"
 
-struct Location;
+struct LgsLocation;
 
 class LgsErrHandler {
 public:
@@ -11,7 +11,7 @@ public:
     vector<LgsWarning> warnings;
 
     void setUnsuccessful();
-    void handleError(const LgsError& lgsErr, const Location* location, const vector<string>& args = {});
+    void handleError(const LgsError& lgsErr, const LgsLocation* location, const vector<string>& args = {});
     void addErrors(vector<LgsError> newErrors);
     ~LgsErrHandler() = default;
 };

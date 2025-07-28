@@ -8,7 +8,7 @@ static const unordered_set<string> LOGOS_KEYWORDS = {"object", "single", "self",
 #define LOGOS_BUILD_IR "IR"
 #define LOGOS_MAIN_FILE_NAME "Main"
 #define LOGOS_APP_FILE_NAME "App"
-#define LOGOS_MAIN_FUNC "main"
+#define LOGOS_MAIN_FUNC_NAME "main"
 #define LOGOS_SELF "self"
 #define LOGOS_OBJECT_FILE "main.o"
 #define LOGOS_EXECUTABLE_FILE "output"
