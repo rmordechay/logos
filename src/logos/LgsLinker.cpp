@@ -1,6 +1,6 @@
 #include "logos/LgsLinker.h"
-#include "data/LgsDefinitions.h"
-#include "logos/LgsConfig.h"
+#include "configs/LgsDefinitions.h"
+#include "../../include/configs/LgsConfig.h"
 #include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
@@ -8,6 +8,8 @@
 #include <llvm/Transforms/Coroutines/CoroSplit.h>
 #include <llvm/Transforms/Coroutines/CoroEarly.h>
 #include <llvm/Transforms/Coroutines/CoroCleanup.h>
+
+inline LogLevel logLevel = DEBUG;
 
 unique_ptr<Module> parseModule(LLVMContext& context, const string& path) {
     SMDiagnostic diag;

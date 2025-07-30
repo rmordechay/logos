@@ -1,6 +1,6 @@
 #include "extern/LgsCLangVisitor.h"
 
-#include "data/LgsDefinitions.h"
+#include "configs/LgsDefinitions.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "files/LgsFile.h"
 #include "stmts/LgsField.h"

@@ -1,0 +1,6 @@
+#pragma once
+
+#define WRITE_IR_TO_FILE 1
+#define INITIAL_ARRAY_CAPACITY 2
+#define BIG_SIZE_THRESHOLD 20
+#define STACK_SIZE 1024

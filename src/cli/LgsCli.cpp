@@ -3,8 +3,8 @@
 #include "cli/LgsFormatCmd.h"
 #include "cli/LgsGenerateCmd.h"
 #include "cli/LgsRunCmd.h"
-#include "data/LgsDefinitions.h"
-#include "data/PlatformData.h"
+#include "configs/LgsDefinitions.h"
+#include "configs/PlatformData.h"
 
 
 #include <sstream>

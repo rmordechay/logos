@@ -1,5 +1,5 @@
 #include "utils/LgsIRUtils.h"
-#include "data/LgsDefinitions.h"
+#include "configs/LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsVoid.h"
@@ -102,28 +102,6 @@ TargetMachine* getTargetMachine() {
     lock_guard lock(mtx);
     targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), nullopt);
     return targetMachine;
-}
-
-void writeStringsToFile(const vector<LgsFile*>& files) {
-    ofstream ofs("paths.dat", ios::binary);
-    for (const auto file : files) {
-        const auto s = file->absPath.string();
-        file->pos = ofs.tellp();
-        uint32_t len = static_cast<uint32_t>(s.size());
-        ofs.write(reinterpret_cast<const char*>(&len), sizeof(len));
-        ofs.write(s.data(), s.size());
-    }
-}
-
-void readStringsFromFile(const streampos& pos) {
-    ifstream ifs("paths.dat", ios::binary);
-    ifs.seekg(pos);
-
-    int32_t len = 0;
-    ifs.read(reinterpret_cast<char*>(&len), sizeof(len));
-
-    string path(len, '\0');
-    ifs.read(&path[0], len);
 }
 
 void callPushStack(LgsModule* module, const LgsLocation& location, const string& funcName) {

@@ -10,4 +10,5 @@ add_library(lgslib STATIC
 
 target_include_directories(lgslib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../stdlib/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/configs
 )

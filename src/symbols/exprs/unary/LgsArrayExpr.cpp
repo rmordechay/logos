@@ -1,7 +1,7 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "cli/LgsCli.h"
 #include "exprs/unary/LgsIterIndex.h"
-#include "logos/LgsConfig.h"
+#include "../../../../include/configs/LgsConfig.h"
 #include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"
 

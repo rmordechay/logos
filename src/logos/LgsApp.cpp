@@ -13,7 +13,7 @@
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "funcs/LgsMainFunc.h"
-#include "logos/LgsConfig.h"
+#include "../../include/configs/LgsConfig.h"
 #include "logos/LgsLinker.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsInterface.h"
@@ -23,19 +23,19 @@ extern char **environ;
 
 void LgsApp::run() {
     // Validation
-    if (!validate()) handleExitWithErrors();
+    if (!validate()) exitWithErrors();
 
     // Lexing and Parsing
-    if (!parse()) handleExitWithErrors();
+    if (!parse()) exitWithErrors();
 
     // Semantic analysis
-    if (!analyse()) handleExitWithErrors();
+    if (!analyse()) exitWithErrors();
 
     // Code generation
-    if (!generate()) handleExitWithErrors();
+    if (!generate()) exitWithErrors();
 
     // Linking
-    if (!link()) handleExitWithErrors();
+    if (!link()) exitWithErrors();
 
     // Running
     execv(paths.execFilePath.c_str(), args.data());
@@ -70,7 +70,7 @@ bool LgsApp::parse() {
 }
 
 bool LgsApp::analyse() {
-    if (!resolveGlobalTypes()) handleExitWithErrors();
+    if (!resolveGlobalTypes()) exitWithErrors();
     ThreadPool threadPool;
     for (const auto file : files) {
         threadPool.runTask([file, this] {
@@ -87,9 +87,7 @@ bool LgsApp::analyse() {
 }
 
 bool LgsApp::generate() {
-    initLLVM();
-    initBuildDir();
-    writeStringsToFile(files);
+    initBuild();
     ThreadPool threadPool;
     for (const auto& file : files) {
         threadPool.runTask([file, this] {
@@ -263,32 +261,30 @@ void LgsApp::setupActiveEnv() {
     checkRequiredEnvVars();
 }
 
-void LgsApp::initPaths(const path& rootDirPath) {
-    if (rootDirPath == "") return;
-    paths.rootDir = rootDirPath;
-    paths.rootDirAbs = canonical(paths.rootDir);
-    paths.srcDir = paths.rootDir / LOGOS_SRC_DIR;
-    paths.envsDir = paths.rootDir / LOGOS_ENVS_DIR;
-    paths.buildDir = paths.rootDir / LOGOS_BUILD_DIR;
-    paths.buildIR = paths.buildDir / LOGOS_BUILD_IR;
-    paths.objFilePath = paths.buildDir / LOGOS_OBJECT_FILE;
-    paths.execFilePath = paths.buildDir / LOGOS_EXECUTABLE_FILE;
-    paths.appFilePath = paths.rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
-    paths.clibRoot = CLIB_ROOT;
-    paths.clibInclude = paths.clibRoot / "usr/include";
-}
-
-void LgsApp::handleExitWithErrors() const {
-    for (auto error : errHandler.errors) {
-        logInfo(LOGOS_ERROR_STR + error.msg);
+void LgsApp::exitWithErrors() const {
+    for (const auto error : errHandler.errors) {
+        logInfo(LOGOS_ERROR_STR + string(error.msg));
     }
     return exit(1);
 }
 
-void LgsApp::initBuildDir() const {
+void LgsApp::initBuild() const {
     if (exists(paths.buildDir)) remove_all(paths.buildDir);
     create_directories(paths.buildDir);
     create_directories(paths.buildIR);
+    writeDebugFile();
+    initLLVM();
+}
+
+void LgsApp::writeDebugFile() const {
+    ofstream ofs(paths.debugFile, ios::binary);
+    for (const auto file : files) {
+        const auto s = file->absPath.string();
+        file->pathIndex = ofs.tellp();
+        uint32_t len = static_cast<uint32_t>(s.size());
+        ofs.write(reinterpret_cast<const char*>(&len), sizeof(uint32_t));
+        ofs.write(s.data(), s.size());
+    }
 }
 
 LgsApp::~LgsApp() {

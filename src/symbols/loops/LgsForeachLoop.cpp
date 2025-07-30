@@ -1,5 +1,5 @@
 #include "loops/LgsForeachLoop.h"
-#include "data/LgsDefinitions.h"
+#include "configs/LgsDefinitions.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "stmts/LgsVarDec.h"

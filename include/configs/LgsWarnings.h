@@ -1,9 +1,7 @@
 #pragma once
 
-inline string WARNING_PLACEHOLDER = "%s";
-
 struct LgsWarning {
-    string msg;
+    const char* msg;
     size_t warningCode;
 };
 

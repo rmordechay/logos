@@ -1,4 +1,6 @@
 #include "utils/LgsErrHandler.h"
+
+#include "LgsDefinitions.h"
 #include "LgsLocation.h"
 
 void LgsErrHandler::setUnsuccessful() {
@@ -9,14 +11,14 @@ void LgsErrHandler::handleError(const LgsError& lgsErr, const LgsLocation* locat
     setUnsuccessful();
     auto pos = 0;
     auto argIndex = 0;
-    auto result = lgsErr.msg;
-    while ((pos = result.find(ERROR_PLACEHOLDER, pos)) != string::npos && argIndex < args.size()) {
-        result.replace(pos, ERROR_PLACEHOLDER.size(), args[argIndex]);
+    auto result = string(lgsErr.msg);
+    while ((pos = result.find(LOGOS_MSG_PLACEHOLDER, pos)) != string::npos && argIndex < args.size()) {
+        result.replace(pos, string(LOGOS_MSG_PLACEHOLDER).size(), args[argIndex]);
         pos += args[argIndex].length();
         argIndex++;
     }
     const auto finalResult = result + "\n\t   at " + location->getFullPath() + "\n---";
-    errors.emplace_back(LgsError{.msg = finalResult, .errCode = lgsErr.errCode});
+    errors.emplace_back(LgsError{.msg = strdup(finalResult.c_str()), .errCode = lgsErr.errCode});
 }
 
 void LgsErrHandler::addErrors(vector<LgsError> newErrors) {

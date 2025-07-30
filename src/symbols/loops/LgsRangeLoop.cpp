@@ -1,5 +1,5 @@
 #include "loops/LgsRangeLoop.h"
-#include "data/LgsDefinitions.h"
+#include "configs/LgsDefinitions.h"
 #include "stmts/LgsVarDec.h"
 #include "utils/LgsIRUtils.h"
 #include "utils/LgsUtils.h"

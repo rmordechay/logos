@@ -1,5 +1,5 @@
 #include "stmts/LgsIfStmt.h"
-#include "data/LgsDefinitions.h"
+#include "configs/LgsDefinitions.h"
 #include "logos/LgsModule.h"
 #include "utils/LgsIRUtils.h"
 

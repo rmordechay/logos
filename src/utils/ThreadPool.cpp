@@ -1,8 +1,8 @@
 #include "utils/ThreadPool.h"
-#include "logos/LgsConfig.h"
+#include "../../include/configs/LgsConfig.h"
 
 ThreadPool::ThreadPool() {
-    for(size_t i = 0; i < WORKERS_NUMBER; ++i) {
+    for(size_t i = 0; i < thread::hardware_concurrency(); ++i) {
         workers.emplace_back([this] {
             while(true) {
                 function<void()> task;

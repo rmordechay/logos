@@ -37,15 +37,15 @@ public:
     LgsCLang lgsCLang;
 
     explicit LgsApp(const path& rootDirPath = "") : lgsCLang(paths) {
-        initPaths(rootDirPath);
+        paths.initPaths(rootDirPath);
     }
 
     void run();
-    void initPaths(const path& rootDirPath);
     bool validate();
     bool parse();
     bool analyse();
-    void initBuildDir() const;
+    void initBuild() const;
+    void writeDebugFile() const;
     bool generate();
     bool link() const;
     void parseSrcFile(const string& codeText, path filePath = "");
@@ -58,6 +58,6 @@ public:
     void loadBuiltins();
     void loadEnvFiles();
     void checkRequiredEnvVars();
-    void handleExitWithErrors() const;
+    void exitWithErrors() const;
     ~LgsApp();
 };

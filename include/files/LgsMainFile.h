@@ -1,7 +1,7 @@
 #pragma once
 
 #include "LgsFile.h"
-#include "data/LgsDefinitions.h"
+#include "configs/LgsDefinitions.h"
 
 class LgsGroup;
 class LgsMainFunc;

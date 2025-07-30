@@ -53,4 +53,3 @@
     #define PLATFORM_VERSION ""
     #define LINK_FUNC lld::coff::link
 #endif
-

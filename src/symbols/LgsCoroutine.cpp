@@ -1,6 +1,6 @@
 #include "LgsCoroutine.h"
 #include "builtin/LgsBuiltins.h"
-#include "data/LgsDefinitions.h"
+#include "configs/LgsDefinitions.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsSelection.h"
 #include "utils/LgsIRUtils.h"

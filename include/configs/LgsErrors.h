@@ -1,8 +1,7 @@
 #pragma once
-inline string ERROR_PLACEHOLDER = "%s";
 
 struct LgsError {
-    string msg;
+    const char* msg;
     size_t errCode;
 };
 

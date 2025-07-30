@@ -1,7 +1,7 @@
 #include "analysis/SemaAnalyser.h"
 
 #include "LgsCoroutine.h"
-#include "data/LgsErrors.h"
+#include "configs/LgsErrors.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"
 #include "exprs/unary/LgsCast.h"
@@ -23,7 +23,7 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
-#include "logos/LgsConfig.h"
+#include "../../include/configs/LgsConfig.h"
 #include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "stmts/LgsContinueStmt.h"

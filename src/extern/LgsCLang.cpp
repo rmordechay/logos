@@ -1,5 +1,5 @@
 #include "extern/LgsCLang.h"
-#include "data/LgsErrors.h"
+#include "configs/LgsErrors.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "extern/LgsCLangVisitor.h"
 #include "../../include/utils/LgsErrHandler.h"
