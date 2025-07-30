@@ -53,7 +53,6 @@
 #include <types/LgsStr.h>
 #include <types/LgsVoid.h>
 
-
 LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx) {
     LgsFile* file = nullptr;
     if (const auto mainFileCtx = ctx->mainFile()) {
@@ -173,6 +172,7 @@ LgsEnvFile* AntlerConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx) {
 LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const bool isSingleton) {
     const auto obj = new LgsObject(objName);
     obj->setLocation(ctx->start, ctx->stop, filePath);
+    if (!validateTypeName(objName, &obj->location)) return obj;
     // Fields
     for (int i = 0; i < ctx->field().size(); ++i) {
         const auto lgsField = getField(ctx->field(i), obj->name);
@@ -208,6 +208,7 @@ LgsObject* AntlerConverter::getObject(LogosParser::ObjectBodyContext* ctx, const
 LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName) {
     const auto interface = new LgsInterface(interfaceName);
     interface->setLocation(ctx->start, ctx->stop, filePath);
+    if (!validateTypeName(interfaceName, &interface->location)) return interface;
     for (const auto& interfaceFunction : ctx->interfaceFuncSignature()) {
         const auto self = LgsParam(interface, LOGOS_SELF);
         const auto type = getFuncReturnType(interfaceFunction->type());
@@ -234,6 +235,28 @@ LgsInterface* AntlerConverter::getInterface(LogosParser::InterfaceBodyContext* c
         }
     }
     return interface;
+}
+
+LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
+    const auto lgsEnum = new LgsEnum(ctx->IDENTIFIER()->getText());
+    lgsEnum->setLocation(ctx->start, ctx->stop, filePath);
+    if (!validateTypeName(lgsEnum->name, &lgsEnum->location)) return lgsEnum;
+    unordered_set<string> seenNames;
+    for (size_t i = 0; i < ctx->enumField().size(); ++i) {
+        const auto enumField = ctx->enumField()[i];
+        const auto enumName = enumField->IDENTIFIER()->getText();
+        if (!seenNames.insert(enumName).second) {
+            errHandler.handleError(E10011, &lgsEnum->location, {enumName, to_string(lgsEnum->location.lineNumberStart)});
+            break;
+        }
+        const auto field = new LgsField(enumName, &lgsEnum->name, lgsEnum);
+        if (enumField->STRING()) {
+            field->expr = getStrConst(enumField->STRING());
+        }
+        field->setLocation(ctx->start, ctx->stop, filePath);
+        lgsEnum->fields[enumName] = field;
+    }
+    return lgsEnum;
 }
 
 LgsMainFunc* AntlerConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
@@ -573,28 +596,7 @@ LgsForLoop* AntlerConverter::getInfiniteLoop(LogosParser::LoopStatementContext* 
     }
     return rangeLoop;
 }
-
-LgsEnum* AntlerConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
-    const auto lgsEnum = new LgsEnum(ctx->IDENTIFIER()->getText());
-    lgsEnum->setLocation(ctx->start, ctx->stop, filePath);
-    unordered_set<string> seenNames;
-    for (size_t i = 0; i < ctx->enumField().size(); ++i) {
-        const auto enumField = ctx->enumField()[i];
-        const auto enumName = enumField->IDENTIFIER()->getText();
-        if (!seenNames.insert(enumName).second) {
-            errHandler.handleError(E10011, &lgsEnum->location, {enumName, to_string(lgsEnum->location.lineNumberStart)});
-            break;
-        }
-        const auto field = new LgsField(enumName, &lgsEnum->name, lgsEnum);
-        if (enumField->STRING()) {
-            field->expr = getStrConst(enumField->STRING());
-        }
-        field->setLocation(ctx->start, ctx->stop, filePath);
-        lgsEnum->fields[enumName] = field;
-    }
-    return lgsEnum;
-}
-
++
 LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
     if (!ctx) return nullptr;
     LgsExpr* expr = nullptr;
@@ -1037,4 +1039,10 @@ bool AntlerConverter::isArgsDuplicate(const unordered_set<string>& initializedAr
     return false;
 }
 
-
+bool AntlerConverter::validateTypeName(const string& typeName, const LgsLocation* location) {
+    if (islower(typeName[0])) {
+        errHandler.handleError(E10033, location, {typeName});
+        return false;
+    }
+    return true;
+}

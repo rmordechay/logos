@@ -4,6 +4,6 @@ string LgsIterator::prettyName() {
     assert(0);
 }
 
-Value* LgsIterator::createIRValue(LgsModule* module) {
+Value* LgsIterator::createIRValue(LgsCodeGen* codeGen) {
     assert(0);
 }

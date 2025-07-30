@@ -15,9 +15,9 @@ public:
     }
 
     string prettyName() override;
-    Value* hashValue(LgsModule* module) override;
-    Value* createIRValue(LgsModule* module) override;
-    Value* eqIR(LgsModule* module, LgsExpr* other) override;
-    Value* addIR(LgsModule* module, LgsExpr* other) override;
+    Value* hashValue(LgsCodeGen* codeGen) override;
+    Value* createIRValue(LgsCodeGen* codeGen) override;
+    Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     ~LgsStrConst() override = default;
 };

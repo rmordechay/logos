@@ -4,15 +4,15 @@ string LgsPrefixExpr::prettyName() {
     assert(0);
 }
 
-Value* LgsPrefixExpr::createIRValue(LgsModule* module) {
-    const auto exprValue = expr->getIRValue(module);
+Value* LgsPrefixExpr::createIRValue(LgsCodeGen* codeGen) {
+    const auto exprValue = expr->getIRValue(codeGen);
     switch (op) {
     case NOT_PREFIX: {
-        return module->builder.CreateNot(exprValue);
+        return codeGen->builder.CreateNot(exprValue);
     }
     case MINUS_PREFIX:
-        const auto zero = ConstantInt::get(type->getIRType(module), 0);
-        return module->builder.CreateSub(zero, exprValue);
+        const auto zero = ConstantInt::get(type->getIRType(codeGen), 0);
+        return codeGen->builder.CreateSub(zero, exprValue);
     }
     assert(false);
 }

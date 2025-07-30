@@ -9,7 +9,7 @@ public:
         isVoid = true;
     }
     string prettyName() override;
-    Type* getIRType(LgsModule* module) override;
+    Type* getIRType(LgsCodeGen* codeGen) override;
     size_t getSizeBytes() override;
     string getName() override;
     LgsExpr* getZeroValue() override;

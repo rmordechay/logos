@@ -32,17 +32,17 @@ public:
     }
 
     size_t getSizeBytes() override;
-    Type* getIRType(LgsModule* module) override;
+    Type* getIRType(LgsCodeGen* codeGen) override;
     string getName() override;
     string prettyName() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
-    Value* getLength(LgsModule* module, LgsExpr* expr) override;
-    Value* getLoopLength(LgsModule* module, LgsExpr* expr) override;
-    Value* isEmpty(LgsModule* module, LgsExpr* expr) override;
-    Value* isNotEmpty(LgsModule* module, LgsExpr* expr) override;
-    StructType* getMapStruct(LgsModule* module);
+    Value* getLength(LgsExpr* expr) override;
+    Value* getLoopLength(LgsExpr* expr) override;
+    Value* isEmpty(LgsExpr* expr) override;
+    Value* isNotEmpty(LgsExpr* expr) override;
+    StructType* getMapStruct();
     bool equals(LgsType* other) override;
     ~LgsMap() override = default;
 };

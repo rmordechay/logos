@@ -1,6 +1,6 @@
 #include "exprs/unary/constants/LgsBoolConst.h"
 
-#include "utils/LgsIRUtils.h"
+
 #include "utils/LgsUtils.h"
 
 string LgsBoolConst::getValueAsString() const {
@@ -11,64 +11,64 @@ string LgsBoolConst::prettyName() {
     return type->prettyName();
 }
 
-Value* LgsBoolConst::createIRValue(LgsModule* module) {
-    return i1(module, value);
+Value* LgsBoolConst::createIRValue(LgsCodeGen* codeGen) {
+    return codeGen->i1(value);
 }
 
-Value* LgsBoolConst::eqIR(LgsModule* module, LgsExpr* other) {
+Value* LgsBoolConst::eqIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsBoolConst::neIR(LgsModule* module, LgsExpr* other) {
+Value* LgsBoolConst::neIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsBoolConst::ltIR(LgsModule* module, LgsExpr* other) {
+Value* LgsBoolConst::ltIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsBoolConst::gtIR(LgsModule* module, LgsExpr* other) {
+Value* LgsBoolConst::gtIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsBoolConst::geIR(LgsModule* module, LgsExpr* other) {
+Value* LgsBoolConst::geIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsBoolConst::leIR(LgsModule* module, LgsExpr* other) {
+Value* LgsBoolConst::leIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsBoolConst::andIR(LgsModule* module, LgsExpr* other) {
+Value* LgsBoolConst::andIR(LgsCodeGen* codeGen, LgsExpr* other) {
     if (const auto otherBool = other->asBoolConst()) {
-        return i1(module, value && otherBool->value);
+        return codeGen->i1(value && otherBool->value);
     }
     assert(0);
 }
 
-Value* LgsBoolConst::orIR(LgsModule* module, LgsExpr* other) {
+Value* LgsBoolConst::orIR(LgsCodeGen* codeGen, LgsExpr* other) {
     if (const auto otherBool = other->asBoolConst()) {
-        return i1(module, value || otherBool->value);
+        return codeGen->i1(value || otherBool->value);
     }
     assert(0);
 }
 
-Value* LgsBoolConst::bitAndIR(LgsModule* module, LgsExpr* other) {
+Value* LgsBoolConst::bitAndIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsBoolConst::bitOrIR(LgsModule* module, LgsExpr* other) {
+Value* LgsBoolConst::bitOrIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsBoolConst::bitXorIR(LgsModule* module, LgsExpr* other) {
+Value* LgsBoolConst::bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsBoolConst::rshiftIR(LgsModule* module, LgsExpr* other) {
+Value* LgsBoolConst::rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsBoolConst::lshiftIR(LgsModule* module, LgsExpr* other) {
+Value* LgsBoolConst::lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }

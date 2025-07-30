@@ -12,7 +12,7 @@ public:
         isInt = true;
     }
     string prettyName() override;
-    Type* getIRType(LgsModule* module) override;
+    Type* getIRType(LgsCodeGen* codeGen) override;
     string getName() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;

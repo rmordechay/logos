@@ -2,11 +2,11 @@
 #include "LgsEnv.h"
 #include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
-#include "Platform.h"
+#include "LgsPaths.h"
 #include "extern/LgsCLang.h"
 #include "types/LgsAny.h"
 
-class LgsModule;
+class LgsCodeGen;
 class LgsStrConst;
 class LgsFile;
 class LgsEnvFile;
@@ -24,7 +24,6 @@ class LgsApp final {
 public:
     string name;
     string version;
-    LgsPaths paths;
     LgsEnv activeEnv;
     vector<char*> args;
     LgsSymbolTable globals;
@@ -33,7 +32,6 @@ public:
     vector<LgsStrConst*> externFiles;
     LgsAppFile* appFile = nullptr;
     vector<LgsEnvFile*> envFiles;
-    map<string, LgsModule*> modules;
     LgsCLang lgsCLang;
 
     explicit LgsApp(const path& rootDirPath = "") : lgsCLang(paths) {
@@ -46,7 +44,7 @@ public:
     bool analyse();
     void initBuild() const;
     void writeDebugFile() const;
-    bool generate();
+    bool generate() const;
     bool link() const;
     void parseSrcFile(const string& codeText, path filePath = "");
     void parseEnvFile(path fileEntry);

@@ -1,9 +1,9 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/unary/LgsSelection.h"
 
-void LgsStmtsBlock::createIRValue(LgsModule* runtime) const {
+void LgsStmtsBlock::createIRValue(LgsCodeGen* codeGen) const {
     for (const auto stmt : stmts) {
-        stmt->createIRStmt(runtime);
+        stmt->createIRStmt(codeGen);
     }
 }
 

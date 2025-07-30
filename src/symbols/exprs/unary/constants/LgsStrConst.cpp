@@ -2,7 +2,7 @@
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
-#include "utils/LgsIRUtils.h"
+
 #include "utils/LgsUtils.h"
 
 extern "C" {
@@ -13,30 +13,30 @@ string LgsStrConst::prettyName() {
     return type->prettyName();
 }
 
-Value* LgsStrConst::hashValue(LgsModule* module) {
-    return i32(module, Str_hash(value.c_str()));
+Value* LgsStrConst::hashValue(LgsCodeGen* codeGen) {
+    return codeGen->i32(Str_hash(value.c_str()));
 }
 
-Value* LgsStrConst::createIRValue(LgsModule* module) {
-    return getIRStr(module, value);
+Value* LgsStrConst::createIRValue(LgsCodeGen* codeGen) {
+    return codeGen->getIRStr(value);
 }
 
-Value* LgsStrConst::addIR(LgsModule* module, LgsExpr* other) {
+Value* LgsStrConst::addIR(LgsCodeGen* codeGen, LgsExpr* other) {
     if (const auto otherStrConst = other->asIntConst()) {
-        return getIRStr(module, this->value + to_string(otherStrConst->value));
+        return codeGen->getIRStr(this->value + to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asFloatConst()) {
-        return getIRStr(module, this->value + to_string(otherStrConst->value));
+        return codeGen->getIRStr(this->value + to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asStrConst()) {
-        return getIRStr(module, this->value + otherStrConst->value);
+        return codeGen->getIRStr(this->value + otherStrConst->value);
     }
     if (const auto otherBoolConst = other->asBoolConst()) {
-        return getIRStr(module, this->value + otherBoolConst->getValueAsString());
+        return codeGen->getIRStr(this->value + otherBoolConst->getValueAsString());
     }
     assert(0);
 }
 
-Value* LgsStrConst::eqIR(LgsModule* module, LgsExpr* other) {
+Value* LgsStrConst::eqIR(LgsCodeGen* codeGen, LgsExpr* other) {
     return nullptr;
 }

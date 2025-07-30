@@ -7,8 +7,8 @@ string LgsVoid::prettyName() {
     return name;
 }
 
-Type* LgsVoid::getIRType(LgsModule* module) {
-    return Type::getVoidTy(module->context);
+Type* LgsVoid::getIRType(LgsCodeGen* codeGen) {
+    return Type::getVoidTy(codeGen->context);
 }
 
 size_t LgsVoid::getSizeBytes() {

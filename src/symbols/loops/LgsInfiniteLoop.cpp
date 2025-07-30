@@ -1,30 +1,26 @@
 #include "loops/LgsInfiniteLoop.h"
-
 #include "configs/LgsDefinitions.h"
 #include "stmts/LgsVarDec.h"
-#include "utils/LgsIRUtils.h"
-#include "utils/LgsUtils.h"
 
-Value* LgsInfiniteLoop::loopStart(LgsModule* module) {
-    return ConstantInt::get(sizeTy(module), 0);
+Value* LgsInfiniteLoop::loopStart(LgsCodeGen* codeGen) {
+    return codeGen->sizeZero();
 }
 
-Value* LgsInfiniteLoop::loopEnd(LgsModule* module) {
-    return ConstantInt::getTrue(module->context);
+Value* LgsInfiniteLoop::loopEnd(LgsCodeGen* codeGen) {
+    return ConstantInt::getTrue(codeGen->context);
 }
 
-void LgsInfiniteLoop::initIRLoop(LgsModule* module) {
-    IRBodyBlock = BasicBlock::Create(module->context, BLOCK_NAME_LOOP_BODY);
-    IRExitBlock = BasicBlock::Create(module->context, BLOCK_NAME_LOOP_EXIT);
-    module->builder.CreateBr(IRBodyBlock);
+void LgsInfiniteLoop::initIRLoop(LgsCodeGen* codeGen) {
+    IRBodyBlock = BasicBlock::Create(codeGen->context, BLOCK_NAME_LOOP_BODY);
+    IRExitBlock = BasicBlock::Create(codeGen->context, BLOCK_NAME_LOOP_EXIT);
+    codeGen->builder.CreateBr(IRBodyBlock);
 
-    startBlock(module, IRBodyBlock);
+    codeGen->startBlock(IRBodyBlock);
     if (loopVars.empty()) return;
-    const auto iValue = module->builder.CreateLoad(i64Ty(module), iPtr);
+    const auto iValue = codeGen->builder.CreateLoad(codeGen->i64Ty(), iPtr);
     loopVars[0]->setIRValue(iValue);
 }
 
-void LgsInfiniteLoop::exitIRLoop(LgsModule* module) const {
-    module->builder.CreateBr(IRBodyBlock);
-    startBlock(module, IRExitBlock);
+void LgsInfiniteLoop::IRLoopPrologue(LgsCodeGen* codeGen) const {
+    codeGen->builder.CreateBr(IRBodyBlock);
 }

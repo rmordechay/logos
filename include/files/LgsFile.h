@@ -1,28 +1,26 @@
 #pragma once
-#include "logos/LgsModule.h"
+#include "LgsSymbolTable.h"
+#include "logos/LgsCodeGen.h"
 
 class LgsStrConst;
 class LgsApp;
-class LgsModule;
+class LgsCodeGen;
 
 class LgsFile {
 public:
     string name;
     path absPath;
-    streampos pathIndex = 0;
+    LgsCodeGen codeGen;
     LgsSymbolTable symbolTable;
     vector<LgsStrConst*> externFiles;
 
     explicit LgsFile(const string& name, const path& path) : name(name), absPath(path) {}
-    virtual LgsModule* generateIR(LgsSymbolTable& globals);
+    virtual void generateIR();
     virtual void format();
     virtual ~LgsFile() = default;
 };
 
-// Only files that need generation implement this func.
-inline LgsModule* LgsFile::generateIR(LgsSymbolTable& globals) {
-    return nullptr;
-}
+inline void LgsFile::generateIR() {}
 
 inline void LgsFile::format() {
     assert(false);

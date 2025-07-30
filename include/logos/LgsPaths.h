@@ -2,13 +2,8 @@
 #include "LgsDefinitions.h"
 #include "configs/PlatformData.h"
 
-struct Platform {
-    bool (*link)(ArrayRef<const char*>, raw_ostream&, raw_ostream&, bool, bool) = LINK_FUNC;
-};
-
 struct LgsPaths {
     path rootDir;
-    path rootDirAbs;
     path srcDir;
     path envsDir;
     path buildDir;
@@ -24,8 +19,7 @@ struct LgsPaths {
 
 inline void LgsPaths::initPaths(const path& rootDirPath) {
     if (rootDirPath == "") return;
-    rootDir = rootDirPath;
-    rootDirAbs = canonical(rootDir);
+    rootDir = canonical(rootDirPath);
     srcDir = rootDir / LOGOS_SRC_DIR;
     envsDir = rootDir / LOGOS_ENVS_DIR;
     buildDir = rootDir / LOGOS_BUILD_DIR;
@@ -38,4 +32,4 @@ inline void LgsPaths::initPaths(const path& rootDirPath) {
     clibInclude = clibRoot / "usr/include";
 }
 
-inline Platform platform;
+inline LgsPaths paths;

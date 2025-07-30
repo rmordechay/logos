@@ -1,13 +1,11 @@
-#include "Runtime.h"
 #include "LgsConfig.h"
 #include "LgsDefinitions.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 typedef struct StackFrame {
-    const char* func_name;
-    const char* path;
-    uint32_t file_path_index;
+    uint64_t file_path_index;
+    uint64_t func_name_index;
     struct StackFrame* previous;
 } StackFrame;
 
@@ -18,34 +16,32 @@ typedef struct {
 
 Runtime runtime;
 
-void initRuntime(const char* debug_file_path) {
+void init_runtime(const char* debug_file) {
     runtime.stack = NULL;
-    runtime.debug_file = debug_file_path;
+    runtime.debug_file = debug_file;
 }
 
-void push_stack_frame(const char* func_name, const char* path, const uint32_t file_path_index) {
+void push_stack_frame(const uint64_t file_path_index, const uint64_t func_name_index) {
     StackFrame* frame = malloc(sizeof(StackFrame));
-    frame->func_name = func_name;
-    frame->path = path;
     frame->file_path_index = file_path_index;
+    frame->func_name_index = func_name_index;
     frame->previous = runtime.stack;
     runtime.stack = frame;
 }
 
 void pop_stack_frame() {
+    if (!runtime.stack) return;
     StackFrame* prev = runtime.stack->previous;
     free(runtime.stack);
     runtime.stack = prev;
 }
 
-void read_strings_from_file(const long pos, char* buffer) {
-    FILE* ifs = fopen("paths.dat", "rb");
-    fseek(ifs, pos, SEEK_SET);
-    uint32_t len = 0;
-    fread(&len, sizeof(uint32_t), 1, ifs);
-    fread(buffer, 1, len, ifs);
+void read_strings_from_file(FILE* debug_file, const uint64_t pos, char buffer[1024]) {
+    fseek(debug_file, pos, SEEK_SET);
+    uint64_t len = 0;
+    fread(&len, sizeof(uint64_t), 1, debug_file);
+    fread(buffer, 1, len, debug_file);
     buffer[len] = '\0';
-    fclose(ifs);
 }
 
 void print_stack() {
@@ -55,9 +51,15 @@ void print_stack() {
     for (const StackFrame* frame = runtime.stack; frame && count < STACK_SIZE; frame = frame->previous) {
         frames[count++] = frame;
     }
+    FILE* debug_file = fopen(runtime.debug_file, "rb");
     for (int i = count - 1; i >= 0; --i) {
-        printf("\t%s at %s\n", frames[i]->func_name, frames[i]->path);
+        char path[1024];
+        char funcName[1024];
+        read_strings_from_file(debug_file, frames[i]->file_path_index, path);
+        read_strings_from_file(debug_file, frames[i]->func_name_index, funcName);
+        printf("\t%s at %s\n", funcName, path);
     }
+    fclose(debug_file);
 }
 
 void print_error(const char* msg) {

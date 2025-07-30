@@ -6,7 +6,7 @@ public:
     LgsObject *obj = nullptr;
 
     explicit LgsObjectFile(const string& name, const path& path) : LgsFile(name, path) {}
-    LgsModule* generateIR(LgsSymbolTable& globals) override;
+    void generateIR() override;
     ~LgsObjectFile() override;
 };
 

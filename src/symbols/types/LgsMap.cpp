@@ -1,7 +1,7 @@
 #include "types/LgsMap.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "stmts/LgsVarDec.h"
-#include "utils/LgsIRUtils.h"
+
 #include "utils/LgsUtils.h"
 
 size_t LgsMap::getSizeBytes() {
@@ -20,24 +20,24 @@ LgsType* LgsMap::getValueType() {
     return typePair->key;
 }
 
-Value* LgsMap::getLength(LgsModule* module, LgsExpr* expr) {
-    return lenFunc.call(module, {expr});
+Value* LgsMap::getLength(LgsExpr* expr) {
+    return lenFunc.call(codeGen, {expr});
 }
 
-Value* LgsMap::getLoopLength(LgsModule* module, LgsExpr* expr) {
-    return i32(module, 1024);
+Value* LgsMap::getLoopLength(LgsExpr* expr) {
+    return codeGen->i32(1024);
 }
 
-Value* LgsMap::isEmpty(LgsModule* module, LgsExpr* expr) {
-    return isEmptyFunc.call(module, {expr});
+Value* LgsMap::isEmpty(LgsExpr* expr) {
+    return isEmptyFunc.call(codeGen, {expr});
 }
 
-Value* LgsMap::isNotEmpty(LgsModule* module, LgsExpr* expr) {
-    return isNotEmptyFunc.call(module, {expr});
+Value* LgsMap::isNotEmpty(LgsExpr* expr) {
+    return isNotEmptyFunc.call(codeGen, {expr});
 }
 
-Type* LgsMap::getIRType(LgsModule* module) {
-    return getMapStruct(module);
+Type* LgsMap::getIRType(LgsCodeGen* codeGen) {
+    return getMapStruct();
 }
 
 string LgsMap::getName() {
@@ -56,9 +56,9 @@ bool LgsMap::equals(LgsType* other) {
     return keyEqual && typePair->value->equals(otherKvType->value);
 }
 
-StructType* LgsMap::getMapStruct(LgsModule* module) {
+StructType* LgsMap::getMapStruct() {
     if (mapStruct) return mapStruct;
-    const vector<Type*> mapStructFields = {ptrTy(module), i64Ty(module), i64Ty(module)};
-    mapStruct = getIRStructType(module->context, name, mapStructFields);
+    const vector<Type*> mapStructFields = {codeGen->ptrTy(), codeGen->i64Ty(), codeGen->i64Ty()};
+    mapStruct = codeGen->getIRStructType(name, mapStructFields);
     return mapStruct;
 }

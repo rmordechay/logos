@@ -1,6 +1,6 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
-#include "utils/LgsIRUtils.h"
+
 #include "utils/LgsUtils.h"
 
 size_t LgsStr::getSizeBytes() {
@@ -11,8 +11,8 @@ string LgsStr::getName() {
     return name;
 }
 
-Type* LgsStr::getIRType(LgsModule* module) {
-    return ArrayType::get(baseType->getIRType(module), initialLength);
+Type* LgsStr::getIRType(LgsCodeGen* codeGen) {
+    return ArrayType::get(baseType->getIRType(codeGen), initialLength);
 }
 
 string LgsStr::prettyName() {
@@ -35,22 +35,22 @@ LgsType* LgsStr::getValueType() {
     return baseType;
 }
 
-Value* LgsStr::getLength(LgsModule* module, LgsExpr* expr) {
-    return lenFunc.call(module, {expr});
+Value* LgsStr::getLength(LgsExpr* expr) {
+    return lenFunc.call(codeGen, {expr});
 }
 
-Value* LgsStr::getLoopLength(LgsModule* module, LgsExpr* expr) {
-    const auto lenPtr = module->builder.CreateAlloca(i64Ty(module));
-    module->builder.CreateStore(getLength(module, expr), lenPtr);
-    return module->builder.CreateLoad(i64Ty(module), lenPtr);
+Value* LgsStr::getLoopLength(LgsExpr* expr) {
+    const auto lenPtr = codeGen->builder.CreateAlloca(codeGen->i64Ty());
+    codeGen->builder.CreateStore(getLength(expr), lenPtr);
+    return codeGen->builder.CreateLoad(codeGen->i64Ty(), lenPtr);
 }
 
-Value* LgsStr::isEmpty(LgsModule* module, LgsExpr* expr) {
-    return isEmptyFunc.call(module, {expr});
+Value* LgsStr::isEmpty(LgsExpr* expr) {
+    return isEmptyFunc.call(codeGen, {expr});
 }
 
-Value* LgsStr::isNotEmpty(LgsModule* module, LgsExpr* expr) {
-    return isNotEmptyFunc.call(module, {expr});
+Value* LgsStr::isNotEmpty(LgsExpr* expr) {
+    return isNotEmptyFunc.call(codeGen, {expr});
 }
 
 bool LgsStr::equals(LgsType* other) {

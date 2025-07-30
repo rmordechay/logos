@@ -3,7 +3,7 @@
 
 class LgsVariable;
 class LgsExpr;
-class LgsModule;
+class LgsCodeGen;
 class LgsFunc;
 using namespace llvm;
 

@@ -5,7 +5,6 @@
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
-#include "utils/LgsIRUtils.h"
 
 LgsInstance* getSingleton(LgsExpr* expr) {
     const auto parentAsVar = expr->asVariable();
@@ -15,15 +14,15 @@ LgsInstance* getSingleton(LgsExpr* expr) {
     return nullptr;
 }
 
-Value* LgsSelection::createIRValue(LgsModule* module) {
-    return resolveSelection(module);
+Value* LgsSelection::createIRValue(LgsCodeGen* codeGen) {
+    return resolveSelection(codeGen);
 }
 
-void LgsSelection::createIRStmt(LgsModule* module) {
-    resolveSelection(module);
+void LgsSelection::createIRStmt(LgsCodeGen* codeGen) {
+    resolveSelection(codeGen);
 }
 
-Value* LgsSelection::resolveSelection(LgsModule* module) {
+Value* LgsSelection::resolveSelection(LgsCodeGen* codeGen) {
     for (int i = 0; i < exprs.size() - 1; ++i) {
         auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
@@ -32,14 +31,15 @@ Value* LgsSelection::resolveSelection(LgsModule* module) {
             parentExpr = singleton;
         }
         if (childExpr->asFuncCall()) {
-            childExpr->getIRValue(module);
+            childExpr->getIRValue(codeGen);
         } else if (const auto fieldVar = childExpr->asVariable()){
-            fieldVar->ref.field->getIRValue(module, parentExpr);
+            const auto v = fieldVar->ref.field->getIRValue(codeGen, parentExpr);
+            childExpr->setIRValue(v);
         } else {
             assert(0);
         }
     }
-    IRValue = lastExpr()->getIRValue(module);
+    IRValue = lastExpr()->getIRValue(codeGen);
     return IRValue;
 }
 
@@ -62,9 +62,9 @@ LgsExpr* LgsSelection::LastExprParent() const {
     return exprs[exprs.size() - 2];
 }
 
-Value* LgsSelection::hashValue(LgsModule* module) {
+Value* LgsSelection::hashValue(LgsCodeGen* codeGen) {
     const auto lgsExpr = lastExpr();
-    return lgsExpr->hashValue(module);
+    return lgsExpr->hashValue(codeGen);
 }
 
 LgsSelection::~LgsSelection() {

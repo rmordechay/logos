@@ -12,13 +12,13 @@ public:
     LgsIndex* index = nullptr;
 
     explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {}
-    Value* createIRValue(LgsModule* module) override;
-    Value* getArrGEP(LgsModule* module) const;
-    Value* getIRFromArray(LgsModule* module, LgsDArray* arr) const;
-    Value* getIRFromMap(LgsModule* module, LgsMap* map) const;
-    Value* getIRFromStr(LgsModule* module, LgsStr* str) const;
-    Value* getStrSlice(LgsModule* module, const LgsStr* str) const;
-    Value* getStrGEP(LgsModule* module) const;
+    Value* createIRValue(LgsCodeGen* codeGen) override;
+    Value* getArrGEP(LgsCodeGen* codeGen) const;
+    Value* getIRFromArray(LgsCodeGen* codeGen, LgsDArray* arr) const;
+    Value* getIRFromMap(LgsCodeGen* codeGen, LgsMap* map) const;
+    Value* getIRFromStr(LgsCodeGen* codeGen, const LgsStr* str) const;
+    Value* getStrSlice(LgsCodeGen* codeGen, const LgsStr* str) const;
+    Value* getStrGEP(LgsCodeGen* codeGen) const;
     string prettyName() override;
     ~LgsIterIndex() override;
 };

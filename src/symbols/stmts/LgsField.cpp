@@ -1,41 +1,39 @@
 #include "stmts/LgsField.h"
-
 #include "LgsType.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/LgsHashMap.h"
-#include "utils/LgsIRUtils.h"
 
-Value* LgsField::getIRValue(LgsModule* module, LgsExpr* parentInstance) const {
-    Value* value = nullptr;
+Value* LgsField::getIRValue(LgsCodeGen* codeGen, LgsExpr* parentInstance) {
+    if (IRValue) return IRValue;
     if (type->asEnum()) {
-        value = expr ? expr->getIRValue(module) : getIRStr(module, name);
+        IRValue = expr ? expr->getIRValue(codeGen) : codeGen->getIRStr(name);
     } else if (isVirtual) {
-        value = resolveVirtualField(module, parentInstance);
+        IRValue = resolveVirtualField(codeGen, parentInstance);
     } else {
-        value = getGEP(module, parentInstance->getIRValue(module));
+        IRValue = getGEP(codeGen, parentInstance->getIRValue(codeGen));
     }
-    return value;
+    return IRValue;
 }
 
-Value* LgsField::getGEP(LgsModule* module, Value* instance) const {
-    return module->builder.CreateStructGEP(parentIRType, instance, position);
+Value* LgsField::getGEP(LgsCodeGen* codeGen, Value* instance) const {
+    return codeGen->builder.CreateStructGEP(parentIRType, instance, position);
 }
 
-Value* LgsField::resolveVirtualField(LgsModule* module, LgsExpr* parentExpr) const {
+Value* LgsField::resolveVirtualField(LgsCodeGen* codeGen, LgsExpr* parentExpr) const {
     const auto vtable = parentExpr->type->vtable;
-    const auto fieldIRType = type->getIRType(module);
+    const auto fieldIRType = type->getIRType(codeGen);
     const auto vtableMap = vtable->type->asMap();
-    const auto keyIR = getIRStr(module, name);
-    const auto parentIRValue = parentExpr->getIRValue(module);
-    const auto vtableIRType = vtable->type->getIRType(module);
-    const auto mapPtr = module->builder.CreateGEP(vtableIRType, parentIRValue, {i64Zero(module)});
-    const auto rv = vtableMap->getFunc.callIR(module, {mapPtr, keyIR});
-    return module->builder.CreateLoad(fieldIRType, rv);
+    const auto keyIR = codeGen->getIRStr(name);
+    const auto parentIRValue = parentExpr->getIRValue(codeGen);
+    const auto vtableIRType = vtable->type->getIRType(codeGen);
+    const auto mapPtr = codeGen->builder.CreateGEP(vtableIRType, parentIRValue, {codeGen->i64Zero()});
+    const auto rv = vtableMap->getFunc.callIR(codeGen, {mapPtr, keyIR});
+    return codeGen->builder.CreateLoad(fieldIRType, rv);
 }
 
-void LgsField::storeIRValue(LgsModule* module, Value* instance, LgsExpr* value) {
-    const auto exprIRValue = value->getIRValue(module);
-    module->builder.CreateStore(exprIRValue, instance);
+void LgsField::storeIRValue(LgsCodeGen* codeGen, Value* instance, LgsExpr* value) {
+    const auto exprIRValue = value->getIRValue(codeGen);
+    codeGen->builder.CreateStore(exprIRValue, instance);
 }
 
 LgsField* LgsField::clone() const {

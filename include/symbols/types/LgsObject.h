@@ -2,7 +2,7 @@
 #include "LgsType.h"
 
 class LgsInstance;
-class LgsModule;
+class LgsCodeGen;
 class LgsField;
 
 class LgsObject final : public LgsType {
@@ -14,7 +14,7 @@ public:
 
     explicit LgsObject(const string& name) : name(name) {}
     string prettyName() override;
-    Type* getIRType(LgsModule* module) override;
+    Type* getIRType(LgsCodeGen* codeGen) override;
     string getName() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;

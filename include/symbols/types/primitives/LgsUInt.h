@@ -11,7 +11,7 @@ public:
         isPrimitive = true;
     }
     size_t getSizeBytes() override;
-    Type* getIRType(LgsModule* module) override;
+    Type* getIRType(LgsCodeGen* codeGen) override;
     string getName() override;
     string prettyName() override;
     LgsExpr* getZeroValue() override;

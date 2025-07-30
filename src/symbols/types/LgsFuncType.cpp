@@ -1,6 +1,6 @@
 #include "types/LgsFuncType.h"
-#include "logos/LgsModule.h"
-#include "utils/LgsIRUtils.h"
+#include "logos/LgsCodeGen.h"
+
 #include "utils/LgsUtils.h"
 
 bool LgsFuncType::equals(LgsType* other) {
@@ -39,16 +39,16 @@ string LgsFuncType::getName() {
     return IRName;
 }
 
-Type* LgsFuncType::getIRType(LgsModule* module) {
-    const auto returnType = rt->getIRType(module);
+Type* LgsFuncType::getIRType(LgsCodeGen* codeGen) {
+    const auto returnType = rt->getIRType(codeGen);
     vector<Type*> IRParamsTypes;
     for (int i = isStatic; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
         if (param.isSelf || !paramType->isPrimitive) {
-            IRParamsTypes.emplace_back(ptrTy(module));
+            IRParamsTypes.emplace_back(codeGen->ptrTy());
         } else {
-            auto irType = paramType->getIRType(module);
+            auto irType = paramType->getIRType(codeGen);
             IRParamsTypes.emplace_back(irType);
         }
     }

@@ -1,6 +1,6 @@
 #pragma once
 #include "funcs/LgsBuiltinFunc.h"
-#include "utils/LgsIRUtils.h"
+
 #include <types/LgsVoid.h>
 #include <types/primitives/LgsLong.h>
 #include <types/LgsAny.h>
@@ -13,15 +13,15 @@ public:
         funcType->IRName = "printf";
     }
 
-    Value* call(LgsModule* module, const vector<LgsExpr*>& args) override {
+    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
         const auto arg = args.front();
         const auto formatStr = arg->type->getStrFormatPart() + '\n';
-        const auto IRArgs = {getIRStr(module, formatStr), getIRArg(module, arg)};
-        return module->builder.CreateCall(getPrintf(module), IRArgs);
+        const auto IRArgs = {codeGen->getIRStr(formatStr), getIRArg(codeGen, arg)};
+        return codeGen->callPrintf(IRArgs);
     }
 
-    static Value* call(LgsModule* module, const LgsType* type, Value* value) {
-        return module->builder.CreateCall(getPrintf(module), {getIRStr(module, type->getStrFormatPart()), value});
+    Value* call(const LgsType* type, Value* value, LgsCodeGen* codeGen) const {
+        return codeGen->callPrintf({codeGen->getIRStr(type->getStrFormatPart()), value});
     }
 
     ~LgsPrint() override = default;
@@ -32,8 +32,8 @@ public:
     static constexpr auto name = "sizeof";
 
     LgsSizeOf(): LgsBuiltinFunc(name, &LGS_LONG, "", {&LGS_ANY}) {}
-    Value* call(LgsModule* module, const vector<LgsExpr*>& args) override {
-        return i64(module, args.front()->type->getSizeBytes());
+    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
+        return codeGen->i64(args.front()->type->getSizeBytes());
     }
 };
 

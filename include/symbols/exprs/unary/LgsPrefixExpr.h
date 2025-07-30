@@ -15,6 +15,6 @@ public:
 
     LgsPrefixExpr(LgsExpr* baseExpr, const LgsPrefixOperator op) : expr(baseExpr), op(op) {}
     string prettyName() override;
-    Value* createIRValue(LgsModule* module) override;
+    Value* createIRValue(LgsCodeGen* codeGen) override;
     ~LgsPrefixExpr() override = default;
 };

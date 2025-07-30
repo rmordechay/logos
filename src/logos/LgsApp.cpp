@@ -5,7 +5,7 @@
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
-#include "logos/Platform.h"
+#include "logos/LgsPaths.h"
 #include "utils/ThreadPool.h"
 #include "builtin/LgsBuiltins.h"
 #include "exprs/unary/constants/LgsStrConst.h"
@@ -13,11 +13,9 @@
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "funcs/LgsMainFunc.h"
-#include "../../include/configs/LgsConfig.h"
 #include "logos/LgsLinker.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsInterface.h"
-#include "utils/LgsIRUtils.h"
 
 extern char **environ;
 
@@ -86,16 +84,15 @@ bool LgsApp::analyse() {
     return errHandler.successful;
 }
 
-bool LgsApp::generate() {
+bool LgsApp::generate() const {
     initBuild();
     ThreadPool threadPool;
     for (const auto& file : files) {
         threadPool.runTask([file, this] {
-            const auto module = file->generateIR(globals);
-            if (!module) return;
+            file->generateIR();
+            if (!file->codeGen.IRModule) return;
             const auto name = file->name;
             lock_guard lock(mtx);
-            modules[name] = module;
         });
     }
     threadPool.wait();
@@ -103,7 +100,7 @@ bool LgsApp::generate() {
 }
 
 bool LgsApp::link() const {
-    const LgsLinker linker(paths, modules);
+    const LgsLinker linker(paths, files);
     return linker.link();
 }
 
@@ -273,17 +270,38 @@ void LgsApp::initBuild() const {
     create_directories(paths.buildDir);
     create_directories(paths.buildIR);
     writeDebugFile();
-    initLLVM();
+    LgsCodeGen::initLLVM();
 }
 
+void writeFuncIndices(ofstream& ofs, const map<string, LgsFunc*>& funcs) {
+    for (auto [_, func] : funcs) {
+        const auto funcName = func->funcType->name;
+        const uint64_t funcNameSize = funcName.size();
+        func->pathIndex = ofs.tellp();
+        ofs.write(reinterpret_cast<const char*>(&funcNameSize), sizeof(uint64_t));
+        ofs.write(funcName.data(), funcNameSize);
+    }
+}
+
+// debug layout: [size, file_path][size, func_name]*
 void LgsApp::writeDebugFile() const {
     ofstream ofs(paths.debugFile, ios::binary);
     for (const auto file : files) {
-        const auto s = file->absPath.string();
-        file->pathIndex = ofs.tellp();
-        uint32_t len = static_cast<uint32_t>(s.size());
-        ofs.write(reinterpret_cast<const char*>(&len), sizeof(uint32_t));
-        ofs.write(s.data(), s.size());
+        const auto pathStr = file->absPath.string();
+        const uint64_t pathSize = pathStr.size();
+        file->codeGen.filePathIndex = ofs.tellp();
+        ofs.write(reinterpret_cast<const char*>(&pathSize), sizeof(uint64_t));
+        ofs.write(pathStr.data(), pathSize);
+        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
+            writeFuncIndices(ofs, mainFile->funcs);
+            for (const auto object : mainFile->objects) {
+                writeFuncIndices(ofs, object->methods);
+            }
+        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
+            writeFuncIndices(ofs, objFile->obj->methods);
+        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
+            writeFuncIndices(ofs, interfaceFile->interface->methods);
+        }
     }
 }
 

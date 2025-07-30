@@ -13,11 +13,11 @@ public:
     string tag;
 
     LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock) : ifCond(ifCond), ifStmtBlock(ifStmtBlock) {}
-    void generateIfElse(LgsModule* module) const;
-    void createIRStmt(LgsModule* module) override;
-    void generateSimpleIf(LgsModule* module) const;
-    void generateComplexIf(LgsModule* module) const;
-    bool shouldBranch(LgsModule* module, Value* ifCondIR) const;
+    void createIRStmt(LgsCodeGen* codeGen) override;
+    void generateIfElse(LgsCodeGen* codeGen) const;
+    void generateSimpleIf(LgsCodeGen* codeGen) const;
+    void generateComplexIf(LgsCodeGen* codeGen) const;
+    bool shouldBranch(LgsCodeGen* codeGen, Value* ifCondIR) const;
     ~LgsIfStmt() override;
 };
 

@@ -20,10 +20,10 @@ public:
     string prettyName() override;
     LgsExpr* lastExpr() const;
     LgsExpr* LastExprParent() const;
-    Value* resolveSelection(LgsModule* module);
-    Value* hashValue(LgsModule* module) override;
-    void createIRStmt(LgsModule* module) override;
-    Value* createIRValue(LgsModule* module) override;
+    Value* resolveSelection(LgsCodeGen* codeGen);
+    Value* hashValue(LgsCodeGen* codeGen) override;
+    void createIRStmt(LgsCodeGen* codeGen) override;
+    Value* createIRValue(LgsCodeGen* codeGen) override;
     ~LgsSelection() override;
 };
 

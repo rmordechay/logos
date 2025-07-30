@@ -21,7 +21,7 @@ public:
     FunctionType* IRType = nullptr;
     string* implementsName = nullptr;
 
-    Type* getIRType(LgsModule* module) override;
+    Type* getIRType(LgsCodeGen* codeGen) override;
     string getName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() override;

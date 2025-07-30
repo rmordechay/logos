@@ -8,7 +8,7 @@ public:
     std::string tag;
 
     explicit LgsBreakStmt(const std::string& tag = "") : tag(tag) {}
-    void createIRStmt(LgsModule* module) override;
+    void createIRStmt(LgsCodeGen* codeGen) override;
     ~LgsBreakStmt() override = default;
 };
 

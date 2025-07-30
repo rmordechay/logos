@@ -2,12 +2,13 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
 
-void LgsForLoop::createIRStmt(LgsModule* module) {
-    module->stack.enterScope(LOOP_SCOPE, this);
-    initIRLoop(module);
-    stmtBlock->createIRValue(module);
-    exitIRLoop(module);
-    module->stack.exitScope();
+void LgsForLoop::createIRStmt(LgsCodeGen* codeGen) {
+    codeGen->stack.enterScope(LOOP_SCOPE, this);
+    initIRLoop(codeGen);
+    stmtBlock->createIRValue(codeGen);
+    IRLoopPrologue(codeGen);
+    codeGen->startBlock(IRExitBlock);
+    codeGen->stack.exitScope();
 }
 
 LgsForLoop::~LgsForLoop() {

@@ -1,16 +1,14 @@
 #include "files/LgsObjectFile.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsObject.h"
-#include "utils/LgsIRUtils.h"
 
-LgsModule* LgsObjectFile::generateIR(LgsSymbolTable& globals) {
-    const auto module = new LgsModule(*this, globals);
-    module->IRModule = createIRModule(name, module->context);
-    obj->getIRType(module);
+
+void LgsObjectFile::generateIR() {
+    codeGen.createIRModule(name);
+    obj->getIRType(&codeGen);
     for (const auto& [_, method] : obj->methods) {
-        method->generateIR(module);
+        method->generateIR(&codeGen);
     }
-    return module;
 }
 
 LgsObjectFile::~LgsObjectFile() {

@@ -1,24 +1,24 @@
 #include "exprs/unary/LgsHashMap.h"
 
-#include "utils/LgsIRUtils.h"
+
 #include "utils/LgsUtils.h"
 
 string LgsHashMap::prettyName() {
     assert(0);
 }
 
-Value* LgsHashMap::createIRValue(LgsModule* module) {
+Value* LgsHashMap::createIRValue(LgsCodeGen* codeGen) {
     const auto mapType = type->asMap();
     const auto valueType = mapType->typePair->value;
-    const auto elementSize = i64(module, valueType->getSizeBytes());
-    IRValue = module->builder.CreateAlloca(mapType->getMapStruct(module));
-    mapType->initFunc.callIR(module, {IRValue, elementSize});
+    const auto elementSize = codeGen->i64(valueType->getSizeBytes());
+    IRValue = codeGen->builder.CreateAlloca(mapType->getMapStruct());
+    mapType->initFunc.callIR(codeGen, {IRValue, elementSize});
     for (const auto element : initialElements) {
-        mapType->addFunc.call(module, {this, element->key, element->value});
+        mapType->addFunc.call(codeGen, {this, element->key, element->value});
     }
     return IRValue;
 }
 
-void LgsHashMap::free(LgsModule* module) {
-    type->asMap()->freeFunc.call(module, {this});
+void LgsHashMap::free(LgsCodeGen* codeGen) {
+    type->asMap()->freeFunc.call(codeGen, {this});
 }

@@ -14,7 +14,7 @@ public:
     }
     string prettyName() override;
     string getName() override;
-    Type* getIRType(LgsModule* module) override;
+    Type* getIRType(LgsCodeGen* codeGen) override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     ~LgsInterface() override;

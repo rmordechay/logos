@@ -7,6 +7,6 @@ public:
     LgsFuncCall* funcCall = nullptr;
     LgsSelection* selection = nullptr;
 
-    void createIRStmt(LgsModule* module) override;
+    void createIRStmt(LgsCodeGen* codeGen) override;
     ~LgsCoroutine() override = default;
 };

@@ -1,7 +1,7 @@
 #include "types/LgsAny.h"
 
-#include "logos/LgsModule.h"
-#include "utils/LgsIRUtils.h"
+#include "logos/LgsCodeGen.h"
+
 #include "utils/LgsUtils.h"
 
 
@@ -9,8 +9,8 @@ size_t LgsAny::getSizeBytes() {
     return sizeof(void*);
 }
 
-Type* LgsAny::getIRType(LgsModule* module) {
-    return ptrTy(module);
+Type* LgsAny::getIRType(LgsCodeGen* codeGen) {
+    return codeGen->ptrTy();
 }
 
 string LgsAny::getName() {

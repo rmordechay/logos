@@ -1,15 +1,16 @@
 #pragma once
-#include "Platform.h"
+#include "LgsPaths.h"
 
 
-class LgsModule;
+class LgsFile;
+class LgsCodeGen;
 
 class LgsLinker {
 public:
     const LgsPaths& paths;
-    map<string, LgsModule*> modules;
+    vector<LgsFile*> files;
 
-    LgsLinker(const LgsPaths& paths, const map<string, LgsModule*>& modules) : paths(paths), modules(modules) {}
+    LgsLinker(const LgsPaths& paths, const vector<LgsFile*>& modules) : paths(paths), files(modules) {}
     bool generateObjFile(unique_ptr<Module> mainModule) const;
     bool link() const;
     void writeIRFiles() const;

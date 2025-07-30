@@ -1,20 +1,20 @@
 #include "types/LgsInterface.h"
 
 #include "funcs/LgsFunc.h"
-#include "logos/LgsModule.h"
+#include "logos/LgsCodeGen.h"
 #include "types/LgsObject.h"
-#include "utils/LgsIRUtils.h"
+
 #include "utils/LgsUtils.h"
 
-Type* LgsInterface::getIRType(LgsModule* module) {
+Type* LgsInterface::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;
-    IRType = StructType::getTypeByName(module->context, name);
+    IRType = StructType::getTypeByName(codeGen->context, name);
     vector<Type*> elementTypes;
     for (int i = 0; i < methods.size(); ++i) {
-        elementTypes.emplace_back(ptrTy(module));
+        elementTypes.emplace_back(codeGen->ptrTy());
     }
     if (!IRType) {
-        IRType = StructType::create(module->context, elementTypes, name);
+        IRType = StructType::create(codeGen->context, elementTypes, name);
     }
     return IRType;
 }

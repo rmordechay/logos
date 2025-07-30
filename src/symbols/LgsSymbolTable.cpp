@@ -9,7 +9,7 @@
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
-#include "utils/LgsIRUtils.h"
+
 
 void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
     std::lock_guard lock(mtx);

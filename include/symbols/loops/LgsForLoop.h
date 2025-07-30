@@ -15,11 +15,11 @@ public:
     BasicBlock* IRBodyBlock = nullptr;
     BasicBlock* IRExitBlock = nullptr;
 
-    void createIRStmt(LgsModule* module) override;
-    virtual Value* loopStart(LgsModule* module) = 0;
-    virtual Value* loopEnd(LgsModule* module) = 0;
-    virtual void initIRLoop(LgsModule* module) = 0;
-    virtual void exitIRLoop(LgsModule* module) const = 0;
+    void createIRStmt(LgsCodeGen* codeGen) override;
+    virtual Value* loopStart(LgsCodeGen* codeGen) = 0;
+    virtual Value* loopEnd(LgsCodeGen* codeGen) = 0;
+    virtual void initIRLoop(LgsCodeGen* codeGen) = 0;
+    virtual void IRLoopPrologue(LgsCodeGen* codeGen) const = 0;
     ~LgsForLoop() override;
 };
 

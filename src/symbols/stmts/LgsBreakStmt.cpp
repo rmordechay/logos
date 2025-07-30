@@ -1,8 +1,8 @@
 #include "stmts/LgsBreakStmt.h"
 #include "loops/LgsForLoop.h"
 
-void LgsBreakStmt::createIRStmt(LgsModule* module) {
-    const auto loop = module->stack.currentLoop();
+void LgsBreakStmt::createIRStmt(LgsCodeGen* codeGen) {
+    const auto loop = codeGen->stack.currentLoop();
     const auto loopExit = loop->IRExitBlock;
-    module->builder.CreateBr(loopExit);
+    codeGen->builder.CreateBr(loopExit);
 }

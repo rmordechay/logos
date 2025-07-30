@@ -12,22 +12,22 @@ string LgsObject::getName() {
     return name;
 }
 
-Type* LgsObject::getIRType(LgsModule* module) {
+Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
     // Add one or zero if table exists
     const size_t offset = !!vtable;
     vector<Type*> elementTypes(fields.size() + offset);
     size_t position = 0;
     if (vtable) {
-        elementTypes[position++] = vtable->type->getIRType(module);
+        elementTypes[position++] = vtable->type->getIRType(codeGen);
     }
     for (const auto [_, field] : fields) {
-        const auto fieldType = field->type->getIRType(module);
+        const auto fieldType = field->type->getIRType(codeGen);
         elementTypes[field->position + offset] = fieldType;
         field->position = position++;
     }
-    IRType = StructType::getTypeByName(module->context, name);
+    IRType = StructType::getTypeByName(codeGen->context, name);
     if (!IRType) {
-        IRType = StructType::create(module->context, elementTypes, name);
+        IRType = StructType::create(codeGen->context, elementTypes, name);
     }
     for (const auto field : fields) {
         field.second->parentIRType = IRType;

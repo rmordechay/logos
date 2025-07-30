@@ -1,40 +1,32 @@
 #include "funcs/LgsMainFunc.h"
 #include "exprs/unary/LgsArrayExpr.h"
-#include "exprs/unary/LgsInstance.h"
 #include "stmts/LgsStmtsBlock.h"
-#include "types/LgsObject.h"
 #include "types/LgsStr.h"
-#include "utils/LgsIRUtils.h"
 
-void LgsMainFunc::generateIR(LgsModule* module) {
-    module->stack.enterScope(FUNC_SCOPE, this);
-    startFuncBlock(module);
+void LgsMainFunc::generateIR(LgsCodeGen* codeGen) {
+    codeGen->stack.enterScope(FUNC_SCOPE, this);
+    codeGen->startFuncBlock();
+    codeGen->callInitRuntime();
     if (!stmtBlock->stmts.empty()) {
-        const auto firstStmt = stmtBlock->stmts.front();
-        callPushStack(module, firstStmt->location, LOGOS_MAIN_FUNC_NAME);
         if (!funcType->params.empty()) {
-            initArgs(module);
+            initArgs(codeGen);
         }
-        for (auto [_, symbol] : module->globals.symbols) {
-            if (symbol.symbolType != OBJECT || !symbol.object->singleton) continue;
-            symbol.object->singleton->getIRValue(module);
-        }
-        stmtBlock->createIRValue(module);
-        createCleanupBlock(module);
+        stmtBlock->createIRValue(codeGen);
+        createCleanupBlock(codeGen);
     }
-    module->builder.CreateRet(i32(module, EXIT_SUCCESS));
-    module->stack.exitScope();
+    codeGen->builder.CreateRet(codeGen->i32(EXIT_SUCCESS));
+    codeGen->stack.exitScope();
 }
 
-Function* LgsMainFunc::getIRFunc(LgsModule* module) {
+Function* LgsMainFunc::getIRFunc(LgsCodeGen* codeGen) {
     if (IRFunc) return IRFunc;
     FunctionType* mainFuncType;
     if (funcType->params.empty()) {
-        mainFuncType = FunctionType::get(i32Ty(module), {}, false);
+        mainFuncType = FunctionType::get(codeGen->i32Ty(), {}, false);
     } else {
-        mainFuncType = FunctionType::get(i32Ty(module), {i32Ty(module), module->builder.getPtrTy()}, false);
+        mainFuncType = FunctionType::get(codeGen->i32Ty(), {codeGen->i32Ty(), codeGen->builder.getPtrTy()}, false);
     }
-    auto func = module->IRModule->getOrInsertFunction(LOGOS_MAIN_FUNC_NAME, mainFuncType);
+    auto func = codeGen->IRModule->getOrInsertFunction(LOGOS_MAIN_FUNC_NAME, mainFuncType);
     IRFunc = dyn_cast<Function>(func.getCallee());
     if (funcType->params.empty()) return IRFunc;
     auto IRArgs = IRFunc->arg_begin();
@@ -51,12 +43,12 @@ void LgsMainFunc::setArgs() {
     initArgsFunc = new LgsFunc("initArgs", &LGS_VOID, {LgsParam(args->type), LgsParam(&LGS_INT), LgsParam(new LgsStr())});
 }
 
-void LgsMainFunc::initArgs(LgsModule* module) {
-    auto& builder = module->builder;
-    const vector<Type*> structFields{i64Ty(module), i32Ty(module), i32Ty(module), ptrTy(module)};
-    const auto arrStruct = getIRStructType(module->context, args->type->asDArray()->name, structFields);
+void LgsMainFunc::initArgs(LgsCodeGen* codeGen) {
+    auto& builder = codeGen->builder;
+    const vector<Type*> structFields{codeGen->i64Ty(), codeGen->i32Ty(), codeGen->i32Ty(), codeGen->ptrTy()};
+    const auto arrStruct = codeGen->getIRStructType(args->type->asDArray()->name, structFields);
     args->IRValue = builder.CreateAlloca(arrStruct);
-    initArgsFunc->callIR(module, {args->IRValue, argc, argv});
+    initArgsFunc->callIR(codeGen, {args->IRValue, argc, argv});
     funcType->params[0].setIRValue(args->IRValue);
 }
 

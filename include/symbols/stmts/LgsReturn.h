@@ -7,8 +7,8 @@ public:
     LgsExpr *expr = nullptr;
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
-    void createIRStmt(LgsModule* module) override;
-    void addReturnExpr(LgsModule* module) const;
+    void createIRStmt(LgsCodeGen* codeGen) override;
+    void addReturnExpr(LgsCodeGen* codeGen) const;
     ~LgsReturn() override;
 };
 

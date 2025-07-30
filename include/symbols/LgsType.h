@@ -27,7 +27,7 @@ class LgsExpr;
 class LgsFuncCall;
 class LgsField;
 class LgsFunc;
-class LgsModule;
+class LgsCodeGen;
 
 class LgsType {
 public:
@@ -42,6 +42,7 @@ public:
     bool canSlice = false;
     Type* IRType = nullptr;
     LgsHashMap* vtable = nullptr;
+    LgsCodeGen* codeGen = nullptr;
     map<string, LgsField*> fields;
     map<string, LgsFunc*> methods;
 
@@ -75,7 +76,7 @@ public:
     virtual string getName() = 0;
     virtual string prettyName() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Type* getIRType(LgsModule* module) = 0;
+    virtual Type* getIRType(LgsCodeGen* codeGen) = 0;
     virtual bool equals(LgsType* other) = 0;
     virtual ~LgsType();
 };

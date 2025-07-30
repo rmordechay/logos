@@ -1,6 +1,5 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/LgsArrayExpr.h"
-
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsHashMap.h"
@@ -18,11 +17,11 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsIterator.h"
 
-Value* LgsExpr::getIRValue(LgsModule* module) {
+Value* LgsExpr::getIRValue(LgsCodeGen* codeGen) {
     if (IRValue) return IRValue;
-    IRValue = createIRValue(module);
+    IRValue = createIRValue(codeGen);
     if (isHeapAlloc) {
-        module->stack.addHeapExpr(this);
+        codeGen->stack.addHeapExpr(this);
     }
     assert(IRValue);
     return IRValue;
@@ -71,30 +70,30 @@ string LgsExpr::getConstStr() {
     assert(0);
 }
 
-void LgsExpr::free(LgsModule* module) { assert(0); }
+void LgsExpr::free(LgsCodeGen* codeGen) { assert(0); }
 bool LgsExpr::equals(LgsExpr* other) { assert(0); }
 LgsExpr* LgsExpr::convertExpr(LgsType* toType) { assert(0); }
-Value* LgsExpr::hashValue(LgsModule* module) { assert(0); }
+Value* LgsExpr::hashValue(LgsCodeGen* codeGen) { assert(0); }
 LgsExpr* LgsExpr::clone() { assert(0); }
 
 // Comparisons
-Value* LgsExpr::subIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::mulIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::divIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::modIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::eqIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::neIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::ltIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::gtIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::geIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::leIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::andIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::orIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::bitAndIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::bitOrIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::bitXorIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::rshiftIR(LgsModule* module, LgsExpr* other) { assert(0); }
-Value* LgsExpr::lshiftIR(LgsModule* module, LgsExpr* other) { assert(0); }
+Value* LgsExpr::subIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::mulIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::divIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::modIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::eqIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::neIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::ltIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::gtIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::geIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::leIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::andIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::orIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::bitAndIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::bitOrIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
+Value* LgsExpr::lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
 
 // Casting
 LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }

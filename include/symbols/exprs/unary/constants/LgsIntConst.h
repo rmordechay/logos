@@ -10,15 +10,15 @@ public:
         isConstant = true;
     }
     string prettyName() override;
-    Value* createIRValue(LgsModule* module) override;
+    Value* createIRValue(LgsCodeGen* codeGen) override;
     LgsExpr* convertExpr(LgsType* toType) override;
-    Value* andIR(LgsModule* module, LgsExpr* other) override;
-    Value* orIR(LgsModule* module, LgsExpr* other) override;
-    Value* bitAndIR(LgsModule* module, LgsExpr* other) override;
-    Value* bitOrIR(LgsModule* module, LgsExpr* other) override;
-    Value* bitXorIR(LgsModule* module, LgsExpr* other) override;
-    Value* rshiftIR(LgsModule* module, LgsExpr* other) override;
-    Value* lshiftIR(LgsModule* module, LgsExpr* other) override;
+    Value* andIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* orIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* bitAndIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* bitOrIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     LgsExpr* clone() override;
     ~LgsIntConst() override = default;
 };

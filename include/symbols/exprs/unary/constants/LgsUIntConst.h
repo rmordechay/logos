@@ -8,21 +8,21 @@ public:
 
     explicit LgsUIntConst(const int value) : LgsUnaryExpr(&LGS_UINT), value(value) {}
     string prettyName() override;
-    Value* createIRValue(LgsModule* module) override;
+    Value* createIRValue(LgsCodeGen* codeGen) override;
     LgsExpr* convertExpr(LgsType* toType) override;
-    Value* eqIR(LgsModule* module, LgsExpr* other) override;
-    Value* neIR(LgsModule* module, LgsExpr* other) override;
-    Value* gtIR(LgsModule* module, LgsExpr* other) override;
-    Value* ltIR(LgsModule* module, LgsExpr* other) override;
-    Value* geIR(LgsModule* module, LgsExpr* other) override;
-    Value* leIR(LgsModule* module, LgsExpr* other) override;
-    Value* andIR(LgsModule* module, LgsExpr* other) override;
-    Value* orIR(LgsModule* module, LgsExpr* other) override;
-    Value* bitAndIR(LgsModule* module, LgsExpr* other) override;
-    Value* bitOrIR(LgsModule* module, LgsExpr* other) override;
-    Value* bitXorIR(LgsModule* module, LgsExpr* other) override;
-    Value* rshiftIR(LgsModule* module, LgsExpr* other) override;
-    Value* lshiftIR(LgsModule* module, LgsExpr* other) override;
+    Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* neIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* gtIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* ltIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* geIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* leIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* andIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* orIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* bitAndIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* bitOrIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     LgsExpr* clone() override;
     ~LgsUIntConst() override = default;
 };

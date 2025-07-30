@@ -3,26 +3,26 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-#include "utils/LgsIRUtils.h"
 
-Value* LgsFuncCall::createIRValue(LgsModule* module) {
-    callPushStack(module, location, name);
+
+Value* LgsFuncCall::createIRValue(LgsCodeGen* codeGen) {
+    codeGen->callPushStack(func->pathIndex);
     if (callback) {
-        func->setIRValue(getCallback(module));
+        func->setIRValue(getCallback(codeGen));
     } else if (func->funcType->isVirtual) {
-        resolveVirtualFunc(module);
+        resolveVirtualFunc(codeGen);
     }
-    return func->call(module, args);
+    return func->call(codeGen, args);
 }
 
-void LgsFuncCall::createIRStmt(LgsModule* module) {
-    createIRValue(module);
+void LgsFuncCall::createIRStmt(LgsCodeGen* codeGen) {
+    createIRValue(codeGen);
 }
 
-Value* LgsFuncCall::getCallback(LgsModule* module) const {
+Value* LgsFuncCall::getCallback(LgsCodeGen* codeGen) const {
     switch (callback->symbolType) {
     case VAR_DEC:
-        return callback->varDec->expr->getIRValue(module);
+        return callback->varDec->expr->getIRValue(codeGen);
     case PARAM:
         return callback->param->IRValue;
     case FIELD:
@@ -33,17 +33,17 @@ Value* LgsFuncCall::getCallback(LgsModule* module) const {
     assert(0);
 }
 
-void LgsFuncCall::resolveVirtualFunc(LgsModule* module) const {
-    auto& builder = module->builder;
+void LgsFuncCall::resolveVirtualFunc(LgsCodeGen* codeGen) const {
+    auto& builder = codeGen->builder;
     const auto self = args[0];
-    const auto keyIR = getIRStr(module, func->funcType->getName());
-    const auto selfPtr = self->getIRValue(module);
+    const auto keyIR = codeGen->getIRStr(func->funcType->getName());
+    const auto selfPtr = self->getIRValue(codeGen);
     const auto vtable = self->type->vtable;
     const auto vtableMap = vtable->type->asMap();
-    const auto mapType = vtable->type->getIRType(module);
-    const auto mapPtr = builder.CreateGEP(mapType, selfPtr, {i32Zero(module)});
-    auto rv = vtableMap->getFunc.callIR(module, {mapPtr, keyIR});
-    rv = builder.CreateLoad(ptrTy(module), rv);
+    const auto mapType = vtable->type->getIRType(codeGen);
+    const auto mapPtr = builder.CreateGEP(mapType, selfPtr, {codeGen->i32Zero()});
+    auto rv = vtableMap->getFunc.callIR(codeGen, {mapPtr, keyIR});
+    rv = builder.CreateLoad(codeGen->ptrTy(), rv);
     func->setIRValue(rv);
 }
 

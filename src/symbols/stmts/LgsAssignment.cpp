@@ -5,131 +5,131 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
-#include "utils/LgsIRUtils.h"
 
-void LgsAssignment::createIRStmt(LgsModule* module) {
+
+void LgsAssignment::createIRStmt(LgsCodeGen* codeGen) {
     Value* results = nullptr;
     switch (assignmentType) {
     case ASSIGN:
-        createIRAssign(module);
+        createIRAssign(codeGen);
         return;
     case ASSIGN_ADD:
-        results = lValue->addIR(module, rValue);
+        results = lValue->addIR(codeGen, rValue);
         break;
     case ASSIGN_SUB:
-        results = lValue->subIR(module, rValue);
+        results = lValue->subIR(codeGen, rValue);
         break;
     case ASSIGN_MUL:
-        results = lValue->mulIR(module, rValue);
+        results = lValue->mulIR(codeGen, rValue);
         break;
     case ASSIGN_DIV:
-        results = lValue->divIR(module, rValue);
+        results = lValue->divIR(codeGen, rValue);
         break;
     case ASSIGN_MOD:
-        results = lValue->modIR(module, rValue);
+        results = lValue->modIR(codeGen, rValue);
         break;
     case ASSIGN_AND:
-        results = lValue->bitAndIR(module, rValue);
+        results = lValue->bitAndIR(codeGen, rValue);
         break;
     case ASSIGN_OR:
-        results = lValue->bitOrIR(module, rValue);
+        results = lValue->bitOrIR(codeGen, rValue);
         break;
     case ASSIGN_XOR:
-        results = lValue->bitXorIR(module, rValue);
+        results = lValue->bitXorIR(codeGen, rValue);
         break;
     case ASSIGN_LSHIFT:
-        results = lValue->lshiftIR(module, rValue);
+        results = lValue->lshiftIR(codeGen, rValue);
         break;
     case ASSIGN_RSHIFT:
-        results = lValue->rshiftIR(module, rValue);
+        results = lValue->rshiftIR(codeGen, rValue);
         break;
     }
     assert(results);
-    module->builder.CreateStore(results, lValue->getIRValue(module));
+    codeGen->builder.CreateStore(results, lValue->getIRValue(codeGen));
 }
 
-void LgsAssignment::createIRAssign(LgsModule* module) const {
+void LgsAssignment::createIRAssign(LgsCodeGen* codeGen) const {
     if (const auto selection = lValue->asSelection()) {
-        assignToSelection(module, selection, rValue);
+        assignToSelection(codeGen, selection, rValue);
     } else if (const auto iterIndex = lValue->asIterIndex()) {
-        assignToIterIndex(module, iterIndex, rValue);
+        assignToIterIndex(iterIndex, rValue, codeGen);
     } else if (const auto var = lValue->asVariable()) {
-        assignToVariable(module, var, rValue);
+        assignToVariable(codeGen, var, rValue);
     } else {
         assert(0);
     }
 }
 
-void LgsAssignment::assignToIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr) const {
+void LgsAssignment::assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, LgsCodeGen* codeGen) {
     if (const auto map = expr->asHashMap()) {
-        storeHashMapInIterIndex(module, iterIndex, map);
+        storeHashMapInIterIndex(codeGen, iterIndex, map);
     } else if (const auto arr = expr->asArrayExpr()) {
-        storeArrayInIterIndex(module, iterIndex, arr);
+        storeArrayInIterIndex(codeGen, iterIndex, arr);
     } else {
-        storeScalarInIterIndex(module, iterIndex, expr);
+        storeScalarInIterIndex(codeGen, iterIndex, expr);
     }
 }
 
-void LgsAssignment::assignToSelection(LgsModule* module, LgsSelection* selection, LgsExpr* expr) {
-    const auto selectionIRValue = selection->resolveSelection(module);
+void LgsAssignment::assignToSelection(LgsCodeGen* codeGen, LgsSelection* selection, LgsExpr* expr) {
+    const auto selectionIRValue = selection->resolveSelection(codeGen);
     const auto var = selection->lastExpr()->asVariable();
-    var->ref.field->storeIRValue(module, selectionIRValue, expr);
+    var->ref.field->storeIRValue(codeGen, selectionIRValue, expr);
 }
 
-void LgsAssignment::assignToVariable(LgsModule* module, LgsVariable* variable, LgsExpr* expr) {
-    const auto variablePtr = variable->getIRValue(module);
-    const auto exprIRValue = expr->getIRValue(module);
-    module->builder.CreateStore(exprIRValue, variablePtr);
+void LgsAssignment::assignToVariable(LgsCodeGen* codeGen, LgsVariable* variable, LgsExpr* expr) {
+    const auto variablePtr = variable->getIRValue(codeGen);
+    const auto exprIRValue = expr->getIRValue(codeGen);
+    codeGen->builder.CreateStore(exprIRValue, variablePtr);
 }
 
-void LgsAssignment::storeHashMapInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsHashMap* map) {
+void LgsAssignment::storeHashMapInIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map) {
     assert(0);
 }
 
-void LgsAssignment::storeScalarInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr) {
+void LgsAssignment::storeScalarInIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsExpr* expr) {
     const auto baseExpr = iterIndex->baseExpr;
-    const auto rIRValue = expr->getIRValue(module);
-    const auto baseIRValue = baseExpr->getIRValue(module);
+    const auto rIRValue = expr->getIRValue(codeGen);
+    const auto baseIRValue = baseExpr->getIRValue(codeGen);
     if (const auto arr = baseExpr->type->asDArray()) {
-        const auto ptr = module->builder.CreateAlloca(expr->type->getIRType(module));
-        module->builder.CreateStore(rIRValue, ptr);
-        arr->putFunc.callIR(module, {baseIRValue, iterIndex->index->from->getIRValue(module), ptr});
+        const auto ptr = codeGen->builder.CreateAlloca(expr->type->getIRType(codeGen));
+        codeGen->builder.CreateStore(rIRValue, ptr);
+        arr->putFunc.callIR(codeGen, {baseIRValue, iterIndex->index->from->getIRValue(codeGen), ptr});
         return;
     }
     if (baseExpr->type->asSArray()) {
-        module->builder.CreateStore(rIRValue, iterIndex->getArrGEP(module));
+        codeGen->builder.CreateStore(rIRValue, iterIndex->getArrGEP(codeGen));
         return;
     }
     if (const auto map = baseExpr->type->asMap()) {
-        const auto key = iterIndex->index->from->getIRValue(module);
+        const auto key = iterIndex->index->from->getIRValue(codeGen);
         const auto keyIRType = key->getType();
-        const auto keyPtr = module->builder.CreateAlloca(keyIRType);
-        module->builder.CreateStore(key, keyPtr);
-        const auto keyLoad = module->builder.CreateLoad(keyIRType, keyPtr);
-        map->addFunc.callIR(module, {baseIRValue, keyLoad, rIRValue});
+        const auto keyPtr = codeGen->builder.CreateAlloca(keyIRType);
+        codeGen->builder.CreateStore(key, keyPtr);
+        const auto keyLoad = codeGen->builder.CreateLoad(keyIRType, keyPtr);
+        map->addFunc.callIR(codeGen, {baseIRValue, keyLoad, rIRValue});
     } else {
-        const auto iterPtr = iterIndex->getIRValue(module);
-        module->builder.CreateStore(rIRValue, iterPtr);
+        const auto iterPtr = iterIndex->getIRValue(codeGen);
+        codeGen->builder.CreateStore(rIRValue, iterPtr);
     }
 }
 
-void LgsAssignment::storeArrayInIterIndex(LgsModule* module, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) {
+void LgsAssignment::storeArrayInIterIndex(LgsCodeGen* codeGen, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) {
     const auto baseExpr = iterIndex->baseExpr;
-    const auto IRType = baseExpr->type->getIRType(module);
-    const auto arrPtr = baseExpr->getIRValue(module);
-    vector<Value*> IRIndices = {i32Zero(module)};
+    const auto IRType = baseExpr->type->getIRType(codeGen);
+    const auto arrPtr = baseExpr->getIRValue(codeGen);
+    vector<Value*> IRIndices = {codeGen->i32Zero()};
     vector<LgsIndex*> indices;
     setIterIndices(iterIndex, indices);
     for (const auto index : indices) {
-        IRIndices.emplace_back(index->from->getIRValue(module));
+        IRIndices.emplace_back(index->from->getIRValue(codeGen));
     }
     for (int i = 0; i < arr->initialElements.size(); ++i) {
         const auto element = arr->initialElements[i];
-        const auto IRIndex = i32(module, i);
+        const auto IRIndex = codeGen->i32(i);
         IRIndices.push_back(IRIndex);
-        const auto gep = module->builder.CreateGEP(IRType, arrPtr, IRIndices);
-        const auto rValue = element->getIRValue(module);
-        module->builder.CreateStore(rValue, gep);
+        const auto gep = codeGen->builder.CreateGEP(IRType, arrPtr, IRIndices);
+        const auto rValue = element->getIRValue(codeGen);
+        codeGen->builder.CreateStore(rValue, gep);
         IRIndices.pop_back();
     }
 }

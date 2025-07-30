@@ -15,6 +15,7 @@ public:
     vector<LgsExpr*> allocatedExprs;
     LgsStmtsBlock* stmtBlock = nullptr;
     BasicBlock* cleanupBlock = nullptr;
+    off_t pathIndex = 0;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {
         funcType = new LgsFuncType();
@@ -24,15 +25,15 @@ public:
         type = funcType;
     }
     explicit LgsFunc(LgsFuncType* funcType) : LgsUnaryExpr(funcType), funcType(funcType) {}
-    void freeAllocations(LgsModule* module) const;
     string prettyName() override;
     string format(string& tabs) override;
-    Value* createIRValue(LgsModule* module) override;
-    Value* callIR(LgsModule* module, const vector<Value*>& args = {});
-    void createCleanupBlock(LgsModule* module) const;
-    static Value* getIRArg(LgsModule* module, LgsExpr* arg);
-    virtual Value* call(LgsModule* module, const vector<LgsExpr*>& args = {});
-    virtual void generateIR(LgsModule* module);
-    virtual Function* getIRFunc(LgsModule* module);
+    void freeAllocations(LgsCodeGen* codeGen) const;
+    Value* createIRValue(LgsCodeGen* codeGen) override;
+    Value* callIR(LgsCodeGen* codeGen, const vector<Value*>& args = {});
+    void createCleanupBlock(LgsCodeGen* codeGen) const;
+    static Value* getIRArg(LgsCodeGen* codeGen, LgsExpr* arg);
+    virtual Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args = {});
+    virtual void generateIR(LgsCodeGen* codeGen);
+    virtual Function* getIRFunc(LgsCodeGen* codeGen);
     ~LgsFunc() override;
 };

@@ -4,7 +4,7 @@
 class LgsPrefixExpr;
 class LgsIterator;
 class LgsPostfixExpr;
-class LgsModule;
+class LgsCodeGen;
 class LgsFunc;
 class LgsHashMap;
 class LgsFuncCall;
@@ -32,7 +32,7 @@ public:
     BasicBlock* parentBlock = nullptr;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
-    Value* getIRValue(LgsModule* module);
+    Value* getIRValue(LgsCodeGen* codeGen);
     void setType(LgsType* newType);
     int getConstInt();
     string getConstStr();
@@ -57,29 +57,29 @@ public:
     virtual LgsExpr* clone();
     virtual bool equals(LgsExpr* other);
     virtual LgsExpr* convertExpr(LgsType* toType);
-    virtual void free(LgsModule* module);
-    virtual Value* hashValue(LgsModule* module);
-    virtual string prettyName() = 0;
-    virtual Value* createIRValue(LgsModule* module) = 0;
+    virtual void free(LgsCodeGen* codeGen);
+    virtual Value* hashValue(LgsCodeGen* codeGen);
 
-    virtual Value* addIR(LgsModule* module, LgsExpr* other) = 0;
-    virtual Value* subIR(LgsModule* module, LgsExpr* other);
-    virtual Value* mulIR(LgsModule* module, LgsExpr* other);
-    virtual Value* divIR(LgsModule* module, LgsExpr* other);
-    virtual Value* modIR(LgsModule* module, LgsExpr* other);
-    virtual Value* eqIR(LgsModule* module, LgsExpr* other);
-    virtual Value* neIR(LgsModule* module, LgsExpr* other);
-    virtual Value* ltIR(LgsModule* module, LgsExpr* other);
-    virtual Value* gtIR(LgsModule* module, LgsExpr* other);
-    virtual Value* geIR(LgsModule* module, LgsExpr* other);
-    virtual Value* leIR(LgsModule* module, LgsExpr* other);
-    virtual Value* andIR(LgsModule* module, LgsExpr* other);
-    virtual Value* orIR(LgsModule* module, LgsExpr* other);
-    virtual Value* bitAndIR(LgsModule* module, LgsExpr* other);
-    virtual Value* bitOrIR(LgsModule* module, LgsExpr* other);
-    virtual Value* bitXorIR(LgsModule* module, LgsExpr* other);
-    virtual Value* rshiftIR(LgsModule* module, LgsExpr* other);
-    virtual Value* lshiftIR(LgsModule* module, LgsExpr* other);
+    virtual string prettyName() = 0;
+    virtual Value* createIRValue(LgsCodeGen* codeGen) = 0;
+    virtual Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual Value* subIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* mulIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* divIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* modIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* neIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* ltIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* gtIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* geIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* leIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* andIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* orIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* bitAndIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* bitOrIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* bitXorIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other);
+    virtual Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other);
     ~LgsExpr() override = default;
 };
 

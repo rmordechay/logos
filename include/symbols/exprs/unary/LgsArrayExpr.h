@@ -14,9 +14,9 @@ public:
         isHeapAlloc = true;
     }
     string prettyName() override;
-    Value* createIRValue(LgsModule* module) override;
-    Value* createConstArray(LgsModule* module) const;
-    Value* createDynamicArray(LgsModule* module);
-    void free(LgsModule* module) override;
+    Value* createIRValue(LgsCodeGen* codeGen) override;
+    Value* createConstArray(LgsCodeGen* codeGen) const;
+    Value* createDynamicArray(LgsCodeGen* codeGen);
+    void free(LgsCodeGen* codeGen) override;
     ~LgsArrayExpr() override = default;
 };

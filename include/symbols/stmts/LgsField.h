@@ -20,10 +20,10 @@ public:
     bool isOptional = false;
 
     LgsField(const string& name, string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(name), parentName(parentName), type(type), expr(expr) {}
-    Value* getGEP(LgsModule* module, Value* instance) const;
-    Value* getIRValue(LgsModule* module, LgsExpr* parentInstance) const;
+    Value* getGEP(LgsCodeGen* codeGen, Value* instance) const;
+    Value* getIRValue(LgsCodeGen* codeGen, LgsExpr* parentInstance);
     LgsField* clone() const;
-    static void storeIRValue(LgsModule* module, Value* instance, LgsExpr* value);
-    Value* resolveVirtualField(LgsModule* module, LgsExpr* parentExpr) const;
+    void storeIRValue(LgsCodeGen* codeGen, Value* instance, LgsExpr* value);
+    Value* resolveVirtualField(LgsCodeGen* codeGen, LgsExpr* parentExpr) const;
     ~LgsField() override;
 };

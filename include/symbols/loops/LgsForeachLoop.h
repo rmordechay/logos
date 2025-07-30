@@ -11,16 +11,16 @@ public:
     LgsUnaryExpr* iterExpr = nullptr;
 
     explicit LgsForeachLoop(LgsUnaryExpr* iterable) : iterExpr(iterable) {}
-    void setArrIterVars(LgsModule* module, LgsDArray* arr) const;
-    void setMapIterVars(LgsModule* module, const LgsIterator& iterator) const;
-    void setStrIterVars(LgsModule* module, LgsStr* str) const;
-    void setLoopCondition(LgsModule* module);
-    LoadInst* loadIPtr(LgsModule* module) const;
-    void initIPtr(LgsModule* module);
-    Value* loopStart(LgsModule* module) override;
-    Value* loopEnd(LgsModule* module) override;
-    void initIRLoop(LgsModule* module) override;
-    void exitIRLoop(LgsModule* module) const override;
+    void setArrIterVars(LgsCodeGen* codeGen, LgsDArray* arr) const;
+    void setMapIterVars(LgsCodeGen* codeGen, const LgsIterator& iterator) const;
+    void setStrIterVars(LgsCodeGen* codeGen, LgsStr* str) const;
+    void setLoopCondition(LgsCodeGen* codeGen);
+    LoadInst* loadIPtr(LgsCodeGen* codeGen) const;
+    void initIPtr(LgsCodeGen* codeGen);
+    Value* loopStart(LgsCodeGen* codeGen) override;
+    Value* loopEnd(LgsCodeGen* codeGen) override;
+    void initIRLoop(LgsCodeGen* codeGen) override;
+    void IRLoopPrologue(LgsCodeGen* codeGen) const override;
     ~LgsForeachLoop() override;
 };
 

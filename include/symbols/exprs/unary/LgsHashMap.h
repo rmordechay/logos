@@ -11,8 +11,8 @@ public:
     }
     explicit LgsHashMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsHashMap(new LgsMap(keyType, valueType)) {}
     string prettyName() override;
-    Value* createIRValue(LgsModule* module) override;
-    void free(LgsModule* module) override;
+    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void free(LgsCodeGen* codeGen) override;
     ~LgsHashMap() override = default;
 };
 

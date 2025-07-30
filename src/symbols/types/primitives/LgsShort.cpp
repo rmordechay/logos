@@ -1,14 +1,14 @@
 #include "exprs/LgsNullValue.h"
 #include "exprs/unary/constants/LgsShortConst.h"
 #include "types/LgsAny.h"
-#include "utils/LgsIRUtils.h"
+
 
 size_t LgsShort::getSizeBytes() {
     return sizeof(short);
 }
 
-Type* LgsShort::getIRType(LgsModule* module) {
-    return i16Ty(module);
+Type* LgsShort::getIRType(LgsCodeGen* codeGen) {
+    return codeGen->i16Ty();
 }
 
 string LgsShort::prettyName() {

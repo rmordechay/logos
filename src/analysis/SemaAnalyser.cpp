@@ -1,5 +1,4 @@
 #include "analysis/SemaAnalyser.h"
-
 #include "LgsCoroutine.h"
 #include "configs/LgsErrors.h"
 #include "files/LgsInterfaceFile.h"
@@ -14,7 +13,6 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/LgsBinaryExpr.h"
-
 #include "stmts/LgsBreakStmt.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsHashMap.h"
@@ -110,7 +108,7 @@ void SemaAnalyser::visitParam(LgsParam* param) {
     addLocalSymbol(param->name, LgsSymbol(param));
 }
 
-void SemaAnalyser::visitField(const LgsField* field) {
+void SemaAnalyser::visitField(LgsField* field) {
     if (field->expr) {
         visitExpr(field->expr);
         validateExprType(field->expr, field->type);
@@ -311,7 +309,8 @@ void SemaAnalyser::visitContinueStmt(const LgsContinueStmt* continueStmt) {
     }
 }
 
-void SemaAnalyser::visitEnum(const LgsEnum* lgsEnum) const {}
+void SemaAnalyser::visitEnum(LgsEnum* lgsEnum) const {
+}
 
 void SemaAnalyser::visitExpr(LgsExpr* expr) {
     if (!expr) return;
@@ -949,22 +948,21 @@ bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentTyp
 LgsType* SemaAnalyser::resolveType(LgsType* type) {
     if (const auto nullable = type->asNullable()) {
         nullable->baseType = resolveType(nullable->baseType);
-        return nullable;
     }
     if (const auto iter = type->asIterable()) {
         resolveIterable(iter);
-        return iter;
     }
     if (const auto pair = type->asPair()) {
         pair->key = resolveType(pair->key);
         pair->value = resolveType(pair->value);
-        return pair;
     }
     if (const auto funcType = type->asFuncType()) {
         resolveFuncTypes(funcType);
-        return funcType;
     }
-    if (!type->isUnknown) return type;
+
+    if (!type->isUnknown) {
+        return type;
+    }
 
     auto typeName = type->getName();
     auto symbol = globals.getSymbol(typeName);
@@ -1057,4 +1055,3 @@ void SemaAnalyser::resolveGroupTypes(LgsGroup* group) {
         group->types[i] = resolveType(group->types[i]);
     }
 }
-

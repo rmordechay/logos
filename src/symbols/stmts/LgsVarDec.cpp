@@ -1,12 +1,12 @@
 #include "stmts/LgsVarDec.h"
 #include "exprs/unary/LgsArrayExpr.h"
 
-void LgsVarDec::createIRStmt(LgsModule* module) {
-    const auto IRType = type->getIRType(module);
-    const auto exprIRValue = expr->getIRValue(module);
+void LgsVarDec::createIRStmt(LgsCodeGen* codeGen) {
+    const auto IRType = type->getIRType(codeGen);
+    const auto exprIRValue = expr->getIRValue(codeGen);
     if (shouldAllocate(IRType)) {
-        IRValue = module->builder.CreateAlloca(IRType);
-        module->builder.CreateStore(exprIRValue, IRValue);
+        IRValue = codeGen->builder.CreateAlloca(IRType);
+        codeGen->builder.CreateStore(exprIRValue, IRValue);
     } else {
         IRValue = exprIRValue;
     }

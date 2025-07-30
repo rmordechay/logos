@@ -4,7 +4,6 @@ add_library(lgslib STATIC
     lib/HashMap.c
     lib/Array.c
     lib/Str.c
-    lib/VTable.c
     lib/Runtime.c
 )
 

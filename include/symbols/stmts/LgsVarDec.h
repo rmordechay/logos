@@ -10,7 +10,7 @@ public:
     bool isNullable = false;
 
     explicit LgsVarDec(const string& name, LgsExpr* expr = nullptr) : name(name), expr(expr) {}
-    void createIRStmt(LgsModule* module) override;
+    void createIRStmt(LgsCodeGen* codeGen) override;
     string format(string& indentStr) override;
     bool shouldAllocate(const Type* IRType) const;
     ~LgsVarDec() override;

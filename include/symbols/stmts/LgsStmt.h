@@ -3,7 +3,7 @@
 
 class LgsCoroutine;
 class LgsPostfixExpr;
-class LgsModule;
+class LgsCodeGen;
 class LgsForLoop;
 class LgsVarDec;
 class LgsSelection;
@@ -29,7 +29,7 @@ public:
     LgsFuncCall* asFuncCall();
     LgsSelection* asSelection();
     LgsPostfixExpr* asPostfixExpr();
-    virtual void createIRStmt(LgsModule* module) = 0;
+    virtual void createIRStmt(LgsCodeGen* codeGen) = 0;
     ~LgsStmt() override = default;
 };
 

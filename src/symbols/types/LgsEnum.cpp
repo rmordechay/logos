@@ -1,14 +1,15 @@
 #include "types/LgsEnum.h"
 
-#include "utils/LgsIRUtils.h"
+
+#include "logos/LgsCodeGen.h"
 #include "utils/LgsUtils.h"
 
 LgsExpr* LgsEnum::getZeroValue() {
     return nullptr;
 }
 
-Type* LgsEnum::getIRType(LgsModule* module) {
-    return ptrTy(module);
+Type* LgsEnum::getIRType(LgsCodeGen* codeGen) {
+    return codeGen->ptrTy();
 }
 
 string LgsEnum::getName() {

@@ -2,7 +2,7 @@
 
 #include "exprs/LgsNullValue.h"
 #include "exprs/unary/constants/LgsCharConst.h"
-#include "utils/LgsIRUtils.h"
+
 
 string LgsChar::prettyName() {
     return name;
@@ -12,8 +12,8 @@ size_t LgsChar::getSizeBytes() {
     return sizeof(char);
 }
 
-Type* LgsChar::getIRType(LgsModule* module) {
-    return i8Ty(module);
+Type* LgsChar::getIRType(LgsCodeGen* codeGen) {
+    return codeGen->i8Ty();
 }
 
 string LgsChar::getName() {

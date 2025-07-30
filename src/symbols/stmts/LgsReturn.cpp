@@ -2,23 +2,23 @@
 #include "funcs/LgsFunc.h"
 #include "utils/LgsUtils.h"
 
-void LgsReturn::createIRStmt(LgsModule* module) {
+void LgsReturn::createIRStmt(LgsCodeGen* codeGen) {
     if (expr) {
-        addReturnExpr(module);
+        addReturnExpr(codeGen);
     } else {
-        addReturnExpr(module);
+        addReturnExpr(codeGen);
     }
 }
 
-void LgsReturn::addReturnExpr(LgsModule* module) const {
-    const auto currentFunc = module->stack.currentFunc();
+void LgsReturn::addReturnExpr(LgsCodeGen* codeGen) const {
+    const auto currentFunc = codeGen->stack.currentFunc();
     if (expr) {
         // This is to make sure IRValue is computed at
         // this point and not in the cleanup block
-        expr->getIRValue(module);
-        expr->parentBlock = module->builder.GetInsertBlock();
+        expr->getIRValue(codeGen);
+        expr->parentBlock = codeGen->builder.GetInsertBlock();
     }
-    module->builder.CreateBr(currentFunc->cleanupBlock);
+    codeGen->builder.CreateBr(currentFunc->cleanupBlock);
 }
 
 LgsReturn::~LgsReturn() {

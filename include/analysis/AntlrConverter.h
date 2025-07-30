@@ -105,5 +105,6 @@ public:
     LgsType* getTypeFromText(tree::TerminalNode* typeToken) const;
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     bool isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec);
+    bool validateTypeName(const string& typeName, const LgsLocation* location);
     ~AntlerConverter() = default;
 };

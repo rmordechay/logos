@@ -6,7 +6,7 @@
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
-#include "utils/LgsIRUtils.h"
+
 
 size_t LgsInt::getSizeBytes() {
     return sizeof(int);
@@ -16,8 +16,8 @@ string LgsInt::prettyName() {
     return name;
 }
 
-Type* LgsInt::getIRType(LgsModule* module) {
-    return i32Ty(module);
+Type* LgsInt::getIRType(LgsCodeGen* codeGen) {
+    return codeGen->i32Ty();
 }
 
 string LgsInt::getName() {

@@ -16,6 +16,6 @@ bool LgsUnknownType::equals(LgsType* other) {
     return false;
 }
 
-Type* LgsUnknownType::getIRType(LgsModule* module) {
+Type* LgsUnknownType::getIRType(LgsCodeGen* codeGen) {
     assert(0);
 }

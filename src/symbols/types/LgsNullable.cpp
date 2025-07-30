@@ -1,8 +1,8 @@
 #include "types/LgsNullable.h"
-#include "utils/LgsIRUtils.h"
 
-Type* LgsNullable::getIRType(LgsModule* module) {
-    return ptrTy(module);
+
+Type* LgsNullable::getIRType(LgsCodeGen* codeGen) {
+    return codeGen->ptrTy();
 }
 
 string LgsNullable::getName() {

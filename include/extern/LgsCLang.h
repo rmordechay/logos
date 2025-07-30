@@ -1,6 +1,6 @@
 #pragma once
 #include "utils/LgsErrHandler.h"
-#include "logos/Platform.h"
+#include "logos/LgsPaths.h"
 
 class LgsStrConst;
 class LgsFile;

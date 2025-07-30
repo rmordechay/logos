@@ -14,13 +14,13 @@ public:
     LgsSymbol* callback = nullptr;
 
     explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
-    Value* getCallback(LgsModule* module) const;
-    void createIRStmt(LgsModule* module) override;
-    Value* createIRValue(LgsModule* module) override;
+    Value* getCallback(LgsCodeGen* codeGen) const;
+    void createIRStmt(LgsCodeGen* codeGen) override;
+    Value* createIRValue(LgsCodeGen* codeGen) override;
     bool equals(const LgsFuncType* funcType) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
-    void resolveVirtualFunc(LgsModule* module) const;
+    void resolveVirtualFunc(LgsCodeGen* codeGen) const;
     string format(string& indentStr) override;
     string prettyName() override;
     ~LgsFuncCall() override = default;

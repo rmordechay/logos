@@ -1,14 +1,14 @@
 
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/LgsNullValue.h"
-#include "utils/LgsIRUtils.h"
+
 
 string LgsBool::prettyName() {
     return name;
 }
 
-Type* LgsBool::getIRType(LgsModule* module) {
-    return i1Ty(module);
+Type* LgsBool::getIRType(LgsCodeGen* codeGen) {
+    return codeGen->i1Ty();
 }
 
 string LgsBool::getName() {

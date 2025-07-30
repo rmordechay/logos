@@ -1,47 +1,46 @@
 #include "loops/LgsRangeLoop.h"
 #include "configs/LgsDefinitions.h"
 #include "stmts/LgsVarDec.h"
-#include "utils/LgsIRUtils.h"
+
 #include "utils/LgsUtils.h"
 
-Value* LgsRangeLoop::loopStart(LgsModule* module) {
-    return startRange->getIRValue(module);
+Value* LgsRangeLoop::loopStart(LgsCodeGen* codeGen) {
+    return startRange->getIRValue(codeGen);
 }
 
-Value* LgsRangeLoop::loopEnd(LgsModule* module) {
-    return endRange->getIRValue(module);
+Value* LgsRangeLoop::loopEnd(LgsCodeGen* codeGen) {
+    return endRange->getIRValue(codeGen);
 }
 
-void LgsRangeLoop::initIRLoop(LgsModule* module) {
-    IRCondBlock = BasicBlock::Create(module->context, BLOCK_NAME_LOOP_COND);
-    IRBodyBlock = BasicBlock::Create(module->context, BLOCK_NAME_LOOP_BODY);
-    IRExitBlock = BasicBlock::Create(module->context, BLOCK_NAME_LOOP_EXIT);
-    iPtr = module->builder.CreateAlloca(i32Ty(module));
-    module->builder.CreateStore(loopStart(module), iPtr);
-    module->builder.CreateBr(IRCondBlock);
+void LgsRangeLoop::initIRLoop(LgsCodeGen* codeGen) {
+    IRCondBlock = BasicBlock::Create(codeGen->context, BLOCK_NAME_LOOP_COND);
+    IRBodyBlock = BasicBlock::Create(codeGen->context, BLOCK_NAME_LOOP_BODY);
+    IRExitBlock = BasicBlock::Create(codeGen->context, BLOCK_NAME_LOOP_EXIT);
+    iPtr = codeGen->builder.CreateAlloca(codeGen->i32Ty());
+    codeGen->builder.CreateStore(loopStart(codeGen), iPtr);
+    codeGen->builder.CreateBr(IRCondBlock);
 
     // Condition
-    startBlock(module, IRCondBlock);
-    auto iValue = module->builder.CreateLoad(i32Ty(module), iPtr);
-    const auto upperBound = module->builder.CreateZExt(loopEnd(module), i32Ty(module));
-    const auto condition = module->builder.CreateICmpSLT(iValue, upperBound);
-    module->builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
+    codeGen->startBlock(IRCondBlock);
+    auto iValue = codeGen->builder.CreateLoad(codeGen->i32Ty(), iPtr);
+    const auto upperBound = codeGen->builder.CreateZExt(loopEnd(codeGen), codeGen->i32Ty());
+    const auto condition = codeGen->builder.CreateICmpSLT(iValue, upperBound);
+    codeGen->builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
 
     // Body
-    startBlock(module, IRBodyBlock);
-    iValue = module->builder.CreateLoad(i32Ty(module), iPtr);
+    codeGen->startBlock(IRBodyBlock);
+    iValue = codeGen->builder.CreateLoad(codeGen->i32Ty(), iPtr);
     loopVars[0]->setIRValue(iValue);
 }
 
-void LgsRangeLoop::exitIRLoop(LgsModule* module) const {
-    if (!lastInstTerminator(module)) {
+void LgsRangeLoop::IRLoopPrologue(LgsCodeGen* codeGen) const {
+    if (!codeGen->lastInstTerminator()) {
         // Increment loop variable
-        const auto iValue = module->builder.CreateLoad(i32Ty(module), iPtr);
-        const auto inc = module->builder.CreateAdd(iValue, i32(module, 1));
-        module->builder.CreateStore(inc, iPtr);
-        module->builder.CreateBr(IRCondBlock);
+        const auto iValue = codeGen->builder.CreateLoad(codeGen->i32Ty(), iPtr);
+        const auto inc = codeGen->builder.CreateAdd(iValue, codeGen->i32(1));
+        codeGen->builder.CreateStore(inc, iPtr);
+        codeGen->builder.CreateBr(IRCondBlock);
     }
-    startBlock(module, IRExitBlock);
 }
 
 LgsRangeLoop::~LgsRangeLoop() {

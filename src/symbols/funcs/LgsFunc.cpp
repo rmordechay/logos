@@ -3,35 +3,34 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "types/LgsVoid.h"
-#include "utils/LgsIRUtils.h"
+
 #include "utils/LgsUtils.h"
 
-void LgsFunc::generateIR(LgsModule* module) {
-    module->stack.enterScope(FUNC_SCOPE, this);
-    startFuncBlock(module);
-    stmtBlock->createIRValue(module);
-    createCleanupBlock(module);
-    if (!lastInstTerminator(module)) {
-        module->builder.CreateRetVoid();
+void LgsFunc::generateIR(LgsCodeGen* codeGen) {
+    codeGen->stack.enterScope(FUNC_SCOPE, this);
+    codeGen->startFuncBlock();
+    stmtBlock->createIRValue(codeGen);
+    createCleanupBlock(codeGen);
+    if (!codeGen->lastInstTerminator()) {
+        codeGen->builder.CreateRetVoid();
     }
-    module->stack.exitScope();
+    codeGen->stack.exitScope();
 }
 
-Value* LgsFunc::createIRValue(LgsModule* module) {
-    module->savedIP = module->builder.saveIP();
-    generateIR(module);
-    module->builder.restoreIP(module->savedIP);
-    return getIRFunc(module);
+Value* LgsFunc::createIRValue(LgsCodeGen* codeGen) {
+    codeGen->savedIP = codeGen->builder.saveIP();
+    generateIR(codeGen);
+    codeGen->builder.restoreIP(codeGen->savedIP);
+    return getIRFunc(codeGen);
 }
 
-Function* LgsFunc::getIRFunc(LgsModule* module) {
+Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
     const auto funcIRName = funcType->getName();
-    auto IRFunc = module->IRModule->getFunction(funcIRName);
+    auto IRFunc = codeGen->IRModule->getFunction(funcIRName);
     if (IRFunc) return IRFunc;
-    const auto type = funcType->getIRType(module);
+    const auto type = funcType->getIRType(codeGen);
     const auto funcTy = cast<FunctionType>(type);
-    auto func = module->IRModule->getOrInsertFunction(funcIRName, funcTy);
+    auto func = codeGen->IRModule->getOrInsertFunction(funcIRName, funcTy);
     IRFunc = cast<Function>(func.getCallee());
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
@@ -68,63 +67,63 @@ bool shouldLoadIRArg(Value* value) {
     return true;
 }
 
-Value* LgsFunc::getIRArg(LgsModule* module, LgsExpr* arg) {
-    const auto v = arg->getIRValue(module);
+Value* LgsFunc::getIRArg(LgsCodeGen* codeGen, LgsExpr* arg) {
+    const auto v = arg->getIRValue(codeGen);
     if (isa<GlobalVariable>(v) || isa<LoadInst>(v)) return v;
     if (isa<Argument>(v) && v->getType()->isIntegerTy()) return v;
-    const auto ty = arg->type->getIRType(module);
+    const auto ty = arg->type->getIRType(codeGen);
     if (arg->type->isPrimitive && !arg->isConstant) {
-        return module->builder.CreateLoad(ty, v);
+        return codeGen->builder.CreateLoad(ty, v);
     }
     return v;
 }
 
-Value* LgsFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
+Value* LgsFunc::call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
     if (funcType->hasDefaults) assert(0);
     for (int i = funcType->isStatic; i < args.size(); ++i) {
-        auto arg = getIRArg(module, args[i]);
+        auto arg = getIRArg(codeGen, args[i]);
         IRArgs.push_back(arg);
     }
-    return callIR(module, IRArgs);
+    return callIR(codeGen, IRArgs);
 }
 
-Value* LgsFunc::callIR(LgsModule* module, const vector<Value*>& args) {
+Value* LgsFunc::callIR(LgsCodeGen* codeGen, const vector<Value*>& args) {
     if (IRValue) {
-        const auto funcTypeIR = funcType->getIRType(module);
+        const auto funcTypeIR = funcType->getIRType(codeGen);
         const auto IRFuncType = cast<FunctionType>(funcTypeIR);
-        return module->builder.CreateCall(IRFuncType, IRValue, args);
+        return codeGen->builder.CreateCall(IRFuncType, IRValue, args);
     }
-    const auto IRFunc = getIRFunc(module);
-    return module->builder.CreateCall(IRFunc, args);
+    const auto IRFunc = getIRFunc(codeGen);
+    return codeGen->builder.CreateCall(IRFunc, args);
 }
 
-void LgsFunc::createCleanupBlock(LgsModule* module) const {
-    if (!lastInstTerminator(module)) {
-        module->builder.CreateBr(cleanupBlock);
+void LgsFunc::createCleanupBlock(LgsCodeGen* codeGen) const {
+    if (!codeGen->lastInstTerminator()) {
+        codeGen->builder.CreateBr(cleanupBlock);
     }
-    startBlock(module, cleanupBlock);
-    const auto IRReturnType = funcType->rt->getIRType(module);
+    codeGen->startBlock(cleanupBlock);
+    const auto IRReturnType = funcType->rt->getIRType(codeGen);
     Value* rv = nullptr;
     if (returnExprs.size() == 1) {
-        rv = returnExprs.front()->getIRValue(module);
+        rv = returnExprs.front()->getIRValue(codeGen);
     } else if (returnExprs.size() > 1) {
-        const auto phiNode = module->builder.CreatePHI(IRReturnType, returnExprs.size());
+        const auto phiNode = codeGen->builder.CreatePHI(IRReturnType, returnExprs.size());
         for (const auto expr : returnExprs) {
-            phiNode->addIncoming(expr->getIRValue(module), expr->parentBlock);
+            phiNode->addIncoming(expr->getIRValue(codeGen), expr->parentBlock);
         }
         rv = phiNode;
     }
-    freeAllocations(module);
-    callPopStack(module);
+    freeAllocations(codeGen);
+    codeGen->callPopStack();
     if (rv) {
-        module->builder.CreateRet(rv);
+        codeGen->builder.CreateRet(rv);
     }
 }
 
-void LgsFunc::freeAllocations(LgsModule* module) const {
+void LgsFunc::freeAllocations(LgsCodeGen* codeGen) const {
     for (const auto expr : allocatedExprs) {
-        expr->free(module);
+        expr->free(codeGen);
     }
 }
 

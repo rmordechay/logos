@@ -7,7 +7,7 @@ public:
     char value;
     explicit LgsCharConst(const char value) : LgsUnaryExpr(&LGS_CHAR), value(value) {}
     string prettyName() override;
-    Value* createIRValue(LgsModule* module) override;
+    Value* createIRValue(LgsCodeGen* codeGen) override;
 };
 
 

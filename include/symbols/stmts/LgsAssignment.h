@@ -29,14 +29,14 @@ public:
     LgsAssignType assignmentType;
 
     LgsAssignment(const LgsAssignType assignmentType, LgsExpr* lValue, LgsExpr* rValue) : lValue(lValue), rValue(rValue), assignmentType(assignmentType) {}
-    void createIRStmt(LgsModule* module) override;
-    void createIRAssign(LgsModule* module) const;
-    void assignToIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr) const;
-    static void storeArrayInIterIndex(LgsModule* module, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr);
+    void createIRStmt(LgsCodeGen* codeGen) override;
+    void createIRAssign(LgsCodeGen* codeGen) const;
+    static void assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, LgsCodeGen* codeGen);
+    static void storeArrayInIterIndex(LgsCodeGen* codeGen, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr);
     static void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices);
-    static void assignToSelection(LgsModule* module, LgsSelection* selection, LgsExpr* expr);
-    static void assignToVariable(LgsModule* module, LgsVariable* variable, LgsExpr* expr);
-    static void storeScalarInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsExpr* expr);
-    static void storeHashMapInIterIndex(LgsModule* module, LgsIterIndex* iterIndex, LgsHashMap* map);
+    static void assignToSelection(LgsCodeGen* codeGen, LgsSelection* selection, LgsExpr* expr);
+    static void assignToVariable(LgsCodeGen* codeGen, LgsVariable* variable, LgsExpr* expr);
+    static void storeScalarInIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsExpr* expr);
+    static void storeHashMapInIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map);
     ~LgsAssignment() override;
 };

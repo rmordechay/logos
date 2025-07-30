@@ -5,15 +5,15 @@
 #include "types/LgsCPtr.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsSize.h"
-#include "utils/LgsIRUtils.h"
+
 #include "utils/LgsUtils.h"
 
 string LgsLong::prettyName() {
     return name;
 }
 
-Type* LgsLong::getIRType(LgsModule* module) {
-    return i64Ty(module);
+Type* LgsLong::getIRType(LgsCodeGen* codeGen) {
+    return codeGen->i64Ty();
 }
 
 size_t LgsLong::getSizeBytes() {

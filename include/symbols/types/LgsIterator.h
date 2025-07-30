@@ -4,8 +4,6 @@
 #include "funcs/LgsBuiltinFunc.h"
 #include "primitives/LgsBool.h"
 #include "LgsVoid.h"
-#include "utils/LgsIRUtils.h"
-#include "utils/LgsUtils.h"
 
 class LgsIterator final : public LgsUnaryExpr {
 public:
@@ -18,27 +16,27 @@ public:
     }
 
     string prettyName() override;
-    Value* createIRValue(LgsModule* module) override;
-    void initIterator(LgsModule* module);
-    Value* next(LgsModule* module) const;
-    Value* hasNext(LgsModule* module) const;
+    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void initIterator(LgsCodeGen* codeGen);
+    Value* next(LgsCodeGen* codeGen) const;
+    Value* hasNext(LgsCodeGen* codeGen) const;
     ~LgsIterator() override = default;
 };
 
 
-inline void LgsIterator::initIterator(LgsModule* module) {
+inline void LgsIterator::initIterator(LgsCodeGen* codeGen) {
     LgsBuiltinFunc iterInitFunc{"initIter", &LGS_VOID, type->getName(), {type, &LGS_ANY}};
-    const auto structType = getIRStructType(module->context, name, {ptrTy(module), i64Ty(module), ptrTy(module), ptrTy(module), ptrTy(module), ptrTy(module)});
-    IRValue = module->builder.CreateAlloca(structType);
-    iterInitFunc.callIR(module, {baseExpr->getIRValue(module), IRValue});
+    const auto structType = codeGen->getIRStructType(name, {codeGen->ptrTy(), codeGen->i64Ty(), codeGen->ptrTy(), codeGen->ptrTy(), codeGen->ptrTy(), codeGen->ptrTy()});
+    IRValue = codeGen->builder.CreateAlloca(structType);
+    iterInitFunc.callIR(codeGen, {baseExpr->getIRValue(codeGen), IRValue});
 }
 
-inline Value* LgsIterator::next(LgsModule* module) const {
+inline Value* LgsIterator::next(LgsCodeGen* codeGen) const {
     LgsBuiltinFunc iterInitFunc{"next", &LGS_ANY, type->getName(), {&LGS_ANY}};
-    return iterInitFunc.callIR(module, {IRValue});
+    return iterInitFunc.callIR(codeGen, {IRValue});
 }
 
-inline Value* LgsIterator::hasNext(LgsModule* module) const {
+inline Value* LgsIterator::hasNext(LgsCodeGen* codeGen) const {
     LgsBuiltinFunc iterInitFunc{"hasNext", &LGS_BOOL, type->getName(), {&LGS_ANY}};
-    return iterInitFunc.callIR(module, {IRValue});
+    return iterInitFunc.callIR(codeGen, {IRValue});
 }

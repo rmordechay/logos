@@ -32,11 +32,11 @@ public:
 
     explicit LgsBinaryExpr(LgsType* type, LgsExpr* left, LgsExpr* right, const LgsOperator op) : LgsExpr(type), left(left), right(right), op(op) {}
     string prettyName() override;
-    Value* createIRValue(LgsModule* module) override;
-    Value* addIR(LgsModule* module, LgsExpr* other) override;
-    Value* mulIR(LgsModule* module, LgsExpr* other) override;
-    Value* subIR(LgsModule* module, LgsExpr* other) override;
-    Value* divIR(LgsModule* module, LgsExpr* other) override;
+    Value* createIRValue(LgsCodeGen* codeGen) override;
+    Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* mulIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* subIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* divIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     ~LgsBinaryExpr() override = default;
 };
 

@@ -16,7 +16,7 @@ public:
         addMethod(&lenFunc);
     }
 
-    Type* getIRType(LgsModule* module) override;
+    Type* getIRType(LgsCodeGen* codeGen) override;
     string getName() override;
     string prettyName() override;
     size_t getSizeBytes() override;
@@ -24,10 +24,10 @@ public:
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
     string getStrFormatPart() const override;
-    Value* getLength(LgsModule* module, LgsExpr* expr) override;
-    Value* getLoopLength(LgsModule* module, LgsExpr* expr) override;
-    Value* isEmpty(LgsModule* module, LgsExpr* expr) override;
-    Value* isNotEmpty(LgsModule* module, LgsExpr* expr) override;
+    Value* getLength(LgsExpr* expr) override;
+    Value* getLoopLength(LgsExpr* expr) override;
+    Value* isEmpty(LgsExpr* expr) override;
+    Value* isNotEmpty(LgsExpr* expr) override;
     bool equals(LgsType* other) override;
     ~LgsSArray() override;
 };

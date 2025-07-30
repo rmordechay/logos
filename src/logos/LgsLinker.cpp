@@ -1,7 +1,8 @@
 #include "logos/LgsLinker.h"
 #include "configs/LgsDefinitions.h"
-#include "../../include/configs/LgsConfig.h"
-#include "utils/LgsIRUtils.h"
+#include "configs/LgsConfig.h"
+#include "files/LgsFile.h"
+
 #include "utils/LgsUtils.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include <llvm/Transforms/Utils/Cloning.h>
@@ -52,7 +53,8 @@ bool LgsLinker::link() const {
     linkerOpts.push_back(paths.objFilePath.c_str());
     linkerOpts.push_back("-o");
     linkerOpts.push_back(paths.execFilePath.c_str());
-    if (!platform.link(linkerOpts, outs(), errs(), false, false)) {
+    bool (*link)(ArrayRef<const char*>, raw_ostream&, raw_ostream&, bool, bool) = LINK_FUNC;
+    if (!link(linkerOpts, outs(), errs(), false, false)) {
         errs().flush();
         return false;
     }
@@ -83,7 +85,7 @@ bool LgsLinker::generateObjFile(unique_ptr<Module> mainModule) const {
     error_code ec;
     legacy::PassManager pass;
     raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
-    const auto addedPassFailed = getTargetMachine()->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
+    const auto addedPassFailed = LgsCodeGen::getTargetMachine()->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
     if (addedPassFailed) {
         logErr(ec.message() + NEW_LINE);
         return false;
@@ -96,16 +98,16 @@ bool LgsLinker::generateObjFile(unique_ptr<Module> mainModule) const {
 }
 
 void LgsLinker::writeIRFiles() const {
-    for (const auto module : modules) {
-        const auto IRModule = module.second->IRModule;
+    for (const auto file : files) {
+        const auto module = file->codeGen.IRModule;
         if constexpr (WRITE_IR_TO_FILE) {
-            const auto filePath = (paths.buildIR / IRModule->getName().str()).string() + ".ll";
+            const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
             error_code EC;
             raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
-            IRModule->print(textFile, nullptr);
+            module->print(textFile, nullptr);
         }
         if (logLevel == DEBUG) {
-            IRModule->print(outs(), nullptr);
+            module->print(outs(), nullptr);
             logInfo("\n-----\n\n");
         }
     }

@@ -6,9 +6,9 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
-#include "utils/LgsIRUtils.h"
+
 #include "utils/LgsUtils.h"
-#include <logos/LgsModule.h>
+#include <logos/LgsCodeGen.h>
 
 extern "C" {
     size_t Str_hash(const char* key);
@@ -18,20 +18,20 @@ string LgsVariable::prettyName() {
     return name;
 }
 
-Value* LgsVariable::createIRValue(LgsModule* module) {
+Value* LgsVariable::createIRValue(LgsCodeGen* codeGen) {
     switch (ref.symbolType) {
     case VAR_DEC:
         return ref.varDec->IRValue;
     case PARAM:
-        return ref.param->getIRValue(module);
+        return ref.param->getIRValue(codeGen);
     case FUNC:
-        return ref.func->getIRFunc(module);
+        return ref.func->getIRFunc(codeGen);
     case OBJECT:
-        return ref.object->singleton->getIRValue(module);
+        return ref.object->singleton->getIRValue(codeGen);
     case ENUM:
-        return getIRStr(module, name);
+        return codeGen->getIRStr(name);
     case FIELD:
-        return getIRStr(module, name);
+        return nullptr;
     case INTERFACE:
     case GROUP:
     case UNKNOWN:
@@ -65,14 +65,14 @@ LgsExpr* LgsVariable::convertExpr(LgsType* type) {
     assert(0);
 }
 
-Value* LgsVariable::hashValue(LgsModule* module) {
+Value* LgsVariable::hashValue(LgsCodeGen* codeGen) {
     switch (ref.symbolType) {
     case PARAM:
-        return module->builder.CreateCall(getStrHash(module), {ref.param->getIRValue(module)});
+        return codeGen->callStrHash(ref.param->getIRValue(codeGen));
     case VAR_DEC:
-        return ref.varDec->expr->hashValue(module);
+        return ref.varDec->expr->hashValue(codeGen);
     case FIELD:
-        return i32(module, Str_hash(ref.field->name.c_str()));
+        return codeGen->i32(Str_hash(ref.field->name.c_str()));
     default:
         assert(0);
     }

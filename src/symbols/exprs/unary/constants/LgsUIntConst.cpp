@@ -2,15 +2,15 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsLongConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "utils/LgsIRUtils.h"
+
 #include "utils/LgsUtils.h"
 
 string LgsUIntConst::prettyName() {
     return to_string(value);
 }
 
-Value* LgsUIntConst::createIRValue(LgsModule* module) {
-    return i32(module, value);
+Value* LgsUIntConst::createIRValue(LgsCodeGen* codeGen) {
+    return codeGen->i32(value);
 }
 
 LgsExpr* LgsUIntConst::convertExpr(LgsType* toType) {
@@ -30,112 +30,112 @@ LgsExpr* LgsUIntConst::clone() {
     return new LgsIntConst(value);
 }
 
-Value* LgsUIntConst::eqIR(LgsModule* module, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(module);
-    const auto thisIRValue = getIRValue(module);
+Value* LgsUIntConst::eqIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(codeGen);
+    const auto thisIRValue = getIRValue(codeGen);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return module->builder.CreateICmpEQ(thisIRValue, otherIRValue);
+        return codeGen->builder.CreateICmpEQ(thisIRValue, otherIRValue);
     }
     assert(0);
 }
 
-Value* LgsUIntConst::neIR(LgsModule* module, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(module);
-    const auto thisIRValue = getIRValue(module);
+Value* LgsUIntConst::neIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(codeGen);
+    const auto thisIRValue = getIRValue(codeGen);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return module->builder.CreateICmpNE(thisIRValue, otherIRValue);
+        return codeGen->builder.CreateICmpNE(thisIRValue, otherIRValue);
     }
     assert(0);
 }
 
-Value* LgsUIntConst::gtIR(LgsModule* module, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(module);
-    const auto thisIRValue = getIRValue(module);
+Value* LgsUIntConst::gtIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(codeGen);
+    const auto thisIRValue = getIRValue(codeGen);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return module->builder.CreateICmpSGT(thisIRValue, otherIRValue);
+        return codeGen->builder.CreateICmpSGT(thisIRValue, otherIRValue);
     }
     assert(0);
 }
 
-Value* LgsUIntConst::ltIR(LgsModule* module, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(module);
-    const auto thisIRValue = getIRValue(module);
+Value* LgsUIntConst::ltIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(codeGen);
+    const auto thisIRValue = getIRValue(codeGen);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return module->builder.CreateICmpSLT(thisIRValue, otherIRValue);
+        return codeGen->builder.CreateICmpSLT(thisIRValue, otherIRValue);
     }
     assert(0);
 }
 
-Value* LgsUIntConst::geIR(LgsModule* module, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(module);
-    const auto thisIRValue = getIRValue(module);
+Value* LgsUIntConst::geIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(codeGen);
+    const auto thisIRValue = getIRValue(codeGen);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return module->builder.CreateICmpSGE(thisIRValue, otherIRValue);
+        return codeGen->builder.CreateICmpSGE(thisIRValue, otherIRValue);
     }
     assert(0);
 }
 
-Value* LgsUIntConst::leIR(LgsModule* module, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(module);
-    const auto thisIRValue = getIRValue(module);
+Value* LgsUIntConst::leIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(codeGen);
+    const auto thisIRValue = getIRValue(codeGen);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return module->builder.CreateICmpSLE(thisIRValue, otherIRValue);
+        return codeGen->builder.CreateICmpSLE(thisIRValue, otherIRValue);
     }
     assert(0);
 }
 
-Value* LgsUIntConst::andIR(LgsModule* module, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(module);
-    const auto thisIRValue = getIRValue(module);
+Value* LgsUIntConst::andIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(codeGen);
+    const auto thisIRValue = getIRValue(codeGen);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {}
     assert(0);
 }
 
-Value* LgsUIntConst::orIR(LgsModule* module, LgsExpr* other) {
+Value* LgsUIntConst::orIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUIntConst::bitAndIR(LgsModule* module, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(module);
-    const auto thisIRValue = getIRValue(module);
+Value* LgsUIntConst::bitAndIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(codeGen);
+    const auto thisIRValue = getIRValue(codeGen);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return module->builder.CreateAnd(thisIRValue, otherIRValue);
+        return codeGen->builder.CreateAnd(thisIRValue, otherIRValue);
     }
     assert(0);
 }
 
-Value* LgsUIntConst::bitOrIR(LgsModule* module, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(module);
-    const auto thisIRValue = getIRValue(module);
+Value* LgsUIntConst::bitOrIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(codeGen);
+    const auto thisIRValue = getIRValue(codeGen);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return module->builder.CreateOr(thisIRValue, otherIRValue);
+        return codeGen->builder.CreateOr(thisIRValue, otherIRValue);
     }
     assert(0);
 }
 
-Value* LgsUIntConst::bitXorIR(LgsModule* module, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(module);
-    const auto thisIRValue = getIRValue(module);
+Value* LgsUIntConst::bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(codeGen);
+    const auto thisIRValue = getIRValue(codeGen);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return module->builder.CreateXor(thisIRValue, otherIRValue);
+        return codeGen->builder.CreateXor(thisIRValue, otherIRValue);
     }
     assert(0);
 }
 
-Value* LgsUIntConst::lshiftIR(LgsModule* module, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(module);
-    const auto thisIRValue = getIRValue(module);
+Value* LgsUIntConst::lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(codeGen);
+    const auto thisIRValue = getIRValue(codeGen);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return module->builder.CreateShl(thisIRValue, otherIRValue);
+        return codeGen->builder.CreateShl(thisIRValue, otherIRValue);
     }
     assert(0);
 }
 
-Value* LgsUIntConst::rshiftIR(LgsModule* module, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(module);
-    const auto thisIRValue = getIRValue(module);
+Value* LgsUIntConst::rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(codeGen);
+    const auto thisIRValue = getIRValue(codeGen);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return module->builder.CreateAShr(thisIRValue, otherIRValue);
+        return codeGen->builder.CreateAShr(thisIRValue, otherIRValue);
     }
     assert(0);
 }

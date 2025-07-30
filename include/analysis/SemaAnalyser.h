@@ -49,7 +49,7 @@ public:
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
-    void visitField(const LgsField* field);
+    void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
@@ -67,7 +67,7 @@ public:
     void visitReturnStmt(const LgsReturn* returnStmt);
     void visitBreakStmt(const LgsBreakStmt* breakStmt);
     void visitContinueStmt(const LgsContinueStmt* continueStmt);
-    void visitEnum(const LgsEnum* lgsEnum) const;
+    void visitEnum(LgsEnum* lgsEnum) const;
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
     void visitArrayExpr(const LgsArrayExpr* array);

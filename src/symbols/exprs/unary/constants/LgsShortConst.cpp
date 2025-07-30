@@ -1,6 +1,6 @@
 #include "exprs/unary/constants/LgsShortConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "utils/LgsIRUtils.h"
+
 #include "utils/LgsUtils.h"
 
 
@@ -8,8 +8,8 @@ string LgsShortConst::prettyName() {
     return to_string(value);
 }
 
-Value* LgsShortConst::createIRValue(LgsModule* module) {
-    return i16(module, value);
+Value* LgsShortConst::createIRValue(LgsCodeGen* codeGen) {
+    return codeGen->i16(value);
 }
 
 LgsExpr* LgsShortConst::convertExpr(LgsType* toType) {

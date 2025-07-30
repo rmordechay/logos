@@ -40,7 +40,7 @@ inline LgsError E10029{.msg = "Constant field '%s' must be initialized in the cl
 inline LgsError E10030{.msg = "Non-public field '%s' is used outside its parent object '%s'.", .errCode = errCodeStart++};
 inline LgsError E10031{.msg = "Non-public method '%s' is used outside its parent object '%s'.", .errCode = errCodeStart++};
 inline LgsError E10032{.msg = "Singleton object '%s' cannot be instantiated.", .errCode = errCodeStart++};
-inline LgsError E10033{.msg = "", .errCode = errCodeStart++};
+inline LgsError E10033{.msg = "Type name must be capitalized. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10034{.msg = "Object '%s' has a method with name '%s' but it doesn't match the parameters.\n\t   Given:    %s\n\t   Expected: %s", .errCode = errCodeStart++};
 inline LgsError E10035{.msg = "Index of %s has %s level which is too deep. Max level: %s.", .errCode = errCodeStart++};
 inline LgsError E10036{.msg = "'%s' cannot be indexed with type '%s'.", .errCode = errCodeStart++};

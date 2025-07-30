@@ -11,8 +11,8 @@ string LgsCPtr::prettyName() {
     return name;
 }
 
-Type* LgsCPtr::getIRType(LgsModule* module) {
-    return ptrTy(module);
+Type* LgsCPtr::getIRType(LgsCodeGen* codeGen) {
+    return codeGen->ptrTy();
 }
 
 size_t LgsCPtr::getSizeBytes() {

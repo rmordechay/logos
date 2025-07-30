@@ -2,58 +2,58 @@
 #include "cli/LgsCli.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "../../../../include/configs/LgsConfig.h"
-#include "utils/LgsIRUtils.h"
+
 #include "utils/LgsUtils.h"
 
 string LgsArrayExpr::prettyName() {
     return type->prettyName();
 }
 
-Value* LgsArrayExpr::createIRValue(LgsModule* module) {
-    if (type->asSArray()) return createConstArray(module);
-    if (type->asDArray()) return createDynamicArray(module);
+Value* LgsArrayExpr::createIRValue(LgsCodeGen* codeGen) {
+    if (type->asSArray()) return createConstArray(codeGen);
+    if (type->asDArray()) return createDynamicArray(codeGen);
     assert(0);
 }
 
-Value* LgsArrayExpr::createDynamicArray(LgsModule* module) {
-    auto& builder = module->builder;
+Value* LgsArrayExpr::createDynamicArray(LgsCodeGen* codeGen) {
+    auto& builder = codeGen->builder;
     const auto arrType = type->asDArray();
-    const auto elementSize = i64(module, arrType->baseType->getSizeBytes());
-    IRValue = builder.CreateAlloca(arrType->getArrStruct(module));
+    const auto elementSize = codeGen->i64(arrType->baseType->getSizeBytes());
+    IRValue = builder.CreateAlloca(arrType->getArrStruct());
 
     Value* capacityIR = nullptr;
     if (arrType->sizeExpr) {
-        capacityIR = arrType->sizeExpr->getIRValue(module);
-        capacityIR = builder.CreateZExt(capacityIR, i64Ty(module));
+        capacityIR = arrType->sizeExpr->getIRValue(codeGen);
+        capacityIR = builder.CreateZExt(capacityIR, codeGen->i64Ty());
     } else {
         const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
-        capacityIR = i64(module, capacity);
+        capacityIR = codeGen->i64(capacity);
     }
 
-    arrType->initFunc.callIR(module, {IRValue, capacityIR, elementSize});
+    arrType->initFunc.callIR(codeGen, {IRValue, capacityIR, elementSize});
     for (const auto element : initialElements) {
-        arrType->addFunc.call(module, {this, element});
+        arrType->addFunc.call(codeGen, {this, element});
     }
     return IRValue;
 }
 
-Value* LgsArrayExpr::createConstArray(LgsModule* module) const {
-    auto& builder = module->builder;
+Value* LgsArrayExpr::createConstArray(LgsCodeGen* codeGen) const {
+    auto& builder = codeGen->builder;
     const auto arr = type->asSArray();
     const auto baseType = arr->baseType;
-    const auto baseIRType = baseType->getIRType(module);
+    const auto baseIRType = baseType->getIRType(codeGen);
     const auto arrIRType = ArrayType::get(baseIRType, arr->initialLength);
     const auto arrIRPtr = builder.CreateAlloca(arrIRType);
     if (initialElements.empty()) return arrIRPtr;
     for (int i = 0; i < initialElements.size(); ++i) {
-        const auto gep = builder.CreateGEP(arrIRType, arrIRPtr, {i32Zero(module), i32(module, i)});
-        const auto val = initialElements[i]->getIRValue(module);
+        const auto gep = builder.CreateGEP(arrIRType, arrIRPtr, {codeGen->i32Zero(), codeGen->i32(i)});
+        const auto val = initialElements[i]->getIRValue(codeGen);
         builder.CreateStore(val, gep);
     }
     return arrIRPtr;
 }
 
-void LgsArrayExpr::free(LgsModule* module) {
+void LgsArrayExpr::free(LgsCodeGen* codeGen) {
     if (!type->asDArray()) return;
-    type->asDArray()->freeFunc.call(module, {this});
+    type->asDArray()->freeFunc.call(codeGen, {this});
 }

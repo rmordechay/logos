@@ -18,7 +18,7 @@ public:
     explicit LgsParam(LgsType* type = nullptr, const string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     LgsParam(const string& name, LgsExpr* expr) : name(name), expr(expr) {}
     string format(string& indentStr) override;
-    Value* getIRValue(LgsModule* module);
+    Value* getIRValue(LgsCodeGen* codeGen);
     string getIRName();
     ~LgsParam() override = default;
 };

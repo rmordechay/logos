@@ -7,7 +7,7 @@ public:
     bool hasReturn = false;
 
     explicit LgsStmtsBlock(const std::vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
-    void createIRValue(LgsModule* runtime) const;
+    void createIRValue(LgsCodeGen* codeGen) const;
     LgsStmt* lastStmt() const;
     std::string format(std::string& indentStr) override;
     ~LgsStmtsBlock() override;

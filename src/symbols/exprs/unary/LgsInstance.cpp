@@ -4,63 +4,63 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
-#include "utils/LgsIRUtils.h"
+
 
 string LgsInstance::prettyName() {
     return obj->name;
 }
 
-Value* LgsInstance::createIRValue(LgsModule* module) {
-    const auto objIRType = obj->getIRType(module);
+Value* LgsInstance::createIRValue(LgsCodeGen* codeGen) {
+    const auto objIRType = obj->getIRType(codeGen);
     if(obj->singleton) {
         const auto zeroInitializer = ConstantAggregateZero::get(objIRType);
-        IRValue = new GlobalVariable(*module->IRModule, objIRType, false, GlobalValue::ExternalLinkage, zeroInitializer);
+        IRValue = new GlobalVariable(*codeGen->IRModule, objIRType, false, GlobalValue::ExternalLinkage, zeroInitializer);
     } else {
-        IRValue = module->builder.CreateAlloca(objIRType);
+        IRValue = codeGen->builder.CreateAlloca(objIRType);
     }
-    initFields(module);
+    initFields(codeGen);
     if (obj->hasVirtuals) {
-        setVirtuals(module);
+        setVirtuals(codeGen);
     }
     return IRValue;
 }
 
-void LgsInstance::initFields(LgsModule* module) {
+void LgsInstance::initFields(LgsCodeGen* codeGen) {
     for (const auto& [fieldName, field] : obj->fields) {
         auto arg = args.find(fieldName);
         if (arg != args.end()) {
-            field->storeIRValue(module, IRValue, arg->second->expr);
+            field->storeIRValue(codeGen, IRValue, arg->second->expr);
         }
     }
 }
 
-void LgsInstance::setVirtuals(LgsModule* module) const {
+void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
     const auto vtable = obj->vtable->type->asMap();
-    const auto vtableGEP = module->builder.CreateGEP(vtable->getIRType(module), IRValue, {i32Zero(module)});
-    vtable->initFunc.callIR(module, {vtableGEP, i64(module, sizeof(void*))});
+    const auto vtableGEP = codeGen->builder.CreateGEP(vtable->getIRType(codeGen), IRValue, {codeGen->i32Zero()});
+    vtable->initFunc.callIR(codeGen, {vtableGEP, codeGen->i64(sizeof(void*))});
     for (const auto& [name, method] : obj->methods) {
         if (!method->funcType->isVirtual) continue;
-        const auto keyIRStr = getIRStr(module, method->funcType->getName());
-        const auto IRFunc = method->getIRFunc(module);
-        const auto valuePtr = module->builder.CreateAlloca(ptrTy(module));
-        module->builder.CreateStore(IRFunc, valuePtr);
-        vtable->addFunc.callIR(module, {vtableGEP, keyIRStr, valuePtr});
+        const auto keyIRStr = codeGen->getIRStr(method->funcType->getName());
+        const auto IRFunc = method->getIRFunc(codeGen);
+        const auto valuePtr = codeGen->builder.CreateAlloca(codeGen->ptrTy());
+        codeGen->builder.CreateStore(IRFunc, valuePtr);
+        vtable->addFunc.callIR(codeGen, {vtableGEP, keyIRStr, valuePtr});
     }
     for (const auto& [name, field] : obj->fields) {
         if (!field->isVirtual) continue;
-        const auto keyIRStr = getIRStr(module, field->name);
-        const auto fieldGEP = field->getGEP(module, IRValue);
-        const auto fieldIRType = field->type->getIRType(module);
-        const auto loadGEP = module->builder.CreateLoad(fieldIRType, fieldGEP);
-        const auto valuePtr = module->builder.CreateAlloca(fieldIRType);
-        module->builder.CreateStore(loadGEP, valuePtr);
-        vtable->addFunc.callIR(module, {vtableGEP, keyIRStr, valuePtr});
+        const auto keyIRStr = codeGen->getIRStr(field->name);
+        const auto fieldGEP = field->getGEP(codeGen, IRValue);
+        const auto fieldIRType = field->type->getIRType(codeGen);
+        const auto loadGEP = codeGen->builder.CreateLoad(fieldIRType, fieldGEP);
+        const auto valuePtr = codeGen->builder.CreateAlloca(fieldIRType);
+        codeGen->builder.CreateStore(loadGEP, valuePtr);
+        vtable->addFunc.callIR(codeGen, {vtableGEP, keyIRStr, valuePtr});
     }
 }
 
-void LgsInstance::free(LgsModule* module) {
+void LgsInstance::free(LgsCodeGen* codeGen) {
     if (!isHeapAlloc) {
-        module->builder.CreateFree(IRValue);
+        codeGen->builder.CreateFree(IRValue);
     }
 }
 

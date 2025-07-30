@@ -4,9 +4,9 @@
 #include "types/primitives/LgsInt.h"
 #include "utils/LgsUtils.h"
 
-Type* LgsDArray::getIRType(LgsModule* module) {
+Type* LgsDArray::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;
-    return getArrStruct(module);
+    return getArrStruct();
 }
 
 size_t LgsDArray::getSizeBytes() {
@@ -43,36 +43,36 @@ string LgsDArray::getName() {
     return name;
 }
 
-Value* LgsDArray::getLength(LgsModule* module, LgsExpr* expr) {
-    return lenFunc.call(module, {expr});
+Value* LgsDArray::getLength(LgsExpr* expr) {
+    return lenFunc.call(codeGen, {expr});
 }
 
-Value* LgsDArray::getLoopLength(LgsModule* module, LgsExpr* expr) {
-    return getLength(module, expr);
+Value* LgsDArray::getLoopLength(LgsExpr* expr) {
+    return getLength(expr);
 }
 
-Value* LgsDArray::isEmpty(LgsModule* module, LgsExpr* expr) {
-    return isEmptyFunc.call(module, {expr});
+Value* LgsDArray::isEmpty(LgsExpr* expr) {
+    return isEmptyFunc.call(codeGen, {expr});
 }
 
-Value* LgsDArray::isNotEmpty(LgsModule* module, LgsExpr* expr) {
-    return isNotEmptyFunc.call(module, {expr});
+Value* LgsDArray::isNotEmpty(LgsExpr* expr) {
+    return isNotEmptyFunc.call(codeGen, {expr});
 }
 
-StructType* LgsDArray::getArrStruct(LgsModule* module) {
-    auto& context = module->context;
+StructType* LgsDArray::getArrStruct() {
+    auto& context = codeGen->context;
     if (arrStruct) return arrStruct;
-    arrStruct = getIRStructType(context, name, {i64Ty(module), i64Ty(module), i64Ty(module), ptrTy(module)});
+    arrStruct = codeGen->getIRStructType(name, {codeGen->i64Ty(), codeGen->i64Ty(), codeGen->i64Ty(), codeGen->ptrTy()});
     return arrStruct;
 }
 
-Value* LgsArrayAddFunc::call(LgsModule* module, const vector<LgsExpr*>& args) {
+Value* LgsArrayAddFunc::call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) {
     const auto arr = args.front();
     const auto baseType = arr->type->asIterable()->baseType;
-    const auto baseTypeIR = baseType->getIRType(module);
-    const auto valuePtr = module->builder.CreateAlloca(baseTypeIR);
-    module->builder.CreateStore(args[1]->getIRValue(module), valuePtr);
-    return callIR(module, {arr->getIRValue(module), valuePtr});
+    const auto baseTypeIR = baseType->getIRType(codeGen);
+    const auto valuePtr = codeGen->builder.CreateAlloca(baseTypeIR);
+    codeGen->builder.CreateStore(args[1]->getIRValue(codeGen), valuePtr);
+    return callIR(codeGen, {arr->getIRValue(codeGen), valuePtr});
 }
 
 LgsDArray::~LgsDArray() {
