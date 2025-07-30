@@ -27,9 +27,8 @@ public:
     LgsType* type = nullptr;
     bool isNull = false;
     bool isSpread = false;
-    bool isHeapAlloc = false;
     bool isConstant = false;
-    BasicBlock* parentBlock = nullptr;
+    bool isHeapAlloc = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     Value* getIRValue(LgsCodeGen* codeGen);
@@ -57,7 +56,6 @@ public:
     virtual LgsExpr* clone();
     virtual bool equals(LgsExpr* other);
     virtual LgsExpr* convertExpr(LgsType* toType);
-    virtual void free(LgsCodeGen* codeGen);
     virtual Value* hashValue(LgsCodeGen* codeGen);
 
     virtual string prettyName() = 0;

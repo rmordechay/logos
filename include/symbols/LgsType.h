@@ -34,6 +34,7 @@ public:
     LgsLocation location;
     bool isVoid = false;
     bool isInt = false;
+    bool isHeapAlloc = false;
     bool isUnsigned = false;
     bool isPrimitive = false;
     bool isSizeBig = false;
@@ -70,7 +71,7 @@ public:
     LgsTypePair* asPair();
 
     virtual size_t getSizeBytes();
-    virtual bool equals(LgsType& other);
+    virtual void freeValue(LgsCodeGen* codeGen, Value* value);
     virtual string getStrFormatPart() const;
     virtual string getName() = 0;
     virtual string prettyName() = 0;

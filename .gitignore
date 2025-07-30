@@ -1,6 +1,5 @@
 /.idea
 /cmake-build*
-/examples
+/build
 /external/lib
-/sandbox/
 /project/

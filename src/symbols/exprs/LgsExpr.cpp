@@ -21,7 +21,7 @@ Value* LgsExpr::getIRValue(LgsCodeGen* codeGen) {
     if (IRValue) return IRValue;
     IRValue = createIRValue(codeGen);
     if (isHeapAlloc) {
-        codeGen->stack.addHeapExpr(this);
+        codeGen->stack.addHeapAlloc(this);
     }
     assert(IRValue);
     return IRValue;
@@ -70,7 +70,6 @@ string LgsExpr::getConstStr() {
     assert(0);
 }
 
-void LgsExpr::free(LgsCodeGen* codeGen) { assert(0); }
 bool LgsExpr::equals(LgsExpr* other) { assert(0); }
 LgsExpr* LgsExpr::convertExpr(LgsType* toType) { assert(0); }
 Value* LgsExpr::hashValue(LgsCodeGen* codeGen) { assert(0); }

@@ -40,7 +40,12 @@ string LgsFuncType::getName() {
 }
 
 Type* LgsFuncType::getIRType(LgsCodeGen* codeGen) {
-    const auto returnType = rt->getIRType(codeGen);
+    Type* returnType;
+    if (rt->isSizeBig) {
+        returnType = codeGen->ptrTy();
+    } else {
+        returnType = rt->getIRType(codeGen);
+    }
     vector<Type*> IRParamsTypes;
     for (int i = isStatic; i < params.size(); ++i) {
         const auto param = params[i];

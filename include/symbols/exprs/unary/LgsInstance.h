@@ -13,6 +13,5 @@ public:
     void setVirtuals(LgsCodeGen* codeGen) const;
     string prettyName() override;
     void initFields(LgsCodeGen* codeGen);
-    void free(LgsCodeGen* codeGen) override;
     ~LgsInstance() override;
 };

@@ -18,7 +18,3 @@ Value* LgsHashMap::createIRValue(LgsCodeGen* codeGen) {
     }
     return IRValue;
 }
-
-void LgsHashMap::free(LgsCodeGen* codeGen) {
-    type->asMap()->freeFunc.call(codeGen, {this});
-}

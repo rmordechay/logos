@@ -10,13 +10,10 @@ public:
 
     LgsArrayExpr() = default;
     explicit LgsArrayExpr(LgsSArray* arrType) : LgsUnaryExpr(arrType) {}
-    explicit LgsArrayExpr(LgsDArray* arrType) : LgsUnaryExpr(arrType) {
-        isHeapAlloc = true;
-    }
+    explicit LgsArrayExpr(LgsDArray* arrType) : LgsUnaryExpr(arrType) {}
     string prettyName() override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
     Value* createConstArray(LgsCodeGen* codeGen) const;
     Value* createDynamicArray(LgsCodeGen* codeGen);
-    void free(LgsCodeGen* codeGen) override;
     ~LgsArrayExpr() override = default;
 };

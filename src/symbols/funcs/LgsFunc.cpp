@@ -3,6 +3,7 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "stmts/LgsReturn.h"
 #include "utils/LgsUtils.h"
 
 void LgsFunc::generateIR(LgsCodeGen* codeGen) {
@@ -42,29 +43,29 @@ Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
     return IRFunc;
 }
 
-bool shouldLoadIRArg(Value* value) {
-    if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
-    if (const auto alloca = dyn_cast<AllocaInst>(value)) {
-        const auto allocatedType = alloca->getAllocatedType();
-        return !allocatedType->isStructTy() && !allocatedType->isArrayTy();
-    }
-    if (value->getType()->isIntegerTy() || value->getType()->isFloatingPointTy()) {
-        return false;
-    }
-    if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
-        const auto source = gep->getSourceElementType();
-        const auto results = gep->getResultElementType();
-        const auto isArrayTy = source->isArrayTy();
-        const auto isByteTy = results && results->isIntegerTy(8);
-        return !isArrayTy || !isByteTy;
-    }
-    if (isa<ConstantExpr>(value)) {
-        const auto constExpr = cast<ConstantExpr>(value);
-        return constExpr->getOpcode() == Instruction::GetElementPtr;
-    }
-    if (isa<Function>(value)) return false;
-    return true;
-}
+// bool shouldLoadIRArg(Value* value) {
+//     if (isa<GlobalVariable>(value) || isa<LoadInst>(value)) return false;
+//     if (const auto alloca = dyn_cast<AllocaInst>(value)) {
+//         const auto allocatedType = alloca->getAllocatedType();
+//         return !allocatedType->isStructTy() && !allocatedType->isArrayTy();
+//     }
+//     if (value->getType()->isIntegerTy() || value->getType()->isFloatingPointTy()) {
+//         return false;
+//     }
+//     if (const auto gep = dyn_cast<GetElementPtrInst>(value)) {
+//         const auto source = gep->getSourceElementType();
+//         const auto results = gep->getResultElementType();
+//         const auto isArrayTy = source->isArrayTy();
+//         const auto isByteTy = results && results->isIntegerTy(8);
+//         return !isArrayTy || !isByteTy;
+//     }
+//     if (isa<ConstantExpr>(value)) {
+//         const auto constExpr = cast<ConstantExpr>(value);
+//         return constExpr->getOpcode() == Instruction::GetElementPtr;
+//     }
+//     if (isa<Function>(value)) return false;
+//     return true;
+// }
 
 Value* LgsFunc::getIRArg(LgsCodeGen* codeGen, LgsExpr* arg) {
     const auto v = arg->getIRValue(codeGen);
@@ -98,18 +99,22 @@ Value* LgsFunc::callIR(LgsCodeGen* codeGen, const vector<Value*>& args) {
 }
 
 void LgsFunc::createCleanupBlock(LgsCodeGen* codeGen) const {
-    if (!codeGen->lastInstTerminator()) {
-        codeGen->builder.CreateBr(cleanupBlock);
-    }
+    if (!codeGen->lastInstTerminator()) codeGen->builder.CreateBr(cleanupBlock);
     codeGen->startBlock(cleanupBlock);
     const auto IRReturnType = funcType->rt->getIRType(codeGen);
     Value* rv = nullptr;
     if (returnExprs.size() == 1) {
-        rv = returnExprs.front()->getIRValue(codeGen);
+        rv = returnExprs.front()->expr->getIRValue(codeGen);
     } else if (returnExprs.size() > 1) {
-        const auto phiNode = codeGen->builder.CreatePHI(IRReturnType, returnExprs.size());
-        for (const auto expr : returnExprs) {
-            phiNode->addIncoming(expr->getIRValue(codeGen), expr->parentBlock);
+        PHINode* phiNode;
+        if (funcType->rt->isSizeBig) {
+            phiNode = codeGen->builder.CreatePHI(codeGen->ptrTy(), returnExprs.size());
+        } else {
+            phiNode = codeGen->builder.CreatePHI(IRReturnType, returnExprs.size());
+        }
+        for (const auto returnExpr : returnExprs) {
+            const auto exprIR = returnExpr->expr->getIRValue(codeGen);
+            phiNode->addIncoming(exprIR, returnExpr->parentBlock);
         }
         rv = phiNode;
     }
@@ -121,8 +126,8 @@ void LgsFunc::createCleanupBlock(LgsCodeGen* codeGen) const {
 }
 
 void LgsFunc::freeAllocations(LgsCodeGen* codeGen) const {
-    for (const auto expr : allocatedExprs) {
-        expr->free(codeGen);
+    for (const auto expr : heapAllocExprs) {
+        expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
     }
 }
 

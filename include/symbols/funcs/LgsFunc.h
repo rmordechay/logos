@@ -11,8 +11,8 @@ class LgsType;
 class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
-    vector<LgsExpr*> returnExprs;
-    vector<LgsExpr*> allocatedExprs;
+    vector<LgsReturn*> returnExprs;
+    vector<LgsExpr*> heapAllocExprs;
     LgsStmtsBlock* stmtBlock = nullptr;
     BasicBlock* cleanupBlock = nullptr;
     off_t pathIndex = 0;

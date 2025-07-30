@@ -56,6 +56,10 @@ bool LgsMap::equals(LgsType* other) {
     return keyEqual && typePair->value->equals(otherKvType->value);
 }
 
+void LgsMap::freeValue(LgsCodeGen* codeGen, Value* value) {
+    freeFunc.callIR(codeGen, {value});
+}
+
 StructType* LgsMap::getMapStruct(LgsCodeGen* codeGen) {
     if (mapStruct) return mapStruct;
     const vector<Type*> mapStructFields = {codeGen->ptrTy(), codeGen->i64Ty(), codeGen->i64Ty()};

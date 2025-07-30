@@ -22,6 +22,150 @@ TargetMachine* LgsCodeGen::getTargetMachine() {
     return targetMachine;
 }
 
+void LgsCodeGen::createIRModule(const string& moduleName) {
+    const auto module = new Module(moduleName, context);
+    module->setTargetTriple(sys::getDefaultTargetTriple());
+    module->setDataLayout(getTargetMachine()->createDataLayout());
+    IRModule = module;
+}
+
+Value* LgsCodeGen::getIRStr(const string& value) {
+    for (auto& globals : IRModule->globals()) {
+        if (!globals.hasInitializer()) continue;
+        const auto dataArray = dyn_cast<ConstantDataArray>(globals.getInitializer());
+        if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
+        return &globals;
+    }
+    const auto strConstant = ConstantDataArray::getString(context, value, true);
+    const auto globalVariable = new GlobalVariable(
+        *IRModule,
+        strConstant->getType(),
+        true,
+        GlobalValue::PrivateLinkage, strConstant
+    );
+    globalVariable->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
+    return globalVariable;
+}
+
+StructType* LgsCodeGen::getIRStructType(const string& name, const vector<Type*>& fields) {
+    const auto structType = StructType::getTypeByName(context, name);
+    if (!structType) {
+        return StructType::create(context, fields, name);
+    }
+    return structType;
+}
+
+void LgsCodeGen::branchToBlock(BasicBlock* block) {
+    if (!lastInstTerminator()) {
+        builder.CreateBr(block);
+    }
+}
+
+void LgsCodeGen::startBlock(BasicBlock* block) {
+    block->insertInto(stack.currentFunc()->getIRFunc(this));
+    builder.SetInsertPoint(block);
+}
+
+bool LgsCodeGen::lastInstTerminator() const {
+    return builder.GetInsertBlock()->getTerminator();
+}
+
+void LgsCodeGen::startFuncBlock() {
+    const auto currentFunc = stack.currentFunc();
+    const auto IRFunc = currentFunc->getIRFunc(this);
+    currentFunc->cleanupBlock = BasicBlock::Create(context, BLOCK_NAME_CLEANUP);
+    const auto entryBlock = BasicBlock::Create(context, BLOCK_NAME_ENTRY, IRFunc);
+    builder.SetInsertPoint(entryBlock);
+}
+
+void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
+    const auto memCpy = getOrInsertDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), ptrTy()});
+    builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
+}
+
+Value* LgsCodeGen::callPrintf(const vector<Value*>& args) {
+    const auto ft = FunctionType::get(i32Ty(), {ptrTy()}, true);
+    return callFunc("printf", ft, args);
+}
+
+Value* LgsCodeGen::callSnprintf(const vector<Value*>& args) {
+    const auto ft = FunctionType::get(i32Ty(), {ptrTy(), i64Ty(), ptrTy()}, true);
+    return callFunc("snprintf", ft, args);
+}
+
+Value* LgsCodeGen::callStrHash(Value* value) {
+    const auto ft = FunctionType::get(i32Ty(), {ptrTy()}, false);
+    return callFunc("Str_hash", ft, {value});
+}
+
+void LgsCodeGen::callInitRuntime() {
+    const auto ft = FunctionType::get(voidTy(), false);
+    callFunc("init_runtime", ft, {getIRStr(paths.debugFile)});
+}
+
+Value* LgsCodeGen::callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args) {
+    const auto func = IRModule->getOrInsertFunction(funcName, ft);
+    return builder.CreateCall(func, args);
+}
+
+Value* LgsCodeGen::callMalloc(const size_t size) {
+    return builder.CreateMalloc(sizeTy(), sizeTy(), isize(size), nullptr);
+}
+
+void LgsCodeGen::callPushStack(const off_t pathIndex) {
+    const auto ft = FunctionType::get(voidTy(), {sizeTy(), sizeTy()}, false);
+    const auto func = IRModule->getOrInsertFunction("push_stack_frame", ft);
+    builder.CreateCall(func, {isize(filePathIndex), isize(pathIndex)});
+}
+
+void LgsCodeGen::callPopStack() {
+    const auto ft = FunctionType::get(voidTy(), false);
+    const auto func = IRModule->getOrInsertFunction("pop_stack_frame", ft);
+    builder.CreateCall(func);
+}
+
+void LgsCodeGen::callPrintError(const string& msg) {
+    const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
+    const auto func = IRModule->getOrInsertFunction("print_error", ft);
+    builder.CreateCall(func, {getIRStr(msg)});
+}
+
+Value* LgsCodeGen::callIDFunc() {
+    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_id);
+    return builder.CreateCall(func, {i32Zero(), null(), null(), null()});
+}
+
+Value* LgsCodeGen::callSuspendFunc() {
+    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_suspend);
+    return builder.CreateCall(func, {ConstantTokenNone::get(context), builder.getFalse()});
+}
+
+Value* LgsCodeGen::callResumeFunc(Value* handle) {
+    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_resume);
+    return builder.CreateCall(func, {handle});
+}
+
+Value* LgsCodeGen::callSizeFunc() {
+    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_size, {i32Ty()});
+    return builder.CreateCall(func);
+}
+
+Value* LgsCodeGen::callBeginFunc(Value* coroID, Value* frameSize) {
+    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_begin);
+    const auto sizeValue = builder.CreateMalloc(i32Ty(), i8Ty(), frameSize, nullptr);
+    return builder.CreateCall(func, {coroID, sizeValue});
+}
+
+Value* LgsCodeGen::callEndFunc(Value* handle) {
+    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_end);
+    return builder.CreateCall(func, {handle, builder.getFalse(), ConstantTokenNone::get(context)});
+}
+
+Value* LgsCodeGen::callDestroyFunc(Value* handle) {
+    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_destroy);
+    return builder.CreateCall(func, {handle});
+}
+
 PointerType* LgsCodeGen::ptrTy() {
     return PointerType::getUnqual(context);
 }
@@ -78,8 +222,12 @@ ConstantInt* LgsCodeGen::i64(const int64_t v) {
     return builder.getInt64(v);
 }
 
-ConstantInt* LgsCodeGen::size(const size_t v) {
+ConstantInt* LgsCodeGen::isize(const size_t v) {
     return ConstantInt::get(sizeTy(), v);
+}
+
+TypeSize LgsCodeGen::typeSize(StructType* v) const {
+    return IRModule->getDataLayout().getTypeStoreSize(v);
 }
 
 ConstantInt* LgsCodeGen::i32Zero() {
@@ -92,148 +240,4 @@ ConstantInt* LgsCodeGen::i64Zero() {
 
 ConstantInt* LgsCodeGen::sizeZero() {
     return ConstantInt::get(sizeTy(), 0);
-}
-
-void LgsCodeGen::createIRModule(const string& moduleName) {
-    const auto module = new Module(moduleName, context);
-    module->setTargetTriple(sys::getDefaultTargetTriple());
-    module->setDataLayout(getTargetMachine()->createDataLayout());
-    IRModule = module;
-}
-
-Value* LgsCodeGen::getIRStr(const string& value) {
-    for (auto& globals : IRModule->globals()) {
-        if (!globals.hasInitializer()) continue;
-        const auto dataArray = dyn_cast<ConstantDataArray>(globals.getInitializer());
-        if (!dataArray || !dataArray->isCString() || dataArray->getAsCString() != value) continue;
-        return &globals;
-    }
-    const auto strConstant = ConstantDataArray::getString(context, value, true);
-    const auto globalVariable = new GlobalVariable(
-        *IRModule,
-        strConstant->getType(),
-        true,
-        GlobalValue::PrivateLinkage, strConstant
-    );
-    globalVariable->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
-    return globalVariable;
-}
-
-StructType* LgsCodeGen::getIRStructType(const string& name, const vector<Type*>& fields) {
-    const auto structType = StructType::getTypeByName(context, name);
-    if (!structType) {
-        return StructType::create(context, fields, name);
-    }
-    return structType;
-}
-
-GlobalVariable* LgsCodeGen::createIRGlobal(Type* type, Constant* value) const {
-    return new GlobalVariable(*IRModule, type, true, GlobalValue::PrivateLinkage, value);
-}
-
-void LgsCodeGen::branchToBlock(BasicBlock* block) {
-    if (!lastInstTerminator()) {
-        builder.CreateBr(block);
-    }
-}
-
-void LgsCodeGen::startBlock(BasicBlock* block) {
-    block->insertInto(stack.currentFunc()->getIRFunc(this));
-    builder.SetInsertPoint(block);
-}
-
-bool LgsCodeGen::lastInstTerminator() const {
-    return builder.GetInsertBlock()->getTerminator();
-}
-
-void LgsCodeGen::startFuncBlock() {
-    const auto currentFunc = stack.currentFunc();
-    const auto IRFunc = currentFunc->getIRFunc(this);
-    currentFunc->cleanupBlock = BasicBlock::Create(context, BLOCK_NAME_CLEANUP);
-    const auto entryBlock = BasicBlock::Create(context, BLOCK_NAME_ENTRY, IRFunc);
-    builder.SetInsertPoint(entryBlock);
-}
-
-void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
-    const auto memCpy = getOrInsertDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), ptrTy()});
-    builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
-}
-
-Value* LgsCodeGen::callPrintf(const vector<Value*>& args) {
-    const auto ft = FunctionType::get(i32Ty(), {ptrTy()}, true);
-    return callFunc("printf", ft, args);
-}
-
-Value* LgsCodeGen::callSnprintf(const vector<Value*>& args) {
-    const auto ft = FunctionType::get(i32Ty(), {ptrTy(), i64Ty(), ptrTy()}, true);
-    return callFunc("snprintf", ft, args);
-}
-
-Value* LgsCodeGen::callStrHash(Value* value) {
-    const auto ft = FunctionType::get(i32Ty(), {ptrTy()}, false);
-    return callFunc("Str_hash", ft, {value});
-}
-
-void LgsCodeGen::callInitRuntime() {
-    const auto ft = FunctionType::get(voidTy(), false);
-    callFunc("init_runtime", ft, {getIRStr(paths.debugFile)});
-}
-
-Value* LgsCodeGen::callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args) {
-    const auto func = IRModule->getOrInsertFunction(funcName, ft);
-    return builder.CreateCall(func, args);
-}
-
-void LgsCodeGen::callPushStack(const off_t pathIndex) {
-    const auto ft = FunctionType::get(voidTy(), {sizeTy(), sizeTy()}, false);
-    const auto func = IRModule->getOrInsertFunction("push_stack_frame", ft);
-    builder.CreateCall(func, {size(filePathIndex), size(pathIndex)});
-}
-
-void LgsCodeGen::callPopStack() {
-    const auto ft = FunctionType::get(voidTy(), false);
-    const auto func = IRModule->getOrInsertFunction("pop_stack_frame", ft);
-    builder.CreateCall(func);
-}
-
-void LgsCodeGen::callPrintError(const string& msg) {
-    const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
-    const auto func = IRModule->getOrInsertFunction("print_error", ft);
-    builder.CreateCall(func, {getIRStr(msg)});
-}
-
-Value* LgsCodeGen::callIDFunc() {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_id);
-    return builder.CreateCall(func, {i32Zero(), null(), null(), null()});
-}
-
-Value* LgsCodeGen::callSuspendFunc() {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_suspend);
-    return builder.CreateCall(func, {ConstantTokenNone::get(context), builder.getFalse()});
-}
-
-Value* LgsCodeGen::callResumeFunc(Value* handle) {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_resume);
-    return builder.CreateCall(func, {handle});
-}
-
-Value* LgsCodeGen::callSizeFunc() {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_size, {i32Ty()});
-    return builder.CreateCall(func);
-}
-
-Value* LgsCodeGen::callBeginFunc(Value* coroID, Value* frameSize) {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_begin);
-    const auto sizeValue = builder.CreateMalloc(i32Ty(), i8Ty(), frameSize, nullptr);
-    return builder.CreateCall(func, {coroID, sizeValue});
-}
-
-Value* LgsCodeGen::callEndFunc(Value* handle) {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_end);
-    return builder.CreateCall(func, {handle, builder.getFalse(), ConstantTokenNone::get(context)});
-}
-
-Value* LgsCodeGen::callDestroyFunc(Value* handle) {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_destroy);
-    return builder.CreateCall(func, {handle});
 }

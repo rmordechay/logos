@@ -44,5 +44,6 @@ public:
     Value* isNotEmpty(LgsCodeGen* codeGen, LgsExpr* expr) override;
     StructType* getMapStruct(LgsCodeGen* codeGen);
     bool equals(LgsType* other) override;
+    void freeValue(LgsCodeGen* codeGen, Value* value) override;
     ~LgsMap() override = default;
 };

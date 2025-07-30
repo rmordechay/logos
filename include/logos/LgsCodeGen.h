@@ -6,8 +6,8 @@ class LgsErrHandler;
 class LgsForLoop;
 class LgsFuncType;
 
-inline TargetMachine* targetMachine = nullptr;
 inline mutex mtx;
+inline TargetMachine* targetMachine = nullptr;
 
 class LgsCodeGen {
 public:
@@ -22,23 +22,26 @@ public:
     void createIRModule(const string& moduleName);
     Value* getIRStr(const string& value);
     StructType* getIRStructType(const string& name, const vector<Type*>& fields);
-    GlobalVariable* createIRGlobal(Type* type, Constant* value) const;
     bool lastInstTerminator() const;
 
     void branchToBlock(BasicBlock* block);
     void startBlock(BasicBlock* block);
     void startFuncBlock();
 
+    Value* callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args = {});
+    Value* callMalloc(size_t size);
     Value* callPrintf(const vector<Value*>& args);
     Value* callSnprintf(const vector<Value*>& args);
     Value* callStrHash(Value* value);
     void callCopyMem(Value* src, Value* dest, size_t n);
 
-    Value* callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args = {});
+    // Stack
     void callPushStack(off_t pathIndex);
     void callPrintError(const string& msg);
     void callInitRuntime();
     void callPopStack();
+
+    // Coroutines
     Value* callIDFunc();
     Value* callSuspendFunc();
     Value* callResumeFunc(Value* handle);
@@ -47,6 +50,7 @@ public:
     Value* callEndFunc(Value* handle);
     Value* callDestroyFunc(Value* handle);
 
+    // types
     Type* i1Ty();
     Type* i8Ty();
     Type* i16Ty();
@@ -55,16 +59,19 @@ public:
     Type* voidTy();
     PointerType* ptrTy();
     IntegerType* sizeTy();
+
+    // values
+    Value* null();
     ConstantInt* i1(bool v);
     ConstantInt* i8(int8_t v);
     ConstantInt* i16(int16_t v);
     ConstantInt* i32(int32_t v);
     ConstantInt* i64(int64_t v);
-    ConstantInt* size(size_t v);
+    ConstantInt* isize(size_t v);
+    TypeSize typeSize(StructType* v) const;
     ConstantInt* i32Zero();
     ConstantInt* i64Zero();
     ConstantInt* sizeZero();
-    Value* null();
 
     static void initLLVM();
     static TargetMachine* getTargetMachine();

@@ -58,12 +58,6 @@ void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
     }
 }
 
-void LgsInstance::free(LgsCodeGen* codeGen) {
-    if (!isHeapAlloc) {
-        codeGen->builder.CreateFree(IRValue);
-    }
-}
-
 LgsInstance::~LgsInstance() {
     for (const auto arg : args) {
         delete arg.second;

@@ -12,10 +12,6 @@
 
 class LgsShort;
 
-bool LgsType::equals(LgsType& other) {
-    return getName() == other.getName();
-}
-
 LgsField* LgsType::getField(const string& name) {
     const auto field = fields.find(name);
     if (field != fields.end()) {
@@ -56,8 +52,9 @@ void LgsType::setLocation(const Token* begin, const Token* end, const path& file
 }
 
 size_t LgsType::getSizeBytes() { assert(0); }
-string LgsType::getStrFormatPart() const { assert(0); }
 
+void LgsType::freeValue(LgsCodeGen* codeGen, Value* value) {}
+string LgsType::getStrFormatPart() const { assert(0); }
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
 LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }
 LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }

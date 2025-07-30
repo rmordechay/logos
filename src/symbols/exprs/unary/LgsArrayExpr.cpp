@@ -1,9 +1,7 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "cli/LgsCli.h"
 #include "exprs/unary/LgsIterIndex.h"
-#include "../../../../include/configs/LgsConfig.h"
-
-#include "utils/LgsUtils.h"
+#include "configs/LgsConfig.h"
 
 string LgsArrayExpr::prettyName() {
     return type->prettyName();
@@ -19,7 +17,8 @@ Value* LgsArrayExpr::createDynamicArray(LgsCodeGen* codeGen) {
     auto& builder = codeGen->builder;
     const auto arrType = type->asDArray();
     const auto elementSize = codeGen->i64(arrType->baseType->getSizeBytes());
-    IRValue = builder.CreateAlloca(arrType->getArrStruct(codeGen));
+    const auto arrSize = codeGen->typeSize(arrType->getArrStruct(codeGen));
+    IRValue = codeGen->callMalloc(arrSize.getFixedValue());
 
     Value* capacityIR = nullptr;
     if (arrType->sizeExpr) {
@@ -51,9 +50,4 @@ Value* LgsArrayExpr::createConstArray(LgsCodeGen* codeGen) const {
         builder.CreateStore(val, gep);
     }
     return arrIRPtr;
-}
-
-void LgsArrayExpr::free(LgsCodeGen* codeGen) {
-    if (!type->asDArray()) return;
-    type->asDArray()->freeFunc.call(codeGen, {this});
 }

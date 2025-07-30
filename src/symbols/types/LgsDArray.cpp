@@ -2,7 +2,6 @@
 #include "builtin/LgsBuiltins.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include "types/primitives/LgsInt.h"
-#include "utils/LgsUtils.h"
 
 Type* LgsDArray::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;
@@ -37,6 +36,10 @@ bool LgsDArray::equals(LgsType* other) {
     const auto otherArr = other->asDArray();
     if (!otherArr) return false;
     return baseType->equals(otherArr->baseType);
+}
+
+void LgsDArray::freeValue(LgsCodeGen* codeGen, Value* value) {
+    freeFunc.callIR(codeGen, {value});
 }
 
 string LgsDArray::getName() {

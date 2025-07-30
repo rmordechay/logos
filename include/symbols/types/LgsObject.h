@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsType.h"
+#include "LgsValue.h"
 
 class LgsInstance;
 class LgsCodeGen;
@@ -20,5 +21,6 @@ public:
     LgsExpr* getZeroValue() override;
     string getStrFormatPart() const override;
     bool equals(LgsType* other) override;
+    void freeValue(LgsCodeGen* codeGen, Value* value) override;
     ~LgsObject() override;
 };

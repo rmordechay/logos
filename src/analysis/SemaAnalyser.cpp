@@ -280,11 +280,11 @@ void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
     }
 }
 
-void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
+void SemaAnalyser::visitReturnStmt(LgsReturn* returnStmt) {
     const auto funcType = stack.currentFunc()->funcType;
     const auto retExpr = returnStmt->expr;
     if (retExpr) {
-        stack.currentFunc()->returnExprs.push_back(retExpr);
+        stack.currentFunc()->returnExprs.push_back(returnStmt);
         visitExpr(retExpr);
     }
     const auto rt = funcType->rt;
@@ -961,6 +961,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     }
 
     if (!type->isUnknown) {
+        type->isSizeBig = type->getSizeBytes() > BIG_SIZE_THRESHOLD;
         return type;
     }
 
@@ -998,6 +999,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
         break;
     }
     assert(newType);
+    newType->isSizeBig = newType->getSizeBytes() > BIG_SIZE_THRESHOLD;
     freeType(type);
     return newType;
 }
@@ -1045,9 +1047,6 @@ void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
         funcType->params[i].type = resolveType(funcType->params[i].type);
     }
     funcType->rt = resolveType(funcType->rt);
-    if (!funcType->rt->isVoid && funcType->rt->getSizeBytes() > BIG_SIZE_THRESHOLD) {
-        funcType->isSizeBig = true;
-    }
 }
 
 void SemaAnalyser::resolveGroupTypes(LgsGroup* group) {

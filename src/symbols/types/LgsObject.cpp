@@ -61,6 +61,10 @@ bool LgsObject::equals(LgsType* other) {
     return name == other->getName();
 }
 
+void LgsObject::freeValue(LgsCodeGen* codeGen, Value* value) {
+    codeGen->builder.CreateFree(value);
+}
+
 size_t LgsObject::getSizeBytes() {
     size_t sum = 0;
     for (const auto& [name, field] : fields) {

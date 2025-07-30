@@ -4,13 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void resize(Array* arr) {
-    arr->capacity *= 2;
-    void* new_data = realloc(arr->data, arr->capacity * arr->element_size);
-    if (!new_data) return;
-    arr->data = new_data;
-}
-
 void Array_init(Array* arr, const size_t capacity, const size_t element_size) {
     arr->capacity = capacity;
     arr->size = 0;
@@ -19,10 +12,15 @@ void Array_init(Array* arr, const size_t capacity, const size_t element_size) {
     if (!arr->data) exit(1);
 }
 
+static void resize(Array* arr) {
+    arr->capacity *= 2;
+    void* new_data = realloc(arr->data, arr->capacity * arr->element_size);
+    if (!new_data) return;
+    arr->data = new_data;
+}
+
 void Array_add(Array* arr, const void* value) {
-    if (arr->size == arr->capacity) {
-        resize(arr);
-    }
+    if (arr->size == arr->capacity) resize(arr);
     void* target = (char*)arr->data + arr->size * arr->element_size;
     memcpy(target, value, arr->element_size);
     arr->size++;
