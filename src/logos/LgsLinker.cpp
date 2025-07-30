@@ -8,7 +8,6 @@
 #include <llvm/Transforms/Coroutines/CoroSplit.h>
 #include <llvm/Transforms/Coroutines/CoroEarly.h>
 #include <llvm/Transforms/Coroutines/CoroCleanup.h>
-#include <llvm/Transforms/Coroutines/CoroElide.h>
 
 unique_ptr<Module> parseModule(LLVMContext& context, const string& path) {
     SMDiagnostic diag;
@@ -73,9 +72,10 @@ bool LgsLinker::generateObjFile(unique_ptr<Module> mainModule) const {
 
     PassManager<Module, AnalysisManager<Module>> passManager;
     passManager.addPass(CoroEarlyPass());
-    passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(OptimizationLevel::O3)));
     passManager.addPass(createModuleToPostOrderCGSCCPassAdaptor(CoroSplitPass()));
     passManager.addPass(CoroCleanupPass());
+    // passManager.addPass(createModuleToPostOrderCGSCCPassAdaptor(CoroElidePass()));
+    // passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(OptimizationLevel::O3)));
     passManager.run(*mainModule, analysisManager);
 
     error_code ec;
@@ -108,5 +108,3 @@ void LgsLinker::writeIRFiles() const {
         }
     }
 }
-
-

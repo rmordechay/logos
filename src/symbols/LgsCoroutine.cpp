@@ -5,34 +5,39 @@
 #include "exprs/unary/LgsSelection.h"
 #include "utils/LgsIRUtils.h"
 
-Value* callCoroIDFunc(LgsModule* module) {
-    const auto func = getOrInsertDeclaration(module->IRModule, Intrinsic::coro_id, {i32Ty(module)});
+Value* callIDFunc(LgsModule* module) {
+    const auto func = getOrInsertDeclaration(module->IRModule, Intrinsic::coro_id);
     return module->builder.CreateCall(func, {i32Zero(module), null(module), null(module), null(module)});
 }
 
-Value* callCoroSuspendFunc(LgsModule* module) {
+Value* callSuspendFunc(LgsModule* module) {
     const auto func = getOrInsertDeclaration(module->IRModule, Intrinsic::coro_suspend);
     return module->builder.CreateCall(func, {ConstantTokenNone::get(module->context), module->builder.getFalse()});
 }
 
-Value* callCoroSizeFunc(LgsModule* module) {
+Value* callResumeFunc(LgsModule* module, Value* handle) {
+    const auto func = getOrInsertDeclaration(module->IRModule, Intrinsic::coro_resume);
+    return module->builder.CreateCall(func, {handle});
+}
+
+Value* callSizeFunc(LgsModule* module) {
     const auto func = getOrInsertDeclaration(module->IRModule, Intrinsic::coro_size, {i32Ty(module)});
     return module->builder.CreateCall(func);
 }
 
-Value* callCoroBeginFunc(LgsModule* module, Value* coroID, Value* frameSize) {
+Value* callBeginFunc(LgsModule* module, Value* coroID, Value* frameSize) {
     const auto func = getOrInsertDeclaration(module->IRModule, Intrinsic::coro_begin);
     const auto sizeValue = module->builder.CreateMalloc(i32Ty(module), i8Ty(module), frameSize, nullptr);
     return module->builder.CreateCall(func, {coroID, sizeValue});
 }
 
-Value* callCoroEndFunc(LgsModule* module, Value* handle) {
-    const auto func = getOrInsertDeclaration(module->IRModule, Intrinsic::coro_end, {i32Ty(module)});
+Value* callEndFunc(LgsModule* module, Value* handle) {
+    const auto func = getOrInsertDeclaration(module->IRModule, Intrinsic::coro_end);
     return module->builder.CreateCall(func, {handle, module->builder.getFalse(), ConstantTokenNone::get(module->context)});
 }
 
-Value* callCoroDestroyFunc(LgsModule* module, Value* handle) {
-    const auto func = getOrInsertDeclaration(module->IRModule, Intrinsic::coro_destroy, {i32Ty(module)});
+Value* callDestroyFunc(LgsModule* module, Value* handle) {
+    const auto func = getOrInsertDeclaration(module->IRModule, Intrinsic::coro_destroy);
     return module->builder.CreateCall(func, {handle});
 }
 
@@ -62,10 +67,10 @@ void LgsCoroutine::createIRStmt(LgsModule* module) {
 
     // Starts coroutine
     builder.SetInsertPoint(entryBlock);
-    const auto coroID = callCoroIDFunc(module);
-    const auto frameSize = callCoroSizeFunc(module);
-    const auto handle = callCoroBeginFunc(module, coroID, frameSize);
-    const auto suspend = callCoroSuspendFunc(module);
+    const auto coroID = callIDFunc(module);
+    const auto frameSize = callSizeFunc(module);
+    const auto handle = callBeginFunc(module, coroID, frameSize);
+    const auto suspend = callSuspendFunc(module);
     const auto switchIR = builder.CreateSwitch(suspend, suspendBlock, 2);
     switchIR->addCase(i8(module, 0), resumeBlock);
     switchIR->addCase(i8(module, 1), defaultBlock);
@@ -84,11 +89,12 @@ void LgsCoroutine::createIRStmt(LgsModule* module) {
     } else {
         assert(0);
     }
-    callCoroEndFunc(module, handle);
+    callEndFunc(module, handle);
     builder.CreateRet(handle);
 
     // Back to the caller
     builder.restoreIP(module->savedIP);
-    const auto handler = builder.CreateCall(coroutineFunc, originalArgs);
-    callCoroDestroyFunc(module, handler);
+    const auto coroutine = builder.CreateCall(coroutineFunc, originalArgs);
+    callResumeFunc(module, coroutine);
+    callDestroyFunc(module, coroutine);
 }
