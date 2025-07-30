@@ -1,7 +1,8 @@
 #include "LgsConfig.h"
 #include "LgsDefinitions.h"
-#include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 typedef struct StackFrame {
     uint64_t file_path_index;

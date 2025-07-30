@@ -14,6 +14,11 @@
 #include "types/primitives/LgsUInt.h"
 #include "../../include/symbols/types/LgsVoid.h"
 
+bool isCharPointer(const clang::QualType qt) {
+    if (!qt->isPointerType()) return false;
+    const auto pointeeType = qt->getPointeeType();
+    return pointeeType->isCharType();
+}
 
 bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
     auto name = func->getNameAsString();

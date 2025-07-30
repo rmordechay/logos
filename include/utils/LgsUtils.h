@@ -14,7 +14,6 @@ void logInfo(const string& text);
 void logErr(const string& text);
 bool isLogosFile(const directory_entry& entry);
 bool isLLVMFile(const directory_entry& entry);
-bool isCharPointer(clang::QualType qt);
 bool isLogosKeyword(const string& s);
 void cleanStr(string& value);
 string getFileText(path filePath);

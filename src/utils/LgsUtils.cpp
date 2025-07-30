@@ -23,12 +23,6 @@ bool isLLVMFile(const directory_entry& entry) {
     return entry.is_regular_file() && entry.path().extension().string() == ".ll";
 }
 
-bool isCharPointer(const clang::QualType qt) {
-    if (!qt->isPointerType()) return false;
-    const auto pointeeType = qt->getPointeeType();
-    return pointeeType->isCharType();
-}
-
 bool isLogosKeyword(const string& s) {
     return LOGOS_KEYWORDS.find(s) != LOGOS_KEYWORDS.end();
 }

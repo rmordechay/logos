@@ -109,21 +109,21 @@ target_include_directories(lib PUBLIC
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lib PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libLLVM.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libclang-cpp.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldCommon.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/liblldMachO.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/macos/libantlr.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libLLVM.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libclang-cpp.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/liblldCommon.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/liblldMachO.dylib
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libantlr.a
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(ZLIB REQUIRED)
     target_link_libraries(lib PRIVATE
         ZLIB::ZLIB
         zstd
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libLLVM.so
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/liblldCommon.a
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/liblldELF.a
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/linux/libantlr.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/linux/libLLVM.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/linux/liblldCommon.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/linux/liblldELF.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/linux/libantlr.a
     )
 endif()
 
