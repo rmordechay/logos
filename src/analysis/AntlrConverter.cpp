@@ -76,9 +76,9 @@ LgsFile* AntlerConverter::getLogosFile(LogosParser::LogosFileContext* ctx) {
 }
 
 LgsObjectFile* AntlerConverter::getObjectFile(LogosParser::ObjectFileContext* ctx) {
-    const auto objName = ctx->objectDeclaration()->IDENTIFIER()->getText();
+    const auto objName = ctx->IDENTIFIER()->getText();
     const auto objFile = new LgsObjectFile(objName, filePath);
-    objFile->obj = getObject(ctx->objectBody(), objName, !!ctx->objectDeclaration()->SINGLETON());
+    objFile->obj = getObject(ctx->objectBody(), objName, !!ctx->SINGLETON());
     if (!objFile->obj) return nullptr;
     globals.addSymbol(objName, LgsSymbol(objFile->obj), &errHandler);
     return objFile;
@@ -596,7 +596,7 @@ LgsForLoop* AntlerConverter::getInfiniteLoop(LogosParser::LoopStatementContext* 
     }
     return rangeLoop;
 }
-+
+
 LgsExpr* AntlerConverter::getExpr(LogosParser::ExprContext* ctx) {
     if (!ctx) return nullptr;
     LgsExpr* expr = nullptr;

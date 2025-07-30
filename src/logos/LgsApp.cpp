@@ -266,7 +266,7 @@ void LgsApp::exitWithErrors() const {
 }
 
 void LgsApp::initBuild() const {
-    if (exists(paths.buildDir)) remove_all(paths.buildDir);
+    remove_all(paths.buildDir);
     create_directories(paths.buildDir);
     create_directories(paths.buildIR);
     writeDebugFile();

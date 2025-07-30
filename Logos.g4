@@ -4,10 +4,6 @@ logosFile:
         extern? (mainFile | objectFile | interfaceFile)
     ;
 
-extern:
-        EXTERN 'C' LBRACE STRING* RBRACE
-    ;
-
 logosEnvFile:
         (implicitVarDec | explicitVarDec)* EOF
     ;
@@ -21,7 +17,7 @@ mainFile:
     ;
 
 objectFile:
-        objectDeclaration objectBody EOF
+        (OBJECT | SINGLETON) IDENTIFIER objectBody EOF
     ;
 
 interfaceFile:
@@ -63,10 +59,6 @@ field:
 
 interfaceField:
         CONST? IDENTIFIER QUEST_MARK? COLON type (EQUAL expr)?
-    ;
-
-objectDeclaration:
-        (OBJECT | SINGLETON) IDENTIFIER
     ;
 
 implements:
@@ -326,6 +318,10 @@ funcType:
 
 vector:
         (VEC2 | VEC3 | VEC4) LPAREN (expr (COMMA expr)* COMMA?)? RPAREN
+    ;
+
+extern:
+        EXTERN 'C' LBRACE STRING* RBRACE
     ;
 
 requireEnvVars:

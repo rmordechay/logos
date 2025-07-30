@@ -35,22 +35,22 @@ public:
     RuleMainFile = 4, RuleObjectFile = 5, RuleInterfaceFile = 6, RuleInterface = 7, 
     RuleGroup = 8, RuleGroupTypesList = 9, RuleGroupTargetList = 10, RuleInterfaceBody = 11, 
     RuleObject = 12, RuleObjectBody = 13, RuleField = 14, RuleInterfaceField = 15, 
-    RuleObjectDeclaration = 16, RuleImplements = 17, RuleFuncSignatureHeader = 18, 
-    RuleFuncSignature = 19, RuleInterfaceFuncSignature = 20, RuleFuncImpl = 21, 
-    RuleAnonymosFuncSignature = 22, RuleAnonnymosFunc = 23, RuleMethodImplementation = 24, 
-    RuleParam = 25, RuleAnonymousParam = 26, RuleStatement = 27, RuleStatementsBlock = 28, 
-    RuleAssignment = 29, RuleExplicitVarDec = 30, RuleImplicitVarDec = 31, 
-    RuleIfStatement = 32, RuleElseIfStatement = 33, RuleElseStatement = 34, 
-    RulePatternMatching = 35, RulePattern = 36, RuleLoopStatement = 37, 
-    RuleBreakStmt = 38, RuleReturnStatement = 39, RuleEnumDeclaration = 40, 
-    RuleEnumField = 41, RuleCoroutine = 42, RuleExpr = 43, RuleUnaryExpr = 44, 
-    RulePrefixExpr = 45, RulePostfixExpr = 46, RuleArrayExpr = 47, RuleHashMap = 48, 
-    RuleKeyValue = 49, RuleFuncCall = 50, RuleFuncArgList = 51, RuleFuncArg = 52, 
-    RuleConstructor = 53, RuleConstructorArgList = 54, RuleConstructorArg = 55, 
-    RuleConstant = 56, RuleIterIndex = 57, RuleIndex = 58, RuleSelection = 59, 
-    RuleFirstSelectionElement = 60, RuleInnerSelectionElement = 61, RuleRange = 62, 
-    RuleType = 63, RuleMapType = 64, RuleArraySize = 65, RuleFuncType = 66, 
-    RuleVector = 67, RuleRequireEnvVars = 68, RuleAssignemntOp = 69
+    RuleImplements = 16, RuleFuncSignatureHeader = 17, RuleFuncSignature = 18, 
+    RuleInterfaceFuncSignature = 19, RuleFuncImpl = 20, RuleAnonymosFuncSignature = 21, 
+    RuleAnonnymosFunc = 22, RuleMethodImplementation = 23, RuleParam = 24, 
+    RuleAnonymousParam = 25, RuleStatement = 26, RuleStatementsBlock = 27, 
+    RuleAssignment = 28, RuleExplicitVarDec = 29, RuleImplicitVarDec = 30, 
+    RuleIfStatement = 31, RuleElseIfStatement = 32, RuleElseStatement = 33, 
+    RulePatternMatching = 34, RulePattern = 35, RuleLoopStatement = 36, 
+    RuleBreakStmt = 37, RuleReturnStatement = 38, RuleEnumDeclaration = 39, 
+    RuleEnumField = 40, RuleCoroutine = 41, RuleExpr = 42, RuleUnaryExpr = 43, 
+    RulePrefixExpr = 44, RulePostfixExpr = 45, RuleArrayExpr = 46, RuleHashMap = 47, 
+    RuleKeyValue = 48, RuleFuncCall = 49, RuleFuncArgList = 50, RuleFuncArg = 51, 
+    RuleConstructor = 52, RuleConstructorArgList = 53, RuleConstructorArg = 54, 
+    RuleConstant = 55, RuleIterIndex = 56, RuleIndex = 57, RuleSelection = 58, 
+    RuleFirstSelectionElement = 59, RuleInnerSelectionElement = 60, RuleRange = 61, 
+    RuleType = 62, RuleMapType = 63, RuleArraySize = 64, RuleFuncType = 65, 
+    RuleVector = 66, RuleRequireEnvVars = 67, RuleAssignemntOp = 68
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -86,7 +86,6 @@ public:
   class ObjectBodyContext;
   class FieldContext;
   class InterfaceFieldContext;
-  class ObjectDeclarationContext;
   class ImplementsContext;
   class FuncSignatureHeaderContext;
   class FuncSignatureContext;
@@ -226,9 +225,11 @@ public:
   public:
     ObjectFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    ObjectDeclarationContext *objectDeclaration();
+    antlr4::tree::TerminalNode *IDENTIFIER();
     ObjectBodyContext *objectBody();
     antlr4::tree::TerminalNode *EOF();
+    antlr4::tree::TerminalNode *OBJECT();
+    antlr4::tree::TerminalNode *SINGLETON();
 
    
   };
@@ -392,19 +393,6 @@ public:
   };
 
   InterfaceFieldContext* interfaceField();
-
-  class  ObjectDeclarationContext : public antlr4::ParserRuleContext {
-  public:
-    ObjectDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    antlr4::tree::TerminalNode *OBJECT();
-    antlr4::tree::TerminalNode *SINGLETON();
-
-   
-  };
-
-  ObjectDeclarationContext* objectDeclaration();
 
   class  ImplementsContext : public antlr4::ParserRuleContext {
   public:

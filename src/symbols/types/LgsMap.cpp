@@ -20,24 +20,24 @@ LgsType* LgsMap::getValueType() {
     return typePair->key;
 }
 
-Value* LgsMap::getLength(LgsExpr* expr) {
+Value* LgsMap::getLength(LgsCodeGen* codeGen, LgsExpr* expr) {
     return lenFunc.call(codeGen, {expr});
 }
 
-Value* LgsMap::getLoopLength(LgsExpr* expr) {
+Value* LgsMap::getLoopLength(LgsCodeGen* codeGen, LgsExpr* expr) {
     return codeGen->i32(1024);
 }
 
-Value* LgsMap::isEmpty(LgsExpr* expr) {
+Value* LgsMap::isEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
     return isEmptyFunc.call(codeGen, {expr});
 }
 
-Value* LgsMap::isNotEmpty(LgsExpr* expr) {
+Value* LgsMap::isNotEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
     return isNotEmptyFunc.call(codeGen, {expr});
 }
 
 Type* LgsMap::getIRType(LgsCodeGen* codeGen) {
-    return getMapStruct();
+    return getMapStruct(codeGen);
 }
 
 string LgsMap::getName() {
@@ -56,7 +56,7 @@ bool LgsMap::equals(LgsType* other) {
     return keyEqual && typePair->value->equals(otherKvType->value);
 }
 
-StructType* LgsMap::getMapStruct() {
+StructType* LgsMap::getMapStruct(LgsCodeGen* codeGen) {
     if (mapStruct) return mapStruct;
     const vector<Type*> mapStructFields = {codeGen->ptrTy(), codeGen->i64Ty(), codeGen->i64Ty()};
     mapStruct = codeGen->getIRStructType(name, mapStructFields);

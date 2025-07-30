@@ -35,21 +35,21 @@ LgsType* LgsStr::getValueType() {
     return baseType;
 }
 
-Value* LgsStr::getLength(LgsExpr* expr) {
+Value* LgsStr::getLength(LgsCodeGen* codeGen, LgsExpr* expr) {
     return lenFunc.call(codeGen, {expr});
 }
 
-Value* LgsStr::getLoopLength(LgsExpr* expr) {
+Value* LgsStr::getLoopLength(LgsCodeGen* codeGen, LgsExpr* expr) {
     const auto lenPtr = codeGen->builder.CreateAlloca(codeGen->i64Ty());
-    codeGen->builder.CreateStore(getLength(expr), lenPtr);
+    codeGen->builder.CreateStore(getLength(codeGen, expr), lenPtr);
     return codeGen->builder.CreateLoad(codeGen->i64Ty(), lenPtr);
 }
 
-Value* LgsStr::isEmpty(LgsExpr* expr) {
+Value* LgsStr::isEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
     return isEmptyFunc.call(codeGen, {expr});
 }
 
-Value* LgsStr::isNotEmpty(LgsExpr* expr) {
+Value* LgsStr::isNotEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
     return isNotEmptyFunc.call(codeGen, {expr});
 }
 

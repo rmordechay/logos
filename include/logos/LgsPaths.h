@@ -1,5 +1,5 @@
 #pragma once
-#include "LgsDefinitions.h"
+#include "configs/LgsDefinitions.h"
 #include "configs/PlatformData.h"
 
 struct LgsPaths {

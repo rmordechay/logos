@@ -42,7 +42,6 @@ public:
     bool canSlice = false;
     Type* IRType = nullptr;
     LgsHashMap* vtable = nullptr;
-    LgsCodeGen* codeGen = nullptr;
     map<string, LgsField*> fields;
     map<string, LgsFunc*> methods;
 

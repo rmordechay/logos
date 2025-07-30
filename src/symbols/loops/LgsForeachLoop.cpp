@@ -14,7 +14,7 @@ Value* LgsForeachLoop::loopStart(LgsCodeGen* codeGen) {
 
 Value* LgsForeachLoop::loopEnd(LgsCodeGen* codeGen) {
     const auto iterable = iterExpr->type->asIterable();
-    return iterable->getLoopLength(iterExpr);
+    return iterable->getLoopLength(codeGen, iterExpr);
 }
 
 void LgsForeachLoop::initIRLoop(LgsCodeGen* codeGen) {

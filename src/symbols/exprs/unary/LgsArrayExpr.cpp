@@ -19,7 +19,7 @@ Value* LgsArrayExpr::createDynamicArray(LgsCodeGen* codeGen) {
     auto& builder = codeGen->builder;
     const auto arrType = type->asDArray();
     const auto elementSize = codeGen->i64(arrType->baseType->getSizeBytes());
-    IRValue = builder.CreateAlloca(arrType->getArrStruct());
+    IRValue = builder.CreateAlloca(arrType->getArrStruct(codeGen));
 
     Value* capacityIR = nullptr;
     if (arrType->sizeExpr) {

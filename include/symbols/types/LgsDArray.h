@@ -44,11 +44,11 @@ public:
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
     string getStrFormatPart() const override;
-    Value* getLength(LgsExpr* expr) override;
-    Value* getLoopLength(LgsExpr* expr) override;
-    Value* isEmpty(LgsExpr* expr) override;
-    Value* isNotEmpty(LgsExpr* expr) override;
-    StructType* getArrStruct();
+    Value* getLength(LgsCodeGen* codeGen, LgsExpr* expr) override;
+    Value* getLoopLength(LgsCodeGen* codeGen, LgsExpr* expr) override;
+    Value* isEmpty(LgsCodeGen* codeGen, LgsExpr* expr) override;
+    Value* isNotEmpty(LgsCodeGen* codeGen, LgsExpr* expr) override;
+    StructType* getArrStruct(LgsCodeGen* codeGen);
     bool equals(LgsType* other) override;
     ~LgsDArray() override;
 };

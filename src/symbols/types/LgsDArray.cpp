@@ -6,7 +6,7 @@
 
 Type* LgsDArray::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;
-    return getArrStruct();
+    return getArrStruct(codeGen);
 }
 
 size_t LgsDArray::getSizeBytes() {
@@ -43,24 +43,23 @@ string LgsDArray::getName() {
     return name;
 }
 
-Value* LgsDArray::getLength(LgsExpr* expr) {
+Value* LgsDArray::getLength(LgsCodeGen* codeGen, LgsExpr* expr) {
     return lenFunc.call(codeGen, {expr});
 }
 
-Value* LgsDArray::getLoopLength(LgsExpr* expr) {
-    return getLength(expr);
+Value* LgsDArray::getLoopLength(LgsCodeGen* codeGen, LgsExpr* expr) {
+    return getLength(codeGen, expr);
 }
 
-Value* LgsDArray::isEmpty(LgsExpr* expr) {
+Value* LgsDArray::isEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
     return isEmptyFunc.call(codeGen, {expr});
 }
 
-Value* LgsDArray::isNotEmpty(LgsExpr* expr) {
+Value* LgsDArray::isNotEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
     return isNotEmptyFunc.call(codeGen, {expr});
 }
 
-StructType* LgsDArray::getArrStruct() {
-    auto& context = codeGen->context;
+StructType* LgsDArray::getArrStruct(LgsCodeGen* codeGen) {
     if (arrStruct) return arrStruct;
     arrStruct = codeGen->getIRStructType(name, {codeGen->i64Ty(), codeGen->i64Ty(), codeGen->i64Ty(), codeGen->ptrTy()});
     return arrStruct;
