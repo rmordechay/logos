@@ -20,9 +20,6 @@
 Value* LgsExpr::getIRValue(LgsCodeGen* codeGen) {
     if (IRValue) return IRValue;
     IRValue = createIRValue(codeGen);
-    if (isHeapAlloc) {
-        codeGen->stack.addHeapAlloc(this);
-    }
     assert(IRValue);
     return IRValue;
 }

@@ -25,7 +25,8 @@ public:
     bool lastInstTerminator() const;
 
     // Blocks
-    void branchToBlock(BasicBlock* block);
+    BasicBlock* createBlock(const string& name, Function* parent = nullptr);
+    void branchIfNeeded(BasicBlock* block);
     void startBlock(BasicBlock* block);
     void startFuncBlock();
 
@@ -75,7 +76,8 @@ public:
     ConstantInt* i64Zero();
     ConstantInt* sizeZero();
 
-    void printPtr(Value* ptr);
+    void printPtr(Value* ptr, const string& text);
+    void printInt(Value* number, const string& text);
     void printStr(const string& str);
     static void initLLVM();
     static TargetMachine* getTargetMachine();

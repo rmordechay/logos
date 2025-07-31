@@ -16,7 +16,6 @@
 #define LOGOS_MSG_PLACEHOLDER "%s"
 #define LOGOS_ERROR_STR "\033[1;31mError:\033[0m "
 
-#define BLOCK_NAME_CLEANUP "cleanup"
 #define BLOCK_NAME_IF_TRUE "if_true"
 #define BLOCK_NAME_DEFAULT_CASE "default"
 #define BLOCK_NAME_EXIT_PATTERN "exit_pattern_matching"
@@ -32,3 +31,12 @@
 #define BLOCK_NAME_LOOP_BODY "loop_body"
 #define BLOCK_NAME_LOOP_EXIT "loop_exit"
 #define BLOCK_NAME_BREAK "break"
+#define BLOCK_NAME_IS_NULL "is_null_block"
+#define BLOCK_NAME_NOT_NULL "not_null_block"
+#define BLOCK_NAME_CLEANUP "cleanup"
+#define BLOCK_NAME_CLEANUP_LOOP_COND "cleanup_loop_cond"
+#define BLOCK_NAME_CLEANUP_LOOP_BODY "cleanup_loop_body"
+#define BLOCK_NAME_CLEANUP_LOOP_EXIT "cleanup_loop_exit"
+#define BLOCK_NAME_CLEANUP_LOOP_INC "cleanup_loop_inc"
+#define BLOCK_NAME_CLEANUP_FREE_ELEMENT "cleanup_free_element"
+

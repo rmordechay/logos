@@ -2,9 +2,11 @@
 #include "exprs/unary/LgsSelection.h"
 
 void LgsStmtsBlock::createIRValue(LgsCodeGen* codeGen) const {
+    // const auto returnExprsArr = allocReturnStructs(codeGen);
     for (const auto stmt : stmts) {
         stmt->createIRStmt(codeGen);
     }
+    // createCleanupBlock(codeGen, returnExprsArr);
 }
 
 LgsStmt* LgsStmtsBlock::lastStmt() const {

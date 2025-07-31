@@ -12,7 +12,6 @@ class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
     vector<LgsReturn*> returnExprs;
-    vector<LgsExpr*> heapAllocExprs;
     LgsStmtsBlock* stmtBlock = nullptr;
     BasicBlock* cleanupBlock = nullptr;
     off_t pathIndex = 0;
@@ -25,13 +24,13 @@ public:
         type = funcType;
     }
     explicit LgsFunc(LgsFuncType* funcType) : LgsUnaryExpr(funcType), funcType(funcType) {}
-    void allocReturnStructs(LgsCodeGen* codeGen) const;
+    AllocaInst* allocReturnStructs(LgsCodeGen* codeGen) const;
     string prettyName() override;
     string format(string& tabs) override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
     Value* callIR(LgsCodeGen* codeGen, const vector<Value*>& args = {});
-    void createCleanupBlock(LgsCodeGen* codeGen) const;
-    PHINode* cleanupExprs(LgsCodeGen* codeGen) const;
+    void cleanup(LgsCodeGen* codeGen, AllocaInst* returnExprsArr) const;
+    PHINode* cleanupExprs(LgsCodeGen* codeGen, AllocaInst* returnExprsArr) const;
     static Value* getIRArg(LgsCodeGen* codeGen, LgsExpr* arg);
     virtual Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args = {});
     virtual void generateIR(LgsCodeGen* codeGen);

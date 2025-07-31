@@ -3,8 +3,9 @@ project(logos VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
+find_package(ZLIB REQUIRED)
+
 set(SOURCE_FILES
     src/utils/LgsErrHandler.cpp
     src/logos/LgsApp.cpp
@@ -116,7 +117,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libantlr.a
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    find_package(ZLIB REQUIRED)
     target_link_libraries(lib PRIVATE
         ZLIB::ZLIB
         zstd

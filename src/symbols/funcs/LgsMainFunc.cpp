@@ -7,13 +7,10 @@ void LgsMainFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(FUNC_SCOPE, this);
     codeGen->startFuncBlock();
     codeGen->callInitRuntime();
-    if (!stmtBlock->stmts.empty()) {
-        if (!funcType->params.empty()) {
-            initArgs(codeGen);
-        }
-        stmtBlock->createIRValue(codeGen);
-        createCleanupBlock(codeGen);
+    if (!funcType->params.empty()) {
+        initArgs(codeGen);
     }
+    stmtBlock->createIRValue(codeGen);
     codeGen->builder.CreateRet(codeGen->i32(EXIT_SUCCESS));
     codeGen->stack.exitScope();
 }

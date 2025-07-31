@@ -56,7 +56,11 @@ StructType* LgsCodeGen::getIRStructType(const string& name, const vector<Type*>&
     return structType;
 }
 
-void LgsCodeGen::branchToBlock(BasicBlock* block) {
+BasicBlock* LgsCodeGen::createBlock(const string& name, Function* parent) {
+    return BasicBlock::Create(context, name, parent);
+}
+
+void LgsCodeGen::branchIfNeeded(BasicBlock* block) {
     if (!lastInstTerminator()) {
         builder.CreateBr(block);
     }
@@ -243,9 +247,15 @@ ConstantInt* LgsCodeGen::sizeZero() {
     return ConstantInt::get(sizeTy(), 0);
 }
 
-void LgsCodeGen::printPtr(Value* ptr) {
+void LgsCodeGen::printPtr(Value* ptr, const string& text = "") {
     assert(ptr->getType()->isPointerTy());
+    if (text != "") printStr(text);
     callPrintf({getIRStr(LGS_ANY.getStrFormatPart() + '\n'), ptr});
+}
+
+void LgsCodeGen::printInt(Value* number, const string& text = "") {
+    if (text != "") printStr(text);
+    callPrintf({getIRStr("%d\n"), number});
 }
 
 void LgsCodeGen::printStr(const string& str) {

@@ -11,8 +11,8 @@ Value* LgsInfiniteLoop::loopEnd(LgsCodeGen* codeGen) {
 }
 
 void LgsInfiniteLoop::initIRLoop(LgsCodeGen* codeGen) {
-    IRBodyBlock = BasicBlock::Create(codeGen->context, BLOCK_NAME_LOOP_BODY);
-    IRExitBlock = BasicBlock::Create(codeGen->context, BLOCK_NAME_LOOP_EXIT);
+    IRBodyBlock = codeGen->createBlock(BLOCK_NAME_LOOP_BODY);
+    IRExitBlock = codeGen->createBlock(BLOCK_NAME_LOOP_EXIT);
     codeGen->builder.CreateBr(IRBodyBlock);
 
     codeGen->startBlock(IRBodyBlock);

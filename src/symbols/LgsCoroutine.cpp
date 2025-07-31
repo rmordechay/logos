@@ -23,10 +23,10 @@ void LgsCoroutine::createIRStmt(LgsCodeGen* codeGen) {
     for (int i = 0; i < args.size(); ++i) {
         coroutineArgs.push_back(arg++);
     }
-    const auto entryBlock = BasicBlock::Create(codeGen->context, BLOCK_NAME_ENTRY, coroutineFunc);
-    const auto suspendBlock = BasicBlock::Create(codeGen->context, BLOCK_NAME_SUSPEND, coroutineFunc);
-    const auto resumeBlock = BasicBlock::Create(codeGen->context, BLOCK_NAME_RESUME, coroutineFunc);
-    const auto defaultBlock = BasicBlock::Create(codeGen->context, BLOCK_NAME_DEFAULT_CASE, coroutineFunc);
+    const auto entryBlock = codeGen->createBlock(BLOCK_NAME_ENTRY, coroutineFunc);
+    const auto suspendBlock = codeGen->createBlock(BLOCK_NAME_SUSPEND, coroutineFunc);
+    const auto resumeBlock = codeGen->createBlock(BLOCK_NAME_RESUME, coroutineFunc);
+    const auto defaultBlock = codeGen->createBlock(BLOCK_NAME_DEFAULT_CASE, coroutineFunc);
 
     // Starts coroutine
     builder.SetInsertPoint(entryBlock);

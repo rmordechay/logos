@@ -33,7 +33,6 @@ public:
     LgsLocation location;
     bool isVoid = false;
     bool isInt = false;
-    bool isHeapAlloc = false;
     bool isUnsigned = false;
     bool isPrimitive = false;
     bool isBig = false;
