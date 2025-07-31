@@ -37,7 +37,7 @@ void LgsField::storeIRValue(LgsCodeGen* codeGen, Value* instance, LgsExpr* value
 }
 
 LgsField* LgsField::clone() const {
-    const auto cloned = new LgsField(name, parentName, type, expr);
+    const auto cloned = new LgsField(*this);
     cloned->position = position;
     cloned->isPublic = isPublic;
     cloned->isVirtual = isVirtual;

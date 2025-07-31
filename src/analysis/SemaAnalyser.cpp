@@ -21,7 +21,7 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
-#include "../../include/configs/LgsConfig.h"
+#include "configs/LgsConfig.h"
 #include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "stmts/LgsContinueStmt.h"
@@ -537,7 +537,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     }
 
     if (!instance->obj) {
-        instance->obj = symbol->object;
+        instance->obj = symbol->object->clone();
         instance->setType(instance->obj);
     }
 

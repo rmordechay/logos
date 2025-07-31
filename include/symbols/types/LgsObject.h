@@ -22,5 +22,6 @@ public:
     string getStrFormatPart() const override;
     bool equals(LgsType* other) override;
     void freeValue(LgsCodeGen* codeGen, Value* value) override;
+    LgsObject* clone();
     ~LgsObject() override;
 };

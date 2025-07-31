@@ -62,4 +62,7 @@ LgsInstance::~LgsInstance() {
     for (const auto arg : args) {
         delete arg.second;
     }
+    if (obj) {
+        delete obj;
+    }
 }

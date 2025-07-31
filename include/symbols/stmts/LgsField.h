@@ -22,8 +22,8 @@ public:
     LgsField(const string& name, string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(name), parentName(parentName), type(type), expr(expr) {}
     Value* getGEP(LgsCodeGen* codeGen, Value* instance) const;
     Value* getIRValue(LgsCodeGen* codeGen, LgsExpr* parentInstance);
-    LgsField* clone() const;
     void storeIRValue(LgsCodeGen* codeGen, Value* instance, LgsExpr* value);
     Value* resolveVirtualField(LgsCodeGen* codeGen, LgsExpr* parentExpr) const;
+    LgsField* clone() const;
     ~LgsField() override;
 };
