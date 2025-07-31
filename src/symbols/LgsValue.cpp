@@ -1,5 +1,6 @@
 #include "LgsValue.h"
 #include "funcs/LgsFunc.h"
+#include "stmts/LgsReturn.h"
 #include "utils/LgsUtils.h"
 
 void LgsValue::setLocation(const Token* start, const Token* end, const path& filePath) {

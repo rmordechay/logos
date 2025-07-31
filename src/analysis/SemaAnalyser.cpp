@@ -960,48 +960,44 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
         resolveFuncTypes(funcType);
     }
 
-    if (!type->isUnknown) {
-        type->isBig = type->getSizeBytes() > BIG_SIZE_THRESHOLD;
-        return type;
+    if (type->isUnknown) {
+        auto typeName = type->getName();
+        auto symbol = globals.getSymbol(typeName);
+        if (!symbol) {
+            symbol = file->symbolTable.getSymbol(typeName);
+        }
+        if (!symbol) {
+            errHandler.handleError(E10006, &type->location, {typeName});
+            return nullptr;
+        }
+        LgsType* newType = nullptr;
+        switch (symbol->symbolType) {
+        case FUNC:
+            newType = symbol->func->funcType;
+            break;
+        case OBJECT:
+            newType = symbol->object;
+            break;
+        case INTERFACE:
+            newType = symbol->interface;
+            break;
+        case GROUP:
+            newType = symbol->group;
+            break;
+        case ENUM:
+            newType = symbol->lgsEnum;
+            break;
+        default:
+            break;
+        }
+        assert(newType);
+        newType->isBig = newType->getSizeBytes() > BIG_SIZE_THRESHOLD;
+        freeType(type);
+        type = newType;
     }
 
-    auto typeName = type->getName();
-    auto symbol = globals.getSymbol(typeName);
-    if (!symbol) {
-        symbol = file->symbolTable.getSymbol(typeName);
-    }
-    if (!symbol) {
-        errHandler.handleError(E10006, &type->location, {typeName});
-        return nullptr;
-    }
-
-    LgsType* newType = nullptr;
-    switch (symbol->symbolType) {
-    case FUNC:
-        newType = symbol->func->funcType;
-        break;
-    case OBJECT:
-        newType = symbol->object;
-        break;
-    case INTERFACE:
-        newType = symbol->interface;
-        break;
-    case GROUP:
-        newType = symbol->group;
-        break;
-    case ENUM:
-        newType = symbol->lgsEnum;
-        break;
-    case VAR_DEC:
-    case PARAM:
-    case FIELD:
-    case UNKNOWN:
-        break;
-    }
-    assert(newType);
-    newType->isBig = newType->getSizeBytes() > BIG_SIZE_THRESHOLD;
-    freeType(type);
-    return newType;
+    type->isBig = type->getSizeBytes() > BIG_SIZE_THRESHOLD;
+    return type;
 }
 
 void SemaAnalyser::resolveIterable(LgsIterable* iterable) {

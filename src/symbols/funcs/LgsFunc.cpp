@@ -11,7 +11,6 @@ void LgsFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(FUNC_SCOPE, this);
     codeGen->startFuncBlock();
     stmtBlock->createIRValue(codeGen);
-    cleanup(codeGen, nullptr);
     if (!codeGen->lastInstTerminator()) {
         codeGen->builder.CreateRetVoid();
     }
@@ -75,22 +74,9 @@ Value* LgsFunc::callIR(LgsCodeGen* codeGen, const vector<Value*>& args) {
     return codeGen->builder.CreateCall(IRFunc, args);
 }
 
-void LgsFunc::cleanup(LgsCodeGen* codeGen, AllocaInst* returnExprsArr) const {
-    codeGen->branchIfNeeded(cleanupBlock);
-    codeGen->startBlock(cleanupBlock);
-    Value* rv = nullptr;
-    if (returnExprs.size() == 1) {
-        rv = returnExprs.front()->expr->getIRValue(codeGen);
-    } else if (returnExprs.size() > 1) {
-        rv = cleanupExprs(codeGen, returnExprsArr);
-    }
-    codeGen->callPopStack();
-    if (rv) codeGen->builder.CreateRet(rv);
-}
-
-PHINode* LgsFunc::cleanupExprs(LgsCodeGen* codeGen, AllocaInst* returnExprsArr) const {
+PHINode* LgsFunc::cleanupExprs(LgsCodeGen* codeGen) {
     PHINode* phiNode;
-    auto& builder = codeGen->builder;
+    auto& builder = builder;
     if (funcType->rt->isBig) {
         phiNode = builder.CreatePHI(codeGen->ptrTy(), returnExprs.size());
     } else {
@@ -101,69 +87,7 @@ PHINode* LgsFunc::cleanupExprs(LgsCodeGen* codeGen, AllocaInst* returnExprsArr) 
         const auto exprIR = expr->expr->getIRValue(codeGen);
         phiNode->addIncoming(exprIR, expr->parentBlock);
     }
-
-    // Cleanup loop
-    // const auto notNullBlock = codeGen->createBlock(BLOCK_NAME_NOT_NULL);
-    // const auto blockLoopCond = codeGen->createBlock(BLOCK_NAME_CLEANUP_LOOP_COND);
-    // const auto blockLoopBody = codeGen->createBlock(BLOCK_NAME_CLEANUP_LOOP_BODY);
-    // const auto blockLoopExit = codeGen->createBlock(BLOCK_NAME_CLEANUP_LOOP_EXIT);
-    // const auto blockLoopInc = codeGen->createBlock(BLOCK_NAME_CLEANUP_LOOP_INC);
-    // const auto blockFreeElement = codeGen->createBlock(BLOCK_NAME_CLEANUP_FREE_ELEMENT);
-    // const auto iPtr = builder.CreateAlloca(codeGen->i32Ty());
-    // const auto upperBound = codeGen->i32(returnExprs.size());
-    // builder.CreateStore(codeGen->i32Zero(), iPtr);
-    // builder.CreateBr(blockLoopCond);
-    //
-    // // Cond
-    // codeGen->startBlock(blockLoopCond);
-    // auto iValue = builder.CreateLoad(codeGen->i32Ty(), iPtr);
-    // const auto cond = builder.CreateICmpSLT(iValue, upperBound);
-    // builder.CreateCondBr(cond, blockLoopBody, blockLoopExit);
-    //
-    // // Body
-    // codeGen->startBlock(blockLoopBody);
-    // const auto rsType = StructType::get(codeGen->context, {codeGen->i1Ty(), codeGen->ptrTy()});
-    // const auto arrType = ArrayType::get(rsType, returnExprs.size());
-    // const auto structPtr = builder.CreateInBoundsGEP(arrType, returnExprsArr, {codeGen->i32(0), iValue});
-    // const auto flagPtr = builder.CreateStructGEP(rsType, structPtr, 0);
-    // const auto flagValue = builder.CreateLoad(codeGen->i1Ty(), flagPtr);
-    // builder.CreateCondBr(flagValue, blockLoopInc, blockFreeElement);
-    //
-    // // Free element
-    // codeGen->startBlock(blockFreeElement);
-    // const auto gep = builder.CreateStructGEP(rsType, structPtr, 1);
-    // const auto value = builder.CreateLoad(codeGen->ptrTy(), gep);
-    //
-    // // const auto isNull = builder.CreateIsNull(value);
-    // // builder.CreateCondBr(isNull, blockLoopInc, notNullBlock);
-    // // codeGen->startBlock(notNullBlock);
-    // funcType->rt->freeValue(codeGen, value);
-    // builder.CreateBr(blockLoopInc);
-    //
-    // // Loop inc
-    // codeGen->startBlock(blockLoopInc);
-    // iValue = builder.CreateLoad(codeGen->i32Ty(), iPtr);
-    // const auto inc = builder.CreateAdd(iValue, codeGen->i32(1));
-    // builder.CreateStore(inc, iPtr);
-    // builder.CreateBr(blockLoopCond);
-    //
-    // // Exit
-    // codeGen->startBlock(blockLoopExit);
     return phiNode;
-}
-
-AllocaInst* LgsFunc::allocReturnStructs(LgsCodeGen* codeGen) const {
-    if (!funcType->rt->isBig || returnExprs.size() <= 1) return nullptr;
-    const auto structType = StructType::get(codeGen->context, {codeGen->i1Ty(), codeGen->ptrTy()});
-    const auto arrType = ArrayType::get(structType, returnExprs.size());
-    const auto returnExprsArr = codeGen->builder.CreateAlloca(arrType);
-    for (int i = 0; i < returnExprs.size(); ++i) {
-        const auto structPtr = codeGen->builder.CreateInBoundsGEP(arrType, returnExprsArr, {codeGen->i32(0), codeGen->i32(i)});
-        returnExprs[i]->returnStructPtr = dyn_cast<GetElementPtrInst>(structPtr);
-        returnExprs[i]->setReturnFlag(codeGen, false);
-        returnExprs[i]->setReturnValue(codeGen, codeGen->null());
-    }
-    return returnExprsArr;
 }
 
 string LgsFunc::prettyName() {

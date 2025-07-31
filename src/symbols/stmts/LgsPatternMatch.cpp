@@ -1,10 +1,7 @@
 #include "stmts/LgsPatternMatch.h"
-
 #include "configs/LgsDefinitions.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
-
-#include "utils/LgsUtils.h"
 
 void LgsPatternMatch::createIRStmt(LgsCodeGen* codeGen) {
     const auto exprIRValue = expr->hashValue(codeGen);

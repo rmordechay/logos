@@ -2,11 +2,23 @@
 #include "exprs/unary/LgsSelection.h"
 
 void LgsStmtsBlock::createIRValue(LgsCodeGen* codeGen) const {
-    // const auto returnExprsArr = allocReturnStructs(codeGen);
     for (const auto stmt : stmts) {
         stmt->createIRStmt(codeGen);
     }
-    // createCleanupBlock(codeGen, returnExprsArr);
+    cleanup(codeGen);
+}
+
+void LgsStmtsBlock::cleanup(LgsCodeGen* codeGen) const {
+    codeGen->branchIfNeeded(cleanupBlock);
+    codeGen->startBlock(cleanupBlock);
+    Value* rv = nullptr;
+    if (heapAllocExprs.size() == 1) {
+        rv = heapAllocExprs.front()->expr->getIRValue(codeGen);
+    } else if (heapAllocExprs.size() > 1) {
+        rv = cleanupExprs(codeGen);
+    }
+    codeGen->callPopStack();
+    if (rv) codeGen->builder.CreateRet(rv);
 }
 
 LgsStmt* LgsStmtsBlock::lastStmt() const {

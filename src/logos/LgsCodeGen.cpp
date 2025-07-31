@@ -2,6 +2,7 @@
 #include "LgsDefinitions.h"
 #include "funcs/LgsFunc.h"
 #include "logos/LgsPaths.h"
+#include "stmts/LgsReturn.h"
 #include "types/LgsAny.h"
 
 void LgsCodeGen::initLLVM() {
@@ -83,6 +84,11 @@ void LgsCodeGen::startFuncBlock() {
     builder.SetInsertPoint(entryBlock);
 }
 
+void LgsCodeGen::callInitRuntime() {
+    const auto ft = FunctionType::get(voidTy(), false);
+    callFunc("init_runtime", ft, {getIRStr(paths.debugFile)});
+}
+
 void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
     const auto memCpy = getOrInsertDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), ptrTy()});
     builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
@@ -101,11 +107,6 @@ Value* LgsCodeGen::callSnprintf(const vector<Value*>& args) {
 Value* LgsCodeGen::callStrHash(Value* value) {
     const auto ft = FunctionType::get(i32Ty(), {ptrTy()}, false);
     return callFunc("Str_hash", ft, {value});
-}
-
-void LgsCodeGen::callInitRuntime() {
-    const auto ft = FunctionType::get(voidTy(), false);
-    callFunc("init_runtime", ft, {getIRStr(paths.debugFile)});
 }
 
 Value* LgsCodeGen::callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args) {
