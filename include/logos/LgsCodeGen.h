@@ -24,10 +24,12 @@ public:
     StructType* getIRStructType(const string& name, const vector<Type*>& fields);
     bool lastInstTerminator() const;
 
+    // Blocks
     void branchToBlock(BasicBlock* block);
     void startBlock(BasicBlock* block);
     void startFuncBlock();
 
+    // Funcs
     Value* callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args = {});
     Value* callMalloc(size_t size);
     Value* callPrintf(const vector<Value*>& args);
@@ -73,6 +75,8 @@ public:
     ConstantInt* i64Zero();
     ConstantInt* sizeZero();
 
+    void printPtr(Value* ptr);
+    void printStr(const string& str);
     static void initLLVM();
     static TargetMachine* getTargetMachine();
     ~LgsCodeGen() = default;

@@ -10,7 +10,6 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
-
 void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
     std::lock_guard lock(mtx);
     if (symbols.find(name) != symbols.end()) {

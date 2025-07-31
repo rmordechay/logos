@@ -2,6 +2,7 @@
 #include "LgsDefinitions.h"
 #include "funcs/LgsFunc.h"
 #include "logos/LgsPaths.h"
+#include "types/LgsAny.h"
 
 void LgsCodeGen::initLLVM() {
     InitializeNativeTarget();
@@ -179,15 +180,15 @@ IntegerType* LgsCodeGen::sizeTy() {
 }
 
 Type* LgsCodeGen::i1Ty() {
-    return IntegerType::getInt32Ty(context);
+    return IntegerType::getInt1Ty(context);
 }
 
 Type* LgsCodeGen::i8Ty() {
-    return IntegerType::getInt32Ty(context);
+    return IntegerType::getInt8Ty(context);
 }
 
 Type* LgsCodeGen::i16Ty() {
-    return IntegerType::getInt32Ty(context);
+    return IntegerType::getInt16Ty(context);
 }
 
 Type* LgsCodeGen::i32Ty() {
@@ -240,4 +241,13 @@ ConstantInt* LgsCodeGen::i64Zero() {
 
 ConstantInt* LgsCodeGen::sizeZero() {
     return ConstantInt::get(sizeTy(), 0);
+}
+
+void LgsCodeGen::printPtr(Value* ptr) {
+    assert(ptr->getType()->isPointerTy());
+    callPrintf({getIRStr(LGS_ANY.getStrFormatPart() + '\n'), ptr});
+}
+
+void LgsCodeGen::printStr(const string& str) {
+    callPrintf({getIRStr("%s"), getIRStr(str)});
 }

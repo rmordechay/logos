@@ -36,7 +36,7 @@ public:
     bool isHeapAlloc = false;
     bool isUnsigned = false;
     bool isPrimitive = false;
-    bool isSizeBig = false;
+    bool isBig = false;
     bool isBuiltin = false;
     bool isUnknown = false;
     bool canSlice = false;
@@ -69,13 +69,13 @@ public:
     LgsGroup* asGroup();
     LgsTypePair* asPair();
 
-    virtual string getStrFormatPart() const;
     virtual string getName() = 0;
     virtual string prettyName() = 0;
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual Type* getIRType(LgsCodeGen* codeGen) = 0;
     virtual bool equals(LgsType* other) = 0;
+    virtual string getStrFormatPart() const;
     virtual void freeValue(LgsCodeGen* codeGen, Value* value);
     virtual ~LgsType();
 };

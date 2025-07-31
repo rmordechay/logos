@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsType.h"
-#include "LgsValue.h"
 
 class LgsInstance;
 class LgsCodeGen;

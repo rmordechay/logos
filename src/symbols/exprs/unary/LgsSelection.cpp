@@ -33,7 +33,7 @@ Value* LgsSelection::resolveSelection(LgsCodeGen* codeGen) {
         if (childExpr->asFuncCall()) {
             childExpr->getIRValue(codeGen);
         } else if (const auto fieldVar = childExpr->asVariable()){
-            const auto v = fieldVar->ref.field->getIRValue(codeGen, parentExpr);
+            const auto v = fieldVar->ref.field->getIRValue(codeGen, parentExpr->type->vtable);
             childExpr->setIRValue(v);
         } else {
             assert(0);
@@ -55,11 +55,6 @@ string LgsSelection::prettyName() {
 LgsExpr* LgsSelection::lastExpr() const {
     assert(exprs.size() > 1);
     return exprs[exprs.size() - 1];
-}
-
-LgsExpr* LgsSelection::LastExprParent() const {
-    assert(exprs.size() > 1);
-    return exprs[exprs.size() - 2];
 }
 
 Value* LgsSelection::hashValue(LgsCodeGen* codeGen) {

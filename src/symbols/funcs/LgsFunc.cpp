@@ -4,11 +4,15 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsReturn.h"
+#include "types/LgsFuncType.h"
 #include "utils/LgsUtils.h"
 
 void LgsFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(FUNC_SCOPE, this);
     codeGen->startFuncBlock();
+    if (funcType->rt->isBig && returnExprs.size() > 1) {
+        allocReturnStructs(codeGen);
+    }
     stmtBlock->createIRValue(codeGen);
     createCleanupBlock(codeGen);
     if (!codeGen->lastInstTerminator()) {
@@ -101,33 +105,44 @@ Value* LgsFunc::callIR(LgsCodeGen* codeGen, const vector<Value*>& args) {
 void LgsFunc::createCleanupBlock(LgsCodeGen* codeGen) const {
     if (!codeGen->lastInstTerminator()) codeGen->builder.CreateBr(cleanupBlock);
     codeGen->startBlock(cleanupBlock);
-    const auto IRReturnType = funcType->rt->getIRType(codeGen);
     Value* rv = nullptr;
     if (returnExprs.size() == 1) {
         rv = returnExprs.front()->expr->getIRValue(codeGen);
     } else if (returnExprs.size() > 1) {
-        PHINode* phiNode;
-        if (funcType->rt->isSizeBig) {
-            phiNode = codeGen->builder.CreatePHI(codeGen->ptrTy(), returnExprs.size());
-        } else {
-            phiNode = codeGen->builder.CreatePHI(IRReturnType, returnExprs.size());
-        }
-        for (const auto returnExpr : returnExprs) {
-            const auto exprIR = returnExpr->expr->getIRValue(codeGen);
-            phiNode->addIncoming(exprIR, returnExpr->parentBlock);
-        }
-        rv = phiNode;
+        rv = cleanupExprs(codeGen);
     }
-    freeAllocations(codeGen);
+    for (const auto expr : heapAllocExprs) {
+        expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
+    }
     codeGen->callPopStack();
     if (rv) {
         codeGen->builder.CreateRet(rv);
     }
 }
 
-void LgsFunc::freeAllocations(LgsCodeGen* codeGen) const {
-    for (const auto expr : heapAllocExprs) {
-        expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
+PHINode* LgsFunc::cleanupExprs(LgsCodeGen* codeGen) const {
+    PHINode* phiNode;
+    if (funcType->rt->isBig) {
+        phiNode = codeGen->builder.CreatePHI(codeGen->ptrTy(), returnExprs.size());
+    } else {
+        const auto IRReturnType = funcType->rt->getIRType(codeGen);
+        phiNode = codeGen->builder.CreatePHI(IRReturnType, returnExprs.size());
+    }
+    for (const auto returnExpr : returnExprs) {
+        const auto exprIR = returnExpr->expr->getIRValue(codeGen);
+        phiNode->addIncoming(exprIR, returnExpr->parentBlock);
+        codeGen->printStr(returnExpr->parentBlock->getName().str() + ": ");
+        codeGen->printPtr(exprIR);
+    }
+    codeGen->printPtr(phiNode);
+    return phiNode;
+}
+
+void LgsFunc::allocReturnStructs(LgsCodeGen* codeGen) const {
+    for (const auto expr : returnExprs) {
+        const auto structType = StructType::get(codeGen->context, {codeGen->i1Ty(), codeGen->ptrTy()});
+        expr->returnStruct = codeGen->builder.CreateAlloca(structType);
+        expr->setReturnFlag(codeGen, false);
     }
 }
 

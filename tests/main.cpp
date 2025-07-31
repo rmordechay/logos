@@ -1,4 +1,3 @@
-
 #include "logos/LgsCodeGen.h"
 #include <doctest.h>
 

@@ -19,7 +19,6 @@ public:
     explicit LgsSelection(const std::vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
     string prettyName() override;
     LgsExpr* lastExpr() const;
-    LgsExpr* LastExprParent() const;
     Value* resolveSelection(LgsCodeGen* codeGen);
     Value* hashValue(LgsCodeGen* codeGen) override;
     void createIRStmt(LgsCodeGen* codeGen) override;

@@ -39,7 +39,7 @@ bool LgsInterface::equals(LgsType* other) {
 }
 
 size_t LgsInterface::getSizeBytes() {
-    assert(0);
+    return 0;
 }
 
 string LgsInterface::prettyName() {

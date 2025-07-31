@@ -961,7 +961,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
     }
 
     if (!type->isUnknown) {
-        type->isSizeBig = type->getSizeBytes() > BIG_SIZE_THRESHOLD;
+        type->isBig = type->getSizeBytes() > BIG_SIZE_THRESHOLD;
         return type;
     }
 
@@ -999,7 +999,7 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
         break;
     }
     assert(newType);
-    newType->isSizeBig = newType->getSizeBytes() > BIG_SIZE_THRESHOLD;
+    newType->isBig = newType->getSizeBytes() > BIG_SIZE_THRESHOLD;
     freeType(type);
     return newType;
 }

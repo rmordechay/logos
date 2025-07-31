@@ -21,7 +21,7 @@ string LgsFuncType::getName() {
 
 Type* LgsFuncType::getIRType(LgsCodeGen* codeGen) {
     Type* returnType;
-    if (rt->isSizeBig) {
+    if (rt->isBig) {
         returnType = codeGen->ptrTy();
     } else {
         returnType = rt->getIRType(codeGen);

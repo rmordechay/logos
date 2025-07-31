@@ -1,9 +1,5 @@
 #include "types/LgsAny.h"
-
 #include "logos/LgsCodeGen.h"
-
-#include "utils/LgsUtils.h"
-
 
 size_t LgsAny::getSizeBytes() {
     return sizeof(void*);
@@ -23,6 +19,10 @@ LgsExpr* LgsAny::getZeroValue() {
 
 string LgsAny::prettyName() {
     return name;
+}
+
+string LgsAny::getStrFormatPart() const {
+    return "%p";
 }
 
 bool LgsAny::equals(LgsType* other) {

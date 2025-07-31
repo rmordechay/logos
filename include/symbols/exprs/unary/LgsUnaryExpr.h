@@ -1,11 +1,7 @@
 #pragma once
+#include "LgsType.h"
 #include "exprs/LgsExpr.h"
 #include "logos/LgsCodeGen.h"
-#include "LgsType.h"
-
-#include <tuple>
-#include <tuple>
-#include <tuple>
 
 class LgsUnaryExpr : public LgsExpr {
 public:
@@ -85,7 +81,7 @@ inline tuple<Value*, Value*> LgsUnaryExpr::loadExprs(LgsCodeGen* codeGen, LgsExp
     auto l = this->getIRValue(codeGen);
     auto r = rExpr->getIRValue(codeGen);
     if (l->getType()->isPointerTy()) {
-        l = codeGen->builder.CreateLoad(this->type->getIRType(codeGen), l);
+        l = codeGen->builder.CreateLoad(type->getIRType(codeGen), l);
     }
     if (r->getType()->isPointerTy()) {
         r = codeGen->builder.CreateLoad(rExpr->type->getIRType(codeGen), r);

@@ -29,8 +29,10 @@ void LgsInstance::initFields(LgsCodeGen* codeGen) {
     for (const auto& [fieldName, field] : obj->fields) {
         auto arg = args.find(fieldName);
         if (arg != args.end()) {
-            field->storeIRValue(codeGen, IRValue, arg->second->expr);
+            const auto exprIR = arg->second->expr->getIRValue(codeGen);
+            codeGen->builder.CreateStore(exprIR, field->getGEP(codeGen));
         }
+        field->parentIRValue = IRValue;
     }
 }
 
@@ -49,7 +51,8 @@ void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
     for (const auto& [name, field] : obj->fields) {
         if (!field->isVirtual) continue;
         const auto keyIRStr = codeGen->getIRStr(field->name);
-        const auto fieldGEP = field->getGEP(codeGen, IRValue);
+        const auto objIR = obj->getIRType(codeGen);
+        const auto fieldGEP = codeGen->builder.CreateStructGEP(objIR, IRValue, field->position);
         const auto fieldIRType = field->type->getIRType(codeGen);
         const auto loadGEP = codeGen->builder.CreateLoad(fieldIRType, fieldGEP);
         const auto valuePtr = codeGen->builder.CreateAlloca(fieldIRType);

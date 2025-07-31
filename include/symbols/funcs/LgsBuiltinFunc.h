@@ -1,4 +1,5 @@
 #pragma once
+#include "types/LgsFuncType.h"
 #include "funcs/LgsFunc.h"
 
 class LgsBuiltinFunc : public LgsFunc {
@@ -15,5 +16,4 @@ public:
             funcType->params.emplace_back(paramsType);
         }
     }
-    ~LgsBuiltinFunc() override = default;
 };

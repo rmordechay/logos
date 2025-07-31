@@ -1,6 +1,5 @@
 #pragma once
 #include "funcs/LgsBuiltinFunc.h"
-
 #include <types/LgsVoid.h>
 #include <types/primitives/LgsLong.h>
 #include <types/LgsAny.h>
@@ -18,10 +17,6 @@ public:
         const auto formatStr = arg->type->getStrFormatPart() + '\n';
         const auto IRArgs = {codeGen->getIRStr(formatStr), getIRArg(codeGen, arg)};
         return codeGen->callPrintf(IRArgs);
-    }
-
-    Value* call(const LgsType* type, Value* value, LgsCodeGen* codeGen) const {
-        return codeGen->callPrintf({codeGen->getIRStr(type->getStrFormatPart()), value});
     }
 
     ~LgsPrint() override = default;

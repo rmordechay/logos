@@ -67,19 +67,9 @@ void LgsObject::freeValue(LgsCodeGen* codeGen, Value* value) {
 
 LgsObject* LgsObject::clone() {
     const auto cloned = new LgsObject(*this);
-    cloned->hasVirtuals = hasVirtuals;
-    cloned->isVoid = isVoid;
-    cloned->isInt = isInt;
-    cloned->isHeapAlloc = isHeapAlloc;
-    cloned->isUnsigned = isUnsigned;
-    cloned->isPrimitive = isPrimitive;
-    cloned->isSizeBig = isSizeBig;
-    cloned->isBuiltin = isBuiltin;
-    cloned->isUnknown = isUnknown;
-    cloned->canSlice = canSlice;
     cloned->fields.clear();
     for (const auto [name, field] : fields) {
-        cloned->fields[name] = field->clone();
+        cloned->fields[name] = new LgsField(*field);
     }
     return cloned;
 }
