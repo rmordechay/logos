@@ -12,6 +12,7 @@ public:
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     string getStrFormatPart() const override;
+    size_t getSizeBytes() override;
     ~LgsEnum() override = default;
 };
 

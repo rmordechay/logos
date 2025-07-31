@@ -12,6 +12,7 @@ public:
     string getName() override;
     string prettyName() override;
     LgsExpr* getZeroValue() override;
+    size_t getSizeBytes() override;
     bool equals(LgsType* other) override;
     ~LgsUnknownType() override = default;
 };

@@ -70,13 +70,13 @@ public:
     LgsGroup* asGroup();
     LgsTypePair* asPair();
 
-    virtual size_t getSizeBytes();
-    virtual void freeValue(LgsCodeGen* codeGen, Value* value);
+    virtual size_t getSizeBytes() = 0;
     virtual string getStrFormatPart() const;
     virtual string getName() = 0;
     virtual string prettyName() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual Type* getIRType(LgsCodeGen* codeGen) = 0;
     virtual bool equals(LgsType* other) = 0;
+    virtual void freeValue(LgsCodeGen* codeGen, Value* value);
     virtual ~LgsType();
 };

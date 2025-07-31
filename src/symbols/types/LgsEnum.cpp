@@ -27,3 +27,7 @@ bool LgsEnum::equals(LgsType* other) {
 string LgsEnum::getStrFormatPart() const {
     return "%s";
 }
+
+size_t LgsEnum::getSizeBytes() {
+    assert(0);
+}

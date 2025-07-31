@@ -12,6 +12,7 @@ public:
     Type* getIRType(LgsCodeGen* codeGen) override;
     string getName() override;
     LgsExpr* getZeroValue() override;
+    size_t getSizeBytes() override;
     string prettyName() override;
     bool equals(LgsType* other) override;
 };
@@ -26,6 +27,10 @@ inline string LgsTypePair::getName() {
 
 inline LgsExpr* LgsTypePair::getZeroValue() {
     assert(false);
+}
+
+inline size_t LgsTypePair::getSizeBytes() {
+    assert(0);
 }
 
 inline string LgsTypePair::prettyName() {

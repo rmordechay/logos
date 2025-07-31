@@ -22,3 +22,7 @@ bool LgsNullable::equals(LgsType* other) {
     if (!otherNullable) return false;
     return baseType->equals(otherNullable->baseType);
 }
+
+size_t LgsNullable::getSizeBytes() {
+    return 0;
+}

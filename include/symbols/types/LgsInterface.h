@@ -17,5 +17,6 @@ public:
     Type* getIRType(LgsCodeGen* codeGen) override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
+    size_t getSizeBytes() override;
     ~LgsInterface() override;
 };

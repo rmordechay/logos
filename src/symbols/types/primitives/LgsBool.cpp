@@ -29,3 +29,7 @@ bool LgsBool::equals(LgsType* other) {
 string LgsBool::getStrFormatPart() const {
     return "%d";
 }
+
+size_t LgsBool::getSizeBytes() {
+    return sizeof(bool);
+}
