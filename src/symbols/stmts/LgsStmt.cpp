@@ -13,6 +13,10 @@
 #include "stmts/LgsVarDec.h"
 #include <loops/LgsForLoop.h>
 
+bool LgsStmt::isTerminator() {
+    return asReturn() || asContinue() || asBreak();
+}
+
 LgsForLoop* LgsStmt::asLoop() { return dynamic_cast<LgsForLoop*>(this); }
 LgsCoroutine* LgsStmt::asCoroutine() { return dynamic_cast<LgsCoroutine*>(this); }
 LgsFuncCall* LgsStmt::asFuncCall() { return dynamic_cast<LgsFuncCall*>(this); }
@@ -20,7 +24,7 @@ LgsIfStmt* LgsStmt::asIfStmt() { return dynamic_cast<LgsIfStmt*>(this); }
 LgsPatternMatch* LgsStmt::asPatternMatch() { return dynamic_cast<LgsPatternMatch*>(this); }
 LgsPostfixExpr* LgsStmt::asPostfixExpr() { return dynamic_cast<LgsPostfixExpr*>(this); }
 LgsSelection* LgsStmt::asSelection() { return dynamic_cast<LgsSelection*>(this); }
-LgsBreakStmt* LgsStmt::asBreakStmt() { return dynamic_cast<LgsBreakStmt*>(this); }
+LgsBreakStmt* LgsStmt::asBreak() { return dynamic_cast<LgsBreakStmt*>(this); }
 LgsContinueStmt* LgsStmt::asContinue() { return dynamic_cast<LgsContinueStmt*>(this); }
 LgsReturn* LgsStmt::asReturn() { return dynamic_cast<LgsReturn*>(this); }
 LgsVarDec* LgsStmt::asVarDec() { return dynamic_cast<LgsVarDec*>(this); }

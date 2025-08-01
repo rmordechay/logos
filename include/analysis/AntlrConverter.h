@@ -40,13 +40,13 @@ class LgsAppFile;
 class LgsForLoop;
 class LgsAssignment;
 
-class AntlerConverter {
+class AntlrConverter {
 public:
     path filePath;
     LgsErrHandler errHandler;
     LgsSymbolTable& globals;
 
-    explicit AntlerConverter(const path& filePath, LgsSymbolTable& globals) : filePath(filePath), globals(globals) {}
+    explicit AntlrConverter(const path& filePath, LgsSymbolTable& globals) : filePath(filePath), globals(globals) {}
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx);
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx);
     LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx);
@@ -106,5 +106,5 @@ public:
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     bool isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec);
     bool validateTypeName(const string& typeName, const LgsLocation* location);
-    ~AntlerConverter() = default;
+    ~AntlrConverter() = default;
 };

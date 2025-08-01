@@ -29,5 +29,5 @@ string LgsEnum::getStrFormatPart() const {
 }
 
 size_t LgsEnum::getSizeBytes() {
-    assert(0);
+    return 0;
 }

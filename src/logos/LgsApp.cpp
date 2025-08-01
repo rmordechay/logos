@@ -115,7 +115,7 @@ void LgsApp::parseSrcFile(const string& codeText, path filePath) {
         errHandler.setUnsuccessful();
         return;
     }
-    AntlerConverter antlerConverter(filePath, globals);
+    AntlrConverter antlerConverter(filePath, globals);
     const auto file = antlerConverter.getLogosFile(ast);
     lock_guard lock(mtx);
     files.push_back(file);
@@ -130,7 +130,7 @@ void LgsApp::parseSrcFile(const string& codeText, path filePath) {
 
 void LgsApp::parseEnvFile(path fileEntry) {
     const auto absFilePath = new path(canonical(fileEntry));
-    AntlerConverter antlerConverter(*absFilePath, globals);
+    AntlrConverter antlerConverter(*absFilePath, globals);
     const auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
@@ -144,7 +144,7 @@ void LgsApp::parseEnvFile(path fileEntry) {
 
 void LgsApp::parseAppFile(path fileEntry) {
     const auto absFilePath = new path(canonical(fileEntry));
-    AntlerConverter antlerConverter(*absFilePath, globals);
+    AntlrConverter antlerConverter(*absFilePath, globals);
     auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);

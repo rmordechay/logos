@@ -121,14 +121,12 @@ void SemaAnalyser::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
         visitStmt(stmt);
     }
     const auto lastStmt = stmtsBlock->lastStmt();
-    if (lastStmt->asReturn()) {
-        for (int i = 0; i < stmtsBlock->stmts.size() - 1; ++i) {
-            const auto stmt = stmtsBlock->stmts[i];
-            if (stmt->asReturn() || stmt->asContinue() || stmt->asBreak()) {
-                return errHandler.handleError(E10059, &lastStmt->location);
-            }
+    if (!lastStmt->isTerminator()) return;
+    stmtsBlock->hasReturn = !!lastStmt->asReturn();
+    for (int i = 0; i < stmtsBlock->stmts.size() - 1; ++i) {
+        if (stmtsBlock->stmts[i]->isTerminator()) {
+            return errHandler.handleError(E10059, &lastStmt->location);
         }
-        stmtsBlock->hasReturn = true;
     }
 }
 
@@ -142,7 +140,7 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
     else if (const auto postfixExpr = stmt->asPostfixExpr()) visitPostfixExpr(postfixExpr);
     else if (const auto selection = stmt->asSelection()) visitSelection(selection);
     else if (const auto returnStmt = stmt->asReturn()) visitReturnStmt(returnStmt);
-    else if (const auto breakStmt = stmt->asBreakStmt()) visitBreakStmt(breakStmt);
+    else if (const auto breakStmt = stmt->asBreak()) visitBreakStmt(breakStmt);
     else if (const auto continueStmt = stmt->asContinue()) visitContinueStmt(continueStmt);
     else if (const auto coroutine = stmt->asCoroutine()) visitCoroutine(coroutine);
 }

@@ -103,6 +103,7 @@ anonymousParam:
 
 statement:
         assignment
+    |   returnStatement
     |   explicitVarDec
     |   implicitVarDec
     |   ifStatement
@@ -110,7 +111,6 @@ statement:
     |   loopStatement
     |   CONTINUE
     |   breakStmt
-    |   returnStatement
     |   funcCall
     |   selection
     |   coroutine

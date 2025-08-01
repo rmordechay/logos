@@ -31,26 +31,26 @@ public:
   };
 
   enum {
-    RuleLogosFile = 0, RuleExtern = 1, RuleLogosEnvFile = 2, RuleLogosAppFile = 3, 
-    RuleMainFile = 4, RuleObjectFile = 5, RuleInterfaceFile = 6, RuleInterface = 7, 
-    RuleGroup = 8, RuleGroupTypesList = 9, RuleGroupTargetList = 10, RuleInterfaceBody = 11, 
-    RuleObject = 12, RuleObjectBody = 13, RuleField = 14, RuleInterfaceField = 15, 
-    RuleImplements = 16, RuleFuncSignatureHeader = 17, RuleFuncSignature = 18, 
-    RuleInterfaceFuncSignature = 19, RuleFuncImpl = 20, RuleAnonymosFuncSignature = 21, 
-    RuleAnonnymosFunc = 22, RuleMethodImplementation = 23, RuleParam = 24, 
-    RuleAnonymousParam = 25, RuleStatement = 26, RuleStatementsBlock = 27, 
-    RuleAssignment = 28, RuleExplicitVarDec = 29, RuleImplicitVarDec = 30, 
-    RuleIfStatement = 31, RuleElseIfStatement = 32, RuleElseStatement = 33, 
-    RulePatternMatching = 34, RulePattern = 35, RuleLoopStatement = 36, 
-    RuleBreakStmt = 37, RuleReturnStatement = 38, RuleEnumDeclaration = 39, 
-    RuleEnumField = 40, RuleCoroutine = 41, RuleExpr = 42, RuleUnaryExpr = 43, 
-    RulePrefixExpr = 44, RulePostfixExpr = 45, RuleArrayExpr = 46, RuleHashMap = 47, 
-    RuleKeyValue = 48, RuleFuncCall = 49, RuleFuncArgList = 50, RuleFuncArg = 51, 
-    RuleConstructor = 52, RuleConstructorArgList = 53, RuleConstructorArg = 54, 
-    RuleConstant = 55, RuleIterIndex = 56, RuleIndex = 57, RuleSelection = 58, 
-    RuleFirstSelectionElement = 59, RuleInnerSelectionElement = 60, RuleRange = 61, 
-    RuleType = 62, RuleMapType = 63, RuleArraySize = 64, RuleFuncType = 65, 
-    RuleVector = 66, RuleRequireEnvVars = 67, RuleAssignemntOp = 68
+    RuleLogosFile = 0, RuleLogosEnvFile = 1, RuleLogosAppFile = 2, RuleMainFile = 3, 
+    RuleObjectFile = 4, RuleInterfaceFile = 5, RuleInterface = 6, RuleGroup = 7, 
+    RuleGroupTypesList = 8, RuleGroupTargetList = 9, RuleInterfaceBody = 10, 
+    RuleObject = 11, RuleObjectBody = 12, RuleField = 13, RuleInterfaceField = 14, 
+    RuleImplements = 15, RuleFuncSignatureHeader = 16, RuleFuncSignature = 17, 
+    RuleInterfaceFuncSignature = 18, RuleFuncImpl = 19, RuleAnonymosFuncSignature = 20, 
+    RuleAnonnymosFunc = 21, RuleMethodImplementation = 22, RuleParam = 23, 
+    RuleAnonymousParam = 24, RuleStatement = 25, RuleStatementsBlock = 26, 
+    RuleAssignment = 27, RuleExplicitVarDec = 28, RuleImplicitVarDec = 29, 
+    RuleIfStatement = 30, RuleElseIfStatement = 31, RuleElseStatement = 32, 
+    RulePatternMatching = 33, RulePattern = 34, RuleLoopStatement = 35, 
+    RuleBreakStmt = 36, RuleReturnStatement = 37, RuleEnumDeclaration = 38, 
+    RuleEnumField = 39, RuleCoroutine = 40, RuleExpr = 41, RuleUnaryExpr = 42, 
+    RulePrefixExpr = 43, RulePostfixExpr = 44, RuleArrayExpr = 45, RuleHashMap = 46, 
+    RuleKeyValue = 47, RuleFuncCall = 48, RuleFuncArgList = 49, RuleFuncArg = 50, 
+    RuleConstructor = 51, RuleConstructorArgList = 52, RuleConstructorArg = 53, 
+    RuleConstant = 54, RuleIterIndex = 55, RuleIndex = 56, RuleSelection = 57, 
+    RuleFirstSelectionElement = 58, RuleInnerSelectionElement = 59, RuleRange = 60, 
+    RuleType = 61, RuleMapType = 62, RuleArraySize = 63, RuleFuncType = 64, 
+    RuleVector = 65, RuleExtern = 66, RuleRequireEnvVars = 67, RuleAssignemntOp = 68
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -71,7 +71,6 @@ public:
 
 
   class LogosFileContext;
-  class ExternContext;
   class LogosEnvFileContext;
   class LogosAppFileContext;
   class MainFileContext;
@@ -137,6 +136,7 @@ public:
   class ArraySizeContext;
   class FuncTypeContext;
   class VectorContext;
+  class ExternContext;
   class RequireEnvVarsContext;
   class AssignemntOpContext; 
 
@@ -153,21 +153,6 @@ public:
   };
 
   LogosFileContext* logosFile();
-
-  class  ExternContext : public antlr4::ParserRuleContext {
-  public:
-    ExternContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *EXTERN();
-    antlr4::tree::TerminalNode *LBRACE();
-    antlr4::tree::TerminalNode *RBRACE();
-    std::vector<antlr4::tree::TerminalNode *> STRING();
-    antlr4::tree::TerminalNode* STRING(size_t i);
-
-   
-  };
-
-  ExternContext* extern_();
 
   class  LogosEnvFileContext : public antlr4::ParserRuleContext {
   public:
@@ -544,6 +529,7 @@ public:
     StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     AssignmentContext *assignment();
+    ReturnStatementContext *returnStatement();
     ExplicitVarDecContext *explicitVarDec();
     ImplicitVarDecContext *implicitVarDec();
     IfStatementContext *ifStatement();
@@ -551,7 +537,6 @@ public:
     LoopStatementContext *loopStatement();
     antlr4::tree::TerminalNode *CONTINUE();
     BreakStmtContext *breakStmt();
-    ReturnStatementContext *returnStatement();
     FuncCallContext *funcCall();
     SelectionContext *selection();
     CoroutineContext *coroutine();
@@ -1203,6 +1188,21 @@ public:
   };
 
   VectorContext* vector();
+
+  class  ExternContext : public antlr4::ParserRuleContext {
+  public:
+    ExternContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *EXTERN();
+    antlr4::tree::TerminalNode *LBRACE();
+    antlr4::tree::TerminalNode *RBRACE();
+    std::vector<antlr4::tree::TerminalNode *> STRING();
+    antlr4::tree::TerminalNode* STRING(size_t i);
+
+   
+  };
+
+  ExternContext* extern_();
 
   class  RequireEnvVarsContext : public antlr4::ParserRuleContext {
   public:
