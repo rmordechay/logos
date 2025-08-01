@@ -512,11 +512,10 @@ LgsIfStmt* AntlrConverter::getIfStatement(LogosParser::IfStatementContext* ctx) 
     for (const auto &elseIfStmt : ctx->elseIfStatement()) {
         auto elseIfExpr = getExpr(elseIfStmt->expr());
         auto elseIfStmtBlock = getStmtBlock(elseIfStmt->statementsBlock());
-        ifStmt->elseIfConds.emplace_back(elseIfExpr);
-        ifStmt->elseIfStmtsBlocks.emplace_back(elseIfStmtBlock);
+        ifStmt->elseIfs.emplace_back(make_pair(elseIfExpr, elseIfStmtBlock));
     }
     if (const auto &elseStmt = ctx->elseStatement()) {
-        ifStmt->elseStmtsBlock = getStmtBlock(elseStmt->statementsBlock());
+        ifStmt->elseBlock = getStmtBlock(elseStmt->statementsBlock());
     }
     ifStmt->setLocation(ctx->start, ctx->stop, filePath);
     return ifStmt;
@@ -534,10 +533,9 @@ LgsStmt* AntlrConverter::getPatternMatching(LogosParser::PatternMatchingContext*
     for (const auto& pattern : ctx->pattern()) {
         const auto expr = getExpr(pattern->expr());
         const auto stmtBlock = getStmtBlock(pattern->statementsBlock());
-        patternMatching->elseIfConds.emplace_back(expr);
-        patternMatching->elseIfStmtsBlocks.emplace_back(stmtBlock);
+        patternMatching->elseIfs.emplace_back(make_pair(expr, stmtBlock));
     }
-    patternMatching->elseStmtsBlock = getStmtBlock(ctx->statementsBlock());
+    patternMatching->elseBlock = getStmtBlock(ctx->statementsBlock());
     return patternMatching;
 }
 

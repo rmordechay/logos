@@ -5,14 +5,18 @@
 
 void LgsIfStmt::createIRStmt(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(IF_SCOPE, this);
-    if (elseIfConds.empty()) {
-        if (!elseStmtsBlock) {
-            generateSimpleIf(codeGen);
-        } else {
-            generateIfElse(codeGen);
-        }
+    if (isPatternMatching) {
+        generatePatternMatching(codeGen);
     } else {
-        generateComplexIf(codeGen);
+        if (elseIfs.empty()) {
+            if (!elseBlock) {
+                generateSimpleIf(codeGen);
+            } else {
+                generateIfElse(codeGen);
+            }
+        } else {
+            generateComplexIf(codeGen);
+        }
     }
     codeGen->stack.exitScope();
 }
@@ -24,7 +28,7 @@ void LgsIfStmt::generateSimpleIf(LgsCodeGen* codeGen) const {
     const auto endBlock = codeGen->createBlock(BLOCK_NAME_IF_END);
     codeGen->builder.CreateCondBr(ifCondIR, trueBlock, endBlock);
     codeGen->startBlock(trueBlock);
-    ifStmtsBlock->createIRValue(codeGen);
+    ifBlock->createIRValue(codeGen);
     codeGen->branchAndStartBlock(endBlock);
 }
 
@@ -37,11 +41,11 @@ void LgsIfStmt::generateIfElse(LgsCodeGen* codeGen) const {
     // if block
     codeGen->builder.CreateCondBr(ifCondIR, trueBlock, elseBlock);
     codeGen->startBlock(trueBlock);
-    ifStmtsBlock->createIRValue(codeGen);
+    ifBlock->createIRValue(codeGen);
     codeGen->branchIfNeeded(endBlock);
     // else block
     codeGen->startBlock(elseBlock);
-    elseStmtsBlock->createIRValue(codeGen);
+    elseBlock->createIRValue(codeGen);
     codeGen->branchAndStartBlock(endBlock);
 }
 
@@ -56,18 +60,19 @@ void LgsIfStmt::generateComplexIf(LgsCodeGen* codeGen) const {
     // if block
     codeGen->builder.CreateCondBr(ifCondIR, trueBlock, elseIfCheckBlock);
     codeGen->startBlock(trueBlock);
-    ifStmtsBlock->createIRValue(codeGen);
+    ifBlock->createIRValue(codeGen);
     codeGen->branchIfNeeded(endBlock);
 
-    for (int i = 0; i < elseIfConds.size(); ++i) {
+    for (int i = 0; i < elseIfs.size(); ++i) {
         codeGen->startBlock(elseIfCheckBlock);
-        const auto elseIfCond = elseIfConds[i];
-        const auto stmtBlock = elseIfStmtsBlocks[i];
-        const auto elseIfCondIR = elseIfCond->getIRValue(codeGen);
+        const auto elseIfPair = elseIfs[i];
+        const auto expr = elseIfPair.first;
+        const auto stmtBlock = elseIfPair.second;
+        const auto elseIfCondIR = expr->getIRValue(codeGen);
         trueBlock = codeGen->createBlock(BLOCK_NAME_ELSE_IF);
-        const auto lastIter = i == elseIfConds.size() - 1;
+        const auto lastIter = i == elseIfs.size() - 1;
         if (lastIter) {
-            if (elseStmtsBlock) {
+            if (elseBlock) {
                 codeGen->builder.CreateCondBr(elseIfCondIR, trueBlock, elseBlock);
             } else {
                 codeGen->builder.CreateCondBr(elseIfCondIR, trueBlock, endBlock);
@@ -81,9 +86,9 @@ void LgsIfStmt::generateComplexIf(LgsCodeGen* codeGen) const {
         codeGen->branchIfNeeded(endBlock);
     }
 
-    if (elseStmtsBlock) {
+    if (elseBlock) {
         codeGen->startBlock(elseBlock);
-        elseStmtsBlock->createIRValue(codeGen);
+        elseBlock->createIRValue(codeGen);
         codeGen->branchIfNeeded(endBlock);
     }
     codeGen->startBlock(endBlock);
@@ -96,19 +101,19 @@ void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) const {
     const auto switchInst = codeGen->builder.CreateSwitch(exprIRValue, defaultBlock);
 
     vector<BasicBlock*> blocks;
-    for (size_t i = 0; i < elseIfConds.size(); ++i) {
-        const auto pattern = elseIfConds[i];
-        const auto patterIRValue = pattern->hashValue(codeGen);
+    for (size_t i = 0; i < elseIfs.size(); ++i) {
+        const auto elseIfPair = elseIfs[i];
+        const auto patterIRValue = elseIfPair.first->hashValue(codeGen);
         const auto IRFunc = codeGen->stack.currentFunc()->getIRFunc(codeGen);
         const auto patternBlock = codeGen->createBlock(BLOCK_NAME_CASE_PREFIX + to_string(i), IRFunc);
         switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
         codeGen->builder.SetInsertPoint(patternBlock);
-        elseIfStmtsBlocks[i]->createIRValue(codeGen);
+        elseIfs[i].second->createIRValue(codeGen);
         codeGen->builder.CreateBr(exitBlock);
     }
 
     codeGen->startBlock(defaultBlock);
-    elseStmtsBlock->createIRValue(codeGen);
+    elseBlock->createIRValue(codeGen);
 
     codeGen->builder.CreateBr(exitBlock);
     codeGen->startBlock(exitBlock);
@@ -117,7 +122,7 @@ void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) const {
 bool LgsIfStmt::shouldBranch(LgsCodeGen* codeGen, Value* ifCondIR) const {
     if (const auto* constBool = dyn_cast<ConstantInt>(ifCondIR)) {
         if (constBool->isOne()) {
-            ifStmtsBlock->createIRValue(codeGen);
+            ifBlock->createIRValue(codeGen);
         }
         return false;
     }
@@ -126,14 +131,12 @@ bool LgsIfStmt::shouldBranch(LgsCodeGen* codeGen, Value* ifCondIR) const {
 
 LgsIfStmt::~LgsIfStmt() {
     delete ifCond;
-    delete ifStmtsBlock;
-    for (const auto &elseIfCond : elseIfConds) {
-        delete elseIfCond;
+    delete ifBlock;
+    for (const auto &elseIfStmtBlock : elseIfs) {
+        delete elseIfStmtBlock.first;
+        delete elseIfStmtBlock.second;
     }
-    for (const auto &elseIfStmtBlock : elseIfStmtsBlocks) {
-        delete elseIfStmtBlock;
-    }
-    if (elseStmtsBlock) {
-        delete elseStmtsBlock;
+    if (elseBlock) {
+        delete elseBlock;
     }
 }
