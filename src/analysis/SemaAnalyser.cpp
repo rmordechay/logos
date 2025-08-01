@@ -51,9 +51,6 @@ void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
     for (const auto obj : mainFile->objects) {
         visitObject(obj);
     }
-    for (const auto lgsEnum : mainFile->enums) {
-        visitEnum(lgsEnum);
-    }
     for (const auto group : mainFile->groups) {
         visitGroup(group);
     }
@@ -283,7 +280,7 @@ void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
     }
 }
 
-void SemaAnalyser::visitReturnStmt(LgsReturn* returnStmt) {
+void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
     const auto funcType = stack.currentFunc()->funcType;
     const auto retExpr = returnStmt->expr;
     if (retExpr) {
@@ -291,7 +288,7 @@ void SemaAnalyser::visitReturnStmt(LgsReturn* returnStmt) {
         visitExpr(retExpr);
     }
     const auto rt = funcType->rt;
-    if (rt->isVoid && retExpr) {
+    if (rt->isVoid && retExpr->type && !retExpr->type->isVoid) {
         errHandler.handleError(E10027, &returnStmt->location, {retExpr->type->prettyName()});
     } else if (!rt->isVoid && !retExpr) {
         errHandler.handleError(E10026, &returnStmt->location, {funcType->name, rt->prettyName()});
@@ -310,9 +307,6 @@ void SemaAnalyser::visitContinueStmt(const LgsContinueStmt* continueStmt) {
     if (!stack.currentLoop()) {
         return errHandler.handleError(E10038, &continueStmt->location);
     }
-}
-
-void SemaAnalyser::visitEnum(LgsEnum* lgsEnum) const {
 }
 
 void SemaAnalyser::visitExpr(LgsExpr* expr) {

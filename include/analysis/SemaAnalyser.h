@@ -63,10 +63,9 @@ public:
     void visitForeachLoop(LgsForeachLoop* foreachLoop);
     void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
     void visitCoroutine(const LgsCoroutine* coroutine);
-    void visitReturnStmt(LgsReturn* returnStmt);
+    void visitReturnStmt(const LgsReturn* returnStmt);
     void visitBreakStmt(const LgsBreakStmt* breakStmt);
     void visitContinueStmt(const LgsContinueStmt* continueStmt);
-    void visitEnum(LgsEnum* lgsEnum) const;
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
     void visitArrayExpr(const LgsArrayExpr* array);

@@ -1,9 +1,4 @@
 #include "stmts/LgsContinueStmt.h"
-
-
-#include "utils/LgsUtils.h"
-
-
 #include <loops/LgsForLoop.h>
 
 void LgsContinueStmt::createIRStmt(LgsCodeGen* codeGen) {

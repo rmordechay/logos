@@ -14,6 +14,8 @@ public:
     BasicBlock* IRCondBlock = nullptr;
     BasicBlock* IRBodyBlock = nullptr;
     BasicBlock* IRExitBlock = nullptr;
+    bool hasIsFirst = false;
+    bool hasIsLast = false;
 
     void createIRStmt(LgsCodeGen* codeGen) override;
     virtual Value* loopStart(LgsCodeGen* codeGen) = 0;

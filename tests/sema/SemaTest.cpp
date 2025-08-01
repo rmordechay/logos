@@ -388,7 +388,10 @@ TEST_CASE("TestSema10026") {
 TEST_CASE("TestSema10027") {
     LgsApp app;
     const auto code = R"(
-    func() { return 2 }
+    fun(): Int { return 2 }
+    fun2() {
+        return fun()
+    }
     main() {}
     )";
     app.parseSrcFile(code);

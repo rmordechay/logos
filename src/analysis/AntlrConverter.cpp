@@ -639,6 +639,8 @@ LgsUnaryExpr* AntlrConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto func = ctx->anonnymosFunc()) return getAnonymousFunc(func);
     if (const auto vector = ctx->vector()) return getVector(vector);
     if (const auto null = ctx->NULL_()) return getNullValue(null);
+    // if (ctx->isFirst()) return getAnonymousFunc(func);
+    // if (ctx->isLast()) return getAnonymousFunc(func);
     assert(0);
 }
 

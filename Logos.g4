@@ -207,6 +207,8 @@ unaryExpr:
     |   selection
     |   arrayExpr
     |   hashMap
+    |   isFirst
+    |   isLast
     ;
 
 prefixExpr:
@@ -268,6 +270,14 @@ index:
         LBRACK from=expr COLON? RBRACK
     |   LBRACK COLON to=expr RBRACK
     |   LBRACK from=expr COLON to=expr RBRACK
+    ;
+
+isFirst:
+        FOR DOT 'isFirst'
+    ;
+
+isLast:
+        FOR DOT 'isFirst'
     ;
 
 selection:

@@ -14,18 +14,15 @@ enum LgsScope {
     FUNC_SCOPE,
     LOOP_SCOPE,
     IF_SCOPE,
-    BLOCK_SCOPE,
 };
 
 struct LgsStackFrame {
     LgsSymbolTable symbolTable;
     LgsFunc* func = nullptr;
-    LgsStmtsBlock* stmtBlock = nullptr;
     LgsScope scopeType;
     union {
         LgsForLoop* loop;
         LgsIfStmt* ifStmt;
-        LgsStmtsBlock* stmtsBlock;
     };
 };
 

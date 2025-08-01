@@ -4,29 +4,25 @@
 #include "stmts/LgsIfStmt.h"
 
 void LgsStack::enterScope(const LgsScope scope, LgsValue* value) {
-    if (scope == FUNC_SCOPE) {
-        const auto func = dynamic_cast<LgsFunc*>(value);
-        push(LgsStackFrame{.scopeType = FUNC_SCOPE, .func = func, .stmtBlock = func->stmtBlock});
-    } else {
-        LgsStackFrame stackFrame{.scopeType = scope, .symbolTable = top().symbolTable};
-        switch (scope) {
-        case LOOP_SCOPE:
-            stackFrame.loop = dynamic_cast<LgsForLoop*>(value);
-            stackFrame.stmtBlock = stackFrame.loop->stmtBlock;
-            break;
-        case IF_SCOPE:
-            stackFrame.ifStmt = dynamic_cast<LgsIfStmt*>(value);
-            stackFrame.stmtBlock = stackFrame.ifStmt->ifStmtsBlock;
-            break;
-        case BLOCK_SCOPE:
-            stackFrame.stmtsBlock = dynamic_cast<LgsStmtsBlock*>(value);
-            stackFrame.stmtBlock = stackFrame.stmtsBlock;
-            break;
-        default:
-            assert(0);
-        }
+    LgsStackFrame stackFrame;
+    switch (scope) {
+    case LOOP_SCOPE:
+        stackFrame = {.scopeType = scope, .symbolTable = top().symbolTable};
+        stackFrame.loop = dynamic_cast<LgsForLoop*>(value);
         stackFrame.func = currentFunc();
         push(stackFrame);
+        return;
+    case IF_SCOPE:
+        stackFrame = {.scopeType = scope, .symbolTable = top().symbolTable};
+        stackFrame.ifStmt = dynamic_cast<LgsIfStmt*>(value);
+        stackFrame.func = currentFunc();
+        push(stackFrame);
+        return;
+    case FUNC_SCOPE:
+        const auto func = dynamic_cast<LgsFunc*>(value);
+        stackFrame = {.scopeType = FUNC_SCOPE, .func = func};
+        push(stackFrame);
+        return;
     }
 }
 
@@ -39,7 +35,15 @@ LgsFunc* LgsStack::currentFunc() {
 }
 
 LgsStmtsBlock* LgsStack::currentStmtsBlock() {
-    return top().stmtBlock;
+    switch (top().scopeType) {
+    case FUNC_SCOPE:
+        return currentFunc()->stmtBlock;
+    case LOOP_SCOPE:
+        return currentLoop()->stmtBlock;
+    case IF_SCOPE:
+        return currentFunc()->stmtBlock;
+    }
+    return nullptr;
 }
 
 LgsForLoop* LgsStack::currentLoop() {

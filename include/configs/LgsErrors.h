@@ -34,7 +34,7 @@ inline LgsError E10023{.msg = "Type '%s' must be nullable.", .errCode = errCodeS
 inline LgsError E10024{.msg = "Declaration of null value must have an explict nullable type.", .errCode = errCodeStart++};
 inline LgsError E10025{.msg = "Only interfaces are allowed in 'implements'. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10026{.msg = "Function '%s' must return an expression of type '%s'. None was given.", .errCode = errCodeStart++};
-inline LgsError E10027{.msg = "Void function must not return a value. Given: '%s'.", .errCode = errCodeStart++};
+inline LgsError E10027{.msg = "Void function can either return 'Void' type or empty 'return'. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10028{.msg = "Default parameters must be defined lastly.", .errCode = errCodeStart++};
 inline LgsError E10029{.msg = "Constant field '%s' must be initialized in the class or in the constructor.", .errCode = errCodeStart++};
 inline LgsError E10030{.msg = "Non-public field '%s' is used outside its parent object '%s'.", .errCode = errCodeStart++};
