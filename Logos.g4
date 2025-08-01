@@ -277,7 +277,7 @@ isFirst:
     ;
 
 isLast:
-        FOR DOT 'isFirst'
+        FOR DOT 'isLast'
     ;
 
 selection:

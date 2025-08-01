@@ -3,6 +3,5 @@
 
 void LgsBreakStmt::createIRStmt(LgsCodeGen* codeGen) {
     const auto loop = codeGen->stack.currentLoop();
-    const auto loopExit = loop->IRExitBlock;
-    codeGen->builder.CreateBr(loopExit);
+    codeGen->builder.CreateBr(loop->IRExitBlock);
 }

@@ -56,7 +56,7 @@ public:
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(const LgsAssignment* assignment);
     void visitIfStmt(LgsIfStmt* ifStmt);
-    void visitPatternMatching(LgsIfStmt* patternMatching);
+    void visitPatternMatching(LgsIfStmt* pm);
     void visitBoolPatternMatching(const LgsIfStmt* patternMatching);
     void visitLoopStmt(LgsForLoop* loopStmt);
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);

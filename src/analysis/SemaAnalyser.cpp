@@ -85,7 +85,7 @@ void SemaAnalyser::visitInterface(LgsInterface* interface) {
 }
 
 void SemaAnalyser::visitFunc(LgsFunc* func) {
-    stack.enterScope(FUNC_SCOPE, func);
+    stack.enterScope(func);
     for (auto& param : func->funcType->params) {
         visitParam(&param);
     }
@@ -171,50 +171,49 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
     if (ifStmt->isPatternMatching) return visitPatternMatching(ifStmt);
-    stack.enterScope(IF_SCOPE, ifStmt);
+    stack.enterScope(ifStmt, ifStmt->ifBlock);
     visitExpr(ifStmt->ifCond);
     visitStmtsBlock(ifStmt->ifBlock);
     stack.exitScope();
-    stack.enterScope(IF_SCOPE, ifStmt);
-    for (const auto& elseIfCond : ifStmt->elseIfs) {
-        visitExpr(elseIfCond.first);
-    }
-    stack.exitScope();
-    for (const auto& elseIfStmtBlock : ifStmt->elseIfs) {
-        stack.enterScope(IF_SCOPE, ifStmt);
-        visitStmtsBlock(elseIfStmtBlock.second);
+    for (const auto& elseIfPair : ifStmt->elseIfs) {
+        stack.enterScope(ifStmt, elseIfPair.second);
+        visitExpr(elseIfPair.first);
+        visitStmtsBlock(elseIfPair.second);
         stack.exitScope();
     }
     if (ifStmt->elseBlock) {
+        stack.enterScope(ifStmt, ifStmt->elseBlock);
         visitStmtsBlock(ifStmt->elseBlock);
+        stack.exitScope();
     }
 }
 
-void SemaAnalyser::visitPatternMatching(LgsIfStmt* patternMatching) {
-    stack.enterScope(IF_SCOPE, patternMatching);
-    const auto baseExpr = patternMatching->ifCond;
+void SemaAnalyser::visitPatternMatching(LgsIfStmt* pm) {
+    const auto baseExpr = pm->ifCond;
     if (!baseExpr) {
-        return visitBoolPatternMatching(patternMatching);
+        return visitBoolPatternMatching(pm);
     }
     visitExpr(baseExpr);
     const auto baseExprType = baseExpr->type;
+    // Allows local enum fields to not have have a quilifier
     if (baseExprType->asEnum()) {
         for (auto [name, field] : baseExprType->fields) {
             addLocalSymbol(name, LgsSymbol(field));
         }
     }
-    for (const auto elseIfPair : patternMatching->elseIfs) {
+    for (const auto elseIfPair : pm->elseIfs) {
+        stack.enterScope(pm, elseIfPair.second);
         const auto expr = elseIfPair.first;
         visitExpr(expr);
+        visitStmtsBlock(elseIfPair.second);
         if (expr->type->isUnknown) continue;
         if (!expr->type->equals(baseExprType)) {
             return errHandler.handleError(E10014, &expr->location, {expr->type->prettyName(), baseExprType->prettyName()});
         }
+        stack.exitScope();
     }
-    for (const auto& patternsStmtBlock : patternMatching->elseIfs) {
-        visitStmtsBlock(patternsStmtBlock.second);
-    }
-    visitStmtsBlock(patternMatching->elseBlock);
+    stack.enterScope(pm, pm->elseBlock);
+    visitStmtsBlock(pm->elseBlock);
     stack.exitScope();
 }
 
@@ -233,7 +232,7 @@ void SemaAnalyser::visitBoolPatternMatching(const LgsIfStmt* patternMatching) {
 }
 
 void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
-    stack.enterScope(LOOP_SCOPE, loopStmt);
+    stack.enterScope(loopStmt);
     if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {
         visitRangeLoop(rangeLoop);
     } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loopStmt)) {

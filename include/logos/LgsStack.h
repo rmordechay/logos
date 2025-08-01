@@ -10,28 +10,21 @@ class LgsExpr;
 class LgsForLoop;
 class LgsFunc;
 
-enum LgsScope {
-    FUNC_SCOPE,
-    LOOP_SCOPE,
-    IF_SCOPE,
-};
-
 struct LgsStackFrame {
     LgsSymbolTable symbolTable;
     LgsFunc* func = nullptr;
-    LgsScope scopeType;
-    union {
-        LgsForLoop* loop;
-        LgsIfStmt* ifStmt;
-    };
+    LgsForLoop* loop;
+    LgsIfStmt* ifStmt;
+    LgsStmtsBlock* stmtsBlock;
 };
 
 class LgsStack final : public stack<LgsStackFrame> {
 public:
-    void enterScope(LgsScope scope, LgsValue* value);
+    void enterScope(LgsValue* value, LgsStmtsBlock* stmtsBlock = nullptr);
     void exitScope();
     LgsFunc* currentFunc();
     LgsForLoop* currentLoop();
+    LgsIfStmt* currentIfStmt();
     LgsStmtsBlock* currentStmtsBlock();
     auto begin();
     auto end();

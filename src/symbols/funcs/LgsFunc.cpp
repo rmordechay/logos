@@ -7,7 +7,7 @@
 #include "utils/LgsUtils.h"
 
 void LgsFunc::generateIR(LgsCodeGen* codeGen) {
-    codeGen->stack.enterScope(FUNC_SCOPE, this);
+    codeGen->stack.enterScope(this);
     startFuncBlock(codeGen);
     stmtBlock->createIRValue(codeGen);
     if (!codeGen->lastInstTerminator()) {
