@@ -13,7 +13,6 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/LgsBinaryExpr.h"
-#include "stmts/LgsBreakStmt.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsPostfixExpr.h"
@@ -22,9 +21,9 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
 #include "configs/LgsConfig.h"
+#include "exprs/unary/constants/LgsBoolConst.h"
 #include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
-#include "stmts/LgsContinueStmt.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsDArray.h"
 #include "types/LgsGroup.h"
@@ -101,7 +100,7 @@ void SemaAnalyser::visitParam(LgsParam* param) {
     } else if (param->isVariadic) {
         assert(0);
     }
-    addLocalSymbol(param->name, LgsSymbol(param));
+    addLocalSymbol(LgsSymbol(param));
 }
 
 void SemaAnalyser::visitField(const LgsField* field) {
@@ -135,8 +134,6 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
     else if (const auto postfixExpr = stmt->asPostfixExpr()) visitPostfixExpr(postfixExpr);
     else if (const auto selection = stmt->asSelection()) visitSelection(selection);
     else if (const auto returnStmt = stmt->asReturn()) visitReturnStmt(returnStmt);
-    else if (const auto breakStmt = stmt->asBreak()) visitBreakStmt(breakStmt);
-    else if (const auto continueStmt = stmt->asContinue()) visitContinueStmt(continueStmt);
     else if (const auto coroutine = stmt->asCoroutine()) visitCoroutine(coroutine);
 }
 
@@ -154,7 +151,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
         varDec->type = varDec->expr->type;
         validateExprType(varDec->expr, varDec->type);
     }
-    addLocalSymbol(varDec->name, LgsSymbol(varDec));
+    addLocalSymbol(LgsSymbol(varDec));
 }
 
 void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
@@ -198,7 +195,7 @@ void SemaAnalyser::visitPatternMatching(LgsIfStmt* pm) {
     // Allows local enum fields to not have have a quilifier inside the block
     if (baseExprType->asEnum()) {
         for (auto [name, field] : baseExprType->fields) {
-            addLocalSymbol(name, LgsSymbol(field));
+            addLocalSymbol(LgsSymbol(field));
         }
     }
     for (const auto elseIfPair : pm->elseIfs) {
@@ -240,6 +237,8 @@ void SemaAnalyser::visitBoolPatternMatching(LgsIfStmt* pm) {
 
 void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
     stack.enterScope(loopStmt, loopStmt->stmtsBlock);
+    if (loopStmt->isFirstVarDec) addLocalSymbol(LgsSymbol(loopStmt->isFirstVarDec));
+    if (loopStmt->isLastVarDec) addLocalSymbol(LgsSymbol(loopStmt->isLastVarDec));
     if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {
         visitRangeLoop(rangeLoop);
     } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loopStmt)) {
@@ -252,11 +251,11 @@ void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
     stack.exitScope();
 }
 
-void SemaAnalyser::visitRangeLoop(LgsRangeLoop* rangeLoop) {
+void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
     const auto loopVar = rangeLoop->loopVars.front();
     visitExpr(rangeLoop->startRange);
     visitExpr(rangeLoop->endRange);
-    addLocalSymbol(loopVar->name, LgsSymbol(loopVar));
+    addLocalSymbol(LgsSymbol(loopVar));
     visitStmtsBlock(rangeLoop->stmtsBlock);
 }
 
@@ -271,16 +270,16 @@ void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     }
     if (setLoopVars(foreachLoop, iterExpr, iterable)) return;
     for (const auto varDec : foreachLoop->loopVars) {
-        addLocalSymbol(varDec->name, LgsSymbol(varDec));
+        addLocalSymbol(LgsSymbol(varDec));
     }
     visitStmtsBlock(foreachLoop->stmtsBlock);
 }
 
-void SemaAnalyser::visitInfiniteLoop(LgsInfiniteLoop* infiniteLoop) {
+void SemaAnalyser::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
     visitStmtsBlock(infiniteLoop->stmtsBlock);
 }
 
-void SemaAnalyser::visitCoroutine(LgsCoroutine* coroutine) {
+void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
     if (coroutine->stmtsBlock) {
         visitStmtsBlock(coroutine->stmtsBlock);
     } else if (coroutine->funcCall) {
@@ -306,18 +305,6 @@ void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
         errHandler.handleError(E10026, &returnStmt->location, {funcType->name, rt->prettyName()});
     } else if (retExpr && retExpr->type && !rt->equals(retExpr->type)) {
         errHandler.handleError(E10004, &returnStmt->location, {funcType->name, rt->prettyName(), retExpr->type->prettyName()});
-    }
-}
-
-void SemaAnalyser::visitBreakStmt(const LgsBreakStmt* breakStmt) {
-    if (!stack.getCurrentLoop()) {
-        return errHandler.handleError(E10017, &breakStmt->location);
-    }
-}
-
-void SemaAnalyser::visitContinueStmt(const LgsContinueStmt* continueStmt) {
-    if (!stack.getCurrentLoop()) {
-        return errHandler.handleError(E10038, &continueStmt->location);
     }
 }
 
@@ -903,8 +890,8 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsLocation* locati
     return nullptr;
 }
 
-void SemaAnalyser::addLocalSymbol(const string&name, const LgsSymbol& newSymbol) {
-    stack.top().symbolTable.addSymbol(name, newSymbol, &errHandler);
+void SemaAnalyser::addLocalSymbol(const LgsSymbol& newSymbol) {
+    stack.top().symbolTable.addSymbol(*newSymbol.name, newSymbol, &errHandler);
 }
 
 void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {

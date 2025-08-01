@@ -59,13 +59,11 @@ public:
     void visitPatternMatching(LgsIfStmt* pm);
     void visitBoolPatternMatching(LgsIfStmt* pm);
     void visitLoopStmt(LgsForLoop* loopStmt);
-    void visitRangeLoop(LgsRangeLoop* rangeLoop);
+    void visitRangeLoop(const LgsRangeLoop* rangeLoop);
     void visitForeachLoop(LgsForeachLoop* foreachLoop);
-    void visitInfiniteLoop(LgsInfiniteLoop* infiniteLoop);
-    void visitCoroutine(LgsCoroutine* coroutine);
+    void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
+    void visitCoroutine(const LgsCoroutine* coroutine);
     void visitReturnStmt(const LgsReturn* returnStmt);
-    void visitBreakStmt(const LgsBreakStmt* breakStmt);
-    void visitContinueStmt(const LgsContinueStmt* continueStmt);
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
     void visitArrayExpr(const LgsArrayExpr* array);
@@ -104,7 +102,7 @@ public:
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     LgsSymbol* getSymbol(const string& name, const LgsLocation* location);
-    void addLocalSymbol(const string& name, const LgsSymbol& newSymbol);
+    void addLocalSymbol(const LgsSymbol& newSymbol);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     LgsType* resolveType(LgsType* type);

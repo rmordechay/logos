@@ -14,10 +14,11 @@ public:
     BasicBlock* IRCondBlock = nullptr;
     BasicBlock* IRBodyBlock = nullptr;
     BasicBlock* IRExitBlock = nullptr;
-    bool hasIsFirst = false;
-    bool hasIsLast = false;
+    LgsVarDec* isFirstVarDec = nullptr;
+    LgsVarDec* isLastVarDec = nullptr;
 
     void createIRStmt(LgsCodeGen* codeGen) override;
+    void setLoopTerminals(LgsCodeGen* codeGen, Value* iValue);
     virtual Value* loopStart(LgsCodeGen* codeGen) = 0;
     virtual Value* loopEnd(LgsCodeGen* codeGen) = 0;
     virtual void initIRLoop(LgsCodeGen* codeGen) = 0;

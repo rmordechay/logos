@@ -74,9 +74,8 @@ void LgsIfStmt::generateElseIf(LgsCodeGen* codeGen, Value* ifCondIR) {
         codeGen->startBlock(IRBlockElseIfCheck);
         const auto elseIfCondIR = expr->getIRValue(codeGen);
         IRBlockTrue = codeGen->createBlock(BLOCK_NAME_ELSE_IF);
-        const auto lastIter = i == elseIfs.size() - 1;
-        if (lastIter) {
-            if (IRBlockElse) {
+        if (i == elseIfs.size() - 1) {
+            if (elseBlock) {
                 codeGen->builder.CreateCondBr(elseIfCondIR, IRBlockTrue, IRBlockElse);
             } else {
                 codeGen->builder.CreateCondBr(elseIfCondIR, IRBlockTrue, IRBlockEnd);
@@ -91,7 +90,7 @@ void LgsIfStmt::generateElseIf(LgsCodeGen* codeGen, Value* ifCondIR) {
         codeGen->stack.exitScope();
     }
 
-    if (IRBlockElse) {
+    if (elseBlock) {
         codeGen->stack.enterScope(this, elseBlock);
         codeGen->startBlock(IRBlockElse);
         elseBlock->createIRValue(codeGen);
@@ -122,10 +121,12 @@ void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) {
         codeGen->stack.exitScope();
     }
 
-    codeGen->stack.enterScope(this, elseBlock);
-    codeGen->startBlock(defaultBlock);
-    elseBlock->createIRValue(codeGen);
-    codeGen->stack.exitScope();
+    if (elseBlock) {
+        codeGen->stack.enterScope(this, elseBlock);
+        codeGen->startBlock(defaultBlock);
+        elseBlock->createIRValue(codeGen);
+        codeGen->stack.exitScope();
+    }
 
     codeGen->builder.CreateBr(exitBlock);
     codeGen->startBlock(exitBlock);

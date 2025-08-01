@@ -36,7 +36,6 @@ public:
     bool isUnsigned = false;
     bool isPrimitive = false;
     bool isBig = false;
-    bool isBuiltin = false;
     bool isUnknown = false;
     bool canSlice = false;
     Type* IRType = nullptr;

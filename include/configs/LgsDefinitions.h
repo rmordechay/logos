@@ -9,6 +9,8 @@
 #define LOGOS_APP_FILE_NAME "App"
 #define LOGOS_MAIN_FUNC_NAME "main"
 #define LOGOS_SELF "self"
+#define LOGOS_LOOP_IS_FIRST "for.isFirst"
+#define LOGOS_LOOP_IS_LAST "for.isLast"
 #define LOGOS_OBJECT_FILE "main.o"
 #define LOGOS_DEBUG_FILE "paths.dat"
 #define LOGOS_EXECUTABLE_FILE "output"

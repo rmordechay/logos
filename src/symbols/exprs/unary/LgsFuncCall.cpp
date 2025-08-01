@@ -5,7 +5,9 @@
 #include "stmts/LgsVarDec.h"
 
 Value* LgsFuncCall::createIRValue(LgsCodeGen* codeGen) {
-    codeGen->callPushStack(func->pathIndex);
+    if (!dynamic_cast<LgsBuiltinFunc*>(func)) {
+        codeGen->callPushStack(func->pathIndex);
+    }
     if (callback) {
         func->setIRValue(getCallback(codeGen));
     } else if (func->funcType->isVirtual) {

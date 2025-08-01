@@ -24,6 +24,7 @@ enum LgsSymbolType {
 };
 
 struct LgsSymbol {
+    string* name;
     LgsSymbolType symbolType;
     bool isExternal = false;
 

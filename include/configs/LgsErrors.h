@@ -24,7 +24,7 @@ inline LgsError E10013{.msg = "Method '%s' is not a member of '%s'.", .errCode =
 inline LgsError E10014{.msg = "Expression of type '%s' does not match base type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10015{.msg = "Function with name '%s' was found but it doesn't match the parameters.\n\t   Given:    %s\n\t   Expected: %s", .errCode = errCodeStart++};
 inline LgsError E10016{.msg = "Object '%s' does not fully implement '%s'. Missing fields/methods:%s", .errCode = errCodeStart++};
-inline LgsError E10017{.msg = "'break' must be inside a loop statement.", .errCode = errCodeStart++};
+inline LgsError E10017{.msg = "'break' must be inside a for loop.", .errCode = errCodeStart++};
 inline LgsError E10018{.msg = "Expression of type '%s' cannot be casted to type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10019{.msg = "activeEnv '%s' could not be found in the envs directory.", .errCode = errCodeStart++};
 inline LgsError E10020{.msg = "Environment '%s' does not define the required field '%s'.", .errCode = errCodeStart++};
@@ -45,7 +45,7 @@ inline LgsError E10034{.msg = "Object '%s' has a method with name '%s' but it do
 inline LgsError E10035{.msg = "Index of %s has %s level which is too deep. Max level: %s.", .errCode = errCodeStart++};
 inline LgsError E10036{.msg = "'%s' cannot be indexed with type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10037{.msg = "Left index of slice must be less or equal than the right index. Given: %s.", .errCode = errCodeStart++};
-inline LgsError E10038{.msg = "'continue' must be inside a loop statement.", .errCode = errCodeStart++};
+inline LgsError E10038{.msg = "'continue' must be inside a for loop.", .errCode = errCodeStart++};
 inline LgsError E10039{.msg = "main() function accepts only one optional parameter of type 'Str[]'.", .errCode = errCodeStart++};
 inline LgsError E10040{.msg = "The number of variables in the for loop (%s) do not match the number of the iterable's returned values (%s).", .errCode = errCodeStart++};
 inline LgsError E10041{.msg = "'%s' unpacks %s or %s, Given: %s.", .errCode = errCodeStart++};
@@ -67,3 +67,4 @@ inline LgsError E10056{.msg = "Type '%s' has multiple fields/methods with the sa
 inline LgsError E10057{.msg = "Pattern matching expression '%s' must be of type Bool.", .errCode = errCodeStart++};
 inline LgsError E10058{.msg = "Field '%s' is defined in multiple interfaces: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10059{.msg = "Unreachable code.", .errCode = errCodeStart++};
+inline LgsError E10060{.msg = "'for.isFirst' and 'for.isLast' are only allowed inside a for loop.", .errCode = errCodeStart++};

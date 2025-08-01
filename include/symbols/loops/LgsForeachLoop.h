@@ -14,7 +14,6 @@ public:
     void setArrIterVars(LgsCodeGen* codeGen, LgsDArray* arr) const;
     void setMapIterVars(LgsCodeGen* codeGen, const LgsIterator& iterator) const;
     void setStrIterVars(LgsCodeGen* codeGen, LgsStr* str) const;
-    void setLoopCondition(LgsCodeGen* codeGen);
     LoadInst* loadIPtr(LgsCodeGen* codeGen) const;
     void initIPtr(LgsCodeGen* codeGen);
     Value* loopStart(LgsCodeGen* codeGen) override;

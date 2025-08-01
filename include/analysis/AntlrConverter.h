@@ -45,6 +45,7 @@ public:
     path filePath;
     LgsErrHandler errHandler;
     LgsSymbolTable& globals;
+    stack<LgsForLoop*> loopStack;
 
     explicit AntlrConverter(const path& filePath, LgsSymbolTable& globals) : filePath(filePath), globals(globals) {}
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx);
@@ -70,11 +71,12 @@ public:
     LgsCoroutine* getCoroutine(LogosParser::CoroutineContext* ctx);
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
-    LgsBreakStmt* getBreakStmt(LogosParser::StatementContext* ctx) const;
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
+    LgsBreakStmt* getBreakStmt(LogosParser::StatementContext* ctx);
+    LgsStmt* getContinueStmt(const LogosParser::StatementContext* ctx);
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
-    LgsForLoop* getLoopStatement(LogosParser::LoopStatementContext* ctx);
+    LgsForLoop* getForLoop(LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getRangeLoop(LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getForeachLoop(LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getInfiniteLoop(LogosParser::LoopStatementContext* ctx) const;
@@ -98,6 +100,8 @@ public:
     LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx) const;
     LgsStrConst* getStrConst(tree::TerminalNode* type) const;
     LgsUnaryExpr* getNullValue(const tree::TerminalNode* ctx) const;
+    LgsUnaryExpr* getLoopIsFirst(const LogosParser::IsFirstContext* ctx);
+    LgsUnaryExpr* getLoopIsLast(const LogosParser::IsLastContext* ctx);
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsGroup* getGroup(LogosParser::GroupContext* ctx);
     LgsFuncType* getFuncType(LogosParser::FuncTypeContext* ctx);

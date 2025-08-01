@@ -9,6 +9,7 @@ public:
     LgsSymbol ref;
 
     explicit LgsVariable(const string& name) : LgsUnaryExpr(nullptr), name(name) {}
+    explicit LgsVariable(const string& name, LgsType* type) : LgsUnaryExpr(type), name(name) {}
     string prettyName() override;
     Value* hashValue(LgsCodeGen* codeGen) override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
@@ -16,10 +17,3 @@ public:
     bool equals(LgsExpr* other) override;
     ~LgsVariable() override = default;
 };
-
-class LgsConst final :  public LgsVariable {
-public:
-    explicit LgsConst(const string& name) : LgsVariable(name) {}
-};
-
-

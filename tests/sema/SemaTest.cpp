@@ -292,7 +292,7 @@ TEST_CASE("TestSema10016B") {
     CHECK_EQ(app.errHandler.errors[1].errCode, E10016.errCode);
 }
 
-TEST_CASE("TestSema10017") {
+TEST_CASE("TestSema10017A") {
     LgsApp app;
     const auto code = R"(
     main() {
@@ -300,7 +300,6 @@ TEST_CASE("TestSema10017") {
     }
     )";
     app.parseSrcFile(code);
-    app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10017.errCode);
 }
@@ -482,6 +481,18 @@ TEST_CASE("TestSema10032") {
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10032.errCode);
+}
+
+TEST_CASE("TestSema10038") {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        continue
+    }
+    )";
+    app.parseSrcFile(code);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10038.errCode);
 }
 
 TEST_CASE("TestSema10042") {

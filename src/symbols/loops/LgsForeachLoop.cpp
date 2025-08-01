@@ -36,7 +36,11 @@ void LgsForeachLoop::initIRLoop(LgsCodeGen* codeGen) {
     }
 
     // Without iterator
-    setLoopCondition(codeGen);
+    initIPtr(codeGen);
+    const auto iValue = codeGen->builder.CreateLoad(codeGen->i64Ty(), iPtr);
+    const auto upperBound = codeGen->builder.CreateZExt(loopEnd(codeGen), codeGen->i64Ty());
+    const auto condition = codeGen->builder.CreateICmpSLT(iValue, upperBound);
+    codeGen->builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
     codeGen->startBlock(IRBodyBlock);
     iterPtr = iterExpr->getIRValue(codeGen);
     if (const auto str = iterable->asStr()) {
@@ -49,7 +53,6 @@ void LgsForeachLoop::initIRLoop(LgsCodeGen* codeGen) {
 }
 
 void LgsForeachLoop::IRLoopPrologue(LgsCodeGen* codeGen) const {
-    // Increment loop variable
     const auto iValue = codeGen->builder.CreateLoad(codeGen->i64Ty(), iPtr);
     const auto inc = codeGen->builder.CreateAdd(iValue, codeGen->i64(1));
     codeGen->builder.CreateStore(inc, iPtr);
@@ -101,14 +104,6 @@ void LgsForeachLoop::setMapIterVars(LgsCodeGen* codeGen, const LgsIterator& iter
     }
     loopVars[0 + withIndex]->setIRValue(keyGEP);
     loopVars[1 + withIndex]->setIRValue(valueGEP);
-}
-
-void LgsForeachLoop::setLoopCondition(LgsCodeGen* codeGen) {
-    initIPtr(codeGen);
-    const auto iValue = codeGen->builder.CreateLoad(codeGen->i64Ty(), iPtr);
-    const auto upperBound = codeGen->builder.CreateZExt(loopEnd(codeGen), codeGen->i64Ty());
-    const auto condition = codeGen->builder.CreateICmpSLT(iValue, upperBound);
-    codeGen->builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
 }
 
 LoadInst* LgsForeachLoop::loadIPtr(LgsCodeGen* codeGen) const {

@@ -5,7 +5,7 @@ void LgsVarDec::createIRStmt(LgsCodeGen* codeGen) {
     const auto IRType = type->getIRType(codeGen);
     const auto exprIRValue = expr->getIRValue(codeGen);
     if (shouldAllocate(IRType)) {
-        IRValue = codeGen->builder.CreateAlloca(IRType);
+        IRValue = codeGen->builder.CreateAlloca(IRType, nullptr, name);
         codeGen->builder.CreateStore(exprIRValue, IRValue);
     } else {
         IRValue = exprIRValue;

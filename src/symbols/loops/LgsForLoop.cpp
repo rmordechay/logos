@@ -11,8 +11,24 @@ void LgsForLoop::createIRStmt(LgsCodeGen* codeGen) {
     codeGen->stack.exitScope();
 }
 
+void LgsForLoop::setLoopTerminals(LgsCodeGen* codeGen, Value* iValue) {
+    if (isFirstVarDec) {
+        isFirstVarDec->setIRValue(codeGen->builder.CreateICmpEQ(iValue, loopEnd(codeGen)));
+    }
+    if (isLastVarDec) {
+        const auto decremented = codeGen->builder.CreateSub(loopEnd(codeGen), codeGen->i32(1));
+        isLastVarDec->setIRValue(codeGen->builder.CreateICmpEQ(iValue, decremented));
+    }
+}
+
 LgsForLoop::~LgsForLoop() {
     for (const auto& loopVar : loopVars) {
         delete loopVar;
+    }
+    if (isFirstVarDec) {
+        delete isFirstVarDec;
+    }
+    if (isLastVarDec) {
+        delete isLastVarDec;
     }
 }

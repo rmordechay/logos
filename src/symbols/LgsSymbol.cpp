@@ -6,16 +6,35 @@
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
+#include "types/LgsUnknownType.h"
 
-LgsSymbol::LgsSymbol(): symbolType(UNKNOWN), location(nullptr) {}
-LgsSymbol::LgsSymbol(LgsParam* param): symbolType(PARAM), param(param), location(&param->location) {}
-LgsSymbol::LgsSymbol(LgsVarDec* varDec): symbolType(VAR_DEC), varDec(varDec), location(&varDec->location) {}
-LgsSymbol::LgsSymbol(LgsField* field): symbolType(FIELD), field(field), location(&field->location) {}
-LgsSymbol::LgsSymbol(LgsGroup* group): symbolType(GROUP), group(group), location(&group->location) {}
-LgsSymbol::LgsSymbol(LgsInterface* interface): symbolType(INTERFACE), interface(interface), location(&interface->location) {}
-LgsSymbol::LgsSymbol(LgsObject* object, bool isExternal): symbolType(OBJECT), isExternal(isExternal), object(object), location(&object->location) {}
-LgsSymbol::LgsSymbol(LgsEnum* lgsEnum, bool isExternal): symbolType(ENUM), isExternal(isExternal), lgsEnum(lgsEnum), location(&lgsEnum->location) {}
-LgsSymbol::LgsSymbol(LgsFunc* func, bool isExternal): symbolType(FUNC), isExternal(isExternal), func(func), location(&func->location) {}
+LgsSymbol::LgsSymbol()
+    : name(nullptr), symbolType(UNKNOWN), location(nullptr) {}
+
+LgsSymbol::LgsSymbol(LgsParam* param)
+    : name(&param->name), symbolType(PARAM), param(param), location(&param->location) {}
+
+LgsSymbol::LgsSymbol(LgsVarDec* varDec)
+    : name(&varDec->name), symbolType(VAR_DEC), varDec(varDec), location(&varDec->location) {}
+
+LgsSymbol::LgsSymbol(LgsField* field)
+    : name(&field->name), symbolType(FIELD), field(field), location(&field->location) {}
+
+LgsSymbol::LgsSymbol(LgsGroup* group)
+    : name(&group->name), symbolType(GROUP), group(group), location(&group->location) {}
+
+LgsSymbol::LgsSymbol(LgsInterface* interface)
+    : name(&interface->name), symbolType(INTERFACE), interface(interface), location(&interface->location) {}
+
+LgsSymbol::LgsSymbol(LgsObject* object, const bool isExternal)
+    : name(&object->name), symbolType(OBJECT), isExternal(isExternal), object(object), location(&object->location) {}
+
+LgsSymbol::LgsSymbol(LgsEnum* lgsEnum, const bool isExternal)
+    : name(&lgsEnum->name), symbolType(ENUM), isExternal(isExternal), lgsEnum(lgsEnum), location(&lgsEnum->location) {}
+
+LgsSymbol::LgsSymbol(LgsFunc* func, const bool isExternal)
+    : name(&func->funcType->name), symbolType(FUNC), isExternal(isExternal), func(func), location(&func->location) {}
+
 
 
 void* LgsSymbol::getSymbol() const {

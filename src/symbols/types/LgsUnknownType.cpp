@@ -5,7 +5,7 @@ string LgsUnknownType::prettyName() {
 }
 
 string LgsUnknownType::getName() {
-    return name == "" ? "<Unknown>" : name;
+    return name == "" ? genricName : name;
 }
 
 LgsExpr* LgsUnknownType::getZeroValue() {

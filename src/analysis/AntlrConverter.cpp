@@ -409,13 +409,13 @@ LgsStmt* AntlrConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto coroutine = ctx->coroutine()) return getCoroutine(coroutine);
     if (const auto ifStmt = ctx->ifStatement()) return getIfStatement(ifStmt);
     if (const auto patternMatching = ctx->patternMatching()) return getPatternMatching(patternMatching);
-    if (const auto loopStmt = ctx->loopStatement()) return getLoopStatement(loopStmt);
+    if (const auto loopStmt = ctx->loopStatement()) return getForLoop(loopStmt);
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
     if (const auto selection = ctx->selection()) return getSelection(selection);
     if (const auto returnStmt = ctx->returnStatement()) return getReturnStmt(returnStmt);
     if (const auto postfixExpr = ctx->postfixExpr()) return getPostfixExpr(postfixExpr);
     if (ctx->breakStmt()) return getBreakStmt(ctx);
-    if (ctx->CONTINUE()) return new LgsContinueStmt();
+    if (ctx->CONTINUE()) return getContinueStmt(ctx);
     assert(0);
 }
 
@@ -521,10 +521,28 @@ LgsIfStmt* AntlrConverter::getIfStatement(LogosParser::IfStatementContext* ctx) 
     return ifStmt;
 }
 
-LgsBreakStmt* AntlrConverter::getBreakStmt(LogosParser::StatementContext* ctx) const {
+LgsBreakStmt* AntlrConverter::getBreakStmt(LogosParser::StatementContext* ctx) {
+    const auto breakStmt = new LgsBreakStmt();
+    breakStmt->setLocation(ctx->start, ctx->stop, filePath);
+    if (loopStack.empty()) {
+        errHandler.handleError(E10017, &breakStmt->location);
+        return breakStmt;
+    }
     const auto tag = ctx->breakStmt()->TAG();
-    if (tag) return new LgsBreakStmt(tag->getText().substr(1));
-    return new LgsBreakStmt();
+    if (tag) {
+        breakStmt->tag = tag->getText().substr(1);
+    }
+    return breakStmt;
+}
+
+LgsStmt* AntlrConverter::getContinueStmt(const LogosParser::StatementContext* ctx) {
+    const auto continueStmt = new LgsContinueStmt();
+    continueStmt->setLocation(ctx->start, ctx->stop, filePath);
+    if (loopStack.empty()) {
+        errHandler.handleError(E10038, &continueStmt->location);
+        return continueStmt;
+    }
+    return continueStmt;
 }
 
 LgsStmt* AntlrConverter::getPatternMatching(LogosParser::PatternMatchingContext* ctx) {
@@ -539,7 +557,7 @@ LgsStmt* AntlrConverter::getPatternMatching(LogosParser::PatternMatchingContext*
     return patternMatching;
 }
 
-LgsForLoop* AntlrConverter::getLoopStatement(LogosParser::LoopStatementContext* ctx) {
+LgsForLoop* AntlrConverter::getForLoop(LogosParser::LoopStatementContext* ctx) {
     LgsForLoop* loopStmt = nullptr;
     if (ctx->iterableExpr) {
         loopStmt = getForeachLoop(ctx);
@@ -548,8 +566,10 @@ LgsForLoop* AntlrConverter::getLoopStatement(LogosParser::LoopStatementContext* 
     } else {
         loopStmt = getInfiniteLoop(ctx);
     }
-    loopStmt->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     loopStmt->setLocation(ctx->start, ctx->stop, filePath);
+    loopStack.push(loopStmt);
+    loopStmt->stmtsBlock = getStmtBlock(ctx->statementsBlock());
+    loopStack.pop();
     return loopStmt;
 }
 
@@ -637,8 +657,8 @@ LgsUnaryExpr* AntlrConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto func = ctx->anonnymosFunc()) return getAnonymousFunc(func);
     if (const auto vector = ctx->vector()) return getVector(vector);
     if (const auto null = ctx->NULL_()) return getNullValue(null);
-    // if (ctx->isFirst()) return getAnonymousFunc(func);
-    // if (ctx->isLast()) return getAnonymousFunc(func);
+    if (const auto isFirst = ctx->isFirst()) return getLoopIsFirst(isFirst);
+    if (const auto isLast = ctx->isLast()) return getLoopIsLast(isLast);
     assert(0);
 }
 
@@ -922,6 +942,32 @@ LgsUnaryExpr* AntlrConverter::getNullValue(const tree::TerminalNode* ctx) const 
     const auto lgsNull = new LgsNullValue();
     lgsNull->setLocation(ctx->getSymbol(), nullptr, filePath);
     return lgsNull;
+}
+
+LgsUnaryExpr* AntlrConverter::getLoopIsFirst(const LogosParser::IsFirstContext* ctx) {
+    const auto var = new LgsVariable(LOGOS_LOOP_IS_FIRST, &LGS_BOOL);
+    var->setLocation(ctx->start, ctx->stop, filePath);
+    if (loopStack.empty()) {
+        errHandler.handleError(E10060, &var->location);
+        return nullptr;
+    }
+    if (!loopStack.top()->isFirstVarDec) {
+        loopStack.top()->isFirstVarDec = new LgsVarDec(LOGOS_LOOP_IS_FIRST, new LgsBoolConst(false));
+    }
+    return var;
+}
+
+LgsUnaryExpr* AntlrConverter::getLoopIsLast(const LogosParser::IsLastContext* ctx) {
+    const auto var = new LgsVariable(LOGOS_LOOP_IS_LAST, &LGS_BOOL);
+    var->setLocation(ctx->start, ctx->stop, filePath);
+    if (loopStack.empty()) {
+        errHandler.handleError(E10060, &var->location);
+        return nullptr;
+    }
+    if (!loopStack.top()->isLastVarDec) {
+        loopStack.top()->isLastVarDec = new LgsVarDec(LOGOS_LOOP_IS_LAST, new LgsBoolConst(false));
+    }
+    return var;
 }
 
 LgsType* AntlrConverter::getType(LogosParser::TypeContext* ctx) {

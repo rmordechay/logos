@@ -4,6 +4,7 @@
 class LgsUnknownType final : public LgsType {
 public:
     string name;
+    constexpr static auto genricName = "<Unknown>";
 
     explicit LgsUnknownType(const string& name = "") : name(name) {
         isUnknown = true;
