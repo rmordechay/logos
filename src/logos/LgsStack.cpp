@@ -3,20 +3,16 @@
 #include "loops/LgsForLoop.h"
 #include "stmts/LgsIfStmt.h"
 
-void LgsStack::enterScope(LgsValue* value, LgsStmtsBlock* stmtsBlock) {
-    LgsStackFrame stackFrame = {.stmtsBlock = stmtsBlock};
+void LgsStack::enterScope(LgsValue* value) {
+    LgsStackFrame stackFrame;
     if (const auto func = dynamic_cast<LgsFunc*>(value)) {
         stackFrame = {.func = func};
-    } else if (const auto ifStmt = dynamic_cast<LgsIfStmt*>(value)) {
-        stackFrame = {.func = currentFunc(), .symbolTable = top().symbolTable};
-        stackFrame.ifStmt = ifStmt;
-        stackFrame.loop = currentLoop();
-    } else if (const auto forLoop = dynamic_cast<LgsForLoop*>(value)) {
-        stackFrame = {.func = currentFunc(), .symbolTable = top().symbolTable};
-        stackFrame.loop = forLoop;
-        stackFrame.ifStmt = currentIfStmt();
     } else {
-        assert(0);
+        stackFrame = {.func = currentFunc(), .symbolTable = top().symbolTable};
+        stackFrame.loop = currentLoop();
+        if (const auto forLoop = dynamic_cast<LgsForLoop*>(value)) {
+            stackFrame.loop = forLoop;
+        }
     }
     push(stackFrame);
 }
@@ -35,10 +31,6 @@ LgsStmtsBlock* LgsStack::currentStmtsBlock() {
 
 LgsForLoop* LgsStack::currentLoop() {
     return top().loop;
-}
-
-LgsIfStmt* LgsStack::currentIfStmt() {
-    return top().ifStmt;
 }
 
 auto LgsStack::begin() {

@@ -14,13 +14,11 @@ struct LgsStackFrame {
     LgsSymbolTable symbolTable;
     LgsFunc* func = nullptr;
     LgsForLoop* loop;
-    LgsIfStmt* ifStmt;
-    LgsStmtsBlock* stmtsBlock;
 };
 
 class LgsStack final : public stack<LgsStackFrame> {
 public:
-    void enterScope(LgsValue* value, LgsStmtsBlock* stmtsBlock = nullptr);
+    void enterScope(LgsValue* value);
     void exitScope();
     LgsFunc* currentFunc();
     LgsForLoop* currentLoop();

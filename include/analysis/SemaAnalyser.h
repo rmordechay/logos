@@ -57,12 +57,12 @@ public:
     void visitAssignment(const LgsAssignment* assignment);
     void visitIfStmt(LgsIfStmt* ifStmt);
     void visitPatternMatching(LgsIfStmt* pm);
-    void visitBoolPatternMatching(const LgsIfStmt* patternMatching);
+    void visitBoolPatternMatching(LgsIfStmt* pm);
     void visitLoopStmt(LgsForLoop* loopStmt);
-    void visitRangeLoop(const LgsRangeLoop* rangeLoop);
+    void visitRangeLoop(LgsRangeLoop* rangeLoop);
     void visitForeachLoop(LgsForeachLoop* foreachLoop);
-    void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
-    void visitCoroutine(const LgsCoroutine* coroutine);
+    void visitInfiniteLoop(LgsInfiniteLoop* infiniteLoop);
+    void visitCoroutine(LgsCoroutine* coroutine);
     void visitReturnStmt(const LgsReturn* returnStmt);
     void visitBreakStmt(const LgsBreakStmt* breakStmt);
     void visitContinueStmt(const LgsContinueStmt* continueStmt);

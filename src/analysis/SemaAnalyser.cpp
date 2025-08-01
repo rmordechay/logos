@@ -171,24 +171,21 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
     if (ifStmt->isPatternMatching) return visitPatternMatching(ifStmt);
-    stack.enterScope(ifStmt, ifStmt->ifBlock);
+    stack.enterScope(ifStmt);
     visitExpr(ifStmt->ifCond);
     visitStmtsBlock(ifStmt->ifBlock);
-    stack.exitScope();
     for (const auto& elseIfPair : ifStmt->elseIfs) {
-        stack.enterScope(ifStmt, elseIfPair.second);
         visitExpr(elseIfPair.first);
         visitStmtsBlock(elseIfPair.second);
-        stack.exitScope();
     }
     if (ifStmt->elseBlock) {
-        stack.enterScope(ifStmt, ifStmt->elseBlock);
         visitStmtsBlock(ifStmt->elseBlock);
-        stack.exitScope();
     }
+    stack.exitScope();
 }
 
 void SemaAnalyser::visitPatternMatching(LgsIfStmt* pm) {
+    stack.enterScope(pm);
     const auto baseExpr = pm->ifCond;
     if (!baseExpr) {
         return visitBoolPatternMatching(pm);
@@ -202,7 +199,6 @@ void SemaAnalyser::visitPatternMatching(LgsIfStmt* pm) {
         }
     }
     for (const auto elseIfPair : pm->elseIfs) {
-        stack.enterScope(pm, elseIfPair.second);
         const auto expr = elseIfPair.first;
         visitExpr(expr);
         visitStmtsBlock(elseIfPair.second);
@@ -210,25 +206,23 @@ void SemaAnalyser::visitPatternMatching(LgsIfStmt* pm) {
         if (!expr->type->equals(baseExprType)) {
             return errHandler.handleError(E10014, &expr->location, {expr->type->prettyName(), baseExprType->prettyName()});
         }
-        stack.exitScope();
     }
-    stack.enterScope(pm, pm->elseBlock);
     visitStmtsBlock(pm->elseBlock);
     stack.exitScope();
 }
 
-void SemaAnalyser::visitBoolPatternMatching(const LgsIfStmt* patternMatching) {
-    for (const auto elseIfPair : patternMatching->elseIfs) {
+void SemaAnalyser::visitBoolPatternMatching(LgsIfStmt* pm) {
+    for (const auto elseIfPair : pm->elseIfs) {
         const auto expr = elseIfPair.first;
         visitExpr(expr);
         if (!expr->type->asBool()) {
             return errHandler.handleError(E10057, &expr->location, {expr->prettyName()});
         }
     }
-    for (const auto& patternsStmtBlock : patternMatching->elseIfs) {
+    for (const auto& patternsStmtBlock : pm->elseIfs) {
         visitStmtsBlock(patternsStmtBlock.second);
     }
-    visitStmtsBlock(patternMatching->elseBlock);
+    visitStmtsBlock(pm->elseBlock);
 }
 
 void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
@@ -245,7 +239,7 @@ void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
     stack.exitScope();
 }
 
-void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
+void SemaAnalyser::visitRangeLoop(LgsRangeLoop* rangeLoop) {
     const auto loopVar = rangeLoop->loopVars.front();
     visitExpr(rangeLoop->startRange);
     visitExpr(rangeLoop->endRange);
@@ -269,11 +263,11 @@ void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     visitStmtsBlock(foreachLoop->stmtBlock);
 }
 
-void SemaAnalyser::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
+void SemaAnalyser::visitInfiniteLoop(LgsInfiniteLoop* infiniteLoop) {
     visitStmtsBlock(infiniteLoop->stmtBlock);
 }
 
-void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
+void SemaAnalyser::visitCoroutine(LgsCoroutine* coroutine) {
     if (coroutine->stmtsBlock) {
         visitStmtsBlock(coroutine->stmtsBlock);
     } else if (coroutine->funcCall) {
