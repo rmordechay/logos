@@ -17,7 +17,7 @@ void LgsStmtsBlock::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
-void LgsStmtsBlock::cleanup(LgsCodeGen* codeGen) {
+void LgsStmtsBlock::cleanup(LgsCodeGen* codeGen) const {
     codeGen->branchAndStartBlock(cleanupBlock);
     codeGen->builder.CreateRet(returnPhiNode);
 }

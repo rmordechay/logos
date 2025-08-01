@@ -25,7 +25,6 @@
 #include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "stmts/LgsContinueStmt.h"
-#include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsDArray.h"
 #include "types/LgsGroup.h"
@@ -133,7 +132,6 @@ void SemaAnalyser::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
 void SemaAnalyser::visitStmt(LgsStmt* stmt) {
     if (const auto varDec = stmt->asVarDec()) visitVarDec(varDec);
     else if (const auto ifStmt = stmt->asIfStmt()) visitIfStmt(ifStmt);
-    else if (const auto patternMatch = stmt->asPatternMatch()) visitPatternMatch(patternMatch);
     else if (const auto loopStmt = stmt->asLoop()) visitLoopStmt(loopStmt);
     else if (const auto assignment = stmt->asAssignment()) visitAssignment(assignment);
     else if (const auto funcCall = stmt->asFuncCall()) visitFuncCall(funcCall);
@@ -175,6 +173,7 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
 }
 
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
+    if (ifStmt->isPatternMatching) return visitPatternMatching(ifStmt);
     stack.enterScope(IF_SCOPE, ifStmt);
     visitExpr(ifStmt->ifCond);
     visitStmtsBlock(ifStmt->ifStmtsBlock);
@@ -190,9 +189,9 @@ void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
     stack.exitScope();
 }
 
-void SemaAnalyser::visitPatternMatch(LgsPatternMatch* patternMatching) {
+void SemaAnalyser::visitPatternMatching(LgsIfStmt* patternMatching) {
     stack.enterScope(IF_SCOPE, patternMatching);
-    const auto baseExpr = patternMatching->expr;
+    const auto baseExpr = patternMatching->ifCond;
     if (!baseExpr) {
         return visitBoolPatternMatching(patternMatching);
     }
@@ -203,31 +202,31 @@ void SemaAnalyser::visitPatternMatch(LgsPatternMatch* patternMatching) {
             addLocalSymbol(name, LgsSymbol(field));
         }
     }
-    for (const auto patternExpr : patternMatching->patterns) {
+    for (const auto patternExpr : patternMatching->elseIfConds) {
         visitExpr(patternExpr);
         if (patternExpr->type->isUnknown) continue;
         if (!patternExpr->type->equals(baseExprType)) {
             return errHandler.handleError(E10014, &patternExpr->location, {patternExpr->type->prettyName(), baseExprType->prettyName()});
         }
     }
-    for (const auto& patternsStmtBlock : patternMatching->patternsStmtBlocks) {
+    for (const auto& patternsStmtBlock : patternMatching->elseIfStmtsBlocks) {
         visitStmtsBlock(patternsStmtBlock);
     }
-    visitStmtsBlock(patternMatching->elseStmtBlock);
+    visitStmtsBlock(patternMatching->elseStmtsBlock);
     stack.exitScope();
 }
 
-void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatch* patternMatching) {
-    for (const auto patternExpr : patternMatching->patterns) {
+void SemaAnalyser::visitBoolPatternMatching(const LgsIfStmt* patternMatching) {
+    for (const auto patternExpr : patternMatching->elseIfConds) {
         visitExpr(patternExpr);
         if (!patternExpr->type->asBool()) {
             return errHandler.handleError(E10057, &patternExpr->location, {patternExpr->prettyName()});
         }
     }
-    for (const auto& patternsStmtBlock : patternMatching->patternsStmtBlocks) {
+    for (const auto& patternsStmtBlock : patternMatching->elseIfStmtsBlocks) {
         visitStmtsBlock(patternsStmtBlock);
     }
-    visitStmtsBlock(patternMatching->elseStmtBlock);
+    visitStmtsBlock(patternMatching->elseStmtsBlock);
 }
 
 void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
@@ -866,11 +865,11 @@ bool SemaAnalyser::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, cons
             isValid = isValid && validateBlockControlFlow(ifStmt->elseStmtsBlock, func);
         } else if (const auto loop = stmt->asLoop()) {
             isValid = isValid && validateBlockControlFlow(loop->stmtBlock, func);
-        } else if (const auto patternMatch = stmt->asPatternMatch()) {
-            for (const auto patternsStmtBlock : patternMatch->patternsStmtBlocks) {
+        } else if (const auto patternMatch = stmt->asIfStmt()) {
+            for (const auto patternsStmtBlock : patternMatch->elseIfStmtsBlocks) {
                 isValid = isValid && validateBlockControlFlow(patternsStmtBlock, func);
             }
-            isValid = isValid && validateBlockControlFlow(patternMatch->elseStmtBlock, func);
+            isValid = isValid && validateBlockControlFlow(patternMatch->elseStmtsBlock, func);
         }
     }
     return isValid;

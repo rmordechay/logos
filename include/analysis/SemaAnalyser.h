@@ -18,7 +18,6 @@ class LgsBreakStmt;
 class LgsReturn;
 class LgsForeachLoop;
 class LgsRangeLoop;
-class LgsPatternMatch;
 class LgsStmtsBlock;
 class LgsStmt;
 class LgsMainFile;
@@ -57,8 +56,8 @@ public:
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(const LgsAssignment* assignment);
     void visitIfStmt(LgsIfStmt* ifStmt);
-    void visitPatternMatch(LgsPatternMatch* patternMatching);
-    void visitBoolPatternMatching(const LgsPatternMatch* patternMatching);
+    void visitPatternMatching(LgsIfStmt* patternMatching);
+    void visitBoolPatternMatching(const LgsIfStmt* patternMatching);
     void visitLoopStmt(LgsForLoop* loopStmt);
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);
     void visitForeachLoop(LgsForeachLoop* foreachLoop);

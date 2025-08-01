@@ -30,7 +30,7 @@ inline LgsExpr* LgsTypePair::getZeroValue() {
 }
 
 inline size_t LgsTypePair::getSizeBytes() {
-    assert(0);
+    return key->getSizeBytes() + value->getSizeBytes();
 }
 
 inline string LgsTypePair::prettyName() {

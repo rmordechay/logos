@@ -62,7 +62,6 @@ set(SOURCE_FILES
     src/symbols/stmts/LgsContinueStmt.cpp
     src/symbols/stmts/LgsField.cpp
     src/symbols/stmts/LgsIfStmt.cpp
-    src/symbols/stmts/LgsPatternMatch.cpp
     src/symbols/stmts/LgsReturn.cpp
     src/symbols/stmts/LgsStmt.cpp
     src/symbols/stmts/LgsStmtsBlock.cpp

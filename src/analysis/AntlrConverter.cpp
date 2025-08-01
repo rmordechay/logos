@@ -36,7 +36,6 @@
 #include "loops/LgsInfiniteLoop.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
-#include "stmts/LgsPatternMatch.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsDArray.h"
 #include "types/LgsGroup.h"
@@ -530,14 +529,15 @@ LgsBreakStmt* AntlrConverter::getBreakStmt(LogosParser::StatementContext* ctx) c
 }
 
 LgsStmt* AntlrConverter::getPatternMatching(LogosParser::PatternMatchingContext* ctx) {
-    const auto patternMatching = new LgsPatternMatch(getExpr(ctx->expr()));
+    const auto patternMatching = new LgsIfStmt(getExpr(ctx->expr()));
+    patternMatching->isPatternMatching = true;
     for (const auto& pattern : ctx->pattern()) {
         const auto expr = getExpr(pattern->expr());
         const auto stmtBlock = getStmtBlock(pattern->statementsBlock());
-        patternMatching->patterns.emplace_back(expr);
-        patternMatching->patternsStmtBlocks.emplace_back(stmtBlock);
+        patternMatching->elseIfConds.emplace_back(expr);
+        patternMatching->elseIfStmtsBlocks.emplace_back(stmtBlock);
     }
-    patternMatching->elseStmtBlock = getStmtBlock(ctx->statementsBlock());
+    patternMatching->elseStmtsBlock = getStmtBlock(ctx->statementsBlock());
     return patternMatching;
 }
 

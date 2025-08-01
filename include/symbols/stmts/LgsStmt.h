@@ -9,7 +9,6 @@ class LgsVarDec;
 class LgsSelection;
 class LgsFuncCall;
 class LgsReturn;
-class LgsPatternMatch;
 class LgsIfStmt;
 class LgsContinueStmt;
 class LgsBreakStmt;
@@ -22,7 +21,6 @@ public:
     LgsCoroutine* asCoroutine();
     LgsFuncCall* asFuncCall();
     LgsIfStmt* asIfStmt();
-    LgsPatternMatch* asPatternMatch();
     LgsPostfixExpr* asPostfixExpr();
     LgsSelection* asSelection();
     LgsBreakStmt* asBreak();

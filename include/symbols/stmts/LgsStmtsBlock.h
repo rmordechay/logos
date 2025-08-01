@@ -13,7 +13,7 @@ public:
     explicit LgsStmtsBlock(const vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
     bool needsCleanup() const;
     void createIRValue(LgsCodeGen* codeGen);
-    void cleanup(LgsCodeGen* codeGen);
+    void cleanup(LgsCodeGen* codeGen) const;
     void initCleanup(LgsCodeGen* codeGen);
     LgsStmt* lastStmt() const;
     string format(string& indentStr) override;

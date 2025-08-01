@@ -1,5 +1,6 @@
 #include "stmts/LgsIfStmt.h"
 #include "configs/LgsDefinitions.h"
+#include "funcs/LgsFunc.h"
 #include "logos/LgsCodeGen.h"
 
 void LgsIfStmt::createIRStmt(LgsCodeGen* codeGen) {
@@ -86,6 +87,31 @@ void LgsIfStmt::generateComplexIf(LgsCodeGen* codeGen) const {
         codeGen->branchIfNeeded(endBlock);
     }
     codeGen->startBlock(endBlock);
+}
+
+void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) const {
+    const auto exprIRValue = ifCond->hashValue(codeGen);
+    const auto exitBlock = codeGen->createBlock(BLOCK_NAME_EXIT_PATTERN);
+    const auto defaultBlock = codeGen->createBlock(BLOCK_NAME_DEFAULT_CASE);
+    const auto switchInst = codeGen->builder.CreateSwitch(exprIRValue, defaultBlock);
+
+    vector<BasicBlock*> blocks;
+    for (size_t i = 0; i < elseIfConds.size(); ++i) {
+        const auto pattern = elseIfConds[i];
+        const auto patterIRValue = pattern->hashValue(codeGen);
+        const auto IRFunc = codeGen->stack.currentFunc()->getIRFunc(codeGen);
+        const auto patternBlock = codeGen->createBlock(BLOCK_NAME_CASE_PREFIX + to_string(i), IRFunc);
+        switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
+        codeGen->builder.SetInsertPoint(patternBlock);
+        elseIfStmtsBlocks[i]->createIRValue(codeGen);
+        codeGen->builder.CreateBr(exitBlock);
+    }
+
+    codeGen->startBlock(defaultBlock);
+    elseStmtsBlock->createIRValue(codeGen);
+
+    codeGen->builder.CreateBr(exitBlock);
+    codeGen->startBlock(exitBlock);
 }
 
 bool LgsIfStmt::shouldBranch(LgsCodeGen* codeGen, Value* ifCondIR) const {

@@ -137,14 +137,12 @@ TEST_CASE("TestSema10006B") {
     enum Enum {
         ENUM1
     }
-
     func(x: Int, e: Enum) {
         if e {
             ENUM1: {}
         }
         a = ENUM1
     }
-
     main() {
         func(10, Enum.ENUM1)
     }
@@ -260,15 +258,11 @@ TEST_CASE("TestSema10016A") {
     interface Interface {
         func()
     }
-
     object Object {
         implements: Interface
         a: Int
     }
-
-    main() {
-
-    }
+    main() {}
     )";
     app.parseSrcFile(code);
     app.analyse();
