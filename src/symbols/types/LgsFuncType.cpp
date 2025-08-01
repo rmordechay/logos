@@ -20,12 +20,6 @@ string LgsFuncType::getName() {
 }
 
 Type* LgsFuncType::getIRType(LgsCodeGen* codeGen) {
-    Type* returnType;
-    if (rt->isBig) {
-        returnType = codeGen->ptrTy();
-    } else {
-        returnType = rt->getIRType(codeGen);
-    }
     vector<Type*> IRParamsTypes;
     for (int i = isStatic; i < params.size(); ++i) {
         const auto param = params[i];
@@ -33,10 +27,10 @@ Type* LgsFuncType::getIRType(LgsCodeGen* codeGen) {
         if (param.isSelf || !paramType->isPrimitive) {
             IRParamsTypes.emplace_back(codeGen->ptrTy());
         } else {
-            auto irType = paramType->getIRType(codeGen);
-            IRParamsTypes.emplace_back(irType);
+            IRParamsTypes.emplace_back(paramType->getIRType(codeGen));
         }
     }
+    const auto returnType = rt->isBig ? codeGen->ptrTy() : rt->getIRType(codeGen);
     IRType = FunctionType::get(returnType, IRParamsTypes, this->isVariadic);
     return IRType;
 }

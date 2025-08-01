@@ -17,18 +17,18 @@ class LgsAssignment;
 
 class LgsStmt : virtual public LgsValue {
 public:
+    LgsForLoop* asLoop();
+    LgsCoroutine* asCoroutine();
+    LgsFuncCall* asFuncCall();
+    LgsIfStmt* asIfStmt();
+    LgsPatternMatch* asPatternMatch();
+    LgsPostfixExpr* asPostfixExpr();
+    LgsSelection* asSelection();
+    LgsBreakStmt* asBreakStmt();
+    LgsContinueStmt* asContinue();
+    LgsReturn* asReturn();
     LgsVarDec* asVarDec();
     LgsAssignment* asAssignment();
-    LgsIfStmt* asIfStmt();
-    LgsForLoop* asLoop();
-    LgsPatternMatch* asPatternMatch();
-    LgsReturn* asReturn();
-    LgsContinueStmt* asContinue();
-    LgsCoroutine* asCoroutine();
-    LgsBreakStmt* asBreakStmt();
-    LgsFuncCall* asFuncCall();
-    LgsSelection* asSelection();
-    LgsPostfixExpr* asPostfixExpr();
     virtual void createIRStmt(LgsCodeGen* codeGen) = 0;
     ~LgsStmt() override = default;
 };

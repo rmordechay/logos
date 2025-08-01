@@ -13,8 +13,7 @@ string LgsInstance::prettyName() {
 Value* LgsInstance::createIRValue(LgsCodeGen* codeGen) {
     const auto objIRType = obj->getIRType(codeGen);
     if(obj->singleton) {
-        const auto zeroInitializer = ConstantAggregateZero::get(objIRType);
-        IRValue = new GlobalVariable(*codeGen->IRModule, objIRType, false, GlobalValue::ExternalLinkage, zeroInitializer);
+        IRValue = codeGen->createPublicGlobal(objIRType);
     } else {
         IRValue = codeGen->builder.CreateAlloca(objIRType);
     }

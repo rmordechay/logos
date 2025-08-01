@@ -1,13 +1,10 @@
 #include "exprs/unary/LgsVariable.h"
-
 #include "exprs/unary/LgsInstance.h"
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
-
-#include "utils/LgsUtils.h"
 #include <logos/LgsCodeGen.h>
 
 extern "C" {

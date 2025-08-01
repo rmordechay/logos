@@ -11,7 +11,6 @@ class LgsType;
 class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
-    vector<LgsReturn*> returnExprs;
     LgsStmtsBlock* stmtBlock = nullptr;
     off_t pathIndex = 0;
 
@@ -27,8 +26,7 @@ public:
     string format(string& tabs) override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
     Value* callIR(LgsCodeGen* codeGen, const vector<Value*>& args = {});
-    PHINode* cleanupExprs(LgsCodeGen* codeGen);
-    PHINode* cleanupExprs(LgsCodeGen* codeGen) const;
+    void startFuncBlock(LgsCodeGen* codeGen);
     static Value* getIRArg(LgsCodeGen* codeGen, LgsExpr* arg);
     virtual Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args = {});
     virtual void generateIR(LgsCodeGen* codeGen);

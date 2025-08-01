@@ -66,3 +66,4 @@ inline LgsError E10055{.msg = "Function '%s' must return from all its paths.", .
 inline LgsError E10056{.msg = "Type '%s' has multiple fields/methods with the same name '%s'.", .errCode = errCodeStart++};
 inline LgsError E10057{.msg = "Pattern matching expression '%s' must be of type Bool.", .errCode = errCodeStart++};
 inline LgsError E10058{.msg = "Field '%s' is defined in multiple interfaces: '%s'.", .errCode = errCodeStart++};
+inline LgsError E10059{.msg = "Unreachable code.", .errCode = errCodeStart++};

@@ -3,15 +3,15 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "stmts/LgsReturn.h"
 #include "types/LgsFuncType.h"
 #include "utils/LgsUtils.h"
 
 void LgsFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(FUNC_SCOPE, this);
-    codeGen->startFuncBlock();
+    startFuncBlock(codeGen);
     stmtBlock->createIRValue(codeGen);
     if (!codeGen->lastInstTerminator()) {
+        codeGen->callPopStack();
         codeGen->builder.CreateRetVoid();
     }
     codeGen->stack.exitScope();
@@ -74,20 +74,10 @@ Value* LgsFunc::callIR(LgsCodeGen* codeGen, const vector<Value*>& args) {
     return codeGen->builder.CreateCall(IRFunc, args);
 }
 
-PHINode* LgsFunc::cleanupExprs(LgsCodeGen* codeGen) {
-    PHINode* phiNode;
-    auto& builder = builder;
-    if (funcType->rt->isBig) {
-        phiNode = builder.CreatePHI(codeGen->ptrTy(), returnExprs.size());
-    } else {
-        const auto IRReturnType = funcType->rt->getIRType(codeGen);
-        phiNode = builder.CreatePHI(IRReturnType, returnExprs.size());
-    }
-    for (const auto expr : returnExprs) {
-        const auto exprIR = expr->expr->getIRValue(codeGen);
-        phiNode->addIncoming(exprIR, expr->parentBlock);
-    }
-    return phiNode;
+void LgsFunc::startFuncBlock(LgsCodeGen* codeGen) {
+    const auto IRFunc = getIRFunc(codeGen);
+    const auto entryBlock = codeGen->createBlock(BLOCK_NAME_ENTRY, IRFunc);
+    codeGen->builder.SetInsertPoint(entryBlock);
 }
 
 string LgsFunc::prettyName() {

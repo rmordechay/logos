@@ -7,12 +7,12 @@ class LgsIfStmt final : public LgsStmt {
 public:
     LgsExpr* ifCond;
     vector<LgsExpr*> elseIfConds;
-    LgsStmtsBlock* ifStmtBlock;
-    vector<LgsStmtsBlock*> elseIfStmtBlocks;
-    LgsStmtsBlock* elseStmtBlock = nullptr;
+    LgsStmtsBlock* ifStmtsBlock;
+    vector<LgsStmtsBlock*> elseIfStmtsBlocks;
+    LgsStmtsBlock* elseStmtsBlock = nullptr;
     string tag;
 
-    LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock) : ifCond(ifCond), ifStmtBlock(ifStmtBlock) {}
+    LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock) : ifCond(ifCond), ifStmtsBlock(ifStmtBlock) {}
     void createIRStmt(LgsCodeGen* codeGen) override;
     void generateIfElse(LgsCodeGen* codeGen) const;
     void generateSimpleIf(LgsCodeGen* codeGen) const;

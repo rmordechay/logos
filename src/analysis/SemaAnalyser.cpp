@@ -93,7 +93,7 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
     for (auto& param : func->funcType->params) {
         visitParam(&param);
     }
-    visitStmtBlock(func->stmtBlock);
+    visitStmtsBlock(func->stmtBlock);
     validateFuncControlFlow(func);
     stack.exitScope();
 }
@@ -108,10 +108,27 @@ void SemaAnalyser::visitParam(LgsParam* param) {
     addLocalSymbol(param->name, LgsSymbol(param));
 }
 
-void SemaAnalyser::visitField(LgsField* field) {
+void SemaAnalyser::visitField(const LgsField* field) {
     if (field->expr) {
         visitExpr(field->expr);
         validateExprType(field->expr, field->type);
+    }
+}
+
+void SemaAnalyser::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
+    if (!stmtsBlock) return;
+    for (const auto& stmt : stmtsBlock->stmts) {
+        visitStmt(stmt);
+    }
+    const auto lastStmt = stmtsBlock->lastStmt();
+    if (lastStmt->asReturn()) {
+        for (int i = 0; i < stmtsBlock->stmts.size() - 1; ++i) {
+            const auto stmt = stmtsBlock->stmts[i];
+            if (stmt->asReturn() || stmt->asContinue() || stmt->asBreak()) {
+                return errHandler.handleError(E10059, &lastStmt->location);
+            }
+        }
+        stmtsBlock->hasReturn = true;
     }
 }
 
@@ -128,17 +145,6 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
     else if (const auto breakStmt = stmt->asBreakStmt()) visitBreakStmt(breakStmt);
     else if (const auto continueStmt = stmt->asContinue()) visitContinueStmt(continueStmt);
     else if (const auto coroutine = stmt->asCoroutine()) visitCoroutine(coroutine);
-}
-
-void SemaAnalyser::visitStmtBlock(LgsStmtsBlock* stmtBlock) {
-    if (!stmtBlock) return;
-    for (const auto& stmt : stmtBlock->stmts) {
-        visitStmt(stmt);
-    }
-    const auto lastStmt = stmtBlock->lastStmt();
-    if (lastStmt->asReturn()) {
-        stmtBlock->hasReturn = true;
-    }
 }
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
@@ -173,15 +179,15 @@ void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
 void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
     stack.enterScope(IF_SCOPE, ifStmt);
     visitExpr(ifStmt->ifCond);
-    visitStmtBlock(ifStmt->ifStmtBlock);
+    visitStmtsBlock(ifStmt->ifStmtsBlock);
     for (const auto& elseIfCond : ifStmt->elseIfConds) {
         visitExpr(elseIfCond);
     }
-    for (const auto& elseIfStmtBlock : ifStmt->elseIfStmtBlocks) {
-        visitStmtBlock(elseIfStmtBlock);
+    for (const auto& elseIfStmtBlock : ifStmt->elseIfStmtsBlocks) {
+        visitStmtsBlock(elseIfStmtBlock);
     }
-    if (ifStmt->elseStmtBlock) {
-        visitStmtBlock(ifStmt->elseStmtBlock);
+    if (ifStmt->elseStmtsBlock) {
+        visitStmtsBlock(ifStmt->elseStmtsBlock);
     }
     stack.exitScope();
 }
@@ -207,9 +213,9 @@ void SemaAnalyser::visitPatternMatch(LgsPatternMatch* patternMatching) {
         }
     }
     for (const auto& patternsStmtBlock : patternMatching->patternsStmtBlocks) {
-        visitStmtBlock(patternsStmtBlock);
+        visitStmtsBlock(patternsStmtBlock);
     }
-    visitStmtBlock(patternMatching->elseStmtBlock);
+    visitStmtsBlock(patternMatching->elseStmtBlock);
     stack.exitScope();
 }
 
@@ -221,9 +227,9 @@ void SemaAnalyser::visitBoolPatternMatching(const LgsPatternMatch* patternMatchi
         }
     }
     for (const auto& patternsStmtBlock : patternMatching->patternsStmtBlocks) {
-        visitStmtBlock(patternsStmtBlock);
+        visitStmtsBlock(patternsStmtBlock);
     }
-    visitStmtBlock(patternMatching->elseStmtBlock);
+    visitStmtsBlock(patternMatching->elseStmtBlock);
 }
 
 void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
@@ -245,7 +251,7 @@ void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
     visitExpr(rangeLoop->startRange);
     visitExpr(rangeLoop->endRange);
     addLocalSymbol(loopVar->name, LgsSymbol(loopVar));
-    visitStmtBlock(rangeLoop->stmtBlock);
+    visitStmtsBlock(rangeLoop->stmtBlock);
 }
 
 void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
@@ -261,16 +267,16 @@ void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     for (const auto varDec : foreachLoop->loopVars) {
         addLocalSymbol(varDec->name, LgsSymbol(varDec));
     }
-    visitStmtBlock(foreachLoop->stmtBlock);
+    visitStmtsBlock(foreachLoop->stmtBlock);
 }
 
 void SemaAnalyser::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
-    visitStmtBlock(infiniteLoop->stmtBlock);
+    visitStmtsBlock(infiniteLoop->stmtBlock);
 }
 
 void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
     if (coroutine->stmtsBlock) {
-        visitStmtBlock(coroutine->stmtsBlock);
+        visitStmtsBlock(coroutine->stmtsBlock);
     } else if (coroutine->funcCall) {
         visitFuncCall(coroutine->funcCall);
     } else if (coroutine->selection) {
@@ -284,7 +290,7 @@ void SemaAnalyser::visitReturnStmt(LgsReturn* returnStmt) {
     const auto funcType = stack.currentFunc()->funcType;
     const auto retExpr = returnStmt->expr;
     if (retExpr) {
-        stack.currentFunc()->returnExprs.push_back(returnStmt);
+        stack.currentStmtsBlock()->returnExprs.push_back(retExpr);
         visitExpr(retExpr);
     }
     const auto rt = funcType->rt;
@@ -855,11 +861,11 @@ bool SemaAnalyser::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, cons
     auto isValid = false;
     for (const auto stmt : stmtBlock->stmts) {
         if (const auto ifStmt = stmt->asIfStmt()) {
-            isValid = validateBlockControlFlow(ifStmt->ifStmtBlock, func);
-            for (const auto elseIfStmtBlock : ifStmt->elseIfStmtBlocks) {
+            isValid = validateBlockControlFlow(ifStmt->ifStmtsBlock, func);
+            for (const auto elseIfStmtBlock : ifStmt->elseIfStmtsBlocks) {
                 isValid = isValid && validateBlockControlFlow(elseIfStmtBlock, func);
             }
-            isValid = isValid && validateBlockControlFlow(ifStmt->elseStmtBlock, func);
+            isValid = isValid && validateBlockControlFlow(ifStmt->elseStmtsBlock, func);
         } else if (const auto loop = stmt->asLoop()) {
             isValid = isValid && validateBlockControlFlow(loop->stmtBlock, func);
         } else if (const auto patternMatch = stmt->asPatternMatch()) {

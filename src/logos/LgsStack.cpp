@@ -5,18 +5,22 @@
 
 void LgsStack::enterScope(const LgsScope scope, LgsValue* value) {
     if (scope == FUNC_SCOPE) {
-        push(LgsStackFrame{.scopeType = FUNC_SCOPE, .func = dynamic_cast<LgsFunc*>(value)});
+        const auto func = dynamic_cast<LgsFunc*>(value);
+        push(LgsStackFrame{.scopeType = FUNC_SCOPE, .func = func, .stmtBlock = func->stmtBlock});
     } else {
         LgsStackFrame stackFrame{.scopeType = scope, .symbolTable = top().symbolTable};
         switch (scope) {
         case LOOP_SCOPE:
             stackFrame.loop = dynamic_cast<LgsForLoop*>(value);
+            stackFrame.stmtBlock = stackFrame.loop->stmtBlock;
             break;
         case IF_SCOPE:
             stackFrame.ifStmt = dynamic_cast<LgsIfStmt*>(value);
+            stackFrame.stmtBlock = stackFrame.ifStmt->ifStmtsBlock;
             break;
         case BLOCK_SCOPE:
             stackFrame.stmtsBlock = dynamic_cast<LgsStmtsBlock*>(value);
+            stackFrame.stmtBlock = stackFrame.stmtsBlock;
             break;
         default:
             assert(0);
@@ -32,6 +36,10 @@ void LgsStack::exitScope() {
 
 LgsFunc* LgsStack::currentFunc() {
     return top().func;
+}
+
+LgsStmtsBlock* LgsStack::currentStmtsBlock() {
+    return top().stmtBlock;
 }
 
 LgsForLoop* LgsStack::currentLoop() {

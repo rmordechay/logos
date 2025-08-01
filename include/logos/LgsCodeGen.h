@@ -19,16 +19,19 @@ public:
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
 
-    void createIRModule(const string& moduleName);
+    void setIRModule(const string& moduleName);
     Value* getIRStr(const string& value);
-    StructType* getIRStructType(const string& name, const vector<Type*>& fields);
     bool lastInstTerminator() const;
+    GlobalVariable* createPrivateGlobal(Constant* initializer) const;
+    GlobalVariable* createPublicGlobal(Type* type) const;
+    StructType* getIRStructType(const string& name, const vector<Type*>& fields);
 
     // Blocks
     BasicBlock* createBlock(const string& name, Function* parent = nullptr);
-    void branchIfNeeded(BasicBlock* block);
     void startBlock(BasicBlock* block);
-    void startFuncBlock();
+    void branchIfNeeded(BasicBlock* block);
+    void branchAndStartBlock(BasicBlock* block);
+    void branchToCleanup(Value* exprIR = nullptr);
 
     // Funcs
     Value* callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args = {});
@@ -53,7 +56,7 @@ public:
     Value* callEndFunc(Value* handle);
     Value* callDestroyFunc(Value* handle);
 
-    // types
+    // Types
     Type* i1Ty();
     Type* i8Ty();
     Type* i16Ty();
@@ -76,9 +79,11 @@ public:
     ConstantInt* i64Zero();
     ConstantInt* sizeZero();
 
+    // Debugging
     void printPtr(Value* ptr, const string& text);
     void printInt(Value* number, const string& text);
     void printStr(const string& str);
+
     static void initLLVM();
     static TargetMachine* getTargetMachine();
     ~LgsCodeGen() = default;

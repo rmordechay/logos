@@ -49,11 +49,11 @@ public:
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
-    void visitField(LgsField* field);
+    void visitField(const LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitParam(LgsParam* param);
     void visitStmt(LgsStmt* stmt);
-    void visitStmtBlock(LgsStmtsBlock* stmtBlock);
+    void visitStmtsBlock(LgsStmtsBlock* stmtsBlock);
     void visitVarDec(LgsVarDec* varDec);
     void visitAssignment(const LgsAssignment* assignment);
     void visitIfStmt(LgsIfStmt* ifStmt);

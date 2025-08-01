@@ -4,7 +4,7 @@
 
 
 void LgsObjectFile::generateIR() {
-    codeGen.createIRModule(name);
+    codeGen.setIRModule(name);
     obj->getIRType(&codeGen);
     for (const auto& [_, method] : obj->methods) {
         method->generateIR(&codeGen);

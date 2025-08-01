@@ -20,6 +20,7 @@ enum LgsScope {
 struct LgsStackFrame {
     LgsSymbolTable symbolTable;
     LgsFunc* func = nullptr;
+    LgsStmtsBlock* stmtBlock = nullptr;
     LgsScope scopeType;
     union {
         LgsForLoop* loop;
@@ -34,7 +35,7 @@ public:
     void exitScope();
     LgsFunc* currentFunc();
     LgsForLoop* currentLoop();
-    void addHeapAlloc(LgsExpr* expr);
+    LgsStmtsBlock* currentStmtsBlock();
     auto begin();
     auto end();
     auto rbegin();

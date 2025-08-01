@@ -515,10 +515,10 @@ LgsIfStmt* AntlerConverter::getIfStatement(LogosParser::IfStatementContext* ctx)
         auto elseIfExpr = getExpr(elseIfStmt->expr());
         auto elseIfStmtBlock = getStmtBlock(elseIfStmt->statementsBlock());
         ifStmt->elseIfConds.emplace_back(elseIfExpr);
-        ifStmt->elseIfStmtBlocks.emplace_back(elseIfStmtBlock);
+        ifStmt->elseIfStmtsBlocks.emplace_back(elseIfStmtBlock);
     }
     if (const auto &elseStmt = ctx->elseStatement()) {
-        ifStmt->elseStmtBlock = getStmtBlock(elseStmt->statementsBlock());
+        ifStmt->elseStmtsBlock = getStmtBlock(elseStmt->statementsBlock());
     }
     ifStmt->setLocation(ctx->start, ctx->stop, filePath);
     return ifStmt;
