@@ -39,7 +39,7 @@ StructType* LgsCodeGen::getIRStructType(const string& name, const vector<Type*>&
 }
 
 void LgsCodeGen::branchToCleanup(Value* exprIR) {
-    const auto stmtsBlock = stack.currentStmtsBlock();
+    const auto stmtsBlock = stack.getCurrentStmtsBlock();
     if (exprIR) {
         stmtsBlock->returnPhiNode->addIncoming(exprIR, builder.GetInsertBlock());
     }
@@ -62,7 +62,7 @@ void LgsCodeGen::branchAndStartBlock(BasicBlock* block) {
 }
 
 void LgsCodeGen::startBlock(BasicBlock* block) {
-    block->insertInto(stack.currentFunc()->getIRFunc(this));
+    block->insertInto(stack.getCurrentFunc()->getIRFunc(this));
     builder.SetInsertPoint(block);
 }
 

@@ -263,7 +263,7 @@ LgsMainFunc* AntlrConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
     const auto funcSignature = ctx->funcSignature();
     mainFunc->setLocation(funcSignature->funcSignatureHeader()->IDENTIFIER()->getSymbol(), nullptr, filePath);
     const auto statementsBlock = ctx->statementsBlock();
-    mainFunc->stmtBlock = getStmtBlock(statementsBlock);
+    mainFunc->stmtsBlock = getStmtBlock(statementsBlock);
     bool isValid = true;
     const auto paramSize = funcSignature->funcSignatureHeader()->param().size();
     if (paramSize > 1) {
@@ -297,7 +297,7 @@ LgsFunc* AntlrConverter::getFuncImpl(LogosParser::FuncImplContext* ctx) {
     const auto func = new LgsFunc(tokenName->getText(), rt);
     func->setLocation(tokenName->getSymbol(), nullptr, filePath);
     setParams(func->funcType, funcSignature->funcSignatureHeader()->param());
-    func->stmtBlock = getStmtBlock(ctx->statementsBlock());
+    func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     return func;
 }
 
@@ -313,7 +313,7 @@ LgsFunc* AntlrConverter::getMethodImpl(LogosParser::MethodImplementationContext*
     self.isSelf = true;
     method->funcType->params.push_back(self);
     setParams(method->funcType, funcSignature->funcSignatureHeader()->param());
-    method->stmtBlock = getStmtBlock(ctx->statementsBlock());
+    method->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     if (ctx->VISIBILITY()) {
         method->funcType->isPublic = true;
     }
@@ -330,7 +330,7 @@ LgsFunc* AntlrConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx
         lgsParam.setLocation(param->start, param->stop, filePath);
         func->funcType->params.push_back(lgsParam);
     }
-    func->stmtBlock = getStmtBlock(ctx->statementsBlock());
+    func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     func->setLocation(funcSignature->LPAREN()->getSymbol(), nullptr, filePath);
     return func;
 }
@@ -548,7 +548,7 @@ LgsForLoop* AntlrConverter::getLoopStatement(LogosParser::LoopStatementContext* 
     } else {
         loopStmt = getInfiniteLoop(ctx);
     }
-    loopStmt->stmtBlock = getStmtBlock(ctx->statementsBlock());
+    loopStmt->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     loopStmt->setLocation(ctx->start, ctx->stop, filePath);
     return loopStmt;
 }

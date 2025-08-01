@@ -43,7 +43,6 @@ class LgsAssignment;
 class AntlrConverter {
 public:
     path filePath;
-    LgsStack stack;
     LgsErrHandler errHandler;
     LgsSymbolTable& globals;
 

@@ -10,7 +10,7 @@ class LgsForLoop : public LgsStmt {
 public:
     vector<LgsVarDec*> loopVars;
     AllocaInst* iPtr = nullptr;
-    LgsStmtsBlock* stmtBlock = nullptr;
+    LgsStmtsBlock* stmtsBlock = nullptr;
     BasicBlock* IRCondBlock = nullptr;
     BasicBlock* IRBodyBlock = nullptr;
     BasicBlock* IRExitBlock = nullptr;

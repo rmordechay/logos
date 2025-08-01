@@ -4,13 +4,13 @@
 #include "types/LgsStr.h"
 
 void LgsMainFunc::generateIR(LgsCodeGen* codeGen) {
-    codeGen->stack.enterScope(this);
+    codeGen->stack.enterScope(this, stmtsBlock);
     startFuncBlock(codeGen);
     codeGen->callInitRuntime();
     if (!funcType->params.empty()) {
         initArgs(codeGen);
     }
-    stmtBlock->createIRValue(codeGen);
+    stmtsBlock->createIRValue(codeGen);
     codeGen->builder.CreateRet(codeGen->i32(EXIT_SUCCESS));
     codeGen->stack.exitScope();
 }

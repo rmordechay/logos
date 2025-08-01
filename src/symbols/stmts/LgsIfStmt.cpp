@@ -5,23 +5,26 @@
 
 void LgsIfStmt::createIRStmt(LgsCodeGen* codeGen) {
     if (isPatternMatching) {
-        generatePatternMatching(codeGen);
-    } else {
-        if (elseIfs.empty()) {
-            if (!elseBlock) {
-                generateSimpleIf(codeGen);
-            } else {
-                generateIfElse(codeGen);
-            }
+        return generatePatternMatching(codeGen);
+    }
+    codeGen->stack.enterScope(this, ifBlock);
+    const auto ifCondIR = ifCond->getIRValue(codeGen);
+    if (!shouldBranch(ifCondIR)) {
+        ifBlock->createIRValue(codeGen);
+        codeGen->stack.exitScope();
+    } else if (elseIfs.empty()) {
+        if (!elseBlock) {
+            generateSimpleIf(codeGen, ifCondIR);
+            codeGen->stack.exitScope();
         } else {
-            generateComplexIf(codeGen);
+            generateIfWithElse(codeGen, ifCondIR);
         }
+    } else {
+        generateElseIf(codeGen, ifCondIR);
     }
 }
 
-void LgsIfStmt::generateSimpleIf(LgsCodeGen* codeGen) {
-    const auto ifCondIR = ifCond->getIRValue(codeGen);
-    if (!shouldBranch(codeGen, ifCondIR)) return;
+void LgsIfStmt::generateSimpleIf(LgsCodeGen* codeGen, Value* ifCondIR) const {
     const auto IRBlockTrue = codeGen->createBlock(BLOCK_NAME_IF_TRUE);
     const auto IRBlockEnd = codeGen->createBlock(BLOCK_NAME_IF_END);
     codeGen->builder.CreateCondBr(ifCondIR, IRBlockTrue, IRBlockEnd);
@@ -30,41 +33,44 @@ void LgsIfStmt::generateSimpleIf(LgsCodeGen* codeGen) {
     codeGen->branchAndStartBlock(IRBlockEnd);
 }
 
-void LgsIfStmt::generateIfElse(LgsCodeGen* codeGen) {
-    const auto ifCondIR = ifCond->getIRValue(codeGen);
-    if (!shouldBranch(codeGen, ifCondIR)) return;
+void LgsIfStmt::generateIfWithElse(LgsCodeGen* codeGen, Value* ifCondIR) {
     const auto IRBlockTrue = codeGen->createBlock(BLOCK_NAME_IF_TRUE);
     const auto IRBlockElse = codeGen->createBlock(BLOCK_NAME_ELSE);
     const auto IRBlockEnd = codeGen->createBlock(BLOCK_NAME_IF_END);
-    // if block
+
+    // if block (caller entered the scope)
     codeGen->builder.CreateCondBr(ifCondIR, IRBlockTrue, IRBlockElse);
     codeGen->startBlock(IRBlockTrue);
     ifBlock->createIRValue(codeGen);
     codeGen->branchIfNeeded(IRBlockEnd);
+    codeGen->stack.exitScope();
+
     // else block
+    codeGen->stack.enterScope(this, elseBlock);
     codeGen->startBlock(IRBlockElse);
     elseBlock->createIRValue(codeGen);
     codeGen->branchAndStartBlock(IRBlockEnd);
+    codeGen->stack.exitScope();
 }
 
-void LgsIfStmt::generateComplexIf(LgsCodeGen* codeGen) {
-    const auto ifCondIR = ifCond->getIRValue(codeGen);
-    if (!shouldBranch(codeGen, ifCondIR)) return;
+void LgsIfStmt::generateElseIf(LgsCodeGen* codeGen, Value* ifCondIR) {
     auto IRBlockTrue = codeGen->createBlock(BLOCK_NAME_IF_TRUE);
     auto IRBlockElseIfCheck = codeGen->createBlock(BLOCK_NAME_ELSE_IF_CHECK);
     const auto IRBlockElse = codeGen->createBlock(BLOCK_NAME_ELSE);
     const auto IRBlockEnd = codeGen->createBlock(BLOCK_NAME_IF_END);
 
-    // if block
+    // if block (caller entered the scope)
     codeGen->builder.CreateCondBr(ifCondIR, IRBlockTrue, IRBlockElseIfCheck);
     codeGen->startBlock(IRBlockTrue);
     ifBlock->createIRValue(codeGen);
     codeGen->branchIfNeeded(IRBlockEnd);
+    codeGen->stack.exitScope();
 
     for (int i = 0; i < elseIfs.size(); ++i) {
         const auto elseIfPair = elseIfs[i];
         const auto expr = elseIfPair.first;
         const auto stmtBlock = elseIfPair.second;
+        codeGen->stack.enterScope(this, stmtBlock);
         codeGen->startBlock(IRBlockElseIfCheck);
         const auto elseIfCondIR = expr->getIRValue(codeGen);
         IRBlockTrue = codeGen->createBlock(BLOCK_NAME_ELSE_IF);
@@ -82,12 +88,15 @@ void LgsIfStmt::generateComplexIf(LgsCodeGen* codeGen) {
         codeGen->startBlock(IRBlockTrue);
         stmtBlock->createIRValue(codeGen);
         codeGen->branchIfNeeded(IRBlockEnd);
+        codeGen->stack.exitScope();
     }
 
     if (IRBlockElse) {
+        codeGen->stack.enterScope(this, elseBlock);
         codeGen->startBlock(IRBlockElse);
         elseBlock->createIRValue(codeGen);
         codeGen->branchIfNeeded(IRBlockEnd);
+        codeGen->stack.exitScope();
     }
     codeGen->startBlock(IRBlockEnd);
 }
@@ -97,34 +106,34 @@ void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) {
     const auto exitBlock = codeGen->createBlock(BLOCK_NAME_EXIT_PATTERN);
     const auto defaultBlock = codeGen->createBlock(BLOCK_NAME_DEFAULT_CASE);
     const auto switchInst = codeGen->builder.CreateSwitch(exprIRValue, defaultBlock);
-
     vector<BasicBlock*> blocks;
     for (size_t i = 0; i < elseIfs.size(); ++i) {
         const auto elseIfPair = elseIfs[i];
         const auto expr = elseIfPair.first;
         const auto stmtsBlock = elseIfPair.second;
+        codeGen->stack.enterScope(this, stmtsBlock);
         const auto patterIRValue = expr->hashValue(codeGen);
-        const auto IRFunc = codeGen->stack.currentFunc()->getIRFunc(codeGen);
+        const auto IRFunc = codeGen->stack.getCurrentFunc()->getIRFunc(codeGen);
         const auto patternBlock = codeGen->createBlock(BLOCK_NAME_CASE_PREFIX + to_string(i), IRFunc);
         switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
         codeGen->builder.SetInsertPoint(patternBlock);
         stmtsBlock->createIRValue(codeGen);
         codeGen->builder.CreateBr(exitBlock);
+        codeGen->stack.exitScope();
     }
 
+    codeGen->stack.enterScope(this, elseBlock);
     codeGen->startBlock(defaultBlock);
     elseBlock->createIRValue(codeGen);
+    codeGen->stack.exitScope();
 
     codeGen->builder.CreateBr(exitBlock);
     codeGen->startBlock(exitBlock);
 }
 
-bool LgsIfStmt::shouldBranch(LgsCodeGen* codeGen, Value* ifCondIR) const {
+bool LgsIfStmt::shouldBranch(Value* ifCondIR) {
     if (const auto* constBool = dyn_cast<ConstantInt>(ifCondIR)) {
-        if (constBool->isOne()) {
-            ifBlock->createIRValue(codeGen);
-        }
-        return false;
+        return constBool->isOne();
     }
     return true;
 }

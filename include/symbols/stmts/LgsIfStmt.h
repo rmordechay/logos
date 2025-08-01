@@ -14,10 +14,10 @@ public:
 
     explicit LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock = nullptr) : ifCond(ifCond), ifBlock(ifStmtBlock) {}
     void createIRStmt(LgsCodeGen* codeGen) override;
-    void generateIfElse(LgsCodeGen* codeGen);
-    void generateSimpleIf(LgsCodeGen* codeGen);
-    void generateComplexIf(LgsCodeGen* codeGen);
+    void generateSimpleIf(LgsCodeGen* codeGen, Value* ifCondIR) const;
+    void generateIfWithElse(LgsCodeGen* codeGen, Value* ifCondIR);
+    void generateElseIf(LgsCodeGen* codeGen, Value* ifCondIR);
     void generatePatternMatching(LgsCodeGen* codeGen);
-    bool shouldBranch(LgsCodeGen* codeGen, Value* ifCondIR) const;
+    static bool shouldBranch(Value* ifCondIR);
     ~LgsIfStmt() override;
 };

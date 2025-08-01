@@ -3,9 +3,9 @@
 #include "stmts/LgsVarDec.h"
 
 void LgsForLoop::createIRStmt(LgsCodeGen* codeGen) {
-    codeGen->stack.enterScope(this);
+    codeGen->stack.enterScope(this, stmtsBlock);
     initIRLoop(codeGen);
-    stmtBlock->createIRValue(codeGen);
+    stmtsBlock->createIRValue(codeGen);
     IRLoopPrologue(codeGen);
     codeGen->startBlock(IRExitBlock);
     codeGen->stack.exitScope();

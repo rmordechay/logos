@@ -24,7 +24,7 @@ void LgsStmtsBlock::cleanup(LgsCodeGen* codeGen) const {
 
 void LgsStmtsBlock::initCleanup(LgsCodeGen* codeGen) {
     cleanupBlock = codeGen->createBlock(BLOCK_NAME_CLEANUP);
-    const auto currentFunc = codeGen->stack.currentFunc();
+    const auto currentFunc = codeGen->stack.getCurrentFunc();
     const auto IRReturnType = currentFunc->funcType->rt->getIRType(codeGen);
     returnPhiNode = codeGen->builder.CreatePHI(IRReturnType, returnExprs.size());
 }

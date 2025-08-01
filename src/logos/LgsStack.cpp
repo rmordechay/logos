@@ -3,13 +3,13 @@
 #include "loops/LgsForLoop.h"
 #include "stmts/LgsIfStmt.h"
 
-void LgsStack::enterScope(LgsValue* value) {
-    LgsStackFrame stackFrame;
+void LgsStack::enterScope(LgsValue* value, LgsStmtsBlock* stmtsBlock) {
+    LgsStackFrame stackFrame = {.stmtsBlock = stmtsBlock};
     if (const auto func = dynamic_cast<LgsFunc*>(value)) {
-        stackFrame = {.func = func};
+        stackFrame.func = func;
     } else {
-        stackFrame = {.func = currentFunc(), .symbolTable = top().symbolTable};
-        stackFrame.loop = currentLoop();
+        stackFrame.func = top().func;
+        stackFrame.symbolTable = top().symbolTable;
         if (const auto forLoop = dynamic_cast<LgsForLoop*>(value)) {
             stackFrame.loop = forLoop;
         }
@@ -21,30 +21,17 @@ void LgsStack::exitScope() {
     pop();
 }
 
-LgsFunc* LgsStack::currentFunc() {
+LgsFunc* LgsStack::getCurrentFunc() {
     return top().func;
 }
 
-LgsStmtsBlock* LgsStack::currentStmtsBlock() {
+LgsStmtsBlock* LgsStack::getCurrentStmtsBlock() {
     return top().stmtsBlock;
 }
 
-LgsForLoop* LgsStack::currentLoop() {
-    return top().loop;
-}
-
-auto LgsStack::begin() {
-    return c.begin();
-}
-
-auto LgsStack::end() {
-    return c.end();
-}
-
-auto LgsStack::rbegin() {
-    return c.rbegin();
-}
-
-auto LgsStack::rend() {
-    return c.rend();
+LgsForLoop* LgsStack::getCurrentLoop() {
+    for (auto it = rbegin(); it != rend(); ++it) {
+        if (it->loop) return it->loop;
+    }
+    return nullptr;
 }

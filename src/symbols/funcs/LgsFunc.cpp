@@ -7,9 +7,9 @@
 #include "utils/LgsUtils.h"
 
 void LgsFunc::generateIR(LgsCodeGen* codeGen) {
-    codeGen->stack.enterScope(this);
+    codeGen->stack.enterScope(this, stmtsBlock);
     startFuncBlock(codeGen);
-    stmtBlock->createIRValue(codeGen);
+    stmtsBlock->createIRValue(codeGen);
     if (!codeGen->lastInstTerminator()) {
         codeGen->callPopStack();
         codeGen->builder.CreateRetVoid();
@@ -98,13 +98,13 @@ string LgsFunc::format(string& tabs) {
     if (funcType->name != LOGOS_MAIN_FUNC_NAME) {
         str << funcType->rt->getName();
     }
-    str << stmtBlock->format(tabs);
+    str << stmtsBlock->format(tabs);
     return str.str();
 }
 
 LgsFunc::~LgsFunc() {
     freeType(type);
-    if (stmtBlock) {
-        delete stmtBlock;
+    if (stmtsBlock) {
+        delete stmtsBlock;
     }
 }
