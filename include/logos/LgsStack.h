@@ -23,6 +23,7 @@ public:
     void exitScope();
     LgsFunc* currentFunc();
     LgsForLoop* currentLoop();
+    LgsStmtsBlock* getParentBlock() const;
     LgsStmtsBlock* currentStmtsBlock();
     LgsSymbolTable& getSymbolTable();
     void addHeapAllocExpr(LgsExpr* expr);

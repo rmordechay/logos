@@ -43,3 +43,7 @@ LgsForLoop* LgsStack::currentLoop() {
     }
     return nullptr;
 }
+
+LgsStmtsBlock* LgsStack::getParentBlock() const {
+    return this->c[this->size() - 2].stmtsBlock;
+}

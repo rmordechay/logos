@@ -63,7 +63,7 @@ public:
     void visitForeachLoop(LgsForeachLoop* foreachLoop);
     void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
     void visitCoroutine(const LgsCoroutine* coroutine);
-    void visitReturnStmt(const LgsReturn* returnStmt);
+    void visitReturnStmt(LgsReturn* returnStmt);
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
     void visitArrayExpr(const LgsArrayExpr* array);
@@ -76,7 +76,6 @@ public:
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
-    void visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType);
     void visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);

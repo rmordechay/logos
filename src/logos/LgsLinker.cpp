@@ -63,24 +63,23 @@ bool LgsLinker::link() const {
 }
 
 bool LgsLinker::generateObjFile(unique_ptr<Module> mainModule) const {
-    PassBuilder passBuilder(targetMachine);
-    LoopAnalysisManager loopAnalyser;
-    FunctionAnalysisManager funcAnalyser;
-    CGSCCAnalysisManager CGAnalyser;
-    ModuleAnalysisManager analysisManager;
-    passBuilder.registerModuleAnalyses(analysisManager);
-    passBuilder.registerFunctionAnalyses(funcAnalyser);
-    passBuilder.registerLoopAnalyses(loopAnalyser);
-    passBuilder.registerCGSCCAnalyses(CGAnalyser);
-    passBuilder.crossRegisterProxies(loopAnalyser, funcAnalyser, CGAnalyser, analysisManager);
-
-    PassManager<Module, AnalysisManager<Module>> passManager;
-    passManager.addPass(CoroEarlyPass());
-    passManager.addPass(createModuleToPostOrderCGSCCPassAdaptor(CoroSplitPass()));
-    passManager.addPass(CoroCleanupPass());
-    // passManager.addPass(createModuleToPostOrderCGSCCPassAdaptor(CoroElidePass()));
+    // PassBuilder passBuilder(targetMachine);
+    // LoopAnalysisManager loopAnalyser;
+    // FunctionAnalysisManager funcAnalyser;
+    // CGSCCAnalysisManager CGAnalyser;
+    // ModuleAnalysisManager analysisManager;
+    // passBuilder.registerModuleAnalyses(analysisManager);
+    // passBuilder.registerFunctionAnalyses(funcAnalyser);
+    // passBuilder.registerLoopAnalyses(loopAnalyser);
+    // passBuilder.registerCGSCCAnalyses(CGAnalyser);
+    // passBuilder.crossRegisterProxies(loopAnalyser, funcAnalyser, CGAnalyser, analysisManager);
+    //
+    // PassManager<Module, AnalysisManager<Module>> passManager;
+    // passManager.addPass(CoroEarlyPass());
+    // passManager.addPass(createModuleToPostOrderCGSCCPassAdaptor(CoroSplitPass()));
+    // passManager.addPass(CoroCleanupPass());
     // passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(OptimizationLevel::O3)));
-    passManager.run(*mainModule, analysisManager);
+    // passManager.run(*mainModule, analysisManager);
 
     error_code ec;
     legacy::PassManager pass;

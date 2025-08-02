@@ -117,7 +117,7 @@ void SemaAnalyser::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     }
     const auto lastStmt = stmtsBlock->lastStmt();
     if (!lastStmt->isTerminator()) return;
-    stmtsBlock->hasReturn = !!lastStmt->asReturn();
+    stmtsBlock->returnExpr = lastStmt->asReturn();
     for (int i = 0; i < stmtsBlock->stmts.size() - 1; ++i) {
         if (stmtsBlock->stmts[i]->isTerminator()) {
             return errHandler.handleError(E10059, &lastStmt->location);
@@ -291,11 +291,11 @@ void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
     }
 }
 
-void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
+void SemaAnalyser::visitReturnStmt(LgsReturn* returnStmt) {
     const auto funcType = stack.currentFunc()->funcType;
     const auto retExpr = returnStmt->expr;
     if (retExpr) {
-        stack.currentFunc()->returnExprs.push_back(retExpr);
+        stack.currentFunc()->returnStmts.push_back(returnStmt);
         visitExpr(retExpr);
     }
     const auto rt = funcType->rt;
@@ -577,18 +577,6 @@ void SemaAnalyser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
     prefixExpr->setType(type);
 }
 
-void SemaAnalyser::visitAnonymousFunc(LgsFuncCall* funcCall, LgsFuncType* funcType) {
-    for (const auto& arg : funcCall->args) {
-        visitExpr(arg);
-    }
-    if (!funcCall->equals(funcType)) {
-        errHandler.handleError(E10006, &funcCall->location, {funcCall->name});
-        return;
-    }
-    funcCall->setType(funcType->rt);
-    funcCall->func = new LgsFunc(funcType);
-}
-
 void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto exprFrom = iterIndex->index->from;
@@ -850,7 +838,7 @@ void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
 
 bool SemaAnalyser::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func) {
     if (!stmtBlock) return true;
-    if (stmtBlock->hasReturn) return true;
+    if (stmtBlock->returnExpr) return true;
     auto isValid = false;
     for (const auto stmt : stmtBlock->stmts) {
         if (const auto ifStmt = stmt->asIfStmt()) {

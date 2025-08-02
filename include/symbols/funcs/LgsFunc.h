@@ -11,9 +11,8 @@ class LgsType;
 class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
-    vector<LgsExpr*> returnExprs;
+    vector<LgsReturn*> returnStmts;
     LgsStmtsBlock* stmtsBlock = nullptr;
-    PHINode* returnPhiNode = nullptr;
     bool isBuiltin = false;
     off_t pathIndex = 0;
 
@@ -24,7 +23,6 @@ public:
         funcType->params = params;
         type = funcType;
     }
-    explicit LgsFunc(LgsFuncType* funcType) : LgsUnaryExpr(funcType), funcType(funcType) {}
     string prettyName() override;
     string format(string& tabs) override;
     Value* createIRValue(LgsCodeGen* codeGen) override;

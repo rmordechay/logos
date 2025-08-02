@@ -59,15 +59,15 @@ public:
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, bool isSingleton);
     LgsField* getField(LogosParser::FieldContext* ctx, string& parentName);
-    LgsFunc* getFuncImpl(LogosParser::FuncImplContext* ctx);
+    LgsFunc* getFunc(LogosParser::FuncImplContext* ctx);
     void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);
     LgsFunc* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param);
     LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName);
-    LgsFunc* getMethodImpl(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
+    LgsFunc* getMethod(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
-    LgsStmtsBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
+    LgsStmtsBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx, bool isTerminal);
     LgsCoroutine* getCoroutine(LogosParser::CoroutineContext* ctx);
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);

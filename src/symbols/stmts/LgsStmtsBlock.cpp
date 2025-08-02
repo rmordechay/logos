@@ -9,13 +9,28 @@ void LgsStmtsBlock::createIRValue(LgsCodeGen* codeGen) {
         stmt->createIRStmt(codeGen);
     }
     if (needsCleanup()) {
-        const auto currentFunc = codeGen->stack.currentFunc();
-        codeGen->branchAndStartBlock(getCleanupBlock(codeGen));
-        for (const auto expr : heapAllocExprs) {
-            expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
-        }
-        if (hasReturn) {
-            codeGen->builder.CreateRet(currentFunc->returnPhiNode);
+        cleanupExprs(codeGen);
+    }
+}
+
+void LgsStmtsBlock::cleanupExprs(LgsCodeGen* codeGen) {
+    const auto cleanupBlock = getCleanupBlock(codeGen);
+    codeGen->branchAndStartBlock(cleanupBlock);
+    const auto currentFunc = codeGen->stack.currentFunc();
+    for (const auto expr : heapAllocExprs) {
+        expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
+    }
+    if (returnExpr) {
+        if (isTerminal) {
+            const auto IRReturnType = currentFunc->funcType->rt->getIRType(codeGen);
+            const auto returnPhiNode = codeGen->builder.CreatePHI(IRReturnType, currentFunc->returnStmts.size());
+            for (const auto returnStmt : currentFunc->returnStmts) {
+                returnPhiNode->addIncoming(returnStmt->expr->getIRValue(codeGen), returnStmt->parentBlock);
+            }
+            codeGen->builder.CreateRet(returnPhiNode);
+        } else {
+            const auto stmtsBlock = codeGen->stack.getParentBlock();
+            codeGen->builder.CreateBr(stmtsBlock->getCleanupBlock(codeGen));
         }
     }
 }
