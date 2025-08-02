@@ -256,7 +256,8 @@ constructorArg:
     ;
 
 constant:
-        INTEGER
+        LONG
+    |   INTEGER
     |   FLOAT
     |   BOOL
     |   STRING
@@ -429,6 +430,7 @@ OR: 'or';
 NOT: 'not';
 IN: 'in';
 
+LONG: [0-9][0-9_]*'L';
 INTEGER: [0-9][0-9_]*;
 FLOAT: '-'?[0-9]+'.'[0-9]+;
 BOOL: 'true' | 'false';

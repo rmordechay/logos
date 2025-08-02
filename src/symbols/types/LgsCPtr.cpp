@@ -1,6 +1,8 @@
 #include "types/LgsCPtr.h"
 #include "exprs/LgsNullValue.h"
 #include "types/LgsAny.h"
+#include "types/LgsDArray.h"
+#include "types/LgsSArray.h"
 #include "types/primitives/LgsLong.h"
 
 string LgsCPtr::getName() {
@@ -27,5 +29,7 @@ bool LgsCPtr::equals(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsLong::name) return true;
+    if (IRName == LgsSArray::name) return true;
+    if (IRName == LgsDArray::name) return true;
     return name == IRName;
 }

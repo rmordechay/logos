@@ -4,7 +4,7 @@
 
 class LgsCPtr final : public LgsType {
 public:
-    static constexpr auto name = "Ptr";
+    static constexpr auto name = "CPtr";
     LgsType* baseType;
 
     explicit LgsCPtr(LgsType* baseType) : baseType(baseType) {}

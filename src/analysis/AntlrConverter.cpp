@@ -911,6 +911,8 @@ LgsUnaryExpr* AntlrConverter::getConstant(LogosParser::ConstantContext* ctx) con
         } else {
             constant = new LgsLongConst(longValue);
         }
+    } else if (const auto longToken = ctx->LONG()) {
+        constant = new LgsLongConst(std::stol(longToken->getText()));
     } else if (const auto floatToken = ctx->FLOAT()) {
         const auto value = stof(floatToken->getText());
         constant = new LgsFloatConst(value);

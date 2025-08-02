@@ -64,7 +64,7 @@ Value* LgsFunc::call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) {
 }
 
 Value* LgsFunc::callIR(LgsCodeGen* codeGen, const vector<Value*>& args) {
-    if (!isBuiltin) codeGen->callPushStack(pathIndex);
+    codeGen->callPushStack(pathIndex);
     CallInst* rv = nullptr;
     if (IRValue) {
         const auto funcTypeIR = funcType->getIRType(codeGen);
@@ -74,7 +74,7 @@ Value* LgsFunc::callIR(LgsCodeGen* codeGen, const vector<Value*>& args) {
         const auto IRFunc = getIRFunc(codeGen);
         rv = codeGen->builder.CreateCall(IRFunc, args);
     }
-    if (!isBuiltin) codeGen->callPopStack();
+    codeGen->callPopStack();
     return rv;
 }
 

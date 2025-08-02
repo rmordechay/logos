@@ -27,7 +27,9 @@ Value* LgsCodeGen::getIRStr(const string& value) {
         return &globals;
     }
     const auto strConstant = ConstantDataArray::getString(context, value, true);
-    return createPrivateGlobal(strConstant);
+    const auto globalVariable = createPrivateGlobal(strConstant);
+    globalVariable->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
+    return globalVariable;
 }
 
 StructType* LgsCodeGen::getIRStructType(const string& name, const vector<Type*>& fields) {

@@ -26,8 +26,9 @@ public:
     EXTERN = 57, VISIBILITY = 58, IMPLEMENTS = 59, CONST = 60, ENUM = 61, 
     GO = 62, VEC2 = 63, VEC3 = 64, VEC4 = 65, IF = 66, ELSE = 67, FOR = 68, 
     BREAK = 69, CONTINUE = 70, RETURN = 71, AND = 72, OR = 73, NOT = 74, 
-    IN = 75, INTEGER = 76, FLOAT = 77, BOOL = 78, NULL_ = 79, IDENTIFIER = 80, 
-    STRING = 81, TAG = 82, LINE_COMMENT = 83, BLOCK_COMMENT = 84, WS = 85
+    IN = 75, LONG = 76, INTEGER = 77, FLOAT = 78, BOOL = 79, NULL_ = 80, 
+    IDENTIFIER = 81, STRING = 82, TAG = 83, LINE_COMMENT = 84, BLOCK_COMMENT = 85, 
+    WS = 86
   };
 
   enum {
@@ -1004,6 +1005,7 @@ public:
   public:
     ConstantContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LONG();
     antlr4::tree::TerminalNode *INTEGER();
     antlr4::tree::TerminalNode *FLOAT();
     antlr4::tree::TerminalNode *BOOL();

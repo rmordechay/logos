@@ -1,6 +1,4 @@
 #include "extern/LgsCLangVisitor.h"
-
-#include "configs/LgsDefinitions.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "files/LgsFile.h"
 #include "stmts/LgsField.h"
@@ -12,7 +10,7 @@
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsUInt.h"
-#include "../../include/symbols/types/LgsVoid.h"
+#include "types/LgsVoid.h"
 
 bool isCharPointer(const clang::QualType qt) {
     if (!qt->isPointerType()) return false;
