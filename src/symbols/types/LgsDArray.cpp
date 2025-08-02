@@ -69,12 +69,15 @@ StructType* LgsDArray::getArrStruct(LgsCodeGen* codeGen) {
 }
 
 Value* LgsArrayAddFunc::call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) {
-    const auto arr = args.front();
-    const auto baseType = arr->type->asIterable()->baseType;
-    const auto baseTypeIR = baseType->getIRType(codeGen);
-    const auto valuePtr = codeGen->builder.CreateAlloca(baseTypeIR);
-    codeGen->builder.CreateStore(args[1]->getIRValue(codeGen), valuePtr);
-    return callIR(codeGen, {arr->getIRValue(codeGen), valuePtr});
+    const auto arr = args[0];
+    const auto exprToAdd = args[1];
+    const auto exprIR = exprToAdd->getIRValue(codeGen);
+    if (exprToAdd->type->asBool()) return addBoolFunc.callIR(codeGen, {arr->getIRValue(codeGen), exprIR});
+    if (exprToAdd->type->asChar()) return addByteFunc.callIR(codeGen, {arr->getIRValue(codeGen), exprIR});
+    if (exprToAdd->type->asShort()) return addShortFunc.callIR(codeGen, {arr->getIRValue(codeGen), exprIR});
+    if (exprToAdd->type->asInt()) return addIntFunc.callIR(codeGen, {arr->getIRValue(codeGen), exprIR});
+    if (exprToAdd->type->asLong()) return addLongFunc.callIR(codeGen, {arr->getIRValue(codeGen), exprIR});
+    return callIR(codeGen, {arr->getIRValue(codeGen), exprIR});
 }
 
 LgsDArray::~LgsDArray() {

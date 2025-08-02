@@ -4,10 +4,17 @@
 
 class LgsBuiltinFunc : public LgsFunc {
 public:
+    LgsBuiltinFunc(const string& name, LgsType* rt): LgsFunc(name, rt) {
+        isBuiltin = true;
+    }
     LgsBuiltinFunc(const string& name, LgsType* rt, const string& parentName, const vector<LgsType*>& paramsTypes, const bool isPublic = false, const bool isVariadic = false): LgsFunc(name, rt) {
         isBuiltin = true;
         funcType->isPublic = isPublic;
         funcType->isVariadic = isVariadic;
+        init(parentName, paramsTypes);
+    }
+
+    void init(const string& parentName, const vector<LgsType*>& paramsTypes) const {
         if (parentName != "") {
             funcType->parentName = parentName;
             funcType->isMethod = true;

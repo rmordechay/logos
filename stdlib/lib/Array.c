@@ -1,4 +1,5 @@
 #include "Iterator.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,6 +31,26 @@ void Array_add(Array* arr, const void* value) {
     void* target = (char*)arr->data + arr->size * arr->element_size;
     memcpy(target, value, arr->element_size);
     arr->size++;
+}
+
+void Array_addBool(Array* arr, const bool value) {
+    Array_add(arr, &value);
+}
+
+void Array_addByte(Array* arr, const int8_t value) {
+    Array_add(arr, &value);
+}
+
+void Array_addShort(Array* arr, const int16_t value) {
+    Array_add(arr, &value);
+}
+
+void Array_addInt(Array* arr, const int32_t value) {
+    Array_add(arr, &value);
+}
+
+void Array_addLong(Array* arr, const int64_t value) {
+    Array_add(arr, &value);
 }
 
 void* Array_get(const Array* arr, const size_t index) {

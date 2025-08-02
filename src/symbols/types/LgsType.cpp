@@ -56,6 +56,7 @@ size_t LgsType::getSizeBytes() { assert(0); }
 void LgsType::freeValue(LgsCodeGen* codeGen, Value* value) {}
 string LgsType::getStrFormatPart() const { assert(0); }
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
+LgsChar* LgsType::asChar() { return dynamic_cast<LgsChar*>(this); }
 LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }
 LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }
 LgsLong* LgsType::asLong() { return dynamic_cast<LgsLong*>(this); }

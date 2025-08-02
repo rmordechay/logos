@@ -5,11 +5,24 @@
 #include "primitives/LgsInt.h"
 #include "primitives/LgsLong.h"
 #include "LgsVoid.h"
+#include "primitives/LgsChar.h"
+#include "primitives/LgsShort.h"
 #include "types/LgsIterable.h"
 
 class LgsArrayAddFunc final : public LgsBuiltinFunc {
 public:
-    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getName(), {parent, &LGS_ANY}, true) {}
+    LgsBuiltinFunc addBoolFunc{"addBool", &LGS_VOID};
+    LgsBuiltinFunc addByteFunc{"addByte", &LGS_VOID};
+    LgsBuiltinFunc addShortFunc{"addShort", &LGS_VOID};
+    LgsBuiltinFunc addIntFunc{"addInt", &LGS_VOID};
+    LgsBuiltinFunc addLongFunc{"addLong", &LGS_VOID};
+    explicit LgsArrayAddFunc(LgsType* parent) : LgsBuiltinFunc("add", &LGS_VOID, parent->getName(), {parent, &LGS_ANY}, true) {
+        addBoolFunc.init(parent->getName(), {parent, &LGS_BOOL});
+        addByteFunc.init(parent->getName(), {parent, &LGS_CHAR});
+        addShortFunc.init(parent->getName(), {parent, &LGS_SHORT});
+        addIntFunc.init(parent->getName(), {parent, &LGS_INT});
+        addLongFunc.init(parent->getName(), {parent, &LGS_LONG});
+    }
     Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override;
     ~LgsArrayAddFunc() override = default;
 };

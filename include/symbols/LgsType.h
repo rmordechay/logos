@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsLocation.h"
 
+class LgsChar;
 class LgsVariable;
 class LgsSArray;
 class LgsNullable;
@@ -50,6 +51,7 @@ public:
     void setLocation(const Token* begin, const Token* end, const path& filePath);
 
     LgsBool* asBool();
+    LgsChar* asChar();
     LgsStr* asStr();
     LgsInt* asInt();
     LgsShort* asShort();
