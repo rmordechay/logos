@@ -35,7 +35,6 @@
 #include <clang/Tooling/Tooling.h>
 #include <clang/CodeGen/CodeGenAction.h>
 #include <clang/Basic/Diagnostic.h>
-#include <lld/Common/Driver.h>
 
 using namespace std;
 using namespace filesystem;

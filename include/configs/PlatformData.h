@@ -15,7 +15,6 @@
 #endif
 
 #if defined(__linux__)
-    LLD_HAS_DRIVER(elf);
     #define OS_NAME "Linux"
     #define LINKER "ld"
     #define CLIB_ROOT "/usr/lib/aarch64-linux-gnu/"
@@ -31,7 +30,6 @@
         "/usr/lib/aarch64-linux-gnu/crtn.o", \
     }
 #elif defined(__APPLE__) && defined(__MACH__)
-    LLD_HAS_DRIVER(macho);
     #define OS_NAME "macOS"
     #define LINKER "ld.lld"
     #define CLIB_ROOT "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"

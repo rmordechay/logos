@@ -8,6 +8,14 @@
 #include <llvm/Transforms/Coroutines/CoroEarly.h>
 #include <llvm/Transforms/Coroutines/CoroCleanup.h>
 
+namespace lld::macho {
+    bool link(ArrayRef<const char *> args, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
+}
+
+namespace lld::elf {
+    bool link(ArrayRef<const char *> args, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
+}
+
 unique_ptr<Module> parseModule(LLVMContext& context, const string& path) {
     SMDiagnostic diag;
     auto parsedModule = parseIRFile(path, diag, context);
