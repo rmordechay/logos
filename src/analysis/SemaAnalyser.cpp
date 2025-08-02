@@ -292,10 +292,10 @@ void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
 }
 
 void SemaAnalyser::visitReturnStmt(const LgsReturn* returnStmt) {
-    const auto funcType = stack.getCurrentFunc()->funcType;
+    const auto funcType = stack.currentFunc()->funcType;
     const auto retExpr = returnStmt->expr;
     if (retExpr) {
-        stack.getCurrentStmtsBlock()->returnExprs.push_back(retExpr);
+        stack.currentFunc()->returnExprs.push_back(retExpr);
         visitExpr(retExpr);
     }
     const auto rt = funcType->rt;
@@ -316,6 +316,9 @@ void SemaAnalyser::visitExpr(LgsExpr* expr) {
         visitUnaryExpr(unaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
+    }
+    if (expr->isHeapAlloc) {
+        stack.addHeapAllocExpr(expr);
     }
 }
 
@@ -881,7 +884,7 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsLocation* locati
         const auto symbol = externalFile->second->symbolTable.getSymbol(name);
         if (symbol) return symbol;
     }
-    if (const auto symbol = stack.top().symbolTable.getSymbol(name)) {
+    if (const auto symbol = stack.getSymbolTable().getSymbol(name)) {
         return symbol;
     }
     if (location) {
@@ -891,7 +894,7 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsLocation* locati
 }
 
 void SemaAnalyser::addLocalSymbol(const LgsSymbol& newSymbol) {
-    stack.top().symbolTable.addSymbol(*newSymbol.name, newSymbol, &errHandler);
+    stack.getSymbolTable().addSymbol(*newSymbol.name, newSymbol, &errHandler);
 }
 
 void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {

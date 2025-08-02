@@ -78,6 +78,10 @@ void LgsFunc::startFuncBlock(LgsCodeGen* codeGen) {
     const auto IRFunc = getIRFunc(codeGen);
     const auto entryBlock = codeGen->createBlock(BLOCK_NAME_ENTRY, IRFunc);
     codeGen->builder.SetInsertPoint(entryBlock);
+    if (!returnExprs.empty()) {
+        const auto IRReturnType = funcType->rt->getIRType(codeGen);
+        returnPhiNode = codeGen->builder.CreatePHI(IRReturnType, returnExprs.size());
+    }
 }
 
 string LgsFunc::prettyName() {

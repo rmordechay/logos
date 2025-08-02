@@ -17,13 +17,15 @@ struct LgsStackFrame {
     LgsStmtsBlock* stmtsBlock = nullptr;
 };
 
-class LgsStack final : public stack<LgsStackFrame> {
+class LgsStack final : stack<LgsStackFrame> {
 public:
     void enterScope(LgsValue* value, LgsStmtsBlock* stmtsBlock);
     void exitScope();
-    LgsFunc* getCurrentFunc();
-    LgsForLoop* getCurrentLoop();
-    LgsStmtsBlock* getCurrentStmtsBlock();
+    LgsFunc* currentFunc();
+    LgsForLoop* currentLoop();
+    LgsStmtsBlock* currentStmtsBlock();
+    LgsSymbolTable& getSymbolTable();
+    void addHeapAllocExpr(LgsExpr* expr);
     auto begin() { return c.begin(); }
     auto end() { return c.end(); }
     auto rbegin() { return c.rbegin(); }

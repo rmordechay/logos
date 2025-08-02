@@ -3,6 +3,8 @@ project(logos VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_COMPILER_LAUNCHER ccache)
+set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 find_package(ZLIB REQUIRED)
 
@@ -95,9 +97,9 @@ set(SOURCE_FILES
 
 add_subdirectory(stdlib)
 add_library(lib ${SOURCE_FILES})
+target_link_libraries(lib PRIVATE lgslib)
 target_precompile_headers(lib PRIVATE include/pch.h)
 
-target_link_libraries(lib PRIVATE lgslib)
 target_include_directories(lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/stdlib/include
@@ -113,7 +115,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libclang-cpp.dylib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/liblldCommon.dylib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/liblldMachO.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libantlr.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libantlr4.dylib
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(lib PRIVATE

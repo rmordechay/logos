@@ -31,7 +31,6 @@ public:
     void startBlock(BasicBlock* block);
     void branchIfNeeded(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);
-    void branchToCleanup(Value* exprIR = nullptr);
 
     // Funcs
     Value* callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args = {});

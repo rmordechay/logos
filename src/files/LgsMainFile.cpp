@@ -3,7 +3,6 @@
 #include "types/LgsEnum.h"
 #include "types/LgsObject.h"
 
-
 void LgsMainFile::generateIR() {
     codeGen.setIRModule(LOGOS_MAIN_FILE_NAME);
     for (const auto object : objects) {

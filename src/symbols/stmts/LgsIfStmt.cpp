@@ -112,7 +112,7 @@ void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) {
         const auto stmtsBlock = elseIfPair.second;
         codeGen->stack.enterScope(this, stmtsBlock);
         const auto patterIRValue = expr->hashValue(codeGen);
-        const auto IRFunc = codeGen->stack.getCurrentFunc()->getIRFunc(codeGen);
+        const auto IRFunc = codeGen->stack.currentFunc()->getIRFunc(codeGen);
         const auto patternBlock = codeGen->createBlock(BLOCK_NAME_CASE_PREFIX + to_string(i), IRFunc);
         switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
         codeGen->builder.SetInsertPoint(patternBlock);

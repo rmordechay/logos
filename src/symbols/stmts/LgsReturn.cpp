@@ -2,21 +2,23 @@
 #include "funcs/LgsFunc.h"
 
 void LgsReturn::createIRStmt(LgsCodeGen* codeGen) {
-    const auto withCleanup = codeGen->stack.getCurrentStmtsBlock()->needsCleanup();
+    const auto exprIR = expr ? expr->getIRValue(codeGen) : nullptr;
+    const auto currentFunc = codeGen->stack.currentFunc();
+    const auto currentStmtsBlock = codeGen->stack.currentStmtsBlock();
+    const auto withCleanup = currentStmtsBlock->needsCleanup();
     if (withCleanup) {
-        const auto exprIR = expr ? expr->getIRValue(codeGen) : nullptr;
-        codeGen->branchToCleanup(exprIR);
-    } else {
-        if (expr) {
-            const auto exprIR = expr->getIRValue(codeGen);
-            if (!codeGen->stack.getCurrentFunc()->funcType->rt->isVoid) {
-                codeGen->callPopStack();
-                codeGen->builder.CreateRet(exprIR);
-                return;
-            }
+        if (exprIR) {
+            currentFunc->returnPhiNode->addIncoming(exprIR, codeGen->builder.GetInsertBlock());
         }
+        const auto cleanupBlock = currentStmtsBlock->getCleanupBlock(codeGen);
+        codeGen->builder.CreateBr(cleanupBlock);
+    } else {
         codeGen->callPopStack();
-        codeGen->builder.CreateRetVoid();
+        if (currentFunc->funcType->rt->isVoid) {
+            codeGen->builder.CreateRetVoid();
+        } else {
+            codeGen->builder.CreateRet(exprIR);
+        }
     }
 }
 

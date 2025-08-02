@@ -735,15 +735,13 @@ LgsPostfixExpr* AntlrConverter::getPostfixExpr(LogosParser::PostfixExprContext* 
 }
 
 LgsUnaryExpr* AntlrConverter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {
-    const auto array = new LgsArrayExpr();
-    LgsIterable* arrType;
+    LgsArrayExpr* array = nullptr;
     if (ctx->EXCLA_MARK()) {
-        arrType = new LgsSArray();
+        array = new LgsArrayExpr(new LgsSArray());
     } else {
-        arrType = new LgsDArray();
+        array = new LgsArrayExpr(new LgsDArray());
     }
-    arrType->sizeExpr = new LgsIntConst(ctx->expr().size());
-    array->type = arrType;
+    array->type->asIterable()->sizeExpr = new LgsIntConst(ctx->expr().size());
     for (const auto expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }

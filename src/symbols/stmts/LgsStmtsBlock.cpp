@@ -5,40 +5,35 @@
 #include "stmts/LgsReturn.h"
 
 void LgsStmtsBlock::createIRValue(LgsCodeGen* codeGen) {
-    const auto withCleanup = needsCleanup();
-    if (withCleanup) {
-        initCleanup(codeGen);
-    }
     for (const auto stmt : stmts) {
         stmt->createIRStmt(codeGen);
     }
-    if (withCleanup) {
-        cleanup(codeGen);
+    if (needsCleanup()) {
+        const auto currentFunc = codeGen->stack.currentFunc();
+        codeGen->branchAndStartBlock(getCleanupBlock(codeGen));
+        for (const auto expr : heapAllocExprs) {
+            expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
+        }
+        if (hasReturn) {
+            codeGen->callPopStack();
+            codeGen->builder.CreateRet(currentFunc->returnPhiNode);
+        }
     }
 }
 
-void LgsStmtsBlock::cleanup(LgsCodeGen* codeGen) const {
-    codeGen->branchAndStartBlock(cleanupBlock);
-    codeGen->builder.CreateRet(returnPhiNode);
+bool LgsStmtsBlock::needsCleanup() const {
+    return !heapAllocExprs.empty();
 }
 
-void LgsStmtsBlock::initCleanup(LgsCodeGen* codeGen) {
+BasicBlock* LgsStmtsBlock::getCleanupBlock(LgsCodeGen* codeGen) {
+    if (cleanupBlock) return cleanupBlock;
     cleanupBlock = codeGen->createBlock(BLOCK_NAME_CLEANUP);
-    const auto currentFunc = codeGen->stack.getCurrentFunc();
-    const auto IRReturnType = currentFunc->funcType->rt->getIRType(codeGen);
-    returnPhiNode = codeGen->builder.CreatePHI(IRReturnType, returnExprs.size());
+    return cleanupBlock;
 }
 
 LgsStmt* LgsStmtsBlock::lastStmt() const {
     if (stmts.empty()) return nullptr;
     return stmts[stmts.size() - 1];
-}
-
-bool LgsStmtsBlock::needsCleanup() const {
-    if (heapAllocExprs.size() == 1 && returnExprs.size() == 1) {
-        return !heapAllocExprs.front()->equals(returnExprs.front());
-    }
-    return !heapAllocExprs.empty();
 }
 
 string LgsStmtsBlock::format(string& indentStr) {

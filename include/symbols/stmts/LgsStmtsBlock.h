@@ -4,17 +4,14 @@
 class LgsStmtsBlock final : public LgsValue {
 public:
     vector<LgsStmt*> stmts;
-    vector<LgsExpr*> returnExprs;
     vector<LgsExpr*> heapAllocExprs;
     BasicBlock* cleanupBlock = nullptr;
-    PHINode* returnPhiNode = nullptr;
     bool hasReturn = false;
 
     explicit LgsStmtsBlock(const vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
     bool needsCleanup() const;
+    BasicBlock* getCleanupBlock(LgsCodeGen* codeGen);
     void createIRValue(LgsCodeGen* codeGen);
-    void cleanup(LgsCodeGen* codeGen) const;
-    void initCleanup(LgsCodeGen* codeGen);
     LgsStmt* lastStmt() const;
     string format(string& indentStr) override;
     ~LgsStmtsBlock() override;

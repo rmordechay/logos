@@ -28,6 +28,7 @@ public:
     bool isNull = false;
     bool isSpread = false;
     bool isConstant = false;
+    bool isHeapAlloc = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     Value* getIRValue(LgsCodeGen* codeGen);

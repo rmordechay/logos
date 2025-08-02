@@ -11,7 +11,9 @@ class LgsType;
 class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
+    vector<LgsExpr*> returnExprs;
     LgsStmtsBlock* stmtsBlock = nullptr;
+    PHINode* returnPhiNode = nullptr;
     off_t pathIndex = 0;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {

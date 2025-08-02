@@ -21,15 +21,23 @@ void LgsStack::exitScope() {
     pop();
 }
 
-LgsFunc* LgsStack::getCurrentFunc() {
+LgsFunc* LgsStack::currentFunc() {
     return top().func;
 }
 
-LgsStmtsBlock* LgsStack::getCurrentStmtsBlock() {
+LgsStmtsBlock* LgsStack::currentStmtsBlock() {
     return top().stmtsBlock;
 }
 
-LgsForLoop* LgsStack::getCurrentLoop() {
+LgsSymbolTable& LgsStack::getSymbolTable() {
+    return top().symbolTable;
+}
+
+void LgsStack::addHeapAllocExpr(LgsExpr* expr) {
+    currentStmtsBlock()->heapAllocExprs.push_back(expr);
+}
+
+LgsForLoop* LgsStack::currentLoop() {
     for (auto it = rbegin(); it != rend(); ++it) {
         if (it->loop) return it->loop;
     }

@@ -115,12 +115,12 @@ void LgsApp::parseSrcFile(const string& codeText, path filePath) {
         errHandler.setUnsuccessful();
         return;
     }
-    AntlrConverter antlerConverter(filePath, globals);
-    const auto file = antlerConverter.getLogosFile(ast);
+    AntlrConverter antlrConverter(filePath, globals);
+    const auto file = antlrConverter.getLogosFile(ast);
     lock_guard lock(mtx);
     files.push_back(file);
-    if (!antlerConverter.errHandler.successful) {
-        errHandler.addErrors(antlerConverter.errHandler.errors);
+    if (!antlrConverter.errHandler.successful) {
+        errHandler.addErrors(antlrConverter.errHandler.errors);
         return;
     }
     for (const auto externFile : file->externFiles) {
