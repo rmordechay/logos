@@ -15,7 +15,6 @@ void LgsStmtsBlock::createIRValue(LgsCodeGen* codeGen) {
             expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
         }
         if (hasReturn) {
-            codeGen->callPopStack();
             codeGen->builder.CreateRet(currentFunc->returnPhiNode);
         }
     }

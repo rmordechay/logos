@@ -14,6 +14,7 @@ public:
     vector<LgsExpr*> returnExprs;
     LgsStmtsBlock* stmtsBlock = nullptr;
     PHINode* returnPhiNode = nullptr;
+    bool isBuiltin = false;
     off_t pathIndex = 0;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {

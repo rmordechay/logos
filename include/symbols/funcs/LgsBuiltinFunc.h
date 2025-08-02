@@ -5,6 +5,7 @@
 class LgsBuiltinFunc : public LgsFunc {
 public:
     LgsBuiltinFunc(const string& name, LgsType* rt, const string& parentName, const vector<LgsType*>& paramsTypes, const bool isPublic = false, const bool isVariadic = false): LgsFunc(name, rt) {
+        isBuiltin = true;
         funcType->isPublic = isPublic;
         funcType->isVariadic = isVariadic;
         if (parentName != "") {

@@ -13,7 +13,6 @@ void LgsReturn::createIRStmt(LgsCodeGen* codeGen) {
         const auto cleanupBlock = currentStmtsBlock->getCleanupBlock(codeGen);
         codeGen->builder.CreateBr(cleanupBlock);
     } else {
-        codeGen->callPopStack();
         if (currentFunc->funcType->rt->isVoid) {
             codeGen->builder.CreateRetVoid();
         } else {
