@@ -6,19 +6,26 @@ void LgsForLoop::createIRStmt(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, stmtsBlock);
     initIRLoop(codeGen);
     stmtsBlock->createIRValue(codeGen);
-    IRLoopPrologue(codeGen);
+    incIndex(codeGen);
     codeGen->startBlock(IRExitBlock);
     codeGen->stack.exitScope();
 }
 
-void LgsForLoop::setLoopTerminals(LgsCodeGen* codeGen, Value* iValue) {
-    if (isFirstVarDec) {
-        isFirstVarDec->setIRValue(codeGen->builder.CreateICmpEQ(iValue, loopEnd(codeGen)));
-    }
-    if (isLastVarDec) {
-        const auto decremented = codeGen->builder.CreateSub(loopEnd(codeGen), codeGen->i32(1));
-        isLastVarDec->setIRValue(codeGen->builder.CreateICmpEQ(iValue, decremented));
-    }
+void LgsForLoop::initIndex(LgsCodeGen* codeGen) {
+    iPtr = codeGen->builder.CreateAlloca(codeGen->i32Ty());
+    codeGen->builder.CreateStore(codeGen->i32Zero(), iPtr);
+}
+
+LoadInst* LgsForLoop::loadIndex(LgsCodeGen* codeGen) const {
+    return codeGen->builder.CreateLoad(codeGen->i32Ty(), iPtr);
+}
+
+void LgsForLoop::incIndex(LgsCodeGen* codeGen) const {
+    if (codeGen->lastInstTerminator()) return;
+    const auto iValue = loadIndex(codeGen);
+    const auto inc = codeGen->builder.CreateAdd(iValue, codeGen->i32(1));
+    codeGen->builder.CreateStore(inc, iPtr);
+    codeGen->builder.CreateBr(IRCondBlock);
 }
 
 LgsForLoop::~LgsForLoop() {

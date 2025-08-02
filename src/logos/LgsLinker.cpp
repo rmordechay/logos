@@ -1,8 +1,6 @@
 #include "logos/LgsLinker.h"
 #include "configs/LgsDefinitions.h"
-#include "configs/LgsConfig.h"
 #include "files/LgsFile.h"
-
 #include "utils/LgsUtils.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include <llvm/Transforms/Utils/Cloning.h>

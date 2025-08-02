@@ -18,11 +18,10 @@ public:
     LgsVarDec* isLastVarDec = nullptr;
 
     void createIRStmt(LgsCodeGen* codeGen) override;
-    void setLoopTerminals(LgsCodeGen* codeGen, Value* iValue);
-    virtual Value* loopStart(LgsCodeGen* codeGen) = 0;
-    virtual Value* loopEnd(LgsCodeGen* codeGen) = 0;
+    void initIndex(LgsCodeGen* codeGen);
+    void incIndex(LgsCodeGen* codeGen) const;
+    LoadInst* loadIndex(LgsCodeGen* codeGen) const;
     virtual void initIRLoop(LgsCodeGen* codeGen) = 0;
-    virtual void IRLoopPrologue(LgsCodeGen* codeGen) const = 0;
     ~LgsForLoop() override;
 };
 
