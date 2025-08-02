@@ -66,7 +66,7 @@ string LgsCLang::getCode(const LgsStrConst* filePath) {
     if (exists(cLibPath)) {
         return getFileText(cLibPath);
     }
-    errHandler.handleError(E10047, &filePath->location, {pathStr});
+    errHandler.addError(E10047, &filePath->location, {pathStr});
     return "";
 }
 

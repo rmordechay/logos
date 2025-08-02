@@ -7,7 +7,7 @@ void LgsErrHandler::setUnsuccessful() {
     successful = false;
 }
 
-void LgsErrHandler::handleError(const LgsError& lgsErr, const LgsLocation* location, const vector<string>& args) {
+void LgsErrHandler::addError(const LgsError& lgsErr, const LgsLocation* location, const vector<string>& args) {
     setUnsuccessful();
     auto pos = 0;
     auto argIndex = 0;
@@ -21,7 +21,7 @@ void LgsErrHandler::handleError(const LgsError& lgsErr, const LgsLocation* locat
     errors.emplace_back(LgsError{.msg = strdup(finalResult.c_str()), .errCode = lgsErr.errCode});
 }
 
-void LgsErrHandler::addErrors(vector<LgsError> newErrors) {
+void LgsErrHandler::copyErrors(vector<LgsError> newErrors) {
     setUnsuccessful();
     errors.insert(errors.end(), newErrors.begin(), newErrors.end());
 }

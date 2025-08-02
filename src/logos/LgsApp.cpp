@@ -49,12 +49,12 @@ void LgsApp::run() {
 
 bool LgsApp::validate() {
     if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {
-        errHandler.handleError(E10010, nullptr);
+        errHandler.addError(E10010, nullptr);
         return false;
     }
 
     if (!exists(paths.appFilePath)) {
-        errHandler.handleError(E10008, nullptr);
+        errHandler.addError(E10008, nullptr);
         return false;
     }
     return true;
@@ -84,7 +84,7 @@ bool LgsApp::analyse() {
             semaAnalyser.analyse();
             if (!semaAnalyser.errHandler.successful) {
                 lock_guard lock(mtx);
-                errHandler.addErrors(semaAnalyser.errHandler.errors);
+                errHandler.copyErrors(semaAnalyser.errHandler.errors);
             }
         });
     }
@@ -129,7 +129,7 @@ void LgsApp::parseSrcFile(const string& codeText, path filePath) {
     lock_guard lock(mtx);
     files.push_back(file);
     if (!antlrConverter.errHandler.successful) {
-        errHandler.addErrors(antlrConverter.errHandler.errors);
+        errHandler.copyErrors(antlrConverter.errHandler.errors);
         return;
     }
     for (const auto externFile : file->externFiles) {
@@ -148,7 +148,7 @@ void LgsApp::parseEnvFile(path fileEntry) {
     auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
     lock_guard lock(mtx);
     envFiles.emplace_back(file);
-    errHandler.addErrors(antlerConverter.errHandler.errors);
+    errHandler.copyErrors(antlerConverter.errHandler.errors);
 }
 
 void LgsApp::parseAppFile(path fileEntry) {
@@ -198,7 +198,7 @@ bool LgsApp::resolveGlobalTypes() {
             semaAnalyser.resolveInterfaceTypes(interfaceFile->interface);
         }
         if (!semaAnalyser.errHandler.successful) {
-            errHandler.addErrors(semaAnalyser.errHandler.errors);
+            errHandler.copyErrors(semaAnalyser.errHandler.errors);
         }
         successful = successful && semaAnalyser.errHandler.successful;
     }
@@ -243,7 +243,7 @@ void LgsApp::checkRequiredEnvVars() {
                 }
             }
             if (!found) {
-                errHandler.handleError(E10020, nullptr, {envFile->name, requireEnvVar.name});
+                errHandler.addError(E10020, nullptr, {envFile->name, requireEnvVar.name});
             }
         }
     }

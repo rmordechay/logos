@@ -11,7 +11,7 @@ public:
     vector<LgsWarning> warnings;
 
     void setUnsuccessful();
-    void handleError(const LgsError& lgsErr, const LgsLocation* location, const vector<string>& args = {});
-    void addErrors(vector<LgsError> newErrors);
+    void addError(const LgsError& lgsErr, const LgsLocation* location, const vector<string>& args = {});
+    void copyErrors(vector<LgsError> newErrors);
     ~LgsErrHandler() = default;
 };

@@ -13,7 +13,7 @@
 void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
     std::lock_guard lock(mtx);
     if (symbols.find(name) != symbols.end()) {
-        return errHandler->handleError(E10011, symbol.location, {name, symbol.location->lineNumberStr()});
+        return errHandler->addError(E10011, symbol.location, {name, symbol.location->lineNumberStr()});
     }
     symbols[name] = symbol;
 }

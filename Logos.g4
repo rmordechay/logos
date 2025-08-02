@@ -13,7 +13,7 @@ logosAppFile:
     ;
 
 mainFile:
-        (object | enumDeclaration | interface | group)* funcImpl+ EOF
+        (object | enumDeclaration | interface | group)* func+ EOF
     ;
 
 objectFile:
@@ -41,7 +41,7 @@ groupTargetList:
     ;
 
 interfaceBody:
-            implements? interfaceField* interfaceFuncSignature* funcImpl*
+            implements? interfaceField* interfaceFuncSignature* func*
     ;
 
 object:
@@ -49,7 +49,7 @@ object:
     ;
 
 objectBody:
-        implements? field* methodImplementation*
+        implements? field* method*
     ;
 
 
@@ -77,7 +77,7 @@ interfaceFuncSignature:
         funcSignatureHeader QUEST_MARK? (COLON type)?
     ;
 
-funcImpl:
+func:
         funcSignature statementsBlock
     ;
 
@@ -89,7 +89,7 @@ anonnymosFunc:
         anonymosFuncSignature statementsBlock
     ;
 
-methodImplementation:
+method:
         VISIBILITY? funcSignature statementsBlock
     ;
 
@@ -303,7 +303,7 @@ innerSelectionElement:
 
 range:
         start=expr DOUBLE_DOT end=expr
-    |   DOUBLE_DOT end=expr
+    |   DOUBLE_DOT? end=expr
     |   start=expr DOUBLE_DOT
     ;
 

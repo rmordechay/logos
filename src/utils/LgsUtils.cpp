@@ -56,7 +56,7 @@ void freeType(const LgsType* type) {
 bool isBuiltinName(const string& name, const LgsLocation* location, LgsErrHandler& errHandler) {
     const auto isLgsBuiltin = name == LgsSizeOf::name || name == LgsPrint::name;
     if (isLgsBuiltin) {
-        errHandler.handleError(E10053, location, {name});
+        errHandler.addError(E10053, location, {name});
         return true;
     }
     return false;

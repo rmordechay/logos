@@ -3,6 +3,7 @@
 #include "stmts/LgsVarDec.h"
 
 Value* LgsRangeLoop::loopStart(LgsCodeGen* codeGen) {
+    if (!startRange) return codeGen->i32Zero();
     return startRange->getIRValue(codeGen);
 }
 
