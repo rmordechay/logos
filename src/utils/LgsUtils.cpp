@@ -1,6 +1,6 @@
 #include "utils/LgsUtils.h"
 #include "LgsType.h"
-#include "builtin/LgsBuiltins.h"
+#include "builtins/LgsBuiltins.h"
 #include "configs/LgsDefinitions.h"
 #include "configs/PlatformData.h"
 #include "utils/LgsErrHandler.h"

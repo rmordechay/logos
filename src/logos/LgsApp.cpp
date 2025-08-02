@@ -1,4 +1,6 @@
 #include "logos/LgsApp.h"
+
+#include "LgsConfig.h"
 #include "LogosLexer.h"
 #include "analysis/AntlrConverter.h"
 #include "analysis/SemaAnalyser.h"
@@ -7,7 +9,7 @@
 #include "files/LgsObjectFile.h"
 #include "logos/LgsPaths.h"
 #include "utils/ThreadPool.h"
-#include "builtin/LgsBuiltins.h"
+#include "builtins/LgsBuiltins.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "extern/LgsCLang.h"
 #include "files/LgsAppFile.h"
@@ -18,6 +20,12 @@
 #include "types/LgsInterface.h"
 
 extern char **environ;
+
+enum LogLevel {
+    INFO,
+    DEBUG,
+    ERROR,
+};
 
 void LgsApp::run() {
     // Validation
@@ -96,6 +104,7 @@ bool LgsApp::generate() const {
         });
     }
     threadPool.wait();
+    writeIRFiles();
     return errHandler.successful;
 }
 
@@ -206,8 +215,8 @@ bool LgsApp::resolveExternalFiles() {
 }
 
 void LgsApp::loadBuiltins() {
-    globals.addSymbol(lgsPrint.name, LgsSymbol(new LgsPrint()), &errHandler);
-    globals.addSymbol(lgsSizeof.name, LgsSymbol(new LgsSizeOf()), &errHandler);
+    globals.addSymbol(LgsPrint::name, LgsSymbol(new LgsPrint()), &errHandler);
+    globals.addSymbol(LgsSizeOf::name, LgsSymbol(new LgsSizeOf()), &errHandler);
 }
 
 void LgsApp::loadEnvFiles() {
@@ -301,6 +310,22 @@ void LgsApp::writeDebugFile() const {
             writeFuncIndices(ofs, objFile->obj->methods);
         } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
             writeFuncIndices(ofs, interfaceFile->interface->methods);
+        }
+    }
+}
+
+void LgsApp::writeIRFiles() const {
+    for (const auto file : files) {
+        const auto module = file->codeGen.IRModule;
+        if constexpr (WRITE_IR_TO_FILE) {
+            const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
+            error_code EC;
+            raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
+            module->print(textFile, nullptr);
+        }
+        if constexpr (LOG_LEVEL == DEBUG) {
+            module->print(outs(), nullptr);
+            logInfo("\n-----\n\n");
         }
     }
 }

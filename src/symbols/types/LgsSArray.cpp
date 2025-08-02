@@ -1,5 +1,5 @@
 #include "types/LgsSArray.h"
-#include "builtin/LgsBuiltins.h"
+#include "builtins/LgsBuiltins.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include "types/primitives/LgsInt.h"
 

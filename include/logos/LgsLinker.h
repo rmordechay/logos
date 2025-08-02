@@ -13,7 +13,6 @@ public:
     LgsLinker(const LgsPaths& paths, const vector<LgsFile*>& modules) : paths(paths), files(modules) {}
     bool generateObjFile(unique_ptr<Module> mainModule) const;
     bool link() const;
-    void writeIRFiles() const;
     ~LgsLinker() = default;
 };
 

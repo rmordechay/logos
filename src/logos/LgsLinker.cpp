@@ -10,8 +10,6 @@
 #include <llvm/Transforms/Coroutines/CoroEarly.h>
 #include <llvm/Transforms/Coroutines/CoroCleanup.h>
 
-inline LogLevel logLevel = DEBUG;
-
 unique_ptr<Module> parseModule(LLVMContext& context, const string& path) {
     SMDiagnostic diag;
     auto parsedModule = parseIRFile(path, diag, context);
@@ -27,7 +25,6 @@ unique_ptr<Module> parseModule(LLVMContext& context, const string& path) {
 }
 
 bool LgsLinker::link() const {
-    writeIRFiles();
     LLVMContext context;
     unique_ptr<Module> mainModule = nullptr;
     vector<unique_ptr<Module>> modules;
@@ -94,20 +91,4 @@ bool LgsLinker::generateObjFile(unique_ptr<Module> mainModule) const {
     outputStream.flush();
     outputStream.close();
     return true;
-}
-
-void LgsLinker::writeIRFiles() const {
-    for (const auto file : files) {
-        const auto module = file->codeGen.IRModule;
-        if constexpr (WRITE_IR_TO_FILE) {
-            const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
-            error_code EC;
-            raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
-            module->print(textFile, nullptr);
-        }
-        if (logLevel == DEBUG) {
-            module->print(outs(), nullptr);
-            logInfo("\n-----\n\n");
-        }
-    }
 }

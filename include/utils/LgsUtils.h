@@ -4,12 +4,6 @@ class LgsErrHandler;
 struct LgsLocation;
 class LgsType;
 
-enum LogLevel {
-    INFO,
-    DEBUG,
-    ERROR,
-};
-
 void logInfo(const string& text);
 void logErr(const string& text);
 bool isLogosFile(const directory_entry& entry);

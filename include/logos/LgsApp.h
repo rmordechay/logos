@@ -4,7 +4,6 @@
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
 #include "extern/LgsCLang.h"
-#include "types/LgsAny.h"
 
 class LgsCodeGen;
 class LgsStrConst;
@@ -44,6 +43,7 @@ public:
     bool analyse();
     void initBuild() const;
     void writeDebugFile() const;
+    void writeIRFiles() const;
     bool generate() const;
     bool link() const;
     void parseSrcFile(const string& codeText, path filePath = "");

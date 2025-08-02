@@ -93,6 +93,7 @@ set(SOURCE_FILES
     src/symbols/types/LgsCPtr.cpp
     src/symbols/types/LgsNullable.cpp
     src/logos/LgsCodeGen.cpp
+    src/symbols/builtins/LgsBuiltins.cpp
 )
 
 add_subdirectory(stdlib)
