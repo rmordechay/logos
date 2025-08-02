@@ -10,21 +10,20 @@ class LgsSelection;
 class LgsFuncCall;
 class LgsReturn;
 class LgsIfStmt;
-class LgsContinueStmt;
-class LgsBreakStmt;
+class LgsContinue;
+class LgsBreak;
 class LgsAssignment;
 
 class LgsStmt : virtual public LgsValue {
 public:
-    bool isTerminator();
     LgsForLoop* asLoop();
     LgsCoroutine* asCoroutine();
     LgsFuncCall* asFuncCall();
     LgsIfStmt* asIfStmt();
     LgsPostfixExpr* asPostfixExpr();
     LgsSelection* asSelection();
-    LgsBreakStmt* asBreak();
-    LgsContinueStmt* asContinue();
+    LgsBreak* asBreak();
+    LgsContinue* asContinue();
     LgsReturn* asReturn();
     LgsVarDec* asVarDec();
     LgsAssignment* asAssignment();

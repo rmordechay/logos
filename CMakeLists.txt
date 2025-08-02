@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 project(logos VERSION 0.0.1)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_COMPILER_LAUNCHER ccache)
 set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
@@ -60,8 +60,8 @@ set(SOURCE_FILES
     src/symbols/loops/LgsRangeLoop.cpp
     src/symbols/loops/LgsInfiniteLoop.cpp
     src/symbols/stmts/LgsAssignment.cpp
-    src/symbols/stmts/LgsBreakStmt.cpp
-    src/symbols/stmts/LgsContinueStmt.cpp
+    src/symbols/stmts/LgsBreak.cpp
+    src/symbols/stmts/LgsContinue.cpp
     src/symbols/stmts/LgsField.cpp
     src/symbols/stmts/LgsIfStmt.cpp
     src/symbols/stmts/LgsReturn.cpp

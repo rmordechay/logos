@@ -1,7 +1,7 @@
-#include "stmts/LgsBreakStmt.h"
+#include "stmts/LgsBreak.h"
 #include "loops/LgsForLoop.h"
 
-void LgsBreakStmt::createIRStmt(LgsCodeGen* codeGen) {
+void LgsBreak::createIRStmt(LgsCodeGen* codeGen) {
     const auto loop = codeGen->stack.currentLoop();
     codeGen->builder.CreateBr(loop->IRExitBlock);
 }

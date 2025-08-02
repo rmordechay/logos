@@ -18,5 +18,3 @@ public:
     Function* getIRFunc(LgsCodeGen* codeGen) override;
     ~LgsMainFunc() override;
 };
-
-

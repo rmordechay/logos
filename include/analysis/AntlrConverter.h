@@ -7,7 +7,7 @@
 #include "funcs/LgsFunc.h"
 #include "utils/LgsErrHandler.h"
 #include "stmts/LgsAssignment.h"
-#include "stmts/LgsBreakStmt.h"
+#include "stmts/LgsBreak.h"
 
 using namespace filesystem;
 
@@ -72,7 +72,7 @@ public:
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
-    LgsBreakStmt* getBreakStmt(LogosParser::StatementContext* ctx);
+    LgsBreak* getBreakStmt(LogosParser::StatementContext* ctx);
     LgsStmt* getContinueStmt(const LogosParser::StatementContext* ctx);
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);

@@ -3,13 +3,11 @@
 
 class LgsForLoop;
 
-class LgsBreakStmt final : public LgsStmt {
+class LgsBreak final : public LgsStmt {
 public:
     string tag;
-
-    explicit LgsBreakStmt() {}
     void createIRStmt(LgsCodeGen* codeGen) override;
-    ~LgsBreakStmt() override = default;
+    ~LgsBreak() override = default;
 };
 
 

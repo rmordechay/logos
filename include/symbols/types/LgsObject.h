@@ -5,7 +5,7 @@ class LgsInstance;
 class LgsCodeGen;
 class LgsField;
 
-class LgsObject final : public LgsType {
+class LgsObject : public LgsType {
 public:
     string name;
     bool hasVirtuals = false;

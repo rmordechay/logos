@@ -22,8 +22,8 @@
 #include "funcs/LgsParam.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsReturn.h"
-#include "stmts/LgsBreakStmt.h"
-#include "stmts/LgsContinueStmt.h"
+#include "stmts/LgsBreak.h"
+#include "stmts/LgsContinue.h"
 #include "types/LgsEnum.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsPostfixExpr.h"
@@ -522,8 +522,8 @@ LgsIfStmt* AntlrConverter::getIfStatement(LogosParser::IfStatementContext* ctx) 
     return ifStmt;
 }
 
-LgsBreakStmt* AntlrConverter::getBreakStmt(LogosParser::StatementContext* ctx) {
-    const auto breakStmt = new LgsBreakStmt();
+LgsBreak* AntlrConverter::getBreakStmt(LogosParser::StatementContext* ctx) {
+    const auto breakStmt = new LgsBreak();
     breakStmt->setLocation(ctx->start, ctx->stop, filePath);
     if (loopStack.empty()) {
         errHandler.handleError(E10017, &breakStmt->location);
@@ -537,7 +537,7 @@ LgsBreakStmt* AntlrConverter::getBreakStmt(LogosParser::StatementContext* ctx) {
 }
 
 LgsStmt* AntlrConverter::getContinueStmt(const LogosParser::StatementContext* ctx) {
-    const auto continueStmt = new LgsContinueStmt();
+    const auto continueStmt = new LgsContinue();
     continueStmt->setLocation(ctx->start, ctx->stop, filePath);
     if (loopStack.empty()) {
         errHandler.handleError(E10038, &continueStmt->location);

@@ -45,7 +45,7 @@ Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
 Value* LgsFunc::getIRArg(LgsCodeGen* codeGen, LgsExpr* arg) {
     const auto v = arg->getIRValue(codeGen);
     if (isa<GlobalVariable>(v) || isa<LoadInst>(v)) return v;
-    if (isa<Argument>(v) && v->getType()->isIntegerTy()) return v;
+    if (v->getType()->isIntegerTy()) return v;
     const auto ty = arg->type->getIRType(codeGen);
     if (arg->type->isPrimitive && !arg->isConstant) {
         return codeGen->builder.CreateLoad(ty, v);

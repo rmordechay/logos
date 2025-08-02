@@ -24,6 +24,8 @@
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
+#include "stmts/LgsBreak.h"
+#include "stmts/LgsContinue.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsDArray.h"
 #include "types/LgsGroup.h"
@@ -110,16 +112,27 @@ void SemaAnalyser::visitField(const LgsField* field) {
     }
 }
 
+bool isTerminator(LgsValue* value) {
+    if (dynamic_cast<LgsBreak*>(value) || dynamic_cast<LgsContinue*>(value) || dynamic_cast<LgsReturn*>(value)) {
+        return true;
+    }
+    const auto fc = dynamic_cast<LgsFuncCall*>(value);
+    if (fc && fc->func->funcType->isTerminator) return true;
+    const auto selection = dynamic_cast<LgsSelection*>(value);
+    if (!selection) return false;
+    const auto methodCall = selection->lastExpr()->asFuncCall();
+    return methodCall && methodCall->func->funcType->isTerminator;
+}
+
 void SemaAnalyser::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     if (!stmtsBlock) return;
     for (const auto& stmt : stmtsBlock->stmts) {
         visitStmt(stmt);
     }
     const auto lastStmt = stmtsBlock->lastStmt();
-    if (!lastStmt->isTerminator()) return;
     stmtsBlock->returnExpr = lastStmt->asReturn();
     for (int i = 0; i < stmtsBlock->stmts.size() - 1; ++i) {
-        if (stmtsBlock->stmts[i]->isTerminator()) {
+        if (isTerminator(stmtsBlock->stmts[i])) {
             return errHandler.handleError(E10059, &lastStmt->location);
         }
     }
@@ -895,23 +908,20 @@ void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
             funcCall->setType(func->funcType->rt);
         } else {
             errHandler.handleError(E10015, &funcCall->location, {funcCall->name, funcCall->prettyName(), func->prettyName()});
-            return;
         }
-        assert(funcCall->func);
-        return;
-    }
+    } else {
+        LgsType* symbolType = nullptr;
+        if (symbol->symbolType == VAR_DEC) {
+            funcCall->callback = new LgsSymbol(symbol->varDec);
+            symbolType = symbol->varDec->type;
+        } else if (symbol->symbolType == PARAM) {
+            funcCall->callback = new LgsSymbol(symbol->param);
+            symbolType = symbol->param->type;
+        }
 
-    LgsType* symbolType = nullptr;
-    if (symbol->symbolType == VAR_DEC) {
-        funcCall->callback = new LgsSymbol(symbol->varDec);
-        symbolType = symbol->varDec->type;
-    } else if (symbol->symbolType == PARAM) {
-        funcCall->callback = new LgsSymbol(symbol->param);
-        symbolType = symbol->param->type;
-    }
-
-    if (!symbolType->asFuncType()) {
-        errHandler.handleError(E10046, &funcCall->location, {funcCall->name});
+        if (!symbolType->asFuncType()) {
+            errHandler.handleError(E10046, &funcCall->location, {funcCall->name});
+        }
     }
 }
 
