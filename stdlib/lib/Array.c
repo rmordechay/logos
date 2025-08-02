@@ -1,8 +1,14 @@
-#include "Array.h"
 #include "Iterator.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+typedef struct {
+    size_t element_size;
+    size_t capacity;
+    size_t size;
+    void* data;
+} Array;
 
 void Array_init(Array* arr, const size_t capacity, const size_t element_size) {
     arr->capacity = capacity;

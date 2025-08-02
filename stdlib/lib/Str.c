@@ -1,6 +1,5 @@
 #include "Str.h"
-#include <string.h>
-
+#include <stdbool.h>
 #define HASH 2166136261u
 #define FNV_PRIME 16777619
 #define MAX_STR_LEN 1024

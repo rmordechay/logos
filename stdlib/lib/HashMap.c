@@ -1,8 +1,23 @@
-#include "HashMap.h"
+#include "Iterator.h"
 #include "Str.h"
+
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+
+#define MAP_CAPACITY 1024
+
+typedef struct Entry {
+    char* key;
+    void* value;
+    struct Entry* next;
+} Entry;
+
+typedef struct {
+    Entry** buckets;
+    size_t size;
+    size_t value_size;
+} HashMap;
 
 static Entry* new_entry(HashMap* map, const char* key, const void* value) {
     Entry* entry = malloc(sizeof(Entry));
