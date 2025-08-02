@@ -8,7 +8,7 @@ void LgsMainFunc::generateIR(LgsCodeGen* codeGen) {
     startFuncBlock(codeGen);
     codeGen->callInitRuntime();
     if (!funcType->params.empty()) {
-        initArgs(codeGen);
+        initMainArgs(codeGen);
     }
     stmtsBlock->createIRValue(codeGen);
     codeGen->builder.CreateRet(codeGen->i32(EXIT_SUCCESS));
@@ -35,21 +35,21 @@ Function* LgsMainFunc::getIRFunc(LgsCodeGen* codeGen) {
     return IRFunc;
 }
 
-void LgsMainFunc::setArgs() {
-    args = new LgsArrayExpr(new LgsDArray(new LgsStr()));
-    initArgsFunc = new LgsFunc("initArgs", &LGS_VOID, {LgsParam(args->type), LgsParam(&LGS_INT), LgsParam(new LgsStr())});
+void LgsMainFunc::setMainArgs() {
+    mainArgs = new LgsArrayExpr(new LgsDArray(new LgsStr()));
+    initArgsFunc = new LgsFunc("initArgs", &LGS_VOID, {LgsParam(mainArgs->type), LgsParam(&LGS_INT), LgsParam(new LgsStr())});
 }
 
-void LgsMainFunc::initArgs(LgsCodeGen* codeGen) {
+void LgsMainFunc::initMainArgs(LgsCodeGen* codeGen) {
     auto& builder = codeGen->builder;
     const vector<Type*> structFields{codeGen->i64Ty(), codeGen->i32Ty(), codeGen->i32Ty(), codeGen->ptrTy()};
-    const auto arrStruct = codeGen->getIRStructType(args->type->asDArray()->name, structFields);
-    args->IRValue = builder.CreateAlloca(arrStruct);
-    initArgsFunc->callIR(codeGen, {args->IRValue, argc, argv});
-    funcType->params[0].setIRValue(args->IRValue);
+    const auto arrStruct = codeGen->getIRStructType(mainArgs->type->asDArray()->name, structFields);
+    mainArgs->IRValue = builder.CreateAlloca(arrStruct);
+    initArgsFunc->callIR(codeGen, {mainArgs->IRValue, argc, argv});
+    funcType->params[0].setIRValue(mainArgs->IRValue);
 }
 
 LgsMainFunc::~LgsMainFunc() {
     if (initArgsFunc) delete initArgsFunc;
-    if (args) delete args;
+    if (mainArgs) delete mainArgs;
 }

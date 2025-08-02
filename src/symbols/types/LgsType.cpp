@@ -42,15 +42,6 @@ LgsFunc* LgsType::getMethod(const string& name) const {
     return nullptr;
 }
 
-void LgsType::setLocation(const Token* begin, const Token* end, const path& filePath) {
-    location.lineNumberStart = begin->getLine();
-    location.posInLineStart = begin->getCharPositionInLine() + 1;
-    if (end) {
-        location.posInLineEnd = end->getCharPositionInLine() + 1;
-    }
-    location.filePath = filePath;
-}
-
 size_t LgsType::getSizeBytes() { assert(0); }
 
 void LgsType::freeValue(LgsCodeGen* codeGen, Value* value) {}

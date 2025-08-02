@@ -48,7 +48,6 @@ public:
     bool addMethod(LgsFunc* method);
     LgsField* getField(const string& name);
     LgsFunc* getMethod(const string& name) const;
-    void setLocation(const Token* begin, const Token* end, const path& filePath);
 
     LgsBool* asBool();
     LgsChar* asChar();

@@ -91,7 +91,7 @@ public:
     LgsUnaryExpr* getHashMap(LogosParser::HashMapContext* ctx);
     LgsVariable* getVariable(tree::TerminalNode* ctx) const;
     LgsFuncCall* getFuncCall(LogosParser::FuncCallContext* ctx);
-    LgsUnaryExpr* getVector(LogosParser::VectorContext* vector) const;
+    LgsUnaryExpr* getVector(LogosParser::VectorContext* vector);
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
     LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
     vector<LgsUnaryExpr*> getSelectionExprs(LogosParser::SelectionContext* ctx);
@@ -110,5 +110,6 @@ public:
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     bool isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec);
     bool validateTypeName(const string& typeName, const LgsLocation* location);
+    void setLocation(LgsLocation& location, const Token* start, const Token* end) const;
     ~AntlrConverter() = default;
 };

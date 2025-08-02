@@ -11,6 +11,7 @@ public:
     string name;
     path absPath;
     LgsCodeGen codeGen;
+    LgsLocation location;
     LgsSymbolTable symbolTable;
     vector<LgsStrConst*> externFiles;
 
