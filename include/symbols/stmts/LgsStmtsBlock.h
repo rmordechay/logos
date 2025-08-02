@@ -7,7 +7,6 @@ public:
     vector<LgsExpr*> heapAllocExprs;
     BasicBlock* cleanupBlock = nullptr;
     LgsReturn* returnExpr = nullptr;
-    bool isTerminal = false;
 
     explicit LgsStmtsBlock(const vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
     bool needsCleanup() const;

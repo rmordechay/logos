@@ -27,6 +27,7 @@ public:
     LgsStmtsBlock* currentStmtsBlock();
     LgsSymbolTable& getSymbolTable();
     void addHeapAllocExpr(LgsExpr* expr);
+    bool isRootScope() const;
     auto begin() { return c.begin(); }
     auto end() { return c.end(); }
     auto rbegin() { return c.rbegin(); }

@@ -17,18 +17,21 @@ void LgsStmtsBlock::cleanupExprs(LgsCodeGen* codeGen) {
     const auto cleanupBlock = getCleanupBlock(codeGen);
     codeGen->branchAndStartBlock(cleanupBlock);
     const auto currentFunc = codeGen->stack.currentFunc();
-    for (const auto expr : heapAllocExprs) {
-        expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
-    }
-    if (returnExpr) {
-        if (isTerminal) {
-            const auto IRReturnType = currentFunc->funcType->rt->getIRType(codeGen);
-            const auto returnPhiNode = codeGen->builder.CreatePHI(IRReturnType, currentFunc->returnStmts.size());
-            for (const auto returnStmt : currentFunc->returnStmts) {
-                returnPhiNode->addIncoming(returnStmt->expr->getIRValue(codeGen), returnStmt->parentBlock);
-            }
-            codeGen->builder.CreateRet(returnPhiNode);
-        } else {
+    if (returnExpr && codeGen->stack.isRootScope()) {
+        const auto IRReturnType = currentFunc->funcType->rt->getIRType(codeGen);
+        const auto returnPhiNode = codeGen->builder.CreatePHI(IRReturnType, currentFunc->returnStmts.size());
+        for (const auto returnStmt : currentFunc->returnStmts) {
+            returnPhiNode->addIncoming(returnStmt->expr->getIRValue(codeGen), returnStmt->parentBlock);
+        }
+        for (const auto expr : heapAllocExprs) {
+            expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
+        }
+        codeGen->builder.CreateRet(returnPhiNode);
+    } else {
+        for (const auto expr : heapAllocExprs) {
+            expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
+        }
+        if (returnExpr) {
             const auto stmtsBlock = codeGen->stack.getParentBlock();
             codeGen->builder.CreateBr(stmtsBlock->getCleanupBlock(codeGen));
         }

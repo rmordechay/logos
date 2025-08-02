@@ -3,7 +3,6 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "stmts/LgsReturn.h"
 #include "types/LgsFuncType.h"
 #include "utils/LgsUtils.h"
 

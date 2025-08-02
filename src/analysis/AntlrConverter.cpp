@@ -278,7 +278,7 @@ LgsFunc* AntlrConverter::getFunc(LogosParser::FuncImplContext* ctx) {
     const auto func = new LgsFunc(tokenName->getText(), rt);
     func->setLocation(tokenName->getSymbol(), nullptr, filePath);
     setParams(func->funcType, funcSignature->funcSignatureHeader()->param());
-    func->stmtsBlock = getStmtBlock(ctx->statementsBlock(), true);
+    func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     return func;
 }
 
@@ -287,7 +287,7 @@ LgsMainFunc* AntlrConverter::getMainFunc(LogosParser::FuncImplContext* ctx) {
     const auto funcSignature = ctx->funcSignature();
     mainFunc->setLocation(funcSignature->funcSignatureHeader()->IDENTIFIER()->getSymbol(), nullptr, filePath);
     const auto statementsBlock = ctx->statementsBlock();
-    mainFunc->stmtsBlock = getStmtBlock(statementsBlock, true);
+    mainFunc->stmtsBlock = getStmtBlock(statementsBlock);
     bool isValid = true;
     const auto paramSize = funcSignature->funcSignatureHeader()->param().size();
     if (paramSize > 1) {
@@ -314,7 +314,7 @@ LgsFunc* AntlrConverter::getMethod(LogosParser::MethodImplementationContext* ctx
     self.isSelf = true;
     method->funcType->params.push_back(self);
     setParams(method->funcType, funcSignature->funcSignatureHeader()->param());
-    method->stmtsBlock = getStmtBlock(ctx->statementsBlock(), true);
+    method->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     if (ctx->VISIBILITY()) {
         method->funcType->isPublic = true;
     }
@@ -331,7 +331,7 @@ LgsFunc* AntlrConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx
         lgsParam.setLocation(param->start, param->stop, filePath);
         func->funcType->params.push_back(lgsParam);
     }
-    func->stmtsBlock = getStmtBlock(ctx->statementsBlock(), true);
+    func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     func->setLocation(funcSignature->LPAREN()->getSymbol(), nullptr, filePath);
     return func;
 }
@@ -392,10 +392,9 @@ LgsField* AntlrConverter::getField(LogosParser::FieldContext* ctx, string& paren
     return field;
 }
 
-LgsStmtsBlock* AntlrConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx, bool isTerminal) {
+LgsStmtsBlock* AntlrConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
     const auto stmtBlock = new LgsStmtsBlock();
     stmtBlock->setLocation(ctx->start, ctx->stop, filePath);
-    stmtBlock->isTerminal = isTerminal;
     if (!ctx) return stmtBlock;
     for (const auto& statement : ctx->statement()) {
         auto stmt = getStmt(statement);
@@ -491,7 +490,7 @@ LgsCoroutine* AntlrConverter::getCoroutine(LogosParser::CoroutineContext* ctx) {
         }
         coroutine->selection = lgsSelection;
     } else if (const auto stmtsBlock = ctx->statementsBlock()) {
-        coroutine->stmtsBlock = getStmtBlock(stmtsBlock, true);
+        coroutine->stmtsBlock = getStmtBlock(stmtsBlock);
     } else {
         assert(0);
     }
@@ -506,18 +505,18 @@ LgsStmt* AntlrConverter::getReturnStmt(LogosParser::ReturnStatementContext* ctx)
 
 LgsIfStmt* AntlrConverter::getIfStatement(LogosParser::IfStatementContext* ctx) {
     const auto expr = getExpr(ctx->expr());
-    const auto stmts = getStmtBlock(ctx->statementsBlock(), false);
+    const auto stmts = getStmtBlock(ctx->statementsBlock());
     const auto ifStmt = new LgsIfStmt(expr, stmts);
     if (const auto tag = ctx->TAG()) {
         ifStmt->tag = tag->getText().substr(1);
     }
     for (const auto &elseIfStmt : ctx->elseIfStatement()) {
         auto elseIfExpr = getExpr(elseIfStmt->expr());
-        auto elseIfStmtBlock = getStmtBlock(elseIfStmt->statementsBlock(), false);
+        auto elseIfStmtBlock = getStmtBlock(elseIfStmt->statementsBlock());
         ifStmt->elseIfs.emplace_back(make_pair(elseIfExpr, elseIfStmtBlock));
     }
     if (const auto &elseStmt = ctx->elseStatement()) {
-        ifStmt->elseBlock = getStmtBlock(elseStmt->statementsBlock(), false);
+        ifStmt->elseBlock = getStmtBlock(elseStmt->statementsBlock());
     }
     ifStmt->setLocation(ctx->start, ctx->stop, filePath);
     return ifStmt;
@@ -552,10 +551,10 @@ LgsStmt* AntlrConverter::getPatternMatching(LogosParser::PatternMatchingContext*
     patternMatching->isPatternMatching = true;
     for (const auto& pattern : ctx->pattern()) {
         const auto expr = getExpr(pattern->expr());
-        const auto stmtBlock = getStmtBlock(pattern->statementsBlock(), false);
+        const auto stmtBlock = getStmtBlock(pattern->statementsBlock());
         patternMatching->elseIfs.emplace_back(make_pair(expr, stmtBlock));
     }
-    patternMatching->elseBlock = getStmtBlock(ctx->statementsBlock(), false);
+    patternMatching->elseBlock = getStmtBlock(ctx->statementsBlock());
     return patternMatching;
 }
 
@@ -570,7 +569,7 @@ LgsForLoop* AntlrConverter::getForLoop(LogosParser::LoopStatementContext* ctx) {
     }
     loopStmt->setLocation(ctx->start, ctx->stop, filePath);
     loopStack.push(loopStmt);
-    loopStmt->stmtsBlock = getStmtBlock(ctx->statementsBlock(), false);
+    loopStmt->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     loopStack.pop();
     return loopStmt;
 }

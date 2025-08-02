@@ -67,7 +67,7 @@ public:
     LgsFunc* getMethod(LogosParser::MethodImplementationContext* ctx, LgsObject* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
-    LgsStmtsBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx, bool isTerminal);
+    LgsStmtsBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
     LgsCoroutine* getCoroutine(LogosParser::CoroutineContext* ctx);
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);

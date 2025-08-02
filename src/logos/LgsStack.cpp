@@ -37,6 +37,10 @@ void LgsStack::addHeapAllocExpr(LgsExpr* expr) {
     currentStmtsBlock()->heapAllocExprs.push_back(expr);
 }
 
+bool LgsStack::isRootScope() const {
+    return size() == 1;
+}
+
 LgsForLoop* LgsStack::currentLoop() {
     for (auto it = rbegin(); it != rend(); ++it) {
         if (it->loop) return it->loop;
@@ -45,5 +49,6 @@ LgsForLoop* LgsStack::currentLoop() {
 }
 
 LgsStmtsBlock* LgsStack::getParentBlock() const {
+    assert(this->size() >= 2);
     return this->c[this->size() - 2].stmtsBlock;
 }
