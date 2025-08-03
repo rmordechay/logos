@@ -1,25 +1,21 @@
 #include "loops/LgsRangeLoop.h"
-#include "configs/LgsDefinitions.h"
 #include "stmts/LgsVarDec.h"
 
-void LgsRangeLoop::initIRLoop(LgsCodeGen* codeGen) {
-    IRCondBlock = codeGen->createBlock(BLOCK_NAME_LOOP_COND);
-    IRBodyBlock = codeGen->createBlock(BLOCK_NAME_LOOP_BODY);
-    IRExitBlock = codeGen->createBlock(BLOCK_NAME_LOOP_EXIT);
+void LgsRangeLoop::createIRLoop(LgsCodeGen* codeGen) {
     initIndex(codeGen);
     codeGen->builder.CreateBr(IRCondBlock);
 
     // Condition
     codeGen->startBlock(IRCondBlock);
-    auto iValue = loadIndex(codeGen);
+    const auto iValue = loadIndex(codeGen);
     const auto condition = codeGen->builder.CreateICmpSLT(iValue, loopEnd(codeGen));
     setLoopTerminals(codeGen, iValue);
     codeGen->builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
 
     // Body
     codeGen->startBlock(IRBodyBlock);
-    iValue = loadIndex(codeGen);
-    loopVars[0]->setIRValue(iValue);
+    loopVars.front()->setIRValue(iValue);
+    stmtsBlock->createIRValue(codeGen);
 }
 
 Value* LgsRangeLoop::loopStart(LgsCodeGen* codeGen) const {

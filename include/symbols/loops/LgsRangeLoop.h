@@ -10,8 +10,6 @@ public:
     Value* loopStart(LgsCodeGen* codeGen) const;
     Value* loopEnd(LgsCodeGen* codeGen) const;
     void setLoopTerminals(LgsCodeGen* codeGen, Value* iValue) const;
-    void initIRLoop(LgsCodeGen* codeGen) override;
+    void createIRLoop(LgsCodeGen* codeGen) override;
     ~LgsRangeLoop() override;
 };
-
-

@@ -15,9 +15,9 @@ public:
     explicit LgsIterable(LgsType* baseType = nullptr) : baseType(baseType) {}
     virtual LgsType* getIndexType() = 0;
     virtual LgsType* getValueType() = 0;
-    virtual Value* getLength(LgsCodeGen* codeGen, LgsExpr* expr) = 0;
-    virtual Value* getLoopLength(LgsCodeGen* codeGen, LgsExpr* expr) = 0;
-    virtual Value* isEmpty(LgsCodeGen* codeGen, LgsExpr* expr) = 0;
-    virtual Value* isNotEmpty(LgsCodeGen* codeGen, LgsExpr* expr) = 0;
+    virtual Value* getLoopLength(LgsCodeGen* codeGen, LgsExpr* iterable) = 0;
+    virtual Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) = 0;
+    virtual Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) = 0;
+    virtual Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) = 0;
     ~LgsIterable() override = default;
 };

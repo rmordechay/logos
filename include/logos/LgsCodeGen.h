@@ -73,10 +73,10 @@ public:
     ConstantInt* i32(int32_t v);
     ConstantInt* i64(int64_t v);
     ConstantInt* isize(size_t v);
-    TypeSize typeSize(StructType* v) const;
     ConstantInt* i32Zero();
     ConstantInt* i64Zero();
     ConstantInt* sizeZero();
+    TypeSize typeSize(StructType* v) const;
 
     // Debugging
     void printPtr(Value* ptr, const string& text);

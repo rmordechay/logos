@@ -46,20 +46,24 @@ string LgsDArray::getName() {
     return name;
 }
 
-Value* LgsDArray::getLength(LgsCodeGen* codeGen, LgsExpr* expr) {
-    return lenFunc.call(codeGen, {expr});
+Value* LgsDArray::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
+    return lenFunc.call(codeGen, {iterable});
 }
 
-Value* LgsDArray::getLoopLength(LgsCodeGen* codeGen, LgsExpr* expr) {
-    return getLength(codeGen, expr);
+Value* LgsDArray::getLoopLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
+    return IRLength(codeGen, iterable);
 }
 
-Value* LgsDArray::isEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
-    return isEmptyFunc.call(codeGen, {expr});
+Value* LgsDArray::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
+    return isEmptyFunc.call(codeGen, {iterable});
 }
 
-Value* LgsDArray::isNotEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
-    return isNotEmptyFunc.call(codeGen, {expr});
+Value* LgsDArray::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
+    return isNotEmptyFunc.call(codeGen, {iterable});
+}
+
+Value* LgsDArray::IRContains(LgsCodeGen* codeGen, LgsExpr* iterable) {
+    return isNotEmptyFunc.call(codeGen, {iterable});
 }
 
 StructType* LgsDArray::getArrStruct(LgsCodeGen* codeGen) {

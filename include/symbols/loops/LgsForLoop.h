@@ -19,9 +19,11 @@ public:
 
     void createIRStmt(LgsCodeGen* codeGen) override;
     void initIndex(LgsCodeGen* codeGen);
-    void incIndex(LgsCodeGen* codeGen) const;
     LoadInst* loadIndex(LgsCodeGen* codeGen) const;
-    virtual void initIRLoop(LgsCodeGen* codeGen) = 0;
+    void incIndex(LgsCodeGen* codeGen) const;
+    virtual void setBlocks(LgsCodeGen* codeGen);
+    virtual void incAndJumpToCond(LgsCodeGen* codeGen) const;
+    virtual void createIRLoop(LgsCodeGen* codeGen) = 0;
     ~LgsForLoop() override;
 };
 

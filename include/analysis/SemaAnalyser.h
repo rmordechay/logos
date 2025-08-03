@@ -86,7 +86,6 @@ public:
     void visitSlice(LgsIterIndex* iterIndex);
     void visitGroup(LgsGroup* group) const;
 
-    void setBinaryExprType(LgsBinaryExpr* binaryExpr);
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     bool setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
 

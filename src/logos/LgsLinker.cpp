@@ -44,24 +44,15 @@ bool LgsLinker::link() const {
             modules.push_back(std::move(module));
         }
     }
-
     Linker llvmLinker(*mainModule);
     for (auto& module : modules) {
         llvmLinker.linkInModule(std::move(module));
     }
-
-    if (!generateObjFile(std::move(mainModule))) return false;
-
-    vector linkerOpts = LINKER_OPTS;
-    linkerOpts.push_back(paths.objFilePath.c_str());
-    linkerOpts.push_back("-o");
-    linkerOpts.push_back(paths.execFilePath.c_str());
-    bool (*link)(ArrayRef<const char*>, raw_ostream&, raw_ostream&, bool, bool) = LINK_FUNC;
-    if (!link(linkerOpts, outs(), errs(), false, false)) {
-        errs().flush();
+    if (!generateObjFile(std::move(mainModule))) {
         return false;
     }
-
+    const auto linkCmd = "clang++ -Lstdlib -llgslib " + paths.objFilePath.string() + " -o " + paths.execFilePath.string();
+    std::system(linkCmd.c_str());
     return true;
 }
 

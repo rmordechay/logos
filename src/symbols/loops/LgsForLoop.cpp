@@ -1,12 +1,12 @@
 #include "loops/LgsForLoop.h"
-#include "stmts/LgsStmtsBlock.h"
+#include "LgsDefinitions.h"
 #include "stmts/LgsVarDec.h"
 
 void LgsForLoop::createIRStmt(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, stmtsBlock);
-    initIRLoop(codeGen);
-    stmtsBlock->createIRValue(codeGen);
-    incIndex(codeGen);
+    setBlocks(codeGen);
+    createIRLoop(codeGen);
+    incAndJumpToCond(codeGen);
     codeGen->startBlock(IRExitBlock);
     codeGen->stack.exitScope();
 }
@@ -21,10 +21,20 @@ LoadInst* LgsForLoop::loadIndex(LgsCodeGen* codeGen) const {
 }
 
 void LgsForLoop::incIndex(LgsCodeGen* codeGen) const {
-    if (codeGen->lastInstTerminator()) return;
     const auto iValue = loadIndex(codeGen);
     const auto inc = codeGen->builder.CreateAdd(iValue, codeGen->i32(1));
     codeGen->builder.CreateStore(inc, iPtr);
+}
+
+void LgsForLoop::setBlocks(LgsCodeGen* codeGen) {
+    IRBodyBlock = codeGen->createBlock(BLOCK_NAME_LOOP_BODY);
+    IRExitBlock = codeGen->createBlock(BLOCK_NAME_LOOP_EXIT);
+    IRCondBlock = codeGen->createBlock(BLOCK_NAME_LOOP_COND);
+}
+
+void LgsForLoop::incAndJumpToCond(LgsCodeGen* codeGen) const {
+    if (codeGen->lastInstTerminator()) return;
+    incIndex(codeGen);
     codeGen->builder.CreateBr(IRCondBlock);
 }
 

@@ -57,12 +57,12 @@ public:
     LgsType* getIndexType() override;
     LgsType* getValueType() override;
     string getStrFormatPart() const override;
-    Value* getLength(LgsCodeGen* codeGen, LgsExpr* expr) override;
-    Value* getLoopLength(LgsCodeGen* codeGen, LgsExpr* expr) override;
-    Value* isEmpty(LgsCodeGen* codeGen, LgsExpr* expr) override;
-    Value* isNotEmpty(LgsCodeGen* codeGen, LgsExpr* expr) override;
     StructType* getArrStruct(LgsCodeGen* codeGen);
-    bool equals(LgsType* other) override;
     void freeValue(LgsCodeGen* codeGen, Value* value) override;
+    Value* getLoopLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
+    Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
+    Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
+    Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
+    bool equals(LgsType* other) override;
     ~LgsDArray() override;
 };

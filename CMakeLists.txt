@@ -107,6 +107,7 @@ target_include_directories(lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
     ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
+    /opt/homebrew/Cellar/llvm@19/19.1.7/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime
 )
 
@@ -114,7 +115,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lib PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libLLVM.dylib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libclang-cpp.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/liblldMachO.dylib
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libantlr4.dylib
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -122,8 +122,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         ZLIB::ZLIB
         zstd
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/linux/libLLVM.so
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/linux/liblldCommon.a
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/linux/liblldELF.a
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/linux/libantlr.a
     )
 endif()

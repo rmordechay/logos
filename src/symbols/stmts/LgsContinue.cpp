@@ -3,5 +3,5 @@
 
 void LgsContinue::createIRStmt(LgsCodeGen* codeGen) {
     const auto currentLoop = codeGen->stack.currentLoop();
-    currentLoop->incIndex(codeGen);
+    currentLoop->incAndJumpToCond(codeGen);
 }

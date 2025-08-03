@@ -293,8 +293,7 @@ LgsMainFunc* AntlrConverter::getMainFunc(LogosParser::FuncContext* ctx) {
     const auto mainFunc = new LgsMainFunc();
     const auto funcSignature = ctx->funcSignature();
     setLocation(mainFunc->location, funcSignature->funcSignatureHeader()->IDENTIFIER()->getSymbol(), nullptr);
-    const auto statementsBlock = ctx->statementsBlock();
-    mainFunc->stmtsBlock = getStmtBlock(statementsBlock);
+    mainFunc->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     bool isValid = true;
     const auto paramSize = funcSignature->funcSignatureHeader()->param().size();
     if (paramSize > 1) {
@@ -405,7 +404,7 @@ LgsStmtsBlock* AntlrConverter::getStmtBlock(LogosParser::StatementsBlockContext*
     if (!ctx) return stmtBlock;
     for (const auto& statement : ctx->statement()) {
         auto stmt = getStmt(statement);
-        stmtBlock->stmts.emplace_back(stmt);
+        stmtBlock->stmts.push_back(stmt);
     }
     return stmtBlock;
 }
@@ -611,13 +610,13 @@ LgsForLoop* AntlrConverter::getForeachLoop(LogosParser::LoopStatementContext* ct
 LgsForLoop* AntlrConverter::getInfiniteLoop(LogosParser::LoopStatementContext* ctx) const {
     const auto rangeLoop = new LgsInfiniteLoop();
     if (!ctx->IDENTIFIER().empty()) {
-        const auto idToken = ctx->IDENTIFIER()[0];
+        const auto idToken = ctx->IDENTIFIER().front();
         const auto loopVarName = idToken->getText();
-        auto varDec = new LgsVarDec(loopVarName);
+        const auto varDec = new LgsVarDec(loopVarName);
         setLocation(varDec->location, idToken->getSymbol(), nullptr);
         varDec->type = &LGS_INT;
         varDec->expr = LGS_INT.getZeroValue();
-        rangeLoop->loopVars.emplace_back(varDec);
+        rangeLoop->loopVars.push_back(varDec);
     }
     return rangeLoop;
 }
@@ -970,7 +969,11 @@ LgsUnaryExpr* AntlrConverter::getLoopIsLast(const LogosParser::IsLastContext* ct
     setLocation(var->location, ctx->start, ctx->stop);
     if (loopStack.empty()) {
         errHandler.addError(E10060, &var->location);
-        return nullptr;
+        return var;
+    }
+    if (dynamic_cast<LgsInfiniteLoop*>(loopStack.top())) {
+        errHandler.addError(E10061, &var->location);
+        return var;
     }
     if (!loopStack.top()->isLastVarDec) {
         loopStack.top()->isLastVarDec = new LgsVarDec(LOGOS_LOOP_IS_LAST, new LgsBoolConst(false));

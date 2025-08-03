@@ -10,7 +10,7 @@ Value* LgsParam::getIRValue(LgsCodeGen* codeGen) {
     if (isVariadic) {
         if (vaList) return vaList;
         vaList = codeGen->builder.CreateAlloca(codeGen->builder.getPtrTy());
-        const auto vaStart = getOrInsertDeclaration(codeGen->IRModule, Intrinsic::vastart, {codeGen->builder.getPtrTy()});
+        const auto vaStart = Intrinsic::getDeclaration(codeGen->IRModule, Intrinsic::vastart, {codeGen->builder.getPtrTy()});
         codeGen->builder.CreateCall(vaStart, {vaList});
         return vaList;
     }

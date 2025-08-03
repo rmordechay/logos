@@ -28,13 +28,6 @@
 #include <llvm/IRReader/IRReader.h>
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
-#include <clang/Driver/Compilation.h>
-#include <clang/Driver/Driver.h>
-#include <clang/AST/ASTConsumer.h>
-#include <clang/AST/RecursiveASTVisitor.h>
-#include <clang/Tooling/Tooling.h>
-#include <clang/CodeGen/CodeGenAction.h>
-#include <clang/Basic/Diagnostic.h>
 
 using namespace std;
 using namespace filesystem;

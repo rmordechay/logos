@@ -16,7 +16,6 @@
 
 #if defined(__linux__)
     #define OS_NAME "Linux"
-    #define LINKER "ld"
     #define CLIB_ROOT "/usr/lib/aarch64-linux-gnu/"
     #define PLATFORM_VERSION "15.0"
     #define LINK_FUNC lld::elf::link
@@ -31,7 +30,6 @@
     }
 #elif defined(__APPLE__) && defined(__MACH__)
     #define OS_NAME "macOS"
-    #define LINKER "ld.lld"
     #define CLIB_ROOT "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
     #define PLATFORM_VERSION "15.0"
     #define LINK_FUNC lld::macho::link
@@ -46,7 +44,6 @@
 #elif defined(_WIN32)
     LLD_HAS_DRIVER(coff);
     #define OS_NAME "Win"
-    #define LINKER ""
     #define CLIB_ROOT ""
     #define PLATFORM_VERSION ""
     #define LINK_FUNC lld::coff::link

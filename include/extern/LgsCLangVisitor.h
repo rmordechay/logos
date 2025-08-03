@@ -1,14 +1,14 @@
 #pragma once
 #include "files/LgsFile.h"
-#include "utils/LgsErrHandler.h"
 #include "utils/LgsUtils.h"
+#include <clang/AST/RecursiveASTVisitor.h>
+#include <clang/Frontend/FrontendAction.h>
 
 class LgsErrHandler;
 class LgsFile;
 class LgsObject;
 class LgsType;
 struct LgsSymbol;
-using namespace clang::tooling;
 
 class LgsCLangVisitor : public clang::RecursiveASTVisitor<LgsCLangVisitor> {
 public:

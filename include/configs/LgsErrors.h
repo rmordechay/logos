@@ -68,3 +68,4 @@ inline LgsError E10057{.msg = "Pattern matching expression '%s' must be of type 
 inline LgsError E10058{.msg = "Field '%s' is defined in multiple interfaces: '%s'.", .errCode = errCodeStart++};
 inline LgsError E10059{.msg = "Unreachable code.", .errCode = errCodeStart++};
 inline LgsError E10060{.msg = "'for.isFirst' and 'for.isLast' are only allowed inside a for loop.", .errCode = errCodeStart++};
+inline LgsError E10061{.msg = "'for.isLast' is not allowed in an infinite loop.", .errCode = errCodeStart++};

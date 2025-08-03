@@ -70,7 +70,7 @@ void LgsCodeGen::callInitRuntime() {
 }
 
 void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
-    const auto memCpy = getOrInsertDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), ptrTy()});
+    const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), ptrTy()});
     builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
 }
 
@@ -117,38 +117,38 @@ void LgsCodeGen::callPrintError(const string& msg) {
 }
 
 Value* LgsCodeGen::callIDFunc() {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_id);
+    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_id);
     return builder.CreateCall(func, {i32Zero(), null(), null(), null()});
 }
 
 Value* LgsCodeGen::callSuspendFunc() {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_suspend);
+    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_suspend);
     return builder.CreateCall(func, {ConstantTokenNone::get(context), builder.getFalse()});
 }
 
 Value* LgsCodeGen::callResumeFunc(Value* handle) {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_resume);
+    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_resume);
     return builder.CreateCall(func, {handle});
 }
 
 Value* LgsCodeGen::callSizeFunc() {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_size, {i32Ty()});
+    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_size, {i32Ty()});
     return builder.CreateCall(func);
 }
 
 Value* LgsCodeGen::callBeginFunc(Value* coroID, Value* frameSize) {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_begin);
+    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_begin);
     const auto sizeValue = builder.CreateMalloc(i32Ty(), i8Ty(), frameSize, nullptr);
     return builder.CreateCall(func, {coroID, sizeValue});
 }
 
 Value* LgsCodeGen::callEndFunc(Value* handle) {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_end);
+    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_end);
     return builder.CreateCall(func, {handle, builder.getFalse(), ConstantTokenNone::get(context)});
 }
 
 Value* LgsCodeGen::callDestroyFunc(Value* handle) {
-    const auto func = getOrInsertDeclaration(IRModule, Intrinsic::coro_destroy);
+    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_destroy);
     return builder.CreateCall(func, {handle});
 }
 

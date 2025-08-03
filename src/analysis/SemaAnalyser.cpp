@@ -125,7 +125,7 @@ bool isTerminator(LgsValue* value) {
 }
 
 void SemaAnalyser::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
-    if (!stmtsBlock) return;
+    if (!stmtsBlock || stmtsBlock->stmts.empty()) return;
     for (const auto& stmt : stmtsBlock->stmts) {
         visitStmt(stmt);
     }
@@ -265,10 +265,9 @@ void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
 }
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
-    const auto loopVar = rangeLoop->loopVars.front();
     visitExpr(rangeLoop->startRange);
     visitExpr(rangeLoop->endRange);
-    addLocalSymbol(LgsSymbol(loopVar));
+    addLocalSymbol(LgsSymbol(rangeLoop->loopVars.front()));
     visitStmtsBlock(rangeLoop->stmtsBlock);
 }
 
@@ -289,6 +288,9 @@ void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
 }
 
 void SemaAnalyser::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
+    if (!infiniteLoop->loopVars.empty()) {
+        addLocalSymbol(LgsSymbol(infiniteLoop->loopVars.front()));
+    }
     visitStmtsBlock(infiniteLoop->stmtsBlock);
 }
 
@@ -365,7 +367,39 @@ void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
 void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     visitExpr(binaryExpr->left);
     visitExpr(binaryExpr->right);
-    setBinaryExprType(binaryExpr);
+    LgsType* type = nullptr;
+    switch (binaryExpr->op) {
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+    case MOD:
+    case BIT_AND:
+    case BIT_OR:
+    case BIT_XOR:
+    case LSHIFT:
+    case RSHIFT: {
+        const auto lType = binaryExpr->left->type;
+        const auto rType = binaryExpr->right->type;
+        if (!lType || !rType) return;
+        type = lType;
+        break;
+    }
+    case AND:
+    case OR:
+    case NE:
+    case EQ:
+    case LT:
+    case GT:
+    case GE:
+    case LE: {
+        type = &LGS_BOOL;
+        break;
+    }
+    case NOOP:
+        break;
+    }
+    binaryExpr->setType(type);
 }
 
 void SemaAnalyser::visitArrayExpr(const LgsArrayExpr* array) {
@@ -649,44 +683,6 @@ bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable
     }
     fieldVariable->setType(field->type);
     return true;
-}
-
-void SemaAnalyser::setBinaryExprType(LgsBinaryExpr* binaryExpr) {
-    visitExpr(binaryExpr->left);
-    visitExpr(binaryExpr->right);
-    LgsType* type = nullptr;
-    switch (binaryExpr->op) {
-    case ADD:
-    case SUB:
-    case MUL:
-    case DIV:
-    case MOD:
-    case BIT_AND:
-    case BIT_OR:
-    case BIT_XOR:
-    case LSHIFT:
-    case RSHIFT: {
-        const auto lType = binaryExpr->left->type;
-        const auto rType = binaryExpr->right->type;
-        if (!lType || !rType) return;
-        type = lType;
-        break;
-    }
-    case AND:
-    case OR:
-    case NE:
-    case EQ:
-    case LT:
-    case GT:
-    case GE:
-    case LE: {
-        type = &LGS_BOOL;
-        break;
-    }
-    case NOOP:
-        break;
-    }
-    binaryExpr->setType(type);
 }
 
 bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable) {

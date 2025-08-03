@@ -1,5 +1,4 @@
 #include "loops/LgsForeachLoop.h"
-#include "configs/LgsDefinitions.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "stmts/LgsVarDec.h"
 #include "stmts/LgsStmtsBlock.h"
@@ -7,40 +6,35 @@
 #include "types/LgsIterator.h"
 #include "types/LgsMap.h"
 
-void LgsForeachLoop::initIRLoop(LgsCodeGen* codeGen) {
-    IRCondBlock = codeGen->createBlock(BLOCK_NAME_LOOP_COND);
-    IRBodyBlock = codeGen->createBlock(BLOCK_NAME_LOOP_BODY);
-    IRExitBlock = codeGen->createBlock(BLOCK_NAME_LOOP_EXIT);
-
+void LgsForeachLoop::createIRLoop(LgsCodeGen* codeGen) {
     initIndex(codeGen);
     codeGen->branchAndStartBlock(IRCondBlock);
-
-    // With iterator
     const auto iterable = iterExpr->type->asIterable();
     if (iterable->asMap()) {
+        // With iterator
         LgsIterator iterator = iterExpr->toIterator();
         iterator.initIterator(codeGen);
         codeGen->builder.CreateCondBr(iterator.hasNext(codeGen), IRBodyBlock, IRExitBlock);
         codeGen->startBlock(IRBodyBlock);
         iterPtr = iterExpr->getIRValue(codeGen);
         setMapIterVars(codeGen, iterator);
-        return;
-    }
-
-    // Without iterator
-    const auto iValue = loadIndex(codeGen);
-    const auto loopEnd = iterable->getLoopLength(codeGen, iterExpr);
-    const auto condition = codeGen->builder.CreateICmpSLT(iValue, loopEnd);
-    codeGen->builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
-    codeGen->startBlock(IRBodyBlock);
-    iterPtr = iterExpr->getIRValue(codeGen);
-    if (const auto str = iterable->asStr()) {
-        setStrIterVars(codeGen, str);
-    } else if (const auto arr = iterable->asDArray()) {
-        setArrIterVars(codeGen, arr);
     } else {
-        assert(0);
+        // Without iterator
+        const auto iValue = loadIndex(codeGen);
+        const auto loopEnd = iterable->getLoopLength(codeGen, iterExpr);
+        const auto condition = codeGen->builder.CreateICmpSLT(iValue, loopEnd);
+        codeGen->builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
+        codeGen->startBlock(IRBodyBlock);
+        iterPtr = iterExpr->getIRValue(codeGen);
+        if (const auto str = iterable->asStr()) {
+            setStrIterVars(codeGen, str);
+        } else if (const auto arr = iterable->asDArray()) {
+            setArrIterVars(codeGen, arr);
+        } else {
+            assert(0);
+        }
     }
+    stmtsBlock->createIRValue(codeGen);
 }
 
 void LgsForeachLoop::setStrIterVars(LgsCodeGen* codeGen, LgsStr* str) const {

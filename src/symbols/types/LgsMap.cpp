@@ -20,20 +20,20 @@ LgsType* LgsMap::getValueType() {
     return typePair->key;
 }
 
-Value* LgsMap::getLength(LgsCodeGen* codeGen, LgsExpr* expr) {
-    return lenFunc.call(codeGen, {expr});
+Value* LgsMap::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
+    return lenFunc.call(codeGen, {iterable});
 }
 
-Value* LgsMap::getLoopLength(LgsCodeGen* codeGen, LgsExpr* expr) {
+Value* LgsMap::getLoopLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
     return codeGen->i32(1024);
 }
 
-Value* LgsMap::isEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
-    return isEmptyFunc.call(codeGen, {expr});
+Value* LgsMap::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
+    return isEmptyFunc.call(codeGen, {iterable});
 }
 
-Value* LgsMap::isNotEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
-    return isNotEmptyFunc.call(codeGen, {expr});
+Value* LgsMap::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
+    return isNotEmptyFunc.call(codeGen, {iterable});
 }
 
 Type* LgsMap::getIRType(LgsCodeGen* codeGen) {

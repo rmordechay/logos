@@ -45,19 +45,19 @@ string LgsSArray::getName() {
     return name;
 }
 
-Value* LgsSArray::getLength(LgsCodeGen* codeGen, LgsExpr* expr) {
+Value* LgsSArray::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
     return sizeExpr->getIRValue(codeGen);
 }
 
-Value* LgsSArray::getLoopLength(LgsCodeGen* codeGen, LgsExpr* expr) {
-    return getLength(codeGen, expr);
+Value* LgsSArray::getLoopLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
+    return IRLength(codeGen, iterable);
 }
 
-Value* LgsSArray::isEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
+Value* LgsSArray::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
     assert(0);
 }
 
-Value* LgsSArray::isNotEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
+Value* LgsSArray::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
     assert(0);
 }
 

@@ -7,12 +7,12 @@
 void LgsCoroutine::createIRStmt(LgsCodeGen* codeGen) {
     auto& builder = codeGen->builder;
     codeGen->savedIP = builder.saveIP();
+    const auto funcOrMethodCall = funcCall ? funcCall : selection->lastExpr()->asFuncCall();
 
     vector<Type*> argTypes;
     vector<Value*> coroutineArgs;
     vector<Value*> originalArgs;
-    const auto& args = funcCall ? funcCall->args : selection->lastExpr()->asFuncCall()->args;
-    for (const auto arg : args) {
+    for (const auto arg : funcOrMethodCall->args) {
         originalArgs.push_back(arg->getIRValue(codeGen));
         argTypes.push_back(arg->type->getIRType(codeGen));
     }
@@ -20,7 +20,7 @@ void LgsCoroutine::createIRStmt(LgsCodeGen* codeGen) {
     const auto ft = FunctionType::get(codeGen->ptrTy(), argTypes, false);
     const auto coroutineFunc = Function::Create(ft, GlobalValue::PrivateLinkage, "coroutine", codeGen->IRModule);
     auto arg = coroutineFunc->arg_begin();
-    for (int i = 0; i < args.size(); ++i) {
+    for (int i = 0; i < funcOrMethodCall->args.size(); ++i) {
         coroutineArgs.push_back(arg++);
     }
     const auto entryBlock = codeGen->createBlock(BLOCK_NAME_ENTRY, coroutineFunc);

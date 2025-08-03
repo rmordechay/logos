@@ -318,6 +318,7 @@ void LgsApp::writeDebugFile() const {
 void LgsApp::writeIRFiles() const {
     for (const auto file : files) {
         const auto module = file->codeGen.IRModule;
+        if (!module) continue;
         if constexpr (WRITE_IR_TO_FILE) {
             const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
             error_code EC;

@@ -35,22 +35,22 @@ LgsType* LgsStr::getValueType() {
     return baseType;
 }
 
-Value* LgsStr::getLength(LgsCodeGen* codeGen, LgsExpr* expr) {
-    return lenFunc.call(codeGen, {expr});
+Value* LgsStr::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
+    return lenFunc.call(codeGen, {iterable});
 }
 
-Value* LgsStr::getLoopLength(LgsCodeGen* codeGen, LgsExpr* expr) {
+Value* LgsStr::getLoopLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
     const auto lenPtr = codeGen->builder.CreateAlloca(codeGen->i64Ty());
-    codeGen->builder.CreateStore(getLength(codeGen, expr), lenPtr);
+    codeGen->builder.CreateStore(IRLength(codeGen, iterable), lenPtr);
     return codeGen->builder.CreateLoad(codeGen->i64Ty(), lenPtr);
 }
 
-Value* LgsStr::isEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
-    return isEmptyFunc.call(codeGen, {expr});
+Value* LgsStr::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
+    return isEmptyFunc.call(codeGen, {iterable});
 }
 
-Value* LgsStr::isNotEmpty(LgsCodeGen* codeGen, LgsExpr* expr) {
-    return isNotEmptyFunc.call(codeGen, {expr});
+Value* LgsStr::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
+    return isNotEmptyFunc.call(codeGen, {iterable});
 }
 
 bool LgsStr::equals(LgsType* other) {

@@ -2,11 +2,16 @@
 #include "configs/LgsErrors.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "extern/LgsCLangVisitor.h"
-#include "../../include/utils/LgsErrHandler.h"
+#include "utils/LgsErrHandler.h"
 #include "logos/LgsPaths.h"
 #include "utils/LgsUtils.h"
-
-using namespace clang;
+#include <clang/Driver/Compilation.h>
+#include <clang/Driver/Driver.h>
+#include <clang/AST/RecursiveASTVisitor.h>
+#include <clang/Tooling/Tooling.h>
+#include <clang/CodeGen/CodeGenAction.h>
+#include <clang/Frontend/CompilerInvocation.h>
+#include <clang/Frontend/CompilerInstance.h>
 
 #define CLANG_BINARY "clang"
 
@@ -14,32 +19,32 @@ void LgsCLang::parseFile(const string& filePath) {
     auto headerPath = paths.clibInclude / filePath;
     if (isCLibHeader(headerPath)) {
         const auto code = getFileText(headerPath);
-        runToolOnCodeWithArgs(make_unique<LgsCLangFeAction>(headerPath), code, {"-isysroot", paths.clibRoot});
+        clang::tooling::runToolOnCodeWithArgs(make_unique<LgsCLangFeAction>(headerPath), code, {"-isysroot", paths.clibRoot});
     }
 }
 
-void LgsCLang::compile(const vector<LgsStrConst*>& files) const {
+void LgsCLang::compile(const vector<LgsStrConst*>& files) {
     const auto targetTriple = sys::getDefaultTargetTriple();
-    DiagnosticsEngine diags(new DiagnosticIDs(), new DiagnosticOptions(), new DiagnosticConsumer());
-    Driver driver(CLANG_BINARY, targetTriple, diags);
+    clang::DiagnosticsEngine diags(new clang::DiagnosticIDs(), new clang::DiagnosticOptions(), new clang::DiagnosticConsumer());
+    clang::driver::Driver driver(CLANG_BINARY, targetTriple, diags);
 
-    auto invocation = make_unique<CompilerInvocation>();
+    auto invocation = make_unique<clang::CompilerInvocation>();
     vector<const char*> args;
     setCompileArgs(files, args);
-    CompilerInvocation::CreateFromArgs(*invocation, args, diags);
-    auto compilerInstance = make_unique<CompilerInstance>();
+    clang::CompilerInvocation::CreateFromArgs(*invocation, args, diags);
+    auto compilerInstance = make_unique<clang::CompilerInstance>();
     compilerInstance->setInvocation(std::move(invocation));
     compilerInstance->createFileManager();
     compilerInstance->createSourceManager(compilerInstance->getFileManager());
 
     switch (compilerInstance->getFrontendOpts().ProgramAction) {
-    case frontend::ActionKind::EmitObj: {
-        EmitObjAction action;
+    case clang::frontend::ActionKind::EmitObj: {
+        clang::EmitObjAction action;
         compilerInstance->ExecuteAction(action);
         break;
     }
-    case frontend::ActionKind::EmitAssembly: {
-        EmitAssemblyAction action;
+    case clang::frontend::ActionKind::EmitAssembly: {
+        clang::EmitAssemblyAction action;
         compilerInstance->ExecuteAction(action);
         break;
     }
@@ -88,10 +93,10 @@ void LgsCLang::setCHeaderPaths() {
 }
 
 void LgsCLang::getClibRoot() const {
-    DiagnosticsEngine diags(new DiagnosticIDs(), new DiagnosticOptions(), new DiagnosticConsumer());
-    auto invocation = make_unique<CompilerInvocation>();
-    CompilerInvocation::CreateFromArgs(*invocation, {CLANG_BINARY, "-x", "c", "-E", "-"}, diags);
-    auto compilerInstance = make_unique<CompilerInstance>();
+    clang::DiagnosticsEngine diags(new clang::DiagnosticIDs(), new clang::DiagnosticOptions(), new clang::DiagnosticConsumer());
+    auto invocation = make_unique<clang::CompilerInvocation>();
+    clang::CompilerInvocation::CreateFromArgs(*invocation, {CLANG_BINARY, "-x", "c", "-E", "-"}, diags);
+    auto compilerInstance = make_unique<clang::CompilerInstance>();
     compilerInstance->setInvocation(std::move(invocation));
 }
 
