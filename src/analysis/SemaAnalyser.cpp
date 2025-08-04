@@ -70,7 +70,7 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
     for (const auto& [_, method] : obj->methods) {
         visitFunc(method);
     }
-    validateInterfaces(obj, obj->interfaces);
+    validateObjImplements(obj, obj->interfaces);
 }
 
 void SemaAnalyser::visitInterface(LgsInterface* interface) {
@@ -578,7 +578,10 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     if (symbol->symbolType != OBJECT && symbol->symbolType != INTERFACE) {
         return errHandler.addError(E10022, &instance->location, {objName});
     }
-    if (symbol->object->singleton) {
+    if (symbol->symbolType == INTERFACE) {
+        validateInterfaceInstance(instance, symbol->interface);
+    }
+    if (symbol->symbolType == OBJECT && symbol->object->singleton) {
         return errHandler.addError(E10032, &instance->location, {objName});
     }
 
@@ -706,7 +709,7 @@ bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterEx
     return false;
 }
 
-void SemaAnalyser::validateInterfaces(LgsObject* obj, const vector<LgsType*>& interfaces) {
+void SemaAnalyser::validateObjImplements(LgsObject* obj, const vector<LgsType*>& interfaces) {
     unordered_set<string> interfacesNames;
     obj->hasVirtuals = !interfaces.empty();
     for (int i = 0; i < interfaces.size(); ++i) {
@@ -716,9 +719,9 @@ void SemaAnalyser::validateInterfaces(LgsObject* obj, const vector<LgsType*>& in
             errHandler.addError(E10025, &implementsInterface->location, {implementsInterface->prettyName()});
             continue;
         }
-        validateImplements(obj, interface);
+        validateObjInterface(obj, interface);
         for (const auto parentInterface: interface->interfaces) {
-            validateImplements(obj, parentInterface->asInterface());
+            validateObjInterface(obj, parentInterface->asInterface());
         }
     }
 }
@@ -736,11 +739,11 @@ string getMissingImplementsStr(const vector<LgsField*>& fields, const vector<Lgs
     return str.str();
 }
 
-void SemaAnalyser::validateImplements(LgsObject* type, LgsInterface* interface) {
+void SemaAnalyser::validateObjInterface(LgsObject* obj, LgsInterface* interface) {
     // Fields
     vector<LgsField*> missingFields;
     for (const auto& [name, interfaceField] : interface->fields) {
-        const auto objField = type->getField(name);
+        const auto objField = obj->getField(name);
         if (objField && objField->type->equals(interfaceField->type)) {
             objField->isVirtual = true;
             continue;
@@ -753,7 +756,7 @@ void SemaAnalyser::validateImplements(LgsObject* type, LgsInterface* interface) 
     // Methods
     vector<LgsFunc*> missingMethods;
     for (const auto& [name, interfaceMethod] : interface->methods) {
-        const auto objMethod = type->getMethod(name);
+        const auto objMethod = obj->getMethod(name);
         if (objMethod && objMethod->funcType->equals(interfaceMethod->funcType)) {
             objMethod->funcType->isVirtual = true;
             objMethod->funcType->implementsName = &interface->name;
@@ -765,8 +768,12 @@ void SemaAnalyser::validateImplements(LgsObject* type, LgsInterface* interface) 
     }
 
     if (!missingMethods.empty() || !missingFields.empty()) {
-        errHandler.addError(E10016, &type->location, {type->prettyName(), interface->name, getMissingImplementsStr(missingFields, missingMethods)});
+        errHandler.addError(E10016, &obj->location, {obj->prettyName(), interface->name, getMissingImplementsStr(missingFields, missingMethods)});
     }
+}
+
+void SemaAnalyser::validateInterfaceInstance(LgsInstance* instance, LgsInterface* interface) {
+
 }
 
 void SemaAnalyser::validateIndex(LgsIterIndex* iterIndex) {
@@ -891,7 +898,15 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsLocation* locati
 }
 
 void SemaAnalyser::addLocalSymbol(const LgsSymbol& newSymbol) {
-    stack.getSymbolTable().addSymbol(*newSymbol.name, newSymbol, &errHandler);
+    auto symbolName = *newSymbol.name;
+    auto symbol = globals.getSymbol(symbolName);
+    if (symbol && symbol->isBuiltin) {
+        return errHandler.addError(E10053, newSymbol.location, {symbolName});
+    }
+    if ((symbol = file->symbolTable.getSymbol(symbolName))) {
+        return errHandler.addError(E10011, newSymbol.location, {symbolName, symbol->location->lineNumberStr()});
+    }
+    stack.getSymbolTable().addSymbol(symbolName, newSymbol, &errHandler);
 }
 
 void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {

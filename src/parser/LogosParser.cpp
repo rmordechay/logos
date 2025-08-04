@@ -61,7 +61,7 @@ void logosParserInitialize() {
       "patternMatching", "pattern", "loopStatement", "breakStmt", "returnStatement", 
       "enumDeclaration", "enumField", "coroutine", "expr", "unaryExpr", 
       "prefixExpr", "postfixExpr", "arrayExpr", "hashMap", "keyValue", "funcCall", 
-      "funcArgList", "funcArg", "constructor", "constructorArgList", "constructorArg", 
+      "funcArgList", "funcArg", "instance", "instanceArgList", "instanceArg", 
       "constant", "iterIndex", "index", "isFirst", "isLast", "selection", 
       "firstSelectionElement", "innerSelectionElement", "range", "type", 
       "mapType", "arraySize", "funcType", "vector", "extern", "requireEnvVars", 
@@ -4331,8 +4331,8 @@ LogosParser::VectorContext* LogosParser::UnaryExprContext::vector() {
   return getRuleContext<LogosParser::VectorContext>(0);
 }
 
-LogosParser::ConstructorContext* LogosParser::UnaryExprContext::constructor() {
-  return getRuleContext<LogosParser::ConstructorContext>(0);
+LogosParser::InstanceContext* LogosParser::UnaryExprContext::instance() {
+  return getRuleContext<LogosParser::InstanceContext>(0);
 }
 
 LogosParser::ConstantContext* LogosParser::UnaryExprContext::constant() {
@@ -4450,7 +4450,7 @@ LogosParser::UnaryExprContext* LogosParser::unaryExpr() {
     case 10: {
       enterOuterAlt(_localctx, 10);
       setState(600);
-      constructor();
+      instance();
       break;
     }
 
@@ -5185,37 +5185,37 @@ LogosParser::FuncArgContext* LogosParser::funcArg() {
   return _localctx;
 }
 
-//----------------- ConstructorContext ------------------------------------------------------------------
+//----------------- InstanceContext ------------------------------------------------------------------
 
-LogosParser::ConstructorContext::ConstructorContext(ParserRuleContext *parent, size_t invokingState)
+LogosParser::InstanceContext::InstanceContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* LogosParser::ConstructorContext::IDENTIFIER() {
+tree::TerminalNode* LogosParser::InstanceContext::IDENTIFIER() {
   return getToken(LogosParser::IDENTIFIER, 0);
 }
 
-tree::TerminalNode* LogosParser::ConstructorContext::LBRACE() {
+tree::TerminalNode* LogosParser::InstanceContext::LBRACE() {
   return getToken(LogosParser::LBRACE, 0);
 }
 
-tree::TerminalNode* LogosParser::ConstructorContext::RBRACE() {
+tree::TerminalNode* LogosParser::InstanceContext::RBRACE() {
   return getToken(LogosParser::RBRACE, 0);
 }
 
-LogosParser::ConstructorArgListContext* LogosParser::ConstructorContext::constructorArgList() {
-  return getRuleContext<LogosParser::ConstructorArgListContext>(0);
+LogosParser::InstanceArgListContext* LogosParser::InstanceContext::instanceArgList() {
+  return getRuleContext<LogosParser::InstanceArgListContext>(0);
 }
 
 
-size_t LogosParser::ConstructorContext::getRuleIndex() const {
-  return LogosParser::RuleConstructor;
+size_t LogosParser::InstanceContext::getRuleIndex() const {
+  return LogosParser::RuleInstance;
 }
 
 
-LogosParser::ConstructorContext* LogosParser::constructor() {
-  ConstructorContext *_localctx = _tracker.createInstance<ConstructorContext>(_ctx, getState());
-  enterRule(_localctx, 102, LogosParser::RuleConstructor);
+LogosParser::InstanceContext* LogosParser::instance() {
+  InstanceContext *_localctx = _tracker.createInstance<InstanceContext>(_ctx, getState());
+  enterRule(_localctx, 102, LogosParser::RuleInstance);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -5237,7 +5237,7 @@ LogosParser::ConstructorContext* LogosParser::constructor() {
     _la = _input->LA(1);
     if (_la == LogosParser::IDENTIFIER) {
       setState(689);
-      constructorArgList();
+      instanceArgList();
     }
     setState(692);
     match(LogosParser::RBRACE);
@@ -5252,37 +5252,37 @@ LogosParser::ConstructorContext* LogosParser::constructor() {
   return _localctx;
 }
 
-//----------------- ConstructorArgListContext ------------------------------------------------------------------
+//----------------- InstanceArgListContext ------------------------------------------------------------------
 
-LogosParser::ConstructorArgListContext::ConstructorArgListContext(ParserRuleContext *parent, size_t invokingState)
+LogosParser::InstanceArgListContext::InstanceArgListContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-std::vector<LogosParser::ConstructorArgContext *> LogosParser::ConstructorArgListContext::constructorArg() {
-  return getRuleContexts<LogosParser::ConstructorArgContext>();
+std::vector<LogosParser::InstanceArgContext *> LogosParser::InstanceArgListContext::instanceArg() {
+  return getRuleContexts<LogosParser::InstanceArgContext>();
 }
 
-LogosParser::ConstructorArgContext* LogosParser::ConstructorArgListContext::constructorArg(size_t i) {
-  return getRuleContext<LogosParser::ConstructorArgContext>(i);
+LogosParser::InstanceArgContext* LogosParser::InstanceArgListContext::instanceArg(size_t i) {
+  return getRuleContext<LogosParser::InstanceArgContext>(i);
 }
 
-std::vector<tree::TerminalNode *> LogosParser::ConstructorArgListContext::COMMA() {
+std::vector<tree::TerminalNode *> LogosParser::InstanceArgListContext::COMMA() {
   return getTokens(LogosParser::COMMA);
 }
 
-tree::TerminalNode* LogosParser::ConstructorArgListContext::COMMA(size_t i) {
+tree::TerminalNode* LogosParser::InstanceArgListContext::COMMA(size_t i) {
   return getToken(LogosParser::COMMA, i);
 }
 
 
-size_t LogosParser::ConstructorArgListContext::getRuleIndex() const {
-  return LogosParser::RuleConstructorArgList;
+size_t LogosParser::InstanceArgListContext::getRuleIndex() const {
+  return LogosParser::RuleInstanceArgList;
 }
 
 
-LogosParser::ConstructorArgListContext* LogosParser::constructorArgList() {
-  ConstructorArgListContext *_localctx = _tracker.createInstance<ConstructorArgListContext>(_ctx, getState());
-  enterRule(_localctx, 104, LogosParser::RuleConstructorArgList);
+LogosParser::InstanceArgListContext* LogosParser::instanceArgList() {
+  InstanceArgListContext *_localctx = _tracker.createInstance<InstanceArgListContext>(_ctx, getState());
+  enterRule(_localctx, 104, LogosParser::RuleInstanceArgList);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -5296,7 +5296,7 @@ LogosParser::ConstructorArgListContext* LogosParser::constructorArgList() {
     size_t alt;
     enterOuterAlt(_localctx, 1);
     setState(694);
-    constructorArg();
+    instanceArg();
     setState(699);
     _errHandler->sync(this);
     alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 87, _ctx);
@@ -5305,7 +5305,7 @@ LogosParser::ConstructorArgListContext* LogosParser::constructorArgList() {
         setState(695);
         match(LogosParser::COMMA);
         setState(696);
-        constructorArg(); 
+        instanceArg(); 
       }
       setState(701);
       _errHandler->sync(this);
@@ -5330,33 +5330,33 @@ LogosParser::ConstructorArgListContext* LogosParser::constructorArgList() {
   return _localctx;
 }
 
-//----------------- ConstructorArgContext ------------------------------------------------------------------
+//----------------- InstanceArgContext ------------------------------------------------------------------
 
-LogosParser::ConstructorArgContext::ConstructorArgContext(ParserRuleContext *parent, size_t invokingState)
+LogosParser::InstanceArgContext::InstanceArgContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* LogosParser::ConstructorArgContext::IDENTIFIER() {
+tree::TerminalNode* LogosParser::InstanceArgContext::IDENTIFIER() {
   return getToken(LogosParser::IDENTIFIER, 0);
 }
 
-tree::TerminalNode* LogosParser::ConstructorArgContext::EQUAL() {
+tree::TerminalNode* LogosParser::InstanceArgContext::EQUAL() {
   return getToken(LogosParser::EQUAL, 0);
 }
 
-LogosParser::ExprContext* LogosParser::ConstructorArgContext::expr() {
+LogosParser::ExprContext* LogosParser::InstanceArgContext::expr() {
   return getRuleContext<LogosParser::ExprContext>(0);
 }
 
 
-size_t LogosParser::ConstructorArgContext::getRuleIndex() const {
-  return LogosParser::RuleConstructorArg;
+size_t LogosParser::InstanceArgContext::getRuleIndex() const {
+  return LogosParser::RuleInstanceArg;
 }
 
 
-LogosParser::ConstructorArgContext* LogosParser::constructorArg() {
-  ConstructorArgContext *_localctx = _tracker.createInstance<ConstructorArgContext>(_ctx, getState());
-  enterRule(_localctx, 106, LogosParser::RuleConstructorArg);
+LogosParser::InstanceArgContext* LogosParser::instanceArg() {
+  InstanceArgContext *_localctx = _tracker.createInstance<InstanceArgContext>(_ctx, getState());
+  enterRule(_localctx, 106, LogosParser::RuleInstanceArg);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -5884,8 +5884,8 @@ LogosParser::FuncCallContext* LogosParser::FirstSelectionElementContext::funcCal
   return getRuleContext<LogosParser::FuncCallContext>(0);
 }
 
-LogosParser::ConstructorContext* LogosParser::FirstSelectionElementContext::constructor() {
-  return getRuleContext<LogosParser::ConstructorContext>(0);
+LogosParser::InstanceContext* LogosParser::FirstSelectionElementContext::instance() {
+  return getRuleContext<LogosParser::InstanceContext>(0);
 }
 
 LogosParser::IterIndexContext* LogosParser::FirstSelectionElementContext::iterIndex() {
@@ -5951,7 +5951,7 @@ LogosParser::FirstSelectionElementContext* LogosParser::firstSelectionElement() 
     case 6: {
       enterOuterAlt(_localctx, 6);
       setState(766);
-      constructor();
+      instance();
       break;
     }
 

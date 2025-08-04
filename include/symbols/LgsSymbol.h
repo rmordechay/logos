@@ -27,6 +27,7 @@ struct LgsSymbol {
     string* name;
     LgsSymbolType symbolType;
     bool isExternal = false;
+    bool isBuiltin = false;
 
     LgsVarDec* varDec = nullptr;
     LgsParam* param = nullptr;
@@ -44,9 +45,9 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsField* field);
     explicit LgsSymbol(LgsGroup* group);
     explicit LgsSymbol(LgsInterface* interface);
-    explicit LgsSymbol(LgsObject* object, bool isExternal = false);
-    explicit LgsSymbol(LgsEnum* lgsEnum, bool isExternal = false);
-    explicit LgsSymbol(LgsFunc* func, bool isExternal = false);
+    explicit LgsSymbol(LgsObject* object, bool isExternal = false, bool isBuiltin = false);
+    explicit LgsSymbol(LgsEnum* lgsEnum, bool isExternal = false, bool isBuiltin = false);
+    explicit LgsSymbol(LgsFunc* func, bool isExternal = false, bool isBuiltin = false);
     void* getSymbol() const;
     ~LgsSymbol() = default;
 };

@@ -2,7 +2,6 @@
 #include "exprs/unary/LgsInstance.h"
 #include "funcs/LgsBuiltinFunc.h"
 #include "types/primitives/LgsInt.h"
-
 #include <types/LgsVoid.h>
 #include <types/primitives/LgsLong.h>
 #include <types/LgsAny.h>

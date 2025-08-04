@@ -228,9 +228,9 @@ keyValue
 funcCall
 funcArgList
 funcArg
-constructor
-constructorArgList
-constructorArg
+instance
+instanceArgList
+instanceArg
 constant
 iterIndex
 index

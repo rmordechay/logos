@@ -46,9 +46,9 @@ public:
     RuleEnumDeclaration = 38, RuleEnumField = 39, RuleCoroutine = 40, RuleExpr = 41, 
     RuleUnaryExpr = 42, RulePrefixExpr = 43, RulePostfixExpr = 44, RuleArrayExpr = 45, 
     RuleHashMap = 46, RuleKeyValue = 47, RuleFuncCall = 48, RuleFuncArgList = 49, 
-    RuleFuncArg = 50, RuleConstructor = 51, RuleConstructorArgList = 52, 
-    RuleConstructorArg = 53, RuleConstant = 54, RuleIterIndex = 55, RuleIndex = 56, 
-    RuleIsFirst = 57, RuleIsLast = 58, RuleSelection = 59, RuleFirstSelectionElement = 60, 
+    RuleFuncArg = 50, RuleInstance = 51, RuleInstanceArgList = 52, RuleInstanceArg = 53, 
+    RuleConstant = 54, RuleIterIndex = 55, RuleIndex = 56, RuleIsFirst = 57, 
+    RuleIsLast = 58, RuleSelection = 59, RuleFirstSelectionElement = 60, 
     RuleInnerSelectionElement = 61, RuleRange = 62, RuleType = 63, RuleMapType = 64, 
     RuleArraySize = 65, RuleFuncType = 66, RuleVector = 67, RuleExtern = 68, 
     RuleRequireEnvVars = 69, RuleAssignemntOp = 70
@@ -122,9 +122,9 @@ public:
   class FuncCallContext;
   class FuncArgListContext;
   class FuncArgContext;
-  class ConstructorContext;
-  class ConstructorArgListContext;
-  class ConstructorArgContext;
+  class InstanceContext;
+  class InstanceArgListContext;
+  class InstanceArgContext;
   class ConstantContext;
   class IterIndexContext;
   class IndexContext;
@@ -824,7 +824,7 @@ public:
     FuncCallContext *funcCall();
     AnonnymosFuncContext *anonnymosFunc();
     VectorContext *vector();
-    ConstructorContext *constructor();
+    InstanceContext *instance();
     ConstantContext *constant();
     IterIndexContext *iterIndex();
     SelectionContext *selection();
@@ -959,37 +959,37 @@ public:
 
   FuncArgContext* funcArg();
 
-  class  ConstructorContext : public antlr4::ParserRuleContext {
+  class  InstanceContext : public antlr4::ParserRuleContext {
   public:
-    ConstructorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    InstanceContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *LBRACE();
     antlr4::tree::TerminalNode *RBRACE();
-    ConstructorArgListContext *constructorArgList();
+    InstanceArgListContext *instanceArgList();
 
    
   };
 
-  ConstructorContext* constructor();
+  InstanceContext* instance();
 
-  class  ConstructorArgListContext : public antlr4::ParserRuleContext {
+  class  InstanceArgListContext : public antlr4::ParserRuleContext {
   public:
-    ConstructorArgListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    InstanceArgListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<ConstructorArgContext *> constructorArg();
-    ConstructorArgContext* constructorArg(size_t i);
+    std::vector<InstanceArgContext *> instanceArg();
+    InstanceArgContext* instanceArg(size_t i);
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
    
   };
 
-  ConstructorArgListContext* constructorArgList();
+  InstanceArgListContext* instanceArgList();
 
-  class  ConstructorArgContext : public antlr4::ParserRuleContext {
+  class  InstanceArgContext : public antlr4::ParserRuleContext {
   public:
-    ConstructorArgContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    InstanceArgContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *EQUAL();
@@ -998,7 +998,7 @@ public:
    
   };
 
-  ConstructorArgContext* constructorArg();
+  InstanceArgContext* instanceArg();
 
   class  ConstantContext : public antlr4::ParserRuleContext {
   public:
@@ -1096,7 +1096,7 @@ public:
     antlr4::tree::TerminalNode *SELF_CLASS();
     antlr4::tree::TerminalNode *SELF_INSTANCE();
     FuncCallContext *funcCall();
-    ConstructorContext *constructor();
+    InstanceContext *instance();
     IterIndexContext *iterIndex();
 
    

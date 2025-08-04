@@ -89,8 +89,9 @@ public:
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     bool setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
 
-    void validateInterfaces(LgsObject* obj, const vector<LgsType*>& interfaces);
-    void validateImplements(LgsObject* type, LgsInterface* interface);
+    void validateObjImplements(LgsObject* obj, const vector<LgsType*>& interfaces);
+    void validateObjInterface(LgsObject* obj, LgsInterface* interface);
+    void validateInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     void validateExprType(const LgsExpr* expr, LgsType* type);
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);

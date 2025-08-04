@@ -655,7 +655,7 @@ LgsUnaryExpr* AntlrConverter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
     if (const auto prefixExpr = ctx->prefixExpr()) return getPrefixExpr(prefixExpr);
     if (const auto postfixExpr = ctx->postfixExpr()) return getPostfixExpr(postfixExpr);
-    if (const auto constructor = ctx->constructor()) return getInstance(constructor);
+    if (const auto constructor = ctx->instance()) return getInstance(constructor);
     if (const auto constant = ctx->constant()) return getConstant(constant);
     if (const auto array = ctx->arrayExpr()) return getArrayExpr(array);
     if (const auto hashMap = ctx->hashMap()) return getHashMap(hashMap);
@@ -801,13 +801,13 @@ LgsUnaryExpr* AntlrConverter::getVector(LogosParser::VectorContext* vector) {
     assert(0);
 }
 
-LgsInstance* AntlrConverter::getInstance(LogosParser::ConstructorContext* ctx) {
+LgsInstance* AntlrConverter::getInstance(LogosParser::InstanceContext* ctx) {
     const auto instance = new LgsInstance(ctx->IDENTIFIER()->getText());
     setLocation(instance->location, ctx->start, ctx->stop);
-    const auto args = ctx->constructorArgList();
+    const auto args = ctx->instanceArgList();
     if (!args) return instance;
     unordered_set<string> initializedArgs;
-    for (const auto& arg : args->constructorArg()) {
+    for (const auto& arg : args->instanceArg()) {
         const auto argExpr = getExpr(arg->expr());
         const auto idToken = arg->IDENTIFIER();
         const auto varDec = new LgsVarDec(idToken->getText(), argExpr);

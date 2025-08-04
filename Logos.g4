@@ -81,12 +81,12 @@ func:
         funcSignature statementsBlock
     ;
 
-anonymosFuncSignature:
-        LPAREN (anonymousParam (COMMA anonymousParam)* COMMA?)? RPAREN (COLON type)?
-    ;
-
 anonnymosFunc:
         anonymosFuncSignature statementsBlock
+    ;
+
+anonymosFuncSignature:
+        LPAREN (anonymousParam (COMMA anonymousParam)* COMMA?)? RPAREN (COLON type)?
     ;
 
 method:
@@ -201,7 +201,7 @@ unaryExpr:
     |   funcCall
     |   anonnymosFunc
     |   vector
-    |   constructor
+    |   instance
     |   constant
     |   iterIndex
     |   selection
@@ -243,15 +243,15 @@ funcArg:
         (IDENTIFIER EQUAL)? expr
     ;
 
-constructor:
-        IDENTIFIER LBRACE constructorArgList? RBRACE
+instance:
+        IDENTIFIER LBRACE instanceArgList? RBRACE
     ;
 
-constructorArgList:
-        constructorArg (COMMA constructorArg)* COMMA?
+instanceArgList:
+        instanceArg (COMMA instanceArg)* COMMA?
     ;
 
-constructorArg:
+instanceArg:
         IDENTIFIER EQUAL expr
     ;
 
@@ -291,7 +291,7 @@ firstSelectionElement:
     |   SELF_CLASS
     |   SELF_INSTANCE
     |   funcCall
-    |   constructor
+    |   instance
     |   iterIndex
     ;
 

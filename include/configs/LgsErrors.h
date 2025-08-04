@@ -69,3 +69,4 @@ inline LgsError E10058{.msg = "Field '%s' is defined in multiple interfaces: '%s
 inline LgsError E10059{.msg = "Unreachable code.", .errCode = errCodeStart++};
 inline LgsError E10060{.msg = "'for.isFirst' and 'for.isLast' are only allowed inside a for loop.", .errCode = errCodeStart++};
 inline LgsError E10061{.msg = "'for.isLast' is not allowed in an infinite loop.", .errCode = errCodeStart++};
+inline LgsError E10062{.msg = "Interface '%s' implements all its fields and/or methods which is not allowed. Make at least one of the fields or methods abstract (without implementation) or change it to 'object'", .errCode = errCodeStart++};

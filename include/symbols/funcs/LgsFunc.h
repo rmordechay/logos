@@ -13,7 +13,6 @@ public:
     LgsFuncType* funcType;
     vector<LgsReturn*> returnStmts;
     LgsStmtsBlock* stmtsBlock = nullptr;
-    bool isBuiltin = false;
     off_t pathIndex = 0;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {

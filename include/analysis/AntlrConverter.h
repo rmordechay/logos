@@ -95,7 +95,7 @@ public:
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
     LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
     vector<LgsUnaryExpr*> getSelectionExprs(LogosParser::SelectionContext* ctx);
-    LgsInstance* getInstance(LogosParser::ConstructorContext* ctx);
+    LgsInstance* getInstance(LogosParser::InstanceContext* ctx);
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
     LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx) const;
     LgsStrConst* getStrConst(tree::TerminalNode* type) const;

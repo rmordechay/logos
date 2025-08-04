@@ -215,9 +215,9 @@ bool LgsApp::resolveExternalFiles() {
 }
 
 void LgsApp::loadBuiltins() {
-    globals.addSymbol(LgsPrint::name, LgsSymbol(new LgsPrint()), &errHandler);
-    globals.addSymbol(LgsSizeOf::name, LgsSymbol(new LgsSizeOf()), &errHandler);
-    globals.addSymbol(LgsOS::name, LgsSymbol(new LgsOS()), &errHandler);
+    globals.addSymbol(LgsPrint::name, LgsSymbol(new LgsPrint(), false, true), &errHandler);
+    globals.addSymbol(LgsSizeOf::name, LgsSymbol(new LgsSizeOf(), false, true), &errHandler);
+    globals.addSymbol(LgsOS::name, LgsSymbol(new LgsOS(), false, true), &errHandler);
 }
 
 void LgsApp::loadEnvFiles() {
