@@ -1,5 +1,4 @@
 #pragma once
-#include "LgsSymbol.h"
 #include "LgsSymbolTable.h"
 #include "stmts/LgsStmtsBlock.h"
 

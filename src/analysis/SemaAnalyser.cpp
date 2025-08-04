@@ -875,6 +875,12 @@ bool SemaAnalyser::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, cons
     return isValid;
 }
 
+struct Symbols {
+    LgsSymbolTable* file;
+    LgsSymbolTable* locals;
+    LgsSymbolTable* globals;
+};
+
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsLocation* location) {
     if (const auto globalSymbol = globals.getSymbol(name)) {
         return globalSymbol;
@@ -902,9 +908,9 @@ void SemaAnalyser::addLocalSymbol(const LgsSymbol& newSymbol) {
         return errHandler.addError(E10053, newSymbol.location, {symbolName});
     }
     if ((symbol = file->symbolTable.getSymbol(symbolName))) {
-        return errHandler.addError(E10011, newSymbol.location, {symbolName, symbol->location->lineNumberStr()});
+        return errHandler.addError(E10011, newSymbol.location, {symbolName, symbol->location->getFullPath()});
     }
-    stack.getSymbolTable().addSymbol(symbolName, newSymbol, &errHandler);
+    stack.getSymbolTable().addSymbol(newSymbol, &errHandler);
 }
 
 void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {

@@ -57,7 +57,7 @@ public:
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName);
-    LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, bool isSingleton);
+    LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, tree::TerminalNode* objName, bool isSingleton);
     LgsField* getField(LogosParser::FieldContext* ctx, string& parentName);
     LgsFunc* getFunc(LogosParser::FuncContext* ctx);
     void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);
@@ -108,6 +108,7 @@ public:
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
     LgsType* getTypeFromText(tree::TerminalNode* typeToken) const;
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
+    void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     bool isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec);
     bool validateTypeName(const string& typeName, const LgsLocation* location);
     void setLocation(LgsLocation& location, const Token* start, const Token* end) const;

@@ -10,12 +10,13 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
-void LgsSymbolTable::addSymbol(const string& name, const LgsSymbol& symbol, LgsErrHandler* errHandler) {
+void LgsSymbolTable::addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler) {
+    const auto symbolName = *symbol.name;
     std::lock_guard lock(mtx);
-    if (symbols.find(name) != symbols.end()) {
-        return errHandler->addError(E10011, symbol.location, {name, symbol.location->lineNumberStr()});
+    if (symbols.find(symbolName) != symbols.end()) {
+        return errHandler->addError(E10011, symbol.location, {symbolName, symbol.location->getFullPath()});
     }
-    symbols[name] = symbol;
+    symbols[symbolName] = symbol;
 }
 
 LgsSymbol* LgsSymbolTable::getSymbol(const string& name) {

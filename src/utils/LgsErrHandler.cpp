@@ -17,7 +17,7 @@ void LgsErrHandler::addError(const LgsError& lgsErr, const LgsLocation* location
         pos += args[argIndex].length();
         argIndex++;
     }
-    const auto finalResult = result + "\n\t   at " + location->getFullPath() + "\n---";
+    const auto finalResult = result + "\n\t   at " + location->getFullPath();
     errors.emplace_back(LgsError{.msg = strdup(finalResult.c_str()), .errCode = lgsErr.errCode});
 }
 

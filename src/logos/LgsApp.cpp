@@ -215,9 +215,9 @@ bool LgsApp::resolveExternalFiles() {
 }
 
 void LgsApp::loadBuiltins() {
-    globals.addSymbol(LgsPrint::name, LgsSymbol(new LgsPrint(), false, true), &errHandler);
-    globals.addSymbol(LgsSizeOf::name, LgsSymbol(new LgsSizeOf(), false, true), &errHandler);
-    globals.addSymbol(LgsOS::name, LgsSymbol(new LgsOS(), false, true), &errHandler);
+    globals.addSymbol(LgsSymbol(new LgsPrint(), false, true), &errHandler);
+    globals.addSymbol(LgsSymbol(new LgsSizeOf(), false, true), &errHandler);
+    globals.addSymbol(LgsSymbol(new LgsOS(), false, true), &errHandler);
 }
 
 void LgsApp::loadEnvFiles() {
@@ -268,13 +268,6 @@ void LgsApp::setupActiveEnv() {
     checkRequiredEnvVars();
 }
 
-void LgsApp::exitWithErrors() const {
-    for (const auto error : errHandler.errors) {
-        logInfo(LOGOS_ERROR_STR + string(error.msg));
-    }
-    return exit(1);
-}
-
 void LgsApp::initBuild() const {
     remove_all(paths.buildDir);
     create_directories(paths.buildDir);
@@ -294,6 +287,7 @@ void writeFuncIndices(ofstream& ofs, const map<string, LgsFunc*>& funcs) {
 }
 
 // debug layout: [size, file_path][size, func_name]*
+
 void LgsApp::writeDebugFile() const {
     ofstream ofs(paths.debugFile, ios::binary);
     for (const auto file : files) {
@@ -330,6 +324,18 @@ void LgsApp::writeIRFiles() const {
             logInfo("\n-----\n\n");
         }
     }
+}
+
+void LgsApp::exitWithErrors() const {
+    for (int i = 0; i < errHandler.errors.size(); ++i) {
+        const auto msg = errHandler.errors[i].msg;
+        if (i == errHandler.errors.size() - 1) {
+            logInfo(LOGOS_ERROR_STR + string(msg));
+        } else {
+            logInfo(LOGOS_ERROR_STR + string(msg) +  "\n---");
+        }
+    }
+    return exit(1);
 }
 
 LgsApp::~LgsApp() {

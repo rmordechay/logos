@@ -81,20 +81,20 @@ LgsMainFile* AntlrConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     for (const auto enumDeclaration : ctx->enumDeclaration()) {
         auto lgsEnum = getEnum(enumDeclaration);
         file->enums.emplace_back(lgsEnum);
-        file->symbolTable.addSymbol(lgsEnum->name, LgsSymbol(lgsEnum), &errHandler);
+        addFileSymbol(file, LgsSymbol(lgsEnum));
     }
 
     for (const auto object : ctx->object()) {
-        auto lgsObject = getObject(object->objectBody(), object->IDENTIFIER()->getText(), !!object->SINGLETON());
+        auto lgsObject = getObject(object->objectBody(), object->IDENTIFIER(), !!object->SINGLETON());
         if (!lgsObject) continue;
         file->objects.emplace_back(lgsObject);
-        file->symbolTable.addSymbol(lgsObject->name, LgsSymbol(lgsObject), &errHandler);
+        addFileSymbol(file, LgsSymbol(lgsObject));
     }
 
     for (const auto interface : ctx->interface()) {
         auto lgsInterface = getInterface(interface->interfaceBody(), interface->IDENTIFIER()->getText());
         file->interfaces.push_back(lgsInterface);
-        file->symbolTable.addSymbol(lgsInterface->name, LgsSymbol(lgsInterface), &errHandler);
+        addFileSymbol(file, LgsSymbol(lgsInterface));
     }
 
     for (const auto func : funcs) {
@@ -104,14 +104,14 @@ LgsMainFile* AntlrConverter::getMainFile(LogosParser::MainFileContext* ctx) {
         } else {
             const auto funcImpl = getFunc(func);
             file->funcs[funcName] = funcImpl;
-            file->symbolTable.addSymbol(funcImpl->funcType->name, LgsSymbol(funcImpl), &errHandler);
+            addFileSymbol(file, LgsSymbol(funcImpl));
         }
     }
 
     for (const auto group : ctx->group()) {
         const auto lgsGroup = getGroup(group);
         file->groups.push_back(lgsGroup);
-        file->symbolTable.addSymbol(lgsGroup->name, LgsSymbol(lgsGroup), &errHandler);
+        addFileSymbol(file, LgsSymbol(lgsGroup));
     }
 
     if (file->funcs.find(LOGOS_MAIN_FUNC_NAME) == file->funcs.end()) {
@@ -122,12 +122,12 @@ LgsMainFile* AntlrConverter::getMainFile(LogosParser::MainFileContext* ctx) {
 }
 
 LgsObjectFile* AntlrConverter::getObjectFile(LogosParser::ObjectFileContext* ctx) {
-    const auto objName = ctx->IDENTIFIER()->getText();
-    const auto file = new LgsObjectFile(objName, filePath);
+    const auto objName = ctx->IDENTIFIER();
+    const auto file = new LgsObjectFile(objName->getText(), filePath);
     setLocation(file->location, ctx->start, ctx->stop);
     file->obj = getObject(ctx->objectBody(), objName, !!ctx->SINGLETON());
     if (!file->obj) return nullptr;
-    globals.addSymbol(objName, LgsSymbol(file->obj), &errHandler);
+    globals.addSymbol(LgsSymbol(file->obj), &errHandler);
     return file;
 }
 
@@ -136,7 +136,7 @@ LgsFile* AntlrConverter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx
     const auto file = new LgsInterfaceFile(interfaceName, filePath);
     setLocation(file->location, ctx->start, ctx->stop);
     file->interface = getInterface(ctx->interfaceBody(), interfaceName);
-    globals.addSymbol(interfaceName, LgsSymbol(file->interface), &errHandler);
+    globals.addSymbol(LgsSymbol(file->interface), &errHandler);
     return file;
 }
 
@@ -175,10 +175,10 @@ LgsEnvFile* AntlrConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx) {
     return new LgsEnvFile("EnvFile", filePath, varDecs);
 }
 
-LgsObject* AntlrConverter::getObject(LogosParser::ObjectBodyContext* ctx, const string& objName, const bool isSingleton) {
-    const auto obj = new LgsObject(objName);
-    setLocation(obj->location, ctx->start, ctx->stop);
-    if (!validateTypeName(objName, &obj->location)) return obj;
+LgsObject* AntlrConverter::getObject(LogosParser::ObjectBodyContext* ctx, tree::TerminalNode* objName, const bool isSingleton) {
+    const auto obj = new LgsObject(objName->getText());
+    setLocation(obj->location, objName->getSymbol(), ctx->stop);
+    if (!validateTypeName(obj->name, &obj->location)) return obj;
     // Fields
     for (int i = 0; i < ctx->field().size(); ++i) {
         const auto lgsField = getField(ctx->field(i), obj->name);
@@ -253,7 +253,7 @@ LgsEnum* AntlrConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
         const auto enumField = ctx->enumField()[i];
         const auto enumName = enumField->IDENTIFIER()->getText();
         if (!seenNames.insert(enumName).second) {
-            errHandler.addError(E10011, &lgsEnum->location, {enumName, to_string(lgsEnum->location.lineStart)});
+            errHandler.addError(E10011, &lgsEnum->location, {enumName, lgsEnum->location.getFullPath()});
             break;
         }
         const auto field = new LgsField(enumName, &lgsEnum->name, lgsEnum);
@@ -1011,7 +1011,7 @@ LgsGroup* AntlrConverter::getGroup(LogosParser::GroupContext* ctx) {
         const auto var = getVariable(target);
         group->targetSymbols.push_back(var);
     }
-    globals.addSymbol(group->name, LgsSymbol(group), &errHandler);
+    globals.addSymbol(LgsSymbol(group), &errHandler);
     return group;
 }
 
@@ -1055,6 +1055,18 @@ LgsType* AntlrConverter::getFuncReturnType(LogosParser::TypeContext* ctx) {
         setLocation(result->location, ctx->start, ctx->stop);
     }
     return result;
+}
+
+void AntlrConverter::addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol) {
+    auto symbolName = *newSymbol.name;
+    const auto globalSymbol = globals.getSymbol(symbolName);
+    if (globalSymbol) {
+        if (globalSymbol->isBuiltin) {
+            return errHandler.addError(E10053, newSymbol.location, {symbolName});
+        }
+        return errHandler.addError(E10011, newSymbol.location, {symbolName, newSymbol.location->getFullPath()});
+    }
+    file->symbolTable.addSymbol(newSymbol, &errHandler);
 }
 
 LgsType* AntlrConverter::getTypeFromText(tree::TerminalNode* typeToken) const {
