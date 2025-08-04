@@ -399,9 +399,9 @@ LgsField* AntlrConverter::getField(LogosParser::FieldContext* ctx, string& paren
 }
 
 LgsStmtsBlock* AntlrConverter::getStmtBlock(LogosParser::StatementsBlockContext* ctx) {
+    if (!ctx) return nullptr;
     const auto stmtBlock = new LgsStmtsBlock();
     setLocation(stmtBlock->location, ctx->start, ctx->stop);
-    if (!ctx) return stmtBlock;
     for (const auto& statement : ctx->statement()) {
         auto stmt = getStmt(statement);
         stmtBlock->stmts.push_back(stmt);

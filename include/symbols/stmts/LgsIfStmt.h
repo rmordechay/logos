@@ -18,6 +18,5 @@ public:
     void generateIfWithElse(LgsCodeGen* codeGen, Value* ifCondIR);
     void generateElseIf(LgsCodeGen* codeGen, Value* ifCondIR);
     void generatePatternMatching(LgsCodeGen* codeGen);
-    static bool shouldBranch(Value* ifCondIR);
     ~LgsIfStmt() override;
 };

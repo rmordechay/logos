@@ -6,20 +6,20 @@
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 
-LgsInstance* getSingleton(LgsExpr* expr) {
-    const auto parentAsVar = expr->asVariable();
-    if (parentAsVar->ref.symbolType == OBJECT && parentAsVar->ref.object->singleton) {
-        return parentAsVar->ref.object->singleton;
-    }
-    return nullptr;
-}
-
 Value* LgsSelection::createIRValue(LgsCodeGen* codeGen) {
     return resolveSelection(codeGen);
 }
 
 void LgsSelection::createIRStmt(LgsCodeGen* codeGen) {
     resolveSelection(codeGen);
+}
+
+LgsInstance* getSingleton(LgsExpr* expr) {
+    const auto parentAsVar = expr->asVariable();
+    if (parentAsVar->ref.symbolType == OBJECT && parentAsVar->ref.object->singleton) {
+        return parentAsVar->ref.object->singleton;
+    }
+    return nullptr;
 }
 
 Value* LgsSelection::resolveSelection(LgsCodeGen* codeGen) {
@@ -30,14 +30,7 @@ Value* LgsSelection::resolveSelection(LgsCodeGen* codeGen) {
         if (i == 0 && singleton) {
             parentExpr = singleton;
         }
-        if (childExpr->asFuncCall()) {
-            childExpr->getIRValue(codeGen);
-        } else if (const auto fieldVar = childExpr->asVariable()){
-            const auto v = fieldVar->ref.field->getIRValue(codeGen, parentExpr->type->vtable);
-            childExpr->setIRValue(v);
-        } else {
-            assert(0);
-        }
+        childExpr->getIRValue(codeGen);
     }
     IRValue = lastExpr()->getIRValue(codeGen);
     return IRValue;

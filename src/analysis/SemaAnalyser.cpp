@@ -891,9 +891,7 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsLocation* locati
     if (const auto symbol = stack.getSymbolTable().getSymbol(name)) {
         return symbol;
     }
-    if (location) {
-        errHandler.addError(E10006, location, {name});
-    }
+    errHandler.addError(E10006, location, {name});
     return nullptr;
 }
 

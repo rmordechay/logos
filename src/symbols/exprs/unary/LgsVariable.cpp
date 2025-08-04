@@ -28,9 +28,8 @@ Value* LgsVariable::createIRValue(LgsCodeGen* codeGen) {
     case OBJECT:
         return ref.object->singleton->getIRValue(codeGen);
     case ENUM:
-        return codeGen->getIRStr(name);
     case FIELD:
-        return nullptr;
+        return codeGen->getIRStr(name);
     case INTERFACE:
     case GROUP:
     case UNKNOWN:

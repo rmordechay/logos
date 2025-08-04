@@ -9,10 +9,7 @@ void LgsIfStmt::createIRStmt(LgsCodeGen* codeGen) {
     }
     codeGen->stack.enterScope(this, ifBlock);
     const auto ifCondIR = ifCond->getIRValue(codeGen);
-    if (!shouldBranch(ifCondIR)) {
-        ifBlock->createIRValue(codeGen);
-        codeGen->stack.exitScope();
-    } else if (elseIfs.empty()) {
+    if (elseIfs.empty()) {
         if (!elseBlock) {
             generateSimpleIf(codeGen, ifCondIR);
             codeGen->stack.exitScope();
@@ -101,10 +98,18 @@ void LgsIfStmt::generateElseIf(LgsCodeGen* codeGen, Value* ifCondIR) {
 }
 
 void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) {
-    const auto exprIRValue = ifCond->hashValue(codeGen);
-    const auto exitBlock = codeGen->createBlock(BLOCK_NAME_EXIT_PATTERN);
     const auto defaultBlock = codeGen->createBlock(BLOCK_NAME_DEFAULT_CASE);
-    const auto switchInst = codeGen->builder.CreateSwitch(exprIRValue, defaultBlock);
+    const auto exitBlock = codeGen->createBlock(BLOCK_NAME_EXIT_PATTERN);
+
+    const auto exprIRValue = ifCond->hashValue(codeGen);
+    SwitchInst* switchInst;
+    if (elseBlock) {
+        const auto numOfCases = elseIfs.size() + !!elseBlock;
+        switchInst = codeGen->builder.CreateSwitch(exprIRValue, defaultBlock, numOfCases);
+    } else {
+        switchInst = codeGen->builder.CreateSwitch(exprIRValue, exitBlock, elseIfs.size());
+    }
+
     vector<BasicBlock*> blocks;
     for (size_t i = 0; i < elseIfs.size(); ++i) {
         const auto elseIfPair = elseIfs[i];
@@ -125,18 +130,11 @@ void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) {
         codeGen->stack.enterScope(this, elseBlock);
         codeGen->startBlock(defaultBlock);
         elseBlock->createIRValue(codeGen);
+        codeGen->builder.CreateBr(exitBlock);
         codeGen->stack.exitScope();
     }
 
-    codeGen->builder.CreateBr(exitBlock);
     codeGen->startBlock(exitBlock);
-}
-
-bool LgsIfStmt::shouldBranch(Value* ifCondIR) {
-    if (const auto* constBool = dyn_cast<ConstantInt>(ifCondIR)) {
-        return constBool->isOne();
-    }
-    return true;
 }
 
 LgsIfStmt::~LgsIfStmt() {
