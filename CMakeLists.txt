@@ -94,6 +94,7 @@ set(SOURCE_FILES
     src/symbols/types/LgsNullable.cpp
     src/logos/LgsCodeGen.cpp
     src/symbols/builtins/LgsBuiltins.cpp
+    src/files/LgsInterfaceFile.cpp
 )
 
 add_subdirectory(stdlib)

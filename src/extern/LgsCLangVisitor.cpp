@@ -111,7 +111,7 @@ LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
 
 LgsObject* LgsCLangVisitor::mapCRecord(const clang::RecordDecl* record) {
     const auto name = record->getNameAsString();
-    auto* obj = new LgsObject(name);
+    const auto obj = new LgsObject(name);
     for (const clang::FieldDecl* field : record->fields()) {
         const auto fieldName = field->getNameAsString();
         const auto fieldType = mapCType(field->getType());

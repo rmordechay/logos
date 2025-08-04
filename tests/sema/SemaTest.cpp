@@ -206,7 +206,7 @@ TEST_CASE("TestSema10013A") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10013.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
 }
 
 TEST_CASE("TestSema10013B") {
@@ -220,7 +220,7 @@ TEST_CASE("TestSema10013B") {
     app.parseSrcFile(code);
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10013.errCode);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
 }
 
 TEST_CASE("TestSema10014") {

@@ -37,9 +37,9 @@ public:
     RuleGroupTypesList = 8, RuleGroupTargetList = 9, RuleInterfaceBody = 10, 
     RuleObject = 11, RuleObjectBody = 12, RuleField = 13, RuleInterfaceField = 14, 
     RuleImplements = 15, RuleFuncSignatureHeader = 16, RuleFuncSignature = 17, 
-    RuleInterfaceFuncSignature = 18, RuleFunc = 19, RuleAnonymosFuncSignature = 20, 
-    RuleAnonnymosFunc = 21, RuleMethod = 22, RuleParam = 23, RuleAnonymousParam = 24, 
-    RuleStatement = 25, RuleStatementsBlock = 26, RuleAssignment = 27, RuleExplicitVarDec = 28, 
+    RuleInterfaceFunc = 18, RuleFunc = 19, RuleAnonnymosFunc = 20, RuleAnonymosFuncSignature = 21, 
+    RuleMethod = 22, RuleParam = 23, RuleAnonymousParam = 24, RuleStatement = 25, 
+    RuleStatementsBlock = 26, RuleAssignment = 27, RuleExplicitVarDec = 28, 
     RuleImplicitVarDec = 29, RuleIfStatement = 30, RuleElseIfStatement = 31, 
     RuleElseStatement = 32, RulePatternMatching = 33, RulePattern = 34, 
     RuleLoopStatement = 35, RuleBreakStmt = 36, RuleReturnStatement = 37, 
@@ -89,10 +89,10 @@ public:
   class ImplementsContext;
   class FuncSignatureHeaderContext;
   class FuncSignatureContext;
-  class InterfaceFuncSignatureContext;
+  class InterfaceFuncContext;
   class FuncContext;
-  class AnonymosFuncSignatureContext;
   class AnonnymosFuncContext;
+  class AnonymosFuncSignatureContext;
   class MethodContext;
   class ParamContext;
   class AnonymousParamContext;
@@ -307,10 +307,8 @@ public:
     ImplementsContext *implements();
     std::vector<InterfaceFieldContext *> interfaceField();
     InterfaceFieldContext* interfaceField(size_t i);
-    std::vector<InterfaceFuncSignatureContext *> interfaceFuncSignature();
-    InterfaceFuncSignatureContext* interfaceFuncSignature(size_t i);
-    std::vector<FuncContext *> func();
-    FuncContext* func(size_t i);
+    std::vector<InterfaceFuncContext *> interfaceFunc();
+    InterfaceFuncContext* interfaceFunc(size_t i);
 
    
   };
@@ -428,19 +426,20 @@ public:
 
   FuncSignatureContext* funcSignature();
 
-  class  InterfaceFuncSignatureContext : public antlr4::ParserRuleContext {
+  class  InterfaceFuncContext : public antlr4::ParserRuleContext {
   public:
-    InterfaceFuncSignatureContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    InterfaceFuncContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     FuncSignatureHeaderContext *funcSignatureHeader();
     antlr4::tree::TerminalNode *QUEST_MARK();
     antlr4::tree::TerminalNode *COLON();
     TypeContext *type();
+    StatementsBlockContext *statementsBlock();
 
    
   };
 
-  InterfaceFuncSignatureContext* interfaceFuncSignature();
+  InterfaceFuncContext* interfaceFunc();
 
   class  FuncContext : public antlr4::ParserRuleContext {
   public:
@@ -453,6 +452,18 @@ public:
   };
 
   FuncContext* func();
+
+  class  AnonnymosFuncContext : public antlr4::ParserRuleContext {
+  public:
+    AnonnymosFuncContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    AnonymosFuncSignatureContext *anonymosFuncSignature();
+    StatementsBlockContext *statementsBlock();
+
+   
+  };
+
+  AnonnymosFuncContext* anonnymosFunc();
 
   class  AnonymosFuncSignatureContext : public antlr4::ParserRuleContext {
   public:
@@ -471,18 +482,6 @@ public:
   };
 
   AnonymosFuncSignatureContext* anonymosFuncSignature();
-
-  class  AnonnymosFuncContext : public antlr4::ParserRuleContext {
-  public:
-    AnonnymosFuncContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    AnonymosFuncSignatureContext *anonymosFuncSignature();
-    StatementsBlockContext *statementsBlock();
-
-   
-  };
-
-  AnonnymosFuncContext* anonnymosFunc();
 
   class  MethodContext : public antlr4::ParserRuleContext {
   public:

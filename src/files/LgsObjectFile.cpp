@@ -2,7 +2,6 @@
 #include "funcs/LgsFunc.h"
 #include "types/LgsObject.h"
 
-
 void LgsObjectFile::generateIR() {
     codeGen.setIRModule(name);
     obj->getIRType(&codeGen);

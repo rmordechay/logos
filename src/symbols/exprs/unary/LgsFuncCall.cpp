@@ -3,6 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsObject.h"
 
 Value* LgsFuncCall::createIRValue(LgsCodeGen* codeGen) {
     if (callback) {
@@ -36,7 +37,7 @@ void LgsFuncCall::resolveVirtualFunc(LgsCodeGen* codeGen) const {
     const auto self = args[0];
     const auto keyIR = codeGen->getIRStr(func->funcType->getName());
     const auto selfPtr = self->getIRValue(codeGen);
-    const auto vtable = self->type->vtable;
+    const auto vtable = self->type->asObject()->vtable;
     const auto vtableMap = vtable->type->asMap();
     const auto mapType = vtable->type->getIRType(codeGen);
     const auto mapPtr = builder.CreateGEP(mapType, selfPtr, {codeGen->i32Zero()});
@@ -48,7 +49,7 @@ void LgsFuncCall::resolveVirtualFunc(LgsCodeGen* codeGen) const {
 bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
     if (funcType->hasDefaults) return equalsDefaultParams(funcType);
     if (funcType->isVariadic) return equalsVariadic(funcType);
-    if (!funcType->isAnonymous && name != funcType->name) return false;
+    if (funcType->name != "" && name != funcType->name) return false;
     if (funcType->params.size() != args.size()) return false;
     if (funcType->params.size() == 0 && args.size() == 0) return true;
     for (size_t i = funcType->isStatic; i < funcType->params.size(); ++i) {

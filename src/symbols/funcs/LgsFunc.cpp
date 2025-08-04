@@ -9,8 +9,10 @@
 void LgsFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, stmtsBlock);
     startFuncBlock(codeGen);
+    codeGen->callPushStack(pathIndex);
     stmtsBlock->createIRValue(codeGen);
     if (!codeGen->lastInstTerminator()) {
+        codeGen->callPopStack();
         codeGen->builder.CreateRetVoid();
     }
     codeGen->stack.exitScope();
@@ -64,7 +66,6 @@ Value* LgsFunc::call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) {
 }
 
 Value* LgsFunc::callIR(LgsCodeGen* codeGen, const vector<Value*>& args) {
-    codeGen->callPushStack(pathIndex);
     CallInst* rv = nullptr;
     if (IRValue) {
         const auto funcTypeIR = funcType->getIRType(codeGen);
@@ -74,7 +75,6 @@ Value* LgsFunc::callIR(LgsCodeGen* codeGen, const vector<Value*>& args) {
         const auto IRFunc = getIRFunc(codeGen);
         rv = codeGen->builder.CreateCall(IRFunc, args);
     }
-    codeGen->callPopStack();
     return rv;
 }
 

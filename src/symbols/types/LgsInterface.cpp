@@ -29,8 +29,9 @@ LgsExpr* LgsInterface::getZeroValue() {
 
 bool LgsInterface::equals(LgsType* other) {
     if (const auto interface = other->asInterface()) {
-        if (interface->getName() == getName()) return true;
+        if (interface->name == getName()) return true;
     } else if (const auto obj = other->asObject()) {
+        if (obj->name == getName()) return true;
         for (const auto& implement : obj->interfaces) {
             if (implement->getName() == getName()) return true;
         }

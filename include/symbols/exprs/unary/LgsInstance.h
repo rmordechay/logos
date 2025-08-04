@@ -10,8 +10,9 @@ public:
     explicit LgsInstance(const string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), name(obj->name), obj(obj) {}
     Value* createIRValue(LgsCodeGen* codeGen) override;
+    void setObject(LgsObject* obj);
     void setVirtuals(LgsCodeGen* codeGen) const;
     string prettyName() override;
-    void initFields(LgsCodeGen* codeGen);
+    void initFields(LgsCodeGen* codeGen, const map<string, LgsField*>& fields);
     ~LgsInstance() override;
 };

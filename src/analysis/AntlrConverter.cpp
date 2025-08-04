@@ -92,7 +92,7 @@ LgsMainFile* AntlrConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     }
 
     for (const auto interface : ctx->interface()) {
-        auto lgsInterface = getInterface(interface->interfaceBody(), interface->IDENTIFIER()->getText());
+        auto lgsInterface = getInterface(interface->interfaceBody(), interface->IDENTIFIER());
         file->interfaces.push_back(lgsInterface);
         addFileSymbol(file, LgsSymbol(lgsInterface));
     }
@@ -132,8 +132,8 @@ LgsObjectFile* AntlrConverter::getObjectFile(LogosParser::ObjectFileContext* ctx
 }
 
 LgsFile* AntlrConverter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx) {
-    const auto interfaceName = ctx->IDENTIFIER()->getText();
-    const auto file = new LgsInterfaceFile(interfaceName, filePath);
+    const auto interfaceName = ctx->IDENTIFIER();
+    const auto file = new LgsInterfaceFile(interfaceName->getText(), filePath);
     setLocation(file->location, ctx->start, ctx->stop);
     file->interface = getInterface(ctx->interfaceBody(), interfaceName);
     globals.addSymbol(LgsSymbol(file->interface), &errHandler);
@@ -211,35 +211,51 @@ LgsObject* AntlrConverter::getObject(LogosParser::ObjectBodyContext* ctx, tree::
     return obj;
 }
 
-LgsInterface* AntlrConverter::getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName) {
-    const auto interface = new LgsInterface(interfaceName);
-    setLocation(interface->location, ctx->start, ctx->stop);
-    if (!validateTypeName(interfaceName, &interface->location)) return interface;
-    for (const auto& interfaceFunction : ctx->interfaceFuncSignature()) {
-        const auto self = LgsParam(interface, LOGOS_SELF);
-        const auto type = getFuncReturnType(interfaceFunction->type());
-        const auto funcName = interfaceFunction->funcSignatureHeader()->IDENTIFIER()->getText();
-        const auto func = new LgsFunc(funcName, type);
-        func->funcType->parentName = interfaceName;
-        func->funcType->isMethod = true;
-        func->funcType->isVirtual = true;
-        func->funcType->implementsName = &interface->name;
-        func->funcType->params.push_back(self);
-        func->funcType->isOptional = !!interfaceFunction->QUEST_MARK();
-        setParams(func->funcType, interfaceFunction->funcSignatureHeader()->param());
-        interface->addMethod(func);
+LgsInterface* AntlrConverter::getInterface(LogosParser::InterfaceBodyContext* ctx, tree::TerminalNode* interfaceName) {
+    const auto interface = new LgsInterface(interfaceName->getText());
+    setLocation(interface->location, interfaceName->getSymbol(), ctx->stop);
+    if (!validateTypeName(interface->name, &interface->location)) return interface;
+
+    if (ctx->implements()) {
+        for (const auto& type : ctx->implements()->IDENTIFIER()) {
+            auto implementType = getTypeFromText(type);
+            interface->interfaces.push_back(implementType);
+        }
     }
+
+    if (ctx->interfaceField().empty() && ctx->interfaceFunc().empty()) {
+        errHandler.addError(E10063, &interface->location);
+        return interface;
+    }
+
     for (const auto interfaceField : ctx->interfaceField()) {
         const auto field = getInterfaceField(interfaceField, interface->name);
         field->isOptional = !!interfaceField->QUEST_MARK();
         field->isVirtual = true;
         interface->addField(field);
     }
-    if (ctx->implements()) {
-        for (const auto& type : ctx->implements()->IDENTIFIER()) {
-            auto implementType = getTypeFromText(type);
-            interface->interfaces.push_back(implementType);
-        }
+
+    auto allMethodsAreImplemented = true;
+    for (const auto& interfaceFunc : ctx->interfaceFunc()) {
+        const auto self = LgsParam(interface, LOGOS_SELF);
+        const auto type = getFuncReturnType(interfaceFunc->type());
+        const auto funcName = interfaceFunc->funcSignatureHeader()->IDENTIFIER();
+        const auto func = new LgsFunc(funcName->getText(), type);
+        setLocation(func->location, funcName->getSymbol(), ctx->stop);
+        func->stmtsBlock = getStmtBlock(interfaceFunc->statementsBlock());
+        func->funcType->parentName = interface->name;
+        func->funcType->isMethod = true;
+        func->funcType->isPublic = true;
+        func->funcType->isVirtual = !func->stmtsBlock;
+        func->funcType->isOptional = !!interfaceFunc->QUEST_MARK();
+        func->funcType->params.push_back(self);
+        setParams(func->funcType, interfaceFunc->funcSignatureHeader()->param());
+        allMethodsAreImplemented = allMethodsAreImplemented && func->stmtsBlock;
+        interface->addMethod(func);
+    }
+
+    if (allMethodsAreImplemented) {
+        errHandler.addError(E10062, &interface->location, {interface->name});
     }
     return interface;
 }
@@ -308,14 +324,14 @@ LgsMainFunc* AntlrConverter::getMainFunc(LogosParser::FuncContext* ctx) {
     return mainFunc;
 }
 
-LgsFunc* AntlrConverter::getMethod(LogosParser::MethodContext* ctx, LgsObject* obj) {
+LgsFunc* AntlrConverter::getMethod(LogosParser::MethodContext* ctx, LgsType* obj) {
     const auto rt = getFuncReturnType(ctx->funcSignature()->type());
     const auto funcSignature = ctx->funcSignature();
     const auto nameToken = funcSignature->funcSignatureHeader()->IDENTIFIER();
     const auto method = new LgsFunc(nameToken->getText(), rt);
     setLocation(method->location, nameToken->getSymbol(), nullptr);
     method->funcType->isMethod = true;
-    method->funcType->parentName = obj->name;
+    method->funcType->parentName = obj->getName();
     auto self = LgsParam(obj, LOGOS_SELF);
     self.isSelf = true;
     method->funcType->params.push_back(self);
@@ -331,7 +347,6 @@ LgsFunc* AntlrConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx
     const auto funcSignature = ctx->anonymosFuncSignature();
     const auto rt = getFuncReturnType(funcSignature->type());
     const auto func = new LgsFunc("", rt);
-    func->funcType->isAnonymous = true;
     for (const auto param : funcSignature->anonymousParam()) {
         auto lgsParam = LgsParam(getType(param->type()), param->IDENTIFIER()->getText());
         setLocation(lgsParam.location, param->start, param->stop);

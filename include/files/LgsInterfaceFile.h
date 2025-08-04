@@ -8,6 +8,7 @@ public:
     LgsInterface* interface = nullptr;
 
     LgsInterfaceFile(const string& name, const path& path) : LgsFile(name, path) {}
+    void generateIR() override;
     ~LgsInterfaceFile() override = default;
 };
 

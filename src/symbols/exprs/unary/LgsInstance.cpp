@@ -5,11 +5,6 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
-
-string LgsInstance::prettyName() {
-    return obj->name;
-}
-
 Value* LgsInstance::createIRValue(LgsCodeGen* codeGen) {
     const auto objIRType = obj->getIRType(codeGen);
     if(obj->singleton) {
@@ -17,21 +12,21 @@ Value* LgsInstance::createIRValue(LgsCodeGen* codeGen) {
     } else {
         IRValue = codeGen->builder.CreateAlloca(objIRType);
     }
-    initFields(codeGen);
-    if (obj->hasVirtuals) {
+    initFields(codeGen, obj->fields);
+    if (!obj->interfaces.empty()) {
         setVirtuals(codeGen);
     }
     return IRValue;
 }
 
-void LgsInstance::initFields(LgsCodeGen* codeGen) {
-    for (const auto& [fieldName, field] : obj->fields) {
-        auto arg = args.find(fieldName);
-        if (arg != args.end()) {
-            const auto exprIR = arg->second->expr->getIRValue(codeGen);
-            codeGen->builder.CreateStore(exprIR, field->getGEP(codeGen));
+void LgsInstance::initFields(LgsCodeGen* codeGen, const map<string, LgsField*>& fields) {
+    for (const auto& [argName, arg] : args) {
+        const auto exprIR = arg->expr->getIRValue(codeGen);
+        auto field = fields.find(argName);
+        if (field != fields.end()) {
+            codeGen->builder.CreateStore(exprIR, field->second->getGEP(codeGen));
+            field->second->parentIRValue = IRValue;
         }
-        field->parentIRValue = IRValue;
     }
 }
 
@@ -58,6 +53,15 @@ void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
         codeGen->builder.CreateStore(loadGEP, valuePtr);
         vtable->addFunc.callIR(codeGen, {vtableGEP, keyIRStr, valuePtr});
     }
+}
+
+string LgsInstance::prettyName() {
+    return obj->name;
+}
+
+void LgsInstance::setObject(LgsObject* obj) {
+    this->obj = obj;
+    setType(this->obj);
 }
 
 LgsInstance::~LgsInstance() {

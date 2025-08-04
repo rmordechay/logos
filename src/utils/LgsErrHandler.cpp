@@ -17,8 +17,19 @@ void LgsErrHandler::addError(const LgsError& lgsErr, const LgsLocation* location
         pos += args[argIndex].length();
         argIndex++;
     }
-    const auto finalResult = result + "\n\t   at " + location->getFullPath();
-    errors.emplace_back(LgsError{.msg = strdup(finalResult.c_str()), .errCode = lgsErr.errCode});
+    pos = 0;
+    argIndex = 0;
+    while ((pos = result.find(LOGOS_MSG_PADDING_PLACEHOLDER, pos)) != string::npos) {
+        result.replace(pos, string(LOGOS_MSG_PADDING_PLACEHOLDER).size(), ERROR_PADDING);
+        pos += args[argIndex].length();
+        argIndex++;
+    }
+    if (location) {
+        const auto finalResult = result + "\n\t    at " + location->getFullPath();
+        errors.emplace_back(LgsError{.msg = strdup(finalResult.c_str()), .errCode = lgsErr.errCode});
+    } else {
+        errors.emplace_back(LgsError{.msg = strdup(result.c_str()), .errCode = lgsErr.errCode});
+    }
 }
 
 void LgsErrHandler::copyErrors(vector<LgsError> newErrors) {

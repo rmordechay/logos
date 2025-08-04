@@ -62,7 +62,7 @@ void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
 
 void SemaAnalyser::visitObject(LgsObject* obj) {
     if (!obj->interfaces.empty()) {
-        obj->vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
+        obj->setVTable();
     }
     for (const auto& [_, field] : obj->fields) {
         visitField(field);
@@ -79,9 +79,6 @@ void SemaAnalyser::visitInterface(LgsInterface* interface) {
     }
     for (const auto& [_, method] : interface->methods) {
         visitFunc(method);
-    }
-    for (const auto parentInterface : interface->interfaces) {
-        visitInterface(parentInterface->asInterface());
     }
 }
 
@@ -109,6 +106,9 @@ void SemaAnalyser::visitField(const LgsField* field) {
     if (field->expr) {
         visitExpr(field->expr);
         validateExprType(field->expr, field->type);
+    }
+    if (field->type && field->type->asFuncType()) {
+        errHandler.addError(E10013, &field->location, {field->name});
     }
 }
 
@@ -578,25 +578,19 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     if (symbol->symbolType != OBJECT && symbol->symbolType != INTERFACE) {
         return errHandler.addError(E10022, &instance->location, {objName});
     }
+
     if (symbol->symbolType == INTERFACE) {
-        validateInterfaceInstance(instance, symbol->interface);
+        visitInterfaceInstance(instance, symbol->interface);
+        return;
     }
-    if (symbol->symbolType == OBJECT && symbol->object->singleton) {
+
+    const auto obj = symbol->object;
+    if (obj->singleton) {
         return errHandler.addError(E10032, &instance->location, {objName});
     }
 
-    if (!instance->obj) {
-        instance->obj = symbol->object->clone();
-        instance->setType(instance->obj);
-    }
-
-    for (const auto [name, field] : instance->obj->fields) {
-        if (!field->isMutable && instance->args.find(name) == instance->args.end()) {
-            errHandler.addError(E10029, &field->location, {field->name});
-            continue;
-        }
-    }
-
+    instance->setObject(obj->clone());
+    // Args
     for (const auto& [_, arg] : instance->args) {
         const auto field = instance->obj->getField(arg->name);
         if (!field) {
@@ -607,6 +601,47 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
         visitExpr(arg->expr);
         validateExprType(arg->expr, field->type);
         field->expr = arg->expr;
+    }
+
+    // Missing required fields
+    for (const auto [name, field] : instance->obj->fields) {
+        if (!field->isMutable && instance->args.find(name) == instance->args.end()) {
+            errHandler.addError(E10029, &field->location, {field->name});
+            continue;
+        }
+    }
+}
+
+void SemaAnalyser::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface) {
+    instance->setObject(new LgsObject(interface->name));
+    instance->obj->location = instance->location;
+    instance->obj->interfaces.push_back(interface);
+    auto isValid = true;
+    for (const auto [name, arg] : instance->args) {
+        visitExpr(arg->expr);
+        const auto field = interface->getField(name);
+        if (field) {
+            const auto newField = new LgsField(*field);
+            newField->expr = arg->expr;
+            instance->obj->addField(newField);
+            continue;
+        }
+        const auto method = interface->getMethod(name);
+        if (method) {
+            const auto newMethod = arg->expr->asFunc();
+            newMethod->funcType->name = method->funcType->name;
+            newMethod->funcType->params.insert(newMethod->funcType->params.begin(), LgsParam(interface, LOGOS_SELF));
+            instance->obj->addMethod(newMethod);
+            continue;
+        }
+        if (!field && !method) {
+            errHandler.addError(E10005, &arg->location, {arg->name, interface->name});
+            isValid = false;
+            continue;
+        }
+    }
+    if (isValid) {
+        visitObject(instance->obj);
     }
 }
 
@@ -711,7 +746,6 @@ bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterEx
 
 void SemaAnalyser::validateObjImplements(LgsObject* obj, const vector<LgsType*>& interfaces) {
     unordered_set<string> interfacesNames;
-    obj->hasVirtuals = !interfaces.empty();
     for (int i = 0; i < interfaces.size(); ++i) {
         const auto implementsInterface = interfaces[i];
         const auto interface = implementsInterface->asInterface();
@@ -728,13 +762,18 @@ void SemaAnalyser::validateObjImplements(LgsObject* obj, const vector<LgsType*>&
 
 string getMissingImplementsStr(const vector<LgsField*>& fields, const vector<LgsFunc*>& methods) {
     stringstream str;
-    str << "\n\t\tFields:";
-    for (const auto& field : fields) {
-        str << "\n\t\t     - " << field->name << ": " <<  field->type->prettyName();
+    str << "Missing fields/methods:";
+    if (!fields.empty()) {
+        str << ERROR_PADDING << "Fields:";
+        for (const auto& field : fields) {
+            str << "\n\t\t     - " << field->name << ": " <<  field->type->prettyName();
+        }
     }
-    str << "\n\t\tMethods:";
-    for (const auto& method : methods) {
-        str << "\n\t\t     - " << method->funcType->prettyName();
+    if (!methods.empty()) {
+        str << ERROR_PADDING << "Methods:";
+        for (const auto& method : methods) {
+            str << "\n\t\t     - " << method->funcType->prettyName();
+        }
     }
     return str.str();
 }
@@ -756,13 +795,16 @@ void SemaAnalyser::validateObjInterface(LgsObject* obj, LgsInterface* interface)
     // Methods
     vector<LgsFunc*> missingMethods;
     for (const auto& [name, interfaceMethod] : interface->methods) {
-        const auto objMethod = obj->getMethod(name);
-        if (objMethod && objMethod->funcType->equals(interfaceMethod->funcType)) {
-            objMethod->funcType->isVirtual = true;
-            objMethod->funcType->implementsName = &interface->name;
-            continue;
+        const auto method = obj->methods.find(name);
+        if (method != obj->methods.end()) {
+            const auto objMethod = obj->getMethod(name);
+            if (objMethod && objMethod->funcType->equals(interfaceMethod->funcType)) {
+                objMethod->funcType->isVirtual = true;
+                continue;
+            }
         }
-        if (!interfaceMethod->funcType->isOptional) {
+
+        if (!interfaceMethod->stmtsBlock && !interfaceMethod->funcType->isOptional) {
             missingMethods.emplace_back(interfaceMethod);
         }
     }
@@ -770,10 +812,6 @@ void SemaAnalyser::validateObjInterface(LgsObject* obj, LgsInterface* interface)
     if (!missingMethods.empty() || !missingFields.empty()) {
         errHandler.addError(E10016, &obj->location, {obj->prettyName(), interface->name, getMissingImplementsStr(missingFields, missingMethods)});
     }
-}
-
-void SemaAnalyser::validateInterfaceInstance(LgsInstance* instance, LgsInterface* interface) {
-
 }
 
 void SemaAnalyser::validateIndex(LgsIterIndex* iterIndex) {
@@ -825,7 +863,7 @@ bool SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall, const
     const auto method = methodCall->func;
     if (!method || method->funcType->isVirtual) return false;
     if (!method->funcType->isPublic && file->absPath != method->location.filePath) {
-        errHandler.addError(E10031, &method->location, {method->funcType->name, method->funcType->parentName});
+        errHandler.addError(E10031, &methodCall->location, {method->funcType->name, method->funcType->parentName});
         return false;
     }
     return true;
@@ -874,12 +912,6 @@ bool SemaAnalyser::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, cons
     }
     return isValid;
 }
-
-struct Symbols {
-    LgsSymbolTable* file;
-    LgsSymbolTable* locals;
-    LgsSymbolTable* globals;
-};
 
 LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsLocation* location) {
     if (const auto globalSymbol = globals.getSymbol(name)) {
@@ -944,7 +976,7 @@ bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentTyp
     auto name = methodCall->name;
     const auto method = parentType->getMethod(name);
     if (!method) {
-        errHandler.addError(E10013, &methodCall->location, {name, parentType->prettyName()});
+        errHandler.addError(E10005, &methodCall->location, {name, parentType->prettyName()});
         return false;
     }
     if (methodCall->equals(method->funcType)) {

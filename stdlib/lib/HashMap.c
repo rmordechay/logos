@@ -1,9 +1,10 @@
 #include "Iterator.h"
+#include "Runtime.h"
 #include "Str.h"
-
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define MAP_CAPACITY 1024
 
@@ -63,6 +64,9 @@ void* Map_get(const HashMap* map, const char* key) {
         }
         entry = entry->next;
     }
+    char buffer[512];
+    sprintf(buffer, "%s not found\n", key);
+    print_error(buffer);
     return NULL;
 }
 

@@ -41,7 +41,7 @@ groupTargetList:
     ;
 
 interfaceBody:
-            implements? interfaceField* interfaceFuncSignature* func*
+            implements? interfaceField* interfaceFunc*
     ;
 
 object:
@@ -73,8 +73,8 @@ funcSignature:
         funcSignatureHeader (COLON type)?
     ;
 
-interfaceFuncSignature:
-        funcSignatureHeader QUEST_MARK? (COLON type)?
+interfaceFunc:
+        funcSignatureHeader QUEST_MARK? (COLON type)? statementsBlock?
     ;
 
 func:

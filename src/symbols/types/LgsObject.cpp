@@ -61,6 +61,10 @@ bool LgsObject::equals(LgsType* other) {
     return name == other->getName();
 }
 
+void LgsObject::setVTable() {
+    vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
+}
+
 void LgsObject::freeValue(LgsCodeGen* codeGen, Value* value) {
     codeGen->builder.CreateFree(value);
 }
@@ -83,6 +87,7 @@ size_t LgsObject::getSizeBytes() {
 }
 
 LgsObject::~LgsObject() {
+    if (vtable) delete vtable;
     for (const auto interface : interfaces) {
         freeType(interface);
     }

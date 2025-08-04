@@ -14,9 +14,10 @@
 #define LOGOS_EXECUTABLE_FILE "output"
 #define LOGOS_STR_FORMAT_PART "%v"
 #define LOGOS_MSG_PLACEHOLDER "%s"
+#define LOGOS_MSG_PADDING_PLACEHOLDER "%p"
 #define LOGOS_LOOP_IS_FIRST "for.isFirst"
 #define LOGOS_LOOP_IS_LAST "for.isLast"
-#define LOGOS_ERROR_STR "\033[1;31mError:\033[0m "
+#define LOGOS_ERROR_STR "\033[1;31mError:\033[0m  "
 
 #define BLOCK_NAME_IF_TRUE "if_true"
 #define BLOCK_NAME_DEFAULT_CASE "default"

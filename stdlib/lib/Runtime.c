@@ -1,3 +1,4 @@
+#include "Runtime.h"
 #include "LgsConfig.h"
 #include "LgsDefinitions.h"
 #include <stdint.h>

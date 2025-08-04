@@ -8,8 +8,8 @@ class LgsField;
 class LgsObject : public LgsType {
 public:
     string name;
-    bool hasVirtuals = false;
     vector<LgsType*> interfaces;
+    LgsHashMap* vtable = nullptr;
     LgsInstance* singleton = nullptr;
 
     explicit LgsObject(const string& name) : name(name) {}
@@ -20,6 +20,7 @@ public:
     LgsExpr* getZeroValue() override;
     string getStrFormatPart() const override;
     bool equals(LgsType* other) override;
+    void setVTable();
     void freeValue(LgsCodeGen* codeGen, Value* value) override;
     LgsObject* clone();
     ~LgsObject() override;

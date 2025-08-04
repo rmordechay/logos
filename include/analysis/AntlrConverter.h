@@ -56,7 +56,7 @@ public:
     bool setMainArgsParam(const LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx);
-    LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, const string& interfaceName);
+    LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, tree::TerminalNode* interfaceName);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, tree::TerminalNode* objName, bool isSingleton);
     LgsField* getField(LogosParser::FieldContext* ctx, string& parentName);
     LgsFunc* getFunc(LogosParser::FuncContext* ctx);
@@ -64,7 +64,7 @@ public:
     LgsFunc* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param);
     LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName);
-    LgsFunc* getMethod(LogosParser::MethodContext* ctx, LgsObject* obj);
+    LgsFunc* getMethod(LogosParser::MethodContext* ctx, LgsType* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     LgsStmtsBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);

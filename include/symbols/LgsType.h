@@ -40,14 +40,13 @@ public:
     bool isUnknown = false;
     bool canSlice = false;
     Type* IRType = nullptr;
-    LgsHashMap* vtable = nullptr;
     map<string, LgsField*> fields;
     map<string, LgsFunc*> methods;
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
     LgsField* getField(const string& name);
-    LgsFunc* getMethod(const string& name) const;
+    LgsFunc* getMethod(const string& name);
 
     LgsBool* asBool();
     LgsChar* asChar();
@@ -76,5 +75,5 @@ public:
     virtual bool equals(LgsType* other) = 0;
     virtual string getStrFormatPart() const;
     virtual void freeValue(LgsCodeGen* codeGen, Value* value);
-    virtual ~LgsType();
+    virtual ~LgsType() = default;
 };

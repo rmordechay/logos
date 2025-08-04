@@ -91,7 +91,7 @@ public:
 
     void validateObjImplements(LgsObject* obj, const vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);
-    void validateInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
+    void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     void validateExprType(const LgsExpr* expr, LgsType* type);
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);

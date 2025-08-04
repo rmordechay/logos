@@ -1,4 +1,5 @@
 #pragma once
+const auto ERROR_PADDING = "\n\t\t";
 
 struct LgsError {
     const char* msg;
@@ -12,7 +13,7 @@ inline LgsError E10001{.msg = "Left type '%s' does not match the right type '%s'
 inline LgsError E10002{.msg = "'%s' must be an iterable.", .errCode = errCodeStart++};
 inline LgsError E10003{.msg = "Index '%s' is out of bounds. Max expected size: %s.", .errCode = errCodeStart++};
 inline LgsError E10004{.msg = "Function '%s' must return an expression of type '%s'. Given: '%s'.", .errCode = errCodeStart++};
-inline LgsError E10005{.msg = "Field '%s' is not a member of '%s'.", .errCode = errCodeStart++};
+inline LgsError E10005{.msg = "'%s' is not a member of '%s'.", .errCode = errCodeStart++};
 inline LgsError E10006{.msg = "'%s' is not defined.", .errCode = errCodeStart++};
 inline LgsError E10007{.msg = "File name '%s.lgs' is duplicate. All files in a project must be unique. Locations:%s", .errCode = errCodeStart++};
 inline LgsError E10008{.msg = "'Main.lgs' could not be found in 'src' directory.", .errCode = errCodeStart++};
@@ -20,10 +21,10 @@ inline LgsError E10009{.msg = "Duplicate Main files were found in the project. L
 inline LgsError E10010{.msg = "Path is not a root path of a logos project.", .errCode = errCodeStart++};
 inline LgsError E10011{.msg = "'%s' is already declared at %s.", .errCode = errCodeStart++};
 inline LgsError E10012{.msg = "Function call cannot be assigned to a value.", .errCode = errCodeStart++};
-inline LgsError E10013{.msg = "Method '%s' is not a member of '%s'.", .errCode = errCodeStart++};
+inline LgsError E10013{.msg = "Field '%s' is declared with type function. Declare it as a method instead.%pExplanation: Logos highly encourages uniformity wherever possible. Having the ability to declare%pfunctions in both manners may create a codebase that violates this rule.", .errCode = errCodeStart++};
 inline LgsError E10014{.msg = "Expression of type '%s' does not match base type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10015{.msg = "Function with name '%s' was found but it doesn't match the parameters.\n\t   Given:    %s\n\t   Expected: %s", .errCode = errCodeStart++};
-inline LgsError E10016{.msg = "Object '%s' does not fully implement '%s'. Missing fields/methods:%s", .errCode = errCodeStart++};
+inline LgsError E10016{.msg = "Object '%s' does not fully implement '%s'. %s", .errCode = errCodeStart++};
 inline LgsError E10017{.msg = "'break' must be inside a for loop.", .errCode = errCodeStart++};
 inline LgsError E10018{.msg = "Expression of type '%s' cannot be casted to type '%s'.", .errCode = errCodeStart++};
 inline LgsError E10019{.msg = "activeEnv '%s' could not be found in the envs directory.", .errCode = errCodeStart++};
@@ -69,4 +70,6 @@ inline LgsError E10058{.msg = "Field '%s' is defined in multiple interfaces: '%s
 inline LgsError E10059{.msg = "Unreachable code.", .errCode = errCodeStart++};
 inline LgsError E10060{.msg = "'for.isFirst' and 'for.isLast' are only allowed inside a for loop.", .errCode = errCodeStart++};
 inline LgsError E10061{.msg = "'for.isLast' is not allowed in an infinite loop.", .errCode = errCodeStart++};
-inline LgsError E10062{.msg = "Interface '%s' implements all its fields and/or methods which is not allowed. Make at least one of the fields or methods abstract (without implementation) or change it to 'object'", .errCode = errCodeStart++};
+inline LgsError E10062{.msg = "Interface '%s' implements all its methods which is not allowed. Make at least one of the methods abstract (without implementation) or change it to 'object'", .errCode = errCodeStart++};
+inline LgsError E10063{.msg = "Interfaces must have at least one (abstract) method or field.", .errCode = errCodeStart++};
+

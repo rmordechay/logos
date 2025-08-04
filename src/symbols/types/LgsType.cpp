@@ -17,6 +17,42 @@ LgsField* LgsType::getField(const string& name) {
     if (field != fields.end()) {
         return field->second;
     }
+
+    vector<LgsType*> interfaces;
+    if (const auto obj = asObject()) {
+        interfaces = obj->interfaces;
+    } else if (const auto interface = asInterface()) {
+        interfaces = interface->interfaces;
+    }
+
+    for (const auto interface : interfaces) {
+        const auto interfaceField = interface->getField(name);
+        if (interfaceField) {
+            return interfaceField;
+        }
+    }
+
+    return nullptr;
+}
+
+LgsFunc* LgsType::getMethod(const string& name) {
+    const auto method = methods.find(name);
+    if (method != methods.end()) {
+        return method->second;
+    }
+    vector<LgsType*> interfaces;
+    if (const auto obj = asObject()) {
+        interfaces = obj->interfaces;
+    } else if (const auto interface = asInterface()) {
+        interfaces = interface->interfaces;
+    }
+
+    for (const auto interface : interfaces) {
+        const auto interfaceMethod = interface->getMethod(name);
+        if (interfaceMethod) {
+            return interfaceMethod;
+        }
+    }
     return nullptr;
 }
 
@@ -33,16 +69,6 @@ bool LgsType::addField(LgsField* field) {
     fields[field->name] = field;
     return true;
 }
-
-LgsFunc* LgsType::getMethod(const string& name) const {
-    const auto method = methods.find(name);
-    if (method != methods.end()) {
-        return method->second;
-    }
-    return nullptr;
-}
-
-size_t LgsType::getSizeBytes() { assert(0); }
 
 void LgsType::freeValue(LgsCodeGen* codeGen, Value* value) {}
 string LgsType::getStrFormatPart() const { assert(0); }
@@ -64,7 +90,3 @@ LgsEnum* LgsType::asEnum() { return dynamic_cast<LgsEnum*>(this); }
 LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
 LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }
 LgsTypePair* LgsType::asPair() { return dynamic_cast<LgsTypePair*>(this); }
-
-LgsType::~LgsType() {
-    if (vtable) delete vtable;
-}

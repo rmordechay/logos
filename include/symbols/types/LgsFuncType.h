@@ -13,14 +13,11 @@ public:
     bool isPublic = false;
     bool isVirtual = false;
     bool isVariadic = false;
-    bool isAnonymous = false;
     bool isStatic = false;
     bool isOptional = false;
     bool isTerminator = false;
     bool hasDefaults = false;
-    int returnParamIndex = -1;
     FunctionType* IRType = nullptr;
-    string* implementsName = nullptr;
 
     Type* getIRType(LgsCodeGen* codeGen) override;
     string getName() override;
