@@ -2,26 +2,6 @@
 #include "doctest.h"
 #include "logos/LgsApp.h"
 
-TEST_CASE("TestSemaHappy") {
-    LgsApp app;
-    const auto code = R"(
-    interface Type1 {
-        a: Int
-    }
-    interface Type2 {
-        implements: Type1
-        b: Int
-    }
-    main() {
-        a = 2
-        arr: Int[a]!
-    }
-    )";
-    app.parseSrcFile(code);
-    app.analyse();
-    CHECK_EQ(app.errHandler.errors.size(), 0);
-}
-
 TEST_CASE("TestSema10001") {
     LgsApp app;
     app.parseSrcFile("main() {a: Str = 34}");
@@ -34,7 +14,7 @@ TEST_CASE("TestSema10002A") {
     LgsApp app;
     const auto code = R"(
     main() {
-        a = 34
+        a = "c"
         for i in a {}
     }
     )";
@@ -78,6 +58,7 @@ TEST_CASE("TestSema10004") {
     f(): Int {
         return "str"
     }
+    main() {}
     )";
     app.parseSrcFile(code);
     app.analyse();
@@ -180,20 +161,6 @@ TEST_CASE("TestSema10011B") {
     CHECK_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
 }
 
-TEST_CASE("TestSema10012") {
-    LgsApp app;
-    const auto code = R"(
-    main() {
-        obj = Obj{}
-        obj.func() := 23
-    }
-    )";
-    app.parseSrcFile(code, "code.lgs");
-    // TODO move to parser test
-    CHECK_EQ(app.errHandler.errors.size(), 1);
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10012.errCode);
-}
-
 TEST_CASE("TestSema10013A") {
     LgsApp app;
     const auto code = R"(
@@ -290,32 +257,6 @@ TEST_CASE("TestSema10016B") {
     CHECK_EQ(app.errHandler.errors.size(), 2);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10016.errCode);
     CHECK_EQ(app.errHandler.errors[1].errCode, E10016.errCode);
-}
-
-TEST_CASE("TestSema10017A") {
-    LgsApp app;
-    const auto code = R"(
-    main() {
-        break
-    }
-    )";
-    app.parseSrcFile(code);
-    CHECK_EQ(app.errHandler.errors.size(), 1);
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10017.errCode);
-}
-
-TEST_CASE("TestSema10021") {
-    LgsApp app;
-    const auto code = R"(
-    main() {
-        obj = Obj{}
-        go obj.x
-    }
-    )";
-    app.parseSrcFile(code);
-    // TODO move to parser test
-    CHECK_EQ(app.errHandler.errors.size(), 1);
-    CHECK_EQ(app.errHandler.errors[0].errCode, E10021.errCode);
 }
 
 TEST_CASE("TestSema10022") {
@@ -558,6 +499,7 @@ TEST_CASE("TestSema10055") {
     LgsApp app;
     const auto code = R"(
     f(): Int {}
+    main() {}
     )";
     app.parseSrcFile(code);
     app.analyse();

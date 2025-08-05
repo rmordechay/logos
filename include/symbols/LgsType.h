@@ -33,7 +33,7 @@ class LgsType {
 public:
     LgsLocation location;
     bool isVoid = false;
-    bool isInt = false;
+    bool isNumber = false;
     bool isUnsigned = false;
     bool isPrimitive = false;
     bool isBig = false;

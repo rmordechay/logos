@@ -17,7 +17,7 @@ LgsType* LgsMap::getIndexType() {
 }
 
 LgsType* LgsMap::getValueType() {
-    return typePair->key;
+    return typePair->value;
 }
 
 Value* LgsMap::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {

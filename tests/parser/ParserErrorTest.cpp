@@ -1,10 +1,42 @@
 #include "logos/LgsApp.h"
 #include <doctest.h>
 
-TEST_CASE("TestParserHappy") {
+TEST_CASE("TestSema10012") {
     LgsApp app;
-    app.parseSrcFile("main() {a: Str = 34}");
-    CHECK(app.errHandler.errors.empty());
+    const auto code = R"(
+    main() {
+        obj = Obj{}
+        obj.func() := 23
+    }
+    )";
+    app.parseSrcFile(code, "code.lgs");
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10012.errCode);
+}
+
+TEST_CASE("TestSema10017A") {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        break
+    }
+    )";
+    app.parseSrcFile(code);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10017.errCode);
+}
+
+TEST_CASE("TestSema10021") {
+    LgsApp app;
+    const auto code = R"(
+    main() {
+        obj = Obj{}
+        go obj.x
+    }
+    )";
+    app.parseSrcFile(code);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10021.errCode);
 }
 
 TEST_CASE("TestParser10033A") {

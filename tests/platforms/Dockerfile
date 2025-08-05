@@ -1,30 +1,21 @@
 FROM ubuntu:latest
 
 RUN apt-get update &&  \
-    apt-get install -y  \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y  \
     cmake \
-    build-essential \
-    lsb-release \
-    wget \
-    software-properties-common \
-    gnupg \
-    file \
+    clang-19 \
+    llvm-19-dev \
+    libclang-19-dev libclang-cpp19-dev \
+    curl libcurlpp-dev \
+    zlib1g zlib1g-dev libzstd-dev \
     libedit-dev \
-    zlib1g-dev \
-    libzstd-dev \
-    libcurl4-openssl-dev \
-    git
+    unzip
 
-#RUN wget https://apt.llvm.org/llvm.sh &&  \
-#    chmod +x llvm.sh && \
-#    ./llvm.sh 20 all && \
-#    rm llvm.sh
-
-#RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang-20 100 && \
-#    update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-20 100 \
-
-#ENV PATH="/lib/llvm-19/bin:${PATH}"
+RUN update-alternatives --install /usr/bin/clang clang /usr/lib/llvm-19/bin/clang 100
+RUN update-alternatives --install /usr/bin/clang++ clang++ /usr/lib/llvm-19/bin/clang++ 100
 
 WORKDIR /app/
+
+RUN make build
 
 CMD ["/bin/bash"]

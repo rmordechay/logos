@@ -7,7 +7,7 @@ public:
 
     LgsShort() {
         isPrimitive = true;
-        isInt = true;
+        isNumber = true;
     }
     size_t getSizeBytes() override;
     Type* getIRType(LgsCodeGen* codeGen) override;

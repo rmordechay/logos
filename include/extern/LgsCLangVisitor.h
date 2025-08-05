@@ -14,7 +14,7 @@ class LgsCLangVisitor : public clang::RecursiveASTVisitor<LgsCLangVisitor> {
 public:
     LgsFile* cFile;
 
-    explicit LgsCLangVisitor(const path& filePath) : cFile(new LgsFile(filePath.filename(), filePath)) {}
+    explicit LgsCLangVisitor(const filesystem::path& filePath) : cFile(new LgsFile(filePath.filename(), filePath)) {}
     bool VisitFunctionDecl(const clang::FunctionDecl* func);
     bool VisitRecordDecl(const clang::RecordDecl* record);
     LgsType* mapCType(clang::QualType type);
@@ -29,16 +29,16 @@ class LgsCLangASTConsumer final : public clang::ASTConsumer {
 public:
     LgsCLangVisitor visitor;
 
-    explicit LgsCLangASTConsumer(const path& filePath) : visitor(filePath) {}
+    explicit LgsCLangASTConsumer(const filesystem::path& filePath) : visitor(filePath) {}
     void HandleTranslationUnit(clang::ASTContext& context) override;
     ~LgsCLangASTConsumer() override = default;
 };
 
 class LgsCLangFeAction final : public clang::ASTFrontendAction {
 public:
-    path& filePath;
+    filesystem::path& filePath;
 
-    explicit LgsCLangFeAction(path& filePath) : filePath(filePath) {}
+    explicit LgsCLangFeAction(filesystem::path& filePath) : filePath(filePath) {}
     unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) override {
         return make_unique<LgsCLangASTConsumer>(filePath);
     }

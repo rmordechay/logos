@@ -243,6 +243,7 @@ LgsInterface* AntlrConverter::getInterface(LogosParser::InterfaceBodyContext* ct
         const auto func = new LgsFunc(funcName->getText(), type);
         setLocation(func->location, funcName->getSymbol(), ctx->stop);
         func->stmtsBlock = getStmtBlock(interfaceFunc->statementsBlock());
+        allMethodsAreImplemented = allMethodsAreImplemented && func->stmtsBlock;
         func->funcType->parentName = interface->name;
         func->funcType->isMethod = true;
         func->funcType->isPublic = true;
@@ -250,13 +251,13 @@ LgsInterface* AntlrConverter::getInterface(LogosParser::InterfaceBodyContext* ct
         func->funcType->isOptional = !!interfaceFunc->QUEST_MARK();
         func->funcType->params.push_back(self);
         setParams(func->funcType, interfaceFunc->funcSignatureHeader()->param());
-        allMethodsAreImplemented = allMethodsAreImplemented && func->stmtsBlock;
         interface->addMethod(func);
     }
 
-    if (allMethodsAreImplemented) {
+    if (!ctx->interfaceFunc().empty() && allMethodsAreImplemented) {
         errHandler.addError(E10062, &interface->location, {interface->name});
     }
+
     return interface;
 }
 
@@ -267,17 +268,17 @@ LgsEnum* AntlrConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
     unordered_set<string> seenNames;
     for (size_t i = 0; i < ctx->enumField().size(); ++i) {
         const auto enumField = ctx->enumField()[i];
-        const auto enumName = enumField->IDENTIFIER()->getText();
-        if (!seenNames.insert(enumName).second) {
-            errHandler.addError(E10011, &lgsEnum->location, {enumName, lgsEnum->location.getFullPath()});
+        const auto enumFieldName = enumField->IDENTIFIER()->getText();
+        if (!seenNames.insert(enumFieldName).second) {
+            errHandler.addError(E10064, &lgsEnum->location, {enumFieldName, lgsEnum->name});
             break;
         }
-        const auto field = new LgsField(enumName, &lgsEnum->name, lgsEnum);
+        const auto field = new LgsField(enumFieldName, &lgsEnum->name, lgsEnum);
         if (enumField->STRING()) {
             field->expr = getStrConst(enumField->STRING());
         }
         setLocation(field->location, ctx->start, ctx->stop);
-        lgsEnum->fields[enumName] = field;
+        lgsEnum->fields[enumFieldName] = field;
     }
     return lgsEnum;
 }
@@ -1079,7 +1080,7 @@ void AntlrConverter::addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol
         if (globalSymbol->isBuiltin) {
             return errHandler.addError(E10053, newSymbol.location, {symbolName});
         }
-        return errHandler.addError(E10011, newSymbol.location, {symbolName, newSymbol.location->getFullPath()});
+        return errHandler.addError(E10011, newSymbol.location, {symbolName, getFullPath(*newSymbol.location)});
     }
     file->symbolTable.addSymbol(newSymbol, &errHandler);
 }
@@ -1137,5 +1138,5 @@ void AntlrConverter::setLocation(LgsLocation& location, const Token* start, cons
         location.lineEnd = end->getLine();
         location.posEnd = end->getCharPositionInLine() + 1;
     }
-    location.filePath = filePath;
+    location.filePath = filePath.c_str();
 }

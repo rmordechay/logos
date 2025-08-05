@@ -18,7 +18,7 @@ inline LgsError E10006{.msg = "'%s' is not defined.", .errCode = errCodeStart++}
 inline LgsError E10007{.msg = "File name '%s.lgs' is duplicate. All files in a project must be unique. Locations:%s", .errCode = errCodeStart++};
 inline LgsError E10008{.msg = "'Main.lgs' could not be found in 'src' directory.", .errCode = errCodeStart++};
 inline LgsError E10009{.msg = "Duplicate Main files were found in the project. Locations:%s", .errCode = errCodeStart++};
-inline LgsError E10010{.msg = "Path is not a root path of a logos project.", .errCode = errCodeStart++};
+inline LgsError E10010{.msg = "Not a root path of a logos project.", .errCode = errCodeStart++};
 inline LgsError E10011{.msg = "'%s' is already declared at %s.", .errCode = errCodeStart++};
 inline LgsError E10012{.msg = "Function call cannot be assigned to a value.", .errCode = errCodeStart++};
 inline LgsError E10013{.msg = "Field '%s' is declared with type function. Declare it as a method instead.%pExplanation: Logos highly encourages uniformity wherever possible. Having the ability to declare%pfunctions in both manners may create a codebase that violates this rule.", .errCode = errCodeStart++};
@@ -72,4 +72,4 @@ inline LgsError E10060{.msg = "'for.isFirst' and 'for.isLast' are only allowed i
 inline LgsError E10061{.msg = "'for.isLast' is not allowed in an infinite loop.", .errCode = errCodeStart++};
 inline LgsError E10062{.msg = "Interface '%s' implements all its methods which is not allowed. Make at least one of the methods abstract (without implementation) or change it to 'object'", .errCode = errCodeStart++};
 inline LgsError E10063{.msg = "Interfaces must have at least one (abstract) method or field.", .errCode = errCodeStart++};
-
+inline LgsError E10064{.msg = "'%s' is already defined in '%s'.", .errCode = errCodeStart++};

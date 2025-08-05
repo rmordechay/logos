@@ -6,6 +6,6 @@ class LgsVarDec;
 class LgsEnvFile final : public LgsFile {
 public:
     vector<LgsVarDec*> varDecs;
-    LgsEnvFile(const string& fileName, const path& path, const vector<LgsVarDec*>& varDecs) : LgsFile(fileName, path), varDecs(varDecs) {}
+    LgsEnvFile(const string& fileName, const filesystem::path& path, const vector<LgsVarDec*>& varDecs) : LgsFile(fileName, path), varDecs(varDecs) {}
     ~LgsEnvFile() override = default;
 };

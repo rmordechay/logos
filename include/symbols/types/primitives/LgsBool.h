@@ -9,7 +9,7 @@ public:
 
     LgsBool() {
         isPrimitive = true;
-        isInt = true;
+        isNumber = true;
     }
     string prettyName() override;
     Type* getIRType(LgsCodeGen* codeGen) override;

@@ -30,8 +30,8 @@ void LgsCoroutine::createIRStmt(LgsCodeGen* codeGen) {
 
     // Starts coroutine
     builder.SetInsertPoint(entryBlock);
-    const auto coroID = codeGen->callIDFunc();
-    const auto frameSize = codeGen->callSizeFunc();
+    const auto coroID = codeGen->callCoroIDFunc();
+    const auto frameSize = codeGen->callCoroSizeFunc();
     const auto handle = codeGen->callBeginFunc(coroID, frameSize);
     const auto suspend = codeGen->callSuspendFunc();
     const auto switchIR = builder.CreateSwitch(suspend, suspendBlock, 2);
@@ -52,12 +52,12 @@ void LgsCoroutine::createIRStmt(LgsCodeGen* codeGen) {
     } else {
         assert(0);
     }
-    codeGen->callEndFunc(handle);
+    codeGen->callCoroEndFunc(handle);
     builder.CreateRet(handle);
 
     // Back to the caller
     builder.restoreIP(codeGen->savedIP);
     const auto coroutine = builder.CreateCall(coroutineFunc, originalArgs);
     codeGen->callResumeFunc(coroutine);
-    codeGen->callDestroyFunc(coroutine);
+    codeGen->callCoroDestroyFunc(coroutine);
 }

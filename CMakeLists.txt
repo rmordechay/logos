@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.22)
 project(logos VERSION 0.0.1)
 
-set(CMAKE_CXX_STANDARD 17   )
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_C_COMPILER_LAUNCHER ccache)
-set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
-find_package(ZLIB REQUIRED)
+find_package(LLVM REQUIRED CONFIG)
+find_package(Clang REQUIRED CONFIG)
+find_library(CLANG_CPP_LIB clang-cpp REQUIRED)
 
 set(SOURCE_FILES
     src/utils/LgsErrHandler.cpp
@@ -27,14 +27,17 @@ set(SOURCE_FILES
     src/parser/LogosParser.cpp
     src/utils/LgsUtils.cpp
     src/utils/ThreadPool.cpp
+    src/logos/LgsCodeGen.cpp
+    src/files/LgsInterfaceFile.cpp
 
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsValue.cpp
     src/symbols/LgsSymbolTable.cpp
     src/symbols/LgsCoroutine.cpp
     src/symbols/exprs/LgsBinaryExpr.cpp
-    src/symbols/exprs/unary/LgsCast.cpp
+    src/symbols/builtins/LgsBuiltins.cpp
     src/symbols/exprs/LgsExpr.cpp
+    src/symbols/exprs/unary/LgsCast.cpp
     src/symbols/exprs/unary/constants/LgsBoolConst.cpp
     src/symbols/exprs/unary/constants/LgsCharConst.cpp
     src/symbols/exprs/unary/constants/LgsFloatConst.cpp
@@ -92,9 +95,6 @@ set(SOURCE_FILES
     src/symbols/types/LgsIterator.cpp
     src/symbols/types/LgsCPtr.cpp
     src/symbols/types/LgsNullable.cpp
-    src/logos/LgsCodeGen.cpp
-    src/symbols/builtins/LgsBuiltins.cpp
-    src/files/LgsInterfaceFile.cpp
 )
 
 add_subdirectory(stdlib)
@@ -102,31 +102,49 @@ add_library(lib ${SOURCE_FILES})
 target_link_libraries(lib PRIVATE lgslib)
 target_precompile_headers(lib PRIVATE include/pch.h)
 
+llvm_map_components_to_libnames(LLVM_LIBS
+    support
+    core
+    irreader
+    linker
+    aarch64codegen
+    asmparser
+    asmprinter
+    coroutines
+    passes
+    aarch64asmparser
+    option
+)
+
 target_include_directories(lib PUBLIC
+    ${LLVM_INCLUDE_DIRS}
+    ${Clang_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/stdlib/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
     ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
-    /opt/homebrew/Cellar/llvm@19/19.1.7/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lib PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libLLVM.dylib
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libclang-cpp.dylib
+        ${LLVM_LIBS}
+        ${CLANG_CPP_LIB}
         ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libantlr4.dylib
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    find_package(ZLIB REQUIRED)
     target_link_libraries(lib PRIVATE
         ZLIB::ZLIB
         zstd
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/linux/libLLVM.so
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/linux/libantlr.a
+        ${LLVM_LIBS}
+        ${CLANG_CPP_LIB}
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/linux/libantlr4.so
     )
 endif()
 
 add_executable(lgs main.cpp)
 target_link_libraries(lgs PRIVATE lib)
+
 add_subdirectory(tests)

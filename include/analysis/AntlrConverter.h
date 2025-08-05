@@ -1,15 +1,9 @@
 #pragma once
-
-
-#include "LgsCoroutine.h"
 #include "LogosParser.h"
-#include "exprs/LgsBinaryExpr.h"
 #include "funcs/LgsFunc.h"
 #include "utils/LgsErrHandler.h"
 #include "stmts/LgsAssignment.h"
-#include "stmts/LgsBreak.h"
 
-using namespace filesystem;
 
 class LgsStrConst;
 class LgsType;
@@ -42,12 +36,12 @@ class LgsAssignment;
 
 class AntlrConverter {
 public:
-    path filePath;
+    filesystem::path filePath;
     LgsErrHandler errHandler;
     LgsSymbolTable& globals;
     stack<LgsForLoop*> loopStack;
 
-    explicit AntlrConverter(const path& filePath, LgsSymbolTable& globals) : filePath(filePath), globals(globals) {}
+    explicit AntlrConverter(const filesystem::path& filePath, LgsSymbolTable& globals) : filePath(filePath), globals(globals) {}
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx);
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx);
     LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx);

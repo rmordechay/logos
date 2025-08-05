@@ -1,9 +1,10 @@
 #include "Runtime.h"
 #include "LgsConfig.h"
 #include "LgsDefinitions.h"
-#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <unistd.h>
 
 typedef struct StackFrame {
     uint64_t file_path_index;
@@ -56,10 +57,12 @@ void print_stack() {
     FILE* debug_file = fopen(runtime.debug_file, "rb");
     for (int i = count - 1; i >= 0; --i) {
         char path[1024];
+        char cwd[1024];
         char funcName[1024];
+        getcwd(cwd, sizeof(cwd));
         read_strings_from_file(debug_file, frames[i]->file_path_index, path);
         read_strings_from_file(debug_file, frames[i]->func_name_index, funcName);
-        printf("\t%s at %s\n", funcName, path);
+        printf("\t%s at %s/%s\n", funcName, cwd, path);
     }
     fclose(debug_file);
 }

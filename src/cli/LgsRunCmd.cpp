@@ -3,7 +3,7 @@
 void LgsRunCmd::runCmd() {
     const auto firstArg = argv[2];
     const auto isCurrentDirOrEmpty = strcmp(firstArg, ".") == 0 || argc == 2;
-    const auto rootPath = isCurrentDirOrEmpty ? current_path().string() : firstArg;
+    const auto rootPath = isCurrentDirOrEmpty ? filesystem::current_path().string() : firstArg;
     LgsApp logos(rootPath);
     setArgs(&logos);
     logos.run();

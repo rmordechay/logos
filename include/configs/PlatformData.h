@@ -17,34 +17,13 @@
 #if defined(__linux__)
     #define OS_NAME "Linux"
     #define CLIB_ROOT "/usr/lib/aarch64-linux-gnu/"
-    #define PLATFORM_VERSION "15.0"
-    #define LINK_FUNC lld::elf::link
-    #define LINKER_OPTS { \
-        LINKER, \
-        "-L", "/usr/lib/aarch64-linux-gnu", \
-        "../stdlib/lgslib.a", \
-        "-lc", \
-        "--dynamic-linker", "/lib/ld-linux-aarch64.so.1", \
-        "/usr/lib/aarch64-linux-gnu/crti.o", \
-        "/usr/lib/aarch64-linux-gnu/crtn.o", \
-    }
+    #define CLIB_INCLUDE "/usr/include/aarch64-linux-gnu/bsd"
 #elif defined(__APPLE__) && defined(__MACH__)
     #define OS_NAME "macOS"
     #define CLIB_ROOT "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
-    #define PLATFORM_VERSION "15.0"
-    #define LINK_FUNC lld::macho::link
-    #define LINKER_OPTS { \
-        LINKER, \
-        "-lSystem", \
-        "-syslibroot", CLIB_ROOT, \
-        "stdlib/liblgslib.a", \
-        "-platform_version", OS_NAME, PLATFORM_VERSION, PLATFORM_VERSION, \
-        "-arch", ARCH_NAME, \
-    }
+    #define CLIB_INCLUDE "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
 #elif defined(_WIN32)
     LLD_HAS_DRIVER(coff);
     #define OS_NAME "Win"
     #define CLIB_ROOT ""
-    #define PLATFORM_VERSION ""
-    #define LINK_FUNC lld::coff::link
 #endif

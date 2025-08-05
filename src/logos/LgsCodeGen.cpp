@@ -64,11 +64,6 @@ bool LgsCodeGen::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
 }
 
-void LgsCodeGen::callInitRuntime() {
-    const auto ft = FunctionType::get(voidTy(), false);
-    callFunc("init_runtime", ft, {getIRStr(paths.debugFile)});
-}
-
 void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
     const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), ptrTy()});
     builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
@@ -98,25 +93,13 @@ Value* LgsCodeGen::callMalloc(const size_t size) {
     return builder.CreateMalloc(sizeTy(), sizeTy(), isize(size), nullptr);
 }
 
-void LgsCodeGen::callPushStack(const off_t pathIndex) {
-    const auto ft = FunctionType::get(voidTy(), {sizeTy(), sizeTy()}, false);
-    const auto func = IRModule->getOrInsertFunction("push_stack_frame", ft);
-    builder.CreateCall(func, {isize(filePathIndex), isize(pathIndex)});
-}
-
-void LgsCodeGen::callPopStack() {
-    const auto ft = FunctionType::get(voidTy(), false);
-    const auto func = IRModule->getOrInsertFunction("pop_stack_frame", ft);
-    builder.CreateCall(func);
-}
-
 void LgsCodeGen::callPrintError(const string& msg) {
     const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
     const auto func = IRModule->getOrInsertFunction("print_error", ft);
     builder.CreateCall(func, {getIRStr(msg)});
 }
 
-Value* LgsCodeGen::callIDFunc() {
+Value* LgsCodeGen::callCoroIDFunc() {
     const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_id);
     return builder.CreateCall(func, {i32Zero(), null(), null(), null()});
 }
@@ -131,7 +114,7 @@ Value* LgsCodeGen::callResumeFunc(Value* handle) {
     return builder.CreateCall(func, {handle});
 }
 
-Value* LgsCodeGen::callSizeFunc() {
+Value* LgsCodeGen::callCoroSizeFunc() {
     const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_size, {i32Ty()});
     return builder.CreateCall(func);
 }
@@ -142,12 +125,12 @@ Value* LgsCodeGen::callBeginFunc(Value* coroID, Value* frameSize) {
     return builder.CreateCall(func, {coroID, sizeValue});
 }
 
-Value* LgsCodeGen::callEndFunc(Value* handle) {
+Value* LgsCodeGen::callCoroEndFunc(Value* handle) {
     const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_end);
     return builder.CreateCall(func, {handle, builder.getFalse(), ConstantTokenNone::get(context)});
 }
 
-Value* LgsCodeGen::callDestroyFunc(Value* handle) {
+Value* LgsCodeGen::callCoroDestroyFunc(Value* handle) {
     const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_destroy);
     return builder.CreateCall(func, {handle});
 }
@@ -247,9 +230,7 @@ void LgsCodeGen::initLLVM() {
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();
-    InitializeAllTargetMCs();
-    InitializeAllTargets();
-    InitializeAllTargetInfos();
+    LLVMInitializeAArch64TargetInfo();
 }
 
 TargetMachine* LgsCodeGen::getTargetMachine() {

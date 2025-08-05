@@ -64,10 +64,10 @@ bool LgsApp::validate() {
 bool LgsApp::parse() {
     loadBuiltins();
     ThreadPool threadPool;
-    for (const auto& entry : recursive_directory_iterator(paths.srcDir)) {
+    for (const auto& entry : filesystem::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
-            const auto absFilePath = path(canonical(entry));
+            const auto absFilePath = filesystem::path(canonical(entry));
             const auto codeText = getFileText(absFilePath);
             parseSrcFile(codeText, absFilePath);
         });
@@ -97,10 +97,9 @@ bool LgsApp::generate() const {
     initBuild();
     ThreadPool threadPool;
     for (const auto& file : files) {
-        threadPool.runTask([file, this] {
+        threadPool.runTask([file] {
             file->generateIR();
             if (!file->codeGen.IRModule) return;
-            const auto name = file->name;
             lock_guard lock(mtx);
         });
     }
@@ -114,7 +113,7 @@ bool LgsApp::link() const {
     return linker.link();
 }
 
-void LgsApp::parseSrcFile(const string& codeText, path filePath) {
+void LgsApp::parseSrcFile(const string& codeText, filesystem::path filePath) {
     ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
@@ -138,8 +137,8 @@ void LgsApp::parseSrcFile(const string& codeText, path filePath) {
     }
 }
 
-void LgsApp::parseEnvFile(path fileEntry) {
-    const auto absFilePath = new path(canonical(fileEntry));
+void LgsApp::parseEnvFile(filesystem::path fileEntry) {
+    const auto absFilePath = new filesystem::path(filesystem::canonical(fileEntry));
     AntlrConverter antlerConverter(*absFilePath, globals);
     const auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
@@ -152,8 +151,8 @@ void LgsApp::parseEnvFile(path fileEntry) {
     errHandler.copyErrors(antlerConverter.errHandler.errors);
 }
 
-void LgsApp::parseAppFile(path fileEntry) {
-    const auto absFilePath = new path(canonical(fileEntry));
+void LgsApp::parseAppFile(filesystem::path fileEntry) {
+    const auto absFilePath = new filesystem::path(filesystem::canonical(fileEntry));
     AntlrConverter antlerConverter(*absFilePath, globals);
     auto codeText = getFileText(fileEntry);
     ANTLRInputStream input(codeText);
@@ -222,9 +221,8 @@ void LgsApp::loadBuiltins() {
 }
 
 void LgsApp::loadEnvFiles() {
-    vector<LgsEnvFile*> files;
     ThreadPool threadPool;
-    for (const auto& entry : directory_iterator(paths.envsDir)) {
+    for (const auto& entry : filesystem::directory_iterator(paths.envsDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
             parseEnvFile(entry);
@@ -269,45 +267,11 @@ void LgsApp::setupActiveEnv() {
     checkRequiredEnvVars();
 }
 
-void LgsApp::initBuild() const {
+void LgsApp::initBuild() {
     remove_all(paths.buildDir);
     create_directories(paths.buildDir);
     create_directories(paths.buildIR);
-    writeDebugFile();
     LgsCodeGen::initLLVM();
-}
-
-void writeFuncIndices(ofstream& ofs, const map<string, LgsFunc*>& funcs) {
-    for (auto [_, func] : funcs) {
-        const auto funcName = func->funcType->name;
-        const uint64_t funcNameSize = funcName.size();
-        func->pathIndex = ofs.tellp();
-        ofs.write(reinterpret_cast<const char*>(&funcNameSize), sizeof(uint64_t));
-        ofs.write(funcName.data(), funcNameSize);
-    }
-}
-
-// debug layout: [size, file_path][size, func_name]*
-
-void LgsApp::writeDebugFile() const {
-    ofstream ofs(paths.debugFile, ios::binary);
-    for (const auto file : files) {
-        const auto pathStr = file->absPath.string();
-        const uint64_t pathSize = pathStr.size();
-        file->codeGen.filePathIndex = ofs.tellp();
-        ofs.write(reinterpret_cast<const char*>(&pathSize), sizeof(uint64_t));
-        ofs.write(pathStr.data(), pathSize);
-        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
-            writeFuncIndices(ofs, mainFile->funcs);
-            for (const auto object : mainFile->objects) {
-                writeFuncIndices(ofs, object->methods);
-            }
-        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-            writeFuncIndices(ofs, objFile->obj->methods);
-        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            writeFuncIndices(ofs, interfaceFile->interface->methods);
-        }
-    }
 }
 
 void LgsApp::writeIRFiles() const {
@@ -329,12 +293,13 @@ void LgsApp::writeIRFiles() const {
 
 void LgsApp::exitWithErrors() const {
     for (int i = 0; i < errHandler.errors.size(); ++i) {
-        const auto msg = errHandler.errors[i].msg;
+        const auto lgsError = errHandler.errors[i];
         if (i == errHandler.errors.size() - 1) {
-            logInfo(LOGOS_ERROR_STR + string(msg));
+            logInfo(LOGOS_ERROR_STR + string(lgsError.msg));
         } else {
-            logInfo(LOGOS_ERROR_STR + string(msg) +  "\n---");
+            logInfo(LOGOS_ERROR_STR + string(lgsError.msg) +  "\n---");
         }
+        free((void*)lgsError.msg);
     }
     return exit(1);
 }

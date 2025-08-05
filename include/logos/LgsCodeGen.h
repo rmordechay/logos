@@ -40,20 +40,16 @@ public:
     Value* callStrHash(Value* value);
     void callCopyMem(Value* src, Value* dest, size_t n);
 
-    // Stack
-    void callPushStack(off_t pathIndex);
     void callPrintError(const string& msg);
-    void callInitRuntime();
-    void callPopStack();
 
     // Coroutines
-    Value* callIDFunc();
+    Value* callCoroIDFunc();
     Value* callSuspendFunc();
     Value* callResumeFunc(Value* handle);
-    Value* callSizeFunc();
+    Value* callCoroSizeFunc();
     Value* callBeginFunc(Value* coroID, Value* frameSize);
-    Value* callEndFunc(Value* handle);
-    Value* callDestroyFunc(Value* handle);
+    Value* callCoroEndFunc(Value* handle);
+    Value* callCoroDestroyFunc(Value* handle);
 
     // Types
     Type* i1Ty();

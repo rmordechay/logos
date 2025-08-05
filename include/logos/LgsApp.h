@@ -33,7 +33,7 @@ public:
     vector<LgsEnvFile*> envFiles;
     LgsCLang lgsCLang;
 
-    explicit LgsApp(const path& rootDirPath = "") : lgsCLang(paths) {
+    explicit LgsApp(const filesystem::path& rootDirPath = "") : lgsCLang(paths) {
         paths.initPaths(rootDirPath);
     }
 
@@ -41,21 +41,20 @@ public:
     bool validate();
     bool parse();
     bool analyse();
-    void initBuild() const;
-    void writeDebugFile() const;
-    void writeIRFiles() const;
     bool generate() const;
     bool link() const;
-    void parseSrcFile(const string& codeText, path filePath = "");
-    void parseEnvFile(path fileEntry);
-    void parseAppFile(path fileEntry);
+    void parseSrcFile(const string& codeText, filesystem::path filePath = "");
+    void parseEnvFile(filesystem::path fileEntry);
+    void parseAppFile(filesystem::path fileEntry);
     bool resolveExternalFiles();
     bool resolveGlobalTypes();
-    void setEnvVars();
-    void setupActiveEnv();
     void loadBuiltins();
     void loadEnvFiles();
+    void setEnvVars();
+    void setupActiveEnv();
     void checkRequiredEnvVars();
+    void writeIRFiles() const;
     void exitWithErrors() const;
+    static void initBuild();
     ~LgsApp();
 };

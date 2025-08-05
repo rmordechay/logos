@@ -65,8 +65,8 @@ void* Map_get(const HashMap* map, const char* key) {
         entry = entry->next;
     }
     char buffer[512];
-    sprintf(buffer, "%s not found\n", key);
-    print_error(buffer);
+    sprintf(buffer, "Error: %s not found\n", key);
+    fprintf(stderr, "%s\n", buffer);
     return NULL;
 }
 

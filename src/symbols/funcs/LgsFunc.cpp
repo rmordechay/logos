@@ -9,10 +9,8 @@
 void LgsFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, stmtsBlock);
     startFuncBlock(codeGen);
-    codeGen->callPushStack(pathIndex);
     stmtsBlock->createIRValue(codeGen);
     if (!codeGen->lastInstTerminator()) {
-        codeGen->callPopStack();
         codeGen->builder.CreateRetVoid();
     }
     codeGen->stack.exitScope();

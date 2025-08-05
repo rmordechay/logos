@@ -1,7 +1,7 @@
 #include "utils/LgsErrHandler.h"
-
 #include "LgsDefinitions.h"
 #include "LgsLocation.h"
+#include "utils/LgsUtils.h"
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;
@@ -25,7 +25,7 @@ void LgsErrHandler::addError(const LgsError& lgsErr, const LgsLocation* location
         argIndex++;
     }
     if (location) {
-        const auto finalResult = result + "\n\t    at " + location->getFullPath();
+        const auto finalResult = result + "\n\t    at " + getFullPath(*location);
         errors.emplace_back(LgsError{.msg = strdup(finalResult.c_str()), .errCode = lgsErr.errCode});
     } else {
         errors.emplace_back(LgsError{.msg = strdup(result.c_str()), .errCode = lgsErr.errCode});

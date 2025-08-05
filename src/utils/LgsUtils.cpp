@@ -15,11 +15,11 @@ void logErr(const string& text) {
     cerr << text << NEW_LINE;
 }
 
-bool isLogosFile(const directory_entry& entry) {
+bool isLogosFile(const filesystem::directory_entry& entry) {
     return entry.is_regular_file() && entry.path().extension().string() == LOGOS_FILE_EXTENSION;
 }
 
-bool isLLVMFile(const directory_entry& entry) {
+bool isLLVMFile(const filesystem::directory_entry& entry) {
     return entry.is_regular_file() && entry.path().extension().string() == ".ll";
 }
 
@@ -32,8 +32,8 @@ void cleanStr(string& value) {
     value.pop_back();
 }
 
-string getFileText(path filePath) {
-    if (!exists(filePath)) return "";
+string getFileText(filesystem::path filePath) {
+    if (!filesystem::exists(filePath)) return "";
     ifstream file(filePath);
     if (!file.is_open()) return "";
     stringstream fileContents;
@@ -60,4 +60,8 @@ bool isBuiltinName(const string& name, const LgsLocation* location, LgsErrHandle
         return true;
     }
     return false;
+}
+
+string getFullPath(const LgsLocation& location) {
+    return string(location.filePath) + ":" + to_string(location.lineStart) + ":" + to_string(location.posStart);
 }

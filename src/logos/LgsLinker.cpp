@@ -1,4 +1,6 @@
 #include "logos/LgsLinker.h"
+
+#include "PlatformData.h"
 #include "configs/LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "utils/LgsUtils.h"
@@ -34,7 +36,7 @@ bool LgsLinker::link() const {
     LLVMContext context;
     unique_ptr<Module> mainModule = nullptr;
     vector<unique_ptr<Module>> modules;
-    for (const auto& entry : directory_iterator(paths.buildIR)) {
+    for (const auto& entry : filesystem::directory_iterator(paths.buildIR)) {
         if (!isLLVMFile(entry)) continue;
         auto module = parseModule(context, entry.path());
         if (!module) return false;

@@ -265,8 +265,16 @@ void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
 }
 
 void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
-    visitExpr(rangeLoop->startRange);
-    visitExpr(rangeLoop->endRange);
+    const auto startRange = rangeLoop->startRange;
+    const auto endRange = rangeLoop->endRange;
+    visitExpr(startRange);
+    visitExpr(endRange);
+    if (startRange && startRange->type && !startRange->type->isNumber) {
+        errHandler.addError(E10002, &startRange->location, {startRange->prettyName()});
+    }
+    if (endRange && endRange->type && !endRange->type->isNumber) {
+        errHandler.addError(E10002, &endRange->location, {endRange->prettyName()});
+    }
     addLocalSymbol(LgsSymbol(rangeLoop->loopVars.front()));
     visitStmtsBlock(rangeLoop->stmtsBlock);
 }
@@ -276,7 +284,6 @@ void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     visitUnaryExpr(iterExpr);
     const auto iterable = iterExpr->type->asIterable();
     if (!iterable) {
-        // If type is not defined an error was already thrown
         if (iterExpr->type) errHandler.addError(E10002, &iterExpr->location, {iterExpr->prettyName()});
         return;
     }
@@ -457,7 +464,13 @@ void SemaAnalyser::visitStaticArray(const LgsArrayExpr* arrayExpr) {
 void SemaAnalyser::visitHashMap(const LgsHashMap* hashMap) {
     const auto typePair = hashMap->type->asMap()->typePair;
     if (typePair->key && typePair->value) return;
-    if (hashMap->initialElements.empty()) return errHandler.addError(E10049, &hashMap->location);
+    if (hashMap->initialElements.empty()) {
+        return errHandler.addError(E10049, &hashMap->location);
+    }
+    for (const auto element : hashMap->initialElements) {
+        visitExpr(element->key);
+        visitExpr(element->value);
+    }
     const auto firstElement = hashMap->initialElements.front();
     typePair->key = firstElement->key->type;
     typePair->value = firstElement->value->type;
@@ -766,13 +779,13 @@ string getMissingImplementsStr(const vector<LgsField*>& fields, const vector<Lgs
     if (!fields.empty()) {
         str << ERROR_PADDING << "Fields:";
         for (const auto& field : fields) {
-            str << "\n\t\t     - " << field->name << ": " <<  field->type->prettyName();
+            str << ERROR_PADDING << "\t- " << field->name << ": " <<  field->type->prettyName();
         }
     }
     if (!methods.empty()) {
         str << ERROR_PADDING << "Methods:";
         for (const auto& method : methods) {
-            str << "\n\t\t     - " << method->funcType->prettyName();
+            str << ERROR_PADDING << "\t- " << method->funcType->prettyName();
         }
     }
     return str.str();
@@ -782,9 +795,9 @@ void SemaAnalyser::validateObjInterface(LgsObject* obj, LgsInterface* interface)
     // Fields
     vector<LgsField*> missingFields;
     for (const auto& [name, interfaceField] : interface->fields) {
-        const auto objField = obj->getField(name);
-        if (objField && objField->type->equals(interfaceField->type)) {
-            objField->isVirtual = true;
+        const auto objField = obj->fields.find(name);
+        if (objField != obj->fields.end() && objField->second->type->equals(interfaceField->type)) {
+            objField->second->isVirtual = true;
             continue;
         }
         if (!interfaceField->isOptional) {
@@ -797,9 +810,9 @@ void SemaAnalyser::validateObjInterface(LgsObject* obj, LgsInterface* interface)
     for (const auto& [name, interfaceMethod] : interface->methods) {
         const auto method = obj->methods.find(name);
         if (method != obj->methods.end()) {
-            const auto objMethod = obj->getMethod(name);
-            if (objMethod && objMethod->funcType->equals(interfaceMethod->funcType)) {
-                objMethod->funcType->isVirtual = true;
+            const auto objMethod = obj->methods.find(name);
+            if (objMethod != obj->methods.end() && objMethod->second->funcType->equals(interfaceMethod->funcType)) {
+                objMethod->second->funcType->isVirtual = true;
                 continue;
             }
         }
@@ -940,7 +953,7 @@ void SemaAnalyser::addLocalSymbol(const LgsSymbol& newSymbol) {
         return errHandler.addError(E10053, newSymbol.location, {symbolName});
     }
     if ((symbol = file->symbolTable.getSymbol(symbolName))) {
-        return errHandler.addError(E10011, newSymbol.location, {symbolName, symbol->location->getFullPath()});
+        return errHandler.addError(E10011, newSymbol.location, {symbolName, getFullPath(*symbol->location)});
     }
     stack.getSymbolTable().addSymbol(newSymbol, &errHandler);
 }

@@ -9,7 +9,7 @@ public:
 
     LgsLong() {
         isPrimitive = true;
-        isInt = true;
+        isNumber = true;
     }
     Type* getIRType(LgsCodeGen* codeGen) override;
     size_t getSizeBytes() override;

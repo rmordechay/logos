@@ -1,4 +1,5 @@
 #include "extern/LgsCLang.h"
+#include "PlatformData.h"
 #include "configs/LgsErrors.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "extern/LgsCLangVisitor.h"
@@ -7,26 +8,23 @@
 #include "utils/LgsUtils.h"
 #include <clang/Driver/Compilation.h>
 #include <clang/Driver/Driver.h>
-#include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/Tooling/Tooling.h>
 #include <clang/CodeGen/CodeGenAction.h>
 #include <clang/Frontend/CompilerInvocation.h>
 #include <clang/Frontend/CompilerInstance.h>
 
-#define CLANG_BINARY "clang"
-
 void LgsCLang::parseFile(const string& filePath) {
-    auto headerPath = paths.clibInclude / filePath;
+    auto headerPath = filesystem::path(CLIB_INCLUDE) / filePath;
     if (isCLibHeader(headerPath)) {
         const auto code = getFileText(headerPath);
-        clang::tooling::runToolOnCodeWithArgs(make_unique<LgsCLangFeAction>(headerPath), code, {"-isysroot", paths.clibRoot});
+        clang::tooling::runToolOnCodeWithArgs(make_unique<LgsCLangFeAction>(headerPath), code, {"-isysroot", CLIB_ROOT});
     }
 }
 
-void LgsCLang::compile(const vector<LgsStrConst*>& files) {
+void LgsCLang::compile(const vector<LgsStrConst*>& files) const {
     const auto targetTriple = sys::getDefaultTargetTriple();
     clang::DiagnosticsEngine diags(new clang::DiagnosticIDs(), new clang::DiagnosticOptions(), new clang::DiagnosticConsumer());
-    clang::driver::Driver driver(CLANG_BINARY, targetTriple, diags);
+    clang::driver::Driver driver("clang", targetTriple, diags);
 
     auto invocation = make_unique<clang::CompilerInvocation>();
     vector<const char*> args;
@@ -53,7 +51,7 @@ void LgsCLang::compile(const vector<LgsStrConst*>& files) {
 }
 
 void LgsCLang::setCompileArgs(const vector<LgsStrConst*>& files, vector<const char*>& args) const {
-    vector<string> compileArgs{CLANG_BINARY, "-c", "-isysroot", paths.clibRoot};
+    vector<string> compileArgs{"clang", "-c", "-isysroot", CLIB_ROOT};
     for (const auto& file : files) {
         compileArgs.push_back(file->value);
     }
@@ -67,8 +65,8 @@ void LgsCLang::setCompileArgs(const vector<LgsStrConst*>& files, vector<const ch
 string LgsCLang::getCode(const LgsStrConst* filePath) {
     string code;
     const auto pathStr = filePath->value;
-    const auto cLibPath = paths.clibInclude / pathStr;
-    if (exists(cLibPath)) {
+    const auto cLibPath = filesystem::path(CLIB_INCLUDE) / pathStr;
+    if (filesystem::exists(cLibPath)) {
         return getFileText(cLibPath);
     }
     errHandler.addError(E10047, &filePath->location, {pathStr});
@@ -76,30 +74,28 @@ string LgsCLang::getCode(const LgsStrConst* filePath) {
 }
 
 void LgsCLang::setCHeaderPaths() {
-    assert(paths.clibInclude != "");
-    for (const auto& entry : directory_iterator(paths.clibInclude)) {
+    for (const auto& entry : filesystem::directory_iterator(CLIB_INCLUDE)) {
         if (!entry.is_regular_file()) continue;
         auto ext = entry.path().extension();
         if (ext == ".h" || ext == ".hpp" || ext == ".hh" || ext == ".hxx") {
             headers.push_back(entry.path().string());
         }
     }
-
-    for (const auto& entry : directory_iterator(paths.clibInclude / "sys/_types")) {
-        if (!entry.is_regular_file()) continue;
-        parseFile(entry.path().string());
-        time_t now = time(nullptr);
-    }
+    // TODO enable again more cross platform
+    // for (const auto& entry : filesystem::directory_iterator(filesystem::path(CLIB_INCLUDE) / "sys/_types")) {
+    //     if (!entry.is_regular_file()) continue;
+    //     parseFile(entry.path().string());
+    // }
 }
 
-void LgsCLang::getClibRoot() const {
+void LgsCLang::getClibRoot() {
     clang::DiagnosticsEngine diags(new clang::DiagnosticIDs(), new clang::DiagnosticOptions(), new clang::DiagnosticConsumer());
     auto invocation = make_unique<clang::CompilerInvocation>();
-    clang::CompilerInvocation::CreateFromArgs(*invocation, {CLANG_BINARY, "-x", "c", "-E", "-"}, diags);
-    auto compilerInstance = make_unique<clang::CompilerInstance>();
+    clang::CompilerInvocation::CreateFromArgs(*invocation, {"clang", "-x", "c", "-E", "-"}, diags);
+    const auto compilerInstance = make_unique<clang::CompilerInstance>();
     compilerInstance->setInvocation(std::move(invocation));
 }
 
-bool LgsCLang::isCLibHeader(const path& cLibPath) {
+bool LgsCLang::isCLibHeader(const filesystem::path& cLibPath) {
     return std::find(headers.begin(), headers.end(), cLibPath) != headers.end();
 }

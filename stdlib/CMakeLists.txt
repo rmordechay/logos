@@ -5,7 +5,6 @@ add_library(lgslib STATIC
     lib/Array.c
     lib/Str.c
     lib/Runtime.c
-    include/Runtime.h
 )
 
 target_include_directories(lgslib PUBLIC

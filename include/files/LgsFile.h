@@ -9,13 +9,13 @@ class LgsCodeGen;
 class LgsFile {
 public:
     string name;
-    path absPath;
+    filesystem::path absPath;
     LgsCodeGen codeGen;
     LgsLocation location;
     LgsSymbolTable symbolTable;
     vector<LgsStrConst*> externFiles;
 
-    explicit LgsFile(const string& name, const path& path) : name(name), absPath(path) {}
+    explicit LgsFile(const string& name, const filesystem::path& path) : name(name), absPath(path) {}
     virtual void generateIR();
     virtual void format();
     virtual ~LgsFile() = default;

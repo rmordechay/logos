@@ -6,7 +6,7 @@ public:
     static constexpr auto name = "UInt";
 
     LgsUInt() {
-        isInt = true;
+        isNumber = true;
         isUnsigned = true;
         isPrimitive = true;
     }

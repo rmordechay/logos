@@ -6,7 +6,6 @@
 void LgsMainFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, stmtsBlock);
     startFuncBlock(codeGen);
-    codeGen->callInitRuntime();
     if (!funcType->params.empty()) {
         initMainArgs(codeGen);
     }
@@ -29,8 +28,7 @@ Function* LgsMainFunc::getIRFunc(LgsCodeGen* codeGen) {
     auto IRArgs = IRFunc->arg_begin();
     argc = IRArgs;
     IRArgs->setName("argc");
-    IRArgs++;
-    argv = IRArgs;
+    argv = IRArgs++;
     IRArgs->setName("argv");
     return IRFunc;
 }

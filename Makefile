@@ -1,19 +1,9 @@
-.PHONY: all configure build clean run
-all: configure build
-build_and_run: configure build run
-
-configure:
-	@mkdir -p build
-	@cd build && cmake ..
-
 build:
-	@cd build && make -j10
+	cmake -S . -B build
+	cmake --build build -j5
 
-clean:
-	rm -rf build
-
-run:
-	@cd project && ../build/lgs run .
+run: build
+	cd build && ./lgs run ../project
 
 generate_grammar:
 	rm -rf src/parser
@@ -25,7 +15,7 @@ run_llvm:
 	cd project/build && ./output
 
 run_linux_docker tests/platforms/Dockerfile:
-	docker build -f tests/platforms/Dockerfile -t linux . && docker run -it -v $(pwd):/app linux /bin/bash && cmake .. && make -j 5
+	docker build -f tests/platforms/Dockerfile -v $(pwd):/app -t linux . && docker run -it -v $(pwd):/app linux
 
 run_qemu:
 	qemu-img create -f qcow2 linux-x86.qcow2 5G
