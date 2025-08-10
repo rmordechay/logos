@@ -105,6 +105,17 @@ Value* LgsCodeGen::callCoroIDFunc() {
     return builder.CreateCall(func, {i32Zero(), null(), null(), null()});
 }
 
+Value* LgsCodeGen::callCoroBeginFunc(Value* coroID, Value* frameSize) {
+    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_begin);
+    const auto sizeValue = builder.CreateMalloc(i32Ty(), i8Ty(), frameSize, nullptr);
+    return builder.CreateCall(func, {coroID, sizeValue});
+}
+
+Value* LgsCodeGen::callCoroSizeFunc() {
+    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_size, {i32Ty()});
+    return builder.CreateCall(func);
+}
+
 Value* LgsCodeGen::callSuspendFunc() {
     const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_suspend);
     return builder.CreateCall(func, {ConstantTokenNone::get(context), builder.getFalse()});
@@ -113,17 +124,6 @@ Value* LgsCodeGen::callSuspendFunc() {
 Value* LgsCodeGen::callResumeFunc(Value* handle) {
     const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_resume);
     return builder.CreateCall(func, {handle});
-}
-
-Value* LgsCodeGen::callCoroSizeFunc() {
-    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_size, {i32Ty()});
-    return builder.CreateCall(func);
-}
-
-Value* LgsCodeGen::callBeginFunc(Value* coroID, Value* frameSize) {
-    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_begin);
-    const auto sizeValue = builder.CreateMalloc(i32Ty(), i8Ty(), frameSize, nullptr);
-    return builder.CreateCall(func, {coroID, sizeValue});
 }
 
 Value* LgsCodeGen::callCoroEndFunc(Value* handle) {
@@ -148,6 +148,10 @@ IntegerType* LgsCodeGen::sizeTy() {
     return IRModule->getDataLayout().getIntPtrType(context);
 }
 
+Type* LgsCodeGen::iNTy(const unsigned n) {
+    return IntegerType::getIntNTy(context, n);
+}
+
 Type* LgsCodeGen::i1Ty() {
     return IntegerType::getInt1Ty(context);
 }
@@ -170,6 +174,10 @@ Type* LgsCodeGen::i64Ty() {
 
 Type* LgsCodeGen::voidTy() {
     return Type::getVoidTy(context);
+}
+
+ConstantInt* LgsCodeGen::iN(const unsigned size, const size_t v) {
+    return builder.getIntN(size, v);
 }
 
 ConstantInt* LgsCodeGen::i1(const bool v) {
@@ -232,7 +240,6 @@ void LgsCodeGen::initLLVM() {
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();
     LLVMInitializeAArch64TargetInfo();
-    findLibC();
 }
 
 TargetMachine* LgsCodeGen::getTargetMachine() {

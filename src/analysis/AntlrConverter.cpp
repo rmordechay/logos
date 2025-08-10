@@ -466,7 +466,7 @@ LgsAssignment* AntlrConverter::getAssignment(LogosParser::AssignmentContext* ctx
         lValue = getIterIndex(iterIndex);
     } else if (const auto selection = ctx->selection()) {
         const auto lgsSelection = getSelection(selection);
-        if (lgsSelection->selectionType == SELECTION_FUNC_CALL) {
+        if (!lgsSelection->lastExpr()->asFuncCall()) {
             errHandler.addError(E10012, &lgsSelection->location);
         }
         lValue = lgsSelection;
@@ -507,7 +507,7 @@ LgsCoroutine* AntlrConverter::getCoroutine(LogosParser::CoroutineContext* ctx) {
         coroutine->funcCall = getFuncCall(funcCall);
     } else if (const auto selection = ctx->selection()) {
         const auto lgsSelection = getSelection(selection);
-        if (lgsSelection->selectionType != SELECTION_FUNC_CALL) {
+        if (!lgsSelection->lastExpr()->asFuncCall()) {
             errHandler.addError(E10021, &lgsSelection->location);
         }
         coroutine->selection = lgsSelection;
@@ -863,14 +863,6 @@ LgsSelection* AntlrConverter::getSelection(LogosParser::SelectionContext* ctx) {
     const auto exprs = getSelectionExprs(ctx);
     const auto selection = new LgsSelection(exprs);
     setLocation(selection->location, ctx->start, ctx->stop);
-    const auto lastExpr = exprs[exprs.size() - 1];
-    if (lastExpr->asFuncCall()) {
-        selection->selectionType = SELECTION_FUNC_CALL;
-    } else if (lastExpr->asVariable()) {
-        selection->selectionType = SELECTION_FIELD;
-    } else if (lastExpr->asIterIndex()) {
-        selection->selectionType = SELECTION_ITER_INDEX;
-    }
     return selection;
 }
 

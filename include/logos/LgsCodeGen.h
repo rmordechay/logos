@@ -47,7 +47,7 @@ public:
     Value* callSuspendFunc();
     Value* callResumeFunc(Value* handle);
     Value* callCoroSizeFunc();
-    Value* callBeginFunc(Value* coroID, Value* frameSize);
+    Value* callCoroBeginFunc(Value* coroID, Value* frameSize);
     Value* callCoroEndFunc(Value* handle);
     Value* callCoroDestroyFunc(Value* handle);
 
@@ -59,6 +59,7 @@ public:
     Type* i64Ty();
     Type* voidTy();
     PointerType* ptrTy();
+    Type* iNTy(unsigned n);
     IntegerType* sizeTy();
 
     // values
@@ -72,6 +73,7 @@ public:
     ConstantInt* i32Zero();
     ConstantInt* i64Zero();
     ConstantInt* sizeZero();
+    ConstantInt* iN(unsigned size, size_t v);
     TypeSize typeSize(StructType* v) const;
 
     // Debugging

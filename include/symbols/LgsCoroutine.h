@@ -8,5 +8,5 @@ public:
     LgsSelection* selection = nullptr;
 
     void createIRStmt(LgsCodeGen* codeGen) override;
-    ~LgsCoroutine() override = default;
+    ~LgsCoroutine() override;
 };
