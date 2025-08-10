@@ -16,7 +16,6 @@ public:
     string getCode(LgsStrConst* filePath);
     void parseFile(const string& filePath);
     void compile(const vector<LgsStrConst*>& files) const;
-    static void getClibRoot();
     bool isCLibHeader(const filesystem::path& cLibPath);
     void setCompileArgs(const vector<LgsStrConst*>& files, vector<const char*>& args) const;
     ~LgsCLang() = default;

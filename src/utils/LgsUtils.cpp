@@ -69,3 +69,17 @@ string getFullPath(const char* filePath, const int32_t lineStart, const int32_t 
 string getFullPath(const LgsLocation& location) {
     return getFullPath(location.filePath, location.lineStart, location.posStart);
 }
+
+void findLibC() {
+    clang::DiagnosticsEngine diags(new clang::DiagnosticIDs(), new clang::DiagnosticOptions(), new clang::DiagnosticConsumer());
+    const auto vfs = vfs::getRealFileSystem();
+    const auto target_triple = sys::getDefaultTargetTriple();
+    auto driver = clang::driver::Driver("clang", target_triple, diags, "clang", vfs);
+    const auto args = {"clang", "-c", "dummy.c"};
+    const auto compilation = std::unique_ptr<clang::driver::Compilation>(driver.BuildCompilation(args));
+    auto& toolChain = compilation->getDefaultToolChain();
+    std::cout << driver.getClangProgramPath() << std::endl;
+    std::cout << driver.ResourceDir << std::endl;
+    std::cout << driver.SystemConfigDir << std::endl;
+    std::cout << toolChain.getOSLibName().front() << std::endl;
+}

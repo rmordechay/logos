@@ -2,6 +2,7 @@
 #include "funcs/LgsFunc.h"
 #include "logos/LgsPaths.h"
 #include "types/LgsAny.h"
+#include "utils/LgsUtils.h"
 
 void LgsCodeGen::setIRModule(const string& moduleName) {
     const auto module = new Module(moduleName, context);
@@ -231,6 +232,7 @@ void LgsCodeGen::initLLVM() {
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();
     LLVMInitializeAArch64TargetInfo();
+    findLibC();
 }
 
 TargetMachine* LgsCodeGen::getTargetMachine() {

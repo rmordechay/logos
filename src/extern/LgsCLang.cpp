@@ -6,12 +6,6 @@
 #include "utils/LgsErrHandler.h"
 #include "logos/LgsPaths.h"
 #include "utils/LgsUtils.h"
-#include <clang/Driver/Compilation.h>
-#include <clang/Driver/Driver.h>
-#include <clang/Tooling/Tooling.h>
-#include <clang/CodeGen/CodeGenAction.h>
-#include <clang/Frontend/CompilerInvocation.h>
-#include <clang/Frontend/CompilerInstance.h>
 
 void LgsCLang::parseFile(const string& filePath) {
     auto headerPath = filesystem::path(CLIB_INCLUDE) / filePath;
@@ -86,14 +80,6 @@ void LgsCLang::setCHeaderPaths() {
     //     if (!entry.is_regular_file()) continue;
     //     parseFile(entry.path().string());
     // }
-}
-
-void LgsCLang::getClibRoot() {
-    clang::DiagnosticsEngine diags(new clang::DiagnosticIDs(), new clang::DiagnosticOptions(), new clang::DiagnosticConsumer());
-    auto invocation = make_unique<clang::CompilerInvocation>();
-    clang::CompilerInvocation::CreateFromArgs(*invocation, {"clang", "-x", "c", "-E", "-"}, diags);
-    const auto compilerInstance = make_unique<clang::CompilerInstance>();
-    compilerInstance->setInvocation(std::move(invocation));
 }
 
 bool LgsCLang::isCLibHeader(const filesystem::path& cLibPath) {
