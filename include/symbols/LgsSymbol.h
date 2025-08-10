@@ -14,7 +14,7 @@ class LgsLocation;
 enum LgsSymbolType {
     VAR_DEC,
     PARAM,
-    FIELD,
+    ENUM_FIELD,
     FUNC,
     OBJECT,
     INTERFACE,

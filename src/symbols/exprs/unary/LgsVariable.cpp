@@ -27,7 +27,7 @@ Value* LgsVariable::createIRValue(LgsCodeGen* codeGen) {
     case OBJECT:
         return ref.object->singleton->getIRValue(codeGen);
     case ENUM:
-    case FIELD:
+    case ENUM_FIELD:
         return codeGen->getIRStr(name);
     case INTERFACE:
     case GROUP:
@@ -48,7 +48,7 @@ LgsExpr* LgsVariable::convertExpr(LgsType* type) {
     switch (ref.symbolType) {
     case VAR_DEC:
         return ref.varDec->expr->convertExpr(type);
-    case FIELD:
+    case ENUM_FIELD:
         return ref.field->expr->convertExpr(type);
     case PARAM:
     case FUNC:
@@ -68,7 +68,7 @@ Value* LgsVariable::hashValue(LgsCodeGen* codeGen) {
         return codeGen->callStrHash(ref.param->getIRValue(codeGen));
     case VAR_DEC:
         return ref.varDec->expr->hashValue(codeGen);
-    case FIELD:
+    case ENUM_FIELD:
         return codeGen->i32(Str_hash(ref.field->name.c_str()));
     default:
         assert(0);

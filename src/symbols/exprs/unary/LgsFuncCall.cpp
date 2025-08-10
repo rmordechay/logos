@@ -24,7 +24,7 @@ Value* LgsFuncCall::getCallback(LgsCodeGen* codeGen) const {
         return callback->varDec->expr->getIRValue(codeGen);
     case PARAM:
         return callback->param->IRValue;
-    case FIELD:
+    case ENUM_FIELD:
         return callback->field->IRValue;
     default:
         break;

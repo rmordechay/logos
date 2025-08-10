@@ -35,7 +35,7 @@ void LgsSymbolTable::freeSymbols() {
         case PARAM:
             delete symbol.second.param;
             break;
-        case FIELD:
+        case ENUM_FIELD:
             delete symbol.second.field;
             break;
         case FUNC:

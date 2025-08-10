@@ -42,8 +42,8 @@ LgsExpr* LgsObject::getZeroValue() {
 string LgsObject::getStrFormatPart() const {
     stringstream str;
     str << '{';
-    for (const auto [name, field] : fields) {
-        str << name << " = " << field->type->getStrFormatPart();
+    for (const auto [fieldName, field] : fields) {
+        str << fieldName << " = " << field->type->getStrFormatPart();
     }
     str << '}';
     return str.str();
@@ -72,15 +72,15 @@ void LgsObject::freeValue(LgsCodeGen* codeGen, Value* value) {
 LgsObject* LgsObject::clone() {
     const auto cloned = new LgsObject(*this);
     cloned->fields.clear();
-    for (const auto [name, field] : fields) {
-        cloned->fields[name] = new LgsField(*field);
+    for (const auto [fieldName, field] : fields) {
+        cloned->fields[fieldName] = new LgsField(*field);
     }
     return cloned;
 }
 
 size_t LgsObject::getSizeBytes() {
     size_t sum = 0;
-    for (const auto& [name, field] : fields) {
+    for (const auto& [_, field] : fields) {
         sum += field->type->getSizeBytes();
     }
     return sum;

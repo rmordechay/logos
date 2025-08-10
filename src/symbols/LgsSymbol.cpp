@@ -18,7 +18,7 @@ LgsSymbol::LgsSymbol(LgsVarDec* varDec)
     : name(&varDec->name), symbolType(VAR_DEC), varDec(varDec), location(&varDec->location) {}
 
 LgsSymbol::LgsSymbol(LgsField* field)
-    : name(&field->name), symbolType(FIELD), field(field), location(&field->location) {}
+    : name(&field->name), symbolType(ENUM_FIELD), field(field), location(&field->location) {}
 
 LgsSymbol::LgsSymbol(LgsGroup* group)
     : name(&group->name), symbolType(GROUP), group(group), location(&group->location) {}
@@ -47,7 +47,7 @@ void* LgsSymbol::getSymbol() const {
         return object;
     case INTERFACE:
         return interface;
-    case FIELD:
+    case ENUM_FIELD:
         return field;
     case ENUM:
         return lgsEnum;

@@ -41,7 +41,7 @@ int LgsExpr::getConstInt() {
         switch (var->ref.symbolType) {
         case VAR_DEC:
             return var->ref.varDec->expr->getConstInt();
-        case FIELD:
+        case ENUM_FIELD:
             return var->ref.field->expr->getConstInt();
         default:
             break;
@@ -58,7 +58,7 @@ string LgsExpr::getConstStr() {
         switch (var->ref.symbolType) {
         case VAR_DEC:
             return var->ref.varDec->expr->getConstStr();
-        case FIELD:
+        case ENUM_FIELD:
             return var->ref.field->expr->getConstStr();
         default:
             break;

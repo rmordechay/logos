@@ -205,7 +205,7 @@ void SemaAnalyser::visitPatternMatching(LgsIfStmt* pm) {
     stack.enterScope(pm, nullptr);
     visitExpr(baseExpr);
     const auto baseExprType = baseExpr->type;
-    // Allows local enum fields to not have have a quilifier inside the block
+    // Allows local enum fields to not have have a qualifier inside the block
     if (baseExprType->asEnum()) {
         for (auto [name, field] : baseExprType->fields) {
             addLocalSymbol(LgsSymbol(field));
@@ -486,7 +486,7 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
         variable->isMutable = symbol->varDec->isMutable;
         variable->setType(symbol->varDec->type);
         break;
-    case FIELD:
+    case ENUM_FIELD:
         variable->ref.field = symbol->field;
         variable->isMutable = symbol->field->isMutable;
         variable->setType(symbol->field->type);
@@ -1048,7 +1048,6 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
             break;
         }
         assert(newType);
-        newType->isBig = newType->getSizeBytes() > BIG_SIZE_THRESHOLD;
         freeType(type);
         type = newType;
     }
