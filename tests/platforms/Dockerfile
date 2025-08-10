@@ -6,6 +6,7 @@ RUN apt-get update &&  \
     clang-19 \
     llvm-19-dev \
     libclang-19-dev libclang-cpp19-dev \
+    libantlr4-runtime-dev \
     curl libcurlpp-dev \
     zlib1g zlib1g-dev libzstd-dev \
     libedit-dev \

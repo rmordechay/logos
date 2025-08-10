@@ -4,9 +4,10 @@ project(logos VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
+
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
-find_library(CLANG_CPP_LIB clang-cpp REQUIRED)
+find_package(antlr4-runtime REQUIRED)
 
 set(SOURCE_FILES
     src/utils/LgsErrHandler.cpp
@@ -119,19 +120,18 @@ llvm_map_components_to_libnames(LLVM_LIBS
 target_include_directories(lib PUBLIC
     ${LLVM_INCLUDE_DIRS}
     ${Clang_INCLUDE_DIRS}
+    ${ANTLR4_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/stdlib/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
     ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(lib PRIVATE
         ${LLVM_LIBS}
         ${CLANG_CPP_LIB}
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/macos/libantlr4.dylib
+        antlr4_static
     )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(ZLIB REQUIRED)
@@ -139,8 +139,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         ZLIB::ZLIB
         zstd
         ${LLVM_LIBS}
-        ${CLANG_CPP_LIB}
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/lib/aarch64/linux/libantlr4.so
+#        ${CLANG_CPP_LIB}
+        antlr4_static
     )
 endif()
 
