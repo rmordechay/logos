@@ -62,7 +62,7 @@ void LgsCLang::setCompileArgs(const vector<LgsStrConst*>& files, vector<const ch
     }
 }
 
-string LgsCLang::getCode(const LgsStrConst* filePath) {
+string LgsCLang::getCode(LgsStrConst* filePath) {
     string code;
     const auto pathStr = filePath->value;
     const auto cLibPath = filesystem::path(CLIB_INCLUDE) / pathStr;

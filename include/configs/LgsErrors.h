@@ -1,9 +1,18 @@
 #pragma once
 const auto ERROR_PADDING = "\n\t\t";
 
+struct LgsLocation {
+    int32_t lineStart = 0;
+    int32_t lineEnd = 0;
+    int32_t posStart = 0;
+    int32_t posEnd = 0;
+    const char* filePath = "";
+};
+
 struct LgsError {
     const char* msg;
     size_t errCode;
+    LgsLocation* location;
 };
 
 /** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */

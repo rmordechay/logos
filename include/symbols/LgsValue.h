@@ -1,5 +1,5 @@
 #pragma once
-#include "LgsLocation.h"
+#include "LgsErrors.h"
 
 class LgsVariable;
 class LgsExpr;

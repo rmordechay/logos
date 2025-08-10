@@ -13,7 +13,7 @@ public:
 
     explicit LgsCLang(LgsPaths& paths) : paths(paths) {}
     void setCHeaderPaths();
-    string getCode(const LgsStrConst* filePath);
+    string getCode(LgsStrConst* filePath);
     void parseFile(const string& filePath);
     void compile(const vector<LgsStrConst*>& files) const;
     static void getClibRoot();

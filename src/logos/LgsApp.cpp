@@ -294,12 +294,11 @@ void LgsApp::writeIRFiles() const {
 void LgsApp::exitWithErrors() const {
     for (int i = 0; i < errHandler.errors.size(); ++i) {
         const auto lgsError = errHandler.errors[i];
-        if (i == errHandler.errors.size() - 1) {
-            logInfo(LOGOS_ERROR_STR + string(lgsError.msg));
-        } else {
-            logInfo(LOGOS_ERROR_STR + string(lgsError.msg) +  "\n---");
-        }
+        const auto finalResult = string(lgsError.msg) + "\n\t    at " + getFullPath(*lgsError.location);
+        logInfo(LOGOS_ERROR_STR + string(finalResult));
+        if (i != errHandler.errors.size() - 1) logInfo("\n---");
         free((void*)lgsError.msg);
+        free((void*)lgsError.location->filePath);
     }
     return exit(1);
 }

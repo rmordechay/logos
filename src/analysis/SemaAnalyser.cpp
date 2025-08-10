@@ -102,7 +102,7 @@ void SemaAnalyser::visitParam(LgsParam* param) {
     addLocalSymbol(LgsSymbol(param));
 }
 
-void SemaAnalyser::visitField(const LgsField* field) {
+void SemaAnalyser::visitField(LgsField* field) {
     if (field->expr) {
         visitExpr(field->expr);
         validateExprType(field->expr, field->type);
@@ -167,7 +167,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     addLocalSymbol(LgsSymbol(varDec));
 }
 
-void SemaAnalyser::visitAssignment(const LgsAssignment* assignment) {
+void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
     const auto lValue = assignment->lValue;
     const auto rValue = assignment->rValue;
     visitExpr(lValue);
@@ -409,7 +409,7 @@ void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     binaryExpr->setType(type);
 }
 
-void SemaAnalyser::visitArrayExpr(const LgsArrayExpr* array) {
+void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
     for (const auto element : array->initialElements) {
         visitExpr(element);
     }
@@ -433,7 +433,7 @@ void inferBaseType(const LgsArrayExpr* array) {
     array->type->asIterable()->baseType = baseType;
 }
 
-void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
+void SemaAnalyser::visitDynamicArray(LgsArrayExpr* array) {
     const auto dArr = array->type->asDArray();
     if (!dArr->sizeExpr) {
         dArr->sizeExpr = new LgsIntConst(array->initialElements.size());
@@ -447,7 +447,7 @@ void SemaAnalyser::visitDynamicArray(const LgsArrayExpr* array) {
     inferBaseType(array);
 }
 
-void SemaAnalyser::visitStaticArray(const LgsArrayExpr* arrayExpr) {
+void SemaAnalyser::visitStaticArray(LgsArrayExpr* arrayExpr) {
     const auto& initialElements = arrayExpr->initialElements;
     const auto arr = arrayExpr->type->asSArray();
     if (initialElements.empty() && !arr->baseType) {
@@ -461,7 +461,7 @@ void SemaAnalyser::visitStaticArray(const LgsArrayExpr* arrayExpr) {
     }
 }
 
-void SemaAnalyser::visitHashMap(const LgsHashMap* hashMap) {
+void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) {
     const auto typePair = hashMap->type->asMap()->typePair;
     if (typePair->key && typePair->value) return;
     if (hashMap->initialElements.empty()) {
@@ -871,7 +871,7 @@ bool SemaAnalyser::validateFieldVisibility(LgsField* field, const LgsObject* par
     return true;
 }
 
-bool SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall, const LgsObject* parent) {
+bool SemaAnalyser::validateMethodVisibility(LgsFuncCall* methodCall, const LgsObject* parent) {
     if (parent && parent->singleton) return true;
     const auto method = methodCall->func;
     if (!method || method->funcType->isVirtual) return false;
@@ -882,7 +882,7 @@ bool SemaAnalyser::validateMethodVisibility(const LgsFuncCall* methodCall, const
     return true;
 }
 
-void SemaAnalyser::validateExprType(const LgsExpr* expr, LgsType* type) {
+void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
     assert(expr);
     if (expr->isNull) {
         // null must have a type
@@ -896,7 +896,7 @@ void SemaAnalyser::validateExprType(const LgsExpr* expr, LgsType* type) {
     }
 }
 
-void SemaAnalyser::validateFuncControlFlow(const LgsFunc* func) {
+void SemaAnalyser::validateFuncControlFlow(LgsFunc* func) {
     if (func->funcType->rt->isVoid) return;
     if (!validateBlockControlFlow(func->stmtsBlock, func)) {
         errHandler.addError(E10055, &func->location, {func->funcType->name});
@@ -926,7 +926,7 @@ bool SemaAnalyser::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, cons
     return isValid;
 }
 
-LgsSymbol* SemaAnalyser::getSymbol(const string& name, const LgsLocation* location) {
+LgsSymbol* SemaAnalyser::getSymbol(const string& name, LgsLocation* location) {
     if (const auto globalSymbol = globals.getSymbol(name)) {
         return globalSymbol;
     }

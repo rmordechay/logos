@@ -1115,7 +1115,7 @@ LgsType* AntlrConverter::getTypeFromText(tree::TerminalNode* typeToken) const {
     return type;
 }
 
-bool AntlrConverter::isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec) {
+bool AntlrConverter::isArgsDuplicate(const unordered_set<string>& initializedArgs, LgsVarDec* varDec) {
     if (initializedArgs.count(varDec->name)) {
         errHandler.addError(E10054, &varDec->location, {varDec->name});
         return true;
@@ -1123,7 +1123,7 @@ bool AntlrConverter::isArgsDuplicate(const unordered_set<string>& initializedArg
     return false;
 }
 
-bool AntlrConverter::validateTypeName(const string& typeName, const LgsLocation* location) {
+bool AntlrConverter::validateTypeName(const string& typeName, LgsLocation* location) {
     if (islower(typeName[0])) {
         errHandler.addError(E10033, location, {typeName});
         return false;
@@ -1138,5 +1138,5 @@ void AntlrConverter::setLocation(LgsLocation& location, const Token* start, cons
         location.lineEnd = end->getLine();
         location.posEnd = end->getCharPositionInLine() + 1;
     }
-    location.filePath = filePath.c_str();
+    location.filePath = strdup(filePath.c_str());
 }

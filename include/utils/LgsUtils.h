@@ -13,5 +13,5 @@ void cleanStr(string& value);
 string getFileText(filesystem::path filePath);
 string removeUnderscores(const string& input);
 void freeType(const LgsType* type);
-bool isBuiltinName(const string& name, const LgsLocation* location, LgsErrHandler& errHandler);
+bool isBuiltinName(const string& name, LgsLocation* location, LgsErrHandler& errHandler);
 string getFullPath(const LgsLocation& location);

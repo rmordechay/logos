@@ -103,8 +103,8 @@ public:
     LgsType* getTypeFromText(tree::TerminalNode* typeToken) const;
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
-    bool isArgsDuplicate(const unordered_set<string>& initializedArgs, const LgsVarDec* varDec);
-    bool validateTypeName(const string& typeName, const LgsLocation* location);
+    bool isArgsDuplicate(const unordered_set<string>& initializedArgs, LgsVarDec* varDec);
+    bool validateTypeName(const string& typeName, LgsLocation* location);
     void setLocation(LgsLocation& location, const Token* start, const Token* end) const;
     ~AntlrConverter() = default;
 };
