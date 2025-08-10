@@ -1,4 +1,6 @@
 #include "types/LgsFuncType.h"
+
+#include "configs/LgsConfig.h"
 #include "logos/LgsCodeGen.h"
 #include "utils/LgsUtils.h"
 
@@ -28,8 +30,12 @@ Type* LgsFuncType::getIRType(LgsCodeGen* codeGen) {
             IRParamsTypes.emplace_back(paramType->getIRType(codeGen));
         }
     }
-    const auto returnType = rt->isBig ? codeGen->ptrTy() : rt->getIRType(codeGen);
-    IRType = FunctionType::get(returnType, IRParamsTypes, this->isVariadic);
+    const auto isBig = rt->getSizeBytes() >= BIG_SIZE_THRESHOLD;
+    if (isBig) {
+        IRType = FunctionType::get(codeGen->ptrTy(), IRParamsTypes, this->isVariadic);
+    } else {
+        IRType = FunctionType::get(rt->getIRType(codeGen), IRParamsTypes, this->isVariadic);
+    }
     return IRType;
 }
 

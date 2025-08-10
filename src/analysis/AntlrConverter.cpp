@@ -181,8 +181,7 @@ LgsObject* AntlrConverter::getObject(LogosParser::ObjectBodyContext* ctx, antlr4
     if (!validateTypeName(obj->name, &obj->location)) return obj;
     // Fields
     for (int i = 0; i < ctx->field().size(); ++i) {
-        const auto lgsField = getField(ctx->field(i), obj->name);
-        lgsField->position = i;
+        const auto lgsField = getField(ctx->field(i), obj->name, i);
         const auto fieldAdded = obj->addField(lgsField);
         if (!fieldAdded) {
             errHandler.addError(E10056, &obj->location, {obj->name, lgsField->name});
@@ -228,8 +227,9 @@ LgsInterface* AntlrConverter::getInterface(LogosParser::InterfaceBodyContext* ct
         return interface;
     }
 
-    for (const auto interfaceField : ctx->interfaceField()) {
-        const auto field = getInterfaceField(interfaceField, interface->name);
+    for (int i = 0; i < ctx->interfaceField().size(); ++i) {
+        const auto interfaceField = ctx->interfaceField()[i];
+        const auto field = getInterfaceField(interfaceField, interface->name, i);
         field->isOptional = !!interfaceField->QUEST_MARK();
         field->isVirtual = true;
         interface->addField(field);
@@ -393,7 +393,7 @@ LgsParam AntlrConverter::getParam(LgsFuncType* funcType, LogosParser::ParamConte
     return lgsParam;
 }
 
-LgsField* AntlrConverter::getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName) {
+LgsField* AntlrConverter::getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName, const size_t position) {
     const auto name = ctx->IDENTIFIER()->getText();
     const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
@@ -403,13 +403,14 @@ LgsField* AntlrConverter::getInterfaceField(LogosParser::InterfaceFieldContext* 
     return field;
 }
 
-LgsField* AntlrConverter::getField(LogosParser::FieldContext* ctx, string& parentName) {
+LgsField* AntlrConverter::getField(LogosParser::FieldContext* ctx, string& parentName, const size_t position) {
     const auto name = ctx->IDENTIFIER()->getText();
     const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
     const auto field = new LgsField(name, &parentName, type, expr);
     field->isPublic = !!ctx->VISIBILITY();
     field->isMutable = ctx->CONST() == nullptr;
+    field->position = position;
     setLocation(field->location, ctx->start, ctx->stop);
     return field;
 }
@@ -466,7 +467,7 @@ LgsAssignment* AntlrConverter::getAssignment(LogosParser::AssignmentContext* ctx
         lValue = getIterIndex(iterIndex);
     } else if (const auto selection = ctx->selection()) {
         const auto lgsSelection = getSelection(selection);
-        if (!lgsSelection->lastExpr()->asFuncCall()) {
+        if (lgsSelection->lastExpr()->asFuncCall()) {
             errHandler.addError(E10012, &lgsSelection->location);
         }
         lValue = lgsSelection;

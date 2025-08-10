@@ -13,7 +13,7 @@ LgsExpr* LgsUnknownType::getZeroValue() {
 }
 
 size_t LgsUnknownType::getSizeBytes() {
-    assert(0);
+    return 0;
 }
 
 bool LgsUnknownType::equals(LgsType* other) {

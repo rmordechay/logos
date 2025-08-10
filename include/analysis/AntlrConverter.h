@@ -52,12 +52,12 @@ public:
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, bool isSingleton);
-    LgsField* getField(LogosParser::FieldContext* ctx, string& parentName);
+    LgsField* getField(LogosParser::FieldContext* ctx, string& parentName, size_t position);
     LgsFunc* getFunc(LogosParser::FuncContext* ctx);
     void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);
     LgsFunc* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param);
-    LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName);
+    LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName, size_t position);
     LgsFunc* getMethod(LogosParser::MethodContext* ctx, LgsType* obj);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);

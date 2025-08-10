@@ -65,6 +65,11 @@ bool LgsCodeGen::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
 }
 
+Value* LgsCodeGen::callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args) {
+    const auto func = IRModule->getOrInsertFunction(funcName, ft);
+    return builder.CreateCall(func, args);
+}
+
 void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
     const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), ptrTy()});
     builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
@@ -75,19 +80,24 @@ Value* LgsCodeGen::callPrintf(const vector<Value*>& args) {
     return callFunc("printf", ft, args);
 }
 
+Value* LgsCodeGen::callExit(Value* exitCode) {
+    const auto ft = FunctionType::get(voidTy(), {i32Ty()}, false);
+    return callFunc("exit", ft, {exitCode});
+}
+
 Value* LgsCodeGen::callSnprintf(const vector<Value*>& args) {
     const auto ft = FunctionType::get(i32Ty(), {ptrTy(), i64Ty(), ptrTy()}, true);
     return callFunc("snprintf", ft, args);
 }
 
+Value* LgsCodeGen::callSleep(Value* time) {
+    const auto ft = FunctionType::get(voidTy(), {sizeTy()}, false);
+    return callFunc("sleep", ft, {time});
+}
+
 Value* LgsCodeGen::callStrHash(Value* value) {
     const auto ft = FunctionType::get(i32Ty(), {ptrTy()}, false);
     return callFunc("Str_hash", ft, {value});
-}
-
-Value* LgsCodeGen::callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args) {
-    const auto func = IRModule->getOrInsertFunction(funcName, ft);
-    return builder.CreateCall(func, args);
 }
 
 Value* LgsCodeGen::callMalloc(const size_t size) {

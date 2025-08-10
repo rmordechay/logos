@@ -16,14 +16,18 @@ Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
     // Add one or zero if table exists
     const size_t offset = !!vtable;
     vector<Type*> elementTypes(fields.size() + offset);
-    size_t position = 0;
     if (vtable) {
-        elementTypes[position++] = vtable->type->getIRType(codeGen);
+        elementTypes[0] = vtable->type->getIRType(codeGen);
     }
-    for (const auto [_, field] : fields) {
-        const auto fieldType = field->type->getIRType(codeGen);
+    for (const auto [fieldName, field] : fields) {
+        Type* fieldType;
+        if (field->type->asObject()) {
+            fieldType = codeGen->ptrTy();
+            elementTypes[field->position + offset] = fieldType;
+        } else {
+            fieldType = field->type->getIRType(codeGen);
+        }
         elementTypes[field->position + offset] = fieldType;
-        field->position = position++;
     }
     IRType = StructType::getTypeByName(codeGen->context, name);
     if (!IRType) {
@@ -81,7 +85,11 @@ LgsObject* LgsObject::clone() {
 size_t LgsObject::getSizeBytes() {
     size_t sum = 0;
     for (const auto& [_, field] : fields) {
-        sum += field->type->getSizeBytes();
+        if (name == field->type->getName()) {
+            sum += sizeof(void*);
+        } else {
+            sum += field->type->getSizeBytes();
+        }
     }
     return sum;
 }

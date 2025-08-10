@@ -16,6 +16,7 @@ Value* LgsField::getIRValue(LgsCodeGen* codeGen, const LgsHashMap* vtable) {
 }
 
 Value* LgsField::getGEP(LgsCodeGen* codeGen) const {
+    assert(parentIRType && parentIRValue);
     return codeGen->builder.CreateStructGEP(parentIRType, parentIRValue, position);
 }
 

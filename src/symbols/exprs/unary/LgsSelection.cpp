@@ -30,7 +30,17 @@ Value* LgsSelection::resolveSelection(LgsCodeGen* codeGen) {
         if (i == 0 && singleton) {
             parentExpr = singleton;
         }
-        childExpr->getIRValue(codeGen);
+        if (const auto var = childExpr->asVariable()) {
+            const auto field = parentExpr->type->getField(var->name);
+            if (i == 0) {
+                field->parentIRValue = parentExpr->getIRValue(codeGen);
+            } else {
+                field->parentIRValue = codeGen->builder.CreateLoad(codeGen->ptrTy(), parentExpr->getIRValue(codeGen));
+            }
+            childExpr->setIRValue(field->getGEP(codeGen));
+        } else {
+            childExpr->createIRValue(codeGen);
+        }
     }
     IRValue = lastExpr()->getIRValue(codeGen);
     return IRValue;

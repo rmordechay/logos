@@ -36,6 +36,8 @@ public:
     Value* callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args = {});
     Value* callMalloc(size_t size);
     Value* callPrintf(const vector<Value*>& args);
+    Value* callExit(Value* exitCode);
+    Value* callSleep(Value* time);
     Value* callSnprintf(const vector<Value*>& args);
     Value* callStrHash(Value* value);
     void callCopyMem(Value* src, Value* dest, size_t n);

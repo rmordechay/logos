@@ -121,7 +121,7 @@ bool isTerminator(LgsValue* value) {
     const auto selection = dynamic_cast<LgsSelection*>(value);
     if (!selection) return false;
     const auto methodCall = selection->lastExpr()->asFuncCall();
-    return methodCall && methodCall->func->funcType->isTerminator;
+    return methodCall && methodCall->func && methodCall->func->funcType->isTerminator;
 }
 
 void SemaAnalyser::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
@@ -1051,8 +1051,6 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
         freeType(type);
         type = newType;
     }
-
-    type->isBig = type->getSizeBytes() > BIG_SIZE_THRESHOLD;
     return type;
 }
 
@@ -1070,7 +1068,11 @@ void SemaAnalyser::resolveIterable(LgsIterable* iterable) {
 
 void SemaAnalyser::resolveObjTypes(LgsObject* obj) {
     for (const auto& [_, field] : obj->fields) {
-        field->type = resolveType(field->type);
+        if (obj->name == field->type->getName()) {
+            field->type = obj;
+        } else {
+            field->type = resolveType(field->type);
+        }
         field->parentName = &obj->name;
     }
     for (const auto& [_, method] : obj->methods) {

@@ -2,6 +2,8 @@
 #include "exprs/unary/LgsInstance.h"
 #include "funcs/LgsBuiltinFunc.h"
 #include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsSize.h"
+
 #include <types/LgsVoid.h>
 #include <types/primitives/LgsLong.h>
 #include <types/LgsAny.h>
@@ -23,36 +25,46 @@ public:
     Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override;
 };
 
-class LgsOSPid final : public LgsBuiltinFunc {
+class LgsSystemPid final : public LgsBuiltinFunc {
 public:
     static constexpr auto name = "pid";
-    explicit LgsOSPid(LgsType* parent): LgsBuiltinFunc(name, &LGS_LONG, parent->getName(), {parent}, true) {
+    explicit LgsSystemPid(LgsType* parent): LgsBuiltinFunc(name, &LGS_LONG, parent->getName(), {parent}, true) {
         funcType->isStatic = true;
     }
     Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override;
-    ~LgsOSPid() override = default;
+    ~LgsSystemPid() override = default;
 };
 
-class LgsOSExit final : public LgsBuiltinFunc {
+class LgsSystemSleep final : public LgsBuiltinFunc {
+public:
+    static constexpr auto name = "sleep";
+    explicit LgsSystemSleep(LgsType* parent): LgsBuiltinFunc(name, &LGS_SIZE, parent->getName(), {parent, &LGS_SIZE}, true) {
+        funcType->isStatic = true;
+    }
+    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override;
+    ~LgsSystemSleep() override = default;
+};
+
+class LgsSystemExit final : public LgsBuiltinFunc {
 public:
     static constexpr auto name = "exit";
-    explicit LgsOSExit(LgsType* parent): LgsBuiltinFunc(name, &LGS_VOID, parent->getName(), {parent, &LGS_INT}, true) {
+    explicit LgsSystemExit(LgsType* parent): LgsBuiltinFunc(name, &LGS_VOID, parent->getName(), {parent, &LGS_INT}, true) {
         funcType->isStatic = true;
         funcType->isTerminator = true;
     }
     Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override;
-    ~LgsOSExit() override = default;
+    ~LgsSystemExit() override = default;
 };
 
-class LgsOS final : public LgsObject {
+class LgsSystem final : public LgsObject {
 public:
     static constexpr auto name = "System";
-    LgsOSPid pidFunc{this};
-    LgsOSExit pidExit{this};
+    LgsSystemPid pidFunc{this};
+    LgsSystemExit pidExit{this};
 
-    explicit LgsOS() : LgsObject(name) {
+    explicit LgsSystem() : LgsObject(name) {
         addMethod(&pidFunc);
         addMethod(&pidExit);
     }
-    ~LgsOS() override = default;
+    ~LgsSystem() override = default;
 };

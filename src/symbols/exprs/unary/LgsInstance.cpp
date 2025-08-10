@@ -24,8 +24,8 @@ void LgsInstance::initFields(LgsCodeGen* codeGen, const map<string, LgsField*>& 
         const auto exprIR = arg->expr->getIRValue(codeGen);
         auto field = fields.find(argName);
         if (field != fields.end()) {
-            codeGen->builder.CreateStore(exprIR, field->second->getGEP(codeGen));
             field->second->parentIRValue = IRValue;
+            codeGen->builder.CreateStore(exprIR, field->second->getGEP(codeGen));
         }
     }
 }
@@ -34,7 +34,7 @@ void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
     const auto vtable = obj->vtable->type->asMap();
     const auto vtableGEP = codeGen->builder.CreateGEP(vtable->getIRType(codeGen), IRValue, {codeGen->i32Zero()});
     vtable->initFunc.callIR(codeGen, {vtableGEP, codeGen->i64(sizeof(void*))});
-    for (const auto& [name, method] : obj->methods) {
+    for (const auto& [methodName, method] : obj->methods) {
         if (!method->funcType->isVirtual) continue;
         const auto keyIRStr = codeGen->getIRStr(method->funcType->getName());
         const auto IRFunc = method->getIRFunc(codeGen);
@@ -42,7 +42,7 @@ void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
         codeGen->builder.CreateStore(IRFunc, valuePtr);
         vtable->addFunc.callIR(codeGen, {vtableGEP, keyIRStr, valuePtr});
     }
-    for (const auto& [name, field] : obj->fields) {
+    for (const auto& [fieldName, field] : obj->fields) {
         if (!field->isVirtual) continue;
         const auto keyIRStr = codeGen->getIRStr(field->name);
         const auto objIR = obj->getIRType(codeGen);
