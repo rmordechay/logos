@@ -9,9 +9,9 @@ class LgsCodeGen;
 class LgsFile {
 public:
     string name;
-    filesystem::path absPath;
     LgsCodeGen codeGen;
     LgsLocation location;
+    filesystem::path absPath;
     LgsSymbolTable symbolTable;
     vector<LgsStrConst*> externFiles;
 

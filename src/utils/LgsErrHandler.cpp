@@ -5,7 +5,7 @@ void LgsErrHandler::setUnsuccessful() {
     successful = false;
 }
 
-void LgsErrHandler::addError(const LgsError& lgsErr, LgsLocation* location, const vector<string>& args) {
+void LgsErrHandler::addError(const LgsBaseError& lgsErr, LgsLocation* location, const vector<string>& args) {
     setUnsuccessful();
     auto pos = 0;
     auto argIndex = 0;

@@ -558,7 +558,7 @@ LgsBreak* AntlrConverter::getBreakStmt(LogosParser::StatementContext* ctx) {
     return breakStmt;
 }
 
-LgsStmt* AntlrConverter::getContinueStmt(const LogosParser::StatementContext* ctx) {
+LgsStmt* AntlrConverter::getContinueStmt(LogosParser::StatementContext* ctx) {
     const auto continueStmt = new LgsContinue();
     setLocation(continueStmt->location, ctx->start, ctx->stop);
     if (loopStack.empty()) {
@@ -953,13 +953,13 @@ LgsStrConst* AntlrConverter::getStrConst(antlr4::tree::TerminalNode* type) const
     return strConst;
 }
 
-LgsUnaryExpr* AntlrConverter::getNullValue(const antlr4::tree::TerminalNode* ctx) const {
+LgsUnaryExpr* AntlrConverter::getNullValue(antlr4::tree::TerminalNode* ctx) const {
     const auto lgsNull = new LgsNullValue();
     setLocation(lgsNull->location, ctx->getSymbol(), nullptr);
     return lgsNull;
 }
 
-LgsUnaryExpr* AntlrConverter::getLoopIsFirst(const LogosParser::IsFirstContext* ctx) {
+LgsUnaryExpr* AntlrConverter::getLoopIsFirst(LogosParser::IsFirstContext* ctx) {
     const auto var = new LgsVariable(LOGOS_LOOP_IS_FIRST, &LGS_BOOL);
     setLocation(var->location, ctx->start, ctx->stop);
     if (loopStack.empty()) {
@@ -972,7 +972,7 @@ LgsUnaryExpr* AntlrConverter::getLoopIsFirst(const LogosParser::IsFirstContext* 
     return var;
 }
 
-LgsUnaryExpr* AntlrConverter::getLoopIsLast(const LogosParser::IsLastContext* ctx) {
+LgsUnaryExpr* AntlrConverter::getLoopIsLast(LogosParser::IsLastContext* ctx) {
     const auto var = new LgsVariable(LOGOS_LOOP_IS_LAST, &LGS_BOOL);
     setLocation(var->location, ctx->start, ctx->stop);
     if (loopStack.empty()) {

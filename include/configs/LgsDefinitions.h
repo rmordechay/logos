@@ -17,6 +17,7 @@
 #define LOGOS_MSG_PADDING_PLACEHOLDER "%p"
 #define LOGOS_LOOP_IS_FIRST "for.isFirst"
 #define LOGOS_LOOP_IS_LAST "for.isLast"
+#define ERROR_PADDING "\n\t\t"
 #define LOGOS_ERROR_STR "\033[1;31mError:\033[0m  "
 
 #define BLOCK_NAME_IF_TRUE "if_true"

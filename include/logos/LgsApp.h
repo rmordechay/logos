@@ -15,7 +15,7 @@ class ThreadPool;
 class LgsEnv;
 class LgsAppFile;
 class LgsMainFile;
-struct LgsError;
+struct LgsBaseError;
 struct LgsPaths;
 struct RequireEnvVar;
 
