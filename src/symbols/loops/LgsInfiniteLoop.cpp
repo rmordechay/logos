@@ -1,5 +1,5 @@
 #include "loops/LgsInfiniteLoop.h"
-#include "LgsDefinitions.h"
+#include "configs/LgsDefinitions.h"
 #include "stmts/LgsVarDec.h"
 
 void LgsInfiniteLoop::createIRLoop(LgsCodeGen* codeGen) {

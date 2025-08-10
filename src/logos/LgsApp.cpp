@@ -1,6 +1,6 @@
 #include "logos/LgsApp.h"
 
-#include "LgsConfig.h"
+#include "configs/LgsConfig.h"
 #include "LogosLexer.h"
 #include "analysis/AntlrConverter.h"
 #include "analysis/SemaAnalyser.h"
@@ -114,9 +114,9 @@ bool LgsApp::link() const {
 }
 
 void LgsApp::parseSrcFile(const string& codeText, filesystem::path filePath) {
-    ANTLRInputStream input(codeText);
+    antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
-    CommonTokenStream tokens(&lexer);
+    antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     const auto ast = parser.logosFile();
     if (parser.getNumberOfSyntaxErrors() != 0) {
@@ -141,9 +141,9 @@ void LgsApp::parseEnvFile(filesystem::path fileEntry) {
     const auto absFilePath = new filesystem::path(filesystem::canonical(fileEntry));
     AntlrConverter antlerConverter(*absFilePath, globals);
     const auto codeText = getFileText(fileEntry);
-    ANTLRInputStream input(codeText);
+    antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
-    CommonTokenStream tokens(&lexer);
+    antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
     lock_guard lock(mtx);
@@ -155,9 +155,9 @@ void LgsApp::parseAppFile(filesystem::path fileEntry) {
     const auto absFilePath = new filesystem::path(filesystem::canonical(fileEntry));
     AntlrConverter antlerConverter(*absFilePath, globals);
     auto codeText = getFileText(fileEntry);
-    ANTLRInputStream input(codeText);
+    antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
-    CommonTokenStream tokens(&lexer);
+    antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
 
     appFile = antlerConverter.getAppFile(parser.logosAppFile());

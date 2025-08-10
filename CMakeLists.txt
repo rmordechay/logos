@@ -98,11 +98,6 @@ set(SOURCE_FILES
     src/symbols/types/LgsNullable.cpp
 )
 
-add_subdirectory(stdlib)
-add_library(lib ${SOURCE_FILES})
-target_link_libraries(lib PRIVATE lgslib)
-target_precompile_headers(lib PRIVATE include/pch.h)
-
 llvm_map_components_to_libnames(LLVM_LIBS
     support
     core
@@ -117,9 +112,12 @@ llvm_map_components_to_libnames(LLVM_LIBS
     option
 )
 
-target_include_directories(lib PUBLIC
+add_library(lgs_core STATIC ${SOURCE_FILES})
+target_precompile_headers(lgs_core PRIVATE include/pch.h)
+
+target_include_directories(lgs_core PUBLIC
     ${LLVM_INCLUDE_DIRS}
-    ${Clang_INCLUDE_DIRS}
+    ${CLANG_INCLUDE_DIRS}
     ${ANTLR4_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
@@ -127,24 +125,22 @@ target_include_directories(lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/external/include
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    target_link_libraries(lib PRIVATE
-        ${LLVM_LIBS}
-        ${CLANG_CPP_LIB}
-        antlr4_static
-    )
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    find_package(ZLIB REQUIRED)
-    target_link_libraries(lib PRIVATE
-        ZLIB::ZLIB
-        zstd
-        ${LLVM_LIBS}
-#        ${CLANG_CPP_LIB}
-        antlr4_static
-    )
-endif()
+target_link_libraries(lgs_core PUBLIC
+    ${LLVM_LIBS}
+    clangBasic
+    clangLex
+    clangParse
+    clangAST
+    clangSema
+    clangCodeGen
+    clangAnalysis
+    clangDriver
+    clangFrontend
+    clangTooling
+    antlr4_static
+)
 
+add_subdirectory(stdlib)
 add_executable(lgs main.cpp)
-target_link_libraries(lgs PRIVATE lib)
-
+target_link_libraries(lgs PRIVATE lgs_core lgslib)
 add_subdirectory(tests)

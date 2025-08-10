@@ -1,5 +1,5 @@
 #include "loops/LgsForLoop.h"
-#include "LgsDefinitions.h"
+#include "configs/LgsDefinitions.h"
 #include "stmts/LgsVarDec.h"
 
 void LgsForLoop::createIRStmt(LgsCodeGen* codeGen) {

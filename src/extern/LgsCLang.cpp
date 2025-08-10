@@ -1,5 +1,5 @@
 #include "extern/LgsCLang.h"
-#include "PlatformData.h"
+#include "configs/PlatformData.h"
 #include "configs/LgsErrors.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "extern/LgsCLangVisitor.h"

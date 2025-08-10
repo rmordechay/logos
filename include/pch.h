@@ -1,6 +1,10 @@
 #pragma once
 
+#include <antlr4-runtime.h>
+#include <fstream>
+#include <stack>
 #include <iostream>
+#include <unordered_set>
 #include <vector>
 #include <map>
 #include <string>
@@ -13,7 +17,6 @@
 #include <condition_variable>
 #include <functional>
 
-#include <Token.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Value.h>
@@ -39,4 +42,3 @@
 
 using namespace std;
 using namespace llvm;
-using namespace antlr4;

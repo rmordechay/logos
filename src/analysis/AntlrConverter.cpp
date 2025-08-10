@@ -175,7 +175,7 @@ LgsEnvFile* AntlrConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx) {
     return new LgsEnvFile("EnvFile", filePath, varDecs);
 }
 
-LgsObject* AntlrConverter::getObject(LogosParser::ObjectBodyContext* ctx, tree::TerminalNode* objName, const bool isSingleton) {
+LgsObject* AntlrConverter::getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, const bool isSingleton) {
     const auto obj = new LgsObject(objName->getText());
     setLocation(obj->location, objName->getSymbol(), ctx->stop);
     if (!validateTypeName(obj->name, &obj->location)) return obj;
@@ -211,7 +211,7 @@ LgsObject* AntlrConverter::getObject(LogosParser::ObjectBodyContext* ctx, tree::
     return obj;
 }
 
-LgsInterface* AntlrConverter::getInterface(LogosParser::InterfaceBodyContext* ctx, tree::TerminalNode* interfaceName) {
+LgsInterface* AntlrConverter::getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName) {
     const auto interface = new LgsInterface(interfaceName->getText());
     setLocation(interface->location, interfaceName->getSymbol(), ctx->stop);
     if (!validateTypeName(interface->name, &interface->location)) return interface;
@@ -783,7 +783,7 @@ LgsUnaryExpr* AntlrConverter::getHashMap(LogosParser::HashMapContext* ctx) {
     return hashMap;
 }
 
-LgsVariable* AntlrConverter::getVariable(tree::TerminalNode* ctx) const {
+LgsVariable* AntlrConverter::getVariable(antlr4::tree::TerminalNode* ctx) const {
     const auto variable = new LgsVariable(ctx->getText());
     setLocation(variable->location, ctx->getSymbol(), nullptr);
     return variable;
@@ -945,7 +945,7 @@ LgsUnaryExpr* AntlrConverter::getConstant(LogosParser::ConstantContext* ctx) con
     return constant;
 }
 
-LgsStrConst* AntlrConverter::getStrConst(tree::TerminalNode* type) const {
+LgsStrConst* AntlrConverter::getStrConst(antlr4::tree::TerminalNode* type) const {
     auto typeText = type->getText();
     cleanStr(typeText);
     const auto strConst = new LgsStrConst(typeText);
@@ -953,7 +953,7 @@ LgsStrConst* AntlrConverter::getStrConst(tree::TerminalNode* type) const {
     return strConst;
 }
 
-LgsUnaryExpr* AntlrConverter::getNullValue(const tree::TerminalNode* ctx) const {
+LgsUnaryExpr* AntlrConverter::getNullValue(const antlr4::tree::TerminalNode* ctx) const {
     const auto lgsNull = new LgsNullValue();
     setLocation(lgsNull->location, ctx->getSymbol(), nullptr);
     return lgsNull;
@@ -1077,7 +1077,7 @@ void AntlrConverter::addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol
     file->symbolTable.addSymbol(newSymbol, &errHandler);
 }
 
-LgsType* AntlrConverter::getTypeFromText(tree::TerminalNode* typeToken) const {
+LgsType* AntlrConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken) const {
     const auto typeText = typeToken->getText();
     LgsType* type = nullptr;
     if (typeText == LgsBool::name) {
@@ -1123,7 +1123,7 @@ bool AntlrConverter::validateTypeName(const string& typeName, LgsLocation* locat
     return true;
 }
 
-void AntlrConverter::setLocation(LgsLocation& location, const Token* start, const Token* end) const {
+void AntlrConverter::setLocation(LgsLocation& location, const antlr4::Token* start, const antlr4::Token* end) const {
     location.lineStart = start->getLine();
     location.posStart = start->getCharPositionInLine() + 1;
     if (end) {

@@ -1,5 +1,5 @@
 #include "stmts/LgsStmtsBlock.h"
-#include "LgsDefinitions.h"
+#include "configs/LgsDefinitions.h"
 #include "exprs/unary/LgsSelection.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsReturn.h"
@@ -14,8 +14,8 @@ void LgsStmtsBlock::createIRValue(LgsCodeGen* codeGen) {
 }
 
 void LgsStmtsBlock::cleanupExprs(LgsCodeGen* codeGen) {
-    const auto cleanupBlock = getCleanupBlock(codeGen);
-    codeGen->branchAndStartBlock(cleanupBlock);
+    const auto cleanupBB = getCleanupBlock(codeGen);
+    codeGen->branchAndStartBlock(cleanupBB);
     const auto currentFunc = codeGen->stack.currentFunc();
     if (returnExpr && codeGen->stack.isRootScope()) {
         const auto IRReturnType = currentFunc->funcType->rt->getIRType(codeGen);

@@ -6,9 +6,5 @@ add_executable(lgs_tests
     codegen/CodegenTest.cpp
     sema/SemaErrorTest.cpp
 )
-target_include_directories(lgs_tests PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../external/include/doctest.h
-)
-
-target_precompile_headers(lgs_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include/pch.h)
-target_link_libraries(lgs_tests PRIVATE lib)
+target_precompile_headers(lgs_tests REUSE_FROM lgs_core)
+target_link_libraries(lgs_tests PRIVATE lgs_core lgslib)

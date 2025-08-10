@@ -1,6 +1,6 @@
 #include "logos/LgsLinker.h"
 
-#include "PlatformData.h"
+#include "configs/PlatformData.h"
 #include "configs/LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "utils/LgsUtils.h"
