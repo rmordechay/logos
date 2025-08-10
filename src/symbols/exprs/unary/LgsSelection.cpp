@@ -39,7 +39,7 @@ Value* LgsSelection::resolveSelection(LgsCodeGen* codeGen) {
             }
             childExpr->setIRValue(field->getGEP(codeGen));
         } else {
-            childExpr->createIRValue(codeGen);
+            childExpr->getIRValue(codeGen);
         }
     }
     IRValue = lastExpr()->getIRValue(codeGen);

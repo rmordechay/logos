@@ -1,5 +1,9 @@
 #include "types/primitives/LgsSize.h"
 
+#include "types/LgsAny.h"
+#include "types/primitives/LgsFloat.h"
+#include "types/primitives/LgsLong.h"
+
 size_t LgsSize::getSizeBytes() {
     return sizeof(size_t);
 }
@@ -21,7 +25,11 @@ LgsExpr* LgsSize::getZeroValue() {
 }
 
 bool LgsSize::equals(LgsType* other) {
-    assert(0);
+    const auto IRName = other->getName();
+    if (IRName == LgsAny::name) return true;
+    if (IRName == LgsFloat::name) return true;
+    if (IRName == LgsLong::name) return true;
+    return name == IRName;
 }
 
 std::string LgsSize::getStrFormatPart() const {

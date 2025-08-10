@@ -32,7 +32,7 @@ void push_stack_frame(const uint64_t file_path_index, const uint64_t func_name_i
     runtime.stack = frame;
 }
 
-void pop_stack_frame() {
+void pop_stack_frame(void) {
     if (!runtime.stack) return;
     StackFrame* prev = runtime.stack->previous;
     free(runtime.stack);
@@ -47,7 +47,7 @@ void read_strings_from_file(FILE* debug_file, const uint64_t pos, char buffer[10
     buffer[len] = '\0';
 }
 
-void print_stack() {
+void print_stack(void) {
     printf("Stack trace:\n");
     const StackFrame* frames[STACK_SIZE];
     int count = 0;

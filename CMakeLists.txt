@@ -34,7 +34,7 @@ set(SOURCE_FILES
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsValue.cpp
     src/symbols/LgsSymbolTable.cpp
-    src/symbols/LgsCoroutine.cpp
+    src/symbols/funcs/LgsCoroutine.cpp
     src/symbols/exprs/LgsBinaryExpr.cpp
     src/symbols/builtins/LgsBuiltins.cpp
     src/symbols/exprs/LgsExpr.cpp
@@ -96,6 +96,8 @@ set(SOURCE_FILES
     src/symbols/types/LgsIterator.cpp
     src/symbols/types/LgsCPtr.cpp
     src/symbols/types/LgsNullable.cpp
+    src/symbols/builtins/LgsSystem.cpp
+    include/symbols/builtins/LgsSystem.h
 )
 
 llvm_map_components_to_libnames(LLVM_LIBS

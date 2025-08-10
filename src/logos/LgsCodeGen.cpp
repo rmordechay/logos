@@ -1,8 +1,6 @@
 #include "logos/LgsCodeGen.h"
 #include "funcs/LgsFunc.h"
-#include "logos/LgsPaths.h"
 #include "types/LgsAny.h"
-#include "utils/LgsUtils.h"
 
 void LgsCodeGen::setIRModule(const string& moduleName) {
     const auto module = new Module(moduleName, context);
@@ -70,19 +68,13 @@ Value* LgsCodeGen::callFunc(const string& funcName, FunctionType* ft, const vect
     return builder.CreateCall(func, args);
 }
 
-void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
-    const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), ptrTy()});
-    builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
+Value* LgsCodeGen::callMalloc(const size_t size) {
+    return builder.CreateMalloc(sizeTy(), sizeTy(), isize(size), nullptr);
 }
 
 Value* LgsCodeGen::callPrintf(const vector<Value*>& args) {
     const auto ft = FunctionType::get(i32Ty(), {ptrTy()}, true);
     return callFunc("printf", ft, args);
-}
-
-Value* LgsCodeGen::callExit(Value* exitCode) {
-    const auto ft = FunctionType::get(voidTy(), {i32Ty()}, false);
-    return callFunc("exit", ft, {exitCode});
 }
 
 Value* LgsCodeGen::callSnprintf(const vector<Value*>& args) {
@@ -95,13 +87,26 @@ Value* LgsCodeGen::callSleep(Value* time) {
     return callFunc("sleep", ft, {time});
 }
 
+Value* LgsCodeGen::callExit(Value* exitCode) {
+    const auto ft = FunctionType::get(voidTy(), {i32Ty()}, false);
+    return callFunc("exit", ft, {exitCode});
+}
+
+Value* LgsCodeGen::callCwd() {
+    const auto ft = FunctionType::get(voidTy(), {i32Ty()}, false);
+    const auto value = builder.CreateAlloca(ArrayType::get(i8Ty(), 1024));
+    callFunc("getcwd", ft, {value});
+    return value;
+}
+
+void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
+    const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), ptrTy()});
+    builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
+}
+
 Value* LgsCodeGen::callStrHash(Value* value) {
     const auto ft = FunctionType::get(i32Ty(), {ptrTy()}, false);
     return callFunc("Str_hash", ft, {value});
-}
-
-Value* LgsCodeGen::callMalloc(const size_t size) {
-    return builder.CreateMalloc(sizeTy(), sizeTy(), isize(size), nullptr);
 }
 
 void LgsCodeGen::callPrintError(const string& msg) {
