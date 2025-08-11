@@ -1,5 +1,5 @@
 #pragma once
-#include "exprs/LgsNullValue.h"
+#include "exprs/LgsNull.h"
 #include "funcs/LgsBuiltinFunc.h"
 #include "types/LgsNullable.h"
 #include "types/LgsObject.h"
@@ -61,13 +61,22 @@ public:
     static constexpr auto name = "getEnv";
     explicit LgsSystemGetEnv(LgsType* parent): LgsBuiltinFunc(name, new LgsStr(), parent->getName(), {parent, new LgsStr(), new LgsNullable(new LgsStr())}, true) {
         funcType->isStatic = true;
+        funcType->hasDefaults = true;
         funcType->params[2].expr = new LgsNull();
     }
-
-    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
-        return codeGen->callGetEnv(args[1]->getIRValue(codeGen));
-    }
     ~LgsSystemGetEnv() override = default;
+};
+
+class LgsSystemCoresNum final : public LgsBuiltinFunc {
+public:
+    static constexpr auto name = "coresNum";
+    explicit LgsSystemCoresNum(LgsType* parent): LgsBuiltinFunc(name, &LGS_LONG, parent->getName(), {parent}, true) {
+        funcType->isStatic = true;
+    }
+    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
+        return codeGen->callCoresNum();
+    }
+    ~LgsSystemCoresNum() override = default;
 };
 
 class LgsSystem final : public LgsObject {
@@ -78,6 +87,7 @@ public:
     LgsSystemExit exitFunc{this};
     LgsSystemCwd cwdFunc{this};
     LgsSystemGetEnv getEnvFunc{this};
+    LgsSystemCoresNum coresNumFunc{this};
 
     explicit LgsSystem() : LgsObject(name) {
         addMethod(&pidFunc);
@@ -85,6 +95,7 @@ public:
         addMethod(&exitFunc);
         addMethod(&cwdFunc);
         addMethod(&getEnvFunc);
+        addMethod(&coresNumFunc);
     }
     ~LgsSystem() override = default;
 };

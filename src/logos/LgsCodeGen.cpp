@@ -102,6 +102,11 @@ Value* LgsCodeGen::callGetPid() {
     return callFunc("getpid", ft);
 }
 
+Value* LgsCodeGen::callCoresNum() {
+    const auto ft = FunctionType::get(i64Ty(), {i32Ty()}, false);
+    return callFunc("sysconf", ft, {i32(58)});
+}
+
 Value* LgsCodeGen::callCwd() {
     const auto ft = FunctionType::get(voidTy(), {i32Ty()}, false);
     const auto value = builder.CreateAlloca(ArrayType::get(i8Ty(), 1024));

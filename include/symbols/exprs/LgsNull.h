@@ -1,7 +1,6 @@
 #pragma once
 #include "exprs/unary/LgsUnaryExpr.h"
 
-
 class LgsNull final : public LgsUnaryExpr {
 public:
     explicit LgsNull() : LgsUnaryExpr(nullptr) {

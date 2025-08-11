@@ -41,6 +41,7 @@ public:
     Value* callExit(Value* exitCode);
     Value* callGetEnv(Value* name);
     Value* callGetPid();
+    Value* callCoresNum();
     Value* callCwd();
     Value* callStrHash(Value* value);
     void callCopyMem(Value* src, Value* dest, size_t n);

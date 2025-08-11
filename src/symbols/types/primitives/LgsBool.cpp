@@ -1,6 +1,6 @@
 
 #include "exprs/unary/constants/LgsBoolConst.h"
-#include "exprs/LgsNullValue.h"
+#include "exprs/LgsNull.h"
 
 
 string LgsBool::prettyName() {

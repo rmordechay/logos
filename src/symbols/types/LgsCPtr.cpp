@@ -1,5 +1,5 @@
 #include "types/LgsCPtr.h"
-#include "exprs/LgsNullValue.h"
+#include "exprs/LgsNull.h"
 #include "types/LgsAny.h"
 #include "types/LgsDArray.h"
 #include "types/LgsSArray.h"

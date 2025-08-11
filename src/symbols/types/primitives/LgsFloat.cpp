@@ -1,4 +1,4 @@
-#include "exprs/LgsNullValue.h"
+#include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"

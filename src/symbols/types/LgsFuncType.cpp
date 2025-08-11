@@ -1,23 +1,7 @@
 #include "types/LgsFuncType.h"
-
 #include "configs/LgsConfig.h"
 #include "logos/LgsCodeGen.h"
 #include "utils/LgsUtils.h"
-
-string LgsFuncType::getName() {
-    if (IRName != "") return IRName;
-    stringstream strStream;
-    if (isMethod) {
-        if (parentName != "") {
-            strStream << parentName << "_";
-        }
-    } else if (name == "") {
-        strStream << "Anonymous";
-    }
-    strStream << name;
-    IRName = strStream.str();
-    return IRName;
-}
 
 Type* LgsFuncType::getIRType(LgsCodeGen* codeGen) {
     vector<Type*> IRParamsTypes;
@@ -39,10 +23,6 @@ Type* LgsFuncType::getIRType(LgsCodeGen* codeGen) {
     return IRType;
 }
 
-string LgsFuncType::getStrFormatPart() const {
-    return "%p";
-}
-
 bool LgsFuncType::equals(LgsType* other) {
     const auto otherFuncType = other->asFuncType();
     if (!otherFuncType) return false;
@@ -56,6 +36,21 @@ bool LgsFuncType::equals(LgsType* other) {
         if (!thisType->equals(otherType)) return false;
     }
     return true;
+}
+
+string LgsFuncType::getName() {
+    if (IRName != "") return IRName;
+    stringstream strStream;
+    if (isMethod) {
+        if (parentName != "") {
+            strStream << parentName << "_";
+        }
+    } else if (name == "") {
+        strStream << "Anonymous";
+    }
+    strStream << name;
+    IRName = strStream.str();
+    return IRName;
 }
 
 LgsExpr* LgsFuncType::getZeroValue() {
@@ -79,6 +74,10 @@ string LgsFuncType::prettyName() {
         strStream << ')';
     }
     return strStream.str();
+}
+
+string LgsFuncType::getStrFormatPart() const {
+    return "%p";
 }
 
 size_t LgsFuncType::getSizeBytes() {

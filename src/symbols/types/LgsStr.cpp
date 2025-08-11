@@ -12,7 +12,7 @@ string LgsStr::getName() {
 }
 
 Type* LgsStr::getIRType(LgsCodeGen* codeGen) {
-    return ArrayType::get(baseType->getIRType(codeGen), initialLength);
+    return codeGen->ptrTy();
 }
 
 string LgsStr::prettyName() {

@@ -1,6 +1,6 @@
 #include "../../../include/symbols/types/LgsVoid.h"
 
-#include "exprs/LgsNullValue.h"
+#include "exprs/LgsNull.h"
 
 
 string LgsVoid::prettyName() {

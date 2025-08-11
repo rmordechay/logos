@@ -5,7 +5,7 @@
 #include "files/LgsInterfaceFile.h"
 #include "LogosLexer.h"
 #include "exprs/unary/LgsCast.h"
-#include "exprs/LgsNullValue.h"
+#include "exprs/LgsNull.h"
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsCharConst.h"
