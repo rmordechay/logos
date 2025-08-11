@@ -54,15 +54,6 @@ void freeType(const LgsType* type) {
     // delete type;
 }
 
-bool isBuiltinName(const string& name, LgsLocation* location, LgsErrHandler& errHandler) {
-    const auto isLgsBuiltin = name == LgsSizeOf::name || name == LgsPrint::name || name == LgsSystem::name;
-    if (isLgsBuiltin) {
-        errHandler.addError(E10053, location, {name});
-        return true;
-    }
-    return false;
-}
-
 string getFullPath(const char* filePath, const int32_t lineStart, const int32_t posStart) {
     return string(filePath) + ":" + to_string(lineStart) + ":" + to_string(posStart);
 }

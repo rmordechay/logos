@@ -92,6 +92,16 @@ Value* LgsCodeGen::callExit(Value* exitCode) {
     return callFunc("exit", ft, {exitCode});
 }
 
+Value* LgsCodeGen::callGetEnv(Value* name) {
+    const auto ft = FunctionType::get(ptrTy(), {ptrTy()}, false);
+    return callFunc("getenv", ft, {name});
+}
+
+Value* LgsCodeGen::callGetPid() {
+    const auto ft = FunctionType::get(i32Ty(), false);
+    return callFunc("getpid", ft);
+}
+
 Value* LgsCodeGen::callCwd() {
     const auto ft = FunctionType::get(voidTy(), {i32Ty()}, false);
     const auto value = builder.CreateAlloca(ArrayType::get(i8Ty(), 1024));

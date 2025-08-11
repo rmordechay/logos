@@ -39,6 +39,8 @@ public:
     Value* callSnprintf(const vector<Value*>& args);
     Value* callSleep(Value* time);
     Value* callExit(Value* exitCode);
+    Value* callGetEnv(Value* name);
+    Value* callGetPid();
     Value* callCwd();
     Value* callStrHash(Value* value);
     void callCopyMem(Value* src, Value* dest, size_t n);

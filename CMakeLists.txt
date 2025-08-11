@@ -36,7 +36,6 @@ set(SOURCE_FILES
     src/symbols/LgsSymbolTable.cpp
     src/symbols/funcs/LgsCoroutine.cpp
     src/symbols/exprs/LgsBinaryExpr.cpp
-    src/symbols/builtins/LgsBuiltins.cpp
     src/symbols/exprs/LgsExpr.cpp
     src/symbols/exprs/unary/LgsCast.cpp
     src/symbols/exprs/unary/constants/LgsBoolConst.cpp
@@ -97,7 +96,6 @@ set(SOURCE_FILES
     src/symbols/types/LgsIterator.cpp
     src/symbols/types/LgsCPtr.cpp
     src/symbols/types/LgsNullable.cpp
-    src/symbols/builtins/LgsSystem.cpp
     include/symbols/loops/LgsWhileLoop.h
 )
 
