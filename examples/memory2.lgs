@@ -1,0 +1,19 @@
+object Obj1 {
+    x: Int
+}
+
+object Obj2 {
+    obj1: Obj1
+}
+
+object Obj3 {
+    obj1: Obj1
+}
+
+main() {
+    obj2 = Obj2{obj1 = Obj1{x = 234}}
+    obj3 = Obj3{obj1 = Obj1{x = 23445}}
+    obj2.obj1 := obj3.obj1
+    print(obj2.obj1.x)
+    print(obj3.obj1.x)
+}

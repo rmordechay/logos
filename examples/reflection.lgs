@@ -1,0 +1,13 @@
+object Obj {
+    name: Str
+    func() {}
+}
+
+main() {
+    obj = Obj{}
+    field = Reflect.getField(obj, "name")
+    method = Reflect.getMethod(obj, "func")
+    field.setValue("roi")
+    method()
+    print(obj.name)
+}

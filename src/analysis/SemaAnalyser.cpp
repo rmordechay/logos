@@ -1,5 +1,5 @@
 #include "analysis/SemaAnalyser.h"
-#include "LgsCoroutine.h"
+#include "../../include/symbols/funcs/LgsCoroutine.h"
 #include "configs/LgsErrors.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsObjectFile.h"

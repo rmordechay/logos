@@ -1,5 +1,5 @@
 #include "stmts/LgsStmt.h"
-#include "LgsCoroutine.h"
+#include "../../../include/symbols/funcs/LgsCoroutine.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsSelection.h"

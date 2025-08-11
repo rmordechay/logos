@@ -1,0 +1,10 @@
+main() {
+    for i in 0..10 {
+        if for.isFirst {
+            print(i)
+        }
+        if for.isLast {
+            print(i)
+        }
+    }
+}

@@ -1,5 +1,5 @@
 #include "analysis/AntlrConverter.h"
-#include "LgsCoroutine.h"
+#include "../../include/symbols/funcs/LgsCoroutine.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "files/LgsInterfaceFile.h"

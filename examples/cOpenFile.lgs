@@ -1,0 +1,10 @@
+extern C {
+    "stdio.h"
+}
+
+main() {
+    file = fopen("../../main.cpp", "rb")
+    buffer: Char[1024]!
+    bytesRead = fread(buffer, 1L, sizeof(buffer), file)
+    fclose(file)
+}
