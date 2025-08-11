@@ -1,13 +1,8 @@
 #include "cli/LgsCli.h"
-
 #include "cli/LgsFormatCmd.h"
 #include "cli/LgsGenerateCmd.h"
 #include "cli/LgsRunCmd.h"
-#include "configs/LgsDefinitions.h"
 #include "configs/PlatformData.h"
-
-
-#include <sstream>
 
 void LgsCli::execute() const {
     if (argc < 2) {

@@ -2,10 +2,9 @@
 
 struct LgsLocation {
     int32_t lineStart = 0;
-    int32_t lineEnd = 0;
-    int32_t posStart = 0;
-    int32_t posEnd = 0;
+    int32_t posInLine = 0;
     const char* filePath = "";
+    const char* code = "";
 };
 
 struct LgsBaseError {
@@ -23,7 +22,7 @@ struct LgsError {
 inline size_t errCodeStart = 10000;
 inline LgsBaseError E10000{.msg = "main() function is not defined in Main.lgs file.", .errCode = errCodeStart++};
 inline LgsBaseError E10001{.msg = "Left type '%s' does not match the right type '%s'.", .errCode = errCodeStart++};
-inline LgsBaseError E10002{.msg = "'%s' must be an iterable.", .errCode = errCodeStart++};
+inline LgsBaseError E10002{.msg = "Expression '%s' of type '%s' must be an iterable.", .errCode = errCodeStart++};
 inline LgsBaseError E10003{.msg = "Index '%s' is out of bounds. Max expected size: %s.", .errCode = errCodeStart++};
 inline LgsBaseError E10004{.msg = "Function '%s' must return an expression of type '%s'. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10005{.msg = "'%s' is not a member of '%s'.", .errCode = errCodeStart++};

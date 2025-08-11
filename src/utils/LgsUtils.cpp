@@ -9,7 +9,7 @@
 const unordered_set<string> LOGOS_KEYWORDS = {"object", "single", "self", "Self", "interface", "extern", "pub", "implements", "const", "enum",  "vec2", "vec3", "vec4", "if", "else", "for", "break", "continue", "return", "and", "or", "not", "in"};
 
 void logInfo(const string& text) {
-    cout << text << NEW_LINE;
+    cout << text;
 }
 
 void logErr(const string& text) {
@@ -59,7 +59,7 @@ string getFullPath(const char* filePath, const int32_t lineStart, const int32_t 
 }
 
 string getFullPath(const LgsLocation& location) {
-    return getFullPath(location.filePath, location.lineStart, location.posStart);
+    return getFullPath(location.filePath, location.lineStart, location.posInLine);
 }
 
 void findLibC() {

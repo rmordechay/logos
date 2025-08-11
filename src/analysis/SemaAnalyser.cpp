@@ -292,10 +292,10 @@ void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
     visitExpr(startRange);
     visitExpr(endRange);
     if (startRange && startRange->type && !startRange->type->isNumber) {
-        errHandler.addError(E10002, &startRange->location, {startRange->prettyName()});
+        errHandler.addError(E10002, &startRange->location, {startRange->prettyName(), startRange->type->prettyName()});
     }
     if (endRange && endRange->type && !endRange->type->isNumber) {
-        errHandler.addError(E10002, &endRange->location, {endRange->prettyName()});
+        errHandler.addError(E10002, &endRange->location, {endRange->prettyName(), endRange->type->prettyName()});
     }
     addLocalSymbol(LgsSymbol(rangeLoop->loopVars.front()));
     visitStmtsBlock(rangeLoop->stmtsBlock);
@@ -306,7 +306,7 @@ void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     visitUnaryExpr(iterExpr);
     const auto iterable = iterExpr->type->asIterable();
     if (!iterable) {
-        if (iterExpr->type) errHandler.addError(E10002, &iterExpr->location, {iterExpr->prettyName()});
+        if (iterExpr->type) errHandler.addError(E10002, &iterExpr->location, {iterExpr->prettyName(), iterExpr->type->prettyName()});
         return;
     }
     if (setLoopVars(foreachLoop, iterExpr, iterable)) return;
@@ -707,7 +707,7 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     if (baseExpr->type->isUnknown) return;
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable) {
-        return errHandler.addError(E10002, &iterIndex->location, {iterIndex->baseExpr->prettyName()});
+        return errHandler.addError(E10002, &iterIndex->location, {baseExpr->prettyName(), baseExpr->type->prettyName()});
     }
     if (exprTo) {
         visitSlice(iterIndex);

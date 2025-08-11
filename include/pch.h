@@ -16,6 +16,7 @@
 #include <queue>
 #include <condition_variable>
 #include <functional>
+#include <sstream>
 
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
