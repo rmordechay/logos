@@ -22,10 +22,8 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
-    LgsType* getValueType() override;
     string getStrFormatPart() const override;
     Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
-    Value* getLoopLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     bool equals(LgsType* other) override;

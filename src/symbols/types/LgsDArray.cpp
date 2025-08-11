@@ -20,10 +20,6 @@ LgsType* LgsDArray::getIndexType() {
     return &LGS_INT;
 }
 
-LgsType* LgsDArray::getValueType() {
-    return baseType;
-}
-
 string LgsDArray::getStrFormatPart() const {
     return "%p";
 }
@@ -48,10 +44,6 @@ string LgsDArray::getName() {
 
 Value* LgsDArray::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
     return lenFunc.call(codeGen, {iterable});
-}
-
-Value* LgsDArray::getLoopLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return IRLength(codeGen, iterable);
 }
 
 Value* LgsDArray::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {

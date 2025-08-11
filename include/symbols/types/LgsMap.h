@@ -37,9 +37,7 @@ public:
     string prettyName() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
-    LgsType* getValueType() override;
     Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
-    Value* getLoopLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     StructType* getMapStruct(LgsCodeGen* codeGen);

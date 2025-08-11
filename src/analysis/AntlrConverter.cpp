@@ -114,11 +114,6 @@ LgsMainFile* AntlrConverter::getMainFile(LogosParser::MainFileContext* ctx) {
         file->groups.push_back(lgsGroup);
         addFileSymbol(file, LgsSymbol(lgsGroup));
     }
-
-    if (file->funcs.find(LOGOS_MAIN_FUNC_NAME) == file->funcs.end()) {
-        errHandler.addError(E10000, &file->location);
-    }
-
     return file;
 }
 
@@ -221,11 +216,6 @@ LgsInterface* AntlrConverter::getInterface(LogosParser::InterfaceBodyContext* ct
             auto implementType = getTypeFromText(type);
             interface->interfaces.push_back(implementType);
         }
-    }
-
-    if (ctx->interfaceField().empty() && ctx->interfaceFunc().empty()) {
-        errHandler.addError(E10063, &interface->location);
-        return interface;
     }
 
     for (int i = 0; i < ctx->interfaceField().size(); ++i) {
@@ -374,9 +364,6 @@ void AntlrConverter::setParams(LgsFuncType* funcType, const vector<LogosParser::
             funcType->params.push_back(lgsParam);
         }
     }
-    if (funcType->isVariadic && funcType->hasDefaults) {
-        errHandler.addError(E10043, &funcType->location);
-    }
 }
 
 LgsParam AntlrConverter::getParam(LgsFuncType* funcType, LogosParser::ParamContext* param) {
@@ -385,7 +372,6 @@ LgsParam AntlrConverter::getParam(LgsFuncType* funcType, LogosParser::ParamConte
     auto lgsParam = LgsParam(getType(param->type()), variableName, expr);
     setLocation(lgsParam.location, param->start, param->stop);
     if (param->TRIPLE_DOT()) {
-        if (lgsParam.expr) errHandler.addError(E10045, &lgsParam.location);
         lgsParam.isVariadic = true;
         funcType->isVariadic = true;
     } else if (lgsParam.expr) {

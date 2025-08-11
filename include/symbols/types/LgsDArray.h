@@ -55,11 +55,9 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
-    LgsType* getValueType() override;
     string getStrFormatPart() const override;
     StructType* getArrStruct(LgsCodeGen* codeGen);
     void freeValue(LgsCodeGen* codeGen, Value* value) override;
-    Value* getLoopLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;

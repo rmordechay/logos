@@ -31,18 +31,8 @@ LgsType* LgsStr::getIndexType() {
     return &LGS_INT;
 }
 
-LgsType* LgsStr::getValueType() {
-    return baseType;
-}
-
 Value* LgsStr::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
     return lenFunc.call(codeGen, {iterable});
-}
-
-Value* LgsStr::getLoopLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    const auto lenPtr = codeGen->builder.CreateAlloca(codeGen->i64Ty());
-    codeGen->builder.CreateStore(IRLength(codeGen, iterable), lenPtr);
-    return codeGen->builder.CreateLoad(codeGen->i64Ty(), lenPtr);
 }
 
 Value* LgsStr::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {

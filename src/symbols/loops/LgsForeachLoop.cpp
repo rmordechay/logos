@@ -19,7 +19,7 @@ void LgsForeachLoop::createIRLoop(LgsCodeGen* codeGen) {
         setMapIterVars(codeGen, iterator);
     } else { // Without iterator
         const auto iValue = loadIndex(codeGen);
-        const auto loopEnd = iterable->getLoopLength(codeGen, iterExpr);
+        const auto loopEnd = iterable->IRLength(codeGen, iterExpr);
         const auto condition = codeGen->builder.CreateICmpSLT(iValue, loopEnd);
         codeGen->builder.CreateCondBr(condition, IRBodyBlock, IRExitBlock);
         codeGen->startBlock(IRBodyBlock);

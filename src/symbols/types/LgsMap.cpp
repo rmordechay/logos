@@ -16,15 +16,7 @@ LgsType* LgsMap::getIndexType() {
     return typePair->key;
 }
 
-LgsType* LgsMap::getValueType() {
-    return typePair->value;
-}
-
 Value* LgsMap::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return lenFunc.call(codeGen, {iterable});
-}
-
-Value* LgsMap::getLoopLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
     return codeGen->i32(1024);
 }
 

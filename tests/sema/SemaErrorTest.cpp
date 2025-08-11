@@ -2,6 +2,14 @@
 #include "doctest.h"
 #include "logos/LgsApp.h"
 
+TEST_CASE("TestSema10000") {
+    LgsApp app;
+    app.parseSrcFile("f() {a = 34}");
+    app.analyse();
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10000.errCode);
+}
+
 TEST_CASE("TestSema10001") {
     LgsApp app;
     app.parseSrcFile("main() {a: Str = 34}");

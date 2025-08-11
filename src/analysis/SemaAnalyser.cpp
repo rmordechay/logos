@@ -58,6 +58,9 @@ void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
     for (const auto [_, func] : mainFile->funcs) {
         visitFunc(func);
     }
+    if (mainFile->funcs.find(LOGOS_MAIN_FUNC_NAME) == mainFile->funcs.end()) {
+        errHandler.addError(E10000, &file->location);
+    }
 }
 
 void SemaAnalyser::visitObject(LgsObject* obj) {
@@ -85,6 +88,9 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
         visitParam(&param);
     }
     visitStmtsBlock(func->stmtsBlock);
+    if (func->funcType->isVariadic && func->funcType->hasDefaults) {
+        errHandler.addError(E10043, &func->location);
+    }
     validateFuncControlFlow(func);
     stack.exitScope();
 }
@@ -94,6 +100,9 @@ void SemaAnalyser::visitParam(LgsParam* param) {
         visitExpr(param->expr);
         validateExprType(param->expr, param->type);
     } else if (param->isVariadic) {
+        if (param->expr) {
+            errHandler.addError(E10045, &param->location);
+        }
         assert(0);
     }
     addLocalSymbol(LgsSymbol(param));
@@ -700,7 +709,11 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
         iterIndex->setType(iterable);
     } else {
         validateIndex(iterIndex);
-        iterIndex->setType(iterable->getValueType());
+        if (const auto map = iterable->asMap()) {
+            iterIndex->setType(map->typePair->value);
+        } else {
+            iterIndex->setType(iterable->baseType);
+        }
     }
 }
 

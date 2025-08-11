@@ -22,10 +22,6 @@ LgsType* LgsSArray::getIndexType() {
     return &LGS_INT;
 }
 
-LgsType* LgsSArray::getValueType() {
-    return baseType;
-}
-
 string LgsSArray::getStrFormatPart() const {
     return "%p";
 }
@@ -47,10 +43,6 @@ string LgsSArray::getName() {
 
 Value* LgsSArray::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
     return sizeExpr->getIRValue(codeGen);
-}
-
-Value* LgsSArray::getLoopLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return IRLength(codeGen, iterable);
 }
 
 Value* LgsSArray::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
