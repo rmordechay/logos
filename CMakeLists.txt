@@ -115,9 +115,9 @@ llvm_map_components_to_libnames(LLVM_LIBS
 
 add_library(lgs_core STATIC ${SOURCE_FILES})
 target_precompile_headers(lgs_core PRIVATE include/pch.h)
-
+message("${ANTLR4_INCLUDE_DIR}")
 target_include_directories(lgs_core PUBLIC
-    ${LLVM_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime
     ${CLANG_INCLUDE_DIRS}
     ${ANTLR4_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include

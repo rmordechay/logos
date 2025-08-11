@@ -10,6 +10,7 @@ RUN apt-get update &&  \
     curl libcurlpp-dev \
     zlib1g zlib1g-dev libzstd-dev \
     libedit-dev \
+    uuid-dev \
     unzip
 
 RUN update-alternatives --install /usr/bin/clang clang /usr/lib/llvm-19/bin/clang 100
@@ -17,6 +18,6 @@ RUN update-alternatives --install /usr/bin/clang++ clang++ /usr/lib/llvm-19/bin/
 
 WORKDIR /app/
 
-RUN make build
+RUN make -B build
 
 CMD ["/bin/bash"]

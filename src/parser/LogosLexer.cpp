@@ -4,13 +4,6 @@
 
 #include "LogosLexer.h"
 
-
-using namespace antlr4;
-
-
-
-using namespace antlr4;
-
 namespace {
 
 struct LogosLexerStaticData final {
@@ -304,9 +297,9 @@ void logoslexerLexerInitialize() {
 
 }
 
-LogosLexer::LogosLexer(CharStream *input) : Lexer(input) {
+LogosLexer::LogosLexer(antlr4::CharStream *input) : Lexer(input) {
   LogosLexer::initialize();
-  _interpreter = new atn::LexerATNSimulator(this, *logoslexerLexerStaticData->atn, logoslexerLexerStaticData->decisionToDFA, logoslexerLexerStaticData->sharedContextCache);
+  _interpreter = new antlr4::atn::LexerATNSimulator(this, *logoslexerLexerStaticData->atn, logoslexerLexerStaticData->decisionToDFA, logoslexerLexerStaticData->sharedContextCache);
 }
 
 LogosLexer::~LogosLexer() {
@@ -329,7 +322,7 @@ const std::vector<std::string>& LogosLexer::getModeNames() const {
   return logoslexerLexerStaticData->modeNames;
 }
 
-const dfa::Vocabulary& LogosLexer::getVocabulary() const {
+const antlr4::dfa::Vocabulary& LogosLexer::getVocabulary() const {
   return logoslexerLexerStaticData->vocabulary;
 }
 
@@ -337,7 +330,7 @@ antlr4::atn::SerializedATNView LogosLexer::getSerializedATN() const {
   return logoslexerLexerStaticData->serializedATN;
 }
 
-const atn::ATN& LogosLexer::getATN() const {
+const antlr4::atn::ATN& LogosLexer::getATN() const {
   return *logoslexerLexerStaticData->atn;
 }
 
