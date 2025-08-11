@@ -27,5 +27,3 @@ inline void LgsPaths::initPaths(const filesystem::path& rootDirPath) {
     execFilePath = buildDir / LOGOS_EXECUTABLE_FILE;
     appFilePath = rootDir / LOGOS_APP_FILE_NAME LOGOS_FILE_EXTENSION;
 }
-
-inline LgsPaths paths;

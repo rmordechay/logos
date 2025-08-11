@@ -267,10 +267,10 @@ void LgsApp::setupActiveEnv() {
     checkRequiredEnvVars();
 }
 
-void LgsApp::initBuild() {
-    remove_all(paths.buildDir);
-    create_directories(paths.buildDir);
-    create_directories(paths.buildIR);
+void LgsApp::initBuild() const {
+    filesystem::remove_all(paths.buildDir);
+    filesystem::create_directories(paths.buildDir);
+    filesystem::create_directories(paths.buildIR);
     LgsCodeGen::initLLVM();
 }
 

@@ -1,8 +1,0 @@
-extern C {
-    "../test.c"
-}
-
-main() {
-    bla = Bla(a = 3458)
-    printA(bla)
-}

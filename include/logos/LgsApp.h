@@ -23,6 +23,7 @@ class LgsApp final {
 public:
     string name;
     string version;
+    LgsPaths paths;
     LgsEnv activeEnv;
     vector<char*> args;
     LgsSymbolTable globals;
@@ -43,6 +44,7 @@ public:
     bool analyse();
     bool generate() const;
     bool link() const;
+    void initBuild() const;
     void parseSrcFile(const string& codeText, filesystem::path filePath = "");
     void parseEnvFile(filesystem::path fileEntry);
     void parseAppFile(filesystem::path fileEntry);
@@ -55,6 +57,5 @@ public:
     void checkRequiredEnvVars();
     void writeIRFiles() const;
     void exitWithErrors() const;
-    static void initBuild();
     ~LgsApp();
 };

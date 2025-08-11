@@ -18,11 +18,13 @@ run_linux_docker tests/platforms/Dockerfile:
 	docker build -f tests/platforms/Dockerfile -v $(pwd):/app -t linux . && docker run -it -v $(pwd):/app linux
 
 run_qemu:
-	qemu-img create -f qcow2 linux-x86.qcow2 5G
+	qemu-img create -f qcow2 linux-x86.qcow2 30G
 	qemu-system-x86_64 \
-      -machine accel=tcg \
-      -cpu max \
-      -m 2G \
-      -drive file=linux-x86.qcow2,format=qcow2 \
-      -net nic -net user \
-      -nographic
+	  -machine accel=tcg \
+	  -cpu max \
+	  -m 2G \
+	  -drive file=linux-x86.qcow2,format=qcow2 \
+	  -cdrom alpine-x86_64.iso \
+	  -boot d \
+	  -net nic -net user \
+	  -nographic

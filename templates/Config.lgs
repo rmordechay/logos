@@ -1,7 +1,0 @@
-app {
-    environment: "stg"
-}
-
-logger {
-    prefix: "$timedate $thread $msg"
-}
