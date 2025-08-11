@@ -294,8 +294,8 @@ void LgsApp::writeIRFiles() const {
 void LgsApp::exitWithErrors() const {
     for (int i = 0; i < errHandler.errors.size(); ++i) {
         const auto lgsError = errHandler.errors[i];
-        const auto code = "\n\t    " + string(lgsError.location->code);
-        const auto path = "\n\t    at " + getFullPath(*lgsError.location);
+        const auto code = "\n code:  " + string(lgsError.location->code);
+        const auto path = "\n   at:  " + getFullPath(*lgsError.location);
         logInfo(LOGOS_ERROR_STR + string(lgsError.msg));
         logInfo(code);
         logInfo(path);
