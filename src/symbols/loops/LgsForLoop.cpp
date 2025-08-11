@@ -1,5 +1,6 @@
 #include "loops/LgsForLoop.h"
 #include "configs/LgsDefinitions.h"
+#include "logos/LgsCodeGen.h"
 #include "stmts/LgsVarDec.h"
 
 void LgsForLoop::createIRStmt(LgsCodeGen* codeGen) {
@@ -42,10 +43,10 @@ LgsForLoop::~LgsForLoop() {
     for (const auto& loopVar : loopVars) {
         delete loopVar;
     }
-    if (isFirstVarDec) {
-        delete isFirstVarDec;
+    if (isFirst) {
+        delete isFirst;
     }
-    if (isLastVarDec) {
-        delete isLastVarDec;
+    if (isLast) {
+        delete isLast;
     }
 }

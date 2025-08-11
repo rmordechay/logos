@@ -86,3 +86,5 @@ inline LgsBaseError E10061{.msg = "'for.isLast' is not allowed in an infinite lo
 inline LgsBaseError E10062{.msg = "Interface '%s' implements all its methods which is not allowed. Make at least one of the methods abstract (without implementation) or change it to 'object'", .errCode = errCodeStart++};
 inline LgsBaseError E10063{.msg = "Interfaces must have at least one (abstract) method or field.", .errCode = errCodeStart++};
 inline LgsBaseError E10064{.msg = "'%s' is already defined in '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10065{.msg = "'for.isFirst' and 'for.isLast' are not allowed in a while loop.", .errCode = errCodeStart++};
+inline LgsBaseError E10066{.msg = "While loop condition '%s' must be of type Bool. Given: '%s'", .errCode = errCodeStart++};

@@ -20,10 +20,10 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
-#include "configs/LgsConfig.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
+#include "loops/LgsWhileLoop.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"
 #include "stmts/LgsVarDec.h"
@@ -245,16 +245,27 @@ void SemaAnalyser::visitBoolPatternMatching(LgsIfStmt* pm) {
     }
 }
 
+void SemaAnalyser::visitWhileLoop(LgsWhileLoop* whileLoop) {
+    visitExpr(whileLoop->condExpr);
+    const auto condType = whileLoop->condExpr->type;
+    if (!condType->asBool()) {
+        return errHandler.addError(E10066, &whileLoop->location, {whileLoop->condExpr->prettyName(), condType->prettyName()});
+    }
+    visitStmtsBlock(whileLoop->stmtsBlock);
+}
+
 void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
     stack.enterScope(loopStmt, loopStmt->stmtsBlock);
-    if (loopStmt->isFirstVarDec) addLocalSymbol(LgsSymbol(loopStmt->isFirstVarDec));
-    if (loopStmt->isLastVarDec) addLocalSymbol(LgsSymbol(loopStmt->isLastVarDec));
+    if (loopStmt->isFirst) addLocalSymbol(LgsSymbol(loopStmt->isFirst));
+    if (loopStmt->isLast) addLocalSymbol(LgsSymbol(loopStmt->isLast));
     if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {
         visitRangeLoop(rangeLoop);
     } else if (const auto foreachLoop = dynamic_cast<LgsForeachLoop*>(loopStmt)) {
         visitForeachLoop(foreachLoop);
     } else if (const auto infiniteLoop = dynamic_cast<LgsInfiniteLoop*>(loopStmt)) {
         visitInfiniteLoop(infiniteLoop);
+    } else if (const auto whileLoop = dynamic_cast<LgsWhileLoop*>(loopStmt)) {
+        visitWhileLoop(whileLoop);
     } else {
         assert(0);
     }

@@ -63,6 +63,7 @@ set(SOURCE_FILES
     src/symbols/loops/LgsForeachLoop.cpp
     src/symbols/loops/LgsRangeLoop.cpp
     src/symbols/loops/LgsInfiniteLoop.cpp
+    src/symbols/loops/LgsWhileLoop.cpp
     src/symbols/stmts/LgsAssignment.cpp
     src/symbols/stmts/LgsBreak.cpp
     src/symbols/stmts/LgsContinue.cpp
@@ -97,7 +98,7 @@ set(SOURCE_FILES
     src/symbols/types/LgsCPtr.cpp
     src/symbols/types/LgsNullable.cpp
     src/symbols/builtins/LgsSystem.cpp
-    include/symbols/builtins/LgsSystem.h
+    include/symbols/loops/LgsWhileLoop.h
 )
 
 llvm_map_components_to_libnames(LLVM_LIBS

@@ -1,7 +1,12 @@
 #pragma once
+#include "logos/LgsStack.h"
 #include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
+#include "loops/LgsWhileLoop.h"
 
+class LgsFuncType;
+class LgsIterable;
+class LgsFile;
 class LgsCoroutine;
 class LgsPrefixExpr;
 class LgsDArray;
@@ -58,6 +63,7 @@ public:
     void visitIfStmt(LgsIfStmt* ifStmt);
     void visitPatternMatching(LgsIfStmt* pm);
     void visitBoolPatternMatching(LgsIfStmt* pm);
+    void visitWhileLoop(LgsWhileLoop* whileLoop);
     void visitLoopStmt(LgsForLoop* loopStmt);
     void visitRangeLoop(const LgsRangeLoop* rangeLoop);
     void visitForeachLoop(LgsForeachLoop* foreachLoop);

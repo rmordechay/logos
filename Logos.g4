@@ -154,7 +154,8 @@ pattern:
     ;
 
 loopStatement:
-        FOR IDENTIFIER COMMA? IN iterableRange=range statementsBlock
+        FOR whileExpr=expr statementsBlock
+    |   FOR IDENTIFIER IN iterableRange=range statementsBlock
     |   FOR IDENTIFIER (COMMA IDENTIFIER)* COMMA? IN iterableExpr=unaryExpr statementsBlock
     |   FOR IDENTIFIER? statementsBlock
     ;

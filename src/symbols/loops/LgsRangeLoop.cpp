@@ -1,4 +1,5 @@
 #include "loops/LgsRangeLoop.h"
+#include "logos/LgsCodeGen.h"
 #include "stmts/LgsVarDec.h"
 
 void LgsRangeLoop::createIRLoop(LgsCodeGen* codeGen) {
@@ -28,12 +29,12 @@ Value* LgsRangeLoop::loopEnd(LgsCodeGen* codeGen) const {
 }
 
 void LgsRangeLoop::setLoopTerminals(LgsCodeGen* codeGen, Value* iValue) const {
-    if (isFirstVarDec) {
-        isFirstVarDec->setIRValue(codeGen->builder.CreateICmpEQ(iValue, loopStart(codeGen)));
+    if (isFirst) {
+        isFirst->setIRValue(codeGen->builder.CreateICmpEQ(iValue, loopStart(codeGen)));
     }
-    if (isLastVarDec) {
+    if (isLast) {
         const auto decremented = codeGen->builder.CreateSub(loopEnd(codeGen), codeGen->i32(1));
-        isLastVarDec->setIRValue(codeGen->builder.CreateICmpEQ(iValue, decremented));
+        isLast->setIRValue(codeGen->builder.CreateICmpEQ(iValue, decremented));
     }
 }
 

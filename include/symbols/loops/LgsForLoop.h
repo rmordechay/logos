@@ -1,5 +1,4 @@
 #pragma once
-#include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsStmt.h"
 
 class LgsVariable;
@@ -14,8 +13,8 @@ public:
     BasicBlock* IRCondBlock = nullptr;
     BasicBlock* IRBodyBlock = nullptr;
     BasicBlock* IRExitBlock = nullptr;
-    LgsVarDec* isFirstVarDec = nullptr;
-    LgsVarDec* isLastVarDec = nullptr;
+    LgsVarDec* isFirst = nullptr;
+    LgsVarDec* isLast = nullptr;
 
     void createIRStmt(LgsCodeGen* codeGen) override;
     void initIndex(LgsCodeGen* codeGen);

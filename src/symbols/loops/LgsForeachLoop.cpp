@@ -10,16 +10,14 @@ void LgsForeachLoop::createIRLoop(LgsCodeGen* codeGen) {
     initIndex(codeGen);
     codeGen->branchAndStartBlock(IRCondBlock);
     const auto iterable = iterExpr->type->asIterable();
-    if (iterable->asMap()) {
-        // With iterator
+    if (iterable->asMap()) { // With iterator
         LgsIterator iterator = iterExpr->toIterator();
         iterator.initIterator(codeGen);
         codeGen->builder.CreateCondBr(iterator.hasNext(codeGen), IRBodyBlock, IRExitBlock);
         codeGen->startBlock(IRBodyBlock);
         iterPtr = iterExpr->getIRValue(codeGen);
         setMapIterVars(codeGen, iterator);
-    } else {
-        // Without iterator
+    } else { // Without iterator
         const auto iValue = loadIndex(codeGen);
         const auto loopEnd = iterable->getLoopLength(codeGen, iterExpr);
         const auto condition = codeGen->builder.CreateICmpSLT(iValue, loopEnd);

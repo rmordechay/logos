@@ -73,6 +73,7 @@ public:
     LgsForLoop* getForLoop(LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getRangeLoop(LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getForeachLoop(LogosParser::LoopStatementContext* ctx);
+    LgsForLoop* getWhileLoop(const LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getInfiniteLoop(LogosParser::LoopStatementContext* ctx) const;
     LgsEnum* getEnum(LogosParser::EnumDeclarationContext* ctx);
     LgsExpr* getExpr(LogosParser::ExprContext* ctx);
@@ -92,9 +93,9 @@ public:
     LgsInstance* getInstance(LogosParser::InstanceContext* ctx);
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
     LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx) const;
-    LgsStrConst* getStrConst(antlr4::tree::TerminalNode* type) const;
-    LgsUnaryExpr* getNullValue(antlr4::tree::TerminalNode* ctx) const;
-    LgsUnaryExpr* getLoopIsFirst(LogosParser::IsFirstContext* ctx);
+    LgsStrConst* getStrConst(antlr4::tree::TerminalNode* ctx) const;
+    LgsUnaryExpr* getNullValue(const antlr4::tree::TerminalNode* ctx) const;
+    LgsUnaryExpr* getLoopIsFirst(const LogosParser::IsFirstContext* ctx);
     LgsUnaryExpr* getLoopIsLast(LogosParser::IsLastContext* ctx);
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsGroup* getGroup(LogosParser::GroupContext* ctx);

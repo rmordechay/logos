@@ -48,6 +48,7 @@
 #include "utils/LgsUtils.h"
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
+#include <loops/LgsWhileLoop.h>
 #include <types/LgsStr.h>
 #include <types/LgsVoid.h>
 
@@ -587,6 +588,8 @@ LgsForLoop* AntlrConverter::getForLoop(LogosParser::LoopStatementContext* ctx) {
         loopStmt = getForeachLoop(ctx);
     } else if (ctx->iterableRange) {
         loopStmt = getRangeLoop(ctx);
+    } else if (ctx->whileExpr) {
+        loopStmt = getWhileLoop(ctx);
     } else {
         loopStmt = getInfiniteLoop(ctx);
     }
@@ -622,6 +625,13 @@ LgsForLoop* AntlrConverter::getForeachLoop(LogosParser::LoopStatementContext* ct
         foreachLoop->loopVars.emplace_back(varDec);
     }
     return foreachLoop;
+}
+
+LgsForLoop* AntlrConverter::getWhileLoop(const LogosParser::LoopStatementContext* ctx) {
+    const auto expr = getExpr(ctx->whileExpr);
+    const auto whileLoop = new LgsWhileLoop(expr);
+    setLocation(whileLoop->location, ctx->start, ctx->stop);
+    return whileLoop;
 }
 
 LgsForLoop* AntlrConverter::getInfiniteLoop(LogosParser::LoopStatementContext* ctx) const {
@@ -946,29 +956,33 @@ LgsUnaryExpr* AntlrConverter::getConstant(LogosParser::ConstantContext* ctx) con
     return constant;
 }
 
-LgsStrConst* AntlrConverter::getStrConst(antlr4::tree::TerminalNode* type) const {
-    auto typeText = type->getText();
+LgsStrConst* AntlrConverter::getStrConst(antlr4::tree::TerminalNode* ctx) const {
+    auto typeText = ctx->getText();
     cleanStr(typeText);
     const auto strConst = new LgsStrConst(typeText);
-    setLocation(strConst->location, type->getSymbol(), nullptr);
+    setLocation(strConst->location, ctx->getSymbol(), nullptr);
     return strConst;
 }
 
-LgsUnaryExpr* AntlrConverter::getNullValue(antlr4::tree::TerminalNode* ctx) const {
+LgsUnaryExpr* AntlrConverter::getNullValue(const antlr4::tree::TerminalNode* ctx) const {
     const auto lgsNull = new LgsNullValue();
     setLocation(lgsNull->location, ctx->getSymbol(), nullptr);
     return lgsNull;
 }
 
-LgsUnaryExpr* AntlrConverter::getLoopIsFirst(LogosParser::IsFirstContext* ctx) {
+LgsUnaryExpr* AntlrConverter::getLoopIsFirst(const LogosParser::IsFirstContext* ctx) {
     const auto var = new LgsVariable(LOGOS_LOOP_IS_FIRST, &LGS_BOOL);
     setLocation(var->location, ctx->start, ctx->stop);
     if (loopStack.empty()) {
         errHandler.addError(E10060, &var->location);
         return nullptr;
     }
-    if (!loopStack.top()->isFirstVarDec) {
-        loopStack.top()->isFirstVarDec = new LgsVarDec(LOGOS_LOOP_IS_FIRST, new LgsBoolConst(false));
+    if (dynamic_cast<LgsWhileLoop*>(loopStack.top())) {
+        errHandler.addError(E10065, &var->location);
+        return var;
+    }
+    if (!loopStack.top()->isFirst) {
+        loopStack.top()->isFirst = new LgsVarDec(LOGOS_LOOP_IS_FIRST, new LgsBoolConst(false));
     }
     return var;
 }
@@ -984,8 +998,12 @@ LgsUnaryExpr* AntlrConverter::getLoopIsLast(LogosParser::IsLastContext* ctx) {
         errHandler.addError(E10061, &var->location);
         return var;
     }
-    if (!loopStack.top()->isLastVarDec) {
-        loopStack.top()->isLastVarDec = new LgsVarDec(LOGOS_LOOP_IS_LAST, new LgsBoolConst(false));
+    if (dynamic_cast<LgsWhileLoop*>(loopStack.top())) {
+        errHandler.addError(E10065, &var->location);
+        return var;
+    }
+    if (!loopStack.top()->isLast) {
+        loopStack.top()->isLast = new LgsVarDec(LOGOS_LOOP_IS_LAST, new LgsBoolConst(false));
     }
     return var;
 }
