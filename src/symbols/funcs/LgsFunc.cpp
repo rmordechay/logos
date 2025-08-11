@@ -55,10 +55,21 @@ Value* LgsFunc::getIRArg(LgsCodeGen* codeGen, LgsExpr* arg) {
 
 Value* LgsFunc::call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) {
     vector<Value*> IRArgs;
-    if (funcType->hasDefaults) assert(0);
-    for (int i = funcType->isStatic; i < args.size(); ++i) {
-        auto arg = getIRArg(codeGen, args[i]);
-        IRArgs.push_back(arg);
+    if (funcType->hasDefaults) {
+        for (int i = funcType->isStatic; i < args.size(); ++i) {
+            auto arg = getIRArg(codeGen, args[i]);
+            IRArgs.push_back(arg);
+        }
+        const vector defaultParams(funcType->params.begin() + args.size(), funcType->params.end());
+        for (const auto defaultParam : defaultParams) {
+            auto arg = defaultParam.expr->getIRValue(codeGen);
+            IRArgs.push_back(arg);
+        }
+    } else {
+        for (int i = funcType->isStatic; i < args.size(); ++i) {
+            auto arg = getIRArg(codeGen, args[i]);
+            IRArgs.push_back(arg);
+        }
     }
     return callIR(codeGen, IRArgs);
 }
@@ -108,5 +119,8 @@ LgsFunc::~LgsFunc() {
     freeType(type);
     if (stmtsBlock) {
         delete stmtsBlock;
+    }
+    if (funcType) {
+        delete funcType;
     }
 }

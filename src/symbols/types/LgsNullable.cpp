@@ -1,5 +1,6 @@
 #include "types/LgsNullable.h"
-
+#include "logos/LgsCodeGen.h"
+#include "utils/LgsUtils.h"
 
 Type* LgsNullable::getIRType(LgsCodeGen* codeGen) {
     return codeGen->ptrTy();
@@ -25,4 +26,8 @@ bool LgsNullable::equals(LgsType* other) {
 
 size_t LgsNullable::getSizeBytes() {
     return 0;
+}
+
+LgsNullable::~LgsNullable() {
+    freeType(baseType);
 }

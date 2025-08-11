@@ -1,5 +1,7 @@
 #pragma once
+#include "exprs/LgsNullValue.h"
 #include "funcs/LgsBuiltinFunc.h"
+#include "types/LgsNullable.h"
 #include "types/LgsObject.h"
 #include "types/LgsStr.h"
 #include "types/primitives/LgsInt.h"
@@ -57,9 +59,11 @@ public:
 class LgsSystemGetEnv final : public LgsBuiltinFunc {
 public:
     static constexpr auto name = "getEnv";
-    explicit LgsSystemGetEnv(LgsType* parent): LgsBuiltinFunc(name, new LgsStr(), parent->getName(), {parent, new LgsStr()}, true) {
+    explicit LgsSystemGetEnv(LgsType* parent): LgsBuiltinFunc(name, new LgsStr(), parent->getName(), {parent, new LgsStr(), new LgsNullable(new LgsStr())}, true) {
         funcType->isStatic = true;
+        funcType->params[2].expr = new LgsNull();
     }
+
     Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
         return codeGen->callGetEnv(args[1]->getIRValue(codeGen));
     }

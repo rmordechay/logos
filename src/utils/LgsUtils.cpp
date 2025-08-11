@@ -51,7 +51,7 @@ string removeUnderscores(const string& input) {
 void freeType(const LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
-    // delete type;
+    delete type;
 }
 
 string getFullPath(const char* filePath, const int32_t lineStart, const int32_t posStart) {

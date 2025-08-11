@@ -356,8 +356,8 @@ TEST_CASE("TestSema10028") {
     )";
     app.parseSrcFile(code);
     app.analyse();
-    // CHECK_EQ(app.errHandler.errors.size(), 1);
-    // CHECK_EQ(app.errHandler.errors[0].errCode, E10028.errCode);
+    CHECK_EQ(app.errHandler.errors.size(), 1);
+    CHECK_EQ(app.errHandler.errors[0].errCode, E10028.errCode);
 }
 
 TEST_CASE("TestSema10030A") {

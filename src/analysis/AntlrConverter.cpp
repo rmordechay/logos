@@ -951,7 +951,7 @@ LgsStrConst* AntlrConverter::getStrConst(antlr4::tree::TerminalNode* ctx) const 
 }
 
 LgsUnaryExpr* AntlrConverter::getNullValue(const antlr4::tree::TerminalNode* ctx) const {
-    const auto lgsNull = new LgsNullValue();
+    const auto lgsNull = new LgsNull();
     setLocation(lgsNull->location, ctx->getSymbol(), nullptr);
     return lgsNull;
 }

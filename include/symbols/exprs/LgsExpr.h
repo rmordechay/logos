@@ -78,6 +78,6 @@ public:
     virtual Value* bitXorIR(LgsCodeGen* codeGen, LgsExpr* other);
     virtual Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other);
     virtual Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other);
-    ~LgsExpr() override = default;
+    ~LgsExpr() override;
 };
 

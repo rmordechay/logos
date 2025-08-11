@@ -2,20 +2,20 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 
 
-class LgsNullValue final : public LgsUnaryExpr {
+class LgsNull final : public LgsUnaryExpr {
 public:
-    explicit LgsNullValue() : LgsUnaryExpr(nullptr) {
+    explicit LgsNull() : LgsUnaryExpr(nullptr) {
         isNull = true;
     }
     Value* createIRValue(LgsCodeGen* codeGen) override;
     string prettyName() override;
-    ~LgsNullValue() override = default;
+    ~LgsNull() override = default;
 };
 
-inline Value* LgsNullValue::createIRValue(LgsCodeGen* codeGen) {
+inline Value* LgsNull::createIRValue(LgsCodeGen* codeGen) {
     return ConstantPointerNull::get(codeGen->ptrTy());
 }
 
-inline string LgsNullValue::prettyName() {
+inline string LgsNull::prettyName() {
     return "null";
 }

@@ -66,7 +66,11 @@ string LgsFuncType::prettyName() {
     stringstream strStream;
     strStream << name << '(';
     for (size_t i = isMethod; i < params.size(); ++i) {
-        strStream << params[i].type->prettyName();
+        const auto param = params[i];
+        strStream << param.type->prettyName();
+        if (param.expr) {
+            strStream << " = " << param.expr->prettyName();
+        }
         if (i != params.size() - 1) strStream << ", ";
     }
     if (rt) {

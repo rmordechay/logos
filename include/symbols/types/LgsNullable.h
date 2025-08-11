@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsType.h"
-#include "logos/LgsCodeGen.h"
 
 class LgsNullable final : public LgsType {
 public:
@@ -13,5 +12,5 @@ public:
     string prettyName() override;
     bool equals(LgsType* other) override;
     size_t getSizeBytes() override;
-    ~LgsNullable() override = default;
+    ~LgsNullable() override;
 };

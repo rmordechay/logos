@@ -84,8 +84,13 @@ void SemaAnalyser::visitInterface(LgsInterface* interface) {
 
 void SemaAnalyser::visitFunc(LgsFunc* func) {
     stack.enterScope(func, func->stmtsBlock);
+    auto defaultParamsStarted = false;
     for (auto& param : func->funcType->params) {
         visitParam(&param);
+        if (defaultParamsStarted && !param.expr) {
+            errHandler.addError(E10028, &param.location);
+        }
+        defaultParamsStarted = !!param.expr;
     }
     visitStmtsBlock(func->stmtsBlock);
     if (func->funcType->isVariadic && func->funcType->hasDefaults) {
