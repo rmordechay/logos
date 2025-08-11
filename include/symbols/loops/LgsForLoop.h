@@ -18,7 +18,7 @@ public:
 
     void createIRStmt(LgsCodeGen* codeGen) override;
     void initIndex(LgsCodeGen* codeGen);
-    LoadInst* loadIndex(LgsCodeGen* codeGen) const;
+    Value* loadIndex(LgsCodeGen* codeGen) const;
     void incIndex(LgsCodeGen* codeGen) const;
     virtual void setBlocks(LgsCodeGen* codeGen);
     virtual void incAndJumpToCond(LgsCodeGen* codeGen) const;

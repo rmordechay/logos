@@ -1,5 +1,4 @@
 #pragma once
-#include "LgsAny.h"
 #include "funcs/LgsBuiltinFunc.h"
 #include "primitives/LgsBool.h"
 #include "primitives/LgsChar.h"
@@ -21,6 +20,7 @@ public:
         unpackLength = 1;
         canSlice = true;
     }
+    Type* getIRBaseType(LgsCodeGen* codeGen) const;
     size_t getSizeBytes() override;
     string getName() override;
     string prettyName() override;

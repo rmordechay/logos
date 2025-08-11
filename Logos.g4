@@ -304,7 +304,7 @@ innerSelectionElement:
 
 range:
         start=expr DOUBLE_DOT end=expr
-    |   DOUBLE_DOT? end=expr
+    |   DOUBLE_DOT end=expr
     |   start=expr DOUBLE_DOT
     ;
 

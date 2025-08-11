@@ -1,7 +1,16 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsVarDec.h"
+#include "types/LgsAny.h"
 
 #include "utils/LgsUtils.h"
+
+Type* LgsStr::getIRBaseType(LgsCodeGen* codeGen) const {
+    return ArrayType::get(baseType->getIRType(codeGen), initialLength);
+}
+
+Type* LgsStr::getIRType(LgsCodeGen* codeGen) {
+    return codeGen->ptrTy();
+}
 
 size_t LgsStr::getSizeBytes() {
     return initialLength + 1;
@@ -9,10 +18,6 @@ size_t LgsStr::getSizeBytes() {
 
 string LgsStr::getName() {
     return name;
-}
-
-Type* LgsStr::getIRType(LgsCodeGen* codeGen) {
-    return codeGen->ptrTy();
 }
 
 string LgsStr::prettyName() {

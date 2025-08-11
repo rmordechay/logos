@@ -17,7 +17,7 @@ void LgsForLoop::initIndex(LgsCodeGen* codeGen) {
     codeGen->builder.CreateStore(codeGen->i32Zero(), iPtr);
 }
 
-LoadInst* LgsForLoop::loadIndex(LgsCodeGen* codeGen) const {
+Value* LgsForLoop::loadIndex(LgsCodeGen* codeGen) const {
     return codeGen->builder.CreateLoad(codeGen->i32Ty(), iPtr);
 }
 
