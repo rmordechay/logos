@@ -19,11 +19,9 @@ public:
     bool isVirtual = false;
     bool isOptional = false;
     Type* parentIRType = nullptr;
-    Value* parentIRValue = nullptr;
 
     LgsField(const string& name, string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(name), parentName(parentName), type(type), expr(expr) {}
-    Value* getGEP(LgsCodeGen* codeGen) const;
-    Value* getIRValue(LgsCodeGen* codeGen, const LgsHashMap* vtable);
-    Value* resolveVirtualField(LgsCodeGen* codeGen, const LgsHashMap* vtable) const;
+    Value* getGEP(LgsCodeGen* codeGen, Value* parentIRValue) const;
+    Value* resolveVirtualField(LgsCodeGen* codeGen, const LgsHashMap* vtable, Value* parentIRValue) const;
     ~LgsField() override;
 };

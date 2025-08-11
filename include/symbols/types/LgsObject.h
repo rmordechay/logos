@@ -21,6 +21,7 @@ public:
     string getStrFormatPart() const override;
     bool equals(LgsType* other) override;
     void setVTable();
+    bool hasVirtuals() const;
     void freeValue(LgsCodeGen* codeGen, Value* value) override;
     LgsObject* clone();
     ~LgsObject() override;

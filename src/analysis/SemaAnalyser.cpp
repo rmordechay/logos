@@ -61,9 +61,6 @@ void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
 }
 
 void SemaAnalyser::visitObject(LgsObject* obj) {
-    if (!obj->interfaces.empty()) {
-        obj->setVTable();
-    }
     for (const auto& [_, field] : obj->fields) {
         visitField(field);
     }
@@ -593,8 +590,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     }
 
     if (symbol->symbolType == INTERFACE) {
-        visitInterfaceInstance(instance, symbol->interface);
-        return;
+        return visitInterfaceInstance(instance, symbol->interface);
     }
 
     const auto obj = symbol->object;

@@ -71,9 +71,7 @@ void LgsAssignment::assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, Lg
 }
 
 void LgsAssignment::assignToSelection(LgsCodeGen* codeGen, LgsSelection* selection, LgsExpr* expr) {
-    selection->resolveSelection(codeGen);
-    const auto field = selection->lastExpr()->asVariable()->ref.field;
-    codeGen->builder.CreateStore(expr->getIRValue(codeGen), field->getGEP(codeGen));
+    codeGen->builder.CreateStore(expr->getIRValue(codeGen), selection->resolveSelection(codeGen));
 }
 
 void LgsAssignment::assignToVariable(LgsCodeGen* codeGen, LgsVariable* variable, LgsExpr* expr) {

@@ -32,12 +32,13 @@ Value* LgsSelection::resolveSelection(LgsCodeGen* codeGen) {
         }
         if (const auto var = childExpr->asVariable()) {
             const auto field = parentExpr->type->getField(var->name);
+            Value* v;
             if (i == 0) {
-                field->parentIRValue = parentExpr->getIRValue(codeGen);
+                v = parentExpr->getIRValue(codeGen);
             } else {
-                field->parentIRValue = codeGen->builder.CreateLoad(codeGen->ptrTy(), parentExpr->getIRValue(codeGen));
+                v = codeGen->builder.CreateLoad(codeGen->ptrTy(), parentExpr->getIRValue(codeGen));
             }
-            childExpr->setIRValue(field->getGEP(codeGen));
+            childExpr->setIRValue(field->getGEP(codeGen, v));
         } else {
             childExpr->getIRValue(codeGen);
         }

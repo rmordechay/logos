@@ -10,6 +10,7 @@
 #include "logos/LgsPaths.h"
 #include "utils/ThreadPool.h"
 #include "builtins/LgsBuiltins.h"
+#include "builtins/LgsSystem.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "extern/LgsCLang.h"
 #include "files/LgsAppFile.h"

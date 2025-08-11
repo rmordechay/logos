@@ -24,8 +24,7 @@ void LgsInstance::initFields(LgsCodeGen* codeGen, const map<string, LgsField*>& 
         const auto exprIR = arg->expr->getIRValue(codeGen);
         auto field = fields.find(argName);
         if (field != fields.end()) {
-            field->second->parentIRValue = IRValue;
-            codeGen->builder.CreateStore(exprIR, field->second->getGEP(codeGen));
+            codeGen->builder.CreateStore(exprIR, field->second->getGEP(codeGen, IRValue));
         }
     }
 }
@@ -59,9 +58,9 @@ string LgsInstance::prettyName() {
     return obj->name;
 }
 
-void LgsInstance::setObject(LgsObject* obj) {
-    this->obj = obj;
-    setType(this->obj);
+void LgsInstance::setObject(LgsObject* newObj) {
+    obj = newObj;
+    setType(obj);
 }
 
 LgsInstance::~LgsInstance() {
