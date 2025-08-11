@@ -299,7 +299,8 @@ void LgsApp::exitWithErrors() const {
         logInfo(LOGOS_ERROR_STR + string(lgsError.msg));
         logInfo(code);
         logInfo(path);
-        if (i != errHandler.errors.size() - 1) logInfo("\n---");
+        if (i != errHandler.errors.size() - 1) logInfo("\n---\n");
+        else logInfo("\n");
         free((void*)lgsError.msg);
         free((void*)lgsError.location->filePath);
         free((void*)lgsError.location->code);

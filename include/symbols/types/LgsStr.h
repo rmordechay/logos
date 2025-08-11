@@ -5,13 +5,45 @@
 #include "primitives/LgsLong.h"
 #include "types/LgsIterable.h"
 
+class LgsStrLen final : public LgsBuiltinFunc {
+public:
+    static constexpr auto name = "len";
+    explicit LgsStrLen(LgsType* parent): LgsBuiltinFunc(name, &LGS_LONG, parent->getName(), {parent}, true) {}
+    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
+        return codeGen->callStrLen(args[0]->getIRValue(codeGen));
+    }
+    ~LgsStrLen() override = default;
+};
+
+class LgsStrIsEmpty final : public LgsBuiltinFunc {
+public:
+    static constexpr auto name = "isEmpty";
+    explicit LgsStrIsEmpty(LgsType* parent): LgsBuiltinFunc(name, &LGS_BOOL, parent->getName(), {parent}, true) {}
+    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
+        const auto strLen = codeGen->callStrLen(args[0]->getIRValue(codeGen));
+        return codeGen->builder.CreateICmpEQ(strLen, codeGen->builder.getInt64(0));
+    }
+    ~LgsStrIsEmpty() override = default;
+};
+
+class LgsStrIsNotEmpty final : public LgsBuiltinFunc {
+public:
+    static constexpr auto name = "isNotEmpty";
+    explicit LgsStrIsNotEmpty(LgsType* parent): LgsBuiltinFunc(name, &LGS_BOOL, parent->getName(), {parent}, true) {}
+    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
+        const auto strLen = codeGen->callStrLen(args[0]->getIRValue(codeGen));
+        return codeGen->builder.CreateICmpNE(strLen, codeGen->builder.getInt64(0));
+    }
+    ~LgsStrIsNotEmpty() override = default;
+};
+
 class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
     size_t initialLength = 0;
-    LgsBuiltinFunc lenFunc{"len", &LGS_LONG, name, {this}};
-    LgsBuiltinFunc isEmptyFunc{"isEmpty", &LGS_BOOL, name, {this}};
-    LgsBuiltinFunc isNotEmptyFunc{"isNotEmpty", &LGS_BOOL, name, {this}};
+    LgsStrLen lenFunc{this};
+    LgsStrIsEmpty isEmptyFunc{this};
+    LgsStrIsNotEmpty isNotEmptyFunc{this};
 
     LgsStr() : LgsIterable(&LGS_CHAR) {
         addMethod(&lenFunc);

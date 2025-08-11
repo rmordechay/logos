@@ -41,12 +41,11 @@ public:
     Value* callExit(Value* exitCode);
     Value* callGetEnv(Value* name);
     Value* callGetPid();
-    Value* callCoresNum();
     Value* callCwd();
+    Value* callCoresNum();
     Value* callStrHash(Value* value);
     void callCopyMem(Value* src, Value* dest, size_t n);
-
-    void callPrintError(const string& msg);
+    Value* callStrLen(Value* str);
 
     // Coroutines
     Value* callCoroIDFunc();

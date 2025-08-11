@@ -128,7 +128,7 @@ bool isTerminator(LgsValue* value) {
         return true;
     }
     const auto fc = dynamic_cast<LgsFuncCall*>(value);
-    if (fc && fc->func->funcType->isTerminator) return true;
+    if (fc && fc->func && fc->func->funcType->isTerminator) return true;
     const auto selection = dynamic_cast<LgsSelection*>(value);
     if (!selection) return false;
     const auto methodCall = selection->lastExpr()->asFuncCall();

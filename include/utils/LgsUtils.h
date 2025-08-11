@@ -4,7 +4,7 @@ class LgsErrHandler;
 struct LgsLocation;
 class LgsType;
 
-void logInfo(const string& text);
+void logInfo(const string& text = "");
 void logErr(const string& text);
 bool isLogosFile(const filesystem::directory_entry& entry);
 bool isLLVMFile(const filesystem::directory_entry& entry);

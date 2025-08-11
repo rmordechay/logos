@@ -119,15 +119,14 @@ void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
     builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
 }
 
+Value* LgsCodeGen::callStrLen(Value* str) {
+    const auto ft = FunctionType::get(i64Ty(), {ptrTy()}, false);
+    return callFunc("strlen", ft, {str});
+}
+
 Value* LgsCodeGen::callStrHash(Value* value) {
     const auto ft = FunctionType::get(i32Ty(), {ptrTy()}, false);
     return callFunc("Str_hash", ft, {value});
-}
-
-void LgsCodeGen::callPrintError(const string& msg) {
-    const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
-    const auto func = IRModule->getOrInsertFunction("print_error", ft);
-    builder.CreateCall(func, {getIRStr(msg)});
 }
 
 Value* LgsCodeGen::callCoroIDFunc() {
