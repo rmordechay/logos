@@ -25,6 +25,6 @@ public:
     string prettyName() override;
     size_t getSizeBytes() override;
     bool equals(LgsType* other) override;
-    string getStrFormatPart() const override;
+    string strFormatPart() const override;
     ~LgsFuncType() override;
 };

@@ -252,7 +252,7 @@ ConstantInt* LgsCodeGen::sizeZero() {
 void LgsCodeGen::printPtr(Value* ptr, const string& text = "") {
     assert(ptr->getType()->isPointerTy());
     if (text != "") printStr(text);
-    callPrintf({getIRStr(LGS_ANY.getStrFormatPart() + '\n'), ptr});
+    callPrintf({getIRStr(LGS_ANY.strFormatPart() + '\n'), ptr});
 }
 
 void LgsCodeGen::printInt(Value* number, const string& text = "") {

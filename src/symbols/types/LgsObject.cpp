@@ -45,11 +45,11 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(this);
 }
 
-string LgsObject::getStrFormatPart() const {
+string LgsObject::strFormatPart() const {
     stringstream str;
     str << '{';
     for (const auto [fieldName, field] : fields) {
-        str << fieldName << " = " << field->type->getStrFormatPart();
+        str << fieldName << " = " << field->type->strFormatPart();
     }
     str << '}';
     return str.str();

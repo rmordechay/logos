@@ -26,7 +26,7 @@ bool LgsBool::equals(LgsType* other) {
     return name == other->getName();
 }
 
-string LgsBool::getStrFormatPart() const {
+string LgsBool::strFormatPart() const {
     return "%d";
 }
 

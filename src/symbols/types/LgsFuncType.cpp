@@ -76,7 +76,7 @@ string LgsFuncType::prettyName() {
     return strStream.str();
 }
 
-string LgsFuncType::getStrFormatPart() const {
+string LgsFuncType::strFormatPart() const {
     return "%p";
 }
 

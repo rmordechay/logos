@@ -92,8 +92,8 @@ public:
     vector<LgsUnaryExpr*> getSelectionExprs(LogosParser::SelectionContext* ctx);
     LgsInstance* getInstance(LogosParser::InstanceContext* ctx);
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
-    LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx) const;
-    LgsStrConst* getStrConst(antlr4::tree::TerminalNode* ctx) const;
+    LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
+    LgsStrConst* getStrConst(antlr4::tree::TerminalNode* ctx);
     LgsUnaryExpr* getNullValue(antlr4::tree::TerminalNode* ctx) const;
     LgsUnaryExpr* getLoopIsFirst(LogosParser::IsFirstContext* ctx);
     LgsUnaryExpr* getLoopIsLast(LogosParser::IsLastContext* ctx);
@@ -107,5 +107,6 @@ public:
     bool isArgsDuplicate(const unordered_set<string>& initializedArgs, LgsVarDec* varDec);
     bool validateTypeName(const string& typeName, LgsLocation* location);
     void setLocation(LgsLocation& location, const antlr4::Token* start, const string& code) const;
+    void extractStrParts(LgsStrConst& strConst);
     ~AntlrConverter() = default;
 };

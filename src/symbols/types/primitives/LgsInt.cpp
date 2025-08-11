@@ -37,6 +37,6 @@ bool LgsInt::equals(LgsType* other) {
     return name == IRName;
 }
 
-string LgsInt::getStrFormatPart() const {
+string LgsInt::strFormatPart() const {
     return "%d";
 }

@@ -24,7 +24,7 @@ bool LgsEnum::equals(LgsType* other) {
     return name == other->getName();
 }
 
-string LgsEnum::getStrFormatPart() const {
+string LgsEnum::strFormatPart() const {
     return "%s";
 }
 

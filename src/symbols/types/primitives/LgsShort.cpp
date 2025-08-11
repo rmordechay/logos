@@ -28,6 +28,6 @@ bool LgsShort::equals(LgsType* other) {
     return name == other->getName();
 }
 
-string LgsShort::getStrFormatPart() const {
+string LgsShort::strFormatPart() const {
     return "%d";
 }

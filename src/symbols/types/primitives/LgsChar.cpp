@@ -24,7 +24,7 @@ LgsExpr* LgsChar::getZeroValue() {
     return new LgsCharConst('0');
 }
 
-string LgsChar::getStrFormatPart() const {
+string LgsChar::strFormatPart() const {
     return "%c";
 }
 

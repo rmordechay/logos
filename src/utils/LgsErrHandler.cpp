@@ -18,7 +18,7 @@ void LgsErrHandler::addError(const LgsBaseError& lgsErr, LgsLocation* location, 
     pos = 0;
     argIndex = 0;
     while ((pos = result.find(LOGOS_MSG_PADDING_PLACEHOLDER, pos)) != string::npos) {
-        result.replace(pos, string(LOGOS_MSG_PADDING_PLACEHOLDER).size(), ERROR_PADDING);
+        result.replace(pos, string(LOGOS_MSG_PADDING_PLACEHOLDER).size(), LOGOS_ERROR_PADDING);
         pos += args[argIndex].length();
         argIndex++;
     }

@@ -32,6 +32,6 @@ bool LgsSize::equals(LgsType* other) {
     return name == IRName;
 }
 
-std::string LgsSize::getStrFormatPart() const {
+std::string LgsSize::strFormatPart() const {
     return "%zu";
 }

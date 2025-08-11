@@ -15,7 +15,7 @@ public:
     string prettyName() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
-    string getStrFormatPart() const override;
+    string strFormatPart() const override;
     ~LgsInt() override = default;
 };
 

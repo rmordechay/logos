@@ -383,6 +383,7 @@ void SemaAnalyser::visitCast(LgsCast* castExpr) {
 void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     if (const auto instance = unaryExpr->asInstance()) visitInstance(instance);
     else if (const auto funcCall = unaryExpr->asFuncCall()) visitFuncCall(funcCall);
+    else if (const auto strConst = unaryExpr->asStrConst()) visitStrConst(strConst);
     else if (const auto func = unaryExpr->asFunc()) visitFunc(func);
     else if (const auto selection = unaryExpr->asSelection()) visitSelection(selection);
     else if (const auto arrayExpr = unaryExpr->asArrayExpr()) visitArrayExpr(arrayExpr);
@@ -689,6 +690,13 @@ void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     postfixExpr->setType(type);
 }
 
+void SemaAnalyser::visitStrConst(LgsStrConst* strConst) {
+    if (strConst->templateParts.empty()) return;
+    for (const auto templatePart : strConst->templateParts) {
+        visitExpr(templatePart);
+    }
+}
+
 void SemaAnalyser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
     const auto baseExpr = prefixExpr->expr;
     visitExpr(baseExpr);
@@ -802,15 +810,15 @@ string getMissingImplementsStr(const vector<LgsField*>& fields, const vector<Lgs
     stringstream str;
     str << "Missing fields/methods:";
     if (!fields.empty()) {
-        str << ERROR_PADDING << "Fields:";
+        str << LOGOS_ERROR_PADDING << "Fields:";
         for (const auto& field : fields) {
-            str << ERROR_PADDING << "\t- " << field->name << ": " <<  field->type->prettyName();
+            str << LOGOS_ERROR_PADDING << "\t- " << field->name << ": " <<  field->type->prettyName();
         }
     }
     if (!methods.empty()) {
-        str << ERROR_PADDING << "Methods:";
+        str << LOGOS_ERROR_PADDING << "Methods:";
         for (const auto& method : methods) {
-            str << ERROR_PADDING << "\t- " << method->funcType->prettyName();
+            str << LOGOS_ERROR_PADDING << "\t- " << method->funcType->prettyName();
         }
     }
     return str.str();

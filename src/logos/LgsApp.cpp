@@ -297,7 +297,7 @@ void LgsApp::exitWithErrors() const {
         const auto code = "\n code:  " + string(lgsError.location->code);
         const auto path = "\n   at:  " + getFullPath(*lgsError.location);
         logInfo(LOGOS_ERROR_STR + string(lgsError.msg));
-        logInfo(code);
+        // logInfo(code);
         logInfo(path);
         if (i != errHandler.errors.size() - 1) logInfo("\n---\n");
         else logInfo("\n");

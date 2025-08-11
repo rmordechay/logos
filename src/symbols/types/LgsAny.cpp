@@ -21,7 +21,7 @@ string LgsAny::prettyName() {
     return name;
 }
 
-string LgsAny::getStrFormatPart() const {
+string LgsAny::strFormatPart() const {
     return "%p";
 }
 

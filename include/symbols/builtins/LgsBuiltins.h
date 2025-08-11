@@ -1,6 +1,7 @@
 #pragma once
+#include "configs/LgsDefinitions.h"
+#include "exprs/unary/constants/LgsStrConst.h"
 #include "funcs/LgsBuiltinFunc.h"
-#include "types/primitives/LgsInt.h"
 #include <types/LgsVoid.h>
 #include <types/primitives/LgsLong.h>
 #include <types/LgsAny.h>
@@ -11,14 +12,35 @@ public:
     explicit LgsPrint(): LgsBuiltinFunc(name, &LGS_VOID, "", {&LGS_ANY, &LGS_ANY}, true, true) {
         funcType->IRName = "printf";
     }
-    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override;
+
+    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
+        const auto arg = args.front();
+        const auto strConst = arg->asStrConst();
+        if (strConst && !strConst->templateParts.empty()) {
+            return printFormat(codeGen, strConst);
+        }
+        const auto formatStr = arg->type->strFormatPart() + '\n';
+        const auto IRArgs = {codeGen->getIRStr(formatStr), getIRArg(codeGen, arg)};
+        return codeGen->callPrintf(IRArgs);
+    }
+
+    static Value* printFormat(LgsCodeGen* codeGen, const LgsStrConst* const strConst) {
+        auto formated = strConst->formatedStr;
+        vector<Value*> values;
+        for (const auto part : strConst->templateParts) {
+            auto partIR = getIRArg(codeGen, part);
+            values.push_back(partIR);
+            const auto pos = formated.find(LOGOS_STR_FMT_PLACEHOLDER);
+            if (pos != std::string::npos) {
+                formated.replace(pos, strlen(LOGOS_STR_FMT_PLACEHOLDER), part->type->strFormatPart());
+            }
+        }
+        vector IRArgs = {codeGen->getIRStr(formated)};
+        IRArgs.insert(IRArgs.end(), values.begin(), values.end());
+        return codeGen->callPrintf(IRArgs);
+    }
+
     ~LgsPrint() override = default;
 };
 
-inline Value* LgsPrint::call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) {
-    const auto arg = args.front();
-    const auto formatStr = arg->type->getStrFormatPart() + '\n';
-    const auto IRArgs = {codeGen->getIRStr(formatStr), getIRArg(codeGen, arg)};
-    return codeGen->callPrintf(IRArgs);
-}
 

@@ -910,12 +910,12 @@ LgsUnaryExpr* AntlrConverter::getFirstSelection(LogosParser::SelectionContext* c
     assert(0);
 }
 
-LgsUnaryExpr* AntlrConverter::getConstant(LogosParser::ConstantContext* ctx) const {
+LgsUnaryExpr* AntlrConverter::getConstant(LogosParser::ConstantContext* ctx) {
     LgsUnaryExpr* constant = nullptr;
     if (const auto intToken = ctx->INTEGER()) {
         const auto input = removeUnderscores(intToken->getText());
         char* end;
-        const auto longValue = std::strtol(input.c_str(), &end, 10);
+        const auto longValue = strtol(input.c_str(), &end, 10);
         if (longValue >= INT_MIN && longValue <= INT_MAX) {
             const auto intValue = static_cast<int>(longValue);
             constant = new LgsIntConst(intValue);
@@ -923,7 +923,7 @@ LgsUnaryExpr* AntlrConverter::getConstant(LogosParser::ConstantContext* ctx) con
             constant = new LgsLongConst(longValue);
         }
     } else if (const auto longToken = ctx->LONG()) {
-        constant = new LgsLongConst(std::stol(longToken->getText()));
+        constant = new LgsLongConst(stol(longToken->getText()));
     } else if (const auto floatToken = ctx->FLOAT()) {
         const auto value = stof(floatToken->getText());
         constant = new LgsFloatConst(value);
@@ -942,10 +942,11 @@ LgsUnaryExpr* AntlrConverter::getConstant(LogosParser::ConstantContext* ctx) con
     return constant;
 }
 
-LgsStrConst* AntlrConverter::getStrConst(antlr4::tree::TerminalNode* ctx) const {
-    auto typeText = ctx->getText();
-    cleanStr(typeText);
-    const auto strConst = new LgsStrConst(typeText);
+LgsStrConst* AntlrConverter::getStrConst(antlr4::tree::TerminalNode* ctx) {
+    auto text = ctx->getText();
+    cleanStr(text);
+    const auto strConst = new LgsStrConst(text);
+    extractStrParts(*strConst);
     setLocation(strConst->location, ctx->getSymbol(), ctx->getText());
     return strConst;
 }
@@ -1133,4 +1134,29 @@ void AntlrConverter::setLocation(LgsLocation& location, const antlr4::Token* sta
     location.posInLine = start->getCharPositionInLine() + 1;
     location.filePath = strdup(filePath.c_str());
     location.code = strdup(code.c_str());
+}
+
+void AntlrConverter::extractStrParts(LgsStrConst& strConst) {
+    size_t start = 0;
+    string replaced = strConst.value;
+    while (true) {
+        const auto open = replaced.find('{', start);
+        if (open == string::npos) break;
+        const auto close = replaced.find('}', open);
+        if (close == string::npos) break;
+        if (close > open + 1) {
+            const auto part = replaced.substr(open + 1, close - open - 1);
+            antlr4::ANTLRInputStream input(part);
+            LogosLexer lexer(&input);
+            antlr4::CommonTokenStream tokens(&lexer);
+            LogosParser parser(&tokens);
+            const auto expr = getExpr(parser.expr());
+            strConst.templateParts.push_back(expr);
+        }
+        replaced.replace(open, close - open + 1, LOGOS_STR_FMT_PLACEHOLDER);
+        start = open + strlen(LOGOS_STR_FMT_PLACEHOLDER);
+    }
+    if (replaced != strConst.value) {
+        strConst.formatedStr = strdup(replaced.c_str());
+    }
 }

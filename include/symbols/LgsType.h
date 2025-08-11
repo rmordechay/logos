@@ -72,7 +72,7 @@ public:
     virtual LgsExpr* getZeroValue() = 0;
     virtual Type* getIRType(LgsCodeGen* codeGen) = 0;
     virtual bool equals(LgsType* other) = 0;
-    virtual string getStrFormatPart() const;
+    virtual string strFormatPart() const;
     virtual void freeValue(LgsCodeGen* codeGen, Value* value);
     virtual ~LgsType() = default;
 };

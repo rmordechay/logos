@@ -15,7 +15,7 @@ public:
     Type* getIRType(LgsCodeGen* codeGen) override;
     string getName() override;
     LgsExpr* getZeroValue() override;
-    string getStrFormatPart() const override;
+    string strFormatPart() const override;
     size_t getSizeBytes() override;
     bool equals(LgsType* other) override;
     ~LgsBool() override = default;

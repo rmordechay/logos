@@ -71,7 +71,7 @@ bool LgsType::addField(LgsField* field) {
 }
 
 void LgsType::freeValue(LgsCodeGen* codeGen, Value* value) {}
-string LgsType::getStrFormatPart() const { assert(0); }
+string LgsType::strFormatPart() const { assert(0); }
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
 LgsChar* LgsType::asChar() { return dynamic_cast<LgsChar*>(this); }
 LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }

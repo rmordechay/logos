@@ -23,7 +23,7 @@ size_t LgsFloat::getSizeBytes() {
     return sizeof(float);
 }
 
-string LgsFloat::getStrFormatPart() const {
+string LgsFloat::strFormatPart() const {
     return "%f";
 }
 

@@ -13,7 +13,7 @@ public:
     string getName() override;
     LgsExpr* getZeroValue() override;
     string prettyName() override;
-    string getStrFormatPart() const override;
+    string strFormatPart() const override;
     bool equals(LgsType* other) override;
     ~LgsAny() override = default;
 };

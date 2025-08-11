@@ -5,6 +5,7 @@
 class LgsStrConst final : public LgsUnaryExpr {
 public:
     string value;
+    string formatedStr = "";
     vector<LgsExpr*> templateParts;
 
     explicit LgsStrConst(const string& value) : value(value) {
@@ -19,5 +20,5 @@ public:
     Value* createIRValue(LgsCodeGen* codeGen) override;
     Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) override;
-    ~LgsStrConst() override = default;
+    ~LgsStrConst() override;
 };

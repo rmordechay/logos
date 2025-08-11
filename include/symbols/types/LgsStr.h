@@ -58,7 +58,7 @@ public:
     string prettyName() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
     LgsExpr* getZeroValue() override;
-    string getStrFormatPart() const override;
+    string strFormatPart() const override;
     LgsType* getIndexType() override;
     Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;

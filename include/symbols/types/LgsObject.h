@@ -18,7 +18,7 @@ public:
     string getName() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    string getStrFormatPart() const override;
+    string strFormatPart() const override;
     bool equals(LgsType* other) override;
     void setVTable();
     bool hasVirtuals() const;

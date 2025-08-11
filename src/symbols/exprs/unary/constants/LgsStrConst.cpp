@@ -40,3 +40,9 @@ Value* LgsStrConst::addIR(LgsCodeGen* codeGen, LgsExpr* other) {
 Value* LgsStrConst::eqIR(LgsCodeGen* codeGen, LgsExpr* other) {
     return nullptr;
 }
+
+LgsStrConst::~LgsStrConst() {
+    if (formatedStr != "") {
+        delete formatedStr.c_str();
+    }
+}

@@ -22,7 +22,7 @@ LgsType* LgsSArray::getIndexType() {
     return &LGS_INT;
 }
 
-string LgsSArray::getStrFormatPart() const {
+string LgsSArray::strFormatPart() const {
     return "%p";
 }
 

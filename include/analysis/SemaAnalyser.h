@@ -82,6 +82,7 @@ public:
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
+    void visitStrConst(LgsStrConst* strConst);
     void visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
