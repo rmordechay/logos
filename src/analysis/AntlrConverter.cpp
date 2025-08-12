@@ -1,5 +1,5 @@
 #include "analysis/AntlrConverter.h"
-#include "../../include/symbols/funcs/LgsCoroutine.h"
+#include "funcs/LgsCoroutine.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "files/LgsInterfaceFile.h"
@@ -63,6 +63,7 @@ LgsFile* AntlrConverter::getLogosFile(LogosParser::LogosFileContext* ctx) {
     if (const auto interfaceFileCtx = ctx->interfaceFile()) {
         file = getInterfaceFile(interfaceFileCtx);
     }
+    assert(file);
     if (ctx->extern_()) {
         for (const auto importPath : ctx->extern_()->STRING()) {
             auto basicString = importPath->getText();
@@ -122,7 +123,6 @@ LgsObjectFile* AntlrConverter::getObjectFile(LogosParser::ObjectFileContext* ctx
     const auto file = new LgsObjectFile(objName->getText(), filePath);
     setLocation(file->location, ctx->start, ctx->getText());
     file->obj = getObject(ctx->objectBody(), objName, !!ctx->SINGLETON());
-    if (!file->obj) return nullptr;
     globals.addSymbol(LgsSymbol(file->obj), &errHandler);
     return file;
 }
@@ -181,7 +181,6 @@ LgsObject* AntlrConverter::getObject(LogosParser::ObjectBodyContext* ctx, antlr4
         const auto fieldAdded = obj->addField(lgsField);
         if (!fieldAdded) {
             errHandler.addError(E10056, &obj->location, {obj->name, lgsField->name});
-            continue;
         }
     }
     // Methods
@@ -190,7 +189,6 @@ LgsObject* AntlrConverter::getObject(LogosParser::ObjectBodyContext* ctx, antlr4
         const auto methodAdded = obj->addMethod(method);
         if (!methodAdded) {
             errHandler.addError(E10056, &obj->location, {obj->name, method->funcType->prettyName()});
-            continue;
         }
     }
     // Interfaces
@@ -220,7 +218,7 @@ LgsInterface* AntlrConverter::getInterface(LogosParser::InterfaceBodyContext* ct
 
     for (int i = 0; i < ctx->interfaceField().size(); ++i) {
         const auto interfaceField = ctx->interfaceField()[i];
-        const auto field = getInterfaceField(interfaceField, interface->name, i);
+        const auto field = getInterfaceField(interfaceField, interface->name);
         field->isOptional = !!interfaceField->QUEST_MARK();
         field->isVirtual = true;
         interface->addField(field);
@@ -380,7 +378,7 @@ LgsParam AntlrConverter::getParam(LgsFuncType* funcType, LogosParser::ParamConte
     return lgsParam;
 }
 
-LgsField* AntlrConverter::getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName, const size_t position) {
+LgsField* AntlrConverter::getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName) {
     const auto name = ctx->IDENTIFIER()->getText();
     const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
@@ -646,6 +644,7 @@ LgsExpr* AntlrConverter::getExpr(LogosParser::ExprContext* ctx) {
     } else if (ctx->LPAREN() && ctx->RPAREN()) {
         expr = getExpr(ctx->left);
     }
+    assert(expr);
     if (!expr->type) {
         expr->type = new LgsUnknownType();
     }
@@ -938,7 +937,9 @@ LgsUnaryExpr* AntlrConverter::getConstant(LogosParser::ConstantContext* ctx) {
             constant = getStrConst(stringToken);
         }
     }
-    setLocation(constant->location, ctx->start, ctx->getText());
+    if (constant) {
+        setLocation(constant->location, ctx->start, ctx->getText());
+    }
     return constant;
 }
 

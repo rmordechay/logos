@@ -55,7 +55,7 @@ public:
 
     virtual LgsExpr* clone();
     virtual bool equals(LgsExpr* other);
-    virtual LgsExpr* convertExpr(LgsType* toType);
+    virtual LgsExpr* castTo(LgsType* toType);
     virtual Value* hashValue(LgsCodeGen* codeGen);
 
     virtual string prettyName() = 0;

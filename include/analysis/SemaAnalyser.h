@@ -82,7 +82,7 @@ public:
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
-    void visitStrConst(LgsStrConst* strConst);
+    void visitStrConst(const LgsStrConst* strConst);
     void visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
@@ -91,7 +91,7 @@ public:
     void visitInstance(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitSlice(LgsIterIndex* iterIndex);
-    void visitGroup(LgsGroup* group) const;
+    static void visitGroup(LgsGroup* group);
 
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     bool setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);

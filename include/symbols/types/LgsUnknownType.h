@@ -1,4 +1,5 @@
 #pragma once
+#include <utility>
 #include "LgsType.h"
 
 class LgsUnknownType final : public LgsType {
@@ -6,7 +7,7 @@ public:
     string name;
     constexpr static auto genricName = "<Unknown>";
 
-    explicit LgsUnknownType(const string& name = "") : name(name) {
+    explicit LgsUnknownType(string  name = "") : name(std::move(name)) {
         isUnknown = true;
     }
     Type* getIRType(LgsCodeGen* codeGen) override;

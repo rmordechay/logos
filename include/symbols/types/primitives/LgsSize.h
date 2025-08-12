@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsType.h"
-#include "logos/LgsCodeGen.h"
 
 class LgsSize final : public LgsType {
 public:

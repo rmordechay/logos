@@ -9,7 +9,7 @@ public:
     explicit LgsShortConst(const int value) : LgsUnaryExpr(&LGS_SHORT), value(value) {}
     string prettyName() override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
-    LgsExpr* convertExpr(LgsType* toType) override;
+    LgsExpr* castTo(LgsType* toType) override;
     LgsExpr* clone() override;
     ~LgsShortConst() override = default;
 };

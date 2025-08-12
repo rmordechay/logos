@@ -16,8 +16,16 @@ std::string LgsCast::prettyName() {
 }
 
 LgsCast::~LgsCast() {
-    delete fromValue;
+    if (fromValue) {
+        delete fromValue;
+        fromValue = nullptr;
+    }
     if (toValue) {
         delete toValue;
+        toValue = nullptr;
+    }
+    if (toType) {
+        freeType(toType);
+        toType = nullptr;
     }
 }

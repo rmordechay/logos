@@ -3,8 +3,9 @@ extern C {
 }
 
 main() {
-    file = fopen("../../main.cpp", "rb")
+    file = fopen("../.gitignore", "r")
     buffer: Char[1024]!
-    bytesRead = fread(buffer, 1L, sizeof(buffer), file)
+    lineRead = fgets(buffer, 1024, file)
+    print(buffer)
     fclose(file)
 }

@@ -15,7 +15,16 @@ void LgsCoroutine::createIRStmt(LgsCodeGen* codeGen) {
 }
 
 LgsCoroutine::~LgsCoroutine() {
-    if (stmtsBlock) delete stmtsBlock;
-    if (funcCall) delete funcCall;
-    if (selection) delete selection;
+    if (stmtsBlock) {
+        delete stmtsBlock;
+        stmtsBlock = nullptr;
+    }
+    if (funcCall) {
+        delete funcCall;
+        funcCall = nullptr;
+    }
+    if (selection) {
+        delete selection;
+        selection = nullptr;
+    }
 }

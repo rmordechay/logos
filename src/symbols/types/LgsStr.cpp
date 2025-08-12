@@ -49,7 +49,9 @@ Value* LgsStr::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
 }
 
 bool LgsStr::equals(LgsType* other) {
-    assert(other);
     if (other->getName() == LgsAny::name) return true;
+    if (const auto iter = other->asIterable(); iter->baseType->asChar()) {
+        return true;
+    }
     return name == other->getName();
 }

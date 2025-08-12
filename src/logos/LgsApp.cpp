@@ -297,11 +297,14 @@ void LgsApp::exitWithErrors() const {
         logInfo(path);
         if (i != errHandler.errors.size() - 1) logInfo("\n---\n");
         else logInfo("\n");
+        assert(strlen(lgsError.msg) > 0);
+        assert(strlen(lgsError.location->filePath) > 0);
+        assert(strlen(lgsError.location->code) > 0);
         free((void*)lgsError.msg);
         free((void*)lgsError.location->filePath);
         free((void*)lgsError.location->code);
     }
-    return exit(1);
+    exit(1);
 }
 
 LgsApp::~LgsApp() {

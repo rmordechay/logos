@@ -13,7 +13,7 @@ public:
     string prettyName() override;
     Value* hashValue(LgsCodeGen* codeGen) override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
-    LgsExpr* convertExpr(LgsType* type) override;
+    LgsExpr* castTo(LgsType* type) override;
     bool equals(LgsExpr* other) override;
     ~LgsVariable() override = default;
 };

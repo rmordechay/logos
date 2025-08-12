@@ -12,14 +12,14 @@ Value* LgsShortConst::createIRValue(LgsCodeGen* codeGen) {
     return codeGen->i16(value);
 }
 
-LgsExpr* LgsShortConst::convertExpr(LgsType* toType) {
+LgsExpr* LgsShortConst::castTo(LgsType* toType) {
     if (toType->asShort()) {
         return this;
     }
     if (toType->asStr()) {
         return new LgsStrConst(to_string(value));
     }
-    assert(0);
+    return nullptr;
 }
 
 LgsExpr* LgsShortConst::clone() {

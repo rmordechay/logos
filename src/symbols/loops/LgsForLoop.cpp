@@ -40,13 +40,20 @@ void LgsForLoop::incAndJumpToCond(LgsCodeGen* codeGen) const {
 }
 
 LgsForLoop::~LgsForLoop() {
-    for (const auto& loopVar : loopVars) {
-        delete loopVar;
-    }
     if (isFirst) {
         delete isFirst;
+        isFirst = nullptr;
     }
     if (isLast) {
         delete isLast;
+        isLast = nullptr;
     }
+    if (stmtsBlock) {
+        delete stmtsBlock;
+        stmtsBlock = nullptr;
+    }
+    for (const auto& loopVar : loopVars) {
+        delete loopVar;
+    }
+    loopVars.clear();
 }

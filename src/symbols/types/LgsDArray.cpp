@@ -21,6 +21,7 @@ LgsType* LgsDArray::getIndexType() {
 }
 
 string LgsDArray::strFormatPart() const {
+    if (baseType->asChar()) return "%s";
     return "%p";
 }
 

@@ -68,4 +68,5 @@ LgsStmtsBlock::~LgsStmtsBlock() {
     for (const auto& stmt : stmts) {
         delete stmt;
     }
+    stmts.clear();
 }

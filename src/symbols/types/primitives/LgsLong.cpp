@@ -1,12 +1,9 @@
 #include "types/primitives/LgsLong.h"
-
 #include "exprs/unary/constants/LgsLongConst.h"
 #include "types/LgsAny.h"
 #include "types/LgsCPtr.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsSize.h"
-
-#include "utils/LgsUtils.h"
 
 string LgsLong::prettyName() {
     return name;
@@ -31,8 +28,8 @@ string LgsLong::getName() {
 bool LgsLong::equals(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
-    if (IRName == LgsFloat::name) return true;
     if (IRName == LgsSize::name) return true;
+    if (IRName == LgsFloat::name) return true;
     return name == IRName;
 }
 

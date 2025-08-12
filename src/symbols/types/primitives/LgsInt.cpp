@@ -1,4 +1,3 @@
-#include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
@@ -31,9 +30,10 @@ LgsExpr* LgsInt::getZeroValue() {
 bool LgsInt::equals(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
-    if (IRName == LgsFloat::name) return true;
     if (IRName == LgsUInt::name) return true;
     if (IRName == LgsSize::name) return true;
+    if (IRName == LgsLong::name) return true;
+    if (IRName == LgsFloat::name) return true;
     return name == IRName;
 }
 

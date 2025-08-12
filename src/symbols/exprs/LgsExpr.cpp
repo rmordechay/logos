@@ -75,7 +75,7 @@ LgsExpr::~LgsExpr() {
 }
 
 bool LgsExpr::equals(LgsExpr* other) { assert(0); }
-LgsExpr* LgsExpr::convertExpr(LgsType* toType) { assert(0); }
+LgsExpr* LgsExpr::castTo(LgsType* toType) { assert(0); }
 Value* LgsExpr::hashValue(LgsCodeGen* codeGen) { assert(0); }
 LgsExpr* LgsExpr::clone() { assert(0); }
 

@@ -1,6 +1,10 @@
-#include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsShortConst.h"
 #include "types/LgsAny.h"
+#include "types/primitives/LgsFloat.h"
+#include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsLong.h"
+#include "types/primitives/LgsSize.h"
+#include "types/primitives/LgsUInt.h"
 
 
 size_t LgsShort::getSizeBytes() {
@@ -24,8 +28,14 @@ LgsExpr* LgsShort::getZeroValue() {
 }
 
 bool LgsShort::equals(LgsType* other) {
-    if (other->getName() == LgsAny::name) return true;
-    return name == other->getName();
+    const auto IRName = other->getName();
+    if (IRName == LgsAny::name) return true;
+    if (IRName == LgsInt::name) return true;
+    if (IRName == LgsUInt::name) return true;
+    if (IRName == LgsSize::name) return true;
+    if (IRName == LgsLong::name) return true;
+    if (IRName == LgsFloat::name) return true;
+    return name == IRName;
 }
 
 string LgsShort::strFormatPart() const {

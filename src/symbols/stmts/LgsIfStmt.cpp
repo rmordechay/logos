@@ -64,9 +64,7 @@ void LgsIfStmt::generateElseIf(LgsCodeGen* codeGen, Value* ifCondIR) {
     codeGen->stack.exitScope();
 
     for (int i = 0; i < elseIfs.size(); ++i) {
-        const auto elseIfPair = elseIfs[i];
-        const auto expr = elseIfPair.first;
-        const auto stmtBlock = elseIfPair.second;
+        const auto [expr, stmtBlock] = elseIfs[i];
         codeGen->stack.enterScope(this, stmtBlock);
         codeGen->startBlock(IRBlockElseIfCheck);
         const auto elseIfCondIR = expr->getIRValue(codeGen);
@@ -112,9 +110,7 @@ void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) {
 
     vector<BasicBlock*> blocks;
     for (size_t i = 0; i < elseIfs.size(); ++i) {
-        const auto elseIfPair = elseIfs[i];
-        const auto expr = elseIfPair.first;
-        const auto stmtsBlock = elseIfPair.second;
+        const auto [expr, stmtsBlock] = elseIfs[i];
         codeGen->stack.enterScope(this, stmtsBlock);
         const auto patterIRValue = expr->hashValue(codeGen);
         const auto IRFunc = codeGen->stack.currentFunc()->getIRFunc(codeGen);
@@ -138,13 +134,21 @@ void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) {
 }
 
 LgsIfStmt::~LgsIfStmt() {
-    delete ifCond;
-    delete ifBlock;
-    for (const auto &elseIfStmtBlock : elseIfs) {
-        delete elseIfStmtBlock.first;
-        delete elseIfStmtBlock.second;
+    if (ifCond) {
+        delete ifCond;
+        ifCond = nullptr;
+    }
+    if (ifBlock) {
+        delete ifBlock;
+        ifBlock = nullptr;
     }
     if (elseBlock) {
         delete elseBlock;
+        elseBlock = nullptr;
     }
+    for (const auto& [expr, block] : elseIfs) {
+        delete expr;
+        delete block;
+    }
+    elseIfs.clear();
 }

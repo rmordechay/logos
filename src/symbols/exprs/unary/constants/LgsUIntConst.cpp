@@ -13,7 +13,7 @@ Value* LgsUIntConst::createIRValue(LgsCodeGen* codeGen) {
     return codeGen->i32(value);
 }
 
-LgsExpr* LgsUIntConst::convertExpr(LgsType* toType) {
+LgsExpr* LgsUIntConst::castTo(LgsType* toType) {
     if (toType->asUInt()) {
         return this;
     }
@@ -23,7 +23,7 @@ LgsExpr* LgsUIntConst::convertExpr(LgsType* toType) {
     if (toType->asLong()) {
         return new LgsLongConst(value);
     }
-    assert(0);
+    return nullptr;
 }
 
 LgsExpr* LgsUIntConst::clone() {

@@ -23,6 +23,7 @@ LgsType* LgsSArray::getIndexType() {
 }
 
 string LgsSArray::strFormatPart() const {
+    if (baseType->asChar()) return "%s";
     return "%p";
 }
 
@@ -31,7 +32,7 @@ string LgsSArray::prettyName() {
 }
 
 bool LgsSArray::equals(LgsType* other) {
-    const auto otherArr = other->asDArray();
+    const auto otherArr = other->asSArray();
     if (!otherArr) return false;
     if (!baseType->equals(otherArr->baseType)) return false;
     return sizeExpr->type->equals(otherArr->sizeExpr->type);;

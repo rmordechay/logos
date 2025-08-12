@@ -11,7 +11,7 @@ public:
     }
     string prettyName() override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
-    LgsExpr* convertExpr(LgsType* toType) override;
+    LgsExpr* castTo(LgsType* toType) override;
     Value* andIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* orIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* bitAndIR(LgsCodeGen* codeGen, LgsExpr* other) override;
