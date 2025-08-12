@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
+set(LLVM_LINK_LLVM_DYLIB ON)
+set(CLANG_LINK_CLANG_DYLIB ON)
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
 find_package(antlr4-runtime REQUIRED)
@@ -113,17 +115,17 @@ llvm_map_components_to_libnames(LLVM_LIBS
     option
 )
 
-add_library(lgs_core STATIC ${SOURCE_FILES})
+add_library(lgs_core ${SOURCE_FILES})
 target_precompile_headers(lgs_core PRIVATE include/pch.h)
-message("${ANTLR4_INCLUDE_DIR}")
+
 target_include_directories(lgs_core PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/include/antlr4-runtime
+        include/external/antlr4-runtime
     ${CLANG_INCLUDE_DIRS}
     ${ANTLR4_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
     ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/include
+        include/external/include
 )
 
 target_link_libraries(lgs_core PUBLIC

@@ -20,7 +20,6 @@ public:
     LgsExpr* getZeroValue() override;
     string strFormatPart() const override;
     bool equals(LgsType* other) override;
-    void setVTable();
     bool hasVirtuals() const;
     void freeValue(LgsCodeGen* codeGen, Value* value) override;
     LgsObject* clone();

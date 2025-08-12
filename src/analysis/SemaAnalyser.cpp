@@ -162,18 +162,19 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
 }
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
-    if (varDec->type && varDec->expr) {
+    if (varDec->type) {
         varDec->type = resolveType(varDec->type);
+        if (!varDec->expr) {
+            varDec->expr = varDec->type->getZeroValue();
+        }
+    }
+    if (varDec->expr) {
         visitExpr(varDec->expr);
-        validateExprType(varDec->expr, varDec->type);
-    } else if (varDec->type) {
-        varDec->type = resolveType(varDec->type);
-        varDec->expr = varDec->type->getZeroValue();
-        visitExpr(varDec->expr);
-    } else if (varDec->expr) {
-        visitExpr(varDec->expr);
-        varDec->type = varDec->expr->type;
-        validateExprType(varDec->expr, varDec->type);
+        if (varDec->type) {
+            validateExprType(varDec->expr, varDec->type);
+        } else {
+            varDec->type = varDec->expr->type;
+        }
     }
     addLocalSymbol(LgsSymbol(varDec));
 }

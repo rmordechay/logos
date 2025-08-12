@@ -10,7 +10,7 @@ bool isLogosFile(const fs::directory_entry& entry);
 bool isLLVMFile(const fs::directory_entry& entry);
 bool isLogosKeyword(const string& s);
 void cleanStr(string& value);
-string getFileText(fs::path filePath);
+string getFileText(const fs::path& filePath);
 string removeUnderscores(const string& input);
 void freeType(const LgsType* type);
 string getFullPath(const LgsLocation& location);

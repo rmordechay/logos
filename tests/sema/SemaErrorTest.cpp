@@ -1,5 +1,5 @@
 #define DOCTEST_CONFIG_IMPLEMENT
-#include "doctest.h"
+#include "../../include/external/doctest.h"
 #include "logos/LgsApp.h"
 
 TEST_CASE("TestSema10000") {
@@ -22,7 +22,7 @@ TEST_CASE("TestSema10002A") {
     LgsApp app;
     const auto code = R"(
     main() {
-        a = "c"
+        a = 6
         for i in a {}
     }
     )";

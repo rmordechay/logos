@@ -116,11 +116,8 @@ string LgsFunc::format(string& tabs) {
 }
 
 LgsFunc::~LgsFunc() {
-    freeType(type);
     if (stmtsBlock) {
         delete stmtsBlock;
-    }
-    if (funcType) {
-        delete funcType;
+        stmtsBlock = nullptr;
     }
 }

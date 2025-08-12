@@ -68,7 +68,10 @@ string LgsExpr::getConstStr() {
 }
 
 LgsExpr::~LgsExpr() {
-    freeType(type);
+    if (type) {
+        freeType(type);
+        type = nullptr;
+    }
 }
 
 bool LgsExpr::equals(LgsExpr* other) { assert(0); }

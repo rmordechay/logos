@@ -14,15 +14,15 @@ string LgsObject::getName() {
 
 Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;
-    // Add one or zero if table exists
-    const size_t offset = hasVirtuals();
-    vector<Type*> elementTypes(fields.size() + offset);
-    if (offset) {
-        setVTable();
+    // Fields start at offset 1 if vtable exists
+    const auto fieldsStartOffset = hasVirtuals();
+    vector<Type*> elementTypes(fields.size() + fieldsStartOffset);
+    if (fieldsStartOffset) {
+        vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
         elementTypes[0] = vtable->type->getIRType(codeGen);
     }
     for (const auto [fieldName, field] : fields) {
-        field->position += offset;
+        field->position += fieldsStartOffset;
         Type* fieldType;
         if (field->type->asObject()) {
             fieldType = codeGen->ptrTy();
@@ -35,8 +35,8 @@ Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
     if (!IRType) {
         IRType = StructType::create(codeGen->context, elementTypes, name);
     }
-    for (const auto field : fields) {
-        field.second->parentIRType = IRType;
+    for (const auto [_, field] : fields) {
+        field->parentIRType = IRType;
     }
     return IRType;
 }
@@ -67,13 +67,9 @@ bool LgsObject::equals(LgsType* other) {
     return name == other->getName();
 }
 
-void LgsObject::setVTable() {
-    vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
-}
-
 bool LgsObject::hasVirtuals() const {
-    for (const auto method : methods) {
-        if (method.second->funcType->isVirtual) {
+    for (const auto [_, method] : methods) {
+        if (method->funcType->isVirtual) {
             return true;
         }
     }
@@ -110,4 +106,5 @@ LgsObject::~LgsObject() {
     for (const auto interface : interfaces) {
         freeType(interface);
     }
+    interfaces.clear();
 }

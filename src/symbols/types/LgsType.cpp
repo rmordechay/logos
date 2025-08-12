@@ -31,7 +31,6 @@ LgsField* LgsType::getField(const string& name) {
             return interfaceField;
         }
     }
-
     return nullptr;
 }
 
@@ -46,7 +45,6 @@ LgsFunc* LgsType::getMethod(const string& name) {
     } else if (const auto interface = asInterface()) {
         interfaces = interface->interfaces;
     }
-
     for (const auto interface : interfaces) {
         const auto interfaceMethod = interface->getMethod(name);
         if (interfaceMethod) {

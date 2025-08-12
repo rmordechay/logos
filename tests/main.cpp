@@ -1,5 +1,5 @@
 #include "logos/LgsCodeGen.h"
-#include <doctest.h>
+#include <../include/external/doctest.h>
 
 int main(const int argc, char** argv) {
     LgsCodeGen::initLLVM();

@@ -30,7 +30,7 @@ void cleanStr(string& value) {
     value.pop_back();
 }
 
-string getFileText(fs::path filePath) {
+string getFileText(const fs::path& filePath) {
     if (!fs::exists(filePath)) return "";
     ifstream file(filePath);
     if (!file.is_open()) return "";
@@ -48,7 +48,7 @@ string removeUnderscores(const string& input) {
 void freeType(const LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
-    delete type;
+    // delete type;
 }
 
 string getFullPath(const LgsLocation& location) {

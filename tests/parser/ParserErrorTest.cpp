@@ -1,5 +1,5 @@
 #include "logos/LgsApp.h"
-#include <doctest.h>
+#include <../../include/external/doctest.h>
 
 TEST_CASE("TestSema10012") {
     LgsApp app;

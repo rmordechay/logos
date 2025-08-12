@@ -27,5 +27,8 @@ size_t LgsNullable::getSizeBytes() {
 }
 
 LgsNullable::~LgsNullable() {
-    freeType(baseType);
+    if (baseType) {
+        freeType(baseType);
+        baseType = nullptr;
+    }
 }

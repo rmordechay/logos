@@ -1,5 +1,6 @@
 #include "stmts/LgsVarDec.h"
 #include "exprs/unary/LgsArrayExpr.h"
+#include "utils/LgsUtils.h"
 
 void LgsVarDec::createIRStmt(LgsCodeGen* codeGen) {
     const auto IRType = type->getIRType(codeGen);
@@ -22,5 +23,15 @@ string LgsVarDec::format(string& indentStr) {
 }
 
 LgsVarDec::~LgsVarDec() {
-    delete expr;
+    if (expr) {
+        if (expr->type != type) {
+            freeType(type);
+            type = nullptr;
+        }
+        delete expr;
+        expr = nullptr;
+    } else if (type) {
+        freeType(type);
+        type = nullptr;
+    }
 }

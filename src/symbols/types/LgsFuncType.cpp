@@ -88,13 +88,16 @@ LgsFuncType::~LgsFuncType() {
     for (int i = isMethod && !isStatic; i < params.size(); ++i) {
         const auto param = params[i];
         if (param.isSelf) continue;
-        if (!param.expr) {
-            freeType(param.type);
-        } else {
-            if (param.expr->type != param.type) {
+        if (param.expr) {
+            if (param.type && param.expr->type != param.type) {
                 freeType(param.type);
+                params[i].type = nullptr;
             }
             delete param.expr;
+            params[i].expr = nullptr;
+        } else if (param.type) {
+            freeType(param.type);
+            params[i].type = nullptr;
         }
     }
 }
