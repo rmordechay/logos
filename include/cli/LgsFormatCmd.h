@@ -4,7 +4,7 @@
 
 class LgsFormatCmd final : public LgsCmd {
 public:
-    std::filesystem::path filePath;
+    fs::path filePath;
 
     LgsFormatCmd(const int argc, char** argv) : LgsCmd(argc, argv) {}
     void runCmd() override;
@@ -12,6 +12,3 @@ public:
     void printHelp() override;
     ~LgsFormatCmd() override = default;
 };
-
-
-

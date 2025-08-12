@@ -1,43 +1,59 @@
 #include "utils/ThreadPool.h"
-#include "../../include/configs/LgsConfig.h"
 
 ThreadPool::ThreadPool() {
-    for(size_t i = 0; i < thread::hardware_concurrency(); ++i) {
-        workers.emplace_back([this] {
-            while(true) {
-                function<void()> task;
-                {
-                    unique_lock lock(mtx);
-                    condition.wait(lock, [this] {
-                        return stop || !tasks.empty();
-                    });
-                    if(tasks.empty()) {
-                        return;
-                    }
-                    task = std::move(tasks.front());
-                    tasks.pop();
-                }
-                task();
-            }
-        });
+    const auto n = std::max(1u, std::thread::hardware_concurrency());
+    workers.reserve(n);
+    for (unsigned i = 0; i < n; ++i) {
+        workers.emplace_back([this]{ worker(); });
     }
 }
 
-void ThreadPool::runTask(function<void()> task) {
+void ThreadPool::runTask(std::function<void()> task) {
     {
-        lock_guard lock(mtx);
+        std::lock_guard lock(mtx);
         tasks.push(std::move(task));
     }
-    condition.notify_one();
+    cvTask.notify_one();
 }
 
 void ThreadPool::wait() {
+    std::unique_lock lock(mtx);
+    cvIdle.wait(lock, [this]{
+        return tasks.empty() && active == 0;
+    });
+}
+
+void ThreadPool::worker() {
+    while (true) {
+        std::function<void()> task;
+        {
+            std::unique_lock lock(mtx);
+            cvTask.wait(lock, [this]{
+                return stop || !tasks.empty();
+            });
+            if (stop && tasks.empty()) return;
+            task = std::move(tasks.front());
+            tasks.pop();
+            ++active;
+        }
+        try { task(); } catch (...) {}
+        {
+            std::lock_guard lock(mtx);
+            --active;
+            if (tasks.empty() && active == 0) {
+                cvIdle.notify_all();
+            }
+        }
+    }
+}
+
+ThreadPool::~ThreadPool() {
     {
-        unique_lock lock(mtx);
+        std::lock_guard lock(mtx);
         stop = true;
     }
-    condition.notify_all();
-    for(auto& worker: workers) {
-        worker.join();
+    cvTask.notify_all();
+    for (auto& w : workers) {
+        w.join();
     }
 }

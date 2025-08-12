@@ -36,12 +36,12 @@ class LgsAssignment;
 
 class AntlrConverter {
 public:
-    filesystem::path filePath;
+    fs::path filePath;
     LgsErrHandler errHandler;
     LgsSymbolTable& globals;
     stack<LgsForLoop*> loopStack;
 
-    explicit AntlrConverter(const filesystem::path& filePath, LgsSymbolTable& globals) : filePath(filePath), globals(globals) {}
+    explicit AntlrConverter(const fs::path& filePath, LgsSymbolTable& globals) : filePath(filePath), globals(globals) {}
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx);
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx);
     LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx);

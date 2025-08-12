@@ -12,6 +12,6 @@ public:
 
     void setUnsuccessful();
     void addError(const LgsBaseError& lgsErr, LgsLocation* location, const vector<string>& args = {});
-    void copyErrors(vector<LgsError> newErrors);
+    void mergeErrors(LgsErrHandler& other);
     ~LgsErrHandler() = default;
 };

@@ -29,12 +29,10 @@ public:
     LgsSymbolTable globals;
     vector<LgsFile*> files;
     LgsErrHandler errHandler;
-    vector<LgsStrConst*> externFiles;
     LgsAppFile* appFile = nullptr;
     vector<LgsEnvFile*> envFiles;
-    LgsCLang lgsCLang;
 
-    explicit LgsApp(const filesystem::path& rootDirPath = "") : lgsCLang(paths) {
+    explicit LgsApp(const fs::path& rootDirPath = "") {
         paths.initPaths(rootDirPath);
     }
 
@@ -45,10 +43,9 @@ public:
     bool generate() const;
     bool link() const;
     void initBuild() const;
-    void parseSrcFile(const string& codeText, filesystem::path filePath = "");
-    void parseEnvFile(filesystem::path fileEntry);
-    void parseAppFile(filesystem::path fileEntry);
-    bool resolveExternalFiles();
+    void parseSrcFile(const string& codeText, fs::path filePath = "");
+    void parseEnvFile(fs::path fileEntry);
+    void parseAppFile(fs::path fileEntry);
     bool resolveGlobalTypes();
     void loadBuiltins();
     void loadEnvFiles();

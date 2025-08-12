@@ -12,10 +12,9 @@
 #include "types/primitives/LgsUInt.h"
 #include "types/LgsVoid.h"
 
-bool isCharPointer(const clang::QualType qt) {
-    if (!qt->isPointerType()) return false;
-    const auto pointeeType = qt->getPointeeType();
-    return pointeeType->isCharType();
+void LgsCLangVisitor::HandleTranslationUnit(clang::ASTContext& clangContext){
+    context = &clangContext;
+    TraverseDecl(clangContext.getTranslationUnitDecl());
 }
 
 bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
@@ -31,7 +30,7 @@ bool LgsCLangVisitor::VisitFunctionDecl(const clang::FunctionDecl* func) {
         funcImpl->funcType->params.push_back(lgsParam);
     }
     funcImpl->funcType->isVariadic = func->isVariadic();
-    cFile->symbolTable.addSymbol(LgsSymbol(funcImpl, true), nullptr);
+    file->symbolTable.addSymbol(LgsSymbol(funcImpl, true), &errHandler);
     return true;
 }
 
@@ -42,19 +41,33 @@ bool LgsCLangVisitor::VisitRecordDecl(const clang::RecordDecl* record) {
         name = name + '_';
     }
     if (!record->isStruct() || !record->isThisDeclarationADefinition()) return true;
-    const auto objSymbol = cFile->symbolTable.getSymbol(name);
+    const auto objSymbol = file->symbolTable.getSymbol(name);
     if (objSymbol) return true;
     const auto obj = mapCRecord(record);
-    cFile->symbolTable.addSymbol(LgsSymbol(obj, true), nullptr);
+    file->symbolTable.addSymbol(LgsSymbol(obj, true), &errHandler);
     return true;
 }
 
 LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
-    if (isCharPointer(type)) {
+    if (recursionDepth++ > 2000) assert(0);
+    if (type->isPointerType() && type->getPointeeType()->isCharType()) {
         return new LgsStr();
     }
     if (type->isPointerType()) {
-        return new LgsCPtr(mapCType(type->getPointeeType()));
+        const auto pointee = type->getPointeeType();
+        if (pointee.getTypePtr() == type.getTypePtr()) {
+            return new LgsCPtr(new LgsVoid());
+        }
+        if (pointee->isVoidType()) {
+            return new LgsCPtr(new LgsVoid());
+        }
+        if (pointee->isIncompleteType() && !pointee->isStructureType()) {
+            return new LgsCPtr(new LgsVoid());
+        }
+        if (pointee->isElaboratedTypeSpecifier()) {
+            return new LgsCPtr(new LgsVoid());
+        }
+        return new LgsCPtr(mapCType(pointee));
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::Bool)) {
         return new LgsBool();
@@ -128,10 +141,10 @@ LgsType* LgsCLangVisitor::mapCStruct(const clang::QualType type) {
     if (name == "") {
         name = decl->getQualifiedNameAsString();
     }
-    const auto objSymbol = cFile->symbolTable.getSymbol(name);
+    const auto objSymbol = file->symbolTable.getSymbol(name);
     if (objSymbol) return objSymbol->object;
     const auto obj = mapCRecord(decl);
-    cFile->symbolTable.addSymbol(LgsSymbol(obj, true), nullptr);
+    file->symbolTable.addSymbol(LgsSymbol(obj, true), &errHandler);
     return obj;
 }
 
@@ -153,10 +166,4 @@ LgsType* LgsCLangVisitor::mapCArray(const clang::QualType type) {
     const auto arr = new LgsDArray(baseType);
     arr->sizeExpr = new LgsIntConst(size);
     return arr;
-}
-
-void LgsCLangASTConsumer::HandleTranslationUnit(clang::ASTContext& context) {
-    visitor.TraverseDecl(context.getTranslationUnitDecl());
-    lock_guard lock(mtx);
-    externalFiles[visitor.cFile->name] = visitor.cFile;
 }

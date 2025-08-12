@@ -1,5 +1,6 @@
 #include "utils/LgsErrHandler.h"
 #include "configs/LgsDefinitions.h"
+#include "logos/LgsCodeGen.h"
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;
@@ -10,15 +11,15 @@ void LgsErrHandler::addError(const LgsBaseError& lgsErr, LgsLocation* location, 
     auto pos = 0;
     auto argIndex = 0;
     auto result = string(lgsErr.msg);
-    while ((pos = result.find(LOGOS_MSG_PLACEHOLDER, pos)) != string::npos && argIndex < args.size()) {
-        result.replace(pos, string(LOGOS_MSG_PLACEHOLDER).size(), args[argIndex]);
+    while ((pos = result.find(LGS_MSG_PLACEHOLDER, pos)) != string::npos && argIndex < args.size()) {
+        result.replace(pos, string(LGS_MSG_PLACEHOLDER).size(), args[argIndex]);
         pos += args[argIndex].length();
         argIndex++;
     }
     pos = 0;
     argIndex = 0;
-    while ((pos = result.find(LOGOS_MSG_PADDING_PLACEHOLDER, pos)) != string::npos) {
-        result.replace(pos, string(LOGOS_MSG_PADDING_PLACEHOLDER).size(), LOGOS_ERROR_PADDING);
+    while ((pos = result.find(LGS_MSG_PADDING_PLACEHOLDER, pos)) != string::npos) {
+        result.replace(pos, string(LGS_MSG_PADDING_PLACEHOLDER).size(), LGS_ERROR_PADDING);
         pos += args[argIndex].length();
         argIndex++;
     }
@@ -29,7 +30,7 @@ void LgsErrHandler::addError(const LgsBaseError& lgsErr, LgsLocation* location, 
     }
 }
 
-void LgsErrHandler::copyErrors(vector<LgsError> newErrors) {
+void LgsErrHandler::mergeErrors(LgsErrHandler& other) {
     setUnsuccessful();
-    errors.insert(errors.end(), newErrors.begin(), newErrors.end());
+    errors.insert(errors.end(), other.errors.begin(), other.errors.end());
 }

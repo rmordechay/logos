@@ -30,9 +30,9 @@ public:
         for (const auto part : strConst->templateParts) {
             auto partIR = getIRArg(codeGen, part);
             values.push_back(partIR);
-            const auto pos = formated.find(LOGOS_STR_FMT_PLACEHOLDER);
+            const auto pos = formated.find(LGS_STR_FMT_PLACEHOLDER);
             if (pos != std::string::npos) {
-                formated.replace(pos, strlen(LOGOS_STR_FMT_PLACEHOLDER), part->type->strFormatPart());
+                formated.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), part->type->strFormatPart());
             }
         }
         vector IRArgs = {codeGen->getIRStr(formated)};

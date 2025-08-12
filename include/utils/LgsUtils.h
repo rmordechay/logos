@@ -6,12 +6,11 @@ class LgsType;
 
 void logInfo(const string& text = "");
 void logErr(const string& text);
-bool isLogosFile(const filesystem::directory_entry& entry);
-bool isLLVMFile(const filesystem::directory_entry& entry);
+bool isLogosFile(const fs::directory_entry& entry);
+bool isLLVMFile(const fs::directory_entry& entry);
 bool isLogosKeyword(const string& s);
 void cleanStr(string& value);
-string getFileText(filesystem::path filePath);
+string getFileText(fs::path filePath);
 string removeUnderscores(const string& input);
 void freeType(const LgsType* type);
 string getFullPath(const LgsLocation& location);
-void findLibC();

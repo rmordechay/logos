@@ -58,7 +58,7 @@ void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
     for (const auto [_, func] : mainFile->funcs) {
         visitFunc(func);
     }
-    if (mainFile->funcs.find(LOGOS_MAIN_FUNC_NAME) == mainFile->funcs.end()) {
+    if (mainFile->funcs.find(LGS_MAIN_FUNC_NAME) == mainFile->funcs.end()) {
         errHandler.addError(E10000, &file->location);
     }
 }
@@ -665,7 +665,7 @@ void SemaAnalyser::visitInterfaceInstance(LgsInstance* instance, LgsInterface* i
         if (method) {
             const auto newMethod = arg->expr->asFunc();
             newMethod->funcType->name = method->funcType->name;
-            newMethod->funcType->params.insert(newMethod->funcType->params.begin(), LgsParam(interface, LOGOS_SELF));
+            newMethod->funcType->params.insert(newMethod->funcType->params.begin(), LgsParam(interface, LGS_SELF));
             instance->obj->addMethod(newMethod);
             continue;
         }
@@ -810,15 +810,15 @@ string getMissingImplementsStr(const vector<LgsField*>& fields, const vector<Lgs
     stringstream str;
     str << "Missing fields/methods:";
     if (!fields.empty()) {
-        str << LOGOS_ERROR_PADDING << "Fields:";
+        str << LGS_ERROR_PADDING << "Fields:";
         for (const auto& field : fields) {
-            str << LOGOS_ERROR_PADDING << "\t- " << field->name << ": " <<  field->type->prettyName();
+            str << LGS_ERROR_PADDING << "\t- " << field->name << ": " <<  field->type->prettyName();
         }
     }
     if (!methods.empty()) {
-        str << LOGOS_ERROR_PADDING << "Methods:";
+        str << LGS_ERROR_PADDING << "Methods:";
         for (const auto& method : methods) {
-            str << LOGOS_ERROR_PADDING << "\t- " << method->funcType->prettyName();
+            str << LGS_ERROR_PADDING << "\t- " << method->funcType->prettyName();
         }
     }
     return str.str();
@@ -966,11 +966,11 @@ LgsSymbol* SemaAnalyser::getSymbol(const string& name, LgsLocation* location) {
     if (const auto fileSymbol = file->symbolTable.getSymbol(name)) {
         return fileSymbol;
     }
-    for (const auto externFilePath : file->externFiles) {
-        auto externalFile = externalFiles.find(externFilePath->value);
-        if (externalFile == externalFiles.end()) continue;
-        const auto symbol = externalFile->second->symbolTable.getSymbol(name);
-        if (symbol) return symbol;
+    for (const auto externFilePath : file->externalCPaths) {
+        // auto externalFile = externalFiles.find(externFilePath->value);
+        // if (externalFile == externalFiles.end()) continue;
+        // const auto symbol = externalFile->second->symbolTable.getSymbol(name);
+        // if (symbol) return symbol;
     }
     if (const auto symbol = stack.getSymbolTable().getSymbol(name)) {
         return symbol;

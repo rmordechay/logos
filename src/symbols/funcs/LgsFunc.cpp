@@ -108,7 +108,7 @@ string LgsFunc::format(string& tabs) {
         }
     }
     str << ")";
-    if (funcType->name != LOGOS_MAIN_FUNC_NAME) {
+    if (funcType->name != LGS_MAIN_FUNC_NAME) {
         str << funcType->rt->getName();
     }
     str << stmtsBlock->format(tabs);

@@ -1,6 +1,6 @@
 #pragma once
-#include "utils/LgsErrHandler.h"
 #include "logos/LgsPaths.h"
+#include "utils/LgsErrHandler.h"
 
 class LgsStrConst;
 class LgsFile;
@@ -8,15 +8,13 @@ class LgsFile;
 class LgsCLang {
 public:
     LgsPaths& paths;
-    vector<string> headers;
     LgsErrHandler errHandler;
 
     explicit LgsCLang(LgsPaths& paths) : paths(paths) {}
-    void setCHeaderPaths();
-    string getCode(LgsStrConst* filePath);
-    void parseFile(const string& filePath);
+    void parseFile(const fs::path& fileName, LgsFile* lgsFile) const;
     void compile(const vector<LgsStrConst*>& files) const;
-    bool isCLibHeader(const filesystem::path& cLibPath);
-    void setCompileArgs(const vector<LgsStrConst*>& files, vector<const char*>& args) const;
+    vector<const char*> getCompileArgs(const vector<LgsStrConst*>& files) const;
+    fs::path resolveExternalFile(LgsStrConst* filePath);
+    void resolveCFiles(LgsFile* lgsFile);
     ~LgsCLang() = default;
 };

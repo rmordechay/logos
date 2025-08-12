@@ -2,7 +2,6 @@
 #include "cli/LgsFormatCmd.h"
 #include "cli/LgsGenerateCmd.h"
 #include "cli/LgsRunCmd.h"
-#include "configs/PlatformData.h"
 
 void LgsCli::execute() const {
     if (argc < 2) {
@@ -31,20 +30,18 @@ void LgsCli::execute() const {
 
 void LgsCli::printVersion() {
     ostringstream txt;
-    txt << "Logos version: " + string(LOGOS_VERSION) << NEW_LINE;
-    txt << "Architecture: " + string(ARCH_NAME) << NEW_LINE;
-    txt << "Operation System: " + string("macOS") << NEW_LINE;
+    txt << "Logos version: " + string(LOGOS_VERSION) << '\n';
     logInfo(txt.str());
 }
 
 void LgsCli::printHelp() {
     ostringstream txt;
     txt << "Usage: lgs <command> <options>" << "\n\n";
-    txt << "Commands:" << NEW_LINE;
-    txt << "run                       execute a logos script or run application" << NEW_LINE;
-    txt << "help                      print logos help" << NEW_LINE;
-    txt << "version, -v, --version    print logos version" << NEW_LINE;
-    txt << NEW_LINE << "For more information: lgs [command] help" << NEW_LINE;
+    txt << "Commands:" << '\n';
+    txt << "run                       execute a logos script or run application" << '\n';
+    txt << "help                      print logos help" << '\n';
+    txt << "version, -v, --version    print logos version" << '\n';
+    txt << '\n' << "For more information: lgs [command] help" << '\n';
     logInfo(txt.str());
 }
 

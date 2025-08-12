@@ -1,9 +1,6 @@
 #include "utils/LgsUtils.h"
 #include "LgsType.h"
-#include "builtins/LgsBuiltins.h"
-#include "builtins/LgsSystem.h"
 #include "configs/LgsDefinitions.h"
-#include "configs/PlatformData.h"
 #include "utils/LgsErrHandler.h"
 
 const unordered_set<string> LOGOS_KEYWORDS = {"object", "single", "self", "Self", "interface", "extern", "pub", "implements", "const", "enum",  "vec2", "vec3", "vec4", "if", "else", "for", "break", "continue", "return", "and", "or", "not", "in"};
@@ -13,14 +10,14 @@ void logInfo(const string& text) {
 }
 
 void logErr(const string& text) {
-    cerr << text << NEW_LINE;
+    cerr << text << '\n';
 }
 
-bool isLogosFile(const filesystem::directory_entry& entry) {
-    return entry.is_regular_file() && entry.path().extension().string() == LOGOS_FILE_EXTENSION;
+bool isLogosFile(const fs::directory_entry& entry) {
+    return entry.is_regular_file() && entry.path().extension().string() == LGS_FILE_EXTENSION;
 }
 
-bool isLLVMFile(const filesystem::directory_entry& entry) {
+bool isLLVMFile(const fs::directory_entry& entry) {
     return entry.is_regular_file() && entry.path().extension().string() == ".ll";
 }
 
@@ -33,8 +30,8 @@ void cleanStr(string& value) {
     value.pop_back();
 }
 
-string getFileText(filesystem::path filePath) {
-    if (!filesystem::exists(filePath)) return "";
+string getFileText(fs::path filePath) {
+    if (!fs::exists(filePath)) return "";
     ifstream file(filePath);
     if (!file.is_open()) return "";
     stringstream fileContents;
@@ -54,24 +51,6 @@ void freeType(const LgsType* type) {
     delete type;
 }
 
-string getFullPath(const char* filePath, const int32_t lineStart, const int32_t posStart) {
-    return string(filePath) + ":" + to_string(lineStart) + ":" + to_string(posStart);
-}
-
 string getFullPath(const LgsLocation& location) {
-    return getFullPath(location.filePath, location.lineStart, location.posInLine);
-}
-
-void findLibC() {
-    clang::DiagnosticsEngine diags(new clang::DiagnosticIDs(), new clang::DiagnosticOptions(), new clang::DiagnosticConsumer());
-    const auto vfs = vfs::getRealFileSystem();
-    const auto target_triple = sys::getDefaultTargetTriple();
-    auto driver = clang::driver::Driver("clang", target_triple, diags, "clang", vfs);
-    const auto args = {"clang", "-c", "dummy.c"};
-    const auto compilation = std::unique_ptr<clang::driver::Compilation>(driver.BuildCompilation(args));
-    auto& toolChain = compilation->getDefaultToolChain();
-    std::cout << driver.getClangProgramPath() << std::endl;
-    std::cout << driver.ResourceDir << std::endl;
-    std::cout << driver.SystemConfigDir << std::endl;
-    std::cout << toolChain.getOSLibName().front() << std::endl;
+    return string(location.filePath) + ":" + to_string(location.lineStart) + ":" + to_string(location.posInLine);
 }

@@ -15,7 +15,7 @@ public:
     vector<LgsInterface*> interfaces;
     vector<LgsGroup*> groups;
 
-    explicit LgsMainFile(const filesystem::path& path) : LgsFile(LOGOS_MAIN_FILE_NAME, path) {}
+    explicit LgsMainFile(const fs::path& path) : LgsFile(LGS_MAIN_FILE_NAME, path) {}
     void format() override;
     void generateIR() override;
     ~LgsMainFile() override;

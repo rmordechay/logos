@@ -1,6 +1,5 @@
 #include "logos/LgsLinker.h"
 
-#include "configs/PlatformData.h"
 #include "configs/LgsDefinitions.h"
 #include "files/LgsFile.h"
 #include "utils/LgsUtils.h"
@@ -36,11 +35,11 @@ bool LgsLinker::link() const {
     LLVMContext context;
     unique_ptr<Module> mainModule = nullptr;
     vector<unique_ptr<Module>> modules;
-    for (const auto& entry : filesystem::directory_iterator(paths.buildIR)) {
+    for (const auto& entry : fs::directory_iterator(paths.buildIR)) {
         if (!isLLVMFile(entry)) continue;
         auto module = parseModule(context, entry.path());
         if (!module) return false;
-        if (entry.path().filename().stem() == LOGOS_MAIN_FILE_NAME) {
+        if (entry.path().filename().stem() == LGS_MAIN_FILE_NAME) {
             mainModule = std::move(module);
         } else {
             modules.push_back(std::move(module));
@@ -82,7 +81,7 @@ bool LgsLinker::generateObjFile(unique_ptr<Module> mainModule) const {
     raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
     const auto addedPassFailed = LgsCodeGen::getTargetMachine()->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
     if (addedPassFailed) {
-        logErr(ec.message() + NEW_LINE);
+        logErr(ec.message() + '\n');
         return false;
     }
 

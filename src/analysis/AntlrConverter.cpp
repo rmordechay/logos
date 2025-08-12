@@ -67,7 +67,7 @@ LgsFile* AntlrConverter::getLogosFile(LogosParser::LogosFileContext* ctx) {
         for (const auto importPath : ctx->extern_()->STRING()) {
             auto basicString = importPath->getText();
             auto str = getStrConst(importPath);
-            file->externFiles.push_back(str);
+            file->externalCPaths.push_back(str);
         }
     }
     file->absPath = filePath;
@@ -100,7 +100,7 @@ LgsMainFile* AntlrConverter::getMainFile(LogosParser::MainFileContext* ctx) {
 
     for (const auto func : funcs) {
         auto funcName = func->funcSignature()->funcSignatureHeader()->IDENTIFIER()->getText();
-        if (funcName == LOGOS_MAIN_FUNC_NAME) {
+        if (funcName == LGS_MAIN_FUNC_NAME) {
             file->funcs[funcName] = getMainFunc(func);
         } else {
             const auto funcImpl = getFunc(func);
@@ -228,7 +228,7 @@ LgsInterface* AntlrConverter::getInterface(LogosParser::InterfaceBodyContext* ct
 
     auto allMethodsAreImplemented = true;
     for (const auto& interfaceFunc : ctx->interfaceFunc()) {
-        const auto self = LgsParam(interface, LOGOS_SELF);
+        const auto self = LgsParam(interface, LGS_SELF);
         const auto type = getFuncReturnType(interfaceFunc->type());
         const auto funcName = interfaceFunc->funcSignatureHeader()->IDENTIFIER();
         const auto func = new LgsFunc(funcName->getText(), type);
@@ -324,7 +324,7 @@ LgsFunc* AntlrConverter::getMethod(LogosParser::MethodContext* ctx, LgsType* obj
     setLocation(method->location, nameToken->getSymbol(), ctx->getText());
     method->funcType->isMethod = true;
     method->funcType->parentName = obj->getName();
-    auto self = LgsParam(obj, LOGOS_SELF);
+    auto self = LgsParam(obj, LGS_SELF);
     self.isSelf = true;
     method->funcType->params.push_back(self);
     setParams(method->funcType, funcSignature->funcSignatureHeader()->param());
@@ -958,7 +958,7 @@ LgsUnaryExpr* AntlrConverter::getNullValue(antlr4::tree::TerminalNode* ctx) cons
 }
 
 LgsUnaryExpr* AntlrConverter::getLoopIsFirst(LogosParser::IsFirstContext* ctx) {
-    const auto var = new LgsVariable(LOGOS_LOOP_IS_FIRST, &LGS_BOOL);
+    const auto var = new LgsVariable(LGS_LOOP_IS_FIRST, &LGS_BOOL);
     setLocation(var->location, ctx->start, ctx->getText());
     if (loopStack.empty()) {
         errHandler.addError(E10060, &var->location);
@@ -969,13 +969,13 @@ LgsUnaryExpr* AntlrConverter::getLoopIsFirst(LogosParser::IsFirstContext* ctx) {
         return var;
     }
     if (!loopStack.top()->isFirst) {
-        loopStack.top()->isFirst = new LgsVarDec(LOGOS_LOOP_IS_FIRST, new LgsBoolConst(false));
+        loopStack.top()->isFirst = new LgsVarDec(LGS_LOOP_IS_FIRST, new LgsBoolConst(false));
     }
     return var;
 }
 
 LgsUnaryExpr* AntlrConverter::getLoopIsLast(LogosParser::IsLastContext* ctx) {
-    const auto var = new LgsVariable(LOGOS_LOOP_IS_LAST, &LGS_BOOL);
+    const auto var = new LgsVariable(LGS_LOOP_IS_LAST, &LGS_BOOL);
     setLocation(var->location, ctx->start, ctx->getText());
     if (loopStack.empty()) {
         errHandler.addError(E10060, &var->location);
@@ -990,7 +990,7 @@ LgsUnaryExpr* AntlrConverter::getLoopIsLast(LogosParser::IsLastContext* ctx) {
         return var;
     }
     if (!loopStack.top()->isLast) {
-        loopStack.top()->isLast = new LgsVarDec(LOGOS_LOOP_IS_LAST, new LgsBoolConst(false));
+        loopStack.top()->isLast = new LgsVarDec(LGS_LOOP_IS_LAST, new LgsBoolConst(false));
     }
     return var;
 }
@@ -1153,8 +1153,8 @@ void AntlrConverter::extractStrParts(LgsStrConst& strConst) {
             const auto expr = getExpr(parser.expr());
             strConst.templateParts.push_back(expr);
         }
-        replaced.replace(open, close - open + 1, LOGOS_STR_FMT_PLACEHOLDER);
-        start = open + strlen(LOGOS_STR_FMT_PLACEHOLDER);
+        replaced.replace(open, close - open + 1, LGS_STR_FMT_PLACEHOLDER);
+        start = open + strlen(LGS_STR_FMT_PLACEHOLDER);
     }
     if (replaced != strConst.value) {
         strConst.formatedStr = strdup(replaced.c_str());

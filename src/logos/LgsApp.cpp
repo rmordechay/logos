@@ -65,16 +65,17 @@ bool LgsApp::validate() {
 bool LgsApp::parse() {
     loadBuiltins();
     ThreadPool threadPool;
-    for (const auto& entry : filesystem::recursive_directory_iterator(paths.srcDir)) {
+    for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
-            const auto absFilePath = filesystem::path(canonical(entry));
+            const auto absFilePath = fs::path(canonical(entry));
             const auto codeText = getFileText(absFilePath);
             parseSrcFile(codeText, absFilePath);
         });
     }
     threadPool.wait();
-    return errHandler.successful && resolveExternalFiles();
+    if (!errHandler.successful) return false;
+    return true;
 }
 
 bool LgsApp::analyse() {
@@ -86,7 +87,7 @@ bool LgsApp::analyse() {
             semaAnalyser.analyse();
             if (!semaAnalyser.errHandler.successful) {
                 lock_guard lock(mtx);
-                errHandler.copyErrors(semaAnalyser.errHandler.errors);
+                errHandler.mergeErrors(semaAnalyser.errHandler);
             }
         });
     }
@@ -114,7 +115,7 @@ bool LgsApp::link() const {
     return linker.link();
 }
 
-void LgsApp::parseSrcFile(const string& codeText, filesystem::path filePath) {
+void LgsApp::parseSrcFile(const string& codeText, fs::path filePath) {
     antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
@@ -127,19 +128,23 @@ void LgsApp::parseSrcFile(const string& codeText, filesystem::path filePath) {
     }
     AntlrConverter antlrConverter(filePath, globals);
     const auto file = antlrConverter.getLogosFile(ast);
-    lock_guard lock(mtx);
     files.push_back(file);
-    if (!antlrConverter.errHandler.successful) {
-        errHandler.copyErrors(antlrConverter.errHandler.errors);
-        return;
+    if (!file->externalCPaths.empty()) {
+        LgsCLang lgsCLang(paths);
+        lgsCLang.resolveCFiles(file);
+        if (!lgsCLang.errHandler.successful) {
+            lock_guard lock(mtx);
+            errHandler.mergeErrors(antlrConverter.errHandler);
+        }
     }
-    for (const auto externFile : file->externFiles) {
-        externFiles.push_back(externFile);
+    if (!antlrConverter.errHandler.successful) {
+        lock_guard lock(mtx);
+        errHandler.mergeErrors(antlrConverter.errHandler);
     }
 }
 
-void LgsApp::parseEnvFile(filesystem::path fileEntry) {
-    const auto absFilePath = new filesystem::path(filesystem::canonical(fileEntry));
+void LgsApp::parseEnvFile(fs::path fileEntry) {
+    const auto absFilePath = new fs::path(fs::canonical(fileEntry));
     AntlrConverter antlerConverter(*absFilePath, globals);
     const auto codeText = getFileText(fileEntry);
     antlr4::ANTLRInputStream input(codeText);
@@ -149,11 +154,11 @@ void LgsApp::parseEnvFile(filesystem::path fileEntry) {
     auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
     lock_guard lock(mtx);
     envFiles.emplace_back(file);
-    errHandler.copyErrors(antlerConverter.errHandler.errors);
+    errHandler.mergeErrors(antlerConverter.errHandler);
 }
 
-void LgsApp::parseAppFile(filesystem::path fileEntry) {
-    const auto absFilePath = new filesystem::path(filesystem::canonical(fileEntry));
+void LgsApp::parseAppFile(fs::path fileEntry) {
+    const auto absFilePath = new fs::path(fs::canonical(fileEntry));
     AntlrConverter antlerConverter(*absFilePath, globals);
     auto codeText = getFileText(fileEntry);
     antlr4::ANTLRInputStream input(codeText);
@@ -199,20 +204,11 @@ bool LgsApp::resolveGlobalTypes() {
             semaAnalyser.resolveInterfaceTypes(interfaceFile->interface);
         }
         if (!semaAnalyser.errHandler.successful) {
-            errHandler.copyErrors(semaAnalyser.errHandler.errors);
+            errHandler.mergeErrors(semaAnalyser.errHandler);
         }
         successful = successful && semaAnalyser.errHandler.successful;
     }
     return successful;
-}
-
-bool LgsApp::resolveExternalFiles() {
-    lgsCLang.setCHeaderPaths();
-    if (externFiles.empty()) return true;
-    for (const auto externFile : externFiles) {
-        lgsCLang.parseFile(externFile->value);
-    }
-    return lgsCLang.errHandler.successful;
 }
 
 void LgsApp::loadBuiltins() {
@@ -222,7 +218,7 @@ void LgsApp::loadBuiltins() {
 
 void LgsApp::loadEnvFiles() {
     ThreadPool threadPool;
-    for (const auto& entry : filesystem::directory_iterator(paths.envsDir)) {
+    for (const auto& entry : fs::directory_iterator(paths.envsDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
             parseEnvFile(entry);
@@ -268,9 +264,9 @@ void LgsApp::setupActiveEnv() {
 }
 
 void LgsApp::initBuild() const {
-    filesystem::remove_all(paths.buildDir);
-    filesystem::create_directories(paths.buildDir);
-    filesystem::create_directories(paths.buildIR);
+    fs::remove_all(paths.buildDir);
+    fs::create_directories(paths.buildDir);
+    fs::create_directories(paths.buildIR);
     LgsCodeGen::initLLVM();
 }
 
@@ -296,7 +292,7 @@ void LgsApp::exitWithErrors() const {
         const auto lgsError = errHandler.errors[i];
         const auto code = "\n code:  " + string(lgsError.location->code);
         const auto path = "\n   at:  " + getFullPath(*lgsError.location);
-        logInfo(LOGOS_ERROR_STR + string(lgsError.msg));
+        logInfo(LGS_ERROR_STR + string(lgsError.msg));
         // logInfo(code);
         logInfo(path);
         if (i != errHandler.errors.size() - 1) logInfo("\n---\n");

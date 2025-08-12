@@ -1,5 +1,6 @@
 #pragma once
 #include "files/LgsFile.h"
+#include "utils/LgsErrHandler.h"
 #include "utils/LgsUtils.h"
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/Frontend/FrontendAction.h>
@@ -10,11 +11,15 @@ class LgsObject;
 class LgsType;
 struct LgsSymbol;
 
-class LgsCLangVisitor : public clang::RecursiveASTVisitor<LgsCLangVisitor> {
+class LgsCLangVisitor final : public clang::RecursiveASTVisitor<LgsCLangVisitor>, public clang::ASTConsumer {
 public:
-    LgsFile* cFile;
+    LgsFile* file;
+    LgsErrHandler errHandler;
+    clang::ASTContext* context = nullptr;
+    int recursionDepth = 0;
 
-    explicit LgsCLangVisitor(const filesystem::path& filePath) : cFile(new LgsFile(filePath.filename(), filePath)) {}
+    explicit LgsCLangVisitor(LgsFile* file) : file(file) {}
+    void HandleTranslationUnit(clang::ASTContext& clangContext) override;
     bool VisitFunctionDecl(const clang::FunctionDecl* func);
     bool VisitRecordDecl(const clang::RecordDecl* record);
     LgsType* mapCType(clang::QualType type);
@@ -22,25 +27,16 @@ public:
     LgsType* mapCArray(clang::QualType type);
     LgsType* mapCStruct(clang::QualType type);
     LgsType* mapCFunc(clang::QualType type);
-    ~LgsCLangVisitor() = default;
-};
-
-class LgsCLangASTConsumer final : public clang::ASTConsumer {
-public:
-    LgsCLangVisitor visitor;
-
-    explicit LgsCLangASTConsumer(const filesystem::path& filePath) : visitor(filePath) {}
-    void HandleTranslationUnit(clang::ASTContext& context) override;
-    ~LgsCLangASTConsumer() override = default;
+    ~LgsCLangVisitor() override = default;
 };
 
 class LgsCLangFeAction final : public clang::ASTFrontendAction {
 public:
-    filesystem::path& filePath;
+    LgsFile* file;
 
-    explicit LgsCLangFeAction(filesystem::path& filePath) : filePath(filePath) {}
-    unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef file) override {
-        return make_unique<LgsCLangASTConsumer>(filePath);
+    explicit LgsCLangFeAction(LgsFile* file) : file(file) {}
+    unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef inFile) override {
+        return make_unique<LgsCLangVisitor>(file);
     }
     ~LgsCLangFeAction() override = default;
 };

@@ -1,28 +1,30 @@
 #include "extern/LgsCLang.h"
-#include "configs/PlatformData.h"
-#include "configs/LgsErrors.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "extern/LgsCLangVisitor.h"
-#include "utils/LgsErrHandler.h"
 #include "logos/LgsPaths.h"
 #include "utils/LgsUtils.h"
 
-void LgsCLang::parseFile(const string& filePath) {
-    auto headerPath = filesystem::path(CLIB_INCLUDE) / filePath;
-    if (isCLibHeader(headerPath)) {
-        const auto code = getFileText(headerPath);
-        clang::tooling::runToolOnCodeWithArgs(make_unique<LgsCLangFeAction>(headerPath), code, {"-isysroot", CLIB_ROOT});
+void LgsCLang::resolveCFiles(LgsFile* lgsFile) {
+    for (const auto externalCPath : lgsFile->externalCPaths) {
+        const auto entryPath = resolveExternalFile(externalCPath);
+        if (entryPath == "") continue;
+        parseFile(entryPath, lgsFile);
     }
+}
+
+void LgsCLang::parseFile(const fs::path& fileName, LgsFile* lgsFile) const {
+    if (fileName == "") return;
+    const auto filePath = paths.cLibHeadersDir / fileName;
+    const auto code = getFileText(filePath);
+    clang::tooling::runToolOnCodeWithArgs(make_unique<LgsCLangFeAction>(lgsFile), code, {"-isysroot", paths.cLibRoot.c_str()});
 }
 
 void LgsCLang::compile(const vector<LgsStrConst*>& files) const {
     const auto targetTriple = sys::getDefaultTargetTriple();
     clang::DiagnosticsEngine diags(new clang::DiagnosticIDs(), new clang::DiagnosticOptions(), new clang::DiagnosticConsumer());
     clang::driver::Driver driver("clang", targetTriple, diags);
-
     auto invocation = make_unique<clang::CompilerInvocation>();
-    vector<const char*> args;
-    setCompileArgs(files, args);
+    const auto args = getCompileArgs(files);
     clang::CompilerInvocation::CreateFromArgs(*invocation, args, diags);
     auto compilerInstance = make_unique<clang::CompilerInstance>();
     compilerInstance->setInvocation(std::move(invocation));
@@ -44,44 +46,20 @@ void LgsCLang::compile(const vector<LgsStrConst*>& files) const {
     }
 }
 
-void LgsCLang::setCompileArgs(const vector<LgsStrConst*>& files, vector<const char*>& args) const {
-    vector<string> compileArgs{"clang", "-c", "-isysroot", CLIB_ROOT};
+vector<const char*> LgsCLang::getCompileArgs(const vector<LgsStrConst*>& files) const {
+    vector compileArgs{"clang", "-c", "-isysroot", paths.cLibRoot.c_str()};
     for (const auto& file : files) {
-        compileArgs.push_back(file->value);
+        compileArgs.push_back(file->value.c_str());
     }
     compileArgs.push_back("-o");
-    compileArgs.push_back((paths.buildDir / "external_c.o").string());
-    for (const auto& argStr : compileArgs) {
-        args.push_back(argStr.c_str());
-    }
+    compileArgs.push_back((paths.buildDir / "external_c.o").c_str());
+    return compileArgs;
 }
 
-string LgsCLang::getCode(LgsStrConst* filePath) {
-    string code;
-    const auto pathStr = filePath->value;
-    const auto cLibPath = filesystem::path(CLIB_INCLUDE) / pathStr;
-    if (filesystem::exists(cLibPath)) {
-        return getFileText(cLibPath);
-    }
-    errHandler.addError(E10047, &filePath->location, {pathStr});
+fs::path LgsCLang::resolveExternalFile(LgsStrConst* filePath) {
+    if (fs::exists(filePath->value)) return filePath->value;
+    const auto cLibHeaderFile = paths.cLibHeadersDir / filePath->value;
+    if (fs::exists(cLibHeaderFile)) return cLibHeaderFile;
+    errHandler.addError(E10047, &filePath->location, {filePath->value});
     return "";
-}
-
-void LgsCLang::setCHeaderPaths() {
-    for (const auto& entry : filesystem::directory_iterator(CLIB_INCLUDE)) {
-        if (!entry.is_regular_file()) continue;
-        auto ext = entry.path().extension();
-        if (ext == ".h" || ext == ".hpp" || ext == ".hh" || ext == ".hxx") {
-            headers.push_back(entry.path().string());
-        }
-    }
-    // TODO enable again more cross platform
-    // for (const auto& entry : filesystem::directory_iterator(filesystem::path(CLIB_INCLUDE) / "sys/_types")) {
-    //     if (!entry.is_regular_file()) continue;
-    //     parseFile(entry.path().string());
-    // }
-}
-
-bool LgsCLang::isCLibHeader(const filesystem::path& cLibPath) {
-    return std::find(headers.begin(), headers.end(), cLibPath) != headers.end();
 }

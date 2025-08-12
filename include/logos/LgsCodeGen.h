@@ -90,5 +90,3 @@ public:
     static TargetMachine* getTargetMachine();
     ~LgsCodeGen() = default;
 };
-
-inline map<string, LgsFile*> externalFiles;

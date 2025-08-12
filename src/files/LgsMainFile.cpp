@@ -4,7 +4,7 @@
 #include "types/LgsObject.h"
 
 void LgsMainFile::generateIR() {
-    codeGen.setIRModule(LOGOS_MAIN_FILE_NAME);
+    codeGen.setIRModule(LGS_MAIN_FILE_NAME);
     for (const auto object : objects) {
         object->getIRType(&codeGen);
         for (const auto& [_, method] : object->methods) {
