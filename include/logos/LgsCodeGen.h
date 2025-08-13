@@ -24,8 +24,8 @@ public:
     void callStackPush();
     void callStackPop();
     Value* getIRStr(const string& value);
-    GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit) const;
-    StructType* getStructType(const string& name, const vector<Type*>& fields);
+    GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit, const string& name = "") const;
+    StructType* getStructType(const vector<Type*>& fields, const string& name = "");
 
     // Blocks
     BasicBlock* createBlock(const string& name, Function* parent = nullptr);

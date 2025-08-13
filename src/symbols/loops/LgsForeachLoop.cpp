@@ -67,7 +67,7 @@ void LgsForeachLoop::setArrIterVars(LgsCodeGen* codeGen, LgsDArray* arr) const {
 
 void LgsForeachLoop::setMapIterVars(LgsCodeGen* codeGen, const LgsIterator& iterator) const {
     const auto next = iterator.next(codeGen);
-    const auto entryType = codeGen->getStructType("MapEntry", {codeGen->ptrTy(), codeGen->ptrTy()});
+    const auto entryType = codeGen->getStructType({codeGen->ptrTy(), codeGen->ptrTy()}, "MapEntry");
     const auto keyGEP = codeGen->builder.CreateStructGEP(entryType, next, 0);
     const auto valueGEP = codeGen->builder.CreateStructGEP(entryType, next, 1);
     if (withIndex) {

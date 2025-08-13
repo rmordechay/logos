@@ -57,7 +57,7 @@ Value* LgsDArray::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
 
 StructType* LgsDArray::getArrStruct(LgsCodeGen* codeGen) {
     if (arrStruct) return arrStruct;
-    arrStruct = codeGen->getStructType(name, {codeGen->i64Ty(), codeGen->i64Ty(), codeGen->i64Ty(), codeGen->ptrTy()});
+    arrStruct = codeGen->getStructType({codeGen->i64Ty(), codeGen->i64Ty(), codeGen->i64Ty(), codeGen->ptrTy()}, name);
     return arrStruct;
 }
 

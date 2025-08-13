@@ -8,7 +8,7 @@
 Value* LgsInstance::createIRValue(LgsCodeGen* codeGen) {
     const auto objIRType = obj->getIRType(codeGen);
     if(obj->singleton) {
-        IRValue = codeGen->createGlobal(objIRType, ConstantAggregateZero::get(objIRType));
+        IRValue = codeGen->createGlobal(objIRType, ConstantAggregateZero::get(objIRType), obj->name);
     } else {
         IRValue = codeGen->builder.CreateAlloca(objIRType);
     }

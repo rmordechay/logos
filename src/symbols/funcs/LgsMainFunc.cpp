@@ -41,7 +41,7 @@ void LgsMainFunc::setMainArgs() {
 void LgsMainFunc::initMainArgs(LgsCodeGen* codeGen) {
     auto& builder = codeGen->builder;
     const vector<Type*> structFields{codeGen->i64Ty(), codeGen->i32Ty(), codeGen->i32Ty(), codeGen->ptrTy()};
-    const auto arrStruct = codeGen->getStructType(LgsDArray::name, structFields);
+    const auto arrStruct = codeGen->getStructType(structFields, LgsDArray::name);
     mainArgs->IRValue = builder.CreateAlloca(arrStruct);
     initArgsFunc->callIR(codeGen, {mainArgs->IRValue, argc, argv});
     funcType->params[0].setIRValue(mainArgs->IRValue);

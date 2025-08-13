@@ -26,7 +26,7 @@ public:
 
 inline void LgsIterator::initIterator(LgsCodeGen* codeGen) {
     LgsBuiltinFunc iterInitFunc{"initIter", &LGS_VOID, type->getName(), {type, &LGS_ANY}};
-    const auto structType = codeGen->getStructType(name, {codeGen->ptrTy(), codeGen->i64Ty(), codeGen->ptrTy(), codeGen->ptrTy(), codeGen->ptrTy(), codeGen->ptrTy()});
+    const auto structType = codeGen->getStructType({codeGen->ptrTy(), codeGen->i64Ty(), codeGen->ptrTy(), codeGen->ptrTy(), codeGen->ptrTy(), codeGen->ptrTy()}, name);
     IRValue = codeGen->builder.CreateAlloca(structType);
     iterInitFunc.callIR(codeGen, {baseExpr->getIRValue(codeGen), IRValue});
 }

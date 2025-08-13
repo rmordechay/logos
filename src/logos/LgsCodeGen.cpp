@@ -15,14 +15,14 @@ void LgsCodeGen::setupModule(const string& moduleName, const DataLayout& dataLay
 
 void LgsCodeGen::setRuntimePtr() {
     const auto localsArr = ArrayType::get(ptrTy(), 16);
-    const auto stackFrameStruct = getStructType("stack_frame", {localsArr, i32Ty()});
+    const auto stackFrameStruct = getStructType({localsArr, i32Ty()}, "stack_frame_ty");
     const auto stackCapacity = ArrayType::get(stackFrameStruct, 64);
-    const auto stackStruct = getStructType("stack", {stackCapacity, i32Ty()});
-    const auto runtimeType = getStructType("runtime", {stackStruct});
+    const auto stackStruct = getStructType({stackCapacity, i32Ty()}, "stack_ty");
+    const auto runtimeType = getStructType({stackStruct}, "runtime_ty");
     if (IRModule->getName() == LGS_MAIN_FILE_NAME) {
-        runtimePtr = createGlobal(runtimeType, ConstantAggregateZero::get(runtimeType));
+        runtimePtr = createGlobal(runtimeType, ConstantAggregateZero::get(runtimeType), "runtime");
     } else {
-        runtimePtr = createGlobal(runtimeType, nullptr);
+        runtimePtr = createGlobal(runtimeType, nullptr, "runtime");
     }
 }
 
@@ -49,11 +49,11 @@ Value* LgsCodeGen::getIRStr(const string& value) {
     return globalVar;
 }
 
-GlobalVariable* LgsCodeGen::createGlobal(Type* type, ConstantAggregateZero* zeroInit) const {
-    return new GlobalVariable(*IRModule, type, false, GlobalValue::ExternalLinkage, zeroInit);
+GlobalVariable* LgsCodeGen::createGlobal(Type* type, ConstantAggregateZero* zeroInit, const string& name) const {
+    return new GlobalVariable(*IRModule, type, false, GlobalValue::ExternalLinkage, zeroInit, name);
 }
 
-StructType* LgsCodeGen::getStructType(const string& name, const vector<Type*>& fields) {
+StructType* LgsCodeGen::getStructType(const vector<Type*>& fields, const string& name) {
     const auto structType = StructType::getTypeByName(context, name);
     if (!structType) {
         return StructType::create(context, fields, name);
