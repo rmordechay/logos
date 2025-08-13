@@ -177,11 +177,11 @@ enumField:
     ;
 
 coroutine:
-        GO (funcCall | selection | statementsBlock)
+        GO (funcCall | selection)
     ;
 
 deferStmt:
-        DEFER (funcCall | selection | statementsBlock)
+        DEFER (funcCall | selection)
     ;
 
 expr:

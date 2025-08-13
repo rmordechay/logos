@@ -336,9 +336,7 @@ void SemaAnalyser::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
 }
 
 void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
-    if (coroutine->stmtsBlock) {
-        visitStmtsBlock(coroutine->stmtsBlock);
-    } else if (coroutine->funcCall) {
+    if (coroutine->funcCall) {
         visitFuncCall(coroutine->funcCall);
     } else if (coroutine->selection) {
         visitSelection(coroutine->selection);
@@ -348,12 +346,12 @@ void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
 }
 
 void SemaAnalyser::visitDeferStmt(LgsDeferStmt* deferStmt) {
-    if (deferStmt->stmtsBlock) {
-        visitStmtsBlock(deferStmt->stmtsBlock);
-    } else if (deferStmt->funcCall) {
+    if (deferStmt->funcCall) {
         visitFuncCall(deferStmt->funcCall);
     } else if (deferStmt->selection) {
         visitSelection(deferStmt->selection);
+    } else {
+        assert(0);
     }
     stack.currentFunc()->deferStmts.push_back(deferStmt);
 }

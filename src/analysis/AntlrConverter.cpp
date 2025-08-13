@@ -337,12 +337,12 @@ LgsFunc* AntlrConverter::getMethod(LogosParser::MethodContext* ctx, LgsType* obj
 
 LgsStmt* AntlrConverter::getDeferStmt(LogosParser::DeferStmtContext* ctx) {
     const auto deferStmt = new LgsDeferStmt();
-    if (const auto stmtsBlock = ctx->statementsBlock()) {
-        deferStmt->stmtsBlock = getStmtBlock(stmtsBlock);
-    } else if (const auto funcCall = ctx->funcCall()) {
+    if (const auto funcCall = ctx->funcCall()) {
         deferStmt->funcCall = getFuncCall(funcCall);
     } else if (const auto selection = ctx->selection()) {
         deferStmt->selection = getSelection(selection);
+    } else {
+        assert(0);
     }
     setLocation(deferStmt->location, ctx->start, ctx->getText());
     return deferStmt;
@@ -513,8 +513,6 @@ LgsCoroutine* AntlrConverter::getCoroutine(LogosParser::CoroutineContext* ctx) {
             errHandler.addError(E10021, &lgsSelection->location);
         }
         coroutine->selection = lgsSelection;
-    } else if (const auto stmtsBlock = ctx->statementsBlock()) {
-        coroutine->stmtsBlock = getStmtBlock(stmtsBlock);
     } else {
         assert(0);
     }

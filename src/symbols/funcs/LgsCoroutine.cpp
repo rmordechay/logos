@@ -15,10 +15,6 @@ void LgsCoroutine::createIRStmt(LgsCodeGen* codeGen) {
 }
 
 LgsCoroutine::~LgsCoroutine() {
-    if (stmtsBlock) {
-        delete stmtsBlock;
-        stmtsBlock = nullptr;
-    }
     if (funcCall) {
         delete funcCall;
         funcCall = nullptr;

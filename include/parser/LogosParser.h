@@ -768,7 +768,6 @@ public:
     antlr4::tree::TerminalNode *GO();
     FuncCallContext *funcCall();
     SelectionContext *selection();
-    StatementsBlockContext *statementsBlock();
 
    
   };
@@ -782,7 +781,6 @@ public:
     antlr4::tree::TerminalNode *DEFER();
     FuncCallContext *funcCall();
     SelectionContext *selection();
-    StatementsBlockContext *statementsBlock();
 
    
   };

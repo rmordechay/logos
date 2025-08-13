@@ -3,7 +3,6 @@
 
 class LgsCoroutine final : public LgsStmt {
 public:
-    LgsStmtsBlock* stmtsBlock = nullptr;
     LgsFuncCall* funcCall = nullptr;
     LgsSelection* selection = nullptr;
 
