@@ -4,7 +4,7 @@
 #include <stmts/LgsStmtsBlock.h>
 
 void LgsDeferStmt::createIRStmt(LgsCodeGen* codeGen) {
-    codeGen->callFunc("init_defer", FunctionType::get(codeGen->voidTy(), {}, false));
+    codeGen->callFunc("Defer_init", FunctionType::get(codeGen->voidTy(), {}, false));
     if (funcCall) {
         for (const auto& arg : funcCall->args) {
             arg->getIRValue(codeGen);

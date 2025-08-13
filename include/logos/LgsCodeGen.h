@@ -19,12 +19,12 @@ public:
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
 
-    void setIRModule(const string& moduleName);
+    void setupModule(const string& moduleName);
     Value* getIRStr(const string& value);
     bool lastInstTerminator() const;
     GlobalVariable* createPrivateGlobal(Constant* initializer) const;
     GlobalVariable* createPublicGlobal(Type* type) const;
-    StructType* getIRStructType(const string& name, const vector<Type*>& fields);
+    StructType* getStructType(const string& name, const vector<Type*>& fields);
 
     // Blocks
     BasicBlock* createBlock(const string& name, Function* parent = nullptr);

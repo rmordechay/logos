@@ -4,7 +4,7 @@
 #include "types/LgsInterface.h"
 
 void LgsInterfaceFile::generateIR() {
-    codeGen.setIRModule(name);
+    codeGen.setupModule(name);
     for (const auto& [_, method] : interface->methods) {
         if (!method->stmtsBlock) continue;
         method->generateIR(&codeGen);

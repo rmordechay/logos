@@ -2,7 +2,7 @@
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 
-void LgsCodeGen::setIRModule(const string& moduleName) {
+void LgsCodeGen::setupModule(const string& moduleName) {
     const auto module = new Module(moduleName, context);
     module->setTargetTriple(sys::getDefaultTargetTriple());
     module->setDataLayout(getTargetMachine()->createDataLayout());
@@ -26,12 +26,12 @@ Value* LgsCodeGen::getIRStr(const string& value) {
         return &globals;
     }
     const auto strConstant = ConstantDataArray::getString(context, value, true);
-    const auto globalVariable = createPrivateGlobal(strConstant);
-    globalVariable->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
-    return globalVariable;
+    const auto globalVar = createPrivateGlobal(strConstant);
+    globalVar->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
+    return globalVar;
 }
 
-StructType* LgsCodeGen::getIRStructType(const string& name, const vector<Type*>& fields) {
+StructType* LgsCodeGen::getStructType(const string& name, const vector<Type*>& fields) {
     const auto structType = StructType::getTypeByName(context, name);
     if (!structType) {
         return StructType::create(context, fields, name);

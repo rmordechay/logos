@@ -5,6 +5,8 @@ add_library(lgslib STATIC
     lib/Array.c
     lib/Str.c
     lib/System.c
+        lib/Defer.c
+        include/Defer.h
 )
 
 target_include_directories(lgslib PUBLIC
