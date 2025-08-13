@@ -3,7 +3,7 @@
 #include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
-#include "extern/LgsCLang.h"
+#include "lgsc/LgsCLang.h"
 
 class LgsCodeGen;
 class LgsStrConst;

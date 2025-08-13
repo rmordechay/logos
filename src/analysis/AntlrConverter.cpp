@@ -29,7 +29,7 @@
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
 #include "exprs/unary/constants/LgsLongConst.h"
-#include "extern/LgsCLang.h"
+#include "lgsc/LgsCLang.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "funcs/LgsMainFunc.h"

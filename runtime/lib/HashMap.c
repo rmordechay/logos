@@ -1,5 +1,4 @@
 #include "Iterator.h"
-#include "Runtime.h"
 #include "Str.h"
 #include <assert.h>
 #include <string.h>

@@ -145,7 +145,7 @@ target_link_libraries(lgs_core PUBLIC
     antlr4_static
 )
 
-add_subdirectory(stdlib)
+add_subdirectory(runtime)
 add_executable(lgs main.cpp)
 target_link_libraries(lgs PRIVATE lgs_core lgslib)
 add_subdirectory(tests)

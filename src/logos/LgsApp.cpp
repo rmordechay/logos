@@ -12,7 +12,7 @@
 #include "builtins/LgsBuiltins.h"
 #include "builtins/LgsSystem.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "extern/LgsCLang.h"
+#include "lgsc/LgsCLang.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "funcs/LgsMainFunc.h"
