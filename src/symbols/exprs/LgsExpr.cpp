@@ -79,25 +79,6 @@ LgsExpr* LgsExpr::castTo(LgsType* toType) { assert(0); }
 Value* LgsExpr::hashValue(LgsCodeGen* codeGen) { assert(0); }
 LgsExpr* LgsExpr::clone() { assert(0); }
 
-// Comparisons
-Value* LgsExpr::subIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::mulIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::divIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::modIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::eqIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::neIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::ltIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::gtIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::geIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::leIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::andIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::orIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::bitAndIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::bitOrIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-Value* LgsExpr::lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) { assert(0); }
-
 // Casting
 LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }
 LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }

@@ -2,11 +2,38 @@
 #include "configs/LgsDefinitions.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
+#include <llvm/IR/Module.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/TargetParser/Host.h>
 
 void LgsCodeGen::setupModule(const string& moduleName, const DataLayout& dataLayout) {
     IRModule = new Module(moduleName, context);
     IRModule->setTargetTriple(sys::getDefaultTargetTriple());
     IRModule->setDataLayout(dataLayout);
+    setRuntimePtr();
+}
+
+void LgsCodeGen::setRuntimePtr() {
+    const auto localsArr = ArrayType::get(ptrTy(), 16);
+    const auto stackFrameStruct = getStructType("stack_frame", {localsArr, i32Ty()});
+    const auto stackCapacity = ArrayType::get(stackFrameStruct, 64);
+    const auto stackStruct = getStructType("stack", {stackCapacity, i32Ty()});
+    const auto runtimeType = getStructType("runtime", {stackStruct});
+    if (IRModule->getName() == LGS_MAIN_FILE_NAME) {
+        runtimePtr = createGlobal(runtimeType, ConstantAggregateZero::get(runtimeType));
+    } else {
+        runtimePtr = createGlobal(runtimeType, nullptr);
+    }
+}
+
+void LgsCodeGen::callStackPush() {
+    const auto stackInitFt = FunctionType::get(voidTy(), {ptrTy()}, false);
+    callLgsFunc("Stack_push", stackInitFt, {runtimePtr});
+}
+
+void LgsCodeGen::callStackPop() {
+    const auto stackInitFt = FunctionType::get(voidTy(), {ptrTy()}, false);
+    callLgsFunc("Stack_pop", stackInitFt, {runtimePtr});
 }
 
 Value* LgsCodeGen::getIRStr(const string& value) {

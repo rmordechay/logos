@@ -1,6 +1,6 @@
 #pragma once
+#include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsStmt.h"
-
 class LgsVariable;
 class LgsStmtsBlock;
 class LgsExpr;

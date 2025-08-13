@@ -1,5 +1,9 @@
 #pragma once
 #include "configs/LgsDefinitions.h"
+#include <llvm/MC/TargetRegistry.h>
+#include <llvm/TargetParser/Host.h>
+
+using namespace llvm;
 
 struct LgsPaths {
     fs::path relRootDir;

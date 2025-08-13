@@ -27,8 +27,8 @@ public:
     string format(string& tabs) override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
     Value* callIR(LgsCodeGen* codeGen, const vector<Value*>& args = {});
-    void startFuncBlock(LgsCodeGen* codeGen);
-    void createEpilogueBlock(LgsCodeGen* codeGen) const;
+    void createPrologue(LgsCodeGen* codeGen);
+    void createEpilogue(LgsCodeGen* codeGen) const;
     static Value* getIRArg(LgsCodeGen* codeGen, LgsExpr* arg);
     virtual Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args);
     virtual void generateIR(LgsCodeGen* codeGen);

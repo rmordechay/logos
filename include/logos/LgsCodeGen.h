@@ -1,5 +1,6 @@
 #pragma once
 #include "LgsStack.h"
+#include <llvm/IR/IRBuilder.h>
 
 class LgsRuntime;
 class LgsFile;
@@ -15,9 +16,13 @@ public:
     LLVMContext context;
     Module* IRModule = nullptr;
     IRBuilderBase::InsertPoint savedIP;
+    GlobalVariable* runtimePtr = nullptr;
     IRBuilder<> builder = IRBuilder(context);
 
     void setupModule(const string& moduleName, const DataLayout& dataLayout);
+    void setRuntimePtr();
+    void callStackPush();
+    void callStackPop();
     Value* getIRStr(const string& value);
     GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit) const;
     StructType* getStructType(const string& name, const vector<Type*>& fields);

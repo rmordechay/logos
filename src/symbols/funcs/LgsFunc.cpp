@@ -5,15 +5,14 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsDeferStmt.h"
 #include "types/LgsFuncType.h"
+#include <llvm/IR/Module.h>
 
 void LgsFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, stmtsBlock);
-    startFuncBlock(codeGen);
+    createPrologue(codeGen);
     stmtsBlock->createIRValue(codeGen);
-    createEpilogueBlock(codeGen);
-    if (!codeGen->lastInstTerminator()) {
-        codeGen->builder.CreateRetVoid();
-    }
+    createEpilogue(codeGen);
+    if (!codeGen->lastInstTerminator()) codeGen->builder.CreateRetVoid();
     codeGen->stack.exitScope();
 }
 
@@ -89,14 +88,15 @@ Value* LgsFunc::callIR(LgsCodeGen* codeGen, const vector<Value*>& args) {
     return rv;
 }
 
-void LgsFunc::startFuncBlock(LgsCodeGen* codeGen) {
+void LgsFunc::createPrologue(LgsCodeGen* codeGen) {
     const auto IRFunc = getIRFunc(codeGen);
     const auto entryBlock = codeGen->createBlock(BLOCK_NAME_ENTRY, IRFunc);
     codeGen->builder.SetInsertPoint(entryBlock);
+    codeGen->callStackPush();
 }
 
-void LgsFunc::createEpilogueBlock(LgsCodeGen* codeGen) const {
-    assert(!stmtsBlock->cleanupBlock);
+void LgsFunc::createEpilogue(LgsCodeGen* codeGen) const {
+    codeGen->callStackPop();
     if (!deferStmts.empty()) {
         codeGen->branchAndStartBlock(codeGen->createBlock(BLOCK_NAME_DEFER));
         for (const auto deferStmt : deferStmts) {

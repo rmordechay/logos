@@ -1,5 +1,6 @@
 #include "logos/LgsApp.h"
-
+#include <llvm/Support/FileSystem.h>
+#include <llvm/IR/Module.h>
 #include "configs/LgsConfig.h"
 #include "LogosLexer.h"
 #include "analysis/AntlrConverter.h"
@@ -103,7 +104,6 @@ bool LgsApp::generate() {
     for (const auto& file : files) {
         threadPool.runTask([this, file] {
             file->codeGen.setupModule(file->name, targetMachine->createDataLayout());
-            file->runtime->setRuntime(&file->codeGen);
             file->generateIR();
             if (!file->codeGen.IRModule) return;
             lock_guard lock(mtx);

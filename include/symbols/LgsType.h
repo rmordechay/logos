@@ -1,5 +1,8 @@
 #pragma once
 #include "configs/LgsErrors.h"
+#include <llvm/Target/TargetMachine.h>
+
+using namespace llvm;
 
 class LgsChar;
 class LgsVariable;

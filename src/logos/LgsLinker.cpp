@@ -1,11 +1,16 @@
 #include "logos/LgsLinker.h"
 #include "configs/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
+#include "llvm/Linker/Linker.h"
+#include <llvm/Passes/PassBuilder.h>
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include <llvm/Transforms/Utils/Cloning.h>
 #include <llvm/Transforms/Coroutines/CoroSplit.h>
 #include <llvm/Transforms/Coroutines/CoroEarly.h>
 #include <llvm/Transforms/Coroutines/CoroCleanup.h>
+#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/Support/FileSystem.h>
+#include <llvm/IRReader/IRReader.h>
 
 namespace lld::macho {
     bool link(ArrayRef<const char *> args, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);

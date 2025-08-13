@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsStmt.h"
 #include "exprs/LgsExpr.h"
+#include <llvm/IRReader/IRReader.h>
 
 class LgsReturn final : public LgsStmt {
 public:

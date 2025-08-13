@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsPaths.h"
-
+#include <llvm/Target/TargetMachine.h>
 
 class LgsFile;
 class LgsCodeGen;

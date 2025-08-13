@@ -1,5 +1,6 @@
 #pragma once
 #include "stmts/LgsStmt.h"
+#include <llvm/IRReader/IRReader.h>
 
 class LgsStmtsBlock final : public LgsValue {
 public:

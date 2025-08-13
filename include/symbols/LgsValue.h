@@ -1,6 +1,6 @@
 #pragma once
 #include "configs/LgsErrors.h"
-
+#include <llvm/Target/TargetMachine.h>
 class LgsVariable;
 class LgsExpr;
 class LgsCodeGen;

@@ -1,17 +1,15 @@
 #include "funcs/LgsMainFunc.h"
 #include "exprs/unary/LgsArrayExpr.h"
-#include "stmts/LgsDeferStmt.h"
+#include <llvm/IR/Module.h>
 #include "stmts/LgsStmtsBlock.h"
 #include "types/LgsStr.h"
 
 void LgsMainFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, stmtsBlock);
-    startFuncBlock(codeGen);
-    const auto stackInitFt = FunctionType::get(codeGen->voidTy(), {codeGen->ptrTy()}, false);
-    // codeGen->callLgsFunc("Stack_init", stackInitFt, {runtime->runtimePtr});
+    createPrologue(codeGen);
     if (!funcType->params.empty()) initMainArgs(codeGen);
     stmtsBlock->createIRValue(codeGen);
-    createEpilogueBlock(codeGen);
+    createEpilogue(codeGen);
     codeGen->builder.CreateRet(codeGen->i32(EXIT_SUCCESS));
     codeGen->stack.exitScope();
 }

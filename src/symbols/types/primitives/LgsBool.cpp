@@ -1,4 +1,3 @@
-
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/LgsNull.h"
 #include "types/LgsAny.h"
@@ -8,7 +7,6 @@
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
-
 
 string LgsBool::prettyName() {
     return name;

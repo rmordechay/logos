@@ -3,7 +3,6 @@
 
 class LgsRuntime {
 public:
-    GlobalVariable* runtimePtr = nullptr;
-    ~LgsRuntime() = default;
     void setRuntime(LgsCodeGen* codeGen);
+    ~LgsRuntime() = default;
 };

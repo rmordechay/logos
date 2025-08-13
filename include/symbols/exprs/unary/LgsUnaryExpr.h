@@ -5,6 +5,7 @@
 
 class LgsUnaryExpr : public LgsExpr {
 public:
+
     explicit LgsUnaryExpr() : LgsExpr(nullptr) {}
     explicit LgsUnaryExpr(LgsType* type) : LgsExpr(type) {}
     Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) override;
@@ -18,6 +19,13 @@ public:
     Value* gtIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* geIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* leIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* andIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* orIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* bitAndIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* bitOrIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     tuple<Value*, Value*> loadExprs(LgsCodeGen* codeGen, LgsExpr* rExpr);
     ~LgsUnaryExpr() override = default;
 };
@@ -75,6 +83,34 @@ inline Value* LgsUnaryExpr::geIR(LgsCodeGen* codeGen, LgsExpr* other) {
 inline Value* LgsUnaryExpr::leIR(LgsCodeGen* codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(codeGen, other);
     return codeGen->builder.CreateICmpSLE(l, r);
+}
+
+inline Value* LgsUnaryExpr::andIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    assert(0);
+}
+
+inline Value* LgsUnaryExpr::orIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    assert(0);
+}
+
+inline Value* LgsUnaryExpr::bitAndIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    assert(0);
+}
+
+inline Value* LgsUnaryExpr::bitOrIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    assert(0);
+}
+
+inline Value* LgsUnaryExpr::bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    assert(0);
+}
+
+inline Value* LgsUnaryExpr::rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    assert(0);
+}
+
+inline Value* LgsUnaryExpr::lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    assert(0);
 }
 
 inline tuple<Value*, Value*> LgsUnaryExpr::loadExprs(LgsCodeGen* codeGen, LgsExpr* rExpr) {
