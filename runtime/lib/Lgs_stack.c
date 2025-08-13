@@ -1,16 +1,19 @@
-#include <stdlib.h>
-#include <string.h>
+#include "LgsConfig.h"
 
-#define LGS_MAX_FRAMES 64
-#define LGS_MAX_LOCALS 16
+typedef void (*Lgs_Defer_Func)(void*);
 
 typedef struct {
-    char* locals[LGS_MAX_LOCALS];
+    Lgs_Defer_Func func;
+    void* ctx;
+} Lgs_Func_Entry;
+
+typedef struct {
+    Lgs_Func_Entry defer_funcs[LOCALS_CAPACITY];
     int local_count;
 } Lgs_Stack_Frame;
 
 typedef struct {
-    Lgs_Stack_Frame frames[LGS_MAX_FRAMES];
+    Lgs_Stack_Frame frames[STACK_FRAMES_CAPACITY];
     int top;
 } Lgs_Stack;
 
@@ -24,18 +27,17 @@ void Lgs_Stack_pop(Lgs_Stack* stack) {
     stack->top--;
 }
 
-void Lgs_Stack_addLocal(Lgs_Stack_Frame* frame, const char* name) {
-    frame->locals[frame->local_count++] = strdup(name);
+void Lgs_Stack_addDefer(Lgs_Stack* stack, void* funcPtr, void* ctx) {
+    Lgs_Stack_Frame* top = &stack->frames[stack->top];
+    const Lgs_Func_Entry func_entry = {.func = funcPtr, .ctx = ctx};
+    top->defer_funcs[top->local_count++] = func_entry;
 }
 
-char* Lgs_Stack_getLocal(const Lgs_Stack_Frame* frame, const int index) {
-    return frame->locals[index];
-}
-
-void Lgs_Stack_free(const Lgs_Stack* stack) {
-    for (int f = 0; f <= stack->top; f++) {
-        for (int i = 0; i < stack->frames[f].local_count; i++) {
-            free(stack->frames[f].locals[i]);
-        }
+void Lgs_Stack_callDefers(const Lgs_Stack* stack) {
+    const Lgs_Stack_Frame* top = &stack->frames[stack->top];
+    for (int i = 0; i < LOCALS_CAPACITY; ++i) {
+        const Lgs_Func_Entry funcEntry = top->defer_funcs[i];
+        if (!funcEntry.func) continue;
+        funcEntry.func(funcEntry.ctx);
     }
 }

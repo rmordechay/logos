@@ -1,4 +1,6 @@
 #include "logos/LgsCodeGen.h"
+
+#include "configs/LgsConfig.h"
 #include "configs/LgsDefinitions.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
@@ -14,9 +16,9 @@ void LgsCodeGen::setupModule(const string& moduleName, const DataLayout& dataLay
 }
 
 void LgsCodeGen::setRuntimePtr() {
-    const auto localsArr = ArrayType::get(ptrTy(), 16);
+    const auto localsArr = ArrayType::get(ptrTy(), LOCALS_CAPACITY);
     const auto stackFrameStruct = getStructType({localsArr, i32Ty()}, "stack_frame_ty");
-    const auto stackCapacity = ArrayType::get(stackFrameStruct, 64);
+    const auto stackCapacity = ArrayType::get(stackFrameStruct, STACK_FRAMES_CAPACITY);
     const auto stackStruct = getStructType({stackCapacity, i32Ty()}, "stack_ty");
     const auto runtimeType = getStructType({stackStruct}, "runtime_ty");
     if (IRModule->getName() == LGS_MAIN_FILE_NAME) {
@@ -24,16 +26,6 @@ void LgsCodeGen::setRuntimePtr() {
     } else {
         runtimePtr = createGlobal(runtimeType, nullptr, "runtime");
     }
-}
-
-void LgsCodeGen::callStackPush() {
-    const auto stackInitFt = FunctionType::get(voidTy(), {ptrTy()}, false);
-    callLgsFunc("Stack_push", stackInitFt, {runtimePtr});
-}
-
-void LgsCodeGen::callStackPop() {
-    const auto stackInitFt = FunctionType::get(voidTy(), {ptrTy()}, false);
-    callLgsFunc("Stack_pop", stackInitFt, {runtimePtr});
 }
 
 Value* LgsCodeGen::getIRStr(const string& value) {
@@ -92,6 +84,31 @@ Value* LgsCodeGen::callLgsFunc(const string& funcName, FunctionType* ft, const v
 Value* LgsCodeGen::callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args) {
     const auto func = IRModule->getOrInsertFunction(funcName, ft);
     return builder.CreateCall(func, args);
+}
+
+void LgsCodeGen::callStackPush() {
+    const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
+    callLgsFunc("Stack_push", ft, {runtimePtr});
+}
+
+void LgsCodeGen::callPopStack() {
+    const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
+    callLgsFunc("Stack_pop", ft, {runtimePtr});
+}
+
+void LgsCodeGen::addDeferFunc(Value* deferFuncPtr, Value* ctx) {
+    const auto ft = FunctionType::get(voidTy(), {ptrTy(), ptrTy(), ptrTy()}, false);
+    if (ctx) {
+        callLgsFunc("Stack_addDefer", ft, {runtimePtr, deferFuncPtr, ctx});
+    } else {
+        callLgsFunc("Stack_addDefer", ft, {runtimePtr, deferFuncPtr, null()});
+    }
+}
+
+void LgsCodeGen::callDefers() {
+    branchAndStartBlock(createBlock(BLOCK_NAME_DEFER));
+    const auto ft = FunctionType::get(voidTy(), false);
+    callLgsFunc("Stack_callDefers", ft, {runtimePtr});
 }
 
 Value* LgsCodeGen::callMalloc(const size_t size) {
@@ -188,6 +205,11 @@ Value* LgsCodeGen::callCoroEndFunc(Value* handle) {
 Value* LgsCodeGen::callCoroDestroyFunc(Value* handle) {
     const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_destroy);
     return builder.CreateCall(func, {handle});
+}
+
+void LgsCodeGen::storeValueInStruct(StructType* ty, Value* ptr, const int i, Value* v) {
+    const auto fieldPtr = builder.CreateStructGEP(ty, ptr, i);
+    builder.CreateStore(v, fieldPtr);
 }
 
 PointerType* LgsCodeGen::ptrTy() {

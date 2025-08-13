@@ -2,6 +2,8 @@
 #include "configs/LgsDefinitions.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "funcs/LgsBuiltinFunc.h"
+
+#include <llvm/IR/Module.h>
 #include <types/LgsVoid.h>
 #include <types/primitives/LgsLong.h>
 #include <types/LgsAny.h>
@@ -22,6 +24,12 @@ public:
         const auto formatStr = arg->type->strFormatPart() + '\n';
         const auto IRArgs = {codeGen->getIRStr(formatStr), getIRArg(codeGen, arg)};
         return codeGen->callPrintf(IRArgs);
+    }
+
+    Function* getIRFunc(LgsCodeGen* codeGen) override {
+        const auto ft = FunctionType::get(codeGen->i32Ty(), {codeGen->ptrTy()}, true);
+        auto func = codeGen->IRModule->getOrInsertFunction("printf", ft);
+        return dyn_cast<Function>(func.getCallee());
     }
 
     static Value* printFormat(LgsCodeGen* codeGen, const LgsStrConst* const strConst) {

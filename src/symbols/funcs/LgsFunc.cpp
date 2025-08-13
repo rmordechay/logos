@@ -29,8 +29,7 @@ Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(codeGen);
     const auto funcTy = cast<FunctionType>(type);
-    const auto funcIRName = string(LGS_RUNTIME_NAMES_PREFIX) + funcName;
-    auto func = codeGen->IRModule->getOrInsertFunction(funcIRName, funcTy);
+    auto func = codeGen->IRModule->getOrInsertFunction(funcName, funcTy);
     IRFunc = cast<Function>(func.getCallee());
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
@@ -96,13 +95,8 @@ void LgsFunc::createPrologue(LgsCodeGen* codeGen) {
 }
 
 void LgsFunc::createEpilogue(LgsCodeGen* codeGen) const {
-    codeGen->callStackPop();
-    if (!deferStmts.empty()) {
-        codeGen->branchAndStartBlock(codeGen->createBlock(BLOCK_NAME_DEFER));
-        for (const auto deferStmt : deferStmts) {
-            deferStmt->generateIR(codeGen);
-        }
-    }
+    if (hasDefers) codeGen->callDefers();
+    codeGen->callPopStack();
 }
 
 string LgsFunc::prettyName() {

@@ -12,9 +12,8 @@ class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
     vector<LgsReturn*> returnStmts;
-    vector<LgsDeferStmt*> deferStmts;
     LgsStmtsBlock* stmtsBlock = nullptr;
-    off_t pathIndex = 0;
+    bool hasDefers = false;
 
     explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {
         funcType = new LgsFuncType();

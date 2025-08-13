@@ -12,7 +12,6 @@ void LgsIfStmt::createIRStmt(LgsCodeGen* codeGen) {
     if (elseIfs.empty()) {
         if (!elseBlock) {
             generateSimpleIf(codeGen, ifCondIR);
-            codeGen->stack.exitScope();
         } else {
             generateIfWithElse(codeGen, ifCondIR);
         }
@@ -28,6 +27,7 @@ void LgsIfStmt::generateSimpleIf(LgsCodeGen* codeGen, Value* ifCondIR) const {
     codeGen->startBlock(IRBlockIfTrue);
     ifBlock->createIRValue(codeGen);
     codeGen->branchAndStartBlock(IRBlockIfFalse);
+    codeGen->stack.exitScope();
 }
 
 void LgsIfStmt::generateIfWithElse(LgsCodeGen* codeGen, Value* ifCondIR) {

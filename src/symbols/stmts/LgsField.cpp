@@ -4,7 +4,6 @@
 #include "exprs/unary/LgsHashMap.h"
 
 Value* LgsField::getGEP(LgsCodeGen* codeGen, Value* parentIRValue) const {
-    assert(parentIRType);
     return codeGen->builder.CreateStructGEP(parentIRType, parentIRValue, position);
 }
 
@@ -19,5 +18,8 @@ Value* LgsField::resolveVirtualField(LgsCodeGen* codeGen, const LgsHashMap* vtab
 }
 
 LgsField::~LgsField() {
-    if (expr) delete expr;
+    if (expr) {
+        delete expr;
+        expr = nullptr;
+    }
 }

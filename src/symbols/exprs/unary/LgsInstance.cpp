@@ -24,7 +24,8 @@ void LgsInstance::initFields(LgsCodeGen* codeGen, const map<string, LgsField*>& 
         const auto exprIR = arg->expr->getIRValue(codeGen);
         auto field = fields.find(argName);
         if (field != fields.end()) {
-            codeGen->builder.CreateStore(exprIR, field->second->getGEP(codeGen, IRValue));
+            const auto gep = field->second->getGEP(codeGen, IRValue);
+            codeGen->builder.CreateStore(exprIR, gep);
         }
     }
 }

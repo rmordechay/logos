@@ -22,7 +22,9 @@ public:
     void setupModule(const string& moduleName, const DataLayout& dataLayout);
     void setRuntimePtr();
     void callStackPush();
-    void callStackPop();
+    void callPopStack();
+    void addDeferFunc(Value* deferFuncPtr, Value* ctx);
+    void callDefers();
     Value* getIRStr(const string& value);
     GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit, const string& name = "") const;
     StructType* getStructType(const vector<Type*>& fields, const string& name = "");
@@ -58,6 +60,7 @@ public:
     Value* callCoroBeginFunc(Value* coroID, Value* frameSize);
     Value* callCoroEndFunc(Value* handle);
     Value* callCoroDestroyFunc(Value* handle);
+    void storeValueInStruct(StructType* ty, Value* ptr, int i, Value* v);
 
     // Types
     Type* i1Ty();

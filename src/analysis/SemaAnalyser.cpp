@@ -346,14 +346,9 @@ void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
 }
 
 void SemaAnalyser::visitDeferStmt(LgsDeferStmt* deferStmt) {
-    if (deferStmt->funcCall) {
-        visitFuncCall(deferStmt->funcCall);
-    } else if (deferStmt->selection) {
-        visitSelection(deferStmt->selection);
-    } else {
-        assert(0);
-    }
-    stack.currentFunc()->deferStmts.push_back(deferStmt);
+    if (deferStmt->funcCall) visitFuncCall(deferStmt->funcCall);
+    else visitSelection(deferStmt->selection);
+    stack.currentFunc()->hasDefers = true;
 }
 
 void SemaAnalyser::visitReturnStmt(LgsReturn* returnStmt) {
