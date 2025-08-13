@@ -27,6 +27,7 @@
 #include "loops/LgsWhileLoop.h"
 #include "stmts/LgsBreak.h"
 #include "stmts/LgsContinue.h"
+#include "stmts/LgsDeferStmt.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsDArray.h"
 #include "types/LgsGroup.h"
@@ -156,12 +157,13 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
     if (const auto ifStmt = stmt->asIfStmt()) ifStmt->isPatternMatching ? visitPatternMatching(ifStmt) : visitIfStmt(ifStmt);
     else if (const auto varDec = stmt->asVarDec()) visitVarDec(varDec);
     else if (const auto loopStmt = stmt->asLoop()) visitLoopStmt(loopStmt);
+    else if (const auto coroutine = stmt->asCoroutine()) visitCoroutine(coroutine);
+    else if (const auto deferStmt = stmt->asDefer()) visitDeferStmt(deferStmt);
     else if (const auto assignment = stmt->asAssignment()) visitAssignment(assignment);
     else if (const auto funcCall = stmt->asFuncCall()) visitFuncCall(funcCall);
     else if (const auto postfixExpr = stmt->asPostfixExpr()) visitPostfixExpr(postfixExpr);
     else if (const auto selection = stmt->asSelection()) visitSelection(selection);
     else if (const auto returnStmt = stmt->asReturn()) visitReturnStmt(returnStmt);
-    else if (const auto coroutine = stmt->asCoroutine()) visitCoroutine(coroutine);
 }
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
@@ -343,6 +345,17 @@ void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
     } else {
         assert(0);
     }
+}
+
+void SemaAnalyser::visitDeferStmt(LgsDeferStmt* deferStmt) {
+    if (deferStmt->stmtsBlock) {
+        visitStmtsBlock(deferStmt->stmtsBlock);
+    } else if (deferStmt->funcCall) {
+        visitFuncCall(deferStmt->funcCall);
+    } else if (deferStmt->selection) {
+        visitSelection(deferStmt->selection);
+    }
+    stack.currentFunc()->deferStmts.push_back(deferStmt);
 }
 
 void SemaAnalyser::visitReturnStmt(LgsReturn* returnStmt) {

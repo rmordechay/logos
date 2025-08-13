@@ -59,6 +59,7 @@ public:
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param);
     LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName);
     LgsFunc* getMethod(LogosParser::MethodContext* ctx, LgsType* obj);
+    LgsStmt* getDeferStmt(LogosParser::DeferStmtContext* ctx);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     LgsStmtsBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);

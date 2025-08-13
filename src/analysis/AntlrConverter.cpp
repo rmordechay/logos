@@ -4,6 +4,7 @@
 #include "files/LgsEnvFile.h"
 #include "files/LgsInterfaceFile.h"
 #include "LogosLexer.h"
+#include "LogosParser.h"
 #include "exprs/unary/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsBinaryExpr.h"
@@ -49,6 +50,7 @@
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
 #include <loops/LgsWhileLoop.h>
+#include <stmts/LgsDeferStmt.h>
 #include <types/LgsStr.h>
 #include <types/LgsVoid.h>
 
@@ -333,6 +335,19 @@ LgsFunc* AntlrConverter::getMethod(LogosParser::MethodContext* ctx, LgsType* obj
     return method;
 }
 
+LgsStmt* AntlrConverter::getDeferStmt(LogosParser::DeferStmtContext* ctx) {
+    const auto deferStmt = new LgsDeferStmt();
+    if (const auto stmtsBlock = ctx->statementsBlock()) {
+        deferStmt->stmtsBlock = getStmtBlock(stmtsBlock);
+    } else if (const auto funcCall = ctx->funcCall()) {
+        deferStmt->funcCall = getFuncCall(funcCall);
+    } else if (const auto selection = ctx->selection()) {
+        deferStmt->selection = getSelection(selection);
+    }
+    setLocation(deferStmt->location, ctx->start, ctx->getText());
+    return deferStmt;
+}
+
 LgsFunc* AntlrConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx) {
     const auto funcSignature = ctx->anonymosFuncSignature();
     const auto rt = getFuncReturnType(funcSignature->type());
@@ -416,6 +431,7 @@ LgsStmt* AntlrConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto implicitVarDec = ctx->implicitVarDec()) return getImplicitVarDec(implicitVarDec);
     if (const auto explicitVarDec = ctx->explicitVarDec()) return getExplicitVarDec(explicitVarDec);
     if (const auto coroutine = ctx->coroutine()) return getCoroutine(coroutine);
+    if (const auto deferStmt = ctx->deferStmt()) return getDeferStmt(deferStmt);
     if (const auto ifStmt = ctx->ifStatement()) return getIfStatement(ifStmt);
     if (const auto patternMatching = ctx->patternMatching()) return getPatternMatching(patternMatching);
     if (const auto loopStmt = ctx->loopStatement()) return getForLoop(loopStmt);

@@ -24,11 +24,11 @@ public:
     PIPE = 48, CARET = 49, DOUBLE_RANGLE = 50, DOUBLE_LANGLE = 51, OBJECT = 52, 
     SINGLETON = 53, SELF_INSTANCE = 54, SELF_CLASS = 55, INTERFACE = 56, 
     EXTERN = 57, VISIBILITY = 58, IMPLEMENTS = 59, CONST = 60, ENUM = 61, 
-    GO = 62, VEC2 = 63, VEC3 = 64, VEC4 = 65, IF = 66, ELSE = 67, FOR = 68, 
-    BREAK = 69, CONTINUE = 70, RETURN = 71, AND = 72, OR = 73, NOT = 74, 
-    IN = 75, LONG = 76, INTEGER = 77, FLOAT = 78, BOOL = 79, NULL_ = 80, 
-    IDENTIFIER = 81, STRING = 82, TAG = 83, LINE_COMMENT = 84, BLOCK_COMMENT = 85, 
-    WS = 86
+    GO = 62, DEFER = 63, VEC2 = 64, VEC3 = 65, VEC4 = 66, IF = 67, ELSE = 68, 
+    FOR = 69, BREAK = 70, CONTINUE = 71, RETURN = 72, AND = 73, OR = 74, 
+    NOT = 75, IN = 76, LONG = 77, INTEGER = 78, FLOAT = 79, BOOL = 80, NULL_ = 81, 
+    IDENTIFIER = 82, STRING = 83, TAG = 84, LINE_COMMENT = 85, BLOCK_COMMENT = 86, 
+    WS = 87
   };
 
   enum {
@@ -43,15 +43,15 @@ public:
     RuleImplicitVarDec = 29, RuleIfStatement = 30, RuleElseIfStatement = 31, 
     RuleElseStatement = 32, RulePatternMatching = 33, RulePattern = 34, 
     RuleLoopStatement = 35, RuleBreakStmt = 36, RuleReturnStatement = 37, 
-    RuleEnumDeclaration = 38, RuleEnumField = 39, RuleCoroutine = 40, RuleExpr = 41, 
-    RuleUnaryExpr = 42, RulePrefixExpr = 43, RulePostfixExpr = 44, RuleArrayExpr = 45, 
-    RuleHashMap = 46, RuleKeyValue = 47, RuleFuncCall = 48, RuleFuncArgList = 49, 
-    RuleFuncArg = 50, RuleInstance = 51, RuleInstanceArgList = 52, RuleInstanceArg = 53, 
-    RuleConstant = 54, RuleIterIndex = 55, RuleIndex = 56, RuleIsFirst = 57, 
-    RuleIsLast = 58, RuleSelection = 59, RuleFirstSelectionElement = 60, 
-    RuleInnerSelectionElement = 61, RuleRange = 62, RuleType = 63, RuleMapType = 64, 
-    RuleArraySize = 65, RuleFuncType = 66, RuleVector = 67, RuleExtern = 68, 
-    RuleRequireEnvVars = 69, RuleAssignemntOp = 70
+    RuleEnumDeclaration = 38, RuleEnumField = 39, RuleCoroutine = 40, RuleDeferStmt = 41, 
+    RuleExpr = 42, RuleUnaryExpr = 43, RulePrefixExpr = 44, RulePostfixExpr = 45, 
+    RuleArrayExpr = 46, RuleHashMap = 47, RuleKeyValue = 48, RuleFuncCall = 49, 
+    RuleFuncArgList = 50, RuleFuncArg = 51, RuleInstance = 52, RuleInstanceArgList = 53, 
+    RuleInstanceArg = 54, RuleConstant = 55, RuleIterIndex = 56, RuleIndex = 57, 
+    RuleIsFirst = 58, RuleIsLast = 59, RuleSelection = 60, RuleFirstSelectionElement = 61, 
+    RuleInnerSelectionElement = 62, RuleRange = 63, RuleType = 64, RuleMapType = 65, 
+    RuleArraySize = 66, RuleFuncType = 67, RuleVector = 68, RuleExtern = 69, 
+    RuleRequireEnvVars = 70, RuleAssignemntOp = 71
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -112,6 +112,7 @@ public:
   class EnumDeclarationContext;
   class EnumFieldContext;
   class CoroutineContext;
+  class DeferStmtContext;
   class ExprContext;
   class UnaryExprContext;
   class PrefixExprContext;
@@ -541,8 +542,9 @@ public:
     BreakStmtContext *breakStmt();
     FuncCallContext *funcCall();
     SelectionContext *selection();
-    CoroutineContext *coroutine();
     PostfixExprContext *postfixExpr();
+    CoroutineContext *coroutine();
+    DeferStmtContext *deferStmt();
 
    
   };
@@ -772,6 +774,20 @@ public:
   };
 
   CoroutineContext* coroutine();
+
+  class  DeferStmtContext : public antlr4::ParserRuleContext {
+  public:
+    DeferStmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *DEFER();
+    FuncCallContext *funcCall();
+    SelectionContext *selection();
+    StatementsBlockContext *statementsBlock();
+
+   
+  };
+
+  DeferStmtContext* deferStmt();
 
   class  ExprContext : public antlr4::ParserRuleContext {
   public:

@@ -3,13 +3,14 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "stmts/LgsDeferStmt.h"
 #include "types/LgsFuncType.h"
-#include "utils/LgsUtils.h"
 
 void LgsFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, stmtsBlock);
     startFuncBlock(codeGen);
     stmtsBlock->createIRValue(codeGen);
+    createEpilogueBlock(codeGen);
     if (!codeGen->lastInstTerminator()) {
         codeGen->builder.CreateRetVoid();
     }
@@ -61,7 +62,7 @@ Value* LgsFunc::call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) {
             IRArgs.push_back(arg);
         }
         const vector defaultParams(funcType->params.begin() + args.size(), funcType->params.end());
-        for (const auto defaultParam : defaultParams) {
+        for (const auto& defaultParam : defaultParams) {
             auto arg = defaultParam.expr->getIRValue(codeGen);
             IRArgs.push_back(arg);
         }
@@ -91,6 +92,16 @@ void LgsFunc::startFuncBlock(LgsCodeGen* codeGen) {
     const auto IRFunc = getIRFunc(codeGen);
     const auto entryBlock = codeGen->createBlock(BLOCK_NAME_ENTRY, IRFunc);
     codeGen->builder.SetInsertPoint(entryBlock);
+}
+
+void LgsFunc::createEpilogueBlock(LgsCodeGen* codeGen) const {
+    assert(!stmtsBlock->cleanupBlock);
+    if (!deferStmts.empty()) {
+        codeGen->branchAndStartBlock(codeGen->createBlock(BLOCK_NAME_DEFER));
+        for (const auto deferStmt : deferStmts) {
+            deferStmt->generateIR(codeGen);
+        }
+    }
 }
 
 string LgsFunc::prettyName() {

@@ -99,6 +99,8 @@ set(SOURCE_FILES
     src/symbols/types/LgsCPtr.cpp
     src/symbols/types/LgsNullable.cpp
     include/symbols/loops/LgsWhileLoop.h
+        src/symbols/stmts/LgsDeferStmt.cpp
+        include/symbols/stmts/LgsDeferStmt.h
 )
 
 llvm_map_components_to_libnames(LLVM_LIBS

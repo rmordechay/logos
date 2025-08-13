@@ -1,4 +1,6 @@
 #pragma once
+#include <utility>
+
 #include "LgsValue.h"
 #include "exprs/unary/LgsHashMap.h"
 
@@ -20,7 +22,7 @@ public:
     bool isOptional = false;
     Type* parentIRType = nullptr;
 
-    LgsField(const string& name, string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(name), parentName(parentName), type(type), expr(expr) {}
+    LgsField(string  name, string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(std::move(name)), parentName(parentName), type(type), expr(expr) {}
     Value* getGEP(LgsCodeGen* codeGen, Value* parentIRValue) const;
     Value* resolveVirtualField(LgsCodeGen* codeGen, const LgsHashMap* vtable, Value* parentIRValue) const;
     ~LgsField() override;

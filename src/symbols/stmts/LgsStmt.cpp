@@ -10,9 +10,11 @@
 #include "stmts/LgsReturn.h"
 #include "stmts/LgsVarDec.h"
 #include "loops/LgsForLoop.h"
+#include "stmts/LgsDeferStmt.h"
 
 LgsForLoop* LgsStmt::asLoop() { return dynamic_cast<LgsForLoop*>(this); }
 LgsCoroutine* LgsStmt::asCoroutine() { return dynamic_cast<LgsCoroutine*>(this); }
+LgsDeferStmt* LgsStmt::asDefer() { return dynamic_cast<LgsDeferStmt*>(this); }
 LgsFuncCall* LgsStmt::asFuncCall() { return dynamic_cast<LgsFuncCall*>(this); }
 LgsIfStmt* LgsStmt::asIfStmt() { return dynamic_cast<LgsIfStmt*>(this); }
 LgsPostfixExpr* LgsStmt::asPostfixExpr() { return dynamic_cast<LgsPostfixExpr*>(this); }

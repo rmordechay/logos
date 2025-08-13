@@ -1,6 +1,7 @@
 #pragma once
 #include <LgsValue.h>
 
+class LgsDeferStmt;
 class LgsCoroutine;
 class LgsPostfixExpr;
 class LgsCodeGen;
@@ -18,6 +19,7 @@ class LgsStmt : virtual public LgsValue {
 public:
     LgsForLoop* asLoop();
     LgsCoroutine* asCoroutine();
+    LgsDeferStmt* asDefer();
     LgsFuncCall* asFuncCall();
     LgsIfStmt* asIfStmt();
     LgsPostfixExpr* asPostfixExpr();

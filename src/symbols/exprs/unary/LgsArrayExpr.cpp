@@ -26,7 +26,7 @@ Value* LgsArrayExpr::createDynamicArray(LgsCodeGen* codeGen) {
         capacityIR = builder.CreateZExt(capacityIR, codeGen->i64Ty());
     } else {
         const auto capacity = initialElements.empty() ? INITIAL_ARRAY_CAPACITY : initialElements.size() * 2;
-        capacityIR = codeGen->i64(capacity);
+        capacityIR = codeGen->isize(capacity);
     }
 
     arrType->initFunc.callIR(codeGen, {IRValue, capacityIR, elementSize});

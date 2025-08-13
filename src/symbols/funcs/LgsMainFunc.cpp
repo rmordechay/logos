@@ -1,5 +1,6 @@
 #include "funcs/LgsMainFunc.h"
 #include "exprs/unary/LgsArrayExpr.h"
+#include "stmts/LgsDeferStmt.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "types/LgsStr.h"
 
@@ -10,6 +11,7 @@ void LgsMainFunc::generateIR(LgsCodeGen* codeGen) {
         initMainArgs(codeGen);
     }
     stmtsBlock->createIRValue(codeGen);
+    createEpilogueBlock(codeGen);
     codeGen->builder.CreateRet(codeGen->i32(EXIT_SUCCESS));
     codeGen->stack.exitScope();
 }
@@ -41,13 +43,19 @@ void LgsMainFunc::setMainArgs() {
 void LgsMainFunc::initMainArgs(LgsCodeGen* codeGen) {
     auto& builder = codeGen->builder;
     const vector<Type*> structFields{codeGen->i64Ty(), codeGen->i32Ty(), codeGen->i32Ty(), codeGen->ptrTy()};
-    const auto arrStruct = codeGen->getIRStructType(mainArgs->type->asDArray()->name, structFields);
+    const auto arrStruct = codeGen->getIRStructType(LgsDArray::name, structFields);
     mainArgs->IRValue = builder.CreateAlloca(arrStruct);
     initArgsFunc->callIR(codeGen, {mainArgs->IRValue, argc, argv});
     funcType->params[0].setIRValue(mainArgs->IRValue);
 }
 
 LgsMainFunc::~LgsMainFunc() {
-    if (initArgsFunc) delete initArgsFunc;
-    if (mainArgs) delete mainArgs;
+    if (initArgsFunc) {
+        delete initArgsFunc;
+        initArgsFunc = nullptr;
+    }
+    if (mainArgs) {
+        delete mainArgs;
+        mainArgs = nullptr;
+    }
 }

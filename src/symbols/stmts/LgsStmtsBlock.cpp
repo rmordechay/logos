@@ -14,8 +14,7 @@ void LgsStmtsBlock::createIRValue(LgsCodeGen* codeGen) {
 }
 
 void LgsStmtsBlock::cleanupExprs(LgsCodeGen* codeGen) {
-    const auto cleanupBB = getCleanupBlock(codeGen);
-    codeGen->branchAndStartBlock(cleanupBB);
+    codeGen->branchAndStartBlock(getCleanupBlock(codeGen));
     const auto currentFunc = codeGen->stack.currentFunc();
     if (returnExpr && codeGen->stack.isRootScope()) {
         const auto IRReturnType = currentFunc->funcType->rt->getIRType(codeGen);

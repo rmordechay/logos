@@ -52,7 +52,6 @@ objectBody:
         implements? field* method*
     ;
 
-
 field:
         VISIBILITY? CONST? IDENTIFIER COLON type (EQUAL expr)?
     ;
@@ -113,8 +112,9 @@ statement:
     |   breakStmt
     |   funcCall
     |   selection
-    |   coroutine
     |   postfixExpr
+    |   coroutine
+    |   deferStmt
     ;
 
 statementsBlock:
@@ -178,6 +178,10 @@ enumField:
 
 coroutine:
         GO (funcCall | selection | statementsBlock)
+    ;
+
+deferStmt:
+        DEFER (funcCall | selection | statementsBlock)
     ;
 
 expr:
@@ -414,6 +418,7 @@ IMPLEMENTS: 'implements';
 CONST: 'const';
 ENUM: 'enum';
 GO: 'go';
+DEFER: 'defer';
 
 VEC2: 'vec2';
 VEC3: 'vec3';
