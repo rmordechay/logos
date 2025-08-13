@@ -1,0 +1,13 @@
+func(str: Str) {
+    if false {
+        a = "3df"
+        defer print(a)
+        print("fh")
+    }
+    print(str)
+}
+
+main() {
+    defer func("after")
+    print("before")
+}

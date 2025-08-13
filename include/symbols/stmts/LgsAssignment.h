@@ -32,11 +32,10 @@ public:
     void createIRStmt(LgsCodeGen* codeGen) override;
     void createIRAssign(LgsCodeGen* codeGen) const;
     static void assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, LgsCodeGen* codeGen);
-    static void storeArrayInIterIndex(LgsCodeGen* codeGen, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr);
-    static void setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices);
+    static void assignArrayToIterIndex(LgsCodeGen* codeGen, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr);
     static void assignToSelection(LgsCodeGen* codeGen, LgsSelection* selection, LgsExpr* expr);
     static void assignToVariable(LgsCodeGen* codeGen, LgsVariable* variable, LgsExpr* expr);
-    static void storeScalarInIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsExpr* expr);
-    static void storeHashMapInIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map);
+    static void assignScalarToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsExpr* expr);
+    static void assignHashMapToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map);
     ~LgsAssignment() override;
 };

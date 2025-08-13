@@ -85,7 +85,9 @@ bool LgsApp::analyse() {
         threadPool.runTask([file, this] {
             SemaAnalyser semaAnalyser(file, globals);
             semaAnalyser.analyse();
-            if (!semaAnalyser.errHandler.successful) {
+            if (semaAnalyser.errHandler.successful) {
+                file->runtime = &runtime;
+            } else {
                 lock_guard lock(mtx);
                 errHandler.mergeErrors(semaAnalyser.errHandler);
             }
@@ -95,11 +97,13 @@ bool LgsApp::analyse() {
     return errHandler.successful;
 }
 
-bool LgsApp::generate() const {
+bool LgsApp::generate() {
     initBuild();
     ThreadPool threadPool;
     for (const auto& file : files) {
-        threadPool.runTask([file] {
+        threadPool.runTask([this, file] {
+            file->codeGen.setupModule(file->name, targetMachine->createDataLayout());
+            file->runtime->setRuntime(&file->codeGen);
             file->generateIR();
             if (!file->codeGen.IRModule) return;
             lock_guard lock(mtx);
@@ -112,7 +116,7 @@ bool LgsApp::generate() const {
 
 bool LgsApp::link() const {
     const LgsLinker linker(paths, files);
-    return linker.link();
+    return linker.link(targetMachine);
 }
 
 void LgsApp::parseSrcFile(const string& codeText, fs::path filePath) {
@@ -184,17 +188,17 @@ bool LgsApp::resolveGlobalTypes() {
     bool successful = true;
     for (const auto& file : files) {
         SemaAnalyser semaAnalyser(file, globals);
-        if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
-            for (const auto object : mainFile->objects) {
+        if (const auto mf = dynamic_cast<LgsMainFile*>(file)) {
+            for (const auto object : mf->objects) {
                 semaAnalyser.resolveObjTypes(object);
             }
-            for (const auto interface : mainFile->interfaces) {
+            for (const auto interface : mf->interfaces) {
                 semaAnalyser.resolveInterfaceTypes(interface);
             }
-            for (const auto group : mainFile->groups) {
+            for (const auto group : mf->groups) {
                 semaAnalyser.resolveGroupTypes(group);
             }
-            for (const auto [_, func] : mainFile->funcs) {
+            for (const auto [_, func] : mf->funcs) {
                 if (dynamic_cast<LgsMainFunc*>(func)) continue;
                 semaAnalyser.resolveFuncTypes(func->funcType);
             }
@@ -228,17 +232,17 @@ void LgsApp::loadEnvFiles() {
 }
 
 void LgsApp::checkRequiredEnvVars() {
-    for (const auto& requireEnvVar : appFile->requireEnvVars) {
+    for (const auto& [_, requireEnvVar] : appFile->requireEnvVars) {
         for (const auto envFile : envFiles) {
             auto found = false;
             for (const auto& varDec : envFile->varDecs) {
-                if (requireEnvVar.name == varDec->name && requireEnvVar.type->equals(varDec->type)) {
+                if (name == varDec->name && requireEnvVar->equals(varDec->type)) {
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                errHandler.addError(E10020, nullptr, {envFile->name, requireEnvVar.name});
+                errHandler.addError(E10020, nullptr, {envFile->name, name});
             }
         }
     }
@@ -263,11 +267,12 @@ void LgsApp::setupActiveEnv() {
     checkRequiredEnvVars();
 }
 
-void LgsApp::initBuild() const {
+void LgsApp::initBuild() {
     fs::remove_all(paths.buildDir);
     fs::create_directories(paths.buildDir);
     fs::create_directories(paths.buildIR);
     LgsCodeGen::initLLVM();
+    setTargetMachine();
 }
 
 void LgsApp::writeIRFiles() const {
@@ -300,11 +305,18 @@ void LgsApp::exitWithErrors() const {
         assert(strlen(lgsError.msg) > 0);
         assert(strlen(lgsError.location->filePath) > 0);
         assert(strlen(lgsError.location->code) > 0);
-        free((void*)lgsError.msg);
-        free((void*)lgsError.location->filePath);
-        free((void*)lgsError.location->code);
+        free(lgsError.msg);
+        free(lgsError.location->filePath);
+        free(lgsError.location->code);
     }
     exit(1);
+}
+
+void LgsApp::setTargetMachine() {
+    string error;
+    const auto targetTriple = sys::getDefaultTargetTriple();
+    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), nullopt);
 }
 
 LgsApp::~LgsApp() {

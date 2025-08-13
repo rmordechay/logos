@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
+set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
+set(CMAKE_C_COMPILER_LAUNCHER ccache)
 set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
 find_package(LLVM REQUIRED CONFIG)
@@ -101,6 +103,8 @@ set(SOURCE_FILES
     include/symbols/loops/LgsWhileLoop.h
         src/symbols/stmts/LgsDeferStmt.cpp
         include/symbols/stmts/LgsDeferStmt.h
+        src/logos/LgsRuntime.cpp
+        include/logos/LgsRuntime.h
 )
 
 llvm_map_components_to_libnames(LLVM_LIBS
@@ -147,5 +151,5 @@ target_link_libraries(lgs_core PUBLIC
 
 add_subdirectory(runtime)
 add_executable(lgs main.cpp)
-target_link_libraries(lgs PRIVATE lgs_core lgslib)
+target_link_libraries(lgs PRIVATE lgs_core lgs_runtime)
 add_subdirectory(tests)

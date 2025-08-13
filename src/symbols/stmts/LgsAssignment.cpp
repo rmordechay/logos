@@ -6,7 +6,6 @@
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 
-
 void LgsAssignment::createIRStmt(LgsCodeGen* codeGen) {
     Value* results = nullptr;
     switch (assignmentType) {
@@ -62,11 +61,11 @@ void LgsAssignment::createIRAssign(LgsCodeGen* codeGen) const {
 
 void LgsAssignment::assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, LgsCodeGen* codeGen) {
     if (const auto map = expr->asHashMap()) {
-        storeHashMapInIterIndex(codeGen, iterIndex, map);
+        assignHashMapToIterIndex(codeGen, iterIndex, map);
     } else if (const auto arr = expr->asArrayExpr()) {
-        storeArrayInIterIndex(codeGen, iterIndex, arr);
+        assignArrayToIterIndex(codeGen, iterIndex, arr);
     } else {
-        storeScalarInIterIndex(codeGen, iterIndex, expr);
+        assignScalarToIterIndex(codeGen, iterIndex, expr);
     }
 }
 
@@ -80,11 +79,11 @@ void LgsAssignment::assignToVariable(LgsCodeGen* codeGen, LgsVariable* variable,
     codeGen->builder.CreateStore(exprIRValue, variablePtr);
 }
 
-void LgsAssignment::storeHashMapInIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map) {
+void LgsAssignment::assignHashMapToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map) {
     assert(0);
 }
 
-void LgsAssignment::storeScalarInIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsExpr* expr) {
+void LgsAssignment::assignScalarToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsExpr* expr) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto rIRValue = expr->getIRValue(codeGen);
     const auto baseIRValue = baseExpr->getIRValue(codeGen);
@@ -100,24 +99,27 @@ void LgsAssignment::storeScalarInIterIndex(LgsCodeGen* codeGen, LgsIterIndex* it
     }
     if (const auto map = baseExpr->type->asMap()) {
         const auto key = iterIndex->index->from->getIRValue(codeGen);
-        const auto keyIRType = key->getType();
-        const auto keyPtr = codeGen->builder.CreateAlloca(keyIRType);
-        codeGen->builder.CreateStore(key, keyPtr);
-        const auto keyLoad = codeGen->builder.CreateLoad(keyIRType, keyPtr);
-        map->addFunc.callIR(codeGen, {baseIRValue, keyLoad, rIRValue});
+        map->addFunc.callIR(codeGen, {baseIRValue, key, rIRValue});
     } else {
         const auto iterPtr = iterIndex->getIRValue(codeGen);
         codeGen->builder.CreateStore(rIRValue, iterPtr);
     }
 }
 
-void LgsAssignment::storeArrayInIterIndex(LgsCodeGen* codeGen, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) {
+void LgsAssignment::assignArrayToIterIndex(LgsCodeGen* codeGen, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto IRType = baseExpr->type->getIRType(codeGen);
     const auto arrPtr = baseExpr->getIRValue(codeGen);
-    vector<Value*> IRIndices = {codeGen->i32Zero()};
+
+    // Flatten the indices and reverse them to use them as indices.
     vector<LgsIndex*> indices;
-    setIterIndices(iterIndex, indices);
+    while (iterIndex) {
+        if (iterIndex->index) indices.push_back(iterIndex->index);
+        iterIndex = baseExpr->asIterIndex();
+    }
+    reverse(indices.begin(), indices.end());
+
+    vector<Value*> IRIndices = {codeGen->i32Zero()};
     for (const auto index : indices) {
         IRIndices.emplace_back(index->from->getIRValue(codeGen));
     }
@@ -130,16 +132,6 @@ void LgsAssignment::storeArrayInIterIndex(LgsCodeGen* codeGen, const LgsIterInde
         codeGen->builder.CreateStore(rValue, gep);
         IRIndices.pop_back();
     }
-}
-
-void LgsAssignment::setIterIndices(const LgsIterIndex* iterIndex, vector<LgsIndex*>& indices) {
-    while (iterIndex) {
-        if (iterIndex->index) {
-            indices.push_back(iterIndex->index);
-        }
-        iterIndex = iterIndex->baseExpr->asIterIndex();
-    }
-    reverse(indices.begin(), indices.end());
 }
 
 LgsAssignment::~LgsAssignment() {

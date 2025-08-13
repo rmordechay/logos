@@ -65,12 +65,14 @@ Value* LgsArrayAddFunc::call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) 
     const auto arr = args[0];
     const auto exprToAdd = args[1];
     const auto exprIR = exprToAdd->getIRValue(codeGen);
-    if (exprToAdd->type->asBool()) return addBoolFunc.callIR(codeGen, {arr->getIRValue(codeGen), exprIR});
-    if (exprToAdd->type->asChar()) return addByteFunc.callIR(codeGen, {arr->getIRValue(codeGen), exprIR});
-    if (exprToAdd->type->asShort()) return addShortFunc.callIR(codeGen, {arr->getIRValue(codeGen), exprIR});
-    if (exprToAdd->type->asInt()) return addIntFunc.callIR(codeGen, {arr->getIRValue(codeGen), exprIR});
-    if (exprToAdd->type->asLong()) return addLongFunc.callIR(codeGen, {arr->getIRValue(codeGen), exprIR});
-    return callIR(codeGen, {arr->getIRValue(codeGen), exprIR});
+    const auto arrPtr = arr->getIRValue(codeGen);
+    const auto exprTy = exprToAdd->type;
+    if (exprTy->asBool()) return addBoolFunc.callIR(codeGen, {arrPtr, exprIR});
+    if (exprTy->asChar()) return addByteFunc.callIR(codeGen, {arrPtr, exprIR});
+    if (exprTy->asShort()) return addShortFunc.callIR(codeGen, {arrPtr, exprIR});
+    if (exprTy->asInt()) return addIntFunc.callIR(codeGen, {arrPtr, exprIR});
+    if (exprTy->asLong()) return addLongFunc.callIR(codeGen, {arrPtr, exprIR});
+    return callIR(codeGen, {arrPtr, exprIR});
 }
 
 LgsDArray::~LgsDArray() {

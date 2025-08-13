@@ -7,9 +7,9 @@
 void LgsMainFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, stmtsBlock);
     startFuncBlock(codeGen);
-    if (!funcType->params.empty()) {
-        initMainArgs(codeGen);
-    }
+    const auto stackInitFt = FunctionType::get(codeGen->voidTy(), {codeGen->ptrTy()}, false);
+    // codeGen->callLgsFunc("Stack_init", stackInitFt, {runtime->runtimePtr});
+    if (!funcType->params.empty()) initMainArgs(codeGen);
     stmtsBlock->createIRValue(codeGen);
     createEpilogueBlock(codeGen);
     codeGen->builder.CreateRet(codeGen->i32(EXIT_SUCCESS));

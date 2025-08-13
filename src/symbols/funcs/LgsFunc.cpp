@@ -25,11 +25,12 @@ Value* LgsFunc::createIRValue(LgsCodeGen* codeGen) {
 }
 
 Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
-    const auto funcIRName = funcType->getName();
-    auto IRFunc = codeGen->IRModule->getFunction(funcIRName);
+    const auto funcName = funcType->getName();
+    auto IRFunc = codeGen->IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(codeGen);
     const auto funcTy = cast<FunctionType>(type);
+    const auto funcIRName = string(LGS_RUNTIME_NAMES_PREFIX) + funcName;
     auto func = codeGen->IRModule->getOrInsertFunction(funcIRName, funcTy);
     IRFunc = cast<Function>(func.getCallee());
     if (funcType->params.empty()) return IRFunc;

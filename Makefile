@@ -10,10 +10,6 @@ generate_grammar:
 	java -jar bin/antlr.jar -no-listener -Dlanguage=Cpp -o src/parser Logos.g4
 	mv src/parser/*.h include/parser/
 
-run_llvm:
-	cd project/build && clang IR/Main.ll ../../cmake-build-debug/stdlib/liblgslib.a -o output
-	cd project/build && ./output
-
 run_linux_docker tests/platforms/DockerfileUbuntu:
 	docker build -f tests/platforms/DockerfileUbuntu -v $(pwd):/app -t linux . && docker run -it -v $(pwd):/app linux
 

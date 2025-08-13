@@ -1,21 +1,12 @@
 #include "logos/LgsCodeGen.h"
+#include "configs/LgsDefinitions.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 
-void LgsCodeGen::setupModule(const string& moduleName) {
-    const auto module = new Module(moduleName, context);
-    module->setTargetTriple(sys::getDefaultTargetTriple());
-    module->setDataLayout(getTargetMachine()->createDataLayout());
-    IRModule = module;
-}
-
-GlobalVariable* LgsCodeGen::createPrivateGlobal(Constant* initializer) const {
-    return new GlobalVariable(*IRModule, initializer->getType(), true, GlobalValue::PrivateLinkage, initializer);
-}
-
-GlobalVariable* LgsCodeGen::createPublicGlobal(Type* type) const {
-    const auto zeroInitializer = ConstantAggregateZero::get(type);
-    return new GlobalVariable(*IRModule, type, false, GlobalValue::ExternalLinkage, zeroInitializer);
+void LgsCodeGen::setupModule(const string& moduleName, const DataLayout& dataLayout) {
+    IRModule = new Module(moduleName, context);
+    IRModule->setTargetTriple(sys::getDefaultTargetTriple());
+    IRModule->setDataLayout(dataLayout);
 }
 
 Value* LgsCodeGen::getIRStr(const string& value) {
@@ -26,9 +17,13 @@ Value* LgsCodeGen::getIRStr(const string& value) {
         return &globals;
     }
     const auto strConstant = ConstantDataArray::getString(context, value, true);
-    const auto globalVar = createPrivateGlobal(strConstant);
+    const auto globalVar = new GlobalVariable(*IRModule, strConstant->getType(), true, GlobalValue::PrivateLinkage, strConstant);
     globalVar->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
     return globalVar;
+}
+
+GlobalVariable* LgsCodeGen::createGlobal(Type* type, ConstantAggregateZero* zeroInit) const {
+    return new GlobalVariable(*IRModule, type, false, GlobalValue::ExternalLinkage, zeroInit);
 }
 
 StructType* LgsCodeGen::getStructType(const string& name, const vector<Type*>& fields) {
@@ -61,6 +56,10 @@ void LgsCodeGen::startBlock(BasicBlock* block) {
 
 bool LgsCodeGen::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
+}
+
+Value* LgsCodeGen::callLgsFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args) {
+    return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, ft, args);
 }
 
 Value* LgsCodeGen::callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args) {
@@ -124,9 +123,8 @@ Value* LgsCodeGen::callStrLen(Value* str) {
     return callFunc("strlen", ft, {str});
 }
 
-Value* LgsCodeGen::callStrHash(Value* value) {
-    const auto ft = FunctionType::get(i32Ty(), {ptrTy()}, false);
-    return callFunc("Str_hash", ft, {value});
+Value* LgsCodeGen::callHashStr(Value* value) {
+    return callLgsFunc("hash", FunctionType::get(i32Ty(), {ptrTy()}, false), {value});
 }
 
 Value* LgsCodeGen::callCoroIDFunc() {
@@ -269,14 +267,4 @@ void LgsCodeGen::initLLVM() {
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();
     LLVMInitializeAArch64TargetInfo();
-}
-
-TargetMachine* LgsCodeGen::getTargetMachine() {
-    if (targetMachine) return targetMachine;
-    const auto targetTriple = sys::getDefaultTargetTriple();
-    string error;
-    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    lock_guard lock(mtx);
-    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), nullopt);
-    return targetMachine;
 }

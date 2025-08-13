@@ -4,7 +4,6 @@
 #include "types/LgsObject.h"
 
 void LgsMainFile::generateIR() {
-    codeGen.setupModule(LGS_MAIN_FILE_NAME);
     for (const auto object : objects) {
         object->getIRType(&codeGen);
         for (const auto& [_, method] : object->methods) {
@@ -18,12 +17,11 @@ void LgsMainFile::generateIR() {
 
 void LgsMainFile::format() {
     string indentStr = "";
-    // ofstream outFile(absPath, ios::trunc);
 }
 
 LgsMainFile::~LgsMainFile() {
-    for (const auto& func : funcs) {
-        delete func.second;
+    for (const auto& [_, func] : funcs) {
+        delete func;
     }
     for (const auto& object : objects) {
         delete object;

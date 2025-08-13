@@ -3,6 +3,7 @@
 #include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
+#include "LgsRuntime.h"
 #include "lgsc/LgsCLang.h"
 
 class LgsCodeGen;
@@ -25,12 +26,14 @@ public:
     string version;
     LgsPaths paths;
     LgsEnv activeEnv;
+    LgsRuntime runtime;
     vector<char*> args;
     LgsSymbolTable globals;
     vector<LgsFile*> files;
     LgsErrHandler errHandler;
-    LgsAppFile* appFile = nullptr;
     vector<LgsEnvFile*> envFiles;
+    LgsAppFile* appFile = nullptr;
+    TargetMachine* targetMachine = nullptr;
 
     explicit LgsApp(const fs::path& rootDirPath = "") {
         paths.initPaths(rootDirPath);
@@ -40,9 +43,9 @@ public:
     bool validate();
     bool parse();
     bool analyse();
-    bool generate() const;
+    bool generate();
     bool link() const;
-    void initBuild() const;
+    void initBuild();
     void parseSrcFile(const string& codeText, fs::path filePath = "");
     void parseEnvFile(fs::path fileEntry);
     void parseAppFile(fs::path fileEntry);
@@ -54,5 +57,6 @@ public:
     void checkRequiredEnvVars();
     void writeIRFiles() const;
     void exitWithErrors() const;
+    void setTargetMachine();
     ~LgsApp();
 };

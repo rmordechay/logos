@@ -9,7 +9,7 @@
 #include <logos/LgsCodeGen.h>
 
 extern "C" {
-    size_t Str_hash(const char* key);
+    size_t Lgs_hash(const char* key);
 }
 
 string LgsVariable::prettyName() {
@@ -64,11 +64,11 @@ LgsExpr* LgsVariable::castTo(LgsType* type) {
 Value* LgsVariable::hashValue(LgsCodeGen* codeGen) {
     switch (ref.symbolType) {
     case PARAM:
-        return codeGen->callStrHash(ref.param->getIRValue(codeGen));
+        return codeGen->callHashStr(ref.param->getIRValue(codeGen));
     case VAR_DEC:
         return ref.varDec->expr->hashValue(codeGen);
     case ENUM_FIELD:
-        return codeGen->i32(Str_hash(ref.field->name.c_str()));
+        return codeGen->i32(Lgs_hash(ref.field->name.c_str()));
     default:
         assert(0);
     }

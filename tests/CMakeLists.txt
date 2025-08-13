@@ -7,4 +7,4 @@ add_executable(lgs_tests
     sema/SemaErrorTest.cpp
 )
 target_precompile_headers(lgs_tests REUSE_FROM lgs_core)
-target_link_libraries(lgs_tests PRIVATE lgs_core lgslib)
+target_link_libraries(lgs_tests PRIVATE lgs_core lgs_runtime)

@@ -1,5 +1,5 @@
-#include "Iterator.h"
-#include "Str.h"
+#include "Lgs_iterator.h"
+#include "Lgs_helpers.h"
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -11,16 +11,16 @@ typedef struct Entry {
     char* key;
     void* value;
     struct Entry* next;
-} Entry;
+} Lgs_Map_Entry;
 
 typedef struct {
-    Entry** buckets;
+    Lgs_Map_Entry** buckets;
     size_t size;
     size_t value_size;
-} HashMap;
+} Lgs_Hashmap;
 
-static Entry* new_entry(HashMap* map, const char* key, const void* value) {
-    Entry* entry = malloc(sizeof(Entry));
+static Lgs_Map_Entry* new_entry(Lgs_Hashmap* map, const char* key, const void* value) {
+    Lgs_Map_Entry* entry = malloc(sizeof(Lgs_Map_Entry));
     entry->key = strdup(key);
     entry->value = malloc(map->value_size);
     entry->next = NULL;
@@ -28,20 +28,20 @@ static Entry* new_entry(HashMap* map, const char* key, const void* value) {
     return entry;
 }
 
-static void free_entry(Entry* current) {
+static void free_entry(Lgs_Map_Entry* current) {
     free(current->key);
     free(current);
 }
 
-void Map_init(HashMap* map, const size_t value_size) {
+void Lgs_Map_init(Lgs_Hashmap* map, const size_t value_size) {
     map->size = 0;
     map->value_size = value_size;
     map->buckets = calloc(MAP_CAPACITY, sizeof(void*));
 }
 
-void Map_add(HashMap* map, const char* key, const void* value) {
-    const size_t index = Str_hash(key);
-    Entry* entry = map->buckets[index];
+void Lgs_Map_add(Lgs_Hashmap* map, const char* key, const void* value) {
+    const size_t index = Lgs_hash(key);
+    Lgs_Map_Entry* entry = map->buckets[index];
     while (entry) {
         if (strcmp(entry->key, key) == 0) {
             memcpy(entry->value, value, map->value_size);
@@ -54,9 +54,9 @@ void Map_add(HashMap* map, const char* key, const void* value) {
     map->size++;
 }
 
-void* Map_get(const HashMap* map, const char* key) {
-    const size_t index = Str_hash(key);
-    const Entry* entry = map->buckets[index];
+void* Lgs_Map_get(const Lgs_Hashmap* map, const char* key) {
+    const size_t index = Lgs_hash(key);
+    const Lgs_Map_Entry* entry = map->buckets[index];
     while (entry) {
         if (strcmp(entry->key, key) == 0) {
             return entry->value;
@@ -69,10 +69,10 @@ void* Map_get(const HashMap* map, const char* key) {
     return NULL;
 }
 
-void Map_delete(HashMap* map, const char* key) {
-    const size_t index = Str_hash(key);
-    Entry* current = map->buckets[index];
-    Entry* prev = NULL;
+void Lgs_Map_delete(Lgs_Hashmap* map, const char* key) {
+    const size_t index = Lgs_hash(key);
+    Lgs_Map_Entry* current = map->buckets[index];
+    Lgs_Map_Entry* prev = NULL;
     while (current) {
         if (strcmp(current->key, key) == 0) {
             if (prev) {
@@ -89,23 +89,23 @@ void Map_delete(HashMap* map, const char* key) {
     }
 }
 
-size_t Map_len(const HashMap* map) {
+size_t Lgs_Map_len(const Lgs_Hashmap* map) {
     return map->size;
 }
 
-bool Map_isEmpty(const HashMap* map) {
+bool Lgs_Map_isEmpty(const Lgs_Hashmap* map) {
     return map->size == 0;
 }
 
-bool Map_isNotEmpty(const HashMap* map) {
+bool Lgs_Map_isNotEmpty(const Lgs_Hashmap* map) {
     return map->size != 0;
 }
 
-void Map_free(const HashMap* map) {
+void Lgs_Map_free(const Lgs_Hashmap* map) {
     for (size_t i = 0; i < MAP_CAPACITY; ++i) {
-        Entry* current = map->buckets[i];
+        Lgs_Map_Entry* current = map->buckets[i];
         while (current) {
-            Entry* next = current->next;
+            Lgs_Map_Entry* next = current->next;
             free_entry(current);
             current = next;
         }
@@ -113,8 +113,8 @@ void Map_free(const HashMap* map) {
     free(map->buckets);
 }
 
-bool Map_hasNext(Iterator* iter) {
-    const HashMap* map = iter->container;
+bool Lgs_Map_hasNext(Lgs_Iterator* iter) {
+    const Lgs_Hashmap* map = iter->container;
     if (iter->entry != NULL) return true;
     while (iter->current < MAP_CAPACITY) {
         if (map->buckets[iter->current] != NULL) {
@@ -126,9 +126,9 @@ bool Map_hasNext(Iterator* iter) {
     return false;
 }
 
-void* Map_next(Iterator* iter) {
-    if (!Map_hasNext(iter)) return NULL;
-    Entry* entry = iter->entry;
+void* Lgs_Map_next(Lgs_Iterator* iter) {
+    if (!Lgs_Map_hasNext(iter)) return NULL;
+    Lgs_Map_Entry* entry = iter->entry;
     iter->entry = entry->next;
     if (iter->entry == NULL) {
         iter->current++;
@@ -136,11 +136,11 @@ void* Map_next(Iterator* iter) {
     return entry;
 }
 
-void Map_initIter(HashMap* map, Iterator* iter) {
+void Lgs_Map_initIter(Lgs_Hashmap* map, Lgs_Iterator* iter) {
     iter->container = (void*)map;
     iter->current = 0;
     iter->entry = NULL;
-    iter->hasNext = Map_hasNext;
-    iter->next = Map_next;
-    iter->reset = Iter_reset;
+    iter->hasNext = Lgs_Map_hasNext;
+    iter->next = Lgs_Map_next;
+    iter->reset = Lgs_Iterator_reset;
 }

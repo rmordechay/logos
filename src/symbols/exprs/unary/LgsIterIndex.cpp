@@ -11,19 +11,19 @@ Value* LgsIterIndex::createIRValue(LgsCodeGen* codeGen) {
         return getArrGEP(codeGen);
     }
     if (const auto arr = baseExprType->asDArray()) {
-        return getIRFromArray(codeGen, arr);
+        return createIRFromArray(codeGen, arr);
     }
     if (const auto map = baseExprType->asMap()) {
-        return getIRFromMap(codeGen, map);
+        return createIRFromMap(codeGen, map);
     }
     if (const auto str = baseExprType->asStr()) {
-        return getIRFromStr(codeGen, str);
+        return createIRFromStr(codeGen, str);
     }
     assert(0);
 }
 
-Value* LgsIterIndex::getIRFromStr(LgsCodeGen* codeGen, const LgsStr* str) const {
-    if (index->to) return getStrSlice(codeGen, str);
+Value* LgsIterIndex::createIRFromStr(LgsCodeGen* codeGen, const LgsStr* str) const {
+    if (index->to) return createStrSlice(codeGen, str);
     const auto baseExprIRValue = baseExpr->getIRValue(codeGen);
     const auto baseExprIRType = baseExpr->type->getIRType(codeGen);
     const auto ptr = codeGen->builder.CreateAlloca(baseExprIRType);
@@ -32,7 +32,7 @@ Value* LgsIterIndex::getIRFromStr(LgsCodeGen* codeGen, const LgsStr* str) const 
     return codeGen->builder.CreateLoad(baseExprIRType, ptr);
 }
 
-Value* LgsIterIndex::getIRFromArray(LgsCodeGen* codeGen, LgsDArray* arr) const {
+Value* LgsIterIndex::createIRFromArray(LgsCodeGen* codeGen, LgsDArray* arr) const {
     auto& builder = codeGen->builder;
     const auto arrPtr = baseExpr->getIRValue(codeGen);
     auto indexIRValue = index->from->getIRValue(codeGen);
@@ -40,13 +40,13 @@ Value* LgsIterIndex::getIRFromArray(LgsCodeGen* codeGen, LgsDArray* arr) const {
     return arr->getFunc.callIR(codeGen, {arrPtr, indexIRValue});
 }
 
-Value* LgsIterIndex::getIRFromMap(LgsCodeGen* codeGen, LgsMap* map) const {
+Value* LgsIterIndex::createIRFromMap(LgsCodeGen* codeGen, LgsMap* map) const {
     const auto mapPtr = baseExpr->getIRValue(codeGen);
     const auto key = index->from->getIRValue(codeGen);
     return map->getFunc.callIR(codeGen, {mapPtr, key});
 }
 
-Value* LgsIterIndex::getStrSlice(LgsCodeGen* codeGen, const LgsStr* str) const {
+Value* LgsIterIndex::createStrSlice(LgsCodeGen* codeGen, const LgsStr* str) const {
     const auto intFrom = index->from->asIntConst();
     const auto intTo = index->to->asIntConst();
     const auto strConst = baseExpr->getConstStr();

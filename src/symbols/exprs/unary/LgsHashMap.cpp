@@ -1,7 +1,7 @@
 #include "exprs/unary/LgsHashMap.h"
 
 string LgsHashMap::prettyName() {
-    assert(0);
+    return type->prettyName();
 }
 
 Value* LgsHashMap::createIRValue(LgsCodeGen* codeGen) {

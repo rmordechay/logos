@@ -32,14 +32,6 @@
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
 
-#include <clang/Basic/Diagnostic.h>
-#include <clang/Driver/Compilation.h>
-#include <clang/Driver/Driver.h>
-#include <clang/Tooling/Tooling.h>
-#include <clang/CodeGen/CodeGenAction.h>
-#include <clang/Frontend/CompilerInvocation.h>
-#include <clang/Frontend/CompilerInstance.h>
-
 using namespace std;
 using namespace llvm;
 namespace fs = std::filesystem;

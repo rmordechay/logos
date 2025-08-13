@@ -1,29 +1,25 @@
 #pragma once
 #include "LgsStack.h"
 
+class LgsRuntime;
 class LgsFile;
 class LgsErrHandler;
 class LgsForLoop;
 class LgsFuncType;
 
 inline mutex mtx;
-inline TargetMachine* targetMachine = nullptr;
 
 class LgsCodeGen {
 public:
     LgsStack stack;
     LLVMContext context;
-    Value* pathIR = nullptr;
-    off_t filePathIndex = 0;
     Module* IRModule = nullptr;
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
 
-    void setupModule(const string& moduleName);
+    void setupModule(const string& moduleName, const DataLayout& dataLayout);
     Value* getIRStr(const string& value);
-    bool lastInstTerminator() const;
-    GlobalVariable* createPrivateGlobal(Constant* initializer) const;
-    GlobalVariable* createPublicGlobal(Type* type) const;
+    GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit) const;
     StructType* getStructType(const string& name, const vector<Type*>& fields);
 
     // Blocks
@@ -31,9 +27,11 @@ public:
     void startBlock(BasicBlock* block);
     void branchIfNeeded(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);
+    bool lastInstTerminator() const;
 
     // Funcs
     Value* callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args = {});
+    Value* callLgsFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args);
     Value* callMalloc(size_t size);
     Value* callPrintf(const vector<Value*>& args);
     Value* callSnprintf(const vector<Value*>& args);
@@ -43,7 +41,7 @@ public:
     Value* callGetPid();
     Value* callCwd();
     Value* callCoresNum();
-    Value* callStrHash(Value* value);
+    Value* callHashStr(Value* value);
     void callCopyMem(Value* src, Value* dest, size_t n);
     Value* callStrLen(Value* str);
 
@@ -87,6 +85,5 @@ public:
     void printStr(const string& str);
 
     static void initLLVM();
-    static TargetMachine* getTargetMachine();
     ~LgsCodeGen() = default;
 };

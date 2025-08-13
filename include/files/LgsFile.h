@@ -13,6 +13,7 @@ public:
     LgsCodeGen codeGen;
     LgsLocation location;
     LgsSymbolTable symbolTable;
+    LgsRuntime* runtime = nullptr;
     vector<LgsStrConst*> externalCPaths;
 
     explicit LgsFile(const string& name, const fs::path& path) : name(name), absPath(path) {}

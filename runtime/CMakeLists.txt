@@ -1,15 +1,15 @@
-project(lgslib C)
+project(lgs_runtime C)
 
-add_library(lgslib STATIC
-    lib/HashMap.c
-    lib/Array.c
-    lib/Str.c
-    lib/System.c
-        lib/Defer.c
-        include/Defer.h
+add_library(lgs_runtime
+        lib/Lgs_hashmap.c
+        lib/Lgs_array.c
+        lib/Lgs_helpers.c
+        lib/Lgs_system.c
+        lib/Lgs_defer.c
+        lib/Lgs_stack.c
 )
 
-target_include_directories(lgslib PUBLIC
+target_include_directories(lgs_runtime PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../runtime/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../include/configs
 )

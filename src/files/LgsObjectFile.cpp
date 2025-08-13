@@ -3,7 +3,6 @@
 #include "types/LgsObject.h"
 
 void LgsObjectFile::generateIR() {
-    codeGen.setupModule(name);
     obj->getIRType(&codeGen);
     for (const auto& [_, method] : obj->methods) {
         method->generateIR(&codeGen);

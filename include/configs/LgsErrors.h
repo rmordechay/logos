@@ -3,8 +3,8 @@
 struct LgsLocation {
     int32_t lineStart = 0;
     int32_t posInLine = 0;
-    const char* filePath = "";
-    const char* code = "";
+    char* filePath;
+    char* code;
 };
 
 struct LgsBaseError {
@@ -13,7 +13,7 @@ struct LgsBaseError {
 };
 
 struct LgsError {
-    const char* msg;
+    char* msg;
     size_t errCode;
     LgsLocation* location;
 };

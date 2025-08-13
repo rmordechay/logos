@@ -3,6 +3,12 @@
 #include "lgsc/LgsCLangVisitor.h"
 #include "logos/LgsPaths.h"
 #include "utils/LgsUtils.h"
+#include <clang/Driver/Compilation.h>
+#include <clang/Driver/Driver.h>
+#include <clang/Tooling/Tooling.h>
+#include <clang/CodeGen/CodeGenAction.h>
+#include <clang/Frontend/CompilerInvocation.h>
+#include <clang/Frontend/CompilerInstance.h>
 
 void LgsCLang::resolveCFiles(LgsFile* lgsFile) {
     for (const auto externalCPath : lgsFile->externalCPaths) {

@@ -1,7 +1,5 @@
 #include "logos/LgsLinker.h"
-
 #include "configs/LgsDefinitions.h"
-#include "files/LgsFile.h"
 #include "utils/LgsUtils.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include <llvm/Transforms/Utils/Cloning.h>
@@ -31,7 +29,7 @@ unique_ptr<Module> parseModule(LLVMContext& context, const string& path) {
     return parsedModule;
 }
 
-bool LgsLinker::link() const {
+bool LgsLinker::link(TargetMachine* targetMachine) const {
     LLVMContext context;
     unique_ptr<Module> mainModule = nullptr;
     vector<unique_ptr<Module>> modules;
@@ -49,15 +47,15 @@ bool LgsLinker::link() const {
     for (auto& module : modules) {
         llvmLinker.linkInModule(std::move(module));
     }
-    if (!generateObjFile(std::move(mainModule))) {
+    if (!generateObjFile(std::move(mainModule), targetMachine)) {
         return false;
     }
-    const auto linkCmd = "clang++ -Lstdlib -llgslib " + paths.objFilePath.string() + " -o " + paths.execFilePath.string();
+    const auto linkCmd = "clang++ -Lruntime -llgs_runtime " + paths.objFilePath.string() + " -o " + paths.execFilePath.string();
     std::system(linkCmd.c_str());
     return true;
 }
 
-bool LgsLinker::generateObjFile(unique_ptr<Module> mainModule) const {
+bool LgsLinker::generateObjFile(unique_ptr<Module> mainModule, TargetMachine* targetMachine) const {
     PassBuilder passBuilder(targetMachine);
     LoopAnalysisManager loopAnalyser;
     FunctionAnalysisManager funcAnalyser;
@@ -79,7 +77,7 @@ bool LgsLinker::generateObjFile(unique_ptr<Module> mainModule) const {
     error_code ec;
     legacy::PassManager pass;
     raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
-    const auto addedPassFailed = LgsCodeGen::getTargetMachine()->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
+    const auto addedPassFailed = targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
     if (addedPassFailed) {
         logErr(ec.message() + '\n');
         return false;

@@ -4,7 +4,10 @@
 #include <stmts/LgsStmtsBlock.h>
 
 void LgsDeferStmt::createIRStmt(LgsCodeGen* codeGen) {
-    codeGen->callFunc("Defer_init", FunctionType::get(codeGen->voidTy(), {}, false));
+    auto ptrTy = codeGen->ptrTy();
+    const auto deferNodeType = codeGen->getStructType("DeferNode", {ptrTy, ptrTy, ptrTy, ptrTy});
+    const auto deferNodePtr = codeGen->builder.CreateAlloca(deferNodeType);
+    codeGen->callLgsFunc("Defer_init", FunctionType::get(codeGen->voidTy(), {deferNodeType}, false), {deferNodePtr});
     if (funcCall) {
         for (const auto& arg : funcCall->args) {
             arg->getIRValue(codeGen);

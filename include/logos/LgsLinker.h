@@ -11,8 +11,8 @@ public:
     vector<LgsFile*> files;
 
     LgsLinker(const LgsPaths& paths, const vector<LgsFile*>& modules) : paths(paths), files(modules) {}
-    bool generateObjFile(unique_ptr<Module> mainModule) const;
-    bool link() const;
+    bool generateObjFile(unique_ptr<Module> mainModule, TargetMachine* targetMachine) const;
+    bool link(TargetMachine* targetMachine) const;
     ~LgsLinker() = default;
 };
 
