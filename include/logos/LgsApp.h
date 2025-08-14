@@ -3,6 +3,7 @@
 #include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
+#include "LogosParser.h"
 #include "lgsc/LgsCLang.h"
 
 class LgsCodeGen;
@@ -21,7 +22,7 @@ struct RequireEnvVar;
 
 class LgsApp final {
 public:
-    std::string name;
+    std::string name = "main";
     std::string version;
     LgsPaths paths;
     LgsEnv activeEnv;
@@ -45,13 +46,13 @@ public:
     bool link() const;
     void initBuild();
     void parseSrcFile(const std::string& codeText, fs::path filePath = "");
+    bool checkParserErrors(LogosParser* parser);
     void parseEnvFile(fs::path fileEntry);
     void parseAppFile(fs::path fileEntry);
     bool resolveGlobalTypes();
     void loadBuiltins();
     void loadEnvFiles();
     void setEnvVars();
-    void setupActiveEnv();
     void checkRequiredEnvVars();
     void writeIRFiles() const;
     void exitWithErrors() const;

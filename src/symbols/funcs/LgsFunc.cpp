@@ -23,11 +23,14 @@ Value* LgsFunc::createIRValue(LgsCodeGen* codeGen) {
 }
 
 Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
-    const auto funcName = funcType->getName();
+    auto funcName = funcType->getName();
     auto IRFunc = codeGen->IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(codeGen);
     const auto funcTy = cast<FunctionType>(type);
+    if (funcType->isInternal) {
+        funcName = LGS_RUNTIME_NAMES_PREFIX + funcName;
+    }
     IRFunc = codeGen->getFunc(funcName, funcTy);
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
@@ -93,7 +96,7 @@ void LgsFunc::createPrologue(LgsCodeGen* codeGen) {
 }
 
 void LgsFunc::createEpilogue(LgsCodeGen* codeGen) const {
-    if (defersCounter > 0) codeGen->callDefers();
+    if (hasDefers) codeGen->callDefers();
     codeGen->callPopStack();
 }
 

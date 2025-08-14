@@ -34,7 +34,10 @@ Function* LgsMainFunc::getIRFunc(LgsCodeGen* codeGen) {
 
 void LgsMainFunc::setMainArgs() {
     mainArgs = new LgsArrayExpr(new LgsDArray(new LgsStr()));
-    initArgsFunc = new LgsFunc("initArgs", &LGS_VOID, {LgsParam(mainArgs->type), LgsParam(&LGS_INT), LgsParam(new LgsStr())});
+    initArgsFunc = new LgsFunc("initArgs", &LGS_VOID);
+    initArgsFunc->funcType->params.emplace_back(LgsParam(mainArgs->type));
+    initArgsFunc->funcType->params.emplace_back(LgsParam(&LGS_INT));
+    initArgsFunc->funcType->params.emplace_back(LgsParam(new LgsStr()));
 }
 
 void LgsMainFunc::initMainArgs(LgsCodeGen* codeGen) {

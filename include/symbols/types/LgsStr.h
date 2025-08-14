@@ -1,24 +1,24 @@
 #pragma once
-#include "funcs/LgsBuiltinFunc.h"
+#include "funcs/LgsFunc.h"
 #include "primitives/LgsBool.h"
 #include "primitives/LgsChar.h"
 #include "primitives/LgsLong.h"
 #include "types/LgsIterable.h"
 
-class LgsStrLen final : public LgsBuiltinFunc {
+class LgsStrLen final : public LgsFunc {
 public:
     static constexpr auto name = "len";
-    explicit LgsStrLen(LgsType* parent): LgsBuiltinFunc(name, &LGS_LONG, parent->getName(), {parent}, true) {}
+    explicit LgsStrLen(LgsType* parent): LgsFunc(name, &LGS_LONG, {parent}, PUBLIC | METHOD) {}
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         return codeGen->callStrLen(args[0]->getIRValue(codeGen));
     }
     ~LgsStrLen() override = default;
 };
 
-class LgsStrIsEmpty final : public LgsBuiltinFunc {
+class LgsStrIsEmpty final : public LgsFunc {
 public:
     static constexpr auto name = "isEmpty";
-    explicit LgsStrIsEmpty(LgsType* parent): LgsBuiltinFunc(name, &LGS_BOOL, parent->getName(), {parent}, true) {}
+    explicit LgsStrIsEmpty(LgsType* parent): LgsFunc(name, &LGS_BOOL, {parent}, PUBLIC | METHOD) {}
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         const auto strLen = codeGen->callStrLen(args[0]->getIRValue(codeGen));
         return codeGen->builder.CreateICmpEQ(strLen, codeGen->builder.getInt64(0));
@@ -26,10 +26,10 @@ public:
     ~LgsStrIsEmpty() override = default;
 };
 
-class LgsStrIsNotEmpty final : public LgsBuiltinFunc {
+class LgsStrIsNotEmpty final : public LgsFunc {
 public:
     static constexpr auto name = "isNotEmpty";
-    explicit LgsStrIsNotEmpty(LgsType* parent): LgsBuiltinFunc(name, &LGS_BOOL, parent->getName(), {parent}, true) {}
+    explicit LgsStrIsNotEmpty(LgsType* parent): LgsFunc(name, &LGS_BOOL, {parent}, PUBLIC | METHOD) {}
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         const auto strLen = codeGen->callStrLen(args[0]->getIRValue(codeGen));
         return codeGen->builder.CreateICmpNE(strLen, codeGen->builder.getInt64(0));

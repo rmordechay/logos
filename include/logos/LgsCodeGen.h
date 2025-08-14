@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsStack.h"
 #include <llvm/IR/IRBuilder.h>
+#include <llvm/Passes/PassBuilder.h>
 
 class LgsRuntime;
 class LgsFile;
@@ -18,6 +19,7 @@ public:
     IRBuilderBase::InsertPoint savedIP;
     GlobalVariable* runtimePtr = nullptr;
     IRBuilder<> builder = IRBuilder(context);
+    DIBuilder* diBuilder = nullptr;
 
     void setupModule(const std::string& moduleName, const DataLayout& dataLayout);
     void setRuntimePtr();
@@ -95,5 +97,5 @@ public:
     void printStr(const std::string& str);
 
     static void initLLVM();
-    ~LgsCodeGen() = default;
+    ~LgsCodeGen();
 };

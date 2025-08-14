@@ -5,7 +5,6 @@ class LgsStmtsBlock;
 
 class LgsDeferStmt final : public LgsStmt {
 public:
-    int index = -1;
     LgsFuncCall* funcCall = nullptr;
     LgsSelection* selection = nullptr;
 

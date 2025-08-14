@@ -1,6 +1,5 @@
 #pragma once
-#include "funcs/LgsBuiltinFunc.h"
-#include "primitives/LgsBool.h"
+#include "funcs/LgsFunc.h"
 #include "primitives/LgsInt.h"
 #include "types/LgsIterable.h"
 
@@ -8,7 +7,7 @@ class LgsSArray final : public LgsIterable {
 public:
     static constexpr auto name = "SArray";
     size_t initialLength = 0;
-    LgsBuiltinFunc lenFunc{"len", &LGS_INT, name, {this}, true};
+    LgsFunc lenFunc{"len", &LGS_INT, {this}, PUBLIC | METHOD};
 
     explicit LgsSArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         unpackLength = 1;

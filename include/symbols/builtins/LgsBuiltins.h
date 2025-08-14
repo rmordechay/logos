@@ -1,18 +1,20 @@
 #pragma once
 #include "configs/LgsDefinitions.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "funcs/LgsBuiltinFunc.h"
-
 #include <llvm/IR/Module.h>
 #include <types/LgsVoid.h>
 #include <types/primitives/LgsLong.h>
 #include <types/LgsAny.h>
 
-class LgsPrint final : public LgsBuiltinFunc {
+class LgsPrint final : public LgsFunc {
 public:
     static constexpr auto name = "print";
-    explicit LgsPrint(): LgsBuiltinFunc(name, &LGS_VOID, "", {&LGS_ANY, &LGS_ANY}, true, true) {
+    explicit LgsPrint(): LgsFunc(name, &LGS_VOID) {
         funcType->IRName = "printf";
+        funcType->isPublic = true;
+        funcType->isVariadic = true;
+        funcType->params.emplace_back(LgsParam(&LGS_ANY));
+        funcType->params.emplace_back(LgsParam(&LGS_ANY));
     }
 
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {

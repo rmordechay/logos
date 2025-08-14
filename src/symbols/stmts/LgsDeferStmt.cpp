@@ -8,10 +8,15 @@
 void LgsDeferStmt::createIRStmt(LgsCodeGen* codeGen) {
     const auto fc = funcCall ? funcCall : selection->lastExpr()->asFuncCall();
     const auto ctxTy = getCtxType(codeGen);
-    const auto ctx = codeGen->builder.CreateAlloca(ctxTy);
-    for (int i = 0; i < fc->args.size(); i++) {
-        Value* v = fc->args[i]->getIRValue(codeGen);
-        codeGen->storeValueInStruct(dyn_cast<StructType>(ctxTy), ctx, i, v);
+    Value* ctx;
+    if (!fc->args.empty()) {
+        ctx = codeGen->builder.CreateAlloca(ctxTy);
+        for (int i = 0; i < fc->args.size(); i++) {
+            Value* v = fc->args[i]->getIRValue(codeGen);
+            codeGen->storeValueInStruct(dyn_cast<StructType>(ctxTy), ctx, i, v);
+        }
+    } else {
+        ctx = codeGen->null();
     }
     const auto func = createThunkFunc(codeGen, ctxTy);
     codeGen->addDeferFunc(func, ctx);

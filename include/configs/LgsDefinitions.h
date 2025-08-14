@@ -12,11 +12,7 @@
 #define LGS_SELF "self"
 #define LGS_LOOP_IS_FIRST "for.isFirst"
 #define LGS_LOOP_IS_LAST "for.isLast"
-#define LGS_OBJECT_FILE "main.o"
-#define LGS_EXECUTABLE_FILE "output"
 #define LGS_STR_FMT_PLACEHOLDER "$!v!$"
-#define LGS_MSG_PLACEHOLDER "%s"
-#define LGS_MSG_PADDING_PLACEHOLDER "%p"
 #define LGS_ERROR_PADDING "\n\t\t"
 #define LGS_ERROR_STR "\033[1;31mError:\033[0m  "
 

@@ -7,11 +7,13 @@
 #include <llvm/IR/Module.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/TargetParser/Host.h>
+#include <llvm/IR/DIBuilder.h>
 
 void LgsCodeGen::setupModule(const std::string& moduleName, const DataLayout& dataLayout) {
     IRModule = new Module(moduleName, context);
     IRModule->setTargetTriple(sys::getDefaultTargetTriple());
     IRModule->setDataLayout(dataLayout);
+    diBuilder = new DIBuilder(*IRModule);
     setRuntimePtr();
 }
 
@@ -104,11 +106,7 @@ void LgsCodeGen::callPopStack() {
 
 void LgsCodeGen::addDeferFunc(Value* deferFuncPtr, Value* ctx) {
     const auto ft = FunctionType::get(voidTy(), {ptrTy(), ptrTy(), ptrTy()}, false);
-    if (ctx) {
-        callLgsFunc("Stack_addDefer", ft, {runtimePtr, deferFuncPtr, ctx});
-    } else {
-        callLgsFunc("Stack_addDefer", ft, {runtimePtr, deferFuncPtr, null()});
-    }
+    callLgsFunc("Stack_addDefer", ft, {runtimePtr, deferFuncPtr, ctx});
 }
 
 void LgsCodeGen::callDefers() {
@@ -327,4 +325,11 @@ void LgsCodeGen::initLLVM() {
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();
     LLVMInitializeAArch64TargetInfo();
+}
+
+LgsCodeGen::~LgsCodeGen() {
+    if (diBuilder) {
+        delete diBuilder;
+        diBuilder = nullptr;
+    }
 }

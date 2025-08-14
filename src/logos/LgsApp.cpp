@@ -65,6 +65,7 @@ bool LgsApp::validate() {
 
 bool LgsApp::parse() {
     loadBuiltins();
+    // parseAppFile(paths.appFilePath);
     ThreadPool threadPool;
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
@@ -123,11 +124,7 @@ void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     const auto ast = parser.logosFile();
-    if (parser.getNumberOfSyntaxErrors() != 0) {
-        std::lock_guard lock(mtx);
-        errHandler.setUnsuccessful();
-        return;
-    }
+    if (checkParserErrors(&parser)) return;
     AntlrConverter antlrConverter(filePath, globals);
     const auto file = antlrConverter.getLogosFile(ast);
     files.push_back(file);
@@ -145,30 +142,17 @@ void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
     }
 }
 
-void LgsApp::parseEnvFile(fs::path fileEntry) {
-    const auto absFilePath = new fs::path(fs::canonical(fileEntry));
-    AntlrConverter antlerConverter(*absFilePath, globals);
-    const auto codeText = getFileText(fileEntry);
-    antlr4::ANTLRInputStream input(codeText);
-    LogosLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
-    LogosParser parser(&tokens);
-    auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
-    std::lock_guard lock(mtx);
-    envFiles.emplace_back(file);
-    errHandler.mergeErrors(antlerConverter.errHandler);
-}
-
 void LgsApp::parseAppFile(fs::path fileEntry) {
-    const auto absFilePath = new fs::path(fs::canonical(fileEntry));
-    AntlrConverter antlerConverter(*absFilePath, globals);
+    const auto absFilePath = fs::path(fs::canonical(fileEntry));
+    if (!fs::exists(absFilePath)) return;
     auto codeText = getFileText(fileEntry);
+    AntlrConverter antlerConverter(absFilePath, globals);
     antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-
     appFile = antlerConverter.getAppFile(parser.logosAppFile());
+    if (checkParserErrors(&parser)) return;
     for (const auto& varDec : appFile->varDecs) {
         if (varDec->name == "name") {
             name = varDec->expr->asStrConst()->value;
@@ -180,6 +164,30 @@ void LgsApp::parseAppFile(fs::path fileEntry) {
             activeEnv.name = varDec->expr->asStrConst()->value;
         }
     }
+}
+
+void LgsApp::parseEnvFile(fs::path fileEntry) {
+    const auto absFilePath = fs::path(fs::canonical(fileEntry));
+    const auto codeText = getFileText(fileEntry);
+    AntlrConverter antlerConverter(absFilePath, globals);
+    antlr4::ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    antlr4::CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+    auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
+    if (checkParserErrors(&parser)) return;
+    std::lock_guard lock(mtx);
+    envFiles.emplace_back(file);
+    errHandler.mergeErrors(antlerConverter.errHandler);
+}
+
+bool LgsApp::checkParserErrors(LogosParser* parser) {
+    if (parser->getNumberOfSyntaxErrors() != 0) {
+        std::lock_guard lock(mtx);
+        errHandler.setUnsuccessful();
+        return true;
+    }
+    return false;
 }
 
 bool LgsApp::resolveGlobalTypes() {
@@ -258,19 +266,14 @@ void LgsApp::setEnvVars() {
     }
 }
 
-void LgsApp::setupActiveEnv() {
-    setEnvVars();
-    parseAppFile(paths.appFilePath);
-    loadEnvFiles();
-    checkRequiredEnvVars();
-}
-
 void LgsApp::initBuild() {
     fs::remove_all(paths.buildDir);
     fs::create_directories(paths.buildDir);
     fs::create_directories(paths.buildIR);
     LgsCodeGen::initLLVM();
     setTargetMachine();
+    paths.objFilePath = paths.buildDir / (name + ".o");
+    paths.execFilePath = paths.buildDir / name;
 }
 
 void LgsApp::writeIRFiles() const {

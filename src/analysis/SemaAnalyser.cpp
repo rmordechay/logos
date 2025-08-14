@@ -344,10 +344,10 @@ void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
     }
 }
 
-void SemaAnalyser::visitDeferStmt(LgsDeferStmt* deferStmt) {
+void SemaAnalyser::visitDeferStmt(const LgsDeferStmt* deferStmt) {
     if (deferStmt->funcCall) visitFuncCall(deferStmt->funcCall);
     else visitSelection(deferStmt->selection);
-    deferStmt->index = stack.currentFunc()->defersCounter++;
+    stack.currentFunc()->hasDefers = true;
 }
 
 void SemaAnalyser::visitReturnStmt(LgsReturn* returnStmt) {
@@ -922,9 +922,12 @@ bool SemaAnalyser::validateMethodVisibility(LgsFuncCall* methodCall, const LgsOb
     if (parent && parent->singleton) return true;
     const auto method = methodCall->func;
     if (!method || method->funcType->isVirtual) return false;
-    if (!method->funcType->isPublic && file->absPath != method->location.filePath) {
-        errHandler.addError(E10031, &methodCall->location, {method->funcType->name, method->funcType->parentName});
-        return false;
+    if (!method->funcType->isPublic) {
+        assert(method->location.filePath);
+        if (file->absPath != method->location.filePath) {
+            errHandler.addError(E10031, &methodCall->location, {method->funcType->name, method->funcType->parentName});
+            return false;
+        }
     }
     return true;
 }

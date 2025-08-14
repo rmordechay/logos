@@ -2,6 +2,9 @@
 #include "configs/LgsDefinitions.h"
 #include "logos/LgsCodeGen.h"
 
+#define MSG_PLACEHOLDER "%s"
+#define MSG_PADDING_PLACEHOLDER "%p"
+
 void LgsErrHandler::setUnsuccessful() {
     successful = false;
 }
@@ -11,15 +14,15 @@ void LgsErrHandler::addError(const LgsBaseError& lgsErr, LgsLocation* location, 
     auto pos = 0;
     auto argIndex = 0;
     auto result = std::string(lgsErr.msg);
-    while ((pos = result.find(LGS_MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
-        result.replace(pos, std::string(LGS_MSG_PLACEHOLDER).size(), args[argIndex]);
+    while ((pos = result.find(MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
+        result.replace(pos, std::string(MSG_PLACEHOLDER).size(), args[argIndex]);
         pos += args[argIndex].length();
         argIndex++;
     }
     pos = 0;
     argIndex = 0;
-    while ((pos = result.find(LGS_MSG_PADDING_PLACEHOLDER, pos)) != std::string::npos) {
-        result.replace(pos, std::string(LGS_MSG_PADDING_PLACEHOLDER).size(), LGS_ERROR_PADDING);
+    while ((pos = result.find(MSG_PADDING_PLACEHOLDER, pos)) != std::string::npos) {
+        result.replace(pos, std::string(MSG_PADDING_PLACEHOLDER).size(), LGS_ERROR_PADDING);
         pos += args[argIndex].length();
         argIndex++;
     }

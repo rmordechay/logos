@@ -11,9 +11,10 @@ public:
     std::vector<LgsParam> params;
     bool isMethod = false;
     bool isPublic = false;
+    bool isInternal = false;
     bool isVirtual = false;
     bool isVariadic = false;
-    bool isStatic = true;
+    bool isStatic = false;
     bool isOptional = false;
     bool isTerminator = false;
     bool hasDefaults = false;
