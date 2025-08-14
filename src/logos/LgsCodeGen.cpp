@@ -20,11 +20,11 @@ void LgsCodeGen::setRuntimePtr() {
     const auto stackFrameStruct = getStructType({localsArr, i32Ty()}, "stack_frame_ty");
     const auto stackCapacity = ArrayType::get(stackFrameStruct, STACK_FRAMES_CAPACITY);
     const auto stackStruct = getStructType({stackCapacity, i32Ty()}, "stack_ty");
-    const auto runtimeType = getStructType({stackStruct}, "runtime_ty");
+    const auto runtimeTy = getStructType({stackStruct}, "runtime_ty");
     if (IRModule->getName() == LGS_MAIN_FILE_NAME) {
-        runtimePtr = createGlobal(runtimeType, ConstantAggregateZero::get(runtimeType), "runtime");
+        runtimePtr = createGlobal(runtimeTy, ConstantAggregateZero::get(runtimeTy), "runtime");
     } else {
-        runtimePtr = createGlobal(runtimeType, nullptr, "runtime");
+        runtimePtr = createGlobal(runtimeTy, nullptr, "runtime");
     }
 }
 
@@ -210,6 +210,11 @@ Value* LgsCodeGen::callCoroDestroyFunc(Value* handle) {
 void LgsCodeGen::storeValueInStruct(StructType* ty, Value* ptr, const int i, Value* v) {
     const auto fieldPtr = builder.CreateStructGEP(ty, ptr, i);
     builder.CreateStore(v, fieldPtr);
+}
+
+Value* LgsCodeGen::loadValueFromStruct(Type* ty, Value* ptr, const int i) {
+    const auto gep = builder.CreateStructGEP(ty, ptr, i);
+    return builder.CreateLoad(ty->getStructElementType(i), gep);
 }
 
 PointerType* LgsCodeGen::ptrTy() {

@@ -1,4 +1,6 @@
 #pragma once
+#include <utility>
+
 #include "LgsType.h"
 
 class LgsInstance;
@@ -12,15 +14,15 @@ public:
     LgsHashMap* vtable = nullptr;
     LgsInstance* singleton = nullptr;
 
-    explicit LgsObject(const std::string& name) : name(name) {}
+    explicit LgsObject(std::string  name) : name(std::move(name)) {}
     std::string prettyName() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    std::string strFormatPart() const override;
+    [[nodiscard]] std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
-    bool hasVirtuals() const;
+    [[nodiscard]] bool hasVirtuals() const;
     void freeValue(LgsCodeGen* codeGen, Value* value) override;
     LgsObject* clone();
     ~LgsObject() override;

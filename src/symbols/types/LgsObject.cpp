@@ -21,7 +21,7 @@ Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
         vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
         elementTypes[0] = vtable->type->getIRType(codeGen);
     }
-    for (const auto [fieldName, field] : fields) {
+    for (const auto& [fieldName, field] : fields) {
         field->position += fieldsStartOffset;
         Type* fieldType;
         if (field->type->asObject()) {
@@ -35,7 +35,7 @@ Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
     if (!IRType) {
         IRType = StructType::create(codeGen->context, elementTypes, name);
     }
-    for (const auto [_, field] : fields) {
+    for (const auto& [_, field] : fields) {
         field->parentIRType = IRType;
     }
     return IRType;
@@ -48,7 +48,7 @@ LgsExpr* LgsObject::getZeroValue() {
 std::string LgsObject::strFormatPart() const {
     std::stringstream str;
     str << '{';
-    for (const auto [fieldName, field] : fields) {
+    for (const auto& [fieldName, field] : fields) {
         str << fieldName << " = " << field->type->strFormatPart();
     }
     str << '}';
@@ -68,12 +68,9 @@ bool LgsObject::equals(LgsType* other) {
 }
 
 bool LgsObject::hasVirtuals() const {
-    for (const auto [_, method] : methods) {
-        if (method->funcType->isVirtual) {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(methods.begin(), methods.end(), [](const auto& pair) {
+        return pair.second->funcType->isVirtual;
+    });
 }
 
 void LgsObject::freeValue(LgsCodeGen* codeGen, Value* value) {
@@ -83,7 +80,7 @@ void LgsObject::freeValue(LgsCodeGen* codeGen, Value* value) {
 LgsObject* LgsObject::clone() {
     const auto cloned = new LgsObject(*this);
     cloned->fields.clear();
-    for (const auto [fieldName, field] : fields) {
+    for (const auto& [fieldName, field] : fields) {
         cloned->fields[fieldName] = new LgsField(*field);
     }
     return cloned;
@@ -102,7 +99,10 @@ size_t LgsObject::getSizeBytes() {
 }
 
 LgsObject::~LgsObject() {
-    if (vtable) delete vtable;
+    if (vtable) {
+        delete vtable;
+        vtable = nullptr;
+    }
     for (const auto interface : interfaces) {
         freeType(interface);
     }

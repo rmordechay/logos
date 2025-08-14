@@ -61,6 +61,7 @@ public:
     Value* callCoroEndFunc(Value* handle);
     Value* callCoroDestroyFunc(Value* handle);
     void storeValueInStruct(StructType* ty, Value* ptr, int i, Value* v);
+    Value* loadValueFromStruct(Type* ty, Value* ptr, int i);
 
     // Types
     Type* i1Ty();
