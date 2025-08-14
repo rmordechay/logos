@@ -23,6 +23,8 @@ void LgsCli::execute() const {
         LgsGenerateCmd command(argc, argv);
         command.validate();
         command.runCmd();
+    } else if (cmd == "help") {
+        printHelp();
     } else if (cmd == "version" || cmd == "-v" || cmd == "--version") {
         printVersion();
     }

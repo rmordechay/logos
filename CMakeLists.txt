@@ -5,13 +5,31 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
-set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
-set(CMAKE_C_COMPILER_LAUNCHER ccache)
+find_program(CCACHE_PROGRAM ccache)
+if (CCACHE_PROGRAM)
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+    set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+endif()
+
 set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
 find_package(antlr4-runtime REQUIRED)
+
+llvm_map_components_to_libnames(LLVM_LIBS
+        support
+        core
+        irreader
+        linker
+        aarch64codegen
+        asmparser
+        asmprinter
+        coroutines
+        passes
+        aarch64asmparser
+        option
+)
 
 set(SOURCE_FILES
     src/utils/LgsErrHandler.cpp
@@ -76,6 +94,7 @@ set(SOURCE_FILES
     src/symbols/stmts/LgsStmt.cpp
     src/symbols/stmts/LgsStmtsBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
+    src/symbols/stmts/LgsDeferStmt.cpp
     src/symbols/types/primitives/LgsBool.cpp
     src/symbols/types/primitives/LgsChar.cpp
     src/symbols/types/primitives/LgsFloat.cpp
@@ -100,38 +119,17 @@ set(SOURCE_FILES
     src/symbols/types/LgsIterator.cpp
     src/symbols/types/LgsCPtr.cpp
     src/symbols/types/LgsNullable.cpp
-    include/symbols/loops/LgsWhileLoop.h
-        src/symbols/stmts/LgsDeferStmt.cpp
-        include/symbols/stmts/LgsDeferStmt.h
-)
-
-llvm_map_components_to_libnames(LLVM_LIBS
-    support
-    core
-    irreader
-    linker
-    aarch64codegen
-    asmparser
-    asmprinter
-    coroutines
-    passes
-    aarch64asmparser
-    option
 )
 
 add_library(lgs_core ${SOURCE_FILES})
-target_precompile_headers(lgs_core PRIVATE include/pch.h)
-
 target_include_directories(lgs_core PUBLIC
-        include/external/antlr4-runtime
+    include/external/include
+    include/external/antlr4-runtime
     ${CLANG_INCLUDE_DIRS}
-    ${ANTLR4_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
     ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
-        include/external/include
 )
-
 target_link_libraries(lgs_core PUBLIC
     ${LLVM_LIBS}
     clangBasic
@@ -148,6 +146,7 @@ target_link_libraries(lgs_core PUBLIC
 )
 
 add_subdirectory(runtime)
+target_precompile_headers(lgs_core PRIVATE include/pch.h)
 add_executable(lgs main.cpp)
 target_link_libraries(lgs PRIVATE lgs_core lgs_runtime)
 add_subdirectory(tests)
