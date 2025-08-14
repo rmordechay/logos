@@ -17,7 +17,6 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
-#include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
@@ -35,11 +34,11 @@
 #include "types/LgsNullable.h"
 #include "types/LgsUnknownType.h"
 #include "utils/LgsUtils.h"
-#include <loops/LgsForeachLoop.h>
-#include <loops/LgsForLoop.h>
-#include <loops/LgsRangeLoop.h>
-#include <stmts/LgsAssignment.h>
-#include <stmts/LgsIfStmt.h>
+#include "loops/LgsForeachLoop.h"
+#include "loops/LgsForLoop.h"
+#include "loops/LgsRangeLoop.h"
+#include "stmts/LgsAssignment.h"
+#include "stmts/LgsIfStmt.h"
 
 void SemaAnalyser::analyse() {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
@@ -533,6 +532,9 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     case PARAM:
         variable->ref.param = symbol->param;
         variable->setType(symbol->param->type);
+        if (variable->ref.param->isSelf) {
+            stack.currentFunc()->funcType->isStatic = false;
+        }
         break;
     case ENUM:
         variable->ref.lgsEnum = symbol->lgsEnum;

@@ -37,6 +37,7 @@ public:
     bool lastInstTerminator() const;
 
     // Funcs
+    Function* getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     Value* callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
     Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args);
     Value* callMalloc(size_t size);

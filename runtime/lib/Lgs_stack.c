@@ -41,12 +41,3 @@ void Lgs_Stack_callDefers(const Lgs_Stack* stack) {
         funcEntry.func(funcEntry.ctx);
     }
 }
-
-void Lgs_Stack_getDefers(const Lgs_Stack* stack) {
-    const Lgs_Stack_Frame* top = &stack->frames[stack->top];
-    for (int i = 0; i < LOCALS_CAPACITY; ++i) {
-        const Lgs_Func_Entry funcEntry = top->defer_funcs[i];
-        if (!funcEntry.func) continue;
-        funcEntry.func(funcEntry.ctx);
-    }
-}

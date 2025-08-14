@@ -3,7 +3,6 @@
 #include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
-#include "LgsRuntime.h"
 #include "lgsc/LgsCLang.h"
 
 class LgsCodeGen;
@@ -26,7 +25,6 @@ public:
     std::string version;
     LgsPaths paths;
     LgsEnv activeEnv;
-    LgsRuntime runtime;
     std::vector<char*> args;
     LgsSymbolTable globals;
     std::vector<LgsFile*> files;

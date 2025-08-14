@@ -1,7 +1,5 @@
 #include "files/LgsInterfaceFile.h"
-
 #include "funcs/LgsFunc.h"
-#include "logos/LgsRuntime.h"
 #include "types/LgsInterface.h"
 
 void LgsInterfaceFile::generateIR() {

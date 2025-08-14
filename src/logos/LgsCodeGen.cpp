@@ -77,13 +77,19 @@ bool LgsCodeGen::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
 }
 
-Value* LgsCodeGen::callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args) {
-    return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, ft, args);
+Function* LgsCodeGen::getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage) const {
+    const auto func = IRModule->getFunction(funcName);
+    if (func) return func;
+    return Function::Create(ft, linkage, funcName, IRModule);
 }
 
 Value* LgsCodeGen::callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args) {
-    const auto func = IRModule->getOrInsertFunction(funcName, ft);
+    const auto func = getFunc(funcName, ft);
     return builder.CreateCall(func, args);
+}
+
+Value* LgsCodeGen::callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args) {
+    return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, ft, args);
 }
 
 void LgsCodeGen::callStackPush() {

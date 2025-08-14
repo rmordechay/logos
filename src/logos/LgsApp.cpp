@@ -86,10 +86,8 @@ bool LgsApp::analyse() {
         threadPool.runTask([file, this] {
             SemaAnalyser semaAnalyser(file, globals);
             semaAnalyser.analyse();
-            if (semaAnalyser.errHandler.successful) {
-                file->runtime = &runtime;
-            } else {
-                std::lock_guard lock(mtx);
+            std::lock_guard lock(mtx);
+            if (!semaAnalyser.errHandler.successful) {
                 errHandler.mergeErrors(semaAnalyser.errHandler);
             }
         });

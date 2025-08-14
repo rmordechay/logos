@@ -22,8 +22,7 @@ Function* LgsMainFunc::getIRFunc(LgsCodeGen* codeGen) {
     } else {
         mainFuncType = FunctionType::get(codeGen->i32Ty(), {codeGen->i32Ty(), codeGen->builder.getPtrTy()}, false);
     }
-    auto func = codeGen->IRModule->getOrInsertFunction(LGS_MAIN_FUNC_NAME, mainFuncType);
-    IRFunc = dyn_cast<Function>(func.getCallee());
+    IRFunc = codeGen->getFunc(LGS_MAIN_FUNC_NAME, mainFuncType);
     if (funcType->params.empty()) return IRFunc;
     auto IRArgs = IRFunc->arg_begin();
     argc = IRArgs;

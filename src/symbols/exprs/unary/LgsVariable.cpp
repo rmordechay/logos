@@ -25,6 +25,7 @@ Value* LgsVariable::createIRValue(LgsCodeGen* codeGen) {
     case FUNC:
         return ref.func->getIRFunc(codeGen);
     case OBJECT:
+        assert(ref.object->singleton);
         return ref.object->singleton->getIRValue(codeGen);
     case ENUM:
     case ENUM_FIELD:

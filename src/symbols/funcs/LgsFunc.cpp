@@ -28,8 +28,7 @@ Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(codeGen);
     const auto funcTy = cast<FunctionType>(type);
-    auto func = codeGen->IRModule->getOrInsertFunction(funcName, funcTy);
-    IRFunc = cast<Function>(func.getCallee());
+    IRFunc = codeGen->getFunc(funcName, funcTy);
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
     for (int i = funcType->isStatic; i < funcType->params.size(); ++i) {

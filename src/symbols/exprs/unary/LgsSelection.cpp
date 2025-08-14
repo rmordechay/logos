@@ -1,6 +1,5 @@
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsIterIndex.h"
-#include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsInstance.h"
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
@@ -14,22 +13,16 @@ void LgsSelection::createIRStmt(LgsCodeGen* codeGen) {
     resolveSelection(codeGen);
 }
 
-LgsInstance* getSingleton(LgsExpr* expr) {
-    const auto parentAsVar = expr->asVariable();
-    if (parentAsVar->ref.symbolType == OBJECT && parentAsVar->ref.object->singleton) {
-        return parentAsVar->ref.object->singleton;
-    }
-    return nullptr;
-}
-
 Value* LgsSelection::resolveSelection(LgsCodeGen* codeGen) {
-    for (int i = 0; i < exprs.size() - 1; ++i) {
-        auto parentExpr = exprs[i];
+    auto startIndex = 0;
+    const auto parentAsVar = exprs.front()->asVariable();
+    if (parentAsVar && parentAsVar->ref.symbolType == OBJECT) {
+        exprs.front() = parentAsVar->ref.object->singleton;
+        startIndex = 1;
+    }
+    for (int i = startIndex; i < exprs.size() - 1; ++i) {
+        const auto parentExpr = exprs[i];
         const auto childExpr = exprs[i + 1];
-        const auto singleton = getSingleton(parentExpr);
-        if (i == 0 && singleton) {
-            parentExpr = singleton;
-        }
         if (const auto var = childExpr->asVariable()) {
             const auto field = parentExpr->type->getField(var->name);
             Value* v;

@@ -103,8 +103,6 @@ set(SOURCE_FILES
     include/symbols/loops/LgsWhileLoop.h
         src/symbols/stmts/LgsDeferStmt.cpp
         include/symbols/stmts/LgsDeferStmt.h
-        src/logos/LgsRuntime.cpp
-        include/logos/LgsRuntime.h
 )
 
 llvm_map_components_to_libnames(LLVM_LIBS

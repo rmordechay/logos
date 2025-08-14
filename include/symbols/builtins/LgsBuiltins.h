@@ -28,8 +28,7 @@ public:
 
     Function* getIRFunc(LgsCodeGen* codeGen) override {
         const auto ft = FunctionType::get(codeGen->i32Ty(), {codeGen->ptrTy()}, true);
-        auto func = codeGen->IRModule->getOrInsertFunction("printf", ft);
-        return dyn_cast<Function>(func.getCallee());
+        return codeGen->getFunc("printf", ft);
     }
 
     static Value* printFormat(LgsCodeGen* codeGen, const LgsStrConst* const strConst) {
