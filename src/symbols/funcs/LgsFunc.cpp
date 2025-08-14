@@ -53,14 +53,14 @@ Value* LgsFunc::getIRArg(LgsCodeGen* codeGen, LgsExpr* arg) {
     return v;
 }
 
-Value* LgsFunc::call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) {
-    vector<Value*> IRArgs;
+Value* LgsFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
+    std::vector<Value*> IRArgs;
     if (funcType->hasDefaults) {
         for (int i = funcType->isStatic; i < args.size(); ++i) {
             auto arg = getIRArg(codeGen, args[i]);
             IRArgs.push_back(arg);
         }
-        const vector defaultParams(funcType->params.begin() + args.size(), funcType->params.end());
+        const std::vector defaultParams(funcType->params.begin() + args.size(), funcType->params.end());
         for (const auto& defaultParam : defaultParams) {
             auto arg = defaultParam.expr->getIRValue(codeGen);
             IRArgs.push_back(arg);
@@ -74,7 +74,7 @@ Value* LgsFunc::call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) {
     return callIR(codeGen, IRArgs);
 }
 
-Value* LgsFunc::callIR(LgsCodeGen* codeGen, const vector<Value*>& args) {
+Value* LgsFunc::callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args) {
     CallInst* rv = nullptr;
     if (IRValue) {
         const auto funcTypeIR = funcType->getIRType(codeGen);
@@ -95,16 +95,16 @@ void LgsFunc::createPrologue(LgsCodeGen* codeGen) {
 }
 
 void LgsFunc::createEpilogue(LgsCodeGen* codeGen) const {
-    if (hasDefers) codeGen->callDefers();
+    if (defersCounter > 0) codeGen->callDefers();
     codeGen->callPopStack();
 }
 
-string LgsFunc::prettyName() {
+std::string LgsFunc::prettyName() {
     return funcType->prettyName();
 }
 
-string LgsFunc::format(string& tabs) {
-    stringstream str;
+std::string LgsFunc::format(std::string& tabs) {
+    std::stringstream str;
     str << funcType->name << "(";
     for (int i = funcType->isMethod; i < funcType->params.size(); ++i) {
         auto param = funcType->params[i];

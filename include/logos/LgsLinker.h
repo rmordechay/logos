@@ -8,10 +8,10 @@ class LgsCodeGen;
 class LgsLinker {
 public:
     const LgsPaths& paths;
-    vector<LgsFile*> files;
+    std::vector<LgsFile*> files;
 
-    LgsLinker(const LgsPaths& paths, const vector<LgsFile*>& modules) : paths(paths), files(modules) {}
-    bool generateObjFile(unique_ptr<Module> mainModule, TargetMachine* targetMachine) const;
+    LgsLinker(const LgsPaths& paths, const std::vector<LgsFile*>& modules) : paths(paths), files(modules) {}
+    bool generateObjFile(std::unique_ptr<Module> mainModule, TargetMachine* targetMachine) const;
     bool link(TargetMachine* targetMachine) const;
     ~LgsLinker() = default;
 };

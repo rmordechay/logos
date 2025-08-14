@@ -16,7 +16,7 @@ struct LgsStackFrame {
     LgsStmtsBlock* stmtsBlock = nullptr;
 };
 
-class LgsStack final : stack<LgsStackFrame> {
+class LgsStack final : std::stack<LgsStackFrame> {
 public:
     void enterScope(LgsValue* value, LgsStmtsBlock* stmtsBlock);
     void exitScope();

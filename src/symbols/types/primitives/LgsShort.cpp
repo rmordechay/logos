@@ -15,11 +15,11 @@ Type* LgsShort::getIRType(LgsCodeGen* codeGen) {
     return codeGen->i16Ty();
 }
 
-string LgsShort::prettyName() {
+std::string LgsShort::prettyName() {
     return name;
 }
 
-string LgsShort::getName() {
+std::string LgsShort::getName() {
     return name;
 }
 
@@ -38,6 +38,6 @@ bool LgsShort::equals(LgsType* other) {
     return name == IRName;
 }
 
-string LgsShort::strFormatPart() const {
+std::string LgsShort::strFormatPart() const {
     return "%d";
 }

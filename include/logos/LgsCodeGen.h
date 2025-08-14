@@ -8,7 +8,7 @@ class LgsErrHandler;
 class LgsForLoop;
 class LgsFuncType;
 
-inline mutex mtx;
+inline std::mutex mtx;
 
 class LgsCodeGen {
 public:
@@ -19,29 +19,29 @@ public:
     GlobalVariable* runtimePtr = nullptr;
     IRBuilder<> builder = IRBuilder(context);
 
-    void setupModule(const string& moduleName, const DataLayout& dataLayout);
+    void setupModule(const std::string& moduleName, const DataLayout& dataLayout);
     void setRuntimePtr();
     void callStackPush();
     void callPopStack();
     void addDeferFunc(Value* deferFuncPtr, Value* ctx);
     void callDefers();
-    Value* getIRStr(const string& value);
-    GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit, const string& name = "") const;
-    StructType* getStructType(const vector<Type*>& fields, const string& name = "");
+    Value* getIRStr(const std::string& value);
+    GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name = "") const;
+    StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
 
     // Blocks
-    BasicBlock* createBlock(const string& name, Function* parent = nullptr);
+    BasicBlock* createBlock(const std::string& name, Function* parent = nullptr);
     void startBlock(BasicBlock* block);
     void branchIfNeeded(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);
     bool lastInstTerminator() const;
 
     // Funcs
-    Value* callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args = {});
-    Value* callLgsFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args);
+    Value* callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
+    Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args);
     Value* callMalloc(size_t size);
-    Value* callPrintf(const vector<Value*>& args);
-    Value* callSnprintf(const vector<Value*>& args);
+    Value* callPrintf(const std::vector<Value*>& args);
+    Value* callSnprintf(const std::vector<Value*>& args);
     Value* callSleep(Value* time);
     Value* callExit(Value* exitCode);
     Value* callGetEnv(Value* name);
@@ -88,9 +88,9 @@ public:
     TypeSize typeSize(StructType* v) const;
 
     // Debugging
-    void printPtr(Value* ptr, const string& text);
-    void printInt(Value* number, const string& text);
-    void printStr(const string& str);
+    void printPtr(Value* ptr, const std::string& text);
+    void printInt(Value* number, const std::string& text);
+    void printStr(const std::string& str);
 
     static void initLLVM();
     ~LgsCodeGen() = default;

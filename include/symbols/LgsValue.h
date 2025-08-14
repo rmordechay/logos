@@ -14,6 +14,6 @@ public:
     Value* IRValue = nullptr;
 
     void setIRValue(Value* value);
-    virtual string format(string& indentStr);
+    virtual std::string format(std::string& indentStr);
     virtual ~LgsValue() = default;
 };

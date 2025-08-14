@@ -33,7 +33,7 @@ public:
     explicit LgsExpr(LgsType* type) : type(type) {}
     Value* getIRValue(LgsCodeGen* codeGen);
     int getConstInt();
-    string getConstStr();
+    std::string getConstStr();
     LgsIterator toIterator();
     void setType(LgsType* newType);
 
@@ -58,7 +58,7 @@ public:
     virtual LgsExpr* castTo(LgsType* toType);
     virtual Value* hashValue(LgsCodeGen* codeGen);
 
-    virtual string prettyName() = 0;
+    virtual std::string prettyName() = 0;
     virtual Value* createIRValue(LgsCodeGen* codeGen) = 0;
     virtual Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
     virtual Value* subIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;

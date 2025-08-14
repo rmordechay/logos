@@ -23,7 +23,7 @@ public:
         addIntFunc.init(parent->getName(), {parent, &LGS_INT});
         addLongFunc.init(parent->getName(), {parent, &LGS_LONG});
     }
-    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override;
+    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override;
     ~LgsArrayAddFunc() override = default;
 };
 
@@ -50,12 +50,12 @@ public:
         canSlice = true;
     }
     Type* getIRType(LgsCodeGen* codeGen) override;
-    string getName() override;
-    string prettyName() override;
+    std::string getName() override;
+    std::string prettyName() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
-    string strFormatPart() const override;
+    std::string strFormatPart() const override;
     StructType* getArrStruct(LgsCodeGen* codeGen);
     void freeValue(LgsCodeGen* codeGen, Value* value) override;
     Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;

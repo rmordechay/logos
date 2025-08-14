@@ -7,7 +7,7 @@ extern "C" {
     size_t Lgs_hash(const char* key);
 }
 
-string LgsStrConst::prettyName() {
+std::string LgsStrConst::prettyName() {
     return type->prettyName();
 }
 
@@ -21,10 +21,10 @@ Value* LgsStrConst::createIRValue(LgsCodeGen* codeGen) {
 
 Value* LgsStrConst::addIR(LgsCodeGen* codeGen, LgsExpr* other) {
     if (const auto otherStrConst = other->asIntConst()) {
-        return codeGen->getIRStr(this->value + to_string(otherStrConst->value));
+        return codeGen->getIRStr(this->value + std::to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asFloatConst()) {
-        return codeGen->getIRStr(this->value + to_string(otherStrConst->value));
+        return codeGen->getIRStr(this->value + std::to_string(otherStrConst->value));
     }
     if (const auto otherStrConst = other->asStrConst()) {
         return codeGen->getIRStr(this->value + otherStrConst->value);

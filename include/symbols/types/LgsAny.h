@@ -10,10 +10,10 @@ public:
     }
     size_t getSizeBytes() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
-    string getName() override;
+    std::string getName() override;
     LgsExpr* getZeroValue() override;
-    string prettyName() override;
-    string strFormatPart() const override;
+    std::string prettyName() override;
+    std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
     ~LgsAny() override = default;
 };

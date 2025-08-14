@@ -13,8 +13,8 @@ public:
 
     explicit LgsCLang(LgsPaths& paths) : paths(paths) {}
     void parseFile(const fs::path& fileName, LgsFile* lgsFile) const;
-    void compile(const vector<LgsStrConst*>& files) const;
-    vector<const char*> getCompileArgs(const vector<LgsStrConst*>& files) const;
+    void compile(const std::vector<LgsStrConst*>& files) const;
+    std::vector<const char*> getCompileArgs(const std::vector<LgsStrConst*>& files) const;
     fs::path resolveExternalFile(LgsStrConst* filePath);
     void resolveCFiles(LgsFile* lgsFile);
     ~LgsCLang() = default;

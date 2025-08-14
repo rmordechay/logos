@@ -11,25 +11,25 @@ class LgsType;
 class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
-    vector<LgsReturn*> returnStmts;
+    std::vector<LgsReturn*> returnStmts;
     LgsStmtsBlock* stmtsBlock = nullptr;
-    bool hasDefers = false;
+    size_t defersCounter = 0;
 
-    explicit LgsFunc(const string& name, LgsType* rt, const vector<LgsParam>& params = {}) {
+    explicit LgsFunc(const std::string& name, LgsType* rt, const std::vector<LgsParam>& params = {}) {
         funcType = new LgsFuncType();
         funcType->name = name;
         funcType->rt = rt;
         funcType->params = params;
         type = funcType;
     }
-    string prettyName() override;
-    string format(string& tabs) override;
+    std::string prettyName() override;
+    std::string format(std::string& tabs) override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
-    Value* callIR(LgsCodeGen* codeGen, const vector<Value*>& args = {});
+    Value* callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args = {});
     void createPrologue(LgsCodeGen* codeGen);
     void createEpilogue(LgsCodeGen* codeGen) const;
     static Value* getIRArg(LgsCodeGen* codeGen, LgsExpr* arg);
-    virtual Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args);
+    virtual Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args);
     virtual void generateIR(LgsCodeGen* codeGen);
     virtual Function* getIRFunc(LgsCodeGen* codeGen);
     ~LgsFunc() override;

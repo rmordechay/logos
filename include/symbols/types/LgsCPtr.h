@@ -8,8 +8,8 @@ public:
     LgsType* baseType;
 
     explicit LgsCPtr(LgsType* baseType) : baseType(baseType) {}
-    string getName() override;
-    string prettyName() override;
+    std::string getName() override;
+    std::string prettyName() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;

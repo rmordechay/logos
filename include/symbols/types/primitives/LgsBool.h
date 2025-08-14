@@ -11,11 +11,11 @@ public:
         isPrimitive = true;
         isNumber = true;
     }
-    string prettyName() override;
+    std::string prettyName() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
-    string getName() override;
+    std::string getName() override;
     LgsExpr* getZeroValue() override;
-    string strFormatPart() const override;
+    std::string strFormatPart() const override;
     size_t getSizeBytes() override;
     bool equals(LgsType* other) override;
     ~LgsBool() override = default;

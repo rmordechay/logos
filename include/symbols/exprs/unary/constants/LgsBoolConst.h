@@ -7,8 +7,8 @@ public:
     bool value;
 
     explicit LgsBoolConst(const bool value) : LgsUnaryExpr(&LGS_BOOL), value(value) {}
-    string getValueAsString() const;
-    string prettyName() override;
+    std::string getValueAsString() const;
+    std::string prettyName() override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
     Value* andIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* orIR(LgsCodeGen* codeGen, LgsExpr* other) override;

@@ -1,6 +1,6 @@
 #include "exprs/unary/LgsHashMap.h"
 
-string LgsHashMap::prettyName() {
+std::string LgsHashMap::prettyName() {
     return type->prettyName();
 }
 

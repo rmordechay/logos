@@ -7,13 +7,13 @@ struct LgsSymbol;
 
 class LgsFuncCall final : public LgsStmt, public LgsUnaryExpr {
 public:
-    string name;
-    vector<LgsExpr*> args;
+    std::string name;
+    std::vector<LgsExpr*> args;
     LgsFunc* func = nullptr;
     bool isMethodCall = false;
     LgsSymbol* callback = nullptr;
 
-    explicit LgsFuncCall(const string& name, const vector<LgsExpr*>& args = {}) : name(name), args(args) {}
+    explicit LgsFuncCall(const std::string& name, const std::vector<LgsExpr*>& args = {}) : name(name), args(args) {}
     Value* getCallback(LgsCodeGen* codeGen) const;
     void createIRStmt(LgsCodeGen* codeGen) override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
@@ -21,7 +21,7 @@ public:
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
     void resolveVirtualFunc(LgsCodeGen* codeGen) const;
-    string prettyName() override;
-    string format(string& indentStr) override;
+    std::string prettyName() override;
+    std::string format(std::string& indentStr) override;
     ~LgsFuncCall() override = default;
 };

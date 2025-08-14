@@ -42,13 +42,13 @@ public:
     bool isUnknown = false;
     bool canSlice = false;
     Type* IRType = nullptr;
-    map<string, LgsField*> fields;
-    map<string, LgsFunc*> methods;
+   std::map<std::string, LgsField*> fields;
+   std::map<std::string, LgsFunc*> methods;
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
-    LgsField* getField(const string& name);
-    LgsFunc* getMethod(const string& name);
+    LgsField* getField(const std::string& name);
+    LgsFunc* getMethod(const std::string& name);
 
     LgsBool* asBool();
     LgsChar* asChar();
@@ -69,13 +69,13 @@ public:
     LgsGroup* asGroup();
     LgsTypePair* asPair();
 
-    virtual string getName() = 0;
-    virtual string prettyName() = 0;
+    virtual std::string getName() = 0;
+    virtual std::string prettyName() = 0;
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual Type* getIRType(LgsCodeGen* codeGen) = 0;
     virtual bool equals(LgsType* other) = 0;
-    virtual string strFormatPart() const;
+    virtual std::string strFormatPart() const;
     virtual void freeValue(LgsCodeGen* codeGen, Value* value);
     virtual ~LgsType() = default;
 };

@@ -55,7 +55,7 @@ inline void LgsPaths::findCLibRoot() {
         assert(0);
     }
     fgets(buffer, sizeof(buffer), pipe);
-    string line = buffer;
+    std::string line = buffer;
     line.pop_back();
     cLibRoot = fs::path(line);
     if (pipe) pclose(pipe);
@@ -66,7 +66,7 @@ inline void LgsPaths::findCLibHeaders() {
     if (!pipe) assert(0);
     char buffer[512];
     while (fgets(buffer, sizeof(buffer), pipe)) {
-        string line = buffer;
+        std::string line = buffer;
         // Include paths starts with a space
         if (line.empty() || !isspace(static_cast<unsigned char>(line[0]))) continue;
         // Ignore frameworks
@@ -74,7 +74,7 @@ inline void LgsPaths::findCLibHeaders() {
         if (frameworks != std::string::npos) continue;
         const auto start = line.find_first_not_of(" \t");
         const auto end = line.find_last_not_of("\r\n");
-        if (start == string::npos || end == string::npos) continue;
+        if (start == std::string::npos || end == std::string::npos) continue;
         auto dir = fs::path(line.substr(start, end - start + 1));
         if (fs::exists(dir / "stdio.h") && fs::exists(dir / "stdlib.h")) {
             cLibHeadersDir = dir;

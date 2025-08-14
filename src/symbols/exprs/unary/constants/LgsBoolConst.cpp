@@ -3,11 +3,11 @@
 
 #include "utils/LgsUtils.h"
 
-string LgsBoolConst::getValueAsString() const {
+std::string LgsBoolConst::getValueAsString() const {
     return value ? LgsBool::trueLiteral : LgsBool::falseLiteral;
 }
 
-string LgsBoolConst::prettyName() {
+std::string LgsBoolConst::prettyName() {
     return type->prettyName();
 }
 

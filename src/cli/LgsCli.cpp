@@ -10,7 +10,7 @@ void LgsCli::execute() const {
         exit(0);
     }
 
-    const string cmd = argv[1];
+    const std::string cmd = argv[1];
     if (cmd == "run") {
         LgsRunCmd command(argc, argv);
         command.validate();
@@ -29,13 +29,13 @@ void LgsCli::execute() const {
 }
 
 void LgsCli::printVersion() {
-    ostringstream txt;
-    txt << "Logos version: " + string(LOGOS_VERSION) << '\n';
+    std::ostringstream txt;
+    txt << "Logos version: " + std::string(LOGOS_VERSION) << '\n';
     logInfo(txt.str());
 }
 
 void LgsCli::printHelp() {
-    ostringstream txt;
+    std::ostringstream txt;
     txt << "Usage: lgs <command> <options>" << "\n\n";
     txt << "Commands:" << '\n';
     txt << "run                       execute a logos script or run application" << '\n';
@@ -45,7 +45,7 @@ void LgsCli::printHelp() {
     logInfo(txt.str());
 }
 
-void LgsCli::exitWithMsg(const string& errorMsg) {
+void LgsCli::exitWithMsg(const std::string& errorMsg) {
     logInfo(errorMsg + "\n\n");
     exit(0);
 }

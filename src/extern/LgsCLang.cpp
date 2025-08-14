@@ -22,17 +22,17 @@ void LgsCLang::parseFile(const fs::path& fileName, LgsFile* lgsFile) const {
     if (fileName == "") return;
     const auto filePath = paths.cLibHeadersDir / fileName;
     const auto code = getFileText(filePath);
-    clang::tooling::runToolOnCodeWithArgs(make_unique<LgsCLangFeAction>(lgsFile), code, {"-isysroot", paths.cLibRoot.c_str()});
+    clang::tooling::runToolOnCodeWithArgs(std::make_unique<LgsCLangFeAction>(lgsFile), code, {"-isysroot", paths.cLibRoot.c_str()});
 }
 
-void LgsCLang::compile(const vector<LgsStrConst*>& files) const {
+void LgsCLang::compile(const std::vector<LgsStrConst*>& files) const {
     const auto targetTriple = sys::getDefaultTargetTriple();
     clang::DiagnosticsEngine diags(new clang::DiagnosticIDs(), new clang::DiagnosticOptions(), new clang::DiagnosticConsumer());
     clang::driver::Driver driver("clang", targetTriple, diags);
-    auto invocation = make_unique<clang::CompilerInvocation>();
+    auto invocation = std::make_unique<clang::CompilerInvocation>();
     const auto args = getCompileArgs(files);
     clang::CompilerInvocation::CreateFromArgs(*invocation, args, diags);
-    auto compilerInstance = make_unique<clang::CompilerInstance>();
+    auto compilerInstance = std::make_unique<clang::CompilerInstance>();
     compilerInstance->setInvocation(std::move(invocation));
     compilerInstance->createFileManager();
     compilerInstance->createSourceManager(compilerInstance->getFileManager());
@@ -52,8 +52,8 @@ void LgsCLang::compile(const vector<LgsStrConst*>& files) const {
     }
 }
 
-vector<const char*> LgsCLang::getCompileArgs(const vector<LgsStrConst*>& files) const {
-    vector compileArgs{"clang", "-c", "-isysroot", paths.cLibRoot.c_str()};
+std::vector<const char*> LgsCLang::getCompileArgs(const std::vector<LgsStrConst*>& files) const {
+    std::vector compileArgs{"clang", "-c", "-isysroot", paths.cLibRoot.c_str()};
     for (const auto& file : files) {
         compileArgs.push_back(file->value.c_str());
     }

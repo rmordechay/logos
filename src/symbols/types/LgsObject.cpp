@@ -4,11 +4,11 @@
 #include "types/LgsGroup.h"
 #include "utils/LgsUtils.h"
 
-string LgsObject::prettyName() {
+std::string LgsObject::prettyName() {
     return name;
 }
 
-string LgsObject::getName() {
+std::string LgsObject::getName() {
     return name;
 }
 
@@ -16,7 +16,7 @@ Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;
     // Fields start at offset 1 if vtable exists
     const auto fieldsStartOffset = hasVirtuals();
-    vector<Type*> elementTypes(fields.size() + fieldsStartOffset);
+    std::vector<Type*> elementTypes(fields.size() + fieldsStartOffset);
     if (fieldsStartOffset) {
         vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
         elementTypes[0] = vtable->type->getIRType(codeGen);
@@ -45,8 +45,8 @@ LgsExpr* LgsObject::getZeroValue() {
     return new LgsInstance(this);
 }
 
-string LgsObject::strFormatPart() const {
-    stringstream str;
+std::string LgsObject::strFormatPart() const {
+    std::stringstream str;
     str << '{';
     for (const auto [fieldName, field] : fields) {
         str << fieldName << " = " << field->type->strFormatPart();

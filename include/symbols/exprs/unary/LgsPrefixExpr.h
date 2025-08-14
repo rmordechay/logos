@@ -14,7 +14,7 @@ public:
     LgsPrefixOperator op;
 
     LgsPrefixExpr(LgsExpr* baseExpr, const LgsPrefixOperator op) : expr(baseExpr), op(op) {}
-    string prettyName() override;
+    std::string prettyName() override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
     ~LgsPrefixExpr() override = default;
 };

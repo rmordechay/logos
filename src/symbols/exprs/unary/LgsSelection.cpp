@@ -47,8 +47,8 @@ Value* LgsSelection::resolveSelection(LgsCodeGen* codeGen) {
     return IRValue;
 }
 
-string LgsSelection::prettyName() {
-    stringstream str;
+std::string LgsSelection::prettyName() {
+    std::stringstream str;
     str << exprs[0]->prettyName();
     for (int i = 1; i < exprs.size(); ++i) {
         str << '.' << exprs[i]->prettyName();

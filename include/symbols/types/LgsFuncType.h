@@ -4,11 +4,11 @@
 
 class LgsFuncType final : public LgsType {
 public:
-    string name;
-    string IRName;
-    string parentName;
+    std::string name;
+    std::string IRName;
+    std::string parentName;
     LgsType* rt = nullptr;
-    vector<LgsParam> params;
+    std::vector<LgsParam> params;
     bool isMethod = false;
     bool isPublic = false;
     bool isVirtual = false;
@@ -20,11 +20,11 @@ public:
     FunctionType* IRType = nullptr;
 
     Type* getIRType(LgsCodeGen* codeGen) override;
-    string getName() override;
+    std::string getName() override;
     LgsExpr* getZeroValue() override;
-    string prettyName() override;
+    std::string prettyName() override;
     size_t getSizeBytes() override;
     bool equals(LgsType* other) override;
-    string strFormatPart() const override;
+    std::string strFormatPart() const override;
     ~LgsFuncType() override;
 };

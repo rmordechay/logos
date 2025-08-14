@@ -3,7 +3,7 @@
 #include "exprs/LgsNull.h"
 
 
-string LgsVoid::prettyName() {
+std::string LgsVoid::prettyName() {
     return name;
 }
 
@@ -15,7 +15,7 @@ size_t LgsVoid::getSizeBytes() {
     return 0;
 }
 
-string LgsVoid::getName() {
+std::string LgsVoid::getName() {
     return name;
 }
 

@@ -22,13 +22,13 @@ LgsType* LgsSArray::getIndexType() {
     return &LGS_INT;
 }
 
-string LgsSArray::strFormatPart() const {
+std::string LgsSArray::strFormatPart() const {
     if (baseType->asChar()) return "%s";
     return "%p";
 }
 
-string LgsSArray::prettyName() {
-    return baseType->prettyName() + '[' + (initialLength == 0 ? "" : to_string(initialLength)) + "]!";
+std::string LgsSArray::prettyName() {
+    return baseType->prettyName() + '[' + (initialLength == 0 ? "" : std::to_string(initialLength)) + "]!";
 }
 
 bool LgsSArray::equals(LgsType* other) {
@@ -38,7 +38,7 @@ bool LgsSArray::equals(LgsType* other) {
     return sizeExpr->type->equals(otherArr->sizeExpr->type);;
 }
 
-string LgsSArray::getName() {
+std::string LgsSArray::getName() {
     return name;
 }
 

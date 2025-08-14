@@ -5,7 +5,7 @@
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsSize.h"
 
-string LgsLong::prettyName() {
+std::string LgsLong::prettyName() {
     return name;
 }
 
@@ -21,7 +21,7 @@ LgsExpr* LgsLong::getZeroValue() {
     return new LgsLongConst(0);
 }
 
-string LgsLong::getName() {
+std::string LgsLong::getName() {
     return name;
 }
 
@@ -33,6 +33,6 @@ bool LgsLong::equals(LgsType* other) {
     return name == IRName;
 }
 
-string LgsLong::strFormatPart() const {
+std::string LgsLong::strFormatPart() const {
     return "%lu";
 }

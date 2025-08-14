@@ -9,12 +9,12 @@ public:
         isPrimitive = true;
     }
     Type* getIRType(LgsCodeGen* codeGen) override;
-    string getName() override;
+    std::string getName() override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;
-    string strFormatPart() const override;
+    std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
-    string prettyName() override;
+    std::string prettyName() override;
     ~LgsFloat() override = default;
 };
 

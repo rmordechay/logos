@@ -20,7 +20,7 @@ namespace lld::elf {
     bool link(ArrayRef<const char *> args, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
 }
 
-unique_ptr<Module> parseModule(LLVMContext& context, const string& path) {
+std::unique_ptr<Module> parseModule(LLVMContext& context, const std::string& path) {
     SMDiagnostic diag;
     auto parsedModule = parseIRFile(path, diag, context);
     if (!parsedModule) {
@@ -36,8 +36,8 @@ unique_ptr<Module> parseModule(LLVMContext& context, const string& path) {
 
 bool LgsLinker::link(TargetMachine* targetMachine) const {
     LLVMContext context;
-    unique_ptr<Module> mainModule = nullptr;
-    vector<unique_ptr<Module>> modules;
+    std::unique_ptr<Module> mainModule = nullptr;
+    std::vector<std::unique_ptr<Module>> modules;
     for (const auto& entry : fs::directory_iterator(paths.buildIR)) {
         if (!isLLVMFile(entry)) continue;
         auto module = parseModule(context, entry.path());
@@ -60,7 +60,7 @@ bool LgsLinker::link(TargetMachine* targetMachine) const {
     return true;
 }
 
-bool LgsLinker::generateObjFile(unique_ptr<Module> mainModule, TargetMachine* targetMachine) const {
+bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachine* targetMachine) const {
     PassBuilder passBuilder(targetMachine);
     LoopAnalysisManager loopAnalyser;
     FunctionAnalysisManager funcAnalyser;
@@ -79,7 +79,7 @@ bool LgsLinker::generateObjFile(unique_ptr<Module> mainModule, TargetMachine* ta
     // passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(OptimizationLevel::O3)));
     passManager.run(*mainModule, analysisManager);
 
-    error_code ec;
+    std::error_code ec;
     legacy::PassManager pass;
     raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
     const auto addedPassFailed = targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);

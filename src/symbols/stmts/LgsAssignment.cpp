@@ -112,14 +112,14 @@ void LgsAssignment::assignArrayToIterIndex(LgsCodeGen* codeGen, const LgsIterInd
     const auto arrPtr = baseExpr->getIRValue(codeGen);
 
     // Flatten the indices and reverse them to use them as indices.
-    vector<LgsIndex*> indices;
+    std::vector<LgsIndex*> indices;
     while (iterIndex) {
         if (iterIndex->index) indices.push_back(iterIndex->index);
         iterIndex = baseExpr->asIterIndex();
     }
     reverse(indices.begin(), indices.end());
 
-    vector<Value*> IRIndices = {codeGen->i32Zero()};
+    std::vector<Value*> IRIndices = {codeGen->i32Zero()};
     for (const auto index : indices) {
         IRIndices.emplace_back(index->from->getIRValue(codeGen));
     }

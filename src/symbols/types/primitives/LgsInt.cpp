@@ -11,7 +11,7 @@ size_t LgsInt::getSizeBytes() {
     return sizeof(int);
 }
 
-string LgsInt::prettyName() {
+std::string LgsInt::prettyName() {
     return name;
 }
 
@@ -19,7 +19,7 @@ Type* LgsInt::getIRType(LgsCodeGen* codeGen) {
     return codeGen->i32Ty();
 }
 
-string LgsInt::getName() {
+std::string LgsInt::getName() {
     return name;
 }
 
@@ -37,6 +37,6 @@ bool LgsInt::equals(LgsType* other) {
     return name == IRName;
 }
 
-string LgsInt::strFormatPart() const {
+std::string LgsInt::strFormatPart() const {
     return "%d";
 }

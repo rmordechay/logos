@@ -6,15 +6,15 @@ class LgsVariable;
 
 class LgsGroup final : public LgsType {
 public:
-    string name;
-    vector<LgsType*> types;
-    vector<LgsVariable*> targetSymbols;
+    std::string name;
+    std::vector<LgsType*> types;
+    std::vector<LgsVariable*> targetSymbols;
 
-    explicit LgsGroup(const string& name) : name(name) {}
+    explicit LgsGroup(const std::string& name) : name(name) {}
     Type* getIRType(LgsCodeGen* codeGen) override;
-    string getName() override;
+    std::string getName() override;
     LgsExpr* getZeroValue() override;
-    string prettyName() override;
+    std::string prettyName() override;
     size_t getSizeBytes() override;
     bool equals(LgsType* other) override;
 

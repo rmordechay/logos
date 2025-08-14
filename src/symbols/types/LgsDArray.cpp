@@ -20,12 +20,12 @@ LgsType* LgsDArray::getIndexType() {
     return &LGS_INT;
 }
 
-string LgsDArray::strFormatPart() const {
+std::string LgsDArray::strFormatPart() const {
     if (baseType->asChar()) return "%s";
     return "%p";
 }
 
-string LgsDArray::prettyName() {
+std::string LgsDArray::prettyName() {
     return baseType->prettyName() + "[]";
 }
 
@@ -39,7 +39,7 @@ void LgsDArray::freeValue(LgsCodeGen* codeGen, Value* value) {
     freeFunc.callIR(codeGen, {value});
 }
 
-string LgsDArray::getName() {
+std::string LgsDArray::getName() {
     return name;
 }
 
@@ -61,7 +61,7 @@ StructType* LgsDArray::getArrStruct(LgsCodeGen* codeGen) {
     return arrStruct;
 }
 
-Value* LgsArrayAddFunc::call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) {
+Value* LgsArrayAddFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
     const auto arr = args[0];
     const auto exprToAdd = args[1];
     const auto exprIR = exprToAdd->getIRValue(codeGen);

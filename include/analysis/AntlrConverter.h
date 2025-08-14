@@ -39,7 +39,7 @@ public:
     fs::path filePath;
     LgsErrHandler errHandler;
     LgsSymbolTable& globals;
-    stack<LgsForLoop*> loopStack;
+    std::stack<LgsForLoop*> loopStack;
 
     explicit AntlrConverter(const fs::path& filePath, LgsSymbolTable& globals) : filePath(filePath), globals(globals) {}
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx);
@@ -52,12 +52,12 @@ public:
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, bool isSingleton);
-    LgsField* getField(LogosParser::FieldContext* ctx, string& parentName, size_t position);
+    LgsField* getField(LogosParser::FieldContext* ctx, std::string& parentName, size_t position);
     LgsFunc* getFunc(LogosParser::FuncContext* ctx);
-    void setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params);
+    void setParams(LgsFuncType* funcType, const std::vector<LogosParser::ParamContext*>& params);
     LgsFunc* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param);
-    LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName);
+    LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx, std::string& parentName);
     LgsFunc* getMethod(LogosParser::MethodContext* ctx, LgsType* obj);
     LgsStmt* getDeferStmt(LogosParser::DeferStmtContext* ctx);
     LgsStmt* getStmt(LogosParser::StatementContext* ctx);
@@ -90,7 +90,7 @@ public:
     LgsUnaryExpr* getVector(LogosParser::VectorContext* vector);
     LgsSelection* getSelection(LogosParser::SelectionContext* ctx);
     LgsUnaryExpr* getFirstSelection(LogosParser::SelectionContext* ctx);
-    vector<LgsUnaryExpr*> getSelectionExprs(LogosParser::SelectionContext* ctx);
+    std::vector<LgsUnaryExpr*> getSelectionExprs(LogosParser::SelectionContext* ctx);
     LgsInstance* getInstance(LogosParser::InstanceContext* ctx);
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
     LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
@@ -105,9 +105,9 @@ public:
     LgsType* getTypeFromText(antlr4::tree::TerminalNode* typeToken) const;
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
-    bool isArgsDuplicate(const unordered_set<string>& initializedArgs, LgsVarDec* varDec);
-    bool validateTypeName(const string& typeName, LgsLocation* location);
-    void setLocation(LgsLocation& location, const antlr4::Token* start, const string& code) const;
+    bool isArgsDuplicate(const std::unordered_set<std::string>& initializedArgs, LgsVarDec* varDec);
+    bool validateTypeName(const std::string& typeName, LgsLocation* location);
+    void setLocation(LgsLocation& location, const antlr4::Token* start, const std::string& code) const;
     void extractStrParts(LgsStrConst& strConst);
     ~AntlrConverter() = default;
 };

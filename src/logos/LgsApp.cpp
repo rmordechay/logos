@@ -89,7 +89,7 @@ bool LgsApp::analyse() {
             if (semaAnalyser.errHandler.successful) {
                 file->runtime = &runtime;
             } else {
-                lock_guard lock(mtx);
+                std::lock_guard lock(mtx);
                 errHandler.mergeErrors(semaAnalyser.errHandler);
             }
         });
@@ -106,7 +106,7 @@ bool LgsApp::generate() {
             file->codeGen.setupModule(file->name, targetMachine->createDataLayout());
             file->generateIR();
             if (!file->codeGen.IRModule) return;
-            lock_guard lock(mtx);
+            std::lock_guard lock(mtx);
         });
     }
     threadPool.wait();
@@ -119,14 +119,14 @@ bool LgsApp::link() const {
     return linker.link(targetMachine);
 }
 
-void LgsApp::parseSrcFile(const string& codeText, fs::path filePath) {
+void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
     antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     const auto ast = parser.logosFile();
     if (parser.getNumberOfSyntaxErrors() != 0) {
-        lock_guard lock(mtx);
+        std::lock_guard lock(mtx);
         errHandler.setUnsuccessful();
         return;
     }
@@ -137,12 +137,12 @@ void LgsApp::parseSrcFile(const string& codeText, fs::path filePath) {
         LgsCLang lgsCLang(paths);
         lgsCLang.resolveCFiles(file);
         if (!lgsCLang.errHandler.successful) {
-            lock_guard lock(mtx);
+            std::lock_guard lock(mtx);
             errHandler.mergeErrors(antlrConverter.errHandler);
         }
     }
     if (!antlrConverter.errHandler.successful) {
-        lock_guard lock(mtx);
+        std::lock_guard lock(mtx);
         errHandler.mergeErrors(antlrConverter.errHandler);
     }
 }
@@ -156,7 +156,7 @@ void LgsApp::parseEnvFile(fs::path fileEntry) {
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
-    lock_guard lock(mtx);
+    std::lock_guard lock(mtx);
     envFiles.emplace_back(file);
     errHandler.mergeErrors(antlerConverter.errHandler);
 }
@@ -250,9 +250,9 @@ void LgsApp::checkRequiredEnvVars() {
 
 void LgsApp::setEnvVars() {
     for (char **env = environ; *env != nullptr; ++env) {
-        string entry(*env);
+        std::string entry(*env);
         const auto pos = entry.find('=');
-        if (pos != string::npos) {
+        if (pos != std::string::npos) {
             auto key = entry.substr(0, pos);
             const auto value = entry.substr(pos + 1);
             activeEnv.envVars[key] = value;
@@ -281,7 +281,7 @@ void LgsApp::writeIRFiles() const {
         if (!module) continue;
         if constexpr (WRITE_IR_TO_FILE) {
             const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
-            error_code EC;
+            std::error_code EC;
             raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
             module->print(textFile, nullptr);
         }
@@ -295,9 +295,9 @@ void LgsApp::writeIRFiles() const {
 void LgsApp::exitWithErrors() const {
     for (int i = 0; i < errHandler.errors.size(); ++i) {
         const auto lgsError = errHandler.errors[i];
-        const auto code = "\n code:  " + string(lgsError.location->code);
+        const auto code = "\n code:  " + std::string(lgsError.location->code);
         const auto path = "\n   at:  " + getFullPath(*lgsError.location);
-        logInfo(LGS_ERROR_STR + string(lgsError.msg));
+        logInfo(LGS_ERROR_STR + std::string(lgsError.msg));
         // logInfo(code);
         logInfo(path);
         if (i != errHandler.errors.size() - 1) logInfo("\n---\n");
@@ -313,10 +313,10 @@ void LgsApp::exitWithErrors() const {
 }
 
 void LgsApp::setTargetMachine() {
-    string error;
+    std::string error;
     const auto targetTriple = sys::getDefaultTargetTriple();
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), nullopt);
+    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
 LgsApp::~LgsApp() {

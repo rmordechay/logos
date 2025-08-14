@@ -36,8 +36,8 @@ public:
     LgsFile* file;
 
     explicit LgsCLangFeAction(LgsFile* file) : file(file) {}
-    unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef inFile) override {
-        return make_unique<LgsCLangVisitor>(file);
+    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef inFile) override {
+        return std::make_unique<LgsCLangVisitor>(file);
     }
     ~LgsCLangFeAction() override = default;
 };

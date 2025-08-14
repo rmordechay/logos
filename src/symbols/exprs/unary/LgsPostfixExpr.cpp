@@ -6,7 +6,7 @@ Value* LgsPostfixExpr::createIRValue(LgsCodeGen* codeGen) {
     return IncOrDecValue(codeGen);
 }
 
-string LgsPostfixExpr::prettyName() {
+std::string LgsPostfixExpr::prettyName() {
     assert(0);
 }
 

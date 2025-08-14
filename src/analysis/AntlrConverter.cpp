@@ -139,7 +139,7 @@ LgsFile* AntlrConverter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx
 }
 
 LgsAppFile* AntlrConverter::getAppFile(LogosParser::LogosAppFileContext* ctx) {
-    vector<LgsVarDec*> varDecs;
+    std::vector<LgsVarDec*> varDecs;
     for (const auto& explicitVarDec : ctx->explicitVarDec()) {
         varDecs.emplace_back(getExplicitVarDec(explicitVarDec));
     }
@@ -151,7 +151,7 @@ LgsAppFile* AntlrConverter::getAppFile(LogosParser::LogosAppFileContext* ctx) {
     const auto requireEnvs = ctx->requireEnvVars();
     if (!requireEnvs) return file;
 
-    vector<RequireEnvVar> requireEnvVars;
+    std::vector<RequireEnvVar> requireEnvVars;
     for (int i = 0; i < requireEnvs->type().size(); ++i) {
         const auto name = requireEnvs->IDENTIFIER()[i]->getText();
         const auto type = getType(requireEnvs->type()[i]);
@@ -163,7 +163,7 @@ LgsAppFile* AntlrConverter::getAppFile(LogosParser::LogosAppFileContext* ctx) {
 }
 
 LgsEnvFile* AntlrConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx) {
-    vector<LgsVarDec*> varDecs;
+    std::vector<LgsVarDec*> varDecs;
     for (const auto& explicitVarDec : ctx->explicitVarDec()) {
         varDecs.emplace_back(getExplicitVarDec(explicitVarDec));
     }
@@ -256,7 +256,7 @@ LgsEnum* AntlrConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
     const auto lgsEnum = new LgsEnum(ctx->IDENTIFIER()->getText());
     setLocation(lgsEnum->location, ctx->start, ctx->getText());
     if (!validateTypeName(lgsEnum->name, &lgsEnum->location)) return lgsEnum;
-    unordered_set<string> seenNames;
+    std::unordered_set<std::string> seenNames;
     for (size_t i = 0; i < ctx->enumField().size(); ++i) {
         const auto enumField = ctx->enumField()[i];
         const auto enumFieldName = enumField->IDENTIFIER()->getText();
@@ -362,7 +362,7 @@ LgsFunc* AntlrConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx
     return func;
 }
 
-void AntlrConverter::setParams(LgsFuncType* funcType, const vector<LogosParser::ParamContext*>& params) {
+void AntlrConverter::setParams(LgsFuncType* funcType, const std::vector<LogosParser::ParamContext*>& params) {
     for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         if (param->type()) {
@@ -393,7 +393,7 @@ LgsParam AntlrConverter::getParam(LgsFuncType* funcType, LogosParser::ParamConte
     return lgsParam;
 }
 
-LgsField* AntlrConverter::getInterfaceField(LogosParser::InterfaceFieldContext* ctx, string& parentName) {
+LgsField* AntlrConverter::getInterfaceField(LogosParser::InterfaceFieldContext* ctx, std::string& parentName) {
     const auto name = ctx->IDENTIFIER()->getText();
     const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
@@ -403,7 +403,7 @@ LgsField* AntlrConverter::getInterfaceField(LogosParser::InterfaceFieldContext* 
     return field;
 }
 
-LgsField* AntlrConverter::getField(LogosParser::FieldContext* ctx, string& parentName, const size_t position) {
+LgsField* AntlrConverter::getField(LogosParser::FieldContext* ctx, std::string& parentName, const size_t position) {
     const auto name = ctx->IDENTIFIER()->getText();
     const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
@@ -535,7 +535,7 @@ LgsIfStmt* AntlrConverter::getIfStatement(LogosParser::IfStatementContext* ctx) 
     for (const auto &elseIfStmt : ctx->elseIfStatement()) {
         auto elseIfExpr = getExpr(elseIfStmt->expr());
         auto elseIfStmtBlock = getStmtBlock(elseIfStmt->statementsBlock());
-        ifStmt->elseIfs.emplace_back(make_pair(elseIfExpr, elseIfStmtBlock));
+        ifStmt->elseIfs.emplace_back(std::make_pair(elseIfExpr, elseIfStmtBlock));
     }
     if (const auto &elseStmt = ctx->elseStatement()) {
         ifStmt->elseBlock = getStmtBlock(elseStmt->statementsBlock());
@@ -574,7 +574,7 @@ LgsStmt* AntlrConverter::getPatternMatching(LogosParser::PatternMatchingContext*
     for (const auto& pattern : ctx->pattern()) {
         const auto expr = getExpr(pattern->expr());
         const auto stmtBlock = getStmtBlock(pattern->statementsBlock());
-        patternMatching->elseIfs.emplace_back(make_pair(expr, stmtBlock));
+        patternMatching->elseIfs.emplace_back(std::make_pair(expr, stmtBlock));
     }
     patternMatching->elseBlock = getStmtBlock(ctx->statementsBlock());
     return patternMatching;
@@ -801,7 +801,7 @@ LgsVariable* AntlrConverter::getVariable(antlr4::tree::TerminalNode* ctx) const 
 
 LgsFuncCall* AntlrConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
     const auto name = ctx->IDENTIFIER()->getText();
-    vector<LgsExpr*> args;
+    std::vector<LgsExpr*> args;
     if (ctx->funcArgList()) {
         for (const auto& arg : ctx->funcArgList()->funcArg()) {
             auto argExpr = getExpr(arg->expr());
@@ -832,7 +832,7 @@ LgsInstance* AntlrConverter::getInstance(LogosParser::InstanceContext* ctx) {
     setLocation(instance->location, ctx->start, ctx->getText());
     const auto args = ctx->instanceArgList();
     if (!args) return instance;
-    unordered_set<string> initializedArgs;
+    std::unordered_set<std::string> initializedArgs;
     for (const auto& arg : args->instanceArg()) {
         const auto argExpr = getExpr(arg->expr());
         const auto idToken = arg->IDENTIFIER();
@@ -876,8 +876,8 @@ LgsSelection* AntlrConverter::getSelection(LogosParser::SelectionContext* ctx) {
     return selection;
 }
 
-vector<LgsUnaryExpr*> AntlrConverter::getSelectionExprs(LogosParser::SelectionContext* ctx) {
-    vector exprs = {getFirstSelection(ctx)};
+std::vector<LgsUnaryExpr*> AntlrConverter::getSelectionExprs(LogosParser::SelectionContext* ctx) {
+    std::vector exprs = {getFirstSelection(ctx)};
     const auto innerSelections = ctx->innerSelectionElement();
     for (int i = 0; i < innerSelections.size(); ++i) {
         const auto& currentExpr = innerSelections[i];
@@ -943,12 +943,12 @@ LgsUnaryExpr* AntlrConverter::getConstant(LogosParser::ConstantContext* ctx) {
     } else if (const auto boolToken = ctx->BOOL()) {
         const auto value = boolToken->getText() == LgsBool::trueLiteral;
         constant = new LgsBoolConst(value);
-    } else if (const auto stringToken = ctx->STRING()) {
-        const auto value = stringToken->getText();
+    } else if (const auto strToken = ctx->STRING()) {
+        const auto value = strToken->getText();
         if (value.size() == 1) {
             constant = new LgsCharConst(value[0]);
         } else {
-            constant = getStrConst(stringToken);
+            constant = getStrConst(strToken);
         }
     }
     if (constant) {
@@ -1128,7 +1128,7 @@ LgsType* AntlrConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken) 
     return type;
 }
 
-bool AntlrConverter::isArgsDuplicate(const unordered_set<string>& initializedArgs, LgsVarDec* varDec) {
+bool AntlrConverter::isArgsDuplicate(const std::unordered_set<std::string>& initializedArgs, LgsVarDec* varDec) {
     if (initializedArgs.count(varDec->name)) {
         errHandler.addError(E10054, &varDec->location, {varDec->name});
         return true;
@@ -1136,7 +1136,7 @@ bool AntlrConverter::isArgsDuplicate(const unordered_set<string>& initializedArg
     return false;
 }
 
-bool AntlrConverter::validateTypeName(const string& typeName, LgsLocation* location) {
+bool AntlrConverter::validateTypeName(const std::string& typeName, LgsLocation* location) {
     if (islower(typeName[0])) {
         errHandler.addError(E10033, location, {typeName});
         return false;
@@ -1144,7 +1144,7 @@ bool AntlrConverter::validateTypeName(const string& typeName, LgsLocation* locat
     return true;
 }
 
-void AntlrConverter::setLocation(LgsLocation& location, const antlr4::Token* start, const string& code) const {
+void AntlrConverter::setLocation(LgsLocation& location, const antlr4::Token* start, const std::string& code) const {
     location.lineStart = start->getLine();
     location.posInLine = start->getCharPositionInLine() + 1;
     location.filePath = strdup(filePath.c_str());
@@ -1153,12 +1153,12 @@ void AntlrConverter::setLocation(LgsLocation& location, const antlr4::Token* sta
 
 void AntlrConverter::extractStrParts(LgsStrConst& strConst) {
     size_t start = 0;
-    string replaced = strConst.value;
+    std::string replaced = strConst.value;
     while (true) {
         const auto open = replaced.find('{', start);
-        if (open == string::npos) break;
+        if (open == std::string::npos) break;
         const auto close = replaced.find('}', open);
-        if (close == string::npos) break;
+        if (close == std::string::npos) break;
         if (close > open + 1) {
             const auto part = replaced.substr(open + 1, close - open - 1);
             antlr4::ANTLRInputStream input(part);

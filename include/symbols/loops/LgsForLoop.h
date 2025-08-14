@@ -7,7 +7,7 @@ class LgsExpr;
 
 class LgsForLoop : public LgsStmt {
 public:
-    vector<LgsVarDec*> loopVars;
+    std::vector<LgsVarDec*> loopVars;
     AllocaInst* iPtr = nullptr;
     LgsStmtsBlock* stmtsBlock = nullptr;
     BasicBlock* IRCondBlock = nullptr;

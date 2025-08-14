@@ -8,12 +8,12 @@ public:
     LgsChar() {
         isPrimitive = true;
     }
-    string prettyName() override;
+    std::string prettyName() override;
     size_t getSizeBytes() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
-    string getName() override;
+    std::string getName() override;
     LgsExpr* getZeroValue() override;
-    string strFormatPart() const override;
+    std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
     ~LgsChar() override = default;
 };

@@ -18,7 +18,7 @@ bool LgsVarDec::shouldAllocate(const Type* IRType) const {
     return !IRType->isArrayTy() && !IRType->isPointerTy() && !IRType->isVoidTy();
 }
 
-string LgsVarDec::format(string& indentStr) {
+std::string LgsVarDec::format(std::string& indentStr) {
     return indentStr + name + " = ";
 }
 

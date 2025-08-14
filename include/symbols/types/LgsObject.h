@@ -7,18 +7,18 @@ class LgsField;
 
 class LgsObject : public LgsType {
 public:
-    string name;
-    vector<LgsType*> interfaces;
+    std::string name;
+    std::vector<LgsType*> interfaces;
     LgsHashMap* vtable = nullptr;
     LgsInstance* singleton = nullptr;
 
-    explicit LgsObject(const string& name) : name(name) {}
-    string prettyName() override;
+    explicit LgsObject(const std::string& name) : name(name) {}
+    std::string prettyName() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
-    string getName() override;
+    std::string getName() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    string strFormatPart() const override;
+    std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
     bool hasVirtuals() const;
     void freeValue(LgsCodeGen* codeGen, Value* value) override;

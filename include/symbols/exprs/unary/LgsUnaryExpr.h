@@ -26,7 +26,7 @@ public:
     Value* bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
-    tuple<Value*, Value*> loadExprs(LgsCodeGen* codeGen, LgsExpr* rExpr);
+    std::tuple<Value*, Value*> loadExprs(LgsCodeGen* codeGen, LgsExpr* rExpr);
     ~LgsUnaryExpr() override = default;
 };
 
@@ -113,7 +113,7 @@ inline Value* LgsUnaryExpr::lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-inline tuple<Value*, Value*> LgsUnaryExpr::loadExprs(LgsCodeGen* codeGen, LgsExpr* rExpr) {
+inline std::tuple<Value*, Value*> LgsUnaryExpr::loadExprs(LgsCodeGen* codeGen, LgsExpr* rExpr) {
     auto l = this->getIRValue(codeGen);
     auto r = rExpr->getIRValue(codeGen);
     if (l->getType()->isPointerTy()) {
@@ -122,5 +122,5 @@ inline tuple<Value*, Value*> LgsUnaryExpr::loadExprs(LgsCodeGen* codeGen, LgsExp
     if (r->getType()->isPointerTy()) {
         r = codeGen->builder.CreateLoad(rExpr->type->getIRType(codeGen), r);
     }
-    return tuple(l, r);
+    return std::tuple(l, r);
 }

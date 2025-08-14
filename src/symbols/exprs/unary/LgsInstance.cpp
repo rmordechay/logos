@@ -19,7 +19,7 @@ Value* LgsInstance::createIRValue(LgsCodeGen* codeGen) {
     return IRValue;
 }
 
-void LgsInstance::initFields(LgsCodeGen* codeGen, const map<string, LgsField*>& fields) {
+void LgsInstance::initFields(LgsCodeGen* codeGen, std::map<std::string, LgsField*>& fields) {
     for (const auto& [argName, arg] : args) {
         const auto exprIR = arg->expr->getIRValue(codeGen);
         auto field = fields.find(argName);
@@ -55,7 +55,7 @@ void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
     }
 }
 
-string LgsInstance::prettyName() {
+std::string LgsInstance::prettyName() {
     return obj->name;
 }
 

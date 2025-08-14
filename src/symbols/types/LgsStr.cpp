@@ -16,11 +16,11 @@ size_t LgsStr::getSizeBytes() {
     return initialLength + 1;
 }
 
-string LgsStr::getName() {
+std::string LgsStr::getName() {
     return name;
 }
 
-string LgsStr::prettyName() {
+std::string LgsStr::prettyName() {
     return name;
 }
 
@@ -28,7 +28,7 @@ LgsExpr* LgsStr::getZeroValue() {
     return new LgsStrConst("");
 }
 
-string LgsStr::strFormatPart() const {
+std::string LgsStr::strFormatPart() const {
     return "%s";
 }
 

@@ -9,11 +9,11 @@ class LgsEnum;
 
 class LgsMainFile final : public LgsFile {
 public:
-    vector<LgsEnum*> enums;
-    vector<LgsObject*> objects;
-    map<string, LgsFunc*> funcs;
-    vector<LgsInterface*> interfaces;
-    vector<LgsGroup*> groups;
+    std::vector<LgsEnum*> enums;
+    std::vector<LgsObject*> objects;
+   std::map<std::string, LgsFunc*> funcs;
+    std::vector<LgsInterface*> interfaces;
+    std::vector<LgsGroup*> groups;
 
     explicit LgsMainFile(const fs::path& path) : LgsFile(LGS_MAIN_FILE_NAME, path) {}
     void format() override;

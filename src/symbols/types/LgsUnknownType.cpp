@@ -1,10 +1,10 @@
 #include "types/LgsUnknownType.h"
 
-string LgsUnknownType::prettyName() {
+std::string LgsUnknownType::prettyName() {
     return getName();
 }
 
-string LgsUnknownType::getName() {
+std::string LgsUnknownType::getName() {
     return name == "" ? genricName : name;
 }
 

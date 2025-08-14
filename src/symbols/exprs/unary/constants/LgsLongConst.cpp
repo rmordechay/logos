@@ -4,7 +4,7 @@
 #include "utils/LgsUtils.h"
 
 
-string LgsLongConst::prettyName() {
+std::string LgsLongConst::prettyName() {
     return type->prettyName();
 }
 

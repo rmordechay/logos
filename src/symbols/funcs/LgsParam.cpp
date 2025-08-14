@@ -1,7 +1,7 @@
 #include "funcs/LgsParam.h"
 #include "funcs/LgsFunc.h"
 
-string LgsParam::format(string& indentStr) {
+std::string LgsParam::format(std::string& indentStr) {
     return name + ": " + type->prettyName();
 }
 
@@ -17,7 +17,7 @@ Value* LgsParam::getIRValue(LgsCodeGen* codeGen) {
     assert(0);
 }
 
-string LgsParam::getIRName() {
+std::string LgsParam::getIRName() {
     if (const auto funcType = dynamic_cast<LgsFuncType*>(type)) {
         return funcType->IRName;
     }

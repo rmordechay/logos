@@ -10,10 +10,10 @@ public:
 
     explicit LgsTypePair(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : key(keyType), value(valueType) {}
     Type* getIRType(LgsCodeGen* codeGen) override;
-    string getName() override;
+    std::string getName() override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;
-    string prettyName() override;
+    std::string prettyName() override;
     bool equals(LgsType* other) override;
 };
 
@@ -21,7 +21,7 @@ inline Type* LgsTypePair::getIRType(LgsCodeGen* codeGen) {
     assert(0);
 }
 
-inline string LgsTypePair::getName() {
+inline std::string LgsTypePair::getName() {
     return name;
 }
 
@@ -33,7 +33,7 @@ inline size_t LgsTypePair::getSizeBytes() {
     return key->getSizeBytes() + value->getSizeBytes() ;
 }
 
-inline string LgsTypePair::prettyName() {
+inline std::string LgsTypePair::prettyName() {
     return '<' + key->prettyName() + "," + value->prettyName() + '>';
 }
 

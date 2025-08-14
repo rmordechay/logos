@@ -4,7 +4,7 @@
 #include "exprs/unary/constants/LgsCharConst.h"
 
 
-string LgsChar::prettyName() {
+std::string LgsChar::prettyName() {
     return name;
 }
 
@@ -16,7 +16,7 @@ Type* LgsChar::getIRType(LgsCodeGen* codeGen) {
     return codeGen->i8Ty();
 }
 
-string LgsChar::getName() {
+std::string LgsChar::getName() {
     return name;
 }
 
@@ -24,7 +24,7 @@ LgsExpr* LgsChar::getZeroValue() {
     return new LgsCharConst('0');
 }
 
-string LgsChar::strFormatPart() const {
+std::string LgsChar::strFormatPart() const {
     return "%c";
 }
 

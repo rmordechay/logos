@@ -4,11 +4,11 @@
 
 class LgsHashMap final : public LgsUnaryExpr {
 public:
-    vector<LgsMapEntry*> initialElements;
+    std::vector<LgsMapEntry*> initialElements;
 
     explicit LgsHashMap(LgsMap* mapType) : LgsUnaryExpr(mapType) {}
     explicit LgsHashMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsHashMap(new LgsMap(keyType, valueType)) {}
-    string prettyName() override;
+    std::string prettyName() override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
     ~LgsHashMap() override = default;
 };

@@ -5,7 +5,7 @@ class LgsForLoop;
 
 class LgsBreak final : public LgsStmt {
 public:
-    string tag;
+    std::string tag;
     void createIRStmt(LgsCodeGen* codeGen) override;
     ~LgsBreak() override = default;
 };

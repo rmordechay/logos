@@ -3,7 +3,7 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "configs/LgsConfig.h"
 
-string LgsArrayExpr::prettyName() {
+std::string LgsArrayExpr::prettyName() {
     return type->prettyName();
 }
 

@@ -5,6 +5,6 @@ void LgsValue::setIRValue(Value* value) {
     IRValue = value;
 }
 
-string LgsValue::format(string& indentStr) {
+std::string LgsValue::format(std::string& indentStr) {
     assert(0);
 }

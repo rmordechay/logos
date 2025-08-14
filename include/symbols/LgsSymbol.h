@@ -24,7 +24,7 @@ enum LgsSymbolType {
 };
 
 struct LgsSymbol {
-    string* name;
+    std::string* name;
     LgsSymbolType symbolType;
     bool isExternal = false;
     bool isBuiltin = false;

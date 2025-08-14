@@ -9,7 +9,7 @@
 Type* LgsInterface::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;
     IRType = StructType::getTypeByName(codeGen->context, name);
-    vector<Type*> elementTypes;
+    std::vector<Type*> elementTypes;
     for (int i = 0; i < methods.size(); ++i) {
         elementTypes.emplace_back(codeGen->ptrTy());
     }
@@ -19,7 +19,7 @@ Type* LgsInterface::getIRType(LgsCodeGen* codeGen) {
     return IRType;
 }
 
-string LgsInterface::getName() {
+std::string LgsInterface::getName() {
     return name;
 }
 
@@ -43,7 +43,7 @@ size_t LgsInterface::getSizeBytes() {
     return 0;
 }
 
-string LgsInterface::prettyName() {
+std::string LgsInterface::prettyName() {
     return name;
 }
 

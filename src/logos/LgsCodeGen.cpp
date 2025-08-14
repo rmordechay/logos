@@ -8,7 +8,7 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/TargetParser/Host.h>
 
-void LgsCodeGen::setupModule(const string& moduleName, const DataLayout& dataLayout) {
+void LgsCodeGen::setupModule(const std::string& moduleName, const DataLayout& dataLayout) {
     IRModule = new Module(moduleName, context);
     IRModule->setTargetTriple(sys::getDefaultTargetTriple());
     IRModule->setDataLayout(dataLayout);
@@ -28,7 +28,7 @@ void LgsCodeGen::setRuntimePtr() {
     }
 }
 
-Value* LgsCodeGen::getIRStr(const string& value) {
+Value* LgsCodeGen::getIRStr(const std::string& value) {
     for (auto& globals : IRModule->globals()) {
         if (!globals.hasInitializer()) continue;
         const auto dataArray = dyn_cast<ConstantDataArray>(globals.getInitializer());
@@ -41,11 +41,11 @@ Value* LgsCodeGen::getIRStr(const string& value) {
     return globalVar;
 }
 
-GlobalVariable* LgsCodeGen::createGlobal(Type* type, ConstantAggregateZero* zeroInit, const string& name) const {
+GlobalVariable* LgsCodeGen::createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name) const {
     return new GlobalVariable(*IRModule, type, false, GlobalValue::ExternalLinkage, zeroInit, name);
 }
 
-StructType* LgsCodeGen::getStructType(const vector<Type*>& fields, const string& name) {
+StructType* LgsCodeGen::getStructType(const std::vector<Type*>& fields, const std::string& name) {
     const auto structType = StructType::getTypeByName(context, name);
     if (!structType) {
         return StructType::create(context, fields, name);
@@ -53,7 +53,7 @@ StructType* LgsCodeGen::getStructType(const vector<Type*>& fields, const string&
     return structType;
 }
 
-BasicBlock* LgsCodeGen::createBlock(const string& name, Function* parent) {
+BasicBlock* LgsCodeGen::createBlock(const std::string& name, Function* parent) {
     return BasicBlock::Create(context, name, parent);
 }
 
@@ -77,11 +77,11 @@ bool LgsCodeGen::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
 }
 
-Value* LgsCodeGen::callLgsFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args) {
+Value* LgsCodeGen::callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args) {
     return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, ft, args);
 }
 
-Value* LgsCodeGen::callFunc(const string& funcName, FunctionType* ft, const vector<Value*>& args) {
+Value* LgsCodeGen::callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args) {
     const auto func = IRModule->getOrInsertFunction(funcName, ft);
     return builder.CreateCall(func, args);
 }
@@ -115,12 +115,12 @@ Value* LgsCodeGen::callMalloc(const size_t size) {
     return builder.CreateMalloc(sizeTy(), sizeTy(), isize(size), nullptr);
 }
 
-Value* LgsCodeGen::callPrintf(const vector<Value*>& args) {
+Value* LgsCodeGen::callPrintf(const std::vector<Value*>& args) {
     const auto ft = FunctionType::get(i32Ty(), {ptrTy()}, true);
     return callFunc("printf", ft, args);
 }
 
-Value* LgsCodeGen::callSnprintf(const vector<Value*>& args) {
+Value* LgsCodeGen::callSnprintf(const std::vector<Value*>& args) {
     const auto ft = FunctionType::get(i32Ty(), {ptrTy(), i64Ty(), ptrTy()}, true);
     return callFunc("snprintf", ft, args);
 }
@@ -296,18 +296,18 @@ ConstantInt* LgsCodeGen::sizeZero() {
     return ConstantInt::get(sizeTy(), 0);
 }
 
-void LgsCodeGen::printPtr(Value* ptr, const string& text = "") {
+void LgsCodeGen::printPtr(Value* ptr, const std::string& text = "") {
     assert(ptr->getType()->isPointerTy());
     if (text != "") printStr(text);
     callPrintf({getIRStr(LGS_ANY.strFormatPart() + '\n'), ptr});
 }
 
-void LgsCodeGen::printInt(Value* number, const string& text = "") {
+void LgsCodeGen::printInt(Value* number, const std::string& text = "") {
     if (text != "") printStr(text);
     callPrintf({getIRStr("%d\n"), number});
 }
 
-void LgsCodeGen::printStr(const string& str) {
+void LgsCodeGen::printStr(const std::string& str) {
     callPrintf({getIRStr("%s"), getIRStr(str)});
 }
 

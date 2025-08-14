@@ -7,11 +7,11 @@ struct LgsLocation;
 class LgsErrHandler {
 public:
     bool successful = true;
-    vector<LgsError> errors;
-    vector<LgsWarning> warnings;
+    std::vector<LgsError> errors;
+    std::vector<LgsWarning> warnings;
 
     void setUnsuccessful();
-    void addError(const LgsBaseError& lgsErr, LgsLocation* location, const vector<string>& args = {});
+    void addError(const LgsBaseError& lgsErr, LgsLocation* location, const std::vector<std::string>& args = {});
     void mergeErrors(LgsErrHandler& other);
     ~LgsErrHandler() = default;
 };

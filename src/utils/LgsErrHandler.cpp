@@ -6,20 +6,20 @@ void LgsErrHandler::setUnsuccessful() {
     successful = false;
 }
 
-void LgsErrHandler::addError(const LgsBaseError& lgsErr, LgsLocation* location, const vector<string>& args) {
+void LgsErrHandler::addError(const LgsBaseError& lgsErr, LgsLocation* location, const std::vector<std::string>& args) {
     setUnsuccessful();
     auto pos = 0;
     auto argIndex = 0;
-    auto result = string(lgsErr.msg);
-    while ((pos = result.find(LGS_MSG_PLACEHOLDER, pos)) != string::npos && argIndex < args.size()) {
-        result.replace(pos, string(LGS_MSG_PLACEHOLDER).size(), args[argIndex]);
+    auto result = std::string(lgsErr.msg);
+    while ((pos = result.find(LGS_MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
+        result.replace(pos, std::string(LGS_MSG_PLACEHOLDER).size(), args[argIndex]);
         pos += args[argIndex].length();
         argIndex++;
     }
     pos = 0;
     argIndex = 0;
-    while ((pos = result.find(LGS_MSG_PADDING_PLACEHOLDER, pos)) != string::npos) {
-        result.replace(pos, string(LGS_MSG_PADDING_PLACEHOLDER).size(), LGS_ERROR_PADDING);
+    while ((pos = result.find(LGS_MSG_PADDING_PLACEHOLDER, pos)) != std::string::npos) {
+        result.replace(pos, std::string(LGS_MSG_PADDING_PLACEHOLDER).size(), LGS_ERROR_PADDING);
         pos += args[argIndex].length();
         argIndex++;
     }

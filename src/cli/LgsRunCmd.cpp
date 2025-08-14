@@ -14,7 +14,7 @@ void LgsRunCmd::validate() {
 }
 
 void LgsRunCmd::setArgs(LgsApp* app) const {
-    vector<char*> args;
+    std::vector<char*> args;
     for (int i = 0; i < argc; ++i) {
         app->args.emplace_back(argv[i]);
     }

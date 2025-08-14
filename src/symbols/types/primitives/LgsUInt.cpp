@@ -10,7 +10,7 @@ size_t LgsUInt::getSizeBytes() {
     return sizeof(unsigned int);
 }
 
-string LgsUInt::prettyName() {
+std::string LgsUInt::prettyName() {
     return name;
 }
 
@@ -18,7 +18,7 @@ Type* LgsUInt::getIRType(LgsCodeGen* codeGen) {
     return codeGen->i32Ty();
 }
 
-string LgsUInt::getName() {
+std::string LgsUInt::getName() {
     return name;
 }
 
@@ -34,6 +34,6 @@ bool LgsUInt::equals(LgsType* other) {
     return name == IRName;
 }
 
-string LgsUInt::strFormatPart() const {
+std::string LgsUInt::strFormatPart() const {
     return "%d";
 }

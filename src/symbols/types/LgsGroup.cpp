@@ -10,11 +10,11 @@ LgsExpr* LgsGroup::getZeroValue() {
     assert(0);
 }
 
-string LgsGroup::getName() {
+std::string LgsGroup::getName() {
     return name;
 }
 
-string LgsGroup::prettyName() {
+std::string LgsGroup::prettyName() {
     return name;
 }
 

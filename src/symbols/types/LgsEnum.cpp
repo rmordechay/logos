@@ -12,11 +12,11 @@ Type* LgsEnum::getIRType(LgsCodeGen* codeGen) {
     return codeGen->ptrTy();
 }
 
-string LgsEnum::getName() {
+std::string LgsEnum::getName() {
     return name;
 }
 
-string LgsEnum::prettyName() {
+std::string LgsEnum::prettyName() {
     return name;
 }
 
@@ -24,7 +24,7 @@ bool LgsEnum::equals(LgsType* other) {
     return name == other->getName();
 }
 
-string LgsEnum::strFormatPart() const {
+std::string LgsEnum::strFormatPart() const {
     return "%s";
 }
 

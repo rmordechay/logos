@@ -22,16 +22,16 @@ struct RequireEnvVar;
 
 class LgsApp final {
 public:
-    string name;
-    string version;
+    std::string name;
+    std::string version;
     LgsPaths paths;
     LgsEnv activeEnv;
     LgsRuntime runtime;
-    vector<char*> args;
+    std::vector<char*> args;
     LgsSymbolTable globals;
-    vector<LgsFile*> files;
+    std::vector<LgsFile*> files;
     LgsErrHandler errHandler;
-    vector<LgsEnvFile*> envFiles;
+    std::vector<LgsEnvFile*> envFiles;
     LgsAppFile* appFile = nullptr;
     TargetMachine* targetMachine = nullptr;
 
@@ -46,7 +46,7 @@ public:
     bool generate();
     bool link() const;
     void initBuild();
-    void parseSrcFile(const string& codeText, fs::path filePath = "");
+    void parseSrcFile(const std::string& codeText, fs::path filePath = "");
     void parseEnvFile(fs::path fileEntry);
     void parseAppFile(fs::path fileEntry);
     bool resolveGlobalTypes();

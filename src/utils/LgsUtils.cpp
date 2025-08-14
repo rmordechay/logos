@@ -3,14 +3,14 @@
 #include "configs/LgsDefinitions.h"
 #include "utils/LgsErrHandler.h"
 
-const unordered_set<string> LOGOS_KEYWORDS = {"object", "single", "self", "Self", "interface", "extern", "pub", "implements", "const", "enum",  "vec2", "vec3", "vec4", "if", "else", "for", "break", "continue", "return", "and", "or", "not", "in"};
+const std::unordered_set<std::string> LOGOS_KEYWORDS = {"object", "single", "self", "Self", "interface", "extern", "pub", "implements", "const", "enum",  "vec2", "vec3", "vec4", "if", "else", "for", "break", "continue", "return", "and", "or", "not", "in"};
 
-void logInfo(const string& text) {
-    cout << text;
+void logInfo(const std::string& text) {
+    std::cout << text;
 }
 
-void logErr(const string& text) {
-    cerr << text << '\n';
+void logErr(const std::string& text) {
+    std::cerr << text << '\n';
 }
 
 bool isLogosFile(const fs::directory_entry& entry) {
@@ -21,26 +21,26 @@ bool isLLVMFile(const fs::directory_entry& entry) {
     return entry.is_regular_file() && entry.path().extension().string() == ".ll";
 }
 
-bool isLogosKeyword(const string& s) {
+bool isLogosKeyword(const std::string& s) {
     return LOGOS_KEYWORDS.find(s) != LOGOS_KEYWORDS.end();
 }
 
-void cleanStr(string& value) {
+void cleanStr(std::string& value) {
     value.erase(0, 1);
     value.pop_back();
 }
 
-string getFileText(const fs::path& filePath) {
+std::string getFileText(const fs::path& filePath) {
     if (!fs::exists(filePath)) return "";
-    ifstream file(filePath);
+    std::ifstream file(filePath);
     if (!file.is_open()) return "";
-    stringstream fileContents;
+    std::stringstream fileContents;
     fileContents << file.rdbuf();
     return fileContents.str();
 }
 
-string removeUnderscores(const string& input) {
-    string result = input;
+std::string removeUnderscores(const std::string& input) {
+    std::string result = input;
     result.erase(remove(result.begin(), result.end(), '_'), result.end());
     return result;
 }
@@ -51,6 +51,6 @@ void freeType(const LgsType* type) {
     // delete type;
 }
 
-string getFullPath(const LgsLocation& location) {
-    return string(location.filePath) + ":" + to_string(location.lineStart) + ":" + to_string(location.posInLine);
+std::string getFullPath(const LgsLocation& location) {
+    return std::string(location.filePath) + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.posInLine);
 }

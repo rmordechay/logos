@@ -8,7 +8,7 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
-string LgsBool::prettyName() {
+std::string LgsBool::prettyName() {
     return name;
 }
 
@@ -16,7 +16,7 @@ Type* LgsBool::getIRType(LgsCodeGen* codeGen) {
     return codeGen->i1Ty();
 }
 
-string LgsBool::getName() {
+std::string LgsBool::getName() {
     return name;
 }
 
@@ -36,7 +36,7 @@ bool LgsBool::equals(LgsType* other) {
     return name == IRName;
 }
 
-string LgsBool::strFormatPart() const {
+std::string LgsBool::strFormatPart() const {
     return "%d";
 }
 

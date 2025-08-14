@@ -5,11 +5,11 @@
 #include "types/LgsSArray.h"
 #include "types/primitives/LgsLong.h"
 
-string LgsCPtr::getName() {
+std::string LgsCPtr::getName() {
     return name;
 }
 
-string LgsCPtr::prettyName() {
+std::string LgsCPtr::prettyName() {
     return name;
 }
 

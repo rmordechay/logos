@@ -5,7 +5,7 @@
 // #include <doctest.h>
 // #include <regex>
 //
-// typedef map<string, map<string, vector<string>>> ExpectedInstructions;
+// typedef map<string, map<string, std::vector<string>>> ExpectedInstructions;
 //
 // string normalize(const string& str) {
 //     const auto newStr = regex_replace(str, regex(R"(, align \d+)"), "");
@@ -49,7 +49,7 @@
 //             c = a + b
 //         }
 //     )";
-//     const map<string, map<string, vector<string>>> expectedInts = {
+//     const map<string, map<string, std::vector<string>>> expectedInts = {
 //         {"main", {
 //             {"entry", {
 //                 "%0 = alloca i32",
@@ -80,7 +80,7 @@
 //         func(10)
 //     }
 //     )";
-//     const map<string, map<string, vector<string>>> expectedInts = {
+//     const map<string, map<string, std::vector<string>>> expectedInts = {
 //         {"main", {
 //             {"entry", {
 //                 "call void @func(i32 10)",

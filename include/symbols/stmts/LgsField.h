@@ -12,8 +12,8 @@ class LgsExpr;
 
 class LgsField final : public LgsValue {
 public:
-    string name;
-    string* parentName;
+    std::string name;
+    std::string* parentName;
     size_t position = 0;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
@@ -22,7 +22,7 @@ public:
     bool isOptional = false;
     Type* parentIRType = nullptr;
 
-    LgsField(string  name, string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(std::move(name)), parentName(parentName), type(type), expr(expr) {}
+    LgsField(std::string  name, std::string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(std::move(name)), parentName(parentName), type(type), expr(expr) {}
     Value* getGEP(LgsCodeGen* codeGen, Value* parentIRValue) const;
     Value* resolveVirtualField(LgsCodeGen* codeGen, const LgsHashMap* vtable, Value* parentIRValue) const;
     ~LgsField() override;

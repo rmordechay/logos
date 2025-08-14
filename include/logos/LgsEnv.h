@@ -2,6 +2,6 @@
 
 class LgsEnv {
 public:
-    string name;
-    map<string, string> envVars;
+    std::string name;
+   std::map<std::string, std::string> envVars;
 };

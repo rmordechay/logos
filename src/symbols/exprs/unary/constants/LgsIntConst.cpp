@@ -5,8 +5,8 @@
 
 #include "utils/LgsUtils.h"
 
-string LgsIntConst::prettyName() {
-    return to_string(value);
+std::string LgsIntConst::prettyName() {
+    return std::to_string(value);
 }
 
 Value* LgsIntConst::createIRValue(LgsCodeGen* codeGen) {
@@ -18,7 +18,7 @@ LgsExpr* LgsIntConst::castTo(LgsType* toType) {
         return this;
     }
     if (toType->asStr()) {
-        return new LgsStrConst(to_string(value));
+        return new LgsStrConst(std::to_string(value));
     }
     if (toType->asLong()) {
         return new LgsLongConst(value);

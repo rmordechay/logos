@@ -13,7 +13,7 @@ public:
     explicit LgsSystemPid(LgsType* parent): LgsBuiltinFunc(name, &LGS_INT, parent->getName(), {parent}, true) {
         funcType->isStatic = true;
     }
-    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
+    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         return codeGen->callGetPid();
     }
     ~LgsSystemPid() override = default;
@@ -25,7 +25,7 @@ public:
     explicit LgsSystemSleep(LgsType* parent): LgsBuiltinFunc(name, &LGS_VOID, parent->getName(), {parent, &LGS_INT}, true) {
         funcType->isStatic = true;
     }
-    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
+    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         return codeGen->callSleep(args[1]->getIRValue(codeGen));
     }
     ~LgsSystemSleep() override = default;
@@ -38,7 +38,7 @@ public:
         funcType->isStatic = true;
         funcType->isTerminator = true;
     }
-    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
+    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         return codeGen->callExit(args[1]->getIRValue(codeGen));
     }
     ~LgsSystemExit() override = default;
@@ -50,7 +50,7 @@ public:
     explicit LgsSystemCwd(LgsType* parent): LgsBuiltinFunc(name, new LgsStr(), parent->getName(), {parent}, true) {
         funcType->isStatic = true;
     }
-    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
+    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         return codeGen->callCwd();
     }
     ~LgsSystemCwd() override = default;
@@ -73,7 +73,7 @@ public:
     explicit LgsSystemCoresNum(LgsType* parent): LgsBuiltinFunc(name, &LGS_LONG, parent->getName(), {parent}, true) {
         funcType->isStatic = true;
     }
-    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
+    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         return codeGen->callCoresNum();
     }
     ~LgsSystemCoresNum() override = default;

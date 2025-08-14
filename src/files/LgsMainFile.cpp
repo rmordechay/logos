@@ -16,7 +16,7 @@ void LgsMainFile::generateIR() {
 }
 
 void LgsMainFile::format() {
-    string indentStr = "";
+    std::string indentStr = "";
 }
 
 LgsMainFile::~LgsMainFile() {

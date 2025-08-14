@@ -8,16 +8,16 @@
 
 class ThreadPool {
 public:
-    mutex mtx;
+    std::mutex mtx;
     bool stop = false;
     size_t active = 0;
-    vector<thread> workers;
-    condition_variable cvTask;
-    condition_variable cvIdle;
-    queue<function<void()>> tasks;
+    std::vector<std::thread> workers;
+    std::condition_variable cvTask;
+    std::condition_variable cvIdle;
+    std::queue<std::function<void()>> tasks;
 
     ThreadPool();
-    void runTask(function<void()> task);
+    void runTask(std::function<void()> task);
     void wait();
     void worker();
     ~ThreadPool();

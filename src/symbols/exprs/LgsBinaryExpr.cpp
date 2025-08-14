@@ -1,7 +1,7 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 
-string LgsBinaryExpr::prettyName() {
+std::string LgsBinaryExpr::prettyName() {
     return left->prettyName() + ' ' + opStr + ' ' + right->prettyName();
 }
 

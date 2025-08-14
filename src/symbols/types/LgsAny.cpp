@@ -9,7 +9,7 @@ Type* LgsAny::getIRType(LgsCodeGen* codeGen) {
     return codeGen->ptrTy();
 }
 
-string LgsAny::getName() {
+std::string LgsAny::getName() {
     return name;
 }
 
@@ -17,11 +17,11 @@ LgsExpr* LgsAny::getZeroValue() {
     assert(0);
 }
 
-string LgsAny::prettyName() {
+std::string LgsAny::prettyName() {
     return name;
 }
 
-string LgsAny::strFormatPart() const {
+std::string LgsAny::strFormatPart() const {
     return "%p";
 }
 

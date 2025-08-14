@@ -8,7 +8,7 @@ public:
 
     explicit LgsFloatConst(const float value) : LgsUnaryExpr(&LGS_FLOAT), value(value) {}
     Value* createIRValue(LgsCodeGen* codeGen) override;
-    string prettyName() override;
+    std::string prettyName() override;
     ~LgsFloatConst() override = default;
 };
 

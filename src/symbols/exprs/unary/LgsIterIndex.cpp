@@ -61,7 +61,7 @@ Value* LgsIterIndex::getStrGEP(LgsCodeGen* codeGen) const {
 }
 
 Value* LgsIterIndex::getArrGEP(LgsCodeGen* codeGen) const {
-    vector<Value*> IRIndices = {};
+    std::vector<Value*> IRIndices = {};
     Type* ty = nullptr;
     Value* ptr = nullptr;
     auto iterIndex = this;
@@ -82,8 +82,8 @@ Value* LgsIterIndex::getArrGEP(LgsCodeGen* codeGen) const {
     return codeGen->builder.CreateGEP(ty, ptr, IRIndices);
 }
 
-string LgsIterIndex::prettyName() {
-    stringstream str;
+std::string LgsIterIndex::prettyName() {
+    std::stringstream str;
     str << baseExpr->prettyName();
     if (index->to) {
         str << '[' << index->from->prettyName() << ':' << index->to->prettyName() << ']';

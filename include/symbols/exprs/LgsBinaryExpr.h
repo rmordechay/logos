@@ -27,11 +27,11 @@ class LgsBinaryExpr final : public LgsExpr {
 public:
     LgsExpr* left;
     LgsExpr* right;
-    string opStr;
+    std::string opStr;
     LgsOperator op;
 
     explicit LgsBinaryExpr(LgsType* type, LgsExpr* left, LgsExpr* right, const LgsOperator op) : LgsExpr(type), left(left), right(right), op(op) {}
-    string prettyName() override;
+    std::string prettyName() override;
     Value* createIRValue(LgsCodeGen* codeGen) override;
     Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* mulIR(LgsCodeGen* codeGen, LgsExpr* other) override;

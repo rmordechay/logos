@@ -7,10 +7,10 @@ class LgsIfStmt final : public LgsStmt {
 public:
     LgsExpr* ifCond;
     LgsStmtsBlock* ifBlock;
-    vector<std::pair<LgsExpr*, LgsStmtsBlock*>> elseIfs;
+    std::vector<std::pair<LgsExpr*, LgsStmtsBlock*>> elseIfs;
     LgsStmtsBlock* elseBlock = nullptr;
     bool isPatternMatching = false;
-    string tag;
+    std::string tag;
 
     explicit LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock = nullptr) : ifCond(ifCond), ifBlock(ifStmtBlock) {}
     void createIRStmt(LgsCodeGen* codeGen) override;

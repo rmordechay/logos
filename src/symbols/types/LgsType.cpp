@@ -12,13 +12,13 @@
 
 class LgsShort;
 
-LgsField* LgsType::getField(const string& name) {
+LgsField* LgsType::getField(const std::string& name) {
     const auto field = fields.find(name);
     if (field != fields.end()) {
         return field->second;
     }
 
-    vector<LgsType*> interfaces;
+    std::vector<LgsType*> interfaces;
     if (const auto obj = asObject()) {
         interfaces = obj->interfaces;
     } else if (const auto interface = asInterface()) {
@@ -34,12 +34,12 @@ LgsField* LgsType::getField(const string& name) {
     return nullptr;
 }
 
-LgsFunc* LgsType::getMethod(const string& name) {
+LgsFunc* LgsType::getMethod(const std::string& name) {
     const auto method = methods.find(name);
     if (method != methods.end()) {
         return method->second;
     }
-    vector<LgsType*> interfaces;
+    std::vector<LgsType*> interfaces;
     if (const auto obj = asObject()) {
         interfaces = obj->interfaces;
     } else if (const auto interface = asInterface()) {
@@ -69,7 +69,7 @@ bool LgsType::addField(LgsField* field) {
 }
 
 void LgsType::freeValue(LgsCodeGen* codeGen, Value* value) {}
-string LgsType::strFormatPart() const { assert(0); }
+std::string LgsType::strFormatPart() const { assert(0); }
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
 LgsChar* LgsType::asChar() { return dynamic_cast<LgsChar*>(this); }
 LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }

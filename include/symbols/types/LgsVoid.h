@@ -8,10 +8,10 @@ public:
     LgsVoid() {
         isVoid = true;
     }
-    string prettyName() override;
+    std::string prettyName() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
     size_t getSizeBytes() override;
-    string getName() override;
+    std::string getName() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     ~LgsVoid() override = default;

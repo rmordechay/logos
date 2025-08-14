@@ -348,7 +348,7 @@ void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
 void SemaAnalyser::visitDeferStmt(LgsDeferStmt* deferStmt) {
     if (deferStmt->funcCall) visitFuncCall(deferStmt->funcCall);
     else visitSelection(deferStmt->selection);
-    stack.currentFunc()->hasDefers = true;
+    deferStmt->index = stack.currentFunc()->defersCounter++;
 }
 
 void SemaAnalyser::visitReturnStmt(LgsReturn* returnStmt) {
@@ -790,7 +790,7 @@ bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterEx
         foreachLoop->loopVars[0]->type = &LGS_INT;
         foreachLoop->loopVars[0]->expr = LGS_INT.getZeroValue();
     } else if (iterable->unpackLength != varDecSize) {
-        errHandler.addError(E10041, &iterExpr->location, {iterExpr->prettyName(), to_string(iterable->unpackLength), to_string(iterable->unpackLength + 1), to_string(varDecSize)});
+        errHandler.addError(E10041, &iterExpr->location, {iterExpr->prettyName(), std::to_string(iterable->unpackLength), std::to_string(iterable->unpackLength + 1), std::to_string(varDecSize)});
         return true;
     }
 
@@ -803,8 +803,8 @@ bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterEx
     return false;
 }
 
-void SemaAnalyser::validateObjImplements(LgsObject* obj, const vector<LgsType*>& interfaces) {
-    unordered_set<string> interfacesNames;
+void SemaAnalyser::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces) {
+    std::unordered_set<std::string> interfacesNames;
     for (const auto implementsInterface : interfaces) {
         const auto interface = implementsInterface->asInterface();
         if (!interface) {
@@ -818,8 +818,8 @@ void SemaAnalyser::validateObjImplements(LgsObject* obj, const vector<LgsType*>&
     }
 }
 
-string getMissingImplementsStr(const vector<LgsField*>& fields, const vector<LgsFunc*>& methods) {
-    stringstream str;
+std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {
+    std::stringstream str;
     str << "Missing fields/methods:";
     if (!fields.empty()) {
         str << LGS_ERROR_PADDING << "Fields:";
@@ -838,7 +838,7 @@ string getMissingImplementsStr(const vector<LgsField*>& fields, const vector<Lgs
 
 void SemaAnalyser::validateObjInterface(LgsObject* obj, LgsInterface* interface) {
     // Fields
-    vector<LgsField*> missingFields;
+    std::vector<LgsField*> missingFields;
     for (const auto& [name, interfaceField] : interface->fields) {
         const auto objField = obj->fields.find(name);
         if (objField != obj->fields.end() && objField->second->type->equals(interfaceField->type)) {
@@ -851,7 +851,7 @@ void SemaAnalyser::validateObjInterface(LgsObject* obj, LgsInterface* interface)
     }
 
     // Methods
-    vector<LgsFunc*> missingMethods;
+    std::vector<LgsFunc*> missingMethods;
     for (const auto& [name, interfaceMethod] : interface->methods) {
         const auto method = obj->methods.find(name);
         if (method != obj->methods.end()) {
@@ -883,7 +883,7 @@ void SemaAnalyser::validateIndex(LgsIterIndex* iterIndex) {
         const auto i = exprFrom->getConstInt();
         const auto bound = sArr->initialLength;
         if (i >= bound) {
-            return errHandler.addError(E10003, &iterIndex->location, {iterIndex->prettyName(), to_string(bound)});
+            return errHandler.addError(E10003, &iterIndex->location, {iterIndex->prettyName(), std::to_string(bound)});
         }
     }
 }
@@ -901,7 +901,7 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
         const auto j = exprTo->getConstInt();
         const auto bound = sArr->initialLength;
         if (i >= bound || j >= bound) {
-            return errHandler.addError(E10003, &iterIndex->location, {iterIndex->prettyName(), to_string(bound)});
+            return errHandler.addError(E10003, &iterIndex->location, {iterIndex->prettyName(), std::to_string(bound)});
         }
     }
 }
@@ -971,7 +971,7 @@ bool SemaAnalyser::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, cons
     return isValid;
 }
 
-LgsSymbol* SemaAnalyser::getSymbol(const string& name, LgsLocation* location) {
+LgsSymbol* SemaAnalyser::getSymbol(const std::string& name, LgsLocation* location) {
     if (const auto globalSymbol = globals.getSymbol(name)) {
         return globalSymbol;
     }

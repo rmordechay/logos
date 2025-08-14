@@ -4,16 +4,16 @@
 
 class LgsInstance final : public LgsUnaryExpr {
 public:
-    string name;
+    std::string name;
     LgsObject* obj = nullptr;
 
-    map<string, LgsVarDec*> args;
-    explicit LgsInstance(const string& name): name(name) {}
+   std::map<std::string, LgsVarDec*> args;
+    explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), name(obj->name), obj(obj) {}
     Value* createIRValue(LgsCodeGen* codeGen) override;
     void setObject(LgsObject* newObj);
     void setVirtuals(LgsCodeGen* codeGen) const;
-    string prettyName() override;
-    void initFields(LgsCodeGen* codeGen, const map<string, LgsField*>& fields);
+    std::string prettyName() override;
+    void initFields(LgsCodeGen* codeGen, std::map<std::string, LgsField*>& fields);
     ~LgsInstance() override;
 };

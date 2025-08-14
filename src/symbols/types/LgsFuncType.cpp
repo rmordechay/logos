@@ -4,7 +4,7 @@
 #include "utils/LgsUtils.h"
 
 Type* LgsFuncType::getIRType(LgsCodeGen* codeGen) {
-    vector<Type*> IRParamsTypes;
+    std::vector<Type*> IRParamsTypes;
     for (int i = isStatic; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
@@ -38,9 +38,9 @@ bool LgsFuncType::equals(LgsType* other) {
     return true;
 }
 
-string LgsFuncType::getName() {
+std::string LgsFuncType::getName() {
     if (IRName != "") return IRName;
-    stringstream strStream;
+    std::stringstream strStream;
     if (isMethod) {
         if (parentName != "") {
             strStream << parentName << "_";
@@ -57,8 +57,8 @@ LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
 
-string LgsFuncType::prettyName() {
-    stringstream strStream;
+std::string LgsFuncType::prettyName() {
+    std::stringstream strStream;
     strStream << name << '(';
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param = params[i];
@@ -76,7 +76,7 @@ string LgsFuncType::prettyName() {
     return strStream.str();
 }
 
-string LgsFuncType::strFormatPart() const {
+std::string LgsFuncType::strFormatPart() const {
     return "%p";
 }
 

@@ -6,7 +6,7 @@ Type* LgsNullable::getIRType(LgsCodeGen* codeGen) {
     return codeGen->ptrTy();
 }
 
-string LgsNullable::getName() {
+std::string LgsNullable::getName() {
     assert(0);
 }
 
@@ -14,7 +14,7 @@ LgsExpr* LgsNullable::getZeroValue() {
     return baseType->getZeroValue();
 }
 
-string LgsNullable::prettyName() {
+std::string LgsNullable::prettyName() {
     return baseType->prettyName() + '?';
 }
 

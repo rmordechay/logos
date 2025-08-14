@@ -50,7 +50,7 @@ int LgsExpr::getConstInt() {
     return -1;
 }
 
-string LgsExpr::getConstStr() {
+std::string LgsExpr::getConstStr() {
     if (const auto strConst = asStrConst()) {
         return strConst->value;
     }

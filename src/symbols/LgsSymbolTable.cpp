@@ -19,7 +19,7 @@ void LgsSymbolTable::addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandle
     symbols[symbolName] = symbol;
 }
 
-LgsSymbol* LgsSymbolTable::getSymbol(const string& name) {
+LgsSymbol* LgsSymbolTable::getSymbol(const std::string& name) {
     if (symbols.find(name) != symbols.end()) {
         return &symbols[name];
     }

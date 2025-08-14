@@ -5,6 +5,6 @@ Value* LgsFloatConst::createIRValue(LgsCodeGen* codeGen) {
     return ConstantFP::get(codeGen->builder.getFloatTy(), value);
 }
 
-string LgsFloatConst::prettyName() {
+std::string LgsFloatConst::prettyName() {
     return type->prettyName();
 }

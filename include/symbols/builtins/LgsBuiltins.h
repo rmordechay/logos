@@ -15,7 +15,7 @@ public:
         funcType->IRName = "printf";
     }
 
-    Value* call(LgsCodeGen* codeGen, const vector<LgsExpr*>& args) override {
+    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         const auto arg = args.front();
         const auto strConst = arg->asStrConst();
         if (strConst && !strConst->templateParts.empty()) {
@@ -34,7 +34,7 @@ public:
 
     static Value* printFormat(LgsCodeGen* codeGen, const LgsStrConst* const strConst) {
         auto formated = strConst->formatedStr;
-        vector<Value*> values;
+        std::vector<Value*> values;
         for (const auto part : strConst->templateParts) {
             auto partIR = getIRArg(codeGen, part);
             values.push_back(partIR);
@@ -43,7 +43,7 @@ public:
                 formated.replace(pos, strlen(LGS_STR_FMT_PLACEHOLDER), part->type->strFormatPart());
             }
         }
-        vector IRArgs = {codeGen->getIRStr(formated)};
+        std::vector IRArgs = {codeGen->getIRStr(formated)};
         IRArgs.insert(IRArgs.end(), values.begin(), values.end());
         return codeGen->callPrintf(IRArgs);
     }

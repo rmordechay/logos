@@ -1,6 +1,6 @@
 #include "types/LgsIterator.h"
 
-string LgsIterator::prettyName() {
+std::string LgsIterator::prettyName() {
     assert(0);
 }
 

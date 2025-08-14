@@ -97,7 +97,7 @@ public:
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     bool setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
 
-    void validateObjImplements(LgsObject* obj, const vector<LgsType*>& interfaces);
+    void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);
     void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     void validateExprType(LgsExpr* expr, LgsType* type);
@@ -108,7 +108,7 @@ public:
     void validateFuncControlFlow(LgsFunc* func);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
-    LgsSymbol* getSymbol(const string& name, LgsLocation* location);
+    LgsSymbol* getSymbol(const std::string& name, LgsLocation* location);
     void addLocalSymbol(const LgsSymbol& newSymbol);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);

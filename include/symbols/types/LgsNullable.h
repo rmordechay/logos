@@ -7,9 +7,9 @@ public:
 
     explicit LgsNullable(LgsType* baseType) : baseType(baseType) {}
     Type* getIRType(LgsCodeGen* codeGen) override;
-    string getName() override;
+    std::string getName() override;
     LgsExpr* getZeroValue() override;
-    string prettyName() override;
+    std::string prettyName() override;
     bool equals(LgsType* other) override;
     size_t getSizeBytes() override;
     ~LgsNullable() override;

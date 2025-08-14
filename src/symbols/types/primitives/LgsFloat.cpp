@@ -3,7 +3,7 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 
-string LgsFloat::prettyName() {
+std::string LgsFloat::prettyName() {
     return name;
 }
 
@@ -11,7 +11,7 @@ Type* LgsFloat::getIRType(LgsCodeGen* codeGen) {
     return Type::getFloatTy(codeGen->context);
 }
 
-string LgsFloat::getName() {
+std::string LgsFloat::getName() {
     return name;
 }
 
@@ -23,7 +23,7 @@ size_t LgsFloat::getSizeBytes() {
     return sizeof(float);
 }
 
-string LgsFloat::strFormatPart() const {
+std::string LgsFloat::strFormatPart() const {
     return "%f";
 }
 
