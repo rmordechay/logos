@@ -114,9 +114,9 @@ LgsMainFile* AntlrConverter::getMainFile(LogosParser::MainFileContext* ctx) {
         if (funcName == LGS_MAIN_FUNC_NAME) {
             file->funcs[funcName] = getMainFunc(func);
         } else {
-            const auto funcImpl = getFunc(func);
-            file->funcs[funcName] = funcImpl;
-            addFileSymbol(file, LgsSymbol(funcImpl));
+            const auto lgsFunc = getFunc(func);
+            file->funcs[funcName] = lgsFunc;
+            addFileSymbol(file, LgsSymbol(lgsFunc));
         }
     }
 
@@ -359,9 +359,10 @@ LgsStmt* AntlrConverter::getDeferStmt(LogosParser::DeferStmtContext* ctx) {
 LgsFunc* AntlrConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx) {
     const auto rt = getFuncReturnType(ctx->type());
     const auto func = new LgsFunc("", rt);
-    for (const auto param : ctx->anonymousParam()) {
-        auto lgsParam = LgsParam(getType(param->type()), param->IDENTIFIER()->getText());
-        setLocation(lgsParam.location, param->start, ctx->getText());
+    func->funcType->isAnonymous = true;
+    for (const auto param : ctx->IDENTIFIER()) {
+        auto lgsParam = LgsParam(nullptr, param->getText());
+        setLocation(lgsParam.location, param->getSymbol(), ctx->getText());
         func->funcType->params.push_back(lgsParam);
     }
     func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
@@ -372,17 +373,17 @@ LgsFunc* AntlrConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx
 void AntlrConverter::setParams(LgsFuncType* funcType, const std::vector<LogosParser::ParamContext*>& params) {
     for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
-        if (param->type()) {
-            auto lgsParam = getParam(funcType, param);
-            funcType->params.push_back(lgsParam);
-        } else if (const auto paramFuncType = param->funcType()) {
+        if (const auto paramFuncType = param->type()->funcType()) {
             const auto lgsParamFuncType = getFuncType(paramFuncType);
             lgsParamFuncType->name = param->IDENTIFIER()->getText();
             auto lgsParam = LgsParam(lgsParamFuncType);
             lgsParam.name = lgsParamFuncType->name;
             setLocation(lgsParam.location, param->start, param->getText());
             funcType->params.push_back(lgsParam);
+            continue;
         }
+        auto lgsParam = getParam(funcType, param);
+        funcType->params.push_back(lgsParam);
     }
 }
 

@@ -12,7 +12,7 @@ Value* LgsValue::getIRValue(LgsCodeGen* codeGen) {
     return IRValue;
 }
 
-void LgsValue::getDebugValue(LgsCodeGen* codeGen) {
+void LgsValue::createDebugValue(LgsCodeGen* codeGen) {
     assert(0);
 }
 

@@ -16,7 +16,6 @@ public:
     Value* vaList = nullptr;
 
     explicit LgsParam(LgsType* type = nullptr, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
-    LgsParam(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {}
     void createIRValue(LgsCodeGen* codeGen) override;
     std::string format(std::string& indentStr) override;
     ~LgsParam() override = default;

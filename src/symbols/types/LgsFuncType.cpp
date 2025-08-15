@@ -3,6 +3,18 @@
 #include "logos/LgsCodeGen.h"
 #include "utils/LgsUtils.h"
 
+void LgsFuncType::setFuncOptions(const uint32_t ops) {
+    isMethod = ops & METHOD;
+    isPublic = ops & PUBLIC;
+    isInternal = ops & INTERNAL;
+    isVirtual = ops & VIRTUAL;
+    isStatic = ops & STATIC;
+    isVariadic = ops & VARIADIC;
+    hasDefaults = ops & HAS_DEFAULTS;
+    isOptional = ops & OPTIONAL;
+    isTerminator = ops & TERMINATOR;
+}
+
 Type* LgsFuncType::getIRType(LgsCodeGen* codeGen) {
     std::vector<Type*> IRParamsTypes;
     for (int i = isStatic; i < params.size(); ++i) {
@@ -30,6 +42,7 @@ bool LgsFuncType::equals(LgsType* other) {
     if (!rt->equals(otherFuncType->rt)) return false;
     if (params.size() != otherParams.size()) return false;
     if (params.size() == 0 && otherParams.size() == 0) return true;
+    if (isAnonymous) return true;
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto thisType = params[i].type;
         const auto otherType = otherFuncType->params[i].type;

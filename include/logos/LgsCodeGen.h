@@ -65,14 +65,14 @@ public:
     Value* callStrLen(Value* str);
     void callCopyMem(Value* src, Value* dest, size_t n);
 
+    // Stack
     void callStackPush();
     void callPopStack();
     void callDefers();
     void addDeferFunc(Value* deferFuncPtr, Value* ctx);
-    void addCoro(Value* coroPtr, Value* ctx);
-    Value* callHashStr(Value* value);
 
     // Coroutines
+    void addCoro(Value* coroPtr, Value* ctx);
     Value* callCoroIDFunc();
     Value* callSuspendFunc();
     Value* callResumeFunc(Value* handle);
@@ -80,6 +80,9 @@ public:
     Value* callCoroBeginFunc(Value* coroID, Value* frameSize);
     Value* callCoroEndFunc(Value* handle);
     Value* callCoroDestroyFunc(Value* handle);
+
+    // Internal
+    Value* callHashStr(Value* value);
 
     // Types
     Type* i1Ty();

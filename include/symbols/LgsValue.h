@@ -17,7 +17,7 @@ public:
     void setIRValue(Value* value);
     Value* getIRValue(LgsCodeGen* codeGen);
     virtual void createIRValue(LgsCodeGen* codeGen) = 0;
-    virtual void getDebugValue(LgsCodeGen* codeGen);
+    virtual void createDebugValue(LgsCodeGen* codeGen);
     virtual std::string format(std::string& indentStr);
     virtual ~LgsValue() = default;
 };

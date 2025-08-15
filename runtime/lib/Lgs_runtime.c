@@ -8,7 +8,7 @@ typedef struct {
 
 Lgs_runtime runtime;
 
-void Lgs_Stack_push() {
+void Lgs_Stack_push(void) {
     if (runtime.stack.top + 1 >= STACK_CAPACITY) exit(1);
     runtime.stack.top++;
     Lgs_Stack_Frame* frame = &runtime.stack.frames[runtime.stack.top];

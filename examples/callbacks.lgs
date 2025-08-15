@@ -1,0 +1,14 @@
+f(a: (Int, Int): Void) {
+    ac: (Int, Int): Void = (x, y): Void {
+        print("fkj")
+    }
+    ac()
+    ab: (Int, Int): Void = (x, y) {
+
+    }
+}
+
+main() {
+    a = [3, 4, 67]
+    //a.map((it): Int: it + 3)
+}

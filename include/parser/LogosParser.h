@@ -38,20 +38,19 @@ public:
     RuleObject = 11, RuleObjectBody = 12, RuleField = 13, RuleInterfaceField = 14, 
     RuleImplements = 15, RuleFuncSignatureHeader = 16, RuleFuncSignature = 17, 
     RuleInterfaceFunc = 18, RuleFunc = 19, RuleAnonnymosFunc = 20, RuleMethod = 21, 
-    RuleParam = 22, RuleAnonymousParam = 23, RuleStatement = 24, RuleStatementsBlock = 25, 
-    RuleAssignment = 26, RuleExplicitVarDec = 27, RuleImplicitVarDec = 28, 
-    RuleIfStatement = 29, RuleElseIfStatement = 30, RuleElseStatement = 31, 
-    RulePatternMatching = 32, RulePattern = 33, RuleLoopStatement = 34, 
-    RuleBreakStmt = 35, RuleReturnStatement = 36, RuleEnumDeclaration = 37, 
-    RuleEnumField = 38, RuleCoroutine = 39, RuleDeferStmt = 40, RuleExpr = 41, 
-    RuleUnaryExpr = 42, RulePrefixExpr = 43, RulePostfixExpr = 44, RuleArrayExpr = 45, 
-    RuleHashMap = 46, RuleKeyValue = 47, RuleFuncCall = 48, RuleFuncArgList = 49, 
-    RuleFuncArg = 50, RuleInstance = 51, RuleInstanceArgList = 52, RuleInstanceArg = 53, 
-    RuleConstant = 54, RuleIterIndex = 55, RuleIndex = 56, RuleIsFirst = 57, 
-    RuleIsLast = 58, RuleSelection = 59, RuleFirstSelectionElement = 60, 
-    RuleInnerSelectionElement = 61, RuleRange = 62, RuleType = 63, RuleMapType = 64, 
-    RuleArraySize = 65, RuleFuncType = 66, RuleVector = 67, RuleExtern = 68, 
-    RuleRequireEnvVars = 69, RuleAssignemntOp = 70
+    RuleParam = 22, RuleStatement = 23, RuleStatementsBlock = 24, RuleAssignment = 25, 
+    RuleExplicitVarDec = 26, RuleImplicitVarDec = 27, RuleIfStatement = 28, 
+    RuleElseIfStatement = 29, RuleElseStatement = 30, RulePatternMatching = 31, 
+    RulePattern = 32, RuleLoopStatement = 33, RuleBreakStmt = 34, RuleReturnStatement = 35, 
+    RuleEnumDeclaration = 36, RuleEnumField = 37, RuleCoroutine = 38, RuleDeferStmt = 39, 
+    RuleExpr = 40, RuleUnaryExpr = 41, RulePrefixExpr = 42, RulePostfixExpr = 43, 
+    RuleArrayExpr = 44, RuleHashMap = 45, RuleKeyValue = 46, RuleFuncCall = 47, 
+    RuleFuncArgList = 48, RuleFuncArg = 49, RuleInstance = 50, RuleInstanceArgList = 51, 
+    RuleInstanceArg = 52, RuleConstant = 53, RuleIterIndex = 54, RuleIndex = 55, 
+    RuleIsFirst = 56, RuleIsLast = 57, RuleSelection = 58, RuleFirstSelectionElement = 59, 
+    RuleInnerSelectionElement = 60, RuleRange = 61, RuleType = 62, RuleMapType = 63, 
+    RuleArraySize = 64, RuleFuncType = 65, RuleVector = 66, RuleExtern = 67, 
+    RuleRequireEnvVars = 68, RuleAssignemntOp = 69
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -94,7 +93,6 @@ public:
   class AnonnymosFuncContext;
   class MethodContext;
   class ParamContext;
-  class AnonymousParamContext;
   class StatementContext;
   class StatementsBlockContext;
   class AssignmentContext;
@@ -460,8 +458,8 @@ public:
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
     StatementsBlockContext *statementsBlock();
-    std::vector<AnonymousParamContext *> anonymousParam();
-    AnonymousParamContext* anonymousParam(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> IDENTIFIER();
+    antlr4::tree::TerminalNode* IDENTIFIER(size_t i);
     antlr4::tree::TerminalNode *COLON();
     TypeContext *type();
     std::vector<antlr4::tree::TerminalNode *> COMMA();
@@ -491,7 +489,6 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *COLON();
-    FuncTypeContext *funcType();
     TypeContext *type();
     antlr4::tree::TerminalNode *TRIPLE_DOT();
     antlr4::tree::TerminalNode *EQUAL();
@@ -501,19 +498,6 @@ public:
   };
 
   ParamContext* param();
-
-  class  AnonymousParamContext : public antlr4::ParserRuleContext {
-  public:
-    AnonymousParamContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    antlr4::tree::TerminalNode *COLON();
-    TypeContext *type();
-
-   
-  };
-
-  AnonymousParamContext* anonymousParam();
 
   class  StatementContext : public antlr4::ParserRuleContext {
   public:
@@ -541,10 +525,10 @@ public:
   public:
     StatementsBlockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<StatementContext *> statement();
-    StatementContext* statement(size_t i);
     antlr4::tree::TerminalNode *LBRACE();
     antlr4::tree::TerminalNode *RBRACE();
+    std::vector<StatementContext *> statement();
+    StatementContext* statement(size_t i);
 
    
   };

@@ -106,18 +106,6 @@ std::string LgsFunc::prettyName() {
     return funcType->prettyName();
 }
 
-void LgsFunc::setFuncOptions(const uint32_t ops) const {
-    funcType->isMethod = ops & METHOD;
-    funcType->isPublic = ops & PUBLIC;
-    funcType->isInternal = ops & INTERNAL;
-    funcType->isVirtual = ops & VIRTUAL;
-    funcType->isStatic = ops & STATIC;
-    funcType->isVariadic = ops & VARIADIC;
-    funcType->hasDefaults = ops & HAS_DEFAULTS;
-    funcType->isOptional = ops & OPTIONAL;
-    funcType->isTerminator = ops & TERMINATOR;
-}
-
 std::string LgsFunc::format(std::string& tabs) {
     std::stringstream str;
     str << funcType->name << "(";
@@ -136,19 +124,11 @@ std::string LgsFunc::format(std::string& tabs) {
     return str.str();
 }
 
-void LgsFunc::getDebugValue(LgsCodeGen* codeGen) {
+void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
     const auto& debug = codeGen->debug;
     const auto dbInt32 = debug.diBuilder->createBasicType("int", 32, dwarf::DW_ATE_signed);
     const auto subroutine = debug.diBuilder->createSubroutineType(debug.diBuilder->getOrCreateTypeArray({dbInt32}));
-    const auto subprogram = debug.diBuilder->createFunction(
-        debug.compileUnit,
-        funcType->name,
-        "",
-        debug.diFile,
-        1,
-        subroutine,
-        1
-    );
+    const auto subprogram = debug.diBuilder->createFunction(debug.compileUnit, funcType->name, "", debug.diFile, 1, subroutine, 1);
     getIRFunc(codeGen)->setSubprogram(subprogram);
     codeGen->builder.SetCurrentDebugLocation(DILocation::get(
         codeGen->context,
@@ -157,6 +137,15 @@ void LgsFunc::getDebugValue(LgsCodeGen* codeGen) {
         subprogram,
         subprogram->getScope()
     ));
+}
+
+LgsExpr* LgsFunc::castTo(LgsType* toType) {
+    const auto otherFuncType = toType->asFuncType();
+    assert(funcType->params.size() == otherFuncType->params.size());
+    for (int i = 0; i < funcType->params.size(); ++i) {
+        funcType->params[i].type = otherFuncType->params[i].type;
+    }
+    return this;
 }
 
 LgsFunc::~LgsFunc() {

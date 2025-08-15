@@ -21,6 +21,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
+#include "llvm/IR/Verifier.h"
 
 extern char **environ;
 
@@ -65,7 +66,6 @@ bool LgsApp::validate() {
 bool LgsApp::parse() {
     loadBuiltins();
     // parseAppFile(paths.appFilePath);
-    ThreadPool threadPool;
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
@@ -81,7 +81,6 @@ bool LgsApp::parse() {
 
 bool LgsApp::analyse() {
     if (!resolveGlobalTypes()) exitWithErrors();
-    ThreadPool threadPool;
     for (const auto file : files) {
         threadPool.runTask([file, this] {
             SemaAnalyser semaAnalyser(file, globals);
@@ -98,13 +97,10 @@ bool LgsApp::analyse() {
 
 bool LgsApp::generate() {
     initBuild();
-    ThreadPool threadPool;
     for (const auto& file : files) {
         threadPool.runTask([this, file] {
             file->codeGen.setupModule(file->name, targetMachine->createDataLayout());
             file->generateIR();
-            if (!file->codeGen.IRModule) return;
-            std::lock_guard lock(mtx);
         });
     }
     threadPool.wait();
@@ -226,7 +222,6 @@ void LgsApp::loadBuiltins() {
 }
 
 void LgsApp::loadEnvFiles() {
-    ThreadPool threadPool;
     for (const auto& entry : fs::directory_iterator(paths.envsDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
@@ -266,7 +261,6 @@ void LgsApp::setEnvVars() {
 }
 
 void LgsApp::initBuild() {
-    fs::remove_all(paths.buildDir);
     fs::create_directories(paths.buildDir);
     fs::create_directories(paths.buildIR);
     LgsCodeGen::initLLVM();
@@ -275,10 +269,22 @@ void LgsApp::initBuild() {
     paths.execFilePath = paths.buildDir / name;
 }
 
-void LgsApp::writeIRFiles() const {
+void LgsApp::setTargetMachine() {
+    std::string error;
+    const auto targetTriple = sys::getDefaultTargetTriple();
+    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
+}
+
+void LgsApp::writeIRFiles() {
     for (const auto file : files) {
         const auto module = file->codeGen.IRModule;
         if (!module) continue;
+        if (verifyModule(*module, &errs())) {
+            errHandler.setUnsuccessful();
+            module->print(errs(), nullptr);
+            continue;
+        }
         if constexpr (WRITE_IR_TO_FILE) {
             const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
             std::error_code EC;
@@ -290,13 +296,6 @@ void LgsApp::writeIRFiles() const {
             logInfo("\n-----\n\n");
         }
     }
-}
-
-void LgsApp::setTargetMachine() {
-    std::string error;
-    const auto targetTriple = sys::getDefaultTargetTriple();
-    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
 void LgsApp::exitWithErrors() const {

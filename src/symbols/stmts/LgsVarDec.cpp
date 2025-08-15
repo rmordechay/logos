@@ -14,7 +14,7 @@ void LgsVarDec::createIRValue(LgsCodeGen* codeGen) {
 }
 
 bool LgsVarDec::shouldAllocate(const Type* IRType) const {
-    if (type->asMap() || type->asDArray() || expr->asInstance()) return false;
+    if (type->asFuncType() || type->asMap() || type->asDArray() || expr->asInstance()) return false;
     return !IRType->isArrayTy() && !IRType->isPointerTy() && !IRType->isVoidTy();
 }
 

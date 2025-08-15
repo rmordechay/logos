@@ -200,12 +200,11 @@ void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
 }
 
 void LgsCodeGen::callStackPush() {
-    const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
-    callLgsFunc("Stack_push", ft);
+    callLgsFunc("Stack_push", FunctionType::get(voidTy(), false));
 }
 
 void LgsCodeGen::callPopStack() {
-    callLgsFunc("Stack_pop", FunctionType::get(voidTy(), {ptrTy()}, false));
+    callLgsFunc("Stack_pop", FunctionType::get(voidTy(), false));
 }
 
 void LgsCodeGen::callDefers() {

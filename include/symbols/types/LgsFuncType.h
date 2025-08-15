@@ -2,6 +2,19 @@
 #include "LgsType.h"
 #include "funcs/LgsParam.h"
 
+enum LgsFuncFlags : uint32_t {
+    METHOD = 1 << 0,
+    PUBLIC = 1 << 1,
+    INTERNAL = 1 << 2,
+    VIRTUAL = 1 << 3,
+    STATIC = 1 << 4,
+    VARIADIC = 1 << 5,
+    ANONYMOUS = 1 << 6,
+    HAS_DEFAULTS = 1 << 7,
+    OPTIONAL = 1 << 8,
+    TERMINATOR = 1 << 9,
+};
+
 class LgsFuncType final : public LgsType {
 public:
     std::string name;
@@ -17,9 +30,11 @@ public:
     bool isStatic = false;
     bool isOptional = false;
     bool isTerminator = false;
+    bool isAnonymous = false;
     bool hasDefaults = false;
     FunctionType* IRType = nullptr;
 
+    void setFuncOptions(uint32_t ops);
     Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;

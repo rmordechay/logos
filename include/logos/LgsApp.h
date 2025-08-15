@@ -5,6 +5,7 @@
 #include "LgsPaths.h"
 #include "LogosParser.h"
 #include "lgsc/LgsCLang.h"
+#include "utils/ThreadPool.h"
 
 class LgsCodeGen;
 class LgsStrConst;
@@ -33,6 +34,7 @@ public:
     std::vector<LgsEnvFile*> envFiles;
     LgsAppFile* appFile = nullptr;
     TargetMachine* targetMachine = nullptr;
+    ThreadPool threadPool;
 
     explicit LgsApp(const fs::path& rootDirPath = "") {
         paths.initPaths(rootDirPath);
@@ -54,7 +56,7 @@ public:
     void loadEnvFiles();
     void setEnvVars();
     void checkRequiredEnvVars();
-    void writeIRFiles() const;
+    void writeIRFiles();
     void exitWithErrors() const;
     void setTargetMachine();
     ~LgsApp();

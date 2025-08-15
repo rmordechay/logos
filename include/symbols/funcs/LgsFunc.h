@@ -8,18 +8,6 @@ class LgsExpr;
 class LgsStmt;
 class LgsType;
 
-enum LgsFuncFlags : uint32_t {
-    METHOD = 1 << 0,
-    PUBLIC = 1 << 1,
-    INTERNAL = 1 << 2,
-    VIRTUAL = 1 << 3,
-    STATIC = 1 << 4,
-    VARIADIC = 1 << 5,
-    HAS_DEFAULTS = 1 << 6,
-    OPTIONAL = 1 << 7,
-    TERMINATOR = 1 << 8,
-};
-
 class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
@@ -31,7 +19,7 @@ public:
         funcType = new LgsFuncType();
         funcType->name = name;
         funcType->rt = rt;
-        setFuncOptions(ops);
+        funcType->setFuncOptions(ops);
         if (funcType->isMethod) {
             funcType->parentName = paramTypes.front()->getName();
         }
@@ -44,11 +32,11 @@ public:
     Value* callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args = {});
     void createPrologue(LgsCodeGen* codeGen);
     void createEpilogue(LgsCodeGen* codeGen) const;
-    void setFuncOptions(uint32_t ops) const;
     void createIRValue(LgsCodeGen* codeGen) override;
+    void createDebugValue(LgsCodeGen* codeGen) override;
+    LgsExpr* castTo(LgsType* toType) override;
     std::string prettyName() override;
     std::string format(std::string& tabs) override;
-    void getDebugValue(LgsCodeGen* codeGen) override;
     virtual Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args);
     virtual void generateIR(LgsCodeGen* codeGen);
     virtual Function* getIRFunc(LgsCodeGen* codeGen);

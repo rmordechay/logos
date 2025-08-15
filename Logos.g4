@@ -81,7 +81,7 @@ func:
     ;
 
 anonnymosFunc:
-        LPAREN (anonymousParam (COMMA anonymousParam)* COMMA?)? RPAREN (COLON type)? statementsBlock
+        LPAREN (IDENTIFIER (COMMA IDENTIFIER)* COMMA?)? RPAREN (COLON type)? statementsBlock
     ;
 
 method:
@@ -89,11 +89,7 @@ method:
     ;
 
 param:
-        IDENTIFIER COLON (funcType | (type TRIPLE_DOT? (EQUAL expr)?))
-    ;
-
-anonymousParam:
-        IDENTIFIER (COLON type)?
+        IDENTIFIER COLON type TRIPLE_DOT? (EQUAL expr)?
     ;
 
 statement:
@@ -112,8 +108,8 @@ statement:
     ;
 
 statementsBlock:
-        statement
-    |   LBRACE statement* RBRACE
+        LBRACE statement* RBRACE
+    |   statement
     ;
 
 assignment:

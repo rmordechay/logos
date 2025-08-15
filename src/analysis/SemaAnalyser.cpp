@@ -176,10 +176,12 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     if (varDec->expr) {
         visitExpr(varDec->expr);
         if (varDec->type) {
-            validateExprType(varDec->expr, varDec->type);
+            if (!validateExprType(varDec->expr, varDec->type)) return;
             if (varDec->expr->type != varDec->type) {
                 const auto castExpr = varDec->expr->castTo(varDec->type);
-                delete varDec->expr;
+                if (varDec->expr != castExpr) {
+                    delete varDec->expr;
+                }
                 varDec->expr = castExpr;
             }
         } else {
@@ -932,18 +934,26 @@ bool SemaAnalyser::validateMethodVisibility(LgsFuncCall* methodCall, const LgsOb
     return true;
 }
 
-void SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
+bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
     assert(expr);
     if (expr->isNull) {
         // null must have a type
-        if (type->isUnknown) return errHandler.addError(E10024, &expr->location);
+        if (type->isUnknown) {
+            errHandler.addError(E10024, &expr->location);
+            return false;
+        }
         // type must be nullable
-        if (!type->asNullable()) return errHandler.addError(E10023, &type->location, {type->prettyName(), type->prettyName()});
+        if (!type->asNullable()) {
+            errHandler.addError(E10023, &type->location, {type->prettyName(), type->prettyName()});
+            return false;
+        }
     }
-    if (type->isUnknown || expr->type->isUnknown) return;
+    if (type->isUnknown || expr->type->isUnknown) return false;
     if (!expr->type->equals(type)) {
-        return errHandler.addError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
+        errHandler.addError(E10001, &expr->location, {type->prettyName(), expr->type->prettyName()});
+        return false;
     }
+    return true;
 }
 
 void SemaAnalyser::validateFuncControlFlow(LgsFunc* func) {

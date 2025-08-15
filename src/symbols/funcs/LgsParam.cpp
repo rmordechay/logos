@@ -12,7 +12,6 @@ void LgsParam::createIRValue(LgsCodeGen* codeGen) {
         codeGen->builder.CreateCall(vaStart, {vaList});
         IRValue = vaList;
     }
-    assert(0);
 }
 
 std::string LgsParam::format(std::string& indentStr) {

@@ -100,7 +100,7 @@ public:
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);
     void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
-    void validateExprType(LgsExpr* expr, LgsType* type);
+    bool validateExprType(LgsExpr* expr, LgsType* type);
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field, const LgsObject* parent);
