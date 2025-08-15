@@ -3,7 +3,7 @@
 #include "logos/LgsCodeGen.h"
 #include "loops/LgsForLoop.h"
 
-void LgsBreak::createIRStmt(LgsCodeGen* codeGen) {
+void LgsBreak::createIRValue(LgsCodeGen* codeGen) {
     const auto loop = codeGen->stack.currentLoop();
     codeGen->builder.CreateBr(loop->IRExitBlock);
 }

@@ -11,10 +11,10 @@ public:
 
     explicit LgsStmtsBlock(const std::vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
     bool needsCleanup() const;
-    BasicBlock* getCleanupBlock(LgsCodeGen* codeGen);
-    void cleanupExprs(LgsCodeGen* codeGen);
-    void createIRValue(LgsCodeGen* codeGen);
     LgsStmt* lastStmt() const;
+    void cleanupExprs(LgsCodeGen* codeGen);
+    BasicBlock* getCleanupBlock(LgsCodeGen* codeGen);
+    void createIRValue(LgsCodeGen* codeGen) override;
     std::string format(std::string& indentStr) override;
     ~LgsStmtsBlock() override;
 };

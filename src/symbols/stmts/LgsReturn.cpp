@@ -1,7 +1,7 @@
 #include "stmts/LgsReturn.h"
 #include "funcs/LgsFunc.h"
 
-void LgsReturn::createIRStmt(LgsCodeGen* codeGen) {
+void LgsReturn::createIRValue(LgsCodeGen* codeGen) {
     const auto exprIR = expr ? expr->getIRValue(codeGen) : nullptr;
     const auto currentStmtsBlock = codeGen->stack.currentStmtsBlock();
     const auto currentFunc = codeGen->stack.currentFunc();

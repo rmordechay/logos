@@ -2,7 +2,7 @@
 #include "logos/LgsCodeGen.h"
 #include <loops/LgsForLoop.h>
 
-void LgsContinue::createIRStmt(LgsCodeGen* codeGen) {
+void LgsContinue::createIRValue(LgsCodeGen* codeGen) {
     const auto currentLoop = codeGen->stack.currentLoop();
     currentLoop->incAndJumpToCond(codeGen);
 }

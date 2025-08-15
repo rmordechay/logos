@@ -13,7 +13,7 @@ public:
         isHeapAlloc = true;
     }
     std::string prettyName() override;
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     Value* createConstArray(LgsCodeGen* codeGen) const;
     Value* createDynamicArray(LgsCodeGen* codeGen);
     ~LgsArrayExpr() override = default;

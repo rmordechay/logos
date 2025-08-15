@@ -8,7 +8,7 @@ public:
 
     explicit LgsLongConst(const int value) : LgsUnaryExpr(&LGS_LONG), value(value) {}
     std::string prettyName() override;
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     ~LgsLongConst() override = default;
 };
 

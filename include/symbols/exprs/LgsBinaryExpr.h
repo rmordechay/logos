@@ -31,8 +31,7 @@ public:
     LgsOperator op;
 
     explicit LgsBinaryExpr(LgsType* type, LgsExpr* left, LgsExpr* right, const LgsOperator op) : LgsExpr(type), left(left), right(right), op(op) {}
-    std::string prettyName() override;
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* mulIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* subIR(LgsCodeGen* codeGen, LgsExpr* other) override;
@@ -51,7 +50,6 @@ public:
     Value* bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    std::string prettyName() override;
     ~LgsBinaryExpr() override = default;
 };
-
-

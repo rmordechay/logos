@@ -1,8 +1,8 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 
 
-Value* LgsFloatConst::createIRValue(LgsCodeGen* codeGen) {
-    return ConstantFP::get(codeGen->builder.getFloatTy(), value);
+void LgsFloatConst::createIRValue(LgsCodeGen* codeGen) {
+    IRValue = ConstantFP::get(codeGen->builder.getFloatTy(), value);
 }
 
 std::string LgsFloatConst::prettyName() {

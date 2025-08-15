@@ -7,9 +7,9 @@ std::string LgsArrayExpr::prettyName() {
     return type->prettyName();
 }
 
-Value* LgsArrayExpr::createIRValue(LgsCodeGen* codeGen) {
-    if (type->asSArray()) return createConstArray(codeGen);
-    if (type->asDArray()) return createDynamicArray(codeGen);
+void LgsArrayExpr::createIRValue(LgsCodeGen* codeGen) {
+    if (type->asSArray()) IRValue = createConstArray(codeGen);
+    else if (type->asDArray()) IRValue = createDynamicArray(codeGen);
     assert(0);
 }
 

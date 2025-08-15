@@ -110,9 +110,7 @@ statement:
     |   loopStatement
     |   CONTINUE
     |   breakStmt
-    |   funcCall
-    |   selection
-    |   postfixExpr
+    |   expr
     |   coroutine
     |   deferStmt
     ;
@@ -197,13 +195,9 @@ expr:
     ;
 
 unaryExpr:
-        IDENTIFIER
-    |   SELF_INSTANCE
-    |   SELF_CLASS
-    |   NULL
+        funcCall
     |   prefixExpr
     |   postfixExpr
-    |   funcCall
     |   anonnymosFunc
     |   vector
     |   instance
@@ -214,6 +208,10 @@ unaryExpr:
     |   hashMap
     |   isFirst
     |   isLast
+    |   SELF_INSTANCE
+    |   SELF_CLASS
+    |   NULL
+    |   IDENTIFIER
     ;
 
 prefixExpr:

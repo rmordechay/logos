@@ -9,8 +9,8 @@ std::string LgsIntConst::prettyName() {
     return std::to_string(value);
 }
 
-Value* LgsIntConst::createIRValue(LgsCodeGen* codeGen) {
-    return codeGen->i32(value);
+void LgsIntConst::createIRValue(LgsCodeGen* codeGen) {
+    IRValue = codeGen->i32(value);
 }
 
 LgsExpr* LgsIntConst::castTo(LgsType* toType) {

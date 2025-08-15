@@ -8,6 +8,6 @@ std::string LgsLongConst::prettyName() {
     return type->prettyName();
 }
 
-Value* LgsLongConst::createIRValue(LgsCodeGen* codeGen) {
-    return codeGen->i64(value);
+void LgsLongConst::createIRValue(LgsCodeGen* codeGen) {
+    IRValue = codeGen->i64(value);
 }

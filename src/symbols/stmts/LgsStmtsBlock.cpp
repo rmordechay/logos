@@ -6,7 +6,7 @@
 
 void LgsStmtsBlock::createIRValue(LgsCodeGen* codeGen) {
     for (const auto stmt : stmts) {
-        stmt->createIRStmt(codeGen);
+        stmt->createIRValue(codeGen);
     }
     if (needsCleanup()) {
         cleanupExprs(codeGen);

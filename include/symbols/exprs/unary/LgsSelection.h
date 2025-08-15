@@ -4,7 +4,7 @@
 
 class LgsUnaryExpr;
 
-class LgsSelection final : public LgsStmt, public LgsUnaryExpr {
+class LgsSelection final : public LgsUnaryExpr {
 public:
     std::vector<LgsUnaryExpr*> exprs;
 
@@ -13,8 +13,7 @@ public:
     LgsExpr* lastExpr() const;
     Value* resolveSelection(LgsCodeGen* codeGen);
     Value* hashValue(LgsCodeGen* codeGen) override;
-    void createIRStmt(LgsCodeGen* codeGen) override;
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     ~LgsSelection() override;
 };
 

@@ -6,13 +6,14 @@ public:
     explicit LgsNull() : LgsUnaryExpr(nullptr) {
         isNull = true;
     }
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+
+    void createIRValue(LgsCodeGen* codeGen) override;
     std::string prettyName() override;
     ~LgsNull() override = default;
 };
 
-inline Value* LgsNull::createIRValue(LgsCodeGen* codeGen) {
-    return ConstantPointerNull::get(codeGen->ptrTy());
+inline void LgsNull::createIRValue(LgsCodeGen* codeGen) {
+    IRValue = ConstantPointerNull::get(codeGen->ptrTy());
 }
 
 inline std::string LgsNull::prettyName() {

@@ -5,7 +5,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
-Value* LgsInstance::createIRValue(LgsCodeGen* codeGen) {
+void LgsInstance::createIRValue(LgsCodeGen* codeGen) {
     const auto objIRType = obj->getIRType(codeGen);
     if(obj->singleton) {
         IRValue = codeGen->createGlobal(objIRType, ConstantAggregateZero::get(objIRType), obj->name);
@@ -16,7 +16,6 @@ Value* LgsInstance::createIRValue(LgsCodeGen* codeGen) {
     if (!obj->interfaces.empty()) {
         setVirtuals(codeGen);
     }
-    return IRValue;
 }
 
 void LgsInstance::initFields(LgsCodeGen* codeGen, std::map<std::string, LgsField*>& fields) {

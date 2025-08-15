@@ -1,4 +1,6 @@
 #pragma once
+#include <stmts/LgsStmt.h>
+
 #include "LgsValue.h"
 
 class LgsPrefixExpr;
@@ -22,7 +24,7 @@ class LgsIntConst;
 class LgsStrConst;
 class LgsTypeConst;
 
-class LgsExpr : virtual public LgsValue {
+class LgsExpr : virtual public LgsStmt {
 public:
     LgsType* type = nullptr;
     bool isNull = false;
@@ -31,7 +33,6 @@ public:
     bool isHeapAlloc = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
-    Value* getIRValue(LgsCodeGen* codeGen);
     int getConstInt();
     std::string getConstStr();
     LgsIterator toIterator();
@@ -39,12 +40,9 @@ public:
 
     LgsFunc* asFunc();
     LgsVariable* asVariable();
-    LgsFuncCall* asFuncCall();
     LgsPrefixExpr* asPrefixExpr();
-    LgsPostfixExpr* asPostfixExpr();
     LgsIterIndex* asIterIndex();
     LgsInstance* asInstance();
-    LgsSelection* asSelection();
     LgsArrayExpr* asArrayExpr();
     LgsHashMap* asHashMap();
     LgsBoolConst* asBoolConst();
@@ -59,7 +57,6 @@ public:
     virtual Value* hashValue(LgsCodeGen* codeGen);
 
     virtual std::string prettyName() = 0;
-    virtual Value* createIRValue(LgsCodeGen* codeGen) = 0;
     virtual Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
     virtual Value* subIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
     virtual Value* mulIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;

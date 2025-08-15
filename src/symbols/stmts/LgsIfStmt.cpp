@@ -3,7 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "logos/LgsCodeGen.h"
 
-void LgsIfStmt::createIRStmt(LgsCodeGen* codeGen) {
+void LgsIfStmt::createIRValue(LgsCodeGen* codeGen) {
     if (isPatternMatching) {
         return generatePatternMatching(codeGen);
     }

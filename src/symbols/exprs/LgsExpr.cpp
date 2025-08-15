@@ -17,22 +17,6 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsIterator.h"
 
-Value* LgsExpr::getIRValue(LgsCodeGen* codeGen) {
-    if (IRValue) return IRValue;
-    IRValue = createIRValue(codeGen);
-    assert(IRValue);
-    return IRValue;
-}
-
-void LgsExpr::setType(LgsType* newType) {
-    if (type && type->isUnknown) freeType(type);
-    type = newType;
-}
-
-LgsIterator LgsExpr::toIterator() {
-    return LgsIterator(this);
-}
-
 int LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
         return intConst->value;
@@ -67,31 +51,38 @@ std::string LgsExpr::getConstStr() {
     assert(0);
 }
 
+LgsIterator LgsExpr::toIterator() {
+    return LgsIterator(this);
+}
+
+void LgsExpr::setType(LgsType* newType) {
+    if (type && type->isUnknown) freeType(type);
+    type = newType;
+}
+
+// Casting
+LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }
+
+LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }
+LgsPrefixExpr* LgsExpr::asPrefixExpr() { return dynamic_cast<LgsPrefixExpr*>(this); }
+LgsIterIndex* LgsExpr::asIterIndex() { return dynamic_cast<LgsIterIndex*>(this); }
+LgsInstance* LgsExpr::asInstance() { return dynamic_cast<LgsInstance*>(this); }
+LgsArrayExpr* LgsExpr::asArrayExpr() { return dynamic_cast<LgsArrayExpr*>(this); }
+LgsHashMap* LgsExpr::asHashMap() { return dynamic_cast<LgsHashMap*>(this); }
+LgsBoolConst* LgsExpr::asBoolConst() { return dynamic_cast<LgsBoolConst*>(this); }
+LgsCharConst* LgsExpr::asCharConst() { return dynamic_cast<LgsCharConst*>(this); }
+LgsFloatConst* LgsExpr::asFloatConst() { return dynamic_cast<LgsFloatConst*>(this); }
+LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
+LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }
+
+LgsExpr* LgsExpr::clone() { assert(0); }
+bool LgsExpr::equals(LgsExpr* other) { assert(0); }
+LgsExpr* LgsExpr::castTo(LgsType* toType) { assert(0); }
+Value* LgsExpr::hashValue(LgsCodeGen* codeGen) { assert(0); }
+
 LgsExpr::~LgsExpr() {
     if (type) {
         freeType(type);
         type = nullptr;
     }
 }
-
-bool LgsExpr::equals(LgsExpr* other) { assert(0); }
-LgsExpr* LgsExpr::castTo(LgsType* toType) { assert(0); }
-Value* LgsExpr::hashValue(LgsCodeGen* codeGen) { assert(0); }
-LgsExpr* LgsExpr::clone() { assert(0); }
-
-// Casting
-LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }
-LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }
-LgsFuncCall* LgsExpr::asFuncCall() { return dynamic_cast<LgsFuncCall*>(this); }
-LgsPrefixExpr* LgsExpr::asPrefixExpr() { return dynamic_cast<LgsPrefixExpr*>(this); }
-LgsPostfixExpr* LgsExpr::asPostfixExpr() { return dynamic_cast<LgsPostfixExpr*>(this); }
-LgsInstance* LgsExpr::asInstance() { return dynamic_cast<LgsInstance*>(this); }
-LgsSelection* LgsExpr::asSelection() { return dynamic_cast<LgsSelection*>(this); }
-LgsArrayExpr* LgsExpr::asArrayExpr() { return dynamic_cast<LgsArrayExpr*>(this); }
-LgsHashMap* LgsExpr::asHashMap() { return dynamic_cast<LgsHashMap*>(this); }
-LgsBoolConst* LgsExpr::asBoolConst() { return dynamic_cast<LgsBoolConst*>(this); }
-LgsCharConst* LgsExpr::asCharConst() { return dynamic_cast<LgsCharConst*>(this); }
-LgsIterIndex* LgsExpr::asIterIndex() { return dynamic_cast<LgsIterIndex*>(this); }
-LgsFloatConst* LgsExpr::asFloatConst() { return dynamic_cast<LgsFloatConst*>(this); }
-LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
-LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }

@@ -12,7 +12,7 @@ public:
     LgsIndex* index = nullptr;
 
     explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {}
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     Value* createIRFromArray(LgsCodeGen* codeGen, LgsDArray* arr) const;
     Value* createIRFromMap(LgsCodeGen* codeGen, LgsMap* map) const;
     Value* createIRFromStr(LgsCodeGen* codeGen, const LgsStr* str) const;

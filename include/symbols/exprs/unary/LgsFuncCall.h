@@ -5,7 +5,7 @@
 class LgsFuncType;
 struct LgsSymbol;
 
-class LgsFuncCall final : public LgsStmt, public LgsUnaryExpr {
+class LgsFuncCall final : public LgsUnaryExpr {
 public:
     std::string name;
     std::vector<LgsExpr*> args;
@@ -15,8 +15,7 @@ public:
 
     explicit LgsFuncCall(const std::string& name, const std::vector<LgsExpr*>& args = {}) : name(name), args(args) {}
     Value* getCallback(LgsCodeGen* codeGen) const;
-    void createIRStmt(LgsCodeGen* codeGen) override;
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     bool equals(const LgsFuncType* funcType) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;

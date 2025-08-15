@@ -24,6 +24,7 @@ public:
 
     LgsField(std::string  name, std::string* parentName, LgsType* type, LgsExpr* expr = nullptr) : name(std::move(name)), parentName(parentName), type(type), expr(expr) {}
     Value* getGEP(LgsCodeGen* codeGen, Value* parentIRValue) const;
+    void createIRValue(LgsCodeGen* codeGen) override;
     Value* resolveVirtualField(LgsCodeGen* codeGen, const LgsHashMap* vtable, Value* parentIRValue) const;
     ~LgsField() override;
 };

@@ -29,7 +29,6 @@
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
 #include "exprs/unary/constants/LgsLongConst.h"
-#include "lgsc/LgsCLang.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "funcs/LgsMainFunc.h"
@@ -435,10 +434,8 @@ LgsStmt* AntlrConverter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto ifStmt = ctx->ifStatement()) return getIfStatement(ifStmt);
     if (const auto patternMatching = ctx->patternMatching()) return getPatternMatching(patternMatching);
     if (const auto loopStmt = ctx->loopStatement()) return getForLoop(loopStmt);
-    if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
-    if (const auto selection = ctx->selection()) return getSelection(selection);
     if (const auto returnStmt = ctx->returnStatement()) return getReturnStmt(returnStmt);
-    if (const auto postfixExpr = ctx->postfixExpr()) return getPostfixExpr(postfixExpr);
+    if (const auto expr = ctx->expr()) return getExpr(expr);
     if (ctx->breakStmt()) return getBreakStmt(ctx);
     if (ctx->CONTINUE()) return getContinueStmt(ctx);
     assert(0);

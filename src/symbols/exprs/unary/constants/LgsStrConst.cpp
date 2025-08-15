@@ -15,8 +15,8 @@ Value* LgsStrConst::hashValue(LgsCodeGen* codeGen) {
     return codeGen->i32(Lgs_hash(value.c_str()));
 }
 
-Value* LgsStrConst::createIRValue(LgsCodeGen* codeGen) {
-    return codeGen->getIRStr(value);
+void LgsStrConst::createIRValue(LgsCodeGen* codeGen) {
+    IRValue = codeGen->getIRStr(value);
 }
 
 Value* LgsStrConst::addIR(LgsCodeGen* codeGen, LgsExpr* other) {

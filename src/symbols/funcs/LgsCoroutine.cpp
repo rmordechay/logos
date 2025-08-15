@@ -3,7 +3,7 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsSelection.h"
 
-void LgsCoroutine::createIRStmt(LgsCodeGen* codeGen) {
+void LgsCoroutine::createIRValue(LgsCodeGen* codeGen) {
     auto& builder = codeGen->builder;
     // codeGen->savedIP = builder.saveIP();
     const auto coroID = codeGen->callCoroIDFunc();

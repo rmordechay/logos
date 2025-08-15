@@ -4,7 +4,7 @@ std::string LgsHashMap::prettyName() {
     return type->prettyName();
 }
 
-Value* LgsHashMap::createIRValue(LgsCodeGen* codeGen) {
+void LgsHashMap::createIRValue(LgsCodeGen* codeGen) {
     const auto mapType = type->asMap();
     const auto valueType = mapType->typePair->value;
     const auto elementSize = codeGen->i64(valueType->getSizeBytes());
@@ -13,5 +13,4 @@ Value* LgsHashMap::createIRValue(LgsCodeGen* codeGen) {
     for (const auto element : initialElements) {
         mapType->addFunc.call(codeGen, {this, element->key, element->value});
     }
-    return IRValue;
 }

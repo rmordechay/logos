@@ -3,7 +3,7 @@
 #include "logos/LgsCodeGen.h"
 #include "stmts/LgsVarDec.h"
 
-void LgsForLoop::createIRStmt(LgsCodeGen* codeGen) {
+void LgsForLoop::createIRValue(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, stmtsBlock);
     setBlocks(codeGen);
     createIRLoop(codeGen);

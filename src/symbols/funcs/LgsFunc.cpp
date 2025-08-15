@@ -15,11 +15,11 @@ void LgsFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.exitScope();
 }
 
-Value* LgsFunc::createIRValue(LgsCodeGen* codeGen) {
+void LgsFunc::createIRValue(LgsCodeGen* codeGen) {
     codeGen->savedIP = codeGen->builder.saveIP();
     generateIR(codeGen);
     codeGen->builder.restoreIP(codeGen->savedIP);
-    return getIRFunc(codeGen);
+    IRValue = getIRFunc(codeGen);
 }
 
 Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
@@ -102,6 +102,18 @@ void LgsFunc::createEpilogue(LgsCodeGen* codeGen) const {
 
 std::string LgsFunc::prettyName() {
     return funcType->prettyName();
+}
+
+void LgsFunc::setFuncOptions(const uint32_t ops) const {
+    funcType->isMethod = ops & METHOD;
+    funcType->isPublic = ops & PUBLIC;
+    funcType->isInternal = ops & INTERNAL;
+    funcType->isVirtual = ops & VIRTUAL;
+    funcType->isStatic = ops & STATIC;
+    funcType->isVariadic = ops & VARIADIC;
+    funcType->hasDefaults = ops & HAS_DEFAULTS;
+    funcType->isOptional = ops & OPTIONAL;
+    funcType->isTerminator = ops & TERMINATOR;
 }
 
 std::string LgsFunc::format(std::string& tabs) {

@@ -5,19 +5,16 @@
 #include <exprs/unary/LgsArrayExpr.h>
 #include "types/LgsMap.h"
 
-Value* LgsIterIndex::createIRValue(LgsCodeGen* codeGen) {
+void LgsIterIndex::createIRValue(LgsCodeGen* codeGen) {
     const auto baseExprType = baseExpr->type;
     if (baseExprType->asSArray()) {
-        return getArrGEP(codeGen);
-    }
-    if (const auto arr = baseExprType->asDArray()) {
-        return createIRFromArray(codeGen, arr);
-    }
-    if (const auto map = baseExprType->asMap()) {
-        return createIRFromMap(codeGen, map);
-    }
-    if (const auto str = baseExprType->asStr()) {
-        return createIRFromStr(codeGen, str);
+        IRValue = getArrGEP(codeGen);
+    } else if (const auto arr = baseExprType->asDArray()) {
+        IRValue = createIRFromArray(codeGen, arr);
+    } else if (const auto map = baseExprType->asMap()) {
+        IRValue = createIRFromMap(codeGen, map);
+    } else if (const auto str = baseExprType->asStr()) {
+        IRValue = createIRFromStr(codeGen, str);
     }
     assert(0);
 }

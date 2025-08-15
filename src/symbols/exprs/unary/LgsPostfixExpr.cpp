@@ -1,17 +1,12 @@
 #include "exprs/unary/LgsPostfixExpr.h"
+#include "LgsType.h"
 
-#include "../../../../include/symbols/LgsType.h"
-
-Value* LgsPostfixExpr::createIRValue(LgsCodeGen* codeGen) {
-    return IncOrDecValue(codeGen);
+void LgsPostfixExpr::createIRValue(LgsCodeGen* codeGen) {
+    IRValue = IncOrDecValue(codeGen);
 }
 
 std::string LgsPostfixExpr::prettyName() {
     assert(0);
-}
-
-void LgsPostfixExpr::createIRStmt(LgsCodeGen* codeGen) {
-    IncOrDecValue(codeGen);
 }
 
 Value* LgsPostfixExpr::IncOrDecValue(LgsCodeGen* codeGen) const {

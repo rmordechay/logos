@@ -10,7 +10,7 @@ public:
         isConstant = true;
     }
     std::string prettyName() override;
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     LgsExpr* castTo(LgsType* toType) override;
     Value* andIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* orIR(LgsCodeGen* codeGen, LgsExpr* other) override;

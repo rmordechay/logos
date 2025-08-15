@@ -13,7 +13,7 @@ public:
     std::string tag;
 
     explicit LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock = nullptr) : ifCond(ifCond), ifBlock(ifStmtBlock) {}
-    void createIRStmt(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     void generateSimpleIf(LgsCodeGen* codeGen, Value* ifCondIR) const;
     void generateIfWithElse(LgsCodeGen* codeGen, Value* ifCondIR);
     void generateElseIf(LgsCodeGen* codeGen, Value* ifCondIR);

@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
+find_package(LLVM REQUIRED CONFIG)
+find_package(Clang REQUIRED CONFIG)
+find_package(antlr4-runtime REQUIRED)
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
@@ -14,9 +17,6 @@ endif()
 
 set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
-find_package(LLVM REQUIRED CONFIG)
-find_package(Clang REQUIRED CONFIG)
-find_package(antlr4-runtime REQUIRED)
 
 llvm_map_components_to_libnames(LLVM_LIBS
         support
@@ -132,22 +132,15 @@ target_include_directories(lgs_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
 )
 target_link_libraries(lgs_core PUBLIC
-    ${LLVM_LIBS}
-    clangBasic
-    clangLex
-    clangParse
-    clangAST
-    clangSema
-    clangCodeGen
-    clangAnalysis
-    clangDriver
-    clangFrontend
-    clangTooling
+    LLVM
+    clang-cpp
     antlr4_static
 )
 
 add_subdirectory(runtime)
 target_precompile_headers(lgs_core PRIVATE include/pch.h)
+
 add_executable(lgs main.cpp)
 target_link_libraries(lgs PRIVATE lgs_core lgs_runtime)
+
 add_subdirectory(tests)

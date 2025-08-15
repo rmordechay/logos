@@ -7,7 +7,7 @@ enum LgsPostfixOperator {
     DEC,
 };
 
-class LgsPostfixExpr final : public LgsStmt, public LgsUnaryExpr {
+class LgsPostfixExpr final : public LgsUnaryExpr {
 public:
 
     LgsUnaryExpr* expr;
@@ -15,8 +15,7 @@ public:
 
     LgsPostfixExpr(LgsUnaryExpr* baseExpr, const LgsPostfixOperator op) : expr(baseExpr), op(op) {}
     Value* IncOrDecValue(LgsCodeGen* codeGen) const;
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     std::string prettyName() override;
-    void createIRStmt(LgsCodeGen* codeGen) override;
     ~LgsPostfixExpr() override = default;
 };

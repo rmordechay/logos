@@ -6,7 +6,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 
-void LgsAssignment::createIRStmt(LgsCodeGen* codeGen) {
+void LgsAssignment::createIRValue(LgsCodeGen* codeGen) {
     Value* results = nullptr;
     switch (assignmentType) {
     case ASSIGN:

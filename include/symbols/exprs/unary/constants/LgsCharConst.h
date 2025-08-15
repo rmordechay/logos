@@ -7,7 +7,7 @@ public:
     char value;
     explicit LgsCharConst(const char value) : LgsUnaryExpr(&LGS_CHAR), value(value) {}
     std::string prettyName() override;
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
 };
 
 

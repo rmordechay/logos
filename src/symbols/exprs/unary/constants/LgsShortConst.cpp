@@ -8,8 +8,8 @@ std::string LgsShortConst::prettyName() {
     return std::to_string(value);
 }
 
-Value* LgsShortConst::createIRValue(LgsCodeGen* codeGen) {
-    return codeGen->i16(value);
+void LgsShortConst::createIRValue(LgsCodeGen* codeGen) {
+    IRValue = codeGen->i16(value);
 }
 
 LgsExpr* LgsShortConst::castTo(LgsType* toType) {

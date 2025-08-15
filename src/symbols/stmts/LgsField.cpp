@@ -7,6 +7,8 @@ Value* LgsField::getGEP(LgsCodeGen* codeGen, Value* parentIRValue) const {
     return codeGen->builder.CreateStructGEP(parentIRType, parentIRValue, position);
 }
 
+void LgsField::createIRValue(LgsCodeGen* codeGen) {}
+
 Value* LgsField::resolveVirtualField(LgsCodeGen* codeGen, const LgsHashMap* vtable, Value* parentIRValue) const {
     const auto vtableMap = vtable->type->asMap();
     const auto fieldIRType = type->getIRType(codeGen);

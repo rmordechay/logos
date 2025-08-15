@@ -16,20 +16,25 @@ std::string LgsVariable::prettyName() {
     return name;
 }
 
-Value* LgsVariable::createIRValue(LgsCodeGen* codeGen) {
+void LgsVariable::createIRValue(LgsCodeGen* codeGen) {
     switch (ref.symbolType) {
     case VAR_DEC:
-        return ref.varDec->IRValue;
+        IRValue = ref.varDec->IRValue;
+        return;
     case PARAM:
-        return ref.param->getIRValue(codeGen);
+        IRValue = ref.param->getIRValue(codeGen);
+        return;
     case FUNC:
-        return ref.func->getIRFunc(codeGen);
+        IRValue = ref.func->getIRFunc(codeGen);
+        return;
     case OBJECT:
         assert(ref.object->singleton);
-        return ref.object->singleton->getIRValue(codeGen);
+        IRValue = ref.object->singleton->getIRValue(codeGen);
+        return;
     case ENUM:
     case ENUM_FIELD:
-        return codeGen->getIRStr(name);
+        IRValue = codeGen->getIRStr(name);
+        return;
     case INTERFACE:
     case GROUP:
     case UNKNOWN:

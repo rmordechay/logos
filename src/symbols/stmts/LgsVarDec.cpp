@@ -2,7 +2,7 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "utils/LgsUtils.h"
 
-void LgsVarDec::createIRStmt(LgsCodeGen* codeGen) {
+void LgsVarDec::createIRValue(LgsCodeGen* codeGen) {
     const auto IRType = type->getIRType(codeGen);
     const auto exprIRValue = expr->getIRValue(codeGen);
     if (shouldAllocate(IRType)) {

@@ -3,8 +3,8 @@
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
-Value* LgsCast::createIRValue(LgsCodeGen* codeGen) {
-    return toValue->getIRValue(codeGen);
+void LgsCast::createIRValue(LgsCodeGen* codeGen) {
+    IRValue = toValue->getIRValue(codeGen);
 }
 
 Value* LgsCast::addIR(LgsCodeGen* codeGen, LgsExpr* other) {

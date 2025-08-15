@@ -5,17 +5,13 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
-Value* LgsFuncCall::createIRValue(LgsCodeGen* codeGen) {
+void LgsFuncCall::createIRValue(LgsCodeGen* codeGen) {
     if (callback) {
         func->setIRValue(getCallback(codeGen));
     } else if (func->funcType->isVirtual) {
         resolveVirtualFunc(codeGen);
     }
-    return func->call(codeGen, args);
-}
-
-void LgsFuncCall::createIRStmt(LgsCodeGen* codeGen) {
-    createIRValue(codeGen);
+    IRValue = func->call(codeGen, args);
 }
 
 Value* LgsFuncCall::getCallback(LgsCodeGen* codeGen) const {

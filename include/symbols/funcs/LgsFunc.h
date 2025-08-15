@@ -31,15 +31,7 @@ public:
         funcType = new LgsFuncType();
         funcType->name = name;
         funcType->rt = rt;
-        funcType->isMethod = ops & METHOD;
-        funcType->isPublic = ops & PUBLIC;
-        funcType->isInternal = ops & INTERNAL;
-        funcType->isVirtual = ops & VIRTUAL;
-        funcType->isStatic = ops & STATIC;
-        funcType->isVariadic = ops & VARIADIC;
-        funcType->hasDefaults = ops & HAS_DEFAULTS;
-        funcType->isOptional = ops & OPTIONAL;
-        funcType->isTerminator = ops & TERMINATOR;
+        setFuncOptions(ops);
         if (funcType->isMethod) {
             funcType->parentName = paramTypes.front()->getName();
         }
@@ -49,12 +41,13 @@ public:
         type = funcType;
     }
 
-    std::string prettyName() override;
     std::string format(std::string& tabs) override;
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     Value* callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args = {});
     void createPrologue(LgsCodeGen* codeGen);
     void createEpilogue(LgsCodeGen* codeGen) const;
+    void setFuncOptions(uint32_t ops) const;
+    std::string prettyName() override;
     static Value* getIRArg(LgsCodeGen* codeGen, LgsExpr* arg);
     virtual Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args);
     virtual void generateIR(LgsCodeGen* codeGen);

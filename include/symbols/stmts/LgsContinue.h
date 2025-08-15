@@ -3,7 +3,7 @@
 
 class LgsContinue final : public LgsStmt {
 public:
-    void createIRStmt(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     ~LgsContinue() override = default;
 };
 

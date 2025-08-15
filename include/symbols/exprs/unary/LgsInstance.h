@@ -10,7 +10,7 @@ public:
    std::map<std::string, LgsVarDec*> args;
     explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), name(obj->name), obj(obj) {}
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     void setObject(LgsObject* newObj);
     void setVirtuals(LgsCodeGen* codeGen) const;
     std::string prettyName() override;

@@ -16,7 +16,7 @@ public:
     LgsVarDec* isFirst = nullptr;
     LgsVarDec* isLast = nullptr;
 
-    void createIRStmt(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     void initIndex(LgsCodeGen* codeGen);
     Value* loadIndex(LgsCodeGen* codeGen) const;
     void incIndex(LgsCodeGen* codeGen) const;

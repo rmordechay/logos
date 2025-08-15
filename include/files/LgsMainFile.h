@@ -1,5 +1,4 @@
 #pragma once
-
 #include "LgsFile.h"
 #include "configs/LgsDefinitions.h"
 
@@ -11,7 +10,7 @@ class LgsMainFile final : public LgsFile {
 public:
     std::vector<LgsEnum*> enums;
     std::vector<LgsObject*> objects;
-   std::map<std::string, LgsFunc*> funcs;
+    std::map<std::string, LgsFunc*> funcs;
     std::vector<LgsInterface*> interfaces;
     std::vector<LgsGroup*> groups;
 

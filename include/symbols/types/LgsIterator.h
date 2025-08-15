@@ -16,7 +16,7 @@ public:
     }
 
     std::string prettyName() override;
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     void initIterator(LgsCodeGen* codeGen);
     Value* next(LgsCodeGen* codeGen) const;
     Value* hasNext(LgsCodeGen* codeGen) const;

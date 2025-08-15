@@ -17,7 +17,7 @@ public:
 
     std::string prettyName() override;
     Value* hashValue(LgsCodeGen* codeGen) override;
-    Value* createIRValue(LgsCodeGen* codeGen) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
     Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     ~LgsStrConst() override;

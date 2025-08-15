@@ -5,12 +5,8 @@
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 
-Value* LgsSelection::createIRValue(LgsCodeGen* codeGen) {
-    return resolveSelection(codeGen);
-}
-
-void LgsSelection::createIRStmt(LgsCodeGen* codeGen) {
-    resolveSelection(codeGen);
+void LgsSelection::createIRValue(LgsCodeGen* codeGen) {
+    IRValue = resolveSelection(codeGen);
 }
 
 Value* LgsSelection::resolveSelection(LgsCodeGen* codeGen) {

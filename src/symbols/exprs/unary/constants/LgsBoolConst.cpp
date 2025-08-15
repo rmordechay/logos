@@ -11,8 +11,8 @@ std::string LgsBoolConst::prettyName() {
     return type->prettyName();
 }
 
-Value* LgsBoolConst::createIRValue(LgsCodeGen* codeGen) {
-    return codeGen->i1(value);
+void LgsBoolConst::createIRValue(LgsCodeGen* codeGen) {
+    IRValue = codeGen->i1(value);
 }
 
 Value* LgsBoolConst::andIR(LgsCodeGen* codeGen, LgsExpr* other) {

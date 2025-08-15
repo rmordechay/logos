@@ -1,48 +1,62 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 
-std::string LgsBinaryExpr::prettyName() {
-    return left->prettyName() + ' ' + opStr + ' ' + right->prettyName();
-}
-
-Value* LgsBinaryExpr::createIRValue(LgsCodeGen* codeGen) {
+void LgsBinaryExpr::createIRValue(LgsCodeGen* codeGen) {
     switch (op) {
     case ADD:
-        return left->addIR(codeGen, right);
+        IRValue = left->addIR(codeGen, right);
+        break;
     case SUB:
-        return left->subIR(codeGen, right);
+        IRValue = left->subIR(codeGen, right);
+        break;
     case MUL:
-        return left->mulIR(codeGen, right);
+        IRValue = left->mulIR(codeGen, right);
+        break;
     case DIV:
-        return left->divIR(codeGen, right);
+        IRValue = left->divIR(codeGen, right);
+        break;
     case MOD:
-        return left->modIR(codeGen, right);
+        IRValue = left->modIR(codeGen, right);
+        break;
     case EQ:
-        return left->eqIR(codeGen, right);
+        IRValue = left->eqIR(codeGen, right);
+        break;
     case NE:
-        return left->neIR(codeGen, right);
+        IRValue = left->neIR(codeGen, right);
+        break;
     case AND:
-        return left->andIR(codeGen, right);
+        IRValue = left->andIR(codeGen, right);
+        break;
     case OR:
-        return left->orIR(codeGen, right);
+        IRValue = left->orIR(codeGen, right);
+        break;
     case LT:
-        return left->ltIR(codeGen, right);
+        IRValue = left->ltIR(codeGen, right);
+        break;
     case GT:
-        return left->gtIR(codeGen, right);
+        IRValue = left->gtIR(codeGen, right);
+        break;
     case GE:
-        return left->geIR(codeGen, right);
+        IRValue = left->geIR(codeGen, right);
+        break;
     case LE:
-        return left->leIR(codeGen, right);
+        IRValue = left->leIR(codeGen, right);
+        break;
     case BIT_AND:
-        return left->bitAndIR(codeGen, right);
+        IRValue = left->bitAndIR(codeGen, right);
+        break;
     case BIT_OR:
-        return left->bitOrIR(codeGen, right);
+        IRValue = left->bitOrIR(codeGen, right);
+        break;
     case BIT_XOR:
-        return left->bitXorIR(codeGen, right);
+        IRValue = left->bitXorIR(codeGen, right);
+        break;
     case LSHIFT:
-        return left->rshiftIR(codeGen, right);
+        IRValue = left->rshiftIR(codeGen, right);
+        break;
     case RSHIFT:
-        return left->lshiftIR(codeGen, right);
+        IRValue = left->lshiftIR(codeGen, right);
+        break;
     case NOOP:
         break;
     }
@@ -119,4 +133,8 @@ Value* LgsBinaryExpr::rshiftIR(LgsCodeGen* codeGen, LgsExpr* other)  {
 
 Value* LgsBinaryExpr::lshiftIR(LgsCodeGen* codeGen, LgsExpr* other)  {
     assert(0);
+}
+
+std::string LgsBinaryExpr::prettyName() {
+    return left->prettyName() + ' ' + opStr + ' ' + right->prettyName();
 }

@@ -5,7 +5,7 @@
 #include <exprs/unary/LgsSelection.h>
 #include <llvm/IR/Module.h>
 
-void LgsDeferStmt::createIRStmt(LgsCodeGen* codeGen) {
+void LgsDeferStmt::createIRValue(LgsCodeGen* codeGen) {
     const auto fc = funcCall ? funcCall : selection->lastExpr()->asFuncCall();
     const auto ctxTy = getCtxType(codeGen);
     Value* ctx;

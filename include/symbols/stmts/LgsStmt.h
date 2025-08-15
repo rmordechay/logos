@@ -29,7 +29,6 @@ public:
     LgsReturn* asReturn();
     LgsVarDec* asVarDec();
     LgsAssignment* asAssignment();
-    virtual void createIRStmt(LgsCodeGen* codeGen) = 0;
     ~LgsStmt() override = default;
 };
 

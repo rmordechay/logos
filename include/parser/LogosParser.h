@@ -540,9 +540,7 @@ public:
     LoopStatementContext *loopStatement();
     antlr4::tree::TerminalNode *CONTINUE();
     BreakStmtContext *breakStmt();
-    FuncCallContext *funcCall();
-    SelectionContext *selection();
-    PostfixExprContext *postfixExpr();
+    ExprContext *expr();
     CoroutineContext *coroutine();
     DeferStmtContext *deferStmt();
 
@@ -830,13 +828,9 @@ public:
   public:
     UnaryExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    antlr4::tree::TerminalNode *SELF_INSTANCE();
-    antlr4::tree::TerminalNode *SELF_CLASS();
-    antlr4::tree::TerminalNode *NULL_();
+    FuncCallContext *funcCall();
     PrefixExprContext *prefixExpr();
     PostfixExprContext *postfixExpr();
-    FuncCallContext *funcCall();
     AnonnymosFuncContext *anonnymosFunc();
     VectorContext *vector();
     InstanceContext *instance();
@@ -847,6 +841,10 @@ public:
     HashMapContext *hashMap();
     IsFirstContext *isFirst();
     IsLastContext *isLast();
+    antlr4::tree::TerminalNode *SELF_INSTANCE();
+    antlr4::tree::TerminalNode *SELF_CLASS();
+    antlr4::tree::TerminalNode *NULL_();
+    antlr4::tree::TerminalNode *IDENTIFIER();
 
    
   };
