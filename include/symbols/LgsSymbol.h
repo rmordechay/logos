@@ -9,7 +9,7 @@ class LgsInterface;
 class LgsObject;
 class LgsParam;
 class LgsVarDec;
-class LgsLocation;
+struct LgsLocation;
 
 enum LgsSymbolType {
     VAR_DEC,

@@ -1,6 +1,7 @@
 #pragma once
 #include "LgsSymbolTable.h"
 #include "logos/LgsCodeGen.h"
+#include "configs/LgsErrors.h"
 
 class LgsStrConst;
 class LgsApp;

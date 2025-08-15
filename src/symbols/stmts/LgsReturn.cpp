@@ -1,5 +1,6 @@
 #include "stmts/LgsReturn.h"
 #include "funcs/LgsFunc.h"
+#include "stmts/LgsStmtsBlock.h"
 
 void LgsReturn::createIRValue(LgsCodeGen* codeGen) {
     const auto exprIR = expr ? expr->getIRValue(codeGen) : nullptr;

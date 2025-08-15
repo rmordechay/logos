@@ -2,6 +2,7 @@
 
 #include "exprs/LgsExpr.h"
 #include "logos/LgsCodeGen.h"
+#include "stmts/LgsStmtsBlock.h"
 
 void LgsWhileLoop::createIRLoop(LgsCodeGen* codeGen) {
     codeGen->builder.CreateBr(IRCondBlock);

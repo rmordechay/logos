@@ -1,9 +1,12 @@
 #pragma once
 #include "logos/LgsStack.h"
 #include "utils/LgsErrHandler.h"
-#include "loops/LgsInfiniteLoop.h"
-#include "loops/LgsWhileLoop.h"
 
+class LgsPostfixExpr;
+class LgsDeferStmt;
+class LgsInfiniteLoop;
+class LgsObject;
+class LgsWhileLoop;
 class LgsFuncType;
 class LgsIterable;
 class LgsFile;
@@ -92,7 +95,7 @@ public:
     void visitInstance(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitSlice(LgsIterIndex* iterIndex);
-    static void visitGroup(LgsGroup* group);
+    void visitGroup(LgsGroup* group);
 
     bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
     bool setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);

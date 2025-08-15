@@ -1,7 +1,7 @@
 #pragma once
 #include "LgsSymbolTable.h"
-#include "stmts/LgsStmtsBlock.h"
 
+class LgsValue;
 class LgsStmtsBlock;
 class LgsStmt;
 class LgsIfStmt;

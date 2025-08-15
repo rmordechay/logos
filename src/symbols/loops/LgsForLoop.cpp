@@ -1,6 +1,7 @@
 #include "loops/LgsForLoop.h"
 #include "configs/LgsDefinitions.h"
 #include "logos/LgsCodeGen.h"
+#include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
 
 void LgsForLoop::createIRValue(LgsCodeGen* codeGen) {

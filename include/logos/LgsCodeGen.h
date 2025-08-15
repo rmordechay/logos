@@ -6,11 +6,14 @@
 #include <llvm/Passes/PassBuilder.h>
 
 
+class LgsFuncCall;
 class LgsRuntime;
 class LgsFile;
 class LgsErrHandler;
 class LgsForLoop;
 class LgsFuncType;
+
+using namespace llvm;
 
 struct LgsDebug {
     DIFile* diFile = nullptr;

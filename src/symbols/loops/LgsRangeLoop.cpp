@@ -1,5 +1,6 @@
 #include "loops/LgsRangeLoop.h"
 #include "logos/LgsCodeGen.h"
+#include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
 
 void LgsRangeLoop::createIRLoop(LgsCodeGen* codeGen) {
