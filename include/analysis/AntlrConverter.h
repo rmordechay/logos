@@ -64,17 +64,18 @@ public:
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     LgsStmtsBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
     LgsCoroutine* getCoroutine(LogosParser::CoroutineContext* ctx);
+    LgsVarDec* getVarDec(antlr4::tree::TerminalNode* name, LgsExpr* expr = nullptr) const;
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
     LgsBreak* getBreakStmt(LogosParser::StatementContext* ctx);
-    LgsStmt* getContinueStmt(LogosParser::StatementContext* ctx);
+    LgsStmt* getContinueStmt(const LogosParser::StatementContext* ctx);
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
     LgsForLoop* getForLoop(LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getRangeLoop(LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getForeachLoop(LogosParser::LoopStatementContext* ctx);
-    LgsForLoop* getWhileLoop(LogosParser::LoopStatementContext* ctx);
+    LgsForLoop* getWhileLoop(const LogosParser::LoopStatementContext* ctx);
     LgsForLoop* getInfiniteLoop(LogosParser::LoopStatementContext* ctx) const;
     LgsEnum* getEnum(LogosParser::EnumDeclarationContext* ctx);
     LgsExpr* getExpr(LogosParser::ExprContext* ctx);
@@ -95,7 +96,7 @@ public:
     LgsIterIndex* getIterIndex(LogosParser::IterIndexContext* ctx);
     LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
     LgsStrConst* getStrConst(antlr4::tree::TerminalNode* ctx);
-    LgsUnaryExpr* getNullValue(antlr4::tree::TerminalNode* ctx) const;
+    LgsUnaryExpr* getNullValue(const antlr4::tree::TerminalNode* ctx) const;
     LgsUnaryExpr* getLoopIsFirst(LogosParser::IsFirstContext* ctx);
     LgsUnaryExpr* getLoopIsLast(LogosParser::IsLastContext* ctx);
     LgsType* getType(LogosParser::TypeContext* ctx);
@@ -107,7 +108,7 @@ public:
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     bool isArgsDuplicate(const std::unordered_set<std::string>& initializedArgs, LgsVarDec* varDec);
     bool validateTypeName(const std::string& typeName, LgsLocation* location);
-    void setLocation(LgsLocation& location, const antlr4::Token* start, const std::string& code) const;
+    void setLocation(LgsLocation& location, const antlr4::Token* start) const;
     void extractStrParts(LgsStrConst& strConst);
     ~AntlrConverter() = default;
 };

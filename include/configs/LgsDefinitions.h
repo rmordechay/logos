@@ -10,8 +10,6 @@
 #define LGS_APP_FILE_NAME "App"
 #define LGS_MAIN_FUNC_NAME "main"
 #define LGS_SELF "self"
-#define LGS_LOOP_IS_FIRST "for.isFirst"
-#define LGS_LOOP_IS_LAST "for.isLast"
 #define LGS_STR_FMT_PLACEHOLDER "$!v!$"
 #define LGS_ERROR_PADDING "\n\t\t"
 #define LGS_ERROR_STR "\033[1;31mError:\033[0m  "

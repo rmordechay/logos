@@ -12,23 +12,22 @@
 class  LogosParser : public antlr4::Parser {
 public:
   enum {
-    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, DOUBLE_EQUAL = 6, 
-    NOT_EQUAL = 7, GE = 8, LE = 9, LPAREN = 10, RPAREN = 11, LBRACE = 12, 
-    RBRACE = 13, LBRACK = 14, RBRACK = 15, ARROW = 16, LANGLE = 17, RANGLE = 18, 
-    COMMA = 19, TRIPLE_DOT = 20, DOUBLE_DOT = 21, WALRUS = 22, EQUAL_PLUS = 23, 
-    EQUAL_MINUS = 24, EQUAL_STAR = 25, EQUAL_SLASH = 26, EQUAL_PERCENT = 27, 
-    EQUAL_AMPERSAND = 28, EQUAL_PIPE = 29, EQUAL_CARET = 30, EQUAL_DOUBLE_RANGLE = 31, 
-    EQUAL_DOUBLE_LANGLE = 32, INC = 33, DEC = 34, DOT = 35, COLON = 36, 
-    EQUAL = 37, PLUS = 38, MINUS = 39, STAR = 40, SLASH = 41, HASH = 42, 
-    QUEST_MARK = 43, EXCLA_MARK = 44, PERCENT = 45, DOLLAR = 46, AMPERSAND = 47, 
-    PIPE = 48, CARET = 49, DOUBLE_RANGLE = 50, DOUBLE_LANGLE = 51, OBJECT = 52, 
-    SINGLETON = 53, SELF_INSTANCE = 54, SELF_CLASS = 55, INTERFACE = 56, 
-    EXTERN = 57, VISIBILITY = 58, IMPLEMENTS = 59, CONST = 60, ENUM = 61, 
-    GO = 62, DEFER = 63, VEC2 = 64, VEC3 = 65, VEC4 = 66, IF = 67, ELSE = 68, 
-    FOR = 69, BREAK = 70, CONTINUE = 71, RETURN = 72, AND = 73, OR = 74, 
-    NOT = 75, IN = 76, LONG = 77, INTEGER = 78, FLOAT = 79, BOOL = 80, NULL_ = 81, 
-    IDENTIFIER = 82, STRING = 83, TAG = 84, LINE_COMMENT = 85, BLOCK_COMMENT = 86, 
-    WS = 87
+    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, DOUBLE_EQUAL = 5, NOT_EQUAL = 6, 
+    GE = 7, LE = 8, LPAREN = 9, RPAREN = 10, LBRACE = 11, RBRACE = 12, LBRACK = 13, 
+    RBRACK = 14, ARROW = 15, LANGLE = 16, RANGLE = 17, COMMA = 18, TRIPLE_DOT = 19, 
+    DOUBLE_DOT = 20, WALRUS = 21, EQUAL_PLUS = 22, EQUAL_MINUS = 23, EQUAL_STAR = 24, 
+    EQUAL_SLASH = 25, EQUAL_PERCENT = 26, EQUAL_AMPERSAND = 27, EQUAL_PIPE = 28, 
+    EQUAL_CARET = 29, EQUAL_DOUBLE_RANGLE = 30, EQUAL_DOUBLE_LANGLE = 31, 
+    INC = 32, DEC = 33, DOT = 34, COLON = 35, EQUAL = 36, PLUS = 37, MINUS = 38, 
+    STAR = 39, SLASH = 40, HASH = 41, QUEST_MARK = 42, EXCLA_MARK = 43, 
+    PERCENT = 44, DOLLAR = 45, AMPERSAND = 46, PIPE = 47, CARET = 48, DOUBLE_RANGLE = 49, 
+    DOUBLE_LANGLE = 50, OBJECT = 51, SINGLETON = 52, SELF_INSTANCE = 53, 
+    SELF_CLASS = 54, INTERFACE = 55, EXTERN = 56, VISIBILITY = 57, IMPLEMENTS = 58, 
+    CONST = 59, ENUM = 60, GO = 61, DEFER = 62, FOR_IS_FIRST = 63, FOR_IS_LAST = 64, 
+    VEC2 = 65, VEC3 = 66, VEC4 = 67, IF = 68, ELSE = 69, FOR = 70, BREAK = 71, 
+    CONTINUE = 72, RETURN = 73, AND = 74, OR = 75, NOT = 76, IN = 77, LONG = 78, 
+    INTEGER = 79, FLOAT = 80, BOOL = 81, NULL_ = 82, IDENTIFIER = 83, STRING = 84, 
+    TAG = 85, LINE_COMMENT = 86, BLOCK_COMMENT = 87, WS = 88
   };
 
   enum {
@@ -50,7 +49,7 @@ public:
     RuleIsFirst = 56, RuleIsLast = 57, RuleSelection = 58, RuleFirstSelectionElement = 59, 
     RuleInnerSelectionElement = 60, RuleRange = 61, RuleType = 62, RuleMapType = 63, 
     RuleArraySize = 64, RuleFuncType = 65, RuleVector = 66, RuleExtern = 67, 
-    RuleRequireEnvVars = 68, RuleAssignemntOp = 69
+    RuleRequireEnvVars = 68, RuleRequirePackages = 69, RuleAssignemntOp = 70
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -139,6 +138,7 @@ public:
   class VectorContext;
   class ExternContext;
   class RequireEnvVarsContext;
+  class RequirePackagesContext;
   class AssignemntOpContext; 
 
   class  LogosFileContext : public antlr4::ParserRuleContext {
@@ -175,11 +175,14 @@ public:
     LogosAppFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *EOF();
-    std::vector<ImplicitVarDecContext *> implicitVarDec();
-    ImplicitVarDecContext* implicitVarDec(size_t i);
-    std::vector<ExplicitVarDecContext *> explicitVarDec();
-    ExplicitVarDecContext* explicitVarDec(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> IDENTIFIER();
+    antlr4::tree::TerminalNode* IDENTIFIER(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> EQUAL();
+    antlr4::tree::TerminalNode* EQUAL(size_t i);
+    std::vector<ExprContext *> expr();
+    ExprContext* expr(size_t i);
     RequireEnvVarsContext *requireEnvVars();
+    RequirePackagesContext *requirePackages();
 
    
   };
@@ -1035,8 +1038,7 @@ public:
   public:
     IsFirstContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *FOR();
-    antlr4::tree::TerminalNode *DOT();
+    antlr4::tree::TerminalNode *FOR_IS_FIRST();
 
    
   };
@@ -1047,8 +1049,7 @@ public:
   public:
     IsLastContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *FOR();
-    antlr4::tree::TerminalNode *DOT();
+    antlr4::tree::TerminalNode *FOR_IS_LAST();
 
    
   };
@@ -1236,6 +1237,20 @@ public:
   };
 
   RequireEnvVarsContext* requireEnvVars();
+
+  class  RequirePackagesContext : public antlr4::ParserRuleContext {
+  public:
+    RequirePackagesContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *LBRACE();
+    antlr4::tree::TerminalNode *RBRACE();
+    std::vector<antlr4::tree::TerminalNode *> STRING();
+    antlr4::tree::TerminalNode* STRING(size_t i);
+
+   
+  };
+
+  RequirePackagesContext* requirePackages();
 
   class  AssignemntOpContext : public antlr4::ParserRuleContext {
   public:

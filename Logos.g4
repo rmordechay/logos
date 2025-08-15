@@ -9,7 +9,7 @@ logosEnvFile:
     ;
 
 logosAppFile:
-        (implicitVarDec | explicitVarDec)* requireEnvVars? EOF
+        (IDENTIFIER EQUAL expr)* (requireEnvVars | requirePackages)? EOF
     ;
 
 mainFile:
@@ -270,11 +270,11 @@ index:
     ;
 
 isFirst:
-        FOR DOT 'isFirst'
+        FOR_IS_FIRST
     ;
 
 isLast:
-        FOR DOT 'isLast'
+        FOR_IS_LAST
     ;
 
 selection:
@@ -332,7 +332,11 @@ extern:
     ;
 
 requireEnvVars:
-        'require' 'envs' LBRACE (IDENTIFIER COLON type)* RBRACE
+        'require' 'envs' LBRACE (IDENTIFIER COLON type)+ RBRACE
+    ;
+
+requirePackages:
+        'require' 'packages' LBRACE STRING+ RBRACE
     ;
 
 assignemntOp:
@@ -410,6 +414,8 @@ CONST: 'const';
 ENUM: 'enum';
 GO: 'go';
 DEFER: 'defer';
+FOR_IS_FIRST: 'for.isFirst';
+FOR_IS_LAST: 'for.isLast';
 
 VEC2: 'vec2';
 VEC3: 'vec3';

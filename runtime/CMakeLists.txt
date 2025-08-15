@@ -8,9 +8,7 @@ add_library(lgs_runtime
     lib/Lgs_helpers.cpp
     lib/Lgs_system.cpp
     lib/Lgs_defer.c
-    include/Lgs_Stack.h
     lib/Lgs_runtime.c
-    include/Lgs_runtime.h
 )
 
 target_include_directories(lgs_runtime PUBLIC

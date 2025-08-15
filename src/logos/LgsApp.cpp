@@ -65,7 +65,7 @@ bool LgsApp::validate() {
 
 bool LgsApp::parse() {
     loadBuiltins();
-    // parseAppFile(paths.appFilePath);
+    parseAppFile(paths.appFilePath);
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
