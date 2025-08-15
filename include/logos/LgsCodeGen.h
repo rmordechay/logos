@@ -27,7 +27,6 @@ public:
     LLVMContext context;
     Module* IRModule = nullptr;
     IRBuilderBase::InsertPoint savedIP;
-    GlobalVariable* runtimePtr = nullptr;
     IRBuilder<> builder = IRBuilder(context);
     LgsDebug debug;
 
@@ -48,7 +47,10 @@ public:
     // Funcs
     Function* getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     Value* callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
-    Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args);
+    Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
+    Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy);
+    Value* getThunkCtxValue(const LgsFuncCall* fc, Type* ctxTy);
+    Type* getThunkCtxType(const LgsFuncCall* fc);
 
     // System
     Value* callMalloc(size_t size);
@@ -63,12 +65,11 @@ public:
     Value* callStrLen(Value* str);
     void callCopyMem(Value* src, Value* dest, size_t n);
 
-    // Runtime
-    void setRuntimePtr();
-    void callStackPush(const std::string& loc);
+    void callStackPush();
     void callPopStack();
     void callDefers();
     void addDeferFunc(Value* deferFuncPtr, Value* ctx);
+    void addCoro(Value* coroPtr, Value* ctx);
     Value* callHashStr(Value* value);
 
     // Coroutines

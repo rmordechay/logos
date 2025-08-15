@@ -2,7 +2,6 @@
 #include "funcs/LgsFunc.h"
 
 void LgsParam::createIRValue(LgsCodeGen* codeGen) {
-    if (IRValue) return;
     if (isVariadic) {
         if (vaList) {
             IRValue = vaList;

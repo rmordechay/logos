@@ -6,7 +6,6 @@
 using namespace llvm;
 
 struct LgsPaths {
-    fs::path relRootDir;
     fs::path rootDir;
     fs::path srcDir;
     fs::path envsDir;
@@ -25,7 +24,6 @@ struct LgsPaths {
 
 inline void LgsPaths::initPaths(const fs::path& rootDirPath) {
     if (rootDirPath == "") return;
-    relRootDir = rootDirPath;
     rootDir = canonical(rootDirPath);
     srcDir = rootDir / LGS_SRC_DIR;
     envsDir = rootDir / LGS_ENVS_DIR;
@@ -49,7 +47,6 @@ inline void LgsPaths::findCLibRoot() {
         pipe = popen("cc -print-sysroot 2>/dev/null", "r");
         break;
     default:
-        if (pipe) pclose(pipe);
         assert(0);
     }
     fgets(buffer, sizeof(buffer), pipe);

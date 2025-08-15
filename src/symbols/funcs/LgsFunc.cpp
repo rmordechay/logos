@@ -4,8 +4,6 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "types/LgsFuncType.h"
-#include "utils/LgsUtils.h"
-
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 
@@ -93,9 +91,10 @@ Value* LgsFunc::callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args) {
 
 void LgsFunc::createPrologue(LgsCodeGen* codeGen) {
     const auto IRFunc = getIRFunc(codeGen);
+    IRFunc->setLinkage(funcType->isPublic ? GlobalValue::ExternalLinkage : GlobalValue::PrivateLinkage);
     const auto entryBlock = codeGen->createBlock(BLOCK_NAME_ENTRY, IRFunc);
     codeGen->builder.SetInsertPoint(entryBlock);
-    codeGen->callStackPush(getFullPath(location));
+    codeGen->callStackPush();
 }
 
 void LgsFunc::createEpilogue(LgsCodeGen* codeGen) const {

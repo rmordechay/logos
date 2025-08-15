@@ -4,14 +4,11 @@
 #include "exprs/unary/LgsSelection.h"
 
 void LgsCoroutine::createIRValue(LgsCodeGen* codeGen) {
-    auto& builder = codeGen->builder;
-    // codeGen->savedIP = builder.saveIP();
-    const auto coroID = codeGen->callCoroIDFunc();
-    const auto coroSize = codeGen->callCoroSizeFunc();
-    const auto coroBegin = codeGen->callCoroBeginFunc(coroID, coroSize);
-    auto callCoroEndFunc = codeGen->callCoroEndFunc(coroBegin);
-    // Back to the caller
-    // builder.restoreIP(codeGen->savedIP);
+    const auto fc = funcCall ? funcCall : selection->lastExpr()->asFuncCall();
+    const auto ctxTy = codeGen->getThunkCtxType(fc);
+    const auto ctx = codeGen->getThunkCtxValue(fc, ctxTy);
+    const auto func = codeGen->getThunkFunc(fc, ctxTy);
+    codeGen->addCoro(func, ctx);
 }
 
 LgsCoroutine::~LgsCoroutine() {

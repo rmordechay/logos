@@ -54,3 +54,12 @@ void freeType(const LgsType* type) {
 std::string getFullPath(const LgsLocation& location) {
     return std::string(location.filePath) + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.posInLine);
 }
+
+std::string getFullRelPath(const LgsLocation& location) {
+    const auto pos = std::string(location.filePath).rfind(std::string(LGS_SRC_DIR));
+    fs::path relPath;
+    if (pos != std::string::npos) {
+        relPath = std::string(location.filePath).substr(pos + std::strlen(LGS_SRC_DIR) + 1);
+    }
+    return std::string(relPath) + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.posInLine);
+}

@@ -3,6 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+
+#define ARRAY_MAX_CAPACITY 1024*1000
+#define ARRAY_MAX_ELEMENT_SIZE 1024*4
 
 typedef struct {
     size_t element_size;
@@ -12,6 +16,8 @@ typedef struct {
 } Lgs_Array;
 
 void Lgs_Array_init(Lgs_Array* arr, const size_t capacity, const size_t element_size) {
+    if (capacity == 0 || capacity > ARRAY_MAX_CAPACITY) exit(1);
+    if (element_size == 0 || element_size > ARRAY_MAX_ELEMENT_SIZE) exit(1);
     arr->capacity = capacity;
     arr->size = 0;
     arr->element_size = element_size;
@@ -20,13 +26,15 @@ void Lgs_Array_init(Lgs_Array* arr, const size_t capacity, const size_t element_
 }
 
 static void resize(Lgs_Array* arr) {
+    if (arr->capacity > ARRAY_MAX_CAPACITY) exit(1);
     arr->capacity *= 2;
     void* new_data = realloc(arr->data, arr->capacity * arr->element_size);
-    if (!new_data) return;
+    if (!new_data) exit(1);
     arr->data = new_data;
 }
 
 void Lgs_Array_add(Lgs_Array* arr, const void* value) {
+    if (!value) exit(1);
     if (arr->size == arr->capacity) resize(arr);
     void* target = (char*)arr->data + arr->size * arr->element_size;
     memcpy(target, value, arr->element_size);
@@ -54,8 +62,8 @@ void Lgs_Array_addLong(Lgs_Array* arr, const int64_t value) {
 }
 
 void* Lgs_Array_get(const Lgs_Array* arr, const size_t index) {
-    if (index >= arr->size) return NULL;
-    return arr->data + index * arr->element_size;
+    if (index >= arr->size) exit(1);
+    return (char*)arr->data + index * arr->element_size;
 }
 
 size_t Lgs_Array_len(const Lgs_Array* arr) {
@@ -71,17 +79,18 @@ bool Lgs_Array_isNotEmpty(const Lgs_Array* arr) {
 }
 
 void Lgs_Array_free(const Lgs_Array* arr) {
+    if (!arr->data) exit(1);
     free(arr->data);
 }
 
 bool Lgs_ArrayIter_hasNext(Lgs_Iterator* iter) {
     const Lgs_Array* arr = iter->container;
-    return iter->current >= arr->size;
+    return iter->current < arr->size;
 }
 
 void* Lgs_ArrayIter_next(Lgs_Iterator* iter) {
     const Lgs_Array* arr = iter->container;
-    if (iter->current >= arr->size) return NULL;
+    if (iter->current >= arr->size) exit(1);
     void* elem = (char*)arr->data + iter->current * arr->element_size;
     iter->current++;
     return elem;

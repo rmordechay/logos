@@ -1,6 +1,7 @@
 #include "logos/LgsCodeGen.h"
 #include "configs/LgsConfig.h"
 #include "configs/LgsDefinitions.h"
+#include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include <llvm/Support/FileSystem.h>
@@ -14,7 +15,6 @@ void LgsCodeGen::setupModule(const std::string& moduleName, const DataLayout& da
     IRModule = new Module(moduleName, context);
     IRModule->setTargetTriple(sys::getDefaultTargetTriple());
     IRModule->setDataLayout(dataLayout);
-    setRuntimePtr();
     if (debug.isDebug) {
         debug.diBuilder = new DIBuilder(*IRModule);
         debug.diFile = debug.diBuilder->createFile(moduleName, "");
@@ -87,6 +87,52 @@ Function* LgsCodeGen::getFunc(const std::string& funcName, FunctionType* ft, Glo
     return Function::Create(ft, linkage, funcName, IRModule);
 }
 
+Function* LgsCodeGen::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) {
+    auto func = IRModule->getFunction(fc->name + "_thunk");
+    if (func) return func;
+
+    savedIP = builder.saveIP();
+    const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
+    func = Function::Create(ft, Function::PrivateLinkage, fc->name + "_thunk", IRModule);
+    const auto entryBlock = BasicBlock::Create(context, BLOCK_NAME_ENTRY);
+    entryBlock->insertInto(func);
+    builder.SetInsertPoint(entryBlock);
+
+    std::vector<Value*> args;
+    for (int i = 0; i < fc->args.size(); i++) {
+        const auto fieldTy = dyn_cast<StructType>(ctxTy)->getElementType(i);
+        const auto fieldPtr = builder.CreateStructGEP(ctxTy, func->arg_begin(), i);
+        const auto v = builder.CreateLoad(fieldTy, fieldPtr);
+        args.push_back(v);
+    }
+    const auto deferFunc = fc->func->getIRFunc(this);
+    builder.CreateCall(deferFunc, args);
+    builder.CreateRetVoid();
+
+    builder.restoreIP(savedIP);
+    return func;
+}
+
+Value* LgsCodeGen::getThunkCtxValue(const LgsFuncCall* fc, Type* ctxTy) {
+    if (fc->args.empty()) return null();
+    const auto ctx = builder.CreateAlloca(ctxTy);
+    for (int i = 0; i < fc->args.size(); i++) {
+        const auto v = fc->args[i]->getIRValue(this);
+        storeValueInStruct(dyn_cast<StructType>(ctxTy), ctx, i, v);
+    }
+    return ctx;
+}
+
+Type* LgsCodeGen::getThunkCtxType(const LgsFuncCall* fc) {
+    if (fc->args.empty()) return ptrTy();
+    std::vector<Value*> args;
+    std::vector<Type*> types;
+    for (const auto& arg : fc->args) {
+        types.push_back(arg->type->getIRType(this));
+    }
+    return getStructType(types, fc->name + "_thunk_type");
+}
+
 Value* LgsCodeGen::callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args) {
     const auto func = getFunc(funcName, ft);
     return builder.CreateCall(func, args);
@@ -153,38 +199,29 @@ void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
     builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
 }
 
-void LgsCodeGen::setRuntimePtr() {
-    const auto localsArr = ArrayType::get(ptrTy(), LOCALS_CAPACITY);
-    const auto stackFrameStruct = getStructType({localsArr, i32Ty()}, "stack_frame_ty");
-    const auto stackCapacity = ArrayType::get(stackFrameStruct, STACK_FRAMES_CAPACITY);
-    const auto stackStruct = getStructType({stackCapacity, i32Ty()}, "stack_ty");
-    const auto runtimeTy = getStructType({stackStruct}, "runtime_ty");
-    if (IRModule->getName() == LGS_MAIN_FILE_NAME) {
-        runtimePtr = createGlobal(runtimeTy, ConstantAggregateZero::get(runtimeTy), "runtime");
-    } else {
-        runtimePtr = createGlobal(runtimeTy, nullptr, "runtime");
-    }
-}
-
-void LgsCodeGen::callStackPush(const std::string& loc) {
+void LgsCodeGen::callStackPush() {
     const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
-    callLgsFunc("Stack_push", ft, {runtimePtr, getIRStr(loc)});
+    callLgsFunc("Stack_push", ft);
 }
 
 void LgsCodeGen::callPopStack() {
-    const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
-    callLgsFunc("Stack_pop", ft, {runtimePtr});
+    callLgsFunc("Stack_pop", FunctionType::get(voidTy(), {ptrTy()}, false));
 }
 
 void LgsCodeGen::callDefers() {
     branchAndStartBlock(createBlock(BLOCK_NAME_DEFER));
     const auto ft = FunctionType::get(voidTy(), false);
-    callLgsFunc("Stack_callDefers", ft, {runtimePtr});
+    callLgsFunc("Stack_callDefers", ft);
 }
 
 void LgsCodeGen::addDeferFunc(Value* deferFuncPtr, Value* ctx) {
-    const auto ft = FunctionType::get(voidTy(), {ptrTy(), ptrTy(), ptrTy()}, false);
-    callLgsFunc("Stack_addDefer", ft, {runtimePtr, deferFuncPtr, ctx});
+    const auto ft = FunctionType::get(voidTy(), {ptrTy(), ptrTy()}, false);
+    callLgsFunc("Stack_addDefer", ft, {deferFuncPtr, ctx});
+}
+
+void LgsCodeGen::addCoro(Value* coroPtr, Value* ctx) {
+    const auto ft = FunctionType::get(voidTy(), {ptrTy(), ptrTy()}, false);
+    callLgsFunc("Stack_addCoro", ft, {coroPtr, ctx});
 }
 
 Value* LgsCodeGen::callHashStr(Value* value) {

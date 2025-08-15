@@ -7,5 +7,6 @@ public:
     LgsSelection* selection = nullptr;
 
     void createIRValue(LgsCodeGen* codeGen) override;
+    Type* getCtxType(LgsCodeGen* codeGen) const;
     ~LgsCoroutine() override;
 };

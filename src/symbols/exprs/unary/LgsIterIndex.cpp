@@ -15,8 +15,9 @@ void LgsIterIndex::createIRValue(LgsCodeGen* codeGen) {
         IRValue = createIRFromMap(codeGen, map);
     } else if (const auto str = baseExprType->asStr()) {
         IRValue = createIRFromStr(codeGen, str);
+    } else {
+        assert(0);
     }
-    assert(0);
 }
 
 Value* LgsIterIndex::createIRFromStr(LgsCodeGen* codeGen, const LgsStr* str) const {

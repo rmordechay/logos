@@ -81,11 +81,7 @@ func:
     ;
 
 anonnymosFunc:
-        anonymosFuncSignature statementsBlock
-    ;
-
-anonymosFuncSignature:
-        LPAREN (anonymousParam (COMMA anonymousParam)* COMMA?)? RPAREN (COLON type)?
+        LPAREN (anonymousParam (COMMA anonymousParam)* COMMA?)? RPAREN (COLON type)? statementsBlock
     ;
 
 method:
@@ -108,15 +104,16 @@ statement:
     |   ifStatement
     |   patternMatching
     |   loopStatement
-    |   CONTINUE
-    |   breakStmt
-    |   expr
     |   coroutine
     |   deferStmt
+    |   breakStmt
+    |   expr
+    |   CONTINUE
     ;
 
 statementsBlock:
-        LBRACE statement* RBRACE
+        statement
+    |   LBRACE statement* RBRACE
     ;
 
 assignment:
@@ -132,7 +129,7 @@ implicitVarDec:
     ;
 
 ifStatement:
-        IF expr TAG? statementsBlock elseIfStatement* elseStatement?
+        IF expr TAG? (statementsBlock) elseIfStatement* elseStatement?
     ;
 
 elseIfStatement:

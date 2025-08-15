@@ -55,7 +55,6 @@ bool LgsApp::validate() {
         errHandler.addError(E10010, nullptr);
         return false;
     }
-
     if (!exists(paths.appFilePath)) {
         errHandler.addError(E10008, nullptr);
         return false;
@@ -303,19 +302,15 @@ void LgsApp::setTargetMachine() {
 void LgsApp::exitWithErrors() const {
     for (int i = 0; i < errHandler.errors.size(); ++i) {
         const auto lgsError = errHandler.errors[i];
-        const auto code = "\n code:  " + std::string(lgsError.location->code);
         const auto path = "\n   at:  " + getFullPath(*lgsError.location);
         logInfo(LGS_ERROR_STR + std::string(lgsError.msg));
-        // logInfo(code);
         logInfo(path);
         if (i != errHandler.errors.size() - 1) logInfo("\n---\n");
         else logInfo("\n");
         assert(strlen(lgsError.msg) > 0);
         assert(strlen(lgsError.location->filePath) > 0);
-        assert(strlen(lgsError.location->code) > 0);
         free(lgsError.msg);
         free(lgsError.location->filePath);
-        free(lgsError.location->code);
     }
     exit(1);
 }

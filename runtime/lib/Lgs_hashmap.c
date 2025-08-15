@@ -1,9 +1,7 @@
 #include "Lgs_iterator.h"
 #include "Lgs_helpers.h"
-#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #define MAP_CAPACITY 1024
 
@@ -34,13 +32,15 @@ static void free_entry(Lgs_Map_Entry* current) {
 }
 
 void Lgs_Map_init(Lgs_Hashmap* map, const size_t value_size) {
+    if (value_size == 0 || value_size > 4096) exit(1);
     map->size = 0;
     map->value_size = value_size;
     map->buckets = calloc(MAP_CAPACITY, sizeof(void*));
 }
 
 void Lgs_Map_add(Lgs_Hashmap* map, const char* key, const void* value) {
-    const size_t index = Lgs_hash(key);
+    if (!key || strlen(key) > 1024) exit(1);
+    const size_t index = Lgs_hash(key) % MAP_CAPACITY;
     Lgs_Map_Entry* entry = map->buckets[index];
     while (entry) {
         if (strcmp(entry->key, key) == 0) {
@@ -50,36 +50,33 @@ void Lgs_Map_add(Lgs_Hashmap* map, const char* key, const void* value) {
         entry = entry->next;
     }
     entry = new_entry(map, key, value);
+    entry->next = map->buckets[index];
     map->buckets[index] = entry;
     map->size++;
 }
 
 void* Lgs_Map_get(const Lgs_Hashmap* map, const char* key) {
-    const size_t index = Lgs_hash(key);
+    if (!key || strlen(key) > 1024) exit(1);
+    const size_t index = Lgs_hash(key) % MAP_CAPACITY;
     const Lgs_Map_Entry* entry = map->buckets[index];
     while (entry) {
-        if (strcmp(entry->key, key) == 0) {
-            return entry->value;
-        }
+        if (strcmp(entry->key, key) == 0) return entry->value;
         entry = entry->next;
     }
-    char buffer[512];
-    sprintf(buffer, "Error: %s not found\n", key);
-    fprintf(stderr, "%s\n", buffer);
+    Lgs_printError(key);
+    Lgs_printError2();
     return NULL;
 }
 
 void Lgs_Map_delete(Lgs_Hashmap* map, const char* key) {
-    const size_t index = Lgs_hash(key);
+    if (!key || strlen(key) > 1024) exit(1);
+    const size_t index = Lgs_hash(key) % MAP_CAPACITY;
     Lgs_Map_Entry* current = map->buckets[index];
     Lgs_Map_Entry* prev = NULL;
     while (current) {
         if (strcmp(current->key, key) == 0) {
-            if (prev) {
-                prev->next = current->next;
-            } else {
-                map->buckets[index] = current->next;
-            }
+            if (prev) prev->next = current->next;
+            else map->buckets[index] = current->next;
             free_entry(current);
             map->size--;
             return;
@@ -115,9 +112,9 @@ void Lgs_Map_free(const Lgs_Hashmap* map) {
 
 bool Lgs_Map_hasNext(Lgs_Iterator* iter) {
     const Lgs_Hashmap* map = iter->container;
-    if (iter->entry != NULL) return true;
+    if (iter->entry) return true;
     while (iter->current < MAP_CAPACITY) {
-        if (map->buckets[iter->current] != NULL) {
+        if (map->buckets[iter->current]) {
             iter->entry = map->buckets[iter->current];
             return true;
         }
@@ -130,9 +127,7 @@ void* Lgs_Map_next(Lgs_Iterator* iter) {
     if (!Lgs_Map_hasNext(iter)) return NULL;
     Lgs_Map_Entry* entry = iter->entry;
     iter->entry = entry->next;
-    if (iter->entry == NULL) {
-        iter->current++;
-    }
+    if (!iter->entry) iter->current++;
     return entry;
 }
 

@@ -1,10 +1,9 @@
 #pragma once
 
 struct LgsLocation {
-    int32_t lineStart = 0;
-    int32_t posInLine = 0;
-    char* filePath = nullptr;
-    char* code = nullptr;
+    int32_t lineStart;
+    int32_t posInLine;
+    char* filePath;
 };
 
 struct LgsBaseError {
@@ -12,11 +11,11 @@ struct LgsBaseError {
     size_t const errCode;
 };
 
-struct LgsError {
+typedef struct {
     char* msg;
     size_t errCode;
     LgsLocation* location;
-};
+} LgsError;
 
 /** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */
 inline size_t errCodeStart = 10000;
@@ -87,3 +86,4 @@ inline LgsBaseError E10063{.msg = "Interfaces must have at least one (abstract) 
 inline LgsBaseError E10064{.msg = "'%s' is already defined in '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10065{.msg = "'for.isFirst' and 'for.isLast' are not allowed in a while loop.", .errCode = errCodeStart++};
 inline LgsBaseError E10066{.msg = "While loop condition '%s' must be of type Bool. Given: '%s'", .errCode = errCodeStart++};
+inline LgsBaseError E10067{.msg = "'%s' was not found in '%s'", .errCode = errCodeStart++};

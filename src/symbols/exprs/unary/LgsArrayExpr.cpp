@@ -10,7 +10,7 @@ std::string LgsArrayExpr::prettyName() {
 void LgsArrayExpr::createIRValue(LgsCodeGen* codeGen) {
     if (type->asSArray()) IRValue = createConstArray(codeGen);
     else if (type->asDArray()) IRValue = createDynamicArray(codeGen);
-    assert(0);
+    else assert(0);
 }
 
 Value* LgsArrayExpr::createDynamicArray(LgsCodeGen* codeGen) {

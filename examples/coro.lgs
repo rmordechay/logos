@@ -1,0 +1,13 @@
+func() {
+    for i in ..10 {
+        print(i)
+    }
+}
+
+func2() {
+    func()
+}
+
+main() {
+    go func2()
+}

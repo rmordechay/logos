@@ -76,6 +76,15 @@ LgsFile* AntlrConverter::getLogosFile(LogosParser::LogosFileContext* ctx) {
     return file;
 }
 
+std::string after_last_src(const std::string& fullPath) {
+    const std::string needle = "/src/";
+    const auto pos = fullPath.rfind(needle);
+    if (pos != std::string::npos) {
+        return fullPath.substr(pos + needle.size());
+    }
+    return fullPath;
+}
+
 LgsMainFile* AntlrConverter::getMainFile(LogosParser::MainFileContext* ctx) {
     const auto funcs = ctx->func();
     const auto file = new LgsMainFile(filePath);
@@ -348,16 +357,15 @@ LgsStmt* AntlrConverter::getDeferStmt(LogosParser::DeferStmtContext* ctx) {
 }
 
 LgsFunc* AntlrConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx) {
-    const auto funcSignature = ctx->anonymosFuncSignature();
-    const auto rt = getFuncReturnType(funcSignature->type());
+    const auto rt = getFuncReturnType(ctx->type());
     const auto func = new LgsFunc("", rt);
-    for (const auto param : funcSignature->anonymousParam()) {
+    for (const auto param : ctx->anonymousParam()) {
         auto lgsParam = LgsParam(getType(param->type()), param->IDENTIFIER()->getText());
         setLocation(lgsParam.location, param->start, ctx->getText());
         func->funcType->params.push_back(lgsParam);
     }
     func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
-    setLocation(func->location, funcSignature->LPAREN()->getSymbol(), ctx->getText());
+    setLocation(func->location, ctx->LPAREN()->getSymbol(), ctx->getText());
     return func;
 }
 
@@ -1145,7 +1153,6 @@ void AntlrConverter::setLocation(LgsLocation& location, const antlr4::Token* sta
     location.lineStart = start->getLine();
     location.posInLine = start->getCharPositionInLine() + 1;
     location.filePath = strdup(filePath.c_str());
-    location.code = strdup(code.c_str());
 }
 
 void AntlrConverter::extractStrParts(LgsStrConst& strConst) {
