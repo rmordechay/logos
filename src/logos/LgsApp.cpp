@@ -14,7 +14,7 @@
 #include "builtins/LgsSystem.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "lgsc/LgsCLang.h"
-#include "files/LgsAppFile.h"
+#include "files/LgsAppInfo.h"
 #include "files/LgsEnvFile.h"
 #include "funcs/LgsMainFunc.h"
 #include "logos/LgsLinker.h"
@@ -65,7 +65,7 @@ bool LgsApp::validate() {
 
 bool LgsApp::parse() {
     loadBuiltins();
-    parseAppFile(paths.appFilePath);
+    if (!parseAppFile()) return false;
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
@@ -119,7 +119,7 @@ void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     const auto ast = parser.logosFile();
-    if (checkParserErrors(&parser)) return;
+    if (!checkParserErrors(&parser)) return;
     AntlrConverter antlrConverter(filePath, globals);
     const auto file = antlrConverter.getLogosFile(ast);
     files.push_back(file);
@@ -137,28 +137,21 @@ void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
     }
 }
 
-void LgsApp::parseAppFile(fs::path fileEntry) {
-    const auto absFilePath = fs::path(fs::canonical(fileEntry));
-    if (!fs::exists(absFilePath)) return;
-    auto codeText = getFileText(fileEntry);
-    AntlrConverter antlerConverter(absFilePath, globals);
+bool LgsApp::parseAppFile() {
+    appInfo.appFilePath = fs::path(fs::canonical(paths.appFilePath));
+    if (!fs::exists(appInfo.appFilePath)) return false;
+    auto codeText = getFileText(paths.appFilePath);
+    AntlrConverter antlerConverter(appInfo.appFilePath, globals);
     antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    appFile = antlerConverter.getAppFile(parser.logosAppFile());
-    if (checkParserErrors(&parser)) return;
-    for (const auto& varDec : appFile->varDecs) {
-        if (varDec->name == "name") {
-            name = varDec->expr->asStrConst()->value;
-        }
-        if (varDec->name == "version") {
-            version = varDec->expr->asStrConst()->value;
-        }
-        if (varDec->name == "activeEnv") {
-            activeEnv.name = varDec->expr->asStrConst()->value;
-        }
+    antlerConverter.getAppInfo(parser.logosAppFile(), appInfo);
+    if (!checkParserErrors(&parser)) return false;
+    if (!antlerConverter.errHandler.successful) {
+        errHandler.mergeErrors(antlerConverter.errHandler);
     }
+    return checkParserErrors(&parser) && errHandler.successful;
 }
 
 void LgsApp::parseEnvFile(fs::path fileEntry) {
@@ -170,19 +163,19 @@ void LgsApp::parseEnvFile(fs::path fileEntry) {
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
-    if (checkParserErrors(&parser)) return;
+    if (!checkParserErrors(&parser)) return;
     std::lock_guard lock(mtx);
     envFiles.emplace_back(file);
     errHandler.mergeErrors(antlerConverter.errHandler);
 }
 
 bool LgsApp::checkParserErrors(LogosParser* parser) {
-    if (parser->getNumberOfSyntaxErrors() != 0) {
+    if (parser->getNumberOfSyntaxErrors() > 0) {
         std::lock_guard lock(mtx);
         errHandler.setUnsuccessful();
-        return true;
+        return false;
     }
-    return false;
+    return true;
 }
 
 bool LgsApp::resolveGlobalTypes() {
@@ -232,20 +225,6 @@ void LgsApp::loadEnvFiles() {
 }
 
 void LgsApp::checkRequiredEnvVars() {
-    for (const auto& [_, requireEnvVar] : appFile->requireEnvVars) {
-        for (const auto envFile : envFiles) {
-            auto found = false;
-            for (const auto& varDec : envFile->varDecs) {
-                if (name == varDec->name && requireEnvVar->equals(varDec->type)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                errHandler.addError(E10020, nullptr, {envFile->name, name});
-            }
-        }
-    }
 }
 
 void LgsApp::setEnvVars() {
@@ -255,7 +234,7 @@ void LgsApp::setEnvVars() {
         if (pos != std::string::npos) {
             auto key = entry.substr(0, pos);
             const auto value = entry.substr(pos + 1);
-            activeEnv.envVars[key] = value;
+            assert(0);
         }
     }
 }
@@ -265,8 +244,8 @@ void LgsApp::initBuild() {
     fs::create_directories(paths.buildIR);
     LgsCodeGen::initLLVM();
     setTargetMachine();
-    paths.objFilePath = paths.buildDir / (name + ".o");
-    paths.execFilePath = paths.buildDir / name;
+    paths.objFilePath = paths.buildDir / (appInfo.name + ".o");
+    paths.execFilePath = paths.buildDir / appInfo.name;
 }
 
 void LgsApp::setTargetMachine() {

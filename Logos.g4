@@ -9,7 +9,7 @@ logosEnvFile:
     ;
 
 logosAppFile:
-        (IDENTIFIER EQUAL expr)* (requireEnvVars | requirePackages)? EOF
+        (IDENTIFIER EQUAL expr)* requireEnvVars? requirePackages? EOF
     ;
 
 mainFile:

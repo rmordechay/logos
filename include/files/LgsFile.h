@@ -12,9 +12,9 @@ public:
     std::string name;
     fs::path absPath;
     LgsCodeGen codeGen;
-    LgsLocation location;
     LgsSymbolTable symbolTable;
     LgsRuntime* runtime = nullptr;
+    LgsLocation location{0, 0, nullptr};
     std::vector<LgsStrConst*> externalCPaths;
 
     explicit LgsFile(const std::string& name, const fs::path& path) : name(name), absPath(path) {}

@@ -125,7 +125,7 @@ std::string LgsFunc::format(std::string& tabs) {
 }
 
 void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
-    const auto& debug = codeGen->debug;
+    const auto& debug = codeGen->debugger;
     const auto dbInt32 = debug.diBuilder->createBasicType("int", 32, dwarf::DW_ATE_signed);
     const auto subroutine = debug.diBuilder->createSubroutineType(debug.diBuilder->getOrCreateTypeArray({dbInt32}));
     const auto subprogram = debug.diBuilder->createFunction(debug.compileUnit, funcType->name, "", debug.diFile, 1, subroutine, 1);

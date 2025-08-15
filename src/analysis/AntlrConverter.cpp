@@ -1,6 +1,5 @@
 #include "analysis/AntlrConverter.h"
 #include "funcs/LgsCoroutine.h"
-#include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "files/LgsInterfaceFile.h"
 #include "LogosLexer.h"
@@ -29,6 +28,7 @@
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
 #include "exprs/unary/constants/LgsLongConst.h"
+#include "files/LgsAppInfo.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
 #include "funcs/LgsMainFunc.h"
@@ -47,7 +47,6 @@
 #include "types/primitives/LgsUInt.h"
 #include "utils/LgsUtils.h"
 
-#include <LogosParser.h>
 #include <loops/LgsForeachLoop.h>
 #include <loops/LgsRangeLoop.h>
 #include <loops/LgsWhileLoop.h>
@@ -76,15 +75,6 @@ LgsFile* AntlrConverter::getLogosFile(LogosParser::LogosFileContext* ctx) {
     }
     file->absPath = filePath;
     return file;
-}
-
-std::string after_last_src(const std::string& fullPath) {
-    const std::string needle = "/src/";
-    const auto pos = fullPath.rfind(needle);
-    if (pos != std::string::npos) {
-        return fullPath.substr(pos + needle.size());
-    }
-    return fullPath;
 }
 
 LgsMainFile* AntlrConverter::getMainFile(LogosParser::MainFileContext* ctx) {
@@ -148,27 +138,43 @@ LgsFile* AntlrConverter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx
     return file;
 }
 
-LgsAppFile* AntlrConverter::getAppFile(LogosParser::LogosAppFileContext* ctx) {
-    std::vector<LgsVarDec*> varDecs;
+void AntlrConverter::getAppInfo(LogosParser::LogosAppFileContext* ctx, LgsAppInfo& appInfo) {
+    setLocation(appInfo.location, ctx->start);
     for (int i = 0; i < ctx->IDENTIFIER().size(); ++i) {
-        const auto varName = ctx->IDENTIFIER()[i];
+        const auto varToken = ctx->IDENTIFIER()[i];
+        const auto varName = varToken->getText();
         const auto expr = getExpr(ctx->expr()[i]);
-        varDecs.emplace_back(getVarDec(varName, expr));
+        if (varName == "name") {
+            appInfo.name = expr->asStrConst()->value;
+        }
+        if (varName == "version") {
+            auto versionStr = expr->asStrConst()->value;
+            if (appInfo.parseVersion(versionStr.c_str())) continue;
+            errHandler.addError(E10068, &appInfo.location, {versionStr});
+        }
+        if (varName == "activeEnv") {
+            appInfo.activeEnv = expr->asStrConst()->value;
+        }
+        delete expr;
     }
-    const auto file = new LgsAppFile(filePath, varDecs);
-    setLocation(file->location, ctx->start);
-    const auto requireEnvs = ctx->requireEnvVars();
-    if (!requireEnvs) return file;
 
-    std::vector<RequireEnvVar> requireEnvVars;
+    const auto requireEnvs = ctx->requireEnvVars();
+    if (!requireEnvs) return;
     for (int i = 0; i < requireEnvs->type().size(); ++i) {
         const auto name = requireEnvs->IDENTIFIER()[i]->getText();
         const auto type = getType(requireEnvs->type()[i]);
-        const RequireEnvVar requireEnvVar{.name = name, .type = type};
-        requireEnvVars.push_back(requireEnvVar);
+        const auto varDec = new LgsVarDec(name, nullptr);
+        varDec->type = type;
+        appInfo.requireEnvVars.push_back(varDec);
     }
-    file->requireEnvVars = requireEnvVars;
-    return file;
+
+    const auto packages = ctx->requirePackages();
+    if (!packages) return;
+    for (const auto packagePath : packages->STRING()) {
+        auto pathText = packagePath->getText();
+        cleanStr(pathText);
+        appInfo.requirePackages.push_back(pathText);
+    }
 }
 
 LgsEnvFile* AntlrConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx) {
@@ -613,7 +619,6 @@ LgsForLoop* AntlrConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx)
     const auto loopVarToken = ctx->IDENTIFIER().front();
     const auto loopVarName = loopVarToken->getText();
     auto varDec = getVarDec(loopVarToken, LGS_INT.getZeroValue());
-    varDec->type = varDec->expr->type;
     varDec->expr->location = varDec->location;
     rangeLoop->loopVars.emplace_back(varDec);
     return rangeLoop;
@@ -625,7 +630,6 @@ LgsForLoop* AntlrConverter::getForeachLoop(LogosParser::LoopStatementContext* ct
     for (const auto variable : ctx->IDENTIFIER()) {
         const auto loopVarName = variable->getText();
         auto varDec = getVarDec(variable);
-        setLocation(varDec->location, variable->getSymbol());
         foreachLoop->loopVars.emplace_back(varDec);
     }
     return foreachLoop;
@@ -644,7 +648,6 @@ LgsForLoop* AntlrConverter::getInfiniteLoop(LogosParser::LoopStatementContext* c
         const auto idToken = ctx->IDENTIFIER().front();
         const auto loopVarName = idToken->getText();
         const auto varDec = getVarDec(idToken, LGS_INT.getZeroValue());
-        varDec->type = varDec->expr->type;
         rangeLoop->loopVars.push_back(varDec);
     }
     return rangeLoop;
@@ -840,7 +843,6 @@ LgsInstance* AntlrConverter::getInstance(LogosParser::InstanceContext* ctx) {
     for (const auto& arg : args->instanceArg()) {
         const auto argExpr = getExpr(arg->expr());
         const auto varDec = getVarDec(arg->IDENTIFIER(), argExpr);
-        setLocation(varDec->location, arg->start);
         if (isArgsDuplicate(initializedArgs, varDec)) return instance;
         initializedArgs.insert(varDec->name);
         instance->args[varDec->name] = varDec;

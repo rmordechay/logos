@@ -19,17 +19,17 @@ struct LgsDebug {
     DIFile* diFile = nullptr;
     DIBuilder* diBuilder = nullptr;
     DICompileUnit* compileUnit = nullptr;
-    bool isDebug = false;
+    bool isDebugMode = false;
 };
 
 class LgsCodeGen {
 public:
     LgsStack stack;
+    LgsDebug debugger;
     LLVMContext context;
     Module* IRModule = nullptr;
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
-    LgsDebug debug;
 
     void setupModule(const std::string& moduleName, const DataLayout& dataLayout);
     Value* getIRStr(const std::string& value);

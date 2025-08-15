@@ -1,9 +1,9 @@
 #pragma once
-#include "LgsEnv.h"
 #include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
 #include "LogosParser.h"
+#include "files/LgsAppInfo.h"
 #include "lgsc/LgsCLang.h"
 #include "utils/ThreadPool.h"
 
@@ -14,28 +14,23 @@ class LgsEnvFile;
 class LgsObject;
 class LgsFuncType;
 class ThreadPool;
-class LgsEnv;
-class LgsAppFile;
 class LgsMainFile;
 struct LgsBaseError;
 struct LgsPaths;
-struct RequireEnvVar;
+
+inline std::mutex mtx;
 
 class LgsApp final {
 public:
-    std::string name = "main";
-    std::string version;
-    LgsPaths paths;
-    std::vector<LgsFile*> files;
-    std::vector<char*> args;
+    LgsAppInfo appInfo;
     LgsSymbolTable globals;
+    std::vector<char*> args;
     LgsErrHandler errHandler;
+    std::vector<LgsFile*> files;
     std::vector<LgsEnvFile*> envFiles;
-    LgsEnv activeEnv;
-    LgsAppFile* appFile = nullptr;
-    std::mutex mtx;
-    ThreadPool threadPool;
     TargetMachine* targetMachine = nullptr;
+    ThreadPool threadPool;
+    LgsPaths paths;
 
     explicit LgsApp(const fs::path& rootDirPath = "") {
         paths.initPaths(rootDirPath);
@@ -51,7 +46,7 @@ public:
     void parseSrcFile(const std::string& codeText, fs::path filePath = "");
     bool checkParserErrors(LogosParser* parser);
     void parseEnvFile(fs::path fileEntry);
-    void parseAppFile(fs::path fileEntry);
+    bool parseAppFile();
     bool resolveGlobalTypes();
     void loadBuiltins();
     void loadEnvFiles();

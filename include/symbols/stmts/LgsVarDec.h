@@ -10,7 +10,7 @@ public:
     bool isNullable = false;
 
     explicit LgsVarDec(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {
-        type = expr->type;
+        if (expr) type = expr->type;
     }
     void createIRValue(LgsCodeGen* codeGen) override;
     std::string format(std::string& indentStr) override;

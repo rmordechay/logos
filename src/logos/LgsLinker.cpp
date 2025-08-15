@@ -9,6 +9,7 @@
 #include <llvm/Transforms/Coroutines/CoroEarly.h>
 #include <llvm/Transforms/Coroutines/CoroCleanup.h>
 #include <llvm/IR/LegacyPassManager.h>
+#include <llvm/IR/Verifier.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/IRReader/IRReader.h>
 

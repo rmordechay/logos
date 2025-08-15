@@ -30,7 +30,7 @@ class LgsMainFunc;
 class LgsMainFile;
 class LgsFile;
 class LgsEnvFile;
-class LgsAppFile;
+class LgsAppInfo;
 class LgsForLoop;
 class LgsAssignment;
 
@@ -44,7 +44,7 @@ public:
     explicit AntlrConverter(const fs::path& filePath, LgsSymbolTable& globals) : filePath(filePath), globals(globals) {}
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx);
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx);
-    LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx);
+    void getAppInfo(LogosParser::LogosAppFileContext* ctx, LgsAppInfo& appInfo);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx);
     LgsMainFunc* getMainFunc(LogosParser::FuncContext* ctx);
     bool setMainArgsParam(const LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature);
