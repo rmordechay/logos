@@ -5,16 +5,18 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 
-set(LLVM_LINK_LLVM_DYLIB ON)
-set(CLANG_LINK_CLANG_DYLIB ON)
-find_package(LLVM REQUIRED CONFIG)
-find_package(Clang REQUIRED CONFIG)
-find_package(antlr4-runtime REQUIRED)
+
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
     set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
     set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
 endif()
+
+set(LLVM_LINK_LLVM_DYLIB ON)
+set(CLANG_LINK_CLANG_DYLIB ON)
+find_package(LLVM REQUIRED CONFIG)
+find_package(Clang REQUIRED CONFIG)
+find_package(antlr4-runtime REQUIRED)
 
 llvm_map_components_to_libnames(LLVM_LIBS
         support

@@ -1,9 +1,10 @@
 #include "logos/LgsCodeGen.h"
-
 #include "configs/LgsConfig.h"
 #include "configs/LgsDefinitions.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
+#include <llvm/Support/FileSystem.h>
+#include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/TargetParser/Host.h>
@@ -13,8 +14,19 @@ void LgsCodeGen::setupModule(const std::string& moduleName, const DataLayout& da
     IRModule = new Module(moduleName, context);
     IRModule->setTargetTriple(sys::getDefaultTargetTriple());
     IRModule->setDataLayout(dataLayout);
-    diBuilder = new DIBuilder(*IRModule);
     setRuntimePtr();
+    if (isDebug) {
+        diBuilder = new DIBuilder(*IRModule);
+        const auto currentFunc = stack.currentFunc();
+        const auto diFile = diBuilder->createFile(moduleName, "");
+        const auto compileUnit = diBuilder->createCompileUnit(dwarf::DW_LANG_lo_user, diFile, "", false, "", 0);
+        const auto dbInt32 = diBuilder->createBasicType("int", 32, dwarf::DW_ATE_signed);
+        const auto subroutine = diBuilder->createSubroutineType(diBuilder->getOrCreateTypeArray({dbInt32}));
+        const auto subprogram = diBuilder->createFunction(compileUnit, currentFunc->funcType->name, "", diFile, 1, subroutine, 1, DINode::FlagPrototyped, DISubprogram::SPFlagDefinition);
+        currentFunc->getIRFunc(this)->setSubprogram(subprogram);
+        const auto loc = DILocation::get(context, 1, 1, subprogram, subprogram->getScope());
+        builder.SetCurrentDebugLocation(loc);
+    }
 }
 
 void LgsCodeGen::setRuntimePtr() {
@@ -329,6 +341,12 @@ void LgsCodeGen::initLLVM() {
 
 LgsCodeGen::~LgsCodeGen() {
     if (diBuilder) {
+        assert(isDebug);
+        diBuilder->finalize();
+        std::error_code EC;
+        raw_fd_ostream file("logosdbg.bc", EC, sys::fs::OF_None);
+        WriteBitcodeToFile(*IRModule, file);
+        file.flush();
         delete diBuilder;
         diBuilder = nullptr;
     }

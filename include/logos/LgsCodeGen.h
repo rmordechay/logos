@@ -1,7 +1,10 @@
 #pragma once
 #include "LgsStack.h"
+
 #include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/LLVMContext.h>
 #include <llvm/Passes/PassBuilder.h>
+
 
 class LgsRuntime;
 class LgsFile;
@@ -20,6 +23,7 @@ public:
     GlobalVariable* runtimePtr = nullptr;
     IRBuilder<> builder = IRBuilder(context);
     DIBuilder* diBuilder = nullptr;
+    bool isDebug = false;
 
     void setupModule(const std::string& moduleName, const DataLayout& dataLayout);
     void setRuntimePtr();

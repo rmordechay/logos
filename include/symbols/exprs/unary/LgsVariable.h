@@ -3,7 +3,7 @@
 
 struct LgsSymbol;
 
-class LgsVariable :  public LgsUnaryExpr {
+class LgsVariable final :  public LgsUnaryExpr {
 public:
     std::string name;
     LgsSymbol ref;
