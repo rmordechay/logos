@@ -24,11 +24,11 @@ class LgsApp final {
 public:
     LgsAppInfo appInfo;
     LgsSymbolTable globals;
-    std::vector<char*> args;
     LgsErrHandler errHandler;
     std::vector<LgsFile*> files;
     std::vector<LgsEnvFile*> envFiles;
     TargetMachine* targetMachine = nullptr;
+    std::vector<char*> args;
     ThreadPool threadPool;
     LgsPaths paths;
 
@@ -36,6 +36,7 @@ public:
         paths.initPaths(rootDirPath);
     }
 
+    void execute();
     void run();
     bool validate();
     bool parse();
@@ -51,9 +52,7 @@ public:
     void loadBuiltins();
     void loadEnvFiles();
     void setEnvVars();
-    void checkRequiredEnvVars();
     void writeIRFiles();
     void exitWithErrors() const;
-    void setTargetMachine();
     ~LgsApp();
 };

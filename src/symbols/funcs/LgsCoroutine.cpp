@@ -1,4 +1,4 @@
-#include "../../../include/symbols/funcs/LgsCoroutine.h"
+#include "funcs/LgsCoroutine.h"
 #include "builtins/LgsBuiltins.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsSelection.h"

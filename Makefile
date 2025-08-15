@@ -2,6 +2,10 @@ build:
 	cmake -S . -B build
 	cmake --build build -j5
 
+build_debug:
+	cmake -S . -B build
+	cmake --build build -j5
+
 run: build
 	cd build && ./lgs run ../project
 

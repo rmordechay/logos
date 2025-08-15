@@ -13,14 +13,6 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/IRReader/IRReader.h>
 
-namespace lld::macho {
-    bool link(ArrayRef<const char *> args, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
-}
-
-namespace lld::elf {
-    bool link(ArrayRef<const char *> args, raw_ostream &stdoutOS, raw_ostream &stderrOS, bool exitEarly, bool disableOutput);
-}
-
 std::unique_ptr<Module> parseModule(LLVMContext& context, const std::string& path) {
     SMDiagnostic diag;
     auto parsedModule = parseIRFile(path, diag, context);
@@ -56,8 +48,16 @@ bool LgsLinker::link(TargetMachine* targetMachine) const {
     if (!generateObjFile(std::move(mainModule), targetMachine)) {
         return false;
     }
-    const auto linkCmd = "clang++ -Lruntime -llgs_runtime " + paths.objFilePath.string() + " -o " + paths.execFilePath.string();
-    std::system(linkCmd.c_str());
+    char linkCmd[1024];
+    std::snprintf(
+        linkCmd,
+        sizeof(linkCmd),
+        linkString,
+        paths.objFilePath.c_str(),
+        (paths.lgsRoot / "runtime").c_str(),
+        paths.execFilePath.c_str()
+    );
+    std::system(linkCmd);
     return true;
 }
 

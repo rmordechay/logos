@@ -12,13 +12,11 @@
 #include "utils/ThreadPool.h"
 #include "builtins/LgsBuiltins.h"
 #include "builtins/LgsSystem.h"
-#include "exprs/unary/constants/LgsStrConst.h"
 #include "lgsc/LgsCLang.h"
 #include "files/LgsAppInfo.h"
 #include "files/LgsEnvFile.h"
 #include "funcs/LgsMainFunc.h"
 #include "logos/LgsLinker.h"
-#include "stmts/LgsVarDec.h"
 #include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 #include "llvm/IR/Verifier.h"
@@ -48,7 +46,7 @@ void LgsApp::run() {
     if (!link()) exitWithErrors();
 
     // Running
-    execv(paths.execFilePath.c_str(), args.data());
+    execute();
 }
 
 bool LgsApp::validate() {
@@ -111,6 +109,16 @@ bool LgsApp::generate() {
 bool LgsApp::link() const {
     const LgsLinker linker(paths, files);
     return linker.link(targetMachine);
+}
+
+void LgsApp::execute() {
+    args.insert(args.begin(), const_cast<char*>(paths.execFilePath.c_str()));
+    if (args.empty() || args.back() != nullptr) {
+        args.push_back(nullptr);
+    }
+    execv(paths.execFilePath.c_str(), args.data());
+    perror("Logos execution failed.");
+    exit(EXIT_FAILURE);
 }
 
 void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
@@ -224,9 +232,6 @@ void LgsApp::loadEnvFiles() {
     threadPool.wait();
 }
 
-void LgsApp::checkRequiredEnvVars() {
-}
-
 void LgsApp::setEnvVars() {
     for (char **env = environ; *env != nullptr; ++env) {
         std::string entry(*env);
@@ -243,12 +248,8 @@ void LgsApp::initBuild() {
     fs::create_directories(paths.buildDir);
     fs::create_directories(paths.buildIR);
     LgsCodeGen::initLLVM();
-    setTargetMachine();
     paths.objFilePath = paths.buildDir / (appInfo.name + ".o");
     paths.execFilePath = paths.buildDir / appInfo.name;
-}
-
-void LgsApp::setTargetMachine() {
     std::string error;
     const auto targetTriple = sys::getDefaultTargetTriple();
     const auto target = TargetRegistry::lookupTarget(targetTriple, error);

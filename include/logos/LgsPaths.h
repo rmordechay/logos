@@ -15,9 +15,11 @@ struct LgsPaths {
     fs::path appFilePath;
     fs::path objFilePath;
     fs::path execFilePath;
+    fs::path lgsRoot;
     fs::path cLibRoot;
     fs::path cLibHeadersDir;
     void initPaths(const fs::path& rootDirPath);
+    void findLgsRoot();
     void findCLibRoot();
     void findCLibHeaders();
 };
@@ -30,9 +32,17 @@ inline void LgsPaths::initPaths(const fs::path& rootDirPath) {
     buildDir = rootDir / LGS_BUILD_DIR;
     buildIR = buildDir / LGS_BUILD_IR;
     appFilePath = rootDir / LGS_APP_FILE_NAME LGS_FILE_EXTENSION;
+    findLgsRoot();
     findCLibRoot();
     findCLibHeaders();
-    assert(cLibRoot != "" && cLibHeadersDir != "");
+}
+
+inline void LgsPaths::findLgsRoot() {
+#ifdef __APPLE__
+    lgsRoot = rootDir.parent_path() / "cmake-build-debug";
+#elif defined(__linux__)
+    lgsRoot = rootDir.parent_path() / "build";
+#endif
 }
 
 inline void LgsPaths::findCLibRoot() {
@@ -44,15 +54,16 @@ inline void LgsPaths::findCLibRoot() {
         pipe = popen("xcrun --show-sdk-path 2>/dev/null", "r");
         break;
     case Triple::Linux:
-        pipe = popen("cc -print-sysroot 2>/dev/null", "r");
+        pipe = popen("clang -print-resource-dir 2>/dev/null", "r");
         break;
     default:
         assert(0);
     }
     fgets(buffer, sizeof(buffer), pipe);
-    std::string line = buffer;
-    line.pop_back();
-    cLibRoot = fs::path(line);
+    std::string clibRoot = buffer;
+    assert(clibRoot != "");
+    clibRoot.pop_back();
+    cLibRoot = fs::path(clibRoot);
     if (pipe) pclose(pipe);
 }
 
@@ -76,5 +87,6 @@ inline void LgsPaths::findCLibHeaders() {
             break;
         }
     }
+    assert(cLibHeadersDir != "");
     pclose(pipe);
 }
