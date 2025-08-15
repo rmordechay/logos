@@ -26,15 +26,16 @@ public:
     std::string name = "main";
     std::string version;
     LgsPaths paths;
-    LgsEnv activeEnv;
+    std::vector<LgsFile*> files;
     std::vector<char*> args;
     LgsSymbolTable globals;
-    std::vector<LgsFile*> files;
     LgsErrHandler errHandler;
     std::vector<LgsEnvFile*> envFiles;
+    LgsEnv activeEnv;
     LgsAppFile* appFile = nullptr;
-    TargetMachine* targetMachine = nullptr;
+    std::mutex mtx;
     ThreadPool threadPool;
+    TargetMachine* targetMachine = nullptr;
 
     explicit LgsApp(const fs::path& rootDirPath = "") {
         paths.initPaths(rootDirPath);

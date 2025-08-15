@@ -50,7 +50,6 @@ set(SOURCE_FILES
     src/parser/LogosLexer.cpp
     src/parser/LogosParser.cpp
     src/utils/LgsUtils.cpp
-    src/utils/ThreadPool.cpp
     src/logos/LgsCodeGen.cpp
     src/files/LgsInterfaceFile.cpp
 

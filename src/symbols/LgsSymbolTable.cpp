@@ -12,7 +12,6 @@
 
 void LgsSymbolTable::addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler) {
     const auto symbolName = *symbol.name;
-    std::lock_guard lock(mtx);
     if (symbols.find(symbolName) != symbols.end()) {
         return errHandler->addError(E10011, symbol.location, {symbolName, getFullPath(*symbol.location)});
     }

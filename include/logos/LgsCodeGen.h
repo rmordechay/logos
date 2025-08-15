@@ -12,8 +12,6 @@ class LgsErrHandler;
 class LgsForLoop;
 class LgsFuncType;
 
-inline std::mutex mtx;
-
 struct LgsDebug {
     DIFile* diFile = nullptr;
     DIBuilder* diBuilder = nullptr;
