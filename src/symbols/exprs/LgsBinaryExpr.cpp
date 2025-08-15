@@ -58,9 +58,8 @@ void LgsBinaryExpr::createIRValue(LgsCodeGen* codeGen) {
         IRValue = left->lshiftIR(codeGen, right);
         break;
     case NOOP:
-        break;
+        assert(0);
     }
-    assert(0);
 }
 
 Value* LgsBinaryExpr::addIR(LgsCodeGen* codeGen, LgsExpr* other) {

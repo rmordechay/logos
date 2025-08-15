@@ -15,30 +15,10 @@ void LgsCodeGen::setupModule(const std::string& moduleName, const DataLayout& da
     IRModule->setTargetTriple(sys::getDefaultTargetTriple());
     IRModule->setDataLayout(dataLayout);
     setRuntimePtr();
-    if (isDebug) {
-        diBuilder = new DIBuilder(*IRModule);
-        const auto currentFunc = stack.currentFunc();
-        const auto diFile = diBuilder->createFile(moduleName, "");
-        const auto compileUnit = diBuilder->createCompileUnit(dwarf::DW_LANG_lo_user, diFile, "", false, "", 0);
-        const auto dbInt32 = diBuilder->createBasicType("int", 32, dwarf::DW_ATE_signed);
-        const auto subroutine = diBuilder->createSubroutineType(diBuilder->getOrCreateTypeArray({dbInt32}));
-        const auto subprogram = diBuilder->createFunction(compileUnit, currentFunc->funcType->name, "", diFile, 1, subroutine, 1, DINode::FlagPrototyped, DISubprogram::SPFlagDefinition);
-        currentFunc->getIRFunc(this)->setSubprogram(subprogram);
-        const auto loc = DILocation::get(context, 1, 1, subprogram, subprogram->getScope());
-        builder.SetCurrentDebugLocation(loc);
-    }
-}
-
-void LgsCodeGen::setRuntimePtr() {
-    const auto localsArr = ArrayType::get(ptrTy(), LOCALS_CAPACITY);
-    const auto stackFrameStruct = getStructType({localsArr, i32Ty()}, "stack_frame_ty");
-    const auto stackCapacity = ArrayType::get(stackFrameStruct, STACK_FRAMES_CAPACITY);
-    const auto stackStruct = getStructType({stackCapacity, i32Ty()}, "stack_ty");
-    const auto runtimeTy = getStructType({stackStruct}, "runtime_ty");
-    if (IRModule->getName() == LGS_MAIN_FILE_NAME) {
-        runtimePtr = createGlobal(runtimeTy, ConstantAggregateZero::get(runtimeTy), "runtime");
-    } else {
-        runtimePtr = createGlobal(runtimeTy, nullptr, "runtime");
+    if (debug.isDebug) {
+        debug.diBuilder = new DIBuilder(*IRModule);
+        debug.diFile = debug.diBuilder->createFile(moduleName, "");
+        debug.compileUnit = debug.diBuilder->createCompileUnit(dwarf::DW_LANG_lo_user, debug.diFile, "", false, "", 0);
     }
 }
 
@@ -67,8 +47,23 @@ StructType* LgsCodeGen::getStructType(const std::vector<Type*>& fields, const st
     return structType;
 }
 
+void LgsCodeGen::storeValueInStruct(StructType* ty, Value* ptr, const int i, Value* v) {
+    const auto fieldPtr = builder.CreateStructGEP(ty, ptr, i);
+    builder.CreateStore(v, fieldPtr);
+}
+
+Value* LgsCodeGen::loadValueFromStruct(Type* ty, Value* ptr, const int i) {
+    const auto gep = builder.CreateStructGEP(ty, ptr, i);
+    return builder.CreateLoad(ty->getStructElementType(i), gep);
+}
+
 BasicBlock* LgsCodeGen::createBlock(const std::string& name, Function* parent) {
     return BasicBlock::Create(context, name, parent);
+}
+
+void LgsCodeGen::startBlock(BasicBlock* block) {
+    block->insertInto(stack.currentFunc()->getIRFunc(this));
+    builder.SetInsertPoint(block);
 }
 
 void LgsCodeGen::branchIfNeeded(BasicBlock* block) {
@@ -80,11 +75,6 @@ void LgsCodeGen::branchIfNeeded(BasicBlock* block) {
 void LgsCodeGen::branchAndStartBlock(BasicBlock* block) {
     branchIfNeeded(block);
     startBlock(block);
-}
-
-void LgsCodeGen::startBlock(BasicBlock* block) {
-    block->insertInto(stack.currentFunc()->getIRFunc(this));
-    builder.SetInsertPoint(block);
 }
 
 bool LgsCodeGen::lastInstTerminator() const {
@@ -106,26 +96,6 @@ Value* LgsCodeGen::callLgsFunc(const std::string& funcName, FunctionType* ft, co
     return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, ft, args);
 }
 
-void LgsCodeGen::callStackPush() {
-    const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
-    callLgsFunc("Stack_push", ft, {runtimePtr});
-}
-
-void LgsCodeGen::callPopStack() {
-    const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
-    callLgsFunc("Stack_pop", ft, {runtimePtr});
-}
-
-void LgsCodeGen::addDeferFunc(Value* deferFuncPtr, Value* ctx) {
-    const auto ft = FunctionType::get(voidTy(), {ptrTy(), ptrTy(), ptrTy()}, false);
-    callLgsFunc("Stack_addDefer", ft, {runtimePtr, deferFuncPtr, ctx});
-}
-
-void LgsCodeGen::callDefers() {
-    branchAndStartBlock(createBlock(BLOCK_NAME_DEFER));
-    const auto ft = FunctionType::get(voidTy(), false);
-    callLgsFunc("Stack_callDefers", ft, {runtimePtr});
-}
 
 Value* LgsCodeGen::callMalloc(const size_t size) {
     return builder.CreateMalloc(sizeTy(), sizeTy(), isize(size), nullptr);
@@ -161,11 +131,6 @@ Value* LgsCodeGen::callGetPid() {
     return callFunc("getpid", ft);
 }
 
-Value* LgsCodeGen::callCoresNum() {
-    const auto ft = FunctionType::get(i64Ty(), {i32Ty()}, false);
-    return callFunc("sysconf", ft, {i32(58)});
-}
-
 Value* LgsCodeGen::callCwd() {
     const auto ft = FunctionType::get(voidTy(), {i32Ty()}, false);
     const auto value = builder.CreateAlloca(ArrayType::get(i8Ty(), 1024));
@@ -173,14 +138,53 @@ Value* LgsCodeGen::callCwd() {
     return value;
 }
 
-void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
-    const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), ptrTy()});
-    builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
+Value* LgsCodeGen::callCoresNum() {
+    const auto ft = FunctionType::get(i64Ty(), {i32Ty()}, false);
+    return callFunc("sysconf", ft, {i32(58)});
 }
 
 Value* LgsCodeGen::callStrLen(Value* str) {
     const auto ft = FunctionType::get(i64Ty(), {ptrTy()}, false);
     return callFunc("strlen", ft, {str});
+}
+
+void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
+    const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), ptrTy()});
+    builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
+}
+
+void LgsCodeGen::setRuntimePtr() {
+    const auto localsArr = ArrayType::get(ptrTy(), LOCALS_CAPACITY);
+    const auto stackFrameStruct = getStructType({localsArr, i32Ty()}, "stack_frame_ty");
+    const auto stackCapacity = ArrayType::get(stackFrameStruct, STACK_FRAMES_CAPACITY);
+    const auto stackStruct = getStructType({stackCapacity, i32Ty()}, "stack_ty");
+    const auto runtimeTy = getStructType({stackStruct}, "runtime_ty");
+    if (IRModule->getName() == LGS_MAIN_FILE_NAME) {
+        runtimePtr = createGlobal(runtimeTy, ConstantAggregateZero::get(runtimeTy), "runtime");
+    } else {
+        runtimePtr = createGlobal(runtimeTy, nullptr, "runtime");
+    }
+}
+
+void LgsCodeGen::callStackPush(const std::string& loc) {
+    const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
+    callLgsFunc("Stack_push", ft, {runtimePtr, getIRStr(loc)});
+}
+
+void LgsCodeGen::callPopStack() {
+    const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
+    callLgsFunc("Stack_pop", ft, {runtimePtr});
+}
+
+void LgsCodeGen::callDefers() {
+    branchAndStartBlock(createBlock(BLOCK_NAME_DEFER));
+    const auto ft = FunctionType::get(voidTy(), false);
+    callLgsFunc("Stack_callDefers", ft, {runtimePtr});
+}
+
+void LgsCodeGen::addDeferFunc(Value* deferFuncPtr, Value* ctx) {
+    const auto ft = FunctionType::get(voidTy(), {ptrTy(), ptrTy(), ptrTy()}, false);
+    callLgsFunc("Stack_addDefer", ft, {runtimePtr, deferFuncPtr, ctx});
 }
 
 Value* LgsCodeGen::callHashStr(Value* value) {
@@ -190,17 +194,6 @@ Value* LgsCodeGen::callHashStr(Value* value) {
 Value* LgsCodeGen::callCoroIDFunc() {
     const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_id);
     return builder.CreateCall(func, {i32Zero(), null(), null(), null()});
-}
-
-Value* LgsCodeGen::callCoroBeginFunc(Value* coroID, Value* frameSize) {
-    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_begin);
-    const auto sizeValue = builder.CreateMalloc(i32Ty(), i8Ty(), frameSize, nullptr);
-    return builder.CreateCall(func, {coroID, sizeValue});
-}
-
-Value* LgsCodeGen::callCoroSizeFunc() {
-    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_size, {i32Ty()});
-    return builder.CreateCall(func);
 }
 
 Value* LgsCodeGen::callSuspendFunc() {
@@ -213,6 +206,17 @@ Value* LgsCodeGen::callResumeFunc(Value* handle) {
     return builder.CreateCall(func, {handle});
 }
 
+Value* LgsCodeGen::callCoroSizeFunc() {
+    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_size, {i32Ty()});
+    return builder.CreateCall(func);
+}
+
+Value* LgsCodeGen::callCoroBeginFunc(Value* coroID, Value* frameSize) {
+    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_begin);
+    const auto sizeValue = builder.CreateMalloc(i32Ty(), i8Ty(), frameSize, nullptr);
+    return builder.CreateCall(func, {coroID, sizeValue});
+}
+
 Value* LgsCodeGen::callCoroEndFunc(Value* handle) {
     const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_end);
     return builder.CreateCall(func, {handle, builder.getFalse(), ConstantTokenNone::get(context)});
@@ -221,32 +225,6 @@ Value* LgsCodeGen::callCoroEndFunc(Value* handle) {
 Value* LgsCodeGen::callCoroDestroyFunc(Value* handle) {
     const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_destroy);
     return builder.CreateCall(func, {handle});
-}
-
-void LgsCodeGen::storeValueInStruct(StructType* ty, Value* ptr, const int i, Value* v) {
-    const auto fieldPtr = builder.CreateStructGEP(ty, ptr, i);
-    builder.CreateStore(v, fieldPtr);
-}
-
-Value* LgsCodeGen::loadValueFromStruct(Type* ty, Value* ptr, const int i) {
-    const auto gep = builder.CreateStructGEP(ty, ptr, i);
-    return builder.CreateLoad(ty->getStructElementType(i), gep);
-}
-
-PointerType* LgsCodeGen::ptrTy() {
-    return PointerType::getUnqual(context);
-}
-
-Value* LgsCodeGen::null() {
-    return ConstantPointerNull::get(ptrTy());
-}
-
-IntegerType* LgsCodeGen::sizeTy() {
-    return IRModule->getDataLayout().getIntPtrType(context);
-}
-
-Type* LgsCodeGen::iNTy(const unsigned n) {
-    return IntegerType::getIntNTy(context, n);
 }
 
 Type* LgsCodeGen::i1Ty() {
@@ -273,8 +251,20 @@ Type* LgsCodeGen::voidTy() {
     return Type::getVoidTy(context);
 }
 
-ConstantInt* LgsCodeGen::iN(const unsigned size, const size_t v) {
-    return builder.getIntN(size, v);
+PointerType* LgsCodeGen::ptrTy() {
+    return PointerType::getUnqual(context);
+}
+
+Type* LgsCodeGen::iNTy(const unsigned n) {
+    return IntegerType::getIntNTy(context, n);
+}
+
+IntegerType* LgsCodeGen::sizeTy() {
+    return IRModule->getDataLayout().getIntPtrType(context);
+}
+
+Value* LgsCodeGen::null() {
+    return ConstantPointerNull::get(ptrTy());
 }
 
 ConstantInt* LgsCodeGen::i1(const bool v) {
@@ -301,10 +291,6 @@ ConstantInt* LgsCodeGen::isize(const size_t v) {
     return ConstantInt::get(sizeTy(), v);
 }
 
-TypeSize LgsCodeGen::typeSize(StructType* v) const {
-    return IRModule->getDataLayout().getTypeStoreSize(v);
-}
-
 ConstantInt* LgsCodeGen::i32Zero() {
     return builder.getInt32(0);
 }
@@ -315,6 +301,14 @@ ConstantInt* LgsCodeGen::i64Zero() {
 
 ConstantInt* LgsCodeGen::sizeZero() {
     return ConstantInt::get(sizeTy(), 0);
+}
+
+ConstantInt* LgsCodeGen::iN(const unsigned size, const size_t v) {
+    return builder.getIntN(size, v);
+}
+
+TypeSize LgsCodeGen::typeSize(StructType* v) const {
+    return IRModule->getDataLayout().getTypeStoreSize(v);
 }
 
 void LgsCodeGen::printPtr(Value* ptr, const std::string& text = "") {
@@ -340,14 +334,14 @@ void LgsCodeGen::initLLVM() {
 }
 
 LgsCodeGen::~LgsCodeGen() {
-    if (diBuilder) {
-        assert(isDebug);
-        diBuilder->finalize();
+    if (debug.diBuilder) {
+        assert(debug.isDebug);
+        debug.diBuilder->finalize();
         std::error_code EC;
         raw_fd_ostream file("logosdbg.bc", EC, sys::fs::OF_None);
         WriteBitcodeToFile(*IRModule, file);
         file.flush();
-        delete diBuilder;
-        diBuilder = nullptr;
+        delete debug.diBuilder;
+        debug.diBuilder = nullptr;
     }
 }

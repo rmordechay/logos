@@ -41,16 +41,17 @@ public:
         type = funcType;
     }
 
-    std::string format(std::string& tabs) override;
-    void createIRValue(LgsCodeGen* codeGen) override;
     Value* callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args = {});
     void createPrologue(LgsCodeGen* codeGen);
     void createEpilogue(LgsCodeGen* codeGen) const;
     void setFuncOptions(uint32_t ops) const;
+    void createIRValue(LgsCodeGen* codeGen) override;
     std::string prettyName() override;
-    static Value* getIRArg(LgsCodeGen* codeGen, LgsExpr* arg);
+    std::string format(std::string& tabs) override;
+    void getDebugValue(LgsCodeGen* codeGen) override;
     virtual Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args);
     virtual void generateIR(LgsCodeGen* codeGen);
     virtual Function* getIRFunc(LgsCodeGen* codeGen);
+    static Value* getIRArg(LgsCodeGen* codeGen, LgsExpr* arg);
     ~LgsFunc() override;
 };

@@ -5,22 +5,21 @@
 
 void LgsIfStmt::createIRValue(LgsCodeGen* codeGen) {
     if (isPatternMatching) {
-        return generatePatternMatching(codeGen);
-    }
-    codeGen->stack.enterScope(this, ifBlock);
-    const auto ifCondIR = ifCond->getIRValue(codeGen);
-    if (elseIfs.empty()) {
+        generatePatternMatching(codeGen);
+    } else if (elseIfs.empty()) {
         if (!elseBlock) {
-            generateSimpleIf(codeGen, ifCondIR);
+            generateSimpleIf(codeGen);
         } else {
-            generateIfWithElse(codeGen, ifCondIR);
+            generateIfWithElse(codeGen);
         }
     } else {
-        generateElseIf(codeGen, ifCondIR);
+        generateElseIf(codeGen);
     }
 }
 
-void LgsIfStmt::generateSimpleIf(LgsCodeGen* codeGen, Value* ifCondIR) const {
+void LgsIfStmt::generateSimpleIf(LgsCodeGen* codeGen) {
+    codeGen->stack.enterScope(this, ifBlock);
+    const auto ifCondIR = ifCond->getIRValue(codeGen);
     const auto IRBlockIfTrue = codeGen->createBlock(BLOCK_NAME_IF_TRUE);
     const auto IRBlockIfFalse = codeGen->createBlock(BLOCK_NAME_IF_FALSE);
     codeGen->builder.CreateCondBr(ifCondIR, IRBlockIfTrue, IRBlockIfFalse);
@@ -30,7 +29,9 @@ void LgsIfStmt::generateSimpleIf(LgsCodeGen* codeGen, Value* ifCondIR) const {
     codeGen->stack.exitScope();
 }
 
-void LgsIfStmt::generateIfWithElse(LgsCodeGen* codeGen, Value* ifCondIR) {
+void LgsIfStmt::generateIfWithElse(LgsCodeGen* codeGen) {
+    codeGen->stack.enterScope(this, ifBlock);
+    const auto ifCondIR = ifCond->getIRValue(codeGen);
     const auto IRBlockTrue = codeGen->createBlock(BLOCK_NAME_IF_TRUE);
     const auto IRBlockElse = codeGen->createBlock(BLOCK_NAME_ELSE);
     const auto IRBlockEnd = codeGen->createBlock(BLOCK_NAME_IF_FALSE);
@@ -50,7 +51,9 @@ void LgsIfStmt::generateIfWithElse(LgsCodeGen* codeGen, Value* ifCondIR) {
     codeGen->stack.exitScope();
 }
 
-void LgsIfStmt::generateElseIf(LgsCodeGen* codeGen, Value* ifCondIR) {
+void LgsIfStmt::generateElseIf(LgsCodeGen* codeGen) {
+    codeGen->stack.enterScope(this, ifBlock);
+    const auto ifCondIR = ifCond->getIRValue(codeGen);
     auto IRBlockTrue = codeGen->createBlock(BLOCK_NAME_IF_TRUE);
     auto IRBlockElseIfCheck = codeGen->createBlock(BLOCK_NAME_ELSE_IF_CHECK);
     const auto IRBlockElse = codeGen->createBlock(BLOCK_NAME_ELSE);

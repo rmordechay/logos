@@ -14,9 +14,9 @@ public:
 
     explicit LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock = nullptr) : ifCond(ifCond), ifBlock(ifStmtBlock) {}
     void createIRValue(LgsCodeGen* codeGen) override;
-    void generateSimpleIf(LgsCodeGen* codeGen, Value* ifCondIR) const;
-    void generateIfWithElse(LgsCodeGen* codeGen, Value* ifCondIR);
-    void generateElseIf(LgsCodeGen* codeGen, Value* ifCondIR);
+    void generateSimpleIf(LgsCodeGen* codeGen);
+    void generateIfWithElse(LgsCodeGen* codeGen);
+    void generateElseIf(LgsCodeGen* codeGen);
     void generatePatternMatching(LgsCodeGen* codeGen);
     ~LgsIfStmt() override;
 };

@@ -4,6 +4,9 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "types/LgsFuncType.h"
+#include "utils/LgsUtils.h"
+
+#include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 
 void LgsFunc::generateIR(LgsCodeGen* codeGen) {
@@ -92,7 +95,7 @@ void LgsFunc::createPrologue(LgsCodeGen* codeGen) {
     const auto IRFunc = getIRFunc(codeGen);
     const auto entryBlock = codeGen->createBlock(BLOCK_NAME_ENTRY, IRFunc);
     codeGen->builder.SetInsertPoint(entryBlock);
-    codeGen->callStackPush();
+    codeGen->callStackPush(getFullPath(location));
 }
 
 void LgsFunc::createEpilogue(LgsCodeGen* codeGen) const {
@@ -132,6 +135,29 @@ std::string LgsFunc::format(std::string& tabs) {
     }
     str << stmtsBlock->format(tabs);
     return str.str();
+}
+
+void LgsFunc::getDebugValue(LgsCodeGen* codeGen) {
+    const auto& debug = codeGen->debug;
+    const auto dbInt32 = debug.diBuilder->createBasicType("int", 32, dwarf::DW_ATE_signed);
+    const auto subroutine = debug.diBuilder->createSubroutineType(debug.diBuilder->getOrCreateTypeArray({dbInt32}));
+    const auto subprogram = debug.diBuilder->createFunction(
+        debug.compileUnit,
+        funcType->name,
+        "",
+        debug.diFile,
+        1,
+        subroutine,
+        1
+    );
+    getIRFunc(codeGen)->setSubprogram(subprogram);
+    codeGen->builder.SetCurrentDebugLocation(DILocation::get(
+        codeGen->context,
+        location.lineStart,
+        location.posInLine,
+        subprogram,
+        subprogram->getScope()
+    ));
 }
 
 LgsFunc::~LgsFunc() {

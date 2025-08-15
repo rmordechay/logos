@@ -293,6 +293,13 @@ void LgsApp::writeIRFiles() const {
     }
 }
 
+void LgsApp::setTargetMachine() {
+    std::string error;
+    const auto targetTriple = sys::getDefaultTargetTriple();
+    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
+}
+
 void LgsApp::exitWithErrors() const {
     for (int i = 0; i < errHandler.errors.size(); ++i) {
         const auto lgsError = errHandler.errors[i];
@@ -311,13 +318,6 @@ void LgsApp::exitWithErrors() const {
         free(lgsError.location->code);
     }
     exit(1);
-}
-
-void LgsApp::setTargetMachine() {
-    std::string error;
-    const auto targetTriple = sys::getDefaultTargetTriple();
-    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
 LgsApp::~LgsApp() {

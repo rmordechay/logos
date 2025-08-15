@@ -14,6 +14,13 @@ class LgsFuncType;
 
 inline std::mutex mtx;
 
+struct LgsDebug {
+    DIFile* diFile = nullptr;
+    DIBuilder* diBuilder = nullptr;
+    DICompileUnit* compileUnit = nullptr;
+    bool isDebug = false;
+};
+
 class LgsCodeGen {
 public:
     LgsStack stack;
@@ -22,18 +29,14 @@ public:
     IRBuilderBase::InsertPoint savedIP;
     GlobalVariable* runtimePtr = nullptr;
     IRBuilder<> builder = IRBuilder(context);
-    DIBuilder* diBuilder = nullptr;
-    bool isDebug = false;
+    LgsDebug debug;
 
     void setupModule(const std::string& moduleName, const DataLayout& dataLayout);
-    void setRuntimePtr();
-    void callStackPush();
-    void callPopStack();
-    void addDeferFunc(Value* deferFuncPtr, Value* ctx);
-    void callDefers();
     Value* getIRStr(const std::string& value);
     GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name = "") const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
+    void storeValueInStruct(StructType* ty, Value* ptr, int i, Value* v);
+    Value* loadValueFromStruct(Type* ty, Value* ptr, int i);
 
     // Blocks
     BasicBlock* createBlock(const std::string& name, Function* parent = nullptr);
@@ -46,6 +49,8 @@ public:
     Function* getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     Value* callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
     Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args);
+
+    // System
     Value* callMalloc(size_t size);
     Value* callPrintf(const std::vector<Value*>& args);
     Value* callSnprintf(const std::vector<Value*>& args);
@@ -55,9 +60,16 @@ public:
     Value* callGetPid();
     Value* callCwd();
     Value* callCoresNum();
-    Value* callHashStr(Value* value);
-    void callCopyMem(Value* src, Value* dest, size_t n);
     Value* callStrLen(Value* str);
+    void callCopyMem(Value* src, Value* dest, size_t n);
+
+    // Runtime
+    void setRuntimePtr();
+    void callStackPush(const std::string& loc);
+    void callPopStack();
+    void callDefers();
+    void addDeferFunc(Value* deferFuncPtr, Value* ctx);
+    Value* callHashStr(Value* value);
 
     // Coroutines
     Value* callCoroIDFunc();
@@ -67,8 +79,6 @@ public:
     Value* callCoroBeginFunc(Value* coroID, Value* frameSize);
     Value* callCoroEndFunc(Value* handle);
     Value* callCoroDestroyFunc(Value* handle);
-    void storeValueInStruct(StructType* ty, Value* ptr, int i, Value* v);
-    Value* loadValueFromStruct(Type* ty, Value* ptr, int i);
 
     // Types
     Type* i1Ty();
