@@ -287,9 +287,10 @@ void LgsApp::exitWithErrors() const {
         if (i != errHandler.errors.size() - 1) logInfo("\n---\n");
         else logInfo("\n");
         assert(strlen(lgsError.msg) > 0);
-        assert(strlen(lgsError.location->filePath) > 0);
         free(lgsError.msg);
-        free(lgsError.location->filePath);
+        if (lgsError.location->filePath) {
+            free(lgsError.location->filePath);
+        }
     }
     exit(1);
 }

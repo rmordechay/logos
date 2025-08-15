@@ -181,8 +181,8 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
                 const auto castExpr = varDec->expr->castTo(varDec->type);
                 if (varDec->expr != castExpr) {
                     delete varDec->expr;
+                    varDec->expr = castExpr;
                 }
-                varDec->expr = castExpr;
             }
         } else {
             varDec->type = varDec->expr->type;

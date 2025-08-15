@@ -837,6 +837,7 @@ LgsUnaryExpr* AntlrConverter::getVector(LogosParser::VectorContext* vector) {
 LgsInstance* AntlrConverter::getInstance(LogosParser::InstanceContext* ctx) {
     const auto instance = new LgsInstance(ctx->IDENTIFIER()->getText());
     setLocation(instance->location, ctx->start);
+    instance->type = new LgsUnknownType(instance->name);
     const auto args = ctx->instanceArgList();
     if (!args) return instance;
     std::unordered_set<std::string> initializedArgs;

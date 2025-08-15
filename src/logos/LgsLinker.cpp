@@ -4,12 +4,10 @@
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>
 #include "llvm/Bitcode/BitcodeWriter.h"
-#include <llvm/Transforms/Utils/Cloning.h>
 #include <llvm/Transforms/Coroutines/CoroSplit.h>
 #include <llvm/Transforms/Coroutines/CoroEarly.h>
 #include <llvm/Transforms/Coroutines/CoroCleanup.h>
 #include <llvm/IR/LegacyPassManager.h>
-#include <llvm/IR/Verifier.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/IRReader/IRReader.h>
 
@@ -77,7 +75,7 @@ bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachin
     passManager.addPass(CoroEarlyPass());
     passManager.addPass(createModuleToPostOrderCGSCCPassAdaptor(CoroSplitPass()));
     passManager.addPass(CoroCleanupPass());
-    // passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(OptimizationLevel::O3)));
+    passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(OptimizationLevel::O3)));
     passManager.run(*mainModule, analysisManager);
 
     std::error_code ec;

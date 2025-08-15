@@ -18,6 +18,10 @@ void LgsInstance::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
+LgsExpr* LgsInstance::castTo(LgsType* toType) {
+    return this;
+}
+
 void LgsInstance::initFields(LgsCodeGen* codeGen, std::map<std::string, LgsField*>& fields) {
     for (const auto& [argName, arg] : args) {
         const auto exprIR = arg->expr->getIRValue(codeGen);
