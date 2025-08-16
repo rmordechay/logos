@@ -45,9 +45,10 @@ std::string removeUnderscores(const std::string& input) {
     return result;
 }
 
-void freeType(const LgsType* type) {
+void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
+    if (type->isUnknown() && type->getName() == "") return;
     // delete type;
 }
 
@@ -63,4 +64,14 @@ std::string getFullRelPath(const LgsLocation& location) {
         relPath = std::string(location.filePath).substr(pos + std::strlen(LGS_SRC_DIR) + 1);
     }
     return std::string(relPath) + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.posInLine);
+}
+
+size_t hashStr(const char* key) {
+    size_t hash = 2166136261u;
+    while (*key) {
+        hash ^= static_cast<unsigned char>(*key++);
+        hash *= FNV_PRIME;
+        hash %= MAX_STR_HASH_LEN;
+    }
+    return hash;
 }

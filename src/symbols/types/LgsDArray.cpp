@@ -34,6 +34,7 @@ uint16_t LgsDArray::getUnpackCount() const {
 }
 
 bool LgsDArray::equals(LgsType* other) {
+    if (!baseType) return false;
     const auto otherArr = other->asDArray();
     if (!otherArr) return false;
     return baseType->equals(otherArr->baseType);

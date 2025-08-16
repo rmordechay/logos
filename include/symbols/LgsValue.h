@@ -1,6 +1,8 @@
 #pragma once
 #include "configs/LgsErrors.h"
 
+class LgsType;
+
 namespace llvm {
     class Value;
 }

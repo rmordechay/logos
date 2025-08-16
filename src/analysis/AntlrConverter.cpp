@@ -28,7 +28,7 @@
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
 #include "exprs/unary/constants/LgsLongConst.h"
-#include "exprs/unary/vectors/LgsVector.h"
+#include "exprs/unary/vectors/LgsVectorExpr.h"
 #include "files/LgsAppInfo.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
@@ -822,11 +822,13 @@ LgsFuncCall* AntlrConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
 }
 
 LgsUnaryExpr* AntlrConverter::getVector(LogosParser::VectorContext* ctx) {
-    const auto lgsVec = new LgsVector();
-    if (ctx->VEC2()) {
-        lgsVec->type = new LgsVec2();
-        lgsVec->vecSize = 2;
-    }
+    const auto lgsVec = new LgsVectorExpr();
+    uint8_t dim = 0;
+    if (ctx->VEC2()) dim = 2;
+    else if (ctx->VEC3()) dim = 3;
+    else if (ctx->VEC4()) dim = 4;
+    else assert(0);
+    lgsVec->type = new LgsVec(dim);
     setLocation(lgsVec->location, ctx->start);
     for (const auto& expr : ctx->expr()) {
         lgsVec->args.emplace_back(getExpr(expr));
@@ -1125,8 +1127,8 @@ LgsType* AntlrConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken) 
         type = &LGS_VOID;
     } else if (typeText == LgsStr::name) {
         type = new LgsStr();
-    } else if (typeText == LgsVec2::name) {
-        type = new LgsVec2();
+    } else if (typeText.length() == 4 && typeText.substr(0, 3) == "vec") {
+        type = new LgsVec(typeText[3] - '0');
     } else {
         type = new LgsUnknownType(typeText);
     }

@@ -25,7 +25,7 @@ public:
     LgsAppInfo appInfo;
     LgsSymbolTable globals;
     LgsErrHandler errHandler;
-    std::vector<LgsFile*> files;
+    std::vector<LgsFile*> ast;
     std::vector<LgsEnvFile*> envFiles;
     std::vector<char*> args;
     ThreadPool threadPool;

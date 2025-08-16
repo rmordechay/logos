@@ -10,7 +10,7 @@ public:
     explicit LgsSelection(const std::vector<LgsUnaryExpr*>& exprs) : exprs(exprs) {}
     std::string pname() override;
     LgsExpr* lastExpr() const;
-    Value* hashValue(LgsCodeGen* codeGen) override;
+    Value* hash(LgsCodeGen* codeGen) override;
     void createIRValue(LgsCodeGen* codeGen) override;
     ~LgsSelection() override;
 };

@@ -102,7 +102,7 @@ void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) {
     const auto defaultBlock = codeGen->createBlock(BLOCK_NAME_DEFAULT_CASE);
     const auto exitBlock = codeGen->createBlock(BLOCK_NAME_EXIT_PATTERN);
 
-    const auto exprIRValue = ifCond->hashValue(codeGen);
+    const auto exprIRValue = ifCond->hash(codeGen);
     SwitchInst* switchInst;
     if (elseBlock) {
         const auto numOfCases = elseIfs.size() + !!elseBlock;
@@ -115,7 +115,7 @@ void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) {
     for (size_t i = 0; i < elseIfs.size(); ++i) {
         const auto [expr, stmtsBlock] = elseIfs[i];
         codeGen->stack.enterScope(this, stmtsBlock);
-        const auto patterIRValue = expr->hashValue(codeGen);
+        const auto patterIRValue = expr->hash(codeGen);
         const auto IRFunc = codeGen->stack.currentFunc()->getIRFunc(codeGen);
         const auto patternBlock = codeGen->createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), IRFunc);
         switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);

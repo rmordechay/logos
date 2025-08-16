@@ -1,6 +1,6 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsVariable.h"
-#include "exprs/unary/vectors/LgsVector.h"
+#include "exprs/unary/vectors/LgsVectorExpr.h"
 #include "stmts/LgsVarDec.h"
 #include <exprs/unary/LgsArrayExpr.h>
 #include "types/LgsMap.h"

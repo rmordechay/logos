@@ -292,9 +292,9 @@ firstSelectionElement:
     ;
 
 innerSelectionElement:
-        IDENTIFIER
-    |   funcCall
+        funcCall
     |   iterIndex
+    |   IDENTIFIER
     ;
 
 range:

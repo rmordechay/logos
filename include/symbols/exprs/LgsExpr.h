@@ -3,7 +3,7 @@
 
 #include "LgsValue.h"
 
-class LgsVector;
+class LgsVectorExpr;
 class LgsPrefixExpr;
 class LgsIterator;
 class LgsPostfixExpr;
@@ -51,12 +51,12 @@ public:
     LgsFloatConst* asFloatConst();
     LgsIntConst* asIntConst();
     LgsStrConst* asStrConst();
-    LgsVector* asVector();
+    LgsVectorExpr* asVector();
 
     virtual LgsExpr* clone();
     virtual bool equals(LgsExpr* other);
     virtual LgsExpr* castTo(LgsType* toType);
-    virtual llvm::Value* hashValue(LgsCodeGen* codeGen);
+    virtual llvm::Value* hash(LgsCodeGen* codeGen);
 
     virtual std::string pname() = 0;
     virtual llvm::Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;

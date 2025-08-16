@@ -10,7 +10,7 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "exprs/unary/vectors/LgsVector.h"
+#include "exprs/unary/vectors/LgsVectorExpr.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsIterator.h"
@@ -72,12 +72,12 @@ LgsCharConst* LgsExpr::asCharConst() { return dynamic_cast<LgsCharConst*>(this);
 LgsFloatConst* LgsExpr::asFloatConst() { return dynamic_cast<LgsFloatConst*>(this); }
 LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
 LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }
-LgsVector* LgsExpr::asVector() { return dynamic_cast<LgsVector*>(this); }
+LgsVectorExpr* LgsExpr::asVector() { return dynamic_cast<LgsVectorExpr*>(this); }
 
 LgsExpr* LgsExpr::clone() { assert(0); }
 bool LgsExpr::equals(LgsExpr* other) { assert(0); }
 LgsExpr* LgsExpr::castTo(LgsType* toType) { assert(0); }
-Value* LgsExpr::hashValue(LgsCodeGen* codeGen) { assert(0); }
+Value* LgsExpr::hash(LgsCodeGen* codeGen) { assert(0); }
 
 LgsExpr::~LgsExpr() {
     if (type) {

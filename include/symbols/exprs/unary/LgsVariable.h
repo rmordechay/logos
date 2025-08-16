@@ -11,7 +11,7 @@ public:
     explicit LgsVariable(const std::string& name) : LgsUnaryExpr(nullptr), name(name) {}
     explicit LgsVariable(const std::string& name, LgsType* type) : LgsUnaryExpr(type), name(name) {}
     std::string pname() override;
-    Value* hashValue(LgsCodeGen* codeGen) override;
+    Value* hash(LgsCodeGen* codeGen) override;
     void createIRValue(LgsCodeGen* codeGen) override;
     LgsExpr* castTo(LgsType* type) override;
     bool equals(LgsExpr* other) override;

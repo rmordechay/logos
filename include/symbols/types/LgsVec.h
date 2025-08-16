@@ -3,17 +3,14 @@
 #include "stmts/LgsField.h"
 #include "types/primitives/LgsFloat.h"
 
-class LgsVec2 final : public LgsIterable {
+class LgsVec final : public LgsIterable {
 public:
-    static constexpr auto name = "vec2";
-    LgsField* x = new LgsField("x", &LGS_FLOAT, LGS_FLOAT.getZeroValue());
-    LgsField* y = new LgsField("y", &LGS_FLOAT, LGS_FLOAT.getZeroValue());
+    int8_t dim = 0;
 
-    explicit LgsVec2() : LgsIterable(&LGS_FLOAT) {
-        sizeExpr = new LgsIntConst(2);
-        addField(x);
-        addField(y);
+    explicit LgsVec(const int8_t dim) : LgsIterable(&LGS_FLOAT), dim(dim) {
+        sizeExpr = new LgsIntConst(dim);
     }
+
     Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     std::string pname() override;
@@ -25,5 +22,7 @@ public:
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     bool equals(LgsType* other) override;
-    ~LgsVec2() override = default;
+    static uint8_t getSwizzleSet(char c);
+    static uint8_t getComponentIndex(char c);
+    ~LgsVec() override = default;
 };

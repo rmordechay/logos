@@ -322,7 +322,7 @@ void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
         if (iterExpr->type) errHandler.addError(E10002, &iterExpr->location, {iterExpr->pname(), iterExpr->type->pname()});
         return;
     }
-    if (setLoopVars(foreachLoop, iterExpr, iterable)) return;
+    if (resolveLoopVars(foreachLoop, iterExpr, iterable)) return;
     for (const auto varDec : foreachLoop->loopVars) {
         addLocalSymbol(LgsSymbol(varDec));
     }
@@ -474,18 +474,34 @@ void inferBaseType(const LgsArrayExpr* array) {
     array->type->asIterable()->baseType = baseType;
 }
 
-void SemaAnalyser::visitDynamicArray(LgsArrayExpr* array) {
-    const auto dArr = array->type->asDArray();
-    if (!dArr->sizeExpr) {
-        dArr->sizeExpr = new LgsLongConst(array->initialElements.size());
-    }
-    if (array->initialElements.empty()) {
-        if (!dArr->baseType) {
-            errHandler.addError(E10049, &array->location);
+void SemaAnalyser::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface) {
+    instance->setObject(new LgsObject(interface->name));
+    instance->obj->location = instance->location;
+    instance->obj->interfaces.push_back(interface);
+    auto isValid = true;
+    for (const auto& [name, arg] : instance->args) {
+        visitExpr(arg->expr);
+        const auto field = interface->getField(name);
+        if (field) {
+            const auto newField = new LgsField(*field);
+            newField->expr = arg->expr;
+            instance->obj->addField(newField);
+            continue;
         }
-        return;
+        const auto method = interface->getMethod(name);
+        if (method) {
+            const auto newMethod = arg->expr->asFunc();
+            newMethod->funcType->name = method->funcType->name;
+            newMethod->funcType->params.insert(newMethod->funcType->params.begin(), LgsParam(interface, LGS_SELF));
+            instance->obj->addMethod(newMethod);
+            continue;
+        }
+        errHandler.addError(E10005, &arg->location, {arg->name, interface->name});
+        isValid = false;
     }
-    inferBaseType(array);
+    if (isValid) {
+        visitObject(instance->obj);
+    }
 }
 
 void SemaAnalyser::visitStaticArray(LgsArrayExpr* arrayExpr) {
@@ -499,6 +515,20 @@ void SemaAnalyser::visitStaticArray(LgsArrayExpr* arrayExpr) {
     }
     if (!arr->baseType) {
         arr->baseType = initialElements.front()->type;
+    }
+}
+
+void SemaAnalyser::visitDynamicArray(LgsArrayExpr* array) {
+    const auto dArr = array->type->asDArray();
+    if (!dArr->sizeExpr) {
+        dArr->sizeExpr = new LgsLongConst(array->initialElements.size());
+    }
+    if (array->initialElements.empty()) {
+        if (!dArr->baseType) {
+            errHandler.addError(E10049, &array->location);
+        }
+    } else {
+        inferBaseType(array);
     }
 }
 
@@ -517,7 +547,7 @@ void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) {
     typePair->value = firstElement->value->type;
 }
 
-void SemaAnalyser::visitVector(const LgsVector* vec) {
+void SemaAnalyser::visitVector(const LgsVectorExpr* vec) {
     for (const auto arg : vec->args) {
         visitExpr(arg);
     }
@@ -563,61 +593,34 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     assert(variable->ref.symbolType != UNKNOWN);
 }
 
-void SemaAnalyser::visitSelection(LgsSelection* selection) {
-    const auto exprs = selection->exprs;
-    const auto firstExpr = exprs.front();
-    visitFirstSelection(firstExpr);
-    if (!firstExpr->type || firstExpr->type->isUnknown()) return;
-    visitInnerSelections(selection);
-    selection->setType(selection->lastExpr()->type);
-    selection->isMutable = selection->lastExpr()->isMutable;
+void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
+    for (const auto arg : funcCall->args) {
+        visitExpr(arg);
+    }
+    resolveFuncCall(funcCall);
 }
 
-void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
-    if (const auto variable = firstExpr->asVariable()) {
-        visitVariable(variable);
-    } else if (const auto funcCall = firstExpr->asFuncCall()) {
-        visitFuncCall(funcCall);
-    } else if (const auto iterIndex = firstExpr->asIterIndex()) {
-        visitIterIndex(iterIndex);
-    }
+void SemaAnalyser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
+    const auto baseExpr = prefixExpr->expr;
+    visitExpr(baseExpr);
+    const auto type = baseExpr->type;
+    prefixExpr->setType(type);
 }
 
-void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
-    const auto exprs = selection->exprs;
-    for (int i = 0; i < exprs.size() - 1; ++i) {
-        const auto parentExpr = exprs[i];
-        const auto childExpr = exprs[i + 1];
-        if (const auto var = childExpr->asVariable()) {
-            visitFieldSelection(var, parentExpr);
-        } else if (const auto methodCall = childExpr->asFuncCall()) {
-            visitMethodCall(methodCall, parentExpr->type);
-        }
-        if (!childExpr->type || childExpr->type->isUnknown()) return;
+void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
+    const auto baseExpr = postfixExpr->expr;
+    visitUnaryExpr(baseExpr);
+    const auto type = baseExpr->type;
+    if (!type->asInt()) {
+        return errHandler.addError(E10050, &postfixExpr->location, {type->pname()});
     }
+    postfixExpr->setType(type);
 }
 
-void SemaAnalyser::visitFieldSelection(LgsVariable* child, LgsExpr* parent) {
-    if (!parent) return;
-    auto childName = child->name;
-    const auto parentType = parent->type;
-    LgsField* field = nullptr;
-    if (const auto vec = parent->asVector()) {
-        if (validateSwizzle(childName, vec)) {
-            field = vec->getScalars(childName);
-        }
-    } else {
-        field = parentType->getField(childName);
-    }
-    if (!field) {
-        errHandler.addError(E10005, &child->location, {childName, parentType->pname()});
-        return;
-    }
-    child->setType(field->type);
-    child->isMutable = field->isMutable;
-    child->ref = LgsSymbol(field);
-    if (const auto parentAsObj = parentType->asObject()) {
-        validateFieldVisibility(field, parentAsObj);
+void SemaAnalyser::visitStrConst(const LgsStrConst* strConst) {
+    if (strConst->templateParts.empty()) return;
+    for (const auto templatePart : strConst->templateParts) {
+        visitExpr(templatePart);
     }
 }
 
@@ -636,11 +639,60 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType)
     }
 }
 
-void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
-    for (const auto arg : funcCall->args) {
-        visitExpr(arg);
+void SemaAnalyser::visitSelection(LgsSelection* selection) {
+    const auto exprs = selection->exprs;
+    const auto firstExpr = exprs.front();
+    visitFirstSelection(firstExpr);
+    if (!firstExpr->type || firstExpr->type->isUnknown()) return;
+    visitInnerSelections(selection);
+    selection->setType(selection->lastExpr()->type);
+    selection->isMutable = selection->lastExpr()->isMutable;
+}
+
+void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
+    const auto exprs = selection->exprs;
+    for (int i = 0; i < exprs.size() - 1; ++i) {
+        const auto parentExpr = exprs[i];
+        const auto childExpr = exprs[i + 1];
+        if (const auto var = childExpr->asVariable()) {
+            visitFieldSelection(var, parentExpr->type);
+        } else if (const auto methodCall = childExpr->asFuncCall()) {
+            visitMethodCall(methodCall, parentExpr->type);
+        }
+        if (!childExpr->type || childExpr->type->isUnknown()) return;
     }
-    resolveFuncCall(funcCall);
+}
+
+void SemaAnalyser::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
+    if (!parentType) return;
+    auto childName = child->name;
+    LgsField* field = nullptr;
+    if (parentType->isVector()) {
+        field = resolveVectorField(child, parentType->asVec());
+        if (!field) return;
+    } else {
+        field = parentType->getField(childName);
+    }
+    if (!field) {
+        errHandler.addError(E10005, &child->location, {childName, parentType->pname()});
+        return;
+    }
+    child->setType(field->type);
+    child->isMutable = field->isMutable;
+    child->ref = LgsSymbol(field);
+    if (const auto parentAsObj = parentType->asObject()) {
+        validateFieldVisibility(field, parentAsObj);
+    }
+}
+
+void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
+    if (const auto variable = firstExpr->asVariable()) {
+        visitVariable(variable);
+    } else if (const auto funcCall = firstExpr->asFuncCall()) {
+        visitFuncCall(funcCall);
+    } else if (const auto iterIndex = firstExpr->asIterIndex()) {
+        visitIterIndex(iterIndex);
+    }
 }
 
 void SemaAnalyser::visitInstance(LgsInstance* instance) {
@@ -680,60 +732,6 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
             errHandler.addError(E10029, &field->location, {field->name});
         }
     }
-}
-
-void SemaAnalyser::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface) {
-    instance->setObject(new LgsObject(interface->name));
-    instance->obj->location = instance->location;
-    instance->obj->interfaces.push_back(interface);
-    auto isValid = true;
-    for (const auto& [name, arg] : instance->args) {
-        visitExpr(arg->expr);
-        const auto field = interface->getField(name);
-        if (field) {
-            const auto newField = new LgsField(*field);
-            newField->expr = arg->expr;
-            instance->obj->addField(newField);
-            continue;
-        }
-        const auto method = interface->getMethod(name);
-        if (method) {
-            const auto newMethod = arg->expr->asFunc();
-            newMethod->funcType->name = method->funcType->name;
-            newMethod->funcType->params.insert(newMethod->funcType->params.begin(), LgsParam(interface, LGS_SELF));
-            instance->obj->addMethod(newMethod);
-            continue;
-        }
-        errHandler.addError(E10005, &arg->location, {arg->name, interface->name});
-        isValid = false;
-    }
-    if (isValid) {
-        visitObject(instance->obj);
-    }
-}
-
-void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
-    const auto baseExpr = postfixExpr->expr;
-    visitUnaryExpr(baseExpr);
-    const auto type = baseExpr->type;
-    if (!type->asInt()) {
-        return errHandler.addError(E10050, &postfixExpr->location, {type->pname()});
-    }
-    postfixExpr->setType(type);
-}
-
-void SemaAnalyser::visitStrConst(const LgsStrConst* strConst) {
-    if (strConst->templateParts.empty()) return;
-    for (const auto templatePart : strConst->templateParts) {
-        visitExpr(templatePart);
-    }
-}
-
-void SemaAnalyser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
-    const auto baseExpr = prefixExpr->expr;
-    visitExpr(baseExpr);
-    const auto type = baseExpr->type;
-    prefixExpr->setType(type);
 }
 
 void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
@@ -790,22 +788,22 @@ void SemaAnalyser::visitGroup(LgsGroup* group) {
     }
 }
 
-bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable) {
-    const auto type = parent->type;
-    if (!type) {
-        errHandler.addError(E10005, &fieldVariable->location, {fieldVariable->pname(), "<Unknown>"});
-        return false;
+void SemaAnalyser::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces) {
+    std::unordered_set<std::string> interfacesNames;
+    for (const auto implementsInterface : interfaces) {
+        const auto interface = implementsInterface->asInterface();
+        if (!interface) {
+            errHandler.addError(E10025, &implementsInterface->location, {implementsInterface->pname()});
+            continue;
+        }
+        validateObjInterface(obj, interface);
+        for (const auto parentInterface: interface->interfaces) {
+            validateObjInterface(obj, parentInterface->asInterface());
+        }
     }
-    const auto field = type->getField(fieldVariable->name);
-    if (!field) {
-        errHandler.addError(E10005, &fieldVariable->location, {fieldVariable->pname(), type->pname()});
-        return false;
-    }
-    fieldVariable->setType(field->type);
-    return true;
 }
 
-bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable) {
+bool SemaAnalyser::resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable) {
     const auto varDecSize = foreachLoop->loopVars.size();
     const auto unpackCount = iterable->getUnpackCount();
     foreachLoop->withIndex = unpackCount + 1 == varDecSize;
@@ -825,21 +823,6 @@ bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterEx
         foreachLoop->loopVars[0 + withIndex]->type = iterable->baseType;
     }
     return false;
-}
-
-void SemaAnalyser::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces) {
-    std::unordered_set<std::string> interfacesNames;
-    for (const auto implementsInterface : interfaces) {
-        const auto interface = implementsInterface->asInterface();
-        if (!interface) {
-            errHandler.addError(E10025, &implementsInterface->location, {implementsInterface->pname()});
-            continue;
-        }
-        validateObjInterface(obj, interface);
-        for (const auto parentInterface: interface->interfaces) {
-            validateObjInterface(obj, parentInterface->asInterface());
-        }
-    }
 }
 
 std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const std::vector<LgsFunc*>& methods) {
@@ -1078,6 +1061,48 @@ bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentTyp
     return true;
 }
 
+LgsField* SemaAnalyser::resolveVectorField(LgsVariable* fieldVar, LgsVec* vecType) {
+    const auto scalarPositions = resolveScalars(fieldVar, vecType);
+    if (scalarPositions.empty()) return nullptr;
+    const auto fieldName = fieldVar->name;
+    const auto lgsVec = new LgsVec(fieldName.size());
+    const auto field = new LgsField(fieldName, lgsVec);
+    vecType->addField(field);
+    return field;
+}
+
+std::vector<uint8_t> SemaAnalyser::resolveScalars(LgsVariable* fieldVar, LgsVec* vec) {
+    assert(vec->isVector());
+    const auto fieldName = fieldVar->name;
+    const auto dim = vec->dim;
+    if (fieldName.empty() || fieldName.size() > 4) {
+        errHandler.addError(E10069, &fieldVar->location, {vec->pname()});
+        return {};
+    }
+
+    const auto expectedSet = vec->getSwizzleSet(fieldName[0]);
+    if (expectedSet < 0) {
+        errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
+        return {};
+    }
+
+    std::vector<uint8_t> indices;
+    indices.reserve(fieldName.size());
+    for (const char c : fieldName) {
+        if (vec->getSwizzleSet(c) != expectedSet) {
+            errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
+            return {};
+        }
+        const auto componentIndex = vec->getComponentIndex(c);
+        if (componentIndex >= dim) {
+            errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
+            return {};
+        }
+        indices.push_back(componentIndex);
+    }
+    return indices;
+}
+
 LgsType* SemaAnalyser::resolveType(LgsType* type) {
     if (const auto nullable = type->asNullable()) {
         nullable->baseType = resolveType(nullable->baseType);
@@ -1181,34 +1206,4 @@ void SemaAnalyser::resolveGroupTypes(LgsGroup* group) {
     for (auto & type : group->types) {
         type = resolveType(type);
     }
-}
-
-bool SemaAnalyser::validateSwizzle(const std::string& field, LgsVector* vec) {
-    if (field.empty() || field.size() > 4) return false;
-    auto getSwizzleSet = [](const char c) {
-        if (strchr("xyzw", c)) return 0;
-        if (strchr("rgba", c)) return 1;
-        if (strchr("stpq", c)) return 2;
-        return -1;
-    };
-    const int expectedSet = getSwizzleSet(field[0]);
-    if (expectedSet < 0) return false;
-    for (const char c : field) {
-        if (getSwizzleSet(c) != expectedSet) {
-            return false;
-        }
-        auto i = -1;
-        switch (c) {
-            case 'x': case 'r': case 's': i = 0; break;
-            case 'y': case 'g': case 't': i = 1; break;
-            case 'z': case 'b': case 'p': i = 2; break;
-            case 'w': case 'a': case 'q': i = 3; break;
-            default:;
-        }
-        if (i >= vec->vecSize) {
-            errHandler.addError(E10069, &vec->location, {field, vec->pname()});
-            return false;
-        }
-    }
-    return true;
 }

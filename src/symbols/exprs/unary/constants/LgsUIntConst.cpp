@@ -1,9 +1,6 @@
 #include "exprs/unary/constants/LgsUIntConst.h"
-#include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsLongConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-
-#include "utils/LgsUtils.h"
 
 std::string LgsUIntConst::pname() {
     return std::to_string(value);

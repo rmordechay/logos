@@ -45,9 +45,9 @@ LgsExpr* LgsSelection::lastExpr() const {
     return exprs[exprs.size() - 1];
 }
 
-Value* LgsSelection::hashValue(LgsCodeGen* codeGen) {
+Value* LgsSelection::hash(LgsCodeGen* codeGen) {
     const auto lgsExpr = lastExpr();
-    return lgsExpr->hashValue(codeGen);
+    return lgsExpr->hash(codeGen);
 }
 
 LgsSelection::~LgsSelection() {

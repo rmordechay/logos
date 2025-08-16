@@ -369,8 +369,8 @@ void logosParserInitialize() {
   	763,5,83,0,0,756,763,5,84,0,0,757,763,5,54,0,0,758,763,5,53,0,0,759,763,
   	3,94,47,0,760,763,3,100,50,0,761,763,3,108,54,0,762,755,1,0,0,0,762,756,
   	1,0,0,0,762,757,1,0,0,0,762,758,1,0,0,0,762,759,1,0,0,0,762,760,1,0,0,
-  	0,762,761,1,0,0,0,763,119,1,0,0,0,764,768,5,83,0,0,765,768,3,94,47,0,
-  	766,768,3,108,54,0,767,764,1,0,0,0,767,765,1,0,0,0,767,766,1,0,0,0,768,
+  	0,762,761,1,0,0,0,763,119,1,0,0,0,764,768,3,94,47,0,765,768,3,108,54,
+  	0,766,768,5,83,0,0,767,764,1,0,0,0,767,765,1,0,0,0,767,766,1,0,0,0,768,
   	121,1,0,0,0,769,770,3,80,40,0,770,771,5,20,0,0,771,772,3,80,40,0,772,
   	779,1,0,0,0,773,774,5,20,0,0,774,779,3,80,40,0,775,776,3,80,40,0,776,
   	777,5,20,0,0,777,779,1,0,0,0,778,769,1,0,0,0,778,773,1,0,0,0,778,775,
@@ -5943,16 +5943,16 @@ LogosParser::InnerSelectionElementContext::InnerSelectionElementContext(ParserRu
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* LogosParser::InnerSelectionElementContext::IDENTIFIER() {
-  return getToken(LogosParser::IDENTIFIER, 0);
-}
-
 LogosParser::FuncCallContext* LogosParser::InnerSelectionElementContext::funcCall() {
   return getRuleContext<LogosParser::FuncCallContext>(0);
 }
 
 LogosParser::IterIndexContext* LogosParser::InnerSelectionElementContext::iterIndex() {
   return getRuleContext<LogosParser::IterIndexContext>(0);
+}
+
+tree::TerminalNode* LogosParser::InnerSelectionElementContext::IDENTIFIER() {
+  return getToken(LogosParser::IDENTIFIER, 0);
 }
 
 
@@ -5979,21 +5979,21 @@ LogosParser::InnerSelectionElementContext* LogosParser::innerSelectionElement() 
     case 1: {
       enterOuterAlt(_localctx, 1);
       setState(764);
-      match(LogosParser::IDENTIFIER);
+      funcCall();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
       setState(765);
-      funcCall();
+      iterIndex();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
       setState(766);
-      iterIndex();
+      match(LogosParser::IDENTIFIER);
       break;
     }
 

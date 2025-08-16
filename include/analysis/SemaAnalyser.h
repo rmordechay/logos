@@ -1,5 +1,5 @@
 #pragma once
-#include "exprs/unary/vectors/LgsVector.h"
+#include "exprs/unary/vectors/LgsVectorExpr.h"
 #include "logos/LgsStack.h"
 #include "utils/LgsErrHandler.h"
 
@@ -75,13 +75,14 @@ public:
     void visitCoroutine(const LgsCoroutine* coroutine);
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitReturnStmt(LgsReturn* returnStmt);
+    void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
     void visitArrayExpr(LgsArrayExpr* array);
     void visitStaticArray(LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap);
-    void visitVector(const LgsVector* vec);
+    void visitVector(const LgsVectorExpr* vec);
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
@@ -92,19 +93,15 @@ public:
     void visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
-    void visitFieldSelection(LgsVariable* child, LgsExpr* parent);
+    void visitFieldSelection(LgsVariable* child, LgsType* parentType);
     void visitFirstSelection(LgsExpr* firstExpr);
     void visitInstance(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitSlice(LgsIterIndex* iterIndex);
     void visitGroup(LgsGroup* group);
 
-    bool setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable* fieldVariable);
-    bool setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
-
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);
-    void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     bool validateExprType(LgsExpr* expr, LgsType* type);
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
@@ -117,12 +114,14 @@ public:
     void addLocalSymbol(const LgsSymbol& newSymbol);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
+    LgsField* resolveVectorField(LgsVariable* fieldVar, LgsVec* vecType);
     LgsType* resolveType(LgsType* type);
     void resolveIterable(LgsIterable* iterable);
     void resolveFuncTypes(LgsFuncType* funcType);
     void resolveObjTypes(LgsObject* obj);
+    bool resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
     void resolveInterfaceTypes(LgsInterface* interface);
     void resolveGroupTypes(LgsGroup* group);
-    bool validateSwizzle(const std::string& field, LgsVector* vec);
+    std::vector<uint8_t> resolveScalars(LgsVariable* fieldVar, LgsVec* vec);
     ~SemaAnalyser() = default;
 };

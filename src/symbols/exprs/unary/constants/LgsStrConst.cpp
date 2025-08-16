@@ -3,16 +3,12 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 
-extern "C" {
-    size_t Lgs_hash(const char* key);
-}
-
 std::string LgsStrConst::pname() {
     return type->pname();
 }
 
-Value* LgsStrConst::hashValue(LgsCodeGen* codeGen) {
-    return codeGen->i32(Lgs_hash(value.c_str()));
+Value* LgsStrConst::hash(LgsCodeGen* codeGen) {
+    return codeGen->i32(hashStr(value.c_str()));
 }
 
 void LgsStrConst::createIRValue(LgsCodeGen* codeGen) {

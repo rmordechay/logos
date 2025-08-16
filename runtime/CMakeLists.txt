@@ -5,9 +5,9 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 find_package(Boost CONFIG REQUIRED context coroutine)
 
-add_library(lgs_runtime
+add_library(lgs_runtime SHARED
     lib/Lgs_hashmap.c
-    lib/Lgs_array.c
+    lib/Lgs_array.cpp
     lib/Lgs_helpers.cpp
     lib/Lgs_system.cpp
     lib/Lgs_defer.c

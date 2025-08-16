@@ -6,8 +6,8 @@ namespace llvm {
     class Type;
 }
 
-class LgsVec2;
-class LgsVector;
+class LgsVec;
+class LgsVectorExpr;
 
 class LgsChar;
 class LgsVariable;
@@ -68,7 +68,7 @@ public:
     LgsIterable* asIterable();
     LgsDArray* asDArray();
     LgsSArray* asSArray();
-    LgsVec2* asVec2();
+    LgsVec* asVec();
     LgsFuncType* asFuncType();
     LgsGroup* asGroup();
     LgsTypePair* asPair();

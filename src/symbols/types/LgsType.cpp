@@ -1,4 +1,4 @@
-#include "exprs/unary/vectors/LgsVector.h"
+#include "exprs/unary/vectors/LgsVectorExpr.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
@@ -68,12 +68,12 @@ LgsInterface* LgsType::asInterface() { return dynamic_cast<LgsInterface*>(this);
 LgsIterable* LgsType::asIterable() { return dynamic_cast<LgsIterable*>(this); }
 LgsDArray* LgsType::asDArray() { return dynamic_cast<LgsDArray*>(this); }
 LgsSArray* LgsType::asSArray() { return dynamic_cast<LgsSArray*>(this); }
-LgsVec2* LgsType::asVec2() { return dynamic_cast<LgsVec2*>(this); }
+LgsVec* LgsType::asVec() { return dynamic_cast<LgsVec*>(this); }
 LgsMap* LgsType::asMap() { return dynamic_cast<LgsMap*>(this); }
 LgsEnum* LgsType::asEnum() { return dynamic_cast<LgsEnum*>(this); }
 LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
 LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }
 LgsTypePair* LgsType::asPair() { return dynamic_cast<LgsTypePair*>(this); }
-bool LgsType::isVector() { return dynamic_cast<LgsVec2*>(this); }
+bool LgsType::isVector() { return dynamic_cast<LgsVec*>(this); }
 bool LgsType::isVoid() { return dynamic_cast<LgsVoid*>(this); }
 bool LgsType::isUnknown() { return dynamic_cast<LgsUnknownType*>(this); }

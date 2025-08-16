@@ -11,6 +11,8 @@
 #define LGS_MAIN_FUNC_NAME "main"
 #define LGS_SELF "self"
 #define LGS_STR_FMT_PLACEHOLDER "$!v!$"
+#define FNV_PRIME 16777619
+#define MAX_STR_HASH_LEN 1024
 #define LGS_ERROR_PADDING "\n\t\t"
 #define LGS_ERROR_STR "\033[1;31mError:\033[0m  "
 

@@ -1,0 +1,4 @@
+main() {
+    vec = vec4()
+    xy = vec.yxz.xy
+}

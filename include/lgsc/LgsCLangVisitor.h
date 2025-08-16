@@ -3,7 +3,6 @@
 #include "utils/LgsErrHandler.h"
 #include "utils/LgsUtils.h"
 #include <clang/AST/RecursiveASTVisitor.h>
-#include <clang/Frontend/FrontendAction.h>
 #include <clang/Tooling/Tooling.h>
 
 class LgsErrHandler;

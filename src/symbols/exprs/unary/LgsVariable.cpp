@@ -8,9 +8,6 @@
 #include "types/LgsObject.h"
 #include <logos/LgsCodeGen.h>
 
-extern "C" {
-    size_t Lgs_hash(const char* key);
-}
 
 std::string LgsVariable::pname() {
     return name;
@@ -67,14 +64,14 @@ LgsExpr* LgsVariable::castTo(LgsType* type) {
     assert(0);
 }
 
-Value* LgsVariable::hashValue(LgsCodeGen* codeGen) {
+Value* LgsVariable::hash(LgsCodeGen* codeGen) {
     switch (ref.symbolType) {
     case PARAM:
         return codeGen->callHashStr(ref.param->getIRValue(codeGen));
     case VAR_DEC:
-        return ref.varDec->expr->hashValue(codeGen);
+        return ref.varDec->expr->hash(codeGen);
     case ENUM_FIELD:
-        return codeGen->i32(Lgs_hash(ref.field->name.c_str()));
+        return codeGen->i32(hashStr(ref.field->name.c_str()));
     default:
         assert(0);
     }

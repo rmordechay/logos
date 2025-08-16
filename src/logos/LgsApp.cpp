@@ -80,7 +80,7 @@ bool LgsApp::parse() {
 
 bool LgsApp::analyse() {
     if (!resolveGlobalTypes()) exitWithErrors();
-    for (const auto file : files) {
+    for (const auto file : ast) {
         threadPool.runTask([this, file] {
             SemaAnalyser semaAnalyser(file, globals);
             semaAnalyser.analyse();
@@ -97,7 +97,7 @@ bool LgsApp::analyse() {
 bool LgsApp::generate() {
     initBuild();
     const auto targetMachine = LgsCodeGen::getTargetMachine();
-    for (const auto& file : files) {
+    for (const auto& file : ast) {
         threadPool.runTask([file, targetMachine] {
             file->codeGen.setupModule(file->name, targetMachine->createDataLayout());
             file->generateIR();
@@ -109,7 +109,7 @@ bool LgsApp::generate() {
 }
 
 bool LgsApp::link() const {
-    const LgsLinker linker(paths, files);
+    const LgsLinker linker(paths, ast);
     return linker.link();
 }
 
@@ -128,14 +128,14 @@ void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
     LogosLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    const auto ast = parser.logosFile();
+    const auto file = parser.logosFile();
     if (!checkParserErrors(&parser)) return;
     AntlrConverter antlrConverter(filePath, globals);
-    const auto file = antlrConverter.getLogosFile(ast);
-    files.push_back(file);
-    if (!file->externalCPaths.empty()) {
+    const auto lgsFile = antlrConverter.getLogosFile(file);
+    ast.push_back(lgsFile);
+    if (!lgsFile->externalCPaths.empty()) {
         LgsCLang lgsCLang(paths);
-        lgsCLang.resolveCFiles(file);
+        lgsCLang.resolveCFiles(lgsFile);
         if (!lgsCLang.errHandler.successful) {
             std::lock_guard lock(mtx);
             errHandler.mergeErrors(antlrConverter.errHandler);
@@ -190,7 +190,7 @@ bool LgsApp::checkParserErrors(LogosParser* parser) {
 
 bool LgsApp::resolveGlobalTypes() {
     bool successful = true;
-    for (const auto& file : files) {
+    for (const auto& file : ast) {
         SemaAnalyser semaAnalyser(file, globals);
         if (const auto mf = dynamic_cast<LgsMainFile*>(file)) {
             for (const auto object : mf->objects) {
@@ -255,18 +255,17 @@ void LgsApp::initBuild() {
 }
 
 void LgsApp::writeIRFiles() {
-    for (const auto file : files) {
+    for (const auto file : ast) {
         const auto module = file->codeGen.IRModule;
         if (!module) continue;
-        auto invalid = false;
-        if ((invalid = verifyModule(*module, &errs()))) {
-            errHandler.setUnsuccessful();
-        }
         if constexpr (LOG_LEVEL == DEBUG) {
             module->print(outs(), nullptr);
             logInfo("\n-----\n\n");
         }
-        if (invalid) return;
+        if (verifyModule(*module, &errs())) {
+            errHandler.setUnsuccessful();
+            continue;
+        }
         if constexpr (WRITE_IR_TO_FILE) {
             const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
             std::error_code EC;
@@ -294,7 +293,7 @@ void LgsApp::exitWithErrors() const {
 }
 
 LgsApp::~LgsApp() {
-    for (const auto file : files) {
+    for (const auto file : ast) {
         delete file;
     }
 }

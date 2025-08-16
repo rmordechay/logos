@@ -46,9 +46,10 @@ Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
 
 Value* LgsFunc::getIRArg(LgsCodeGen* codeGen, LgsExpr* arg) {
     const auto v = arg->getIRValue(codeGen);
+    if (arg->type->asDArray()) return v;
     if (!v->getType()->isPointerTy()) return v;
-    if (isa<GlobalVariable>(v) || isa<LoadInst>(v)) return v;
     if (v->getType()->isIntegerTy()) return v;
+    if (isa<GlobalVariable>(v) || isa<LoadInst>(v)) return v;
     const auto ty = arg->type->getIRType(codeGen);
     return codeGen->builder.CreateLoad(ty, v);
 }
