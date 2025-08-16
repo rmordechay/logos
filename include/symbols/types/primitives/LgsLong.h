@@ -16,7 +16,7 @@ public:
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;
     std::string getName() override;
-    std::string prettyName() override;
+    std::string pname() override;
     bool equals(LgsType* other) override;
     ~LgsLong() override = default;
 };

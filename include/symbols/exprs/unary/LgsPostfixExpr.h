@@ -16,6 +16,6 @@ public:
     LgsPostfixExpr(LgsUnaryExpr* baseExpr, const LgsPostfixOperator op) : expr(baseExpr), op(op) {}
     Value* IncOrDecValue(LgsCodeGen* codeGen) const;
     void createIRValue(LgsCodeGen* codeGen) override;
-    std::string prettyName() override;
+    std::string pname() override;
     ~LgsPostfixExpr() override = default;
 };

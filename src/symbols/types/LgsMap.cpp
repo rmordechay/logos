@@ -38,8 +38,8 @@ std::string LgsMap::getName() {
     return name;
 }
 
-std::string LgsMap::prettyName() {
-    return '{' + typePair->key->prettyName() + ": " + typePair->value->prettyName() + '}';
+std::string LgsMap::pname() {
+    return '{' + typePair->key->pname() + ": " + typePair->value->pname() + '}';
 }
 
 bool LgsMap::equals(LgsType* other) {

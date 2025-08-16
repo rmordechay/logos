@@ -206,7 +206,7 @@ LgsObject* AntlrConverter::getObject(LogosParser::ObjectBodyContext* ctx, antlr4
         const auto method = getMethod(func, obj);
         const auto methodAdded = obj->addMethod(method);
         if (!methodAdded) {
-            errHandler.addError(E10056, &obj->location, {obj->name, method->funcType->prettyName()});
+            errHandler.addError(E10056, &obj->location, {obj->name, method->funcType->pname()});
         }
     }
     // Interfaces

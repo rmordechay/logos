@@ -77,12 +77,12 @@ public:
     bool isUnknown();
 
     virtual std::string getName() = 0;
-    virtual std::string prettyName() = 0;
+    virtual std::string pname() = 0; // pretty name
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual llvm::Type* getIRType(LgsCodeGen* codeGen) = 0;
     virtual bool equals(LgsType* other) = 0;
     virtual std::string strFormatPart() const;
     virtual void freeValue(LgsCodeGen* codeGen, llvm::Value* value);
-    virtual ~LgsType() = default;
+    virtual ~LgsType();
 };

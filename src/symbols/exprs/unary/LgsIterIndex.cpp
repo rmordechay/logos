@@ -89,13 +89,13 @@ Value* LgsIterIndex::loadFromSArray(LgsCodeGen* codeGen) const {
     return codeGen->builder.CreateGEP(ty, ptr, IRIndices);
 }
 
-std::string LgsIterIndex::prettyName() {
+std::string LgsIterIndex::pname() {
     std::stringstream str;
-    str << baseExpr->prettyName();
+    str << baseExpr->pname();
     if (index->to) {
-        str << '[' << index->from->prettyName() << ':' << index->to->prettyName() << ']';
+        str << '[' << index->from->pname() << ':' << index->to->pname() << ']';
     } else {
-        str << '[' << index->from->prettyName() << ']';
+        str << '[' << index->from->pname() << ']';
     }
     return str.str();
 }

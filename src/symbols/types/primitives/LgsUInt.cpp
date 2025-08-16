@@ -10,7 +10,7 @@ size_t LgsUInt::getSizeBytes() {
     return sizeof(unsigned int);
 }
 
-std::string LgsUInt::prettyName() {
+std::string LgsUInt::pname() {
     return name;
 }
 

@@ -9,7 +9,7 @@ public:
     explicit LgsIntConst(const int value) : LgsUnaryExpr(&LGS_INT), value(value) {
         isConstant = true;
     }
-    std::string prettyName() override;
+    std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
     LgsExpr* castTo(LgsType* toType) override;
     Value* andIR(LgsCodeGen* codeGen, LgsExpr* other) override;

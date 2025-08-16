@@ -7,8 +7,8 @@ std::string LgsBoolConst::getValueAsString() const {
     return value ? LgsBool::trueLiteral : LgsBool::falseLiteral;
 }
 
-std::string LgsBoolConst::prettyName() {
-    return type->prettyName();
+std::string LgsBoolConst::pname() {
+    return type->pname();
 }
 
 void LgsBoolConst::createIRValue(LgsCodeGen* codeGen) {

@@ -16,7 +16,7 @@ std::string LgsEnum::getName() {
     return name;
 }
 
-std::string LgsEnum::prettyName() {
+std::string LgsEnum::pname() {
     return name;
 }
 

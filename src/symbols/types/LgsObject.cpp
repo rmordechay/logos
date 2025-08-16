@@ -4,7 +4,7 @@
 #include "types/LgsGroup.h"
 #include "utils/LgsUtils.h"
 
-std::string LgsObject::prettyName() {
+std::string LgsObject::pname() {
     return name;
 }
 

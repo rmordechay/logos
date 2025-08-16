@@ -9,7 +9,7 @@ public:
     explicit LgsUnknownType(std::string  name) : name(std::move(name)) {}
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
-    std::string prettyName() override;
+    std::string pname() override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;
     bool equals(LgsType* other) override;

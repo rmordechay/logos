@@ -14,7 +14,7 @@ std::string LgsGroup::getName() {
     return name;
 }
 
-std::string LgsGroup::prettyName() {
+std::string LgsGroup::pname() {
     return name;
 }
 

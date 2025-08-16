@@ -5,7 +5,7 @@
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsSize.h"
 
-std::string LgsLong::prettyName() {
+std::string LgsLong::pname() {
     return name;
 }
 

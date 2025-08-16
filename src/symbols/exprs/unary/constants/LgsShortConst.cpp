@@ -4,7 +4,7 @@
 #include "utils/LgsUtils.h"
 
 
-std::string LgsShortConst::prettyName() {
+std::string LgsShortConst::pname() {
     return std::to_string(value);
 }
 

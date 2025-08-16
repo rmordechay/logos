@@ -50,6 +50,6 @@ public:
     llvm::Value* bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     llvm::Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     llvm::Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
-    std::string prettyName() override;
+    std::string pname() override;
     ~LgsBinaryExpr() override = default;
 };

@@ -22,7 +22,7 @@ std::string LgsStr::getName() {
     return name;
 }
 
-std::string LgsStr::prettyName() {
+std::string LgsStr::pname() {
     return name;
 }
 

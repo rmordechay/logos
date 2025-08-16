@@ -8,7 +8,7 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
-std::string LgsBool::prettyName() {
+std::string LgsBool::pname() {
     return name;
 }
 

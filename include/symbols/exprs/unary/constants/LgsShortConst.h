@@ -7,7 +7,7 @@ public:
     uint16_t value;
 
     explicit LgsShortConst(const int value) : LgsUnaryExpr(&LGS_SHORT), value(value) {}
-    std::string prettyName() override;
+    std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
     LgsExpr* castTo(LgsType* toType) override;
     LgsExpr* clone() override;

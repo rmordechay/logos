@@ -15,7 +15,7 @@ public:
         type = baseExpr->type;
     }
 
-    std::string prettyName() override;
+    std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
     void initIterator(LgsCodeGen* codeGen);
     Value* next(LgsCodeGen* codeGen) const;

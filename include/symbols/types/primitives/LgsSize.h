@@ -12,7 +12,7 @@ public:
     size_t getSizeBytes() override;
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
-    std::string prettyName() override;
+    std::string pname() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     std::string strFormatPart() const override;

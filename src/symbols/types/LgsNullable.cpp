@@ -14,8 +14,8 @@ LgsExpr* LgsNullable::getZeroValue() {
     return baseType->getZeroValue();
 }
 
-std::string LgsNullable::prettyName() {
-    return baseType->prettyName() + '?';
+std::string LgsNullable::pname() {
+    return baseType->pname() + '?';
 }
 
 bool LgsNullable::equals(LgsType* other) {

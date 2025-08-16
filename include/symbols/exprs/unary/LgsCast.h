@@ -15,7 +15,7 @@ public:
     LgsCast(LgsType* castToType, LgsExpr* castFromValue) : LgsUnaryExpr(castToType), toType(castToType), fromValue(castFromValue) {}
     void createIRValue(LgsCodeGen* codeGen) override;
     Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) override;
-    std::string prettyName() override;
+    std::string pname() override;
     ~LgsCast() override;
 };
 

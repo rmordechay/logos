@@ -11,7 +11,7 @@ size_t LgsInt::getSizeBytes() {
     return sizeof(int);
 }
 
-std::string LgsInt::prettyName() {
+std::string LgsInt::pname() {
     return name;
 }
 

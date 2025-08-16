@@ -100,8 +100,8 @@ void LgsFunc::createEpilogue(LgsCodeGen* codeGen) const {
     codeGen->callPopStack();
 }
 
-std::string LgsFunc::prettyName() {
-    return funcType->prettyName();
+std::string LgsFunc::pname() {
+    return funcType->pname();
 }
 
 std::string LgsFunc::format(std::string& tabs) {

@@ -68,7 +68,7 @@ size_t LgsInterface::getSizeBytes() {
     return 0;
 }
 
-std::string LgsInterface::prettyName() {
+std::string LgsInterface::pname() {
     return name;
 }
 

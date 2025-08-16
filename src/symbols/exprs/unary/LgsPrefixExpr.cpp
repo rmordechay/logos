@@ -1,6 +1,6 @@
 #include "exprs/unary/LgsPrefixExpr.h"
 
-std::string LgsPrefixExpr::prettyName() {
+std::string LgsPrefixExpr::pname() {
     assert(0);
 }
 

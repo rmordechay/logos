@@ -15,7 +15,7 @@ public:
     LgsInstance* singleton = nullptr;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {}
-    std::string prettyName() override;
+    std::string pname() override;
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     LgsField* getField(const std::string& name) override;

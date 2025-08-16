@@ -3,7 +3,7 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 
-std::string LgsFloat::prettyName() {
+std::string LgsFloat::pname() {
     return name;
 }
 

@@ -3,8 +3,8 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "configs/LgsConfig.h"
 
-std::string LgsArrayExpr::prettyName() {
-    return type->prettyName();
+std::string LgsArrayExpr::pname() {
+    return type->pname();
 }
 
 void LgsArrayExpr::createIRValue(LgsCodeGen* codeGen) {

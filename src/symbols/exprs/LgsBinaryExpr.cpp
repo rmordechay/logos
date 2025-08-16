@@ -134,6 +134,6 @@ Value* LgsBinaryExpr::lshiftIR(LgsCodeGen* codeGen, LgsExpr* other)  {
     assert(0);
 }
 
-std::string LgsBinaryExpr::prettyName() {
-    return left->prettyName() + ' ' + opStr + ' ' + right->prettyName();
+std::string LgsBinaryExpr::pname() {
+    return left->pname() + ' ' + opStr + ' ' + right->pname();
 }

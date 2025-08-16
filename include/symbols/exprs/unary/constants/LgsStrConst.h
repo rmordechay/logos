@@ -15,7 +15,7 @@ public:
         type = lgsStr;
     }
 
-    std::string prettyName() override;
+    std::string pname() override;
     Value* hashValue(LgsCodeGen* codeGen) override;
     void createIRValue(LgsCodeGen* codeGen) override;
     Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other) override;

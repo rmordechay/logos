@@ -45,7 +45,7 @@ public:
     }
     Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
-    std::string prettyName() override;
+    std::string pname() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;

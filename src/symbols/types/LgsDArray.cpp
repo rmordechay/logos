@@ -25,8 +25,8 @@ std::string LgsDArray::strFormatPart() const {
     return "%p";
 }
 
-std::string LgsDArray::prettyName() {
-    return baseType->prettyName() + "[]";
+std::string LgsDArray::pname() {
+    return baseType->pname() + "[]";
 }
 
 uint16_t LgsDArray::getUnpackCount() const {

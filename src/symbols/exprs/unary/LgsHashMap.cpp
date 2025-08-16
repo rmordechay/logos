@@ -1,7 +1,7 @@
 #include "exprs/unary/LgsHashMap.h"
 
-std::string LgsHashMap::prettyName() {
-    return type->prettyName();
+std::string LgsHashMap::pname() {
+    return type->pname();
 }
 
 void LgsHashMap::createIRValue(LgsCodeGen* codeGen) {

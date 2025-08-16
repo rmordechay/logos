@@ -12,7 +12,7 @@ extern "C" {
     size_t Lgs_hash(const char* key);
 }
 
-std::string LgsVariable::prettyName() {
+std::string LgsVariable::pname() {
     return name;
 }
 

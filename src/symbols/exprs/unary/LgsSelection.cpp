@@ -31,11 +31,11 @@ void LgsSelection::createIRValue(LgsCodeGen* codeGen) {
     IRValue = lastExpr()->getIRValue(codeGen);
 }
 
-std::string LgsSelection::prettyName() {
+std::string LgsSelection::pname() {
     std::stringstream str;
-    str << exprs[0]->prettyName();
+    str << exprs[0]->pname();
     for (int i = 1; i < exprs.size(); ++i) {
-        str << '.' << exprs[i]->prettyName();
+        str << '.' << exprs[i]->pname();
     }
     return str.str();
 }

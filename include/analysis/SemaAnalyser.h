@@ -92,7 +92,7 @@ public:
     void visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     void visitSelection(LgsSelection* selection);
     void visitInnerSelections(const LgsSelection* selection);
-    void visitFieldSelection(LgsVariable* childField, LgsType* parentType);
+    void visitFieldSelection(LgsVariable* child, LgsExpr* parent);
     void visitFirstSelection(LgsExpr* firstExpr);
     void visitInstance(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex);
@@ -123,6 +123,6 @@ public:
     void resolveObjTypes(LgsObject* obj);
     void resolveInterfaceTypes(LgsInterface* interface);
     void resolveGroupTypes(LgsGroup* group);
-    bool checkSwizzle(const std::string& field, LgsVector* vec);
+    bool validateSwizzle(const std::string& field, LgsVector* vec);
     ~SemaAnalyser() = default;
 };

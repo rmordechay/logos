@@ -4,8 +4,8 @@
 #include "utils/LgsUtils.h"
 
 
-std::string LgsCharConst::prettyName() {
-    return type->prettyName();
+std::string LgsCharConst::pname() {
+    return type->pname();
 }
 
 void LgsCharConst::createIRValue(LgsCodeGen* codeGen) {

@@ -20,7 +20,7 @@ public:
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
     void resolveVirtualFunc(LgsCodeGen* codeGen) const;
-    std::string prettyName() override;
+    std::string pname() override;
     std::string format(std::string& indentStr) override;
     ~LgsFuncCall() override = default;
 };

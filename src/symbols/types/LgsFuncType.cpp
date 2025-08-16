@@ -70,19 +70,19 @@ LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
 
-std::string LgsFuncType::prettyName() {
+std::string LgsFuncType::pname() {
     std::stringstream strStream;
     strStream << name << '(';
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param = params[i];
-        strStream << param.type->prettyName();
+        strStream << param.type->pname();
         if (param.expr) {
-            strStream << " = " << param.expr->prettyName();
+            strStream << " = " << param.expr->pname();
         }
         if (i != params.size() - 1) strStream << ", ";
     }
     if (rt) {
-        strStream << "): " << rt->prettyName();
+        strStream << "): " << rt->pname();
     } else {
         strStream << ')';
     }

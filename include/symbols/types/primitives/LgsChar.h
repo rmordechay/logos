@@ -8,7 +8,7 @@ public:
     LgsChar() {
         isPrimitive = true;
     }
-    std::string prettyName() override;
+    std::string pname() override;
     size_t getSizeBytes() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;

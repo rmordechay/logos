@@ -31,8 +31,8 @@ std::string LgsSArray::strFormatPart() const {
     return "%p";
 }
 
-std::string LgsSArray::prettyName() {
-    return baseType->prettyName() + '[' + (fixedLength == 0 ? "" : std::to_string(fixedLength)) + "]!";
+std::string LgsSArray::pname() {
+    return baseType->pname() + '[' + (fixedLength == 0 ? "" : std::to_string(fixedLength)) + "]!";
 }
 
 bool LgsSArray::equals(LgsType* other) {

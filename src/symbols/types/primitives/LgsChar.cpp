@@ -4,7 +4,7 @@
 #include "exprs/unary/constants/LgsCharConst.h"
 
 
-std::string LgsChar::prettyName() {
+std::string LgsChar::pname() {
     return name;
 }
 

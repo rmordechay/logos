@@ -17,7 +17,7 @@ LgsExpr* LgsAny::getZeroValue() {
     assert(0);
 }
 
-std::string LgsAny::prettyName() {
+std::string LgsAny::pname() {
     return name;
 }
 

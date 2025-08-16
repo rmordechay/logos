@@ -14,7 +14,7 @@ public:
     size_t getSizeBytes() override;
     std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
-    std::string prettyName() override;
+    std::string pname() override;
     ~LgsFloat() override = default;
 };
 

@@ -15,6 +15,6 @@ void LgsParam::createIRValue(LgsCodeGen* codeGen) {
 }
 
 std::string LgsParam::format(std::string& indentStr) {
-    return name + ": " + type->prettyName();
+    return name + ": " + type->pname();
 }
 

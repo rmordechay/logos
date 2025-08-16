@@ -8,6 +8,7 @@ public:
     std::vector<LgsExpr*> args;
 
     void createIRValue(LgsCodeGen* codeGen) override;
-    std::string prettyName() override;
+    LgsField* getScalars(const std::string& fieldName);
+    std::string pname() override;
     ~LgsVector() override = default;
 };

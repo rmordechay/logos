@@ -58,7 +58,7 @@ public:
     virtual LgsExpr* castTo(LgsType* toType);
     virtual llvm::Value* hashValue(LgsCodeGen* codeGen);
 
-    virtual std::string prettyName() = 0;
+    virtual std::string pname() = 0;
     virtual llvm::Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
     virtual llvm::Value* subIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
     virtual llvm::Value* mulIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;

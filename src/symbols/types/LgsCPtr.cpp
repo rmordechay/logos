@@ -9,7 +9,7 @@ std::string LgsCPtr::getName() {
     return name;
 }
 
-std::string LgsCPtr::prettyName() {
+std::string LgsCPtr::pname() {
     return name;
 }
 

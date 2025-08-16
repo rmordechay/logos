@@ -5,7 +5,7 @@ std::string LgsVec2::getName() {
     return name;
 }
 
-std::string LgsVec2::prettyName() {
+std::string LgsVec2::pname() {
     return getName();
 }
 

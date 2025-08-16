@@ -1,6 +1,6 @@
 #include "types/LgsUnknownType.h"
 
-std::string LgsUnknownType::prettyName() {
+std::string LgsUnknownType::pname() {
     return getName();
 }
 

@@ -8,7 +8,7 @@ public:
     }
 
     void createIRValue(LgsCodeGen* codeGen) override;
-    std::string prettyName() override;
+    std::string pname() override;
     ~LgsNull() override = default;
 };
 
@@ -16,6 +16,6 @@ inline void LgsNull::createIRValue(LgsCodeGen* codeGen) {
     IRValue = ConstantPointerNull::get(codeGen->ptrTy());
 }
 
-inline std::string LgsNull::prettyName() {
+inline std::string LgsNull::pname() {
     return "null";
 }

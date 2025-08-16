@@ -44,6 +44,15 @@ bool LgsType::addField(LgsField* field) {
     return true;
 }
 
+LgsType::~LgsType() {
+    for (const auto& [_, field] : fields) {
+        delete field;
+    }
+    for (const auto& [_, method] : methods) {
+        delete method;
+    }
+}
+
 void LgsType::freeValue(LgsCodeGen* codeGen, Value* value) {}
 std::string LgsType::strFormatPart() const { assert(0); }
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }

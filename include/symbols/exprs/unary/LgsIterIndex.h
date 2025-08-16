@@ -20,7 +20,7 @@ public:
     Value* createStrSlice(LgsCodeGen* codeGen, const LgsStr* str) const;
     Value* loadFromSArray(LgsCodeGen* codeGen) const;
     Value* getStrGEP(LgsCodeGen* codeGen) const;
-    std::string prettyName() override;
+    std::string pname() override;
     ~LgsIterIndex() override;
 };
 

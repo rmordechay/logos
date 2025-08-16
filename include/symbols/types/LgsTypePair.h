@@ -13,7 +13,7 @@ public:
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;
-    std::string prettyName() override;
+    std::string pname() override;
     bool equals(LgsType* other) override;
 };
 
@@ -33,8 +33,8 @@ inline size_t LgsTypePair::getSizeBytes() {
     return key->getSizeBytes() + value->getSizeBytes() ;
 }
 
-inline std::string LgsTypePair::prettyName() {
-    return '<' + key->prettyName() + "," + value->prettyName() + '>';
+inline std::string LgsTypePair::pname() {
+    return '<' + key->pname() + "," + value->pname() + '>';
 }
 
 inline bool LgsTypePair::equals(LgsType* other) {

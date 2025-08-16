@@ -9,7 +9,7 @@ public:
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
-    std::string prettyName() override;
+    std::string pname() override;
     bool equals(LgsType* other) override;
     size_t getSizeBytes() override;
     ~LgsNullable() override;

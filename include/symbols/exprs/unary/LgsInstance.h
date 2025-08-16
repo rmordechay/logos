@@ -15,6 +15,6 @@ public:
     void initFields(LgsCodeGen* codeGen, std::map<std::string, LgsField*>& fields);
     void createIRValue(LgsCodeGen* codeGen) override;
     LgsExpr* castTo(LgsType* toType) override;
-    std::string prettyName() override;
+    std::string pname() override;
     ~LgsInstance() override;
 };

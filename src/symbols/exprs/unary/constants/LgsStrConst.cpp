@@ -7,8 +7,8 @@ extern "C" {
     size_t Lgs_hash(const char* key);
 }
 
-std::string LgsStrConst::prettyName() {
-    return type->prettyName();
+std::string LgsStrConst::pname() {
+    return type->pname();
 }
 
 Value* LgsStrConst::hashValue(LgsCodeGen* codeGen) {

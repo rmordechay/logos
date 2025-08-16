@@ -11,8 +11,8 @@ Value* LgsCast::addIR(LgsCodeGen* codeGen, LgsExpr* other) {
     return toValue->addIR(codeGen, other);
 }
 
-std::string LgsCast::prettyName() {
-    return fromValue->prettyName() + "->" + toType->prettyName();
+std::string LgsCast::pname() {
+    return fromValue->pname() + "->" + toType->pname();
 }
 
 LgsCast::~LgsCast() {

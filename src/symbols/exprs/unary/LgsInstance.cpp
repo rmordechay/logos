@@ -58,7 +58,7 @@ void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
     }
 }
 
-std::string LgsInstance::prettyName() {
+std::string LgsInstance::pname() {
     return obj->name;
 }
 

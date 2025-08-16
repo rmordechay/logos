@@ -5,6 +5,10 @@ void LgsVector::createIRValue(LgsCodeGen* codeGen) {
     IRValue = codeGen->builder.CreateAlloca(ty);
 }
 
-std::string LgsVector::prettyName() {
+LgsField* LgsVector::getScalars(const std::string& fieldName) {
+    assert(0);
+}
+
+std::string LgsVector::pname() {
     return "vec2";
 }

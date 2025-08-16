@@ -15,7 +15,7 @@ Type* LgsShort::getIRType(LgsCodeGen* codeGen) {
     return codeGen->i16Ty();
 }
 
-std::string LgsShort::prettyName() {
+std::string LgsShort::pname() {
     return name;
 }
 

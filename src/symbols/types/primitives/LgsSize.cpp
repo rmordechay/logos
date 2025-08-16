@@ -16,7 +16,7 @@ std::string LgsSize::getName() {
     return name;
 }
 
-std::string LgsSize::prettyName() {
+std::string LgsSize::pname() {
     return name;
 }
 
