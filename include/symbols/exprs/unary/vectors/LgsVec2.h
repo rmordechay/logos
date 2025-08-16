@@ -1,13 +1,14 @@
 #pragma once
+#include "LgsVec.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 
-class LgsVec2 final : public LgsUnaryExpr {
+class LgsVec2 final : public LgsVec {
 public:
-    LgsExpr* x;
-    LgsExpr* y;
+    LgsExpr* x = nullptr;
+    LgsExpr* y = nullptr;
 
-    LgsVec2(LgsExpr* x, LgsExpr* y) : x(x), y(y) {}
-    Value* createIRValue(LgsRuntime* runtime) override;
+    void createIRValue(LgsCodeGen* codeGen) override;
+    std::string prettyName() override;
     ~LgsVec2() override = default;
 };
 

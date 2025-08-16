@@ -66,6 +66,9 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/constants/LgsShortConst.cpp
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
     src/symbols/exprs/unary/constants/LgsUIntConst.cpp
+    src/symbols/exprs/unary/vectors/LgsVec2.cpp
+    src/symbols/exprs/unary/vectors/LgsVec3.cpp
+    src/symbols/exprs/unary/vectors/LgsVec4.cpp
     src/symbols/exprs/unary/LgsArrayExpr.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
     src/symbols/exprs/unary/LgsHashMap.cpp

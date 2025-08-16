@@ -28,6 +28,9 @@
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
 #include "exprs/unary/constants/LgsLongConst.h"
+#include "exprs/unary/vectors/LgsVec2.h"
+#include "exprs/unary/vectors/LgsVec3.h"
+#include "exprs/unary/vectors/LgsVec4.h"
 #include "files/LgsAppInfo.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
@@ -823,15 +826,21 @@ LgsFuncCall* AntlrConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
     return funcCall;
 }
 
-LgsUnaryExpr* AntlrConverter::getVector(LogosParser::VectorContext* vector) {
-    if (vector->VEC2()) {
-
-    } else if (vector->VEC3()) {
-
-    } else if (vector->VEC4()) {
-
+LgsUnaryExpr* AntlrConverter::getVector(LogosParser::VectorContext* ctx) {
+    LgsVec* lgsVec = nullptr;
+    if (ctx->VEC2()) {
+        lgsVec = new LgsVec2();
+    } else if (ctx->VEC3()) {
+        lgsVec = new LgsVec3();
+    } else if (ctx->VEC4()) {
+        lgsVec = new LgsVec4();
     }
-    assert(0);
+    assert(lgsVec);
+    for (const auto& expr : ctx->expr()) {
+        lgsVec->args.emplace_back(getExpr(expr));
+    }
+    setLocation(lgsVec->location, ctx->start);
+    return lgsVec;
 }
 
 LgsInstance* AntlrConverter::getInstance(LogosParser::InstanceContext* ctx) {
