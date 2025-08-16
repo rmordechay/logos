@@ -6,12 +6,16 @@
 Type* LgsSArray::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;
     const auto innerIRType = baseType->getIRType(codeGen);
-    IRType = ArrayType::get(innerIRType, initialLength);
+    IRType = ArrayType::get(innerIRType, arrLength);
     return IRType;
 }
 
 size_t LgsSArray::getSizeBytes() {
-    return baseType->getSizeBytes() * initialLength;
+    return baseType->getSizeBytes() * arrLength;
+}
+
+uint16_t LgsSArray::getUnpackCount() const {
+    return 1;
 }
 
 LgsExpr* LgsSArray::getZeroValue() {
@@ -28,14 +32,13 @@ std::string LgsSArray::strFormatPart() const {
 }
 
 std::string LgsSArray::prettyName() {
-    return baseType->prettyName() + '[' + (initialLength == 0 ? "" : std::to_string(initialLength)) + "]!";
+    return baseType->prettyName() + '[' + (arrLength == 0 ? "" : std::to_string(arrLength)) + "]!";
 }
 
 bool LgsSArray::equals(LgsType* other) {
     const auto otherArr = other->asSArray();
     if (!otherArr) return false;
-    if (!baseType->equals(otherArr->baseType)) return false;
-    return sizeExpr->type->equals(otherArr->sizeExpr->type);;
+    return baseType->equals(otherArr->baseType);
 }
 
 std::string LgsSArray::getName() {
@@ -47,11 +50,11 @@ Value* LgsSArray::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
 }
 
 Value* LgsSArray::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    assert(0);
+    return codeGen->builder.getFalse();
 }
 
 Value* LgsSArray::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    assert(0);
+    return codeGen->builder.getTrue();
 }
 
 LgsSArray::~LgsSArray() {

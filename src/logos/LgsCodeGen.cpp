@@ -10,6 +10,7 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/TargetParser/Host.h>
 #include <llvm/IR/DIBuilder.h>
+#include <llvm/MC/TargetRegistry.h>
 
 void LgsCodeGen::setupModule(const std::string& moduleName, const DataLayout& dataLayout) {
     IRModule = new Module(moduleName, context);
@@ -299,6 +300,10 @@ IntegerType* LgsCodeGen::sizeTy() {
     return IRModule->getDataLayout().getIntPtrType(context);
 }
 
+Type* LgsCodeGen::floatTy() {
+    return builder.getFloatTy();
+}
+
 Value* LgsCodeGen::null() {
     return ConstantPointerNull::get(ptrTy());
 }
@@ -321,6 +326,10 @@ ConstantInt* LgsCodeGen::i32(const int32_t v) {
 
 ConstantInt* LgsCodeGen::i64(const int64_t v) {
     return builder.getInt64(v);
+}
+
+ConstantFP* LgsCodeGen::flo(const float_t v) {
+    return ConstantFP::get(context, APFloat(v));
 }
 
 ConstantInt* LgsCodeGen::isize(const size_t v) {
@@ -367,6 +376,13 @@ void LgsCodeGen::initLLVM() {
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();
     LLVMInitializeAArch64TargetInfo();
+}
+
+TargetMachine* LgsCodeGen::getTargetMachine() {
+    std::string error;
+    const auto targetTriple = sys::getDefaultTargetTriple();
+    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
+    return target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
 LgsCodeGen::~LgsCodeGen() {

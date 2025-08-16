@@ -24,18 +24,18 @@ public:
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {
         typePair = new LgsTypePair(keyType, valueType);
         baseType = typePair;
-        unpackLength = 2;
         addMethod(&lenFunc);
         addMethod(&isEmptyFunc);
         addMethod(&isNotEmptyFunc);
     }
 
-    size_t getSizeBytes() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     std::string prettyName() override;
+    size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
+    uint16_t getUnpackCount() const override;
     Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;

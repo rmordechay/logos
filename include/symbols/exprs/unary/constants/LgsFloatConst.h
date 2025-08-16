@@ -4,7 +4,7 @@
 
 class LgsFloatConst final : public LgsUnaryExpr {
 public:
-    double value;
+    float_t value;
 
     explicit LgsFloatConst(const float value) : LgsUnaryExpr(&LGS_FLOAT), value(value) {}
     void createIRValue(LgsCodeGen* codeGen) override;

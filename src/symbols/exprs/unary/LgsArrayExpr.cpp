@@ -41,7 +41,7 @@ Value* LgsArrayExpr::createConstArray(LgsCodeGen* codeGen) const {
     const auto arr = type->asSArray();
     const auto baseType = arr->baseType;
     const auto baseIRType = baseType->getIRType(codeGen);
-    const auto arrIRType = ArrayType::get(baseIRType, arr->initialLength);
+    const auto arrIRType = ArrayType::get(baseIRType, arr->arrLength);
     const auto arrIRPtr = builder.CreateAlloca(arrIRType);
     if (initialElements.empty()) return arrIRPtr;
     for (int i = 0; i < initialElements.size(); ++i) {

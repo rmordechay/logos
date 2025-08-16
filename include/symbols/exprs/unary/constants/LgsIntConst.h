@@ -4,7 +4,7 @@
 
 class LgsIntConst final : public LgsUnaryExpr {
 public:
-    int value;
+    uint32_t value;
 
     explicit LgsIntConst(const int value) : LgsUnaryExpr(&LGS_INT), value(value) {
         isConstant = true;

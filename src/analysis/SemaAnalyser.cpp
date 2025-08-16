@@ -176,8 +176,8 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     if (varDec->expr) {
         visitExpr(varDec->expr);
         if (varDec->type) {
-            if (!validateExprType(varDec->expr, varDec->type)) return;
             if (varDec->expr->type != varDec->type) {
+                if (!validateExprType(varDec->expr, varDec->type)) return;
                 const auto castExpr = varDec->expr->castTo(varDec->type);
                 if (varDec->expr != castExpr) {
                     delete varDec->expr;
@@ -409,6 +409,7 @@ void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     else if (const auto variable = unaryExpr->asVariable()) visitVariable(variable);
     else if (const auto postfixExpr = unaryExpr->asPostfixExpr()) visitPostfixExpr(postfixExpr);
     else if (const auto prefixExpr = unaryExpr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
+    else if (const auto vec2 = unaryExpr->asVec2()) visitVector(vec2);
 }
 
 void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
@@ -514,6 +515,13 @@ void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) {
     const auto firstElement = hashMap->initialElements.front();
     typePair->key = firstElement->key->type;
     typePair->value = firstElement->value->type;
+}
+
+void SemaAnalyser::visitVector(const LgsVec2* vec2) {
+    for (const auto arg : vec2->args) {
+        visitExpr(arg);
+    }
+
 }
 
 void SemaAnalyser::visitVariable(LgsVariable* variable) {
@@ -788,13 +796,14 @@ bool SemaAnalyser::setSelectionFieldType(const LgsUnaryExpr* parent, LgsVariable
 
 bool SemaAnalyser::setLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable) {
     const auto varDecSize = foreachLoop->loopVars.size();
-    foreachLoop->withIndex = iterable->unpackLength + 1 == varDecSize;
+    const auto unpackCount = iterable->getUnpackCount();
+    foreachLoop->withIndex = unpackCount + 1 == varDecSize;
     const bool withIndex = foreachLoop->withIndex;
     if (withIndex) {
         foreachLoop->loopVars[0]->type = &LGS_INT;
         foreachLoop->loopVars[0]->expr = LGS_INT.getZeroValue();
-    } else if (iterable->unpackLength != varDecSize) {
-        errHandler.addError(E10041, &iterExpr->location, {iterExpr->prettyName(), std::to_string(iterable->unpackLength), std::to_string(iterable->unpackLength + 1), std::to_string(varDecSize)});
+    } else if (unpackCount != varDecSize) {
+        errHandler.addError(E10041, &iterExpr->location, {iterExpr->prettyName(), std::to_string(unpackCount), std::to_string(unpackCount + 1), std::to_string(varDecSize)});
         return true;
     }
 
@@ -885,7 +894,7 @@ void SemaAnalyser::validateIndex(LgsIterIndex* iterIndex) {
     }
     if (const auto sArr = iterable->asSArray()) {
         const auto i = exprFrom->getConstInt();
-        const auto bound = sArr->initialLength;
+        const auto bound = sArr->arrLength;
         if (i >= bound) {
             return errHandler.addError(E10003, &iterIndex->location, {iterIndex->prettyName(), std::to_string(bound)});
         }
@@ -903,7 +912,7 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
         }
         const auto i = exprFrom->getConstInt();
         const auto j = exprTo->getConstInt();
-        const auto bound = sArr->initialLength;
+        const auto bound = sArr->arrLength;
         if (i >= bound || j >= bound) {
             return errHandler.addError(E10003, &iterIndex->location, {iterIndex->prettyName(), std::to_string(bound)});
         }
@@ -1118,7 +1127,7 @@ void SemaAnalyser::resolveIterable(LgsIterable* iterable) {
         if (exprConstNumber <= 0) {
             return errHandler.addError(E10048, &iterable->location, {iterable->prettyName()});
         }
-        staticArr->initialLength = exprConstNumber;
+        staticArr->arrLength = exprConstNumber;
     }
 }
 

@@ -67,8 +67,6 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
     src/symbols/exprs/unary/constants/LgsUIntConst.cpp
     src/symbols/exprs/unary/vectors/LgsVec2.cpp
-    src/symbols/exprs/unary/vectors/LgsVec3.cpp
-    src/symbols/exprs/unary/vectors/LgsVec4.cpp
     src/symbols/exprs/unary/LgsArrayExpr.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
     src/symbols/exprs/unary/LgsHashMap.cpp
@@ -120,9 +118,13 @@ set(SOURCE_FILES
     src/symbols/types/LgsIterator.cpp
     src/symbols/types/LgsCPtr.cpp
     src/symbols/types/LgsNullable.cpp
+    src/symbols/types/LgsVector.cpp
 )
 
+add_subdirectory(runtime)
 add_library(lgs_core ${SOURCE_FILES})
+target_link_libraries(lgs_core PUBLIC LLVM clang-cpp antlr4_shared)
+target_precompile_headers(lgs_core PRIVATE include/pch.h)
 target_include_directories(lgs_core PUBLIC
     include/external/include
     include/external/antlr4-runtime
@@ -131,14 +133,6 @@ target_include_directories(lgs_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
     ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
 )
-target_link_libraries(lgs_core PUBLIC
-    LLVM
-    clang-cpp
-    antlr4_shared
-)
-
-add_subdirectory(runtime)
-target_precompile_headers(lgs_core PRIVATE include/pch.h)
 
 add_executable(lgs main.cpp)
 target_link_libraries(lgs PRIVATE lgs_core lgs_runtime)

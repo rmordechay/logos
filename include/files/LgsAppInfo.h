@@ -15,9 +15,9 @@ public:
     std::string name = "main";
     std::string activeEnv = "Pro";
     LgsAppVersion version{1, 0, 0};
+    fs::path appFilePath;
     std::vector<LgsVarDec*> requireEnvVars;
     std::vector<std::string> requirePackages;
-    fs::path appFilePath = "";
     LgsLocation location{0, 0, nullptr};
     ~LgsAppInfo() = default;
     bool parseVersion(const char* versionStr);

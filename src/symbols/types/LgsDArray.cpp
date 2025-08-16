@@ -29,6 +29,10 @@ std::string LgsDArray::prettyName() {
     return baseType->prettyName() + "[]";
 }
 
+uint16_t LgsDArray::getUnpackCount() const {
+    return 1;
+}
+
 bool LgsDArray::equals(LgsType* other) {
     const auto otherArr = other->asDArray();
     if (!otherArr) return false;

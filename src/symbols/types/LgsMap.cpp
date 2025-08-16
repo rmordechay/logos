@@ -8,6 +8,10 @@ size_t LgsMap::getSizeBytes() {
     return sizeof(void*);
 }
 
+uint16_t LgsMap::getUnpackCount() const {
+    return 2;
+}
+
 LgsExpr* LgsMap::getZeroValue() {
     return new LgsHashMap(this);
 }

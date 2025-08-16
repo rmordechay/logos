@@ -80,7 +80,7 @@ bool LgsApp::parse() {
 bool LgsApp::analyse() {
     if (!resolveGlobalTypes()) exitWithErrors();
     for (const auto file : files) {
-        threadPool.runTask([file, this] {
+        threadPool.runTask([this, file] {
             SemaAnalyser semaAnalyser(file, globals);
             semaAnalyser.analyse();
             std::lock_guard lock(mtx);
@@ -95,8 +95,9 @@ bool LgsApp::analyse() {
 
 bool LgsApp::generate() {
     initBuild();
+    const auto targetMachine = LgsCodeGen::getTargetMachine();
     for (const auto& file : files) {
-        threadPool.runTask([this, file] {
+        threadPool.runTask([file, targetMachine] {
             file->codeGen.setupModule(file->name, targetMachine->createDataLayout());
             file->generateIR();
         });
@@ -108,7 +109,7 @@ bool LgsApp::generate() {
 
 bool LgsApp::link() const {
     const LgsLinker linker(paths, files);
-    return linker.link(targetMachine);
+    return linker.link();
 }
 
 void LgsApp::execute() {
@@ -250,10 +251,6 @@ void LgsApp::initBuild() {
     LgsCodeGen::initLLVM();
     paths.objFilePath = paths.buildDir / (appInfo.name + ".o");
     paths.execFilePath = paths.buildDir / appInfo.name;
-    std::string error;
-    const auto targetTriple = sys::getDefaultTargetTriple();
-    const auto target = TargetRegistry::lookupTarget(targetTriple, error);
-    targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), std::nullopt);
 }
 
 void LgsApp::writeIRFiles() {

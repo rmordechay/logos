@@ -27,7 +27,6 @@ public:
     LgsErrHandler errHandler;
     std::vector<LgsFile*> files;
     std::vector<LgsEnvFile*> envFiles;
-    TargetMachine* targetMachine = nullptr;
     std::vector<char*> args;
     ThreadPool threadPool;
     LgsPaths paths;
@@ -45,14 +44,14 @@ public:
     bool link() const;
     void initBuild();
     void parseSrcFile(const std::string& codeText, fs::path filePath = "");
-    bool checkParserErrors(LogosParser* parser);
-    void parseEnvFile(fs::path fileEntry);
     bool parseAppFile();
-    bool resolveGlobalTypes();
-    void loadBuiltins();
     void loadEnvFiles();
+    void loadBuiltins();
+    void parseEnvFile(fs::path fileEntry);
+    bool resolveGlobalTypes();
     void setEnvVars();
     void writeIRFiles();
     void exitWithErrors() const;
+    bool checkParserErrors(LogosParser* parser);
     ~LgsApp();
 };

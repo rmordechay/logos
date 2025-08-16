@@ -49,17 +49,17 @@ public:
         addMethod(&lenFunc);
         addMethod(&isEmptyFunc);
         addMethod(&isNotEmptyFunc);
-        unpackLength = 1;
         canSlice = true;
     }
     Type* getIRBaseType(LgsCodeGen* codeGen) const;
-    size_t getSizeBytes() override;
+    Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     std::string prettyName() override;
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    std::string strFormatPart() const override;
     LgsType* getIndexType() override;
+    std::string strFormatPart() const override;
+    uint16_t getUnpackCount() const override;
     Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;

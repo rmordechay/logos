@@ -34,7 +34,6 @@ class LgsCodeGen;
 
 class LgsType {
 public:
-    LgsLocation location;
     bool isVoid = false;
     bool isNumber = false;
     bool isUnsigned = false;
@@ -42,8 +41,9 @@ public:
     bool isUnknown = false;
     bool canSlice = false;
     Type* IRType = nullptr;
-   std::map<std::string, LgsField*> fields;
-   std::map<std::string, LgsFunc*> methods;
+    LgsLocation location{0, 0, nullptr};
+    std::map<std::string, LgsField*> fields;
+    std::map<std::string, LgsFunc*> methods;
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);

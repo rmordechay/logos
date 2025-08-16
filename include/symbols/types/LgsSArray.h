@@ -6,11 +6,10 @@
 class LgsSArray final : public LgsIterable {
 public:
     static constexpr auto name = "SArray";
-    size_t initialLength = 0;
+    size_t arrLength = 0;
     LgsFunc lenFunc{"len", &LGS_INT, {this}, PUBLIC | METHOD};
 
     explicit LgsSArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
-        unpackLength = 1;
         canSlice = true;
         addMethod(&lenFunc);
     }
@@ -21,6 +20,7 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
+    uint16_t getUnpackCount() const override;
     std::string strFormatPart() const override;
     Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;

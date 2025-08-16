@@ -16,6 +16,10 @@ size_t LgsStr::getSizeBytes() {
     return initialLength + 1;
 }
 
+uint16_t LgsStr::getUnpackCount() const {
+    return 1;
+}
+
 std::string LgsStr::getName() {
     return name;
 }

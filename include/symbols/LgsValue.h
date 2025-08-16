@@ -10,9 +10,9 @@ using namespace llvm;
 
 class LgsValue {
 public:
-    LgsLocation location;
     bool isMutable = false;
     Value* IRValue = nullptr;
+    LgsLocation location{0, 0, nullptr};
 
     void setIRValue(Value* value);
     Value* getIRValue(LgsCodeGen* codeGen);

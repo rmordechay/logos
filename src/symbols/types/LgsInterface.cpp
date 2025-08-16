@@ -1,10 +1,7 @@
 #include "types/LgsInterface.h"
-
 #include "funcs/LgsFunc.h"
 #include "logos/LgsCodeGen.h"
 #include "types/LgsObject.h"
-
-#include "utils/LgsUtils.h"
 
 Type* LgsInterface::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;

@@ -4,7 +4,7 @@
 
 class LgsShortConst final : public LgsUnaryExpr {
 public:
-    int value;
+    uint16_t value;
 
     explicit LgsShortConst(const int value) : LgsUnaryExpr(&LGS_SHORT), value(value) {}
     std::string prettyName() override;

@@ -3,6 +3,7 @@
 
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
+#include <llvm/MC/TargetRegistry.h>
 #include <llvm/Passes/PassBuilder.h>
 
 
@@ -91,10 +92,11 @@ public:
     Type* i16Ty();
     Type* i32Ty();
     Type* i64Ty();
+    Type* floatTy();
     Type* voidTy();
-    PointerType* ptrTy();
     Type* iNTy(unsigned n);
     IntegerType* sizeTy();
+    PointerType* ptrTy();
 
     // values
     Value* null();
@@ -103,6 +105,7 @@ public:
     ConstantInt* i16(int16_t v);
     ConstantInt* i32(int32_t v);
     ConstantInt* i64(int64_t v);
+    ConstantFP* flo(float v);
     ConstantInt* isize(size_t v);
     ConstantInt* i32Zero();
     ConstantInt* i64Zero();
@@ -116,5 +119,6 @@ public:
     void printStr(const std::string& str);
 
     static void initLLVM();
+    static TargetMachine* getTargetMachine();
     ~LgsCodeGen();
 };

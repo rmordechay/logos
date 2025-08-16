@@ -13,6 +13,7 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "exprs/unary/vectors/LgsVec2.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsIterator.h"
@@ -74,6 +75,7 @@ LgsCharConst* LgsExpr::asCharConst() { return dynamic_cast<LgsCharConst*>(this);
 LgsFloatConst* LgsExpr::asFloatConst() { return dynamic_cast<LgsFloatConst*>(this); }
 LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
 LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }
+LgsVec2* LgsExpr::asVec2() { return dynamic_cast<LgsVec2*>(this); }
 
 LgsExpr* LgsExpr::clone() { assert(0); }
 bool LgsExpr::equals(LgsExpr* other) { assert(0); }

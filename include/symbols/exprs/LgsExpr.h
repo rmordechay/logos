@@ -3,6 +3,7 @@
 
 #include "LgsValue.h"
 
+class LgsVec2;
 class LgsPrefixExpr;
 class LgsIterator;
 class LgsPostfixExpr;
@@ -50,6 +51,7 @@ public:
     LgsFloatConst* asFloatConst();
     LgsIntConst* asIntConst();
     LgsStrConst* asStrConst();
+    LgsVec2* asVec2();
 
     virtual LgsExpr* clone();
     virtual bool equals(LgsExpr* other);

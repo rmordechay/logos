@@ -37,7 +37,6 @@ public:
     LgsFunc freeFunc{"free", &LGS_VOID, {this}, INTERNAL | METHOD};
 
     explicit LgsDArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
-        unpackLength = 1;
         addMethod(&addFunc);
         addMethod(&lenFunc);
         addMethod(&isEmptyFunc);
@@ -50,6 +49,7 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
+    uint16_t getUnpackCount() const override;
     std::string strFormatPart() const override;
     StructType* getArrStruct(LgsCodeGen* codeGen);
     void freeValue(LgsCodeGen* codeGen, Value* value) override;
