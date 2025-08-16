@@ -1,7 +1,6 @@
 #pragma once
 #include "configs/LgsDefinitions.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include <llvm/IR/Module.h>
 #include <types/LgsVoid.h>
 #include <types/primitives/LgsLong.h>
 #include <types/LgsAny.h>

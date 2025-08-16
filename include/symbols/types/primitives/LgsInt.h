@@ -10,7 +10,7 @@ public:
         isNumber = true;
     }
     size_t getSizeBytes() override;
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     std::string prettyName() override;
     LgsExpr* getZeroValue() override;

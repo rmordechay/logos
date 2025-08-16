@@ -12,7 +12,7 @@ public:
         isNumber = true;
     }
     std::string prettyName() override;
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;

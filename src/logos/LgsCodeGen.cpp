@@ -11,6 +11,7 @@
 #include <llvm/TargetParser/Host.h>
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/MC/TargetRegistry.h>
+#include <llvm/Target/TargetOptions.h>
 
 void LgsCodeGen::setupModule(const std::string& moduleName, const DataLayout& dataLayout) {
     IRModule = new Module(moduleName, context);

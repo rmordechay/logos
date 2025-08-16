@@ -13,7 +13,7 @@ public:
     LgsExpr* expr = nullptr;
     bool isSelf = false;
     bool isVariadic = false;
-    Value* vaList = nullptr;
+    llvm::Value* vaList = nullptr;
 
     explicit LgsParam(LgsType* type = nullptr, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     void createIRValue(LgsCodeGen* codeGen) override;

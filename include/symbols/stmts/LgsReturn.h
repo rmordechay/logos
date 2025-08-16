@@ -1,12 +1,15 @@
 #pragma once
 #include "LgsStmt.h"
 #include "exprs/LgsExpr.h"
-#include <llvm/IRReader/IRReader.h>
+
+namespace llvm {
+    class BasicBlock;
+}
 
 class LgsReturn final : public LgsStmt {
 public:
     LgsExpr *expr = nullptr;
-    BasicBlock* parentBlock = nullptr;
+    llvm::BasicBlock* parentBlock = nullptr;
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
     void createIRValue(LgsCodeGen* codeGen) override;

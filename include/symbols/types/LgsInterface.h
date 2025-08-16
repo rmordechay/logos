@@ -7,7 +7,7 @@ public:
     explicit LgsInterface(const std::string& name) : LgsObject(name) {}
     std::string prettyName() override;
     std::string getName() override;
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     LgsField* getField(const std::string& fieldName) override;
     LgsFunc* getMethod(const std::string& methodName) override;
     LgsExpr* getZeroValue() override;

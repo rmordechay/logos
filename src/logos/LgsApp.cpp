@@ -20,6 +20,7 @@
 #include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 #include "llvm/IR/Verifier.h"
+#include <llvm/Target/TargetMachine.h>
 
 extern char **environ;
 

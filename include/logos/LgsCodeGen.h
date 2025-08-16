@@ -3,9 +3,11 @@
 
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
-#include <llvm/MC/TargetRegistry.h>
-#include <llvm/Passes/PassBuilder.h>
 
+namespace llvm {
+    class TargetMachine;
+    class DIBuilder;
+}
 
 class LgsFuncCall;
 class LgsRuntime;

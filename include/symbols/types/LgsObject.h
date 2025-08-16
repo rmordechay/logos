@@ -16,7 +16,7 @@ public:
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {}
     std::string prettyName() override;
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     LgsField* getField(const std::string& name) override;
     LgsFunc* getMethod(const std::string& name) override;
@@ -25,7 +25,7 @@ public:
     std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
     bool hasVirtuals() const;
-    void freeValue(LgsCodeGen* codeGen, Value* value) override;
+    void freeValue(LgsCodeGen* codeGen, llvm::Value* value) override;
     LgsObject* clone();
     ~LgsObject() override;
 };

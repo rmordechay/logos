@@ -2,6 +2,10 @@
 #include "LgsType.h"
 #include "funcs/LgsParam.h"
 
+namespace llvm {
+    class FunctionType;
+}
+
 enum LgsFuncFlags : uint32_t {
     METHOD = 1 << 0,
     PUBLIC = 1 << 1,
@@ -32,10 +36,10 @@ public:
     bool isTerminator = false;
     bool isAnonymous = false;
     bool hasDefaults = false;
-    FunctionType* IRType = nullptr;
+    llvm::FunctionType* IRType = nullptr;
 
     void setFuncOptions(uint32_t ops);
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string prettyName() override;

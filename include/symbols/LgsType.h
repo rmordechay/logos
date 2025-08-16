@@ -1,10 +1,13 @@
 #pragma once
 #include "configs/LgsErrors.h"
-#include <llvm/Target/TargetMachine.h>
+
+namespace llvm {
+    class Value;
+    class Type;
+}
 
 class LgsVec2;
 class LgsVector;
-using namespace llvm;
 
 class LgsChar;
 class LgsVariable;
@@ -40,7 +43,7 @@ public:
     bool isUnsigned = false;
     bool isPrimitive = false;
     bool canSlice = false;
-    Type* IRType = nullptr;
+    llvm::Type* IRType = nullptr;
     LgsLocation location{0, 0, nullptr};
     std::map<std::string, LgsField*> fields;
     std::map<std::string, LgsFunc*> methods;
@@ -77,9 +80,9 @@ public:
     virtual std::string prettyName() = 0;
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual Type* getIRType(LgsCodeGen* codeGen) = 0;
+    virtual llvm::Type* getIRType(LgsCodeGen* codeGen) = 0;
     virtual bool equals(LgsType* other) = 0;
     virtual std::string strFormatPart() const;
-    virtual void freeValue(LgsCodeGen* codeGen, Value* value);
+    virtual void freeValue(LgsCodeGen* codeGen, llvm::Value* value);
     virtual ~LgsType() = default;
 };

@@ -9,6 +9,7 @@
 #include <clang/CodeGen/CodeGenAction.h>
 #include <clang/Frontend/CompilerInvocation.h>
 #include <clang/Frontend/CompilerInstance.h>
+#include <llvm/TargetParser/Host.h>
 
 void LgsCLang::resolveCFiles(LgsFile* lgsFile) {
     for (const auto externalCPath : lgsFile->externalCPaths) {

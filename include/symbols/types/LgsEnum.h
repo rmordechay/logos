@@ -6,7 +6,7 @@ public:
     std::string name;
 
     explicit LgsEnum(const std::string& enumName) : name(enumName) {}
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     std::string prettyName() override;
     LgsExpr* getZeroValue() override;

@@ -11,6 +11,7 @@
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/IRReader/IRReader.h>
+#include <llvm/Target/TargetMachine.h>
 
 std::unique_ptr<Module> parseModule(LLVMContext& context, const std::string& path) {
     SMDiagnostic diag;

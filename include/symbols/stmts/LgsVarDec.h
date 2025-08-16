@@ -2,6 +2,10 @@
 #include "LgsStmt.h"
 #include "exprs/LgsExpr.h"
 
+namespace llvm {
+    class Type;
+}
+
 class LgsVarDec final : public LgsStmt {
 public:
     std::string name;
@@ -14,7 +18,7 @@ public:
     }
     void createIRValue(LgsCodeGen* codeGen) override;
     std::string format(std::string& indentStr) override;
-    bool shouldAllocate(const Type* IRType) const;
+    bool shouldAllocate(const llvm::Type* IRType) const;
     ~LgsVarDec() override;
 };
 

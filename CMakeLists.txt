@@ -119,6 +119,7 @@ set(SOURCE_FILES
     src/symbols/types/LgsCPtr.cpp
     src/symbols/types/LgsNullable.cpp
     src/symbols/types/LgsVec2.cpp
+    src/logos/LgsPaths.cpp
 )
 
 add_subdirectory(runtime)
