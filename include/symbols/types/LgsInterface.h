@@ -1,12 +1,10 @@
 #pragma once
+#include "LgsObject.h"
 #include "LgsType.h"
 
-class LgsInterface final : public LgsType {
+class LgsInterface final : public LgsObject {
 public:
-    std::string name;
-    std::vector<LgsType*> interfaces;
-
-    explicit LgsInterface(const std::string& name) : name(name) {}
+    explicit LgsInterface(const std::string& name) : LgsObject(name) {}
     std::string prettyName() override;
     std::string getName() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
