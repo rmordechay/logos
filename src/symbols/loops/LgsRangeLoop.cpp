@@ -40,6 +40,8 @@ void LgsRangeLoop::setLoopTerminals(LgsCodeGen* codeGen, Value* iValue) const {
 }
 
 LgsRangeLoop::~LgsRangeLoop() {
-    // rangeStart will be freed with varDec freeing
-    delete endRange;
+    if (endRange) {
+        delete endRange;
+        endRange = nullptr;
+    }
 }

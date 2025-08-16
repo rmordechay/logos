@@ -3,7 +3,7 @@
 
 #include "LgsValue.h"
 
-class LgsVec2;
+class LgsVector;
 class LgsPrefixExpr;
 class LgsIterator;
 class LgsPostfixExpr;
@@ -34,7 +34,7 @@ public:
     bool isHeapAlloc = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
-    int getConstInt();
+    size_t getConstInt();
     std::string getConstStr();
     LgsIterator toIterator();
     void setType(LgsType* newType);
@@ -51,7 +51,7 @@ public:
     LgsFloatConst* asFloatConst();
     LgsIntConst* asIntConst();
     LgsStrConst* asStrConst();
-    LgsVec2* asVec2();
+    LgsVector* asVector();
 
     virtual LgsExpr* clone();
     virtual bool equals(LgsExpr* other);

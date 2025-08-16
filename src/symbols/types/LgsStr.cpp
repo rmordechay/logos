@@ -2,8 +2,6 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
 
-#include "utils/LgsUtils.h"
-
 Type* LgsStr::getIRBaseType(LgsCodeGen* codeGen) const {
     return ArrayType::get(baseType->getIRType(codeGen), initialLength);
 }

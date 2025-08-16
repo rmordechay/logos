@@ -5,7 +5,7 @@ std::string LgsUnknownType::prettyName() {
 }
 
 std::string LgsUnknownType::getName() {
-    return name == "" ? genricName : name;
+    return name;
 }
 
 LgsExpr* LgsUnknownType::getZeroValue() {

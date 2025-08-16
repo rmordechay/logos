@@ -16,6 +16,34 @@ Type* LgsInterface::getIRType(LgsCodeGen* codeGen) {
     return IRType;
 }
 
+LgsField* LgsInterface::getField(const std::string& fieldName) {
+    const auto field = fields.find(fieldName);
+    if (field != fields.end()) {
+        return field->second;
+    }
+    for (const auto interface : interfaces) {
+        const auto interfaceField = interface->getField(fieldName);
+        if (interfaceField) {
+            return interfaceField;
+        }
+    }
+    return nullptr;
+}
+
+LgsFunc* LgsInterface::getMethod(const std::string& methodName) {
+    const auto method = methods.find(methodName);
+    if (method != methods.end()) {
+        return method->second;
+    }
+    for (const auto interface : interfaces) {
+        const auto interfaceMethod = interface->getMethod(methodName);
+        if (interfaceMethod) {
+            return interfaceMethod;
+        }
+    }
+    return nullptr;
+}
+
 std::string LgsInterface::getName() {
     return name;
 }

@@ -328,7 +328,7 @@ ConstantInt* LgsCodeGen::i64(const int64_t v) {
     return builder.getInt64(v);
 }
 
-ConstantFP* LgsCodeGen::flo(const float_t v) {
+ConstantFP* LgsCodeGen::floatv(const float_t v) {
     return ConstantFP::get(context, APFloat(v));
 }
 

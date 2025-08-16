@@ -2,14 +2,16 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "stmts/LgsVarDec.h"
 
-#include "utils/LgsUtils.h"
-
 size_t LgsMap::getSizeBytes() {
     return sizeof(void*);
 }
 
 uint16_t LgsMap::getUnpackCount() const {
     return 2;
+}
+
+Type* LgsMap::getIRType(LgsCodeGen* codeGen) {
+    return getMapStruct(codeGen);
 }
 
 LgsExpr* LgsMap::getZeroValue() {
@@ -30,10 +32,6 @@ Value* LgsMap::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
 
 Value* LgsMap::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
     return isNotEmptyFunc.call(codeGen, {iterable});
-}
-
-Type* LgsMap::getIRType(LgsCodeGen* codeGen) {
-    return getMapStruct(codeGen);
 }
 
 std::string LgsMap::getName() {

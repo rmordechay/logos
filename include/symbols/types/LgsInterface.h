@@ -10,6 +10,8 @@ public:
     std::string prettyName() override;
     std::string getName() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
+    LgsField* getField(const std::string& fieldName) override;
+    LgsFunc* getMethod(const std::string& methodName) override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     size_t getSizeBytes() override;

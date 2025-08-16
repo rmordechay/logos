@@ -1,5 +1,5 @@
 #pragma once
-#include "exprs/unary/vectors/LgsVec2.h"
+#include "exprs/unary/vectors/LgsVector.h"
 #include "logos/LgsStack.h"
 #include "utils/LgsErrHandler.h"
 
@@ -81,7 +81,7 @@ public:
     void visitStaticArray(LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* array);
     void visitHashMap(LgsHashMap* hashMap);
-    void visitVector(const LgsVec2* vec2);
+    void visitVector(const LgsVector* vec);
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
@@ -123,5 +123,6 @@ public:
     void resolveObjTypes(LgsObject* obj);
     void resolveInterfaceTypes(LgsInterface* interface);
     void resolveGroupTypes(LgsGroup* group);
+    bool checkSwizzle(const std::string& field, LgsVector* vec);
     ~SemaAnalyser() = default;
 };

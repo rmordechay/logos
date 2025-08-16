@@ -79,7 +79,7 @@ std::string LgsFuncCall::prettyName() {
         strStream << args[i]->type->prettyName();
         if (i != args.size() - 1) strStream << ", ";
     }
-    if (type && !type->isUnknown) {
+    if (type && !type->isUnknown()) {
         strStream << "): " << type->prettyName();
     } else {
         strStream << ')';

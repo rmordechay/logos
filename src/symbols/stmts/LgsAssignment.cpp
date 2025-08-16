@@ -70,7 +70,7 @@ void LgsAssignment::assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, Lg
 }
 
 void LgsAssignment::assignToSelection(LgsCodeGen* codeGen, LgsSelection* selection, LgsExpr* expr) {
-    codeGen->builder.CreateStore(expr->getIRValue(codeGen), selection->resolveSelection(codeGen));
+    codeGen->builder.CreateStore(expr->getIRValue(codeGen), selection->getIRValue(codeGen));
 }
 
 void LgsAssignment::assignToVariable(LgsCodeGen* codeGen, LgsVariable* variable, LgsExpr* expr) {
@@ -94,7 +94,7 @@ void LgsAssignment::assignScalarToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* i
         return;
     }
     if (baseExpr->type->asSArray()) {
-        codeGen->builder.CreateStore(rIRValue, iterIndex->getArrGEP(codeGen));
+        codeGen->builder.CreateStore(rIRValue, iterIndex->loadFromSArray(codeGen));
         return;
     }
     if (const auto map = baseExpr->type->asMap()) {

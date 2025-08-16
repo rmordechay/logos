@@ -82,7 +82,4 @@ LgsForeachLoop::~LgsForeachLoop() {
     if (iterExpr) {
         delete iterExpr;
     }
-    if (stmtsBlock) {
-        delete stmtsBlock;
-    }
 }

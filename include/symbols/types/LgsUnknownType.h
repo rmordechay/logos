@@ -5,11 +5,8 @@
 class LgsUnknownType final : public LgsType {
 public:
     std::string name;
-    constexpr static auto genricName = "<Unknown>";
 
-    explicit LgsUnknownType(std::string  name = "") : name(std::move(name)) {
-        isUnknown = true;
-    }
+    explicit LgsUnknownType(std::string  name) : name(std::move(name)) {}
     Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     std::string prettyName() override;

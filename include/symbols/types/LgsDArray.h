@@ -24,7 +24,7 @@ public:
 
 class LgsDArray final : public LgsIterable {
 public:
-    static constexpr auto name = "Array";
+    static constexpr auto name = "DArray";
     StructType* arrStruct = nullptr;
     LgsArrayAddFunc addFunc{this};
     LgsFunc lenFunc{"len", &LGS_INT, {this}, INTERNAL | METHOD | PUBLIC};

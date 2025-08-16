@@ -1,3 +1,4 @@
+#include "exprs/unary/vectors/LgsVector.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
@@ -7,6 +8,7 @@
 #include "types/LgsMap.h"
 #include "types/LgsNullable.h"
 #include "types/LgsSArray.h"
+#include "types/LgsUnknownType.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsUInt.h"
 
@@ -17,20 +19,6 @@ LgsField* LgsType::getField(const std::string& name) {
     if (field != fields.end()) {
         return field->second;
     }
-
-    std::vector<LgsType*> interfaces;
-    if (const auto obj = asObject()) {
-        interfaces = obj->interfaces;
-    } else if (const auto interface = asInterface()) {
-        interfaces = interface->interfaces;
-    }
-
-    for (const auto interface : interfaces) {
-        const auto interfaceField = interface->getField(name);
-        if (interfaceField) {
-            return interfaceField;
-        }
-    }
     return nullptr;
 }
 
@@ -38,18 +26,6 @@ LgsFunc* LgsType::getMethod(const std::string& name) {
     const auto method = methods.find(name);
     if (method != methods.end()) {
         return method->second;
-    }
-    std::vector<LgsType*> interfaces;
-    if (const auto obj = asObject()) {
-        interfaces = obj->interfaces;
-    } else if (const auto interface = asInterface()) {
-        interfaces = interface->interfaces;
-    }
-    for (const auto interface : interfaces) {
-        const auto interfaceMethod = interface->getMethod(name);
-        if (interfaceMethod) {
-            return interfaceMethod;
-        }
     }
     return nullptr;
 }
@@ -83,8 +59,12 @@ LgsInterface* LgsType::asInterface() { return dynamic_cast<LgsInterface*>(this);
 LgsIterable* LgsType::asIterable() { return dynamic_cast<LgsIterable*>(this); }
 LgsDArray* LgsType::asDArray() { return dynamic_cast<LgsDArray*>(this); }
 LgsSArray* LgsType::asSArray() { return dynamic_cast<LgsSArray*>(this); }
+LgsVec2* LgsType::asVec2() { return dynamic_cast<LgsVec2*>(this); }
 LgsMap* LgsType::asMap() { return dynamic_cast<LgsMap*>(this); }
 LgsEnum* LgsType::asEnum() { return dynamic_cast<LgsEnum*>(this); }
 LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
 LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }
 LgsTypePair* LgsType::asPair() { return dynamic_cast<LgsTypePair*>(this); }
+bool LgsType::isVector() { return dynamic_cast<LgsVec2*>(this); }
+bool LgsType::isVoid() { return dynamic_cast<LgsVoid*>(this); }
+bool LgsType::isUnknown() { return dynamic_cast<LgsUnknownType*>(this); }

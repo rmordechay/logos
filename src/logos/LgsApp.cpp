@@ -257,20 +257,20 @@ void LgsApp::writeIRFiles() {
     for (const auto file : files) {
         const auto module = file->codeGen.IRModule;
         if (!module) continue;
-        if (verifyModule(*module, &errs())) {
+        auto invalid = false;
+        if ((invalid = verifyModule(*module, &errs()))) {
             errHandler.setUnsuccessful();
-            module->print(errs(), nullptr);
-            continue;
         }
+        if constexpr (LOG_LEVEL == DEBUG) {
+            module->print(outs(), nullptr);
+            logInfo("\n-----\n\n");
+        }
+        if (invalid) return;
         if constexpr (WRITE_IR_TO_FILE) {
             const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
             std::error_code EC;
             raw_fd_ostream textFile(filePath, EC, sys::fs::OF_None);
             module->print(textFile, nullptr);
-        }
-        if constexpr (LOG_LEVEL == DEBUG) {
-            module->print(outs(), nullptr);
-            logInfo("\n-----\n\n");
         }
     }
 }

@@ -89,3 +89,4 @@ inline LgsBaseError E10065{.msg = "'for.isFirst' and 'for.isLast' are not allowe
 inline LgsBaseError E10066{.msg = "While loop condition '%s' must be of type Bool. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10067{.msg = "'%s' was not found in '%s'", .errCode = errCodeStart++};
 inline LgsBaseError E10068{.msg = "App version must be in the form of '1.0.0'. Given: '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10069{.msg = "Scalars '$s' are invalid for '%s'.", .errCode = errCodeStart++};

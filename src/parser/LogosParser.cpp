@@ -316,8 +316,8 @@ void logosParserInitialize() {
   	0,0,582,583,7,7,0,0,583,585,3,80,40,2,584,563,1,0,0,0,584,566,1,0,0,0,
   	584,569,1,0,0,0,584,572,1,0,0,0,584,575,1,0,0,0,584,578,1,0,0,0,584,581,
   	1,0,0,0,585,588,1,0,0,0,586,584,1,0,0,0,586,587,1,0,0,0,587,81,1,0,0,
-  	0,588,586,1,0,0,0,589,607,3,94,47,0,590,607,3,84,42,0,591,607,3,86,43,
-  	0,592,607,3,40,20,0,593,607,3,132,66,0,594,607,3,100,50,0,595,607,3,106,
+  	0,588,586,1,0,0,0,589,607,3,132,66,0,590,607,3,94,47,0,591,607,3,86,43,
+  	0,592,607,3,40,20,0,593,607,3,84,42,0,594,607,3,100,50,0,595,607,3,106,
   	53,0,596,607,3,108,54,0,597,607,3,116,58,0,598,607,3,88,44,0,599,607,
   	3,90,45,0,600,607,3,112,56,0,601,607,3,114,57,0,602,607,5,53,0,0,603,
   	607,5,54,0,0,604,607,5,82,0,0,605,607,5,83,0,0,606,589,1,0,0,0,606,590,
@@ -4272,12 +4272,12 @@ LogosParser::UnaryExprContext::UnaryExprContext(ParserRuleContext *parent, size_
   : ParserRuleContext(parent, invokingState) {
 }
 
-LogosParser::FuncCallContext* LogosParser::UnaryExprContext::funcCall() {
-  return getRuleContext<LogosParser::FuncCallContext>(0);
+LogosParser::VectorContext* LogosParser::UnaryExprContext::vector() {
+  return getRuleContext<LogosParser::VectorContext>(0);
 }
 
-LogosParser::PrefixExprContext* LogosParser::UnaryExprContext::prefixExpr() {
-  return getRuleContext<LogosParser::PrefixExprContext>(0);
+LogosParser::FuncCallContext* LogosParser::UnaryExprContext::funcCall() {
+  return getRuleContext<LogosParser::FuncCallContext>(0);
 }
 
 LogosParser::PostfixExprContext* LogosParser::UnaryExprContext::postfixExpr() {
@@ -4288,8 +4288,8 @@ LogosParser::AnonnymosFuncContext* LogosParser::UnaryExprContext::anonnymosFunc(
   return getRuleContext<LogosParser::AnonnymosFuncContext>(0);
 }
 
-LogosParser::VectorContext* LogosParser::UnaryExprContext::vector() {
-  return getRuleContext<LogosParser::VectorContext>(0);
+LogosParser::PrefixExprContext* LogosParser::UnaryExprContext::prefixExpr() {
+  return getRuleContext<LogosParser::PrefixExprContext>(0);
 }
 
 LogosParser::InstanceContext* LogosParser::UnaryExprContext::instance() {
@@ -4364,14 +4364,14 @@ LogosParser::UnaryExprContext* LogosParser::unaryExpr() {
     case 1: {
       enterOuterAlt(_localctx, 1);
       setState(589);
-      funcCall();
+      vector();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
       setState(590);
-      prefixExpr();
+      funcCall();
       break;
     }
 
@@ -4392,7 +4392,7 @@ LogosParser::UnaryExprContext* LogosParser::unaryExpr() {
     case 5: {
       enterOuterAlt(_localctx, 5);
       setState(593);
-      vector();
+      prefixExpr();
       break;
     }
 

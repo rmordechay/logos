@@ -18,11 +18,13 @@ public:
     std::string prettyName() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
+    LgsField* getField(const std::string& name) override;
+    LgsFunc* getMethod(const std::string& name) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    [[nodiscard]] std::string strFormatPart() const override;
+    std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
-    [[nodiscard]] bool hasVirtuals() const;
+    bool hasVirtuals() const;
     void freeValue(LgsCodeGen* codeGen, Value* value) override;
     LgsObject* clone();
     ~LgsObject() override;

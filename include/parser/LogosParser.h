@@ -803,11 +803,11 @@ public:
   public:
     UnaryExprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    VectorContext *vector();
     FuncCallContext *funcCall();
-    PrefixExprContext *prefixExpr();
     PostfixExprContext *postfixExpr();
     AnonnymosFuncContext *anonnymosFunc();
-    VectorContext *vector();
+    PrefixExprContext *prefixExpr();
     InstanceContext *instance();
     ConstantContext *constant();
     IterIndexContext *iterIndex();

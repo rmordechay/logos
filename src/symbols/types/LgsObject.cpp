@@ -12,6 +12,34 @@ std::string LgsObject::getName() {
     return name;
 }
 
+LgsField* LgsObject::getField(const std::string& fieldName) {
+    const auto field = fields.find(fieldName);
+    if (field != fields.end()) {
+        return field->second;
+    }
+    for (const auto interface : interfaces) {
+        const auto interfaceField = interface->getField(fieldName);
+        if (interfaceField) {
+            return interfaceField;
+        }
+    }
+    return nullptr;
+}
+
+LgsFunc* LgsObject::getMethod(const std::string& methodName) {
+    const auto method = methods.find(methodName);
+    if (method != methods.end()) {
+        return method->second;
+    }
+    for (const auto interface : interfaces) {
+        const auto interfaceMethod = interface->getMethod(methodName);
+        if (interfaceMethod) {
+            return interfaceMethod;
+        }
+    }
+    return nullptr;
+}
+
 Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;
     // Fields start at offset 1 if vtable exists

@@ -16,7 +16,7 @@ void LgsReturn::createIRValue(LgsCodeGen* codeGen) {
         }
         codeGen->builder.CreateBr(cleanupBlock);
     } else {
-        if (currentFunc->funcType->rt->isVoid) {
+        if (currentFunc->funcType->rt->isVoid()) {
             codeGen->builder.CreateRetVoid();
         } else {
             codeGen->builder.CreateRet(exprIR);

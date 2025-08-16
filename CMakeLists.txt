@@ -66,7 +66,7 @@ set(SOURCE_FILES
     src/symbols/exprs/unary/constants/LgsShortConst.cpp
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
     src/symbols/exprs/unary/constants/LgsUIntConst.cpp
-    src/symbols/exprs/unary/vectors/LgsVec2.cpp
+    src/symbols/exprs/unary/vectors/LgsVector.cpp
     src/symbols/exprs/unary/LgsArrayExpr.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
     src/symbols/exprs/unary/LgsHashMap.cpp
@@ -118,7 +118,7 @@ set(SOURCE_FILES
     src/symbols/types/LgsIterator.cpp
     src/symbols/types/LgsCPtr.cpp
     src/symbols/types/LgsNullable.cpp
-    src/symbols/types/LgsVector.cpp
+    src/symbols/types/LgsVec2.cpp
 )
 
 add_subdirectory(runtime)

@@ -1,24 +1,21 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/LgsArrayExpr.h"
 #include "exprs/unary/LgsIterIndex.h"
-#include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsInstance.h"
-#include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
-#include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsCharConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "exprs/unary/vectors/LgsVec2.h"
+#include "exprs/unary/vectors/LgsVector.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsIterator.h"
 
-int LgsExpr::getConstInt() {
+size_t LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {
         return intConst->value;
     }
@@ -32,7 +29,7 @@ int LgsExpr::getConstInt() {
             break;
         }
     }
-    return -1;
+    assert(0);
 }
 
 std::string LgsExpr::getConstStr() {
@@ -57,7 +54,7 @@ LgsIterator LgsExpr::toIterator() {
 }
 
 void LgsExpr::setType(LgsType* newType) {
-    if (type && type->isUnknown) freeType(type);
+    if (type && type->isUnknown()) freeType(type);
     type = newType;
 }
 
@@ -75,7 +72,7 @@ LgsCharConst* LgsExpr::asCharConst() { return dynamic_cast<LgsCharConst*>(this);
 LgsFloatConst* LgsExpr::asFloatConst() { return dynamic_cast<LgsFloatConst*>(this); }
 LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
 LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }
-LgsVec2* LgsExpr::asVec2() { return dynamic_cast<LgsVec2*>(this); }
+LgsVector* LgsExpr::asVector() { return dynamic_cast<LgsVector*>(this); }
 
 LgsExpr* LgsExpr::clone() { assert(0); }
 bool LgsExpr::equals(LgsExpr* other) { assert(0); }

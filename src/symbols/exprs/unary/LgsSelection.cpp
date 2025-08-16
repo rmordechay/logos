@@ -6,10 +6,6 @@
 #include "types/LgsInterface.h"
 
 void LgsSelection::createIRValue(LgsCodeGen* codeGen) {
-    IRValue = resolveSelection(codeGen);
-}
-
-Value* LgsSelection::resolveSelection(LgsCodeGen* codeGen) {
     auto startIndex = 0;
     const auto parentAsVar = exprs.front()->asVariable();
     if (parentAsVar && parentAsVar->ref.symbolType == OBJECT) {
@@ -21,19 +17,18 @@ Value* LgsSelection::resolveSelection(LgsCodeGen* codeGen) {
         const auto childExpr = exprs[i + 1];
         if (const auto var = childExpr->asVariable()) {
             const auto field = parentExpr->type->getField(var->name);
-            Value* v;
-            if (i == 0) {
-                v = parentExpr->getIRValue(codeGen);
-            } else {
-                v = codeGen->builder.CreateLoad(codeGen->ptrTy(), parentExpr->getIRValue(codeGen));
+            field->parentIRType = parentExpr->type->getIRType(codeGen);
+            field->parentIRValue = parentExpr->getIRValue(codeGen);
+            if (i > 0) {
+                field->parentIRValue = codeGen->builder.CreateLoad(codeGen->ptrTy(), field->parentIRValue);
             }
-            childExpr->setIRValue(field->getGEP(codeGen, v));
+            const auto fieldIR = field->getIRValue(codeGen);
+            childExpr->setIRValue(fieldIR);
         } else {
-            childExpr->getIRValue(codeGen);
+            childExpr->createIRValue(codeGen);
         }
     }
     IRValue = lastExpr()->getIRValue(codeGen);
-    return IRValue;
 }
 
 std::string LgsSelection::prettyName() {

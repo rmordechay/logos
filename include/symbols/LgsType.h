@@ -2,6 +2,8 @@
 #include "configs/LgsErrors.h"
 #include <llvm/Target/TargetMachine.h>
 
+class LgsVec2;
+class LgsVector;
 using namespace llvm;
 
 class LgsChar;
@@ -34,11 +36,9 @@ class LgsCodeGen;
 
 class LgsType {
 public:
-    bool isVoid = false;
     bool isNumber = false;
     bool isUnsigned = false;
     bool isPrimitive = false;
-    bool isUnknown = false;
     bool canSlice = false;
     Type* IRType = nullptr;
     LgsLocation location{0, 0, nullptr};
@@ -47,8 +47,8 @@ public:
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);
-    LgsField* getField(const std::string& name);
-    LgsFunc* getMethod(const std::string& name);
+    virtual LgsField* getField(const std::string& name);
+    virtual LgsFunc* getMethod(const std::string& name);
 
     LgsBool* asBool();
     LgsChar* asChar();
@@ -65,9 +65,13 @@ public:
     LgsIterable* asIterable();
     LgsDArray* asDArray();
     LgsSArray* asSArray();
+    LgsVec2* asVec2();
     LgsFuncType* asFuncType();
     LgsGroup* asGroup();
     LgsTypePair* asPair();
+    bool isVector();
+    bool isVoid();
+    bool isUnknown();
 
     virtual std::string getName() = 0;
     virtual std::string prettyName() = 0;

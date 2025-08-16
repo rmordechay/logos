@@ -188,11 +188,11 @@ expr:
     ;
 
 unaryExpr:
-        funcCall
-    |   prefixExpr
+        vector
+    |   funcCall
     |   postfixExpr
     |   anonnymosFunc
-    |   vector
+    |   prefixExpr
     |   instance
     |   constant
     |   iterIndex

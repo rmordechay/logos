@@ -28,7 +28,7 @@
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
 #include "exprs/unary/constants/LgsLongConst.h"
-#include "exprs/unary/vectors/LgsVec2.h"
+#include "exprs/unary/vectors/LgsVector.h"
 #include "files/LgsAppInfo.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
@@ -280,7 +280,7 @@ LgsEnum* AntlrConverter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
             errHandler.addError(E10064, &lgsEnum->location, {enumFieldName, lgsEnum->name});
             break;
         }
-        const auto field = new LgsField(enumFieldName, &lgsEnum->name, lgsEnum);
+        const auto field = new LgsField(enumFieldName, lgsEnum);
         if (enumField->STRING()) {
             field->expr = getStrConst(enumField->STRING());
         }
@@ -413,7 +413,7 @@ LgsField* AntlrConverter::getInterfaceField(LogosParser::InterfaceFieldContext* 
     const auto name = ctx->IDENTIFIER()->getText();
     const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
-    const auto field = new LgsField(name, &parentName, type, expr);
+    const auto field = new LgsField(name, type, expr);
     field->isMutable = ctx->CONST() == nullptr;
     setLocation(field->location, ctx->start);
     return field;
@@ -423,7 +423,7 @@ LgsField* AntlrConverter::getField(LogosParser::FieldContext* ctx, std::string& 
     const auto name = ctx->IDENTIFIER()->getText();
     const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
-    const auto field = new LgsField(name, &parentName, type, expr);
+    const auto field = new LgsField(name, type, expr);
     field->isPublic = !!ctx->VISIBILITY();
     field->isMutable = ctx->CONST() == nullptr;
     field->position = position;
@@ -667,9 +667,6 @@ LgsExpr* AntlrConverter::getExpr(LogosParser::ExprContext* ctx) {
         expr = getExpr(ctx->left);
     }
     assert(expr);
-    if (!expr->type) {
-        expr->type = new LgsUnknownType();
-    }
     return expr;
 }
 
@@ -825,15 +822,16 @@ LgsFuncCall* AntlrConverter::getFuncCall(LogosParser::FuncCallContext* ctx) {
 }
 
 LgsUnaryExpr* AntlrConverter::getVector(LogosParser::VectorContext* ctx) {
+    const auto lgsVec = new LgsVector();
     if (ctx->VEC2()) {
-        const auto lgsVec = new LgsVec2();
-        setLocation(lgsVec->location, ctx->start);
-        for (const auto& expr : ctx->expr()) {
-            lgsVec->args.emplace_back(getExpr(expr));
-        }
-        return lgsVec;
+        lgsVec->type = new LgsVec2();
+        lgsVec->vecSize = 2;
     }
-    assert(0);
+    setLocation(lgsVec->location, ctx->start);
+    for (const auto& expr : ctx->expr()) {
+        lgsVec->args.emplace_back(getExpr(expr));
+    }
+    return lgsVec;
 }
 
 LgsInstance* AntlrConverter::getInstance(LogosParser::InstanceContext* ctx) {
@@ -891,7 +889,6 @@ std::vector<LgsUnaryExpr*> AntlrConverter::getSelectionExprs(LogosParser::Select
         const auto& currentExpr = innerSelections[i];
         if (const auto field = currentExpr->IDENTIFIER()) {
             const auto lgsField = getVariable(field);
-            lgsField->type = new LgsUnknownType();
             exprs.push_back(lgsField);
         } else if (const auto funcCall = currentExpr->funcCall()) {
             const auto logosMethodCall = getFuncCall(funcCall);
@@ -901,7 +898,6 @@ std::vector<LgsUnaryExpr*> AntlrConverter::getSelectionExprs(LogosParser::Select
             exprs.push_back(logosMethodCall);
         } else if (const auto iterIndex = currentExpr->iterIndex()) {
             const auto logosIterIndex = getIterIndex(iterIndex);
-            logosIterIndex->type = new LgsUnknownType();
             exprs.push_back(logosIterIndex);
         }
     }
@@ -1129,6 +1125,8 @@ LgsType* AntlrConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken) 
         type = &LGS_VOID;
     } else if (typeText == LgsStr::name) {
         type = new LgsStr();
+    } else if (typeText == LgsVec2::name) {
+        type = new LgsVec2();
     } else {
         type = new LgsUnknownType(typeText);
     }
