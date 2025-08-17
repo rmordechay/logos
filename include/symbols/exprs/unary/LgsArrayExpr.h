@@ -10,11 +10,12 @@ public:
 
     explicit LgsArrayExpr(LgsSArray* arrType) : LgsUnaryExpr(arrType) {}
     explicit LgsArrayExpr(LgsDArray* arrType) : LgsUnaryExpr(arrType) {
-        isHeapAlloc = true;
+        type->isHeapAlloc = true;
     }
     std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
     Value* createConstArray(LgsCodeGen* codeGen) const;
     Value* createDynamicArray(LgsCodeGen* codeGen);
+    LgsExpr* castTo(LgsType* toType) override;
     ~LgsArrayExpr() override = default;
 };

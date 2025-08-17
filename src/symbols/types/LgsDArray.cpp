@@ -39,26 +39,26 @@ uint16_t LgsDArray::getUnpackCount() const {
 }
 
 bool LgsDArray::equals(LgsType* other) {
-    if (!baseType) return false;
     const auto otherArr = other->asDArray();
     if (!otherArr) return false;
+    if (!baseType) return true;
     return baseType->equals(otherArr->baseType);
 }
 
 void LgsDArray::freeValue(LgsCodeGen* codeGen, Value* value) {
-    freeFunc.callIR(codeGen, {value});
+    freeFunc->callIR(codeGen, {value});
 }
 
 Value* LgsDArray::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return lenFunc.call(codeGen, {iterable});
+    return lenFunc->call(codeGen, {iterable});
 }
 
 Value* LgsDArray::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return isEmptyFunc.call(codeGen, {iterable});
+    return isEmptyFunc->call(codeGen, {iterable});
 }
 
 Value* LgsDArray::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return isNotEmptyFunc.call(codeGen, {iterable});
+    return isNotEmptyFunc->call(codeGen, {iterable});
 }
 
 StructType* LgsDArray::getArrStruct(LgsCodeGen* codeGen) {
@@ -73,12 +73,9 @@ Value* LgsArrayAddFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& a
     const auto exprIR = exprToAdd->getIRValue(codeGen);
     const auto arrPtr = arr->getIRValue(codeGen);
     const auto exprTy = exprToAdd->type;
-    if (exprTy->asBool()) return addBoolFunc.callIR(codeGen, {arrPtr, exprIR});
-    if (exprTy->asChar()) return addByteFunc.callIR(codeGen, {arrPtr, exprIR});
-    if (exprTy->asShort()) return addShortFunc.callIR(codeGen, {arrPtr, exprIR});
-    if (exprTy->asInt()) return addIntFunc.callIR(codeGen, {arrPtr, exprIR});
-    if (exprTy->asLong()) return addLongFunc.callIR(codeGen, {arrPtr, exprIR});
-    return callIR(codeGen, {arrPtr, exprIR});
+    const auto ptr = codeGen->builder.CreateAlloca(exprTy->getIRType(codeGen));
+    codeGen->builder.CreateStore(exprIR, ptr);
+    return callIR(codeGen, {arrPtr, ptr});
 }
 
 LgsDArray::~LgsDArray() {

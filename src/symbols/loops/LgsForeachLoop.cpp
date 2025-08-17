@@ -60,7 +60,7 @@ void LgsForeachLoop::setArrIterVars(LgsCodeGen* codeGen, LgsDArray* arr) const {
         if (withIndex) {
             loopVars[0]->setIRValue(iValue);
         }
-        const auto element = arr->getFunc.callIR(codeGen, {iterPtr, iValue});
+        const auto element = arr->getFunc->callIR(codeGen, {iterPtr, iValue});
         loopVars[0 + withIndex]->setIRValue(element);
     }
 }

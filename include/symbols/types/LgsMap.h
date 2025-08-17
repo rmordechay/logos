@@ -1,7 +1,6 @@
 #pragma once
 #include "LgsAny.h"
 #include "LgsStr.h"
-#include "primitives/LgsInt.h"
 #include "LgsVoid.h"
 #include "types/LgsTypePair.h"
 
@@ -12,21 +11,21 @@ public:
     static constexpr auto name = "Map";
     StructType* mapStruct = nullptr;
     LgsTypePair* typePair = nullptr;
-    LgsFunc getFunc{"get", &LGS_ANY, {this, new LgsStr()}, PUBLIC | INTERNAL | METHOD};
-    LgsFunc addFunc{"add", &LGS_VOID, {this, new LgsStr(), &LGS_ANY}, PUBLIC | INTERNAL | METHOD};
-    LgsFunc lenFunc{"len", &LGS_LONG, {this}, PUBLIC | INTERNAL | METHOD};
-    LgsFunc isEmptyFunc{"isEmpty", &LGS_BOOL, {this}, PUBLIC | INTERNAL | METHOD};
-    LgsFunc isNotEmptyFunc{"isNotEmpty", &LGS_BOOL, {this}, PUBLIC | INTERNAL | METHOD};
-    LgsFunc initFunc{"init", &LGS_VOID, {this, &LGS_LONG}, INTERNAL | METHOD};
-    LgsFunc deleteFunc{"delete", &LGS_VOID, {this, &LGS_ANY}, INTERNAL | METHOD};
-    LgsFunc freeFunc{"free", &LGS_VOID, {this}, INTERNAL | METHOD};
+    LgsFunc* getFunc = new LgsFunc("get", &LGS_ANY, {this, new LgsStr()}, PUBLIC | INTERNAL | METHOD);
+    LgsFunc* addFunc = new LgsFunc("add", &LGS_VOID, {this, new LgsStr(), &LGS_ANY}, PUBLIC | INTERNAL | METHOD);
+    LgsFunc* lenFunc = new LgsFunc("len", &LGS_LONG, {this}, PUBLIC | INTERNAL | METHOD);
+    LgsFunc* isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, PUBLIC | INTERNAL | METHOD);
+    LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, PUBLIC | INTERNAL | METHOD);
+    LgsFunc* initFunc = new LgsFunc("init", &LGS_VOID, {this, &LGS_LONG}, INTERNAL | METHOD);
+    LgsFunc* deleteFunc = new LgsFunc("delete", &LGS_VOID, {this, &LGS_ANY}, INTERNAL | METHOD);
+    LgsFunc* freeFunc = new LgsFunc("free", &LGS_VOID, {this}, INTERNAL | METHOD);
 
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {
         typePair = new LgsTypePair(keyType, valueType);
         baseType = typePair;
-        addMethod(&lenFunc);
-        addMethod(&isEmptyFunc);
-        addMethod(&isNotEmptyFunc);
+        addMethod(lenFunc);
+        addMethod(isEmptyFunc);
+        addMethod(isNotEmptyFunc);
     }
 
     Type* getIRType(LgsCodeGen* codeGen) override;

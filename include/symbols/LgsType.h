@@ -43,6 +43,7 @@ public:
     bool isUnsigned = false;
     bool isPrimitive = false;
     bool isSliceable = false;
+    bool isHeapAlloc = false;
     llvm::Type* IRType = nullptr;
     LgsLocation location{0, 0, 0};
     std::map<std::string, LgsField*> fields;

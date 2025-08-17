@@ -31,7 +31,6 @@ public:
     bool isNull = false;
     bool isSpread = false;
     bool isConstant = false;
-    bool isHeapAlloc = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     size_t getConstInt();
@@ -55,7 +54,7 @@ public:
 
     virtual LgsExpr* clone();
     virtual bool equals(LgsExpr* other);
-    virtual LgsExpr* castImplicitly(LgsType* toType);
+    virtual LgsExpr* castTo(LgsType* toType);
     virtual llvm::Value* hash(LgsCodeGen* codeGen);
 
     virtual std::string pname() = 0; // pretty name

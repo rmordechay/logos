@@ -60,7 +60,6 @@ bool LgsLinker::link() const {
         (paths.lgsRoot / "runtime").c_str(),
         paths.execFilePath.c_str()
     );
-    std::cout << linkCmd << std::endl;
     std::system(linkCmd);
     return true;
 }

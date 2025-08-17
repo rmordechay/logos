@@ -18,7 +18,7 @@ void LgsInstance::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
-LgsExpr* LgsInstance::castImplicitly(LgsType* toType) {
+LgsExpr* LgsInstance::castTo(LgsType* toType) {
     return this;
 }
 
@@ -36,14 +36,14 @@ void LgsInstance::initFields(LgsCodeGen* codeGen, std::map<std::string, LgsField
 void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
     const auto vtable = obj->vtable->type->asMap();
     const auto vtableGEP = codeGen->builder.CreateGEP(vtable->getIRType(codeGen), IRValue, {codeGen->i32Zero()});
-    vtable->initFunc.callIR(codeGen, {vtableGEP, codeGen->i64(sizeof(void*))});
+    vtable->initFunc->callIR(codeGen, {vtableGEP, codeGen->i64(sizeof(void*))});
     for (const auto& [methodName, method] : obj->methods) {
         if (!method->funcType->isVirtual) continue;
         const auto keyIRStr = codeGen->getIRStr(method->funcType->getName());
         const auto IRFunc = method->getIRFunc(codeGen);
         const auto valuePtr = codeGen->builder.CreateAlloca(codeGen->ptrTy());
         codeGen->builder.CreateStore(IRFunc, valuePtr);
-        vtable->addFunc.callIR(codeGen, {vtableGEP, keyIRStr, valuePtr});
+        vtable->addFunc->callIR(codeGen, {vtableGEP, keyIRStr, valuePtr});
     }
     for (const auto& [fieldName, field] : obj->fields) {
         if (!field->isVirtual) continue;
@@ -54,7 +54,7 @@ void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
         const auto loadGEP = codeGen->builder.CreateLoad(fieldIRType, fieldGEP);
         const auto valuePtr = codeGen->builder.CreateAlloca(fieldIRType);
         codeGen->builder.CreateStore(loadGEP, valuePtr);
-        vtable->addFunc.callIR(codeGen, {vtableGEP, keyIRStr, valuePtr});
+        vtable->addFunc->callIR(codeGen, {vtableGEP, keyIRStr, valuePtr});
     }
 }
 

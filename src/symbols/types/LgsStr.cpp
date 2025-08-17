@@ -3,7 +3,7 @@
 #include "types/LgsAny.h"
 
 Type* LgsStr::getIRBaseType(LgsCodeGen* codeGen) const {
-    return ArrayType::get(baseType->getIRType(codeGen), initialLength);
+    return ArrayType::get(baseType->getIRType(codeGen), sizeExpr->getConstInt());
 }
 
 Type* LgsStr::getIRType(LgsCodeGen* codeGen) {
@@ -11,7 +11,7 @@ Type* LgsStr::getIRType(LgsCodeGen* codeGen) {
 }
 
 size_t LgsStr::getSizeBytes() {
-    return initialLength + 1;
+    return isHeapAlloc ? sizeof(void*) : sizeExpr->getConstInt() + 1;
 }
 
 uint16_t LgsStr::getUnpackCount() const {
@@ -39,15 +39,15 @@ LgsType* LgsStr::getIndexType() {
 }
 
 Value* LgsStr::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return lenFunc.call(codeGen, {iterable});
+    return lenFunc->call(codeGen, {iterable});
 }
 
 Value* LgsStr::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return isEmptyFunc.call(codeGen, {iterable});
+    return isEmptyFunc->call(codeGen, {iterable});
 }
 
 Value* LgsStr::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return isNotEmptyFunc.call(codeGen, {iterable});
+    return isNotEmptyFunc->call(codeGen, {iterable});
 }
 
 bool LgsStr::equals(LgsType* other) {

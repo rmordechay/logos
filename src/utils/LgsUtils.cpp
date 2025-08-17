@@ -49,7 +49,7 @@ void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
     if (type->isUnknown() && type->getName() == "<Unknown>") return;
-    // delete type;
+    delete type;
 }
 
 size_t hashStr(const char* key) {

@@ -44,13 +44,13 @@ Value* LgsIterIndex::loadFromDArray(LgsCodeGen* codeGen, LgsDArray* arr) const {
     const auto arrPtr = baseExpr->getIRValue(codeGen);
     auto indexIRValue = index->from->getIRValue(codeGen);
     indexIRValue = codeGen->builder.CreateZExt(indexIRValue, codeGen->i64Ty());
-    return arr->getFunc.callIR(codeGen, {arrPtr, indexIRValue});
+    return arr->getFunc->callIR(codeGen, {arrPtr, indexIRValue});
 }
 
 Value* LgsIterIndex::loadFromMap(LgsCodeGen* codeGen, LgsMap* map) const {
     const auto mapPtr = baseExpr->getIRValue(codeGen);
     const auto key = index->from->getIRValue(codeGen);
-    return map->getFunc.callIR(codeGen, {mapPtr, key});
+    return map->getFunc->callIR(codeGen, {mapPtr, key});
 }
 
 Value* LgsIterIndex::createStrSlice(LgsCodeGen* codeGen, const LgsStr* str) const {

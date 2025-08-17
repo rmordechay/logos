@@ -12,7 +12,7 @@ void LgsShortConst::createIRValue(LgsCodeGen* codeGen) {
     IRValue = codeGen->i16(value);
 }
 
-LgsExpr* LgsShortConst::castImplicitly(LgsType* toType) {
+LgsExpr* LgsShortConst::castTo(LgsType* toType) {
     if (toType->asShort()) {
         return this;
     }

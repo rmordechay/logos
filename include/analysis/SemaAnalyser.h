@@ -103,7 +103,6 @@ public:
 
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);
-    bool validateExprType(LgsExpr* expr, LgsType* type);
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field, const LgsObject* parent);
@@ -112,17 +111,18 @@ public:
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     LgsSymbol* getSymbol(const std::string& name, LgsLocation* location);
+    LgsType* resolveType(LgsType* type);
     void addLocalSymbol(const LgsSymbol& newSymbol);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
-    LgsField* resolveVectorField(LgsVariable* fieldVar, LgsVec* vecType);
-    LgsType* resolveType(LgsType* type);
     void resolveIterable(LgsIterable* iterable);
     void resolveFuncTypes(LgsFuncType* funcType);
     void resolveObjTypes(LgsObject* obj);
     bool resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
     void resolveInterfaceTypes(LgsInterface* interface);
     void resolveGroupTypes(LgsGroup* group);
+    LgsExpr* matchExprToType(LgsExpr* expr, LgsType* type);
+    LgsField* resolveVectorField(LgsVariable* fieldVar, LgsVec* vecType);
     std::vector<uint8_t> resolveScalars(LgsVariable* fieldVar, LgsVec* vec);
     ~SemaAnalyser() = default;
 };

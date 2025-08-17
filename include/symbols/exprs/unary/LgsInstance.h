@@ -14,7 +14,7 @@ public:
     void setVirtuals(LgsCodeGen* codeGen) const;
     void initFields(LgsCodeGen* codeGen, std::map<std::string, LgsField*>& fields);
     void createIRValue(LgsCodeGen* codeGen) override;
-    LgsExpr* castImplicitly(LgsType* toType) override;
+    LgsExpr* castTo(LgsType* toType) override;
     std::string pname() override;
     ~LgsInstance() override;
 };

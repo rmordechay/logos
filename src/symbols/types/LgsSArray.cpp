@@ -6,12 +6,12 @@
 Type* LgsSArray::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;
     const auto innerIRType = baseType->getIRType(codeGen);
-    IRType = ArrayType::get(innerIRType, fixedLength);
+    IRType = ArrayType::get(innerIRType, sizeExpr->getConstInt());
     return IRType;
 }
 
 size_t LgsSArray::getSizeBytes() {
-    return baseType->getSizeBytes() * fixedLength;
+    return baseType->getSizeBytes() * sizeExpr->getConstInt();
 }
 
 uint16_t LgsSArray::getUnpackCount() const {
@@ -32,7 +32,9 @@ std::string LgsSArray::strFormatPart() const {
 }
 
 std::string LgsSArray::pname() {
-    return baseType->pname() + '[' + (fixedLength == 0 ? "" : std::to_string(fixedLength)) + "]!";
+    const auto index = sizeExpr->getConstInt() == 0 ? "" : std::to_string(sizeExpr->getConstInt());
+    const auto ty = baseType ? baseType->pname() : "";
+    return ty + '[' + index + "]!";
 }
 
 bool LgsSArray::equals(LgsType* other) {

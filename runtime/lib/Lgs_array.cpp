@@ -1,4 +1,5 @@
 #include <cstring>
+#include <iostream>
 #include <vector>
 
 struct Lgs_Array {
@@ -12,32 +13,31 @@ extern "C" void Lgs_DArray_init(Lgs_Array* arr, const size_t elementSize) {
 }
 
 extern "C" void Lgs_DArray_add(const Lgs_Array* arr, const void* value) {
-    auto& vec = *arr->data;
-    const auto oldSize = vec.size();
-    vec.resize(oldSize + arr->elementSize);
-    std::memcpy(vec.data() + oldSize, value, arr->elementSize);
+    const auto oldSize = arr->data->size();
+    arr->data->resize(oldSize + arr->elementSize);
+    std::memcpy(arr->data->data() + oldSize, value, arr->elementSize);
 }
 
 extern "C" void Lgs_DArray_addBool(const Lgs_Array* a, const bool v)   {
     Lgs_DArray_add(a, &v);
 }
 
-extern "C" void Lgs_DArray_addShort(const Lgs_Array* a, const int32_t v) {
+extern "C" void Lgs_DArray_addShort(const Lgs_Array* a, const int16_t v) {
     Lgs_DArray_add(a, &v);
 }
 
-extern "C" void Lgs_DArray_addInt(const Lgs_Array* a, const bool v)   {
+extern "C" void Lgs_DArray_addInt(const Lgs_Array* a, const int32_t v)   {
     Lgs_DArray_add(a, &v);
 }
 
-extern "C" void Lgs_DArray_addLong(const Lgs_Array* a, const bool v)   {
+extern "C" void Lgs_DArray_addLong(const Lgs_Array* a, const int64_t v)   {
     Lgs_DArray_add(a, &v);
 }
 
 extern "C" void* Lgs_DArray_get(const Lgs_Array* arr, const size_t index) {
-    auto& vec = *arr->data;
-    if (index >= vec.size() / arr->elementSize) std::abort();
-    return vec.data() + index * arr->elementSize;
+    const auto arrLen = arr->data->size() / arr->elementSize;
+    if (index >= arrLen) std::exit(1);
+    return arr->data->data() + index * arr->elementSize;
 }
 
 extern "C" size_t Lgs_DArray_len(const Lgs_Array* arr) {
@@ -52,7 +52,6 @@ extern "C" bool Lgs_DArray_isNotEmpty(const Lgs_Array* arr) {
     return !arr->data->empty();
 }
 
-extern "C" void Lgs_DArray_free(Lgs_Array* arr) {
+extern "C" void Lgs_DArray_free(const Lgs_Array* arr) {
     delete arr->data;
-    arr->data = nullptr;
 }

@@ -90,7 +90,7 @@ void LgsAssignment::assignScalarToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* i
     if (const auto arr = baseExpr->type->asDArray()) {
         const auto ptr = codeGen->builder.CreateAlloca(expr->type->getIRType(codeGen));
         codeGen->builder.CreateStore(rIRValue, ptr);
-        arr->putFunc.callIR(codeGen, {baseIRValue, iterIndex->index->from->getIRValue(codeGen), ptr});
+        arr->putFunc->callIR(codeGen, {baseIRValue, iterIndex->index->from->getIRValue(codeGen), ptr});
         return;
     }
     if (baseExpr->type->asSArray()) {
@@ -99,7 +99,7 @@ void LgsAssignment::assignScalarToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* i
     }
     if (const auto map = baseExpr->type->asMap()) {
         const auto key = iterIndex->index->from->getIRValue(codeGen);
-        map->addFunc.callIR(codeGen, {baseIRValue, key, rIRValue});
+        map->addFunc->callIR(codeGen, {baseIRValue, key, rIRValue});
     } else {
         const auto iterPtr = iterIndex->getIRValue(codeGen);
         codeGen->builder.CreateStore(rIRValue, iterPtr);

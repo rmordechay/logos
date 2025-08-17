@@ -6,12 +6,11 @@
 class LgsSArray final : public LgsIterable {
 public:
     static constexpr auto name = "SArray";
-    size_t fixedLength = 0;
-    LgsFunc lenFunc{"len", &LGS_INT, {this}, PUBLIC | METHOD};
+    LgsFunc* lenFunc = new LgsFunc("len", &LGS_INT, {this}, PUBLIC | METHOD);
 
     explicit LgsSArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
         isSliceable = true;
-        addMethod(&lenFunc);
+        addMethod(lenFunc);
     }
 
     Type* getIRType(LgsCodeGen* codeGen) override;

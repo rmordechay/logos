@@ -11,7 +11,6 @@ public:
     explicit LgsStrConst(const std::string& value) : value(value) {
         const auto lgsStr = new LgsStr();
         lgsStr->sizeExpr = new LgsIntConst(value.size());
-        lgsStr->initialLength = value.size();
         type = lgsStr;
     }
 

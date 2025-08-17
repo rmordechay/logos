@@ -27,11 +27,11 @@ Value* LgsMap::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
 }
 
 Value* LgsMap::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return isEmptyFunc.call(codeGen, {iterable});
+    return isEmptyFunc->call(codeGen, {iterable});
 }
 
 Value* LgsMap::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return isNotEmptyFunc.call(codeGen, {iterable});
+    return isNotEmptyFunc->call(codeGen, {iterable});
 }
 
 std::string LgsMap::getName() {
@@ -51,7 +51,7 @@ bool LgsMap::equals(LgsType* other) {
 }
 
 void LgsMap::freeValue(LgsCodeGen* codeGen, Value* value) {
-    freeFunc.callIR(codeGen, {value});
+    freeFunc->callIR(codeGen, {value});
 }
 
 StructType* LgsMap::getMapStruct(LgsCodeGen* codeGen) {

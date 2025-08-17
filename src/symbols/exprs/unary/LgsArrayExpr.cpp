@@ -1,7 +1,8 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "cli/LgsCli.h"
 #include "exprs/unary/LgsIterIndex.h"
-#include "configs/LgsConfig.h"
+
+#include <llvm/IR/Module.h>
 
 std::string LgsArrayExpr::pname() {
     return type->pname();
@@ -14,22 +15,18 @@ void LgsArrayExpr::createIRValue(LgsCodeGen* codeGen) {
 }
 
 Value* LgsArrayExpr::createDynamicArray(LgsCodeGen* codeGen) {
-    auto& builder = codeGen->builder;
     const auto arr = type->asDArray();
-    const auto elementSize = codeGen->i64(arr->baseType->getSizeBytes());
+    const auto dl = codeGen->IRModule->getDataLayout();
+    const auto size = dl.getTypeAllocSize(arr->baseType->getIRType(codeGen));
+    const auto elementSize = codeGen->i64(size);
     const auto arrSize = codeGen->typeSize(arr->getArrStruct(codeGen));
     IRValue = codeGen->callMalloc(arrSize.getFixedValue());
-
-    Value* capacityIR = nullptr;
-    if (arr->sizeExpr) {
-        capacityIR = arr->sizeExpr->getIRValue(codeGen);
-        capacityIR = builder.CreateZExt(capacityIR, codeGen->i64Ty());
-    } else {
-        capacityIR = codeGen->isize(INITIAL_ARRAY_CAPACITY);
-    }
-
-    arr->initFunc.callIR(codeGen, {IRValue, capacityIR, elementSize});
+    arr->initFunc->callIR(codeGen, {IRValue, elementSize});
     return IRValue;
+}
+
+LgsExpr* LgsArrayExpr::castTo(LgsType* toType) {
+    return this;
 }
 
 Value* LgsArrayExpr::createConstArray(LgsCodeGen* codeGen) const {
@@ -37,7 +34,7 @@ Value* LgsArrayExpr::createConstArray(LgsCodeGen* codeGen) const {
     const auto arr = type->asSArray();
     const auto baseType = arr->baseType;
     const auto baseIRType = baseType->getIRType(codeGen);
-    const auto arrIRType = ArrayType::get(baseIRType, arr->fixedLength);
+    const auto arrIRType = ArrayType::get(baseIRType, arr->sizeExpr->getConstInt());
     const auto arrIRPtr = builder.CreateAlloca(arrIRType);
     if (initialElements.empty()) return arrIRPtr;
     for (int i = 0; i < initialElements.size(); ++i) {

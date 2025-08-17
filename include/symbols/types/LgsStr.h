@@ -40,15 +40,14 @@ public:
 class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
-    size_t initialLength = 0;
-    LgsStrLen lenFunc{this};
-    LgsStrIsEmpty isEmptyFunc{this};
-    LgsStrIsNotEmpty isNotEmptyFunc{this};
+    LgsStrLen* lenFunc = new LgsStrLen(this);
+    LgsStrIsEmpty* isEmptyFunc = new LgsStrIsEmpty(this);
+    LgsStrIsNotEmpty* isNotEmptyFunc = new LgsStrIsNotEmpty(this);
 
     LgsStr() : LgsIterable(&LGS_CHAR) {
-        addMethod(&lenFunc);
-        addMethod(&isEmptyFunc);
-        addMethod(&isNotEmptyFunc);
+        addMethod(lenFunc);
+        addMethod(isEmptyFunc);
+        addMethod(isNotEmptyFunc);
         isSliceable = true;
     }
     Type* getIRBaseType(LgsCodeGen* codeGen) const;
