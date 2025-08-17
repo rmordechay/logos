@@ -48,7 +48,7 @@ std::string removeUnderscores(const std::string& input) {
 void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
-    if (type->isUnknown() && type->getName() == "") return;
+    if (type->isUnknown() && type->getName() == "<Unknown>") return;
     // delete type;
 }
 

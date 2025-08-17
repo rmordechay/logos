@@ -49,7 +49,7 @@ public:
         addMethod(&lenFunc);
         addMethod(&isEmptyFunc);
         addMethod(&isNotEmptyFunc);
-        canSlice = true;
+        isSliceable = true;
     }
     Type* getIRBaseType(LgsCodeGen* codeGen) const;
     Type* getIRType(LgsCodeGen* codeGen) override;

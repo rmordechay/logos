@@ -2,6 +2,10 @@
 #include <utility>
 #include "LgsType.h"
 
+/**
+ * Only named unknown types should be allocated on the heap, otherwise
+ * use the singleton instance.
+ */
 class LgsUnknownType final : public LgsType {
 public:
     std::string name;
@@ -15,3 +19,8 @@ public:
     bool equals(LgsType* other) override;
     ~LgsUnknownType() override = default;
 };
+
+static LgsUnknownType* lgsUnknownType() {
+    static LgsUnknownType instance("<Unknown>");
+    return &instance;
+}

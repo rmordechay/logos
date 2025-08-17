@@ -765,7 +765,7 @@ void SemaAnalyser::visitSlice(LgsIterIndex* iterIndex) {
     const auto exprFrom = iterIndex->index->from;
     const auto exprTo = iterIndex->index->to;
     const auto iterable = baseExpr->type->asIterable();
-    if (!baseExpr->type->canSlice) {
+    if (!baseExpr->type->isSliceable) {
         return errHandler.addError(E10042, &iterIndex->location, {iterIndex->pname(), baseExpr->type->pname()});
     }
     if (!iterable->getIndexType()->equals(exprFrom->type)) {

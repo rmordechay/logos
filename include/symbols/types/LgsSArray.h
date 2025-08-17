@@ -10,7 +10,7 @@ public:
     LgsFunc lenFunc{"len", &LGS_INT, {this}, PUBLIC | METHOD};
 
     explicit LgsSArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
-        canSlice = true;
+        isSliceable = true;
         addMethod(&lenFunc);
     }
 

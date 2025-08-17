@@ -42,7 +42,7 @@ public:
     bool isNumber = false;
     bool isUnsigned = false;
     bool isPrimitive = false;
-    bool canSlice = false;
+    bool isSliceable = false;
     llvm::Type* IRType = nullptr;
     LgsLocation location{0, 0, nullptr};
     std::map<std::string, LgsField*> fields;

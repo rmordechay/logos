@@ -41,7 +41,7 @@ public:
         addMethod(&lenFunc);
         addMethod(&isEmptyFunc);
         addMethod(&isNotEmptyFunc);
-        canSlice = true;
+        isSliceable = true;
     }
     Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
