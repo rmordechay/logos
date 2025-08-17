@@ -8,8 +8,11 @@ add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
 find_package(antlr4-runtime REQUIRED)
+find_package(Boost CONFIG REQUIRED context coroutine)
+
 set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
+
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
     set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
@@ -17,20 +20,20 @@ if (CCACHE_PROGRAM)
 endif()
 
 llvm_map_components_to_libnames(LLVM_LIBS
-        support
-        core
-        irreader
-        linker
-        aarch64codegen
-        asmparser
-        asmprinter
-        coroutines
-        passes
-        aarch64asmparser
-        option
+    support
+    core
+    irreader
+    linker
+    aarch64codegen
+    asmparser
+    asmprinter
+    coroutines
+    passes
+    aarch64asmparser
+    option
 )
 
-set(SOURCE_FILES
+set(CORE_SOURCES
     src/utils/LgsErrHandler.cpp
     src/logos/LgsApp.cpp
     src/logos/LgsStack.cpp
@@ -122,9 +125,25 @@ set(SOURCE_FILES
     src/logos/LgsPaths.cpp
 )
 
-add_subdirectory(runtime)
-add_library(lgs_core SHARED ${SOURCE_FILES})
-target_link_libraries(lgs_core PUBLIC LLVM clang-cpp antlr4_shared)
+set(RUNTIME_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_hashmap.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_array.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_helpers.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_system.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_defer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_runtime.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_scheduler.cpp
+)
+
+add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})
+target_link_libraries(lgs_core PUBLIC
+    LLVM
+    clang-cpp
+    antlr4_shared
+    Boost::context
+    Boost::coroutine
+)
+
 target_precompile_headers(lgs_core PRIVATE include/pch.h)
 target_include_directories(lgs_core PUBLIC
     include/external/include
@@ -133,9 +152,10 @@ target_include_directories(lgs_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
     ${CMAKE_CURRENT_SOURCE_DIR}/include/parser
+    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/include
 )
 
 add_executable(lgs main.cpp)
-target_link_libraries(lgs PRIVATE lgs_core lgs_runtime)
+target_link_libraries(lgs PRIVATE lgs_core)
 
 add_subdirectory(tests)

@@ -11,11 +11,11 @@ struct LgsBaseError {
     size_t const errCode;
 };
 
-typedef struct {
+struct LgsError {
     char* msg;
     size_t errCode;
     LgsLocation* location;
-} LgsError;
+};
 
 /** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */
 inline size_t errCodeStart = 10000;

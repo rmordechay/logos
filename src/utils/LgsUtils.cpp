@@ -81,3 +81,11 @@ void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& 
         argIndex++;
     }
 }
+
+void logError(const LgsError& err, const std::string& path) {
+    logInfo(LGS_ERROR_STR + std::string(err.msg));
+    logInfo(path);
+    logInfo("\n---\n");
+    assert(strlen(err.msg) > 0);
+    free(err.msg);
+}

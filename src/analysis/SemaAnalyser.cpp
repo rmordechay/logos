@@ -954,18 +954,31 @@ bool SemaAnalyser::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, cons
     return isValid;
 }
 
-LgsSymbol* SemaAnalyser::getSymbol(const std::string& name, LgsLocation* location) {
-    if (const auto globalSymbol = globals.getSymbol(name)) {
-        return globalSymbol;
+LgsExpr* SemaAnalyser::matchExprToType(LgsExpr* expr, LgsType* type) {
+    if (expr->type == type) return expr;
+    if (expr->isNull) {
+        // null must have a type
+        if (!type || type->isUnknown()) {
+            errHandler.addError(E10024, &expr->location);
+            return expr;
+        }
+        // type must be nullable
+        if (!type->asNullable()) {
+            errHandler.addError(E10023, &type->location, {type->pname(), type->pname()});
+            return expr;
+        }
+        return expr;
     }
-    if (const auto fileSymbol = file->symbolTable.getSymbol(name)) {
-        return fileSymbol;
+    if (!type || !expr->type || expr->type->isUnknown()) return expr;
+    if (!expr->type->equals(type)) {
+        errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
+        return expr;
     }
-    if (const auto symbol = stack.getSymbolTable().getSymbol(name)) {
-        return symbol;
+    const auto castExpr = expr->castTo(type);
+    if (expr != castExpr) {
+        delete expr;
     }
-    errHandler.addError(E10006, location, {name});
-    return nullptr;
+    return castExpr;
 }
 
 LgsType* SemaAnalyser::resolveType(LgsType* type) {
@@ -1018,18 +1031,6 @@ LgsType* SemaAnalyser::resolveType(LgsType* type) {
         type = newType;
     }
     return type;
-}
-
-void SemaAnalyser::addLocalSymbol(const LgsSymbol& newSymbol) {
-    auto symbolName = *newSymbol.name;
-    const auto symbol = globals.getSymbol(symbolName);
-    if (symbol && symbol->isBuiltin) {
-        return errHandler.addError(E10053, newSymbol.location, {symbolName});
-    }
-    if (file->symbolTable.getSymbol(symbolName)) {
-        return errHandler.addError(E10011, newSymbol.location, {symbolName});
-    }
-    stack.getSymbolTable().addSymbol(newSymbol, &errHandler);
 }
 
 void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
@@ -1130,33 +1131,6 @@ void SemaAnalyser::resolveGroupTypes(LgsGroup* group) {
     }
 }
 
-LgsExpr* SemaAnalyser::matchExprToType(LgsExpr* expr, LgsType* type) {
-    if (expr->type == type) return expr;
-    if (expr->isNull) {
-        // null must have a type
-        if (!type || type->isUnknown()) {
-            errHandler.addError(E10024, &expr->location);
-            return expr;
-        }
-        // type must be nullable
-        if (!type->asNullable()) {
-            errHandler.addError(E10023, &type->location, {type->pname(), type->pname()});
-            return expr;
-        }
-        return expr;
-    }
-    if (!type || !expr->type || expr->type->isUnknown()) return expr;
-    if (!expr->type->equals(type)) {
-        errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
-        return expr;
-    }
-    const auto castExpr = expr->castTo(type);
-    if (expr != castExpr) {
-        delete expr;
-    }
-    return castExpr;
-}
-
 LgsField* SemaAnalyser::resolveVectorField(LgsVariable* fieldVar, LgsVec* vecType) {
     const auto scalarPositions = resolveScalars(fieldVar, vecType);
     if (scalarPositions.empty()) return nullptr;
@@ -1197,4 +1171,30 @@ std::vector<uint8_t> SemaAnalyser::resolveScalars(LgsVariable* fieldVar, LgsVec*
         indices.push_back(componentIndex);
     }
     return indices;
+}
+
+LgsSymbol* SemaAnalyser::getSymbol(const std::string& name, LgsLocation* location) {
+    if (const auto globalSymbol = globals.getSymbol(name)) {
+        return globalSymbol;
+    }
+    if (const auto fileSymbol = file->symbolTable.getSymbol(name)) {
+        return fileSymbol;
+    }
+    if (const auto symbol = stack.getSymbolTable().getSymbol(name)) {
+        return symbol;
+    }
+    errHandler.addError(E10006, location, {name});
+    return nullptr;
+}
+
+void SemaAnalyser::addLocalSymbol(const LgsSymbol& newSymbol) {
+    auto symbolName = *newSymbol.name;
+    const auto symbol = globals.getSymbol(symbolName);
+    if (symbol && symbol->isBuiltin) {
+        return errHandler.addError(E10053, newSymbol.location, {symbolName});
+    }
+    if (file->symbolTable.getSymbol(symbolName)) {
+        return errHandler.addError(E10011, newSymbol.location, {symbolName});
+    }
+    stack.getSymbolTable().addSymbol(newSymbol, &errHandler);
 }

@@ -50,14 +50,13 @@ bool LgsLinker::link() const {
         return false;
     }
     char linkCmd[1024];
-    const auto runtimeDir = (paths.lgsRoot / "runtime").c_str();
     std::snprintf(
         linkCmd,
         sizeof(linkCmd),
         LINK_STRING,
         paths.objFilePath.c_str(),
-        (paths.lgsRoot / "runtime").c_str(),
-        (paths.lgsRoot / "runtime").c_str(),
+        paths.lgsRoot.c_str(),
+        paths.lgsRoot.c_str(),
         paths.execFilePath.c_str()
     );
     std::system(linkCmd);

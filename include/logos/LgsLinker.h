@@ -8,7 +8,7 @@ namespace llvm {
 class LgsFile;
 class LgsCodeGen;
 
-const auto LINK_STRING = "clang++ %s -L%s -llgs_runtime -Wl,-rpath,%s -o %s";
+const auto LINK_STRING = "clang++ %s -L%s -llgs_core -Wl,-rpath,%s -o %s";
 
 class LgsLinker {
 public:

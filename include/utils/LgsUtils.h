@@ -1,5 +1,6 @@
 #pragma once
 
+struct LgsError;
 struct LgsBaseError;
 class LgsFile;
 class LgsErrHandler;
@@ -17,3 +18,4 @@ std::string removeUnderscores(const std::string& input);
 void freeType(LgsType* type);
 size_t hashStr(const char* key);
 void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& args, std::string& result);
+void logError(const LgsError& err, const std::string& path);

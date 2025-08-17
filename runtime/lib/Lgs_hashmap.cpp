@@ -1,7 +1,6 @@
-#include "Lgs_helpers.h"
+#include "types/LgsMap.h"
 #include "utils/LgsErrHandler.h"
 #include "utils/LgsUtils.h"
-
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -32,7 +31,7 @@ extern "C" void* Lgs_Map_get(const Lgs_Map* map, const char* key) {
     const auto it = map->data->find(key);
     if (it == map->data->end()) {
         std::string msg;
-        formatErrorMsg(E10000, {"roi", "roi"}, msg);
+        formatErrorMsg(E10067, {key, LgsMap::name}, msg);
         std::cout << msg << std::endl;
         return nullptr;
     }

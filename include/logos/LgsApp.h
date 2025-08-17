@@ -57,3 +57,4 @@ public:
     bool checkParserErrors(LogosParser* parser);
     ~LgsApp();
 };
+

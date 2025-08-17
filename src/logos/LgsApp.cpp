@@ -276,28 +276,18 @@ void LgsApp::writeIRFiles() {
 }
 
 void LgsApp::exitWithErrors() const {
-    for (int i = 0; i < errHandler.errors.size(); ++i) {
-        const auto lgsError = errHandler.errors[i];
-        const auto path = "\n   at:  " + getFullPath(lgsError.location);
-        logInfo(LGS_ERROR_STR + std::string(lgsError.msg));
-        logInfo(path);
-        if (i != errHandler.errors.size() - 1) logInfo("\n---\n");
-        else logInfo("\n");
-        assert(strlen(lgsError.msg) > 0);
-        free(lgsError.msg);
+    for (const auto& err : errHandler.errors) {
+        const auto path = "\n   at:  " + getFullPath(err.location);
+        logError(err, path);
     }
     exit(1);
 }
 
 std::string LgsApp::getFullPath(const LgsLocation* location) const {
+    assert(location->fileID > 0);
     const auto posInLine = std::to_string(location->posInLine);
     const auto lineNumber = std::to_string(location->lineStart);
-    LgsFile* file;
-    if (location->fileID != 0) {
-        file = appFile;
-    } else {
-        file = ast[location->fileID - 1];
-    }
+    const auto file = ast[location->fileID - 1];
     const auto filePath = file->absPath.string();
     return filePath + ":" + lineNumber + ":" + posInLine;
 }

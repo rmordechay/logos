@@ -110,9 +110,8 @@ public:
     void validateFuncControlFlow(LgsFunc* func);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
-    LgsSymbol* getSymbol(const std::string& name, LgsLocation* location);
+    LgsExpr* matchExprToType(LgsExpr* expr, LgsType* type);
     LgsType* resolveType(LgsType* type);
-    void addLocalSymbol(const LgsSymbol& newSymbol);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     void resolveIterable(LgsIterable* iterable);
@@ -121,8 +120,9 @@ public:
     bool resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
     void resolveInterfaceTypes(LgsInterface* interface);
     void resolveGroupTypes(LgsGroup* group);
-    LgsExpr* matchExprToType(LgsExpr* expr, LgsType* type);
     LgsField* resolveVectorField(LgsVariable* fieldVar, LgsVec* vecType);
     std::vector<uint8_t> resolveScalars(LgsVariable* fieldVar, LgsVec* vec);
+    LgsSymbol* getSymbol(const std::string& name, LgsLocation* location);
+    void addLocalSymbol(const LgsSymbol& newSymbol);
     ~SemaAnalyser() = default;
 };
