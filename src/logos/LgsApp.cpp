@@ -12,7 +12,6 @@
 #include "utils/ThreadPool.h"
 #include "builtins/LgsBuiltins.h"
 #include "builtins/LgsSystem.h"
-#include "lgsc/LgsCLang.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "funcs/LgsMainFunc.h"
@@ -32,19 +31,19 @@ enum LogLevel {
 
 void LgsApp::run() {
     // Validation
-    if (!validate()) exitWithErrors();
+    if (!validate()) exitWithErrors(errHandler, ast);
 
     // Lexing and Parsing
-    if (!parse()) exitWithErrors();
+    if (!parse()) exitWithErrors(errHandler, ast);
 
     // Semantic analysis
-    if (!analyse()) exitWithErrors();
+    if (!analyse()) exitWithErrors(errHandler, ast);
 
     // Code generation
-    if (!generate()) exitWithErrors();
+    if (!generate()) exitWithErrors(errHandler, ast);
 
     // Linking
-    if (!link()) exitWithErrors();
+    if (!link()) exitWithErrors(errHandler, ast);
 
     // Running
     execute();
@@ -79,7 +78,7 @@ bool LgsApp::parse() {
 }
 
 bool LgsApp::analyse() {
-    if (!resolveGlobalTypes()) exitWithErrors();
+    if (!resolveGlobalTypes()) exitWithErrors(errHandler, ast);
     for (const auto file : ast) {
         threadPool.runTask([this, file] {
             SemaAnalyser semaAnalyser(file, globals);
@@ -273,23 +272,6 @@ void LgsApp::writeIRFiles() {
             module->print(textFile, nullptr);
         }
     }
-}
-
-void LgsApp::exitWithErrors() const {
-    for (const auto& err : errHandler.errors) {
-        const auto path = "\n   at:  " + getFullPath(err.location);
-        logError(err, path);
-    }
-    exit(1);
-}
-
-std::string LgsApp::getFullPath(const LgsLocation* location) const {
-    assert(location->fileID > 0);
-    const auto posInLine = std::to_string(location->posInLine);
-    const auto lineNumber = std::to_string(location->lineStart);
-    const auto file = ast[location->fileID - 1];
-    const auto filePath = file->absPath.string();
-    return filePath + ":" + lineNumber + ":" + posInLine;
 }
 
 LgsApp::~LgsApp() {

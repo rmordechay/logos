@@ -12,7 +12,7 @@ struct LgsBaseError {
 };
 
 struct LgsError {
-    char* msg;
+    std::string msg;
     size_t errCode;
     LgsLocation* location;
 };
@@ -86,7 +86,7 @@ inline LgsBaseError E10063{.msg = "Interfaces must have at least one (abstract) 
 inline LgsBaseError E10064{.msg = "'%s' is already defined in '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10065{.msg = "'for.isFirst' and 'for.isLast' are not allowed in a while loop.", .errCode = errCodeStart++};
 inline LgsBaseError E10066{.msg = "While loop condition '%s' must be of type Bool. Given: '%s'.", .errCode = errCodeStart++};
-inline LgsBaseError E10067{.msg = "'%s' was not found in '%s'", .errCode = errCodeStart++};
+inline LgsBaseError E10067{.msg = "'%s' was not found.", .errCode = errCodeStart++};
 inline LgsBaseError E10068{.msg = "App version must be in the form of '1.0.0'. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10069{.msg = "Too many scalars passed to '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10070{.msg = "Invalid scalars '%s' for '%s'.", .errCode = errCodeStart++};

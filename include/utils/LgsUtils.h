@@ -8,7 +8,11 @@ struct LgsLocation;
 class LgsType;
 
 void logInfo(const std::string& text = "");
-void logErr(const std::string& text);
+void logError(const std::string& msg, const std::string& path = "");
+void formatAndLogError(const LgsBaseError& lgsErr, const std::vector<std::string>& args);
+void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& args, std::string& result);
+void exitWithErrors(const LgsErrHandler& errHandler, const std::vector<LgsFile*>& ast);
+std::string getFullPath(const LgsLocation* location, const std::vector<LgsFile*>& ast);
 bool isLogosFile(const fs::directory_entry& entry);
 bool isLLVMFile(const fs::directory_entry& entry);
 bool isLogosKeyword(const std::string& s);
@@ -17,5 +21,3 @@ std::string getFileText(const fs::path& filePath);
 std::string removeUnderscores(const std::string& input);
 void freeType(LgsType* type);
 size_t hashStr(const char* key);
-void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& args, std::string& result);
-void logError(const LgsError& err, const std::string& path);

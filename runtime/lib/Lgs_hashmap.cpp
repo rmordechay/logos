@@ -1,10 +1,6 @@
 #include "types/LgsMap.h"
 #include "utils/LgsErrHandler.h"
 #include "utils/LgsUtils.h"
-#include <unordered_map>
-#include <string>
-#include <vector>
-#include <cstring>
 
 struct Lgs_Map {
     size_t valueSize;
@@ -30,9 +26,7 @@ extern "C" void* Lgs_Map_get(const Lgs_Map* map, const char* key) {
     if (!map || !key) std::exit(1);
     const auto it = map->data->find(key);
     if (it == map->data->end()) {
-        std::string msg;
-        formatErrorMsg(E10067, {key, LgsMap::name}, msg);
-        std::cout << msg << std::endl;
+        formatAndLogError(E10067, {key});
         return nullptr;
     }
     return it->second.data();

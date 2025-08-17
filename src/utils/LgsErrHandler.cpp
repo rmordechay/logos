@@ -1,8 +1,6 @@
 #include "utils/LgsErrHandler.h"
 #include "logos/LgsCodeGen.h"
 #include "utils/LgsUtils.h"
-#define MSG_PLACEHOLDER "%s"
-#define MSG_PADDING_PLACEHOLDER "%p"
 
 void LgsErrHandler::setUnsuccessful() {
     successful = false;
@@ -13,9 +11,9 @@ void LgsErrHandler::addError(const LgsBaseError& lgsErr, LgsLocation* location, 
     std::string result;
     formatErrorMsg(lgsErr, args, result);
     if (location) {
-        errors.emplace_back(LgsError{.msg = strdup(result.c_str()), .errCode = lgsErr.errCode, .location = location});
+        errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.errCode, .location = location});
     } else {
-        errors.emplace_back(LgsError{.msg = strdup(result.c_str()), .errCode = lgsErr.errCode});
+        errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.errCode});
     }
 }
 

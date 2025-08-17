@@ -52,8 +52,6 @@ public:
     bool resolveGlobalTypes();
     void setEnvVars();
     void writeIRFiles();
-    void exitWithErrors() const;
-    std::string getFullPath(const LgsLocation* location) const;
     bool checkParserErrors(LogosParser* parser);
     ~LgsApp();
 };

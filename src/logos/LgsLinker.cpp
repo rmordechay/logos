@@ -17,11 +17,13 @@ std::unique_ptr<Module> parseModule(LLVMContext& context, const std::string& pat
     SMDiagnostic diag;
     auto parsedModule = parseIRFile(path, diag, context);
     if (!parsedModule) {
-        logErr(diag.getMessage().str());
-        logErr(diag.getLineContents().str());
+        std::stringstream errMsg;
+        errMsg << diag.getMessage().str();
+        errMsg << diag.getLineContents().str();
         for (auto fixIt : diag.getFixIts()) {
-            logErr(fixIt.getText().str());
+            errMsg << fixIt.getText().str();
         }
+        logError(errMsg.str());
         return nullptr;
     }
     return parsedModule;
@@ -87,7 +89,7 @@ bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachin
     raw_fd_ostream outputStream(paths.objFilePath.c_str(), ec, sys::fs::OF_None);
     const auto addedPassFailed = targetMachine->addPassesToEmitFile(pass, outputStream, nullptr, CodeGenFileType::ObjectFile);
     if (addedPassFailed) {
-        logErr(ec.message() + '\n');
+        logError(ec.message() + '\n');
         return false;
     }
 
