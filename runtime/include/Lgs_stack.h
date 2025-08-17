@@ -4,19 +4,19 @@
 
 typedef void (*Lgs_Defer_Func)(void*);
 
-typedef struct {
+struct Lgs_Thunk_Func {
     Lgs_Defer_Func func;
     void* ctx;
-} Lgs_Thunk_Func;
+};
 
-typedef struct {
+struct Lgs_Stack_Frame {
     Lgs_Thunk_Func defers[LOCALS_CAPACITY];
     Lgs_Thunk_Func coros[LOCALS_CAPACITY];
     int defers_count;
     int coros_count;
-} Lgs_Stack_Frame;
+};
 
-typedef struct {
+struct Lgs_Stack {
     Lgs_Stack_Frame frames[STACK_CAPACITY];
     int top;
-} Lgs_Stack;
+};

@@ -128,7 +128,6 @@ set(CORE_SOURCES
 set(RUNTIME_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_hashmap.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_array.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_helpers.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_system.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_defer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_runtime.cpp

@@ -71,20 +71,20 @@ public:
 class LgsSystem final : public LgsObject {
 public:
     static constexpr auto name = "System";
-    LgsSystemPid pidFunc{this};
-    LgsSystemSleep sleepFunc{this};
-    LgsSystemExit exitFunc{this};
-    LgsSystemCwd cwdFunc{this};
-    LgsSystemGetEnv getEnvFunc{this};
-    LgsSystemCoresNum coresNumFunc{this};
+    LgsSystemPid* pidFunc = new LgsSystemPid{this};
+    LgsSystemSleep* sleepFunc = new LgsSystemSleep{this};
+    LgsSystemExit* exitFunc = new LgsSystemExit{this};
+    LgsSystemCwd* cwdFunc = new LgsSystemCwd{this};
+    LgsSystemGetEnv* getEnvFunc = new LgsSystemGetEnv{this};
+    LgsSystemCoresNum* coresNumFunc = new LgsSystemCoresNum{this};
 
     explicit LgsSystem() : LgsObject(name) {
-        addMethod(&pidFunc);
-        addMethod(&sleepFunc);
-        addMethod(&exitFunc);
-        addMethod(&cwdFunc);
-        addMethod(&getEnvFunc);
-        addMethod(&coresNumFunc);
+        addMethod(pidFunc);
+        addMethod(sleepFunc);
+        addMethod(exitFunc);
+        addMethod(cwdFunc);
+        addMethod(getEnvFunc);
+        addMethod(coresNumFunc);
     }
     ~LgsSystem() override = default;
 };

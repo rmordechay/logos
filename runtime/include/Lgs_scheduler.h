@@ -1,13 +1,7 @@
 #pragma once
-#ifdef __cplusplus
-extern "C" {
-#endif
-    void LgsScheduler_init(int hz);
-    void LgsScheduler_shutdown();
-    void LgsScheduler_spawn(void (*task)(void*), void* userdata);
-    void LgsScheduler_run();
-    void LgsScheduler_yield();
 
-#ifdef __cplusplus
-}
-#endif
+extern "C" void LgsScheduler_init(int hz);
+extern "C" void LgsScheduler_shutdown();
+extern "C" void LgsScheduler_spawn(void (*task)(void*), void* userdata);
+extern "C" void LgsScheduler_run();
+extern "C" void LgsScheduler_yield();

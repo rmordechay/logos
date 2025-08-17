@@ -278,4 +278,14 @@ LgsApp::~LgsApp() {
     for (const auto file : ast) {
         delete file;
     }
+    ast.clear();
+    if (appFile) {
+        delete appFile;
+        appFile = nullptr;
+    }
+    for (const auto envFile : envFiles) {
+        delete envFile;
+    }
+    envFiles.clear();
+
 }

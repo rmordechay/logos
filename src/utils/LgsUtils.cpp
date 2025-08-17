@@ -4,9 +4,12 @@
 #include "files/LgsFile.h"
 #include "utils/LgsErrHandler.h"
 
-const std::unordered_set<std::string> LOGOS_KEYWORDS = {"object", "single", "self", "Self", "interface", "extern", "pub", "implements", "const", "enum",  "vec2", "vec3", "vec4", "if", "else", "for", "break", "continue", "return", "and", "or", "not", "in"};
+#define FNV_PRIME 16777619
+#define MAX_STR_HASH_LEN 1024
 #define MSG_PLACEHOLDER "%s"
 #define MSG_PADDING_PLACEHOLDER "%p"
+
+const std::unordered_set<std::string> LOGOS_KEYWORDS = {"object", "single", "self", "Self", "interface", "extern", "pub", "implements", "const", "enum",  "vec2", "vec3", "vec4", "if", "else", "for", "break", "continue", "return", "and", "or", "not", "in"};
 
 void logInfo(const std::string& text) {
     std::cout << text;
@@ -96,7 +99,7 @@ std::string removeUnderscores(const std::string& input) {
 void freeType(LgsType* type) {
     if (!type) return;
     if (type->isPrimitive) return;
-    if (type->isUnknown() && type->getName() == "<Unknown>") return;
+    if (type->isUnknown() && type->getName() == LGS_UNKNOWN_TYPE) return;
     delete type;
 }
 
@@ -109,4 +112,3 @@ size_t hashStr(const char* key) {
     }
     return hash;
 }
-
