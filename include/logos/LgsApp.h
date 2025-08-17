@@ -22,6 +22,7 @@ inline std::mutex mtx;
 
 class LgsApp final {
 public:
+    LgsPaths paths;
     LgsAppInfo appInfo;
     LgsSymbolTable globals;
     LgsErrHandler errHandler;
@@ -29,7 +30,6 @@ public:
     std::vector<LgsEnvFile*> envFiles;
     std::vector<char*> args;
     ThreadPool threadPool;
-    LgsPaths paths;
 
     explicit LgsApp(const fs::path& rootDirPath = "") {
         paths.initPaths(rootDirPath);

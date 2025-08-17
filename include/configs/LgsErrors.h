@@ -1,10 +1,10 @@
 #pragma once
-#include <stdint.h>
 
 struct LgsLocation {
     int32_t lineStart;
     int32_t posInLine;
     char* filePath;
+    int32_t fileIndex;
 };
 
 struct LgsBaseError {

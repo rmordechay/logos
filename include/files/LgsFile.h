@@ -9,6 +9,7 @@ class LgsCodeGen;
 
 class LgsFile {
 public:
+    size_t id = 0;
     std::string name;
     fs::path absPath;
     LgsCodeGen codeGen;

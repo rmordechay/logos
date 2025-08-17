@@ -15,20 +15,20 @@ void LgsArrayExpr::createIRValue(LgsCodeGen* codeGen) {
 
 Value* LgsArrayExpr::createDynamicArray(LgsCodeGen* codeGen) {
     auto& builder = codeGen->builder;
-    const auto arrType = type->asDArray();
-    const auto elementSize = codeGen->i64(arrType->baseType->getSizeBytes());
-    const auto arrSize = codeGen->typeSize(arrType->getArrStruct(codeGen));
+    const auto arr = type->asDArray();
+    const auto elementSize = codeGen->i64(arr->baseType->getSizeBytes());
+    const auto arrSize = codeGen->typeSize(arr->getArrStruct(codeGen));
     IRValue = codeGen->callMalloc(arrSize.getFixedValue());
 
     Value* capacityIR = nullptr;
-    if (arrType->sizeExpr) {
-        capacityIR = arrType->sizeExpr->getIRValue(codeGen);
+    if (arr->sizeExpr) {
+        capacityIR = arr->sizeExpr->getIRValue(codeGen);
         capacityIR = builder.CreateZExt(capacityIR, codeGen->i64Ty());
     } else {
         capacityIR = codeGen->isize(INITIAL_ARRAY_CAPACITY);
     }
 
-    arrType->initFunc.callIR(codeGen, {IRValue, capacityIR, elementSize});
+    arr->initFunc.callIR(codeGen, {IRValue, capacityIR, elementSize});
     return IRValue;
 }
 

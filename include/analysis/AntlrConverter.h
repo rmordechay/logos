@@ -103,7 +103,7 @@ public:
     LgsGroup* getGroup(LogosParser::GroupContext* ctx);
     LgsFuncType* getFuncType(LogosParser::FuncTypeContext* ctx);
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
-    LgsType* getTypeFromText(antlr4::tree::TerminalNode* typeToken) const;
+    LgsType* getTypeFromText(antlr4::tree::TerminalNode* ctx) const;
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     bool isArgsDuplicate(const std::unordered_set<std::string>& initializedArgs, LgsVarDec* varDec);

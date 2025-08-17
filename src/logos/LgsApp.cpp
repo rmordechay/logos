@@ -132,7 +132,6 @@ void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
     if (!checkParserErrors(&parser)) return;
     AntlrConverter antlrConverter(filePath, globals);
     const auto lgsFile = antlrConverter.getLogosFile(file);
-    ast.push_back(lgsFile);
     if (!lgsFile->externalCPaths.empty()) {
         LgsCLang lgsCLang(paths);
         lgsCLang.resolveCFiles(lgsFile);
@@ -144,7 +143,11 @@ void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
     if (!antlrConverter.errHandler.successful) {
         std::lock_guard lock(mtx);
         errHandler.mergeErrors(antlrConverter.errHandler);
+        return;
     }
+    std::lock_guard lock(mtx);
+    lgsFile->id = ast.size();
+    ast.push_back(lgsFile);
 }
 
 bool LgsApp::parseAppFile() {
@@ -286,7 +289,7 @@ void LgsApp::exitWithErrors() const {
         assert(strlen(lgsError.msg) > 0);
         free(lgsError.msg);
         if (lgsError.location->filePath) {
-            free(lgsError.location->filePath);
+            // free(lgsError.location->filePath);
         }
     }
     exit(1);

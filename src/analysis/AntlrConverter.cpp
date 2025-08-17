@@ -1104,8 +1104,8 @@ void AntlrConverter::addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol
     file->symbolTable.addSymbol(newSymbol, &errHandler);
 }
 
-LgsType* AntlrConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken) const {
-    const auto typeText = typeToken->getText();
+LgsType* AntlrConverter::getTypeFromText(antlr4::tree::TerminalNode* ctx) const {
+    const auto typeText = ctx->getText();
     LgsType* type = nullptr;
     if (typeText == LgsBool::name) {
         type = &LGS_BOOL;
@@ -1132,7 +1132,7 @@ LgsType* AntlrConverter::getTypeFromText(antlr4::tree::TerminalNode* typeToken) 
     } else {
         type = new LgsUnknownType(typeText);
     }
-    setLocation(type->location, typeToken->getSymbol());
+    setLocation(type->location, ctx->getSymbol());
     return type;
 }
 

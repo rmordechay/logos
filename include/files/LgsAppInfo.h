@@ -15,10 +15,11 @@ public:
     std::string name = "main";
     std::string activeEnv = "Pro";
     LgsAppVersion version{1, 0, 0};
-    fs::path appFilePath;
+    LgsLocation location{0, 0, nullptr};
     std::vector<LgsVarDec*> requireEnvVars;
     std::vector<std::string> requirePackages;
-    LgsLocation location{0, 0, nullptr};
+    fs::path appFilePath;
+
     ~LgsAppInfo() = default;
     bool parseVersion(const char* versionStr);
 };

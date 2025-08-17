@@ -176,8 +176,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     if (varDec->expr) {
         visitExpr(varDec->expr);
         if (varDec->type) {
-            if (varDec->expr->type != varDec->type) {
-                if (!validateExprType(varDec->expr, varDec->type)) return;
+            if (varDec->expr->type != varDec->type && validateExprType(varDec->expr, varDec->type)) {
                 const auto castExpr = varDec->expr->castTo(varDec->type);
                 if (varDec->expr != castExpr) {
                     delete varDec->expr;
@@ -454,12 +453,10 @@ void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
     for (const auto element : array->initialElements) {
         visitExpr(element);
     }
-    if (array->type->asSArray()) {
-        visitStaticArray(array);
-    } else if (array->type->asDArray()) {
+    if (array->isHeapAlloc) {
         visitDynamicArray(array);
     } else {
-        assert(0);
+        visitStaticArray(array);
     }
 }
 
@@ -519,14 +516,12 @@ void SemaAnalyser::visitStaticArray(LgsArrayExpr* arrayExpr) {
 }
 
 void SemaAnalyser::visitDynamicArray(LgsArrayExpr* array) {
-    const auto dArr = array->type->asDArray();
+    const auto dArr = array->type->asIterable();
     if (!dArr->sizeExpr) {
         dArr->sizeExpr = new LgsLongConst(array->initialElements.size());
     }
-    if (array->initialElements.empty()) {
-        if (!dArr->baseType) {
-            errHandler.addError(E10049, &array->location);
-        }
+    if (!dArr->baseType && array->initialElements.empty()) {
+        errHandler.addError(E10049, &array->location);
     } else {
         inferBaseType(array);
     }
@@ -745,7 +740,8 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     if (baseExpr->type->isUnknown()) return;
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable) {
-        return errHandler.addError(E10002, &iterIndex->location, {baseExpr->pname(), baseExpr->type->pname()});
+        if (baseExpr->type) errHandler.addError(E10002, &iterIndex->location, {baseExpr->pname(), baseExpr->type->pname()});
+        return;
     }
     if (exprTo) {
         visitSlice(iterIndex);
@@ -917,7 +913,7 @@ bool SemaAnalyser::validateFieldVisibility(LgsField* field, const LgsObject* par
     if (parent && parent->singleton) return true;
     if (!field || field->isVirtual) return false;
     if (!field->isPublic && file->absPath != field->location.filePath) {
-        errHandler.addError(E10030, &field->location, {field->name, parent->name});
+        if (parent) errHandler.addError(E10030, &field->location, {field->name, parent->name});
         return false;
     }
     return true;
@@ -941,7 +937,7 @@ bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
     assert(expr);
     if (expr->isNull) {
         // null must have a type
-        if (type->isUnknown()) {
+        if (!type || type->isUnknown()) {
             errHandler.addError(E10024, &expr->location);
             return false;
         }
@@ -950,10 +946,11 @@ bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
             errHandler.addError(E10023, &type->location, {type->pname(), type->pname()});
             return false;
         }
+        return true;
     }
-    if (type->isUnknown() || expr->type->isUnknown()) return false;
+    if (!expr->type || expr->type->isUnknown()) return false;
     if (!expr->type->equals(type)) {
-        errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
+        if (type) errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
         return false;
     }
     return true;

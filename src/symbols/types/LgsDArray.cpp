@@ -25,8 +25,12 @@ std::string LgsDArray::strFormatPart() const {
     return "%p";
 }
 
+std::string LgsDArray::getName() {
+    return name;
+}
+
 std::string LgsDArray::pname() {
-    return baseType->pname() + "[]";
+    return (baseType ? baseType->pname() : name) + "[]";
 }
 
 uint16_t LgsDArray::getUnpackCount() const {
@@ -42,10 +46,6 @@ bool LgsDArray::equals(LgsType* other) {
 
 void LgsDArray::freeValue(LgsCodeGen* codeGen, Value* value) {
     freeFunc.callIR(codeGen, {value});
-}
-
-std::string LgsDArray::getName() {
-    return name;
 }
 
 Value* LgsDArray::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
