@@ -14,7 +14,7 @@ public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, DOUBLE_EQUAL = 5, NOT_EQUAL = 6, 
     GE = 7, LE = 8, LPAREN = 9, RPAREN = 10, LBRACE = 11, RBRACE = 12, LBRACK = 13, 
-    RBRACK = 14, ARROW = 15, LANGLE = 16, RANGLE = 17, COMMA = 18, TRIPLE_DOT = 19, 
+    RBRACK = 14, LANGLE = 15, RANGLE = 16, COMMA = 17, ARROW = 18, TRIPLE_DOT = 19, 
     DOUBLE_DOT = 20, WALRUS = 21, EQUAL_PLUS = 22, EQUAL_MINUS = 23, EQUAL_STAR = 24, 
     EQUAL_SLASH = 25, EQUAL_PERCENT = 26, EQUAL_AMPERSAND = 27, EQUAL_PIPE = 28, 
     EQUAL_CARET = 29, EQUAL_DOUBLE_RANGLE = 30, EQUAL_DOUBLE_LANGLE = 31, 
@@ -36,20 +36,21 @@ public:
     RuleGroupTypesList = 8, RuleGroupTargetList = 9, RuleInterfaceBody = 10, 
     RuleObject = 11, RuleObjectBody = 12, RuleField = 13, RuleInterfaceField = 14, 
     RuleImplements = 15, RuleFuncSignatureHeader = 16, RuleFuncSignature = 17, 
-    RuleInterfaceFunc = 18, RuleFunc = 19, RuleAnonnymosFunc = 20, RuleMethod = 21, 
-    RuleParam = 22, RuleStatement = 23, RuleStatementsBlock = 24, RuleAssignment = 25, 
-    RuleExplicitVarDec = 26, RuleImplicitVarDec = 27, RuleIfStatement = 28, 
-    RuleElseIfStatement = 29, RuleElseStatement = 30, RulePatternMatching = 31, 
-    RulePattern = 32, RuleLoopStatement = 33, RuleBreakStmt = 34, RuleReturnStatement = 35, 
-    RuleEnumDeclaration = 36, RuleEnumField = 37, RuleCoroutine = 38, RuleDeferStmt = 39, 
-    RuleExpr = 40, RuleUnaryExpr = 41, RulePrefixExpr = 42, RulePostfixExpr = 43, 
-    RuleArrayExpr = 44, RuleHashMap = 45, RuleKeyValue = 46, RuleFuncCall = 47, 
-    RuleFuncArgList = 48, RuleFuncArg = 49, RuleInstance = 50, RuleInstanceArgList = 51, 
-    RuleInstanceArg = 52, RuleConstant = 53, RuleIterIndex = 54, RuleIndex = 55, 
-    RuleIsFirst = 56, RuleIsLast = 57, RuleSelection = 58, RuleFirstSelectionElement = 59, 
-    RuleInnerSelectionElement = 60, RuleRange = 61, RuleType = 62, RuleMapType = 63, 
-    RuleArraySize = 64, RuleFuncType = 65, RuleVector = 66, RuleExtern = 67, 
-    RuleRequireEnvVars = 68, RuleRequirePackages = 69, RuleAssignemntOp = 70
+    RuleInterfaceFunc = 18, RuleFunc = 19, RuleAnonnymosFunc = 20, RuleAnonnymosFuncParams = 21, 
+    RuleMethod = 22, RuleParam = 23, RuleStatement = 24, RuleStatementsBlock = 25, 
+    RuleAssignment = 26, RuleExplicitVarDec = 27, RuleImplicitVarDec = 28, 
+    RuleIfStatement = 29, RuleElseIfStatement = 30, RuleElseStatement = 31, 
+    RulePatternMatching = 32, RulePattern = 33, RuleLoopStatement = 34, 
+    RuleBreakStmt = 35, RuleReturnStatement = 36, RuleEnumDeclaration = 37, 
+    RuleEnumField = 38, RuleCoroutine = 39, RuleDeferStmt = 40, RuleExpr = 41, 
+    RuleUnaryExpr = 42, RulePrefixExpr = 43, RulePostfixExpr = 44, RuleArrayExpr = 45, 
+    RuleHashMap = 46, RuleKeyValue = 47, RuleFuncCall = 48, RuleFuncArgList = 49, 
+    RuleFuncArg = 50, RuleInstance = 51, RuleInstanceArgList = 52, RuleInstanceArg = 53, 
+    RuleConstant = 54, RuleIterIndex = 55, RuleIndex = 56, RuleIsFirst = 57, 
+    RuleIsLast = 58, RuleSelection = 59, RuleFirstSelectionElement = 60, 
+    RuleInnerSelectionElement = 61, RuleRange = 62, RuleType = 63, RuleMapType = 64, 
+    RuleArraySize = 65, RuleFuncType = 66, RuleVector = 67, RuleExtern = 68, 
+    RuleRequireEnvVars = 69, RuleRequirePackages = 70, RuleAssignemntOp = 71
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -90,6 +91,7 @@ public:
   class InterfaceFuncContext;
   class FuncContext;
   class AnonnymosFuncContext;
+  class AnonnymosFuncParamsContext;
   class MethodContext;
   class ParamContext;
   class StatementContext;
@@ -458,20 +460,31 @@ public:
   public:
     AnonnymosFuncContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *ARROW();
+    StatementsBlockContext *statementsBlock();
+    antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
-    StatementsBlockContext *statementsBlock();
+    AnonnymosFuncParamsContext *anonnymosFuncParams();
+
+   
+  };
+
+  AnonnymosFuncContext* anonnymosFunc();
+
+  class  AnonnymosFuncParamsContext : public antlr4::ParserRuleContext {
+  public:
+    AnonnymosFuncParamsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
     std::vector<antlr4::tree::TerminalNode *> IDENTIFIER();
     antlr4::tree::TerminalNode* IDENTIFIER(size_t i);
-    antlr4::tree::TerminalNode *COLON();
-    TypeContext *type();
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
    
   };
 
-  AnonnymosFuncContext* anonnymosFunc();
+  AnonnymosFuncParamsContext* anonnymosFuncParams();
 
   class  MethodContext : public antlr4::ParserRuleContext {
   public:

@@ -81,7 +81,11 @@ func:
     ;
 
 anonnymosFunc:
-        LPAREN (IDENTIFIER (COMMA IDENTIFIER)* COMMA?)? RPAREN (COLON type)? statementsBlock
+        (IDENTIFIER | (LPAREN anonnymosFuncParams? RPAREN)) ARROW statementsBlock
+    ;
+
+anonnymosFuncParams:
+        IDENTIFIER (COMMA IDENTIFIER)* COMMA?
     ;
 
 method:
@@ -364,11 +368,11 @@ LBRACE: '{';
 RBRACE: '}';
 LBRACK: '[';
 RBRACK: ']';
-ARROW: '->';
 LANGLE: '<';
 RANGLE: '>';
 
 COMMA: ',';
+ARROW: '->';
 TRIPLE_DOT: '...';
 DOUBLE_DOT: '..';
 WALRUS: ':=';

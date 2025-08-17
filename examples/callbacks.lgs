@@ -1,14 +1,6 @@
-f(cb: (Int, Int): Int) {
-    funcVar: (Int, Int): Void = (x, y) {
-        cb(x, y)
-    }
-    y = funcVar(2, 5)
-    print(y)
-}
-
 main() {
-    f((x, y): {
-        return x + y
-    })
-    arr.map(it -> it + 3)
+    funcVar: (Int, Int): Void = (x, y) -> {
+        print(x)
+    }
+    //arr.map((it) -> print(it))
 }

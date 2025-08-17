@@ -11,7 +11,7 @@ Type* LgsStr::getIRType(LgsCodeGen* codeGen) {
 }
 
 size_t LgsStr::getSizeBytes() {
-    return isHeapAlloc ? sizeof(void*) : sizeExpr->getConstInt() + 1;
+    return sizeof(void*);
 }
 
 uint16_t LgsStr::getUnpackCount() const {

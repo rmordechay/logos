@@ -10,6 +10,18 @@ uint16_t LgsMap::getUnpackCount() const {
     return 2;
 }
 
+Value* LgsMapAddFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
+    const auto arr = args[0];
+    const auto keyIR = args[1]->getIRValue(codeGen);
+    const auto value = args[2];
+    const auto exprIR = value->getIRValue(codeGen);
+    const auto arrPtr = arr->getIRValue(codeGen);
+    const auto exprTy = value->type;
+    const auto ptr = codeGen->builder.CreateAlloca(exprTy->getIRType(codeGen));
+    codeGen->builder.CreateStore(exprIR, ptr);
+    return callIR(codeGen, {arrPtr, keyIR, ptr});
+}
+
 Type* LgsMap::getIRType(LgsCodeGen* codeGen) {
     return getMapStruct(codeGen);
 }

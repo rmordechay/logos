@@ -388,9 +388,9 @@ void SemaAnalyser::visitCast(LgsCast* castExpr) {
 
 void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     if (const auto instance = unaryExpr->asInstance()) visitInstance(instance);
+    else if (const auto func = unaryExpr->asFunc()) visitFunc(func);
     else if (const auto funcCall = unaryExpr->asFuncCall()) visitFuncCall(funcCall);
     else if (const auto strConst = unaryExpr->asStrConst()) visitStrConst(strConst);
-    else if (const auto func = unaryExpr->asFunc()) visitFunc(func);
     else if (const auto selection = unaryExpr->asSelection()) visitSelection(selection);
     else if (const auto arrayExpr = unaryExpr->asArrayExpr()) visitArrayExpr(arrayExpr);
     else if (const auto hashMap = unaryExpr->asHashMap()) visitHashMap(hashMap);

@@ -15,7 +15,7 @@ public:
     LgsStmtsBlock* stmtsBlock = nullptr;
     bool hasDefers = false;
 
-    explicit LgsFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes = {}, const uint32_t ops = 0) {
+    explicit LgsFunc(const std::string& name, LgsType* rt = nullptr, const std::vector<LgsType*>& paramTypes = {}, const uint32_t ops = 0) {
         funcType = new LgsFuncType();
         funcType->name = name;
         funcType->rt = rt;

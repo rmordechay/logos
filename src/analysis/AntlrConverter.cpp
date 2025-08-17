@@ -345,13 +345,18 @@ void AntlrConverter::setParams(LgsFuncType* funcType, const std::vector<LogosPar
 }
 
 LgsFunc* AntlrConverter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx) {
-    const auto rt = getFuncReturnType(ctx->type());
-    const auto func = new LgsFunc("", rt);
+    const auto func = new LgsFunc("");
     func->funcType->isAnonymous = true;
-    for (const auto param : ctx->IDENTIFIER()) {
-        auto lgsParam = LgsParam(nullptr, param->getText());
-        setLocation(lgsParam.location, param->getSymbol());
+    if (const auto singleParam = ctx->IDENTIFIER()) {
+        auto lgsParam = LgsParam(nullptr, singleParam->getText());
+        setLocation(lgsParam.location, singleParam->getSymbol());
         func->funcType->params.push_back(lgsParam);
+    } else if (const auto params = ctx->anonnymosFuncParams()) {
+        for (const auto param : params->IDENTIFIER()) {
+            auto lgsParam = LgsParam(nullptr, param->getText());
+            setLocation(lgsParam.location, param->getSymbol());
+            func->funcType->params.push_back(lgsParam);
+        }
     }
     func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     setLocation(func->location, ctx->LPAREN()->getSymbol());
