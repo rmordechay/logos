@@ -1,7 +1,5 @@
 #pragma once
-#include "files/LgsFile.h"
 #include "utils/LgsErrHandler.h"
-#include "utils/LgsUtils.h"
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/Tooling/Tooling.h>
 
@@ -35,8 +33,6 @@ public:
     LgsFile* file;
 
     explicit LgsCLangFeAction(LgsFile* file) : file(file) {}
-    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef inFile) override {
-        return std::make_unique<LgsCLangVisitor>(file);
-    }
+    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, llvm::StringRef inFile) override;
     ~LgsCLangFeAction() override = default;
 };

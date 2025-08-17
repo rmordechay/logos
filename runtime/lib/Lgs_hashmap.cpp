@@ -1,3 +1,7 @@
+#include "Lgs_helpers.h"
+#include "utils/LgsErrHandler.h"
+#include "utils/LgsUtils.h"
+
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -5,6 +9,7 @@
 
 struct Lgs_Map {
     size_t valueSize;
+    LgsErrHandler errHandler;
     std::unordered_map<std::string, std::vector<char>>* data;
 };
 
@@ -24,8 +29,13 @@ extern "C" void Lgs_Map_add(const Lgs_Map* map, const char* key, const void* val
 
 extern "C" void* Lgs_Map_get(const Lgs_Map* map, const char* key) {
     if (!map || !key) std::exit(1);
-    auto it = map->data->find(key);
-    if (it == map->data->end()) return nullptr;
+    const auto it = map->data->find(key);
+    if (it == map->data->end()) {
+        std::string msg;
+        formatErrorMsg(E10000, {"roi", "roi"}, msg);
+        std::cout << msg << std::endl;
+        return nullptr;
+    }
     return it->second.data();
 }
 

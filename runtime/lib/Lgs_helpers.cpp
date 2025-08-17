@@ -1,6 +1,8 @@
 #include "Lgs_helpers.h"
-#include "LgsDefinitions.h"
-#include "LgsErrors.h"
+
+#include "configs/LgsDefinitions.h"
+#include "configs/LgsErrors.h"
+
 #include <iostream>
 
 size_t Lgs_hash(const char* key) {

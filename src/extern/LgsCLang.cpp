@@ -1,5 +1,6 @@
 #include "lgsc/LgsCLang.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "files/LgsFile.h"
 #include "lgsc/LgsCLangVisitor.h"
 #include "logos/LgsPaths.h"
 #include "utils/LgsUtils.h"

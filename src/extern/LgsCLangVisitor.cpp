@@ -159,6 +159,10 @@ LgsType* LgsCLangVisitor::mapCFunc(const clang::QualType type) {
     return lgsFuncType;
 }
 
+std::unique_ptr<clang::ASTConsumer> LgsCLangFeAction::CreateASTConsumer(clang::CompilerInstance& compilerInstance, StringRef inFile) {
+    return std::make_unique<LgsCLangVisitor>(file);
+}
+
 LgsType* LgsCLangVisitor::mapCArray(const clang::QualType type) {
     const auto arrayType = cast<clang::ConstantArrayType>(type.getTypePtr());
     const auto baseType = mapCType(arrayType->getElementType());

@@ -4,6 +4,8 @@
 #include "files/LgsFile.h"
 
 const std::unordered_set<std::string> LOGOS_KEYWORDS = {"object", "single", "self", "Self", "interface", "extern", "pub", "implements", "const", "enum",  "vec2", "vec3", "vec4", "if", "else", "for", "break", "continue", "return", "and", "or", "not", "in"};
+#define MSG_PLACEHOLDER "%s"
+#define MSG_PADDING_PLACEHOLDER "%p"
 
 void logInfo(const std::string& text) {
     std::cout << text;
@@ -60,4 +62,22 @@ size_t hashStr(const char* key) {
         hash %= MAX_STR_HASH_LEN;
     }
     return hash;
+}
+
+void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& args, std::string& result) {
+    auto pos = 0;
+    auto argIndex = 0;
+    result = std::string(lgsErr.msg);
+    while ((pos = result.find(MSG_PLACEHOLDER, pos)) != std::string::npos && argIndex < args.size()) {
+        result.replace(pos, std::strlen(MSG_PLACEHOLDER), args[argIndex]);
+        pos += args[argIndex].length();
+        argIndex++;
+    }
+    pos = 0;
+    argIndex = 0;
+    while ((pos = result.find(MSG_PADDING_PLACEHOLDER, pos)) != std::string::npos) {
+        result.replace(pos, std::strlen(MSG_PADDING_PLACEHOLDER), LGS_ERROR_PADDING);
+        pos += args[argIndex].length();
+        argIndex++;
+    }
 }
