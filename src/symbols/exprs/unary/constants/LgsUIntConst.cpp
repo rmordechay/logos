@@ -10,7 +10,7 @@ void LgsUIntConst::createIRValue(LgsCodeGen* codeGen) {
     IRValue = codeGen->i32(value);
 }
 
-LgsExpr* LgsUIntConst::castTo(LgsType* toType) {
+LgsExpr* LgsUIntConst::castImplicitly(LgsType* toType) {
     if (toType->asUInt()) {
         return this;
     }

@@ -20,7 +20,7 @@ typedef struct {
 /** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */
 inline size_t errCodeStart = 10000;
 inline LgsBaseError E10000{.msg = "main() function is not defined in Main.lgs file.", .errCode = errCodeStart++};
-inline LgsBaseError E10001{.msg = "Left type '%s' does not match the right type '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10001{.msg = "Expected type '%s' does not match the given type '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10002{.msg = "Expression '%s' of type '%s' must be an iterable.", .errCode = errCodeStart++};
 inline LgsBaseError E10003{.msg = "Index '%s' is out of bounds. Max expected size: %s.", .errCode = errCodeStart++};
 inline LgsBaseError E10004{.msg = "Function '%s' must return an expression of type '%s'. Given: '%s'.", .errCode = errCodeStart++};

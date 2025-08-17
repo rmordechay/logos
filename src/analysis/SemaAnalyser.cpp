@@ -166,27 +166,25 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
 }
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
-    if (varDec->type) {
+    if (varDec->expr && varDec->type) {
         varDec->type = resolveType(varDec->type);
-        if (!varDec->expr) {
-            varDec->expr = varDec->type->getZeroValue();
-            varDec->expr->location = varDec->location;
-        }
-    }
-    if (varDec->expr) {
         visitExpr(varDec->expr);
-        if (varDec->type) {
-            if (varDec->expr->type != varDec->type && validateExprType(varDec->expr, varDec->type)) {
-                const auto castExpr = varDec->expr->castTo(varDec->type);
-                if (varDec->expr != castExpr) {
-                    delete varDec->expr;
-                    varDec->expr = castExpr;
-                }
+        if (varDec->expr->type != varDec->type && validateExprType(varDec->expr, varDec->type)) {
+            const auto castExpr = varDec->expr->castImplicitly(varDec->type);
+            if (varDec->expr != castExpr) {
+                delete varDec->expr;
+                varDec->expr = castExpr;
             }
-        } else {
-            varDec->type = varDec->expr->type;
         }
+    } else if (varDec->expr) {
+        visitExpr(varDec->expr);
+        varDec->type = varDec->expr->type;
+    } else {
+        varDec->type = resolveType(varDec->type);
+        varDec->expr = varDec->type->getZeroValue();
+        varDec->expr->location = varDec->location;
     }
+
     addLocalSymbol(LgsSymbol(varDec));
 }
 
@@ -390,7 +388,7 @@ void SemaAnalyser::visitCast(LgsCast* castExpr) {
         visitBinaryExpr(binaryExpr);
     }
     castExpr->toType = resolveType(castExpr->toType);
-    castExpr->toValue = fromValue->castTo(castExpr->toType);
+    castExpr->toValue = fromValue->castImplicitly(castExpr->toType);
     if (!castExpr->toValue) {
         errHandler.addError(E10018, &castExpr->location, {fromValue->type->pname(), castExpr->toType->pname()});
     }
@@ -933,7 +931,6 @@ bool SemaAnalyser::validateMethodVisibility(LgsFuncCall* methodCall, const LgsOb
 }
 
 bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
-    assert(expr);
     if (expr->isNull) {
         // null must have a type
         if (!type || type->isUnknown()) {
@@ -947,9 +944,9 @@ bool SemaAnalyser::validateExprType(LgsExpr* expr, LgsType* type) {
         }
         return true;
     }
-    if (!expr->type || expr->type->isUnknown()) return false;
+    if (!type || !expr->type || expr->type->isUnknown()) return false;
     if (!expr->type->equals(type)) {
-        if (type) errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
+        errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
         return false;
     }
     return true;

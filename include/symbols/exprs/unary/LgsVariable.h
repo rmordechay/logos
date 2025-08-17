@@ -13,7 +13,7 @@ public:
     std::string pname() override;
     Value* hash(LgsCodeGen* codeGen) override;
     void createIRValue(LgsCodeGen* codeGen) override;
-    LgsExpr* castTo(LgsType* type) override;
+    LgsExpr* castImplicitly(LgsType* type) override;
     bool equals(LgsExpr* other) override;
     ~LgsVariable() override = default;
 };

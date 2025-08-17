@@ -43,7 +43,7 @@ public:
     LgsSymbolTable& globals;
     std::stack<LgsForLoop*> loopStack;
 
-    explicit AntlrConverter(int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
+    explicit AntlrConverter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const fs::path& filePath);
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx, const fs::path& filePath);
     LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx, const fs::path& filePath);

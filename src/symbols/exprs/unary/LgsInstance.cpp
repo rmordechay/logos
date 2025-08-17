@@ -18,7 +18,7 @@ void LgsInstance::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
-LgsExpr* LgsInstance::castTo(LgsType* toType) {
+LgsExpr* LgsInstance::castImplicitly(LgsType* toType) {
     return this;
 }
 

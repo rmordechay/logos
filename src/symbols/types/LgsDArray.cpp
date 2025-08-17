@@ -30,7 +30,8 @@ std::string LgsDArray::getName() {
 }
 
 std::string LgsDArray::pname() {
-    return (baseType ? baseType->pname() : name) + "[]";
+    assert(baseType);
+    return baseType->pname() + "[]";
 }
 
 uint16_t LgsDArray::getUnpackCount() const {

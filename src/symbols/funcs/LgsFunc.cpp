@@ -138,7 +138,7 @@ void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
     ));
 }
 
-LgsExpr* LgsFunc::castTo(LgsType* toType) {
+LgsExpr* LgsFunc::castImplicitly(LgsType* toType) {
     const auto otherFuncType = toType->asFuncType();
     assert(funcType->params.size() == otherFuncType->params.size());
     for (int i = 0; i < funcType->params.size(); ++i) {

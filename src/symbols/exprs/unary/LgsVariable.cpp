@@ -47,10 +47,10 @@ bool LgsVariable::equals(LgsExpr* other) {
     assert(0);
 }
 
-LgsExpr* LgsVariable::castTo(LgsType* type) {
+LgsExpr* LgsVariable::castImplicitly(LgsType* type) {
     switch (ref.symbolType) {
     case VAR_DEC:
-        return ref.varDec->expr->castTo(type);
+        return ref.varDec->expr->castImplicitly(type);
     case ENUM_FIELD:
     case PARAM:
     case FUNC:
