@@ -98,6 +98,7 @@ size_t LgsFuncType::getSizeBytes() {
 }
 
 LgsFuncType::~LgsFuncType() {
+    freeType(rt);
     for (int i = isMethod && !isStatic; i < params.size(); ++i) {
         const auto param = params[i];
         if (param.isSelf) continue;

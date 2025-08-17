@@ -166,8 +166,8 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
 
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     if (varDec->expr && varDec->type) {
-        varDec->type = resolveType(varDec->type);
         visitExpr(varDec->expr);
+        varDec->type = resolveType(varDec->type);
         varDec->expr = matchExprToType(varDec->expr, varDec->type);
     } else if (varDec->expr) {
         visitExpr(varDec->expr);

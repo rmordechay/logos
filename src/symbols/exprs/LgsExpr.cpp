@@ -85,3 +85,4 @@ LgsExpr::~LgsExpr() {
         type = nullptr;
     }
 }
+

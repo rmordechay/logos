@@ -1,14 +1,14 @@
-f(a: (Int, Int): Void) {
-    ac: (Int, Int): Void = (x, y): Void {
-        print("fkj")
+f(cb: (Int, Int): Int) {
+    funcVar: (Int, Int): Void = (x, y) {
+        cb(x, y)
     }
-    ac()
-    ab: (Int, Int): Void = (x, y) {
-
-    }
+    y = funcVar(2, 5)
+    print(y)
 }
 
 main() {
-    a = [3, 4, 67]
-    //a.map((it): Int: it + 3)
+    f((x, y): {
+        return x + y
+    })
+    arr.map(it -> it + 3)
 }

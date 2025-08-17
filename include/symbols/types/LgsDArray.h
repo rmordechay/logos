@@ -20,10 +20,10 @@ public:
     static constexpr auto name = "DArray";
     StructType* arrStruct = nullptr;
     LgsArrayAddFunc* addFunc = new LgsArrayAddFunc(this);
-    LgsFunc* lenFunc = new LgsFunc("len", &LGS_INT, {this}, INTERNAL | METHOD | PUBLIC);
-    LgsFunc* getFunc = new LgsFunc("get", &LGS_ANY, {this, &LGS_LONG}, INTERNAL | METHOD | PUBLIC);
-    LgsFunc* isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, INTERNAL | METHOD | PUBLIC);
-    LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, INTERNAL | METHOD | PUBLIC);
+    LgsFunc* lenFunc = new LgsFunc("len", &LGS_INT, {this}, INTERNAL | PUBLIC | METHOD);
+    LgsFunc* getFunc = new LgsFunc("get", &LGS_ANY, {this, &LGS_LONG}, INTERNAL | PUBLIC | METHOD);
+    LgsFunc* isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
+    LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
     LgsFunc* initFunc = new LgsFunc("init", &LGS_VOID, {this, &LGS_LONG}, INTERNAL | METHOD);
     LgsFunc* putFunc = new LgsFunc("put", &LGS_VOID, {this, &LGS_LONG, &LGS_ANY}, INTERNAL | METHOD);
     LgsFunc* deleteFunc = new LgsFunc("delete", &LGS_VOID, {this, &LGS_LONG}, INTERNAL | METHOD);

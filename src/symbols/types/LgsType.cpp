@@ -48,9 +48,12 @@ LgsType::~LgsType() {
     for (const auto& [_, field] : fields) {
         delete field;
     }
+    fields.clear();
     for (const auto& [_, method] : methods) {
+        if (method->funcType->isInternal) continue;
         delete method;
     }
+    methods.clear();
 }
 
 void LgsType::freeValue(LgsCodeGen* codeGen, Value* value) {}

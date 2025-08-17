@@ -86,31 +86,38 @@ inline Value* LgsUnaryExpr::leIR(LgsCodeGen* codeGen, LgsExpr* other) {
 }
 
 inline Value* LgsUnaryExpr::andIR(LgsCodeGen* codeGen, LgsExpr* other) {
-    assert(0);
+    auto [l, r] = loadExprs(codeGen, other);
+    return codeGen->builder.CreateLogicalAnd(l, r);
 }
 
 inline Value* LgsUnaryExpr::orIR(LgsCodeGen* codeGen, LgsExpr* other) {
-    assert(0);
+    auto [l, r] = loadExprs(codeGen, other);
+    return codeGen->builder.CreateLogicalOr(l, r);
 }
 
 inline Value* LgsUnaryExpr::bitAndIR(LgsCodeGen* codeGen, LgsExpr* other) {
-    assert(0);
+    auto [l, r] = loadExprs(codeGen, other);
+    return codeGen->builder.CreateAnd(l, r);
 }
 
 inline Value* LgsUnaryExpr::bitOrIR(LgsCodeGen* codeGen, LgsExpr* other) {
-    assert(0);
+    auto [l, r] = loadExprs(codeGen, other);
+    return codeGen->builder.CreateOr(l, r);
 }
 
 inline Value* LgsUnaryExpr::bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) {
-    assert(0);
+    auto [l, r] = loadExprs(codeGen, other);
+    return codeGen->builder.CreateXor(l, r);
 }
 
 inline Value* LgsUnaryExpr::rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) {
-    assert(0);
+    auto [l, r] = loadExprs(codeGen, other);
+    return codeGen->builder.CreateShl(l, r);
 }
 
 inline Value* LgsUnaryExpr::lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) {
-    assert(0);
+    auto [l, r] = loadExprs(codeGen, other);
+    return codeGen->builder.CreateAShr(l, r);
 }
 
 inline std::tuple<Value*, Value*> LgsUnaryExpr::loadExprs(LgsCodeGen* codeGen, LgsExpr* rExpr) {

@@ -1,0 +1,8 @@
+main() {
+    arr2 = [23]
+    arr2.add(3)
+    print(arr2[0])
+    arr1 = ["adf"]
+    arr1.add("str")
+    print(arr1[0])
+}
