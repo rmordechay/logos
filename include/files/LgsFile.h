@@ -15,10 +15,10 @@ public:
     LgsCodeGen codeGen;
     LgsSymbolTable symbolTable;
     LgsRuntime* runtime = nullptr;
-    LgsLocation location{0, 0, nullptr};
+    LgsLocation location{0, 0, 0};
     std::vector<LgsStrConst*> externalCPaths;
 
-    explicit LgsFile(const std::string& name, const fs::path& path) : name(name), absPath(path) {}
+    explicit LgsFile(const size_t fileID, const std::string& name, const fs::path& path) : id(fileID), name(name), absPath(path) {}
     virtual void generateIR();
     virtual void format();
     virtual ~LgsFile() = default;

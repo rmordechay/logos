@@ -44,7 +44,7 @@ public:
     bool isPrimitive = false;
     bool isSliceable = false;
     llvm::Type* IRType = nullptr;
-    LgsLocation location{0, 0, nullptr};
+    LgsLocation location{0, 0, 0};
     std::map<std::string, LgsField*> fields;
     std::map<std::string, LgsFunc*> methods;
 

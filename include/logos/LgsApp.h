@@ -3,7 +3,7 @@
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
 #include "LogosParser.h"
-#include "files/LgsAppInfo.h"
+#include "files/LgsAppFile.h"
 #include "lgsc/LgsCLang.h"
 #include "utils/ThreadPool.h"
 
@@ -23,11 +23,12 @@ inline std::mutex mtx;
 class LgsApp final {
 public:
     LgsPaths paths;
-    LgsAppInfo appInfo;
     LgsSymbolTable globals;
     LgsErrHandler errHandler;
     std::vector<LgsFile*> ast;
+    LgsAppFile* appFile = nullptr;
     std::vector<LgsEnvFile*> envFiles;
+    std::atomic<size_t> nextFileID = 0;
     std::vector<char*> args;
     ThreadPool threadPool;
 
@@ -52,6 +53,7 @@ public:
     void setEnvVars();
     void writeIRFiles();
     void exitWithErrors() const;
+    std::string getFullPath(const LgsLocation* location) const;
     bool checkParserErrors(LogosParser* parser);
     ~LgsApp();
 };

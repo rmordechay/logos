@@ -1,5 +1,6 @@
 #pragma once
 
+class LgsFile;
 class LgsErrHandler;
 struct LgsLocation;
 class LgsType;
@@ -13,6 +14,4 @@ void cleanStr(std::string& value);
 std::string getFileText(const fs::path& filePath);
 std::string removeUnderscores(const std::string& input);
 void freeType(LgsType* type);
-std::string getFullPath(const LgsLocation& location);
-std::string getFullRelPath(const LgsLocation& location);
 size_t hashStr(const char* key);

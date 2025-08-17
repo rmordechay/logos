@@ -13,7 +13,7 @@
 void LgsSymbolTable::addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler) {
     const auto symbolName = *symbol.name;
     if (symbols.find(symbolName) != symbols.end()) {
-        return errHandler->addError(E10011, symbol.location, {symbolName, getFullPath(*symbol.location)});
+        return errHandler->addError(E10011, symbol.location, {symbolName});
     }
     symbols[symbolName] = symbol;
 }

@@ -13,7 +13,7 @@
 #include "builtins/LgsBuiltins.h"
 #include "builtins/LgsSystem.h"
 #include "lgsc/LgsCLang.h"
-#include "files/LgsAppInfo.h"
+#include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
 #include "funcs/LgsMainFunc.h"
 #include "logos/LgsLinker.h"
@@ -83,6 +83,7 @@ bool LgsApp::analyse() {
     for (const auto file : ast) {
         threadPool.runTask([this, file] {
             SemaAnalyser semaAnalyser(file, globals);
+            semaAnalyser.ast = ast;
             semaAnalyser.analyse();
             std::lock_guard lock(mtx);
             if (!semaAnalyser.errHandler.successful) {
@@ -130,56 +131,51 @@ void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
     LogosParser parser(&tokens);
     const auto file = parser.logosFile();
     if (!checkParserErrors(&parser)) return;
-    AntlrConverter antlrConverter(filePath, globals);
-    const auto lgsFile = antlrConverter.getLogosFile(file);
-    if (!lgsFile->externalCPaths.empty()) {
-        LgsCLang lgsCLang(paths);
-        lgsCLang.resolveCFiles(lgsFile);
-        if (!lgsCLang.errHandler.successful) {
-            std::lock_guard lock(mtx);
-            errHandler.mergeErrors(antlrConverter.errHandler);
-        }
-    }
-    if (!antlrConverter.errHandler.successful) {
+    auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
+    AntlrConverter antlrConverter(fileID, paths, globals);
+    const auto lgsFile = antlrConverter.getLogosFile(file, filePath);
+    if (antlrConverter.errHandler.successful) {
+        std::lock_guard lock(mtx);
+        assert(fileID == lgsFile->id);
+        lgsFile->id = ast.size();
+        ast.push_back(lgsFile);
+    } else {
         std::lock_guard lock(mtx);
         errHandler.mergeErrors(antlrConverter.errHandler);
-        return;
     }
-    std::lock_guard lock(mtx);
-    lgsFile->id = ast.size();
-    ast.push_back(lgsFile);
 }
 
 bool LgsApp::parseAppFile() {
-    appInfo.appFilePath = fs::path(fs::canonical(paths.appFilePath));
-    if (!fs::exists(appInfo.appFilePath)) return false;
+    if (!fs::exists(paths.appFilePath)) return false;
     auto codeText = getFileText(paths.appFilePath);
-    AntlrConverter antlerConverter(appInfo.appFilePath, globals);
+    auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
+    AntlrConverter antlrConverter(fileID, paths, globals);
     antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    antlerConverter.getAppInfo(parser.logosAppFile(), appInfo);
+    appFile = antlrConverter.getAppFile(parser.logosAppFile(), paths.appFilePath);
     if (!checkParserErrors(&parser)) return false;
-    if (!antlerConverter.errHandler.successful) {
-        errHandler.mergeErrors(antlerConverter.errHandler);
+    if (!antlrConverter.errHandler.successful) {
+        errHandler.mergeErrors(antlrConverter.errHandler);
     }
-    return checkParserErrors(&parser) && errHandler.successful;
+    return errHandler.successful;
 }
 
 void LgsApp::parseEnvFile(fs::path fileEntry) {
-    const auto absFilePath = fs::path(fs::canonical(fileEntry));
     const auto codeText = getFileText(fileEntry);
-    AntlrConverter antlerConverter(absFilePath, globals);
+    auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
+    AntlrConverter antlrConverter(fileID, paths, globals);
     antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
-    auto file = antlerConverter.getEnvFile(parser.logosEnvFile());
+    const auto absFilePath = fs::path(fs::canonical(fileEntry));
+    auto file = antlrConverter.getEnvFile(parser.logosEnvFile(), absFilePath);
     if (!checkParserErrors(&parser)) return;
     std::lock_guard lock(mtx);
     envFiles.emplace_back(file);
-    errHandler.mergeErrors(antlerConverter.errHandler);
+    errHandler.mergeErrors(antlrConverter.errHandler);
 }
 
 bool LgsApp::checkParserErrors(LogosParser* parser) {
@@ -195,6 +191,7 @@ bool LgsApp::resolveGlobalTypes() {
     bool successful = true;
     for (const auto& file : ast) {
         SemaAnalyser semaAnalyser(file, globals);
+        semaAnalyser.ast = ast;
         if (const auto mf = dynamic_cast<LgsMainFile*>(file)) {
             for (const auto object : mf->objects) {
                 semaAnalyser.resolveObjTypes(object);
@@ -253,8 +250,8 @@ void LgsApp::initBuild() {
     fs::create_directories(paths.buildDir);
     fs::create_directories(paths.buildIR);
     LgsCodeGen::initLLVM();
-    paths.objFilePath = paths.buildDir / (appInfo.name + ".o");
-    paths.execFilePath = paths.buildDir / appInfo.name;
+    paths.objFilePath = paths.buildDir / (appFile->name + ".o");
+    paths.execFilePath = paths.buildDir / appFile->name;
 }
 
 void LgsApp::writeIRFiles() {
@@ -281,18 +278,28 @@ void LgsApp::writeIRFiles() {
 void LgsApp::exitWithErrors() const {
     for (int i = 0; i < errHandler.errors.size(); ++i) {
         const auto lgsError = errHandler.errors[i];
-        const auto path = "\n   at:  " + getFullPath(*lgsError.location);
+        const auto path = "\n   at:  " + getFullPath(lgsError.location);
         logInfo(LGS_ERROR_STR + std::string(lgsError.msg));
         logInfo(path);
         if (i != errHandler.errors.size() - 1) logInfo("\n---\n");
         else logInfo("\n");
         assert(strlen(lgsError.msg) > 0);
         free(lgsError.msg);
-        if (lgsError.location->filePath) {
-            // free(lgsError.location->filePath);
-        }
     }
     exit(1);
+}
+
+std::string LgsApp::getFullPath(const LgsLocation* location) const {
+    const auto posInLine = std::to_string(location->posInLine);
+    const auto lineNumber = std::to_string(location->lineStart);
+    LgsFile* file;
+    if (location->fileID != 0) {
+        file = appFile;
+    } else {
+        file = ast[location->fileID - 1];
+    }
+    const auto filePath = file->absPath.string();
+    return filePath + ":" + lineNumber + ":" + posInLine;
 }
 
 LgsApp::~LgsApp() {

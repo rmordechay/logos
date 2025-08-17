@@ -1,4 +1,6 @@
 #pragma once
+#include "LgsFile.h"
+#include "configs/LgsDefinitions.h"
 #include "stmts/LgsVarDec.h"
 #include <regex>
 
@@ -10,21 +12,19 @@ struct LgsAppVersion {
     int micro;
 };
 
-class LgsAppInfo final {
+class LgsAppFile final : public LgsFile {
 public:
-    std::string name = "main";
     std::string activeEnv = "Pro";
     LgsAppVersion version{1, 0, 0};
-    LgsLocation location{0, 0, nullptr};
     std::vector<LgsVarDec*> requireEnvVars;
     std::vector<std::string> requirePackages;
-    fs::path appFilePath;
 
-    ~LgsAppInfo() = default;
+    explicit LgsAppFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, LGS_APP_FILE_NAME, path) {}
     bool parseVersion(const char* versionStr);
+    ~LgsAppFile() override = default;
 };
 
-inline bool LgsAppInfo::parseVersion(const char* versionStr) {
+inline bool LgsAppFile::parseVersion(const char* versionStr) {
     int consumed = 0;
     if (std::sscanf(versionStr, "%d.%d.%d%n", &version.major, &version.minor, &version.micro, &consumed) == 3) {
         return versionStr[consumed] == '\0';

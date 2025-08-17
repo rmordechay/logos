@@ -50,6 +50,7 @@ public:
     LgsStack stack;
     LgsFile* file = nullptr;
     LgsErrHandler errHandler;
+    std::vector<LgsFile*> ast;
     LgsSymbolTable& globals;
 
     explicit SemaAnalyser(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals) {}

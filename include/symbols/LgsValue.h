@@ -16,7 +16,7 @@ class LgsValue {
 public:
     bool isMutable = false;
     llvm::Value* IRValue = nullptr;
-    LgsLocation location{0, 0, nullptr};
+    LgsLocation location{0, 0, 0};
 
     void setIRValue(llvm::Value* value);
     llvm::Value* getIRValue(LgsCodeGen* codeGen);

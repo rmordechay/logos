@@ -1,10 +1,9 @@
 #pragma once
 
 struct LgsLocation {
-    int32_t lineStart;
-    int32_t posInLine;
-    char* filePath;
-    int32_t fileIndex;
+    size_t fileID;
+    size_t lineStart;
+    size_t posInLine;
 };
 
 struct LgsBaseError {
@@ -31,7 +30,7 @@ inline LgsBaseError E10007{.msg = "File name '%s.lgs' is duplicate. All files in
 inline LgsBaseError E10008{.msg = "'Main.lgs' could not be found in 'src' directory.", .errCode = errCodeStart++};
 inline LgsBaseError E10009{.msg = "Duplicate Main files were found in the project. Locations:%s", .errCode = errCodeStart++};
 inline LgsBaseError E10010{.msg = "Not a root path of a logos project.", .errCode = errCodeStart++};
-inline LgsBaseError E10011{.msg = "'%s' is already declared at %s.", .errCode = errCodeStart++};
+inline LgsBaseError E10011{.msg = "'%s' is already declared.", .errCode = errCodeStart++};
 inline LgsBaseError E10012{.msg = "Function call cannot be assigned to a value.", .errCode = errCodeStart++};
 inline LgsBaseError E10013{.msg = "Field '%s' is declared with type function. Declare it as a method instead.%pExplanation: Logos highly encourages uniformity wherever possible. Having the ability to declare%pfunctions in both manners may create a codebase that violates this rule.", .errCode = errCodeStart++};
 inline LgsBaseError E10014{.msg = "Expression of type '%s' does not match base type '%s'.", .errCode = errCodeStart++};

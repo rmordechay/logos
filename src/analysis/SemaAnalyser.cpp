@@ -912,7 +912,7 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
 bool SemaAnalyser::validateFieldVisibility(LgsField* field, const LgsObject* parent) {
     if (parent && parent->singleton) return true;
     if (!field || field->isVirtual) return false;
-    if (!field->isPublic && file->absPath != field->location.filePath) {
+    if (!field->isPublic && file->id != field->location.fileID) {
         if (parent) errHandler.addError(E10030, &field->location, {field->name, parent->name});
         return false;
     }
@@ -924,8 +924,7 @@ bool SemaAnalyser::validateMethodVisibility(LgsFuncCall* methodCall, const LgsOb
     const auto method = methodCall->func;
     if (!method || method->funcType->isVirtual) return false;
     if (!method->funcType->isPublic) {
-        assert(method->location.filePath);
-        if (file->absPath != method->location.filePath) {
+        if (file->id != method->location.fileID) {
             errHandler.addError(E10031, &methodCall->location, {method->funcType->name, method->funcType->parentName});
             return false;
         }
@@ -1002,12 +1001,12 @@ LgsSymbol* SemaAnalyser::getSymbol(const std::string& name, LgsLocation* locatio
 
 void SemaAnalyser::addLocalSymbol(const LgsSymbol& newSymbol) {
     auto symbolName = *newSymbol.name;
-    auto symbol = globals.getSymbol(symbolName);
+    const auto symbol = globals.getSymbol(symbolName);
     if (symbol && symbol->isBuiltin) {
         return errHandler.addError(E10053, newSymbol.location, {symbolName});
     }
-    if ((symbol = file->symbolTable.getSymbol(symbolName))) {
-        return errHandler.addError(E10011, newSymbol.location, {symbolName, getFullPath(*symbol->location)});
+    if (file->symbolTable.getSymbol(symbolName)) {
+        return errHandler.addError(E10011, newSymbol.location, {symbolName});
     }
     stack.getSymbolTable().addSymbol(newSymbol, &errHandler);
 }

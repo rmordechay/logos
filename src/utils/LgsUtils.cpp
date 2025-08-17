@@ -1,7 +1,7 @@
 #include "utils/LgsUtils.h"
 #include "LgsType.h"
 #include "configs/LgsDefinitions.h"
-#include "utils/LgsErrHandler.h"
+#include "files/LgsFile.h"
 
 const std::unordered_set<std::string> LOGOS_KEYWORDS = {"object", "single", "self", "Self", "interface", "extern", "pub", "implements", "const", "enum",  "vec2", "vec3", "vec4", "if", "else", "for", "break", "continue", "return", "and", "or", "not", "in"};
 
@@ -50,20 +50,6 @@ void freeType(LgsType* type) {
     if (type->isPrimitive) return;
     if (type->isUnknown() && type->getName() == "<Unknown>") return;
     // delete type;
-}
-
-std::string getFullPath(const LgsLocation& location) {
-    if (!location.filePath) return "";
-    return std::string(location.filePath) + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.posInLine);
-}
-
-std::string getFullRelPath(const LgsLocation& location) {
-    const auto pos = std::string(location.filePath).rfind(std::string(LGS_SRC_DIR));
-    fs::path relPath;
-    if (pos != std::string::npos) {
-        relPath = std::string(location.filePath).substr(pos + std::strlen(LGS_SRC_DIR) + 1);
-    }
-    return std::string(relPath) + ":" + std::to_string(location.lineStart) + ":" + std::to_string(location.posInLine);
 }
 
 size_t hashStr(const char* key) {
