@@ -1,11 +1,11 @@
 #pragma once
 #include "LgsSymbolTable.h"
-#include "logos/LgsCodeGen.h"
 #include "configs/LgsErrors.h"
+#include "logos/LgsCodeGen.h"
 
+class LgsRuntime;
 class LgsStrConst;
 class LgsApp;
-class LgsCodeGen;
 
 class LgsFile {
 public:

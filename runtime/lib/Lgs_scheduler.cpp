@@ -16,17 +16,14 @@ void Lgs_Scheduler::run() {
 }
 
 void Lgs_Scheduler::spawn(void (*task)(void*), void* userdata) {
-    const auto fn = [task, userdata](const Yield& yield) {
-        tlsYield = yield;
-        task(userdata);
-    };
     queue.push_back(boost::context::callcc(
-        [fn = std::move(fn)](continuation&& scheduler) mutable {
+        [task, userdata](continuation&& scheduler) mutable {
             auto back = std::move(scheduler);
             const Yield y = [&back] {
                 back = std::move(back).resume();
             };
-            fn(y);
+            tlsYield = y;
+            task(userdata);
             return std::move(back);
         }
     ));

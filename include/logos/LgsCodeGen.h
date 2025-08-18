@@ -1,4 +1,5 @@
 #pragma once
+#include "LgsApp.h"
 #include "LgsStack.h"
 
 #include <llvm/IR/IRBuilder.h>
@@ -22,7 +23,6 @@ struct LgsDebug {
     DIFile* diFile = nullptr;
     DIBuilder* diBuilder = nullptr;
     DICompileUnit* compileUnit = nullptr;
-    bool isDebugMode = false;
 };
 
 class LgsCodeGen {
@@ -33,6 +33,7 @@ public:
     Module* IRModule = nullptr;
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
+    LgsAppConfigs* appConfigs = nullptr;
 
     void setupModule(const std::string& moduleName, const DataLayout& dataLayout);
     Value* getIRStr(const std::string& value);

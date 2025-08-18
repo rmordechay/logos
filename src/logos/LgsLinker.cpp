@@ -75,7 +75,7 @@ bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachin
     passBuilder.crossRegisterProxies(loopAnalyser, funcAnalyser, CGAnalyser, analysisManager);
 
     PassManager<Module, AnalysisManager<Module>> passManager;
-    passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(OptimizationLevel::O3)));
+    passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(getOptLevel())));
     passManager.run(*mainModule, analysisManager);
 
     std::error_code ec;
@@ -91,4 +91,18 @@ bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachin
     outputStream.flush();
     outputStream.close();
     return true;
+}
+
+OptimizationLevel LgsLinker::getOptLevel() const {
+    OptimizationLevel optLevel;
+    if (appConfigs.optLevel == 0) {
+        optLevel = OptimizationLevel::O0;
+    } else if (appConfigs.optLevel == 1) {
+        optLevel = OptimizationLevel::O1;
+    } else if (appConfigs.optLevel == 2) {
+        optLevel = OptimizationLevel::O2;
+    } else if (appConfigs.optLevel == 3) {
+        optLevel = OptimizationLevel::O3;
+    }
+    return optLevel;
 }

@@ -89,46 +89,48 @@ LgsEnvFile* AntlrConverter::getEnvFile(LogosParser::LogosEnvFileContext* ctx, co
     return new LgsEnvFile(fileID, "EnvFile", filePath, varDecs);
 }
 
-LgsAppFile* AntlrConverter::getAppFile(LogosParser::LogosAppFileContext* ctx, const fs::path& filePath) {
-    const auto file = new LgsAppFile(fileID, filePath);
-    setLocation(file->location, ctx->start);
+void AntlrConverter::setAppConfigs(LogosParser::LogosAppFileContext* ctx, const fs::path& filePath, LgsAppConfigs& appConfigs) {
+    LgsAppFile file(fileID, filePath);
+    setLocation(file.location, ctx->start);
     for (int i = 0; i < ctx->IDENTIFIER().size(); ++i) {
         const auto varToken = ctx->IDENTIFIER()[i];
         const auto varName = varToken->getText();
         const auto expr = getExpr(ctx->expr()[i]);
         if (varName == "name") {
-            file->name = expr->asStrConst()->value;
+            appConfigs.name = expr->asStrConst()->value;
         }
         if (varName == "version") {
             auto versionStr = expr->asStrConst()->value;
-            if (file->parseVersion(versionStr.c_str())) continue;
-            errHandler.addError(E10068, &file->location, {versionStr});
+            int consumed = 0;
+            auto [major, minor, micro] = appConfigs.version;
+            const auto s = std::sscanf(versionStr.c_str(), "%d.%d.%d%n", &major, &minor, &micro, &consumed) == 3;
+            if (!s || versionStr[consumed] != '\0') {
+                errHandler.addError(E10068, &file.location, {versionStr});
+            }
         }
         if (varName == "activeEnv") {
-            file->activeEnv = expr->asStrConst()->value;
+            appConfigs.activeEnv = expr->asStrConst()->value;
         }
         delete expr;
     }
 
     const auto requireEnvs = ctx->requireEnvVars();
-    if (!requireEnvs) return file;
+    if (!requireEnvs) return;
     for (int i = 0; i < requireEnvs->type().size(); ++i) {
         const auto name = requireEnvs->IDENTIFIER()[i]->getText();
         const auto type = getType(requireEnvs->type()[i]);
         const auto varDec = new LgsVarDec(name, nullptr);
         varDec->type = type;
-        file->requireEnvVars.push_back(varDec);
+        file.requireEnvVars.push_back(varDec);
     }
 
     const auto packages = ctx->requirePackages();
-    if (!packages) return file;
+    if (!packages) return;
     for (const auto packagePath : packages->STRING()) {
         auto pathText = packagePath->getText();
         cleanStr(pathText);
-        file->requirePackages.push_back(pathText);
+        file.requirePackages.push_back(pathText);
     }
-
-    return file;
 }
 
 LgsMainFile* AntlrConverter::getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath) {

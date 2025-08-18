@@ -37,7 +37,7 @@ class LgsAssignment;
 
 class AntlrConverter {
 public:
-    int fileID;
+    size_t fileID;
     LgsPaths& paths;
     LgsErrHandler errHandler;
     LgsSymbolTable& globals;
@@ -46,7 +46,7 @@ public:
     explicit AntlrConverter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const fs::path& filePath);
     LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx, const fs::path& filePath);
-    LgsAppFile* getAppFile(LogosParser::LogosAppFileContext* ctx, const fs::path& filePath);
+    void setAppConfigs(LogosParser::LogosAppFileContext* ctx, const fs::path& filePath, LgsAppConfigs& appConfigs);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const fs::path& filePath);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const fs::path& filePath);

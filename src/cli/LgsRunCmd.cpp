@@ -21,5 +21,7 @@ void LgsRunCmd::setArgs(LgsApp* app) const {
 }
 
 void LgsRunCmd::printHelp() {
-    logInfo("Usage: lgs run <path> <options>\n");
+    std::ostringstream txt;
+    txt << "Usage: lgs run <path> <options>\n";
+    logInfo(txt.str());
 }

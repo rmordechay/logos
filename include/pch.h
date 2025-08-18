@@ -17,6 +17,7 @@
 #include <functional>
 #include <sstream>
 #include <boost/json/object.hpp>
+#include <regex>
 
 namespace json = boost::json;
 namespace fs = std::filesystem;
