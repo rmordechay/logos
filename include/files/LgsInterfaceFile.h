@@ -7,7 +7,7 @@ public:
 
     LgsInterfaceFile(const size_t fileID, const std::string& name, const fs::path& path) : LgsFile(fileID, name, path) {}
     void generateIR() override;
-    ~LgsInterfaceFile() override = default;
+    ~LgsInterfaceFile() override;
 };
 
 

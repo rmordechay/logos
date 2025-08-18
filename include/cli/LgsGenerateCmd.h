@@ -8,7 +8,6 @@ public:
     void runCmd() override;
     void validate() override;
     void printHelp() override;
-    ~LgsGenerateCmd() override = default;
 };
 
 

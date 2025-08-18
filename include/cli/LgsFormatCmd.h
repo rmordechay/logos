@@ -10,5 +10,4 @@ public:
     void runCmd() override;
     void validate() override;
     void printHelp() override;
-    ~LgsFormatCmd() override = default;
 };

@@ -7,9 +7,9 @@ public:
     LgsExpr* endRange = nullptr;
 
     LgsRangeLoop(LgsExpr* rangeStart, LgsExpr* rangeEnd) : startRange(rangeStart), endRange(rangeEnd) {}
-    Value* loopStart(LgsCodeGen* codeGen) const;
-    Value* loopEnd(LgsCodeGen* codeGen) const;
-    void setLoopTerminals(LgsCodeGen* codeGen, Value* iValue) const;
+    llvm::Value* loopStart(LgsCodeGen* codeGen) const;
+    llvm::Value* loopEnd(LgsCodeGen* codeGen) const;
+    void setLoopTerminals(LgsCodeGen* codeGen, llvm::Value* iValue) const;
     void createIRLoop(LgsCodeGen* codeGen) override;
     ~LgsRangeLoop() override;
 };

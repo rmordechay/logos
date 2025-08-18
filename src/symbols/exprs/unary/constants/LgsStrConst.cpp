@@ -1,7 +1,5 @@
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "exprs/unary/constants/LgsBoolConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
-#include "exprs/unary/constants/LgsIntConst.h"
 
 std::string LgsStrConst::pname() {
     return type->pname();
@@ -16,17 +14,8 @@ void LgsStrConst::createIRValue(LgsCodeGen* codeGen) {
 }
 
 Value* LgsStrConst::addIR(LgsCodeGen* codeGen, LgsExpr* other) {
-    if (const auto otherStrConst = other->asIntConst()) {
+    if (const auto otherStrConst = other->asConstNumber()) {
         return codeGen->getIRStr(this->value + std::to_string(otherStrConst->value));
-    }
-    if (const auto otherStrConst = other->asFloatConst()) {
-        return codeGen->getIRStr(this->value + std::to_string(otherStrConst->value));
-    }
-    if (const auto otherStrConst = other->asStrConst()) {
-        return codeGen->getIRStr(this->value + otherStrConst->value);
-    }
-    if (const auto otherBoolConst = other->asBoolConst()) {
-        return codeGen->getIRStr(this->value + otherBoolConst->getValueAsString());
     }
     assert(0);
 }

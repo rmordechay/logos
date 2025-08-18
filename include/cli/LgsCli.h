@@ -11,7 +11,6 @@ public:
     void execute() const;
     static void printHelp();
     static void exitWithMsg(const std::string& errorMsg);
-    ~LgsCli() = default;
 };
 
 

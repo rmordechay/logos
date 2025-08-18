@@ -25,7 +25,6 @@ public:
     LgsType* mapCArray(clang::QualType type);
     LgsType* mapCStruct(clang::QualType type);
     LgsType* mapCFunc(clang::QualType type);
-    ~LgsCLangVisitor() override = default;
 };
 
 class LgsCLangFeAction final : public clang::ASTFrontendAction {
@@ -34,5 +33,4 @@ public:
 
     explicit LgsCLangFeAction(LgsFile* file) : file(file) {}
     std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& compilerInstance, llvm::StringRef inFile) override;
-    ~LgsCLangFeAction() override = default;
 };

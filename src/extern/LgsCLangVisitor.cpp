@@ -1,5 +1,6 @@
 #include "lgsc/LgsCLangVisitor.h"
-#include "exprs/unary/constants/LgsIntConst.h"
+
+#include "exprs/unary/constants/LgsNumberConst.h"
 #include "files/LgsFile.h"
 #include "stmts/LgsField.h"
 #include "types/LgsDArray.h"
@@ -168,6 +169,6 @@ LgsType* LgsCLangVisitor::mapCArray(const clang::QualType type) {
     const auto baseType = mapCType(arrayType->getElementType());
     const auto size = arrayType->getSize().getZExtValue();
     const auto arr = new LgsDArray(baseType);
-    arr->sizeExpr = new LgsIntConst(size);
+    arr->sizeExpr = new LgsNumberConst(&LGS_INT, size);
     return arr;
 }

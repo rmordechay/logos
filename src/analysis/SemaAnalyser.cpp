@@ -19,8 +19,6 @@
 #include "exprs/unary/LgsPrefixExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
-#include "exprs/unary/constants/LgsBoolConst.h"
-#include "exprs/unary/constants/LgsLongConst.h"
 #include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "loops/LgsWhileLoop.h"
@@ -508,7 +506,7 @@ void SemaAnalyser::visitStaticArray(LgsArrayExpr* arrayExpr) {
 void SemaAnalyser::visitDynamicArray(LgsArrayExpr* array) {
     const auto dArr = array->type->asIterable();
     if (!dArr->sizeExpr) {
-        dArr->sizeExpr = new LgsLongConst(array->initialElements.size());
+        dArr->sizeExpr = new LgsNumberConst(&LGS_LONG, array->initialElements.size());
     }
     if (!dArr->baseType && array->initialElements.empty()) {
         errHandler.addError(E10049, &array->location);

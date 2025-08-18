@@ -1,5 +1,6 @@
 #include "types/primitives/LgsLong.h"
-#include "exprs/unary/constants/LgsLongConst.h"
+
+#include "exprs/unary/constants/LgsNumberConst.h"
 #include "types/LgsAny.h"
 #include "types/LgsCPtr.h"
 #include "types/primitives/LgsFloat.h"
@@ -18,7 +19,7 @@ size_t LgsLong::getSizeBytes() {
 }
 
 LgsExpr* LgsLong::getZeroValue() {
-    return new LgsLongConst(0);
+    return new LgsNumberConst(&LGS_LONG, 0);
 }
 
 std::string LgsLong::getName() {

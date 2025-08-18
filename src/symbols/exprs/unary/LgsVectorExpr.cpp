@@ -1,4 +1,4 @@
-#include "exprs/unary/vectors/LgsVectorExpr.h"
+#include "exprs/unary/LgsVectorExpr.h"
 
 void LgsVectorExpr::createIRValue(LgsCodeGen* codeGen) {
     const auto ty = type->getIRType(codeGen);

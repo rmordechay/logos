@@ -1,6 +1,11 @@
 #pragma once
-#include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsStmt.h"
+
+namespace llvm {
+    class BasicBlock;
+    class AllocaInst;
+}
+
 class LgsVariable;
 class LgsStmtsBlock;
 class LgsExpr;
@@ -8,22 +13,20 @@ class LgsExpr;
 class LgsForLoop : public LgsStmt {
 public:
     std::vector<LgsVarDec*> loopVars;
-    AllocaInst* iPtr = nullptr;
+    llvm::AllocaInst* iPtr = nullptr;
     LgsStmtsBlock* stmtsBlock = nullptr;
-    BasicBlock* IRCondBlock = nullptr;
-    BasicBlock* IRBodyBlock = nullptr;
-    BasicBlock* IRExitBlock = nullptr;
+    llvm::BasicBlock* IRCondBlock = nullptr;
+    llvm::BasicBlock* IRBodyBlock = nullptr;
+    llvm::BasicBlock* IRExitBlock = nullptr;
     LgsVarDec* isFirst = nullptr;
     LgsVarDec* isLast = nullptr;
 
-    void createIRValue(LgsCodeGen* codeGen) override;
     void initIndex(LgsCodeGen* codeGen);
-    Value* loadIndex(LgsCodeGen* codeGen) const;
     void incIndex(LgsCodeGen* codeGen) const;
+    llvm::Value* loadIndex(LgsCodeGen* codeGen) const;
+    void createIRValue(LgsCodeGen* codeGen) override;
     virtual void setBlocks(LgsCodeGen* codeGen);
     virtual void incAndJumpToCond(LgsCodeGen* codeGen) const;
     virtual void createIRLoop(LgsCodeGen* codeGen) = 0;
     ~LgsForLoop() override;
 };
-
-

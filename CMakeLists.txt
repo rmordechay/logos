@@ -61,15 +61,11 @@ set(CORE_SOURCES
     src/symbols/exprs/LgsBinaryExpr.cpp
     src/symbols/exprs/LgsExpr.cpp
     src/symbols/exprs/unary/LgsCast.cpp
-    src/symbols/exprs/unary/constants/LgsBoolConst.cpp
     src/symbols/exprs/unary/constants/LgsCharConst.cpp
     src/symbols/exprs/unary/constants/LgsFloatConst.cpp
-    src/symbols/exprs/unary/constants/LgsIntConst.cpp
-    src/symbols/exprs/unary/constants/LgsLongConst.cpp
-    src/symbols/exprs/unary/constants/LgsShortConst.cpp
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
-    src/symbols/exprs/unary/constants/LgsUIntConst.cpp
-    src/symbols/exprs/unary/vectors/LgsVectorExpr.cpp
+    src/symbols/exprs/unary/constants/LgsUNumberConst.cpp
+    src/symbols/exprs/unary/LgsVectorExpr.cpp
     src/symbols/exprs/unary/LgsArrayExpr.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
     src/symbols/exprs/unary/LgsHashMap.cpp
@@ -132,6 +128,8 @@ set(RUNTIME_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_defer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_runtime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_scheduler.cpp
+    src/symbols/exprs/unary/constants/LgsNumberConst.cpp
+    include/symbols/exprs/unary/constants/LgsNumberConst.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

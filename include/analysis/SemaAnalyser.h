@@ -1,5 +1,5 @@
 #pragma once
-#include "exprs/unary/vectors/LgsVectorExpr.h"
+#include "../symbols/exprs/unary/LgsVectorExpr.h"
 #include "logos/LgsStack.h"
 #include "utils/LgsErrHandler.h"
 
@@ -50,7 +50,6 @@ public:
     LgsStack stack;
     LgsFile* file = nullptr;
     LgsErrHandler errHandler;
-    std::vector<LgsFile*> ast;
     LgsSymbolTable& globals;
 
     explicit SemaAnalyser(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals) {}
@@ -124,5 +123,4 @@ public:
     std::vector<uint8_t> resolveScalars(LgsVariable* fieldVar, LgsVec* vec);
     LgsSymbol* getSymbol(const std::string& name, LgsLocation* location);
     void addLocalSymbol(const LgsSymbol& newSymbol);
-    ~SemaAnalyser() = default;
 };

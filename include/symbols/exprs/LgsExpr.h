@@ -3,6 +3,7 @@
 
 #include "LgsValue.h"
 
+class LgsNumberConst;
 class LgsVectorExpr;
 class LgsPrefixExpr;
 class LgsIterator;
@@ -18,10 +19,8 @@ class LgsInstance;
 class LgsIterIndex;
 class LgsArrayExpr;
 class LgsSArray;
-class LgsBoolConst;
 class LgsCharConst;
 class LgsFloatConst;
-class LgsIntConst;
 class LgsStrConst;
 class LgsTypeConst;
 
@@ -45,12 +44,11 @@ public:
     LgsInstance* asInstance();
     LgsArrayExpr* asArrayExpr();
     LgsHashMap* asHashMap();
-    LgsBoolConst* asBoolConst();
     LgsCharConst* asCharConst();
     LgsFloatConst* asFloatConst();
-    LgsIntConst* asIntConst();
     LgsStrConst* asStrConst();
     LgsVectorExpr* asVector();
+    LgsNumberConst* asConstNumber();
 
     virtual LgsExpr* clone();
     virtual bool equals(LgsExpr* other);

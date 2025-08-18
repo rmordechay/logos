@@ -8,3 +8,8 @@ void LgsInterfaceFile::generateIR() {
         method->generateIR(&codeGen);
     }
 }
+
+LgsInterfaceFile::~LgsInterfaceFile() {
+    delete interface;
+    interface = nullptr;
+}

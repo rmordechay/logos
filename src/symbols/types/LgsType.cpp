@@ -1,4 +1,4 @@
-#include "exprs/unary/vectors/LgsVectorExpr.h"
+#include "../../../include/symbols/exprs/unary/LgsVectorExpr.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"

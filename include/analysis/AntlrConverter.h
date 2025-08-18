@@ -112,5 +112,4 @@ public:
     bool validateTypeName(const std::string& typeName, LgsLocation* location);
     void extractStrParts(LgsStrConst& strConst);
     void setLocation(LgsLocation& location, const antlr4::Token* start) const;
-    ~AntlrConverter() = default;
 };

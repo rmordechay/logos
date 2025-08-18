@@ -82,7 +82,6 @@ bool LgsApp::analyse() {
     for (const auto file : ast) {
         threadPool.runTask([this, file] {
             SemaAnalyser semaAnalyser(file, globals);
-            semaAnalyser.ast = ast;
             semaAnalyser.analyse();
             std::lock_guard lock(mtx);
             if (!semaAnalyser.errHandler.successful) {
@@ -190,7 +189,6 @@ bool LgsApp::resolveGlobalTypes() {
     bool successful = true;
     for (const auto& file : ast) {
         SemaAnalyser semaAnalyser(file, globals);
-        semaAnalyser.ast = ast;
         if (const auto mf = dynamic_cast<LgsMainFile*>(file)) {
             for (const auto object : mf->objects) {
                 semaAnalyser.resolveObjTypes(object);

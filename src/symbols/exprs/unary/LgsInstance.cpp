@@ -68,8 +68,8 @@ void LgsInstance::setObject(LgsObject* newObj) {
 }
 
 LgsInstance::~LgsInstance() {
-    for (const auto arg : args) {
-        delete arg.second;
+    for (const auto [_, arg] : args) {
+        delete arg;
     }
     if (obj) {
         delete obj;

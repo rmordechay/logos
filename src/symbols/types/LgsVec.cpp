@@ -1,4 +1,4 @@
-#include "exprs/unary/vectors/LgsVectorExpr.h"
+#include "../../../include/symbols/exprs/unary/LgsVectorExpr.h"
 
 std::string LgsVec::getName() {
     return "vec" + std::to_string(dim);
@@ -14,7 +14,7 @@ Type* LgsVec::getIRType(LgsCodeGen* codeGen) {
 }
 
 size_t LgsVec::getSizeBytes() {
-    return sizeof(float) * 2;
+    return baseType->getSizeBytes() * 2;
 }
 
 LgsExpr* LgsVec::getZeroValue() {

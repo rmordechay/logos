@@ -9,7 +9,6 @@ public:
     void runCmd() override;
     void validate() override;
     void printHelp() override;
-    ~LgsRunCmd() override = default;
 };
 
 

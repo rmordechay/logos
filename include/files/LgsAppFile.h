@@ -21,7 +21,7 @@ public:
 
     explicit LgsAppFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, LGS_APP_FILE_NAME, path) {}
     bool parseVersion(const char* versionStr);
-    ~LgsAppFile() override = default;
+    ~LgsAppFile() override;
 };
 
 inline bool LgsAppFile::parseVersion(const char* versionStr) {
@@ -30,4 +30,11 @@ inline bool LgsAppFile::parseVersion(const char* versionStr) {
         return versionStr[consumed] == '\0';
     }
     return false;
+}
+
+inline LgsAppFile::~LgsAppFile() {
+    for (const auto varDec : requireEnvVars) {
+        delete varDec;
+    }
+    requireEnvVars.clear();
 }

@@ -7,10 +7,10 @@
 #include "exprs/unary/LgsCast.h"
 #include "exprs/LgsNull.h"
 #include "exprs/LgsBinaryExpr.h"
-#include "exprs/unary/constants/LgsBoolConst.h"
+
 #include "exprs/unary/constants/LgsCharConst.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
-#include "exprs/unary/constants/LgsIntConst.h"
+
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "exprs/unary/LgsInstance.h"
 #include "exprs/unary/LgsSelection.h"
@@ -27,8 +27,8 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
-#include "exprs/unary/constants/LgsLongConst.h"
-#include "exprs/unary/vectors/LgsVectorExpr.h"
+
+#include "../../include/symbols/exprs/unary/LgsVectorExpr.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
@@ -789,7 +789,7 @@ LgsUnaryExpr* AntlrConverter::getArrayExpr(LogosParser::ArrayExprContext* ctx) {
     } else {
         array = new LgsArrayExpr(new LgsDArray());
     }
-    array->type->asIterable()->sizeExpr = new LgsIntConst(ctx->expr().size());
+    array->type->asIterable()->sizeExpr = new LgsNumberConst(&LGS_INT, ctx->expr().size());
     for (const auto expr : ctx->expr()) {
         array->initialElements.emplace_back(getExpr(expr));
     }
@@ -947,18 +947,18 @@ LgsUnaryExpr* AntlrConverter::getConstant(LogosParser::ConstantContext* ctx) {
         const auto longValue = strtol(input.c_str(), &end, 10);
         if (longValue >= INT_MIN && longValue <= INT_MAX) {
             const auto intValue = static_cast<int>(longValue);
-            constant = new LgsIntConst(intValue);
+            constant = new LgsNumberConst(&LGS_INT, intValue);
         } else {
-            constant = new LgsLongConst(longValue);
+            constant = new LgsNumberConst(&LGS_LONG, longValue);
         }
     } else if (const auto longToken = ctx->LONG()) {
-        constant = new LgsLongConst(stol(longToken->getText()));
+        constant = new LgsNumberConst(&LGS_LONG, stol(longToken->getText()));
     } else if (const auto floatToken = ctx->FLOAT()) {
         const auto value = stof(floatToken->getText());
         constant = new LgsFloatConst(value);
     } else if (const auto boolToken = ctx->BOOL()) {
         const auto value = boolToken->getText() == LgsBool::trueLiteral;
-        constant = new LgsBoolConst(value);
+        constant = new LgsNumberConst(&LGS_BOOL, value);
     } else if (const auto strToken = ctx->STRING()) {
         const auto value = strToken->getText();
         if (value.size() == 1) {
@@ -1000,7 +1000,7 @@ LgsUnaryExpr* AntlrConverter::getLoopIsFirst(LogosParser::IsFirstContext* ctx) {
         return var;
     }
     if (!loopStack.top()->isFirst) {
-        loopStack.top()->isFirst = getVarDec(ctx->FOR_IS_FIRST(), new LgsBoolConst(false));
+        loopStack.top()->isFirst = getVarDec(ctx->FOR_IS_FIRST(), new LgsNumberConst(&LGS_BOOL, false));
     }
     return var;
 }
@@ -1021,7 +1021,7 @@ LgsUnaryExpr* AntlrConverter::getLoopIsLast(LogosParser::IsLastContext* ctx) {
         return var;
     }
     if (!loopStack.top()->isLast) {
-        loopStack.top()->isLast = getVarDec(ctx->FOR_IS_LAST(), new LgsBoolConst(false));
+        loopStack.top()->isLast = getVarDec(ctx->FOR_IS_LAST(), new LgsNumberConst(&LGS_BOOL, false));
     }
     return var;
 }

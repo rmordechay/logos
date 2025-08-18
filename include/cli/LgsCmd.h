@@ -7,11 +7,11 @@ public:
     char** argv;
 
     LgsCmd(const int argc, char** argv) : argc(argc), argv(argv) {}
+    void printInfoAndExit();
+    void printInfoAndExit(const std::string& msg);
     virtual void runCmd() = 0;
     virtual void validate() = 0;
     virtual void printHelp() = 0;
-    void printInfoAndExit();
-    void printInfoAndExit(const std::string& msg);
     virtual ~LgsCmd() = default;
 };
 

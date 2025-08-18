@@ -1,6 +1,6 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsVariable.h"
-#include "exprs/unary/vectors/LgsVectorExpr.h"
+#include "../../../../include/symbols/exprs/unary/LgsVectorExpr.h"
 #include "stmts/LgsVarDec.h"
 #include <exprs/unary/LgsArrayExpr.h>
 #include "types/LgsMap.h"
@@ -54,8 +54,8 @@ Value* LgsIterIndex::loadFromMap(LgsCodeGen* codeGen, LgsMap* map) const {
 }
 
 Value* LgsIterIndex::createStrSlice(LgsCodeGen* codeGen, const LgsStr* str) const {
-    const auto intFrom = index->from->asIntConst();
-    const auto intTo = index->to->asIntConst();
+    const auto intFrom = index->from->asConstNumber();
+    const auto intTo = index->to->asConstNumber();
     const auto strConst = baseExpr->getConstStr();
     return codeGen->getIRStr(strConst.substr(intFrom->value, intTo->value));
 }

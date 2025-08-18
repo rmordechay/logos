@@ -1,11 +1,11 @@
-#include "exprs/unary/constants/LgsShortConst.h"
+#include "types/primitives/LgsShort.h"
+#include "exprs/unary/constants/LgsNumberConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
-
 
 size_t LgsShort::getSizeBytes() {
     return sizeof(short);
@@ -24,7 +24,7 @@ std::string LgsShort::getName() {
 }
 
 LgsExpr* LgsShort::getZeroValue() {
-    return new LgsShortConst(0);
+    return new LgsNumberConst(&LGS_SHORT, 0);
 }
 
 bool LgsShort::equals(LgsType* other) {
