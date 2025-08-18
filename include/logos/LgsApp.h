@@ -4,7 +4,6 @@
 #include "LgsPaths.h"
 #include "LogosParser.h"
 #include "files/LgsAppFile.h"
-#include "lgsc/LgsCLang.h"
 #include "utils/ThreadPool.h"
 
 class LgsCodeGen;
@@ -29,20 +28,20 @@ public:
     LgsAppFile* appFile = nullptr;
     std::vector<LgsEnvFile*> envFiles;
     std::atomic<size_t> nextFileID = 0;
-    std::vector<char*> args;
+    std::vector<char*> appArgs;
     ThreadPool threadPool;
 
     explicit LgsApp(const fs::path& rootDirPath = "") {
         paths.initPaths(rootDirPath);
     }
 
-    void execute();
     void run();
-    bool validate();
-    bool parse();
-    bool analyse();
-    bool generate();
-    bool link() const;
+    void validate();
+    void parse();
+    void analyse();
+    void generate();
+    void link() const;
+    void execute();
     void initBuild();
     void parseSrcFile(const std::string& codeText, fs::path filePath = "");
     bool parseAppFile();

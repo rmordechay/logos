@@ -17,6 +17,11 @@ struct Lgs_Stack_Frame {
 };
 
 struct Lgs_Stack {
+    int stackIndex;
     Lgs_Stack_Frame frames[STACK_CAPACITY];
-    int top;
+    void push();
+    void pop();
+    void callDefers() const;
+    void addDefer(void* funcPtr, void* ctx);
+    void addCoro(void* funcPtr, void* ctx);
 };

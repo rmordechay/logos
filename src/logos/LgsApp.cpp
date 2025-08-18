@@ -6,15 +6,12 @@
 #include "analysis/AntlrConverter.h"
 #include "analysis/SemaAnalyser.h"
 #include "files/LgsInterfaceFile.h"
-#include "files/LgsMainFile.h"
-#include "files/LgsObjectFile.h"
 #include "logos/LgsPaths.h"
 #include "utils/ThreadPool.h"
 #include "builtins/LgsBuiltins.h"
 #include "builtins/LgsSystem.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsEnvFile.h"
-#include "funcs/LgsMainFunc.h"
 #include "logos/LgsLinker.h"
 #include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
@@ -30,40 +27,28 @@ enum LogLevel {
 };
 
 void LgsApp::run() {
-    // Validation
-    if (!validate()) exitWithErrors();
-
-    // Lexing and Parsing
-    if (!parse()) exitWithErrors();
-
-    // Semantic analysis
-    if (!analyse()) exitWithErrors();
-
-    // Code generation
-    if (!generate()) exitWithErrors();
-
-    // Linking
-    if (!link()) exitWithErrors();
-
-    // Running
+    validate();
+    parse();
+    analyse();
+    generate();
+    link();
     execute();
 }
 
-bool LgsApp::validate() {
+void LgsApp::validate() {
     if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {
         errHandler.addError(E10010, nullptr);
-        return false;
+        exitWithErrors();
     }
     if (!exists(paths.appFilePath)) {
         errHandler.addError(E10008, nullptr);
-        return false;
+        exitWithErrors();
     }
-    return true;
 }
 
-bool LgsApp::parse() {
+void LgsApp::parse() {
     loadBuiltins();
-    if (!parseAppFile()) return false;
+    if (!parseAppFile()) exitWithErrors();
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
@@ -73,11 +58,10 @@ bool LgsApp::parse() {
         });
     }
     threadPool.wait();
-    if (!errHandler.successful) return false;
-    return true;
+    if (!errHandler.successful) exitWithErrors();
 }
 
-bool LgsApp::analyse() {
+void LgsApp::analyse() {
     LgsTypeResolver typeResolver(errHandler, globals);
     if (!typeResolver.resolveGlobalTypes(ast)) {
         exitWithErrors();
@@ -93,10 +77,10 @@ bool LgsApp::analyse() {
         });
     }
     threadPool.wait();
-    return errHandler.successful;
+    if (!errHandler.successful) exitWithErrors();
 }
 
-bool LgsApp::generate() {
+void LgsApp::generate() {
     initBuild();
     const auto targetMachine = LgsCodeGen::getTargetMachine();
     for (const auto& file : ast) {
@@ -107,22 +91,30 @@ bool LgsApp::generate() {
     }
     threadPool.wait();
     writeIRFiles();
-    return errHandler.successful;
+    if (!errHandler.successful) exitWithErrors();
 }
 
-bool LgsApp::link() const {
+void LgsApp::link() const {
     const LgsLinker linker(paths, ast);
-    return linker.link();
+    if (!linker.link()) exitWithErrors();
 }
 
 void LgsApp::execute() {
-    args.insert(args.begin(), const_cast<char*>(paths.execFilePath.c_str()));
-    if (args.empty() || args.back() != nullptr) {
-        args.push_back(nullptr);
+    appArgs.insert(appArgs.begin(), const_cast<char*>(paths.execFilePath.c_str()));
+    if (appArgs.empty() || appArgs.back() != nullptr) {
+        appArgs.push_back(nullptr);
     }
-    execv(paths.execFilePath.c_str(), args.data());
+    execv(paths.execFilePath.c_str(), appArgs.data());
     perror("Logos execution failed.");
     exit(EXIT_FAILURE);
+}
+
+void LgsApp::initBuild() {
+    fs::create_directories(paths.buildDir);
+    fs::create_directories(paths.buildIR);
+    LgsCodeGen::initLLVM();
+    paths.objFilePath = paths.buildDir / (appFile->name + ".o");
+    paths.execFilePath = paths.buildDir / appFile->name;
 }
 
 void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
@@ -163,6 +155,21 @@ bool LgsApp::parseAppFile() {
     return errHandler.successful;
 }
 
+void LgsApp::loadEnvFiles() {
+    for (const auto& entry : fs::directory_iterator(paths.envsDir)) {
+        if (!isLogosFile(entry)) continue;
+        threadPool.runTask([entry, this] {
+            parseEnvFile(entry);
+        });
+    }
+    threadPool.wait();
+}
+
+void LgsApp::loadBuiltins() {
+    globals.addSymbol(LgsSymbol(new LgsPrint(), false, true), &errHandler);
+    globals.addSymbol(LgsSymbol(new LgsSystem(), false, true), &errHandler);
+}
+
 void LgsApp::parseEnvFile(fs::path fileEntry) {
     const auto codeText = getFileText(fileEntry);
     auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
@@ -179,30 +186,6 @@ void LgsApp::parseEnvFile(fs::path fileEntry) {
     errHandler.mergeErrors(antlrConverter.errHandler);
 }
 
-bool LgsApp::checkParserErrors(LogosParser* parser) {
-    if (parser->getNumberOfSyntaxErrors() > 0) {
-        std::lock_guard lock(mtx);
-        errHandler.setUnsuccessful();
-        return false;
-    }
-    return true;
-}
-
-void LgsApp::loadBuiltins() {
-    globals.addSymbol(LgsSymbol(new LgsPrint(), false, true), &errHandler);
-    globals.addSymbol(LgsSymbol(new LgsSystem(), false, true), &errHandler);
-}
-
-void LgsApp::loadEnvFiles() {
-    for (const auto& entry : fs::directory_iterator(paths.envsDir)) {
-        if (!isLogosFile(entry)) continue;
-        threadPool.runTask([entry, this] {
-            parseEnvFile(entry);
-        });
-    }
-    threadPool.wait();
-}
-
 void LgsApp::setEnvVars() {
     for (char **env = environ; *env != nullptr; ++env) {
         std::string entry(*env);
@@ -213,14 +196,6 @@ void LgsApp::setEnvVars() {
             assert(0);
         }
     }
-}
-
-void LgsApp::initBuild() {
-    fs::create_directories(paths.buildDir);
-    fs::create_directories(paths.buildIR);
-    LgsCodeGen::initLLVM();
-    paths.objFilePath = paths.buildDir / (appFile->name + ".o");
-    paths.execFilePath = paths.buildDir / appFile->name;
 }
 
 void LgsApp::writeIRFiles() {
@@ -258,6 +233,15 @@ void LgsApp::exitWithErrors() const {
     }
     logInfo("\n");
     exit(1);
+}
+
+bool LgsApp::checkParserErrors(LogosParser* parser) {
+    if (parser->getNumberOfSyntaxErrors() > 0) {
+        std::lock_guard lock(mtx);
+        errHandler.setUnsuccessful();
+        return false;
+    }
+    return true;
 }
 
 LgsApp::~LgsApp() {

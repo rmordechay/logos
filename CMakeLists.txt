@@ -131,6 +131,7 @@ set(RUNTIME_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_defer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_runtime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_scheduler.cpp
+    runtime/lib/Lgs_stack.cpp
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

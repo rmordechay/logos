@@ -9,39 +9,41 @@ extern "C" void* Lgs_Vtable_get(void* instancePtr, const char* name) {
 }
 
 extern "C" void Lgs_Stack_push() {
-    if (runtime.stack.top + 1 >= STACK_CAPACITY) std::exit(1);
-    runtime.stack.top++;
-    Lgs_Stack_Frame& frame = runtime.stack.frames[runtime.stack.top];
-    frame.defers_count = 0;
-    frame.coros_count = 0;
+    runtime.stack.push();
 }
 
 extern "C" void Lgs_Stack_pop() {
-    if (runtime.stack.top < 0) std::exit(1);
-    runtime.stack.top--;
+    runtime.stack.pop();
 }
 
 extern "C" void Lgs_Stack_addDefer(void* funcPtr, void* ctx) {
-    if (runtime.stack.top < 0) std::exit(1);
-    auto& top = runtime.stack.frames[runtime.stack.top];
-    const auto deferFunc = reinterpret_cast<Lgs_Defer_Func>(funcPtr);
-    const Lgs_Thunk_Func func_entry{deferFunc, ctx};
-    top.defers[top.defers_count++] = func_entry;
+    runtime.stack.addDefer(funcPtr, ctx);
 }
 
 extern "C" void Lgs_Stack_addCoro(void* funcPtr, void* ctx) {
-    if (runtime.stack.top < 0) std::exit(1);
-    auto& top = runtime.stack.frames[runtime.stack.top];
-    const auto deferFunc = reinterpret_cast<Lgs_Defer_Func>(funcPtr);
-    const Lgs_Thunk_Func func_entry{deferFunc, ctx};
-    top.coros[top.coros_count++] = func_entry;
+    runtime.stack.addCoro(funcPtr, ctx);
 }
 
 extern "C" void Lgs_Stack_callDefers() {
-    const auto& top = runtime.stack.frames[runtime.stack.top];
-    for (int i = 0; i < LOCALS_CAPACITY; ++i) {
-        const auto [func, ctx] = top.defers[i];
-        if (!func) continue;
-        func(ctx);
-    }
+    runtime.stack.callDefers();
+}
+
+extern "C" void Lgs_Scheduler_run() {
+    runtime.scheduler.run();
+}
+
+extern "C" void Lgs_Scheduler_spawn(void (*task)(void*), void* userdata) {
+    runtime.scheduler.spawn(task, userdata);
+}
+
+extern "C" void Lgs_Scheduler_init(const int hz) {
+    runtime.scheduler.init(hz);
+}
+
+extern "C" void Lgs_Scheduler_yield() {
+    runtime.scheduler.yield();
+}
+
+extern "C" void Lgs_Scheduler_shutdown() {
+    runtime.scheduler.shutdown();
 }

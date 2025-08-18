@@ -15,6 +15,3 @@ struct Lgs_Iterator {
     void (*reset)(Lgs_Iterator* iter);
 };
 
-static void Lgs_Iterator_reset(Lgs_Iterator* iter) {
-    iter->current = 0;
-}
