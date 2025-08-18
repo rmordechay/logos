@@ -230,7 +230,7 @@ void SemaAnalyser::visitPatternMatching(LgsIfStmt* pm) {
         visitExpr(expr);
         visitStmtsBlock(block);
         if (expr->type->isUnknown()) continue;
-        if (!expr->type->equals(baseExprType)) {
+        if (!baseExprType->equals(expr->type)) {
             return errHandler.addError(E10014, &expr->location, {expr->type->pname(), baseExprType->pname()});
         }
         stack.exitScope();
@@ -986,7 +986,7 @@ LgsExpr* SemaAnalyser::matchExprToType(LgsExpr* expr, LgsType* type) {
         return expr;
     }
     if (!type || !expr->type || expr->type->isUnknown()) return expr;
-    if (!expr->type->equals(type)) {
+    if (!type->equals(expr->type)) {
         errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
         return expr;
     }

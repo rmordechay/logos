@@ -19,7 +19,7 @@ public:
 class LgsSystemSleep final : public LgsFunc {
 public:
     static constexpr auto name = "sleep";
-    explicit LgsSystemSleep(LgsType* parent): LgsFunc(name, &LGS_VOID, {parent, &LGS_INT}, PUBLIC | STATIC | INTERNAL | METHOD ) {}
+    explicit LgsSystemSleep(LgsType* parent): LgsFunc(name, &LGS_VOID, {parent, &LGS_LONG}, PUBLIC | STATIC | INTERNAL | METHOD ) {}
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         return codeGen->callSleep(args[1]->getIRValue(codeGen));
     }

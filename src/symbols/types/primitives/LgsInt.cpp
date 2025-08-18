@@ -4,6 +4,7 @@
 #include "types/LgsAny.h"
 #include "types/LgsCPtr.h"
 #include "types/primitives/LgsFloat.h"
+#include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
@@ -21,13 +22,13 @@ LgsExpr* LgsInt::getZeroValue() {
 }
 
 bool LgsInt::equals(LgsType* other) {
-    const auto IRName = other->getName();
-    if (IRName == LgsAny::name) return true;
-    if (IRName == LgsUInt::name) return true;
-    if (IRName == LgsSize::name) return true;
-    if (IRName == LgsLong::name) return true;
-    if (IRName == LgsFloat::name) return true;
-    return name == IRName;
+    const auto otherName = other->getName();
+    if (otherName == LgsAny::name) return true;
+    if (otherName == LgsBool::name) return true;
+    if (otherName == LgsChar::name) return true;
+    if (otherName == LgsShort::name) return true;
+    if (otherName == LgsFloat::name) return true;
+    return name == otherName;
 }
 
 std::string LgsInt::strFormatPart() const {
