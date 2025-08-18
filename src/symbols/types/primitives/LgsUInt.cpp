@@ -1,14 +1,12 @@
 #include "types/primitives/LgsUInt.h"
-
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "logos/LgsCodeGen.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
 
-
 size_t LgsUInt::getSizeBytes() {
-    return sizeof(unsigned int);
+    return sizeof(uint32_t);
 }
 
 json::object LgsUInt::asJSON() {

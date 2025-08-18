@@ -31,8 +31,8 @@ public:
     std::vector<char*> appArgs;
     ThreadPool threadPool;
 
-    explicit LgsApp(const fs::path& rootDirPath = "") {
-        paths.initPaths(rootDirPath);
+    explicit LgsApp(const fs::path& rootOrFile = "") {
+        paths.initPaths(rootOrFile);
     }
 
     void run();
@@ -52,6 +52,6 @@ public:
     void writeIRFiles();
     void exitWithErrors() const;
     bool checkParserErrors(LogosParser* parser);
-    ~LgsApp();
+    void freeApp();
 };
 

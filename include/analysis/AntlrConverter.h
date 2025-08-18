@@ -50,13 +50,11 @@ public:
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const fs::path& filePath);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const fs::path& filePath);
+    LgsFunc* getFunc(LogosParser::FuncContext* ctx);
     LgsMainFunc* getMainFunc(LogosParser::FuncContext* ctx);
-    bool setMainArgsParam(const LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, bool isSingleton);
     LgsField* getField(LogosParser::FieldContext* ctx, size_t position);
-    LgsFunc* getFunc(LogosParser::FuncContext* ctx);
-    void setParams(LgsFuncType* funcType, const std::vector<LogosParser::ParamContext*>& params);
     LgsFunc* getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx);
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param);
     LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx);
@@ -107,6 +105,8 @@ public:
     LgsType* getArrayType(LogosParser::TypeContext* ctx);
     LgsType* getTypeFromText(antlr4::tree::TerminalNode* ctx) const;
     LgsType* getFuncReturnType(LogosParser::TypeContext* ctx);
+    void setParams(LgsFuncType* funcType, const std::vector<LogosParser::ParamContext*>& params);
+    bool setMainArgsParam(const LgsMainFunc* mainFunc, LogosParser::FuncSignatureContext* funcSignature);
     void addFileSymbol(LgsMainFile* file, const LgsSymbol& newSymbol);
     bool isArgsDuplicate(const std::unordered_set<std::string>& initializedArgs, LgsVarDec* varDec);
     bool validateTypeName(const std::string& typeName, LgsLocation* location);

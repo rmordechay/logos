@@ -70,8 +70,8 @@ void LgsApp::analyse() {
         threadPool.runTask([this, file] {
             SemaAnalyser semaAnalyser(file, globals);
             semaAnalyser.analyse();
-            std::lock_guard lock(mtx);
             if (!semaAnalyser.errHandler.successful) {
+                std::lock_guard lock(mtx);
                 errHandler.mergeErrors(semaAnalyser.errHandler);
             }
         });
@@ -104,6 +104,7 @@ void LgsApp::execute() {
     if (appArgs.empty() || appArgs.back() != nullptr) {
         appArgs.push_back(nullptr);
     }
+    freeApp();
     execv(paths.execFilePath.c_str(), appArgs.data());
     perror("Logos execution failed.");
     exit(EXIT_FAILURE);
@@ -244,7 +245,7 @@ bool LgsApp::checkParserErrors(LogosParser* parser) {
     return true;
 }
 
-LgsApp::~LgsApp() {
+void LgsApp::freeApp() {
     for (const auto file : ast) {
         delete file;
     }
@@ -258,3 +259,4 @@ LgsApp::~LgsApp() {
     }
     envFiles.clear();
 }
+
