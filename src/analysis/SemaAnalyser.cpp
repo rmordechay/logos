@@ -382,7 +382,7 @@ void SemaAnalyser::visitCast(LgsCast* castExpr) {
         visitBinaryExpr(binaryExpr);
     }
     castExpr->toType = typeResolver.resolveType(castExpr->toType, *file);
-    castType(fromValue, castExpr->toType);
+    castExprToType(fromValue, castExpr->toType);
 }
 
 void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
@@ -582,6 +582,26 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
         visitExpr(arg);
     }
     resolveFuncCall(funcCall);
+    if (!funcCall->func) return;
+    validateArgs(funcCall);
+}
+
+void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
+    for (int i = 1; i < methodCall->args.size(); ++i) {
+        const auto arg = methodCall->args[i];
+        visitExpr(arg);
+    }
+    if (!resolveMethodCall(methodCall, parentType)) return;
+    validateMethodVisibility(methodCall, parentType->asObject());
+    validateArgs(methodCall);
+}
+
+void SemaAnalyser::validateArgs(const LgsFuncCall* funcCall) {
+    for (int i = funcCall->func->funcType->isStatic; i < funcCall->args.size(); ++i) {
+        const auto arg = funcCall->args[i];
+        const auto param = funcCall->func->funcType->params[i];
+        castExprToType(arg, param.type);
+    }
 }
 
 void SemaAnalyser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -615,21 +635,6 @@ void SemaAnalyser::visitStrConst(const LgsStrConst* strConst) {
     if (strConst->templateParts.empty()) return;
     for (const auto templatePart : strConst->templateParts) {
         visitExpr(templatePart);
-    }
-}
-
-void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
-    for (int i = 1; i < methodCall->args.size(); ++i) {
-        const auto arg = methodCall->args[i];
-        visitExpr(arg);
-    }
-    if (!resolveMethodCall(methodCall, parentType)) return;
-    if (!validateMethodVisibility(methodCall, parentType->asObject())) return;
-    if (methodCall->isSpread) {
-        const auto lastArg = methodCall->args[methodCall->args.size() - 1];
-        if (!lastArg->type->asIterable()) {
-            return errHandler.addError(E10052, &methodCall->location, {lastArg->pname(), lastArg->type->pname()});
-        }
     }
 }
 
@@ -963,7 +968,7 @@ bool SemaAnalyser::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, cons
     return isValid;
 }
 
-void SemaAnalyser::castType(LgsExpr* expr, LgsType* toType) {
+void SemaAnalyser::castExprToType(LgsExpr* expr, LgsType* toType) {
     if (expr->type == toType) return;
     if (!expr->castTo(toType)) {
         errHandler.addError(E10018, &expr->location, {expr->type->pname(), toType->pname()});
@@ -990,7 +995,7 @@ LgsExpr* SemaAnalyser::matchExprToType(LgsExpr* expr, LgsType* type) {
         errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
         return expr;
     }
-    castType(expr, type);
+    castExprToType(expr, type);
     return expr;
 }
 

@@ -11,7 +11,7 @@
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
-#include "../../../include/symbols/exprs/unary/LgsIterator.h"
+#include "exprs/unary/LgsIterator.h"
 
 size_t LgsExpr::getConstInt() {
     if (const auto intConst = asIntConst()) {

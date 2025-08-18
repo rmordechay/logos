@@ -88,6 +88,7 @@ public:
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
+    void validateArgs(const LgsFuncCall* funcCall);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
@@ -111,7 +112,7 @@ public:
     void validateFuncControlFlow(LgsFunc* func);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
-    void castType(LgsExpr* expr, LgsType* toType);
+    void castExprToType(LgsExpr* expr, LgsType* toType);
     LgsExpr* matchExprToType(LgsExpr* expr, LgsType* type);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
