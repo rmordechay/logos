@@ -31,7 +31,6 @@
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsNullable.h"
-#include "utils/LgsUtils.h"
 #include "loops/LgsForeachLoop.h"
 #include "loops/LgsForLoop.h"
 #include "loops/LgsRangeLoop.h"
@@ -382,10 +381,7 @@ void SemaAnalyser::visitCast(LgsCast* castExpr) {
         visitBinaryExpr(binaryExpr);
     }
     castExpr->toType = typeResolver.resolveType(castExpr->toType, *file);
-    castExpr->toValue = fromValue->castTo(castExpr->toType);
-    if (!castExpr->toValue) {
-        errHandler.addError(E10018, &castExpr->location, {fromValue->type->pname(), castExpr->toType->pname()});
-    }
+    castType(fromValue, castExpr->toType);
 }
 
 void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
@@ -591,6 +587,14 @@ void SemaAnalyser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
     const auto baseExpr = prefixExpr->expr;
     visitExpr(baseExpr);
     const auto type = baseExpr->type;
+    switch (prefixExpr->op) {
+    case NOT_PREFIX:
+        break;
+    case MINUS_PREFIX:
+        break;
+    case SQRT_PREFIX:
+        break;
+    }
     prefixExpr->setType(type);
 }
 
@@ -598,7 +602,7 @@ void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     const auto baseExpr = postfixExpr->expr;
     visitUnaryExpr(baseExpr);
     const auto type = baseExpr->type;
-    if (!type->asInt()) {
+    if (!type->isNumber) {
         return errHandler.addError(E10050, &postfixExpr->location, {type->pname()});
     }
     postfixExpr->setType(type);
@@ -976,11 +980,15 @@ LgsExpr* SemaAnalyser::matchExprToType(LgsExpr* expr, LgsType* type) {
         errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
         return expr;
     }
-    const auto castExpr = expr->castTo(type);
-    if (expr != castExpr) {
-        delete expr;
+    castType(expr, type);
+    return expr;
+}
+
+void SemaAnalyser::castType(LgsExpr* expr, LgsType* toType) {
+    if (expr->type == toType) return;
+    if (!expr->castTo(toType)) {
+        errHandler.addError(E10018, &expr->location, {expr->type->pname(), toType->pname()});
     }
-    return castExpr;
 }
 
 void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {

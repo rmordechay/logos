@@ -51,7 +51,7 @@ public:
 
     virtual LgsExpr* clone();
     virtual bool equals(LgsExpr* other);
-    virtual LgsExpr* castTo(LgsType* toType);
+    virtual bool castTo(LgsType* toType);
     virtual llvm::Value* hash(LgsCodeGen* codeGen);
 
     virtual std::string pname() = 0; // pretty name

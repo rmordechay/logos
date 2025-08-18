@@ -138,13 +138,14 @@ void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
     ));
 }
 
-LgsExpr* LgsFunc::castTo(LgsType* toType) {
+bool LgsFunc::castTo(LgsType* toType) {
     const auto otherFuncType = toType->asFuncType();
+    if (!otherFuncType) return false;
     funcType->rt = otherFuncType->rt;
     for (int i = 0; i < funcType->params.size(); ++i) {
         funcType->params[i].type = otherFuncType->params[i].type;
     }
-    return this;
+    return true;
 }
 
 LgsFunc::~LgsFunc() {

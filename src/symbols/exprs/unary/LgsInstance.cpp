@@ -18,8 +18,9 @@ void LgsInstance::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
-LgsExpr* LgsInstance::castTo(LgsType* toType) {
-    return this;
+bool LgsInstance::castTo(LgsType* toType) {
+    if (!toType->asObject()) return false;
+    assert(0);
 }
 
 void LgsInstance::initFields(LgsCodeGen* codeGen, std::map<std::string, LgsField*>& fields) {

@@ -10,17 +10,9 @@ void LgsUIntConst::createIRValue(LgsCodeGen* codeGen) {
     IRValue = codeGen->i32(value);
 }
 
-LgsExpr* LgsUIntConst::castTo(LgsType* toType) {
-    if (toType->asUInt()) {
-        return this;
-    }
-    if (toType->asStr()) {
-        return new LgsStrConst(std::to_string(value));
-    }
-    if (toType->asLong()) {
-        return new LgsIntConst(&LGS_LONG, value);
-    }
-    return nullptr;
+bool LgsUIntConst::castTo(LgsType* toType) {
+    if (toType->asUInt()) return true;
+    assert(0);
 }
 
 LgsExpr* LgsUIntConst::clone() {

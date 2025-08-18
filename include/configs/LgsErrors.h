@@ -37,7 +37,7 @@ inline LgsBaseError E10014{.msg = "Expression of type '%s' does not match base t
 inline LgsBaseError E10015{.msg = "Function with name '%s' was found but it doesn't match the parameters.%pGiven:\t  %s%pExpected: %s", .errCode = errCodeStart++};
 inline LgsBaseError E10016{.msg = "Object '%s' does not fully implement '%s'. %s", .errCode = errCodeStart++};
 inline LgsBaseError E10017{.msg = "'break' must be inside a for loop.", .errCode = errCodeStart++};
-inline LgsBaseError E10018{.msg = "Expression of type '%s' cannot be casted to type '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10018{.msg = "Expression of type '%s' cannot cast to type '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10019{.msg = "activeEnv '%s' could not be found in the envs directory.", .errCode = errCodeStart++};
 inline LgsBaseError E10020{.msg = "Environment '%s' does not define the required field '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10021{.msg = "Only function call or block is allowed to run as coroutine.", .errCode = errCodeStart++};

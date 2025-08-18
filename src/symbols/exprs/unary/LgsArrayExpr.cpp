@@ -25,8 +25,8 @@ Value* LgsArrayExpr::createDynamicArray(LgsCodeGen* codeGen) {
     return IRValue;
 }
 
-LgsExpr* LgsArrayExpr::castTo(LgsType* toType) {
-    return this;
+bool LgsArrayExpr::castTo(LgsType* toType) {
+    return true;
 }
 
 Value* LgsArrayExpr::createConstArray(LgsCodeGen* codeGen) const {

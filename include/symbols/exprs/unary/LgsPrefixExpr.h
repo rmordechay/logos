@@ -9,7 +9,6 @@ enum LgsPrefixOperator {
 
 class LgsPrefixExpr final : public LgsUnaryExpr {
 public:
-
     LgsExpr* expr;
     LgsPrefixOperator op;
 

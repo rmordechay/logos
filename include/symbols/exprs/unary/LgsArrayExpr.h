@@ -16,6 +16,6 @@ public:
     void createIRValue(LgsCodeGen* codeGen) override;
     Value* createConstArray(LgsCodeGen* codeGen) const;
     Value* createDynamicArray(LgsCodeGen* codeGen);
-    LgsExpr* castTo(LgsType* toType) override;
+    bool castTo(LgsType* toType) override;
     ~LgsArrayExpr() override = default;
 };

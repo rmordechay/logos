@@ -34,7 +34,7 @@ public:
     void createEpilogue(LgsCodeGen* codeGen) const;
     void createIRValue(LgsCodeGen* codeGen) override;
     void createDebugValue(LgsCodeGen* codeGen) override;
-    LgsExpr* castTo(LgsType* toType) override;
+    bool castTo(LgsType* toType) override;
     std::string pname() override;
     std::string format(std::string& tabs) override;
     virtual Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args);

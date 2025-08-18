@@ -25,5 +25,3 @@ Type* LgsDouble::getIRType(LgsCodeGen* codeGen) {
 bool LgsDouble::equals(LgsType* other) {
     return name == other->getName();
 }
-
-inline LgsFloat LGS_DOUBLE;

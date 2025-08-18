@@ -15,3 +15,5 @@ public:
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     bool equals(LgsType* other) override;
 };
+
+inline LgsDouble LGS_DOUBLE;

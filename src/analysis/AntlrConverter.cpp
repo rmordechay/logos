@@ -41,6 +41,7 @@
 #include "types/LgsMap.h"
 #include "types/LgsNullable.h"
 #include "types/LgsUnknownType.h"
+#include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
@@ -744,7 +745,7 @@ LgsUnaryExpr* AntlrConverter::getPrefixExpr(LogosParser::PrefixExprContext* ctx)
         op = NOT_PREFIX;
     } else if (ctx->MINUS()) {
         op = MINUS_PREFIX;
-    } else if (ctx->MINUS()) {
+    } else if (ctx->SLIDER()) {
         op = SQRT_PREFIX;
     } else {
         assert(0);
@@ -1109,6 +1110,8 @@ LgsType* AntlrConverter::getTypeFromText(antlr4::tree::TerminalNode* ctx) const 
         type = &LGS_SIZE;
     } else if (typeText == LgsFloat::name) {
         type = &LGS_FLOAT;
+    } else if (typeText == LgsDouble::name) {
+        type = &LGS_DOUBLE;
     } else if (typeText == LgsVoid::name) {
         type = &LGS_VOID;
     } else if (typeText == LgsStr::name) {

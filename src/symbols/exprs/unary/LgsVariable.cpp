@@ -47,7 +47,7 @@ bool LgsVariable::equals(LgsExpr* other) {
     assert(0);
 }
 
-LgsExpr* LgsVariable::castTo(LgsType* type) {
+bool LgsVariable::castTo(LgsType* type) {
     switch (ref.symbolType) {
     case VAR_DEC:
         return ref.varDec->expr->castTo(type);
@@ -61,7 +61,7 @@ LgsExpr* LgsVariable::castTo(LgsType* type) {
     case UNKNOWN:
         break;
     }
-    assert(0);
+    return false;
 }
 
 Value* LgsVariable::hash(LgsCodeGen* codeGen) {
