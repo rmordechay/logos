@@ -4,12 +4,44 @@
 #include "types/LgsGroup.h"
 #include "utils/LgsUtils.h"
 
-std::string LgsObject::pname() {
-    return name;
+LgsObject* LgsObject::clone() {
+    const auto cloned = new LgsObject(*this);
+    cloned->fields.clear();
+    for (const auto& [fieldName, field] : fields) {
+        cloned->fields[fieldName] = new LgsField(*field);
+    }
+    return cloned;
 }
 
-std::string LgsObject::getName() {
-    return name;
+bool LgsObject::hasVirtuals() const {
+    return std::any_of(methods.begin(), methods.end(), [](const auto& pair) {
+        return pair.second->funcType->isVirtual;
+    });
+}
+
+Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
+    if (IRType) return IRType;
+    // const auto fieldsStartOffset = hasVirtuals();
+    std::vector<Type*> elementTypes(fields.size());
+    int iCounter = 0;
+    for (const auto& [fieldName, field] : fields) {
+        field->position = iCounter++;
+        Type* fieldType;
+        if (field->type->asObject()) {
+            fieldType = codeGen->ptrTy();
+        } else {
+            fieldType = field->type->getIRType(codeGen);
+        }
+        elementTypes[field->position] = fieldType;
+    }
+    IRType = StructType::getTypeByName(codeGen->context, name);
+    if (!IRType) {
+        IRType = StructType::create(codeGen->context, elementTypes, name);
+    }
+    for (const auto& [_, field] : fields) {
+        field->parentIRType = IRType;
+    }
+    return IRType;
 }
 
 LgsField* LgsObject::getField(const std::string& fieldName) {
@@ -40,33 +72,20 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
-    if (IRType) return IRType;
-    // Fields start at offset 1 if vtable exists
-    const auto fieldsStartOffset = hasVirtuals();
-    std::vector<Type*> elementTypes(fields.size() + fieldsStartOffset);
-    if (fieldsStartOffset) {
-        vtable = new LgsHashMap(new LgsStr(), &LGS_ANY);
-        elementTypes[0] = vtable->type->getIRType(codeGen);
-    }
-    for (const auto& [fieldName, field] : fields) {
-        field->position += fieldsStartOffset;
-        Type* fieldType;
-        if (field->type->asObject()) {
-            fieldType = codeGen->ptrTy();
-        } else {
-            fieldType = field->type->getIRType(codeGen);
-        }
-        elementTypes[field->position] = fieldType;
-    }
-    IRType = StructType::getTypeByName(codeGen->context, name);
-    if (!IRType) {
-        IRType = StructType::create(codeGen->context, elementTypes, name);
-    }
+void LgsObject::freeValue(LgsCodeGen* codeGen, Value* value) {
+    codeGen->builder.CreateFree(value);
+}
+
+size_t LgsObject::getSizeBytes() {
+    size_t sum = 0;
     for (const auto& [_, field] : fields) {
-        field->parentIRType = IRType;
+        if (name == field->type->getName()) {
+            sum += sizeof(void*);
+        } else {
+            sum += field->type->getSizeBytes();
+        }
     }
-    return IRType;
+    return sum;
 }
 
 LgsExpr* LgsObject::getZeroValue() {
@@ -95,42 +114,15 @@ bool LgsObject::equals(LgsType* other) {
     return name == other->getName();
 }
 
-bool LgsObject::hasVirtuals() const {
-    return std::any_of(methods.begin(), methods.end(), [](const auto& pair) {
-        return pair.second->funcType->isVirtual;
-    });
+std::string LgsObject::getName() {
+    return name;
 }
 
-void LgsObject::freeValue(LgsCodeGen* codeGen, Value* value) {
-    codeGen->builder.CreateFree(value);
-}
-
-LgsObject* LgsObject::clone() {
-    const auto cloned = new LgsObject(*this);
-    cloned->fields.clear();
-    for (const auto& [fieldName, field] : fields) {
-        cloned->fields[fieldName] = new LgsField(*field);
-    }
-    return cloned;
-}
-
-size_t LgsObject::getSizeBytes() {
-    size_t sum = 0;
-    for (const auto& [_, field] : fields) {
-        if (name == field->type->getName()) {
-            sum += sizeof(void*);
-        } else {
-            sum += field->type->getSizeBytes();
-        }
-    }
-    return sum;
+std::string LgsObject::pname() {
+    return name;
 }
 
 LgsObject::~LgsObject() {
-    if (vtable) {
-        delete vtable;
-        vtable = nullptr;
-    }
     for (const auto interface : interfaces) {
         freeType(interface);
     }

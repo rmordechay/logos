@@ -3,6 +3,7 @@
 
 struct Lgs_runtime {
     Lgs_Stack stack;
+    std::map<void*, std::map<std::string, void*>> vtable;
 };
 
 extern "C" void Lgs_Stack_push();

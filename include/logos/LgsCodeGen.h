@@ -70,11 +70,13 @@ public:
     Value* callSqrt(Value* radicant);
     void callCopyMem(Value* src, Value* dest, size_t n);
 
-    // Stack
+    // Runtime
     void callStackPush();
     void callPopStack();
     void callDefers();
     void addDeferFunc(Value* deferFuncPtr, Value* ctx);
+    void addPtrToVtable(Value* instancePtr, Value* name, Value* ptr);
+    Value* getPtrFromVtable(Value* instancePtr, Value* name);
 
     // Coroutines
     void addCoro(Value* coroPtr, Value* ctx);

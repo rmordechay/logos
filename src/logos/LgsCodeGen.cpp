@@ -225,6 +225,16 @@ void LgsCodeGen::addDeferFunc(Value* deferFuncPtr, Value* ctx) {
     callLgsFunc("Stack_addDefer", ft, {deferFuncPtr, ctx});
 }
 
+void LgsCodeGen::addPtrToVtable(Value* instancePtr, Value* name, Value* ptr) {
+    const auto ft = FunctionType::get(voidTy(), {ptrTy(), ptrTy(), ptrTy()}, false);
+    callLgsFunc("Vtable_add", ft, {instancePtr, name, ptr});
+}
+
+Value* LgsCodeGen::getPtrFromVtable(Value* instancePtr, Value* name) {
+    const auto ft = FunctionType::get(ptrTy(), {ptrTy(), ptrTy()}, false);
+    return callLgsFunc("Vtable_get", ft, {instancePtr, name});
+}
+
 void LgsCodeGen::addCoro(Value* coroPtr, Value* ctx) {
     const auto ft = FunctionType::get(voidTy(), {ptrTy(), ptrTy()}, false);
     callLgsFunc("Stack_addCoro", ft, {coroPtr, ctx});

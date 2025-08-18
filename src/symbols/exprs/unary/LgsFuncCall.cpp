@@ -29,16 +29,10 @@ Value* LgsFuncCall::getCallback(LgsCodeGen* codeGen) const {
 }
 
 void LgsFuncCall::resolveVirtualFunc(LgsCodeGen* codeGen) const {
-    auto& builder = codeGen->builder;
     const auto self = args[0];
     const auto keyIR = codeGen->getIRStr(func->funcType->getName());
     const auto selfPtr = self->getIRValue(codeGen);
-    const auto vtable = self->type->asObject()->vtable;
-    const auto vtableMap = vtable->type->asMap();
-    const auto mapType = vtable->type->getIRType(codeGen);
-    const auto mapPtr = builder.CreateGEP(mapType, selfPtr, {codeGen->i32Zero()});
-    auto rv = vtableMap->getFunc->callIR(codeGen, {mapPtr, keyIR});
-    rv = builder.CreateLoad(codeGen->ptrTy(), rv);
+    const auto rv = codeGen->getPtrFromVtable(selfPtr, keyIR);
     func->setIRValue(rv);
 }
 

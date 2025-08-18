@@ -46,6 +46,7 @@ Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
 
 Value* LgsFunc::getIRArg(LgsCodeGen* codeGen, LgsExpr* arg) {
     const auto v = arg->getIRValue(codeGen);
+    if (arg->type->asObject()) return v;
     if (arg->type->asDArray()) return v;
     if (!v->getType()->isPointerTy()) return v;
     if (v->getType()->isIntegerTy()) return v;

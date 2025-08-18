@@ -11,21 +11,21 @@ class LgsObject : public LgsType {
 public:
     std::string name;
     std::vector<LgsType*> interfaces;
-    LgsHashMap* vtable = nullptr;
+    // LgsHashMap* vtable = nullptr;
     LgsInstance* singleton = nullptr;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {}
-    std::string pname() override;
+    LgsObject* clone();
+    bool hasVirtuals() const;
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
-    std::string getName() override;
     LgsField* getField(const std::string& name) override;
     LgsFunc* getMethod(const std::string& name) override;
+    void freeValue(LgsCodeGen* codeGen, llvm::Value* value) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
-    bool hasVirtuals() const;
-    void freeValue(LgsCodeGen* codeGen, llvm::Value* value) override;
-    LgsObject* clone();
+    std::string getName() override;
+    std::string pname() override;
     ~LgsObject() override;
 };

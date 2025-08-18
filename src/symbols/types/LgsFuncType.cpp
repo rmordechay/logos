@@ -54,10 +54,8 @@ bool LgsFuncType::equals(LgsType* other) {
 std::string LgsFuncType::getName() {
     if (IRName != "") return IRName;
     std::stringstream strStream;
-    if (isMethod) {
-        if (parentName != "") {
-            strStream << parentName << "_";
-        }
+    if (isMethod && !isVirtual) {
+        strStream << parentName << "_";
     } else if (name == "") {
         strStream << "Anonymous";
     }

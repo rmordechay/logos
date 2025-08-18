@@ -1,5 +1,12 @@
 #include "Lgs_runtime.h"
-#include <cstdlib>
+
+extern "C" void Lgs_Vtable_add(void* instancePtr, const char* name, void* ptr) {
+    runtime.vtable[instancePtr].emplace(name, ptr);
+}
+
+extern "C" void* Lgs_Vtable_get(void* instancePtr, const char* name) {
+    return runtime.vtable[instancePtr][name];
+}
 
 extern "C" void Lgs_Stack_push() {
     if (runtime.stack.top + 1 >= STACK_CAPACITY) std::exit(1);

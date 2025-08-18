@@ -1,12 +1,6 @@
+#include "Lgs_hashmap.h"
 #include "types/LgsMap.h"
-#include "utils/LgsErrHandler.h"
 #include "utils/LgsUtils.h"
-
-struct Lgs_Map {
-    size_t valueSize;
-    LgsErrHandler errHandler;
-    std::unordered_map<std::string, std::vector<char>>* data;
-};
 
 extern "C" void Lgs_Map_init(Lgs_Map* map, const size_t valueSize) {
     if (!map || valueSize == 0 || valueSize > 4096) std::exit(1);

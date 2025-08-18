@@ -132,6 +132,7 @@ set(RUNTIME_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_scheduler.cpp
     src/symbols/types/primitives/LgsDouble.cpp
     include/symbols/types/primitives/LgsDouble.h
+    runtime/include/Lgs_hashmap.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

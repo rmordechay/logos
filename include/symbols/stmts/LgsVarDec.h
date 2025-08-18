@@ -13,9 +13,7 @@ public:
     LgsExpr* expr = nullptr;
     bool isNullable = false;
 
-    explicit LgsVarDec(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {
-        if (expr) type = expr->type;
-    }
+    explicit LgsVarDec(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {}
     void createIRValue(LgsCodeGen* codeGen) override;
     std::string format(std::string& indentStr) override;
     bool shouldAllocate(const llvm::Type* IRType) const;
