@@ -86,7 +86,6 @@ bool LgsApp::analyse() {
         threadPool.runTask([this, file] {
             SemaAnalyser semaAnalyser(file, globals);
             semaAnalyser.analyse();
-            std::cout << file->asJSON() << std::endl;
             std::lock_guard lock(mtx);
             if (!semaAnalyser.errHandler.successful) {
                 errHandler.mergeErrors(semaAnalyser.errHandler);

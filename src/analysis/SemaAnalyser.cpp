@@ -963,6 +963,13 @@ bool SemaAnalyser::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, cons
     return isValid;
 }
 
+void SemaAnalyser::castType(LgsExpr* expr, LgsType* toType) {
+    if (expr->type == toType) return;
+    if (!expr->castTo(toType)) {
+        errHandler.addError(E10018, &expr->location, {expr->type->pname(), toType->pname()});
+    }
+}
+
 LgsExpr* SemaAnalyser::matchExprToType(LgsExpr* expr, LgsType* type) {
     if (expr->type == type) return expr;
     if (expr->isNull) {
@@ -985,13 +992,6 @@ LgsExpr* SemaAnalyser::matchExprToType(LgsExpr* expr, LgsType* type) {
     }
     castType(expr, type);
     return expr;
-}
-
-void SemaAnalyser::castType(LgsExpr* expr, LgsType* toType) {
-    if (expr->type == toType) return;
-    if (!expr->castTo(toType)) {
-        errHandler.addError(E10018, &expr->location, {expr->type->pname(), toType->pname()});
-    }
 }
 
 void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {

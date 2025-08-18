@@ -24,7 +24,6 @@ public:
     Value* bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
-    LgsExpr* clone() override;
     ~LgsUIntConst() override = default;
 };
 

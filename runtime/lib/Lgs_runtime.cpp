@@ -24,11 +24,17 @@ extern "C" void Lgs_Stack_pop() {
 extern "C" void Lgs_Stack_addDefer(void* funcPtr, void* ctx) {
     if (runtime.stack.top < 0) std::exit(1);
     auto& top = runtime.stack.frames[runtime.stack.top];
-    const Lgs_Thunk_Func func_entry{reinterpret_cast<Lgs_Defer_Func>(funcPtr), ctx};
+    const auto deferFunc = reinterpret_cast<Lgs_Defer_Func>(funcPtr);
+    const Lgs_Thunk_Func func_entry{deferFunc, ctx};
     top.defers[top.defers_count++] = func_entry;
 }
 
 extern "C" void Lgs_Stack_addCoro(void* funcPtr, void* ctx) {
+    if (runtime.stack.top < 0) std::exit(1);
+    auto& top = runtime.stack.frames[runtime.stack.top];
+    const auto deferFunc = reinterpret_cast<Lgs_Defer_Func>(funcPtr);
+    const Lgs_Thunk_Func func_entry{deferFunc, ctx};
+    top.coros[top.coros_count++] = func_entry;
 }
 
 extern "C" void Lgs_Stack_callDefers() {

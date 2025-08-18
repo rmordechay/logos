@@ -2,9 +2,13 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "utils/LgsUtils.h"
 
-json::object LgsVarDec::asJSON() {
-    json::object obj;
-    return obj;
+bool LgsVarDec::shouldAllocate(const Type* IRType) const {
+    if (type->isVector() ||
+        type->asFuncType() ||
+        type->asMap() ||
+        type->asDArray() ||
+        expr->asInstance()) return false;
+    return !IRType->isArrayTy() && !IRType->isPointerTy() && !IRType->isVoidTy();
 }
 
 void LgsVarDec::createIRValue(LgsCodeGen* codeGen) {
@@ -18,13 +22,12 @@ void LgsVarDec::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
-bool LgsVarDec::shouldAllocate(const Type* IRType) const {
-    if (type->isVector() ||
-        type->asFuncType() ||
-        type->asMap() ||
-        type->asDArray() ||
-        expr->asInstance()) return false;
-    return !IRType->isArrayTy() && !IRType->isPointerTy() && !IRType->isVoidTy();
+json::object LgsVarDec::asJSON() {
+    json::object obj;
+    obj["stmtKind"] = "VarDec";
+    obj["type"] = type->asJSON();
+    obj["expr"] = expr->asJSON();
+    return obj;
 }
 
 LgsVarDec::~LgsVarDec() {

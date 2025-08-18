@@ -1,8 +1,19 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 
-json::object LgsIntConst::asJSON() {
-    json::object obj;
-    return obj;
+void LgsIntConst::setNumberType() {
+    if (type->asBool()) {
+        numberType = LgsNumberType::I1;
+    } else if (type->asChar()) {
+        numberType = LgsNumberType::I8;
+    } else if (type->asShort()) {
+        numberType = LgsNumberType::I16;
+    } else if (type->asInt()) {
+        numberType = LgsNumberType::I32;
+    } else if (type->asInt()) {
+        numberType = LgsNumberType::I64;
+    } else {
+        assert(0);
+    }
 }
 
 void LgsIntConst::createIRValue(LgsCodeGen* codeGen) {
@@ -27,4 +38,9 @@ void LgsIntConst::createIRValue(LgsCodeGen* codeGen) {
 
 std::string LgsIntConst::pname() {
     return type->getName() + "(" + std::to_string(value) + ")";
+}
+
+json::object LgsIntConst::asJSON() {
+    json::object obj;
+    return obj;
 }

@@ -11,12 +11,12 @@ public:
     }
     size_t getSizeBytes() override;
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
-    std::string getName() override;
-    std::string pname() override;
-    json::object asJSON() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     std::string strFormatPart() const override;
+    std::string getName() override;
+    std::string pname() override;
+    json::object asJSON() override;
     ~LgsInt() override = default;
 };
 

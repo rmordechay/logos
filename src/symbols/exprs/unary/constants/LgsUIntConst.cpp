@@ -20,10 +20,6 @@ bool LgsUIntConst::castTo(LgsType* toType) {
     assert(0);
 }
 
-LgsExpr* LgsUIntConst::clone() {
-    return new LgsIntConst(&LGS_UINT, value);
-}
-
 Value* LgsUIntConst::eqIR(LgsCodeGen* codeGen, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(codeGen);
     const auto thisIRValue = getIRValue(codeGen);

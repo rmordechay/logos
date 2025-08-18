@@ -628,6 +628,7 @@ LgsForLoop* AntlrConverter::getRangeLoop(LogosParser::LoopStatementContext* ctx)
     const auto loopVarToken = ctx->IDENTIFIER().front();
     const auto loopVarName = loopVarToken->getText();
     auto varDec = getVarDec(loopVarToken, LGS_INT.getZeroValue());
+    varDec->type = &LGS_INT;
     varDec->expr->location = varDec->location;
     rangeLoop->loopVars.emplace_back(varDec);
     return rangeLoop;

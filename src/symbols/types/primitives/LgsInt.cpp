@@ -12,21 +12,8 @@ size_t LgsInt::getSizeBytes() {
     return sizeof(int);
 }
 
-json::object LgsInt::asJSON() {
-    json::object obj;
-    return obj;
-}
-
-std::string LgsInt::pname() {
-    return name;
-}
-
 Type* LgsInt::getIRType(LgsCodeGen* codeGen) {
     return codeGen->i32Ty();
-}
-
-std::string LgsInt::getName() {
-    return name;
 }
 
 LgsExpr* LgsInt::getZeroValue() {
@@ -45,4 +32,18 @@ bool LgsInt::equals(LgsType* other) {
 
 std::string LgsInt::strFormatPart() const {
     return "%d";
+}
+
+std::string LgsInt::getName() {
+    return name;
+}
+
+std::string LgsInt::pname() {
+    return getName();
+}
+
+json::object LgsInt::asJSON() {
+    json::object jsonObj;
+    jsonObj["name"] = name;
+    return jsonObj;
 }

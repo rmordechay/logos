@@ -152,7 +152,7 @@ json::object LgsFunc::asJSON() {
         params.emplace_back(param.asJSON());
     }
     obj["params"] = params;
-    obj["stmtsBlock"] = stmtsBlock->asJSON();
+    obj["stmtsBlock"] = stmtsBlock->asJSON()["stmts"];
     return obj;
 }
 

@@ -119,8 +119,14 @@ std::string LgsObject::getName() {
 }
 
 json::object LgsObject::asJSON() {
-    json::object obj;
-    return obj;
+    json::object jsonObj;
+    jsonObj["name"] = getName();
+    json::array jsonFields;
+    for (auto& [_, field] : fields) {
+        jsonFields.emplace_back(field->asJSON());
+    }
+    jsonObj["fields"] = jsonFields;
+    return jsonObj;
 }
 
 std::string LgsObject::pname() {

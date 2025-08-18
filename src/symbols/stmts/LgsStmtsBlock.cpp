@@ -53,8 +53,13 @@ LgsStmt* LgsStmtsBlock::lastStmt() const {
 }
 
 json::object LgsStmtsBlock::asJSON() {
-    json::object obj;
-    return obj;
+    json::array jsonStmts;
+    for (const auto& stmt : stmts) {
+        jsonStmts.emplace_back(stmt->asJSON());
+    }
+    json::object jsonObj;
+    jsonObj["stmts"] = jsonStmts;
+    return jsonObj;
 }
 
 LgsStmtsBlock::~LgsStmtsBlock() {
