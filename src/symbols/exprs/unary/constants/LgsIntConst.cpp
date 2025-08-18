@@ -1,7 +1,7 @@
-#include "exprs/unary/constants/LgsNumberConst.h"
+#include "exprs/unary/constants/LgsIntConst.h"
 
-void LgsNumberConst::createIRValue(LgsCodeGen* codeGen) {
-    switch (number) {
+void LgsIntConst::createIRValue(LgsCodeGen* codeGen) {
+    switch (numberType) {
     case LgsNumberType::I1:
         IRValue = codeGen->i1(value);
         break;
@@ -20,6 +20,6 @@ void LgsNumberConst::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
-std::string LgsNumberConst::pname() {
-    return std::to_string(value);
+std::string LgsIntConst::pname() {
+    return type->getName() + "(" + std::to_string(value) + ")";
 }

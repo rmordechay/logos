@@ -14,7 +14,7 @@
 #include "types/LgsIterator.h"
 
 size_t LgsExpr::getConstInt() {
-    if (const auto intConst = asConstNumber()) {
+    if (const auto intConst = asIntConst()) {
         return intConst->value;
     }
     if (const auto var = asVariable()) {
@@ -68,7 +68,7 @@ LgsCharConst* LgsExpr::asCharConst() { return dynamic_cast<LgsCharConst*>(this);
 LgsFloatConst* LgsExpr::asFloatConst() { return dynamic_cast<LgsFloatConst*>(this); }
 LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }
 LgsVectorExpr* LgsExpr::asVector() { return dynamic_cast<LgsVectorExpr*>(this); }
-LgsNumberConst* LgsExpr::asConstNumber() { return dynamic_cast<LgsNumberConst*>(this); }
+LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
 
 LgsExpr* LgsExpr::clone() { assert(0); }
 bool LgsExpr::equals(LgsExpr* other) { assert(0); }

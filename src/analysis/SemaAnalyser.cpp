@@ -19,6 +19,7 @@
 #include "exprs/unary/LgsPrefixExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
+#include "funcs/LgsMainFunc.h"
 #include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
 #include "loops/LgsWhileLoop.h"
@@ -122,19 +123,6 @@ void SemaAnalyser::visitField(LgsField* field) {
     }
 }
 
-bool isTerminator(LgsValue* value) {
-    if (dynamic_cast<LgsBreak*>(value) || dynamic_cast<LgsContinue*>(value) || dynamic_cast<LgsReturn*>(value)) {
-        return true;
-    }
-    const auto fc = dynamic_cast<LgsFuncCall*>(value);
-    if (fc && fc->func && fc->func->funcType->isTerminator) return true;
-    const auto selection = dynamic_cast<LgsSelection*>(value);
-    if (!selection) return false;
-    const auto methodCall = selection->lastExpr()->asFuncCall();
-    if (!methodCall) return false;
-    return methodCall->func && methodCall->func->funcType->isTerminator;
-}
-
 void SemaAnalyser::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     if (!stmtsBlock || stmtsBlock->stmts.empty()) return;
     for (const auto& stmt : stmtsBlock->stmts) {
@@ -142,6 +130,18 @@ void SemaAnalyser::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     }
     const auto lastStmt = stmtsBlock->lastStmt();
     stmtsBlock->returnExpr = lastStmt->asReturn();
+    const auto isTerminator = [](LgsValue* value) -> bool {
+        if (dynamic_cast<LgsBreak*>(value) || dynamic_cast<LgsContinue*>(value) || dynamic_cast<LgsReturn*>(value)) {
+            return true;
+        }
+        const auto fc = dynamic_cast<LgsFuncCall*>(value);
+        if (fc && fc->func && fc->func->funcType->isTerminator) return true;
+        const auto selection = dynamic_cast<LgsSelection*>(value);
+        if (!selection) return false;
+        const auto methodCall = selection->lastExpr()->asFuncCall();
+        if (!methodCall) return false;
+        return methodCall->func && methodCall->func->funcType->isTerminator;
+    };
     for (int i = 0; i < stmtsBlock->stmts.size() - 1; ++i) {
         if (isTerminator(stmtsBlock->stmts[i])) {
             return errHandler.addError(E10059, &lastStmt->location);
@@ -165,13 +165,14 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
 void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     if (varDec->expr && varDec->type) {
         visitExpr(varDec->expr);
-        varDec->type = resolveType(varDec->type);
+        varDec->type = typeResolver.resolveType(varDec->type, *file);
         varDec->expr = matchExprToType(varDec->expr, varDec->type);
     } else if (varDec->expr) {
         visitExpr(varDec->expr);
         varDec->type = varDec->expr->type;
     } else {
-        varDec->type = resolveType(varDec->type);
+        if (const auto iter = varDec->type->asIterable()) visitExpr(iter->sizeExpr);
+        varDec->type = typeResolver.resolveType(varDec->type, *file);
         varDec->expr = varDec->type->getZeroValue();
         varDec->expr->location = varDec->location;
     }
@@ -358,6 +359,9 @@ void SemaAnalyser::visitReturnStmt(LgsReturn* returnStmt) {
 
 void SemaAnalyser::visitExpr(LgsExpr* expr) {
     if (!expr) return;
+    if (const auto iter = expr->type->asIterable()) {
+        visitExpr(iter->sizeExpr);
+    }
     if (const auto castExpr = dynamic_cast<LgsCast*>(expr)) {
         visitCast(castExpr);
     } else if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(expr)) {
@@ -377,7 +381,7 @@ void SemaAnalyser::visitCast(LgsCast* castExpr) {
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(fromValue)) {
         visitBinaryExpr(binaryExpr);
     }
-    castExpr->toType = resolveType(castExpr->toType);
+    castExpr->toType = typeResolver.resolveType(castExpr->toType, *file);
     castExpr->toValue = fromValue->castTo(castExpr->toType);
     if (!castExpr->toValue) {
         errHandler.addError(E10018, &castExpr->location, {fromValue->type->pname(), castExpr->toType->pname()});
@@ -506,7 +510,7 @@ void SemaAnalyser::visitStaticArray(LgsArrayExpr* arrayExpr) {
 void SemaAnalyser::visitDynamicArray(LgsArrayExpr* array) {
     const auto dArr = array->type->asIterable();
     if (!dArr->sizeExpr) {
-        dArr->sizeExpr = new LgsNumberConst(&LGS_LONG, array->initialElements.size());
+        dArr->sizeExpr = new LgsIntConst(&LGS_LONG, array->initialElements.size());
     }
     if (!dArr->baseType && array->initialElements.empty()) {
         errHandler.addError(E10049, &array->location);
@@ -979,58 +983,6 @@ LgsExpr* SemaAnalyser::matchExprToType(LgsExpr* expr, LgsType* type) {
     return castExpr;
 }
 
-LgsType* SemaAnalyser::resolveType(LgsType* type) {
-    if (const auto nullable = type->asNullable()) {
-        nullable->baseType = resolveType(nullable->baseType);
-    }
-    if (const auto iter = type->asIterable()) {
-        resolveIterable(iter);
-    }
-    if (const auto pair = type->asPair()) {
-        pair->key = resolveType(pair->key);
-        pair->value = resolveType(pair->value);
-    }
-    if (const auto funcType = type->asFuncType()) {
-        resolveFuncTypes(funcType);
-    }
-
-    if (type->isUnknown()) {
-        auto typeName = type->getName();
-        auto symbol = globals.getSymbol(typeName);
-        if (!symbol) {
-            symbol = file->symbolTable.getSymbol(typeName);
-        }
-        if (!symbol) {
-            errHandler.addError(E10006, &type->location, {typeName});
-            return nullptr;
-        }
-        LgsType* newType = nullptr;
-        switch (symbol->symbolType) {
-        case FUNC:
-            newType = symbol->func->funcType;
-            break;
-        case OBJECT:
-            newType = symbol->object;
-            break;
-        case INTERFACE:
-            newType = symbol->interface;
-            break;
-        case GROUP:
-            newType = symbol->group;
-            break;
-        case ENUM:
-            newType = symbol->lgsEnum;
-            break;
-        default:
-            break;
-        }
-        assert(newType);
-        freeType(type);
-        type = newType;
-    }
-    return type;
-}
-
 void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
     const auto symbol = getSymbol(funcCall->name, &funcCall->location);
     if (!symbol) return;
@@ -1075,58 +1027,6 @@ bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentTyp
         return false;
     }
     return true;
-}
-
-void SemaAnalyser::resolveIterable(LgsIterable* iterable) {
-    iterable->baseType = resolveType(iterable->baseType);
-    visitExpr(iterable->sizeExpr);
-    if (iterable->asSArray()) {
-        const auto exprConstNumber = iterable->sizeExpr->getConstInt();
-        if (exprConstNumber == 0) {
-            return errHandler.addError(E10048, &iterable->location, {iterable->pname()});
-        }
-    }
-}
-
-void SemaAnalyser::resolveFuncTypes(LgsFuncType* funcType) {
-    for (auto & param : funcType->params) {
-        param.type = resolveType(param.type);
-    }
-    funcType->rt = resolveType(funcType->rt);
-}
-
-void SemaAnalyser::resolveObjTypes(LgsObject* obj) {
-    for (const auto& [_, field] : obj->fields) {
-        if (obj->name == field->type->getName()) {
-            field->type = obj;
-        } else {
-            field->type = resolveType(field->type);
-        }
-    }
-    for (const auto& [_, method] : obj->methods) {
-        resolveFuncTypes(method->funcType);
-    }
-    for (auto& interface : obj->interfaces) {
-        interface = resolveType(interface);
-    }
-}
-
-void SemaAnalyser::resolveInterfaceTypes(LgsInterface* interface) {
-    for (const auto& [_, field] : interface->fields) {
-        field->type = resolveType(field->type);
-    }
-    for (const auto& [_, method] : interface->methods) {
-        resolveFuncTypes(method->funcType);
-    }
-    for (auto& i : interface->interfaces) {
-        i = resolveType(i);
-    }
-}
-
-void SemaAnalyser::resolveGroupTypes(LgsGroup* group) {
-    for (auto & type : group->types) {
-        type = resolveType(type);
-    }
 }
 
 LgsField* SemaAnalyser::resolveVectorField(LgsVariable* fieldVar, LgsVec* vecType) {

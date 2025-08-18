@@ -34,12 +34,12 @@ llvm_map_components_to_libnames(LLVM_LIBS
 )
 
 set(CORE_SOURCES
-    src/utils/LgsErrHandler.cpp
     src/logos/LgsApp.cpp
     src/logos/LgsStack.cpp
     src/logos/LgsLinker.cpp
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
+    src/analysis/LgsTypeResolver.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsFormatCmd.cpp
     src/cli/LgsGenerateCmd.cpp
@@ -53,6 +53,7 @@ set(CORE_SOURCES
     src/utils/LgsUtils.cpp
     src/logos/LgsCodeGen.cpp
     src/files/LgsInterfaceFile.cpp
+    src/utils/LgsErrHandler.cpp
 
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsValue.cpp
@@ -64,7 +65,8 @@ set(CORE_SOURCES
     src/symbols/exprs/unary/constants/LgsCharConst.cpp
     src/symbols/exprs/unary/constants/LgsFloatConst.cpp
     src/symbols/exprs/unary/constants/LgsStrConst.cpp
-    src/symbols/exprs/unary/constants/LgsUNumberConst.cpp
+    src/symbols/exprs/unary/constants/LgsUIntConst.cpp
+    src/symbols/exprs/unary/constants/LgsIntConst.cpp
     src/symbols/exprs/unary/LgsVectorExpr.cpp
     src/symbols/exprs/unary/LgsArrayExpr.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
@@ -128,8 +130,8 @@ set(RUNTIME_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_defer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_runtime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_scheduler.cpp
-    src/symbols/exprs/unary/constants/LgsNumberConst.cpp
-    include/symbols/exprs/unary/constants/LgsNumberConst.h
+    src/symbols/types/primitives/LgsDouble.cpp
+    include/symbols/types/primitives/LgsDouble.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

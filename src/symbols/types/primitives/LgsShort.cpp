@@ -1,5 +1,5 @@
 #include "types/primitives/LgsShort.h"
-#include "exprs/unary/constants/LgsNumberConst.h"
+#include "exprs/unary/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
@@ -24,7 +24,7 @@ std::string LgsShort::getName() {
 }
 
 LgsExpr* LgsShort::getZeroValue() {
-    return new LgsNumberConst(&LGS_SHORT, 0);
+    return new LgsIntConst(&LGS_SHORT, 0);
 }
 
 bool LgsShort::equals(LgsType* other) {

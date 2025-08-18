@@ -1,5 +1,5 @@
 #pragma once
-#include "LgsNumberConst.h"
+#include "LgsIntConst.h"
 #include "types/LgsStr.h"
 #include "types/primitives/LgsInt.h"
 
@@ -11,7 +11,7 @@ public:
 
     explicit LgsStrConst(const std::string& value) : value(value) {
         const auto lgsStr = new LgsStr();
-        lgsStr->sizeExpr = new LgsNumberConst(&LGS_INT, value.size());
+        lgsStr->sizeExpr = new LgsIntConst(&LGS_INT, value.size());
         type = lgsStr;
     }
 

@@ -1,10 +1,10 @@
 #pragma once
 #include "LgsUnaryExpr.h"
-#include "stmts/LgsStmt.h"
 
 enum LgsPrefixOperator {
     NOT_PREFIX,
     MINUS_PREFIX,
+    SQRT_PREFIX,
 };
 
 class LgsPrefixExpr final : public LgsUnaryExpr {
@@ -14,7 +14,7 @@ public:
     LgsPrefixOperator op;
 
     LgsPrefixExpr(LgsExpr* baseExpr, const LgsPrefixOperator op) : expr(baseExpr), op(op) {}
-    std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
+    std::string pname() override;
     ~LgsPrefixExpr() override = default;
 };

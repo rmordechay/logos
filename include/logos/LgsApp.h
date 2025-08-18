@@ -49,7 +49,6 @@ public:
     void loadEnvFiles();
     void loadBuiltins();
     void parseEnvFile(fs::path fileEntry);
-    bool resolveGlobalTypes();
     void setEnvVars();
     void writeIRFiles();
     bool checkParserErrors(LogosParser* parser);

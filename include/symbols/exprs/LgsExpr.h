@@ -1,9 +1,8 @@
 #pragma once
 #include <stmts/LgsStmt.h>
-
 #include "LgsValue.h"
 
-class LgsNumberConst;
+class LgsIntConst;
 class LgsVectorExpr;
 class LgsPrefixExpr;
 class LgsIterator;
@@ -48,7 +47,7 @@ public:
     LgsFloatConst* asFloatConst();
     LgsStrConst* asStrConst();
     LgsVectorExpr* asVector();
-    LgsNumberConst* asConstNumber();
+    LgsIntConst* asIntConst();
 
     virtual LgsExpr* clone();
     virtual bool equals(LgsExpr* other);
@@ -76,4 +75,3 @@ public:
     virtual llvm::Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
     ~LgsExpr() override;
 };
-

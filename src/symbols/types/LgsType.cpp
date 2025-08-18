@@ -9,6 +9,7 @@
 #include "types/LgsNullable.h"
 #include "types/LgsSArray.h"
 #include "types/LgsUnknownType.h"
+#include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsUInt.h"
 
@@ -64,6 +65,8 @@ LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }
 LgsInt* LgsType::asInt() { return dynamic_cast<LgsInt*>(this); }
 LgsLong* LgsType::asLong() { return dynamic_cast<LgsLong*>(this); }
 LgsUInt* LgsType::asUInt() { return dynamic_cast<LgsUInt*>(this); }
+LgsFloat* LgsType::asFloat() { return dynamic_cast<LgsFloat*>(this); }
+LgsDouble* LgsType::asDouble() { return dynamic_cast<LgsDouble*>(this); }
 LgsStr* LgsType::asStr() { return dynamic_cast<LgsStr*>(this); }
 LgsObject* LgsType::asObject() { return dynamic_cast<LgsObject*>(this); }
 LgsNullable* LgsType::asNullable() { return dynamic_cast<LgsNullable*>(this); }

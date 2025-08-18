@@ -1,6 +1,6 @@
 #pragma once
 
-#include "exprs/unary/constants/LgsNumberConst.h"
+#include "exprs/unary/constants/LgsIntConst.h"
 #include "primitives/LgsInt.h"
 #include "stmts/LgsField.h"
 #include "types/primitives/LgsFloat.h"
@@ -10,7 +10,7 @@ public:
     int8_t dim = 0;
 
     explicit LgsVec(const int8_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), dim(dim) {
-        sizeExpr = new LgsNumberConst(&LGS_INT, dim);
+        sizeExpr = new LgsIntConst(&LGS_INT, dim);
     }
 
     Type* getIRType(LgsCodeGen* codeGen) override;

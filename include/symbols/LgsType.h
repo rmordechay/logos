@@ -1,6 +1,9 @@
 #pragma once
 #include "configs/LgsErrors.h"
 
+class LgsDouble;
+class LgsFloat;
+
 namespace llvm {
     class Value;
     class Type;
@@ -61,6 +64,8 @@ public:
     LgsShort* asShort();
     LgsLong* asLong();
     LgsUInt* asUInt();
+    LgsFloat* asFloat();
+    LgsDouble* asDouble();
     LgsMap* asMap();
     LgsEnum* asEnum();
     LgsNullable* asNullable();

@@ -78,7 +78,10 @@ bool LgsApp::parse() {
 }
 
 bool LgsApp::analyse() {
-    if (!resolveGlobalTypes()) exitWithErrors(errHandler, ast);
+    LgsTypeResolver typeResolver(errHandler, globals);
+    if (!typeResolver.resolveGlobalTypes(ast)) {
+        exitWithErrors(errHandler, ast);
+    }
     for (const auto file : ast) {
         threadPool.runTask([this, file] {
             SemaAnalyser semaAnalyser(file, globals);
@@ -183,37 +186,6 @@ bool LgsApp::checkParserErrors(LogosParser* parser) {
         return false;
     }
     return true;
-}
-
-bool LgsApp::resolveGlobalTypes() {
-    bool successful = true;
-    for (const auto& file : ast) {
-        SemaAnalyser semaAnalyser(file, globals);
-        if (const auto mf = dynamic_cast<LgsMainFile*>(file)) {
-            for (const auto object : mf->objects) {
-                semaAnalyser.resolveObjTypes(object);
-            }
-            for (const auto interface : mf->interfaces) {
-                semaAnalyser.resolveInterfaceTypes(interface);
-            }
-            for (const auto group : mf->groups) {
-                semaAnalyser.resolveGroupTypes(group);
-            }
-            for (const auto [_, func] : mf->funcs) {
-                if (dynamic_cast<LgsMainFunc*>(func)) continue;
-                semaAnalyser.resolveFuncTypes(func->funcType);
-            }
-        } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
-            semaAnalyser.resolveObjTypes(objFile->obj);
-        } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
-            semaAnalyser.resolveInterfaceTypes(interfaceFile->interface);
-        }
-        if (!semaAnalyser.errHandler.successful) {
-            errHandler.mergeErrors(semaAnalyser.errHandler);
-        }
-        successful = successful && semaAnalyser.errHandler.successful;
-    }
-    return successful;
 }
 
 void LgsApp::loadBuiltins() {

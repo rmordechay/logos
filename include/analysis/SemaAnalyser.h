@@ -2,6 +2,7 @@
 #include "../symbols/exprs/unary/LgsVectorExpr.h"
 #include "logos/LgsStack.h"
 #include "utils/LgsErrHandler.h"
+#include "analysis/LgsTypeResolver.h"
 
 class LgsPostfixExpr;
 class LgsDeferStmt;
@@ -51,8 +52,9 @@ public:
     LgsFile* file = nullptr;
     LgsErrHandler errHandler;
     LgsSymbolTable& globals;
+    LgsTypeResolver typeResolver;
 
-    explicit SemaAnalyser(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals) {}
+    explicit SemaAnalyser(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {}
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
@@ -110,17 +112,12 @@ public:
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     LgsExpr* matchExprToType(LgsExpr* expr, LgsType* type);
-    LgsType* resolveType(LgsType* type);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
-    void resolveIterable(LgsIterable* iterable);
-    void resolveFuncTypes(LgsFuncType* funcType);
-    void resolveObjTypes(LgsObject* obj);
     bool resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
-    void resolveInterfaceTypes(LgsInterface* interface);
-    void resolveGroupTypes(LgsGroup* group);
     LgsField* resolveVectorField(LgsVariable* fieldVar, LgsVec* vecType);
     std::vector<uint8_t> resolveScalars(LgsVariable* fieldVar, LgsVec* vec);
     LgsSymbol* getSymbol(const std::string& name, LgsLocation* location);
     void addLocalSymbol(const LgsSymbol& newSymbol);
 };
+

@@ -4,12 +4,12 @@
 
 class LgsFloatConst final : public LgsUnaryExpr {
 public:
-    float_t value;
+    double_t value;
 
-    explicit LgsFloatConst(const float value) : LgsUnaryExpr(&LGS_FLOAT), value(value) {}
+    explicit LgsFloatConst(LgsType* type, const double_t value) : LgsUnaryExpr(type), value(value) {
+        isConstant = true;
+    }
     void createIRValue(LgsCodeGen* codeGen) override;
     std::string pname() override;
     ~LgsFloatConst() override = default;
 };
-
-

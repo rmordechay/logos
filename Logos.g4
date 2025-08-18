@@ -212,7 +212,7 @@ unaryExpr:
     ;
 
 prefixExpr:
-        (NOT | MINUS) expr
+        (NOT | MINUS | SLIDER) expr
     ;
 
 postfixExpr:
@@ -405,6 +405,7 @@ PIPE: '|';
 CARET: '^';
 DOUBLE_RANGLE: '<<';
 DOUBLE_LANGLE: '>>';
+SLIDER: '_/';
 
 OBJECT: 'object';
 SINGLETON: 'single';

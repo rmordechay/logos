@@ -1,10 +1,11 @@
 #include "types/primitives/LgsUInt.h"
-#include "exprs/unary/constants/LgsUNumberConst.h"
+
+#include "exprs/unary/constants/LgsIntConst.h"
+#include "logos/LgsCodeGen.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 #include "types/primitives/LgsSize.h"
 
-#include "utils/LgsUtils.h"
 
 size_t LgsUInt::getSizeBytes() {
     return sizeof(unsigned int);
@@ -14,7 +15,7 @@ std::string LgsUInt::pname() {
     return name;
 }
 
-Type* LgsUInt::getIRType(LgsCodeGen* codeGen) {
+llvm::Type* LgsUInt::getIRType(LgsCodeGen* codeGen) {
     return codeGen->i32Ty();
 }
 
@@ -23,7 +24,7 @@ std::string LgsUInt::getName() {
 }
 
 LgsExpr* LgsUInt::getZeroValue() {
-    return new LgsUNumberConst(0);
+    return new LgsIntConst(this, 0);
 }
 
 bool LgsUInt::equals(LgsType* other) {

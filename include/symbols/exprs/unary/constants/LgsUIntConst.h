@@ -2,11 +2,11 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "types/primitives/LgsUInt.h"
 
-class LgsUNumberConst final : public LgsUnaryExpr {
+class LgsUIntConst final : public LgsUnaryExpr {
 public:
     int64_t value;
 
-    explicit LgsUNumberConst(const int value) : LgsUnaryExpr(&LGS_UINT), value(value) {}
+    explicit LgsUIntConst(const int value) : LgsUnaryExpr(&LGS_UINT), value(value) {}
     std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
     LgsExpr* castTo(LgsType* toType) override;
@@ -24,7 +24,7 @@ public:
     Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     LgsExpr* clone() override;
-    ~LgsUNumberConst() override = default;
+    ~LgsUIntConst() override = default;
 };
 
 

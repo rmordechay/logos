@@ -14,7 +14,7 @@ void LgsStrConst::createIRValue(LgsCodeGen* codeGen) {
 }
 
 Value* LgsStrConst::addIR(LgsCodeGen* codeGen, LgsExpr* other) {
-    if (const auto otherStrConst = other->asConstNumber()) {
+    if (const auto otherStrConst = other->asIntConst()) {
         return codeGen->getIRStr(this->value + std::to_string(otherStrConst->value));
     }
     assert(0);

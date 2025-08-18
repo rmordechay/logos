@@ -16,7 +16,7 @@ std::string LgsFloat::getName() {
 }
 
 LgsExpr* LgsFloat::getZeroValue() {
-    return new LgsFloatConst(0.0);
+    return new LgsFloatConst(this, 0.0);
 }
 
 size_t LgsFloat::getSizeBytes() {

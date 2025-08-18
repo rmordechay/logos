@@ -95,6 +95,7 @@ public:
     Type* i32Ty();
     Type* i64Ty();
     Type* floatTy();
+    Type* doubleTy();
     Type* voidTy();
     Type* iNTy(unsigned n);
     IntegerType* sizeTy();
@@ -107,7 +108,8 @@ public:
     ConstantInt* i16(int16_t v);
     ConstantInt* i32(int32_t v);
     ConstantInt* i64(int64_t v);
-    ConstantFP* floatv(float v);
+    Constant* floatv(float_t v);
+    Constant* doublev(double_t v);
     ConstantInt* isize(size_t v);
     ConstantInt* i32Zero();
     ConstantInt* i64Zero();

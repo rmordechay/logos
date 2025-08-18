@@ -305,6 +305,10 @@ Type* LgsCodeGen::floatTy() {
     return builder.getFloatTy();
 }
 
+Type* LgsCodeGen::doubleTy() {
+    return builder.getDoubleTy();
+}
+
 Value* LgsCodeGen::null() {
     return ConstantPointerNull::get(ptrTy());
 }
@@ -329,8 +333,12 @@ ConstantInt* LgsCodeGen::i64(const int64_t v) {
     return builder.getInt64(v);
 }
 
-ConstantFP* LgsCodeGen::floatv(const float_t v) {
-    return ConstantFP::get(context, APFloat(v));
+Constant* LgsCodeGen::floatv(const float_t v) {
+    return ConstantFP::get(floatTy(), v);
+}
+
+Constant* LgsCodeGen::doublev(const double_t v) {
+    return ConstantFP::get(doubleTy(), v);
 }
 
 ConstantInt* LgsCodeGen::isize(const size_t v) {

@@ -1,5 +1,6 @@
 #include "types/primitives/LgsBool.h"
-#include "exprs/unary/constants/LgsNumberConst.h"
+
+#include "exprs/unary/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
@@ -21,7 +22,7 @@ std::string LgsBool::getName() {
 }
 
 LgsExpr* LgsBool::getZeroValue() {
-    return new LgsNumberConst(&LGS_BOOL, false);
+    return new LgsIntConst(&LGS_BOOL, false);
 }
 
 bool LgsBool::equals(LgsType* other) {

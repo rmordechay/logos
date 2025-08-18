@@ -7,6 +7,7 @@ public:
 
     LgsFloat() {
         isPrimitive = true;
+        isNumber = true;
     }
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
@@ -15,9 +16,6 @@ public:
     std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
     std::string pname() override;
-    ~LgsFloat() override = default;
 };
 
 inline LgsFloat LGS_FLOAT;
-
-
