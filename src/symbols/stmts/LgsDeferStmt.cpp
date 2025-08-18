@@ -5,6 +5,11 @@
 #include <exprs/unary/LgsSelection.h>
 #include <llvm/IR/Module.h>
 
+json::object LgsDeferStmt::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsDeferStmt::createIRValue(LgsCodeGen* codeGen) {
     const auto fc = funcCall ? funcCall : selection->lastExpr()->asFuncCall();
     const auto ctxTy = codeGen->getThunkCtxType(fc);

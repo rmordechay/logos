@@ -1,8 +1,8 @@
 #pragma once
-#include "LgsAny.h"
+#include "../../types/LgsAny.h"
 #include "exprs/unary/LgsUnaryExpr.h"
-#include "primitives/LgsBool.h"
-#include "LgsVoid.h"
+#include "../../types/primitives/LgsBool.h"
+#include "../../types/LgsVoid.h"
 #include "funcs/LgsFunc.h"
 
 class LgsIterator final : public LgsUnaryExpr {
@@ -17,6 +17,7 @@ public:
 
     std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
+    json::object asJSON() override;
     void initIterator(LgsCodeGen* codeGen);
     Value* next(LgsCodeGen* codeGen) const;
     Value* hasNext(LgsCodeGen* codeGen) const;

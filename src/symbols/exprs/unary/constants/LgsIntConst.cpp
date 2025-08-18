@@ -1,5 +1,10 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 
+json::object LgsIntConst::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsIntConst::createIRValue(LgsCodeGen* codeGen) {
     switch (numberType) {
     case LgsNumberType::I1:

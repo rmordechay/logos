@@ -16,6 +16,7 @@ public:
     explicit LgsFuncCall(const std::string& name, const std::vector<LgsExpr*>& args = {}) : name(name), args(args) {}
     Value* getCallback(LgsCodeGen* codeGen) const;
     void createIRValue(LgsCodeGen* codeGen) override;
+    json::object asJSON() override;
     bool equals(const LgsFuncType* funcType) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;

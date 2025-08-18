@@ -6,6 +6,7 @@ public:
     static constexpr auto name = "Void";
 
     std::string pname() override;
+    json::object asJSON() override;
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     size_t getSizeBytes() override;
     std::string getName() override;

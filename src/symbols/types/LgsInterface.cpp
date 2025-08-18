@@ -68,6 +68,11 @@ size_t LgsInterface::getSizeBytes() {
     return 0;
 }
 
+json::object LgsInterface::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsInterface::pname() {
     return name;
 }

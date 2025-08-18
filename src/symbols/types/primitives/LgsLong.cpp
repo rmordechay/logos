@@ -6,6 +6,11 @@
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsSize.h"
 
+json::object LgsLong::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsLong::pname() {
     return name;
 }

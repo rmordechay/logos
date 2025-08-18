@@ -31,6 +31,11 @@ std::string LgsSArray::strFormatPart() const {
     return "%p";
 }
 
+json::object LgsSArray::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsSArray::pname() {
     const auto index = sizeExpr->getConstInt() == 0 ? "" : std::to_string(sizeExpr->getConstInt());
     const auto ty = baseType ? baseType->pname() : "";

@@ -3,6 +3,11 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 
+json::object LgsFloat::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsFloat::pname() {
     return name;
 }

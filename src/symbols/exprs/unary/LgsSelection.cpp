@@ -5,6 +5,11 @@
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 
+json::object LgsSelection::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsSelection::createIRValue(LgsCodeGen* codeGen) {
     auto startIndex = 0;
     const auto parentAsVar = exprs.front()->asVariable();

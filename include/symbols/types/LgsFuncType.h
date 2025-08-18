@@ -43,6 +43,7 @@ public:
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string pname() override;
+    json::object asJSON() override;
     size_t getSizeBytes() override;
     bool equals(LgsType* other) override;
     std::string strFormatPart() const override;

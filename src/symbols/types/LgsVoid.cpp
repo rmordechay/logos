@@ -3,6 +3,11 @@
 #include "exprs/LgsNull.h"
 
 
+json::object LgsVoid::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsVoid::pname() {
     return name;
 }

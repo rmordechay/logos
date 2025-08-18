@@ -29,6 +29,11 @@ std::string LgsDArray::getName() {
     return name;
 }
 
+json::object LgsDArray::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsDArray::pname() {
     assert(baseType);
     return baseType->pname() + "[]";

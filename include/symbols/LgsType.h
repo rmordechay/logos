@@ -89,6 +89,7 @@ public:
     virtual std::string pname() = 0; // pretty name
     virtual bool equals(LgsType* other) = 0;
     virtual std::string strFormatPart() const = 0;
+    virtual json::object asJSON() = 0;
     virtual void freeValue(LgsCodeGen* codeGen, llvm::Value* value);
     virtual ~LgsType();
 };

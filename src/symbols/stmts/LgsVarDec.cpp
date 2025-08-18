@@ -2,6 +2,11 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "utils/LgsUtils.h"
 
+json::object LgsVarDec::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsVarDec::createIRValue(LgsCodeGen* codeGen) {
     const auto IRType = type->getIRType(codeGen);
     const auto exprIRValue = expr->getIRValue(codeGen);

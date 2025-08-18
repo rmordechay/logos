@@ -1,6 +1,11 @@
 #include "funcs/LgsParam.h"
 #include "funcs/LgsFunc.h"
 
+json::object LgsParam::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsParam::createIRValue(LgsCodeGen* codeGen) {
     if (isVariadic) {
         if (vaList) {

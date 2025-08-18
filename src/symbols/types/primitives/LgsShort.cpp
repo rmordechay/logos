@@ -15,6 +15,11 @@ Type* LgsShort::getIRType(LgsCodeGen* codeGen) {
     return codeGen->i16Ty();
 }
 
+json::object LgsShort::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsShort::pname() {
     return name;
 }

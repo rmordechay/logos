@@ -12,6 +12,11 @@ size_t LgsInt::getSizeBytes() {
     return sizeof(int);
 }
 
+json::object LgsInt::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsInt::pname() {
     return name;
 }

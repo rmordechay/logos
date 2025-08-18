@@ -1,5 +1,10 @@
 #include "types/LgsUnknownType.h"
 
+json::object LgsUnknownType::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsUnknownType::pname() {
     return getName();
 }

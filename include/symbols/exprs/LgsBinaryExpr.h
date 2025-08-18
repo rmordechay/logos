@@ -32,6 +32,7 @@ public:
 
     explicit LgsBinaryExpr(LgsType* type, LgsExpr* left, LgsExpr* right, const LgsOperator op) : LgsExpr(type), left(left), right(right), op(op) {}
     void createIRValue(LgsCodeGen* codeGen) override;
+    json::object asJSON() override;
     llvm::Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     llvm::Value* mulIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     llvm::Value* subIR(LgsCodeGen* codeGen, LgsExpr* other) override;

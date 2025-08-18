@@ -16,5 +16,7 @@
 #include <condition_variable>
 #include <functional>
 #include <sstream>
+#include <boost/json/object.hpp>
 
+namespace json = boost::json;
 namespace fs = std::filesystem;

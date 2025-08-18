@@ -11,8 +11,6 @@ void logInfo(const std::string& text = "");
 void logError(const std::string& msg, const std::string& path = "");
 void formatAndLogError(const LgsBaseError& lgsErr, const std::vector<std::string>& args);
 void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& args, std::string& result);
-void exitWithErrors(const LgsErrHandler& errHandler, const std::vector<LgsFile*>& ast);
-std::string getFullPath(const LgsLocation* location, const std::vector<LgsFile*>& ast);
 bool isLogosFile(const fs::directory_entry& entry);
 bool isLLVMFile(const fs::directory_entry& entry);
 bool isLogosKeyword(const std::string& s);

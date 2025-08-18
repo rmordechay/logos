@@ -39,6 +39,7 @@ public:
     Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     std::string pname() override;
+    json::object asJSON() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;

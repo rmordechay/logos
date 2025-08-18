@@ -3,7 +3,7 @@
 #include "stmts/LgsVarDec.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "types/LgsDArray.h"
-#include "types/LgsIterator.h"
+#include "exprs/unary/LgsIterator.h"
 #include "types/LgsMap.h"
 
 void LgsForeachLoop::createIRLoop(LgsCodeGen* codeGen) {

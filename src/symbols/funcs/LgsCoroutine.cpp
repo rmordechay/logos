@@ -3,6 +3,11 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsSelection.h"
 
+json::object LgsCoroutine::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsCoroutine::createIRValue(LgsCodeGen* codeGen) {
     const auto fc = funcCall ? funcCall : selection->lastExpr()->asFuncCall();
     const auto ctxTy = codeGen->getThunkCtxType(fc);

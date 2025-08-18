@@ -9,6 +9,7 @@ public:
     LgsSelection* selection = nullptr;
 
     void createIRValue(LgsCodeGen* codeGen) override;
+    json::object asJSON() override;
     void generateIR(LgsCodeGen* codeGen) const;
     ~LgsDeferStmt() override;
 };

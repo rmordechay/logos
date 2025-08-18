@@ -18,6 +18,7 @@ public:
     void cleanupExprs(LgsCodeGen* codeGen);
     llvm::BasicBlock* getCleanupBlock(LgsCodeGen* codeGen);
     void createIRValue(LgsCodeGen* codeGen) override;
+    json::object asJSON() override;
     std::string format(std::string& indentStr) override;
     ~LgsStmtsBlock() override;
 };

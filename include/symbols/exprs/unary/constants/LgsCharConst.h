@@ -8,6 +8,7 @@ public:
     explicit LgsCharConst(const char value) : LgsUnaryExpr(&LGS_CHAR), value(value) {}
     std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
+    json::object asJSON() override;
 };
 
 

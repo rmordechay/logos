@@ -4,6 +4,11 @@ std::string LgsPrefixExpr::pname() {
     assert(0);
 }
 
+json::object LgsPrefixExpr::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsPrefixExpr::createIRValue(LgsCodeGen* codeGen) {
     const auto exprIRVal = expr->getIRValue(codeGen);
     switch (op) {

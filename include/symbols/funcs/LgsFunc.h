@@ -33,6 +33,7 @@ public:
     void createPrologue(LgsCodeGen* codeGen);
     void createEpilogue(LgsCodeGen* codeGen) const;
     void createIRValue(LgsCodeGen* codeGen) override;
+    json::object asJSON() override;
     void createDebugValue(LgsCodeGen* codeGen) override;
     bool castTo(LgsType* toType) override;
     std::string pname() override;

@@ -16,6 +16,11 @@ void LgsFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.exitScope();
 }
 
+json::object LgsFunc::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsFunc::createIRValue(LgsCodeGen* codeGen) {
     codeGen->savedIP = codeGen->builder.saveIP();
     generateIR(codeGen);

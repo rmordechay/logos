@@ -118,6 +118,11 @@ std::string LgsObject::getName() {
     return name;
 }
 
+json::object LgsObject::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsObject::pname() {
     return name;
 }

@@ -6,6 +6,11 @@ std::string LgsDouble::getName() {
     return name;
 }
 
+json::object LgsDouble::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsDouble::pname() {
     return getName();
 }

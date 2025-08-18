@@ -14,6 +14,11 @@ std::string LgsGroup::getName() {
     return name;
 }
 
+json::object LgsGroup::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsGroup::pname() {
     return name;
 }

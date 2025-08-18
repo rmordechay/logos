@@ -3,6 +3,11 @@
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
+json::object LgsCast::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsCast::createIRValue(LgsCodeGen* codeGen) {
     IRValue = toValue->getIRValue(codeGen);
 }

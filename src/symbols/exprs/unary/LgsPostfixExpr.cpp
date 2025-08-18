@@ -1,6 +1,11 @@
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "LgsType.h"
 
+json::object LgsPostfixExpr::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsPostfixExpr::createIRValue(LgsCodeGen* codeGen) {
     IRValue = IncOrDecValue(codeGen);
 }

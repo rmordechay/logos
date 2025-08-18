@@ -26,26 +26,6 @@ void formatAndLogError(const LgsBaseError& lgsErr, const std::vector<std::string
     logError(msg + '\n');
 }
 
-void exitWithErrors(const LgsErrHandler& errHandler, const std::vector<LgsFile*>& ast) {
-    for (int i = 0; i < errHandler.errors.size(); ++i) {
-        const auto err = errHandler.errors[i];
-        const auto path = "\n   at:  " + getFullPath(err.location, ast);
-        logError(err.msg, path);
-        if (i != errHandler.errors.size() - 1) logInfo("\n\n------\n\n");
-    }
-    logInfo("\n");
-    exit(1);
-}
-
-std::string getFullPath(const LgsLocation* location, const std::vector<LgsFile*>& ast) {
-    assert(location->fileID > 0);
-    const auto posInLine = std::to_string(location->posInLine);
-    const auto lineNumber = std::to_string(location->lineStart);
-    const auto file = ast[location->fileID - 1];
-    const auto filePath = file->absPath.string();
-    return filePath + ":" + lineNumber + ":" + posInLine;
-}
-
 void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& args, std::string& result) {
     auto pos = 0;
     auto argIndex = 0;

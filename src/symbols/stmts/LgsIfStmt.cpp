@@ -3,6 +3,11 @@
 #include "funcs/LgsFunc.h"
 #include "logos/LgsCodeGen.h"
 
+json::object LgsIfStmt::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsIfStmt::createIRValue(LgsCodeGen* codeGen) {
     if (isPatternMatching) {
         generatePatternMatching(codeGen);

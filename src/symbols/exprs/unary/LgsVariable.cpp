@@ -13,6 +13,11 @@ std::string LgsVariable::pname() {
     return name;
 }
 
+json::object LgsVariable::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsVariable::createIRValue(LgsCodeGen* codeGen) {
     switch (ref.symbolType) {
     case VAR_DEC:

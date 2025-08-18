@@ -68,6 +68,11 @@ LgsExpr* LgsFuncType::getZeroValue() {
     assert(0);
 }
 
+json::object LgsFuncType::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsFuncType::pname() {
     std::stringstream strStream;
     strStream << name << '(';

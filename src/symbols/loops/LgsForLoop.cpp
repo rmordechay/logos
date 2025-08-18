@@ -4,6 +4,11 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
 
+json::object LgsForLoop::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsForLoop::createIRValue(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, stmtsBlock);
     setBlocks(codeGen);

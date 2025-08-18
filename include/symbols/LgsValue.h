@@ -23,5 +23,6 @@ public:
     virtual void createIRValue(LgsCodeGen* codeGen) = 0;
     virtual void createDebugValue(LgsCodeGen* codeGen);
     virtual std::string format(std::string& indentStr);
+    virtual json::object asJSON() = 0;
     virtual ~LgsValue() = default;
 };

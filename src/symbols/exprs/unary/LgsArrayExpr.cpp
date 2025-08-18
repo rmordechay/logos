@@ -8,6 +8,11 @@ std::string LgsArrayExpr::pname() {
     return type->pname();
 }
 
+json::object LgsArrayExpr::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsArrayExpr::createIRValue(LgsCodeGen* codeGen) {
     if (type->asSArray()) IRValue = createConstArray(codeGen);
     else if (type->asDArray()) IRValue = createDynamicArray(codeGen);

@@ -5,6 +5,11 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
+json::object LgsInstance::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsInstance::createIRValue(LgsCodeGen* codeGen) {
     const auto objIRType = obj->getIRType(codeGen);
     if(obj->singleton) {

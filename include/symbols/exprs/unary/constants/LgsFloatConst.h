@@ -10,6 +10,7 @@ public:
         isConstant = true;
     }
     void createIRValue(LgsCodeGen* codeGen) override;
+    json::object asJSON() override;
     std::string pname() override;
     ~LgsFloatConst() override = default;
 };

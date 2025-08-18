@@ -31,19 +31,19 @@ enum LogLevel {
 
 void LgsApp::run() {
     // Validation
-    if (!validate()) exitWithErrors(errHandler, ast);
+    if (!validate()) exitWithErrors();
 
     // Lexing and Parsing
-    if (!parse()) exitWithErrors(errHandler, ast);
+    if (!parse()) exitWithErrors();
 
     // Semantic analysis
-    if (!analyse()) exitWithErrors(errHandler, ast);
+    if (!analyse()) exitWithErrors();
 
     // Code generation
-    if (!generate()) exitWithErrors(errHandler, ast);
+    if (!generate()) exitWithErrors();
 
     // Linking
-    if (!link()) exitWithErrors(errHandler, ast);
+    if (!link()) exitWithErrors();
 
     // Running
     execute();
@@ -80,12 +80,13 @@ bool LgsApp::parse() {
 bool LgsApp::analyse() {
     LgsTypeResolver typeResolver(errHandler, globals);
     if (!typeResolver.resolveGlobalTypes(ast)) {
-        exitWithErrors(errHandler, ast);
+        exitWithErrors();
     }
     for (const auto file : ast) {
         threadPool.runTask([this, file] {
             SemaAnalyser semaAnalyser(file, globals);
             semaAnalyser.analyse();
+            std::cout << file->asJSON() << std::endl;
             std::lock_guard lock(mtx);
             if (!semaAnalyser.errHandler.successful) {
                 errHandler.mergeErrors(semaAnalyser.errHandler);
@@ -244,6 +245,22 @@ void LgsApp::writeIRFiles() {
     }
 }
 
+void LgsApp::exitWithErrors() const {
+    for (int i = 0; i < errHandler.errors.size(); ++i) {
+        const auto err = errHandler.errors[i];
+        const auto posInLine = std::to_string(err.location->posInLine);
+        const auto lineNumber = std::to_string(err.location->lineStart);
+        const auto file = ast[err.location->fileID - 1];
+        const auto filePath = file->absPath.string();
+        const auto fullPath = filePath + ":" + lineNumber + ":" + posInLine;
+        const auto path = "\n   at:  " + fullPath;
+        logError(err.msg, path);
+        if (i != errHandler.errors.size() - 1) logInfo("\n\n------\n\n");
+    }
+    logInfo("\n");
+    exit(1);
+}
+
 LgsApp::~LgsApp() {
     for (const auto file : ast) {
         delete file;
@@ -257,5 +274,4 @@ LgsApp::~LgsApp() {
         delete envFile;
     }
     envFiles.clear();
-
 }

@@ -6,6 +6,11 @@
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 
+json::object LgsAssignment::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsAssignment::createIRValue(LgsCodeGen* codeGen) {
     Value* results = nullptr;
     switch (assignmentType) {

@@ -16,6 +16,7 @@ public:
     std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
     std::string pname() override;
+    json::object asJSON() override;
 };
 
 inline LgsFloat LGS_FLOAT;

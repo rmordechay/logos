@@ -14,6 +14,7 @@ public:
 
     explicit LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock = nullptr) : ifCond(ifCond), ifBlock(ifStmtBlock) {}
     void createIRValue(LgsCodeGen* codeGen) override;
+    json::object asJSON() override;
     void generateSimpleIf(LgsCodeGen* codeGen);
     void generateIfWithElse(LgsCodeGen* codeGen);
     void generateElseIf(LgsCodeGen* codeGen);

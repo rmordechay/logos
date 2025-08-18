@@ -13,6 +13,7 @@ public:
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;
     std::string pname() override;
+    json::object asJSON() override;
     bool equals(LgsType* other) override;
     std::string strFormatPart() const override;
 };
@@ -35,6 +36,11 @@ inline size_t LgsTypePair::getSizeBytes() {
 
 inline std::string LgsTypePair::pname() {
     return '<' + key->pname() + "," + value->pname() + '>';
+}
+
+inline json::object LgsTypePair::asJSON() {
+    json::object obj;
+    return obj;
 }
 
 inline bool LgsTypePair::equals(LgsType* other) {

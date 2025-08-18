@@ -5,6 +5,11 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
+json::object LgsFuncCall::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsFuncCall::createIRValue(LgsCodeGen* codeGen) {
     if (callback) {
         func->setIRValue(getCallback(codeGen));

@@ -13,6 +13,7 @@ public:
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
     void createIRValue(LgsCodeGen* codeGen) override;
+    json::object asJSON() override;
     ~LgsReturn() override;
 };
 

@@ -5,6 +5,11 @@
 #include <exprs/unary/LgsArrayExpr.h>
 #include "types/LgsMap.h"
 
+json::object LgsIterIndex::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsIterIndex::createIRValue(LgsCodeGen* codeGen) {
     const auto baseExprType = baseExpr->type;
     if (baseExprType->asSArray()) {

@@ -50,6 +50,11 @@ std::string LgsMap::getName() {
     return name;
 }
 
+json::object LgsMap::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsMap::pname() {
     return '{' + typePair->key->pname() + ": " + typePair->value->pname() + '}';
 }

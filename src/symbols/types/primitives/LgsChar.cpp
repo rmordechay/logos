@@ -4,6 +4,11 @@
 #include "exprs/unary/constants/LgsCharConst.h"
 
 
+json::object LgsChar::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsChar::pname() {
     return name;
 }

@@ -51,6 +51,7 @@ public:
     void parseEnvFile(fs::path fileEntry);
     void setEnvVars();
     void writeIRFiles();
+    void exitWithErrors() const;
     bool checkParserErrors(LogosParser* parser);
     ~LgsApp();
 };

@@ -1,6 +1,11 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 
+json::object LgsBinaryExpr::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsBinaryExpr::createIRValue(LgsCodeGen* codeGen) {
     switch (op) {
     case ADD:

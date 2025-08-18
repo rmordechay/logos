@@ -4,6 +4,11 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsReturn.h"
 
+json::object LgsStmtsBlock::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsStmtsBlock::createIRValue(LgsCodeGen* codeGen) {
     for (const auto stmt : stmts) {
         stmt->createIRValue(codeGen);

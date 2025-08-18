@@ -17,6 +17,11 @@ LgsExpr* LgsAny::getZeroValue() {
     assert(0);
 }
 
+json::object LgsAny::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsAny::pname() {
     return name;
 }

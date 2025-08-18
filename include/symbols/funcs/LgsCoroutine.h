@@ -7,5 +7,6 @@ public:
     LgsSelection* selection = nullptr;
 
     void createIRValue(LgsCodeGen* codeGen) override;
+    json::object asJSON() override;
     ~LgsCoroutine() override;
 };

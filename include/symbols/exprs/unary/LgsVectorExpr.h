@@ -8,6 +8,7 @@ public:
     std::vector<LgsExpr*> args;
 
     void createIRValue(LgsCodeGen* codeGen) override;
+    json::object asJSON() override;
     std::string pname() override;
     ~LgsVectorExpr() override = default;
 };

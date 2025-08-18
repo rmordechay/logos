@@ -1,6 +1,8 @@
 #include "files/LgsMainFile.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsEnum.h"
+#include "types/LgsGroup.h"
+#include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
 void LgsMainFile::generateIR() {
@@ -13,6 +15,36 @@ void LgsMainFile::generateIR() {
     for (const auto [_, func] : funcs) {
         func->generateIR(&codeGen);
     }
+}
+
+json::object LgsMainFile::asJSON() {
+    json::object obj;
+    json::array jsonEnums;
+    for (const auto& enum_ : enums) {
+        jsonEnums.push_back(enum_->asJSON());
+    }
+    obj["enums"] = jsonEnums;
+    json::array jsonObjects;
+    for (const auto& object : objects) {
+        jsonObjects.push_back(object->asJSON());
+    }
+    obj["objects"] = jsonObjects;
+    json::array jsonFuncs;
+    for (const auto& func : funcs) {
+
+    }
+    obj["funcs"] = jsonFuncs;
+    json::array jsonInterfaces;
+    for (const auto& interface : interfaces) {
+        jsonInterfaces.push_back(interface->asJSON());
+    }
+    obj["interfaces"] = jsonInterfaces;
+    json::array jsonGroups;
+    for (const auto& group : groups) {
+        jsonGroups.push_back(group->asJSON());
+    }
+    obj["groups"] = jsonGroups;
+    return obj;
 }
 
 void LgsMainFile::format() {

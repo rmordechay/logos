@@ -1,5 +1,10 @@
 #include "exprs/unary/LgsHashMap.h"
 
+json::object LgsHashMap::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsHashMap::createIRValue(LgsCodeGen* codeGen) {
     const auto mapType = type->asMap();
     const auto valueType = mapType->typePair->value;

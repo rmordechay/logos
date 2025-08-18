@@ -3,6 +3,11 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/LgsHashMap.h"
 
+json::object LgsField::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsField::createIRValue(LgsCodeGen* codeGen) {
     if (parentIRType->isVectorTy()) {
         const auto vec = codeGen->builder.CreateLoad(parentIRType, parentIRValue);

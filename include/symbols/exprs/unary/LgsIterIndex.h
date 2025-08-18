@@ -13,6 +13,7 @@ public:
 
     explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {}
     void createIRValue(LgsCodeGen* codeGen) override;
+    json::object asJSON() override;
     Value* loadFromDArray(LgsCodeGen* codeGen, LgsDArray* arr) const;
     Value* loadFromMap(LgsCodeGen* codeGen, LgsMap* map) const;
     Value* loadFromStr(LgsCodeGen* codeGen, const LgsStr* str) const;

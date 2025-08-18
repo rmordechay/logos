@@ -6,6 +6,11 @@ std::string LgsUIntConst::pname() {
     return std::to_string(value);
 }
 
+json::object LgsUIntConst::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsUIntConst::createIRValue(LgsCodeGen* codeGen) {
     IRValue = codeGen->i32(value);
 }

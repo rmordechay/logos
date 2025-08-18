@@ -2,6 +2,11 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsStmtsBlock.h"
 
+json::object LgsReturn::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 void LgsReturn::createIRValue(LgsCodeGen* codeGen) {
     const auto exprIR = expr ? expr->getIRValue(codeGen) : nullptr;
     const auto currentStmtsBlock = codeGen->stack.currentStmtsBlock();

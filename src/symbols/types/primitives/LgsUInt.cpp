@@ -11,6 +11,11 @@ size_t LgsUInt::getSizeBytes() {
     return sizeof(unsigned int);
 }
 
+json::object LgsUInt::asJSON() {
+    json::object obj;
+    return obj;
+}
+
 std::string LgsUInt::pname() {
     return name;
 }

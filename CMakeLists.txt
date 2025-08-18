@@ -8,7 +8,7 @@ add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
 find_package(antlr4-runtime REQUIRED)
-find_package(Boost CONFIG REQUIRED context coroutine)
+find_package(Boost CONFIG REQUIRED context coroutine json)
 
 set(LLVM_LINK_LLVM_DYLIB ON)
 set(CLANG_LINK_CLANG_DYLIB ON)
@@ -37,6 +37,7 @@ set(CORE_SOURCES
     src/logos/LgsApp.cpp
     src/logos/LgsStack.cpp
     src/logos/LgsLinker.cpp
+    src/logos/LgsPaths.cpp
     src/analysis/AntlrConverter.cpp
     src/analysis/SemaAnalyser.cpp
     src/analysis/LgsTypeResolver.cpp
@@ -56,71 +57,71 @@ set(CORE_SOURCES
     src/utils/LgsErrHandler.cpp
 
     src/symbols/LgsSymbol.cpp
-    src/symbols/LgsValue.cpp
     src/symbols/LgsSymbolTable.cpp
-    src/symbols/funcs/LgsCoroutine.cpp
+    src/symbols/LgsValue.cpp
     src/symbols/exprs/LgsBinaryExpr.cpp
     src/symbols/exprs/LgsExpr.cpp
-    src/symbols/exprs/unary/LgsCast.cpp
-    src/symbols/exprs/unary/constants/LgsCharConst.cpp
-    src/symbols/exprs/unary/constants/LgsFloatConst.cpp
-    src/symbols/exprs/unary/constants/LgsStrConst.cpp
-    src/symbols/exprs/unary/constants/LgsUIntConst.cpp
-    src/symbols/exprs/unary/constants/LgsIntConst.cpp
-    src/symbols/exprs/unary/LgsVectorExpr.cpp
     src/symbols/exprs/unary/LgsArrayExpr.cpp
+    src/symbols/exprs/unary/LgsCast.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
     src/symbols/exprs/unary/LgsHashMap.cpp
     src/symbols/exprs/unary/LgsInstance.cpp
     src/symbols/exprs/unary/LgsIterIndex.cpp
-    src/symbols/exprs/unary/LgsSelection.cpp
-    src/symbols/exprs/unary/LgsVariable.cpp
     src/symbols/exprs/unary/LgsPostfixExpr.cpp
     src/symbols/exprs/unary/LgsPrefixExpr.cpp
+    src/symbols/exprs/unary/LgsSelection.cpp
+    src/symbols/exprs/unary/LgsVariable.cpp
+    src/symbols/exprs/unary/LgsVectorExpr.cpp
+    src/symbols/exprs/unary/constants/LgsCharConst.cpp
+    src/symbols/exprs/unary/constants/LgsFloatConst.cpp
+    src/symbols/exprs/unary/constants/LgsIntConst.cpp
+    src/symbols/exprs/unary/constants/LgsStrConst.cpp
+    src/symbols/exprs/unary/constants/LgsUIntConst.cpp
+    src/symbols/funcs/LgsCoroutine.cpp
     src/symbols/funcs/LgsFunc.cpp
     src/symbols/funcs/LgsMainFunc.cpp
     src/symbols/funcs/LgsParam.cpp
     src/symbols/loops/LgsForLoop.cpp
     src/symbols/loops/LgsForeachLoop.cpp
-    src/symbols/loops/LgsRangeLoop.cpp
     src/symbols/loops/LgsInfiniteLoop.cpp
+    src/symbols/loops/LgsRangeLoop.cpp
     src/symbols/loops/LgsWhileLoop.cpp
     src/symbols/stmts/LgsAssignment.cpp
     src/symbols/stmts/LgsBreak.cpp
     src/symbols/stmts/LgsContinue.cpp
+    src/symbols/stmts/LgsDeferStmt.cpp
     src/symbols/stmts/LgsField.cpp
     src/symbols/stmts/LgsIfStmt.cpp
     src/symbols/stmts/LgsReturn.cpp
     src/symbols/stmts/LgsStmt.cpp
     src/symbols/stmts/LgsStmtsBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
-    src/symbols/stmts/LgsDeferStmt.cpp
+    src/symbols/types/LgsAny.cpp
+    src/symbols/types/LgsCPtr.cpp
+    src/symbols/types/LgsDArray.cpp
+    src/symbols/types/LgsEnum.cpp
+    src/symbols/types/LgsFuncType.cpp
+    src/symbols/types/LgsGroup.cpp
+    src/symbols/types/LgsInterface.cpp
+    src/symbols/types/LgsIterator.cpp
+    src/symbols/types/LgsMap.cpp
+    src/symbols/types/LgsNullable.cpp
+    src/symbols/types/LgsObject.cpp
+    src/symbols/types/LgsSArray.cpp
+    src/symbols/types/LgsStr.cpp
+    src/symbols/types/LgsType.cpp
+    src/symbols/types/LgsUnknownType.cpp
+    src/symbols/types/LgsVec.cpp
+    src/symbols/types/LgsVoid.cpp
     src/symbols/types/primitives/LgsBool.cpp
     src/symbols/types/primitives/LgsChar.cpp
+    src/symbols/types/primitives/LgsDouble.cpp
     src/symbols/types/primitives/LgsFloat.cpp
     src/symbols/types/primitives/LgsInt.cpp
     src/symbols/types/primitives/LgsLong.cpp
     src/symbols/types/primitives/LgsShort.cpp
     src/symbols/types/primitives/LgsSize.cpp
-    src/symbols/types/LgsVoid.cpp
-    src/symbols/types/LgsAny.cpp
-    src/symbols/types/LgsDArray.cpp
-    src/symbols/types/LgsSArray.cpp
-    src/symbols/types/LgsEnum.cpp
-    src/symbols/types/LgsFuncType.cpp
-    src/symbols/types/LgsGroup.cpp
-    src/symbols/types/LgsInterface.cpp
-    src/symbols/types/LgsMap.cpp
-    src/symbols/types/LgsObject.cpp
-    src/symbols/types/LgsStr.cpp
-    src/symbols/types/LgsType.cpp
-    src/symbols/types/LgsUnknownType.cpp
     src/symbols/types/primitives/LgsUInt.cpp
-    src/symbols/types/LgsIterator.cpp
-    src/symbols/types/LgsCPtr.cpp
-    src/symbols/types/LgsNullable.cpp
-    src/symbols/types/LgsVec.cpp
-    src/logos/LgsPaths.cpp
 )
 
 set(RUNTIME_SOURCES
@@ -130,9 +131,6 @@ set(RUNTIME_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_defer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_runtime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_scheduler.cpp
-    src/symbols/types/primitives/LgsDouble.cpp
-    include/symbols/types/primitives/LgsDouble.h
-    runtime/include/Lgs_hashmap.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})
@@ -142,6 +140,7 @@ target_link_libraries(lgs_core PUBLIC
     antlr4_shared
     Boost::context
     Boost::coroutine
+    Boost::json
 )
 
 target_precompile_headers(lgs_core PRIVATE include/pch.h)
