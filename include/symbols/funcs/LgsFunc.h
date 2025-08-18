@@ -37,7 +37,6 @@ public:
     void createDebugValue(LgsCodeGen* codeGen) override;
     bool castTo(LgsType* toType) override;
     std::string pname() override;
-    std::string format(std::string& tabs) override;
     virtual Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args);
     virtual void generateIR(LgsCodeGen* codeGen);
     virtual Function* getIRFunc(LgsCodeGen* codeGen);

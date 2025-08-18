@@ -85,7 +85,3 @@ std::string LgsFuncCall::pname() {
     }
     return strStream.str();
 }
-
-std::string LgsFuncCall::format(std::string& indentStr) {
-    return indentStr + name + "()";
-}

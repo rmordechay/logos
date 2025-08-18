@@ -18,8 +18,3 @@ void LgsParam::createIRValue(LgsCodeGen* codeGen) {
         IRValue = vaList;
     }
 }
-
-std::string LgsParam::format(std::string& indentStr) {
-    return name + ": " + type->pname();
-}
-

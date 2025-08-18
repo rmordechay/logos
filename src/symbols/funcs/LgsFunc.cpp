@@ -16,11 +16,6 @@ void LgsFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.exitScope();
 }
 
-json::object LgsFunc::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 void LgsFunc::createIRValue(LgsCodeGen* codeGen) {
     codeGen->savedIP = codeGen->builder.saveIP();
     generateIR(codeGen);
@@ -111,24 +106,6 @@ std::string LgsFunc::pname() {
     return funcType->pname();
 }
 
-std::string LgsFunc::format(std::string& tabs) {
-    std::stringstream str;
-    str << funcType->name << "(";
-    for (int i = funcType->isMethod; i < funcType->params.size(); ++i) {
-        auto param = funcType->params[i];
-        str << param.format(tabs);
-        if (i != funcType->params.size() - 1) {
-            str << ", ";
-        }
-    }
-    str << ")";
-    if (funcType->name != LGS_MAIN_FUNC_NAME) {
-        str << funcType->rt->getName();
-    }
-    str << stmtsBlock->format(tabs);
-    return str.str();
-}
-
 void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
     const auto& debug = codeGen->debugger;
     const auto dbInt32 = debug.diBuilder->createBasicType("int", 32, dwarf::DW_ATE_signed);
@@ -152,6 +129,31 @@ bool LgsFunc::castTo(LgsType* toType) {
         funcType->params[i].type = otherFuncType->params[i].type;
     }
     return true;
+}
+
+json::object LgsFunc::asJSON() {
+    json::object obj;
+    obj["name"] = funcType->name;
+    obj["rt"] = funcType->rt->asJSON();
+    json::object funcConfigs;
+    funcConfigs["isMethod"] = funcType->isMethod;
+    funcConfigs["isPublic"] = funcType->isPublic;
+    funcConfigs["isInternal"] = funcType->isInternal;
+    funcConfigs["isVirtual"] = funcType->isVirtual;
+    funcConfigs["isVariadic"] = funcType->isVariadic;
+    funcConfigs["isStatic"] = funcType->isStatic;
+    funcConfigs["isOptional"] = funcType->isOptional;
+    funcConfigs["isTerminator"] = funcType->isTerminator;
+    funcConfigs["isAnonymous"] = funcType->isAnonymous;
+    funcConfigs["hasDefaults"] = funcType->hasDefaults;
+    obj["configs"] = funcConfigs;
+    json::array params;
+    for (auto& param : funcType->params) {
+        params.emplace_back(param.asJSON());
+    }
+    obj["params"] = params;
+    obj["stmtsBlock"] = stmtsBlock->asJSON();
+    return obj;
 }
 
 LgsFunc::~LgsFunc() {

@@ -21,27 +21,27 @@ json::object LgsMainFile::asJSON() {
     json::object obj;
     json::array jsonEnums;
     for (const auto& enum_ : enums) {
-        jsonEnums.push_back(enum_->asJSON());
+        jsonEnums.emplace_back(enum_->asJSON());
     }
     obj["enums"] = jsonEnums;
     json::array jsonObjects;
     for (const auto& object : objects) {
-        jsonObjects.push_back(object->asJSON());
+        jsonObjects.emplace_back(object->asJSON());
     }
     obj["objects"] = jsonObjects;
     json::array jsonFuncs;
-    for (const auto& func : funcs) {
-
+    for (const auto& [_, func] : funcs) {
+        jsonFuncs.emplace_back(func->asJSON());
     }
     obj["funcs"] = jsonFuncs;
     json::array jsonInterfaces;
     for (const auto& interface : interfaces) {
-        jsonInterfaces.push_back(interface->asJSON());
+        jsonInterfaces.emplace_back(interface->asJSON());
     }
     obj["interfaces"] = jsonInterfaces;
     json::array jsonGroups;
     for (const auto& group : groups) {
-        jsonGroups.push_back(group->asJSON());
+        jsonGroups.emplace_back(group->asJSON());
     }
     obj["groups"] = jsonGroups;
     return obj;

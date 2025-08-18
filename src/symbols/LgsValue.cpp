@@ -15,7 +15,3 @@ Value* LgsValue::getIRValue(LgsCodeGen* codeGen) {
 void LgsValue::createDebugValue(LgsCodeGen* codeGen) {
     assert(0);
 }
-
-std::string LgsValue::format(std::string& indentStr) {
-    assert(0);
-}

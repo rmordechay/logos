@@ -4,11 +4,6 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsReturn.h"
 
-json::object LgsStmtsBlock::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 void LgsStmtsBlock::createIRValue(LgsCodeGen* codeGen) {
     for (const auto stmt : stmts) {
         stmt->createIRValue(codeGen);
@@ -57,15 +52,9 @@ LgsStmt* LgsStmtsBlock::lastStmt() const {
     return stmts[stmts.size() - 1];
 }
 
-std::string LgsStmtsBlock::format(std::string& indentStr) {
-    std::stringstream oss;
-    oss << " {\n";
-    indentStr += '\t';
-    for (const auto& stmt : stmts) {
-        oss << stmt->format(indentStr) << '\n';
-    }
-    oss << "}\n\n";
-    return oss.str();
+json::object LgsStmtsBlock::asJSON() {
+    json::object obj;
+    return obj;
 }
 
 LgsStmtsBlock::~LgsStmtsBlock() {
