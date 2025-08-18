@@ -14,5 +14,6 @@ public:
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;
     bool equals(LgsType* other) override;
+    std::string strFormatPart() const override;
     ~LgsUnknownType() override = default;
 };

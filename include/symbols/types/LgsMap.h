@@ -49,5 +49,6 @@ public:
     StructType* getMapStruct(LgsCodeGen* codeGen);
     bool equals(LgsType* other) override;
     void freeValue(LgsCodeGen* codeGen, Value* value) override;
+    std::string strFormatPart() const override;
     ~LgsMap() override = default;
 };

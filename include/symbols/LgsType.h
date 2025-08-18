@@ -82,13 +82,13 @@ public:
     bool isVoid();
     bool isUnknown();
 
-    virtual std::string getName() = 0;
-    virtual std::string pname() = 0; // pretty name
+    virtual llvm::Type* getIRType(LgsCodeGen* codeGen) = 0;
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
-    virtual llvm::Type* getIRType(LgsCodeGen* codeGen) = 0;
+    virtual std::string getName() = 0;
+    virtual std::string pname() = 0; // pretty name
     virtual bool equals(LgsType* other) = 0;
-    virtual std::string strFormatPart() const;
+    virtual std::string strFormatPart() const = 0;
     virtual void freeValue(LgsCodeGen* codeGen, llvm::Value* value);
     virtual ~LgsType();
 };

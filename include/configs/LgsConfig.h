@@ -1,7 +1,7 @@
 #pragma once
 
 #define LOG_LEVEL DEBUG
-#define WRITE_IR_TO_FILE 1
+#define WRITE_IR_TO_FILE true
 #define INITIAL_ARRAY_CAPACITY 2
 #define BIG_SIZE_THRESHOLD 4
 #define STACK_CAPACITY 8

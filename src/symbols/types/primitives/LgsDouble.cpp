@@ -18,6 +18,10 @@ LgsExpr* LgsDouble::getZeroValue() {
     return new LgsFloatConst(this, 0.0);
 }
 
+std::string LgsDouble::strFormatPart() const {
+    return "%f";
+}
+
 Type* LgsDouble::getIRType(LgsCodeGen* codeGen) {
     return codeGen->builder.getDoubleTy();
 }

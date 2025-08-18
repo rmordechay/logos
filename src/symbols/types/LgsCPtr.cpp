@@ -33,3 +33,7 @@ bool LgsCPtr::equals(LgsType* other) {
     if (IRName == LgsDArray::name) return true;
     return name == IRName;
 }
+
+std::string LgsCPtr::strFormatPart() const {
+    return "%p";
+}

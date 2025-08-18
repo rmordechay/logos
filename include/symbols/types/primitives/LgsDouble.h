@@ -8,11 +8,12 @@ public:
         isPrimitive = true;
         isNumber = true;
     }
+    llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     std::string pname() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
-    llvm::Type* getIRType(LgsCodeGen* codeGen) override;
+    std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
 };
 

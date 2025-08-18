@@ -26,6 +26,10 @@ size_t LgsNullable::getSizeBytes() {
     return 0;
 }
 
+std::string LgsNullable::strFormatPart() const {
+    return baseType->strFormatPart();
+}
+
 LgsNullable::~LgsNullable() {
     if (baseType) {
         freeType(baseType);

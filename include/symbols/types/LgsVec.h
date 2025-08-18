@@ -24,6 +24,7 @@ public:
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     bool equals(LgsType* other) override;
+    std::string strFormatPart() const override;
     static uint8_t getSwizzleSet(char c);
     static uint8_t getComponentIndex(char c);
     ~LgsVec() override = default;

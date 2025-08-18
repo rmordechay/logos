@@ -36,6 +36,7 @@
 #include "loops/LgsRangeLoop.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
+#include "types/primitives/LgsDouble.h"
 
 void SemaAnalyser::analyse() {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
@@ -589,13 +590,15 @@ void SemaAnalyser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
     const auto type = baseExpr->type;
     switch (prefixExpr->op) {
     case NOT_PREFIX:
+        prefixExpr->setType(type);
         break;
     case MINUS_PREFIX:
+        prefixExpr->setType(type);
         break;
     case SQRT_PREFIX:
+        prefixExpr->setType(&LGS_DOUBLE);
         break;
     }
-    prefixExpr->setType(type);
 }
 
 void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {

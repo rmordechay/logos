@@ -1,5 +1,4 @@
 #pragma once
-#include "utils/LgsUtils.h"
 
 class LgsTypePair final : public LgsType {
 public:
@@ -15,6 +14,7 @@ public:
     size_t getSizeBytes() override;
     std::string pname() override;
     bool equals(LgsType* other) override;
+    std::string strFormatPart() const override;
 };
 
 inline Type* LgsTypePair::getIRType(LgsCodeGen* codeGen) {
@@ -41,4 +41,8 @@ inline bool LgsTypePair::equals(LgsType* other) {
     const auto otherPair = dynamic_cast<LgsTypePair*>(other);
     if (!otherPair) return false;
     return key->equals(otherPair->key) && value->equals(otherPair->value);
+}
+
+inline std::string LgsTypePair::strFormatPart() const {
+    return "%s";
 }

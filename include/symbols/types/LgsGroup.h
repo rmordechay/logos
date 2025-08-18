@@ -1,7 +1,5 @@
 #pragma once
-
 #include "exprs/unary/LgsHashMap.h"
-
 class LgsVariable;
 
 class LgsGroup final : public LgsType {
@@ -16,6 +14,7 @@ public:
     LgsExpr* getZeroValue() override;
     std::string pname() override;
     size_t getSizeBytes() override;
+    std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
 
 };

@@ -45,6 +45,10 @@ bool LgsVec::equals(LgsType* other) {
     assert(0);
 }
 
+std::string LgsVec::strFormatPart() const {
+    return "%s";
+}
+
 uint8_t LgsVec::getSwizzleSet(const char c) {
     if (strchr("xyzw", c)) return 0;
     if (strchr("rgba", c)) return 1;

@@ -12,5 +12,6 @@ public:
     std::string pname() override;
     bool equals(LgsType* other) override;
     size_t getSizeBytes() override;
+    std::string strFormatPart() const override;
     ~LgsNullable() override;
 };

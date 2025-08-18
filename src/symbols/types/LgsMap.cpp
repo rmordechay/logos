@@ -66,6 +66,10 @@ void LgsMap::freeValue(LgsCodeGen* codeGen, Value* value) {
     freeFunc->callIR(codeGen, {value});
 }
 
+std::string LgsMap::strFormatPart() const {
+    return "%s";
+}
+
 StructType* LgsMap::getMapStruct(LgsCodeGen* codeGen) {
     const std::vector<Type*> mapStructFields = {codeGen->ptrTy(), codeGen->i64Ty(), codeGen->i64Ty()};
     mapStruct = codeGen->getStructType(mapStructFields, name);

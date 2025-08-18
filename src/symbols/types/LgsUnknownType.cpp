@@ -20,6 +20,10 @@ bool LgsUnknownType::equals(LgsType* other) {
     return false;
 }
 
+std::string LgsUnknownType::strFormatPart() const {
+    assert(0);
+}
+
 llvm::Type* LgsUnknownType::getIRType(LgsCodeGen* codeGen) {
     assert(0);
 }
