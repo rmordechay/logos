@@ -5,7 +5,7 @@
 #include <exprs/unary/LgsArrayExpr.h>
 #include "types/LgsMap.h"
 
-json::object LgsIterIndex::asJSON() {
+json::value_ref LgsIterIndex::asJSON() {
     json::object obj;
     return obj;
 }

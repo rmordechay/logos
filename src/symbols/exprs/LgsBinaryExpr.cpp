@@ -1,7 +1,7 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 
-json::object LgsBinaryExpr::asJSON() {
+json::value_ref LgsBinaryExpr::asJSON() {
     json::object obj;
     return obj;
 }
@@ -141,4 +141,15 @@ Value* LgsBinaryExpr::lshiftIR(LgsCodeGen* codeGen, LgsExpr* other)  {
 
 std::string LgsBinaryExpr::pname() {
     return left->pname() + ' ' + opStr + ' ' + right->pname();
+}
+
+LgsBinaryExpr::~LgsBinaryExpr() {
+    if (left) {
+        delete left;
+        right = nullptr;
+    }
+    if (right) {
+        delete right;
+        left = nullptr;
+    }
 }

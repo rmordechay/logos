@@ -159,7 +159,7 @@ Value* LgsCodeGen::callSnprintf(const std::vector<Value*>& args) {
 }
 
 Value* LgsCodeGen::callSleep(Value* time) {
-    const auto ft = FunctionType::get(voidTy(), {sizeTy()}, false);
+    const auto ft = FunctionType::get(voidTy(), {i32Ty()}, false);
     return callFunc("sleep", ft, {time});
 }
 

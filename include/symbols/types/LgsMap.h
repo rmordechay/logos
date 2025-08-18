@@ -11,7 +11,6 @@ public:
     LgsType* parent;
     explicit LgsMapAddFunc(LgsType* parentType) : LgsFunc("add", &LGS_VOID, {parentType, new LgsStr(), &LGS_ANY}, PUBLIC | INTERNAL | METHOD), parent(parentType) {}
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override;
-    ~LgsMapAddFunc() override = default;
 };
 
 class LgsMap final : public LgsIterable {
@@ -51,5 +50,5 @@ public:
     bool equals(LgsType* other) override;
     void freeValue(LgsCodeGen* codeGen, Value* value) override;
     std::string strFormatPart() const override;
-    ~LgsMap() override = default;
+    ~LgsMap() override;
 };

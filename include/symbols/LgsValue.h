@@ -22,6 +22,6 @@ public:
     llvm::Value* getIRValue(LgsCodeGen* codeGen);
     virtual void createIRValue(LgsCodeGen* codeGen) = 0;
     virtual void createDebugValue(LgsCodeGen* codeGen);
-    virtual json::object asJSON() = 0;
+    virtual json::value_ref asJSON() = 0;
     virtual ~LgsValue() = default;
 };

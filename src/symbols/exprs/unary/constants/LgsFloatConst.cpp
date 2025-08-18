@@ -1,6 +1,6 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 
-json::object LgsFloatConst::asJSON() {
+json::value_ref LgsFloatConst::asJSON() {
     json::object obj;
     return obj;
 }

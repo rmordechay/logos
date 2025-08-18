@@ -6,7 +6,7 @@ std::string LgsUIntConst::pname() {
     return std::to_string(value);
 }
 
-json::object LgsUIntConst::asJSON() {
+json::value_ref LgsUIntConst::asJSON() {
     json::object obj;
     return obj;
 }

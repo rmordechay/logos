@@ -35,6 +35,14 @@ Type* LgsFuncType::getIRType(LgsCodeGen* codeGen) {
     return IRType;
 }
 
+LgsExpr* LgsFuncType::getZeroValue() {
+    assert(0);
+}
+
+size_t LgsFuncType::getSizeBytes() {
+    return sizeof(void*);
+}
+
 bool LgsFuncType::equals(LgsType* other) {
     const auto otherFuncType = other->asFuncType();
     if (!otherFuncType) return false;
@@ -64,15 +72,6 @@ std::string LgsFuncType::getName() {
     return IRName;
 }
 
-LgsExpr* LgsFuncType::getZeroValue() {
-    assert(0);
-}
-
-json::object LgsFuncType::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 std::string LgsFuncType::pname() {
     std::stringstream strStream;
     strStream << name << '(';
@@ -92,12 +91,13 @@ std::string LgsFuncType::pname() {
     return strStream.str();
 }
 
-std::string LgsFuncType::strFormatPart() const {
-    return "%p";
+json::object LgsFuncType::asJSON() {
+    json::object obj;
+    return obj;
 }
 
-size_t LgsFuncType::getSizeBytes() {
-    return sizeof(void*);
+std::string LgsFuncType::strFormatPart() const {
+    return "%p";
 }
 
 LgsFuncType::~LgsFuncType() {

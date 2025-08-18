@@ -40,7 +40,7 @@ std::string LgsIntConst::pname() {
     return type->getName() + "(" + std::to_string(value) + ")";
 }
 
-json::object LgsIntConst::asJSON() {
+json::value_ref LgsIntConst::asJSON() {
     json::object obj;
     return obj;
 }

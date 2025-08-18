@@ -5,7 +5,6 @@
 
 class LgsUnaryExpr : public LgsExpr {
 public:
-
     explicit LgsUnaryExpr() : LgsExpr(nullptr) {}
     explicit LgsUnaryExpr(LgsType* type) : LgsExpr(type) {}
     Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) override;
@@ -27,7 +26,6 @@ public:
     Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     std::tuple<Value*, Value*> loadExprs(LgsCodeGen* codeGen, LgsExpr* rExpr);
-    ~LgsUnaryExpr() override = default;
 };
 
 inline Value* LgsUnaryExpr::addIR(LgsCodeGen* codeGen, LgsExpr* other) {

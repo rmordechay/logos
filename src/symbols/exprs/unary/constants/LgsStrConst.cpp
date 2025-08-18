@@ -9,7 +9,7 @@ Value* LgsStrConst::hash(LgsCodeGen* codeGen) {
     return codeGen->i32(hashStr(value.c_str()));
 }
 
-json::object LgsStrConst::asJSON() {
+json::value_ref LgsStrConst::asJSON() {
     json::object obj;
     return obj;
 }

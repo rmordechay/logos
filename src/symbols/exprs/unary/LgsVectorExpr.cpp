@@ -1,6 +1,6 @@
 #include "exprs/unary/LgsVectorExpr.h"
 
-json::object LgsVectorExpr::asJSON() {
+json::value_ref LgsVectorExpr::asJSON() {
     json::object obj;
     return obj;
 }
@@ -12,4 +12,11 @@ void LgsVectorExpr::createIRValue(LgsCodeGen* codeGen) {
 
 std::string LgsVectorExpr::pname() {
     return "vec2";
+}
+
+LgsVectorExpr::~LgsVectorExpr() {
+    for (const auto & arg : args) {
+        delete arg;
+    }
+    args.clear();
 }

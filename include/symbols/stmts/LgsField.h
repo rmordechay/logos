@@ -25,6 +25,6 @@ public:
     LgsField(std::string  name, LgsType* type, LgsExpr* expr = nullptr) : name(std::move(name)), type(type), expr(expr) {}
     Value* resolveVirtualField(LgsCodeGen* codeGen, const LgsHashMap* vtable) const;
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::object asJSON() override;
+    json::value_ref asJSON() override;
     ~LgsField() override;
 };

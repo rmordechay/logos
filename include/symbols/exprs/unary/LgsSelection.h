@@ -12,7 +12,7 @@ public:
     LgsExpr* lastExpr() const;
     Value* hash(LgsCodeGen* codeGen) override;
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::object asJSON() override;
+    json::value_ref asJSON() override;
     ~LgsSelection() override;
 };
 

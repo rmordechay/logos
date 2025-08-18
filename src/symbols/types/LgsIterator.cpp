@@ -4,7 +4,7 @@ std::string LgsIterator::pname() {
     assert(0);
 }
 
-json::object LgsIterator::asJSON() {
+json::value_ref LgsIterator::asJSON() {
     json::object obj;
     return obj;
 }

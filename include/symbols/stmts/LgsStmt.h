@@ -29,7 +29,6 @@ public:
     LgsReturn* asReturn();
     LgsVarDec* asVarDec();
     LgsAssignment* asAssignment();
-    ~LgsStmt() override = default;
 };
 
 

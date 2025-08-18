@@ -4,7 +4,7 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
 
-json::object LgsForLoop::asJSON() {
+json::value_ref LgsForLoop::asJSON() {
     json::object obj;
     return obj;
 }

@@ -1,14 +1,5 @@
 #include "exprs/unary/LgsPrefixExpr.h"
 
-std::string LgsPrefixExpr::pname() {
-    assert(0);
-}
-
-json::object LgsPrefixExpr::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 void LgsPrefixExpr::createIRValue(LgsCodeGen* codeGen) {
     const auto exprIRVal = expr->getIRValue(codeGen);
     switch (op) {
@@ -25,5 +16,21 @@ void LgsPrefixExpr::createIRValue(LgsCodeGen* codeGen) {
         IRValue = codeGen->callSqrt(exprIRVal);
         break;
     }
+    }
+}
+
+json::value_ref LgsPrefixExpr::asJSON() {
+    json::object obj;
+    return obj;
+}
+
+std::string LgsPrefixExpr::pname() {
+    assert(0);
+}
+
+LgsPrefixExpr::~LgsPrefixExpr() {
+    if (expr) {
+        delete expr;
+        expr = nullptr;
     }
 }

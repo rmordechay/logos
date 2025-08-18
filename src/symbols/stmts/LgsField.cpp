@@ -23,7 +23,7 @@ void LgsField::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
-json::object LgsField::asJSON() {
+json::value_ref LgsField::asJSON() {
     json::object obj;
     obj["name"] = name;
     obj["type"] = type->asJSON();

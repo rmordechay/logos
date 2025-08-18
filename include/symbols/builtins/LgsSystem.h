@@ -14,7 +14,6 @@ public:
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         return codeGen->callGetPid();
     }
-    ~LgsSystemPid() override = default;
 };
 
 class LgsSystemSleep final : public LgsFunc {
@@ -24,7 +23,6 @@ public:
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         return codeGen->callSleep(args[1]->getIRValue(codeGen));
     }
-    ~LgsSystemSleep() override = default;
 };
 
 class LgsSystemExit final : public LgsFunc {
@@ -34,7 +32,6 @@ public:
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         return codeGen->callExit(args[1]->getIRValue(codeGen));
     }
-    ~LgsSystemExit() override = default;
 };
 
 class LgsSystemCwd final : public LgsFunc {
@@ -44,7 +41,6 @@ public:
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         return codeGen->callCwd();
     }
-    ~LgsSystemCwd() override = default;
 };
 
 class LgsSystemGetEnv final : public LgsFunc {
@@ -53,7 +49,6 @@ public:
     explicit LgsSystemGetEnv(LgsType* parent): LgsFunc(name, new LgsStr(), {parent, new LgsStr(), new LgsNullable(new LgsStr())}, PUBLIC | STATIC | INTERNAL | METHOD | HAS_DEFAULTS) {
         funcType->params[2].expr = new LgsNull();
     }
-    ~LgsSystemGetEnv() override = default;
 };
 
 class LgsSystemCoresNum final : public LgsFunc {
@@ -65,7 +60,6 @@ public:
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         return codeGen->callCoresNum();
     }
-    ~LgsSystemCoresNum() override = default;
 };
 
 class LgsSystem final : public LgsObject {
@@ -86,5 +80,4 @@ public:
         addMethod(getEnvFunc);
         addMethod(coresNumFunc);
     }
-    ~LgsSystem() override = default;
 };

@@ -19,7 +19,6 @@ public:
     std::string pname() override;
     json::object asJSON() override;
     bool equals(LgsType* other) override;
-    ~LgsLong() override = default;
 };
 
 inline LgsLong LGS_LONG;

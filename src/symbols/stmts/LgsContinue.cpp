@@ -2,7 +2,7 @@
 #include "logos/LgsCodeGen.h"
 #include <loops/LgsForLoop.h>
 
-json::object LgsContinue::asJSON() {
+json::value_ref LgsContinue::asJSON() {
     json::object obj;
     return obj;
 }

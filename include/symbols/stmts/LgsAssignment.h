@@ -30,7 +30,7 @@ public:
 
     LgsAssignment(const LgsAssignType assignmentType, LgsExpr* lValue, LgsExpr* rValue) : lValue(lValue), rValue(rValue), assignmentType(assignmentType) {}
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::object asJSON() override;
+    json::value_ref asJSON() override;
     void createIRAssign(LgsCodeGen* codeGen) const;
     static void assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, LgsCodeGen* codeGen);
     static void assignArrayToIterIndex(LgsCodeGen* codeGen, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr);

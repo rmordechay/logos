@@ -2,7 +2,7 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsStmtsBlock.h"
 
-json::object LgsReturn::asJSON() {
+json::value_ref LgsReturn::asJSON() {
     json::object obj;
     return obj;
 }

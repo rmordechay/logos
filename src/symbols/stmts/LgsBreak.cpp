@@ -3,7 +3,7 @@
 #include "logos/LgsCodeGen.h"
 #include "loops/LgsForLoop.h"
 
-json::object LgsBreak::asJSON() {
+json::value_ref LgsBreak::asJSON() {
     json::object obj;
     return obj;
 }

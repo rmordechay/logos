@@ -52,14 +52,12 @@ LgsStmt* LgsStmtsBlock::lastStmt() const {
     return stmts[stmts.size() - 1];
 }
 
-json::object LgsStmtsBlock::asJSON() {
+json::value_ref LgsStmtsBlock::asJSON() {
     json::array jsonStmts;
     for (const auto& stmt : stmts) {
         jsonStmts.emplace_back(stmt->asJSON());
     }
-    json::object jsonObj;
-    jsonObj["stmts"] = jsonStmts;
-    return jsonObj;
+    return jsonStmts;
 }
 
 LgsStmtsBlock::~LgsStmtsBlock() {

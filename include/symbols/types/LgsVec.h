@@ -28,5 +28,4 @@ public:
     std::string strFormatPart() const override;
     static uint8_t getSwizzleSet(char c);
     static uint8_t getComponentIndex(char c);
-    ~LgsVec() override = default;
 };

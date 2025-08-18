@@ -5,7 +5,7 @@
 #include <exprs/unary/LgsSelection.h>
 #include <llvm/IR/Module.h>
 
-json::object LgsDeferStmt::asJSON() {
+json::value_ref LgsDeferStmt::asJSON() {
     json::object obj;
     return obj;
 }

@@ -3,7 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "logos/LgsCodeGen.h"
 
-json::object LgsIfStmt::asJSON() {
+json::value_ref LgsIfStmt::asJSON() {
     json::object obj;
     return obj;
 }

@@ -17,7 +17,6 @@ public:
     std::string getName() override;
     std::string pname() override;
     json::object asJSON() override;
-    ~LgsInt() override = default;
 };
 
 inline LgsInt LGS_INT;

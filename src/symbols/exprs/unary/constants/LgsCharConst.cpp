@@ -8,7 +8,7 @@ std::string LgsCharConst::pname() {
     return type->pname();
 }
 
-json::object LgsCharConst::asJSON() {
+json::value_ref LgsCharConst::asJSON() {
     json::object obj;
     return obj;
 }

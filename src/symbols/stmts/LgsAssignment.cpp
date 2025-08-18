@@ -6,7 +6,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 
-json::object LgsAssignment::asJSON() {
+json::value_ref LgsAssignment::asJSON() {
     json::object obj;
     return obj;
 }

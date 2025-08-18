@@ -7,9 +7,8 @@
 
 class LgsIterator final : public LgsUnaryExpr {
 public:
-
-    LgsExpr* baseExpr;
     static constexpr auto name = "Iterator";
+    LgsExpr* baseExpr;
 
     explicit LgsIterator(LgsExpr* baseExpr) : baseExpr(baseExpr) {
         type = baseExpr->type;
@@ -17,11 +16,10 @@ public:
 
     std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::object asJSON() override;
+    json::value_ref asJSON() override;
     void initIterator(LgsCodeGen* codeGen);
     Value* next(LgsCodeGen* codeGen) const;
     Value* hasNext(LgsCodeGen* codeGen) const;
-    ~LgsIterator() override = default;
 };
 
 

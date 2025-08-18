@@ -40,12 +40,12 @@ public:
 
     void setFuncOptions(uint32_t ops);
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
-    std::string getName() override;
     LgsExpr* getZeroValue() override;
-    std::string pname() override;
-    json::object asJSON() override;
     size_t getSizeBytes() override;
     bool equals(LgsType* other) override;
+    std::string getName() override;
+    std::string pname() override;
+    json::object asJSON() override;
     std::string strFormatPart() const override;
     ~LgsFuncType() override;
 };

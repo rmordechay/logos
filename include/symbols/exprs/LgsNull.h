@@ -7,15 +7,13 @@ public:
         isNull = true;
     }
 
-    json::object asJSON() override;
+    json::value_ref asJSON() override;
     void createIRValue(LgsCodeGen* codeGen) override;
     std::string pname() override;
-    ~LgsNull() override = default;
 };
 
-inline json::object LgsNull::asJSON() {
-    json::object obj;
-    return obj;
+inline json::value_ref LgsNull::asJSON() {
+    return json::value(nullptr);
 }
 
 inline void LgsNull::createIRValue(LgsCodeGen* codeGen) {

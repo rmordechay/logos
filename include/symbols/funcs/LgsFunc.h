@@ -20,11 +20,11 @@ public:
         funcType->name = name;
         funcType->rt = rt;
         funcType->setFuncOptions(ops);
-        if (funcType->isMethod) {
+        if (funcType->isMethod && !funcType->isStatic) {
             funcType->parentName = paramTypes.front()->getName();
         }
         for (const auto paramsType : paramTypes) {
-            funcType->params.emplace_back(paramsType);
+            funcType->params.push_back(LgsParam(paramsType));
         }
         type = funcType;
     }
@@ -33,10 +33,10 @@ public:
     void createPrologue(LgsCodeGen* codeGen);
     void createEpilogue(LgsCodeGen* codeGen) const;
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::object asJSON() override;
     void createDebugValue(LgsCodeGen* codeGen) override;
     bool castTo(LgsType* toType) override;
     std::string pname() override;
+    json::value_ref asJSON() override;
     virtual Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args);
     virtual void generateIR(LgsCodeGen* codeGen);
     virtual Function* getIRFunc(LgsCodeGen* codeGen);

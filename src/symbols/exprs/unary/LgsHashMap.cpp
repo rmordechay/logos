@@ -1,6 +1,6 @@
 #include "exprs/unary/LgsHashMap.h"
 
-json::object LgsHashMap::asJSON() {
+json::value_ref LgsHashMap::asJSON() {
     json::object obj;
     return obj;
 }

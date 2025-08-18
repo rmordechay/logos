@@ -5,7 +5,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
-json::object LgsInstance::asJSON() {
+json::value_ref LgsInstance::asJSON() {
     json::object obj;
     return obj;
 }

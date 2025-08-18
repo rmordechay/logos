@@ -13,7 +13,7 @@ std::string LgsVariable::pname() {
     return name;
 }
 
-json::object LgsVariable::asJSON() {
+json::value_ref LgsVariable::asJSON() {
     json::object obj;
     return obj;
 }

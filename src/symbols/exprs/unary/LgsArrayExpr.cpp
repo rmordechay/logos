@@ -8,15 +8,31 @@ std::string LgsArrayExpr::pname() {
     return type->pname();
 }
 
-json::object LgsArrayExpr::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 void LgsArrayExpr::createIRValue(LgsCodeGen* codeGen) {
     if (type->asSArray()) IRValue = createConstArray(codeGen);
     else if (type->asDArray()) IRValue = createDynamicArray(codeGen);
     else assert(0);
+}
+
+json::value_ref LgsArrayExpr::asJSON() {
+    json::object obj;
+    return obj;
+}
+
+Value* LgsArrayExpr::createConstArray(LgsCodeGen* codeGen) const {
+    auto& builder = codeGen->builder;
+    const auto arr = type->asSArray();
+    const auto baseType = arr->baseType;
+    const auto baseIRType = baseType->getIRType(codeGen);
+    const auto arrIRType = ArrayType::get(baseIRType, arr->sizeExpr->getConstInt());
+    const auto arrIRPtr = builder.CreateAlloca(arrIRType);
+    if (initialElements.empty()) return arrIRPtr;
+    for (int i = 0; i < initialElements.size(); ++i) {
+        const auto gep = builder.CreateGEP(arrIRType, arrIRPtr, {codeGen->i32Zero(), codeGen->i32(i)});
+        const auto val = initialElements[i]->getIRValue(codeGen);
+        builder.CreateStore(val, gep);
+    }
+    return arrIRPtr;
 }
 
 Value* LgsArrayExpr::createDynamicArray(LgsCodeGen* codeGen) {
@@ -34,18 +50,9 @@ bool LgsArrayExpr::castTo(LgsType* toType) {
     return true;
 }
 
-Value* LgsArrayExpr::createConstArray(LgsCodeGen* codeGen) const {
-    auto& builder = codeGen->builder;
-    const auto arr = type->asSArray();
-    const auto baseType = arr->baseType;
-    const auto baseIRType = baseType->getIRType(codeGen);
-    const auto arrIRType = ArrayType::get(baseIRType, arr->sizeExpr->getConstInt());
-    const auto arrIRPtr = builder.CreateAlloca(arrIRType);
-    if (initialElements.empty()) return arrIRPtr;
-    for (int i = 0; i < initialElements.size(); ++i) {
-        const auto gep = builder.CreateGEP(arrIRType, arrIRPtr, {codeGen->i32Zero(), codeGen->i32(i)});
-        const auto val = initialElements[i]->getIRValue(codeGen);
-        builder.CreateStore(val, gep);
+LgsArrayExpr::~LgsArrayExpr() {
+    for (const auto& initialElement : initialElements) {
+        delete initialElement;
     }
-    return arrIRPtr;
+    initialElements.clear();
 }

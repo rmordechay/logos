@@ -3,7 +3,7 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsSelection.h"
 
-json::object LgsCoroutine::asJSON() {
+json::value_ref LgsCoroutine::asJSON() {
     json::object obj;
     return obj;
 }

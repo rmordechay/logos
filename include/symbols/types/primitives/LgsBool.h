@@ -19,7 +19,6 @@ public:
     std::string strFormatPart() const override;
     size_t getSizeBytes() override;
     bool equals(LgsType* other) override;
-    ~LgsBool() override = default;
 };
 
 inline LgsBool LGS_BOOL;

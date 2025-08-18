@@ -5,7 +5,7 @@
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 
-json::object LgsSelection::asJSON() {
+json::value_ref LgsSelection::asJSON() {
     json::object obj;
     return obj;
 }

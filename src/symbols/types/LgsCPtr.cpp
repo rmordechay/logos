@@ -42,3 +42,10 @@ bool LgsCPtr::equals(LgsType* other) {
 std::string LgsCPtr::strFormatPart() const {
     return "%p";
 }
+
+LgsCPtr::~LgsCPtr() {
+    if (baseType) {
+        freeType(baseType);
+        baseType = nullptr;
+    }
+}

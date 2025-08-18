@@ -21,5 +21,5 @@ public:
     void setNumberType();
     void createIRValue(LgsCodeGen* codeGen) override;
     std::string pname() override;
-    json::object asJSON() override;
+    json::value_ref asJSON() override;
 };

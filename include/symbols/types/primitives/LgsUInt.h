@@ -18,7 +18,6 @@ public:
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
-    ~LgsUInt() override = default;
 };
 
 inline LgsUInt LGS_UINT;

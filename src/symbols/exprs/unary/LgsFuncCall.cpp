@@ -5,7 +5,7 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
-json::object LgsFuncCall::asJSON() {
+json::value_ref LgsFuncCall::asJSON() {
     json::object obj;
     return obj;
 }
@@ -84,4 +84,14 @@ std::string LgsFuncCall::pname() {
         strStream << ')';
     }
     return strStream.str();
+}
+
+LgsFuncCall::~LgsFuncCall() {
+    for (const auto& arg : args) {
+        delete arg;
+    }
+    if (callback) {
+        delete callback;
+        callback = nullptr;
+    }
 }

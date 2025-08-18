@@ -22,7 +22,7 @@ void LgsVarDec::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
-json::object LgsVarDec::asJSON() {
+json::value_ref LgsVarDec::asJSON() {
     json::object obj;
     obj["stmtKind"] = "VarDec";
     obj["type"] = type->asJSON();

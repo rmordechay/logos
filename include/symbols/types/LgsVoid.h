@@ -13,7 +13,6 @@ public:
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
-    ~LgsVoid() override = default;
 };
 
 inline LgsVoid LGS_VOID;

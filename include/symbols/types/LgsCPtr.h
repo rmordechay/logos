@@ -16,5 +16,5 @@ public:
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     std::string strFormatPart() const override;
-    ~LgsCPtr() override = default;
+    ~LgsCPtr() override;
 };

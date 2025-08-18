@@ -3,7 +3,7 @@
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
-json::object LgsCast::asJSON() {
+json::value_ref LgsCast::asJSON() {
     json::object obj;
     return obj;
 }

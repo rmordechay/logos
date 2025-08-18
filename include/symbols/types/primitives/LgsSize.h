@@ -17,7 +17,6 @@ public:
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     std::string strFormatPart() const override;
-    ~LgsSize() override = default;
 };
 
 inline LgsSize LGS_SIZE;

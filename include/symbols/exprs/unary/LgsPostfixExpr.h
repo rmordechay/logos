@@ -9,14 +9,13 @@ enum LgsPostfixOperator {
 
 class LgsPostfixExpr final : public LgsUnaryExpr {
 public:
-
     LgsUnaryExpr* expr;
     LgsPostfixOperator op;
 
     LgsPostfixExpr(LgsUnaryExpr* baseExpr, const LgsPostfixOperator op) : expr(baseExpr), op(op) {}
     Value* IncOrDecValue(LgsCodeGen* codeGen) const;
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::object asJSON() override;
     std::string pname() override;
-    ~LgsPostfixExpr() override = default;
+    json::value_ref asJSON() override;
+    ~LgsPostfixExpr() override;
 };

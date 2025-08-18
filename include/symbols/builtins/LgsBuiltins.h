@@ -2,7 +2,6 @@
 #include "configs/LgsDefinitions.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include <types/LgsVoid.h>
-#include <types/primitives/LgsLong.h>
 #include <types/LgsAny.h>
 
 class LgsPrint final : public LgsFunc {
@@ -12,8 +11,8 @@ public:
         funcType->IRName = "printf";
         funcType->isPublic = true;
         funcType->isVariadic = true;
-        funcType->params.emplace_back(LgsParam(&LGS_ANY));
-        funcType->params.emplace_back(LgsParam(&LGS_ANY));
+        funcType->params.emplace_back(&LGS_ANY);
+        funcType->params.emplace_back(&LGS_ANY);
     }
 
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
@@ -47,8 +46,6 @@ public:
         IRArgs.insert(IRArgs.end(), values.begin(), values.end());
         return codeGen->callPrintf(IRArgs);
     }
-
-    ~LgsPrint() override = default;
 };
 
 

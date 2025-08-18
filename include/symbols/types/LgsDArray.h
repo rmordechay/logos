@@ -12,7 +12,6 @@ public:
     LgsType* parent;
     explicit LgsArrayAddFunc(LgsType* parentType) : LgsFunc("add", &LGS_VOID, {parentType, &LGS_ANY}, PUBLIC | INTERNAL | METHOD), parent(parentType) {}
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override;
-    ~LgsArrayAddFunc() override = default;
 };
 
 class LgsDArray final : public LgsIterable {

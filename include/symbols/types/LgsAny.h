@@ -16,7 +16,6 @@ public:
     json::object asJSON() override;
     std::string strFormatPart() const override;
     bool equals(LgsType* other) override;
-    ~LgsAny() override = default;
 };
 
 inline LgsAny LGS_ANY;
