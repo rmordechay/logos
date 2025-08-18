@@ -9,5 +9,4 @@ struct LgsSymbolTable {
     LgsSymbol* getSymbol(const std::string& name);
     void addSymbol(const LgsSymbol& symbol, LgsErrHandler* errHandler);
     void freeSymbols();
-    ~LgsSymbolTable() = default;
 };

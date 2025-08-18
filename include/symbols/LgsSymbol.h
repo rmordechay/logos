@@ -49,5 +49,4 @@ struct LgsSymbol {
     explicit LgsSymbol(LgsEnum* lgsEnum, bool isExternal = false, bool isBuiltin = false);
     explicit LgsSymbol(LgsFunc* func, bool isExternal = false, bool isBuiltin = false);
     void* getSymbol() const;
-    ~LgsSymbol() = default;
 };

@@ -16,5 +16,4 @@ public:
     std::vector<const char*> getCompileArgs(const std::vector<LgsStrConst*>& files) const;
     fs::path resolveExternalFile(LgsStrConst* filePath);
     void resolveCFiles(LgsFile* lgsFile);
-    ~LgsCLang() = default;
 };

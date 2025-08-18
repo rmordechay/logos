@@ -18,6 +18,5 @@ public:
     LgsLinker(const LgsPaths& paths, const std::vector<LgsFile*>& modules) : paths(paths), files(modules) {}
     bool generateObjFile(std::unique_ptr<llvm::Module> mainModule, llvm::TargetMachine* targetMachine) const;
     bool link() const;
-    ~LgsLinker() = default;
 };
 

@@ -10,7 +10,7 @@ public:
     explicit LgsHashMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsHashMap(new LgsMap(keyType, valueType)) {}
     std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
-    ~LgsHashMap() override = default;
+    ~LgsHashMap() override;
 };
 
 class LgsMapEntry final {
@@ -19,7 +19,7 @@ public:
     LgsExpr* value;
 
     LgsMapEntry(LgsExpr* key, LgsExpr* value) : key(key), value(value) {}
-    ~LgsMapEntry() = default;
+    ~LgsMapEntry();
 };
 
 

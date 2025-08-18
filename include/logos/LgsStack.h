@@ -31,5 +31,4 @@ public:
     auto end() { return c.end(); }
     auto rbegin() { return c.rbegin(); }
     auto rend() { return c.rend(); }
-    ~LgsStack() = default;
 };
