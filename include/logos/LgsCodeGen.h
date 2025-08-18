@@ -67,6 +67,7 @@ public:
     Value* callCwd();
     Value* callCoresNum();
     Value* callStrLen(Value* str);
+    Value* callSqrt(Value* radicant);
     void callCopyMem(Value* src, Value* dest, size_t n);
 
     // Stack

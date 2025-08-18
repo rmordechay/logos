@@ -17,9 +17,7 @@ void LgsPrefixExpr::createIRValue(LgsCodeGen* codeGen) {
         break;
     }
     case SQRT_PREFIX: {
-        const auto ft = FunctionType::get(codeGen->doubleTy(), {codeGen->doubleTy()}, false);
-        const auto d = codeGen->builder.CreateSIToFP(exprIRVal, codeGen->doubleTy());
-        IRValue = codeGen->callFunc("sqrt", ft, {d});
+        IRValue = codeGen->callSqrt(exprIRVal);
         break;
     }
     }

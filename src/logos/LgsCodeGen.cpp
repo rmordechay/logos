@@ -89,6 +89,15 @@ Function* LgsCodeGen::getFunc(const std::string& funcName, FunctionType* ft, Glo
     return Function::Create(ft, linkage, funcName, IRModule);
 }
 
+Value* LgsCodeGen::callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args) {
+    const auto func = getFunc(funcName, ft);
+    return builder.CreateCall(func, args);
+}
+
+Value* LgsCodeGen::callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args) {
+    return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, ft, args);
+}
+
 Function* LgsCodeGen::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) {
     auto func = IRModule->getFunction(fc->name + "_thunk");
     if (func) return func;
@@ -134,16 +143,6 @@ Type* LgsCodeGen::getThunkCtxType(const LgsFuncCall* fc) {
     }
     return getStructType(types, fc->name + "_thunk_type");
 }
-
-Value* LgsCodeGen::callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args) {
-    const auto func = getFunc(funcName, ft);
-    return builder.CreateCall(func, args);
-}
-
-Value* LgsCodeGen::callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args) {
-    return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, ft, args);
-}
-
 
 Value* LgsCodeGen::callMalloc(const size_t size) {
     return builder.CreateMalloc(sizeTy(), sizeTy(), isize(size), nullptr);
@@ -196,6 +195,12 @@ Value* LgsCodeGen::callStrLen(Value* str) {
     return callFunc("strlen", ft, {str});
 }
 
+Value* LgsCodeGen::callSqrt(Value* radicant) {
+    auto d = builder.CreateSIToFP(radicant, doubleTy());
+    const auto ft = FunctionType::get(doubleTy(), {doubleTy()}, false);
+    return callFunc("sqrt", ft, {d});
+}
+
 void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
     const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), ptrTy()});
     builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
@@ -223,10 +228,6 @@ void LgsCodeGen::addDeferFunc(Value* deferFuncPtr, Value* ctx) {
 void LgsCodeGen::addCoro(Value* coroPtr, Value* ctx) {
     const auto ft = FunctionType::get(voidTy(), {ptrTy(), ptrTy()}, false);
     callLgsFunc("Stack_addCoro", ft, {coroPtr, ctx});
-}
-
-Value* LgsCodeGen::callHashStr(Value* value) {
-    return callLgsFunc("hash", FunctionType::get(i32Ty(), {ptrTy()}, false), {value});
 }
 
 Value* LgsCodeGen::callCoroIDFunc() {
@@ -265,6 +266,10 @@ Value* LgsCodeGen::callCoroDestroyFunc(Value* handle) {
     return builder.CreateCall(func, {handle});
 }
 
+Value* LgsCodeGen::callHashStr(Value* value) {
+    return callLgsFunc("hash", FunctionType::get(i32Ty(), {ptrTy()}, false), {value});
+}
+
 Type* LgsCodeGen::i1Ty() {
     return IntegerType::getInt1Ty(context);
 }
@@ -285,12 +290,16 @@ Type* LgsCodeGen::i64Ty() {
     return IntegerType::getInt64Ty(context);
 }
 
-Type* LgsCodeGen::voidTy() {
-    return Type::getVoidTy(context);
+Type* LgsCodeGen::floatTy() {
+    return builder.getFloatTy();
 }
 
-PointerType* LgsCodeGen::ptrTy() {
-    return PointerType::getUnqual(context);
+Type* LgsCodeGen::doubleTy() {
+    return builder.getDoubleTy();
+}
+
+Type* LgsCodeGen::voidTy() {
+    return Type::getVoidTy(context);
 }
 
 Type* LgsCodeGen::iNTy(const unsigned n) {
@@ -301,12 +310,8 @@ IntegerType* LgsCodeGen::sizeTy() {
     return IRModule->getDataLayout().getIntPtrType(context);
 }
 
-Type* LgsCodeGen::floatTy() {
-    return builder.getFloatTy();
-}
-
-Type* LgsCodeGen::doubleTy() {
-    return builder.getDoubleTy();
+PointerType* LgsCodeGen::ptrTy() {
+    return PointerType::getUnqual(context);
 }
 
 Value* LgsCodeGen::null() {
