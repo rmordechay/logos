@@ -35,7 +35,7 @@ class LgsAppFile;
 class LgsForLoop;
 class LgsAssignment;
 
-class LgsAntlrAdapter {
+class LgsParserAdapter {
 public:
     size_t fileID;
     LgsPaths& paths;
@@ -43,7 +43,7 @@ public:
     LgsSymbolTable& globals;
     std::stack<LgsForLoop*> loopStack;
 
-    explicit LgsAntlrAdapter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
+    explicit LgsParserAdapter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const fs::path& filePath);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const fs::path& filePath);

@@ -1,5 +1,5 @@
 #pragma once
-#include "../exprs/unary/LgsUnaryExpr.h"
+#include "LgsType.h"
 
 class LgsTable final : public LgsType {
 public:

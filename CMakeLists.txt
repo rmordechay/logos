@@ -39,7 +39,7 @@ set(CORE_SOURCES
     src/logos/LgsStack.cpp
     src/logos/LgsLinker.cpp
     src/logos/LgsPaths.cpp
-    src/analysis/LgsAntlrAdapter.cpp
+    src/analysis/LgsParserAdapter.cpp
     src/analysis/LgsSema.cpp
     src/analysis/LgsTypeResolver.cpp
     src/cli/LgsCli.cpp
@@ -136,6 +136,8 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_stack.cpp
     src/symbols/types/LgsTable.cpp
     include/symbols/types/LgsTable.h
+    src/symbols/exprs/unary/LgsTableExpr.cpp
+    include/symbols/exprs/unary/LgsTableExpr.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

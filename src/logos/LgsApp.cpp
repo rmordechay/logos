@@ -3,7 +3,7 @@
 #include <llvm/IR/Module.h>
 #include "configs/LgsConfig.h"
 #include "LogosLexer.h"
-#include "analysis/LgsAntlrAdapter.h"
+#include "analysis/LgsParserAdapter.h"
 #include "analysis/LgsSema.h"
 #include "logos/LgsPaths.h"
 #include "utils/ThreadPool.h"
@@ -133,7 +133,7 @@ void LgsApp::setEnvVariables() {
 bool LgsApp::parseAppFile() {
     if (!fs::exists(paths.appFilePath)) return false;
     auto codeText = getFileText(paths.appFilePath);
-    LgsAntlrAdapter antlrConverter(0, paths, globals);
+    LgsParserAdapter antlrConverter(0, paths, globals);
     antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
@@ -150,7 +150,7 @@ bool LgsApp::parseAppFile() {
 void LgsApp::parseEnvFile(fs::path fileEntry) {
     const auto codeText = getFileText(fileEntry);
     auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
-    LgsAntlrAdapter antlrConverter(fileID, paths, globals);
+    LgsParserAdapter antlrConverter(fileID, paths, globals);
     antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
@@ -171,7 +171,7 @@ void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
     const auto file = parser.logosFile();
     if (!checkParserErrors(&parser)) return;
     auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
-    LgsAntlrAdapter antlrConverter(fileID, paths, globals);
+    LgsParserAdapter antlrConverter(fileID, paths, globals);
     const auto lgsFile = antlrConverter.getLogosFile(file, filePath);
     if (antlrConverter.errHandler.successful) {
         std::lock_guard lock(mtx);
