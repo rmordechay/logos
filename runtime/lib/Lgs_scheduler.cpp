@@ -4,35 +4,12 @@
 
 using Yield = std::function<void()>;
 thread_local Yield tlsYield;
-std::atomic preempt_requested{false};
+std::atomic preempt{false};
 
-void Lgs_Scheduler::run() {
-    while (!queue.empty()) {
-        auto c = std::move(queue.front());
-        queue.pop_front();
-        c = std::move(c).resume();
-        if (c) queue.push_back(std::move(c));
-    }
-}
-
-void Lgs_Scheduler::spawn(void (*task)(void*), void* userdata) {
-    queue.push_back(boost::context::callcc(
-        [task, userdata](continuation&& scheduler) mutable {
-            auto back = std::move(scheduler);
-            const Yield y = [&back] {
-                back = std::move(back).resume();
-            };
-            tlsYield = y;
-            task(userdata);
-            return std::move(back);
-        }
-    ));
-}
-
-void Lgs_Scheduler::init(const int hz) {
+static void init() {
     struct sigaction sa{};
     const auto onTick = [](int) {
-        preempt_requested.store(true, std::memory_order_relaxed);
+        preempt.store(true, std::memory_order_relaxed);
     };
     sa.sa_handler = onTick;
     sigemptyset(&sa.sa_mask);
@@ -40,21 +17,42 @@ void Lgs_Scheduler::init(const int hz) {
     sigaction(SIGALRM, &sa, nullptr);
 
     itimerval it{};
+    constexpr auto hz = 1000;
     it.it_interval.tv_sec = 0;
-    it.it_interval.tv_usec = 1000000 / (hz > 0 ? hz : 1000);
+    it.it_interval.tv_usec = 1000000 / hz;
     it.it_value = it.it_interval;
     setitimer(ITIMER_REAL, &it, nullptr);
 }
 
+void Lgs_Scheduler::run() {
+    init();
+    while (!queue.empty()) {
+        auto c = std::move(queue.front());
+        queue.pop_front();
+        c = std::move(c).resume();
+        if (!c) continue;
+        queue.push_back(std::move(c));
+    }
+}
+
+void Lgs_Scheduler::spawn(void (*task)(void*), void* ctx) {
+    queue.push_back(boost::context::callcc(
+        [task, ctx](continuation&& c) mutable {
+            tlsYield = [&c] {
+                c = std::move(c).resume();
+            };
+            task(ctx);
+            return std::move(c);
+        }
+    ));
+}
 
 void Lgs_Scheduler::yield() {
     if (!tlsYield) return;
-    const auto safePointYield = [](const Yield& yield) {
-        if (preempt_requested.exchange(false, std::memory_order_relaxed)) {
-            yield();
-        }
-    };
-    safePointYield(tlsYield);
+    const auto shouldYield = preempt.exchange(false, std::memory_order_relaxed);
+    if (shouldYield) {
+        tlsYield();
+    }
 }
 
 void Lgs_Scheduler::shutdown() {

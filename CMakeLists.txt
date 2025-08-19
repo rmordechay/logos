@@ -38,8 +38,8 @@ set(CORE_SOURCES
     src/logos/LgsStack.cpp
     src/logos/LgsLinker.cpp
     src/logos/LgsPaths.cpp
-    src/analysis/AntlrConverter.cpp
-    src/analysis/SemaAnalyser.cpp
+    src/analysis/LgsAntlrConverter.cpp
+    src/analysis/LgsSema.cpp
     src/analysis/LgsTypeResolver.cpp
     src/cli/LgsCli.cpp
     src/cli/LgsFormatCmd.cpp

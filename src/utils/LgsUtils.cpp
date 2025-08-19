@@ -2,6 +2,7 @@
 #include "LgsType.h"
 #include "configs/LgsDefinitions.h"
 #include "files/LgsFile.h"
+#include "types/LgsStr.h"
 #include "utils/LgsErrHandler.h"
 
 #define FNV_PRIME 16777619

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "primitives/LgsInt.h"
 #include "stmts/LgsField.h"
@@ -26,6 +25,4 @@ public:
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     bool equals(LgsType* other) override;
     std::string strFormatPart() const override;
-    static uint8_t getSwizzleSet(char c);
-    static uint8_t getComponentIndex(char c);
 };

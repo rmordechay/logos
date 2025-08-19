@@ -57,6 +57,8 @@ Value* LgsSelection::hash(LgsCodeGen* codeGen) {
 
 LgsSelection::~LgsSelection() {
     for (const auto& expr : exprs) {
-        delete expr;
+        // TODO delete
+        // delete expr;
     }
+    exprs.clear();
 }

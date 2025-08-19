@@ -15,11 +15,6 @@ void LgsUIntConst::createIRValue(LgsCodeGen* codeGen) {
     IRValue = codeGen->i32(value);
 }
 
-bool LgsUIntConst::castTo(LgsType* toType) {
-    if (toType->asUInt()) return true;
-    assert(0);
-}
-
 Value* LgsUIntConst::eqIR(LgsCodeGen* codeGen, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(codeGen);
     const auto thisIRValue = getIRValue(codeGen);

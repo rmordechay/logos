@@ -17,6 +17,5 @@ public:
     json::value_ref asJSON() override;
     Value* createConstArray(LgsCodeGen* codeGen) const;
     Value* createDynamicArray(LgsCodeGen* codeGen);
-    bool castTo(LgsType* toType) override;
     ~LgsArrayExpr() override;
 };

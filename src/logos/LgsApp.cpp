@@ -3,8 +3,8 @@
 #include <llvm/IR/Module.h>
 #include "configs/LgsConfig.h"
 #include "LogosLexer.h"
-#include "analysis/AntlrConverter.h"
-#include "analysis/SemaAnalyser.h"
+#include "analysis/LgsAntlrConverter.h"
+#include "analysis/LgsSema.h"
 #include "logos/LgsPaths.h"
 #include "utils/ThreadPool.h"
 #include "builtins/LgsBuiltins.h"
@@ -60,7 +60,7 @@ void LgsApp::analyse() {
     }
     for (const auto file : ast) {
         threadPool.runTask([this, file] {
-            SemaAnalyser semaAnalyser(file, globals);
+            LgsSema semaAnalyser(file, globals);
             semaAnalyser.analyse();
             if (!semaAnalyser.errHandler.successful) {
                 std::lock_guard lock(mtx);
@@ -133,7 +133,7 @@ void LgsApp::setEnvVariables() {
 bool LgsApp::parseAppFile() {
     if (!fs::exists(paths.appFilePath)) return false;
     auto codeText = getFileText(paths.appFilePath);
-    AntlrConverter antlrConverter(0, paths, globals);
+    LgsAntlrConverter antlrConverter(0, paths, globals);
     antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
@@ -150,7 +150,7 @@ bool LgsApp::parseAppFile() {
 void LgsApp::parseEnvFile(fs::path fileEntry) {
     const auto codeText = getFileText(fileEntry);
     auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
-    AntlrConverter antlrConverter(fileID, paths, globals);
+    LgsAntlrConverter antlrConverter(fileID, paths, globals);
     antlr4::ANTLRInputStream input(codeText);
     LogosLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
@@ -171,7 +171,7 @@ void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
     const auto file = parser.logosFile();
     if (!checkParserErrors(&parser)) return;
     auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
-    AntlrConverter antlrConverter(fileID, paths, globals);
+    LgsAntlrConverter antlrConverter(fileID, paths, globals);
     const auto lgsFile = antlrConverter.getLogosFile(file, filePath);
     if (antlrConverter.errHandler.successful) {
         std::lock_guard lock(mtx);

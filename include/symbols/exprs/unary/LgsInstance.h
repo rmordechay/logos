@@ -15,7 +15,6 @@ public:
     void initFields(LgsCodeGen* codeGen, std::map<std::string, LgsField*>& fields);
     void createIRValue(LgsCodeGen* codeGen) override;
     json::value_ref asJSON() override;
-    bool castTo(LgsType* toType) override;
     std::string pname() override;
     ~LgsInstance() override;
 };

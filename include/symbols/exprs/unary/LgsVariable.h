@@ -14,6 +14,5 @@ public:
     Value* hash(LgsCodeGen* codeGen) override;
     void createIRValue(LgsCodeGen* codeGen) override;
     json::value_ref asJSON() override;
-    bool castTo(LgsType* type) override;
     bool equals(LgsExpr* other) override;
 };

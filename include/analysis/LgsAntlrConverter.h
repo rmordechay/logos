@@ -35,7 +35,7 @@ class LgsAppFile;
 class LgsForLoop;
 class LgsAssignment;
 
-class AntlrConverter {
+class LgsAntlrConverter {
 public:
     size_t fileID;
     LgsPaths& paths;
@@ -43,13 +43,13 @@ public:
     LgsSymbolTable& globals;
     std::stack<LgsForLoop*> loopStack;
 
-    explicit AntlrConverter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
+    explicit LgsAntlrConverter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const fs::path& filePath);
-    LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx, const fs::path& filePath);
-    void setAppConfigs(LogosParser::LogosAppFileContext* ctx, const fs::path& filePath, LgsAppConfigs& appConfigs);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const fs::path& filePath);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const fs::path& filePath);
+    void setAppConfigs(LogosParser::LogosAppFileContext* ctx, const fs::path& filePath, LgsAppConfigs& appConfigs);
+    LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx, const fs::path& filePath);
     LgsFunc* getFunc(LogosParser::FuncContext* ctx);
     LgsMainFunc* getMainFunc(LogosParser::FuncContext* ctx);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName);

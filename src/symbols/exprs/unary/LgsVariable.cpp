@@ -52,23 +52,6 @@ bool LgsVariable::equals(LgsExpr* other) {
     assert(0);
 }
 
-bool LgsVariable::castTo(LgsType* type) {
-    switch (ref.symbolType) {
-    case VAR_DEC:
-        return ref.varDec->expr->castTo(type);
-    case ENUM_FIELD:
-    case PARAM:
-    case FUNC:
-    case OBJECT:
-    case INTERFACE:
-    case GROUP:
-    case ENUM:
-    case UNKNOWN:
-        break;
-    }
-    return false;
-}
-
 Value* LgsVariable::hash(LgsCodeGen* codeGen) {
     switch (ref.symbolType) {
     case PARAM:

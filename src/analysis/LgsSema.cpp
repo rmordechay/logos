@@ -1,4 +1,4 @@
-#include "analysis/SemaAnalyser.h"
+#include "analysis/LgsSema.h"
 #include "funcs/LgsCoroutine.h"
 #include "configs/LgsErrors.h"
 #include "files/LgsInterfaceFile.h"
@@ -38,7 +38,7 @@
 #include "stmts/LgsIfStmt.h"
 #include "types/primitives/LgsDouble.h"
 
-void SemaAnalyser::analyse() {
+void LgsSema::analyse() {
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(file)) {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(file)) {
@@ -48,7 +48,7 @@ void SemaAnalyser::analyse() {
     }
 }
 
-void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
+void LgsSema::visitMainFile(LgsMainFile* mainFile) {
     for (const auto obj : mainFile->objects) {
         visitObject(obj);
     }
@@ -63,7 +63,7 @@ void SemaAnalyser::visitMainFile(LgsMainFile* mainFile) {
     }
 }
 
-void SemaAnalyser::visitObject(LgsObject* obj) {
+void LgsSema::visitObject(LgsObject* obj) {
     for (const auto& [_, field] : obj->fields) {
         visitField(field);
     }
@@ -73,7 +73,7 @@ void SemaAnalyser::visitObject(LgsObject* obj) {
     validateObjImplements(obj, obj->interfaces);
 }
 
-void SemaAnalyser::visitInterface(LgsInterface* interface) {
+void LgsSema::visitInterface(LgsInterface* interface) {
     for (const auto& [_, field] : interface->fields) {
         visitField(field);
     }
@@ -82,7 +82,7 @@ void SemaAnalyser::visitInterface(LgsInterface* interface) {
     }
 }
 
-void SemaAnalyser::visitFunc(LgsFunc* func) {
+void LgsSema::visitFunc(LgsFunc* func) {
     stack.enterScope(func, func->stmtsBlock);
     auto defaultParamsStarted = false;
     for (auto& param : func->funcType->params) {
@@ -100,7 +100,7 @@ void SemaAnalyser::visitFunc(LgsFunc* func) {
     stack.exitScope();
 }
 
-void SemaAnalyser::visitParam(LgsParam* param) {
+void LgsSema::visitParam(LgsParam* param) {
     if (param->expr) {
         visitExpr(param->expr);
         param->expr = matchExprToType(param->expr, param->type);
@@ -113,7 +113,7 @@ void SemaAnalyser::visitParam(LgsParam* param) {
     addLocalSymbol(LgsSymbol(param));
 }
 
-void SemaAnalyser::visitField(LgsField* field) {
+void LgsSema::visitField(LgsField* field) {
     if (field->expr) {
         visitExpr(field->expr);
         field->expr = matchExprToType(field->expr, field->type);
@@ -123,7 +123,7 @@ void SemaAnalyser::visitField(LgsField* field) {
     }
 }
 
-void SemaAnalyser::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
+void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     if (!stmtsBlock || stmtsBlock->stmts.empty()) return;
     for (const auto& stmt : stmtsBlock->stmts) {
         visitStmt(stmt);
@@ -149,7 +149,7 @@ void SemaAnalyser::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     }
 }
 
-void SemaAnalyser::visitStmt(LgsStmt* stmt) {
+void LgsSema::visitStmt(LgsStmt* stmt) {
     if (const auto ifStmt = stmt->asIfStmt()) ifStmt->isPatternMatching ? visitPatternMatching(ifStmt) : visitIfStmt(ifStmt);
     else if (const auto varDec = stmt->asVarDec()) visitVarDec(varDec);
     else if (const auto loopStmt = stmt->asLoop()) visitLoopStmt(loopStmt);
@@ -162,7 +162,7 @@ void SemaAnalyser::visitStmt(LgsStmt* stmt) {
     else if (const auto returnStmt = stmt->asReturn()) visitReturnStmt(returnStmt);
 }
 
-void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
+void LgsSema::visitVarDec(LgsVarDec* varDec) {
     if (varDec->expr && varDec->type) {
         visitExpr(varDec->expr);
         varDec->type = typeResolver.resolveType(varDec->type, *file);
@@ -179,7 +179,7 @@ void SemaAnalyser::visitVarDec(LgsVarDec* varDec) {
     addLocalSymbol(LgsSymbol(varDec));
 }
 
-void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
+void LgsSema::visitAssignment(LgsAssignment* assignment) {
     const auto lValue = assignment->lValue;
     const auto rValue = assignment->rValue;
     visitExpr(lValue);
@@ -193,7 +193,7 @@ void SemaAnalyser::visitAssignment(LgsAssignment* assignment) {
     }
 }
 
-void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
+void LgsSema::visitIfStmt(LgsIfStmt* ifStmt) {
     stack.enterScope(ifStmt, ifStmt->ifBlock);
     visitExpr(ifStmt->ifCond);
     visitStmtsBlock(ifStmt->ifBlock);
@@ -211,7 +211,7 @@ void SemaAnalyser::visitIfStmt(LgsIfStmt* ifStmt) {
     }
 }
 
-void SemaAnalyser::visitPatternMatching(LgsIfStmt* pm) {
+void LgsSema::visitPatternMatching(LgsIfStmt* pm) {
     if (!pm->ifCond) {
         return visitBoolPatternMatching(pm);
     }
@@ -243,7 +243,7 @@ void SemaAnalyser::visitPatternMatching(LgsIfStmt* pm) {
     stack.exitScope();
 }
 
-void SemaAnalyser::visitBoolPatternMatching(LgsIfStmt* pm) {
+void LgsSema::visitBoolPatternMatching(LgsIfStmt* pm) {
     for (const auto [expr, block] : pm->elseIfs) {
         stack.enterScope(pm, block);
         visitExpr(expr);
@@ -260,7 +260,7 @@ void SemaAnalyser::visitBoolPatternMatching(LgsIfStmt* pm) {
     }
 }
 
-void SemaAnalyser::visitWhileLoop(LgsWhileLoop* whileLoop) {
+void LgsSema::visitWhileLoop(LgsWhileLoop* whileLoop) {
     visitExpr(whileLoop->condExpr);
     const auto condType = whileLoop->condExpr->type;
     if (!condType->asBool()) {
@@ -269,7 +269,7 @@ void SemaAnalyser::visitWhileLoop(LgsWhileLoop* whileLoop) {
     visitStmtsBlock(whileLoop->stmtsBlock);
 }
 
-void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
+void LgsSema::visitLoopStmt(LgsForLoop* loopStmt) {
     stack.enterScope(loopStmt, loopStmt->stmtsBlock);
     if (loopStmt->isFirst) addLocalSymbol(LgsSymbol(loopStmt->isFirst));
     if (loopStmt->isLast) addLocalSymbol(LgsSymbol(loopStmt->isLast));
@@ -287,7 +287,7 @@ void SemaAnalyser::visitLoopStmt(LgsForLoop* loopStmt) {
     stack.exitScope();
 }
 
-void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
+void LgsSema::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
     const auto startRange = rangeLoop->startRange;
     const auto endRange = rangeLoop->endRange;
     visitExpr(startRange);
@@ -302,7 +302,7 @@ void SemaAnalyser::visitRangeLoop(const LgsRangeLoop* rangeLoop) {
     visitStmtsBlock(rangeLoop->stmtsBlock);
 }
 
-void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
+void LgsSema::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     const auto iterExpr = foreachLoop->iterExpr;
     visitUnaryExpr(iterExpr);
     const auto iterable = iterExpr->type->asIterable();
@@ -317,14 +317,14 @@ void SemaAnalyser::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     visitStmtsBlock(foreachLoop->stmtsBlock);
 }
 
-void SemaAnalyser::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
+void LgsSema::visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop) {
     if (!infiniteLoop->loopVars.empty()) {
         addLocalSymbol(LgsSymbol(infiniteLoop->loopVars.front()));
     }
     visitStmtsBlock(infiniteLoop->stmtsBlock);
 }
 
-void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
+void LgsSema::visitCoroutine(const LgsCoroutine* coroutine) {
     if (coroutine->funcCall) {
         visitFuncCall(coroutine->funcCall);
     } else if (coroutine->selection) {
@@ -334,13 +334,13 @@ void SemaAnalyser::visitCoroutine(const LgsCoroutine* coroutine) {
     }
 }
 
-void SemaAnalyser::visitDeferStmt(const LgsDeferStmt* deferStmt) {
+void LgsSema::visitDeferStmt(const LgsDeferStmt* deferStmt) {
     if (deferStmt->funcCall) visitFuncCall(deferStmt->funcCall);
     else visitSelection(deferStmt->selection);
     stack.currentFunc()->hasDefers = true;
 }
 
-void SemaAnalyser::visitReturnStmt(LgsReturn* returnStmt) {
+void LgsSema::visitReturnStmt(LgsReturn* returnStmt) {
     const auto funcType = stack.currentFunc()->funcType;
     const auto retExpr = returnStmt->expr;
     if (retExpr) {
@@ -357,7 +357,7 @@ void SemaAnalyser::visitReturnStmt(LgsReturn* returnStmt) {
     }
 }
 
-void SemaAnalyser::visitExpr(LgsExpr* expr) {
+void LgsSema::visitExpr(LgsExpr* expr) {
     if (!expr) return;
     if (const auto iter = expr->type->asIterable()) {
         visitExpr(iter->sizeExpr);
@@ -374,7 +374,7 @@ void SemaAnalyser::visitExpr(LgsExpr* expr) {
     }
 }
 
-void SemaAnalyser::visitCast(LgsCast* castExpr) {
+void LgsSema::visitCast(LgsCast* castExpr) {
     const auto fromValue = castExpr->fromValue;
     if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(fromValue)) {
         visitUnaryExpr(unaryExpr);
@@ -385,7 +385,7 @@ void SemaAnalyser::visitCast(LgsCast* castExpr) {
     castExprToType(fromValue, castExpr->toType);
 }
 
-void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
+void LgsSema::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     if (const auto instance = unaryExpr->asInstance()) visitInstance(instance);
     else if (const auto func = unaryExpr->asFunc()) visitFunc(func);
     else if (const auto funcCall = unaryExpr->asFuncCall()) visitFuncCall(funcCall);
@@ -400,7 +400,7 @@ void SemaAnalyser::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     else if (const auto vec2 = unaryExpr->asVector()) visitVector(vec2);
 }
 
-void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
+void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     visitExpr(binaryExpr->left);
     visitExpr(binaryExpr->right);
     LgsType* type = nullptr;
@@ -438,7 +438,7 @@ void SemaAnalyser::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     binaryExpr->setType(type);
 }
 
-void SemaAnalyser::visitArrayExpr(LgsArrayExpr* array) {
+void LgsSema::visitArrayExpr(LgsArrayExpr* array) {
     for (const auto element : array->initialElements) {
         visitExpr(element);
     }
@@ -460,7 +460,7 @@ void inferBaseType(const LgsArrayExpr* array) {
     array->type->asIterable()->baseType = baseType;
 }
 
-void SemaAnalyser::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface) {
+void LgsSema::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface) {
     instance->setObject(new LgsObject(interface->name));
     instance->obj->location = instance->location;
     instance->obj->interfaces.push_back(interface);
@@ -490,7 +490,7 @@ void SemaAnalyser::visitInterfaceInstance(LgsInstance* instance, LgsInterface* i
     }
 }
 
-void SemaAnalyser::visitStaticArray(LgsArrayExpr* arrayExpr) {
+void LgsSema::visitStaticArray(LgsArrayExpr* arrayExpr) {
     const auto& initialElements = arrayExpr->initialElements;
     const auto arr = arrayExpr->type->asSArray();
     if (initialElements.empty() && !arr->baseType) {
@@ -504,7 +504,7 @@ void SemaAnalyser::visitStaticArray(LgsArrayExpr* arrayExpr) {
     }
 }
 
-void SemaAnalyser::visitDynamicArray(LgsArrayExpr* array) {
+void LgsSema::visitDynamicArray(LgsArrayExpr* array) {
     const auto dArr = array->type->asIterable();
     if (!dArr->sizeExpr) {
         dArr->sizeExpr = new LgsIntConst(&LGS_LONG, array->initialElements.size());
@@ -516,7 +516,7 @@ void SemaAnalyser::visitDynamicArray(LgsArrayExpr* array) {
     }
 }
 
-void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) {
+void LgsSema::visitHashMap(LgsHashMap* hashMap) {
     const auto typePair = hashMap->type->asMap()->typePair;
     if (typePair->key && typePair->value) return;
     if (hashMap->initialElements.empty()) {
@@ -531,13 +531,13 @@ void SemaAnalyser::visitHashMap(LgsHashMap* hashMap) {
     typePair->value = firstElement->value->type;
 }
 
-void SemaAnalyser::visitVector(const LgsVectorExpr* vec) {
+void LgsSema::visitVector(const LgsVectorExpr* vec) {
     for (const auto arg : vec->args) {
         visitExpr(arg);
     }
 }
 
-void SemaAnalyser::visitVariable(LgsVariable* variable) {
+void LgsSema::visitVariable(LgsVariable* variable) {
     const auto symbol = getSymbol(variable->name, &variable->location);
     if (!symbol) return;
     variable->ref.symbolType = symbol->symbolType;
@@ -577,7 +577,7 @@ void SemaAnalyser::visitVariable(LgsVariable* variable) {
     assert(variable->ref.symbolType != UNKNOWN);
 }
 
-void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
+void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
     for (const auto arg : funcCall->args) {
         visitExpr(arg);
     }
@@ -586,7 +586,7 @@ void SemaAnalyser::visitFuncCall(LgsFuncCall* funcCall) {
     validateArgs(funcCall);
 }
 
-void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
+void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
     for (int i = 1; i < methodCall->args.size(); ++i) {
         const auto arg = methodCall->args[i];
         visitExpr(arg);
@@ -596,7 +596,7 @@ void SemaAnalyser::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType)
     validateArgs(methodCall);
 }
 
-void SemaAnalyser::validateArgs(const LgsFuncCall* funcCall) {
+void LgsSema::validateArgs(const LgsFuncCall* funcCall) {
     for (int i = funcCall->func->funcType->isStatic; i < funcCall->args.size(); ++i) {
         const auto arg = funcCall->args[i];
         const auto param = funcCall->func->funcType->params[i];
@@ -604,7 +604,7 @@ void SemaAnalyser::validateArgs(const LgsFuncCall* funcCall) {
     }
 }
 
-void SemaAnalyser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
+void LgsSema::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
     const auto baseExpr = prefixExpr->expr;
     visitExpr(baseExpr);
     const auto type = baseExpr->type;
@@ -621,7 +621,7 @@ void SemaAnalyser::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
     }
 }
 
-void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
+void LgsSema::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     const auto baseExpr = postfixExpr->expr;
     visitUnaryExpr(baseExpr);
     const auto type = baseExpr->type;
@@ -631,14 +631,14 @@ void SemaAnalyser::visitPostfixExpr(LgsPostfixExpr* postfixExpr) {
     postfixExpr->setType(type);
 }
 
-void SemaAnalyser::visitStrConst(const LgsStrConst* strConst) {
+void LgsSema::visitStrConst(const LgsStrConst* strConst) {
     if (strConst->templateParts.empty()) return;
     for (const auto templatePart : strConst->templateParts) {
         visitExpr(templatePart);
     }
 }
 
-void SemaAnalyser::visitSelection(LgsSelection* selection) {
+void LgsSema::visitSelection(LgsSelection* selection) {
     const auto exprs = selection->exprs;
     const auto firstExpr = exprs.front();
     visitFirstSelection(firstExpr);
@@ -648,7 +648,7 @@ void SemaAnalyser::visitSelection(LgsSelection* selection) {
     selection->isMutable = selection->lastExpr()->isMutable;
 }
 
-void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
+void LgsSema::visitInnerSelections(const LgsSelection* selection) {
     const auto exprs = selection->exprs;
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
@@ -662,7 +662,7 @@ void SemaAnalyser::visitInnerSelections(const LgsSelection* selection) {
     }
 }
 
-void SemaAnalyser::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
+void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (!parentType) return;
     auto childName = child->name;
     LgsField* field = nullptr;
@@ -684,7 +684,7 @@ void SemaAnalyser::visitFieldSelection(LgsVariable* child, LgsType* parentType) 
     }
 }
 
-void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
+void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
     if (const auto variable = firstExpr->asVariable()) {
         visitVariable(variable);
     } else if (const auto funcCall = firstExpr->asFuncCall()) {
@@ -694,7 +694,7 @@ void SemaAnalyser::visitFirstSelection(LgsExpr* firstExpr) {
     }
 }
 
-void SemaAnalyser::visitInstance(LgsInstance* instance) {
+void LgsSema::visitInstance(LgsInstance* instance) {
     const auto objName = instance->name;
     const auto symbol = getSymbol(objName, &instance->location);
     if (!symbol) return;
@@ -733,7 +733,7 @@ void SemaAnalyser::visitInstance(LgsInstance* instance) {
     }
 }
 
-void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
+void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto exprFrom = iterIndex->index->from;
     const auto exprTo = iterIndex->index->to;
@@ -760,7 +760,7 @@ void SemaAnalyser::visitIterIndex(LgsIterIndex* iterIndex) {
     }
 }
 
-void SemaAnalyser::visitSlice(LgsIterIndex* iterIndex) {
+void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto exprFrom = iterIndex->index->from;
     const auto exprTo = iterIndex->index->to;
@@ -777,7 +777,7 @@ void SemaAnalyser::visitSlice(LgsIterIndex* iterIndex) {
     validateSliceBounds(iterIndex);
 }
 
-void SemaAnalyser::visitGroup(LgsGroup* group) {
+void LgsSema::visitGroup(LgsGroup* group) {
     for (const auto targetSymbol : group->targetSymbols) {
         for (const auto type : group->types) {
             const auto method = type->getMethod(targetSymbol->name);
@@ -788,7 +788,7 @@ void SemaAnalyser::visitGroup(LgsGroup* group) {
     }
 }
 
-void SemaAnalyser::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces) {
+void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces) {
     std::unordered_set<std::string> interfacesNames;
     for (const auto implementsInterface : interfaces) {
         const auto interface = implementsInterface->asInterface();
@@ -803,7 +803,7 @@ void SemaAnalyser::validateObjImplements(LgsObject* obj, const std::vector<LgsTy
     }
 }
 
-bool SemaAnalyser::resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable) {
+bool LgsSema::resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable) {
     const auto varDecSize = foreachLoop->loopVars.size();
     const auto unpackCount = iterable->getUnpackCount();
     foreachLoop->withIndex = unpackCount + 1 == varDecSize;
@@ -843,7 +843,7 @@ std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const 
     return str.str();
 }
 
-void SemaAnalyser::validateObjInterface(LgsObject* obj, LgsInterface* interface) {
+void LgsSema::validateObjInterface(LgsObject* obj, LgsInterface* interface) {
     // Fields
     std::vector<LgsField*> missingFields;
     for (const auto& [name, interfaceField] : interface->fields) {
@@ -879,7 +879,7 @@ void SemaAnalyser::validateObjInterface(LgsObject* obj, LgsInterface* interface)
     }
 }
 
-void SemaAnalyser::validateIndex(LgsIterIndex* iterIndex) {
+void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto exprFrom = iterIndex->index->from;
     const auto iterable = baseExpr->type->asIterable();
@@ -895,7 +895,7 @@ void SemaAnalyser::validateIndex(LgsIterIndex* iterIndex) {
     }
 }
 
-void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
+void LgsSema::validateSliceBounds(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto exprFrom = iterIndex->index->from;
     const auto exprTo = iterIndex->index->to;
@@ -915,7 +915,7 @@ void SemaAnalyser::validateSliceBounds(LgsIterIndex* iterIndex) {
     }
 }
 
-bool SemaAnalyser::validateFieldVisibility(LgsField* field, const LgsObject* parent) {
+bool LgsSema::validateFieldVisibility(LgsField* field, const LgsObject* parent) {
     if (parent && parent->singleton) return true;
     if (!field || field->isVirtual) return false;
     if (!field->isPublic && file->id != field->location.fileID) {
@@ -925,7 +925,7 @@ bool SemaAnalyser::validateFieldVisibility(LgsField* field, const LgsObject* par
     return true;
 }
 
-bool SemaAnalyser::validateMethodVisibility(LgsFuncCall* methodCall, const LgsObject* parent) {
+bool LgsSema::validateMethodVisibility(LgsFuncCall* methodCall, const LgsObject* parent) {
     if (parent && parent->singleton) return true;
     const auto method = methodCall->func;
     if (!method || method->funcType->isVirtual) return false;
@@ -938,14 +938,14 @@ bool SemaAnalyser::validateMethodVisibility(LgsFuncCall* methodCall, const LgsOb
     return true;
 }
 
-void SemaAnalyser::validateFuncControlFlow(LgsFunc* func) {
+void LgsSema::validateFuncControlFlow(LgsFunc* func) {
     if (func->funcType->rt->isVoid()) return;
     if (!validateBlockControlFlow(func->stmtsBlock, func)) {
         errHandler.addError(E10055, &func->location, {func->funcType->name});
     }
 }
 
-bool SemaAnalyser::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func) {
+bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func) {
     if (!stmtBlock) return true;
     if (stmtBlock->returnExpr) return true;
     auto isValid = false;
@@ -968,14 +968,14 @@ bool SemaAnalyser::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, cons
     return isValid;
 }
 
-void SemaAnalyser::castExprToType(LgsExpr* expr, LgsType* toType) {
+void LgsSema::castExprToType(LgsExpr* expr, LgsType* toType) {
     if (expr->type == toType) return;
     if (!expr->castTo(toType)) {
         errHandler.addError(E10018, &expr->location, {expr->type->pname(), toType->pname()});
     }
 }
 
-LgsExpr* SemaAnalyser::matchExprToType(LgsExpr* expr, LgsType* type) {
+LgsExpr* LgsSema::matchExprToType(LgsExpr* expr, LgsType* type) {
     if (expr->type == type) return expr;
     if (expr->isNull) {
         // null must have a type
@@ -999,7 +999,7 @@ LgsExpr* SemaAnalyser::matchExprToType(LgsExpr* expr, LgsType* type) {
     return expr;
 }
 
-void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
+void LgsSema::resolveFuncCall(LgsFuncCall* funcCall) {
     const auto symbol = getSymbol(funcCall->name, &funcCall->location);
     if (!symbol) return;
     if (symbol->symbolType == FUNC) {
@@ -1028,7 +1028,7 @@ void SemaAnalyser::resolveFuncCall(LgsFuncCall* funcCall) {
     }
 }
 
-bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
+bool LgsSema::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
     auto name = methodCall->name;
     const auto method = parentType->getMethod(name);
     if (!method) {
@@ -1045,7 +1045,7 @@ bool SemaAnalyser::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentTyp
     return true;
 }
 
-LgsField* SemaAnalyser::resolveVectorField(LgsVariable* fieldVar, LgsVec* vecType) {
+LgsField* LgsSema::resolveVectorField(LgsVariable* fieldVar, LgsVec* vecType) {
     const auto scalarPositions = resolveScalars(fieldVar, vecType);
     if (scalarPositions.empty()) return nullptr;
     const auto fieldName = fieldVar->name;
@@ -1055,7 +1055,7 @@ LgsField* SemaAnalyser::resolveVectorField(LgsVariable* fieldVar, LgsVec* vecTyp
     return field;
 }
 
-std::vector<uint8_t> SemaAnalyser::resolveScalars(LgsVariable* fieldVar, LgsVec* vec) {
+std::vector<uint8_t> LgsSema::resolveScalars(LgsVariable* fieldVar, LgsVec* vec) {
     assert(vec->isVector());
     const auto fieldName = fieldVar->name;
     const auto dim = vec->dim;
@@ -1064,7 +1064,22 @@ std::vector<uint8_t> SemaAnalyser::resolveScalars(LgsVariable* fieldVar, LgsVec*
         return {};
     }
 
-    const auto expectedSet = vec->getSwizzleSet(fieldName[0]);
+    const auto getSwizzleSet = [](const char c) {
+        if (strchr("xyzw", c)) return 0;
+        if (strchr("rgba", c)) return 1;
+        if (strchr("stpq", c)) return 2;
+        return -1;
+    };
+    const auto getComponentIndex = [](const char c) {
+        switch (c) {
+        case 'x': case 'r': case 's': return 0;
+        case 'y': case 'g': case 't': return 1;
+        case 'z': case 'b': case 'p': return 2;
+        case 'w': case 'a': case 'q': return 3;
+        default: return 255; // Invalid marker
+        }
+    };
+    const auto expectedSet = getSwizzleSet(fieldName[0]);
     if (expectedSet < 0) {
         errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
         return {};
@@ -1073,11 +1088,11 @@ std::vector<uint8_t> SemaAnalyser::resolveScalars(LgsVariable* fieldVar, LgsVec*
     std::vector<uint8_t> indices;
     indices.reserve(fieldName.size());
     for (const char c : fieldName) {
-        if (vec->getSwizzleSet(c) != expectedSet) {
+        if (getSwizzleSet(c) != expectedSet) {
             errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
             return {};
         }
-        const auto componentIndex = vec->getComponentIndex(c);
+        const auto componentIndex = getComponentIndex(c);
         if (componentIndex >= dim) {
             errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
             return {};
@@ -1087,7 +1102,7 @@ std::vector<uint8_t> SemaAnalyser::resolveScalars(LgsVariable* fieldVar, LgsVec*
     return indices;
 }
 
-LgsSymbol* SemaAnalyser::getSymbol(const std::string& name, LgsLocation* location) {
+LgsSymbol* LgsSema::getSymbol(const std::string& name, LgsLocation* location) {
     if (const auto globalSymbol = globals.getSymbol(name)) {
         return globalSymbol;
     }
@@ -1101,7 +1116,7 @@ LgsSymbol* SemaAnalyser::getSymbol(const std::string& name, LgsLocation* locatio
     return nullptr;
 }
 
-void SemaAnalyser::addLocalSymbol(const LgsSymbol& newSymbol) {
+void LgsSema::addLocalSymbol(const LgsSymbol& newSymbol) {
     auto symbolName = *newSymbol.name;
     const auto symbol = globals.getSymbol(symbolName);
     if (symbol && symbol->isBuiltin) {

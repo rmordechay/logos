@@ -46,7 +46,7 @@ class LgsForLoop;
 struct LgsSymbol;
 struct LgsIndex;
 
-class SemaAnalyser final {
+class LgsSema final {
 public:
     LgsStack stack;
     LgsFile* file = nullptr;
@@ -54,7 +54,7 @@ public:
     LgsSymbolTable& globals;
     LgsTypeResolver typeResolver;
 
-    explicit SemaAnalyser(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {}
+    explicit LgsSema(LgsFile* file, LgsSymbolTable& globals) : file(file), globals(globals), typeResolver(errHandler, globals) {}
     void analyse();
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);

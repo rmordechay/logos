@@ -10,7 +10,6 @@ public:
     std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
     json::value_ref asJSON() override;
-    bool castTo(LgsType* toType) override;
     Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* neIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* gtIR(LgsCodeGen* codeGen, LgsExpr* other) override;

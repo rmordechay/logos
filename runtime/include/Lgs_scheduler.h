@@ -8,8 +8,7 @@ struct Lgs_Scheduler {
     std::deque<continuation> queue;
 
     void run();
-    void spawn(void (*task)(void*), void* userdata);
-    static void init(int hz);
+    void spawn(void (*task)(void*), void* ctx);
     static void yield();
     static void shutdown();
 };

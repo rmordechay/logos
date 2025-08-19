@@ -32,12 +32,8 @@ extern "C" void Lgs_Scheduler_run() {
     runtime.scheduler.run();
 }
 
-extern "C" void Lgs_Scheduler_spawn(void (*task)(void*), void* userdata) {
-    runtime.scheduler.spawn(task, userdata);
-}
-
-extern "C" void Lgs_Scheduler_init(const int hz) {
-    runtime.scheduler.init(hz);
+extern "C" void Lgs_Scheduler_spawn(void (*task)(void*), void* ctx) {
+    runtime.scheduler.spawn(task, ctx);
 }
 
 extern "C" void Lgs_Scheduler_yield() {

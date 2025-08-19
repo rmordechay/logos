@@ -71,7 +71,7 @@ LgsVectorExpr* LgsExpr::asVector() { return dynamic_cast<LgsVectorExpr*>(this); 
 LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
 
 bool LgsExpr::equals(LgsExpr* other) { assert(0); }
-bool LgsExpr::castTo(LgsType* toType) { assert(0); }
+bool LgsExpr::castTo(LgsType* toType) { return true; }
 Value* LgsExpr::hash(LgsCodeGen* codeGen) { assert(0); }
 
 LgsExpr::~LgsExpr() {

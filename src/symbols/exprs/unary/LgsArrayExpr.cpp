@@ -46,10 +46,6 @@ Value* LgsArrayExpr::createDynamicArray(LgsCodeGen* codeGen) {
     return IRValue;
 }
 
-bool LgsArrayExpr::castTo(LgsType* toType) {
-    return true;
-}
-
 LgsArrayExpr::~LgsArrayExpr() {
     for (const auto& initialElement : initialElements) {
         delete initialElement;

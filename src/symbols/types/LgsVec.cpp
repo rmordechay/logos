@@ -53,20 +53,3 @@ bool LgsVec::equals(LgsType* other) {
 std::string LgsVec::strFormatPart() const {
     return "%s";
 }
-
-uint8_t LgsVec::getSwizzleSet(const char c) {
-    if (strchr("xyzw", c)) return 0;
-    if (strchr("rgba", c)) return 1;
-    if (strchr("stpq", c)) return 2;
-    return -1;
-}
-
-uint8_t LgsVec::getComponentIndex(const char c) {
-    switch (c) {
-    case 'x': case 'r': case 's': return 0;
-    case 'y': case 'g': case 't': return 1;
-    case 'z': case 'b': case 'p': return 2;
-    case 'w': case 'a': case 'q': return 3;
-    default: return 255; // Invalid marker
-    }
-}
