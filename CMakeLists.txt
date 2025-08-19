@@ -43,8 +43,6 @@ set(CORE_SOURCES
     src/analysis/LgsSema.cpp
     src/analysis/LgsTypeResolver.cpp
     src/cli/LgsCli.cpp
-    src/cli/LgsFormatCmd.cpp
-    src/cli/LgsGenerateCmd.cpp
     src/cli/LgsRunCmd.cpp
     src/extern/LgsCLang.cpp
     src/extern/LgsCLangVisitor.cpp
@@ -56,6 +54,8 @@ set(CORE_SOURCES
     src/logos/LgsCodeGen.cpp
     src/files/LgsInterfaceFile.cpp
     src/utils/LgsErrHandler.cpp
+    src/symbols/types/LgsTable.cpp
+    src/symbols/exprs/unary/LgsTableExpr.cpp
 
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsSymbolTable.cpp
@@ -74,6 +74,7 @@ set(CORE_SOURCES
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
     src/symbols/exprs/unary/LgsVectorExpr.cpp
+    src/symbols/exprs/unary/LgsTableExpr.cpp
     src/symbols/exprs/unary/constants/LgsCharConst.cpp
     src/symbols/exprs/unary/constants/LgsFloatConst.cpp
     src/symbols/exprs/unary/constants/LgsIntConst.cpp
@@ -115,6 +116,7 @@ set(CORE_SOURCES
     src/symbols/types/LgsUnknown.cpp
     src/symbols/types/LgsVec.cpp
     src/symbols/types/LgsVoid.cpp
+    src/symbols/types/LgsTable.cpp
     src/symbols/types/primitives/LgsBool.cpp
     src/symbols/types/primitives/LgsChar.cpp
     src/symbols/types/primitives/LgsDouble.cpp
@@ -127,17 +129,13 @@ set(CORE_SOURCES
 )
 
 set(RUNTIME_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_hashmap.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_array.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_system.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_defer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_runtime.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_scheduler.cpp
+    runtime/lib/Lgs_hashmap.cpp
+    runtime/lib/Lgs_array.cpp
+    runtime/lib/Lgs_system.cpp
+    runtime/lib/Lgs_defer.cpp
+    runtime/lib/Lgs_runtime.cpp
+    runtime/lib/Lgs_scheduler.cpp
     runtime/lib/Lgs_stack.cpp
-    src/symbols/types/LgsTable.cpp
-    include/symbols/types/LgsTable.h
-    src/symbols/exprs/unary/LgsTableExpr.cpp
-    include/symbols/exprs/unary/LgsTableExpr.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

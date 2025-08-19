@@ -1,14 +1,10 @@
 #pragma once
-#include "LgsCmd.h"
-#include "logos/LgsApp.h"
+#include "LgsCliCmd.h"
 
-class LgsRunCmd final : public LgsCmd {
+class LgsRunCmd final : public LgsCliCmd {
 public:
-    LgsRunCmd(const int argc, char** argv) : LgsCmd(argc, argv) {}
-    void setArgs(LgsApp* app) const;
-    void runCmd() override;
-    void validate() override;
-    void printHelp() override;
+    LgsRunCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
+    void run() override;
+    bool setup() override;
+    LgsCliCmdHelp& help() override;
 };
-
-

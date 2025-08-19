@@ -203,7 +203,7 @@ void LgsApp::writeIRFiles() {
         }
         if constexpr (LOG_LEVEL == DEBUG) {
             module->print(outs(), nullptr);
-            logInfo("\n-----\n\n");
+            logInfo(LGS_MSG_LINE_SEPERATOR);
         }
         if constexpr (WRITE_IR_TO_FILE) {
             const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";
@@ -224,9 +224,8 @@ void LgsApp::exitWithErrors() const {
         const auto fullPath = filePath + ":" + lineNumber + ":" + posInLine;
         const auto path = "\n   at:  " + fullPath;
         logError(err.msg, path);
-        if (i != errHandler.errors.size() - 1) logInfo("\n\n------\n\n");
+        if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
     }
-    logInfo("\n");
     exit(1);
 }
 

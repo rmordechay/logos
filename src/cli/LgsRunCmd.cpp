@@ -1,27 +1,48 @@
 #include "cli/LgsRunCmd.h"
+#include "logos/LgsApp.h"
+#include "types/LgsStr.h"
+#include "types/primitives/LgsInt.h"
 
-void LgsRunCmd::runCmd() {
-    const auto firstArg = argv[2];
-    const auto isCurrentDirOrEmpty = strcmp(firstArg, ".") == 0 || argc == 2;
-    const auto rootPath = isCurrentDirOrEmpty ? fs::current_path().string() : firstArg;
-    LgsApp logos(rootPath);
-    setArgs(&logos);
-    logos.run();
-}
+inline LgsCliCmdHelp runCmdHelp{
+    .name = "run",
+    .usage = "lgs run <path> <options>",
+    .args = {
+        {
+            .name = "<path>",
+            .type = LgsStr::name,
+            .desc = "Path to file or application root.",
+            .required = true
+        },
+    },
+    .opts = {
+        {
+            .name = "-o",
+            .type = LgsInt::name,
+            .defaultVal = "2",
+            .possibleValues = "[0, 1, 2, 3]",
+            .desc = "Optimization level"
+        },
+    }
+};
 
-void LgsRunCmd::validate() {
-    if (argc < 3) printInfoAndExit("Too few arguments.\n");
-}
-
-void LgsRunCmd::setArgs(LgsApp* app) const {
+void LgsRunCmd::run() {
+    LgsApp app(argv[2]);
     std::vector<char*> args;
     for (int i = 0; i < argc; ++i) {
-        app->appArgs.emplace_back(argv[i]);
+        app.appArgs.emplace_back(argv[i]);
     }
+    app.run();
 }
 
-void LgsRunCmd::printHelp() {
-    std::ostringstream txt;
-    txt << "Usage: lgs run <path> <options>\n";
-    logInfo(txt.str());
+bool LgsRunCmd::setup() {
+    if (argc < 3) {
+        errMsg = "Too few arguments for command 'run'.";
+        return false;
+    }
+    if (argv[2][0] == '-') return false;
+    return fs::exists(argv[2]);
+}
+
+LgsCliCmdHelp& LgsRunCmd::help() {
+    return runCmdHelp;
 }
