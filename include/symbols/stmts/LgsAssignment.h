@@ -30,13 +30,13 @@ public:
 
     LgsAssignment(const LgsAssignType assignmentType, LgsExpr* lValue, LgsExpr* rValue) : lValue(lValue), rValue(rValue), assignmentType(assignmentType) {}
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
-    void createIRAssign(LgsCodeGen* codeGen) const;
+    void createIRAssignment(LgsCodeGen* codeGen) const;
     static void assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, LgsCodeGen* codeGen);
     static void assignArrayToIterIndex(LgsCodeGen* codeGen, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr);
     static void assignToSelection(LgsCodeGen* codeGen, LgsSelection* selection, LgsExpr* expr);
     static void assignToVariable(LgsCodeGen* codeGen, LgsVariable* variable, LgsExpr* expr);
     static void assignScalarToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsExpr* expr);
     static void assignHashMapToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map);
+    json::value_ref asJSON() override;
     ~LgsAssignment() override;
 };

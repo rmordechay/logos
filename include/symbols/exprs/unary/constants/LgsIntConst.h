@@ -15,7 +15,6 @@ public:
     LgsNumberType numberType;
 
     LgsIntConst(LgsType* type, const size_t value) : LgsUnaryExpr(type), value(value) {
-        isConstant = true;
         setNumberType();
     }
     void setNumberType();

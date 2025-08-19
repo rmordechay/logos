@@ -14,7 +14,7 @@ LgsExpr* LgsNullable::getZeroValue() {
     return baseType->getZeroValue();
 }
 
-json::object LgsNullable::asJSON() {
+json::value_ref LgsNullable::asJSON() {
     json::object obj;
     return obj;
 }

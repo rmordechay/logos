@@ -16,7 +16,7 @@ std::string LgsSize::getName() {
     return name;
 }
 
-json::object LgsSize::asJSON() {
+json::value_ref LgsSize::asJSON() {
     json::object obj;
     return obj;
 }

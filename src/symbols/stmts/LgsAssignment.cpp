@@ -4,18 +4,13 @@
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsSelection.h"
 #include "exprs/unary/LgsVariable.h"
-#include "stmts/LgsField.h"
-
-json::value_ref LgsAssignment::asJSON() {
-    json::object obj;
-    return obj;
-}
+#include "types/LgsVec.h"
 
 void LgsAssignment::createIRValue(LgsCodeGen* codeGen) {
     Value* results = nullptr;
     switch (assignmentType) {
     case ASSIGN:
-        createIRAssign(codeGen);
+        createIRAssignment(codeGen);
         return;
     case ASSIGN_ADD:
         results = lValue->addIR(codeGen, rValue);
@@ -52,7 +47,7 @@ void LgsAssignment::createIRValue(LgsCodeGen* codeGen) {
     codeGen->builder.CreateStore(results, lValue->getIRValue(codeGen));
 }
 
-void LgsAssignment::createIRAssign(LgsCodeGen* codeGen) const {
+void LgsAssignment::createIRAssignment(LgsCodeGen* codeGen) const {
     if (const auto selection = lValue->asSelection()) {
         assignToSelection(codeGen, selection, rValue);
     } else if (const auto iterIndex = lValue->asIterIndex()) {
@@ -71,43 +66,6 @@ void LgsAssignment::assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, Lg
         assignArrayToIterIndex(codeGen, iterIndex, arr);
     } else {
         assignScalarToIterIndex(codeGen, iterIndex, expr);
-    }
-}
-
-void LgsAssignment::assignToSelection(LgsCodeGen* codeGen, LgsSelection* selection, LgsExpr* expr) {
-    codeGen->builder.CreateStore(expr->getIRValue(codeGen), selection->getIRValue(codeGen));
-}
-
-void LgsAssignment::assignToVariable(LgsCodeGen* codeGen, LgsVariable* variable, LgsExpr* expr) {
-    const auto variablePtr = variable->getIRValue(codeGen);
-    const auto exprIRValue = expr->getIRValue(codeGen);
-    codeGen->builder.CreateStore(exprIRValue, variablePtr);
-}
-
-void LgsAssignment::assignHashMapToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map) {
-    assert(0);
-}
-
-void LgsAssignment::assignScalarToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsExpr* expr) {
-    const auto baseExpr = iterIndex->baseExpr;
-    const auto rIRValue = expr->getIRValue(codeGen);
-    const auto baseIRValue = baseExpr->getIRValue(codeGen);
-    if (const auto arr = baseExpr->type->asDArray()) {
-        const auto ptr = codeGen->builder.CreateAlloca(expr->type->getIRType(codeGen));
-        codeGen->builder.CreateStore(rIRValue, ptr);
-        arr->putFunc->callIR(codeGen, {baseIRValue, iterIndex->index->from->getIRValue(codeGen), ptr});
-        return;
-    }
-    if (baseExpr->type->asSArray()) {
-        codeGen->builder.CreateStore(rIRValue, iterIndex->loadFromSArray(codeGen));
-        return;
-    }
-    if (const auto map = baseExpr->type->asMap()) {
-        const auto key = iterIndex->index->from->getIRValue(codeGen);
-        map->addFunc->callIR(codeGen, {baseIRValue, key, rIRValue});
-    } else {
-        const auto iterPtr = iterIndex->getIRValue(codeGen);
-        codeGen->builder.CreateStore(rIRValue, iterPtr);
     }
 }
 
@@ -137,6 +95,63 @@ void LgsAssignment::assignArrayToIterIndex(LgsCodeGen* codeGen, const LgsIterInd
         codeGen->builder.CreateStore(rValue, gep);
         IRIndices.pop_back();
     }
+}
+
+void LgsAssignment::assignToSelection(LgsCodeGen* codeGen, LgsSelection* selection, LgsExpr* expr) {
+    const auto rIR = expr->getIRValue(codeGen);
+    const auto lastExprParent = selection->lastExprParent();
+    if (lastExprParent->type->asVec()) {
+        const auto vecTy = lastExprParent->type->getIRType(codeGen);
+        const auto vec = codeGen->builder.CreateLoad(vecTy, lastExprParent->getIRValue(codeGen));
+        const auto c = selection->lastExpr()->asVariable()->name;
+        const auto i = codeGen->i32(LgsVec::getComponentIndex(c.front()));
+        const auto insert = codeGen->builder.CreateInsertElement(vec, rIR, i);
+        codeGen->builder.CreateStore(insert, lastExprParent->getIRValue(codeGen));
+    } else {
+        const auto lIR = selection->getIRValue(codeGen);
+        codeGen->builder.CreateStore(rIR, lIR);
+    }
+}
+
+void LgsAssignment::assignToVariable(LgsCodeGen* codeGen, LgsVariable* variable, LgsExpr* expr) {
+    const auto variablePtr = variable->getIRValue(codeGen);
+    const auto exprIRValue = expr->getIRValue(codeGen);
+    codeGen->builder.CreateStore(exprIRValue, variablePtr);
+}
+
+void LgsAssignment::assignScalarToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsExpr* expr) {
+    const auto baseExpr = iterIndex->baseExpr;
+    const auto rIRValue = expr->getIRValue(codeGen);
+    const auto baseIRValue = baseExpr->getIRValue(codeGen);
+    if (const auto arr = baseExpr->type->asDArray()) {
+        const auto ptr = codeGen->builder.CreateAlloca(expr->type->getIRType(codeGen));
+        codeGen->builder.CreateStore(rIRValue, ptr);
+        arr->putFunc->callIR(codeGen, {baseIRValue, iterIndex->index->from->getIRValue(codeGen), ptr});
+        return;
+    }
+    if (baseExpr->type->asSArray()) {
+        codeGen->builder.CreateStore(rIRValue, iterIndex->loadFromSArray(codeGen));
+        return;
+    }
+    if (const auto map = baseExpr->type->asMap()) {
+        const auto key = iterIndex->index->from->getIRValue(codeGen);
+        map->addFunc->callIR(codeGen, {baseIRValue, key, rIRValue});
+    } else {
+        const auto iterPtr = iterIndex->getIRValue(codeGen);
+        codeGen->builder.CreateStore(rIRValue, iterPtr);
+    }
+}
+
+void LgsAssignment::assignHashMapToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map) {
+    assert(0);
+}
+
+json::value_ref LgsAssignment::asJSON() {
+    json::object obj;
+    obj["lValue"] = lValue->asJSON();
+    obj["rValue"] = rValue->asJSON();
+    obj["assignmentType"] = assignmentType;
+    return obj;
 }
 
 LgsAssignment::~LgsAssignment() {

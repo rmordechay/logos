@@ -12,6 +12,7 @@ public:
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
     bool isNullable = false;
+    bool isConst = false;
 
     explicit LgsVarDec(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {}
     bool shouldAllocate(const llvm::Type* IRType) const;

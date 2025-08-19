@@ -9,13 +9,14 @@ public:
     int8_t dim = 0;
 
     explicit LgsVec(const int8_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), dim(dim) {
+        assert(dim > 1 && dim <= 4);
         sizeExpr = new LgsIntConst(&LGS_INT, dim);
     }
 
     Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     std::string pname() override;
-    json::object asJSON() override;
+    json::value_ref asJSON() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
@@ -24,5 +25,7 @@ public:
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     bool equals(LgsType* other) override;
+    static int8_t getSwizzleSet(const char c);
+    static int8_t getComponentIndex(const char c);
     std::string strFormatPart() const override;
 };

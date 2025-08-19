@@ -1,17 +1,18 @@
 #include "exprs/unary/LgsVectorExpr.h"
 
-json::value_ref LgsVectorExpr::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 void LgsVectorExpr::createIRValue(LgsCodeGen* codeGen) {
     const auto ty = type->getIRType(codeGen);
     IRValue = codeGen->builder.CreateAlloca(ty);
+    codeGen->builder.CreateStore(ConstantAggregateZero::get(ty), IRValue);
 }
 
 std::string LgsVectorExpr::pname() {
     return "vec2";
+}
+
+auto LgsVectorExpr::asJSON() -> json::value_ref {
+    json::object obj;
+    return obj;
 }
 
 LgsVectorExpr::~LgsVectorExpr() {

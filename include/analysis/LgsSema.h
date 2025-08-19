@@ -88,16 +88,15 @@ public:
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
     void visitBinaryExpr(LgsBinaryExpr* binaryExpr);
     void visitVariable(LgsVariable* variable);
-    void validateArgs(const LgsFuncCall* funcCall);
+    void visitSelection(LgsSelection* selection);
+    void visitFirstSelection(LgsExpr* firstExpr);
+    void visitInnerSelections(LgsSelection* selection);
+    void visitFieldSelection(LgsVariable* child, LgsType* parentType);
+    void visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     void visitFuncCall(LgsFuncCall* funcCall);
     void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
     void visitPostfixExpr(LgsPostfixExpr* postfixExpr);
     void visitStrConst(const LgsStrConst* strConst);
-    void visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
-    void visitSelection(LgsSelection* selection);
-    void visitInnerSelections(const LgsSelection* selection);
-    void visitFieldSelection(LgsVariable* child, LgsType* parentType);
-    void visitFirstSelection(LgsExpr* firstExpr);
     void visitInstance(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitSlice(LgsIterIndex* iterIndex);
@@ -105,6 +104,7 @@ public:
 
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);
+    void validateArgs(const LgsFuncCall* funcCall);
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field, const LgsObject* parent);
@@ -117,7 +117,7 @@ public:
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     bool resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
-    LgsField* resolveVectorField(LgsVariable* fieldVar, LgsVec* vecType);
+    LgsField* resolveVectorField(LgsVariable* fieldVar, LgsVec* vec);
     std::vector<uint8_t> resolveScalars(LgsVariable* fieldVar, LgsVec* vec);
     LgsSymbol* getSymbol(const std::string& name, LgsLocation* location);
     void addLocalSymbol(const LgsSymbol& newSymbol);

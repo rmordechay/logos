@@ -9,7 +9,7 @@ public:
         isPrimitive = true;
     }
     std::string pname() override;
-    json::object asJSON() override;
+    json::value_ref asJSON() override;
     size_t getSizeBytes() override;
     Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;

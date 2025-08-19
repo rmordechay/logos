@@ -8,6 +8,7 @@ add_definitions(-DLOGOS_VERSION="${CMAKE_PROJECT_VERSION}")
 find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
 find_package(antlr4-runtime REQUIRED)
+find_package(SQLite3 REQUIRED)
 find_package(Boost CONFIG REQUIRED context coroutine json)
 
 set(LLVM_LINK_LLVM_DYLIB ON)
@@ -38,7 +39,7 @@ set(CORE_SOURCES
     src/logos/LgsStack.cpp
     src/logos/LgsLinker.cpp
     src/logos/LgsPaths.cpp
-    src/analysis/LgsAntlrConverter.cpp
+    src/analysis/LgsAntlrAdapter.cpp
     src/analysis/LgsSema.cpp
     src/analysis/LgsTypeResolver.cpp
     src/cli/LgsCli.cpp
@@ -59,8 +60,9 @@ set(CORE_SOURCES
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsSymbolTable.cpp
     src/symbols/LgsValue.cpp
-    src/symbols/exprs/LgsBinaryExpr.cpp
     src/symbols/exprs/LgsExpr.cpp
+    src/symbols/exprs/LgsUnaryExpr.cpp
+    src/symbols/exprs/LgsBinaryExpr.cpp
     src/symbols/exprs/unary/LgsArrayExpr.cpp
     src/symbols/exprs/unary/LgsCast.cpp
     src/symbols/exprs/unary/LgsFuncCall.cpp
@@ -110,7 +112,7 @@ set(CORE_SOURCES
     src/symbols/types/LgsSArray.cpp
     src/symbols/types/LgsStr.cpp
     src/symbols/types/LgsType.cpp
-    src/symbols/types/LgsUnknownType.cpp
+    src/symbols/types/LgsUnknown.cpp
     src/symbols/types/LgsVec.cpp
     src/symbols/types/LgsVoid.cpp
     src/symbols/types/primitives/LgsBool.cpp
@@ -132,6 +134,8 @@ set(RUNTIME_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_runtime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/runtime/lib/Lgs_scheduler.cpp
     runtime/lib/Lgs_stack.cpp
+    src/symbols/types/LgsTable.cpp
+    include/symbols/types/LgsTable.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})
@@ -142,6 +146,7 @@ target_link_libraries(lgs_core PUBLIC
     Boost::context
     Boost::coroutine
     Boost::json
+    SQLite::SQLite3
 )
 
 target_precompile_headers(lgs_core PRIVATE include/pch.h)
@@ -149,6 +154,7 @@ target_include_directories(lgs_core PUBLIC
     include/external/include
     include/external/antlr4-runtime
     ${CLANG_INCLUDE_DIRS}
+    ${SQLite3_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/symbols
     ${CMAKE_CURRENT_SOURCE_DIR}/include/parser

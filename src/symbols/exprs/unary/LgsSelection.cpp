@@ -1,13 +1,32 @@
 #include "exprs/unary/LgsSelection.h"
+#include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsIterIndex.h"
 #include "exprs/unary/LgsInstance.h"
 #include "exprs/unary/LgsVariable.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 
-json::value_ref LgsSelection::asJSON() {
-    json::object obj;
-    return obj;
+LgsExpr* LgsSelection::lastExpr() const {
+    assert(exprs.size() > 1);
+    return exprs[exprs.size() - 1];
+}
+
+LgsExpr* LgsSelection::lastExprParent() const {
+    return exprs[exprs.size() - 2];
+}
+
+std::string LgsSelection::pname() {
+    std::stringstream str;
+    str << exprs[0]->pname();
+    for (int i = 1; i < exprs.size(); ++i) {
+        str << '.' << exprs[i]->pname();
+    }
+    return str.str();
+}
+
+Value* LgsSelection::hash(LgsCodeGen* codeGen) {
+    const auto lgsExpr = lastExpr();
+    return lgsExpr->hash(codeGen);
 }
 
 void LgsSelection::createIRValue(LgsCodeGen* codeGen) {
@@ -36,23 +55,15 @@ void LgsSelection::createIRValue(LgsCodeGen* codeGen) {
     IRValue = lastExpr()->getIRValue(codeGen);
 }
 
-std::string LgsSelection::pname() {
-    std::stringstream str;
-    str << exprs[0]->pname();
-    for (int i = 1; i < exprs.size(); ++i) {
-        str << '.' << exprs[i]->pname();
+json::value_ref LgsSelection::asJSON() {
+    json::object obj;
+    auto parts = json::array();
+    for (const auto& expr : exprs) {
+        parts.emplace_back(expr->asJSON());
     }
-    return str.str();
-}
-
-LgsExpr* LgsSelection::lastExpr() const {
-    assert(exprs.size() > 1);
-    return exprs[exprs.size() - 1];
-}
-
-Value* LgsSelection::hash(LgsCodeGen* codeGen) {
-    const auto lgsExpr = lastExpr();
-    return lgsExpr->hash(codeGen);
+    obj["parts"] = parts;
+    obj["type"] = type->asJSON();
+    return obj;
 }
 
 LgsSelection::~LgsSelection() {

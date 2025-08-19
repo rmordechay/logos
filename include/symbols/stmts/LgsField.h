@@ -19,6 +19,7 @@ public:
     bool isPublic = false;
     bool isVirtual = false;
     bool isOptional = false;
+    bool isConst = false;
     Type* parentIRType = nullptr;
     Value* parentIRValue = nullptr;
 

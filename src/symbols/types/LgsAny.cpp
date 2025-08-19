@@ -17,7 +17,7 @@ LgsExpr* LgsAny::getZeroValue() {
     assert(0);
 }
 
-json::object LgsAny::asJSON() {
+json::value_ref LgsAny::asJSON() {
     json::object obj;
     return obj;
 }

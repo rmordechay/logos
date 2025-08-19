@@ -10,7 +10,7 @@ public:
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string pname() override;
-    json::object asJSON() override;
+    json::value_ref asJSON() override;
     bool equals(LgsType* other) override;
     size_t getSizeBytes() override;
     std::string strFormatPart() const override;

@@ -29,7 +29,7 @@ std::string LgsDArray::getName() {
     return name;
 }
 
-json::object LgsDArray::asJSON() {
+json::value_ref LgsDArray::asJSON() {
     json::object obj;
     return obj;
 }

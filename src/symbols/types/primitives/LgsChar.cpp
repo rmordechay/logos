@@ -4,7 +4,7 @@
 #include "exprs/unary/constants/LgsCharConst.h"
 
 
-json::object LgsChar::asJSON() {
+json::value_ref LgsChar::asJSON() {
     json::object obj;
     return obj;
 }

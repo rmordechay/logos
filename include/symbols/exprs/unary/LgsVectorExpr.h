@@ -7,8 +7,11 @@ public:
     size_t dim = 0;
     std::vector<LgsExpr*> args;
 
+    LgsVectorExpr() {
+        isMutable = true;
+    }
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
     std::string pname() override;
+    json::value_ref asJSON() override;
     ~LgsVectorExpr() override;
 };

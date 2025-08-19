@@ -6,7 +6,7 @@ std::string LgsDouble::getName() {
     return name;
 }
 
-json::object LgsDouble::asJSON() {
+json::value_ref LgsDouble::asJSON() {
     json::object obj;
     return obj;
 }

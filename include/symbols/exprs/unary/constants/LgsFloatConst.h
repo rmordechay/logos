@@ -6,9 +6,7 @@ class LgsFloatConst final : public LgsUnaryExpr {
 public:
     double_t value;
 
-    explicit LgsFloatConst(LgsType* type, const double_t value) : LgsUnaryExpr(type), value(value) {
-        isConstant = true;
-    }
+    explicit LgsFloatConst(LgsType* type, const double_t value) : LgsUnaryExpr(type), value(value) {}
     void createIRValue(LgsCodeGen* codeGen) override;
     json::value_ref asJSON() override;
     std::string pname() override;

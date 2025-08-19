@@ -9,7 +9,7 @@ size_t LgsUInt::getSizeBytes() {
     return sizeof(uint32_t);
 }
 
-json::object LgsUInt::asJSON() {
+json::value_ref LgsUInt::asJSON() {
     json::object obj;
     return obj;
 }

@@ -1,7 +1,6 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "cli/LgsCli.h"
 #include "exprs/unary/LgsIterIndex.h"
-
 #include <llvm/IR/Module.h>
 
 std::string LgsArrayExpr::pname() {

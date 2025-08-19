@@ -12,7 +12,7 @@ public:
         isNumber = true;
     }
     std::string pname() override;
-    json::object asJSON() override;
+    json::value_ref asJSON() override;
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;

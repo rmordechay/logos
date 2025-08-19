@@ -3,7 +3,7 @@
 #include "exprs/LgsNull.h"
 
 
-json::object LgsVoid::asJSON() {
+json::value_ref LgsVoid::asJSON() {
     json::object obj;
     return obj;
 }

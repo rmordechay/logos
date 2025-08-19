@@ -1,26 +1,29 @@
 #include "exprs/unary/LgsUnaryExpr.h"
-
 #include "LgsType.h"
 #include "logos/LgsCodeGen.h"
 
 
 Value* LgsUnaryExpr::addIR(LgsCodeGen* codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(codeGen, other);
+    if (l->getType()->isFloatingPointTy()) return codeGen->builder.CreateFAdd(l, r);
     return codeGen->builder.CreateAdd(l, r);
 }
 
 Value* LgsUnaryExpr::subIR(LgsCodeGen* codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(codeGen, other);
+    if (l->getType()->isFloatingPointTy()) return codeGen->builder.CreateFSub(l, r);
     return codeGen->builder.CreateSub(l, r);
 }
 
 Value* LgsUnaryExpr::mulIR(LgsCodeGen* codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(codeGen, other);
+    if (l->getType()->isFloatingPointTy()) return codeGen->builder.CreateFMul(l, r);
     return codeGen->builder.CreateMul(l, r);
 }
 
 Value* LgsUnaryExpr::divIR(LgsCodeGen* codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(codeGen, other);
+    if (l->getType()->isFloatingPointTy()) return codeGen->builder.CreateFDiv(l, r);
     return codeGen->builder.CreateSDiv(l, r);
 }
 

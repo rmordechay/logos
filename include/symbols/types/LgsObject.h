@@ -27,6 +27,6 @@ public:
     bool equals(LgsType* other) override;
     std::string getName() override;
     std::string pname() override;
-    json::object asJSON() override;
+    json::value_ref asJSON() override;
     ~LgsObject() override;
 };

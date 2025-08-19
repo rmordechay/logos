@@ -6,7 +6,7 @@
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
-#include "types/LgsUnknownType.h"
+#include "types/LgsUnknown.h"
 
 LgsSymbol::LgsSymbol()
     : name(nullptr), symbolType(UNKNOWN), location(nullptr) {}

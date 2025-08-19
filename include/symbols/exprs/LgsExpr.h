@@ -28,7 +28,6 @@ public:
     LgsType* type = nullptr;
     bool isNull = false;
     bool isSpread = false;
-    bool isConstant = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     size_t getConstInt();
@@ -46,7 +45,7 @@ public:
     LgsCharConst* asCharConst();
     LgsFloatConst* asFloatConst();
     LgsStrConst* asStrConst();
-    LgsVectorExpr* asVector();
+    LgsVectorExpr* asVectorExpr();
     LgsIntConst* asIntConst();
 
     virtual bool equals(LgsExpr* other);

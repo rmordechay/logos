@@ -35,7 +35,7 @@ class LgsAppFile;
 class LgsForLoop;
 class LgsAssignment;
 
-class LgsAntlrConverter {
+class LgsAntlrAdapter {
 public:
     size_t fileID;
     LgsPaths& paths;
@@ -43,7 +43,7 @@ public:
     LgsSymbolTable& globals;
     std::stack<LgsForLoop*> loopStack;
 
-    explicit LgsAntlrConverter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
+    explicit LgsAntlrAdapter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const fs::path& filePath);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const fs::path& filePath);
@@ -64,7 +64,7 @@ public:
     LgsAssignment* getAssignment(LogosParser::AssignmentContext* ctx);
     LgsStmtsBlock* getStmtBlock(LogosParser::StatementsBlockContext* ctx);
     LgsCoroutine* getCoroutine(LogosParser::CoroutineContext* ctx);
-    LgsVarDec* getVarDec(antlr4::tree::TerminalNode* name, LgsExpr* expr = nullptr) const;
+    LgsVarDec* getVarDec(antlr4::tree::TerminalNode* name, bool isConst = false, LgsExpr* expr = nullptr) const;
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);

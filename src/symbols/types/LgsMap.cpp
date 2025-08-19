@@ -26,7 +26,7 @@ std::string LgsMap::pname() {
     return '{' + typePair->key->pname() + ": " + typePair->value->pname() + '}';
 }
 
-json::object LgsMap::asJSON() {
+json::value_ref LgsMap::asJSON() {
     json::object obj;
     return obj;
 }

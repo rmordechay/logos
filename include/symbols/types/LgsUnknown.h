@@ -3,15 +3,15 @@
 #include "LgsType.h"
 #include "configs/LgsDefinitions.h"
 
-class LgsUnknownType final : public LgsType {
+class LgsUnknown final : public LgsType {
 public:
     std::string name;
 
-    explicit LgsUnknownType(std::string name = LGS_UNKNOWN_TYPE) : name(std::move(name)) {}
+    explicit LgsUnknown(std::string name = LGS_UNKNOWN_TYPE) : name(std::move(name)) {}
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     std::string pname() override;
-    json::object asJSON() override;
+    json::value_ref asJSON() override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;
     bool equals(LgsType* other) override;

@@ -9,7 +9,7 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
-json::object LgsBool::asJSON() {
+json::value_ref LgsBool::asJSON() {
     json::object obj;
     return obj;
 }

@@ -184,7 +184,9 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
     const auto rValue = assignment->rValue;
     visitExpr(lValue);
     visitExpr(rValue);
-    if (!lValue->isMutable) return errHandler.addError(E10051, &lValue->location, {lValue->pname()});
+    if (!lValue->isMutable) {
+        return errHandler.addError(E10051, &lValue->location, {lValue->pname()});
+    }
     const auto lType = lValue->type;
     const auto rType = rValue->type;
     if (!lType || !rType) return;
@@ -397,7 +399,7 @@ void LgsSema::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     else if (const auto variable = unaryExpr->asVariable()) visitVariable(variable);
     else if (const auto postfixExpr = unaryExpr->asPostfixExpr()) visitPostfixExpr(postfixExpr);
     else if (const auto prefixExpr = unaryExpr->asPrefixExpr()) visitPrefixExpr(prefixExpr);
-    else if (const auto vec2 = unaryExpr->asVector()) visitVector(vec2);
+    else if (const auto vec2 = unaryExpr->asVectorExpr()) visitVector(vec2);
 }
 
 void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
@@ -577,13 +579,61 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     assert(variable->ref.symbolType != UNKNOWN);
 }
 
-void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
-    for (const auto arg : funcCall->args) {
-        visitExpr(arg);
+void LgsSema::visitSelection(LgsSelection* selection) {
+    const auto exprs = selection->exprs;
+    const auto firstExpr = exprs.front();
+    visitFirstSelection(firstExpr);
+    if (!firstExpr->type || firstExpr->type->isUnknown()) return;
+    visitInnerSelections(selection);
+    selection->setType(selection->lastExpr()->type);
+    selection->isMutable = selection->lastExpr()->isMutable;
+}
+
+void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
+    if (const auto variable = firstExpr->asVariable()) {
+        visitVariable(variable);
+    } else if (const auto funcCall = firstExpr->asFuncCall()) {
+        visitFuncCall(funcCall);
+    } else if (const auto iterIndex = firstExpr->asIterIndex()) {
+        visitIterIndex(iterIndex);
     }
-    resolveFuncCall(funcCall);
-    if (!funcCall->func) return;
-    validateArgs(funcCall);
+}
+
+void LgsSema::visitInnerSelections(LgsSelection* selection) {
+    const auto exprs = selection->exprs;
+    for (int i = 0; i < exprs.size() - 1; ++i) {
+        const auto parentExpr = exprs[i];
+        const auto childExpr = exprs[i + 1];
+        if (const auto var = childExpr->asVariable()) {
+            visitFieldSelection(var, parentExpr->type);
+        } else if (const auto methodCall = childExpr->asFuncCall()) {
+            visitMethodCall(methodCall, parentExpr->type);
+        }
+        if (!childExpr->type || childExpr->type->isUnknown()) return;
+    }
+    selection->isMutable = selection->lastExpr()->isMutable;
+}
+
+void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
+    if (!parentType) return;
+    auto childName = child->name;
+    LgsField* field = nullptr;
+    if (parentType->isVector()) {
+        field = resolveVectorField(child, parentType->asVec());
+        if (!field) return;
+    } else {
+        field = parentType->getField(childName);
+    }
+    if (!field) {
+        errHandler.addError(E10005, &child->location, {childName, parentType->pname()});
+        return;
+    }
+    child->setType(field->type);
+    child->isMutable = !field->isConst;
+    child->ref = LgsSymbol(field);
+    if (const auto parentAsObj = parentType->asObject()) {
+        validateFieldVisibility(field, parentAsObj);
+    }
 }
 
 void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
@@ -596,12 +646,13 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
     validateArgs(methodCall);
 }
 
-void LgsSema::validateArgs(const LgsFuncCall* funcCall) {
-    for (int i = funcCall->func->funcType->isStatic; i < funcCall->args.size(); ++i) {
-        const auto arg = funcCall->args[i];
-        const auto param = funcCall->func->funcType->params[i];
-        castExprToType(arg, param.type);
+void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
+    for (const auto arg : funcCall->args) {
+        visitExpr(arg);
     }
+    resolveFuncCall(funcCall);
+    if (!funcCall->func) return;
+    validateArgs(funcCall);
 }
 
 void LgsSema::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -635,62 +686,6 @@ void LgsSema::visitStrConst(const LgsStrConst* strConst) {
     if (strConst->templateParts.empty()) return;
     for (const auto templatePart : strConst->templateParts) {
         visitExpr(templatePart);
-    }
-}
-
-void LgsSema::visitSelection(LgsSelection* selection) {
-    const auto exprs = selection->exprs;
-    const auto firstExpr = exprs.front();
-    visitFirstSelection(firstExpr);
-    if (!firstExpr->type || firstExpr->type->isUnknown()) return;
-    visitInnerSelections(selection);
-    selection->setType(selection->lastExpr()->type);
-    selection->isMutable = selection->lastExpr()->isMutable;
-}
-
-void LgsSema::visitInnerSelections(const LgsSelection* selection) {
-    const auto exprs = selection->exprs;
-    for (int i = 0; i < exprs.size() - 1; ++i) {
-        const auto parentExpr = exprs[i];
-        const auto childExpr = exprs[i + 1];
-        if (const auto var = childExpr->asVariable()) {
-            visitFieldSelection(var, parentExpr->type);
-        } else if (const auto methodCall = childExpr->asFuncCall()) {
-            visitMethodCall(methodCall, parentExpr->type);
-        }
-        if (!childExpr->type || childExpr->type->isUnknown()) return;
-    }
-}
-
-void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
-    if (!parentType) return;
-    auto childName = child->name;
-    LgsField* field = nullptr;
-    if (parentType->isVector()) {
-        field = resolveVectorField(child, parentType->asVec());
-        if (!field) return;
-    } else {
-        field = parentType->getField(childName);
-    }
-    if (!field) {
-        errHandler.addError(E10005, &child->location, {childName, parentType->pname()});
-        return;
-    }
-    child->setType(field->type);
-    child->isMutable = field->isMutable;
-    child->ref = LgsSymbol(field);
-    if (const auto parentAsObj = parentType->asObject()) {
-        validateFieldVisibility(field, parentAsObj);
-    }
-}
-
-void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
-    if (const auto variable = firstExpr->asVariable()) {
-        visitVariable(variable);
-    } else if (const auto funcCall = firstExpr->asFuncCall()) {
-        visitFuncCall(funcCall);
-    } else if (const auto iterIndex = firstExpr->asIterIndex()) {
-        visitIterIndex(iterIndex);
     }
 }
 
@@ -800,6 +795,14 @@ void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>&
         for (const auto parentInterface: interface->interfaces) {
             validateObjInterface(obj, parentInterface->asInterface());
         }
+    }
+}
+
+void LgsSema::validateArgs(const LgsFuncCall* funcCall) {
+    for (int i = funcCall->func->funcType->isStatic; i < funcCall->args.size(); ++i) {
+        const auto arg = funcCall->args[i];
+        const auto param = funcCall->func->funcType->params[i];
+        castExprToType(arg, param.type);
     }
 }
 
@@ -1045,13 +1048,18 @@ bool LgsSema::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
     return true;
 }
 
-LgsField* LgsSema::resolveVectorField(LgsVariable* fieldVar, LgsVec* vecType) {
-    const auto scalarPositions = resolveScalars(fieldVar, vecType);
+LgsField* LgsSema::resolveVectorField(LgsVariable* fieldVar, LgsVec* vec) {
+    const auto scalarPositions = resolveScalars(fieldVar, vec);
     if (scalarPositions.empty()) return nullptr;
     const auto fieldName = fieldVar->name;
-    const auto lgsVec = new LgsVec(fieldName.size());
-    const auto field = new LgsField(fieldName, lgsVec);
-    vecType->addField(field);
+    const auto dim = fieldName.size();
+    LgsField* field = nullptr;
+    if (dim == 1) {
+        field = new LgsField(fieldName, vec->baseType);
+    } else {
+        field = new LgsField(fieldName, new LgsVec(dim));
+    }
+    vec->addField(field);
     return field;
 }
 
@@ -1064,22 +1072,7 @@ std::vector<uint8_t> LgsSema::resolveScalars(LgsVariable* fieldVar, LgsVec* vec)
         return {};
     }
 
-    const auto getSwizzleSet = [](const char c) {
-        if (strchr("xyzw", c)) return 0;
-        if (strchr("rgba", c)) return 1;
-        if (strchr("stpq", c)) return 2;
-        return -1;
-    };
-    const auto getComponentIndex = [](const char c) {
-        switch (c) {
-        case 'x': case 'r': case 's': return 0;
-        case 'y': case 'g': case 't': return 1;
-        case 'z': case 'b': case 'p': return 2;
-        case 'w': case 'a': case 'q': return 3;
-        default: return 255; // Invalid marker
-        }
-    };
-    const auto expectedSet = getSwizzleSet(fieldName[0]);
+    const auto expectedSet = LgsVec::getSwizzleSet(fieldName[0]);
     if (expectedSet < 0) {
         errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
         return {};
@@ -1088,11 +1081,11 @@ std::vector<uint8_t> LgsSema::resolveScalars(LgsVariable* fieldVar, LgsVec* vec)
     std::vector<uint8_t> indices;
     indices.reserve(fieldName.size());
     for (const char c : fieldName) {
-        if (getSwizzleSet(c) != expectedSet) {
+        if (LgsVec::getSwizzleSet(c) != expectedSet) {
             errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
             return {};
         }
-        const auto componentIndex = getComponentIndex(c);
+        const auto componentIndex = LgsVec::getComponentIndex(c);
         if (componentIndex >= dim) {
             errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
             return {};

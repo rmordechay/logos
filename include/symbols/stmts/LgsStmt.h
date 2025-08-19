@@ -30,5 +30,3 @@ public:
     LgsVarDec* asVarDec();
     LgsAssignment* asAssignment();
 };
-
-

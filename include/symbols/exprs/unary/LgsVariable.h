@@ -8,8 +8,7 @@ public:
     std::string name;
     LgsSymbol ref;
 
-    explicit LgsVariable(const std::string& name) : LgsUnaryExpr(nullptr), name(name) {}
-    explicit LgsVariable(const std::string& name, LgsType* type) : LgsUnaryExpr(type), name(name) {}
+    explicit LgsVariable(const std::string& name, LgsType* type = nullptr) : LgsUnaryExpr(type), name(name) {}
     std::string pname() override;
     Value* hash(LgsCodeGen* codeGen) override;
     void createIRValue(LgsCodeGen* codeGen) override;

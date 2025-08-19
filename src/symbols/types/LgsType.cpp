@@ -8,7 +8,7 @@
 #include "types/LgsMap.h"
 #include "types/LgsNullable.h"
 #include "types/LgsSArray.h"
-#include "types/LgsUnknownType.h"
+#include "types/LgsUnknown.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsUInt.h"
@@ -81,4 +81,4 @@ LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }
 LgsTypePair* LgsType::asPair() { return dynamic_cast<LgsTypePair*>(this); }
 bool LgsType::isVector() { return dynamic_cast<LgsVec*>(this); }
 bool LgsType::isVoid() { return dynamic_cast<LgsVoid*>(this); }
-bool LgsType::isUnknown() { return dynamic_cast<LgsUnknownType*>(this); }
+bool LgsType::isUnknown() { return dynamic_cast<LgsUnknown*>(this); }

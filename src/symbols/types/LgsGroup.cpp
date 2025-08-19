@@ -14,7 +14,7 @@ std::string LgsGroup::getName() {
     return name;
 }
 
-json::object LgsGroup::asJSON() {
+json::value_ref LgsGroup::asJSON() {
     json::object obj;
     return obj;
 }

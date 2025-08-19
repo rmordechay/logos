@@ -7,12 +7,8 @@
 class LgsPrint final : public LgsFunc {
 public:
     static constexpr auto name = "print";
-    explicit LgsPrint(): LgsFunc(name, &LGS_VOID) {
+    explicit LgsPrint(): LgsFunc(name, &LGS_INT, {&LGS_ANY, &LGS_ANY}, PUBLIC | VARIADIC) {
         funcType->IRName = "printf";
-        funcType->isPublic = true;
-        funcType->isVariadic = true;
-        funcType->params.emplace_back(&LGS_ANY);
-        funcType->params.emplace_back(&LGS_ANY);
     }
 
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
@@ -47,5 +43,3 @@ public:
         return codeGen->callPrintf(IRArgs);
     }
 };
-
-
