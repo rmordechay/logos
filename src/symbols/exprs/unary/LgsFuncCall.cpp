@@ -5,11 +5,6 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
-json::value_ref LgsFuncCall::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 void LgsFuncCall::createIRValue(LgsCodeGen* codeGen) {
     if (callback) {
         func->setIRValue(getCallback(codeGen));
@@ -17,6 +12,32 @@ void LgsFuncCall::createIRValue(LgsCodeGen* codeGen) {
         resolveVirtualFunc(codeGen);
     }
     IRValue = func->call(codeGen, args);
+}
+
+std::string LgsFuncCall::pname() {
+    std::stringstream strStream;
+    strStream << name << '(';
+    for (size_t i = isMethodCall; i < args.size(); ++i) {
+        strStream << args[i]->type->pname();
+        if (i != args.size() - 1) strStream << ", ";
+    }
+    if (type && !type->isUnknown()) {
+        strStream << "): " << type->pname();
+    } else {
+        strStream << ')';
+    }
+    return strStream.str();
+}
+
+json::value LgsFuncCall::asJSON() {
+    json::object jsonObj;
+    jsonObj["name"] = name;
+    jsonObj["type"] = type->asJSON();
+    json::array jsonArgs;
+    for (const auto& arg : args) {
+        jsonArgs.emplace_back(arg->asJSON());
+    }
+    return jsonObj;
 }
 
 Value* LgsFuncCall::getCallback(LgsCodeGen* codeGen) const {
@@ -31,14 +52,6 @@ Value* LgsFuncCall::getCallback(LgsCodeGen* codeGen) const {
         break;
     }
     assert(0);
-}
-
-void LgsFuncCall::resolveVirtualFunc(LgsCodeGen* codeGen) const {
-    const auto self = args[0];
-    const auto keyIR = codeGen->getIRStr(func->funcType->getName());
-    const auto selfPtr = self->getIRValue(codeGen);
-    const auto rv = codeGen->getPtrFromVtable(selfPtr, keyIR);
-    func->setIRValue(rv);
 }
 
 bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
@@ -56,6 +69,10 @@ bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
     return true;
 }
 
+bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
+    return true;
+}
+
 bool LgsFuncCall::equalsDefaultParams(const LgsFuncType* funcType) const {
     const auto argsSize = args.size();
     for (size_t i = funcType->isMethod; i < funcType->params.size(); ++i) {
@@ -67,23 +84,12 @@ bool LgsFuncCall::equalsDefaultParams(const LgsFuncType* funcType) const {
     return true;
 }
 
-bool LgsFuncCall::equalsVariadic(const LgsFuncType* funcType) const {
-    return true;
-}
-
-std::string LgsFuncCall::pname() {
-    std::stringstream strStream;
-    strStream << name << '(';
-    for (size_t i = isMethodCall; i < args.size(); ++i) {
-        strStream << args[i]->type->pname();
-        if (i != args.size() - 1) strStream << ", ";
-    }
-    if (type && !type->isUnknown()) {
-        strStream << "): " << type->pname();
-    } else {
-        strStream << ')';
-    }
-    return strStream.str();
+void LgsFuncCall::resolveVirtualFunc(LgsCodeGen* codeGen) const {
+    const auto self = args[0];
+    const auto keyIR = codeGen->getIRStr(func->funcType->getName());
+    const auto selfPtr = self->getIRValue(codeGen);
+    const auto rv = codeGen->getPtrFromVtable(selfPtr, keyIR);
+    func->setIRValue(rv);
 }
 
 LgsFuncCall::~LgsFuncCall() {

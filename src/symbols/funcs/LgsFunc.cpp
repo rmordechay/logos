@@ -7,93 +7,6 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 
-Value* LgsFunc::callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args) {
-    CallInst* rv = nullptr;
-    if (IRValue) {
-        const auto funcTypeIR = funcType->getIRType(codeGen);
-        const auto IRFuncType = cast<FunctionType>(funcTypeIR);
-        rv = codeGen->builder.CreateCall(IRFuncType, IRValue, args);
-    } else {
-        const auto IRFunc = getIRFunc(codeGen);
-        rv = codeGen->builder.CreateCall(IRFunc, args);
-    }
-    return rv;
-}
-
-void LgsFunc::createPrologue(LgsCodeGen* codeGen) {
-    const auto IRFunc = getIRFunc(codeGen);
-    IRFunc->setLinkage(funcType->isPublic ? GlobalValue::ExternalLinkage : GlobalValue::PrivateLinkage);
-    const auto entryBlock = codeGen->createBlock(BLOCK_NAME_ENTRY, IRFunc);
-    codeGen->builder.SetInsertPoint(entryBlock);
-    codeGen->callStackPush();
-}
-
-void LgsFunc::createEpilogue(LgsCodeGen* codeGen) const {
-    if (hasDefers) codeGen->callDefers();
-    codeGen->callPopStack();
-}
-
-void LgsFunc::createIRValue(LgsCodeGen* codeGen) {
-    codeGen->savedIP = codeGen->builder.saveIP();
-    generateIR(codeGen);
-    codeGen->builder.restoreIP(codeGen->savedIP);
-    IRValue = getIRFunc(codeGen);
-}
-
-void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
-    const auto& debug = codeGen->debugger;
-    const auto dbInt32 = debug.diBuilder->createBasicType("int", 32, dwarf::DW_ATE_signed);
-    const auto subroutine = debug.diBuilder->createSubroutineType(debug.diBuilder->getOrCreateTypeArray({dbInt32}));
-    const auto subprogram = debug.diBuilder->createFunction(debug.compileUnit, funcType->name, "", debug.diFile, 1, subroutine, 1);
-    getIRFunc(codeGen)->setSubprogram(subprogram);
-    codeGen->builder.SetCurrentDebugLocation(DILocation::get(
-        codeGen->context,
-        location.lineStart,
-        location.posInLine,
-        subprogram,
-        subprogram->getScope()
-        ));
-}
-
-bool LgsFunc::castTo(LgsType* toType) {
-    const auto otherFuncType = toType->asFuncType();
-    if (!otherFuncType) return false;
-    funcType->rt = otherFuncType->rt;
-    for (int i = 0; i < funcType->params.size(); ++i) {
-        funcType->params[i].type = otherFuncType->params[i].type;
-    }
-    return true;
-}
-
-std::string LgsFunc::pname() {
-    return funcType->pname();
-}
-
-json::value_ref LgsFunc::asJSON() {
-    json::object obj;
-    obj["name"] = funcType->name;
-    obj["rt"] = funcType->rt->asJSON();
-    json::object funcConfigs;
-    funcConfigs["isMethod"] = funcType->isMethod;
-    funcConfigs["isPublic"] = funcType->isPublic;
-    funcConfigs["isInternal"] = funcType->isInternal;
-    funcConfigs["isVirtual"] = funcType->isVirtual;
-    funcConfigs["isVariadic"] = funcType->isVariadic;
-    funcConfigs["isStatic"] = funcType->isStatic;
-    funcConfigs["isOptional"] = funcType->isOptional;
-    funcConfigs["isTerminator"] = funcType->isTerminator;
-    funcConfigs["isAnonymous"] = funcType->isAnonymous;
-    funcConfigs["hasDefaults"] = funcType->hasDefaults;
-    obj["configs"] = funcConfigs;
-    json::array params;
-    for (auto& param : funcType->params) {
-        params.emplace_back(param.asJSON());
-    }
-    obj["params"] = params;
-    obj["stmtsBlock"] = stmtsBlock->asJSON();
-    return obj;
-}
-
 Value* LgsFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
     std::vector<Value*> IRArgs;
     if (funcType->hasDefaults) {
@@ -143,6 +56,108 @@ Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
         args++;
     }
     return IRFunc;
+}
+
+void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes,
+                       const uint32_t ops) {
+    funcType = new LgsFuncType();
+    funcType->name = name;
+    funcType->rt = rt;
+    funcType->setFuncOptions(ops);
+    if (funcType->isMethod && !funcType->isStatic) {
+        funcType->parentName = paramTypes.front()->getName();
+    }
+    for (const auto paramsType : paramTypes) {
+        funcType->params.push_back(LgsParam(paramsType));
+    }
+    type = funcType;
+}
+
+Value* LgsFunc::callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args) {
+    CallInst* rv = nullptr;
+    if (IRValue) {
+        const auto funcTypeIR = funcType->getIRType(codeGen);
+        const auto IRFuncType = cast<FunctionType>(funcTypeIR);
+        rv = codeGen->builder.CreateCall(IRFuncType, IRValue, args);
+    } else {
+        const auto IRFunc = getIRFunc(codeGen);
+        rv = codeGen->builder.CreateCall(IRFunc, args);
+    }
+    return rv;
+}
+
+void LgsFunc::createPrologue(LgsCodeGen* codeGen) {
+    const auto IRFunc = getIRFunc(codeGen);
+    IRFunc->setLinkage(funcType->isPublic ? GlobalValue::ExternalLinkage : GlobalValue::PrivateLinkage);
+    const auto entryBlock = codeGen->createBlock(BLOCK_NAME_ENTRY, IRFunc);
+    codeGen->builder.SetInsertPoint(entryBlock);
+    codeGen->callStackPush();
+}
+
+void LgsFunc::createEpilogue(LgsCodeGen* codeGen) const {
+    if (hasDefers) codeGen->callDefers();
+    codeGen->callPopStack();
+}
+
+void LgsFunc::createIRValue(LgsCodeGen* codeGen) {
+    codeGen->savedIP = codeGen->builder.saveIP();
+    generateIR(codeGen);
+    codeGen->builder.restoreIP(codeGen->savedIP);
+    IRValue = getIRFunc(codeGen);
+}
+
+void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
+    const auto& [diFile, diBuilder, compileUnit] = codeGen->debugger;
+    const auto dbInt32 = diBuilder->createBasicType("int", 32, dwarf::DW_ATE_signed);
+    const auto subroutine = diBuilder->createSubroutineType(diBuilder->getOrCreateTypeArray({dbInt32}));
+    const auto subprogram = diBuilder->createFunction(compileUnit, funcType->name, "", diFile, 1, subroutine, 1);
+    getIRFunc(codeGen)->setSubprogram(subprogram);
+    codeGen->builder.SetCurrentDebugLocation(DILocation::get(
+        codeGen->context,
+        location.lineStart,
+        location.posInLine,
+        subprogram,
+        subprogram->getScope()
+        ));
+}
+
+bool LgsFunc::castTo(LgsType* toType) {
+    const auto otherFuncType = toType->asFuncType();
+    if (!otherFuncType) return false;
+    funcType->rt = otherFuncType->rt;
+    for (int i = 0; i < funcType->params.size(); ++i) {
+        funcType->params[i].type = otherFuncType->params[i].type;
+    }
+    return true;
+}
+
+std::string LgsFunc::pname() {
+    return funcType->pname();
+}
+
+json::value LgsFunc::asJSON() {
+    json::object obj;
+    obj["name"] = funcType->name;
+    obj["rt"] = funcType->rt->asJSON();
+    json::object funcConfigs;
+    funcConfigs["isMethod"] = funcType->isMethod;
+    funcConfigs["isPublic"] = funcType->isPublic;
+    funcConfigs["isInternal"] = funcType->isInternal;
+    funcConfigs["isVirtual"] = funcType->isVirtual;
+    funcConfigs["isVariadic"] = funcType->isVariadic;
+    funcConfigs["isStatic"] = funcType->isStatic;
+    funcConfigs["isOptional"] = funcType->isOptional;
+    funcConfigs["isTerminator"] = funcType->isTerminator;
+    funcConfigs["isAnonymous"] = funcType->isAnonymous;
+    funcConfigs["hasDefaults"] = funcType->hasDefaults;
+    obj["configs"] = funcConfigs;
+    json::array params;
+    for (auto& param : funcType->params) {
+        params.emplace_back(param.asJSON());
+    }
+    obj["params"] = params;
+    obj["stmtsBlock"] = stmtsBlock->asJSON();
+    return obj;
 }
 
 Value* LgsFunc::getIRArg(LgsCodeGen* codeGen, LgsExpr* arg) {

@@ -13,7 +13,7 @@ public:
     std::string pname() override;
     Value* hash(LgsCodeGen* codeGen) override;
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
+    json::value asJSON() override;
     ~LgsSelection() override;
 };
 

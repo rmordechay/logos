@@ -1,9 +1,8 @@
 #include "exprs/LgsBinaryExpr.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 
-json::value_ref LgsBinaryExpr::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsBinaryExpr::asJSON() {
+    assert(0);
 }
 
 void LgsBinaryExpr::createIRValue(LgsCodeGen* codeGen) {

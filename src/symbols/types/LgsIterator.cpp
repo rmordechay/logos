@@ -4,9 +4,8 @@ std::string LgsIterator::pname() {
     assert(0);
 }
 
-json::value_ref LgsIterator::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsIterator::asJSON() {
+    assert(0);
 }
 
 void LgsIterator::createIRValue(LgsCodeGen* codeGen) {

@@ -13,11 +13,6 @@ void LgsArrayExpr::createIRValue(LgsCodeGen* codeGen) {
     else assert(0);
 }
 
-json::value_ref LgsArrayExpr::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 Value* LgsArrayExpr::createConstArray(LgsCodeGen* codeGen) const {
     auto& builder = codeGen->builder;
     const auto arr = type->asSArray();
@@ -43,6 +38,13 @@ Value* LgsArrayExpr::createDynamicArray(LgsCodeGen* codeGen) {
     IRValue = codeGen->callMalloc(arrSize.getFixedValue());
     arr->initFunc->callIR(codeGen, {IRValue, elementSize});
     return IRValue;
+}
+
+json::value LgsArrayExpr::asJSON() {
+    json::object jsonObj;
+    jsonObj["exprKind"] = "arrayExpr";
+    jsonObj["type"] = type->asJSON();
+    return jsonObj;
 }
 
 LgsArrayExpr::~LgsArrayExpr() {

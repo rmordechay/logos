@@ -146,7 +146,7 @@ void LgsAssignment::assignHashMapToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* 
     assert(0);
 }
 
-json::value_ref LgsAssignment::asJSON() {
+json::value LgsAssignment::asJSON() {
     json::object obj;
     obj["lValue"] = lValue->asJSON();
     obj["rValue"] = rValue->asJSON();

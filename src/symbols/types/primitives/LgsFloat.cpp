@@ -3,9 +3,8 @@
 #include "types/LgsAny.h"
 #include "types/primitives/LgsInt.h"
 
-json::value_ref LgsFloat::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsFloat::asJSON() {
+    assert(0);
 }
 
 std::string LgsFloat::pname() {

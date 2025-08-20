@@ -25,6 +25,7 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
+#include "exprs/unary/LgsTableExpr.h"
 #include "exprs/unary/LgsVectorExpr.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsMainFile.h"
@@ -275,6 +276,7 @@ LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antl
     const auto obj = new LgsObject(objName->getText());
     setLocation(obj->location, objName->getSymbol());
     if (!validateTypeName(obj->name, &obj->location)) return obj;
+
     // Fields
     for (int i = 0; i < ctx->field().size(); ++i) {
         const auto lgsField = getField(ctx->field(i), i);
@@ -283,6 +285,7 @@ LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antl
             errHandler.addError(E10056, &obj->location, {obj->name, lgsField->name});
         }
     }
+
     // Methods
     for (const auto& func : ctx->method()) {
         const auto method = getMethod(func, obj);
@@ -291,6 +294,7 @@ LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antl
             errHandler.addError(E10056, &obj->location, {obj->name, method->funcType->pname()});
         }
     }
+
     // Interfaces
     if (ctx->implements()) {
         for (const auto& type : ctx->implements()->IDENTIFIER()) {

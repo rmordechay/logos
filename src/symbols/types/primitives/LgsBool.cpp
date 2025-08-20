@@ -9,9 +9,8 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
-json::value_ref LgsBool::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsBool::asJSON() {
+    assert(0);
 }
 
 std::string LgsBool::pname() {

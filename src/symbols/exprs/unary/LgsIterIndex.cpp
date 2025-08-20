@@ -5,11 +5,6 @@
 #include <exprs/unary/LgsArrayExpr.h>
 #include "types/LgsMap.h"
 
-json::value_ref LgsIterIndex::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 void LgsIterIndex::createIRValue(LgsCodeGen* codeGen) {
     const auto baseExprType = baseExpr->type;
     if (baseExprType->asSArray()) {
@@ -25,6 +20,19 @@ void LgsIterIndex::createIRValue(LgsCodeGen* codeGen) {
     } else {
         assert(0);
     }
+}
+
+Value* LgsIterIndex::loadFromDArray(LgsCodeGen* codeGen, LgsDArray* arr) const {
+    const auto arrPtr = baseExpr->getIRValue(codeGen);
+    auto indexIRValue = index->from->getIRValue(codeGen);
+    indexIRValue = codeGen->builder.CreateZExt(indexIRValue, codeGen->i64Ty());
+    return arr->getFunc->callIR(codeGen, {arrPtr, indexIRValue});
+}
+
+Value* LgsIterIndex::loadFromMap(LgsCodeGen* codeGen, LgsMap* map) const {
+    const auto mapPtr = baseExpr->getIRValue(codeGen);
+    const auto key = index->from->getIRValue(codeGen);
+    return map->getFunc->callIR(codeGen, {mapPtr, key});
 }
 
 Value* LgsIterIndex::loadFromStr(LgsCodeGen* codeGen, const LgsStr* str) const {
@@ -45,31 +53,11 @@ Value* LgsIterIndex::loadFromVec(LgsCodeGen* codeGen) const {
     return codeGen->builder.CreateExtractElement(vec, i);
 }
 
-Value* LgsIterIndex::loadFromDArray(LgsCodeGen* codeGen, LgsDArray* arr) const {
-    const auto arrPtr = baseExpr->getIRValue(codeGen);
-    auto indexIRValue = index->from->getIRValue(codeGen);
-    indexIRValue = codeGen->builder.CreateZExt(indexIRValue, codeGen->i64Ty());
-    return arr->getFunc->callIR(codeGen, {arrPtr, indexIRValue});
-}
-
-Value* LgsIterIndex::loadFromMap(LgsCodeGen* codeGen, LgsMap* map) const {
-    const auto mapPtr = baseExpr->getIRValue(codeGen);
-    const auto key = index->from->getIRValue(codeGen);
-    return map->getFunc->callIR(codeGen, {mapPtr, key});
-}
-
 Value* LgsIterIndex::createStrSlice(LgsCodeGen* codeGen, const LgsStr* str) const {
     const auto intFrom = index->from->asIntConst();
     const auto intTo = index->to->asIntConst();
     const auto strConst = baseExpr->getConstStr();
     return codeGen->getIRStr(strConst.substr(intFrom->value, intTo->value));
-}
-
-Value* LgsIterIndex::getStrGEP(LgsCodeGen* codeGen) const {
-    const auto ty = baseExpr->type->getIRType(codeGen);
-    const auto value = baseExpr->getIRValue(codeGen);
-    const auto iValue = index->from->getIRValue(codeGen);
-    return codeGen->builder.CreateGEP(ty, value, {codeGen->i32Zero(), iValue});
 }
 
 Value* LgsIterIndex::loadFromSArray(LgsCodeGen* codeGen) const {
@@ -94,6 +82,13 @@ Value* LgsIterIndex::loadFromSArray(LgsCodeGen* codeGen) const {
     return codeGen->builder.CreateGEP(ty, ptr, IRIndices);
 }
 
+Value* LgsIterIndex::getStrGEP(LgsCodeGen* codeGen) const {
+    const auto ty = baseExpr->type->getIRType(codeGen);
+    const auto value = baseExpr->getIRValue(codeGen);
+    const auto iValue = index->from->getIRValue(codeGen);
+    return codeGen->builder.CreateGEP(ty, value, {codeGen->i32Zero(), iValue});
+}
+
 std::string LgsIterIndex::pname() {
     std::stringstream str;
     str << baseExpr->pname();
@@ -105,9 +100,22 @@ std::string LgsIterIndex::pname() {
     return str.str();
 }
 
+json::value LgsIterIndex::asJSON() {
+    json::object jsonObj;
+    jsonObj["exprType"] = "iterIndex";
+    jsonObj["from"] = index->from->asJSON();
+    if (index->to) jsonObj["to"] = index->to->asJSON();
+    jsonObj["baseExpr"] = baseExpr->asJSON();
+    return jsonObj;
+}
+
 LgsIterIndex::~LgsIterIndex() {
-    delete baseExpr;
-    delete index->from;
-    delete index->to;
-    delete index;
+    if (baseExpr) {
+        // delete baseExpr;
+        baseExpr = nullptr;
+    }
+    if (index) {
+        delete index;
+        index = nullptr;
+    }
 }

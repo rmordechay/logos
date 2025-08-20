@@ -5,9 +5,8 @@
 #include <exprs/unary/LgsSelection.h>
 #include <llvm/IR/Module.h>
 
-json::value_ref LgsDeferStmt::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsDeferStmt::asJSON() {
+    assert(0);
 }
 
 void LgsDeferStmt::createIRValue(LgsCodeGen* codeGen) {

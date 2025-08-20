@@ -55,15 +55,16 @@ void LgsSelection::createIRValue(LgsCodeGen* codeGen) {
     IRValue = lastExpr()->getIRValue(codeGen);
 }
 
-json::value_ref LgsSelection::asJSON() {
-    json::object obj;
-    auto parts = json::array();
+json::value LgsSelection::asJSON() {
+    json::object jsonObj;
+    jsonObj["stmtKind"] = "selection";
+    json::array exprParts;
     for (const auto& expr : exprs) {
-        parts.emplace_back(expr->asJSON());
+        exprParts.emplace_back(expr->asJSON());
     }
-    obj["parts"] = parts;
-    obj["type"] = type->asJSON();
-    return obj;
+    jsonObj["parts"] = exprParts;
+    jsonObj["type"] = type->asJSON();
+    return jsonObj;
 }
 
 LgsSelection::~LgsSelection() {

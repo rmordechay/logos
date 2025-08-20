@@ -118,7 +118,7 @@ std::string LgsObject::getName() {
     return name;
 }
 
-json::value_ref LgsObject::asJSON() {
+json::value LgsObject::asJSON() {
     json::object jsonObj;
     jsonObj["name"] = getName();
     json::array jsonFields;

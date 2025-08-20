@@ -30,6 +30,27 @@ public:
     bool isSpread = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
+
+    virtual std::string pname() = 0; // pretty name
+    virtual llvm::Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* subIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* mulIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* divIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* modIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* neIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* ltIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* gtIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* geIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* leIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* andIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* orIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* bitAndIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* bitOrIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+
     size_t getConstInt();
     std::string getConstStr();
     LgsIterator toIterator();
@@ -51,25 +72,5 @@ public:
     virtual bool equals(LgsExpr* other);
     virtual bool castTo(LgsType* toType);
     virtual llvm::Value* hash(LgsCodeGen* codeGen);
-
-    virtual std::string pname() = 0; // pretty name
-    virtual llvm::Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* subIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* mulIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* divIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* modIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* neIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* ltIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* gtIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* geIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* leIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* andIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* orIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* bitAndIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* bitOrIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
     ~LgsExpr() override;
 };

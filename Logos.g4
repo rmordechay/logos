@@ -45,7 +45,7 @@ interfaceBody:
     ;
 
 object:
-        (OBJECT | SINGLETON) IDENTIFIER LBRACE objectBody RBRACE
+        (OBJECT | SINGLETON | TABLE) IDENTIFIER LBRACE objectBody RBRACE
     ;
 
 objectBody:
@@ -408,6 +408,7 @@ DOUBLE_LANGLE: '>>';
 SLIDER: '_/';
 
 OBJECT: 'object';
+TABLE: 'table';
 SINGLETON: 'single';
 SELF_INSTANCE: 'self';
 SELF_CLASS: 'Self';

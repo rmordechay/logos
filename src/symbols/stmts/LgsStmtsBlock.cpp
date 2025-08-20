@@ -52,7 +52,7 @@ LgsStmt* LgsStmtsBlock::lastStmt() const {
     return stmts[stmts.size() - 1];
 }
 
-json::value_ref LgsStmtsBlock::asJSON() {
+json::value LgsStmtsBlock::asJSON() {
     json::array jsonStmts;
     for (const auto& stmt : stmts) {
         jsonStmts.emplace_back(stmt->asJSON());

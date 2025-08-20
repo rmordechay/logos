@@ -9,9 +9,9 @@ public:
     LgsSymbol ref;
 
     explicit LgsVariable(const std::string& name, LgsType* type = nullptr) : LgsUnaryExpr(type), name(name) {}
-    std::string pname() override;
-    Value* hash(LgsCodeGen* codeGen) override;
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
+    Value* hash(LgsCodeGen* codeGen) override;
     bool equals(LgsExpr* other) override;
+    std::string pname() override;
+    json::value asJSON() override;
 };

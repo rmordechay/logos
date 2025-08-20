@@ -18,5 +18,5 @@ public:
 
     explicit LgsParam(LgsType* type = nullptr, const std::string& name = "", LgsExpr* expr = nullptr) : name(name), type(type), expr(expr) {}
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
+    json::value asJSON() override;
 };

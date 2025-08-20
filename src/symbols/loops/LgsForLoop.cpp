@@ -4,9 +4,8 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
 
-json::value_ref LgsForLoop::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsForLoop::asJSON() {
+    assert(0);
 }
 
 void LgsForLoop::createIRValue(LgsCodeGen* codeGen) {

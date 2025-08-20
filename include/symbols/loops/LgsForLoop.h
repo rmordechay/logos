@@ -21,13 +21,13 @@ public:
     LgsVarDec* isFirst = nullptr;
     LgsVarDec* isLast = nullptr;
 
+    virtual void setBlocks(LgsCodeGen* codeGen);
+    virtual void incAndJumpToCond(LgsCodeGen* codeGen) const;
+    virtual void createIRLoop(LgsCodeGen* codeGen) = 0;
     void initIndex(LgsCodeGen* codeGen);
     void incIndex(LgsCodeGen* codeGen) const;
     llvm::Value* loadIndex(LgsCodeGen* codeGen) const;
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
-    virtual void setBlocks(LgsCodeGen* codeGen);
-    virtual void incAndJumpToCond(LgsCodeGen* codeGen) const;
-    virtual void createIRLoop(LgsCodeGen* codeGen) = 0;
+    json::value asJSON() override;
     ~LgsForLoop() override;
 };

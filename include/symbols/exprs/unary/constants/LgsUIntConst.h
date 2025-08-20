@@ -9,7 +9,7 @@ public:
     explicit LgsUIntConst(const int value) : LgsUnaryExpr(&LGS_UINT), value(value) {}
     std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
+    json::value asJSON() override;
     Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* neIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* gtIR(LgsCodeGen* codeGen, LgsExpr* other) override;

@@ -16,19 +16,14 @@ public:
     bool hasDefers = false;
 
     explicit LgsFunc(const std::string& name, LgsType* rt = nullptr, const std::vector<LgsType*>& paramTypes = {}, const uint32_t ops = 0) {
-        funcType = new LgsFuncType();
-        funcType->name = name;
-        funcType->rt = rt;
-        funcType->setFuncOptions(ops);
-        if (funcType->isMethod && !funcType->isStatic) {
-            funcType->parentName = paramTypes.front()->getName();
-        }
-        for (const auto paramsType : paramTypes) {
-            funcType->params.push_back(LgsParam(paramsType));
-        }
-        type = funcType;
+        initFunc(name, rt, paramTypes, ops);
     }
 
+
+    virtual Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args);
+    virtual void generateIR(LgsCodeGen* codeGen);
+    virtual Function* getIRFunc(LgsCodeGen* codeGen);
+    void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops);
     Value* callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args = {});
     void createPrologue(LgsCodeGen* codeGen);
     void createEpilogue(LgsCodeGen* codeGen) const;
@@ -36,10 +31,7 @@ public:
     void createDebugValue(LgsCodeGen* codeGen) override;
     bool castTo(LgsType* toType) override;
     std::string pname() override;
-    json::value_ref asJSON() override;
-    virtual Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args);
-    virtual void generateIR(LgsCodeGen* codeGen);
-    virtual Function* getIRFunc(LgsCodeGen* codeGen);
+    json::value asJSON() override;
     static Value* getIRArg(LgsCodeGen* codeGen, LgsExpr* arg);
     ~LgsFunc() override;
 };

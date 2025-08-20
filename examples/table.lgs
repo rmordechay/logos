@@ -1,14 +1,10 @@
-// not implemented
-interface Table {
-    select(query: Str): Result
-    execute(query: Str): Void
-}
-
-object Obj {
-    implements: Table
+table Table {
+    id: Long
+    name: Str
+    x: Int
 }
 
 main() {
-    results = obj.select("SELECT * FROM obj")
-    print(results.get(0))
+    table = Table{file = "memory"}
+    table.execute("INSERT INTO {self}")
 }

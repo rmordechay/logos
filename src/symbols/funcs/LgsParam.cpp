@@ -14,7 +14,8 @@ void LgsParam::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
-json::value_ref LgsParam::asJSON() {
+json::value LgsParam::asJSON() {
     json::object obj;
+    obj["name"] = name;
     return obj;
 }

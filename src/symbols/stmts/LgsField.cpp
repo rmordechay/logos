@@ -23,7 +23,7 @@ Value* LgsField::resolveVirtualField(LgsCodeGen* codeGen, const LgsHashMap* vtab
     return codeGen->builder.CreateLoad(fieldIRType, rv);
 }
 
-json::value_ref LgsField::asJSON() {
+json::value LgsField::asJSON() {
     json::object obj;
     obj["name"] = name;
     obj["type"] = type->asJSON();

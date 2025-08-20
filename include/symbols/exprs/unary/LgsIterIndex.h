@@ -1,6 +1,5 @@
 #pragma once
 #include "LgsUnaryExpr.h"
-#include <LgsValue.h>
 
 class LgsMap;
 class LgsDArray;
@@ -13,7 +12,6 @@ public:
 
     explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {}
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
     Value* loadFromDArray(LgsCodeGen* codeGen, LgsDArray* arr) const;
     Value* loadFromMap(LgsCodeGen* codeGen, LgsMap* map) const;
     Value* loadFromStr(LgsCodeGen* codeGen, const LgsStr* str) const;
@@ -22,12 +20,24 @@ public:
     Value* loadFromSArray(LgsCodeGen* codeGen) const;
     Value* getStrGEP(LgsCodeGen* codeGen) const;
     std::string pname() override;
+    json::value asJSON() override;
     ~LgsIterIndex() override;
 };
 
 struct LgsIndex {
     LgsExpr* from;
     LgsExpr* to;
+
+    ~LgsIndex() {
+        if (from) {
+            delete from;
+            from = nullptr;
+        }
+        if (to) {
+            delete to;
+            to = nullptr;
+        }
+    }
 };
 
 

@@ -31,9 +31,8 @@ std::string LgsSArray::strFormatPart() const {
     return "%p";
 }
 
-json::value_ref LgsSArray::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsSArray::asJSON() {
+    assert(0);
 }
 
 std::string LgsSArray::pname() {

@@ -7,7 +7,7 @@ class LgsBreak final : public LgsStmt {
 public:
     std::string tag;
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
+    json::value asJSON() override;
 };
 
 

@@ -22,9 +22,10 @@ std::string LgsStr::getName() {
     return name;
 }
 
-json::value_ref LgsStr::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsStr::asJSON() {
+    json::object jsonObj;
+    jsonObj["name"] = name;
+    return jsonObj;
 }
 
 std::string LgsStr::pname() {

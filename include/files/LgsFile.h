@@ -19,13 +19,13 @@ public:
     std::vector<LgsStrConst*> externalCPaths;
 
     explicit LgsFile(const size_t fileID, const std::string& name, const fs::path& path) : id(fileID), name(name), absPath(path) {}
-    virtual json::object asJSON();
+    virtual json::value asJSON();
     virtual void generateIR();
     virtual void format();
     virtual ~LgsFile() = default;
 };
 
-inline json::object LgsFile::asJSON() {
+inline json::value LgsFile::asJSON() {
     assert(0);
 }
 

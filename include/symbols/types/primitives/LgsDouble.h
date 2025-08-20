@@ -11,7 +11,7 @@ public:
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     std::string pname() override;
-    json::value_ref asJSON() override;
+    json::value asJSON() override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;

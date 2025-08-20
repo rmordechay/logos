@@ -1,7 +1,5 @@
 #include "exprs/unary/LgsTableExpr.h"
-
 #include "utils/LgsUtils.h"
-
 #include <sqlite3.h>
 
 void LgsTableExpr::createIRValue(LgsCodeGen* codeGen) {
@@ -29,9 +27,8 @@ void LgsTableExpr::createIRValue(LgsCodeGen* codeGen) {
     sqlite3_close(db);
 }
 
-json::value_ref LgsTableExpr::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsTableExpr::asJSON() {
+    assert(0);
 }
 
 std::string LgsTableExpr::pname() {

@@ -14,9 +14,8 @@ LgsExpr* LgsNullable::getZeroValue() {
     return baseType->getZeroValue();
 }
 
-json::value_ref LgsNullable::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsNullable::asJSON() {
+    assert(0);
 }
 
 std::string LgsNullable::pname() {

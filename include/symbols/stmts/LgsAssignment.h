@@ -37,6 +37,6 @@ public:
     static void assignToVariable(LgsCodeGen* codeGen, LgsVariable* variable, LgsExpr* expr);
     static void assignScalarToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsExpr* expr);
     static void assignHashMapToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map);
-    json::value_ref asJSON() override;
+    json::value asJSON() override;
     ~LgsAssignment() override;
 };

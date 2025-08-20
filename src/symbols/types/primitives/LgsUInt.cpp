@@ -9,9 +9,8 @@ size_t LgsUInt::getSizeBytes() {
     return sizeof(uint32_t);
 }
 
-json::value_ref LgsUInt::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsUInt::asJSON() {
+    assert(0);
 }
 
 std::string LgsUInt::pname() {

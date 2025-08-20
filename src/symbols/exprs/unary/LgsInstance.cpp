@@ -5,34 +5,9 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
-json::value_ref LgsInstance::asJSON() {
-    json::object obj;
-    return obj;
-}
-
-void LgsInstance::createIRValue(LgsCodeGen* codeGen) {
-    const auto objIRType = obj->getIRType(codeGen);
-    if(obj->singleton) {
-        IRValue = codeGen->createGlobal(objIRType, ConstantAggregateZero::get(objIRType), obj->name);
-    } else {
-        IRValue = codeGen->builder.CreateAlloca(objIRType);
-    }
-    initFields(codeGen, obj->fields);
-    if (!obj->interfaces.empty()) {
-        setVirtuals(codeGen);
-    }
-}
-
-void LgsInstance::initFields(LgsCodeGen* codeGen, std::map<std::string, LgsField*>& fields) {
-    for (const auto& [argName, arg] : args) {
-        const auto exprIR = arg->expr->getIRValue(codeGen);
-        auto field = fields.find(argName);
-        if (field != fields.end()) {
-            field->second->parentIRValue = IRValue;
-            const auto gep = field->second->getIRValue(codeGen);
-            codeGen->builder.CreateStore(exprIR, gep);
-        }
-    }
+void LgsInstance::setObject(LgsObject* newObj) {
+    obj = newObj;
+    setType(obj);
 }
 
 void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
@@ -51,13 +26,37 @@ void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
     }
 }
 
-std::string LgsInstance::pname() {
-    return obj->name;
+void LgsInstance::initFields(LgsCodeGen* codeGen, std::map<std::string, LgsField*>& fields) {
+    for (const auto& [argName, arg] : args) {
+        const auto exprIR = arg->expr->getIRValue(codeGen);
+        auto field = fields.find(argName);
+        if (field != fields.end()) {
+            field->second->parentIRValue = IRValue;
+            const auto gep = field->second->getIRValue(codeGen);
+            codeGen->builder.CreateStore(exprIR, gep);
+        }
+    }
 }
 
-void LgsInstance::setObject(LgsObject* newObj) {
-    obj = newObj;
-    setType(obj);
+void LgsInstance::createIRValue(LgsCodeGen* codeGen) {
+    const auto objIRType = obj->getIRType(codeGen);
+    if(obj->singleton) {
+        IRValue = codeGen->createGlobal(objIRType, ConstantAggregateZero::get(objIRType), obj->name);
+    } else {
+        IRValue = codeGen->builder.CreateAlloca(objIRType);
+    }
+    initFields(codeGen, obj->fields);
+    if (!obj->interfaces.empty()) {
+        setVirtuals(codeGen);
+    }
+}
+
+json::value LgsInstance::asJSON() {
+    assert(0);
+}
+
+std::string LgsInstance::pname() {
+    return obj->name;
 }
 
 LgsInstance::~LgsInstance() {

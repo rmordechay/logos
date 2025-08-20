@@ -9,7 +9,7 @@ public:
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     std::string pname() override;
-    json::value_ref asJSON() override;
+    json::value asJSON() override;
     LgsExpr* getZeroValue() override;
     bool equals(LgsType* other) override;
     std::string strFormatPart() const override;

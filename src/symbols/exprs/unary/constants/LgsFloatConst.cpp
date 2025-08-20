@@ -1,10 +1,5 @@
 #include "exprs/unary/constants/LgsFloatConst.h"
 
-json::value_ref LgsFloatConst::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 void LgsFloatConst::createIRValue(LgsCodeGen* codeGen) {
     if (type->asFloat()) {
         IRValue = codeGen->floatv(value);
@@ -13,6 +8,10 @@ void LgsFloatConst::createIRValue(LgsCodeGen* codeGen) {
     } else {
         assert(0);
     }
+}
+
+json::value LgsFloatConst::asJSON() {
+    assert(0);
 }
 
 std::string LgsFloatConst::pname() {

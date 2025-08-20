@@ -2,9 +2,8 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsStmtsBlock.h"
 
-json::value_ref LgsReturn::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsReturn::asJSON() {
+    assert(0);
 }
 
 void LgsReturn::createIRValue(LgsCodeGen* codeGen) {

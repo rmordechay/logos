@@ -27,9 +27,8 @@ std::string LgsPostfixExpr::pname() {
     assert(0);
 }
 
-json::value_ref LgsPostfixExpr::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsPostfixExpr::asJSON() {
+    assert(0);
 }
 
 LgsPostfixExpr::~LgsPostfixExpr() {

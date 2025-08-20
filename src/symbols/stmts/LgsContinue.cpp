@@ -2,9 +2,8 @@
 #include "logos/LgsCodeGen.h"
 #include <loops/LgsForLoop.h>
 
-json::value_ref LgsContinue::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsContinue::asJSON() {
+    assert(0);
 }
 
 void LgsContinue::createIRValue(LgsCodeGen* codeGen) {

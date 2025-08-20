@@ -4,9 +4,8 @@ std::string LgsVec::getName() {
     return "vec" + std::to_string(dim);
 }
 
-json::value_ref LgsVec::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsVec::asJSON() {
+    assert(0);
 }
 
 std::string LgsVec::pname() {

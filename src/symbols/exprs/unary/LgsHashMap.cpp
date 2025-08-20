@@ -1,8 +1,7 @@
 #include "exprs/unary/LgsHashMap.h"
 
-json::value_ref LgsHashMap::asJSON() {
-    json::object obj;
-    return obj;
+std::string LgsHashMap::pname() {
+    return type->pname();
 }
 
 void LgsHashMap::createIRValue(LgsCodeGen* codeGen) {
@@ -16,8 +15,8 @@ void LgsHashMap::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
-std::string LgsHashMap::pname() {
-    return type->pname();
+json::value LgsHashMap::asJSON() {
+    assert(0);
 }
 
 LgsHashMap::~LgsHashMap() {

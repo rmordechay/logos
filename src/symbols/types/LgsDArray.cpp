@@ -3,9 +3,29 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "types/primitives/LgsInt.h"
 
+Value* LgsArrayAddFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
+    const auto arr = args[0];
+    const auto exprToAdd = args[1];
+    const auto exprIR = exprToAdd->getIRValue(codeGen);
+    const auto arrPtr = arr->getIRValue(codeGen);
+    const auto exprTy = exprToAdd->type;
+    const auto ptr = codeGen->builder.CreateAlloca(exprTy->getIRType(codeGen));
+    codeGen->builder.CreateStore(exprIR, ptr);
+    return callIR(codeGen, {arrPtr, ptr});
+}
+
 Type* LgsDArray::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;
     return getArrStruct(codeGen);
+}
+
+std::string LgsDArray::getName() {
+    return name;
+}
+
+std::string LgsDArray::pname() {
+    assert(baseType);
+    return baseType->pname() + "[]";
 }
 
 size_t LgsDArray::getSizeBytes() {
@@ -20,34 +40,19 @@ LgsType* LgsDArray::getIndexType() {
     return &LGS_INT;
 }
 
+uint16_t LgsDArray::getUnpackCount() const {
+    return 1;
+}
+
 std::string LgsDArray::strFormatPart() const {
     if (baseType->asChar()) return "%s";
     return "%p";
 }
 
-std::string LgsDArray::getName() {
-    return name;
-}
-
-json::value_ref LgsDArray::asJSON() {
-    json::object obj;
-    return obj;
-}
-
-std::string LgsDArray::pname() {
-    assert(baseType);
-    return baseType->pname() + "[]";
-}
-
-uint16_t LgsDArray::getUnpackCount() const {
-    return 1;
-}
-
-bool LgsDArray::equals(LgsType* other) {
-    const auto otherArr = other->asDArray();
-    if (!otherArr) return false;
-    if (!baseType) return true;
-    return baseType->equals(otherArr->baseType);
+StructType* LgsDArray::getArrStruct(LgsCodeGen* codeGen) {
+    if (arrStruct) return arrStruct;
+    arrStruct = codeGen->getStructType({codeGen->i64Ty(), codeGen->i64Ty(), codeGen->i64Ty(), codeGen->ptrTy()}, name);
+    return arrStruct;
 }
 
 void LgsDArray::freeValue(LgsCodeGen* codeGen, Value* value) {
@@ -66,23 +71,15 @@ Value* LgsDArray::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
     return isNotEmptyFunc->call(codeGen, {iterable});
 }
 
-StructType* LgsDArray::getArrStruct(LgsCodeGen* codeGen) {
-    if (arrStruct) return arrStruct;
-    arrStruct = codeGen->getStructType({codeGen->i64Ty(), codeGen->i64Ty(), codeGen->i64Ty(), codeGen->ptrTy()}, name);
-    return arrStruct;
+bool LgsDArray::equals(LgsType* other) {
+    const auto otherArr = other->asDArray();
+    if (!otherArr) return false;
+    if (!baseType) return true;
+    return baseType->equals(otherArr->baseType);
 }
 
-Value* LgsArrayAddFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
-    const auto arr = args[0];
-    const auto exprToAdd = args[1];
-    const auto exprIR = exprToAdd->getIRValue(codeGen);
-    const auto arrPtr = arr->getIRValue(codeGen);
-    const auto exprTy = exprToAdd->type;
-    const auto ptr = codeGen->builder.CreateAlloca(exprTy->getIRType(codeGen));
-    codeGen->builder.CreateStore(exprIR, ptr);
-    return callIR(codeGen, {arrPtr, ptr});
-}
-
-LgsDArray::~LgsDArray() {
-    delete sizeExpr;
+json::value LgsDArray::asJSON() {
+    json::object jsonObj;
+    jsonObj["name"] = name;
+    return jsonObj;
 }

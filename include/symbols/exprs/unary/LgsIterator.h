@@ -16,7 +16,7 @@ public:
 
     std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
+    json::value asJSON() override;
     void initIterator(LgsCodeGen* codeGen);
     Value* next(LgsCodeGen* codeGen) const;
     Value* hasNext(LgsCodeGen* codeGen) const;

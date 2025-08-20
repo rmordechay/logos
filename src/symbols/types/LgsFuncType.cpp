@@ -91,9 +91,8 @@ std::string LgsFuncType::pname() {
     return strStream.str();
 }
 
-json::value_ref LgsFuncType::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsFuncType::asJSON() {
+    assert(0);
 }
 
 std::string LgsFuncType::strFormatPart() const {

@@ -10,7 +10,7 @@ std::string LgsVectorExpr::pname() {
     return "vec2";
 }
 
-auto LgsVectorExpr::asJSON() -> json::value_ref {
+auto LgsVectorExpr::asJSON() -> json::value {
     json::object obj;
     return obj;
 }

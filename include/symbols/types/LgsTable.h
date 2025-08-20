@@ -12,5 +12,5 @@ public:
     std::string getName() override;
     bool equals(LgsType* other) override;
     std::string strFormatPart() const override;
-    json::value_ref asJSON() override;
+    json::value asJSON() override;
 };

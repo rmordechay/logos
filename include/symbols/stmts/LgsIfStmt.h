@@ -14,10 +14,11 @@ public:
 
     explicit LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock = nullptr) : ifCond(ifCond), ifBlock(ifStmtBlock) {}
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
     void generateSimpleIf(LgsCodeGen* codeGen);
     void generateIfWithElse(LgsCodeGen* codeGen);
     void generateElseIf(LgsCodeGen* codeGen);
     void generatePatternMatching(LgsCodeGen* codeGen);
+    json::value asJSON() override;
+    static void generateSimpleIf(LgsCodeGen* codeGen, LgsExpr* cond, const std::function<void()>& trueBlockCb);
     ~LgsIfStmt() override;
 };

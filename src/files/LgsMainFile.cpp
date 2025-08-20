@@ -17,7 +17,7 @@ void LgsMainFile::generateIR() {
     }
 }
 
-json::object LgsMainFile::asJSON() {
+json::value LgsMainFile::asJSON() {
     json::object obj;
     json::array jsonEnums;
     for (const auto& enum_ : enums) {

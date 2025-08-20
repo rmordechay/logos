@@ -6,13 +6,12 @@ std::string LgsUIntConst::pname() {
     return std::to_string(value);
 }
 
-json::value_ref LgsUIntConst::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 void LgsUIntConst::createIRValue(LgsCodeGen* codeGen) {
     IRValue = codeGen->i32(value);
+}
+
+json::value LgsUIntConst::asJSON() {
+    assert(0);
 }
 
 Value* LgsUIntConst::eqIR(LgsCodeGen* codeGen, LgsExpr* other) {
@@ -107,20 +106,20 @@ Value* LgsUIntConst::bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUIntConst::lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) {
-    const auto otherIRValue = other->getIRValue(codeGen);
-    const auto thisIRValue = getIRValue(codeGen);
-    if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
-        return codeGen->builder.CreateShl(thisIRValue, otherIRValue);
-    }
-    assert(0);
-}
-
 Value* LgsUIntConst::rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) {
     const auto otherIRValue = other->getIRValue(codeGen);
     const auto thisIRValue = getIRValue(codeGen);
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
         return codeGen->builder.CreateAShr(thisIRValue, otherIRValue);
+    }
+    assert(0);
+}
+
+Value* LgsUIntConst::lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    const auto otherIRValue = other->getIRValue(codeGen);
+    const auto thisIRValue = getIRValue(codeGen);
+    if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
+        return codeGen->builder.CreateShl(thisIRValue, otherIRValue);
     }
     assert(0);
 }

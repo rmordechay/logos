@@ -7,12 +7,12 @@ public:
         isNull = true;
     }
 
-    json::value_ref asJSON() override;
+    json::value asJSON() override;
     void createIRValue(LgsCodeGen* codeGen) override;
     std::string pname() override;
 };
 
-inline json::value_ref LgsNull::asJSON() {
+inline json::value LgsNull::asJSON() {
     return json::value(nullptr);
 }
 

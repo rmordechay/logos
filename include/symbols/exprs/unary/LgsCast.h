@@ -14,9 +14,9 @@ public:
 
     LgsCast(LgsType* castToType, LgsExpr* castFromValue) : LgsUnaryExpr(castToType), toType(castToType), fromValue(castFromValue) {}
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
     Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     std::string pname() override;
+    json::value asJSON() override;
     ~LgsCast() override;
 };
 

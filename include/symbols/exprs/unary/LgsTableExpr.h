@@ -8,7 +8,7 @@ public:
 
     explicit LgsTableExpr(LgsTable* tableType = new LgsTable()): tableType(tableType) {}
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
+    json::value asJSON() override;
     std::string pname() override;
     ~LgsTableExpr() override;
 };

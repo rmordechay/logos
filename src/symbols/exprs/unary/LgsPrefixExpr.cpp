@@ -19,9 +19,8 @@ void LgsPrefixExpr::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
-json::value_ref LgsPrefixExpr::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsPrefixExpr::asJSON() {
+    assert(0);
 }
 
 std::string LgsPrefixExpr::pname() {

@@ -3,9 +3,8 @@
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsSelection.h"
 
-json::value_ref LgsCoroutine::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsCoroutine::asJSON() {
+    assert(0);
 }
 
 void LgsCoroutine::createIRValue(LgsCodeGen* codeGen) {

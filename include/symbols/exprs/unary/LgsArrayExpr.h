@@ -14,8 +14,8 @@ public:
     }
     std::string pname() override;
     void createIRValue(LgsCodeGen* codeGen) override;
-    json::value_ref asJSON() override;
     Value* createConstArray(LgsCodeGen* codeGen) const;
     Value* createDynamicArray(LgsCodeGen* codeGen);
+    json::value asJSON() override;
     ~LgsArrayExpr() override;
 };

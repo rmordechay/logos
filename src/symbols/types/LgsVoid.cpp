@@ -1,12 +1,7 @@
-#include "../../../include/symbols/types/LgsVoid.h"
+#include "symbols/types/LgsVoid.h"
 
 #include "exprs/LgsNull.h"
 
-
-json::value_ref LgsVoid::asJSON() {
-    json::object obj;
-    return obj;
-}
 
 std::string LgsVoid::pname() {
     return name;
@@ -34,4 +29,8 @@ std::string LgsVoid::strFormatPart() const {
 
 bool LgsVoid::equals(LgsType* other) {
     return name == other->getName();
+}
+
+json::value LgsVoid::asJSON() {
+    return name;
 }

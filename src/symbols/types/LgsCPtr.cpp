@@ -9,9 +9,8 @@ std::string LgsCPtr::getName() {
     return name;
 }
 
-json::value_ref LgsCPtr::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsCPtr::asJSON() {
+    assert(0);
 }
 
 std::string LgsCPtr::pname() {

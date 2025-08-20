@@ -3,11 +3,6 @@
 #include "funcs/LgsFunc.h"
 #include "logos/LgsCodeGen.h"
 
-json::value_ref LgsIfStmt::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 void LgsIfStmt::createIRValue(LgsCodeGen* codeGen) {
     if (isPatternMatching) {
         generatePatternMatching(codeGen);
@@ -24,13 +19,9 @@ void LgsIfStmt::createIRValue(LgsCodeGen* codeGen) {
 
 void LgsIfStmt::generateSimpleIf(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, ifBlock);
-    const auto ifCondIR = ifCond->getIRValue(codeGen);
-    const auto IRBlockIfTrue = codeGen->createBlock(BLOCK_NAME_IF_TRUE);
-    const auto IRBlockIfFalse = codeGen->createBlock(BLOCK_NAME_IF_FALSE);
-    codeGen->builder.CreateCondBr(ifCondIR, IRBlockIfTrue, IRBlockIfFalse);
-    codeGen->startBlock(IRBlockIfTrue);
-    ifBlock->createIRValue(codeGen);
-    codeGen->branchAndStartBlock(IRBlockIfFalse);
+    generateSimpleIf(codeGen, ifCond, [this, codeGen] {
+        ifBlock->createIRValue(codeGen);
+    });
     codeGen->stack.exitScope();
 }
 
@@ -139,6 +130,20 @@ void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) {
     }
 
     codeGen->startBlock(exitBlock);
+}
+
+json::value LgsIfStmt::asJSON() {
+    assert(0);
+}
+
+void LgsIfStmt::generateSimpleIf(LgsCodeGen* codeGen, LgsExpr* cond, const std::function<void()>& trueBlockCb) {
+    const auto ifCondIR = cond->getIRValue(codeGen);
+    const auto IRBlockIfTrue = codeGen->createBlock(BLOCK_NAME_IF_TRUE);
+    const auto IRBlockIfFalse = codeGen->createBlock(BLOCK_NAME_IF_FALSE);
+    codeGen->builder.CreateCondBr(ifCondIR, IRBlockIfTrue, IRBlockIfFalse);
+    codeGen->startBlock(IRBlockIfTrue);
+    trueBlockCb();
+    codeGen->branchAndStartBlock(IRBlockIfFalse);
 }
 
 LgsIfStmt::~LgsIfStmt() {

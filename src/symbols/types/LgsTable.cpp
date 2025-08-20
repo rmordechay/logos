@@ -30,7 +30,6 @@ std::string LgsTable::strFormatPart() const {
     return "%s";
 }
 
-json::value_ref LgsTable::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsTable::asJSON() {
+    assert(0);
 }

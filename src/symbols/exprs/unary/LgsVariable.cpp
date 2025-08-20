@@ -9,15 +9,6 @@
 #include <logos/LgsCodeGen.h>
 
 
-std::string LgsVariable::pname() {
-    return name;
-}
-
-json::value_ref LgsVariable::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 void LgsVariable::createIRValue(LgsCodeGen* codeGen) {
     switch (ref.symbolType) {
     case VAR_DEC:
@@ -45,13 +36,6 @@ void LgsVariable::createIRValue(LgsCodeGen* codeGen) {
     assert(0);
 }
 
-bool LgsVariable::equals(LgsExpr* other) {
-    if (const auto otherVar = other->asVariable()) {
-        return ref.getSymbol() == otherVar->ref.getSymbol();
-    }
-    assert(0);
-}
-
 Value* LgsVariable::hash(LgsCodeGen* codeGen) {
     switch (ref.symbolType) {
     case PARAM:
@@ -63,4 +47,23 @@ Value* LgsVariable::hash(LgsCodeGen* codeGen) {
     default:
         assert(0);
     }
+}
+
+bool LgsVariable::equals(LgsExpr* other) {
+    if (const auto otherVar = other->asVariable()) {
+        return ref.getSymbol() == otherVar->ref.getSymbol();
+    }
+    assert(0);
+}
+
+std::string LgsVariable::pname() {
+    return name;
+}
+
+json::value LgsVariable::asJSON() {
+    json::object jsonObj;
+    jsonObj["exprType"] = "variable";
+    jsonObj["name"] = name;
+    jsonObj["type"] = type->asJSON();
+    return jsonObj;
 }

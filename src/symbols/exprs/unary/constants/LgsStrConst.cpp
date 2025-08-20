@@ -9,13 +9,20 @@ Value* LgsStrConst::hash(LgsCodeGen* codeGen) {
     return codeGen->i32(hashStr(value.c_str()));
 }
 
-json::value_ref LgsStrConst::asJSON() {
-    json::object obj;
-    return obj;
-}
-
 void LgsStrConst::createIRValue(LgsCodeGen* codeGen) {
     IRValue = codeGen->getIRStr(value);
+}
+
+json::value LgsStrConst::asJSON() {
+    json::object jsonObj;
+    jsonObj["exprType"] = "strConst";
+    jsonObj["value"] = value;
+    jsonObj["type"] = type->asJSON();
+    return jsonObj;
+}
+
+Value* LgsStrConst::eqIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    return nullptr;
 }
 
 Value* LgsStrConst::addIR(LgsCodeGen* codeGen, LgsExpr* other) {
@@ -23,10 +30,6 @@ Value* LgsStrConst::addIR(LgsCodeGen* codeGen, LgsExpr* other) {
         return codeGen->getIRStr(this->value + std::to_string(otherStrConst->value));
     }
     assert(0);
-}
-
-Value* LgsStrConst::eqIR(LgsCodeGen* codeGen, LgsExpr* other) {
-    return nullptr;
 }
 
 LgsStrConst::~LgsStrConst() {

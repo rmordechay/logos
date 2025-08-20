@@ -1,8 +1,7 @@
 #include "types/LgsUnknown.h"
 
-json::value_ref LgsUnknown::asJSON() {
-    json::object obj;
-    return obj;
+json::value LgsUnknown::asJSON() {
+    assert(0);
 }
 
 std::string LgsUnknown::pname() {
