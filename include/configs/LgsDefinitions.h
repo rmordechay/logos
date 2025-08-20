@@ -47,5 +47,5 @@
 #define LGS_MSG_COLOR_WHITE   "\033[1;37m"
 #define LGS_MSG_COLOR_RESET   "\033[0m"
 #define LGS_COLORIZE(text, color) color text LGS_MSG_COLOR_RESET
-#define LGS_ERROR_STR LGS_COLORIZE("Error:", LGS_MSG_COLOR_RED) "  "
+#define LGS_ERROR_STR LGS_COLORIZE("Error:", LGS_MSG_COLOR_RED) " "
 #define LGS_WARN_STR LGS_COLORIZE("Warning:", LGS_MSG_COLOR_YELLOW)

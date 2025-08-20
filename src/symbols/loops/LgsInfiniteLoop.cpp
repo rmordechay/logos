@@ -5,7 +5,10 @@
 #include "stmts/LgsVarDec.h"
 
 void LgsInfiniteLoop::createIRLoop(LgsCodeGen* codeGen) {
-    if (!loopVars.empty()) initIndex(codeGen);
+    if (!loopVars.empty()) {
+        iPtr = codeGen->builder.CreateAlloca(codeGen->i32Ty());
+        codeGen->builder.CreateStore(codeGen->i32Zero(), iPtr);
+    }
     codeGen->branchAndStartBlock(IRBodyBlock);
     if (!loopVars.empty()) {
         const auto iValue = loadIndex(codeGen);

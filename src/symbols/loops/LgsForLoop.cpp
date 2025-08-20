@@ -17,11 +17,6 @@ void LgsForLoop::createIRValue(LgsCodeGen* codeGen) {
     codeGen->stack.exitScope();
 }
 
-void LgsForLoop::initIndex(LgsCodeGen* codeGen) {
-    iPtr = codeGen->builder.CreateAlloca(codeGen->i32Ty());
-    codeGen->builder.CreateStore(codeGen->i32Zero(), iPtr);
-}
-
 Value* LgsForLoop::loadIndex(LgsCodeGen* codeGen) const {
     return codeGen->builder.CreateLoad(codeGen->i32Ty(), iPtr);
 }

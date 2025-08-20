@@ -4,7 +4,8 @@
 #include "stmts/LgsVarDec.h"
 
 void LgsRangeLoop::createIRLoop(LgsCodeGen* codeGen) {
-    initIndex(codeGen);
+    iPtr = codeGen->builder.CreateAlloca(codeGen->i32Ty());
+    codeGen->builder.CreateStore(loopStart(codeGen), iPtr);
     codeGen->builder.CreateBr(IRCondBlock);
 
     // Condition

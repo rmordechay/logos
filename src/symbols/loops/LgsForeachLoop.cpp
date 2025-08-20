@@ -7,7 +7,8 @@
 #include "types/LgsMap.h"
 
 void LgsForeachLoop::createIRLoop(LgsCodeGen* codeGen) {
-    initIndex(codeGen);
+    iPtr = codeGen->builder.CreateAlloca(codeGen->i32Ty());
+    codeGen->builder.CreateStore(codeGen->i32Zero(), iPtr);
     codeGen->branchAndStartBlock(IRCondBlock);
     const auto iterable = iterExpr->type->asIterable();
     if (iterable->asMap()) { // With iterator

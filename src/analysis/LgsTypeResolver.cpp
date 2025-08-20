@@ -41,26 +41,26 @@ bool LgsTypeResolver::resolveGlobalTypes(const std::vector<LgsFile*>& ast) {
     return successful;
 }
 
-LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile& file) {
+LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
     if (const auto nullable = type->asNullable()) {
         nullable->baseType = resolveType(nullable->baseType, file);
     }
     if (const auto iter = type->asIterable()) {
-        resolveIterable(iter, file);
+        resolveIterable(iter, *file);
     }
     if (const auto pair = type->asPair()) {
         pair->key = resolveType(pair->key, file);
         pair->value = resolveType(pair->value, file);
     }
     if (const auto funcType = type->asFuncType()) {
-        resolveFuncTypes(funcType, file);
+        resolveFuncTypes(funcType, *file);
     }
 
     if (type->isUnknown()) {
         auto typeName = type->getName();
         auto symbol = globals.getSymbol(typeName);
         if (!symbol) {
-            symbol = file.symbolTable.getSymbol(typeName);
+            symbol = file->symbolTable.getSymbol(typeName);
         }
         if (!symbol) {
             errHandler.addError(E10006, &type->location, {typeName});
@@ -98,31 +98,31 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
         if (obj->name == field->type->getName()) {
             field->type = obj;
         } else {
-            field->type = resolveType(field->type, file);
+            field->type = resolveType(field->type, &file);
         }
     }
     for (const auto& [_, method] : obj->methods) {
         resolveFuncTypes(method->funcType, file);
     }
     for (auto& interface : obj->interfaces) {
-        interface = resolveType(interface, file);
+        interface = resolveType(interface, &file);
     }
 }
 
 void LgsTypeResolver::resolveInterfaceTypes(LgsInterface* interface, LgsFile& file) {
     for (const auto& [_, field] : interface->fields) {
-        field->type = resolveType(field->type, file);
+        field->type = resolveType(field->type, &file);
     }
     for (const auto& [_, method] : interface->methods) {
         resolveFuncTypes(method->funcType, file);
     }
     for (auto& i : interface->interfaces) {
-        i = resolveType(i, file);
+        i = resolveType(i, &file);
     }
 }
 
 void LgsTypeResolver::resolveIterable(LgsIterable* iterable, LgsFile& file) {
-    iterable->baseType = resolveType(iterable->baseType, file);
+    iterable->baseType = resolveType(iterable->baseType, &file);
     if (iterable->asSArray()) {
         if (!iterable->sizeExpr->type) return;
         const auto exprConstNumber = iterable->sizeExpr->getConstInt();
@@ -134,13 +134,13 @@ void LgsTypeResolver::resolveIterable(LgsIterable* iterable, LgsFile& file) {
 
 void LgsTypeResolver::resolveFuncTypes(LgsFuncType* funcType, LgsFile& file) {
     for (auto & param : funcType->params) {
-        param.type = resolveType(param.type, file);
+        param.type = resolveType(param.type, &file);
     }
-    funcType->rt = resolveType(funcType->rt, file);
+    funcType->rt = resolveType(funcType->rt, &file);
 }
 
 void LgsTypeResolver::resolveGroupTypes(LgsGroup* group, LgsFile& file) {
     for (auto& type : group->types) {
-        type = resolveType(type, file);
+        type = resolveType(type, &file);
     }
 }
