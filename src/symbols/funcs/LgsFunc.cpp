@@ -148,7 +148,7 @@ json::value LgsFunc::asJSON() {
     funcConfigs["isStatic"] = funcType->isStatic;
     funcConfigs["isOptional"] = funcType->isOptional;
     funcConfigs["isTerminator"] = funcType->isTerminator;
-    funcConfigs["isAnonymous"] = funcType->isAnonymous;
+    funcConfigs["isAnonymous"] = funcType->isLambda;
     funcConfigs["hasDefaults"] = funcType->hasDefaults;
     obj["configs"] = funcConfigs;
     json::array params;

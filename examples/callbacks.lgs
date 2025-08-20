@@ -1,6 +1,9 @@
 main() {
-    funcVar: (Int, Int): Void = (x, y) -> {
-        print(x)
+    funcVar = (x: Int, y: Int): Void -> {
+        print(x + y)
     }
-    //arr.map((it) -> print(it))
+    funcVar = (x: Int, y: Int): Void -> print(x + y)
+    funcVar = (x: Int, y: Int) -> print(x + y)
+    funcVar = (x, y) -> print(x + y)
+    funcVar = x -> print(x) // only with single param
 }

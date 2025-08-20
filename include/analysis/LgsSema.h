@@ -113,7 +113,6 @@ public:
     void validateSliceBounds(LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field, const LgsObject* parent);
     bool validateMethodVisibility(LgsFuncCall* methodCall, const LgsObject* parent);
-    void validateFuncControlFlow(LgsFunc* func);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     void castExprToType(LgsExpr* expr, LgsType* toType);

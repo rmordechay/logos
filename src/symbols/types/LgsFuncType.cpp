@@ -47,10 +47,10 @@ bool LgsFuncType::equals(LgsType* other) {
     const auto otherFuncType = other->asFuncType();
     if (!otherFuncType) return false;
     const auto otherParams = otherFuncType->params;
-    if (otherFuncType->rt && !rt->equals(otherFuncType->rt)) return false;
     if (params.size() != otherParams.size()) return false;
     if (params.size() == 0 && otherParams.size() == 0) return true;
-    if (isAnonymous) return true;
+    if (otherFuncType->isLambda) return true;
+    if (otherFuncType->rt && !rt->equals(otherFuncType->rt)) return false;
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto thisType = params[i].type;
         const auto otherType = otherFuncType->params[i].type;
@@ -74,10 +74,18 @@ std::string LgsFuncType::getName() {
 
 std::string LgsFuncType::pname() {
     std::stringstream strStream;
-    strStream << name << '(';
+    if (isLambda) {
+        strStream << "Anonymous" << '(';
+    } else {
+        strStream << name << '(';
+    }
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto param = params[i];
-        strStream << param.type->pname();
+        if (param.type) {
+            strStream << param.type->pname();
+        } else {
+            strStream << param.name;
+        }
         if (param.expr) {
             strStream << " = " << param.expr->pname();
         }

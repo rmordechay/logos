@@ -111,7 +111,9 @@ void LgsSema::visitFunc(LgsFunc* func) {
     if (func->funcType->isVariadic && func->funcType->hasDefaults) {
         errHandler.addError(E10043, &func->location);
     }
-    validateFuncControlFlow(func);
+    if (!validateBlockControlFlow(func->stmtsBlock, func)) {
+        errHandler.addError(E10055, &func->location, {func->pname()});
+    }
     stack.exitScope();
 }
 
@@ -984,14 +986,8 @@ bool LgsSema::validateMethodVisibility(LgsFuncCall* methodCall, const LgsObject*
     return true;
 }
 
-void LgsSema::validateFuncControlFlow(LgsFunc* func) {
-    if (func->funcType->rt->isVoid()) return;
-    if (!validateBlockControlFlow(func->stmtsBlock, func)) {
-        errHandler.addError(E10055, &func->location, {func->funcType->name});
-    }
-}
-
 bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func) {
+    if (func->funcType->rt->isVoid()) return true;
     if (!stmtBlock) return true;
     if (stmtBlock->returnExpr) return true;
     auto isValid = false;
@@ -1036,7 +1032,7 @@ void LgsSema::matchExprToType(LgsExpr* expr, LgsType* type) {
         }
         return;
     }
-    if (!type || !expr->type || expr->type->isUnknown()) return;
+    if (!type || !expr->type) return;
     if (!type->equals(expr->type)) {
         errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
         return;

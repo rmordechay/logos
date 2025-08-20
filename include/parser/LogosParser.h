@@ -37,7 +37,7 @@ public:
     RuleGroupTypesList = 8, RuleGroupTargetList = 9, RuleInterfaceBody = 10, 
     RuleObject = 11, RuleObjectBody = 12, RuleField = 13, RuleInterfaceField = 14, 
     RuleImplements = 15, RuleFuncSignatureHeader = 16, RuleFuncSignature = 17, 
-    RuleInterfaceFunc = 18, RuleFunc = 19, RuleAnonnymosFunc = 20, RuleAnonnymosFuncParams = 21, 
+    RuleInterfaceFunc = 18, RuleFunc = 19, RuleLambda = 20, RuleLambdaParams = 21, 
     RuleMethod = 22, RuleParam = 23, RuleStatement = 24, RuleStatementsBlock = 25, 
     RuleAssignment = 26, RuleExplicitVarDec = 27, RuleImplicitVarDec = 28, 
     RuleIfStatement = 29, RuleElseIfStatement = 30, RuleElseStatement = 31, 
@@ -91,8 +91,8 @@ public:
   class FuncSignatureContext;
   class InterfaceFuncContext;
   class FuncContext;
-  class AnonnymosFuncContext;
-  class AnonnymosFuncParamsContext;
+  class LambdaContext;
+  class LambdaParamsContext;
   class MethodContext;
   class ParamContext;
   class StatementContext;
@@ -458,35 +458,42 @@ public:
 
   FuncContext* func();
 
-  class  AnonnymosFuncContext : public antlr4::ParserRuleContext {
+  class  LambdaContext : public antlr4::ParserRuleContext {
   public:
-    AnonnymosFuncContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    LogosParser::TypeContext *rt = nullptr;
+    LambdaContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *ARROW();
     StatementsBlockContext *statementsBlock();
     antlr4::tree::TerminalNode *IDENTIFIER();
+    antlr4::tree::TerminalNode *COLON();
     antlr4::tree::TerminalNode *LPAREN();
     antlr4::tree::TerminalNode *RPAREN();
-    AnonnymosFuncParamsContext *anonnymosFuncParams();
+    TypeContext *type();
+    LambdaParamsContext *lambdaParams();
 
    
   };
 
-  AnonnymosFuncContext* anonnymosFunc();
+  LambdaContext* lambda();
 
-  class  AnonnymosFuncParamsContext : public antlr4::ParserRuleContext {
+  class  LambdaParamsContext : public antlr4::ParserRuleContext {
   public:
-    AnonnymosFuncParamsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    LambdaParamsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<antlr4::tree::TerminalNode *> IDENTIFIER();
     antlr4::tree::TerminalNode* IDENTIFIER(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COLON();
+    antlr4::tree::TerminalNode* COLON(size_t i);
+    std::vector<TypeContext *> type();
+    TypeContext* type(size_t i);
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
    
   };
 
-  AnonnymosFuncParamsContext* anonnymosFuncParams();
+  LambdaParamsContext* lambdaParams();
 
   class  MethodContext : public antlr4::ParserRuleContext {
   public:
@@ -822,7 +829,7 @@ public:
     VectorContext *vector();
     FuncCallContext *funcCall();
     PostfixExprContext *postfixExpr();
-    AnonnymosFuncContext *anonnymosFunc();
+    LambdaContext *lambda();
     PrefixExprContext *prefixExpr();
     InstanceContext *instance();
     ConstantContext *constant();

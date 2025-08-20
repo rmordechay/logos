@@ -80,12 +80,12 @@ func:
         funcSignature statementsBlock
     ;
 
-anonnymosFunc:
-        (IDENTIFIER | (LPAREN anonnymosFuncParams? RPAREN)) ARROW statementsBlock
+lambda:
+        (IDENTIFIER | (LPAREN lambdaParams? RPAREN)) (COLON rt=type)? ARROW statementsBlock
     ;
 
-anonnymosFuncParams:
-        IDENTIFIER (COMMA IDENTIFIER)* COMMA?
+lambdaParams:
+         IDENTIFIER (COLON type)? (COMMA IDENTIFIER (COLON type)?)* COMMA?
     ;
 
 method:
@@ -195,7 +195,7 @@ unaryExpr:
         vector
     |   funcCall
     |   postfixExpr
-    |   anonnymosFunc
+    |   lambda
     |   prefixExpr
     |   instance
     |   constant

@@ -314,14 +314,17 @@ LgsField* LgsParserAdapter::getField(LogosParser::FieldContext* ctx, const size_
     return field;
 }
 
-LgsFunc* LgsParserAdapter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* ctx) {
+LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
     const auto func = new LgsFunc("");
-    func->funcType->isAnonymous = true;
+    func->funcType->isLambda = true;
+    if (ctx->rt) {
+        func->funcType->rt = getType(ctx->rt);
+    }
     if (const auto singleParam = ctx->IDENTIFIER()) {
         auto lgsParam = LgsParam(nullptr, singleParam->getText());
         setLocation(lgsParam.location, singleParam->getSymbol());
         func->funcType->params.push_back(lgsParam);
-    } else if (const auto params = ctx->anonnymosFuncParams()) {
+    } else if (const auto params = ctx->lambdaParams()) {
         for (const auto param : params->IDENTIFIER()) {
             auto lgsParam = LgsParam(nullptr, param->getText());
             setLocation(lgsParam.location, param->getSymbol());
@@ -329,7 +332,7 @@ LgsFunc* LgsParserAdapter::getAnonymousFunc(LogosParser::AnonnymosFuncContext* c
         }
     }
     func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
-    setLocation(func->location, ctx->LPAREN()->getSymbol());
+    setLocation(func->location, ctx->start);
     return func;
 }
 
@@ -690,7 +693,7 @@ LgsUnaryExpr* LgsParserAdapter::getUnaryExpr(LogosParser::UnaryExprContext* ctx)
     if (const auto hashMap = ctx->hashMap()) return getHashMap(hashMap);
     if (const auto iterIndex = ctx->iterIndex()) return getIterIndex(iterIndex);
     if (const auto selection = ctx->selection()) return getSelection(selection);
-    if (const auto func = ctx->anonnymosFunc()) return getAnonymousFunc(func);
+    if (const auto func = ctx->lambda()) return getLambda(func);
     if (const auto vector = ctx->vector()) return getVector(vector);
     if (const auto null = ctx->NULL_()) return getNullValue(null);
     if (const auto isFirst = ctx->isFirst()) return getLoopIsFirst(isFirst);

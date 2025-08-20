@@ -13,7 +13,7 @@ enum LgsFuncFlags : uint32_t {
     VIRTUAL = 1 << 3,
     STATIC = 1 << 4,
     VARIADIC = 1 << 5,
-    ANONYMOUS = 1 << 6,
+    LAMBDA = 1 << 6,
     HAS_DEFAULTS = 1 << 7,
     OPTIONAL = 1 << 8,
     TERMINATOR = 1 << 9,
@@ -34,7 +34,7 @@ public:
     bool isStatic = false;
     bool isOptional = false;
     bool isTerminator = false;
-    bool isAnonymous = false;
+    bool isLambda = false;
     bool hasDefaults = false;
     llvm::FunctionType* IRType = nullptr;
 
