@@ -47,7 +47,7 @@ bool LgsFuncType::equals(LgsType* other) {
     const auto otherFuncType = other->asFuncType();
     if (!otherFuncType) return false;
     const auto otherParams = otherFuncType->params;
-    if (rt && !rt->equals(otherFuncType->rt)) return false;
+    if (otherFuncType->rt && !rt->equals(otherFuncType->rt)) return false;
     if (params.size() != otherParams.size()) return false;
     if (params.size() == 0 && otherParams.size() == 0) return true;
     if (isAnonymous) return true;

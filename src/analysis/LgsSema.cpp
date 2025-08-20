@@ -150,20 +150,8 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
     }
     const auto lastStmt = stmtsBlock->lastStmt();
     stmtsBlock->returnExpr = lastStmt->asReturn();
-    const auto isTerminator = [](LgsValue* value) -> bool {
-        if (dynamic_cast<LgsBreak*>(value) || dynamic_cast<LgsContinue*>(value) || dynamic_cast<LgsReturn*>(value)) {
-            return true;
-        }
-        const auto fc = dynamic_cast<LgsFuncCall*>(value);
-        if (fc && fc->func && fc->func->funcType->isTerminator) return true;
-        const auto selection = dynamic_cast<LgsSelection*>(value);
-        if (!selection) return false;
-        const auto methodCall = selection->lastExpr()->asFuncCall();
-        if (!methodCall) return false;
-        return methodCall->func && methodCall->func->funcType->isTerminator;
-    };
     for (int i = 0; i < stmtsBlock->stmts.size() - 1; ++i) {
-        if (isTerminator(stmtsBlock->stmts[i])) {
+        if (stmtsBlock->stmts[i]->isTerminator()) {
             return errHandler.addError(E10059, &lastStmt->location);
         }
     }

@@ -12,6 +12,18 @@
 #include "loops/LgsForLoop.h"
 #include "stmts/LgsDeferStmt.h"
 
+bool LgsStmt::isTerminator() {
+    const bool isControlFlow = dynamic_cast<LgsBreak*>(this) || dynamic_cast<LgsContinue*>(this) || dynamic_cast<LgsReturn*>(this);
+    if (isControlFlow) return true;
+    const auto fc = asFuncCall();
+    if (fc && fc->func && fc->func->funcType->isTerminator) return true;
+    const auto selection = asSelection();
+    if (!selection) return false;
+    const auto methodCall = selection->lastExpr()->asFuncCall();
+    if (!methodCall) return false;
+    return methodCall->func && methodCall->func->funcType->isTerminator;
+}
+
 LgsForLoop* LgsStmt::asLoop() { return dynamic_cast<LgsForLoop*>(this); }
 LgsCoroutine* LgsStmt::asCoroutine() { return dynamic_cast<LgsCoroutine*>(this); }
 LgsDeferStmt* LgsStmt::asDefer() { return dynamic_cast<LgsDeferStmt*>(this); }
