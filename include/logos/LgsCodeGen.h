@@ -42,12 +42,14 @@ public:
     void storeValueInStruct(StructType* ty, Value* ptr, int i, Value* v);
     Value* loadValueFromStruct(Type* ty, Value* ptr, int i);
 
+
     // Blocks
     BasicBlock* createBlock(const std::string& name, Function* parent = nullptr);
     void startBlock(BasicBlock* block);
     void branchIfNeeded(BasicBlock* block);
     void branchAndStartBlock(BasicBlock* block);
     bool lastInstTerminator() const;
+    void generateIf(Value* cond, const std::function<void()>& blockStmtCb);
 
     // Funcs
     Function* getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;

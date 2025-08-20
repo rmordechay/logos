@@ -39,9 +39,8 @@ class LgsParserAdapter {
 public:
     size_t fileID;
     LgsPaths& paths;
-    LgsErrHandler errHandler;
     LgsSymbolTable& globals;
-    std::stack<LgsForLoop*> loopStack;
+    LgsErrHandler errHandler;
 
     explicit LgsParserAdapter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const fs::path& filePath);
@@ -68,8 +67,8 @@ public:
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
-    LgsBreak* getBreakStmt(LogosParser::StatementContext* ctx);
-    LgsStmt* getContinueStmt(const LogosParser::StatementContext* ctx);
+    LgsBreak* getBreakStmt(LogosParser::StatementContext* ctx) const;
+    LgsStmt* getContinueStmt(const LogosParser::StatementContext* ctx) const;
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);
     LgsForLoop* getForLoop(LogosParser::LoopStatementContext* ctx);
@@ -97,8 +96,8 @@ public:
     LgsUnaryExpr* getConstant(LogosParser::ConstantContext* ctx);
     LgsStrConst* getStrConst(antlr4::tree::TerminalNode* ctx);
     LgsUnaryExpr* getNullValue(const antlr4::tree::TerminalNode* ctx) const;
-    LgsUnaryExpr* getLoopIsFirst(LogosParser::IsFirstContext* ctx);
-    LgsUnaryExpr* getLoopIsLast(LogosParser::IsLastContext* ctx);
+    LgsUnaryExpr* getLoopIsFirst(LogosParser::IsFirstContext* ctx) const;
+    LgsUnaryExpr* getLoopIsLast(LogosParser::IsLastContext* ctx) const;
     LgsType* getType(LogosParser::TypeContext* ctx);
     LgsGroup* getGroup(LogosParser::GroupContext* ctx);
     LgsFuncType* getFuncType(LogosParser::FuncTypeContext* ctx);

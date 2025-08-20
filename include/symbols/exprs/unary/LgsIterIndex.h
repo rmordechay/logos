@@ -10,7 +10,9 @@ public:
     LgsUnaryExpr* baseExpr;
     LgsIndex* index = nullptr;
 
-    explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {}
+    explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {
+        isAssignable = true;
+    }
     void createIRValue(LgsCodeGen* codeGen) override;
     Value* loadFromDArray(LgsCodeGen* codeGen, LgsDArray* arr) const;
     Value* loadFromMap(LgsCodeGen* codeGen, LgsMap* map) const;

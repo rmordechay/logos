@@ -5,10 +5,9 @@ class LgsForLoop;
 
 class LgsBreak final : public LgsStmt {
 public:
+    bool isBreakIf;
     std::string tag;
+
     void createIRValue(LgsCodeGen* codeGen) override;
     json::value asJSON() override;
 };
-
-
-

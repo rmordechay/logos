@@ -13,6 +13,7 @@ struct LgsStackFrame {
     LgsSymbolTable symbolTable;
     LgsFunc* func = nullptr;
     LgsForLoop* loop = nullptr;
+    LgsIfStmt* ifStmt = nullptr;
     LgsStmtsBlock* stmtsBlock = nullptr;
 };
 
@@ -22,8 +23,10 @@ public:
     void exitScope();
     LgsFunc* currentFunc();
     LgsForLoop* currentLoop();
-    LgsStmtsBlock* getParentBlock() const;
+    LgsIfStmt* currentIfStmt();
     LgsStmtsBlock* currentStmtsBlock();
+    LgsIfStmt* outermostIfStmt();
+    LgsStmtsBlock* parentBlock() const;
     LgsSymbolTable& getSymbolTable();
     void addHeapAllocExpr(LgsExpr* expr);
     bool isRootScope() const;

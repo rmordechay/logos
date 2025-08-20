@@ -31,7 +31,7 @@ void LgsStmtsBlock::cleanupExprs(LgsCodeGen* codeGen) {
             expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
         }
         if (returnExpr) {
-            const auto stmtsBlock = codeGen->stack.getParentBlock();
+            const auto stmtsBlock = codeGen->stack.parentBlock();
             codeGen->builder.CreateBr(stmtsBlock->getCleanupBlock(codeGen));
         }
     }

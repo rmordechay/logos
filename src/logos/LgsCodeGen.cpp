@@ -59,6 +59,15 @@ Value* LgsCodeGen::loadValueFromStruct(Type* ty, Value* ptr, const int i) {
     return builder.CreateLoad(ty->getStructElementType(i), gep);
 }
 
+void LgsCodeGen::generateIf(Value* cond, const std::function<void()>& blockStmtCb) {
+    const auto IRBlockIfTrue = createBlock(BLOCK_NAME_IF_TRUE);
+    const auto IRBlockIfFalse = createBlock(BLOCK_NAME_IF_FALSE);
+    builder.CreateCondBr(cond, IRBlockIfTrue, IRBlockIfFalse);
+    startBlock(IRBlockIfTrue);
+    blockStmtCb();
+    branchAndStartBlock(IRBlockIfFalse);
+}
+
 BasicBlock* LgsCodeGen::createBlock(const std::string& name, Function* parent) {
     return BasicBlock::Create(context, name, parent);
 }

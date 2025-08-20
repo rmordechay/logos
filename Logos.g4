@@ -156,7 +156,7 @@ loopStatement:
     ;
 
 breakStmt:
-        BREAK TAG?
+        BREAK (TAG | IF)?
     ;
 
 returnStatement:

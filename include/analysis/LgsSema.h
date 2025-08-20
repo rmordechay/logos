@@ -75,8 +75,10 @@ public:
     void visitForeachLoop(LgsForeachLoop* foreachLoop);
     void visitInfiniteLoop(const LgsInfiniteLoop* infiniteLoop);
     void visitCoroutine(const LgsCoroutine* coroutine);
-    void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitReturnStmt(LgsReturn* returnStmt);
+    void visitContinueStmt(LgsContinue* continueStmt);
+    void visitBreakStmt(LgsBreak* breakStmt);
+    void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* castExpr);
@@ -101,6 +103,8 @@ public:
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitSlice(LgsIterIndex* iterIndex);
     void visitGroup(LgsGroup* group);
+    void visitForIsFirst(LgsVariable* variable);
+    void visitForIsLast(LgsVariable* variable);
 
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);
@@ -113,7 +117,7 @@ public:
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
     void castExprToType(LgsExpr* expr, LgsType* toType);
-    LgsExpr* matchExprToType(LgsExpr* expr, LgsType* type);
+    void matchExprToType(LgsExpr* expr, LgsType* type);
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     bool resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);

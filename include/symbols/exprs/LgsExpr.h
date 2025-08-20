@@ -28,6 +28,7 @@ public:
     LgsType* type = nullptr;
     bool isNull = false;
     bool isSpread = false;
+    bool isAssignable = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
 

@@ -75,7 +75,7 @@ inline LgsBaseError E10052{.msg = "Spread operator in '%s...' must only be used 
 inline LgsBaseError E10053{.msg = "'%s' is a Logos global name and cannot be redefined.", .errCode = errCodeStart++};
 inline LgsBaseError E10054{.msg = "Field '%s' is set more than one time.", .errCode = errCodeStart++};
 inline LgsBaseError E10055{.msg = "Function '%s' must return from all its paths.", .errCode = errCodeStart++};
-inline LgsBaseError E10056{.msg = "Type '%s' has multiple fields/methods with the same name '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10056{.msg = "Type '%s' has multiple fields with the same name '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10057{.msg = "Pattern matching expression '%s' must be of type Bool.", .errCode = errCodeStart++};
 inline LgsBaseError E10058{.msg = "Field '%s' is defined in multiple interfaces: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10059{.msg = "Unreachable code.", .errCode = errCodeStart++};
@@ -90,3 +90,5 @@ inline LgsBaseError E10067{.msg = "'%s' was not found.", .errCode = errCodeStart
 inline LgsBaseError E10068{.msg = "App version must be in the form of '1.0.0'. Given: '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10069{.msg = "Too many scalars passed to '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10070{.msg = "Invalid scalars '%s' for '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10071{.msg = "'break if' must be inside an if statement.", .errCode = errCodeStart++};
+inline LgsBaseError E10072{.msg = "Type '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};

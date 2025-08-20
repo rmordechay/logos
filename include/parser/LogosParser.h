@@ -702,6 +702,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *BREAK();
     antlr4::tree::TerminalNode *TAG();
+    antlr4::tree::TerminalNode *IF();
 
    
   };

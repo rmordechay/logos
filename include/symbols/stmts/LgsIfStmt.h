@@ -10,6 +10,7 @@ public:
     std::vector<std::pair<LgsExpr*, LgsStmtsBlock*>> elseIfs;
     LgsStmtsBlock* elseBlock = nullptr;
     bool isPatternMatching = false;
+    llvm::BasicBlock* IRExitBlock = nullptr;
     std::string tag;
 
     explicit LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock = nullptr) : ifCond(ifCond), ifBlock(ifStmtBlock) {}
@@ -19,6 +20,5 @@ public:
     void generateElseIf(LgsCodeGen* codeGen);
     void generatePatternMatching(LgsCodeGen* codeGen);
     json::value asJSON() override;
-    static void generateSimpleIf(LgsCodeGen* codeGen, LgsExpr* cond, const std::function<void()>& trueBlockCb);
     ~LgsIfStmt() override;
 };

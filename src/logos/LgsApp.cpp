@@ -169,17 +169,15 @@ void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
     antlr4::CommonTokenStream tokens(&lexer);
     LogosParser parser(&tokens);
     const auto file = parser.logosFile();
-    if (!checkParserErrors(&parser)) return;
     auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
     LgsParserAdapter antlrConverter(fileID, paths, globals);
     const auto lgsFile = antlrConverter.getLogosFile(file, filePath);
-    if (antlrConverter.errHandler.successful) {
+    checkParserErrors(&parser);
+    {
         std::lock_guard lock(mtx);
-        assert(fileID == lgsFile->id);
         lgsFile->id = ast.size();
         ast.push_back(lgsFile);
-    } else {
-        std::lock_guard lock(mtx);
+        if (antlrConverter.errHandler.successful) return;
         errHandler.mergeErrors(antlrConverter.errHandler);
     }
 }
@@ -248,4 +246,3 @@ void LgsApp::freeApp() {
     }
     envFiles.clear();
 }
-

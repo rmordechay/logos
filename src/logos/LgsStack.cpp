@@ -7,12 +7,14 @@ void LgsStack::enterScope(LgsValue* value, LgsStmtsBlock* stmtsBlock) {
     LgsStackFrame stackFrame = {.stmtsBlock = stmtsBlock};
     if (const auto func = dynamic_cast<LgsFunc*>(value)) {
         stackFrame.func = func;
-    } else {
+    } else if (const auto loop = dynamic_cast<LgsForLoop*>(value)) {
         stackFrame.func = top().func;
         stackFrame.symbolTable = top().symbolTable;
-        if (const auto forLoop = dynamic_cast<LgsForLoop*>(value)) {
-            stackFrame.loop = forLoop;
-        }
+        stackFrame.loop = loop;
+    } else if (const auto ifStmt = dynamic_cast<LgsIfStmt*>(value)) {
+        stackFrame.func = top().func;
+        stackFrame.symbolTable = top().symbolTable;
+        stackFrame.ifStmt = ifStmt;
     }
     push(stackFrame);
 }
@@ -25,8 +27,33 @@ LgsFunc* LgsStack::currentFunc() {
     return top().func;
 }
 
+LgsForLoop* LgsStack::currentLoop() {
+    for (auto it = rbegin(); it != rend(); ++it) {
+        if (it->loop) return it->loop;
+    }
+    return nullptr;
+}
+
+LgsIfStmt* LgsStack::currentIfStmt() {
+    for (auto it = rbegin(); it != rend(); ++it) {
+        if (it->ifStmt) return it->ifStmt;
+    }
+    return nullptr;
+}
+
+LgsIfStmt* LgsStack::outermostIfStmt() {
+    for (auto it = begin(); it != end(); ++it) {
+        if (it->ifStmt) return it->ifStmt;
+    }
+    return nullptr;
+}
+
 LgsStmtsBlock* LgsStack::currentStmtsBlock() {
     return top().stmtsBlock;
+}
+
+LgsStmtsBlock* LgsStack::parentBlock() const {
+    return this->c[this->size() - 2].stmtsBlock;
 }
 
 LgsSymbolTable& LgsStack::getSymbolTable() {
@@ -39,16 +66,4 @@ void LgsStack::addHeapAllocExpr(LgsExpr* expr) {
 
 bool LgsStack::isRootScope() const {
     return size() == 1;
-}
-
-LgsForLoop* LgsStack::currentLoop() {
-    for (auto it = rbegin(); it != rend(); ++it) {
-        if (it->loop) return it->loop;
-    }
-    return nullptr;
-}
-
-LgsStmtsBlock* LgsStack::getParentBlock() const {
-    assert(this->size() >= 2);
-    return this->c[this->size() - 2].stmtsBlock;
 }
