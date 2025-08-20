@@ -4,21 +4,6 @@
 #include "types/LgsGroup.h"
 #include "utils/LgsUtils.h"
 
-LgsObject* LgsObject::clone() {
-    const auto cloned = new LgsObject(*this);
-    cloned->fields.clear();
-    for (const auto& [fieldName, field] : fields) {
-        cloned->fields[fieldName] = new LgsField(*field);
-    }
-    return cloned;
-}
-
-bool LgsObject::hasVirtuals() const {
-    return std::any_of(methods.begin(), methods.end(), [](const auto& pair) {
-        return pair.second->funcType->isVirtual;
-    });
-}
-
 Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;
     // const auto fieldsStartOffset = hasVirtuals();
@@ -102,6 +87,29 @@ std::string LgsObject::strFormatPart() const {
     return str.str();
 }
 
+bool LgsObject::hasVirtuals() const {
+    return std::any_of(methods.begin(), methods.end(), [](const auto& pair) {
+        return pair.second->funcType->isVirtual;
+    });
+}
+
+LgsObject* LgsObject::clone() {
+    const auto cloned = new LgsObject(*this);
+    cloned->fields.clear();
+    for (const auto& [fieldName, field] : fields) {
+        cloned->fields[fieldName] = new LgsField(*field);
+    }
+    return cloned;
+}
+
+std::string LgsObject::getName() {
+    return name;
+}
+
+std::string LgsObject::pname() {
+    return name;
+}
+
 bool LgsObject::equals(LgsType* other) {
     if (const auto group = other->asGroup()) {
         for (const auto groupType : group->types) {
@@ -114,10 +122,6 @@ bool LgsObject::equals(LgsType* other) {
     return name == other->getName();
 }
 
-std::string LgsObject::getName() {
-    return name;
-}
-
 json::value LgsObject::asJSON() {
     json::object jsonObj;
     jsonObj["name"] = getName();
@@ -127,10 +131,6 @@ json::value LgsObject::asJSON() {
     }
     jsonObj["fields"] = jsonFields;
     return jsonObj;
-}
-
-std::string LgsObject::pname() {
-    return name;
 }
 
 LgsObject::~LgsObject() {

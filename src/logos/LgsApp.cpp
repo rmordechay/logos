@@ -220,10 +220,11 @@ void LgsApp::exitWithErrors() const {
         const auto file = ast[err.location->fileID];
         const auto filePath = file->absPath.string();
         const auto fullPath = filePath + ":" + lineNumber + ":" + posInLine;
-        const auto path = "\n   at:  " + fullPath;
+        const auto path = "\n   at: " + fullPath;
         logError(err.msg, path);
         if (i != errHandler.errors.size() - 1) logInfo(LGS_MSG_LINE_SEPERATOR);
     }
+    logInfo("\n");
     exit(1);
 }
 

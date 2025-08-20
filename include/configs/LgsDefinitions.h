@@ -12,7 +12,7 @@
 #define LGS_SELF "self"
 #define LGS_STR_FMT_PLACEHOLDER "$!v!$"
 #define LGS_UNKNOWN_TYPE "<Unknown>"
-#define LGS_ERROR_PADDING "\n\t\t"
+#define LGS_ANONYMOUS_STR "anonymous"
 
 #define BLOCK_NAME_IF_TRUE "if_true"
 #define BLOCK_NAME_DEFAULT_CASE "default"
@@ -41,11 +41,12 @@
 #define BLOCK_NAME_CLEANUP_LOOP_INC "cleanup_loop_inc"
 #define BLOCK_NAME_CLEANUP_FREE_ELEMENT "cleanup_free_element"
 
-#define LGS_MSG_LINE_SEPERATOR "\n------\n"
-#define LGS_MSG_COLOR_RED     "\033[1;31m"
-#define LGS_MSG_COLOR_YELLOW  "\033[1;33m"
-#define LGS_MSG_COLOR_WHITE   "\033[1;37m"
-#define LGS_MSG_COLOR_RESET   "\033[0m"
+#define LGS_ERROR_PADDING "\n\t   "
+#define LGS_MSG_LINE_SEPERATOR "\n\n------\n\n"
+#define LGS_MSG_COLOR_RED "\033[1;31m"
+#define LGS_MSG_COLOR_YELLOW "\033[1;33m"
+#define LGS_MSG_COLOR_WHITE "\033[1;37m"
+#define LGS_MSG_COLOR_RESET "\033[0m"
 #define LGS_COLORIZE(text, color) color text LGS_MSG_COLOR_RESET
 #define LGS_ERROR_STR LGS_COLORIZE("Error:", LGS_MSG_COLOR_RED) " "
 #define LGS_WARN_STR LGS_COLORIZE("Warning:", LGS_MSG_COLOR_YELLOW)

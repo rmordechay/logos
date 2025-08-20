@@ -162,10 +162,10 @@ json::value LgsFunc::asJSON() {
 
 Value* LgsFunc::getIRArg(LgsCodeGen* codeGen, LgsExpr* arg) {
     const auto v = arg->getIRValue(codeGen);
+    if (arg->type->asFuncType() || arg->type->asObject() || arg->type->asDArray()) return v;
     const auto vTy = v->getType();
     if (vTy->isIntegerTy() || vTy->isFloatingPointTy()) return v;
     if (!vTy->isPointerTy()) return v;
-    if (arg->type->asObject() || arg->type->asDArray()) return v;
     if (isa<GlobalVariable>(v) || isa<LoadInst>(v)) return v;
     const auto ty = arg->type->getIRType(codeGen);
     return codeGen->builder.CreateLoad(ty, v);

@@ -59,6 +59,6 @@ bool LgsRunCmd::setup() {
     return fs::exists(argv[2]);
 }
 
-LgsCliCmdHelp& LgsRunCmd::help() {
+LgsCliCmdHelp& LgsRunCmd::getHelp() {
     return runCmdHelp;
 }

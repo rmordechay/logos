@@ -843,8 +843,7 @@ bool LgsSema::resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExp
         foreachLoop->loopVars[0]->type = &LGS_INT;
         foreachLoop->loopVars[0]->expr = LGS_INT.getZeroValue();
     } else if (unpackCount != varDecSize) {
-        errHandler.addError(E10041, &iterExpr->location, {iterExpr->pname(), std::to_string(unpackCount),
-                                                          std::to_string(unpackCount + 1), std::to_string(varDecSize)});
+        errHandler.addError(E10041, &iterExpr->location, {iterExpr->pname(), std::to_string(unpackCount), std::to_string(unpackCount + 1), std::to_string(varDecSize)});
         return true;
     }
 
@@ -907,8 +906,7 @@ void LgsSema::validateObjInterface(LgsObject* obj, LgsInterface* interface) {
     }
 
     if (!missingMethods.empty() || !missingFields.empty()) {
-        errHandler.addError(E10016, &obj->location,
-                            {obj->pname(), interface->name, getMissingImplementsStr(missingFields, missingMethods)});
+        errHandler.addError(E10016, &obj->location, {obj->pname(), interface->name, getMissingImplementsStr(missingFields, missingMethods)});
     }
 }
 
@@ -1007,13 +1005,11 @@ void LgsSema::matchExprToType(LgsExpr* expr, LgsType* type) {
     if (expr->isNull) {
         // null must have a type
         if (!type || type->isUnknown()) {
-            errHandler.addError(E10024, &expr->location);
-            return;
+            return errHandler.addError(E10024, &expr->location);
         }
         // type must be nullable
         if (!type->asNullable()) {
             errHandler.addError(E10023, &type->location, {type->pname(), type->pname()});
-            return;
         }
         return;
     }
@@ -1037,18 +1033,30 @@ void LgsSema::resolveFuncCall(LgsFuncCall* funcCall) {
             errHandler.addError(E10015, &funcCall->location, {funcCall->name, funcCall->pname(), func->pname()});
         }
     } else {
-        LgsType* symbolType = nullptr;
+        LgsType* type = nullptr;
         if (symbol->symbolType == VAR_DEC) {
-            funcCall->callback = new LgsSymbol(symbol->varDec);
-            symbolType = symbol->varDec->type;
+            type = symbol->varDec->type;
+            if (const auto func = symbol->varDec->expr->asFunc()) {
+                if (funcCall->equals(func->funcType)) {
+                    funcCall->func = func;
+                    funcCall->setType(func->funcType->rt);
+                } else {
+                    errHandler.addError(E10015, &funcCall->location, {funcCall->name, funcCall->pname(), func->pname()});
+                }
+            }
         } else if (symbol->symbolType == PARAM) {
-            funcCall->callback = new LgsSymbol(symbol->param);
-            symbolType = symbol->param->type;
+            type = symbol->param->type;
+            if (funcCall->equals(type->asFuncType())) {
+                funcCall->ref.symbolType = PARAM;
+                funcCall->ref.param = symbol->param;
+            } else {
+                errHandler.addError(E10015, &funcCall->location, {funcCall->name, funcCall->pname(), type->pname()});
+            }
         } else {
             assert(0);
         }
 
-        if (!symbolType->asFuncType()) {
+        if (!type->asFuncType()) {
             errHandler.addError(E10046, &funcCall->location, {funcCall->name});
         }
     }

@@ -1,5 +1,6 @@
 #include "types/LgsFuncType.h"
 #include "configs/LgsConfig.h"
+#include "configs/LgsDefinitions.h"
 #include "logos/LgsCodeGen.h"
 #include "utils/LgsUtils.h"
 
@@ -62,7 +63,7 @@ std::string LgsFuncType::getName() {
     if (isMethod && !isVirtual) {
         strStream << parentName << "_";
     } else if (name == "") {
-        strStream << "Anonymous";
+        strStream << LGS_ANONYMOUS_STR;
     }
     strStream << name;
     IRName = strStream.str();
@@ -72,7 +73,7 @@ std::string LgsFuncType::getName() {
 std::string LgsFuncType::pname() {
     std::stringstream strStream;
     if (isLambda) {
-        strStream << "Anonymous" << '(';
+        strStream << LGS_ANONYMOUS_STR << '(';
     } else {
         strStream << name << '(';
     }

@@ -18,8 +18,7 @@ public:
     explicit LgsFunc(const std::string& name, LgsType* rt = nullptr, const std::vector<LgsType*>& paramTypes = {}, const uint32_t ops = 0) {
         initFunc(name, rt, paramTypes, ops);
     }
-
-
+    explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {}
     virtual Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args);
     virtual void generateIR(LgsCodeGen* codeGen);
     virtual Function* getIRFunc(LgsCodeGen* codeGen);

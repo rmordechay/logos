@@ -6,9 +6,13 @@
 #include "types/LgsObject.h"
 
 void LgsFuncCall::createIRValue(LgsCodeGen* codeGen) {
-    if (callback) {
-        func->setIRValue(getCallback(codeGen));
-    } else if (func->funcType->isVirtual) {
+    if (ref.symbolType == PARAM) {
+        LgsFunc f(ref.param->type->asFuncType());
+        f.setIRValue(ref.param->IRValue);
+        IRValue = f.call(codeGen, args);
+        return;
+    }
+    if (func->funcType->isVirtual) {
         resolveVirtualFunc(codeGen);
     }
     IRValue = func->call(codeGen, args);
@@ -40,29 +44,16 @@ json::value LgsFuncCall::asJSON() {
     return jsonObj;
 }
 
-Value* LgsFuncCall::getCallback(LgsCodeGen* codeGen) const {
-    switch (callback->symbolType) {
-    case VAR_DEC:
-        return callback->varDec->expr->getIRValue(codeGen);
-    case PARAM:
-        return callback->param->IRValue;
-    case ENUM_FIELD:
-        return callback->field->IRValue;
-    default:
-        break;
-    }
-    assert(0);
-}
-
 bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
     if (funcType->hasDefaults) return equalsDefaultParams(funcType);
     if (funcType->isVariadic) return equalsVariadic(funcType);
-    if (funcType->name != "" && name != funcType->name) return false;
+    if (!funcType->isLambda && name != funcType->name) return false;
     if (funcType->params.size() != args.size()) return false;
     if (funcType->params.size() == 0 && args.size() == 0) return true;
     for (size_t i = funcType->isStatic; i < funcType->params.size(); ++i) {
         const auto paramType = funcType->params[i].type;
         const auto argType = args[i]->type;
+        if (!paramType || !argType) return false;
         if (args[i]->isNull) continue;
         if (!paramType->equals(argType)) return false;
     }
@@ -95,9 +86,5 @@ void LgsFuncCall::resolveVirtualFunc(LgsCodeGen* codeGen) const {
 LgsFuncCall::~LgsFuncCall() {
     for (const auto& arg : args) {
         delete arg;
-    }
-    if (callback) {
-        delete callback;
-        callback = nullptr;
     }
 }

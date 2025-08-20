@@ -10,13 +10,12 @@ public:
     std::vector<LgsExpr*> args;
     LgsFunc* func = nullptr;
     bool isMethodCall = false;
-    LgsSymbol* callback = nullptr;
+    LgsSymbol ref;
 
     explicit LgsFuncCall(const std::string& name, const std::vector<LgsExpr*>& args = {}) : name(name), args(args) {}
     void createIRValue(LgsCodeGen* codeGen) override;
     std::string pname() override;
     json::value asJSON() override;
-    Value* getCallback(LgsCodeGen* codeGen) const;
     bool equals(const LgsFuncType* funcType) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;

@@ -15,8 +15,6 @@ public:
     LgsInstance* singleton = nullptr;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {}
-    LgsObject* clone();
-    bool hasVirtuals() const;
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     LgsField* getField(const std::string& name) override;
     LgsFunc* getMethod(const std::string& name) override;
@@ -24,9 +22,11 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;
-    bool equals(LgsType* other) override;
+    bool hasVirtuals() const;
+    LgsObject* clone();
     std::string getName() override;
     std::string pname() override;
+    bool equals(LgsType* other) override;
     json::value asJSON() override;
     ~LgsObject() override;
 };

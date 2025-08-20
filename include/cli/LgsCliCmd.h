@@ -35,7 +35,7 @@ public:
 
     virtual void run() = 0;
     virtual bool setup() = 0;
-    virtual LgsCliCmdHelp& help() = 0;
+    virtual LgsCliCmdHelp& getHelp() = 0;
     virtual ~LgsCliCmd() = default;
 };
 
@@ -53,7 +53,7 @@ inline size_t getLongestStrSize(const LgsCliCmdHelp& help) {
 }
 
 inline void LgsCliCmd::printHelp() {
-    const auto h = help();
+    const auto h = getHelp();
     std::ostringstream txt;
     txt << LGS_COLORIZE("Help", LGS_MSG_COLOR_WHITE) << '\n';
 

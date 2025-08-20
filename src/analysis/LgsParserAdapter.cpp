@@ -226,6 +226,28 @@ LgsMainFunc* LgsParserAdapter::getMainFunc(LogosParser::FuncContext* ctx) {
     return mainFunc;
 }
 
+LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
+    const auto func = new LgsFunc(LGS_ANONYMOUS_STR);
+    func->funcType->isLambda = true;
+    func->funcType->rt = getFuncReturnType(ctx->rt);
+    if (const auto singleParam = ctx->IDENTIFIER()) {
+        auto lgsParam = LgsParam(nullptr, singleParam->getText());
+        setLocation(lgsParam.location, singleParam->getSymbol());
+        func->funcType->params.push_back(lgsParam);
+    } else if (const auto params = ctx->lambdaParams()) {
+        for (int i = 0; i < params->IDENTIFIER().size(); ++i) {
+            const auto param = params->IDENTIFIER()[i];
+            const auto type = getType(params->type()[i]);
+            auto lgsParam = LgsParam(type, param->getText());
+            setLocation(lgsParam.location, param->getSymbol());
+            func->funcType->params.push_back(lgsParam);
+        }
+    }
+    func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
+    setLocation(func->location, ctx->start);
+    return func;
+}
+
 LgsInterface* LgsParserAdapter::getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName) {
     const auto interface = new LgsInterface(interfaceName->getText());
     setLocation(interface->location, interfaceName->getSymbol());
@@ -312,28 +334,6 @@ LgsField* LgsParserAdapter::getField(LogosParser::FieldContext* ctx, const size_
     field->position = position;
     setLocation(field->location, ctx->start);
     return field;
-}
-
-LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
-    const auto func = new LgsFunc("");
-    func->funcType->isLambda = true;
-    if (ctx->rt) {
-        func->funcType->rt = getType(ctx->rt);
-    }
-    if (const auto singleParam = ctx->IDENTIFIER()) {
-        auto lgsParam = LgsParam(nullptr, singleParam->getText());
-        setLocation(lgsParam.location, singleParam->getSymbol());
-        func->funcType->params.push_back(lgsParam);
-    } else if (const auto params = ctx->lambdaParams()) {
-        for (const auto param : params->IDENTIFIER()) {
-            auto lgsParam = LgsParam(nullptr, param->getText());
-            setLocation(lgsParam.location, param->getSymbol());
-            func->funcType->params.push_back(lgsParam);
-        }
-    }
-    func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
-    setLocation(func->location, ctx->start);
-    return func;
 }
 
 LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamContext* param) {

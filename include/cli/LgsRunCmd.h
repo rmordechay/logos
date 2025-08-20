@@ -6,5 +6,5 @@ public:
     LgsRunCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
     void run() override;
     bool setup() override;
-    LgsCliCmdHelp& help() override;
+    LgsCliCmdHelp& getHelp() override;
 };

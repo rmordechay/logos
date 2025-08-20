@@ -34,7 +34,7 @@ inline LgsBaseError E10011{.msg = "'%s' is already declared.", .errCode = errCod
 inline LgsBaseError E10012{.msg = "Function call cannot be assigned to a value.", .errCode = errCodeStart++};
 inline LgsBaseError E10013{.msg = "Field '%s' is declared with type function. Declare it as a method instead.%pExplanation: Logos highly encourages uniformity wherever possible. Having the ability to declare%pfunctions in both manners may create a codebase that violates this rule.", .errCode = errCodeStart++};
 inline LgsBaseError E10014{.msg = "Expression of type '%s' does not match base type '%s'.", .errCode = errCodeStart++};
-inline LgsBaseError E10015{.msg = "Function with name '%s' was found but it doesn't match the parameters.%pGiven:\t  %s%pExpected: %s", .errCode = errCodeStart++};
+inline LgsBaseError E10015{.msg = "Function with name '%s' was found but it doesn't match the parameters.%pGiven:\t  %s%pExpected:  %s", .errCode = errCodeStart++};
 inline LgsBaseError E10016{.msg = "Object '%s' does not fully implement '%s'. %s", .errCode = errCodeStart++};
 inline LgsBaseError E10017{.msg = "'break' must be inside a for loop.", .errCode = errCodeStart++};
 inline LgsBaseError E10018{.msg = "Expression of type '%s' cannot cast to type '%s'.", .errCode = errCodeStart++};
