@@ -94,7 +94,7 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
 }
 
 void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
-    for (const auto& [_, field] : obj->fields) {
+    for (const auto& field : obj->fields) {
         if (obj->name == field->type->getName()) {
             field->type = obj;
         } else {
@@ -110,7 +110,7 @@ void LgsTypeResolver::resolveObjTypes(LgsObject* obj, LgsFile& file) {
 }
 
 void LgsTypeResolver::resolveInterfaceTypes(LgsInterface* interface, LgsFile& file) {
-    for (const auto& [_, field] : interface->fields) {
+    for (const auto& field : interface->fields) {
         field->type = resolveType(field->type, &file);
     }
     for (const auto& [_, method] : interface->methods) {

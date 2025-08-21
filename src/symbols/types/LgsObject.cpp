@@ -6,33 +6,32 @@
 
 Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
     if (IRType) return IRType;
-    // const auto fieldsStartOffset = hasVirtuals();
-    std::vector<Type*> elementTypes(fields.size());
-    int iCounter = 0;
-    for (const auto& [fieldName, field] : fields) {
-        field->position = iCounter++;
+    std::vector<Type*> elementTypes;
+    elementTypes.reserve(fields.size());
+    for (int i = 0; i < fields.size(); ++i) {
+        const auto field = fields[i];
+        field->position = i;
         Type* fieldType;
         if (field->type->asObject()) {
             fieldType = codeGen->ptrTy();
         } else {
             fieldType = field->type->getIRType(codeGen);
         }
-        elementTypes[field->position] = fieldType;
+        elementTypes.push_back(fieldType);
     }
     IRType = StructType::getTypeByName(codeGen->context, name);
     if (!IRType) {
         IRType = StructType::create(codeGen->context, elementTypes, name);
     }
-    for (const auto& [_, field] : fields) {
+    for (const auto& field : fields) {
         field->parentIRType = IRType;
     }
     return IRType;
 }
 
 LgsField* LgsObject::getField(const std::string& fieldName) {
-    const auto field = fields.find(fieldName);
-    if (field != fields.end()) {
-        return field->second;
+    for (auto* f : fields) {
+        if (f->name == fieldName) return f;
     }
     for (const auto interface : interfaces) {
         const auto interfaceField = interface->getField(fieldName);
@@ -63,7 +62,7 @@ void LgsObject::freeValue(LgsCodeGen* codeGen, Value* value) {
 
 size_t LgsObject::getSizeBytes() {
     size_t sum = 0;
-    for (const auto& [_, field] : fields) {
+    for (const auto& field : fields) {
         if (name == field->type->getName()) {
             sum += sizeof(void*);
         } else {
@@ -80,8 +79,11 @@ LgsExpr* LgsObject::getZeroValue() {
 std::string LgsObject::strFormatPart() const {
     std::stringstream str;
     str << '{';
-    for (const auto& [fieldName, field] : fields) {
-        str << fieldName << " = " << field->type->strFormatPart();
+    bool first = true;
+    for (const auto& field : fields) {
+        if (!first) str << ", ";
+        str << field->name << " = " << field->type->strFormatPart();
+        first = false;
     }
     str << '}';
     return str.str();
@@ -96,8 +98,8 @@ bool LgsObject::hasVirtuals() const {
 LgsObject* LgsObject::clone() {
     const auto cloned = new LgsObject(*this);
     cloned->fields.clear();
-    for (const auto& [fieldName, field] : fields) {
-        cloned->fields[fieldName] = new LgsField(*field);
+    for (const auto& field : fields) {
+        cloned->addField(field->clone());
     }
     return cloned;
 }
@@ -126,7 +128,7 @@ json::value LgsObject::asJSON() {
     json::object jsonObj;
     jsonObj["name"] = getName();
     json::array jsonFields;
-    for (auto& [_, field] : fields) {
+    for (auto& field : fields) {
         jsonFields.emplace_back(field->asJSON());
     }
     jsonObj["fields"] = jsonFields;

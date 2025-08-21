@@ -9,7 +9,7 @@ void LgsIntConst::setNumberType() {
         numberType = LgsNumberType::I16;
     } else if (type->asInt()) {
         numberType = LgsNumberType::I32;
-    } else if (type->asInt()) {
+    } else if (type->asLong()) {
         numberType = LgsNumberType::I64;
     } else {
         assert(0);

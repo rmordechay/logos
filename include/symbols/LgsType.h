@@ -49,7 +49,7 @@ public:
     bool isHeapAlloc = false;
     llvm::Type* IRType = nullptr;
     LgsLocation location{0, 0, 0};
-    std::map<std::string, LgsField*> fields;
+    std::vector<LgsField*> fields;
     std::map<std::string, LgsFunc*> methods;
 
     virtual LgsField* getField(const std::string& name);

@@ -11,8 +11,8 @@ Value* LgsFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
     std::vector<Value*> IRArgs;
     if (funcType->hasDefaults) {
         for (int i = funcType->isStatic; i < args.size(); ++i) {
-            auto arg = getIRArg(codeGen, args[i]);
-            IRArgs.push_back(arg);
+            const auto arg = args[i];
+            IRArgs.push_back(loadIRArg(codeGen, arg->getIRValue(codeGen), arg->type));
         }
         const std::vector defaultParams(funcType->params.begin() + args.size(), funcType->params.end());
         for (const auto& defaultParam : defaultParams) {
@@ -21,8 +21,8 @@ Value* LgsFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
         }
     } else {
         for (int i = funcType->isStatic; i < args.size(); ++i) {
-            auto arg = getIRArg(codeGen, args[i]);
-            IRArgs.push_back(arg);
+            const auto arg = args[i];
+            IRArgs.push_back(loadIRArg(codeGen, arg->getIRValue(codeGen), arg->type));
         }
     }
     return callIR(codeGen, IRArgs);
@@ -160,14 +160,13 @@ json::value LgsFunc::asJSON() {
     return obj;
 }
 
-Value* LgsFunc::getIRArg(LgsCodeGen* codeGen, LgsExpr* arg) {
-    const auto v = arg->getIRValue(codeGen);
-    if (arg->type->asFuncType() || arg->type->asObject() || arg->type->asDArray()) return v;
+Value* LgsFunc::loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type) {
+    if (type->asFuncType() || type->asObject() || type->asDArray()) return v;
     const auto vTy = v->getType();
     if (vTy->isIntegerTy() || vTy->isFloatingPointTy()) return v;
     if (!vTy->isPointerTy()) return v;
     if (isa<GlobalVariable>(v) || isa<LoadInst>(v)) return v;
-    const auto ty = arg->type->getIRType(codeGen);
+    const auto ty = type->getIRType(codeGen);
     return codeGen->builder.CreateLoad(ty, v);
 }
 

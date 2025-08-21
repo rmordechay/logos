@@ -1,4 +1,4 @@
-#include "../../../include/symbols/exprs/unary/LgsVectorExpr.h"
+#include "exprs/unary/LgsVectorExpr.h"
 #include "stmts/LgsField.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
@@ -16,9 +16,8 @@
 class LgsShort;
 
 LgsField* LgsType::getField(const std::string& name) {
-    const auto field = fields.find(name);
-    if (field != fields.end()) {
-        return field->second;
+    for (auto* f : fields) {
+        if (f->name == name) return f;
     }
     return nullptr;
 }
@@ -33,20 +32,24 @@ LgsFunc* LgsType::getMethod(const std::string& name) {
 
 bool LgsType::addMethod(LgsFunc* method) {
     if (methods.find(method->funcType->name) != methods.end()) return false;
-    if (fields.find(method->funcType->name) != fields.end()) return false;
+    for (const auto* f : fields) {
+        if (f->name == method->funcType->name) return false;
+    }
     methods[method->funcType->name] = method;
     return true;
 }
 
 bool LgsType::addField(LgsField* field) {
-    if (fields.find(field->name) != fields.end()) return false;
+    for (const auto* f : fields) {
+        if (f->name == field->name) return false;
+    }
     if (methods.find(field->name) != methods.end()) return false;
-    fields[field->name] = field;
+    fields.push_back(field);
     return true;
 }
 
 LgsType::~LgsType() {
-    for (const auto& [_, field] : fields) {
+    for (const auto& field : fields) {
         delete field;
     }
     fields.clear();

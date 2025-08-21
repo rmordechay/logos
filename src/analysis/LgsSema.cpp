@@ -64,7 +64,7 @@ void LgsSema::visitMainFile(LgsMainFile* mainFile) {
 }
 
 void LgsSema::visitObject(LgsObject* obj) {
-    for (const auto& [_, field] : obj->fields) {
+    for (const auto& field : obj->fields) {
         visitField(field);
     }
     for (const auto& [_, method] : obj->methods) {
@@ -74,7 +74,7 @@ void LgsSema::visitObject(LgsObject* obj) {
 }
 
 void LgsSema::visitInterface(LgsInterface* interface) {
-    for (const auto& [_, field] : interface->fields) {
+    for (const auto& field : interface->fields) {
         visitField(field);
     }
     auto allMethodsImplemented = true;
@@ -225,7 +225,7 @@ void LgsSema::visitPatternMatching(LgsIfStmt* pm) {
     const auto baseExprType = baseExpr->type;
     // Allows local enum fields to not have a qualifier inside the block
     if (baseExprType->asEnum()) {
-        for (const auto& [name, field] : baseExprType->fields) {
+        for (const auto& field : baseExprType->fields) {
             addLocalSymbol(LgsSymbol(field));
         }
     }
@@ -311,9 +311,9 @@ void LgsSema::visitForeachLoop(LgsForeachLoop* foreachLoop) {
     visitUnaryExpr(iterExpr);
     const auto iterable = iterExpr->type->asIterable();
     if (!iterable) {
-        if (iterExpr->type)
-            errHandler.addError(E10002, &iterExpr->location,
-                                {iterExpr->pname(), iterExpr->type->pname()});
+        if (iterExpr->type) {
+            errHandler.addError(E10002, &iterExpr->location, {iterExpr->pname(), iterExpr->type->pname()});
+        }
         return;
     }
     if (resolveLoopVars(foreachLoop, iterExpr, iterable)) return;
@@ -714,12 +714,11 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         if (!validateFieldVisibility(field, instance->obj)) continue;
         visitExpr(arg->expr);
         matchExprToType(arg->expr, field->type);
-        field->expr = arg->expr;
     }
 
     // Missing required fields
-    for (const auto& [name, field] : instance->obj->fields) {
-        if (!field->isMutable && instance->args.find(name) == instance->args.end()) {
+    for (const auto& field : instance->obj->fields) {
+        if (!field->isConst && instance->args.find(field->name) == instance->args.end()) {
             errHandler.addError(E10029, &field->location, {field->name});
         }
     }
@@ -877,10 +876,10 @@ std::string getMissingImplementsStr(const std::vector<LgsField*>& fields, const 
 void LgsSema::validateObjInterface(LgsObject* obj, LgsInterface* interface) {
     // Fields
     std::vector<LgsField*> missingFields;
-    for (const auto& [name, interfaceField] : interface->fields) {
-        const auto objField = obj->fields.find(name);
-        if (objField != obj->fields.end() && objField->second->type->equals(interfaceField->type)) {
-            objField->second->isVirtual = true;
+    for (const auto& interfaceField : interface->fields) {
+        const auto objField = obj->getField(interfaceField->name);
+        if (objField && objField->type->equals(interfaceField->type)) {
+            objField->isVirtual = true;
             continue;
         }
         if (!interfaceField->isOptional) {

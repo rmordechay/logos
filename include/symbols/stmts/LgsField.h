@@ -27,5 +27,6 @@ public:
     Value* resolveVirtualField(LgsCodeGen* codeGen, const LgsHashMap* vtable) const;
     void createIRValue(LgsCodeGen* codeGen) override;
     json::value asJSON() override;
+    LgsField* clone() const;
     ~LgsField() override;
 };

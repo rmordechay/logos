@@ -1,6 +1,7 @@
 #include "types/LgsInterface.h"
 #include "funcs/LgsFunc.h"
 #include "logos/LgsCodeGen.h"
+#include "stmts/LgsField.h"
 #include "types/LgsObject.h"
 
 Type* LgsInterface::getIRType(LgsCodeGen* codeGen) {
@@ -17,9 +18,8 @@ Type* LgsInterface::getIRType(LgsCodeGen* codeGen) {
 }
 
 LgsField* LgsInterface::getField(const std::string& fieldName) {
-    const auto field = fields.find(fieldName);
-    if (field != fields.end()) {
-        return field->second;
+    for (auto* f : fields) {
+        if (f->name == name) return f;
     }
     for (const auto interface : interfaces) {
         const auto interfaceField = interface->getField(fieldName);

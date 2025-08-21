@@ -30,8 +30,17 @@ json::value LgsField::asJSON() {
     return obj;
 }
 
+LgsField* LgsField::clone() const {
+    const auto newField = new LgsField(*this);
+    if (expr) {
+        newField->expr = expr->clone();
+    }
+    return newField;
+}
+
 LgsField::~LgsField() {
     if (expr) {
+        std::cout << name << std::endl;
         delete expr;
         expr = nullptr;
     }

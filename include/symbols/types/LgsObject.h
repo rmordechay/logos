@@ -1,6 +1,5 @@
 #pragma once
 #include <utility>
-
 #include "LgsType.h"
 
 class LgsInstance;
@@ -11,13 +10,12 @@ class LgsObject : public LgsType {
 public:
     std::string name;
     std::vector<LgsType*> interfaces;
-    // LgsHashMap* vtable = nullptr;
     LgsInstance* singleton = nullptr;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {}
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
-    LgsField* getField(const std::string& name) override;
-    LgsFunc* getMethod(const std::string& name) override;
+    LgsField* getField(const std::string& fieldName) override;
+    LgsFunc* getMethod(const std::string& methodName) override;
     void freeValue(LgsCodeGen* codeGen, llvm::Value* value) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;

@@ -1,5 +1,4 @@
 #include "exprs/unary/LgsVariable.h"
-
 #include "exprs/unary/LgsInstance.h"
 #include "funcs/LgsFunc.h"
 #include "funcs/LgsParam.h"
@@ -8,11 +7,10 @@
 #include "types/LgsObject.h"
 #include <logos/LgsCodeGen.h>
 
-
 void LgsVariable::createIRValue(LgsCodeGen* codeGen) {
     switch (ref.symbolType) {
     case VAR_DEC:
-        IRValue = ref.varDec->IRValue;
+        IRValue = ref.varDec->getIRValue(codeGen);
         return;
     case PARAM:
         IRValue = ref.param->getIRValue(codeGen);

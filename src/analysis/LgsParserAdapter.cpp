@@ -436,7 +436,7 @@ LgsEnum* LgsParserAdapter::getEnum(LogosParser::EnumDeclarationContext* ctx) {
             field->expr = getStrConst(enumField->STRING());
         }
         setLocation(field->location, ctx->start);
-        lgsEnum->fields[enumFieldName] = field;
+        lgsEnum->fields.push_back(field);
     }
     return lgsEnum;
 }
@@ -810,8 +810,10 @@ LgsVariable* LgsParserAdapter::getVariable(antlr4::tree::TerminalNode* ctx) cons
 LgsFuncCall* LgsParserAdapter::getFuncCall(LogosParser::FuncCallContext* ctx) {
     const auto name = ctx->IDENTIFIER()->getText();
     std::vector<LgsExpr*> args;
-    if (ctx->funcArgList()) {
-        for (const auto& arg : ctx->funcArgList()->funcArg()) {
+    const auto funcArgsList = ctx->funcArgList();
+    if (funcArgsList) {
+        args.reserve(funcArgsList->funcArg().size());
+        for (const auto& arg : funcArgsList->funcArg()) {
             auto argExpr = getExpr(arg->expr());
             args.push_back(argExpr);
         }

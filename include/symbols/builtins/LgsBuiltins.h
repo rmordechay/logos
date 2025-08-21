@@ -1,7 +1,8 @@
 #pragma once
 #include "configs/LgsDefinitions.h"
+#include "stmts/LgsField.h"
+#include "exprs/unary/LgsInstance.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include <types/LgsVoid.h>
 #include <types/LgsAny.h>
 
 class LgsPrint final : public LgsFunc {
@@ -12,14 +13,25 @@ public:
     }
 
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
-        const auto arg = args.front();
-        const auto strConst = arg->asStrConst();
+        const auto firstArg = args.front();
+        const auto strConst = firstArg->asStrConst();
         if (strConst && !strConst->templateParts.empty()) {
             return printFormat(codeGen, strConst);
         }
-        const auto formatStr = arg->type->strFormatPart() + '\n';
-        const auto IRArgs = {codeGen->getIRStr(formatStr), getIRArg(codeGen, arg)};
-        return codeGen->callPrintf(IRArgs);
+        const auto formatStr = firstArg->type->strFormatPart() + '\n';
+        std::vector IRArgs = {codeGen->getIRStr(formatStr)};
+        if (const auto obj = firstArg->type->asObject()) {
+            for (const auto& field : obj->fields) {
+                const auto ir = field->getIRValue(codeGen);
+                IRArgs.emplace_back(loadIRArg(codeGen, ir, field->type));
+            }
+        } else {
+            for (int i = 1; i < args.size(); ++i) {
+                const auto arg = args[i];
+                IRArgs.emplace_back(arg->getIRValue(codeGen));
+            }
+        }
+        return codeGen->callLgsFunc(name, FunctionType::get(codeGen->voidTy(), {codeGen->ptrTy()}, true), IRArgs);
     }
 
     Function* getIRFunc(LgsCodeGen* codeGen) override {
@@ -31,7 +43,7 @@ public:
         auto formated = strConst->formatedStr;
         std::vector<Value*> values;
         for (const auto part : strConst->templateParts) {
-            auto partIR = getIRArg(codeGen, part);
+            auto partIR = loadIRArg(codeGen, part->getIRValue(codeGen), part->type);
             values.push_back(partIR);
             const auto pos = formated.find(LGS_STR_FMT_PLACEHOLDER);
             if (pos != std::string::npos) {

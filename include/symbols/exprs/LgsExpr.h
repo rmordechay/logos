@@ -70,6 +70,7 @@ public:
     LgsVectorExpr* asVectorExpr();
     LgsIntConst* asIntConst();
 
+    virtual LgsExpr* clone();
     virtual bool equals(LgsExpr* other);
     virtual bool castTo(LgsType* toType);
     virtual llvm::Value* hash(LgsCodeGen* codeGen);

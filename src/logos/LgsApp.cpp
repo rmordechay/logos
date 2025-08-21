@@ -97,7 +97,7 @@ void LgsApp::execute() {
     if (appArgs.empty() || appArgs.back() != nullptr) {
         appArgs.push_back(nullptr);
     }
-    freeApp();
+    // freeApp();
     execv(paths.execFilePath.c_str(), appArgs.data());
     perror("Logos execution failed.");
     exit(EXIT_FAILURE);
