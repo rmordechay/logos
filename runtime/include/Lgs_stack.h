@@ -19,6 +19,7 @@ struct Lgs_Stack_Frame {
 struct Lgs_Stack {
     int stackIndex;
     Lgs_Stack_Frame frames[STACK_CAPACITY];
+
     void push();
     void pop();
     void callDefers() const;

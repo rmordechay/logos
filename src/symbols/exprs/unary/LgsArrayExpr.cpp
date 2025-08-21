@@ -1,6 +1,5 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "cli/LgsCli.h"
-#include "exprs/unary/LgsIterIndex.h"
 #include <llvm/IR/Module.h>
 
 std::string LgsArrayExpr::pname() {
@@ -31,8 +30,7 @@ Value* LgsArrayExpr::createConstArray(LgsCodeGen* codeGen) const {
 
 Value* LgsArrayExpr::createDynamicArray(LgsCodeGen* codeGen) {
     const auto arr = type->asDArray();
-    const auto dl = codeGen->IRModule->getDataLayout();
-    const auto size = dl.getTypeAllocSize(arr->baseType->getIRType(codeGen));
+    const auto size = arr->baseType->getSizeBytes();
     const auto elementSize = codeGen->i64(size);
     const auto arrSize = codeGen->typeSize(arr->getArrStruct(codeGen));
     IRValue = codeGen->callMalloc(arrSize.getFixedValue());

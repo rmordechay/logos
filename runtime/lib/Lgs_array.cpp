@@ -18,6 +18,14 @@ extern "C" void Lgs_DArray_add(const Lgs_Array* arr, const void* value) {
     std::memcpy(arr->data->data() + oldSize, value, arr->elementSize);
 }
 
+extern "C" void Lgs_DArray_addMany(const Lgs_Array* arr, const void* values, const size_t count) {
+    if (count == 0) return;
+    const auto oldSize = arr->data->size();
+    const auto bytesToAdd = arr->elementSize * count;
+    arr->data->resize(oldSize + bytesToAdd);
+    std::memcpy(arr->data->data() + oldSize, values, bytesToAdd);
+}
+
 extern "C" void Lgs_DArray_addBool(const Lgs_Array* a, const bool v)   {
     Lgs_DArray_add(a, &v);
 }

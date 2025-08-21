@@ -32,7 +32,6 @@ public:
     bool isMutable = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
-
     virtual std::string pname() = 0; // pretty name
     virtual llvm::Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
     virtual llvm::Value* subIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;

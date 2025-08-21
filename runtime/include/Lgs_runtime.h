@@ -7,5 +7,3 @@ struct Lgs_runtime {
     Lgs_Scheduler scheduler;
     std::map<void*, std::map<std::string, void*>> vtable;
 };
-
-inline Lgs_runtime runtime;

@@ -1,5 +1,7 @@
 #include "Lgs_runtime.h"
 
+static inline Lgs_runtime runtime;
+
 extern "C" void Lgs_Vtable_add(void* instancePtr, const char* name, void* ptr) {
     runtime.vtable[instancePtr].emplace(name, ptr);
 }
