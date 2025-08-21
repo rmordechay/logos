@@ -2,6 +2,7 @@
 #include "configs/LgsDefinitions.h"
 #include "funcs/LgsFunc.h"
 #include "logos/LgsCodeGen.h"
+#include "utils/LgsUtils.h"
 
 void LgsIfStmt::createIRValue(LgsCodeGen* codeGen) {
     if (isPatternMatching) {
@@ -154,7 +155,7 @@ LgsIfStmt::~LgsIfStmt() {
         elseBlock = nullptr;
     }
     for (const auto& [expr, block] : elseIfs) {
-        delete expr;
+        freeExpr(expr);
         delete block;
     }
     elseIfs.clear();

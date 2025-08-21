@@ -29,6 +29,7 @@ public:
     bool isNull = false;
     bool isSpread = false;
     bool isAssignable = false;
+    bool isMutable = false;
 
     explicit LgsExpr(LgsType* type) : type(type) {}
 

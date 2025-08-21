@@ -1,6 +1,7 @@
 #include "files/LgsInterfaceFile.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsInterface.h"
+#include "utils/LgsUtils.h"
 
 void LgsInterfaceFile::generateIR() {
     for (const auto& [_, method] : interface->methods) {
@@ -10,6 +11,6 @@ void LgsInterfaceFile::generateIR() {
 }
 
 LgsInterfaceFile::~LgsInterfaceFile() {
-    delete interface;
+    freeType(interface);
     interface = nullptr;
 }

@@ -10,6 +10,5 @@ public:
 
     void createIRValue(LgsCodeGen* codeGen) override;
     json::value asJSON() override;
-    void generateIR(LgsCodeGen* codeGen) const;
     ~LgsDeferStmt() override;
 };

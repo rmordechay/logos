@@ -45,6 +45,10 @@ void LgsIntConst::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
+LgsExpr* LgsIntConst::clone() {
+    return new LgsIntConst(*this);
+}
+
 std::string LgsIntConst::pname() {
     return type->getName() + "(" + std::to_string(value) + ")";
 }

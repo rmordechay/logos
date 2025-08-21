@@ -84,6 +84,11 @@ void freeType(LgsType* type) {
     delete type;
 }
 
+void freeExpr(const LgsExpr* expr) {
+    if (!expr) return;
+    delete expr;
+}
+
 size_t hashStr(const char* key) {
     size_t hash = 2166136261u;
     while (*key) {

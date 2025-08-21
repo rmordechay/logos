@@ -1,10 +1,7 @@
 #include "stmts/LgsReturn.h"
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsStmtsBlock.h"
-
-json::value LgsReturn::asJSON() {
-    assert(0);
-}
+#include "utils/LgsUtils.h"
 
 void LgsReturn::createIRValue(LgsCodeGen* codeGen) {
     const auto exprIR = expr ? expr->getIRValue(codeGen) : nullptr;
@@ -28,6 +25,11 @@ void LgsReturn::createIRValue(LgsCodeGen* codeGen) {
     }
 }
 
+json::value LgsReturn::asJSON() {
+    assert(0);
+}
+
 LgsReturn::~LgsReturn() {
-    delete expr;
+    freeExpr(expr);
+    expr = nullptr;
 }

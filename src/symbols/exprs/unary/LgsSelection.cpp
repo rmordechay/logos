@@ -69,7 +69,7 @@ json::value LgsSelection::asJSON() {
 LgsSelection::~LgsSelection() {
     for (const auto& expr : exprs) {
         // TODO delete
-        // delete expr;
+        // freeExpr(expr);
     }
     exprs.clear();
 }

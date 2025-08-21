@@ -36,7 +36,7 @@ LgsVarDec::~LgsVarDec() {
             freeType(type);
             type = nullptr;
         }
-        delete expr;
+        freeExpr(expr);
         expr = nullptr;
     } else if (type) {
         freeType(type);

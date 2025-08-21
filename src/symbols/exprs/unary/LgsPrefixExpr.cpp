@@ -1,5 +1,7 @@
 #include "exprs/unary/LgsPrefixExpr.h"
 
+#include "utils/LgsUtils.h"
+
 void LgsPrefixExpr::createIRValue(LgsCodeGen* codeGen) {
     const auto exprIRVal = expr->getIRValue(codeGen);
     switch (op) {
@@ -28,8 +30,6 @@ std::string LgsPrefixExpr::pname() {
 }
 
 LgsPrefixExpr::~LgsPrefixExpr() {
-    if (expr) {
-        delete expr;
-        expr = nullptr;
-    }
+    freeExpr(expr);
+    expr = nullptr;
 }

@@ -1,20 +1,28 @@
+#include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/LgsVectorExpr.h"
+
+Type* LgsVec::getIRType(LgsCodeGen* codeGen) {
+    IRType = FixedVectorType::get(baseType->getIRType(codeGen), 2);
+    return IRType;
+}
+
+LgsField* LgsVec::getField(const std::string& fieldName) {
+    const auto fieldType = dim == 1 ? baseType : new LgsVec(dim);
+    const auto field = new LgsField(fieldName, fieldType);
+    addField(field);
+    return field;
+}
 
 std::string LgsVec::getName() {
     return "vec" + std::to_string(dim);
-}
-
-json::value LgsVec::asJSON() {
-    assert(0);
 }
 
 std::string LgsVec::pname() {
     return getName();
 }
 
-Type* LgsVec::getIRType(LgsCodeGen* codeGen) {
-    IRType = FixedVectorType::get(baseType->getIRType(codeGen), 2);
-    return IRType;
+json::value LgsVec::asJSON() {
+    assert(0);
 }
 
 size_t LgsVec::getSizeBytes() {

@@ -20,16 +20,10 @@ json::value LgsCast::asJSON() {
 }
 
 LgsCast::~LgsCast() {
-    if (fromValue) {
-        delete fromValue;
-        fromValue = nullptr;
-    }
-    if (toValue) {
-        delete toValue;
-        toValue = nullptr;
-    }
-    if (toType) {
-        freeType(toType);
-        toType = nullptr;
-    }
+    freeExpr(fromValue);
+    freeExpr(toValue);
+    freeType(toType);
+    fromValue = nullptr;
+    toValue = nullptr;
+    toType = nullptr;
 }

@@ -81,7 +81,7 @@ std::string LgsMap::strFormatPart() const {
 }
 
 LgsMap::~LgsMap() {
-    delete typePair;
+    freeType(typePair);
     delete addFunc;
     delete initFunc;
     delete getFunc;

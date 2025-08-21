@@ -32,9 +32,6 @@ LgsFunc* LgsType::getMethod(const std::string& name) {
 
 bool LgsType::addMethod(LgsFunc* method) {
     if (methods.find(method->funcType->name) != methods.end()) return false;
-    for (const auto* f : fields) {
-        if (f->name == method->funcType->name) return false;
-    }
     methods[method->funcType->name] = method;
     return true;
 }
@@ -48,19 +45,8 @@ bool LgsType::addField(LgsField* field) {
     return true;
 }
 
-LgsType::~LgsType() {
-    for (const auto& field : fields) {
-        delete field;
-    }
-    fields.clear();
-    for (const auto& [_, method] : methods) {
-        if (method->funcType->isInternal) continue;
-        delete method;
-    }
-    methods.clear();
-}
-
 void LgsType::freeValue(LgsCodeGen* codeGen, Value* value) {}
+LgsType* LgsType::clone() { if (isPrimitive || isVoid()) return this; assert(0); }
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
 LgsChar* LgsType::asChar() { return dynamic_cast<LgsChar*>(this); }
 LgsShort* LgsType::asShort() { return dynamic_cast<LgsShort*>(this); }
@@ -85,3 +71,15 @@ LgsTypePair* LgsType::asPair() { return dynamic_cast<LgsTypePair*>(this); }
 bool LgsType::isVector() { return dynamic_cast<LgsVec*>(this); }
 bool LgsType::isVoid() { return dynamic_cast<LgsVoid*>(this); }
 bool LgsType::isUnknown() { return dynamic_cast<LgsUnknown*>(this); }
+
+LgsType::~LgsType() {
+    for (const auto& field : fields) {
+        delete field;
+    }
+    fields.clear();
+    for (const auto& [_, method] : methods) {
+        if (method->funcType->isInternal) continue;
+        delete method;
+    }
+    methods.clear();
+}

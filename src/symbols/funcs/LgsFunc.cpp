@@ -58,8 +58,7 @@ Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
     return IRFunc;
 }
 
-void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes,
-                       const uint32_t ops) {
+void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops) {
     funcType = new LgsFuncType();
     funcType->name = name;
     funcType->rt = rt;
@@ -158,6 +157,14 @@ json::value LgsFunc::asJSON() {
     obj["params"] = params;
     obj["stmtsBlock"] = stmtsBlock->asJSON();
     return obj;
+}
+
+LgsExpr* LgsFunc::clone() {
+    const auto newFunc = new LgsFunc(funcType->clone()->asFuncType());
+    newFunc->isNull = isNull;
+    newFunc->isSpread = isSpread;
+    newFunc->isAssignable = isAssignable;
+    return newFunc;
 }
 
 Value* LgsFunc::loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type) {

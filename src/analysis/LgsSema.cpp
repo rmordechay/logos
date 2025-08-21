@@ -92,7 +92,7 @@ void LgsSema::visitField(LgsField* field) {
         visitExpr(field->expr);
         matchExprToType(field->expr, field->type);
     }
-    if (field->type && field->type->asFuncType()) {
+    if (field->expr && field->expr->asFunc()) {
         errHandler.addError(E10013, &field->location, {field->name});
     }
 }
@@ -550,29 +550,41 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     if (!symbol) return;
     variable->ref.symbolType = symbol->symbolType;
     switch (symbol->symbolType) {
-    case VAR_DEC: variable->ref.varDec = symbol->varDec;
-        variable->isMutable = symbol->varDec->isMutable;
+    case VAR_DEC: {
+        variable->ref.varDec = symbol->varDec;
+        variable->isMutable = symbol->varDec->isConst;
         variable->setType(symbol->varDec->type);
         break;
-    case ENUM_FIELD: variable->ref.field = symbol->field;
-        variable->isMutable = symbol->field->isMutable;
+    }
+    case ENUM_FIELD: {
+        variable->ref.field = symbol->field;
+        variable->isMutable = !symbol->field->isConst;
         variable->setType(symbol->field->type);
         break;
-    case PARAM: variable->ref.param = symbol->param;
+    }
+    case PARAM: {
+        variable->ref.param = symbol->param;
         variable->setType(symbol->param->type);
         if (variable->ref.param->isSelf) {
             stack.currentFunc()->funcType->isStatic = false;
         }
         break;
-    case ENUM: variable->ref.lgsEnum = symbol->lgsEnum;
+    }
+    case ENUM: {
+        variable->ref.lgsEnum = symbol->lgsEnum;
         variable->setType(symbol->lgsEnum);
         break;
-    case FUNC: variable->ref.func = symbol->func;
+    }
+    case FUNC: {
+        variable->ref.func = symbol->func;
         variable->setType(symbol->func->funcType);
         break;
-    case OBJECT: variable->ref.object = symbol->object;
+    }
+    case OBJECT: {
+        variable->ref.object = symbol->object;
         variable->setType(symbol->object);
         break;
+    }
     default:
         assert(false);
     }
@@ -599,7 +611,7 @@ void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
     }
 }
 
-void LgsSema::visitInnerSelections(LgsSelection* selection) {
+void LgsSema::visitInnerSelections(const LgsSelection* selection) {
     const auto exprs = selection->exprs;
     for (int i = 0; i < exprs.size() - 1; ++i) {
         const auto parentExpr = exprs[i];
@@ -611,19 +623,13 @@ void LgsSema::visitInnerSelections(LgsSelection* selection) {
         }
         if (!childExpr->type || childExpr->type->isUnknown()) return;
     }
-    selection->isMutable = selection->lastExpr()->isMutable;
 }
 
 void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     if (!parentType) return;
     auto childName = child->name;
-    LgsField* field = nullptr;
-    if (parentType->isVector()) {
-        field = resolveVectorField(child, parentType->asVec());
-        if (!field) return;
-    } else {
-        field = parentType->getField(childName);
-    }
+    if (parentType->isVector()) resolveScalars(child, parentType->asVec());
+    const auto field = parentType->getField(childName);
     if (!field) {
         errHandler.addError(E10005, &child->location, {childName, parentType->pname()});
         return;
@@ -714,11 +720,12 @@ void LgsSema::visitInstance(LgsInstance* instance) {
         if (!validateFieldVisibility(field, instance->obj)) continue;
         visitExpr(arg->expr);
         matchExprToType(arg->expr, field->type);
+        field->expr = arg->expr->clone();
     }
 
     // Missing required fields
     for (const auto& field : instance->obj->fields) {
-        if (!field->isConst && instance->args.find(field->name) == instance->args.end()) {
+        if (field->isConst && instance->args.find(field->name) == instance->args.end()) {
             errHandler.addError(E10029, &field->location, {field->name});
         }
     }
@@ -1072,58 +1079,36 @@ bool LgsSema::resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
         methodCall->func = method;
         methodCall->setType(method->funcType->rt);
     } else {
-        errHandler.addError(E10034, &methodCall->location,
-                            {parentType->pname(), name, methodCall->pname(), method->pname()});
+        errHandler.addError(E10034, &methodCall->location, {parentType->pname(), name, methodCall->pname(), method->pname()});
         return false;
     }
     return true;
 }
 
-LgsField* LgsSema::resolveVectorField(LgsVariable* fieldVar, LgsVec* vec) {
-    const auto scalarPositions = resolveScalars(fieldVar, vec);
-    if (scalarPositions.empty()) return nullptr;
-    const auto fieldName = fieldVar->name;
-    const auto dim = fieldName.size();
-    LgsField* field = nullptr;
-    if (dim == 1) {
-        field = new LgsField(fieldName, vec->baseType);
-    } else {
-        field = new LgsField(fieldName, new LgsVec(dim));
-    }
-    vec->addField(field);
-    return field;
-}
-
-std::vector<uint8_t> LgsSema::resolveScalars(LgsVariable* fieldVar, LgsVec* vec) {
-    assert(vec->isVector());
+void LgsSema::resolveScalars(LgsVariable* fieldVar, LgsVec* vec) {
     const auto fieldName = fieldVar->name;
     const auto dim = vec->dim;
     if (fieldName.empty() || fieldName.size() > 4) {
-        errHandler.addError(E10069, &fieldVar->location, {vec->pname()});
-        return {};
+        return errHandler.addError(E10069, &fieldVar->location, {vec->pname()});
     }
 
     const auto expectedSet = LgsVec::getSwizzleSet(fieldName[0]);
     if (expectedSet < 0) {
-        errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
-        return {};
+        return errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
     }
 
     std::vector<uint8_t> indices;
     indices.reserve(fieldName.size());
     for (const char c : fieldName) {
         if (LgsVec::getSwizzleSet(c) != expectedSet) {
-            errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
-            return {};
+            return errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
         }
         const auto componentIndex = LgsVec::getComponentIndex(c);
         if (componentIndex >= dim) {
-            errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
-            return {};
+            return errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
         }
         indices.push_back(componentIndex);
     }
-    return indices;
 }
 
 LgsSymbol* LgsSema::getSymbol(const std::string& name, LgsLocation* location) {

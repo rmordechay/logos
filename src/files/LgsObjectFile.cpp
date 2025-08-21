@@ -1,6 +1,7 @@
 #include "files/LgsObjectFile.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsObject.h"
+#include "utils/LgsUtils.h"
 
 void LgsObjectFile::generateIR() {
     obj->getIRType(&codeGen);
@@ -10,5 +11,6 @@ void LgsObjectFile::generateIR() {
 }
 
 LgsObjectFile::~LgsObjectFile() {
-    delete obj;
+    freeType(obj);
+    obj = nullptr;
 }

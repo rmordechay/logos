@@ -18,38 +18,12 @@ void LgsFuncCall::createIRValue(LgsCodeGen* codeGen) {
     IRValue = func->call(codeGen, args);
 }
 
-std::string LgsFuncCall::pname() {
-    std::stringstream strStream;
-    strStream << name << '(';
-    for (size_t i = isMethodCall; i < args.size(); ++i) {
-        strStream << args[i]->type->pname();
-        if (i != args.size() - 1) strStream << ", ";
-    }
-    if (type && !type->isUnknown()) {
-        strStream << "): " << type->pname();
-    } else {
-        strStream << ')';
-    }
-    return strStream.str();
-}
-
-json::value LgsFuncCall::asJSON() {
-    json::object jsonObj;
-    jsonObj["name"] = name;
-    jsonObj["type"] = type->asJSON();
-    json::array jsonArgs;
-    for (const auto& arg : args) {
-        jsonArgs.emplace_back(arg->asJSON());
-    }
-    return jsonObj;
-}
-
 bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
     if (funcType->hasDefaults) return equalsDefaultParams(funcType);
     if (funcType->isVariadic) return equalsVariadic(funcType);
-    if (!funcType->isLambda && name != funcType->name) return false;
     if (funcType->params.size() != args.size()) return false;
     if (funcType->params.size() == 0 && args.size() == 0) return true;
+    if (funcType->isLambda) return true;
     for (size_t i = funcType->isStatic; i < funcType->params.size(); ++i) {
         const auto paramType = funcType->params[i].type;
         const auto argType = args[i]->type;
@@ -81,6 +55,32 @@ void LgsFuncCall::resolveVirtualFunc(LgsCodeGen* codeGen) const {
     const auto selfPtr = self->getIRValue(codeGen);
     const auto rv = codeGen->getPtrFromVtable(selfPtr, keyIR);
     func->setIRValue(rv);
+}
+
+std::string LgsFuncCall::pname() {
+    std::stringstream strStream;
+    strStream << name << '(';
+    for (size_t i = isMethodCall; i < args.size(); ++i) {
+        strStream << args[i]->type->pname();
+        if (i != args.size() - 1) strStream << ", ";
+    }
+    if (type && !type->isUnknown()) {
+        strStream << "): " << type->pname();
+    } else {
+        strStream << ')';
+    }
+    return strStream.str();
+}
+
+json::value LgsFuncCall::asJSON() {
+    json::object jsonObj;
+    jsonObj["name"] = name;
+    jsonObj["type"] = type->asJSON();
+    json::array jsonArgs;
+    for (const auto& arg : args) {
+        jsonArgs.emplace_back(arg->asJSON());
+    }
+    return jsonObj;
 }
 
 LgsFuncCall::~LgsFuncCall() {

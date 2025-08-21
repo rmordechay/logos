@@ -92,7 +92,7 @@ public:
     void visitVariable(LgsVariable* variable);
     void visitSelection(LgsSelection* selection);
     void visitFirstSelection(LgsExpr* firstExpr);
-    void visitInnerSelections(LgsSelection* selection);
+    void visitInnerSelections(const LgsSelection* selection);
     void visitFieldSelection(LgsVariable* child, LgsType* parentType);
     void visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     void visitFuncCall(LgsFuncCall* funcCall);
@@ -120,8 +120,7 @@ public:
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     bool resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
-    LgsField* resolveVectorField(LgsVariable* fieldVar, LgsVec* vec);
-    std::vector<uint8_t> resolveScalars(LgsVariable* fieldVar, LgsVec* vec);
+    void resolveScalars(LgsVariable* fieldVar, LgsVec* vec);
     LgsSymbol* getSymbol(const std::string& name, LgsLocation* location);
     void addLocalSymbol(const LgsSymbol& newSymbol);
 };

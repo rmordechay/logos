@@ -21,5 +21,6 @@ public:
     json::value asJSON() override;
     Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* addIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    LgsExpr* clone() override;
     ~LgsStrConst() override;
 };

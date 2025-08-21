@@ -7,6 +7,7 @@
 class LgsVec final : public LgsIterable {
 public:
     int8_t dim = 0;
+    std::vector<uint8_t> indices;
 
     explicit LgsVec(const int8_t dim, LgsType* baseType = &LGS_FLOAT) : LgsIterable(baseType), dim(dim) {
         assert(dim > 1 && dim <= 4);
@@ -14,6 +15,7 @@ public:
     }
 
     Type* getIRType(LgsCodeGen* codeGen) override;
+    LgsField* getField(const std::string& fieldName) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;

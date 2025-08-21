@@ -1,5 +1,6 @@
 #pragma once
 
+class LgsExpr;
 struct LgsError;
 struct LgsBaseError;
 class LgsFile;
@@ -18,4 +19,5 @@ void cleanStr(std::string& value);
 std::string getFileText(const fs::path& filePath);
 std::string removeUnderscores(const std::string& input);
 void freeType(LgsType* type);
+void freeExpr(const LgsExpr* expr);
 size_t hashStr(const char* key);

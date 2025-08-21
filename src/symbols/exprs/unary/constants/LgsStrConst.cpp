@@ -1,5 +1,4 @@
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "exprs/unary/constants/LgsFloatConst.h"
 
 std::string LgsStrConst::pname() {
     return type->pname();
@@ -32,8 +31,13 @@ Value* LgsStrConst::addIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
+LgsExpr* LgsStrConst::clone() {
+    return new LgsStrConst(*this);
+}
+
 LgsStrConst::~LgsStrConst() {
     if (formatedStr != "") {
         delete formatedStr.c_str();
+        formatedStr = "";
     }
 }

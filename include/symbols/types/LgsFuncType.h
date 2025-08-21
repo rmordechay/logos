@@ -42,10 +42,11 @@ public:
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;
-    bool equals(LgsType* other) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
     std::string strFormatPart() const override;
+    bool equals(LgsType* other) override;
+    LgsType* clone() override;
     ~LgsFuncType() override;
 };

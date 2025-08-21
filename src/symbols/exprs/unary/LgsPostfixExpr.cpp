@@ -1,5 +1,6 @@
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "LgsType.h"
+#include "utils/LgsUtils.h"
 
 Value* LgsPostfixExpr::IncOrDecValue(LgsCodeGen* codeGen) const {
     const auto exprIRValue = expr->getIRValue(codeGen);
@@ -32,8 +33,6 @@ json::value LgsPostfixExpr::asJSON() {
 }
 
 LgsPostfixExpr::~LgsPostfixExpr() {
-    if (expr) {
-        delete expr;
-        expr = nullptr;
-    }
+    freeExpr(expr);
+    expr = nullptr;
 }

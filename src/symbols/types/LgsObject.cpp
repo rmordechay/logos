@@ -12,7 +12,7 @@ Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
         const auto field = fields[i];
         field->position = i;
         Type* fieldType;
-        if (field->type->asObject()) {
+        if (field->type->asObject() || field->type->asFuncType()) {
             fieldType = codeGen->ptrTy();
         } else {
             fieldType = field->type->getIRType(codeGen);
@@ -46,6 +46,12 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
     const auto method = methods.find(methodName);
     if (method != methods.end()) {
         return method->second;
+    }
+    for (const auto* f : fields) {
+        if (f->name != methodName) continue;
+        if (f->expr && f->expr->asFunc()) {
+            return f->expr->asFunc();
+        }
     }
     for (const auto interface : interfaces) {
         const auto interfaceMethod = interface->getMethod(methodName);

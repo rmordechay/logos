@@ -55,10 +55,13 @@ LgsMainFile::~LgsMainFile() {
     for (const auto& [_, func] : funcs) {
         delete func;
     }
+    funcs.clear();
     for (const auto& object : objects) {
-        delete object;
+        freeType(object);
     }
+    objects.clear();
     for (const auto lgsEnum : enums) {
-        delete lgsEnum;
+        freeType(lgsEnum);
     }
+    enums.clear();
 }

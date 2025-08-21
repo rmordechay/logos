@@ -26,31 +26,31 @@ LgsSymbol* LgsSymbolTable::getSymbol(const std::string& name) {
 }
 
 void LgsSymbolTable::freeSymbols() {
-    for (const auto symbol : symbols) {
-        switch (symbol.second.symbolType) {
+    for (const auto [_, symbol] : symbols) {
+        switch (symbol.symbolType) {
         case VAR_DEC:
-            delete symbol.second.varDec;
+            delete symbol.varDec;
             break;
         case PARAM:
-            delete symbol.second.param;
+            delete symbol.param;
             break;
         case ENUM_FIELD:
-            delete symbol.second.field;
+            delete symbol.field;
             break;
         case FUNC:
-            delete symbol.second.func;
+            delete symbol.func;
             break;
         case OBJECT:
-            delete symbol.second.object;
+            delete symbol.object;
             break;
         case INTERFACE:
-            delete symbol.second.interface;
+            delete symbol.interface;
             break;
         case GROUP:
-            delete symbol.second.group;
+            delete symbol.group;
             break;
         case ENUM:
-            delete symbol.second.lgsEnum;
+            delete symbol.lgsEnum;
             break;
         case UNKNOWN:
             break;

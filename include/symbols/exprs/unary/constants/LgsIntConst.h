@@ -20,6 +20,7 @@ public:
     void setNumberType();
     bool castTo(LgsType* toType) override;
     void createIRValue(LgsCodeGen* codeGen) override;
+    LgsExpr* clone() override;
     std::string pname() override;
     json::value asJSON() override;
 };

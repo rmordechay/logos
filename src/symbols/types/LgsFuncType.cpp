@@ -41,22 +41,6 @@ size_t LgsFuncType::getSizeBytes() {
     return sizeof(void*);
 }
 
-bool LgsFuncType::equals(LgsType* other) {
-    const auto otherFuncType = other->asFuncType();
-    if (!otherFuncType) return false;
-    const auto otherParams = otherFuncType->params;
-    if (params.size() != otherParams.size()) return false;
-    if (params.size() == 0 && otherParams.size() == 0) return true;
-    if (otherFuncType->isLambda) return true;
-    if (otherFuncType->rt && !rt->equals(otherFuncType->rt)) return false;
-    for (size_t i = isMethod; i < params.size(); ++i) {
-        const auto thisType = params[i].type;
-        const auto otherType = otherFuncType->params[i].type;
-        if (!thisType->equals(otherType)) return false;
-    }
-    return true;
-}
-
 std::string LgsFuncType::getName() {
     if (IRName != "") return IRName;
     std::stringstream strStream;
@@ -105,6 +89,45 @@ std::string LgsFuncType::strFormatPart() const {
     return "%p";
 }
 
+bool LgsFuncType::equals(LgsType* other) {
+    const auto otherFuncType = other->asFuncType();
+    if (!otherFuncType) return false;
+    const auto otherParams = otherFuncType->params;
+    if (params.size() != otherParams.size()) return false;
+    if (params.size() == 0 && otherParams.size() == 0) return true;
+    if (otherFuncType->isLambda) return true;
+    if (otherFuncType->rt && !rt->equals(otherFuncType->rt)) return false;
+    for (size_t i = isMethod; i < params.size(); ++i) {
+        const auto thisType = params[i].type;
+        const auto otherType = otherFuncType->params[i].type;
+        if (!thisType->equals(otherType)) return false;
+    }
+    return true;
+}
+
+LgsType* LgsFuncType::clone() {
+    const auto copy = new LgsFuncType();
+    copy->name        = name;
+    copy->IRName      = IRName;
+    copy->parentName  = parentName;
+    if (rt) copy->rt = rt->clone();
+    copy->params.reserve(params.size());
+    for (auto p : params) {
+        copy->params.push_back(p.clone());
+    }
+    copy->isMethod    = isMethod;
+    copy->isPublic    = isPublic;
+    copy->isInternal  = isInternal;
+    copy->isVirtual   = isVirtual;
+    copy->isVariadic  = isVariadic;
+    copy->isStatic    = isStatic;
+    copy->isOptional  = isOptional;
+    copy->isTerminator= isTerminator;
+    copy->isLambda    = isLambda;
+    copy->hasDefaults = hasDefaults;
+    return copy;
+}
+
 LgsFuncType::~LgsFuncType() {
     freeType(rt);
     for (int i = isMethod && !isStatic; i < params.size(); ++i) {
@@ -113,13 +136,11 @@ LgsFuncType::~LgsFuncType() {
         if (param.expr) {
             if (param.type && param.expr->type != param.type) {
                 freeType(param.type);
-                params[i].type = nullptr;
             }
-            delete param.expr;
-            params[i].expr = nullptr;
+            freeExpr(param.expr);
         } else if (param.type) {
             freeType(param.type);
-            params[i].type = nullptr;
         }
     }
+    params.clear();
 }

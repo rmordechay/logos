@@ -163,7 +163,7 @@ void LgsParserAdapter::setAppConfigs(LogosParser::LogosAppFileContext* ctx, cons
         if (varName == "activeEnv") {
             appConfigs.activeEnv = expr->asStrConst()->value;
         }
-        delete expr;
+        freeExpr(expr);
     }
 
     const auto requireEnvs = ctx->requireEnvVars();
@@ -294,7 +294,7 @@ LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antl
 
     // Fields
     for (int i = 0; i < ctx->field().size(); ++i) {
-        const auto lgsField = getField(ctx->field(i), i);
+        const auto lgsField = getField(ctx->field(i), i, obj);
         const auto fieldAdded = obj->addField(lgsField);
         if (!fieldAdded) {
             errHandler.addError(E10056, &obj->location, {obj->name, lgsField->name});
@@ -324,18 +324,6 @@ LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antl
     return obj;
 }
 
-LgsField* LgsParserAdapter::getField(LogosParser::FieldContext* ctx, const size_t position) {
-    const auto name = ctx->IDENTIFIER()->getText();
-    const auto type = getType(ctx->type());
-    const auto expr = getExpr(ctx->expr());
-    const auto field = new LgsField(name, type, expr);
-    field->isPublic = !!ctx->VISIBILITY();
-    field->isConst = ctx->CONST() == nullptr;
-    field->position = position;
-    setLocation(field->location, ctx->start);
-    return field;
-}
-
 LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamContext* param) {
     const auto variableName = param->IDENTIFIER()->getText();
     const auto expr = getExpr(param->expr());
@@ -350,12 +338,24 @@ LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamCon
     return lgsParam;
 }
 
+LgsField* LgsParserAdapter::getField(LogosParser::FieldContext* ctx, const size_t position, LgsObject* obj) {
+    const auto name = ctx->IDENTIFIER()->getText();
+    const auto type = getType(ctx->type());
+    const auto expr = getExpr(ctx->expr());
+    const auto field = new LgsField(name, type, expr);
+    field->isPublic = !!ctx->VISIBILITY();
+    field->isConst = ctx->CONST() != nullptr;
+    field->position = position;
+    setLocation(field->location, ctx->start);
+    return field;
+}
+
 LgsField* LgsParserAdapter::getInterfaceField(LogosParser::InterfaceFieldContext* ctx) {
     const auto name = ctx->IDENTIFIER()->getText();
     const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
     const auto field = new LgsField(name, type, expr);
-    field->isConst = ctx->CONST() == nullptr;
+    field->isConst = ctx->CONST() != nullptr;
     setLocation(field->location, ctx->start);
     return field;
 }
@@ -521,7 +521,7 @@ LgsVarDec* LgsParserAdapter::getExplicitVarDec(LogosParser::ExplicitVarDecContex
     varDec->isConst = !ctx->CONST();
     if (ctx->expr()) {
         varDec->expr = getExpr(ctx->expr());
-        varDec->expr->isMutable = varDec->isMutable;
+        varDec->expr->isMutable = varDec->isConst;
     }
     varDec->type = getType(ctx->type());
     return varDec;

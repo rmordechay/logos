@@ -31,6 +31,7 @@ public:
     bool castTo(LgsType* toType) override;
     std::string pname() override;
     json::value asJSON() override;
+    LgsExpr* clone() override;
     static Value* loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type);
     ~LgsFunc() override;
 };

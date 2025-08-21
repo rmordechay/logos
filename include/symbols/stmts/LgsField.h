@@ -16,10 +16,10 @@ public:
     size_t position = 0;
     LgsType* type = nullptr;
     LgsExpr* expr = nullptr;
+    bool isConst = false;
     bool isPublic = false;
     bool isVirtual = false;
     bool isOptional = false;
-    bool isConst = false;
     Type* parentIRType = nullptr;
     Value* parentIRValue = nullptr;
 

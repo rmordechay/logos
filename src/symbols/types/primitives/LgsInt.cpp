@@ -48,3 +48,7 @@ json::value LgsInt::asJSON() {
     jsonObj["name"] = name;
     return jsonObj;
 }
+
+LgsType* LgsInt::clone() {
+    return this;
+}

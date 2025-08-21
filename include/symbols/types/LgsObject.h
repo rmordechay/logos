@@ -21,7 +21,7 @@ public:
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;
     bool hasVirtuals() const;
-    LgsObject* clone();
+    LgsObject* clone() override;
     std::string getName() override;
     std::string pname() override;
     bool equals(LgsType* other) override;

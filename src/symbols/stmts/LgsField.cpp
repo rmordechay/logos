@@ -41,7 +41,7 @@ LgsField* LgsField::clone() const {
 LgsField::~LgsField() {
     if (expr) {
         std::cout << name << std::endl;
-        delete expr;
+        freeExpr(expr);
         expr = nullptr;
     }
 }
