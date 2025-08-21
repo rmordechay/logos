@@ -1,7 +1,10 @@
 #include "cli/LgsCli.h"
+#include "cli/LgsAstCmd.h"
 #include "cli/LgsRunCmd.h"
 #include "configs/LgsDefinitions.h"
 #include "utils/LgsUtils.h"
+
+void printLgsHelp();
 
 void LgsCli::execute() const {
     if (argc < 2) {
@@ -13,10 +16,10 @@ void LgsCli::execute() const {
     const std::string cmdStr = argv[1];
     if (cmdStr == "run") {
         LgsRunCmd cmd(argc, argv);
-        cmd.run();
+        runCmd(cmd);
     } else if (cmdStr == "ast") {
-        LgsRunCmd cmd(argc, argv);
-        cmd.run();
+        LgsAstCmd cmd(argc, argv);
+        runCmd(cmd);
     } else if (cmdStr == "help") {
         printLgsHelp();
     } else if (cmdStr == "version" || cmdStr == "-v" || cmdStr == "--version") {
@@ -24,9 +27,19 @@ void LgsCli::execute() const {
     }
 }
 
+void LgsCli::runCmd(LgsCliCmd& cmd) const {
+    if (isHelpCmd()) return cmd.printHelp();
+    cmd.run();
+}
+
+bool LgsCli::isHelpCmd() const {
+    return argc > 2 && std::string(argv[2]) == "help";
+}
+
 void printLgsHelp() {
     const std::string commands[][2] = {
-        {"run", "Executes Logos script or application."},
+        {"run", runCmdHelp.summary},
+        {"ast", astCmdHelp.summary},
         {"version, -v, --version", "Prints Logos version."},
         {"help, --help", "Prints Logos help."},
     };

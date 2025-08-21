@@ -75,7 +75,9 @@ bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachin
     passBuilder.crossRegisterProxies(loopAnalyser, funcAnalyser, CGAnalyser, analysisManager);
 
     PassManager<Module, AnalysisManager<Module>> passManager;
-    passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(getOptLevel())));
+
+    std::cout << getOptLevel(appConfigs.optLevel).getSizeLevel() << std::endl;
+    passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(getOptLevel(appConfigs.optLevel))));
     passManager.run(*mainModule, analysisManager);
 
     std::error_code ec;
@@ -93,16 +95,10 @@ bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachin
     return true;
 }
 
-OptimizationLevel LgsLinker::getOptLevel() const {
-    OptimizationLevel optLevel;
-    if (appConfigs.optLevel == 0) {
-        optLevel = OptimizationLevel::O0;
-    } else if (appConfigs.optLevel == 1) {
-        optLevel = OptimizationLevel::O1;
-    } else if (appConfigs.optLevel == 2) {
-        optLevel = OptimizationLevel::O2;
-    } else if (appConfigs.optLevel == 3) {
-        optLevel = OptimizationLevel::O3;
-    }
-    return optLevel;
+OptimizationLevel LgsLinker::getOptLevel(const uint8_t level) const {
+    if (appConfigs.optLevel == level) return OptimizationLevel::O0;
+    if (appConfigs.optLevel == level) return OptimizationLevel::O1;
+    if (appConfigs.optLevel == level) return OptimizationLevel::O2;
+    if (appConfigs.optLevel == level) return OptimizationLevel::O3;
+    assert(0);
 }
