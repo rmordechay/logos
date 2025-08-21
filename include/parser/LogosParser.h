@@ -38,20 +38,20 @@ public:
     RuleObject = 11, RuleObjectBody = 12, RuleField = 13, RuleInterfaceField = 14, 
     RuleImplements = 15, RuleFuncSignatureHeader = 16, RuleFuncSignature = 17, 
     RuleInterfaceFunc = 18, RuleFunc = 19, RuleLambda = 20, RuleLambdaParams = 21, 
-    RuleMethod = 22, RuleParam = 23, RuleStatement = 24, RuleStatementsBlock = 25, 
-    RuleAssignment = 26, RuleExplicitVarDec = 27, RuleImplicitVarDec = 28, 
-    RuleIfStatement = 29, RuleElseIfStatement = 30, RuleElseStatement = 31, 
-    RulePatternMatching = 32, RulePattern = 33, RuleLoopStatement = 34, 
-    RuleBreakStmt = 35, RuleReturnStatement = 36, RuleEnumDeclaration = 37, 
-    RuleEnumField = 38, RuleCoroutine = 39, RuleDeferStmt = 40, RuleExpr = 41, 
-    RuleUnaryExpr = 42, RulePrefixExpr = 43, RulePostfixExpr = 44, RuleArrayExpr = 45, 
-    RuleHashMap = 46, RuleKeyValue = 47, RuleFuncCall = 48, RuleFuncArgList = 49, 
-    RuleFuncArg = 50, RuleInstance = 51, RuleInstanceArgList = 52, RuleInstanceArg = 53, 
-    RuleConstant = 54, RuleIterIndex = 55, RuleIndex = 56, RuleIsFirst = 57, 
-    RuleIsLast = 58, RuleSelection = 59, RuleFirstSelectionElement = 60, 
-    RuleInnerSelectionElement = 61, RuleRange = 62, RuleType = 63, RuleMapType = 64, 
-    RuleArraySize = 65, RuleFuncType = 66, RuleVector = 67, RuleExtern = 68, 
-    RuleRequireEnvVars = 69, RuleRequirePackages = 70, RuleAssignemntOp = 71
+    RuleLambdaParam = 22, RuleMethod = 23, RuleParam = 24, RuleStatement = 25, 
+    RuleStatementsBlock = 26, RuleAssignment = 27, RuleExplicitVarDec = 28, 
+    RuleImplicitVarDec = 29, RuleIfStatement = 30, RuleElseIfStatement = 31, 
+    RuleElseStatement = 32, RulePatternMatching = 33, RulePattern = 34, 
+    RuleLoopStatement = 35, RuleBreakStmt = 36, RuleReturnStatement = 37, 
+    RuleEnumDeclaration = 38, RuleEnumField = 39, RuleCoroutine = 40, RuleDeferStmt = 41, 
+    RuleExpr = 42, RuleUnaryExpr = 43, RulePrefixExpr = 44, RulePostfixExpr = 45, 
+    RuleArrayExpr = 46, RuleHashMap = 47, RuleKeyValue = 48, RuleFuncCall = 49, 
+    RuleFuncArgList = 50, RuleFuncArg = 51, RuleInstance = 52, RuleInstanceArgList = 53, 
+    RuleInstanceArg = 54, RuleConstant = 55, RuleIterIndex = 56, RuleIndex = 57, 
+    RuleIsFirst = 58, RuleIsLast = 59, RuleSelection = 60, RuleFirstSelectionElement = 61, 
+    RuleInnerSelectionElement = 62, RuleRange = 63, RuleType = 64, RuleMapType = 65, 
+    RuleArraySize = 66, RuleFuncType = 67, RuleVector = 68, RuleExtern = 69, 
+    RuleRequireEnvVars = 70, RuleRequirePackages = 71, RuleAssignemntOp = 72
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -93,6 +93,7 @@ public:
   class FuncContext;
   class LambdaContext;
   class LambdaParamsContext;
+  class LambdaParamContext;
   class MethodContext;
   class ParamContext;
   class StatementContext;
@@ -481,12 +482,8 @@ public:
   public:
     LambdaParamsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<antlr4::tree::TerminalNode *> IDENTIFIER();
-    antlr4::tree::TerminalNode* IDENTIFIER(size_t i);
-    std::vector<antlr4::tree::TerminalNode *> COLON();
-    antlr4::tree::TerminalNode* COLON(size_t i);
-    std::vector<TypeContext *> type();
-    TypeContext* type(size_t i);
+    std::vector<LambdaParamContext *> lambdaParam();
+    LambdaParamContext* lambdaParam(size_t i);
     std::vector<antlr4::tree::TerminalNode *> COMMA();
     antlr4::tree::TerminalNode* COMMA(size_t i);
 
@@ -494,6 +491,19 @@ public:
   };
 
   LambdaParamsContext* lambdaParams();
+
+  class  LambdaParamContext : public antlr4::ParserRuleContext {
+  public:
+    LambdaParamContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *IDENTIFIER();
+    antlr4::tree::TerminalNode *COLON();
+    TypeContext *type();
+
+   
+  };
+
+  LambdaParamContext* lambdaParam();
 
   class  MethodContext : public antlr4::ParserRuleContext {
   public:

@@ -85,7 +85,11 @@ lambda:
     ;
 
 lambdaParams:
-         IDENTIFIER (COLON type)? (COMMA IDENTIFIER (COLON type)?)* COMMA?
+         lambdaParam (COMMA lambdaParam)* COMMA?
+    ;
+
+lambdaParam:
+        IDENTIFIER (COLON type)?
     ;
 
 method:

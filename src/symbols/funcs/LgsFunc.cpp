@@ -120,12 +120,17 @@ void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
         ));
 }
 
-bool LgsFunc::castTo(LgsType* toType) {
+bool LgsFunc::completeType(LgsType* toType) {
     const auto otherFuncType = toType->asFuncType();
     if (!otherFuncType) return false;
-    funcType->rt = otherFuncType->rt;
+    if (otherFuncType->params.size() != funcType->params.size()) return false;
     for (int i = 0; i < funcType->params.size(); ++i) {
-        funcType->params[i].type = otherFuncType->params[i].type;
+        auto thisParam = funcType->params[i];
+        if (thisParam.type) continue;
+        thisParam.type = otherFuncType->params[i].type;
+    }
+    if (!funcType->rt) {
+        funcType->rt = otherFuncType->rt;
     }
     return true;
 }

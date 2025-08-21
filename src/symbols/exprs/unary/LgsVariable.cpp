@@ -47,13 +47,6 @@ Value* LgsVariable::hash(LgsCodeGen* codeGen) {
     }
 }
 
-bool LgsVariable::equals(LgsExpr* other) {
-    if (const auto otherVar = other->asVariable()) {
-        return ref.getSymbol() == otherVar->ref.getSymbol();
-    }
-    assert(0);
-}
-
 std::string LgsVariable::pname() {
     return name;
 }

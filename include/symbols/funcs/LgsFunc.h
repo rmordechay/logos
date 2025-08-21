@@ -28,7 +28,7 @@ public:
     void createEpilogue(LgsCodeGen* codeGen) const;
     void createIRValue(LgsCodeGen* codeGen) override;
     void createDebugValue(LgsCodeGen* codeGen) override;
-    bool castTo(LgsType* toType) override;
+    bool completeType(LgsType* toType) override;
     std::string pname() override;
     json::value asJSON() override;
     LgsExpr* clone() override;

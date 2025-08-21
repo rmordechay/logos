@@ -81,7 +81,7 @@ public:
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     void visitExpr(LgsExpr* expr);
-    void visitCast(LgsCast* castExpr);
+    void visitCast(LgsCast* lgsCast);
     void visitArrayExpr(LgsArrayExpr* array);
     void visitStaticArray(LgsArrayExpr* arrayExpr);
     void visitDynamicArray(LgsArrayExpr* array);
@@ -108,15 +108,15 @@ public:
 
     void validateObjImplements(LgsObject* obj, const std::vector<LgsType*>& interfaces);
     void validateObjInterface(LgsObject* obj, LgsInterface* interface);
-    void validateArgs(const LgsFuncCall* funcCall);
     void validateIndex(LgsIterIndex* iterIndex);
     void validateSliceBounds(LgsIterIndex* iterIndex);
     bool validateFieldVisibility(LgsField* field, const LgsObject* parent);
     bool validateMethodVisibility(LgsFuncCall* methodCall, const LgsObject* parent);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
-    void castExprToType(LgsExpr* expr, LgsType* toType);
+    void completeExprType(LgsExpr* expr, LgsType* type);
     void matchExprToType(LgsExpr* expr, LgsType* type);
+
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     bool resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);

@@ -164,6 +164,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
 void LgsSema::visitVarDec(LgsVarDec* varDec) {
     if (varDec->expr && varDec->type) {
         varDec->type = typeResolver.resolveType(varDec->type, file);
+        completeExprType(varDec->expr, varDec->type);
         visitExpr(varDec->expr);
         matchExprToType(varDec->expr, varDec->type);
     } else if (varDec->expr) {
@@ -394,15 +395,14 @@ void LgsSema::visitExpr(LgsExpr* expr) {
     }
 }
 
-void LgsSema::visitCast(LgsCast* castExpr) {
-    const auto fromValue = castExpr->fromValue;
+void LgsSema::visitCast(LgsCast* lgsCast) {
+    const auto fromValue = lgsCast->fromValue;
     if (const auto unaryExpr = dynamic_cast<LgsUnaryExpr*>(fromValue)) {
         visitUnaryExpr(unaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(fromValue)) {
         visitBinaryExpr(binaryExpr);
     }
-    castExpr->toType = typeResolver.resolveType(castExpr->toType, file);
-    castExprToType(fromValue, castExpr->toType);
+    lgsCast->toType = typeResolver.resolveType(lgsCast->toType, file);
 }
 
 void LgsSema::visitArrayExpr(LgsArrayExpr* array) {
@@ -649,7 +649,6 @@ void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
     }
     if (!resolveMethodCall(methodCall, parentType)) return;
     validateMethodVisibility(methodCall, parentType->asObject());
-    validateArgs(methodCall);
 }
 
 void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
@@ -657,8 +656,6 @@ void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {
         visitExpr(arg);
     }
     resolveFuncCall(funcCall);
-    if (!funcCall->func) return;
-    validateArgs(funcCall);
 }
 
 void LgsSema::visitPrefixExpr(LgsPrefixExpr* prefixExpr) {
@@ -742,9 +739,9 @@ void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {
     if (baseExpr->type->isUnknown()) return;
     const auto iterable = baseExpr->type->asIterable();
     if (!iterable) {
-        if (baseExpr->type)
-            errHandler.addError(E10002, &iterIndex->location,
-                                {baseExpr->pname(), baseExpr->type->pname()});
+        if (baseExpr->type) {
+            errHandler.addError(E10002, &iterIndex->location, {baseExpr->pname(), baseExpr->type->pname()});
+        }
         return;
     }
     if (exprTo) {
@@ -829,14 +826,6 @@ void LgsSema::validateObjImplements(LgsObject* obj, const std::vector<LgsType*>&
         for (const auto parentInterface : interface->interfaces) {
             validateObjInterface(obj, parentInterface->asInterface());
         }
-    }
-}
-
-void LgsSema::validateArgs(const LgsFuncCall* funcCall) {
-    for (int i = funcCall->func->funcType->isStatic; i < funcCall->args.size(); ++i) {
-        const auto arg = funcCall->args[i];
-        const auto param = funcCall->func->funcType->params[i];
-        castExprToType(arg, param.type);
     }
 }
 
@@ -999,11 +988,8 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
     return isValid;
 }
 
-void LgsSema::castExprToType(LgsExpr* expr, LgsType* toType) {
-    if (expr->type == toType) return;
-    if (!expr->castTo(toType)) {
-        errHandler.addError(E10018, &expr->location, {expr->type->pname(), toType->pname()});
-    }
+void LgsSema::completeExprType(LgsExpr* expr, LgsType* type) {
+    expr->completeType(type);
 }
 
 void LgsSema::matchExprToType(LgsExpr* expr, LgsType* type) {
@@ -1022,9 +1008,7 @@ void LgsSema::matchExprToType(LgsExpr* expr, LgsType* type) {
     if (!type || !expr->type) return;
     if (!type->equals(expr->type)) {
         errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
-        return;
     }
-    castExprToType(expr, type);
 }
 
 void LgsSema::resolveFuncCall(LgsFuncCall* funcCall) {

@@ -16,15 +16,6 @@ void LgsIntConst::setNumberType() {
     }
 }
 
-bool LgsIntConst::castTo(LgsType* toType) {
-    if (toType->asLong()) {
-        type = toType;
-        numberType = LgsNumberType::I64;
-        return true;
-    }
-    return LgsUnaryExpr::castTo(toType);
-}
-
 void LgsIntConst::createIRValue(LgsCodeGen* codeGen) {
     switch (numberType) {
     case LgsNumberType::I1:
