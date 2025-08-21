@@ -15,18 +15,22 @@ public:
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
         const auto firstArg = args.front();
         const auto strConst = firstArg->asStrConst();
-        if (strConst && !strConst->templateParts.empty()) {
-            return printFormat(codeGen, strConst);
-        }
         const auto formatStr = firstArg->type->strFormatPart() + '\n';
-        std::vector IRArgs = {codeGen->getIRStr(formatStr)};
-        if (const auto obj = firstArg->type->asObject()) {
+        std::vector<Value*> IRArgs;
+        if (strConst) {
+            if (!strConst->templateParts.empty()) {
+                return printFormat(codeGen, strConst);
+            }
+            IRArgs.emplace_back(firstArg->getIRValue(codeGen));
+        } else if (const auto obj = firstArg->type->asObject()) {
+            IRArgs.emplace_back(codeGen->getIRStr(formatStr));
             for (const auto& field : obj->fields) {
                 const auto ir = field->getIRValue(codeGen);
                 IRArgs.emplace_back(loadIRArg(codeGen, ir, field->type));
             }
         } else {
-            for (int i = 1; i < args.size(); ++i) {
+            IRArgs.emplace_back(codeGen->getIRStr(formatStr));
+            for (int i = 0; i < args.size(); ++i) {
                 const auto arg = args[i];
                 IRArgs.emplace_back(arg->getIRValue(codeGen));
             }
