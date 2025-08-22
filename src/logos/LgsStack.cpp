@@ -51,11 +51,3 @@ LgsIfStmt* LgsStack::outermostIfStmt() {
 LgsSymbolTable& LgsStack::getSymbolTable() {
     return top().symbolTable;
 }
-
-void LgsStack::addHeapAllocExpr(LgsExpr* expr) {
-    currentFunc()->heapAllocExprs.push_back(expr);
-}
-
-bool LgsStack::isRootScope() const {
-    return size() == 1;
-}

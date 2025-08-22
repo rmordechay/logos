@@ -15,7 +15,6 @@ public:
     LgsStmtsBlock* stmtsBlock = nullptr;
     std::vector<LgsExpr*> heapAllocExprs;
     BasicBlock* cleanupBlock = nullptr;
-    LgsReturn* returnExpr = nullptr;
     bool hasDefers = false;
 
     explicit LgsFunc(const std::string& name, LgsType* rt = nullptr, const std::vector<LgsType*>& paramTypes = {}, const uint32_t ops = 0) {
@@ -30,6 +29,7 @@ public:
     static Value* loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type);
     void createPrologue(LgsCodeGen* codeGen);
     void createEpilogue(LgsCodeGen* codeGen);
+    void freeHeap(LgsCodeGen* codeGen) const;
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops);
     bool needsCleanup() const;
     void cleanupExprs(LgsCodeGen* codeGen);

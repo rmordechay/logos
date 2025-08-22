@@ -163,14 +163,13 @@ void LgsApp::writeIRFiles() {
     for (const auto file : ast) {
         const auto module = file->codeGen.IRModule;
         if (!module) continue;
-        if (verifyModule(*module, &errs())) {
-            errHandler.setUnsuccessful();
-            module->print(outs(), nullptr);
-            continue;
-        }
         if constexpr (LOG_LEVEL == DEBUG) {
             module->print(outs(), nullptr);
             logInfo(LGS_MSG_LINE_SEPERATOR);
+        }
+        if (verifyModule(*module, &errs())) {
+            errHandler.setUnsuccessful();
+            continue;
         }
         if constexpr (WRITE_IR_TO_FILE) {
             const auto filePath = (paths.buildIR / module->getName().str()).string() + ".ll";

@@ -1,3 +1,4 @@
+#include "configs/LgsConfig.h"
 #include "exprs/unary/LgsVectorExpr.h"
 #include "stmts/LgsField.h"
 #include "types/LgsCPtr.h"
@@ -44,6 +45,10 @@ bool LgsType::addField(LgsField* field) {
     if (methods.find(field->name) != methods.end()) return false;
     fields.push_back(field);
     return true;
+}
+
+bool LgsType::isBig() {
+    return (asObject() || asDArray()) && getSizeBytes() >= BIG_SIZE_THRESHOLD;
 }
 
 void LgsType::freeValue(LgsCodeGen* codeGen, Value* value) {}

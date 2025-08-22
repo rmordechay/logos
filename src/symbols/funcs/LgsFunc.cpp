@@ -93,8 +93,36 @@ void LgsFunc::createEpilogue(LgsCodeGen* codeGen) {
     if (hasDefers) codeGen->callDefers();
     if (needsCleanup()) {
         cleanupExprs(codeGen);
+    } else {
+        codeGen->callPopStack();
     }
-    codeGen->callPopStack();
+}
+
+void LgsFunc::cleanupExprs(LgsCodeGen* codeGen) {
+    codeGen->branchAndStartBlock(getCleanupBlock(codeGen));
+    const auto func = codeGen->stack.currentFunc();
+    if (!func->returnStmts.empty()) {
+        auto rt = func->funcType->rt->getIRType(codeGen);
+        if (func->funcType->rt->asDArray()) {
+            rt = rt->getPointerTo();
+        }
+        const auto phi = codeGen->builder.CreatePHI(rt, func->returnStmts.size());
+        for (const auto returnStmt : func->returnStmts) {
+            phi->addIncoming(returnStmt->expr->getIRValue(codeGen), returnStmt->parentBlock);
+        }
+        codeGen->callPopStack();
+        freeHeap(codeGen);
+        codeGen->builder.CreateRet(phi);
+    } else {
+        codeGen->callPopStack();
+        freeHeap(codeGen);
+    }
+}
+
+void LgsFunc::freeHeap(LgsCodeGen* codeGen) const {
+    for (const auto expr : heapAllocExprs) {
+        expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
+    }
 }
 
 void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops) {
@@ -113,30 +141,6 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
 
 bool LgsFunc::needsCleanup() const {
     return !heapAllocExprs.empty();
-}
-
-void LgsFunc::cleanupExprs(LgsCodeGen* codeGen) {
-    codeGen->branchAndStartBlock(getCleanupBlock(codeGen));
-    const auto currentFunc = codeGen->stack.currentFunc();
-    if (returnExpr && codeGen->stack.isRootScope()) {
-        const auto IRReturnType = currentFunc->funcType->rt->getIRType(codeGen);
-        const auto returnPhiNode = codeGen->builder.CreatePHI(IRReturnType, currentFunc->returnStmts.size());
-        for (const auto returnStmt : currentFunc->returnStmts) {
-            returnPhiNode->addIncoming(returnStmt->expr->getIRValue(codeGen), returnStmt->parentBlock);
-        }
-        for (const auto expr : heapAllocExprs) {
-            expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
-        }
-        codeGen->builder.CreateRet(returnPhiNode);
-    } else {
-        for (const auto expr : heapAllocExprs) {
-            expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
-        }
-        if (returnExpr) {
-            // const auto stmtsBlock = codeGen->stack.parentBlock();
-            // codeGen->builder.CreateBr(stmtsBlock->getCleanupBlock(codeGen));
-        }
-    }
 }
 
 BasicBlock* LgsFunc::getCleanupBlock(LgsCodeGen* codeGen) {

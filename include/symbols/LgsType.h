@@ -92,5 +92,6 @@ public:
     bool isVector();
     bool isVoid();
     bool isUnknown();
+    bool isBig();
     virtual ~LgsType();
 };

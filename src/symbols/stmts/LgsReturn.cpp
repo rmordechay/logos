@@ -9,11 +9,7 @@ void LgsReturn::createIRValue(LgsCodeGen* codeGen) {
     const auto withCleanup = currentStmtsBlock->needsCleanup();
     if (withCleanup) {
         const auto cleanupBlock = currentStmtsBlock->getCleanupBlock(codeGen);
-        if (codeGen->stack.isRootScope()) {
-            parentBlock = codeGen->builder.GetInsertBlock();
-        } else {
-            parentBlock = cleanupBlock;
-        }
+        parentBlock = codeGen->builder.GetInsertBlock();
         codeGen->builder.CreateBr(cleanupBlock);
     } else {
         if (currentFunc->funcType->rt->isVoid()) {
