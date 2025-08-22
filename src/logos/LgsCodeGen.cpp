@@ -1,5 +1,4 @@
 #include "logos/LgsCodeGen.h"
-#include "configs/LgsConfig.h"
 #include "configs/LgsDefinitions.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
@@ -168,7 +167,7 @@ Value* LgsCodeGen::callSnprintf(const std::vector<Value*>& args) {
 }
 
 Value* LgsCodeGen::callSleep(Value* time) {
-    const auto ft = FunctionType::get(voidTy(), {sizeTy()}, false);
+    const auto ft = FunctionType::get(i32Ty(), {i32Ty()}, false);
     return callFunc("sleep", ft, {time});
 }
 
@@ -215,6 +214,10 @@ void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
     builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
 }
 
+void LgsCodeGen::callRuntimeInit() {
+    callLgsFunc("Runtime_init", FunctionType::get(voidTy(), false));
+}
+
 void LgsCodeGen::callStackPush() {
     callLgsFunc("Stack_push", FunctionType::get(voidTy(), false));
 }
@@ -249,40 +252,16 @@ void LgsCodeGen::addCoro(Value* coroPtr, Value* ctx) {
     callLgsFunc("Stack_addCoro", ft, {coroPtr, ctx});
 }
 
-Value* LgsCodeGen::callCoroIDFunc() {
-    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_id);
-    return builder.CreateCall(func, {i32Zero(), null(), null(), null()});
+void LgsCodeGen::callSpawn(Value* task, Value* ctx) {
+    callLgsFunc("Scheduler_yield", FunctionType::get(voidTy(), false), {task, ctx});
 }
 
-Value* LgsCodeGen::callSuspendFunc() {
-    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_suspend);
-    return builder.CreateCall(func, {ConstantTokenNone::get(context), builder.getFalse()});
+void LgsCodeGen::callYield() {
+    callLgsFunc("Scheduler_yield", FunctionType::get(voidTy(), false), {});
 }
 
-Value* LgsCodeGen::callResumeFunc(Value* handle) {
-    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_resume);
-    return builder.CreateCall(func, {handle});
-}
-
-Value* LgsCodeGen::callCoroSizeFunc() {
-    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_size, {i32Ty()});
-    return builder.CreateCall(func);
-}
-
-Value* LgsCodeGen::callCoroBeginFunc(Value* coroID, Value* frameSize) {
-    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_begin);
-    const auto sizeValue = builder.CreateMalloc(i32Ty(), i8Ty(), frameSize, nullptr);
-    return builder.CreateCall(func, {coroID, sizeValue});
-}
-
-Value* LgsCodeGen::callCoroEndFunc(Value* handle) {
-    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_end);
-    return builder.CreateCall(func, {handle, builder.getFalse(), ConstantTokenNone::get(context)});
-}
-
-Value* LgsCodeGen::callCoroDestroyFunc(Value* handle) {
-    const auto func = Intrinsic::getDeclaration(IRModule, Intrinsic::coro_destroy);
-    return builder.CreateCall(func, {handle});
+void LgsCodeGen::callShutdown() {
+    callLgsFunc("Scheduler_shutdown", FunctionType::get(voidTy(), false), {});
 }
 
 Value* LgsCodeGen::callHashStr(Value* value) {

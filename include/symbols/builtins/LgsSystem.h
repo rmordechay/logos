@@ -5,6 +5,8 @@
 #include "types/LgsObject.h"
 #include "types/LgsStr.h"
 #include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsUInt.h"
+
 #include <types/LgsVoid.h>
 
 class LgsSystemPid final : public LgsFunc {
@@ -19,9 +21,10 @@ public:
 class LgsSystemSleep final : public LgsFunc {
 public:
     static constexpr auto name = "sleep";
-    explicit LgsSystemSleep(LgsType* parent): LgsFunc(name, &LGS_VOID, {parent, &LGS_LONG}, PUBLIC | STATIC | INTERNAL | METHOD ) {}
+    explicit LgsSystemSleep(LgsType* parent): LgsFunc(name, &LGS_VOID, {parent, &LGS_INT}, PUBLIC | STATIC | INTERNAL | METHOD ) {}
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
-        return codeGen->callSleep(args[1]->getIRValue(codeGen));
+        const auto arg = loadIRArg(codeGen, args[1]->getIRValue(codeGen), args[1]->type);
+        return codeGen->callSleep(arg);
     }
 };
 

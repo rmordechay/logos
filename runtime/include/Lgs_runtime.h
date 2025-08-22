@@ -6,4 +6,6 @@ struct Lgs_runtime {
     Lgs_Stack stack;
     Lgs_Scheduler scheduler;
     std::map<void*, std::map<std::string, void*>> vtable;
+
+    void init();
 };

@@ -6,7 +6,7 @@ using Yield = std::function<void()>;
 thread_local Yield tlsYield;
 std::atomic preempt{false};
 
-static void init() {
+static void initSignals() {
     struct sigaction sa{};
     const auto onTick = [](int) {
         preempt.store(true, std::memory_order_relaxed);
@@ -25,7 +25,7 @@ static void init() {
 }
 
 void Lgs_Scheduler::run() {
-    init();
+    initSignals();
     while (!queue.empty()) {
         auto c = std::move(queue.front());
         queue.pop_front();

@@ -7,6 +7,7 @@
 void LgsMainFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, stmtsBlock);
     createPrologue(codeGen);
+    codeGen->callRuntimeInit();
     if (!funcType->params.empty()) initMainArgs(codeGen);
     stmtsBlock->createIRValue(codeGen);
     createEpilogue(codeGen);

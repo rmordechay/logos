@@ -72,6 +72,7 @@ public:
     Value* callStrLen(Value* str);
     Value* callSqrt(Value* radicant);
     void callCopyMem(Value* src, Value* dest, size_t n);
+    void callRuntimeInit();
 
     // Runtime
     void callStackPush();
@@ -83,13 +84,9 @@ public:
 
     // Coroutines
     void addCoro(Value* coroPtr, Value* ctx);
-    Value* callCoroIDFunc();
-    Value* callSuspendFunc();
-    Value* callResumeFunc(Value* handle);
-    Value* callCoroSizeFunc();
-    Value* callCoroBeginFunc(Value* coroID, Value* frameSize);
-    Value* callCoroEndFunc(Value* handle);
-    Value* callCoroDestroyFunc(Value* handle);
+    void callSpawn(Value* task, Value* ctx);
+    void callYield();
+    void callShutdown();
 
     // Internal
     Value* callHashStr(Value* value);
