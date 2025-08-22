@@ -3,6 +3,7 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "stmts/LgsReturn.h"
 #include "types/LgsFuncType.h"
 #include "types/LgsVoid.h"
 
@@ -95,8 +96,11 @@ void LgsFunc::createPrologue(LgsCodeGen* codeGen) {
     codeGen->callStackPush();
 }
 
-void LgsFunc::createEpilogue(LgsCodeGen* codeGen) const {
+void LgsFunc::createEpilogue(LgsCodeGen* codeGen) {
     if (hasDefers) codeGen->callDefers();
+    if (needsCleanup()) {
+        cleanupExprs(codeGen);
+    }
     codeGen->callPopStack();
 }
 
@@ -105,6 +109,40 @@ void LgsFunc::createIRValue(LgsCodeGen* codeGen) {
     generateIR(codeGen);
     codeGen->builder.restoreIP(codeGen->savedIP);
     IRValue = getIRFunc(codeGen);
+}
+
+void LgsFunc::cleanupExprs(LgsCodeGen* codeGen) {
+    codeGen->branchAndStartBlock(getCleanupBlock(codeGen));
+    const auto currentFunc = codeGen->stack.currentFunc();
+    if (returnExpr && codeGen->stack.isRootScope()) {
+        const auto IRReturnType = currentFunc->funcType->rt->getIRType(codeGen);
+        const auto returnPhiNode = codeGen->builder.CreatePHI(IRReturnType, currentFunc->returnStmts.size());
+        for (const auto returnStmt : currentFunc->returnStmts) {
+            returnPhiNode->addIncoming(returnStmt->expr->getIRValue(codeGen), returnStmt->parentBlock);
+        }
+        for (const auto expr : heapAllocExprs) {
+            expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
+        }
+        codeGen->builder.CreateRet(returnPhiNode);
+    } else {
+        for (const auto expr : heapAllocExprs) {
+            expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
+        }
+        if (returnExpr) {
+            // const auto stmtsBlock = codeGen->stack.parentBlock();
+            // codeGen->builder.CreateBr(stmtsBlock->getCleanupBlock(codeGen));
+        }
+    }
+}
+
+bool LgsFunc::needsCleanup() const {
+    return !heapAllocExprs.empty();
+}
+
+BasicBlock* LgsFunc::getCleanupBlock(LgsCodeGen* codeGen) {
+    if (cleanupBlock) return cleanupBlock;
+    cleanupBlock = codeGen->createBlock(BLOCK_NAME_CLEANUP);
+    return cleanupBlock;
 }
 
 void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {

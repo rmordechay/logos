@@ -26,7 +26,6 @@ public:
     LgsIfStmt* currentIfStmt();
     LgsStmtsBlock* currentStmtsBlock();
     LgsIfStmt* outermostIfStmt();
-    LgsStmtsBlock* parentBlock() const;
     LgsSymbolTable& getSymbolTable();
     void addHeapAllocExpr(LgsExpr* expr);
     bool isRootScope() const;

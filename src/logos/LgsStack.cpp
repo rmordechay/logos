@@ -52,16 +52,12 @@ LgsStmtsBlock* LgsStack::currentStmtsBlock() {
     return top().stmtsBlock;
 }
 
-LgsStmtsBlock* LgsStack::parentBlock() const {
-    return this->c[this->size() - 2].stmtsBlock;
-}
-
 LgsSymbolTable& LgsStack::getSymbolTable() {
     return top().symbolTable;
 }
 
 void LgsStack::addHeapAllocExpr(LgsExpr* expr) {
-    currentStmtsBlock()->heapAllocExprs.push_back(expr);
+    currentFunc()->heapAllocExprs.push_back(expr);
 }
 
 bool LgsStack::isRootScope() const {

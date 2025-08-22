@@ -56,7 +56,7 @@ public:
     Value* callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
     Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy);
-    Value* getThunkCtxValue(const LgsFuncCall* fc, Type* ctxTy);
+    Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy);
     Type* getThunkCtxType(const LgsFuncCall* fc);
 
     // System

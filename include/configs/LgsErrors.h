@@ -92,3 +92,5 @@ inline LgsBaseError E10069{.msg = "Too many scalars passed to '%s'.", .errCode =
 inline LgsBaseError E10070{.msg = "Invalid scalars '%s' for '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10071{.msg = "'break if' must be inside an if statement.", .errCode = errCodeStart++};
 inline LgsBaseError E10072{.msg = "Type '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10078{.msg = "Type '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10079{.msg = "Defer functions must return 'Void'. Given: '%s'.", .errCode = errCodeStart++};

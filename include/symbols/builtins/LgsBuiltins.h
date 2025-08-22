@@ -8,20 +8,18 @@
 class LgsPrint final : public LgsFunc {
 public:
     static constexpr auto name = "print";
-    explicit LgsPrint(): LgsFunc(name, &LGS_INT, {&LGS_ANY, &LGS_ANY}, PUBLIC | VARIADIC) {
-        funcType->IRName = "printf";
-    }
+    explicit LgsPrint(): LgsFunc(name, &LGS_VOID, {&LGS_ANY, &LGS_ANY}, PUBLIC | VARIADIC) {}
 
     Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
-        const auto firstArg = args.front();
-        const auto strConst = firstArg->asStrConst();
-        const auto formatStr = firstArg->type->strFormatPart() + '\n';
         std::vector<Value*> IRArgs;
-        if (strConst) {
+        const auto firstArg = args.front();
+        const auto formatStr = firstArg->type->strFormatPart() + '\n';
+        if (const auto strConst = firstArg->asStrConst()) {
             if (!strConst->templateParts.empty()) {
                 return printFormat(codeGen, strConst);
             }
-            IRArgs.emplace_back(firstArg->getIRValue(codeGen));
+            LgsStrConst withNewLine(strConst->value + '\n');
+            IRArgs.emplace_back(withNewLine.getIRValue(codeGen));
         } else if (const auto obj = firstArg->type->asObject()) {
             IRArgs.emplace_back(codeGen->getIRStr(formatStr));
             for (const auto& field : obj->fields) {

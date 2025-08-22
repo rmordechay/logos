@@ -78,7 +78,7 @@ public:
     void visitReturnStmt(LgsReturn* returnStmt);
     void visitContinueStmt(LgsContinue* continueStmt);
     void visitBreakStmt(LgsBreak* breakStmt);
-    void visitDeferStmt(const LgsDeferStmt* deferStmt);
+    void visitDeferStmt(LgsDeferStmt* deferStmt);
     void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
     void visitExpr(LgsExpr* expr);
     void visitCast(LgsCast* lgsCast);

@@ -10,7 +10,7 @@ json::value LgsCoroutine::asJSON() {
 void LgsCoroutine::createIRValue(LgsCodeGen* codeGen) {
     const auto fc = funcCall ? funcCall : selection->lastExpr()->asFuncCall();
     const auto ctxTy = codeGen->getThunkCtxType(fc);
-    const auto ctx = codeGen->getThunkCtxValue(fc, ctxTy);
+    const auto ctx = codeGen->getThunkCtx(fc, ctxTy);
     const auto func = codeGen->getThunkFunc(fc, ctxTy);
     codeGen->addCoro(func, ctx);
 }

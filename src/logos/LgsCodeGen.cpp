@@ -133,7 +133,7 @@ Function* LgsCodeGen::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) {
     return func;
 }
 
-Value* LgsCodeGen::getThunkCtxValue(const LgsFuncCall* fc, Type* ctxTy) {
+Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) {
     if (fc->args.empty()) return null();
     const auto ctx = builder.CreateAlloca(ctxTy);
     for (int i = 0; i < fc->args.size(); i++) {

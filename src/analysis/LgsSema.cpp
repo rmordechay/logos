@@ -374,9 +374,13 @@ void LgsSema::visitBreakStmt(LgsBreak* breakStmt) {
     }
 }
 
-void LgsSema::visitDeferStmt(const LgsDeferStmt* deferStmt) {
+void LgsSema::visitDeferStmt(LgsDeferStmt* deferStmt) {
     if (deferStmt->funcCall) visitFuncCall(deferStmt->funcCall);
     else visitSelection(deferStmt->selection);
+    const auto deferType = deferStmt->funcCall ? deferStmt->funcCall->type : deferStmt->selection->type;
+    if (!deferType->isVoid()) {
+        errHandler.addError(E10079, &deferStmt->location, {deferType->pname()});
+    }
     stack.currentFunc()->hasDefers = true;
 }
 

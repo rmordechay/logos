@@ -13,6 +13,9 @@ public:
     LgsFuncType* funcType;
     std::vector<LgsReturn*> returnStmts;
     LgsStmtsBlock* stmtsBlock = nullptr;
+    std::vector<LgsExpr*> heapAllocExprs;
+    BasicBlock* cleanupBlock = nullptr;
+    LgsReturn* returnExpr = nullptr;
     bool hasDefers = false;
 
     explicit LgsFunc(const std::string& name, LgsType* rt = nullptr, const std::vector<LgsType*>& paramTypes = {}, const uint32_t ops = 0) {
@@ -25,8 +28,11 @@ public:
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops);
     Value* callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args = {});
     void createPrologue(LgsCodeGen* codeGen);
-    void createEpilogue(LgsCodeGen* codeGen) const;
+    void createEpilogue(LgsCodeGen* codeGen);
     void createIRValue(LgsCodeGen* codeGen) override;
+    bool needsCleanup() const;
+    void cleanupExprs(LgsCodeGen* codeGen);
+    BasicBlock* getCleanupBlock(LgsCodeGen* codeGen);
     void createDebugValue(LgsCodeGen* codeGen) override;
     bool completeType(LgsType* toType) override;
     std::string pname() override;
