@@ -7,6 +7,7 @@ class LgsRunCmd final : public LgsCliCmd {
 public:
     LgsRunCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
     void run() override;
+    std::string joinArgs() const;
     LgsCliCmdHelp& getHelp() override;
 };
 

@@ -75,8 +75,8 @@ bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachin
     passBuilder.crossRegisterProxies(loopAnalyser, funcAnalyser, CGAnalyser, analysisManager);
 
     PassManager<Module, AnalysisManager<Module>> passManager;
-
-    passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(getOptLevel(appConfigs.optLevel))));
+    const auto optLevel = getOptLevel(appConfigs.optLevel);
+    passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(optLevel)));
     passManager.run(*mainModule, analysisManager);
 
     std::error_code ec;
