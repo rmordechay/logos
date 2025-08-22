@@ -37,6 +37,7 @@ public:
     virtual llvm::Value* subIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
     virtual llvm::Value* mulIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
     virtual llvm::Value* divIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* inIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
     virtual llvm::Value* modIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
     virtual llvm::Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;
     virtual llvm::Value* neIR(LgsCodeGen* codeGen, LgsExpr* other) = 0;

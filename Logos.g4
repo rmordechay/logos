@@ -193,6 +193,7 @@ expr:
     |   left=expr op=(AND | OR) right=expr
     |   left=expr op=(AMPERSAND | CARET | PIPE) right=expr
     |   left=expr op=(DOUBLE_LANGLE | DOUBLE_RANGLE) right=expr
+    |   left=expr op=IN right=expr
     ;
 
 unaryExpr:

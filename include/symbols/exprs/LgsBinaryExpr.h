@@ -20,6 +20,7 @@ enum LgsOperator {
     BIT_XOR,
     LSHIFT,
     RSHIFT,
+    IN,
     NOOP,
 };
 
@@ -37,6 +38,7 @@ public:
     llvm::Value* mulIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     llvm::Value* subIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     llvm::Value* divIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    llvm::Value* inIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     llvm::Value* modIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     llvm::Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     llvm::Value* neIR(LgsCodeGen* codeGen, LgsExpr* other) override;

@@ -27,6 +27,10 @@ Value* LgsUnaryExpr::divIR(LgsCodeGen* codeGen, LgsExpr* other) {
     return codeGen->builder.CreateSDiv(l, r);
 }
 
+Value* LgsUnaryExpr::inIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    assert(0);
+}
+
 Value* LgsUnaryExpr::modIR(LgsCodeGen* codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(codeGen, other);
     return codeGen->builder.CreateSRem(l, r);
@@ -90,7 +94,7 @@ Value* LgsUnaryExpr::lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) {
     assert(0);
 }
 
-std::tuple<Value*, Value*> LgsUnaryExpr::loadExprs(LgsCodeGen* codeGen, LgsExpr* rExpr) {
+std::pair<Value*, Value*> LgsUnaryExpr::loadExprs(LgsCodeGen* codeGen, LgsExpr* rExpr) {
     auto l = this->getIRValue(codeGen);
     auto r = rExpr->getIRValue(codeGen);
     if (l->getType()->isPointerTy()) {
@@ -99,5 +103,5 @@ std::tuple<Value*, Value*> LgsUnaryExpr::loadExprs(LgsCodeGen* codeGen, LgsExpr*
     if (r->getType()->isPointerTy()) {
         r = codeGen->builder.CreateLoad(rExpr->type->getIRType(codeGen), r);
     }
-    return std::tuple(l, r);
+    return std::pair(l, r);
 }

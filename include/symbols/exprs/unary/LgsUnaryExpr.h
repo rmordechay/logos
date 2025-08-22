@@ -11,6 +11,7 @@ public:
     Value* subIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* mulIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* divIR(LgsCodeGen* codeGen, LgsExpr* other) override;
+    Value* inIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* modIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* eqIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* neIR(LgsCodeGen* codeGen, LgsExpr* other) override;
@@ -25,6 +26,6 @@ public:
     Value* bitXorIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* rshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
     Value* lshiftIR(LgsCodeGen* codeGen, LgsExpr* other) override;
-    std::tuple<Value*, Value*> loadExprs(LgsCodeGen* codeGen, LgsExpr* rExpr);
+    std::pair<Value*, Value*> loadExprs(LgsCodeGen* codeGen, LgsExpr* rExpr);
 };
 

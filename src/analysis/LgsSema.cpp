@@ -443,21 +443,36 @@ void LgsSema::visitBinaryExpr(LgsBinaryExpr* binaryExpr) {
     visitExpr(binaryExpr->right);
     LgsType* type = nullptr;
     switch (binaryExpr->op) {
-    case ADD: case SUB: case MUL: case DIV:
-    case MOD: case BIT_AND: case BIT_OR: case BIT_XOR:
-    case LSHIFT: case RSHIFT: {
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+    case MOD:
+    case BIT_AND:
+    case BIT_OR:
+    case BIT_XOR:
+    case LSHIFT:
+    case RSHIFT: {
         const auto lType = binaryExpr->left->type;
         const auto rType = binaryExpr->right->type;
         if (!lType || !rType) return;
         type = lType;
         break;
     }
-    case AND: case OR: case NE: case EQ:
-    case LT: case GT: case GE:case LE: {
+    case AND:
+    case OR:
+    case NE:
+    case EQ:
+    case LT:
+    case GT:
+    case GE:
+    case LE:
+    case IN: {
         type = &LGS_BOOL;
         break;
     }
-    case NOOP: break;
+    case NOOP:
+        break;
     }
     binaryExpr->setType(type);
 }

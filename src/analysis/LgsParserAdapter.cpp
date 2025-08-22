@@ -748,6 +748,7 @@ LgsOperator mapOperator(LogosParser::ExprContext* expr) {
     if (expr->DOUBLE_LANGLE()) return LSHIFT;
     if (expr->DOUBLE_RANGLE()) return RSHIFT;
     if (expr->CARET()) return BIT_XOR;
+    if (expr->IN()) return IN;
     assert(false);
 }
 

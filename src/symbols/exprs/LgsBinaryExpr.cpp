@@ -19,6 +19,9 @@ void LgsBinaryExpr::createIRValue(LgsCodeGen* codeGen) {
     case DIV:
         IRValue = left->divIR(codeGen, right);
         break;
+    case IN:
+        IRValue = left->inIR(codeGen, right);
+        break;
     case MOD:
         IRValue = left->modIR(codeGen, right);
         break;
@@ -80,6 +83,10 @@ Value* LgsBinaryExpr::mulIR(LgsCodeGen* codeGen, LgsExpr* other) {
 
 Value* LgsBinaryExpr::divIR(LgsCodeGen* codeGen, LgsExpr* other) {
     return left->divIR(codeGen, right);
+}
+
+Value* LgsBinaryExpr::inIR(LgsCodeGen* codeGen, LgsExpr* other) {
+    return left->inIR(codeGen, right);
 }
 
 Value* LgsBinaryExpr::modIR(LgsCodeGen* codeGen, LgsExpr* other)  {

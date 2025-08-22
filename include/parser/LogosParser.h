@@ -826,6 +826,7 @@ public:
     antlr4::tree::TerminalNode *PIPE();
     antlr4::tree::TerminalNode *DOUBLE_LANGLE();
     antlr4::tree::TerminalNode *DOUBLE_RANGLE();
+    antlr4::tree::TerminalNode *IN();
 
    
   };

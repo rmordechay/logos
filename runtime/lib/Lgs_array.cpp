@@ -60,6 +60,19 @@ extern "C" bool Lgs_DArray_isNotEmpty(const Lgs_Array* arr) {
     return !arr->data->empty();
 }
 
+extern "C" bool Lgs_DArray_contains(const Lgs_Array* arr, const void* value) {
+    if (!arr || !arr->data || arr->data->empty()) return false;
+    const size_t len = arr->data->size() / arr->elementSize;
+    const char* base = arr->data->data();
+    for (size_t i = 0; i < len; ++i) {
+        const void* elem = base + i * arr->elementSize;
+        if (std::memcmp(elem, value, arr->elementSize) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 extern "C" void Lgs_DArray_free(const Lgs_Array* arr) {
     delete arr->data;
 }
