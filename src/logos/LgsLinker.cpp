@@ -76,7 +76,6 @@ bool LgsLinker::generateObjFile(std::unique_ptr<Module> mainModule, TargetMachin
 
     PassManager<Module, AnalysisManager<Module>> passManager;
 
-    std::cout << getOptLevel(appConfigs.optLevel).getSizeLevel() << std::endl;
     passManager.addPass(std::move(passBuilder.buildPerModuleDefaultPipeline(getOptLevel(appConfigs.optLevel))));
     passManager.run(*mainModule, analysisManager);
 

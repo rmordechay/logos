@@ -107,6 +107,9 @@ void LgsSema::visitFunc(LgsFunc* func) {
         }
         defaultParamsStarted = !!param.expr;
     }
+    if (!func->funcType->rt) {
+        func->funcType->rt = &LGS_VOID;
+    }
     visitStmtsBlock(func->stmtsBlock);
     if (func->funcType->isVariadic && func->funcType->hasDefaults) {
         errHandler.addError(E10043, &func->location);

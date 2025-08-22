@@ -4,6 +4,8 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "types/LgsFuncType.h"
+#include "types/LgsVoid.h"
+
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 
@@ -125,9 +127,8 @@ bool LgsFunc::completeType(LgsType* toType) {
     if (!otherFuncType) return false;
     if (otherFuncType->params.size() != funcType->params.size()) return false;
     for (int i = 0; i < funcType->params.size(); ++i) {
-        auto thisParam = funcType->params[i];
-        if (thisParam.type) continue;
-        thisParam.type = otherFuncType->params[i].type;
+        if (funcType->params[i].type) continue;
+        funcType->params[i].type = otherFuncType->params[i].type;
     }
     if (!funcType->rt) {
         funcType->rt = otherFuncType->rt;

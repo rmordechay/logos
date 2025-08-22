@@ -229,7 +229,7 @@ LgsMainFunc* LgsParserAdapter::getMainFunc(LogosParser::FuncContext* ctx) {
 LgsFunc* LgsParserAdapter::getLambda(LogosParser::LambdaContext* ctx) {
     const auto func = new LgsFunc(LGS_ANONYMOUS_STR);
     func->funcType->isLambda = true;
-    func->funcType->rt = getFuncReturnType(ctx->rt);
+    func->funcType->rt = getType(ctx->rt);
     if (const auto singleParam = ctx->IDENTIFIER()) {
         auto lgsParam = LgsParam(nullptr, singleParam->getText());
         setLocation(lgsParam.location, singleParam->getSymbol());
