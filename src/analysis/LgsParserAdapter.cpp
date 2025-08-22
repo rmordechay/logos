@@ -1,5 +1,4 @@
 #include "analysis/LgsParserAdapter.h"
-#include "analysis/LgsParserAdapter.h"
 #include "funcs/LgsCoroutine.h"
 #include "files/LgsEnvFile.h"
 #include "files/LgsInterfaceFile.h"
@@ -306,7 +305,8 @@ LgsInterface* LgsParserAdapter::getInterface(LogosParser::InterfaceBodyContext* 
     }
 
     for (const auto& interfaceFunc : ctx->interfaceFunc()) {
-        const auto self = LgsParam(interface, LGS_SELF);
+        auto self = LgsParam(interface, LGS_SELF);
+        self.isSelf = true;
         const auto type = getFuncReturnType(interfaceFunc->type());
         const auto funcName = interfaceFunc->funcSignatureHeader()->IDENTIFIER();
         const auto func = new LgsFunc(funcName->getText(), type);

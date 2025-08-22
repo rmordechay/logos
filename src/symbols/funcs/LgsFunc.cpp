@@ -20,13 +20,17 @@ Value* LgsFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
     if (funcType->hasDefaults) assert(0);
     std::vector<Value*> IRArgs;
     for (int i = funcType->isStatic; i < funcType->params.size(); ++i) {
-        const auto arg = args[i];
+        auto arg = args[i];
         const auto& param = funcType->params[i];
-        const auto argToParam = arg->castTo(param.type);
-        auto v = argToParam->getIRValue(codeGen);
+        if (!param.isSelf) {
+            arg = arg->castTo(param.type);
+        }
+        auto v = arg->getIRValue(codeGen);
         v = loadIRArg(codeGen, v, arg->type);
         IRArgs.push_back(v);
-        freeExpr(argToParam);
+        if (!param.isSelf && args[i] != arg) {
+            freeExpr(arg);
+        }
     }
     return callIR(codeGen, IRArgs);
 }

@@ -52,6 +52,32 @@ Value* LgsVariable::hash(LgsCodeGen* codeGen) {
     }
 }
 
+LgsExpr* LgsVariable::castTo(LgsType* toType) {
+    switch (ref.symbolType) {
+    case VAR_DEC:
+        break;
+    case PARAM:
+        break;
+    case ENUM_FIELD:
+        break;
+    case FUNC:
+        break;
+    case OBJECT:
+        break;
+    case INTERFACE:
+        break;
+    case GROUP:
+        break;
+    case ENUM:
+        break;
+    case TABLE:
+        break;
+    case UNKNOWN:
+        break;
+    }
+    return this;
+}
+
 std::string LgsVariable::pname() {
     return name;
 }

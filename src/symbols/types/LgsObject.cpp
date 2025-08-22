@@ -2,6 +2,7 @@
 #include "exprs/unary/LgsInstance.h"
 #include "stmts/LgsField.h"
 #include "types/LgsGroup.h"
+#include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 
 Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
@@ -119,9 +120,17 @@ std::string LgsObject::pname() {
 }
 
 bool LgsObject::canCastTo(LgsType* other) {
-    if (const auto group = other->asGroup()) {
-        for (const auto groupType : group->types) {
-            if (name == groupType->getName()) {
+    if (const auto otherInterface = other->asInterface()) {
+        for (const auto objInterface : interfaces) {
+            if (objInterface->getName() == otherInterface->name) {
+                return true;
+            }
+        }
+        return false;
+    }
+    if (const auto otherGroup = other->asGroup()) {
+        for (const auto otherGroupType : otherGroup->types) {
+            if (name == otherGroupType->getName()) {
                 return true;
             }
         }
