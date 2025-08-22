@@ -33,11 +33,11 @@ public:
                 IRArgs.emplace_back(arg->getIRValue(codeGen));
             }
         }
-        return codeGen->callLgsFunc(name, FunctionType::get(codeGen->voidTy(), {codeGen->ptrTy()}, true), IRArgs);
+        return codeGen->callLgsFunc(name, codeGen->getFT(codeGen->voidTy(), {codeGen->ptrTy()}, true), IRArgs);
     }
 
     Function* getIRFunc(LgsCodeGen* codeGen) override {
-        const auto ft = FunctionType::get(codeGen->i32Ty(), {codeGen->ptrTy()}, true);
+        const auto ft = codeGen->getFT(codeGen->i32Ty(), {codeGen->ptrTy()}, true);
         return codeGen->getFunc("printf", ft);
     }
 

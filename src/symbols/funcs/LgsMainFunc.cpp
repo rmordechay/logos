@@ -7,7 +7,7 @@
 void LgsMainFunc::generateIR(LgsCodeGen* codeGen) {
     codeGen->stack.enterScope(this, stmtsBlock);
     createPrologue(codeGen);
-    codeGen->callRuntimeInit();
+    // codeGen->callRuntimeInit();
     if (!funcType->params.empty()) initMainArgs(codeGen);
     stmtsBlock->createIRValue(codeGen);
     createEpilogue(codeGen);
@@ -19,9 +19,9 @@ Function* LgsMainFunc::getIRFunc(LgsCodeGen* codeGen) {
     if (IRFunc) return IRFunc;
     FunctionType* mainFuncType;
     if (funcType->params.empty()) {
-        mainFuncType = FunctionType::get(codeGen->i32Ty(), {}, false);
+        mainFuncType = codeGen->getFT(codeGen->i32Ty());
     } else {
-        mainFuncType = FunctionType::get(codeGen->i32Ty(), {codeGen->i32Ty(), codeGen->builder.getPtrTy()}, false);
+        mainFuncType = codeGen->getFT(codeGen->i32Ty(), {codeGen->i32Ty(), codeGen->builder.getPtrTy()});
     }
     IRFunc = codeGen->getFunc(LGS_MAIN_FUNC_NAME, mainFuncType);
     if (funcType->params.empty()) return IRFunc;

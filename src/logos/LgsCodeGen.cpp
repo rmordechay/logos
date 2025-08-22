@@ -58,15 +58,6 @@ Value* LgsCodeGen::loadValueFromStruct(Type* ty, Value* ptr, const int i) {
     return builder.CreateLoad(ty->getStructElementType(i), gep);
 }
 
-void LgsCodeGen::generateIf(Value* cond, const std::function<void()>& blockStmtCb) {
-    const auto IRBlockIfTrue = createBlock(BLOCK_NAME_IF_TRUE);
-    const auto IRBlockIfFalse = createBlock(BLOCK_NAME_IF_FALSE);
-    builder.CreateCondBr(cond, IRBlockIfTrue, IRBlockIfFalse);
-    startBlock(IRBlockIfTrue);
-    blockStmtCb();
-    branchAndStartBlock(IRBlockIfFalse);
-}
-
 BasicBlock* LgsCodeGen::createBlock(const std::string& name, Function* parent) {
     return BasicBlock::Create(context, name, parent);
 }
@@ -91,6 +82,19 @@ bool LgsCodeGen::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
 }
 
+void LgsCodeGen::generateIf(Value* cond, const std::function<void()>& blockStmtCb) {
+    const auto IRBlockIfTrue = createBlock(BLOCK_NAME_IF_TRUE);
+    const auto IRBlockIfFalse = createBlock(BLOCK_NAME_IF_FALSE);
+    builder.CreateCondBr(cond, IRBlockIfTrue, IRBlockIfFalse);
+    startBlock(IRBlockIfTrue);
+    blockStmtCb();
+    branchAndStartBlock(IRBlockIfFalse);
+}
+
+FunctionType* LgsCodeGen::getFT(Type* rt, const std::vector<Type*>& params, const bool isVariadic) {
+    return FunctionType::get(rt, params, isVariadic);
+}
+
 Function* LgsCodeGen::getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage) const {
     const auto func = IRModule->getFunction(funcName);
     if (func) return func;
@@ -111,7 +115,7 @@ Function* LgsCodeGen::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) {
     if (func) return func;
 
     savedIP = builder.saveIP();
-    const auto ft = FunctionType::get(voidTy(), {ptrTy()}, false);
+    const auto ft = getFT(voidTy(), {ptrTy()});
     func = Function::Create(ft, Function::PrivateLinkage, fc->name + "_thunk", IRModule);
     const auto entryBlock = BasicBlock::Create(context, BLOCK_NAME_ENTRY);
     entryBlock->insertInto(func);
@@ -119,11 +123,10 @@ Function* LgsCodeGen::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) {
 
     std::vector<Value*> args;
     for (int i = 0; i < fc->args.size(); i++) {
-        const auto fieldTy = dyn_cast<StructType>(ctxTy)->getElementType(i);
-        const auto fieldPtr = builder.CreateStructGEP(ctxTy, func->arg_begin(), i);
-        const auto v = builder.CreateLoad(fieldTy, fieldPtr);
+        const auto v = loadValueFromStruct(ctxTy, func->arg_begin(), i);
         args.push_back(v);
     }
+
     const auto deferFunc = fc->func->getIRFunc(this);
     builder.CreateCall(deferFunc, args);
     builder.CreateRetVoid();
@@ -157,56 +160,46 @@ Value* LgsCodeGen::callMalloc(const size_t size) {
 }
 
 Value* LgsCodeGen::callPrintf(const std::vector<Value*>& args) {
-    const auto ft = FunctionType::get(i32Ty(), {ptrTy()}, true);
-    return callFunc("printf", ft, args);
+    return callFunc("printf", getFT(i32Ty(), {ptrTy()}, true), args);
 }
 
 Value* LgsCodeGen::callSnprintf(const std::vector<Value*>& args) {
-    const auto ft = FunctionType::get(i32Ty(), {ptrTy(), i64Ty(), ptrTy()}, true);
-    return callFunc("snprintf", ft, args);
+    return callFunc("snprintf", getFT(i32Ty(), {ptrTy(), i64Ty(), ptrTy()}, true), args);
 }
 
 Value* LgsCodeGen::callSleep(Value* time) {
-    const auto ft = FunctionType::get(i32Ty(), {i32Ty()}, false);
-    return callFunc("sleep", ft, {time});
+    return callFunc("sleep", getFT(i32Ty(), {i32Ty()}), {time});
 }
 
 Value* LgsCodeGen::callExit(Value* exitCode) {
-    const auto ft = FunctionType::get(voidTy(), {i32Ty()}, false);
-    return callFunc("exit", ft, {exitCode});
+    return callFunc("exit", getFT(voidTy(), {i32Ty()}), {exitCode});
 }
 
 Value* LgsCodeGen::callGetEnv(Value* name) {
-    const auto ft = FunctionType::get(ptrTy(), {ptrTy()}, false);
-    return callFunc("getenv", ft, {name});
+    return callFunc("getenv", getFT(ptrTy(), {ptrTy()}), {name});
 }
 
 Value* LgsCodeGen::callGetPid() {
-    const auto ft = FunctionType::get(i32Ty(), false);
-    return callFunc("getpid", ft);
+    return callFunc("getpid", getFT(i32Ty()));
 }
 
 Value* LgsCodeGen::callCwd() {
-    const auto ft = FunctionType::get(voidTy(), {i32Ty()}, false);
     const auto value = builder.CreateAlloca(ArrayType::get(i8Ty(), 1024));
-    callFunc("getcwd", ft, {value});
+    callFunc("getcwd", getFT(voidTy(), {i32Ty()}), {value});
     return value;
 }
 
 Value* LgsCodeGen::callCoresNum() {
-    const auto ft = FunctionType::get(i64Ty(), {i32Ty()}, false);
-    return callFunc("sysconf", ft, {i32(58)});
+    return callFunc("sysconf", getFT(i64Ty(), {i32Ty()}), {i32(58)});
 }
 
 Value* LgsCodeGen::callStrLen(Value* str) {
-    const auto ft = FunctionType::get(i64Ty(), {ptrTy()}, false);
-    return callFunc("strlen", ft, {str});
+    return callFunc("strlen", getFT(i64Ty(), {ptrTy()}), {str});
 }
 
 Value* LgsCodeGen::callSqrt(Value* radicant) {
     auto d = builder.CreateSIToFP(radicant, doubleTy());
-    const auto ft = FunctionType::get(doubleTy(), {doubleTy()}, false);
-    return callFunc("sqrt", ft, {d});
+    return callFunc("sqrt", getFT(doubleTy(), {doubleTy()}), {d});
 }
 
 void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
@@ -215,57 +208,53 @@ void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
 }
 
 void LgsCodeGen::callRuntimeInit() {
-    callLgsFunc("Runtime_init", FunctionType::get(voidTy(), false));
+    callLgsFunc("Runtime_init", getFT(voidTy()));
 }
 
 void LgsCodeGen::callStackPush() {
-    callLgsFunc("Stack_push", FunctionType::get(voidTy(), false));
+    callLgsFunc("Stack_push", getFT(voidTy()));
 }
 
 void LgsCodeGen::callPopStack() {
-    callLgsFunc("Stack_pop", FunctionType::get(voidTy(), false));
+    callLgsFunc("Stack_pop", getFT(voidTy()));
 }
 
 void LgsCodeGen::callDefers() {
     branchAndStartBlock(createBlock(BLOCK_NAME_DEFER));
-    const auto ft = FunctionType::get(voidTy(), false);
+    const auto ft = getFT(voidTy());
     callLgsFunc("Stack_callDefers", ft);
 }
 
 void LgsCodeGen::addDeferFunc(Value* deferFuncPtr, Value* ctx) {
-    const auto ft = FunctionType::get(voidTy(), {ptrTy(), ptrTy()}, false);
-    callLgsFunc("Stack_addDefer", ft, {deferFuncPtr, ctx});
+    callLgsFunc("Stack_addDefer", getFT(voidTy(), {ptrTy(), ptrTy()}), {deferFuncPtr, ctx});
 }
 
 void LgsCodeGen::addPtrToVtable(Value* instancePtr, Value* name, Value* ptr) {
-    const auto ft = FunctionType::get(voidTy(), {ptrTy(), ptrTy(), ptrTy()}, false);
-    callLgsFunc("Vtable_add", ft, {instancePtr, name, ptr});
+    callLgsFunc("Vtable_add", getFT(voidTy(), {ptrTy(), ptrTy(), ptrTy()}), {instancePtr, name, ptr});
 }
 
 Value* LgsCodeGen::getPtrFromVtable(Value* instancePtr, Value* name) {
-    const auto ft = FunctionType::get(ptrTy(), {ptrTy(), ptrTy()}, false);
-    return callLgsFunc("Vtable_get", ft, {instancePtr, name});
+    return callLgsFunc("Vtable_get", getFT(ptrTy(), {ptrTy(), ptrTy()}), {instancePtr, name});
 }
 
 void LgsCodeGen::addCoro(Value* coroPtr, Value* ctx) {
-    const auto ft = FunctionType::get(voidTy(), {ptrTy(), ptrTy()}, false);
-    callLgsFunc("Stack_addCoro", ft, {coroPtr, ctx});
+    callLgsFunc("Stack_addCoro", getFT(voidTy(), {ptrTy(), ptrTy()}), {coroPtr, ctx});
 }
 
 void LgsCodeGen::callSpawn(Value* task, Value* ctx) {
-    callLgsFunc("Scheduler_yield", FunctionType::get(voidTy(), false), {task, ctx});
+    callLgsFunc("Scheduler_yield", getFT(voidTy(), {ptrTy(), ptrTy()}), {task, ctx});
 }
 
 void LgsCodeGen::callYield() {
-    callLgsFunc("Scheduler_yield", FunctionType::get(voidTy(), false), {});
+    callLgsFunc("Scheduler_yield", getFT(voidTy()), {});
 }
 
 void LgsCodeGen::callShutdown() {
-    callLgsFunc("Scheduler_shutdown", FunctionType::get(voidTy(), false), {});
+    callLgsFunc("Scheduler_shutdown", getFT(voidTy()), {});
 }
 
 Value* LgsCodeGen::callHashStr(Value* value) {
-    return callLgsFunc("hash", FunctionType::get(i32Ty(), {ptrTy()}, false), {value});
+    return callLgsFunc("hash", getFT(i32Ty(), {ptrTy()}), {value});
 }
 
 Type* LgsCodeGen::i1Ty() {

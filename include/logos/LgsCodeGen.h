@@ -42,7 +42,6 @@ public:
     void storeValueInStruct(StructType* ty, Value* ptr, int i, Value* v);
     Value* loadValueFromStruct(Type* ty, Value* ptr, int i);
 
-
     // Blocks
     BasicBlock* createBlock(const std::string& name, Function* parent = nullptr);
     void startBlock(BasicBlock* block);
@@ -52,6 +51,7 @@ public:
     void generateIf(Value* cond, const std::function<void()>& blockStmtCb);
 
     // Funcs
+    static FunctionType* getFT(Type* rt, const std::vector<Type*>& params = {}, bool isVariadic = false);
     Function* getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     Value* callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
     Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});

@@ -29,7 +29,7 @@ Type* LgsFuncType::getIRType(LgsCodeGen* codeGen) {
     }
     const auto isBigObject = rt->asObject() && rt->getSizeBytes() >= BIG_SIZE_THRESHOLD;
     const auto returnType = isBigObject ? codeGen->ptrTy() : rt->getIRType(codeGen);
-    IRType = FunctionType::get(returnType, IRParamsTypes, this->isVariadic);
+    IRType = codeGen->getFT(returnType, IRParamsTypes, this->isVariadic);
     return IRType;
 }
 

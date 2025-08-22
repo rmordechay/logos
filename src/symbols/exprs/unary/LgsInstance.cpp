@@ -12,13 +12,13 @@ void LgsInstance::createIRValue(LgsCodeGen* codeGen) {
     } else {
         IRValue = codeGen->builder.CreateAlloca(objIRType);
     }
-    initFields(codeGen, obj->fields);
+    initFields(codeGen);
     if (!obj->interfaces.empty()) {
         setVirtuals(codeGen);
     }
 }
 
-void LgsInstance::initFields(LgsCodeGen* codeGen, std::vector<LgsField*>& fields) {
+void LgsInstance::initFields(LgsCodeGen* codeGen) {
     for (const auto& [argName, arg] : args) {
         const auto exprIR = arg->expr->getIRValue(codeGen);
         const auto field = obj->getField(argName);
@@ -51,7 +51,14 @@ void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
 }
 
 json::value LgsInstance::asJSON() {
-    assert(0);
+    json::object jsonObj;
+    jsonObj["exprType"] = "instance";
+    jsonObj["obj"] = obj->asJSON();
+    jsonObj["args"] = json::array();
+    for (const auto& [argName, arg] : args) {
+        jsonObj["args"].as_array().push_back(arg->asJSON());
+    }
+    return jsonObj;
 }
 
 std::string LgsInstance::pname() {
