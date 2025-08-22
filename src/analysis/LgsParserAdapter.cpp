@@ -25,7 +25,6 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "exprs/unary/LgsPostfixExpr.h"
 #include "exprs/unary/LgsPrefixExpr.h"
-#include "exprs/unary/LgsTableExpr.h"
 #include "exprs/unary/LgsVectorExpr.h"
 #include "files/LgsAppFile.h"
 #include "files/LgsMainFile.h"
@@ -53,6 +52,19 @@
 #include <stmts/LgsDeferStmt.h>
 #include <types/LgsStr.h>
 #include <types/LgsVoid.h>
+
+
+LgsFile* LgsParserAdapter::parseFile(const fs::path& filePath) {
+    const auto absFilePath = fs::path(fs::canonical(filePath));
+    const auto codeText = getFileText(absFilePath);
+    antlr4::ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    antlr4::CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+    const auto file = parser.logosFile();
+    checkParserErrors(&parser);
+    return getLogosFile(file, absFilePath);
+}
 
 LgsFile* LgsParserAdapter::getLogosFile(LogosParser::LogosFileContext* ctx, const fs::path& filePath) {
     LgsFile* file = nullptr;
@@ -140,9 +152,17 @@ LgsFile* LgsParserAdapter::getInterfaceFile(LogosParser::InterfaceFileContext* c
     return file;
 }
 
-void LgsParserAdapter::setAppConfigs(LogosParser::LogosAppFileContext* ctx, const fs::path& filePath, LgsAppConfigs& appConfigs) {
-    LgsAppFile file(fileID, filePath);
-    setLocation(file.location, ctx->start);
+void LgsParserAdapter::setAppConfigs(LgsAppConfigs& appConfigs) {
+    if (!fs::exists(paths.appFilePath)) return;
+    auto codeText = getFileText(paths.appFilePath);
+    antlr4::ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    antlr4::CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+    if (!checkParserErrors(&parser)) return;
+    const auto ctx = parser.logosAppFile();
+    LgsAppFile lgsAppFile(fileID, paths.appFilePath);
+    setLocation(lgsAppFile.location, ctx->start);
     for (int i = 0; i < ctx->IDENTIFIER().size(); ++i) {
         const auto varToken = ctx->IDENTIFIER()[i];
         const auto varName = varToken->getText();
@@ -157,7 +177,7 @@ void LgsParserAdapter::setAppConfigs(LogosParser::LogosAppFileContext* ctx, cons
             auto [major, minor, micro] = appConfigs.version;
             const auto s = std::sscanf(versionStr.c_str(), "%d.%d.%d%n", &major, &minor, &micro, &consumed) == 3;
             if (!s || versionStr[consumed] != '\0') {
-                errHandler.addError(E10068, &file.location, {versionStr});
+                errHandler.addError(E10068, &lgsAppFile.location, {versionStr});
             }
         }
         if (varName == "activeEnv") {
@@ -173,7 +193,7 @@ void LgsParserAdapter::setAppConfigs(LogosParser::LogosAppFileContext* ctx, cons
         const auto type = getType(requireEnvs->type()[i]);
         const auto varDec = new LgsVarDec(name, nullptr);
         varDec->type = type;
-        file.requireEnvVars.push_back(varDec);
+        lgsAppFile.requireEnvVars.push_back(varDec);
     }
 
     const auto packages = ctx->requirePackages();
@@ -181,11 +201,18 @@ void LgsParserAdapter::setAppConfigs(LogosParser::LogosAppFileContext* ctx, cons
     for (const auto packagePath : packages->STRING()) {
         auto pathText = packagePath->getText();
         cleanStr(pathText);
-        file.requirePackages.push_back(pathText);
+        lgsAppFile.requirePackages.push_back(pathText);
     }
 }
 
-LgsEnvFile* LgsParserAdapter::getEnvFile(LogosParser::LogosEnvFileContext* ctx, const fs::path& filePath) {
+LgsEnvFile* LgsParserAdapter::getEnvFile(const fs::path& filePath) {
+    const auto absFilePath = fs::path(fs::canonical(filePath));
+    const auto codeText = getFileText(absFilePath);
+    antlr4::ANTLRInputStream input(codeText);
+    LogosLexer lexer(&input);
+    antlr4::CommonTokenStream tokens(&lexer);
+    LogosParser parser(&tokens);
+    const auto ctx = parser.logosEnvFile();
     std::vector<LgsVarDec*> varDecs;
     for (const auto& explicitVarDec : ctx->explicitVarDec()) {
         varDecs.emplace_back(getExplicitVarDec(explicitVarDec));
@@ -193,7 +220,9 @@ LgsEnvFile* LgsParserAdapter::getEnvFile(LogosParser::LogosEnvFileContext* ctx, 
     for (const auto& implicitVarDec : ctx->implicitVarDec()) {
         varDecs.emplace_back(getImplicitVarDec(implicitVarDec));
     }
-    return new LgsEnvFile(fileID, "EnvFile", filePath, varDecs);
+    auto file = new LgsEnvFile(fileID, "EnvFile", absFilePath, varDecs);
+    if (!checkParserErrors(&parser)) return file;
+    return file;
 }
 
 LgsFunc* LgsParserAdapter::getFunc(LogosParser::FuncContext* ctx) {
@@ -1155,6 +1184,15 @@ void LgsParserAdapter::extractStrParts(LgsStrConst& strConst) {
     if (replaced != strConst.value) {
         strConst.formatedStr = strdup(replaced.c_str());
     }
+}
+
+bool LgsParserAdapter::checkParserErrors(LogosParser* parser) {
+    if (parser->getNumberOfSyntaxErrors() > 0) {
+        std::lock_guard lock(mtx);
+        errHandler.setUnsuccessful();
+        return false;
+    }
+    return true;
 }
 
 void LgsParserAdapter::setLocation(LgsLocation& location, const antlr4::Token* start) const {

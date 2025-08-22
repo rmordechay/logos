@@ -5,9 +5,8 @@
 #include <llvm/TargetParser/Host.h>
 #include <llvm/TargetParser/Triple.h>
 
-void LgsPaths::initPaths(const fs::path& rootDirPath) {
-    if (rootDirPath == "") return;
-    rootDir = canonical(rootDirPath);
+void LgsPaths::initPaths() {
+    assert(rootDir != "");
     srcDir = rootDir / LGS_SRC_DIR;
     envsDir = rootDir / LGS_ENVS_DIR;
     buildDir = rootDir / LGS_BUILD_DIR;

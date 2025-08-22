@@ -45,8 +45,8 @@ void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& 
     }
 }
 
-bool isLogosFile(const fs::directory_entry& entry) {
-    return entry.is_regular_file() && entry.path().extension().string() == LGS_FILE_EXTENSION;
+bool isLogosFile(const fs::path& filePath) {
+    return fs::exists(filePath) && is_regular_file(filePath) && filePath.extension().string() == LGS_FILE_EXTENSION;
 }
 
 bool isLLVMFile(const fs::directory_entry& entry) {

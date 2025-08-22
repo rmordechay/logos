@@ -2,7 +2,6 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/IR/Module.h>
 #include "configs/LgsConfig.h"
-#include "LogosLexer.h"
 #include "analysis/LgsParserAdapter.h"
 #include "analysis/LgsSema.h"
 #include "logos/LgsPaths.h"
@@ -11,7 +10,6 @@
 #include "builtins/LgsSystem.h"
 #include "files/LgsEnvFile.h"
 #include "logos/LgsLinker.h"
-#include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 #include "llvm/IR/Verifier.h"
 #include <llvm/Target/TargetMachine.h>
@@ -19,44 +17,48 @@
 extern char **environ;
 
 void LgsApp::run() {
-    validate();
-    parse();
-    analyse();
-    generate();
-    link();
+    if (!setup()) exitWithErrors();
+    if (!parse()) exitWithErrors();
+    if (!analyse()) exitWithErrors();
+    if (!generate()) exitWithErrors();
+    if (!link()) exitWithErrors();
     execute();
 }
 
-void LgsApp::validate() {
+bool LgsApp::setup() {
+    if (isLogosFile(paths.rootDir)) {
+        isFileMode = true;
+        return true;
+    }
+    paths.initPaths();
     if (!is_directory(paths.rootDir) || !is_directory(paths.srcDir)) {
         errHandler.addError(E10010, nullptr);
-        exitWithErrors();
+        return false;
     }
     if (!exists(paths.appFilePath)) {
         errHandler.addError(E10008, nullptr);
-        exitWithErrors();
+        return false;
     }
+    return true;
 }
 
-void LgsApp::parse() {
+bool LgsApp::parse() {
     loadBuiltins();
-    if (!parseAppFile()) exitWithErrors();
+    if (!parseAppFile()) return false;
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
-            const auto absFilePath = fs::path(canonical(entry));
-            const auto codeText = getFileText(absFilePath);
-            parseSrcFile(codeText, absFilePath);
+            parseSrcFile(entry);
         });
     }
     threadPool.wait();
-    if (!errHandler.successful) exitWithErrors();
+    return errHandler.successful;
 }
 
-void LgsApp::analyse() {
+bool LgsApp::analyse() {
     LgsTypeResolver typeResolver(errHandler, globals);
     if (!typeResolver.resolveGlobalTypes(ast)) {
-        exitWithErrors();
+        return false;
     }
     for (const auto file : ast) {
         threadPool.runTask([this, file] {
@@ -69,10 +71,10 @@ void LgsApp::analyse() {
         });
     }
     threadPool.wait();
-    if (!errHandler.successful) exitWithErrors();
+    return errHandler.successful;
 }
 
-void LgsApp::generate() {
+bool LgsApp::generate() {
     initBuild();
     const auto targetMachine = LgsCodeGen::getTargetMachine();
     for (const auto& file : ast) {
@@ -84,12 +86,12 @@ void LgsApp::generate() {
     }
     threadPool.wait();
     writeIRFiles();
-    if (!errHandler.successful) exitWithErrors();
+    return errHandler.successful;
 }
 
-void LgsApp::link() {
+bool LgsApp::link() {
     const LgsLinker linker(configs, paths, ast);
-    if (!linker.link()) exitWithErrors();
+    return linker.link();
 }
 
 void LgsApp::execute() {
@@ -118,61 +120,28 @@ void LgsApp::loadEnvFiles() {
     threadPool.wait();
 }
 
-void LgsApp::setEnvVariables() {
-    for (char **env = environ; *env != nullptr; ++env) {
-        std::string entry(*env);
-        const auto pos = entry.find('=');
-        if (pos != std::string::npos) {
-            auto key = entry.substr(0, pos);
-            const auto value = entry.substr(pos + 1);
-            assert(0);
-        }
-    }
-}
-
 bool LgsApp::parseAppFile() {
-    if (!fs::exists(paths.appFilePath)) return false;
-    auto codeText = getFileText(paths.appFilePath);
     LgsParserAdapter antlrConverter(0, paths, globals);
-    antlr4::ANTLRInputStream input(codeText);
-    LogosLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
-    LogosParser parser(&tokens);
-    const auto file = parser.logosAppFile();
-    antlrConverter.setAppConfigs(file, paths.appFilePath, configs);
-    if (!checkParserErrors(&parser)) return false;
+    antlrConverter.setAppConfigs(configs);
     if (!antlrConverter.errHandler.successful) {
         errHandler.mergeErrors(antlrConverter.errHandler);
     }
     return errHandler.successful;
 }
 
-void LgsApp::parseEnvFile(fs::path fileEntry) {
-    const auto codeText = getFileText(fileEntry);
-    auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
+void LgsApp::parseEnvFile(const fs::path& filePath) {
+    const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
     LgsParserAdapter antlrConverter(fileID, paths, globals);
-    antlr4::ANTLRInputStream input(codeText);
-    LogosLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
-    LogosParser parser(&tokens);
-    const auto absFilePath = fs::path(fs::canonical(fileEntry));
-    auto file = antlrConverter.getEnvFile(parser.logosEnvFile(), absFilePath);
-    if (!checkParserErrors(&parser)) return;
+    auto file = antlrConverter.getEnvFile(filePath);
     std::lock_guard lock(mtx);
     envFiles.emplace_back(file);
     errHandler.mergeErrors(antlrConverter.errHandler);
 }
 
-void LgsApp::parseSrcFile(const std::string& codeText, fs::path filePath) {
-    antlr4::ANTLRInputStream input(codeText);
-    LogosLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
-    LogosParser parser(&tokens);
-    const auto file = parser.logosFile();
-    auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
+void LgsApp::parseSrcFile(const fs::path& filePath) {
+    const auto fileID = nextFileID.fetch_add(1, std::memory_order_relaxed);
     LgsParserAdapter antlrConverter(fileID, paths, globals);
-    const auto lgsFile = antlrConverter.getLogosFile(file, filePath);
-    checkParserErrors(&parser);
+    const auto lgsFile = antlrConverter.parseFile(filePath);
     {
         std::lock_guard lock(mtx);
         lgsFile->id = ast.size();
@@ -226,15 +195,6 @@ void LgsApp::exitWithErrors() const {
     }
     logInfo("\n");
     exit(1);
-}
-
-bool LgsApp::checkParserErrors(LogosParser* parser) {
-    if (parser->getNumberOfSyntaxErrors() > 0) {
-        std::lock_guard lock(mtx);
-        errHandler.setUnsuccessful();
-        return false;
-    }
-    return true;
 }
 
 void LgsApp::freeApp() {

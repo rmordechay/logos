@@ -2,12 +2,8 @@
 #include "cli/LgsCliHelp.h"
 #include "logos/LgsApp.h"
 #include "types/LgsStr.h"
-#include "types/primitives/LgsInt.h"
 
 void LgsRunCmd::run() {
-    if (argc < 3) {
-        return exitWithError("Too few arguments for command 'run'.");
-    }
     const std::string subCmd = argv[2];
     if (subCmd[0] == '-') return exitWithError(unknownCmd + ": " + subCmd + ".");
     if (!fs::exists(subCmd)) return exitWithError("Path not found");

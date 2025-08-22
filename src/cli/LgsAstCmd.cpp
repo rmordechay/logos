@@ -1,8 +1,20 @@
 #include "cli/LgsAstCmd.h"
-#include "types/LgsStr.h"
+#include "files/LgsFile.h"
 
 void LgsAstCmd::run() {
-    assert(0);
+    const auto filePath = argv[2];
+    if (!fs::exists(filePath)) {
+        exitWithError("File '" + std::string(filePath) + "' was not found.");
+    }
+    LgsApp app(fs::canonical(filePath));
+    app.setup();
+    app.loadBuiltins();
+    app.parseSrcFile(app.paths.rootDir);
+    app.analyse();
+    json::object ast;
+    ast["ast"] = app.ast.front()->asJSON();
+    ast["errors"] = app.errHandler.asJSON();
+    std::cout << app.ast.front()->asJSON() << std::endl;
 }
 
 LgsCliCmdHelp& LgsAstCmd::getHelp() {

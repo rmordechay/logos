@@ -16,7 +16,11 @@ void LgsDeferStmt::createIRValue(LgsCodeGen* codeGen) {
 }
 
 json::value LgsDeferStmt::asJSON() {
-    assert(0);
+    json::object obj;
+    obj["stmtKind"] = "DeferStmt";
+    obj["funcCall"] = funcCall ? funcCall->asJSON() : nullptr;
+    obj["selection"] = selection ? selection->asJSON() : nullptr;
+    return obj;
 }
 
 LgsDeferStmt::~LgsDeferStmt() {

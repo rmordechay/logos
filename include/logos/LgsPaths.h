@@ -13,7 +13,7 @@ struct LgsPaths {
     fs::path lgsRoot;
     fs::path cLibRoot;
     fs::path cLibHeadersDir;
-    void initPaths(const fs::path& rootDirPath);
+    void initPaths();
     void findLgsRoot();
     void findCLibRoot();
     void findCLibHeaders();

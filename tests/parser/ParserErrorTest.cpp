@@ -9,7 +9,7 @@ TEST_CASE("TestSema10012") {
         obj.func() := 23
     }
     )";
-    app.parseSrcFile(code, "code.lgs");
+    app.parseSrcFile("code.lgs");
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10012.errCode);
 }
@@ -21,7 +21,7 @@ TEST_CASE("TestSema10017A") {
         break
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10017.errCode);
 }
@@ -34,7 +34,7 @@ TEST_CASE("TestSema10021") {
         go obj.x
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10021.errCode);
 }
@@ -45,7 +45,7 @@ TEST_CASE("TestParser10033A") {
         object obj
         x: Int
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
 }
@@ -56,7 +56,7 @@ TEST_CASE("ParserTest10033B") {
         interface inter
         x: Int
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
 }
@@ -68,7 +68,7 @@ TEST_CASE("ParserTest10033C") {
         object obj {}
         main() {}
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     CHECK_EQ(app.errHandler.errors.size(), 2);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10033.errCode);
     CHECK_EQ(app.errHandler.errors[1].errCode, E10033.errCode);

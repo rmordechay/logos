@@ -21,3 +21,14 @@ void LgsErrHandler::mergeErrors(LgsErrHandler& other) {
     setUnsuccessful();
     errors.insert(errors.end(), other.errors.begin(), other.errors.end());
 }
+
+json::value LgsErrHandler::asJSON() const {
+    json::array jsonErrors;
+    for (const auto& err : errors) {
+        json::object jsonError;
+        jsonError["msg"] = err.msg;
+        jsonError["errCode"] = err.errCode;
+        jsonErrors.push_back(jsonErrors);
+    }
+    return jsonErrors;
+}

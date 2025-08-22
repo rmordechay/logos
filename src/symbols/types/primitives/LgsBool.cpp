@@ -10,7 +10,9 @@
 #include "types/primitives/LgsUInt.h"
 
 json::value LgsBool::asJSON() {
-    assert(0);
+    json::object obj;
+    obj["name"] = name;
+    return obj;
 }
 
 std::string LgsBool::pname() {

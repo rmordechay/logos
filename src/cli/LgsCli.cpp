@@ -29,6 +29,10 @@ void LgsCli::execute() const {
 
 void LgsCli::runCmd(LgsCliCmd& cmd) const {
     if (isHelpCmd()) return cmd.printHelp();
+    const auto requiredArgs = cmd.getHelp().requiredArgs.size();
+    if (argc - 2 < requiredArgs) {
+        cmd.exitWithError("Too few arguments for command '%s" + cmd.getHelp().name + "'.");
+    }
     cmd.run();
 }
 

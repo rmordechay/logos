@@ -3,6 +3,7 @@
 #include "funcs/LgsFunc.h"
 #include "utils/LgsErrHandler.h"
 #include "stmts/LgsAssignment.h"
+#include "utils/LgsUtils.h"
 
 
 struct LgsPaths;
@@ -43,12 +44,13 @@ public:
     LgsErrHandler errHandler;
 
     explicit LgsParserAdapter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
+    LgsFile* parseFile(const fs::path& filePath);
     LgsFile* getLogosFile(LogosParser::LogosFileContext* ctx, const fs::path& filePath);
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const fs::path& filePath);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const fs::path& filePath);
-    void setAppConfigs(LogosParser::LogosAppFileContext* ctx, const fs::path& filePath, LgsAppConfigs& appConfigs);
-    LgsEnvFile* getEnvFile(LogosParser::LogosEnvFileContext* ctx, const fs::path& filePath);
+    void setAppConfigs(LgsAppConfigs& appConfigs);
+    LgsEnvFile* getEnvFile(const fs::path& filePath);
     LgsFunc* getFunc(LogosParser::FuncContext* ctx);
     LgsMainFunc* getMainFunc(LogosParser::FuncContext* ctx);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName);
@@ -110,5 +112,6 @@ public:
     bool isArgsDuplicate(const std::unordered_set<std::string>& initializedArgs, LgsVarDec* varDec);
     bool validateTypeName(const std::string& typeName, LgsLocation* location);
     void extractStrParts(LgsStrConst& strConst);
+    bool checkParserErrors(LogosParser* parser);
     void setLocation(LgsLocation& location, const antlr4::Token* start) const;
 };

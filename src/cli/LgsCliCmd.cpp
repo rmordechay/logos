@@ -11,7 +11,7 @@ void LgsCliCmd::printHelp() {
     assert(h.name != "" && h.usage != "" && h.desc != "" && !h.examples.empty());
     std::ostringstream txt;
 
-    txt << LGS_COLORIZE("Help", LGS_MSG_COLOR_WHITE) << '\n';
+    txt << LGS_COLORIZE("\n\nHelp", LGS_MSG_COLOR_WHITE) << '\n';
     getLongestArg(h);
     txt << padString(USAGE_STR) << h.usage << "\n";
 

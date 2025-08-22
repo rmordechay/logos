@@ -12,7 +12,7 @@ void logInfo(const std::string& text = "");
 void logError(const std::string& msg, const std::string& path = "");
 void formatAndLogError(const LgsBaseError& lgsErr, const std::vector<std::string>& args);
 void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& args, std::string& result);
-bool isLogosFile(const fs::directory_entry& entry);
+bool isLogosFile(const fs::path& filePath);
 bool isLLVMFile(const fs::directory_entry& entry);
 bool isLogosKeyword(const std::string& s);
 void cleanStr(std::string& value);

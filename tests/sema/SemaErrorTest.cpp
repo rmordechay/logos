@@ -4,7 +4,7 @@
 
 TEST_CASE("TestSema10000") {
     LgsApp app;
-    app.parseSrcFile("f() {a = 34}");
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10000.errCode);
@@ -12,7 +12,7 @@ TEST_CASE("TestSema10000") {
 
 TEST_CASE("TestSema10001") {
     LgsApp app;
-    app.parseSrcFile("main() {a: Str = 34}");
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10001.errCode);
@@ -26,7 +26,7 @@ TEST_CASE("TestSema10002A") {
         for i in a {}
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10002.errCode);
@@ -40,7 +40,7 @@ TEST_CASE("TestSema10002B") {
         a = num[1:3]
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10002.errCode);
@@ -54,7 +54,7 @@ TEST_CASE("TestSema10003") {
         arr[3] := 2
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10003.errCode);
@@ -68,7 +68,7 @@ TEST_CASE("TestSema10004") {
     }
     main() {}
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10004.errCode);
@@ -85,7 +85,7 @@ TEST_CASE("TestSema10005A") {
         a = obj.a
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
@@ -101,7 +101,7 @@ TEST_CASE("TestSema10005B") {
         obj = Obj{a = 3487, b = 234}
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
@@ -114,7 +114,7 @@ TEST_CASE("TestSema10006A") {
         a = b
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10006.errCode);
@@ -136,7 +136,7 @@ TEST_CASE("TestSema10006B") {
         func(10, Enum.ENUM1)
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10006.errCode);
@@ -150,7 +150,7 @@ TEST_CASE("TestSema10011A") {
         a = 3
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
@@ -163,7 +163,7 @@ TEST_CASE("TestSema10011B") {
     func() {}
     main() {}
     )";
-    app.parseSrcFile(code, "code.lgs");
+    app.parseSrcFile("code.lgs");
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10011.errCode);
@@ -178,7 +178,7 @@ TEST_CASE("TestSema10013A") {
         obj.func()
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
@@ -192,7 +192,7 @@ TEST_CASE("TestSema10013B") {
         arr.add(2)
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10005.errCode);
@@ -207,7 +207,7 @@ TEST_CASE("TestSema10014") {
         }
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10014.errCode);
@@ -221,7 +221,7 @@ TEST_CASE("TestSema10015") {
         func("str")
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10015.errCode);
@@ -239,7 +239,7 @@ TEST_CASE("TestSema10016A") {
     }
     main() {}
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10016.errCode);
@@ -260,7 +260,7 @@ TEST_CASE("TestSema10016B") {
     }
     main() {}
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 2);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10016.errCode);
@@ -275,7 +275,7 @@ TEST_CASE("TestSema10022") {
         a = var{}
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10022.errCode);
@@ -288,7 +288,7 @@ TEST_CASE("TestSema10023") {
         a: Int = null
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10023.errCode);
@@ -301,7 +301,7 @@ TEST_CASE("TestSema10024") {
         a = null
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10024.errCode);
@@ -315,7 +315,7 @@ TEST_CASE("TestSema10025") {
     }
     main() {}
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10025.errCode);
@@ -327,7 +327,7 @@ TEST_CASE("TestSema10026") {
     func(): Int { return }
     main() {}
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10026.errCode);
@@ -342,7 +342,7 @@ TEST_CASE("TestSema10027") {
     }
     main() {}
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10027.errCode);
@@ -354,7 +354,7 @@ TEST_CASE("TestSema10028") {
     func(x: Int = 23, y: Str) { }
     main() {}
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10028.errCode);
@@ -372,8 +372,8 @@ TEST_CASE("TestSema10030A") {
         b = a.x
     }
     )";
-    app.parseSrcFile(code1, "code1.lgs");
-    app.parseSrcFile(code2, "code2.lgs");
+    app.parseSrcFile("code1.lgs");
+    app.parseSrcFile("code2.lgs");
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10030.errCode);
@@ -390,8 +390,8 @@ TEST_CASE("TestSema10030B") {
         a = Obj{x = 2}
     }
     )";
-    app.parseSrcFile(code1, "code1.lgs");
-    app.parseSrcFile(code2, "code2.lgs");
+    app.parseSrcFile("code1.lgs");
+    app.parseSrcFile("code2.lgs");
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10030.errCode);
@@ -409,8 +409,8 @@ TEST_CASE("TestSema10031") {
         a.func()
     }
     )";
-    app.parseSrcFile(code1, "code1.lgs");
-    app.parseSrcFile(code2, "code2.lgs");
+    app.parseSrcFile("code1.lgs");
+    app.parseSrcFile("code2.lgs");
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10031.errCode);
@@ -426,7 +426,7 @@ TEST_CASE("TestSema10032") {
         obj = Obj{}
     }
     )";
-    app.parseSrcFile(code, "code.lgs");
+    app.parseSrcFile("code.lgs");
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10032.errCode);
@@ -439,7 +439,7 @@ TEST_CASE("TestSema10038") {
         continue
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10038.errCode);
 }
@@ -452,7 +452,7 @@ TEST_CASE("TestSema10042") {
         a = map[1:3]
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10042.errCode);
@@ -468,7 +468,7 @@ TEST_CASE("TestSema10046") {
         obj = Obj()
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10046.errCode);
@@ -484,7 +484,7 @@ TEST_CASE("TestSema10048A") {
         arr: Int[func()]!
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10048.errCode);
@@ -497,7 +497,7 @@ TEST_CASE("TestSema10048B") {
         arr: Int[]!
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10048.errCode);
@@ -509,7 +509,7 @@ TEST_CASE("TestSema10055") {
     f(): Int {}
     main() {}
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10055.errCode);
@@ -524,7 +524,7 @@ TEST_CASE("TestSema10056A") {
     }
     main() {}
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10056.errCode);
@@ -539,7 +539,7 @@ TEST_CASE("TestSema10056B") {
     }
     main() {}
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10056.errCode);
@@ -561,7 +561,7 @@ TEST_CASE("TestSema10059") {
     }
     main() {}
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 2);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10059.errCode);
@@ -578,7 +578,7 @@ TEST_CASE("TestSema10066") {
         }
     }
     )";
-    app.parseSrcFile(code);
+    app.parseSrcFile();
     app.analyse();
     CHECK_EQ(app.errHandler.errors.size(), 1);
     CHECK_EQ(app.errHandler.errors[0].errCode, E10066.errCode);

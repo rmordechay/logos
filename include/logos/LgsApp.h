@@ -1,4 +1,5 @@
 #pragma once
+#include "LgsLinker.h"
 #include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
@@ -47,27 +48,25 @@ public:
     std::atomic<size_t> nextFileID = 0;
     std::vector<char*> appArgs;
     ThreadPool threadPool;
+    bool isFileMode = false;
 
     explicit LgsApp(const fs::path& rootOrFile = "") {
-        paths.initPaths(rootOrFile);
+        paths.rootDir = rootOrFile;
     }
-
     void run();
-    void validate();
-    void parse();
-    void analyse();
-    void generate();
-    void link();
+    bool setup();
+    bool parse();
+    bool analyse();
+    bool generate();
+    bool link();
     void execute();
     void loadBuiltins();
     void loadEnvFiles();
-    void setEnvVariables();
     bool parseAppFile();
-    void parseEnvFile(fs::path fileEntry);
-    void parseSrcFile(const std::string& codeText, fs::path filePath = "");
+    void parseEnvFile(const fs::path& filePath);
+    void parseSrcFile(const fs::path& filePath = "");
     void initBuild();
     void writeIRFiles();
     void exitWithErrors() const;
-    bool checkParserErrors(LogosParser* parser);
     void freeApp();
 };

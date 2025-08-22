@@ -98,7 +98,17 @@ void LgsIfStmt::generateElseIf(LgsCodeGen* codeGen) {
 }
 
 json::value LgsIfStmt::asJSON() {
-    assert(0);
+    json::object obj;
+    obj["ifCond"] = ifCond->asJSON();
+    obj["ifBlock"] = ifBlock->asJSON();
+    if (elseBlock) obj["elseBlock"] = elseBlock->asJSON();
+    for (const auto& [expr, block] : elseIfs) {
+        json::object elseIfObj;
+        elseIfObj["expr"] = expr->asJSON();
+        elseIfObj["block"] = block->asJSON();
+        obj["elseIfs"].as_array().emplace_back(elseIfObj);
+    }
+    return obj;
 }
 
 LgsIfStmt::~LgsIfStmt() {
