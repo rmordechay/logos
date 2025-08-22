@@ -29,6 +29,7 @@ LgsCoroutine* LgsStmt::asCoroutine() { return dynamic_cast<LgsCoroutine*>(this);
 LgsDeferStmt* LgsStmt::asDefer() { return dynamic_cast<LgsDeferStmt*>(this); }
 LgsFuncCall* LgsStmt::asFuncCall() { return dynamic_cast<LgsFuncCall*>(this); }
 LgsIfStmt* LgsStmt::asIfStmt() { return dynamic_cast<LgsIfStmt*>(this); }
+LgsPattern* LgsStmt::asPattern() { return dynamic_cast<LgsPattern*>(this); }
 LgsPostfixExpr* LgsStmt::asPostfixExpr() { return dynamic_cast<LgsPostfixExpr*>(this); }
 LgsSelection* LgsStmt::asSelection() { return dynamic_cast<LgsSelection*>(this); }
 LgsBreak* LgsStmt::asBreak() { return dynamic_cast<LgsBreak*>(this); }

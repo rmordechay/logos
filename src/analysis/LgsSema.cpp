@@ -131,9 +131,8 @@ void LgsSema::visitParam(LgsParam* param) {
 }
 
 void LgsSema::visitStmt(LgsStmt* stmt) {
-    if (const auto ifStmt = stmt->asIfStmt()) {
-        ifStmt->isPatternMatching ? visitPatternMatching(ifStmt) : visitIfStmt(ifStmt);
-    }
+    if (const auto ifStmt = stmt->asIfStmt()) visitIfStmt(ifStmt);
+    else if (const auto pattern = stmt->asPattern()) visitPatternMatching(pattern);
     else if (const auto varDec = stmt->asVarDec()) visitVarDec(varDec);
     else if (const auto loopStmt = stmt->asLoop()) visitLoopStmt(loopStmt);
     else if (const auto coroutine = stmt->asCoroutine()) visitCoroutine(coroutine);

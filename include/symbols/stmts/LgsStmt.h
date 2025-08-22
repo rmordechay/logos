@@ -1,6 +1,7 @@
 #pragma once
 #include <LgsValue.h>
 
+class LgsPattern;
 class LgsDeferStmt;
 class LgsCoroutine;
 class LgsPostfixExpr;
@@ -23,6 +24,7 @@ public:
     LgsDeferStmt* asDefer();
     LgsFuncCall* asFuncCall();
     LgsIfStmt* asIfStmt();
+    LgsPattern* asPattern();
     LgsPostfixExpr* asPostfixExpr();
     LgsSelection* asSelection();
     LgsBreak* asBreak();

@@ -56,6 +56,18 @@ void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }
 
+bool LgsExpr::completeType(LgsType* toType) {
+    return true;
+}
+
+LgsExpr* LgsExpr::clone() {
+    assert(0);
+}
+
+Value* LgsExpr::hash(LgsCodeGen* codeGen) {
+    assert(0);
+}
+
 // Casting
 LgsFunc* LgsExpr::asFunc() { return dynamic_cast<LgsFunc*>(this); }
 LgsVariable* LgsExpr::asVariable() { return dynamic_cast<LgsVariable*>(this); }
@@ -69,10 +81,6 @@ LgsFloatConst* LgsExpr::asFloatConst() { return dynamic_cast<LgsFloatConst*>(thi
 LgsStrConst* LgsExpr::asStrConst() { return dynamic_cast<LgsStrConst*>(this); }
 LgsVectorExpr* LgsExpr::asVectorExpr() { return dynamic_cast<LgsVectorExpr*>(this); }
 LgsIntConst* LgsExpr::asIntConst() { return dynamic_cast<LgsIntConst*>(this); }
-
-LgsExpr* LgsExpr::clone() { assert(0); }
-Value* LgsExpr::hash(LgsCodeGen* codeGen) { assert(0); }
-bool LgsExpr::completeType(LgsType* toType) { return true; }
 
 LgsExpr::~LgsExpr() {
     if (type) {

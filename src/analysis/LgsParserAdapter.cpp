@@ -586,8 +586,7 @@ LgsStmt* LgsParserAdapter::getContinueStmt(const LogosParser::StatementContext* 
 }
 
 LgsStmt* LgsParserAdapter::getPatternMatching(LogosParser::PatternMatchingContext* ctx) {
-    const auto patternMatching = new LgsIfStmt(getExpr(ctx->expr()));
-    patternMatching->isPatternMatching = true;
+    const auto patternMatching = new LgsPattern(getExpr(ctx->expr()));
     for (const auto& pattern : ctx->pattern()) {
         const auto expr = getExpr(pattern->expr());
         const auto stmtBlock = getStmtBlock(pattern->statementsBlock());

@@ -3,7 +3,7 @@
 #include "LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 
-class LgsIfStmt final : public LgsStmt {
+class LgsIfStmt : public LgsStmt {
 public:
     LgsExpr* ifCond;
     LgsStmtsBlock* ifBlock;
@@ -13,12 +13,17 @@ public:
     llvm::BasicBlock* IRExitBlock = nullptr;
     std::string tag;
 
-    explicit LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock = nullptr) : ifCond(ifCond), ifBlock(ifStmtBlock) {}
+    explicit LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock) : ifCond(ifCond), ifBlock(ifStmtBlock) {}
     void createIRValue(LgsCodeGen* codeGen) override;
     void generateSimpleIf(LgsCodeGen* codeGen);
     void generateIfWithElse(LgsCodeGen* codeGen);
     void generateElseIf(LgsCodeGen* codeGen);
-    void generatePatternMatching(LgsCodeGen* codeGen);
     json::value asJSON() override;
     ~LgsIfStmt() override;
+};
+
+class LgsPattern final : public LgsIfStmt {
+public:
+    explicit LgsPattern(LgsExpr* ifCond) : LgsIfStmt(ifCond, nullptr) {}
+    void createIRValue(LgsCodeGen* codeGen) override;
 };

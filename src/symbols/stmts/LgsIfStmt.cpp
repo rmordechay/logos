@@ -5,9 +5,7 @@
 #include "utils/LgsUtils.h"
 
 void LgsIfStmt::createIRValue(LgsCodeGen* codeGen) {
-    if (isPatternMatching) {
-        generatePatternMatching(codeGen);
-    } else if (elseIfs.empty()) {
+    if (elseIfs.empty()) {
         if (!elseBlock) {
             generateSimpleIf(codeGen);
         } else {
@@ -99,7 +97,31 @@ void LgsIfStmt::generateElseIf(LgsCodeGen* codeGen) {
     codeGen->startBlock(IRExitBlock);
 }
 
-void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) {
+json::value LgsIfStmt::asJSON() {
+    assert(0);
+}
+
+LgsIfStmt::~LgsIfStmt() {
+    if (ifCond) {
+        delete ifCond;
+        ifCond = nullptr;
+    }
+    if (ifBlock) {
+        delete ifBlock;
+        ifBlock = nullptr;
+    }
+    if (elseBlock) {
+        delete elseBlock;
+        elseBlock = nullptr;
+    }
+    for (const auto& [expr, block] : elseIfs) {
+        freeExpr(expr);
+        delete block;
+    }
+    elseIfs.clear();
+}
+
+void LgsPattern::createIRValue(LgsCodeGen* codeGen) {
     const auto defaultBlock = codeGen->createBlock(BLOCK_NAME_DEFAULT_CASE);
     const auto exitBlock = codeGen->createBlock(BLOCK_NAME_EXIT_PATTERN);
 
@@ -135,28 +157,4 @@ void LgsIfStmt::generatePatternMatching(LgsCodeGen* codeGen) {
     }
 
     codeGen->startBlock(exitBlock);
-}
-
-json::value LgsIfStmt::asJSON() {
-    assert(0);
-}
-
-LgsIfStmt::~LgsIfStmt() {
-    if (ifCond) {
-        delete ifCond;
-        ifCond = nullptr;
-    }
-    if (ifBlock) {
-        delete ifBlock;
-        ifBlock = nullptr;
-    }
-    if (elseBlock) {
-        delete elseBlock;
-        elseBlock = nullptr;
-    }
-    for (const auto& [expr, block] : elseIfs) {
-        freeExpr(expr);
-        delete block;
-    }
-    elseIfs.clear();
 }
