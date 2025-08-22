@@ -31,7 +31,7 @@ LgsExpr* LgsShort::getZeroValue() {
     return new LgsIntConst(&LGS_SHORT, 0);
 }
 
-bool LgsShort::equals(LgsType* other) {
+bool LgsShort::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsInt::name) return true;

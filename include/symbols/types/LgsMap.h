@@ -47,7 +47,7 @@ public:
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     StructType* getMapStruct(LgsCodeGen* codeGen);
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
     void freeValue(LgsCodeGen* codeGen, Value* value) override;
     std::string strFormatPart() const override;
     ~LgsMap() override;

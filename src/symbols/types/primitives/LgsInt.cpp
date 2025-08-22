@@ -3,11 +3,11 @@
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
 #include "types/LgsCPtr.h"
+#include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsShort.h"
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
-
 
 size_t LgsInt::getSizeBytes() {
     return sizeof(int);
@@ -21,14 +21,13 @@ LgsExpr* LgsInt::getZeroValue() {
     return new LgsIntConst(&LGS_INT, 0);
 }
 
-bool LgsInt::equals(LgsType* other) {
+bool LgsInt::canCastTo(LgsType* other) {
     const auto otherName = other->getName();
+    if (name == otherName) return true;
     if (otherName == LgsAny::name) return true;
-    if (otherName == LgsBool::name) return true;
-    if (otherName == LgsChar::name) return true;
-    if (otherName == LgsShort::name) return true;
     if (otherName == LgsFloat::name) return true;
-    return name == otherName;
+    if (otherName == LgsDouble::name) return true;
+    return false;
 }
 
 std::string LgsInt::strFormatPart() const {

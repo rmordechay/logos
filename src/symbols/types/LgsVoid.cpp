@@ -27,7 +27,7 @@ std::string LgsVoid::strFormatPart() const {
     assert(0);
 }
 
-bool LgsVoid::equals(LgsType* other) {
+bool LgsVoid::canCastTo(LgsType* other) {
     return name == other->getName();
 }
 

@@ -30,6 +30,6 @@ Type* LgsDouble::getIRType(LgsCodeGen* codeGen) {
     return codeGen->builder.getDoubleTy();
 }
 
-bool LgsDouble::equals(LgsType* other) {
+bool LgsDouble::canCastTo(LgsType* other) {
     return name == other->getName();
 }

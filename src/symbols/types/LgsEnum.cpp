@@ -24,7 +24,7 @@ std::string LgsEnum::pname() {
     return name;
 }
 
-bool LgsEnum::equals(LgsType* other) {
+bool LgsEnum::canCastTo(LgsType* other) {
     return name == other->getName();
 }
 

@@ -10,7 +10,7 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string getName() override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     json::value asJSON() override;
 };

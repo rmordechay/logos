@@ -29,7 +29,7 @@ LgsExpr* LgsCPtr::getZeroValue() {
     return new LgsNull();
 }
 
-bool LgsCPtr::equals(LgsType* other) {
+bool LgsCPtr::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsLong::name) return true;

@@ -17,13 +17,16 @@ void LgsFunc::createIRValue(LgsCodeGen* codeGen) {
 }
 
 Value* LgsFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
-    if (funcType->hasDefaults) {
-        assert(0);
-    }
+    if (funcType->hasDefaults) assert(0);
     std::vector<Value*> IRArgs;
-    for (int i = funcType->isStatic; i < args.size(); ++i) {
-        auto arg = loadIRArg(codeGen, args[i]->getIRValue(codeGen), args[i]->type);
-        IRArgs.push_back(arg);
+    for (int i = funcType->isStatic; i < funcType->params.size(); ++i) {
+        const auto arg = args[i];
+        const auto& param = funcType->params[i];
+        const auto argToParam = arg->castTo(param.type);
+        auto v = argToParam->getIRValue(codeGen);
+        v = loadIRArg(codeGen, v, arg->type);
+        IRArgs.push_back(v);
+        freeExpr(argToParam);
     }
     return callIR(codeGen, IRArgs);
 }
@@ -42,7 +45,7 @@ Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
     auto IRFunc = codeGen->IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(codeGen);
-    const auto funcTy = cast<FunctionType>(type);
+    const auto funcTy = llvm::cast<FunctionType>(type);
     if (funcType->isInternal) {
         funcName = LGS_RUNTIME_NAMES_PREFIX + funcName;
     }
@@ -62,7 +65,7 @@ Value* LgsFunc::callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args) {
     CallInst* rv = nullptr;
     if (IRValue) {
         const auto funcTypeIR = funcType->getIRType(codeGen);
-        const auto IRFuncType = cast<FunctionType>(funcTypeIR);
+        const auto IRFuncType = llvm::cast<FunctionType>(funcTypeIR);
         rv = codeGen->builder.CreateCall(IRFuncType, IRValue, args);
     } else {
         const auto IRFunc = getIRFunc(codeGen);

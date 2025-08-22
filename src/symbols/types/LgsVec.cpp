@@ -53,7 +53,7 @@ Value* LgsVec::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
     return codeGen->builder.getTrue();
 }
 
-bool LgsVec::equals(LgsType* other) {
+bool LgsVec::canCastTo(LgsType* other) {
     assert(0);
 }
 

@@ -16,7 +16,7 @@ public:
     json::value asJSON() override;
     size_t getSizeBytes() override;
     std::string strFormatPart() const override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
 
 };
 

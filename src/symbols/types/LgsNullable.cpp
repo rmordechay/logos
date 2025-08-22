@@ -22,8 +22,8 @@ std::string LgsNullable::pname() {
     return baseType->pname() + '?';
 }
 
-bool LgsNullable::equals(LgsType* other) {
-    return baseType->equals(other);
+bool LgsNullable::canCastTo(LgsType* other) {
+    return baseType->canCastTo(other);
 }
 
 size_t LgsNullable::getSizeBytes() {

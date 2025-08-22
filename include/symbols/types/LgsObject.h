@@ -24,7 +24,7 @@ public:
     LgsObject* clone() override;
     std::string getName() override;
     std::string pname() override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
     json::value asJSON() override;
     ~LgsObject() override;
 };

@@ -71,11 +71,11 @@ Value* LgsDArray::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
     return isNotEmptyFunc->call(codeGen, {iterable});
 }
 
-bool LgsDArray::equals(LgsType* other) {
+bool LgsDArray::canCastTo(LgsType* other) {
     const auto otherArr = other->asDArray();
     if (!otherArr) return false;
     if (!baseType) return true;
-    return baseType->equals(otherArr->baseType);
+    return baseType->canCastTo(otherArr->baseType);
 }
 
 json::value LgsDArray::asJSON() {

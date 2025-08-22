@@ -118,7 +118,7 @@ std::string LgsObject::pname() {
     return name;
 }
 
-bool LgsObject::equals(LgsType* other) {
+bool LgsObject::canCastTo(LgsType* other) {
     if (const auto group = other->asGroup()) {
         for (const auto groupType : group->types) {
             if (name == groupType->getName()) {

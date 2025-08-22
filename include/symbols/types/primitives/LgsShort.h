@@ -8,6 +8,7 @@ public:
     LgsShort() {
         isPrimitive = true;
         isNumber = true;
+        isInt = true;
     }
     size_t getSizeBytes() override;
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
@@ -15,7 +16,7 @@ public:
     std::string pname() override;
     json::value asJSON() override;
     LgsExpr* getZeroValue() override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
 };
 

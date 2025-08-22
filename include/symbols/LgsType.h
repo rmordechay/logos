@@ -42,8 +42,10 @@ class LgsCodeGen;
 
 class LgsType {
 public:
+    bool isInt = false;
     bool isNumber = false;
     bool isUnsigned = false;
+    bool isFloatPoint = false;
     bool isPrimitive = false;
     bool isSliceable = false;
     bool isHeapAlloc = false;
@@ -55,15 +57,15 @@ public:
     virtual LgsField* getField(const std::string& name);
     virtual LgsFunc* getMethod(const std::string& name);
     virtual llvm::Type* getIRType(LgsCodeGen* codeGen) = 0;
-    virtual void freeValue(LgsCodeGen* codeGen, llvm::Value* value);
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual std::string getName() = 0;
     virtual std::string pname() = 0; // pretty name
-    virtual bool equals(LgsType* other) = 0;
+    virtual bool canCastTo(LgsType* other) = 0;
     virtual std::string strFormatPart() const = 0;
     virtual json::value asJSON() = 0;
     virtual LgsType* clone();
+    virtual void freeValue(LgsCodeGen* codeGen, llvm::Value* value);
 
     bool addField(LgsField* field);
     bool addMethod(LgsFunc* method);

@@ -22,11 +22,14 @@ json::value LgsVarDec::asJSON() {
 }
 
 bool LgsVarDec::shouldAllocate(const Type* IRType) const {
-    if (type->isVector() ||
+    if (type->isNumber ||
+        type->isVector() ||
         type->asFuncType() ||
         type->asMap() ||
         type->asDArray() ||
-        expr->asInstance()) return false;
+        expr->asInstance() ||
+        (expr->asFuncCall() && type->isNumber)
+    ) return false;
     return !IRType->isArrayTy() && !IRType->isPointerTy() && !IRType->isVoidTy();
 }
 

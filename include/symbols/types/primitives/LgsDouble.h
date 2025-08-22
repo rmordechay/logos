@@ -7,6 +7,7 @@ public:
     LgsDouble() {
         isPrimitive = true;
         isNumber = true;
+        isFloatPoint = true;
     }
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
@@ -15,7 +16,7 @@ public:
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
 };
 
 inline LgsDouble LGS_DOUBLE;

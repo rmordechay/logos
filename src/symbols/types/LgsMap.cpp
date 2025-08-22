@@ -64,12 +64,12 @@ StructType* LgsMap::getMapStruct(LgsCodeGen* codeGen) {
     return mapStruct;
 }
 
-bool LgsMap::equals(LgsType* other) {
+bool LgsMap::canCastTo(LgsType* other) {
     const auto otherMap = other->asMap();
     if (!otherMap) return false;
     const auto otherKvType = otherMap->typePair;
-    const auto keyEqual = typePair->key->equals(otherKvType->key);
-    return keyEqual && typePair->value->equals(otherKvType->value);
+    const auto keyEqual = typePair->key->canCastTo(otherKvType->key);
+    return keyEqual && typePair->value->canCastTo(otherKvType->value);
 }
 
 void LgsMap::freeValue(LgsCodeGen* codeGen, Value* value) {

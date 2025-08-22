@@ -8,13 +8,14 @@ public:
     LgsFloat() {
         isPrimitive = true;
         isNumber = true;
+        isFloatPoint = true;
     }
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;
     std::string strFormatPart() const override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
     std::string pname() override;
     json::value asJSON() override;
 };

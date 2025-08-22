@@ -14,7 +14,7 @@ public:
     size_t getSizeBytes() override;
     std::string pname() override;
     json::value asJSON() override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
 };
 
@@ -43,10 +43,10 @@ inline json::value LgsTypePair::asJSON() {
     return obj;
 }
 
-inline bool LgsTypePair::equals(LgsType* other) {
+inline bool LgsTypePair::canCastTo(LgsType* other) {
     const auto otherPair = dynamic_cast<LgsTypePair*>(other);
     if (!otherPair) return false;
-    return key->equals(otherPair->key) && value->equals(otherPair->value);
+    return key->canCastTo(otherPair->key) && value->canCastTo(otherPair->value);
 }
 
 inline std::string LgsTypePair::strFormatPart() const {

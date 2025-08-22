@@ -64,6 +64,10 @@ LgsExpr* LgsExpr::clone() {
     assert(0);
 }
 
+LgsExpr* LgsExpr::castTo(LgsType* toType) {
+    assert(0);
+}
+
 Value* LgsExpr::hash(LgsCodeGen* codeGen) {
     assert(0);
 }

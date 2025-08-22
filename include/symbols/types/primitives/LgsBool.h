@@ -10,6 +10,7 @@ public:
     LgsBool() {
         isPrimitive = true;
         isNumber = true;
+        isInt = true;
     }
     std::string pname() override;
     json::value asJSON() override;
@@ -18,7 +19,7 @@ public:
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;
     size_t getSizeBytes() override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
 };
 
 inline LgsBool LGS_BOOL;

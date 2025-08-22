@@ -15,7 +15,7 @@ public:
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
 };
 
 inline LgsChar LGS_CHAR;

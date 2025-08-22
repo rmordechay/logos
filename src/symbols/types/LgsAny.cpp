@@ -29,6 +29,6 @@ std::string LgsAny::strFormatPart() const {
     return "%p";
 }
 
-bool LgsAny::equals(LgsType* other) {
+bool LgsAny::canCastTo(LgsType* other) {
     return true;
 }

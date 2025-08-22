@@ -20,7 +20,7 @@ size_t LgsUnknown::getSizeBytes() {
     return 0;
 }
 
-bool LgsUnknown::equals(LgsType* other) {
+bool LgsUnknown::canCastTo(LgsType* other) {
     return false;
 }
 

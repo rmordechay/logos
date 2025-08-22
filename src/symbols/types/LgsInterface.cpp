@@ -52,7 +52,7 @@ LgsExpr* LgsInterface::getZeroValue() {
     assert(0);
 }
 
-bool LgsInterface::equals(LgsType* other) {
+bool LgsInterface::canCastTo(LgsType* other) {
     if (const auto interface = other->asInterface()) {
         if (interface->name == getName()) return true;
     } else if (const auto obj = other->asObject()) {

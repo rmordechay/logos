@@ -30,9 +30,9 @@ std::string LgsGroup::strFormatPart() const {
     return "%s";
 }
 
-bool LgsGroup::equals(LgsType* other) {
+bool LgsGroup::canCastTo(LgsType* other) {
     for (const auto type : types) {
-        if (type->equals(other)) return true;
+        if (type->canCastTo(other)) return true;
     }
     return false;
 }

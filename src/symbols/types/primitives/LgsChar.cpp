@@ -32,6 +32,6 @@ std::string LgsChar::strFormatPart() const {
     return "%c";
 }
 
-bool LgsChar::equals(LgsType* other) {
+bool LgsChar::canCastTo(LgsType* other) {
     return name == other->getName();
 }

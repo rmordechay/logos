@@ -26,7 +26,7 @@ public:
     Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
     static int8_t getSwizzleSet(const char c);
     static int8_t getComponentIndex(const char c);
     std::string strFormatPart() const override;

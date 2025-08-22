@@ -72,6 +72,7 @@ public:
     LgsIntConst* asIntConst();
 
     virtual LgsExpr* clone();
+    virtual LgsExpr* castTo(LgsType* toType);
     virtual bool completeType(LgsType* toType);
     virtual llvm::Value* hash(LgsCodeGen* codeGen);
     ~LgsExpr() override;

@@ -33,7 +33,7 @@ std::string LgsLong::getName() {
     return name;
 }
 
-bool LgsLong::equals(LgsType* other) {
+bool LgsLong::canCastTo(LgsType* other) {
     const auto otherName = other->getName();
     if (otherName == LgsAny::name) return true;
     if (otherName == LgsChar::name) return true;

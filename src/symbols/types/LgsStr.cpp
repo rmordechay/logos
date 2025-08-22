@@ -56,7 +56,7 @@ Value* LgsStr::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
     return isNotEmptyFunc->call(codeGen, {iterable});
 }
 
-bool LgsStr::equals(LgsType* other) {
+bool LgsStr::canCastTo(LgsType* other) {
     if (other->getName() == LgsAny::name) return true;
     if (const auto iter = other->asIterable()) {
         return iter->baseType && iter->baseType->asChar();

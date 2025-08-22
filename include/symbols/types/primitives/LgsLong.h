@@ -10,6 +10,7 @@ public:
     LgsLong() {
         isPrimitive = true;
         isNumber = true;
+        isInt = true;
     }
     Type* getIRType(LgsCodeGen* codeGen) override;
     size_t getSizeBytes() override;
@@ -18,7 +19,7 @@ public:
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
 };
 
 inline LgsLong LGS_LONG;

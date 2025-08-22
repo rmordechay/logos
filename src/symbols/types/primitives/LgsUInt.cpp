@@ -29,7 +29,7 @@ LgsExpr* LgsUInt::getZeroValue() {
     return new LgsIntConst(this, 0);
 }
 
-bool LgsUInt::equals(LgsType* other) {
+bool LgsUInt::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsInt::name) return true;

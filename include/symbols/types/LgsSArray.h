@@ -25,6 +25,6 @@ public:
     Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
     ~LgsSArray() override;
 };

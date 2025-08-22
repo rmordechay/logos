@@ -22,7 +22,7 @@ std::string LgsTable::getName() {
     return name;
 }
 
-bool LgsTable::equals(LgsType* other) {
+bool LgsTable::canCastTo(LgsType* other) {
     assert(0);
 }
 

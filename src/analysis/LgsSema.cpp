@@ -195,7 +195,7 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
     const auto lType = lValue->type;
     const auto rType = rValue->type;
     if (!lType || !rType) return;
-    if (!lType->equals(rType)) {
+    if (!lType->canCastTo(rType)) {
         errHandler.addError(E10001, &assignment->location, {lType->pname(), rType->pname()});
     }
 }
@@ -237,7 +237,7 @@ void LgsSema::visitPatternMatching(LgsIfStmt* pm) {
         visitExpr(expr);
         visitStmtsBlock(block);
         if (expr->type->isUnknown()) continue;
-        if (!baseExprType->equals(expr->type)) {
+        if (!baseExprType->canCastTo(expr->type)) {
             return errHandler.addError(E10014, &expr->location, {expr->type->pname(), baseExprType->pname()});
         }
         stack.exitScope();
@@ -355,7 +355,7 @@ void LgsSema::visitReturnStmt(LgsReturn* returnStmt) {
         errHandler.addError(E10027, &returnStmt->location, {retExpr->type->pname()});
     } else if (!rt->isVoid() && !retExpr) {
         errHandler.addError(E10026, &returnStmt->location, {funcType->name, rt->pname()});
-    } else if (retExpr && retExpr->type && !rt->equals(retExpr->type)) {
+    } else if (retExpr && retExpr->type && !rt->canCastTo(retExpr->type)) {
         errHandler.addError(E10004, &returnStmt->location, {funcType->name, rt->pname(), retExpr->type->pname()});
     }
 }
@@ -787,10 +787,10 @@ void LgsSema::visitSlice(LgsIterIndex* iterIndex) {
     if (!baseExpr->type->isSliceable) {
         return errHandler.addError(E10042, &iterIndex->location, {iterIndex->pname(), baseExpr->type->pname()});
     }
-    if (!iterable->getIndexType()->equals(exprFrom->type)) {
+    if (!iterable->getIndexType()->canCastTo(exprFrom->type)) {
         return errHandler.addError(E10036, &iterIndex->location, {iterIndex->pname(), exprFrom->type->pname()});
     }
-    if (!iterable->getIndexType()->equals(exprTo->type)) {
+    if (!iterable->getIndexType()->canCastTo(exprTo->type)) {
         return errHandler.addError(E10036, &iterIndex->location, {iterIndex->pname(), exprFrom->type->pname()});
     }
     validateSliceBounds(iterIndex);
@@ -896,7 +896,7 @@ void LgsSema::validateObjInterface(LgsObject* obj, LgsInterface* interface) {
     std::vector<LgsField*> missingFields;
     for (const auto& interfaceField : interface->fields) {
         const auto objField = obj->getField(interfaceField->name);
-        if (objField && objField->type->equals(interfaceField->type)) {
+        if (objField && objField->type->canCastTo(interfaceField->type)) {
             objField->isVirtual = true;
             continue;
         }
@@ -911,7 +911,7 @@ void LgsSema::validateObjInterface(LgsObject* obj, LgsInterface* interface) {
         const auto method = obj->methods.find(name);
         if (method != obj->methods.end()) {
             const auto objMethod = obj->methods.find(name);
-            if (objMethod != obj->methods.end() && objMethod->second->funcType->equals(interfaceMethod->funcType)) {
+            if (objMethod != obj->methods.end() && objMethod->second->funcType->canCastTo(interfaceMethod->funcType)) {
                 objMethod->second->funcType->isVirtual = true;
                 continue;
             }
@@ -931,7 +931,7 @@ void LgsSema::validateIndex(LgsIterIndex* iterIndex) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto exprFrom = iterIndex->index->from;
     const auto iterable = baseExpr->type->asIterable();
-    if (!iterable->getIndexType()->equals(exprFrom->type)) {
+    if (!iterable->getIndexType()->canCastTo(exprFrom->type)) {
         return errHandler.addError(E10036, &iterIndex->location, {iterIndex->pname(), exprFrom->type->pname()});
     }
     if (const auto sArr = iterable->asSArray()) {
@@ -1028,7 +1028,7 @@ void LgsSema::matchExprToType(LgsExpr* expr, LgsType* type) {
         return;
     }
     if (!type || !expr->type) return;
-    if (!type->equals(expr->type)) {
+    if (!type->canCastTo(expr->type)) {
         errHandler.addError(E10001, &expr->location, {type->pname(), expr->type->pname()});
     }
 }

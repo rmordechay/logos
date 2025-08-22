@@ -1,6 +1,7 @@
 #include "exprs/LgsNull.h"
 #include "exprs/unary/constants/LgsFloatConst.h"
 #include "types/LgsAny.h"
+#include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsInt.h"
 
 json::value LgsFloat::asJSON() {
@@ -31,9 +32,10 @@ std::string LgsFloat::strFormatPart() const {
     return "%f";
 }
 
-bool LgsFloat::equals(LgsType* other) {
+bool LgsFloat::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
+    if (name == IRName) return true;
     if (IRName == LgsAny::name) return true;
-    if (IRName == LgsInt::name) return true;
-    return name == IRName;
+    if (IRName == LgsDouble::name) return true;
+    return false;
 }

@@ -41,10 +41,10 @@ std::string LgsSArray::pname() {
     return ty + '[' + index + "]!";
 }
 
-bool LgsSArray::equals(LgsType* other) {
+bool LgsSArray::canCastTo(LgsType* other) {
     const auto otherArr = other->asSArray();
     if (!otherArr) return false;
-    return baseType->equals(otherArr->baseType);
+    return baseType->canCastTo(otherArr->baseType);
 }
 
 std::string LgsSArray::getName() {

@@ -46,7 +46,7 @@ public:
     std::string pname() override;
     json::value asJSON() override;
     std::string strFormatPart() const override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
     LgsType* clone() override;
     ~LgsFuncType() override;
 };

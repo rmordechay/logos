@@ -8,11 +8,12 @@ public:
     LgsInt() {
         isPrimitive = true;
         isNumber = true;
+        isInt = true;
     }
     size_t getSizeBytes() override;
     llvm::Type* getIRType(LgsCodeGen* codeGen) override;
     LgsExpr* getZeroValue() override;
-    bool equals(LgsType* other) override;
+    bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
     std::string getName() override;
     std::string pname() override;

@@ -28,7 +28,7 @@ LgsExpr* LgsSize::getZeroValue() {
     assert(0);
 }
 
-bool LgsSize::equals(LgsType* other) {
+bool LgsSize::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsFloat::name) return true;

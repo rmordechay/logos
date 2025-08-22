@@ -1,39 +1,38 @@
 #include "exprs/unary/constants/LgsIntConst.h"
+#include "exprs/unary/constants/LgsFloatConst.h"
+#include "types/primitives/LgsBool.h"
+#include "types/primitives/LgsChar.h"
+#include "types/primitives/LgsDouble.h"
+#include "types/primitives/LgsInt.h"
+#include "types/primitives/LgsLong.h"
+#include "types/primitives/LgsShort.h"
 
-void LgsIntConst::setNumberType() {
+void LgsIntConst::createIRValue(LgsCodeGen* codeGen) {
     if (type->asBool()) {
-        numberType = LgsNumberType::I1;
+        IRValue = codeGen->i1(value);
     } else if (type->asChar()) {
-        numberType = LgsNumberType::I8;
+        IRValue = codeGen->i8(value);
     } else if (type->asShort()) {
-        numberType = LgsNumberType::I16;
+        IRValue = codeGen->i16(value);
     } else if (type->asInt()) {
-        numberType = LgsNumberType::I32;
+        IRValue = codeGen->i32(value);
     } else if (type->asLong()) {
-        numberType = LgsNumberType::I64;
-    } else {
-        assert(0);
+        IRValue = codeGen->i64(value);
     }
 }
 
-void LgsIntConst::createIRValue(LgsCodeGen* codeGen) {
-    switch (numberType) {
-    case LgsNumberType::I1:
-        IRValue = codeGen->i1(value);
-        break;
-    case LgsNumberType::I8:
-        IRValue = codeGen->i8(value);
-        break;
-    case LgsNumberType::I16:
-        IRValue = codeGen->i16(value);
-        break;
-    case LgsNumberType::I32:
-        IRValue = codeGen->i32(value);
-        break;
-    case LgsNumberType::I64:
-        IRValue = codeGen->i64(value);
-        break;
+LgsExpr* LgsIntConst::castTo(LgsType* toType) {
+    if (type->getName() == toType->getName()) return this;
+    if (toType->asLong()) {
+        return new LgsIntConst(&LGS_LONG, value);
     }
+    if (toType->asFloat()) {
+        return new LgsFloatConst(&LGS_FLOAT, value);
+    }
+    if (toType->asDouble()) {
+        return new LgsFloatConst(&LGS_DOUBLE, value);
+    }
+    assert(0);
 }
 
 LgsExpr* LgsIntConst::clone() {

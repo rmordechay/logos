@@ -88,17 +88,17 @@ std::string LgsFuncType::strFormatPart() const {
     return "%p";
 }
 
-bool LgsFuncType::equals(LgsType* other) {
+bool LgsFuncType::canCastTo(LgsType* other) {
     const auto otherFuncType = other->asFuncType();
     if (!otherFuncType) return false;
     const auto otherParams = otherFuncType->params;
     if (params.size() != otherParams.size()) return false;
     if (params.size() == 0 && otherParams.size() == 0) return true;
-    if (otherFuncType->rt && !rt->equals(otherFuncType->rt)) return false;
+    if (otherFuncType->rt && !rt->canCastTo(otherFuncType->rt)) return false;
     for (size_t i = isMethod; i < params.size(); ++i) {
         const auto thisType = params[i].type;
         const auto otherType = otherFuncType->params[i].type;
-        if (!thisType->equals(otherType)) return false;
+        if (!thisType->canCastTo(otherType)) return false;
     }
     return true;
 }
