@@ -36,6 +36,7 @@
 #include "loops/LgsRangeLoop.h"
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
+#include "types/LgsTable.h"
 #include "types/primitives/LgsDouble.h"
 
 void LgsSema::analyse() {
@@ -84,6 +85,15 @@ void LgsSema::visitInterface(LgsInterface* interface) {
     }
     if (allMethodsImplemented) {
         errHandler.addError(E10062, &interface->location, {interface->name});
+    }
+}
+
+void LgsSema::visitTable(LgsTable* table) {
+    for (const auto& field : table->fields) {
+        visitField(field);
+    }
+    for (const auto& [_, method] : table->methods) {
+        visitFunc(method);
     }
 }
 
@@ -694,7 +704,9 @@ void LgsSema::visitInstance(LgsInstance* instance) {
     }
 
     if (symbol->symbolType == TABLE) {
-        return visitTableInstance(instance, symbol->table);
+        instance->table = symbol->table;
+        instance->setType(symbol->table);
+        return;
     }
 
     const auto obj = symbol->object;
@@ -752,10 +764,6 @@ void LgsSema::visitInterfaceInstance(LgsInstance* instance, LgsInterface* interf
     if (isValid) {
         visitObject(instance->obj);
     }
-}
-
-void LgsSema::visitTableInstance(LgsInstance* instance, LgsTable* table) {
-    assert(0);
 }
 
 void LgsSema::visitIterIndex(LgsIterIndex* iterIndex) {

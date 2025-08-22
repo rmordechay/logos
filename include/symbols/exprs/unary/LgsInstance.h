@@ -12,6 +12,7 @@ public:
     explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), name(obj->name), obj(obj) {}
     void createIRValue(LgsCodeGen* codeGen) override;
+    void createIRTable(LgsCodeGen* codeGen);
     void initFields(LgsCodeGen* codeGen);
     void setObject(LgsObject* newObj);
     void setVirtuals(LgsCodeGen* codeGen) const;

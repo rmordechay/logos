@@ -46,6 +46,14 @@ extern "C" void* Lgs_Vtable_get(void* instancePtr, const char* name) {
     return runtime.vtable[instancePtr][name];
 }
 
+extern "C" void initDB() {
+    sqlite3_open(":memory:", &runtime.db);
+}
+
+extern "C" void closeDB() {
+    sqlite3_close(runtime.db);
+}
+
 void Lgs_runtime::init() {
     scheduler.run();
 }

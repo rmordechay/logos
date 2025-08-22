@@ -59,6 +59,7 @@ public:
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
+    void visitTable(LgsTable* table);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitParam(LgsParam* param);
@@ -100,7 +101,6 @@ public:
     void visitStrConst(const LgsStrConst* strConst);
     void visitInstance(LgsInstance* instance);
     void visitInterfaceInstance(LgsInstance* instance, LgsInterface* interface);
-    void visitTableInstance(LgsInstance* instance, LgsTable* table);
     void visitIterIndex(LgsIterIndex* iterIndex);
     void visitSlice(LgsIterIndex* iterIndex);
     void visitGroup(LgsGroup* group);

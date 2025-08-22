@@ -137,6 +137,7 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_scheduler.cpp
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
+    runtime/lib/Lgs_table.cpp
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

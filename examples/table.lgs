@@ -5,6 +5,6 @@ table Table {
 }
 
 main() {
-    table = Table{file = "memory"}
-    table.execute("INSERT INTO {self}")
+    t = Table{file = "memory"}
+    //t.execute("INSERT INTO")
 }
