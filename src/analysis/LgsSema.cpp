@@ -98,7 +98,7 @@ void LgsSema::visitField(LgsField* field) {
 }
 
 void LgsSema::visitFunc(LgsFunc* func) {
-    stack.enterScope(func, func->stmtsBlock);
+    stack.enterScope(func);
     auto defaultParamsStarted = false;
     for (auto& param : func->funcType->params) {
         visitParam(&param);
@@ -201,18 +201,18 @@ void LgsSema::visitAssignment(LgsAssignment* assignment) {
 }
 
 void LgsSema::visitIfStmt(LgsIfStmt* ifStmt) {
-    stack.enterScope(ifStmt, ifStmt->ifBlock);
+    stack.enterScope(ifStmt);
     visitExpr(ifStmt->ifCond);
     visitStmtsBlock(ifStmt->ifBlock);
     stack.exitScope();
     for (const auto& [expr, block] : ifStmt->elseIfs) {
-        stack.enterScope(ifStmt, block);
+        stack.enterScope(ifStmt);
         visitExpr(expr);
         visitStmtsBlock(block);
         stack.exitScope();
     }
     if (ifStmt->elseBlock) {
-        stack.enterScope(ifStmt, ifStmt->elseBlock);
+        stack.enterScope(ifStmt);
         visitStmtsBlock(ifStmt->elseBlock);
         stack.exitScope();
     }
@@ -223,7 +223,7 @@ void LgsSema::visitPatternMatching(LgsIfStmt* pm) {
         return visitBoolPatternMatching(pm);
     }
     const auto baseExpr = pm->ifCond;
-    stack.enterScope(pm, nullptr);
+    stack.enterScope(pm);
     visitExpr(baseExpr);
     const auto baseExprType = baseExpr->type;
     // Allows local enum fields to not have a qualifier inside the block
@@ -233,7 +233,7 @@ void LgsSema::visitPatternMatching(LgsIfStmt* pm) {
         }
     }
     for (const auto [expr, block] : pm->elseIfs) {
-        stack.enterScope(pm, block);
+        stack.enterScope(pm);
         visitExpr(expr);
         visitStmtsBlock(block);
         if (expr->type->isUnknown()) continue;
@@ -243,7 +243,7 @@ void LgsSema::visitPatternMatching(LgsIfStmt* pm) {
         stack.exitScope();
     }
     if (pm->elseBlock) {
-        stack.enterScope(pm, pm->elseBlock);
+        stack.enterScope(pm);
         visitStmtsBlock(pm->elseBlock);
         stack.exitScope();
     }
@@ -252,7 +252,7 @@ void LgsSema::visitPatternMatching(LgsIfStmt* pm) {
 
 void LgsSema::visitBoolPatternMatching(LgsIfStmt* pm) {
     for (const auto [expr, block] : pm->elseIfs) {
-        stack.enterScope(pm, block);
+        stack.enterScope(pm);
         visitExpr(expr);
         if (!expr->type->asBool()) {
             return errHandler.addError(E10057, &expr->location, {expr->pname()});
@@ -261,7 +261,7 @@ void LgsSema::visitBoolPatternMatching(LgsIfStmt* pm) {
         stack.exitScope();
     }
     if (pm->elseBlock) {
-        stack.enterScope(pm, pm->elseBlock);
+        stack.enterScope(pm);
         visitStmtsBlock(pm->elseBlock);
         stack.exitScope();
     }
@@ -277,7 +277,7 @@ void LgsSema::visitWhileLoop(LgsWhileLoop* whileLoop) {
 }
 
 void LgsSema::visitLoopStmt(LgsForLoop* loopStmt) {
-    stack.enterScope(loopStmt, loopStmt->stmtsBlock);
+    stack.enterScope(loopStmt);
     if (loopStmt->isFirst) addLocalSymbol(LgsSymbol(loopStmt->isFirst));
     if (loopStmt->isLast) addLocalSymbol(LgsSymbol(loopStmt->isLast));
     if (const auto rangeLoop = dynamic_cast<LgsRangeLoop*>(loopStmt)) {

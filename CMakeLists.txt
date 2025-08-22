@@ -43,7 +43,9 @@ set(CORE_SOURCES
     src/analysis/LgsSema.cpp
     src/analysis/LgsTypeResolver.cpp
     src/cli/LgsCli.cpp
+    src/cli/LgsCliCmd.cpp
     src/cli/LgsRunCmd.cpp
+    src/cli/LgsAstCmd.cpp
     src/extern/LgsCLang.cpp
     src/extern/LgsCLangVisitor.cpp
     src/files/LgsMainFile.cpp
@@ -137,10 +139,6 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_scheduler.cpp
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
-    src/cli/LgsCliCmd.cpp
-    include/cli/LgsCliHelp.h
-    src/cli/LgsAstCmd.cpp
-    include/cli/LgsAstCmd.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})

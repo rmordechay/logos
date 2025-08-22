@@ -6,33 +6,30 @@
 #include "stmts/LgsReturn.h"
 #include "types/LgsFuncType.h"
 #include "types/LgsVoid.h"
-
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 
+void LgsFunc::createIRValue(LgsCodeGen* codeGen) {
+    codeGen->savedIP = codeGen->builder.saveIP();
+    generateIR(codeGen);
+    codeGen->builder.restoreIP(codeGen->savedIP);
+    IRValue = getIRFunc(codeGen);
+}
+
 Value* LgsFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
-    std::vector<Value*> IRArgs;
     if (funcType->hasDefaults) {
-        for (int i = funcType->isStatic; i < args.size(); ++i) {
-            const auto arg = args[i];
-            IRArgs.push_back(loadIRArg(codeGen, arg->getIRValue(codeGen), arg->type));
-        }
-        const std::vector defaultParams(funcType->params.begin() + args.size(), funcType->params.end());
-        for (const auto& defaultParam : defaultParams) {
-            auto arg = defaultParam.expr->getIRValue(codeGen);
-            IRArgs.push_back(arg);
-        }
-    } else {
-        for (int i = funcType->isStatic; i < args.size(); ++i) {
-            const auto arg = args[i];
-            IRArgs.push_back(loadIRArg(codeGen, arg->getIRValue(codeGen), arg->type));
-        }
+        assert(0);
+    }
+    std::vector<Value*> IRArgs;
+    for (int i = funcType->isStatic; i < args.size(); ++i) {
+        auto arg = loadIRArg(codeGen, args[i]->getIRValue(codeGen), args[i]->type);
+        IRArgs.push_back(arg);
     }
     return callIR(codeGen, IRArgs);
 }
 
 void LgsFunc::generateIR(LgsCodeGen* codeGen) {
-    codeGen->stack.enterScope(this, stmtsBlock);
+    codeGen->stack.enterScope(this);
     createPrologue(codeGen);
     stmtsBlock->createIRValue(codeGen);
     createEpilogue(codeGen);
@@ -61,20 +58,6 @@ Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
     return IRFunc;
 }
 
-void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops) {
-    funcType = new LgsFuncType();
-    funcType->name = name;
-    funcType->rt = rt;
-    funcType->setFuncOptions(ops);
-    if (funcType->isMethod && !funcType->isStatic) {
-        funcType->parentName = paramTypes.front()->getName();
-    }
-    for (const auto paramsType : paramTypes) {
-        funcType->params.push_back(LgsParam(paramsType));
-    }
-    type = funcType;
-}
-
 Value* LgsFunc::callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args) {
     CallInst* rv = nullptr;
     if (IRValue) {
@@ -86,6 +69,16 @@ Value* LgsFunc::callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args) {
         rv = codeGen->builder.CreateCall(IRFunc, args);
     }
     return rv;
+}
+
+Value* LgsFunc::loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type) {
+    if (type->asCPtr() || type->asFuncType() || type->asObject() || type->asDArray() || type->asSArray()) return v;
+    const auto vTy = v->getType();
+    if (vTy->isIntegerTy() || vTy->isFloatingPointTy()) return v;
+    if (!vTy->isPointerTy()) return v;
+    if (isa<GlobalVariable>(v) || isa<LoadInst>(v)) return v;
+    const auto ty = type->getIRType(codeGen);
+    return codeGen->builder.CreateLoad(ty, v);
 }
 
 void LgsFunc::createPrologue(LgsCodeGen* codeGen) {
@@ -104,11 +97,22 @@ void LgsFunc::createEpilogue(LgsCodeGen* codeGen) {
     codeGen->callPopStack();
 }
 
-void LgsFunc::createIRValue(LgsCodeGen* codeGen) {
-    codeGen->savedIP = codeGen->builder.saveIP();
-    generateIR(codeGen);
-    codeGen->builder.restoreIP(codeGen->savedIP);
-    IRValue = getIRFunc(codeGen);
+void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops) {
+    funcType = new LgsFuncType();
+    funcType->name = name;
+    funcType->rt = rt;
+    funcType->setFuncOptions(ops);
+    if (funcType->isMethod && !funcType->isStatic) {
+        funcType->parentName = paramTypes.front()->getName();
+    }
+    for (const auto paramsType : paramTypes) {
+        funcType->params.push_back(LgsParam(paramsType));
+    }
+    type = funcType;
+}
+
+bool LgsFunc::needsCleanup() const {
+    return !heapAllocExprs.empty();
 }
 
 void LgsFunc::cleanupExprs(LgsCodeGen* codeGen) {
@@ -133,10 +137,6 @@ void LgsFunc::cleanupExprs(LgsCodeGen* codeGen) {
             // codeGen->builder.CreateBr(stmtsBlock->getCleanupBlock(codeGen));
         }
     }
-}
-
-bool LgsFunc::needsCleanup() const {
-    return !heapAllocExprs.empty();
 }
 
 BasicBlock* LgsFunc::getCleanupBlock(LgsCodeGen* codeGen) {
@@ -209,16 +209,6 @@ LgsExpr* LgsFunc::clone() {
     newFunc->isSpread = isSpread;
     newFunc->isAssignable = isAssignable;
     return newFunc;
-}
-
-Value* LgsFunc::loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type) {
-    if (type->asFuncType() || type->asObject() || type->asDArray()) return v;
-    const auto vTy = v->getType();
-    if (vTy->isIntegerTy() || vTy->isFloatingPointTy()) return v;
-    if (!vTy->isPointerTy()) return v;
-    if (isa<GlobalVariable>(v) || isa<LoadInst>(v)) return v;
-    const auto ty = type->getIRType(codeGen);
-    return codeGen->builder.CreateLoad(ty, v);
 }
 
 LgsFunc::~LgsFunc() {

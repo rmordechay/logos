@@ -3,8 +3,8 @@
 #include "loops/LgsForLoop.h"
 #include "stmts/LgsIfStmt.h"
 
-void LgsStack::enterScope(LgsValue* value, LgsStmtsBlock* stmtsBlock) {
-    LgsStackFrame stackFrame = {.stmtsBlock = stmtsBlock};
+void LgsStack::enterScope(LgsValue* value) {
+    LgsStackFrame stackFrame;
     if (const auto func = dynamic_cast<LgsFunc*>(value)) {
         stackFrame.func = func;
     } else if (const auto loop = dynamic_cast<LgsForLoop*>(value)) {
@@ -46,10 +46,6 @@ LgsIfStmt* LgsStack::outermostIfStmt() {
         if (it->ifStmt) return it->ifStmt;
     }
     return nullptr;
-}
-
-LgsStmtsBlock* LgsStack::currentStmtsBlock() {
-    return top().stmtsBlock;
 }
 
 LgsSymbolTable& LgsStack::getSymbolTable() {

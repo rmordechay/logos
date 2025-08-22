@@ -3,7 +3,6 @@
 
 #include "utils/LgsUtils.h"
 
-
 std::string LgsCharConst::pname() {
     return type->pname();
 }

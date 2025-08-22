@@ -1,0 +1,19 @@
+interface Interface {
+    func()
+}
+
+object Obj {
+    implements: Interface
+    func() {
+        print("From Obj")
+    }
+}
+
+r(o: Interface) {
+    o.func()
+}
+
+main() {
+    obj = Obj{}
+    r(obj)
+}

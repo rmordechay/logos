@@ -5,7 +5,7 @@
 #include "types/LgsStr.h"
 
 void LgsMainFunc::generateIR(LgsCodeGen* codeGen) {
-    codeGen->stack.enterScope(this, stmtsBlock);
+    codeGen->stack.enterScope(this);
     createPrologue(codeGen);
     // codeGen->callRuntimeInit();
     if (!funcType->params.empty()) initMainArgs(codeGen);

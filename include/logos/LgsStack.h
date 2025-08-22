@@ -14,17 +14,15 @@ struct LgsStackFrame {
     LgsFunc* func = nullptr;
     LgsForLoop* loop = nullptr;
     LgsIfStmt* ifStmt = nullptr;
-    LgsStmtsBlock* stmtsBlock = nullptr;
 };
 
 class LgsStack final : std::stack<LgsStackFrame> {
 public:
-    void enterScope(LgsValue* value, LgsStmtsBlock* stmtsBlock);
+    void enterScope(LgsValue* value);
     void exitScope();
     LgsFunc* currentFunc();
     LgsForLoop* currentLoop();
     LgsIfStmt* currentIfStmt();
-    LgsStmtsBlock* currentStmtsBlock();
     LgsIfStmt* outermostIfStmt();
     LgsSymbolTable& getSymbolTable();
     void addHeapAllocExpr(LgsExpr* expr);

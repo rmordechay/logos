@@ -9,7 +9,7 @@ json::value LgsForLoop::asJSON() {
 }
 
 void LgsForLoop::createIRValue(LgsCodeGen* codeGen) {
-    codeGen->stack.enterScope(this, stmtsBlock);
+    codeGen->stack.enterScope(this);
     setBlocks(codeGen);
     createIRLoop(codeGen);
     incAndJumpToCond(codeGen);
