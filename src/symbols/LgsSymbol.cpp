@@ -6,7 +6,9 @@
 #include "types/LgsGroup.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
-#include "types/LgsUnknown.h"
+#include "types/LgsTable.h"
+
+class LgsTable;
 
 LgsSymbol::LgsSymbol()
     : name(nullptr), symbolType(UNKNOWN), location(nullptr) {}
@@ -14,8 +16,8 @@ LgsSymbol::LgsSymbol()
 LgsSymbol::LgsSymbol(LgsParam* param)
     : name(&param->name), symbolType(PARAM), param(param), location(&param->location) {}
 
-LgsSymbol::LgsSymbol(LgsVarDec* varDec)
-    : name(&varDec->name), symbolType(VAR_DEC), varDec(varDec), location(&varDec->location) {}
+LgsSymbol::LgsSymbol(LgsTable* table)
+    : name(&table->name), symbolType(TABLE), table(table), location(&table->location) {}
 
 LgsSymbol::LgsSymbol(LgsField* field)
     : name(&field->name), symbolType(ENUM_FIELD), field(field), location(&field->location) {}
@@ -35,26 +37,5 @@ LgsSymbol::LgsSymbol(LgsEnum* lgsEnum, const bool isExternal, const bool isBuilt
 LgsSymbol::LgsSymbol(LgsFunc* func, const bool isExternal, const bool isBuiltin)
     : name(&func->funcType->name), symbolType(FUNC), isExternal(isExternal), isBuiltin(isBuiltin), func(func), location(&func->location) {}
 
-void* LgsSymbol::getSymbol() const {
-    switch (symbolType) {
-    case VAR_DEC:
-        return varDec;
-    case PARAM:
-        return param;
-    case FUNC:
-        return func;
-    case OBJECT:
-        return object;
-    case INTERFACE:
-        return interface;
-    case ENUM_FIELD:
-        return field;
-    case ENUM:
-        return lgsEnum;
-    case GROUP:
-        return group;
-    case UNKNOWN:
-        break;
-    }
-    assert(0);
-}
+LgsSymbol::LgsSymbol(LgsVarDec* varDec)
+    : name(&varDec->name), symbolType(VAR_DEC), varDec(varDec), location(&varDec->location) {}

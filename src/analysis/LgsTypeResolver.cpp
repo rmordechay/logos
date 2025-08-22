@@ -1,4 +1,5 @@
 #include "analysis/LgsTypeResolver.h"
+
 #include "files/LgsFile.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"
@@ -83,7 +84,15 @@ LgsType* LgsTypeResolver::resolveType(LgsType* type, LgsFile* file) {
         case ENUM:
             newType = symbol->lgsEnum;
             break;
-        default:
+        case VAR_DEC:
+            break;
+        case PARAM:
+            break;
+        case ENUM_FIELD:
+            break;
+        case TABLE:
+            break;
+        case UNKNOWN:
             break;
         }
         assert(newType);

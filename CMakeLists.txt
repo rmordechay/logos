@@ -57,7 +57,6 @@ set(CORE_SOURCES
     src/files/LgsInterfaceFile.cpp
     src/utils/LgsErrHandler.cpp
     src/symbols/types/LgsTable.cpp
-    src/symbols/exprs/unary/LgsTableExpr.cpp
 
     src/symbols/LgsSymbol.cpp
     src/symbols/LgsSymbolTable.cpp
@@ -76,7 +75,6 @@ set(CORE_SOURCES
     src/symbols/exprs/unary/LgsSelection.cpp
     src/symbols/exprs/unary/LgsVariable.cpp
     src/symbols/exprs/unary/LgsVectorExpr.cpp
-    src/symbols/exprs/unary/LgsTableExpr.cpp
     src/symbols/exprs/unary/constants/LgsCharConst.cpp
     src/symbols/exprs/unary/constants/LgsFloatConst.cpp
     src/symbols/exprs/unary/constants/LgsIntConst.cpp
@@ -154,6 +152,7 @@ target_link_libraries(lgs_core PUBLIC
 
 target_precompile_headers(lgs_core PRIVATE include/pch.h)
 target_include_directories(lgs_core PUBLIC
+    include
     include/external/include
     include/external/antlr4-runtime
     ${CLANG_INCLUDE_DIRS}

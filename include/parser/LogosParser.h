@@ -35,23 +35,23 @@ public:
     RuleLogosFile = 0, RuleLogosEnvFile = 1, RuleLogosAppFile = 2, RuleMainFile = 3, 
     RuleObjectFile = 4, RuleInterfaceFile = 5, RuleInterface = 6, RuleGroup = 7, 
     RuleGroupTypesList = 8, RuleGroupTargetList = 9, RuleInterfaceBody = 10, 
-    RuleObject = 11, RuleObjectBody = 12, RuleField = 13, RuleInterfaceField = 14, 
-    RuleImplements = 15, RuleFuncSignatureHeader = 16, RuleFuncSignature = 17, 
-    RuleInterfaceFunc = 18, RuleFunc = 19, RuleLambda = 20, RuleLambdaParams = 21, 
-    RuleLambdaParam = 22, RuleMethod = 23, RuleParam = 24, RuleStatement = 25, 
-    RuleStatementsBlock = 26, RuleAssignment = 27, RuleExplicitVarDec = 28, 
-    RuleImplicitVarDec = 29, RuleIfStatement = 30, RuleElseIfStatement = 31, 
-    RuleElseStatement = 32, RulePatternMatching = 33, RulePattern = 34, 
-    RuleLoopStatement = 35, RuleBreakStmt = 36, RuleReturnStatement = 37, 
-    RuleEnumDeclaration = 38, RuleEnumField = 39, RuleCoroutine = 40, RuleDeferStmt = 41, 
-    RuleExpr = 42, RuleUnaryExpr = 43, RulePrefixExpr = 44, RulePostfixExpr = 45, 
-    RuleArrayExpr = 46, RuleHashMap = 47, RuleKeyValue = 48, RuleFuncCall = 49, 
-    RuleFuncArgList = 50, RuleFuncArg = 51, RuleInstance = 52, RuleInstanceArgList = 53, 
-    RuleInstanceArg = 54, RuleConstant = 55, RuleIterIndex = 56, RuleIndex = 57, 
-    RuleIsFirst = 58, RuleIsLast = 59, RuleSelection = 60, RuleFirstSelectionElement = 61, 
-    RuleInnerSelectionElement = 62, RuleRange = 63, RuleType = 64, RuleMapType = 65, 
-    RuleArraySize = 66, RuleFuncType = 67, RuleVector = 68, RuleExtern = 69, 
-    RuleRequireEnvVars = 70, RuleRequirePackages = 71, RuleAssignemntOp = 72
+    RuleObject = 11, RuleTable = 12, RuleObjectBody = 13, RuleTableBody = 14, 
+    RuleField = 15, RuleInterfaceField = 16, RuleImplements = 17, RuleFuncSignatureHeader = 18, 
+    RuleFuncSignature = 19, RuleInterfaceFunc = 20, RuleFunc = 21, RuleLambda = 22, 
+    RuleLambdaParams = 23, RuleLambdaParam = 24, RuleMethod = 25, RuleParam = 26, 
+    RuleStatement = 27, RuleStatementsBlock = 28, RuleAssignment = 29, RuleExplicitVarDec = 30, 
+    RuleImplicitVarDec = 31, RuleIfStatement = 32, RuleElseIfStatement = 33, 
+    RuleElseStatement = 34, RulePatternMatching = 35, RulePattern = 36, 
+    RuleLoopStatement = 37, RuleBreakStmt = 38, RuleReturnStatement = 39, 
+    RuleEnumDeclaration = 40, RuleEnumField = 41, RuleCoroutine = 42, RuleDeferStmt = 43, 
+    RuleExpr = 44, RuleUnaryExpr = 45, RulePrefixExpr = 46, RulePostfixExpr = 47, 
+    RuleArrayExpr = 48, RuleHashMap = 49, RuleKeyValue = 50, RuleFuncCall = 51, 
+    RuleFuncArgList = 52, RuleFuncArg = 53, RuleInstance = 54, RuleInstanceArgList = 55, 
+    RuleInstanceArg = 56, RuleConstant = 57, RuleIterIndex = 58, RuleIndex = 59, 
+    RuleIsFirst = 60, RuleIsLast = 61, RuleSelection = 62, RuleFirstSelectionElement = 63, 
+    RuleInnerSelectionElement = 64, RuleRange = 65, RuleType = 66, RuleMapType = 67, 
+    RuleArraySize = 68, RuleFuncType = 69, RuleVector = 70, RuleExtern = 71, 
+    RuleRequireEnvVars = 72, RuleRequirePackages = 73, RuleAssignemntOp = 74
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -83,7 +83,9 @@ public:
   class GroupTargetListContext;
   class InterfaceBodyContext;
   class ObjectContext;
+  class TableContext;
   class ObjectBodyContext;
+  class TableBodyContext;
   class FieldContext;
   class InterfaceFieldContext;
   class ImplementsContext;
@@ -206,6 +208,8 @@ public:
     InterfaceContext* interface(size_t i);
     std::vector<GroupContext *> group();
     GroupContext* group(size_t i);
+    std::vector<TableContext *> table();
+    TableContext* table(size_t i);
     std::vector<FuncContext *> func();
     FuncContext* func(size_t i);
 
@@ -330,12 +334,26 @@ public:
     antlr4::tree::TerminalNode *RBRACE();
     antlr4::tree::TerminalNode *OBJECT();
     antlr4::tree::TerminalNode *SINGLETON();
-    antlr4::tree::TerminalNode *TABLE();
 
    
   };
 
   ObjectContext* object();
+
+  class  TableContext : public antlr4::ParserRuleContext {
+  public:
+    TableContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *TABLE();
+    antlr4::tree::TerminalNode *IDENTIFIER();
+    antlr4::tree::TerminalNode *LBRACE();
+    TableBodyContext *tableBody();
+    antlr4::tree::TerminalNode *RBRACE();
+
+   
+  };
+
+  TableContext* table();
 
   class  ObjectBodyContext : public antlr4::ParserRuleContext {
   public:
@@ -351,6 +369,20 @@ public:
   };
 
   ObjectBodyContext* objectBody();
+
+  class  TableBodyContext : public antlr4::ParserRuleContext {
+  public:
+    TableBodyContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<FieldContext *> field();
+    FieldContext* field(size_t i);
+    std::vector<MethodContext *> method();
+    MethodContext* method(size_t i);
+
+   
+  };
+
+  TableBodyContext* tableBody();
 
   class  FieldContext : public antlr4::ParserRuleContext {
   public:

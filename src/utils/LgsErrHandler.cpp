@@ -6,12 +6,12 @@ void LgsErrHandler::setUnsuccessful() {
     successful = false;
 }
 
-void LgsErrHandler::addError(const LgsBaseError& lgsErr, LgsLocation* location, const std::vector<std::string>& args) {
+void LgsErrHandler::addError(const LgsBaseError& lgsErr, const LgsLocation* location, const std::vector<std::string>& args) {
     setUnsuccessful();
     std::string result;
     formatErrorMsg(lgsErr, args, result);
     if (location) {
-        errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.errCode, .location = location});
+        errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.errCode, .location = *location});
     } else {
         errors.emplace_back(LgsError{.msg = result, .errCode = lgsErr.errCode});
     }

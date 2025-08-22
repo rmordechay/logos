@@ -14,7 +14,7 @@ struct LgsBaseError {
 struct LgsError {
     std::string msg;
     size_t errCode;
-    LgsLocation* location;
+    LgsLocation location;
 };
 
 /** Templates errors. Should not be returned directly, but formatted and returned as a new LgsError */

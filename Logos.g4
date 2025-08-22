@@ -13,7 +13,7 @@ logosAppFile:
     ;
 
 mainFile:
-        (object | enumDeclaration | interface | group)* func+ EOF
+        (object | enumDeclaration | interface | group | table)* func+ EOF
     ;
 
 objectFile:
@@ -45,11 +45,19 @@ interfaceBody:
     ;
 
 object:
-        (OBJECT | SINGLETON | TABLE) IDENTIFIER LBRACE objectBody RBRACE
+        (OBJECT | SINGLETON) IDENTIFIER LBRACE objectBody RBRACE
+    ;
+
+table:
+        TABLE IDENTIFIER LBRACE tableBody RBRACE
     ;
 
 objectBody:
         implements? field* method*
+    ;
+
+tableBody:
+        field* method*
     ;
 
 field:

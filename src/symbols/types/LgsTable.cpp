@@ -1,6 +1,5 @@
 #include "types/LgsTable.h"
 #include "builtins/LgsSystem.h"
-#include "exprs/unary/LgsTableExpr.h"
 
 std::string LgsTable::pname() {
     return getName();
@@ -15,7 +14,7 @@ size_t LgsTable::getSizeBytes() {
 }
 
 LgsExpr* LgsTable::getZeroValue() {
-    return new LgsTableExpr(this);
+    assert(0);
 }
 
 std::string LgsTable::getName() {
@@ -32,4 +31,9 @@ std::string LgsTable::strFormatPart() const {
 
 json::value LgsTable::asJSON() {
     assert(0);
+}
+
+LgsTable::~LgsTable() {
+    freeExpr(instance);
+    instance = nullptr;
 }

@@ -3,8 +3,6 @@
 #include "funcs/LgsFunc.h"
 #include "utils/LgsErrHandler.h"
 #include "stmts/LgsAssignment.h"
-#include "utils/LgsUtils.h"
-
 
 struct LgsPaths;
 class LgsStrConst;
@@ -55,7 +53,8 @@ public:
     LgsMainFunc* getMainFunc(LogosParser::FuncContext* ctx);
     LgsInterface* getInterface(LogosParser::InterfaceBodyContext* ctx, antlr4::tree::TerminalNode* interfaceName);
     LgsObject* getObject(LogosParser::ObjectBodyContext* ctx, antlr4::tree::TerminalNode* objName, bool isSingleton);
-    LgsField* getField(LogosParser::FieldContext* ctx, size_t position, LgsObject* obj);
+    LgsTable* getTable(LogosParser::TableContext* ctx);
+    LgsField* getField(LogosParser::FieldContext* ctx, size_t position, LgsType* parentType);
     LgsFunc* getLambda(LogosParser::LambdaContext* ctx);
     LgsParam getParam(LgsFuncType* funcType, LogosParser::ParamContext* param);
     LgsField* getInterfaceField(LogosParser::InterfaceFieldContext* ctx);

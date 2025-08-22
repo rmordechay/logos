@@ -6,8 +6,9 @@ class LgsInstance final : public LgsUnaryExpr {
 public:
     std::string name;
     LgsObject* obj = nullptr;
+    LgsTable* table = nullptr;
+    std::map<std::string, LgsVarDec*> args;
 
-   std::map<std::string, LgsVarDec*> args;
     explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), name(obj->name), obj(obj) {}
     void createIRValue(LgsCodeGen* codeGen) override;

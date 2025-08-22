@@ -12,6 +12,7 @@ public:
     std::vector<LgsObject*> objects;
     std::map<std::string, LgsFunc*> funcs;
     std::vector<LgsInterface*> interfaces;
+    std::vector<LgsTable*> tables;
     std::vector<LgsGroup*> groups;
 
     explicit LgsMainFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, LGS_MAIN_FILE_NAME, path) {}

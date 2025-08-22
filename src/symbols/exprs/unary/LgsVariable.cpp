@@ -5,6 +5,8 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
+#include "types/LgsTable.h"
+
 #include <logos/LgsCodeGen.h>
 
 void LgsVariable::createIRValue(LgsCodeGen* codeGen) {
@@ -26,6 +28,9 @@ void LgsVariable::createIRValue(LgsCodeGen* codeGen) {
     case ENUM_FIELD:
         IRValue = codeGen->getIRStr(name);
         return;
+    case TABLE:
+        IRValue = ref.table->instance->getIRValue(codeGen);
+        break;
     case INTERFACE:
     case GROUP:
     case UNKNOWN:

@@ -1,4 +1,5 @@
 #include "analysis/LgsParserAdapter.h"
+#include "analysis/LgsParserAdapter.h"
 #include "funcs/LgsCoroutine.h"
 #include "files/LgsEnvFile.h"
 #include "files/LgsInterfaceFile.h"
@@ -40,6 +41,7 @@
 #include "types/LgsInterface.h"
 #include "types/LgsMap.h"
 #include "types/LgsNullable.h"
+#include "types/LgsTable.h"
 #include "types/LgsUnknown.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsShort.h"
@@ -113,6 +115,12 @@ LgsMainFile* LgsParserAdapter::getMainFile(LogosParser::MainFileContext* ctx, co
         auto lgsInterface = getInterface(interface->interfaceBody(), interface->IDENTIFIER());
         file->interfaces.push_back(lgsInterface);
         addFileSymbol(file, LgsSymbol(lgsInterface));
+    }
+
+    for (const auto table : ctx->table()) {
+        auto lgsTable = getTable(table);
+        file->tables.push_back(lgsTable);
+        addFileSymbol(file, LgsSymbol(lgsTable));
     }
 
     for (const auto func : funcs) {
@@ -353,6 +361,28 @@ LgsObject* LgsParserAdapter::getObject(LogosParser::ObjectBodyContext* ctx, antl
     return obj;
 }
 
+LgsTable* LgsParserAdapter::getTable(LogosParser::TableContext* ctx) {
+    const auto table = new LgsTable(ctx->IDENTIFIER()->getText());
+    setLocation(table->location, ctx->start);
+    // Fields
+    for (int i = 0; i < ctx->tableBody()->field().size(); ++i) {
+        const auto lgsField = getField(ctx->tableBody()->field(i), i, table);
+        const auto fieldAdded = table->addField(lgsField);
+        if (!fieldAdded) {
+            errHandler.addError(E10056, &table->location, {table->name, lgsField->name});
+        }
+    }
+    // Methods
+    for (const auto& func : ctx->tableBody()->method()) {
+        const auto method = getMethod(func, table);
+        const auto methodAdded = table->addMethod(method);
+        if (!methodAdded) {
+            errHandler.addError(E10072, &table->location, {table->name, method->funcType->pname()});
+        }
+    }
+    return table;
+}
+
 LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamContext* param) {
     const auto variableName = param->IDENTIFIER()->getText();
     const auto expr = getExpr(param->expr());
@@ -367,7 +397,7 @@ LgsParam LgsParserAdapter::getParam(LgsFuncType* funcType, LogosParser::ParamCon
     return lgsParam;
 }
 
-LgsField* LgsParserAdapter::getField(LogosParser::FieldContext* ctx, const size_t position, LgsObject* obj) {
+LgsField* LgsParserAdapter::getField(LogosParser::FieldContext* ctx, const size_t position, LgsType* parentType) {
     const auto name = ctx->IDENTIFIER()->getText();
     const auto type = getType(ctx->type());
     const auto expr = getExpr(ctx->expr());
@@ -695,7 +725,6 @@ LgsExpr* LgsParserAdapter::getExpr(LogosParser::ExprContext* ctx) {
     } else if (ctx->LPAREN() && ctx->RPAREN()) {
         expr = getExpr(ctx->left);
     }
-    assert(expr);
     return expr;
 }
 
@@ -726,7 +755,11 @@ LgsUnaryExpr* LgsParserAdapter::getUnaryExpr(LogosParser::UnaryExprContext* ctx)
     if (const auto null = ctx->NULL_()) return getNullValue(null);
     if (const auto isFirst = ctx->isFirst()) return getLoopIsFirst(isFirst);
     if (const auto isLast = ctx->isLast()) return getLoopIsLast(isLast);
-    assert(0);
+    LgsLocation location;
+    location.fileID = fileID;
+    setLocation(location, ctx->start);
+    errHandler.addError(E10006, &location, {ctx->getText()});
+    return nullptr;
 }
 
 LgsOperator mapOperator(LogosParser::ExprContext* expr) {

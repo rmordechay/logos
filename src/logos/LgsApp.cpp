@@ -183,9 +183,9 @@ void LgsApp::writeIRFiles() {
 void LgsApp::exitWithErrors() const {
     for (int i = 0; i < errHandler.errors.size(); ++i) {
         const auto err = errHandler.errors[i];
-        const auto posInLine = std::to_string(err.location->posInLine);
-        const auto lineNumber = std::to_string(err.location->lineStart);
-        const auto file = ast[err.location->fileID];
+        const auto posInLine = std::to_string(err.location.posInLine);
+        const auto lineNumber = std::to_string(err.location.lineStart);
+        const auto file = ast[err.location.fileID];
         const auto filePath = file->absPath.string();
         const auto fullPath = filePath + ":" + lineNumber + ":" + posInLine;
         const auto path = "\n   at: " + fullPath;

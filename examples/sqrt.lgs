@@ -1,0 +1,8 @@
+func(x: Double) {
+    a = _/x + _/34
+    print(a)
+}
+
+main() {
+    func(2)
+}
