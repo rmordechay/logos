@@ -94,3 +94,4 @@ inline LgsBaseError E10071{.msg = "'break if' must be inside an if statement.", 
 inline LgsBaseError E10072{.msg = "Type '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10078{.msg = "Type '%s' has multiple methods with the same name '%s'.", .errCode = errCodeStart++};
 inline LgsBaseError E10079{.msg = "Defer functions must return 'Void'. Given: '%s'.", .errCode = errCodeStart++};
+inline LgsBaseError E10080{.msg = "Index '%s' was not found in iterable.", .errCode = errCodeStart++};

@@ -4,14 +4,14 @@
 #include <exprs/unary/LgsArrayExpr.h>
 #include "types/LgsMap.h"
 
-Value* LgsIterIndex::loadFromDArray(LgsCodeGen& codeGen, LgsDArray* arr) const {
+Value* LgsIterIndex::loadFromDArray(LgsCodeGen& codeGen, const LgsDArray* arr) const {
     const auto arrPtr = baseExpr->IRValue;
     auto indexIRValue = index->from->IRValue;
     indexIRValue = codeGen.builder.CreateZExt(indexIRValue, codeGen.i64Ty());
     return arr->getFunc->callIR(codeGen, {arrPtr, indexIRValue});
 }
 
-Value* LgsIterIndex::loadFromMap(LgsCodeGen& codeGen, LgsMap* map) const {
+Value* LgsIterIndex::loadFromMap(LgsCodeGen& codeGen, const LgsMap* map) const {
     const auto mapPtr = baseExpr->IRValue;
     const auto key = index->from->IRValue;
     return map->getFunc->callIR(codeGen, {mapPtr, key});

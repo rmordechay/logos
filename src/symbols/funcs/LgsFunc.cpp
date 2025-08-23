@@ -87,10 +87,10 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
     type = funcType;
 }
 
-bool LgsFunc::completeType(LgsType* toType) {
+void LgsFunc::completeType(LgsType* toType) {
     const auto otherFuncType = toType->asFuncType();
-    if (!otherFuncType) return false;
-    if (otherFuncType->params.size() != funcType->params.size()) return false;
+    if (!otherFuncType) return;
+    if (otherFuncType->params.size() != funcType->params.size()) return;
     for (int i = 0; i < funcType->params.size(); ++i) {
         if (funcType->params[i].type) continue;
         funcType->params[i].type = otherFuncType->params[i].type;
@@ -98,7 +98,6 @@ bool LgsFunc::completeType(LgsType* toType) {
     if (!funcType->rt) {
         funcType->rt = otherFuncType->rt;
     }
-    return true;
 }
 
 BasicBlock* LgsFunc::getCleanupBlock(LgsCodeGen& codeGen) {

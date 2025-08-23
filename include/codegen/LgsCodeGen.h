@@ -29,10 +29,12 @@ public:
     DIBuilder* diBuilder = nullptr;
     DICompileUnit* compileUnit = nullptr;
     DISubprogram* diProgram = nullptr;
+    TargetMachine* targetMachine = nullptr;
 
-    void setupModule(const LgsFile& file, const DataLayout& dataLayout, bool debugMode = false);
+    void setupModule(const LgsFile& file, bool debugMode = false);
     Value* getIRStr(const std::string& value);
     GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name = "") const;
+    GlobalVariable* createConstGlobal(Type* type, Constant* zeroInit, const std::string& name = "") const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
     void storeValueInStruct(StructType* ty, Value* ptr, int i, Value* v);
     Value* loadValueFromStruct(Type* ty, Value* ptr, int i);
@@ -59,7 +61,7 @@ public:
     Value* callCoresNum();
     Value* callStrLen(Value* str);
     Value* callSqrt(Value* radicant);
-    void callCopyMem(Value* src, Value* dest, size_t n);
+    void callCopyMem(Value* dest, Value* src, ArrayType* at);
     void callRuntimeInit();
 
     // Runtime

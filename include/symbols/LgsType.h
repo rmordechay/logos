@@ -58,7 +58,6 @@ public:
     virtual LgsField* getField(const std::string& name);
     virtual LgsFunc* getMethod(const std::string& name);
     virtual llvm::Type* getIRType(LgsCodeGen& codeGen) = 0;
-    virtual llvm::DIBasicType* getDebugType(LgsCodeGen& codeGen);
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual std::string getName() = 0;
@@ -67,6 +66,7 @@ public:
     virtual std::string strFormatPart() const = 0;
     virtual json::value asJSON() = 0;
     virtual LgsType* clone();
+    virtual llvm::DIBasicType* getDebugType(LgsCodeGen& codeGen);
     virtual void freeValue(LgsCodeGen& codeGen, llvm::Value* value);
 
     bool addField(LgsField* field);

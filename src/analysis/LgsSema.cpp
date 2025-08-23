@@ -176,7 +176,7 @@ void LgsSema::visitStmtsBlock(LgsStmtsBlock* stmtsBlock) {
 void LgsSema::visitVarDec(LgsVarDec* varDec) {
     if (varDec->expr && varDec->type) {
         varDec->type = typeResolver.resolveType(varDec->type, file);
-        completeExprType(varDec->expr, varDec->type);
+        varDec->expr->completeType(varDec->type);
         visitExpr(varDec->expr);
         matchExprToType(varDec->expr, varDec->type);
     } else if (varDec->expr) {
@@ -1024,10 +1024,6 @@ bool LgsSema::validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const Lgs
         }
     }
     return isValid;
-}
-
-void LgsSema::completeExprType(LgsExpr* expr, LgsType* type) {
-    expr->completeType(type);
 }
 
 void LgsSema::matchExprToType(const LgsExpr* expr, LgsType* type) {

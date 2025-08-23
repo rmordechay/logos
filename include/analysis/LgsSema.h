@@ -117,7 +117,6 @@ public:
     bool validateMethodVisibility(const LgsFuncCall* methodCall, const LgsObject* parent);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
 
-    void completeExprType(LgsExpr* expr, LgsType* type);
     void matchExprToType(const LgsExpr* expr, LgsType* type);
 
     void resolveFuncCall(LgsFuncCall* funcCall);

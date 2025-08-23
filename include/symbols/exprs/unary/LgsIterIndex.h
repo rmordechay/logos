@@ -14,8 +14,8 @@ public:
         isAssignable = true;
     }
 
-    Value* loadFromDArray(LgsCodeGen& codeGen, LgsDArray* arr) const;
-    Value* loadFromMap(LgsCodeGen& codeGen, LgsMap* map) const;
+    Value* loadFromDArray(LgsCodeGen& codeGen, const LgsDArray* arr) const;
+    Value* loadFromMap(LgsCodeGen& codeGen, const LgsMap* map) const;
     Value* loadFromStr(LgsCodeGen& codeGen, const LgsStr* str) const;
     Value* loadFromVec(LgsCodeGen& codeGen) const;
     Value* createStrSlice(LgsCodeGen& codeGen, const LgsStr* str) const;

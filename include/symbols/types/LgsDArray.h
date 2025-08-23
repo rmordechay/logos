@@ -11,7 +11,7 @@ class LgsDArray final : public LgsIterable {
 public:
     static constexpr auto name = "DArray";
     StructType* arrStruct = nullptr;
-    LgsFunc* addFunc = new LgsFunc("add", &LGS_VOID, {this, &LGS_ANY}, PUBLIC | INTERNAL | METHOD);
+    LgsFunc* addFunc = new LgsFunc("add", &LGS_VOID, {this, &LGS_ANY}, INTERNAL | PUBLIC | METHOD);
     LgsFunc* lenFunc = new LgsFunc("len", &LGS_INT, {this}, INTERNAL | PUBLIC | METHOD);
     LgsFunc* getFunc = new LgsFunc("get", &LGS_ANY, {this, &LGS_LONG}, INTERNAL | PUBLIC | METHOD);
     LgsFunc* isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
@@ -21,7 +21,7 @@ public:
     LgsFunc* deleteFunc = new LgsFunc("delete", &LGS_VOID, {this, &LGS_LONG}, INTERNAL | METHOD);
     LgsFunc* freeFunc = new LgsFunc("free", &LGS_VOID, {this}, INTERNAL | METHOD);
 
-    explicit LgsDArray(LgsType* baseType = nullptr): LgsIterable(baseType) {
+    explicit LgsDArray(LgsType* baseType = nullptr) : LgsIterable(baseType) {
         addFunc->fn = [this](LgsCodeGen& cg, const std::vector<LgsExpr*>& args) {
             return callAdd(cg, args);
         };
@@ -31,6 +31,7 @@ public:
         addMethod(isNotEmptyFunc);
         isSliceable = true;
     }
+
     Value* callAdd(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) const;
     Type* getIRType(LgsCodeGen& codeGen) override;
     std::string getName() override;

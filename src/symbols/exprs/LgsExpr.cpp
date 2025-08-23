@@ -56,9 +56,7 @@ void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }
 
-bool LgsExpr::completeType(LgsType* toType) {
-    return true;
-}
+void LgsExpr::completeType(LgsType* toType) {}
 
 LgsExpr* LgsExpr::clone() {
     assert(0);

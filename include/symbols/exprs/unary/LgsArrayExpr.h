@@ -14,5 +14,6 @@ public:
     }
     std::string pname() override;
     json::value asJSON() override;
+    void completeType(LgsType* toType) override;
     ~LgsArrayExpr() override;
 };

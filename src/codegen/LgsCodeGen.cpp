@@ -11,12 +11,13 @@
 #include <llvm/TargetParser/Host.h>
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/MC/TargetRegistry.h>
+#include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
 
-void LgsCodeGen::setupModule(const LgsFile& file, const DataLayout& dataLayout, const bool debugMode) {
+void LgsCodeGen::setupModule(const LgsFile& file, const bool debugMode) {
     IRModule = new Module(file.name, context);
     IRModule->setTargetTriple(sys::getDefaultTargetTriple());
-    IRModule->setDataLayout(dataLayout);
+    IRModule->setDataLayout(targetMachine->createDataLayout());
     if (debugMode) {
         diBuilder = new DIBuilder(*IRModule);
         diFile = diBuilder->createFile(file.path.string(), "");
@@ -41,6 +42,10 @@ Value* LgsCodeGen::getIRStr(const std::string& value) {
 
 GlobalVariable* LgsCodeGen::createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name) const {
     return new GlobalVariable(*IRModule, type, false, GlobalValue::ExternalLinkage, zeroInit, name);
+}
+
+GlobalVariable* LgsCodeGen::createConstGlobal(Type* type, Constant* zeroInit, const std::string& name) const {
+    return new GlobalVariable(*IRModule, type, true, GlobalValue::PrivateLinkage, zeroInit, name);
 }
 
 StructType* LgsCodeGen::getStructType(const std::vector<Type*>& fields, const std::string& name) {
@@ -137,9 +142,11 @@ Value* LgsCodeGen::callSqrt(Value* radicant) {
     return callFunc("sqrt", getFT(doubleTy(), {doubleTy()}), {d});
 }
 
-void LgsCodeGen::callCopyMem(Value* src, Value* dest, const size_t n) {
-    const auto memCpy = Intrinsic::getDeclaration(IRModule, Intrinsic::memcpy, {ptrTy(), ptrTy(), ptrTy()});
-    builder.CreateCall(memCpy, {dest, src, i64(n), builder.getFalse()});
+void LgsCodeGen::callCopyMem(Value* dest, Value* src, ArrayType* at) {
+    const auto dataLayout = targetMachine->createDataLayout();
+    const auto size = dataLayout.getTypeAllocSize(at);
+    const auto align = dataLayout.getABITypeAlign(at).value();
+    builder.CreateMemCpy(dest, MaybeAlign(align), src, MaybeAlign(align), size);
 }
 
 void LgsCodeGen::callRuntimeInit() {

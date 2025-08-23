@@ -10,7 +10,7 @@ class LgsType;
 
 void logInfo(const std::string& text = "");
 void logError(const std::string& msg, const std::string& path = "");
-void formatAndLogError(const LgsBaseError& lgsErr, const std::vector<std::string>& args);
+void formatAndLogError(const LgsBaseError& lgsErr, const std::vector<std::string>& args = {});
 void formatErrorMsg(const LgsBaseError& lgsErr, const std::vector<std::string>& args, std::string& result);
 bool isLogosFile(const fs::path& filePath);
 bool isLLVMFile(const fs::directory_entry& entry);

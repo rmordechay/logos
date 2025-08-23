@@ -1,7 +1,6 @@
 #include "types/LgsDArray.h"
 #include "builtins/LgsPrint.h"
 #include "exprs/unary/LgsArrayExpr.h"
-#include "../codegen/LgsCodeGenVisitor.h"
 #include "types/primitives/LgsInt.h"
 
 Value* LgsDArray::callAdd(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) const {

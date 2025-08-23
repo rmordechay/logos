@@ -31,7 +31,8 @@ public:
             IRArgs.emplace_back(codeGen.getIRStr(formatStr));
             for (int i = 0; i < args.size(); ++i) {
                 const auto arg = args[i];
-                IRArgs.emplace_back(arg->IRValue);
+                const auto ir = loadIRArg(&codeGen, arg->IRValue, arg->type);
+                IRArgs.emplace_back(ir);
             }
         }
         return codeGen.callLgsFunc(name, codeGen.getFT(codeGen.voidTy(), {codeGen.ptrTy()}, true), IRArgs);

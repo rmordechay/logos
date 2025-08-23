@@ -1,5 +1,7 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "cli/LgsCli.h"
+#include "exprs/unary/constants/LgsIntConst.h"
+
 #include <llvm/IR/Module.h>
 
 std::string LgsArrayExpr::pname() {
@@ -11,6 +13,20 @@ json::value LgsArrayExpr::asJSON() {
     jsonObj["exprKind"] = "arrayExpr";
     jsonObj["type"] = type->asJSON();
     return jsonObj;
+}
+
+void LgsArrayExpr::completeType(LgsType* toType) {
+    const auto thisDArr = type->asDArray();
+    if (thisDArr && toType->asDArray()) {
+        freeExpr(thisDArr->sizeExpr);
+        thisDArr->sizeExpr = toType->asDArray()->sizeExpr;
+        return;
+    }
+    const auto thisSArr = type->asSArray();
+    if (thisSArr && toType->asSArray()) {
+        freeExpr(thisSArr->sizeExpr);
+        thisSArr->sizeExpr = toType->asSArray()->sizeExpr;
+    }
 }
 
 LgsArrayExpr::~LgsArrayExpr() {

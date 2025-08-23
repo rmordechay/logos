@@ -30,7 +30,7 @@ public:
     static Value* loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type);
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops);
     BasicBlock* getCleanupBlock(LgsCodeGen& codeGen);
-    bool completeType(LgsType* toType) override;
+    void completeType(LgsType* toType) override;
     bool needsCleanup() const;
     std::string pname() override;
     json::value asJSON() override;

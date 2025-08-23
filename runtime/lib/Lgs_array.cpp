@@ -1,3 +1,6 @@
+#include "configs/LgsErrors.h"
+#include "utils/LgsUtils.h"
+
 #include <cstring>
 #include <iostream>
 #include <vector>
@@ -44,7 +47,10 @@ extern "C" void Lgs_DArray_addLong(const Lgs_Array* a, const int64_t v)   {
 
 extern "C" void* Lgs_DArray_get(const Lgs_Array* arr, const size_t index) {
     const auto arrLen = arr->data->size() / arr->elementSize;
-    if (index >= arrLen) std::exit(1);
+    if (index >= arrLen) {
+        formatAndLogError(E10080, {std::to_string(index)});
+        return nullptr;
+    }
     return arr->data->data() + index * arr->elementSize;
 }
 
