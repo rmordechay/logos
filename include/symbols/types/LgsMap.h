@@ -6,19 +6,12 @@
 
 class LgsMapEntry;
 
-class LgsMapAddFunc final : public LgsFunc {
-public:
-    LgsType* parent;
-    explicit LgsMapAddFunc(LgsType* parentType) : LgsFunc("add", &LGS_VOID, {parentType, new LgsStr(), &LGS_ANY}, PUBLIC | INTERNAL | METHOD), parent(parentType) {}
-    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override;
-};
-
 class LgsMap final : public LgsIterable {
 public:
     static constexpr auto name = "Map";
     StructType* mapStruct = nullptr;
     LgsTypePair* typePair = nullptr;
-    LgsMapAddFunc* addFunc = new LgsMapAddFunc(this);
+    LgsFunc* addFunc = new LgsFunc("add", &LGS_VOID, {this, new LgsStr(), &LGS_ANY}, PUBLIC | INTERNAL | METHOD);
     LgsFunc* initFunc = new LgsFunc("init", &LGS_VOID, {this, &LGS_LONG}, INTERNAL | METHOD);
     LgsFunc* getFunc = new LgsFunc("get", &LGS_ANY, {this, new LgsStr()}, PUBLIC | INTERNAL | METHOD);
     LgsFunc* lenFunc = new LgsFunc("len", &LGS_LONG, {this}, PUBLIC | INTERNAL | METHOD);
@@ -30,11 +23,15 @@ public:
     explicit LgsMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) {
         typePair = new LgsTypePair(keyType, valueType);
         baseType = typePair;
+        addFunc->fn = [this](LgsCodeGen& cg, const std::vector<LgsExpr*>& args) {
+            return callAdd(cg, args);
+        };
         addMethod(lenFunc);
         addMethod(isEmptyFunc);
         addMethod(isNotEmptyFunc);
     }
 
+    Value* callAdd(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) const;
     Type* getIRType(LgsCodeGen& codeGen) override;
     std::string getName() override;
     std::string pname() override;

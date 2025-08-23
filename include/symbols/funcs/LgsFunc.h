@@ -8,6 +8,8 @@ class LgsExpr;
 class LgsStmt;
 class LgsType;
 
+using CallFn = std::function<Value*(LgsCodeGen&, const std::vector<LgsExpr*>&)>;
+
 class LgsFunc : public LgsUnaryExpr {
 public:
     LgsFuncType* funcType;
@@ -16,18 +18,19 @@ public:
     std::vector<LgsExpr*> heapAllocExprs;
     BasicBlock* cleanupBlock = nullptr;
     bool hasDefers = false;
+    CallFn fn;
 
     explicit LgsFunc(const std::string& name, LgsType* rt = nullptr, const std::vector<LgsType*>& paramTypes = {}, const uint32_t ops = 0) {
         initFunc(name, rt, paramTypes, ops);
     }
     explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {}
     virtual Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args);
-    static Value* loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type);
-    virtual Function* getIRFunc(LgsCodeGen& codeGen);
     Value* callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args = {});
+    virtual Function* getIRFunc(LgsCodeGen& codeGen);
+    static Value* loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type);
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops);
-    bool completeType(LgsType* toType) override;
     BasicBlock* getCleanupBlock(LgsCodeGen& codeGen);
+    bool completeType(LgsType* toType) override;
     bool needsCleanup() const;
     std::string pname() override;
     json::value asJSON() override;

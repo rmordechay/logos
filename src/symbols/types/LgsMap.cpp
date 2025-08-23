@@ -2,7 +2,7 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "stmts/LgsVarDec.h"
 
-Value* LgsMapAddFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
+Value* LgsMap::callAdd(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) const {
     const auto arr = args[0];
     const auto keyIR = args[1]->IRValue;
     const auto value = args[2];
@@ -11,7 +11,7 @@ Value* LgsMapAddFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& arg
     const auto exprTy = value->type;
     const auto ptr = codeGen.builder.CreateAlloca(exprTy->getIRType(codeGen));
     codeGen.builder.CreateStore(exprIR, ptr);
-    return callIR(codeGen, {arrPtr, keyIR, ptr});
+    return addFunc->callIR(codeGen, {arrPtr, keyIR, ptr});
 }
 
 Type* LgsMap::getIRType(LgsCodeGen& codeGen) {

@@ -10,6 +10,7 @@
 #include <llvm/IR/Module.h>
 
 Value* LgsFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
+    if (fn) return fn(codeGen, args);
     if (funcType->hasDefaults) assert(0);
     std::vector<Value*> IRArgs;
     for (int i = funcType->isStatic; i < funcType->params.size(); ++i) {
@@ -26,6 +27,19 @@ Value* LgsFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
         }
     }
     return callIR(codeGen, IRArgs);
+}
+
+Value* LgsFunc::callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args) {
+    CallInst* rv = nullptr;
+    if (IRValue) {
+        const auto funcTypeIR = funcType->getIRType(codeGen);
+        const auto IRFuncType = llvm::cast<FunctionType>(funcTypeIR);
+        rv = codeGen.builder.CreateCall(IRFuncType, IRValue, args);
+    } else {
+        const auto IRFunc = getIRFunc(codeGen);
+        rv = codeGen.builder.CreateCall(IRFunc, args);
+    }
+    return rv;
 }
 
 Value* LgsFunc::loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type) {
@@ -57,19 +71,6 @@ Function* LgsFunc::getIRFunc(LgsCodeGen& codeGen) {
         args++;
     }
     return IRFunc;
-}
-
-Value* LgsFunc::callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args) {
-    CallInst* rv = nullptr;
-    if (IRValue) {
-        const auto funcTypeIR = funcType->getIRType(codeGen);
-        const auto IRFuncType = llvm::cast<FunctionType>(funcTypeIR);
-        rv = codeGen.builder.CreateCall(IRFuncType, IRValue, args);
-    } else {
-        const auto IRFunc = getIRFunc(codeGen);
-        rv = codeGen.builder.CreateCall(IRFunc, args);
-    }
-    return rv;
 }
 
 void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops) {

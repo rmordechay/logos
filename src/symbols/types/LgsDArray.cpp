@@ -4,7 +4,7 @@
 #include "../codegen/LgsCodeGenVisitor.h"
 #include "types/primitives/LgsInt.h"
 
-Value* LgsArrayAddFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
+Value* LgsDArray::callAdd(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) const {
     const auto arr = args[0];
     const auto exprToAdd = args[1];
     const auto exprIR = exprToAdd->IRValue;
@@ -12,7 +12,7 @@ Value* LgsArrayAddFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& a
     const auto exprTy = exprToAdd->type;
     const auto ptr = codeGen.builder.CreateAlloca(exprTy->getIRType(codeGen));
     codeGen.builder.CreateStore(exprIR, ptr);
-    return callIR(codeGen, {arrPtr, ptr});
+    return addFunc->callIR(codeGen, {arrPtr, ptr});
 }
 
 Type* LgsDArray::getIRType(LgsCodeGen& codeGen) {

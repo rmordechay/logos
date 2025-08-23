@@ -94,7 +94,9 @@ public:
     void visitCast(LgsCast* lgsCast);
     void visitLambda(LgsFunc* func);
     void visitIntConst(LgsIntConst* intConst) const;
-    void visitArrayExpr(LgsArrayExpr* array) const;
+    void visitArrayExpr(LgsArrayExpr* array);
+    Value* createConstArray(const LgsArrayExpr* arrayExpr);
+    Value* createDynamicArray(LgsArrayExpr* arrayExpr);
     void visitHashMap(LgsHashMap* hashMap);
     void visitVectorExpr(LgsVectorExpr* vec);
     void visitVariable(LgsVariable* variable);

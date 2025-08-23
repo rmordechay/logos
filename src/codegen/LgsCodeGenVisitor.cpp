@@ -604,14 +604,45 @@ void LgsCodeGenVisitor::visitIntConst(LgsIntConst* intConst) const {
     }
 }
 
-void LgsCodeGenVisitor::visitArrayExpr(LgsArrayExpr* array) const {
+void LgsCodeGenVisitor::visitArrayExpr(LgsArrayExpr* array) {
     if (array->type->asSArray()) {
-        array->IRValue = array->createConstArray(cg);
+        array->IRValue = createConstArray(array);
     } else if (array->type->asDArray()) {
-        array->IRValue = array->createDynamicArray(cg);
+        array->IRValue = createDynamicArray(array);
     }
     else assert(0);
 }
+
+Value* LgsCodeGenVisitor::createConstArray(const LgsArrayExpr* arrayExpr) {
+    const auto arr = arrayExpr->type->asSArray();
+    const auto baseType = arr->baseType;
+    const auto baseIRType = baseType->getIRType(cg);
+    const auto arrIRType = ArrayType::get(baseIRType, arr->sizeExpr->getConstInt());
+    const auto arrIRPtr = cg.builder.CreateAlloca(arrIRType);
+    if (arrayExpr->initialElements.empty()) return arrIRPtr;
+    for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
+        const auto element = arrayExpr->initialElements[i];
+        visitExpr(element);
+        const auto gep = cg.builder.CreateGEP(arrIRType, arrIRPtr, {cg.i32Zero(), cg.i32(i)});
+        cg.builder.CreateStore(element->IRValue, gep);
+    }
+    return arrIRPtr;
+}
+
+Value* LgsCodeGenVisitor::createDynamicArray(LgsArrayExpr* arrayExpr) {
+    const auto arr = arrayExpr->type->asDArray();
+    const auto size = arr->baseType->getSizeBytes();
+    const auto elementSize = cg.i64(size);
+    const auto arrSize = cg.typeSize(arr->getArrStruct(&cg));
+    arrayExpr->IRValue = cg.callMalloc(arrSize.getFixedValue());
+    arr->initFunc->callIR(cg, {arrayExpr->IRValue, elementSize});
+    for (int i = 0; i < arrayExpr->initialElements.size(); ++i) {
+        const auto element = arrayExpr->initialElements[i];
+        visitExpr(element);
+    }
+    return arrayExpr->IRValue;
+}
+
 
 void LgsCodeGenVisitor::visitHashMap(LgsHashMap* hashMap) {
     const auto mapType = hashMap->type->asMap();
@@ -685,6 +716,7 @@ void LgsCodeGenVisitor::visitSelection(LgsSelection* selection) {
             getIRValue(childExpr);
         }
     }
+    assert(selection->lastExpr()->IRValue);
     selection->IRValue = getIRValue(selection->lastExpr());
 }
 

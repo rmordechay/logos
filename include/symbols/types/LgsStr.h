@@ -6,43 +6,25 @@
 #include "primitives/LgsLong.h"
 #include "types/LgsIterable.h"
 
-class LgsStrLen final : public LgsFunc {
-public:
-    static constexpr auto name = "len";
-    explicit LgsStrLen(LgsType* parent): LgsFunc(name, &LGS_LONG, {parent}, INTERNAL | PUBLIC | METHOD) {}
-    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override {
-        return codeGen.callStrLen(args[0]->IRValue);
-    }
-};
-
-class LgsStrIsEmpty final : public LgsFunc {
-public:
-    static constexpr auto name = "isEmpty";
-    explicit LgsStrIsEmpty(LgsType* parent): LgsFunc(name, &LGS_BOOL, {parent}, INTERNAL | PUBLIC | METHOD) {}
-    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override {
-        const auto strLen = codeGen.callStrLen(args[0]->IRValue);
-        return codeGen.builder.CreateICmpEQ(strLen, codeGen.builder.getInt64(0));
-    }
-};
-
-class LgsStrIsNotEmpty final : public LgsFunc {
-public:
-    static constexpr auto name = "isNotEmpty";
-    explicit LgsStrIsNotEmpty(LgsType* parent): LgsFunc(name, &LGS_BOOL, {parent}, INTERNAL | PUBLIC | METHOD) {}
-    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override {
-        const auto strLen = codeGen.callStrLen(args[0]->IRValue);
-        return codeGen.builder.CreateICmpNE(strLen, codeGen.builder.getInt64(0));
-    }
-};
-
 class LgsStr final : public LgsIterable {
 public:
     static constexpr auto name = "Str";
-    LgsStrLen* lenFunc = new LgsStrLen(this);
-    LgsStrIsEmpty* isEmptyFunc = new LgsStrIsEmpty(this);
-    LgsStrIsNotEmpty* isNotEmptyFunc = new LgsStrIsNotEmpty(this);
+    LgsFunc* lenFunc = new LgsFunc("len", &LGS_LONG, {this}, INTERNAL | PUBLIC | METHOD);
+    LgsFunc* isEmptyFunc = new LgsFunc("isEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
+    LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
 
     LgsStr() : LgsIterable(&LGS_CHAR) {
+        lenFunc->fn = [](LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
+            return codeGen.callStrLen(args[0]->IRValue);
+        };
+        isEmptyFunc->fn = [](LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
+            const auto strLen = codeGen.callStrLen(args[0]->IRValue);
+            return codeGen.builder.CreateICmpEQ(strLen, codeGen.builder.getInt64(0));
+        };
+        isNotEmptyFunc->fn = [](LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
+            const auto strLen = codeGen.callStrLen(args[0]->IRValue);
+            return codeGen.builder.CreateICmpNE(strLen, codeGen.builder.getInt64(0));
+        };
         addMethod(lenFunc);
         addMethod(isEmptyFunc);
         addMethod(isNotEmptyFunc);
