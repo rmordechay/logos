@@ -87,31 +87,6 @@ void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<L
     type = funcType;
 }
 
-bool LgsFunc::needsCleanup() const {
-    return !heapAllocExprs.empty();
-}
-
-BasicBlock* LgsFunc::getCleanupBlock(LgsCodeGen& codeGen) {
-    if (cleanupBlock) return cleanupBlock;
-    cleanupBlock = codeGen.createBlock(BLOCK_NAME_CLEANUP);
-    return cleanupBlock;
-}
-
-void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
-    const auto& [diFile, diBuilder, compileUnit] = codeGen->debugger;
-    const auto dbInt32 = diBuilder->createBasicType("int", 32, dwarf::DW_ATE_signed);
-    const auto subroutine = diBuilder->createSubroutineType(diBuilder->getOrCreateTypeArray({dbInt32}));
-    const auto subprogram = diBuilder->createFunction(compileUnit, funcType->name, "", diFile, 1, subroutine, 1);
-    getIRFunc(*codeGen)->setSubprogram(subprogram);
-    codeGen->builder.SetCurrentDebugLocation(DILocation::get(
-        codeGen->context,
-        location.lineStart,
-        location.posInLine,
-        subprogram,
-        subprogram->getScope()
-    ));
-}
-
 bool LgsFunc::completeType(LgsType* toType) {
     const auto otherFuncType = toType->asFuncType();
     if (!otherFuncType) return false;
@@ -124,6 +99,16 @@ bool LgsFunc::completeType(LgsType* toType) {
         funcType->rt = otherFuncType->rt;
     }
     return true;
+}
+
+BasicBlock* LgsFunc::getCleanupBlock(LgsCodeGen& codeGen) {
+    if (cleanupBlock) return cleanupBlock;
+    cleanupBlock = codeGen.createBlock(BLOCK_NAME_CLEANUP);
+    return cleanupBlock;
+}
+
+bool LgsFunc::needsCleanup() const {
+    return !heapAllocExprs.empty();
 }
 
 std::string LgsFunc::pname() {
@@ -143,6 +128,21 @@ LgsExpr* LgsFunc::clone() {
     newFunc->isSpread = isSpread;
     newFunc->isAssignable = isAssignable;
     return newFunc;
+}
+
+void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
+    const auto& [diFile, diBuilder, compileUnit] = codeGen->debugger;
+    const auto dbInt32 = diBuilder->createBasicType("int", 32, dwarf::DW_ATE_signed);
+    const auto subroutine = diBuilder->createSubroutineType(diBuilder->getOrCreateTypeArray({dbInt32}));
+    const auto subprogram = diBuilder->createFunction(compileUnit, funcType->name, "", diFile, 1, subroutine, 1);
+    getIRFunc(*codeGen)->setSubprogram(subprogram);
+    codeGen->builder.SetCurrentDebugLocation(DILocation::get(
+        codeGen->context,
+        location.lineStart,
+        location.posInLine,
+        subprogram,
+        subprogram->getScope()
+        ));
 }
 
 LgsFunc::~LgsFunc() {

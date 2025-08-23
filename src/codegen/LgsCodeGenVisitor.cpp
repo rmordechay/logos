@@ -875,32 +875,32 @@ void LgsCodeGenVisitor::createEpilogue(LgsFunc* func) {
     if (func->hasDefers) {
         generator.callDefers();
     }
+    // 0 return, 0 heap
+    // 1 return, 0 heap
+    // >1 return, 0 heap
     if (!func->needsCleanup()) {
         generator.callPopStack();
         return;
     }
-    if (func->returnStmts.size() == 1 && func->heapAllocExprs.size() == 1) {
+    // 0 return, 1 heap
+    // 0 return, >1 heap
+    if (func->returnStmts.empty()) {
         generator.callPopStack();
-        const auto returnStmt = func->returnStmts.front();
-        if (func->heapAllocExprs.front() == returnStmt->expr) {
-            generator.builder.CreateRet(returnStmt->IRValue);
-        } else {
-            freeHeap(func);
-        }
-    } else if (!func->returnStmts.empty()) {
-        auto rt = func->funcType->rt->getIRType(generator);
-        if (func->funcType->rt->asDArray()) {
-            rt = rt->getPointerTo();
-        }
-        const auto phi = generator.builder.CreatePHI(rt, func->returnStmts.size());
-        for (const auto returnStmt : func->returnStmts) {
-            phi->addIncoming(getIRValue(returnStmt->expr), returnStmt->parentBlock);
-        }
-        generator.callPopStack();
-        generator.builder.CreateRet(phi);
-    } else {
-        generator.callPopStack();
+        freeHeap(func);
+        return;
     }
+    // 1 return, >1 heap
+    // >1 return, >1 heap
+    auto rt = func->funcType->rt->getIRType(generator);
+    if (func->funcType->rt->asDArray()) {
+        rt = rt->getPointerTo();
+    }
+    const auto phi = generator.builder.CreatePHI(rt, func->returnStmts.size());
+    for (const auto returnStmt : func->returnStmts) {
+        phi->addIncoming(getIRValue(returnStmt->expr), returnStmt->parentBlock);
+    }
+    generator.callPopStack();
+    generator.builder.CreateRet(phi);
 }
 
 void LgsCodeGenVisitor::freeHeap(const LgsFunc* func) {
