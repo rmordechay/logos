@@ -21,19 +21,15 @@ public:
         initFunc(name, rt, paramTypes, ops);
     }
     explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {}
-    void createIRValue(LgsCodeGen* codeGen) override;
-    virtual Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args);
-    virtual void generateIR(LgsCodeGen* codeGen);
-    virtual Function* getIRFunc(LgsCodeGen* codeGen);
-    Value* callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args = {});
+
+    virtual Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args);
     static Value* loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type);
-    void createPrologue(LgsCodeGen* codeGen);
-    void createEpilogue(LgsCodeGen* codeGen);
-    void freeHeap(LgsCodeGen* codeGen) const;
+    virtual Function* getIRFunc(LgsCodeGen& codeGen);
+    Value* callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args = {});
+
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops);
     bool needsCleanup() const;
-    void cleanupExprs(LgsCodeGen* codeGen);
-    BasicBlock* getCleanupBlock(LgsCodeGen* codeGen);
+    BasicBlock* getCleanupBlock(LgsCodeGen& codeGen);
     void createDebugValue(LgsCodeGen* codeGen) override;
     bool completeType(LgsType* toType) override;
     std::string pname() override;

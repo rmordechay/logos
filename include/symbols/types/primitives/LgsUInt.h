@@ -11,7 +11,7 @@ public:
         isPrimitive = true;
     }
     size_t getSizeBytes() override;
-    llvm::Type* getIRType(LgsCodeGen* codeGen) override;
+    llvm::Type* getIRType(LgsCodeGen& codeGen) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;

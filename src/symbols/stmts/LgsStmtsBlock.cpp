@@ -4,12 +4,6 @@
 #include "funcs/LgsFunc.h"
 #include "stmts/LgsReturn.h"
 
-void LgsStmtsBlock::createIRValue(LgsCodeGen* codeGen) {
-    for (const auto stmt : stmts) {
-        stmt->createIRValue(codeGen);
-    }
-}
-
 LgsStmt* LgsStmtsBlock::lastStmt() const {
     if (stmts.empty()) return nullptr;
     return stmts[stmts.size() - 1];

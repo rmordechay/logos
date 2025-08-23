@@ -13,7 +13,6 @@ public:
     LgsPrefixOperator op;
 
     LgsPrefixExpr(LgsExpr* baseExpr, const LgsPrefixOperator op) : expr(baseExpr), op(op) {}
-    void createIRValue(LgsCodeGen* codeGen) override;
     json::value asJSON() override;
     std::string pname() override;
     ~LgsPrefixExpr() override;

@@ -10,7 +10,7 @@ public:
     LgsVectorExpr() {
         isMutable = true;
     }
-    void createIRValue(LgsCodeGen* codeGen) override;
+
     std::string pname() override;
     json::value asJSON() override;
     ~LgsVectorExpr() override;

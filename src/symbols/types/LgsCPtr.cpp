@@ -17,8 +17,8 @@ std::string LgsCPtr::pname() {
     return name;
 }
 
-Type* LgsCPtr::getIRType(LgsCodeGen* codeGen) {
-    return codeGen->ptrTy();
+Type* LgsCPtr::getIRType(LgsCodeGen& codeGen) {
+    return codeGen.ptrTy();
 }
 
 size_t LgsCPtr::getSizeBytes() {

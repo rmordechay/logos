@@ -5,7 +5,7 @@
 #include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 
-Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
+Type* LgsObject::getIRType(LgsCodeGen& codeGen) {
     if (IRType) return IRType;
     std::vector<Type*> elementTypes;
     elementTypes.reserve(fields.size());
@@ -14,15 +14,15 @@ Type* LgsObject::getIRType(LgsCodeGen* codeGen) {
         field->position = i;
         Type* fieldType;
         if (field->type->asObject() || field->type->asFuncType()) {
-            fieldType = codeGen->ptrTy();
+            fieldType = codeGen.ptrTy();
         } else {
             fieldType = field->type->getIRType(codeGen);
         }
         elementTypes.push_back(fieldType);
     }
-    IRType = StructType::getTypeByName(codeGen->context, name);
+    IRType = StructType::getTypeByName(codeGen.context, name);
     if (!IRType) {
-        IRType = StructType::create(codeGen->context, elementTypes, name);
+        IRType = StructType::create(codeGen.context, elementTypes, name);
     }
     for (const auto& field : fields) {
         field->parentIRType = IRType;
@@ -63,8 +63,8 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-void LgsObject::freeValue(LgsCodeGen* codeGen, Value* value) {
-    codeGen->builder.CreateFree(value);
+void LgsObject::freeValue(LgsCodeGen& codeGen, Value* value) {
+    codeGen.builder.CreateFree(value);
 }
 
 size_t LgsObject::getSizeBytes() {

@@ -9,7 +9,6 @@ public:
     explicit LgsHashMap(LgsMap* mapType) : LgsUnaryExpr(mapType) {}
     explicit LgsHashMap(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : LgsHashMap(new LgsMap(keyType, valueType)) {}
     std::string pname() override;
-    void createIRValue(LgsCodeGen* codeGen) override;
     json::value asJSON() override;
     ~LgsHashMap() override;
 };

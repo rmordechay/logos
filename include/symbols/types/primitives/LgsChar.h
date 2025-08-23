@@ -11,7 +11,7 @@ public:
     std::string pname() override;
     json::value asJSON() override;
     size_t getSizeBytes() override;
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    Type* getIRType(LgsCodeGen& codeGen) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;

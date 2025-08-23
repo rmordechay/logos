@@ -6,7 +6,7 @@ public:
     std::string name;
 
     explicit LgsEnum(const std::string& enumName) : name(enumName) {}
-    llvm::Type* getIRType(LgsCodeGen* codeGen) override;
+    llvm::Type* getIRType(LgsCodeGen& codeGen) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;

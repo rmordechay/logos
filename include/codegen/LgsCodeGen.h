@@ -1,6 +1,6 @@
 #pragma once
-#include "LgsApp.h"
-#include "LgsStack.h"
+#include "../logos/LgsApp.h"
+#include "../logos/LgsStack.h"
 
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
@@ -27,15 +27,13 @@ struct LgsDebug {
 
 class LgsCodeGen {
 public:
-    LgsStack stack;
     LgsDebug debugger;
     LLVMContext context;
     Module* IRModule = nullptr;
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
-    LgsAppConfigs* appConfigs = nullptr;
 
-    void setupModule(const std::string& moduleName, const DataLayout& dataLayout);
+    void setupModule(const std::string& moduleName, const DataLayout& dataLayout, bool debugMode = false);
     Value* getIRStr(const std::string& value);
     GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name = "") const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
@@ -44,11 +42,8 @@ public:
 
     // Blocks
     BasicBlock* createBlock(const std::string& name, Function* parent = nullptr);
-    void startBlock(BasicBlock* block);
     void branchIfNeeded(BasicBlock* block);
-    void branchAndStartBlock(BasicBlock* block);
     bool lastInstTerminator() const;
-    void generateIf(Value* cond, const std::function<void()>& blockStmtCb);
 
     // Funcs
     static FunctionType* getFT(Type* rt, const std::vector<Type*>& params = {}, bool isVariadic = false);

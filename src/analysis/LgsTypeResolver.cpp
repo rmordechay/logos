@@ -1,5 +1,4 @@
 #include "analysis/LgsTypeResolver.h"
-
 #include "files/LgsFile.h"
 #include "files/LgsInterfaceFile.h"
 #include "files/LgsMainFile.h"

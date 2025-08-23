@@ -4,12 +4,8 @@ std::string LgsStrConst::pname() {
     return type->pname();
 }
 
-Value* LgsStrConst::hash(LgsCodeGen* codeGen) {
-    return codeGen->i32(hashStr(value.c_str()));
-}
-
-void LgsStrConst::createIRValue(LgsCodeGen* codeGen) {
-    IRValue = codeGen->getIRStr(value);
+Value* LgsStrConst::hash(LgsCodeGen& codeGen) {
+    return codeGen.i32(hashStr(value.c_str()));
 }
 
 json::value LgsStrConst::asJSON() {
@@ -20,13 +16,13 @@ json::value LgsStrConst::asJSON() {
     return jsonObj;
 }
 
-Value* LgsStrConst::eqIR(LgsCodeGen* codeGen, LgsExpr* other) {
+Value* LgsStrConst::eqIR(LgsCodeGen& codeGen, LgsExpr* other) {
     return nullptr;
 }
 
-Value* LgsStrConst::addIR(LgsCodeGen* codeGen, LgsExpr* other) {
+Value* LgsStrConst::addIR(LgsCodeGen& codeGen, LgsExpr* other) {
     if (const auto otherStrConst = other->asIntConst()) {
-        return codeGen->getIRStr(this->value + std::to_string(otherStrConst->value));
+        return codeGen.getIRStr(this->value + std::to_string(otherStrConst->value));
     }
     assert(0);
 }

@@ -2,19 +2,19 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "stmts/LgsVarDec.h"
 
-Value* LgsMapAddFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
+Value* LgsMapAddFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
     const auto arr = args[0];
-    const auto keyIR = args[1]->getIRValue(codeGen);
+    const auto keyIR = args[1]->IRValue;
     const auto value = args[2];
-    const auto exprIR = value->getIRValue(codeGen);
-    const auto arrPtr = arr->getIRValue(codeGen);
+    const auto exprIR = value->IRValue;
+    const auto arrPtr = arr->IRValue;
     const auto exprTy = value->type;
-    const auto ptr = codeGen->builder.CreateAlloca(exprTy->getIRType(codeGen));
-    codeGen->builder.CreateStore(exprIR, ptr);
+    const auto ptr = codeGen.builder.CreateAlloca(exprTy->getIRType(codeGen));
+    codeGen.builder.CreateStore(exprIR, ptr);
     return callIR(codeGen, {arrPtr, keyIR, ptr});
 }
 
-Type* LgsMap::getIRType(LgsCodeGen* codeGen) {
+Type* LgsMap::getIRType(LgsCodeGen& codeGen) {
     return getMapStruct(codeGen);
 }
 
@@ -46,21 +46,21 @@ uint16_t LgsMap::getUnpackCount() const {
     return 2;
 }
 
-Value* LgsMap::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return codeGen->i32(1024);
+Value* LgsMap::IRLength(LgsCodeGen& codeGen, LgsExpr* iterable) {
+    return codeGen.i32(1024);
 }
 
 Value* LgsMap::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return isEmptyFunc->call(codeGen, {iterable});
+    return isEmptyFunc->call(*codeGen, {iterable});
 }
 
 Value* LgsMap::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return isNotEmptyFunc->call(codeGen, {iterable});
+    return isNotEmptyFunc->call(*codeGen, {iterable});
 }
 
-StructType* LgsMap::getMapStruct(LgsCodeGen* codeGen) {
-    const std::vector<Type*> mapStructFields = {codeGen->ptrTy(), codeGen->i64Ty(), codeGen->i64Ty()};
-    mapStruct = codeGen->getStructType(mapStructFields, name);
+StructType* LgsMap::getMapStruct(LgsCodeGen& codeGen) {
+    const std::vector<Type*> mapStructFields = {codeGen.ptrTy(), codeGen.i64Ty(), codeGen.i64Ty()};
+    mapStruct = codeGen.getStructType(mapStructFields, name);
     return mapStruct;
 }
 
@@ -72,7 +72,7 @@ bool LgsMap::canCastTo(LgsType* other) {
     return keyEqual && typePair->value->canCastTo(otherKvType->value);
 }
 
-void LgsMap::freeValue(LgsCodeGen* codeGen, Value* value) {
+void LgsMap::freeValue(LgsCodeGen& codeGen, Value* value) {
     freeFunc->callIR(codeGen, {value});
 }
 

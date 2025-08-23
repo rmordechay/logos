@@ -11,8 +11,7 @@ public:
     LgsExpr* lastExpr() const;
     LgsExpr* lastExprParent() const;
     std::string pname() override;
-    Value* hash(LgsCodeGen* codeGen) override;
-    void createIRValue(LgsCodeGen* codeGen) override;
+    Value* hash(LgsCodeGen& codeGen) override;
     json::value asJSON() override;
     ~LgsSelection() override;
 };

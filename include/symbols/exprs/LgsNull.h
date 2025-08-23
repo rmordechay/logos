@@ -8,16 +8,11 @@ public:
     }
 
     json::value asJSON() override;
-    void createIRValue(LgsCodeGen* codeGen) override;
     std::string pname() override;
 };
 
 inline json::value LgsNull::asJSON() {
     return json::value(nullptr);
-}
-
-inline void LgsNull::createIRValue(LgsCodeGen* codeGen) {
-    IRValue = ConstantPointerNull::get(codeGen->ptrTy());
 }
 
 inline std::string LgsNull::pname() {

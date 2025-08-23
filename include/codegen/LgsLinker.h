@@ -1,5 +1,5 @@
 #pragma once
-#include "LgsPaths.h"
+#include "../logos/LgsPaths.h"
 
 #include <llvm/Passes/OptimizationLevel.h>
 

@@ -8,6 +8,5 @@ public:
     bool isBreakIf;
     std::string tag;
 
-    void createIRValue(LgsCodeGen* codeGen) override;
     json::value asJSON() override;
 };

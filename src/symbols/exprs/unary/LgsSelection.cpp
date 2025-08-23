@@ -23,35 +23,9 @@ std::string LgsSelection::pname() {
     return str.str();
 }
 
-Value* LgsSelection::hash(LgsCodeGen* codeGen) {
+Value* LgsSelection::hash(LgsCodeGen& codeGen) {
     const auto lgsExpr = lastExpr();
     return lgsExpr->hash(codeGen);
-}
-
-void LgsSelection::createIRValue(LgsCodeGen* codeGen) {
-    auto startIndex = 0;
-    const auto parentAsVar = exprs.front()->asVariable();
-    if (parentAsVar && parentAsVar->ref.symbolType == OBJECT) {
-        exprs.front() = parentAsVar->ref.object->singleton;
-        startIndex = 1;
-    }
-    for (int i = startIndex; i < exprs.size() - 1; ++i) {
-        const auto parentExpr = exprs[i];
-        const auto childExpr = exprs[i + 1];
-        if (const auto var = childExpr->asVariable()) {
-            const auto field = parentExpr->type->getField(var->name);
-            field->parentIRType = parentExpr->type->getIRType(codeGen);
-            field->parentIRValue = parentExpr->getIRValue(codeGen);
-            if (i > 0) {
-                field->parentIRValue = codeGen->builder.CreateLoad(codeGen->ptrTy(), field->parentIRValue);
-            }
-            const auto fieldIR = field->getIRValue(codeGen);
-            childExpr->setIRValue(fieldIR);
-        } else {
-            childExpr->createIRValue(codeGen);
-        }
-    }
-    IRValue = lastExpr()->getIRValue(codeGen);
 }
 
 json::value LgsSelection::asJSON() {

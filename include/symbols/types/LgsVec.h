@@ -14,7 +14,7 @@ public:
         sizeExpr = new LgsIntConst(&LGS_INT, dim);
     }
 
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    Type* getIRType(LgsCodeGen& codeGen) override;
     LgsField* getField(const std::string& fieldName) override;
     std::string getName() override;
     std::string pname() override;
@@ -23,7 +23,7 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
-    Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
+    Value* IRLength(LgsCodeGen& codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     bool canCastTo(LgsType* other) override;

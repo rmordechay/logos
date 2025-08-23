@@ -4,6 +4,8 @@
 #include "utils/LgsErrHandler.h"
 #include "analysis/LgsTypeResolver.h"
 
+class LgsInterfaceFile;
+class LgsObjectFile;
 class LgsPostfixExpr;
 class LgsDeferStmt;
 class LgsInfiniteLoop;

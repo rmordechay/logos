@@ -13,8 +13,8 @@ size_t LgsInt::getSizeBytes() {
     return sizeof(int);
 }
 
-Type* LgsInt::getIRType(LgsCodeGen* codeGen) {
-    return codeGen->i32Ty();
+Type* LgsInt::getIRType(LgsCodeGen& codeGen) {
+    return codeGen.i32Ty();
 }
 
 LgsExpr* LgsInt::getZeroValue() {

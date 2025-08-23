@@ -1,7 +1,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "exprs/unary/LgsVectorExpr.h"
 
-Type* LgsVec::getIRType(LgsCodeGen* codeGen) {
+Type* LgsVec::getIRType(LgsCodeGen& codeGen) {
     IRType = FixedVectorType::get(baseType->getIRType(codeGen), 2);
     return IRType;
 }
@@ -41,8 +41,8 @@ uint16_t LgsVec::getUnpackCount() const {
     return 1;
 }
 
-Value* LgsVec::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return codeGen->isize(2);
+Value* LgsVec::IRLength(LgsCodeGen& codeGen, LgsExpr* iterable) {
+    return codeGen.isize(2);
 }
 
 Value* LgsVec::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {

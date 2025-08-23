@@ -7,7 +7,6 @@ public:
     double_t value;
 
     explicit LgsFloatConst(LgsType* type, const double_t value) : LgsUnaryExpr(type), value(value) {}
-    void createIRValue(LgsCodeGen* codeGen) override;
     json::value asJSON() override;
     std::string pname() override;
     ~LgsFloatConst() override = default;

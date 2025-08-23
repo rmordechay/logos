@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsType.h"
-#include "logos/LgsCodeGen.h"
+#include "codegen/LgsCodeGen.h"
 
 class LgsCPtr final : public LgsType {
 public:
@@ -11,7 +11,7 @@ public:
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    Type* getIRType(LgsCodeGen& codeGen) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;

@@ -4,26 +4,15 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "types/LgsStr.h"
 
-void LgsMainFunc::generateIR(LgsCodeGen* codeGen) {
-    codeGen->stack.enterScope(this);
-    createPrologue(codeGen);
-    // codeGen->callRuntimeInit();
-    if (!funcType->params.empty()) initMainArgs(codeGen);
-    stmtsBlock->createIRValue(codeGen);
-    createEpilogue(codeGen);
-    codeGen->builder.CreateRet(codeGen->i32(EXIT_SUCCESS));
-    codeGen->stack.exitScope();
-}
-
-Function* LgsMainFunc::getIRFunc(LgsCodeGen* codeGen) {
+Function* LgsMainFunc::getIRFunc(LgsCodeGen& codeGen) {
     if (IRFunc) return IRFunc;
     FunctionType* mainFuncType;
     if (funcType->params.empty()) {
-        mainFuncType = codeGen->getFT(codeGen->i32Ty());
+        mainFuncType = codeGen.getFT(codeGen.i32Ty());
     } else {
-        mainFuncType = codeGen->getFT(codeGen->i32Ty(), {codeGen->i32Ty(), codeGen->builder.getPtrTy()});
+        mainFuncType = codeGen.getFT(codeGen.i32Ty(), {codeGen.i32Ty(), codeGen.builder.getPtrTy()});
     }
-    IRFunc = codeGen->getFunc(LGS_MAIN_FUNC_NAME, mainFuncType);
+    IRFunc = codeGen.getFunc(LGS_MAIN_FUNC_NAME, mainFuncType);
     if (funcType->params.empty()) return IRFunc;
     auto IRArgs = IRFunc->arg_begin();
     argc = IRArgs;
@@ -41,10 +30,10 @@ void LgsMainFunc::setMainArgs() {
     initArgsFunc->funcType->params.emplace_back(LgsParam(new LgsStr()));
 }
 
-void LgsMainFunc::initMainArgs(LgsCodeGen* codeGen) {
-    auto& builder = codeGen->builder;
-    const std::vector<Type*> structFields{codeGen->i64Ty(), codeGen->i32Ty(), codeGen->i32Ty(), codeGen->ptrTy()};
-    const auto arrStruct = codeGen->getStructType(structFields, LgsDArray::name);
+void LgsMainFunc::initMainArgs(LgsCodeGen& codeGen) {
+    auto& builder = codeGen.builder;
+    const std::vector<Type*> structFields{codeGen.i64Ty(), codeGen.i32Ty(), codeGen.i32Ty(), codeGen.ptrTy()};
+    const auto arrStruct = codeGen.getStructType(structFields, LgsDArray::name);
     mainArgs->IRValue = builder.CreateAlloca(arrStruct);
     initArgsFunc->callIR(codeGen, {mainArgs->IRValue, argc, argv});
     funcType->params[0].setIRValue(mainArgs->IRValue);

@@ -12,8 +12,8 @@ std::string LgsFloat::pname() {
     return name;
 }
 
-Type* LgsFloat::getIRType(LgsCodeGen* codeGen) {
-    return Type::getFloatTy(codeGen->context);
+Type* LgsFloat::getIRType(LgsCodeGen& codeGen) {
+    return Type::getFloatTy(codeGen.context);
 }
 
 std::string LgsFloat::getName() {

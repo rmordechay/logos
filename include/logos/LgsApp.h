@@ -1,5 +1,5 @@
 #pragma once
-#include "LgsLinker.h"
+#include "../codegen/LgsLinker.h"
 #include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"

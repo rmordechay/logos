@@ -1,6 +1,6 @@
-#include "logos/LgsLinker.h"
+#include "codegen/LgsLinker.h"
 #include "configs/LgsDefinitions.h"
-#include "logos/LgsCodeGen.h"
+#include "codegen/LgsCodeGen.h"
 #include "utils/LgsUtils.h"
 #include "llvm/Linker/Linker.h"
 #include <llvm/Passes/PassBuilder.h>

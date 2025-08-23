@@ -37,7 +37,7 @@ llvm_map_components_to_libnames(LLVM_LIBS
 set(CORE_SOURCES
     src/logos/LgsApp.cpp
     src/logos/LgsStack.cpp
-    src/logos/LgsLinker.cpp
+    src/codegen/LgsLinker.cpp
     src/logos/LgsPaths.cpp
     src/analysis/LgsParserAdapter.cpp
     src/analysis/LgsSema.cpp
@@ -46,14 +46,14 @@ set(CORE_SOURCES
     src/cli/LgsCliCmd.cpp
     src/cli/LgsRunCmd.cpp
     src/cli/LgsAstCmd.cpp
-    src/extern/LgsCLang.cpp
-    src/extern/LgsCLangVisitor.cpp
+    src/lgsc/LgsCLang.cpp
+    src/lgsc/LgsCLangVisitor.cpp
     src/files/LgsMainFile.cpp
     src/files/LgsObjectFile.cpp
     src/parser/LogosLexer.cpp
     src/parser/LogosParser.cpp
     src/utils/LgsUtils.cpp
-    src/logos/LgsCodeGen.cpp
+    src/codegen/LgsCodeGen.cpp
     src/files/LgsInterfaceFile.cpp
     src/utils/LgsErrHandler.cpp
     src/symbols/types/LgsTable.cpp
@@ -126,6 +126,8 @@ set(CORE_SOURCES
     src/symbols/types/primitives/LgsShort.cpp
     src/symbols/types/primitives/LgsSize.cpp
     src/symbols/types/primitives/LgsUInt.cpp
+    src/codegen/LgsCodeGenVisitor.cpp
+    include/codegen/LgsCodeGenVisitor.h
 )
 
 set(RUNTIME_SOURCES

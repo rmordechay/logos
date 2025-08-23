@@ -1,4 +1,4 @@
-#include "logos/LgsCodeGen.h"
+#include "codegen/LgsCodeGen.h"
 #include "configs/LgsDefinitions.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "funcs/LgsFunc.h"
@@ -12,11 +12,11 @@
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Target/TargetOptions.h>
 
-void LgsCodeGen::setupModule(const std::string& moduleName, const DataLayout& dataLayout) {
+void LgsCodeGen::setupModule(const std::string& moduleName, const DataLayout& dataLayout, const bool debugMode) {
     IRModule = new Module(moduleName, context);
     IRModule->setTargetTriple(sys::getDefaultTargetTriple());
     IRModule->setDataLayout(dataLayout);
-    if (appConfigs->debugMode) {
+    if (debugMode) {
         debugger.diBuilder = new DIBuilder(*IRModule);
         debugger.diFile = debugger.diBuilder->createFile(moduleName, "");
         debugger.compileUnit = debugger.diBuilder->createCompileUnit(dwarf::DW_LANG_lo_user, debugger.diFile, "", false, "", 0);
@@ -62,33 +62,14 @@ BasicBlock* LgsCodeGen::createBlock(const std::string& name, Function* parent) {
     return BasicBlock::Create(context, name, parent);
 }
 
-void LgsCodeGen::startBlock(BasicBlock* block) {
-    block->insertInto(stack.currentFunc()->getIRFunc(this));
-    builder.SetInsertPoint(block);
-}
-
 void LgsCodeGen::branchIfNeeded(BasicBlock* block) {
     if (!lastInstTerminator()) {
         builder.CreateBr(block);
     }
 }
 
-void LgsCodeGen::branchAndStartBlock(BasicBlock* block) {
-    branchIfNeeded(block);
-    startBlock(block);
-}
-
 bool LgsCodeGen::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
-}
-
-void LgsCodeGen::generateIf(Value* cond, const std::function<void()>& blockStmtCb) {
-    const auto IRBlockIfTrue = createBlock(BLOCK_NAME_IF_TRUE);
-    const auto IRBlockIfFalse = createBlock(BLOCK_NAME_IF_FALSE);
-    builder.CreateCondBr(cond, IRBlockIfTrue, IRBlockIfFalse);
-    startBlock(IRBlockIfTrue);
-    blockStmtCb();
-    branchAndStartBlock(IRBlockIfFalse);
 }
 
 FunctionType* LgsCodeGen::getFT(Type* rt, const std::vector<Type*>& params, const bool isVariadic) {
@@ -127,7 +108,7 @@ Function* LgsCodeGen::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) {
         args.push_back(v);
     }
 
-    const auto deferFunc = fc->func->getIRFunc(this);
+    const auto deferFunc = fc->func->getIRFunc(*this);
     builder.CreateCall(deferFunc, args);
     builder.CreateRetVoid();
 
@@ -139,7 +120,7 @@ Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) {
     if (fc->args.empty()) return null();
     const auto ctx = builder.CreateAlloca(ctxTy);
     for (int i = 0; i < fc->args.size(); i++) {
-        const auto v = fc->args[i]->getIRValue(this);
+        const auto v = fc->args[i]->IRValue;
         storeValueInStruct(dyn_cast<StructType>(ctxTy), ctx, i, v);
     }
     return ctx;
@@ -150,7 +131,7 @@ Type* LgsCodeGen::getThunkCtxType(const LgsFuncCall* fc) {
     std::vector<Value*> args;
     std::vector<Type*> types;
     for (const auto& arg : fc->args) {
-        types.push_back(arg->type->getIRType(this));
+        types.push_back(arg->type->getIRType(*this));
     }
     return getStructType(types, fc->name + "_thunk_type");
 }
@@ -220,7 +201,6 @@ void LgsCodeGen::callPopStack() {
 }
 
 void LgsCodeGen::callDefers() {
-    branchAndStartBlock(createBlock(BLOCK_NAME_DEFER));
     const auto ft = getFT(voidTy());
     callLgsFunc("Stack_callDefers", ft);
 }
@@ -388,7 +368,6 @@ TargetMachine* LgsCodeGen::getTargetMachine() {
 
 LgsCodeGen::~LgsCodeGen() {
     if (!debugger.diBuilder) return;
-    assert(appConfigs->debugMode);
     debugger.diBuilder->finalize();
     std::error_code EC;
     raw_fd_ostream file("logosdbg.bc", EC, sys::fs::OF_None);

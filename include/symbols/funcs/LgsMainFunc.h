@@ -13,8 +13,7 @@ public:
 
     explicit LgsMainFunc() : LgsFunc(LGS_MAIN_FUNC_NAME, &LGS_VOID, {}, PUBLIC) {}
     void setMainArgs();
-    void initMainArgs(LgsCodeGen* codeGen);
-    void generateIR(LgsCodeGen* codeGen) override;
-    Function* getIRFunc(LgsCodeGen* codeGen) override;
+    void initMainArgs(LgsCodeGen& codeGen);
+    Function* getIRFunc(LgsCodeGen& codeGen) override;
     ~LgsMainFunc() override;
 };

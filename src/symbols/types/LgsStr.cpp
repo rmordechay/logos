@@ -3,11 +3,11 @@
 #include "types/LgsAny.h"
 
 Type* LgsStr::getIRBaseType(LgsCodeGen* codeGen) const {
-    return ArrayType::get(baseType->getIRType(codeGen), sizeExpr->getConstInt());
+    return ArrayType::get(baseType->getIRType(*codeGen), sizeExpr->getConstInt());
 }
 
-Type* LgsStr::getIRType(LgsCodeGen* codeGen) {
-    return codeGen->ptrTy();
+Type* LgsStr::getIRType(LgsCodeGen& codeGen) {
+    return codeGen.ptrTy();
 }
 
 size_t LgsStr::getSizeBytes() {
@@ -44,16 +44,16 @@ LgsType* LgsStr::getIndexType() {
     return &LGS_INT;
 }
 
-Value* LgsStr::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
+Value* LgsStr::IRLength(LgsCodeGen& codeGen, LgsExpr* iterable) {
     return lenFunc->call(codeGen, {iterable});
 }
 
 Value* LgsStr::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return isEmptyFunc->call(codeGen, {iterable});
+    return isEmptyFunc->call(*codeGen, {iterable});
 }
 
 Value* LgsStr::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return isNotEmptyFunc->call(codeGen, {iterable});
+    return isNotEmptyFunc->call(*codeGen, {iterable});
 }
 
 bool LgsStr::canCastTo(LgsType* other) {

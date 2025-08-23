@@ -1,22 +1,23 @@
 #include "types/LgsDArray.h"
-#include "builtins/LgsBuiltins.h"
+#include "builtins/LgsPrint.h"
 #include "exprs/unary/LgsArrayExpr.h"
+#include "../codegen/LgsCodeGenVisitor.h"
 #include "types/primitives/LgsInt.h"
 
-Value* LgsArrayAddFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
+Value* LgsArrayAddFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
     const auto arr = args[0];
     const auto exprToAdd = args[1];
-    const auto exprIR = exprToAdd->getIRValue(codeGen);
-    const auto arrPtr = arr->getIRValue(codeGen);
+    const auto exprIR = exprToAdd->IRValue;
+    const auto arrPtr = arr->IRValue;
     const auto exprTy = exprToAdd->type;
-    const auto ptr = codeGen->builder.CreateAlloca(exprTy->getIRType(codeGen));
-    codeGen->builder.CreateStore(exprIR, ptr);
+    const auto ptr = codeGen.builder.CreateAlloca(exprTy->getIRType(codeGen));
+    codeGen.builder.CreateStore(exprIR, ptr);
     return callIR(codeGen, {arrPtr, ptr});
 }
 
-Type* LgsDArray::getIRType(LgsCodeGen* codeGen) {
+Type* LgsDArray::getIRType(LgsCodeGen& codeGen) {
     if (IRType) return IRType;
-    return getArrStruct(codeGen);
+    return getArrStruct(&codeGen);
 }
 
 std::string LgsDArray::getName() {
@@ -55,20 +56,20 @@ StructType* LgsDArray::getArrStruct(LgsCodeGen* codeGen) {
     return arrStruct;
 }
 
-void LgsDArray::freeValue(LgsCodeGen* codeGen, Value* value) {
+void LgsDArray::freeValue(LgsCodeGen& codeGen, Value* value) {
     freeFunc->callIR(codeGen, {value});
 }
 
-Value* LgsDArray::IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) {
+Value* LgsDArray::IRLength(LgsCodeGen& codeGen, LgsExpr* iterable) {
     return lenFunc->call(codeGen, {iterable});
 }
 
 Value* LgsDArray::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return isEmptyFunc->call(codeGen, {iterable});
+    return isEmptyFunc->call(*codeGen, {iterable});
 }
 
 Value* LgsDArray::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
-    return isNotEmptyFunc->call(codeGen, {iterable});
+    return isNotEmptyFunc->call(*codeGen, {iterable});
 }
 
 bool LgsDArray::canCastTo(LgsType* other) {

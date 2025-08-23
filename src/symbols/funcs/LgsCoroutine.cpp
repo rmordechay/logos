@@ -1,18 +1,10 @@
 #include "funcs/LgsCoroutine.h"
-#include "builtins/LgsBuiltins.h"
+#include "builtins/LgsPrint.h"
 #include "exprs/unary/LgsFuncCall.h"
 #include "exprs/unary/LgsSelection.h"
 
 json::value LgsCoroutine::asJSON() {
     assert(0);
-}
-
-void LgsCoroutine::createIRValue(LgsCodeGen* codeGen) {
-    const auto fc = funcCall ? funcCall : selection->lastExpr()->asFuncCall();
-    const auto ctxTy = codeGen->getThunkCtxType(fc);
-    const auto ctx = codeGen->getThunkCtx(fc, ctxTy);
-    const auto func = codeGen->getThunkFunc(fc, ctxTy);
-    codeGen->addCoro(func, ctx);
 }
 
 LgsCoroutine::~LgsCoroutine() {

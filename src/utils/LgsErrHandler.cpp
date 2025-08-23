@@ -1,5 +1,5 @@
 #include "utils/LgsErrHandler.h"
-#include "logos/LgsCodeGen.h"
+#include "codegen/LgsCodeGen.h"
 #include "utils/LgsUtils.h"
 
 void LgsErrHandler::setUnsuccessful() {

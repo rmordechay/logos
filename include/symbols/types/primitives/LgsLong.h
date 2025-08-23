@@ -1,6 +1,6 @@
 #pragma once
 #include "LgsType.h"
-#include "logos/LgsCodeGen.h"
+#include "../codegen/LgsCodeGen.h"
 
 
 class LgsLong final : public LgsType {
@@ -12,7 +12,7 @@ public:
         isNumber = true;
         isInt = true;
     }
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    Type* getIRType(LgsCodeGen& codeGen) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;

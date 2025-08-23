@@ -1,5 +1,6 @@
 #pragma once
 #include "funcs/LgsFunc.h"
+#include "codegen/LgsCodeGenVisitor.h"
 #include "primitives/LgsBool.h"
 #include "primitives/LgsChar.h"
 #include "primitives/LgsLong.h"
@@ -9,8 +10,8 @@ class LgsStrLen final : public LgsFunc {
 public:
     static constexpr auto name = "len";
     explicit LgsStrLen(LgsType* parent): LgsFunc(name, &LGS_LONG, {parent}, INTERNAL | PUBLIC | METHOD) {}
-    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
-        return codeGen->callStrLen(args[0]->getIRValue(codeGen));
+    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override {
+        return codeGen.callStrLen(args[0]->IRValue);
     }
 };
 
@@ -18,9 +19,9 @@ class LgsStrIsEmpty final : public LgsFunc {
 public:
     static constexpr auto name = "isEmpty";
     explicit LgsStrIsEmpty(LgsType* parent): LgsFunc(name, &LGS_BOOL, {parent}, INTERNAL | PUBLIC | METHOD) {}
-    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
-        const auto strLen = codeGen->callStrLen(args[0]->getIRValue(codeGen));
-        return codeGen->builder.CreateICmpEQ(strLen, codeGen->builder.getInt64(0));
+    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override {
+        const auto strLen = codeGen.callStrLen(args[0]->IRValue);
+        return codeGen.builder.CreateICmpEQ(strLen, codeGen.builder.getInt64(0));
     }
 };
 
@@ -28,9 +29,9 @@ class LgsStrIsNotEmpty final : public LgsFunc {
 public:
     static constexpr auto name = "isNotEmpty";
     explicit LgsStrIsNotEmpty(LgsType* parent): LgsFunc(name, &LGS_BOOL, {parent}, INTERNAL | PUBLIC | METHOD) {}
-    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
-        const auto strLen = codeGen->callStrLen(args[0]->getIRValue(codeGen));
-        return codeGen->builder.CreateICmpNE(strLen, codeGen->builder.getInt64(0));
+    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override {
+        const auto strLen = codeGen.callStrLen(args[0]->IRValue);
+        return codeGen.builder.CreateICmpNE(strLen, codeGen.builder.getInt64(0));
     }
 };
 
@@ -48,7 +49,7 @@ public:
         isSliceable = true;
     }
     Type* getIRBaseType(LgsCodeGen* codeGen) const;
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    Type* getIRType(LgsCodeGen& codeGen) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
@@ -57,7 +58,7 @@ public:
     LgsType* getIndexType() override;
     std::string strFormatPart() const override;
     uint16_t getUnpackCount() const override;
-    Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
+    Value* IRLength(LgsCodeGen& codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     bool canCastTo(LgsType* other) override;

@@ -3,7 +3,6 @@
 
 class LgsContinue final : public LgsStmt {
 public:
-    void createIRValue(LgsCodeGen* codeGen) override;
     json::value asJSON() override;
 };
 

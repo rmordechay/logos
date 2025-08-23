@@ -7,14 +7,6 @@
 #include <exprs/unary/LgsSelection.h>
 #include <llvm/IR/Module.h>
 
-void LgsDeferStmt::createIRValue(LgsCodeGen* codeGen) {
-    const auto fc = funcCall ? funcCall : selection->lastExpr()->asFuncCall();
-    const auto ctxTy = codeGen->getThunkCtxType(fc);
-    const auto ctx = codeGen->getThunkCtx(fc, ctxTy);
-    const auto func = codeGen->getThunkFunc(fc, ctxTy);
-    codeGen->addDeferFunc(func, ctx);
-}
-
 json::value LgsDeferStmt::asJSON() {
     json::object obj;
     obj["stmtKind"] = "DeferStmt";

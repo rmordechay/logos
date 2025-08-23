@@ -1,7 +1,7 @@
 #include "types/LgsFuncType.h"
 #include "configs/LgsConfig.h"
 #include "configs/LgsDefinitions.h"
-#include "logos/LgsCodeGen.h"
+#include "codegen/LgsCodeGen.h"
 #include "utils/LgsUtils.h"
 
 void LgsFuncType::setFuncOptions(const uint32_t ops) {
@@ -16,19 +16,19 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isTerminator = ops & TERMINATOR;
 }
 
-Type* LgsFuncType::getIRType(LgsCodeGen* codeGen) {
+Type* LgsFuncType::getIRType(LgsCodeGen& codeGen) {
     std::vector<Type*> IRParamsTypes;
     for (int i = isStatic; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
         if (param.isSelf || !paramType->isPrimitive) {
-            IRParamsTypes.emplace_back(codeGen->ptrTy());
+            IRParamsTypes.emplace_back(codeGen.ptrTy());
         } else {
             IRParamsTypes.emplace_back(paramType->getIRType(codeGen));
         }
     }
-    const auto returnType = rt->isBig() ? codeGen->ptrTy() : rt->getIRType(codeGen);
-    IRType = codeGen->getFT(returnType, IRParamsTypes, this->isVariadic);
+    const auto returnType = rt->isBig() ? codeGen.ptrTy() : rt->getIRType(codeGen);
+    IRType = codeGen.getFT(returnType, IRParamsTypes, this->isVariadic);
     return IRType;
 }
 
@@ -81,7 +81,25 @@ std::string LgsFuncType::pname() {
 }
 
 json::value LgsFuncType::asJSON() {
-    assert(0);
+    json::object jsonObj;
+    jsonObj["name"] = name;
+    jsonObj["rt"] = rt->asJSON();
+    json::array jsonParams;
+    for (auto& param : params) {
+        jsonParams.emplace_back(param.asJSON());
+    }
+    jsonObj["params"] = jsonParams;
+    jsonObj["isMethod"] = isMethod;
+    jsonObj["isPublic"] = isPublic;
+    jsonObj["isInternal"] = isInternal;
+    jsonObj["isVirtual"] = isVirtual;
+    jsonObj["isVariadic"] = isVariadic;
+    jsonObj["isStatic"] = isStatic;
+    jsonObj["isOptional"] = isOptional;
+    jsonObj["isTerminator"] = isTerminator;
+    jsonObj["isAnonymous"] = isLambda;
+    jsonObj["hasDefaults"] = hasDefaults;
+    return jsonObj;
 }
 
 std::string LgsFuncType::strFormatPart() const {

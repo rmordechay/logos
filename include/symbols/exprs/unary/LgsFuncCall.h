@@ -13,11 +13,10 @@ public:
     LgsSymbol ref;
 
     explicit LgsFuncCall(const std::string& name, const std::vector<LgsExpr*>& args = {}) : name(name), args(args) {}
-    void createIRValue(LgsCodeGen* codeGen) override;
     bool equals(const LgsFuncType* funcType) const;
     bool equalsVariadic(const LgsFuncType* funcType) const;
     bool equalsDefaultParams(const LgsFuncType* funcType) const;
-    void resolveVirtualFunc(LgsCodeGen* codeGen) const;
+    void resolveVirtualFunc(LgsCodeGen& codeGen) const;
     std::string pname() override;
     json::value asJSON() override;
     ~LgsFuncCall() override;

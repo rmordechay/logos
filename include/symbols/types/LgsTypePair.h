@@ -8,7 +8,7 @@ public:
     StructType* pairIRType = nullptr;
 
     explicit LgsTypePair(LgsType* keyType = nullptr, LgsType* valueType = nullptr) : key(keyType), value(valueType) {}
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    Type* getIRType(LgsCodeGen& codeGen) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;
@@ -18,7 +18,7 @@ public:
     std::string strFormatPart() const override;
 };
 
-inline Type* LgsTypePair::getIRType(LgsCodeGen* codeGen) {
+inline Type* LgsTypePair::getIRType(LgsCodeGen& codeGen) {
     assert(0);
 }
 

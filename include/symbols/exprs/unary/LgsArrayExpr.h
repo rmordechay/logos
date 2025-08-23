@@ -13,9 +13,8 @@ public:
         type->isHeapAlloc = true;
     }
     std::string pname() override;
-    void createIRValue(LgsCodeGen* codeGen) override;
-    Value* createConstArray(LgsCodeGen* codeGen) const;
-    Value* createDynamicArray(LgsCodeGen* codeGen);
+    Value* createConstArray(LgsCodeGen& codeGen) const;
+    Value* createDynamicArray(LgsCodeGen& codeGen);
     json::value asJSON() override;
     ~LgsArrayExpr() override;
 };

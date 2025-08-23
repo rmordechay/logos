@@ -11,8 +11,8 @@ size_t LgsShort::getSizeBytes() {
     return sizeof(short);
 }
 
-Type* LgsShort::getIRType(LgsCodeGen* codeGen) {
-    return codeGen->i16Ty();
+Type* LgsShort::getIRType(LgsCodeGen& codeGen) {
+    return codeGen.i16Ty();
 }
 
 json::value LgsShort::asJSON() {

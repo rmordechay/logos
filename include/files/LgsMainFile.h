@@ -17,7 +17,6 @@ public:
 
     explicit LgsMainFile(const size_t fileID, const fs::path& path) : LgsFile(fileID, LGS_MAIN_FILE_NAME, path) {}
     void format() override;
-    void generateIR() override;
     json::value asJSON() override;
     ~LgsMainFile() override;
 };

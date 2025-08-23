@@ -1,5 +1,5 @@
 #define DOCTEST_CONFIG_IMPLEMENT
-#include "../../include/external/doctest.h"
+#include "external/doctest.h"
 #include "logos/LgsApp.h"
 
 TEST_CASE("TestSema10000") {

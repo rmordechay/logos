@@ -10,7 +10,7 @@ class LgsMapAddFunc final : public LgsFunc {
 public:
     LgsType* parent;
     explicit LgsMapAddFunc(LgsType* parentType) : LgsFunc("add", &LGS_VOID, {parentType, new LgsStr(), &LGS_ANY}, PUBLIC | INTERNAL | METHOD), parent(parentType) {}
-    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override;
+    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override;
 };
 
 class LgsMap final : public LgsIterable {
@@ -35,7 +35,7 @@ public:
         addMethod(isNotEmptyFunc);
     }
 
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    Type* getIRType(LgsCodeGen& codeGen) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
@@ -43,12 +43,12 @@ public:
     LgsExpr* getZeroValue() override;
     LgsType* getIndexType() override;
     uint16_t getUnpackCount() const override;
-    Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
+    Value* IRLength(LgsCodeGen& codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
-    StructType* getMapStruct(LgsCodeGen* codeGen);
+    StructType* getMapStruct(LgsCodeGen& codeGen);
     bool canCastTo(LgsType* other) override;
-    void freeValue(LgsCodeGen* codeGen, Value* value) override;
+    void freeValue(LgsCodeGen& codeGen, Value* value) override;
     std::string strFormatPart() const override;
     ~LgsMap() override;
 };

@@ -6,42 +6,28 @@
 #include "types/LgsObject.h"
 #include "types/LgsTable.h"
 
-void LgsInstance::createIRValue(LgsCodeGen* codeGen) {
-    if (table) return createIRTable(codeGen);
-    const auto objIRType = obj->getIRType(codeGen);
-    if(obj->singleton) {
-        IRValue = codeGen->createGlobal(objIRType, ConstantAggregateZero::get(objIRType), obj->name);
-    } else {
-        IRValue = codeGen->builder.CreateAlloca(objIRType);
-    }
-    initFields(codeGen);
-    if (!obj->interfaces.empty()) {
-        setVirtuals(codeGen);
-    }
-}
-
-void LgsInstance::createIRTable(LgsCodeGen* codeGen) {
-    const auto tableFieldType = codeGen->getStructType({codeGen->ptrTy(), codeGen->ptrTy()}, "_Table_Field");
+void LgsInstance::createIRTable(LgsCodeGen& codeGen) {
+    const auto tableFieldType = codeGen.getStructType({codeGen.ptrTy(), codeGen.ptrTy()}, "_Table_Field");
     const auto fieldsType = ArrayType::get(tableFieldType, 1024);
-    const auto tableType = codeGen->getStructType({codeGen->ptrTy(), codeGen->sizeTy(), fieldsType}, "_Table");
-    IRValue = codeGen->builder.CreateAlloca(tableType);
-    codeGen->callLgsFunc("Table_init", codeGen->getFT(codeGen->voidTy(), {codeGen->ptrTy()}), {IRValue});
-    const auto ft = codeGen->getFT(codeGen->voidTy(), {codeGen->ptrTy(), codeGen->ptrTy(), codeGen->ptrTy()});
+    const auto tableType = codeGen.getStructType({codeGen.ptrTy(), codeGen.sizeTy(), fieldsType}, "_Table");
+    IRValue = codeGen.builder.CreateAlloca(tableType);
+    codeGen.callLgsFunc("Table_init", codeGen.getFT(codeGen.voidTy(), {codeGen.ptrTy()}), {IRValue});
+    const auto ft = codeGen.getFT(codeGen.voidTy(), {codeGen.ptrTy(), codeGen.ptrTy(), codeGen.ptrTy()});
     for (int i = 0; i < table->fields.size(); ++i) {
-        const auto fieldNameIR = codeGen->getIRStr(table->fields[i]->name);
-        const auto fieldTypeIR = codeGen->getIRStr(table->fields[i]->type->getName());
-        codeGen->callLgsFunc("Table_add", ft, {IRValue, fieldNameIR, fieldTypeIR});
+        const auto fieldNameIR = codeGen.getIRStr(table->fields[i]->name);
+        const auto fieldTypeIR = codeGen.getIRStr(table->fields[i]->type->getName());
+        codeGen.callLgsFunc("Table_add", ft, {IRValue, fieldNameIR, fieldTypeIR});
     }
 }
 
-void LgsInstance::initFields(LgsCodeGen* codeGen) {
+void LgsInstance::initFields(LgsCodeGen& codeGen) {
     for (const auto& [argName, arg] : args) {
-        const auto exprIR = arg->expr->getIRValue(codeGen);
+        const auto exprIR = arg->expr->IRValue;
         const auto field = obj->getField(argName);
         if (!field) continue;
         field->parentIRValue = IRValue;
-        const auto gep = field->getIRValue(codeGen);
-        codeGen->builder.CreateStore(exprIR, gep);
+        const auto gep = field->IRValue;
+        codeGen.builder.CreateStore(exprIR, gep);
     }
 }
 
@@ -50,19 +36,19 @@ void LgsInstance::setObject(LgsObject* newObj) {
     setType(obj);
 }
 
-void LgsInstance::setVirtuals(LgsCodeGen* codeGen) const {
+void LgsInstance::setVirtuals(LgsCodeGen& codeGen) const {
     for (const auto& [methodName, method] : obj->methods) {
         if (!method->funcType->isVirtual) continue;
-        const auto keyIRStr = codeGen->getIRStr(method->funcType->getName());
+        const auto keyIRStr = codeGen.getIRStr(method->funcType->getName());
         const auto IRFunc = method->getIRFunc(codeGen);
-        codeGen->addPtrToVtable(IRValue, keyIRStr, IRFunc);
+        codeGen.addPtrToVtable(IRValue, keyIRStr, IRFunc);
     }
     for (const auto& field : obj->fields) {
         if (!field->isVirtual) continue;
-        const auto keyIRStr = codeGen->getIRStr(field->name);
+        const auto keyIRStr = codeGen.getIRStr(field->name);
         const auto objIR = obj->getIRType(codeGen);
-        const auto fieldGEP = codeGen->builder.CreateStructGEP(objIR, IRValue, field->position);
-        codeGen->addPtrToVtable(IRValue, keyIRStr, fieldGEP);
+        const auto fieldGEP = codeGen.builder.CreateStructGEP(objIR, IRValue, field->position);
+        codeGen.addPtrToVtable(IRValue, keyIRStr, fieldGEP);
     }
 }
 

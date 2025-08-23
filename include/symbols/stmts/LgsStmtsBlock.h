@@ -12,7 +12,6 @@ public:
 
     explicit LgsStmtsBlock(const std::vector<LgsStmt*>& stmts = {}) : stmts(stmts) {}
     LgsStmt* lastStmt() const;
-    void createIRValue(LgsCodeGen* codeGen) override;
     json::value asJSON() override;
     ~LgsStmtsBlock() override;
 };

@@ -10,7 +10,7 @@ public:
         isNumber = true;
         isFloatPoint = true;
     }
-    llvm::Type* getIRType(LgsCodeGen* codeGen) override;
+    llvm::Type* getIRType(LgsCodeGen& codeGen) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;

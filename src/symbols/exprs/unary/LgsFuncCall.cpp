@@ -5,19 +5,6 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsObject.h"
 
-void LgsFuncCall::createIRValue(LgsCodeGen* codeGen) {
-    if (ref.symbolType == PARAM) {
-        LgsFunc f(ref.param->type->asFuncType());
-        f.setIRValue(ref.param->IRValue);
-        IRValue = f.call(codeGen, args);
-        return;
-    }
-    if (func->funcType->isVirtual) {
-        resolveVirtualFunc(codeGen);
-    }
-    IRValue = func->call(codeGen, args);
-}
-
 bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
     if (funcType->hasDefaults) return equalsDefaultParams(funcType);
     if (funcType->isVariadic) return equalsVariadic(funcType);
@@ -49,11 +36,11 @@ bool LgsFuncCall::equalsDefaultParams(const LgsFuncType* funcType) const {
     return true;
 }
 
-void LgsFuncCall::resolveVirtualFunc(LgsCodeGen* codeGen) const {
+void LgsFuncCall::resolveVirtualFunc(LgsCodeGen& codeGen) const {
     const auto self = args[0];
-    const auto keyIR = codeGen->getIRStr(func->funcType->getName());
-    const auto selfPtr = self->getIRValue(codeGen);
-    const auto rv = codeGen->getPtrFromVtable(selfPtr, keyIR);
+    const auto keyIR = codeGen.getIRStr(func->funcType->getName());
+    const auto selfPtr = self->IRValue;
+    const auto rv = codeGen.getPtrFromVtable(selfPtr, keyIR);
     func->setIRValue(rv);
 }
 

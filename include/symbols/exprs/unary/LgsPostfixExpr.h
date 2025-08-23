@@ -13,8 +13,7 @@ public:
     LgsPostfixOperator op;
 
     LgsPostfixExpr(LgsUnaryExpr* baseExpr, const LgsPostfixOperator op) : expr(baseExpr), op(op) {}
-    Value* IncOrDecValue(LgsCodeGen* codeGen) const;
-    void createIRValue(LgsCodeGen* codeGen) override;
+    Value* IncOrDecValue(LgsCodeGen& codeGen) const;
     std::string pname() override;
     json::value asJSON() override;
     ~LgsPostfixExpr() override;

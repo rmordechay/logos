@@ -11,7 +11,7 @@ class LgsArrayAddFunc final : public LgsFunc {
 public:
     LgsType* parent;
     explicit LgsArrayAddFunc(LgsType* parentType) : LgsFunc("add", &LGS_VOID, {parentType, &LGS_ANY}, PUBLIC | INTERNAL | METHOD), parent(parentType) {}
-    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override;
+    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override;
 };
 
 class LgsDArray final : public LgsIterable {
@@ -35,7 +35,7 @@ public:
         addMethod(isNotEmptyFunc);
         isSliceable = true;
     }
-    Type* getIRType(LgsCodeGen* codeGen) override;
+    Type* getIRType(LgsCodeGen& codeGen) override;
     std::string getName() override;
     std::string pname() override;
     size_t getSizeBytes() override;
@@ -44,8 +44,8 @@ public:
     uint16_t getUnpackCount() const override;
     std::string strFormatPart() const override;
     StructType* getArrStruct(LgsCodeGen* codeGen);
-    void freeValue(LgsCodeGen* codeGen, Value* value) override;
-    Value* IRLength(LgsCodeGen* codeGen, LgsExpr* iterable) override;
+    void freeValue(LgsCodeGen& codeGen, Value* value) override;
+    Value* IRLength(LgsCodeGen& codeGen, LgsExpr* iterable) override;
     Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
     bool canCastTo(LgsType* other) override;

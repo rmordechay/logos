@@ -17,8 +17,8 @@ std::string LgsLong::pname() {
     return name;
 }
 
-Type* LgsLong::getIRType(LgsCodeGen* codeGen) {
-    return codeGen->i64Ty();
+Type* LgsLong::getIRType(LgsCodeGen& codeGen) {
+    return codeGen.i64Ty();
 }
 
 size_t LgsLong::getSizeBytes() {

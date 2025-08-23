@@ -68,7 +68,7 @@ LgsExpr* LgsExpr::castTo(LgsType* toType) {
     assert(0);
 }
 
-Value* LgsExpr::hash(LgsCodeGen* codeGen) {
+Value* LgsExpr::hash(LgsCodeGen& codeGen) {
     assert(0);
 }
 

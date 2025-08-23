@@ -1,13 +1,9 @@
-#include "../../../../include/symbols/exprs/unary/LgsCast.h"
+#include "exprs/unary/LgsCast.h"
 
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
-void LgsCast::createIRValue(LgsCodeGen* codeGen) {
-    IRValue = toValue->getIRValue(codeGen);
-}
-
-Value* LgsCast::addIR(LgsCodeGen* codeGen, LgsExpr* other) {
+Value* LgsCast::addIR(LgsCodeGen& codeGen, LgsExpr* other) {
     return toValue->addIR(codeGen, other);
 }
 

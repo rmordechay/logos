@@ -11,7 +11,7 @@ public:
         isInt = true;
     }
     size_t getSizeBytes() override;
-    llvm::Type* getIRType(LgsCodeGen* codeGen) override;
+    llvm::Type* getIRType(LgsCodeGen& codeGen) override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;

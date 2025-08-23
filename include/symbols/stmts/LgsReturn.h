@@ -12,7 +12,6 @@ public:
     llvm::BasicBlock* parentBlock = nullptr;
 
     explicit LgsReturn(LgsExpr* expr) : expr(expr) {}
-    void createIRValue(LgsCodeGen* codeGen) override;
     json::value asJSON() override;
     ~LgsReturn() override;
 };

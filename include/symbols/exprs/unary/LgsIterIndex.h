@@ -13,14 +13,14 @@ public:
     explicit LgsIterIndex(LgsUnaryExpr* baseExpr, LgsIndex* index = nullptr) : baseExpr(baseExpr), index(index) {
         isAssignable = true;
     }
-    void createIRValue(LgsCodeGen* codeGen) override;
-    Value* loadFromDArray(LgsCodeGen* codeGen, LgsDArray* arr) const;
-    Value* loadFromMap(LgsCodeGen* codeGen, LgsMap* map) const;
-    Value* loadFromStr(LgsCodeGen* codeGen, const LgsStr* str) const;
-    Value* loadFromVec(LgsCodeGen* codeGen) const;
-    Value* createStrSlice(LgsCodeGen* codeGen, const LgsStr* str) const;
-    Value* loadFromSArray(LgsCodeGen* codeGen) const;
-    Value* getStrGEP(LgsCodeGen* codeGen) const;
+
+    Value* loadFromDArray(LgsCodeGen& codeGen, LgsDArray* arr) const;
+    Value* loadFromMap(LgsCodeGen& codeGen, LgsMap* map) const;
+    Value* loadFromStr(LgsCodeGen& codeGen, const LgsStr* str) const;
+    Value* loadFromVec(LgsCodeGen& codeGen) const;
+    Value* createStrSlice(LgsCodeGen& codeGen, const LgsStr* str) const;
+    Value* loadFromSArray(LgsCodeGen& codeGen) const;
+    Value* getStrGEP(LgsCodeGen& codeGen) const;
     std::string pname() override;
     json::value asJSON() override;
     ~LgsIterIndex() override;

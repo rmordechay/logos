@@ -3,20 +3,14 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
+#include "../codegen/LgsCodeGenVisitor.h"
 #include "stmts/LgsReturn.h"
 #include "types/LgsFuncType.h"
 #include "types/LgsVoid.h"
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 
-void LgsFunc::createIRValue(LgsCodeGen* codeGen) {
-    codeGen->savedIP = codeGen->builder.saveIP();
-    generateIR(codeGen);
-    codeGen->builder.restoreIP(codeGen->savedIP);
-    IRValue = getIRFunc(codeGen);
-}
-
-Value* LgsFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
+Value* LgsFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
     if (funcType->hasDefaults) assert(0);
     std::vector<Value*> IRArgs;
     for (int i = funcType->isStatic; i < funcType->params.size(); ++i) {
@@ -25,8 +19,8 @@ Value* LgsFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
         if (!param.isSelf) {
             arg = arg->castTo(param.type);
         }
-        auto v = arg->getIRValue(codeGen);
-        v = loadIRArg(codeGen, v, arg->type);
+        auto v = arg->IRValue;
+        v = loadIRArg(&codeGen, v, arg->type);
         IRArgs.push_back(v);
         if (!param.isSelf && args[i] != arg) {
             freeExpr(arg);
@@ -35,25 +29,26 @@ Value* LgsFunc::call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) {
     return callIR(codeGen, IRArgs);
 }
 
-void LgsFunc::generateIR(LgsCodeGen* codeGen) {
-    codeGen->stack.enterScope(this);
-    createPrologue(codeGen);
-    stmtsBlock->createIRValue(codeGen);
-    createEpilogue(codeGen);
-    if (!codeGen->lastInstTerminator()) codeGen->builder.CreateRetVoid();
-    codeGen->stack.exitScope();
+Value* LgsFunc::loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type) {
+    if (type->asCPtr() || type->asFuncType() || type->asObject() || type->asDArray() || type->asSArray()) return v;
+    const auto vTy = v->getType();
+    if (vTy->isIntegerTy() || vTy->isFloatingPointTy()) return v;
+    if (!vTy->isPointerTy()) return v;
+    if (isa<GlobalVariable>(v) || isa<LoadInst>(v)) return v;
+    const auto ty = type->getIRType(*codeGen);
+    return codeGen->builder.CreateLoad(ty, v);
 }
 
-Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
+Function* LgsFunc::getIRFunc(LgsCodeGen& codeGen) {
     auto funcName = funcType->getName();
-    auto IRFunc = codeGen->IRModule->getFunction(funcName);
+    auto IRFunc = codeGen.IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
     const auto type = funcType->getIRType(codeGen);
     const auto funcTy = llvm::cast<FunctionType>(type);
     if (funcType->isInternal) {
         funcName = LGS_RUNTIME_NAMES_PREFIX + funcName;
     }
-    IRFunc = codeGen->getFunc(funcName, funcTy);
+    IRFunc = codeGen.getFunc(funcName, funcTy);
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
     for (int i = funcType->isStatic; i < funcType->params.size(); ++i) {
@@ -65,71 +60,17 @@ Function* LgsFunc::getIRFunc(LgsCodeGen* codeGen) {
     return IRFunc;
 }
 
-Value* LgsFunc::callIR(LgsCodeGen* codeGen, const std::vector<Value*>& args) {
+Value* LgsFunc::callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args) {
     CallInst* rv = nullptr;
     if (IRValue) {
         const auto funcTypeIR = funcType->getIRType(codeGen);
         const auto IRFuncType = llvm::cast<FunctionType>(funcTypeIR);
-        rv = codeGen->builder.CreateCall(IRFuncType, IRValue, args);
+        rv = codeGen.builder.CreateCall(IRFuncType, IRValue, args);
     } else {
         const auto IRFunc = getIRFunc(codeGen);
-        rv = codeGen->builder.CreateCall(IRFunc, args);
+        rv = codeGen.builder.CreateCall(IRFunc, args);
     }
     return rv;
-}
-
-Value* LgsFunc::loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type) {
-    if (type->asCPtr() || type->asFuncType() || type->asObject() || type->asDArray() || type->asSArray()) return v;
-    const auto vTy = v->getType();
-    if (vTy->isIntegerTy() || vTy->isFloatingPointTy()) return v;
-    if (!vTy->isPointerTy()) return v;
-    if (isa<GlobalVariable>(v) || isa<LoadInst>(v)) return v;
-    const auto ty = type->getIRType(codeGen);
-    return codeGen->builder.CreateLoad(ty, v);
-}
-
-void LgsFunc::createPrologue(LgsCodeGen* codeGen) {
-    const auto IRFunc = getIRFunc(codeGen);
-    IRFunc->setLinkage(funcType->isPublic ? GlobalValue::ExternalLinkage : GlobalValue::PrivateLinkage);
-    const auto entryBlock = codeGen->createBlock(BLOCK_NAME_ENTRY, IRFunc);
-    codeGen->builder.SetInsertPoint(entryBlock);
-    codeGen->callStackPush();
-}
-
-void LgsFunc::createEpilogue(LgsCodeGen* codeGen) {
-    if (hasDefers) codeGen->callDefers();
-    if (needsCleanup()) {
-        cleanupExprs(codeGen);
-    } else {
-        codeGen->callPopStack();
-    }
-}
-
-void LgsFunc::cleanupExprs(LgsCodeGen* codeGen) {
-    codeGen->branchAndStartBlock(getCleanupBlock(codeGen));
-    const auto func = codeGen->stack.currentFunc();
-    if (!func->returnStmts.empty()) {
-        auto rt = func->funcType->rt->getIRType(codeGen);
-        if (func->funcType->rt->asDArray()) {
-            rt = rt->getPointerTo();
-        }
-        const auto phi = codeGen->builder.CreatePHI(rt, func->returnStmts.size());
-        for (const auto returnStmt : func->returnStmts) {
-            phi->addIncoming(returnStmt->expr->getIRValue(codeGen), returnStmt->parentBlock);
-        }
-        codeGen->callPopStack();
-        freeHeap(codeGen);
-        codeGen->builder.CreateRet(phi);
-    } else {
-        codeGen->callPopStack();
-        freeHeap(codeGen);
-    }
-}
-
-void LgsFunc::freeHeap(LgsCodeGen* codeGen) const {
-    for (const auto expr : heapAllocExprs) {
-        expr->type->freeValue(codeGen, expr->getIRValue(codeGen));
-    }
 }
 
 void LgsFunc::initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops) {
@@ -150,9 +91,9 @@ bool LgsFunc::needsCleanup() const {
     return !heapAllocExprs.empty();
 }
 
-BasicBlock* LgsFunc::getCleanupBlock(LgsCodeGen* codeGen) {
+BasicBlock* LgsFunc::getCleanupBlock(LgsCodeGen& codeGen) {
     if (cleanupBlock) return cleanupBlock;
-    cleanupBlock = codeGen->createBlock(BLOCK_NAME_CLEANUP);
+    cleanupBlock = codeGen.createBlock(BLOCK_NAME_CLEANUP);
     return cleanupBlock;
 }
 
@@ -161,14 +102,14 @@ void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
     const auto dbInt32 = diBuilder->createBasicType("int", 32, dwarf::DW_ATE_signed);
     const auto subroutine = diBuilder->createSubroutineType(diBuilder->getOrCreateTypeArray({dbInt32}));
     const auto subprogram = diBuilder->createFunction(compileUnit, funcType->name, "", diFile, 1, subroutine, 1);
-    getIRFunc(codeGen)->setSubprogram(subprogram);
+    getIRFunc(*codeGen)->setSubprogram(subprogram);
     codeGen->builder.SetCurrentDebugLocation(DILocation::get(
         codeGen->context,
         location.lineStart,
         location.posInLine,
         subprogram,
         subprogram->getScope()
-        ));
+    ));
 }
 
 bool LgsFunc::completeType(LgsType* toType) {
@@ -191,25 +132,7 @@ std::string LgsFunc::pname() {
 
 json::value LgsFunc::asJSON() {
     json::object obj;
-    obj["name"] = funcType->name;
-    obj["rt"] = funcType->rt->asJSON();
-    json::object funcConfigs;
-    funcConfigs["isMethod"] = funcType->isMethod;
-    funcConfigs["isPublic"] = funcType->isPublic;
-    funcConfigs["isInternal"] = funcType->isInternal;
-    funcConfigs["isVirtual"] = funcType->isVirtual;
-    funcConfigs["isVariadic"] = funcType->isVariadic;
-    funcConfigs["isStatic"] = funcType->isStatic;
-    funcConfigs["isOptional"] = funcType->isOptional;
-    funcConfigs["isTerminator"] = funcType->isTerminator;
-    funcConfigs["isAnonymous"] = funcType->isLambda;
-    funcConfigs["hasDefaults"] = funcType->hasDefaults;
-    obj["configs"] = funcConfigs;
-    json::array params;
-    for (auto& param : funcType->params) {
-        params.emplace_back(param.asJSON());
-    }
-    obj["params"] = params;
+    obj["funcType"] = funcType->asJSON();
     obj["stmtsBlock"] = stmtsBlock->asJSON();
     return obj;
 }

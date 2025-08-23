@@ -14,10 +14,6 @@ public:
     std::string tag;
 
     explicit LgsIfStmt(LgsExpr* ifCond, LgsStmtsBlock* ifStmtBlock) : ifCond(ifCond), ifBlock(ifStmtBlock) {}
-    void createIRValue(LgsCodeGen* codeGen) override;
-    void generateSimpleIf(LgsCodeGen* codeGen);
-    void generateIfWithElse(LgsCodeGen* codeGen);
-    void generateElseIf(LgsCodeGen* codeGen);
     json::value asJSON() override;
     ~LgsIfStmt() override;
 };
@@ -25,5 +21,4 @@ public:
 class LgsPattern final : public LgsIfStmt {
 public:
     explicit LgsPattern(LgsExpr* ifCond) : LgsIfStmt(ifCond, nullptr) {}
-    void createIRValue(LgsCodeGen* codeGen) override;
 };

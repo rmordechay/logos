@@ -5,18 +5,6 @@
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 
-void LgsMainFile::generateIR() {
-    for (const auto object : objects) {
-        object->getIRType(&codeGen);
-        for (const auto& [_, method] : object->methods) {
-            method->generateIR(&codeGen);
-        }
-    }
-    for (const auto [_, func] : funcs) {
-        func->generateIR(&codeGen);
-    }
-}
-
 json::value LgsMainFile::asJSON() {
     json::object obj;
     json::array jsonEnums;

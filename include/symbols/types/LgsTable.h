@@ -13,7 +13,7 @@ public:
         instance = new LgsInstance(name);
     }
     std::string pname() override;
-    llvm::Type* getIRType(LgsCodeGen* codeGen) override;
+    llvm::Type* getIRType(LgsCodeGen& codeGen) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string getName() override;

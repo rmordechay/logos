@@ -13,8 +13,8 @@ class LgsSystemPid final : public LgsFunc {
 public:
     static constexpr auto name = "pid";
     explicit LgsSystemPid(LgsType* parent): LgsFunc(name, &LGS_INT, {parent}, PUBLIC | STATIC | INTERNAL | METHOD ) {}
-    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
-        return codeGen->callGetPid();
+    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override {
+        return codeGen.callGetPid();
     }
 };
 
@@ -22,9 +22,9 @@ class LgsSystemSleep final : public LgsFunc {
 public:
     static constexpr auto name = "sleep";
     explicit LgsSystemSleep(LgsType* parent): LgsFunc(name, &LGS_VOID, {parent, &LGS_INT}, PUBLIC | STATIC | INTERNAL | METHOD ) {}
-    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
-        const auto arg = loadIRArg(codeGen, args[1]->getIRValue(codeGen), args[1]->type);
-        return codeGen->callSleep(arg);
+    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override {
+        const auto arg = loadIRArg(&codeGen, args[1]->IRValue, args[1]->type);
+        return codeGen.callSleep(arg);
     }
 };
 
@@ -32,8 +32,8 @@ class LgsSystemExit final : public LgsFunc {
 public:
     static constexpr auto name = "exit";
     explicit LgsSystemExit(LgsType* parent): LgsFunc(name, &LGS_VOID, {parent, &LGS_INT}, PUBLIC | STATIC | INTERNAL | METHOD | TERMINATOR) {}
-    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
-        return codeGen->callExit(args[1]->getIRValue(codeGen));
+    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override {
+        return codeGen.callExit(args[1]->IRValue);
     }
 };
 
@@ -41,8 +41,8 @@ class LgsSystemCwd final : public LgsFunc {
 public:
     static constexpr auto name = "cwd";
     explicit LgsSystemCwd(LgsType* parent): LgsFunc(name, new LgsStr(), {parent}, PUBLIC | STATIC | INTERNAL | METHOD ) {}
-    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
-        return codeGen->callCwd();
+    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override {
+        return codeGen.callCwd();
     }
 };
 
@@ -60,8 +60,8 @@ public:
     explicit LgsSystemCoresNum(LgsType* parent): LgsFunc(name, &LGS_LONG, {parent}, PUBLIC | STATIC | INTERNAL | METHOD ) {
         funcType->isStatic = true;
     }
-    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
-        return codeGen->callCoresNum();
+    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override {
+        return codeGen.callCoresNum();
     }
 };
 

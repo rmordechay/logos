@@ -2,8 +2,8 @@
 
 
 
-Type* LgsGroup::getIRType(LgsCodeGen* codeGen) {
-    return codeGen->ptrTy();
+Type* LgsGroup::getIRType(LgsCodeGen& codeGen) {
+    return codeGen.ptrTy();
 }
 
 LgsExpr* LgsGroup::getZeroValue() {

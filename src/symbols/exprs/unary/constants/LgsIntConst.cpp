@@ -7,20 +7,6 @@
 #include "types/primitives/LgsLong.h"
 #include "types/primitives/LgsShort.h"
 
-void LgsIntConst::createIRValue(LgsCodeGen* codeGen) {
-    if (type->asBool()) {
-        IRValue = codeGen->i1(value);
-    } else if (type->asChar()) {
-        IRValue = codeGen->i8(value);
-    } else if (type->asShort()) {
-        IRValue = codeGen->i16(value);
-    } else if (type->asInt()) {
-        IRValue = codeGen->i32(value);
-    } else if (type->asLong()) {
-        IRValue = codeGen->i64(value);
-    }
-}
-
 LgsExpr* LgsIntConst::castTo(LgsType* toType) {
     if (type->getName() == toType->getName()) return this;
     if (toType->asLong()) {

@@ -10,42 +10,43 @@ public:
     static constexpr auto name = "print";
     explicit LgsPrint(): LgsFunc(name, &LGS_VOID, {&LGS_ANY, &LGS_ANY}, PUBLIC | VARIADIC) {}
 
-    Value* call(LgsCodeGen* codeGen, const std::vector<LgsExpr*>& args) override {
+    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override {
         std::vector<Value*> IRArgs;
         const auto firstArg = args.front();
         const auto formatStr = firstArg->type->strFormatPart() + '\n';
         if (const auto strConst = firstArg->asStrConst()) {
             if (!strConst->templateParts.empty()) {
-                return printFormat(codeGen, strConst);
+                return printFormat(&codeGen, strConst);
             }
             LgsStrConst withNewLine(strConst->value + '\n');
-            IRArgs.emplace_back(withNewLine.getIRValue(codeGen));
+            withNewLine.IRValue = codeGen.getIRStr(strConst->value);
+            IRArgs.emplace_back(withNewLine.IRValue);
         } else if (const auto obj = firstArg->type->asObject()) {
-            IRArgs.emplace_back(codeGen->getIRStr(formatStr));
+            IRArgs.emplace_back(codeGen.getIRStr(formatStr));
             for (const auto& field : obj->fields) {
-                const auto ir = field->getIRValue(codeGen);
-                IRArgs.emplace_back(loadIRArg(codeGen, ir, field->type));
+                const auto ir = field->IRValue;
+                IRArgs.emplace_back(loadIRArg(&codeGen, ir, field->type));
             }
         } else {
-            IRArgs.emplace_back(codeGen->getIRStr(formatStr));
+            IRArgs.emplace_back(codeGen.getIRStr(formatStr));
             for (int i = 0; i < args.size(); ++i) {
                 const auto arg = args[i];
-                IRArgs.emplace_back(arg->getIRValue(codeGen));
+                IRArgs.emplace_back(arg->IRValue);
             }
         }
-        return codeGen->callLgsFunc(name, codeGen->getFT(codeGen->voidTy(), {codeGen->ptrTy()}, true), IRArgs);
+        return codeGen.callLgsFunc(name, codeGen.getFT(codeGen.voidTy(), {codeGen.ptrTy()}, true), IRArgs);
     }
 
-    Function* getIRFunc(LgsCodeGen* codeGen) override {
-        const auto ft = codeGen->getFT(codeGen->i32Ty(), {codeGen->ptrTy()}, true);
-        return codeGen->getFunc("printf", ft);
+    Function* getIRFunc(LgsCodeGen& codeGen) override {
+        const auto ft = codeGen.getFT(codeGen.i32Ty(), {codeGen.ptrTy()}, true);
+        return codeGen.getFunc("printf", ft);
     }
 
     static Value* printFormat(LgsCodeGen* codeGen, const LgsStrConst* const strConst) {
         auto formated = strConst->formatedStr;
         std::vector<Value*> values;
         for (const auto part : strConst->templateParts) {
-            auto partIR = loadIRArg(codeGen, part->getIRValue(codeGen), part->type);
+            auto partIR = loadIRArg(codeGen, part->IRValue, part->type);
             values.push_back(partIR);
             const auto pos = formated.find(LGS_STR_FMT_PLACEHOLDER);
             if (pos != std::string::npos) {

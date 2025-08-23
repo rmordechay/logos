@@ -6,10 +6,11 @@
 #include "analysis/LgsSema.h"
 #include "logos/LgsPaths.h"
 #include "utils/ThreadPool.h"
-#include "builtins/LgsBuiltins.h"
+#include "builtins/LgsPrint.h"
 #include "builtins/LgsSystem.h"
 #include "files/LgsEnvFile.h"
-#include "logos/LgsLinker.h"
+#include "codegen/LgsCodeGenVisitor.h"
+#include "codegen/LgsLinker.h"
 #include "utils/LgsUtils.h"
 #include "llvm/IR/Verifier.h"
 #include <llvm/Target/TargetMachine.h>
@@ -79,9 +80,8 @@ bool LgsApp::generate() {
     const auto targetMachine = LgsCodeGen::getTargetMachine();
     for (const auto& file : ast) {
         threadPool.runTask([this, file, targetMachine] {
-            file->codeGen.appConfigs = &configs;
-            file->codeGen.setupModule(file->name, targetMachine->createDataLayout());
-            file->generateIR();
+            LgsCodeGenVisitor code(*file);
+            code.generate(configs, *targetMachine);
         });
     }
     threadPool.wait();
@@ -161,7 +161,7 @@ void LgsApp::initBuild() {
 
 void LgsApp::writeIRFiles() {
     for (const auto file : ast) {
-        const auto module = file->codeGen.IRModule;
+        const auto module = file->generator.IRModule;
         if (!module) continue;
         if constexpr (LOG_LEVEL == DEBUG) {
             module->print(outs(), nullptr);

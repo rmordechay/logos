@@ -1,7 +1,7 @@
 #pragma once
 #include "LgsSymbolTable.h"
 #include "configs/LgsErrors.h"
-#include "logos/LgsCodeGen.h"
+#include "../codegen/LgsCodeGen.h"
 
 class LgsRuntime;
 class LgsStrConst;
@@ -12,7 +12,7 @@ public:
     size_t id = 0;
     std::string name;
     fs::path absPath;
-    LgsCodeGen codeGen;
+    LgsCodeGen generator;
     LgsSymbolTable symbolTable;
     LgsRuntime* runtime = nullptr;
     LgsLocation location{0, 0, 0};
@@ -20,7 +20,6 @@ public:
 
     explicit LgsFile(const size_t fileID, const std::string& name, const fs::path& path) : id(fileID), name(name), absPath(path) {}
     virtual json::value asJSON();
-    virtual void generateIR();
     virtual void format();
     virtual ~LgsFile() = default;
 };
@@ -28,8 +27,6 @@ public:
 inline json::value LgsFile::asJSON() {
     assert(0);
 }
-
-inline void LgsFile::generateIR() {}
 
 inline void LgsFile::format() {
     assert(false);

@@ -28,6 +28,6 @@ std::string LgsUnknown::strFormatPart() const {
     assert(0);
 }
 
-llvm::Type* LgsUnknown::getIRType(LgsCodeGen* codeGen) {
+llvm::Type* LgsUnknown::getIRType(LgsCodeGen& codeGen) {
     assert(0);
 }
