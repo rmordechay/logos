@@ -35,10 +35,12 @@
 #include "stmts/LgsAssignment.h"
 #include "stmts/LgsIfStmt.h"
 #include "types/LgsTable.h"
+
+#include <llvm/IR/Module.h>
 #include <llvm/Target/TargetMachine.h>
 
 void LgsCodeGenVisitor::generate(const LgsAppConfigs& appConfigs, const TargetMachine& targetMachine) {
-    cg.setupModule(file.name, targetMachine.createDataLayout(), appConfigs.debugMode);
+    cg.setupModule(file, targetMachine.createDataLayout(), appConfigs.debugMode);
     if (const auto mainFile = dynamic_cast<LgsMainFile*>(&file)) {
         visitMainFile(mainFile);
     } else if (const auto objFile = dynamic_cast<LgsObjectFile*>(&file)) {
@@ -550,7 +552,9 @@ void LgsCodeGenVisitor::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {
     assert(0);
 }
 
-void LgsCodeGenVisitor::visitBinaryExpr(LgsBinaryExpr* binExpr) const {
+void LgsCodeGenVisitor::visitBinaryExpr(LgsBinaryExpr* binExpr) {
+    visitExpr(binExpr->left);
+    visitExpr(binExpr->right);
     switch (binExpr->op) {
     case ADD: binExpr->IRValue = binExpr->left->addIR(cg, binExpr->right); break;
     case SUB: binExpr->IRValue = binExpr->left->subIR(cg, binExpr->right); break;

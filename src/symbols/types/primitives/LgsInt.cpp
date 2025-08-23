@@ -9,6 +9,8 @@
 #include "types/primitives/LgsSize.h"
 #include "types/primitives/LgsUInt.h"
 
+#include <llvm/IR/DIBuilder.h>
+
 size_t LgsInt::getSizeBytes() {
     return sizeof(int);
 }
@@ -50,4 +52,8 @@ json::value LgsInt::asJSON() {
 
 LgsType* LgsInt::clone() {
     return this;
+}
+
+DIBasicType* LgsInt::getDebugType(LgsCodeGen& codeGen) {
+    return codeGen.diBuilder->createBasicType(name, 32, dwarf::DW_ATE_signed);
 }

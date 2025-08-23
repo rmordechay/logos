@@ -1,6 +1,7 @@
 #include "codegen/LgsCodeGen.h"
 #include "configs/LgsDefinitions.h"
 #include "exprs/unary/LgsFuncCall.h"
+#include "files/LgsFile.h"
 #include "funcs/LgsFunc.h"
 #include "types/LgsAny.h"
 #include <llvm/Support/FileSystem.h>
@@ -12,14 +13,16 @@
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Target/TargetOptions.h>
 
-void LgsCodeGen::setupModule(const std::string& moduleName, const DataLayout& dataLayout, const bool debugMode) {
-    IRModule = new Module(moduleName, context);
+void LgsCodeGen::setupModule(const LgsFile& file, const DataLayout& dataLayout, const bool debugMode) {
+    IRModule = new Module(file.name, context);
     IRModule->setTargetTriple(sys::getDefaultTargetTriple());
     IRModule->setDataLayout(dataLayout);
     if (debugMode) {
         diBuilder = new DIBuilder(*IRModule);
-        diFile = diBuilder->createFile(moduleName, "");
+        diFile = diBuilder->createFile(file.path.string(), "");
         compileUnit = diBuilder->createCompileUnit(dwarf::DW_LANG_lo_user, diFile, "", false, "", 0);
+        IRModule->addModuleFlag(Module::Warning, "Dwarf Version", 5);
+        IRModule->addModuleFlag(Module::Warning, "Debug Info Version", DEBUG_METADATA_VERSION);
     }
 }
 

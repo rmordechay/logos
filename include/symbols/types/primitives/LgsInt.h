@@ -19,6 +19,7 @@ public:
     std::string pname() override;
     json::value asJSON() override;
     LgsType* clone() override;
+    llvm::DIBasicType* getDebugType(LgsCodeGen& codeGen) override;
 };
 
 inline LgsInt LGS_INT;

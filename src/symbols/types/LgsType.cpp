@@ -32,6 +32,10 @@ LgsFunc* LgsType::getMethod(const std::string& name) {
     return nullptr;
 }
 
+DIBasicType* LgsType::getDebugType(LgsCodeGen& codeGen) {
+    assert(0);
+}
+
 bool LgsType::addMethod(LgsFunc* method) {
     if (methods.find(method->funcType->name) != methods.end()) return false;
     methods[method->funcType->name] = method;

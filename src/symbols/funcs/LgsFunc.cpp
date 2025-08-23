@@ -125,23 +125,25 @@ LgsExpr* LgsFunc::clone() {
     const auto newFunc = new LgsFunc(funcType->clone()->asFuncType());
     newFunc->isNull = isNull;
     newFunc->isSpread = isSpread;
-    newFunc->isAssignable = isAssignable;
     return newFunc;
 }
 
-void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
-    const auto diBuilder = codeGen->diBuilder;
-    const auto dbInt32 = diBuilder->createBasicType("int", 32, dwarf::DW_ATE_signed);
-    const auto subroutine = diBuilder->createSubroutineType(diBuilder->getOrCreateTypeArray({dbInt32}));
-    const auto subprogram = diBuilder->createFunction(codeGen->compileUnit, funcType->name, "", codeGen->diFile, 1, subroutine, 1);
-    getIRFunc(*codeGen)->setSubprogram(subprogram);
-    codeGen->builder.SetCurrentDebugLocation(DILocation::get(
-        codeGen->context,
+void LgsFunc::setDebugValue(LgsCodeGen& codeGen) {
+    const auto diBuilder = codeGen.diBuilder;
+    const auto dbInt32 = funcType->rt->getDebugType(codeGen);
+    const auto parameterTypes = diBuilder->getOrCreateTypeArray({dbInt32});
+    const auto subroutine = diBuilder->createSubroutineType(parameterTypes);
+    codeGen.diProgram = diBuilder->createFunction(
+        codeGen.compileUnit,
+        funcType->name,
+        "",
+        codeGen.diFile,
         location.lineStart,
-        location.posInLine,
-        subprogram,
-        subprogram->getScope()
-    ));
+        subroutine,
+        location.lineStart
+    );
+    getIRFunc(codeGen)->setSubprogram(codeGen.diProgram);
+    codeGen.builder.SetCurrentDebugLocation(getDebugLoc(codeGen));
 }
 
 LgsFunc::~LgsFunc() {

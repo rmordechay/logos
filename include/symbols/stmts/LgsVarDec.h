@@ -17,6 +17,7 @@ public:
     explicit LgsVarDec(const std::string& name, LgsExpr* expr) : name(name), expr(expr) {}
     bool shouldAllocate(const llvm::Type* IRType) const;
     json::value asJSON() override;
+    void setDebugValue(LgsCodeGen& codeGen) override;
     ~LgsVarDec() override;
 };
 

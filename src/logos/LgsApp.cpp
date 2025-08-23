@@ -186,7 +186,7 @@ void LgsApp::exitWithErrors() const {
         const auto posInLine = std::to_string(err.location.posInLine);
         const auto lineNumber = std::to_string(err.location.lineStart);
         const auto file = ast[err.location.fileID];
-        const auto filePath = file->absPath.string();
+        const auto filePath = file->path.string();
         const auto fullPath = filePath + ":" + lineNumber + ":" + posInLine;
         const auto path = "\n   at: " + fullPath;
         logError(err.msg, path);

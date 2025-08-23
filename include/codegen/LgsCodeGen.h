@@ -28,8 +28,9 @@ public:
     DIFile* diFile = nullptr;
     DIBuilder* diBuilder = nullptr;
     DICompileUnit* compileUnit = nullptr;
+    DISubprogram* diProgram = nullptr;
 
-    void setupModule(const std::string& moduleName, const DataLayout& dataLayout, bool debugMode = false);
+    void setupModule(const LgsFile& file, const DataLayout& dataLayout, bool debugMode = false);
     Value* getIRStr(const std::string& value);
     GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name = "") const;
     StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");

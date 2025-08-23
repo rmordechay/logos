@@ -32,6 +32,6 @@ public:
     std::string pname() override;
     json::value asJSON() override;
     LgsExpr* clone() override;
-    void createDebugValue(LgsCodeGen* codeGen) override;
+    void setDebugValue(LgsCodeGen& codeGen) override;
     ~LgsFunc() override;
 };

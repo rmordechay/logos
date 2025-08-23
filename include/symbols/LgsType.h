@@ -6,6 +6,7 @@ class LgsDouble;
 class LgsFloat;
 
 namespace llvm {
+    class DIBasicType;
     class Value;
     class Type;
 }
@@ -57,6 +58,7 @@ public:
     virtual LgsField* getField(const std::string& name);
     virtual LgsFunc* getMethod(const std::string& name);
     virtual llvm::Type* getIRType(LgsCodeGen& codeGen) = 0;
+    virtual llvm::DIBasicType* getDebugType(LgsCodeGen& codeGen);
     virtual size_t getSizeBytes() = 0;
     virtual LgsExpr* getZeroValue() = 0;
     virtual std::string getName() = 0;

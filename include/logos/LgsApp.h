@@ -1,10 +1,9 @@
 #pragma once
-#include "../codegen/LgsLinker.h"
+#include "codegen/LgsLinker.h"
 #include "LgsSymbolTable.h"
 #include "utils/LgsErrHandler.h"
 #include "LgsPaths.h"
 #include "utils/ThreadPool.h"
-
 #include <llvm/Passes/OptimizationLevel.h>
 
 class LgsAppFile;
@@ -31,7 +30,7 @@ enum LgsLogLevel {
 struct LgsAppConfigs {
     std::string name = "app";
     uint8_t optLevel = 2;
-    bool debugMode = false;
+    bool debugMode = true;
     LgsLogLevel logLevel = INFO;
     std::string activeEnv = "Pro";
     struct { int major; int minor; int micro; } version{1, 0, 0};

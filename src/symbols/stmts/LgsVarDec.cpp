@@ -2,12 +2,31 @@
 #include "exprs/unary/LgsArrayExpr.h"
 #include "utils/LgsUtils.h"
 
+#include <llvm/IR/DIBuilder.h>
+
 json::value LgsVarDec::asJSON() {
     json::object obj;
     obj["stmtKind"] = "VarDec";
     obj["type"] = type->asJSON();
     obj["expr"] = expr->asJSON();
     return obj;
+}
+
+void LgsVarDec::setDebugValue(LgsCodeGen& codeGen) {
+    const auto var = codeGen.diBuilder->createAutoVariable(
+        codeGen.compileUnit,
+        name,
+        codeGen.diFile,
+        location.lineStart,
+        type->getDebugType(codeGen)
+    );
+    codeGen.diBuilder->insertDeclare(
+        IRValue,
+        var,
+        codeGen.diBuilder->createExpression(),
+        getDebugLoc(codeGen),
+        codeGen.builder.GetInsertBlock()
+    );
 }
 
 bool LgsVarDec::shouldAllocate(const Type* IRType) const {

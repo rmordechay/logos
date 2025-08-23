@@ -90,7 +90,7 @@ public:
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitExpr(LgsExpr* expr);
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
-    void visitBinaryExpr(LgsBinaryExpr* binExpr) const;
+    void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitCast(LgsCast* lgsCast);
     void visitLambda(LgsFunc* func);
     void visitIntConst(LgsIntConst* intConst);
