@@ -93,7 +93,7 @@ public:
     void visitBinaryExpr(LgsBinaryExpr* binExpr);
     void visitCast(LgsCast* lgsCast);
     void visitLambda(LgsFunc* func);
-    void visitIntConst(LgsIntConst* intConst);
+    void visitIntConst(LgsIntConst* intConst) const;
     void visitArrayExpr(LgsArrayExpr* array) const;
     void visitHashMap(LgsHashMap* hashMap);
     void visitVectorExpr(LgsVectorExpr* vec);
@@ -115,4 +115,7 @@ public:
     void createPrologue(LgsFunc* func) const;
     void createEpilogue(LgsFunc* func);
     void freeHeap(const LgsFunc* func);
+    Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy);
+    Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
+    Type* getThunkCtxType(const LgsFuncCall* fc) const;
 };

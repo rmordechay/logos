@@ -94,61 +94,12 @@ Value* LgsCodeGen::callLgsFunc(const std::string& funcName, FunctionType* ft, co
     return callFunc(LGS_RUNTIME_NAMES_PREFIX + funcName, ft, args);
 }
 
-Function* LgsCodeGen::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) {
-    auto func = IRModule->getFunction(fc->name + "_thunk");
-    if (func) return func;
-
-    savedIP = builder.saveIP();
-    const auto ft = getFT(voidTy(), {ptrTy()});
-    func = Function::Create(ft, Function::PrivateLinkage, fc->name + "_thunk", IRModule);
-    const auto entryBlock = BasicBlock::Create(context, BLOCK_NAME_ENTRY);
-    entryBlock->insertInto(func);
-    builder.SetInsertPoint(entryBlock);
-
-    std::vector<Value*> args;
-    for (int i = 0; i < fc->args.size(); i++) {
-        const auto v = loadValueFromStruct(ctxTy, func->arg_begin(), i);
-        args.push_back(v);
-    }
-
-    const auto deferFunc = fc->func->getIRFunc(*this);
-    builder.CreateCall(deferFunc, args);
-    builder.CreateRetVoid();
-
-    builder.restoreIP(savedIP);
-    return func;
-}
-
-Value* LgsCodeGen::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) {
-    if (fc->args.empty()) return null();
-    const auto ctx = builder.CreateAlloca(ctxTy);
-    for (int i = 0; i < fc->args.size(); i++) {
-        const auto v = fc->args[i]->IRValue;
-        storeValueInStruct(dyn_cast<StructType>(ctxTy), ctx, i, v);
-    }
-    return ctx;
-}
-
-Type* LgsCodeGen::getThunkCtxType(const LgsFuncCall* fc) {
-    if (fc->args.empty()) return ptrTy();
-    std::vector<Value*> args;
-    std::vector<Type*> types;
-    for (const auto& arg : fc->args) {
-        types.push_back(arg->type->getIRType(*this));
-    }
-    return getStructType(types, fc->name + "_thunk_type");
-}
-
 Value* LgsCodeGen::callMalloc(const size_t size) {
     return builder.CreateMalloc(sizeTy(), sizeTy(), isize(size), nullptr);
 }
 
 Value* LgsCodeGen::callPrintf(const std::vector<Value*>& args) {
     return callFunc("printf", getFT(i32Ty(), {ptrTy()}, true), args);
-}
-
-Value* LgsCodeGen::callSnprintf(const std::vector<Value*>& args) {
-    return callFunc("snprintf", getFT(i32Ty(), {ptrTy(), i64Ty(), ptrTy()}, true), args);
 }
 
 Value* LgsCodeGen::callSleep(Value* time) {

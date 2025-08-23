@@ -463,9 +463,9 @@ void LgsCodeGenVisitor::visitCoroutine(const LgsCoroutine* coroutine) {
     } else {
         assert(0);
     }
-    const auto ctxTy = cg.getThunkCtxType(fc);
-    const auto ctx = cg.getThunkCtx(fc, ctxTy);
-    const auto func = cg.getThunkFunc(fc, ctxTy);
+    const auto ctxTy = getThunkCtxType(fc);
+    const auto ctx = getThunkCtx(fc, ctxTy);
+    const auto func = getThunkFunc(fc, ctxTy);
     cg.addCoro(func, ctx);
 }
 
@@ -514,9 +514,9 @@ void LgsCodeGenVisitor::visitDeferStmt(const LgsDeferStmt* deferStmt) {
     for (const auto& arg : fc->args) {
         visitExpr(arg);
     }
-    const auto ctxTy = cg.getThunkCtxType(fc);
-    const auto ctx = cg.getThunkCtx(fc, ctxTy);
-    const auto func = cg.getThunkFunc(fc, ctxTy);
+    const auto ctxTy = getThunkCtxType(fc);
+    const auto ctx = getThunkCtx(fc, ctxTy);
+    const auto func = getThunkFunc(fc, ctxTy);
     cg.addDeferFunc(func, ctx);
 }
 
@@ -590,7 +590,7 @@ void LgsCodeGenVisitor::visitLambda(LgsFunc* func) {
     func->IRValue = func->getIRFunc(cg);
 }
 
-void LgsCodeGenVisitor::visitIntConst(LgsIntConst* intConst) {
+void LgsCodeGenVisitor::visitIntConst(LgsIntConst* intConst) const {
     if (intConst->type->asBool()) {
         intConst->IRValue = cg.i1(intConst->value);
     } else if (intConst->type->asChar()) {
@@ -853,4 +853,49 @@ void LgsCodeGenVisitor::freeHeap(const LgsFunc* func) {
     for (const auto expr : func->heapAllocExprs) {
         expr->type->freeValue(cg, getIRValue(expr));
     }
+}
+
+Function* LgsCodeGenVisitor::getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) {
+    auto func = cg.IRModule->getFunction(fc->name + "_thunk");
+    if (func) return func;
+
+    cg.savedIP = cg.builder.saveIP();
+    const auto ft = cg.getFT(cg.voidTy(), {cg.ptrTy()});
+    func = Function::Create(ft, Function::PrivateLinkage, fc->name + "_thunk", cg.IRModule);
+    const auto entryBlock = BasicBlock::Create(cg.context, BLOCK_NAME_ENTRY);
+    entryBlock->insertInto(func);
+    cg.builder.SetInsertPoint(entryBlock);
+
+    std::vector<Value*> args;
+    for (int i = 0; i < fc->args.size(); i++) {
+        const auto v = cg.loadValueFromStruct(ctxTy, func->arg_begin(), i);
+        args.push_back(v);
+    }
+
+    const auto deferFunc = fc->func->getIRFunc(cg);
+    cg.builder.CreateCall(deferFunc, args);
+    cg.builder.CreateRetVoid();
+
+    cg.builder.restoreIP(cg.savedIP);
+    return func;
+}
+
+Value* LgsCodeGenVisitor::getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const {
+    if (fc->args.empty()) return cg.null();
+    const auto ctx = cg.builder.CreateAlloca(ctxTy);
+    for (int i = 0; i < fc->args.size(); i++) {
+        const auto v = fc->args[i]->IRValue;
+        cg.storeValueInStruct(dyn_cast<StructType>(ctxTy), ctx, i, v);
+    }
+    return ctx;
+}
+
+Type* LgsCodeGenVisitor::getThunkCtxType(const LgsFuncCall* fc) const {
+    if (fc->args.empty()) return cg.ptrTy();
+    std::vector<Value*> args;
+    std::vector<Type*> types;
+    for (const auto& arg : fc->args) {
+        types.push_back(arg->type->getIRType(cg));
+    }
+    return cg.getStructType(types, fc->name + "_thunk_type");
 }

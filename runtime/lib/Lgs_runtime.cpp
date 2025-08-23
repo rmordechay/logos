@@ -1,4 +1,15 @@
-#include "Lgs_runtime.h"
+#include "Lgs_scheduler.h"
+#include "Lgs_stack.h"
+#include <sqlite3.h>
+
+struct Lgs_runtime {
+    Lgs_Stack stack;
+    Lgs_Scheduler scheduler;
+    std::map<void*, std::map<std::string, void*>> vtable;
+    sqlite3* db;
+    void init();
+    void close();
+};
 
 static inline Lgs_runtime runtime;
 
@@ -46,14 +57,12 @@ extern "C" void* Lgs_Vtable_get(void* instancePtr, const char* name) {
     return runtime.vtable[instancePtr][name];
 }
 
-extern "C" void initDB() {
+void Lgs_runtime::init() {
+    // scheduler.run();
     sqlite3_open(":memory:", &runtime.db);
 }
 
-extern "C" void closeDB() {
+void Lgs_runtime::close() {
+    // scheduler.shutdown();
     sqlite3_close(runtime.db);
-}
-
-void Lgs_runtime::init() {
-    scheduler.run();
 }

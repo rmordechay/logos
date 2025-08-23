@@ -47,14 +47,10 @@ public:
     Function* getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
     Value* callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
     Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
-    Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy);
-    Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy);
-    Type* getThunkCtxType(const LgsFuncCall* fc);
 
     // System
     Value* callMalloc(size_t size);
     Value* callPrintf(const std::vector<Value*>& args);
-    Value* callSnprintf(const std::vector<Value*>& args);
     Value* callSleep(Value* time);
     Value* callExit(Value* exitCode);
     Value* callGetEnv(Value* name);
