@@ -42,7 +42,7 @@ std::string LgsSArray::pname() {
 }
 
 bool LgsSArray::canCastTo(LgsType* other) {
-    const auto otherArr = other->asSArray();
+    const auto otherArr = other->asIterable();
     if (!otherArr) return false;
     return baseType->canCastTo(otherArr->baseType);
 }

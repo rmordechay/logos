@@ -4,7 +4,6 @@
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "../codegen/LgsCodeGenVisitor.h"
-#include "stmts/LgsReturn.h"
 #include "types/LgsFuncType.h"
 #include "types/LgsVoid.h"
 #include <llvm/IR/DIBuilder.h>
@@ -131,10 +130,10 @@ LgsExpr* LgsFunc::clone() {
 }
 
 void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
-    const auto& [diFile, diBuilder, compileUnit] = codeGen->debugger;
+    const auto diBuilder = codeGen->diBuilder;
     const auto dbInt32 = diBuilder->createBasicType("int", 32, dwarf::DW_ATE_signed);
     const auto subroutine = diBuilder->createSubroutineType(diBuilder->getOrCreateTypeArray({dbInt32}));
-    const auto subprogram = diBuilder->createFunction(compileUnit, funcType->name, "", diFile, 1, subroutine, 1);
+    const auto subprogram = diBuilder->createFunction(codeGen->compileUnit, funcType->name, "", codeGen->diFile, 1, subroutine, 1);
     getIRFunc(*codeGen)->setSubprogram(subprogram);
     codeGen->builder.SetCurrentDebugLocation(DILocation::get(
         codeGen->context,
@@ -142,7 +141,7 @@ void LgsFunc::createDebugValue(LgsCodeGen* codeGen) {
         location.posInLine,
         subprogram,
         subprogram->getScope()
-        ));
+    ));
 }
 
 LgsFunc::~LgsFunc() {

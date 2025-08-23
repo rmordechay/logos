@@ -19,19 +19,15 @@ class LgsFuncType;
 
 using namespace llvm;
 
-struct LgsDebug {
-    DIFile* diFile = nullptr;
-    DIBuilder* diBuilder = nullptr;
-    DICompileUnit* compileUnit = nullptr;
-};
-
 class LgsCodeGen {
 public:
-    LgsDebug debugger;
     LLVMContext context;
     Module* IRModule = nullptr;
     IRBuilderBase::InsertPoint savedIP;
     IRBuilder<> builder = IRBuilder(context);
+    DIFile* diFile = nullptr;
+    DIBuilder* diBuilder = nullptr;
+    DICompileUnit* compileUnit = nullptr;
 
     void setupModule(const std::string& moduleName, const DataLayout& dataLayout, bool debugMode = false);
     Value* getIRStr(const std::string& value);

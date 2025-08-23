@@ -53,9 +53,9 @@ class LgsCodeGenVisitor {
 public:
     LgsFile& file;
     LgsStack stack;
-    LgsCodeGen& generator;
+    LgsCodeGen& cg;
 
-    explicit LgsCodeGenVisitor(LgsFile& file) : file(file), generator(file.generator) {}
+    explicit LgsCodeGenVisitor(LgsFile& file) : file(file), cg(file.generator) {}
     void generate(const LgsAppConfigs& appConfigs, const TargetMachine& targetMachine);
     void visitMainFile(LgsMainFile* mainFile);
     void visitObjFile(const LgsObjectFile* objFile);
@@ -90,7 +90,7 @@ public:
     void visitDeferStmt(const LgsDeferStmt* deferStmt);
     void visitExpr(LgsExpr* expr);
     void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
-    void visitBinaryExpr(LgsBinaryExpr* binaryExpr) const;
+    void visitBinaryExpr(LgsBinaryExpr* binExpr) const;
     void visitCast(LgsCast* lgsCast);
     void visitLambda(LgsFunc* func);
     void visitIntConst(LgsIntConst* intConst);

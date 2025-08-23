@@ -17,9 +17,9 @@ void LgsCodeGen::setupModule(const std::string& moduleName, const DataLayout& da
     IRModule->setTargetTriple(sys::getDefaultTargetTriple());
     IRModule->setDataLayout(dataLayout);
     if (debugMode) {
-        debugger.diBuilder = new DIBuilder(*IRModule);
-        debugger.diFile = debugger.diBuilder->createFile(moduleName, "");
-        debugger.compileUnit = debugger.diBuilder->createCompileUnit(dwarf::DW_LANG_lo_user, debugger.diFile, "", false, "", 0);
+        diBuilder = new DIBuilder(*IRModule);
+        diFile = diBuilder->createFile(moduleName, "");
+        compileUnit = diBuilder->createCompileUnit(dwarf::DW_LANG_lo_user, diFile, "", false, "", 0);
     }
 }
 
@@ -367,12 +367,12 @@ TargetMachine* LgsCodeGen::getTargetMachine() {
 }
 
 LgsCodeGen::~LgsCodeGen() {
-    if (!debugger.diBuilder) return;
-    debugger.diBuilder->finalize();
+    if (!diBuilder) return;
+    diBuilder->finalize();
     std::error_code EC;
     raw_fd_ostream file("logosdbg.bc", EC, sys::fs::OF_None);
     WriteBitcodeToFile(*IRModule, file);
     file.flush();
-    delete debugger.diBuilder;
-    debugger.diBuilder = nullptr;
+    delete diBuilder;
+    diBuilder = nullptr;
 }

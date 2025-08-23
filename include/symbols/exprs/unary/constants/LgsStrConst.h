@@ -21,5 +21,6 @@ public:
     Value* eqIR(LgsCodeGen& codeGen, LgsExpr* other) override;
     Value* addIR(LgsCodeGen& codeGen, LgsExpr* other) override;
     LgsExpr* clone() override;
+    LgsExpr* castTo(LgsType* toType) override;
     ~LgsStrConst() override;
 };
