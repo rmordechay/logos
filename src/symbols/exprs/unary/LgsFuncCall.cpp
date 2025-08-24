@@ -11,7 +11,7 @@ bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
     if (funcType->params.size() != args.size()) return false;
     if (funcType->params.size() == 0 && args.size() == 0) return true;
     if (funcType->isLambda) return true;
-    for (size_t i = funcType->isStatic; i < funcType->params.size(); ++i) {
+    for (size_t i = 0; i < funcType->params.size(); ++i) {
         const auto paramType = funcType->params[i].type;
         const auto argType = args[i]->type;
         if (!paramType || !argType) return false;

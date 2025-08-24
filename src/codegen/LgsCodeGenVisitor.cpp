@@ -155,7 +155,8 @@ void LgsCodeGenVisitor::visitField(LgsField* field) const {
     }
 }
 
-void LgsCodeGenVisitor::visitParam(LgsParam* param) const {
+void LgsCodeGenVisitor::visitParam(LgsParam* param) {
+    visitExpr(param->expr);
     if (!param->isVariadic) return;
     if (param->vaList) {
         param->IRValue = param->vaList;

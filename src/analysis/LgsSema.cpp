@@ -619,6 +619,9 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
             visitFieldSelection(var, parentExpr->type);
         } else if (const auto methodCall = childExpr->asFuncCall()) {
             visitMethodCall(methodCall, parentExpr->type);
+            if (!methodCall->func->funcType->isStatic) {
+                methodCall->args.insert(methodCall->args.begin(), parentExpr);
+            }
         }
         if (!childExpr->type || childExpr->type->isUnknown()) return;
     }
@@ -642,7 +645,7 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
 }
 
 void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
-    for (int i = 1; i < methodCall->args.size(); ++i) {
+    for (int i = 0; i < methodCall->args.size(); ++i) {
         const auto arg = methodCall->args[i];
         visitExpr(arg);
     }

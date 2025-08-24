@@ -9,7 +9,7 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isPublic = ops & PUBLIC;
     isInternal = ops & INTERNAL;
     isVirtual = ops & VIRTUAL;
-    isStatic = ops & STATIC;
+    if (ops & STATIC && isMethod) isStatic = true;
     isVariadic = ops & VARIADIC;
     hasDefaults = ops & HAS_DEFAULTS;
     isOptional = ops & OPTIONAL;
@@ -18,7 +18,7 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
 
 Type* LgsFuncType::getIRType(LgsCodeGen& codeGen) {
     std::vector<Type*> IRParamsTypes;
-    for (int i = isStatic; i < params.size(); ++i) {
+    for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
         const auto paramType = param.type;
         if (param.isSelf || !paramType->isPrimitive) {
@@ -146,9 +146,8 @@ LgsType* LgsFuncType::clone() {
 
 LgsFuncType::~LgsFuncType() {
     freeType(rt);
-    for (int i = isMethod && !isStatic; i < params.size(); ++i) {
+    for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];
-        if (param.isSelf) continue;
         if (param.expr) {
             if (param.type && param.expr->type != param.type) {
                 freeType(param.type);

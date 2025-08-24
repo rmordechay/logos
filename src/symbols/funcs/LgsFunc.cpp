@@ -10,30 +10,18 @@
 
 Value* LgsFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
     if (fn) return fn(codeGen, args);
-    if (funcType->hasDefaults) {
-        callWithDefaults(codeGen, args);
-    }
     std::vector<Value*> IRArgs;
-    for (int i = funcType->isStatic; i < funcType->params.size(); ++i) {
-        auto arg = args[i];
-        const auto& param = funcType->params[i];
-        if (!param.isSelf) {
-            arg = arg->castTo(param.type);
+    if (funcType->hasDefaults) {
+        const auto diff = funcType->params.size() - args.size();
+        setIRArgs(codeGen, args, IRArgs);
+        for (int i = diff - 1; i < funcType->params.size(); ++i) {
+            const auto& param = funcType->params[i];
+            IRArgs.emplace_back(param.expr->IRValue);
         }
-        auto v = arg->IRValue;
-        v = loadIRArg(&codeGen, v, arg->type);
-        IRArgs.push_back(v);
-        if (!param.isSelf && args[i] != arg) {
-            freeExpr(arg);
-        }
+    } else {
+        setIRArgs(codeGen, args, IRArgs);
     }
     return callIR(codeGen, IRArgs);
-}
-
-void LgsFunc::callWithDefaults(const LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
-    const auto diff = funcType->params.size() - args.size();
-    for (int i = 0; i < diff; ++i) {
-    }
 }
 
 Value* LgsFunc::callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args) {
@@ -47,6 +35,22 @@ Value* LgsFunc::callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args) {
         rv = codeGen.builder.CreateCall(IRFunc, args);
     }
     return rv;
+}
+
+void LgsFunc::setIRArgs(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args, std::vector<Value*> IRArgs) const {
+    for (int i = 0; i < args.size(); ++i) {
+        auto arg = args[i];
+        const auto& param = funcType->params[i];
+        if (!param.isSelf) {
+            arg = arg->castTo(param.type);
+        }
+        auto v = arg->IRValue;
+        v = loadIRArg(&codeGen, v, arg->type);
+        if (!param.isSelf && args[i] != arg) {
+            freeExpr(arg);
+        }
+        IRArgs.emplace_back(v);
+    }
 }
 
 Value* LgsFunc::loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type) {
@@ -71,7 +75,7 @@ Function* LgsFunc::getIRFunc(LgsCodeGen& codeGen) {
     IRFunc = codeGen.getFunc(funcName, funcTy);
     if (funcType->params.empty()) return IRFunc;
     auto args = IRFunc->arg_begin();
-    for (int i = funcType->isStatic; i < funcType->params.size(); ++i) {
+    for (int i = 0; i < funcType->params.size(); ++i) {
         auto& param = funcType->params[i];
         param.setIRValue(args);
         args->setName(param.name);

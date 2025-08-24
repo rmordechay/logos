@@ -241,6 +241,9 @@ LgsFunc* LgsParserAdapter::getFunc(LogosParser::FuncContext* ctx) {
     setLocation(func->location, tokenName->getSymbol());
     setParams(func->funcType, funcSignature->funcSignatureHeader()->param());
     func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
+    if (func->funcType->isMethod && func->funcType->isStatic) {
+        func->funcType->params.erase(func->funcType->params.begin());
+    }
     currentFunc = nullptr;
     return func;
 }
@@ -280,6 +283,9 @@ LgsFunc* LgsParserAdapter::getMethod(LogosParser::MethodContext* ctx, LgsType* o
     method->funcType->params.push_back(self);
     setParams(method->funcType, funcSignature->funcSignatureHeader()->param());
     method->stmtsBlock = getStmtBlock(ctx->statementsBlock());
+    if (method->funcType->isStatic) {
+        method->funcType->params.erase(method->funcType->params.begin());
+    }
     if (ctx->VISIBILITY()) {
         method->funcType->isPublic = true;
     }
@@ -925,7 +931,7 @@ LgsUnaryExpr* LgsParserAdapter::getFirstSelection(LogosParser::SelectionContext*
     if (const auto variable = firstExpr->IDENTIFIER()) {
         const auto var = getVariable(variable);
         if (var->name == LGS_SELF) {
-            currentFunc->funcType->isStatic = false;
+            currentFunc->funcType->isStatic = true;
         }
         return var;
     }
@@ -958,8 +964,6 @@ std::vector<LgsUnaryExpr*> LgsParserAdapter::getSelectionExprs(LogosParser::Sele
         } else if (const auto funcCall = currentExpr->funcCall()) {
             const auto logosMethodCall = getFuncCall(funcCall);
             logosMethodCall->isMethodCall = true;
-            const auto prevExpr = exprs[i];
-            logosMethodCall->args.insert(logosMethodCall->args.begin(), prevExpr);
             exprs.push_back(logosMethodCall);
         } else if (const auto iterIndex = currentExpr->iterIndex()) {
             const auto logosIterIndex = getIterIndex(iterIndex);
