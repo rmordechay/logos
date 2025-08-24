@@ -25,7 +25,7 @@ interfaceFile:
     ;
 
 testFile:
-        'test' IDENTIFIER func* EOF
+        'test' IDENTIFIER func*
     ;
 
 interface:

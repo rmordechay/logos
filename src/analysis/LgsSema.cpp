@@ -19,6 +19,7 @@
 #include "exprs/unary/LgsPrefixExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
 #include "files/LgsMainFile.h"
+#include "files/LgsTestFile.h"
 #include "funcs/LgsMainFunc.h"
 #include "utils/LgsErrHandler.h"
 #include "loops/LgsInfiniteLoop.h"
@@ -45,6 +46,8 @@ void LgsSema::analyse() {
         visitObject(objFile->obj);
     } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
         visitInterface(interfaceFile->interface);
+    } else if (const auto testFile = dynamic_cast<LgsTestFile*>(file)) {
+        visitTestFile(testFile);
     } else {
         assert(0);
     }
@@ -86,6 +89,15 @@ void LgsSema::visitInterface(LgsInterface* interface) {
     }
     if (allMethodsImplemented) {
         errHandler.addError(E10062, &interface->location, {interface->name});
+    }
+}
+
+void LgsSema::visitTestFile(const LgsTestFile* testFile) {
+    for (const auto& func : testFile->funcs) {
+        visitFunc(func);
+    }
+    for (const auto& test : testFile->tests) {
+        visitFunc(test);
     }
 }
 
@@ -584,6 +596,7 @@ void LgsSema::visitSelection(LgsSelection* selection) {
     visitInnerSelections(selection);
     selection->setType(selection->lastExpr()->type);
     selection->isMutable = selection->lastExpr()->isMutable;
+    checkMock(selection);
 }
 
 void LgsSema::visitFirstSelection(LgsExpr* firstExpr) {
@@ -1106,6 +1119,20 @@ void LgsSema::resolveScalars(const LgsVariable* fieldVar, LgsVec* vec) {
             return errHandler.addError(E10070, &fieldVar->location, {fieldName, vec->pname()});
         }
         indices.push_back(componentIndex);
+    }
+}
+
+void LgsSema::checkMock(const LgsSelection* selection) {
+    const auto currentFunc = stack.currentFunc();
+    if (!currentFunc->funcType->isTest) return;
+    if (selection->exprs.size() != 2) {
+        return;
+    }
+    const auto funcCall1 = selection->exprs[0]->asFuncCall();
+    const auto funcCall2 = selection->exprs[1]->asFuncCall();
+    if (funcCall1 && funcCall2 && funcCall1->name == "when" && funcCall2->name == "ret") {
+        auto mock = LgsMock(funcCall1->args.front(), funcCall2->args.front());
+        assert(0);
     }
 }
 

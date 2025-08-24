@@ -1,4 +1,5 @@
 #pragma once
+#include "LgsMock.h"
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "types/LgsFuncType.h"
 
@@ -17,6 +18,7 @@ public:
     LgsStmtsBlock* stmtsBlock = nullptr;
     std::vector<LgsExpr*> heapAllocExprs;
     BasicBlock* cleanupBlock = nullptr;
+    std::vector<LgsMock> mocks;
     bool hasDefers = false;
     CallFn fn;
 

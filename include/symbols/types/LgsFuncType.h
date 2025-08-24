@@ -33,6 +33,7 @@ public:
     bool isOptional = false;
     bool isTerminator = false;
     bool isMethod = false;
+    bool isTest = false;
     bool hasDefaults = false;
     llvm::FunctionType* IRType = nullptr;
 

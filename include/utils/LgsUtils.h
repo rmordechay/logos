@@ -21,3 +21,4 @@ std::string removeUnderscores(const std::string& input);
 void freeType(LgsType* type);
 void freeExpr(const LgsExpr* expr);
 size_t hashStr(const char* key);
+bool startsWith(const std::string& str, const std::string& prefix);

@@ -32,7 +32,7 @@ public:
     std::vector<LgsFile*> ast;
     std::vector<LgsTestFile*> tests;
     std::vector<LgsEnvFile*> envFiles;
-    std::atomic<size_t> nextFileID = 0;
+    std::atomic<size_t> nextFileID = 1;
     std::vector<char*> appArgs;
     ThreadPool threadPool;
     bool isFileMode = false;

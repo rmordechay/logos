@@ -94,7 +94,6 @@ LgsFile* LgsParserAdapter::getLogosFile(LogosParser::LogosFileContext* ctx, cons
 LgsMainFile* LgsParserAdapter::getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath) {
     const auto funcs = ctx->func();
     const auto file = new LgsMainFile(fileID, filePath);
-    currentFile = file;
     setLocation(file->location, ctx->start);
 
     for (const auto enumDeclaration : ctx->enumDeclaration()) {
@@ -138,7 +137,6 @@ LgsMainFile* LgsParserAdapter::getMainFile(LogosParser::MainFileContext* ctx, co
 LgsObjectFile* LgsParserAdapter::getObjectFile(LogosParser::ObjectFileContext* ctx, const fs::path& filePath) {
     const auto objName = ctx->IDENTIFIER();
     const auto file = new LgsObjectFile(fileID, objName->getText(), filePath);
-    currentFile = file;
     setLocation(file->location, ctx->start);
     file->obj = getObject(ctx->objectBody(), objName, !!ctx->SINGLETON());
     globals.addSymbol(LgsSymbol(file->obj), &errHandler);
@@ -148,7 +146,6 @@ LgsObjectFile* LgsParserAdapter::getObjectFile(LogosParser::ObjectFileContext* c
 LgsFile* LgsParserAdapter::getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const fs::path& filePath) {
     const auto interfaceNameToken = ctx->IDENTIFIER();
     const auto file = new LgsInterfaceFile(fileID, interfaceNameToken->getText(), filePath);
-    currentFile = file;
     setLocation(file->location, ctx->start);
     file->interface = getInterface(ctx->interfaceBody(), interfaceNameToken);
     globals.addSymbol(LgsSymbol(file->interface), &errHandler);
@@ -157,8 +154,16 @@ LgsFile* LgsParserAdapter::getInterfaceFile(LogosParser::InterfaceFileContext* c
 
 LgsFile* LgsParserAdapter::getTestFile(LogosParser::TestFileContext* ctx, const fs::path& filePath) {
     const auto file = new LgsTestFile(fileID, ctx->IDENTIFIER()->getText(), filePath);
-    currentFile = file;
     setLocation(file->location, ctx->start);
+    for (const auto& func : ctx->func()) {
+        const auto lgsFunc = getFunc(func);
+        if (startsWith(lgsFunc->funcType->name, "test")) {
+            lgsFunc->funcType->isTest = true;
+            file->tests.push_back(lgsFunc);
+        } else {
+            file->funcs.push_back(lgsFunc);
+        }
+    }
     return file;
 }
 
@@ -238,10 +243,11 @@ LgsEnvFile* LgsParserAdapter::getEnvFile(const fs::path& filePath) {
 LgsFunc* LgsParserAdapter::getFunc(LogosParser::FuncContext* ctx) {
     const auto rt = getFuncReturnType(ctx->funcSignature()->type());
     const auto funcSignature = ctx->funcSignature();
-    const auto tokenName = funcSignature->funcSignatureHeader()->IDENTIFIER();
-    const auto func = new LgsFunc(tokenName->getText(), rt);
+    const auto funcNameToken = funcSignature->funcSignatureHeader()->IDENTIFIER();
+    const auto funcName = funcNameToken->getText();
+    const auto func = new LgsFunc(funcName, rt);
     currentFunc = func;
-    setLocation(func->location, tokenName->getSymbol());
+    setLocation(func->location, funcNameToken->getSymbol());
     setParams(func->funcType, funcSignature->funcSignatureHeader()->param());
     func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
     currentFunc = nullptr;

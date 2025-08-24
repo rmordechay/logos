@@ -46,6 +46,7 @@ bool LgsApp::setup() {
 bool LgsApp::parse() {
     loadBuiltins();
     if (!parseAppFile()) return false;
+    threadPool.start();
     for (const auto& entry : fs::recursive_directory_iterator(paths.srcDir)) {
         if (!isLogosFile(entry)) continue;
         threadPool.runTask([entry, this] {
@@ -99,7 +100,7 @@ void LgsApp::execute() {
     if (appArgs.empty() || appArgs.back() != nullptr) {
         appArgs.push_back(nullptr);
     }
-    // freeApp();
+    freeApp();
     execv(paths.execFilePath.c_str(), appArgs.data());
     perror("Logos execution failed.");
     exit(EXIT_FAILURE);
@@ -144,7 +145,7 @@ void LgsApp::parseSrcFile(const fs::path& filePath) {
     const auto lgsFile = antlrConverter.parseFile(filePath);
     {
         std::lock_guard lock(mtx);
-        lgsFile->id = ast.size();
+        lgsFile->id = fileID;
         ast.push_back(lgsFile);
         if (antlrConverter.errHandler.successful) return;
         errHandler.mergeErrors(antlrConverter.errHandler);
@@ -185,8 +186,14 @@ void LgsApp::exitWithErrors() const {
         const auto err = errHandler.errors[i];
         const auto posInLine = std::to_string(err.location.posInLine);
         const auto lineNumber = std::to_string(err.location.lineStart);
-        const auto file = ast[err.location.fileID];
-        const auto filePath = file->path.string();
+        const LgsFile* errFile = nullptr;
+        for (const auto& file : ast) {
+            if (file->id != err.location.fileID) continue;
+            errFile = file;
+            break;
+        }
+        assert(errFile);
+        const auto filePath = errFile->path.string();
         const auto fullPath = filePath + ":" + lineNumber + ":" + posInLine;
         const auto path = "\n   at: " + fullPath;
         logError(err.msg, path);
@@ -197,6 +204,7 @@ void LgsApp::exitWithErrors() const {
 }
 
 void LgsApp::freeApp() {
+    threadPool.shutdown();
     for (const auto file : ast) {
         delete file;
     }

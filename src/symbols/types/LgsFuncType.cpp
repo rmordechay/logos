@@ -91,10 +91,11 @@ json::value LgsFuncType::asJSON() {
     jsonObj["isInternal"] = isInternal;
     jsonObj["isVirtual"] = isVirtual;
     jsonObj["isVariadic"] = isVariadic;
+    jsonObj["isLambda"] = isLambda;
     jsonObj["isOptional"] = isOptional;
     jsonObj["isTerminator"] = isTerminator;
-    jsonObj["isAnonymous"] = isLambda;
     jsonObj["isMethod"] = isMethod;
+    jsonObj["isTest"] = isTest;
     jsonObj["hasDefaults"] = hasDefaults;
     return jsonObj;
 }
@@ -136,6 +137,7 @@ LgsType* LgsFuncType::clone() {
     copy->isOptional = isOptional;
     copy->isTerminator = isTerminator;
     copy->isLambda = isLambda;
+    copy->isTest = isTest;
     copy->hasDefaults = hasDefaults;
     return copy;
 }

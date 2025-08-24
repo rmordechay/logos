@@ -1,8 +1,5 @@
 #pragma once
-#include "types/LgsAny.h"
 #include "exprs/unary/LgsUnaryExpr.h"
-#include "types/primitives/LgsBool.h"
-#include "types/LgsVoid.h"
 #include "funcs/LgsFunc.h"
 
 class LgsIterator final : public LgsUnaryExpr {

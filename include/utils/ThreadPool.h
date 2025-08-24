@@ -6,10 +6,10 @@ public:
     std::vector<std::thread> workers;
     std::queue<std::function<void()>> tasks;
     std::condition_variable cvTask, cvIdle;
-    std::atomic<size_t> active;
-    bool stop;
+    std::atomic<size_t> active = 0;
+    bool stop = false;
 
-    explicit ThreadPool(size_t n = std::thread::hardware_concurrency()) : active(0), stop(false) {
+    void start(size_t n = std::thread::hardware_concurrency()) {
         n = std::max<size_t>(1, n);
         workers.reserve(n);
         for (size_t i = 0; i < n; ++i) {
@@ -59,12 +59,14 @@ public:
         }
     }
 
-    ~ThreadPool() {
+    void shutdown() {
         {
             std::lock_guard lock(mtx);
             stop = true;
         }
         cvTask.notify_all();
-        for (auto& w : workers) w.join();
+        for (auto& w : workers) {
+            w.join();
+        }
     }
 };

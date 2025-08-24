@@ -61,6 +61,7 @@ public:
     void visitMainFile(LgsMainFile* mainFile);
     void visitObject(LgsObject* obj);
     void visitInterface(LgsInterface* interface);
+    void visitTestFile(const LgsTestFile* testFile);
     void visitField(LgsField* field);
     void visitFunc(LgsFunc* func);
     void visitParam(LgsParam* param);
@@ -115,13 +116,13 @@ public:
     bool validateFieldVisibility(LgsField* field, const LgsObject* parent);
     bool validateMethodVisibility(const LgsFuncCall* methodCall, const LgsObject* parent);
     static bool validateBlockControlFlow(const LgsStmtsBlock* stmtBlock, const LgsFunc* func);
-
     void matchExprToType(const LgsExpr* expr, LgsType* type);
 
     void resolveFuncCall(LgsFuncCall* funcCall);
     bool resolveMethodCall(LgsFuncCall* methodCall, LgsType* parentType);
     bool resolveLoopVars(LgsForeachLoop* foreachLoop, LgsUnaryExpr* iterExpr, const LgsIterable* iterable);
     void resolveScalars(const LgsVariable* fieldVar, LgsVec* vec);
+    void checkMock(const LgsSelection* selection);
     LgsSymbol* getSymbol(const std::string& name, const LgsLocation* location);
     void addLocalSymbol(const LgsSymbol& newSymbol);
 };
