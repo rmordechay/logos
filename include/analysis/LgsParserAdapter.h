@@ -48,6 +48,7 @@ public:
     LgsMainFile* getMainFile(LogosParser::MainFileContext* ctx, const fs::path& filePath);
     LgsObjectFile* getObjectFile(LogosParser::ObjectFileContext* ctx, const fs::path& filePath);
     LgsFile* getInterfaceFile(LogosParser::InterfaceFileContext* ctx, const fs::path& filePath);
+    LgsFile* getTestFile(LogosParser::TestFileContext* ctx, const fs::path& filePath) const;
     void setAppConfigs(LgsAppConfigs& appConfigs);
     LgsEnvFile* getEnvFile(const fs::path& filePath);
     LgsFunc* getFunc(LogosParser::FuncContext* ctx);

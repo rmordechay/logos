@@ -12,47 +12,47 @@
 class  LogosParser : public antlr4::Parser {
 public:
   enum {
-    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, DOUBLE_EQUAL = 6, 
-    NOT_EQUAL = 7, GE = 8, LE = 9, LPAREN = 10, RPAREN = 11, LBRACE = 12, 
-    RBRACE = 13, LBRACK = 14, RBRACK = 15, LANGLE = 16, RANGLE = 17, COMMA = 18, 
-    ARROW = 19, TRIPLE_DOT = 20, DOUBLE_DOT = 21, WALRUS = 22, EQUAL_PLUS = 23, 
-    EQUAL_MINUS = 24, EQUAL_STAR = 25, EQUAL_SLASH = 26, EQUAL_PERCENT = 27, 
-    EQUAL_AMPERSAND = 28, EQUAL_PIPE = 29, EQUAL_CARET = 30, EQUAL_DOUBLE_RANGLE = 31, 
-    EQUAL_DOUBLE_LANGLE = 32, INC = 33, DEC = 34, DOT = 35, COLON = 36, 
-    EQUAL = 37, PLUS = 38, MINUS = 39, STAR = 40, SLASH = 41, HASH = 42, 
-    QUEST_MARK = 43, EXCLA_MARK = 44, PERCENT = 45, DOLLAR = 46, AMPERSAND = 47, 
-    PIPE = 48, CARET = 49, DOUBLE_RANGLE = 50, DOUBLE_LANGLE = 51, SLIDER = 52, 
-    OBJECT = 53, SINGLETON = 54, SELF_INSTANCE = 55, SELF_CLASS = 56, INTERFACE = 57, 
-    EXTERN = 58, VISIBILITY = 59, IMPLEMENTS = 60, CONST = 61, ENUM = 62, 
-    GO = 63, DEFER = 64, FOR_IS_FIRST = 65, FOR_IS_LAST = 66, VEC2 = 67, 
-    VEC3 = 68, VEC4 = 69, IF = 70, ELSE = 71, FOR = 72, BREAK = 73, CONTINUE = 74, 
-    RETURN = 75, AND = 76, OR = 77, NOT = 78, IN = 79, LONG = 80, INTEGER = 81, 
-    FLOAT = 82, BOOL = 83, NULL_ = 84, IDENTIFIER = 85, STRING = 86, TAG = 87, 
-    LINE_COMMENT = 88, BLOCK_COMMENT = 89, WS = 90
+    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, DOUBLE_EQUAL = 7, 
+    NOT_EQUAL = 8, GE = 9, LE = 10, LPAREN = 11, RPAREN = 12, LBRACE = 13, 
+    RBRACE = 14, LBRACK = 15, RBRACK = 16, LANGLE = 17, RANGLE = 18, COMMA = 19, 
+    ARROW = 20, TRIPLE_DOT = 21, DOUBLE_DOT = 22, WALRUS = 23, EQUAL_PLUS = 24, 
+    EQUAL_MINUS = 25, EQUAL_STAR = 26, EQUAL_SLASH = 27, EQUAL_PERCENT = 28, 
+    EQUAL_AMPERSAND = 29, EQUAL_PIPE = 30, EQUAL_CARET = 31, EQUAL_DOUBLE_RANGLE = 32, 
+    EQUAL_DOUBLE_LANGLE = 33, INC = 34, DEC = 35, DOT = 36, COLON = 37, 
+    EQUAL = 38, PLUS = 39, MINUS = 40, STAR = 41, SLASH = 42, HASH = 43, 
+    QUEST_MARK = 44, EXCLA_MARK = 45, PERCENT = 46, DOLLAR = 47, AMPERSAND = 48, 
+    PIPE = 49, CARET = 50, DOUBLE_RANGLE = 51, DOUBLE_LANGLE = 52, SLIDER = 53, 
+    OBJECT = 54, SINGLETON = 55, SELF_INSTANCE = 56, SELF_CLASS = 57, INTERFACE = 58, 
+    EXTERN = 59, VISIBILITY = 60, IMPLEMENTS = 61, CONST = 62, ENUM = 63, 
+    GO = 64, DEFER = 65, FOR_IS_FIRST = 66, FOR_IS_LAST = 67, VEC2 = 68, 
+    VEC3 = 69, VEC4 = 70, IF = 71, ELSE = 72, FOR = 73, BREAK = 74, CONTINUE = 75, 
+    RETURN = 76, AND = 77, OR = 78, NOT = 79, IN = 80, LONG = 81, INTEGER = 82, 
+    FLOAT = 83, BOOL = 84, NULL_ = 85, IDENTIFIER = 86, STRING = 87, TAG = 88, 
+    LINE_COMMENT = 89, BLOCK_COMMENT = 90, WS = 91
   };
 
   enum {
     RuleLogosFile = 0, RuleLogosEnvFile = 1, RuleLogosAppFile = 2, RuleMainFile = 3, 
-    RuleObjectFile = 4, RuleInterfaceFile = 5, RuleInterface = 6, RuleGroup = 7, 
-    RuleGroupTypesList = 8, RuleGroupTargetList = 9, RuleInterfaceBody = 10, 
-    RuleObject = 11, RuleObjectBody = 12, RuleField = 13, RuleInterfaceField = 14, 
-    RuleImplements = 15, RuleFuncSignatureHeader = 16, RuleFuncSignature = 17, 
-    RuleInterfaceFunc = 18, RuleFunc = 19, RuleLambda = 20, RuleLambdaParams = 21, 
-    RuleLambdaParam = 22, RuleMethod = 23, RuleParam = 24, RuleStatement = 25, 
-    RuleStatementsBlock = 26, RuleAssignment = 27, RuleExplicitVarDec = 28, 
-    RuleImplicitVarDec = 29, RuleIfStatement = 30, RuleElseIfStatement = 31, 
-    RuleElseStatement = 32, RulePatternMatching = 33, RulePattern = 34, 
-    RuleLoopStatement = 35, RuleBreakStmt = 36, RuleReturnStatement = 37, 
-    RuleEnumDeclaration = 38, RuleEnumField = 39, RuleCoroutine = 40, RuleDeferStmt = 41, 
-    RuleExpr = 42, RuleUnaryExpr = 43, RulePrefixExpr = 44, RulePostfixExpr = 45, 
-    RuleArrayExpr = 46, RuleHashMap = 47, RuleKeyValue = 48, RuleFuncCall = 49, 
-    RuleFuncArgList = 50, RuleFuncArg = 51, RuleInstance = 52, RuleInstanceArgList = 53, 
-    RuleInstanceArg = 54, RuleConstant = 55, RuleIterIndex = 56, RuleIndex = 57, 
-    RuleIsFirst = 58, RuleIsLast = 59, RuleSelection = 60, RuleFirstSelectionElement = 61, 
-    RuleInnerSelectionElement = 62, RuleRange = 63, RuleType = 64, RuleMapType = 65, 
-    RuleArraySize = 66, RuleFuncType = 67, RuleVector = 68, RuleExtern = 69, 
-    RuleRequireEnvVars = 70, RuleRequirePackages = 71, RuleAssignemntOp = 72, 
-    RuleJson = 73, RuleJsonObj = 74, RuleJsonPair = 75, RuleJsonArray = 76
+    RuleObjectFile = 4, RuleInterfaceFile = 5, RuleTestFile = 6, RuleInterface = 7, 
+    RuleGroup = 8, RuleGroupTypesList = 9, RuleGroupTargetList = 10, RuleInterfaceBody = 11, 
+    RuleObject = 12, RuleObjectBody = 13, RuleField = 14, RuleInterfaceField = 15, 
+    RuleImplements = 16, RuleFuncSignatureHeader = 17, RuleFuncSignature = 18, 
+    RuleInterfaceFunc = 19, RuleFunc = 20, RuleLambda = 21, RuleLambdaParams = 22, 
+    RuleLambdaParam = 23, RuleMethod = 24, RuleParam = 25, RuleStatement = 26, 
+    RuleStatementsBlock = 27, RuleAssignment = 28, RuleExplicitVarDec = 29, 
+    RuleImplicitVarDec = 30, RuleIfStatement = 31, RuleElseIfStatement = 32, 
+    RuleElseStatement = 33, RulePatternMatching = 34, RulePattern = 35, 
+    RuleLoopStatement = 36, RuleBreakStmt = 37, RuleReturnStatement = 38, 
+    RuleEnumDeclaration = 39, RuleEnumField = 40, RuleCoroutine = 41, RuleDeferStmt = 42, 
+    RuleExpr = 43, RuleUnaryExpr = 44, RulePrefixExpr = 45, RulePostfixExpr = 46, 
+    RuleArrayExpr = 47, RuleHashMap = 48, RuleKeyValue = 49, RuleFuncCall = 50, 
+    RuleFuncArgList = 51, RuleFuncArg = 52, RuleInstance = 53, RuleInstanceArgList = 54, 
+    RuleInstanceArg = 55, RuleConstant = 56, RuleIterIndex = 57, RuleIndex = 58, 
+    RuleIsFirst = 59, RuleIsLast = 60, RuleSelection = 61, RuleFirstSelectionElement = 62, 
+    RuleInnerSelectionElement = 63, RuleRange = 64, RuleType = 65, RuleMapType = 66, 
+    RuleArraySize = 67, RuleFuncType = 68, RuleVector = 69, RuleExtern = 70, 
+    RuleRequireEnvVars = 71, RuleRequirePackages = 72, RuleAssignemntOp = 73, 
+    RuleJson = 74, RuleJsonObj = 75, RuleJsonPair = 76, RuleJsonArray = 77
   };
 
   explicit LogosParser(antlr4::TokenStream *input);
@@ -78,6 +78,7 @@ public:
   class MainFileContext;
   class ObjectFileContext;
   class InterfaceFileContext;
+  class TestFileContext;
   class InterfaceContext;
   class GroupContext;
   class GroupTypesListContext;
@@ -157,6 +158,7 @@ public:
     MainFileContext *mainFile();
     ObjectFileContext *objectFile();
     InterfaceFileContext *interfaceFile();
+    TestFileContext *testFile();
     ExternContext *extern_();
 
    
@@ -247,6 +249,20 @@ public:
   };
 
   InterfaceFileContext* interfaceFile();
+
+  class  TestFileContext : public antlr4::ParserRuleContext {
+  public:
+    TestFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *IDENTIFIER();
+    antlr4::tree::TerminalNode *EOF();
+    std::vector<FuncContext *> func();
+    FuncContext* func(size_t i);
+
+   
+  };
+
+  TestFileContext* testFile();
 
   class  InterfaceContext : public antlr4::ParserRuleContext {
   public:

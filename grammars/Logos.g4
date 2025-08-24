@@ -1,7 +1,7 @@
 grammar Logos;
 
 logosFile:
-        extern? (mainFile | objectFile | interfaceFile)
+        extern? (mainFile | objectFile | interfaceFile | testFile)
     ;
 
 logosEnvFile:
@@ -22,6 +22,10 @@ objectFile:
 
 interfaceFile:
         INTERFACE IDENTIFIER interfaceBody EOF
+    ;
+
+testFile:
+        'test' IDENTIFIER func* EOF
     ;
 
 interface:

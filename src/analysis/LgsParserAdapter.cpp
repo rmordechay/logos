@@ -29,6 +29,7 @@
 #include "files/LgsAppFile.h"
 #include "files/LgsMainFile.h"
 #include "files/LgsObjectFile.h"
+#include "files/LgsTestFile.h"
 #include "funcs/LgsMainFunc.h"
 #include "lgsc/LgsCLang.h"
 #include "loops/LgsInfiniteLoop.h"
@@ -68,14 +69,14 @@ LgsFile* LgsParserAdapter::parseFile(const fs::path& filePath) {
 
 LgsFile* LgsParserAdapter::getLogosFile(LogosParser::LogosFileContext* ctx, const fs::path& filePath) {
     LgsFile* file = nullptr;
-    if (const auto mainFileCtx = ctx->mainFile()) {
-        file = getMainFile(mainFileCtx, filePath);
-    }
-    if (const auto objFileCtx = ctx->objectFile()) {
-        file = getObjectFile(objFileCtx, filePath);
-    }
-    if (const auto interfaceFileCtx = ctx->interfaceFile()) {
-        file = getInterfaceFile(interfaceFileCtx, filePath);
+    if (const auto mainFile = ctx->mainFile()) {
+        file = getMainFile(mainFile, filePath);
+    } else if (const auto objFile = ctx->objectFile()) {
+        file = getObjectFile(objFile, filePath);
+    } else if (const auto interfaceFile = ctx->interfaceFile()) {
+        file = getInterfaceFile(interfaceFile, filePath);
+    } else if (const auto testFile = ctx->testFile()) {
+        file = getTestFile(testFile, filePath);
     }
     assert(file);
     if (ctx->extern_()) {
@@ -150,6 +151,12 @@ LgsFile* LgsParserAdapter::getInterfaceFile(LogosParser::InterfaceFileContext* c
     file->interface = getInterface(ctx->interfaceBody(), interfaceNameToken);
     globals.addSymbol(LgsSymbol(file->interface), &errHandler);
     return file;
+}
+
+LgsFile* LgsParserAdapter::getTestFile(LogosParser::TestFileContext* ctx, const fs::path& filePath) const {
+    const auto testFile = new LgsTestFile(fileID, ctx->IDENTIFIER()->getText(), filePath);
+    setLocation(testFile->location, ctx->start);
+    return testFile;
 }
 
 void LgsParserAdapter::setAppConfigs(LgsAppConfigs& appConfigs) {

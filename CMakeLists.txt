@@ -126,6 +126,8 @@ set(CORE_SOURCES
     src/symbols/types/primitives/LgsUInt.cpp
     src/codegen/LgsCodeGen.cpp
     include/codegen/LgsCodeGen.h
+    src/files/LgsTestFile.cpp
+    include/files/LgsTestFile.h
 )
 
 set(RUNTIME_SOURCES
@@ -137,6 +139,7 @@ set(RUNTIME_SOURCES
     runtime/lib/Lgs_scheduler.cpp
     runtime/lib/Lgs_stack.cpp
     runtime/lib/Lgs_print.cpp
+    include/logos/LgsAppConfigs.h
 )
 
 add_library(lgs_core SHARED ${CORE_SOURCES} ${RUNTIME_SOURCES})
