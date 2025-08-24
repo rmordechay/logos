@@ -14,8 +14,8 @@ public:
 inline LgsCliCmdHelp astCmdHelp{
     .name = "ast",
     .usage = "lgs ast <file>",
-    .summary = "Generates an AST from the source file.",
-    .desc = "The ast command generates an AST from the source file.",
+    .summary = "Generates an AST from a source file.",
+    .desc = "The ast command generates an AST from a source file.",
     .requiredArgs = {
         {
             .name = "<file>",

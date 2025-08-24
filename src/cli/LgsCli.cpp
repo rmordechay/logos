@@ -25,7 +25,7 @@ void LgsCli::execute() const {
     } else if (firstCmdStr == "version" || firstCmdStr == "-v" || firstCmdStr == "--version") {
         logInfo(std::string(LOGOS_VERSION));
     } else {
-        logError("Unknown command '" + cmdStr + "'\n\n");
+        logError("Unknown command.\n" + cmdStr + "\n\n");
         printLgsHelp();
     }
 }
