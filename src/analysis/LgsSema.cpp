@@ -567,9 +567,6 @@ void LgsSema::visitVariable(LgsVariable* variable) {
     case PARAM: {
         variable->ref.param = symbol->param;
         variable->setType(symbol->param->type);
-        if (variable->ref.param->isSelf) {
-            stack.currentFunc()->funcType->isStatic = false;
-        }
         break;
     }
     case ENUM: {

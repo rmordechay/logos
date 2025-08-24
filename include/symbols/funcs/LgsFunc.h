@@ -25,6 +25,7 @@ public:
     }
     explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {}
     virtual Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args);
+    void callWithDefaults(const LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args);
     Value* callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args = {});
     virtual Function* getIRFunc(LgsCodeGen& codeGen);
     static Value* loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type);

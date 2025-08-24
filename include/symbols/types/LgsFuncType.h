@@ -31,7 +31,7 @@ public:
     bool isInternal = false;
     bool isVirtual = false;
     bool isVariadic = false;
-    bool isStatic = false;
+    bool isStatic = true;
     bool isOptional = false;
     bool isTerminator = false;
     bool isLambda = false;

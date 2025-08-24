@@ -3,7 +3,6 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "exprs/LgsExpr.h"
 #include "exprs/unary/constants/LgsStrConst.h"
-#include "../codegen/LgsCodeGenVisitor.h"
 #include "types/LgsFuncType.h"
 #include "types/LgsVoid.h"
 #include <llvm/IR/DIBuilder.h>
@@ -11,7 +10,9 @@
 
 Value* LgsFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
     if (fn) return fn(codeGen, args);
-    if (funcType->hasDefaults) assert(0);
+    if (funcType->hasDefaults) {
+        callWithDefaults(codeGen, args);
+    }
     std::vector<Value*> IRArgs;
     for (int i = funcType->isStatic; i < funcType->params.size(); ++i) {
         auto arg = args[i];
@@ -27,6 +28,12 @@ Value* LgsFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
         }
     }
     return callIR(codeGen, IRArgs);
+}
+
+void LgsFunc::callWithDefaults(const LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
+    const auto diff = funcType->params.size() - args.size();
+    for (int i = 0; i < diff; ++i) {
+    }
 }
 
 Value* LgsFunc::callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args) {

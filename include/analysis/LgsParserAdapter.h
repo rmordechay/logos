@@ -40,6 +40,7 @@ public:
     LgsPaths& paths;
     LgsSymbolTable& globals;
     LgsErrHandler errHandler;
+    LgsFunc* currentFunc = nullptr;
 
     explicit LgsParserAdapter(const int fileID, LgsPaths& paths, LgsSymbolTable& globals) : fileID(fileID), paths(paths), globals(globals) {}
     LgsFile* parseFile(const fs::path& filePath);
