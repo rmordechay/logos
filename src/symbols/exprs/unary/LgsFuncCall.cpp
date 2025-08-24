@@ -8,14 +8,15 @@
 bool LgsFuncCall::equals(const LgsFuncType* funcType) const {
     if (funcType->hasDefaults) return equalsDefaultParams(funcType);
     if (funcType->isVariadic) return equalsVariadic(funcType);
-    if (funcType->params.size() != args.size()) return false;
+    if (funcType->params.size() - funcType->isMethod != args.size()) return false;
     if (funcType->params.size() == 0 && args.size() == 0) return true;
     if (funcType->isLambda) return true;
-    for (size_t i = 0; i < funcType->params.size(); ++i) {
+    for (size_t i = funcType->isMethod; i < funcType->params.size(); ++i) {
         const auto paramType = funcType->params[i].type;
-        const auto argType = args[i]->type;
+        const auto arg = args[i - funcType->isMethod];
+        const auto argType = arg->type;
         if (!paramType || !argType) return false;
-        if (args[i]->isNull) continue;
+        if (arg->isNull) continue;
         if (!argType->canCastTo(paramType)) return false;
     }
     return true;

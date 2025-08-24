@@ -618,10 +618,7 @@ void LgsSema::visitInnerSelections(const LgsSelection* selection) {
         if (const auto var = childExpr->asVariable()) {
             visitFieldSelection(var, parentExpr->type);
         } else if (const auto methodCall = childExpr->asFuncCall()) {
-            visitMethodCall(methodCall, parentExpr->type);
-            if (methodCall->func->funcType->isMethod) {
-                methodCall->args.insert(methodCall->args.begin(), parentExpr);
-            }
+            visitMethodCall(methodCall, parentExpr);
         }
         if (!childExpr->type || childExpr->type->isUnknown()) return;
     }
@@ -644,13 +641,16 @@ void LgsSema::visitFieldSelection(LgsVariable* child, LgsType* parentType) {
     }
 }
 
-void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsType* parentType) {
+void LgsSema::visitMethodCall(LgsFuncCall* methodCall, LgsExpr* parent) {
     for (int i = 0; i < methodCall->args.size(); ++i) {
         const auto arg = methodCall->args[i];
         visitExpr(arg);
     }
-    if (!resolveMethodCall(methodCall, parentType)) return;
-    validateMethodVisibility(methodCall, parentType->asObject());
+    if (!resolveMethodCall(methodCall, parent->type)) return;
+    if (methodCall->func->funcType->isMethod) {
+        methodCall->args.insert(methodCall->args.begin(), parent);
+    }
+    validateMethodVisibility(methodCall, parent->type->asObject());
 }
 
 void LgsSema::visitFuncCall(LgsFuncCall* funcCall) {

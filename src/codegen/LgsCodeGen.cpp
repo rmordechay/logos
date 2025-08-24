@@ -757,12 +757,11 @@ void LgsCodeGen::visitInstance(LgsInstance* instance) {
 
 void LgsCodeGen::initFields(LgsInstance* instance) {
     for (const auto& [argName, arg] : instance->args) {
-        visitExpr(arg->expr);
-        const auto exprIR = arg->expr->IRValue;
+        const auto exprIR = getIRValue(arg->expr);
         const auto field = instance->obj->getField(argName);
         if (!field) continue;
-        field->parentIRValue = instance->IRValue;
-        const auto gep = field->IRValue;
+        field->parentIRValue = getIRValue(instance);
+        const auto gep = getIRValue(field);
         cg.builder.CreateStore(exprIR, gep);
     }
 }

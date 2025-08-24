@@ -241,9 +241,6 @@ LgsFunc* LgsParserAdapter::getFunc(LogosParser::FuncContext* ctx) {
     setLocation(func->location, tokenName->getSymbol());
     setParams(func->funcType, funcSignature->funcSignatureHeader()->param());
     func->stmtsBlock = getStmtBlock(ctx->statementsBlock());
-    if (!func->funcType->isMethod) {
-        func->funcType->params.erase(func->funcType->params.begin());
-    }
     currentFunc = nullptr;
     return func;
 }
@@ -276,18 +273,14 @@ LgsFunc* LgsParserAdapter::getMethod(LogosParser::MethodContext* ctx, LgsType* o
     const auto method = new LgsFunc(nameToken->getText(), rt);
     currentFunc = method;
     setLocation(method->location, nameToken->getSymbol());
-    method->funcType->isMethod = true;
     method->funcType->parentName = obj->getName();
-    auto self = LgsParam(obj, LGS_SELF);
-    self.isSelf = true;
-    method->funcType->params.push_back(self);
     setParams(method->funcType, funcSignature->funcSignatureHeader()->param());
     method->stmtsBlock = getStmtBlock(ctx->statementsBlock());
-    if (!method->funcType->isMethod) {
-        method->funcType->params.erase(method->funcType->params.begin());
-    }
     if (ctx->VISIBILITY()) {
         method->funcType->isPublic = true;
+    }
+    if (method->funcType->isMethod) {
+        method->funcType->params.insert(method->funcType->params.begin(), LgsParam(obj, LGS_SELF));
     }
     currentFunc = nullptr;
     return method;
@@ -338,19 +331,15 @@ LgsInterface* LgsParserAdapter::getInterface(LogosParser::InterfaceBodyContext* 
     }
 
     for (const auto& interfaceFunc : ctx->interfaceFunc()) {
-        auto self = LgsParam(interface, LGS_SELF);
-        self.isSelf = true;
         const auto type = getFuncReturnType(interfaceFunc->type());
         const auto funcName = interfaceFunc->funcSignatureHeader()->IDENTIFIER();
         const auto func = new LgsFunc(funcName->getText(), type);
         currentFunc = func;
         setLocation(func->location, funcName->getSymbol());
         func->funcType->parentName = interface->name;
-        func->funcType->isMethod = true;
         func->funcType->isPublic = true;
         func->funcType->isVirtual = !func->stmtsBlock;
         func->funcType->isOptional = !!interfaceFunc->QUEST_MARK();
-        func->funcType->params.push_back(self);
         setParams(func->funcType, interfaceFunc->funcSignatureHeader()->param());
         func->stmtsBlock = getStmtBlock(interfaceFunc->statementsBlock());
         currentFunc = nullptr;
@@ -881,6 +870,9 @@ LgsUnaryExpr* LgsParserAdapter::getHashMap(LogosParser::HashMapContext* ctx) {
 
 LgsVariable* LgsParserAdapter::getVariable(antlr4::tree::TerminalNode* ctx) const {
     const auto variable = new LgsVariable(ctx->getText());
+    if (variable->name == LGS_SELF) {
+        currentFunc->funcType->isMethod = true;
+    }
     setLocation(variable->location, ctx->getSymbol());
     return variable;
 }
@@ -929,11 +921,7 @@ LgsSelection* LgsParserAdapter::getSelection(LogosParser::SelectionContext* ctx)
 LgsUnaryExpr* LgsParserAdapter::getFirstSelection(LogosParser::SelectionContext* ctx) {
     const auto firstExpr = ctx->firstSelectionElement();
     if (const auto variable = firstExpr->IDENTIFIER()) {
-        const auto var = getVariable(variable);
-        if (var->name == LGS_SELF) {
-            currentFunc->funcType->isMethod = true;
-        }
-        return var;
+        return getVariable(variable);
     }
     if (const auto funcCall = firstExpr->funcCall()) {
         return getFuncCall(funcCall);
