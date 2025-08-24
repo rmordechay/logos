@@ -68,7 +68,7 @@ public:
     LgsVarDec* getImplicitVarDec(LogosParser::ImplicitVarDecContext* ctx);
     LgsVarDec* getExplicitVarDec(LogosParser::ExplicitVarDecContext* ctx);
     LgsStmt* getReturnStmt(LogosParser::ReturnStatementContext* ctx);
-    LgsBreak* getBreakStmt(LogosParser::StatementContext* ctx) const;
+    LgsBreak* getBreakStmt(LogosParser::BreakStmtContext* ctx) const;
     LgsStmt* getContinueStmt(const LogosParser::StatementContext* ctx) const;
     LgsIfStmt* getIfStatement(LogosParser::IfStatementContext* ctx);
     LgsStmt* getPatternMatching(LogosParser::PatternMatchingContext* ctx);

@@ -487,6 +487,8 @@ void LgsCodeGen::visitContinueStmt() {
 void LgsCodeGen::visitBreakStmt(const LgsBreak* breakStmt) {
     if (breakStmt->isBreakIf) {
         cg.builder.CreateBr(stack.outermostIfStmt()->IRExitBlock);
+    } else if (breakStmt->tag != "") {
+        cg.builder.CreateBr(stack.findTagExitBlock(breakStmt->tag));
     } else {
         const auto loop = stack.currentLoop();
         cg.builder.CreateBr(loop->IRExitBlock);

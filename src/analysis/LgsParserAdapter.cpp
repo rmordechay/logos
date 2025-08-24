@@ -438,7 +438,7 @@ LgsStmt* LgsParserAdapter::getStmt(LogosParser::StatementContext* ctx) {
     if (const auto loopStmt = ctx->loopStatement()) return getForLoop(loopStmt);
     if (const auto returnStmt = ctx->returnStatement()) return getReturnStmt(returnStmt);
     if (const auto expr = ctx->expr()) return getExpr(expr);
-    if (ctx->breakStmt()) return getBreakStmt(ctx);
+    if (const auto breakStmt = ctx->breakStmt()) return getBreakStmt(breakStmt);
     if (ctx->CONTINUE()) return getContinueStmt(ctx);
     assert(0);
 }
@@ -603,12 +603,12 @@ LgsIfStmt* LgsParserAdapter::getIfStatement(LogosParser::IfStatementContext* ctx
     return ifStmt;
 }
 
-LgsBreak* LgsParserAdapter::getBreakStmt(LogosParser::StatementContext* ctx) const {
+LgsBreak* LgsParserAdapter::getBreakStmt(LogosParser::BreakStmtContext* ctx) const {
     const auto breakStmt = new LgsBreak();
     setLocation(breakStmt->location, ctx->start);
-    if (const auto tag = ctx->breakStmt()->TAG()) {
+    if (const auto tag = ctx->TAG()) {
         breakStmt->tag = tag->getText().substr(1);
-    } else if (ctx->breakStmt()->IF()) {
+    } else if (ctx->IF()) {
         breakStmt->isBreakIf = true;
     }
     return breakStmt;

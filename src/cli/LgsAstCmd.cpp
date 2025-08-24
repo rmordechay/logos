@@ -13,7 +13,9 @@ void LgsAstCmd::run() {
     app.analyse();
     json::object ast;
     ast["ast"] = app.ast.front()->asJSON();
-    ast["errors"] = app.errHandler.asJSON();
+    if (withErrors) {
+        ast["errors"] = app.errHandler.asJSON();
+    }
     std::cout << app.ast.front()->asJSON() << std::endl;
 }
 

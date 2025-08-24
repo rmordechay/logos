@@ -1,0 +1,9 @@
+main() {
+    a = 10
+    if a > 7 @tag {
+        if a < 11 {
+            break @tag
+        }
+        print("roi")
+    }
+}

@@ -369,7 +369,7 @@ void LgsSema::visitContinueStmt(const LgsContinue* continueStmt) {
 void LgsSema::visitBreakStmt(const LgsBreak* breakStmt) {
     if (breakStmt->isBreakIf) {
         if (!stack.currentIfStmt()) errHandler.addError(E10071, &breakStmt->location);
-    } else if (!stack.currentLoop()) {
+    } else if (!stack.currentLoop() && breakStmt->tag == "") {
         errHandler.addError(E10017, &breakStmt->location);
     }
 }

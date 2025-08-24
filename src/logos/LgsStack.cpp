@@ -48,6 +48,15 @@ LgsIfStmt* LgsStack::outermostIfStmt() {
     return nullptr;
 }
 
+BasicBlock* LgsStack::findTagExitBlock(const std::string& tag) {
+    for (auto it = begin(); it != end(); ++it) {
+        if (it->ifStmt && it->ifStmt->tag == tag) {
+            return it->ifStmt->IRExitBlock;
+        }
+    }
+    assert(0);
+}
+
 LgsSymbolTable& LgsStack::getSymbolTable() {
     return top().symbolTable;
 }

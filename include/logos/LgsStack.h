@@ -1,6 +1,8 @@
 #pragma once
 #include "LgsSymbolTable.h"
 
+#include <llvm/IR/BasicBlock.h>
+
 class LgsValue;
 class LgsStmtsBlock;
 class LgsStmt;
@@ -24,6 +26,7 @@ public:
     LgsForLoop* currentLoop();
     LgsIfStmt* currentIfStmt();
     LgsIfStmt* outermostIfStmt();
+    llvm::BasicBlock* findTagExitBlock(const std::string& tag);
     LgsSymbolTable& getSymbolTable();
     auto begin() { return c.begin(); }
     auto end() { return c.end(); }

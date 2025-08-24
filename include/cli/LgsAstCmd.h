@@ -4,6 +4,8 @@
 
 class LgsAstCmd final : public LgsCliCmd {
 public:
+    bool withErrors = false;
+
     LgsAstCmd(const int argc, char** argv) : LgsCliCmd(argc, argv) {}
     void run() override;
     LgsCliCmdHelp& getHelp() override;
@@ -23,5 +25,6 @@ inline LgsCliCmdHelp astCmdHelp{
     },
     .examples = {
         "lgs ast app.lgs",
+        "lgs ast app.lgs --no-errors",
     }
 };
