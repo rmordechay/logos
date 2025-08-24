@@ -54,7 +54,6 @@
 #include <types/LgsStr.h>
 #include <types/LgsVoid.h>
 
-
 LgsFile* LgsParserAdapter::parseFile(const fs::path& filePath) {
     const auto absFilePath = fs::path(fs::canonical(filePath));
     const auto codeText = getFileText(absFilePath);

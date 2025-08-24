@@ -7,6 +7,7 @@
 #include "utils/ThreadPool.h"
 #include <llvm/Passes/OptimizationLevel.h>
 
+class LgsTestFile;
 class LgsAppFile;
 class LogosParser;
 class LgsLLVM;
@@ -29,6 +30,7 @@ public:
     LgsSymbolTable globals;
     LgsErrHandler errHandler;
     std::vector<LgsFile*> ast;
+    std::vector<LgsTestFile*> tests;
     std::vector<LgsEnvFile*> envFiles;
     std::atomic<size_t> nextFileID = 0;
     std::vector<char*> appArgs;

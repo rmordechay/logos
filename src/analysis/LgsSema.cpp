@@ -45,6 +45,8 @@ void LgsSema::analyse() {
         visitObject(objFile->obj);
     } else if (const auto interfaceFile = dynamic_cast<LgsInterfaceFile*>(file)) {
         visitInterface(interfaceFile->interface);
+    } else {
+        assert(0);
     }
 }
 
@@ -379,9 +381,6 @@ void LgsSema::visitDeferStmt(const LgsDeferStmt* deferStmt) {
     else visitSelection(deferStmt->selection);
     const auto deferType = deferStmt->funcCall ? deferStmt->funcCall->type : deferStmt->selection->type;
     assert(deferType);
-    // if (!deferType->isVoid()) {
-    //     errHandler.addError(E10079, &deferStmt->location, {deferType->pname()});
-    // }
     stack.currentFunc()->hasDefers = true;
 }
 

@@ -107,17 +107,32 @@ public:
     void initFields(LgsInstance* instance);
     void visitIterIndex(LgsIterIndex* iterIndex);
 
-    void generateIf(Value* cond, const std::function<void()>& blockStmtCb);
+    // Funcs
+    void initMainArgs(LgsMainFunc* mainFunc);
     void createPrologue(LgsFunc* func);
     void createEpilogue(LgsFunc* func);
     void freeHeap(const LgsFunc* func);
-
-    Value* getIRValue(LgsValue* value);
-    Value* createConstArray(const LgsArrayExpr* arrayExpr);
-    Value* createDynamicArray(LgsArrayExpr* arrayExpr);
-    Value* loopEnd(const LgsRangeLoop* loop);
-    Value* loopStart(const LgsRangeLoop* loop);
     Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
     Type* getThunkCtxType(const LgsFuncCall* fc) const;
     Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;
+
+    // If stmt
+    void generateIf(Value* cond, const std::function<void()>& blockStmtCb);
+
+    // Loops
+    Value* loopEnd(const LgsRangeLoop* loop);
+    Value* loopStart(const LgsRangeLoop* loop);
+
+    // Iterables
+    Value* createConstArray(const LgsArrayExpr* arrayExpr);
+    Value* createDynamicArray(LgsArrayExpr* arrayExpr);
+    void setStrIterVars(const LgsForeachLoop* loop, const LgsStr* str) const;
+    void setArrIterVars(LgsForeachLoop* loop, LgsDArray* arr) const;
+    void setMapIterVars(const LgsForeachLoop* loop, LgsIterator* iterator) const;
+    void initIterator(LgsIterator* iterator) const;
+    Value* iterNext(LgsIterator* iterator) const;
+    Value* iterHasNext(LgsIterator* iterator) const;
+
+    // Generic
+    Value* getIRValue(LgsValue* value);
 };

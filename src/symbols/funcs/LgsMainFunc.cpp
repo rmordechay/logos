@@ -30,15 +30,6 @@ void LgsMainFunc::setMainArgs() {
     initArgsFunc->funcType->params.emplace_back(LgsParam(new LgsStr()));
 }
 
-void LgsMainFunc::initMainArgs(LgsLLVM& codeGen) {
-    auto& builder = codeGen.builder;
-    const std::vector<Type*> structFields{codeGen.i64Ty(), codeGen.i32Ty(), codeGen.i32Ty(), codeGen.ptrTy()};
-    const auto arrStruct = codeGen.getStructType(structFields, LgsDArray::name);
-    mainArgs->IRValue = builder.CreateAlloca(arrStruct);
-    initArgsFunc->callIR(codeGen, {mainArgs->IRValue, argc, argv});
-    funcType->params[0].setIRValue(mainArgs->IRValue);
-}
-
 LgsMainFunc::~LgsMainFunc() {
     if (initArgsFunc) {
         delete initArgsFunc;
