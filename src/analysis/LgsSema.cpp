@@ -397,9 +397,6 @@ void LgsSema::visitExpr(LgsExpr* expr) {
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
     }
-    if (expr->type && !expr->asVariable() && expr->type->isHeapAlloc) {
-        stack.currentFunc()->heapAllocExprs.push_back(expr);
-    }
 }
 
 void LgsSema::visitUnaryExpr(LgsUnaryExpr* unaryExpr) {

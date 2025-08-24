@@ -2,7 +2,7 @@
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "stmts/LgsField.h"
 #include "types/LgsAny.h"
-#include "types/LgsCPtr.h"
+#include "types/LgsPtr.h"
 #include "types/primitives/LgsDouble.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsShort.h"

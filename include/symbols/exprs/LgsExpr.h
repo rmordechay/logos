@@ -57,6 +57,7 @@ public:
     std::string getConstStr();
     LgsIterator toIterator();
     void setType(LgsType* newType);
+    bool equals(LgsExpr* other);
 
     LgsFunc* asFunc();
     LgsVariable* asVariable();

@@ -56,6 +56,18 @@ void LgsExpr::setType(LgsType* newType) {
     type = newType;
 }
 
+bool LgsExpr::equals(LgsExpr* other) {
+    if (const auto var = asVariable()) {
+        switch (var->ref.symbolType) {
+        case VAR_DEC:
+            return var->ref.varDec->expr == other;
+        default:
+            assert(0);
+        }
+    }
+    return false;
+}
+
 void LgsExpr::completeType(LgsType* toType) {}
 
 LgsExpr* LgsExpr::clone() {

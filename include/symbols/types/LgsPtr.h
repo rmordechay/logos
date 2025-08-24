@@ -2,12 +2,12 @@
 #include "LgsType.h"
 #include "codegen/LgsLLVM.h"
 
-class LgsCPtr final : public LgsType {
+class LgsPtr final : public LgsType {
 public:
     static constexpr auto name = "CPtr";
     LgsType* baseType;
 
-    explicit LgsCPtr(LgsType* baseType) : baseType(baseType) {}
+    explicit LgsPtr(LgsType* baseType) : baseType(baseType) {}
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
@@ -16,5 +16,5 @@ public:
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
-    ~LgsCPtr() override;
+    ~LgsPtr() override;
 };

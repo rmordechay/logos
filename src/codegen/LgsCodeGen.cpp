@@ -466,7 +466,7 @@ void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
 void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
     returnStmt->IRValue = returnStmt->expr ? getIRValue(returnStmt->expr) : nullptr;
     const auto currentFunc = stack.currentFunc();
-    if (currentFunc->needsCleanup()) {
+    if (!currentFunc->heapAllocExprs.empty()) {
         returnStmt->parentBlock = cg.builder.GetInsertBlock();
         const auto cleanupBlock = currentFunc->getCleanupBlock(cg);
         cg.builder.CreateBr(cleanupBlock);
@@ -524,6 +524,9 @@ void LgsCodeGen::visitExpr(LgsExpr* expr) {
         visitUnaryExpr(unaryExpr);
     } else if (const auto binaryExpr = dynamic_cast<LgsBinaryExpr*>(expr)) {
         visitBinaryExpr(binaryExpr);
+    }
+    if (expr->type->isHeapAlloc && !expr->asVariable()) {
+        stack.currentFunc()->heapAllocExprs.push_back(expr);
     }
     assert(expr->IRValue);
 }
@@ -793,26 +796,37 @@ void LgsCodeGen::createPrologue(LgsFunc* func) {
 
 void LgsCodeGen::createEpilogue(LgsFunc* func) {
     cg.branchAndStartBlock(func->getCleanupBlock(cg), currentIRFunc);
-    if (func->hasDefers) {
-        cg.callDefers();
-    }
     currentIRFunc = nullptr;
-    // 0 return, 0 heap
-    // 1 return, 0 heap
-    // >1 return, 0 heap
-    if (!func->needsCleanup()) {
+    if (func->hasDefers) cg.callDefers();
+
+    if (func->heapAllocExprs.empty()) {
         cg.callPopStack();
         return;
     }
-    // 0 return, 1 heap
-    // 0 return, >1 heap
+
     if (func->returnStmts.empty()) {
         cg.callPopStack();
+        cg.builder.CreateRetVoid();
         freeHeap(func);
         return;
     }
-    // 1 return, >1 heap
-    // >1 return, >1 heap
+
+    if (func->returnStmts.size() == 1) {
+        if (func->heapAllocExprs.size() == 1) {
+            const auto returnRef = func->returnStmts.front()->expr;
+            const auto heapExprRef = func->heapAllocExprs.front();
+            if (returnRef->equals(heapExprRef)) {
+                cg.callPopStack();
+                cg.builder.CreateRet(func->returnStmts.front()->IRValue);
+                return;
+            }
+        }
+        freeHeap(func);
+        cg.builder.CreateRet(func->returnStmts.front()->IRValue);
+        return;
+    }
+
+    // multiple return stmts, one or more heap allocations
     auto rt = func->funcType->rt->getIRType(cg);
     if (func->funcType->rt->asDArray()) {
         rt = rt->getPointerTo();
@@ -823,6 +837,7 @@ void LgsCodeGen::createEpilogue(LgsFunc* func) {
     }
     cg.callPopStack();
     cg.builder.CreateRet(phi);
+    assert(0);
 }
 
 void LgsCodeGen::freeHeap(const LgsFunc* func) {

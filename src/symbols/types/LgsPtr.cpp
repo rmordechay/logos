@@ -1,35 +1,35 @@
-#include "types/LgsCPtr.h"
+#include "types/LgsPtr.h"
 #include "exprs/LgsNull.h"
 #include "types/LgsAny.h"
 #include "types/LgsDArray.h"
 #include "types/LgsSArray.h"
 #include "types/primitives/LgsLong.h"
 
-std::string LgsCPtr::getName() {
+std::string LgsPtr::getName() {
     return name;
 }
 
-json::value LgsCPtr::asJSON() {
+json::value LgsPtr::asJSON() {
     assert(0);
 }
 
-std::string LgsCPtr::pname() {
+std::string LgsPtr::pname() {
     return name;
 }
 
-Type* LgsCPtr::getIRType(LgsLLVM& codeGen) {
+Type* LgsPtr::getIRType(LgsLLVM& codeGen) {
     return codeGen.ptrTy();
 }
 
-size_t LgsCPtr::getSizeBytes() {
+size_t LgsPtr::getSizeBytes() {
     return sizeof(void*);
 }
 
-LgsExpr* LgsCPtr::getZeroValue() {
+LgsExpr* LgsPtr::getZeroValue() {
     return new LgsNull();
 }
 
-bool LgsCPtr::canCastTo(LgsType* other) {
+bool LgsPtr::canCastTo(LgsType* other) {
     const auto IRName = other->getName();
     if (IRName == LgsAny::name) return true;
     if (IRName == LgsLong::name) return true;
@@ -38,11 +38,11 @@ bool LgsCPtr::canCastTo(LgsType* other) {
     return name == IRName;
 }
 
-std::string LgsCPtr::strFormatPart() const {
+std::string LgsPtr::strFormatPart() const {
     return "%p";
 }
 
-LgsCPtr::~LgsCPtr() {
+LgsPtr::~LgsPtr() {
     if (baseType) {
         freeType(baseType);
         baseType = nullptr;

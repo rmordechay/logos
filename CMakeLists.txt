@@ -99,7 +99,7 @@ set(CORE_SOURCES
     src/symbols/stmts/LgsStmtsBlock.cpp
     src/symbols/stmts/LgsVarDec.cpp
     src/symbols/types/LgsAny.cpp
-    src/symbols/types/LgsCPtr.cpp
+    src/symbols/types/LgsPtr.cpp
     src/symbols/types/LgsDArray.cpp
     src/symbols/types/LgsEnum.cpp
     src/symbols/types/LgsFuncType.cpp

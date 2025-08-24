@@ -1,7 +1,7 @@
 #include "configs/LgsConfig.h"
 #include "exprs/unary/LgsVectorExpr.h"
 #include "stmts/LgsField.h"
-#include "types/LgsCPtr.h"
+#include "types/LgsPtr.h"
 #include "types/LgsInterface.h"
 #include "types/LgsObject.h"
 #include "types/LgsDArray.h"
@@ -76,7 +76,7 @@ LgsVec* LgsType::asVec() { return dynamic_cast<LgsVec*>(this); }
 LgsMap* LgsType::asMap() { return dynamic_cast<LgsMap*>(this); }
 LgsEnum* LgsType::asEnum() { return dynamic_cast<LgsEnum*>(this); }
 LgsFuncType* LgsType::asFuncType() { return dynamic_cast<LgsFuncType*>(this); }
-LgsCPtr* LgsType::asCPtr() { return dynamic_cast<LgsCPtr*>(this); }
+LgsPtr* LgsType::asCPtr() { return dynamic_cast<LgsPtr*>(this); }
 LgsGroup* LgsType::asGroup() { return dynamic_cast<LgsGroup*>(this); }
 LgsTypePair* LgsType::asPair() { return dynamic_cast<LgsTypePair*>(this); }
 bool LgsType::isVector() { return dynamic_cast<LgsVec*>(this); }

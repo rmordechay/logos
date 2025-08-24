@@ -1,7 +1,7 @@
 #include "types/primitives/LgsLong.h"
 #include "exprs/unary/constants/LgsIntConst.h"
 #include "types/LgsAny.h"
-#include "types/LgsCPtr.h"
+#include "types/LgsPtr.h"
 #include "types/primitives/LgsBool.h"
 #include "types/primitives/LgsChar.h"
 #include "types/primitives/LgsFloat.h"

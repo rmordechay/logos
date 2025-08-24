@@ -4,7 +4,7 @@
 #include "stmts/LgsField.h"
 #include "types/LgsDArray.h"
 #include "types/LgsObject.h"
-#include "types/LgsCPtr.h"
+#include "types/LgsPtr.h"
 #include "types/LgsStr.h"
 #include "types/primitives/LgsFloat.h"
 #include "types/primitives/LgsInt.h"
@@ -56,18 +56,18 @@ LgsType* LgsCLangVisitor::mapCType(const clang::QualType type) {
     if (type->isPointerType()) {
         const auto pointee = type->getPointeeType();
         if (pointee.getTypePtr() == type.getTypePtr()) {
-            return new LgsCPtr(new LgsVoid());
+            return new LgsPtr(new LgsVoid());
         }
         if (pointee->isVoidType()) {
-            return new LgsCPtr(new LgsVoid());
+            return new LgsPtr(new LgsVoid());
         }
         if (pointee->isIncompleteType() && !pointee->isStructureType()) {
-            return new LgsCPtr(new LgsVoid());
+            return new LgsPtr(new LgsVoid());
         }
         if (pointee->isElaboratedTypeSpecifier()) {
-            return new LgsCPtr(new LgsVoid());
+            return new LgsPtr(new LgsVoid());
         }
-        return new LgsCPtr(mapCType(pointee));
+        return new LgsPtr(mapCType(pointee));
     }
     if (type->isSpecificBuiltinType(clang::BuiltinType::Bool)) {
         return new LgsBool();

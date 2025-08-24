@@ -1,7 +1,7 @@
 #pragma once
 #include "configs/LgsErrors.h"
 
-class LgsCPtr;
+class LgsPtr;
 class LgsDouble;
 class LgsFloat;
 
@@ -90,7 +90,7 @@ public:
     LgsSArray* asSArray();
     LgsVec* asVec();
     LgsFuncType* asFuncType();
-    LgsCPtr* asCPtr();
+    LgsPtr* asCPtr();
     LgsGroup* asGroup();
     LgsTypePair* asPair();
     bool isVector();
