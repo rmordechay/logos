@@ -8,7 +8,7 @@ size_t LgsSize::getSizeBytes() {
     return sizeof(size_t);
 }
 
-Type* LgsSize::getIRType(LgsCodeGen& codeGen) {
+Type* LgsSize::getIRType(LgsLLVM& codeGen) {
     return codeGen.sizeTy();
 }
 

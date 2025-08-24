@@ -10,7 +10,7 @@ public:
     static constexpr auto name = "print";
     explicit LgsPrint(): LgsFunc(name, &LGS_VOID, {&LGS_ANY, &LGS_ANY}, PUBLIC | VARIADIC) {}
 
-    Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) override {
+    Value* call(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) override {
         std::vector<Value*> IRArgs;
         const auto firstArg = args.front();
         const auto formatStr = firstArg->type->strFormatPart() + '\n';
@@ -38,12 +38,12 @@ public:
         return codeGen.callLgsFunc(name, codeGen.getFT(codeGen.voidTy(), {codeGen.ptrTy()}, true), IRArgs);
     }
 
-    Function* getIRFunc(LgsCodeGen& codeGen) override {
+    Function* getIRFunc(LgsLLVM& codeGen) override {
         const auto ft = codeGen.getFT(codeGen.i32Ty(), {codeGen.ptrTy()}, true);
         return codeGen.getFunc("printf", ft);
     }
 
-    static Value* printFormat(LgsCodeGen* codeGen, const LgsStrConst* const strConst) {
+    static Value* printFormat(LgsLLVM* codeGen, const LgsStrConst* const strConst) {
         auto formated = strConst->formatedStr;
         std::vector<Value*> values;
         for (const auto part : strConst->templateParts) {

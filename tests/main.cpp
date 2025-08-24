@@ -1,7 +1,7 @@
-#include "../include/codegen/LgsCodeGen.h"
+#include "../include/codegen/LgsLLVM.h"
 #include <../include/external/doctest.h>
 
 int main(const int argc, char** argv) {
-    LgsCodeGen::initLLVM();
+    LgsLLVM::initLLVM();
     return doctest::Context(argc, argv).run();
 }

@@ -37,7 +37,7 @@ public:
     llvm::FunctionType* IRType = nullptr;
 
     void setFuncOptions(uint32_t ops);
-    llvm::Type* getIRType(LgsCodeGen& codeGen) override;
+    llvm::Type* getIRType(LgsLLVM& codeGen) override;
     LgsExpr* getZeroValue() override;
     size_t getSizeBytes() override;
     std::string getName() override;

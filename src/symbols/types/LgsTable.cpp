@@ -5,7 +5,7 @@ std::string LgsTable::pname() {
     return getName();
 }
 
-llvm::Type* LgsTable::getIRType(LgsCodeGen& codeGen) {
+llvm::Type* LgsTable::getIRType(LgsLLVM& codeGen) {
     const auto fieldsArrType = ArrayType::get(codeGen.ptrTy(), fields.size());
     const auto tableFieldType = codeGen.getStructType({codeGen.ptrTy(), codeGen.ptrTy()}, "Table_Field");
     return codeGen.getStructType({fieldsArrType, tableFieldType}, "Table");

@@ -6,7 +6,7 @@
 #include "exprs/unary/LgsVariable.h"
 #include "types/LgsVec.h"
 
-void LgsAssignment::createIRAssignment(LgsCodeGen& codeGen) const {
+void LgsAssignment::createIRAssignment(LgsLLVM& codeGen) const {
     if (const auto selection = lValue->asSelection()) {
         assignToSelection(&codeGen, selection, rValue);
     } else if (const auto iterIndex = lValue->asIterIndex()) {
@@ -18,7 +18,7 @@ void LgsAssignment::createIRAssignment(LgsCodeGen& codeGen) const {
     }
 }
 
-void LgsAssignment::assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, LgsCodeGen* codeGen) {
+void LgsAssignment::assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, LgsLLVM* codeGen) {
     if (const auto map = expr->asHashMap()) {
         assignHashMapToIterIndex(codeGen, iterIndex, map);
     } else if (const auto arr = expr->asArrayExpr()) {
@@ -28,7 +28,7 @@ void LgsAssignment::assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, Lg
     }
 }
 
-void LgsAssignment::assignArrayToIterIndex(LgsCodeGen* codeGen, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) {
+void LgsAssignment::assignArrayToIterIndex(LgsLLVM* codeGen, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto IRType = baseExpr->type->getIRType(*codeGen);
     const auto arrPtr = baseExpr->IRValue;
@@ -56,7 +56,7 @@ void LgsAssignment::assignArrayToIterIndex(LgsCodeGen* codeGen, const LgsIterInd
     }
 }
 
-void LgsAssignment::assignToSelection(LgsCodeGen* codeGen, LgsSelection* selection, LgsExpr* expr) {
+void LgsAssignment::assignToSelection(LgsLLVM* codeGen, LgsSelection* selection, LgsExpr* expr) {
     const auto rIR = expr->IRValue;
     const auto lastExprParent = selection->lastExprParent();
     if (lastExprParent->type->asVec()) {
@@ -72,13 +72,13 @@ void LgsAssignment::assignToSelection(LgsCodeGen* codeGen, LgsSelection* selecti
     }
 }
 
-void LgsAssignment::assignToVariable(LgsCodeGen* codeGen, LgsVariable* variable, LgsExpr* expr) {
+void LgsAssignment::assignToVariable(LgsLLVM* codeGen, LgsVariable* variable, LgsExpr* expr) {
     const auto variablePtr = variable->IRValue;
     const auto exprIRValue = expr->IRValue;
     codeGen->builder.CreateStore(exprIRValue, variablePtr);
 }
 
-void LgsAssignment::assignScalarToIterIndex(LgsCodeGen& codeGen, LgsIterIndex* iterIndex, LgsExpr* expr) {
+void LgsAssignment::assignScalarToIterIndex(LgsLLVM& codeGen, LgsIterIndex* iterIndex, LgsExpr* expr) {
     const auto baseExpr = iterIndex->baseExpr;
     const auto rIRValue = expr->IRValue;
     const auto baseIRValue = baseExpr->IRValue;
@@ -101,7 +101,7 @@ void LgsAssignment::assignScalarToIterIndex(LgsCodeGen& codeGen, LgsIterIndex* i
     }
 }
 
-void LgsAssignment::assignHashMapToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map) {
+void LgsAssignment::assignHashMapToIterIndex(LgsLLVM* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map) {
     assert(0);
 }
 

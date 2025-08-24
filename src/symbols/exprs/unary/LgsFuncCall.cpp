@@ -36,7 +36,7 @@ bool LgsFuncCall::equalsDefaultParams(const LgsFuncType* funcType) const {
     return true;
 }
 
-void LgsFuncCall::resolveVirtualFunc(LgsCodeGen& codeGen) const {
+void LgsFuncCall::resolveVirtualFunc(LgsLLVM& codeGen) const {
     const auto self = args[0];
     const auto keyIR = codeGen.getIRStr(func->funcType->getName());
     const auto selfPtr = self->IRValue;

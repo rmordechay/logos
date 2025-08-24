@@ -6,7 +6,7 @@ public:
     static constexpr auto name = "Void";
 
     std::string pname() override;
-    llvm::Type* getIRType(LgsCodeGen& codeGen) override;
+    llvm::Type* getIRType(LgsLLVM& codeGen) override;
     size_t getSizeBytes() override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;

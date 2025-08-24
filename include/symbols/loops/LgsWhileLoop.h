@@ -6,6 +6,6 @@ public:
     LgsExpr* condExpr;
 
     explicit LgsWhileLoop(LgsExpr* cond_expr) : condExpr(cond_expr) {}
-    void incAndJumpToCond(LgsCodeGen& codeGen) const override;
+    void incAndJumpToCond(LgsLLVM& codeGen) const override;
     ~LgsWhileLoop() override;
 };

@@ -1,6 +1,6 @@
 #pragma once
 #include "funcs/LgsFunc.h"
-#include "codegen/LgsCodeGenVisitor.h"
+#include "codegen/LgsCodeGen.h"
 #include "primitives/LgsBool.h"
 #include "primitives/LgsChar.h"
 #include "primitives/LgsLong.h"
@@ -14,14 +14,14 @@ public:
     LgsFunc* isNotEmptyFunc = new LgsFunc("isNotEmpty", &LGS_BOOL, {this}, INTERNAL | PUBLIC | METHOD);
 
     LgsStr() : LgsIterable(&LGS_CHAR) {
-        lenFunc->fn = [](LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
+        lenFunc->fn = [](LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) {
             return codeGen.callStrLen(args[0]->IRValue);
         };
-        isEmptyFunc->fn = [](LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
+        isEmptyFunc->fn = [](LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) {
             const auto strLen = codeGen.callStrLen(args[0]->IRValue);
             return codeGen.builder.CreateICmpEQ(strLen, codeGen.builder.getInt64(0));
         };
-        isNotEmptyFunc->fn = [](LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
+        isNotEmptyFunc->fn = [](LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) {
             const auto strLen = codeGen.callStrLen(args[0]->IRValue);
             return codeGen.builder.CreateICmpNE(strLen, codeGen.builder.getInt64(0));
         };
@@ -30,8 +30,8 @@ public:
         addMethod(isNotEmptyFunc);
         isSliceable = true;
     }
-    Type* getIRBaseType(LgsCodeGen* codeGen) const;
-    Type* getIRType(LgsCodeGen& codeGen) override;
+    Type* getIRBaseType(LgsLLVM* codeGen) const;
+    Type* getIRType(LgsLLVM& codeGen) override;
     std::string getName() override;
     std::string pname() override;
     json::value asJSON() override;
@@ -40,8 +40,8 @@ public:
     LgsType* getIndexType() override;
     std::string strFormatPart() const override;
     uint16_t getUnpackCount() const override;
-    Value* IRLength(LgsCodeGen& codeGen, LgsExpr* iterable) override;
-    Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
-    Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) override;
+    Value* IRLength(LgsLLVM& codeGen, LgsExpr* iterable) override;
+    Value* IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) override;
+    Value* IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) override;
     bool canCastTo(LgsType* other) override;
 };

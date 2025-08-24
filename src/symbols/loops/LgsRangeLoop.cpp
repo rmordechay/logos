@@ -1,18 +1,18 @@
 #include "loops/LgsRangeLoop.h"
-#include "codegen/LgsCodeGen.h"
+#include "codegen/LgsLLVM.h"
 #include "stmts/LgsStmtsBlock.h"
 #include "stmts/LgsVarDec.h"
 
-Value* LgsRangeLoop::loopStart(LgsCodeGen* codeGen) const {
+Value* LgsRangeLoop::loopStart(LgsLLVM* codeGen) const {
     if (!startRange) return codeGen->i32Zero();
     return startRange->IRValue;
 }
 
-Value* LgsRangeLoop::loopEnd(LgsCodeGen* codeGen) const {
+Value* LgsRangeLoop::loopEnd(LgsLLVM* codeGen) const {
     return endRange->IRValue;
 }
 
-void LgsRangeLoop::setLoopTerminals(LgsCodeGen* codeGen, Value* iValue) const {
+void LgsRangeLoop::setLoopTerminals(LgsLLVM* codeGen, Value* iValue) const {
     if (isFirst) {
         isFirst->setIRValue(codeGen->builder.CreateICmpEQ(iValue, loopStart(codeGen)));
     }

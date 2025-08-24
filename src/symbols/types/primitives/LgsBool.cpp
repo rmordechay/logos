@@ -18,7 +18,7 @@ std::string LgsBool::pname() {
     return name;
 }
 
-Type* LgsBool::getIRType(LgsCodeGen& codeGen) {
+Type* LgsBool::getIRType(LgsLLVM& codeGen) {
     return codeGen.i1Ty();
 }
 

@@ -8,7 +8,7 @@ class LgsExpr;
 class LgsStmt;
 class LgsType;
 
-using CallFn = std::function<Value*(LgsCodeGen&, const std::vector<LgsExpr*>&)>;
+using CallFn = std::function<Value*(LgsLLVM&, const std::vector<LgsExpr*>&)>;
 
 class LgsFunc : public LgsUnaryExpr {
 public:
@@ -24,18 +24,18 @@ public:
         initFunc(name, rt, paramTypes, ops);
     }
     explicit LgsFunc(LgsFuncType* funcType) : funcType(funcType) {}
-    void setIRArgs(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args, std::vector<Value*>& IRArgs) const;
-    virtual Value* call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args);
-    Value* callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args = {});
-    virtual Function* getIRFunc(LgsCodeGen& codeGen);
-    static Value* loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type);
+    void setIRArgs(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args, std::vector<Value*>& IRArgs) const;
+    virtual Value* call(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args);
+    Value* callIR(LgsLLVM& codeGen, const std::vector<Value*>& args = {});
+    virtual Function* getIRFunc(LgsLLVM& codeGen);
+    static Value* loadIRArg(LgsLLVM* codeGen, Value* v, LgsType* type);
     void initFunc(const std::string& name, LgsType* rt, const std::vector<LgsType*>& paramTypes, const uint32_t ops);
-    BasicBlock* getCleanupBlock(LgsCodeGen& codeGen);
+    BasicBlock* getCleanupBlock(LgsLLVM& codeGen);
     void completeType(LgsType* toType) override;
     bool needsCleanup() const;
     std::string pname() override;
     json::value asJSON() override;
     LgsExpr* clone() override;
-    void setDebugValue(LgsCodeGen& codeGen) override;
+    void setDebugValue(LgsLLVM& codeGen) override;
     ~LgsFunc() override;
 };

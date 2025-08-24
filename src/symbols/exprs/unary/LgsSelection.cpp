@@ -23,7 +23,7 @@ std::string LgsSelection::pname() {
     return str.str();
 }
 
-Value* LgsSelection::hash(LgsCodeGen& codeGen) {
+Value* LgsSelection::hash(LgsLLVM& codeGen) {
     const auto lgsExpr = lastExpr();
     return lgsExpr->hash(codeGen);
 }

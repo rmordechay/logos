@@ -11,9 +11,9 @@ public:
 
     explicit LgsInstance(const std::string& name): name(name) {}
     explicit LgsInstance(LgsObject* obj) : LgsUnaryExpr(obj), name(obj->name), obj(obj) {}
-    void createIRTable(LgsCodeGen& codeGen);
+    void createIRTable(LgsLLVM& codeGen);
     void setObject(LgsObject* newObj);
-    void setVirtuals(LgsCodeGen& codeGen) const;
+    void setVirtuals(LgsLLVM& codeGen) const;
     json::value asJSON() override;
     std::string pname() override;
     ~LgsInstance() override;

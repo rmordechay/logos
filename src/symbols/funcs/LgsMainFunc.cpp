@@ -4,7 +4,7 @@
 #include "stmts/LgsStmtsBlock.h"
 #include "types/LgsStr.h"
 
-Function* LgsMainFunc::getIRFunc(LgsCodeGen& codeGen) {
+Function* LgsMainFunc::getIRFunc(LgsLLVM& codeGen) {
     if (IRFunc) return IRFunc;
     FunctionType* mainFuncType;
     if (funcType->params.empty()) {
@@ -30,7 +30,7 @@ void LgsMainFunc::setMainArgs() {
     initArgsFunc->funcType->params.emplace_back(LgsParam(new LgsStr()));
 }
 
-void LgsMainFunc::initMainArgs(LgsCodeGen& codeGen) {
+void LgsMainFunc::initMainArgs(LgsLLVM& codeGen) {
     auto& builder = codeGen.builder;
     const std::vector<Type*> structFields{codeGen.i64Ty(), codeGen.i32Ty(), codeGen.i32Ty(), codeGen.ptrTy()};
     const auto arrStruct = codeGen.getStructType(structFields, LgsDArray::name);

@@ -3,7 +3,7 @@
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
-Value* LgsCast::addIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsCast::addIR(LgsLLVM& codeGen, LgsExpr* other) {
     return toValue->addIR(codeGen, other);
 }
 

@@ -10,7 +10,7 @@ namespace llvm {
     class TargetMachine;
 }
 class LgsFile;
-class LgsCodeGen;
+class LgsLLVM;
 
 const auto LINK_STRING = "clang++ %s -L%s -llgs_core -Wl,-rpath,%s -o %s";
 

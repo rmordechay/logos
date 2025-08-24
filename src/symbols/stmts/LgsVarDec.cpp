@@ -12,7 +12,7 @@ json::value LgsVarDec::asJSON() {
     return obj;
 }
 
-void LgsVarDec::setDebugValue(LgsCodeGen& codeGen) {
+void LgsVarDec::setDebugValue(LgsLLVM& codeGen) {
     const auto var = codeGen.diBuilder->createAutoVariable(
         codeGen.compileUnit,
         name,

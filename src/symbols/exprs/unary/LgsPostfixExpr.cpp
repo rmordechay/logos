@@ -2,7 +2,7 @@
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
-Value* LgsPostfixExpr::IncOrDecValue(LgsCodeGen& codeGen) const {
+Value* LgsPostfixExpr::IncOrDecValue(LgsLLVM& codeGen) const {
     const auto exprIRValue = expr->IRValue;
     const auto exprIRType = expr->type->getIRType(codeGen);
     const auto exprLoad = codeGen.builder.CreateLoad(exprIRType, exprIRValue);

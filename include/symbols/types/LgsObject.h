@@ -3,7 +3,7 @@
 #include "LgsType.h"
 
 class LgsInstance;
-class LgsCodeGen;
+class LgsLLVM;
 class LgsField;
 
 class LgsObject : public LgsType {
@@ -13,10 +13,10 @@ public:
     LgsInstance* singleton = nullptr;
 
     explicit LgsObject(std::string  name) : name(std::move(name)) {}
-    llvm::Type* getIRType(LgsCodeGen& codeGen) override;
+    llvm::Type* getIRType(LgsLLVM& codeGen) override;
     LgsField* getField(const std::string& fieldName) override;
     LgsFunc* getMethod(const std::string& methodName) override;
-    void freeValue(LgsCodeGen& codeGen, llvm::Value* value) override;
+    void freeValue(LgsLLVM& codeGen, llvm::Value* value) override;
     size_t getSizeBytes() override;
     LgsExpr* getZeroValue() override;
     std::string strFormatPart() const override;

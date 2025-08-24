@@ -2,11 +2,11 @@
 #include "stmts/LgsVarDec.h"
 #include "types/LgsAny.h"
 
-Type* LgsStr::getIRBaseType(LgsCodeGen* codeGen) const {
+Type* LgsStr::getIRBaseType(LgsLLVM* codeGen) const {
     return ArrayType::get(baseType->getIRType(*codeGen), sizeExpr->getConstInt());
 }
 
-Type* LgsStr::getIRType(LgsCodeGen& codeGen) {
+Type* LgsStr::getIRType(LgsLLVM& codeGen) {
     return codeGen.ptrTy();
 }
 
@@ -44,15 +44,15 @@ LgsType* LgsStr::getIndexType() {
     return &LGS_INT;
 }
 
-Value* LgsStr::IRLength(LgsCodeGen& codeGen, LgsExpr* iterable) {
+Value* LgsStr::IRLength(LgsLLVM& codeGen, LgsExpr* iterable) {
     return lenFunc->call(codeGen, {iterable});
 }
 
-Value* LgsStr::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
+Value* LgsStr::IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
     return isEmptyFunc->call(*codeGen, {iterable});
 }
 
-Value* LgsStr::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
+Value* LgsStr::IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
     return isNotEmptyFunc->call(*codeGen, {iterable});
 }
 

@@ -1,121 +1,125 @@
 #pragma once
-#include "../logos/LgsApp.h"
-#include "../logos/LgsStack.h"
+#include "LgsLLVM.h"
+#include "exprs/unary/constants/LgsIntConst.h"
+#include "files/LgsFile.h"
 
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/LLVMContext.h>
-
-namespace llvm {
-    class TargetMachine;
-    class DIBuilder;
-}
-
-class LgsFuncCall;
-class LgsRuntime;
-class LgsFile;
-class LgsErrHandler;
-class LgsForLoop;
+class LgsMainFunc;
+class LgsInterfaceFile;
+class LgsObjectFile;
+class LgsVectorExpr;
+class LgsPostfixExpr;
+class LgsDeferStmt;
+class LgsInfiniteLoop;
+class LgsObject;
+class LgsWhileLoop;
 class LgsFuncType;
-
-using namespace llvm;
+class LgsIterable;
+class LgsFile;
+class LgsCoroutine;
+class LgsPrefixExpr;
+class LgsDArray;
+class LgsGroup;
+class LgsValue;
+class LgsVariable;
+class LgsUnaryExpr;
+class LgsStrConst;
+class LgsHashMap;
+class LgsExpr;
+class LgsType;
+class LgsContinue;
+class LgsBreak;
+class LgsReturn;
+class LgsForeachLoop;
+class LgsRangeLoop;
+class LgsStmtsBlock;
+class LgsStmt;
+class LgsMainFile;
+class LgsApp;
+class LgsCast;
+class LgsVarDec;
+class LgsInstance;
+class LgsIterIndex;
+class LgsSelection;
+class LgsFuncCall;
+class LgsBinaryExpr;
+class LgsArrayExpr;
+class LgsIfStmt;
+class LgsAssignment;
+class LgsForLoop;
+struct LgsSymbol;
+struct LgsIndex;
 
 class LgsCodeGen {
 public:
-    LLVMContext context;
-    Module* IRModule = nullptr;
-    IRBuilderBase::InsertPoint savedIP;
-    IRBuilder<> builder = IRBuilder(context);
-    DIFile* diFile = nullptr;
-    DIBuilder* diBuilder = nullptr;
-    DICompileUnit* compileUnit = nullptr;
-    DISubprogram* diProgram = nullptr;
-    TargetMachine* targetMachine = nullptr;
+    LgsFile& file;
+    LgsStack stack;
+    LgsLLVM& cg;
 
-    void setupModule(const LgsFile& file, bool debugMode = false);
-    Value* getIRStr(const std::string& value);
-    GlobalVariable* createGlobal(Type* type, ConstantAggregateZero* zeroInit, const std::string& name = "") const;
-    GlobalVariable* createConstGlobal(Type* type, Constant* zeroInit, const std::string& name = "") const;
-    StructType* getStructType(const std::vector<Type*>& fields, const std::string& name = "");
-    void storeValueInStruct(StructType* ty, Value* ptr, int i, Value* v);
-    Value* loadValueFromStruct(Type* ty, Value* ptr, int i);
+    explicit LgsCodeGen(LgsFile& file) : file(file), cg(file.generator) {}
+    void generate(const LgsAppConfigs& appConfigs, TargetMachine& targetMachine);
+    void visitMainFile(LgsMainFile* mainFile);
+    void visitObjFile(const LgsObjectFile* objFile);
+    void visitInterfaceFile(const LgsInterfaceFile* interfaceFile);
+    void visitMainFunc(LgsMainFunc* func);
+    void visitFunc(LgsFunc* func);
+    void visitObject(LgsObject* obj) const;
+    void visitInterface(LgsInterface* interface) const;
+    void visitGroup(LgsGroup* group);
+    void visitTable(LgsTable* table);
+    void visitField(LgsField* field) const;
+    void visitParam(LgsParam* param);
+    void visitLoop(LgsForLoop* loopStmt);
+    void visitRangeLoop(LgsRangeLoop* loop);
+    void visitForeachLoop(LgsForeachLoop* loop);
+    void visitInfiniteLoop(LgsInfiniteLoop* loop);
+    void visitWhileLoop(LgsWhileLoop* loop);
+    void visitLoopTerminals(const LgsRangeLoop* loop, Value* iValue);
+    void visitStmt(LgsStmt* stmt);
+    void visitStmtsBlock(const LgsStmtsBlock* stmtsBlock);
+    void visitVarDec(LgsVarDec* varDec);
+    void visitAssignment(const LgsAssignment* assignment);
+    void visitIfStmt(LgsIfStmt* ifStmt);
+    void visitSimpleIf(LgsIfStmt* ifStmt);
+    void visitIfWithElse(LgsIfStmt* ifStmt);
+    void visitElseIf(LgsIfStmt* ifStmt);
+    void visitPatternMatching(LgsIfStmt* pm);
+    void visitCoroutine(const LgsCoroutine* coroutine);
+    void visitReturnStmt(LgsReturn* returnStmt);
+    void visitContinueStmt();
+    void visitBreakStmt(const LgsBreak* breakStmt);
+    void visitDeferStmt(const LgsDeferStmt* deferStmt);
+    void visitExpr(LgsExpr* expr);
+    void visitUnaryExpr(LgsUnaryExpr* unaryExpr);
+    void visitBinaryExpr(LgsBinaryExpr* binExpr);
+    void visitCast(LgsCast* lgsCast);
+    void visitLambda(LgsFunc* func);
+    void visitIntConst(LgsIntConst* intConst) const;
+    void visitArrayExpr(LgsArrayExpr* array);
+    void visitHashMap(LgsHashMap* hashMap);
+    void visitVectorExpr(LgsVectorExpr* vec);
+    void visitVariable(LgsVariable* variable);
+    void visitSelection(LgsSelection* selection);
+    void visitFuncCall(LgsFuncCall* funcCall);
+    void visitPrefixExpr(LgsPrefixExpr* prefixExpr);
+    void visitPostfixExpr(LgsPostfixExpr* postfixExpr) const;
+    void visitStrConst(LgsStrConst* strConst) const;
+    void visitInstance(LgsInstance* instance);
+    void initFields(LgsInstance* instance);
+    void visitIterIndex(LgsIterIndex* iterIndex);
 
-    // Blocks
-    BasicBlock* createBlock(const std::string& name, Function* parent = nullptr);
-    void branchIfNeeded(BasicBlock* block);
-    bool lastInstTerminator() const;
+    void generateIf(Value* cond, const std::function<void()>& blockStmtCb);
+    void startBlock(BasicBlock* block);
+    void branchAndStartBlock(BasicBlock* block);
+    void createPrologue(LgsFunc* func) const;
+    void createEpilogue(LgsFunc* func);
+    void freeHeap(const LgsFunc* func);
 
-    // Funcs
-    static FunctionType* getFT(Type* rt, const std::vector<Type*>& params = {}, bool isVariadic = false);
-    Function* getFunc(const std::string& funcName, FunctionType* ft, GlobalValue::LinkageTypes linkage = GlobalValue::ExternalLinkage) const;
-    Value* callFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
-    Value* callLgsFunc(const std::string& funcName, FunctionType* ft, const std::vector<Value*>& args = {});
-
-    // System
-    Value* callMalloc(size_t size);
-    Value* callPrintf(const std::vector<Value*>& args);
-    Value* callSleep(Value* time);
-    Value* callExit(Value* exitCode);
-    Value* callGetEnv(Value* name);
-    Value* callGetPid();
-    Value* callCwd();
-    Value* callCoresNum();
-    Value* callStrLen(Value* str);
-    Value* callSqrt(Value* radicant);
-    void callCopyMem(Value* dest, Value* src, ArrayType* at);
-    void callRuntimeInit();
-
-    // Runtime
-    void callStackPush();
-    void callPopStack();
-    void callDefers();
-    void addDeferFunc(Value* deferFuncPtr, Value* ctx);
-    void addPtrToVtable(Value* instancePtr, Value* name, Value* ptr);
-    Value* getPtrFromVtable(Value* instancePtr, Value* name);
-
-    // Coroutines
-    void addCoro(Value* coroPtr, Value* ctx);
-    void callSpawn(Value* task, Value* ctx);
-    void callYield();
-    void callShutdown();
-
-    // Internal
-    Value* callHashStr(Value* value);
-
-    // Types
-    Type* i1Ty();
-    Type* i8Ty();
-    Type* i16Ty();
-    Type* i32Ty();
-    Type* i64Ty();
-    Type* floatTy();
-    Type* doubleTy();
-    Type* voidTy();
-    Type* iNTy(unsigned n);
-    IntegerType* sizeTy();
-    PointerType* ptrTy();
-
-    // values
-    Value* null();
-    ConstantInt* i1(bool v);
-    ConstantInt* i8(int8_t v);
-    ConstantInt* i16(int16_t v);
-    ConstantInt* i32(int32_t v);
-    ConstantInt* i64(int64_t v);
-    Constant* floatv(float_t v);
-    Constant* doublev(double_t v);
-    ConstantInt* isize(size_t v);
-    ConstantInt* i32Zero();
-    ConstantInt* i64Zero();
-    ConstantInt* sizeZero();
-    ConstantInt* iN(unsigned size, size_t v);
-    TypeSize typeSize(StructType* v) const;
-
-    // Debugging
-    void printPtr(Value* ptr, const std::string& text);
-    void printInt(Value* number, const std::string& text);
-    void printStr(const std::string& str);
-
-    static void initLLVM();
-    static TargetMachine* getTargetMachine();
-    ~LgsCodeGen();
+    Value* getIRValue(LgsValue* value);
+    Value* createConstArray(const LgsArrayExpr* arrayExpr);
+    Value* createDynamicArray(LgsArrayExpr* arrayExpr);
+    Value* loopEnd(const LgsRangeLoop* loop);
+    Value* loopStart(const LgsRangeLoop* loop);
+    Value* getThunkCtx(const LgsFuncCall* fc, Type* ctxTy) const;
+    Type* getThunkCtxType(const LgsFuncCall* fc) const;
+    Function* getThunkFunc(const LgsFuncCall* fc, Type* ctxTy) const;
 };

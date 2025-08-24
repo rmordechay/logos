@@ -7,7 +7,7 @@ class LgsVectorExpr;
 class LgsPrefixExpr;
 class LgsIterator;
 class LgsPostfixExpr;
-class LgsCodeGen;
+class LgsLLVM;
 class LgsFunc;
 class LgsHashMap;
 class LgsFuncCall;
@@ -33,25 +33,25 @@ public:
 
     explicit LgsExpr(LgsType* type) : type(type) {}
     virtual std::string pname() = 0; // pretty name
-    virtual llvm::Value* addIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* subIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* mulIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* divIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* inIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* modIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* eqIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* neIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* ltIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* gtIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* geIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* leIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* andIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* orIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* bitAndIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* bitOrIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* bitXorIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* rshiftIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
-    virtual llvm::Value* lshiftIR(LgsCodeGen& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* addIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* subIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* mulIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* divIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* inIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* modIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* eqIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* neIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* ltIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* gtIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* geIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* leIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* andIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* orIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* bitAndIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* bitOrIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* bitXorIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* rshiftIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
+    virtual llvm::Value* lshiftIR(LgsLLVM& codeGen, LgsExpr* other) = 0;
 
     size_t getConstInt();
     std::string getConstStr();
@@ -74,6 +74,6 @@ public:
     virtual LgsExpr* clone();
     virtual LgsExpr* castTo(LgsType* toType);
     virtual void completeType(LgsType* toType);
-    virtual llvm::Value* hash(LgsCodeGen& codeGen);
+    virtual llvm::Value* hash(LgsLLVM& codeGen);
     ~LgsExpr() override;
 };

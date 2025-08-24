@@ -12,7 +12,7 @@ public:
         isAssignable = true;
     }
 
-    Value* hash(LgsCodeGen& codeGen) override;
+    Value* hash(LgsLLVM& codeGen) override;
     LgsExpr* castTo(LgsType* toType) override;
     std::string pname() override;
     json::value asJSON() override;

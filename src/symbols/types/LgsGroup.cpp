@@ -2,7 +2,7 @@
 
 
 
-Type* LgsGroup::getIRType(LgsCodeGen& codeGen) {
+Type* LgsGroup::getIRType(LgsLLVM& codeGen) {
     return codeGen.ptrTy();
 }
 

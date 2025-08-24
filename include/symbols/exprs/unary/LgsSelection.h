@@ -11,7 +11,7 @@ public:
     LgsExpr* lastExpr() const;
     LgsExpr* lastExprParent() const;
     std::string pname() override;
-    Value* hash(LgsCodeGen& codeGen) override;
+    Value* hash(LgsLLVM& codeGen) override;
     json::value asJSON() override;
     ~LgsSelection() override;
 };

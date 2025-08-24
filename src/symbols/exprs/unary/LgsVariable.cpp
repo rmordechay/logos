@@ -5,9 +5,9 @@
 #include "stmts/LgsField.h"
 #include "stmts/LgsVarDec.h"
 #include "types/LgsTable.h"
-#include <codegen/LgsCodeGen.h>
+#include <codegen/LgsLLVM.h>
 
-Value* LgsVariable::hash(LgsCodeGen& codeGen) {
+Value* LgsVariable::hash(LgsLLVM& codeGen) {
     switch (ref.symbolType) {
     case PARAM:
         return codeGen.callHashStr(ref.param->IRValue);

@@ -9,7 +9,7 @@ public:
     std::vector<LgsVariable*> targetSymbols;
 
     explicit LgsGroup(const std::string& name) : name(name) {}
-    Type* getIRType(LgsCodeGen& codeGen) override;
+    Type* getIRType(LgsLLVM& codeGen) override;
     std::string getName() override;
     LgsExpr* getZeroValue() override;
     std::string pname() override;

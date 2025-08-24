@@ -4,20 +4,20 @@
 #include <exprs/unary/LgsArrayExpr.h>
 #include "types/LgsMap.h"
 
-Value* LgsIterIndex::loadFromDArray(LgsCodeGen& codeGen, const LgsDArray* arr) const {
+Value* LgsIterIndex::loadFromDArray(LgsLLVM& codeGen, const LgsDArray* arr) const {
     const auto arrPtr = baseExpr->IRValue;
     auto indexIRValue = index->from->IRValue;
     indexIRValue = codeGen.builder.CreateZExt(indexIRValue, codeGen.i64Ty());
     return arr->getFunc->callIR(codeGen, {arrPtr, indexIRValue});
 }
 
-Value* LgsIterIndex::loadFromMap(LgsCodeGen& codeGen, const LgsMap* map) const {
+Value* LgsIterIndex::loadFromMap(LgsLLVM& codeGen, const LgsMap* map) const {
     const auto mapPtr = baseExpr->IRValue;
     const auto key = index->from->IRValue;
     return map->getFunc->callIR(codeGen, {mapPtr, key});
 }
 
-Value* LgsIterIndex::loadFromStr(LgsCodeGen& codeGen, const LgsStr* str) const {
+Value* LgsIterIndex::loadFromStr(LgsLLVM& codeGen, const LgsStr* str) const {
     if (index->to) return createStrSlice(codeGen, str);
     auto& builder = codeGen.builder;
     const auto baseExprIRValue = baseExpr->IRValue;
@@ -28,21 +28,21 @@ Value* LgsIterIndex::loadFromStr(LgsCodeGen& codeGen, const LgsStr* str) const {
     return builder.CreateLoad(baseExprIRType, ptr);
 }
 
-Value* LgsIterIndex::loadFromVec(LgsCodeGen& codeGen) const {
+Value* LgsIterIndex::loadFromVec(LgsLLVM& codeGen) const {
     const auto ptr = baseExpr->IRValue;
     const auto vec = codeGen.builder.CreateLoad(baseExpr->type->getIRType(codeGen), ptr);
     const auto i = index->from->IRValue;
     return codeGen.builder.CreateExtractElement(vec, i);
 }
 
-Value* LgsIterIndex::createStrSlice(LgsCodeGen& codeGen, const LgsStr* str) const {
+Value* LgsIterIndex::createStrSlice(LgsLLVM& codeGen, const LgsStr* str) const {
     const auto intFrom = index->from->asIntConst();
     const auto intTo = index->to->asIntConst();
     const auto strConst = baseExpr->getConstStr();
     return codeGen.getIRStr(strConst.substr(intFrom->value, intTo->value));
 }
 
-Value* LgsIterIndex::loadFromSArray(LgsCodeGen& codeGen) const {
+Value* LgsIterIndex::loadFromSArray(LgsLLVM& codeGen) const {
     std::vector<Value*> IRIndices = {};
     Type* ty = nullptr;
     Value* ptr = nullptr;
@@ -64,7 +64,7 @@ Value* LgsIterIndex::loadFromSArray(LgsCodeGen& codeGen) const {
     return codeGen.builder.CreateGEP(ty, ptr, IRIndices);
 }
 
-Value* LgsIterIndex::getStrGEP(LgsCodeGen& codeGen) const {
+Value* LgsIterIndex::getStrGEP(LgsLLVM& codeGen) const {
     const auto ty = baseExpr->type->getIRType(codeGen);
     const auto value = baseExpr->IRValue;
     const auto iValue = index->from->IRValue;

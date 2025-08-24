@@ -5,7 +5,7 @@
 #include "types/LgsInterface.h"
 #include "utils/LgsUtils.h"
 
-Type* LgsObject::getIRType(LgsCodeGen& codeGen) {
+Type* LgsObject::getIRType(LgsLLVM& codeGen) {
     if (IRType) return IRType;
     std::vector<Type*> elementTypes;
     elementTypes.reserve(fields.size());
@@ -63,7 +63,7 @@ LgsFunc* LgsObject::getMethod(const std::string& methodName) {
     return nullptr;
 }
 
-void LgsObject::freeValue(LgsCodeGen& codeGen, Value* value) {
+void LgsObject::freeValue(LgsLLVM& codeGen, Value* value) {
     codeGen.builder.CreateFree(value);
 }
 

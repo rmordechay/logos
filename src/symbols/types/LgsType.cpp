@@ -32,7 +32,7 @@ LgsFunc* LgsType::getMethod(const std::string& name) {
     return nullptr;
 }
 
-DIBasicType* LgsType::getDebugType(LgsCodeGen& codeGen) {
+DIBasicType* LgsType::getDebugType(LgsLLVM& codeGen) {
     assert(0);
 }
 
@@ -55,7 +55,7 @@ bool LgsType::isBig() {
     return (asObject() || asDArray()) && getSizeBytes() >= BIG_SIZE_THRESHOLD;
 }
 
-void LgsType::freeValue(LgsCodeGen& codeGen, Value* value) {}
+void LgsType::freeValue(LgsLLVM& codeGen, Value* value) {}
 LgsType* LgsType::clone() { if (isPrimitive || isVoid()) return this; assert(0); }
 LgsBool* LgsType::asBool() { return dynamic_cast<LgsBool*>(this); }
 LgsChar* LgsType::asChar() { return dynamic_cast<LgsChar*>(this); }

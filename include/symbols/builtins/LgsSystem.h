@@ -19,20 +19,20 @@ public:
 
     explicit LgsSystem() : LgsObject(name) {
         getEnvFunc->funcType->params[2].expr = new LgsNull();
-        pidFunc->fn = [](LgsCodeGen& codeGen, const std::vector<LgsExpr*>&) {
+        pidFunc->fn = [](LgsLLVM& codeGen, const std::vector<LgsExpr*>&) {
             return codeGen.callGetPid();
         };
-        sleepFunc->fn = [](LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
+        sleepFunc->fn = [](LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) {
             const auto arg = LgsFunc::loadIRArg(&codeGen, args[1]->IRValue, args[1]->type);
             return codeGen.callSleep(arg);
         };
-        exitFunc->fn = [](LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
+        exitFunc->fn = [](LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) {
             return codeGen.callExit(args[1]->IRValue);
         };
-        cwdFunc->fn = [](LgsCodeGen& codeGen, const std::vector<LgsExpr*>&) {
+        cwdFunc->fn = [](LgsLLVM& codeGen, const std::vector<LgsExpr*>&) {
             return codeGen.callCwd();
         };
-        coresNumFunc->fn = [](LgsCodeGen& codeGen, const std::vector<LgsExpr*>&) {
+        coresNumFunc->fn = [](LgsLLVM& codeGen, const std::vector<LgsExpr*>&) {
             return codeGen.callCoresNum();
         };
         addMethod(pidFunc);

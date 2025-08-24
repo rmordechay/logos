@@ -9,19 +9,19 @@ public:
     explicit LgsUIntConst(const int value) : LgsUnaryExpr(&LGS_UINT), value(value) {}
     std::string pname() override;
     json::value asJSON() override;
-    Value* eqIR(LgsCodeGen& codeGen, LgsExpr* other) override;
-    Value* neIR(LgsCodeGen& codeGen, LgsExpr* other) override;
-    Value* gtIR(LgsCodeGen& codeGen, LgsExpr* other) override;
-    Value* ltIR(LgsCodeGen& codeGen, LgsExpr* other) override;
-    Value* geIR(LgsCodeGen& codeGen, LgsExpr* other) override;
-    Value* leIR(LgsCodeGen& codeGen, LgsExpr* other) override;
-    Value* andIR(LgsCodeGen& codeGen, LgsExpr* other) override;
-    Value* orIR(LgsCodeGen& codeGen, LgsExpr* other) override;
-    Value* bitAndIR(LgsCodeGen& codeGen, LgsExpr* other) override;
-    Value* bitOrIR(LgsCodeGen& codeGen, LgsExpr* other) override;
-    Value* bitXorIR(LgsCodeGen& codeGen, LgsExpr* other) override;
-    Value* rshiftIR(LgsCodeGen& codeGen, LgsExpr* other) override;
-    Value* lshiftIR(LgsCodeGen& codeGen, LgsExpr* other) override;
+    Value* eqIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* neIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* gtIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* ltIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* geIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* leIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* andIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* orIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* bitAndIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* bitOrIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* bitXorIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* rshiftIR(LgsLLVM& codeGen, LgsExpr* other) override;
+    Value* lshiftIR(LgsLLVM& codeGen, LgsExpr* other) override;
     ~LgsUIntConst() override = default;
 };
 

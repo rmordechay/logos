@@ -1,6 +1,6 @@
 #include "types/LgsFuncType.h"
 #include "configs/LgsDefinitions.h"
-#include "codegen/LgsCodeGen.h"
+#include "codegen/LgsLLVM.h"
 #include "utils/LgsUtils.h"
 
 void LgsFuncType::setFuncOptions(const uint32_t ops) {
@@ -14,7 +14,7 @@ void LgsFuncType::setFuncOptions(const uint32_t ops) {
     isMethod = ops & METHOD;
 }
 
-Type* LgsFuncType::getIRType(LgsCodeGen& codeGen) {
+Type* LgsFuncType::getIRType(LgsLLVM& codeGen) {
     std::vector<Type*> IRParamsTypes;
     for (int i = 0; i < params.size(); ++i) {
         const auto param = params[i];

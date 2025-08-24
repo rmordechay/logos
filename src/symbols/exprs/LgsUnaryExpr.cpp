@@ -1,100 +1,100 @@
 #include "exprs/unary/LgsUnaryExpr.h"
 #include "LgsType.h"
-#include "codegen/LgsCodeGen.h"
+#include "codegen/LgsLLVM.h"
 
 
-Value* LgsUnaryExpr::addIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::addIR(LgsLLVM& codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(&codeGen, other);
     if (l->getType()->isFloatingPointTy()) return codeGen.builder.CreateFAdd(l, r);
     return codeGen.builder.CreateAdd(l, r);
 }
 
-Value* LgsUnaryExpr::subIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::subIR(LgsLLVM& codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(&codeGen, other);
     if (l->getType()->isFloatingPointTy()) return codeGen.builder.CreateFSub(l, r);
     return codeGen.builder.CreateSub(l, r);
 }
 
-Value* LgsUnaryExpr::mulIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::mulIR(LgsLLVM& codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(&codeGen, other);
     if (l->getType()->isFloatingPointTy()) return codeGen.builder.CreateFMul(l, r);
     return codeGen.builder.CreateMul(l, r);
 }
 
-Value* LgsUnaryExpr::divIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::divIR(LgsLLVM& codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(&codeGen, other);
     if (l->getType()->isFloatingPointTy()) return codeGen.builder.CreateFDiv(l, r);
     return codeGen.builder.CreateSDiv(l, r);
 }
 
-Value* LgsUnaryExpr::inIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::inIR(LgsLLVM& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUnaryExpr::modIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::modIR(LgsLLVM& codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(&codeGen, other);
     return codeGen.builder.CreateSRem(l, r);
 }
 
-Value* LgsUnaryExpr::eqIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::eqIR(LgsLLVM& codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(&codeGen, other);
     return codeGen.builder.CreateICmpEQ(l, r);
 }
 
-Value* LgsUnaryExpr::neIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::neIR(LgsLLVM& codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(&codeGen, other);
     return codeGen.builder.CreateICmpNE(l, r);
 }
 
-Value* LgsUnaryExpr::ltIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::ltIR(LgsLLVM& codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(&codeGen, other);
     return codeGen.builder.CreateICmpSLT(l, r);
 }
 
-Value* LgsUnaryExpr::gtIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::gtIR(LgsLLVM& codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(&codeGen, other);
     return codeGen.builder.CreateICmpSGT(l, r);
 }
 
-Value* LgsUnaryExpr::geIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::geIR(LgsLLVM& codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(&codeGen, other);
     return codeGen.builder.CreateICmpSGE(l, r);
 }
 
-Value* LgsUnaryExpr::leIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::leIR(LgsLLVM& codeGen, LgsExpr* other) {
     auto [l, r] = loadExprs(&codeGen, other);
     return codeGen.builder.CreateICmpSLE(l, r);
 }
 
-Value* LgsUnaryExpr::andIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::andIR(LgsLLVM& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUnaryExpr::orIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::orIR(LgsLLVM& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUnaryExpr::bitAndIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::bitAndIR(LgsLLVM& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUnaryExpr::bitOrIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::bitOrIR(LgsLLVM& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUnaryExpr::bitXorIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::bitXorIR(LgsLLVM& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUnaryExpr::rshiftIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::rshiftIR(LgsLLVM& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUnaryExpr::lshiftIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUnaryExpr::lshiftIR(LgsLLVM& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-std::pair<Value*, Value*> LgsUnaryExpr::loadExprs(LgsCodeGen* codeGen, LgsExpr* rExpr) {
+std::pair<Value*, Value*> LgsUnaryExpr::loadExprs(LgsLLVM* codeGen, LgsExpr* rExpr) {
     auto l = this->IRValue;
     auto r = rExpr->IRValue;
     if (l->getType()->isPointerTy()) {

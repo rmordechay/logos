@@ -53,7 +53,7 @@ set(CORE_SOURCES
     src/parser/LogosLexer.cpp
     src/parser/LogosParser.cpp
     src/utils/LgsUtils.cpp
-    src/codegen/LgsCodeGen.cpp
+    src/codegen/LgsLLVM.cpp
     src/files/LgsInterfaceFile.cpp
     src/utils/LgsErrHandler.cpp
     src/symbols/types/LgsTable.cpp
@@ -126,8 +126,8 @@ set(CORE_SOURCES
     src/symbols/types/primitives/LgsShort.cpp
     src/symbols/types/primitives/LgsSize.cpp
     src/symbols/types/primitives/LgsUInt.cpp
-    src/codegen/LgsCodeGenVisitor.cpp
-    include/codegen/LgsCodeGenVisitor.h
+    src/codegen/LgsCodeGen.cpp
+    include/codegen/LgsCodeGen.h
 )
 
 set(RUNTIME_SOURCES

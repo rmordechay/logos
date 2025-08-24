@@ -8,7 +8,7 @@
 
 class LgsAppFile;
 class LogosParser;
-class LgsCodeGen;
+class LgsLLVM;
 class LgsStrConst;
 class LgsFile;
 class LgsEnvFile;

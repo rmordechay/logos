@@ -11,7 +11,7 @@ size_t LgsShort::getSizeBytes() {
     return sizeof(short);
 }
 
-Type* LgsShort::getIRType(LgsCodeGen& codeGen) {
+Type* LgsShort::getIRType(LgsLLVM& codeGen) {
     return codeGen.i16Ty();
 }
 

@@ -1,10 +1,10 @@
 #include "loops/LgsWhileLoop.h"
 
 #include "exprs/LgsExpr.h"
-#include "codegen/LgsCodeGen.h"
+#include "codegen/LgsLLVM.h"
 #include "stmts/LgsStmtsBlock.h"
 
-void LgsWhileLoop::incAndJumpToCond(LgsCodeGen& codeGen) const {
+void LgsWhileLoop::incAndJumpToCond(LgsLLVM& codeGen) const {
     if (codeGen.lastInstTerminator()) return;
     codeGen.builder.CreateBr(IRCondBlock);
 }

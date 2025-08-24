@@ -5,11 +5,11 @@ void LgsValue::setIRValue(Value* value) {
     IRValue = value;
 }
 
-void LgsValue::setDebugValue(LgsCodeGen& codeGen) {
+void LgsValue::setDebugValue(LgsLLVM& codeGen) {
     assert(0);
 }
 
-DILocation* LgsValue::getDebugLoc(LgsCodeGen& codeGen) const {
+DILocation* LgsValue::getDebugLoc(LgsLLVM& codeGen) const {
     return DILocation::get(
         codeGen.context,
         location.lineStart,

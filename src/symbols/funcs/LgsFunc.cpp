@@ -8,7 +8,7 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/Module.h>
 
-Value* LgsFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
+Value* LgsFunc::call(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) {
     if (fn) return fn(codeGen, args);
     std::vector<Value*> IRArgs;
     if (funcType->hasDefaults) {
@@ -24,7 +24,7 @@ Value* LgsFunc::call(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) {
     return callIR(codeGen, IRArgs);
 }
 
-Value* LgsFunc::callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args) {
+Value* LgsFunc::callIR(LgsLLVM& codeGen, const std::vector<Value*>& args) {
     CallInst* rv = nullptr;
     if (IRValue) {
         const auto funcTypeIR = funcType->getIRType(codeGen);
@@ -37,7 +37,7 @@ Value* LgsFunc::callIR(LgsCodeGen& codeGen, const std::vector<Value*>& args) {
     return rv;
 }
 
-void LgsFunc::setIRArgs(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args, std::vector<Value*>& IRArgs) const {
+void LgsFunc::setIRArgs(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args, std::vector<Value*>& IRArgs) const {
     for (int i = 0; i < args.size(); ++i) {
         auto arg = args[i];
         const auto& param = funcType->params[i];
@@ -53,7 +53,7 @@ void LgsFunc::setIRArgs(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args, 
     }
 }
 
-Value* LgsFunc::loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type) {
+Value* LgsFunc::loadIRArg(LgsLLVM* codeGen, Value* v, LgsType* type) {
     if (type->asCPtr() || type->asFuncType() || type->asObject() || type->asDArray() || type->asSArray()) return v;
     const auto vTy = v->getType();
     if (vTy->isIntegerTy() || vTy->isFloatingPointTy()) return v;
@@ -63,7 +63,7 @@ Value* LgsFunc::loadIRArg(LgsCodeGen* codeGen, Value* v, LgsType* type) {
     return codeGen->builder.CreateLoad(ty, v);
 }
 
-Function* LgsFunc::getIRFunc(LgsCodeGen& codeGen) {
+Function* LgsFunc::getIRFunc(LgsLLVM& codeGen) {
     auto funcName = funcType->getName();
     auto IRFunc = codeGen.IRModule->getFunction(funcName);
     if (IRFunc) return IRFunc;
@@ -111,7 +111,7 @@ void LgsFunc::completeType(LgsType* toType) {
     }
 }
 
-BasicBlock* LgsFunc::getCleanupBlock(LgsCodeGen& codeGen) {
+BasicBlock* LgsFunc::getCleanupBlock(LgsLLVM& codeGen) {
     if (cleanupBlock) return cleanupBlock;
     cleanupBlock = codeGen.createBlock(BLOCK_NAME_CLEANUP);
     return cleanupBlock;
@@ -139,7 +139,7 @@ LgsExpr* LgsFunc::clone() {
     return newFunc;
 }
 
-void LgsFunc::setDebugValue(LgsCodeGen& codeGen) {
+void LgsFunc::setDebugValue(LgsLLVM& codeGen) {
     const auto diBuilder = codeGen.diBuilder;
     const auto dbInt32 = funcType->rt->getDebugType(codeGen);
     const auto parameterTypes = diBuilder->getOrCreateTypeArray({dbInt32});

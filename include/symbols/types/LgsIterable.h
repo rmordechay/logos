@@ -2,7 +2,7 @@
 #include "LgsType.h"
 #include "utils/LgsUtils.h"
 
-class LgsCodeGen;
+class LgsLLVM;
 class LgsVarDec;
 struct LgsIndex;
 struct CodegenMetadata;
@@ -14,15 +14,15 @@ public:
 
     explicit LgsIterable(LgsType* baseType = nullptr) : baseType(baseType) {}
     virtual LgsType* getIndexType() = 0;
-    virtual Value* loadWithIndex(LgsCodeGen* codeGen);
+    virtual Value* loadWithIndex(LgsLLVM* codeGen);
     virtual uint16_t getUnpackCount() const = 0;
-    virtual Value* IRLength(LgsCodeGen& codeGen, LgsExpr* iterable) = 0;
-    virtual Value* IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) = 0;
-    virtual Value* IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) = 0;
+    virtual Value* IRLength(LgsLLVM& codeGen, LgsExpr* iterable) = 0;
+    virtual Value* IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) = 0;
+    virtual Value* IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) = 0;
     ~LgsIterable() override;
 };
 
-inline Value* LgsIterable::loadWithIndex(LgsCodeGen* codeGen) {
+inline Value* LgsIterable::loadWithIndex(LgsLLVM* codeGen) {
     assert(0);
 }
 

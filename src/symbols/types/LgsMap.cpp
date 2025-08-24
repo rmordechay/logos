@@ -2,7 +2,7 @@
 #include "exprs/unary/LgsHashMap.h"
 #include "stmts/LgsVarDec.h"
 
-Value* LgsMap::callAdd(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) const {
+Value* LgsMap::callAdd(LgsLLVM& codeGen, const std::vector<LgsExpr*>& args) const {
     const auto arr = args[0];
     const auto keyIR = args[1]->IRValue;
     const auto value = args[2];
@@ -14,7 +14,7 @@ Value* LgsMap::callAdd(LgsCodeGen& codeGen, const std::vector<LgsExpr*>& args) c
     return addFunc->callIR(codeGen, {arrPtr, keyIR, ptr});
 }
 
-Type* LgsMap::getIRType(LgsCodeGen& codeGen) {
+Type* LgsMap::getIRType(LgsLLVM& codeGen) {
     return getMapStruct(codeGen);
 }
 
@@ -46,19 +46,19 @@ uint16_t LgsMap::getUnpackCount() const {
     return 2;
 }
 
-Value* LgsMap::IRLength(LgsCodeGen& codeGen, LgsExpr* iterable) {
+Value* LgsMap::IRLength(LgsLLVM& codeGen, LgsExpr* iterable) {
     return codeGen.i32(1024);
 }
 
-Value* LgsMap::IRIsEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
+Value* LgsMap::IRIsEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
     return isEmptyFunc->call(*codeGen, {iterable});
 }
 
-Value* LgsMap::IRIsNotEmpty(LgsCodeGen* codeGen, LgsExpr* iterable) {
+Value* LgsMap::IRIsNotEmpty(LgsLLVM* codeGen, LgsExpr* iterable) {
     return isNotEmptyFunc->call(*codeGen, {iterable});
 }
 
-StructType* LgsMap::getMapStruct(LgsCodeGen& codeGen) {
+StructType* LgsMap::getMapStruct(LgsLLVM& codeGen) {
     const std::vector<Type*> mapStructFields = {codeGen.ptrTy(), codeGen.i64Ty(), codeGen.i64Ty()};
     mapStruct = codeGen.getStructType(mapStructFields, name);
     return mapStruct;
@@ -72,7 +72,7 @@ bool LgsMap::canCastTo(LgsType* other) {
     return keyEqual && typePair->value->canCastTo(otherKvType->value);
 }
 
-void LgsMap::freeValue(LgsCodeGen& codeGen, Value* value) {
+void LgsMap::freeValue(LgsLLVM& codeGen, Value* value) {
     freeFunc->callIR(codeGen, {value});
 }
 

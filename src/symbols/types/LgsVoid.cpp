@@ -7,7 +7,7 @@ std::string LgsVoid::pname() {
     return name;
 }
 
-Type* LgsVoid::getIRType(LgsCodeGen& codeGen) {
+Type* LgsVoid::getIRType(LgsLLVM& codeGen) {
     return Type::getVoidTy(codeGen.context);
 }
 

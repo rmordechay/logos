@@ -1,6 +1,6 @@
 #include "stmts/LgsBreak.h"
 
-#include "codegen/LgsCodeGen.h"
+#include "codegen/LgsLLVM.h"
 #include "loops/LgsForLoop.h"
 #include "stmts/LgsIfStmt.h"
 

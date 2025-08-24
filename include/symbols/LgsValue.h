@@ -11,7 +11,7 @@ namespace llvm {
 
 class LgsVariable;
 class LgsExpr;
-class LgsCodeGen;
+class LgsLLVM;
 class LgsFunc;
 
 class LgsValue {
@@ -20,8 +20,8 @@ public:
     LgsLocation location{0, 0, 0};
 
     void setIRValue(llvm::Value* value);
-    virtual void setDebugValue(LgsCodeGen& codeGen);
+    virtual void setDebugValue(LgsLLVM& codeGen);
     virtual json::value asJSON() = 0;
     virtual ~LgsValue() = default;
-    llvm::DILocation* getDebugLoc(LgsCodeGen& codeGen) const;
+    llvm::DILocation* getDebugLoc(LgsLLVM& codeGen) const;
 };

@@ -9,7 +9,7 @@
 #include "builtins/LgsPrint.h"
 #include "builtins/LgsSystem.h"
 #include "files/LgsEnvFile.h"
-#include "codegen/LgsCodeGenVisitor.h"
+#include "codegen/LgsCodeGen.h"
 #include "codegen/LgsLinker.h"
 #include "utils/LgsUtils.h"
 #include "llvm/IR/Verifier.h"
@@ -77,10 +77,10 @@ bool LgsApp::analyse() {
 
 bool LgsApp::generate() {
     initBuild();
-    const auto targetMachine = LgsCodeGen::getTargetMachine();
+    const auto targetMachine = LgsLLVM::getTargetMachine();
     for (const auto& file : ast) {
         threadPool.runTask([this, file, targetMachine] {
-            LgsCodeGenVisitor code(*file);
+            LgsCodeGen code(*file);
             code.generate(configs, *targetMachine);
         });
     }
@@ -154,7 +154,7 @@ void LgsApp::parseSrcFile(const fs::path& filePath) {
 void LgsApp::initBuild() {
     fs::create_directories(paths.buildDir);
     fs::create_directories(paths.buildIR);
-    LgsCodeGen::initLLVM();
+    LgsLLVM::initLLVM();
     paths.objFilePath = paths.buildDir / (configs.name + ".o");
     paths.execFilePath = paths.buildDir / configs.name;
 }

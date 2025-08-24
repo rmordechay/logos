@@ -1,5 +1,5 @@
 #define TABLE_FIELDS_MAX 1024
-#include "codegen/LgsCodeGen.h"
+#include "codegen/LgsLLVM.h"
 
 struct Lgs_Table_Field {
     const char* name;

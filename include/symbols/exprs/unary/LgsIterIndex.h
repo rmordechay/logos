@@ -14,13 +14,13 @@ public:
         isAssignable = true;
     }
 
-    Value* loadFromDArray(LgsCodeGen& codeGen, const LgsDArray* arr) const;
-    Value* loadFromMap(LgsCodeGen& codeGen, const LgsMap* map) const;
-    Value* loadFromStr(LgsCodeGen& codeGen, const LgsStr* str) const;
-    Value* loadFromVec(LgsCodeGen& codeGen) const;
-    Value* createStrSlice(LgsCodeGen& codeGen, const LgsStr* str) const;
-    Value* loadFromSArray(LgsCodeGen& codeGen) const;
-    Value* getStrGEP(LgsCodeGen& codeGen) const;
+    Value* loadFromDArray(LgsLLVM& codeGen, const LgsDArray* arr) const;
+    Value* loadFromMap(LgsLLVM& codeGen, const LgsMap* map) const;
+    Value* loadFromStr(LgsLLVM& codeGen, const LgsStr* str) const;
+    Value* loadFromVec(LgsLLVM& codeGen) const;
+    Value* createStrSlice(LgsLLVM& codeGen, const LgsStr* str) const;
+    Value* loadFromSArray(LgsLLVM& codeGen) const;
+    Value* getStrGEP(LgsLLVM& codeGen) const;
     std::string pname() override;
     json::value asJSON() override;
     ~LgsIterIndex() override;

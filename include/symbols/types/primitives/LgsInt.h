@@ -11,7 +11,7 @@ public:
         isInt = true;
     }
     size_t getSizeBytes() override;
-    llvm::Type* getIRType(LgsCodeGen& codeGen) override;
+    llvm::Type* getIRType(LgsLLVM& codeGen) override;
     LgsExpr* getZeroValue() override;
     bool canCastTo(LgsType* other) override;
     std::string strFormatPart() const override;
@@ -19,7 +19,7 @@ public:
     std::string pname() override;
     json::value asJSON() override;
     LgsType* clone() override;
-    llvm::DIBasicType* getDebugType(LgsCodeGen& codeGen) override;
+    llvm::DIBasicType* getDebugType(LgsLLVM& codeGen) override;
 };
 
 inline LgsInt LGS_INT;

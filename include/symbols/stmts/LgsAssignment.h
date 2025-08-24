@@ -29,13 +29,13 @@ public:
     LgsAssignType assignmentType;
 
     LgsAssignment(const LgsAssignType assignmentType, LgsExpr* lValue, LgsExpr* rValue) : lValue(lValue), rValue(rValue), assignmentType(assignmentType) {}
-    void createIRAssignment(LgsCodeGen& codeGen) const;
-    static void assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, LgsCodeGen* codeGen);
-    static void assignArrayToIterIndex(LgsCodeGen* codeGen, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr);
-    static void assignToSelection(LgsCodeGen* codeGen, LgsSelection* selection, LgsExpr* expr);
-    static void assignToVariable(LgsCodeGen* codeGen, LgsVariable* variable, LgsExpr* expr);
-    static void assignScalarToIterIndex(LgsCodeGen& codeGen, LgsIterIndex* iterIndex, LgsExpr* expr);
-    static void assignHashMapToIterIndex(LgsCodeGen* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map);
+    void createIRAssignment(LgsLLVM& codeGen) const;
+    static void assignToIterIndex(LgsIterIndex* iterIndex, LgsExpr* expr, LgsLLVM* codeGen);
+    static void assignArrayToIterIndex(LgsLLVM* codeGen, const LgsIterIndex* iterIndex, const LgsArrayExpr* arr);
+    static void assignToSelection(LgsLLVM* codeGen, LgsSelection* selection, LgsExpr* expr);
+    static void assignToVariable(LgsLLVM* codeGen, LgsVariable* variable, LgsExpr* expr);
+    static void assignScalarToIterIndex(LgsLLVM& codeGen, LgsIterIndex* iterIndex, LgsExpr* expr);
+    static void assignHashMapToIterIndex(LgsLLVM* codeGen, LgsIterIndex* iterIndex, LgsHashMap* map);
     json::value asJSON() override;
     ~LgsAssignment() override;
 };

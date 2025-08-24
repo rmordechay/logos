@@ -10,7 +10,7 @@ json::value LgsUIntConst::asJSON() {
     assert(0);
 }
 
-Value* LgsUIntConst::eqIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUIntConst::eqIR(LgsLLVM& codeGen, LgsExpr* other) {
     const auto otherIRValue = other->IRValue;
     const auto thisIRValue = IRValue;
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -19,7 +19,7 @@ Value* LgsUIntConst::eqIR(LgsCodeGen& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUIntConst::neIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUIntConst::neIR(LgsLLVM& codeGen, LgsExpr* other) {
     const auto otherIRValue = other->IRValue;
     const auto thisIRValue = IRValue;
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -28,7 +28,7 @@ Value* LgsUIntConst::neIR(LgsCodeGen& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUIntConst::gtIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUIntConst::gtIR(LgsLLVM& codeGen, LgsExpr* other) {
     const auto otherIRValue = other->IRValue;
     const auto thisIRValue = IRValue;
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -37,7 +37,7 @@ Value* LgsUIntConst::gtIR(LgsCodeGen& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUIntConst::ltIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUIntConst::ltIR(LgsLLVM& codeGen, LgsExpr* other) {
     const auto otherIRValue = other->IRValue;
     const auto thisIRValue = IRValue;
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -46,7 +46,7 @@ Value* LgsUIntConst::ltIR(LgsCodeGen& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUIntConst::geIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUIntConst::geIR(LgsLLVM& codeGen, LgsExpr* other) {
     const auto otherIRValue = other->IRValue;
     const auto thisIRValue = IRValue;
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -55,7 +55,7 @@ Value* LgsUIntConst::geIR(LgsCodeGen& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUIntConst::leIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUIntConst::leIR(LgsLLVM& codeGen, LgsExpr* other) {
     const auto otherIRValue = other->IRValue;
     const auto thisIRValue = IRValue;
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -64,18 +64,18 @@ Value* LgsUIntConst::leIR(LgsCodeGen& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUIntConst::andIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUIntConst::andIR(LgsLLVM& codeGen, LgsExpr* other) {
     const auto otherIRValue = other->IRValue;
     const auto thisIRValue = IRValue;
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {}
     assert(0);
 }
 
-Value* LgsUIntConst::orIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUIntConst::orIR(LgsLLVM& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUIntConst::bitAndIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUIntConst::bitAndIR(LgsLLVM& codeGen, LgsExpr* other) {
     const auto otherIRValue = other->IRValue;
     const auto thisIRValue = IRValue;
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -84,7 +84,7 @@ Value* LgsUIntConst::bitAndIR(LgsCodeGen& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUIntConst::bitOrIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUIntConst::bitOrIR(LgsLLVM& codeGen, LgsExpr* other) {
     const auto otherIRValue = other->IRValue;
     const auto thisIRValue = IRValue;
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -93,7 +93,7 @@ Value* LgsUIntConst::bitOrIR(LgsCodeGen& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUIntConst::bitXorIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUIntConst::bitXorIR(LgsLLVM& codeGen, LgsExpr* other) {
     const auto otherIRValue = other->IRValue;
     const auto thisIRValue = IRValue;
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -102,7 +102,7 @@ Value* LgsUIntConst::bitXorIR(LgsCodeGen& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUIntConst::rshiftIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUIntConst::rshiftIR(LgsLLVM& codeGen, LgsExpr* other) {
     const auto otherIRValue = other->IRValue;
     const auto thisIRValue = IRValue;
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
@@ -111,7 +111,7 @@ Value* LgsUIntConst::rshiftIR(LgsCodeGen& codeGen, LgsExpr* other) {
     assert(0);
 }
 
-Value* LgsUIntConst::lshiftIR(LgsCodeGen& codeGen, LgsExpr* other) {
+Value* LgsUIntConst::lshiftIR(LgsLLVM& codeGen, LgsExpr* other) {
     const auto otherIRValue = other->IRValue;
     const auto thisIRValue = IRValue;
     if (thisIRValue->getType()->isIntegerTy() && otherIRValue->getType()->isIntegerTy()) {
