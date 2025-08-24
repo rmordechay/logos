@@ -80,6 +80,7 @@ public:
     LgsEnum* getEnum(LogosParser::EnumDeclarationContext* ctx);
     LgsExpr* getExpr(LogosParser::ExprContext* ctx);
     LgsExpr* getCast(LogosParser::ExprContext* ctx);
+    LgsUnaryExpr* getJSON(LogosParser::JsonContext* json);
     LgsUnaryExpr* getUnaryExpr(LogosParser::UnaryExprContext* ctx);
     LgsExpr* getBinaryExpr(LogosParser::ExprContext* ctx);
     LgsUnaryExpr* getPrefixExpr(LogosParser::PrefixExprContext* ctx);

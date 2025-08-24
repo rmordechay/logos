@@ -715,6 +715,10 @@ LgsExpr* LgsParserAdapter::getCast(LogosParser::ExprContext* ctx) {
     return new LgsCast(castToType, castFromValue);
 }
 
+LgsUnaryExpr* LgsParserAdapter::getJSON(LogosParser::JsonContext* json) {
+    assert(0);
+}
+
 LgsUnaryExpr* LgsParserAdapter::getUnaryExpr(LogosParser::UnaryExprContext* ctx) {
     if (const auto variable = ctx->IDENTIFIER()) return getVariable(variable);
     if (const auto funcCall = ctx->funcCall()) return getFuncCall(funcCall);
@@ -731,11 +735,8 @@ LgsUnaryExpr* LgsParserAdapter::getUnaryExpr(LogosParser::UnaryExprContext* ctx)
     if (const auto null = ctx->NULL_()) return getNullValue(null);
     if (const auto isFirst = ctx->isFirst()) return getLoopIsFirst(isFirst);
     if (const auto isLast = ctx->isLast()) return getLoopIsLast(isLast);
-    LgsLocation location;
-    location.fileID = fileID;
-    setLocation(location, ctx->start);
-    errHandler.addError(E10006, &location, {ctx->getText()});
-    return nullptr;
+    if (const auto json = ctx->json()) return getJSON(json);
+    assert(0);
 }
 
 LgsOperator mapOperator(LogosParser::ExprContext* expr) {

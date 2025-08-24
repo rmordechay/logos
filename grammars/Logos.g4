@@ -202,6 +202,7 @@ unaryExpr:
     |   postfixExpr
     |   lambda
     |   prefixExpr
+    |   'json'json
     |   instance
     |   constant
     |   iterIndex
@@ -362,6 +363,32 @@ assignemntOp:
     |   EQUAL_DOUBLE_LANGLE
     ;
 
+// JSON
+json:
+        STRING
+    |   INTEGER
+    |   FLOAT
+    |   BOOL
+    |   NULL
+    |   jsonObj
+    |   jsonArray
+    ;
+
+jsonObj:
+        LBRACE jsonPair (COMMA jsonPair)* RBRACE
+    |   LBRACE RBRACE
+    ;
+
+jsonPair:
+        STRING COLON json
+    ;
+
+jsonArray:
+        LBRACK json (COMMA json)* RBRACK
+    |   LBRACK RBRACK
+    ;
+
+// Token
 DOUBLE_EQUAL: '==';
 NOT_EQUAL: '!=';
 GE: '>=';
