@@ -76,6 +76,16 @@ void LgsLLVM::branchIfNeeded(BasicBlock* block) {
     }
 }
 
+void LgsLLVM::startBlock(BasicBlock* block, Function* func) {
+    block->insertInto(func);
+    builder.SetInsertPoint(block);
+}
+
+void LgsLLVM::branchAndStartBlock(BasicBlock* block, Function* func) {
+    branchIfNeeded(block);
+    startBlock(block, func);
+}
+
 bool LgsLLVM::lastInstTerminator() const {
     return builder.GetInsertBlock()->getTerminator();
 }

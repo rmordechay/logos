@@ -42,6 +42,8 @@ public:
     // Blocks
     BasicBlock* createBlock(const std::string& name, Function* parent = nullptr);
     void branchIfNeeded(BasicBlock* block);
+    void startBlock(BasicBlock* block, Function* func);
+    void branchAndStartBlock(BasicBlock* block, Function* func);
     bool lastInstTerminator() const;
 
     // Funcs

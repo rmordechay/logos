@@ -54,6 +54,7 @@ public:
     LgsFile& file;
     LgsStack stack;
     LgsLLVM& cg;
+    Function* currentIRFunc = nullptr;
 
     explicit LgsCodeGen(LgsFile& file) : file(file), cg(file.generator) {}
     void generate(const LgsAppConfigs& appConfigs, TargetMachine& targetMachine);
@@ -107,9 +108,7 @@ public:
     void visitIterIndex(LgsIterIndex* iterIndex);
 
     void generateIf(Value* cond, const std::function<void()>& blockStmtCb);
-    void startBlock(BasicBlock* block);
-    void branchAndStartBlock(BasicBlock* block);
-    void createPrologue(LgsFunc* func) const;
+    void createPrologue(LgsFunc* func);
     void createEpilogue(LgsFunc* func);
     void freeHeap(const LgsFunc* func);
 

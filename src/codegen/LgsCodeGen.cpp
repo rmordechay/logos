@@ -179,7 +179,7 @@ void LgsCodeGen::visitLoop(LgsForLoop* loopStmt) {
     }
     visitStmtsBlock(loopStmt->stmtsBlock);
     loopStmt->incAndJumpToCond(cg);
-    startBlock(loopStmt->IRExitBlock);
+    cg.startBlock(loopStmt->IRExitBlock, currentIRFunc);
     stack.exitScope();
 }
 
@@ -189,27 +189,27 @@ void LgsCodeGen::visitRangeLoop(LgsRangeLoop* loop) {
     cg.builder.CreateBr(loop->IRCondBlock);
 
     // Condition
-    startBlock(loop->IRCondBlock);
+    cg.startBlock(loop->IRCondBlock, currentIRFunc);
     const auto iValue = loop->loadIndex(cg);
     const auto condition = cg.builder.CreateICmpSLT(iValue, loopEnd(loop));
     visitLoopTerminals(loop, iValue);
     cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
 
     // Body
-    startBlock(loop->IRBodyBlock);
+    cg.startBlock(loop->IRBodyBlock, currentIRFunc);
     loop->loopVars.front()->setIRValue(iValue);
 }
 
 void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
     loop->iPtr = cg.builder.CreateAlloca(cg.i32Ty());
     cg.builder.CreateStore(cg.i32Zero(), loop->iPtr);
-    branchAndStartBlock(loop->IRCondBlock);
+    cg.branchAndStartBlock(loop->IRCondBlock, currentIRFunc);
     const auto iterable = loop->iterExpr->type->asIterable();
     if (iterable->asMap()) { // With iterator
         LgsIterator iterator = loop->iterExpr->toIterator();
         iterator.initIterator(cg);
         cg.builder.CreateCondBr(iterator.hasNext(cg), loop->IRBodyBlock, loop->IRExitBlock);
-        startBlock(loop->IRBodyBlock);
+        cg.startBlock(loop->IRBodyBlock, currentIRFunc);
         loop->iterPtr = getIRValue(loop->iterExpr);
         loop->setMapIterVars(cg, iterator);
     } else { // Without iterator
@@ -220,7 +220,7 @@ void LgsCodeGen::visitForeachLoop(LgsForeachLoop* loop) {
         }
         const auto condition = cg.builder.CreateICmpSLT(iValue, loopEnd);
         cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
-        startBlock(loop->IRBodyBlock);
+        cg.startBlock(loop->IRBodyBlock, currentIRFunc);
         loop->iterPtr = getIRValue(loop->iterExpr);
         if (const auto str = iterable->asStr()) {
             loop->setStrIterVars(cg, str);
@@ -237,7 +237,7 @@ void LgsCodeGen::visitInfiniteLoop(LgsInfiniteLoop* loop) {
         loop->iPtr = cg.builder.CreateAlloca(cg.i32Ty());
         cg.builder.CreateStore(cg.i32Zero(), loop->iPtr);
     }
-    branchAndStartBlock(loop->IRBodyBlock);
+    cg.branchAndStartBlock(loop->IRBodyBlock, currentIRFunc);
     if (!loop->loopVars.empty()) {
         const auto iValue = loop->loadIndex(cg);
         loop->loopVars.front()->setIRValue(iValue);
@@ -247,11 +247,11 @@ void LgsCodeGen::visitInfiniteLoop(LgsInfiniteLoop* loop) {
 void LgsCodeGen::visitWhileLoop(LgsWhileLoop* loop) {
     cg.builder.CreateBr(loop->IRCondBlock);
     // Condition
-    startBlock(loop->IRCondBlock);
+    cg.startBlock(loop->IRCondBlock, currentIRFunc);
     const auto condition = getIRValue(loop->condExpr);
     cg.builder.CreateCondBr(condition, loop->IRBodyBlock, loop->IRExitBlock);
     // Body
-    startBlock(loop->IRBodyBlock);
+    cg.startBlock(loop->IRBodyBlock, currentIRFunc);
 }
 
 void LgsCodeGen::visitLoopTerminals(const LgsRangeLoop* loop, Value* iValue) {
@@ -335,9 +335,9 @@ void LgsCodeGen::visitSimpleIf(LgsIfStmt* ifStmt) {
 
     stack.enterScope(ifStmt);
     cg.builder.CreateCondBr(getIRValue(ifStmt->ifCond), IRBlockIfTrue, ifStmt->IRExitBlock);
-    startBlock(IRBlockIfTrue);
+    cg.startBlock(IRBlockIfTrue, currentIRFunc);
     visitStmtsBlock(ifStmt->ifBlock);
-    branchAndStartBlock(ifStmt->IRExitBlock);
+    cg.branchAndStartBlock(ifStmt->IRExitBlock, currentIRFunc);
     stack.exitScope();
 }
 
@@ -350,16 +350,16 @@ void LgsCodeGen::visitIfWithElse(LgsIfStmt* ifStmt) {
     stack.enterScope(ifStmt);
     const auto ifCondIR = getIRValue(ifStmt->ifCond);
     cg.builder.CreateCondBr(ifCondIR, IRBlockTrue, IRBlockElse);
-    startBlock(IRBlockTrue);
+    cg.startBlock(IRBlockTrue, currentIRFunc);
     visitStmtsBlock(ifStmt->ifBlock);
     cg.branchIfNeeded(ifStmt->IRExitBlock);
     stack.exitScope();
 
     // else block
     stack.enterScope(ifStmt);
-    startBlock(IRBlockElse);
+    cg.startBlock(IRBlockElse, currentIRFunc);
     visitStmtsBlock(ifStmt->elseBlock);
-    branchAndStartBlock(ifStmt->IRExitBlock);
+    cg.branchAndStartBlock(ifStmt->IRExitBlock, currentIRFunc);
     stack.exitScope();
 }
 
@@ -374,7 +374,7 @@ void LgsCodeGen::visitElseIf(LgsIfStmt* ifStmt) {
     stack.enterScope(ifStmt);
     const auto ifCondIR = getIRValue(ifStmt->ifCond);
     cg.builder.CreateCondBr(ifCondIR, IRBlockTrue, IRBlockElseIfCheck);
-    startBlock(IRBlockTrue);
+    cg.startBlock(IRBlockTrue, currentIRFunc);
     visitStmtsBlock(ifStmt->ifBlock);
     cg.branchIfNeeded(ifStmt->IRExitBlock);
     stack.exitScope();
@@ -382,7 +382,7 @@ void LgsCodeGen::visitElseIf(LgsIfStmt* ifStmt) {
     for (int i = 0; i < ifStmt->elseIfs.size(); ++i) {
         const auto [expr, stmtBlock] = ifStmt->elseIfs[i];
         stack.enterScope(ifStmt);
-        startBlock(IRBlockElseIfCheck);
+        cg.startBlock(IRBlockElseIfCheck, currentIRFunc);
         const auto elseIfCondIR = getIRValue(expr);
         IRBlockTrue = cg.createBlock(BLOCK_NAME_ELSE_IF);
         if (i == ifStmt->elseIfs.size() - 1) {
@@ -395,7 +395,7 @@ void LgsCodeGen::visitElseIf(LgsIfStmt* ifStmt) {
             IRBlockElseIfCheck = cg.createBlock(BLOCK_NAME_ELSE_IF_CHECK);
             cg.builder.CreateCondBr(elseIfCondIR, IRBlockTrue, IRBlockElseIfCheck);
         }
-        startBlock(IRBlockTrue);
+        cg.startBlock(IRBlockTrue, currentIRFunc);
         visitStmtsBlock(stmtBlock);
         cg.branchIfNeeded(ifStmt->IRExitBlock);
         stack.exitScope();
@@ -403,12 +403,12 @@ void LgsCodeGen::visitElseIf(LgsIfStmt* ifStmt) {
 
     if (ifStmt->elseBlock) {
         stack.enterScope(ifStmt);
-        startBlock(IRBlockElse);
+        cg.startBlock(IRBlockElse, currentIRFunc);
         visitStmtsBlock(ifStmt->elseBlock);
         cg.branchIfNeeded(ifStmt->IRExitBlock);
         stack.exitScope();
     }
-    startBlock(ifStmt->IRExitBlock);
+    cg.startBlock(ifStmt->IRExitBlock, currentIRFunc);
 }
 
 void LgsCodeGen::visitPatternMatching(LgsIfStmt* pm) {
@@ -429,8 +429,7 @@ void LgsCodeGen::visitPatternMatching(LgsIfStmt* pm) {
         const auto [expr, stmtsBlock] = pm->elseIfs[i];
         stack.enterScope(pm);
         const auto patterIRValue = expr->hash(cg);
-        const auto IRFunc = stack.currentFunc()->getIRFunc(cg);
-        const auto patternBlock = cg.createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), IRFunc);
+        const auto patternBlock = cg.createBlock(BLOCK_NAME_CASE_PREFIX + std::to_string(i), currentIRFunc);
         switchInst->addCase(dyn_cast<ConstantInt>(patterIRValue), patternBlock);
         cg.builder.SetInsertPoint(patternBlock);
         cg.builder.CreateBr(exitBlock);
@@ -439,13 +438,12 @@ void LgsCodeGen::visitPatternMatching(LgsIfStmt* pm) {
 
     if (pm->elseBlock) {
         stack.enterScope(pm);
-        startBlock(defaultBlock);
+        cg.startBlock(defaultBlock, currentIRFunc);
         cg.builder.CreateBr(exitBlock);
         stack.exitScope();
     }
 
-    startBlock(exitBlock);
-
+    cg.startBlock(exitBlock, currentIRFunc);
 }
 
 void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
@@ -468,10 +466,9 @@ void LgsCodeGen::visitCoroutine(const LgsCoroutine* coroutine) {
 void LgsCodeGen::visitReturnStmt(LgsReturn* returnStmt) {
     returnStmt->IRValue = returnStmt->expr ? getIRValue(returnStmt->expr) : nullptr;
     const auto currentFunc = stack.currentFunc();
-    const auto currentStmtsBlock = stack.currentFunc();
-    if (currentStmtsBlock->needsCleanup()) {
+    if (currentFunc->needsCleanup()) {
         returnStmt->parentBlock = cg.builder.GetInsertBlock();
-        const auto cleanupBlock = currentStmtsBlock->getCleanupBlock(cg);
+        const auto cleanupBlock = currentFunc->getCleanupBlock(cg);
         cg.builder.CreateBr(cleanupBlock);
     } else {
         if (currentFunc->funcType->rt->isVoid()) {
@@ -781,34 +778,25 @@ void LgsCodeGen::generateIf(Value* cond, const std::function<void()>& blockStmtC
     const auto IRBlockIfTrue = cg.createBlock(BLOCK_NAME_IF_TRUE);
     const auto IRBlockIfFalse = cg.createBlock(BLOCK_NAME_IF_FALSE);
     cg.builder.CreateCondBr(cond, IRBlockIfTrue, IRBlockIfFalse);
-    startBlock(IRBlockIfTrue);
+    cg.startBlock(IRBlockIfTrue, currentIRFunc);
     blockStmtCb();
-    branchAndStartBlock(IRBlockIfFalse);
+    cg.branchAndStartBlock(IRBlockIfFalse, currentIRFunc);
 }
 
-void LgsCodeGen::startBlock(BasicBlock* block) {
-    block->insertInto(stack.currentFunc()->getIRFunc(cg));
-    cg.builder.SetInsertPoint(block);
-}
-
-void LgsCodeGen::branchAndStartBlock(BasicBlock* block) {
-    cg.branchIfNeeded(block);
-    startBlock(block);
-}
-
-void LgsCodeGen::createPrologue(LgsFunc* func) const {
-    const auto IRFunc = func->getIRFunc(cg);
-    IRFunc->setLinkage(func->funcType->isPublic ? GlobalValue::ExternalLinkage : GlobalValue::PrivateLinkage);
-    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, IRFunc);
+void LgsCodeGen::createPrologue(LgsFunc* func) {
+    currentIRFunc = func->getIRFunc(cg);
+    currentIRFunc->setLinkage(func->funcType->isPublic ? GlobalValue::ExternalLinkage : GlobalValue::PrivateLinkage);
+    const auto entryBlock = cg.createBlock(BLOCK_NAME_ENTRY, currentIRFunc);
     cg.builder.SetInsertPoint(entryBlock);
     cg.callStackPush();
 }
 
 void LgsCodeGen::createEpilogue(LgsFunc* func) {
-    branchAndStartBlock(func->getCleanupBlock(cg));
+    cg.branchAndStartBlock(func->getCleanupBlock(cg), currentIRFunc);
     if (func->hasDefers) {
         cg.callDefers();
     }
+    currentIRFunc = nullptr;
     // 0 return, 0 heap
     // 1 return, 0 heap
     // >1 return, 0 heap
